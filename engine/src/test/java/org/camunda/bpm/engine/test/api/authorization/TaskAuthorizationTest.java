@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.test.api.authorization;
 
 
 import static org.camunda.bpm.engine.authorization.Authorization.ANY;
+import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GRANT;
 import static org.camunda.bpm.engine.authorization.Permissions.CREATE;
 import static org.camunda.bpm.engine.authorization.Permissions.CREATE_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Permissions.DELETE;
@@ -31,11 +32,12 @@ import java.util.List;
 import java.util.Map;
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.authorization.Authorization;
-import org.camunda.bpm.engine.authorization.Resources;
+import org.camunda.bpm.engine.authorization.*;
 import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.TaskServiceImpl;
+import org.camunda.bpm.engine.impl.cfg.auth.DefaultAuthorizationProvider;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
+import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 import org.camunda.bpm.engine.task.IdentityLink;
@@ -3563,7 +3565,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     assertNotNull(task);
     assertEquals("demo", task.getAssignee());
 
-   }
+  }
 
   public void testProcessTaskClaimTaskWithRevokeTaskWorkPermissionOnProcessDefinition() {
     // given
@@ -3582,7 +3584,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
       assertTextPresent("The user with id 'test' does not have one of the following permissions: 'TASK_WORK", e.getMessage());
     }
 
-   }
+  }
 
   public void testProcessTaskClaimTask() {
     startProcessInstanceByKey(PROCESS_KEY);
@@ -4714,9 +4716,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     // then
     disableAuthorization();
     Authorization authorization = authorizationService
-      .createAuthorizationQuery()
-      .userIdIn("demo")
-      .singleResult();
+        .createAuthorizationQuery()
+        .userIdIn("demo")
+        .singleResult();
     enableAuthorization();
 
     assertNotNull(authorization);
@@ -4742,9 +4744,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     // then
     disableAuthorization();
     Authorization authorization = authorizationService
-      .createAuthorizationQuery()
-      .userIdIn("demo")
-      .singleResult();
+        .createAuthorizationQuery()
+        .userIdIn("demo")
+        .singleResult();
     enableAuthorization();
 
     assertNotNull(authorization);
@@ -4772,9 +4774,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     // authorization for demo is still available
     disableAuthorization();
     Authorization authorization = authorizationService
-      .createAuthorizationQuery()
-      .userIdIn("demo")
-      .singleResult();
+        .createAuthorizationQuery()
+        .userIdIn("demo")
+        .singleResult();
     enableAuthorization();
 
     assertNotNull(authorization);
@@ -4825,9 +4827,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     // then
     disableAuthorization();
     Authorization authorization = authorizationService
-      .createAuthorizationQuery()
-      .userIdIn("demo")
-      .singleResult();
+        .createAuthorizationQuery()
+        .userIdIn("demo")
+        .singleResult();
     enableAuthorization();
 
     assertNotNull(authorization);
@@ -4854,9 +4856,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     // then
     disableAuthorization();
     Authorization authorization = authorizationService
-      .createAuthorizationQuery()
-      .userIdIn("demo")
-      .singleResult();
+        .createAuthorizationQuery()
+        .userIdIn("demo")
+        .singleResult();
     enableAuthorization();
 
     assertNotNull(authorization);
@@ -4883,9 +4885,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     // then
     disableAuthorization();
     Authorization authorization = authorizationService
-      .createAuthorizationQuery()
-      .userIdIn("demo")
-      .singleResult();
+        .createAuthorizationQuery()
+        .userIdIn("demo")
+        .singleResult();
     enableAuthorization();
 
     assertNotNull(authorization);
@@ -4909,9 +4911,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     // then
     disableAuthorization();
     Authorization authorization = authorizationService
-      .createAuthorizationQuery()
-      .userIdIn("demo")
-      .singleResult();
+        .createAuthorizationQuery()
+        .userIdIn("demo")
+        .singleResult();
     enableAuthorization();
 
     assertNotNull(authorization);
@@ -4937,9 +4939,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     // authorization for demo is still available
     disableAuthorization();
     Authorization authorization = authorizationService
-      .createAuthorizationQuery()
-      .userIdIn("demo")
-      .singleResult();
+        .createAuthorizationQuery()
+        .userIdIn("demo")
+        .singleResult();
     enableAuthorization();
 
     assertNotNull(authorization);
@@ -4985,9 +4987,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     String taskId = selectSingleTask().getId();
     disableAuthorization();
     Authorization authorization = authorizationService
-      .createAuthorizationQuery()
-      .userIdIn("demo")
-      .singleResult();
+        .createAuthorizationQuery()
+        .userIdIn("demo")
+        .singleResult();
     enableAuthorization();
 
     assertNotNull(authorization);
@@ -5023,9 +5025,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     // then
     disableAuthorization();
     Authorization authorization = authorizationService
-      .createAuthorizationQuery()
-      .userIdIn("demo")
-      .singleResult();
+        .createAuthorizationQuery()
+        .userIdIn("demo")
+        .singleResult();
     enableAuthorization();
 
     assertNull(authorization);
@@ -5046,9 +5048,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     // then
     disableAuthorization();
     Authorization authorization = authorizationService
-      .createAuthorizationQuery()
-      .userIdIn("demo")
-      .singleResult();
+        .createAuthorizationQuery()
+        .userIdIn("demo")
+        .singleResult();
     enableAuthorization();
 
     assertNotNull(authorization);
@@ -5074,9 +5076,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     // then
     disableAuthorization();
     Authorization authorization = authorizationService
-      .createAuthorizationQuery()
-      .userIdIn("demo")
-      .singleResult();
+        .createAuthorizationQuery()
+        .userIdIn("demo")
+        .singleResult();
     enableAuthorization();
 
     assertNotNull(authorization);
@@ -5126,9 +5128,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     // then
     disableAuthorization();
     Authorization authorization = authorizationService
-      .createAuthorizationQuery()
-      .userIdIn("demo")
-      .singleResult();
+        .createAuthorizationQuery()
+        .userIdIn("demo")
+        .singleResult();
     enableAuthorization();
 
     assertNotNull(authorization);
@@ -5156,9 +5158,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     // then
     disableAuthorization();
     Authorization authorization = authorizationService
-      .createAuthorizationQuery()
-      .userIdIn("demo")
-      .singleResult();
+        .createAuthorizationQuery()
+        .userIdIn("demo")
+        .singleResult();
     enableAuthorization();
 
     assertNotNull(authorization);
@@ -5185,9 +5187,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     // then
     disableAuthorization();
     Authorization authorization = authorizationService
-      .createAuthorizationQuery()
-      .userIdIn("demo")
-      .singleResult();
+        .createAuthorizationQuery()
+        .userIdIn("demo")
+        .singleResult();
     enableAuthorization();
 
     assertNotNull(authorization);
@@ -5211,9 +5213,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     // then
     disableAuthorization();
     Authorization authorization = authorizationService
-      .createAuthorizationQuery()
-      .userIdIn("demo")
-      .singleResult();
+        .createAuthorizationQuery()
+        .userIdIn("demo")
+        .singleResult();
     enableAuthorization();
 
     assertNotNull(authorization);
@@ -5260,9 +5262,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     // then
     disableAuthorization();
     Authorization authorization = authorizationService
-      .createAuthorizationQuery()
-      .userIdIn("demo")
-      .singleResult();
+        .createAuthorizationQuery()
+        .userIdIn("demo")
+        .singleResult();
     enableAuthorization();
 
     assertNull(authorization);
@@ -5282,9 +5284,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     // then
     disableAuthorization();
     Authorization authorization = authorizationService
-      .createAuthorizationQuery()
-      .userIdIn("demo")
-      .singleResult();
+        .createAuthorizationQuery()
+        .userIdIn("demo")
+        .singleResult();
     enableAuthorization();
 
     assertNotNull(authorization);
@@ -5310,9 +5312,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     // then
     disableAuthorization();
     Authorization authorization = authorizationService
-      .createAuthorizationQuery()
-      .userIdIn("demo")
-      .singleResult();
+        .createAuthorizationQuery()
+        .userIdIn("demo")
+        .singleResult();
     enableAuthorization();
 
     assertNotNull(authorization);
@@ -5388,9 +5390,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     // then
     disableAuthorization();
     Authorization authorization = authorizationService
-      .createAuthorizationQuery()
-      .userIdIn("demo")
-      .singleResult();
+        .createAuthorizationQuery()
+        .userIdIn("demo")
+        .singleResult();
     enableAuthorization();
 
     assertNotNull(authorization);
@@ -5414,9 +5416,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     // then
     disableAuthorization();
     Authorization authorization = authorizationService
-      .createAuthorizationQuery()
-      .userIdIn("demo")
-      .singleResult();
+        .createAuthorizationQuery()
+        .userIdIn("demo")
+        .singleResult();
     enableAuthorization();
 
     assertNotNull(authorization);
@@ -5462,9 +5464,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     String taskId = selectSingleTask().getId();
     disableAuthorization();
     Authorization authorization = authorizationService
-      .createAuthorizationQuery()
-      .userIdIn("demo")
-      .singleResult();
+        .createAuthorizationQuery()
+        .userIdIn("demo")
+        .singleResult();
     enableAuthorization();
 
     assertNotNull(authorization);
@@ -5476,10 +5478,10 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     // an authorization for test has been created
     disableAuthorization();
     authorization = authorizationService
-      .createAuthorizationQuery()
-      .userIdIn("test")
-      .resourceId(taskId)
-      .singleResult();
+        .createAuthorizationQuery()
+        .userIdIn("test")
+        .resourceId(taskId)
+        .singleResult();
     enableAuthorization();
 
     assertNotNull(authorization);
@@ -5521,9 +5523,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     // then
     disableAuthorization();
     Authorization authorization = authorizationService
-      .createAuthorizationQuery()
-      .userIdIn("demo")
-      .singleResult();
+        .createAuthorizationQuery()
+        .userIdIn("demo")
+        .singleResult();
     enableAuthorization();
 
     assertNull(authorization);
@@ -5543,9 +5545,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     // then
     disableAuthorization();
     Authorization authorization = authorizationService
-      .createAuthorizationQuery()
-      .groupIdIn("management")
-      .singleResult();
+        .createAuthorizationQuery()
+        .groupIdIn("management")
+        .singleResult();
     enableAuthorization();
 
     assertNotNull(authorization);
@@ -5571,9 +5573,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     // then
     disableAuthorization();
     Authorization authorization = authorizationService
-      .createAuthorizationQuery()
-      .groupIdIn("management")
-      .singleResult();
+        .createAuthorizationQuery()
+        .groupIdIn("management")
+        .singleResult();
     enableAuthorization();
 
     assertNotNull(authorization);
@@ -5624,9 +5626,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     // then
     disableAuthorization();
     Authorization authorization = authorizationService
-      .createAuthorizationQuery()
-      .groupIdIn("management")
-      .singleResult();
+        .createAuthorizationQuery()
+        .groupIdIn("management")
+        .singleResult();
     enableAuthorization();
 
     assertNotNull(authorization);
@@ -5650,9 +5652,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     // then
     disableAuthorization();
     Authorization authorization = authorizationService
-      .createAuthorizationQuery()
-      .groupIdIn("management")
-      .singleResult();
+        .createAuthorizationQuery()
+        .groupIdIn("management")
+        .singleResult();
     enableAuthorization();
 
     assertNotNull(authorization);
@@ -5698,9 +5700,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     String taskId = selectSingleTask().getId();
     disableAuthorization();
     Authorization authorization = authorizationService
-      .createAuthorizationQuery()
-      .groupIdIn("management")
-      .singleResult();
+        .createAuthorizationQuery()
+        .groupIdIn("management")
+        .singleResult();
     enableAuthorization();
 
     assertNotNull(authorization);
@@ -5712,9 +5714,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     // an authorization for accounting has been created
     disableAuthorization();
     authorization = authorizationService
-      .createAuthorizationQuery()
-      .groupIdIn("accounting")
-      .singleResult();
+        .createAuthorizationQuery()
+        .groupIdIn("accounting")
+        .singleResult();
     enableAuthorization();
 
     assertNotNull(authorization);
@@ -5756,9 +5758,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     // then
     disableAuthorization();
     Authorization authorization = authorizationService
-      .createAuthorizationQuery()
-      .groupIdIn("management")
-      .singleResult();
+        .createAuthorizationQuery()
+        .groupIdIn("management")
+        .singleResult();
     enableAuthorization();
 
     assertNull(authorization);
@@ -9311,7 +9313,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
     try {
       // when (1)
-      ((TaskServiceImpl)taskService).updateVariablesLocal(taskId, getVariables(), null);
+      ((TaskServiceImpl) taskService).updateVariablesLocal(taskId, getVariables(), null);
       fail("Exception expected: It should not be to set a variable");
     } catch (AuthorizationException e) {
       // then (1)
@@ -9324,7 +9326,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
     try {
       // when (2)
-      ((TaskServiceImpl)taskService).updateVariablesLocal(taskId, null, Arrays.asList(VARIABLE_NAME));
+      ((TaskServiceImpl) taskService).updateVariablesLocal(taskId, null, Arrays.asList(VARIABLE_NAME));
       fail("Exception expected: It should not be to set a variable");
     } catch (AuthorizationException e) {
       // then (2)
@@ -9337,7 +9339,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
     try {
       // when (3)
-      ((TaskServiceImpl)taskService).updateVariablesLocal(taskId, getVariables(), Arrays.asList(VARIABLE_NAME));
+      ((TaskServiceImpl) taskService).updateVariablesLocal(taskId, getVariables(), Arrays.asList(VARIABLE_NAME));
       fail("Exception expected: It should not be to set a variable");
     } catch (AuthorizationException e) {
       // then (3)
@@ -9359,7 +9361,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
 
     // when (1)
-    ((TaskServiceImpl)taskService).updateVariablesLocal(taskId, getVariables(), null);
+    ((TaskServiceImpl) taskService).updateVariablesLocal(taskId, getVariables(), null);
 
     // then (1)
     disableAuthorization();
@@ -9367,7 +9369,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     enableAuthorization();
 
     // when (2)
-    ((TaskServiceImpl)taskService).updateVariablesLocal(taskId, null, Arrays.asList(VARIABLE_NAME));
+    ((TaskServiceImpl) taskService).updateVariablesLocal(taskId, null, Arrays.asList(VARIABLE_NAME));
 
     // then (2)
     disableAuthorization();
@@ -9375,7 +9377,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     enableAuthorization();
 
     // when (3)
-    ((TaskServiceImpl)taskService).updateVariablesLocal(taskId, getVariables(), Arrays.asList(VARIABLE_NAME));
+    ((TaskServiceImpl) taskService).updateVariablesLocal(taskId, getVariables(), Arrays.asList(VARIABLE_NAME));
 
     // then (3)
     disableAuthorization();
@@ -9393,7 +9395,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
 
     // when (1)
-    ((TaskServiceImpl)taskService).updateVariablesLocal(taskId, getVariables(), null);
+    ((TaskServiceImpl) taskService).updateVariablesLocal(taskId, getVariables(), null);
 
     // then (1)
     disableAuthorization();
@@ -9401,7 +9403,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     enableAuthorization();
 
     // when (2)
-    ((TaskServiceImpl)taskService).updateVariablesLocal(taskId, null, Arrays.asList(VARIABLE_NAME));
+    ((TaskServiceImpl) taskService).updateVariablesLocal(taskId, null, Arrays.asList(VARIABLE_NAME));
 
     // then (2)
     disableAuthorization();
@@ -9409,7 +9411,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     enableAuthorization();
 
     // when (3)
-    ((TaskServiceImpl)taskService).updateVariablesLocal(taskId, getVariables(), Arrays.asList(VARIABLE_NAME));
+    ((TaskServiceImpl) taskService).updateVariablesLocal(taskId, getVariables(), Arrays.asList(VARIABLE_NAME));
 
     // then (3)
     disableAuthorization();
@@ -9428,7 +9430,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
     try {
       // when (1)
-      ((TaskServiceImpl)taskService).updateVariablesLocal(taskId, getVariables(), null);
+      ((TaskServiceImpl) taskService).updateVariablesLocal(taskId, getVariables(), null);
       fail("Exception expected: It should not be to set a variable");
     } catch (AuthorizationException e) {
       // then (1)
@@ -9444,7 +9446,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
     try {
       // when (2)
-      ((TaskServiceImpl)taskService).updateVariablesLocal(taskId, null, Arrays.asList(VARIABLE_NAME));
+      ((TaskServiceImpl) taskService).updateVariablesLocal(taskId, null, Arrays.asList(VARIABLE_NAME));
       fail("Exception expected: It should not be to set a variable");
     } catch (AuthorizationException e) {
       // then (2)
@@ -9460,7 +9462,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
     try {
       // when (3)
-      ((TaskServiceImpl)taskService).updateVariablesLocal(taskId, getVariables(), Arrays.asList(VARIABLE_NAME));
+      ((TaskServiceImpl) taskService).updateVariablesLocal(taskId, getVariables(), Arrays.asList(VARIABLE_NAME));
       fail("Exception expected: It should not be to set a variable");
     } catch (AuthorizationException e) {
       // then (3)
@@ -9483,7 +9485,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
 
     // when (1)
-    ((TaskServiceImpl)taskService).updateVariablesLocal(taskId, getVariables(), null);
+    ((TaskServiceImpl) taskService).updateVariablesLocal(taskId, getVariables(), null);
 
     // then (1)
     disableAuthorization();
@@ -9491,7 +9493,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     enableAuthorization();
 
     // when (2)
-    ((TaskServiceImpl)taskService).updateVariablesLocal(taskId, null, Arrays.asList(VARIABLE_NAME));
+    ((TaskServiceImpl) taskService).updateVariablesLocal(taskId, null, Arrays.asList(VARIABLE_NAME));
 
     // then (2)
     disableAuthorization();
@@ -9499,7 +9501,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     enableAuthorization();
 
     // when (3)
-    ((TaskServiceImpl)taskService).updateVariablesLocal(taskId, getVariables(), Arrays.asList(VARIABLE_NAME));
+    ((TaskServiceImpl) taskService).updateVariablesLocal(taskId, getVariables(), Arrays.asList(VARIABLE_NAME));
 
     // then (3)
     disableAuthorization();
@@ -9515,7 +9517,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
 
     // when (1)
-    ((TaskServiceImpl)taskService).updateVariablesLocal(taskId, getVariables(), null);
+    ((TaskServiceImpl) taskService).updateVariablesLocal(taskId, getVariables(), null);
 
     // then (1)
     disableAuthorization();
@@ -9523,7 +9525,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     enableAuthorization();
 
     // when (2)
-    ((TaskServiceImpl)taskService).updateVariablesLocal(taskId, null, Arrays.asList(VARIABLE_NAME));
+    ((TaskServiceImpl) taskService).updateVariablesLocal(taskId, null, Arrays.asList(VARIABLE_NAME));
 
     // then (2)
     disableAuthorization();
@@ -9531,7 +9533,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     enableAuthorization();
 
     // when (3)
-    ((TaskServiceImpl)taskService).updateVariablesLocal(taskId, getVariables(), Arrays.asList(VARIABLE_NAME));
+    ((TaskServiceImpl) taskService).updateVariablesLocal(taskId, getVariables(), Arrays.asList(VARIABLE_NAME));
 
     // then (3)
     disableAuthorization();
@@ -9547,7 +9549,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
 
     // when (1)
-    ((TaskServiceImpl)taskService).updateVariablesLocal(taskId, getVariables(), null);
+    ((TaskServiceImpl) taskService).updateVariablesLocal(taskId, getVariables(), null);
 
     // then (1)
     disableAuthorization();
@@ -9555,7 +9557,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     enableAuthorization();
 
     // when (2)
-    ((TaskServiceImpl)taskService).updateVariablesLocal(taskId, null, Arrays.asList(VARIABLE_NAME));
+    ((TaskServiceImpl) taskService).updateVariablesLocal(taskId, null, Arrays.asList(VARIABLE_NAME));
 
     // then (2)
     disableAuthorization();
@@ -9563,7 +9565,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     enableAuthorization();
 
     // when (3)
-    ((TaskServiceImpl)taskService).updateVariablesLocal(taskId, getVariables(), Arrays.asList(VARIABLE_NAME));
+    ((TaskServiceImpl) taskService).updateVariablesLocal(taskId, getVariables(), Arrays.asList(VARIABLE_NAME));
 
     // then (3)
     disableAuthorization();
@@ -9579,7 +9581,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
 
     // when (1)
-    ((TaskServiceImpl)taskService).updateVariablesLocal(taskId, getVariables(), null);
+    ((TaskServiceImpl) taskService).updateVariablesLocal(taskId, getVariables(), null);
 
     // then (1)
     disableAuthorization();
@@ -9587,7 +9589,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     enableAuthorization();
 
     // when (2)
-    ((TaskServiceImpl)taskService).updateVariablesLocal(taskId, null, Arrays.asList(VARIABLE_NAME));
+    ((TaskServiceImpl) taskService).updateVariablesLocal(taskId, null, Arrays.asList(VARIABLE_NAME));
 
     // then (2)
     disableAuthorization();
@@ -9595,7 +9597,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     enableAuthorization();
 
     // when (3)
-    ((TaskServiceImpl)taskService).updateVariablesLocal(taskId, getVariables(), Arrays.asList(VARIABLE_NAME));
+    ((TaskServiceImpl) taskService).updateVariablesLocal(taskId, getVariables(), Arrays.asList(VARIABLE_NAME));
 
     // then (3)
     disableAuthorization();
@@ -9612,7 +9614,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
 
     // when (1)
-    ((TaskServiceImpl)taskService).updateVariablesLocal(taskId, getVariables(), null);
+    ((TaskServiceImpl) taskService).updateVariablesLocal(taskId, getVariables(), null);
 
     // then (1)
     disableAuthorization();
@@ -9620,7 +9622,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     enableAuthorization();
 
     // when (2)
-    ((TaskServiceImpl)taskService).updateVariablesLocal(taskId, null, Arrays.asList(VARIABLE_NAME));
+    ((TaskServiceImpl) taskService).updateVariablesLocal(taskId, null, Arrays.asList(VARIABLE_NAME));
 
     // then (2)
     disableAuthorization();
@@ -9628,7 +9630,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     enableAuthorization();
 
     // when (3)
-    ((TaskServiceImpl)taskService).updateVariablesLocal(taskId, getVariables(), Arrays.asList(VARIABLE_NAME));
+    ((TaskServiceImpl) taskService).updateVariablesLocal(taskId, getVariables(), Arrays.asList(VARIABLE_NAME));
 
     // then (3)
     disableAuthorization();
@@ -9645,7 +9647,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
     try {
       // when (1)
-      ((TaskServiceImpl)taskService).updateVariables(taskId, getVariables(), null);
+      ((TaskServiceImpl) taskService).updateVariables(taskId, getVariables(), null);
       fail("Exception expected: It should not be to set a variable");
     } catch (AuthorizationException e) {
       // then (1)
@@ -9661,7 +9663,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
     try {
       // when (2)
-      ((TaskServiceImpl)taskService).updateVariables(taskId, null, Arrays.asList(VARIABLE_NAME));
+      ((TaskServiceImpl) taskService).updateVariables(taskId, null, Arrays.asList(VARIABLE_NAME));
       fail("Exception expected: It should not be to set a variable");
     } catch (AuthorizationException e) {
       // then (2)
@@ -9677,7 +9679,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
     try {
       // when (3)
-      ((TaskServiceImpl)taskService).updateVariables(taskId, getVariables(), Arrays.asList(VARIABLE_NAME));
+      ((TaskServiceImpl) taskService).updateVariables(taskId, getVariables(), Arrays.asList(VARIABLE_NAME));
       fail("Exception expected: It should not be to set a variable");
     } catch (AuthorizationException e) {
       // then (3)
@@ -9700,7 +9702,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
 
     // when (1)
-    ((TaskServiceImpl)taskService).updateVariables(taskId, getVariables(), null);
+    ((TaskServiceImpl) taskService).updateVariables(taskId, getVariables(), null);
 
     // then (1)
     disableAuthorization();
@@ -9708,7 +9710,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     enableAuthorization();
 
     // when (2)
-    ((TaskServiceImpl)taskService).updateVariables(taskId, null, Arrays.asList(VARIABLE_NAME));
+    ((TaskServiceImpl) taskService).updateVariables(taskId, null, Arrays.asList(VARIABLE_NAME));
 
     // then (2)
     disableAuthorization();
@@ -9716,7 +9718,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     enableAuthorization();
 
     // when (3)
-    ((TaskServiceImpl)taskService).updateVariables(taskId, getVariables(), Arrays.asList(VARIABLE_NAME));
+    ((TaskServiceImpl) taskService).updateVariables(taskId, getVariables(), Arrays.asList(VARIABLE_NAME));
 
     // then (3)
     disableAuthorization();
@@ -9732,7 +9734,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
 
     // when (1)
-    ((TaskServiceImpl)taskService).updateVariables(taskId, getVariables(), null);
+    ((TaskServiceImpl) taskService).updateVariables(taskId, getVariables(), null);
 
     // then (1)
     disableAuthorization();
@@ -9740,7 +9742,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     enableAuthorization();
 
     // when (2)
-    ((TaskServiceImpl)taskService).updateVariables(taskId, null, Arrays.asList(VARIABLE_NAME));
+    ((TaskServiceImpl) taskService).updateVariables(taskId, null, Arrays.asList(VARIABLE_NAME));
 
     // then (2)
     disableAuthorization();
@@ -9748,7 +9750,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     enableAuthorization();
 
     // when (3)
-    ((TaskServiceImpl)taskService).updateVariables(taskId, getVariables(), Arrays.asList(VARIABLE_NAME));
+    ((TaskServiceImpl) taskService).updateVariables(taskId, getVariables(), Arrays.asList(VARIABLE_NAME));
 
     // then (3)
     disableAuthorization();
@@ -9764,7 +9766,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
 
     // when (1)
-    ((TaskServiceImpl)taskService).updateVariables(taskId, getVariables(), null);
+    ((TaskServiceImpl) taskService).updateVariables(taskId, getVariables(), null);
 
     // then (1)
     disableAuthorization();
@@ -9772,7 +9774,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     enableAuthorization();
 
     // when (2)
-    ((TaskServiceImpl)taskService).updateVariables(taskId, null, Arrays.asList(VARIABLE_NAME));
+    ((TaskServiceImpl) taskService).updateVariables(taskId, null, Arrays.asList(VARIABLE_NAME));
 
     // then (2)
     disableAuthorization();
@@ -9780,7 +9782,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     enableAuthorization();
 
     // when (3)
-    ((TaskServiceImpl)taskService).updateVariables(taskId, getVariables(), Arrays.asList(VARIABLE_NAME));
+    ((TaskServiceImpl) taskService).updateVariables(taskId, getVariables(), Arrays.asList(VARIABLE_NAME));
 
     // then (3)
     disableAuthorization();
@@ -9796,7 +9798,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
 
     // when (1)
-    ((TaskServiceImpl)taskService).updateVariables(taskId, getVariables(), null);
+    ((TaskServiceImpl) taskService).updateVariables(taskId, getVariables(), null);
 
     // then (1)
     disableAuthorization();
@@ -9804,7 +9806,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     enableAuthorization();
 
     // when (2)
-    ((TaskServiceImpl)taskService).updateVariables(taskId, null, Arrays.asList(VARIABLE_NAME));
+    ((TaskServiceImpl) taskService).updateVariables(taskId, null, Arrays.asList(VARIABLE_NAME));
 
     // then (2)
     disableAuthorization();
@@ -9812,7 +9814,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     enableAuthorization();
 
     // when (3)
-    ((TaskServiceImpl)taskService).updateVariables(taskId, getVariables(), Arrays.asList(VARIABLE_NAME));
+    ((TaskServiceImpl) taskService).updateVariables(taskId, getVariables(), Arrays.asList(VARIABLE_NAME));
 
     // then (3)
     disableAuthorization();
@@ -9829,7 +9831,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
 
     // when (1)
-    ((TaskServiceImpl)taskService).updateVariables(taskId, getVariables(), null);
+    ((TaskServiceImpl) taskService).updateVariables(taskId, getVariables(), null);
 
     // then (1)
     disableAuthorization();
@@ -9837,7 +9839,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     enableAuthorization();
 
     // when (2)
-    ((TaskServiceImpl)taskService).updateVariables(taskId, null, Arrays.asList(VARIABLE_NAME));
+    ((TaskServiceImpl) taskService).updateVariables(taskId, null, Arrays.asList(VARIABLE_NAME));
 
     // then (2)
     disableAuthorization();
@@ -9845,7 +9847,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     enableAuthorization();
 
     // when (3)
-    ((TaskServiceImpl)taskService).updateVariables(taskId, getVariables(), Arrays.asList(VARIABLE_NAME));
+    ((TaskServiceImpl) taskService).updateVariables(taskId, getVariables(), Arrays.asList(VARIABLE_NAME));
 
     // then (3)
     disableAuthorization();
@@ -10027,6 +10029,95 @@ public class TaskAuthorizationTest extends AuthorizationTest {
           + "id cannot be *. * is a reserved identifier.", e.getMessage());
     }
   }
+
+  public void testAssignSameAssigneeAndOwnerToTask() {
+
+    // given
+    createGrantAuthorization(Resources.TASK, Authorization.ANY, userId, Permissions.ALL);
+
+    // when
+    Task newTask = taskService.newTask();
+    newTask.setAssignee("Horst");
+    newTask.setOwner("Horst");
+
+    // then
+    Exception ex = null;
+    try {
+      taskService.saveTask(newTask);
+    } catch (Exception e) {
+      ex = e;
+    }
+    assertEquals(null, ex);
+
+    taskService.deleteTask(newTask.getId(), true);
+  }
+
+  public void testPermissionsOnAssignSameAssigneeAndOwnerToTask() {
+
+    try {
+      // given
+      createGrantAuthorization(Resources.TASK, Authorization.ANY, userId, Permissions.CREATE, Permissions.DELETE, Permissions.READ);
+      processEngineConfiguration.setResourceAuthorizationProvider(new MyExtendedPermissionDefaultAuthorizationProvider());
+
+      // when
+      Task newTask = taskService.newTask();
+      newTask.setAssignee("Horst");
+      newTask.setOwner("Horst");
+      taskService.saveTask(newTask);
+
+      // then
+      Authorization auth = authorizationService.createAuthorizationQuery().userIdIn("Horst").singleResult();
+      assertTrue(auth.isPermissionGranted(Permissions.DELETE_HISTORY));
+
+      taskService.deleteTask(newTask.getId(), true);
+
+    } finally {
+      processEngineConfiguration.setResourceAuthorizationProvider(new DefaultAuthorizationProvider());
+    }
+
+
+  }
+
+  @Deployment
+  public void testAssignSameAssigneeAndOwnerToProcess() {
+    //given
+    // -> model as xml
+
+    // when
+    createGrantAuthorization(Resources.PROCESS_DEFINITION, Authorization.ANY, userId, Permissions.ALL);
+    createGrantAuthorization(Resources.PROCESS_INSTANCE, Authorization.ANY, userId, Permissions.ALL);
+
+    // then
+    runtimeService.startProcessInstanceByKey("process");
+
+  }
+
+  @Deployment
+  public void testAssignSameUserToProcessTwice() {
+    //given
+    // -> model as xml
+
+    // when
+    createGrantAuthorization(Resources.PROCESS_DEFINITION, Authorization.ANY, userId, Permissions.ALL);
+    createGrantAuthorization(Resources.PROCESS_INSTANCE, Authorization.ANY, userId, Permissions.ALL);
+
+    // then
+    runtimeService.startProcessInstanceByKey("process");
+  }
+
+  @Deployment
+  public void testAssignSameGroupToProcessTwice() {
+    //given
+    // -> model as xml
+
+    // when
+    createGrantAuthorization(Resources.PROCESS_DEFINITION, Authorization.ANY, userId, Permissions.ALL);
+    createGrantAuthorization(Resources.PROCESS_INSTANCE, Authorization.ANY, userId, Permissions.ALL);
+
+    // then
+    runtimeService.startProcessInstanceByKey("process");
+  }
+
 
   // helper ////////////////////////////////////////////////////////////////////////////////
 
