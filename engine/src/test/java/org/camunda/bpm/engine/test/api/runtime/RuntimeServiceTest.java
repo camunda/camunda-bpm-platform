@@ -180,6 +180,58 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Deployment(resources={
+      "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testDeleteProcessInstances() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    // if we skip the custom listeners,
+    runtimeService.deleteProcessInstances(Arrays.asList(processInstance.getId(),processInstance2.getId()), null, false, false);
+
+    assertThat(runtimeService.createProcessInstanceQuery().count(),is(0l));
+  }
+
+  public void testDeleteProcessInstancesWithListeners() {
+
+  }
+
+  public void testDeleteProcessInstancesSkipCustomListenersEnsureHistoryWritten() {
+
+  }
+
+  public void testDeleteProcessInstancesSkipCustomListeners() {
+
+  }
+
+  public void testDeleteProcessInstancesSkipCustomListenersScope() {
+
+  }
+
+  public void testDeleteProcessInstancesSkipCustomTaskListeners() {
+
+  }
+
+  public void testDeleteProcessInstancesNullReason() {
+
+  }
+
+  public void testDeleteProcessInstancesUnexistingId() {
+
+  }
+
+  public void testDeleteProcessInstancesNullId() {
+
+  }
+
+  public void testDeleteProcessInstancesWithActiveCompensation() {
+
+  }
+
+  public void testDeleteProcessInstancesWithVariableOnScopeAndConcurrentExecution() {
+
+  }
+
   @Deployment
   public void testDeleteProcessInstanceWithListeners() {
     RecorderExecutionListener.clear();

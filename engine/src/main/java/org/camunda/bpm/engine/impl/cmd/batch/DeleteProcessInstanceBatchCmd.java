@@ -25,8 +25,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
@@ -52,8 +51,21 @@ public class DeleteProcessInstanceBatchCmd extends AbstractBatchCmd<Batch> {
     this.deleteReason = deleteReason;
   }
 
-  protected List<String> collectProcessInstanceIds(ProcessInstanceQuery processInstanceQuery) {
-    return ((ProcessInstanceQueryImpl)processInstanceQuery).listIds();
+  protected List<String> collectProcessInstanceIds() {
+
+    Set<String> collectedProcessInstanceIds = new HashSet<String>();
+
+    List<String> processInstanceIds = this.getProcessInstanceIds();
+    if (processInstanceIds != null) {
+      collectedProcessInstanceIds.addAll(processInstanceIds);
+    }
+
+    final ProcessInstanceQueryImpl processInstanceQuery = (ProcessInstanceQueryImpl) this.processInstanceQuery;
+    if (processInstanceQuery != null) {
+      collectedProcessInstanceIds.addAll(processInstanceQuery.listIds());
+    }
+
+    return new ArrayList<String>(collectedProcessInstanceIds);
   }
 
   public List<String> getProcessInstanceIds() {
@@ -62,11 +74,8 @@ public class DeleteProcessInstanceBatchCmd extends AbstractBatchCmd<Batch> {
 
   @Override
   public Batch execute(CommandContext commandContext) {
-    if (processInstanceIds == null && processInstanceQuery != null){
-      processInstanceIds = collectProcessInstanceIds(processInstanceQuery);
-    }
+    List<String> processInstanceIds = collectProcessInstanceIds();
 
-    ensureNotNull("processInstanceIds", processInstanceIds);
     ensureNotEmpty("processInstanceIds", processInstanceIds);
     checkAuthorizations(commandContext);
     writeUserOperationLog(commandContext,
@@ -88,13 +97,12 @@ public class DeleteProcessInstanceBatchCmd extends AbstractBatchCmd<Batch> {
   }
 
 
-
   protected BatchEntity createBatch(CommandContext commandContext, List<String> processInstanceIds, String deleteReason) {
     ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
     BatchJobHandler<DeleteProcessInstanceBatchConfiguration> batchJobHandler = getBatchJobHandler(processEngineConfiguration);
 
     DeleteProcessInstanceBatchConfiguration configuration = DeleteProcessInstanceBatchConfiguration
-        .create(processInstanceIds,deleteReason);
+        .create(processInstanceIds, deleteReason);
 
     BatchEntity batch = new BatchEntity();
     batch.setType(batchJobHandler.getType());
@@ -119,7 +127,7 @@ public class DeleteProcessInstanceBatchCmd extends AbstractBatchCmd<Batch> {
   }
 
   protected void writeUserOperationLog(CommandContext commandContext,
-                                       String deletionReason,
+                                       String deleteReason,
                                        int numInstances,
                                        boolean async) {
 
@@ -128,7 +136,7 @@ public class DeleteProcessInstanceBatchCmd extends AbstractBatchCmd<Batch> {
         null,
         numInstances));
     propertyChanges.add(new PropertyChange("async", null, async));
-    propertyChanges.add(new PropertyChange("deletionReason", null, deletionReason));
+    propertyChanges.add(new PropertyChange("deleteReason", null, deleteReason));
 
     commandContext.getOperationLogManager()
         .logProcessInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE,

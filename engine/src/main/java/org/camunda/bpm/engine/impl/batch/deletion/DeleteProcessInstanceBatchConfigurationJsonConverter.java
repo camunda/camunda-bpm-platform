@@ -28,13 +28,13 @@ import java.util.List;
 public class DeleteProcessInstanceBatchConfigurationJsonConverter extends JsonObjectConverter<DeleteProcessInstanceBatchConfiguration> {
   public static final DeleteProcessInstanceBatchConfigurationJsonConverter INSTANCE = new DeleteProcessInstanceBatchConfigurationJsonConverter();
 
-  public static final String DELETION_REASON = "deletionReason";
+  public static final String DELETE_REASON = "deleteReason";
   public static final String PROCESS_INSTANCE_IDS = "processInstanceIds";
 
   public JSONObject toJsonObject(DeleteProcessInstanceBatchConfiguration configuration) {
     JSONObject json = new JSONObject();
 
-    JsonUtil.addField(json, DELETION_REASON, configuration.getDeleteReason());
+    JsonUtil.addField(json, DELETE_REASON, configuration.getDeleteReason());
     JsonUtil.addListField(json, PROCESS_INSTANCE_IDS, configuration.getProcessInstanceIds());
     return json;
   }
@@ -42,7 +42,7 @@ public class DeleteProcessInstanceBatchConfigurationJsonConverter extends JsonOb
   public DeleteProcessInstanceBatchConfiguration toObject(JSONObject json) {
     DeleteProcessInstanceBatchConfiguration configuration = new DeleteProcessInstanceBatchConfiguration();
 
-    String deleteReason = json.optString(DELETION_REASON);
+    String deleteReason = json.optString(DELETE_REASON);
     if (deleteReason != null && !deleteReason.isEmpty()) {
       configuration.setDeleteReason(deleteReason);
     }

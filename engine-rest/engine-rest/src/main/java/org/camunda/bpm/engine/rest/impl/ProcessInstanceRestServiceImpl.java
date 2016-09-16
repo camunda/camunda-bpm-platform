@@ -28,7 +28,6 @@ import org.camunda.bpm.engine.rest.sub.runtime.impl.ProcessInstanceResourceImpl;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 import java.util.ArrayList;
@@ -118,12 +117,12 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
     RuntimeService runtimeService = getProcessEngine().getRuntimeService();
     if (dto.getProcessInstanceIds() != null && !dto.getProcessInstanceIds().isEmpty()) {
       return BatchDto.fromBatch(
-          runtimeService.deleteProcessInstancesAsync(dto.getProcessInstanceIds(),dto.getDeletionReason()));
+          runtimeService.deleteProcessInstancesAsync(dto.getProcessInstanceIds(), dto.getDeleteReason()));
     } else if (dto.getProcessInstanceQuery() != null) {
       ProcessInstanceQuery processInstanceQuery = dto.getProcessInstanceQuery().toQuery(getProcessEngine());
 
       return BatchDto.fromBatch(
-          runtimeService.deleteProcessInstancesAsync(processInstanceQuery,dto.getDeletionReason()));
+          runtimeService.deleteProcessInstancesAsync(processInstanceQuery, dto.getDeleteReason()));
     } else {
       String message = "Either processInstanceIds or processInstanceQuery has to be provided.";
       throw new InvalidRequestException(Status.BAD_REQUEST, message);

@@ -20,18 +20,7 @@ import java.util.*;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.form.FormData;
-import org.camunda.bpm.engine.impl.cmd.DeleteProcessInstanceCmd;
-import org.camunda.bpm.engine.impl.cmd.FindActiveActivityIdsCmd;
-import org.camunda.bpm.engine.impl.cmd.GetActivityInstanceCmd;
-import org.camunda.bpm.engine.impl.cmd.GetExecutionVariableCmd;
-import org.camunda.bpm.engine.impl.cmd.GetExecutionVariableTypedCmd;
-import org.camunda.bpm.engine.impl.cmd.GetExecutionVariablesCmd;
-import org.camunda.bpm.engine.impl.cmd.GetStartFormCmd;
-import org.camunda.bpm.engine.impl.cmd.MessageEventReceivedCmd;
-import org.camunda.bpm.engine.impl.cmd.PatchExecutionVariablesCmd;
-import org.camunda.bpm.engine.impl.cmd.RemoveExecutionVariablesCmd;
-import org.camunda.bpm.engine.impl.cmd.SetExecutionVariablesCmd;
-import org.camunda.bpm.engine.impl.cmd.SignalCmd;
+import org.camunda.bpm.engine.impl.cmd.*;
 import org.camunda.bpm.engine.impl.cmd.batch.DeleteProcessInstanceBatchCmd;
 import org.camunda.bpm.engine.impl.migration.MigrationPlanBuilderImpl;
 import org.camunda.bpm.engine.impl.migration.MigrationPlanExecutionBuilderImpl;
@@ -160,6 +149,10 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
 
   public void deleteProcessInstance(String processInstanceId, String deleteReason, boolean skipCustomListeners, boolean externallyTerminated) {
     commandExecutor.execute(new DeleteProcessInstanceCmd(processInstanceId, deleteReason, skipCustomListeners, externallyTerminated));
+  }
+
+  public void deleteProcessInstances(List<String> processInstanceIds, String deleteReason, boolean skipCustomListeners, boolean externallyTerminated){
+    commandExecutor.execute(new DeleteProcessInstancesCmd(processInstanceIds, deleteReason, skipCustomListeners, externallyTerminated));
   }
 
   public ExecutionQuery createExecutionQuery() {

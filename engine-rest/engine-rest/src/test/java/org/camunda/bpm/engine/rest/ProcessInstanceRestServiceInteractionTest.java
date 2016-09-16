@@ -220,45 +220,43 @@ public class ProcessInstanceRestServiceInteractionTest extends
   @Test
   public void testDeleteAsync() {
     List<String> ids = Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
-    when(runtimeServiceMock.deleteProcessInstancesAsync(anyListOf(String.class),anyString())).thenReturn(new BatchEntity());
-    Map<String, Object> messageBodyJson = new HashMap<String,Object>();
+    when(runtimeServiceMock.deleteProcessInstancesAsync(anyListOf(String.class), anyString())).thenReturn(new BatchEntity());
+    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
     messageBodyJson.put("processInstanceIds", ids);
-    messageBodyJson.put("deletionReason", TEST_DELETE_REASON);
-//    ProcessInstanceQueryDto query = new ProcessInstanceQueryDto();
-    //messageBodyJson.put("processInstanceQuery", query);
+    messageBodyJson.put("deleteReason", TEST_DELETE_REASON);
     given()
         .contentType(ContentType.JSON).body(messageBodyJson)
-    .then().expect()
+        .then().expect()
         .statusCode(Status.OK.getStatusCode())
-    .when().post(DELETE_PROCESS_INSTANCES_ASYNC_URL);
+        .when().post(DELETE_PROCESS_INSTANCES_ASYNC_URL);
 
-    verify(runtimeServiceMock,times(1)).deleteProcessInstancesAsync(ids,TEST_DELETE_REASON);
+    verify(runtimeServiceMock, times(1)).deleteProcessInstancesAsync(ids, TEST_DELETE_REASON);
   }
 
   @Test
   public void testDeleteAsyncWithQuery() {
-    Map<String, Object> messageBodyJson = new HashMap<String,Object>();
-    messageBodyJson.put("deletionReason", TEST_DELETE_REASON);
+    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    messageBodyJson.put("deleteReason", TEST_DELETE_REASON);
     ProcessInstanceQueryDto query = new ProcessInstanceQueryDto();
     messageBodyJson.put("processInstanceQuery", query);
-    when(runtimeServiceMock.deleteProcessInstancesAsync(any(ProcessInstanceQuery.class),anyString())).thenReturn(new BatchEntity());
+    when(runtimeServiceMock.deleteProcessInstancesAsync(any(ProcessInstanceQuery.class), anyString())).thenReturn(new BatchEntity());
 
     given()
         .contentType(ContentType.JSON).body(messageBodyJson)
-    .then().expect()
+        .then().expect()
         .statusCode(Status.OK.getStatusCode())
-    .when().post(DELETE_PROCESS_INSTANCES_ASYNC_URL);
+        .when().post(DELETE_PROCESS_INSTANCES_ASYNC_URL);
 
-    verify(runtimeServiceMock,times(1)).deleteProcessInstancesAsync(
-        Mockito.any(ProcessInstanceQuery.class),Mockito.eq(TEST_DELETE_REASON));
+    verify(runtimeServiceMock, times(1)).deleteProcessInstancesAsync(
+        Mockito.any(ProcessInstanceQuery.class), Mockito.eq(TEST_DELETE_REASON));
   }
 
 
   @Test
   public void testDeleteAsyncWithBadRequestQuery() {
 
-    Map<String, Object> messageBodyJson = new HashMap<String,Object>();
-    messageBodyJson.put("deletionReason", TEST_DELETE_REASON);
+    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    messageBodyJson.put("deleteReason", TEST_DELETE_REASON);
 
     given()
         .contentType(ContentType.JSON).body(messageBodyJson)

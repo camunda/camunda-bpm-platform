@@ -14,282 +14,262 @@
 package org.camunda.bpm.engine.test.api.runtime;
 
 import org.camunda.bpm.engine.BadUserRequestException;
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.HistoryService;
+import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
-import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.runtime.Job;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
-import org.camunda.bpm.engine.test.api.authorization.AuthorizationTest;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
-import org.junit.runners.MethodSorters;
 
 import java.util.*;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.CoreMatchers.startsWith;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 
 /**
  * @author Askar Akhmerov
  */
 public class RuntimeServiceAsyncOperationsTest {
-  public static final String TESTING_INSTANCE_DELETION = "testing instance deletion";
+
+  public static final String TESTING_INSTANCE_DELETE = "testing instance delete";
   public static final String ONE_TASK_PROCESS = "oneTaskProcess";
 
-  public ProcessEngineRule engineRule = new ProcessEngineRule(true);
+  public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
+
   @Rule
   public ExpectedException thrown = ExpectedException.none();
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
+  private RuntimeService runtimeService;
+  private ManagementService managementService;
+  private HistoryService historyService;
+
   @Before
-  public void setUp() {
-    org.camunda.bpm.engine.repository.Deployment deployment = engineRule.getRepositoryService().createDeploymentQuery().singleResult();
-    engineRule.manageDeployment(deployment);
+  public void initServices() {
+    runtimeService = engineRule.getRuntimeService();
+    managementService = engineRule.getManagementService();
+    historyService = engineRule.getHistoryService();
   }
 
   @After
   public void cleanBatch() {
-    HistoricBatch historicBatch = engineRule.getHistoryService().createHistoricBatchQuery().singleResult();
+    Batch batch = managementService.createBatchQuery().singleResult();
+    if (batch != null) {
+      managementService.deleteBatch(batch.getId(), true);
+    }
+
+    HistoricBatch historicBatch = historyService.createHistoricBatchQuery().singleResult();
     if (historicBatch != null) {
-      engineRule.getHistoryService().deleteHistoricBatch(
-          historicBatch.getId());
+      historyService.deleteHistoricBatch(historicBatch.getId());
     }
   }
 
-  @Deployment(resources={
+  @Deployment(resources = {
       "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   @Test
   public void testDeleteProcessInstancesAsyncWithList() throws Exception {
+    // given
+    List<String> processIds = startTestProcesses(2);
 
-    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey(ONE_TASK_PROCESS);
-    ProcessInstance processInstance2 = engineRule.getRuntimeService().startProcessInstanceByKey(ONE_TASK_PROCESS);
-    assertThat(engineRule.getRuntimeService().createProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count(),is(2l));
+    // when
+    Batch batch = runtimeService.deleteProcessInstancesAsync(processIds, TESTING_INSTANCE_DELETE);
 
+    executeSeedJob(batch);
+    executeBatchJobs(batch);
 
-    List<String> processInstanceIds = Arrays.asList(processInstance.getId(), processInstance2.getId());
-    engineRule.getRuntimeService().deleteProcessInstancesAsync(processInstanceIds,TESTING_INSTANCE_DELETION);
-
-    engineRule.getManagementService().executeJob(engineRule.getManagementService().createJobQuery().singleResult().getId());
-    List<Job> list = engineRule.getManagementService().createJobQuery().list();
-    assertThat(list.size(),is(3));
-    for(Job job: list) {
-      engineRule.getManagementService().executeJob(job.getId());
-    }
-
-    if(!ProcessEngineConfiguration.HISTORY_NONE.equals(engineRule.getProcessEngineConfiguration().getHistory())) {
-
-      HistoricTaskInstance historicTaskInstance = engineRule.getHistoryService()
-          .createHistoricTaskInstanceQuery()
-          .processInstanceId(processInstance.getId())
-          .singleResult();
-
-      assertThat(historicTaskInstance.getDeleteReason(), is(TESTING_INSTANCE_DELETION));
-      assertThat(engineRule.getHistoryService()
-          .createHistoricTaskInstanceQuery().count(),is(2l));
-    }
-
-    if(ProcessEngineConfiguration.HISTORY_FULL.equals(engineRule.getProcessEngineConfiguration().getHistory())) {
-      assertThat(engineRule.getHistoryService().createHistoricBatchQuery().count(), is(1l));
-    }
-    assertThat(engineRule.getRuntimeService().createProcessInstanceQuery().list().size(),is(0));
+    // then
+    assertTasksAreDeleted(processIds, TESTING_INSTANCE_DELETE);
+    assertHistoricBatchExists();
+    assertProcessInstancesAreDeleted();
   }
 
-  @Deployment(resources={
+  @Deployment(resources = {
       "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   @Test
   public void testDeleteProcessInstancesAsyncWithNonExistingId() throws Exception {
-    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey(ONE_TASK_PROCESS);
-    ProcessInstance processInstance2 = engineRule.getRuntimeService().startProcessInstanceByKey(ONE_TASK_PROCESS);
-    assertThat(engineRule.getRuntimeService().createProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count(),is(2l));
+    // given
+    List<String> processIds = startTestProcesses(2);
+    processIds.add("unknown");
 
+    // when
+    Batch batch = runtimeService.deleteProcessInstancesAsync(processIds, TESTING_INSTANCE_DELETE);
 
-    List<String> listWithFake = Arrays.asList(processInstance.getId(), processInstance2.getId(), "fake");
-    engineRule.getRuntimeService().deleteProcessInstancesAsync(listWithFake,TESTING_INSTANCE_DELETION);
-    engineRule.getManagementService().executeJob(engineRule.getManagementService().createJobQuery().singleResult().getId());
-    List<Job> list = engineRule.getManagementService().createJobQuery().list();
-    assertThat(list.size(),is(4));
+    executeSeedJob(batch);
 
-    for(Job job: list) {
-      try {
-        engineRule.getManagementService().executeJob(job.getId());
-      } catch (Exception e) {
-        if (!e.getMessage().startsWith("No process instance found for id 'fake'")) {
-          throw new RuntimeException("unexpected exception");
-        }
-      }
+    try {
+      executeBatchJobs(batch);
+      fail("Exception expected");
+    } catch (BadUserRequestException e) {
+      assertTrue(e.getMessage().startsWith("No process instance found for id 'unknown'"));
     }
 
-    assertThat(engineRule.getManagementService().createJobQuery().withException().list().size(),is(1));
+    // then
+    assertThat(managementService.createJobQuery().withException().list().size(), is(1));
 
-    if(!ProcessEngineConfiguration.HISTORY_NONE.equals(engineRule.getProcessEngineConfiguration().getHistory())) {
-
-      HistoricTaskInstance historicTaskInstance = engineRule.getHistoryService()
-          .createHistoricTaskInstanceQuery()
-          .processInstanceId(processInstance.getId())
-          .singleResult();
-
-      assertThat(historicTaskInstance.getDeleteReason(), is(TESTING_INSTANCE_DELETION));
-      assertThat(engineRule.getHistoryService()
-          .createHistoricTaskInstanceQuery().count(),is(2l));
-    }
-
-    if(ProcessEngineConfiguration.HISTORY_FULL.equals(engineRule.getProcessEngineConfiguration().getHistory())) {
-      assertThat(engineRule.getHistoryService().createHistoricBatchQuery().count(), is(1l));
-    }
-    assertThat(engineRule.getRuntimeService().createProcessInstanceQuery().list().size(),is(0));
-
-    engineRule.getManagementService().deleteBatch(
-        engineRule.getManagementService().createBatchQuery().singleResult().getId(),true);
+    processIds.remove("unknown");
+    assertTasksAreDeleted(processIds, TESTING_INSTANCE_DELETE);
+    assertHistoricBatchExists();
+    assertProcessInstancesAreDeleted();
   }
 
-  @Deployment(resources={
+  @Deployment(resources = {
       "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   @Test
   public void testDeleteProcessInstancesAsyncWithNullList() throws Exception {
-    engineRule.getRuntimeService().startProcessInstanceByKey(ONE_TASK_PROCESS);
-    engineRule.getRuntimeService().startProcessInstanceByKey(ONE_TASK_PROCESS);
-    assertThat(engineRule.getRuntimeService().createProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count(),is(2l));
-
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("processInstanceIds is null");
-    engineRule.getRuntimeService().deleteProcessInstancesAsync((List<String>)null,TESTING_INSTANCE_DELETION);
-
-  }
-
-  @Deployment(resources={
-      "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
-  @Test
-  public void testDeleteProcessInstancesAsyncWithemptyList() throws Exception {
-    engineRule.getRuntimeService().startProcessInstanceByKey(ONE_TASK_PROCESS);
-    engineRule.getRuntimeService().startProcessInstanceByKey(ONE_TASK_PROCESS);
-    assertThat(engineRule.getRuntimeService().createProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count(),is(2l));
-
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage("processInstanceIds is empty");
-    engineRule.getRuntimeService().deleteProcessInstancesAsync(new ArrayList<String>(),TESTING_INSTANCE_DELETION);
+
+    runtimeService.deleteProcessInstancesAsync((List<String>) null, TESTING_INSTANCE_DELETE);
 
   }
 
-  @Deployment(resources={
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Test
+  public void testDeleteProcessInstancesAsyncWithEmptyList() throws Exception {
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("processInstanceIds is empty");
+
+    runtimeService.deleteProcessInstancesAsync(new ArrayList<String>(), TESTING_INSTANCE_DELETE);
+
+  }
+
+  @Deployment(resources = {
       "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   @Test
   public void testDeleteProcessInstancesAsyncWithQuery() throws Exception {
-    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey(ONE_TASK_PROCESS);
-    ProcessInstance processInstance1 = engineRule.getRuntimeService().startProcessInstanceByKey(ONE_TASK_PROCESS);
-    assertThat(engineRule.getRuntimeService().createProcessInstanceQuery()
-        .processDefinitionKey(ONE_TASK_PROCESS).count(),is(2l));
+    // given
+    List<String> processIds = startTestProcesses(2);
+    ProcessInstanceQuery processInstanceQuery = runtimeService
+        .createProcessInstanceQuery().processInstanceIds(new HashSet<String>(processIds));
 
+    // when
+    Batch batch = runtimeService.deleteProcessInstancesAsync(processInstanceQuery, TESTING_INSTANCE_DELETE);
 
-    ProcessInstanceQuery processInstanceQuery = engineRule.getRuntimeService()
-        .createProcessInstanceQuery().processInstanceIds(
-            new HashSet<String>(Arrays.asList(processInstance.getId(),processInstance1.getId())));
-    engineRule.getRuntimeService().deleteProcessInstancesAsync(processInstanceQuery,TESTING_INSTANCE_DELETION);
+    executeSeedJob(batch);
+    executeBatchJobs(batch);
 
-    engineRule.getManagementService().executeJob(engineRule.getManagementService().createJobQuery().singleResult().getId());
-    List<Job> list = engineRule.getManagementService().createJobQuery().list();
-    assertThat(list.size(),is(3));
-    for(Job job: list) {
-      engineRule.getManagementService().executeJob(job.getId());
-    }
-
-    if(!ProcessEngineConfiguration.HISTORY_NONE.equals(engineRule.getProcessEngineConfiguration().getHistory())) {
-
-      HistoricTaskInstance historicTaskInstance = engineRule.getHistoryService()
-          .createHistoricTaskInstanceQuery()
-          .processInstanceId(processInstance.getId())
-          .singleResult();
-
-      assertThat(historicTaskInstance.getDeleteReason(), is(TESTING_INSTANCE_DELETION));
-      assertThat(engineRule.getHistoryService()
-          .createHistoricTaskInstanceQuery().count(),is(2l));
-    }
-
-    if(ProcessEngineConfiguration.HISTORY_FULL.equals(engineRule.getProcessEngineConfiguration().getHistory())) {
-      assertThat(engineRule.getHistoryService().createHistoricBatchQuery().count(), is(1l));
-    }
-    assertThat(engineRule.getRuntimeService().createProcessInstanceQuery().list().size(),is(0));
+    // then
+    assertTasksAreDeleted(processIds, TESTING_INSTANCE_DELETE);
+    assertHistoricBatchExists();
+    assertProcessInstancesAreDeleted();
   }
 
-  @Deployment(resources={
+  @Deployment(resources = {
       "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   @Test
-  public void testDeleteProcessInstancesAsyncWithQueryWithoutDeletionReason() throws Exception {
-    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey(ONE_TASK_PROCESS);
-    ProcessInstance processInstance1 = engineRule.getRuntimeService().startProcessInstanceByKey(ONE_TASK_PROCESS);
-    assertThat(engineRule.getRuntimeService().createProcessInstanceQuery()
-        .processDefinitionKey(ONE_TASK_PROCESS).count(),is(2l));
+  public void testDeleteProcessInstancesAsyncWithQueryWithoutDeleteReason() throws Exception {
+    // given
+    List<String> processIds = startTestProcesses(2);
+    ProcessInstanceQuery processInstanceQuery = runtimeService
+        .createProcessInstanceQuery().processInstanceIds(new HashSet<String>(processIds));
 
+    // when
+    Batch batch = runtimeService.deleteProcessInstancesAsync(processInstanceQuery, null);
 
-    ProcessInstanceQuery processInstanceQuery = engineRule.getRuntimeService()
-        .createProcessInstanceQuery().processInstanceIds(
-            new HashSet<String>(Arrays.asList(processInstance.getId(),processInstance1.getId())));
-    engineRule.getRuntimeService().deleteProcessInstancesAsync(processInstanceQuery,null);
+    executeSeedJob(batch);
+    executeBatchJobs(batch);
 
-    engineRule.getManagementService().executeJob(engineRule.getManagementService().createJobQuery().singleResult().getId());
-    List<Job> list = engineRule.getManagementService().createJobQuery().list();
-    assertThat(list.size(),is(3));
-    for(Job job: list) {
-      engineRule.getManagementService().executeJob(job.getId());
-    }
-
-    if(!ProcessEngineConfiguration.HISTORY_NONE.equals(engineRule.getProcessEngineConfiguration().getHistory())) {
-
-      HistoricTaskInstance historicTaskInstance = engineRule.getHistoryService()
-          .createHistoricTaskInstanceQuery()
-          .processInstanceId(processInstance.getId())
-          .singleResult();
-
-      assertThat(historicTaskInstance.getDeleteReason(), is(TaskEntity.DELETE_REASON_DELETED));
-      assertThat(engineRule.getHistoryService()
-          .createHistoricTaskInstanceQuery().count(),is(2l));
-    }
-
-    if(ProcessEngineConfiguration.HISTORY_FULL.equals(engineRule.getProcessEngineConfiguration().getHistory())) {
-      assertThat(engineRule.getHistoryService().createHistoricBatchQuery().count(), is(1l));
-    }
-    assertThat(engineRule.getRuntimeService().createProcessInstanceQuery().list().size(),is(0));
+    // then
+    assertTasksAreDeleted(processIds, "deleted");
+    assertHistoricBatchExists();
+    assertProcessInstancesAreDeleted();
   }
 
-  @Deployment(resources={
+  @Deployment(resources = {
       "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   @Test
   public void testDeleteProcessInstancesAsyncWithNullQueryParameter() throws Exception {
-    engineRule.getRuntimeService().startProcessInstanceByKey(ONE_TASK_PROCESS);
-    engineRule.getRuntimeService().startProcessInstanceByKey(ONE_TASK_PROCESS);
-    assertThat(engineRule.getRuntimeService().createProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count(),is(2l));
-
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage("processInstanceQuery is null");
-    engineRule.getRuntimeService().deleteProcessInstancesAsync((ProcessInstanceQuery)null,TESTING_INSTANCE_DELETION);
 
+    runtimeService.deleteProcessInstancesAsync((ProcessInstanceQuery) null, TESTING_INSTANCE_DELETE);
   }
 
-  @Deployment(resources={
+  @Deployment(resources = {
       "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   @Test
   public void testDeleteProcessInstancesAsyncWithInvalidQueryParameter() throws Exception {
-    engineRule.getRuntimeService().startProcessInstanceByKey(ONE_TASK_PROCESS);
-    engineRule.getRuntimeService().startProcessInstanceByKey(ONE_TASK_PROCESS);
-    assertThat(engineRule.getRuntimeService().createProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count(),is(2l));
+    // given
+    startTestProcesses(2);
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery()
+        .processInstanceBusinessKey("invalid");
 
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage("processInstanceIds is empty");
-    ProcessInstanceQuery query = engineRule.getRuntimeService().createProcessInstanceQuery()
-        .processInstanceBusinessKey("invalid");
-    engineRule.getRuntimeService().deleteProcessInstancesAsync(query,TESTING_INSTANCE_DELETION);
 
+    // when
+    runtimeService.deleteProcessInstancesAsync(query, TESTING_INSTANCE_DELETE);
   }
+
+  /// helper //////
+
+  private void executeSeedJob(Batch batch) {
+    String seedJobDefinitionId = batch.getSeedJobDefinitionId();
+    Job seedJob = managementService.createJobQuery().jobDefinitionId(seedJobDefinitionId).singleResult();
+    assertNotNull(seedJob);
+    managementService.executeJob(seedJob.getId());
+  }
+
+  private void executeBatchJobs(Batch batch) {
+    String batchJobDefinitionId = batch.getBatchJobDefinitionId();
+    List<Job> batchJobs = managementService.createJobQuery().jobDefinitionId(batchJobDefinitionId).list();
+    assertFalse(batchJobs.isEmpty());
+    for (Job batchJob : batchJobs) {
+      managementService.executeJob(batchJob.getId());
+    }
+  }
+
+  protected List<String> startTestProcesses(int numberOfProcesses) {
+    ArrayList<String> ids = new ArrayList<String>();
+
+    for (int i = 0; i < numberOfProcesses; i++) {
+      ids.add(runtimeService.startProcessInstanceByKey(ONE_TASK_PROCESS).getProcessInstanceId());
+    }
+
+    return ids;
+  }
+
+  protected void assertTasksAreDeleted(List<String> processIds, String deleteReason) {
+    if (!testRule.isHistoryLevelNone()) {
+
+      for (String processId : processIds) {
+        HistoricTaskInstance historicTaskInstance = historyService
+            .createHistoricTaskInstanceQuery()
+            .processInstanceId(processId)
+            .singleResult();
+
+        assertThat(historicTaskInstance.getDeleteReason(), is(deleteReason));
+      }
+    }
+  }
+
+  protected void assertHistoricBatchExists() {
+    if (testRule.isHistoryLevelFull()) {
+      assertThat(historyService.createHistoricBatchQuery().count(), is(1L));
+    }
+  }
+
+  protected void assertProcessInstancesAreDeleted() {
+    assertThat(runtimeService.createProcessInstanceQuery().list().size(), is(0));
+  }
+
 }

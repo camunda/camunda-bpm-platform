@@ -10,7 +10,7 @@ import java.util.List;
 public class DeleteProcessInstancesDto {
   protected List<String> processInstanceIds;
   protected ProcessInstanceQueryDto processInstanceQuery;
-  protected String deletionReason;
+  protected String deleteReason;
 
 
   public List<String> getProcessInstanceIds() {
@@ -29,11 +29,11 @@ public class DeleteProcessInstancesDto {
     this.processInstanceQuery = processInstanceQuery;
   }
 
-  public String getDeletionReason() {
-    return deletionReason;
+  public String getDeleteReason() {
+    return deleteReason;
   }
 
-  public void setDeletionReason(String deletionReason) {
-    this.deletionReason = deletionReason;
+  public void setDeleteReason(String deleteReason) {
+    this.deleteReason = deleteReason;
   }
 }

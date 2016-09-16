@@ -16,32 +16,37 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
 import java.io.Serializable;
+import java.util.List;
 
 
 /**
  * @author Joram Barrez
  */
-public class DeleteProcessInstanceCmd extends AbstractDeleteProcessInstanceCmd implements Command<Void>, Serializable {
+public class DeleteProcessInstancesCmd extends AbstractDeleteProcessInstanceCmd implements Command<Void>, Serializable {
 
   private static final long serialVersionUID = 1L;
   protected boolean externallyTerminated;
-  protected String processInstanceId;
+  protected List<String> processInstanceIds;
   protected String deleteReason;
   protected boolean skipCustomListeners;
 
-  public DeleteProcessInstanceCmd(String processInstanceId, String deleteReason, boolean skipCustomListeners) {
-    this(processInstanceId, deleteReason, skipCustomListeners, false);
+  public DeleteProcessInstancesCmd(List<String> processInstanceIds, String deleteReason, boolean skipCustomListeners) {
+    this(processInstanceIds, deleteReason, skipCustomListeners, false);
   }
 
-  public DeleteProcessInstanceCmd(String processInstanceId, String deleteReason, boolean skipCustomListeners, boolean externallyTerminated) {
-    this.processInstanceId = processInstanceId;
+  public DeleteProcessInstancesCmd(List<String> processInstanceIds, String deleteReason, boolean skipCustomListeners, boolean externallyTerminated) {
+
+    this.processInstanceIds = processInstanceIds;
     this.deleteReason = deleteReason;
     this.skipCustomListeners = skipCustomListeners;
     this.externallyTerminated = externallyTerminated;
   }
 
   public Void execute(CommandContext commandContext) {
-    return deleteProcessInstance(commandContext, processInstanceId, deleteReason, skipCustomListeners, externallyTerminated);
+    for (String processInstanceId : this.processInstanceIds) {
+      deleteProcessInstance(commandContext, processInstanceId, deleteReason, skipCustomListeners, externallyTerminated);
+    }
+    return null;
   }
 
 }

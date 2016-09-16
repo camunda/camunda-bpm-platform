@@ -47,8 +47,8 @@ public interface ProcessInstanceRestService {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   List<ProcessInstanceDto> getProcessInstances(@Context UriInfo uriInfo,
-      @QueryParam("firstResult") Integer firstResult,
-      @QueryParam("maxResults") Integer maxResults);
+                                               @QueryParam("firstResult") Integer firstResult,
+                                               @QueryParam("maxResults") Integer maxResults);
 
   /**
    * Expects the same parameters as
@@ -64,8 +64,8 @@ public interface ProcessInstanceRestService {
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   List<ProcessInstanceDto> queryProcessInstances(ProcessInstanceQueryDto query,
-      @QueryParam("firstResult") Integer firstResult,
-      @QueryParam("maxResults") Integer maxResults);
+                                                 @QueryParam("firstResult") Integer firstResult,
+                                                 @QueryParam("maxResults") Integer maxResults);
 
   @GET
   @Path("/count")

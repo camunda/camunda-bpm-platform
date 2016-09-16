@@ -24,7 +24,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.*;
 import java.util.List;
 
 /**
- *
  * @author Askar Akhmerov
  */
 public class DeleteProcessInstancesJobHandler extends AbstractProcessInstanceBatchJobHandler<DeleteProcessInstanceBatchConfiguration> {
@@ -53,16 +52,14 @@ public class DeleteProcessInstancesJobHandler extends AbstractProcessInstanceBat
   @Override
   public void execute(BatchJobConfiguration configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
     ByteArrayEntity configurationEntity = commandContext
-      .getDbEntityManager()
-      .selectById(ByteArrayEntity.class, configuration.getConfigurationByteArrayId());
+        .getDbEntityManager()
+        .selectById(ByteArrayEntity.class, configuration.getConfigurationByteArrayId());
 
     DeleteProcessInstanceBatchConfiguration batchConfiguration = readConfiguration(configurationEntity.getBytes());
 
-    RuntimeService runtimeService = commandContext.getProcessEngineConfiguration().getRuntimeService();
-
-    for (String pi : batchConfiguration.getProcessInstanceIds()) {
-      runtimeService.deleteProcessInstance(pi, batchConfiguration.deleteReason, true, true);
-    }
+    commandContext.getProcessEngineConfiguration()
+        .getRuntimeService()
+        .deleteProcessInstances(batchConfiguration.getProcessInstanceIds(), batchConfiguration.deleteReason, true, true);
 
     commandContext.getByteArrayManager().delete(configurationEntity);
   }
