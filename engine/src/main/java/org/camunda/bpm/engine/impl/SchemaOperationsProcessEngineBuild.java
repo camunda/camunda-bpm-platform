@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.impl;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.SchemaOperationsCommand;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmd.DetermineHistoryLevelCmd;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -31,7 +32,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
  * @author Sebastian Menski
  * @author Daniel Meyer
  */
-public final class SchemaOperationsProcessEngineBuild implements Command<Void> {
+public final class SchemaOperationsProcessEngineBuild implements SchemaOperationsCommand {
 
   private final static EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
