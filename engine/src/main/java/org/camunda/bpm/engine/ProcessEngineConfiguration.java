@@ -19,6 +19,7 @@ import javax.sql.DataSource;
 
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.camunda.bpm.engine.impl.SchemaOperationsProcessEngineBuild;
 import org.camunda.bpm.engine.impl.cfg.BeansConfigurationHelper;
 import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration;
@@ -209,6 +210,7 @@ public abstract class ProcessEngineConfiguration {
   protected String jdbcPingQuery = null;
   protected int jdbcPingConnectionNotUsedFor;
   protected DataSource dataSource;
+  protected SchemaOperationsCommand schemaOperationsCommand = new SchemaOperationsProcessEngineBuild();
   protected boolean transactionsExternallyManaged = false;
   /** the number of seconds the jdbc driver will wait for a response from the database */
   protected Integer jdbcStatementTimeout;
@@ -419,6 +421,14 @@ public abstract class ProcessEngineConfiguration {
   public ProcessEngineConfiguration setDataSource(DataSource dataSource) {
     this.dataSource = dataSource;
     return this;
+  }
+
+  public SchemaOperationsCommand getSchemaOperationsCommand() {
+    return schemaOperationsCommand;
+  }
+
+  public void setSchemaOperationsCommand(SchemaOperationsCommand schemaOperationsCommand) {
+    this.schemaOperationsCommand = schemaOperationsCommand;
   }
 
   public String getJdbcDriver() {

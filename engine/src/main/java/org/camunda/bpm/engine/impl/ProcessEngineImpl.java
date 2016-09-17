@@ -123,7 +123,7 @@ public class ProcessEngineImpl implements ProcessEngine {
   }
 
   protected void executeSchemaOperations() {
-    commandExecutorSchemaOperations.execute(new SchemaOperationsProcessEngineBuild());
+    commandExecutorSchemaOperations.execute(processEngineConfiguration.getSchemaOperationsCommand());
   }
 
   @Override
