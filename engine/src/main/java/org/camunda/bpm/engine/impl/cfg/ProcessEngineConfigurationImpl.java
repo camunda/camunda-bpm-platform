@@ -673,7 +673,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected void invokePreInit() {
     for (ProcessEnginePlugin plugin : processEnginePlugins) {
-      LOG.pluginActivated(plugin.getClass().getSimpleName(), getProcessEngineName());
+      LOG.pluginActivated(plugin.toString(), getProcessEngineName());
       plugin.preInit(this);
     }
   }

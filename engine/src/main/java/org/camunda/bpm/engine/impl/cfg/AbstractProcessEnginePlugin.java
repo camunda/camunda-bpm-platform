@@ -34,4 +34,8 @@ public class AbstractProcessEnginePlugin implements ProcessEnginePlugin {
 
   }
 
+  @Override
+  public String toString() {
+    return getClass().getSimpleName();
+  }
 }
