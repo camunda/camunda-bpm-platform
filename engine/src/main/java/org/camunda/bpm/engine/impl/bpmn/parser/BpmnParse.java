@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.bpmn.parser;
 
+import org.camunda.bpm.engine.ActivityTypes;
 import static org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseUtil.findCamundaExtensionElement;
 import static org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseUtil.parseCamundaScript;
 import static org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseUtil.parseInputOutput;
@@ -688,7 +689,7 @@ public class BpmnParse extends Parse {
   protected HashMap<String, Element> filterIntermediateCatchEvents(List<Element> activityElements) {
     HashMap<String, Element> intermediateCatchEvents = new HashMap<String, Element>();
     for(Element activityElement : activityElements) {
-      if (activityElement.getTagName().equals("intermediateCatchEvent")) {
+      if (activityElement.getTagName().equals(ActivityTypes.INTERMEDIATE_EVENT_CATCH)) {
         intermediateCatchEvents.put(activityElement.attribute("id"), activityElement);
       }
     }
@@ -1243,39 +1244,39 @@ public class BpmnParse extends Parse {
       isMultiInstance = true;
     }
 
-    if (activityElement.getTagName().equals("exclusiveGateway")) {
+    if (activityElement.getTagName().equals(ActivityTypes.GATEWAY_EXCLUSIVE)) {
       activity = parseExclusiveGateway(activityElement, scopeElement);
-    } else if (activityElement.getTagName().equals("inclusiveGateway")) {
+    } else if (activityElement.getTagName().equals(ActivityTypes.GATEWAY_INCLUSIVE)) {
       activity = parseInclusiveGateway(activityElement, scopeElement);
-    } else if (activityElement.getTagName().equals("parallelGateway")) {
+    } else if (activityElement.getTagName().equals(ActivityTypes.GATEWAY_PARALLEL)) {
       activity = parseParallelGateway(activityElement, scopeElement);
-    } else if (activityElement.getTagName().equals("scriptTask")) {
+    } else if (activityElement.getTagName().equals(ActivityTypes.TASK_SCRIPT)) {
       activity = parseScriptTask(activityElement, scopeElement);
-    } else if (activityElement.getTagName().equals("serviceTask")) {
+    } else if (activityElement.getTagName().equals(ActivityTypes.TASK_SERVICE)) {
       activity = parseServiceTask(activityElement, scopeElement);
-    } else if (activityElement.getTagName().equals("businessRuleTask")) {
+    } else if (activityElement.getTagName().equals(ActivityTypes.TASK_BUSINESS_RULE)) {
       activity = parseBusinessRuleTask(activityElement, scopeElement);
-    } else if (activityElement.getTagName().equals("task")) {
+    } else if (activityElement.getTagName().equals(ActivityTypes.TASK)) {
       activity = parseTask(activityElement, scopeElement);
-    } else if (activityElement.getTagName().equals("manualTask")) {
+    } else if (activityElement.getTagName().equals(ActivityTypes.TASK_MANUAL_TASK)) {
       activity = parseManualTask(activityElement, scopeElement);
-    } else if (activityElement.getTagName().equals("userTask")) {
+    } else if (activityElement.getTagName().equals(ActivityTypes.TASK_USER_TASK)) {
       activity = parseUserTask(activityElement, scopeElement);
-    } else if (activityElement.getTagName().equals("sendTask")) {
+    } else if (activityElement.getTagName().equals(ActivityTypes.TASK_SEND_TASK)) {
       activity = parseSendTask(activityElement, scopeElement);
-    } else if (activityElement.getTagName().equals("receiveTask")) {
+    } else if (activityElement.getTagName().equals(ActivityTypes.TASK_RECEIVE_TASK)) {
       activity = parseReceiveTask(activityElement, scopeElement);
-    } else if (activityElement.getTagName().equals("subProcess")) {
+    } else if (activityElement.getTagName().equals(ActivityTypes.SUB_PROCESS)) {
       activity = parseSubProcess(activityElement, scopeElement);
-    } else if (activityElement.getTagName().equals("callActivity")) {
+    } else if (activityElement.getTagName().equals(ActivityTypes.CALL_ACTIVITY)) {
       activity = parseCallActivity(activityElement, scopeElement, isMultiInstance);
-    } else if (activityElement.getTagName().equals("intermediateThrowEvent")) {
+    } else if (activityElement.getTagName().equals(ActivityTypes.INTERMEDIATE_EVENT_THROW)) {
       activity = parseIntermediateThrowEvent(activityElement, scopeElement);
-    } else if (activityElement.getTagName().equals("eventBasedGateway")) {
+    } else if (activityElement.getTagName().equals(ActivityTypes.GATEWAY_EVENT_BASED)) {
       activity = parseEventBasedGateway(activityElement, parentElement, scopeElement);
-    } else if (activityElement.getTagName().equals("transaction")) {
+    } else if (activityElement.getTagName().equals(ActivityTypes.TRANSACTION)) {
       activity = parseTransaction(activityElement, scopeElement);
-    } else if (activityElement.getTagName().equals("adHocSubProcess") || activityElement.getTagName().equals("complexGateway")) {
+    } else if (activityElement.getTagName().equals(ActivityTypes.SUB_PROCESS_AD_HOC) || activityElement.getTagName().equals(ActivityTypes.GATEWAY_COMPLEX)) {
       addWarning("Ignoring unsupported activity type", activityElement);
     }
 
@@ -1425,7 +1426,7 @@ public class BpmnParse extends Parse {
 
   protected void parseIntermediateLinkEventCatchBehavior(Element intermediateEventElement, ActivityImpl activity, Element linkEventDefinitionElement) {
 
-    activity.getProperties().set(BpmnProperties.TYPE, "intermediateLinkCatch");
+    activity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.INTERMEDIATE_EVENT_LINK);
 
     String linkName = linkEventDefinitionElement.attribute("name");
     String elementName = intermediateEventElement.attribute("name");
@@ -1487,12 +1488,12 @@ public class BpmnParse extends Parse {
     parseAsynchronousContinuationForActivity(intermediateEventElement, nestedActivityImpl);
 
     if (signalEventDefinitionElement != null) {
-      nestedActivityImpl.getProperties().set(BpmnProperties.TYPE, "intermediateSignalThrow");
+      nestedActivityImpl.getProperties().set(BpmnProperties.TYPE, ActivityTypes.INTERMEDIATE_EVENT_SIGNAL_THROW);
 
       EventSubscriptionDeclaration signalDefinition = parseSignalEventDefinition(signalEventDefinitionElement);
       activityBehavior = new IntermediateThrowSignalEventActivityBehavior(signalDefinition);
     } else if (compensateEventDefinitionElement != null) {
-      nestedActivityImpl.getProperties().set(BpmnProperties.TYPE, "intermediateCompensationThrowEvent");
+      nestedActivityImpl.getProperties().set(BpmnProperties.TYPE, ActivityTypes.INTERMEDIATE_EVENT_COMPENSATION_THROW);
       CompensateEventDefinition compensateEventDefinition = parseThrowCompensateEventDefinition(compensateEventDefinitionElement, scopeElement);
       activityBehavior = new CompensationEventActivityBehavior(compensateEventDefinition);
       nestedActivityImpl.setProperty(PROPERTYNAME_THROWS_COMPENSATION, true);
@@ -1501,16 +1502,16 @@ public class BpmnParse extends Parse {
       if (isServiceTaskLike(messageEventDefinitionElement)) {
 
         // CAM-436 same behavior as service task
-        nestedActivityImpl.getProperties().set(BpmnProperties.TYPE, "intermediateMessageThrowEvent");
-        activityBehavior = parseServiceTaskLike("intermediateMessageThrowEvent", messageEventDefinitionElement, scopeElement).getActivityBehavior();
+        nestedActivityImpl.getProperties().set(BpmnProperties.TYPE, ActivityTypes.INTERMEDIATE_EVENT_MESSAGE_THROW);
+        activityBehavior = parseServiceTaskLike(ActivityTypes.INTERMEDIATE_EVENT_MESSAGE_THROW, messageEventDefinitionElement, scopeElement).getActivityBehavior();
       } else {
         // default to non behavior if no service task
         // properties have been specified
-        nestedActivityImpl.getProperties().set(BpmnProperties.TYPE, "intermediateNoneThrowEvent");
+        nestedActivityImpl.getProperties().set(BpmnProperties.TYPE, ActivityTypes.INTERMEDIATE_EVENT_NONE_THROW);
         activityBehavior = new IntermediateThrowNoneEventActivityBehavior();
       }
     } else if (escalationEventDefinition != null) {
-      nestedActivityImpl.getProperties().set(BpmnProperties.TYPE, "intermediateEscalationThrowEvent");
+      nestedActivityImpl.getProperties().set(BpmnProperties.TYPE, ActivityTypes.INTERMEDIATE_EVENT_ESCALATION_THROW);
 
       Escalation escalation = findEscalationForEscalationEventDefinition(escalationEventDefinition);
       if (escalation != null && escalation.getEscalationCode() == null) {
@@ -1520,7 +1521,7 @@ public class BpmnParse extends Parse {
       activityBehavior = new ThrowEscalationEventActivityBehavior(escalation);
 
     } else { // None intermediate event
-      nestedActivityImpl.getProperties().set(BpmnProperties.TYPE, "intermediateNoneThrowEvent");
+      nestedActivityImpl.getProperties().set(BpmnProperties.TYPE, ActivityTypes.INTERMEDIATE_EVENT_NONE_THROW);
       activityBehavior = new IntermediateThrowNoneEventActivityBehavior();
     }
 
@@ -1599,7 +1600,7 @@ public class BpmnParse extends Parse {
   }
 
   protected ActivityBehavior parseBoundaryCancelEventDefinition(Element cancelEventDefinition, ActivityImpl activity) {
-    activity.getProperties().set(BpmnProperties.TYPE, "cancelBoundaryCatch");
+    activity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.BOUNDARY_CANCEL);
 
     LegacyBehavior.parseCancelBoundaryEvent(activity);
 
@@ -1968,7 +1969,7 @@ public class BpmnParse extends Parse {
       if (activity.getId().equals(sourceRef)) {
         Element sibling = siblingsMap.get(targetRef);
         if (sibling != null) {
-          if (sibling.getTagName().equals("intermediateCatchEvent")) {
+          if (sibling.getTagName().equals(ActivityTypes.INTERMEDIATE_EVENT_CATCH)) {
             parseIntermediateCatchEvent(sibling, scope, activity);
           } else {
             addError("Event based gateway can only be connected to elements of type intermediateCatchEvent", sibling);
@@ -2839,7 +2840,7 @@ public class BpmnParse extends Parse {
                 "'errorCode' is mandatory on errors referenced by throwing error event definitions, but the error '" + error.getId() + "' does not define one.",
                 errorEventDefinition);
           }
-          activity.getProperties().set(BpmnProperties.TYPE, "errorEndEvent");
+          activity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.END_EVENT_ERROR);
           if(error != null) {
             activity.setActivityBehavior(new ErrorEndEventActivityBehavior(error.getErrorCode()));
           } else {
@@ -2850,41 +2851,41 @@ public class BpmnParse extends Parse {
         if (scope.getProperty("type") == null || !scope.getProperty("type").equals("transaction")) {
           addError("end event with cancelEventDefinition only supported inside transaction subprocess", cancelEventDefinition);
         } else {
-          activity.getProperties().set(BpmnProperties.TYPE, "cancelEndEvent");
+          activity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.END_EVENT_CANCEL);
           activity.setActivityBehavior(new CancelEndEventActivityBehavior());
           activity.setActivityStartBehavior(ActivityStartBehavior.INTERRUPT_FLOW_SCOPE);
           activity.setProperty(PROPERTYNAME_THROWS_COMPENSATION, true);
           activity.setScope(true);
         }
       } else if (terminateEventDefinition != null) {
-        activity.getProperties().set(BpmnProperties.TYPE, "terminateEndEvent");
+        activity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.END_EVENT_TERMINATE);
         activity.setActivityBehavior(new TerminateEndEventActivityBehavior());
         activity.setActivityStartBehavior(ActivityStartBehavior.INTERRUPT_FLOW_SCOPE);
       } else if (messageEventDefinitionElement != null) {
         if (isServiceTaskLike(messageEventDefinitionElement)) {
 
           // CAM-436 same behaviour as service task
-          activity.getProperties().set(BpmnProperties.TYPE, "messageEndEvent");
-          activity.setActivityBehavior(parseServiceTaskLike("messageEndEvent", messageEventDefinitionElement, scope).getActivityBehavior());
+          activity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.END_EVENT_MESSAGE);
+          activity.setActivityBehavior(parseServiceTaskLike(ActivityTypes.END_EVENT_MESSAGE, messageEventDefinitionElement, scope).getActivityBehavior());
         } else {
           // default to non behavior if no service task
           // properties have been specified
           activity.setActivityBehavior(new IntermediateThrowNoneEventActivityBehavior());
         }
       } else if (signalEventDefinition != null) {
-        activity.getProperties().set(BpmnProperties.TYPE, "signalEndEvent");
+        activity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.END_EVENT_SIGNAL);
         EventSubscriptionDeclaration signalDefinition = parseSignalEventDefinition(signalEventDefinition);
         activity.setActivityBehavior(new SignalEndEventActivityBehavior(signalDefinition));
 
       } else if (compensateEventDefinitionElement != null) {
-        activity.getProperties().set(BpmnProperties.TYPE, "compensationEndEvent");
+        activity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.END_EVENT_COMPENSATION);
         CompensateEventDefinition compensateEventDefinition = parseThrowCompensateEventDefinition(compensateEventDefinitionElement, scope);
         activity.setActivityBehavior(new CompensationEventActivityBehavior(compensateEventDefinition));
         activity.setProperty(PROPERTYNAME_THROWS_COMPENSATION, true);
         activity.setScope(true);
 
       } else if(escalationEventDefinition != null) {
-        activity.getProperties().set(BpmnProperties.TYPE, "escalationEndEvent");
+        activity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.END_EVENT_ESCALATION);
 
         Escalation escalation = findEscalationForEscalationEventDefinition(escalationEventDefinition);
         if (escalation != null && escalation.getEscalationCode() == null) {
@@ -2893,7 +2894,7 @@ public class BpmnParse extends Parse {
         activity.setActivityBehavior(new ThrowEscalationEventActivityBehavior(escalation));
 
       } else { // default: none end event
-        activity.getProperties().set(BpmnProperties.TYPE, "noneEndEvent");
+        activity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.END_EVENT_NONE);
         activity.setActivityBehavior(new NoneEndEventActivityBehavior());
       }
 
@@ -3151,7 +3152,7 @@ public class BpmnParse extends Parse {
   }
 
   protected void parseIntermediateSignalEventDefinition(Element element, ActivityImpl signalActivity) {
-    signalActivity.getProperties().set(BpmnProperties.TYPE, "intermediateSignalCatch");
+    signalActivity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.INTERMEDIATE_EVENT_SIGNAL);
 
     parseSignalCatchEventDefinition(element, signalActivity, false);
 
@@ -3255,7 +3256,7 @@ public class BpmnParse extends Parse {
 
   public void parseBoundaryErrorEventDefinition(Element errorEventDefinition, ActivityImpl boundaryEventActivity) {
 
-    boundaryEventActivity.getProperties().set(BpmnProperties.TYPE, "boundaryError");
+    boundaryEventActivity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.BOUNDARY_ERROR);
 
     String errorRef = errorEventDefinition.attribute("errorRef");
     Error error = null;
@@ -3282,7 +3283,7 @@ public class BpmnParse extends Parse {
   }
 
   protected void parseBoundaryEscalationEventDefinition(Element escalationEventDefinitionElement, boolean cancelActivity, ActivityImpl boundaryEventActivity) {
-    boundaryEventActivity.getProperties().set(BpmnProperties.TYPE, "boundaryEscalation");
+    boundaryEventActivity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.BOUNDARY_ESCALATION);
 
     EscalationEventDefinition escalationEventDefinition = createEscalationEventDefinitionForEscalationHandler(escalationEventDefinitionElement, boundaryEventActivity, cancelActivity);
     addEscalationEventDefinition(boundaryEventActivity.getEventScope(), escalationEventDefinition, escalationEventDefinitionElement);

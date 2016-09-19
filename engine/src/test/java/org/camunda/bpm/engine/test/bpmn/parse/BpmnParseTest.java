@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.impl.bpmn.behavior.EventSubProcessStartEventActivi
 import org.camunda.bpm.engine.impl.bpmn.behavior.NoneStartEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.ThrowEscalationEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
+import org.camunda.bpm.engine.ActivityTypes;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -471,7 +472,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
   public void testParseEscalationBoundaryEvent() {
     ActivityImpl escalationBoundaryEvent = findActivityInDeployedProcessDefinition("escalationBoundaryEvent");
 
-    assertEquals("boundaryEscalation", escalationBoundaryEvent.getProperties().get(BpmnProperties.TYPE));
+    assertEquals(ActivityTypes.BOUNDARY_ESCALATION, escalationBoundaryEvent.getProperties().get(BpmnProperties.TYPE));
     assertEquals(BoundaryEventActivityBehavior.class, escalationBoundaryEvent.getActivityBehavior().getClass());
   }
 
@@ -479,7 +480,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
   public void testParseEscalationIntermediateThrowingEvent() {
     ActivityImpl escalationThrowingEvent = findActivityInDeployedProcessDefinition("escalationThrowingEvent");
 
-    assertEquals("intermediateEscalationThrowEvent", escalationThrowingEvent.getProperties().get(BpmnProperties.TYPE));
+    assertEquals(ActivityTypes.INTERMEDIATE_EVENT_ESCALATION_THROW, escalationThrowingEvent.getProperties().get(BpmnProperties.TYPE));
     assertEquals(ThrowEscalationEventActivityBehavior.class, escalationThrowingEvent.getActivityBehavior().getClass());
   }
 
@@ -487,7 +488,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
   public void testParseEscalationEndEvent() {
     ActivityImpl escalationEndEvent = findActivityInDeployedProcessDefinition("escalationEndEvent");
 
-    assertEquals("escalationEndEvent", escalationEndEvent.getProperties().get(BpmnProperties.TYPE));
+    assertEquals(ActivityTypes.END_EVENT_ESCALATION, escalationEndEvent.getProperties().get(BpmnProperties.TYPE));
     assertEquals(ThrowEscalationEventActivityBehavior.class, escalationEndEvent.getActivityBehavior().getClass());
   }
 
@@ -495,7 +496,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
   public void testParseEscalationStartEvent() {
     ActivityImpl escalationStartEvent = findActivityInDeployedProcessDefinition("escalationStartEvent");
 
-    assertEquals("escalationStartEvent", escalationStartEvent.getProperties().get(BpmnProperties.TYPE));
+    assertEquals(ActivityTypes.START_EVENT_ESCALATION, escalationStartEvent.getProperties().get(BpmnProperties.TYPE));
     assertEquals(EventSubProcessStartEventActivityBehavior.class, escalationStartEvent.getActivityBehavior().getClass());
   }
 

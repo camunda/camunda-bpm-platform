@@ -16,7 +16,7 @@ package org.camunda.bpm.engine.impl.migration.validation.instruction;
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
-import org.camunda.bpm.engine.impl.bpmn.parser.ActivityTypes;
+import org.camunda.bpm.engine.ActivityTypes;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 

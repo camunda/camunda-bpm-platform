@@ -19,7 +19,7 @@ import java.util.List;
 import org.camunda.bpm.engine.impl.bpmn.behavior.BoundaryEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.EventSubProcessStartEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
-import org.camunda.bpm.engine.impl.bpmn.parser.ActivityTypes;
+import org.camunda.bpm.engine.ActivityTypes;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 
 /**
