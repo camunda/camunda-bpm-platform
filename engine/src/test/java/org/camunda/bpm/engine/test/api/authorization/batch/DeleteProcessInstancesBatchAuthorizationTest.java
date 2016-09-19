@@ -121,7 +121,7 @@ public class DeleteProcessInstancesBatchAuthorizationTest {
     //given
     List<String> processInstanceIds = Arrays.asList(processInstance.getId(), processInstance2.getId());
     batch = runtimeService.deleteProcessInstancesAsync(
-        processInstanceIds, TEST_REASON);
+        processInstanceIds, null, TEST_REASON);
 
     // when
     authRule
@@ -150,7 +150,7 @@ public class DeleteProcessInstancesBatchAuthorizationTest {
     //given
     ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery()
         .processInstanceIds(new HashSet<String>(Arrays.asList(processInstance.getId(), processInstance2.getId())));
-    batch = runtimeService.deleteProcessInstancesAsync(
+    batch = runtimeService.deleteProcessInstancesAsync(null,
         processInstanceQuery, TEST_REASON);
 
     // when

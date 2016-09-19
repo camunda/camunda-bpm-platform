@@ -38,15 +38,9 @@ public class DeleteProcessInstanceBatchCmd extends AbstractBatchCmd<Batch> {
   protected List<String> processInstanceIds;
   protected ProcessInstanceQuery processInstanceQuery;
 
-  public DeleteProcessInstanceBatchCmd(List<String> processInstances, String deleteReason) {
+  public DeleteProcessInstanceBatchCmd(List<String> processInstances, ProcessInstanceQuery processInstanceQuery, String deleteReason) {
     super();
     this.processInstanceIds = processInstances;
-    this.deleteReason = deleteReason;
-  }
-
-  public DeleteProcessInstanceBatchCmd(ProcessInstanceQuery processInstanceQuery, String deleteReason) {
-    super();
-    ensureNotNull("processInstanceQuery", processInstanceQuery);
     this.processInstanceQuery = processInstanceQuery;
     this.deleteReason = deleteReason;
   }

@@ -110,7 +110,7 @@ public class BatchCreationAuthorizationTest {
     // when
     List<String> processInstanceIds = Arrays.asList(processInstance.getId());
     runtimeService.deleteProcessInstancesAsync(
-        processInstanceIds, TEST_REASON);
+        processInstanceIds, null, TEST_REASON);
 
     // then
     authRule.assertScenario(scenario);

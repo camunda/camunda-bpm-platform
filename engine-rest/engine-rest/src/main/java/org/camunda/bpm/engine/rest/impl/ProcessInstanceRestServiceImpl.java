@@ -115,14 +115,13 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
 
   public BatchDto deleteAsync(DeleteProcessInstancesDto dto) {
     RuntimeService runtimeService = getProcessEngine().getRuntimeService();
-    if (dto.getProcessInstanceIds() != null && !dto.getProcessInstanceIds().isEmpty()) {
-      return BatchDto.fromBatch(
-          runtimeService.deleteProcessInstancesAsync(dto.getProcessInstanceIds(), dto.getDeleteReason()));
-    } else if (dto.getProcessInstanceQuery() != null) {
-      ProcessInstanceQuery processInstanceQuery = dto.getProcessInstanceQuery().toQuery(getProcessEngine());
+    if (dto.getProcessInstanceIds() != null && !dto.getProcessInstanceIds().isEmpty() || dto.getProcessInstanceQuery() != null) {
+      ProcessInstanceQuery processInstanceQuery = dto.getProcessInstanceQuery() != null ? dto.getProcessInstanceQuery().toQuery(getProcessEngine()) : null;
+      return BatchDto.fromBatch(runtimeService.deleteProcessInstancesAsync(
+          dto.getProcessInstanceIds(),
+          processInstanceQuery,
+          dto.getDeleteReason()));
 
-      return BatchDto.fromBatch(
-          runtimeService.deleteProcessInstancesAsync(processInstanceQuery, dto.getDeleteReason()));
     } else {
       String message = "Either processInstanceIds or processInstanceQuery has to be provided.";
       throw new InvalidRequestException(Status.BAD_REQUEST, message);

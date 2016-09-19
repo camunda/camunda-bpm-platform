@@ -90,7 +90,7 @@ public class RuntimeServiceAsyncOperationsTest {
     List<String> processIds = startTestProcesses(2);
 
     // when
-    Batch batch = runtimeService.deleteProcessInstancesAsync(processIds, TESTING_INSTANCE_DELETE);
+    Batch batch = runtimeService.deleteProcessInstancesAsync(processIds, null, TESTING_INSTANCE_DELETE);
 
     executeSeedJob(batch);
     executeBatchJobs(batch);
@@ -110,7 +110,7 @@ public class RuntimeServiceAsyncOperationsTest {
     processIds.add("unknown");
 
     // when
-    Batch batch = runtimeService.deleteProcessInstancesAsync(processIds, TESTING_INSTANCE_DELETE);
+    Batch batch = runtimeService.deleteProcessInstancesAsync(processIds, null, TESTING_INSTANCE_DELETE);
 
     executeSeedJob(batch);
 
@@ -137,7 +137,7 @@ public class RuntimeServiceAsyncOperationsTest {
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage("processInstanceIds is empty");
 
-    runtimeService.deleteProcessInstancesAsync((List<String>) null, TESTING_INSTANCE_DELETE);
+    runtimeService.deleteProcessInstancesAsync(null, null, TESTING_INSTANCE_DELETE);
 
   }
 
@@ -148,7 +148,7 @@ public class RuntimeServiceAsyncOperationsTest {
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage("processInstanceIds is empty");
 
-    runtimeService.deleteProcessInstancesAsync(new ArrayList<String>(), TESTING_INSTANCE_DELETE);
+    runtimeService.deleteProcessInstancesAsync(new ArrayList<String>(), null, TESTING_INSTANCE_DELETE);
 
   }
 
@@ -162,7 +162,7 @@ public class RuntimeServiceAsyncOperationsTest {
         .createProcessInstanceQuery().processInstanceIds(new HashSet<String>(processIds));
 
     // when
-    Batch batch = runtimeService.deleteProcessInstancesAsync(processInstanceQuery, TESTING_INSTANCE_DELETE);
+    Batch batch = runtimeService.deleteProcessInstancesAsync(null, processInstanceQuery, TESTING_INSTANCE_DELETE);
 
     executeSeedJob(batch);
     executeBatchJobs(batch);
@@ -183,7 +183,7 @@ public class RuntimeServiceAsyncOperationsTest {
         .createProcessInstanceQuery().processInstanceIds(new HashSet<String>(processIds));
 
     // when
-    Batch batch = runtimeService.deleteProcessInstancesAsync(processInstanceQuery, null);
+    Batch batch = runtimeService.deleteProcessInstancesAsync(null, processInstanceQuery, null);
 
     executeSeedJob(batch);
     executeBatchJobs(batch);
@@ -199,9 +199,9 @@ public class RuntimeServiceAsyncOperationsTest {
   @Test
   public void testDeleteProcessInstancesAsyncWithNullQueryParameter() throws Exception {
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("processInstanceQuery is null");
+    thrown.expectMessage("processInstanceIds is empty");
 
-    runtimeService.deleteProcessInstancesAsync((ProcessInstanceQuery) null, TESTING_INSTANCE_DELETE);
+    runtimeService.deleteProcessInstancesAsync(null, null, TESTING_INSTANCE_DELETE);
   }
 
   @Deployment(resources = {
@@ -217,7 +217,7 @@ public class RuntimeServiceAsyncOperationsTest {
     thrown.expectMessage("processInstanceIds is empty");
 
     // when
-    runtimeService.deleteProcessInstancesAsync(query, TESTING_INSTANCE_DELETE);
+    runtimeService.deleteProcessInstancesAsync(null, query, TESTING_INSTANCE_DELETE);
   }
 
   /// helper //////
