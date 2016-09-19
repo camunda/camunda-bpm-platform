@@ -21,12 +21,13 @@
   <!-- METER INSERT -->
 
   <insert id="insertMeterLog" parameterType="org.camunda.bpm.engine.impl.persistence.entity.MeterLogEntity">
-    insert into ${prefix}ACT_RU_METER_LOG (ID_, NAME_, REPORTER_, VALUE_, MILLISECONDS_)
+    insert into ${prefix}ACT_RU_METER_LOG (ID_, NAME_, REPORTER_, VALUE_, TIMESTAMP_, MILLISECONDS_)
     values (
     #{id ,jdbcType=VARCHAR},
     #{name ,jdbcType=VARCHAR},
     #{reporter, jdbcType=VARCHAR},
     #{value ,jdbcType=BIGINT},
+    #{timestamp, jdbcType=TIMESTAMP},
     #{milliseconds ,jdbcType=BIGINT}
     )
   </insert>
@@ -67,8 +68,26 @@
 
   <select id="selectMeterLogSum" parameterType="org.camunda.bpm.engine.impl.metrics.MetricsQueryImpl" resultType="long">
     select SUM(RES.VALUE_)
-    <include refid="selectMeterLogsByQueryCriteriaSql"/>
+    <include refid="selectMeterLogsByQueryCriteriaSqlOldTimestampColumn"/>
   </select>
+
+  <sql id="selectMeterLogsByQueryCriteriaSqlOldTimestampColumn">
+    from ${prefix}ACT_RU_METER_LOG RES
+    <where>
+      <if test="name != null">
+        and RES.NAME_ = #{name}
+      </if>
+      <if test="reporter != null">
+        and RES.REPORTER_ = #{reporter}
+      </if>
+      <if test="startDate != null">
+        and RES.TIMESTAMP_ &gt;= #{startDate}
+      </if>
+      <if test="endDate != null">
+        and RES.TIMESTAMP_ &lt; #{endDate}
+      </if>
+    </where>
+  </sql>
 
   <sql id="selectMeterLogsByQueryCriteriaSql">
     from ${prefix}ACT_RU_METER_LOG RES
@@ -80,10 +99,10 @@
         and RES.REPORTER_ = #{reporter}
       </if>
       <if test="startDate != null">
-        and RES.MILLISECONDS_ &gt;= #{startDate}
+        and RES.MILLISECONDS_ &gt;= #{startDateMilliseconds}
       </if>
       <if test="endDate != null">
-        and RES.MILLISECONDS_ &lt; #{endDate}
+        and RES.MILLISECONDS_ &lt; #{endDateMilliseconds}
       </if>
     </where>
   </sql>

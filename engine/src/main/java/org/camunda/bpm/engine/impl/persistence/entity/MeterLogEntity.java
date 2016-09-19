@@ -27,6 +27,7 @@ public class MeterLogEntity implements DbEntity, Serializable {
 
   protected String id;
 
+  protected Date timestamp;
   protected Long milliseconds;
 
   protected String name;
@@ -43,6 +44,7 @@ public class MeterLogEntity implements DbEntity, Serializable {
     this.name = name;
     this.reporter = reporter;
     this.value = value;
+    this.timestamp = timestamp;
     this.milliseconds = timestamp.getTime();
   }
 
@@ -57,12 +59,20 @@ public class MeterLogEntity implements DbEntity, Serializable {
     this.id = id;
   }
 
-  public Long getTimestamp() {
+  public Date getTimestamp() {
+    return timestamp;
+  }
+
+  public void setTimestamp(Date timestamp) {
+    this.timestamp = timestamp;
+  }
+
+  public Long getMilliseconds() {
     return milliseconds;
   }
 
-  public void setTimestamp(Long timestamp) {
-    this.milliseconds = timestamp;
+  public void setMilliseconds(Long milliseconds) {
+    this.milliseconds = milliseconds;
   }
 
   public String getName() {
