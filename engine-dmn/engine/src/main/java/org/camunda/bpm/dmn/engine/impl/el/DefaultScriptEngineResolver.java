@@ -15,6 +15,9 @@ package org.camunda.bpm.dmn.engine.impl.el;
 
 import static org.camunda.commons.utils.EnsureUtil.ensureNotNull;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
@@ -22,11 +25,34 @@ import org.camunda.bpm.dmn.engine.impl.spi.el.DmnScriptEngineResolver;
 
 public class DefaultScriptEngineResolver implements DmnScriptEngineResolver {
 
-  protected ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
+  protected Map<String, ScriptEngine> scriptEngineCache = new HashMap<String, ScriptEngine>();
+
+  protected ScriptEngineManager scriptEngineManager;
+
+  public DefaultScriptEngineResolver(ScriptEngineManager scriptEngineManager) {
+    this.scriptEngineManager = scriptEngineManager;
+  }
+
+  public DefaultScriptEngineResolver() {
+    this(new ScriptEngineManager());
+  }
 
   public ScriptEngine getScriptEngineForLanguage(String language) {
     ensureNotNull("language", language);
-    return scriptEngineManager.getEngineByName(language);
+
+    ScriptEngine scriptEngine = scriptEngineCache.get(language);
+
+    if (scriptEngine == null) {
+      synchronized (this) {
+        scriptEngine = scriptEngineCache.get(language);
+        if (scriptEngine == null) {
+          scriptEngine = scriptEngineManager.getEngineByName(language);
+          scriptEngineCache.put(language, scriptEngine);
+        }
+      }
+    }
+
+    return scriptEngine;
   }
 
 }
