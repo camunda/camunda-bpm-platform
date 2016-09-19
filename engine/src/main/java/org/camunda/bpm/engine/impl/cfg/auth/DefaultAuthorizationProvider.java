@@ -302,7 +302,7 @@ public class DefaultAuthorizationProvider implements ResourceAuthorizationProvid
   protected AuthorizationEntity updateAuthorization(AuthorizationEntity authorization, String userId, String groupId, Resource resource, String resourceId, Permission... permissions) {
     if (authorization == null) {
       authorization = createGrantAuthorization(userId, groupId, resource, resourceId);
-      updateAuthorizationBasedOnCacheEntries( authorization, userId, groupId, resource, resourceId);
+      updateAuthorizationBasedOnCacheEntries(authorization, userId, groupId, resource, resourceId);
     }
 
     if (permissions != null) {
@@ -353,25 +353,33 @@ public class DefaultAuthorizationProvider implements ResourceAuthorizationProvid
     DbEntityManager dbManager = Context.getCommandContext().getDbEntityManager();
     List<AuthorizationEntity> list = dbManager.getCachedEntitiesByType(AuthorizationEntity.class);
     for (AuthorizationEntity authEntity : list) {
-      boolean sameUserId = areIdsEqual(authEntity.getUserId(), userId);
-      boolean sameGroupId = areIdsEqual(authEntity.getGroupId(), groupId);
-      boolean sameResourceId = areIdsEqual(authEntity.getResourceId(), (resourceId));
-      boolean sameResourceType = authEntity.getResourceType() == resource.resourceType();
-      boolean sameAuthorizationType = authEntity.getAuthorizationType() == AUTH_TYPE_GRANT;
-      if (sameUserId && sameGroupId &&
-          sameResourceType && sameResourceId &&
-          sameAuthorizationType) {
+      boolean hasSameAuthRights = hasEntitySameAuthorizationRights(authEntity, userId, groupId, resource, resourceId);
+      if (hasSameAuthRights) {
         int previousPermissions = authEntity.getPermissions();
         authorization.setPermissions(previousPermissions);
         dbManager.getDbEntityCache().remove(authEntity);
+        return;
       }
     }
   }
 
-  private boolean areIdsEqual(String firstId, String secondId) {
-    if (firstId == null || secondId == null)
+  protected boolean hasEntitySameAuthorizationRights(AuthorizationEntity authEntity, String userId, String groupId,
+                                                     Resource resource, String resourceId) {
+    boolean sameUserId = areIdsEqual(authEntity.getUserId(), userId);
+    boolean sameGroupId = areIdsEqual(authEntity.getGroupId(), groupId);
+    boolean sameResourceId = areIdsEqual(authEntity.getResourceId(), (resourceId));
+    boolean sameResourceType = authEntity.getResourceType() == resource.resourceType();
+    boolean sameAuthorizationType = authEntity.getAuthorizationType() == AUTH_TYPE_GRANT;
+    return sameUserId && sameGroupId &&
+        sameResourceType && sameResourceId &&
+        sameAuthorizationType;
+  }
+
+  protected boolean areIdsEqual(String firstId, String secondId) {
+    if (firstId == null || secondId == null) {
       return firstId == secondId;
-    else
+    }else {
       return firstId.equals(secondId);
+    }
   }
 }

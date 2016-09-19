@@ -10,7 +10,7 @@
 
     <sequenceFlow sourceRef="theStart" targetRef="task1" />
 
-    <userTask id="task1" camunda:assignee="horst" camunda:candidateUsers="horst"/>
+    <userTask id="task1" camunda:candidateUsers="hans, hans"/>
 
     <sequenceFlow sourceRef="task1" targetRef="theEnd" />
 

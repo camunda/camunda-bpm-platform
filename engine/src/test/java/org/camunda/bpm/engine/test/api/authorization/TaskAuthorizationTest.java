@@ -10045,9 +10045,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     try {
       taskService.saveTask(newTask);
     } catch (Exception e) {
-      ex = e;
+      fail("Setting same assignee and owner to user should not fail!");
     }
-    assertEquals(null, ex);
 
     taskService.deleteTask(newTask.getId(), true);
   }
@@ -10081,41 +10080,44 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   @Deployment
   public void testAssignSameAssigneeAndOwnerToProcess() {
     //given
-    // -> model as xml
-
-    // when
     createGrantAuthorization(Resources.PROCESS_DEFINITION, Authorization.ANY, userId, Permissions.ALL);
     createGrantAuthorization(Resources.PROCESS_INSTANCE, Authorization.ANY, userId, Permissions.ALL);
 
-    // then
+    // when
     runtimeService.startProcessInstanceByKey("process");
+
+    // then
+    List<Authorization> auths = authorizationService.createAuthorizationQuery().userIdIn("horst").list();
+    assertTrue(auths.size() == 1);
 
   }
 
   @Deployment
   public void testAssignSameUserToProcessTwice() {
     //given
-    // -> model as xml
-
-    // when
     createGrantAuthorization(Resources.PROCESS_DEFINITION, Authorization.ANY, userId, Permissions.ALL);
     createGrantAuthorization(Resources.PROCESS_INSTANCE, Authorization.ANY, userId, Permissions.ALL);
 
-    // then
+    // when
     runtimeService.startProcessInstanceByKey("process");
+
+    // then
+    List<Authorization> auths = authorizationService.createAuthorizationQuery().userIdIn("hans").list();
+    assertTrue(auths.size() == 1);
   }
 
   @Deployment
   public void testAssignSameGroupToProcessTwice() {
     //given
-    // -> model as xml
-
-    // when
     createGrantAuthorization(Resources.PROCESS_DEFINITION, Authorization.ANY, userId, Permissions.ALL);
     createGrantAuthorization(Resources.PROCESS_INSTANCE, Authorization.ANY, userId, Permissions.ALL);
 
-    // then
+    // when
     runtimeService.startProcessInstanceByKey("process");
+
+    // then
+    List<Authorization> auths = authorizationService.createAuthorizationQuery().groupIdIn("abc").list();
+    assertTrue(auths.size() == 1);
   }
 
 
