@@ -119,4 +119,6 @@ public class AbstractBpmnParseListener implements BpmnParseListener {
   public void parseBoundaryEscalationEventDefinition(Element escalationEventDefinition, boolean interrupting, ActivityImpl boundaryEventActivity) {
   }
 
+  public void parseBoundaryConditionalEventDefinition(Element element, boolean interrupting, ActivityImpl conditionalActivity) {
+  }
 }

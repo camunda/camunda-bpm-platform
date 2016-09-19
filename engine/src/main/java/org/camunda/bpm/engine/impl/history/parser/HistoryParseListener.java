@@ -218,6 +218,9 @@ public class HistoryParseListener implements BpmnParseListener {
   public void parseBoundaryEscalationEventDefinition(Element escalationEventDefinition, boolean interrupting, ActivityImpl boundaryEventActivity) {
   }
 
+  public void parseBoundaryConditionalEventDefinition(Element element, boolean interrupting, ActivityImpl conditionalActivity) {
+  }
+
   // helper methods ///////////////////////////////////////////////////////////
 
   protected void addActivityHandlers(ActivityImpl activity) {

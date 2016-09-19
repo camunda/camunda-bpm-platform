@@ -56,6 +56,7 @@ public final class ActivityTypes {
   public static final String BOUNDARY_ERROR = "boundaryError";
   public static final String BOUNDARY_ESCALATION = "boundaryEscalation";
   public static final String BOUNDARY_CANCEL = "cancelBoundaryCatch";
+  public static final String BOUNDARY_CONDITIONAL = "boundaryConditional";
 
   //start events ////////////////////////////////////////
   public static final String START_EVENT = "startEvent";
@@ -65,6 +66,7 @@ public final class ActivityTypes {
   public static final String START_EVENT_ESCALATION = "escalationStartEvent";
   public static final String START_EVENT_COMPENSATION = "compensationStartEvent";
   public static final String START_EVENT_ERROR = "errorStartEvent";
+  public static final String START_EVENT_CONDITIONAL = "conditionalStartEvent";
 
   //intermediate catch events ////////////////////////////////////////
   public static final String INTERMEDIATE_EVENT_CATCH = "intermediateCatchEvent";
@@ -72,6 +74,7 @@ public final class ActivityTypes {
   public static final String INTERMEDIATE_EVENT_TIMER = "intermediateTimer";
   public static final String INTERMEDIATE_EVENT_LINK = "intermediateLinkCatch";
   public static final String INTERMEDIATE_EVENT_SIGNAL = "intermediateSignalCatch";
+  public static final String INTERMEDIATE_EVENT_CONDITIONAL = "intermediateConditional";
 
   //intermediate throw events ////////////////////////////////
   public static final String INTERMEDIATE_EVENT_THROW = "intermediateThrowEvent";

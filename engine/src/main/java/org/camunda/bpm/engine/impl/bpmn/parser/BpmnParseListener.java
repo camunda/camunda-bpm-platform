@@ -68,5 +68,6 @@ public interface BpmnParseListener {
   void parseBoundaryEvent(Element boundaryEventElement, ScopeImpl scopeElement, ActivityImpl nestedActivity);
   void parseBoundaryMessageEventDefinition(Element element, boolean interrupting, ActivityImpl messageActivity);
   void parseBoundaryEscalationEventDefinition(Element escalationEventDefinition, boolean interrupting, ActivityImpl boundaryEventActivity);
+  void parseBoundaryConditionalEventDefinition(Element element, boolean interrupting, ActivityImpl conditionalActivity);
 
 }

@@ -19,6 +19,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.bpmn.behavior.BoundaryEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.CompensationEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.EventSubProcessStartEventActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateCatchEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.NoneStartEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.ThrowEscalationEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
@@ -500,6 +501,31 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
     assertEquals(EventSubProcessStartEventActivityBehavior.class, escalationStartEvent.getActivityBehavior().getClass());
   }
 
+  @Deployment
+  public void testParseConditionalBoundaryEvent() {
+    ActivityImpl conditionalBoundaryEvent = findActivityInDeployedProcessDefinition("conditionalBoundaryEvent");
+
+    assertEquals("boundaryConditional", conditionalBoundaryEvent.getProperties().get(BpmnProperties.TYPE));
+    assertEquals(BoundaryEventActivityBehavior.class, conditionalBoundaryEvent.getActivityBehavior().getClass());
+  }
+
+  @Deployment
+  public void testParseIntermediateConditionalEvent() {
+    ActivityImpl intermediateConditionalEvent = findActivityInDeployedProcessDefinition("intermediateConditionalEvent");
+
+    assertEquals("intermediateConditionalEvent", intermediateConditionalEvent.getProperties().get(BpmnProperties.TYPE));
+    assertEquals(IntermediateCatchEventActivityBehavior.class, intermediateConditionalEvent.getActivityBehavior().getClass());
+  }
+
+  @Deployment
+  public void testParseEventSubprocessConditionalStartEvent() {
+    ActivityImpl conditionalStartEventSubProcess = findActivityInDeployedProcessDefinition("conditionalStartEventSubProcess");
+
+    assertEquals("conditionalStartEventSubprocess", conditionalStartEventSubProcess.getProperties().get(BpmnProperties.TYPE));
+    assertEquals(EventSubProcessStartEventActivityBehavior.class, conditionalStartEventSubProcess.getActivityBehavior().getClass());
+
+  }
+
   protected void assertActivityBounds(ActivityImpl activity, int x, int y, int width, int height) {
     assertEquals(x, activity.getX());
     assertEquals(y, activity.getY());
@@ -517,7 +543,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
   protected ActivityImpl findActivityInDeployedProcessDefinition(String activityId) {
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
     assertNotNull(processDefinition);
-
+    
     ProcessDefinitionEntity cachedProcessDefinition = processEngineConfiguration.getDeploymentCache()
                                                         .getProcessDefinitionCache()
                                                         .get(processDefinition.getId());
