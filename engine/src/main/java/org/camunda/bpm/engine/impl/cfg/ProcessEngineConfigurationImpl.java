@@ -997,48 +997,52 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   }
 
   protected void initSqlSessionFactory() {
-    if(isUseSharedSqlSessionFactory) {
-      sqlSessionFactory = cachedSqlSessionFactory;
-    }
 
-    if (sqlSessionFactory==null) {
-      InputStream inputStream = null;
-      try {
-        inputStream = getMyBatisXmlConfigurationSteam();
+    // to protect access to cachedSqlSessionFactory see CAM-6682
+    synchronized (ProcessEngineConfigurationImpl.class) {
 
-        // update the jdbc parameters to the configured ones...
-        Environment environment = new Environment("default", transactionFactory, dataSource);
-        Reader reader = new InputStreamReader(inputStream);
+      if (isUseSharedSqlSessionFactory) {
+        sqlSessionFactory = cachedSqlSessionFactory;
+      }
 
-        Properties properties = new Properties();
+      if (sqlSessionFactory == null) {
+        InputStream inputStream = null;
+        try {
+          inputStream = getMyBatisXmlConfigurationSteam();
 
-        if(isUseSharedSqlSessionFactory) {
-          properties.put("prefix", "${@org.camunda.bpm.engine.impl.context.Context@getProcessEngineConfiguration().databaseTablePrefix}");
+          // update the jdbc parameters to the configured ones...
+          Environment environment = new Environment("default", transactionFactory, dataSource);
+          Reader reader = new InputStreamReader(inputStream);
+
+          Properties properties = new Properties();
+
+          if (isUseSharedSqlSessionFactory) {
+            properties.put("prefix", "${@org.camunda.bpm.engine.impl.context.Context@getProcessEngineConfiguration().databaseTablePrefix}");
+          } else {
+            properties.put("prefix", databaseTablePrefix);
+          }
+
+          initSqlSessionFactoryProperties(properties, databaseTablePrefix, databaseType);
+
+          XMLConfigBuilder parser = new XMLConfigBuilder(reader, "", properties);
+          Configuration configuration = parser.getConfiguration();
+          configuration.setEnvironment(environment);
+          configuration = parser.parse();
+
+          configuration.setDefaultStatementTimeout(jdbcStatementTimeout);
+
+          sqlSessionFactory = new DefaultSqlSessionFactory(configuration);
+
+          if (isUseSharedSqlSessionFactory) {
+            cachedSqlSessionFactory = sqlSessionFactory;
+          }
+
+
+        } catch (Exception e) {
+          throw new ProcessEngineException("Error while building ibatis SqlSessionFactory: " + e.getMessage(), e);
+        } finally {
+          IoUtil.closeSilently(inputStream);
         }
-        else {
-          properties.put("prefix", databaseTablePrefix);
-        }
-
-        initSqlSessionFactoryProperties(properties, databaseTablePrefix, databaseType);
-
-        XMLConfigBuilder parser = new XMLConfigBuilder(reader,"", properties);
-        Configuration configuration = parser.getConfiguration();
-        configuration.setEnvironment(environment);
-        configuration = parser.parse();
-
-        configuration.setDefaultStatementTimeout(jdbcStatementTimeout);
-
-        sqlSessionFactory = new DefaultSqlSessionFactory(configuration);
-
-        if(isUseSharedSqlSessionFactory) {
-          cachedSqlSessionFactory = sqlSessionFactory;
-        }
-
-
-      } catch (Exception e) {
-        throw new ProcessEngineException("Error while building ibatis SqlSessionFactory: " + e.getMessage(), e);
-      } finally {
-        IoUtil.closeSilently(inputStream);
       }
     }
   }
