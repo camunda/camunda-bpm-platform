@@ -13,28 +13,22 @@
 
 package org.camunda.bpm.engine.impl.batch.deletion;
 
+import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.impl.batch.*;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
-import org.camunda.bpm.engine.impl.json.JsonObjectConverter;
 import org.camunda.bpm.engine.impl.persistence.entity.*;
-import org.camunda.bpm.engine.impl.util.IoUtil;
-import org.camunda.bpm.engine.impl.util.StringUtil;
-import org.camunda.bpm.engine.impl.util.json.JSONObject;
-import org.camunda.bpm.engine.impl.util.json.JSONTokener;
 
-import java.io.ByteArrayOutputStream;
-import java.io.Reader;
-import java.io.Writer;
 import java.util.List;
 
 /**
  *
  * @author Askar Akhmerov
  */
-public class DeleteProcessInstancesJobHandler extends AbstractBatchJobHandler<DeleteProcessInstanceBatchConfiguration> {
+public class DeleteProcessInstancesJobHandler extends AbstractProcessInstanceBatchJobHandler<DeleteProcessInstanceBatchConfiguration> {
+
   public static final DeleteProcessInstancesBatchJobDeclaration JOB_DECLARATION = new DeleteProcessInstancesBatchJobDeclaration();
 
   @Override
@@ -47,73 +41,30 @@ public class DeleteProcessInstancesJobHandler extends AbstractBatchJobHandler<De
   }
 
   @Override
-  public JobDeclaration<?, MessageEntity> getJobDeclaration() {
+  public JobDeclaration<BatchJobContext, MessageEntity> getJobDeclaration() {
     return JOB_DECLARATION;
   }
 
   @Override
-  public boolean createJobs(BatchEntity batch) {
-    CommandContext commandContext = Context.getCommandContext();
-    ByteArrayManager byteArrayManager = commandContext.getByteArrayManager();
-    JobManager jobManager = commandContext.getJobManager();
-
-    DeleteProcessInstanceBatchConfiguration configuration = readConfiguration(batch.getConfigurationBytes());
-
-    int batchJobsPerSeed = batch.getBatchJobsPerSeed();
-    int invocationsPerBatchJob = batch.getInvocationsPerBatchJob();
-
-    List<String> processInstanceIds = configuration.getProcessInstanceIds();
-    int numberOfInstancesToProcess = Math.min(invocationsPerBatchJob * batchJobsPerSeed, processInstanceIds.size());
-    // view of process instances to process
-    List<String> processInstancesToProcess = processInstanceIds.subList(0, numberOfInstancesToProcess);
-
-    int createdJobs = 0;
-    while (!processInstancesToProcess.isEmpty()) {
-      int lastIdIndex = Math.min(invocationsPerBatchJob, processInstancesToProcess.size());
-      // view of process instances for this job
-      List<String> idsForJob = processInstancesToProcess.subList(0, lastIdIndex);
-
-      DeleteProcessInstanceBatchConfiguration jobConfiguration = DeleteProcessInstanceBatchConfiguration
-          .create(idsForJob, configuration.getDeleteReason());
-      ByteArrayEntity configurationEntity = saveConfiguration(byteArrayManager, jobConfiguration);
-
-      JobEntity job = createBatchJob(batch, configurationEntity);
-      jobManager.insertAndHintJobExecutor(job);
-
-      idsForJob.clear();
-      createdJobs++;
-    }
-
-    // update created jobs for batch
-    batch.setJobsCreated(batch.getJobsCreated() + createdJobs);
-
-    // update batch configuration
-    batch.setConfigurationBytes(writeConfiguration(configuration));
-
-    return processInstanceIds.isEmpty();
+  protected DeleteProcessInstanceBatchConfiguration createJobConfiguration(DeleteProcessInstanceBatchConfiguration configuration, List<String> processIdsForJob) {
+    return DeleteProcessInstanceBatchConfiguration.create(processIdsForJob, configuration.getDeleteReason());
   }
 
   @Override
   public void execute(BatchJobConfiguration configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
     ByteArrayEntity configurationEntity = commandContext
-        .getDbEntityManager()
-        .selectById(ByteArrayEntity.class, configuration.getConfigurationByteArrayId());
+      .getDbEntityManager()
+      .selectById(ByteArrayEntity.class, configuration.getConfigurationByteArrayId());
 
     DeleteProcessInstanceBatchConfiguration batchConfiguration = readConfiguration(configurationEntity.getBytes());
 
+    RuntimeService runtimeService = commandContext.getProcessEngineConfiguration().getRuntimeService();
+
     for (String pi : batchConfiguration.getProcessInstanceIds()) {
-      commandContext.getProcessEngineConfiguration()
-          .getRuntimeService()
-          .deleteProcessInstance(pi,batchConfiguration.deleteReason,true,true);
+      runtimeService.deleteProcessInstance(pi, batchConfiguration.deleteReason, true, true);
     }
 
-
     commandContext.getByteArrayManager().delete(configurationEntity);
-  }
-
-  protected JobEntity createBatchJob(BatchEntity batch, ByteArrayEntity configuration) {
-    BatchJobContext creationContext = new BatchJobContext(batch, configuration);
-    return JOB_DECLARATION.createJobInstance(creationContext);
   }
 
 }

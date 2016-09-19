@@ -13,11 +13,18 @@
 
 package org.camunda.bpm.engine.impl.batch;
 
+import org.camunda.bpm.engine.batch.Batch;
+import org.camunda.bpm.engine.impl.batch.deletion.DeleteProcessInstanceBatchConfiguration;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
 import org.camunda.bpm.engine.impl.json.JsonObjectConverter;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayManager;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.JobManager;
+import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.StringUtil;
 import org.camunda.bpm.engine.impl.util.json.JSONObject;
@@ -29,11 +36,67 @@ import java.io.Writer;
 import java.util.List;
 
 /**
- * Common methods for batch job handlers, providing serialization, configuration instantiation, etc.
+ * Common methods for batch job handlers based on process instances, providing serialization, configuration instantiation, etc.
  *
  * @author Askar Akhmerov
  */
-public abstract class AbstractBatchJobHandler <T extends AbstractBatchConfiguration> implements BatchJobHandler<T> {
+public abstract class AbstractProcessInstanceBatchJobHandler<T extends AbstractProcessInstanceBatchConfiguration> implements BatchJobHandler<T> {
+
+  public abstract JobDeclaration<BatchJobContext, MessageEntity> getJobDeclaration();
+
+  @Override
+  public boolean createJobs(BatchEntity batch) {
+    CommandContext commandContext = Context.getCommandContext();
+    ByteArrayManager byteArrayManager = commandContext.getByteArrayManager();
+    JobManager jobManager = commandContext.getJobManager();
+
+    T configuration = readConfiguration(batch.getConfigurationBytes());
+
+    int batchJobsPerSeed = batch.getBatchJobsPerSeed();
+    int invocationsPerBatchJob = batch.getInvocationsPerBatchJob();
+
+    List<String> processInstanceIds = configuration.getProcessInstanceIds();
+    int numberOfInstancesToProcess = Math.min(invocationsPerBatchJob * batchJobsPerSeed, processInstanceIds.size());
+    // view of process instances to process
+    List<String> processInstancesToProcess = processInstanceIds.subList(0, numberOfInstancesToProcess);
+
+    int createdJobs = 0;
+    while (!processInstancesToProcess.isEmpty()) {
+      int lastIdIndex = Math.min(invocationsPerBatchJob, processInstancesToProcess.size());
+      // view of process instances for this job
+      List<String> idsForJob = processInstancesToProcess.subList(0, lastIdIndex);
+
+      T jobConfiguration = createJobConfiguration(configuration, idsForJob);
+      ByteArrayEntity configurationEntity = saveConfiguration(byteArrayManager, jobConfiguration);
+
+      JobEntity job = createBatchJob(batch, configurationEntity);
+      postProcessJob(configuration, job);
+      jobManager.insertAndHintJobExecutor(job);
+
+      idsForJob.clear();
+      createdJobs++;
+    }
+
+    // update created jobs for batch
+    batch.setJobsCreated(batch.getJobsCreated() + createdJobs);
+
+    // update batch configuration
+    batch.setConfigurationBytes(writeConfiguration(configuration));
+
+    return processInstanceIds.isEmpty();
+  }
+
+  protected abstract T createJobConfiguration(T configuration, List<String> processIdsForJob);
+
+  protected void postProcessJob(T configuration, JobEntity job) {
+    // do nothing as default
+  }
+
+
+  protected JobEntity createBatchJob(BatchEntity batch, ByteArrayEntity configuration) {
+    BatchJobContext creationContext = new BatchJobContext(batch, configuration);
+    return getJobDeclaration().createJobInstance(creationContext);
+  }
 
   @Override
   public void deleteJobs(BatchEntity batch) {

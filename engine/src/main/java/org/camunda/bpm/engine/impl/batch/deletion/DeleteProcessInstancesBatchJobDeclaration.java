@@ -14,47 +14,15 @@
 package org.camunda.bpm.engine.impl.batch.deletion;
 
 import org.camunda.bpm.engine.batch.Batch;
-import org.camunda.bpm.engine.impl.batch.BatchJobConfiguration;
-import org.camunda.bpm.engine.impl.batch.BatchJobContext;
-import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.core.variable.mapping.value.ConstantValueProvider;
-import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValueProvider;
-import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
-import org.camunda.bpm.engine.impl.jobexecutor.JobHandlerConfiguration;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
+import org.camunda.bpm.engine.impl.batch.AbstractProcessInstanceBatchJobDeclaration;
 
 /**
  * @author Askar Akhmerov
  */
-public class DeleteProcessInstancesBatchJobDeclaration extends JobDeclaration<BatchJobContext, MessageEntity> {
+public class DeleteProcessInstancesBatchJobDeclaration extends AbstractProcessInstanceBatchJobDeclaration {
+
   public DeleteProcessInstancesBatchJobDeclaration() {
     super(Batch.TYPE_PROCESS_INSTANCE_DELETION);
   }
 
-  @Override
-  protected ExecutionEntity resolveExecution(BatchJobContext context) {
-    return null;
-  }
-
-  @Override
-  protected MessageEntity newJobInstance(BatchJobContext context) {
-    return new MessageEntity();
-  }
-
-  @Override
-  protected JobHandlerConfiguration resolveJobHandlerConfiguration(BatchJobContext context) {
-    return new BatchJobConfiguration(context.getConfiguration().getId());
-  }
-
-  @Override
-  protected String resolveJobDefinitionId(BatchJobContext context) {
-    return context.getBatch().getBatchJobDefinitionId();
-  }
-
-  public ParameterValueProvider getJobPriorityProvider() {
-    long batchJobPriority = Context.getProcessEngineConfiguration()
-        .getBatchJobPriority();
-    return new ConstantValueProvider(batchJobPriority);
-  }
 }

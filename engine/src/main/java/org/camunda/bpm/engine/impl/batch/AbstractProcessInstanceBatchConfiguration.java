@@ -13,6 +13,19 @@
 
 package org.camunda.bpm.engine.impl.batch;
 
-public abstract class AbstractBatchConfiguration {
+import java.util.List;
+
+
+public abstract class AbstractProcessInstanceBatchConfiguration {
+
+  protected List<String> processInstanceIds;
+
+  public List<String> getProcessInstanceIds() {
+    return processInstanceIds;
+  }
+
+  public void setProcessInstanceIds(List<String> processInstanceIds) {
+    this.processInstanceIds = processInstanceIds;
+  }
 
 }
