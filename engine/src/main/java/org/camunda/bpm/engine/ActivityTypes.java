@@ -13,8 +13,9 @@
 package org.camunda.bpm.engine;
 
 /**
- * Represents the XML tags as used in the BPMN 2.0 process definition file.
- * Events, gateways and activities are summed together as activities by Camunda.
+ * Class contains constants that identifies the activity types, which are used by Camunda.
+ * Events, gateways and activities are summed together as activities.
+ * They typically correspond to the XML tags used in the BPMN 2.0 process definition file.
  *
  * @author Thorben Lindhauer
  * @author Christopher Zell <christopher.zell@camunda.com>

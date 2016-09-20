@@ -36,8 +36,10 @@ public interface HistoricActivityInstance {
   String getActivityName();
 
   /**
-   * The XML tag of the activity as used in the process file.
-   * All activity tags are available in {@link org.camunda.bpm.engine.ActivityTypes}
+   * The activity type of the activity.
+   * Typically the activity type correspond to the XML tag used in the BPMN 2.0 process definition file.
+   *
+   * All activity types are available in {@link org.camunda.bpm.engine.ActivityTypes}
    *
    * @see org.camunda.bpm.engine.ActivityTypes
    */
