@@ -32,6 +32,10 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
  */
 public abstract class AbstractDeleteProcessInstanceCmd {
 
+  protected boolean externallyTerminated;
+  protected String deleteReason;
+  protected boolean skipCustomListeners;
+
   protected void checkDeleteProcessInstance(ExecutionEntity execution, CommandContext commandContext) {
     for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
       checker.checkDeleteProcessInstance(execution);

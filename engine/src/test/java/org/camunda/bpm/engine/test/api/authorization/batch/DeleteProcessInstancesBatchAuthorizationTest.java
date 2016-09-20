@@ -11,7 +11,6 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario;
-import org.camunda.bpm.engine.test.api.authorization.util.AuthorizationTestBaseRule;
 import org.camunda.bpm.engine.test.api.authorization.util.AuthorizationTestRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
@@ -20,7 +19,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -33,7 +31,6 @@ import java.util.List;
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario.scenario;
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSpec.grant;
 import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
@@ -43,6 +40,7 @@ import static org.junit.Assert.fail;
 @RunWith(Parameterized.class)
 public class DeleteProcessInstancesBatchAuthorizationTest {
   protected static final String TEST_REASON = "test reason";
+  protected static final long BATCH_OPERATIONS = 3L;
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected AuthorizationTestRule authRule = new AuthorizationTestRule(engineRule);
   protected ProcessEngineTestRule testHelper = new ProcessEngineTestRule(engineRule);
@@ -52,6 +50,7 @@ public class DeleteProcessInstancesBatchAuthorizationTest {
   protected Batch batch;
   protected RuntimeService runtimeService;
   protected ManagementService managementService;
+  protected int invocationsPerBatchJob;
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(authRule).around(testHelper);
@@ -64,17 +63,19 @@ public class DeleteProcessInstancesBatchAuthorizationTest {
     return AuthorizationTestRule.asParameters(
         scenario()
             .withAuthorizations(
-                grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE),
-                grant(Resources.PROCESS_INSTANCE, "processInstance1", "userId", Permissions.DELETE))
+                grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
+                grant(Resources.PROCESS_INSTANCE, "processInstance1", "userId", Permissions.READ, Permissions.DELETE),
+                grant(Resources.PROCESS_INSTANCE, "processInstance2", "userId", Permissions.READ)
+            )
             .failsDueToRequired(
                 grant(Resources.PROCESS_INSTANCE, "processInstance2", "userId", Permissions.DELETE),
                 grant(Resources.PROCESS_DEFINITION, "Process", "userId", Permissions.DELETE_INSTANCE)
             ),
         scenario()
             .withAuthorizations(
-                grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE),
-                grant(Resources.PROCESS_INSTANCE, "processInstance1", "userId", Permissions.DELETE),
-                grant(Resources.PROCESS_INSTANCE, "processInstance2", "userId", Permissions.DELETE)
+                grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
+                grant(Resources.PROCESS_INSTANCE, "processInstance1", "userId", Permissions.ALL),
+                grant(Resources.PROCESS_INSTANCE, "processInstance2", "userId", Permissions.ALL)
             ).succeeds()
     );
   }
@@ -84,10 +85,11 @@ public class DeleteProcessInstancesBatchAuthorizationTest {
     authRule.createUserAndGroup("userId", "groupId");
     runtimeService = engineRule.getRuntimeService();
     managementService = engineRule.getManagementService();
+    invocationsPerBatchJob = engineRule.getProcessEngineConfiguration().getInvocationsPerBatchJob();
   }
 
   @Before
-  public void deployProcessesAndCreateMigrationPlan() {
+  public void deployProcesses() {
     ProcessDefinition sourceDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
     processInstance = engineRule.getRuntimeService().startProcessInstanceById(sourceDefinition.getId());
     processInstance2 = engineRule.getRuntimeService().startProcessInstanceById(sourceDefinition.getId());
@@ -96,6 +98,7 @@ public class DeleteProcessInstancesBatchAuthorizationTest {
   @After
   public void tearDown() {
     authRule.deleteUsersAndGroups();
+    engineRule.getProcessEngineConfiguration().setInvocationsPerBatchJob(invocationsPerBatchJob);
   }
 
   @After
@@ -113,36 +116,57 @@ public class DeleteProcessInstancesBatchAuthorizationTest {
     }
   }
 
+  @Test
+  public void testWithTwoInvocationsProcessInstancesList() {
+    engineRule.getProcessEngineConfiguration().setInvocationsPerBatchJob(2);
+    setupAndExecuteProcessInstancesListTest();
+
+    // then
+    if (authRule.assertScenario(scenario)) {
+      if (testHelper.isHistoryLevelFull()) {
+        assertThat(engineRule.getHistoryService().createUserOperationLogQuery().count(), is(BATCH_OPERATIONS));
+      }
+
+      if (authRule.scenarioSucceeded()) {
+        assertThat(runtimeService.createProcessInstanceQuery().count(), is(0L));
+      } else {
+        assertThat(runtimeService.createProcessInstanceQuery().count(), is(2L));
+      }
+    }
+  }
 
   @Test
-  public void testWithProcessInstancesList() {
-    engineRule.getProcessEngineConfiguration().setInvocationsPerBatchJob(2);
+  public void testProcessInstancesList() {
+    setupAndExecuteProcessInstancesListTest();
+    // then
+    if (authRule.assertScenario(scenario)) {
+      if (testHelper.isHistoryLevelFull()) {
+        assertThat(engineRule.getHistoryService().createUserOperationLogQuery().count(), is(BATCH_OPERATIONS));
+      }
 
+      if (authRule.scenarioSucceeded()) {
+        assertThat(runtimeService.createProcessInstanceQuery().count(), is(0L));
+      } else {
+        assertThat(runtimeService.createProcessInstanceQuery().count(), is(1L));
+      }
+    }
+  }
+
+  protected void setupAndExecuteProcessInstancesListTest() {
     //given
     List<String> processInstanceIds = Arrays.asList(processInstance.getId(), processInstance2.getId());
-    batch = runtimeService.deleteProcessInstancesAsync(
-        processInstanceIds, null, TEST_REASON);
-
-    // when
     authRule
         .init(scenario)
         .withUser("userId")
-        .bindResource("batchId", batch.getId())
         .bindResource("processInstance1", processInstance.getId())
         .bindResource("processInstance2", processInstance2.getId())
         .start();
 
+    // when
+    batch = runtimeService.deleteProcessInstancesAsync(
+        processInstanceIds, null, TEST_REASON);
 
-    executeBatchAndSeeds();
-
-    // then
-    if (authRule.assertScenario(scenario)) {
-      if (ProcessEngineConfiguration.HISTORY_FULL.equals(engineRule.getProcessEngineConfiguration().getHistory())) {
-        assertThat(engineRule.getHistoryService().createUserOperationLogQuery().count(), is(4l));
-      }
-    }
-
-    engineRule.getProcessEngineConfiguration().setInvocationsPerBatchJob(1);
+    executeSeedAndBatchJobs();
   }
 
   @Test
@@ -150,29 +174,29 @@ public class DeleteProcessInstancesBatchAuthorizationTest {
     //given
     ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery()
         .processInstanceIds(new HashSet<String>(Arrays.asList(processInstance.getId(), processInstance2.getId())));
-    batch = runtimeService.deleteProcessInstancesAsync(null,
-        processInstanceQuery, TEST_REASON);
 
-    // when
     authRule
         .init(scenario)
         .withUser("userId")
-        .bindResource("batchId", batch.getId())
         .bindResource("processInstance1", processInstance.getId())
         .bindResource("processInstance2", processInstance2.getId())
         .start();
 
-    executeBatchAndSeeds();
+    // when
+
+    batch = runtimeService.deleteProcessInstancesAsync(null,
+        processInstanceQuery, TEST_REASON);
+    executeSeedAndBatchJobs();
 
     // then
     if (authRule.assertScenario(scenario)) {
-      if (ProcessEngineConfiguration.HISTORY_FULL.equals(engineRule.getProcessEngineConfiguration().getHistory())) {
-        assertThat(engineRule.getHistoryService().createUserOperationLogQuery().count(), is(4l));
+      if (testHelper.isHistoryLevelFull()) {
+        assertThat(engineRule.getHistoryService().createUserOperationLogQuery().count(), is(BATCH_OPERATIONS));
       }
     }
   }
 
-  protected void executeBatchAndSeeds() {
+  protected void executeSeedAndBatchJobs() {
     engineRule.getManagementService().executeJob(
         engineRule.getManagementService().createJobQuery().singleResult().getId());
 

@@ -106,6 +106,25 @@ public class RuntimeServiceAsyncOperationsTest {
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   @Test
+  public void testDeleteProcessInstancesAsyncWithListOnly() throws Exception {
+    // given
+    List<String> processIds = startTestProcesses(2);
+
+    // when
+    Batch batch = runtimeService.deleteProcessInstancesAsync(processIds, TESTING_INSTANCE_DELETE);
+
+    executeSeedJob(batch);
+    executeBatchJobs(batch);
+
+    // then
+    assertTasksAreDeleted(processIds, TESTING_INSTANCE_DELETE);
+    assertHistoricBatchExists();
+    assertProcessInstancesAreDeleted();
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Test
   public void testDeleteProcessInstancesAsyncWithNonExistingId() throws Exception {
     // given
     List<String> processIds = startTestProcesses(2);
@@ -164,6 +183,27 @@ public class RuntimeServiceAsyncOperationsTest {
 
     // when
     Batch batch = runtimeService.deleteProcessInstancesAsync(null, processInstanceQuery, TESTING_INSTANCE_DELETE);
+
+    executeSeedJob(batch);
+    executeBatchJobs(batch);
+
+    // then
+    assertTasksAreDeleted(processIds, TESTING_INSTANCE_DELETE);
+    assertHistoricBatchExists();
+    assertProcessInstancesAreDeleted();
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Test
+  public void testDeleteProcessInstancesAsyncWithQueryOnly() throws Exception {
+    // given
+    List<String> processIds = startTestProcesses(2);
+    ProcessInstanceQuery processInstanceQuery = runtimeService
+        .createProcessInstanceQuery().processInstanceIds(new HashSet<String>(processIds));
+
+    // when
+    Batch batch = runtimeService.deleteProcessInstancesAsync(processInstanceQuery, TESTING_INSTANCE_DELETE);
 
     executeSeedJob(batch);
     executeBatchJobs(batch);

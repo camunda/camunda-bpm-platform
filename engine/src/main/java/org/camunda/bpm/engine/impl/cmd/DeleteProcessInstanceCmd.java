@@ -24,10 +24,7 @@ import java.io.Serializable;
 public class DeleteProcessInstanceCmd extends AbstractDeleteProcessInstanceCmd implements Command<Void>, Serializable {
 
   private static final long serialVersionUID = 1L;
-  protected boolean externallyTerminated;
   protected String processInstanceId;
-  protected String deleteReason;
-  protected boolean skipCustomListeners;
 
   public DeleteProcessInstanceCmd(String processInstanceId, String deleteReason, boolean skipCustomListeners) {
     this(processInstanceId, deleteReason, skipCustomListeners, false);

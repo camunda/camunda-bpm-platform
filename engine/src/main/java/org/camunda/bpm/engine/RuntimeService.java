@@ -587,6 +587,41 @@ public interface RuntimeService {
   Batch deleteProcessInstancesAsync (List<String> processInstanceIds, ProcessInstanceQuery processInstanceQuery, String deleteReason);
 
   /**
+   * Delete an existing runtime process instances asynchronously using Batch operation.
+   *
+   * If both process instances list and query are provided, process instances containing in both sets
+   * will be deleted.
+   *
+   * @param processInstanceQuery query that will be used to fetch affected process instances.
+   *                             Cannot be null.
+   * @param deleteReason reason for deleting, which will be stored in the history. Can be null.
+   *
+   * @throws BadUserRequestException
+   *          when no process instance is found with the given id or id is null.
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#DELETE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#DELETE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   */
+  Batch deleteProcessInstancesAsync (ProcessInstanceQuery processInstanceQuery, String deleteReason);
+
+  /**
+   * Delete an existing runtime process instances asynchronously using Batch operation.
+   *
+   * If both process instances list and query are provided, process instances containing in both sets
+   * will be deleted.
+   *
+   * @param processInstanceIds id's of process instances to delete, cannot be null.
+   * @param deleteReason reason for deleting, which will be stored in the history. Can be null.
+   *
+   * @throws BadUserRequestException
+   *          when no process instance is found with the given id or id is null.
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#DELETE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#DELETE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   */
+  Batch deleteProcessInstancesAsync (List<String> processInstanceIds, String deleteReason);
+
+  /**
    * Delete an existing runtime process instance.
    *
    * @param processInstanceId id of process instance to delete, cannot be null.

@@ -192,46 +192,6 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
     assertThat(runtimeService.createProcessInstanceQuery().count(),is(0l));
   }
 
-  public void testDeleteProcessInstancesWithListeners() {
-
-  }
-
-  public void testDeleteProcessInstancesSkipCustomListenersEnsureHistoryWritten() {
-
-  }
-
-  public void testDeleteProcessInstancesSkipCustomListeners() {
-
-  }
-
-  public void testDeleteProcessInstancesSkipCustomListenersScope() {
-
-  }
-
-  public void testDeleteProcessInstancesSkipCustomTaskListeners() {
-
-  }
-
-  public void testDeleteProcessInstancesNullReason() {
-
-  }
-
-  public void testDeleteProcessInstancesUnexistingId() {
-
-  }
-
-  public void testDeleteProcessInstancesNullId() {
-
-  }
-
-  public void testDeleteProcessInstancesWithActiveCompensation() {
-
-  }
-
-  public void testDeleteProcessInstancesWithVariableOnScopeAndConcurrentExecution() {
-
-  }
-
   @Deployment
   public void testDeleteProcessInstanceWithListeners() {
     RecorderExecutionListener.clear();

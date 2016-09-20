@@ -25,16 +25,12 @@ import java.util.List;
 public class DeleteProcessInstancesCmd extends AbstractDeleteProcessInstanceCmd implements Command<Void>, Serializable {
 
   private static final long serialVersionUID = 1L;
-  protected boolean externallyTerminated;
   protected List<String> processInstanceIds;
-  protected String deleteReason;
-  protected boolean skipCustomListeners;
 
-  public DeleteProcessInstancesCmd(List<String> processInstanceIds, String deleteReason, boolean skipCustomListeners) {
-    this(processInstanceIds, deleteReason, skipCustomListeners, false);
-  }
-
-  public DeleteProcessInstancesCmd(List<String> processInstanceIds, String deleteReason, boolean skipCustomListeners, boolean externallyTerminated) {
+  public DeleteProcessInstancesCmd(List<String> processInstanceIds,
+                                   String deleteReason,
+                                   boolean skipCustomListeners,
+                                   boolean externallyTerminated) {
 
     this.processInstanceIds = processInstanceIds;
     this.deleteReason = deleteReason;

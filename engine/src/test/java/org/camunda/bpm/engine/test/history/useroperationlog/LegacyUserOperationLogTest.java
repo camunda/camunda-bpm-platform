@@ -36,11 +36,7 @@ import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.rules.RuleChain;
 
 /**
@@ -145,6 +141,26 @@ public class LegacyUserOperationLogTest {
     assertEquals(2, userOperationLogQuery().count());
     assertEquals(1, userOperationLogQuery().operationType(UserOperationLogEntry.OPERATION_TYPE_SET_VARIABLE).count());
     assertEquals(1, userOperationLogQuery().operationType(UserOperationLogEntry.OPERATION_TYPE_CREATE).count());
+  }
+
+  @Test
+  @Ignore
+  public void FAILING_testDontWriteDuplicateLogOnBatchDeletionJobExecution() {
+    ProcessDefinition definition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceById(definition.getId());
+    batch = runtimeService.deleteProcessInstancesAsync(
+        Arrays.asList(processInstance.getId()), null, "test reason");
+
+    Job seedJob = managementService
+        .createJobQuery()
+        .singleResult();
+    managementService.executeJob(seedJob.getId());
+
+    for (Job pending : managementService.createJobQuery().list()) {
+      managementService.executeJob(pending.getId());
+    }
+
+    assertEquals(4, userOperationLogQuery().count());
   }
 
   @Test
