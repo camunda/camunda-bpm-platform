@@ -39,7 +39,7 @@
               realOutput.setAttribute('title', 'Variable value of type ' + output.type + ' is not shown');
               realOutput.textContent = ' = [' + output.type + ']';
             }
-            event.gfx.firstChild.appendChild(realOutput);
+            event.gfx.lastChild.appendChild(realOutput);
           }
         });
       }
