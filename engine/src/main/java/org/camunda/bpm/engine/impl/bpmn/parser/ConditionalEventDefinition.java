@@ -25,18 +25,17 @@ import org.camunda.bpm.engine.impl.Condition;
  *
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
-public class ConditionalEventDefinition implements Serializable {
+public class ConditionalEventDefinition extends EventSubscriptionDeclaration implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
   protected Expression expression;
   protected Condition conditionalExpression;
-  protected final String handlerActivityId;
-  protected final boolean cancelActivity;
+  protected boolean interrupting;
 
-  public ConditionalEventDefinition(String handlerActivityId, boolean cancelActivity) {
-    this.handlerActivityId = handlerActivityId;
-    this.cancelActivity = cancelActivity;
+  public ConditionalEventDefinition(String eventName, String eventType, String activityId) {
+    super(eventName, eventType);
+    this.activityId = activityId;
   }
 
   public Expression getExpression() {
@@ -55,12 +54,11 @@ public class ConditionalEventDefinition implements Serializable {
     this.conditionalExpression = conditionalExpression;
   }
 
-  public String getHandlerActivityId() {
-    return handlerActivityId;
+  public boolean isInterrupting() {
+    return interrupting;
   }
 
-  public boolean isCancelActivity() {
-    return cancelActivity;
+  public void setInterrupting(boolean interrupting) {
+    this.interrupting = interrupting;
   }
-
 }

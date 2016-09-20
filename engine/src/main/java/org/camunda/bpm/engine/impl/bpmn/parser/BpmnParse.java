@@ -96,6 +96,7 @@ import org.camunda.bpm.engine.impl.el.Expression;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.el.FixedValue;
 import org.camunda.bpm.engine.impl.el.UelExpressionCondition;
+import org.camunda.bpm.engine.impl.event.ConditionalEventHandler;
 import org.camunda.bpm.engine.impl.event.MessageEventHandler;
 import org.camunda.bpm.engine.impl.form.handler.DefaultStartFormHandler;
 import org.camunda.bpm.engine.impl.form.handler.DefaultTaskFormHandler;
@@ -211,6 +212,7 @@ public class BpmnParse extends Parse {
   public static final String MESSAGE_EVENT_DEFINITION = "messageEventDefinition";
   public static final String ERROR_EVENT_DEFINITION = "errorEventDefinition";
   public static final String CANCEL_EVENT_DEFINITION = "cancelEventDefinition";
+  public static final String LINK_EVENT_DEFINITION = "linkEventDefinition";
   public static final String CONDITION_EXPRESSION = "conditionExpression";
   public static final String CONDITION = "condition";
 
@@ -1395,7 +1397,8 @@ public class BpmnParse extends Parse {
     Element timerEventDefinition = intermediateEventElement.element(TIMER_EVENT_DEFINITION);
     Element signalEventDefinition = intermediateEventElement.element(SIGNAL_EVENT_DEFINITION);
     Element messageEventDefinition = intermediateEventElement.element(MESSAGE_EVENT_DEFINITION);
-    Element linkEventDefinitionElement = intermediateEventElement.element("linkEventDefinition");
+    Element linkEventDefinitionElement = intermediateEventElement.element(LINK_EVENT_DEFINITION);
+    Element conditionalEventDefinitionElement = intermediateEventElement.element(CONDITIONAL_EVENT_DEFINITION);
 
     // shared by all events except for link event
     IntermediateCatchEventActivityBehavior defaultCatchBehaviour = new IntermediateCatchEventActivityBehavior(eventBasedGateway != null);
@@ -1410,16 +1413,14 @@ public class BpmnParse extends Parse {
       nestedActivity.setScope(true);
     }
 
+    nestedActivity.setActivityBehavior(defaultCatchBehaviour);
     if (timerEventDefinition != null) {
-      nestedActivity.setActivityBehavior(defaultCatchBehaviour);
       parseIntermediateTimerEventDefinition(timerEventDefinition, nestedActivity);
 
     } else if (signalEventDefinition != null) {
-      nestedActivity.setActivityBehavior(defaultCatchBehaviour);
       parseIntermediateSignalEventDefinition(signalEventDefinition, nestedActivity);
 
     } else if (messageEventDefinition != null) {
-      nestedActivity.setActivityBehavior(defaultCatchBehaviour);
       parseIntermediateMessageEventDefinition(messageEventDefinition, nestedActivity);
 
     } else if (linkEventDefinitionElement != null) {
@@ -1429,6 +1430,8 @@ public class BpmnParse extends Parse {
       nestedActivity.setActivityBehavior(new IntermediateCatchLinkEventActivityBehavior());
       parseIntermediateLinkEventCatchBehavior(intermediateEventElement, nestedActivity, linkEventDefinitionElement);
 
+    } else if (conditionalEventDefinitionElement != null) {
+      parseIntermediateConditionalEventDefinition(conditionalEventDefinitionElement, nestedActivity);
     } else {
       addError("Unsupported intermediate catch event type", intermediateEventElement);
     }
@@ -1481,7 +1484,7 @@ public class BpmnParse extends Parse {
   public ActivityImpl parseIntermediateThrowEvent(Element intermediateEventElement, ScopeImpl scopeElement) {
     Element signalEventDefinitionElement = intermediateEventElement.element(SIGNAL_EVENT_DEFINITION);
     Element compensateEventDefinitionElement = intermediateEventElement.element(COMPENSATE_EVENT_DEFINITION);
-    Element linkEventDefinitionElement = intermediateEventElement.element("linkEventDefinition");
+    Element linkEventDefinitionElement = intermediateEventElement.element(LINK_EVENT_DEFINITION);
     Element messageEventDefinitionElement = intermediateEventElement.element(MESSAGE_EVENT_DEFINITION);
     Element escalationEventDefinition = intermediateEventElement.element(ESCALATION_EVENT_DEFINITION);
 
@@ -3403,29 +3406,68 @@ public class BpmnParse extends Parse {
     variableDeclarations.add(variableDeclaration);
   }
 
+  /**
+   * Parses the given element as conditional boundary event.
+   *
+   * @param element the XML element which contains the conditional event information
+   * @param interrupting indicates if the event is interrupting or not
+   * @param conditionalActivity the conditional event activity
+   */
   public void parseBoundaryConditionalEventDefinition(Element element, boolean interrupting, ActivityImpl conditionalActivity) {
     conditionalActivity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.BOUNDARY_CONDITIONAL);
 
-    parseConditionalEventDefinition(element, interrupting, conditionalActivity);
+    ConditionalEventDefinition conditionalEventDefinition = parseConditionalEventDefinition(element, conditionalActivity);
+    conditionalEventDefinition.setInterrupting(interrupting);
+    addEventSubscriptionDeclaration(conditionalEventDefinition, conditionalActivity.getEventScope(), element);
 
     for (BpmnParseListener parseListener : parseListeners) {
       parseListener.parseBoundaryConditionalEventDefinition(element, interrupting, conditionalActivity);
     }
   }
 
-  public ActivityImpl parseIntermediateConditionalEventDefinition(Element conditionalEventDefinition, ActivityImpl conditionalActivity) {
+  /**
+   * Parses the given element as intermediate conditional event.
+   *
+   * @param element the XML element which contains the conditional event information
+   * @param conditionalActivity the conditional event activity
+   * @return returns the conditional activity with the parsed information
+   */
+  public ActivityImpl parseIntermediateConditionalEventDefinition(Element element, ActivityImpl conditionalActivity) {
+    conditionalActivity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.INTERMEDIATE_EVENT_CONDITIONAL);
 
+    ConditionalEventDefinition conditionalEventDefinition = parseConditionalEventDefinition(element, conditionalActivity);
+    addEventSubscriptionDeclaration(conditionalEventDefinition, conditionalActivity.getEventScope(), element);
+
+    for (BpmnParseListener parseListener : parseListeners) {
+      parseListener.parseIntermediateConditionalEventDefinition(element, conditionalActivity);
+    }
     return conditionalActivity;
   }
 
+  /**
+   *
+   *
+   * @param conditionalEventDefinition the XML element which contains the conditional event information
+   * @param interrupting indicates if the event is interrupting or not
+   * @param conditionalActivity the conditional event activity
+   * @return
+   */
   public ActivityImpl parseConditionalStartEventForEventSubprocess(Element conditionalEventDefinition, ActivityImpl conditionalActivity, boolean interrupting) {
 
 
     return conditionalActivity;
   }
 
-  public ConditionalEventDefinition parseConditionalEventDefinition(Element element, boolean interrupting, ActivityImpl conditionalActivity) {
-    ConditionalEventDefinition conditionalEventDefinition = new ConditionalEventDefinition(conditionalActivity.getId(), interrupting);
+  /**
+   * Parses the given element and returns an ConditionalEventDefinition object.
+   *
+   * @param element the XML element which contains the conditional event information
+   * @param conditionalActivity the conditional event activity
+   * @return the conditional event definition which was parsed
+   */
+  protected ConditionalEventDefinition parseConditionalEventDefinition(Element element, ActivityImpl conditionalActivity) {
+    ConditionalEventDefinition conditionalEventDefinition = new ConditionalEventDefinition(conditionalActivity.getName(),
+                                                                  ConditionalEventHandler.HANDLER_EVENT_TYPE, conditionalActivity.getId());
 
     Element conditionExprElement = element.element(CONDITION);
     if (conditionExprElement != null) {

@@ -505,7 +505,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
   public void testParseConditionalBoundaryEvent() {
     ActivityImpl conditionalBoundaryEvent = findActivityInDeployedProcessDefinition("conditionalBoundaryEvent");
 
-    assertEquals("boundaryConditional", conditionalBoundaryEvent.getProperties().get(BpmnProperties.TYPE));
+    assertEquals(ActivityTypes.BOUNDARY_CONDITIONAL, conditionalBoundaryEvent.getProperties().get(BpmnProperties.TYPE));
     assertEquals(BoundaryEventActivityBehavior.class, conditionalBoundaryEvent.getActivityBehavior().getClass());
   }
 
@@ -513,7 +513,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
   public void testParseIntermediateConditionalEvent() {
     ActivityImpl intermediateConditionalEvent = findActivityInDeployedProcessDefinition("intermediateConditionalEvent");
 
-    assertEquals("intermediateConditionalEvent", intermediateConditionalEvent.getProperties().get(BpmnProperties.TYPE));
+    assertEquals(ActivityTypes.INTERMEDIATE_EVENT_CONDITIONAL, intermediateConditionalEvent.getProperties().get(BpmnProperties.TYPE));
     assertEquals(IntermediateCatchEventActivityBehavior.class, intermediateConditionalEvent.getActivityBehavior().getClass());
   }
 
@@ -543,7 +543,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
   protected ActivityImpl findActivityInDeployedProcessDefinition(String activityId) {
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
     assertNotNull(processDefinition);
-    
+
     ProcessDefinitionEntity cachedProcessDefinition = processEngineConfiguration.getDeploymentCache()
                                                         .getProcessDefinitionCache()
                                                         .get(processDefinition.getId());

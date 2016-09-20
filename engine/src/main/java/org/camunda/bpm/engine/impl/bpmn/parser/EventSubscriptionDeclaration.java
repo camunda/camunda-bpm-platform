@@ -19,9 +19,11 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
+import org.camunda.bpm.engine.impl.event.ConditionalEventHandler;
 import org.camunda.bpm.engine.impl.event.MessageEventHandler;
 import org.camunda.bpm.engine.impl.event.SignalEventHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.EventSubscriptionJobDeclaration;
+import org.camunda.bpm.engine.impl.persistence.entity.ConditionalEventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEventSubscriptionEntity;
@@ -120,6 +122,8 @@ public class EventSubscriptionDeclaration implements Serializable {
       eventSubscriptionEntity = new MessageEventSubscriptionEntity(execution);
     } else if (eventType.equals(SignalEventHandler.EVENT_HANDLER_TYPE)) {
       eventSubscriptionEntity = new SignalEventSubscriptionEntity(execution);
+    } else if (eventType.equals(ConditionalEventHandler.HANDLER_EVENT_TYPE)) {
+      eventSubscriptionEntity = new ConditionalEventSubscriptionEntity(execution);
     } else {
       throw new ProcessEngineException("Found event definition of unknown type: " + eventType);
     }

@@ -8,7 +8,9 @@
     <bpmn:intermediateCatchEvent id="intermediateConditionalEvent">
       <bpmn:incoming>SequenceFlow_14y5rqk</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_01gkklh</bpmn:outgoing>
-      <bpmn:conditionalEventDefinition />
+      <bpmn:conditionalEventDefinition>
+        <bpmn:condition xsi:type="bpmn:tFormalExpression">${true}</bpmn:condition>
+      </bpmn:conditionalEventDefinition>
     </bpmn:intermediateCatchEvent>
     <bpmn:endEvent id="EndEvent_14y83w9" name="End">
       <bpmn:incoming>SequenceFlow_01gkklh</bpmn:incoming>

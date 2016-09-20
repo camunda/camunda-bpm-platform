@@ -20,11 +20,11 @@ import java.util.Map;
 import java.util.Set;
 
 import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
+import org.camunda.bpm.engine.impl.event.MessageEventHandler;
+import org.camunda.bpm.engine.impl.event.SignalEventHandler;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingEventSubscriptionInstance;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.MessageEventSubscriptionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.migration.MigrationInstruction;
@@ -37,8 +37,8 @@ public class EventSubscriptionInstanceHandler implements MigratingDependentInsta
 
   public static final Set<String> SUPPORTED_EVENT_TYPES = new HashSet<String>();
   static {
-    SUPPORTED_EVENT_TYPES.add(MessageEventSubscriptionEntity.EVENT_TYPE);
-    SUPPORTED_EVENT_TYPES.add(SignalEventSubscriptionEntity.EVENT_TYPE);
+    SUPPORTED_EVENT_TYPES.add(MessageEventHandler.EVENT_HANDLER_TYPE);
+    SUPPORTED_EVENT_TYPES.add(SignalEventHandler.EVENT_HANDLER_TYPE);
   }
 
   @Override

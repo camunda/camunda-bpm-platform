@@ -262,4 +262,9 @@ public class ProcessApplicationEventParseListener implements BpmnParseListener {
   @Override
   public void parseBoundaryConditionalEventDefinition(Element element, boolean interrupting, ActivityImpl conditionalActivity) {
   }
+
+  @Override
+  public void parseIntermediateConditionalEventDefinition(Element conditionalEventDefinition, ActivityImpl conditionalActivity) {
+  }
+
 }
