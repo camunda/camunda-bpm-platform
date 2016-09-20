@@ -13,9 +13,12 @@
 
 package org.camunda.bpm.dmn.engine.impl;
 
+import javax.script.CompiledScript;
+
+import org.camunda.bpm.dmn.engine.impl.spi.el.ElExpression;
 import org.camunda.bpm.dmn.engine.impl.spi.type.DmnTypeDefinition;
 
-public class DmnExpressionImpl {
+public class DmnExpressionImpl implements CachedCompiledScriptSupport, CachedExpressionSupport {
 
   protected String id;
   protected String name;
@@ -23,6 +26,9 @@ public class DmnExpressionImpl {
   protected DmnTypeDefinition typeDefinition;
   protected String expressionLanguage;
   protected String expression;
+
+  protected CompiledScript cachedCompiledScript;
+  protected ElExpression cachedExpression;
 
   public String getId() {
     return id;
@@ -64,6 +70,7 @@ public class DmnExpressionImpl {
     this.expression = expression;
   }
 
+  @Override
   public String toString() {
     return "DmnExpressionImpl{" +
       "id='" + id + '\'' +
@@ -74,4 +81,19 @@ public class DmnExpressionImpl {
       '}';
   }
 
+  public void cacheCompiledScript(CompiledScript compiledScript) {
+    this.cachedCompiledScript = compiledScript;
+  }
+
+  public CompiledScript getCachedCompiledScript() {
+    return this.cachedCompiledScript;
+  }
+
+  public ElExpression getCachedExpression() {
+    return this.cachedExpression;
+  }
+
+  public void setCachedExpression(ElExpression expression) {
+    this.cachedExpression = expression;
+  }
 }

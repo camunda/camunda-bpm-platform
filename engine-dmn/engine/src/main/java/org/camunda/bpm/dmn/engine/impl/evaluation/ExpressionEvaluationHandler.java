@@ -15,9 +15,13 @@ package org.camunda.bpm.dmn.engine.impl.evaluation;
 import static org.camunda.commons.utils.EnsureUtil.ensureNotNull;
 
 import javax.script.Bindings;
+import javax.script.Compilable;
+import javax.script.CompiledScript;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 
+import org.camunda.bpm.dmn.engine.impl.CachedCompiledScriptSupport;
+import org.camunda.bpm.dmn.engine.impl.CachedExpressionSupport;
 import org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration;
 import org.camunda.bpm.dmn.engine.impl.DmnEngineLogger;
 import org.camunda.bpm.dmn.engine.impl.DmnExpressionImpl;
@@ -52,17 +56,17 @@ public class ExpressionEvaluationHandler {
         return evaluateFeelSimpleExpression(expressionText, variableContext);
 
       } else if (isElExpression(expressionLanguage)) {
-        return evaluateElExpression(expressionLanguage, expressionText, variableContext);
+        return evaluateElExpression(expressionLanguage, expressionText, variableContext, expression);
 
       } else {
-        return evaluateScriptExpression(expressionLanguage, variableContext, expressionText);
+        return evaluateScriptExpression(expressionLanguage, variableContext, expressionText, expression);
       }
     } else {
       return null;
     }
   }
 
-  protected Object evaluateScriptExpression(String expressionLanguage, VariableContext variableContext, String expressionText) {
+  protected Object evaluateScriptExpression(String expressionLanguage, VariableContext variableContext, String expressionText, CachedCompiledScriptSupport cachedCompiledScriptSupport) {
     ScriptEngine scriptEngine = getScriptEngineForName(expressionLanguage);
     // wrap script engine bindings + variable context and pass enhanced
     // bindings to the script engine.
@@ -70,16 +74,47 @@ public class ExpressionEvaluationHandler {
     bindings.put("variableContext", variableContext);
 
     try {
-      return scriptEngine.eval(expressionText, bindings);
+      if (scriptEngine instanceof Compilable) {
+
+        CompiledScript compiledScript = cachedCompiledScriptSupport.getCachedCompiledScript();
+        if (compiledScript == null) {
+          synchronized (cachedCompiledScriptSupport) {
+            compiledScript = cachedCompiledScriptSupport.getCachedCompiledScript();
+
+            if(compiledScript == null) {
+              Compilable compilableScriptEngine = (Compilable) scriptEngine;
+              compiledScript = compilableScriptEngine.compile(expressionText);
+
+              cachedCompiledScriptSupport.cacheCompiledScript(compiledScript);
+            }
+          }
+        }
+
+        return compiledScript.eval(bindings);
+      }
+      else {
+        return scriptEngine.eval(expressionText, bindings);
+      }
     }
     catch (ScriptException e) {
       throw LOG.unableToEvaluateExpression(expressionText, scriptEngine.getFactory().getLanguageName(), e);
     }
   }
 
-  protected Object evaluateElExpression(String expressionLanguage, String expressionText, VariableContext variableContext) {
-    ElExpression elExpression = elProvider.createExpression(expressionText);
+  protected Object evaluateElExpression(String expressionLanguage, String expressionText, VariableContext variableContext, CachedExpressionSupport cachedExpressionSupport) {
     try {
+      ElExpression elExpression = cachedExpressionSupport.getCachedExpression();
+
+      if (elExpression == null) {
+        synchronized (cachedExpressionSupport) {
+          elExpression = cachedExpressionSupport.getCachedExpression();
+          if(elExpression == null) {
+            elExpression = elProvider.createExpression(expressionText);
+            cachedExpressionSupport.setCachedExpression(elExpression);
+          }
+        }
+      }
+
       return elExpression.getValue(variableContext);
     }
     // yes, we catch all exceptions
