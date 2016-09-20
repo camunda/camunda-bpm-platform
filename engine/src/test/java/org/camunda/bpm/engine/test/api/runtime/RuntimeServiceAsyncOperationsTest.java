@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
+import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.test.Deployment;
@@ -34,6 +35,7 @@ import org.junit.rules.RuleChain;
 import java.util.*;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
@@ -113,15 +115,14 @@ public class RuntimeServiceAsyncOperationsTest {
     Batch batch = runtimeService.deleteProcessInstancesAsync(processIds, null, TESTING_INSTANCE_DELETE);
 
     executeSeedJob(batch);
-
-    try {
-      executeBatchJobs(batch);
-      fail("Exception expected");
-    } catch (BadUserRequestException e) {
-      assertTrue(e.getMessage().startsWith("No process instance found for id 'unknown'"));
-    }
+    List<Exception> exceptions = executeBatchJobs(batch);
 
     // then
+    assertEquals(1, exceptions.size());
+
+    Exception e = exceptions.get(0);
+    assertTrue(e.getMessage().startsWith("No process instance found for id 'unknown'"));
+
     assertThat(managementService.createJobQuery().withException().list().size(), is(1));
 
     processIds.remove("unknown");
@@ -229,13 +230,29 @@ public class RuntimeServiceAsyncOperationsTest {
     managementService.executeJob(seedJob.getId());
   }
 
-  private void executeBatchJobs(Batch batch) {
+  /**
+   * Execute all batch jobs of batch once and collect exceptions during job execution.
+   *
+   * @param batch the batch for which the batch jobs should be executed
+   * @return the catched exceptions of the batch job executions, is empty if non where thrown
+   */
+  private List<Exception> executeBatchJobs(Batch batch) {
     String batchJobDefinitionId = batch.getBatchJobDefinitionId();
     List<Job> batchJobs = managementService.createJobQuery().jobDefinitionId(batchJobDefinitionId).list();
     assertFalse(batchJobs.isEmpty());
+
+    List<Exception> catchedExceptions = new ArrayList<Exception>();
+
     for (Job batchJob : batchJobs) {
-      managementService.executeJob(batchJob.getId());
+      try {
+        managementService.executeJob(batchJob.getId());
+      }
+      catch (Exception e) {
+        catchedExceptions.add(e);
+      }
     }
+
+    return catchedExceptions;
   }
 
   protected List<String> startTestProcesses(int numberOfProcesses) {
