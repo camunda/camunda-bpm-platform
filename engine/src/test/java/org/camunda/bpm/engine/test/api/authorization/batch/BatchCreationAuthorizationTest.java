@@ -1,5 +1,6 @@
 package org.camunda.bpm.engine.test.api.authorization.batch;
 
+import java.util.Collections;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.authorization.Permissions;
@@ -22,7 +23,6 @@ import org.junit.rules.RuleChain;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -108,7 +108,7 @@ public class BatchCreationAuthorizationTest {
         .start();
 
     // when
-    List<String> processInstanceIds = Arrays.asList(processInstance.getId());
+    List<String> processInstanceIds = Collections.singletonList(processInstance.getId());
     runtimeService.deleteProcessInstancesAsync(
         processInstanceIds, null, TEST_REASON);
 

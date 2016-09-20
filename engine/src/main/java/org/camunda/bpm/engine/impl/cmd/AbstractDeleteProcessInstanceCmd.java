@@ -38,7 +38,7 @@ public abstract class AbstractDeleteProcessInstanceCmd {
     }
   }
 
-  protected Void deleteProcessInstance(
+  protected void deleteProcessInstance(
       CommandContext commandContext,
       String processInstanceId,
       String deleteReason,
@@ -63,7 +63,6 @@ public abstract class AbstractDeleteProcessInstanceCmd {
     commandContext.getOperationLogManager()
         .logProcessInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE, processInstanceId,
             null, null, Collections.singletonList(PropertyChange.EMPTY_CHANGE));
-
-    return null;
   }
+
 }

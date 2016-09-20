@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.engine.impl.cmd.batch;
 
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl;
@@ -70,7 +71,7 @@ public class DeleteProcessInstanceBatchCmd extends AbstractBatchCmd<Batch> {
   public Batch execute(CommandContext commandContext) {
     List<String> processInstanceIds = collectProcessInstanceIds();
 
-    ensureNotEmpty("processInstanceIds", processInstanceIds);
+    ensureNotEmpty(BadUserRequestException.class, "processInstanceIds", processInstanceIds);
     checkAuthorizations(commandContext);
     writeUserOperationLog(commandContext,
         deleteReason,

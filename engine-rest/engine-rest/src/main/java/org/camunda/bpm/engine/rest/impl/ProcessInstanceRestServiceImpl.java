@@ -13,8 +13,10 @@
 package org.camunda.bpm.engine.rest.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.rest.ProcessInstanceRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
@@ -115,16 +117,21 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
 
   public BatchDto deleteAsync(DeleteProcessInstancesDto dto) {
     RuntimeService runtimeService = getProcessEngine().getRuntimeService();
-    if (dto.getProcessInstanceIds() != null && !dto.getProcessInstanceIds().isEmpty() || dto.getProcessInstanceQuery() != null) {
-      ProcessInstanceQuery processInstanceQuery = dto.getProcessInstanceQuery() != null ? dto.getProcessInstanceQuery().toQuery(getProcessEngine()) : null;
-      return BatchDto.fromBatch(runtimeService.deleteProcessInstancesAsync(
-          dto.getProcessInstanceIds(),
-          processInstanceQuery,
-          dto.getDeleteReason()));
 
-    } else {
-      String message = "Either processInstanceIds or processInstanceQuery has to be provided.";
-      throw new InvalidRequestException(Status.BAD_REQUEST, message);
+    ProcessInstanceQuery processInstanceQuery = null;
+    if (dto.getProcessInstanceQuery() != null) {
+      processInstanceQuery = dto.getProcessInstanceQuery().toQuery(getProcessEngine());
+    }
+
+    try {
+      Batch batch = runtimeService.deleteProcessInstancesAsync(
+        dto.getProcessInstanceIds(),
+        processInstanceQuery,
+        dto.getDeleteReason());
+      return BatchDto.fromBatch(batch);
+    }
+    catch (BadUserRequestException e) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());
     }
   }
 

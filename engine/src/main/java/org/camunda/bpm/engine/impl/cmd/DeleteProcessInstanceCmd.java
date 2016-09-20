@@ -41,7 +41,9 @@ public class DeleteProcessInstanceCmd extends AbstractDeleteProcessInstanceCmd i
   }
 
   public Void execute(CommandContext commandContext) {
-    return deleteProcessInstance(commandContext, processInstanceId, deleteReason, skipCustomListeners, externallyTerminated);
+    deleteProcessInstance(commandContext, processInstanceId, deleteReason, skipCustomListeners, externallyTerminated);
+
+    return null;
   }
 
 }
