@@ -266,19 +266,19 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
     DeploymentCache deploymentCache = processEngineConfiguration.getDeploymentCache();
 
     // ensure definitions and models are part of the cache
-    assertTrue(deploymentCache.getProcessDefinitionCache().containsKey(processDefinitionId));
-    assertTrue(deploymentCache.getBpmnModelInstanceCache().containsKey(processDefinitionId));
-    assertTrue(deploymentCache.getCaseDefinitionCache().containsKey(caseDefinitionId));
-    assertTrue(deploymentCache.getCmmnModelInstanceCache().containsKey(caseDefinitionId));
+    assertNotNull(deploymentCache.getProcessDefinitionCache().get(processDefinitionId));
+    assertNotNull(deploymentCache.getBpmnModelInstanceCache().get(processDefinitionId));
+    assertNotNull(deploymentCache.getCaseDefinitionCache().get(caseDefinitionId));
+    assertNotNull(deploymentCache.getCmmnModelInstanceCache().get(caseDefinitionId));
 
     // when the deployment is deleted
     repositoryService.deleteDeployment(deploymentId, true);
 
     // then the definitions and models are removed from the cache
-    assertFalse(deploymentCache.getProcessDefinitionCache().containsKey(processDefinitionId));
-    assertFalse(deploymentCache.getBpmnModelInstanceCache().containsKey(processDefinitionId));
-    assertFalse(deploymentCache.getCaseDefinitionCache().containsKey(caseDefinitionId));
-    assertFalse(deploymentCache.getCmmnModelInstanceCache().containsKey(caseDefinitionId));
+    assertNull(deploymentCache.getProcessDefinitionCache().get(processDefinitionId));
+    assertNull(deploymentCache.getBpmnModelInstanceCache().get(processDefinitionId));
+    assertNull(deploymentCache.getCaseDefinitionCache().get(caseDefinitionId));
+    assertNull(deploymentCache.getCmmnModelInstanceCache().get(caseDefinitionId));
   }
 
   public void testFindDeploymentResourceNamesNullDeploymentId() {

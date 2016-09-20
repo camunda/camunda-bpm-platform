@@ -14,8 +14,10 @@ package org.camunda.bpm.application.impl.deployment;
 
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.repository.Deployment;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.commons.utils.cache.Cache;
 
 /**
  * @author Roman Smirnov
@@ -57,8 +59,13 @@ public class DeploymentRegistrationTest extends PluggableProcessEngineTestCase {
     // this logic should not be executed.
     runtimeService.startProcessInstanceByKey(PROCESS_KEY);
 
+    ProcessDefinition version1 = repositoryService.createProcessDefinitionQuery().deploymentId(deployment1.getId()).singleResult();
+    ProcessDefinition version2 = repositoryService.createProcessDefinitionQuery().deploymentId(deployment2.getId()).singleResult();
+
     // accordingly the process definition cache should only contain the latest version now
-    assertEquals(1, processEngineConfiguration.getDeploymentCache().getProcessDefinitionCache().size());
+    Cache cache = processEngineConfiguration.getDeploymentCache().getProcessDefinitionCache();
+    assertNotNull(cache.get(version2.getId()));
+    assertNull(cache.get(version1.getId()));
 
     deleteDeployments(deployment1, deployment2);
   }

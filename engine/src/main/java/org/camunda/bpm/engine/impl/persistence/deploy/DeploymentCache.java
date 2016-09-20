@@ -13,14 +13,6 @@
 
 package org.camunda.bpm.engine.impl.persistence.deploy;
 
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
-
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Callable;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.cmmn.CaseDefinitionNotFoundException;
 import org.camunda.bpm.engine.exception.dmn.DecisionDefinitionNotFoundException;
@@ -48,6 +40,13 @@ import org.camunda.bpm.model.cmmn.Cmmn;
 import org.camunda.bpm.model.cmmn.CmmnModelInstance;
 import org.camunda.bpm.model.dmn.Dmn;
 import org.camunda.bpm.model.dmn.DmnModelInstance;
+import org.camunda.commons.utils.cache.Cache;
+
+import java.io.InputStream;
+import java.util.List;
+import java.util.concurrent.Callable;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -58,20 +57,30 @@ public class DeploymentCache {
 
   protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
-  protected Map<String, ProcessDefinitionEntity> processDefinitionCache = new HashMap<String, ProcessDefinitionEntity>();
-  protected Map<String, CaseDefinitionEntity> caseDefinitionCache = new HashMap<String, CaseDefinitionEntity>();
-  protected Map<String, DecisionDefinitionEntity> decisionDefinitionCache = new HashMap<String, DecisionDefinitionEntity>();
-  protected Map<String, DecisionRequirementsDefinitionEntity> decisionRequirementsDefinitionCache = new HashMap<String, DecisionRequirementsDefinitionEntity>();
 
-  protected Map<String, BpmnModelInstance> bpmnModelInstanceCache = new HashMap<String, BpmnModelInstance>();
-  protected Map<String, CmmnModelInstance> cmmnModelInstanceCache = new HashMap<String, CmmnModelInstance>();
-  protected Map<String, DmnModelInstance> dmnModelInstanceCache = new HashMap<String, DmnModelInstance>();
+  protected Cache<String, ProcessDefinitionEntity> processDefinitionEntityCache;
+  protected Cache<String, CaseDefinitionEntity> caseDefinitionCache;
+  protected Cache<String, DecisionDefinitionEntity> decisionDefinitionCache;
+  protected Cache<String, DecisionRequirementsDefinitionEntity> decisionRequirementsDefinitionCache;
+  protected Cache<String, BpmnModelInstance> bpmnModelInstanceCache;
+  protected Cache<String, CmmnModelInstance> cmmnModelInstanceCache;
+  protected Cache<String, DmnModelInstance> dmnModelInstanceCache;
   protected List<Deployer> deployers;
+
+  public DeploymentCache(CacheFactory factory, int maxNumberOfElementsInCache) {
+    processDefinitionEntityCache = factory.createCache(maxNumberOfElementsInCache);
+    caseDefinitionCache = factory.createCache(maxNumberOfElementsInCache);
+    decisionDefinitionCache = factory.createCache(maxNumberOfElementsInCache);
+    decisionRequirementsDefinitionCache = factory.createCache(maxNumberOfElementsInCache);
+    bpmnModelInstanceCache = factory.createCache(maxNumberOfElementsInCache);
+    cmmnModelInstanceCache = factory.createCache(maxNumberOfElementsInCache);
+    dmnModelInstanceCache = factory.createCache(maxNumberOfElementsInCache);
+  }
 
   public void deploy(final DeploymentEntity deployment) {
     Context.getCommandContext().runWithoutAuthorization(new Callable<Void>() {
       public Void call() throws Exception {
-        for (Deployer deployer: deployers) {
+        for (Deployer deployer : deployers) {
           deployer.deploy(deployment);
         }
         return null;
@@ -82,7 +91,7 @@ public class DeploymentCache {
   // PROCESS DEFINITION ////////////////////////////////////////////////////////////////////////////////
 
   public ProcessDefinitionEntity findProcessDefinitionFromCache(String processDefinitionId) {
-    return processDefinitionCache.get(processDefinitionId);
+    return processDefinitionEntityCache.get(processDefinitionId);
   }
 
   public ProcessDefinitionEntity findDeployedProcessDefinitionById(String processDefinitionId) {
@@ -91,8 +100,8 @@ public class DeploymentCache {
     ProcessDefinitionEntity processDefinition = commandContext.getDbEntityManager().getCachedEntity(ProcessDefinitionEntity.class, processDefinitionId);
     if (processDefinition == null) {
       processDefinition = commandContext
-        .getProcessDefinitionManager()
-        .findLatestProcessDefinitionById(processDefinitionId);
+          .getProcessDefinitionManager()
+          .findLatestProcessDefinitionById(processDefinitionId);
     }
 
     ensureNotNull("no deployed process definition found with id '" + processDefinitionId + "'", "processDefinition", processDefinition);
@@ -102,16 +111,14 @@ public class DeploymentCache {
 
   /**
    * @return the latest version of the process definition with the given key (from any tenant)
-   *
    * @throws ProcessEngineException if more than one tenant has a process definition with the given key
-   *
    * @see #findDeployedLatestProcessDefinitionByKeyAndTenantId(String, String)
    */
   public ProcessDefinitionEntity findDeployedLatestProcessDefinitionByKey(String processDefinitionKey) {
     ProcessDefinitionEntity processDefinition = Context
-      .getCommandContext()
-      .getProcessDefinitionManager()
-      .findLatestProcessDefinitionByKey(processDefinitionKey);
+        .getCommandContext()
+        .getProcessDefinitionManager()
+        .findLatestProcessDefinitionByKey(processDefinitionKey);
     ensureNotNull("no processes deployed with key '" + processDefinitionKey + "'", "processDefinition", processDefinition);
     processDefinition = resolveProcessDefinition(processDefinition);
     return processDefinition;
@@ -135,8 +142,8 @@ public class DeploymentCache {
     ProcessDefinitionEntity processDefinition = commandContext.runWithoutAuthorization(new Callable<ProcessDefinitionEntity>() {
       public ProcessDefinitionEntity call() throws Exception {
         return (ProcessDefinitionEntity) commandContext
-          .getProcessDefinitionManager()
-          .findProcessDefinitionByKeyVersionAndTenantId(processDefinitionKey, processDefinitionVersion, tenantId);
+            .getProcessDefinitionManager()
+            .findProcessDefinitionByKeyVersionAndTenantId(processDefinitionKey, processDefinitionVersion, tenantId);
       }
     });
     ensureNotNull("no processes deployed with key = '" + processDefinitionKey + "', version = '" + processDefinitionVersion
@@ -147,9 +154,9 @@ public class DeploymentCache {
 
   public ProcessDefinitionEntity findDeployedProcessDefinitionByDeploymentAndKey(String deploymentId, String processDefinitionKey) {
     ProcessDefinitionEntity processDefinition = Context
-      .getCommandContext()
-      .getProcessDefinitionManager()
-      .findProcessDefinitionByDeploymentAndKey(deploymentId, processDefinitionKey);
+        .getCommandContext()
+        .getProcessDefinitionManager()
+        .findProcessDefinitionByDeploymentAndKey(deploymentId, processDefinitionKey);
     ensureNotNull("no processes deployed with key = '" + processDefinitionKey + "' in deployment = '" + deploymentId + "'", "processDefinition", processDefinition);
     processDefinition = resolveProcessDefinition(processDefinition);
     return processDefinition;
@@ -158,16 +165,20 @@ public class DeploymentCache {
   public ProcessDefinitionEntity resolveProcessDefinition(ProcessDefinitionEntity processDefinition) {
     String processDefinitionId = processDefinition.getId();
     String deploymentId = processDefinition.getDeploymentId();
-    ProcessDefinitionEntity cachedProcessDefinition = processDefinitionCache.get(processDefinitionId);
-    if (cachedProcessDefinition==null) {
-      DeploymentEntity deployment = Context
-        .getCommandContext()
-        .getDeploymentManager()
-        .findDeploymentById(deploymentId);
-      deployment.setNew(false);
-      deploy(deployment);
-      cachedProcessDefinition = processDefinitionCache.get(processDefinitionId);
-
+    ProcessDefinitionEntity cachedProcessDefinition = processDefinitionEntityCache.get(processDefinitionId);
+    if (cachedProcessDefinition == null) {
+      synchronized (this) {
+        cachedProcessDefinition = processDefinitionEntityCache.get(processDefinitionId);
+        if (cachedProcessDefinition == null) {
+          DeploymentEntity deployment = Context
+              .getCommandContext()
+              .getDeploymentManager()
+              .findDeploymentById(deploymentId);
+          deployment.setNew(false);
+          deploy(deployment);
+          cachedProcessDefinition = processDefinitionEntityCache.get(processDefinitionId);
+        }
+      }
       ensureNotNull("deployment '" + deploymentId + "' didn't put process definition '" + processDefinitionId + "' in the cache", "cachedProcessDefinition", cachedProcessDefinition);
     } else {
       // update cached process definition
@@ -178,7 +189,7 @@ public class DeploymentCache {
 
   public BpmnModelInstance findBpmnModelInstanceForProcessDefinition(ProcessDefinitionEntity processDefinitionEntity) {
     BpmnModelInstance bpmnModelInstance = bpmnModelInstanceCache.get(processDefinitionEntity.getId());
-    if(bpmnModelInstance == null) {
+    if (bpmnModelInstance == null) {
       bpmnModelInstance = loadAndCacheBpmnModelInstance(processDefinitionEntity);
     }
     return bpmnModelInstance;
@@ -186,7 +197,7 @@ public class DeploymentCache {
 
   public BpmnModelInstance findBpmnModelInstanceForProcessDefinition(String processDefinitionId) {
     BpmnModelInstance bpmnModelInstance = bpmnModelInstanceCache.get(processDefinitionId);
-    if(bpmnModelInstance == null) {
+    if (bpmnModelInstance == null) {
       ProcessDefinitionEntity processDefinition = findDeployedProcessDefinitionById(processDefinitionId);
       bpmnModelInstance = loadAndCacheBpmnModelInstance(processDefinition);
     }
@@ -205,22 +216,22 @@ public class DeploymentCache {
       BpmnModelInstance bpmnModelInstance = Bpmn.readModelFromStream(bpmnResourceInputStream);
       bpmnModelInstanceCache.put(processDefinitionEntity.getId(), bpmnModelInstance);
       return bpmnModelInstance;
-    }catch(Exception e) {
+    } catch (Exception e) {
       throw LOG.loadModelException("BPMN", "process", processDefinitionEntity.getId(), e);
     }
   }
 
   public void addProcessDefinition(ProcessDefinitionEntity processDefinition) {
-    processDefinitionCache.put(processDefinition.getId(), processDefinition);
+    processDefinitionEntityCache.put(processDefinition.getId(), processDefinition);
   }
 
   public void removeProcessDefinition(String processDefinitionId) {
-    processDefinitionCache.remove(processDefinitionId);
+    processDefinitionEntityCache.remove(processDefinitionId);
     bpmnModelInstanceCache.remove(processDefinitionId);
   }
 
   public void discardProcessDefinitionCache() {
-    processDefinitionCache.clear();
+    processDefinitionEntityCache.clear();
     bpmnModelInstanceCache.clear();
   }
 
@@ -237,16 +248,16 @@ public class DeploymentCache {
 
     // try to load case definition from cache
     CaseDefinitionEntity caseDefinition = commandContext
-      .getDbEntityManager()
-      .getCachedEntity(CaseDefinitionEntity.class, caseDefinitionId);
+        .getDbEntityManager()
+        .getCachedEntity(CaseDefinitionEntity.class, caseDefinitionId);
 
     if (caseDefinition == null) {
 
       // if not found, then load the case definition
       // from db
       caseDefinition = commandContext
-        .getCaseDefinitionManager()
-        .findCaseDefinitionById(caseDefinitionId);
+          .getCaseDefinitionManager()
+          .findCaseDefinitionById(caseDefinitionId);
 
     }
 
@@ -259,9 +270,7 @@ public class DeploymentCache {
 
   /**
    * @return the latest version of the case definition with the given key (from any tenant)
-   *
    * @throws ProcessEngineException if more than one tenant has a case definition with the given key
-   *
    * @see #findDeployedLatestCaseDefinitionByKeyAndTenantId(String, String)
    */
   public CaseDefinitionEntity findDeployedLatestCaseDefinitionByKey(String caseDefinitionKey) {
@@ -269,9 +278,9 @@ public class DeploymentCache {
 
     // load case definition by key from db
     CaseDefinitionEntity caseDefinition = Context
-      .getCommandContext()
-      .getCaseDefinitionManager()
-      .findLatestCaseDefinitionByKey(caseDefinitionKey);
+        .getCommandContext()
+        .getCaseDefinitionManager()
+        .findLatestCaseDefinitionByKey(caseDefinitionKey);
 
     ensureNotNull(CaseDefinitionNotFoundException.class, "no case definition deployed with key '" + caseDefinitionKey + "'", "caseDefinition", caseDefinition);
 
@@ -288,9 +297,9 @@ public class DeploymentCache {
 
     // load case definition by key from db
     CaseDefinitionEntity caseDefinition = Context
-      .getCommandContext()
-      .getCaseDefinitionManager()
-      .findLatestCaseDefinitionByKeyAndTenantId(caseDefinitionKey, tenantId);
+        .getCommandContext()
+        .getCaseDefinitionManager()
+        .findLatestCaseDefinitionByKeyAndTenantId(caseDefinitionKey, tenantId);
 
     ensureNotNull(CaseDefinitionNotFoundException.class, "no case definition deployed with key '" + caseDefinitionKey + "' and tenant-id '" + tenantId + "'", "caseDefinition", caseDefinition);
 
@@ -302,9 +311,9 @@ public class DeploymentCache {
   public CaseDefinitionEntity findDeployedCaseDefinitionByKeyVersionAndTenantId(String caseDefinitionKey, Integer caseDefinitionVersion, String tenantId) {
 
     CaseDefinitionEntity caseDefinition = Context
-      .getCommandContext()
-      .getCaseDefinitionManager()
-      .findCaseDefinitionByKeyVersionAndTenantId(caseDefinitionKey, caseDefinitionVersion, tenantId);
+        .getCommandContext()
+        .getCaseDefinitionManager()
+        .findCaseDefinitionByKeyVersionAndTenantId(caseDefinitionKey, caseDefinitionVersion, tenantId);
 
     ensureNotNull(CaseDefinitionNotFoundException.class, "no case definition deployed with key = '" + caseDefinitionKey + "', version = '" + caseDefinitionVersion + "'"
         + " and tenant-id = '" + tenantId + "'", "caseDefinition", caseDefinition);
@@ -315,9 +324,9 @@ public class DeploymentCache {
 
   public CaseDefinitionEntity findDeployedCaseDefinitionByDeploymentAndKey(String deploymentId, String caseDefinitionKey) {
     CaseDefinitionEntity caseDefinition = Context
-      .getCommandContext()
-      .getCaseDefinitionManager()
-      .findCaseDefinitionByDeploymentAndKey(deploymentId, caseDefinitionKey);
+        .getCommandContext()
+        .getCaseDefinitionManager()
+        .findCaseDefinitionByDeploymentAndKey(deploymentId, caseDefinitionKey);
 
     ensureNotNull(CaseDefinitionNotFoundException.class, "no case definition deployed with key = '" + caseDefinitionKey + "' in deployment = '" + deploymentId + "'", "caseDefinition", caseDefinition);
     caseDefinition = resolveCaseDefinition(caseDefinition);
@@ -343,18 +352,20 @@ public class DeploymentCache {
     String deploymentId = caseDefinition.getDeploymentId();
 
     CaseDefinitionEntity cachedCaseDefinition = caseDefinitionCache.get(caseDefinitionId);
+    if (cachedCaseDefinition == null) {
+      synchronized (this) {
+        cachedCaseDefinition = caseDefinitionCache.get(caseDefinitionId);
+        if (cachedCaseDefinition == null) {
+          DeploymentEntity deployment = Context
+              .getCommandContext()
+              .getDeploymentManager()
+              .findDeploymentById(deploymentId);
 
-    if (cachedCaseDefinition==null) {
-      DeploymentEntity deployment = Context
-        .getCommandContext()
-        .getDeploymentManager()
-        .findDeploymentById(deploymentId);
-
-      deployment.setNew(false);
-      deploy(deployment);
-
-      cachedCaseDefinition = caseDefinitionCache.get(caseDefinitionId);
-
+          deployment.setNew(false);
+          deploy(deployment);
+          cachedCaseDefinition = caseDefinitionCache.get(caseDefinitionId);
+        }
+      }
       ensureNotNull("deployment '" + deploymentId + "' didn't put case definition '" + caseDefinitionId + "' in the cache", "cachedCaseDefinition", cachedCaseDefinition);
 
     }
@@ -363,7 +374,7 @@ public class DeploymentCache {
 
   public CmmnModelInstance findCmmnModelInstanceForCaseDefinition(String caseDefinitionId) {
     CmmnModelInstance cmmnModelInstance = cmmnModelInstanceCache.get(caseDefinitionId);
-    if(cmmnModelInstance == null) {
+    if (cmmnModelInstance == null) {
 
       CaseDefinitionEntity caseDefinition = findDeployedCaseDefinitionById(caseDefinitionId);
       final String deploymentId = caseDefinition.getDeploymentId();
@@ -378,7 +389,7 @@ public class DeploymentCache {
 
       try {
         cmmnModelInstance = Cmmn.readModelFromStream(cmmnResourceInputStream);
-      }catch(Exception e) {
+      } catch (Exception e) {
         throw LOG.loadModelException("CMMN", "case", caseDefinitionId, e);
       }
 
@@ -416,16 +427,16 @@ public class DeploymentCache {
 
     // try to load decision definition from cache
     DecisionDefinitionEntity decisionDefinition = commandContext
-      .getDbEntityManager()
-      .getCachedEntity(DecisionDefinitionEntity.class, decisionDefinitionId);
+        .getDbEntityManager()
+        .getCachedEntity(DecisionDefinitionEntity.class, decisionDefinitionId);
 
     if (decisionDefinition == null) {
 
       // if not found, then load the decision definition
       // from db
       decisionDefinition = commandContext
-        .getDecisionDefinitionManager()
-        .findDecisionDefinitionById(decisionDefinitionId);
+          .getDecisionDefinitionManager()
+          .findDecisionDefinitionById(decisionDefinitionId);
 
     }
 
@@ -440,9 +451,9 @@ public class DeploymentCache {
     ensureNotNull("Invalid decision definition key", "decisionDefinitionKey", decisionDefinitionKey);
 
     DecisionDefinitionEntity decisionDefinition = Context
-      .getCommandContext()
-      .getDecisionDefinitionManager()
-      .findLatestDecisionDefinitionByKey(decisionDefinitionKey);
+        .getCommandContext()
+        .getDecisionDefinitionManager()
+        .findLatestDecisionDefinitionByKey(decisionDefinitionKey);
 
     ensureNotNull(DecisionDefinitionNotFoundException.class, "no decision definition deployed with key '" + decisionDefinitionKey + "'", "decisionDefinition", decisionDefinition);
 
@@ -455,9 +466,9 @@ public class DeploymentCache {
     ensureNotNull("Invalid decision definition key", "decisionDefinitionKey", decisionDefinitionKey);
 
     DecisionDefinitionEntity decisionDefinition = Context
-      .getCommandContext()
-      .getDecisionDefinitionManager()
-      .findLatestDecisionDefinitionByKeyAndTenantId(decisionDefinitionKey, tenantId);
+        .getCommandContext()
+        .getDecisionDefinitionManager()
+        .findLatestDecisionDefinitionByKeyAndTenantId(decisionDefinitionKey, tenantId);
 
     ensureNotNull(DecisionDefinitionNotFoundException.class, "no decision definition deployed with key '" + decisionDefinitionKey + "' and tenant-id '" + tenantId + "'", "decisionDefinition", decisionDefinition);
 
@@ -468,9 +479,9 @@ public class DeploymentCache {
 
   public DecisionDefinition findDeployedDecisionDefinitionByDeploymentAndKey(String deploymentId, String decisionDefinitionKey) {
     DecisionDefinitionEntity decisionDefinition = Context
-      .getCommandContext()
-      .getDecisionDefinitionManager()
-      .findDecisionDefinitionByDeploymentAndKey(deploymentId, decisionDefinitionKey);
+        .getCommandContext()
+        .getDecisionDefinitionManager()
+        .findDecisionDefinitionByDeploymentAndKey(deploymentId, decisionDefinitionKey);
 
     ensureNotNull(DecisionDefinitionNotFoundException.class, "no decision definition deployed with key = '" + decisionDefinitionKey + "' in deployment = '" + deploymentId + "'", "decisionDefinition", decisionDefinition);
     decisionDefinition = resolveDecisionDefinition(decisionDefinition);
@@ -480,9 +491,9 @@ public class DeploymentCache {
 
   public DecisionDefinition findDeployedDecisionDefinitionByKeyAndVersion(String decisionDefinitionKey, Integer decisionDefinitionVersion) {
     DecisionDefinitionEntity decisionDefinition = Context
-      .getCommandContext()
-      .getDecisionDefinitionManager()
-      .findDecisionDefinitionByKeyAndVersion(decisionDefinitionKey, decisionDefinitionVersion);
+        .getCommandContext()
+        .getDecisionDefinitionManager()
+        .findDecisionDefinitionByKeyAndVersion(decisionDefinitionKey, decisionDefinitionVersion);
 
     ensureNotNull(DecisionDefinitionNotFoundException.class, "no decision definition deployed with key = '" + decisionDefinitionKey + "' and version = '" + decisionDefinitionVersion + "'", "decisionDefinition", decisionDefinition);
     decisionDefinition = resolveDecisionDefinition(decisionDefinition);
@@ -492,9 +503,9 @@ public class DeploymentCache {
 
   public DecisionDefinition findDeployedDecisionDefinitionByKeyVersionAndTenantId(String decisionDefinitionKey, Integer decisionDefinitionVersion, String tenantId) {
     DecisionDefinitionEntity decisionDefinition = Context
-      .getCommandContext()
-      .getDecisionDefinitionManager()
-      .findDecisionDefinitionByKeyVersionAndTenantId(decisionDefinitionKey, decisionDefinitionVersion, tenantId);
+        .getCommandContext()
+        .getDecisionDefinitionManager()
+        .findDecisionDefinitionByKeyVersionAndTenantId(decisionDefinitionKey, decisionDefinitionVersion, tenantId);
 
     ensureNotNull(DecisionDefinitionNotFoundException.class, "no decision definition deployed with key = '" + decisionDefinitionKey + "', version = '" + decisionDefinitionVersion + "' and tenant-id '" + tenantId + "'", "decisionDefinition", decisionDefinition);
     decisionDefinition = resolveDecisionDefinition(decisionDefinition);
@@ -507,18 +518,20 @@ public class DeploymentCache {
     String deploymentId = decisionDefinition.getDeploymentId();
 
     DecisionDefinitionEntity cachedDecisionDefinition = decisionDefinitionCache.get(decisionDefinitionId);
+    if (cachedDecisionDefinition == null) {
+      synchronized (this) {
+        cachedDecisionDefinition = decisionDefinitionCache.get(decisionDefinitionId);
+        if (cachedDecisionDefinition == null) {
+          DeploymentEntity deployment = Context
+              .getCommandContext()
+              .getDeploymentManager()
+              .findDeploymentById(deploymentId);
 
-    if (cachedDecisionDefinition==null) {
-      DeploymentEntity deployment = Context
-        .getCommandContext()
-        .getDeploymentManager()
-        .findDeploymentById(deploymentId);
-
-      deployment.setNew(false);
-      deploy(deployment);
-
-      cachedDecisionDefinition = decisionDefinitionCache.get(decisionDefinitionId);
-
+          deployment.setNew(false);
+          deploy(deployment);
+          cachedDecisionDefinition = decisionDefinitionCache.get(decisionDefinitionId);
+        }
+      }
       ensureNotNull("deployment '" + deploymentId + "' didn't put decision definition '" + decisionDefinitionId + "' in the cache", "cachedDecisionDefinition", cachedDecisionDefinition);
 
     }
@@ -528,7 +541,7 @@ public class DeploymentCache {
   public DmnModelInstance findDmnModelInstanceForDecisionDefinition(String decisionDefinitionId) {
     DmnModelInstance dmnModelInstance = dmnModelInstanceCache.get(decisionDefinitionId);
 
-    if(dmnModelInstance == null) {
+    if (dmnModelInstance == null) {
 
       DecisionDefinitionEntity decisionDefinition = findDeployedDecisionDefinitionById(decisionDefinitionId);
       final String deploymentId = decisionDefinition.getDeploymentId();
@@ -543,7 +556,7 @@ public class DeploymentCache {
 
       try {
         dmnModelInstance = Dmn.readModelFromStream(dmnResourceInputStream);
-      }catch(Exception e) {
+      } catch (Exception e) {
         throw LOG.loadModelException("DMN", "decision", decisionDefinitionId, e);
       }
 
@@ -585,15 +598,15 @@ public class DeploymentCache {
 
     // try to load definition from cache
     DecisionRequirementsDefinitionEntity decisionRequirementsDefinition = commandContext
-      .getDbEntityManager()
-      .getCachedEntity(DecisionRequirementsDefinitionEntity.class, decisionRequirementsDefinitionId);
+        .getDbEntityManager()
+        .getCachedEntity(DecisionRequirementsDefinitionEntity.class, decisionRequirementsDefinitionId);
 
     if (decisionRequirementsDefinition == null) {
 
       // if not found, then load the definition from db
       decisionRequirementsDefinition = commandContext
-        .getDecisionDefinitionManager()
-        .findDecisionRequirementsDefinitionById(decisionRequirementsDefinitionId);
+          .getDecisionDefinitionManager()
+          .findDecisionRequirementsDefinitionById(decisionRequirementsDefinitionId);
     }
 
     ensureNotNull("no deployed decision requirements definition found with id '" + decisionRequirementsDefinitionId + "'",
@@ -608,19 +621,22 @@ public class DeploymentCache {
     String decisionRequirementsDefinitionId = decisionRequirementsDefinition.getId();
     String deploymentId = decisionRequirementsDefinition.getDeploymentId();
 
-    DecisionRequirementsDefinitionEntity cachedDecisionRequirementsDefinition = decisionRequirementsDefinitionCache.get(decisionRequirementsDefinitionId);
+    DecisionRequirementsDefinitionEntity cachedDecisionRequirementsDefinition =
+        decisionRequirementsDefinitionCache.get(decisionRequirementsDefinitionId);
+    if (cachedDecisionRequirementsDefinition == null) {
+      synchronized (this) {
+        cachedDecisionRequirementsDefinition = decisionRequirementsDefinitionCache.get(decisionRequirementsDefinitionId);
+        if (cachedDecisionRequirementsDefinition == null) {
+          DeploymentEntity deployment = Context
+              .getCommandContext()
+              .getDeploymentManager()
+              .findDeploymentById(deploymentId);
 
-    if (cachedDecisionRequirementsDefinition==null) {
-      DeploymentEntity deployment = Context
-        .getCommandContext()
-        .getDeploymentManager()
-        .findDeploymentById(deploymentId);
-
-      deployment.setNew(false);
-      deploy(deployment);
-
-      cachedDecisionRequirementsDefinition = decisionRequirementsDefinitionCache.get(decisionRequirementsDefinitionId);
-
+          deployment.setNew(false);
+          deploy(deployment);
+          cachedDecisionRequirementsDefinition = decisionRequirementsDefinitionCache.get(decisionRequirementsDefinitionId);
+        }
+      }
       ensureNotNull("deployment '" + deploymentId + "' didn't put decision requirements definition '" + decisionRequirementsDefinitionId + "' in the cache", "cachedDecisionRequirementsDefinition", cachedDecisionRequirementsDefinition);
 
     }
@@ -637,31 +653,31 @@ public class DeploymentCache {
 
   // getters and setters //////////////////////////////////////////////////////
 
-  public Map<String, BpmnModelInstance> getBpmnModelInstanceCache() {
+  public Cache<String, BpmnModelInstance> getBpmnModelInstanceCache() {
     return bpmnModelInstanceCache;
   }
 
-  public Map<String, CmmnModelInstance> getCmmnModelInstanceCache() {
+  public Cache<String, CmmnModelInstance> getCmmnModelInstanceCache() {
     return cmmnModelInstanceCache;
   }
 
-  public Map<String, DmnModelInstance> getDmnModelInstanceCache() {
+  public Cache<String, DmnModelInstance> getDmnModelInstanceCache() {
     return dmnModelInstanceCache;
   }
 
-  public Map<String, ProcessDefinitionEntity> getProcessDefinitionCache() {
-    return processDefinitionCache;
+  public Cache<String, ProcessDefinitionEntity> getProcessDefinitionCache() {
+    return processDefinitionEntityCache;
   }
 
-  public void setProcessDefinitionCache(Map<String, ProcessDefinitionEntity> processDefinitionCache) {
-    this.processDefinitionCache = processDefinitionCache;
+  public void setProcessDefinitionCache(Cache<String, ProcessDefinitionEntity> processDefinitionEntityCache) {
+    this.processDefinitionEntityCache = processDefinitionEntityCache;
   }
 
-  public Map<String, CaseDefinitionEntity> getCaseDefinitionCache() {
+  public Cache<String, CaseDefinitionEntity> getCaseDefinitionCache() {
     return caseDefinitionCache;
   }
 
-  public void setCaseDefinitionCache(Map<String, CaseDefinitionEntity> caseDefinitionCache) {
+  public void setCaseDefinitionCache(Cache<String, CaseDefinitionEntity> caseDefinitionCache) {
     this.caseDefinitionCache = caseDefinitionCache;
   }
 
@@ -687,8 +703,8 @@ public class DeploymentCache {
     List<ProcessDefinition> allDefinitionsForDeployment = commandContext.runWithoutAuthorization(new Callable<List<ProcessDefinition>>() {
       public List<ProcessDefinition> call() throws Exception {
         return new ProcessDefinitionQueryImpl()
-          .deploymentId(deploymentId)
-          .list();
+            .deploymentId(deploymentId)
+            .list();
       }
     });
 
@@ -696,7 +712,7 @@ public class DeploymentCache {
       try {
         removeProcessDefinition(processDefinition.getId());
 
-      } catch(Exception e) {
+      } catch (Exception e) {
         LOG.removeEntryFromDeploymentCacheFailure("process", processDefinition.getId(), e);
       }
     }
@@ -713,7 +729,7 @@ public class DeploymentCache {
       try {
         removeCaseDefinition(caseDefinition.getId());
 
-      } catch(Exception e) {
+      } catch (Exception e) {
         LOG.removeEntryFromDeploymentCacheFailure("case", caseDefinition.getId(), e);
       }
     }
@@ -723,13 +739,13 @@ public class DeploymentCache {
     // remove all decision definitions for a specific deployment
 
     List<DecisionDefinition> allDefinitionsForDeployment = new DecisionDefinitionQueryImpl()
-      .deploymentId(deploymentId)
-      .list();
+        .deploymentId(deploymentId)
+        .list();
 
     for (DecisionDefinition decisionDefinition : allDefinitionsForDeployment) {
       try {
         removeDecisionDefinition(decisionDefinition.getId());
-      } catch(Exception e) {
+      } catch (Exception e) {
         LOG.removeEntryFromDeploymentCacheFailure("decision", decisionDefinition.getId(), e);
       }
     }
@@ -742,13 +758,13 @@ public class DeploymentCache {
         .deploymentId(deploymentId)
         .list();
 
-      for (DecisionRequirementsDefinition decisionRequirementsDefinition : allDefinitionsForDeployment) {
-        try {
-          removeDecisionDefinition(decisionRequirementsDefinition.getId());
-        } catch(Exception e) {
-          LOG.removeEntryFromDeploymentCacheFailure("decision requirement", decisionRequirementsDefinition.getId(), e);
-        }
+    for (DecisionRequirementsDefinition decisionRequirementsDefinition : allDefinitionsForDeployment) {
+      try {
+        removeDecisionDefinition(decisionRequirementsDefinition.getId());
+      } catch (Exception e) {
+        LOG.removeEntryFromDeploymentCacheFailure("decision requirement", decisionRequirementsDefinition.getId(), e);
       }
+    }
   }
 
 }

@@ -13,17 +13,6 @@
 
 package org.camunda.bpm.engine.impl.test;
 
-import java.io.InputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
-
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
@@ -56,9 +45,16 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.cmmn.CmmnModelInstance;
+import org.camunda.commons.utils.cache.Cache;
+import org.camunda.commons.utils.cache.ConcurrentLruCache;
 import org.junit.Assert;
 import org.junit.runner.Description;
 import org.slf4j.Logger;
+
+import java.io.InputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.util.*;
 
 
 /**
@@ -320,27 +316,35 @@ public abstract class TestHelper {
     ProcessEngineConfigurationImpl processEngineConfiguration = ((ProcessEngineImpl) processEngine).getProcessEngineConfiguration();
     DeploymentCache deploymentCache = processEngineConfiguration.getDeploymentCache();
 
-    Map<String, ProcessDefinitionEntity> processDefinitionCache = deploymentCache.getProcessDefinitionCache();
-    if (!processDefinitionCache.isEmpty()) {
-      outputMessage.append("\tProcess Definition Cache: ").append(processDefinitionCache.keySet()).append("\n");
+    Cache<String, ProcessDefinitionEntity> processDefinitionCache = deploymentCache.getProcessDefinitionCache();
+      ConcurrentLruCache<String, ProcessDefinitionEntity> defaultProcessDefinitionCache =
+                                                                (ConcurrentLruCache) processDefinitionCache;
+    if (!defaultProcessDefinitionCache.isEmpty()) {
+      outputMessage.append("\tProcess Definition Cache: ").append(defaultProcessDefinitionCache.keySet()).append("\n");
       processDefinitionCache.clear();
     }
 
-    Map<String, BpmnModelInstance> bpmnModelInstanceCache = deploymentCache.getBpmnModelInstanceCache();
-    if (!bpmnModelInstanceCache.isEmpty()) {
-      outputMessage.append("\tBPMN Model Instance Cache: ").append(bpmnModelInstanceCache.keySet()).append("\n");
+    Cache<String, BpmnModelInstance> bpmnModelInstanceCache = deploymentCache.getBpmnModelInstanceCache();
+    ConcurrentLruCache<String, BpmnModelInstance> defaultBpmnModelInstanceCache =
+                                                                (ConcurrentLruCache) bpmnModelInstanceCache;
+    if (!defaultBpmnModelInstanceCache.isEmpty()) {
+      outputMessage.append("\tBPMN Model Instance Cache: ").append(defaultBpmnModelInstanceCache.keySet()).append("\n");
       bpmnModelInstanceCache.clear();
     }
 
-    Map<String, CaseDefinitionEntity> caseDefinitionCache = deploymentCache.getCaseDefinitionCache();
-    if (!caseDefinitionCache.isEmpty()) {
-      outputMessage.append("\tCase Definition Cache: ").append(caseDefinitionCache.keySet()).append("\n");
+    Cache<String, CaseDefinitionEntity> caseDefinitionCache = deploymentCache.getCaseDefinitionCache();
+    ConcurrentLruCache<String, CaseDefinitionEntity> defaultCaseDefinitionCache =
+                                                                (ConcurrentLruCache) caseDefinitionCache;
+    if (!defaultCaseDefinitionCache.isEmpty()) {
+      outputMessage.append("\tCase Definition Cache: ").append(defaultCaseDefinitionCache.keySet()).append("\n");
       caseDefinitionCache.clear();
     }
 
-    Map<String, CmmnModelInstance> cmmnModelInstanceCache = deploymentCache.getCmmnModelInstanceCache();
-    if (!cmmnModelInstanceCache.isEmpty()) {
-      outputMessage.append("\tCMMN Model Instance Cache: ").append(cmmnModelInstanceCache.keySet()).append("\n");
+    Cache<String, CmmnModelInstance> cmmnModelInstanceCache = deploymentCache.getCmmnModelInstanceCache();
+    ConcurrentLruCache<String, CmmnModelInstance> defaultCmmnModelInstanceCache =
+                                                                (ConcurrentLruCache) cmmnModelInstanceCache;
+    if (!defaultCmmnModelInstanceCache.isEmpty()) {
+      outputMessage.append("\tCMMN Model Instance Cache: ").append(defaultCmmnModelInstanceCache.keySet()).append("\n");
       cmmnModelInstanceCache.clear();
     }
 

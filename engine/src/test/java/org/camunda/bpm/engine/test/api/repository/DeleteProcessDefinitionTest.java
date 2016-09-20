@@ -15,34 +15,33 @@
  */
 package org.camunda.bpm.engine.test.api.repository;
 
-import java.util.List;
-import static junit.framework.TestCase.assertFalse;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
+import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstanceWithVariables;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
-import static org.camunda.bpm.engine.test.api.repository.RedeploymentTest.DEPLOYMENT_NAME;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.commons.utils.cache.Cache;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import static junit.framework.TestCase.assertNotNull;
-import static junit.framework.TestCase.assertNull;
-import static junit.framework.TestCase.assertTrue;
-import static junit.framework.TestCase.fail;
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.exception.NotFoundException;
-import org.camunda.bpm.engine.exception.NullValueException;
-import org.camunda.bpm.engine.impl.history.HistoryLevel;
-import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
-import org.camunda.bpm.model.bpmn.Bpmn;
-import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.junit.After;
-import static org.junit.Assert.assertEquals;
 import org.junit.rules.ExpectedException;
+
+import java.util.List;
+
+import static junit.framework.TestCase.*;
+import static org.camunda.bpm.engine.test.api.repository.RedeploymentTest.DEPLOYMENT_NAME;
+import static org.junit.Assert.assertEquals;
 
 /**
  *
@@ -167,14 +166,14 @@ public class DeleteProcessDefinitionTest {
     DeploymentCache deploymentCache = processEngineConfiguration.getDeploymentCache();
 
     // ensure definitions and models are part of the cache
-    assertTrue(deploymentCache.getProcessDefinitionCache().containsKey(processDefinitionId));
-    assertTrue(deploymentCache.getBpmnModelInstanceCache().containsKey(processDefinitionId));
+    assertNotNull(deploymentCache.getProcessDefinitionCache().get(processDefinitionId));
+    assertNotNull(deploymentCache.getBpmnModelInstanceCache().get(processDefinitionId));
 
     repositoryService.deleteProcessDefinition(processDefinitionId, true);
 
     // then the definitions and models are removed from the cache
-    assertFalse(deploymentCache.getProcessDefinitionCache().containsKey(processDefinitionId));
-    assertFalse(deploymentCache.getBpmnModelInstanceCache().containsKey(processDefinitionId));
+    assertNull(deploymentCache.getProcessDefinitionCache().get(processDefinitionId));
+    assertNull(deploymentCache.getBpmnModelInstanceCache().get(processDefinitionId));
   }
 
   @Test
@@ -183,9 +182,14 @@ public class DeleteProcessDefinitionTest {
     deployment = repositoryService.createDeployment()
             .addClasspathResource("org/camunda/bpm/engine/test/repository/twoProcesses.bpmn20.xml")
             .deploy();
-    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
+    ProcessDefinition processDefinitionOne =
+        repositoryService.createProcessDefinitionQuery().processDefinitionKey("one").singleResult();
+    ProcessDefinition processDefinitionTwo =
+        repositoryService.createProcessDefinitionQuery().processDefinitionKey("two").singleResult();
+
+    String idOne = processDefinitionOne.getId();
     //one is deleted from the deployment
-    repositoryService.deleteProcessDefinition(processDefinitions.get(0).getId());
+    repositoryService.deleteProcessDefinition(idOne);
 
     //when clearing the deployment cache
     processEngineConfiguration.getDeploymentCache().discardProcessDefinitionCache();
@@ -196,10 +200,10 @@ public class DeleteProcessDefinitionTest {
     assertTrue(procInst.getProcessDefinitionId().contains("two"));
 
     //should refill the cache
-    assertEquals(1, processEngineConfiguration.getDeploymentCache().getProcessDefinitionCache().size());
+    Cache cache = processEngineConfiguration.getDeploymentCache().getProcessDefinitionCache();
+    assertNotNull(cache.get(processDefinitionTwo.getId()));
     //The deleted process definition should not be recreated after the cache is refilled
-    assertEquals(1, repositoryService.createProcessDefinitionQuery().count());
-    assertNull(repositoryService.createProcessDefinitionQuery().processDefinitionKey("one").singleResult());
+    assertNull(cache.get(processDefinitionOne.getId()));
   }
 
   @Test
@@ -208,9 +212,12 @@ public class DeleteProcessDefinitionTest {
     deployment = repositoryService.createDeployment()
             .addClasspathResource("org/camunda/bpm/engine/test/repository/twoProcesses.bpmn20.xml")
             .deploy();
-    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
+
+    ProcessDefinition processDefinitionOne =
+        repositoryService.createProcessDefinitionQuery().processDefinitionKey("one").singleResult();
+
     //one is deleted from the deployment
-    repositoryService.deleteProcessDefinition(processDefinitions.get(0).getId());
+    repositoryService.deleteProcessDefinition(processDefinitionOne.getId());
 
     //when the process definition is redeployed
     Deployment deployment2 = repositoryService.createDeployment()
