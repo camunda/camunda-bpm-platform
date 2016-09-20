@@ -73,9 +73,8 @@ public abstract class AbstractMetricsIntervalTest {
     metricsCount = metricNames.size();
     Random rand = new Random(new Date().getTime());
 
-    //current date as start date
-    long startDate = 0;//(long) Math.floor((double) (new DateTime().getMillis() / interval)) * interval;
-    //current date time floor to interval
+    //start date is the default interval since mariadb can't set 0 as timestamp
+    long startDate = DEFAULT_INTERVAL_MILLIS;
     firstInterval = new DateTime(startDate);
     //we will have 5 metric reports in an interval
     int dataPerInterval = 5;
