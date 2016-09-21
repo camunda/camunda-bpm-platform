@@ -12,12 +12,12 @@
  */
 package org.camunda.commons.utils.cache;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class ConcurrentLruCacheTest {
 
@@ -114,5 +114,51 @@ public class ConcurrentLruCacheTest {
 
     new ConcurrentLruCache<String, String>(-1);
   }
+
+  @Test
+  public void removeElementInEmptyCache() {
+
+    // given
+    cache.clear();
+
+    // when
+    cache.remove("123");
+
+    // then
+    assertThat(cache.isEmpty()).isTrue();
+  }
+
+  @Test
+  public void removeNoneExistingKeyInCache(){
+    //given
+    cache.put("a", "1");
+    cache.put("b", "2");
+    cache.put("c", "3");
+
+    // when
+    cache.remove("d");
+
+    // then
+    assertThat(cache.get("a")).isEqualTo("1");
+    assertThat(cache.get("b")).isEqualTo("2");
+    assertThat(cache.get("c")).isEqualTo("3");
+  }
+
+  @Test
+  public void removeAllElements() {
+    // given
+    cache.put("a", "1");
+    cache.put("b", "2");
+    cache.put("c", "3");
+
+    // when
+    cache.remove("a");
+    cache.remove("b");
+    cache.remove("c");
+
+    // then
+    assertThat(cache.isEmpty()).isTrue();
+  }
+
 
 }

@@ -12,6 +12,7 @@
  */
 package org.camunda.commons.utils.cache;
 
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentMap;
@@ -19,6 +20,11 @@ import java.util.concurrent.ConcurrentMap;
 /**
  * A thread-safe LRU {@link Cache} with a fixed capacity. If the cache reaches
  * the capacity, it discards the least recently used entry first.
+ *
+ * *Note*: The consistency of the keys queue with the keys in the cache is not ensured! This means, the keys queue
+ * can contain duplicates of the same key and not all the keys of the queue are necessarily in the cache.
+ * Please also note, that this can lead to lower capacity. However, all the keys of the cache are at least
+ * once contained in the keys queue.
  *
  * @param <K>
  *          the type of keys
@@ -37,7 +43,6 @@ public class ConcurrentLruCache<K, V> implements Cache<K, V> {
    *
    * @param capacity
    *          max number of cache entries
-   *
    * @throws IllegalArgumentException
    *           if capacity is negative
    */
@@ -70,12 +75,26 @@ public class ConcurrentLruCache<K, V> implements Cache<K, V> {
     }
     keys.add(key);
 
-    if (keys.size() > capacity) {
+    if (cache.size() > capacity) {
       K lruKey = keys.poll();
       if (lruKey != null) {
         cache.remove(lruKey);
+
+        // remove duplicated keys
+        this.removeAll(lruKey);
+
+        // queue may not contain any key of a possibly concurrently added entry of the same key in the cache
+        if (cache.containsKey(lruKey)) {
+          keys.add(lruKey);
+        }
       }
     }
+  }
+
+  @Override
+  public void remove(K key) {
+    this.cache.remove(key);
+    keys.remove(key);
   }
 
   @Override
@@ -85,10 +104,44 @@ public class ConcurrentLruCache<K, V> implements Cache<K, V> {
   }
 
   /**
+   * Returns <code>true</code> if this cache contains a mapping for the specified key.
+   *
+   * @param key The key whose presence in this cache is to be tested.
+   * @return <code>true</code> if this cache contains a mapping for the specified key.
+   */
+  public boolean containsKey(K key) {
+    return cache.containsKey(key);
+  }
+
+  /**
+   * Returns <code>true</code> if this cache contains no key-value mappings.
+   */
+  public boolean isEmpty() {
+    return cache.isEmpty();
+  }
+
+  /**
+   * Returns a Set view of the keys contained in this cache.
+   */
+  public Set<K> keySet() {
+    return cache.keySet();
+  }
+
+  /**
    * @return the current size of the cache
    */
   public int size() {
-    return keys.size();
+    return cache.size();
+  }
+
+  /**
+   * Removes duplicated keys within the keys queue.
+   *
+   * @param key
+   *          key which is to be removed from the keys queue.
+   */
+  private void removeAll(K key){
+    while (keys.remove(key)) {}
   }
 
 }
