@@ -1,8 +1,9 @@
 'use strict';
 
 var fs = require('fs');
-
 var angular = require('angular');
+var searchWidgetUtils = require('../../../../../../common/scripts/util/search-widget-utils');
+
 var template = fs.readFileSync(__dirname + '/job-definition-table.html', 'utf8');
 
 var Controller = [
@@ -46,6 +47,7 @@ var Controller = [
     $scope.jobDefinitionVars = { read: [ 'jobDefinition', 'processData', 'filter' ] };
     $scope.jobDefinitionActions = Views.getProviders({ component: 'cockpit.jobDefinition.action' });
 
+    $scope.getSearchQueryForSearchType = searchWidgetUtils.getSearchQueryForSearchType.bind(null, 'activityIdIn');
   }];
 
 var Configuration = function PluginConfiguration(ViewsProvider) {

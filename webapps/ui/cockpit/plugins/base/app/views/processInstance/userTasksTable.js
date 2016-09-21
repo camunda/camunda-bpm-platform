@@ -1,10 +1,11 @@
 'use strict';
 
 var fs = require('fs');
+var searchWidgetUtils = require('../../../../../../common/scripts/util/search-widget-utils');
+var angular = require('angular');
 
 var identityLinksTemplate = fs.readFileSync(__dirname + '/identity-links-modal.html', 'utf8');
 var userTasksTemplate = fs.readFileSync(__dirname + '/user-tasks-table.html', 'utf8');
-var angular = require('angular');
 
 module.exports = function(ngModule) {
 
@@ -57,10 +58,6 @@ module.exports = function(ngModule) {
     return angular.isFunction(func) ? func : angular.noop;
   }
 
-
-
-
-
   ngModule.controller('UserTaskController', [
     '$scope', 'search', 'camAPI', 'TaskResource', 'Notifications', '$modal',
     function($scope,   search,   camAPI,   TaskResource,   Notifications,   $modal) {
@@ -79,6 +76,8 @@ module.exports = function(ngModule) {
       var filter = null;
 
       var Task = camAPI.resource('task');
+
+      $scope.getSearchQueryForSearchType = searchWidgetUtils.getSearchQueryForSearchType.bind(null, 'activityInstanceIdIn');
 
       $scope.$watch('pages.current', function(newValue, oldValue) {
         if (newValue == oldValue) {
@@ -145,7 +144,8 @@ module.exports = function(ngModule) {
 
       $scope.getHref = function(userTask) {
         if(userTask.instance) {
-          return '#/process-instance/' + processInstance.id + '?detailsTab=user-tasks-tab&activityInstanceIds=' + userTask.instance.id;
+          return '#/process-instance/' + processInstance.id + '/runtime?detailsTab=user-tasks-tab&' +
+            $scope.getSearchQueryForSearchType(userTask.instance.id);
         }
 
         return '';

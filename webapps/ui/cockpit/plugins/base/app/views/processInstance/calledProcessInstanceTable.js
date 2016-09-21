@@ -1,9 +1,10 @@
 'use strict';
 
 var fs = require('fs');
+var searchWidgetUtils = require('../../../../../../common/scripts/util/search-widget-utils');
+var angular = require('angular');
 
 var template = fs.readFileSync(__dirname + '/called-process-instance-table.html', 'utf8');
-var angular = require('angular');
 
 module.exports = function(ngModule) {
   ngModule.controller('CalledProcessInstanceController', [
@@ -16,6 +17,8 @@ module.exports = function(ngModule) {
         // var processInstance = $scope.processInstance;
 
       var filter = null;
+
+      $scope.getSearchQueryForSearchType = searchWidgetUtils.getSearchQueryForSearchType.bind(null, 'activityInstanceIdIn');
 
       calledProcessInstanceData.observe([ 'filter', 'instanceIdToInstanceMap' ], function(newFilter, instanceIdToInstanceMap) {
         updateView(newFilter, instanceIdToInstanceMap);

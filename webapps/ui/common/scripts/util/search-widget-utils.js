@@ -4,33 +4,83 @@ var angular = require('angular');
 var includes = require('./includes');
 
 module.exports = {
-  getActivityIdsBasedOnInstances: getActivityIdsBasedOnInstances,
+  getSearchQueryForSearchType:getSearchQueryForSearchType,
   getActivityIdsFromUrlParams: getActivityIdsFromUrlParams,
   replaceActivitiesInSearchQuery: replaceActivitiesInSearchQuery,
-  createSearchQueryForSearchWidget: createSearchQueryForSearchWidget
+  createSearchQueryForSearchWidget: createSearchQueryForSearchWidget,
+  shouldUpdateFilter: shouldUpdateFilter,
+  createSearchesForActivityIds: createSearchesForActivityIds
 };
 
 /**
- * Gets list of activity ids based on instances ids
+ * Creates url part for search query with values for given search type
  *
- * @param instanceIdToInstanceMap
- * @param ids
- * @returns {Array}
+ * @param searchType
+ * @param values list of ids or single id
  */
-function getActivityIdsBasedOnInstances(instanceIdToInstanceMap, ids) {
-  ids = angular.isArray(ids) ? ids : [];
+function getSearchQueryForSearchType(searchType, values) {
+  values = [].concat(values); //convert single id to list of ids or in case of array do nothing
 
-  if (!instanceIdToInstanceMap) {
-    return [];
+  var value = JSON.stringify(
+    createSearchesForActivityIds(searchType, values)
+  );
+
+  return 'searchQuery='+value;
+}
+
+/**
+ * Function that returns true when filter has meaningful changes.
+ *
+ * @param newFilter
+ * @param currentFilter
+ * @param whiteList list of properties that should be ignored while comparing object, by default []
+ * @returns {boolean}
+ */
+function shouldUpdateFilter(newFilter, currentFilter, whiteList) {
+  whiteList = angular.isArray(whiteList) ? whiteList : [];
+
+  return !angular.equals(
+    prepareObjectForComparing(newFilter, whiteList),
+    prepareObjectForComparing(currentFilter, whiteList)
+  );
+}
+
+function prepareObjectForComparing(obj, whiteList) {
+  if (!angular.isObject(obj)) {
+    return obj;
   }
 
-  return ids
-    .filter(function(id) {
-      return instanceIdToInstanceMap[id];
-    })
-    .map(function(id) {
-      return instanceIdToInstanceMap[id].activityId;
-    });
+  return stripUndefinedFromObject(
+    stripProperties(obj, whiteList)
+  );
+}
+
+function stripProperties(obj, whiteList) {
+  return Object
+    .keys(obj)
+    .reduce(function(newObj, key) {
+      var value = obj[key];
+
+      if (includes(whiteList, key)) {
+        newObj[key] = value;
+      }
+
+      return newObj;
+    }, {});
+}
+
+function stripUndefinedFromObject(obj) {
+  return Object
+    .keys(obj)
+    .reduce(function(newObj, key) {
+      var value = obj[key];
+
+      if (value != null) {
+        newObj[key] = value;
+      }
+
+      return newObj;
+    }, {});
 }
 
 /**
@@ -63,26 +113,9 @@ function getActivityIdsFromSearches(searchType, searches) {
  * @param searchType type of activity search pill
  * @param selectedActivityIds list of ids for selected activities
  */
-function replaceActivitiesInSearchQuery(search, searchType, selectedActivityIds) {
-  selectedActivityIds = angular.isArray(selectedActivityIds) ? selectedActivityIds : [];
-
-  var urlParams = search();
-
-  //when there is no searchQuery present and there is no ids to add to searchQuery don't change anything
-  if (!urlParams.searchQuery && !selectedActivityIds.length) {
-    return null;
-  }
-
-  return constructNewSearchQuery(urlParams, searchType, selectedActivityIds);
-}
-
-function constructNewSearchQuery(urlParams, searchType, selectedActivityIds) {
-  var searches = JSON.parse(urlParams.searchQuery || '[]');
-
-  searches = removeActivitySearches(searchType, searches)
+function replaceActivitiesInSearchQuery(searches, searchType, selectedActivityIds) {
+  return removeActivitySearches(searchType, searches)
     .concat(createSearchesForActivityIds(searchType, selectedActivityIds));
-
-  return JSON.stringify(searches);
 }
 
 function removeActivitySearches(searchType, searches) {

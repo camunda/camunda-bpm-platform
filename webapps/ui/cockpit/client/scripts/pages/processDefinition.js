@@ -15,9 +15,7 @@ var Controller = [
   '$scope', '$rootScope', '$q', 'search', 'ProcessDefinitionResource', 'ProcessInstanceResource', 'Views', 'Data', 'Transform', 'Variables', 'dataDepend', 'processDefinition', 'page',
   function($scope,   $rootScope,   $q,   search,   ProcessDefinitionResource,   ProcessInstanceResource,   Views,   Data,   Transform,   Variables,   dataDepend,   processDefinition,   page
   ) {
-
     var processData = $scope.processData = dataDepend.create($scope);
-
 
     // utilities ///////////////////////
 
@@ -26,14 +24,14 @@ var Controller = [
       $scope.hovered = id || null;
     };
 
-    $scope.$on('$routeChanged', function() {
-      processData.set('filter', parseFilterFromUri());
-      // update tab selection
-      setDefaultTab($scope.processDefinitionTabs);
-    });
-
     $scope.$on('$locationChangeSuccess', function() {
-      processData.set('filter', parseFilterFromUri());
+      var newFilter = parseFilterFromUri();
+
+      if (searchWidgetUtils.shouldUpdateFilter(newFilter, currentFilter, ['activityIds', 'parentProcessDefinitionId'])) {
+        processData.set('filter', newFilter);
+      }
+
+      setDefaultTab($scope.processDefinitionTabs);
     });
 
     var currentFilter = null;
@@ -94,19 +92,26 @@ var Controller = [
     }
 
     function serializeFilterToUri(filter) {
-      var activityIds = filter.activityIds,
-          parentProcessDefinitionId = filter.parentProcessDefinitionId;
+      var activityIds = filter.activityIds;
+      var parentProcessDefinitionId = filter.parentProcessDefinitionId;
+      var urlParams = search();
+      var searches = JSON.parse(urlParams.searchQuery || '[]');
+
+      //when there is no searchQuery present and there is no ids to add to searchQuery don't change anything
+      if (!urlParams.searchQuery && !activityIds.length) {
+        searches = null;
+      } else {
+        searches = searchWidgetUtils.replaceActivitiesInSearchQuery(searches, 'activityIdIn', activityIds);
+      }
 
       search.updateSilently({
         parentProcessDefinitionId: parentProcessDefinitionId || null,
-        searchQuery: searchWidgetUtils.replaceActivitiesInSearchQuery(search, 'activityIdIn', activityIds)
+        searchQuery: searches? JSON.stringify(searches) : null
       });
 
       currentFilter = filter;
     }
-
     // end utilities ///////////////////////
-
 
     // begin data definition //////////////////////
 

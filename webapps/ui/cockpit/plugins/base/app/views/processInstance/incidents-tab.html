@@ -58,8 +58,7 @@
         <td class="activity">
           <span ng-show="incident.linkable"
                 cam-widget-clipboard="incident.activityId">
-            <a cam-select-activity="incident.activityId"
-               ng-href="#/process-instance/{{ processInstance.id }}?activityIds={{ incident.activityId }}&amp;detailsTab=incidents-tab">
+            <a ng-href="#/process-instance/{{ processInstance.id }}/runtime?activityIds={{ incident.activityId }}&amp;detailsTab=incidents-tab">
               {{ incident.activityName }}
             </a>
           </span>
@@ -71,7 +70,7 @@
         <td class="cause instance-id">
           <span ng-show="incident.causeIncidentProcessInstanceId !== incident.processInstanceId"
                 cam-widget-clipboard="incident.causeIncidentProcessInstanceId">
-            <a href="#/process-instance/{{incident.causeIncidentProcessInstanceId}}?activityIds={{ incident.causeIncidentActivityId }}&amp;detailsTab=incidents-tab">
+            <a ng-href="#/process-instance/{{incident.causeIncidentProcessInstanceId}}/runtime?activityIds={{ incident.causeIncidentActivityId }}&amp;detailsTab=incidents-tab">
               {{ incident.causeIncidentProcessInstanceId }}
             </a>
           </span>
@@ -80,7 +79,7 @@
         <td class="cause-root instance-id">
           <span ng-show="incident.rootCauseIncidentProcessInstanceId !== incident.processInstanceId"
                 cam-widget-clipboard="incident.rootCauseIncidentProcessInstanceId">
-            <a href="#/process-instance/{{incident.rootCauseIncidentProcessInstanceId}}?activityIds={{ incident.rootCauseIncidentActivityId }}&amp;detailsTab=incidents-tab">
+            <a ng-href="#/process-instance/{{incident.rootCauseIncidentProcessInstanceId}}/runtime?activityIds={{ incident.rootCauseIncidentActivityId }}&amp;detailsTab=incidents-tab">
               {{ incident.rootCauseIncidentProcessInstanceId }}
             </a>
           </span>

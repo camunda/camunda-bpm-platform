@@ -1,8 +1,8 @@
 'use strict';
 
 var fs = require('fs');
-
 var angular = require('angular');
+
 var incidentsTemplate = fs.readFileSync(__dirname + '/incidents-tab.html', 'utf8');
 
 var Configuration = function PluginConfiguration(ViewsProvider) {

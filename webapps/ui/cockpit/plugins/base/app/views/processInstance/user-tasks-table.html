@@ -21,8 +21,7 @@
     <tbody>
       <tr ng-repeat="userTask in userTasks">
         <td class="activity">
-          <a cam-select-activity-instance="userTask.instance.id"
-             ng-href="{{ getHref(userTask) }}">{{ userTask.instance.name || userTask.instance.id }}</a>
+          <a ng-href="{{ getHref(userTask) }}">{{ userTask.instance.name || userTask.instance.id }}</a>
         </td>
 
         <td class="assignee">
