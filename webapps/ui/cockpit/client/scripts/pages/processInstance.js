@@ -41,11 +41,13 @@ var Controller = [
     $scope.$on('$locationChangeSuccess', function() {
       var newFilter = parseFilterFromUri($scope.filter);
 
-      if (searchWidgetUtils.shouldUpdateFilter(newFilter, $scope.filter, ['activityIds', 'activityInstanceIds'])) {
-        processData.set('filter', newFilter);
-      }
+      if ($location.path().indexOf(processInstance.id) > -1) {
+        if (searchWidgetUtils.shouldUpdateFilter(newFilter, $scope.filter, ['activityIds', 'activityInstanceIds'])) {
+          processData.set('filter', newFilter);
+        }
 
-      pageData.set('activeTab', getDefaultTab($scope.processInstanceTabs));
+        pageData.set('activeTab', getDefaultTab($scope.processInstanceTabs));
+      }
     });
 
     function parseFilterFromUri(lastFilter) {
@@ -65,7 +67,7 @@ var Controller = [
         activityIds: activityIds,
         activityInstanceIds: activityInstanceIds,
         page: parseInt(params.page, 10) || undefined,
-        replace: ignoreActivityIds
+        replace: ignoreActivityIds || !lastFilter
       };
     }
 
