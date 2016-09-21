@@ -1058,7 +1058,7 @@ public class BpmnParse extends Parse {
         EscalationEventDefinition escalationEventDefinition = createEscalationEventDefinitionForEscalationHandler(escalationEventDefinitionElement, scopeActivity, isInterrupting);
         addEscalationEventDefinition(startEventActivity.getEventScope(), escalationEventDefinition, escalationEventDefinitionElement);
       } else if (conditionalEventDefinitionElment != null) {
-
+        parseConditionalStartEventForEventSubprocess(conditionalEventDefinitionElment, startEventActivity, isInterrupting);
       } else {
         addError("start event of event subprocess must be of type 'error', 'message', 'timer', 'signal', 'compensation' or 'escalation'", startEventElement);
       }
@@ -3444,15 +3444,23 @@ public class BpmnParse extends Parse {
   }
 
   /**
+   * Parses the given element as conditional start event of an event subprocess.
    *
-   *
-   * @param conditionalEventDefinition the XML element which contains the conditional event information
+   * @param element the XML element which contains the conditional event information
    * @param interrupting indicates if the event is interrupting or not
    * @param conditionalActivity the conditional event activity
    * @return
    */
-  public ActivityImpl parseConditionalStartEventForEventSubprocess(Element conditionalEventDefinition, ActivityImpl conditionalActivity, boolean interrupting) {
+  public ActivityImpl parseConditionalStartEventForEventSubprocess(Element element, ActivityImpl conditionalActivity, boolean interrupting) {
+    conditionalActivity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.START_EVENT_CONDITIONAL);
 
+    ConditionalEventDefinition conditionalEventDefinition = parseConditionalEventDefinition(element, conditionalActivity);
+    conditionalEventDefinition.setInterrupting(interrupting);
+    addEventSubscriptionDeclaration(conditionalEventDefinition, conditionalActivity.getEventScope(), element);
+
+    for (BpmnParseListener parseListener : parseListeners) {
+      parseListener.parseConditionalStartEventForEventSubprocess(element, conditionalActivity, interrupting);
+    }
 
     return conditionalActivity;
   }

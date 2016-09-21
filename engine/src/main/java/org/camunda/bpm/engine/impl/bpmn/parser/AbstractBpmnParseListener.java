@@ -124,4 +124,7 @@ public class AbstractBpmnParseListener implements BpmnParseListener {
 
   public void parseIntermediateConditionalEventDefinition(Element conditionalEventDefinition, ActivityImpl conditionalActivity) {
   }
+
+  public void parseConditionalStartEventForEventSubprocess(Element element, ActivityImpl conditionalActivity, boolean interrupting) {
+  }
 }

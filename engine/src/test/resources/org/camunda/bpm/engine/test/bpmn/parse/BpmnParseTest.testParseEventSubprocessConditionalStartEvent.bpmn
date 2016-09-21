@@ -16,7 +16,9 @@
     <bpmn:subProcess id="SubProcess_05husl4" triggeredByEvent="true">
       <bpmn:startEvent id="conditionalStartEventSubProcess">
         <bpmn:outgoing>SequenceFlow_07a3cqu</bpmn:outgoing>
-        <bpmn:conditionalEventDefinition />
+        <bpmn:conditionalEventDefinition>
+          <bpmn:condition xsi:type="bpmn:tFormalExpression">${true}</bpmn:condition>
+        </bpmn:conditionalEventDefinition>
       </bpmn:startEvent>
       <bpmn:endEvent id="EndEvent_0gar1qq">
         <bpmn:incoming>SequenceFlow_07a3cqu</bpmn:incoming>

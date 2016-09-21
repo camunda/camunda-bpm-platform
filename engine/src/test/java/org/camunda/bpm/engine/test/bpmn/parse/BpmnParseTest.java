@@ -521,7 +521,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
   public void testParseEventSubprocessConditionalStartEvent() {
     ActivityImpl conditionalStartEventSubProcess = findActivityInDeployedProcessDefinition("conditionalStartEventSubProcess");
 
-    assertEquals("conditionalStartEventSubprocess", conditionalStartEventSubProcess.getProperties().get(BpmnProperties.TYPE));
+    assertEquals(ActivityTypes.START_EVENT_CONDITIONAL, conditionalStartEventSubProcess.getProperties().get(BpmnProperties.TYPE));
     assertEquals(EventSubProcessStartEventActivityBehavior.class, conditionalStartEventSubProcess.getActivityBehavior().getClass());
 
   }
