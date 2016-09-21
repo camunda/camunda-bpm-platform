@@ -15,7 +15,7 @@
     {
       "id": {
         "key": "activityIdIn",
-        "value": "Activity Id"
+        "value": "Activity ID"
       },
       "operators": [
         {
@@ -27,7 +27,7 @@
     {
       "id": {
         "key": "startedDate",
-        "value": "Started Date"
+        "value": "Start Date"
       },
       "operators": [
         {
