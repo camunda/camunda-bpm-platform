@@ -51,7 +51,7 @@
           sizes="114x114"
           href="$APP_ROOT/app/admin/assets/images/camunda.114.png" />
   </head>
-  <body ng-class="{'no-breadcrumbs': !$root.showBreadcrumbs}">
+  <body ng-controller="camAdminAppCtrl" ng-class="{'no-breadcrumbs': !$root.showBreadcrumbs}">
     <!-- navigation -->
     <div cam-widget-header
          authentication="authentication"
