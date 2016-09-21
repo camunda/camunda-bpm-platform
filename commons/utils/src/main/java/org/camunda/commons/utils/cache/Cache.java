@@ -21,7 +21,7 @@ package org.camunda.commons.utils.cache;
  * @param <V>
  *          the type of mapped values
  */
-public interface Cache<K, V> {
+public interface  Cache<K, V> {
 
   /**
    * Gets an entry from the cache.
@@ -49,5 +49,15 @@ public interface Cache<K, V> {
    * Clears the contents of the cache.
    */
   void clear();
+
+  /**
+   * Removes an entry from the cache.
+   *
+   * @param key
+   *          key with which the specified value is to be associated.
+   * @return value
+   *          removes the value with the specified key from the cache.
+   */
+  void remove(K key);
 
 }
