@@ -1,5 +1,5 @@
 <!-- # CE - ui/cockpit/plugins/base/app/views/processesDashboard/process-definitions.html -->
-<div class="deployed-processes">
+<div cam-widget-loader loading-state="{{loadingState}}" class="deployed-processes">
   <h3 ng-if="processDefinitionData && processDefinitionData.length">
     {{ processDefinitionData.length }} process {{ (processDefinitionData.length > 1 ? 'definitions' : 'definition') }} deployed
   </h3>

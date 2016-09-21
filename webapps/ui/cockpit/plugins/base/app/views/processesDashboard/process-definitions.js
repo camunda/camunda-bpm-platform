@@ -24,11 +24,18 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
         $scope.hasReportPlugin = Views.getProviders({ component: 'cockpit.report' }).length > 0;
 
         var processDefinitionService = camAPI.resource('process-definition');
+        $scope.loadingState = 'LOADING';
 
         processDefinitionService.list({
           latest: true
         }, function(err, data) {
           $scope.processDefinitionData = data.items;
+
+          if (err) {
+            $scope.loadingState = 'ERROR';
+          }
+
+          $scope.loadingState = 'LOADED';
 
           processData.observe('processDefinitionStatistics', function(processDefinitionStatistics) {
             $scope.statistics = processDefinitionStatistics;
