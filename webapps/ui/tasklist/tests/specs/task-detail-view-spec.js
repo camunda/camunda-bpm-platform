@@ -127,7 +127,6 @@ describe('Tasklist Detail View Spec', function() {
       });
 
       it('should enable form elements', function() {
-
         // given
         taskListPage.selectTask('Task 1');
         dashboardPage.waitForElementToBeVisible(taskViewPage.taskName());
@@ -138,7 +137,28 @@ describe('Tasklist Detail View Spec', function() {
         // then
         expect(taskViewPage.form.completeButton().isEnabled()).to.eventually.be.true;
       });
+    });
 
+    describe('with failing form', function() {
+      before(function() {
+        return testHelper(setupFile.setup5, true);
+      });
+
+      it('should enable form element after fail', function() {
+        //given
+        taskListPage.selectTask('Task_1dh4q2k');
+        dashboardPage.waitForElementToBeVisible(taskViewPage.taskName());
+        taskViewPage.form.selectTab();
+        taskViewPage.claim();
+
+        expect(taskViewPage.form.completeButton().isEnabled()).to.eventually.be.true;
+
+        // when
+        taskViewPage.form.completeButton().click();
+
+        //then
+        expect(taskViewPage.form.completeButton().isEnabled()).to.eventually.be.true;
+      });
     });
 
   });

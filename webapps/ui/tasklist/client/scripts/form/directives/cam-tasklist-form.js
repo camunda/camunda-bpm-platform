@@ -86,6 +86,7 @@ module.exports = [function() {
         $scope.saveHandler = noop;
 
         $scope.$loaded = false;
+        $scope.completeInProgress = false;
 
         // handle tasklist form ///////////////////////////////////////////////////
 
@@ -204,9 +205,11 @@ module.exports = [function() {
 
         var completionCallback = function(err, result)  {
           $scope.onFormCompletionCallback(err, result);
+          $scope.completeInProgress = false;
         };
 
         var complete = $scope.complete = function() {
+          $scope.completeInProgress = true;
           $scope.completionHandler(completionCallback);
         };
 
@@ -219,7 +222,8 @@ module.exports = [function() {
         };
 
         $scope.disableCompleteButton = function() {
-          return $scope.$invalid || ($scope.options && $scope.options.disableCompleteButton);
+          return $scope.completeInProgress || $scope.$invalid ||
+            ($scope.options && $scope.options.disableCompleteButton);
         };
 
         // save ///////////////////////////////////////////////////
