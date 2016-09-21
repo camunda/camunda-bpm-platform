@@ -13,8 +13,6 @@
 
 package org.camunda.bpm.engine.impl;
 
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensurePositive;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,6 +21,7 @@ import java.util.List;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.event.EventType;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
@@ -172,11 +171,11 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
   }
 
   public ProcessDefinitionQuery messageEventSubscription(String messageName) {
-    return eventSubscription("message", messageName);
+    return eventSubscription(EventType.MESSAGE, messageName);
   }
 
   public ProcessDefinitionQuery messageEventSubscriptionName(String messageName) {
-    return eventSubscription("message", messageName);
+    return eventSubscription(EventType.MESSAGE, messageName);
   }
 
   public ProcessDefinitionQuery processDefinitionStarter(String procDefId) {
@@ -184,10 +183,10 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
     return this;
   }
 
-  public ProcessDefinitionQuery eventSubscription(String eventType, String eventName) {
+  public ProcessDefinitionQuery eventSubscription(EventType eventType, String eventName) {
     ensureNotNull("event type", eventType);
     ensureNotNull("event name", eventName);
-    this.eventSubscriptionType = eventType;
+    this.eventSubscriptionType = eventType.name();
     this.eventSubscriptionName = eventName;
     return this;
   }

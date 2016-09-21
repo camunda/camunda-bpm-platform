@@ -96,8 +96,7 @@ import org.camunda.bpm.engine.impl.el.Expression;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.el.FixedValue;
 import org.camunda.bpm.engine.impl.el.UelExpressionCondition;
-import org.camunda.bpm.engine.impl.event.ConditionalEventHandler;
-import org.camunda.bpm.engine.impl.event.MessageEventHandler;
+import org.camunda.bpm.engine.impl.event.EventType;
 import org.camunda.bpm.engine.impl.form.handler.DefaultStartFormHandler;
 import org.camunda.bpm.engine.impl.form.handler.DefaultTaskFormHandler;
 import org.camunda.bpm.engine.impl.form.handler.DelegateStartFormHandler;
@@ -1180,12 +1179,12 @@ public class BpmnParse extends Parse {
       addError("Invalid 'messageRef': no message with id '" + messageRef + "' found.", messageEventDefinition);
     }
 
-    return new EventSubscriptionDeclaration(messageDefinition.getName(), MessageEventHandler.EVENT_HANDLER_TYPE);
+    return new EventSubscriptionDeclaration(messageDefinition.getName(), EventType.MESSAGE);
   }
 
   @SuppressWarnings("unchecked")
   protected void addEventSubscriptionDeclaration(EventSubscriptionDeclaration subscription, ScopeImpl scope, Element element) {
-    if (subscription.getEventType().equals("message") && (subscription.getEventName() == null || "".equalsIgnoreCase(subscription.getEventName().trim()))) {
+    if (subscription.getEventType().equals(EventType.MESSAGE.name()) && (subscription.getEventName() == null || "".equalsIgnoreCase(subscription.getEventName().trim()))) {
       addError("Cannot have a message event subscription with an empty or missing name", element);
     }
 
@@ -1207,11 +1206,11 @@ public class BpmnParse extends Parse {
   }
 
   protected boolean hasMultipleMessageEventDefinitionsWithSameName(EventSubscriptionDeclaration subscription, Collection<EventSubscriptionDeclaration> eventDefinitions) {
-    return hasMultipleEventDefinitionsWithSameName(subscription, eventDefinitions, "message");
+    return hasMultipleEventDefinitionsWithSameName(subscription, eventDefinitions, EventType.MESSAGE.name());
   }
 
   protected boolean hasMultipleSignalEventDefinitionsWithSameName(EventSubscriptionDeclaration subscription, Collection<EventSubscriptionDeclaration> eventDefinitions) {
-    return hasMultipleEventDefinitionsWithSameName(subscription, eventDefinitions, "signal");
+    return hasMultipleEventDefinitionsWithSameName(subscription, eventDefinitions, EventType.SIGNAL.name());
   }
 
   protected boolean hasMultipleEventDefinitionsWithSameName(EventSubscriptionDeclaration subscription, Collection<EventSubscriptionDeclaration> eventDefinitions, String eventType) {
@@ -3208,7 +3207,7 @@ public class BpmnParse extends Parse {
       if (signalDefinition == null) {
         addError("Could not find signal with id '" + signalRef + "'", signalEventDefinitionElement);
       }
-      EventSubscriptionDeclaration signalEventDefinition = new EventSubscriptionDeclaration(signalDefinition.getName(), "signal");
+      EventSubscriptionDeclaration signalEventDefinition = new EventSubscriptionDeclaration(signalDefinition.getName(), EventType.SIGNAL);
 
       boolean throwingAsynch = TRUE.equals(signalEventDefinitionElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "async", "false"));
       signalEventDefinition.setAsync(throwingAsynch);
@@ -3466,8 +3465,7 @@ public class BpmnParse extends Parse {
    * @return the conditional event definition which was parsed
    */
   protected ConditionalEventDefinition parseConditionalEventDefinition(Element element, ActivityImpl conditionalActivity) {
-    ConditionalEventDefinition conditionalEventDefinition = new ConditionalEventDefinition(conditionalActivity.getName(),
-                                                                  ConditionalEventHandler.HANDLER_EVENT_TYPE, conditionalActivity.getId());
+    ConditionalEventDefinition conditionalEventDefinition = new ConditionalEventDefinition(conditionalActivity.getName(), conditionalActivity.getId());
 
     Element conditionExprElement = element.element(CONDITION);
     if (conditionExprElement != null) {

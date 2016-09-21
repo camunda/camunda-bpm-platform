@@ -16,8 +16,8 @@ import java.util.List;
 
 import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionManager;
-import org.camunda.bpm.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 
 
@@ -35,16 +35,16 @@ public class SignalEndEventActivityBehavior extends FlowNodeActivityBehavior {
   @Override
   public void execute(ActivityExecution execution) throws Exception {
 
-    List<SignalEventSubscriptionEntity> signalEventSubscriptions = findSignalEventSubscriptions(signalDefinition.getEventName(), execution.getTenantId());
+    List<EventSubscriptionEntity> signalEventSubscriptions = findSignalEventSubscriptions(signalDefinition.getEventName(), execution.getTenantId());
 
-    for (SignalEventSubscriptionEntity signalEventSubscription : signalEventSubscriptions) {
+    for (EventSubscriptionEntity signalEventSubscription : signalEventSubscriptions) {
       signalEventSubscription.eventReceived(null, signalDefinition.isAsync());
     }
 
     leave(execution);
   }
 
-  protected List<SignalEventSubscriptionEntity> findSignalEventSubscriptions(String signalName, String tenantId) {
+  protected List<EventSubscriptionEntity> findSignalEventSubscriptions(String signalName, String tenantId) {
     EventSubscriptionManager eventSubscriptionManager = Context.getCommandContext().getEventSubscriptionManager();
 
     if(tenantId != null) {

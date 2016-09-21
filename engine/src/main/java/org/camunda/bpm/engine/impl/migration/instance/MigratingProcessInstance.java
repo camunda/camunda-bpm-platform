@@ -20,7 +20,7 @@ import java.util.Set;
 
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.migration.MigrationLogger;
-import org.camunda.bpm.engine.impl.persistence.entity.CompensateEventSubscriptionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
@@ -148,7 +148,7 @@ public class MigratingProcessInstance {
       ScopeImpl sourceScope,
       ScopeImpl targetScope,
       MigrationInstruction eventSubscriptionInstruction,
-      CompensateEventSubscriptionEntity eventSubscription,
+      EventSubscriptionEntity eventSubscription,
       ScopeImpl eventSubscriptionSourceScope,
       ScopeImpl eventSubscriptionTargetScope) {
 
@@ -169,7 +169,7 @@ public class MigratingProcessInstance {
 
   public MigratingCompensationEventSubscriptionInstance addCompensationSubscriptionInstance(
       MigrationInstruction eventSubscriptionInstruction,
-      CompensateEventSubscriptionEntity eventSubscription,
+      EventSubscriptionEntity eventSubscription,
       ScopeImpl sourceScope,
       ScopeImpl targetScope) {
     MigratingCompensationEventSubscriptionInstance compensationInstance = new MigratingCompensationEventSubscriptionInstance(

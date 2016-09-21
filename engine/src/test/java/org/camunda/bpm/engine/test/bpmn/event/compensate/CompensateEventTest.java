@@ -21,17 +21,15 @@ import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecution
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.event.MessageEventHandler;
+import org.camunda.bpm.engine.impl.event.EventType;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
@@ -1016,7 +1014,7 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
     // then there is a message event subscription for the receive task compensation handler
     EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().singleResult();
     assertNotNull(eventSubscription);
-    assertEquals(MessageEventHandler.EVENT_HANDLER_TYPE, eventSubscription.getEventType());
+    assertEquals(EventType.MESSAGE, eventSubscription.getEventType());
 
     // and triggering the message completes compensation
     runtimeService.correlateMessage("Message");

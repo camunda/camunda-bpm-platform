@@ -16,11 +16,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import org.camunda.bpm.engine.impl.bpmn.helper.CompensationUtil;
 
 import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
-import org.camunda.bpm.engine.impl.persistence.entity.CompensateEventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.tree.ReferenceWalker;
+import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 
 /**
  * Ensures that event subscriptions are visited in a top-down fashion, i.e.
@@ -29,14 +30,14 @@ import org.camunda.bpm.engine.impl.tree.ReferenceWalker;
  *
  * @author Thorben Lindhauer
  */
-public class CompensationEventSubscriptionWalker extends ReferenceWalker<CompensateEventSubscriptionEntity> {
+public class CompensationEventSubscriptionWalker extends ReferenceWalker<EventSubscriptionEntity> {
 
   public CompensationEventSubscriptionWalker(Collection<MigratingActivityInstance> collection) {
     super(collectCompensationEventSubscriptions(collection));
   }
 
-  protected static List<CompensateEventSubscriptionEntity> collectCompensationEventSubscriptions(Collection<MigratingActivityInstance> activityInstances) {
-    List<CompensateEventSubscriptionEntity> eventSubscriptions = new ArrayList<CompensateEventSubscriptionEntity>();
+  protected static List<EventSubscriptionEntity> collectCompensationEventSubscriptions(Collection<MigratingActivityInstance> activityInstances) {
+    List<EventSubscriptionEntity> eventSubscriptions = new ArrayList<EventSubscriptionEntity>();
     for (MigratingActivityInstance activityInstance : activityInstances) {
       if (activityInstance.getSourceScope().isScope()) {
         ExecutionEntity scopeExecution = activityInstance.resolveRepresentativeExecution();
@@ -47,9 +48,9 @@ public class CompensationEventSubscriptionWalker extends ReferenceWalker<Compens
   }
 
   @Override
-  protected Collection<CompensateEventSubscriptionEntity> nextElements() {
-    CompensateEventSubscriptionEntity eventSubscriptionEntity = getCurrentElement();
-    ExecutionEntity compensatingExecution = eventSubscriptionEntity.getCompensatingExecution();
+  protected Collection<EventSubscriptionEntity> nextElements() {
+    EventSubscriptionEntity eventSubscriptionEntity = getCurrentElement();
+    ExecutionEntity compensatingExecution = CompensationUtil.getCompensatingExecution(eventSubscriptionEntity);
     if (compensatingExecution != null) {
       return compensatingExecution.getCompensateEventSubscriptions();
     }

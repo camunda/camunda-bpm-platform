@@ -13,15 +13,14 @@
 package org.camunda.bpm.engine.impl.migration.instance.parser;
 
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
-import org.camunda.bpm.engine.impl.event.MessageEventHandler;
-import org.camunda.bpm.engine.impl.event.SignalEventHandler;
+import org.camunda.bpm.engine.impl.event.EventType;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingEventSubscriptionInstance;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
@@ -35,11 +34,7 @@ import org.camunda.bpm.engine.migration.MigrationInstruction;
  */
 public class EventSubscriptionInstanceHandler implements MigratingDependentInstanceParseHandler<MigratingActivityInstance, List<EventSubscriptionEntity>> {
 
-  public static final Set<String> SUPPORTED_EVENT_TYPES = new HashSet<String>();
-  static {
-    SUPPORTED_EVENT_TYPES.add(MessageEventHandler.EVENT_HANDLER_TYPE);
-    SUPPORTED_EVENT_TYPES.add(SignalEventHandler.EVENT_HANDLER_TYPE);
-  }
+  public static final Set<EventType> SUPPORTED_EVENT_TYPES = EnumSet.of(EventType.MESSAGE, EventType.SIGNAL);
 
   @Override
   public void handle(MigratingInstanceParseContext parseContext, MigratingActivityInstance owningInstance, List<EventSubscriptionEntity> elements) {
@@ -47,7 +42,7 @@ public class EventSubscriptionInstanceHandler implements MigratingDependentInsta
     Map<String, EventSubscriptionDeclaration> targetDeclarations = getDeclarationsByTriggeringActivity(owningInstance.getTargetScope());
 
     for (EventSubscriptionEntity eventSubscription : elements) {
-      if (!getSupportedEventTypes().contains(eventSubscription.getEventType())) {
+      if (!getSupportedEventTypes().contains(EventType.valueOf(eventSubscription.getEventType()))) {
         // ignore unsupported event subscriptions
         continue;
       }
@@ -77,7 +72,7 @@ public class EventSubscriptionInstanceHandler implements MigratingDependentInsta
     }
   }
 
-  protected Set<String> getSupportedEventTypes() {
+  protected Set<EventType> getSupportedEventTypes() {
     return SUPPORTED_EVENT_TYPES;
   }
 

@@ -22,12 +22,12 @@ import org.camunda.bpm.engine.impl.ExecutionQueryImpl;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
 import org.camunda.bpm.engine.impl.cmd.CommandLogger;
-import org.camunda.bpm.engine.impl.event.MessageEventHandler;
+import org.camunda.bpm.engine.impl.event.EventType;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
+import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.MessageEventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.runtime.Execution;
 
@@ -152,8 +152,8 @@ public class DefaultCorrelationHandler implements CorrelationHandler {
     List<CorrelationHandlerResult> results = new ArrayList<CorrelationHandlerResult>();
     DeploymentCache deploymentCache = commandContext.getProcessEngineConfiguration().getDeploymentCache();
 
-    List<MessageEventSubscriptionEntity> messageEventSubscriptions = findMessageStartEventSubscriptions(commandContext, messageName, correlationSet);
-    for (MessageEventSubscriptionEntity messageEventSubscription : messageEventSubscriptions) {
+    List<EventSubscriptionEntity> messageEventSubscriptions = findMessageStartEventSubscriptions(commandContext, messageName, correlationSet);
+    for (EventSubscriptionEntity messageEventSubscription : messageEventSubscriptions) {
 
       if (messageEventSubscription.getConfiguration() != null) {
         String processDefinitionId = messageEventSubscription.getConfiguration();
@@ -171,11 +171,11 @@ public class DefaultCorrelationHandler implements CorrelationHandler {
     return results;
   }
 
-  protected List<MessageEventSubscriptionEntity> findMessageStartEventSubscriptions(CommandContext commandContext, String messageName, CorrelationSet correlationSet) {
+  protected List<EventSubscriptionEntity> findMessageStartEventSubscriptions(CommandContext commandContext, String messageName, CorrelationSet correlationSet) {
     EventSubscriptionManager eventSubscriptionManager = commandContext.getEventSubscriptionManager();
 
     if (correlationSet.isTenantIdSet) {
-      MessageEventSubscriptionEntity eventSubscription = eventSubscriptionManager.findMessageStartEventSubscriptionByNameAndTenantId(messageName, correlationSet.getTenantId());
+      EventSubscriptionEntity eventSubscription = eventSubscriptionManager.findMessageStartEventSubscriptionByNameAndTenantId(messageName, correlationSet.getTenantId());
       if (eventSubscription != null) {
         return Collections.singletonList(eventSubscription);
       } else {
@@ -211,7 +211,7 @@ public class DefaultCorrelationHandler implements CorrelationHandler {
   }
 
   protected boolean isMessageStartEventWithName(EventSubscriptionDeclaration declaration, String messageName) {
-    return MessageEventHandler.EVENT_HANDLER_TYPE.equals(declaration.getEventType()) && declaration.isStartEvent()
+    return EventType.MESSAGE.name().equals(declaration.getEventType()) && declaration.isStartEvent()
         && messageName.equals(declaration.getEventName());
   }
 

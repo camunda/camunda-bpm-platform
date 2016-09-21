@@ -18,6 +18,7 @@ package org.camunda.bpm.engine.impl.bpmn.parser;
 import java.io.Serializable;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.impl.Condition;
+import org.camunda.bpm.engine.impl.event.EventType;
 
 /**
  * Represents the conditional event definition corresponding to the
@@ -33,8 +34,8 @@ public class ConditionalEventDefinition extends EventSubscriptionDeclaration imp
   protected Condition conditionalExpression;
   protected boolean interrupting;
 
-  public ConditionalEventDefinition(String eventName, String eventType, String activityId) {
-    super(eventName, eventType);
+  public ConditionalEventDefinition(String eventName, String activityId) {
+    super(eventName, EventType.CONDITONAL);
     this.activityId = activityId;
   }
 

@@ -20,7 +20,6 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.MessageEventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.runtime.CorrelationSet;
 import org.camunda.bpm.engine.impl.util.ClassNameUtil;
 
@@ -110,7 +109,7 @@ public class CommandLogger extends ProcessEngineLogger {
         "015", "exception while getting value for variable {}", t.getMessage(), t);
   }
 
-  public void couldNotFindProcessDefinitionForEventSubscription(MessageEventSubscriptionEntity messageEventSubscription, String processDefinitionId) {
+  public void couldNotFindProcessDefinitionForEventSubscription(EventSubscriptionEntity messageEventSubscription, String processDefinitionId) {
     logDebug(
         "016",
         "Found event subscription with {} but process definition {} could not be found.", messageEventSubscription, processDefinitionId);

@@ -16,6 +16,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.camunda.bpm.engine.impl.event.EventType;
 
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
@@ -92,31 +93,31 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
   }
 
   public ExecutionQuery signalEventSubscription(String signalName) {
-    return eventSubscription("signal", signalName);
+    return eventSubscription(EventType.SIGNAL, signalName);
   }
 
   public ExecutionQuery signalEventSubscriptionName(String signalName) {
-    return eventSubscription("signal", signalName);
+    return eventSubscription(EventType.SIGNAL, signalName);
   }
 
   public ExecutionQuery messageEventSubscriptionName(String messageName) {
-    return eventSubscription("message", messageName);
+    return eventSubscription(EventType.MESSAGE, messageName);
   }
 
   public ExecutionQuery messageEventSubscription() {
-    return eventSubscription("message", null);
+    return eventSubscription(EventType.MESSAGE, null);
   }
 
-  public ExecutionQuery eventSubscription(String eventType, String eventName) {
+  public ExecutionQuery eventSubscription(EventType eventType, String eventName) {
     ensureNotNull("event type", eventType);
-    if (!"message".equals(eventType)) {
+    if (!EventType.MESSAGE.equals(eventType)) {
       // event name is optional for message events
       ensureNotNull("event name", eventName);
     }
     if(eventSubscriptions == null) {
       eventSubscriptions = new ArrayList<EventSubscriptionQueryValue>();
     }
-    eventSubscriptions.add(new EventSubscriptionQueryValue(eventName, eventType));
+    eventSubscriptions.add(new EventSubscriptionQueryValue(eventName, eventType.name()));
     return this;
   }
 

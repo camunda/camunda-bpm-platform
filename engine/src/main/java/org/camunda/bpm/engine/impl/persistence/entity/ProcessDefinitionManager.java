@@ -27,8 +27,7 @@ import org.camunda.bpm.engine.impl.cfg.auth.ResourceAuthorizationProvider;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
-import org.camunda.bpm.engine.impl.event.MessageEventHandler;
-import org.camunda.bpm.engine.impl.event.SignalEventHandler;
+import org.camunda.bpm.engine.impl.event.EventType;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -244,11 +243,11 @@ public class ProcessDefinitionManager extends AbstractManager {
     List<EventSubscriptionEntity> eventSubscriptionsToRemove = new ArrayList<EventSubscriptionEntity>();
     // remove message event subscriptions:
     List<EventSubscriptionEntity> messageEventSubscriptions = getEventSubscriptionManager()
-      .findEventSubscriptionsByConfiguration(MessageEventHandler.EVENT_HANDLER_TYPE, processDefinitionId);
+      .findEventSubscriptionsByConfiguration(EventType.MESSAGE.name(), processDefinitionId);
     eventSubscriptionsToRemove.addAll(messageEventSubscriptions);
 
     // remove signal event subscriptions:
-    List<EventSubscriptionEntity> signalEventSubscriptions = getEventSubscriptionManager().findEventSubscriptionsByConfiguration(SignalEventHandler.EVENT_HANDLER_TYPE , processDefinitionId);
+    List<EventSubscriptionEntity> signalEventSubscriptions = getEventSubscriptionManager().findEventSubscriptionsByConfiguration(EventType.SIGNAL.name(), processDefinitionId);
     eventSubscriptionsToRemove.addAll(signalEventSubscriptions);
 
     for (EventSubscriptionEntity eventSubscriptionEntity : eventSubscriptionsToRemove) {

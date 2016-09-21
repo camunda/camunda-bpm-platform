@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
-import org.camunda.bpm.engine.impl.event.MessageEventHandler;
+import org.camunda.bpm.engine.impl.event.EventType;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
@@ -61,10 +61,10 @@ public class MessageEventReceivedCmd implements Command<Void>, Serializable {
     List<EventSubscriptionEntity> eventSubscriptions = null;
     if (messageName != null) {
       eventSubscriptions = eventSubscriptionManager.findEventSubscriptionsByNameAndExecution(
-          MessageEventHandler.EVENT_HANDLER_TYPE, messageName, executionId, exclusive);
+              EventType.MESSAGE.name(), messageName, executionId, exclusive);
     } else {
       eventSubscriptions = eventSubscriptionManager.findEventSubscriptionsByExecutionAndType(
-          executionId, MessageEventHandler.EVENT_HANDLER_TYPE, exclusive);
+          executionId, EventType.MESSAGE.name(), exclusive);
     }
 
     ensureNotEmpty("Execution with id '" + executionId + "' does not have a subscription to a message event with name '" + messageName + "'", "eventSubscriptions", eventSubscriptions);

@@ -16,12 +16,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
+import org.camunda.bpm.engine.impl.bpmn.helper.CompensationUtil;
 import org.camunda.bpm.engine.impl.core.model.Properties;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingCompensationEventSubscriptionInstance;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingEventScopeInstance;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingProcessElementInstance;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingScopeInstance;
-import org.camunda.bpm.engine.impl.persistence.entity.CompensateEventSubscriptionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
@@ -31,10 +32,10 @@ import org.camunda.bpm.engine.migration.MigrationInstruction;
  * @author Thorben Lindhauer
  *
  */
-public class CompensationInstanceHandler implements MigratingInstanceParseHandler<CompensateEventSubscriptionEntity> {
+public class CompensationInstanceHandler implements MigratingInstanceParseHandler<EventSubscriptionEntity> {
 
   @Override
-  public void handle(MigratingInstanceParseContext parseContext, CompensateEventSubscriptionEntity element) {
+  public void handle(MigratingInstanceParseContext parseContext, EventSubscriptionEntity element) {
 
     MigratingProcessElementInstance migratingInstance;
     if (element.getConfiguration() != null) {
@@ -57,7 +58,7 @@ public class CompensationInstanceHandler implements MigratingInstanceParseHandle
   }
 
   protected MigratingProcessElementInstance createMigratingEventSubscriptionInstance(MigratingInstanceParseContext parseContext,
-      CompensateEventSubscriptionEntity element) {
+      EventSubscriptionEntity element) {
     ActivityImpl compensationHandler = parseContext.getSourceProcessDefinition().findActivity(element.getActivityId());
 
     MigrationInstruction migrationInstruction = getMigrationInstruction(parseContext, compensationHandler);
@@ -81,7 +82,7 @@ public class CompensationInstanceHandler implements MigratingInstanceParseHandle
   }
 
   protected MigratingProcessElementInstance createMigratingEventScopeInstance(MigratingInstanceParseContext parseContext,
-      CompensateEventSubscriptionEntity element) {
+      EventSubscriptionEntity element) {
 
     ActivityImpl compensatingActivity = parseContext.getSourceProcessDefinition().findActivity(element.getActivityId());
 
@@ -99,7 +100,7 @@ public class CompensationInstanceHandler implements MigratingInstanceParseHandle
       }
     }
 
-    ExecutionEntity eventScopeExecution = element.getCompensatingExecution();
+    ExecutionEntity eventScopeExecution = CompensationUtil.getCompensatingExecution(element);
     MigrationInstruction eventScopeInstruction = parseContext.findSingleMigrationInstruction(eventScopeExecution.getActivityId());
     ActivityImpl targetScope = parseContext.getTargetActivity(eventScopeInstruction);
 

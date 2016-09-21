@@ -16,7 +16,7 @@ package org.camunda.bpm.engine.impl.bpmn.behavior;
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.bpmn.helper.CompensationUtil;
-import org.camunda.bpm.engine.impl.persistence.entity.CompensateEventSubscriptionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
@@ -38,7 +38,7 @@ public class CancelEndEventActivityBehavior extends AbstractBpmnActivityBehavior
     EnsureUtil
     .ensureNotNull("Could not find cancel boundary event for cancel end event " + execution.getActivity(), "cancelBoundaryEvent", cancelBoundaryEvent);
 
-    List<CompensateEventSubscriptionEntity> compensateEventSubscriptions =
+    List<EventSubscriptionEntity> compensateEventSubscriptions =
         CompensationUtil.collectCompensateEventSubscriptionsForScope(execution);
 
     if(compensateEventSubscriptions.isEmpty()) {

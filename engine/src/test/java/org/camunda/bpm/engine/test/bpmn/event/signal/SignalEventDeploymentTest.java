@@ -14,6 +14,7 @@
 package org.camunda.bpm.engine.test.bpmn.event.signal;
 
 import java.util.List;
+import org.camunda.bpm.engine.impl.event.EventType;
 
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
@@ -37,7 +38,7 @@ public class SignalEventDeploymentTest extends PluggableProcessEngineTestCase {
     EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().singleResult();
     assertNotNull(eventSubscription);
 
-    assertEquals("signal", eventSubscription.getEventType());
+    assertEquals(EventType.SIGNAL.name(), eventSubscription.getEventType());
     assertEquals("alert", eventSubscription.getEventName());
     assertEquals("start", eventSubscription.getActivityId());
   }

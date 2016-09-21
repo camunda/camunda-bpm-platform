@@ -14,7 +14,7 @@ package org.camunda.bpm.engine.impl.migration.instance;
 
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.migration.MigrationLogger;
-import org.camunda.bpm.engine.impl.persistence.entity.CompensateEventSubscriptionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
@@ -28,13 +28,13 @@ public class MigratingCompensationEventSubscriptionInstance extends MigratingPro
 
   public static final MigrationLogger MIGRATION_LOGGER = ProcessEngineLogger.MIGRATION_LOGGER;
 
-  protected CompensateEventSubscriptionEntity eventSubscription;
+  protected EventSubscriptionEntity eventSubscription;
 
   public MigratingCompensationEventSubscriptionInstance(
       MigrationInstruction migrationInstruction,
       ScopeImpl sourceScope,
       ScopeImpl targetScope,
-      CompensateEventSubscriptionEntity eventSubscription) {
+      EventSubscriptionEntity eventSubscription) {
     this.migrationInstruction = migrationInstruction;
     this.eventSubscription = eventSubscription;
     this.sourceScope = sourceScope;

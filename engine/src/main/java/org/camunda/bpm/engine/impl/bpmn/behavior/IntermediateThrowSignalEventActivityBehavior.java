@@ -18,9 +18,9 @@ import java.util.List;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 
 
@@ -41,9 +41,9 @@ public class IntermediateThrowSignalEventActivityBehavior extends AbstractBpmnAc
   public void execute(ActivityExecution execution) throws Exception {
 
     // trigger all event subscriptions for the signal (start and intermediate)
-    List<SignalEventSubscriptionEntity> signalEventSubscriptions = findSignalEventSubscriptions(signalDefinition.getEventName(), execution.getTenantId());
+    List<EventSubscriptionEntity> signalEventSubscriptions = findSignalEventSubscriptions(signalDefinition.getEventName(), execution.getTenantId());
 
-    for (SignalEventSubscriptionEntity signalEventSubscription : signalEventSubscriptions) {
+    for (EventSubscriptionEntity signalEventSubscription : signalEventSubscriptions) {
       if(isActiveEventSubscription(signalEventSubscription)){
         signalEventSubscription.eventReceived(null, signalDefinition.isAsync());
       }
@@ -52,7 +52,7 @@ public class IntermediateThrowSignalEventActivityBehavior extends AbstractBpmnAc
     leave(execution);
   }
 
-  protected List<SignalEventSubscriptionEntity> findSignalEventSubscriptions(String signalName, String tenantId) {
+  protected List<EventSubscriptionEntity> findSignalEventSubscriptions(String signalName, String tenantId) {
     EventSubscriptionManager eventSubscriptionManager = Context.getCommandContext().getEventSubscriptionManager();
 
     if(tenantId != null) {
@@ -65,16 +65,16 @@ public class IntermediateThrowSignalEventActivityBehavior extends AbstractBpmnAc
     }
   }
 
-  protected boolean isActiveEventSubscription(SignalEventSubscriptionEntity signalEventSubscriptionEntity) {
+  protected boolean isActiveEventSubscription(EventSubscriptionEntity signalEventSubscriptionEntity) {
     return isStartEventSubscription(signalEventSubscriptionEntity)
         || isActiveIntermediateEventSubscription(signalEventSubscriptionEntity);
   }
 
-  protected boolean isStartEventSubscription(SignalEventSubscriptionEntity signalEventSubscriptionEntity) {
+  protected boolean isStartEventSubscription(EventSubscriptionEntity signalEventSubscriptionEntity) {
     return signalEventSubscriptionEntity.getExecutionId() == null;
   }
 
-  protected boolean isActiveIntermediateEventSubscription(SignalEventSubscriptionEntity signalEventSubscriptionEntity) {
+  protected boolean isActiveIntermediateEventSubscription(EventSubscriptionEntity signalEventSubscriptionEntity) {
     ExecutionEntity execution = signalEventSubscriptionEntity.getExecution();
     return execution != null && !execution.isEnded() && !execution.isCanceled();
   }

@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.event.EventHandler;
+import org.camunda.bpm.engine.impl.event.EventType;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.EventSubscriptionJobDeclaration;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
@@ -33,7 +34,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 /**
  * @author Daniel Meyer
  */
-public abstract class EventSubscriptionEntity implements EventSubscription, DbEntity, HasDbRevision, Serializable {
+public class EventSubscriptionEntity implements EventSubscription, DbEntity, HasDbRevision, Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -56,12 +57,17 @@ public abstract class EventSubscriptionEntity implements EventSubscription, DbEn
 
   /////////////////////////////////////////////
 
+  //only for mybatis
   public EventSubscriptionEntity() {
-    this.created = ClockUtil.getCurrentTime();
   }
 
-  public EventSubscriptionEntity(ExecutionEntity executionEntity) {
-    this();
+  public EventSubscriptionEntity(EventType eventType) {
+    this.created = ClockUtil.getCurrentTime();
+    this.eventType = eventType.name();
+  }
+
+  public EventSubscriptionEntity(ExecutionEntity executionEntity, EventType eventType) {
+    this(eventType);
     setExecution(executionEntity);
     setActivity(execution.getActivity());
     this.processInstanceId = executionEntity.getProcessInstanceId();
@@ -113,6 +119,15 @@ public abstract class EventSubscriptionEntity implements EventSubscription, DbEn
       .getEventSubscriptionManager()
       .insert(this);
     addToExecution();
+  }
+
+
+  public static EventSubscriptionEntity createAndInsert(ExecutionEntity executionEntity, EventType eventType, ActivityImpl activity) {
+    EventSubscriptionEntity eventSubscription = new EventSubscriptionEntity(executionEntity, eventType);
+    eventSubscription.setActivity(activity);
+    eventSubscription.setTenantId(executionEntity.getTenantId());
+    eventSubscription.insert();
+    return eventSubscription;
   }
 
  // referential integrity -> ExecutionEntity ////////////////////////////////////
@@ -222,6 +237,10 @@ public abstract class EventSubscriptionEntity implements EventSubscription, DbEn
 
   public int getRevisionNext() {
     return revision +1;
+  }
+
+  public boolean isSubscriptionForEventType(EventType eventType) {
+    return this.eventType.equals(eventType.name());
   }
 
   public String getEventType() {

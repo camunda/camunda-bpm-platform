@@ -19,11 +19,10 @@ import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.EventSubscriptionQueryImpl;
+import org.camunda.bpm.engine.impl.event.EventType;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.MessageEventSubscriptionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.EventSubscriptionQuery;
@@ -214,21 +213,21 @@ public class EventSubscriptionQueryTest extends PluggableProcessEngineTestCase {
         Calendar calendar = new GregorianCalendar();
 
 
-        MessageEventSubscriptionEntity messageEventSubscriptionEntity1 = new MessageEventSubscriptionEntity();
+        EventSubscriptionEntity messageEventSubscriptionEntity1 = new EventSubscriptionEntity(EventType.MESSAGE);
         messageEventSubscriptionEntity1.setEventName("messageName");
         messageEventSubscriptionEntity1.setActivityId("someActivity");
         calendar.set(2001, 1, 1);
         messageEventSubscriptionEntity1.setCreated(calendar.getTime());
         messageEventSubscriptionEntity1.insert();
 
-        MessageEventSubscriptionEntity messageEventSubscriptionEntity2 = new MessageEventSubscriptionEntity();
+        EventSubscriptionEntity messageEventSubscriptionEntity2 = new EventSubscriptionEntity(EventType.MESSAGE);
         messageEventSubscriptionEntity2.setEventName("messageName");
         messageEventSubscriptionEntity2.setActivityId("someActivity");
         calendar.set(2000, 1, 1);
         messageEventSubscriptionEntity2.setCreated(calendar.getTime());
         messageEventSubscriptionEntity2.insert();
 
-        SignalEventSubscriptionEntity signalEventSubscriptionEntity3 = new SignalEventSubscriptionEntity();
+        EventSubscriptionEntity signalEventSubscriptionEntity3 = new EventSubscriptionEntity(EventType.SIGNAL);
         signalEventSubscriptionEntity3.setEventName("messageName2");
         signalEventSubscriptionEntity3.setActivityId("someOtherActivity");
         calendar.set(2002, 1, 1);

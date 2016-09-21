@@ -1,4 +1,7 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
+/*
+ * Copyright 2016 camunda services GmbH.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,21 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl.event;
 
-
-
 /**
- * @author Daniel Meyer
+ *
+ * @author Christopher Zell <christopher.zell@camunda.com>
  */
-public class MessageEventHandler extends AbstractEventHandler {
-
-  public final static String EVENT_HANDLER_TYPE = "message";
-
-  @Override
-  public String getEventHandlerType() {
-    return EVENT_HANDLER_TYPE;
-  }
-
+public enum EventType {
+  MESSAGE, SIGNAL, COMPENSATE, CONDITONAL
 }

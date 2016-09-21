@@ -21,7 +21,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
@@ -49,7 +48,7 @@ import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.HasDbReferences;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
-import org.camunda.bpm.engine.impl.event.CompensationEventHandler;
+import org.camunda.bpm.engine.impl.event.EventType;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventProcessor;
@@ -1007,7 +1006,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     // remove event subscriptions which are not compensate event subscriptions
     List<EventSubscriptionEntity> eventSubscriptions = getEventSubscriptions();
     for (EventSubscriptionEntity eventSubscriptionEntity : eventSubscriptions) {
-      if (!CompensationEventHandler.EVENT_HANDLER_TYPE.equals(eventSubscriptionEntity.getEventType())) {
+      if (!EventType.COMPENSATE.name().equals(eventSubscriptionEntity.getEventType())) {
         eventSubscriptionEntity.delete();
       }
     }
@@ -1475,26 +1474,25 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     return new ArrayList<EventSubscriptionEntity>(getEventSubscriptionsInternal());
   }
 
-  public List<CompensateEventSubscriptionEntity> getCompensateEventSubscriptions() {
+  public List<EventSubscriptionEntity> getCompensateEventSubscriptions() {
     List<EventSubscriptionEntity> eventSubscriptions = getEventSubscriptionsInternal();
-    List<CompensateEventSubscriptionEntity> result = new ArrayList<CompensateEventSubscriptionEntity>(eventSubscriptions.size());
+    List<EventSubscriptionEntity> result = new ArrayList<EventSubscriptionEntity>(eventSubscriptions.size());
     for (EventSubscriptionEntity eventSubscriptionEntity : eventSubscriptions) {
-      if (eventSubscriptionEntity instanceof CompensateEventSubscriptionEntity) {
-        result.add((CompensateEventSubscriptionEntity) eventSubscriptionEntity);
+      if (eventSubscriptionEntity.isSubscriptionForEventType(EventType.COMPENSATE)) {
+        result.add((EventSubscriptionEntity) eventSubscriptionEntity);
       }
     }
     return result;
   }
 
-  public List<CompensateEventSubscriptionEntity> getCompensateEventSubscriptions(String activityId) {
+  public List<EventSubscriptionEntity> getCompensateEventSubscriptions(String activityId) {
     List<EventSubscriptionEntity> eventSubscriptions = getEventSubscriptionsInternal();
-    List<CompensateEventSubscriptionEntity> result = new ArrayList<CompensateEventSubscriptionEntity>(eventSubscriptions.size());
+    List<EventSubscriptionEntity> result = new ArrayList<EventSubscriptionEntity>(eventSubscriptions.size());
     for (EventSubscriptionEntity eventSubscriptionEntity : eventSubscriptions) {
-      if (eventSubscriptionEntity instanceof CompensateEventSubscriptionEntity) {
-        if (activityId.equals(eventSubscriptionEntity.getActivityId())) {
-          result.add((CompensateEventSubscriptionEntity) eventSubscriptionEntity);
+      if (eventSubscriptionEntity.isSubscriptionForEventType(EventType.COMPENSATE)
+              && activityId.equals(eventSubscriptionEntity.getActivityId())) {
+          result.add((EventSubscriptionEntity) eventSubscriptionEntity);
         }
-      }
     }
     return result;
   }

@@ -13,8 +13,9 @@
 package org.camunda.bpm.engine.impl.migration.instance;
 
 import java.util.List;
+import org.camunda.bpm.engine.impl.event.EventType;
+import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 
-import org.camunda.bpm.engine.impl.persistence.entity.CompensateEventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
@@ -55,7 +56,7 @@ public class MigrationCompensationInstanceVisitor extends MigratingProcessElemen
       compensationScopeExecution.setActive(false);
       compensationScopeExecution.enterActivityInstance();
 
-      CompensateEventSubscriptionEntity eventSubscription = CompensateEventSubscriptionEntity.createAndInsert(parentExecution, (ActivityImpl) scope);
+      EventSubscriptionEntity eventSubscription = EventSubscriptionEntity.createAndInsert(parentExecution, EventType.COMPENSATE, (ActivityImpl) scope);
       eventSubscription.setConfiguration(compensationScopeExecution.getId());
 
       executionBranch.visited(new MigratingEventScopeInstance(eventSubscription, compensationScopeExecution, scope));

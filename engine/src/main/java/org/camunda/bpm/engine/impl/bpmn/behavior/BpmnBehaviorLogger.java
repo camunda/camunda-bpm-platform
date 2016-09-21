@@ -16,7 +16,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
-import org.camunda.bpm.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 /**
@@ -93,7 +93,7 @@ public class BpmnBehaviorLogger extends ProcessEngineLogger {
     logDebug("012", "Element with id '{}' does not activate.", activityId);
   }
 
-  public void ignoringEventSubscription(SignalEventSubscriptionEntity eventSubscription, String processDefinitionId) {
+  public void ignoringEventSubscription(EventSubscriptionEntity eventSubscription, String processDefinitionId) {
     logDebug(
       "014",
       "Found event subscription '{}' but process definition with id '{}' could not be found.",

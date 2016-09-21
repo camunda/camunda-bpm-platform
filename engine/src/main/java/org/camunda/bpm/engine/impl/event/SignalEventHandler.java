@@ -13,7 +13,6 @@
 
 package org.camunda.bpm.engine.impl.event;
 
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmd.CommandLogger;
@@ -24,20 +23,19 @@ import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 
 /**
  * @author Daniel Meyer
  */
-public class SignalEventHandler extends AbstractEventHandler {
+public class SignalEventHandler extends EventHandlerImpl {
 
   private final static CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
 
-  public static final String EVENT_HANDLER_TYPE = "signal";
-
-  public String getEventHandlerType() {
-    return EVENT_HANDLER_TYPE;
+  public SignalEventHandler() {
+    super(EventType.SIGNAL);
   }
 
   protected void handleStartEvent(EventSubscriptionEntity eventSubscription, Object payload, CommandContext commandContext) {

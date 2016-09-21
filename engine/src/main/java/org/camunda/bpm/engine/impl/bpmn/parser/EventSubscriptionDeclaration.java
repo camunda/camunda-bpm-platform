@@ -17,17 +17,11 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.Map;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
-import org.camunda.bpm.engine.impl.event.ConditionalEventHandler;
-import org.camunda.bpm.engine.impl.event.MessageEventHandler;
-import org.camunda.bpm.engine.impl.event.SignalEventHandler;
+import org.camunda.bpm.engine.impl.event.EventType;
 import org.camunda.bpm.engine.impl.jobexecutor.EventSubscriptionJobDeclaration;
-import org.camunda.bpm.engine.impl.persistence.entity.ConditionalEventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.MessageEventSubscriptionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmScope;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.LegacyBehavior;
@@ -43,7 +37,7 @@ public class EventSubscriptionDeclaration implements Serializable {
   private static final long serialVersionUID = 1L;
 
   protected final String eventName;
-  protected final String eventType;
+  protected final EventType eventType;
 
   protected boolean async;
   protected String activityId = null;
@@ -52,7 +46,7 @@ public class EventSubscriptionDeclaration implements Serializable {
 
   protected EventSubscriptionJobDeclaration jobDeclaration = null;
 
-  public EventSubscriptionDeclaration(String eventName, String eventType) {
+  public EventSubscriptionDeclaration(String eventName, EventType eventType) {
     this.eventName = eventName;
     this.eventType = eventType;
   }
@@ -94,7 +88,7 @@ public class EventSubscriptionDeclaration implements Serializable {
   }
 
   public String getEventType() {
-    return eventType;
+    return eventType.name();
   }
 
   public void setJobDeclaration(EventSubscriptionJobDeclaration jobDeclaration) {
@@ -117,16 +111,7 @@ public class EventSubscriptionDeclaration implements Serializable {
    * @return subscription entity
    */
   private EventSubscriptionEntity createEventSubscription(ExecutionEntity execution) {
-    EventSubscriptionEntity eventSubscriptionEntity = null;
-    if (eventType.equals(MessageEventHandler.EVENT_HANDLER_TYPE)) {
-      eventSubscriptionEntity = new MessageEventSubscriptionEntity(execution);
-    } else if (eventType.equals(SignalEventHandler.EVENT_HANDLER_TYPE)) {
-      eventSubscriptionEntity = new SignalEventSubscriptionEntity(execution);
-    } else if (eventType.equals(ConditionalEventHandler.HANDLER_EVENT_TYPE)) {
-      eventSubscriptionEntity = new ConditionalEventSubscriptionEntity(execution);
-    } else {
-      throw new ProcessEngineException("Found event definition of unknown type: " + eventType);
-    }
+    EventSubscriptionEntity eventSubscriptionEntity = new EventSubscriptionEntity(execution, eventType);
 
     eventSubscriptionEntity.setEventName(eventName);
     if (activityId != null) {

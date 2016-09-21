@@ -13,7 +13,6 @@
 
 package org.camunda.bpm.engine.impl.cfg;
 
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -127,7 +126,8 @@ import org.camunda.bpm.engine.impl.el.DateTimeFunctionMapper;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.event.CompensationEventHandler;
 import org.camunda.bpm.engine.impl.event.EventHandler;
-import org.camunda.bpm.engine.impl.event.MessageEventHandler;
+import org.camunda.bpm.engine.impl.event.EventHandlerImpl;
+import org.camunda.bpm.engine.impl.event.EventType;
 import org.camunda.bpm.engine.impl.event.SignalEventHandler;
 import org.camunda.bpm.engine.impl.externaltask.DefaultExternalTaskPriorityProvider;
 import org.camunda.bpm.engine.impl.form.engine.FormEngine;
@@ -303,6 +303,7 @@ import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -1797,8 +1798,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       CompensationEventHandler compensationEventHandler = new CompensationEventHandler();
       eventHandlers.put(compensationEventHandler.getEventHandlerType(), compensationEventHandler);
 
-      MessageEventHandler messageEventHandler = new MessageEventHandler();
+      EventHandler messageEventHandler = new EventHandlerImpl(EventType.MESSAGE);
       eventHandlers.put(messageEventHandler.getEventHandlerType(), messageEventHandler);
+
+      EventHandler conditionalEventHandler = new EventHandlerImpl(EventType.CONDITONAL);
+      eventHandlers.put(conditionalEventHandler.getEventHandlerType(), conditionalEventHandler);
 
     }
     if(customEventHandlers != null) {

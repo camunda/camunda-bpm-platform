@@ -17,7 +17,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.impl.bpmn.helper.CompensationUtil;
 import org.camunda.bpm.engine.impl.bpmn.parser.CompensateEventDefinition;
-import org.camunda.bpm.engine.impl.persistence.entity.CompensateEventSubscriptionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
@@ -41,7 +41,7 @@ public class CompensationEventActivityBehavior extends FlowNodeActivityBehavior 
   @Override
   public void execute(ActivityExecution execution) throws Exception {
 
-    final List<CompensateEventSubscriptionEntity> eventSubscriptions = collectEventSubscriptions(execution);
+    final List<EventSubscriptionEntity> eventSubscriptions = collectEventSubscriptions(execution);
     if (eventSubscriptions.isEmpty()) {
       leave(execution);
     } else {
@@ -50,7 +50,7 @@ public class CompensationEventActivityBehavior extends FlowNodeActivityBehavior 
     }
   }
 
-  protected List<CompensateEventSubscriptionEntity> collectEventSubscriptions(ActivityExecution execution) {
+  protected List<EventSubscriptionEntity> collectEventSubscriptions(ActivityExecution execution) {
     final String activityRef = compensateEventDefinition.getActivityRef();
     if (activityRef != null) {
       return CompensationUtil.collectCompensateEventSubscriptionsForActivity(execution, activityRef);

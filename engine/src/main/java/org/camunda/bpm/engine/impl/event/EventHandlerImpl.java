@@ -13,7 +13,6 @@
 
 package org.camunda.bpm.engine.impl.event;
 
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.Map;
 
@@ -22,12 +21,20 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Daniel Meyer
  * @author Falko Menge
+ * @author Christopher Zell
  */
-public abstract class AbstractEventHandler implements EventHandler {
+public class EventHandlerImpl implements EventHandler {
+
+  private final EventType eventType;
+
+  public EventHandlerImpl(EventType eventType) {
+    this.eventType = eventType;
+  }
 
   public void handleIntermediateEvent(EventSubscriptionEntity eventSubscription, Object payload, CommandContext commandContext) {
 
@@ -60,5 +67,10 @@ public abstract class AbstractEventHandler implements EventHandler {
   @Override
   public void handleEvent(EventSubscriptionEntity eventSubscription, Object payload, CommandContext commandContext) {
     handleIntermediateEvent(eventSubscription, payload, commandContext);
+  }
+
+  @Override
+  public String getEventHandlerType() {
+    return eventType.name();
   }
 }

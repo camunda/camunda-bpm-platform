@@ -19,15 +19,11 @@ import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricDetailEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricFormPropertyEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricVariableUpdateEventEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.CompensateEventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricFormPropertyEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.MessageEventSubscriptionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TimerEntity;
-import org.camunda.bpm.engine.runtime.EventSubscription;
 
 /**
  * Provides the keys used by {@link DbEntityCache} for organizing the different {@link DbEntity} types.
@@ -64,11 +60,6 @@ public class DbEntityCacheKeyMapping {
     // subclasses of JobEntity
     mapping.registerEntityCacheKey(MessageEntity.class, JobEntity.class);
     mapping.registerEntityCacheKey(TimerEntity.class, JobEntity.class);
-
-    // subclasses of EventSubscription
-    mapping.registerEntityCacheKey(CompensateEventSubscriptionEntity.class, EventSubscription.class);
-    mapping.registerEntityCacheKey(MessageEventSubscriptionEntity.class, EventSubscription.class);
-    mapping.registerEntityCacheKey(SignalEventSubscriptionEntity.class, EventSubscription.class);
 
     // subclasses of HistoricDetailEventEntity
     mapping.registerEntityCacheKey(HistoricFormPropertyEntity.class, HistoricDetailEventEntity.class);

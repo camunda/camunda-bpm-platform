@@ -22,7 +22,6 @@ import org.camunda.bpm.engine.impl.migration.instance.MigratingProcessElementIns
 import org.camunda.bpm.engine.impl.migration.instance.MigratingProcessInstance;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingTransitionInstance;
 import org.camunda.bpm.engine.impl.migration.validation.instance.MigratingProcessInstanceValidationReportImpl;
-import org.camunda.bpm.engine.impl.persistence.entity.CompensateEventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskEntity;
@@ -51,7 +50,7 @@ public class MigratingInstanceParser {
       new ActivityInstanceHandler();
   protected MigratingInstanceParseHandler<TransitionInstance> transitionInstanceHandler =
       new TransitionInstanceHandler();
-  protected MigratingInstanceParseHandler<CompensateEventSubscriptionEntity> compensationInstanceHandler =
+  protected MigratingInstanceParseHandler<EventSubscriptionEntity> compensationInstanceHandler =
       new CompensationInstanceHandler();
 
   protected MigratingDependentInstanceParseHandler<MigratingActivityInstance, List<JobEntity>> dependentActivityInstanceJobHandler =
@@ -114,9 +113,9 @@ public class MigratingInstanceParser {
     CompensationEventSubscriptionWalker compensateSubscriptionsWalker = new CompensationEventSubscriptionWalker(
         parseContext.getMigratingActivityInstances());
 
-    compensateSubscriptionsWalker.addPreVisitor(new TreeVisitor<CompensateEventSubscriptionEntity>() {
+    compensateSubscriptionsWalker.addPreVisitor(new TreeVisitor<EventSubscriptionEntity>() {
       @Override
-      public void visit(CompensateEventSubscriptionEntity obj) {
+      public void visit(EventSubscriptionEntity obj) {
         compensationInstanceHandler.handle(parseContext, obj);
       }
     });
