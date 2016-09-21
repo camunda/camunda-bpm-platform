@@ -76,6 +76,26 @@ var fragment5 = combine(
   }])
 )
 
+var fragment6 = combine(
+  operation('deployment', 'create', [{
+    deploymentName:  'invoice',
+    files: [
+      {
+        name: 'invoice-prevent.bpmn',
+        content: readResource('invoice-prevent.bpmn')
+      },
+      {
+        name: 'invoice-prevent.html',
+        content: readResource('invoice-prevent.html')
+      }
+    ]
+  }]),
+  operation('process-definition', 'start', [{
+    key: 'invoice',
+    businessKey: 'invoice'
+  }])
+)
+
 var multiTenancyFragment = combine(
     operation('task', 'create', [{
       id: '1',
@@ -94,6 +114,7 @@ module.exports = {
   setup2: combine(fragment3),
   setup3: combine(fragment1, fragment4),
   setup4: combine(fragment1, fragment5),
+  setup5: combine(fragment6),
   multiTenancySetup: combine(fragment1, multiTenancyFragment)
 
 };
