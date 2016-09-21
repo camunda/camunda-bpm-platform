@@ -570,9 +570,6 @@ public interface RuntimeService {
   /**
    * Delete an existing runtime process instances asynchronously using Batch operation.
    *
-   * If both process instances list and query are provided, process instances containing in both sets
-   * will be deleted.
-   *
    * @param processInstanceIds id's of process instances to delete, cannot be null if processInstanceQuery is null.
    * @param processInstanceQuery query that will be used to fetch affected process instances.
    *                             Cannot be null if processInstanceIds are null.
@@ -584,13 +581,10 @@ public interface RuntimeService {
    *          if the user has no {@link Permissions#DELETE} permission on {@link Resources#PROCESS_INSTANCE}
    *          or no {@link Permissions#DELETE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
-  Batch deleteProcessInstancesAsync (List<String> processInstanceIds, ProcessInstanceQuery processInstanceQuery, String deleteReason);
+  Batch deleteProcessInstancesAsync(List<String> processInstanceIds, ProcessInstanceQuery processInstanceQuery, String deleteReason);
 
   /**
    * Delete an existing runtime process instances asynchronously using Batch operation.
-   *
-   * If both process instances list and query are provided, process instances containing in both sets
-   * will be deleted.
    *
    * @param processInstanceQuery query that will be used to fetch affected process instances.
    *                             Cannot be null.
@@ -602,7 +596,7 @@ public interface RuntimeService {
    *          if the user has no {@link Permissions#DELETE} permission on {@link Resources#PROCESS_INSTANCE}
    *          or no {@link Permissions#DELETE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
-  Batch deleteProcessInstancesAsync (ProcessInstanceQuery processInstanceQuery, String deleteReason);
+  Batch deleteProcessInstancesAsync(ProcessInstanceQuery processInstanceQuery, String deleteReason);
 
   /**
    * Delete an existing runtime process instances asynchronously using Batch operation.
@@ -619,7 +613,7 @@ public interface RuntimeService {
    *          if the user has no {@link Permissions#DELETE} permission on {@link Resources#PROCESS_INSTANCE}
    *          or no {@link Permissions#DELETE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
-  Batch deleteProcessInstancesAsync (List<String> processInstanceIds, String deleteReason);
+  Batch deleteProcessInstancesAsync(List<String> processInstanceIds, String deleteReason);
 
   /**
    * Delete an existing runtime process instance.

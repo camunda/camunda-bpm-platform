@@ -76,6 +76,11 @@ public class DeleteProcessInstancesBatchAuthorizationTest {
                 grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
                 grant(Resources.PROCESS_INSTANCE, "processInstance1", "userId", Permissions.ALL),
                 grant(Resources.PROCESS_INSTANCE, "processInstance2", "userId", Permissions.ALL)
+            ).succeeds(),
+        scenario()
+            .withAuthorizations(
+                grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
+                grant(Resources.PROCESS_DEFINITION, "Process", "userId", Permissions.READ_INSTANCE, Permissions.DELETE_INSTANCE)
             ).succeeds()
     );
   }
