@@ -57,13 +57,16 @@ public class DeleteProcessInstancesJobHandler extends AbstractProcessInstanceBat
 
     DeleteProcessInstanceBatchConfiguration batchConfiguration = readConfiguration(configurationEntity.getBytes());
 
+    boolean initialLegacyRestrictions = commandContext.isRestrictUserOperationLogToAuthenticatedUsers();
     commandContext.disableUserOperationLog();
+    commandContext.setRestrictUserOperationLogToAuthenticatedUsers(true);
     try {
       commandContext.getProcessEngineConfiguration()
           .getRuntimeService()
           .deleteProcessInstances(batchConfiguration.getProcessInstanceIds(), batchConfiguration.deleteReason, true, true);
     } finally {
       commandContext.enableUserOperationLog();
+      commandContext.setRestrictUserOperationLogToAuthenticatedUsers(initialLegacyRestrictions);
     }
 
     commandContext.getByteArrayManager().delete(configurationEntity);

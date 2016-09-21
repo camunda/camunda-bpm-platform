@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.batch.Batch;
+import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.migration.MigrationPlan;
@@ -75,8 +76,14 @@ public class LegacyUserOperationLogTest {
 
   @After
   public void removeBatch() {
+    Batch batch = managementService.createBatchQuery().singleResult();
     if (batch != null) {
       managementService.deleteBatch(batch.getId(), true);
+    }
+
+    HistoricBatch historicBatch = historyService.createHistoricBatchQuery().singleResult();
+    if (historicBatch != null) {
+      historyService.deleteHistoricBatch(historicBatch.getId());
     }
   }
 
@@ -144,8 +151,7 @@ public class LegacyUserOperationLogTest {
   }
 
   @Test
-  @Ignore
-  public void FAILING_testDontWriteDuplicateLogOnBatchDeletionJobExecution() {
+  public void testDontWriteDuplicateLogOnBatchDeletionJobExecution() {
     ProcessDefinition definition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
     ProcessInstance processInstance = runtimeService.startProcessInstanceById(definition.getId());
     batch = runtimeService.deleteProcessInstancesAsync(

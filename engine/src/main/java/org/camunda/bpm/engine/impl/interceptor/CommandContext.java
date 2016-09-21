@@ -100,6 +100,7 @@ public class CommandContext {
   protected boolean authorizationCheckEnabled = true;
   protected boolean userOperationLogEnabled = true;
   protected boolean tenantCheckEnabled = true;
+  protected boolean restrictUserOperationLogToAuthenticatedUsers;
 
   protected TransactionContext transactionContext;
   protected Map<Class< ? >, SessionFactory> sessionFactories;
@@ -121,6 +122,7 @@ public class CommandContext {
     this.failedJobCommandFactory = processEngineConfiguration.getFailedJobCommandFactory();
     sessionFactories = processEngineConfiguration.getSessionFactories();
     this.transactionContext = transactionContextFactory.openTransactionContext(this);
+    this.restrictUserOperationLogToAuthenticatedUsers = processEngineConfiguration.isRestrictUserOperationLogToAuthenticatedUsers();
   }
 
   public void performOperation(final CmmnAtomicOperation executionOperation, final CaseExecutionEntity execution) {
@@ -592,4 +594,11 @@ public class CommandContext {
     this.currentJob = currentJob;
   }
 
+  public boolean isRestrictUserOperationLogToAuthenticatedUsers() {
+    return restrictUserOperationLogToAuthenticatedUsers;
+  }
+
+  public void setRestrictUserOperationLogToAuthenticatedUsers(boolean restrictUserOperationLogToAuthenticatedUsers) {
+    this.restrictUserOperationLogToAuthenticatedUsers = restrictUserOperationLogToAuthenticatedUsers;
+  }
 }

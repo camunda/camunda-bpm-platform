@@ -302,8 +302,7 @@ public class UserOperationLogManager extends AbstractHistoricManager {
   }
 
   protected boolean writeUserOperationLogOnlyWithLoggedInUser() {
-    ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
-    return configuration.isRestrictUserOperationLogToAuthenticatedUsers();
+    return Context.getCommandContext().isRestrictUserOperationLogToAuthenticatedUsers();
   }
 
   protected boolean isUserOperationLogEnabledOnCommandContext() {
