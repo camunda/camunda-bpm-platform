@@ -12,8 +12,8 @@ var camCommons = require('camunda-commons-ui/lib');
 var ngModule = angular.module('cam.cockpit.pages.processDefinition', ['dataDepend', camCommons.name]);
 
 var Controller = [
-  '$scope', '$rootScope', '$q', 'search', 'ProcessDefinitionResource', 'ProcessInstanceResource', 'Views', 'Data', 'Transform', 'Variables', 'dataDepend', 'processDefinition', 'page',
-  function($scope,   $rootScope,   $q,   search,   ProcessDefinitionResource,   ProcessInstanceResource,   Views,   Data,   Transform,   Variables,   dataDepend,   processDefinition,   page
+  '$location', '$scope', '$rootScope', '$q', 'search', 'ProcessDefinitionResource', 'ProcessInstanceResource', 'Views', 'Data', 'Transform', 'Variables', 'dataDepend', 'processDefinition', 'page',
+  function($location, $scope,   $rootScope,   $q,   search,   ProcessDefinitionResource,   ProcessInstanceResource,   Views,   Data,   Transform,   Variables,   dataDepend,   processDefinition,   page
   ) {
     var processData = $scope.processData = dataDepend.create($scope);
 
@@ -27,11 +27,14 @@ var Controller = [
     $scope.$on('$locationChangeSuccess', function() {
       var newFilter = parseFilterFromUri();
 
-      if (searchWidgetUtils.shouldUpdateFilter(newFilter, currentFilter, ['activityIds', 'parentProcessDefinitionId'])) {
-        processData.set('filter', newFilter);
-      }
+      if ($location.path().indexOf(processDefinition.id) > -1) {
 
-      setDefaultTab($scope.processDefinitionTabs);
+        if (searchWidgetUtils.shouldUpdateFilter(newFilter, currentFilter, ['activityIds', 'parentProcessDefinitionId'])) {
+          processData.set('filter', newFilter);
+        }
+
+        setDefaultTab($scope.processDefinitionTabs);
+      }
     });
 
     var currentFilter = null;
@@ -106,7 +109,7 @@ var Controller = [
 
       search.updateSilently({
         parentProcessDefinitionId: parentProcessDefinitionId || null,
-        searchQuery: searches? JSON.stringify(searches) : null
+        searchQuery: searches ? JSON.stringify(searches) : null
       });
 
       currentFilter = filter;
