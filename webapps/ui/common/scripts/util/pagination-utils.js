@@ -8,9 +8,17 @@ module.exports = {
   initializePaginationInController: initializePaginationInController
 };
 
+/**
+ * Initializes pagination in controller.
+ *
+ * @param $scope
+ * @param search service from controller
+ * @param updateCallback callback function that is called each time pagination changes,
+ *                       takes two argument newPage and oldPage.
+ * @returns {*}
+ */
 function initializePaginationInController($scope, search, updateCallback) {
   var pages = $scope.pages = angular.copy(DEFAULT_PAGES);
-
   pages.current = getCurrentPageFromSearch(search);
 
   $scope.$watch('pages.current', function(newValue, oldValue) {
@@ -19,13 +27,6 @@ function initializePaginationInController($scope, search, updateCallback) {
     }
 
     search('page', !newValue || newValue == 1 ? null : newValue);
-  });
-
-  $scope.$on('$routeChanged', function() {
-    var oldValue = pages.current;
-    var newValue = getCurrentPageFromSearch(search);
-
-    pages.current = newValue;
 
     updateCallback(newValue, oldValue);
   });
@@ -33,12 +34,6 @@ function initializePaginationInController($scope, search, updateCallback) {
   return pages;
 }
 
-/**
- * Gets current page from url or returns 1 as default page
- *
- * @param search
- * @returns {*|number}
- */
 function getCurrentPageFromSearch(search) {
   return search().page || 1;
 }

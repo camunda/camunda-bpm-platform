@@ -48,6 +48,8 @@ module.exports = function(ngModule) {
         $scope.instanceIdToInstanceMap = instanceIdToInstanceMap;
       });
 
+      $scope.getSearchQueryForSearchType = searchWidgetUtils.getSearchQueryForSearchType.bind(null, 'activityInstanceIdIn');
+
       $scope.$on('addVariableNotification', function() {
         updateView($scope.instanceIdToInstanceMap, $scope.searchConfig.searches);
       });
@@ -251,12 +253,9 @@ module.exports = function(ngModule) {
               // prevents the list to throw an error when the activity instance is missing
             var activityInstanceLink = '';
             if(instance) {
-              activityInstanceLink = '<a cam-select-activity-instance="\'' +
-                  instance.id +
-                  '\'" ng-href="#/process-instance/' +
-                  processInstance.id +
-                  '?detailsTab=variables-tab&activityInstanceIds=' +
-                  instance.id +
+              activityInstanceLink = '<a ng-href="#/process-instance/' +
+                  processInstance.id + '/runtime' +
+                  '?detailsTab=variables-tab&'+ encodeURI($scope.getSearchQueryForSearchType(instance.id)) +
                   '" title="' +
                   instance.id +
                   '">' +

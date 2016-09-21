@@ -1,9 +1,11 @@
 'use strict';
 
 var fs = require('fs');
+var angular = require('angular');
+var searchWidgetUtils = require('../../../../../../common/scripts/util/search-widget-utils');
 
 var template = fs.readFileSync(__dirname + '/called-process-definition-table.html', 'utf8');
-var angular = require('angular');
+
 
 module.exports = [ 'ViewsProvider', function(ViewsProvider) {
 
@@ -13,10 +15,12 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
     template: template,
     controller: [
       '$scope', '$location', '$q', 'PluginProcessDefinitionResource',
-      function($scope,   $location,   $q,   PluginProcessDefinitionResource) {
+      function($scope, $location, $q, PluginProcessDefinitionResource) {
 
         var filter;
         var processData = $scope.processData.newChild($scope);
+
+        $scope.getSearchQueryForSearchType = searchWidgetUtils.getSearchQueryForSearchType.bind(null, 'activityIdIn');
 
         processData.provide('calledProcessDefinitions', [
           'processDefinition', 'filter',

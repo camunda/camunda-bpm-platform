@@ -5,8 +5,9 @@ var fs = require('fs');
 var template = fs.readFileSync(__dirname + '/process-instance.html', 'utf8');
 
 var angular = require('camunda-commons-ui/vendor/angular');
-var routeUtil = require('../../../../common/scripts/util/routeUtil');
 var searchWidgetUtils = require('../../../../common/scripts/util/search-widget-utils');
+
+var routeUtil = require('../../../../common/scripts/util/routeUtil');
 var camCommons = require('camunda-commons-ui/lib');
 
 var ngModule = angular.module('cam.cockpit.pages.processInstance', [camCommons.name, 'dataDepend']);
@@ -37,39 +38,59 @@ var Controller = [
       $scope.hovered = id || null;
     };
 
-    $scope.$on('$routeChanged', function() {
-      processData.set('filter', parseFilterFromUri());
-      // update tab selection
+    $scope.$on('$locationChangeSuccess', function() {
+      var newFilter = parseFilterFromUri($scope.filter);
+
+      if (searchWidgetUtils.shouldUpdateFilter(newFilter, $scope.filter, ['activityIds', 'activityInstanceIds'])) {
+        processData.set('filter', newFilter);
+      }
+
       pageData.set('activeTab', getDefaultTab($scope.processInstanceTabs));
     });
 
-    $scope.$on('$locationChangeSuccess', function() {
-      processData.set('filter', parseFilterFromUri());
-    });
-
-    function parseFilterFromUri() {
+    function parseFilterFromUri(lastFilter) {
       var params = search();
       var activityInstanceIds = searchWidgetUtils.getActivityIdsFromUrlParams('activityInstanceIdIn', params);
-      var activityIds = searchWidgetUtils.getActivityIdsBasedOnInstances(
-        $scope.instanceIdToInstanceMap,
-        activityInstanceIds
-      );
+      var activityIds = params.activityIds ? params.activityIds.split(',') : [];
+      var ignoreActivityIds = shouldActivityIdsBeIgnored(lastFilter, activityIds, activityInstanceIds);
 
-      $scope.filter = filter = {
+      // if activity ids haven't changed but instance ids have changed
+      // then just ignore activity ids from url and let filter auto-complete them
+      // because it means that user removed or added instance id to filter by hand
+      if (ignoreActivityIds) {
+        activityIds = [];
+      }
+
+      return {
         activityIds: activityIds,
         activityInstanceIds: activityInstanceIds,
-        page: parseInt(params.page, 10) || undefined
+        page: parseInt(params.page, 10) || undefined,
+        replace: ignoreActivityIds
       };
-
-      return filter;
     }
 
-    function serializeFilterToUri(newFilter) {
-      var activityInstanceIds = newFilter.activityInstanceIds;
+    function shouldActivityIdsBeIgnored(lastFilter, activityIds, activityInstanceIds) {
+      return lastFilter && angular.equals(activityIds, lastFilter.activityIds) &&
+        !angular.equals(activityInstanceIds, lastFilter.activityInstanceIds);
+    }
+
+    function serializeFilterToUri(newFilter, replace) {
+      var activityInstanceIds = angular.isArray(newFilter.activityInstanceIds) ? newFilter.activityInstanceIds : [];
+      var activityIds = angular.isArray(newFilter.activityIds) ? newFilter.activityIds : [];
+      var urlParams = search();
+      var searches = JSON.parse(urlParams.searchQuery || '[]');
+
+      //when there is no searchQuery present and there is no ids to add to searchQuery don't change anything
+      if (!urlParams.searchQuery && !activityInstanceIds.length && !activityIds.length) {
+        searches = null;
+      } else {
+        searches = searchWidgetUtils.replaceActivitiesInSearchQuery(searches, 'activityInstanceIdIn', activityInstanceIds);
+      }
 
       search.updateSilently({
-        searchQuery: searchWidgetUtils.replaceActivitiesInSearchQuery(search, 'activityInstanceIdIn', activityInstanceIds)
-      });
+        searchQuery: searches? JSON.stringify(searches) : null,
+        activityIds: activityIds.length ? activityIds.join(',') : null
+      }, replace);
 
       $scope.filter = filter = newFilter;
     }
@@ -87,7 +108,6 @@ var Controller = [
      * @param  {*} activityIdToInstancesMap a activity id -> activity instance map
      */
     function autoCompleteFilter(newFilter, instanceIdToInstanceMap, activityIdToInstancesMap) {
-
       var activityIds = newFilter.activityIds || [],
           activityInstanceIds = newFilter.activityInstanceIds || [],
           page = parseInt(newFilter.page, 10) || null,
@@ -96,7 +116,10 @@ var Controller = [
           // newFilter is different from cached filter
           externalUpdate = newFilter !== filter,
           changed,
-          completedFilter;
+          completedFilter,
+          replace = newFilter.replace;
+
+      delete newFilter.replace;
 
       angular.forEach(activityInstanceIds, function(instanceId) {
         var instance = instanceIdToInstanceMap[instanceId] || {},
@@ -183,7 +206,7 @@ var Controller = [
       if (externalUpdate) {
 
         // serialize filter to url
-        serializeFilterToUri(filter);
+        serializeFilterToUri(filter, replace);
       }
     }
 
@@ -293,7 +316,8 @@ var Controller = [
         }
 
         activityInstances.name = getActivityName(model);
-      // add initially the root to the map
+
+        // add initially the root to the map
         instanceIdToInstanceMap[activityInstances.id] = activityInstances;
 
         decorateActivityInstanceTree(activityInstances);
@@ -521,7 +545,6 @@ var Controller = [
     // /////// End of usage of definied process data
 
     $scope.handleBpmnElementSelection = function(id, $event) {
-
       if (!id) {
         processData.set('filter', {});
         return;
@@ -793,7 +816,8 @@ var RouteConfig = [
   function($routeProvider) {
 
     $routeProvider.when('/process-instance/:id', {
-      redirectTo: routeUtil.redirectToRuntime
+      redirectTo: routeUtil.redirectToRuntime,
+      reloadOnSearch: false
     });
 
     $routeProvider.when('/process-instance/:id/runtime', {

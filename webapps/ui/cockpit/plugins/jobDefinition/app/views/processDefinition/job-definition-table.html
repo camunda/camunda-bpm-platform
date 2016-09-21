@@ -23,8 +23,7 @@
       </td>
       <td class="activity"
           cam-widget-clipboard="jobDefinition.activityId">
-        <a cam-select-activity="jobDefinition.activityId"
-           ng-href="#/process-definition/{{ processDefinition.id }}?activityIds={{ jobDefinition.activityId }}&amp;detailsTab=job-definition-table">
+        <a ng-href="#/process-definition/{{ processDefinition.id }}/runtime?{{ getSearchQueryForSearchType(jobDefinition.activityId) }}&amp;detailsTab=job-definition-table">
           {{ jobDefinition.activityName }}
         </a>
       </td>

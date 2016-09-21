@@ -15,14 +15,14 @@
       <tr ng-repeat="calledProcessInstance in calledProcessInstances">
         <td class="called-process-instance"
             cam-widget-clipboard="calledProcessInstance.id">
-          <a href="#/process-instance/{{ calledProcessInstance.id }}">
+          <a href="#/process-instance/{{ calledProcessInstance.id }}/runtime">
             {{ calledProcessInstance.id }}
           </a>
         </td>
 
         <td class="process-definition"
             cam-widget-clipboard="calledProcessInstance.processDefinitionId">
-          <a href="#/process-definition/{{ calledProcessInstance.processDefinitionId }}?parentProcessDefinitionId={{ processInstance.definitionId }}">
+          <a href="#/process-definition/{{ calledProcessInstance.processDefinitionId }}/runtime?parentProcessDefinitionId={{ processInstance.definitionId }}">
             {{ calledProcessInstance.processDefinitionName }}
           </a>
         </td>
@@ -30,8 +30,7 @@
         <td class="activity">
           <span ng-if="!!calledProcessInstance.instance"
                 cam-widget-clipboard="calledProcessInstance.instance.id">
-            <a cam-select-activity-instance="calledProcessInstance.instance.id"
-               ng-href="#/process-instance/{{ processInstance.id }}?detailsTab=called-process-instances-tab&activityInstanceIds={{ calledProcessInstance.instance.id }}">
+            <a ng-href="#/process-instance/{{ processInstance.id }}/runtime?detailsTab=called-process-instances-tab&{{ getSearchQueryForSearchType(calledProcessInstance.instance.id) }}">
               {{ calledProcessInstance.instance.name }}
             </a>
           </span>
