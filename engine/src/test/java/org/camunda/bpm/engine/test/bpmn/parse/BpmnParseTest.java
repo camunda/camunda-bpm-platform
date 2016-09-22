@@ -19,11 +19,11 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.bpmn.behavior.BoundaryEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.CompensationEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.EventSubProcessStartEventActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateCatchEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.NoneStartEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.ThrowEscalationEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
 import org.camunda.bpm.engine.ActivityTypes;
+import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateConditionalEventBehavior;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -448,7 +448,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
     ActivityImpl miActivity = findActivityInDeployedProcessDefinition("undoBookHotel");
     ScopeImpl flowScope = miActivity.getFlowScope();
 
-    assertEquals("multiInstanceBody", flowScope.getProperty(BpmnParse.PROPERTYNAME_TYPE));
+    assertEquals(ActivityTypes.MULTI_INSTANCE_BODY, flowScope.getProperty(BpmnParse.PROPERTYNAME_TYPE));
     assertEquals("bookHotel" + BpmnParse.MULTI_INSTANCE_BODY_ID_SUFFIX, ((ActivityImpl) flowScope).getActivityId());
   }
 
@@ -457,7 +457,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
     ActivityImpl miActivity = findActivityInDeployedProcessDefinition("undoBookHotel");
     ScopeImpl flowScope = miActivity.getFlowScope();
 
-    assertEquals("multiInstanceBody", flowScope.getProperty(BpmnParse.PROPERTYNAME_TYPE));
+    assertEquals(ActivityTypes.MULTI_INSTANCE_BODY, flowScope.getProperty(BpmnParse.PROPERTYNAME_TYPE));
     assertEquals("scope" + BpmnParse.MULTI_INSTANCE_BODY_ID_SUFFIX, ((ActivityImpl) flowScope).getActivityId());
   }
 
@@ -465,7 +465,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
   public void testParseSignalStartEvent(){
     ActivityImpl signalStartActivity = findActivityInDeployedProcessDefinition("start");
 
-    assertEquals("signalStartEvent", signalStartActivity.getProperty("type"));
+    assertEquals(ActivityTypes.START_EVENT_SIGNAL, signalStartActivity.getProperty("type"));
     assertEquals(NoneStartEventActivityBehavior.class, signalStartActivity.getActivityBehavior().getClass());
   }
 
@@ -514,7 +514,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
     ActivityImpl intermediateConditionalEvent = findActivityInDeployedProcessDefinition("intermediateConditionalEvent");
 
     assertEquals(ActivityTypes.INTERMEDIATE_EVENT_CONDITIONAL, intermediateConditionalEvent.getProperties().get(BpmnProperties.TYPE));
-    assertEquals(IntermediateCatchEventActivityBehavior.class, intermediateConditionalEvent.getActivityBehavior().getClass());
+    assertEquals(IntermediateConditionalEventBehavior.class, intermediateConditionalEvent.getActivityBehavior().getClass());
   }
 
   @Deployment

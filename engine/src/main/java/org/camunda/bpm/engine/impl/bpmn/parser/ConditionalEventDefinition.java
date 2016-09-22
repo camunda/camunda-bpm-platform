@@ -16,7 +16,7 @@
 package org.camunda.bpm.engine.impl.bpmn.parser;
 
 import java.io.Serializable;
-import org.camunda.bpm.engine.delegate.Expression;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.impl.Condition;
 import org.camunda.bpm.engine.impl.event.EventType;
 
@@ -30,29 +30,17 @@ public class ConditionalEventDefinition extends EventSubscriptionDeclaration imp
 
   private static final long serialVersionUID = 1L;
 
-  protected Expression expression;
-  protected Condition conditionalExpression;
+  protected final Condition conditionalExpression;
   protected boolean interrupting;
 
-  public ConditionalEventDefinition(String eventName, String activityId) {
+  public ConditionalEventDefinition(Condition conditionalExpression, String eventName, String activityId) {
     super(eventName, EventType.CONDITONAL);
     this.activityId = activityId;
-  }
-
-  public Expression getExpression() {
-    return expression;
-  }
-
-  public void setExpression(Expression expression) {
-    this.expression = expression;
+    this.conditionalExpression = conditionalExpression;
   }
 
   public Condition getConditionalExpression() {
     return conditionalExpression;
-  }
-
-  public void setConditionalExpression(Condition conditionalExpression) {
-    this.conditionalExpression = conditionalExpression;
   }
 
   public boolean isInterrupting() {
@@ -61,5 +49,12 @@ public class ConditionalEventDefinition extends EventSubscriptionDeclaration imp
 
   public void setInterrupting(boolean interrupting) {
     this.interrupting = interrupting;
+  }
+
+  public boolean evaluate(DelegateExecution execution) {
+    if (conditionalExpression != null) {
+      return conditionalExpression.evaluate(execution);
+    }
+    throw new IllegalStateException("Condtional event must have a condition!");
   }
 }
