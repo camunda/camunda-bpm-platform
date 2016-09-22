@@ -12,11 +12,11 @@
  */
 package org.camunda.bpm.engine.spring.application;
 
-import javax.servlet.ServletContext;
-
 import org.camunda.bpm.application.ProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationInfo;
 import org.springframework.web.context.ServletContextAware;
+
+import javax.servlet.ServletContext;
 
 /**
  * <p>Process Application to be used in a Spring Web Application.</p>
@@ -39,11 +39,11 @@ public class SpringServletProcessApplication extends SpringProcessApplication im
   public void setServletContext(ServletContext servletContext) {
     this.servletContext = servletContext;
   }
-  
+
   @Override
-  public void afterPropertiesSet() throws Exception {
+  public void start() {
     properties.put(ProcessApplicationInfo.PROP_SERVLET_CONTEXT_PATH, servletContext.getContextPath());
-    super.afterPropertiesSet();
+    super.start();
   }
 
 }
