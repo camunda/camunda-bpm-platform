@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,15 +20,15 @@ import org.springframework.web.context.ServletContextAware;
 
 /**
  * <p>Process Application to be used in a Spring Web Application.</p>
- * 
+ *
  * <p>Requires the <em>spring-web</em> module to be on the classpath</p>
- * 
- * <p>In addition to the services provided by the {@link SpringProcessApplication}, 
+ *
+ * <p>In addition to the services provided by the {@link SpringProcessApplication},
  * this {@link ProcessApplication} exposes the servlet context path of the web application
  * which it is a part of (see {@link ProcessApplicationInfo#PROP_SERVLET_CONTEXT_PATH}).</p>
- * 
+ *
  * <p>This implementation should be used with Spring Web Applications.</p>
- * 
+ *
  * @author Daniel Meyer
  *
  */
@@ -39,11 +39,17 @@ public class SpringServletProcessApplication extends SpringProcessApplication im
   public void setServletContext(ServletContext servletContext) {
     this.servletContext = servletContext;
   }
-  
+
+  @Override
+  public void start() {
+    properties.put(ProcessApplicationInfo.PROP_SERVLET_CONTEXT_PATH, servletContext.getContextPath());
+    super.start();
+  }
+
   @Override
   public void afterPropertiesSet() throws Exception {
-    properties.put(ProcessApplicationInfo.PROP_SERVLET_CONTEXT_PATH, servletContext.getContextPath());
-    super.afterPropertiesSet();
+    // for backwards compatibility
+    start();
   }
 
 }

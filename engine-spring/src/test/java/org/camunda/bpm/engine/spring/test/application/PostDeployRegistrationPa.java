@@ -67,11 +67,14 @@ public class PostDeployRegistrationPa extends SpringProcessApplication {
 
   protected boolean isInvoked = false;
 
-  public void afterPropertiesSet() throws Exception {
-    // do not auto-deploy the process application : we want to manually deploy from the testcase
+  @Override
+  public void start() {
+    // do not auto-deploy the process application : we want to manually deploy
+    // from the test-case
   }
 
   /** override execute to intercept calls from process engine and record that we are invoked. */
+  @Override
   public <T> T execute(Callable<T> callable) throws ProcessApplicationExecutionException {
     T result = super.execute(callable);
     isInvoked = true;
