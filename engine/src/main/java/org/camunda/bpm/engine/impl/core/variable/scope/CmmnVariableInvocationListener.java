@@ -1,4 +1,7 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
+/*
+ * Copyright 2016 camunda services GmbH.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -17,29 +20,25 @@ import org.camunda.bpm.engine.impl.core.variable.event.VariableEvent;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 
 /**
- * @author Thorben Lindhauer
  *
+ * @author Christopher Zell <christopher.zell@camunda.com>
  */
-public class VariableListenerInvocationListener implements VariableInstanceLifecycleListener<VariableInstanceEntity> {
+public class CmmnVariableInvocationListener implements VariableInstanceLifecycleListener<VariableInstanceEntity> {
 
-  protected final AbstractVariableScope targetScope;
-
-  public VariableListenerInvocationListener(AbstractVariableScope targetScope) {
-    this.targetScope = targetScope;
-  }
+  public static final CmmnVariableInvocationListener INSTANCE = new CmmnVariableInvocationListener();
 
   @Override
   public void onCreate(VariableInstanceEntity variable, AbstractVariableScope sourceScope) {
-    targetScope.dispatchEvent(new VariableEvent(variable, VariableListener.CREATE, sourceScope));
+    sourceScope.dispatchEvent(new VariableEvent(variable, VariableListener.CREATE, sourceScope));
   }
 
   @Override
   public void onUpdate(VariableInstanceEntity variable, AbstractVariableScope sourceScope) {
-    targetScope.dispatchEvent(new VariableEvent(variable, VariableListener.UPDATE, sourceScope));
+    sourceScope.dispatchEvent(new VariableEvent(variable, VariableListener.UPDATE, sourceScope));
   }
 
   @Override
   public void onDelete(VariableInstanceEntity variable, AbstractVariableScope sourceScope) {
-    targetScope.dispatchEvent(new VariableEvent(variable, VariableListener.DELETE, sourceScope));
+    sourceScope.dispatchEvent(new VariableEvent(variable, VariableListener.DELETE, sourceScope));
   }
 }

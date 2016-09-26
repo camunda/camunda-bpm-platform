@@ -939,9 +939,9 @@ public class BpmnParse extends Parse {
     Element escalationEventDefinitionElement = startEventElement.element(ESCALATION_EVENT_DEFINITION);
     Element conditionalEventDefinitionElment = startEventElement.element(CONDITIONAL_EVENT_DEFINITION);
 
-    if (scopeActivity.isTriggeredByEvent()) { // event subprocess
-
-      startEventActivity.setActivityBehavior(new EventSubProcessStartEventActivityBehavior());
+    if (scopeActivity.isTriggeredByEvent()) {
+      // event subprocess
+      EventSubProcessStartEventActivityBehavior behavior = new EventSubProcessStartEventActivityBehavior();
 
       // parse isInterrupting
       String isInterruptingAttr = startEventElement.attribute(INTERRUPTING);
@@ -986,11 +986,14 @@ public class BpmnParse extends Parse {
         EscalationEventDefinition escalationEventDefinition = createEscalationEventDefinitionForEscalationHandler(escalationEventDefinitionElement, scopeActivity, isInterrupting);
         addEscalationEventDefinition(startEventActivity.getEventScope(), escalationEventDefinition, escalationEventDefinitionElement);
       } else if (conditionalEventDefinitionElment != null) {
-        parseConditionalStartEventForEventSubprocess(conditionalEventDefinitionElment, startEventActivity, isInterrupting);
+
+        final ConditionalEventDefinition conditionalEventDef = parseConditionalStartEventForEventSubprocess(conditionalEventDefinitionElment, startEventActivity, isInterrupting);
+        behavior = new EventSubProcessStartConditionalEventActivityBehavior(conditionalEventDef);
       } else {
         addError("start event of event subprocess must be of type 'error', 'message', 'timer', 'signal', 'compensation' or 'escalation'", startEventElement);
       }
 
+     startEventActivity.setActivityBehavior(behavior);
     } else { // "regular" subprocess
       Element conditionalEventDefinition = startEventElement.element(CONDITIONAL_EVENT_DEFINITION);
 
@@ -2980,7 +2983,7 @@ public class BpmnParse extends Parse {
         }
 
       } else if (conditionalEventDefinition != null) {
-        parseBoundaryConditionalEventDefinition(conditionalEventDefinition, isCancelActivity, boundaryEventActivity);
+        behavior = parseBoundaryConditionalEventDefinition(conditionalEventDefinition, isCancelActivity, boundaryEventActivity);
       } else {
         addError("Unsupported boundary event type", boundaryEventElement);
 
@@ -3354,8 +3357,9 @@ public class BpmnParse extends Parse {
    * @param element the XML element which contains the conditional event information
    * @param interrupting indicates if the event is interrupting or not
    * @param conditionalActivity the conditional event activity
+   * @return the boundary conditional event behavior which contains the condition
    */
-  public void parseBoundaryConditionalEventDefinition(Element element, boolean interrupting, ActivityImpl conditionalActivity) {
+  public BoundaryConditionalEventActivityBehavior parseBoundaryConditionalEventDefinition(Element element, boolean interrupting, ActivityImpl conditionalActivity) {
     conditionalActivity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.BOUNDARY_CONDITIONAL);
 
     ConditionalEventDefinition conditionalEventDefinition = parseConditionalEventDefinition(element, conditionalActivity);
@@ -3365,6 +3369,8 @@ public class BpmnParse extends Parse {
     for (BpmnParseListener parseListener : parseListeners) {
       parseListener.parseBoundaryConditionalEventDefinition(element, interrupting, conditionalActivity);
     }
+
+    return new BoundaryConditionalEventActivityBehavior(conditionalEventDefinition);
   }
 
   /**
@@ -3378,7 +3384,6 @@ public class BpmnParse extends Parse {
     conditionalActivity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.INTERMEDIATE_EVENT_CONDITIONAL);
 
     ConditionalEventDefinition conditionalEventDefinition = parseConditionalEventDefinition(element, conditionalActivity);
-    addEventSubscriptionDeclaration(conditionalEventDefinition, conditionalActivity.getEventScope(), element);
 
     for (BpmnParseListener parseListener : parseListeners) {
       parseListener.parseIntermediateConditionalEventDefinition(element, conditionalActivity);
@@ -3395,7 +3400,7 @@ public class BpmnParse extends Parse {
    * @param conditionalActivity the conditional event activity
    * @return
    */
-  public ActivityImpl parseConditionalStartEventForEventSubprocess(Element element, ActivityImpl conditionalActivity, boolean interrupting) {
+  public ConditionalEventDefinition parseConditionalStartEventForEventSubprocess(Element element, ActivityImpl conditionalActivity, boolean interrupting) {
     conditionalActivity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.START_EVENT_CONDITIONAL);
 
     ConditionalEventDefinition conditionalEventDefinition = parseConditionalEventDefinition(element, conditionalActivity);
@@ -3406,7 +3411,7 @@ public class BpmnParse extends Parse {
       parseListener.parseConditionalStartEventForEventSubprocess(element, conditionalActivity, interrupting);
     }
 
-    return conditionalActivity;
+    return conditionalEventDefinition;
   }
 
   /**

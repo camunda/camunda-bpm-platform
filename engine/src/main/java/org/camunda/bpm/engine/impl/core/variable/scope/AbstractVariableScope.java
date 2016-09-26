@@ -46,7 +46,7 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
   protected abstract VariableStore<CoreVariableInstance> getVariableStore();
   protected abstract VariableInstanceFactory<CoreVariableInstance> getVariableInstanceFactory();
   protected abstract List<VariableInstanceLifecycleListener<CoreVariableInstance>> getVariableInstanceLifecycleListeners();
-  
+
   public abstract AbstractVariableScope getParentVariableScope();
 
   // get variable map /////////////////////////////////////////

@@ -43,6 +43,7 @@ import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableInstance;
+import org.camunda.bpm.engine.impl.core.variable.event.VariableEvent;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.impl.core.variable.scope.VariableInstanceFactory;
 import org.camunda.bpm.engine.impl.core.variable.scope.VariableInstanceLifecycleListener;
@@ -491,8 +492,15 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
         (VariableInstanceLifecycleListener) VariableInstanceEntityPersistenceListener.INSTANCE,
         (VariableInstanceLifecycleListener) VariableInstanceSequenceCounterListener.INSTANCE,
         (VariableInstanceLifecycleListener) VariableInstanceHistoryListener.INSTANCE,
-        (VariableInstanceLifecycleListener) VariableListenerInvocationListener.INSTANCE
+        (VariableInstanceLifecycleListener) new VariableListenerInvocationListener(this)
       );
+  }
+
+  @Override
+  public void dispatchEvent(VariableEvent variableEvent) {
+    if (execution != null && variableEvent.getVariableInstance().getTaskId() == null) {
+      execution.handleConditionalEventOnVariableChange(this);
+    }
   }
 
   @Override

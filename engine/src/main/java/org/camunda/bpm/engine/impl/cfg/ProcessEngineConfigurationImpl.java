@@ -1651,7 +1651,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       EventHandler messageEventHandler = new EventHandlerImpl(EventType.MESSAGE);
       eventHandlers.put(messageEventHandler.getEventHandlerType(), messageEventHandler);
 
-      EventHandler conditionalEventHandler = new EventHandlerImpl(EventType.CONDITONAL);
+      EventHandler conditionalEventHandler = new ConditionalEventHandler();
       eventHandlers.put(conditionalEventHandler.getEventHandlerType(), conditionalEventHandler);
 
     }

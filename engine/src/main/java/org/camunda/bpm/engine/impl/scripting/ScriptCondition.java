@@ -18,6 +18,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.Condition;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.delegate.ScriptInvocation;
@@ -35,8 +36,15 @@ public class ScriptCondition implements Condition {
     this.script = script;
   }
 
+  @Override
   public boolean evaluate(DelegateExecution execution) {
-    ScriptInvocation invocation = new ScriptInvocation(script, execution, execution);
+    return evaluate(execution, execution);
+  }
+
+
+  @Override
+  public boolean evaluate(VariableScope scope, DelegateExecution execution) {
+    ScriptInvocation invocation = new ScriptInvocation(script, scope, execution);
     try {
       Context
         .getProcessEngineConfiguration()
@@ -54,6 +62,21 @@ public class ScriptCondition implements Condition {
     ensureInstanceOf("condition script returns non-Boolean", "result", result, Boolean.class);
 
     return (Boolean) result;
+  }
+
+  @Override
+  public boolean tryEvaluate(VariableScope scope, DelegateExecution execution) {
+    boolean result = false;
+
+    try {
+      result = evaluate(scope, execution);
+    } catch (ProcessEngineException pee) {
+      if (!pee.getMessage().contains("No such property")) {
+        throw pee;
+      }
+    }
+
+    return result;
   }
 
   public ExecutableScript getScript() {

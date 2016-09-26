@@ -126,9 +126,14 @@ public class EventSubscriptionEntity implements EventSubscription, DbEntity, Has
 
 
   public static EventSubscriptionEntity createAndInsert(ExecutionEntity executionEntity, EventType eventType, ActivityImpl activity) {
+    return createAndInsert(executionEntity, eventType, activity, null);
+  }
+
+  public static EventSubscriptionEntity createAndInsert(ExecutionEntity executionEntity, EventType eventType, ActivityImpl activity, String configuration) {
     EventSubscriptionEntity eventSubscription = new EventSubscriptionEntity(executionEntity, eventType);
     eventSubscription.setActivity(activity);
     eventSubscription.setTenantId(executionEntity.getTenantId());
+    eventSubscription.setConfiguration(configuration);
     eventSubscription.insert();
     return eventSubscription;
   }

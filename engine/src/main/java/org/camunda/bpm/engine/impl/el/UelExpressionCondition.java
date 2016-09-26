@@ -13,10 +13,12 @@
 
 package org.camunda.bpm.engine.impl.el;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureInstanceOf;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.Condition;
 
 
@@ -34,11 +36,29 @@ public class UelExpressionCondition implements Condition {
     this.expression = expression;
   }
 
+  @Override
   public boolean evaluate(DelegateExecution execution) {
-    Object result = expression.getValue(execution, execution);
+    return evaluate(execution, execution);
+  }
+
+  @Override
+  public boolean evaluate(VariableScope scope, DelegateExecution execution) {
+    Object result = expression.getValue(scope, execution);
     ensureNotNull("condition expression returns null", "result", result);
     ensureInstanceOf("condition expression returns non-Boolean", "result", result, Boolean.class);
     return (Boolean) result;
   }
 
+  @Override
+  public boolean tryEvaluate(VariableScope scope, DelegateExecution execution) {
+    boolean result = false;
+    try {
+      result = evaluate(scope, execution);
+    } catch (ProcessEngineException pee) {
+      if (!pee.getMessage().contains("Unknown property used in expression")) {
+        throw pee;
+      }
+    }
+    return result;
+  }
 }

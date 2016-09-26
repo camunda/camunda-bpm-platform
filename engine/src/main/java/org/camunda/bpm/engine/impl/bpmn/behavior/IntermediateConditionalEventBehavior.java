@@ -15,14 +15,24 @@
  */
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
+import java.util.List;
+import org.camunda.bpm.engine.delegate.VariableScope;
+import org.camunda.bpm.engine.impl.ExecutionQueryImpl;
+import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.bpmn.parser.ConditionalEventDefinition;
+import org.camunda.bpm.engine.impl.event.EventType;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
+import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
+import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 /**
  *
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
-public class IntermediateConditionalEventBehavior extends IntermediateCatchEventActivityBehavior {
+public class IntermediateConditionalEventBehavior extends IntermediateCatchEventActivityBehavior implements ConditionalEventBehavioral {
 
   private final ConditionalEventDefinition conditionalEvent;
 
@@ -32,13 +42,35 @@ public class IntermediateConditionalEventBehavior extends IntermediateCatchEvent
   }
 
   @Override
-  public void execute(ActivityExecution execution) throws Exception {
+  public void execute(final ActivityExecution execution) throws Exception {
     super.execute(execution);
-    if (conditionalEvent.evaluate(execution)) {
+    if (conditionalEvent.evaluate(execution, execution)) {
       leave(execution);
-    } else {
-      // Do nothing: waitstate behavior
+    } else if (execution instanceof ExecutionEntity) {
+      //add variable life cycle listener to evaluate condition after a variable was changed
+      ActivityImpl conditionalActivity = (ActivityImpl) execution.getActivity();
+      EventSubscriptionEntity.createAndInsert((ExecutionEntity) execution, EventType.CONDITONAL, conditionalActivity);
     }
   }
 
+  @Override
+  public void leaveOnSatisfiedCondition(final EventSubscriptionEntity eventSubscription, final VariableScope scope, final CommandContext commandContext) {
+
+    PvmExecutionImpl execution = eventSubscription.getExecution();
+    ActivityImpl activity = eventSubscription.getActivity();
+
+    ExecutionQueryImpl query = new ExecutionQueryImpl();
+    query.activityId(activity.getId());
+    query.processInstanceId(execution.getProcessInstanceId());
+    Page p = new Page(0, 1);
+    List<ExecutionEntity> executions = commandContext.getExecutionManager().findExecutionsByQueryCriteria(query, p);
+    if (!executions.isEmpty()) {
+      execution = executions.get(0);
+      if (!execution.isEnded() && conditionalEvent.evaluate(scope, execution)) {
+        if (execution.isActive() && execution.isScope()) {
+          leave(execution);
+        }
+      }
+    }
+  }
 }
