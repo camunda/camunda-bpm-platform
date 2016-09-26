@@ -250,4 +250,15 @@ public class CdiEventSupportBpmnParseListener implements BpmnParseListener {
   public void parseBoundaryEscalationEventDefinition(Element escalationEventDefinition, boolean interrupting, ActivityImpl boundaryEventActivity) {
   }
 
+  @Override
+  public void parseBoundaryConditionalEventDefinition(Element element, boolean interrupting, ActivityImpl conditionalActivity) {
+  }
+
+  @Override
+  public void parseIntermediateConditionalEventDefinition(Element conditionalEventDefinition, ActivityImpl conditionalActivity) {
+  }
+
+  @Override
+  public void parseConditionalStartEventForEventSubprocess(Element element, ActivityImpl conditionalActivity, boolean interrupting) {
+  }
 }
