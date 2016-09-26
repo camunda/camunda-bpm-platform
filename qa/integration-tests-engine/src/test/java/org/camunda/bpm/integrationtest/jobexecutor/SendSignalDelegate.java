@@ -11,30 +11,30 @@ import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 
 @Named
 public class SendSignalDelegate implements JavaDelegate {
 
   @Inject
-  private RuntimeService runtimeService;  
+  private RuntimeService runtimeService;
 
   @Inject
-  private BusinessProcess businessProcess;   
+  private BusinessProcess businessProcess;
 
   public void execute(DelegateExecution execution) throws Exception {
     businessProcess.setVariable("processName", "throwSignal-visited (was " + businessProcess.getVariable("processName")  + ")");
 
-    String signalProcessInstanceId = (String) execution.getVariable("signalProcessInstanceId");      
-    String executionId = runtimeService.createExecutionQuery().processInstanceId(signalProcessInstanceId).signalEventSubscriptionName("alert").singleResult().getId();      
-    
+    String signalProcessInstanceId = (String) execution.getVariable("signalProcessInstanceId");
+    String executionId = runtimeService.createExecutionQuery().processInstanceId(signalProcessInstanceId).signalEventSubscriptionName("alert").singleResult().getId();
+
     CommandContext commandContext = Context.getCommandContext();
-    List<SignalEventSubscriptionEntity> findSignalEventSubscriptionsByEventName = commandContext
+    List<EventSubscriptionEntity> findSignalEventSubscriptionsByEventName = commandContext
             .getEventSubscriptionManager()
             .findSignalEventSubscriptionsByNameAndExecution("alert", executionId);
 
-    for (SignalEventSubscriptionEntity signalEventSubscriptionEntity : findSignalEventSubscriptionsByEventName) {
+    for (EventSubscriptionEntity signalEventSubscriptionEntity : findSignalEventSubscriptionsByEventName) {
         signalEventSubscriptionEntity.eventReceived(null, true);
-    }       
+    }
   }
 }
