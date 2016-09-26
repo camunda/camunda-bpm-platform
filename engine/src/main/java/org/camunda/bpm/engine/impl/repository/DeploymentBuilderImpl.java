@@ -18,6 +18,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.Collection;
@@ -43,6 +44,10 @@ import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.bpm.model.cmmn.Cmmn;
+import org.camunda.bpm.model.cmmn.CmmnModelInstance;
+import org.camunda.bpm.model.dmn.Dmn;
+import org.camunda.bpm.model.dmn.DmnModelInstance;
 
 /**
  * @author Tom Baeyens
@@ -99,17 +104,38 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
     return this;
   }
 
+  public DeploymentBuilder addModelInstance(String resourceName, CmmnModelInstance modelInstance) {
+    ensureNotNull("modelInstance", modelInstance);
+
+    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    Cmmn.writeModelToStream(outputStream, modelInstance);
+
+    return addModelInstance(resourceName, outputStream);
+  }
+
   public DeploymentBuilder addModelInstance(String resourceName, BpmnModelInstance modelInstance) {
     ensureNotNull("modelInstance", modelInstance);
 
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     Bpmn.writeModelToStream(outputStream, modelInstance);
+
+    return addModelInstance(resourceName, outputStream);
+  }
+
+  public DeploymentBuilder addModelInstance(String resourceName, DmnModelInstance modelInstance) {
+    ensureNotNull("modelInstance", modelInstance);
+
+    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    Dmn.writeModelToStream(outputStream, modelInstance);
+
+    return addModelInstance(resourceName, outputStream);
+  }
+
+  private DeploymentBuilder addModelInstance(String resourceName, ByteArrayOutputStream outputStream) {
     ResourceEntity resource = new ResourceEntity();
     resource.setBytes(outputStream.toByteArray());
     resource.setName(resourceName);
     deployment.addResource(resource);
-
-    return this;
   }
 
   public DeploymentBuilder addZipInputStream(ZipInputStream zipInputStream) {
