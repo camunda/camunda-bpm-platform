@@ -444,10 +444,7 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
       deploymentBuilder.addModelInstance("testProcess-"+i+".bpmn", bpmnModelInstance);
     }
 
-    deploymentId = deploymentBuilder.deploy().getId();
-    deploymentIds.add(deploymentId);
-
-    return deploymentId;
+    return deploymentWithBuilder(deploymentBuilder);
   }
 
   protected String deployment(DeploymentBuilder deploymentBuilder, String... resources) {
@@ -455,7 +452,11 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
       deploymentBuilder.addClasspathResource(resources[i]);
     }
 
-    deploymentId = deploymentBuilder.deploy().getId();
+    return deploymentWithBuilder(deploymentBuilder);
+  }
+
+  protected String deploymentWithBuilder(DeploymentBuilder builder) {
+    deploymentId = builder.deploy().getId();
     deploymentIds.add(deploymentId);
 
     return deploymentId;

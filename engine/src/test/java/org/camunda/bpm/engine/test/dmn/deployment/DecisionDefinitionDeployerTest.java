@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.test.dmn.deployment;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.InputStream;
@@ -32,6 +33,17 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.camunda.bpm.model.dmn.Dmn;
+import org.camunda.bpm.model.dmn.DmnModelInstance;
+import org.camunda.bpm.model.dmn.HitPolicy;
+import org.camunda.bpm.model.dmn.impl.DmnModelConstants;
+import org.camunda.bpm.model.dmn.instance.Decision;
+import org.camunda.bpm.model.dmn.instance.DecisionTable;
+import org.camunda.bpm.model.dmn.instance.Definitions;
+import org.camunda.bpm.model.dmn.instance.Input;
+import org.camunda.bpm.model.dmn.instance.InputExpression;
+import org.camunda.bpm.model.dmn.instance.Output;
+import org.camunda.bpm.model.dmn.instance.Text;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -330,4 +342,56 @@ public class DecisionDefinitionDeployerTest {
     assertEquals(decisionRequirementsDefinition.getId(),secondDecision.getDecisionRequirementsDefinitionId());
   }
 
+  @Test
+  public void testDeployDmnModelInstance() throws Exception {
+    // given
+    DmnModelInstance dmnModelInstance = createDmnModelInstance();
+
+    // when
+    testRule.deploy(repositoryService.createDeployment().addModelInstance("foo.dmn", dmnModelInstance));
+
+    // then
+    assertNotNull(repositoryService.createDecisionDefinitionQuery()
+        .decisionDefinitionResourceName("foo.dmn").singleResult());
+  }
+
+  protected static DmnModelInstance createDmnModelInstance() {
+    DmnModelInstance modelInstance = Dmn.createEmptyModel();
+    Definitions definitions = modelInstance.newInstance(Definitions.class);
+    definitions.setId(DmnModelConstants.DMN_ELEMENT_DEFINITIONS);
+    definitions.setName(DmnModelConstants.DMN_ELEMENT_DEFINITIONS);
+    definitions.setNamespace(DmnModelConstants.CAMUNDA_NS);
+    modelInstance.setDefinitions(definitions);
+
+    Decision decision = modelInstance.newInstance(Decision.class);
+    decision.setId("Decision-1");
+    decision.setName("foo");
+    modelInstance.getDefinitions().addChildElement(decision);
+
+    DecisionTable decisionTable = modelInstance.newInstance(DecisionTable.class);
+    decisionTable.setId(DmnModelConstants.DMN_ELEMENT_DECISION_TABLE);
+    decisionTable.setHitPolicy(HitPolicy.FIRST);
+    decision.addChildElement(decisionTable);
+
+    Input input = modelInstance.newInstance(Input.class);
+    input.setId("Input-1");
+    input.setLabel("Input");
+    decisionTable.addChildElement(input);
+
+    InputExpression inputExpression = modelInstance.newInstance(InputExpression.class);
+    inputExpression.setId("InputExpression-1");
+    Text inputExpressionText = modelInstance.newInstance(Text.class);
+    inputExpressionText.setTextContent("input");
+    inputExpression.setText(inputExpressionText);
+    inputExpression.setTypeRef("string");
+    input.setInputExpression(inputExpression);
+
+    Output output = modelInstance.newInstance(Output.class);
+    output.setName("output");
+    output.setLabel("Output");
+    output.setTypeRef("string");
+    decisionTable.addChildElement(output);
+
+    return modelInstance;
+  }
 }

@@ -32,6 +32,7 @@ import org.camunda.bpm.engine.repository.Resource;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.Test;
 
 
 /**
@@ -356,5 +357,18 @@ public class BpmnDeploymentTest extends PluggableProcessEngineTestCase {
     for (org.camunda.bpm.engine.repository.Deployment deployment : deploymentList) {
       repositoryService.deleteDeployment(deployment.getId());
     }
+  }
+
+  public void testDeployBpmnModelInstance() throws Exception {
+
+    // given
+    final BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("foo").startEvent().userTask().endEvent().done();
+
+    // when
+    deploymentWithBuilder(repositoryService.createDeployment()
+        .addModelInstance("foo.bpmn", modelInstance));
+
+    // then
+    assertNotNull(repositoryService.createProcessDefinitionQuery().processDefinitionResourceName("foo.bpmn").singleResult());
   }
 }

@@ -21,6 +21,10 @@ import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
 import org.camunda.bpm.engine.repository.DeploymentQuery;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.model.cmmn.Cmmn;
+import org.camunda.bpm.model.cmmn.CmmnModelInstance;
+import org.camunda.bpm.model.cmmn.instance.Case;
+import org.camunda.bpm.model.cmmn.instance.CasePlanModel;
 
 /**
  * @author Roman Smirnov
@@ -131,6 +135,35 @@ public class CmmnDeployerTest extends PluggableProcessEngineTestCase {
 
     processEngine.getRepositoryService().deleteDeployment(deploymentId);
 
+  }
+
+  public void testDeployCmmnModelInstance() throws Exception {
+    // given
+    CmmnModelInstance modelInstance = createCmmnModelInstance();
+
+    // when
+    deploymentWithBuilder(repositoryService.createDeployment().addModelInstance("foo.cmmn", modelInstance));
+
+    // then
+    assertNotNull(repositoryService.createCaseDefinitionQuery().caseDefinitionResourceName("foo.cmmn").singleResult());
+  }
+
+  protected static CmmnModelInstance createCmmnModelInstance() {
+    final CmmnModelInstance modelInstance = Cmmn.createEmptyModel();
+    org.camunda.bpm.model.cmmn.instance.Definitions definitions = modelInstance.newInstance(org.camunda.bpm.model.cmmn.instance.Definitions.class);
+    definitions.setTargetNamespace("http://camunda.org/examples");
+    modelInstance.setDefinitions(definitions);
+
+    Case caseElement = modelInstance.newInstance(Case.class);
+    caseElement.setId("a-case");
+    definitions.addChildElement(caseElement);
+
+    CasePlanModel casePlanModel = modelInstance.newInstance(CasePlanModel.class);
+    caseElement.setCasePlanModel(casePlanModel);
+
+    Cmmn.writeModelToStream(System.out, modelInstance);
+
+    return modelInstance;
   }
 
 }

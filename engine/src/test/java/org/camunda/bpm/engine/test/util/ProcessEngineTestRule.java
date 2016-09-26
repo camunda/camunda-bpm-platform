@@ -99,6 +99,14 @@ public class ProcessEngineTestRule extends TestWatcher {
     return deploy(createDeploymentBuilder(), Collections.<BpmnModelInstance> emptyList(), Arrays.asList(resources));
   }
 
+  public Deployment deploy(DeploymentBuilder deploymentBuilder) {
+    Deployment deployment = deploymentBuilder.deploy();
+
+    processEngineRule.manageDeployment(deployment);
+
+    return deployment;
+  }
+
   public Deployment deploy(BpmnModelInstance bpmnModelInstance, String resource) {
     return deploy(createDeploymentBuilder(), Collections.singletonList(bpmnModelInstance), Collections.singletonList(resource));
   }
@@ -139,11 +147,7 @@ public class ProcessEngineTestRule extends TestWatcher {
       deploymentBuilder.addClasspathResource(resource);
     }
 
-    Deployment deployment = deploymentBuilder.deploy();
-
-    processEngineRule.manageDeployment(deployment);
-
-    return deployment;
+    return deploy(deploymentBuilder);
   }
 
   protected DeploymentBuilder createDeploymentBuilder() {
