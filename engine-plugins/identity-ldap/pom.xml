@@ -31,6 +31,13 @@
       </exclusions>
       <scope>test</scope>
     </dependency>
+
+    <dependency>
+      <!-- required for LdapTestEnvironment -->
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
