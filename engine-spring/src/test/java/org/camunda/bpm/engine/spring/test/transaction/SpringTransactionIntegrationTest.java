@@ -42,6 +42,8 @@ public class SpringTransactionIntegrationTest extends SpringProcessEngineTestCas
   @Autowired
   protected DataSource dataSource;
 
+  private static long WAIT_TIME_MILLIS = TimeUnit.MILLISECONDS.convert(20L, TimeUnit.SECONDS);
+
   @Deployment
   public void testBasicActivitiSpringIntegration() {
     userBean.hello();
@@ -82,7 +84,7 @@ public class SpringTransactionIntegrationTest extends SpringProcessEngineTestCas
   })
   public void testErrorPropagationOnExceptionInTransaction(){
       runtimeService.startProcessInstanceByKey("process");
-      waitForJobExecutorToProcessAllJobs(TimeUnit.MILLISECONDS.convert(10L, TimeUnit.SECONDS));
+      waitForJobExecutorToProcessAllJobs(WAIT_TIME_MILLIS);
       Incident incident = runtimeService.createIncidentQuery().activityId("servicetask").singleResult();
       assertThat(incident.getIncidentMessage(), is("error"));
   }
@@ -92,7 +94,7 @@ public class SpringTransactionIntegrationTest extends SpringProcessEngineTestCas
 
     runtimeService.startProcessInstanceByKey("txRollbackServiceTask");
 
-    waitForJobExecutorToProcessAllJobs(10000);
+    waitForJobExecutorToProcessAllJobs(WAIT_TIME_MILLIS);
 
     Job job = managementService.createJobQuery().singleResult();
 
@@ -110,7 +112,7 @@ public class SpringTransactionIntegrationTest extends SpringProcessEngineTestCas
 
     runtimeService.startProcessInstanceByKey("txRollbackServiceTaskWithCustomRetryCycle");
 
-    waitForJobExecutorToProcessAllJobs(10000);
+    waitForJobExecutorToProcessAllJobs(WAIT_TIME_MILLIS);
 
     Job job = managementService.createJobQuery().singleResult();
 
@@ -128,7 +130,7 @@ public class SpringTransactionIntegrationTest extends SpringProcessEngineTestCas
 
     runtimeService.startProcessInstanceByKey("failingTransactionListener");
 
-    waitForJobExecutorToProcessAllJobs(10000);
+    waitForJobExecutorToProcessAllJobs(WAIT_TIME_MILLIS);
 
     Job job = managementService.createJobQuery().singleResult();
 
