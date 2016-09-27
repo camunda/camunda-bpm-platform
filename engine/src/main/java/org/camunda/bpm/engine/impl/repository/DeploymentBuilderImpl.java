@@ -110,7 +110,7 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     Cmmn.writeModelToStream(outputStream, modelInstance);
 
-    return addModelInstance(resourceName, outputStream);
+    return addStream(resourceName, outputStream);
   }
 
   public DeploymentBuilder addModelInstance(String resourceName, BpmnModelInstance modelInstance) {
@@ -119,7 +119,7 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     Bpmn.writeModelToStream(outputStream, modelInstance);
 
-    return addModelInstance(resourceName, outputStream);
+    return addStream(resourceName, outputStream);
   }
 
   public DeploymentBuilder addModelInstance(String resourceName, DmnModelInstance modelInstance) {
@@ -128,14 +128,16 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     Dmn.writeModelToStream(outputStream, modelInstance);
 
-    return addModelInstance(resourceName, outputStream);
+    return addStream(resourceName, outputStream);
   }
 
-  private DeploymentBuilder addModelInstance(String resourceName, ByteArrayOutputStream outputStream) {
+  private DeploymentBuilder addStream(String resourceName, ByteArrayOutputStream outputStream) {
     ResourceEntity resource = new ResourceEntity();
     resource.setBytes(outputStream.toByteArray());
     resource.setName(resourceName);
     deployment.addResource(resource);
+    
+    return this;
   }
 
   public DeploymentBuilder addZipInputStream(ZipInputStream zipInputStream) {
