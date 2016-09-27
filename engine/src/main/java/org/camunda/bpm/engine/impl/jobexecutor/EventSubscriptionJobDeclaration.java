@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
+import org.camunda.bpm.engine.impl.el.StartProcessVariableScope;
 import org.camunda.bpm.engine.impl.jobexecutor.ProcessEventJobHandler.EventSubscriptionJobConfiguration;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -99,13 +100,15 @@ public class EventSubscriptionJobDeclaration extends JobDeclaration<EventSubscri
   }
 
   /**
-   * Assumes that an activity has at most one declaration of a eventName + eventType combination.
+   * Assumes that an activity has at most one declaration of a eventType.
+   *
+   * Note: We assume the we do not have a declaration with the same combination eventName + eventType.
    */
   public static EventSubscriptionJobDeclaration findDeclarationForSubscription(EventSubscriptionEntity eventSubscription) {
     List<EventSubscriptionJobDeclaration> declarations = getDeclarationsForActivity(eventSubscription.getActivity());
 
     for (EventSubscriptionJobDeclaration declaration : declarations) {
-      if (declaration.getEventName().equals(eventSubscription.getEventName()) && declaration.getEventType().equals(eventSubscription.getEventType())) {
+      if (declaration.getEventType().equals(eventSubscription.getEventType())) {
         return declaration;
       }
     }

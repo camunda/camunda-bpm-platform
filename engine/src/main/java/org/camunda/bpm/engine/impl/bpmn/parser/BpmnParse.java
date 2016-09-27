@@ -13,122 +13,36 @@
 package org.camunda.bpm.engine.impl.bpmn.parser;
 
 import org.camunda.bpm.engine.ActivityTypes;
-import static org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseUtil.findCamundaExtensionElement;
-import static org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseUtil.parseCamundaScript;
-import static org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseUtil.parseInputOutput;
-
-import java.io.InputStream;
-import java.net.URL;
-import java.text.StringCharacterIterator;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import org.camunda.bpm.engine.BpmnParseException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.impl.Condition;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
-import org.camunda.bpm.engine.impl.bpmn.behavior.BoundaryEventActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.CallActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.CallableElementActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.CancelBoundaryEventActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.CancelEndEventActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.CaseCallActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.ClassDelegateActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.CompensationEventActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.DmnBusinessRuleTaskActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.ErrorEndEventActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.EventBasedGatewayActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.EventSubProcessActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.EventSubProcessStartEventActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.ExclusiveGatewayActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.ExternalTaskActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.InclusiveGatewayActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateCatchEventActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateCatchLinkEventActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateConditionalEventBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateThrowNoneEventActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateThrowSignalEventActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.MailActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.ManualTaskActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.MultiInstanceActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.NoneEndEventActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.NoneStartEventActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.ParallelGatewayActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.ParallelMultiInstanceActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.ReceiveTaskActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.ScriptTaskActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.SequentialMultiInstanceActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.ServiceTaskDelegateExpressionActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.ServiceTaskExpressionActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.ShellActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.SignalEndEventActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.SubProcessActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.TaskActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.TerminateEndEventActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.ThrowEscalationEventActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.*;
 import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
 import org.camunda.bpm.engine.impl.bpmn.listener.ClassDelegateExecutionListener;
 import org.camunda.bpm.engine.impl.bpmn.listener.DelegateExpressionExecutionListener;
 import org.camunda.bpm.engine.impl.bpmn.listener.ExpressionExecutionListener;
 import org.camunda.bpm.engine.impl.bpmn.listener.ScriptExecutionListener;
-import org.camunda.bpm.engine.impl.core.model.BaseCallableElement;
+import org.camunda.bpm.engine.impl.core.model.*;
 import org.camunda.bpm.engine.impl.core.model.BaseCallableElement.CallableElementBinding;
-import org.camunda.bpm.engine.impl.core.model.CallableElement;
-import org.camunda.bpm.engine.impl.core.model.CallableElementParameter;
-import org.camunda.bpm.engine.impl.core.model.DefaultCallableElementTenantIdProvider;
 import org.camunda.bpm.engine.impl.core.model.Properties;
 import org.camunda.bpm.engine.impl.core.variable.mapping.IoMapping;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ConstantValueProvider;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.NullValueProvider;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValueProvider;
 import org.camunda.bpm.engine.impl.dmn.result.DecisionResultMapper;
-import org.camunda.bpm.engine.impl.el.ElValueProvider;
-import org.camunda.bpm.engine.impl.el.Expression;
-import org.camunda.bpm.engine.impl.el.ExpressionManager;
-import org.camunda.bpm.engine.impl.el.FixedValue;
-import org.camunda.bpm.engine.impl.el.UelExpressionCondition;
+import org.camunda.bpm.engine.impl.el.*;
 import org.camunda.bpm.engine.impl.event.EventType;
-import org.camunda.bpm.engine.impl.form.handler.DefaultStartFormHandler;
-import org.camunda.bpm.engine.impl.form.handler.DefaultTaskFormHandler;
-import org.camunda.bpm.engine.impl.form.handler.DelegateStartFormHandler;
-import org.camunda.bpm.engine.impl.form.handler.DelegateTaskFormHandler;
-import org.camunda.bpm.engine.impl.form.handler.StartFormHandler;
-import org.camunda.bpm.engine.impl.form.handler.TaskFormHandler;
-import org.camunda.bpm.engine.impl.jobexecutor.AsyncAfterMessageJobDeclaration;
-import org.camunda.bpm.engine.impl.jobexecutor.AsyncBeforeMessageJobDeclaration;
-import org.camunda.bpm.engine.impl.jobexecutor.EventSubscriptionJobDeclaration;
-import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
-import org.camunda.bpm.engine.impl.jobexecutor.MessageJobDeclaration;
-import org.camunda.bpm.engine.impl.jobexecutor.TimerCatchIntermediateEventJobHandler;
-import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationImpl;
-import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationType;
-import org.camunda.bpm.engine.impl.jobexecutor.TimerExecuteNestedActivityJobHandler;
-import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventJobHandler;
-import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventSubprocessJobHandler;
+import org.camunda.bpm.engine.impl.form.handler.*;
+import org.camunda.bpm.engine.impl.jobexecutor.*;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmTransition;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
-import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
-import org.camunda.bpm.engine.impl.pvm.process.ActivityStartBehavior;
-import org.camunda.bpm.engine.impl.pvm.process.HasDIBounds;
-import org.camunda.bpm.engine.impl.pvm.process.Lane;
-import org.camunda.bpm.engine.impl.pvm.process.LaneSet;
-import org.camunda.bpm.engine.impl.pvm.process.ParticipantProcess;
-import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
-import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
-import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
+import org.camunda.bpm.engine.impl.pvm.process.*;
 import org.camunda.bpm.engine.impl.pvm.runtime.LegacyBehavior;
 import org.camunda.bpm.engine.impl.scripting.ExecutableScript;
 import org.camunda.bpm.engine.impl.scripting.ScriptCondition;
@@ -148,6 +62,13 @@ import org.camunda.bpm.engine.impl.util.xml.Namespace;
 import org.camunda.bpm.engine.impl.util.xml.Parse;
 import org.camunda.bpm.engine.impl.variable.VariableDeclaration;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+
+import java.io.InputStream;
+import java.net.URL;
+import java.text.StringCharacterIterator;
+import java.util.*;
+
+import static org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseUtil.*;
 import static org.camunda.bpm.engine.impl.util.ClassDelegateUtil.instantiateDelegate;
 
 /**
@@ -435,9 +356,14 @@ public class BpmnParse extends Parse {
   public void parseMessages() {
     for (Element messageElement : rootElement.elements("message")) {
       String id = messageElement.attribute("id");
-      String name = messageElement.attribute("name");
+      String messageName = messageElement.attribute("name");
 
-      MessageDefinition messageDefinition = new MessageDefinition(this.targetNamespace + ":" + id, name);
+      Expression messageExpression = null;
+      if (messageName != null) {
+        messageExpression = expressionManager.createExpression(messageName);
+      }
+
+      MessageDefinition messageDefinition = new MessageDefinition(this.targetNamespace + ":" + id, messageExpression);
       this.messages.put(messageDefinition.getId(), messageDefinition);
     }
   }
@@ -462,11 +388,12 @@ public class BpmnParse extends Parse {
         addError("signal must have an id", signalElement);
       } else if (signalName == null) {
         addError("signal with id '" + id + "' has no name", signalElement);
-
       } else {
+        Expression signalExpression = expressionManager.createExpression(signalName);
         SignalDefinition signal = new SignalDefinition();
         signal.setId(this.targetNamespace + ":" + id);
-        signal.setName(signalName);
+        signal.setExpression(signalExpression);
+
         this.signals.put(signal.getId(), signal);
       }
     }
@@ -1179,8 +1106,7 @@ public class BpmnParse extends Parse {
     if (messageDefinition == null) {
       addError("Invalid 'messageRef': no message with id '" + messageRef + "' found.", messageEventDefinition);
     }
-
-    return new EventSubscriptionDeclaration(messageDefinition.getName(), EventType.MESSAGE);
+    return new EventSubscriptionDeclaration(messageDefinition.getExpression(), EventType.MESSAGE);
   }
 
   @SuppressWarnings("unchecked")
@@ -1234,7 +1160,21 @@ public class BpmnParse extends Parse {
       activity.setProperty(PROPERTYNAME_EVENT_SUBSCRIPTION_JOB_DECLARATION, jobDeclarationsForActivity);
     }
 
+    if(activityAlreadyContainsJobDeclarationEventType(jobDeclarationsForActivity, jobDeclaration)){
+      addError("Activity contains already job declaration with type " + jobDeclaration.getEventType(), element);
+    }
+
     jobDeclarationsForActivity.add(jobDeclaration);
+  }
+
+  protected boolean activityAlreadyContainsJobDeclarationEventType(List<EventSubscriptionJobDeclaration> jobDeclarationsForActivity,
+                                                                   EventSubscriptionJobDeclaration jobDeclaration){
+    for(EventSubscriptionJobDeclaration declaration: jobDeclarationsForActivity){
+      if(declaration.getEventType().equals(jobDeclaration.getEventType())){
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
@@ -3210,7 +3150,7 @@ public class BpmnParse extends Parse {
       if (signalDefinition == null) {
         addError("Could not find signal with id '" + signalRef + "'", signalEventDefinitionElement);
       }
-      EventSubscriptionDeclaration signalEventDefinition = new EventSubscriptionDeclaration(signalDefinition.getName(), EventType.SIGNAL);
+      EventSubscriptionDeclaration signalEventDefinition = new EventSubscriptionDeclaration(signalDefinition.getExpression(), EventType.SIGNAL);
 
       boolean throwingAsynch = TRUE.equals(signalEventDefinitionElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "async", "false"));
       signalEventDefinition.setAsync(throwingAsynch);

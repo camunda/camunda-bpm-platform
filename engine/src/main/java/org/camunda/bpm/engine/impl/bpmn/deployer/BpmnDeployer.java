@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.camunda.bpm.engine.delegate.Expression;
+import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.AbstractDefinitionDeployer;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.diagram.ProcessDiagramGenerator;
@@ -34,6 +35,7 @@ import org.camunda.bpm.engine.impl.core.model.Properties;
 import org.camunda.bpm.engine.impl.core.model.PropertyMapKey;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
+import org.camunda.bpm.engine.impl.el.StartProcessVariableScope;
 import org.camunda.bpm.engine.impl.event.EventType;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationImpl;
@@ -293,24 +295,24 @@ public class BpmnDeployer extends AbstractDefinitionDeployer<ProcessDefinitionEn
 
   protected void addEventSubscriptions(ProcessDefinitionEntity processDefinition) {
     Map<String, EventSubscriptionDeclaration> eventDefinitions = processDefinition.getProperties().get(BpmnProperties.EVENT_SUBSCRIPTION_DECLARATIONS);
-    for (EventSubscriptionDeclaration messageEventDefinition : eventDefinitions.values()) {
-      addEventSubscription(processDefinition, messageEventDefinition);
+    for (EventSubscriptionDeclaration eventDefinition : eventDefinitions.values()) {
+      addEventSubscription(processDefinition, eventDefinition);
     }
   }
 
-  protected void addEventSubscription(ProcessDefinitionEntity processDefinition, EventSubscriptionDeclaration messageEventDefinition) {
-    if (messageEventDefinition.isStartEvent()) {
-      String eventType = messageEventDefinition.getEventType();
+  protected void addEventSubscription(ProcessDefinitionEntity processDefinition, EventSubscriptionDeclaration eventDefinition) {
+    if (eventDefinition.isStartEvent()) {
+      String eventType = eventDefinition.getEventType();
 
       if (eventType.equals(EventType.MESSAGE.name())) {
-        addMessageEventSubscription(messageEventDefinition, processDefinition);
+        addMessageStartEventSubscription(eventDefinition, processDefinition);
       } else if (eventType.equals(EventType.SIGNAL.name())) {
-        addSignalEventSubscription(messageEventDefinition, processDefinition);
+        addSignalStartEventSubscription(eventDefinition, processDefinition);
       }
     }
   }
 
-  protected void addMessageEventSubscription(EventSubscriptionDeclaration messageEventDefinition, ProcessDefinitionEntity processDefinition) {
+  protected void addMessageStartEventSubscription(EventSubscriptionDeclaration messageEventDefinition, ProcessDefinitionEntity processDefinition) {
 
     String tenantId = processDefinition.getTenantId();
 
@@ -318,13 +320,9 @@ public class BpmnDeployer extends AbstractDefinitionDeployer<ProcessDefinitionEn
       throw LOG.messageEventSubscriptionWithSameNameExists(processDefinition.getResourceName(), messageEventDefinition.getEventName());
     }
 
-    EventSubscriptionEntity newSubscription = new EventSubscriptionEntity(EventType.MESSAGE);
-    newSubscription.setEventName(messageEventDefinition.getEventName());
-    newSubscription.setActivityId(messageEventDefinition.getActivityId());
-    newSubscription.setConfiguration(processDefinition.getId());
-    newSubscription.setTenantId(tenantId);
-
+    EventSubscriptionEntity newSubscription = messageEventDefinition.createSubscriptionForStartEvent(processDefinition);
     newSubscription.insert();
+
   }
 
   protected boolean isSameMessageEventSubscriptionAlreadyPresent(EventSubscriptionDeclaration eventSubscription, String tenantId) {
@@ -402,12 +400,8 @@ public class BpmnDeployer extends AbstractDefinitionDeployer<ProcessDefinitionEn
     return subscriptionEntity.getExecutionId() != null;
   }
 
-  protected void addSignalEventSubscription(EventSubscriptionDeclaration signalEventDefinition, ProcessDefinitionEntity processDefinition) {
-    EventSubscriptionEntity newSubscription = new EventSubscriptionEntity(EventType.SIGNAL);
-    newSubscription.setEventName(signalEventDefinition.getEventName());
-    newSubscription.setActivityId(signalEventDefinition.getActivityId());
-    newSubscription.setConfiguration(processDefinition.getId());
-    newSubscription.setTenantId(processDefinition.getTenantId());
+  protected void addSignalStartEventSubscription(EventSubscriptionDeclaration signalEventDefinition, ProcessDefinitionEntity processDefinition) {
+    EventSubscriptionEntity newSubscription = signalEventDefinition.createSubscriptionForStartEvent(processDefinition);
 
     newSubscription.insert();
   }

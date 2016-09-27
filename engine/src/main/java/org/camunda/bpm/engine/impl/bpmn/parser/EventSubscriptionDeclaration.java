@@ -13,18 +13,22 @@
 
 package org.camunda.bpm.engine.impl.bpmn.parser;
 
-import java.io.Serializable;
-import java.util.Collections;
-import java.util.Map;
-
+import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
+import org.camunda.bpm.engine.impl.el.Expression;
+import org.camunda.bpm.engine.impl.el.StartProcessVariableScope;
 import org.camunda.bpm.engine.impl.event.EventType;
 import org.camunda.bpm.engine.impl.jobexecutor.EventSubscriptionJobDeclaration;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmScope;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.LegacyBehavior;
+
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.Map;
 
 
 /**
@@ -36,8 +40,8 @@ public class EventSubscriptionDeclaration implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  protected final String eventName;
   protected final EventType eventType;
+  protected final Expression eventName;
 
   protected boolean async;
   protected String activityId = null;
@@ -46,12 +50,31 @@ public class EventSubscriptionDeclaration implements Serializable {
 
   protected EventSubscriptionJobDeclaration jobDeclaration = null;
 
-  public EventSubscriptionDeclaration(String eventName, EventType eventType) {
-    this.eventName = eventName;
+  public EventSubscriptionDeclaration(Expression eventExpression, EventType eventType) {
+    this.eventName = eventExpression;
     this.eventType = eventType;
   }
 
+  public static Map<String, EventSubscriptionDeclaration> getDeclarationsForScope(PvmScope scope) {
+    if (scope == null) {
+      return Collections.emptyMap();
+    }
+
+    return scope.getProperties().get(BpmnProperties.EVENT_SUBSCRIPTION_DECLARATIONS);
+  }
+
+  /**
+   * Returns the name of the event without evaluating the possible expression that it might contain.
+   */
   public String getEventName() {
+    if (isExpressionAvailable()) {
+      return eventName.getExpressionText();
+    } else {
+      return null;
+    }
+  }
+
+  public Expression getEventNameAsExpression() {
     return eventName;
   }
 
@@ -63,20 +86,20 @@ public class EventSubscriptionDeclaration implements Serializable {
     this.async = async;
   }
 
-  public void setActivityId(String activityId) {
-    this.activityId = activityId;
-  }
-
   public String getActivityId() {
     return activityId;
   }
 
-  public void setEventScopeActivityId(String eventScopeActivityId) {
-    this.eventScopeActivityId = eventScopeActivityId;
+  public void setActivityId(String activityId) {
+    this.activityId = activityId;
   }
 
   public String getEventScopeActivityId() {
     return eventScopeActivityId;
+  }
+
+  public void setEventScopeActivityId(String eventScopeActivityId) {
+    this.eventScopeActivityId = eventScopeActivityId;
   }
 
   public boolean isStartEvent() {
@@ -95,24 +118,26 @@ public class EventSubscriptionDeclaration implements Serializable {
     this.jobDeclaration = jobDeclaration;
   }
 
-  public EventSubscriptionEntity createSubscription(ExecutionEntity execution) {
-    if (isStartEvent()) {
-      return null;
-    } else {
-      return createEventSubscription(execution);
-    }
+  public EventSubscriptionEntity createSubscriptionForStartEvent(ProcessDefinitionEntity processDefinition) {
+    EventSubscriptionEntity eventSubscriptionEntity = new EventSubscriptionEntity(eventType);
+
+    VariableScope scopeForExpression = StartProcessVariableScope.getSharedInstance();
+    String eventName = resolveExpressionOfEventName(scopeForExpression);
+    eventSubscriptionEntity.setEventName(eventName);
+    eventSubscriptionEntity.setActivityId(activityId);
+    eventSubscriptionEntity.setConfiguration(processDefinition.getId());
+    eventSubscriptionEntity.setTenantId(processDefinition.getTenantId());
+
+    return eventSubscriptionEntity;
   }
-
-
 
   /**
    * Creates and inserts a subscription entity depending on the message type of this declaration.
-   * @param execution
-   * @return subscription entity
    */
-  private EventSubscriptionEntity createEventSubscription(ExecutionEntity execution) {
+  public EventSubscriptionEntity createSubscriptionForExecution(ExecutionEntity execution) {
     EventSubscriptionEntity eventSubscriptionEntity = new EventSubscriptionEntity(execution, eventType);
 
+    String eventName = resolveExpressionOfEventName(execution);
     eventSubscriptionEntity.setEventName(eventName);
     if (activityId != null) {
       ActivityImpl activity = execution.getProcessDefinition().findActivity(activityId);
@@ -125,17 +150,22 @@ public class EventSubscriptionDeclaration implements Serializable {
     return eventSubscriptionEntity;
   }
 
-  public void updateSubscription(EventSubscriptionEntity eventSubscription) {
-    eventSubscription.setEventName(eventName);
-    eventSubscription.setActivityId(activityId);
+  protected String resolveExpressionOfEventName(VariableScope scope) {
+    if (isExpressionAvailable()) {
+      return (String) eventName.getValue(scope);
+    } else {
+      return null;
+    }
   }
 
-  public static Map<String, EventSubscriptionDeclaration> getDeclarationsForScope(PvmScope scope) {
-    if (scope == null) {
-      return Collections.emptyMap();
-    }
+  protected boolean isExpressionAvailable() {
+    return eventName != null;
+  }
 
-    return scope.getProperties().get(BpmnProperties.EVENT_SUBSCRIPTION_DECLARATIONS);
+  public void updateSubscription(EventSubscriptionEntity eventSubscription) {
+    String eventName = this.eventName.getExpressionText();
+    eventSubscription.setEventName(eventName);
+    eventSubscription.setActivityId(activityId);
   }
 
 }

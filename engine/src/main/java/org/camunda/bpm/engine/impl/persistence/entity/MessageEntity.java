@@ -42,7 +42,7 @@ public class MessageEntity extends JobEntity {
   @Override
   public String toString() {
     return this.getClass().getSimpleName()
-           + "[repeat" + repeat
+           + "[repeat=" + repeat
            + ", id=" + id
            + ", revision=" + revision
            + ", duedate=" + duedate

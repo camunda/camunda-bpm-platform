@@ -19,8 +19,10 @@ import java.util.Date;
 import java.util.HashMap;
 
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValueProvider;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
+import org.camunda.bpm.engine.impl.el.Expression;
 import org.camunda.bpm.engine.impl.event.EventHandler;
 import org.camunda.bpm.engine.impl.event.EventType;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -43,6 +45,7 @@ public class EventSubscriptionEntity implements EventSubscription, DbEntity, Has
   protected int revision = 1;
   protected String eventType;
   protected String eventName;
+
   protected String executionId;
   protected String processInstanceId;
   protected String activityId;
@@ -252,7 +255,7 @@ public class EventSubscriptionEntity implements EventSubscription, DbEntity, Has
   }
 
   public String getEventName() {
-    return eventName;
+    return this.eventName;
   }
 
   public void setEventName(String eventName) {

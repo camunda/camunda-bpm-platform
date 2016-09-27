@@ -391,7 +391,9 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
 
     // create event subscriptions for the current scope
     for (EventSubscriptionDeclaration declaration : EventSubscriptionDeclaration.getDeclarationsForScope(scope).values()) {
-      declaration.createSubscription(this);
+      if(!declaration.isStartEvent()) {
+        declaration.createSubscriptionForExecution(this);
+      }
     }
   }
 

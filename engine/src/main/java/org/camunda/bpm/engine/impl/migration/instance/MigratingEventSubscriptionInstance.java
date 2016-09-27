@@ -80,7 +80,7 @@ public class MigratingEventSubscriptionInstance implements MigratingInstance, Re
   }
 
   public void create(ExecutionEntity scopeExecution) {
-    eventSubscriptionDeclaration.createSubscription(scopeExecution);
+    eventSubscriptionDeclaration.createSubscriptionForExecution(scopeExecution);
   }
 
   public void remove() {

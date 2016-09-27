@@ -13,6 +13,8 @@
 package org.camunda.bpm.engine.impl.bpmn.parser;
 
 
+import org.camunda.bpm.engine.impl.el.Expression;
+
 /**
  * Implementation of the BPMN 2.0 'message'
  * 
@@ -21,10 +23,9 @@ package org.camunda.bpm.engine.impl.bpmn.parser;
 public class MessageDefinition {
 
   protected String id;
+  private Expression name;
   
-  protected String name;
-  
-  public MessageDefinition(String id, String name) {
+  public MessageDefinition(String id, Expression name) {
     this.id = id;
     this.name = name;
   }
@@ -32,12 +33,13 @@ public class MessageDefinition {
   public String getId() {
     return this.id;
   }
-  
-  public String getName() {
+
+  public Expression getExpression() {
     return name;
   }
-  
-  public void setName(String name) {
-    this.name = name;
+
+  public String getName() {
+    return name.getExpressionText();
   }
+  
 }

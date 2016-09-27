@@ -13,13 +13,6 @@
 
 package org.camunda.bpm.engine.test.bpmn.event.message;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.List;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
@@ -33,6 +26,10 @@ import org.camunda.bpm.engine.test.api.variables.FailingJavaSerializable;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.Variables.SerializationDataFormats;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
+
+import java.io.*;
+import java.util.HashMap;
+import java.util.List;
 
 
 /**
@@ -54,15 +51,15 @@ public class MessageIntermediateEventTest extends PluggableProcessEngineTestCase
 
     String messageName = "newInvoiceMessage";
     Execution execution = runtimeService.createExecutionQuery()
-      .messageEventSubscriptionName(messageName)
-      .singleResult();
+        .messageEventSubscriptionName(messageName)
+        .singleResult();
 
     assertNotNull(execution);
 
     runtimeService.messageEventReceived(messageName, execution.getId());
 
     Task task = taskService.createTaskQuery()
-      .singleResult();
+        .singleResult();
     assertNotNull(task);
     taskService.complete(task.getId());
 
@@ -81,8 +78,8 @@ public class MessageIntermediateEventTest extends PluggableProcessEngineTestCase
 
     String messageName = "newInvoiceMessage";
     List<Execution> executions = runtimeService.createExecutionQuery()
-      .messageEventSubscriptionName(messageName)
-      .list();
+        .messageEventSubscriptionName(messageName)
+        .list();
 
     assertNotNull(executions);
     assertEquals(2, executions.size());
@@ -90,13 +87,13 @@ public class MessageIntermediateEventTest extends PluggableProcessEngineTestCase
     runtimeService.messageEventReceived(messageName, executions.get(0).getId());
 
     Task task = taskService.createTaskQuery()
-            .singleResult();
+        .singleResult();
     assertNull(task);
 
     runtimeService.messageEventReceived(messageName, executions.get(1).getId());
 
     task = taskService.createTaskQuery()
-      .singleResult();
+        .singleResult();
     assertNotNull(task);
 
     taskService.complete(task.getId());
@@ -106,8 +103,8 @@ public class MessageIntermediateEventTest extends PluggableProcessEngineTestCase
 
     // deploy version 1
     repositoryService.createDeployment()
-      .addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/message/MessageIntermediateEventTest.testSingleIntermediateMessageEvent.bpmn20.xml")
-      .deploy();
+        .addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/message/MessageIntermediateEventTest.testSingleIntermediateMessageEvent.bpmn20.xml")
+        .deploy();
     // now there is one process deployed
     assertEquals(1, repositoryService.createProcessDefinitionQuery().count());
 
@@ -120,8 +117,8 @@ public class MessageIntermediateEventTest extends PluggableProcessEngineTestCase
 
     // deploy version 2
     repositoryService.createDeployment()
-      .addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/message/MessageIntermediateEventTest.testSingleIntermediateMessageEvent.bpmn20.xml")
-      .deploy();
+        .addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/message/MessageIntermediateEventTest.testSingleIntermediateMessageEvent.bpmn20.xml")
+        .deploy();
 
     // now there are two versions deployed:
     assertEquals(2, repositoryService.createProcessDefinitionQuery().count());
@@ -142,11 +139,11 @@ public class MessageIntermediateEventTest extends PluggableProcessEngineTestCase
   public void testEmptyMessageNameFails() {
     try {
       repositoryService
-        .createDeployment()
-        .addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/message/MessageIntermediateEventTest.testEmptyMessageNameFails.bpmn20.xml")
-        .deploy();
+          .createDeployment()
+          .addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/message/MessageIntermediateEventTest.testEmptyMessageNameFails.bpmn20.xml")
+          .deploy();
       fail("exception expected");
-    }catch (ProcessEngineException e) {
+    } catch (ProcessEngineException e) {
       assertTrue(e.getMessage().contains("Cannot have a message event subscription with an empty or missing name"));
     }
   }
@@ -175,15 +172,15 @@ public class MessageIntermediateEventTest extends PluggableProcessEngineTestCase
 
     // but it can be set as a variable when delivering a message:
     runtimeService
-      .messageEventReceived(
-          "newInvoiceMessage",
-          messageEventSubscription.getExecutionId(),
-          Variables.createVariables().putValueTyped("var",
-            Variables
-            .serializedObjectValue(serializedObject)
-            .objectTypeName(FailingJavaSerializable.class.getName())
-            .serializationDataFormat(SerializationDataFormats.JAVA)
-            .create()));
+        .messageEventReceived(
+            "newInvoiceMessage",
+            messageEventSubscription.getExecutionId(),
+            Variables.createVariables().putValueTyped("var",
+                Variables
+                    .serializedObjectValue(serializedObject)
+                    .objectTypeName(FailingJavaSerializable.class.getName())
+                    .serializationDataFormat(SerializationDataFormats.JAVA)
+                    .create()));
 
     // then
     ObjectValue variableTyped = runtimeService.getVariableTyped(processInstance.getId(), "var", false);
@@ -192,6 +189,34 @@ public class MessageIntermediateEventTest extends PluggableProcessEngineTestCase
     assertEquals(serializedObject, variableTyped.getValueSerialized());
     assertEquals(FailingJavaSerializable.class.getName(), variableTyped.getObjectTypeName());
     assertEquals(SerializationDataFormats.JAVA.getName(), variableTyped.getSerializationDataFormat());
+  }
+
+  @Deployment
+  public void testExpressionInSingleIntermediateMessageEvent() {
+
+    // given
+    HashMap<String, Object> variables = new HashMap<String, Object>();
+    variables.put("foo", "bar");
+
+    // when
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("process", variables);
+    List<String> activeActivityIds = runtimeService.getActiveActivityIds(pi.getId());
+    assertNotNull(activeActivityIds);
+    assertEquals(1, activeActivityIds.size());
+    assertTrue(activeActivityIds.contains("messageCatch"));
+
+    // then
+    String messageName = "newInvoiceMessage-bar";
+    Execution execution = runtimeService.createExecutionQuery()
+        .messageEventSubscriptionName(messageName)
+        .singleResult();
+    assertNotNull(execution);
+
+    runtimeService.messageEventReceived(messageName, execution.getId());
+    Task task = taskService.createTaskQuery()
+        .singleResult();
+    assertNotNull(task);
+    taskService.complete(task.getId());
   }
 
 }

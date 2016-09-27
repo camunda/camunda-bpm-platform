@@ -12,13 +12,14 @@
  */
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
-import java.util.List;
-
 import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.el.Expression;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionManager;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
+
+import java.util.List;
 
 
 /**
@@ -35,7 +36,9 @@ public class SignalEndEventActivityBehavior extends FlowNodeActivityBehavior {
   @Override
   public void execute(ActivityExecution execution) throws Exception {
 
-    List<EventSubscriptionEntity> signalEventSubscriptions = findSignalEventSubscriptions(signalDefinition.getEventName(), execution.getTenantId());
+    String eventName = resolveExpressionOfEventName(signalDefinition.getEventNameAsExpression(), execution);
+    List<EventSubscriptionEntity> signalEventSubscriptions =
+        findSignalEventSubscriptions(eventName, execution.getTenantId());
 
     for (EventSubscriptionEntity signalEventSubscription : signalEventSubscriptions) {
       signalEventSubscription.eventReceived(null, signalDefinition.isAsync());
@@ -44,10 +47,22 @@ public class SignalEndEventActivityBehavior extends FlowNodeActivityBehavior {
     leave(execution);
   }
 
+  protected String resolveExpressionOfEventName(Expression eventNameAsExpression, ActivityExecution execution) {
+    if (isExpressionAvailable(eventNameAsExpression)) {
+      return (String) eventNameAsExpression.getValue(execution);
+    } else {
+      return null;
+    }
+  }
+
+  protected boolean isExpressionAvailable(Expression expression) {
+    return expression != null;
+  }
+
   protected List<EventSubscriptionEntity> findSignalEventSubscriptions(String signalName, String tenantId) {
     EventSubscriptionManager eventSubscriptionManager = Context.getCommandContext().getEventSubscriptionManager();
 
-    if(tenantId != null) {
+    if (tenantId != null) {
       return eventSubscriptionManager
           .findSignalEventSubscriptionsByEventNameAndTenantIdIncludeWithoutTenantId(signalName, tenantId);
 

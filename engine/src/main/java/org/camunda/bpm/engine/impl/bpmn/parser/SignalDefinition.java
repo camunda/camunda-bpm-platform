@@ -13,6 +13,8 @@
 
 package org.camunda.bpm.engine.impl.bpmn.parser;
 
+import org.camunda.bpm.engine.impl.el.Expression;
+
 import java.io.Serializable;
 
 /**
@@ -25,7 +27,7 @@ public class SignalDefinition implements Serializable {
   private static final long serialVersionUID = 1L;
     
   private String id;
-  private String name;
+  private Expression name;
 
     
   public String getId() {
@@ -37,11 +39,14 @@ public class SignalDefinition implements Serializable {
   }
 
   public String getName() {
+    return name.getExpressionText();
+  }
+
+  public Expression getExpression() {
     return name;
   }
 
-  public void setName(String name) {
+  public void setExpression(Expression name) {
     this.name = name;
   }
-  
 }
