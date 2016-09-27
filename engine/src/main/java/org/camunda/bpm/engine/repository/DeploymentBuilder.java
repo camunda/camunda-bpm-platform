@@ -24,6 +24,8 @@ import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.bpm.model.cmmn.CmmnModelInstance;
+import org.camunda.bpm.model.dmn.DmnModelInstance;
 
 /**
  * Builder for creating new deployments.
@@ -45,6 +47,8 @@ public interface DeploymentBuilder {
   DeploymentBuilder addClasspathResource(String resource);
   DeploymentBuilder addString(String resourceName, String text);
   DeploymentBuilder addModelInstance(String resourceName, BpmnModelInstance modelInstance);
+  DeploymentBuilder addModelInstance(String resourceName, DmnModelInstance modelInstance);
+  DeploymentBuilder addModelInstance(String resourceName, CmmnModelInstance modelInstance);
 
   DeploymentBuilder addZipInputStream(ZipInputStream zipInputStream);
 
