@@ -20,6 +20,7 @@ import org.apache.directory.server.core.partition.impl.btree.jdbm.JdbmIndex;
 import org.apache.directory.server.core.partition.impl.btree.jdbm.JdbmPartition;
 import org.apache.directory.server.ldap.LdapServer;
 import org.apache.directory.server.protocol.shared.transport.TcpTransport;
+import org.apache.directory.server.xdbm.Index;
 import org.apache.directory.api.ldap.model.name.Dn;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 
@@ -47,6 +48,8 @@ import org.apache.directory.server.core.api.schema.SchemaPartition;
 import org.apache.directory.server.core.partition.ldif.LdifPartition;
 import org.apache.directory.server.i18n.I18n;
 
+import org.apache.commons.io.FileUtils;
+
 /**
  * <p>
  * LDAP test setup using apache directory</p>
@@ -69,12 +72,8 @@ public class LdapTestEnvironment {
   public LdapTestEnvironment() {
   }
 
-  protected void initializeDirectory() throws Exception {
-    initializeDirectory(null);
-  }
-
   /**
-   * initialize the schema manager and add the schema partition to diectory
+   * initialize the schema manager and add the schema partition to directory
    * service
    *
    * @throws Exception if the schema LDIF files are not found on the classpath
@@ -86,7 +85,7 @@ public class LdapTestEnvironment {
 
     // Extract the schema on disk (a brand new one) and load the registries
     if (schemaPartitionDirectory.exists()) {
-      System.out.println("schema partition already exists, skipping schema extraction");
+      LOG.log(Level.INFO, "schema partition already exists, skipping schema extraction");
     } else {
       SchemaLdifExtractor extractor = new DefaultSchemaLdifExtractor(instanceLayout.getPartitionsDirectory());
       extractor.extractOrCopy();
@@ -122,15 +121,12 @@ public class LdapTestEnvironment {
    * Initialize the server. It creates the partition, adds the index, and
    * injects the context entries for the created partitions.
    *
-   * @param workingDirectory the directory to be used for storing the data
    * @throws Exception if there were some problems while initializing the system
    */
-  protected void initializeDirectory(File workingDirectory) throws Exception {
+  protected void initializeDirectory() throws Exception {
 
-    if (null == workingDirectory) {
-      workingDirectory = this.workingDirectory;
-      workingDirectory.mkdirs();
-    }
+    workingDirectory.mkdirs();
+
     service = new DefaultDirectoryService();
     InstanceLayout il = new InstanceLayout(workingDirectory);
     service.setInstanceLayout(il);
@@ -158,10 +154,6 @@ public class LdapTestEnvironment {
     // Disable the ChangeLog system
     service.getChangeLog().setEnabled(false);
     service.setDenormalizeOpAttrsEnabled(true);
-
-
-    Properties properties = loadTestProperties();
-    String port = properties.getProperty("ldap.server.port");
 
     Partition camundaPartition = addPartition("camunda", BASE_DN, service.getDnFactory());
     addIndex(camundaPartition, "objectClass", "ou", "uid");
@@ -302,10 +294,10 @@ public class LdapTestEnvironment {
    */
   protected void addIndex(Partition partition, String... attrs) {
     // Index some attributes on the apache partition
-    Set indexedAttributes = new HashSet();
+    Set<Index<?, String>> indexedAttributes = new HashSet<Index<?, String>>();
 
     for (String attribute : attrs) {
-      indexedAttributes.add(new JdbmIndex(attribute, false));
+      indexedAttributes.add(new JdbmIndex<String>(attribute, false));
     }
 
     ((JdbmPartition) partition).setIndexedAttributes(indexedAttributes);
@@ -315,6 +307,9 @@ public class LdapTestEnvironment {
     try {
       ldapService.stop();
       service.shutdown();
+      if (workingDirectory.exists()) {
+        FileUtils.deleteDirectory(workingDirectory);
+      }
     } catch (Exception e) {
       LOG.log(Level.SEVERE, "exception while shutting down ldap", e);
     }

@@ -372,7 +372,7 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
   public List<Group> findGroupByQueryCriteria(LdapGroupQuery query) {
     ensureContextInitialized();
 
-    String groupBaseDn = composeDn(ldapConfiguration.getGroupSearchBase(),ldapConfiguration.getBaseDn());
+    String groupBaseDn = composeDn(ldapConfiguration.getGroupSearchBase(), ldapConfiguration.getBaseDn());
 
     if(ldapConfiguration.isSortControlSupported()) {
       applyRequestControls(query);
@@ -513,8 +513,7 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
     return group;
   }
 
-  @SuppressWarnings("rawtypes")
-  protected void applyRequestControls(AbstractQuery query) {
+  protected void applyRequestControls(AbstractQuery<?, ?> query) {
 
     try {
       List<Control> controls = new ArrayList<Control>();

@@ -355,14 +355,6 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
     return false;
   }
 
-  @Deprecated
-  private static class InteruptTask extends InterruptTask {
-    public InteruptTask(Thread thread) {
-      super(thread);
-    }
-  }
-
-
   private static class InterruptTask extends TimerTask {
     protected boolean timeLimitExceeded = false;
     protected Thread thread;

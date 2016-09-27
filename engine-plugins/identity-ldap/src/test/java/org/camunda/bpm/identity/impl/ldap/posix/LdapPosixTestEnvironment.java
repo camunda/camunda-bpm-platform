@@ -36,13 +36,13 @@ public class LdapPosixTestEnvironment extends LdapTestEnvironment {
 
   public LdapPosixTestEnvironment() {
     super();
+    // overwrite the name of the directory to use
+    workingDirectory = new File(System.getProperty("java.io.tmpdir") + "/ldap-posix-work");
   }
 
   @Override
   public void init() throws Exception {
-    File workingDir = new File(System.getProperty("java.io.tmpdir") + "/ldap-posix-work");
-    workingDir.mkdirs();
-    initializeDirectory(workingDir);
+    initializeDirectory();
 
     // Enable POSIX groups in ApacheDS
     Dn nis = new Dn("cn=nis,ou=schema");
@@ -56,14 +56,14 @@ public class LdapPosixTestEnvironment extends LdapTestEnvironment {
         modifications.add(new DefaultModification(ModificationOperation.REPLACE_ATTRIBUTE, nisDisabled));
         service.getAdminSession().modify(nis, modifications);
         service.shutdown();
-        initializeDirectory(workingDir); // Note: This instantiates service again for schema modifications to take effect.
+        initializeDirectory(); // Note: This instantiates service again for schema modifications to take effect.
       }
     }
 
     startServer();
 
     createGroup("office-berlin");
-    String dnDaniel = createUserUid("daniel", "office-berlin", "Daniel", "Meyer", "daniel@camunda.org");
+    createUserUid("daniel", "office-berlin", "Daniel", "Meyer", "daniel@camunda.org");
 
     createGroup("people");
     createUserUid("ruecker", "people", "Bernd", "Ruecker", "ruecker@camunda.org");
@@ -86,7 +86,6 @@ public class LdapPosixTestEnvironment extends LdapTestEnvironment {
         entry.add("memberUid", memberUid);
       }
       service.getAdminSession().add(entry);
-      System.out.println("created entry: " + dn.getNormName());
     }
   }
 }

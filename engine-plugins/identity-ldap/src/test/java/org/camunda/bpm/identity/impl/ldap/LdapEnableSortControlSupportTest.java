@@ -20,7 +20,6 @@ import java.util.Comparator;
 import java.util.List;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
-import static junit.framework.TestCase.assertEquals;
 
 /**
  * Represents a test case where the sortControlSupport property is enabled.
