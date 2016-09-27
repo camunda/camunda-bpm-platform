@@ -101,7 +101,7 @@ public class EventSubscriptionQueryImpl
 
   public EventSubscriptionQueryImpl eventType(String eventType) {
     ensureNotNull("event type", eventType);
-    this.eventType = eventType.toUpperCase();
+    this.eventType = eventType;
     return this;
   }
 

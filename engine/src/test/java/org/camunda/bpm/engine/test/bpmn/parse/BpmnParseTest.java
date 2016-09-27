@@ -501,6 +501,21 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
     assertEquals(EventSubProcessStartEventActivityBehavior.class, escalationStartEvent.getActivityBehavior().getClass());
   }
 
+
+  public void parseInvalidConditionalEvent(String processDefinitionResource) {
+    try {
+      String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), processDefinitionResource);
+      repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
+      fail("Exception expected: Process definition could be parsed, conditional event definition contains no condition.");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("Conditional event must contain an expression for evaluation.", e.getMessage());
+    }
+  }
+
+  public void testParseInvalidConditionalBoundaryEvent() {
+    parseInvalidConditionalEvent("testParseInvalidConditionalBoundaryEvent");
+  }
+
   @Deployment
   public void testParseConditionalBoundaryEvent() {
     ActivityImpl conditionalBoundaryEvent = findActivityInDeployedProcessDefinition("conditionalBoundaryEvent");
@@ -509,12 +524,20 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
     assertEquals(BoundaryEventActivityBehavior.class, conditionalBoundaryEvent.getActivityBehavior().getClass());
   }
 
+  public void testParseInvalidIntermediateConditionalEvent() {
+    parseInvalidConditionalEvent("testParseInvalidIntermediateConditionalEvent");
+  }
+
   @Deployment
   public void testParseIntermediateConditionalEvent() {
     ActivityImpl intermediateConditionalEvent = findActivityInDeployedProcessDefinition("intermediateConditionalEvent");
 
     assertEquals(ActivityTypes.INTERMEDIATE_EVENT_CONDITIONAL, intermediateConditionalEvent.getProperties().get(BpmnProperties.TYPE));
     assertEquals(IntermediateConditionalEventBehavior.class, intermediateConditionalEvent.getActivityBehavior().getClass());
+  }
+
+  public void testParseInvalidEventSubprocessConditionalStartEvent() {
+    parseInvalidConditionalEvent("testParseInvalidEventSubprocessConditionalStartEvent");
   }
 
   @Deployment

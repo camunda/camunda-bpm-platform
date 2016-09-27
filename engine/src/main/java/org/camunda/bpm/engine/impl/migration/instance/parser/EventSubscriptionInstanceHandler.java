@@ -12,9 +12,10 @@
  */
 package org.camunda.bpm.engine.impl.migration.instance.parser;
 
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -34,7 +35,7 @@ import org.camunda.bpm.engine.migration.MigrationInstruction;
  */
 public class EventSubscriptionInstanceHandler implements MigratingDependentInstanceParseHandler<MigratingActivityInstance, List<EventSubscriptionEntity>> {
 
-  public static final Set<EventType> SUPPORTED_EVENT_TYPES = EnumSet.of(EventType.MESSAGE, EventType.SIGNAL);
+  public static final Set<String> SUPPORTED_EVENT_TYPES = new HashSet<String>(Arrays.asList(EventType.MESSAGE.name(), EventType.SIGNAL.name()));
 
   @Override
   public void handle(MigratingInstanceParseContext parseContext, MigratingActivityInstance owningInstance, List<EventSubscriptionEntity> elements) {
@@ -42,7 +43,7 @@ public class EventSubscriptionInstanceHandler implements MigratingDependentInsta
     Map<String, EventSubscriptionDeclaration> targetDeclarations = getDeclarationsByTriggeringActivity(owningInstance.getTargetScope());
 
     for (EventSubscriptionEntity eventSubscription : elements) {
-      if (!getSupportedEventTypes().contains(EventType.valueOf(eventSubscription.getEventType()))) {
+      if (!getSupportedEventTypes().contains(eventSubscription.getEventType())) {
         // ignore unsupported event subscriptions
         continue;
       }
@@ -72,7 +73,7 @@ public class EventSubscriptionInstanceHandler implements MigratingDependentInsta
     }
   }
 
-  protected Set<EventType> getSupportedEventTypes() {
+  protected Set<String> getSupportedEventTypes() {
     return SUPPORTED_EVENT_TYPES;
   }
 

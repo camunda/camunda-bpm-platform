@@ -16,9 +16,28 @@
 package org.camunda.bpm.engine.impl.event;
 
 /**
+ * Defines the existing event types, on which the subscription can be done.
+ *
+ * Since the the event type for message and signal are historically lower case
+ * the enum variant can't be used, so we have to reimplement an enum like class.
+ * That is done so we can restrict the event types to only the defined ones.
  *
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
-public enum EventType {
-  MESSAGE, SIGNAL, COMPENSATE, CONDITONAL
+public final class EventType {
+
+  public static final EventType MESSAGE = new EventType("message");
+  public static final EventType SIGNAL = new EventType("signal");
+  public static final EventType COMPENSATE = new EventType("compensate");
+  public static final EventType CONDITONAL = new EventType("conditional");
+
+  private final String name;
+
+  private EventType(String name) {
+    this.name = name;
+  }
+
+  public String name() {
+    return name;
+  }
 }

@@ -33,8 +33,8 @@ public class ConditionalEventDefinition extends EventSubscriptionDeclaration imp
   protected final Condition conditionalExpression;
   protected boolean interrupting;
 
-  public ConditionalEventDefinition(Condition conditionalExpression, String eventName, String activityId) {
-    super(eventName, EventType.CONDITONAL);
+  public ConditionalEventDefinition(Condition conditionalExpression, String activityId) {
+    super(null, EventType.CONDITONAL);
     this.activityId = activityId;
     this.conditionalExpression = conditionalExpression;
   }

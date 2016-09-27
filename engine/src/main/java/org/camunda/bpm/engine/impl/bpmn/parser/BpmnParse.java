@@ -821,7 +821,7 @@ public class BpmnParse extends Parse {
         addError("Invalid reference targetRef '" + targetRef + "' of association element ", associationElement);
       } else {
 
-        if (sourceActivity != null && ActivityTypes.BOUNDARY_COMPENSATION.equals(sourceActivity.getProperty(TYPE))) {
+        if (sourceActivity != null && ActivityTypes.BOUNDARY_COMPENSATION.equals(sourceActivity.getProperty(BpmnProperties.TYPE.getName()))) {
 
           if (targetActivity == null && compensationHandlers.containsKey(targetRef)) {
             targetActivity = parseCompensationHandlerForCompensationBoundaryEvent(parentScope, sourceActivity, targetRef, compensationHandlers);
@@ -925,7 +925,7 @@ public class BpmnParse extends Parse {
     List<String> exclusiveStartEventTypes = Arrays.asList("startEvent", "startTimerEvent");
 
     for (ActivityImpl activityImpl : startEventActivities) {
-      if (exclusiveStartEventTypes.contains(activityImpl.getProperty(TYPE))) {
+      if (exclusiveStartEventTypes.contains(activityImpl.getProperty(BpmnProperties.TYPE.getName()))) {
         if (initial == null) {
           initial = activityImpl;
         } else {
@@ -1614,7 +1614,7 @@ public class BpmnParse extends Parse {
 
     ScopeImpl hostActivity = activity.getEventScope();
     for (ActivityImpl sibling : activity.getFlowScope().getActivities()) {
-      if (sibling.getProperty(TYPE).equals("compensationBoundaryCatch") && sibling.getEventScope().equals(hostActivity) && sibling != activity) {
+      if (sibling.getProperty(BpmnProperties.TYPE.getName()).equals("compensationBoundaryCatch") && sibling.getEventScope().equals(hostActivity) && sibling != activity) {
         addError("multiple boundary events with compensateEventDefinition not supported on same activity", compensateEventDefinition);
       }
     }
@@ -1632,13 +1632,13 @@ public class BpmnParse extends Parse {
       transaction = transaction.getActivities().get(0);
     }
 
-    if (!"transaction".equals(transaction.getProperty(TYPE))) {
+    if (!"transaction".equals(transaction.getProperty(BpmnProperties.TYPE.getName()))) {
       addError("boundary event with cancelEventDefinition only supported on transaction subprocesses", cancelEventDefinition);
     }
 
     // ensure there is only one cancel boundary event
     for (ActivityImpl sibling : activity.getFlowScope().getActivities()) {
-      if ("cancelBoundaryCatch".equals(sibling.getProperty(TYPE)) && sibling != activity && sibling.getEventScope() == transaction) {
+      if ("cancelBoundaryCatch".equals(sibling.getProperty(BpmnProperties.TYPE.getName())) && sibling != activity && sibling.getEventScope() == transaction) {
         addError("multiple boundary events with cancelEventDefinition not supported on same transaction subprocess", cancelEventDefinition);
       }
     }
@@ -2871,7 +2871,7 @@ public class BpmnParse extends Parse {
           }
         }
       } else if (cancelEventDefinition != null) {
-        if (scope.getProperty(TYPE) == null || !scope.getProperty(TYPE).equals("transaction")) {
+        if (scope.getProperty(BpmnProperties.TYPE.getName()) == null || !scope.getProperty(BpmnProperties.TYPE.getName()).equals("transaction")) {
           addError("end event with cancelEventDefinition only supported inside transaction subprocess", cancelEventDefinition);
         } else {
           activity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.END_EVENT_CANCEL);
@@ -3482,7 +3482,7 @@ public class BpmnParse extends Parse {
     Element conditionExprElement = element.element(CONDITION);
     if (conditionExprElement != null) {
       Condition condition = parseConditionExpression(conditionExprElement);
-      conditionalEventDefinition = new ConditionalEventDefinition(condition, conditionalActivity.getName(), conditionalActivity.getId());
+      conditionalEventDefinition = new ConditionalEventDefinition(condition, conditionalActivity.getId());
     } else {
       addError("Conditional event must contain an expression for evaluation.", element);
     }

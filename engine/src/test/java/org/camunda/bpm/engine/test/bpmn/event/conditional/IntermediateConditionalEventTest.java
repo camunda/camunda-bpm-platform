@@ -28,7 +28,6 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -43,11 +42,6 @@ public class IntermediateConditionalEventTest {
 
   private RuntimeService runtimeService;
   private TaskService taskService;
-
-  @BeforeClass
-  public static void setUp() throws Exception {
-    org.h2.tools.Server.createWebServer("-web").start();
-  }
 
   @Before
   public void init() {
