@@ -91,9 +91,7 @@ var DirectiveController = ['$scope', '$compile', 'Views', function( $scope,   $c
 /*------------------- Decorate diagram ---------------------*/
 
   function decorateDiagram(bpmnElements) {
-    angular.forEach(bpmnElements, function(bpmnElement) {
-      decorateBpmnElement(bpmnElement);
-    });
+    angular.forEach(bpmnElements, decorateBpmnElement);
   }
 
   function decorateBpmnElement(bpmnElement) {

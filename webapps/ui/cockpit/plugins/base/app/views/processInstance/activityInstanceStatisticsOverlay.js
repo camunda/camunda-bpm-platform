@@ -12,11 +12,14 @@ var Configuration = function PluginConfiguration(ViewsProvider) {
     template: template,
     controller: [
       '$scope',
-      function($scope) {
+      'Loaders',
+      function($scope, Loaders) {
         var bpmnElement = $scope.bpmnElement,
             processData = $scope.processData.newChild($scope);
 
         var multiInstance;
+
+        var stopLoading = Loaders.startLoading();
 
         $scope.activityInstanceStatistics = processData.observe([ 'activityIdToInstancesMap', 'activityIdToIncidentsMap'],
           function(activityIdToInstancesMap, activityIdToIncidentsMap) {
@@ -24,6 +27,8 @@ var Configuration = function PluginConfiguration(ViewsProvider) {
             var activityId = bpmnElement.id,
                 instances = angular.copy(activityIdToInstancesMap[activityId] || []),
                 incidents = angular.copy(activityIdToIncidentsMap[activityId] || []);
+
+            stopLoading();
 
             multiInstance = activityIdToInstancesMap[activityId+'#multiInstanceBody'];
 

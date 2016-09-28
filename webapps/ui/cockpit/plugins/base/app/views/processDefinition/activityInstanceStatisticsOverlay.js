@@ -5,17 +5,20 @@ var fs = require('fs');
 var template = fs.readFileSync(__dirname + '/activity-instance-statistics-overlay.html', 'utf8');
 var angular = require('angular');
 
-module.exports = [ 'ViewsProvider', function(ViewsProvider) {
+module.exports = ['ViewsProvider',  function(ViewsProvider) {
 
   ViewsProvider.registerDefaultView('cockpit.processDefinition.diagram.overlay', {
     id: 'activity-instance-statistics-overlay',
     template: template,
     controller: [
       '$scope',
-      function($scope) {
+      'Loaders',
+      function($scope, Loaders) {
 
         var bpmnElement = $scope.bpmnElement,
             processData = $scope.processData.newChild($scope);
+
+        var stopLoading = Loaders.startLoading();
 
         processData.provide('activityInstance', ['activityInstanceStatistics', function(activityInstanceStatistics) {
           for (var i = 0; i < activityInstanceStatistics.length; i++) {
@@ -42,12 +45,15 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
             bpmnElement.isSelectable = true;
           }
 
+          stopLoading();
           $scope.activityInstance = activityInstance;
         });
         $scope.activityInstanceMI = processData.observe('activityInstanceMI', function(activityInstance) {
           if (activityInstance) {
             bpmnElement.isSelectable = true;
           }
+
+          stopLoading();
           $scope.activityInstanceMI = activityInstance;
         });
 
