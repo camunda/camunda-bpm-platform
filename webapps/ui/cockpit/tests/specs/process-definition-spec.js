@@ -133,6 +133,21 @@ describe('Cockpit Process Definition Spec', function() {
       // then
       expect(definitionPage.diagram.isActivitySelected('UserTask_1')).to.eventually.be.true;
     });
+
+    it('should show loading indicator when loading status is set to LOADING', function() {
+      browser.executeScript('(function() {' +
+        'var scope = angular.element(document.querySelector("[diagram-statistics-loader]")).scope();' +
+        'scope.loadingStatus = "LOADING";' +
+        'scope.$digest();' +
+        '})();'
+      );
+
+      expect(
+        element(
+          by.css('[diagram-statistics-loader] .glyphicon-refresh')
+        ).isDisplayed()
+      ).to.eventually.be.eql(true);
+    });
   });
 
   describe('multi tenancy', function() {
@@ -240,6 +255,6 @@ describe('Cockpit Process Definition Spec', function() {
         expect(definitionPage.information.versionTag()).to.eventually.contain('null');
       });
     });
-  })
+  });
 
 });
