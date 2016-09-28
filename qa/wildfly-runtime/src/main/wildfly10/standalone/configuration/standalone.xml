@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 
-<server xmlns="urn:jboss:domain:4.0">
+<server xmlns="urn:jboss:domain:4.2">
     <extensions>
         <extension module="org.jboss.as.clustering.infinispan"/>
         <extension module="org.jboss.as.connector"/>
@@ -42,6 +42,11 @@
                 </authorization>
             </security-realm>
             <security-realm name="ApplicationRealm">
+                <server-identities>
+                    <ssl>
+                        <keystore path="application.keystore" relative-to="jboss.server.config.dir" keystore-password="password" alias="server" key-password="password" generate-self-signed-certificate-host="localhost"/>
+                    </ssl>
+                </server-identities>
                 <authentication>
                     <local default-user="$local" allowed-users="*" skip-group-loading="true"/>
                     <properties path="application-users.properties" relative-to="jboss.server.config.dir"/>
@@ -240,6 +245,9 @@
                     <transaction mode="BATCH"/>
                     <file-store passivation="false" purge="false"/>
                 </local-cache>
+                <local-cache name="concurrent">
+                    <file-store passivation="true" purge="false"/>
+                </local-cache>
             </cache-container>
             <cache-container name="ejb" aliases="sfsb" default-cache="passivation" module="org.wildfly.clustering.ejb.infinispan">
                 <local-cache name="passivation">
@@ -359,10 +367,11 @@
             </core-environment>
             <recovery-environment socket-binding="txn-recovery-environment" status-socket-binding="txn-status-manager"/>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:undertow:3.0">
+        <subsystem xmlns="urn:jboss:domain:undertow:3.1">
             <buffer-cache name="default"/>
             <server name="default-server">
-                <http-listener name="default" socket-binding="http" redirect-socket="https"/>
+                <http-listener name="default" socket-binding="http" redirect-socket="https" enable-http2="true"/>
+                <https-listener name="https" socket-binding="https" security-realm="ApplicationRealm" enable-http2="true"/>
                 <host name="default-host" alias="localhost">
                     <location name="/" handler="welcome-content"/>
                     <filter-ref name="server-header"/>
@@ -423,11 +432,11 @@
                         <!-- LDAP CONFIGURATION -->
                         <!-- Uncomment this section in order to enable LDAP support for this process engine -->
                         <!-- Adjust configuration, see ( http://docs.camunda.org/latest/guides/user-guide/#process-engine-identity-service-the-ldap-identity-service ) -->
-                        <!-- 
+                        <!--
                             <plugin>
                                 <class>org.camunda.bpm.identity.impl.ldap.plugin.LdapIdentityProviderPlugin</class>
-                                <properties>
 
+                                <properties>
                                     <property name="serverUrl">ldaps://localhost:4334/</property>
                                     <property name="acceptUntrustedCertificates">false</property>
                                     <property name="managerDn">uid=jonny,ou=office-berlin,o=camunda,c=org</property>
@@ -450,14 +459,14 @@
                                     <property name="groupNameAttribute">cn</property>
 
                                     <property name="groupMemberAttribute">member</property>
-
+                                    <property name="sortControlSupported">false</property>
                                 </properties>
                             </plugin>
                         -->
 
                         <!-- LDAP CONFIGURATION -->
                         <!-- The following plugin allows you to grant administrator authorizations to an existing LDAP user -->
-                        <!-- 
+                        <!--
                             <plugin>
                                 <class>org.camunda.bpm.engine.impl.plugin.AdministratorAuthorizationPlugin</class>
                                 <properties>

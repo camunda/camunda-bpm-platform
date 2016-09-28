@@ -113,6 +113,12 @@ In order to configure the build, compose the profiles for runtime container, tes
 mvn clean install -Pengine-integration,jboss,h2
 ```
 
+For using wildfly as the runtime container you have to additionally specify the wildfly version, either wildfly8 or wildfly10. Example:
+
+```
+mvn clean install -Pengine-integration,wildfly,wildfly10,h2
+```
+
 If you want to test against an XA database, just add the corresponding XA database profile to the mvn cmdline above. Example:
 
 ```
