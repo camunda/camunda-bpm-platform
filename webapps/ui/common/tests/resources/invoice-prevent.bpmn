@@ -4,15 +4,15 @@
     <bpmn:startEvent id="StartEvent_1">
       <bpmn:outgoing>SequenceFlow_00ola3c</bpmn:outgoing>
     </bpmn:startEvent>
-    <bpmn:userTask id="Task_1dh4q2k" camunda:formKey="embedded:deployment:invoice-prevent.html">
+    <bpmn:userTask id="Prevent_Task" camunda:formKey="embedded:deployment:invoice-prevent.html">
       <bpmn:incoming>SequenceFlow_00ola3c</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0uescr5</bpmn:outgoing>
     </bpmn:userTask>
     <bpmn:endEvent id="EndEvent_0jvmquf">
       <bpmn:incoming>SequenceFlow_0uescr5</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:sequenceFlow id="SequenceFlow_00ola3c" sourceRef="StartEvent_1" targetRef="Task_1dh4q2k" />
-    <bpmn:sequenceFlow id="SequenceFlow_0uescr5" sourceRef="Task_1dh4q2k" targetRef="EndEvent_0jvmquf" />
+    <bpmn:sequenceFlow id="SequenceFlow_00ola3c" sourceRef="StartEvent_1" targetRef="Prevent_Task" />
+    <bpmn:sequenceFlow id="SequenceFlow_0uescr5" sourceRef="Prevent_Task" targetRef="EndEvent_0jvmquf" />
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="invoice">
@@ -22,7 +22,7 @@
           <dc:Bounds x="146" y="258" width="90" height="20" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="UserTask_0tqmcm6_di" bpmnElement="Task_1dh4q2k">
+      <bpmndi:BPMNShape id="UserTask_0tqmcm6_di" bpmnElement="Prevent_Task">
         <dc:Bounds x="327" y="200" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="EndEvent_0jvmquf_di" bpmnElement="EndEvent_0jvmquf">

@@ -114,7 +114,7 @@ module.exports = {
   setup2: combine(fragment3),
   setup3: combine(fragment1, fragment4),
   setup4: combine(fragment1, fragment5),
-  setup5: combine(fragment6),
+  setup5: combine(fragment1, fragment6),
   multiTenancySetup: combine(fragment1, multiTenancyFragment)
 
 };
