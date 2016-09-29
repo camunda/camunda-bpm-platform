@@ -20,16 +20,13 @@ import java.util.concurrent.ConcurrentMap;
 /**
  * A thread-safe LRU {@link Cache} with a fixed capacity. If the cache reaches
  * the capacity, it discards the least recently used entry first.
- *
+ * <p>
  * *Note*: The consistency of the keys queue with the keys in the cache is not ensured! This means, the keys queue
  * can contain duplicates of the same key and not all the keys of the queue are necessarily in the cache.
- * Please also note, that this can lead to lower capacity. However, all the keys of the cache are at least
- * once contained in the keys queue.
+ * However, all the keys of the cache are at least once contained in the keys queue.
  *
- * @param <K>
- *          the type of keys
- * @param <V>
- *          the type of mapped values
+ * @param <K> the type of keys
+ * @param <V> the type of mapped values
  */
 public class ConcurrentLruCache<K, V> implements Cache<K, V> {
 
@@ -41,10 +38,8 @@ public class ConcurrentLruCache<K, V> implements Cache<K, V> {
   /**
    * Creates the cache with a fixed capacity.
    *
-   * @param capacity
-   *          max number of cache entries
-   * @throws IllegalArgumentException
-   *           if capacity is negative
+   * @param capacity max number of cache entries
+   * @throws IllegalArgumentException if capacity is negative
    */
   public ConcurrentLruCache(int capacity) {
     if (capacity < 0) {
@@ -103,45 +98,27 @@ public class ConcurrentLruCache<K, V> implements Cache<K, V> {
     keys.clear();
   }
 
-  /**
-   * Returns <code>true</code> if this cache contains a mapping for the specified key.
-   *
-   * @param key The key whose presence in this cache is to be tested.
-   * @return <code>true</code> if this cache contains a mapping for the specified key.
-   */
-  public boolean containsKey(K key) {
-    return cache.containsKey(key);
-  }
-
-  /**
-   * Returns <code>true</code> if this cache contains no key-value mappings.
-   */
+  @Override
   public boolean isEmpty() {
     return cache.isEmpty();
   }
 
-  /**
-   * Returns a Set view of the keys contained in this cache.
-   */
+  @Override
   public Set<K> keySet() {
     return cache.keySet();
   }
 
-  /**
-   * @return the current size of the cache
-   */
+  @Override
   public int size() {
     return cache.size();
   }
 
   /**
-   * Removes duplicated keys within the keys queue.
-   *
-   * @param key
-   *          key which is to be removed from the keys queue.
+   * Removes all instances of the given key within the keys queue.
    */
-  private void removeAll(K key){
-    while (keys.remove(key)) {}
+  protected void removeAll(K key) {
+    while (keys.remove(key)) {
+    }
   }
 
 }
