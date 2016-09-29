@@ -25,7 +25,8 @@ function getSearchQueryForSearchType(searchType, values) {
     createSearchesForActivityIds(searchType, values)
   );
 
-  return 'searchQuery='+value;
+  return encodeURI('searchQuery='+value)
+    .replace(/#/g, '%23');
 }
 
 /**

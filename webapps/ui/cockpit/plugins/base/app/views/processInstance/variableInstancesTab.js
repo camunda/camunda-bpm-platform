@@ -255,7 +255,7 @@ module.exports = function(ngModule) {
             if(instance) {
               activityInstanceLink = '<a ng-href="#/process-instance/' +
                   processInstance.id + '/runtime' +
-                  '?detailsTab=variables-tab&'+ encodeURI($scope.getSearchQueryForSearchType(instance.id)) +
+                  '?detailsTab=variables-tab&'+ $scope.getSearchQueryForSearchType(instance.id) +
                   '" title="' +
                   instance.id +
                   '">' +
