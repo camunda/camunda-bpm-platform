@@ -92,6 +92,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
   protected DelegationState delegationState;
 
   protected String parentTaskId;
+  protected transient TaskEntity parentTask;
 
   protected String name;
   protected String description;
@@ -503,6 +504,9 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     if (getCaseExecution()!=null) {
       return caseExecution;
     }
+    if (getParentTask() != null) {
+      return parentTask;
+    }
     return null;
   }
 
@@ -512,6 +516,15 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
   }
 
   // execution ////////////////////////////////////////////////////////////////
+
+  public TaskEntity getParentTask() {
+    if ( parentTask == null && parentTaskId != null) {
+      this.parentTask = Context.getCommandContext()
+                                .getTaskManager()
+                                .findTaskById(parentTaskId);
+    }
+    return parentTask;
+  }
 
   @Override
   public ExecutionEntity getExecution() {
