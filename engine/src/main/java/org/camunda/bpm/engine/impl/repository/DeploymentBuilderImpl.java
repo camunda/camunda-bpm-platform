@@ -18,6 +18,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.Collection;
@@ -43,6 +44,10 @@ import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.bpm.model.cmmn.Cmmn;
+import org.camunda.bpm.model.cmmn.CmmnModelInstance;
+import org.camunda.bpm.model.dmn.Dmn;
+import org.camunda.bpm.model.dmn.DmnModelInstance;
 
 /**
  * @author Tom Baeyens
@@ -70,11 +75,8 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
   public DeploymentBuilder addInputStream(String resourceName, InputStream inputStream) {
     ensureNotNull("inputStream for resource '" + resourceName + "' is null", "inputStream", inputStream);
     byte[] bytes = IoUtil.readInputStream(inputStream, resourceName);
-    ResourceEntity resource = new ResourceEntity();
-    resource.setName(resourceName);
-    resource.setBytes(bytes);
-    deployment.addResource(resource);
-    return this;
+
+    return addBytes(resourceName, bytes);
   }
 
   public DeploymentBuilder addClasspathResource(String resource) {
@@ -85,18 +87,21 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
 
   public DeploymentBuilder addString(String resourceName, String text) {
     ensureNotNull("text", text);
-    ResourceEntity resource = new ResourceEntity();
-    resource.setName(resourceName);
 
-    if (repositoryService != null && repositoryService.getDeploymentCharset() != null) {
-      Charset deploymentCharset = repositoryService.getDeploymentCharset();
-      resource.setBytes(text.getBytes(deploymentCharset));
-    } else {
-      resource.setBytes(text.getBytes());
-    }
+    byte[] bytes = (repositoryService != null && repositoryService.getDeploymentCharset() != null)
+      ? text.getBytes(repositoryService.getDeploymentCharset())
+      : text.getBytes();
 
-    deployment.addResource(resource);
-    return this;
+    return addBytes(resourceName, bytes);
+  }
+
+  public DeploymentBuilder addModelInstance(String resourceName, CmmnModelInstance modelInstance) {
+    ensureNotNull("modelInstance", modelInstance);
+
+    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    Cmmn.writeModelToStream(outputStream, modelInstance);
+
+    return addBytes(resourceName, outputStream.toByteArray());
   }
 
   public DeploymentBuilder addModelInstance(String resourceName, BpmnModelInstance modelInstance) {
@@ -104,11 +109,25 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
 
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     Bpmn.writeModelToStream(outputStream, modelInstance);
+
+    return addBytes(resourceName, outputStream.toByteArray());
+  }
+
+  public DeploymentBuilder addModelInstance(String resourceName, DmnModelInstance modelInstance) {
+    ensureNotNull("modelInstance", modelInstance);
+
+    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    Dmn.writeModelToStream(outputStream, modelInstance);
+
+    return addBytes(resourceName, outputStream.toByteArray());
+  }
+
+  private DeploymentBuilder addBytes(String resourceName, byte[] bytes) {
     ResourceEntity resource = new ResourceEntity();
-    resource.setBytes(outputStream.toByteArray());
+    resource.setBytes(bytes);
     resource.setName(resourceName);
     deployment.addResource(resource);
-
+    
     return this;
   }
 
@@ -119,10 +138,7 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
         if (!entry.isDirectory()) {
           String entryName = entry.getName();
           byte[] bytes = IoUtil.readInputStream(zipInputStream, entryName);
-          ResourceEntity resource = new ResourceEntity();
-          resource.setName(entryName);
-          resource.setBytes(bytes);
-          deployment.addResource(resource);
+          addBytes(entryName, bytes);
         }
         entry = zipInputStream.getNextEntry();
       }
