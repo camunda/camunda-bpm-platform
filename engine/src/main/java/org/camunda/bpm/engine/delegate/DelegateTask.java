@@ -185,4 +185,8 @@ public interface DelegateTask extends VariableScope, BpmnModelExecutionContext, 
    */
   String getTenantId();
 
+  /**
+   * set status to complete, avoid triggering event notifications
+   */
+  void complete();
 }

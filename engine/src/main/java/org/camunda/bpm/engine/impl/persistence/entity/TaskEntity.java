@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.delegate.DelegateCaseExecution;
 import org.camunda.bpm.engine.delegate.DelegateTask;
@@ -83,6 +84,8 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
   public static final String DELETE_REASON_DELETED = "deleted";
 
   private static final long serialVersionUID = 1L;
+  protected static final String COMPLETE_EVENT = "complete";
+  protected static final String DELETE_EVENT = "delete";
 
   protected String id;
   protected int revision;
@@ -275,6 +278,10 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
   }
 
   public void complete() {
+
+    if (COMPLETE_EVENT.equals(this.eventName) || DELETE_EVENT.equals(this.eventName)) {
+      throw LOG.invokeTaskListenerException(new IllegalStateException("invalid task state"));
+    }
     // if the task is associated with a case
     // execution then call complete on the
     // associated case execution. The case
