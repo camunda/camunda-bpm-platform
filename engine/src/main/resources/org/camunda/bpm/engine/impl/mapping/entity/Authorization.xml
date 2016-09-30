@@ -206,12 +206,7 @@
       <!-- User GRANT -->
       <if test="permCheck.resourceIdQueryParam != null || (permCheck.resourceId != null &amp;&amp; !permCheck.resourceId.equals('*')) ">
         WHEN
-          <if test="permCheck.resourceIdQueryParam != null">
-          ${permCheck.resourceIdQueryParam} IN
-          </if>
-          <if test="permCheck.resourceId != null">
           EXISTS
-          </if>
             (SELECT
                     A.RESOURCE_ID_
              FROM
@@ -232,12 +227,7 @@
       <!-- User REVOKE -->
       <if test="revokeAuthorizationCheckEnabled &amp;&amp; (permCheck.resourceIdQueryParam != null || (permCheck.resourceId != null &amp;&amp; !permCheck.resourceId.equals('*'))) ">
         WHEN
-          <if test="permCheck.resourceIdQueryParam != null">
-          ${permCheck.resourceIdQueryParam} IN
-          </if>
-          <if test="permCheck.resourceId != null">
           EXISTS
-          </if>
             (SELECT
                     A.RESOURCE_ID_
              FROM
@@ -304,12 +294,7 @@
                 <!-- Group GRANTS -->
                 <if test="permCheck.resourceIdQueryParam != null || (permCheck.resourceId != null &amp;&amp; !permCheck.resourceId.equals('*')) ">
                   WHEN
-                    <if test="permCheck.resourceIdQueryParam != null">
-                    ${permCheck.resourceIdQueryParam} IN
-                    </if>
-                    <if test="permCheck.resourceId != null">
                     EXISTS
-                    </if>
                       (SELECT
                               A.RESOURCE_ID_
                        FROM
@@ -330,12 +315,7 @@
                 <!-- Group REVOKES -->
                 <if test="revokeAuthorizationCheckEnabled &amp;&amp; (permCheck.resourceIdQueryParam != null || (permCheck.resourceId != null &amp;&amp; !permCheck.resourceId.equals('*'))) ">
                   WHEN
-                    <if test="permCheck.resourceIdQueryParam != null">
-                    ${permCheck.resourceIdQueryParam} IN
-                    </if>
-                    <if test="permCheck.resourceId != null">
                     EXISTS
-                    </if>
                       (SELECT
                               A.RESOURCE_ID_
                        FROM
@@ -400,12 +380,7 @@
                           <!-- GLOBAL GRANTS -->
                           <if test="permCheck.resourceIdQueryParam != null || (permCheck.resourceId != null &amp;&amp; !permCheck.resourceId.equals('*')) ">
                             WHEN
-                              <if test="permCheck.resourceIdQueryParam != null">
-                              ${permCheck.resourceIdQueryParam} IN
-                              </if>
-                              <if test="permCheck.resourceId != null">
                               EXISTS
-                              </if>
                                 (SELECT
                                         A.RESOURCE_ID_
                                  FROM
@@ -426,12 +401,7 @@
                           <!-- GLOBAL REVOKES -->
                           <if test="revokeAuthorizationCheckEnabled &amp;&amp; (permCheck.resourceIdQueryParam != null || (permCheck.resourceId != null &amp;&amp; !permCheck.resourceId.equals('*'))) ">
                             WHEN
-                              <if test="permCheck.resourceIdQueryParam != null">
-                              ${permCheck.resourceIdQueryParam} IN
-                              </if>
-                              <if test="permCheck.resourceId != null">
                               EXISTS
-                              </if>
                                 (SELECT
                                         A.RESOURCE_ID_
                                  FROM
