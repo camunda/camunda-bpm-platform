@@ -22,10 +22,12 @@ import org.camunda.bpm.engine.migration.MigrationPlanExecutionBuilder;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.*;
+import org.camunda.bpm.engine.task.Attachment;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.value.SerializableValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -1806,5 +1808,31 @@ public interface RuntimeService {
    */
   MigrationPlanExecutionBuilder newMigration(MigrationPlan migrationPlan);
 
+
+
+  /**
+   * Add a new attachment to a process instance and use an input stream to provide the content
+   *
+   * @param processInstanceId - cannot be null
+   * @param attachmentType - name of the attachment, can be null
+   * @param attachmentName - name of the attachment, can be null
+   * @param attachmentDescription  - full text description, can be null
+   * @param url - url of the attachment, can be null
+   * @param content - byte array with content of attachment
+   *
+   */
+  Attachment createAttachment(String attachmentType, String processInstanceId, String attachmentName, String attachmentDescription, InputStream content);
+
+  /**
+   * Add a new attachment to a process instance and use an url as the content
+   *
+   * @param processInstanceId - cannot be null
+   * @param attachmentType - name of the attachment, can be null
+   * @param attachmentName - name of the attachment, can be null
+   * @param attachmentDescription  - full text description, can be null
+   * @param url - url of the attachment, can be null
+   *
+   */
+  Attachment createAttachment(String attachmentType, String processInstanceId, String attachmentName, String attachmentDescription, String url);
 
 }

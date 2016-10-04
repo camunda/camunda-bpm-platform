@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.tools.ant.filters.StringInputStream;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
@@ -66,6 +67,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.TransitionInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
+import org.camunda.bpm.engine.task.Attachment;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.api.runtime.util.SimpleSerializableBean;
@@ -2289,5 +2291,29 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
 
     assertEquals(0, runtimeService.createExecutionQuery().count());
 
+  }
+
+  public void testCreateAttachment () {
+    Attachment result = runtimeService.createAttachment("testType", "testProcess", "testName", "aDescription", "aUrl");
+    assertThat(result,is(notNullValue()));
+    taskService.deleteAttachment(result.getId());
+
+    result = runtimeService.createAttachment("testType", "testProcess", "testName", "aDescription", new StringInputStream("aStream"));
+    assertThat(result,is(notNullValue()));
+    taskService.deleteAttachment(result.getId());
+  }
+
+  public void testCreateAttachmentWithoutProcessId () {
+    try {
+      runtimeService.createAttachment("testType", null, "testName", "aDescription", "aUrl");
+    } catch (Exception e) {
+      //expected
+    }
+
+    try {
+      runtimeService.createAttachment("testType", null, "testName", "aDescription", new StringInputStream("aStream"));
+    } catch (Exception e) {
+      //expected
+    }
   }
 }

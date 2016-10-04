@@ -56,11 +56,13 @@ public class CreateAttachmentCmd implements Command<Attachment> {
 
   @Override
   public Attachment execute(CommandContext commandContext) {
-    ensureNotNull("taskId", taskId);
-
-    task = commandContext
-      .getTaskManager()
-      .findTaskById(taskId);
+    if (taskId != null) {
+      task = commandContext
+          .getTaskManager()
+          .findTaskById(taskId);
+    } else {
+      ensureNotNull("taskId or processInstanceId has to be provided", this.processInstanceId);
+    }
 
     AttachmentEntity attachment = new AttachmentEntity();
     attachment.setName(attachmentName);
@@ -82,8 +84,13 @@ public class CreateAttachmentCmd implements Command<Attachment> {
 
     PropertyChange propertyChange = new PropertyChange("name", null, attachmentName);
 
-    commandContext.getOperationLogManager()
-      .logAttachmentOperation(UserOperationLogEntry.OPERATION_TYPE_ADD_ATTACHMENT, task, propertyChange);
+    if (task != null) {
+      commandContext.getOperationLogManager()
+          .logAttachmentOperation(UserOperationLogEntry.OPERATION_TYPE_ADD_ATTACHMENT, task, propertyChange);
+    } else if (processInstanceId != null) {
+      commandContext.getOperationLogManager()
+          .logAttachmentOperation(UserOperationLogEntry.OPERATION_TYPE_ADD_ATTACHMENT, processInstanceId, propertyChange);
+    }
 
     return attachment;
   }

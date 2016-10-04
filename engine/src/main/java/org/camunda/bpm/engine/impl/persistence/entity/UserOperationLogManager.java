@@ -246,6 +246,19 @@ public class UserOperationLogManager extends AbstractHistoricManager {
     }
   }
 
+  public void logAttachmentOperation(String operation, String processInstanceId, PropertyChange propertyChange) {
+    if (isUserOperationLogEnabled()) {
+      UserOperationLogContext context = new UserOperationLogContext();
+
+      UserOperationLogContextEntryBuilder entryBuilder =
+          UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.ATTACHMENT)
+              .inContextOf(processInstanceId, Arrays.asList(propertyChange));
+      context.addEntry(entryBuilder.create());
+
+      fireUserOperationLog(context);
+    }
+  }
+
   public void logVariableOperation(String operation, String executionId, String taskId, PropertyChange propertyChange) {
     if(isUserOperationLogEnabled()) {
 

@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
+import java.io.InputStream;
 import java.util.*;
 
 import org.camunda.bpm.engine.RuntimeService;
@@ -42,6 +43,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstantiationBuilder;
 import org.camunda.bpm.engine.runtime.SignalEventReceivedBuilder;
 import org.camunda.bpm.engine.runtime.UpdateProcessInstanceSuspensionStateSelectBuilder;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
+import org.camunda.bpm.engine.task.Attachment;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
@@ -512,5 +514,16 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
   public MigrationPlanExecutionBuilder newMigration(MigrationPlan migrationPlan) {
     return new MigrationPlanExecutionBuilderImpl(commandExecutor, migrationPlan);
   }
+
+  @Override
+  public Attachment createAttachment(String attachmentType, String processInstanceId, String attachmentName, String attachmentDescription, InputStream content) {
+    return commandExecutor.execute(new CreateAttachmentCmd(attachmentType, null, processInstanceId, attachmentName, attachmentDescription, content, null));
+  }
+
+  @Override
+  public Attachment createAttachment(String attachmentType, String processInstanceId, String attachmentName, String attachmentDescription, String url) {
+    return commandExecutor.execute(new CreateAttachmentCmd(attachmentType, null, processInstanceId, attachmentName, attachmentDescription, null, url));
+  }
+
 
 }

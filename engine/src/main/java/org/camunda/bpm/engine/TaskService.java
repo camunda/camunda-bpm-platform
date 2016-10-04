@@ -903,10 +903,22 @@ public interface TaskService {
   /** The comments related to the given process instance. */
   List<Comment> getProcessInstanceComments(String processInstanceId);
 
-  /** Add a new attachment to a task and/or a process instance and use an input stream to provide the content */
+  /**
+   * Add a new attachment to a task and/or a process instance and use an input stream to provide the content
+   * please use method in runtime service to operate on process instance.
+   *
+   * Either taskId or processInstanceId has to be provided
+   * @see RuntimeService#createAttachment(String, String, String, String, InputStream)
+   */
   Attachment createAttachment(String attachmentType, String taskId, String processInstanceId, String attachmentName, String attachmentDescription, InputStream content);
 
-  /** Add a new attachment to a task and/or a process instance and use an url as the content */
+  /**
+   * Add a new attachment to a task and/or a process instance and use an url as the content
+   * please use method in runtime service to operate on process instance
+   *
+   * Either taskId or processInstanceId has to be provided
+   * @see RuntimeService#createAttachment(String, String, String, String, String)
+   */
   Attachment createAttachment(String attachmentType, String taskId, String processInstanceId, String attachmentName, String attachmentDescription, String url);
 
   /** Update the name and decription of an attachment */

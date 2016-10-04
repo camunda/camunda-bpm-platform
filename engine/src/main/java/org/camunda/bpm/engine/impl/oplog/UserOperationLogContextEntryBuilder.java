@@ -112,6 +112,19 @@ public class UserOperationLogContextEntryBuilder {
     return this;
   }
 
+  public UserOperationLogContextEntryBuilder inContextOf(String processInstanceId, List<PropertyChange> propertyChanges) {
+
+    if (propertyChanges == null || propertyChanges.isEmpty()) {
+      if (OPERATION_TYPE_CREATE.equals(entry.getOperationType())) {
+        propertyChanges = Arrays.asList(PropertyChange.EMPTY_CHANGE);
+      }
+    }
+    entry.setPropertyChanges(propertyChanges);
+    entry.setProcessInstanceId(processInstanceId);
+
+    return this;
+  }
+
   public UserOperationLogContextEntryBuilder propertyChanges(List<PropertyChange> propertyChanges) {
     entry.setPropertyChanges(propertyChanges);
     return this;

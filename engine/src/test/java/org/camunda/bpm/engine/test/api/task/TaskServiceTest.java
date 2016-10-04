@@ -58,6 +58,11 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNull.notNullValue;
+import static org.hamcrest.core.IsNull.nullValue;
+import static org.junit.Assert.assertThat;
+
 /**
  * @author Frederik Heremans
  * @author Joram Barrez
@@ -1560,13 +1565,24 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  public void testCreateTaskAttachmentWithNullTaskId() {
+  public void testCreateTaskAttachmentWithNullTaskAndProcessInstance() {
     int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
     if (historyLevel> ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       try {
-        taskService.createAttachment("web page", null, "someprocessinstanceid", "weatherforcast", "temperatures and more", new ByteArrayInputStream("someContent".getBytes()));
+        taskService.createAttachment("web page", null, null, "weatherforcast", "temperatures and more", new ByteArrayInputStream("someContent".getBytes()));
         fail("expected process engine exception");
       } catch (ProcessEngineException e) {}
+    }
+  }
+
+  public void testCreateTaskAttachmentWithNullTaskId() {
+    int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
+    if (historyLevel> ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+      Attachment attachment = taskService.createAttachment("web page", null, "someProcessId", "weatherforcast", "temperatures and more", new ByteArrayInputStream("someContent".getBytes()));
+      Attachment fetched = taskService.getAttachment(attachment.getId());
+      assertThat(fetched,is(notNullValue()));
+      assertThat(fetched.getTaskId(), is(nullValue()));
+      assertThat(fetched.getProcessInstanceId(),is(notNullValue()));
     }
   }
 
