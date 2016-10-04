@@ -1583,6 +1583,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
       assertThat(fetched,is(notNullValue()));
       assertThat(fetched.getTaskId(), is(nullValue()));
       assertThat(fetched.getProcessInstanceId(),is(notNullValue()));
+      taskService.deleteAttachment(attachment.getId());
     }
   }
 
