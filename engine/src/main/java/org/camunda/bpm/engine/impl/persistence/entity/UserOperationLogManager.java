@@ -29,6 +29,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.oplog.UserOperationLogContext;
 import org.camunda.bpm.engine.impl.oplog.UserOperationLogContextEntryBuilder;
 import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 
 /**
  * Manager for {@link UserOperationLogEntryEventEntity} that also provides a generic and some specific log methods.
@@ -246,13 +247,13 @@ public class UserOperationLogManager extends AbstractHistoricManager {
     }
   }
 
-  public void logAttachmentOperation(String operation, String processInstanceId, PropertyChange propertyChange) {
+  public void logAttachmentOperation(String operation, ExecutionEntity processInstance, PropertyChange propertyChange) {
     if (isUserOperationLogEnabled()) {
       UserOperationLogContext context = new UserOperationLogContext();
 
       UserOperationLogContextEntryBuilder entryBuilder =
           UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.ATTACHMENT)
-              .inContextOf(processInstanceId, Arrays.asList(propertyChange));
+              .inContextOf(processInstance, Arrays.asList(propertyChange));
       context.addEntry(entryBuilder.create());
 
       fireUserOperationLog(context);
