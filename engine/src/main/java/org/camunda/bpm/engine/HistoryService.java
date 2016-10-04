@@ -16,6 +16,7 @@ package org.camunda.bpm.engine;
 
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
+import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatchQuery;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricActivityInstanceQuery;
@@ -51,6 +52,8 @@ import org.camunda.bpm.engine.history.NativeHistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.history.NativeHistoricTaskInstanceQuery;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
+
+import java.util.List;
 
 /**
  * Service exposing information about ongoing and past process instances.  This is different
@@ -132,6 +135,54 @@ public interface HistoryService {
    *          If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void deleteHistoricProcessInstance(String processInstanceId);
+
+  /**
+   * Deletes historic process instances. All historic activities, historic task and
+   * historic details (variable updates, form properties) are deleted as well.
+   *
+   * @throws BadUserRequestException
+   *          when no process instances is found with the given ids or ids are null.
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#PROCESS_DEFINITION}.
+   */
+  void deleteHistoricProcessInstances(List<String> processInstanceIds);
+
+  /**
+   * Deletes historic process instances asynchronously. All historic activities, historic task and
+   * historic details (variable updates, form properties) are deleted as well.
+   *
+   * @throws BadUserRequestException
+   *          when no process instances is found with the given ids or ids are null.
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#PROCESS_DEFINITION}
+   *          or no {@link Permissions#CREATE} permission on {@link Resources#BATCH}.
+   */
+  Batch deleteHistoricProcessInstancesAsync(List<String> processInstanceIds, String deleteReason);
+
+  /**
+   * Deletes historic process instances asynchronously based on query. All historic activities, historic task and
+   * historic details (variable updates, form properties) are deleted as well.
+   *
+   * @throws BadUserRequestException
+   *          when no process instances is found with the given ids or ids are null.
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#PROCESS_DEFINITION}
+   *          or no {@link Permissions#CREATE} permission on {@link Resources#BATCH}.
+   */
+  Batch deleteHistoricProcessInstancesAsync(HistoricProcessInstanceQuery query, String deleteReason);
+
+  /**
+   * Deletes historic process instances asynchronously based on query and a list of process instances. Query result and
+   * list of ids will be merged.
+   * All historic activities, historic task and historic details (variable updates, form properties) are deleted as well.
+   *
+   * @throws BadUserRequestException
+   *          when no process instances is found with the given ids or ids are null.
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#PROCESS_DEFINITION}
+   *          or no {@link Permissions#CREATE} permission on {@link Resources#BATCH}.
+   */
+  Batch deleteHistoricProcessInstancesAsync(List<String> processInstanceIds, HistoricProcessInstanceQuery query, String deleteReason);
 
   /**
    * Deletes a user operation log entry. Does not cascade to any related entities.

@@ -13,13 +13,13 @@
 package org.camunda.bpm.engine.impl.migration.batch;
 
 import org.camunda.bpm.engine.batch.Batch;
-import org.camunda.bpm.engine.impl.batch.AbstractProcessInstanceBatchJobDeclaration;
+import org.camunda.bpm.engine.impl.batch.AbstractBatchJobDeclaration;
 
 /**
  * Job declaration for batch migration jobs. The batch migration job
  * migrates a list of process instances.
  */
-public class MigrationBatchJobDeclaration extends AbstractProcessInstanceBatchJobDeclaration {
+public class MigrationBatchJobDeclaration extends AbstractBatchJobDeclaration {
 
   public MigrationBatchJobDeclaration() {
     super(Batch.TYPE_PROCESS_INSTANCE_MIGRATION);

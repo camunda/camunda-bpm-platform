@@ -113,9 +113,9 @@ public class MigrateProcessInstanceBatchCmd extends AbstractMigrationCmd<Batch> 
     return batch;
   }
 
-  private int calculateSize(ProcessEngineConfigurationImpl engineConfiguration, MigrationBatchConfiguration batchConfiguration) {
+  protected int calculateSize(ProcessEngineConfigurationImpl engineConfiguration, MigrationBatchConfiguration batchConfiguration) {
     int invocationsPerBatchJob = engineConfiguration.getInvocationsPerBatchJob();
-    int processInstanceCount = batchConfiguration.getProcessInstanceIds().size();
+    int processInstanceCount = batchConfiguration.getIds().size();
 
     return (int) Math.ceil(processInstanceCount / invocationsPerBatchJob);
   }

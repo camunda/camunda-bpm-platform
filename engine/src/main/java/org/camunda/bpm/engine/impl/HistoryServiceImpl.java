@@ -15,6 +15,7 @@
 package org.camunda.bpm.engine.impl;
 
 import org.camunda.bpm.engine.HistoryService;
+import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatchQuery;
 import org.camunda.bpm.engine.history.HistoricActivityInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricActivityStatisticsQuery;
@@ -41,10 +42,14 @@ import org.camunda.bpm.engine.impl.batch.history.DeleteHistoricBatchCmd;
 import org.camunda.bpm.engine.impl.batch.history.HistoricBatchQueryImpl;
 import org.camunda.bpm.engine.impl.cmd.DeleteHistoricCaseInstanceCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteHistoricProcessInstanceCmd;
+import org.camunda.bpm.engine.impl.cmd.DeleteHistoricProcessInstancesCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteHistoricTaskInstanceCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteUserOperationLogEntryCmd;
 import org.camunda.bpm.engine.impl.cmd.GetHistoricJobLogExceptionStacktraceCmd;
+import org.camunda.bpm.engine.impl.cmd.batch.DeleteHistoricProcessInstancesBatchCmd;
 import org.camunda.bpm.engine.impl.dmn.cmd.DeleteHistoricDecisionInstanceCmd;
+
+import java.util.List;
 
 /**
  * @author Tom Baeyens
@@ -111,6 +116,22 @@ public class HistoryServiceImpl extends ServiceImpl implements HistoryService {
 
   public void deleteHistoricProcessInstance(String processInstanceId) {
     commandExecutor.execute(new DeleteHistoricProcessInstanceCmd(processInstanceId));
+  }
+
+  public void deleteHistoricProcessInstances(List<String> processInstanceIds) {
+    commandExecutor.execute(new DeleteHistoricProcessInstancesCmd(processInstanceIds));
+  }
+
+  public Batch deleteHistoricProcessInstancesAsync(List<String> processInstanceIds, String deleteReason) {
+    return commandExecutor.execute(new DeleteHistoricProcessInstancesBatchCmd(processInstanceIds, null, deleteReason));
+  }
+
+  public Batch deleteHistoricProcessInstancesAsync(HistoricProcessInstanceQuery query, String deleteReason) {
+    return commandExecutor.execute(new DeleteHistoricProcessInstancesBatchCmd(null, query, deleteReason));
+  }
+
+  public Batch deleteHistoricProcessInstancesAsync(List<String> processInstanceIds, HistoricProcessInstanceQuery query, String deleteReason){
+    return commandExecutor.execute(new DeleteHistoricProcessInstancesBatchCmd(processInstanceIds, query, deleteReason));
   }
 
   public void deleteUserOperationLogEntry(String entryId) {

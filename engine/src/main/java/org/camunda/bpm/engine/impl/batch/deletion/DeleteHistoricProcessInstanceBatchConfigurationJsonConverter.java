@@ -10,7 +10,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl.batch.deletion;
 
 import org.camunda.bpm.engine.impl.json.JsonObjectConverter;
@@ -21,37 +20,30 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Perform serialization of DeleteProcessInstanceBatchConfiguration into JSON format.
- *
  * @author Askar Akhmerov
  */
-public class DeleteProcessInstanceBatchConfigurationJsonConverter extends JsonObjectConverter<DeleteProcessInstanceBatchConfiguration> {
-  public static final DeleteProcessInstanceBatchConfigurationJsonConverter INSTANCE = new DeleteProcessInstanceBatchConfigurationJsonConverter();
+public class DeleteHistoricProcessInstanceBatchConfigurationJsonConverter extends JsonObjectConverter<DeleteHistoricProcessInstanceBatchConfiguration> {
 
-  public static final String DELETE_REASON = "deleteReason";
-  public static final String PROCESS_INSTANCE_IDS = "processInstanceIds";
+  public static final DeleteHistoricProcessInstanceBatchConfigurationJsonConverter INSTANCE = new DeleteHistoricProcessInstanceBatchConfigurationJsonConverter();
 
-  public JSONObject toJsonObject(DeleteProcessInstanceBatchConfiguration configuration) {
+  public static final String HISTORIC_PROCESS_INSTANCE_IDS = "historicProcessInstanceIds";
+
+  public JSONObject toJsonObject(DeleteHistoricProcessInstanceBatchConfiguration configuration) {
     JSONObject json = new JSONObject();
 
-    JsonUtil.addField(json, DELETE_REASON, configuration.getDeleteReason());
-    JsonUtil.addListField(json, PROCESS_INSTANCE_IDS, configuration.getIds());
+    JsonUtil.addListField(json, HISTORIC_PROCESS_INSTANCE_IDS, configuration.getIds());
     return json;
   }
 
-  public DeleteProcessInstanceBatchConfiguration toObject(JSONObject json) {
-    DeleteProcessInstanceBatchConfiguration configuration = new DeleteProcessInstanceBatchConfiguration();
+  public DeleteHistoricProcessInstanceBatchConfiguration toObject(JSONObject json) {
+    DeleteHistoricProcessInstanceBatchConfiguration configuration = new DeleteHistoricProcessInstanceBatchConfiguration();
 
-    String deleteReason = json.optString(DELETE_REASON);
-    if (deleteReason != null && !deleteReason.isEmpty()) {
-      configuration.setDeleteReason(deleteReason);
-    }
     configuration.setIds(readProcessInstanceIds(json));
     return configuration;
   }
 
   protected List<String> readProcessInstanceIds(JSONObject jsonObject) {
-    List<Object> objects = JsonUtil.jsonArrayAsList(jsonObject.getJSONArray(PROCESS_INSTANCE_IDS));
+    List<Object> objects = JsonUtil.jsonArrayAsList(jsonObject.getJSONArray(HISTORIC_PROCESS_INSTANCE_IDS));
     List<String> processInstanceIds = new ArrayList<String>();
     for (Object object : objects) {
       processInstanceIds.add((String) object);

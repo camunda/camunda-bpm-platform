@@ -14,27 +14,31 @@
 package org.camunda.bpm.engine.impl.batch.deletion;
 
 import org.camunda.bpm.engine.batch.Batch;
-import org.camunda.bpm.engine.impl.batch.*;
+import org.camunda.bpm.engine.impl.batch.AbstractListBasedBatchJobHandler;
+import org.camunda.bpm.engine.impl.batch.BatchJobConfiguration;
+import org.camunda.bpm.engine.impl.batch.BatchJobContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
-import org.camunda.bpm.engine.impl.persistence.entity.*;
+import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 
 import java.util.List;
 
 /**
  * @author Askar Akhmerov
  */
-public class DeleteProcessInstancesJobHandler extends AbstractListBasedBatchJobHandler<DeleteProcessInstanceBatchConfiguration> {
+public class DeleteHistoricProcessInstancesJobHandler extends AbstractListBasedBatchJobHandler<DeleteHistoricProcessInstanceBatchConfiguration> {
 
-  public static final DeleteProcessInstancesBatchJobDeclaration JOB_DECLARATION = new DeleteProcessInstancesBatchJobDeclaration();
+  public static final DeleteHistoricProcessInstancesBatchJobDeclaration JOB_DECLARATION = new DeleteHistoricProcessInstancesBatchJobDeclaration();
 
   @Override
   public String getType() {
-    return Batch.TYPE_PROCESS_INSTANCE_DELETION;
+    return Batch.TYPE_HISTORIC_PROCESS_INSTANCE_DELETION;
   }
 
-  protected DeleteProcessInstanceBatchConfigurationJsonConverter getJsonConverterInstance() {
-    return DeleteProcessInstanceBatchConfigurationJsonConverter.INSTANCE;
+  protected DeleteHistoricProcessInstanceBatchConfigurationJsonConverter getJsonConverterInstance() {
+    return DeleteHistoricProcessInstanceBatchConfigurationJsonConverter.INSTANCE;
   }
 
   @Override
@@ -43,8 +47,8 @@ public class DeleteProcessInstancesJobHandler extends AbstractListBasedBatchJobH
   }
 
   @Override
-  protected DeleteProcessInstanceBatchConfiguration createJobConfiguration(DeleteProcessInstanceBatchConfiguration configuration, List<String> processIdsForJob) {
-    return DeleteProcessInstanceBatchConfiguration.create(processIdsForJob, configuration.getDeleteReason());
+  protected DeleteHistoricProcessInstanceBatchConfiguration createJobConfiguration(DeleteHistoricProcessInstanceBatchConfiguration configuration, List<String> processIdsForJob) {
+    return DeleteHistoricProcessInstanceBatchConfiguration.create(processIdsForJob);
   }
 
   @Override
@@ -53,15 +57,15 @@ public class DeleteProcessInstancesJobHandler extends AbstractListBasedBatchJobH
         .getDbEntityManager()
         .selectById(ByteArrayEntity.class, configuration.getConfigurationByteArrayId());
 
-    DeleteProcessInstanceBatchConfiguration batchConfiguration = readConfiguration(configurationEntity.getBytes());
+    DeleteHistoricProcessInstanceBatchConfiguration batchConfiguration = readConfiguration(configurationEntity.getBytes());
 
     boolean initialLegacyRestrictions = commandContext.isRestrictUserOperationLogToAuthenticatedUsers();
     commandContext.disableUserOperationLog();
     commandContext.setRestrictUserOperationLogToAuthenticatedUsers(true);
     try {
       commandContext.getProcessEngineConfiguration()
-          .getRuntimeService()
-          .deleteProcessInstances(batchConfiguration.getIds(), batchConfiguration.deleteReason, true, true);
+          .getHistoryService()
+          .deleteHistoricProcessInstances(batchConfiguration.getIds());
     } finally {
       commandContext.enableUserOperationLog();
       commandContext.setRestrictUserOperationLogToAuthenticatedUsers(initialLegacyRestrictions);

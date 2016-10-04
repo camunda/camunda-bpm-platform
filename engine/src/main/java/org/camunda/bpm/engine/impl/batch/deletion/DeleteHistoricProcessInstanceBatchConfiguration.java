@@ -10,19 +10,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl.batch.deletion;
 
-import org.camunda.bpm.engine.batch.Batch;
-import org.camunda.bpm.engine.impl.batch.AbstractBatchJobDeclaration;
+import org.camunda.bpm.engine.impl.batch.AbstractIdsBatchConfiguration;
+
+import java.util.List;
 
 /**
  * @author Askar Akhmerov
  */
-public class DeleteProcessInstancesBatchJobDeclaration extends AbstractBatchJobDeclaration {
+public class DeleteHistoricProcessInstanceBatchConfiguration extends AbstractIdsBatchConfiguration {
 
-  public DeleteProcessInstancesBatchJobDeclaration() {
-    super(Batch.TYPE_PROCESS_INSTANCE_DELETION);
+  public static DeleteHistoricProcessInstanceBatchConfiguration create(List<String> processInstanceIds) {
+    DeleteHistoricProcessInstanceBatchConfiguration result = new DeleteHistoricProcessInstanceBatchConfiguration();
+    result.setIds(processInstanceIds);
+    return result;
   }
 
 }

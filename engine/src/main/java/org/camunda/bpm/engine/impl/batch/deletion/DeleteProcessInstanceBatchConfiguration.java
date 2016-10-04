@@ -13,25 +13,25 @@
 
 package org.camunda.bpm.engine.impl.batch.deletion;
 
-import org.camunda.bpm.engine.impl.batch.AbstractProcessInstanceBatchConfiguration;
+import org.camunda.bpm.engine.impl.batch.AbstractIdsBatchConfiguration;
 
 import java.util.List;
 
 /**
  * Configuration object that is passed to the Job that will actually perform execution of
  * deletion.
- *
+ * <p>
  * This object will be serialized and persisted as run will be performed asynchronously.
  *
- * @see org.camunda.bpm.engine.impl.batch.deletion.DeleteProcessInstanceBatchConfigurationJsonConverter
  * @author Askar Akhmerov
+ * @see org.camunda.bpm.engine.impl.batch.deletion.DeleteProcessInstanceBatchConfigurationJsonConverter
  */
-public class DeleteProcessInstanceBatchConfiguration extends AbstractProcessInstanceBatchConfiguration {
+public class DeleteProcessInstanceBatchConfiguration extends AbstractIdsBatchConfiguration {
   protected String deleteReason;
 
   public static DeleteProcessInstanceBatchConfiguration create(List<String> processInstanceIds, String deleteReason) {
     DeleteProcessInstanceBatchConfiguration result = new DeleteProcessInstanceBatchConfiguration();
-    result.setProcessInstanceIds(processInstanceIds);
+    result.setIds(processInstanceIds);
     result.setDeleteReason(deleteReason);
     return result;
   }

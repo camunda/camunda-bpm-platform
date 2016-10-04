@@ -13,7 +13,7 @@
 package org.camunda.bpm.engine.impl.migration.batch;
 
 import org.camunda.bpm.engine.batch.Batch;
-import org.camunda.bpm.engine.impl.batch.AbstractProcessInstanceBatchJobHandler;
+import org.camunda.bpm.engine.impl.batch.AbstractListBasedBatchJobHandler;
 import org.camunda.bpm.engine.impl.batch.BatchJobConfiguration;
 import org.camunda.bpm.engine.impl.batch.BatchJobContext;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -26,7 +26,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
-import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.migration.MigrationPlanExecutionBuilder;
 
 import java.util.List;
@@ -35,7 +34,7 @@ import java.util.List;
  * Job handler for batch migration jobs. The batch migration job
  * migrates a list of process instances.
  */
-public class MigrationBatchJobHandler extends AbstractProcessInstanceBatchJobHandler<MigrationBatchConfiguration> {
+public class MigrationBatchJobHandler extends AbstractListBasedBatchJobHandler<MigrationBatchConfiguration> {
 
   public static final MigrationBatchJobDeclaration JOB_DECLARATION = new MigrationBatchJobDeclaration();
 
@@ -81,7 +80,7 @@ public class MigrationBatchJobHandler extends AbstractProcessInstanceBatchJobHan
     MigrationPlanExecutionBuilder executionBuilder = commandContext.getProcessEngineConfiguration()
       .getRuntimeService()
       .newMigration(batchConfiguration.getMigrationPlan())
-        .processInstanceIds(batchConfiguration.getProcessInstanceIds());
+        .processInstanceIds(batchConfiguration.getIds());
 
     if (batchConfiguration.isSkipCustomListeners()) {
       executionBuilder.skipCustomListeners();

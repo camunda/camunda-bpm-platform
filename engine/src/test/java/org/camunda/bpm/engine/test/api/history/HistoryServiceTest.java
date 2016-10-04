@@ -26,6 +26,7 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
@@ -48,13 +49,14 @@ import org.slf4j.Logger;
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
 public class HistoryServiceTest extends PluggableProcessEngineTestCase {
 
-private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
+  public static final String ONE_TASK_PROCESS = "oneTaskProcess";
+  protected static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   public void testHistoricProcessInstanceQuery() {
     // With a clean ProcessEngine, no instances should be available
     assertTrue(historyService.createHistoricProcessInstanceQuery().count() == 0);
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(ONE_TASK_PROCESS);
     assertTrue(historyService.createHistoricProcessInstanceQuery().count() == 1);
 
     // Complete the task and check if the size is count 1
@@ -64,11 +66,11 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
     assertTrue(historyService.createHistoricProcessInstanceQuery().count() == 1);
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   public void testHistoricProcessInstanceQueryOrderBy() {
     // With a clean ProcessEngine, no instances should be available
     assertTrue(historyService.createHistoricProcessInstanceQuery().count() == 0);
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(ONE_TASK_PROCESS);
 
     List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
     assertEquals(1, tasks.size());
@@ -91,10 +93,10 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
     historyService.createHistoricTaskInstanceQuery().orderByTaskPriority().asc().list();
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   public void testHistoricProcessInstanceUserIdAndActivityId() {
     identityService.setAuthenticatedUserId("johndoe");
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(ONE_TASK_PROCESS);
     HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().singleResult();
     assertEquals("johndoe", historicProcessInstance.getStartUserId());
     assertEquals("theStart", historicProcessInstance.getStartActivityId());
@@ -107,8 +109,8 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
     assertEquals("theEnd", historicProcessInstance.getEndActivityId());
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/history/orderProcess.bpmn20.xml",
-      "org/camunda/bpm/engine/test/api/history/checkCreditProcess.bpmn20.xml" })
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/history/orderProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/history/checkCreditProcess.bpmn20.xml"})
   public void testOrderProcessWithCallActivity() {
     // After the process has started, the 'verify credit history' task should be
     // active
@@ -128,16 +130,16 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
     assertTrue(historicProcessInstance.getProcessDefinitionId().contains("checkCreditProcess"));
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml",
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/history/orderProcess.bpmn20.xml",
-      "org/camunda/bpm/engine/test/api/history/checkCreditProcess.bpmn20.xml" })
+      "org/camunda/bpm/engine/test/api/history/checkCreditProcess.bpmn20.xml"})
   public void testHistoricProcessInstanceQueryByProcessDefinitionKey() {
 
-    String processDefinitionKey = "oneTaskProcess";
+    String processDefinitionKey = ONE_TASK_PROCESS;
     runtimeService.startProcessInstanceByKey(processDefinitionKey);
     runtimeService.startProcessInstanceByKey("orderProcess");
     HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processDefinitionKey(processDefinitionKey)
-            .singleResult();
+        .singleResult();
     assertNotNull(historicProcessInstance);
     assertTrue(historicProcessInstance.getProcessDefinitionId().startsWith(processDefinitionKey));
     assertEquals("theStart", historicProcessInstance.getStartActivityId());
@@ -151,17 +153,17 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
     // and make sure the super process instance is set correctly on the
     // HistoricProcessInstance
     HistoricProcessInstance historicProcessInstanceSub = historyService.createHistoricProcessInstanceQuery().processDefinitionKey("checkCreditProcess")
-            .singleResult();
+        .singleResult();
     HistoricProcessInstance historicProcessInstanceSuper = historyService.createHistoricProcessInstanceQuery().processDefinitionKey("orderProcess")
-            .singleResult();
+        .singleResult();
     assertEquals(historicProcessInstanceSuper.getId(), historicProcessInstanceSub.getSuperProcessInstanceId());
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml", "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess2.bpmn20.xml" })
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml", "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess2.bpmn20.xml"})
   public void testHistoricProcessInstanceQueryByProcessInstanceIds() {
     HashSet<String> processInstanceIds = new HashSet<String>();
     for (int i = 0; i < 4; i++) {
-      processInstanceIds.add(runtimeService.startProcessInstanceByKey("oneTaskProcess", i + "").getId());
+      processInstanceIds.add(runtimeService.startProcessInstanceByKey(ONE_TASK_PROCESS, i + "").getId());
     }
     processInstanceIds.add(runtimeService.startProcessInstanceByKey("oneTaskProcess2", "1").getId());
 
@@ -201,7 +203,7 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
     }
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/concurrentExecution.bpmn20.xml" })
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/concurrentExecution.bpmn20.xml"})
   public void testHistoricVariableInstancesOnParallelExecution() {
     Map<String, Object> vars = new HashMap<String, Object>();
     vars.put("rootValue", "test");
@@ -211,7 +213,7 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
     for (Task task : tasks) {
       Map<String, Object> variables = new HashMap<String, Object>();
       // set token local variable
-      LOG.debug("setting variables on task "+task.getId()+", execution "+task.getExecutionId());
+      LOG.debug("setting variables on task " + task.getId() + ", execution " + task.getExecutionId());
       runtimeService.setVariableLocal(task.getExecutionId(), "parallelValue1", task.getName());
       runtimeService.setVariableLocal(task.getExecutionId(), "parallelValue2", "test");
       taskService.complete(task.getId(), variables);
@@ -228,22 +230,22 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
   /**
    * basically copied from {@link ProcessInstanceQueryTest}
    */
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   public void testQueryStringVariable() {
     Map<String, Object> vars = new HashMap<String, Object>();
     vars.put("stringVar", "abcdef");
-    ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
+    ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey(ONE_TASK_PROCESS, vars);
     taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance1.getId()).singleResult().getId());
 
     vars = new HashMap<String, Object>();
     vars.put("stringVar", "abcdef");
     vars.put("stringVar2", "ghijkl");
-    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
+    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey(ONE_TASK_PROCESS, vars);
     taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance2.getId()).singleResult().getId());
 
     vars = new HashMap<String, Object>();
     vars.put("stringVar", "azerty");
-    ProcessInstance processInstance3 = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
+    ProcessInstance processInstance3 = runtimeService.startProcessInstanceByKey(ONE_TASK_PROCESS, vars);
     taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance3.getId()).singleResult().getId());
 
     // Test EQUAL on single string variable, should result in 2 matches
@@ -323,27 +325,27 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
    * all test case logic here.
    * Basically copied from {@link ProcessInstanceQueryTest}
    */
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   public void testQueryDateVariable() throws Exception {
     Map<String, Object> vars = new HashMap<String, Object>();
     Date date1 = Calendar.getInstance().getTime();
     vars.put("dateVar", date1);
 
-    ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
+    ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey(ONE_TASK_PROCESS, vars);
     taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance1.getId()).singleResult().getId());
 
     Date date2 = Calendar.getInstance().getTime();
     vars = new HashMap<String, Object>();
     vars.put("dateVar", date1);
     vars.put("dateVar2", date2);
-    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
+    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey(ONE_TASK_PROCESS, vars);
     taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance2.getId()).singleResult().getId());
 
     Calendar nextYear = Calendar.getInstance();
     nextYear.add(Calendar.YEAR, 1);
     vars = new HashMap<String, Object>();
     vars.put("dateVar", nextYear.getTime());
-    ProcessInstance processInstance3 = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
+    ProcessInstance processInstance3 = runtimeService.startProcessInstanceByKey(ONE_TASK_PROCESS, vars);
     taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance3.getId()).singleResult().getId());
 
     Calendar nextMonth = Calendar.getInstance();
@@ -419,26 +421,26 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
     historyService.deleteHistoricProcessInstance(processInstance3.getId());
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   public void testNativeHistoricProcessInstanceTest() {
     // just test that the query will be constructed and executed, details are tested in the TaskQueryTest
-    runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    runtimeService.startProcessInstanceByKey(ONE_TASK_PROCESS);
     assertEquals(1, historyService.createNativeHistoricProcessInstanceQuery().sql("SELECT count(*) FROM " + managementService.getTableName(HistoricProcessInstance.class)).count());
     assertEquals(1, historyService.createNativeHistoricProcessInstanceQuery().sql("SELECT * FROM " + managementService.getTableName(HistoricProcessInstance.class)).list().size());
 //  assertEquals(1, historyService.createNativeHistoricProcessInstanceQuery().sql("SELECT * FROM " + managementService.getTableName(HistoricProcessInstance.class)).listPage(0, 1).size());
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   public void testNativeHistoricTaskInstanceTest() {
-    runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    runtimeService.startProcessInstanceByKey(ONE_TASK_PROCESS);
     assertEquals(1, historyService.createNativeHistoricTaskInstanceQuery().sql("SELECT count(*) FROM " + managementService.getTableName(HistoricProcessInstance.class)).count());
     assertEquals(1, historyService.createNativeHistoricTaskInstanceQuery().sql("SELECT * FROM " + managementService.getTableName(HistoricProcessInstance.class)).list().size());
     assertEquals(1, historyService.createNativeHistoricTaskInstanceQuery().sql("SELECT * FROM " + managementService.getTableName(HistoricProcessInstance.class)).listPage(0, 1).size());
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   public void testNativeHistoricActivityInstanceTest() {
-    runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    runtimeService.startProcessInstanceByKey(ONE_TASK_PROCESS);
     assertEquals(1, historyService.createNativeHistoricActivityInstanceQuery().sql("SELECT count(*) FROM " + managementService.getTableName(HistoricProcessInstance.class)).count());
     assertEquals(1, historyService.createNativeHistoricActivityInstanceQuery().sql("SELECT * FROM " + managementService.getTableName(HistoricProcessInstance.class)).list().size());
     assertEquals(1, historyService.createNativeHistoricActivityInstanceQuery().sql("SELECT * FROM " + managementService.getTableName(HistoricProcessInstance.class)).listPage(0, 1).size());
@@ -447,34 +449,34 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
   public void testProcessVariableValueEqualsNumber() throws Exception {
     // long
-    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+    runtimeService.startProcessInstanceByKey(ONE_TASK_PROCESS,
         Collections.<String, Object>singletonMap("var", 123L));
 
     // non-matching long
-    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+    runtimeService.startProcessInstanceByKey(ONE_TASK_PROCESS,
         Collections.<String, Object>singletonMap("var", 12345L));
 
     // short
-    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+    runtimeService.startProcessInstanceByKey(ONE_TASK_PROCESS,
         Collections.<String, Object>singletonMap("var", (short) 123));
 
     // double
-    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+    runtimeService.startProcessInstanceByKey(ONE_TASK_PROCESS,
         Collections.<String, Object>singletonMap("var", 123.0d));
 
     // integer
-    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+    runtimeService.startProcessInstanceByKey(ONE_TASK_PROCESS,
         Collections.<String, Object>singletonMap("var", 123));
 
     // untyped null (should not match)
-    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+    runtimeService.startProcessInstanceByKey(ONE_TASK_PROCESS,
         Collections.<String, Object>singletonMap("var", null));
 
     // typed null (should not match)
-    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+    runtimeService.startProcessInstanceByKey(ONE_TASK_PROCESS,
         Collections.<String, Object>singletonMap("var", Variables.longValue(null)));
 
-    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+    runtimeService.startProcessInstanceByKey(ONE_TASK_PROCESS,
         Collections.<String, Object>singletonMap("var", "123"));
 
     assertEquals(4, historyService.createHistoricProcessInstanceQuery().variableValueEquals("var", Variables.numberValue(123)).count());
@@ -485,25 +487,25 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
     assertEquals(1, historyService.createHistoricProcessInstanceQuery().variableValueEquals("var", Variables.numberValue(null)).count());
   }
 
-  @Deployment(resources={
-  "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   public void testDeleteProcessInstance() {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
-    assertEquals(1, runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(ONE_TASK_PROCESS);
+    assertEquals(1, runtimeService.createProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());
 
     runtimeService.deleteProcessInstance(processInstance.getId(), null);
-    assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
-    assertEquals(1, historyService.createHistoricProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
+    assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());
+    assertEquals(1, historyService.createHistoricProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());
 
     historyService.deleteHistoricProcessInstance(processInstance.getId());
-    assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
+    assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());
   }
 
-  @Deployment(resources={
-  "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   public void testDeleteRunningProcessInstance() {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
-    assertEquals(1, runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(ONE_TASK_PROCESS);
+    assertEquals(1, runtimeService.createProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());
     try {
       historyService.deleteHistoricProcessInstance(processInstance.getId());
       fail("ProcessEngineException expected");
@@ -528,5 +530,67 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
     } catch (ProcessEngineException ae) {
       assertTextPresent("processInstanceId is null", ae.getMessage());
     }
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testDeleteProcessInstances() {
+    //given
+    List<String> ids = prepareHistoricProcesses();
+
+    //when
+    historyService.deleteHistoricProcessInstances(ids);
+
+    //then
+    assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testDeleteProcessInstancesWithFake() {
+    //given
+    List<String> ids = prepareHistoricProcesses();
+    ids.add("aFake");
+
+    try {
+      //when
+      historyService.deleteHistoricProcessInstances(ids);
+      fail("Exception expected");
+    } catch (ProcessEngineException e) {
+      //expected
+    }
+
+    //then
+    assertEquals(2, historyService.createHistoricProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testDeleteProcessInstancesWithNull() {
+    try {
+      //when
+      historyService.deleteHistoricProcessInstances(null);
+      fail("Exception expected");
+    } catch (ProcessEngineException e) {
+      //expected
+    }
+  }
+
+  protected List<String> prepareHistoricProcesses() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(ONE_TASK_PROCESS);
+    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey(ONE_TASK_PROCESS);
+
+    List<String> processInstanceIds = Arrays.asList(
+        new String[]{processInstance.getId(), processInstance2.getId()});
+    runtimeService.deleteProcessInstances(processInstanceIds, null, true, true);
+    assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());
+    HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS);
+    assertEquals(2, historicProcessInstanceQuery.count());
+
+    List<String> ids = new ArrayList<String>();
+    for (HistoricProcessInstance pi : historicProcessInstanceQuery.list()) {
+      ids.add(pi.getId());
+    }
+    return ids;
   }
 }

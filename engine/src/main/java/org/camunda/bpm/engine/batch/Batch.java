@@ -33,6 +33,7 @@ public interface Batch {
 
   String TYPE_PROCESS_INSTANCE_MIGRATION = "instance-migration";
   String TYPE_PROCESS_INSTANCE_DELETION = "instance-deletion";
+  String TYPE_HISTORIC_PROCESS_INSTANCE_DELETION = "historic-instance-deletion";
 
   /**
    * @return the id of the batch

@@ -15,10 +15,10 @@ package org.camunda.bpm.engine.impl.migration.batch;
 
 import java.util.List;
 
-import org.camunda.bpm.engine.impl.batch.AbstractProcessInstanceBatchConfiguration;
+import org.camunda.bpm.engine.impl.batch.AbstractIdsBatchConfiguration;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 
-public class MigrationBatchConfiguration extends AbstractProcessInstanceBatchConfiguration {
+public class MigrationBatchConfiguration extends AbstractIdsBatchConfiguration {
 
   protected MigrationPlan migrationPlan;
   protected boolean isSkipCustomListeners;
@@ -55,7 +55,7 @@ public class MigrationBatchConfiguration extends AbstractProcessInstanceBatchCon
     MigrationBatchConfiguration configuration = new MigrationBatchConfiguration();
 
     configuration.migrationPlan = migrationPlan;
-    configuration.processInstanceIds = processInstanceIds;
+    configuration.ids = processInstanceIds;
     configuration.isSkipCustomListeners = skipCustomListeners;
     configuration.isSkipIoMappings = skipIoMappings;
 

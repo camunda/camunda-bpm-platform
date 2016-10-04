@@ -13,43 +13,36 @@
 
 package org.camunda.bpm.engine.test.api.runtime;
 
-import org.camunda.bpm.engine.BadUserRequestException;
-import org.camunda.bpm.engine.HistoryService;
-import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
-import org.camunda.bpm.engine.history.HistoricTaskInstance;
-import org.camunda.bpm.engine.runtime.Execution;
-import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.api.AbstractAsyncOperationsTest;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
-import org.junit.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 
 /**
  * @author Askar Akhmerov
  */
-public class RuntimeServiceAsyncOperationsTest {
-
-  public static final String TESTING_INSTANCE_DELETE = "testing instance delete";
-  public static final String ONE_TASK_PROCESS = "oneTaskProcess";
+public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTest {
 
   public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
@@ -59,10 +52,6 @@ public class RuntimeServiceAsyncOperationsTest {
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
-
-  private RuntimeService runtimeService;
-  private ManagementService managementService;
-  private HistoryService historyService;
 
   @Before
   public void initServices() {
@@ -98,8 +87,8 @@ public class RuntimeServiceAsyncOperationsTest {
     executeBatchJobs(batch);
 
     // then
-    assertTasksAreDeleted(processIds, TESTING_INSTANCE_DELETE);
-    assertHistoricBatchExists();
+    assertHistoricTaskDeletionPresent(processIds, TESTING_INSTANCE_DELETE, testRule);
+    assertHistoricBatchExists(testRule);
     assertProcessInstancesAreDeleted();
   }
 
@@ -117,8 +106,8 @@ public class RuntimeServiceAsyncOperationsTest {
     executeBatchJobs(batch);
 
     // then
-    assertTasksAreDeleted(processIds, TESTING_INSTANCE_DELETE);
-    assertHistoricBatchExists();
+    assertHistoricTaskDeletionPresent(processIds, TESTING_INSTANCE_DELETE, testRule);
+    assertHistoricBatchExists(testRule);
     assertProcessInstancesAreDeleted();
   }
 
@@ -145,8 +134,8 @@ public class RuntimeServiceAsyncOperationsTest {
     assertThat(managementService.createJobQuery().withException().list().size(), is(1));
 
     processIds.remove("unknown");
-    assertTasksAreDeleted(processIds, TESTING_INSTANCE_DELETE);
-    assertHistoricBatchExists();
+    assertHistoricTaskDeletionPresent(processIds, TESTING_INSTANCE_DELETE, testRule);
+    assertHistoricBatchExists(testRule);
     assertProcessInstancesAreDeleted();
   }
 
@@ -188,8 +177,8 @@ public class RuntimeServiceAsyncOperationsTest {
     executeBatchJobs(batch);
 
     // then
-    assertTasksAreDeleted(processIds, TESTING_INSTANCE_DELETE);
-    assertHistoricBatchExists();
+    assertHistoricTaskDeletionPresent(processIds, TESTING_INSTANCE_DELETE, testRule);
+    assertHistoricBatchExists(testRule);
     assertProcessInstancesAreDeleted();
   }
 
@@ -209,8 +198,8 @@ public class RuntimeServiceAsyncOperationsTest {
     executeBatchJobs(batch);
 
     // then
-    assertTasksAreDeleted(processIds, TESTING_INSTANCE_DELETE);
-    assertHistoricBatchExists();
+    assertHistoricTaskDeletionPresent(processIds, TESTING_INSTANCE_DELETE, testRule);
+    assertHistoricBatchExists(testRule);
     assertProcessInstancesAreDeleted();
   }
 
@@ -230,8 +219,8 @@ public class RuntimeServiceAsyncOperationsTest {
     executeBatchJobs(batch);
 
     // then
-    assertTasksAreDeleted(processIds, "deleted");
-    assertHistoricBatchExists();
+    assertHistoricTaskDeletionPresent(processIds, "deleted", testRule);
+    assertHistoricBatchExists(testRule);
     assertProcessInstancesAreDeleted();
   }
 
@@ -259,70 +248,6 @@ public class RuntimeServiceAsyncOperationsTest {
 
     // when
     runtimeService.deleteProcessInstancesAsync(null, query, TESTING_INSTANCE_DELETE);
-  }
-
-  /// helper //////
-
-  private void executeSeedJob(Batch batch) {
-    String seedJobDefinitionId = batch.getSeedJobDefinitionId();
-    Job seedJob = managementService.createJobQuery().jobDefinitionId(seedJobDefinitionId).singleResult();
-    assertNotNull(seedJob);
-    managementService.executeJob(seedJob.getId());
-  }
-
-  /**
-   * Execute all batch jobs of batch once and collect exceptions during job execution.
-   *
-   * @param batch the batch for which the batch jobs should be executed
-   * @return the catched exceptions of the batch job executions, is empty if non where thrown
-   */
-  private List<Exception> executeBatchJobs(Batch batch) {
-    String batchJobDefinitionId = batch.getBatchJobDefinitionId();
-    List<Job> batchJobs = managementService.createJobQuery().jobDefinitionId(batchJobDefinitionId).list();
-    assertFalse(batchJobs.isEmpty());
-
-    List<Exception> catchedExceptions = new ArrayList<Exception>();
-
-    for (Job batchJob : batchJobs) {
-      try {
-        managementService.executeJob(batchJob.getId());
-      }
-      catch (Exception e) {
-        catchedExceptions.add(e);
-      }
-    }
-
-    return catchedExceptions;
-  }
-
-  protected List<String> startTestProcesses(int numberOfProcesses) {
-    ArrayList<String> ids = new ArrayList<String>();
-
-    for (int i = 0; i < numberOfProcesses; i++) {
-      ids.add(runtimeService.startProcessInstanceByKey(ONE_TASK_PROCESS).getProcessInstanceId());
-    }
-
-    return ids;
-  }
-
-  protected void assertTasksAreDeleted(List<String> processIds, String deleteReason) {
-    if (!testRule.isHistoryLevelNone()) {
-
-      for (String processId : processIds) {
-        HistoricTaskInstance historicTaskInstance = historyService
-            .createHistoricTaskInstanceQuery()
-            .processInstanceId(processId)
-            .singleResult();
-
-        assertThat(historicTaskInstance.getDeleteReason(), is(deleteReason));
-      }
-    }
-  }
-
-  protected void assertHistoricBatchExists() {
-    if (testRule.isHistoryLevelFull()) {
-      assertThat(historyService.createHistoricBatchQuery().count(), is(1L));
-    }
   }
 
   protected void assertProcessInstancesAreDeleted() {
