@@ -14,9 +14,11 @@ import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.UserTask;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaTaskListener;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 import static junit.framework.TestCase.fail;
@@ -39,19 +41,27 @@ public class TaskListenerDelegateCompletionTest {
   protected ProcessEngineTestRule testHelper = new ProcessEngineTestRule(engineRule);
 
   @Rule
+  public ExpectedException thrown = ExpectedException.none();
+
+  @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(authRule).around(testHelper);
 
   protected RuntimeService runtimeService;
   protected TaskService taskService;
-
-  protected String event;
-  protected BpmnModelInstance process;
 
   @Before
   public void setUp() {
     taskService = engineRule.getTaskService();
     runtimeService = engineRule.getRuntimeService();
   }
+
+  @After
+  public void cleanUp() {
+    if (runtimeService.createProcessInstanceQuery().count() > 0) {
+      runtimeService.deleteProcessInstance(runtimeService.createProcessInstanceQuery().singleResult().getId(),null,true);
+    }
+  }
+
 
   protected static BpmnModelInstance setupProcess(String eventName) {
     return taskListener(Bpmn.createExecutableProcess(TASK_LISTENER_PROCESS)
@@ -101,46 +111,36 @@ public class TaskListenerDelegateCompletionTest {
 
   @Test
   public void testCompletionIsNotPossibleOnComplete () {
+    // expect
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage(containsString("invalid task state"));
     //given
     createProcessWithListener(TaskListener.EVENTNAME_COMPLETE);
 
     //when
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(TASK_LISTENER_PROCESS);
+    runtimeService.startProcessInstanceByKey(TASK_LISTENER_PROCESS);
     Task task = taskService.createTaskQuery().singleResult();
 
-    try {
-      taskService.complete(task.getId());
-      fail("expected exception to be thrown");
-      //then
-    } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(),containsString("invalid task state"));
-      runtimeService.deleteProcessInstance(processInstance.getId(),"clean up");
-    }
+    taskService.complete(task.getId());
   }
 
   @Test
   public void testCompletionIsNotPossibleOnDelete () {
+    // expect
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage(containsString("invalid task state"));
 
     //given
     createProcessWithListener(TaskListener.EVENTNAME_DELETE);
 
     //when
-    ProcessInstance started = runtimeService.startProcessInstanceByKey(TASK_LISTENER_PROCESS);
-
-    try {
-      runtimeService.deleteProcessInstance(started.getId(),"test reason");
-      fail("expected exception to be thrown");
-      //then
-    } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(),containsString("invalid task state"));
-      taskService.complete(taskService.createTaskQuery().singleResult().getId());
-    }
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(TASK_LISTENER_PROCESS);
+    runtimeService.deleteProcessInstance(processInstance.getId(),"test reason");
   }
 
   protected void createProcessWithListener(String eventName) {
-    this.event = eventName;
-    this.process = setupProcess(eventName);
-    testHelper.deploy(process);
+    BpmnModelInstance bpmnModelInstance = setupProcess(eventName);
+    testHelper.deploy(bpmnModelInstance);
   }
 
 }

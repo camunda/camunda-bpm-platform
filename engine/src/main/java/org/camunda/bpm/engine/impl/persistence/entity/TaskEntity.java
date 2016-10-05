@@ -13,21 +13,6 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.delegate.DelegateCaseExecution;
 import org.camunda.bpm.engine.delegate.DelegateTask;
@@ -71,6 +56,21 @@ import org.camunda.bpm.model.bpmn.instance.UserTask;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.ModelElementType;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static org.camunda.bpm.engine.delegate.TaskListener.EVENTNAME_DELETE;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
@@ -85,8 +85,6 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
   public static final String DELETE_REASON_DELETED = "deleted";
 
   private static final long serialVersionUID = 1L;
-  protected static final String COMPLETE_EVENT = "complete";
-  protected static final String DELETE_EVENT = "delete";
 
   protected String id;
   protected int revision;
@@ -280,7 +278,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
 
   public void complete() {
 
-    if (COMPLETE_EVENT.equals(this.eventName) || DELETE_EVENT.equals(this.eventName)) {
+    if (TaskListener.EVENTNAME_COMPLETE.equals(this.eventName) || TaskListener.EVENTNAME_DELETE.equals(this.eventName)) {
       throw LOG.invokeTaskListenerException(new IllegalStateException("invalid task state"));
     }
     // if the task is associated with a case
@@ -334,7 +332,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
 
   public void delete(String deleteReason, boolean cascade) {
     this.deleteReason = deleteReason;
-    fireEvent(TaskListener.EVENTNAME_DELETE);
+    fireEvent(EVENTNAME_DELETE);
 
     Context
       .getCommandContext()
