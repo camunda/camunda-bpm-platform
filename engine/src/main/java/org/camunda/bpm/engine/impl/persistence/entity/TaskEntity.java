@@ -12,7 +12,6 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-
 import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.delegate.DelegateCaseExecution;
 import org.camunda.bpm.engine.delegate.DelegateTask;
@@ -39,6 +38,7 @@ import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
+import org.camunda.bpm.engine.impl.event.ConditionalVariableEventPayload;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandContextListener;
@@ -497,7 +497,8 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
   @Override
   public void dispatchEvent(VariableEvent variableEvent) {
     if (execution != null && variableEvent.getVariableInstance().getTaskId() == null) {
-      execution.handleConditionalEventOnVariableChange(this);
+      ConditionalVariableEventPayload conditionalEventPayload = new ConditionalVariableEventPayload(variableEvent, this);
+      execution.handleConditionalEventOnVariableChange(conditionalEventPayload);
     }
   }
 

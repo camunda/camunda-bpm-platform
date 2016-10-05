@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.Set;
 import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
-import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.behavior.NoneStartEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
@@ -50,6 +49,7 @@ import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.HasDbReferences;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
+import org.camunda.bpm.engine.impl.event.ConditionalVariableEventPayload;
 import org.camunda.bpm.engine.impl.event.EventType;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
@@ -1702,11 +1702,11 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     }
   }
 
-  public void handleConditionalEventOnVariableChange(VariableScope scope) {
+  public void handleConditionalEventOnVariableChange(ConditionalVariableEventPayload conditionalEventPayload) {
     List<EventSubscriptionEntity> subScriptions = getEventSubscriptions();
     for (EventSubscriptionEntity subscription : subScriptions) {
       if (EventType.CONDITONAL.name().equals(subscription.getEventType())) {
-        subscription.processEventSync(scope);
+        subscription.processEventSync(conditionalEventPayload);
       }
     }
   }
@@ -1717,14 +1717,14 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     new ExecutionTopDownWalker(this).addPreVisitor(new TreeVisitor<ExecutionEntity>() {
       @Override
       public void visit(ExecutionEntity obj) {
-        //
         if (!obj.getEventSubscriptions().isEmpty()) {
           execs.add(obj);
         }
       }
     }).walkUntil();
     for (ExecutionEntity execution : execs) {
-      execution.handleConditionalEventOnVariableChange(this);
+      ConditionalVariableEventPayload conditionalEventPayload = new ConditionalVariableEventPayload(variableEvent, this);
+      execution.handleConditionalEventOnVariableChange(conditionalEventPayload);
     }
   }
 

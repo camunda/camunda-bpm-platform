@@ -16,9 +16,11 @@
 package org.camunda.bpm.engine.impl.bpmn.parser;
 
 import java.io.Serializable;
+import java.util.Set;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.Condition;
+import org.camunda.bpm.engine.impl.core.variable.event.VariableEvent;
 import org.camunda.bpm.engine.impl.event.EventType;
 
 /**
@@ -33,6 +35,8 @@ public class ConditionalEventDefinition extends EventSubscriptionDeclaration imp
 
   protected final Condition condition;
   protected boolean interrupting;
+  protected String variableName;
+  protected Set<String> variableEvents;
 
   public ConditionalEventDefinition(Condition condition, String activityId) {
     super(null, EventType.CONDITONAL);
@@ -50,6 +54,29 @@ public class ConditionalEventDefinition extends EventSubscriptionDeclaration imp
 
   public void setInterrupting(boolean interrupting) {
     this.interrupting = interrupting;
+  }
+
+  public String getVariableName() {
+    return variableName;
+  }
+
+  public void setVariableName(String variableName) {
+    this.variableName = variableName;
+  }
+
+  public Set<String> getVariableEvents() {
+    return variableEvents;
+  }
+
+  public void setVariableEvents(Set<String> variableEvents) {
+    this.variableEvents = variableEvents;
+  }
+
+  public boolean shouldEvaluateForVariableEvent(VariableEvent event) {
+    return variableName == null
+            || (event.getVariableInstance().getName().equals(variableName)
+               && ((variableEvents == null || variableEvents.isEmpty())
+                  || variableEvents.contains(event.getEventName())));
   }
 
   public boolean evaluate(VariableScope scope, DelegateExecution execution) {

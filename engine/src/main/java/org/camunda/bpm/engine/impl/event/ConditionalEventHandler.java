@@ -15,7 +15,7 @@
  */
 package org.camunda.bpm.engine.impl.event;
 
-import org.camunda.bpm.engine.delegate.VariableScope;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.bpmn.behavior.ConditionalEventBehavioral;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
@@ -35,20 +35,20 @@ public class ConditionalEventHandler implements EventHandler {
 
   @Override
   public void handleEvent(EventSubscriptionEntity eventSubscription, Object payload, CommandContext commandContext) {
-    VariableScope scope;
-    if (payload instanceof VariableScope) {
-      scope = (VariableScope) payload;
+    ConditionalVariableEventPayload conditionalEventPayload;
+    if (payload instanceof ConditionalVariableEventPayload) {
+      conditionalEventPayload = (ConditionalVariableEventPayload) payload;
     } else {
-      throw new IllegalArgumentException("Payload have to be variable scope, to evaluate condition.");
+      throw new ProcessEngineException("Payload have to be " + ConditionalVariableEventPayload.class.getName() + ", to evaluate condition.");
     }
 
     ActivityImpl activity = eventSubscription.getActivity();
     ActivityBehavior activityBehavior = activity.getActivityBehavior();
     if (activityBehavior instanceof ConditionalEventBehavioral) {
       ConditionalEventBehavioral conditionalBehavior = (ConditionalEventBehavioral) activityBehavior;
-      conditionalBehavior.leaveOnSatisfiedCondition(eventSubscription, scope, commandContext);
+      conditionalBehavior.leaveOnSatisfiedCondition(eventSubscription, conditionalEventPayload, commandContext);
     } else {
-      throw new IllegalStateException("Conditional Event has not correct behavior: " + activityBehavior);
+      throw new ProcessEngineException("Conditional Event has not correct behavior: " + activityBehavior);
     }
   }
 

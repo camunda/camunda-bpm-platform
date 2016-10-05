@@ -17,6 +17,8 @@ package org.camunda.bpm.engine.impl.bpmn.behavior;
 
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.bpmn.parser.ConditionalEventDefinition;
+import org.camunda.bpm.engine.impl.core.variable.event.VariableEvent;
+import org.camunda.bpm.engine.impl.event.ConditionalVariableEventPayload;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
@@ -35,10 +37,14 @@ public class EventSubProcessStartConditionalEventActivityBehavior extends EventS
   }
 
   @Override
-  public void leaveOnSatisfiedCondition(final EventSubscriptionEntity eventSubscription, final VariableScope scope, final CommandContext commandContext) {
+  public void leaveOnSatisfiedCondition(final EventSubscriptionEntity eventSubscription, final ConditionalVariableEventPayload conditionalVariableEventPayload, final CommandContext commandContext) {
     PvmExecutionImpl execution = eventSubscription.getExecution();
+    final VariableEvent variableEvent = conditionalVariableEventPayload.getVariableEvent();
+    final VariableScope scope = conditionalVariableEventPayload.getScope();
+
     if (!execution.isEnded() && execution.isScope()
-       && conditionalEvent.tryEvaluate(scope, execution)) {
+       && variableEvent != null && conditionalEvent.shouldEvaluateForVariableEvent(variableEvent)
+       && scope != null && conditionalEvent.tryEvaluate(scope, execution)) {
       ActivityImpl activity = eventSubscription.getActivity();
       activity = (ActivityImpl) activity.getFlowScope();
       execution.executeEventHandlerActivity(activity);

@@ -23,10 +23,10 @@ import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.Test;
+import org.camunda.bpm.engine.ProcessEngineException;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertNull;
-import org.camunda.bpm.engine.ProcessEngineException;
 
 /**
  *

@@ -70,6 +70,7 @@ import java.util.*;
 
 import static org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseUtil.*;
 import static org.camunda.bpm.engine.impl.util.ClassDelegateUtil.instantiateDelegate;
+import static org.camunda.bpm.engine.impl.util.ClassDelegateUtil.instantiateDelegate;
 
 /**
  * Specific parsing of one BPMN 2.0 XML file, created by the {@link BpmnParser}.
@@ -3428,6 +3429,15 @@ public class BpmnParse extends Parse {
     if (conditionExprElement != null) {
       Condition condition = parseConditionExpression(conditionExprElement);
       conditionalEventDefinition = new ConditionalEventDefinition(condition, conditionalActivity.getId());
+
+
+      final String variableName = element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "variableName");
+      conditionalEventDefinition.setVariableName(variableName);
+
+      final String variableEvents = element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "variableEvents");
+      final List<String> variableEventsList = parseCommaSeparatedList(variableEvents);
+      conditionalEventDefinition.setVariableEvents(new HashSet<String>(variableEventsList));
+
     } else {
       addError("Conditional event must contain an expression for evaluation.", element);
     }

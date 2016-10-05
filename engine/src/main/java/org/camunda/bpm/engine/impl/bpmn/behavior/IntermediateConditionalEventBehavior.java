@@ -20,6 +20,7 @@ import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.ExecutionQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.bpmn.parser.ConditionalEventDefinition;
+import org.camunda.bpm.engine.impl.event.ConditionalVariableEventPayload;
 import org.camunda.bpm.engine.impl.event.EventType;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
@@ -54,17 +55,18 @@ public class IntermediateConditionalEventBehavior extends IntermediateCatchEvent
   }
 
   @Override
-  public void leaveOnSatisfiedCondition(final EventSubscriptionEntity eventSubscription, final VariableScope scope, final CommandContext commandContext) {
+  public void leaveOnSatisfiedCondition(final EventSubscriptionEntity eventSubscription, final ConditionalVariableEventPayload conditionalVariableEventPayload, final CommandContext commandContext) {
 
     PvmExecutionImpl execution = eventSubscription.getExecution();
     ActivityImpl activity = eventSubscription.getActivity();
+    final VariableScope scope = conditionalVariableEventPayload.getScope();
 
     ExecutionQueryImpl query = new ExecutionQueryImpl();
     query.activityId(activity.getId());
     query.processInstanceId(execution.getProcessInstanceId());
     Page p = new Page(0, 1);
     List<ExecutionEntity> executions = commandContext.getExecutionManager().findExecutionsByQueryCriteria(query, p);
-    if (!executions.isEmpty()) {
+    if (!executions.isEmpty() && scope != null) {
       execution = executions.get(0);
       if (!execution.isEnded() && conditionalEvent.evaluate(scope, execution)) {
         if (execution.isActive() && execution.isScope()) {
