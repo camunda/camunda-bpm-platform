@@ -38,7 +38,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.tools.ant.filters.StringInputStream;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
@@ -87,6 +86,7 @@ import org.camunda.bpm.engine.variable.type.ValueType;
 public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
 
   public static final String TESTING_INSTANCE_DELETION = "testing instance deletion";
+  public static final String A_STREAM = "aStream";
 
   public void testStartProcessInstanceByKeyNullKey() {
     try {
@@ -2298,7 +2298,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
     assertThat(result,is(notNullValue()));
     taskService.deleteAttachment(result.getId());
 
-    result = runtimeService.createAttachment("testType", "testProcess", "testName", "aDescription", new StringInputStream("aStream"));
+    result = runtimeService.createAttachment("testType", "testProcess", "testName", "aDescription", new ByteArrayInputStream(A_STREAM.getBytes()));
     assertThat(result,is(notNullValue()));
     taskService.deleteAttachment(result.getId());
   }
@@ -2311,7 +2311,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
     }
 
     try {
-      runtimeService.createAttachment("testType", null, "testName", "aDescription", new StringInputStream("aStream"));
+      runtimeService.createAttachment("testType", null, "testName", "aDescription", new ByteArrayInputStream(A_STREAM.getBytes()));
     } catch (Exception e) {
       //expected
     }
