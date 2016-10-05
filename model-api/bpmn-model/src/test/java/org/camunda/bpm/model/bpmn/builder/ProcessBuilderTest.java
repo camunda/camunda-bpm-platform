@@ -54,6 +54,7 @@ import org.camunda.bpm.model.bpmn.instance.BpmnModelElementInstance;
 import org.camunda.bpm.model.bpmn.instance.BusinessRuleTask;
 import org.camunda.bpm.model.bpmn.instance.CallActivity;
 import org.camunda.bpm.model.bpmn.instance.CompensateEventDefinition;
+import org.camunda.bpm.model.bpmn.instance.ConditionalEventDefinition;
 import org.camunda.bpm.model.bpmn.instance.Definitions;
 import org.camunda.bpm.model.bpmn.instance.EndEvent;
 import org.camunda.bpm.model.bpmn.instance.Error;
@@ -2327,6 +2328,65 @@ public class ProcessBuilderTest {
     } catch (BpmnModelException e) {
       assertThat(e).hasMessageContaining("Activity with id 'subProcessTask' must be in the same scope as 'boundary'");
     }
+  }
+
+  @Test
+  public void testIntermediateConditionalEventDefinition() {
+
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .intermediateCatchEvent("catch")
+        .conditionalEventDefinition("condition")
+            .condition("${true}")
+        .conditionalEventDefinitionDone()
+      .endEvent("end")
+      .done();
+
+    ConditionalEventDefinition eventDefinition = assertAndGetSingleEventDefinition("catch", ConditionalEventDefinition.class);
+    assertThat(eventDefinition.getId()).isEqualTo("condition");
+    assertThat(eventDefinition.getCondition().getTextContent()).isEqualTo("${true}");
+  }
+
+  @Test
+  public void testBoundaryConditionalEventDefinition() {
+
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .userTask("task")
+      .endEvent()
+        .moveToActivity("task")
+          .boundaryEvent("boundary")
+            .conditionalEventDefinition("condition")
+              .condition("${true}")
+            .conditionalEventDefinitionDone()
+          .endEvent("boundaryEnd")
+      .done();
+
+    ConditionalEventDefinition eventDefinition = assertAndGetSingleEventDefinition("boundary", ConditionalEventDefinition.class);
+    assertThat(eventDefinition.getId()).isEqualTo("condition");
+    assertThat(eventDefinition.getCondition().getTextContent()).isEqualTo("${true}");
+  }
+
+  @Test
+  public void testEventSubProcessConditionalStartEvent() {
+
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .userTask("task")
+      .endEvent()
+      .subProcess()
+        .triggerByEvent()
+        .embeddedSubProcess()
+        .startEvent("start")
+          .conditionalEventDefinition("condition")
+            .condition("${true}")
+          .conditionalEventDefinitionDone()
+        .endEvent("subEnd")
+      .done();
+
+    ConditionalEventDefinition eventDefinition = assertAndGetSingleEventDefinition("start", ConditionalEventDefinition.class);
+    assertThat(eventDefinition.getId()).isEqualTo("condition");
+    assertThat(eventDefinition.getCondition().getTextContent()).isEqualTo("${true}");
   }
 
   protected Message assertMessageEventDefinition(String elementId, String messageName) {

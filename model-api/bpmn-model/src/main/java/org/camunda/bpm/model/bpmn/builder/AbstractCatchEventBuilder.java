@@ -16,6 +16,7 @@ package org.camunda.bpm.model.bpmn.builder;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.CatchEvent;
 import org.camunda.bpm.model.bpmn.instance.CompensateEventDefinition;
+import org.camunda.bpm.model.bpmn.instance.ConditionalEventDefinition;
 import org.camunda.bpm.model.bpmn.instance.MessageEventDefinition;
 import org.camunda.bpm.model.bpmn.instance.SignalEventDefinition;
 import org.camunda.bpm.model.bpmn.instance.TimeCycle;
@@ -137,6 +138,20 @@ public abstract class AbstractCatchEventBuilder<B extends  AbstractCatchEventBui
 
     element.getEventDefinitions().add(eventDefinition);
     return new CompensateEventDefinitionBuilder(modelInstance, eventDefinition);
+  }
+
+  public ConditionalEventDefinitionBuilder conditionalEventDefinition() {
+    return conditionalEventDefinition(null);
+  }
+
+  public ConditionalEventDefinitionBuilder conditionalEventDefinition(String id) {
+    ConditionalEventDefinition eventDefinition = createInstance(ConditionalEventDefinition.class);
+    if (id != null) {
+      eventDefinition.setId(id);
+    }
+
+    element.getEventDefinitions().add(eventDefinition);
+    return new ConditionalEventDefinitionBuilder(modelInstance, eventDefinition);
   }
 
 }
