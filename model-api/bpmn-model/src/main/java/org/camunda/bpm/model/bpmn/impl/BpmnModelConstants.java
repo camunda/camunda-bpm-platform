@@ -469,5 +469,7 @@ public final class BpmnModelConstants {
   public static final String CAMUNDA_ATTRIBUTE_CASE_BINDING = "caseBinding";
   public static final String CAMUNDA_ATTRIBUTE_CASE_VERSION = "caseVersion";
   public static final String CAMUNDA_ATTRIBUTE_CASE_TENANT_ID = "caseTenantId";
+  public static final String CAMUNDA_ATTRIBUTE_VARIABLE_NAME = "variableName";
+  public static final String CAMUNDA_ATTRIBUTE_VARIABLE_EVENTS = "variableEvents";
 
 }

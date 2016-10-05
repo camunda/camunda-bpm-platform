@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.model.bpmn.impl.instance;
 
+import java.util.List;
 import org.camunda.bpm.model.bpmn.instance.Condition;
 import org.camunda.bpm.model.bpmn.instance.ConditionalEventDefinition;
 import org.camunda.bpm.model.bpmn.instance.EventDefinition;
@@ -24,7 +25,12 @@ import org.camunda.bpm.model.xml.type.child.SequenceBuilder;
 
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN20_NS;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN_ELEMENT_CONDITIONAL_EVENT_DEFINITION;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_VARIABLE_NAME;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_NS;
+import org.camunda.bpm.model.xml.impl.util.StringUtil;
 import static org.camunda.bpm.model.xml.type.ModelElementTypeBuilder.ModelTypeInstanceProvider;
+import org.camunda.bpm.model.xml.type.attribute.Attribute;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_VARIABLE_EVENTS;
 
 /**
  * The BPMN conditionalEventDefinition element
@@ -34,12 +40,16 @@ import static org.camunda.bpm.model.xml.type.ModelElementTypeBuilder.ModelTypeIn
 public class ConditionalEventDefinitionImpl extends EventDefinitionImpl implements ConditionalEventDefinition {
 
   protected static ChildElement<Condition> conditionChild;
+  protected static Attribute<String> camundaVariableName;
+  protected static Attribute<String> camundaVariableEvents;
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(ConditionalEventDefinition.class, BPMN_ELEMENT_CONDITIONAL_EVENT_DEFINITION)
       .namespaceUri(BPMN20_NS)
       .extendsType(EventDefinition.class)
       .instanceProvider(new ModelTypeInstanceProvider<ConditionalEventDefinition>() {
+        
+        @Override
         public ConditionalEventDefinition newInstance(ModelTypeInstanceContext instanceContext) {
           return new ConditionalEventDefinitionImpl(instanceContext);
         }
@@ -51,6 +61,16 @@ public class ConditionalEventDefinitionImpl extends EventDefinitionImpl implemen
       .required()
       .build();
 
+    /** camunda extensions */
+
+    camundaVariableName = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_VARIABLE_NAME)
+      .namespace(CAMUNDA_NS)
+      .build();
+
+    camundaVariableEvents = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_VARIABLE_EVENTS)
+      .namespace(CAMUNDA_NS)
+      .build();
+
     typeBuilder.build();
   }
 
@@ -58,11 +78,45 @@ public class ConditionalEventDefinitionImpl extends EventDefinitionImpl implemen
     super(context);
   }
 
+  @Override
   public Condition getCondition() {
     return conditionChild.getChild(this);
   }
 
+  @Override
   public void setCondition(Condition condition) {
     conditionChild.setChild(this, condition);
+  }
+
+  @Override
+  public String getCamundaVariableName() {
+    return camundaVariableName.getValue(this);
+  }
+
+  @Override
+  public void setCamundaVariableName(String variableName) {
+    camundaVariableName.setValue(this, variableName);
+  }
+
+  @Override
+  public String getCamundaVariableEvents() {
+    return camundaVariableEvents.getValue(this);
+  }
+
+  @Override
+  public void setCamundaVariableEvents(String variableEvents) {
+    camundaVariableEvents.setValue(this, variableEvents);
+  }
+
+  @Override
+  public List<String> getCamundaVariableEventsList() {
+    String variableEvents = camundaVariableEvents.getValue(this);
+    return StringUtil.splitCommaSeparatedList(variableEvents);
+  }
+
+  @Override
+  public void setCamundaVariableEventsList(List<String> variableEventsList) {
+    String variableEvents = StringUtil.joinCommaSeparatedList(variableEventsList);
+    camundaVariableEvents.setValue(this, variableEvents);
   }
 }

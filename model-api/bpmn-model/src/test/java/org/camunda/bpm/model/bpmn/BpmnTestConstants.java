@@ -40,6 +40,9 @@ public final class BpmnTestConstants {
   public static final String EXCLUSIVE_GATEWAY = "exclusiveGateway";
   public static final String SUB_PROCESS_ID = "subProcess";
   public static final String TRANSACTION_ID = "transaction";
+  public static final String CONDITION_ID = "condition";
+  public static final String BOUNDARY_ID = "boundary";
+  public static final String CATCH_ID = "catch";
 
   public static final String TEST_STRING_XML = "test";
   public static final String TEST_STRING_API = "api";
@@ -72,5 +75,10 @@ public final class BpmnTestConstants {
   public static final String TEST_PROCESS_JOB_PRIORITY = "15";
   public static final String TEST_PROCESS_TASK_PRIORITY = "13";
   public static final String TEST_SERVICE_TASK_PRIORITY = "${test}";
+
+  public static final String TEST_CONDITION = "${true}";
+  public static final String TEST_CONDITIONAL_VARIABLE_NAME = "variable";
+  public static final String TEST_CONDITIONAL_VARIABLE_EVENTS = "create, update";
+  public static final List<String> TEST_CONDITIONAL_VARIABLE_EVENTS_LIST = Arrays.asList("create", "update");
 
 }

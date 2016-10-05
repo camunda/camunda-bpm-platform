@@ -45,6 +45,14 @@ import java.util.List;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelException;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.BOUNDARY_ID;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.CATCH_ID;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.CONDITION_ID;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_CONDITION;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_CONDITIONAL_VARIABLE_EVENTS;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_CONDITIONAL_VARIABLE_EVENTS_LIST;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_CONDITIONAL_VARIABLE_NAME;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.USER_TASK_ID;
 import org.camunda.bpm.model.bpmn.GatewayDirection;
 import org.camunda.bpm.model.bpmn.TransactionMethod;
 import org.camunda.bpm.model.bpmn.instance.Activity;
@@ -2331,20 +2339,40 @@ public class ProcessBuilderTest {
   }
 
   @Test
+  public void testConditionalEventDefinitionCamundaExtensions() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .intermediateCatchEvent()
+      .conditionalEventDefinition(CONDITION_ID)
+        .condition(TEST_CONDITION)
+        .camundaVariableEvents(TEST_CONDITIONAL_VARIABLE_EVENTS)
+        .camundaVariableEvents(TEST_CONDITIONAL_VARIABLE_EVENTS_LIST)
+        .camundaVariableName(TEST_CONDITIONAL_VARIABLE_NAME)
+      .conditionalEventDefinitionDone()
+      .endEvent()
+      .done();
+
+    ConditionalEventDefinition conditionalEventDef = modelInstance.getModelElementById(CONDITION_ID);
+    assertThat(conditionalEventDef.getCamundaVariableEvents()).isEqualTo(TEST_CONDITIONAL_VARIABLE_EVENTS);
+    assertThat(conditionalEventDef.getCamundaVariableEventsList()).containsAll(TEST_CONDITIONAL_VARIABLE_EVENTS_LIST);
+    assertThat(conditionalEventDef.getCamundaVariableName()).isEqualTo(TEST_CONDITIONAL_VARIABLE_NAME);
+  }
+
+  @Test
   public void testIntermediateConditionalEventDefinition() {
 
     modelInstance = Bpmn.createProcess()
       .startEvent()
-      .intermediateCatchEvent("catch")
-        .conditionalEventDefinition("condition")
-            .condition("${true}")
+      .intermediateCatchEvent(CATCH_ID)
+        .conditionalEventDefinition(CONDITION_ID)
+            .condition(TEST_CONDITION)
         .conditionalEventDefinitionDone()
-      .endEvent("end")
+      .endEvent()
       .done();
 
-    ConditionalEventDefinition eventDefinition = assertAndGetSingleEventDefinition("catch", ConditionalEventDefinition.class);
-    assertThat(eventDefinition.getId()).isEqualTo("condition");
-    assertThat(eventDefinition.getCondition().getTextContent()).isEqualTo("${true}");
+    ConditionalEventDefinition eventDefinition = assertAndGetSingleEventDefinition(CATCH_ID, ConditionalEventDefinition.class);
+    assertThat(eventDefinition.getId()).isEqualTo(CONDITION_ID);
+    assertThat(eventDefinition.getCondition().getTextContent()).isEqualTo(TEST_CONDITION);
   }
 
   @Test
@@ -2352,19 +2380,19 @@ public class ProcessBuilderTest {
 
     modelInstance = Bpmn.createProcess()
       .startEvent()
-      .userTask("task")
+      .userTask(USER_TASK_ID)
       .endEvent()
-        .moveToActivity("task")
-          .boundaryEvent("boundary")
-            .conditionalEventDefinition("condition")
-              .condition("${true}")
+        .moveToActivity(USER_TASK_ID)
+          .boundaryEvent(BOUNDARY_ID)
+            .conditionalEventDefinition(CONDITION_ID)
+              .condition(TEST_CONDITION)
             .conditionalEventDefinitionDone()
-          .endEvent("boundaryEnd")
+          .endEvent()
       .done();
 
-    ConditionalEventDefinition eventDefinition = assertAndGetSingleEventDefinition("boundary", ConditionalEventDefinition.class);
-    assertThat(eventDefinition.getId()).isEqualTo("condition");
-    assertThat(eventDefinition.getCondition().getTextContent()).isEqualTo("${true}");
+    ConditionalEventDefinition eventDefinition = assertAndGetSingleEventDefinition(BOUNDARY_ID, ConditionalEventDefinition.class);
+    assertThat(eventDefinition.getId()).isEqualTo(CONDITION_ID);
+    assertThat(eventDefinition.getCondition().getTextContent()).isEqualTo(TEST_CONDITION);
   }
 
   @Test
@@ -2372,21 +2400,21 @@ public class ProcessBuilderTest {
 
     modelInstance = Bpmn.createProcess()
       .startEvent()
-      .userTask("task")
+      .userTask()
       .endEvent()
       .subProcess()
         .triggerByEvent()
         .embeddedSubProcess()
-        .startEvent("start")
-          .conditionalEventDefinition("condition")
-            .condition("${true}")
+        .startEvent(START_EVENT_ID)
+          .conditionalEventDefinition(CONDITION_ID)
+            .condition(TEST_CONDITION)
           .conditionalEventDefinitionDone()
-        .endEvent("subEnd")
+        .endEvent()
       .done();
 
-    ConditionalEventDefinition eventDefinition = assertAndGetSingleEventDefinition("start", ConditionalEventDefinition.class);
-    assertThat(eventDefinition.getId()).isEqualTo("condition");
-    assertThat(eventDefinition.getCondition().getTextContent()).isEqualTo("${true}");
+    ConditionalEventDefinition eventDefinition = assertAndGetSingleEventDefinition(START_EVENT_ID, ConditionalEventDefinition.class);
+    assertThat(eventDefinition.getId()).isEqualTo(CONDITION_ID);
+    assertThat(eventDefinition.getCondition().getTextContent()).isEqualTo(TEST_CONDITION);
   }
 
   protected Message assertMessageEventDefinition(String elementId, String messageName) {
