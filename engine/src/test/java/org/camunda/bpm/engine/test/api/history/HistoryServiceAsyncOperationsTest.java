@@ -169,7 +169,7 @@ public class HistoryServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
   @Test
   public void testDeleteHistoryProcessInstancesAsyncWithEmptyQuery() throws Exception {
     thrown.expect(Exception.class);
-    HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery().finishedAfter(new Date());
+    HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery().unfinished();
     Batch batch = historyService.deleteHistoricProcessInstancesAsync(query, TEST_REASON);
 
     executeSeedJob(batch);
