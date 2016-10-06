@@ -12,8 +12,6 @@ import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.camunda.bpm.model.bpmn.instance.UserTask;
-import org.camunda.bpm.model.bpmn.instance.camunda.CamundaTaskListener;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -21,7 +19,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
-import static junit.framework.TestCase.fail;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.core.Is.is;
@@ -64,21 +61,12 @@ public class TaskListenerDelegateCompletionTest {
 
 
   protected static BpmnModelInstance setupProcess(String eventName) {
-    return taskListener(Bpmn.createExecutableProcess(TASK_LISTENER_PROCESS)
+    return Bpmn.createExecutableProcess(TASK_LISTENER_PROCESS)
         .startEvent()
           .userTask(ACTIVITY_ID)
+          .camundaTaskListenerClass(eventName,COMPLETE_LISTENER)
         .endEvent()
-        .done(), eventName);
-  }
-
-  protected static BpmnModelInstance taskListener(BpmnModelInstance targetModel, String eventName) {
-    CamundaTaskListener taskListener = targetModel.newInstance(CamundaTaskListener.class);
-    taskListener.setCamundaClass(COMPLETE_LISTENER);
-    taskListener.setCamundaEvent(eventName);
-
-    UserTask task = targetModel.getModelElementById(ACTIVITY_ID);
-    task.builder().addExtensionElement(taskListener);
-    return targetModel;
+        .done();
   }
 
   @Test
