@@ -1571,9 +1571,12 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     } catch (ProcessEngineException e) {}
   }
 
+  @Deployment(resources={
+      "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
   public void testCreateTaskAttachmentWithNullTaskId() {
-    Attachment attachment = taskService.createAttachment("web page", null, "someProcessId", "weatherforcast", "temperatures and more", new ByteArrayInputStream("someContent".getBytes()));
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    Attachment attachment = taskService.createAttachment("web page", null, processInstance.getId(), "weatherforcast", "temperatures and more", new ByteArrayInputStream("someContent".getBytes()));
     Attachment fetched = taskService.getAttachment(attachment.getId());
     assertThat(fetched,is(notNullValue()));
     assertThat(fetched.getTaskId(), is(nullValue()));
