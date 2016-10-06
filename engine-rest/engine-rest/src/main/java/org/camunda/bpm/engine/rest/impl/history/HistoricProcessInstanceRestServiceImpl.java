@@ -12,15 +12,18 @@
  */
 package org.camunda.bpm.engine.rest.impl.history;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.history.ReportResult;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
+import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
 import org.camunda.bpm.engine.rest.dto.converter.ReportResultToCsvConverter;
+import org.camunda.bpm.engine.rest.dto.history.DeleteHistoricProcessInstancesDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceReportDto;
@@ -37,10 +40,10 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Variant;
+import java.util.ArrayList;
+import java.util.List;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-public class HistoricProcessInstanceRestServiceImpl implements HistoricProcessInstanceRestService {
+  public class HistoricProcessInstanceRestServiceImpl implements HistoricProcessInstanceRestService {
 
   public static final MediaType APPLICATION_CSV_TYPE = new MediaType("application", "csv");
   public static final MediaType TEXT_CSV_TYPE = new MediaType("text", "csv");
@@ -138,6 +141,27 @@ public class HistoricProcessInstanceRestServiceImpl implements HistoricProcessIn
       }
     }
     throw new InvalidRequestException(Status.NOT_ACCEPTABLE, "No acceptable content-type found");
+  }
+
+  @Override
+  public BatchDto deleteAsync(DeleteHistoricProcessInstancesDto dto) {
+    HistoryService historyService = processEngine.getHistoryService();
+
+    HistoricProcessInstanceQuery historicProcessInstanceQuery = null;
+    if (dto.getHistoricProcessInstanceQuery() != null) {
+      historicProcessInstanceQuery = dto.getHistoricProcessInstanceQuery().toQuery(processEngine);
+    }
+
+    try {
+      Batch batch = historyService.deleteHistoricProcessInstancesAsync(
+          dto.getHistoricProcessInstanceIds(),
+          historicProcessInstanceQuery,
+          dto.getDeleteReason());
+      return BatchDto.fromBatch(batch);
+
+    } catch (BadUserRequestException e) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());
+    }
   }
 
   protected List<ReportResultDto> getReportResultAsJson(UriInfo uriInfo) {

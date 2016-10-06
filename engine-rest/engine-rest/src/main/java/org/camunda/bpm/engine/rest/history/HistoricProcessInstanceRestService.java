@@ -12,10 +12,10 @@
  */
 package org.camunda.bpm.engine.rest.history;
 
-import java.util.List;
-
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
+import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
+import org.camunda.bpm.engine.rest.dto.history.DeleteHistoricProcessInstancesDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.sub.history.HistoricProcessInstanceResource;
@@ -32,6 +32,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import java.util.List;
 
 @Path(HistoricProcessInstanceRestService.PATH)
 @Produces(MediaType.APPLICATION_JSON)
@@ -83,4 +84,10 @@ public interface HistoricProcessInstanceRestService {
   @Path("/report")
   @Produces({ MediaType.APPLICATION_JSON, "text/csv", "application/csv" })
   Response getHistoricProcessInstancesReport(@Context UriInfo uriInfo, @Context Request request);
+
+  @POST
+  @Path("/delete")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  BatchDto deleteAsync(DeleteHistoricProcessInstancesDto dto);
 }
