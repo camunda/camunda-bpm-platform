@@ -154,4 +154,9 @@ public abstract class AbstractCatchEventBuilder<B extends  AbstractCatchEventBui
     return new ConditionalEventDefinitionBuilder(modelInstance, eventDefinition);
   }
 
+  public B condition(String condition) {
+    conditionalEventDefinition().condition(condition);
+    return myself;
+  }
+
 }

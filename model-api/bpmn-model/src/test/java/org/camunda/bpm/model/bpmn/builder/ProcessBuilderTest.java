@@ -2434,6 +2434,20 @@ public class ProcessBuilderTest {
   }
 
   @Test
+  public void testIntermediateConditionalEventDefinitionShortCut() {
+
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+        .intermediateCatchEvent(CATCH_ID)
+        .condition(TEST_CONDITION)
+      .endEvent()
+      .done();
+
+    ConditionalEventDefinition eventDefinition = assertAndGetSingleEventDefinition(CATCH_ID, ConditionalEventDefinition.class);
+    assertThat(eventDefinition.getCondition().getTextContent()).isEqualTo(TEST_CONDITION);
+  }
+
+  @Test
   public void testBoundaryConditionalEventDefinition() {
 
     modelInstance = Bpmn.createProcess()
