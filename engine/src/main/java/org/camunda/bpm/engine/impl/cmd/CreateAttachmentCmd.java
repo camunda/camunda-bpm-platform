@@ -68,7 +68,7 @@ public class CreateAttachmentCmd implements Command<Attachment> {
           .findTaskById(taskId);
     } else {
       ensureNotNull("taskId or processInstanceId has to be provided", this.processInstanceId);
-      processInstance = (ExecutionEntity) new ProcessInstanceQueryImpl().processInstanceId(processInstanceId).singleResult();
+      processInstance = (ExecutionEntity) commandContext.getExecutionManager().findExecutionsByProcessInstanceId(processInstanceId);
     }
 
     AttachmentEntity attachment = new AttachmentEntity();

@@ -12,16 +12,23 @@
  */
 package org.camunda.bpm.engine.impl;
 
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
-
-import java.io.InputStream;
-import java.util.*;
-
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.form.FormData;
-import org.camunda.bpm.engine.impl.cmd.*;
+import org.camunda.bpm.engine.impl.cmd.CreateAttachmentCmd;
+import org.camunda.bpm.engine.impl.cmd.DeleteProcessInstanceCmd;
+import org.camunda.bpm.engine.impl.cmd.DeleteProcessInstancesCmd;
+import org.camunda.bpm.engine.impl.cmd.FindActiveActivityIdsCmd;
+import org.camunda.bpm.engine.impl.cmd.GetActivityInstanceCmd;
+import org.camunda.bpm.engine.impl.cmd.GetExecutionVariableCmd;
+import org.camunda.bpm.engine.impl.cmd.GetExecutionVariableTypedCmd;
+import org.camunda.bpm.engine.impl.cmd.GetExecutionVariablesCmd;
+import org.camunda.bpm.engine.impl.cmd.GetStartFormCmd;
+import org.camunda.bpm.engine.impl.cmd.MessageEventReceivedCmd;
+import org.camunda.bpm.engine.impl.cmd.PatchExecutionVariablesCmd;
+import org.camunda.bpm.engine.impl.cmd.RemoveExecutionVariablesCmd;
+import org.camunda.bpm.engine.impl.cmd.SetExecutionVariablesCmd;
+import org.camunda.bpm.engine.impl.cmd.SignalCmd;
 import org.camunda.bpm.engine.impl.cmd.batch.DeleteProcessInstanceBatchCmd;
 import org.camunda.bpm.engine.impl.migration.MigrationPlanBuilderImpl;
 import org.camunda.bpm.engine.impl.migration.MigrationPlanExecutionBuilderImpl;
@@ -46,6 +53,15 @@ import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 import org.camunda.bpm.engine.task.Attachment;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.value.TypedValue;
+
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Tom Baeyens
@@ -514,16 +530,5 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
   public MigrationPlanExecutionBuilder newMigration(MigrationPlan migrationPlan) {
     return new MigrationPlanExecutionBuilderImpl(commandExecutor, migrationPlan);
   }
-
-  @Override
-  public Attachment createAttachment(String attachmentType, String processInstanceId, String attachmentName, String attachmentDescription, InputStream content) {
-    return commandExecutor.execute(new CreateAttachmentCmd(attachmentType, null, processInstanceId, attachmentName, attachmentDescription, content, null));
-  }
-
-  @Override
-  public Attachment createAttachment(String attachmentType, String processInstanceId, String attachmentName, String attachmentDescription, String url) {
-    return commandExecutor.execute(new CreateAttachmentCmd(attachmentType, null, processInstanceId, attachmentName, attachmentDescription, null, url));
-  }
-
 
 }

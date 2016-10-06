@@ -1811,31 +1811,4 @@ public interface RuntimeService {
    */
   MigrationPlanExecutionBuilder newMigration(MigrationPlan migrationPlan);
 
-
-
-  /**
-   * Add a new attachment to a process instance and use an input stream to provide the content
-   *
-   * @param processInstanceId - cannot be null
-   * @param attachmentType - name of the attachment, can be null
-   * @param attachmentName - name of the attachment, can be null
-   * @param attachmentDescription  - full text description, can be null
-   * @param url - url of the attachment, can be null
-   * @param content - byte array with content of attachment
-   *
-   */
-  Attachment createAttachment(String attachmentType, String processInstanceId, String attachmentName, String attachmentDescription, InputStream content);
-
-  /**
-   * Add a new attachment to a process instance and use an url as the content
-   *
-   * @param processInstanceId - cannot be null
-   * @param attachmentType - name of the attachment, can be null
-   * @param attachmentName - name of the attachment, can be null
-   * @param attachmentDescription  - full text description, can be null
-   * @param url - url of the attachment, can be null
-   *
-   */
-  Attachment createAttachment(String attachmentType, String processInstanceId, String attachmentName, String attachmentDescription, String url);
-
 }

@@ -908,7 +908,14 @@ public interface TaskService {
    * please use method in runtime service to operate on process instance.
    *
    * Either taskId or processInstanceId has to be provided
-   * @see RuntimeService#createAttachment(String, String, String, String, InputStream)
+   *
+   * @param taskId - task that should have an attachment
+   * @param processInstanceId - id of a process to use if task id is null
+   * @param attachmentType - name of the attachment, can be null
+   * @param attachmentName - name of the attachment, can be null
+   * @param attachmentDescription  - full text description, can be null
+   * @param content - byte array with content of attachment
+   *
    */
   Attachment createAttachment(String attachmentType, String taskId, String processInstanceId, String attachmentName, String attachmentDescription, InputStream content);
 
@@ -917,7 +924,14 @@ public interface TaskService {
    * please use method in runtime service to operate on process instance
    *
    * Either taskId or processInstanceId has to be provided
-   * @see RuntimeService#createAttachment(String, String, String, String, String)
+   *
+   * @param taskId - task that should have an attachment
+   * @param processInstanceId - id of a process to use if task id is null
+   * @param attachmentType - name of the attachment, can be null
+   * @param attachmentName - name of the attachment, can be null
+   * @param attachmentDescription  - full text description, can be null
+   * @param url - url of the attachment, can be null
+   *
    */
   Attachment createAttachment(String attachmentType, String taskId, String processInstanceId, String attachmentName, String attachmentDescription, String url);
 

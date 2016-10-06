@@ -2293,27 +2293,4 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
 
   }
 
-  public void testCreateAttachment () {
-    Attachment result = runtimeService.createAttachment("testType", "testProcess", "testName", "aDescription", "aUrl");
-    assertThat(result,is(notNullValue()));
-    taskService.deleteAttachment(result.getId());
-
-    result = runtimeService.createAttachment("testType", "testProcess", "testName", "aDescription", new ByteArrayInputStream(A_STREAM.getBytes()));
-    assertThat(result,is(notNullValue()));
-    taskService.deleteAttachment(result.getId());
-  }
-
-  public void testCreateAttachmentWithoutProcessId () {
-    try {
-      runtimeService.createAttachment("testType", null, "testName", "aDescription", "aUrl");
-    } catch (Exception e) {
-      //expected
-    }
-
-    try {
-      runtimeService.createAttachment("testType", null, "testName", "aDescription", new ByteArrayInputStream(A_STREAM.getBytes()));
-    } catch (Exception e) {
-      //expected
-    }
-  }
 }
