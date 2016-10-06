@@ -35,6 +35,8 @@ import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.util.ExecutionTree;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.Variables.SerializationDataFormats;
+import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
@@ -865,6 +867,40 @@ public class MigrationVariablesTest {
     testHelper.assertVariableMigratedToExecution(
         testHelper.snapshotBeforeMigration.getSingleVariable("var"),
         jobAfterMigration.getExecutionId());
+  }
+
+  @Test
+  public void testCanMigrateWithObjectVariableThatFailsOnDeserialization()
+  {
+    // given
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask", "userTask")
+        .build();
+
+    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+
+    ObjectValue objectValue = Variables
+      .serializedObjectValue("does/not/deserialize")
+      .serializationDataFormat(SerializationDataFormats.JAVA)
+      .objectTypeName("and.this.is.a.nonexisting.Class")
+      .create();
+
+    runtimeService.setVariable(
+        processInstance.getId(),
+        "var",
+        objectValue);
+
+    // when
+    testHelper.migrateProcessInstance(migrationPlan, processInstance);
+
+    // then
+    ObjectValue migratedValue = runtimeService.getVariableTyped(processInstance.getId(), "var", false);
+    Assert.assertEquals(objectValue.getValueSerialized(), migratedValue.getValueSerialized());
+    Assert.assertEquals(objectValue.getObjectTypeName(), migratedValue.getObjectTypeName());
   }
 
 }
