@@ -295,7 +295,14 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
 
     Task task = tasks.get(0);
 
-    //when local variable is set on execution with condition
+    //when local variable is set on task
+    taskService.setVariableLocal(task.getId(), VARIABLE_NAME, 1);
+
+    //then nothing happens
+    tasks = taskQuery.list();
+    assertEquals(2, tasks.size());
+
+    //when local variable is set on task execution
     runtimeService.setVariableLocal(task.getExecutionId(), VARIABLE_NAME, 1);
 
     //then boundary event is triggered of this task and task ends (subscription is deleted)
@@ -386,6 +393,15 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
              .list();
     assertEquals(2, executions.size());
     assertEquals(1, conditionEventSubscriptionQuery.list().size());
+
+    //when local variable is set on task execution
+    runtimeService.setVariableLocal(task.getExecutionId(), VARIABLE_NAME, 1);
+
+    //then process instance ends
+    executions = runtimeService.createExecutionQuery()
+             .processInstanceId(procInst.getId())
+             .list();
+    assertEquals(0, executions.size());
   }
 
   @Test
