@@ -14,6 +14,7 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.InputStream;
+import java.util.List;
 
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl;
@@ -32,6 +33,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.task.Attachment;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNumberOfElements;
 
 
 /**
@@ -68,7 +70,9 @@ public class CreateAttachmentCmd implements Command<Attachment> {
           .findTaskById(taskId);
     } else {
       ensureNotNull("taskId or processInstanceId has to be provided", this.processInstanceId);
-      processInstance = (ExecutionEntity) commandContext.getExecutionManager().findExecutionsByProcessInstanceId(processInstanceId);
+      List<ExecutionEntity> executionsByProcessInstanceId = commandContext.getExecutionManager().findExecutionsByProcessInstanceId(processInstanceId);
+      ensureNumberOfElements("processInstances",executionsByProcessInstanceId,1);
+      processInstance = executionsByProcessInstanceId.get(0);
     }
 
     AttachmentEntity attachment = new AttachmentEntity();
