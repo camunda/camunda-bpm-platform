@@ -1473,9 +1473,47 @@ public class ProcessBuilderTest {
     Collection<CamundaTaskListener> taskListeners = extensionElements.getChildElementsByType(CamundaTaskListener.class);
     assertThat(taskListeners).hasSize(1);
 
-    CamundaTaskListener executionListener = taskListeners.iterator().next();
-    assertThat(executionListener.getCamundaClass()).isEqualTo("aClass");
-    assertThat(executionListener.getCamundaEvent()).isEqualTo("start");
+    CamundaTaskListener taskListener = taskListeners.iterator().next();
+    assertThat(taskListener.getCamundaClass()).isEqualTo("aClass");
+    assertThat(taskListener.getCamundaEvent()).isEqualTo("start");
+  }
+
+  @Test
+  public void testCamundaTaskListenerByExpression() {
+    modelInstance = Bpmn.createProcess()
+        .startEvent()
+          .userTask("task")
+            .camundaTaskListenerExpression("start", "anExpression")
+        .endEvent()
+        .done();
+
+    UserTask userTask = modelInstance.getModelElementById("task");
+    ExtensionElements extensionElements = userTask.getExtensionElements();
+    Collection<CamundaTaskListener> taskListeners = extensionElements.getChildElementsByType(CamundaTaskListener.class);
+    assertThat(taskListeners).hasSize(1);
+
+    CamundaTaskListener taskListener = taskListeners.iterator().next();
+    assertThat(taskListener.getCamundaExpression()).isEqualTo("anExpression");
+    assertThat(taskListener.getCamundaEvent()).isEqualTo("start");
+  }
+
+  @Test
+  public void testCamundaTaskListenerByDelegateExpression() {
+    modelInstance = Bpmn.createProcess()
+        .startEvent()
+          .userTask("task")
+            .camundaTaskListenerDelegateExpression("start", "aDelegate")
+        .endEvent()
+        .done();
+
+    UserTask userTask = modelInstance.getModelElementById("task");
+    ExtensionElements extensionElements = userTask.getExtensionElements();
+    Collection<CamundaTaskListener> taskListeners = extensionElements.getChildElementsByType(CamundaTaskListener.class);
+    assertThat(taskListeners).hasSize(1);
+
+    CamundaTaskListener taskListener = taskListeners.iterator().next();
+    assertThat(taskListener.getCamundaDelegateExpression()).isEqualTo("aDelegate");
+    assertThat(taskListener.getCamundaEvent()).isEqualTo("start");
   }
 
   @Test

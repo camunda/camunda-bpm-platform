@@ -17,8 +17,10 @@ import java.util.List;
 
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.UserTask;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaExecutionListener;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaFormData;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaFormField;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaTaskListener;
 
 /**
  * @author Sebastian Menski
@@ -161,5 +163,42 @@ public abstract class AbstractUserTaskBuilder<B extends AbstractUserTaskBuilder<
     CamundaFormData camundaFormData = getCreateSingleExtensionElement(CamundaFormData.class);
     CamundaFormField camundaFormField = createChild(camundaFormData, CamundaFormField.class);
     return new CamundaUserTaskFormFieldBuilder(modelInstance, element, camundaFormField);
+  }
+
+  /**
+   * Add a class based task listener with specified event name
+   *
+   * @param eventName - event names to listen to
+   * @param fullQualifiedClassName - a string representing a class
+   * @return the builder object
+   */
+  public B camundaTaskListenerClass(String eventName, String fullQualifiedClassName) {
+    CamundaTaskListener executionListener = createInstance(CamundaTaskListener.class);
+    executionListener.setCamundaEvent(eventName);
+    executionListener.setCamundaClass(fullQualifiedClassName);
+
+    addExtensionElement(executionListener);
+
+    return myself;
+  }
+
+  public B camundaTaskListenerExpression(String eventName, String expression) {
+    CamundaTaskListener executionListener = createInstance(CamundaTaskListener.class);
+    executionListener.setCamundaEvent(eventName);
+    executionListener.setCamundaExpression(expression);
+
+    addExtensionElement(executionListener);
+
+    return myself;
+  }
+
+  public B camundaTaskListenerDelegateExpression(String eventName, String delegateExpression) {
+    CamundaTaskListener executionListener = createInstance(CamundaTaskListener.class);
+    executionListener.setCamundaEvent(eventName);
+    executionListener.setCamundaDelegateExpression(delegateExpression);
+
+    addExtensionElement(executionListener);
+
+    return myself;
   }
 }

@@ -60,21 +60,4 @@ public abstract class AbstractTaskBuilder<B extends AbstractTaskBuilder<B, E>, E
     return myself;
   }
 
-  /**
-   * Add a class based task listener with specified event name
-   *
-   * @param eventName - event names to listen to
-   * @param fullQualifiedClassName - a string representing a class
-   * @return the builder object
-   */
-  public B camundaTaskListenerClass(String eventName, String fullQualifiedClassName) {
-    CamundaTaskListener executionListener = createInstance(CamundaTaskListener.class);
-    executionListener.setCamundaEvent(eventName);
-    executionListener.setCamundaClass(fullQualifiedClassName);
-
-    addExtensionElement(executionListener);
-
-    return myself;
-  }
-
 }
