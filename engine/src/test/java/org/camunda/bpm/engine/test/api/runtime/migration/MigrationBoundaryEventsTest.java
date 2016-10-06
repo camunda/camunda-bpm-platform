@@ -12,13 +12,6 @@
  */
 package org.camunda.bpm.engine.test.api.runtime.migration;
 
-import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
-import java.util.Date;
-
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.migration.MigrationPlan;
@@ -30,13 +23,19 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.FailingDelegate;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
-import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ClockTestUtil;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.joda.time.DateTime;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
+
+import java.util.Date;
+import java.util.HashMap;
+
+import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
+import static org.junit.Assert.*;
 
 public class MigrationBoundaryEventsTest {
 
@@ -1798,6 +1797,78 @@ public class MigrationBoundaryEventsTest {
 
       job = managementService.createJobQuery().jobId(job.getId()).singleResult();
     }
+  }
+
+  @Test
+  public void testUpdateEventSignalNameWithExpression() {
+    // given
+    String signalNameWithExpression = "new" + SIGNAL_NAME + "-${var}";
+    BpmnModelInstance sourceProcess = ProcessModels.ONE_TASK_PROCESS;
+    BpmnModelInstance targetProcess = modify(ProcessModels.ONE_TASK_PROCESS)
+        .activityBuilder("userTask")
+        .boundaryEvent("boundary").signal(signalNameWithExpression)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+        .done();
+
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask", "userTask")
+        .build();
+
+    HashMap<String, Object> variables = new HashMap<String, Object>();
+    variables.put("var", "foo");
+
+    // when
+    testHelper.createProcessInstanceAndMigrate(migrationPlan, variables);
+
+    // the signal event subscription's event name has changed
+    String resolvedSignalName = "new" + SIGNAL_NAME + "-foo";
+    testHelper.assertEventSubscriptionCreated("boundary", resolvedSignalName);
+
+    // and it is possible to successfully complete the migrated instance
+    rule.getRuntimeService().signalEventReceived(resolvedSignalName);
+    testHelper.completeTask(AFTER_BOUNDARY_TASK);
+    testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
+  }
+
+  @Test
+  public void testUpdateEventMessageNameWithExpression() {
+    // given
+    String messageNameWithExpression = "new" + MESSAGE_NAME + "-${var}";
+    BpmnModelInstance sourceProcess = ProcessModels.ONE_TASK_PROCESS;
+    BpmnModelInstance targetProcess = modify(ProcessModels.ONE_TASK_PROCESS)
+        .activityBuilder("userTask")
+        .boundaryEvent("boundary").message(messageNameWithExpression)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+        .done();
+
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask", "userTask")
+        .build();
+
+    HashMap<String, Object> variables = new HashMap<String, Object>();
+    variables.put("var", "foo");
+
+    // when
+    testHelper.createProcessInstanceAndMigrate(migrationPlan, variables);
+
+    // the message event subscription's event name has changed
+    String resolvedMessageName = "new" + MESSAGE_NAME + "-foo";
+    testHelper.assertEventSubscriptionCreated("boundary", resolvedMessageName);
+
+    // and it is possible to successfully complete the migrated instance
+    rule.getRuntimeService().correlateMessage(resolvedMessageName);
+    testHelper.completeTask(AFTER_BOUNDARY_TASK);
+    testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
 }

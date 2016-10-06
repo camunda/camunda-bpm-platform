@@ -163,7 +163,7 @@ public class EventSubscriptionDeclaration implements Serializable {
   }
 
   public void updateSubscription(EventSubscriptionEntity eventSubscription) {
-    String eventName = this.eventName.getExpressionText();
+    String eventName = resolveExpressionOfEventName(eventSubscription.getExecution());
     eventSubscription.setEventName(eventName);
     eventSubscription.setActivityId(activityId);
   }

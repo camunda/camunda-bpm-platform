@@ -12,8 +12,6 @@
  */
 package org.camunda.bpm.engine.test.api.runtime.migration;
 
-import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
-
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -24,6 +22,10 @@ import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
+
+import java.util.HashMap;
+
+import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
 
 /**
  * @author Thorben Lindhauer
@@ -130,13 +132,46 @@ public class MigrationMessageCatchEventTest {
     // when
     ProcessInstance processInstance = testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
-    // then the message event subscription's event name has not changed
+    // then the message event subscription's event name has changed
     testHelper.assertEventSubscriptionMigrated(
         "messageCatch", MessageReceiveModels.MESSAGE_NAME,
         "messageCatch", "new" + MessageReceiveModels.MESSAGE_NAME);
 
     // and it is possible to trigger the event
     rule.getRuntimeService().correlateMessage("new" + MessageReceiveModels.MESSAGE_NAME);
+
+    testHelper.completeTask("userTask");
+    testHelper.assertProcessEnded(processInstance.getId());
+  }
+
+  @Test
+  public void testMigrateEventSubscriptionUpdateMessageNameWithExpression() {
+    // given
+    String newMessageName = "new" + MessageReceiveModels.MESSAGE_NAME + "-${var}";
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(MessageReceiveModels.ONE_MESSAGE_CATCH_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(modify(MessageReceiveModels.ONE_MESSAGE_CATCH_PROCESS)
+        .renameMessage(MessageReceiveModels.MESSAGE_NAME, newMessageName));
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("messageCatch", "messageCatch")
+        .updateEventTrigger()
+        .build();
+
+    HashMap<String, Object> variables = new HashMap<String, Object>();
+    variables.put("var", "foo");
+
+    // when
+    ProcessInstance processInstance = testHelper.createProcessInstanceAndMigrate(migrationPlan, variables);
+
+    // then the message event subscription's event name has changed
+    String resolvedMessageName = "new" + MessageReceiveModels.MESSAGE_NAME + "-foo";
+    testHelper.assertEventSubscriptionMigrated(
+        "messageCatch", MessageReceiveModels.MESSAGE_NAME,
+        "messageCatch", resolvedMessageName);
+
+    // and it is possible to trigger the event
+    rule.getRuntimeService().correlateMessage(resolvedMessageName);
 
     testHelper.completeTask("userTask");
     testHelper.assertProcessEnded(processInstance.getId());

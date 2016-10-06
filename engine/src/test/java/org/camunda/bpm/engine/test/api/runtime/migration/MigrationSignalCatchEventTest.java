@@ -12,20 +12,24 @@
  */
 package org.camunda.bpm.engine.test.api.runtime.migration;
 
-import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
-import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
-import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecutionTree;
-
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.SignalCatchModels;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
+
+import java.util.HashMap;
+
+import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
+import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
+import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecutionTree;
 
 /**
  * @author Thorben Lindhauer
@@ -200,4 +204,49 @@ public class MigrationSignalCatchEventTest {
     testHelper.completeTask("userTask");
     testHelper.assertProcessEnded(processInstance.getId());
   }
+
+  @Test
+  public void testMigrateEventSubscriptionUpdateSignalExpressionNameWithVariables() {
+    // given
+    String newSignalName = "new" + SignalCatchModels.SIGNAL_NAME + "-${var}";
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(SignalCatchModels.ONE_SIGNAL_CATCH_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ProcessModels.newModel()
+        .startEvent()
+        .intermediateCatchEvent("signalCatch")
+        .signal(newSignalName)
+        .userTask("userTask")
+        .endEvent()
+        .done());
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("signalCatch", "signalCatch")
+        .updateEventTrigger()
+        .build();
+
+    HashMap<String, Object> variables = new HashMap<String, Object>();
+    variables.put("var", "foo");
+
+
+    // when
+    ProcessInstance processInstance = testHelper.createProcessInstanceAndMigrate(migrationPlan, variables);
+
+    // then there should be a variable
+    VariableInstance beforeMigration = testHelper.snapshotBeforeMigration.getSingleVariable("var");
+    Assert.assertEquals(1, testHelper.snapshotAfterMigration.getVariables().size());
+    testHelper.assertVariableMigratedToExecution(beforeMigration, beforeMigration.getExecutionId());
+
+    // and the signal event subscription's event name has changed
+    String resolvedSignalName = "new" + SignalCatchModels.SIGNAL_NAME + "-foo";
+    testHelper.assertEventSubscriptionMigrated(
+        "signalCatch", SignalCatchModels.SIGNAL_NAME,
+        "signalCatch", resolvedSignalName);
+
+    // and it is possible to trigger the event and complete the task afterwards
+    rule.getRuntimeService().signalEventReceived(resolvedSignalName);
+
+    testHelper.completeTask("userTask");
+    testHelper.assertProcessEnded(processInstance.getId());
+  }
+
 }

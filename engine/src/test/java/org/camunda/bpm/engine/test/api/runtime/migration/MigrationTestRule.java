@@ -21,6 +21,7 @@ import static org.junit.Assert.fail;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
@@ -107,7 +108,14 @@ public class MigrationTestRule extends ProcessEngineTestRule {
       .startProcessInstanceById(migrationPlan.getSourceProcessDefinitionId());
 
     migrateProcessInstance(migrationPlan, processInstance);
+    return processInstance;
+  }
 
+  public ProcessInstance createProcessInstanceAndMigrate(MigrationPlan migrationPlan, Map<String, Object> variables) {
+    ProcessInstance processInstance = processEngine.getRuntimeService()
+        .startProcessInstanceById(migrationPlan.getSourceProcessDefinitionId(), variables);
+
+    migrateProcessInstance(migrationPlan, processInstance);
     return processInstance;
   }
 
