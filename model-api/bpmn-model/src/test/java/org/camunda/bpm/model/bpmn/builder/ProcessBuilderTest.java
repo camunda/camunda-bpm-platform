@@ -104,6 +104,7 @@ import org.camunda.bpm.model.bpmn.instance.camunda.CamundaInputOutput;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaInputParameter;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaOut;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaOutputParameter;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaTaskListener;
 import org.camunda.bpm.model.xml.Model;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.ModelElementType;
@@ -1456,6 +1457,25 @@ public class ProcessBuilderTest {
     assertThat(succeedingNodes).containsOnly(boundaryEnd1);
     succeedingNodes = boundaryEvent2.getSucceedingNodes().list();
     assertThat(succeedingNodes).containsOnly(boundaryEnd2);
+  }
+
+  @Test
+  public void testCamundaTaskListenerByClass() {
+    modelInstance = Bpmn.createProcess()
+        .startEvent()
+          .userTask("task")
+            .camundaTaskListenerClass("start", "aClass")
+        .endEvent()
+        .done();
+
+    UserTask userTask = modelInstance.getModelElementById("task");
+    ExtensionElements extensionElements = userTask.getExtensionElements();
+    Collection<CamundaTaskListener> taskListeners = extensionElements.getChildElementsByType(CamundaTaskListener.class);
+    assertThat(taskListeners).hasSize(1);
+
+    CamundaTaskListener executionListener = taskListeners.iterator().next();
+    assertThat(executionListener.getCamundaClass()).isEqualTo("aClass");
+    assertThat(executionListener.getCamundaEvent()).isEqualTo("start");
   }
 
   @Test

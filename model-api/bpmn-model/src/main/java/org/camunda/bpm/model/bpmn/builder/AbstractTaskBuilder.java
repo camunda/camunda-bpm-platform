@@ -16,9 +16,11 @@ package org.camunda.bpm.model.bpmn.builder;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.ExtensionElements;
 import org.camunda.bpm.model.bpmn.instance.Task;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaExecutionListener;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaInputOutput;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaInputParameter;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaOutputParameter;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaTaskListener;
 
 /**
  * @author Sebastian Menski
@@ -55,6 +57,23 @@ public abstract class AbstractTaskBuilder<B extends AbstractTaskBuilder<B, E>, E
   @Deprecated
   public B camundaAsync(boolean isCamundaAsync) {
     element.setCamundaAsyncBefore(isCamundaAsync);
+    return myself;
+  }
+
+  /**
+   * Add a class based task listener with specified event name
+   *
+   * @param eventName - event names to listen to
+   * @param fullQualifiedClassName - a string representing a class
+   * @return the builder object
+   */
+  public B camundaTaskListenerClass(String eventName, String fullQualifiedClassName) {
+    CamundaTaskListener executionListener = createInstance(CamundaTaskListener.class);
+    executionListener.setCamundaEvent(eventName);
+    executionListener.setCamundaClass(fullQualifiedClassName);
+
+    addExtensionElement(executionListener);
+
     return myself;
   }
 
