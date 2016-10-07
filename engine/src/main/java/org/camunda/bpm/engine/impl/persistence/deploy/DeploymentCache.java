@@ -67,14 +67,14 @@ public class DeploymentCache {
   protected Cache<String, DmnModelInstance> dmnModelInstanceCache;
   protected List<Deployer> deployers;
 
-  public DeploymentCache(CacheFactory factory, int maxNumberOfElementsInCache) {
-    processDefinitionEntityCache = factory.createCache(maxNumberOfElementsInCache);
-    caseDefinitionCache = factory.createCache(maxNumberOfElementsInCache);
-    decisionDefinitionCache = factory.createCache(maxNumberOfElementsInCache);
-    decisionRequirementsDefinitionCache = factory.createCache(maxNumberOfElementsInCache);
-    bpmnModelInstanceCache = factory.createCache(maxNumberOfElementsInCache);
-    cmmnModelInstanceCache = factory.createCache(maxNumberOfElementsInCache);
-    dmnModelInstanceCache = factory.createCache(maxNumberOfElementsInCache);
+  public DeploymentCache(CacheFactory factory, int cacheCapacity) {
+    processDefinitionEntityCache = factory.createCache(cacheCapacity);
+    caseDefinitionCache = factory.createCache(cacheCapacity);
+    decisionDefinitionCache = factory.createCache(cacheCapacity);
+    decisionRequirementsDefinitionCache = factory.createCache(cacheCapacity);
+    bpmnModelInstanceCache = factory.createCache(cacheCapacity);
+    cmmnModelInstanceCache = factory.createCache(cacheCapacity);
+    dmnModelInstanceCache = factory.createCache(cacheCapacity);
   }
 
   public void deploy(final DeploymentEntity deployment) {

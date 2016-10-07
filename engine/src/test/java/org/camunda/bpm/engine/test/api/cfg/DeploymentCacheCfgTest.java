@@ -1,28 +1,83 @@
+/* Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.camunda.bpm.engine.test.api.cfg;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
-import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.camunda.commons.utils.cache.Cache;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.RuleChain;
+
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 /**
  * @author Johannes Heinemann
  */
-public class DeploymentCacheCfgTest extends ResourceProcessEngineTestCase {
+public class DeploymentCacheCfgTest {
 
+  protected ProcessEngineBootstrapRule cacheFactoryBootstrapRule = new ProcessEngineBootstrapRule() {
+    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+      // apply configuration options here
+      configuration.setCacheCapacity(2);
+      configuration.setCacheFactory(new MyCacheFactory());
+      return configuration;
+    }
+  };
 
-  public DeploymentCacheCfgTest() {
-    super("org/camunda/bpm/engine/test/api/cfg/customized.cacheFactory.camunda.cfg.xml");
+  protected ProvidedProcessEngineRule cacheFactoryEngineRule = new ProvidedProcessEngineRule(cacheFactoryBootstrapRule);
+
+  @Rule
+  public RuleChain ruleChain = RuleChain.outerRule(cacheFactoryBootstrapRule).around(cacheFactoryEngineRule);
+  RepositoryService repositoryService;
+  ProcessEngineConfigurationImpl processEngineConfiguration;
+
+  @Before
+  public void initialize() {
+    repositoryService = cacheFactoryEngineRule.getRepositoryService();
+    processEngineConfiguration = cacheFactoryEngineRule.getProcessEngineConfiguration();
   }
 
   @Test
   @Deployment(resources =
-      {"org/camunda/bpm/engine/test/api/cfg/MaxCacheSizeCfgTest.testDefaultCacheRemovesLRUElementWhenMaxSizeIsExceeded.bpmn20.xml"})
+      {"org/camunda/bpm/engine/test/api/cfg/DeploymentCacheCfgTest.testDefaultCacheRemovesLRUElementWhenMaxSizeIsExceeded.bpmn20.xml"})
   public void testPlugInOwnCacheImplementation() {
-    // The 'customized.cacheFactory.camunda.cfg.xml' sets a customized cache factory that uses the
-    // default cache implementation, but limits the maximum number of elements within the cache to 2.
-    // According to the least recently used principle of the default implementation should the first
-    // process not be contained in the cache anymore.
+
+    // given
+    DeploymentCache deploymentCache = processEngineConfiguration.getDeploymentCache();
+
+    // when
+    Cache cache = deploymentCache.getProcessDefinitionCache();
+
+    // then
+    assertThat(cache, instanceOf(MyCacheImplementation.class));
+  }
+
+  @Test
+  @Deployment(resources =
+      {"org/camunda/bpm/engine/test/api/cfg/DeploymentCacheCfgTest.testDefaultCacheRemovesLRUElementWhenMaxSizeIsExceeded.bpmn20.xml"})
+  public void testDefaultCacheRemovesLRUElementWhenMaxSizeIsExceeded() {
+    // The engine rule sets the maximum number of elements of the to 2.
+    // Accordingly, one process should not be contained in the cache anymore at the end.
 
     // given
     String processDefinitionIdOne = repositoryService.createProcessDefinitionQuery()
@@ -38,15 +93,18 @@ public class DeploymentCacheCfgTest extends ResourceProcessEngineTestCase {
         .singleResult()
         .getId();
 
-
     // when
     DeploymentCache deploymentCache = processEngineConfiguration.getDeploymentCache();
 
     // then
-    assertNotNull(deploymentCache.getProcessDefinitionCache().get(processDefinitionIdTwo));
-    assertNotNull(deploymentCache.getProcessDefinitionCache().get(processDefinitionIdThree));
+    int numberOfProcessesInCache = 0;
+    numberOfProcessesInCache +=
+        deploymentCache.getProcessDefinitionCache().get(processDefinitionIdOne) == null ? 0 : 1;
+    numberOfProcessesInCache +=
+        deploymentCache.getProcessDefinitionCache().get(processDefinitionIdTwo) == null ? 0 : 1;
+    numberOfProcessesInCache +=
+        deploymentCache.getProcessDefinitionCache().get(processDefinitionIdThree) == null ? 0 : 1;
 
-    assertNull(deploymentCache.getProcessDefinitionCache().get(processDefinitionIdOne));
+    assertEquals(2, numberOfProcessesInCache);
   }
-
 }

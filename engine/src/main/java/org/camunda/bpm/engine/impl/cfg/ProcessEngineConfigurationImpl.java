@@ -227,7 +227,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   // CACHE ////////////////////////////////////////////////////////////////////
 
   protected CacheFactory cacheFactory;
-  protected int maxNumberOfElementsInCache = 1000;
+  protected int cacheCapacity = 1000;
 
   // JOB EXECUTOR /////////////////////////////////////////////////////////////
 
@@ -1149,7 +1149,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       }
 
       initCacheFactory();
-      deploymentCache = new DeploymentCache(cacheFactory, maxNumberOfElementsInCache);
+      deploymentCache = new DeploymentCache(cacheFactory, cacheCapacity);
       deploymentCache.setDeployers(deployers);
     }
   }
@@ -2166,8 +2166,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     this.cacheFactory = cacheFactory;
   }
 
-  public void setMaxNumberOfElementsInCache(int maxNumberOfElementsInCache) {
-    this.maxNumberOfElementsInCache = maxNumberOfElementsInCache;
+  public void setCacheCapacity(int cacheCapacity) {
+    this.cacheCapacity = cacheCapacity;
   }
 
   public Permission getDefaultUserPermissionForTask() {

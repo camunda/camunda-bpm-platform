@@ -10,23 +10,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.camunda.bpm.engine.test.api.cfg;
 
-package org.camunda.bpm.engine.impl.persistence.deploy;
-
-import org.camunda.commons.utils.cache.Cache;
+import org.camunda.commons.utils.cache.ConcurrentLruCache;
 
 /**
- * <p>Builds the caches for the {@link DeploymentCache}.</p>
+ * Represents a custom cache implementation
+ *
+ * @author: Johannes Heinemann
  */
-public interface CacheFactory<String, DbEntity> {
+public class MyCacheImplementation<K, V> extends ConcurrentLruCache<K, V> {
 
-  /**
-   * Creates a cache that does not exceed a specified number of elements.
-   *
-   * @param maxNumberOfElementsInCache
-   *        The maximum number of elements that is allowed within the cache at the same time.
-   * @return
-   *        The cache to be created.
-   */
-  public Cache<String, DbEntity> createCache(int maxNumberOfElementsInCache);
+  public MyCacheImplementation(int capacity) {
+    super(capacity);
+  }
 }
