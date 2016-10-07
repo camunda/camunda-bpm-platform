@@ -32,7 +32,7 @@
       <dependency>
         <groupId>org.camunda.commons</groupId>
         <artifactId>camunda-commons-bom</artifactId>
-        <version>1.4.0-alpha3</version>
+        <version>1.4.0-alpha4</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
