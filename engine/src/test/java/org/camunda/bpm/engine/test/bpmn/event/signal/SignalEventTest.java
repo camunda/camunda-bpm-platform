@@ -38,6 +38,7 @@ import org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListe
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.Variables.SerializationDataFormats;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
+import org.junit.Ignore;
 
 
 /**
@@ -511,6 +512,33 @@ public class SignalEventTest extends PluggableProcessEngineTestCase {
     assertEquals(serializedObject, variableTyped.getValueSerialized());
     assertEquals(FailingJavaSerializable.class.getName(), variableTyped.getObjectTypeName());
     assertEquals(SerializationDataFormats.JAVA.getName(), variableTyped.getSerializationDataFormat());
+  }
+
+  /**
+   * CAM-6807
+   */
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.catchAlertSignalBoundary.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.throwAlertSignalAsync.bpmn20.xml"})
+  public void FAILING_testAsyncSignalBoundary() {
+    runtimeService.startProcessInstanceByKey("catchSignal");
+
+    // given a process instance that throws a signal asynchronously
+    runtimeService.startProcessInstanceByKey("throwSignalAsync");
+
+    Job job = managementService.createJobQuery().singleResult();
+    assertNotNull(job);  // Throws Exception!
+
+    // when the job is executed
+    managementService.executeJob(job.getId());
+
+    // then there is a process instance
+    ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().singleResult();
+    assertNotNull(processInstance);
+//    assertEquals(catchingProcessDefinition.getId(), processInstance.getProcessDefinitionId());
+
+    // and a task
+    assertEquals(1, taskService.createTaskQuery().count());
   }
 
 }
