@@ -37,4 +37,13 @@ public interface ExternalTaskQueryTopicBuilder extends ExternalTaskQueryBuilder 
    * @return this builder
    */
   public ExternalTaskQueryTopicBuilder variables(List<String> variables);
+  
+  /**
+   * Specify whether serialized variables should be deserialized on fetching.
+   * 
+   * @param deserialize whether to deserialize
+   * @return this builder
+   */
+  public ExternalTaskQueryTopicBuilder deserializeVariables(boolean deserialize);
+  
 }

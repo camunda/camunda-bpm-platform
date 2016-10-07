@@ -79,5 +79,11 @@ public class ExternalTaskQueryTopicBuilderImpl implements ExternalTaskQueryTopic
       this.instructions.put(currentInstruction.getTopicName(), currentInstruction);
     }
   }
+  
+  @Override
+  public ExternalTaskQueryTopicBuilder deserializeVariables(boolean deserialize) {
+    currentInstruction.setDeserializeVariables(deserialize);
+    return this;
+  }
 
 }

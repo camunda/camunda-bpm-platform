@@ -104,7 +104,7 @@ public class LockedExternalTaskImpl implements LockedExternalTask {
     return priority;
   }
 
-  public static LockedExternalTaskImpl fromEntity(ExternalTaskEntity externalTaskEntity, List<String> variablesToFetch) {
+  public static LockedExternalTaskImpl fromEntity(ExternalTaskEntity externalTaskEntity, List<String> variablesToFetch, boolean deserializeVariables) {
     LockedExternalTaskImpl result = new LockedExternalTaskImpl();
     result.id = externalTaskEntity.getId();
     result.topicName = externalTaskEntity.getTopicName();
@@ -124,7 +124,7 @@ public class LockedExternalTaskImpl implements LockedExternalTask {
 
     ExecutionEntity execution = externalTaskEntity.getExecution();
     result.variables = new VariableMapImpl();
-    execution.collectVariables(result.variables, variablesToFetch, false, false);
+    execution.collectVariables(result.variables, variablesToFetch, false, deserializeVariables);
 
     return result;
   }
