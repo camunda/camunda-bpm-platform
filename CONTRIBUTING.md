@@ -5,7 +5,7 @@ We would love you to contribute to this project. You can do so in various ways.
 
 ## Contribute your knowledge
 
-Help others by participating in our [forum](https://groups.google.com/forum/?fromgroups#!forum/camunda-bpm-users).
+Help others by participating in our [forum](https://forum.camunda.org/).
 
 Before you ask a question, search the forum. The answer may have already been provided.
 
