@@ -21,7 +21,7 @@
 
   <properties>
     <version.assertj>1.7.1</version.assertj>
-    <version.commons>1.4.0-alpha3</version.commons>
+    <version.commons>1.4.0-alpha4</version.commons>
     <version.groovy>2.4.3</version.groovy>
     <version.juel>2.2.7</version.juel>
     <version.junit>4.12</version.junit>
