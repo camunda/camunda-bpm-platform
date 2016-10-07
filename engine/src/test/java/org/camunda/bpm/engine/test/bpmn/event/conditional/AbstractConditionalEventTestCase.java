@@ -33,7 +33,7 @@ import org.junit.rules.ExpectedException;
  *
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
-public class AbstractConditionalEventTestCase {
+public abstract class AbstractConditionalEventTestCase {
 
   protected static final String CONDITIONAL_EVENT_PROCESS_KEY = "conditionalEventProcess";
   protected static final String TASK_BEFORE_CONDITION = "Before Condition";
