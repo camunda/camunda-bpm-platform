@@ -16,6 +16,7 @@
 package org.camunda.bpm.engine.test.bpmn.event.conditional;
 
 import java.util.Map;
+import static junit.framework.Assert.assertEquals;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
@@ -23,10 +24,11 @@ import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.Test;
-import org.camunda.bpm.engine.ProcessEngineException;
-import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertNull;
+import static org.camunda.bpm.engine.test.bpmn.event.conditional.AbstractConditionalEventTestCase.CONDITIONAL_EVENT_PROCESS_KEY;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
 /**
  *
@@ -115,16 +117,6 @@ public class IntermediateConditionalEventTest extends AbstractConditionalEventTe
                              .singleResult();
     assertNull(procInst);
     assertEquals(0, conditionEventSubscriptionQuery.list().size());
-  }
-
-  @Test
-  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/conditional/IntermediateConditionalEventTest.testVariableValue.bpmn20.xml"})
-  public void testWithNoVariableValue() {
-    //given process with intermediate conditional event and no variable
-    //then exception is expected, since no variable with this name exist
-    expectException.expect(ProcessEngineException.class);
-    expectException.expectMessage("Unknown property used in expression: ${variable == 1}. Cause: Cannot resolve identifier 'variable'");
-    runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
   }
 
   @Test
@@ -294,6 +286,152 @@ public class IntermediateConditionalEventTest extends AbstractConditionalEventTe
     //then execution is on next user task and the subscription is deleted
     Task task = taskService.createTaskQuery().processInstanceId(procInst.getId()).singleResult();
     assertNotNull(task);
+    assertEquals(TASK_AFTER_CONDITION, task.getName());
+    assertEquals(0, conditionEventSubscriptionQuery.list().size());
+  }
+
+  @Test
+  public void testVariableConditionWithVariableName() {
+
+    //given process with boundary conditional event and defined variable name
+    final BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
+          .startEvent()
+          .intermediateCatchEvent(CONDITIONAL_EVENT)
+            .conditionalEventDefinition()
+              .condition(CONDITION_EXPR)
+              .camundaVariableName(VARIABLE_NAME)
+            .conditionalEventDefinitionDone()
+          .userTask()
+            .name(TASK_AFTER_CONDITION)
+          .endEvent()
+          .done();
+
+    engine.manageDeployment(repositoryService.createDeployment().addModelInstance(CONDITIONAL_MODEL, modelInstance).deploy());
+
+    ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
+    TaskQuery taskQuery = taskService.createTaskQuery().processInstanceId(procInst.getId());
+    Execution execution = runtimeService.createExecutionQuery()
+             .processInstanceId(procInst.getId())
+             .activityId(CONDITIONAL_EVENT)
+             .singleResult();
+    assertNotNull(execution);
+    assertEquals(1, conditionEventSubscriptionQuery.list().size());
+
+    //when variable with name `variable1` is set on execution
+    runtimeService.setVariable(procInst.getId(), VARIABLE_NAME+1, 1);
+
+    //then nothing happens
+    execution = runtimeService.createExecutionQuery()
+             .processInstanceId(procInst.getId())
+             .activityId(CONDITIONAL_EVENT)
+             .singleResult();
+    assertNotNull(execution);
+    assertEquals(1, conditionEventSubscriptionQuery.list().size());
+
+    //when variable with name `variable` is set on execution
+    runtimeService.setVariable(procInst.getId(), VARIABLE_NAME, 1);
+
+    //then execution is at user task after conditional intermediate event
+    Task task = taskQuery.singleResult();
+    assertEquals(TASK_AFTER_CONDITION, task.getName());
+    assertEquals(0, conditionEventSubscriptionQuery.list().size());
+  }
+
+  @Test
+  public void testVariableConditionWithVariableEvent() {
+
+    //given process with boundary conditional event and defined variable name and event
+    final BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
+          .startEvent()
+          .intermediateCatchEvent(CONDITIONAL_EVENT)
+            .conditionalEventDefinition()
+              .condition(CONDITION_EXPR)
+              .camundaVariableEvents(CONDITIONAL_VAR_EVENT_UPDATE)
+            .conditionalEventDefinitionDone()
+          .userTask()
+            .name(TASK_AFTER_CONDITION)
+          .endEvent()
+          .done();
+
+    engine.manageDeployment(repositoryService.createDeployment().addModelInstance(CONDITIONAL_MODEL, modelInstance).deploy());
+
+    Map<String, Object> variables = Variables.createVariables();
+    variables.put(VARIABLE_NAME+1, 0);
+    ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY, variables);
+    TaskQuery taskQuery = taskService.createTaskQuery().processInstanceId(procInst.getId());
+    Execution execution = runtimeService.createExecutionQuery()
+             .processInstanceId(procInst.getId())
+             .activityId(CONDITIONAL_EVENT)
+             .singleResult();
+    assertNotNull(execution);
+    assertEquals(1, conditionEventSubscriptionQuery.list().size());
+
+
+    //when variable with name `variable` is set on execution
+    runtimeService.setVariable(procInst.getId(), VARIABLE_NAME, 1);
+
+    //then nothing happens
+    execution = runtimeService.createExecutionQuery()
+             .processInstanceId(procInst.getId())
+             .activityId(CONDITIONAL_EVENT)
+             .singleResult();
+    assertNotNull(execution);
+    assertEquals(1, conditionEventSubscriptionQuery.list().size());
+
+    //when variable with name `variable1` is updated
+    runtimeService.setVariable(procInst.getId(), VARIABLE_NAME+1, 1);
+
+    //then execution is at user task after conditional intermediate event
+    Task task = taskQuery.singleResult();
+    assertEquals(TASK_AFTER_CONDITION, task.getName());
+    assertEquals(0, conditionEventSubscriptionQuery.list().size());
+  }
+
+
+  @Test
+  public void testVariableConditionWithVariableNameAndEvent() {
+
+    //given process with boundary conditional event and defined variable name and event
+    final BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
+          .startEvent()
+          .intermediateCatchEvent(CONDITIONAL_EVENT)
+            .conditionalEventDefinition()
+              .condition(CONDITION_EXPR)
+              .camundaVariableName(VARIABLE_NAME)
+              .camundaVariableEvents(CONDITIONAL_VAR_EVENT_UPDATE)
+            .conditionalEventDefinitionDone()
+          .userTask()
+            .name(TASK_AFTER_CONDITION)
+          .endEvent()
+          .done();
+
+    engine.manageDeployment(repositoryService.createDeployment().addModelInstance(CONDITIONAL_MODEL, modelInstance).deploy());
+    ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
+    TaskQuery taskQuery = taskService.createTaskQuery().processInstanceId(procInst.getId());
+    Execution execution = runtimeService.createExecutionQuery()
+             .processInstanceId(procInst.getId())
+             .activityId(CONDITIONAL_EVENT)
+             .singleResult();
+    assertNotNull(execution);
+    assertEquals(1, conditionEventSubscriptionQuery.list().size());
+
+
+    //when variable with name `variable` is set on execution
+    runtimeService.setVariable(procInst.getId(), VARIABLE_NAME, 1);
+
+    //then nothing happens
+    execution = runtimeService.createExecutionQuery()
+             .processInstanceId(procInst.getId())
+             .activityId(CONDITIONAL_EVENT)
+             .singleResult();
+    assertNotNull(execution);
+    assertEquals(1, conditionEventSubscriptionQuery.list().size());
+
+    //when variable with name `variable` is updated
+    runtimeService.setVariable(procInst.getId(), VARIABLE_NAME, 1);
+
+    //then execution is at user task after conditional intermediate event
+    Task task = taskQuery.singleResult();
     assertEquals(TASK_AFTER_CONDITION, task.getName());
     assertEquals(0, conditionEventSubscriptionQuery.list().size());
   }

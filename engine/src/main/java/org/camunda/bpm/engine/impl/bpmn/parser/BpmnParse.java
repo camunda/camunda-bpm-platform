@@ -67,9 +67,9 @@ import java.io.InputStream;
 import java.net.URL;
 import java.text.StringCharacterIterator;
 import java.util.*;
+import org.camunda.bpm.engine.delegate.VariableListener;
 
 import static org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseUtil.*;
-import static org.camunda.bpm.engine.impl.util.ClassDelegateUtil.instantiateDelegate;
 import static org.camunda.bpm.engine.impl.util.ClassDelegateUtil.instantiateDelegate;
 
 /**
@@ -137,6 +137,12 @@ public class BpmnParse extends Parse {
   public static final String LINK_EVENT_DEFINITION = "linkEventDefinition";
   public static final String CONDITION_EXPRESSION = "conditionExpression";
   public static final String CONDITION = "condition";
+
+  public static final List<String> VARIABLE_EVENTS = Arrays.asList(
+      VariableListener.CREATE,
+      VariableListener.DELETE,
+      VariableListener.UPDATE
+  );
 
   /**
    * @deprecated use {@link BpmnProperties#TYPE}
@@ -3385,6 +3391,7 @@ public class BpmnParse extends Parse {
     conditionalActivity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.INTERMEDIATE_EVENT_CONDITIONAL);
 
     ConditionalEventDefinition conditionalEventDefinition = parseConditionalEventDefinition(element, conditionalActivity);
+    addEventSubscriptionDeclaration(conditionalEventDefinition, conditionalActivity.getEventScope(), element);
 
     for (BpmnParseListener parseListener : parseListeners) {
       parseListener.parseIntermediateConditionalEventDefinition(element, conditionalActivity);
@@ -3430,13 +3437,18 @@ public class BpmnParse extends Parse {
       Condition condition = parseConditionExpression(conditionExprElement);
       conditionalEventDefinition = new ConditionalEventDefinition(condition, conditionalActivity.getId());
 
-
       final String variableName = element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "variableName");
       conditionalEventDefinition.setVariableName(variableName);
 
       final String variableEvents = element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "variableEvents");
       final List<String> variableEventsList = parseCommaSeparatedList(variableEvents);
       conditionalEventDefinition.setVariableEvents(new HashSet<String>(variableEventsList));
+
+      for (String variableEvent : variableEventsList) {
+        if (!VARIABLE_EVENTS.contains(variableEvent)) {
+          addWarning("Variable event: " + variableEvent + " is not valid. Possible variable change events are: " + Arrays.toString(VARIABLE_EVENTS.toArray()), element);
+        }
+      }
 
     } else {
       addError("Conditional event must contain an expression for evaluation.", element);

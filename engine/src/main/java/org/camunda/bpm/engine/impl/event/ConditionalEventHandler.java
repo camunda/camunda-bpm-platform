@@ -16,11 +16,12 @@
 package org.camunda.bpm.engine.impl.event;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.bpmn.behavior.ConditionalEventBehavioral;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
+import org.camunda.bpm.engine.impl.bpmn.behavior.ConditionalEventBehavior;
+import org.camunda.bpm.engine.impl.core.variable.event.VariableEvent;
 
 /**
  *
@@ -35,18 +36,18 @@ public class ConditionalEventHandler implements EventHandler {
 
   @Override
   public void handleEvent(EventSubscriptionEntity eventSubscription, Object payload, CommandContext commandContext) {
-    ConditionalVariableEventPayload conditionalEventPayload;
-    if (payload instanceof ConditionalVariableEventPayload) {
-      conditionalEventPayload = (ConditionalVariableEventPayload) payload;
+    VariableEvent variableEvent;
+    if (payload instanceof VariableEvent) {
+      variableEvent = (VariableEvent) payload;
     } else {
-      throw new ProcessEngineException("Payload have to be " + ConditionalVariableEventPayload.class.getName() + ", to evaluate condition.");
+      throw new ProcessEngineException("Payload have to be " + VariableEvent.class.getName() + ", to evaluate condition.");
     }
 
     ActivityImpl activity = eventSubscription.getActivity();
     ActivityBehavior activityBehavior = activity.getActivityBehavior();
-    if (activityBehavior instanceof ConditionalEventBehavioral) {
-      ConditionalEventBehavioral conditionalBehavior = (ConditionalEventBehavioral) activityBehavior;
-      conditionalBehavior.leaveOnSatisfiedCondition(eventSubscription, conditionalEventPayload, commandContext);
+    if (activityBehavior instanceof ConditionalEventBehavior) {
+      ConditionalEventBehavior conditionalBehavior = (ConditionalEventBehavior) activityBehavior;
+      conditionalBehavior.leaveOnSatisfiedCondition(eventSubscription, variableEvent, commandContext);
     } else {
       throw new ProcessEngineException("Conditional Event has not correct behavior: " + activityBehavior);
     }

@@ -17,6 +17,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureInstanceOf;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.ScriptEvaluationException;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.Condition;
@@ -71,7 +72,8 @@ public class ScriptCondition implements Condition {
     try {
       result = evaluate(scope, execution);
     } catch (ProcessEngineException pee) {
-      if (!pee.getMessage().contains("No such property")) {
+      if (! (pee.getMessage().contains("No such property") ||
+             pee.getCause() instanceof ScriptEvaluationException) ) {
         throw pee;
       }
     }

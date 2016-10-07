@@ -15,27 +15,20 @@
  */
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
-import java.util.List;
-import org.camunda.bpm.engine.delegate.VariableScope;
-import org.camunda.bpm.engine.impl.ExecutionQueryImpl;
-import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.bpmn.parser.ConditionalEventDefinition;
-import org.camunda.bpm.engine.impl.event.ConditionalVariableEventPayload;
-import org.camunda.bpm.engine.impl.event.EventType;
+import org.camunda.bpm.engine.impl.core.variable.event.VariableEvent;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
-import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 /**
  *
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
-public class IntermediateConditionalEventBehavior extends IntermediateCatchEventActivityBehavior implements ConditionalEventBehavioral {
+public class IntermediateConditionalEventBehavior extends IntermediateCatchEventActivityBehavior implements ConditionalEventBehavior {
 
-  private final ConditionalEventDefinition conditionalEvent;
+  protected final ConditionalEventDefinition conditionalEvent;
 
   public IntermediateConditionalEventBehavior(ConditionalEventDefinition conditionalEvent, boolean isAfterEventBasedGateway) {
     super(isAfterEventBasedGateway);
@@ -45,34 +38,20 @@ public class IntermediateConditionalEventBehavior extends IntermediateCatchEvent
   @Override
   public void execute(final ActivityExecution execution) throws Exception {
     super.execute(execution);
-    if (conditionalEvent.evaluate(execution, execution)) {
+    if (conditionalEvent.tryEvaluate(execution, execution)) {
       leave(execution);
-    } else if (execution instanceof ExecutionEntity) {
-      //add variable life cycle listener to evaluate condition after a variable was changed
-      ActivityImpl conditionalActivity = (ActivityImpl) execution.getActivity();
-      EventSubscriptionEntity.createAndInsert((ExecutionEntity) execution, EventType.CONDITONAL, conditionalActivity);
     }
   }
 
   @Override
-  public void leaveOnSatisfiedCondition(final EventSubscriptionEntity eventSubscription, final ConditionalVariableEventPayload conditionalVariableEventPayload, final CommandContext commandContext) {
-
+  public void leaveOnSatisfiedCondition(final EventSubscriptionEntity eventSubscription, final VariableEvent variableEvent, final CommandContext commandContext) {
     PvmExecutionImpl execution = eventSubscription.getExecution();
-    ActivityImpl activity = eventSubscription.getActivity();
-    final VariableScope scope = conditionalVariableEventPayload.getScope();
 
-    ExecutionQueryImpl query = new ExecutionQueryImpl();
-    query.activityId(activity.getId());
-    query.processInstanceId(execution.getProcessInstanceId());
-    Page p = new Page(0, 1);
-    List<ExecutionEntity> executions = commandContext.getExecutionManager().findExecutionsByQueryCriteria(query, p);
-    if (!executions.isEmpty() && scope != null) {
-      execution = executions.get(0);
-      if (!execution.isEnded() && conditionalEvent.evaluate(scope, execution)) {
-        if (execution.isActive() && execution.isScope()) {
-          leave(execution);
-        }
-      }
+    if (execution != null && !execution.isEnded()
+        && variableEvent != null
+        && conditionalEvent.tryEvaluate(variableEvent, execution, execution)
+        && execution.isActive() && execution.isScope()) {
+      leave(execution);
     }
   }
 }

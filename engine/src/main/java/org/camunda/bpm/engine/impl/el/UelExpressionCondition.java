@@ -20,6 +20,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.Condition;
+import org.camunda.bpm.engine.impl.javax.el.PropertyNotFoundException;
 
 
 /**
@@ -55,7 +56,7 @@ public class UelExpressionCondition implements Condition {
     try {
       result = evaluate(scope, execution);
     } catch (ProcessEngineException pee) {
-      if (!pee.getMessage().contains("Unknown property used in expression")) {
+      if (!(pee.getCause() instanceof PropertyNotFoundException)) {
         throw pee;
       }
     }

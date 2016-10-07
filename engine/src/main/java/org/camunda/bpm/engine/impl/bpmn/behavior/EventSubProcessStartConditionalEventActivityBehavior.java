@@ -15,10 +15,8 @@
  */
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
-import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.bpmn.parser.ConditionalEventDefinition;
 import org.camunda.bpm.engine.impl.core.variable.event.VariableEvent;
-import org.camunda.bpm.engine.impl.event.ConditionalVariableEventPayload;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
@@ -28,23 +26,21 @@ import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
  *
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
-public class EventSubProcessStartConditionalEventActivityBehavior extends EventSubProcessStartEventActivityBehavior implements ConditionalEventBehavioral {
+public class EventSubProcessStartConditionalEventActivityBehavior extends EventSubProcessStartEventActivityBehavior implements ConditionalEventBehavior {
 
-  private final ConditionalEventDefinition conditionalEvent;
+  protected final ConditionalEventDefinition conditionalEvent;
 
   public EventSubProcessStartConditionalEventActivityBehavior(ConditionalEventDefinition conditionalEvent) {
     this.conditionalEvent = conditionalEvent;
   }
 
   @Override
-  public void leaveOnSatisfiedCondition(final EventSubscriptionEntity eventSubscription, final ConditionalVariableEventPayload conditionalVariableEventPayload, final CommandContext commandContext) {
+  public void leaveOnSatisfiedCondition(final EventSubscriptionEntity eventSubscription, final VariableEvent variableEvent, final CommandContext commandContext) {
     PvmExecutionImpl execution = eventSubscription.getExecution();
-    final VariableEvent variableEvent = conditionalVariableEventPayload.getVariableEvent();
-    final VariableScope scope = conditionalVariableEventPayload.getScope();
 
-    if (!execution.isEnded() && execution.isScope()
-       && variableEvent != null && conditionalEvent.shouldEvaluateForVariableEvent(variableEvent)
-       && scope != null && conditionalEvent.tryEvaluate(scope, execution)) {
+    if (execution != null && !execution.isEnded() && execution.isScope()
+        && variableEvent != null
+        && conditionalEvent.tryEvaluate(variableEvent, execution, execution)) {
       ActivityImpl activity = eventSubscription.getActivity();
       activity = (ActivityImpl) activity.getFlowScope();
       execution.executeEventHandlerActivity(activity);

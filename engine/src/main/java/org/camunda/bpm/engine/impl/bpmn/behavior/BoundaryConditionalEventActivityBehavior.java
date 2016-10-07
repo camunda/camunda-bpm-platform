@@ -15,10 +15,8 @@
  */
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
-import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.bpmn.parser.ConditionalEventDefinition;
 import org.camunda.bpm.engine.impl.core.variable.event.VariableEvent;
-import org.camunda.bpm.engine.impl.event.ConditionalVariableEventPayload;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
@@ -27,9 +25,9 @@ import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
  *
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
-public class BoundaryConditionalEventActivityBehavior extends BoundaryEventActivityBehavior implements ConditionalEventBehavioral {
+public class BoundaryConditionalEventActivityBehavior extends BoundaryEventActivityBehavior implements ConditionalEventBehavior {
 
-  private final ConditionalEventDefinition conditionalEvent;
+  protected final ConditionalEventDefinition conditionalEvent;
 
   public BoundaryConditionalEventActivityBehavior(ConditionalEventDefinition conditionalEvent) {
     this.conditionalEvent = conditionalEvent;
@@ -37,14 +35,12 @@ public class BoundaryConditionalEventActivityBehavior extends BoundaryEventActiv
 
   @Override
   public void leaveOnSatisfiedCondition(final EventSubscriptionEntity eventSubscription,
-          final ConditionalVariableEventPayload conditionalVariableEventPayload, final CommandContext commandContext) {
+          final VariableEvent variableEvent, final CommandContext commandContext) {
     final PvmExecutionImpl execution = eventSubscription.getExecution();
-    final VariableEvent variableEvent = conditionalVariableEventPayload.getVariableEvent();
-    final VariableScope scope = conditionalVariableEventPayload.getScope();
 
-    if (!execution.isEnded()
-        && variableEvent != null && conditionalEvent.shouldEvaluateForVariableEvent(variableEvent)
-        && scope != null && conditionalEvent.tryEvaluate(scope, execution)
+    if (execution != null &&!execution.isEnded()
+        && variableEvent != null
+        && conditionalEvent.tryEvaluate(variableEvent, execution, execution)
         && execution.isScope()) {
       execution.executeActivity(eventSubscription.getActivity());
     }

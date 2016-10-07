@@ -49,7 +49,6 @@ import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.HasDbReferences;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
-import org.camunda.bpm.engine.impl.event.ConditionalVariableEventPayload;
 import org.camunda.bpm.engine.impl.event.EventType;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
@@ -1702,11 +1701,11 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     }
   }
 
-  public void handleConditionalEventOnVariableChange(ConditionalVariableEventPayload conditionalEventPayload) {
+  public void handleConditionalEventOnVariableChange(VariableEvent variableEvent) {
     List<EventSubscriptionEntity> subScriptions = getEventSubscriptions();
     for (EventSubscriptionEntity subscription : subScriptions) {
       if (EventType.CONDITONAL.name().equals(subscription.getEventType())) {
-        subscription.processEventSync(conditionalEventPayload);
+        subscription.processEventSync(variableEvent);
       }
     }
   }
@@ -1723,8 +1722,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
       }
     }).walkUntil();
     for (ExecutionEntity execution : execs) {
-      ConditionalVariableEventPayload conditionalEventPayload = new ConditionalVariableEventPayload(variableEvent, this);
-      execution.handleConditionalEventOnVariableChange(conditionalEventPayload);
+      execution.handleConditionalEventOnVariableChange(variableEvent);
     }
   }
 

@@ -73,10 +73,10 @@ public class ConditionalEventDefinition extends EventSubscriptionDeclaration imp
   }
 
   public boolean shouldEvaluateForVariableEvent(VariableEvent event) {
-    return variableName == null
-            || (event.getVariableInstance().getName().equals(variableName)
-               && ((variableEvents == null || variableEvents.isEmpty())
-                  || variableEvents.contains(event.getEventName())));
+    return
+    ((variableName == null || event.getVariableInstance().getName().equals(variableName))
+                                          &&
+    ((variableEvents == null || variableEvents.isEmpty()) || variableEvents.contains(event.getEventName())));
   }
 
   public boolean evaluate(VariableScope scope, DelegateExecution execution) {
@@ -91,5 +91,9 @@ public class ConditionalEventDefinition extends EventSubscriptionDeclaration imp
       return condition.tryEvaluate(scope, execution);
     }
     throw new IllegalStateException("Condtional event must have a condition!");
+  }
+
+  public boolean tryEvaluate(VariableEvent variableEvent, VariableScope scope, DelegateExecution execution) {
+    return shouldEvaluateForVariableEvent(variableEvent) && tryEvaluate(scope, execution);
   }
 }

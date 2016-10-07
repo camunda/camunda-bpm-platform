@@ -15,7 +15,7 @@
  */
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
-import org.camunda.bpm.engine.impl.event.ConditionalVariableEventPayload;
+import org.camunda.bpm.engine.impl.core.variable.event.VariableEvent;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 
@@ -26,15 +26,15 @@ import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
  *
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
-public interface ConditionalEventBehavioral {
+public interface ConditionalEventBehavior {
 
   /**
    * Checks the condition, on satisfaction the activity is leaved.
    *
    * @param eventSubscription the event subscription which contains all necessary informations
-   * @param conditionalVariableEventPayload the payload to evaluate the condition
+   * @param variableEvent the variableEvent to evaluate the condition
    * @param commandContext the current command context
    */
   void leaveOnSatisfiedCondition(final EventSubscriptionEntity eventSubscription,
-          ConditionalVariableEventPayload conditionalVariableEventPayload, final CommandContext commandContext);
+          final VariableEvent variableEvent, final CommandContext commandContext);
 }
