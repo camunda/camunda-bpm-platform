@@ -81,8 +81,8 @@ public class ExternalTaskQueryTopicBuilderImpl implements ExternalTaskQueryTopic
   }
   
   @Override
-  public ExternalTaskQueryTopicBuilder deserializeVariables(boolean deserialize) {
-    currentInstruction.setDeserializeVariables(deserialize);
+  public ExternalTaskQueryTopicBuilder enableCustomObjectDeserialization() {
+    currentInstruction.setDeserializeVariables(true);
     return this;
   }
 
