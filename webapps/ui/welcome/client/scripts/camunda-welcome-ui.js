@@ -17,6 +17,7 @@ module.exports = function(pluginDependencies) {
   var ngDependencies = [
     'ng',
     'ngResource',
+    'pascalprecht.translate',
     commons.name,
     pagesModule.name,
     directivesModule.name,
@@ -27,6 +28,15 @@ module.exports = function(pluginDependencies) {
 
   var appNgModule = angular.module(APP_NAME, ngDependencies);
 
+  function getUri(id) {
+    var uri = $('base').attr(id);
+    if (!id) {
+      throw new Error('Uri base for ' + id + ' could not be resolved');
+    }
+
+    return uri;
+  }
+
   var ModuleConfig = [
     '$routeProvider',
     'UriProvider',
@@ -35,15 +45,6 @@ module.exports = function(pluginDependencies) {
       UriProvider
     ) {
       $routeProvider.otherwise({ redirectTo: '/welcome' });
-
-      function getUri(id) {
-        var uri = $('base').attr(id);
-        if (!id) {
-          throw new Error('Uri base for ' + id + ' could not be resolved');
-        }
-
-        return uri;
-      }
 
       UriProvider.replace(':appName', 'welcome');
       UriProvider.replace('app://', getUri('href'));
@@ -65,7 +66,12 @@ module.exports = function(pluginDependencies) {
       }]);
     }];
 
+  appNgModule.provider('configuration', require('./../../../common/scripts/services/cam-configuration')(window.camWelcomeConf, 'Welcome'));
+  appNgModule.controller('WelcomePage', require('./controllers/welcome-page'));
+
   appNgModule.config(ModuleConfig);
+
+  require('./../../../common/scripts/services/locales')(appNgModule, getUri('app-root'), 'welcome');
 
   angular.bootstrap(document.documentElement, [ appNgModule.name, 'cam.welcome.custom' ]);
 

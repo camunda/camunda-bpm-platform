@@ -2,7 +2,7 @@
   <div class="user-profile-display"
        ng-if="!visibleForm">
     <h3 class="section-title">
-      Profile
+      {{'PROFILE' | translate}}
     </h3>
 
     <div class="user-profile-info">
@@ -15,15 +15,15 @@
     </div>
 
     <ul class="action-links list-inline">
-      <li><a ng-click="showForm('profile')">Edit profile</a></li>
-      <li><a ng-click="showForm('password')">Change password</a></li>
+      <li><a ng-click="showForm('profile')">{{'EDIT_PROFILE' | translate}}</a></li>
+      <li><a ng-click="showForm('password')">{{'CHANGE_PASSWORD' | translate}}</a></li>
     </ul>
 
     <hr class="narrow"
         ng-if="user.groups.length">
 
     <div ng-if="user.groups.length">
-      <h4>Groups</h4>
+      <h4>{{'GROUPS' | translate}}</h4>
       <ul class="user-profile-groups">
         <li ng-repeat="group in user.groups"
             ng-class="'group-' + group.id + ' type-' + group.type.toLowerCase()">{{ group.name }}</li>
@@ -35,15 +35,15 @@
         class="user-profile"
         ng-submit="submitProfile()"
         ng-show="visibleForm === 'profile'">
-    <h3 class="section-title">Edit your profile</h3>
+    <h3 class="section-title">{{'EDIT_YOUR_PROFILE' | translate}}</h3>
 
     <div class="form-group">
-      <label>Username</label>
+      <label>{{'USERNAME' | translate}}</label>
       <div class="form-control-static">{{ user.id }}</div>
     </div>
 
     <div class="form-group">
-      <label for="user-profile-firstname">First name</label>
+      <label for="user-profile-firstname">{{'FIRST_NAME' | translate}}</label>
       <input class="form-control"
              id="user-profile-firstname"
              type="text"
@@ -54,7 +54,7 @@
     </div>
 
     <div class="form-group">
-      <label for="user-profile-lastname">Last name</label>
+      <label for="user-profile-lastname">{{'LAST_NAME' | translate}}</label>
       <input class="form-control"
              id="user-profile-lastname"
              type="text"
@@ -65,7 +65,7 @@
     </div>
 
     <div class="form-group">
-      <label for="user-profile-email">Email</label>
+      <label for="user-profile-email">{{'EMAIL' | translate}}</label>
       <input class="form-control"
              id="user-profile-email"
              type="text"
@@ -78,12 +78,12 @@
       <div class="col-xs-6">
         <button type="button"
                 class="btn btn-link"
-                ng-click="showForm()">Cancel</button>
+                ng-click="showForm()">{{'CANCEL' | translate}}</button>
       </div>
       <div class="col-xs-6 text-right">
         <button type="submit"
                 ng-disabled="userProfile.$invalid || userProfile.$pristine || processing"
-                class="btn btn-primary">Update</button>
+                class="btn btn-primary">{{'UPDATE' | translate}}</button>
       </div>
     </div>
   </form>
@@ -94,10 +94,10 @@
         class="change-password"
         ng-submit="submitPassword()"
         ng-show="visibleForm === 'password'">
-    <h3 class="section-title">Change your password</h3>
+    <h3 class="section-title">{{'CHANGE_YOUR_PASSWORD' | translate}}</h3>
 
     <div class="form-group">
-      <label for="user-password-current">Current password</label>
+      <label for="user-password-current">{{'CURRENT_PASSWORD' | translate}}</label>
       <input class="form-control"
              id="user-password-current"
              type="password"
@@ -107,7 +107,7 @@
     </div>
 
     <div class="form-group">
-      <label for="user-password-new">New password</label>
+      <label for="user-password-new">{{'NEW_PASSWORD' | translate}}</label>
       <input class="form-control"
              id="user-password-new"
              type="password"
@@ -117,7 +117,7 @@
     </div>
 
     <div class="form-group">
-      <label for="user-password-confirmation">Confirm new password</label>
+      <label for="user-password-confirmation">{{'CONFIRM_NEW_PASSWORD' | translate}}</label>
       <input class="form-control"
              id="user-password-confirmation"
              type="password"
@@ -125,19 +125,19 @@
              required
              ng-model="password.confirmation" />
       <div ng-if="passwordsMismatch"
-           class="help-block error">The new password and the confirmation are not matching.</div>
+           class="help-block error">{{'PASSWORD_NOT_MATCHING' | translate}}</div>
     </div>
 
     <div class="form-group actions row">
       <div class="col-xs-6">
         <button type="button"
                 class="btn btn-link"
-                ng-click="showForm()">Cancel</button>
+                ng-click="showForm()">{{'CANCEL' | translate}}</button>
       </div>
       <div class="col-xs-6 text-right">
         <button type="submit"
                 ng-disabled="changePassword.$invalid || changePassword.$pristine || processing || passwordsMismatch"
-                class="btn btn-primary">Change password</button>
+                class="btn btn-primary">{{'CHANGE_PASSWORD' | translate}}</button>
       </div>
     </div>
   </form>

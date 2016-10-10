@@ -1,0 +1,18 @@
+{
+  "LINKS": "Links",
+  "PROFILE": "Profile",
+  "EDIT_PROFILE": "Edit profile",
+  "CHANGE_PASSWORD": "Change password",
+  "EDIT_YOUR_PROFILE": "Edit your profile",
+  "FIRST_NAME": "First name",
+  "LAST_NAME": "Last name",
+  "EMAIL": "Email",
+  "UPDATE": "Update",
+  "CHANGE_YOUR_PASSWORD": "Change your password",
+  "CURRENT_PASSWORD": "Current password",
+  "NEW_PASSWORD": "New password",
+  "CONFIRM_NEW_PASSWORD": "Confirm new password",
+  "PASSWORD_NOT_MATCHING": "The new password and the confirmation are not matching.",
+  "GROUPS": "Groups",
+  "USERNAME": "Username"
+}

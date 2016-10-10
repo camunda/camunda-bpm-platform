@@ -2,8 +2,7 @@
 var moment = require('camunda-commons-ui/vendor/moment'),
     angular = require('camunda-commons-ui/vendor/angular');
 
-module.exports = function(ngModule, appRoot) {
-
+module.exports = function(ngModule, appRoot, appName) {
   ngModule.factory('localeLoader', ['$q', '$http', 'Notifications',
       function($q, $http, Notifications) {
         return function(options) {
@@ -54,7 +53,7 @@ module.exports = function(ngModule, appRoot) {
       var fallback = configurationProvider.getFallbackLocale();
 
       $translateProvider.useLoader('localeLoader', {
-        prefix: appRoot + '/app/tasklist/locales/',
+        prefix: appRoot + '/app/'+ appName +'/locales/',
         suffix: '.json',
         callback: function(err, data, locale) {
           if(!err && data && data.dateLocales) {
