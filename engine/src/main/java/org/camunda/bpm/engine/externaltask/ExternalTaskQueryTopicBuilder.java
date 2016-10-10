@@ -41,9 +41,8 @@ public interface ExternalTaskQueryTopicBuilder extends ExternalTaskQueryBuilder 
   /**
    * Specify whether serialized variables should be deserialized on fetching.
    * 
-   * @param deserialize whether to deserialize
    * @return this builder
    */
-  public ExternalTaskQueryTopicBuilder deserializeVariables(boolean deserialize);
+  public ExternalTaskQueryTopicBuilder enableCustomObjectDeserialization();
   
 }
