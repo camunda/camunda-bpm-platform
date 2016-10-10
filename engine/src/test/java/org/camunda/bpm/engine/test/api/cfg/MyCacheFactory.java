@@ -21,11 +21,11 @@ import org.camunda.commons.utils.cache.Cache;
  *
  * @author Johannes Heinemann
  */
-public class MyCacheFactory<String, DbEntity> extends DefaultCacheFactory<String, DbEntity> {
+public class MyCacheFactory extends DefaultCacheFactory {
 
   @Override
-  public Cache<String, DbEntity> createCache(int maxNumberOfElementsInCache) {
-    return new MyCacheImplementation<String, DbEntity>(maxNumberOfElementsInCache);
+  public <T> Cache<String, T> createCache(int maxNumberOfElementsInCache) {
+    return new MyCacheImplementation<String, T>(maxNumberOfElementsInCache);
   }
 
 }

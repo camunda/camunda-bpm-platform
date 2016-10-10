@@ -18,7 +18,7 @@ import org.camunda.commons.utils.cache.Cache;
 /**
  * <p>Builds the caches for the {@link DeploymentCache}.</p>
  */
-public interface CacheFactory<String, DbEntity> {
+public interface CacheFactory {
 
   /**
    * Creates a cache that does not exceed a specified number of elements.
@@ -28,5 +28,5 @@ public interface CacheFactory<String, DbEntity> {
    * @return
    *        The cache to be created.
    */
-  public Cache<String, DbEntity> createCache(int maxNumberOfElementsInCache);
+  public <T> Cache<String, T > createCache(int maxNumberOfElementsInCache);
 }

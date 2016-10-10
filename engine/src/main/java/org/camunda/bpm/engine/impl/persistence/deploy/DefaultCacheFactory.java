@@ -22,10 +22,10 @@ import org.camunda.commons.utils.cache.ConcurrentLruCache;
  *
  * @author Johannes Heinemann
  */
-public class DefaultCacheFactory<String, DbEntity> implements CacheFactory<String, DbEntity>{
+public class DefaultCacheFactory implements CacheFactory{
 
   @Override
-  public Cache<String, DbEntity> createCache(int maxNumberOfElementsInCache) {
-    return new ConcurrentLruCache<String, DbEntity>(maxNumberOfElementsInCache);
+  public <T> Cache<String, T> createCache(int maxNumberOfElementsInCache) {
+    return new ConcurrentLruCache<String, T>(maxNumberOfElementsInCache);
   }
 }
