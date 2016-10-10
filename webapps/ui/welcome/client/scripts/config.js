@@ -1,4 +1,19 @@
 window.camWelcomeConf = {
+  // app: {
+  //   name: 'Todos',
+  //   vendor: 'Company'
+  // },
+  //
+  // configure the date format
+  // "dateFormat": {
+  //   "normal": "LLL",
+  //   "long":   "LLLL"
+  // },
+  //
+  // "locales": {
+  //    "availableLocales": ["en", "de"],
+  //    "fallbackLocale": "en"
+  //  },
   // links: [
   //   {
   //     label: 'Angular.js Docs',
