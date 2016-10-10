@@ -1,9 +1,9 @@
 'use strict';
 var _links = [
   {
-    label: 'Documentation',
+    label: 'DOCUMENTATION',
     href: 'https://docs.camunda.org/manual/latest/webapps/',
-    description: 'Camunda webapps user documentation'
+    description: 'DOCUMENTATION_DESCRIPTION'
   }
 ];
 
