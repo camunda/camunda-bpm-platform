@@ -77,6 +77,12 @@ module.exports = function(grunt) {
     buildTarget: pkg.gruntConfig.tasklistBuildTarget
   });
 
+  require('./grunt/config/localescompile')(config, localesConf, {
+    appName: 'welcome',
+    sourceDir: pkg.gruntConfig.welcomeSourceDir,
+    buildTarget: pkg.gruntConfig.welcomeBuildTarget
+  });
+
   var watchConf = {
     commons_styles: {
       options: {

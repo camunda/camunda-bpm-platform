@@ -6,12 +6,9 @@
            ng-init="cols = columnWidth()">
         <div class="row">
           <div class="col-xs-12">
-            <h3 class="section-title">Applications</h3>
+            <h3 class="section-title">{{'APPLICATIONS' | translate}}</h3>
           </div>
         </div>
-
-
-
 
         <div class="row">
           <div ng-if="canAccessApp('cockpit')"
@@ -21,7 +18,7 @@
                href="./../../cockpit/default/">
             </a>
             <h3 class="app-name">
-              <a href="./../../cockpit/default/">Cockpit</a>
+              <a href="./../../cockpit/default/">{{'COCKPIT' | translate}}</a>
             </h3>
           </div>
 
@@ -33,7 +30,7 @@
                href="./../../tasklist/default/">
             </a>
             <h3 class="app-name">
-              <a href="./../../tasklist/default/">Tasklist</a>
+              <a href="./../../tasklist/default/">{{'TASKLIST' | translate}}</a>
             </h3>
           </div>
 
@@ -45,7 +42,7 @@
                href="./../../admin/default/">
             </a>
             <h3 class="app-name">
-              <a href="./../../admin/default/">Admin</a>
+              <a href="./../../admin/default/">{{'ADMIN' | translate}}</a>
             </h3>
           </div>
         </div>
