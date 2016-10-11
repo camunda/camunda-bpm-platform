@@ -419,6 +419,59 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.testFetchVariables.bpmn20.xml")
+  public void testShouldNotFetchSerializedVariables() {
+    // given
+    ExternalTaskCustomValue customValue = new ExternalTaskCustomValue();
+    customValue.setTestValue("value1");
+    runtimeService.startProcessInstanceByKey("subProcessExternalTask",
+        Variables.createVariables().putValue("processVar1", customValue));
+
+    // when
+    List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(1, WORKER_ID)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .variables("processVar1")
+        .execute();
+
+    // then
+    LockedExternalTask task = externalTasks.get(0);
+    VariableMap variables = task.getVariables();
+    assertEquals(1, variables.size());
+
+    try {
+      variables.get("processVar1");
+      fail("did not receive an exception although variable was serialized");
+    } catch (IllegalStateException e) {
+      assertEquals("Object is not deserialized.", e.getMessage());
+    }
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.testFetchVariables.bpmn20.xml")
+  public void testFetchSerializedVariables() {
+    // given
+    ExternalTaskCustomValue customValue = new ExternalTaskCustomValue();
+    customValue.setTestValue("value1");
+    runtimeService.startProcessInstanceByKey("subProcessExternalTask",
+        Variables.createVariables().putValue("processVar1", customValue));
+
+    // when
+    List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(1, WORKER_ID)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .variables("processVar1")
+        .enableCustomObjectDeserialization()
+        .execute();
+
+    // then
+    LockedExternalTask task = externalTasks.get(0);
+    VariableMap variables = task.getVariables();
+    assertEquals(1, variables.size());
+
+    final ExternalTaskCustomValue receivedCustomValue = (ExternalTaskCustomValue) variables.get("processVar1");
+    assertNotNull(receivedCustomValue);
+    assertNotNull(receivedCustomValue.getTestValue());
+    assertEquals("value1", receivedCustomValue.getTestValue());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.testFetchVariables.bpmn20.xml")
   public void testFetchAllVariables() {
     // given
     runtimeService.startProcessInstanceByKey("subProcessExternalTask",

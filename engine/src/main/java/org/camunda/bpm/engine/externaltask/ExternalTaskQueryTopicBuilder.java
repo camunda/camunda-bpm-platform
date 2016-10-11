@@ -37,4 +37,13 @@ public interface ExternalTaskQueryTopicBuilder extends ExternalTaskQueryBuilder 
    * @return this builder
    */
   public ExternalTaskQueryTopicBuilder variables(List<String> variables);
+
+  /**
+   * Enable deserialization of variable values that are custom objects. By default, the query
+   * will not attempt to deserialize the value of these variables.
+   *
+   * @return this builder
+   */
+  public ExternalTaskQueryTopicBuilder enableCustomObjectDeserialization();
+
 }

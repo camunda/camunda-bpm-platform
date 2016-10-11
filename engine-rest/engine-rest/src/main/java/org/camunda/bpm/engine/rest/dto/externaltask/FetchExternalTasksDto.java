@@ -56,6 +56,7 @@ public class FetchExternalTasksDto {
     protected String topicName;
     protected long lockDuration;
     protected List<String> variables;
+    protected boolean deserializeValues = false;
 
     public String getTopicName() {
       return topicName;
@@ -74,6 +75,12 @@ public class FetchExternalTasksDto {
     }
     public void setVariables(List<String> variables) {
       this.variables = variables;
+    }
+    public boolean isDeserializeValues() {
+      return deserializeValues;
+    }
+    public void setDeserializeValues(boolean deserializeValues) {
+      this.deserializeValues = deserializeValues;
     }
   }
 }

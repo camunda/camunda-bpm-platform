@@ -82,4 +82,9 @@ public class ExternalTaskQueryTopicBuilderImpl implements ExternalTaskQueryTopic
     }
   }
 
+  public ExternalTaskQueryTopicBuilder enableCustomObjectDeserialization() {
+    currentInstruction.setDeserializeVariables(true);
+    return this;
+  }
+
 }

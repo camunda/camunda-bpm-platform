@@ -116,6 +116,10 @@ public class ExternalTaskRestServiceImpl extends AbstractRestProcessEngineAware 
           topicFetchBuilder = topicFetchBuilder.variables(topicDto.getVariables());
         }
 
+        if (topicDto.isDeserializeValues()) {
+          topicFetchBuilder = topicFetchBuilder.enableCustomObjectDeserialization();
+        }
+
         fetchBuilder = topicFetchBuilder;
       }
     }

@@ -26,6 +26,7 @@ public class TopicFetchInstruction implements Serializable {
   protected String topicName;
   protected List<String> variablesToFetch;
   protected long lockDuration;
+  protected boolean deserializeVariables = false;
 
   public TopicFetchInstruction(String topicName, long lockDuration) {
     this.topicName = topicName;
@@ -47,4 +48,13 @@ public class TopicFetchInstruction implements Serializable {
   public String getTopicName() {
     return topicName;
   }
+
+  public boolean isDeserializeVariables() {
+    return deserializeVariables;
+  }
+
+  public void setDeserializeVariables(boolean deserializeVariables) {
+    this.deserializeVariables = deserializeVariables;
+  }
+
 }
