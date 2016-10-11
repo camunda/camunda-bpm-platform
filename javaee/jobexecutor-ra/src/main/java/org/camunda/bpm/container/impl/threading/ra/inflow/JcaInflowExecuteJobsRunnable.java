@@ -36,6 +36,7 @@ public class JcaInflowExecuteJobsRunnable extends ExecuteJobsRunnable {
     }
   }
 
+  @Override
   protected void executeJob(String nextJobId, CommandExecutor commandExecutor) {
     JobExecutionHandlerActivation jobHandlerActivation = ra.getJobHandlerActivation();
     if(jobHandlerActivation == null) {

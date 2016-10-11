@@ -53,7 +53,7 @@ public class ExecuteJobsRunnable implements Runnable {
         String nextJobId = currentProcessorJobQueue.remove(0);
         if(jobExecutor.isActive()) {
           try {
-             ExecuteJobHelper.executeJob(nextJobId, commandExecutor);
+             executeJob(nextJobId, commandExecutor);
           }
           catch(Throwable t) {
             LOG.exceptionWhileExecutingJob(nextJobId, t);
@@ -72,6 +72,14 @@ public class ExecuteJobsRunnable implements Runnable {
     } finally {
       Context.removeJobExecutorContext();
     }
+  }
+
+  /**
+   * Note: this is a hook to be overridden by
+   * org.camunda.bpm.container.impl.threading.ra.inflow.JcaInflowExecuteJobsRunnable.executeJob(String, CommandExecutor)
+   */
+  protected void executeJob(String nextJobId, CommandExecutor commandExecutor) {
+    ExecuteJobHelper.executeJob(nextJobId, commandExecutor);
   }
 
   protected void unlockJob(String nextJobId, CommandExecutor commandExecutor) {
