@@ -13,9 +13,10 @@
 package org.camunda.bpm.engine.impl.migration.batch;
 
 import org.camunda.bpm.engine.batch.Batch;
-import org.camunda.bpm.engine.impl.batch.AbstractListBasedBatchJobHandler;
+import org.camunda.bpm.engine.impl.batch.AbstractBatchJobHandler;
 import org.camunda.bpm.engine.impl.batch.BatchJobConfiguration;
 import org.camunda.bpm.engine.impl.batch.BatchJobContext;
+import org.camunda.bpm.engine.impl.batch.BatchJobDeclaration;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
@@ -34,9 +35,9 @@ import java.util.List;
  * Job handler for batch migration jobs. The batch migration job
  * migrates a list of process instances.
  */
-public class MigrationBatchJobHandler extends AbstractListBasedBatchJobHandler<MigrationBatchConfiguration> {
+public class MigrationBatchJobHandler extends AbstractBatchJobHandler<MigrationBatchConfiguration> {
 
-  public static final MigrationBatchJobDeclaration JOB_DECLARATION = new MigrationBatchJobDeclaration();
+  public static final BatchJobDeclaration JOB_DECLARATION = new BatchJobDeclaration(Batch.TYPE_PROCESS_INSTANCE_MIGRATION);
 
   public String getType() {
     return Batch.TYPE_PROCESS_INSTANCE_MIGRATION;
@@ -53,10 +54,10 @@ public class MigrationBatchJobHandler extends AbstractListBasedBatchJobHandler<M
   @Override
   protected MigrationBatchConfiguration createJobConfiguration(MigrationBatchConfiguration configuration, List<String> processIdsForJob) {
     return MigrationBatchConfiguration.create(
-      configuration.getMigrationPlan(),
-      processIdsForJob,
-      configuration.isSkipCustomListeners(),
-      configuration.isSkipIoMappings()
+        configuration.getMigrationPlan(),
+        processIdsForJob,
+        configuration.isSkipCustomListeners(),
+        configuration.isSkipIoMappings()
     );
   }
 
@@ -78,8 +79,8 @@ public class MigrationBatchJobHandler extends AbstractListBasedBatchJobHandler<M
     MigrationBatchConfiguration batchConfiguration = readConfiguration(configurationEntity.getBytes());
 
     MigrationPlanExecutionBuilder executionBuilder = commandContext.getProcessEngineConfiguration()
-      .getRuntimeService()
-      .newMigration(batchConfiguration.getMigrationPlan())
+        .getRuntimeService()
+        .newMigration(batchConfiguration.getMigrationPlan())
         .processInstanceIds(batchConfiguration.getIds());
 
     if (batchConfiguration.isSkipCustomListeners()) {
@@ -98,8 +99,8 @@ public class MigrationBatchJobHandler extends AbstractListBasedBatchJobHandler<M
 
   protected ProcessDefinitionEntity getProcessDefinition(CommandContext commandContext, String processDefinitionId) {
     return commandContext.getProcessEngineConfiguration()
-      .getDeploymentCache()
-      .findDeployedProcessDefinitionById(processDefinitionId);
+        .getDeploymentCache()
+        .findDeployedProcessDefinitionById(processDefinitionId);
   }
 
 }

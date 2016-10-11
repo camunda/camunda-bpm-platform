@@ -13,7 +13,7 @@
 
 package org.camunda.bpm.engine.impl.batch.deletion;
 
-import org.camunda.bpm.engine.impl.batch.AbstractIdsBatchConfiguration;
+import org.camunda.bpm.engine.impl.batch.BatchConfiguration;
 
 import java.util.List;
 
@@ -26,7 +26,7 @@ import java.util.List;
  * @author Askar Akhmerov
  * @see org.camunda.bpm.engine.impl.batch.deletion.DeleteProcessInstanceBatchConfigurationJsonConverter
  */
-public class DeleteProcessInstanceBatchConfiguration extends AbstractIdsBatchConfiguration {
+public class DeleteProcessInstanceBatchConfiguration extends BatchConfiguration {
   protected String deleteReason;
 
   public static DeleteProcessInstanceBatchConfiguration create(List<String> processInstanceIds, String deleteReason) {

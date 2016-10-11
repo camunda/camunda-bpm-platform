@@ -21,9 +21,9 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 
 
-public abstract class AbstractBatchJobDeclaration extends JobDeclaration<BatchJobContext, MessageEntity> {
+public class BatchJobDeclaration extends JobDeclaration<BatchJobContext, MessageEntity> {
 
-  public AbstractBatchJobDeclaration(String jobHandlerType) {
+  public BatchJobDeclaration(String jobHandlerType) {
     super(jobHandlerType);
   }
 

@@ -42,7 +42,7 @@ import static org.junit.Assert.assertThat;
  */
 @RunWith(Parameterized.class)
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
-public class DeleteHistoricProcessInstancesBatchAuthorizationTest extends AbstractBatchAuthorizationTest{
+public class DeleteHistoricProcessInstancesBatchAuthorizationTest extends AbstractBatchAuthorizationTest {
 
   protected static final long BATCH_OPERATIONS = 4;
   @Rule
@@ -88,8 +88,8 @@ public class DeleteHistoricProcessInstancesBatchAuthorizationTest extends Abstra
             .withHistoricInstances(0L)
             .withAuthorizations(
                 grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
-                grant(Resources.PROCESS_DEFINITION, "Process_1", "userId", Permissions.READ_HISTORY,Permissions.DELETE_HISTORY),
-                grant(Resources.PROCESS_DEFINITION, "Process_2", "userId", Permissions.READ_HISTORY,Permissions.DELETE_HISTORY)
+                grant(Resources.PROCESS_DEFINITION, "Process_1", "userId", Permissions.READ_HISTORY, Permissions.DELETE_HISTORY),
+                grant(Resources.PROCESS_DEFINITION, "Process_2", "userId", Permissions.READ_HISTORY, Permissions.DELETE_HISTORY)
             ).succeeds()
     );
   }
@@ -102,12 +102,7 @@ public class DeleteHistoricProcessInstancesBatchAuthorizationTest extends Abstra
     // then
     assertScenario();
 
-
-    if (authRule.scenarioSucceeded()) {
-      assertThat(historyService.createHistoricProcessInstanceQuery().count(), is(0L));
-    } else {
-      assertThat(historyService.createHistoricProcessInstanceQuery().count(), is(getScenario().getHistoricInstances()));
-    }
+    assertThat(historyService.createHistoricProcessInstanceQuery().count(), is(getScenario().getHistoricInstances()));
   }
 
   @Test
@@ -122,7 +117,7 @@ public class DeleteHistoricProcessInstancesBatchAuthorizationTest extends Abstra
     List<String> processInstanceIds = Arrays.asList(processInstance.getId(), processInstance2.getId());
     runtimeService.deleteProcessInstances(processInstanceIds, null, true, false);
 
-    List <String> historicProcessInstances = new ArrayList<String>();
+    List<String> historicProcessInstances = new ArrayList<String>();
     for (HistoricProcessInstance hpi : historyService.createHistoricProcessInstanceQuery().list()) {
       historicProcessInstances.add(hpi.getId());
     }

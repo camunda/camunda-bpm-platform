@@ -37,7 +37,7 @@ import java.util.List;
  *
  * @author Askar Akhmerov
  */
-public abstract class AbstractListBasedBatchJobHandler<T extends AbstractIdsBatchConfiguration> implements BatchJobHandler<T> {
+public abstract class AbstractBatchJobHandler<T extends BatchConfiguration> implements BatchJobHandler<T> {
 
   public abstract JobDeclaration<BatchJobContext, MessageEntity> getJobDeclaration();
 
@@ -55,13 +55,13 @@ public abstract class AbstractListBasedBatchJobHandler<T extends AbstractIdsBatc
     List<String> ids = configuration.getIds();
     int numberOfItemsToProcess = Math.min(invocationsPerBatchJob * batchJobsPerSeed, ids.size());
     // view of process instances to process
-    List<String> idsToProcess = ids.subList(0, numberOfItemsToProcess);
+    List<String> processIds = ids.subList(0, numberOfItemsToProcess);
 
     int createdJobs = 0;
-    while (!idsToProcess.isEmpty()) {
-      int lastIdIndex = Math.min(invocationsPerBatchJob, idsToProcess.size());
+    while (!processIds.isEmpty()) {
+      int lastIdIndex = Math.min(invocationsPerBatchJob, processIds.size());
       // view of process instances for this job
-      List<String> idsForJob = idsToProcess.subList(0, lastIdIndex);
+      List<String> idsForJob = processIds.subList(0, lastIdIndex);
 
       T jobConfiguration = createJobConfiguration(configuration, idsForJob);
       ByteArrayEntity configurationEntity = saveConfiguration(byteArrayManager, jobConfiguration);

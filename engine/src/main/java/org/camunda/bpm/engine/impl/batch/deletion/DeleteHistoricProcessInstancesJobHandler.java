@@ -14,9 +14,11 @@
 package org.camunda.bpm.engine.impl.batch.deletion;
 
 import org.camunda.bpm.engine.batch.Batch;
-import org.camunda.bpm.engine.impl.batch.AbstractListBasedBatchJobHandler;
+import org.camunda.bpm.engine.impl.batch.AbstractBatchJobHandler;
+import org.camunda.bpm.engine.impl.batch.BatchConfiguration;
 import org.camunda.bpm.engine.impl.batch.BatchJobConfiguration;
 import org.camunda.bpm.engine.impl.batch.BatchJobContext;
+import org.camunda.bpm.engine.impl.batch.BatchJobDeclaration;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
@@ -28,9 +30,9 @@ import java.util.List;
 /**
  * @author Askar Akhmerov
  */
-public class DeleteHistoricProcessInstancesJobHandler extends AbstractListBasedBatchJobHandler<DeleteHistoricProcessInstanceBatchConfiguration> {
+public class DeleteHistoricProcessInstancesJobHandler extends AbstractBatchJobHandler<BatchConfiguration> {
 
-  public static final DeleteHistoricProcessInstancesBatchJobDeclaration JOB_DECLARATION = new DeleteHistoricProcessInstancesBatchJobDeclaration();
+  public static final BatchJobDeclaration JOB_DECLARATION = new BatchJobDeclaration(Batch.TYPE_HISTORIC_PROCESS_INSTANCE_DELETION);
 
   @Override
   public String getType() {
@@ -47,8 +49,8 @@ public class DeleteHistoricProcessInstancesJobHandler extends AbstractListBasedB
   }
 
   @Override
-  protected DeleteHistoricProcessInstanceBatchConfiguration createJobConfiguration(DeleteHistoricProcessInstanceBatchConfiguration configuration, List<String> processIdsForJob) {
-    return DeleteHistoricProcessInstanceBatchConfiguration.create(processIdsForJob);
+  protected BatchConfiguration createJobConfiguration(BatchConfiguration configuration, List<String> processIdsForJob) {
+    return BatchConfiguration.create(processIdsForJob);
   }
 
   @Override
@@ -57,7 +59,7 @@ public class DeleteHistoricProcessInstancesJobHandler extends AbstractListBasedB
         .getDbEntityManager()
         .selectById(ByteArrayEntity.class, configuration.getConfigurationByteArrayId());
 
-    DeleteHistoricProcessInstanceBatchConfiguration batchConfiguration = readConfiguration(configurationEntity.getBytes());
+    BatchConfiguration batchConfiguration = readConfiguration(configurationEntity.getBytes());
 
     boolean initialLegacyRestrictions = commandContext.isRestrictUserOperationLogToAuthenticatedUsers();
     commandContext.disableUserOperationLog();

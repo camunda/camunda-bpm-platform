@@ -19,7 +19,10 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.junit.Before;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +43,16 @@ public abstract class AbstractAsyncOperationsTest {
   protected RuntimeService runtimeService;
   protected ManagementService managementService;
   protected HistoryService historyService;
+
+  public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
+  public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
+
+  @Before
+  public void initServices() {
+    runtimeService = engineRule.getRuntimeService();
+    managementService = engineRule.getManagementService();
+    historyService = engineRule.getHistoryService();
+  }
 
   protected void executeSeedJob(Batch batch) {
     String seedJobDefinitionId = batch.getSeedJobDefinitionId();

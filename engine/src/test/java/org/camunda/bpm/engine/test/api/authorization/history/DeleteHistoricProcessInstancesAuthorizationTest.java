@@ -20,7 +20,6 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
-import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -110,11 +109,7 @@ public class DeleteHistoricProcessInstancesAuthorizationTest {
     List<String> processInstanceIds = Arrays.asList(
         new String[]{processInstance.getId(), processInstance2.getId()});
     runtimeService.deleteProcessInstances(processInstanceIds, null, false, false);
-    assertThat(
-        runtimeService.createProcessInstanceQuery().processDefinitionKey(PROCESS_KEY).count(), is(0L));
-    HistoricProcessInstanceQuery historicProcessInstanceQuery =
-        historyService.createHistoricProcessInstanceQuery();
-    assertThat(historicProcessInstanceQuery.count(), is(2L));
+
     historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
         .processInstanceId(processInstance.getId()).singleResult();
 
@@ -132,10 +127,7 @@ public class DeleteHistoricProcessInstancesAuthorizationTest {
     setupAndExecuteProcessInstancesListTest();
     // then
     if (authRule.assertScenario(scenario)) {
-
-      if (authRule.scenarioSucceeded()) {
-        assertThat(historyService.createHistoricProcessInstanceQuery().count(), is(0L));
-      }
+      assertThat(historyService.createHistoricProcessInstanceQuery().count(), is(0L));
     }
   }
 

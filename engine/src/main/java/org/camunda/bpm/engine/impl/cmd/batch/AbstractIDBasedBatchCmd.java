@@ -13,7 +13,7 @@
 
 package org.camunda.bpm.engine.impl.cmd.batch;
 
-import org.camunda.bpm.engine.impl.batch.AbstractIdsBatchConfiguration;
+import org.camunda.bpm.engine.impl.batch.BatchConfiguration;
 import org.camunda.bpm.engine.impl.batch.BatchEntity;
 import org.camunda.bpm.engine.impl.batch.BatchJobHandler;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -37,7 +37,7 @@ public abstract class AbstractIDBasedBatchCmd<T> extends AbstractBatchCmd<T> {
     ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
     BatchJobHandler batchJobHandler = getBatchJobHandler(processEngineConfiguration);
 
-    AbstractIdsBatchConfiguration configuration = getAbstractIdsBatchConfiguration(ids, deleteReason);
+    BatchConfiguration configuration = getAbstractIdsBatchConfiguration(ids, deleteReason);
 
     BatchEntity batch = new BatchEntity();
     batch.setType(batchJobHandler.getType());
@@ -50,14 +50,14 @@ public abstract class AbstractIDBasedBatchCmd<T> extends AbstractBatchCmd<T> {
     return batch;
   }
 
-  protected int calculateSize(ProcessEngineConfigurationImpl engineConfiguration, AbstractIdsBatchConfiguration batchConfiguration) {
+  protected int calculateSize(ProcessEngineConfigurationImpl engineConfiguration, BatchConfiguration batchConfiguration) {
     int invocationsPerBatchJob = engineConfiguration.getInvocationsPerBatchJob();
     int processInstanceCount = batchConfiguration.getIds().size();
 
     return (int) Math.ceil(processInstanceCount / invocationsPerBatchJob);
   }
 
-  protected abstract AbstractIdsBatchConfiguration getAbstractIdsBatchConfiguration(List<String> processInstanceIds, String deleteReason);
+  protected abstract BatchConfiguration getAbstractIdsBatchConfiguration(List<String> processInstanceIds, String deleteReason);
 
   protected abstract BatchJobHandler getBatchJobHandler(ProcessEngineConfigurationImpl processEngineConfiguration);
 }

@@ -14,19 +14,24 @@
 package org.camunda.bpm.engine.impl.batch.deletion;
 
 import org.camunda.bpm.engine.batch.Batch;
-import org.camunda.bpm.engine.impl.batch.*;
+import org.camunda.bpm.engine.impl.batch.AbstractBatchJobHandler;
+import org.camunda.bpm.engine.impl.batch.BatchJobConfiguration;
+import org.camunda.bpm.engine.impl.batch.BatchJobContext;
+import org.camunda.bpm.engine.impl.batch.BatchJobDeclaration;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
-import org.camunda.bpm.engine.impl.persistence.entity.*;
+import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 
 import java.util.List;
 
 /**
  * @author Askar Akhmerov
  */
-public class DeleteProcessInstancesJobHandler extends AbstractListBasedBatchJobHandler<DeleteProcessInstanceBatchConfiguration> {
+public class DeleteProcessInstancesJobHandler extends AbstractBatchJobHandler<DeleteProcessInstanceBatchConfiguration> {
 
-  public static final DeleteProcessInstancesBatchJobDeclaration JOB_DECLARATION = new DeleteProcessInstancesBatchJobDeclaration();
+  public static final BatchJobDeclaration JOB_DECLARATION = new BatchJobDeclaration(Batch.TYPE_PROCESS_INSTANCE_DELETION);
 
   @Override
   public String getType() {
