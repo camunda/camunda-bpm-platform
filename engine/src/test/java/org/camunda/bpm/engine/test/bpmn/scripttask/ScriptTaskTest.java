@@ -406,6 +406,15 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
     assertEquals("bar", variableValue);
   }
 
+  public void testJuelCapitalizedExpression() {
+    deployProcess(JUEL.toUpperCase(), "${execution.setVariable('foo', 'bar')}");
+
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
+
+    String variableValue = (String) runtimeService.getVariable(pi.getId(), "foo");
+    assertEquals("bar", variableValue);
+  }
+
   public void testSourceAsExpressionAsVariable() {
     deployProcess(PYTHON, "${scriptSource}");
 
