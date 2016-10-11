@@ -280,6 +280,27 @@ public class MultiTenancyHistoricDataCmdsTenantCheckTest {
   }
 
   @Test
+  public void failToDeleteHistoricDecisionInstanceByInstanceIdNoAuthenticatedTenants() {
+
+    // given
+    testRule.deployForTenant(TENANT_ONE, DMN);
+    evaluateDecisionTable(null);
+
+    HistoricDecisionInstanceQuery query =
+        historyService.createHistoricDecisionInstanceQuery();
+    HistoricDecisionInstance historicDecisionInstance = query.includeInputs().includeOutputs().singleResult();
+
+    // when
+    identityService.setAuthentication("user", null, null);
+
+    // then
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("Cannot delete the historic decision instance");
+
+    historyService.deleteHistoricDecisionInstanceByInstanceId(historicDecisionInstance.getId());
+  }
+
+  @Test
   public void deleteHistoricDecisionInstanceByInstanceIdWithAuthenticatedTenant() {
 
     // given

@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl.cfg;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricCaseInstance;
+import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.batch.BatchEntity;
@@ -233,6 +234,11 @@ public interface CommandChecker {
    * decision definition key.
    */
   void checkDeleteHistoricDecisionInstance(String decisionDefinitionKey);
+
+  /**
+   * Checks if it is allowed to delete the given historic decision instance.
+   */
+  void checkDeleteHistoricDecisionInstance(HistoricDecisionInstance instance);
 
   /**
    * Checks if it is allowed to read the given historic job log.

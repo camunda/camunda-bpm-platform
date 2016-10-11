@@ -44,7 +44,7 @@ public class DeleteHistoricDecisionInstanceByInstanceIdCmd implements Command<Ob
         "historicDecisionInstance", historicDecisionInstance);
 
     for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
-      checker.checkDeleteHistoricDecisionInstance(historicDecisionInstance.getDecisionDefinitionKey());
+      checker.checkDeleteHistoricDecisionInstance(historicDecisionInstance);
     }
 
     commandContext
