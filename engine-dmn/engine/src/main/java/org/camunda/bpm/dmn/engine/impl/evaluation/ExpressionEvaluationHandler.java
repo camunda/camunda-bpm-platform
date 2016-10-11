@@ -132,7 +132,7 @@ public class ExpressionEvaluationHandler {
   protected String getExpressionTextForLanguage(DmnExpressionImpl expression, String expressionLanguage) {
     String expressionText = expression.getExpression();
     if (expressionText != null) {
-      if (DefaultDmnEngineConfiguration.JUEL_EXPRESSION_LANGUAGE.equals(expressionLanguage) && !StringUtil.isExpression(expressionText)) {
+      if (DefaultDmnEngineConfiguration.JUEL_EXPRESSION_LANGUAGE.equalsIgnoreCase(expressionLanguage) && !StringUtil.isExpression(expressionText)) {
         return "${" + expressionText + "}";
       } else {
         return expressionText;
@@ -154,7 +154,7 @@ public class ExpressionEvaluationHandler {
   }
 
   protected boolean isElExpression(String expressionLanguage) {
-    return DefaultDmnEngineConfiguration.JUEL_EXPRESSION_LANGUAGE.equals(expressionLanguage);
+    return DefaultDmnEngineConfiguration.JUEL_EXPRESSION_LANGUAGE.equalsIgnoreCase(expressionLanguage);
   }
 
   public boolean isFeelExpressionLanguage(String expressionLanguage) {

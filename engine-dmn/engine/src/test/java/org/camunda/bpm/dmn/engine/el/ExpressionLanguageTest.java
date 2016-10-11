@@ -13,15 +13,6 @@
 
 package org.camunda.bpm.dmn.engine.el;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.failBecauseExceptionWasNotThrown;
-import static org.camunda.bpm.dmn.engine.util.DmnExampleVerifier.assertExample;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-
 import org.camunda.bpm.dmn.engine.DmnEngine;
 import org.camunda.bpm.dmn.engine.DmnEngineConfiguration;
 import org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration;
@@ -40,6 +31,15 @@ import org.camunda.bpm.dmn.feel.impl.FeelException;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.failBecauseExceptionWasNotThrown;
+import static org.camunda.bpm.dmn.engine.util.DmnExampleVerifier.assertExample;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+
 public class ExpressionLanguageTest extends DmnEngineTest {
 
   public static final String GROOVY_DECISION_TABLE_DMN = "org/camunda/bpm/dmn/engine/el/ExpressionLanguageTest.groovy.decisionTable.dmn";
@@ -47,6 +47,8 @@ public class ExpressionLanguageTest extends DmnEngineTest {
   public static final String SCRIPT_DMN = "org/camunda/bpm/dmn/engine/el/ExpressionLanguageTest.script.dmn";
   public static final String EMPTY_EXPRESSIONS_DMN = "org/camunda/bpm/dmn/engine/el/ExpressionLanguageTest.emptyExpressions.dmn";
   public static final String DECISION_WITH_LITERAL_EXPRESSION_DMN = "org/camunda/bpm/dmn/engine/el/ExpressionLanguageTest.decisionLiteralExpression.dmn";
+  public static final String CAPITAL_JUEL_DMN = "org/camunda/bpm/dmn/engine/el/ExpressionLanguageTest.JUEL.dmn";
+  public static final String JUEL = "juel";
 
   protected DefaultScriptEngineResolver scriptEngineResolver;
   protected JuelElProvider elProvider;
@@ -90,7 +92,7 @@ public class ExpressionLanguageTest extends DmnEngineTest {
 
     assertExample(dmnEngine, decision);
     verify(scriptEngineResolver, atLeastOnce()).getScriptEngineForLanguage("groovy");
-    verify(scriptEngineResolver, never()).getScriptEngineForLanguage("juel");
+    verify(scriptEngineResolver, never()).getScriptEngineForLanguage(JUEL);
   }
 
   @Test
@@ -104,7 +106,7 @@ public class ExpressionLanguageTest extends DmnEngineTest {
         Variables.createVariables().putValue("a", 2).putValue("b", 3));
 
     verify(scriptEngineResolver, atLeastOnce()).getScriptEngineForLanguage("groovy");
-    verify(scriptEngineResolver, never()).getScriptEngineForLanguage("juel");
+    verify(scriptEngineResolver, never()).getScriptEngineForLanguage(JUEL);
   }
 
   @Test
@@ -117,7 +119,7 @@ public class ExpressionLanguageTest extends DmnEngineTest {
   @Test
   @DecisionResource(resource = SCRIPT_DMN)
   public void testExecuteJuelDmnEngineConfiguration() {
-    DmnEngine juelEngine = createEngineWithDefaultExpressionLanguage("juel");
+    DmnEngine juelEngine = createEngineWithDefaultExpressionLanguage(JUEL);
     assertExample(juelEngine, decision);
 
     verify(elProvider, atLeastOnce()).createExpression(anyString());
@@ -130,7 +132,7 @@ public class ExpressionLanguageTest extends DmnEngineTest {
     assertExample(groovyEngine, decision);
 
     verify(scriptEngineResolver, atLeastOnce()).getScriptEngineForLanguage("groovy");
-    verify(scriptEngineResolver, never()).getScriptEngineForLanguage("juel");
+    verify(scriptEngineResolver, never()).getScriptEngineForLanguage(JUEL);
   }
 
   @Test
@@ -140,7 +142,7 @@ public class ExpressionLanguageTest extends DmnEngineTest {
     assertExample(javascriptEngine, decision);
 
     verify(scriptEngineResolver, atLeastOnce()).getScriptEngineForLanguage("javascript");
-    verify(scriptEngineResolver, never()).getScriptEngineForLanguage("juel");
+    verify(scriptEngineResolver, never()).getScriptEngineForLanguage(JUEL);
   }
 
   @Test
@@ -177,7 +179,7 @@ public class ExpressionLanguageTest extends DmnEngineTest {
   @Test
   @DecisionResource(resource = EMPTY_EXPRESSIONS_DMN)
   public void testJuelEmptyExpressions() {
-    dmnEngine = createEngineWithDefaultExpressionLanguage("juel");
+    dmnEngine = createEngineWithDefaultExpressionLanguage(JUEL);
     assertThatDecisionTableResult()
       .hasSingleResult()
       .hasSingleEntry(true);
@@ -219,6 +221,16 @@ public class ExpressionLanguageTest extends DmnEngineTest {
       assertThat(e).hasMessageContaining("'10'");
       assertThat(e.getMessage()).doesNotContain("cellInput");
     }
+  }
+
+  @Test
+  @DecisionResource(resource = CAPITAL_JUEL_DMN)
+  public void testElResolution () throws Exception {
+    DmnEngine juelEngine = createEngineWithDefaultExpressionLanguage(JUEL);
+    assertExample(juelEngine, decision);
+
+    verify(elProvider, atLeastOnce()).createExpression(anyString());
+    verify(scriptEngineResolver, never()).getScriptEngineForLanguage(JUEL.toUpperCase());
   }
 
   protected DmnEngine createEngineWithDefaultExpressionLanguage(String expressionLanguage) {
