@@ -38,7 +38,7 @@ public class IntermediateConditionalEventBehavior extends IntermediateCatchEvent
   @Override
   public void execute(final ActivityExecution execution) throws Exception {
     super.execute(execution);
-    if (conditionalEvent.tryEvaluate(execution, execution)) {
+    if (conditionalEvent.tryEvaluate(execution)) {
       leave(execution);
     }
   }
@@ -49,7 +49,7 @@ public class IntermediateConditionalEventBehavior extends IntermediateCatchEvent
 
     if (execution != null && !execution.isEnded()
         && variableEvent != null
-        && conditionalEvent.tryEvaluate(variableEvent, execution, execution)
+        && conditionalEvent.tryEvaluate(variableEvent, execution)
         && execution.isActive() && execution.isScope()) {
       leave(execution);
     }

@@ -40,7 +40,7 @@ public class EventSubProcessStartConditionalEventActivityBehavior extends EventS
 
     if (execution != null && !execution.isEnded() && execution.isScope()
         && variableEvent != null
-        && conditionalEvent.tryEvaluate(variableEvent, execution, execution)) {
+        && conditionalEvent.tryEvaluate(variableEvent, execution)) {
       ActivityImpl activity = eventSubscription.getActivity();
       activity = (ActivityImpl) activity.getFlowScope();
       execution.executeEventHandlerActivity(activity);

@@ -79,21 +79,21 @@ public class ConditionalEventDefinition extends EventSubscriptionDeclaration imp
     ((variableEvents == null || variableEvents.isEmpty()) || variableEvents.contains(event.getEventName())));
   }
 
-  public boolean evaluate(VariableScope scope, DelegateExecution execution) {
+  public boolean evaluate(DelegateExecution execution) {
     if (condition != null) {
-      return condition.evaluate(scope, execution);
+      return condition.evaluate(execution, execution);
     }
     throw new IllegalStateException("Condtional event must have a condition!");
   }
 
-  public boolean tryEvaluate(VariableScope scope, DelegateExecution execution) {
+  public boolean tryEvaluate(DelegateExecution execution) {
     if (condition != null) {
-      return condition.tryEvaluate(scope, execution);
+      return condition.tryEvaluate(execution, execution);
     }
     throw new IllegalStateException("Condtional event must have a condition!");
   }
 
-  public boolean tryEvaluate(VariableEvent variableEvent, VariableScope scope, DelegateExecution execution) {
-    return shouldEvaluateForVariableEvent(variableEvent) && tryEvaluate(scope, execution);
+  public boolean tryEvaluate(VariableEvent variableEvent, DelegateExecution execution) {
+    return shouldEvaluateForVariableEvent(variableEvent) && tryEvaluate(execution);
   }
 }
