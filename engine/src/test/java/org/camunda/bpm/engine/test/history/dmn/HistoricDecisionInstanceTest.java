@@ -13,6 +13,9 @@
 
 package org.camunda.bpm.engine.test.history.dmn;
 
+import static org.camunda.bpm.engine.authorization.Permissions.DELETE_HISTORY;
+import static org.camunda.bpm.engine.authorization.Permissions.READ_HISTORY;
+import static org.camunda.bpm.engine.authorization.Resources.DECISION_DEFINITION;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -374,6 +377,24 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
     DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery().singleResult();
     historyService.deleteHistoricDecisionInstanceByDefinitionId(decisionDefinition.getId());
 
+    assertThat(query.count(), is(0L));
+  }
+
+  @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
+  public void testDeleteHistoricDecisionInstanceByInstanceIdWithDeleteHistoryPermissionOnDecisionDefinition() {
+
+    // given
+    startProcessInstanceAndEvaluateDecision();
+    HistoricDecisionInstanceQuery query =
+        historyService.createHistoricDecisionInstanceQuery().decisionDefinitionKey(DECISION_DEFINITION_KEY);
+
+    assertThat(query.count(), is(1L));
+    HistoricDecisionInstance historicDecisionInstance = query.includeInputs().includeOutputs().singleResult();
+
+    // when
+    historyService.deleteHistoricDecisionInstanceByInstanceId(historicDecisionInstance.getId());
+
+    // then
     assertThat(query.count(), is(0L));
   }
 

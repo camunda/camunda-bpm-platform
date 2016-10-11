@@ -202,6 +202,23 @@ public interface HistoryService {
    * Deletes historic decision instances of a decision definition. All historic
    * decision inputs and outputs are deleted as well.
    *
+   * Note that this method name is not expressive enough, because it is also possible to delete the historic decision
+   * instance by the instance id. There use {@link #deleteHistoricDecisionInstanceByDefinitionId} instead to delete
+   * the historic decision instance by the definition id.
+   *
+   * @param decisionDefinitionId
+   *          the id of the decision definition
+   *
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#DECISION_DEFINITION}.
+   */
+  @Deprecated
+  void deleteHistoricDecisionInstance(String decisionDefinitionId);
+
+  /**
+   * Deletes historic decision instances of a decision definition. All historic
+   * decision inputs and outputs are deleted as well.
+   *
    * @param decisionDefinitionId
    *          the id of the decision definition
    *

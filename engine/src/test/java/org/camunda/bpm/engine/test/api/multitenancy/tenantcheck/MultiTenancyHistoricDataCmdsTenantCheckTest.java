@@ -5,6 +5,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.DecisionService;
@@ -15,12 +16,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
-import org.camunda.bpm.engine.history.HistoricCaseInstanceQuery;
-import org.camunda.bpm.engine.history.HistoricDecisionInstanceQuery;
-import org.camunda.bpm.engine.history.HistoricJobLog;
-import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
-import org.camunda.bpm.engine.history.HistoricTaskInstance;
-import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
+import org.camunda.bpm.engine.history.*;
 import org.camunda.bpm.engine.runtime.CaseInstanceBuilder;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -280,6 +276,55 @@ public class MultiTenancyHistoricDataCmdsTenantCheckTest {
     historyService.deleteHistoricDecisionInstanceByDefinitionId(decisionDefinitionIdTwo);
 
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
+    assertThat(query.count(), is(0L));
+  }
+
+  @Test
+  public void deleteHistoricDecisionInstanceByInstanceIdWithAuthenticatedTenant() {
+
+    // given
+    testRule.deployForTenant(TENANT_ONE, DMN);
+    evaluateDecisionTable(null);
+
+    HistoricDecisionInstanceQuery query =
+        historyService.createHistoricDecisionInstanceQuery();
+    HistoricDecisionInstance historicDecisionInstance = query.includeInputs().includeOutputs().singleResult();
+
+    // when
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+    historyService.deleteHistoricDecisionInstanceByInstanceId(historicDecisionInstance.getId());
+
+    // then
+    identityService.clearAuthentication();
+    assertThat(query.count(), is(0L));
+  }
+
+  @Test
+  public void deleteHistoricDecisionInstanceByInstanceIdWithDisabledTenantCheck() {
+
+    // given
+    testRule.deployForTenant(TENANT_ONE, DMN);
+    testRule.deployForTenant(TENANT_TWO, DMN);
+
+    evaluateDecisionTable(TENANT_ONE);
+    evaluateDecisionTable(TENANT_TWO);
+
+    HistoricDecisionInstanceQuery query =
+        historyService.createHistoricDecisionInstanceQuery();
+    List<HistoricDecisionInstance> historicDecisionInstances = query.includeInputs().includeOutputs().list();
+    assertThat(historicDecisionInstances.size(), is(2));
+
+    // when user has no authorization
+    identityService.setAuthentication("user", null, null);
+    // and when tenant check is disabled
+    processEngineConfiguration.setTenantCheckEnabled(false);
+    // and when all decision instances are deleted
+    for(HistoricDecisionInstance in: historicDecisionInstances){
+      historyService.deleteHistoricDecisionInstanceByInstanceId(in.getId());
+    }
+
+    // then
+    identityService.clearAuthentication();
     assertThat(query.count(), is(0L));
   }
 

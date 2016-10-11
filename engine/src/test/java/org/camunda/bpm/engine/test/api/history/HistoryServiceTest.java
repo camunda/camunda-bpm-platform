@@ -85,6 +85,7 @@ public class HistoryServiceTest extends PluggableProcessEngineTestCase {
     historyService.createHistoricTaskInstanceQuery().orderByTaskPriority().asc().list();
   }
 
+  @SuppressWarnings( "deprecation" ) // deprecated method is tested here
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   public void testHistoricProcessInstanceUserIdAndActivityId() {
     identityService.setAuthenticatedUserId("johndoe");
@@ -97,10 +98,8 @@ public class HistoryServiceTest extends PluggableProcessEngineTestCase {
     assertEquals(1, tasks.size());
     taskService.complete(tasks.get(0).getId());
 
-    HistoricActivityInstance lastActivity =
-        historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId())
-            .orderByHistoricActivityInstanceEndTime().desc().list().get(0);
-    assertEquals("theEnd", lastActivity.getActivityId());
+    historicProcessInstance = historyService.createHistoricProcessInstanceQuery().singleResult();
+    assertEquals("theEnd", historicProcessInstance.getEndActivityId());
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/history/orderProcess.bpmn20.xml",

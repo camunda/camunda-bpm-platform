@@ -37,14 +37,14 @@ public class DeleteHistoricDecisionInstanceByInstanceIdCmd implements Command<Ob
   public Object execute(CommandContext commandContext) {
     ensureNotNull("historicDecisionInstanceId", historicDecisionInstanceId);
 
-    HistoricDecisionInstance instance = commandContext
+    HistoricDecisionInstance historicDecisionInstance = commandContext
         .getHistoricDecisionInstanceManager()
         .findHistoricDecisionInstance(historicDecisionInstanceId);
     ensureNotNull("No historic decision instance found with id: " + historicDecisionInstanceId,
-        "historicDecisionInstanceId", historicDecisionInstanceId);
+        "historicDecisionInstance", historicDecisionInstance);
 
     for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
-      checker.checkDeleteHistoricDecisionInstance(instance.getDecisionDefinitionKey());
+      checker.checkDeleteHistoricDecisionInstance(historicDecisionInstance.getDecisionDefinitionKey());
     }
 
     commandContext
