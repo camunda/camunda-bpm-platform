@@ -29,7 +29,9 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.ext.Providers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.ProcessInstanceDto;
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.query.ProcessInstanceQueryDto;
 import org.camunda.bpm.cockpit.impl.plugin.base.sub.resources.ProcessInstanceResource;
@@ -40,10 +42,12 @@ import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
+import org.camunda.bpm.engine.rest.util.ProvidersUtil;
 
 public class ProcessInstanceRestService extends AbstractPluginResource {
 
   public static final String PATH = "/process-instance";
+  protected ObjectMapper objectMapper;
 
   public ProcessInstanceRestService(String engineName) {
     super(engineName);
@@ -70,6 +74,7 @@ public class ProcessInstanceRestService extends AbstractPluginResource {
 
     return getCommandExecutor().executeCommand(new Command<List<ProcessInstanceDto>>() {
       public List<ProcessInstanceDto> execute(CommandContext commandContext) {
+        injectObjectMapper(queryParameter);
         injectEngineConfig(queryParameter);
         paginate(queryParameter, firstResult, maxResults);
         configureExecutionQuery(queryParameter);
@@ -130,5 +135,17 @@ public class ProcessInstanceRestService extends AbstractPluginResource {
     configureTenantCheck(query);
     addPermissionCheck(query, PROCESS_INSTANCE, "RES.PROC_INST_ID_", READ);
     addPermissionCheck(query, PROCESS_DEFINITION, "P.KEY_", READ_INSTANCE);
+  }
+
+  protected void injectObjectMapper(ProcessInstanceQueryDto queryParameter) {
+    queryParameter.setObjectMapper(getObjectMapper());
+  }
+
+  public void setObjectMapper(ObjectMapper objectMapper) {
+    this.objectMapper = objectMapper;
+  }
+
+  public ObjectMapper getObjectMapper() {
+    return objectMapper;
   }
 }

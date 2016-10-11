@@ -16,17 +16,22 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map.Entry;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response.Status;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.cockpit.db.QueryParameters;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.converter.StringToTypeConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
+import org.camunda.bpm.engine.rest.util.ProvidersUtil;
 import org.camunda.bpm.engine.variable.Variables;
 
 /**
@@ -48,6 +53,9 @@ public abstract class AbstractRestQueryParametersDto<T> extends QueryParameters<
 
   protected String sortBy;
   protected String sortOrder;
+
+  @JsonIgnore
+  protected transient ObjectMapper objectMapper;
 
   // required for populating via jackson
   public AbstractRestQueryParametersDto() { }
@@ -100,6 +108,12 @@ public abstract class AbstractRestQueryParametersDto<T> extends QueryParameters<
   protected Object resolveVariableValue(Object value) {
     if (value != null && Number.class.isAssignableFrom(value.getClass())) {
       return Variables.numberValue((Number) value);
+    } else if (value != null && objectMapper != null) {
+      try {
+        return objectMapper.readValue("\"" + value + "\"", Date.class);
+      } catch (Exception e) {
+        // ignore the exception
+      }
     }
     return value;
   }
@@ -169,4 +183,11 @@ public abstract class AbstractRestQueryParametersDto<T> extends QueryParameters<
     return null;
   }
 
+  public ObjectMapper getObjectMapper() {
+    return objectMapper;
+  }
+
+  public void setObjectMapper(ObjectMapper objectMapper) {
+    this.objectMapper = objectMapper;
+  }
 }
