@@ -26,11 +26,11 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
  * @author Philipp Ossler
  *
  */
-public class DeleteHistoricDecisionInstanceCmd implements Command<Object> {
+public class DeleteHistoricDecisionInstanceByDefinitionIdCmd implements Command<Object> {
 
   protected final String decisionDefinitionId;
 
-  public DeleteHistoricDecisionInstanceCmd(String decisionDefinitionId) {
+  public DeleteHistoricDecisionInstanceByDefinitionIdCmd(String decisionDefinitionId) {
     this.decisionDefinitionId = decisionDefinitionId;
   }
 

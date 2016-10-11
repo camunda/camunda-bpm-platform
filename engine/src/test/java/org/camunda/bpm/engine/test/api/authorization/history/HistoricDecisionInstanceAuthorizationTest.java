@@ -13,21 +13,22 @@
 
 package org.camunda.bpm.engine.test.api.authorization.history;
 
+import org.camunda.bpm.engine.AuthorizationException;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.history.HistoricDecisionInstance;
+import org.camunda.bpm.engine.history.HistoricDecisionInstanceQuery;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.camunda.bpm.engine.test.api.authorization.AuthorizationTest;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.camunda.bpm.engine.authorization.Authorization.ANY;
 import static org.camunda.bpm.engine.authorization.Permissions.DELETE_HISTORY;
 import static org.camunda.bpm.engine.authorization.Permissions.READ_HISTORY;
 import static org.camunda.bpm.engine.authorization.Resources.DECISION_DEFINITION;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import org.camunda.bpm.engine.AuthorizationException;
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
-import org.camunda.bpm.engine.history.HistoricDecisionInstanceQuery;
-import org.camunda.bpm.engine.test.RequiredHistoryLevel;
-import org.camunda.bpm.engine.test.api.authorization.AuthorizationTest;
 
 /**
  * @author Philipp Ossler
@@ -108,7 +109,7 @@ public class HistoricDecisionInstanceAuthorizationTest extends AuthorizationTest
 
     try {
       // when
-      historyService.deleteHistoricDecisionInstance(decisionDefinitionId);
+      historyService.deleteHistoricDecisionInstanceByDefinitionId(decisionDefinitionId);
       fail("expect authorization exception");
     } catch (AuthorizationException e) {
       // then
@@ -125,7 +126,7 @@ public class HistoricDecisionInstanceAuthorizationTest extends AuthorizationTest
 
 
     // when
-    historyService.deleteHistoricDecisionInstance(decisionDefinitionId);
+    historyService.deleteHistoricDecisionInstanceByDefinitionId(decisionDefinitionId);
 
     // then
     disableAuthorization();
@@ -140,12 +141,49 @@ public class HistoricDecisionInstanceAuthorizationTest extends AuthorizationTest
     String decisionDefinitionId = selectDecisionDefinitionByKey(DECISION_DEFINITION_KEY).getId();
 
     // when
-    historyService.deleteHistoricDecisionInstance(decisionDefinitionId);
+    historyService.deleteHistoricDecisionInstanceByDefinitionId(decisionDefinitionId);
 
     // then
     disableAuthorization();
     assertThat(historyService.createHistoricDecisionInstanceQuery().count(), is(0L));
     enableAuthorization();
+  }
+
+  public void testDeleteHistoricDecisionInstanceByInstanceIdWithoutAuthorization() {
+
+    // given
+    createGrantAuthorization(DECISION_DEFINITION, DECISION_DEFINITION_KEY, userId, READ_HISTORY);
+    startProcessInstanceAndEvaluateDecision();
+
+    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
+    HistoricDecisionInstance historicDecisionInstance = query.includeInputs().includeOutputs().singleResult();
+
+    try {
+      // when
+      historyService.deleteHistoricDecisionInstanceByInstanceId(historicDecisionInstance.getId());
+      fail("expect authorization exception");
+    } catch (AuthorizationException e) {
+      // then
+      assertThat(e.getMessage(),
+          is("The user with id 'test' does not have 'DELETE_HISTORY' permission on resource 'testDecision' of type 'DecisionDefinition'."));
+    }
+  }
+
+  public void testDeleteHistoricDecisionInstanceByInstanceIdWithDeleteHistoryPermissionOnDecisionDefinition() {
+
+    // given
+    createGrantAuthorization(DECISION_DEFINITION, DECISION_DEFINITION_KEY, userId, DELETE_HISTORY, READ_HISTORY);
+    startProcessInstanceAndEvaluateDecision();
+
+    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
+    verifyQueryResults(query, 1);
+    HistoricDecisionInstance historicDecisionInstance = query.includeInputs().includeOutputs().singleResult();
+
+    // when
+    historyService.deleteHistoricDecisionInstanceByInstanceId(historicDecisionInstance.getId());
+
+    // then
+    verifyQueryResults(query, 0);
   }
 
   protected void startProcessInstanceAndEvaluateDecision() {

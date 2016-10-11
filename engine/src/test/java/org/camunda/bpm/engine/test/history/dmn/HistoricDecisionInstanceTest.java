@@ -372,7 +372,7 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
     assertThat(query.count(), is(1L));
 
     DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery().singleResult();
-    historyService.deleteHistoricDecisionInstance(decisionDefinition.getId());
+    historyService.deleteHistoricDecisionInstanceByDefinitionId(decisionDefinition.getId());
 
     assertThat(query.count(), is(0L));
   }

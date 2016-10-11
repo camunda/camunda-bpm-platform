@@ -208,7 +208,19 @@ public interface HistoryService {
    * @throws AuthorizationException
    *          If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#DECISION_DEFINITION}.
    */
-  void deleteHistoricDecisionInstance(String decisionDefinitionId);
+  void deleteHistoricDecisionInstanceByDefinitionId(String decisionDefinitionId);
+
+
+  /**
+   * Deletes historic decision instances by its id. All historic
+   * decision inputs and outputs are deleted as well.
+   * 
+   * @param historicDecisionInstanceId
+   *          the id of the historic decision instance
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#DECISION_DEFINITION}.
+   */
+  void deleteHistoricDecisionInstanceByInstanceId(String historicDecisionInstanceId);
 
   /**
    * creates a native query to search for {@link HistoricProcessInstance}s via SQL

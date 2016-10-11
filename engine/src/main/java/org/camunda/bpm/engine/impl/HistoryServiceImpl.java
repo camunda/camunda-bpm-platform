@@ -47,7 +47,8 @@ import org.camunda.bpm.engine.impl.cmd.DeleteHistoricTaskInstanceCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteUserOperationLogEntryCmd;
 import org.camunda.bpm.engine.impl.cmd.GetHistoricJobLogExceptionStacktraceCmd;
 import org.camunda.bpm.engine.impl.cmd.batch.DeleteHistoricProcessInstancesBatchCmd;
-import org.camunda.bpm.engine.impl.dmn.cmd.DeleteHistoricDecisionInstanceCmd;
+import org.camunda.bpm.engine.impl.dmn.cmd.DeleteHistoricDecisionInstanceByInstanceIdCmd;
+import org.camunda.bpm.engine.impl.dmn.cmd.DeleteHistoricDecisionInstanceByDefinitionIdCmd;
 
 import java.util.List;
 
@@ -142,8 +143,12 @@ public class HistoryServiceImpl extends ServiceImpl implements HistoryService {
     commandExecutor.execute(new DeleteHistoricCaseInstanceCmd(caseInstanceId));
   }
 
-  public void deleteHistoricDecisionInstance(String decisionDefinitionId) {
-    commandExecutor.execute(new DeleteHistoricDecisionInstanceCmd(decisionDefinitionId));
+  public void deleteHistoricDecisionInstanceByDefinitionId(String decisionDefinitionId) {
+    commandExecutor.execute(new DeleteHistoricDecisionInstanceByDefinitionIdCmd(decisionDefinitionId));
+  }
+
+  public void deleteHistoricDecisionInstanceByInstanceId(String historicDecisionInstanceId){
+    commandExecutor.execute(new DeleteHistoricDecisionInstanceByInstanceIdCmd(historicDecisionInstanceId));
   }
 
   public NativeHistoricProcessInstanceQuery createNativeHistoricProcessInstanceQuery() {

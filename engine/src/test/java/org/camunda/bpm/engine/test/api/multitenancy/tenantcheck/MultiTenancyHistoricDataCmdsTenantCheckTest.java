@@ -240,7 +240,7 @@ public class MultiTenancyHistoricDataCmdsTenantCheckTest {
 
     identityService.setAuthentication("user", null, null);
 
-    historyService.deleteHistoricDecisionInstance(decisionDefinitionId);
+    historyService.deleteHistoricDecisionInstanceByDefinitionId(decisionDefinitionId);
 
     identityService.clearAuthentication();
 
@@ -256,7 +256,7 @@ public class MultiTenancyHistoricDataCmdsTenantCheckTest {
 
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
-    historyService.deleteHistoricDecisionInstance(decisionDefinitionId);
+    historyService.deleteHistoricDecisionInstanceByDefinitionId(decisionDefinitionId);
 
     identityService.clearAuthentication();
 
@@ -276,8 +276,8 @@ public class MultiTenancyHistoricDataCmdsTenantCheckTest {
     identityService.setAuthentication("user", null, null);
     processEngineConfiguration.setTenantCheckEnabled(false);
 
-    historyService.deleteHistoricDecisionInstance(decisionDefinitionIdOne);
-    historyService.deleteHistoricDecisionInstance(decisionDefinitionIdTwo);
+    historyService.deleteHistoricDecisionInstanceByDefinitionId(decisionDefinitionIdOne);
+    historyService.deleteHistoricDecisionInstanceByDefinitionId(decisionDefinitionIdTwo);
 
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
     assertThat(query.count(), is(0L));

@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.test.api.history;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
@@ -31,15 +32,7 @@ import org.junit.Assert;
 import org.slf4j.Logger;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Frederik Heremans
@@ -104,8 +97,10 @@ public class HistoryServiceTest extends PluggableProcessEngineTestCase {
     assertEquals(1, tasks.size());
     taskService.complete(tasks.get(0).getId());
 
-    historicProcessInstance = historyService.createHistoricProcessInstanceQuery().singleResult();
-    assertEquals("theEnd", historicProcessInstance.getEndActivityId());
+    HistoricActivityInstance lastActivity =
+        historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId())
+            .orderByHistoricActivityInstanceEndTime().desc().list().get(0);
+    assertEquals("theEnd", lastActivity.getActivityId());
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/history/orderProcess.bpmn20.xml",
@@ -579,9 +574,17 @@ public class HistoryServiceTest extends PluggableProcessEngineTestCase {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(ONE_TASK_PROCESS);
     ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey(ONE_TASK_PROCESS);
 
-    List<String> processInstanceIds = new ArrayList<String>(Arrays.asList(
-        new String[]{processInstance.getId(), processInstance2.getId()}));
+    List<String> processInstanceIds = Arrays.asList(
+        new String[]{processInstance.getId(), processInstance2.getId()});
     runtimeService.deleteProcessInstances(processInstanceIds, null, true, true);
-    return processInstanceIds;
+    assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());
+    HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS);
+    assertEquals(2, historicProcessInstanceQuery.count());
+
+    List<String> ids = new ArrayList<String>();
+    for (HistoricProcessInstance pi : historicProcessInstanceQuery.list()) {
+      ids.add(pi.getId());
+    }
+    return ids;
   }
 }
