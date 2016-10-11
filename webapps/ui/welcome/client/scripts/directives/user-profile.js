@@ -4,7 +4,7 @@ var fs = require('fs');
 var template = fs.readFileSync(__dirname + '/user-profile.html', 'utf8');
 var angular = require('camunda-commons-ui/vendor/angular');
 
-module.exports = ['camAPI', 'Notifications', function(camAPI, Notifications) {
+module.exports = ['camAPI', 'Notifications', 'translateFilter', function(camAPI, Notifications, translateFilter) {
   return {
     restrict: 'A',
 
@@ -57,7 +57,7 @@ module.exports = ['camAPI', 'Notifications', function(camAPI, Notifications) {
             $scope.userProfile.$setPristine();
 
             Notifications.addMessage({
-              status: 'Changes saved',
+              status: translateFilter('CHANGES_SAVED'),
               message: '',
               http: true,
               exclusive: [ 'http' ],
@@ -68,7 +68,7 @@ module.exports = ['camAPI', 'Notifications', function(camAPI, Notifications) {
           }
           else {
             Notifications.addMessage({
-              status: 'Error while saving',
+              status: translateFilter('ERROR_WHILE_SAVING'),
               message: err.message,
               http: true,
               exclusive: [ 'http' ],
@@ -112,7 +112,7 @@ module.exports = ['camAPI', 'Notifications', function(camAPI, Notifications) {
             };
 
             Notifications.addMessage({
-              status: 'Password changed',
+              status: translateFilter('PASSWORD_CHANGED'),
               message: '',
               http: true,
               exclusive: [ 'http' ],
@@ -123,7 +123,7 @@ module.exports = ['camAPI', 'Notifications', function(camAPI, Notifications) {
           }
           else {
             Notifications.addMessage({
-              status: 'Error while changing password',
+              status: translateFilter('ERROR_WHILE_CHANGING_PASSWORD'),
               message: err.message,
               http: true,
               exclusive: [ 'http' ],
