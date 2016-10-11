@@ -14,5 +14,9 @@
   "CONFIRM_NEW_PASSWORD": "Confirm new password",
   "PASSWORD_NOT_MATCHING": "The new password and the confirmation are not matching.",
   "GROUPS": "Groups",
-  "USERNAME": "Username"
+  "USERNAME": "Username",
+  "CHANGES_SAVED": "Changes saved",
+  "ERROR_WHILE_SAVING": "Error while saving",
+  "PASSWORD_CHANGED": "Password changed",
+  "ERROR_WHILE_CHANGING_PASSWORD": "Error while changing password"
 }
