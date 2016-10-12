@@ -854,10 +854,11 @@ public class MigrationEventSubProcessTest {
 
   @Test
   public void testUpdateEventMessageWithExpression() {
+
     // given
     String newMessageNameWithExpression = "new" + EventSubProcessModels.MESSAGE_NAME + "-${var}";
-    BpmnModelInstance sourceProcess = EventSubProcessModels.MESSAGE_EVENT_SUBPROCESS_PROCESS;
-    BpmnModelInstance targetProcess = modify(EventSubProcessModels.MESSAGE_EVENT_SUBPROCESS_PROCESS)
+    BpmnModelInstance sourceProcess = EventSubProcessModels.MESSAGE_INTERMEDIATE_EVENT_SUBPROCESS_PROCESS;
+    BpmnModelInstance targetProcess = modify(EventSubProcessModels.MESSAGE_INTERMEDIATE_EVENT_SUBPROCESS_PROCESS)
         .renameMessage(EventSubProcessModels.MESSAGE_NAME, newMessageNameWithExpression);
 
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
@@ -866,9 +867,9 @@ public class MigrationEventSubProcessTest {
     MigrationPlan migrationPlan = rule.getRuntimeService()
         .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
         .mapActivities("userTask", "userTask")
-        .mapActivities("eventSubProcessStart", "eventSubProcessStart").updateEventTrigger()
+        .mapActivities("eventSubProcess", "eventSubProcess")
+        .mapActivities("catchMessage", "catchMessage").updateEventTrigger()
         .build();
-
     HashMap<String, Object> variables = new HashMap<String, Object>();
     variables.put("var", "foo");
 
@@ -878,12 +879,12 @@ public class MigrationEventSubProcessTest {
     // then
     String resolvedMessageName = "new" + EventSubProcessModels.MESSAGE_NAME + "-foo";
     testHelper.assertEventSubscriptionMigrated(
-        "eventSubProcessStart", EventSubProcessModels.MESSAGE_NAME,
-        "eventSubProcessStart", resolvedMessageName);
+        "catchMessage", EventSubProcessModels.MESSAGE_NAME,
+        "catchMessage", resolvedMessageName);
 
     // and it is possible to successfully complete the migrated instance
     rule.getRuntimeService().correlateMessage(resolvedMessageName);
-    testHelper.completeTask("eventSubProcessTask");
+    testHelper.completeTask("userTask");
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 

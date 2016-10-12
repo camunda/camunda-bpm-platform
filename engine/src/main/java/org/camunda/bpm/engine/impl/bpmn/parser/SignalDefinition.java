@@ -26,8 +26,8 @@ public class SignalDefinition implements Serializable {
 
   private static final long serialVersionUID = 1L;
     
-  private String id;
-  private Expression name;
+  protected String id;
+  protected Expression name;
 
     
   public String getId() {

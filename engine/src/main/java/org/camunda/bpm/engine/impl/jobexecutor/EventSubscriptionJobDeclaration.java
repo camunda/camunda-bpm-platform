@@ -100,9 +100,7 @@ public class EventSubscriptionJobDeclaration extends JobDeclaration<EventSubscri
   }
 
   /**
-   * Assumes that an activity has at most one declaration of a eventType.
-   *
-   * Note: We assume the we do not have a declaration with the same combination eventName + eventType.
+   * Assumes that an activity has at most one declaration of a certain eventType.
    */
   public static EventSubscriptionJobDeclaration findDeclarationForSubscription(EventSubscriptionEntity eventSubscription) {
     List<EventSubscriptionJobDeclaration> declarations = getDeclarationsForActivity(eventSubscription.getActivity());

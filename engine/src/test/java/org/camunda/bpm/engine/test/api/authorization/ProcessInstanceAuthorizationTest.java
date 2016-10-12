@@ -1223,7 +1223,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   }
 
   /**
-   * currently the IntermediateThrowSignalEventActivityBehavior does not check authorization
+   * currently the ThrowSignalEventActivityBehavior does not check authorization
    */
   public void FAILING_testStartProcessInstanceByThrowSignalEventWithCreatePermissionOnProcessInstance() {
     // given
@@ -1256,7 +1256,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   }
 
   /**
-   * currently the IntermediateThrowSignalEventActivityBehavior does not check authorization
+   * currently the ThrowSignalEventActivityBehavior does not check authorization
    */
   public void FAILING_testThrowSignalEventWithoutAuthorization() {
     // given

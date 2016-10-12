@@ -27,13 +27,26 @@ public class EventSubProcessModels {
 
   public static final BpmnModelInstance MESSAGE_EVENT_SUBPROCESS_PROCESS = modify(ProcessModels.ONE_TASK_PROCESS)
       .addSubProcessTo(ProcessModels.PROCESS_KEY)
-      .id("eventSubProcess")
-      .triggerByEvent()
-      .embeddedSubProcess()
-      .startEvent("eventSubProcessStart").message(MESSAGE_NAME)
-      .userTask("eventSubProcessTask")
-      .endEvent()
+        .id("eventSubProcess")
+        .triggerByEvent()
+        .embeddedSubProcess()
+          .startEvent("eventSubProcessStart").message(MESSAGE_NAME)
+          .userTask("eventSubProcessTask")
+          .endEvent()
       .subProcessDone()
+      .done();
+
+  public static final BpmnModelInstance MESSAGE_INTERMEDIATE_EVENT_SUBPROCESS_PROCESS = ProcessModels.newModel()
+      .startEvent()
+        .subProcess("eventSubProcess")
+        .embeddedSubProcess()
+          .startEvent()
+          .intermediateCatchEvent("catchMessage")
+            .message(MESSAGE_NAME)
+          .userTask("userTask")
+          .endEvent()
+        .subProcessDone()
+      .endEvent()
       .done();
 
   public static final BpmnModelInstance TIMER_EVENT_SUBPROCESS_PROCESS = modify(ProcessModels.ONE_TASK_PROCESS)

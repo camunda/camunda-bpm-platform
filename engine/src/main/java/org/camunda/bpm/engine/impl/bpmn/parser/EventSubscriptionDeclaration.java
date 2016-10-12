@@ -67,15 +67,11 @@ public class EventSubscriptionDeclaration implements Serializable {
    * Returns the name of the event without evaluating the possible expression that it might contain.
    */
   public String getEventName() {
-    if (isExpressionAvailable()) {
       return eventName.getExpressionText();
-    } else {
-      return null;
-    }
   }
 
-  public Expression getEventNameAsExpression() {
-    return eventName;
+  public boolean hasEventName() {
+    return !( eventName == null || "".equalsIgnoreCase(getEventName().trim()) );
   }
 
   public boolean isAsync() {
@@ -150,7 +146,10 @@ public class EventSubscriptionDeclaration implements Serializable {
     return eventSubscriptionEntity;
   }
 
-  protected String resolveExpressionOfEventName(VariableScope scope) {
+  /**
+   * Resolves the event name within the given scope.
+   */
+  public String resolveExpressionOfEventName(VariableScope scope) {
     if (isExpressionAvailable()) {
       return (String) eventName.getValue(scope);
     } else {

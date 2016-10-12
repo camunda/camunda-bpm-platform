@@ -10,53 +10,50 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.el.Expression;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionManager;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 
 import java.util.List;
 
 
 /**
- * @author Kristin Polenz
+ * Defines activity behavior for signal end event and intermediate throw signal event.
+ *
+ * @author Daniel Meyer
  */
-public class SignalEndEventActivityBehavior extends FlowNodeActivityBehavior {
+public class ThrowSignalEventActivityBehavior extends AbstractBpmnActivityBehavior {
 
-  protected EventSubscriptionDeclaration signalDefinition;
+  protected final static BpmnBehaviorLogger LOG = ProcessEngineLogger.BPMN_BEHAVIOR_LOGGER;
 
-  public SignalEndEventActivityBehavior(EventSubscriptionDeclaration signalDefinition) {
+  protected final EventSubscriptionDeclaration signalDefinition;
+
+  public ThrowSignalEventActivityBehavior(EventSubscriptionDeclaration signalDefinition) {
     this.signalDefinition = signalDefinition;
   }
 
   @Override
   public void execute(ActivityExecution execution) throws Exception {
 
-    String eventName = resolveExpressionOfEventName(signalDefinition.getEventNameAsExpression(), execution);
+    String eventName = signalDefinition.resolveExpressionOfEventName(execution);
+    // trigger all event subscriptions for the signal (start and intermediate)
     List<EventSubscriptionEntity> signalEventSubscriptions =
         findSignalEventSubscriptions(eventName, execution.getTenantId());
 
     for (EventSubscriptionEntity signalEventSubscription : signalEventSubscriptions) {
-      signalEventSubscription.eventReceived(null, signalDefinition.isAsync());
+      if (isActiveEventSubscription(signalEventSubscription)) {
+        signalEventSubscription.eventReceived(null, signalDefinition.isAsync());
+      }
     }
-
     leave(execution);
-  }
-
-  protected String resolveExpressionOfEventName(Expression eventNameAsExpression, ActivityExecution execution) {
-    if (isExpressionAvailable(eventNameAsExpression)) {
-      return (String) eventNameAsExpression.getValue(execution);
-    } else {
-      return null;
-    }
-  }
-
-  protected boolean isExpressionAvailable(Expression expression) {
-    return expression != null;
   }
 
   protected List<EventSubscriptionEntity> findSignalEventSubscriptions(String signalName, String tenantId) {
@@ -72,11 +69,18 @@ public class SignalEndEventActivityBehavior extends FlowNodeActivityBehavior {
     }
   }
 
-  public EventSubscriptionDeclaration getSignalDefinition() {
-    return signalDefinition;
+  protected boolean isActiveEventSubscription(EventSubscriptionEntity signalEventSubscriptionEntity) {
+    return isStartEventSubscription(signalEventSubscriptionEntity)
+        || isActiveIntermediateEventSubscription(signalEventSubscriptionEntity);
   }
 
-  public void setSignalDefinition(EventSubscriptionDeclaration signalDefinition) {
-    this.signalDefinition = signalDefinition;
+  protected boolean isStartEventSubscription(EventSubscriptionEntity signalEventSubscriptionEntity) {
+    return signalEventSubscriptionEntity.getExecutionId() == null;
   }
+
+  protected boolean isActiveIntermediateEventSubscription(EventSubscriptionEntity signalEventSubscriptionEntity) {
+    ExecutionEntity execution = signalEventSubscriptionEntity.getExecution();
+    return execution != null && !execution.isEnded() && !execution.isCanceled();
+  }
+
 }

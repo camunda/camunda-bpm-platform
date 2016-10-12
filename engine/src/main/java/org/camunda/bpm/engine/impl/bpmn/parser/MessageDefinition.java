@@ -23,7 +23,7 @@ import org.camunda.bpm.engine.impl.el.Expression;
 public class MessageDefinition {
 
   protected String id;
-  private Expression name;
+  protected Expression name;
   
   public MessageDefinition(String id, Expression name) {
     this.id = id;
@@ -38,8 +38,4 @@ public class MessageDefinition {
     return name;
   }
 
-  public String getName() {
-    return name.getExpressionText();
-  }
-  
 }

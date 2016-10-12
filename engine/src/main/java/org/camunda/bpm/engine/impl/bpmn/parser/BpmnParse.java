@@ -17,6 +17,7 @@ import org.camunda.bpm.engine.BpmnParseException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.delegate.TaskListener;
+import org.camunda.bpm.engine.delegate.VariableListener;
 import org.camunda.bpm.engine.impl.Condition;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.behavior.*;
@@ -67,7 +68,6 @@ import java.io.InputStream;
 import java.net.URL;
 import java.text.StringCharacterIterator;
 import java.util.*;
-import org.camunda.bpm.engine.delegate.VariableListener;
 
 import static org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseUtil.*;
 import static org.camunda.bpm.engine.impl.util.ClassDelegateUtil.instantiateDelegate;
@@ -893,10 +893,13 @@ public class BpmnParse extends Parse {
     } else if (messageEventDefinition != null) {
       startEventActivity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.START_EVENT_MESSAGE);
 
-      EventSubscriptionDeclaration messageDefinition = parseMessageEventDefinition(messageEventDefinition);
-      messageDefinition.setActivityId(startEventActivity.getId());
-      messageDefinition.setStartEvent(true);
-      addEventSubscriptionDeclaration(messageDefinition, processDefinition, startEventElement);
+      EventSubscriptionDeclaration messageStartEventSubscriptionDeclaration =
+          parseMessageEventDefinition(messageEventDefinition);
+      messageStartEventSubscriptionDeclaration.setActivityId(startEventActivity.getId());
+      messageStartEventSubscriptionDeclaration.setStartEvent(true);
+
+      ensureNoExpressionInMessageStartEvent(messageEventDefinition, messageStartEventSubscriptionDeclaration);
+      addEventSubscriptionDeclaration(messageStartEventSubscriptionDeclaration, processDefinition, startEventElement);
     } else if (signalEventDefinition != null){
       startEventActivity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.START_EVENT_SIGNAL);
       startEventActivity.setEventScope(scope);
@@ -972,8 +975,10 @@ public class BpmnParse extends Parse {
       } else if (messageEventDefinition != null) {
         startEventActivity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.START_EVENT_MESSAGE);
 
-        EventSubscriptionDeclaration eventSubscriptionDeclaration = parseMessageEventDefinition(messageEventDefinition);
-        parseEventDefinitionForSubprocess(eventSubscriptionDeclaration, startEventActivity, messageEventDefinition);
+        EventSubscriptionDeclaration messageStartEventSubscriptionDeclaration =
+            parseMessageEventDefinition(messageEventDefinition);
+        ensureNoExpressionInMessageStartEvent(messageEventDefinition, messageStartEventSubscriptionDeclaration);
+        parseEventDefinitionForSubprocess(messageStartEventSubscriptionDeclaration, startEventActivity, messageEventDefinition);
 
       } else if (signalEventDefinition != null) {
         startEventActivity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.START_EVENT_SIGNAL);
@@ -1121,7 +1126,7 @@ public class BpmnParse extends Parse {
 
   @SuppressWarnings("unchecked")
   protected void addEventSubscriptionDeclaration(EventSubscriptionDeclaration subscription, ScopeImpl scope, Element element) {
-    if (subscription.getEventType().equals(EventType.MESSAGE.name()) && (subscription.getEventName() == null || "".equalsIgnoreCase(subscription.getEventName().trim()))) {
+    if (subscription.getEventType().equals(EventType.MESSAGE.name()) && (!subscription.hasEventName())) {
       addError("Cannot have a message event subscription with an empty or missing name", element);
     }
 
@@ -1177,6 +1182,9 @@ public class BpmnParse extends Parse {
     jobDeclarationsForActivity.add(jobDeclaration);
   }
 
+  /**
+   * Assumes that an activity has at most one declaration of a certain eventType.
+   */
   protected boolean activityAlreadyContainsJobDeclarationEventType(List<EventSubscriptionJobDeclaration> jobDeclarationsForActivity,
                                                                    EventSubscriptionJobDeclaration jobDeclaration){
     for(EventSubscriptionJobDeclaration declaration: jobDeclarationsForActivity){
@@ -1464,7 +1472,7 @@ public class BpmnParse extends Parse {
       nestedActivityImpl.getProperties().set(BpmnProperties.TYPE, ActivityTypes.INTERMEDIATE_EVENT_SIGNAL_THROW);
 
       EventSubscriptionDeclaration signalDefinition = parseSignalEventDefinition(signalEventDefinitionElement);
-      activityBehavior = new IntermediateThrowSignalEventActivityBehavior(signalDefinition);
+      activityBehavior = new ThrowSignalEventActivityBehavior(signalDefinition);
     } else if (compensateEventDefinitionElement != null) {
       nestedActivityImpl.getProperties().set(BpmnProperties.TYPE, ActivityTypes.INTERMEDIATE_EVENT_COMPENSATION_THROW);
       CompensateEventDefinition compensateEventDefinition = parseThrowCompensateEventDefinition(compensateEventDefinitionElement, scopeElement);
@@ -2848,7 +2856,7 @@ public class BpmnParse extends Parse {
       } else if (signalEventDefinition != null) {
         activity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.END_EVENT_SIGNAL);
         EventSubscriptionDeclaration signalDefinition = parseSignalEventDefinition(signalEventDefinition);
-        activity.setActivityBehavior(new SignalEndEventActivityBehavior(signalDefinition));
+        activity.setActivityBehavior(new ThrowSignalEventActivityBehavior(signalDefinition));
 
       } else if (compensateEventDefinitionElement != null) {
         activity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.END_EVENT_COMPENSATION);
@@ -4265,14 +4273,14 @@ public class BpmnParse extends Parse {
     return null;
   }
 
-  public Double parseDoubleAttribute(Element element, String attributename, String doubleText, boolean required) {
+  public Double parseDoubleAttribute(Element element, String attributeName, String doubleText, boolean required) {
     if (required && (doubleText == null || "".equals(doubleText))) {
-      addError(attributename + " is required", element);
+      addError(attributeName + " is required", element);
     } else {
       try {
         return Double.parseDouble(doubleText);
       } catch (NumberFormatException e) {
-        addError("Cannot parse " + attributename + ": " + e.getMessage(), element);
+        addError("Cannot parse " + attributeName + ": " + e.getMessage(), element);
       }
     }
     return -1.0;
@@ -4411,4 +4419,27 @@ public class BpmnParse extends Parse {
     addWarning(warning, timeCycleElement);
   }
 
+  protected void ensureNoExpressionInMessageStartEvent(Element element,
+                                                       EventSubscriptionDeclaration messageStartEventSubscriptionDeclaration) {
+    String messageStartName = null;
+    if(messageStartEventSubscriptionDeclaration.hasEventName()) {
+      messageStartName = messageStartEventSubscriptionDeclaration.getEventName();
+    }
+    boolean eventNameContainsExpression = containsJuelEvalExpression(messageStartName);
+    if (eventNameContainsExpression) {
+      addError("Invalid message name '" + messageStartName + "' for element '" +
+          element.getTagName() + "': expressions in the message start event name are not allowed!", element);
+    }
+  }
+
+  /**
+   * Checks if a string contains an Eval Expression (JSP 2.1) of the JUEL expression language. That means, it is examined
+   * if the string contains '#{' or '${'.
+   */
+  protected boolean containsJuelEvalExpression(String str) {
+    if(str != null) {
+      return str.matches(".*((#\\{)|(\\$\\{)).*");
+    }
+    return false;
+  }
 }

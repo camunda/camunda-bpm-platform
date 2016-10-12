@@ -328,22 +328,43 @@ public class MessageStartEventTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  @Deployment
-  public void testExpressionInMessageStartEvent() {
+  public void testUsingExpressionWithDollarTagInMessageStartEventNameThrowsException() {
 
-    // given the resolved message name
-    String resolvedMessageName = "messageName-foo";
-
-    // when starting a process instance with the resolved name
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByMessage(resolvedMessageName);
-    assertFalse(processInstance.isEnded());
-
-    // then we should be able to complete the task
-    Task task = taskService.createTaskQuery().singleResult();
-    assertNotNull(task);
-    taskService.complete(task.getId());
-    assertProcessEnded(processInstance.getId());
-
+    // given a process definition with a start message event that has a message name which contains an expression
+    String processDefinition =
+        "org/camunda/bpm/engine/test/bpmn/event/message/" +
+            "MessageStartEventTest.testUsingExpressionWithDollarTagInMessageStartEventNameThrowsException.bpmn20.xml";
+    try {
+      // when deploying the process
+      repositoryService
+          .createDeployment()
+          .addClasspathResource(processDefinition)
+          .deploy();
+      fail("exception expected");
+    } catch (ProcessEngineException e) {
+      // then a process engine exception should be thrown with a certain message
+      assertTrue(e.getMessage().contains("Invalid message name"));
+      assertTrue(e.getMessage().contains("expressions in the message start event name are not allowed!"));
+    }
   }
 
+  public void testUsingExpressionWithHashTagInMessageStartEventNameThrowsException() {
+
+    // given a process definition with a start message event that has a message name which contains an expression
+    String processDefinition =
+        "org/camunda/bpm/engine/test/bpmn/event/message/" +
+            "MessageStartEventTest.testUsingExpressionWithHashTagInMessageStartEventNameThrowsException.bpmn20.xml";
+    try {
+      // when deploying the process
+      repositoryService
+          .createDeployment()
+          .addClasspathResource(processDefinition)
+          .deploy();
+      fail("exception expected");
+    } catch (ProcessEngineException e) {
+      // then a process engine exception should be thrown with a certain message
+      assertTrue(e.getMessage().contains("Invalid message name"));
+      assertTrue(e.getMessage().contains("expressions in the message start event name are not allowed!"));
+    }
+  }
 }

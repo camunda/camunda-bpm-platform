@@ -20,8 +20,10 @@ import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.*;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.util.ExecutionTree;
 import org.camunda.bpm.engine.test.util.TestExecutionListener;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
 import java.util.List;
 
@@ -474,11 +476,11 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTestCase {
         .matches(
             describeExecutionTree(null).scope()
                 .child(null).scope()
-                .child("subProcessTask").concurrent().noScope().up()
-                .child(null).concurrent().noScope()
-                .child("eventSubProcessTask").scope().up().up()
-                .child(null).concurrent().noScope()
-                .child("eventSubProcessTask").scope()
+                  .child("subProcessTask").concurrent().noScope().up()
+                  .child(null).concurrent().noScope()
+                    .child("eventSubProcessTask").scope().up().up()
+                  .child(null).concurrent().noScope()
+                    .child("eventSubProcessTask").scope()
                 .done());
 
     // complete sub process task
@@ -605,7 +607,7 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTestCase {
                 .child("firstUserTask").concurrent().noScope().up()
                 .child("secondUserTask").concurrent().noScope().up()
                 .child(null).concurrent().noScope()
-                .child("eventSubProcessTask")
+                    .child("eventSubProcessTask")
                 .done());
 
     List<Task> tasks = taskService.createTaskQuery().list();
@@ -639,12 +641,12 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTestCase {
     // sub process execution
     assertThat(executionTree)
         .matches(
-            describeExecutionTree(null).scope()
-                .child(null).concurrent().noScope()
-                .child("receiveTask").scope().up().up()
-                .child(null).concurrent().noScope()
-                .child("eventSubProcessTask").scope()
-                .done());
+          describeExecutionTree(null).scope()
+            .child(null).concurrent().noScope()
+              .child("receiveTask").scope().up().up()
+            .child(null).concurrent().noScope()
+              .child("eventSubProcessTask").scope()
+            .done());
 
     // when (2)
     runtimeService.correlateMessage("secondMessage");
@@ -668,11 +670,11 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTestCase {
     // sub process execution
     assertThat(executionTree)
         .matches(
-            describeExecutionTree(null).scope()
-                .child("userTask").concurrent().noScope().up()
-                .child(null).concurrent().noScope()
-                .child("eventSubProcessTask").scope()
-                .done());
+          describeExecutionTree(null).scope()
+            .child("userTask").concurrent().noScope().up()
+            .child(null).concurrent().noScope()
+              .child("eventSubProcessTask").scope()
+            .done());
 
     assertEquals(1, runtimeService.createEventSubscriptionQuery().count());
 
@@ -874,9 +876,9 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTestCase {
     assertThat(tree).hasStructure(
         describeActivityInstanceTree(instance.getProcessDefinitionId())
             .beginScope("subProcess")
-            .beginScope("eventSubProcess")
-            .activity("eventSubProcessTask")
-            .endScope()
+              .beginScope("eventSubProcess")
+                .activity("eventSubProcessTask")
+              .endScope()
             .endScope()
             .done());
   }
@@ -895,10 +897,10 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTestCase {
     assertThat(tree).hasStructure(
         describeActivityInstanceTree(instance.getProcessDefinitionId())
             .beginScope("subProcess")
-            .activity("innerTask")
-            .beginScope("eventSubProcess")
-            .activity("eventSubProcessTask")
-            .endScope()
+              .activity("innerTask")
+              .beginScope("eventSubProcess")
+                  .activity("eventSubProcessTask")
+              .endScope()
             .endScope()
             .done());
   }
@@ -917,29 +919,12 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTestCase {
     ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
     assertThat(tree).hasStructure(
         describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-            .beginScope("SubProcess_1")
+          .beginScope("SubProcess_1")
             .activity("UserTask_1")
-            .endScope()
-            .endScope()
-            .done()
+          .endScope()
+        .endScope()
+        .done()
     );
-  }
-
-  @Deployment
-  public void testExpressionInMessageNameInInterruptingSubProcessDefinition() {
-    // given an process instance
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
-
-    // when receiving the message
-    runtimeService.messageEventReceived("newMessage-foo", processInstance.getId());
-
-    // the the subprocess is triggered
-    Task task = taskService.createTaskQuery().singleResult();
-    assertEquals("eventSubProcessTask", task.getTaskDefinitionKey());
-    taskService.complete(task.getId());
-    assertProcessEnded(processInstance.getId());
-    assertEquals(0, createEventSubscriptionQuery().count());
-    assertEquals(0, runtimeService.createExecutionQuery().count());
   }
 
 }
