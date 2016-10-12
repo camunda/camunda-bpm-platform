@@ -11,9 +11,10 @@ var angular = require('camunda-commons-ui/vendor/angular'),
 var ngModule = angular.module('cam.cockpit.pages.decisionDefinition', ['dataDepend', camCommons.name]);
 
 var Controller = [
-  '$scope', '$rootScope', '$q', 'dataDepend', 'page', 'camAPI', 'decisionDefinition', 'Views', 'search',
-  function($scope,   $rootScope,   $q,   dataDepend,   page,   camAPI,   decisionDefinition,   Views,   search
-  ) {
+  '$scope', '$rootScope', '$q', 'dataDepend', 'page', 'camAPI',
+  'decisionDefinition', 'Views', 'search', 'isModuleAvailable',
+  function($scope,   $rootScope,   $q,   dataDepend,   page,   camAPI,
+           decisionDefinition,   Views,   search, isModuleAvailable) {
 
     $scope.control = {};
 
@@ -23,10 +24,8 @@ var Controller = [
 
     var decisionDefinitionService = camAPI.resource('decision-definition');
 
-    $scope.hovered = null;
-    $scope.hoverTitle = function(id) {
-      $scope.hovered = id || null;
-    };
+    $scope.hasDrdPlugin = isModuleAvailable('cockpit.plugin.drd');
+    $scope.decisionDefinition = decisionDefinition;
 
     // end utilities ///////////////////////
 

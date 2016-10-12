@@ -28,11 +28,6 @@ var Controller = [
 
     var decisionDefinitionService = camAPI.resource('decision-definition');
 
-    $scope.hovered = null;
-    $scope.hoverTitle = function(id) {
-      $scope.hovered = id || null;
-    };
-
     $scope.hasCasePlugin = false;
     try {
       $scope.hasCasePlugin = !!angular.module('cockpit.plugin.case');

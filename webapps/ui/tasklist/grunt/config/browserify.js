@@ -47,7 +47,8 @@ module.exports = function(config, browserifyConfig) {
                'jquery': 'jquery',
                'camunda-commons-ui': 'camunda-commons-ui',
                'camunda-bpm-sdk-js': 'camunda-bpm-sdk-js',
-               'angular-data-depend': 'angular-data-depend'
+               'angular-data-depend': 'angular-data-depend',
+               'cam-common': 'cam-common'
               }
             }
         ]

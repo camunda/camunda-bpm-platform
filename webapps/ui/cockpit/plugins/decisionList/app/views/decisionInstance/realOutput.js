@@ -5,8 +5,7 @@
     ViewsProvider.registerDefaultView('cockpit.decisionInstance.table', {
       id: 'realOutput',
       initialize: function(data) {
-
-        var viewer = data.tableControl.getViewer();
+        var viewer = data.tableControl.getViewer().tableViewer;
 
         viewer.get('eventBus').on('cell.render', function(event) {
 

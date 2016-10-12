@@ -47,7 +47,8 @@ module.exports = function(config, browserifyConfig) {
                'camunda-bpm-sdk-js': 'camunda-bpm-sdk-js',
                'angular-data-depend': 'angular-data-depend',
                'moment': 'moment',
-               'events': 'events'
+               'events': 'events',
+               'cam-common': 'cam-common'
               }
             }
         ]

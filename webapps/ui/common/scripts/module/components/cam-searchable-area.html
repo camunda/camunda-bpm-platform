@@ -1,0 +1,15 @@
+<div cam-widget-loader
+     text-error="{{Searchable.loadingError}}"
+     loading-state="{{Searchable.loadingState}}">
+
+  <div cam-search="Searchable.config"
+       on-query-change="Searchable.onQueryChange(query)"
+       array-types="Searchable.arrayTypes">
+  </div>
+
+  <div ng-transclude></div>
+
+  <div cam-pagination="Searchable.onPaginationChange(pages)"
+       total="Searchable.total">
+  </div>
+</div>

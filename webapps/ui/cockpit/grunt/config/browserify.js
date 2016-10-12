@@ -49,7 +49,8 @@ module.exports = function(config, browserifyConfig) {
                'camunda-bpm-sdk-js': 'camunda-bpm-sdk-js',
                'angular-data-depend': 'angular-data-depend',
                'moment': 'moment',
-               'events': 'events'
+               'events': 'events',
+               'cam-common': 'cam-common'
               }
             }
         ]
@@ -62,5 +63,4 @@ module.exports = function(config, browserifyConfig) {
     src: ['./<%= pkg.gruntConfig.pluginSourceDir %>/cockpit/plugins/cockpitPlugins.js'],
     dest: '<%= pkg.gruntConfig.pluginBuildTarget %>/cockpit/app/plugin.js'
   };
-
 };

@@ -1,0 +1,31 @@
+<div ng-if="isDrdAvailable">
+  <h3 ng-if="drdsCount">
+    {{drdsCount}} decision {{ (drdsCount > 1 ? 'requirements' : 'requirement') }}  deployed
+  </h3>
+
+  <table class="drd-definitions-list cam-table" ng-if="drdsCount">
+    <thead>
+    <tr>
+      <th class="name">Name</th>
+      <th class="tenant-id">Tenant ID</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    <tr ng-repeat="drd in drds | orderBy:['name || key','tenantId']:false">
+      <td class="name">
+        <a href="#/decision-requirement/{{ drd.id }}">
+          {{ drd.name || drd.key }}
+        </a>
+      </td>
+      <td class="tenant-id">
+        {{ drd.tenantId }}
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+  <h3 ng-if="!drdsCount">
+    No decision requirements deployed
+  </h3>
+</div>
