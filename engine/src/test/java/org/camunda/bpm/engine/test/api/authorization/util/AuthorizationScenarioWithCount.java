@@ -17,23 +17,23 @@ package org.camunda.bpm.engine.test.api.authorization.util;
  * @author Askar Akhmerov
  *
  */
-public class HistoricAuthorizationScenario extends AuthorizationScenario {
-  protected long historicInstances;
+public class AuthorizationScenarioWithCount extends AuthorizationScenario {
+  protected long count;
 
-  public static HistoricAuthorizationScenario scenario() {
-    return new HistoricAuthorizationScenario();
+  public static AuthorizationScenarioWithCount scenario() {
+    return new AuthorizationScenarioWithCount();
   }
 
-  public long getHistoricInstances() {
-    return historicInstances;
+  public long getCount() {
+    return count;
   }
 
-  public void setHistoricInstances(long historicInstances) {
-    this.historicInstances = historicInstances;
+  public void setCount(long count) {
+    this.count = count;
   }
 
-  public HistoricAuthorizationScenario withHistoricInstances(long instances) {
-    this.setHistoricInstances(instances);
+  public AuthorizationScenarioWithCount withCount(long instances) {
+    this.setCount(instances);
     return this;
   }
 }

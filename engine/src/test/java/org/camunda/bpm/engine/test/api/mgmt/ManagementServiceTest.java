@@ -13,13 +13,6 @@
 
 package org.camunda.bpm.engine.test.api.mgmt;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NullValueException;
@@ -47,6 +40,16 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Assert;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
 
 
 /**
@@ -97,22 +100,22 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     // The execution is waiting in the first usertask. This contains a boundry
     // timer event which we will execute manual for testing purposes.
     Job timerJob = managementService.createJobQuery()
-      .processInstanceId(processInstance.getId())
-      .singleResult();
+        .processInstanceId(processInstance.getId())
+        .singleResult();
 
     assertNotNull("No job found for process instance", timerJob);
 
     try {
       managementService.executeJob(timerJob.getId());
       fail("RuntimeException from within the script task expected");
-    } catch(RuntimeException re) {
+    } catch (RuntimeException re) {
       assertTextPresent("This is an exception thrown from scriptTask", re.getMessage());
     }
 
     // Fetch the task to see that the exception that occurred is persisted
     timerJob = managementService.createJobQuery()
-    .processInstanceId(processInstance.getId())
-    .singleResult();
+        .processInstanceId(processInstance.getId())
+        .singleResult();
 
     Assert.assertNotNull(timerJob);
     Assert.assertNotNull(timerJob.getExceptionMessage());
@@ -149,8 +152,8 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     // The execution is waiting in the first usertask. This contains a boundary
     // timer event.
     Job timerJob = managementService.createJobQuery()
-      .processInstanceId(processInstance.getId())
-      .singleResult();
+        .processInstanceId(processInstance.getId())
+        .singleResult();
 
     assertNotNull("No job found for process instance", timerJob);
     assertEquals(JobEntity.DEFAULT_RETRIES, timerJob.getRetries());
@@ -158,9 +161,79 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     managementService.setJobRetries(timerJob.getId(), 5);
 
     timerJob = managementService.createJobQuery()
-      .processInstanceId(processInstance.getId())
-      .singleResult();
+        .processInstanceId(processInstance.getId())
+        .singleResult();
     assertEquals(5, timerJob.getRetries());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml"})
+  public void testSetJobsRetries() {
+    //given
+    runtimeService.startProcessInstanceByKey("exceptionInJobExecution");
+    runtimeService.startProcessInstanceByKey("exceptionInJobExecution");
+    List<String> allJobIds = getAllJobIds();
+
+    //when
+    managementService.setJobRetries(allJobIds, 5);
+
+    //then
+    assertRetries(allJobIds, 5);
+  }
+
+  public void testSetJobsRetriesWithNull() {
+    try {
+      //when
+      managementService.setJobRetries((List<String>) null, 5);
+      fail("exception expected");
+      //then
+    } catch (ProcessEngineException e) {
+      //expected
+    }
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml"})
+  public void testSetJobsRetriesWithNegativeRetries() {
+    try {
+      //when
+      managementService.setJobRetries(Arrays.asList(new String[]{"aFake"}), -1);
+      fail("exception expected");
+      //then
+    } catch (ProcessEngineException e) {
+      //expected
+    }
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml"})
+  public void testSetJobsRetriesWithFake() {
+    //given
+    runtimeService.startProcessInstanceByKey("exceptionInJobExecution");
+
+    List<String> allJobIds = getAllJobIds();
+    allJobIds.add("aFake");
+    try {
+      //when
+      managementService.setJobRetries(allJobIds, 5);
+      fail("exception expected");
+      //then
+    } catch (ProcessEngineException e) {
+      //expected
+    }
+
+    assertRetries(getAllJobIds(), JobEntity.DEFAULT_RETRIES);
+  }
+
+  protected void assertRetries(List<String> allJobIds, int i) {
+    for (String id : allJobIds) {
+      assertThat(managementService.createJobQuery().jobId(id).singleResult().getRetries(), is(i));
+    }
+  }
+
+  protected List<String> getAllJobIds() {
+    ArrayList<String> result = new ArrayList<String>();
+    for (Job job : managementService.createJobQuery().list()) {
+      result.add(job.getId());
+    }
+    return result;
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml"})
@@ -174,8 +247,8 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     // The execution is waiting in the first usertask. This contains a boundary
     // timer event.
     Job timerJob = managementService.createJobQuery()
-      .processInstanceId(processInstance.getId())
-      .singleResult();
+        .processInstanceId(processInstance.getId())
+        .singleResult();
 
     assertNotNull("No job found for process instance", timerJob);
     assertEquals(JobEntity.DEFAULT_RETRIES, timerJob.getRetries());
@@ -183,8 +256,8 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     managementService.setJobRetries(timerJob.getId(), 0);
 
     timerJob = managementService.createJobQuery()
-      .processInstanceId(processInstance.getId())
-      .singleResult();
+        .processInstanceId(processInstance.getId())
+        .singleResult();
     assertEquals(0, timerJob.getRetries());
 
     assertEquals(1, runtimeService.createIncidentQuery().count());
@@ -211,7 +284,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
 
   public void testSetJobRetriesJobIdNull() {
     try {
-      managementService.setJobRetries(null, 5);
+      managementService.setJobRetries((String) null, 5);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException re) {
       assertTextPresent("Either job definition id or job id has to be provided as parameter.", re.getMessage());
@@ -387,7 +460,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
   protected void deleteJobAndIncidents(final Job job) {
     final List<HistoricIncident> incidents =
         historyService.createHistoricIncidentQuery()
-        .incidentType(Incident.FAILED_JOB_HANDLER_TYPE).list();
+            .incidentType(Incident.FAILED_JOB_HANDLER_TYPE).list();
 
     CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
     commandExecutor.execute(new Command<Void>() {
@@ -425,7 +498,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/mgmt/timerOnTask.bpmn20.xml" })
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/timerOnTask.bpmn20.xml"})
   public void testDeleteJobDeletion() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("timerOnTask");
     Job timerJob = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
@@ -437,7 +510,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     assertNull("There should be no job now. It was deleted", timerJob);
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/mgmt/timerOnTask.bpmn20.xml" })
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/timerOnTask.bpmn20.xml"})
   public void testDeleteJobThatWasAlreadyAcquired() {
     ClockUtil.setCurrentTime(new Date());
 
@@ -473,8 +546,8 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     // The execution is waiting in the first usertask. This contains a boundary
     // timer event.
     Job timerJob = managementService.createJobQuery()
-      .processInstanceId(processInstance.getId())
-      .singleResult();
+        .processInstanceId(processInstance.getId())
+        .singleResult();
 
     assertNotNull("No job found for process instance", timerJob);
     assertNotNull(timerJob.getDuedate());
@@ -485,13 +558,13 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     managementService.setJobDuedate(timerJob.getId(), cal.getTime());
 
     Job newTimerJob = managementService.createJobQuery()
-      .processInstanceId(processInstance.getId())
-      .singleResult();
+        .processInstanceId(processInstance.getId())
+        .singleResult();
 
     // normalize date for mysql dropping fractional seconds in time values
     int SECOND = 1000;
     assertEquals((cal.getTime().getTime() / SECOND) * SECOND,
-                 (newTimerJob.getDuedate().getTime() / SECOND) * SECOND);
+        (newTimerJob.getDuedate().getTime() / SECOND) * SECOND);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml"})
@@ -501,8 +574,8 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     // The execution is waiting in the first usertask. This contains a boundary
     // timer event.
     Job timerJob = managementService.createJobQuery()
-      .processInstanceId(processInstance.getId())
-      .singleResult();
+        .processInstanceId(processInstance.getId())
+        .singleResult();
 
     assertNotNull("No job found for process instance", timerJob);
     assertNotNull(timerJob.getDuedate());
@@ -510,8 +583,8 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     managementService.setJobDuedate(timerJob.getId(), null);
 
     timerJob = managementService.createJobQuery()
-      .processInstanceId(processInstance.getId())
-      .singleResult();
+        .processInstanceId(processInstance.getId())
+        .singleResult();
 
     assertNull(timerJob.getDuedate());
   }
@@ -550,7 +623,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     assertFalse(properties.isEmpty());
   }
 
-  public void  testSetProperty() {
+  public void testSetProperty() {
     final String name = "testProp";
     final String value = "testValue";
     managementService.setProperty(name, value);
@@ -563,7 +636,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     managementService.deleteProperty(name);
   }
 
-  public void  testDeleteProperty() {
+  public void testDeleteProperty() {
     final String name = "testProp";
     final String value = "testValue";
     managementService.setProperty(name, value);
@@ -579,7 +652,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
 
   }
 
-  public void  testDeleteNonexistingProperty() {
+  public void testDeleteNonexistingProperty() {
 
     managementService.deleteProperty("non existing");
 
@@ -594,9 +667,9 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
   public void testSetJobPriority() {
     // given
     runtimeService
-      .createProcessInstanceByKey("asyncTaskProcess")
-      .startBeforeActivity("task")
-      .execute();
+        .createProcessInstanceByKey("asyncTaskProcess")
+        .startBeforeActivity("task")
+        .execute();
 
     Job job = managementService.createJobQuery().singleResult();
 
@@ -630,9 +703,9 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/asyncTaskProcess.bpmn20.xml")
   public void testSetJobPriorityToExtremeValues() {
     runtimeService
-      .createProcessInstanceByKey("asyncTaskProcess")
-      .startBeforeActivity("task")
-      .execute();
+        .createProcessInstanceByKey("asyncTaskProcess")
+        .startBeforeActivity("task")
+        .execute();
 
     Job job = managementService.createJobQuery().singleResult();
 
@@ -651,23 +724,23 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     Map<String, Long> tableCount = managementService.getTableCount();
 
     String tablePrefix = processEngineConfiguration.getDatabaseTablePrefix();
-    assertEquals(new Long(5), tableCount.get(tablePrefix+"ACT_GE_PROPERTY"));
-    assertEquals(new Long(0), tableCount.get(tablePrefix+"ACT_GE_BYTEARRAY"));
-    assertEquals(new Long(0), tableCount.get(tablePrefix+"ACT_RE_DEPLOYMENT"));
-    assertEquals(new Long(0), tableCount.get(tablePrefix+"ACT_RU_EXECUTION"));
-    assertEquals(new Long(0), tableCount.get(tablePrefix+"ACT_ID_GROUP"));
-    assertEquals(new Long(0), tableCount.get(tablePrefix+"ACT_ID_MEMBERSHIP"));
-    assertEquals(new Long(0), tableCount.get(tablePrefix+"ACT_ID_USER"));
-    assertEquals(new Long(0), tableCount.get(tablePrefix+"ACT_RE_PROCDEF"));
-    assertEquals(new Long(0), tableCount.get(tablePrefix+"ACT_RU_TASK"));
-    assertEquals(new Long(0), tableCount.get(tablePrefix+"ACT_RU_IDENTITYLINK"));
+    assertEquals(new Long(5), tableCount.get(tablePrefix + "ACT_GE_PROPERTY"));
+    assertEquals(new Long(0), tableCount.get(tablePrefix + "ACT_GE_BYTEARRAY"));
+    assertEquals(new Long(0), tableCount.get(tablePrefix + "ACT_RE_DEPLOYMENT"));
+    assertEquals(new Long(0), tableCount.get(tablePrefix + "ACT_RU_EXECUTION"));
+    assertEquals(new Long(0), tableCount.get(tablePrefix + "ACT_ID_GROUP"));
+    assertEquals(new Long(0), tableCount.get(tablePrefix + "ACT_ID_MEMBERSHIP"));
+    assertEquals(new Long(0), tableCount.get(tablePrefix + "ACT_ID_USER"));
+    assertEquals(new Long(0), tableCount.get(tablePrefix + "ACT_RE_PROCDEF"));
+    assertEquals(new Long(0), tableCount.get(tablePrefix + "ACT_RU_TASK"));
+    assertEquals(new Long(0), tableCount.get(tablePrefix + "ACT_RU_IDENTITYLINK"));
   }
 
   public void testGetTableMetaData() {
 
     String tablePrefix = processEngineConfiguration.getDatabaseTablePrefix();
 
-    TableMetaData tableMetaData = managementService.getTableMetaData(tablePrefix+"ACT_RU_TASK");
+    TableMetaData tableMetaData = managementService.getTableMetaData(tablePrefix + "ACT_RU_TASK");
     assertEquals(tableMetaData.getColumnNames().size(), tableMetaData.getColumnTypes().size());
     assertEquals(21, tableMetaData.getColumnNames().size());
 
@@ -677,13 +750,13 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     assertTrue(assigneeIndex >= 0);
     assertTrue(createTimeIndex >= 0);
 
-    assertOneOf(new String [] {"VARCHAR", "NVARCHAR2", "nvarchar", "NVARCHAR"}, tableMetaData.getColumnTypes().get(assigneeIndex));
-    assertOneOf(new String [] {"TIMESTAMP", "TIMESTAMP(6)", "datetime", "DATETIME", "DATETIME2"}, tableMetaData.getColumnTypes().get(createTimeIndex));
+    assertOneOf(new String[]{"VARCHAR", "NVARCHAR2", "nvarchar", "NVARCHAR"}, tableMetaData.getColumnTypes().get(assigneeIndex));
+    assertOneOf(new String[]{"TIMESTAMP", "TIMESTAMP(6)", "datetime", "DATETIME", "DATETIME2"}, tableMetaData.getColumnTypes().get(createTimeIndex));
   }
 
   private void assertOneOf(String[] possibleValues, String currentValue) {
-    for(String value : possibleValues) {
-      if(currentValue.equals(value)) {
+    for (String value : possibleValues) {
+      if (currentValue.equals(value)) {
         return;
       }
     }
@@ -695,8 +768,8 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     List<String> taskIds = generateDummyTasks(20);
 
     TablePage tablePage = managementService.createTablePageQuery()
-      .tableName(tablePrefix+"ACT_RU_TASK")
-      .listPage(0, 5);
+        .tableName(tablePrefix + "ACT_RU_TASK")
+        .listPage(0, 5);
 
     assertEquals(0, tablePage.getFirstResult());
     assertEquals(5, tablePage.getSize());
@@ -704,8 +777,8 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     assertEquals(20, tablePage.getTotal());
 
     tablePage = managementService.createTablePageQuery()
-      .tableName(tablePrefix+"ACT_RU_TASK")
-      .listPage(14, 10);
+        .tableName(tablePrefix + "ACT_RU_TASK")
+        .listPage(14, 10);
 
     assertEquals(14, tablePage.getFirstResult());
     assertEquals(6, tablePage.getSize());
@@ -721,18 +794,18 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
 
     // With an ascending sort
     TablePage tablePage = managementService.createTablePageQuery()
-      .tableName(tablePrefix+"ACT_RU_TASK")
-      .orderAsc("NAME_")
-      .listPage(1, 7);
-    String[] expectedTaskNames = new String[] {"B", "C", "D", "E", "F", "G", "H"};
+        .tableName(tablePrefix + "ACT_RU_TASK")
+        .orderAsc("NAME_")
+        .listPage(1, 7);
+    String[] expectedTaskNames = new String[]{"B", "C", "D", "E", "F", "G", "H"};
     verifyTaskNames(expectedTaskNames, tablePage.getRows());
 
     // With a descending sort
     tablePage = managementService.createTablePageQuery()
-      .tableName(tablePrefix+"ACT_RU_TASK")
-      .orderDesc("NAME_")
-      .listPage(6, 8);
-    expectedTaskNames = new String[] {"I", "H", "G", "F", "E", "D", "C", "B"} ;
+        .tableName(tablePrefix + "ACT_RU_TASK")
+        .orderDesc("NAME_")
+        .listPage(6, 8);
+    expectedTaskNames = new String[]{"I", "H", "G", "F", "E", "D", "C", "B"};
     verifyTaskNames(expectedTaskNames, tablePage.getRows());
 
     taskService.deleteTasks(taskIds, true);
@@ -742,9 +815,9 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     assertEquals(expectedTaskNames.length, rowData.size());
     String columnKey = "NAME_";
 
-    for (int i=0; i < expectedTaskNames.length; i++) {
+    for (int i = 0; i < expectedTaskNames.length; i++) {
       Object o = rowData.get(i).get(columnKey);
-      if ( o == null ) {
+      if (o == null) {
         o = rowData.get(i).get(columnKey.toLowerCase());
       }
       assertEquals(expectedTaskNames[i], o);
@@ -755,7 +828,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     ArrayList<String> taskIds = new ArrayList<String>();
     for (int i = 0; i < nrOfTasks; i++) {
       Task task = taskService.newTask();
-      task.setName(((char)('A' + i)) + "");
+      task.setName(((char) ('A' + i)) + "");
       taskService.saveTask(task);
       taskIds.add(task.getId());
     }

@@ -12,15 +12,10 @@
  */
 package org.camunda.bpm.engine.impl;
 
-import java.sql.Connection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationRegistration;
 import org.camunda.bpm.engine.ManagementService;
+import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.BatchQuery;
 import org.camunda.bpm.engine.batch.BatchStatisticsQuery;
 import org.camunda.bpm.engine.impl.batch.BatchQueryImpl;
@@ -30,7 +25,6 @@ import org.camunda.bpm.engine.impl.cmd.ActivateBatchCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteJobCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteMetricsCmd;
 import org.camunda.bpm.engine.impl.cmd.DeletePropertyCmd;
-import org.camunda.bpm.engine.impl.cmd.ExecuteJobsCmd;
 import org.camunda.bpm.engine.impl.cmd.GetHistoryLevelCmd;
 import org.camunda.bpm.engine.impl.cmd.GetJobExceptionStacktraceCmd;
 import org.camunda.bpm.engine.impl.cmd.GetProcessApplicationForDeploymentCmd;
@@ -45,6 +39,8 @@ import org.camunda.bpm.engine.impl.cmd.SetJobDefinitionPriorityCmd;
 import org.camunda.bpm.engine.impl.cmd.SetJobDuedateCmd;
 import org.camunda.bpm.engine.impl.cmd.SetJobPriorityCmd;
 import org.camunda.bpm.engine.impl.cmd.SetJobRetriesCmd;
+import org.camunda.bpm.engine.impl.cmd.SetJobsRetriesBatchCmd;
+import org.camunda.bpm.engine.impl.cmd.SetJobsRetriesCmd;
 import org.camunda.bpm.engine.impl.cmd.SetPropertyCmd;
 import org.camunda.bpm.engine.impl.cmd.SuspendBatchCmd;
 import org.camunda.bpm.engine.impl.cmd.UnregisterDeploymentCmd;
@@ -55,7 +51,6 @@ import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.ExecuteJobHelper;
-import org.camunda.bpm.engine.impl.jobexecutor.JobFailureCollector;
 import org.camunda.bpm.engine.impl.management.UpdateJobDefinitionSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.impl.management.UpdateJobSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.impl.metrics.MetricsQueryImpl;
@@ -69,6 +64,13 @@ import org.camunda.bpm.engine.management.TablePageQuery;
 import org.camunda.bpm.engine.management.UpdateJobDefinitionSuspensionStateSelectBuilder;
 import org.camunda.bpm.engine.management.UpdateJobSuspensionStateSelectBuilder;
 import org.camunda.bpm.engine.runtime.JobQuery;
+
+import java.sql.Connection;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -119,6 +121,25 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
     commandExecutor.execute(new SetJobRetriesCmd(jobId, null, retries));
   }
 
+  public void setJobRetries(List<String> jobIds, int retries) {
+    commandExecutor.execute(new SetJobsRetriesCmd(jobIds, retries));
+  }
+
+  @Override
+  public Batch setJobRetriesAsync(List<String> jobIds, int retries) {
+    return this.setJobRetriesAsync(jobIds, null, retries);
+  }
+
+  @Override
+  public Batch setJobRetriesAsync(JobQuery jobQuery, int retries) {
+    return this.setJobRetriesAsync(null, jobQuery, retries);
+  }
+
+  @Override
+  public Batch setJobRetriesAsync(List<String> jobIds, JobQuery jobQuery, int retries) {
+    return commandExecutor.execute(new SetJobsRetriesBatchCmd(jobIds, jobQuery, retries));
+  }
+
   public void setJobRetriesByJobDefinitionId(String jobDefinitionId, int retries) {
     commandExecutor.execute(new SetJobRetriesCmd(null, jobDefinitionId, retries));
   }
@@ -160,7 +181,7 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
   }
 
   public String databaseSchemaUpgrade(final Connection connection, final String catalog, final String schema) {
-    return commandExecutor.execute(new Command<String>(){
+    return commandExecutor.execute(new Command<String>() {
       public String execute(CommandContext commandContext) {
         commandContext.getAuthorizationManager().checkCamundaAdmin();
         DbSqlSessionFactory dbSqlSessionFactory = (DbSqlSessionFactory) commandContext.getSessionFactories().get(DbSqlSession.class);
@@ -206,127 +227,128 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
 
   public void activateJobDefinitionById(String jobDefinitionId) {
     updateJobDefinitionSuspensionState()
-      .byJobDefinitionId(jobDefinitionId)
-      .activate();
+        .byJobDefinitionId(jobDefinitionId)
+        .activate();
   }
 
   public void activateJobDefinitionById(String jobDefinitionId, boolean activateJobs) {
     updateJobDefinitionSuspensionState()
-      .byJobDefinitionId(jobDefinitionId)
-      .includeJobs(activateJobs)
-      .activate();
+        .byJobDefinitionId(jobDefinitionId)
+        .includeJobs(activateJobs)
+        .activate();
   }
 
   public void activateJobDefinitionById(String jobDefinitionId, boolean activateJobs, Date activationDate) {
     updateJobDefinitionSuspensionState()
-      .byJobDefinitionId(jobDefinitionId)
-      .includeJobs(activateJobs)
-      .executionDate(activationDate)
-      .activate();
+        .byJobDefinitionId(jobDefinitionId)
+        .includeJobs(activateJobs)
+        .executionDate(activationDate)
+        .activate();
   }
 
   public void suspendJobDefinitionById(String jobDefinitionId) {
     updateJobDefinitionSuspensionState()
-      .byJobDefinitionId(jobDefinitionId)
-      .suspend();
+        .byJobDefinitionId(jobDefinitionId)
+        .suspend();
   }
 
   public void suspendJobDefinitionById(String jobDefinitionId, boolean suspendJobs) {
     updateJobDefinitionSuspensionState()
-      .byJobDefinitionId(jobDefinitionId)
-      .includeJobs(suspendJobs)
-      .suspend();
+        .byJobDefinitionId(jobDefinitionId)
+        .includeJobs(suspendJobs)
+        .suspend();
   }
 
   public void suspendJobDefinitionById(String jobDefinitionId, boolean suspendJobs, Date suspensionDate) {
     updateJobDefinitionSuspensionState()
-      .byJobDefinitionId(jobDefinitionId)
-      .includeJobs(suspendJobs)
-      .executionDate(suspensionDate)
-      .suspend();
+        .byJobDefinitionId(jobDefinitionId)
+        .includeJobs(suspendJobs)
+        .executionDate(suspensionDate)
+        .suspend();
   }
 
   public void activateJobDefinitionByProcessDefinitionId(String processDefinitionId) {
     updateJobDefinitionSuspensionState()
-      .byProcessDefinitionId(processDefinitionId)
-      .activate();
+        .byProcessDefinitionId(processDefinitionId)
+        .activate();
   }
 
   public void activateJobDefinitionByProcessDefinitionId(String processDefinitionId, boolean activateJobs) {
     updateJobDefinitionSuspensionState()
-      .byProcessDefinitionId(processDefinitionId)
-      .includeJobs(activateJobs)
-      .activate();
+        .byProcessDefinitionId(processDefinitionId)
+        .includeJobs(activateJobs)
+        .activate();
   }
 
   public void activateJobDefinitionByProcessDefinitionId(String processDefinitionId, boolean activateJobs, Date activationDate) {
     updateJobDefinitionSuspensionState()
-      .byProcessDefinitionId(processDefinitionId)
-      .includeJobs(activateJobs)
-      .executionDate(activationDate)
-      .activate();
+        .byProcessDefinitionId(processDefinitionId)
+        .includeJobs(activateJobs)
+        .executionDate(activationDate)
+        .activate();
   }
 
   public void suspendJobDefinitionByProcessDefinitionId(String processDefinitionId) {
     updateJobDefinitionSuspensionState()
-      .byProcessDefinitionId(processDefinitionId)
-      .suspend();
+        .byProcessDefinitionId(processDefinitionId)
+        .suspend();
   }
 
   public void suspendJobDefinitionByProcessDefinitionId(String processDefinitionId, boolean suspendJobs) {
     updateJobDefinitionSuspensionState()
-      .byProcessDefinitionId(processDefinitionId)
-      .includeJobs(suspendJobs)
-      .suspend();
+        .byProcessDefinitionId(processDefinitionId)
+        .includeJobs(suspendJobs)
+        .suspend();
   }
+
   public void suspendJobDefinitionByProcessDefinitionId(String processDefinitionId, boolean suspendJobs, Date suspensionDate) {
     updateJobDefinitionSuspensionState()
-      .byProcessDefinitionId(processDefinitionId)
-      .includeJobs(suspendJobs)
-      .executionDate(suspensionDate)
-      .suspend();
+        .byProcessDefinitionId(processDefinitionId)
+        .includeJobs(suspendJobs)
+        .executionDate(suspensionDate)
+        .suspend();
   }
 
   public void activateJobDefinitionByProcessDefinitionKey(String processDefinitionKey) {
     updateJobDefinitionSuspensionState()
-      .byProcessDefinitionKey(processDefinitionKey)
-      .activate();
+        .byProcessDefinitionKey(processDefinitionKey)
+        .activate();
   }
 
   public void activateJobDefinitionByProcessDefinitionKey(String processDefinitionKey, boolean activateJobs) {
     updateJobDefinitionSuspensionState()
-      .byProcessDefinitionKey(processDefinitionKey)
-      .includeJobs(activateJobs)
-      .activate();
+        .byProcessDefinitionKey(processDefinitionKey)
+        .includeJobs(activateJobs)
+        .activate();
   }
 
   public void activateJobDefinitionByProcessDefinitionKey(String processDefinitionKey, boolean activateJobs, Date activationDate) {
     updateJobDefinitionSuspensionState()
-      .byProcessDefinitionKey(processDefinitionKey)
-      .includeJobs(activateJobs)
-      .executionDate(activationDate)
-      .activate();
+        .byProcessDefinitionKey(processDefinitionKey)
+        .includeJobs(activateJobs)
+        .executionDate(activationDate)
+        .activate();
   }
 
   public void suspendJobDefinitionByProcessDefinitionKey(String processDefinitionKey) {
     updateJobDefinitionSuspensionState()
-      .byProcessDefinitionKey(processDefinitionKey)
-      .suspend();
+        .byProcessDefinitionKey(processDefinitionKey)
+        .suspend();
   }
 
   public void suspendJobDefinitionByProcessDefinitionKey(String processDefinitionKey, boolean suspendJobs) {
     updateJobDefinitionSuspensionState()
-      .byProcessDefinitionKey(processDefinitionKey)
-      .includeJobs(suspendJobs)
-      .suspend();
+        .byProcessDefinitionKey(processDefinitionKey)
+        .includeJobs(suspendJobs)
+        .suspend();
   }
 
   public void suspendJobDefinitionByProcessDefinitionKey(String processDefinitionKey, boolean suspendJobs, Date suspensionDate) {
     updateJobDefinitionSuspensionState()
-      .byProcessDefinitionKey(processDefinitionKey)
-      .includeJobs(suspendJobs)
-      .executionDate(suspensionDate)
-      .suspend();
+        .byProcessDefinitionKey(processDefinitionKey)
+        .includeJobs(suspendJobs)
+        .executionDate(suspensionDate)
+        .suspend();
   }
 
   public UpdateJobDefinitionSuspensionStateSelectBuilder updateJobDefinitionSuspensionState() {
@@ -335,62 +357,62 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
 
   public void activateJobById(String jobId) {
     updateJobSuspensionState()
-      .byJobId(jobId)
-      .activate();
+        .byJobId(jobId)
+        .activate();
   }
 
   public void activateJobByProcessInstanceId(String processInstanceId) {
     updateJobSuspensionState()
-      .byProcessInstanceId(processInstanceId)
-      .activate();
+        .byProcessInstanceId(processInstanceId)
+        .activate();
   }
 
   public void activateJobByJobDefinitionId(String jobDefinitionId) {
     updateJobSuspensionState()
-      .byJobDefinitionId(jobDefinitionId)
-      .activate();
+        .byJobDefinitionId(jobDefinitionId)
+        .activate();
   }
 
   public void activateJobByProcessDefinitionId(String processDefinitionId) {
     updateJobSuspensionState()
-      .byProcessDefinitionId(processDefinitionId)
-      .activate();
+        .byProcessDefinitionId(processDefinitionId)
+        .activate();
   }
 
   public void activateJobByProcessDefinitionKey(String processDefinitionKey) {
     updateJobSuspensionState()
-      .byProcessDefinitionKey(processDefinitionKey)
-      .activate();
+        .byProcessDefinitionKey(processDefinitionKey)
+        .activate();
   }
 
   public void suspendJobById(String jobId) {
     updateJobSuspensionState()
-      .byJobId(jobId)
-      .suspend();
+        .byJobId(jobId)
+        .suspend();
   }
 
   public void suspendJobByJobDefinitionId(String jobDefinitionId) {
     updateJobSuspensionState()
-      .byJobDefinitionId(jobDefinitionId)
-      .suspend();
+        .byJobDefinitionId(jobDefinitionId)
+        .suspend();
   }
 
   public void suspendJobByProcessInstanceId(String processInstanceId) {
     updateJobSuspensionState()
-      .byProcessInstanceId(processInstanceId)
-      .suspend();
+        .byProcessInstanceId(processInstanceId)
+        .suspend();
   }
 
   public void suspendJobByProcessDefinitionId(String processDefinitionId) {
     updateJobSuspensionState()
-      .byProcessDefinitionId(processDefinitionId)
-      .suspend();
+        .byProcessDefinitionId(processDefinitionId)
+        .suspend();
   }
 
   public void suspendJobByProcessDefinitionKey(String processDefinitionKey) {
     updateJobSuspensionState()
-      .byProcessDefinitionKey(processDefinitionKey)
-      .suspend();
+        .byProcessDefinitionKey(processDefinitionKey)
+        .suspend();
   }
 
   public UpdateJobSuspensionStateSelectBuilder updateJobSuspensionState() {

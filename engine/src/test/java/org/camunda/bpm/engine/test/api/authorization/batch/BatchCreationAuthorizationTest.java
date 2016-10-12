@@ -24,7 +24,9 @@ import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
+import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
@@ -53,6 +55,7 @@ import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSp
 @RunWith(Parameterized.class)
 public class BatchCreationAuthorizationTest {
   protected static final String TEST_REASON = "test reason";
+  protected static final String JOB_EXCEPTION_DEFINITION_XML = "org/camunda/bpm/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml";
 
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected AuthorizationTestRule authRule = new AuthorizationTestRule(engineRule);
@@ -134,6 +137,39 @@ public class BatchCreationAuthorizationTest {
 
     // then
     authRule.assertScenario(scenario);
+  }
+
+  @Test
+  public void testBatchSetJobRetries() {
+    //given
+    List<String> jobIds = getSetupFailedJobs();
+    authRule
+        .init(scenario)
+        .withUser("userId")
+        .bindResource("batchId", "*")
+        .start();
+
+    // when
+
+    managementService.setJobRetriesAsync(jobIds,5);
+
+    // then
+    authRule.assertScenario(scenario);
+  }
+
+  protected List<String> getSetupFailedJobs() {
+    List <String> jobIds = new ArrayList<String>();
+
+    Deployment deploy = testHelper.deploy(JOB_EXCEPTION_DEFINITION_XML);
+    ProcessDefinition sourceDefinition = engineRule.getRepositoryService()
+        .createProcessDefinitionQuery().deploymentId(deploy.getId()).singleResult();
+    processInstance = engineRule.getRuntimeService().startProcessInstanceById(sourceDefinition.getId());
+
+    List<Job> jobs = managementService.createJobQuery().processInstanceId(processInstance.getId()).list();
+    for (Job job : jobs) {
+      jobIds.add(job.getId());
+    }
+    return jobIds;
   }
 
   @Test

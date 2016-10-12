@@ -12,15 +12,14 @@
  */
 package org.camunda.bpm.engine.test.api.authorization.batch;
 
-import org.camunda.bpm.engine.HistoryService;
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
-import org.camunda.bpm.engine.history.HistoricProcessInstance;
-import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.camunda.bpm.engine.repository.Deployment;
+import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario;
-import org.camunda.bpm.engine.test.api.authorization.util.AuthorizationTestRule;
 import org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenarioWithCount;
+import org.camunda.bpm.engine.test.api.authorization.util.AuthorizationTestRule;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -29,7 +28,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -41,55 +39,69 @@ import static org.junit.Assert.assertThat;
  * @author Askar Akhmerov
  */
 @RunWith(Parameterized.class)
-@RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
-public class DeleteHistoricProcessInstancesBatchAuthorizationTest extends AbstractBatchAuthorizationTest {
+public class SetJobRetriesBatchAuthorizationTest extends AbstractBatchAuthorizationTest {
 
-  protected static final long BATCH_OPERATIONS = 4;
+  protected static final String DEFINITION_XML = "org/camunda/bpm/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml";
+  protected static final long BATCH_OPERATIONS = 3;
+  protected static final int RETRIES = 5;
+
+  protected void assertRetries(List<String> allJobIds, int i) {
+    for (String id : allJobIds) {
+      Assert.assertThat(managementService.createJobQuery().jobId(id).singleResult().getRetries(), is(i));
+    }
+  }
+
+  protected List<String> getAllJobIds() {
+    ArrayList<String> result = new ArrayList<String>();
+    for (Job job : managementService.createJobQuery().list()) {
+      if (job.getProcessInstanceId() != null) {
+        result.add(job.getId());
+      }
+    }
+    return result;
+  }
+
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(authRule).around(testHelper);
 
   @Parameterized.Parameter
   public AuthorizationScenarioWithCount scenario;
 
-  protected HistoryService historyService;
-
   @Before
-  public void setupHistoricService() {
-    historyService = engineRule.getHistoryService();
-  }
-
-  public void cleanBatch() {
-    super.cleanBatch();
-    List<HistoricProcessInstance> list = historyService.createHistoricProcessInstanceQuery().list();
-
-    if (list.size() > 0) {
-      List<String> instances = new ArrayList<String>();
-      for (HistoricProcessInstance hpi : list) {
-        instances.add(hpi.getId());
-      }
-      historyService.deleteHistoricProcessInstances(instances);
-    }
+  public void deployProcesses() {
+    Deployment deploy = testHelper.deploy(DEFINITION_XML);
+    sourceDefinition = engineRule.getRepositoryService()
+        .createProcessDefinitionQuery().deploymentId(deploy.getId()).singleResult();
+    processInstance = engineRule.getRuntimeService().startProcessInstanceById(sourceDefinition.getId());
+    processInstance2 = engineRule.getRuntimeService().startProcessInstanceById(sourceDefinition.getId());
   }
 
   @Parameterized.Parameters(name = "Scenario {index}")
   public static Collection<AuthorizationScenario[]> scenarios() {
     return AuthorizationTestRule.asParameters(
         AuthorizationScenarioWithCount.scenario()
-            .withCount(1L)
+            .withCount(3)
             .withAuthorizations(
                 grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
-                grant(Resources.PROCESS_DEFINITION, "Process_1", "userId", Permissions.READ_HISTORY, Permissions.DELETE_HISTORY),
-                grant(Resources.PROCESS_DEFINITION, "Process_2", "userId", Permissions.READ_HISTORY)
+                grant(Resources.PROCESS_INSTANCE, "processInstance1", "userId", Permissions.READ, Permissions.UPDATE),
+                grant(Resources.PROCESS_INSTANCE, "processInstance2", "userId", Permissions.READ)
             )
             .failsDueToRequired(
-                grant(Resources.PROCESS_DEFINITION, "Process_2", "userId", Permissions.DELETE_HISTORY)
+                grant(Resources.PROCESS_INSTANCE, "processInstance2", "userId", Permissions.UPDATE),
+                grant(Resources.PROCESS_DEFINITION, "exceptionInJobExecution", "userId", Permissions.UPDATE_INSTANCE)
             ),
         AuthorizationScenarioWithCount.scenario()
-            .withCount(0L)
+            .withCount(5)
             .withAuthorizations(
                 grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
-                grant(Resources.PROCESS_DEFINITION, "Process_1", "userId", Permissions.READ_HISTORY, Permissions.DELETE_HISTORY),
-                grant(Resources.PROCESS_DEFINITION, "Process_2", "userId", Permissions.READ_HISTORY, Permissions.DELETE_HISTORY)
+                grant(Resources.PROCESS_INSTANCE, "processInstance1", "userId", Permissions.ALL),
+                grant(Resources.PROCESS_INSTANCE, "processInstance2", "userId", Permissions.ALL)
+            ).succeeds(),
+        AuthorizationScenarioWithCount.scenario()
+            .withCount(5)
+            .withAuthorizations(
+                grant(Resources.BATCH, "*", "userId", Permissions.CREATE),
+                grant(Resources.PROCESS_DEFINITION, "Process", "userId", Permissions.READ_INSTANCE, Permissions.UPDATE_INSTANCE)
             ).succeeds()
     );
   }
@@ -102,7 +114,7 @@ public class DeleteHistoricProcessInstancesBatchAuthorizationTest extends Abstra
     // then
     assertScenario();
 
-    assertThat(historyService.createHistoricProcessInstanceQuery().count(), is(getScenario().getCount()));
+    assertRetries(getAllJobIds(), Long.valueOf(getScenario().getCount()).intValue());
   }
 
   @Test
@@ -114,24 +126,18 @@ public class DeleteHistoricProcessInstancesBatchAuthorizationTest extends Abstra
 
   protected void setupAndExecuteHistoricProcessInstancesListTest() {
     //given
-    List<String> processInstanceIds = Arrays.asList(processInstance.getId(), processInstance2.getId());
-    runtimeService.deleteProcessInstances(processInstanceIds, null, true, false);
-
-    List<String> historicProcessInstances = new ArrayList<String>();
-    for (HistoricProcessInstance hpi : historyService.createHistoricProcessInstanceQuery().list()) {
-      historicProcessInstances.add(hpi.getId());
-    }
-
+    List<String> allJobIds = getAllJobIds();
     authRule
         .init(scenario)
         .withUser("userId")
-        .bindResource("Process_1", sourceDefinition.getKey())
-        .bindResource("Process_2", sourceDefinition2.getKey())
+        .bindResource("Process", sourceDefinition.getKey())
+        .bindResource("processInstance1", processInstance.getId())
+        .bindResource("processInstance2", processInstance2.getId())
         .start();
 
     // when
-    batch = historyService.deleteHistoricProcessInstancesAsync(
-        historicProcessInstances, TEST_REASON);
+    batch = managementService.setJobRetriesAsync(
+        allJobIds, RETRIES);
 
     executeSeedAndBatchJobs();
   }
@@ -146,7 +152,7 @@ public class DeleteHistoricProcessInstancesBatchAuthorizationTest extends Abstra
       if (testHelper.isHistoryLevelFull()) {
         assertThat(engineRule.getHistoryService().createUserOperationLogQuery().count(), is(BATCH_OPERATIONS));
       }
-      assertThat(historyService.createHistoricProcessInstanceQuery().count(), is(0L));
+      assertRetries(getAllJobIds(), 5);
     }
   }
 }

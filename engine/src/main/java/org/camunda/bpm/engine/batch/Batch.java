@@ -17,15 +17,15 @@ import org.camunda.bpm.engine.ManagementService;
 /**
  * <p>A batch represents a number of jobs which
  * execute a number of commands asynchronously.
- *
+ * <p>
  * <p>Batches have three types of jobs:
  * <ul>
- *   <li>Seed jobs: Create execution jobs
- *   <li>Execution jobs: Execute the actual action
- *   <li>Monitor jobs: Manage the batch once all execution jobs have been created
- *     (e.g. responsible for deletion of the Batch after completion).
+ * <li>Seed jobs: Create execution jobs
+ * <li>Execution jobs: Execute the actual action
+ * <li>Monitor jobs: Manage the batch once all execution jobs have been created
+ * (e.g. responsible for deletion of the Batch after completion).
  * </ul>
- *
+ * <p>
  * <p>All three job types have independent job definitions. They can be controlled individually
  * (e.g. suspension) and are independently represented in the historic job log.
  */
@@ -34,6 +34,7 @@ public interface Batch {
   String TYPE_PROCESS_INSTANCE_MIGRATION = "instance-migration";
   String TYPE_PROCESS_INSTANCE_DELETION = "instance-deletion";
   String TYPE_HISTORIC_PROCESS_INSTANCE_DELETION = "historic-instance-deletion";
+  String TYPE_SET_JOB_RETRIES = "set-job-retries";
 
   /**
    * @return the id of the batch
@@ -87,18 +88,17 @@ public interface Batch {
 
   /**
    * <p>
-   *   Indicates whether this batch is suspended. If a batch is suspended,
-   *   the batch jobs will not be acquired by the job executor.
+   * Indicates whether this batch is suspended. If a batch is suspended,
+   * the batch jobs will not be acquired by the job executor.
    * </p>
-   *
    * <p>
-   *   <strong>Note:</strong> It is still possible to manually suspend and activate
-   *   jobs and job definitions using the {@link ManagementService}, which will
-   *   not change the suspension state of the batch.
+   * <p>
+   * <strong>Note:</strong> It is still possible to manually suspend and activate
+   * jobs and job definitions using the {@link ManagementService}, which will
+   * not change the suspension state of the batch.
    * </p>
    *
    * @return true if this batch is currently suspended, false otherwise
-   *
    * @see ManagementService#suspendBatchById(String)
    * @see ManagementService#activateBatchById(String)
    */

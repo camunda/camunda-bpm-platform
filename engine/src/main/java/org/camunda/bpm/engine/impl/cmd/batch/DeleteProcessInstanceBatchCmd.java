@@ -80,7 +80,7 @@ public class DeleteProcessInstanceBatchCmd extends AbstractIDBasedBatchCmd<Batch
         processInstanceIds.size(),
         true);
 
-    BatchEntity batch = createBatch(commandContext, processInstanceIds, deleteReason);
+    BatchEntity batch = createBatch(commandContext, processInstanceIds);
 
     batch.createSeedJobDefinition();
     batch.createMonitorJobDefinition();
@@ -93,7 +93,7 @@ public class DeleteProcessInstanceBatchCmd extends AbstractIDBasedBatchCmd<Batch
     return batch;
   }
 
-  protected BatchConfiguration getAbstractIdsBatchConfiguration(List<String> processInstanceIds, String deleteReason) {
+  protected BatchConfiguration getAbstractIdsBatchConfiguration(List<String> processInstanceIds) {
     return new DeleteProcessInstanceBatchConfiguration(processInstanceIds, deleteReason);
   }
 

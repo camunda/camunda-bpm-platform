@@ -30,14 +30,10 @@ import java.util.List;
 public abstract class AbstractIDBasedBatchCmd<T> extends AbstractBatchCmd<T> {
 
   protected BatchEntity createBatch(CommandContext commandContext, List<String> ids) {
-    return this.createBatch(commandContext, ids, null);
-  }
-
-  protected BatchEntity createBatch(CommandContext commandContext, List<String> ids, String deleteReason) {
     ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
     BatchJobHandler batchJobHandler = getBatchJobHandler(processEngineConfiguration);
 
-    BatchConfiguration configuration = getAbstractIdsBatchConfiguration(ids, deleteReason);
+    BatchConfiguration configuration = getAbstractIdsBatchConfiguration(ids);
 
     BatchEntity batch = new BatchEntity();
     batch.setType(batchJobHandler.getType());
@@ -57,7 +53,7 @@ public abstract class AbstractIDBasedBatchCmd<T> extends AbstractBatchCmd<T> {
     return (int) Math.ceil(processInstanceCount / invocationsPerBatchJob);
   }
 
-  protected abstract BatchConfiguration getAbstractIdsBatchConfiguration(List<String> processInstanceIds, String deleteReason);
+  protected abstract BatchConfiguration getAbstractIdsBatchConfiguration(List<String> processInstanceIds);
 
   protected abstract BatchJobHandler getBatchJobHandler(ProcessEngineConfigurationImpl processEngineConfiguration);
 }
