@@ -29,6 +29,7 @@ import static org.camunda.bpm.engine.test.bpmn.event.conditional.AbstractConditi
 import org.camunda.bpm.engine.variable.Variables;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
+import org.junit.Ignore;
 
 /**
  *
@@ -193,6 +194,27 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
     //then execution stays at user task
     task = taskQuery.singleResult();
     assertEquals(TASK_BEFORE_CONDITION, task.getName());
+  }
+
+  @Ignore
+  @Deployment
+  public void testSetVariableInDelegate() {
+    // given process with event sub process conditional start event and service task with delegate class which sets a variable
+    ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
+
+    TaskQuery taskQuery = taskService.createTaskQuery().processInstanceId(procInst.getId());
+    Task task = taskQuery.singleResult();
+    assertNotNull(task);
+    assertEquals(TASK_BEFORE_CONDITION, task.getName());
+
+    //when task is completed
+    taskService.complete(task.getId());
+
+    //then service task with delegated code is called and variable is set
+    //-> conditional event is triggered and execution stays is user task after condition
+    task = taskQuery.singleResult();
+    assertNotNull(task);
+    assertEquals(TASK_AFTER_CONDITION, task.getName());
   }
 
   @Test
