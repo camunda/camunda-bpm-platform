@@ -94,8 +94,7 @@ public class DeleteProcessInstanceBatchCmd extends AbstractIDBasedBatchCmd<Batch
   }
 
   protected BatchConfiguration getAbstractIdsBatchConfiguration(List<String> processInstanceIds, String deleteReason) {
-    return DeleteProcessInstanceBatchConfiguration
-        .create(processInstanceIds, deleteReason);
+    return new DeleteProcessInstanceBatchConfiguration(processInstanceIds, deleteReason);
   }
 
   protected BatchJobHandler<DeleteProcessInstanceBatchConfiguration> getBatchJobHandler(ProcessEngineConfigurationImpl processEngineConfiguration) {

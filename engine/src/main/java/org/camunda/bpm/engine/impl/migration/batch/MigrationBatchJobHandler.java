@@ -53,9 +53,9 @@ public class MigrationBatchJobHandler extends AbstractBatchJobHandler<MigrationB
 
   @Override
   protected MigrationBatchConfiguration createJobConfiguration(MigrationBatchConfiguration configuration, List<String> processIdsForJob) {
-    return MigrationBatchConfiguration.create(
-        configuration.getMigrationPlan(),
+    return new MigrationBatchConfiguration(
         processIdsForJob,
+        configuration.getMigrationPlan(),
         configuration.isSkipCustomListeners(),
         configuration.isSkipIoMappings()
     );

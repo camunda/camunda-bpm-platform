@@ -29,11 +29,13 @@ import java.util.List;
 public class DeleteProcessInstanceBatchConfiguration extends BatchConfiguration {
   protected String deleteReason;
 
-  public static DeleteProcessInstanceBatchConfiguration create(List<String> processInstanceIds, String deleteReason) {
-    DeleteProcessInstanceBatchConfiguration result = new DeleteProcessInstanceBatchConfiguration();
-    result.setIds(processInstanceIds);
-    result.setDeleteReason(deleteReason);
-    return result;
+  public DeleteProcessInstanceBatchConfiguration(List<String> ids) {
+    super(ids);
+  }
+
+  public DeleteProcessInstanceBatchConfiguration(List<String> ids, String deleteReason) {
+    super(ids);
+    this.deleteReason = deleteReason;
   }
 
   public String getDeleteReason() {

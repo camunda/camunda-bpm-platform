@@ -37,8 +37,7 @@ public class DeleteHistoricProcessInstanceBatchConfigurationJsonConverter extend
   }
 
   public BatchConfiguration toObject(JSONObject json) {
-    BatchConfiguration configuration = new BatchConfiguration();
-    configuration.setIds(readProcessInstanceIds(json));
+    BatchConfiguration configuration = new BatchConfiguration(readProcessInstanceIds(json));
     return configuration;
   }
 

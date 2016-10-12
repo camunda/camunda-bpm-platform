@@ -20,18 +20,16 @@ public class BatchConfiguration {
 
   protected List<String> ids;
 
+  public BatchConfiguration(List<String> ids) {
+    this.ids = ids;
+  }
+
   public List<String> getIds() {
     return ids;
   }
 
   public void setIds(List<String> ids) {
     this.ids = ids;
-  }
-
-  public static BatchConfiguration create(List<String> processInstanceIds) {
-    BatchConfiguration result = new BatchConfiguration();
-    result.setIds(processInstanceIds);
-    return result;
   }
 
 }

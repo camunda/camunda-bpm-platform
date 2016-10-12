@@ -124,14 +124,6 @@ public class DeleteHistoricProcessInstancesAuthorizationTest {
 
   @Test
   public void testProcessInstancesList() {
-    setupAndExecuteProcessInstancesListTest();
-    // then
-    if (authRule.assertScenario(scenario)) {
-      assertThat(historyService.createHistoricProcessInstanceQuery().count(), is(0L));
-    }
-  }
-
-  protected void setupAndExecuteProcessInstancesListTest() {
     //given
     List<String> processInstanceIds = Arrays.asList(historicProcessInstance.getId(), historicProcessInstance2.getId());
     authRule
@@ -143,5 +135,10 @@ public class DeleteHistoricProcessInstancesAuthorizationTest {
 
     // when
     historyService.deleteHistoricProcessInstances(processInstanceIds);
+
+    // then
+    if (authRule.assertScenario(scenario)) {
+      assertThat(historyService.createHistoricProcessInstanceQuery().count(), is(0L));
+    }
   }
 }

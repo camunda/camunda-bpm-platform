@@ -121,8 +121,7 @@ public class DeleteHistoricProcessInstancesBatchCmd extends AbstractIDBasedBatch
 
 
   protected BatchConfiguration getAbstractIdsBatchConfiguration(List<String> processInstanceIds, String deleteReason) {
-    return BatchConfiguration
-        .create(processInstanceIds);
+    return new BatchConfiguration(processInstanceIds);
   }
 
   protected BatchJobHandler<BatchConfiguration> getBatchJobHandler(ProcessEngineConfigurationImpl processEngineConfiguration) {

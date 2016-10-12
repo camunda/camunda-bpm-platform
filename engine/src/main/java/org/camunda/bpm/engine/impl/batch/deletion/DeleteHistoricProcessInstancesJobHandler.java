@@ -50,7 +50,7 @@ public class DeleteHistoricProcessInstancesJobHandler extends AbstractBatchJobHa
 
   @Override
   protected BatchConfiguration createJobConfiguration(BatchConfiguration configuration, List<String> processIdsForJob) {
-    return BatchConfiguration.create(processIdsForJob);
+    return new BatchConfiguration(processIdsForJob);
   }
 
   @Override

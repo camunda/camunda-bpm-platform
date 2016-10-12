@@ -13,13 +13,6 @@
 package org.camunda.bpm.engine.impl.migration.batch;
 
 
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotContainsNull;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
-
-import java.util.ArrayList;
-import java.util.Collection;
-
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
@@ -34,6 +27,13 @@ import org.camunda.bpm.engine.impl.migration.MigrationLogger;
 import org.camunda.bpm.engine.impl.migration.MigrationPlanExecutionBuilderImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.migration.MigrationPlan;
+
+import java.util.ArrayList;
+import java.util.Collection;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotContainsNull;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 public class MigrateProcessInstanceBatchCmd extends AbstractMigrationCmd<Batch> {
 
@@ -81,7 +81,7 @@ public class MigrateProcessInstanceBatchCmd extends AbstractMigrationCmd<Batch> 
 
   @Override
   protected void checkAuthorizations(CommandContext commandContext, ProcessDefinitionEntity sourceDefinition, ProcessDefinitionEntity targetDefinition,
-      Collection<String> processInstanceIds) {
+                                     Collection<String> processInstanceIds) {
 
     commandContext.getAuthorizationManager().checkAuthorization(Permissions.CREATE, Resources.BATCH);
 
@@ -89,17 +89,17 @@ public class MigrateProcessInstanceBatchCmd extends AbstractMigrationCmd<Batch> 
   }
 
   protected BatchEntity createBatch(CommandContext commandContext,
-      MigrationPlan migrationPlan,
-      Collection<String> processInstanceIds,
-      ProcessDefinitionEntity sourceProcessDefinition) {
+                                    MigrationPlan migrationPlan,
+                                    Collection<String> processInstanceIds,
+                                    ProcessDefinitionEntity sourceProcessDefinition) {
     ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
     BatchJobHandler<MigrationBatchConfiguration> batchJobHandler = getBatchJobHandler(processEngineConfiguration);
 
-    MigrationBatchConfiguration configuration = MigrationBatchConfiguration
-      .create(migrationPlan,
-          new ArrayList<String>(processInstanceIds),
-          executionBuilder.isSkipCustomListeners(),
-          executionBuilder.isSkipIoMappings());
+    MigrationBatchConfiguration configuration = new MigrationBatchConfiguration(
+        new ArrayList<String>(processInstanceIds),
+        migrationPlan,
+        executionBuilder.isSkipCustomListeners(),
+        executionBuilder.isSkipIoMappings());
 
     BatchEntity batch = new BatchEntity();
     batch.setType(batchJobHandler.getType());

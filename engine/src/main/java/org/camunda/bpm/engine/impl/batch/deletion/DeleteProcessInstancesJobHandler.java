@@ -49,7 +49,7 @@ public class DeleteProcessInstancesJobHandler extends AbstractBatchJobHandler<De
 
   @Override
   protected DeleteProcessInstanceBatchConfiguration createJobConfiguration(DeleteProcessInstanceBatchConfiguration configuration, List<String> processIdsForJob) {
-    return DeleteProcessInstanceBatchConfiguration.create(processIdsForJob, configuration.getDeleteReason());
+    return new DeleteProcessInstanceBatchConfiguration(processIdsForJob, configuration.getDeleteReason());
   }
 
   @Override
