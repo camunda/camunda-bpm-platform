@@ -22,3 +22,4 @@ node_modules
 test.*.log
 webapp/*.log
 debug.log
+test-results

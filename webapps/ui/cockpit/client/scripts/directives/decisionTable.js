@@ -17,6 +17,7 @@ var Directive = function() {
     scope: {
       decisionTable: '=',
       control: '=?',
+      table: '@',
       onLoad: '&'
     },
     controller: DirectiveController,

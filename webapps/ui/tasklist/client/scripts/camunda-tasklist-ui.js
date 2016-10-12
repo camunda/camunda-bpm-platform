@@ -111,6 +111,7 @@ module.exports.exposePackages = function(container) {
   container['camunda-commons-ui'] = commons;
   container['camunda-bpm-sdk-js'] = sdk;
   container['angular-data-depend'] = dataDepend;
+  container['cam-common'] = require('../../../common/scripts/module');
 };
 
   /* live-reload

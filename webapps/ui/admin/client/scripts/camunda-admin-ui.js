@@ -143,4 +143,5 @@ module.exports.exposePackages = function(requirePackages) {
   requirePackages.jquery = $;
   requirePackages['camunda-commons-ui'] = camCommonsUi;
   requirePackages['camunda-bpm-sdk-js'] = sdk;
+  requirePackages['cam-common'] = require('../../../common/scripts/module');
 };

@@ -85,6 +85,7 @@ module.exports.exposePackages = function(container) {
   container.jquery = $;
   container['camunda-commons-ui'] = commons;
   container['camunda-bpm-sdk-js'] = sdk;
+  container['cam-common'] = require('../../../common/scripts/module');
 };
 
 

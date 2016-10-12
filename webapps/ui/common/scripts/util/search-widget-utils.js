@@ -1,15 +1,17 @@
 'use strict';
 
-var angular = require('angular');
+var angular = require('camunda-commons-ui/vendor/angular');
 var includes = require('./includes');
 
 module.exports = {
-  getSearchQueryForSearchType:getSearchQueryForSearchType,
+  getSearchQueryForSearchType: getSearchQueryForSearchType,
   getActivityIdsFromUrlParams: getActivityIdsFromUrlParams,
   replaceActivitiesInSearchQuery: replaceActivitiesInSearchQuery,
   createSearchQueryForSearchWidget: createSearchQueryForSearchWidget,
   shouldUpdateFilter: shouldUpdateFilter,
-  createSearchesForActivityIds: createSearchesForActivityIds
+  createSearchesForActivityIds: createSearchesForActivityIds,
+  encodeQuery: encodeQuery,
+  updateSearchValuesForTypeInCtrlMode: updateSearchValuesForTypeInCtrlMode
 };
 
 /**
@@ -25,7 +27,11 @@ function getSearchQueryForSearchType(searchType, values) {
     createSearchesForActivityIds(searchType, values)
   );
 
-  return encodeURI('searchQuery='+value)
+  return encodeQuery('searchQuery='+value);
+}
+
+function encodeQuery(query) {
+  return encodeURI(query)
     .replace(/#/g, '%23');
 }
 
@@ -105,6 +111,41 @@ function getActivityIdsFromSearches(searchType, searches) {
     .map(function(search) {
       return search.value;
     });
+}
+
+/**
+ * Updates values in search query for given search type when control is pressed
+ *
+ * @param searches
+ * @param searchType
+ * @param values
+ * @returns {Array.<T>|string}
+ */
+function updateSearchValuesForTypeInCtrlMode(searches, searchType, values) {
+  var newSearches = removeDoubledSearches(searches, values, searchType);
+  var newValues = removeDoubleValues(values, searches, searchType);
+
+  return newSearches.concat(createSearchesForActivityIds(searchType, newValues));
+}
+
+function removeDoubledSearches(searches, values, searchType) {
+  return searches.filter(function(search) {
+    return search.type !== searchType || !includes(values, search.value);
+  });
+}
+
+function removeDoubleValues(values, searches, searchType) {
+  var searchesValues = searches
+    .filter(function(search) {
+      return search.type === searchType;
+    })
+    .map(function(search) {
+      return search.value;
+    });
+
+  return values.filter(function(value) {
+    return !includes(searchesValues, value);
+  });
 }
 
 /**

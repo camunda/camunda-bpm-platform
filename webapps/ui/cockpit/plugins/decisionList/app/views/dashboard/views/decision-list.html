@@ -1,0 +1,19 @@
+<!-- # CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/decisionList/app/views/dashboard/decision-list.html -->
+<div class="deployed-decisions"
+     cam-widget-loader
+     loading-state="{{ loadingState }}"
+     text-error="{{ loadingError }}">
+
+  <div decisions-table
+       decisions="decisions"
+       decision-count="decisionCount"
+       is-drd-available="isDrdAvailable">
+  </div>
+
+  <div drds-table
+       drds="drds"
+       drds-count="drdsCount"
+       is-drd-available="isDrdAvailable">
+  </div>
+</div>
+<!-- / CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/decisionList/app/views/dashboard/decision-list.html -->

@@ -34,7 +34,7 @@ describe('Cockpit Decision Instance Spec', function() {
           // then
           expect(dashboardPage.breadcrumb.activeCrumb().getText()).to.eventually.eql(decisionName);
         });
-      })
+      });
     });
 
 

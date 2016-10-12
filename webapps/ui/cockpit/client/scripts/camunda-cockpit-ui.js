@@ -6,6 +6,8 @@ var commons = require('camunda-commons-ui/lib');
 var sdk = require('camunda-commons-ui/vendor/camunda-bpm-sdk-angular');
 var dataDepend = require('angular-data-depend');
 
+require('../../../common/scripts/module');
+
 var APP_NAME = 'cam.cockpit';
 
 var angular = require('camunda-commons-ui/vendor/angular');
@@ -108,6 +110,7 @@ module.exports.exposePackages = function(container) {
   container['angular-data-depend'] = dataDepend;
   container['moment'] = require('camunda-commons-ui/vendor/moment');
   container['events'] = require('events');
+  container['cam-common'] = require('../../../common/scripts/module');
 };
 
 

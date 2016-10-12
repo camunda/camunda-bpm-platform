@@ -1,10 +1,7 @@
 'use strict';
 
 var angular = require('angular'),
-
-    // dashboard
-    decisionList = require('./dashboard/decision-list'),
-
+    dashboard = require('./dashboard'),
     // decision definition
     decisionInstanceTable = require('./decisionDefinition/decisionInstanceTable'),
 
@@ -17,9 +14,8 @@ var angular = require('angular'),
     realInput = require('./decisionInstance/realInput'),
     realOutput = require('./decisionInstance/realOutput');
 
-var ngModule = angular.module('cockpit.plugin.decisionList.views', []);
+var ngModule = angular.module('cockpit.plugin.decisionList.views', [dashboard.name]);
 
-ngModule.config(decisionList);
 ngModule.config(decisionInstanceTable);
 ngModule.config(inputTable);
 ngModule.config(outputTable);
