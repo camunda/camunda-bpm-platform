@@ -18,13 +18,16 @@ import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.batch.BatchEntity;
 import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
+import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
+import org.camunda.bpm.engine.rest.util.JsonPathUtil;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.junit.Assert;
@@ -42,6 +45,8 @@ import java.util.Map;
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.path.json.JsonPath.from;
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyString;
@@ -176,21 +181,24 @@ public class HistoricProcessInstanceRestServiceInteractionTest extends AbstractR
   @Test
   public void testDeleteAsync() {
     List<String> ids = Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
+    Batch batchEntity = MockProvider.createMockBatch();
     when(historyServiceMock.deleteHistoricProcessInstancesAsync(
         anyListOf(String.class),
         any(HistoricProcessInstanceQuery.class),
         anyString())
-    ).thenReturn(new BatchEntity());
+    ).thenReturn(batchEntity);
 
     Map<String, Object> messageBodyJson = new HashMap<String, Object>();
     messageBodyJson.put("historicProcessInstanceIds", ids);
     messageBodyJson.put(DELETE_REASON, TEST_DELETE_REASON);
 
-    given()
+    Response response = given()
         .contentType(ContentType.JSON).body(messageBodyJson)
         .then().expect()
         .statusCode(Status.OK.getStatusCode())
         .when().post(DELETE_HISTORIC_PROCESS_INSTANCES_ASYNC_URL);
+
+    verifyBatchJson(response.asString());
 
     verify(historyServiceMock, times(1)).deleteHistoricProcessInstancesAsync(
         eq(ids), eq((HistoricProcessInstanceQuery) null), eq(TEST_DELETE_REASON));
@@ -198,22 +206,25 @@ public class HistoricProcessInstanceRestServiceInteractionTest extends AbstractR
 
   @Test
   public void testDeleteAsyncWithQuery() {
+    Batch batchEntity = MockProvider.createMockBatch();
     when(historyServiceMock.deleteHistoricProcessInstancesAsync(
         anyListOf(String.class),
         any(HistoricProcessInstanceQuery.class),
         anyString())
-    ).thenReturn(new BatchEntity());
+    ).thenReturn(batchEntity);
 
     Map<String, Object> messageBodyJson = new HashMap<String, Object>();
     messageBodyJson.put(DELETE_REASON, TEST_DELETE_REASON);
     HistoricProcessInstanceQueryDto query = new HistoricProcessInstanceQueryDto();
     messageBodyJson.put("historicProcessInstanceQuery", query);
 
-    given()
+    Response response = given()
         .contentType(ContentType.JSON).body(messageBodyJson)
         .then().expect()
         .statusCode(Status.OK.getStatusCode())
         .when().post(DELETE_HISTORIC_PROCESS_INSTANCES_ASYNC_URL);
+
+    verifyBatchJson(response.asString());
 
     verify(historyServiceMock, times(1)).deleteHistoricProcessInstancesAsync(
         eq((List<String>) null), any(HistoricProcessInstanceQuery.class), Mockito.eq(TEST_DELETE_REASON));
@@ -234,5 +245,20 @@ public class HistoricProcessInstanceRestServiceInteractionTest extends AbstractR
         .statusCode(Status.BAD_REQUEST.getStatusCode())
         .when().post(DELETE_HISTORIC_PROCESS_INSTANCES_ASYNC_URL);
   }
+
+  protected void verifyBatchJson(String batchJson) {
+    BatchDto batch = JsonPathUtil.from(batchJson).getObject("", BatchDto.class);
+    assertNotNull("The returned batch should not be null.", batch);
+    assertEquals(MockProvider.EXAMPLE_BATCH_ID, batch.getId());
+    assertEquals(MockProvider.EXAMPLE_BATCH_TYPE, batch.getType());
+    assertEquals(MockProvider.EXAMPLE_BATCH_TOTAL_JOBS, batch.getTotalJobs());
+    assertEquals(MockProvider.EXAMPLE_BATCH_JOBS_PER_SEED, batch.getBatchJobsPerSeed());
+    assertEquals(MockProvider.EXAMPLE_INVOCATIONS_PER_BATCH_JOB, batch.getInvocationsPerBatchJob());
+    assertEquals(MockProvider.EXAMPLE_SEED_JOB_DEFINITION_ID, batch.getSeedJobDefinitionId());
+    assertEquals(MockProvider.EXAMPLE_MONITOR_JOB_DEFINITION_ID, batch.getMonitorJobDefinitionId());
+    assertEquals(MockProvider.EXAMPLE_BATCH_JOB_DEFINITION_ID, batch.getBatchJobDefinitionId());
+    assertEquals(MockProvider.EXAMPLE_TENANT_ID, batch.getTenantId());
+  }
+
 
 }
