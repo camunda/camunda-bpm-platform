@@ -94,7 +94,7 @@ public class ServiceTaskDelegateExpressionActivityBehavior extends TaskActivityB
   }
 
 	@Override
-  public void execute(final ActivityExecution execution) throws Exception {
+  public void performExecution(final ActivityExecution execution) throws Exception {
 	  Callable<Void> callable = new Callable<Void>() {
       @Override
       public Void call() throws Exception {

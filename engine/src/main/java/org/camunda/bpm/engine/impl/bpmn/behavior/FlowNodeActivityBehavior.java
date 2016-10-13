@@ -13,8 +13,10 @@
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.SignallableActivityBehavior;
+import org.camunda.bpm.engine.impl.pvm.runtime.operation.PvmAtomicOperation;
 
 
 /**
@@ -42,7 +44,11 @@ public abstract class FlowNodeActivityBehavior implements SignallableActivityBeh
    * Default way of leaving a BPMN 2.0 activity: evaluate the conditions on the
    * outgoing sequence flow and take those that evaluate to true.
    */
-  protected void leave(ActivityExecution execution) {
+  public void leave(ActivityExecution execution) {
+    ((ExecutionEntity) execution).dispatchDelayedEventsAndPerformOperation(PvmAtomicOperation.ACTIVITY_LEAVE);
+  }
+
+  public void doLeave(ActivityExecution execution) {
     bpmnActivityBehavior.performDefaultOutgoingBehavior(execution);
   }
 

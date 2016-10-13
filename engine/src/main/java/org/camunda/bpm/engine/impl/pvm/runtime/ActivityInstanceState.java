@@ -27,6 +27,8 @@ public interface ActivityInstanceState {
   ActivityInstanceState DEFAULT = new ActivityInstanceStateImpl(0, "default");
   ActivityInstanceState SCOPE_COMPLETE = new ActivityInstanceStateImpl(1, "scopeComplete");
   ActivityInstanceState CANCELED = new ActivityInstanceStateImpl(2, "canceled");
+  ActivityInstanceState STARTING = new ActivityInstanceStateImpl(3, "starting");
+  ActivityInstanceState ENDING = new ActivityInstanceStateImpl(4, "ending");
 
   int getStateCode();
 

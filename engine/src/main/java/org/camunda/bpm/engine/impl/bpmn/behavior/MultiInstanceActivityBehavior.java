@@ -161,10 +161,10 @@ public abstract class MultiInstanceActivityBehavior extends AbstractBpmnActivity
   }
 
   @Override
-  protected void leave(ActivityExecution execution) {
+  public void doLeave(ActivityExecution execution) {
     CompensationUtil.createEventScopeExecution((ExecutionEntity) execution);
 
-    super.leave(execution);
+    super.doLeave(execution);
   }
 
   /**

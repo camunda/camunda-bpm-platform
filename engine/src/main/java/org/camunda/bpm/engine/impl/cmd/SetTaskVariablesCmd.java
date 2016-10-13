@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 
@@ -47,6 +48,11 @@ public class SetTaskVariablesCmd extends AbstractSetVariableCmd {
     checkSetTaskVariables(task);
 
     return task;
+  }
+
+  @Override
+  protected ExecutionEntity getContextExecution() {
+    return getEntity().getExecution();
   }
 
   protected void logVariableOperation(AbstractVariableScope scope) {

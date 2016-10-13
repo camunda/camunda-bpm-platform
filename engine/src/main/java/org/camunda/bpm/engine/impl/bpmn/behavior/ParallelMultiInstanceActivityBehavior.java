@@ -24,6 +24,8 @@ import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.MigrationObserverBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
+import org.camunda.bpm.engine.impl.pvm.runtime.operation.PvmAtomicOperation;
+import org.camunda.bpm.engine.impl.pvm.runtime.operation.PvmAtomicOperationContinuation;
 
 /**
  * @author Daniel Meyer
@@ -101,6 +103,8 @@ public class ParallelMultiInstanceActivityBehavior extends MultiInstanceActivity
       scopeExecution.setActivity((PvmActivity) endedExecution.getActivity().getFlowScope());
       scopeExecution.setActive(true);
       leave(scopeExecution);
+    } else {
+      ((ExecutionEntity) scopeExecution).dispatchDelayedEventsAndPerformOperation((PvmAtomicOperationContinuation) null);
     }
   }
 

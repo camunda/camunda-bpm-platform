@@ -16,7 +16,9 @@
 package org.camunda.bpm.engine.test.bpmn.event.conditional;
 
 import java.util.Map;
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
+
+import org.camunda.bpm.engine.SuspendedEntityInteractionException;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
@@ -24,9 +26,11 @@ import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.Test;
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertNull;
-import static org.camunda.bpm.engine.test.bpmn.event.conditional.AbstractConditionalEventTestCase.CONDITIONAL_EVENT_PROCESS_KEY;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
@@ -35,6 +39,11 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
 public class IntermediateConditionalEventTest extends AbstractConditionalEventTestCase {
+
+  @Override
+  public void checkIfProcessCanBeFinished() {
+    //override since check is not needed in intermediate test suite
+  }
 
   @Test
   @Deployment
@@ -288,6 +297,11 @@ public class IntermediateConditionalEventTest extends AbstractConditionalEventTe
     assertNotNull(task);
     assertEquals(TASK_AFTER_CONDITION, task.getName());
     assertEquals(0, conditionEventSubscriptionQuery.list().size());
+
+    //and task can be completed which ends process instance
+    taskService.complete(task.getId());
+    assertNull(taskService.createTaskQuery().singleResult());
+    assertNull(runtimeService.createProcessInstanceQuery().singleResult());
   }
 
   @Test
@@ -335,6 +349,11 @@ public class IntermediateConditionalEventTest extends AbstractConditionalEventTe
     Task task = taskQuery.singleResult();
     assertEquals(TASK_AFTER_CONDITION, task.getName());
     assertEquals(0, conditionEventSubscriptionQuery.list().size());
+
+    //and task can be completed which ends process instance
+    taskService.complete(task.getId());
+    assertNull(taskService.createTaskQuery().singleResult());
+    assertNull(runtimeService.createProcessInstanceQuery().singleResult());
   }
 
   @Test
@@ -385,6 +404,11 @@ public class IntermediateConditionalEventTest extends AbstractConditionalEventTe
     Task task = taskQuery.singleResult();
     assertEquals(TASK_AFTER_CONDITION, task.getName());
     assertEquals(0, conditionEventSubscriptionQuery.list().size());
+
+    //and task can be completed which ends process instance
+    taskService.complete(task.getId());
+    assertNull(taskService.createTaskQuery().singleResult());
+    assertNull(runtimeService.createProcessInstanceQuery().singleResult());
   }
 
 
@@ -434,5 +458,45 @@ public class IntermediateConditionalEventTest extends AbstractConditionalEventTe
     Task task = taskQuery.singleResult();
     assertEquals(TASK_AFTER_CONDITION, task.getName());
     assertEquals(0, conditionEventSubscriptionQuery.list().size());
+
+    //and task can be completed which ends process instance
+    taskService.complete(task.getId());
+    assertNull(taskService.createTaskQuery().singleResult());
+    assertNull(runtimeService.createProcessInstanceQuery().singleResult());
   }
+
+  @Test
+  public void testSuspendedProcess() {
+
+    final BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
+      .startEvent()
+      .intermediateCatchEvent(CONDITIONAL_EVENT)
+        .conditionalEventDefinition()
+          .condition(CONDITION_EXPR)
+        .conditionalEventDefinitionDone()
+      .endEvent().done();
+
+    engine.manageDeployment(repositoryService.createDeployment().addModelInstance(CONDITIONAL_MODEL, modelInstance).deploy());
+    // given suspended process
+    ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
+    runtimeService.suspendProcessInstanceById(procInst.getId());
+
+    //when wrong variable is set
+    runtimeService.setVariable(procInst.getId(), VARIABLE_NAME+1, 1);
+
+    //then nothing happens
+    assertTrue(runtimeService.createProcessInstanceQuery().singleResult().isSuspended());
+
+    //when variable which triggers condition is set
+    //then exception is expected
+    try {
+      runtimeService.setVariable(procInst.getId(), VARIABLE_NAME, 1);
+      fail("Should fail!");
+    } catch (SuspendedEntityInteractionException seie) {
+      //expected
+    }
+    runtimeService.activateProcessInstanceById(procInst.getId());
+    tasksAfterVariableIsSet = taskService.createTaskQuery().list();
+  }
+
 }

@@ -17,6 +17,8 @@ import java.io.Serializable;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.pvm.runtime.operation.PvmAtomicOperationContinuation;
 
 /**
  * @author Stefan Hentschel.
@@ -47,6 +49,11 @@ public abstract class AbstractVariableCmd implements Command<Void>, Serializable
 
     executeOperation(scope);
 
+    ExecutionEntity contextExecution = getContextExecution();
+    if (contextExecution != null) {
+      contextExecution.dispatchDelayedEventsAndPerformOperation((PvmAtomicOperationContinuation) null);
+    }
+
     if(!preventLogUserOperation) {
       logVariableOperation(scope);
     }
@@ -55,6 +62,8 @@ public abstract class AbstractVariableCmd implements Command<Void>, Serializable
   };
 
   protected abstract AbstractVariableScope getEntity();
+
+  protected abstract ExecutionEntity getContextExecution();
 
   protected abstract void logVariableOperation(AbstractVariableScope scope);
 

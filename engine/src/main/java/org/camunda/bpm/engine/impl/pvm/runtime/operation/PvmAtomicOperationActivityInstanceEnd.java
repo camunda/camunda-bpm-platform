@@ -58,11 +58,6 @@ public abstract class PvmAtomicOperationActivityInstanceEnd extends AbstractPvmE
 
   }
 
-  protected void eventNotificationsCompleted(PvmExecutionImpl execution) {
-    // make execution leave the activity instance
-    execution.leaveActivityInstance();
-  }
-
   @Override
   protected boolean isSkipNotifyListeners(PvmExecutionImpl execution) {
     // listeners are skipped if this execution is not part of an activity instance.

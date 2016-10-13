@@ -6,6 +6,7 @@ import java.util.Collection;
 
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 
@@ -33,6 +34,11 @@ public class RemoveTaskVariablesCmd extends AbstractRemoveVariableCmd {
     checkRemoveTaskVariables(task);
 
     return task;
+  }
+
+  @Override
+  protected ExecutionEntity getContextExecution() {
+    return getEntity().getExecution();
   }
 
   protected void logVariableOperation(AbstractVariableScope scope) {

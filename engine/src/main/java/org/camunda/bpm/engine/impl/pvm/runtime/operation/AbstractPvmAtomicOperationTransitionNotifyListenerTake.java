@@ -34,7 +34,7 @@ public abstract class AbstractPvmAtomicOperationTransitionNotifyListenerTake ext
     switch (destination.getActivityStartBehavior()) {
     case DEFAULT:
       execution.setActivity(destination);
-      execution.performOperation(TRANSITION_CREATE_SCOPE);
+      execution.dispatchDelayedEventsAndPerformOperation(TRANSITION_CREATE_SCOPE);
       break;
     case INTERRUPT_FLOW_SCOPE:
       execution.setActivity(null);

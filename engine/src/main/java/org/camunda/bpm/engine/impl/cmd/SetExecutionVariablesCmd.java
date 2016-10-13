@@ -48,6 +48,11 @@ public class SetExecutionVariablesCmd extends AbstractSetVariableCmd {
     return execution;
   }
 
+  @Override
+  protected ExecutionEntity getContextExecution() {
+    return getEntity();
+  }
+
   protected void logVariableOperation(AbstractVariableScope scope) {
     ExecutionEntity execution = (ExecutionEntity) scope;
     commandContext.getOperationLogManager().logVariableOperation(getLogEntryOperation(), execution.getId(),

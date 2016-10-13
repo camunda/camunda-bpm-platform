@@ -488,8 +488,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     return Arrays.<VariableInstanceLifecycleListener<CoreVariableInstance>>asList(
         (VariableInstanceLifecycleListener) VariableInstanceEntityPersistenceListener.INSTANCE,
         (VariableInstanceLifecycleListener) VariableInstanceSequenceCounterListener.INSTANCE,
-        (VariableInstanceLifecycleListener) VariableInstanceHistoryListener.INSTANCE,
-        (VariableInstanceLifecycleListener) new VariableListenerInvocationListener(this)
+        (VariableInstanceLifecycleListener) VariableInstanceHistoryListener.INSTANCE
       );
   }
 

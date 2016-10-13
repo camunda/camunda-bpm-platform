@@ -284,6 +284,7 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
   public void setVariable(String variableName, Object value) {
     TypedValue typedValue = Variables.untypedValue(value);
     setVariable(variableName, typedValue, getSourceActivityVariableScope());
+
   }
 
   protected void setVariable(String variableName, TypedValue value, AbstractVariableScope sourceActivityVariableScope) {
@@ -376,7 +377,7 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
 
   protected void removeVariable(String variableName, AbstractVariableScope sourceActivityExecution) {
     if (getVariableStore().containsKey(variableName)) {
-      removeVariableLocal(variableName);
+      removeVariableLocal(variableName, sourceActivityExecution);
       return;
     }
     AbstractVariableScope parentVariableScope = getParentVariableScope();

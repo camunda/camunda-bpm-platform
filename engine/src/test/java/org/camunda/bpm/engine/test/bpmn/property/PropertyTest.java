@@ -56,7 +56,7 @@ public class PropertyTest extends PluggableProcessEngineTestCase {
 //    assertNull(deployer.getProcessService().getVariable(pi.getId(), "myVar"));
 //
 //    // When the task completes, the variable 'myVar' is destroyed
-//    deployer.getTaskService().complete(deployer.getTaskService().createTaskQuery().singleResult().getId());
+//    specifier.getTaskService().complete(specifier.getTaskService().createTaskQuery().singleResult().getId());
 //    for (Execution execution : deployer.getProcessService().findChildExecutions(pi.getId())) {
 //      assertNull(deployer.getProcessService().getVariable(execution.getId(), "myVar"));
 //    }
@@ -81,7 +81,7 @@ public class PropertyTest extends PluggableProcessEngineTestCase {
 //    assertNull(deployer.getProcessService().getVariable(pi.getId(), "orderAddress"));
 //
 //    // Completing the task removes the 'orderAddress' variable
-//    deployer.getTaskService().complete(deployer.getTaskService().createTaskQuery().singleResult().getId());
+//    specifier.getTaskService().complete(specifier.getTaskService().createTaskQuery().singleResult().getId());
 //    assertNull(deployer.getProcessService().getVariable(pi.getId(), "orderAddress"));
 //    assertNotNull(deployer.getProcessService().getVariable(pi.getId(), "order"));
   }
@@ -104,7 +104,7 @@ public class PropertyTest extends PluggableProcessEngineTestCase {
 //    // Setting the 'taskVar' value and completing the task should push the value
 //    // into 'processVar'
 //    deployer.getProcessService().setVariable(childExecutionId, "taskVar", "myValue");
-//    deployer.getTaskService().complete(deployer.getTaskService().createTaskQuery().singleResult().getId());
+//    specifier.getTaskService().complete(specifier.getTaskService().createTaskQuery().singleResult().getId());
 //    vars = deployer.getProcessService().getVariables(pi.getId());
 //    assertEquals(1, vars.size());
 //    assertTrue(vars.containsKey("processVar"));
@@ -135,7 +135,7 @@ public class PropertyTest extends PluggableProcessEngineTestCase {
 //    // Setting the 'orderAddress' value and completing the task should push the
 //    // value into order object
 //    deployer.getProcessService().setVariable(childExecutionId, "orderAddress", "testAddress");
-//    deployer.getTaskService().complete(deployer.getTaskService().createTaskQuery().singleResult().getId());
+//    specifier.getTaskService().complete(specifier.getTaskService().createTaskQuery().singleResult().getId());
 //    assertEquals(1, deployer.getProcessService().getVariables(pi.getId()).size());
 //
 //    Order orderAfterComplete = (Order) deployer.getProcessService().getVariable(pi.getId(), "order");
@@ -163,7 +163,7 @@ public class PropertyTest extends PluggableProcessEngineTestCase {
 //    assertNull(deployer.getProcessService().getVariable(pi.getId(), "taskVar"));
 //
 //    // Completing the task copies the value of 'taskVar' into 'inputVar'
-//    deployer.getTaskService().complete(deployer.getTaskService().createTaskQuery().singleResult().getId());
+//    specifier.getTaskService().complete(specifier.getTaskService().createTaskQuery().singleResult().getId());
 //    assertTrue(deployer.getProcessService().findChildExecutions(pi.getId()).isEmpty()); // second
 //                                                                          // task
 //                                                                          // is

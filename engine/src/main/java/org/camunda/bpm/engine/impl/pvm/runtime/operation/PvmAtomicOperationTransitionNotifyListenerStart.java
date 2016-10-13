@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.impl.pvm.runtime.operation;
 
 import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
@@ -39,7 +40,7 @@ public class PvmAtomicOperationTransitionNotifyListenerStart extends PvmAtomicOp
 
     TransitionImpl transition = execution.getTransition();
     PvmActivity destination;
-    if(transition == null) { // this is null after async cont. -> transition is not stored in execution
+    if (transition == null) { // this is null after async cont. -> transition is not stored in execution
       destination = execution.getActivity();
     } else {
       destination = transition.getDestination();
@@ -53,7 +54,7 @@ public class PvmAtomicOperationTransitionNotifyListenerStart extends PvmAtomicOp
       execution.disposeExecutionStartContext();
     }
 
-    execution.performOperation(ACTIVITY_EXECUTE);
+    execution.dispatchDelayedEventsAndPerformOperation(ACTIVITY_EXECUTE);
   }
 
   public String getCanonicalName() {

@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.impl.pvm.runtime.operation;
 
 import static org.camunda.bpm.engine.impl.util.ActivityBehaviorUtil.getActivityBehavior;
 
+import org.camunda.bpm.engine.impl.bpmn.behavior.FlowNodeActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.PvmException;
 import org.camunda.bpm.engine.impl.pvm.PvmLogger;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
@@ -23,7 +24,7 @@ import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 /**
  * @author Tom Baeyens
  */
-public class PvmAtomicOperationActivityExecute implements PvmAtomicOperation {
+public class PvmAtomicOperationActivityLeave implements PvmAtomicOperation {
 
   private final static PvmLogger LOG = PvmLogger.PVM_LOGGER;
 
@@ -33,20 +34,28 @@ public class PvmAtomicOperationActivityExecute implements PvmAtomicOperation {
 
   public void execute(PvmExecutionImpl execution) {
 
-    execution.activityInstanceStarted();
+    execution.activityInstanceDone();
 
     ActivityBehavior activityBehavior = getActivityBehavior(execution);
 
-    ActivityImpl activity = execution.getActivity();
-    LOG.debugExecutesActivity(execution, activity, activityBehavior.getClass().getName());
+    if (activityBehavior instanceof FlowNodeActivityBehavior) {
+      FlowNodeActivityBehavior behavior = (FlowNodeActivityBehavior) activityBehavior;
 
-    try {
-      activityBehavior.execute(execution);
-    } catch (RuntimeException e) {
-      throw e;
-    } catch (Exception e) {
-      throw new PvmException("couldn't execute activity <"+activity.getProperty("type")+" id=\""+activity.getId()+"\" ...>: "+e.getMessage(), e);
+      ActivityImpl activity = execution.getActivity();
+      LOG.debugExecutesActivity(execution, activity, activityBehavior.getClass().getName());
+
+      try {
+        behavior.doLeave(execution);
+      } catch (RuntimeException e) {
+        throw e;
+      } catch (Exception e) {
+        throw new PvmException("couldn't execute activity <"+activity.getProperty("type")+" id=\""+activity.getId()+"\" ...>: "+e.getMessage(), e);
+      }
+    } else {
+      throw new PvmException("Behavior of current activity is not an instance of " + FlowNodeActivityBehavior.class.getSimpleName() + ". Execution " + execution);
     }
+
+
   }
 
   public String getCanonicalName() {

@@ -42,7 +42,7 @@ public class PvmAtomicOperationProcessEnd extends PvmAtomicOperationActivityInst
   @Override
   protected void eventNotificationsCompleted(PvmExecutionImpl execution) {
 
-    super.eventNotificationsCompleted(execution);
+    execution.leaveActivityInstance();
 
     PvmExecutionImpl superExecution = execution.getSuperExecution();
     CmmnActivityExecution superCaseExecution = execution.getSuperCaseExecution();

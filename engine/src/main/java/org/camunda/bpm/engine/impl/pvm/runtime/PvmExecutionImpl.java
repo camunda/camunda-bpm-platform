@@ -17,8 +17,17 @@ import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
+import org.camunda.bpm.engine.impl.core.variable.event.VariableEvent;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
-import org.camunda.bpm.engine.impl.pvm.*;
+import org.camunda.bpm.engine.impl.persistence.entity.DelayedVariableEvent;
+import org.camunda.bpm.engine.impl.pvm.PvmActivity;
+import org.camunda.bpm.engine.impl.pvm.PvmException;
+import org.camunda.bpm.engine.impl.pvm.PvmExecution;
+import org.camunda.bpm.engine.impl.pvm.PvmLogger;
+import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
+import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
+import org.camunda.bpm.engine.impl.pvm.PvmScope;
+import org.camunda.bpm.engine.impl.pvm.PvmTransition;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.CompositeActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.ModificationObserverBehavior;
@@ -26,7 +35,14 @@ import org.camunda.bpm.engine.impl.pvm.delegate.SignallableActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.*;
 import org.camunda.bpm.engine.impl.pvm.runtime.operation.FoxAtomicOperationDeleteCascadeFireActivityEnd;
 import org.camunda.bpm.engine.impl.pvm.runtime.operation.PvmAtomicOperation;
-import org.camunda.bpm.engine.impl.tree.*;
+import org.camunda.bpm.engine.impl.pvm.runtime.operation.PvmAtomicOperationContinuation;
+import org.camunda.bpm.engine.impl.tree.ExecutionWalker;
+import org.camunda.bpm.engine.impl.tree.FlowScopeWalker;
+import org.camunda.bpm.engine.impl.tree.LeafActivityInstanceExecutionCollector;
+import org.camunda.bpm.engine.impl.tree.ReferenceWalker;
+import org.camunda.bpm.engine.impl.tree.ScopeCollector;
+import org.camunda.bpm.engine.impl.tree.ScopeExecutionCollector;
+import org.camunda.bpm.engine.impl.tree.TreeVisitor;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
 import java.util.*;
@@ -658,6 +674,8 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     this.replacedBy = null;
     execution.replacedBy = this;
 
+    this.transitionsToTake = execution.transitionsToTake;
+
     execution.leaveActivityInstance();
   }
 
@@ -1154,6 +1172,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     ActivityImpl activity = getActivity();
 
     activityInstanceId = generateActivityInstanceId(activity.getId());
+    activityInstanceState = ActivityInstanceState.STARTING.getStateCode();
 
     LOG.debugEnterActivityInstance(this, getParentActivityInstanceId());
 
@@ -1167,6 +1186,14 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
       initializeTimerDeclarations();
     }
 
+  }
+
+  public void activityInstanceStarted() {
+    this.activityInstanceState = ActivityInstanceState.DEFAULT.getStateCode();
+  }
+
+  public void activityInstanceDone() {
+    this.activityInstanceState = ActivityInstanceState.ENDING.getStateCode();
   }
 
   protected abstract String generateActivityInstanceId(String activityId);
@@ -1691,6 +1718,10 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     return activityInstanceState;
   }
 
+  public boolean isInState(ActivityInstanceState state) {
+    return activityInstanceState == state.getStateCode();
+  }
+
   public boolean isEventScope() {
     return isEventScope;
   }
@@ -1765,4 +1796,135 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
       }
     }
   }
+
+  protected transient List<DelayedVariableEvent> delayedEvents = new ArrayList<DelayedVariableEvent>();
+
+  public void delayEvent(PvmExecutionImpl targetScope, VariableEvent variableEvent) {
+    DelayedVariableEvent delayedVariableEvent = new DelayedVariableEvent(targetScope, variableEvent);
+    delayEvent(delayedVariableEvent);
+  }
+
+  public void delayEvent(DelayedVariableEvent delayedVariableEvent) {
+    if (isProcessInstanceExecution()) {
+      delayedEvents.add(delayedVariableEvent);
+    } else {
+      getProcessInstance().delayEvent(delayedVariableEvent);
+    }
+  }
+
+  public List<DelayedVariableEvent> getDelayedEvents() {
+    if (isProcessInstanceExecution()) {
+      return delayedEvents;
+    }
+    return getProcessInstance().getDelayedEvents();
+  }
+
+  public void clearDelayedEvents() {
+    if (isProcessInstanceExecution()) {
+      delayedEvents.clear();
+    } else {
+      getProcessInstance().clearDelayedEvents();
+    }
+  }
+
+  public void dispatchDelayedEventsAndPerformOperation(final PvmAtomicOperation atomicOperation) {
+    dispatchDelayedEventsAndPerformOperation(new PvmAtomicOperationContinuation() {
+
+      @Override
+      public void execute(PvmExecutionImpl execution) {
+        execution.performOperation(atomicOperation);
+      }
+    });
+  }
+
+  public void dispatchDelayedEventsAndPerformOperation(PvmAtomicOperationContinuation continuation) {
+    PvmExecutionImpl execution = this;
+
+    String activityId = execution.getActivityId();
+    String activityInstanceId = getActivityInstanceId(execution);
+
+    dispatchScopeEvents(execution);
+
+    execution = execution.getReplacedBy() != null ? execution.getReplacedBy() : execution;
+    String currentActivityInstanceId = getActivityInstanceId(execution);
+    String currentActivityId = execution.getActivityId();
+
+    if (continuation != null &&
+        ((activityInstanceId == null && activityInstanceId == currentActivityInstanceId && activityId.equals(currentActivityId)) //can be null on transitions
+          || (activityInstanceId != null && activityInstanceId.equals(currentActivityInstanceId)))  //if not then string should equal
+
+        && !execution.isCanceled()) {
+      continuation.execute(execution);
+    }
+  }
+
+  protected void dispatchScopeEvents(PvmExecutionImpl execution) {
+    PvmExecutionImpl scopeExecution = execution.isScope() ? execution : execution.getParent();
+
+    List<DelayedVariableEvent> delayedEvents = new ArrayList<DelayedVariableEvent>(scopeExecution.getDelayedEvents());
+    scopeExecution.clearDelayedEvents();
+
+    Map<PvmExecutionImpl, String> activityInstanceIds = new HashMap<PvmExecutionImpl, String>();
+    Map<PvmExecutionImpl, String> activityIds = new HashMap<PvmExecutionImpl, String>();
+
+    for (DelayedVariableEvent event : delayedEvents) {
+      PvmExecutionImpl targetScope = event.getTargetScope();
+
+      String targetScopeActivityInstanceId = getActivityInstanceId(targetScope);
+      activityInstanceIds.put(targetScope, targetScopeActivityInstanceId);
+      activityIds.put(targetScope, targetScope.getActivityId());
+    }
+
+    for (DelayedVariableEvent event : delayedEvents) {
+      PvmExecutionImpl targetScope = getTargetScope(event);
+
+      //current ////////////////////////////////////////////////////////////////////////////////////////////////////////
+      String currentActivityInstanceId = getActivityInstanceId(targetScope);
+      String currentActivityId = targetScope.getActivityId();
+
+      //last ////////////////////////////////////////////////////////////////////////////////////////////////////////
+      final String lastActivityInstanceId = activityInstanceIds.get(targetScope);
+      final String lastActivityId = activityIds.get(targetScope);
+
+      ActivityImpl targetActivity = targetScope.getActivity();
+      if (
+            ((lastActivityInstanceId == null && lastActivityInstanceId == currentActivityInstanceId && lastActivityId.equals(currentActivityId)) //can be null on transitions
+            || (lastActivityInstanceId != null && lastActivityInstanceId.equals(currentActivityInstanceId)))
+            && (targetScope.getActivityId() == null || !targetActivity.isScope()
+            || (targetActivity.isScope() && targetScope.isInState(ActivityInstanceState.DEFAULT)))
+        )
+
+      {
+        targetScope.dispatchEvent(event.getEvent());
+      }
+    }
+  }
+
+  private PvmExecutionImpl getTargetScope(DelayedVariableEvent event) {
+    PvmExecutionImpl targetScope = event.getTargetScope();
+    PvmExecutionImpl replacedBy = targetScope.getReplacedBy();
+
+    // if tree compacted
+    if (replacedBy != null && targetScope.getParent() == replacedBy) {
+      targetScope = replacedBy;
+    }
+    return targetScope;
+  }
+
+  private String getActivityInstanceId(PvmExecutionImpl targetScope) {
+    if (targetScope.isConcurrent()) {
+      return targetScope.getActivityInstanceId();
+    } else {
+      ActivityImpl targetActivity = targetScope.getActivity();
+      if (targetActivity != null && targetActivity.getActivities().isEmpty()) {
+        // TODO: does not always work with a compacted tree, i.e. where targetScope is
+        // in a non-scope activity, because we have to consider if the variable was set in the context
+        // of that non-scope activity, or in the context of the containing scope
+        return targetScope.getActivityInstanceId();
+      } else {
+        return targetScope.getParentActivityInstanceId();
+      }
+    }
+  }
+
 }

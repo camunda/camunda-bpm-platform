@@ -28,7 +28,8 @@ public class DummyActivityBehavior extends TaskActivityBehavior {
     leave(execution);
   }
 
-  public void execute(ActivityExecution execution) throws Exception {
+  @Override
+  public void performExecution(ActivityExecution execution) throws Exception {
     wasExecuted = true;
   }
 

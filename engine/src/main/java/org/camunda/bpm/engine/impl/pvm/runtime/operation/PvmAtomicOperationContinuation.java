@@ -12,27 +12,13 @@
  */
 package org.camunda.bpm.engine.impl.pvm.runtime.operation;
 
-import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 /**
- * In BPMN this is used for terminate end events
- *
- * @author Daniel Meyer
+ * @author Thorben Lindhauer
  *
  */
-public class PvmAtomicOperationsTransitionInterruptFlowScope extends PvmAtomicOperationInterruptScope {
+public interface PvmAtomicOperationContinuation {
 
-  public String getCanonicalName() {
-    return "transition-interrupt-scope";
-  }
-
-  protected void scopeInterrupted(PvmExecutionImpl execution) {
-    execution.dispatchDelayedEventsAndPerformOperation(TRANSITION_CREATE_SCOPE);
-  }
-
-  protected PvmActivity getInterruptingActivity(PvmExecutionImpl execution) {
-    return execution.getTransition().getDestination();
-  }
-
+  void execute(PvmExecutionImpl execution);
 }

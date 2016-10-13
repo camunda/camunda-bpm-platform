@@ -38,7 +38,8 @@ public class ServiceTaskExpressionActivityBehavior extends TaskActivityBehavior 
     this.resultVariable = resultVariable;
   }
 
-  public void execute(final ActivityExecution execution) throws Exception {
+  @Override
+  public void performExecution(final ActivityExecution execution) throws Exception {
     executeWithErrorPropagation(execution, new Callable<Void>() {
       @Override
       public Void call() throws Exception {

@@ -13,6 +13,15 @@
 
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
@@ -54,12 +63,14 @@ import org.camunda.bpm.engine.impl.pvm.delegate.CompositeActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
+import org.camunda.bpm.engine.impl.pvm.runtime.ActivityInstanceState;
 import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperation;
 import org.camunda.bpm.engine.impl.pvm.runtime.ExecutionStartContext;
 import org.camunda.bpm.engine.impl.pvm.runtime.ProcessInstanceStartContext;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.operation.FoxAtomicOperationDeleteCascadeFireActivityEnd;
 import org.camunda.bpm.engine.impl.pvm.runtime.operation.PvmAtomicOperation;
+import org.camunda.bpm.engine.impl.pvm.runtime.operation.PvmAtomicOperationContinuation;
 import org.camunda.bpm.engine.impl.tree.ExecutionTopDownWalker;
 import org.camunda.bpm.engine.impl.tree.TreeVisitor;
 import org.camunda.bpm.engine.impl.util.BitMaskUtil;
@@ -76,7 +87,6 @@ import org.camunda.bpm.model.bpmn.instance.FlowElement;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.ModelElementType;
 
-import java.util.*;
 
 /**
  * @author Tom Baeyens
@@ -151,6 +161,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
   @SuppressWarnings("unchecked")
   protected transient VariableStore<VariableInstanceEntity> variableStore =
       new VariableStore<VariableInstanceEntity>(this, new ExecutionEntityReferencer(this));
+
 
   // replaced by //////////////////////////////////////////////////////////////
 
@@ -1710,7 +1721,8 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     new ExecutionTopDownWalker(this).addPreVisitor(new TreeVisitor<ExecutionEntity>() {
       @Override
       public void visit(ExecutionEntity obj) {
-        if (!obj.getEventSubscriptions().isEmpty()) {
+        if (!obj.getEventSubscriptions().isEmpty() &&
+          (obj.isInState(ActivityInstanceState.DEFAULT) || !obj.getActivity().isScope())) { // state is default or tree is compacted
           execs.add(obj);
         }
       }

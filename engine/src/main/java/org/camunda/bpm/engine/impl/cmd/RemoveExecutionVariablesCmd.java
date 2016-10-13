@@ -35,6 +35,11 @@ public class RemoveExecutionVariablesCmd extends AbstractRemoveVariableCmd {
     return execution;
   }
 
+  @Override
+  protected ExecutionEntity getContextExecution() {
+    return getEntity();
+  }
+
   protected void logVariableOperation(AbstractVariableScope scope) {
     ExecutionEntity execution = (ExecutionEntity) scope;
     commandContext.getOperationLogManager().logVariableOperation(getLogEntryOperation(), execution.getId(), null, PropertyChange.EMPTY_CHANGE);
