@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.integrationtest.functional.context;
 
+import java.util.Date;
 import org.camunda.bpm.application.InvocationContext;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.EventSubscription;
@@ -80,7 +81,10 @@ public class InvocationContextTest extends AbstractFoxPlatformIntegrationTest {
     Job timer = managementService.createJobQuery().timers().singleResult();
     assertThat(timer, is(notNullValue()));
 
-    ClockUtil.setCurrentTime(timer.getDuedate());
+    long dueDate = timer.getDuedate().getTime();
+    Date afterDueDate = new Date(dueDate + 1000 * 60);
+
+    ClockUtil.setCurrentTime(afterDueDate);
     waitForJobExecutorToProcessAllJobs();
 
     InvocationContext invocationContext = ProcessApplicationWithInvocationContext.getInvocationContext();

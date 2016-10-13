@@ -26,16 +26,18 @@ public class ProcessApplicationWithInvocationContext extends ServletProcessAppli
 
   @Override
   public <T> T execute(Callable<T> callable, InvocationContext invocationContext) throws ProcessApplicationExecutionException {
-    ProcessApplicationWithInvocationContext.invocationContext = invocationContext;
+    synchronized (ProcessApplicationWithInvocationContext.class) {
+      ProcessApplicationWithInvocationContext.invocationContext = invocationContext;
+    }
 
     return execute(callable);
   }
 
-  public static InvocationContext getInvocationContext() {
+  public synchronized static InvocationContext getInvocationContext() {
     return ProcessApplicationWithInvocationContext.invocationContext;
   }
 
-  public static void clearInvocationContext() {
+  public synchronized static void clearInvocationContext() {
     ProcessApplicationWithInvocationContext.invocationContext = null;
   }
 
