@@ -91,6 +91,11 @@ public class JuelExpression implements Expression {
     return super.toString();
   }
 
+  @Override
+  public boolean isLiteralText() {
+    return valueExpression.isLiteralText();
+  }
+
   public String getExpressionText() {
     return expressionText;
   }

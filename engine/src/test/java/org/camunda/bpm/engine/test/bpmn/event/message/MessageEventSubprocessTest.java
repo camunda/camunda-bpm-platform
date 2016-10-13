@@ -927,4 +927,19 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTestCase {
     );
   }
 
+  @Deployment
+  public void testExpressionInMessageNameInInterruptingSubProcessDefinition() {
+    // given an process instance
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    // when receiving the message
+    runtimeService.messageEventReceived("newMessage-foo", processInstance.getId());
+
+    // the the subprocess is triggered and we can complete the task
+    Task task = taskService.createTaskQuery().singleResult();
+    assertEquals("eventSubProcessTask", task.getTaskDefinitionKey());
+    taskService.complete(task.getId());
+    assertProcessEnded(processInstance.getId());
+  }
+
 }

@@ -977,7 +977,6 @@ public class BpmnParse extends Parse {
 
         EventSubscriptionDeclaration messageStartEventSubscriptionDeclaration =
             parseMessageEventDefinition(messageEventDefinition);
-        ensureNoExpressionInMessageStartEvent(messageEventDefinition, messageStartEventSubscriptionDeclaration);
         parseEventDefinitionForSubprocess(messageStartEventSubscriptionDeclaration, startEventActivity, messageEventDefinition);
 
       } else if (signalEventDefinition != null) {
@@ -1134,13 +1133,13 @@ public class BpmnParse extends Parse {
 
     // if this is a message event, validate that it is the only one with the provided name for this scope
     if(hasMultipleMessageEventDefinitionsWithSameName(subscription, eventDefinitions.values())){
-      addError("Cannot have more than one message event subscription with name '" + subscription.getEventName() + "' for scope '" + scope.getId() + "'",
+      addError("Cannot have more than one message event subscription with name '" + subscription.getUnresolvedEventName() + "' for scope '" + scope.getId() + "'",
           element);
     }
 
     // if this is a signal event, validate that it is the only one with the provided name for this scope
     if(hasMultipleSignalEventDefinitionsWithSameName(subscription, eventDefinitions.values())){
-      addError("Cannot have more than one signal event subscription with name '" + subscription.getEventName() + "' for scope '" + scope.getId() + "'",
+      addError("Cannot have more than one signal event subscription with name '" + subscription.getUnresolvedEventName() + "' for scope '" + scope.getId() + "'",
           element);
     }
 
@@ -1158,7 +1157,7 @@ public class BpmnParse extends Parse {
   protected boolean hasMultipleEventDefinitionsWithSameName(EventSubscriptionDeclaration subscription, Collection<EventSubscriptionDeclaration> eventDefinitions, String eventType) {
     if (subscription.getEventType().equals(eventType)) {
       for (EventSubscriptionDeclaration eventDefinition : eventDefinitions) {
-        if (eventDefinition.getEventType().equals(eventType) && eventDefinition.getEventName().equals(subscription.getEventName())
+        if (eventDefinition.getEventType().equals(eventType) && eventDefinition.getUnresolvedEventName().equals(subscription.getUnresolvedEventName())
             && eventDefinition.isStartEvent() == subscription.isStartEvent()) {
          return true;
         }
@@ -4421,25 +4420,15 @@ public class BpmnParse extends Parse {
 
   protected void ensureNoExpressionInMessageStartEvent(Element element,
                                                        EventSubscriptionDeclaration messageStartEventSubscriptionDeclaration) {
-    String messageStartName = null;
+    boolean eventNameContainsExpression = false;
     if(messageStartEventSubscriptionDeclaration.hasEventName()) {
-      messageStartName = messageStartEventSubscriptionDeclaration.getEventName();
+      eventNameContainsExpression = !messageStartEventSubscriptionDeclaration.isEventNameLiteralText();
     }
-    boolean eventNameContainsExpression = containsJuelEvalExpression(messageStartName);
     if (eventNameContainsExpression) {
+      String messageStartName = messageStartEventSubscriptionDeclaration.getUnresolvedEventName();
       addError("Invalid message name '" + messageStartName + "' for element '" +
           element.getTagName() + "': expressions in the message start event name are not allowed!", element);
     }
   }
 
-  /**
-   * Checks if a string contains an Eval Expression (JSP 2.1) of the JUEL expression language. That means, it is examined
-   * if the string contains '#{' or '${'.
-   */
-  protected boolean containsJuelEvalExpression(String str) {
-    if(str != null) {
-      return str.matches(".*((#\\{)|(\\$\\{)).*");
-    }
-    return false;
-  }
 }

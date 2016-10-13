@@ -212,7 +212,7 @@ public class DefaultCorrelationHandler implements CorrelationHandler {
 
   protected boolean isMessageStartEventWithName(EventSubscriptionDeclaration declaration, String messageName) {
     return EventType.MESSAGE.name().equals(declaration.getEventType()) && declaration.isStartEvent()
-        && messageName.equals(declaration.getEventName());
+        && messageName.equals(declaration.getUnresolvedEventName());
   }
 
 }

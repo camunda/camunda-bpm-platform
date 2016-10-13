@@ -20,7 +20,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.camunda.bpm.engine.delegate.Expression;
-import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.AbstractDefinitionDeployer;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.diagram.ProcessDiagramGenerator;
@@ -35,7 +34,6 @@ import org.camunda.bpm.engine.impl.core.model.Properties;
 import org.camunda.bpm.engine.impl.core.model.PropertyMapKey;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
-import org.camunda.bpm.engine.impl.el.StartProcessVariableScope;
 import org.camunda.bpm.engine.impl.event.EventType;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationImpl;
@@ -317,7 +315,7 @@ public class BpmnDeployer extends AbstractDefinitionDeployer<ProcessDefinitionEn
     String tenantId = processDefinition.getTenantId();
 
     if(isSameMessageEventSubscriptionAlreadyPresent(messageEventDefinition, tenantId)) {
-      throw LOG.messageEventSubscriptionWithSameNameExists(processDefinition.getResourceName(), messageEventDefinition.getEventName());
+      throw LOG.messageEventSubscriptionWithSameNameExists(processDefinition.getResourceName(), messageEventDefinition.getUnresolvedEventName());
     }
 
     EventSubscriptionEntity newSubscription = messageEventDefinition.createSubscriptionForStartEvent(processDefinition);
@@ -328,7 +326,7 @@ public class BpmnDeployer extends AbstractDefinitionDeployer<ProcessDefinitionEn
   protected boolean isSameMessageEventSubscriptionAlreadyPresent(EventSubscriptionDeclaration eventSubscription, String tenantId) {
     // look for subscriptions for the same name in db:
     List<EventSubscriptionEntity> subscriptionsForSameMessageName = getEventSubscriptionManager()
-      .findEventSubscriptionsByNameAndTenantId(EventType.MESSAGE.name(), eventSubscription.getEventName(), tenantId);
+      .findEventSubscriptionsByNameAndTenantId(EventType.MESSAGE.name(), eventSubscription.getUnresolvedEventName(), tenantId);
 
     // also look for subscriptions created in the session:
     List<EventSubscriptionEntity> cachedSubscriptions = getDbEntityManager()
@@ -336,7 +334,7 @@ public class BpmnDeployer extends AbstractDefinitionDeployer<ProcessDefinitionEn
 
     for (EventSubscriptionEntity cachedSubscription : cachedSubscriptions) {
 
-      if(eventSubscription.getEventName().equals(cachedSubscription.getEventName())
+      if(eventSubscription.getUnresolvedEventName().equals(cachedSubscription.getEventName())
         && hasTenantId(cachedSubscription, tenantId)
         && !subscriptionsForSameMessageName.contains(cachedSubscription)) {
 

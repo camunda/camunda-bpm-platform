@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" targetNamespace="Examples"
+             xmlns:tns="Examples">
+
+    <message id="messageId" name="newMessage-${'foo'}" />
+
+    <process id="process" isExecutable="true">
+
+        <startEvent id="theStart" />
+        <sequenceFlow sourceRef="theStart" targetRef="task" />
+        <userTask id="task" name="Task" />
+        <sequenceFlow sourceRef="task" targetRef="theEnd" />
+        <endEvent id="theEnd" />
+
+        <subProcess id="sub1" triggeredByEvent="true">
+            <startEvent id="eventProcessStart" isInterrupting="true">
+                <messageEventDefinition messageRef="messageId" />
+            </startEvent>
+            <sequenceFlow sourceRef="eventProcessStart" targetRef="eventSubProcessTask" />
+            <userTask id="eventSubProcessTask" name="Task" />
+            <sequenceFlow sourceRef="eventSubProcessTask" targetRef="eventSubProcessEnd" />
+            <endEvent id="eventSubProcessEnd" />
+        </subProcess>
+
+    </process>
+
+</definitions>

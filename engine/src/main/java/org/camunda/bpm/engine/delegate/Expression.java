@@ -26,4 +26,6 @@ public interface Expression {
 
   String getExpressionText();
 
+  boolean isLiteralText();
+
 }

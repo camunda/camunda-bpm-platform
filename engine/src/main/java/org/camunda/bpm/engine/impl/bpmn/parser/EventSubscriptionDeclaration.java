@@ -66,12 +66,16 @@ public class EventSubscriptionDeclaration implements Serializable {
   /**
    * Returns the name of the event without evaluating the possible expression that it might contain.
    */
-  public String getEventName() {
+  public String getUnresolvedEventName() {
       return eventName.getExpressionText();
   }
 
   public boolean hasEventName() {
-    return !( eventName == null || "".equalsIgnoreCase(getEventName().trim()) );
+    return !( eventName == null || "".equalsIgnoreCase(getUnresolvedEventName().trim()) );
+  }
+
+  public boolean isEventNameLiteralText() {
+    return eventName.isLiteralText();
   }
 
   public boolean isAsync() {

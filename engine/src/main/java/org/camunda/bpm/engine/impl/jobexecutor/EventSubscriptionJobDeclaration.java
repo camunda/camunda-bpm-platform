@@ -17,7 +17,6 @@ import java.util.List;
 
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
-import org.camunda.bpm.engine.impl.el.StartProcessVariableScope;
 import org.camunda.bpm.engine.impl.jobexecutor.ProcessEventJobHandler.EventSubscriptionJobConfiguration;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -74,7 +73,7 @@ public class EventSubscriptionJobDeclaration extends JobDeclaration<EventSubscri
   }
 
   public String getEventName() {
-    return eventSubscriptionDeclaration.getEventName();
+    return eventSubscriptionDeclaration.getUnresolvedEventName();
   }
 
   public String getActivityId() {

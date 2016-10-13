@@ -48,4 +48,8 @@ public class FixedValue implements Expression {
     return value.toString();
   }
 
+  @Override
+  public boolean isLiteralText() {
+    return true;
+  }
 }
