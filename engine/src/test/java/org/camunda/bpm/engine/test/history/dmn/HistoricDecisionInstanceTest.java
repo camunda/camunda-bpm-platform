@@ -381,7 +381,7 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
   }
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
-  public void testDeleteHistoricDecisionInstanceByInstanceIdWithDeleteHistoryPermissionOnDecisionDefinition() {
+  public void testDeleteHistoricDecisionInstanceByInstanceId() {
 
     // given
     startProcessInstanceAndEvaluateDecision();
