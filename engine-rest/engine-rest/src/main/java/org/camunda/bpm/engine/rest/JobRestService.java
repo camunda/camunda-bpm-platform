@@ -13,9 +13,11 @@
 package org.camunda.bpm.engine.rest;
 
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
+import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
 import org.camunda.bpm.engine.rest.dto.runtime.JobDto;
 import org.camunda.bpm.engine.rest.dto.runtime.JobQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.JobSuspensionStateDto;
+import org.camunda.bpm.engine.rest.dto.runtime.SetJobRetriesDto;
 import org.camunda.bpm.engine.rest.sub.runtime.JobResource;
 
 import javax.ws.rs.*;
@@ -56,6 +58,13 @@ public interface JobRestService {
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   CountResultDto queryJobsCount(JobQueryDto queryDto);
+
+
+  @POST
+  @Path("/retries")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  BatchDto setRetries (SetJobRetriesDto setJobRetriesDto);
 
   @PUT
   @Path("/suspended")

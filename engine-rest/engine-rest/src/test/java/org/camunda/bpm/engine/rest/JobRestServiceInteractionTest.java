@@ -15,35 +15,49 @@ package org.camunda.bpm.engine.rest;
 import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.AuthorizationException;
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NullValueException;
+import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.management.UpdateJobSuspensionStateSelectBuilder;
 import org.camunda.bpm.engine.management.UpdateJobSuspensionStateTenantBuilder;
+import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
+import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceQueryDto;
+import org.camunda.bpm.engine.rest.dto.runtime.JobQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.JobSuspensionStateDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.helper.MockJobBuilder;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
+import org.camunda.bpm.engine.rest.util.JsonPathUtil;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
@@ -55,15 +69,18 @@ import org.mockito.InOrder;
 
 import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.response.Response;
+import org.mockito.Mockito;
 
 public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
 
+  private static final String RETRIES = "retries";
   @ClassRule
   public static TestContainerRule rule = new TestContainerRule();
 
   protected static final String JOB_RESOURCE_URL = TEST_RESOURCE_ROOT_PATH + "/job";
   protected static final String SINGLE_JOB_RESOURCE_URL = JOB_RESOURCE_URL + "/{id}";
   protected static final String JOB_RESOURCE_SET_RETRIES_URL = SINGLE_JOB_RESOURCE_URL + "/retries";
+  protected static final String JOBS_SET_RETRIES_URL = JOB_RESOURCE_URL + "/retries";
   protected static final String JOB_RESOURCE_SET_PRIORITY_URL = SINGLE_JOB_RESOURCE_URL + "/priority";
   protected static final String JOB_RESOURCE_EXECUTE_JOB_URL = SINGLE_JOB_RESOURCE_URL + "/execute";
   protected static final String JOB_RESOURCE_GET_STACKTRACE_URL = SINGLE_JOB_RESOURCE_URL + "/stacktrace";
@@ -1349,6 +1366,110 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
 
     verify(mockManagementService).deleteJob(jobId);
     verifyNoMoreInteractions(mockManagementService);
+  }
+
+  @Test
+  public void testSetRetriesAsync() {
+    List<String> ids = Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
+    Batch batchEntity = MockProvider.createMockBatch();
+    when(mockManagementService.setJobRetriesAsync(
+        anyListOf(String.class),
+        any(JobQuery.class),
+        anyInt())
+    ).thenReturn(batchEntity);
+
+    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    messageBodyJson.put("jobIds", ids);
+    messageBodyJson.put(RETRIES, 5);
+
+    Response response = given()
+        .contentType(ContentType.JSON).body(messageBodyJson)
+        .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+        .when().post(JOBS_SET_RETRIES_URL);
+
+    verifyBatchJson(response.asString());
+
+    verify(mockManagementService, times(1)).setJobRetriesAsync(
+        eq(ids), eq((JobQuery) null), eq(5));
+  }
+
+  @Test
+  public void testSetRetriesAsyncWithQuery() {
+    Batch batchEntity = MockProvider.createMockBatch();
+    when(mockManagementService.setJobRetriesAsync(
+        anyListOf(String.class),
+        any(JobQuery.class),
+        anyInt())
+    ).thenReturn(batchEntity);
+
+    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    messageBodyJson.put(RETRIES, 5);
+    HistoricProcessInstanceQueryDto query = new HistoricProcessInstanceQueryDto();
+    messageBodyJson.put("jobQuery", query);
+
+    Response response = given()
+        .contentType(ContentType.JSON).body(messageBodyJson)
+        .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+        .when().post(JOBS_SET_RETRIES_URL);
+
+    verifyBatchJson(response.asString());
+
+    verify(mockManagementService, times(1)).setJobRetriesAsync(
+        eq((List<String>) null), any(JobQuery.class), Mockito.eq(5));
+  }
+
+
+  @Test
+  public void testSetRetriesWithBadRequestQuery() {
+    doThrow(new BadUserRequestException("job ids are empty"))
+        .when(mockManagementService).setJobRetriesAsync(eq((List<String>) null), eq((JobQuery) null), anyInt());
+
+    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    messageBodyJson.put(RETRIES, 5);
+
+    given()
+        .contentType(ContentType.JSON).body(messageBodyJson)
+        .then().expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode())
+        .when().post(JOBS_SET_RETRIES_URL);
+  }
+
+  @Test
+  public void testSetRetriesWithoutBody() {
+    given()
+        .contentType(ContentType.JSON)
+        .then().expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode())
+        .when().post(JOBS_SET_RETRIES_URL);
+  }
+
+  @Test
+  public void testSetRetriesWithoutRetries() {
+    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    messageBodyJson.put("jobIds", null);
+
+    given()
+        .contentType(ContentType.JSON)
+        .body(messageBodyJson)
+        .then().expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode())
+        .when().post(JOBS_SET_RETRIES_URL);
+  }
+
+  protected void verifyBatchJson(String batchJson) {
+    BatchDto batch = JsonPathUtil.from(batchJson).getObject("", BatchDto.class);
+    assertNotNull("The returned batch should not be null.", batch);
+    assertEquals(MockProvider.EXAMPLE_BATCH_ID, batch.getId());
+    assertEquals(MockProvider.EXAMPLE_BATCH_TYPE, batch.getType());
+    assertEquals(MockProvider.EXAMPLE_BATCH_TOTAL_JOBS, batch.getTotalJobs());
+    assertEquals(MockProvider.EXAMPLE_BATCH_JOBS_PER_SEED, batch.getBatchJobsPerSeed());
+    assertEquals(MockProvider.EXAMPLE_INVOCATIONS_PER_BATCH_JOB, batch.getInvocationsPerBatchJob());
+    assertEquals(MockProvider.EXAMPLE_SEED_JOB_DEFINITION_ID, batch.getSeedJobDefinitionId());
+    assertEquals(MockProvider.EXAMPLE_MONITOR_JOB_DEFINITION_ID, batch.getMonitorJobDefinitionId());
+    assertEquals(MockProvider.EXAMPLE_BATCH_JOB_DEFINITION_ID, batch.getBatchJobDefinitionId());
+    assertEquals(MockProvider.EXAMPLE_TENANT_ID, batch.getTenantId());
   }
 
 }

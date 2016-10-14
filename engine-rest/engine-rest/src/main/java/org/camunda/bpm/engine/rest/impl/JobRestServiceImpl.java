@@ -13,12 +13,18 @@
 package org.camunda.bpm.engine.rest.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.batch.Batch;
+import org.camunda.bpm.engine.exception.NullValueException;
+import org.camunda.bpm.engine.impl.util.EnsureUtil;
 import org.camunda.bpm.engine.rest.JobRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
+import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
 import org.camunda.bpm.engine.rest.dto.runtime.JobDto;
 import org.camunda.bpm.engine.rest.dto.runtime.JobQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.JobSuspensionStateDto;
+import org.camunda.bpm.engine.rest.dto.runtime.SetJobRetriesDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.sub.runtime.JobResource;
 import org.camunda.bpm.engine.rest.sub.runtime.impl.JobResourceImpl;
@@ -44,14 +50,14 @@ public class JobRestServiceImpl extends AbstractRestProcessEngineAware
 
   @Override
   public List<JobDto> getJobs(UriInfo uriInfo, Integer firstResult,
-      Integer maxResults) {
+                              Integer maxResults) {
     JobQueryDto queryDto = new JobQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
     return queryJobs(queryDto, firstResult, maxResults);
   }
 
   @Override
   public List<JobDto> queryJobs(JobQueryDto queryDto, Integer firstResult,
-      Integer maxResults) {
+                                Integer maxResults) {
     ProcessEngine engine = getProcessEngine();
     queryDto.setObjectMapper(getObjectMapper());
     JobQuery query = queryDto.toQuery(engine);
@@ -90,8 +96,33 @@ public class JobRestServiceImpl extends AbstractRestProcessEngineAware
     return result;
   }
 
+  @Override
+  public BatchDto setRetries(SetJobRetriesDto setJobRetriesDto) {
+    try {
+      EnsureUtil.ensureNotNull("setJobRetriesDto", setJobRetriesDto);
+      EnsureUtil.ensureNotNull("retries", setJobRetriesDto.getRetries());
+    } catch (NullValueException e) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());
+    }
+    JobQuery jobQuery = null;
+    if (setJobRetriesDto.getJobQuery() != null) {
+      jobQuery = setJobRetriesDto.getJobQuery().toQuery(getProcessEngine());
+    }
+
+    try {
+      Batch batch = getProcessEngine().getManagementService().setJobRetriesAsync(
+          setJobRetriesDto.getJobIds(),
+          jobQuery,
+          setJobRetriesDto.getRetries().intValue()
+      );
+      return BatchDto.fromBatch(batch);
+    } catch (BadUserRequestException e) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());
+    }
+  }
+
   private List<Job> executePaginatedQuery(JobQuery query,
-      Integer firstResult, Integer maxResults) {
+                                          Integer firstResult, Integer maxResults) {
     if (firstResult == null) {
       firstResult = 0;
     }
