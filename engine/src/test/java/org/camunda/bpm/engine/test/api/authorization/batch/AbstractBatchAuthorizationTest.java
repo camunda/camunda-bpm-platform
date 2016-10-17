@@ -88,6 +88,11 @@ public abstract class AbstractBatchAuthorizationTest {
       engineRule.getHistoryService().deleteHistoricBatch(
           historicBatch.getId());
     }
+    testCleanUp();
+  }
+
+  protected void testCleanUp() {
+
   }
 
   protected void executeSeedAndBatchJobs() {

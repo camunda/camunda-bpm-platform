@@ -19,6 +19,7 @@ import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario;
 import org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenarioWithCount;
 import org.camunda.bpm.engine.test.api.authorization.util.AuthorizationTestRule;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -28,6 +29,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -74,6 +76,11 @@ public class SetJobRetriesBatchAuthorizationTest extends AbstractBatchAuthorizat
         .createProcessDefinitionQuery().deploymentId(deploy.getId()).singleResult();
     processInstance = engineRule.getRuntimeService().startProcessInstanceById(sourceDefinition.getId());
     processInstance2 = engineRule.getRuntimeService().startProcessInstanceById(sourceDefinition.getId());
+  }
+
+  public void testCleanUp() {
+    engineRule.getRuntimeService().deleteProcessInstances(
+        Arrays.asList(new String [] {processInstance.getId(),processInstance2.getId()}), "test", true, true);
   }
 
   @Parameterized.Parameters(name = "Scenario {index}")
