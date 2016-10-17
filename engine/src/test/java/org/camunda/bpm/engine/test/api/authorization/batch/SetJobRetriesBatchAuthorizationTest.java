@@ -16,10 +16,10 @@ import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario;
 import org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenarioWithCount;
 import org.camunda.bpm.engine.test.api.authorization.util.AuthorizationTestRule;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -82,7 +82,7 @@ public class SetJobRetriesBatchAuthorizationTest extends AbstractBatchAuthorizat
   @Override
   public void testCleanUp() {
     engineRule.getRuntimeService().deleteProcessInstances(
-        Arrays.asList(new String [] {processInstance.getId(),processInstance2.getId()}), "test", true, true);
+        Arrays.asList(new String[]{processInstance.getId(), processInstance2.getId()}), "test", true, true);
   }
 
   @Parameterized.Parameters(name = "Scenario {index}")
@@ -116,9 +116,9 @@ public class SetJobRetriesBatchAuthorizationTest extends AbstractBatchAuthorizat
   }
 
   @Test
-  public void testWithTwoInvocationsProcessInstancesList() {
+  public void testWithTwoInvocationsJobsList() {
     engineRule.getProcessEngineConfiguration().setInvocationsPerBatchJob(2);
-    setupAndExecuteHistoricProcessInstancesListTest();
+    setupAndExecuteJobsListTest();
 
     // then
     assertScenario();
@@ -127,13 +127,49 @@ public class SetJobRetriesBatchAuthorizationTest extends AbstractBatchAuthorizat
   }
 
   @Test
-  public void testProcessInstancesList() {
-    setupAndExecuteHistoricProcessInstancesListTest();
+  public void testJobsList() {
+    setupAndExecuteJobsListTest();
     // then
     assertScenario();
   }
 
-  protected void setupAndExecuteHistoricProcessInstancesListTest() {
+  @Test
+  public void testWithTwoInvocationsProcessList() {
+    engineRule.getProcessEngineConfiguration().setInvocationsPerBatchJob(2);
+    setupAndExecuteProcessListTest();
+
+    // then
+    assertScenario();
+
+    assertRetries(getAllJobIds(), Long.valueOf(getScenario().getCount()).intValue());
+  }
+
+  private void setupAndExecuteProcessListTest() {
+    //given
+    List<String> processInstances = Arrays.asList(new String[]{processInstance.getId(), processInstance2.getId()});
+    authRule
+        .init(scenario)
+        .withUser("userId")
+        .bindResource("Process", sourceDefinition.getKey())
+        .bindResource("processInstance1", processInstance.getId())
+        .bindResource("processInstance2", processInstance2.getId())
+        .start();
+
+    // when
+    batch = managementService.setJobRetriesAsync(
+        processInstances, (ProcessInstanceQuery) null, RETRIES);
+
+    executeSeedAndBatchJobs();
+  }
+
+  @Test
+  public void testProcessList() {
+    setupAndExecuteProcessListTest();
+    // then
+    assertScenario();
+  }
+
+  protected void setupAndExecuteJobsListTest() {
     //given
     List<String> allJobIds = getAllJobIds();
     authRule

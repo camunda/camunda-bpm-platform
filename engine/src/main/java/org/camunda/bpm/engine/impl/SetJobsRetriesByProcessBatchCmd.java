@@ -27,7 +27,7 @@ public class SetJobsRetriesByProcessBatchCmd extends AbstractSetJobsRetriesBatch
 
     if (this.processInstanceIds != null) {
       for (String process : this.processInstanceIds) {
-        for (Job job : commandContext.getJobManager().findJobsByExecutionId(process)) {
+        for (Job job : commandContext.getJobManager().findJobsByProcessInstanceId(process)) {
           collectedJobIds.add(job.getId());
         }
       }
@@ -35,7 +35,7 @@ public class SetJobsRetriesByProcessBatchCmd extends AbstractSetJobsRetriesBatch
 
     if (query != null) {
       for (ProcessInstance process : query.list()) {
-        for (Job job : commandContext.getJobManager().findJobsByExecutionId(process.getId())) {
+        for (Job job : commandContext.getJobManager().findJobsByProcessInstanceId(process.getId())) {
           collectedJobIds.add(job.getId());
         }
       }

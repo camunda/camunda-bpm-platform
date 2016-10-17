@@ -12,9 +12,6 @@
  */
 package org.camunda.bpm.engine.test.api.authorization.batch;
 
-import java.util.ArrayList;
-import java.util.Collections;
-
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
@@ -28,6 +25,7 @@ import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario;
@@ -43,7 +41,9 @@ import org.junit.rules.RuleChain;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario.scenario;
@@ -140,9 +140,9 @@ public class BatchCreationAuthorizationTest {
   }
 
   @Test
-  public void testBatchSetJobRetries() {
+  public void testBatchSetJobRetriesByJobs() {
     //given
-    List<String> jobIds = getSetupFailedJobs();
+    List<String> jobIds = setupFailedJobs();
     authRule
         .init(scenario)
         .withUser("userId")
@@ -151,14 +151,33 @@ public class BatchCreationAuthorizationTest {
 
     // when
 
-    managementService.setJobRetriesAsync(jobIds,5);
+    managementService.setJobRetriesAsync(jobIds, 5);
 
     // then
     authRule.assertScenario(scenario);
   }
 
-  protected List<String> getSetupFailedJobs() {
-    List <String> jobIds = new ArrayList<String>();
+  @Test
+  public void testBatchSetJobRetriesByProcesses() {
+    //given
+    setupFailedJobs();
+    List<String> processInstanceIds = Collections.singletonList(processInstance.getId());
+    authRule
+        .init(scenario)
+        .withUser("userId")
+        .bindResource("batchId", "*")
+        .start();
+
+    // when
+
+    managementService.setJobRetriesAsync(processInstanceIds, (ProcessInstanceQuery) null, 5);
+
+    // then
+    authRule.assertScenario(scenario);
+  }
+
+  protected List<String> setupFailedJobs() {
+    List<String> jobIds = new ArrayList<String>();
 
     Deployment deploy = testHelper.deploy(JOB_EXCEPTION_DEFINITION_XML);
     ProcessDefinition sourceDefinition = engineRule.getRepositoryService()
