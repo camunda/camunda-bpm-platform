@@ -53,7 +53,7 @@ public class SetJobRetriesBatchAuthorizationTest extends AbstractBatchAuthorizat
 
   protected List<String> getAllJobIds() {
     ArrayList<String> result = new ArrayList<String>();
-    for (Job job : managementService.createJobQuery().list()) {
+    for (Job job : managementService.createJobQuery().processDefinitionId(sourceDefinition.getId()).list()) {
       if (job.getProcessInstanceId() != null) {
         result.add(job.getId());
       }
