@@ -69,6 +69,7 @@ public class SetJobRetriesBatchAuthorizationTest extends AbstractBatchAuthorizat
   @Parameterized.Parameter
   public AuthorizationScenarioWithCount scenario;
 
+  @Override
   @Before
   public void deployProcesses() {
     Deployment deploy = testHelper.deploy(DEFINITION_XML);
@@ -78,6 +79,7 @@ public class SetJobRetriesBatchAuthorizationTest extends AbstractBatchAuthorizat
     processInstance2 = engineRule.getRuntimeService().startProcessInstanceById(sourceDefinition.getId());
   }
 
+  @Override
   public void testCleanUp() {
     engineRule.getRuntimeService().deleteProcessInstances(
         Arrays.asList(new String [] {processInstance.getId(),processInstance2.getId()}), "test", true, true);
