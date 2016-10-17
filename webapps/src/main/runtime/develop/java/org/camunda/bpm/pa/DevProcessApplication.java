@@ -29,7 +29,6 @@ import org.camunda.bpm.engine.rest.dto.identity.UserDto;
 import org.camunda.bpm.engine.rest.dto.identity.UserProfileDto;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
-import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.pa.demo.InvoiceDemoDataGenerator;
@@ -237,22 +236,6 @@ public class DevProcessApplication extends ServletProcessApplication {
     startInvoiceInstancesForTenant(engine, "tenant1");
     startInvoiceInstancesForTenant(engine, "tenant1");
     startInvoiceInstancesForTenant(engine, "tenant2");
-
-    // start drd instances
-    runtimeService.startProcessInstanceByKey("desiredDish",
-            Variables.createVariables()
-                .putValue("temperature", 8)
-                .putValue("dayType", "Weekday"));
-
-    runtimeService.startProcessInstanceByKey("desiredDish",
-            Variables.createVariables()
-                .putValue("temperature", 32)
-                .putValue("dayType", "Weekday"));
-
-    runtimeService.startProcessInstanceByKey("desiredDish",
-            Variables.createVariables()
-                .putValue("temperature", 18)
-                .putValue("dayType", "Weekend"));
 
     new Thread(){
       @Override
