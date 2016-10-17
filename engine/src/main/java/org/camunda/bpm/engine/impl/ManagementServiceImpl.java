@@ -64,6 +64,7 @@ import org.camunda.bpm.engine.management.TablePageQuery;
 import org.camunda.bpm.engine.management.UpdateJobDefinitionSuspensionStateSelectBuilder;
 import org.camunda.bpm.engine.management.UpdateJobSuspensionStateSelectBuilder;
 import org.camunda.bpm.engine.runtime.JobQuery;
+import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 
 import java.sql.Connection;
 import java.util.Date;
@@ -78,6 +79,7 @@ import java.util.Set;
  * @author Joram Barrez
  * @author Falko Menge
  * @author Saeid Mizaei
+ * @author Askar AKhmerov
  */
 public class ManagementServiceImpl extends ServiceImpl implements ManagementService {
 
@@ -127,7 +129,7 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
 
   @Override
   public Batch setJobRetriesAsync(List<String> jobIds, int retries) {
-    return this.setJobRetriesAsync(jobIds, null, retries);
+    return this.setJobRetriesAsync(jobIds, (JobQuery) null, retries);
   }
 
   @Override
@@ -138,6 +140,11 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
   @Override
   public Batch setJobRetriesAsync(List<String> jobIds, JobQuery jobQuery, int retries) {
     return commandExecutor.execute(new SetJobsRetriesBatchCmd(jobIds, jobQuery, retries));
+  }
+
+  @Override
+  public Batch setJobRetriesAsync(List<String> processInstanceIds, ProcessInstanceQuery query, int retries) {
+    return commandExecutor.execute(new SetJobsRetriesByProcessBatchCmd(processInstanceIds, query, retries));
   }
 
   public void setJobRetriesByJobDefinitionId(String jobDefinitionId, int retries) {
