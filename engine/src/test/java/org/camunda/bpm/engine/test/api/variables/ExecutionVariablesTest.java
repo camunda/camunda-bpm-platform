@@ -203,7 +203,26 @@ public class ExecutionVariablesTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
-  public void FAILING_testForkWithThreeBranchesAndJoinOfTwoBranches() {
+  public void testForkWithThreeBranchesAndJoinOfTwoBranchesParallelGateway() {
+    // given
+    runtimeService.startProcessInstanceByKey("process");
+
+    Execution task2Execution = runtimeService
+        .createExecutionQuery()
+        .activityId("task2")
+        .singleResult();
+
+    // when
+    runtimeService.setVariableLocal(task2Execution.getId(), "foo", "bar");
+    taskService.complete(taskService.createTaskQuery().taskDefinitionKey("task1").singleResult().getId());
+    taskService.complete(taskService.createTaskQuery().taskDefinitionKey("task2").singleResult().getId());
+
+    // then
+    assertEquals(0, runtimeService.createVariableInstanceQuery().count());
+  }
+
+  @Deployment
+  public void testForkWithThreeBranchesAndJoinOfTwoBranchesInclusiveGateway() {
     // given
     runtimeService.startProcessInstanceByKey("process");
 

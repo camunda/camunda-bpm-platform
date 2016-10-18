@@ -12,49 +12,26 @@
  */
 package org.camunda.bpm.engine.impl.pvm.runtime;
 
-import static org.camunda.bpm.engine.impl.bpmn.helper.CompensationUtil.SIGNAL_COMPENSATION_DONE;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
-import org.camunda.bpm.engine.impl.pvm.PvmActivity;
-import org.camunda.bpm.engine.impl.pvm.PvmException;
-import org.camunda.bpm.engine.impl.pvm.PvmExecution;
-import org.camunda.bpm.engine.impl.pvm.PvmLogger;
-import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
-import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
-import org.camunda.bpm.engine.impl.pvm.PvmScope;
-import org.camunda.bpm.engine.impl.pvm.PvmTransition;
+import org.camunda.bpm.engine.impl.pvm.*;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.CompositeActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.ModificationObserverBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.SignallableActivityBehavior;
-import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
-import org.camunda.bpm.engine.impl.pvm.process.ActivityStartBehavior;
-import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
-import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
-import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
+import org.camunda.bpm.engine.impl.pvm.process.*;
 import org.camunda.bpm.engine.impl.pvm.runtime.operation.FoxAtomicOperationDeleteCascadeFireActivityEnd;
 import org.camunda.bpm.engine.impl.pvm.runtime.operation.PvmAtomicOperation;
-import org.camunda.bpm.engine.impl.tree.ExecutionWalker;
-import org.camunda.bpm.engine.impl.tree.FlowScopeWalker;
-import org.camunda.bpm.engine.impl.tree.LeafActivityInstanceExecutionCollector;
-import org.camunda.bpm.engine.impl.tree.ReferenceWalker;
-import org.camunda.bpm.engine.impl.tree.ScopeCollector;
-import org.camunda.bpm.engine.impl.tree.ScopeExecutionCollector;
-import org.camunda.bpm.engine.impl.tree.TreeVisitor;
+import org.camunda.bpm.engine.impl.tree.*;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
+
+import java.util.*;
+
+import static org.camunda.bpm.engine.impl.bpmn.helper.CompensationUtil.SIGNAL_COMPENSATION_DONE;
 
 /**
  * @author Daniel Meyer
@@ -951,6 +928,8 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
       recyclableExecutions = new ArrayList<ActivityExecution>(_recyclableExecutions);
     }
 
+    clearLocalExecutionVariablesForJoiningParallelGateway(recyclableExecutions);
+
     // mark all recyclable executions as ended
     // if the list of recyclable executions also
     // contains 'this' execution, then 'this' execution
@@ -985,12 +964,26 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
     if (_transitions.isEmpty()) {
       propagatingExecution.end(!propagatingExecution.isConcurrent());
-    }
-    else {
+    } else {
       propagatingExecution.setTransitionsToTake(_transitions);
       propagatingExecution.performOperation(PvmAtomicOperation.TRANSITION_NOTIFY_LISTENER_END);
     }
   }
+
+  // see CAM-5154
+  protected void clearLocalExecutionVariablesForJoiningParallelGateway(List<? extends ActivityExecution> recyclableExecutions) {
+    if(isJoiningExecutions(recyclableExecutions)){
+      clearAllLocalVariablesInternallyAndDeletePersistenceListener();
+    }
+  }
+
+  protected boolean isJoiningExecutions(List<? extends ActivityExecution> recyclableExecutions) {
+    return recyclableExecutions.size() > 1;
+  }
+
+  // Unlike the method removeVariablesLocal() we do not want to remove all listeners, but
+  // just the persistence listener.
+  protected abstract void clearAllLocalVariablesInternallyAndDeletePersistenceListener();
 
   public boolean isActive(String activityId) {
     return findExecution(activityId)!=null;

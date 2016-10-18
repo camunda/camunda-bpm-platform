@@ -13,14 +13,6 @@
 
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
@@ -39,11 +31,7 @@ import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.core.operation.CoreAtomicOperation;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableInstance;
 import org.camunda.bpm.engine.impl.core.variable.event.VariableEvent;
-import org.camunda.bpm.engine.impl.core.variable.scope.VariableCollectionProvider;
-import org.camunda.bpm.engine.impl.core.variable.scope.VariableInstanceFactory;
-import org.camunda.bpm.engine.impl.core.variable.scope.VariableInstanceLifecycleListener;
-import org.camunda.bpm.engine.impl.core.variable.scope.VariableListenerInvocationListener;
-import org.camunda.bpm.engine.impl.core.variable.scope.VariableStore;
+import org.camunda.bpm.engine.impl.core.variable.scope.*;
 import org.camunda.bpm.engine.impl.core.variable.scope.VariableStore.VariablesProvider;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
@@ -87,6 +75,8 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.FlowElement;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.ModelElementType;
+
+import java.util.*;
 
 /**
  * @author Tom Baeyens
@@ -525,13 +515,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     }
 
     // delete all the variable instances
-    for (VariableInstanceEntity variableInstance : variableStore.getVariables()) {
-      invokeVariableLifecycleListenersDelete(
-          variableInstance,
-          this,
-          Collections.singletonList(getVariablePersistenceListener()));
-      variableStore.removeVariable(variableInstance.getName());
-    }
+    clearAllLocalVariablesInternallyAndDeletePersistenceListener();
 
     // delete all the tasks
     removeTasks(null);
@@ -544,6 +528,16 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
 
     // remove all incidents
     removeIncidents();
+  }
+
+  public void clearAllLocalVariablesInternallyAndDeletePersistenceListener() {
+    for (VariableInstanceEntity variableInstance : variableStore.getVariables()) {
+      invokeVariableLifecycleListenersDelete(
+          variableInstance,
+          this,
+          Collections.singletonList(getVariablePersistenceListener()));
+      removeVariableInternal(variableInstance);
+    }
   }
 
   @Override

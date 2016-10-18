@@ -337,4 +337,9 @@ public class ExecutionImpl extends PvmExecutionImpl implements
   public void fireHistoricProcessStartEvent() {
     // do nothing
   }
+
+  protected void clearAllLocalVariablesInternallyAndDeletePersistenceListener(){
+    // do nothing
+  }
+
 }
