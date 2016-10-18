@@ -17,6 +17,7 @@ import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceSuspensionStateDto;
+import org.camunda.bpm.engine.rest.dto.runtime.SetJobRetriesByProcessDto;
 import org.camunda.bpm.engine.rest.dto.runtime.batch.DeleteProcessInstancesDto;
 import org.camunda.bpm.engine.rest.sub.runtime.ProcessInstanceResource;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
@@ -88,5 +89,11 @@ public interface ProcessInstanceRestService {
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   BatchDto deleteAsync(DeleteProcessInstancesDto dto);
+
+  @POST
+  @Path("/job-retries")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  BatchDto setRetriesByProcess (SetJobRetriesByProcessDto setJobRetriesDto);
 
 }
