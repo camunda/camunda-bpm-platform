@@ -338,7 +338,7 @@ public class ExecutionImpl extends PvmExecutionImpl implements
     // do nothing
   }
 
-  protected void clearAllLocalVariablesInternallyAndDeletePersistenceListener(){
+  protected void removeVariablesLocalInternal(){
     // do nothing
   }
 

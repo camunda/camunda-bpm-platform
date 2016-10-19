@@ -515,7 +515,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     }
 
     // delete all the variable instances
-    clearAllLocalVariablesInternallyAndDeletePersistenceListener();
+    removeVariablesLocalInternal();
 
     // delete all the tasks
     removeTasks(null);
@@ -530,7 +530,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     removeIncidents();
   }
 
-  public void clearAllLocalVariablesInternallyAndDeletePersistenceListener() {
+  public void removeVariablesLocalInternal() {
     for (VariableInstanceEntity variableInstance : variableStore.getVariables()) {
       invokeVariableLifecycleListenersDelete(
           variableInstance,

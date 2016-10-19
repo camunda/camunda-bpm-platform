@@ -928,7 +928,16 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
       recyclableExecutions = new ArrayList<ActivityExecution>(_recyclableExecutions);
     }
 
-    clearLocalExecutionVariablesForJoiningParallelGateway(recyclableExecutions);
+    // if recyclable executions size is greater
+    // than 1, then the executions are joined and
+    // the activity is left with 'this' execution,
+    // if it is not not the last concurrent execution.
+    // therefore it is necessary to remove the local
+    // variables (event if it is the last concurrent
+    // execution).
+    if (recyclableExecutions.size() > 1) {
+      removeVariablesLocalInternal();
+    }
 
     // mark all recyclable executions as ended
     // if the list of recyclable executions also
@@ -970,20 +979,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     }
   }
 
-  // see CAM-5154
-  protected void clearLocalExecutionVariablesForJoiningParallelGateway(List<? extends ActivityExecution> recyclableExecutions) {
-    if(isJoiningExecutions(recyclableExecutions)){
-      clearAllLocalVariablesInternallyAndDeletePersistenceListener();
-    }
-  }
-
-  protected boolean isJoiningExecutions(List<? extends ActivityExecution> recyclableExecutions) {
-    return recyclableExecutions.size() > 1;
-  }
-
-  // Unlike the method removeVariablesLocal() we do not want to remove all listeners, but
-  // just the persistence listener.
-  protected abstract void clearAllLocalVariablesInternallyAndDeletePersistenceListener();
+  protected abstract void removeVariablesLocalInternal();
 
   public boolean isActive(String activityId) {
     return findExecution(activityId)!=null;
