@@ -13,11 +13,6 @@
 
 package org.camunda.bpm.engine.impl;
 
-import java.io.InputStream;
-import java.nio.charset.Charset;
-import java.util.Date;
-import java.util.List;
-
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.exception.DeploymentResourceNotFoundException;
@@ -28,58 +23,29 @@ import org.camunda.bpm.engine.exception.cmmn.CaseDefinitionNotFoundException;
 import org.camunda.bpm.engine.exception.cmmn.CmmnModelInstanceNotFoundException;
 import org.camunda.bpm.engine.exception.dmn.DecisionDefinitionNotFoundException;
 import org.camunda.bpm.engine.exception.dmn.DmnModelInstanceNotFoundException;
-import org.camunda.bpm.engine.impl.cmd.AddIdentityLinkForProcessDefinitionCmd;
-import org.camunda.bpm.engine.impl.cmd.DeleteDeploymentCmd;
-import org.camunda.bpm.engine.impl.cmd.DeleteIdentityLinkForProcessDefinitionCmd;
-import org.camunda.bpm.engine.impl.cmd.DeleteProcessDefinitionCmd;
-import org.camunda.bpm.engine.impl.cmd.DeployCmd;
-import org.camunda.bpm.engine.impl.cmd.GetDeployedProcessDefinitionCmd;
-import org.camunda.bpm.engine.impl.cmd.GetDeploymentBpmnModelInstanceCmd;
-import org.camunda.bpm.engine.impl.cmd.GetDeploymentProcessDiagramCmd;
-import org.camunda.bpm.engine.impl.cmd.GetDeploymentProcessDiagramLayoutCmd;
-import org.camunda.bpm.engine.impl.cmd.GetDeploymentProcessModelCmd;
-import org.camunda.bpm.engine.impl.cmd.GetDeploymentResourceCmd;
-import org.camunda.bpm.engine.impl.cmd.GetDeploymentResourceForIdCmd;
-import org.camunda.bpm.engine.impl.cmd.GetDeploymentResourceNamesCmd;
-import org.camunda.bpm.engine.impl.cmd.GetDeploymentResourcesCmd;
-import org.camunda.bpm.engine.impl.cmd.GetIdentityLinksForProcessDefinitionCmd;
+import org.camunda.bpm.engine.impl.cmd.*;
 import org.camunda.bpm.engine.impl.cmmn.cmd.GetDeploymentCaseDefinitionCmd;
 import org.camunda.bpm.engine.impl.cmmn.cmd.GetDeploymentCaseDiagramCmd;
 import org.camunda.bpm.engine.impl.cmmn.cmd.GetDeploymentCaseModelCmd;
 import org.camunda.bpm.engine.impl.cmmn.cmd.GetDeploymentCmmnModelInstanceCmd;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionQueryImpl;
-import org.camunda.bpm.engine.impl.dmn.cmd.GetDeploymentDecisionDefinitionCmd;
-import org.camunda.bpm.engine.impl.dmn.cmd.GetDeploymentDecisionDiagramCmd;
-import org.camunda.bpm.engine.impl.dmn.cmd.GetDeploymentDecisionModelCmd;
-import org.camunda.bpm.engine.impl.dmn.cmd.GetDeploymentDecisionRequirementsDefinitionCmd;
-import org.camunda.bpm.engine.impl.dmn.cmd.GetDeploymentDecisionRequirementsDiagramCmd;
-import org.camunda.bpm.engine.impl.dmn.cmd.GetDeploymentDecisionRequirementsModelCmd;
-import org.camunda.bpm.engine.impl.dmn.cmd.GetDeploymentDmnModelInstanceCmd;
+import org.camunda.bpm.engine.impl.dmn.cmd.*;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionQueryImpl;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionQueryImpl;
 import org.camunda.bpm.engine.impl.pvm.ReadOnlyProcessDefinition;
 import org.camunda.bpm.engine.impl.repository.DeploymentBuilderImpl;
 import org.camunda.bpm.engine.impl.repository.ProcessApplicationDeploymentBuilderImpl;
 import org.camunda.bpm.engine.impl.repository.UpdateProcessDefinitionSuspensionStateBuilderImpl;
-import org.camunda.bpm.engine.repository.CaseDefinition;
-import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
-import org.camunda.bpm.engine.repository.DecisionDefinition;
-import org.camunda.bpm.engine.repository.DecisionDefinitionQuery;
-import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
-import org.camunda.bpm.engine.repository.DecisionRequirementsDefinitionQuery;
-import org.camunda.bpm.engine.repository.Deployment;
-import org.camunda.bpm.engine.repository.DeploymentBuilder;
-import org.camunda.bpm.engine.repository.DeploymentQuery;
-import org.camunda.bpm.engine.repository.DiagramLayout;
-import org.camunda.bpm.engine.repository.ProcessApplicationDeploymentBuilder;
-import org.camunda.bpm.engine.repository.ProcessDefinition;
-import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
-import org.camunda.bpm.engine.repository.Resource;
-import org.camunda.bpm.engine.repository.UpdateProcessDefinitionSuspensionStateSelectBuilder;
+import org.camunda.bpm.engine.repository.*;
 import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.cmmn.CmmnModelInstance;
 import org.camunda.bpm.model.dmn.DmnModelInstance;
+
+import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.util.Date;
+import java.util.List;
 
 /**
  * @author Tom Baeyens
@@ -251,16 +217,8 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
     return commandExecutor.execute(new GetDeploymentProcessModelCmd(processDefinitionId));
   }
 
-  public InputStream getProcessDiagram(String processDefinitionId) {
-    return commandExecutor.execute(new GetDeploymentProcessDiagramCmd(processDefinitionId));
-  }
-
   public InputStream getCaseDiagram(String caseDefinitionId) {
     return commandExecutor.execute(new GetDeploymentCaseDiagramCmd(caseDefinitionId));
-  }
-
-  public DiagramLayout getProcessDiagramLayout(String processDefinitionId) {
-    return commandExecutor.execute(new GetDeploymentProcessDiagramLayoutCmd(processDefinitionId));
   }
 
   public BpmnModelInstance getBpmnModelInstance(String processDefinitionId) {

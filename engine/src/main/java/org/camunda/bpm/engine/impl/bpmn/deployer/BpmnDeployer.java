@@ -12,17 +12,9 @@
  */
 package org.camunda.bpm.engine.impl.bpmn.deployer;
 
-import java.io.ByteArrayInputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.impl.AbstractDefinitionDeployer;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
-import org.camunda.bpm.engine.impl.bpmn.diagram.ProcessDiagramGenerator;
 import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseLogger;
@@ -40,22 +32,14 @@ import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationImpl;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.camunda.bpm.engine.impl.persistence.deploy.Deployer;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
-import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionManager;
-import org.camunda.bpm.engine.impl.persistence.entity.IdentityLinkEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionManager;
-import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.JobManager;
-import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionManager;
-import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.*;
 import org.camunda.bpm.engine.impl.pvm.runtime.LegacyBehavior;
-import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.task.IdentityLinkType;
+
+import java.io.ByteArrayInputStream;
+import java.util.*;
 
 /**
  * {@link Deployer} responsible to parse BPMN 2.0 XML files and create the proper
@@ -128,28 +112,6 @@ public class BpmnDeployer extends AbstractDefinitionDeployer<ProcessDefinitionEn
   @Override
   protected void addDefinitionToDeploymentCache(DeploymentCache deploymentCache, ProcessDefinitionEntity definition) {
     deploymentCache.addProcessDefinition(definition);
-  }
-
-
-  @Override
-  protected String generateDiagramResourceForDefinition(DeploymentEntity deployment, String resourceName, ProcessDefinitionEntity definition, Map<String, ResourceEntity> resources) {
-    String diagramResourceName = null;
-
-    // Only generate the resource when deployment is new to prevent modification of deployment resources
-    // after the process-definition is actually deployed. Also to prevent resource-generation failure every
-    // time the process definition is added to the deployment-cache when diagram-generation has failed the first time.
-    if(deployment.isNew() && getProcessEngineConfiguration().isCreateDiagramOnDeploy() && definition.isGraphicalNotationDefined()) {
-      try {
-        byte[] diagramBytes = IoUtil.readInputStream(ProcessDiagramGenerator.generatePngDiagram(definition), null);
-        diagramResourceName = getDefinitionDiagramResourceName(resourceName, definition, "png");
-        createResource(diagramResourceName, diagramBytes, deployment);
-      }
-      catch (Throwable t) { // if anything goes wrong, we don't store the image (the process will still be executable).
-        LOG.exceptionWhileGeneratingProcessDiagram(t);
-      }
-    }
-
-    return diagramResourceName;
   }
 
   @Override
