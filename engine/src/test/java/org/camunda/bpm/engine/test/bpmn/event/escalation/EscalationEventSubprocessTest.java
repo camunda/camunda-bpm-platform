@@ -377,4 +377,66 @@ public class EscalationEventSubprocessTest extends PluggableProcessEngineTestCas
     assertEquals("escalationCode", runtimeService.getVariable(task.getExecutionId(), "escalationCodeVar"));
   }
 
+  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventSubprocessTest.testNonInterruptingEscalationTriggeredTwice.bpmn20.xml"})
+  public void testNonInterruptingEscalationTriggeredTwiceWithMainTaskCompletedFirst() {
+
+    // given
+    runtimeService.startProcessInstanceByKey("escalationProcess");
+    Task taskInMainprocess = taskService.createTaskQuery().taskDefinitionKey("TaskInMainprocess").singleResult();
+
+    // when
+    taskService.complete(taskInMainprocess.getId());
+
+    // then
+    assertEquals(2, taskService.createTaskQuery().taskDefinitionKey("TaskInSubprocess").count());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventSubprocessTest.testNonInterruptingEscalationTriggeredTwice.bpmn20.xml"})
+  public void testNonInterruptingEscalationTriggeredTwiceWithSubprocessTaskCompletedFirst() {
+
+    // given
+    runtimeService.startProcessInstanceByKey("escalationProcess");
+    Task taskInMainprocess = taskService.createTaskQuery().taskDefinitionKey("TaskInMainprocess").singleResult();
+    Task taskInSubprocess = taskService.createTaskQuery().taskDefinitionKey("TaskInSubprocess").singleResult();
+
+    // when
+    taskService.complete(taskInSubprocess.getId());
+    taskService.complete(taskInMainprocess.getId());
+
+    // then
+    assertEquals(1, taskService.createTaskQuery().taskDefinitionKey("TaskInSubprocess").count());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventSubprocessTest.testNonInterruptingEscalationTriggeredTwiceByIntermediateEvent.bpmn20.xml"})
+  public void testNonInterruptingEscalationTriggeredTwiceByIntermediateEventWithMainTaskCompletedFirst() {
+
+    // given
+    runtimeService.startProcessInstanceByKey("escalationProcess");
+    Task taskInMainprocess = taskService.createTaskQuery().taskDefinitionKey("FirstTaskInMainprocess").singleResult();
+
+    // when
+    taskService.complete(taskInMainprocess.getId());
+
+    // then
+    assertEquals(2, taskService.createTaskQuery().taskDefinitionKey("TaskInSubprocess").count());
+    assertEquals(1, taskService.createTaskQuery().taskDefinitionKey("SecondTaskInMainprocess").count());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventSubprocessTest.testNonInterruptingEscalationTriggeredTwiceByIntermediateEvent.bpmn20.xml"})
+  public void testNonInterruptingEscalationTriggeredTwiceByIntermediateEventWithSubprocessTaskCompletedFirst() {
+
+    // given
+    runtimeService.startProcessInstanceByKey("escalationProcess");
+    Task taskInMainprocess = taskService.createTaskQuery().taskDefinitionKey("FirstTaskInMainprocess").singleResult();
+    Task taskInSubprocess = taskService.createTaskQuery().taskDefinitionKey("TaskInSubprocess").singleResult();
+
+    // when
+    taskService.complete(taskInSubprocess.getId());
+    taskService.complete(taskInMainprocess.getId());
+
+    // then
+    assertEquals(1, taskService.createTaskQuery().taskDefinitionKey("TaskInSubprocess").count());
+    assertEquals(1, taskService.createTaskQuery().taskDefinitionKey("SecondTaskInMainprocess").count());
+  }
+
 }
