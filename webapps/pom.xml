@@ -264,52 +264,6 @@
         <exec.arg>/c</exec.arg>
       </properties>
     </profile>
-    <profile>
-      <id>tomcat</id>
-      <dependencies>
-        <dependency>
-          <groupId>org.jboss.resteasy</groupId>
-          <artifactId>resteasy-jaxrs</artifactId>
-          <scope>runtime</scope>
-        </dependency>
-      </dependencies>
-      <properties>
-        <web.resources.override>src/main/runtime/tomcat/webapp</web.resources.override>
-        <java.resources.override>src/main/runtime/tomcat/resources</java.resources.override>
-      </properties>
-    </profile>
-
-    <profile>
-      <id>jboss</id>
-      <dependencies>
-        <dependency>
-          <groupId>org.jboss.resteasy</groupId>
-          <artifactId>resteasy-jaxrs</artifactId>
-          <scope>provided</scope>
-        </dependency>
-      </dependencies>
-      <properties>
-        <web.resources.override>src/main/runtime/jboss/webapp</web.resources.override>
-        <java.resources.override>src/main/runtime/jboss/resources</java.resources.override>
-      </properties>
-
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-war-plugin</artifactId>
-            <configuration>
-              <archive>
-                <manifestEntries>
-                  <!-- module dependencies for deployment on AS 7 -->
-                  <Dependencies>org.camunda.bpm.camunda-engine,org.camunda.bpm.dmn.camunda-engine-dmn</Dependencies>
-                </manifestEntries>
-              </archive>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
 
     <profile>
       <id>develop</id>
