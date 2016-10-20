@@ -39,35 +39,41 @@
     }
   }
 
-  ul {
-    margin: 0;
-    padding: 0;
+  .stats {
     ul {
-      > li {
-        display: list-item;
-        list-style: disc inside;
+      margin: 0;
+      padding: 0;
+      ul {
+        > li {
+          display: list-item;
+          list-style: disc inside;
+        }
+      }
+    }
+
+    li {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 (@grid-gutter-width * 0.5) 0;
+      &:last-of-type,
+      li {
+        margin-bottom: 0;
+      }
+
+      > a {
+        display: block;
       }
     }
   }
 
-  li {
-    list-style: none;
-    padding: 0;
-    margin: 0 0 (@grid-gutter-width * 0.5) 0;
-    &:last-of-type,
-    li {
-      margin-bottom: 0;
-    }
-  }
-
   .section-title {
-    font-size: 2em;
+    font-size: @font-size-base * 2;
     margin-top: 5px;
     font-weight: 100;
   }
 
   .stats {
-    font-size: 16px;
+    font-size: @font-size-base * 1.2;
     padding-top: @grid-gutter-width * 0.5;
   }
 
@@ -75,10 +81,10 @@
   .value,
   .no-value {
     display: block;
-    font-size: 2em;
+    font-size: @font-size-base * 2;
     font-weight: 100;
     .animate-spin {
-      font-size: 1em;
+      font-size: @font-size-base;
     }
   }
 
@@ -100,10 +106,7 @@
     }
   }
   li.link {
-    padding-top: 15px;
-    li {
-      padding-top: 0;
-    }
+    padding-top: @grid-gutter-width * 0.5;
   }
 
   .misc {
@@ -123,3 +126,45 @@
     }
   }
 }
+
+
+.text-and-sparkline {
+  overflow: hidden;
+  > .text {
+    float: left;
+  }
+}
+
+.value-and-sparkline {
+  overflow: hidden;
+
+  .value,
+  .no-value {
+    float: left;
+  }
+
+  .sparkline-wrapper {
+    float: right;
+  }
+}
+
+[cam-sparkline] {
+  canvas {
+    vertical-align: inherit;
+    display: block;
+  }
+}
+
+/* --------------------------------------------------------------------- */
+
+section.metrics {
+  .value {
+    display: inline-block;
+  }
+}
+
+
+section.state {
+
+}
+

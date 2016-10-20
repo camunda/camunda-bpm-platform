@@ -1,0 +1,65 @@
+.dashboard {
+  .stats {
+    margin-bottom: -10px;
+  }
+  .stats-section {
+    margin-bottom: 10px;
+  }
+
+  .stats-label {
+    display: block;
+  }
+
+  section.now,
+  section.metrics {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  header {
+    overflow: hidden;
+  }
+
+  section > .inner {
+    min-height: auto;
+  }
+
+  .entry {
+    padding-bottom: 10px;
+  }
+
+  view.row {
+    display: block;
+  }
+
+
+  .metrics {
+    header ul {
+      margin-top: 4px;
+      float: right;
+      border-bottom: none;
+      a {
+        padding-bottom: 8px;
+      }
+    }
+
+    .legend-color {
+      display: inline-block;
+      border-radius: 100%;
+      width: 12px;
+      height: 12px;
+    }
+
+    .chart {
+      padding-top: 10px;
+    }
+
+    [cam-sparkline] {
+      min-height: 220px;
+    }
+  }
+
+  .loading .value {
+    color: @gray-lighter;
+  }
+}

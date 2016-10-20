@@ -1,27 +1,180 @@
 <!-- # CE - camunda-cockpit-ui/client/scripts/pages/dashboard.html -->
 <div class="ctn-view dashboard container-fluid">
   <div class="sections row">
-    <section ng-repeat="plugin in mainPlugins"
-             ng-if="!plugin.noDashboardSection && plugin.accessible"
-             class="col-sm-6 col-md-4 col-lg-3">
+    <div class="col-xs-12 col-sm-8 col-lg-10">
+
+
+      <section class="now"
+               ng-class="{'loading': loading}">
+        <div class="inner">
+          <header>
+            <div class="row">
+              <h1 class="col-xs-4 section-title">Actual</h1>
+            </div>
+          </header>
+
+          <div class="row stats">
+            <div class="stats-section col-xs-6 col-lg-3">
+              <div class="stats-label">Running Process Inst.</div>
+              <a class="value"
+                 href="#/processes?searchQuery=%5B%7B%22type%22:%22PIunfinished%22,%22operator%22:%22eq%22,%22value%22:%22%22,%22name%22:%22%22%7D%5D"
+                 ng-if="hasProcessSearch">
+                {{ (!data.actual.runningProcessInstances ? 0 : '') }}
+                {{ data.actual.runningProcessInstances | abbreviateNumber }}
+              </a>
+              <span class="value"
+                    ng-if="!hasProcessSearch">
+                {{ (!data.actual.runningProcessInstances ? 0 : '') }}
+                {{ data.actual.runningProcessInstances | abbreviateNumber }}
+              </span>
+            </div>
+
+            <div class="stats-section col-xs-6 col-lg-3">
+              <div class="stats-label">Open Incidents</div>
+              <a class="value"
+                 href="#/processes?searchQuery=%5B%7B%22type%22:%22PIunfinished%22,%22operator%22:%22eq%22,%22value%22:%22%22,%22name%22:%22%22%7D%5D"
+                 ng-if="hasProcessSearch">
+                {{ (!data.actual.openIncidents ? 0 : '') }}
+                {{ data.actual.openIncidents | abbreviateNumber }}
+              </a>
+              <span class="value"
+                    ng-if="!hasProcessSearch">
+                {{ (!data.actual.openIncidents ? 0 : '') }}
+                {{ data.actual.openIncidents | abbreviateNumber }}
+              </span>
+            </div>
+
+            <div class="stats-section col-xs-6 col-lg-3">
+              <div class="stats-label">Open Cases</div>
+              <a class="value"
+                 ng-if="hasCaseSearch"
+                 href="#/cases?searchQuery=%5B%7B%22type%22:%22notClosed%22,%22operator%22:%22eq%22,%22value%22:%22%22,%22name%22:%22%22%7D%5D">
+                {{ (!data.actual.caseInstances ? 0 : '') }}
+                {{ data.actual.caseInstances | abbreviateNumber }}
+              </a>
+              <span class="value"
+                    ng-if="!hasCaseSearch">
+                {{ (!data.actual.caseInstances ? 0 : '') }}
+                {{ data.actual.caseInstances | abbreviateNumber }}
+              </span>
+            </div>
+
+            <div class="stats-section col-xs-6 col-lg-3">
+              <div class="stats-label">Open Human Tasks</div>
+              <a class="value"
+                 ng-if="hasTaskSearch"
+                 href="#/tasks?searchQuery=%5B%7B%22type%22:%22TAunfinished%22,%22operator%22:%22eq%22,%22value%22:%22%22,%22name%22:%22%22%7D%5D">
+                {{ (!data.actual.tasks ? 0 : '') }}
+                {{ data.actual.tasks | abbreviateNumber }}
+              </a>
+              <span class="value"
+                    ng-if="!hasTaskSearch">
+                {{ (!data.actual.tasks ? 0 : '') }}
+                {{ data.actual.tasks | abbreviateNumber }}
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      <section class="metrics"
+               ng-if="metricsPlugins.length">
+        <div class="inner">
+          <header>
+            <div class="row">
+              <h1 class="col-xs-3 section-title">Metrics</h1>
+
+              <div class="col-xs-9 text-right">
+                <ul class="nav nav-tabs">
+                  <li ng-class="{active: metricsPeriod === 'day'}">
+                    <a ng-click="setMetricsPeriod('day')">Today</a>
+                  </li>
+
+                  <li ng-class="{active: metricsPeriod === 'week'}">
+                    <a ng-click="setMetricsPeriod('week')">This week</a>
+                  </li>
+
+                  <li ng-class="{active: metricsPeriod === 'month'}">
+                    <a ng-click="setMetricsPeriod('month')">This month</a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </header>
+
+
+          <div class="row stats">
+            <div ng-repeat="plugin in metricsPlugins"
+                 data-plugin-id="{{ plugin.id }}"
+                 class="stats-section col-md-6 col-lg-4 entry">
+              <h4>{{ plugin.label }}</h4>
+              <view vars="metricsVars"
+                    provider="plugin"
+                    period="metricsPeriod"
+                    class="row"></view>
+            </div>
+          </div>
+
+
+        </div>
+      </section>
+    </div>
+
+
+    <section class="col-xs-12 col-sm-4 col-lg-2 deployed"
+             ng-class="{'loading': loading}">
       <div class="inner">
         <header>
-          <h1 class="section-title">
-            <a ng-if="plugin.pagePath"
-               ng-href="{{ plugin.pagePath }}">{{ plugin.label }}</a>
-            <span ng-if="!plugin.pagePath">{{ plugin.label }}</span>
-          </h1>
+          <h1 class="section-title">Deployed</h1>
         </header>
 
-        <div class="stats">
-          <view data-plugin-id="{{ plugin.id }}"
-                provider="plugin"></view>
+        <div class="row stats">
+          <div class="stats-section col-sm-12 col-md-6 col-lg-12">
+            <div class="stats-label">Process Definitions</div>
+            <a class="value"
+               href="#/processes">
+              {{ (!data.deployed.processDefinitions ? 0 : '') }}
+              {{ data.deployed.processDefinitions | abbreviateNumber }}
+            </a>
+          </div>
+
+          <div class="stats-section col-sm-12 col-md-6 col-lg-12">
+            <div class="stats-label">Decision Definitions</div>
+            <a class="value"
+               href="#/decisions">
+              {{ (!data.deployed.decisionDefinitions ? 0 : '') }}
+              {{ data.deployed.decisionDefinitions | abbreviateNumber }}
+            </a>
+          </div>
+
+          <div class="stats-section col-sm-12 col-md-6 col-lg-12">
+            <div class="stats-label">Case Definitions</div>
+            <a class="value"
+               href="#/cases"
+               ng-if="hasCaseSearch">
+              {{ (!data.deployed.caseDefinitions ? 0 : '') }}
+              {{ data.deployed.caseDefinitions | abbreviateNumber }}
+            </a>
+            <span class="value"
+                  ng-if="!hasCaseSearch">
+              {{ (!data.deployed.caseDefinitions ? 0 : '') }}
+              {{ data.deployed.caseDefinitions | abbreviateNumber }}
+            </span>
+          </div>
+
+          <div class="stats-section col-sm-12 col-md-6 col-lg-12">
+            <div class="stats-label">Deployments</div>
+            <a class="value"
+               href="#/repository">
+              {{ (!data.deployed.deploymentDefinitions ? 0 : '') }}
+              {{ data.deployed.deploymentDefinitions | abbreviateNumber }}
+            </a>
+          </div>
         </div>
       </div>
     </section>
   </div>
-
-  <hr ng-if="deprecateDashboardProviders.length" />
 
   <div ng-repeat="plugin in deprecateDashboardProviders"
        class="deprecate-dashboard-view row"
