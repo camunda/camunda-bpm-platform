@@ -13,10 +13,8 @@
 
 package org.camunda.bpm.engine.test.standalone.deploy;
 
-import java.io.InputStream;
 
 import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
-import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.test.Deployment;
 
 
@@ -34,23 +32,5 @@ public class BPMNParseListenerTest extends ResourceProcessEngineTestCase {
     // Check if process-definition has different key
     assertEquals(0, repositoryService.createProcessDefinitionQuery().processDefinitionKey("oneTaskProcess").count());
     assertEquals(1, repositoryService.createProcessDefinitionQuery().processDefinitionKey("oneTaskProcess-modified").count());
-
-    // Check if process has an automatically-generated diagram
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("oneTaskProcess-modified").singleResult();
-    assertNotNull(processDefinition.getDiagramResourceName());
-
-    // Get diagram
-    InputStream diagramStream = repositoryService.getResourceAsStream(processDefinition.getDeploymentId(), processDefinition.getDiagramResourceName());
-    try {
-      // Validate if retrieving the image resource works
-      byte[] buffer = new byte[1];
-      assertEquals(1, diagramStream.read(buffer));
-
-    } finally {
-      if(diagramStream != null) {
-        diagramStream.close();
-      }
-    }
-
   }
 }

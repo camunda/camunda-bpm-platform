@@ -148,21 +148,7 @@ public abstract class AbstractDefinitionDeployer<DefinitionEntity extends Resour
         return diagramForFileResource;
       }
     }
-
-    return generateDiagramResourceForDefinition(deployment, resourceName, definition, resources);
-  }
-
-  /**
-   * Generate a diagram resource for a definition and return the name of the image resource.
-   *
-   * @param deployment the deployment entity
-   * @param resourceName the name of the definition resource
-   * @param definition the definition entity
-   * @param resources the resources of the deployment
-   * @return the name of the generated diagram resource or null if non was created
-   */
-  protected String generateDiagramResourceForDefinition(DeploymentEntity deployment, String resourceName, DefinitionEntity definition, Map<String, ResourceEntity> resources) {
-    // default don't generate diagram resources
+    // no matching diagram found
     return null;
   }
 
