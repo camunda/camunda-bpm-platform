@@ -12,5 +12,12 @@
       <a href="#/decisions" ng-if="count.instances == 1">Decision evaluation</a>
       <span class="value">{{ (count.instances | abbreviateNumber) || 0 }}</span>
     </li>
+    <li class="text-and-sparkline">
+      <a href="#/decisions">Evaluated decision elements</a>
+      <span cam-sparkline
+            values="sparklineData"
+            width="160"
+            height="40"></span>
+    </li>
   </ul>
 </div>
