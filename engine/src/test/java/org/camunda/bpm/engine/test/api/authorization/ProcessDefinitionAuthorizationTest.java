@@ -12,22 +12,26 @@
  */
 package org.camunda.bpm.engine.test.api.authorization;
 
+import static org.camunda.bpm.engine.authorization.Authorization.ANY;
+import static org.camunda.bpm.engine.authorization.Permissions.ALL;
+import static org.camunda.bpm.engine.authorization.Permissions.READ;
+import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
+import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_INSTANCE;
+import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
+import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
+
+import java.io.InputStream;
+
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.RepositoryServiceImpl;
 import org.camunda.bpm.engine.impl.pvm.ReadOnlyProcessDefinition;
+import org.camunda.bpm.engine.repository.DiagramLayout;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-
-import java.io.InputStream;
-
-import static org.camunda.bpm.engine.authorization.Authorization.ANY;
-import static org.camunda.bpm.engine.authorization.Permissions.*;
-import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
-import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
 
 /**
  * @author Roman Smirnov
@@ -215,6 +219,38 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     assertNotNull(definition);
   }
 
+  // get process diagram /////////////////////////////////////////////////////
+
+  public void testGetProcessDiagramWithoutAuthorizations() {
+    // given
+    String processDefinitionId = selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY).getId();
+
+    try {
+      // when
+      repositoryService.getProcessDiagram(processDefinitionId);
+      fail("Exception expected: It should not be possible to get the process diagram");
+    } catch (AuthorizationException e) {
+      // then
+      String message = e.getMessage();
+      assertTextPresent(userId, message);
+      assertTextPresent(READ.getName(), message);
+      assertTextPresent(ONE_TASK_PROCESS_KEY, message);
+      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+    }
+  }
+
+  public void testGetProcessDiagram() {
+    // given
+    String processDefinitionId = selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, READ);
+
+    // when
+    InputStream stream = repositoryService.getProcessDiagram(processDefinitionId);
+
+    // then
+    // no process diagram deployed
+    assertNull(stream);
+  }
 
   // get process model /////////////////////////////////////////////////////
 
@@ -278,6 +314,39 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
 
     // then
     assertNotNull(modelInstance);
+  }
+
+  // get process diagram layout /////////////////////////////////////////////////
+
+  public void testGetProcessDiagramLayoutWithoutAuthorization() {
+    // given
+    String processDefinitionId = selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY).getId();
+
+    try {
+      // when
+      repositoryService.getProcessDiagramLayout(processDefinitionId);
+      fail("Exception expected: It should not be possible to get the process diagram layout");
+    } catch (AuthorizationException e) {
+      // then
+      String message = e.getMessage();
+      assertTextPresent(userId, message);
+      assertTextPresent(READ.getName(), message);
+      assertTextPresent(ONE_TASK_PROCESS_KEY, message);
+      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+    }
+  }
+
+  public void testGetProcessDiagramLayout() {
+    // given
+    String processDefinitionId = selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, READ);
+
+    // when
+    DiagramLayout diagramLayout = repositoryService.getProcessDiagramLayout(processDefinitionId);
+
+    // then
+    // no process diagram deployed
+    assertNull(diagramLayout);
   }
 
   // suspend process definition by id ///////////////////////////////////////////

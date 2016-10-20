@@ -13,12 +13,21 @@
 
 package org.camunda.bpm.engine.test.api.multitenancy.tenantcheck;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.junit.Assert.assertThat;
+
+import java.io.InputStream;
+import java.util.Arrays;
+import java.util.List;
+
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.repository.Deployment;
+import org.camunda.bpm.engine.repository.DiagramLayout;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -26,20 +35,12 @@ import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
-
-import java.io.InputStream;
-import java.util.Arrays;
-import java.util.List;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 
 /**
  * @author kristin.polenz
@@ -49,6 +50,7 @@ public class MultiTenancyProcessDefinitionCmdsTenantCheckTest {
   protected static final String TENANT_ONE = "tenant1";
 
   protected static final String BPMN_PROCESS_MODEL = "org/camunda/bpm/engine/test/api/multitenancy/testProcess.bpmn";
+  protected static final String BPMN_PROCESS_DIAGRAM = "org/camunda/bpm/engine/test/api/multitenancy/testProcess.png";
 
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
 
@@ -72,7 +74,7 @@ public class MultiTenancyProcessDefinitionCmdsTenantCheckTest {
     repositoryService = engineRule.getRepositoryService();
     identityService = engineRule.getIdentityService();
 
-    testRule.deployForTenant(TENANT_ONE, BPMN_PROCESS_MODEL);
+    testRule.deployForTenant(TENANT_ONE, BPMN_PROCESS_MODEL, BPMN_PROCESS_DIAGRAM);
 
     processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
   }
@@ -105,6 +107,66 @@ public class MultiTenancyProcessDefinitionCmdsTenantCheckTest {
     InputStream inputStream = repositoryService.getProcessModel(processDefinitionId);
 
     assertThat(inputStream, notNullValue());
+  }
+
+  @Test
+  public void failToGetProcessDiagramNoAuthenticatedTenants() {
+    identityService.setAuthentication("user", null, null);
+
+    // declare expected exception
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("Cannot get the process definition");
+
+    repositoryService.getProcessDiagram(processDefinitionId);
+  }
+
+  @Test
+  public void getProcessDiagramWithAuthenticatedTenant() {
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+
+    InputStream inputStream = repositoryService.getProcessDiagram(processDefinitionId);
+
+    assertThat(inputStream, notNullValue());
+  }
+
+  @Test
+  public void getProcessDiagramDisabledTenantCheck() {
+    processEngineConfiguration.setTenantCheckEnabled(false);
+    identityService.setAuthentication("user", null, null);
+
+    InputStream inputStream = repositoryService.getProcessDiagram(processDefinitionId);
+
+    assertThat(inputStream, notNullValue());
+  }
+
+  @Test
+  public void failToGetProcessDiagramLayoutNoAuthenticatedTenants() {
+    identityService.setAuthentication("user", null, null);
+
+    // declare expected exception
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("Cannot get the process definition");
+
+    repositoryService.getProcessDiagramLayout(processDefinitionId);
+  }
+
+  @Test
+  public void getProcessDiagramLayoutWithAuthenticatedTenant() {
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+
+    DiagramLayout diagramLayout = repositoryService.getProcessDiagramLayout(processDefinitionId);
+
+    assertThat(diagramLayout, notNullValue());
+  }
+
+  @Test
+  public void getProcessDiagramLayoutDisabledTenantCheck() {
+    processEngineConfiguration.setTenantCheckEnabled(false);
+    identityService.setAuthentication("user", null, null);
+
+    DiagramLayout diagramLayout = repositoryService.getProcessDiagramLayout(processDefinitionId);
+
+    assertThat(diagramLayout, notNullValue());
   }
 
   @Test

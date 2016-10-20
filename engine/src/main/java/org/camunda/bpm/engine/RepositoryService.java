@@ -13,21 +13,36 @@
 
 package org.camunda.bpm.engine;
 
+import java.io.InputStream;
+import java.util.Date;
+import java.util.List;
+
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NotValidException;
-import org.camunda.bpm.engine.repository.*;
+import org.camunda.bpm.engine.repository.CaseDefinition;
+import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
+import org.camunda.bpm.engine.repository.DecisionDefinition;
+import org.camunda.bpm.engine.repository.DecisionDefinitionQuery;
+import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
+import org.camunda.bpm.engine.repository.DecisionRequirementsDefinitionQuery;
+import org.camunda.bpm.engine.repository.DeploymentBuilder;
+import org.camunda.bpm.engine.repository.DeploymentQuery;
+import org.camunda.bpm.engine.repository.DiagramLayout;
+import org.camunda.bpm.engine.repository.ProcessApplicationDeployment;
+import org.camunda.bpm.engine.repository.ProcessApplicationDeploymentBuilder;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
+import org.camunda.bpm.engine.repository.Resource;
+import org.camunda.bpm.engine.repository.UpdateProcessDefinitionSuspensionStateBuilder;
+import org.camunda.bpm.engine.repository.UpdateProcessDefinitionSuspensionStateSelectBuilder;
 import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.cmmn.CmmnModelInstance;
 import org.camunda.bpm.model.dmn.DmnModelInstance;
-
-import java.io.InputStream;
-import java.util.Date;
-import java.util.List;
 
 
 /** Service providing access to the repository of process definitions and deployments.
@@ -416,6 +431,21 @@ public interface RepositoryService {
   InputStream getProcessModel(String processDefinitionId);
 
   /**
+   * Gives access to a deployed process diagram, e.g., a PNG image, through a
+   * stream of bytes.
+   *
+   * @param processDefinitionId
+   *          id of a {@link ProcessDefinition}, cannot be null.
+   * @return null when the diagram resource name of a {@link ProcessDefinition} is null.
+   *
+   * @throws ProcessEngineException
+   *           when the process diagram doesn't exist.
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_DEFINITION}.
+   */
+  InputStream getProcessDiagram(String processDefinitionId);
+
+  /**
    * Returns the {@link ProcessDefinition} including all BPMN information like additional
    * Properties (e.g. documentation).
    *
@@ -423,6 +453,24 @@ public interface RepositoryService {
    *          If the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   ProcessDefinition getProcessDefinition(String processDefinitionId);
+
+  /**
+   * Provides positions and dimensions of elements in a process diagram as
+   * provided by {@link RepositoryService#getProcessDiagram(String)}.
+   *
+   * This method requires a process model and a diagram image to be deployed.
+   *
+   * @param processDefinitionId id of a {@link ProcessDefinition}, cannot be null.
+   * @return Map with process element ids as keys and positions and dimensions as values.
+   *
+   * @return null when the input stream of a process diagram is null.
+   *
+   * @throws ProcessEngineException
+   *          When the process model or diagram doesn't exist.
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_DEFINITION}.
+   */
+  DiagramLayout getProcessDiagramLayout(String processDefinitionId);
 
   /**
    * Returns the {@link BpmnModelInstance} for the given processDefinitionId.

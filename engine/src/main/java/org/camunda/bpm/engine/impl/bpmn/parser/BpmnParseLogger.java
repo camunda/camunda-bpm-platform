@@ -46,6 +46,12 @@ public class BpmnParseLogger extends ProcessEngineLogger {
     return new ProcessEngineException(exceptionMessage("009", "Error while parsing process"), cause);
   }
 
+  public void exceptionWhileGeneratingProcessDiagram(Throwable t) {
+    logError(
+        "010",
+        "Error while generating process diagram, image will not be stored in repository", t);
+  }
+
   public ProcessEngineException messageEventSubscriptionWithSameNameExists(String resourceName, String eventName) {
     throw new ProcessEngineException(exceptionMessage(
         "011",
