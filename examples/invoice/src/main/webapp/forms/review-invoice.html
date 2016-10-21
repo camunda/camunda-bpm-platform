@@ -3,7 +3,7 @@
 
   <p>
     <strong>Please clarify:</strong><br/>
-    This invoice needs clarification and could not be approved due to missing data.
+    This invoice needs a review.
   </p>
 
   <div class="form-group">
@@ -55,17 +55,12 @@
   </div>
 
   <div class="form-group">
-    <div class="col-md-10 col-md-offset-2">
-      <div class="checkbox">
-        <label>
-          <input cam-variable-name="clarified"
-                 cam-variable-type="Boolean"
-                 type="checkbox"
-                 name="clarified"
-                 class="form-control" />
-          Could you clarify the invoice?
-        </label>
-      </div>
+    <label class="control-label col-md-2">Your Review Comment</label>
+    <div class="col-md-10">
+      <textarea cam-variable-name="reviewComment"
+          cam-variable-type="String"
+          class="form-control">
+      </textarea>
     </div>
   </div>
 </form>

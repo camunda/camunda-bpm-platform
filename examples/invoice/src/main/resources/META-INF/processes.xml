@@ -8,7 +8,7 @@
     <process-engine>default</process-engine>
     <resource>invoice.v2.bpmn</resource>
     <resource>assign-approver-groups.dmn</resource>
-    <resource>review-invoice.cmmn</resource>
+    <resource>invoice-clarification.cmmn</resource>
     <properties>
       <property name="isDeleteUponUndeploy">false</property>
       <property name="isScanForProcessDefinitions">false</property>
