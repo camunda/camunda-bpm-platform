@@ -31,6 +31,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.Providers;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.ProcessInstanceDto;
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.query.ProcessInstanceQueryDto;
@@ -138,14 +139,12 @@ public class ProcessInstanceRestService extends AbstractPluginResource {
   }
 
   protected void injectObjectMapper(ProcessInstanceQueryDto queryParameter) {
-    queryParameter.setObjectMapper(getObjectMapper());
+    queryParameter.setObjectMapper(objectMapper);
   }
 
+  @JsonIgnore
   public void setObjectMapper(ObjectMapper objectMapper) {
     this.objectMapper = objectMapper;
   }
 
-  public ObjectMapper getObjectMapper() {
-    return objectMapper;
-  }
 }

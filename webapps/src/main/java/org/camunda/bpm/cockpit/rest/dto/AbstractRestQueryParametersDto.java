@@ -54,8 +54,8 @@ public abstract class AbstractRestQueryParametersDto<T> extends QueryParameters<
   protected String sortBy;
   protected String sortOrder;
 
-  @JsonIgnore
-  protected transient ObjectMapper objectMapper;
+
+  protected ObjectMapper objectMapper;
 
   // required for populating via jackson
   public AbstractRestQueryParametersDto() { }
@@ -183,10 +183,7 @@ public abstract class AbstractRestQueryParametersDto<T> extends QueryParameters<
     return null;
   }
 
-  public ObjectMapper getObjectMapper() {
-    return objectMapper;
-  }
-
+  @JsonIgnore
   public void setObjectMapper(ObjectMapper objectMapper) {
     this.objectMapper = objectMapper;
   }
