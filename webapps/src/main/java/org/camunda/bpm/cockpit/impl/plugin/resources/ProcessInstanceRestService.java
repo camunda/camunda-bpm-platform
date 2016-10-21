@@ -142,7 +142,6 @@ public class ProcessInstanceRestService extends AbstractPluginResource {
     queryParameter.setObjectMapper(objectMapper);
   }
 
-  @JsonIgnore
   public void setObjectMapper(ObjectMapper objectMapper) {
     this.objectMapper = objectMapper;
   }
