@@ -36,8 +36,6 @@ public class PermissionCheck {
   /** query parameter for resource Id. Is injected as RAW parameter into the query */
   protected String resourceIdQueryParam;
 
-  protected Long authorizationNotFoundReturnValue = null;
-
   public PermissionCheck() {
   }
 
@@ -86,13 +84,5 @@ public class PermissionCheck {
 
   public void setResourceIdQueryParam(String resourceIdQueryParam) {
     this.resourceIdQueryParam = resourceIdQueryParam;
-  }
-
-  public Long getAuthorizationNotFoundReturnValue() {
-    return authorizationNotFoundReturnValue;
-  }
-
-  public void setAuthorizationNotFoundReturnValue(Long authorizationNotFoundReturnValue) {
-    this.authorizationNotFoundReturnValue = authorizationNotFoundReturnValue;
   }
 }

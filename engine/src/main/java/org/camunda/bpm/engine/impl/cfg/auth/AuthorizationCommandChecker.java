@@ -148,7 +148,6 @@ public class AuthorizationCommandChecker implements CommandChecker {
     secondCheck.setPermission(UPDATE_INSTANCE);
     secondCheck.setResource(PROCESS_DEFINITION);
     secondCheck.setResourceId(processDefinitionKey);
-    secondCheck.setAuthorizationNotFoundReturnValue(0l);
 
     getAuthorizationManager().checkAuthorization(firstCheck, secondCheck);
   }
@@ -179,7 +178,6 @@ public class AuthorizationCommandChecker implements CommandChecker {
     secondCheck.setPermission(DELETE_INSTANCE);
     secondCheck.setResource(PROCESS_DEFINITION);
     secondCheck.setResourceId(processDefinition.getKey());
-    secondCheck.setAuthorizationNotFoundReturnValue(0l);
 
     getAuthorizationManager().checkAuthorization(firstCheck, secondCheck);
   }
@@ -212,7 +210,6 @@ public class AuthorizationCommandChecker implements CommandChecker {
     secondCheck.setPermission(UPDATE_INSTANCE);
     secondCheck.setResource(PROCESS_DEFINITION);
     secondCheck.setResourceId(processDefinition.getKey());
-    secondCheck.setAuthorizationNotFoundReturnValue(0l);
 
     getAuthorizationManager().checkAuthorization(firstCheck, secondCheck);
   }
@@ -238,7 +235,6 @@ public class AuthorizationCommandChecker implements CommandChecker {
     secondCheck.setPermission(UPDATE_INSTANCE);
     secondCheck.setResource(PROCESS_DEFINITION);
     secondCheck.setResourceId(job.getProcessDefinitionKey());
-    secondCheck.setAuthorizationNotFoundReturnValue(0l);
 
     getAuthorizationManager().checkAuthorization(firstCheck, secondCheck);
   }
@@ -271,7 +267,6 @@ public class AuthorizationCommandChecker implements CommandChecker {
     secondCheck.setPermission(READ_INSTANCE);
     secondCheck.setResource(PROCESS_DEFINITION);
     secondCheck.setResourceId(processDefinition.getKey());
-    secondCheck.setAuthorizationNotFoundReturnValue(0l);
 
     getAuthorizationManager().checkAuthorization(firstCheck, secondCheck);
   }
@@ -297,7 +292,6 @@ public class AuthorizationCommandChecker implements CommandChecker {
     secondCheck.setPermission(READ_INSTANCE);
     secondCheck.setResource(PROCESS_DEFINITION);
     secondCheck.setResourceId(job.getProcessDefinitionKey());
-    secondCheck.setAuthorizationNotFoundReturnValue(0l);
 
     getAuthorizationManager().checkAuthorization(firstCheck, secondCheck);
   }
@@ -327,7 +321,6 @@ public class AuthorizationCommandChecker implements CommandChecker {
       readTaskPermissionCheck.setPermission(READ_TASK);
       readTaskPermissionCheck.setResource(PROCESS_DEFINITION);
       readTaskPermissionCheck.setResourceId(processDefinition.getKey());
-      readTaskPermissionCheck.setAuthorizationNotFoundReturnValue(0l);
 
       getAuthorizationManager().checkAuthorization(readPermissionCheck, readTaskPermissionCheck);
 
@@ -374,7 +367,6 @@ public class AuthorizationCommandChecker implements CommandChecker {
       updateTaskPermissionCheck.setPermission(UPDATE_TASK);
       updateTaskPermissionCheck.setResource(PROCESS_DEFINITION);
       updateTaskPermissionCheck.setResourceId(processDefinition.getKey());
-      updateTaskPermissionCheck.setAuthorizationNotFoundReturnValue(0l);
 
       getAuthorizationManager().checkAuthorization(updatePermissionCheck, updateTaskPermissionCheck);
 
