@@ -34,7 +34,7 @@ public class DashboardIT extends AbstractWebappUiIntegrationTest {
     submit.submit();
 
     wait.until(ExpectedConditions.textToBePresentInElementLocated(By.cssSelector(".deployed .processes > .value"), "1"));
-    wait.until(ExpectedConditions.textToBePresentInElementLocated(By.cssSelector(".deployed .processes > a"), "Process definition"));
+    wait.until(ExpectedConditions.textToBePresentInElementLocated(By.cssSelector(".deployed .processes > a"), "Process Definitions"));
 
     wait.until(currentURIIs(new URI(appUrl + "/default/#/dashboard")));
   }
