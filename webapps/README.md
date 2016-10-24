@@ -145,8 +145,8 @@ In place of a guide, just follow the formatting of existing code (and / or use t
 ## Help and support
 
 * [Documentation](http://docs.camunda.org/latest/)
+* [Forum](https://forum.camunda.org)
 * [Stackoverflow](stackoverflow.com/questions/tagged/camunda)
-* Google groups for [users](https://groups.google.com/forum/#!forum/camunda-bpm-users) and [developers](https://groups.google.com/forum/#!forum/camunda-bpm-dev)
 
 ## License
 
