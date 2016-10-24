@@ -214,6 +214,18 @@ grunt.registerTask('build', function(mode, app) {
   });
 
   grunt.registerTask('ensureSelenium', function() {
+
+    // set correct webdriver version
+    require('fs').writeFileSync('node_modules/grunt-protractor-runner/node_modules/protractor/config.json',
+'    {\n'+
+'      "webdriverVersions": {\n' +
+'        "selenium": "2.47.1",\n' +
+'        "chromedriver": "2.24",\n' +
+'        "iedriver": "2.47.0"\n' +
+'      }\n' +
+'    }'
+    );
+
     // async task
     var done = this.async();
 
