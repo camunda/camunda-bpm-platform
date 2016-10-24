@@ -13,15 +13,21 @@
 
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
+import java.util.List;
+
 import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
 import org.camunda.bpm.engine.impl.bpmn.parser.Escalation;
 import org.camunda.bpm.engine.impl.bpmn.parser.EscalationEventDefinition;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmScope;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
-import org.camunda.bpm.engine.impl.tree.*;
-
-import java.util.List;
+import org.camunda.bpm.engine.impl.tree.ActivityExecutionHierarchyWalker;
+import org.camunda.bpm.engine.impl.tree.ActivityExecutionMappingCollector;
+import org.camunda.bpm.engine.impl.tree.ActivityExecutionTuple;
+import org.camunda.bpm.engine.impl.tree.OutputVariablesPropagator;
+import org.camunda.bpm.engine.impl.tree.ReferenceWalker;
+import org.camunda.bpm.engine.impl.tree.TreeVisitor;
 
 /**
  * The activity behavior for an intermediate throwing escalation event and an escalation end event.
@@ -91,31 +97,11 @@ public class ThrowEscalationEventActivityBehavior extends AbstractBpmnActivityBe
 
   protected void leaveExecution(ActivityExecution execution, final PvmActivity currentActivity, EscalationEventDefinition escalationEventDefinition) {
 
-    if (hasActivityChildExecution(execution, currentActivity, escalationEventDefinition)) {
-      ActivityExecution childExecution = getChildExecutionForActivity(execution, currentActivity);
-      leave(childExecution);
-    } else {
-      leave(execution);
-    }
-  }
+    // execution tree could have been expanded by triggering a non-interrupting event
+    ExecutionEntity replacingExecution = ((ExecutionEntity) execution).getReplacedBy();
 
-  protected boolean hasActivityChildExecution(ActivityExecution execution, final PvmActivity currentActivity, EscalationEventDefinition escalationEventDefinition) {
-    return escalationEventDefinition != null
-        && isEscalationEventSubprocessOnTheSameScope(escalationEventDefinition.getEscalationHandler(), currentActivity)
-        && !execution.isConcurrent();
-  }
-
-  protected boolean isEscalationEventSubprocessOnTheSameScope(PvmActivity escalationHandler, final PvmActivity activity) {
-    return escalationHandler.isSubProcessScope() && escalationHandler.getFlowScope().equals(activity.getFlowScope());
-  }
-
-  protected ActivityExecution getChildExecutionForActivity(ActivityExecution execution, final PvmActivity activity) {
-    for (ActivityExecution childExecution : execution.getExecutions()) {
-      if (activity.equals(childExecution.getActivity())) {
-        return childExecution;
-      }
-    }
-    return null;
+    ExecutionEntity leavingExecution = (ExecutionEntity) (replacingExecution != null ? replacingExecution : execution);
+    leave(leavingExecution);
   }
 
   protected class EscalationEventDefinitionFinder implements TreeVisitor<PvmScope> {
