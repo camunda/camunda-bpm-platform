@@ -15,11 +15,15 @@ package org.camunda.bpm.engine.test.api.cfg;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.commons.utils.cache.Cache;
 import org.junit.Before;
 import org.junit.Rule;
@@ -28,6 +32,7 @@ import org.junit.rules.RuleChain;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
 /**
@@ -40,6 +45,7 @@ public class DeploymentCacheCfgTest {
       // apply configuration options here
       configuration.setCacheCapacity(2);
       configuration.setCacheFactory(new MyCacheFactory());
+      configuration.setProcessDefinitionQueryExtendsDeploymentCache(false);
       return configuration;
     }
   };
@@ -50,23 +56,25 @@ public class DeploymentCacheCfgTest {
   public RuleChain ruleChain = RuleChain.outerRule(cacheFactoryBootstrapRule).around(cacheFactoryEngineRule);
   RepositoryService repositoryService;
   ProcessEngineConfigurationImpl processEngineConfiguration;
+  RuntimeService runtimeService;
 
   @Before
   public void initialize() {
     repositoryService = cacheFactoryEngineRule.getRepositoryService();
     processEngineConfiguration = cacheFactoryEngineRule.getProcessEngineConfiguration();
+    runtimeService = cacheFactoryEngineRule.getRuntimeService();
   }
 
   @Test
   @Deployment(resources =
-      {"org/camunda/bpm/engine/test/api/cfg/DeploymentCacheCfgTest.testDefaultCacheRemovesLRUElementWhenMaxSizeIsExceeded.bpmn20.xml"})
+      {"org/camunda/bpm/engine/test/api/cfg/DeploymentCacheCfgTest.testDefaultCacheRemovesElementWhenMaxSizeIsExceeded.bpmn20.xml"})
   public void testPlugInOwnCacheImplementation() {
 
     // given
     DeploymentCache deploymentCache = processEngineConfiguration.getDeploymentCache();
 
     // when
-    Cache cache = deploymentCache.getProcessDefinitionCache();
+    Cache<String, ProcessDefinitionEntity> cache = deploymentCache.getProcessDefinitionCache();
 
     // then
     assertThat(cache, instanceOf(MyCacheImplementation.class));
@@ -74,8 +82,8 @@ public class DeploymentCacheCfgTest {
 
   @Test
   @Deployment(resources =
-      {"org/camunda/bpm/engine/test/api/cfg/DeploymentCacheCfgTest.testDefaultCacheRemovesLRUElementWhenMaxSizeIsExceeded.bpmn20.xml"})
-  public void testDefaultCacheRemovesLRUElementWhenMaxSizeIsExceeded() {
+      {"org/camunda/bpm/engine/test/api/cfg/DeploymentCacheCfgTest.testDefaultCacheRemovesElementWhenMaxSizeIsExceeded.bpmn20.xml"})
+  public void testDefaultCacheRemovesElementWhenMaxSizeIsExceeded() {
     // The engine rule sets the maximum number of elements of the to 2.
     // Accordingly, one process should not be contained in the cache anymore at the end.
 
@@ -107,4 +115,25 @@ public class DeploymentCacheCfgTest {
 
     assertEquals(2, numberOfProcessesInCache);
   }
+
+  @Test
+  @Deployment(resources =
+      {"org/camunda/bpm/engine/test/api/cfg/DeploymentCacheCfgTest.testDefaultCacheRemovesElementWhenMaxSizeIsExceeded.bpmn20.xml"})
+  public void testDisableQueryOfProcessDefinitionAddModelInstancesToDeploymentCache() {
+
+    // given
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("two");
+
+    // when
+    repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("two")
+        .singleResult()
+        .getId();
+
+    // then
+    DeploymentCache deploymentCache = processEngineConfiguration.getDeploymentCache();
+    BpmnModelInstance modelInstance = deploymentCache.getBpmnModelInstanceCache().get(pi.getProcessDefinitionId());
+    assertNull(modelInstance);
+  }
+
 }

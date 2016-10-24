@@ -398,6 +398,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected CacheFactory cacheFactory;
   protected int cacheCapacity = 1000;
+  protected boolean processDefinitionQueryExtendsDeploymentCache = true;
 
   // JOB EXECUTOR /////////////////////////////////////////////////////////////
 
@@ -2364,6 +2365,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setCacheCapacity(int cacheCapacity) {
     this.cacheCapacity = cacheCapacity;
+  }
+
+  public void setProcessDefinitionQueryExtendsDeploymentCache(boolean processDefinitionQueryExtendsDeploymentCache){
+    this.processDefinitionQueryExtendsDeploymentCache = processDefinitionQueryExtendsDeploymentCache;
+  }
+
+  public boolean getProcessDefinitionQueryExtendsDeploymentCache() {
+    return this.processDefinitionQueryExtendsDeploymentCache;
   }
 
   public Permission getDefaultUserPermissionForTask() {

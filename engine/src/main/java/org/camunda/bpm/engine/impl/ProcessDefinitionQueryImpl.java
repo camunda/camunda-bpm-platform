@@ -303,14 +303,24 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
       .getProcessDefinitionManager()
       .findProcessDefinitionsByQueryCriteria(this, page);
 
+    boolean shouldQueryAddBpmnModelInstancesToCache =
+        commandContext.getProcessEngineConfiguration().getProcessDefinitionQueryExtendsDeploymentCache();
+    if(shouldQueryAddBpmnModelInstancesToCache) {
+      addProcessDefinitionToCacheAndRetrieveDocumentation(list);
+    }
+
+    return list;
+  }
+
+  protected void addProcessDefinitionToCacheAndRetrieveDocumentation(List<ProcessDefinition> list) {
     for (ProcessDefinition processDefinition : list) {
 
       BpmnModelInstance bpmnModelInstance = Context.getProcessEngineConfiguration()
-              .getDeploymentCache()
-              .findBpmnModelInstanceForProcessDefinition((ProcessDefinitionEntity) processDefinition);
+          .getDeploymentCache()
+          .findBpmnModelInstanceForProcessDefinition((ProcessDefinitionEntity) processDefinition);
 
       ModelElementInstance processElement = bpmnModelInstance.getModelElementById(processDefinition.getKey());
-      if(processElement != null) {
+      if (processElement != null) {
         Collection<Documentation> documentations = processElement.getChildElementsByType(Documentation.class);
         List<String> docStrings = new ArrayList<String>();
         for (Documentation documentation : documentations) {
@@ -322,8 +332,6 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
       }
 
     }
-
-    return list;
   }
 
   @Override
