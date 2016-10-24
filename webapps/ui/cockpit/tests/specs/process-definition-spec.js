@@ -18,7 +18,7 @@ describe('Cockpit Process Definition Spec', function() {
 
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
-        dashboardPage.goToSection('Processes');
+        dashboardPage.goToSection('processes');
       });
     });
 
@@ -95,7 +95,7 @@ describe('Cockpit Process Definition Spec', function() {
 
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
-        dashboardPage.goToSection('Processes');
+        dashboardPage.goToSection('processes');
         processesPage.deployedProcessesList.selectProcess(0);
       });
     });
@@ -157,7 +157,7 @@ describe('Cockpit Process Definition Spec', function() {
 
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
-        dashboardPage.goToSection('Processes');
+        dashboardPage.goToSection('processes');
       });
     });
 
@@ -192,7 +192,7 @@ describe('Cockpit Process Definition Spec', function() {
       before(function() {
         dashboardPage.navigateToWebapp('Cockpit');
         // first process definition displayed is deployed without tenant id
-        dashboardPage.goToSection('Processes');
+        dashboardPage.goToSection('processes');
         processesPage.deployedProcessesList.selectProcess(0);
       });
 
@@ -224,7 +224,7 @@ describe('Cockpit Process Definition Spec', function() {
 
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
-        dashboardPage.goToSection('Processes');
+        dashboardPage.goToSection('processes');
       });
     });
 
@@ -232,7 +232,7 @@ describe('Cockpit Process Definition Spec', function() {
       before(function() {
         dashboardPage.navigateToWebapp('Cockpit');
         // second process definition is deployed without tenant id
-        dashboardPage.goToSection('Processes');
+        dashboardPage.goToSection('processes');
         processesPage.deployedProcessesList.selectProcess(0);
       });
 
@@ -246,7 +246,7 @@ describe('Cockpit Process Definition Spec', function() {
       before(function() {
         dashboardPage.navigateToWebapp('Cockpit');
         // second process definition is deployed without tenant id
-        dashboardPage.goToSection('Processes');
+        dashboardPage.goToSection('processes');
         processesPage.deployedProcessesList.selectProcess(1);
       });
 

@@ -5,7 +5,7 @@ var Base = require('./tasks-plugin');
 module.exports = Base.extend({
 
   listObject: function() {
-    return this.pluginObject().element(by.css('.open-tasks'));
+    return element(by.css('.open-tasks'));
   },
 
   taskStatisticsTable: function() {
@@ -19,7 +19,7 @@ module.exports = Base.extend({
   taskStatisticsList: function() {
     return this.taskStatisticsTable().all(by.repeater('taskStatistic in taskStatistics'));
   },
-  
+
   taskGroupList: function() {
     return this.taskGroupTable().all(by.repeater('taskGroup in taskGroups'));
   },
@@ -35,11 +35,11 @@ module.exports = Base.extend({
   taskStatisticCount: function(item) {
     return this.taskStatisticsList().get(item).element(by.binding('{{ taskStatistic.count }}')).getText();
   },
-  
+
   taskGroupName: function(item) {
     return this.taskGroupList().get(item).element(by.binding('{{ formatGroupName(taskGroup.groupName) }}')).getText();
   },
-  
+
   taskGroupCount: function(item) {
     return this.taskGroupList().get(item).element(by.binding('{{ taskGroup.taskCount }}')).getText();
   },

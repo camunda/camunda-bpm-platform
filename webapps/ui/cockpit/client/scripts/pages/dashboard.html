@@ -4,7 +4,7 @@
     <div class="col-xs-12 col-sm-8 col-lg-10">
 
 
-      <section class="now"
+      <section class="actual"
                ng-class="{'loading': loading}">
         <div class="inner">
           <header>
@@ -14,7 +14,7 @@
           </header>
 
           <div class="row stats">
-            <div class="stats-section col-xs-6 col-lg-3">
+            <div class="stats-section process-instances col-xs-6 col-lg-3">
               <div class="stats-label">Running Process Inst.</div>
               <a class="value"
                  href="#/processes?searchQuery=%5B%7B%22type%22:%22PIunfinished%22,%22operator%22:%22eq%22,%22value%22:%22%22,%22name%22:%22%22%7D%5D"
@@ -22,14 +22,15 @@
                 {{ (!data.actual.runningProcessInstances ? 0 : '') }}
                 {{ data.actual.runningProcessInstances | abbreviateNumber }}
               </a>
-              <span class="value"
-                    ng-if="!hasProcessSearch">
+              <a class="value"
+                 href="#/processes"
+                 ng-if="!hasProcessSearch">
                 {{ (!data.actual.runningProcessInstances ? 0 : '') }}
                 {{ data.actual.runningProcessInstances | abbreviateNumber }}
-              </span>
+              </a>
             </div>
 
-            <div class="stats-section col-xs-6 col-lg-3">
+            <div class="stats-section open-incidents col-xs-6 col-lg-3">
               <div class="stats-label">Open Incidents</div>
               <a class="value"
                  href="#/processes?searchQuery=%5B%7B%22type%22:%22PIunfinished%22,%22operator%22:%22eq%22,%22value%22:%22%22,%22name%22:%22%22%7D%5D"
@@ -37,14 +38,15 @@
                 {{ (!data.actual.openIncidents ? 0 : '') }}
                 {{ data.actual.openIncidents | abbreviateNumber }}
               </a>
-              <span class="value"
-                    ng-if="!hasProcessSearch">
+              <a class="value"
+                 href="#/processes"
+                 ng-if="!hasProcessSearch">
                 {{ (!data.actual.openIncidents ? 0 : '') }}
                 {{ data.actual.openIncidents | abbreviateNumber }}
-              </span>
+              </a>
             </div>
 
-            <div class="stats-section col-xs-6 col-lg-3">
+            <div class="stats-section open-cases col-xs-6 col-lg-3">
               <div class="stats-label">Open Cases</div>
               <a class="value"
                  ng-if="hasCaseSearch"
@@ -59,7 +61,7 @@
               </span>
             </div>
 
-            <div class="stats-section col-xs-6 col-lg-3">
+            <div class="stats-section open-human-tasks col-xs-6 col-lg-3">
               <div class="stats-label">Open Human Tasks</div>
               <a class="value"
                  ng-if="hasTaskSearch"
@@ -67,8 +69,9 @@
                 {{ (!data.actual.tasks ? 0 : '') }}
                 {{ data.actual.tasks | abbreviateNumber }}
               </a>
-              <span class="value"
-                    ng-if="!hasTaskSearch">
+              <a class="value"
+                 href="#/tasks"
+                 ng-if="!hasTaskSearch">
                 {{ (!data.actual.tasks ? 0 : '') }}
                 {{ data.actual.tasks | abbreviateNumber }}
               </a>

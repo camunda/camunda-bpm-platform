@@ -16,7 +16,7 @@ describe('Cockpit Tasks Dashboard Spec', function() {
         // when
         tasksPage.navigateToWebapp('Cockpit');
         tasksPage.authentication.userLogin('admin', 'admin');
-        tasksPage.goToSection('Human Tasks');
+        tasksPage.goToSection('tasks');
       });
     });
 
@@ -45,7 +45,7 @@ describe('Cockpit Tasks Dashboard Spec', function() {
         // then
         expect(tasksPage.openTasksStatistics.taskStatisticLabel(2)).to.eventually.eql('unassigned');
         expect(tasksPage.openTasksStatistics.taskStatisticCount(2)).to.eventually.eql('1');
-      })
+      });
     });
 
     describe('open task count by group table', function() {

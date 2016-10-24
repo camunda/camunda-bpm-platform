@@ -5,7 +5,7 @@ var Base = require('./../dashboard/dashboard-view');
 module.exports = Base.extend({
 
   pluginList: function () {
-    return element.all(by.css('.dashboard-view'));
+    return element.all(by.css('.processes-dashboard'));
   },
 
   pluginObject: function() {
