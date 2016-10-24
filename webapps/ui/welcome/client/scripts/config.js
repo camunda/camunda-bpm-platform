@@ -22,7 +22,7 @@ window.camWelcomeConf = {
   //   },
   //   {
   //     label: 'XKCD',
-  //     href: 'https://xkcd.org',
+  //     href: 'http://xkcd.org',
   //     description: 'Nerdy comic'
   //   },
   //   {
