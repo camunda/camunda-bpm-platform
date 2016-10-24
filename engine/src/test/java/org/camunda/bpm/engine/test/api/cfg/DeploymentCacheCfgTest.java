@@ -19,6 +19,7 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
@@ -31,9 +32,7 @@ import org.junit.Test;
 import org.junit.rules.RuleChain;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 /**
  * @author Johannes Heinemann
@@ -45,7 +44,7 @@ public class DeploymentCacheCfgTest {
       // apply configuration options here
       configuration.setCacheCapacity(2);
       configuration.setCacheFactory(new MyCacheFactory());
-      configuration.setProcessDefinitionQueryExtendsDeploymentCache(false);
+      configuration.setEnableFetchProcessDefinitionDescription(false);
       return configuration;
     }
   };
@@ -135,5 +134,63 @@ public class DeploymentCacheCfgTest {
     BpmnModelInstance modelInstance = deploymentCache.getBpmnModelInstanceCache().get(pi.getProcessDefinitionId());
     assertNull(modelInstance);
   }
+
+  @Test
+  @Deployment(resources =
+      {"org/camunda/bpm/engine/test/api/cfg/DeploymentCacheCfgTest.testDefaultCacheRemovesElementWhenMaxSizeIsExceeded.bpmn20.xml"})
+  public void testEnableQueryOfProcessDefinitionAddModelInstancesToDeploymentCache() {
+
+    // given
+    processEngineConfiguration.setEnableFetchProcessDefinitionDescription(true);
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("two");
+
+    // when
+    repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("two")
+        .singleResult()
+        .getId();
+
+    // then
+    DeploymentCache deploymentCache = processEngineConfiguration.getDeploymentCache();
+    BpmnModelInstance modelInstance = deploymentCache.getBpmnModelInstanceCache().get(pi.getProcessDefinitionId());
+    assertNotNull(modelInstance);
+  }
+
+  @Test
+  @Deployment(resources =
+      {"org/camunda/bpm/engine/test/api/cfg/DeploymentCacheCfgTest.testDefaultCacheRemovesElementWhenMaxSizeIsExceeded.bpmn20.xml"})
+  public void testDescriptionIsNullWhenFetchProcessDefinitionDescriptionIsDisabled() {
+
+    // given
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("two");
+
+    // when
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("two")
+        .singleResult();
+
+    // then
+    assertNull(processDefinition.getDescription());
+  }
+
+  @Test
+  @Deployment(resources =
+      {"org/camunda/bpm/engine/test/api/cfg/DeploymentCacheCfgTest.testDefaultCacheRemovesElementWhenMaxSizeIsExceeded.bpmn20.xml"})
+  public void testDescriptionIsAvailableWhenFetchProcessDefinitionDescriptionIsEnabled() {
+
+    // given
+    processEngineConfiguration.setEnableFetchProcessDefinitionDescription(true);
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("two");
+
+    // when
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("two")
+        .singleResult();
+
+    // then
+    assertNotNull(processDefinition.getDescription());
+    assertEquals("This is a documentation!", processDefinition.getDescription());
+  }
+
 
 }

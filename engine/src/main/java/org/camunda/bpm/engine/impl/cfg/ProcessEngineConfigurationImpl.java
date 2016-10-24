@@ -398,7 +398,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected CacheFactory cacheFactory;
   protected int cacheCapacity = 1000;
-  protected boolean processDefinitionQueryExtendsDeploymentCache = true;
+  protected boolean enableFetchProcessDefinitionDescription = true;
 
   // JOB EXECUTOR /////////////////////////////////////////////////////////////
 
@@ -2367,12 +2367,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     this.cacheCapacity = cacheCapacity;
   }
 
-  public void setProcessDefinitionQueryExtendsDeploymentCache(boolean processDefinitionQueryExtendsDeploymentCache){
-    this.processDefinitionQueryExtendsDeploymentCache = processDefinitionQueryExtendsDeploymentCache;
+  public void setEnableFetchProcessDefinitionDescription(boolean enableFetchProcessDefinitionDescription){
+    this.enableFetchProcessDefinitionDescription = enableFetchProcessDefinitionDescription;
   }
 
-  public boolean getProcessDefinitionQueryExtendsDeploymentCache() {
-    return this.processDefinitionQueryExtendsDeploymentCache;
+  public boolean getEnableFetchProcessDefinitionDescription() {
+    return this.enableFetchProcessDefinitionDescription;
   }
 
   public Permission getDefaultUserPermissionForTask() {

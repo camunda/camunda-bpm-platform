@@ -304,7 +304,7 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
       .findProcessDefinitionsByQueryCriteria(this, page);
 
     boolean shouldQueryAddBpmnModelInstancesToCache =
-        commandContext.getProcessEngineConfiguration().getProcessDefinitionQueryExtendsDeploymentCache();
+        commandContext.getProcessEngineConfiguration().getEnableFetchProcessDefinitionDescription();
     if(shouldQueryAddBpmnModelInstancesToCache) {
       addProcessDefinitionToCacheAndRetrieveDocumentation(list);
     }

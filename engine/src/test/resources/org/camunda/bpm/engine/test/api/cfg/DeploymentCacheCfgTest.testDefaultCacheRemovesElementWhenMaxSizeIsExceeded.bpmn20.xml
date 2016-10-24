@@ -12,6 +12,7 @@
     </process>
 
     <process id="two" name="Two" isExecutable="true">
+        <documentation>This is a documentation!</documentation>
         <startEvent id="start2" />
         <sequenceFlow id="flow2" sourceRef="start2" targetRef="end2" />
         <endEvent id="end2" />
