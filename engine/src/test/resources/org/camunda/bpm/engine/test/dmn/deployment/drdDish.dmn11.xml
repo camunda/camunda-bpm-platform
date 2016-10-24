@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn11.xsd" id="dish" name="Dish" namespace="test-drd-2">
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd" id="dish" name="Dish" namespace="test-drd-2">
   <decision id="dish-decision" name="Dish Decision">
     <informationRequirement>
       <requiredDecision href="#season" />
