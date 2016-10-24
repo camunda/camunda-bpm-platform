@@ -21,7 +21,7 @@ module.exports = Base.extend({
 
     this.findElementIndexInRepeater('decision in decisions', by.css('.tenant-id'), tenantId).then(function(idx) {
       that.selectDecision(idx);
-    })
+    });
   },
 
   decisionName: function(item) {

@@ -16,7 +16,7 @@ describe('Cockpit Variable Spec', function() {
       return testHelper(setupFile.setup1, function() {
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
-        dashboardPage.goToSection('Processes');
+        dashboardPage.goToSection('processes');
         processesPage.deployedProcessesList.selectProcess(0);
         definitionPage.processInstancesTab.selectInstanceId(0);
       });
@@ -175,7 +175,7 @@ describe('Cockpit Variable Spec', function() {
 
       expect(variable.type().getText()).to.eventually.eql('Date');
       expect(variable.value().getText()).to.eventually.eql('2011-11-11T11:11:11');
-      
+
       // when
       variable.enterEditMode();
       variable.typeSelect('Short').click();

@@ -18,7 +18,7 @@ describe('Cockpit Suspsension Spec', function() {
 
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
-        dashboardPage.goToSection('Processes');
+        dashboardPage.goToSection('processes');
         processesPage.deployedProcessesList.selectProcess(0);
       });
     });
@@ -52,7 +52,7 @@ describe('Cockpit Suspsension Spec', function() {
 
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
-        dashboardPage.goToSection('Processes');
+        dashboardPage.goToSection('processes');
         processesPage.deployedProcessesList.selectProcess(0);
         definitionPage.processInstancesTab.selectInstanceId(0);
       });
@@ -72,7 +72,7 @@ describe('Cockpit Suspsension Spec', function() {
 
       // when
       instancePage.navbarBrand().click();
-      dashboardPage.goToSection('Processes');
+      dashboardPage.goToSection('processes');
       processesPage.deployedProcessesList.selectProcess(0);
 
       // then
@@ -102,7 +102,7 @@ describe('Cockpit Suspsension Spec', function() {
 
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
-        dashboardPage.goToSection('Processes');
+        dashboardPage.goToSection('processes');
         processesPage.deployedProcessesList.selectProcess(0);
         definitionPage.jobDefinitionsTab.selectTab();
       });

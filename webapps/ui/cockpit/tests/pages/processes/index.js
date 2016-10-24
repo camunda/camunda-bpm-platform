@@ -10,7 +10,7 @@ var Page = Base.extend({
   url: '/camunda/app/cockpit/default/#/processes',
 
   pluginList: function () {
-    return element.all(by.css('.dashboard-view'));
+    return element.all(by.css('.dashboard'));
   }
 });
 

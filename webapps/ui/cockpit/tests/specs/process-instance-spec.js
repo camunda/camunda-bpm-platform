@@ -20,7 +20,7 @@ describe('Cockpit Process Instance Spec', function() {
 
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
-        dashboardPage.goToSection('Processes');
+        dashboardPage.goToSection('processes');
         processesPage.deployedProcessesList.selectProcess(0);
       });
     });
@@ -91,7 +91,7 @@ describe('Cockpit Process Instance Spec', function() {
       return testHelper(setupFile.setup1, function() {
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
-        dashboardPage.goToSection('Processes');
+        dashboardPage.goToSection('processes');
         processesPage.deployedProcessesList.selectProcess(0);
         definitionPage.processInstancesTab.selectInstanceId(0);
       });
@@ -135,7 +135,7 @@ describe('Cockpit Process Instance Spec', function() {
       return testHelper(setupFile.setup1, function() {
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
-        dashboardPage.goToSection('Processes');
+        dashboardPage.goToSection('processes');
         processesPage.deployedProcessesList.selectProcess(0);
         definitionPage.processInstancesTab.selectInstanceId(0);
         instancePage.userTasksTab.selectTab();
@@ -257,7 +257,7 @@ describe('Cockpit Process Instance Spec', function() {
       return testHelper(setupFile.setup1, function() {
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
-        dashboardPage.goToSection('Processes');
+        dashboardPage.goToSection('processes');
         processesPage.deployedProcessesList.selectProcess(0);
         definitionPage.processInstancesTab.selectInstanceId(0);
       });
@@ -344,7 +344,7 @@ describe('Cockpit Process Instance Spec', function() {
       return testHelper(setupFile.setup1, function() {
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
-        dashboardPage.goToSection('Processes');
+        dashboardPage.goToSection('processes');
         processesPage.deployedProcessesList.selectProcess(0);
       });
     });
@@ -371,7 +371,7 @@ describe('Cockpit Process Instance Spec', function() {
       return testHelper(setupFile.setup2, function() {
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
-        dashboardPage.goToSection('Processes');
+        dashboardPage.goToSection('processes');
         processesPage.deployedProcessesList.selectProcess(0);
       });
     });
@@ -433,7 +433,7 @@ describe('Cockpit Process Instance Spec', function() {
 
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
-        dashboardPage.goToSection('Processes');
+        dashboardPage.goToSection('processes');
         processesPage.deployedProcessesList.selectProcessByName("Failed external task");
         element(by.css('.ctn-content-bottom .instance-id [ng-transclude] a')).click();
         instancePage.incidentsTab.selectTab();
@@ -452,13 +452,13 @@ describe('Cockpit Process Instance Spec', function() {
       return testHelper(setupFile.setup3, function() {
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
-        dashboardPage.goToSection('Processes');
+        dashboardPage.goToSection('processes');
       });
     });
 
     function goToInstanceJobRetryModal(name) {
       dashboardPage.navigateToWebapp('Cockpit');
-      dashboardPage.goToSection('Processes');
+      dashboardPage.goToSection('processes');
       processesPage.deployedProcessesList.selectProcessByName(name);
       element(by.css('.ctn-content-bottom .instance-id [ng-transclude] a')).click();
       element(by.css('.ctn-toolbar [tooltip~="Retries"]')).click();
@@ -514,12 +514,12 @@ describe('Cockpit Process Instance Spec', function() {
 
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
-        dashboardPage.goToSection('Processes');
+        dashboardPage.goToSection('processes');
       });
     });
 
     it('should display tenant id of instance', function() {
-      dashboardPage.goToSection('Processes');
+      dashboardPage.goToSection('processes');
 
       // through sorting, first process definition is without tenant, second has tenant
       processesPage.deployedProcessesList.selectProcess(1);
@@ -535,7 +535,7 @@ describe('Cockpit Process Instance Spec', function() {
     it('should not display tenant id of instance if not exists', function() {
 
       dashboardPage.navigateToWebapp('Cockpit');
-      dashboardPage.goToSection('Processes');
+      dashboardPage.goToSection('processes');
       // through sorting, first process definition is without tenant, second has tenant
       processesPage.deployedProcessesList.selectProcess(0);
       definitionPage.processInstancesTab.selectInstanceId(0);
@@ -554,7 +554,7 @@ describe('Cockpit Process Instance Spec', function() {
       return testHelper(setupFile.multiTenancySetup, function() {
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
-        dashboardPage.goToSection('Processes');
+        dashboardPage.goToSection('processes');
 
         processesPage.deployedProcessesList.selectProcess(1);
         definitionPage.processInstancesTab.selectInstanceId(0);

@@ -24,7 +24,25 @@ module.exports = Page.extend({
     return this.navbarItem().element(by.css('a')).click();
   },
 
+  navbarDropDown: function () {
+    return this.navbar().all(by.css('[ng-transclude] > ul > li.dropdown'));
+  },
+
+  navbarDropDownItems: function () {
+    return this.navbarDropDown().all(by.css('.dropdown-menu > li'));
+  },
+
+  navbarDropDownItem: function (idx) {
+    return this.navbarDropDownItems().get(idx);
+  },
+
+  navbarDropDownItemClick: function (idx) {
+    this.navbarDropDown().click();
+    return this.navbarDropDownItem(idx).click();
+  },
+
   goToSection: function (name) {
-    return this.navbar().element(by.cssContainingText('[ng-transclude] > ul > li a', name)).click();
+    return browser.get('camunda/app/cockpit/default/#/' + name.toLowerCase());
+    // return this.navbar().element(by.cssContainingText('[ng-transclude] > ul > li a', name)).click();
   }
 });
