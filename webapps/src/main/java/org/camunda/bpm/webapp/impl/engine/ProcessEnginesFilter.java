@@ -66,7 +66,7 @@ public class ProcessEnginesFilter extends AbstractTemplateFilter {
   public static final String PLUGIN_DEPENDENCIES_PLACEHOLDER = "$PLUGIN_DEPENDENCIES";
   public static final String PLUGIN_PACKAGES_PLACEHOLDER = "$PLUGIN_PACKAGES";
 
-  public static Pattern APP_PREFIX_PATTERN = Pattern.compile("/app/(?:([a-zA-Z0-9-]+?)/(?:(index\\.html|[a-zA-Z0-9-]+)?/?([^?]*)?)?)?");
+  public static Pattern APP_PREFIX_PATTERN = Pattern.compile("/app/(?:([\\w-]+?)/(?:(index\\.html|[\\w-]+)?/?([^?]*)?)?)?");
 
   protected final CockpitRuntimeDelegate cockpitRuntimeDelegate;
   protected final AdminRuntimeDelegate adminRuntimeDelegate;
