@@ -43,7 +43,7 @@
         PD.TENANT_ID_ AS TENANT_ID_,
         PD.PROC_DEF_VERSION_ AS VERSION_
       FROM
-        ACT_HI_TASKINST HTI
+        ${prefix}ACT_HI_TASKINST HTI
 
       INNER JOIN (
         SELECT
@@ -51,7 +51,7 @@
           PD_JOIN2.TENANT_ID_   AS TENANT_ID_,
           MAX(PD_JOIN2.VERSION_) AS PROC_DEF_VERSION_
         FROM
-          ACT_RE_PROCDEF PD_JOIN2
+          ${prefix}ACT_RE_PROCDEF PD_JOIN2
         GROUP BY
           PD_JOIN2.KEY_,
           PD_JOIN2.TENANT_ID_
@@ -70,7 +70,7 @@
         PD.TENANT_ID_
     ) COUNTS
     INNER JOIN
-      ACT_RE_PROCDEF PROC_DEF2
+      ${prefix}ACT_RE_PROCDEF PROC_DEF2
     ON
       PROC_DEF2.KEY_ = COUNTS.PROC_DEF_KEY_
     AND
@@ -102,7 +102,7 @@
         PD.TENANT_ID_ AS TENANT_ID_,
         PD.PROC_DEF_VERSION_ AS VERSION_
       FROM
-        ACT_HI_TASKINST HTI
+        ${prefix}ACT_HI_TASKINST HTI
 
       INNER JOIN (
         SELECT
@@ -110,7 +110,7 @@
           PD_JOIN2.TENANT_ID_   AS TENANT_ID_,
           MAX(PD_JOIN2.VERSION_) AS PROC_DEF_VERSION_
         FROM
-          ACT_RE_PROCDEF PD_JOIN2
+          ${prefix}ACT_RE_PROCDEF PD_JOIN2
         GROUP BY
           PD_JOIN2.KEY_,
           PD_JOIN2.TENANT_ID_
@@ -129,7 +129,7 @@
         PD.TENANT_ID_
     ) COUNTS
     INNER JOIN
-      ACT_RE_PROCDEF PROC_DEF2
+      ${prefix}ACT_RE_PROCDEF PROC_DEF2
     ON
       PROC_DEF2.KEY_ = COUNTS.PROC_DEF_KEY_
     AND
@@ -159,7 +159,7 @@
         PD.TENANT_ID_ AS TENANT_ID_,
         PD.PROC_DEF_VERSION_ AS VERSION_
       FROM
-        ACT_HI_TASKINST HTI
+        ${prefix}ACT_HI_TASKINST HTI
 
       INNER JOIN (
       SELECT
@@ -167,7 +167,7 @@
         PD_JOIN2.TENANT_ID_   AS TENANT_ID_,
         MAX(PD_JOIN2.VERSION_) AS PROC_DEF_VERSION_
       FROM
-        ACT_RE_PROCDEF PD_JOIN2
+        ${prefix}ACT_RE_PROCDEF PD_JOIN2
       GROUP BY
         PD_JOIN2.KEY_,
         PD_JOIN2.TENANT_ID_
@@ -185,7 +185,7 @@
         PD.TENANT_ID_
     ) COUNTS
     INNER JOIN
-      ACT_RE_PROCDEF PROC_DEF2
+      ${prefix}ACT_RE_PROCDEF PROC_DEF2
     ON
       PROC_DEF2.KEY_ = COUNTS.PROC_DEF_KEY_
     AND
