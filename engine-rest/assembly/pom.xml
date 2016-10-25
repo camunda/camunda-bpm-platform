@@ -35,6 +35,14 @@
     </dependency>
 
     <dependency>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-engine-rest-core</artifactId>
+      <version>${project.version}</version>
+      <classifier>tests</classifier>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-jaxrs</artifactId>
       <scope>provided</scope>
@@ -141,6 +149,23 @@
             <configuration>
               <descriptors>
                 <descriptor>assembly-sources.xml</descriptor>
+              </descriptors>
+              <finalName>camunda-engine-rest-${project.version}</finalName>
+              <attach>true</attach>
+              <outputDirectory>target/</outputDirectory>
+              <workDirectory>target/assembly/work</workDirectory>
+            </configuration>
+          </execution>
+
+          <execution>
+            <id>tests</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <descriptors>
+                <descriptor>assembly-tests.xml</descriptor>
               </descriptors>
               <finalName>camunda-engine-rest-${project.version}</finalName>
               <attach>true</attach>
