@@ -105,6 +105,7 @@
         <camunda:in source="invoiceCategory" target="invoiceCategory" />
         <camunda:in source="invoiceNumber" target="invoiceNumber" />
         <camunda:out source="clarified" target="clarified" />
+        <camunda:out source="reviewComment" target="reviewComment" />
       </extensionElements>
       <incoming>invoiceNotApproved</incoming>
       <outgoing>sequenceFlow_183</outgoing>

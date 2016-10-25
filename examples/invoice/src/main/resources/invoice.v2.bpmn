@@ -101,6 +101,7 @@
         <camunda:in source="amount" target="amount" />
         <camunda:in source="invoiceCategory" target="invoiceCategory" />
         <camunda:in source="invoiceNumber" target="invoiceNumber" />
+        <camunda:out source="reviewComment" target="reviewComment" />
       </extensionElements>
       <incoming>invoiceNotApproved</incoming>
       <outgoing>sequenceFlow_183</outgoing>
@@ -217,7 +218,7 @@
         <omgdi:waypoint xsi:type="omgdc:Point" x="403" y="35" />
         <omgdi:waypoint xsi:type="omgdc:Point" x="403" y="224" />
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds x="720" y="36" width="32" height="26" />
+          <omgdc:Bounds x="727" y="36" width="18" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_1" bpmnElement="SequenceFlow_2" sourceElement="zberweisung_vorbereiten_169_gui" targetElement="_BPMNShape_ServiceTask_2">
