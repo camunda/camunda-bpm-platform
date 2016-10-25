@@ -60,7 +60,7 @@ module.exports = function(pluginDependencies) {
       UriProvider.replace(':engine', [ '$window', function($window) {
         var uri = $window.location.href;
 
-        var match = uri.match(/\/app\/cockpit\/([a-zA-Z0-9-]+)(|\/)/);
+        var match = uri.match(/\/app\/cockpit\/([\w-]+)(|\/)/);
         if (match) {
           return match[1];
         } else {

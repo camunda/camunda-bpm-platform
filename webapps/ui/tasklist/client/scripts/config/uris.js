@@ -20,7 +20,7 @@ module.exports = function(ngModule, config) {
       UriProvider.replace(':engine', ['$window', function($window) {
         var uri = $window.location.href;
 
-        var match = uri.match(/\/app\/tasklist\/([a-zA-Z0-9-]+)(|\/)/);
+        var match = uri.match(/\/app\/tasklist\/([\w-]+)(|\/)/);
         if (match) {
           return match[1];
         } else {
