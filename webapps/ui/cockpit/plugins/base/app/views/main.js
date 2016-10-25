@@ -9,6 +9,9 @@ var angular = require('angular'),
     dashboardDeployments = require('./dashboard/deployments'),
     dashboardReports = require('./dashboard/reports'),
     dashboardBatches = require('./dashboard/batches'),
+    dashboardProcesses = require('./dashboard/processes'),
+    dashboardDecisions = require('./dashboard/decisions'),
+    dashboardTasks = require('./dashboard/tasks'),
 
     // processes dashboard
     processDefinitions = require('./processesDashboard/process-definitions'),
@@ -43,6 +46,9 @@ var ngModule = angular.module('cockpit.plugin.base.views', []);
 ngModule.config(dashboardDeployments);
 ngModule.config(dashboardReports);
 ngModule.config(dashboardBatches);
+ngModule.config(dashboardProcesses);
+ngModule.config(dashboardDecisions);
+ngModule.config(dashboardTasks);
 
 ngModule.config(processDefinitions);
 
