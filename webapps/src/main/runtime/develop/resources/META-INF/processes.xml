@@ -21,7 +21,7 @@
     </plugins>
   </process-engine>
 
-  <process-engine name="engine2">
+  <process-engine name="spring-engine">
     <configuration>org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration</configuration>
     <properties>
       <property name="jdbcUrl">jdbc:h2:mem:activiti2;MVCC=TRUE;TRACE_LEVEL_FILE=0;DB_CLOSE_ON_EXIT=FALSE</property>
@@ -60,7 +60,7 @@
       <property name="resourceRootPath">pa:pa1</property>
     </properties>
   </process-archive>
-  
+
   <process-archive name="second-test-processes">
     <properties>
       <property name="resourceRootPath">pa:pa2</property>
@@ -72,13 +72,13 @@
       <property name="resourceRootPath">pa:pa3</property>
     </properties>
   </process-archive>
-  
+
   <process-archive name="tenant1-processes" tenantId="tenant1">
     <properties>
       <property name="resourceRootPath">pa:pa3/invoice</property>
     </properties>
   </process-archive>
-  
+
   <process-archive name="tenant2-processes" tenantId="tenant2">
     <properties>
       <property name="resourceRootPath">pa:pa3/invoice</property>
