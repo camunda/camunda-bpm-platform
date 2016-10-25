@@ -21,7 +21,7 @@
     </plugins>
   </process-engine>
 
-  <process-engine name="spring-engine">
+  <process-engine name="engine2">
     <configuration>org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration</configuration>
     <properties>
       <property name="jdbcUrl">jdbc:h2:mem:activiti2;MVCC=TRUE;TRACE_LEVEL_FILE=0;DB_CLOSE_ON_EXIT=FALSE</property>
