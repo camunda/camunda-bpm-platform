@@ -40,6 +40,7 @@ module.exports = function(pluginDependencies) {
     ) {
       $routeProvider.otherwise({ redirectTo: '/' });
 
+
       function getUri(id) {
         var uri = $('base').attr(id);
         if (!id) {
@@ -59,7 +60,7 @@ module.exports = function(pluginDependencies) {
       UriProvider.replace(':engine', [ '$window', function($window) {
         var uri = $window.location.href;
 
-        var match = uri.match(/\/app\/admin\/(\w+)(|\/)/);
+        var match = uri.match(/\/app\/admin\/([a-zA-Z0-9-]+)(|\/)/);
         if (match) {
           return match[1];
         } else {
@@ -80,7 +81,6 @@ module.exports = function(pluginDependencies) {
       camAPI
     ) {
       var userService = camAPI.resource('user');
-
       function getUserProfile(auth) {
         if (!auth || !auth.name) {
           $scope.userFullName = null;
