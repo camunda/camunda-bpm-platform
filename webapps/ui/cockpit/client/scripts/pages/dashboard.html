@@ -9,7 +9,7 @@
         <div class="inner">
           <header>
             <div class="row">
-              <h1 class="col-xs-4 section-title">Actual</h1>
+              <h1 class="col-xs-4 section-title">Right Now</h1>
             </div>
           </header>
 
@@ -33,7 +33,7 @@
             <div class="stats-section open-incidents col-xs-6 col-lg-3">
               <div class="stats-label">Open Incidents</div>
               <a class="value"
-                 href="#/processes?searchQuery=%5B%7B%22type%22:%22PIunfinished%22,%22operator%22:%22eq%22,%22value%22:%22%22,%22name%22:%22%22%7D%5D"
+                 href="#/processes?searchQuery=%5B%7B%22type%22:%22PIwithIncidents%22,%22operator%22:%22eq%22,%22value%22:%22%22,%22name%22:%22%22%7D,%7B%22type%22:%22PIIncidentStatus%22,%22operator%22:%22eq%22,%22value%22:%22open%22,%22name%22:%22%22%7D%5D"
                  ng-if="hasProcessSearch">
                 {{ (!data.actual.openIncidents ? 0 : '') }}
                 {{ data.actual.openIncidents | abbreviateNumber }}
@@ -65,7 +65,7 @@
               <div class="stats-label">Open Human Tasks</div>
               <a class="value"
                  ng-if="hasTaskSearch"
-                 href="#/tasks?searchQuery=%5B%7B%22type%22:%22TAunfinished%22,%22operator%22:%22eq%22,%22value%22:%22%22,%22name%22:%22%22%7D%5D">
+                 href="#/tasks?searchQuery=%5B%7B%22type%22:%22unfinished%22,%22operator%22:%22eq%22,%22value%22:%22%22,%22name%22:%22%22%7D%5D">
                 {{ (!data.actual.tasks ? 0 : '') }}
                 {{ data.actual.tasks | abbreviateNumber }}
               </a>
