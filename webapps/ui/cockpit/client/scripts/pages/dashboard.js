@@ -101,19 +101,25 @@ var Controller = [
     }
 
     function fetchDeployed(cb) {
-      // 5: GET /process-definition/count
-      // 6: GET /decision-definition/count
-      // 7: GET /case-definition/count
+      // 5: GET /process-definition/count?latestVersion=true
+      // 6: GET /decision-definition/count?latestVersion=true
+      // 7: GET /case-definition/count?latestVersion=true
       // 8: GET /deployment/count
       series({
         processDefinitions: function(next) {
-          procDefResource.count({}, next);
+          procDefResource.count({
+            latestVersion: true
+          }, next);
         },
         decisionDefinitions: function(next) {
-          decisionDefResource.count({}, next);
+          decisionDefResource.count({
+            latestVersion: true
+          }, next);
         },
         caseDefinitions: function(next) {
-          caseDefResource.count({}, next);
+          caseDefResource.count({
+            latestVersion: true
+          }, next);
         },
         deploymentDefinitions: function(next) {
           deploymentResource.count({}, next);
