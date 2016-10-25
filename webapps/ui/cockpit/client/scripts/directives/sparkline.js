@@ -119,8 +119,7 @@ proto.setData = function(data, newTimespan) {
 
   this.timeLabels = [];
   if (data.length && data[0] && data[0].length && data[0][0].timestamp) {
-    var set = data[0];
-    var to = moment(set[set.length - 1].timestamp, timestampFormat);
+    var to = moment();
 
     var labelTo = this.labelTo = to.clone();
     if (timespan === 'day') {
