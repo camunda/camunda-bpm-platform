@@ -36,7 +36,7 @@ function Sparkline(options) {
   this.timeLabelFormats = {
     day: 'HH:mm',
     week: 'dd DD',
-    month: 'dd DD MMM'
+    month: 'DD MMM'
   };
 }
 
