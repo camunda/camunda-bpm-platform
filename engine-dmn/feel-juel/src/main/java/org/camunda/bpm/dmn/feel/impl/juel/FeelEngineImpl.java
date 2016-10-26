@@ -49,7 +49,7 @@ public class FeelEngineImpl implements FeelEngine {
     try {
       ELContext elContext = createContext(variableContext);
       ValueExpression valueExpression = transformSimpleUnaryTests(simpleUnaryTests, inputName, elContext);
-      return (Boolean) valueExpression.getValue(elContext);
+       return (Boolean) valueExpression.getValue(elContext);
     }
     catch (FeelMissingFunctionException e) {
       throw LOG.unknownFunction(simpleUnaryTests, e);

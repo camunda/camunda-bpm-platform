@@ -13,13 +13,6 @@
 
 package org.camunda.bpm.dmn.engine.impl;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.camunda.bpm.dmn.engine.DmnDecision;
 import org.camunda.bpm.dmn.engine.DmnDecisionLogic;
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
@@ -29,9 +22,18 @@ import org.camunda.bpm.dmn.engine.impl.delegate.DmnDecisionEvaluationEventImpl;
 import org.camunda.bpm.dmn.engine.impl.evaluation.DecisionLiteralExpressionEvaluationHandler;
 import org.camunda.bpm.dmn.engine.impl.evaluation.DecisionTableEvaluationHandler;
 import org.camunda.bpm.dmn.engine.impl.evaluation.DmnDecisionLogicEvaluationHandler;
+import org.camunda.bpm.dmn.engine.impl.hitpolicy.CollectHitPolicyHandler;
+import org.camunda.bpm.dmn.engine.impl.spi.hitpolicy.DmnHitPolicyHandler;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.context.VariableContext;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Context which evaluates a decision on a given input
@@ -79,7 +81,11 @@ public class DefaultDmnDecisionContext {
 
       evaluatedResult = handler.generateDecisionResult(evaluatedEvent);
       if(decision != evaluateDecision) {
-        addResultToVariableContext(evaluatedResult, variableMap);
+        DmnHitPolicyHandler hitPolicyHandler = null;
+        if (DmnDecisionTableImpl.class.equals(evaluateDecision.getDecisionLogic().getClass())) {
+          hitPolicyHandler =((DmnDecisionTableImpl)evaluateDecision.getDecisionLogic()).getHitPolicyHandler();
+        }
+        addResultToVariableContext(evaluatedResult, variableMap, hitPolicyHandler);
       }
     }
 
@@ -121,13 +127,13 @@ public class DefaultDmnDecisionContext {
     }
   }
 
-  protected void addResultToVariableContext(DmnDecisionResult evaluatedResult, VariableMap variableMap)
-  {
+  protected void addResultToVariableContext(DmnDecisionResult evaluatedResult, VariableMap variableMap, DmnHitPolicyHandler hitPolicyHandler) {
     List<Map<String, Object>> resultList = evaluatedResult.getResultList();
 
-    if(resultList.isEmpty()) {
+    boolean isNotCollectHitPolicy = hitPolicyHandler == null || !CollectHitPolicyHandler.class.equals(hitPolicyHandler.getClass());
+    if (resultList.isEmpty()) {
       return;
-    } else if(resultList.size() == 1) {
+    } else if (resultList.size() == 1 && isNotCollectHitPolicy) {
       variableMap.putAll(evaluatedResult.getSingleResult());
     } else {
       Set<String> outputs = new HashSet<String>();

@@ -20,7 +20,7 @@
       </input>
       <output id="output1" name="aa" typeRef="string" />
       <rule id="rule1">
-        <inputEntry id="inputEntry1"><text><![CDATA[cellInput.contains("bb")]]></text>
+        <inputEntry id="inputEntry1"><text><![CDATA[cellInput.get(0).contains("bb")]]></text>
         </inputEntry>
         <inputEntry id="inputEntry3"><text><![CDATA[cellInput == "cc"]]></text>
         </inputEntry>
@@ -28,7 +28,7 @@
         </outputEntry>
       </rule>
       <rule id="rule2">
-        <inputEntry id="inputEntry4"><text><![CDATA[cellInput.contains("bbb")]]></text>
+        <inputEntry id="inputEntry4"><text><![CDATA[cellInput.get(0).contains("bbb")]]></text>
         </inputEntry>
         <inputEntry id="inputEntry6"><text><![CDATA[cellInput == "cc"]]></text>
         </inputEntry>
@@ -37,7 +37,7 @@
       </rule>
     </decisionTable>
    </decision>
-    
+
    <decision id="B" name="B">
     <decisionTable id="bbDecisionTable" hitPolicy="COLLECT">
       <input id="input4">
@@ -58,7 +58,7 @@
       </rule>
     </decisionTable>
    </decision>
-   
+
    <decision id="C" name="C">
     <decisionTable id="ccDecisionTable">
       <input id="input5">
