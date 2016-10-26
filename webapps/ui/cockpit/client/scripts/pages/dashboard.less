@@ -51,7 +51,28 @@
     }
 
     .chart {
+      position: relative;
       padding-top: 10px;
+
+      [cam-sparkline] {
+        position: relative;
+        z-index: 10;
+      }
+
+      [cam-sparkline].no-data:before {
+        content: 'No Data';
+        position: absolute;
+        display: block;
+        top: 50%;
+        font-size: 32px;
+        margin-top: -36px;
+        line-height: 100%;
+        left: 0;
+        width: 100%;
+        text-align: center;
+        z-index: 5;
+        color: @gray-lighter;
+      }
     }
 
     [cam-sparkline] {

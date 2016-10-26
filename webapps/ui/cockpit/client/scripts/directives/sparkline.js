@@ -57,13 +57,13 @@ proto.max = function(index) {
 
   var val = 0;
   if (!arguments.length) {
-    self.data.forEach(function(set, i) {
+    (self.data || []).forEach(function(set, i) {
       val = Math.max(val, self.max(i));
     });
     return val;
   }
 
-  self.data[index].forEach(function(d) {
+  (self.data[index] || []).forEach(function(d) {
     val = Math.max(d.value, val);
   });
 
@@ -75,14 +75,14 @@ proto.min = function(index) {
 
   var val = self.max();
   if (!arguments.length) {
-    self.data.forEach(function(set, i) {
+    (self.data || []).forEach(function(set, i) {
       val = Math.min(val, self.min(i));
     });
     return val;
   }
 
   val = self.max(index);
-  self.data[index].forEach(function(d) {
+  (self.data[index] || []).forEach(function(d) {
     val = Math.min(d.value, val);
   });
 
@@ -99,7 +99,16 @@ proto.setData = function(data, newTimespan) {
   if (newTimespan) {
     this.timespan = newTimespan;
   }
-  data = data || [[{value: 0}, {value: 0}]];
+  var emptyDate = moment();
+  var defaultData = [[
+    {
+      value: 0,
+      timestamp: emptyDate.format(this.dateformat)
+    }
+  ]];
+  if (!data || !data.length || !data[0]) {
+    data = defaultData;
+  }
   this.data = data;
 
 
@@ -347,13 +356,14 @@ proto.draw = function() {
     });
     ctx.stroke();
 
-
     // draw the starting point
-    ctx.beginPath();
-    ctx.fillStyle = color;
-    ctx.arc(right, top, lineWidth * 2, 0, 2 * Math.PI);
-    ctx.fill();
-    ctx.closePath();
+    if (set.length >= 3) {
+      ctx.beginPath();
+      ctx.fillStyle = color;
+      ctx.arc(right, top, lineWidth * 2, 0, 2 * Math.PI);
+      ctx.fill();
+      ctx.closePath();
+    }
   });
 
   return self;
@@ -383,6 +393,11 @@ module.exports = function() {
       });
 
       $scope.$watch('values', function() {
+        var cn = container.className.replace('no-data', '');
+        if (!$scope.values.length || !$scope.values[0] || !$scope.values[0].length) {
+          cn += ' no-data';
+        }
+        container.className = cn;
         sparkline.setData($scope.values, $scope.timespan);
       });
 
@@ -399,6 +414,6 @@ module.exports = function() {
       });
     },
 
-    template: '<!-- sparkline comes here -->'
+    template: '<!-- keule!! pech jehabt! -->'
   };
 };
