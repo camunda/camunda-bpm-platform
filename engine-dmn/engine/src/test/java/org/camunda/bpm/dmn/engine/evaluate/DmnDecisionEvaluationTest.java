@@ -47,7 +47,7 @@ public class DmnDecisionEvaluationTest extends DmnEngineTest {
   public static final String DMN_DECISION_WITH_BEAN_INVOCATION_IN_LITERAL_EXPRESSION = "org/camunda/bpm/dmn/engine/evaluate/DecisionWithBeanInvocationInLiteralExpression.dmn";
 
   public static final String DRG_COLLECT_DMN = "org/camunda/bpm/dmn/engine/transform/DrgCollectTest.dmn";
-  
+
   @Test
   public void shouldEvaluateDrdDishDecisionExample() {
 
@@ -113,7 +113,7 @@ public class DmnDecisionEvaluationTest extends DmnEngineTest {
   public void shouldEvaluateDecisionsWithRequiredDecisionAndMultipleMatchingRules() {
 
     DmnDecisionTableResult results = dmnEngine.evaluateDecisionTable(parseDecisionFromFile("A", DMN_DECISIONS_WITH_MULTIPLE_MATCHING_RULES) , createVariables()
-        .putValue("dd", "dd")
+        .putValue("dd", 3)
         .putValue("ee", "ee")
         .asVariableContext());
 
@@ -300,11 +300,14 @@ public class DmnDecisionEvaluationTest extends DmnEngineTest {
   }
 
   @Test
-  public void shouldReturnListIfOnlyOneRuleMatched() {
+  public void shouldEvaluateDecisionWithCollectHitPolicyReturningAList() {
     DmnDecisionRequirementsGraph graph = dmnEngine.parseDecisionRequirementsGraph(IoUtil.fileAsStream(DRG_COLLECT_DMN));
     initVariables();
     variables.putValue("dayType","WeekDay");
 
-    dmnEngine.evaluateDecision(graph.getDecision("dish-decision"), variables);
+    DmnDecisionResult result = dmnEngine.evaluateDecision(graph.getDecision("dish-decision"), variables);
+    assertThat(result.getSingleEntry())
+      .isNotNull()
+      .isEqualTo("Steak");
   }
 }

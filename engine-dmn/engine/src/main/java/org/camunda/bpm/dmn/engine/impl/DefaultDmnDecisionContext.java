@@ -22,8 +22,6 @@ import org.camunda.bpm.dmn.engine.impl.delegate.DmnDecisionEvaluationEventImpl;
 import org.camunda.bpm.dmn.engine.impl.evaluation.DecisionLiteralExpressionEvaluationHandler;
 import org.camunda.bpm.dmn.engine.impl.evaluation.DecisionTableEvaluationHandler;
 import org.camunda.bpm.dmn.engine.impl.evaluation.DmnDecisionLogicEvaluationHandler;
-import org.camunda.bpm.dmn.engine.impl.hitpolicy.CollectHitPolicyHandler;
-import org.camunda.bpm.dmn.engine.impl.spi.hitpolicy.DmnHitPolicyHandler;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.context.VariableContext;
@@ -81,11 +79,7 @@ public class DefaultDmnDecisionContext {
 
       evaluatedResult = handler.generateDecisionResult(evaluatedEvent);
       if(decision != evaluateDecision) {
-        DmnHitPolicyHandler hitPolicyHandler = null;
-        if (DmnDecisionTableImpl.class.equals(evaluateDecision.getDecisionLogic().getClass())) {
-          hitPolicyHandler =((DmnDecisionTableImpl)evaluateDecision.getDecisionLogic()).getHitPolicyHandler();
-        }
-        addResultToVariableContext(evaluatedResult, variableMap, hitPolicyHandler);
+        addResultToVariableContext(evaluatedResult, variableMap, evaluateDecision);
       }
     }
 
@@ -127,10 +121,15 @@ public class DefaultDmnDecisionContext {
     }
   }
 
-  protected void addResultToVariableContext(DmnDecisionResult evaluatedResult, VariableMap variableMap, DmnHitPolicyHandler hitPolicyHandler) {
+  protected void addResultToVariableContext(DmnDecisionResult evaluatedResult, VariableMap variableMap, DmnDecision evaluatedDecision) {
     List<Map<String, Object>> resultList = evaluatedResult.getResultList();
 
-    boolean isNotCollectHitPolicy = hitPolicyHandler == null || !CollectHitPolicyHandler.class.equals(hitPolicyHandler.getClass());
+    boolean isNotCollectHitPolicy = true;
+    if (evaluatedDecision.isDecisionTable()) {
+      DmnDecisionTableImpl decisionTable = (DmnDecisionTableImpl) evaluatedDecision.getDecisionLogic();
+      isNotCollectHitPolicy = decisionTable.hasCollectHitPolicyWitoutAggregator() ? false : true;
+    }
+
     if (resultList.isEmpty()) {
       return;
     } else if (resultList.size() == 1 && isNotCollectHitPolicy) {

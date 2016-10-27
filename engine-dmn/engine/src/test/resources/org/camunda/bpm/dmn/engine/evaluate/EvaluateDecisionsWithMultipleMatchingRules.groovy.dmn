@@ -13,14 +13,14 @@
     </informationRequirement>
     <decisionTable id="aaDecisionTable" hitPolicy="COLLECT">
       <input id="input1">
-        <inputExpression><text>bb</text></inputExpression>
+        <inputExpression><text>b_out</text></inputExpression>
       </input>
       <input id="input3">
         <inputExpression><text>cc</text></inputExpression>
       </input>
       <output id="output1" name="aa" typeRef="string" />
       <rule id="rule1">
-        <inputEntry id="inputEntry1"><text><![CDATA[cellInput.get(0).contains("bb")]]></text>
+        <inputEntry id="inputEntry1"><text><![CDATA[cellInput.contains("b1")]]></text>
         </inputEntry>
         <inputEntry id="inputEntry3"><text><![CDATA[cellInput == "cc"]]></text>
         </inputEntry>
@@ -28,7 +28,7 @@
         </outputEntry>
       </rule>
       <rule id="rule2">
-        <inputEntry id="inputEntry4"><text><![CDATA[cellInput.get(0).contains("bbb")]]></text>
+        <inputEntry id="inputEntry4"><text><![CDATA[cellInput.contains("b2")]]></text>
         </inputEntry>
         <inputEntry id="inputEntry6"><text><![CDATA[cellInput == "cc"]]></text>
         </inputEntry>
@@ -43,17 +43,17 @@
       <input id="input4">
         <inputExpression><text>dd</text></inputExpression>
       </input>
-      <output id="output2" name="bb" typeRef="string" />
+      <output id="output2" name="b_out" typeRef="string" />
       <rule id="rule3">
-        <inputEntry id="inputEntry7"><text><![CDATA[cellInput == "dd"]]></text>
+        <inputEntry id="inputEntry7"><text><![CDATA[cellInput > 2]]></text>
         </inputEntry>
-        <outputEntry id="outputEntry3"><text>"bbb"</text>
+        <outputEntry id="outputEntry3"><text>"b2"</text>
         </outputEntry>
       </rule>
       <rule id="rule4">
-        <inputEntry id="inputEntry8"><text><![CDATA[cellInput == "ddd"]]></text>
+        <inputEntry id="inputEntry8"><text><![CDATA[cellInput > 1]]></text>
         </inputEntry>
-        <outputEntry id="outputEntry5"><text>"bb"</text>
+        <outputEntry id="outputEntry5"><text>"b1"</text>
         </outputEntry>
       </rule>
     </decisionTable>

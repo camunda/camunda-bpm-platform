@@ -7,13 +7,13 @@
     <decisionTable id="dishDecisionTable">
       <input id="guestCountInput" label="">
         <inputExpression id="guestCountInputExpression">
-          <text>guestCount</text>
+          <text>guestCount.size()</text>
         </inputExpression>
       </input>
       <output id="output1" label="Dish" name="desiredDish" typeRef="string" />
       <rule id="row-445981423-4">
         <inputEntry id="UnaryTests_0wa71sy" expressionLanguage="juel">
-          <text>cellInput.size() == 1</text>
+          <text>cellInput == 1</text>
         </inputEntry>
         <outputEntry id="LiteralExpression_09ggol9">
           <text><![CDATA["Steak"]]></text>

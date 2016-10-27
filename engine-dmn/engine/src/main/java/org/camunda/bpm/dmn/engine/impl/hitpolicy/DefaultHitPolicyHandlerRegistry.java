@@ -45,6 +45,10 @@ public class DefaultHitPolicyHandlerRegistry implements DmnHitPolicyHandlerRegis
     return handlers.get(new HitPolicyEntry(hitPolicy, builtinAggregator));
   }
 
+  public static DmnHitPolicyHandler getCorrespondingHandler(HitPolicy hitPolicy, BuiltinAggregator builtinAggregator) {
+    return handlers.get(new HitPolicyEntry(hitPolicy, builtinAggregator));
+  }
+
   public void addHandler(HitPolicy hitPolicy, BuiltinAggregator builtinAggregator, DmnHitPolicyHandler hitPolicyHandler) {
     handlers.put(new HitPolicyEntry(hitPolicy, builtinAggregator), hitPolicyHandler);
   }
