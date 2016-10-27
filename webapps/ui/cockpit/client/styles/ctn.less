@@ -278,14 +278,17 @@ a.expand-collapse {
   margin: 0;
   overflow: auto;
   position: absolute;
-  top: 42px;
+  top: 57px;
   bottom: 0;
   left: 0;
   right: 0;
+  padding: 0 (@grid-gutter-width * 0.5) (@grid-gutter-width * 0.5) (@grid-gutter-width * 0.5);
 }
 
 .ctn-tabbed.ctn-content-bottom > h4 {
-  margin: 20px 10px 0 10px;
+  margin: 2px 0 0 0;
+  padding: (@grid-gutter-width * 0.5) (@grid-gutter-width * 0.5) 5px (@grid-gutter-width * 0.5);
+  border-bottom: 1px solid @custom-gray-light;
 }
 
 .resize-handle {
