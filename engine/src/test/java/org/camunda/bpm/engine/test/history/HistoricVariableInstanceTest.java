@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
@@ -37,6 +38,7 @@ import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.Execution;
+import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
@@ -48,6 +50,11 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.FileValue;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 
 /**
@@ -1669,4 +1676,33 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
     } catch (NullValueException e) {}
   }
 
+  public void FAILING_testSetVariableInSubProcessStartEventWithEndListener () throws Exception {
+    //given
+    BpmnModelInstance topProcess = Bpmn.createExecutableProcess("topProcess")
+        .startEvent()
+        .callActivity()
+        .calledElement("subProcess")
+        .camundaIn("executionListenerCounter","executionListenerCounter")
+        .endEvent()
+        .done();
+
+    BpmnModelInstance subProcess = Bpmn.createExecutableProcess("subProcess")
+        .startEvent()
+        .camundaAsyncBefore()
+        .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_END, "org.camunda.bpm.engine.test.history.SubProcessActivityStartListener")
+        .endEvent()
+        .done();
+    org.camunda.bpm.engine.repository.Deployment deployment = repositoryService.createDeployment()
+        .addModelInstance("process.bpmn", topProcess)
+        .addModelInstance("subProcess.bpmn", subProcess)
+        .deploy();
+
+    //when
+    runtimeService.startProcessInstanceByKey("topProcess", Variables.createVariables().putValue("executionListenerCounter",1));
+    managementService.executeJob(managementService.createJobQuery().active().singleResult().getId());
+
+    //then
+    assertThat(historyService.createHistoricVariableInstanceQuery().count(), is (3L));
+    repositoryService.deleteDeployment(deployment.getId(),true);
+  }
 }
