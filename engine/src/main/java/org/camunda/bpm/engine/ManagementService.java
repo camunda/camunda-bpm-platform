@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.batch.BatchQuery;
 import org.camunda.bpm.engine.batch.BatchStatisticsQuery;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.management.ActivityStatisticsQuery;
+import org.camunda.bpm.engine.management.DecisionDefinitionStatisticsQuery;
 import org.camunda.bpm.engine.management.DeploymentStatisticsQuery;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.management.JobDefinitionQuery;
@@ -1223,4 +1224,12 @@ public interface ManagementService {
    */
   BatchStatisticsQuery createBatchStatisticsQuery();
 
+
+  /**
+   * Query for the statistics of DRD evaluation.
+   *
+   * @param decisionRequirementsDefinitionId - id of decision requirement definition
+   * @since 7.6
+   */
+  DecisionDefinitionStatisticsQuery createDecisionRequirementsDefinitionStatisticsQuery (String decisionRequirementsDefinitionId);
 }

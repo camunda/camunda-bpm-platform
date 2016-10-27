@@ -69,6 +69,11 @@
     <result property="suspensionState" column="SUSPENSION_STATE_" jdbcType="INTEGER" />
   </resultMap>
 
+  <resultMap id="decisionDefinitionStatisticsResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.DecisionDefinitionStatisticsImpl">
+    <id property="decisionDefinitionId" column="ID_" jdbcType="VARCHAR" />
+    <result property="evaluations" column="EVALUATION_COUNT_" jdbcType="INTEGER" />
+  </resultMap>
+
   <!-- Process Definition Statistics -->  
   <select id ="selectProcessDefinitionStatistics" resultMap="processDefinitionStatisticsResultMap" 
     parameterType="org.camunda.bpm.engine.impl.ProcessDefinitionStatisticsQueryImpl">
@@ -677,5 +682,43 @@
 
   </sql>
 
+  <!-- DRD Statistics -->
+
+  <select id ="selectDecisionDefinitionStatistics" resultMap="decisionDefinitionStatisticsResultMap" parameterType="org.camunda.bpm.engine.impl.DecisionDefinitionStatisticsQueryImpl">
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
+    ${limitBefore}
+    select ${distinct} RES.*
+    ${limitBetween}
+    <include refid="selectDecisionDefinitionStatisticsByQueryCriteriaSql"/>
+    ${orderBy}
+    ${limitAfter}
+  </select>
+
+  <select id ="selectDecisionDefinitionStatisticsCount" resultType="long" parameterType="org.camunda.bpm.engine.impl.DecisionDefinitionStatisticsQueryImpl">
+    select count(distinct RES.ID_)
+    <include refid="selectDecisionDefinitionStatisticsByQueryCriteriaSql"/>
+  </select>
+
+  <sql id="selectDecisionDefinitionStatisticsByQueryCriteriaSql">
+    from (
+      select
+        RES.DEC_REQ_ID_,
+        RES.DEC_DEF_ID_ as ID_,
+        count(*) as EVALUATION_COUNT_
+      from
+        ${prefix}ACT_HI_DECINST RES
+      group by
+        <if test="isDecisionInstanceIdSet">
+          RES.ID_,
+        </if>
+        RES.DEC_REQ_ID_,
+        RES.DEC_DEF_ID_
+      having
+        RES.DEC_REQ_ID_ = #{decisionRequirementsDefinitionId}
+        <if test="isDecisionInstanceIdSet">
+          and (RES.ID_ = #{decisionInstanceId} or RES.ROOT_DEC_INST_ID_ = #{decisionInstanceId})
+        </if>
+    ) RES
+  </sql>
 
 </mapper>

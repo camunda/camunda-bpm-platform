@@ -48,6 +48,7 @@ import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.ActivityStatisticsQueryImpl;
 import org.camunda.bpm.engine.impl.AuthorizationQueryImpl;
+import org.camunda.bpm.engine.impl.DecisionDefinitionStatisticsQueryImpl;
 import org.camunda.bpm.engine.impl.DeploymentQueryImpl;
 import org.camunda.bpm.engine.impl.DeploymentStatisticsQueryImpl;
 import org.camunda.bpm.engine.impl.EventSubscriptionQueryImpl;
@@ -832,4 +833,8 @@ public class AuthorizationManager extends AbstractManager {
 
   }
 
+  public void configureDecisionRequirementsDefinitionStatisticsQuery(DecisionDefinitionStatisticsQueryImpl query) {
+    configureQuery(query);
+    addPermissionCheck(query, DECISION_DEFINITION, "RES.DEC_DEF_ID_", READ);
+  }
 }
