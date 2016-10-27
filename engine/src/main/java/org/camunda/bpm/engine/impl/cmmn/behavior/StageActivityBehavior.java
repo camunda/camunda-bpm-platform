@@ -12,27 +12,19 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.behavior;
 
-import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.ACTIVE;
-import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.COMPLETED;
-import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.FAILED;
-import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.SUSPENDED;
-import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.SUSPENDING_ON_PARENT_SUSPENSION;
-import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.SUSPENDING_ON_SUSPENSION;
-import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.TERMINATING_ON_EXIT;
-import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.TERMINATING_ON_PARENT_TERMINATION;
-import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.TERMINATING_ON_TERMINATION;
-import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_AUTO_COMPLETE;
-import static org.camunda.bpm.engine.impl.util.ActivityBehaviorUtil.getActivityBehavior;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureInstanceOf;
-
-import java.util.List;
-
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
+
+import java.util.List;
+
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.*;
+import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_AUTO_COMPLETE;
+import static org.camunda.bpm.engine.impl.util.ActivityBehaviorUtil.getActivityBehavior;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureInstanceOf;
 
 /**
  * @author Roman Smirnov
@@ -110,6 +102,17 @@ public class StageActivityBehavior extends StageOrTaskActivityBehavior implement
     ensureTransitionAllowed(execution, ACTIVE, COMPLETED, "complete");
     canComplete(execution, true, true);
     completing(execution);
+  }
+
+  protected void completing(CmmnActivityExecution execution) {
+    List<? extends CmmnExecution> children = execution.getCaseExecutions();
+    for (CmmnExecution child : children) {
+      if (!child.isDisabled()) {
+        child.parentComplete();
+      } else {
+        child.remove();
+      }
+    }
   }
 
   protected boolean canComplete(CmmnActivityExecution execution) {
@@ -242,23 +245,26 @@ public class StageActivityBehavior extends StageOrTaskActivityBehavior implement
     List<? extends CmmnExecution> children = execution.getCaseExecutions();
 
     for (CmmnExecution child : children) {
+      terminateChild(child);
+    }
+  }
 
-      CmmnActivityBehavior behavior = getActivityBehavior(child);
+  protected void terminateChild(CmmnExecution child) {
+    CmmnActivityBehavior behavior = getActivityBehavior(child);
 
-      // "child.isTerminated()": during resuming the children, it can
-      // happen that a sentry will be satisfied, so that a child
-      // will terminated. these terminated child cannot be resumed,
-      // so ignore it.
-      // "child.isCompleted()": in case that an exitCriteria on caseInstance
-      // (ie. casePlanModel) has been fired, when a child inside has been
-      // completed, so ignore it.
-      if (!child.isTerminated() && !child.isCompleted()) {
-        if (behavior instanceof StageOrTaskActivityBehavior) {
-          child.exit();
+    // "child.isTerminated()": during resuming the children, it can
+    // happen that a sentry will be satisfied, so that a child
+    // will terminated. these terminated child cannot be resumed,
+    // so ignore it.
+    // "child.isCompleted()": in case that an exitCriteria on caseInstance
+    // (ie. casePlanModel) has been fired, when a child inside has been
+    // completed, so ignore it.
+    if (!child.isTerminated() && !child.isCompleted()) {
+      if (behavior instanceof StageOrTaskActivityBehavior) {
+        child.exit();
 
-        } else { /* behavior instanceof EventListenerOrMilestoneActivityBehavior */
-          child.parentTerminate();
-        }
+      } else { /* behavior instanceof EventListenerOrMilestoneActivityBehavior */
+        child.parentTerminate();
       }
     }
   }

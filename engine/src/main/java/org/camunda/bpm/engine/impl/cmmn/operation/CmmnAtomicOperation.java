@@ -47,6 +47,7 @@ public interface CmmnAtomicOperation extends CoreAtomicOperation<CmmnExecution> 
   CmmnAtomicOperation CASE_EXECUTION_TERMINATING_ON_TERMINATION = new AtomicOperationCaseExecutionTerminatingOnTermination();
   CmmnAtomicOperation CASE_EXECUTION_TERMINATING_ON_PARENT_TERMINATION = new AtomicOperationCaseExecutionTerminatingOnParentTermination();
   CmmnAtomicOperation CASE_EXECUTION_TERMINATING_ON_EXIT = new AtomicOperationCaseExecutionTerminatingOnExit();
+  CmmnAtomicOperation CASE_EXECUTION_PARENT_COMPLETE = new AtomicOperationCaseExecutionParentComplete();
 
   // suspending
   CmmnAtomicOperation CASE_EXECUTION_SUSPENDING_ON_SUSPENSION = new AtomicOperationCaseExecutionSuspendingOnSuspension();

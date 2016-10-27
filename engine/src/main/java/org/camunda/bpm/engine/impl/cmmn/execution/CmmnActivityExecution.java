@@ -488,6 +488,19 @@ public interface CmmnActivityExecution extends DelegateCaseExecution {
   /**
    * <p>Transition to {@link CaseExecutionState#TERMINATED} state.</p>
    *
+   * <p><code>This</code> case execution must be in {@link CaseExecutionState#AVAILABLE}
+   * or {@link CaseExecutionState#ENABLED} state to be able to do this transition.</p>
+   *
+   * @throws CaseIllegalStateTransitionException will be thrown, if <code>this</code> case execution
+   *         is not in the expected state.
+   * @throws ProcessEngineException when an internal exception happens during the execution
+   *     of the command.
+   */
+  void parentComplete();
+
+  /**
+   * <p>Transition to {@link CaseExecutionState#TERMINATED} state.</p>
+   *
    * <p>This can lead to a completion of the parent case execution, for more
    * details when the parent case execution can be completed see {@link #complete()}.</p>
    *

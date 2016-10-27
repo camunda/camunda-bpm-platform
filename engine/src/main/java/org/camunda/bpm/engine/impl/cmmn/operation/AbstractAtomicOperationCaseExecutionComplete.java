@@ -42,13 +42,6 @@ public abstract class AbstractAtomicOperationCaseExecutionComplete extends Abstr
     CmmnActivityBehavior behavior = getActivityBehavior(execution);
     triggerBehavior(behavior, execution);
 
-    List<? extends CmmnExecution> children = execution.getCaseExecutions();
-    if (children != null && !children.isEmpty()) {
-      for (CmmnExecution child : children) {
-        child.remove();
-      }
-    }
-
     execution.setCurrentState(COMPLETED);
 
     return execution;

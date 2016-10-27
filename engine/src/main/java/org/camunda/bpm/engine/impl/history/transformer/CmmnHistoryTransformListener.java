@@ -126,17 +126,17 @@ public class CmmnHistoryTransformListener implements CmmnTransformListener {
     if (caseActivity != null) {
       if (historyLevel.isHistoryEventProduced(HistoryEventTypes.CASE_INSTANCE_CREATE, null)) {
         for (String event : ItemHandler.CASE_PLAN_MODEL_CREATE_EVENTS) {
-          caseActivity.addListener(event, CASE_INSTANCE_CREATE_LISTENER);
+          caseActivity.addBuiltInListener(event, CASE_INSTANCE_CREATE_LISTENER);
         }
       }
       if (historyLevel.isHistoryEventProduced(HistoryEventTypes.CASE_INSTANCE_UPDATE, null)) {
         for (String event : ItemHandler.CASE_PLAN_MODEL_UPDATE_EVENTS) {
-          caseActivity.addListener(event, CASE_INSTANCE_UPDATE_LISTENER);
+          caseActivity.addBuiltInListener(event, CASE_INSTANCE_UPDATE_LISTENER);
         }
       }
       if (historyLevel.isHistoryEventProduced(HistoryEventTypes.CASE_INSTANCE_CLOSE, null)) {
         for (String event : ItemHandler.CASE_PLAN_MODEL_CLOSE_EVENTS) {
-          caseActivity.addListener(event, CASE_INSTANCE_CLOSE_LISTENER);
+          caseActivity.addBuiltInListener(event, CASE_INSTANCE_CLOSE_LISTENER);
         }
       }
     }
@@ -146,17 +146,17 @@ public class CmmnHistoryTransformListener implements CmmnTransformListener {
     if (caseActivity != null) {
       if (historyLevel.isHistoryEventProduced(HistoryEventTypes.CASE_ACTIVITY_INSTANCE_CREATE, null)) {
         for (String event : ItemHandler.TASK_OR_STAGE_CREATE_EVENTS) {
-          caseActivity.addListener(event, CASE_ACTIVITY_INSTANCE_CREATE_LISTENER);
+          caseActivity.addBuiltInListener(event, CASE_ACTIVITY_INSTANCE_CREATE_LISTENER);
         }
       }
       if (historyLevel.isHistoryEventProduced(HistoryEventTypes.CASE_ACTIVITY_INSTANCE_UPDATE, null)) {
         for (String event : ItemHandler.TASK_OR_STAGE_UPDATE_EVENTS) {
-          caseActivity.addListener(event, CASE_ACTIVITY_INSTANCE_UPDATE_LISTENER);
+          caseActivity.addBuiltInListener(event, CASE_ACTIVITY_INSTANCE_UPDATE_LISTENER);
         }
       }
       if (historyLevel.isHistoryEventProduced(HistoryEventTypes.CASE_ACTIVITY_INSTANCE_END, null)) {
         for (String event : ItemHandler.TASK_OR_STAGE_END_EVENTS) {
-          caseActivity.addListener(event, CASE_ACTIVITY_INSTANCE_END_LISTENER);
+          caseActivity.addBuiltInListener(event, CASE_ACTIVITY_INSTANCE_END_LISTENER);
         }
       }
     }
@@ -166,17 +166,17 @@ public class CmmnHistoryTransformListener implements CmmnTransformListener {
     if (caseActivity != null) {
       if (historyLevel.isHistoryEventProduced(HistoryEventTypes.CASE_ACTIVITY_INSTANCE_CREATE, null)) {
         for (String event : ItemHandler.EVENT_LISTENER_OR_MILESTONE_CREATE_EVENTS) {
-          caseActivity.addListener(event, CASE_ACTIVITY_INSTANCE_CREATE_LISTENER);
+          caseActivity.addBuiltInListener(event, CASE_ACTIVITY_INSTANCE_CREATE_LISTENER);
         }
       }
       if (historyLevel.isHistoryEventProduced(HistoryEventTypes.CASE_ACTIVITY_INSTANCE_UPDATE, null)) {
         for (String event : ItemHandler.EVENT_LISTENER_OR_MILESTONE_UPDATE_EVENTS) {
-          caseActivity.addListener(event, CASE_ACTIVITY_INSTANCE_UPDATE_LISTENER);
+          caseActivity.addBuiltInListener(event, CASE_ACTIVITY_INSTANCE_UPDATE_LISTENER);
         }
       }
       if (historyLevel.isHistoryEventProduced(HistoryEventTypes.CASE_ACTIVITY_INSTANCE_END, null)) {
         for (String event : ItemHandler.EVENT_LISTENER_OR_MILESTONE_END_EVENTS) {
-          caseActivity.addListener(event, CASE_ACTIVITY_INSTANCE_END_LISTENER);
+          caseActivity.addBuiltInListener(event, CASE_ACTIVITY_INSTANCE_END_LISTENER);
         }
       }
     }

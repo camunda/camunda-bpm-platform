@@ -83,6 +83,8 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement, CmmnAc
   public static final String PROPERTY_ACTIVITY_TYPE = "activityType";
   public static final String PROPERTY_ACTIVITY_DESCRIPTION = "description";
 
+  protected static final String PARENT_COMPLETE = "parentComplete";
+
   public static List<String> TASK_OR_STAGE_CREATE_EVENTS = Arrays.asList(
       CaseExecutionListener.CREATE
     );
@@ -102,7 +104,8 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement, CmmnAc
   public static List<String> TASK_OR_STAGE_END_EVENTS = Arrays.asList(
       CaseExecutionListener.TERMINATE,
       CaseExecutionListener.EXIT,
-      CaseExecutionListener.COMPLETE
+      CaseExecutionListener.COMPLETE,
+      PARENT_COMPLETE
     );
 
   public static List<String> TASK_OR_STAGE_EVENTS = new ArrayList<String>();
@@ -119,7 +122,8 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement, CmmnAc
   public static List<String> EVENT_LISTENER_OR_MILESTONE_END_EVENTS = Arrays.asList(
       CaseExecutionListener.TERMINATE,
       CaseExecutionListener.PARENT_TERMINATE,
-      CaseExecutionListener.OCCUR
+      CaseExecutionListener.OCCUR,
+      PARENT_COMPLETE
     );
 
   public static List<String> EVENT_LISTENER_OR_MILESTONE_EVENTS = new ArrayList<String>();

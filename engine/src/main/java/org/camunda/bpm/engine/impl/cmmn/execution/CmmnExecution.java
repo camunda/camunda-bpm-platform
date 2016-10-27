@@ -82,6 +82,7 @@ import org.camunda.bpm.engine.impl.cmmn.model.CmmnIfPartDeclaration;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnOnPartDeclaration;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnSentryDeclaration;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnVariableOnPartDeclaration;
+import org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.core.variable.event.VariableEvent;
@@ -1007,6 +1008,10 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
 
   public void exit() {
     performOperation(CASE_EXECUTION_TERMINATING_ON_EXIT);
+  }
+
+  public void parentComplete() {
+    performOperation(CmmnAtomicOperation.CASE_EXECUTION_PARENT_COMPLETE);
   }
 
   public void performExit() {

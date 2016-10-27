@@ -33,7 +33,7 @@ public abstract class AbstractCmmnEventAtomicOperation extends AbstractEventAtom
     return false;
   }
 
-  protected final void eventNotificationsCompleted(CmmnExecution execution) {
+  protected void eventNotificationsCompleted(CmmnExecution execution) {
     repetition(execution);
     preTransitionNotification(execution);
     performTransitionNotification(execution);
