@@ -15,26 +15,23 @@
  */
 package org.camunda.bpm.engine.test.bpmn.event.conditional;
 
-import java.util.Map;
-
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.SuspendedEntityInteractionException;
-import org.camunda.bpm.engine.delegate.ExecutionListener;
-import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
 import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
 
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.camunda.bpm.engine.variable.Variables;
 
 import static org.junit.Assert.*;
 
 import org.camunda.bpm.model.bpmn.Bpmn;
-import org.camunda.bpm.model.bpmn.instance.SequenceFlow;
-import org.camunda.bpm.model.bpmn.instance.camunda.CamundaExecutionListener;
 
 /**
  *
@@ -201,11 +198,11 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
   }
 
 
-  protected void deployEventSubProcessWithVariableIsSetInDelegationCode(BpmnModelInstance model, boolean isInterrupting) {
-    deployEventSubProcessWithVariableIsSetInDelegationCode(model, CONDITIONAL_EVENT_PROCESS_KEY, isInterrupting);
+  protected void deployConditionalEventSubProcess(BpmnModelInstance model, boolean isInterrupting) {
+    deployConditionalEventSubProcess(model, CONDITIONAL_EVENT_PROCESS_KEY, isInterrupting);
   }
 
-  protected void deployEventSubProcessWithVariableIsSetInDelegationCode(BpmnModelInstance model, String parentId, boolean isInterrupting) {
+  protected void deployConditionalEventSubProcess(BpmnModelInstance model, String parentId, boolean isInterrupting) {
 
     final BpmnModelInstance modelInstance = modify(model)
             .addSubProcessTo(parentId)
@@ -231,7 +228,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
                                                   .serviceTask()
                                                     .camundaClass(SetVariableDelegate.class.getName())
                                                   .endEvent().done();
-    deployEventSubProcessWithVariableIsSetInDelegationCode(modelInstance, true);
+    deployConditionalEventSubProcess(modelInstance, true);
 
     // given process with event sub process conditional start event and service task with delegate class which sets a variable
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -260,7 +257,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
                                                     .camundaClass(SetVariableDelegate.class.getName())
                                                   .userTask()
                                                   .endEvent().done();
-    deployEventSubProcessWithVariableIsSetInDelegationCode(modelInstance, false);
+    deployConditionalEventSubProcess(modelInstance, false);
 
     // given process with event sub process conditional start event and service task with delegate class which sets a variable
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -370,7 +367,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
                                                     .camundaExpression(TRUE_CONDITION)
                                                   .userTask().name(TASK_AFTER_SERVICE_TASK)
                                                   .endEvent().done();
-    deployEventSubProcessWithVariableIsSetInDelegationCode(modelInstance, true);
+    deployConditionalEventSubProcess(modelInstance, true);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -399,7 +396,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
                                                     .camundaExpression(TRUE_CONDITION)
                                                   .userTask().name(TASK_AFTER_SERVICE_TASK)
                                                   .endEvent().done();
-    deployEventSubProcessWithVariableIsSetInDelegationCode(modelInstance, false);
+    deployConditionalEventSubProcess(modelInstance, false);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -427,7 +424,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
                                                     .camundaExpression("${execution.setVariable(\"variable\", 1)}")
                                                   .userTask().name(TASK_AFTER_SERVICE_TASK)
                                                   .endEvent().done();
-    deployEventSubProcessWithVariableIsSetInDelegationCode(modelInstance, true);
+    deployConditionalEventSubProcess(modelInstance, true);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -454,7 +451,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
                                                     .camundaExpression("${execution.setVariable(\"variable\", 1)}")
                                                   .userTask().name(TASK_AFTER_SERVICE_TASK)
                                                   .endEvent().done();
-    deployEventSubProcessWithVariableIsSetInDelegationCode(modelInstance, false);
+    deployConditionalEventSubProcess(modelInstance, false);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -487,7 +484,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
                                                   .subProcessDone()
                                                   .endEvent()
                                                   .done();
-    deployEventSubProcessWithVariableIsSetInDelegationCode(modelInstance, SUB_PROCESS_ID, true);
+    deployConditionalEventSubProcess(modelInstance, SUB_PROCESS_ID, true);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -519,7 +516,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
                                                   .subProcessDone()
                                                   .endEvent()
                                                   .done();
-    deployEventSubProcessWithVariableIsSetInDelegationCode(modelInstance, SUB_PROCESS_ID, false);
+    deployConditionalEventSubProcess(modelInstance, SUB_PROCESS_ID, false);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -549,7 +546,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
                                                   .userTask()
                                                   .endEvent()
                                                   .done();
-    deployEventSubProcessWithVariableIsSetInDelegationCode(modelInstance, true);
+    deployConditionalEventSubProcess(modelInstance, true);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -578,7 +575,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
                                                   .userTask()
                                                   .endEvent()
                                                   .done();
-    deployEventSubProcessWithVariableIsSetInDelegationCode(modelInstance, false);
+    deployConditionalEventSubProcess(modelInstance, false);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -612,7 +609,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
                                                   .userTask()
                                                   .endEvent()
                                                   .done();
-    deployEventSubProcessWithVariableIsSetInDelegationCode(modelInstance, true);
+    deployConditionalEventSubProcess(modelInstance, true);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -645,7 +642,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
                                                   .userTask()
                                                   .endEvent()
                                                   .done();
-    deployEventSubProcessWithVariableIsSetInDelegationCode(modelInstance, false);
+    deployConditionalEventSubProcess(modelInstance, false);
 
 
     // given
@@ -680,7 +677,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
       .userTask().name(TASK_AFTER_OUTPUT_MAPPING)
       .endEvent()
       .done();
-    deployEventSubProcessWithVariableIsSetInDelegationCode(modelInstance, true);
+    deployConditionalEventSubProcess(modelInstance, true);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -713,7 +710,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
       .userTask().name(TASK_AFTER_OUTPUT_MAPPING)
       .endEvent()
       .done();
-    deployEventSubProcessWithVariableIsSetInDelegationCode(modelInstance, false);
+    deployConditionalEventSubProcess(modelInstance, false);
 
 
     // given
@@ -749,7 +746,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
       .userTask().name(TASK_AFTER_OUTPUT_MAPPING)
       .endEvent()
       .done();
-    deployEventSubProcessWithVariableIsSetInDelegationCode(modelInstance, true);
+    deployConditionalEventSubProcess(modelInstance, true);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -782,7 +779,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
       .userTask().name(TASK_AFTER_OUTPUT_MAPPING)
       .endEvent()
       .done();
-    deployEventSubProcessWithVariableIsSetInDelegationCode(modelInstance, false);
+    deployConditionalEventSubProcess(modelInstance, false);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -814,7 +811,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
                                                   .userTask().name(TASK_AFTER_SERVICE_TASK)
                                                   .endEvent()
                                                   .done();
-    deployEventSubProcessWithVariableIsSetInDelegationCode(modelInstance, true);
+    deployConditionalEventSubProcess(modelInstance, true);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -846,7 +843,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
                                                   .userTask().name(TASK_AFTER_SERVICE_TASK)
                                                   .endEvent()
                                                   .done();
-    deployEventSubProcessWithVariableIsSetInDelegationCode(modelInstance, false);
+    deployConditionalEventSubProcess(modelInstance, false);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -882,7 +879,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
                                                   .subProcessDone()
                                                   .endEvent()
                                                   .done();
-    deployEventSubProcessWithVariableIsSetInDelegationCode(modelInstance, SUB_PROCESS_ID, true);
+    deployConditionalEventSubProcess(modelInstance, SUB_PROCESS_ID, true);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -918,7 +915,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
                                                   .subProcessDone()
                                                   .endEvent()
                                                   .done();
-    deployEventSubProcessWithVariableIsSetInDelegationCode(modelInstance, SUB_PROCESS_ID, false);
+    deployConditionalEventSubProcess(modelInstance, SUB_PROCESS_ID, false);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -955,7 +952,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
                                                   .subProcessDone()
                                                   .endEvent()
                                                   .done();
-    deployEventSubProcessWithVariableIsSetInDelegationCode(modelInstance, true);
+    deployConditionalEventSubProcess(modelInstance, true);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -991,7 +988,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
                                                   .subProcessDone()
                                                   .endEvent()
                                                   .done();
-    deployEventSubProcessWithVariableIsSetInDelegationCode(modelInstance, false);
+    deployConditionalEventSubProcess(modelInstance, false);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -1038,7 +1035,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
       .userTask(TASK_WITH_CONDITION_ID)
       .endEvent().done();
 
-    deployEventSubProcessWithVariableIsSetInDelegationCode(modelInstance, true);
+    deployConditionalEventSubProcess(modelInstance, true);
 
     // given suspended process
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -1071,7 +1068,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
       .endEvent().done();
 
 
-    deployEventSubProcessWithVariableIsSetInDelegationCode(modelInstance, false);
+    deployConditionalEventSubProcess(modelInstance, false);
 
     // given suspended process
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -1093,5 +1090,29 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
     }
     runtimeService.activateProcessInstanceById(procInst.getId());
     tasksAfterVariableIsSet = taskService.createTaskQuery().list();
+  }
+
+  @Ignore
+  public void testNonInterruptingSetMultipleVariables() {
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
+      .startEvent()
+      .userTask(TASK_WITH_CONDITION_ID).name(TASK_WITH_CONDITION)
+      .endEvent().done();
+    deployConditionalEventSubProcess(modelInstance, false);
+
+    //given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
+    TaskQuery taskQuery = taskService.createTaskQuery().processInstanceId(processInstance.getId());
+    Task task = taskQuery.singleResult();
+
+    //when multiple variable are set on task execution
+    VariableMap variables = Variables.createVariables();
+    variables.put("variable", 1);
+    variables.put("variable1", 1);
+    runtimeService.setVariables(task.getExecutionId(), variables);
+
+    //then event sub process should be triggered more than once
+    tasksAfterVariableIsSet = taskQuery.list();
+    assertEquals(3, tasksAfterVariableIsSet.size());
   }
 }

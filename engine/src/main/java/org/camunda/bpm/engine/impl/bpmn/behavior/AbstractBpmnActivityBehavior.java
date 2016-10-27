@@ -60,7 +60,6 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
    */
   @Override
   public void doLeave(ActivityExecution execution) {
-    // TODO: call atomic operation
 
     PvmActivity currentActivity = execution.getActivity();
     ActivityImpl compensationHandler = ((ActivityImpl) currentActivity).findCompensationHandler();

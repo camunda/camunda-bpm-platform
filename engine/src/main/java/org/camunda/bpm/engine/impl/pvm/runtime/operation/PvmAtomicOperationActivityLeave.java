@@ -22,7 +22,8 @@ import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 /**
- * @author Tom Baeyens
+ * @author Thorben Lindhauer
+ * @author Christopher Zell
  */
 public class PvmAtomicOperationActivityLeave implements PvmAtomicOperation {
 
@@ -42,24 +43,25 @@ public class PvmAtomicOperationActivityLeave implements PvmAtomicOperation {
       FlowNodeActivityBehavior behavior = (FlowNodeActivityBehavior) activityBehavior;
 
       ActivityImpl activity = execution.getActivity();
-      LOG.debugExecutesActivity(execution, activity, activityBehavior.getClass().getName());
+      String activityInstanceId = execution.getActivityInstanceId();
+      if(activityInstanceId != null) {
+        LOG.debugLeavesActivityInstance(execution, activityInstanceId);
+      }
 
       try {
         behavior.doLeave(execution);
       } catch (RuntimeException e) {
         throw e;
       } catch (Exception e) {
-        throw new PvmException("couldn't execute activity <"+activity.getProperty("type")+" id=\""+activity.getId()+"\" ...>: "+e.getMessage(), e);
+        throw new PvmException("couldn't leave activity <"+activity.getProperty("type")+" id=\""+activity.getId()+"\" ...>: "+e.getMessage(), e);
       }
     } else {
       throw new PvmException("Behavior of current activity is not an instance of " + FlowNodeActivityBehavior.class.getSimpleName() + ". Execution " + execution);
     }
-
-
   }
 
   public String getCanonicalName() {
-    return "activity-execute";
+    return "activity-leave";
   }
 
   public boolean isAsyncCapable() {

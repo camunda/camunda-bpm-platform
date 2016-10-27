@@ -1797,6 +1797,9 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     }
   }
 
+  /**
+   * Contains the delayed variable events, which will be dispatched on a save point.
+   */
   protected transient List<DelayedVariableEvent> delayedEvents = new ArrayList<DelayedVariableEvent>();
 
   public void delayEvent(PvmExecutionImpl targetScope, VariableEvent variableEvent) {
@@ -1840,8 +1843,8 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   public void dispatchDelayedEventsAndPerformOperation(PvmAtomicOperationContinuation continuation) {
     PvmExecutionImpl execution = this;
 
-    String activityId = execution.getActivityId();
-    String activityInstanceId = getActivityInstanceId(execution);
+    String lastActivityId = execution.getActivityId();
+    String lastActivityInstanceId = getActivityInstanceId(execution);
 
     dispatchScopeEvents(execution);
 
@@ -1849,14 +1852,16 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     String currentActivityInstanceId = getActivityInstanceId(execution);
     String currentActivityId = execution.getActivityId();
 
-    if (continuation != null &&
-        ((activityInstanceId == null && activityInstanceId == currentActivityInstanceId && activityId.equals(currentActivityId)) //can be null on transitions
-          || (activityInstanceId != null && activityInstanceId.equals(currentActivityInstanceId)))  //if not then string should equal
-
+    //if execution was canceled or was changed during the dispatch we should not execute the next operation
+    //since another atomic operation was executed during the dispatching
+    if (continuation != null
+        && isOnSameActivity(lastActivityInstanceId, lastActivityId, currentActivityInstanceId, currentActivityId)
         && !execution.isCanceled()) {
       continuation.execute(execution);
     }
   }
+
+
 
   protected void dispatchScopeEvents(PvmExecutionImpl execution) {
     PvmExecutionImpl scopeExecution = execution.isScope() ? execution : execution.getParent();
@@ -1878,28 +1883,71 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     for (DelayedVariableEvent event : delayedEvents) {
       PvmExecutionImpl targetScope = getTargetScope(event);
 
-      //current ////////////////////////////////////////////////////////////////////////////////////////////////////////
       String currentActivityInstanceId = getActivityInstanceId(targetScope);
       String currentActivityId = targetScope.getActivityId();
 
-      //last ////////////////////////////////////////////////////////////////////////////////////////////////////////
       final String lastActivityInstanceId = activityInstanceIds.get(targetScope);
       final String lastActivityId = activityIds.get(targetScope);
 
-      ActivityImpl targetActivity = targetScope.getActivity();
-      if (
-            ((lastActivityInstanceId == null && lastActivityInstanceId == currentActivityInstanceId && lastActivityId.equals(currentActivityId)) //can be null on transitions
-            || (lastActivityInstanceId != null && lastActivityInstanceId.equals(currentActivityInstanceId)))
-            && (targetScope.getActivityId() == null || !targetActivity.isScope()
-            || (targetActivity.isScope() && targetScope.isInState(ActivityInstanceState.DEFAULT)))
-        )
-
+      //dispatching
+      if (isOnSameActivity(lastActivityInstanceId, lastActivityId,
+                           currentActivityInstanceId, currentActivityId)
+         && isOnDispatchableState(targetScope))
       {
         targetScope.dispatchEvent(event.getEvent());
       }
     }
   }
 
+  /**
+   * Checks if the given execution is on a dispatchable state.
+   * That means if the current activity is not a leaf in the activity tree OR
+   * it is a leaf but not a scope OR it is a leaf, a scope
+   * and the execution is in state DEFAULT, which means not in state
+   * Starting, Execute or Ending. For this states it is
+   * prohibited to trigger conditional events, otherwise unexpected behavior can appear.
+   *
+   * @return true if the execution is on a dispatchable state, false otherwise
+   */
+  private boolean isOnDispatchableState(PvmExecutionImpl targetScope) {
+    ActivityImpl targetActivity = targetScope.getActivity();
+    return
+      //if not leaf, activity id is null -> dispatchable
+      targetScope.getActivityId() == null ||
+      // if leaf and not scope -> dispatchable
+      !targetActivity.isScope() ||
+      // if leaf, scope and state in default -> dispatchable
+      (targetScope.isInState(ActivityInstanceState.DEFAULT));
+  }
+
+
+  /**
+   * Compares the given activity instance id's and activity id's to check if the execution is on the same
+   * activity as before an operation was executed. The activity instance id's can be null on transitions.
+   * In this case the activity Id's have to be equal, otherwise the execution changed.
+   *
+   * @param lastActivityInstanceId  the last activity instance id
+   * @param lastActivityId  the last activity id
+   * @param currentActivityInstanceId the current activity instance id
+   * @param currentActivityId the current activity id
+   * @return true if the execution is on the same activity, otherwise false
+   */
+  private boolean isOnSameActivity(String lastActivityInstanceId, String lastActivityId,
+                                     String currentActivityInstanceId, String currentActivityId) {
+    return
+      //activityInstanceId's can be null on transitions, so the activityId must be equal
+      ((lastActivityInstanceId == null && lastActivityInstanceId == currentActivityInstanceId && lastActivityId.equals(currentActivityId))
+        //if activityInstanceId's are not null the must be equal -> otherwise execution changed
+        || (lastActivityInstanceId != null && lastActivityInstanceId.equals(currentActivityInstanceId)));
+
+  }
+
+  /**
+   * Returns the target scope for the given delayed variable event.
+   *
+   * @param event the delayed event for which the target scope is returned
+   * @return the target scope
+   */
   private PvmExecutionImpl getTargetScope(DelayedVariableEvent event) {
     PvmExecutionImpl targetScope = event.getTargetScope();
     PvmExecutionImpl replacedBy = targetScope.getReplacedBy();
@@ -1911,15 +1959,18 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     return targetScope;
   }
 
+  /**
+   * Returns the activity instance id for the given execution.
+   *
+   * @param targetScope the execution for which the activity instance id should be returned
+   * @return the activity instance id
+   */
   private String getActivityInstanceId(PvmExecutionImpl targetScope) {
     if (targetScope.isConcurrent()) {
       return targetScope.getActivityInstanceId();
     } else {
       ActivityImpl targetActivity = targetScope.getActivity();
       if (targetActivity != null && targetActivity.getActivities().isEmpty()) {
-        // TODO: does not always work with a compacted tree, i.e. where targetScope is
-        // in a non-scope activity, because we have to consider if the variable was set in the context
-        // of that non-scope activity, or in the context of the containing scope
         return targetScope.getActivityInstanceId();
       } else {
         return targetScope.getParentActivityInstanceId();
