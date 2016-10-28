@@ -3,6 +3,7 @@ target
 .classpath
 .project
 .settings
+.editorconfig
 build.properties
 bin
 .metadata

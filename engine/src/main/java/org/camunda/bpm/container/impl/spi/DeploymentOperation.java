@@ -12,10 +12,8 @@
  */
 package org.camunda.bpm.container.impl.spi;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
 import org.camunda.bpm.container.impl.ContainerIntegrationLogger;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 
@@ -183,6 +181,11 @@ public class DeploymentOperation {
 
     public DeploymentOperationBuilder addStep(DeploymentOperationStep step) {
       steps.add(step);
+      return this;
+    }
+
+    public DeploymentOperationBuilder addSteps(Collection<DeploymentOperationStep> steps) {
+      steps.addAll(steps);
       return this;
     }
 
