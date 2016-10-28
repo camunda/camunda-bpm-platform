@@ -15,7 +15,8 @@ package org.camunda.bpm.engine.impl.cmmn.operation;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 
 /**
- * @author smirnov
+ * @author Johannes Heinemann
+ * @author Roman Smirnov
  *
  */
 public class AtomicOperationCaseExecutionParentComplete extends AbstractAtomicOperationCaseExecutionTerminate {

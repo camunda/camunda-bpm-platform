@@ -1044,7 +1044,7 @@ public class HistoricCaseActivityInstanceTest extends CmmnProcessEngineTestCase 
     assertThat(instances, contains(matchers.toArray(new Matcher[matchers.size()])));
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneStageAndOneTaskCaseWithManualActivation.cmmn"})
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricCaseActivityInstanceTest.oneStageAndOneTaskCaseWithManualActivation.cmmn"})
   public void testHistoricActivityInstanceWithinStageIsMarkedTerminatedOnComplete() {
 
     // given
@@ -1070,7 +1070,7 @@ public class HistoricCaseActivityInstanceTest extends CmmnProcessEngineTestCase 
     assertTrue(completedTask.isCompleted());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneStageAndOneTaskCaseWithManualActivation.cmmn"})
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricCaseActivityInstanceTest.oneStageAndOneTaskCaseWithManualActivation.cmmn"})
   public void testHistoricActivityInstancesAreMarkedTerminatedOnComplete() {
 
     // given
@@ -1095,7 +1095,7 @@ public class HistoricCaseActivityInstanceTest extends CmmnProcessEngineTestCase 
     assertTrue(taskInstance.isTerminated());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneStageAndOneTaskCaseWithManualActivation.cmmn"})
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricCaseActivityInstanceTest.oneStageAndOneTaskCaseWithManualActivation.cmmn"})
   public void testDisabledHistoricActivityInstancesStayDisabledOnComplete() {
 
     // given
@@ -1122,7 +1122,7 @@ public class HistoricCaseActivityInstanceTest extends CmmnProcessEngineTestCase 
     assertTrue(taskInstance.isTerminated());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneMilestoneCaseWithManualActivation.cmmn"})
+  @Deployment
   public void testMilestoneHistoricActivityInstanceIsTerminatedOnComplete() {
 
     // given
@@ -1142,7 +1142,7 @@ public class HistoricCaseActivityInstanceTest extends CmmnProcessEngineTestCase 
     assertTrue(milestoneInstance.isTerminated());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneStageWithSentryAsEntryPointCase.cmmn"})
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricCaseActivityInstanceTest.oneStageWithSentryAsEntryPointCase.cmmn"})
   public void testHistoricTaskWithSentryIsMarkedTerminatedOnComplete() {
 
     // given
@@ -1163,7 +1163,7 @@ public class HistoricCaseActivityInstanceTest extends CmmnProcessEngineTestCase 
     assertTrue(taskInstance2.isTerminated());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneStageWithSentryAsEntryPointCase.cmmn"})
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricCaseActivityInstanceTest.oneStageWithSentryAsEntryPointCase.cmmn"})
   public void testHistoricTaskWithSentryDoesNotReachStateActiveOnComplete() {
 
     // given
