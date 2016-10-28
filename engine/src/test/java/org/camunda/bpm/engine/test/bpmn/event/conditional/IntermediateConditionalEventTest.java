@@ -499,4 +499,35 @@ public class IntermediateConditionalEventTest extends AbstractConditionalEventTe
     tasksAfterVariableIsSet = taskService.createTaskQuery().list();
   }
 
+  @Test
+  public void testEventBasedGateway() {
+    BpmnModelInstance modelInstance =
+      Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
+        .startEvent()
+        .eventBasedGateway()
+        .intermediateCatchEvent(CONDITIONAL_EVENT)
+          .conditionalEventDefinition()
+          .condition(CONDITION_EXPR)
+          .conditionalEventDefinitionDone()
+        .userTask()
+        .name(TASK_AFTER_CONDITION)
+        .endEvent().done();
+
+    engine.manageDeployment(repositoryService.createDeployment().addModelInstance(CONDITIONAL_MODEL, modelInstance).deploy());
+
+    //given
+    ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
+    TaskQuery taskQuery = taskService.createTaskQuery().processInstanceId(procInst.getId());
+    assertEquals(1, conditionEventSubscriptionQuery.list().size());
+
+    //when variable is set on execution
+    runtimeService.setVariable(procInst.getId(), VARIABLE_NAME, 1);
+
+    //then execution is at user task after intermediate conditional event
+    Task task = taskQuery.singleResult();
+    assertEquals(TASK_AFTER_CONDITION, task.getName());
+    assertEquals(0, conditionEventSubscriptionQuery.list().size());
+  }
+
+
 }

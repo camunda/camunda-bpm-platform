@@ -20,6 +20,7 @@ import org.camunda.bpm.engine.impl.core.variable.event.VariableEvent;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
+import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 /**
@@ -37,8 +38,7 @@ public class IntermediateConditionalEventBehavior extends IntermediateCatchEvent
 
   @Override
   public void execute(final ActivityExecution execution) throws Exception {
-    super.execute(execution);
-    if (conditionalEvent.tryEvaluate(execution)) {
+    if (isAfterEventBasedGateway || conditionalEvent.tryEvaluate(execution)) {
       leave(execution);
     }
   }
@@ -48,10 +48,15 @@ public class IntermediateConditionalEventBehavior extends IntermediateCatchEvent
     PvmExecutionImpl execution = eventSubscription.getExecution();
 
     if (execution != null && !execution.isEnded()
-        && variableEvent != null
-        && conditionalEvent.tryEvaluate(variableEvent, execution)
-        && execution.isActive() && execution.isScope()) {
-      leave(execution);
+      && variableEvent != null
+      && conditionalEvent.tryEvaluate(variableEvent, execution)
+      && execution.isActive() && execution.isScope()) {
+      if (isAfterEventBasedGateway) {
+        final ActivityImpl activity = eventSubscription.getActivity();
+        execution.executeEventHandlerActivity(activity);
+      } else {
+        leave(execution);
+      }
     }
   }
 }
