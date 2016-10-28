@@ -1,35 +1,41 @@
-<h3 ng-if="decisionCount">
-  {{decisionCount}} decision {{ (decisionCount > 1 ? 'tables' : 'table') }}  deployed
-</h3>
+<section>
+  <div class="inner">
+    <header>
+      <h1 class="section-title">{{decisionCount}} decision {{ (decisionCount > 1 ? 'tables' : 'table') }}  deployed</h1>
+    </header>
 
-<table class="decision-definitions-list cam-table" ng-if="decisionCount">
-  <thead>
-  <tr>
-    <th class="name">Name</th>
-    <th class="tenant-id">Tenant ID</th>
-    <th class="tenant-id" ng-if="isDrdAvailable">Decision Requirement Definition</th>
-  </tr>
-  </thead>
+    <table class="decision-definitions-list cam-table"
+           ng-if="decisionCount">
+      <thead>
+      <tr>
+        <th class="name">Name</th>
+        <th class="tenant-id">Tenant ID</th>
+        <th class="tenant-id" ng-if="isDrdAvailable">Decision Requirement Definition</th>
+      </tr>
+      </thead>
 
-  <tbody>
-  <tr ng-repeat="decision in decisions | orderBy:['name || key','tenantId']:false">
-    <td class="name">
-      <a href="#/decision-definition/{{ decision.id }}">
-        {{ decision.name || decision.key }}
-      </a>
-    </td>
-    <td class="tenant-id">
-      {{ decision.tenantId }}
-    </td>
-    <td class="drd" ng-if="isDrdAvailable">
-      <a href="#/decision-requirement/{{ decision.drd.id }}">
-        {{ decision.drd.name || decision.drd.key }}
-      </a>
-    </td>
-  </tr>
-  </tbody>
-</table>
+      <tbody>
+      <tr ng-repeat="decision in decisions | orderBy:['name || key','tenantId']:false">
+        <td class="name">
+          <a href="#/decision-definition/{{ decision.id }}">
+            {{ decision.name || decision.key }}
+          </a>
+        </td>
+        <td class="tenant-id">
+          {{ decision.tenantId }}
+        </td>
+        <td class="drd" ng-if="isDrdAvailable">
+          <a href="#/decision-requirement/{{ decision.drd.id }}">
+            {{ decision.drd.name || decision.drd.key }}
+          </a>
+        </td>
+      </tr>
+      </tbody>
+    </table>
 
-<h3 ng-if="!decisionCount">
-  No decision tables deployed
-</h3>
+    <h3 ng-if="!decisionCount">
+      No decision tables deployed
+    </h3>
+  </div>
+</section>
+

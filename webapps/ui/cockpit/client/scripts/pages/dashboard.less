@@ -1,15 +1,4 @@
 .dashboard {
-  .stats {
-    margin-bottom: -10px;
-  }
-  .stats-section {
-    margin-bottom: 10px;
-  }
-
-  .stats-label {
-    display: block;
-  }
-
   section.actual,
   section.metrics,
   section.deployed.no-metrics {
@@ -17,33 +6,13 @@
     padding-right: 0;
   }
 
-  header {
-    overflow: hidden;
+  .value,
+  .no-value {
+    font-size: @font-size-base * 2;
+    font-weight: 100;
   }
-
-  section > .inner {
-    min-height: auto;
-  }
-
-  .entry {
-    padding-bottom: 10px;
-  }
-
-  view.row {
-    display: block;
-  }
-
 
   .metrics {
-    header ul {
-      margin-top: 4px;
-      float: right;
-      border-bottom: none;
-      a {
-        padding-bottom: 8px;
-      }
-    }
-
     .legend-color {
       display: inline-block;
       border-radius: 100%;
@@ -79,9 +48,5 @@
     [cam-sparkline] {
       min-height: 220px;
     }
-  }
-
-  .loading .value {
-    color: @gray-lighter;
   }
 }

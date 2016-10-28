@@ -1,13 +1,31 @@
 <!-- # CE - ui/cockpit/plugins/base/app/views/processesDashboard/process-definitions.html -->
-<div cam-widget-loader loading-state="{{loadingState}}" class="deployed-processes">
-  <h3 ng-if="processDefinitionData && processDefinitionData.length">
-    {{ processDefinitionData.length }} process {{ (processDefinitionData.length > 1 ? 'definitions' : 'definition') }} deployed
-  </h3>
+<section>
+  <div class="inner">
+    <header>
+      <div class="row">
+        <h1 class="col-xs-6 section-title">{{ processDefinitionData.length }} process {{ (processDefinitionData.length > 1 ? 'definitions' : 'definition') }} deployed</h1>
 
-  <tabset ng-if="processDefinitionData && processDefinitionData.length">
-    <tab heading="List"
-         select="selectTab('list')">
-      <table class="process-definitions-list cam-table">
+
+        <div class="col-xs-6 text-right">
+          <ul class="nav nav-tabs" ng-if="processDefinitionData && processDefinitionData.length">
+            <li ng-class="{active: activeTab === 'list'}">
+              <a ng-click="selectTab('list')">List</a>
+            </li>
+            <li ng-class="{active: activeTab === 'previews'}">
+              <a ng-click="selectTab('previews')">Previews</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </header>
+
+
+
+    <div cam-widget-loader
+         loading-state="{{loadingState}}"
+         class="deployed-processes">
+      <table ng-if="activeTab === 'list'"
+             class="process-definitions-list cam-table">
         <thead>
           <tr>
             <th class="state">State</th>
@@ -63,11 +81,9 @@
           </tr>
         </tbody>
       </table>
-    </tab><!-- / list tab -->
 
-    <tab heading="Previews"
-         select="selectTab('previews')">
-      <div class="tile-grid">
+      <div ng-if="activeTab === 'previews'"
+           class="tile-grid">
         <div ng-repeat="pd in processDefinitionData | orderBy:orderByPredicate:orderByReverse"
              class="tile col-xs-12 col-sm-6 col-md-4 col-lg-3">
           <a href="#/process-definition/{{ pd.id }}">
@@ -76,7 +92,7 @@
             </h4>
 
             <span class="tile-body">
-              <span ng-if="selected === 'previews'"
+              <span ng-if="activeTab === 'previews'"
                     process-diagram-preview
                     process-definition-id="pd.id"></span>
             </span>
@@ -99,12 +115,15 @@
           </a>
         </div>
       </div>
-    </tab><!-- grid tab -->
-  </tabset>
 
-  <h3 ng-if="!processDefinitionData || !processDefinitionData.length">
-    No process definitions deployed
-  </h3>
+      <h3 ng-if="!processDefinitionData || !processDefinitionData.length">
+        No process definitions deployed
+      </h3>
 
-</div>
+    </div>
+
+
+  </div>
+</section>
+
 <!-- / CE - ui/cockpit/plugins/base/app/views/processesDashboard/process-definitions.html -->

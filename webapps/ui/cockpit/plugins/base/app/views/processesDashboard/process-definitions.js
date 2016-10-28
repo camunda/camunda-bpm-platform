@@ -55,9 +55,9 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
           });
         });
 
-        $scope.selected = 'list';
-        $scope.selectTab = function(which) {
-          $scope.selected = which;
+        $scope.activeTab = 'list';
+        $scope.selectTab = function(tab) {
+          $scope.activeTab = tab;
         };
       }],
 
