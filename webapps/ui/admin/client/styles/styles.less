@@ -8,6 +8,7 @@
   margin: 0 (@grid-gutter-width * 0.5);
   border: none;
 }
+
 [ng-view] > section {
   &,
   > aside,
@@ -117,5 +118,11 @@ table.cam-table > tbody > tr > td.action {
   footer & {
     padding-top: 0;
     padding-bottom: 0;
+  }
+}
+
+@media (min-width: 1200px) {
+  .dashboard section > .inner {
+    min-height: 250px;
   }
 }
