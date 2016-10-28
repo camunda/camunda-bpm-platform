@@ -144,42 +144,30 @@
   <sql id="selectHistoricProcessInstancesByQueryCriteriaSql">
     from (
 
-      SELECT RES.*, DEF.NAME_
-      FROM ${prefix}ACT_HI_PROCINST RES
+      SELECT SELF.*, DEF.NAME_
+      FROM ${prefix}ACT_HI_PROCINST SELF
 
       LEFT JOIN ${prefix}ACT_RE_PROCDEF DEF
-      ON RES.PROC_DEF_ID_ = DEF.ID_
-
-      <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
-        LEFT JOIN (
-          SELECT
-              SELF.PROC_DEF_KEY_ AS KEY_
-          FROM
-              (SELECT DISTINCT DKEYS.PROC_DEF_KEY_ from ${prefix}ACT_HI_PROCINST DKEYS) SELF
-          WHERE
-              <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.querySingleAuthorizationCheck" />
-        ) AUTH
-        ON AUTH.KEY_ = RES.PROC_DEF_KEY_
-      </if>
+      ON SELF.PROC_DEF_ID_ = DEF.ID_
 
       <if test="withIncidents || incidentStatus != null || incidentMessage != null || incidentMessageLike != null">
-        inner join ${prefix}ACT_HI_INCIDENT INC on RES.PROC_INST_ID_ = INC.PROC_INST_ID_
+        inner join ${prefix}ACT_HI_INCIDENT INC on SELF.PROC_INST_ID_ = INC.PROC_INST_ID_
       </if>
       <where>
         <if test="processInstanceId != null">
-          RES.PROC_INST_ID_ = #{processInstanceId}
+          SELF.PROC_INST_ID_ = #{processInstanceId}
         </if>
         <if test="processInstanceIds != null and !processInstanceIds.isEmpty()">
-          and RES.PROC_INST_ID_ in
+          and SELF.PROC_INST_ID_ in
           <foreach item="item" index="index" collection="processInstanceIds" open="(" separator="," close=")">
             #{item}
           </foreach>
         </if>
         <if test="caseInstanceId != null">
-          and RES.CASE_INST_ID_ = #{caseInstanceId}
+          and SELF.CASE_INST_ID_ = #{caseInstanceId}
         </if>
         <if test="processDefinitionId != null">
-          and RES.PROC_DEF_ID_ = #{processDefinitionId}
+          and SELF.PROC_DEF_ID_ = #{processDefinitionId}
         </if>
         <if test="processDefinitionKey != null">
           and DEF.KEY_ = #{processDefinitionKey}
@@ -191,23 +179,23 @@
           and DEF.NAME_ like #{processDefinitionNameLike}
         </if>
         <if test="businessKey != null">
-          and RES.BUSINESS_KEY_ = #{businessKey}
+          and SELF.BUSINESS_KEY_ = #{businessKey}
         </if>
         <if test="businessKeyLike != null">
-          and RES.BUSINESS_KEY_ like #{businessKeyLike}
+          and SELF.BUSINESS_KEY_ like #{businessKeyLike}
         </if>
 
         <if test="startedBefore != null">
-          and RES.START_TIME_ &lt;= #{startedBefore}
+          and SELF.START_TIME_ &lt;= #{startedBefore}
         </if>
         <if test="startedAfter != null">
-          and RES.START_TIME_ &gt;= #{startedAfter}
+          and SELF.START_TIME_ &gt;= #{startedAfter}
         </if>
         <if test="finishedBefore != null">
-          and RES.END_TIME_ &lt;= #{finishedBefore}
+          and SELF.END_TIME_ &lt;= #{finishedBefore}
         </if>
         <if test="finishedAfter != null">
-          and RES.END_TIME_ &gt;= #{finishedAfter}
+          and SELF.END_TIME_ &gt;= #{finishedAfter}
         </if>
         <if test="processKeyNotIn != null">
           <foreach collection="processKeyNotIn" index="index" item="procDefKey">
@@ -217,28 +205,28 @@
 
         <!-- DEPRECATED : TO BE REMOVED IN 5.11 -->
         <if test="startDateOn">
-          and RES.START_TIME_ &gt;= #{startDateOnBegin}
-          and RES.START_TIME_ &lt;= #{startDateOnEnd}
+          and SELF.START_TIME_ &gt;= #{startDateOnBegin}
+          and SELF.START_TIME_ &lt;= #{startDateOnEnd}
         </if>
         <!-- DEPRECATED : TO BE REMOVED IN 5.11 -->
         <if test="finishDateOn">
-          and RES.END_TIME_ &gt;= #{finishDateOnBegin}
-          and RES.END_TIME_ &lt;= #{finishDateOnEnd}
+          and SELF.END_TIME_ &gt;= #{finishDateOnBegin}
+          and SELF.END_TIME_ &lt;= #{finishDateOnEnd}
         </if>
         <!-- DEPRECATED : TO BE REMOVED IN 5.11 -->
         <if test="finishDateBy">
-          and RES.END_TIME_ &lt;= #{finishDateBy}
+          and SELF.END_TIME_ &lt;= #{finishDateBy}
         </if>
         <!-- DEPRECATED : TO BE REMOVED IN 5.11 -->
         <if test="startDateBy">
-          and RES.START_TIME_ &gt;= #{startDateBy}
+          and SELF.START_TIME_ &gt;= #{startDateBy}
         </if>
 
         <if test="unfinished">
-          and RES.END_TIME_ IS NULL
+          and SELF.END_TIME_ IS NULL
         </if>
         <if test="finished">
-          and RES.END_TIME_ is not NULL
+          and SELF.END_TIME_ is not NULL
         </if>
 
         <if test="incidentMessage != null">
@@ -258,19 +246,19 @@
         </if>
 
         <if test="startedBy != null">
-          and RES.START_USER_ID_ = #{startedBy}
+          and SELF.START_USER_ID_ = #{startedBy}
         </if>
         <if test="superProcessInstanceId != null">
-          and RES.SUPER_PROCESS_INSTANCE_ID_ = #{superProcessInstanceId}
+          and SELF.SUPER_PROCESS_INSTANCE_ID_ = #{superProcessInstanceId}
         </if>
         <if test="subProcessInstanceId != null">
-          and RES.PROC_INST_ID_ = (select SUPER_PROCESS_INSTANCE_ID_ from ${prefix}ACT_HI_PROCINST where PROC_INST_ID_ = #{subProcessInstanceId})
+          and SELF.PROC_INST_ID_ = (select SUPER_PROCESS_INSTANCE_ID_ from ${prefix}ACT_HI_PROCINST where PROC_INST_ID_ = #{subProcessInstanceId})
         </if>
         <if test="superCaseInstanceId != null">
-          and RES.SUPER_CASE_INSTANCE_ID_ = #{superCaseInstanceId}
+          and SELF.SUPER_CASE_INSTANCE_ID_ = #{superCaseInstanceId}
         </if>
         <if test="subCaseInstanceId != null">
-          and RES.PROC_INST_ID_ = (select SUPER_PROCESS_INSTANCE_ID_ from ${prefix}ACT_HI_CASEINST where CASE_INST_ID_ = #{subCaseInstanceId})
+          and SELF.PROC_INST_ID_ = (select SUPER_PROCESS_INSTANCE_ID_ from ${prefix}ACT_HI_CASEINST where CASE_INST_ID_ = #{subCaseInstanceId})
         </if>
         <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
           and EXISTS (
@@ -280,7 +268,7 @@
               ${prefix}ACT_HI_VARINST
             WHERE
               NAME_= #{queryVariableValue.name}
-            AND PROC_INST_ID_ = RES.PROC_INST_ID_
+            AND PROC_INST_ID_ = SELF.PROC_INST_ID_
 
           <bind name="varTypeField" value="'VAR_TYPE_'"/>
           <bind name="varPrefix" value="''"/>
@@ -291,7 +279,7 @@
           )
         </foreach>
         <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
-          and RES.TENANT_ID_ in
+          and SELF.TENANT_ID_ in
           <foreach item="tenantId" index="index" collection="tenantIds"
                    open="(" separator="," close=")">
             #{tenantId}
@@ -299,10 +287,14 @@
         </if>
 
         <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
-          and ((RES.PROC_DEF_KEY_ is not null and AUTH.KEY_ is not null) or RES.PROC_DEF_KEY_ is null)
+          and (
+            (SELF.PROC_DEF_KEY_ is not null and
+              <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.querySingleAuthorizationCheck"/>
+            ) or SELF.PROC_DEF_KEY_ is null
+          )
         </if>
 
-        <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithSelfPrefix" />
 
       </where>
 
