@@ -220,23 +220,4 @@ public abstract class AbstractProcessApplication implements ProcessApplicationIn
     this.variableSerializers = variableSerializers;
   }
 
-  public List<DeploymentOperationStep> getDeploymentSteps() {
-    return Arrays.asList(
-      new ParseProcessesXmlStep(),
-      new ProcessesXmlStartProcessEnginesStep(),
-      new DeployProcessArchivesStep(),
-      new StartProcessApplicationServiceStep(),
-      new PostDeployInvocationStep());
-  }
-
-  public List<DeploymentOperationStep> getUndeploymentSteps() {
-    return Arrays.asList(
-      new PreUndeployInvocationStep(),
-      new UndeployProcessArchivesStep(),
-      new ProcessesXmlStopProcessEnginesStep(),
-      new StopProcessApplicationServiceStep(),
-      new NotifyPostProcessApplicationUndeployedStep()
-    );
-  }
-
 }

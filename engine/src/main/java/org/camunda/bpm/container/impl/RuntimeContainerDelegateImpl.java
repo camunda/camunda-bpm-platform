@@ -14,6 +14,7 @@ package org.camunda.bpm.container.impl;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -26,10 +27,11 @@ import org.camunda.bpm.application.ProcessApplicationInfo;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.container.ExecutorService;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
-import org.camunda.bpm.container.impl.deployment.Attachments;
+import org.camunda.bpm.container.impl.deployment.*;
 import org.camunda.bpm.container.impl.jmx.MBeanServiceContainer;
 import org.camunda.bpm.container.impl.jmx.services.JmxManagedProcessApplication;
 import org.camunda.bpm.container.impl.jmx.services.JmxManagedProcessEngine;
+import org.camunda.bpm.container.impl.spi.DeploymentOperationStep;
 import org.camunda.bpm.container.impl.spi.PlatformServiceContainer;
 import org.camunda.bpm.container.impl.spi.ServiceTypes;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -82,7 +84,7 @@ public class RuntimeContainerDelegateImpl implements RuntimeContainerDelegate, P
 
     serviceContainer.createDeploymentOperation(operationName)
       .addAttachment(Attachments.PROCESS_APPLICATION, processApplication)
-      .addSteps(processApplication.getDeploymentSteps())
+      .addSteps(getDeploymentSteps())
       .execute();
 
     LOG.paDeployed(processApplication.getName());
@@ -104,11 +106,32 @@ public class RuntimeContainerDelegateImpl implements RuntimeContainerDelegate, P
     // perform the undeployment
     serviceContainer.createUndeploymentOperation(operationName)
       .addAttachment(Attachments.PROCESS_APPLICATION, processApplication)
-      .addSteps(processApplication.getUndeploymentSteps())
+      .addSteps(getUndeploymentSteps())
       .execute();
 
     LOG.paUndeployed(processApplication.getName());
   }
+
+
+  protected List<DeploymentOperationStep> getDeploymentSteps() {
+    return Arrays.asList(
+      new ParseProcessesXmlStep(),
+      new ProcessesXmlStartProcessEnginesStep(),
+      new DeployProcessArchivesStep(),
+      new StartProcessApplicationServiceStep(),
+      new PostDeployInvocationStep());
+  }
+
+  protected List<DeploymentOperationStep> getUndeploymentSteps() {
+    return Arrays.asList(
+      new PreUndeployInvocationStep(),
+      new UndeployProcessArchivesStep(),
+      new ProcessesXmlStopProcessEnginesStep(),
+      new StopProcessApplicationServiceStep(),
+      new NotifyPostProcessApplicationUndeployedStep()
+    );
+  }
+
 
   @Override
   public ProcessEngineService getProcessEngineService() {
