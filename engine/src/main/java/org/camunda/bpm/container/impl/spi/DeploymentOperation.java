@@ -185,7 +185,9 @@ public class DeploymentOperation {
     }
 
     public DeploymentOperationBuilder addSteps(Collection<DeploymentOperationStep> steps) {
-      steps.addAll(steps);
+      for (DeploymentOperationStep step: steps) {
+        addStep(step);
+      }
       return this;
     }
 
