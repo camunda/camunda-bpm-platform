@@ -47,7 +47,7 @@ import org.camunda.bpm.engine.impl.ProcessEngineLogger;
  */
 public class RuntimeContainerDelegateImpl implements RuntimeContainerDelegate, ProcessEngineService, ProcessApplicationService {
 
-  private final static ContainerIntegrationLogger LOG = ProcessEngineLogger.CONTAINER_INTEGRATION_LOGGER;
+  protected final static ContainerIntegrationLogger LOG = ProcessEngineLogger.CONTAINER_INTEGRATION_LOGGER;
 
   protected MBeanServiceContainer serviceContainer = new MBeanServiceContainer();
 
