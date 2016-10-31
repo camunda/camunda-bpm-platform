@@ -35,6 +35,11 @@ public class EventSubProcessStartConditionalEventActivityBehavior extends EventS
   }
 
   @Override
+  public ConditionalEventDefinition getConditionalEventDefinition() {
+    return conditionalEvent;
+  }
+
+  @Override
   public void leaveOnSatisfiedCondition(final EventSubscriptionEntity eventSubscription, final VariableEvent variableEvent, final CommandContext commandContext) {
     PvmExecutionImpl execution = eventSubscription.getExecution();
 

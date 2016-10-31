@@ -37,6 +37,11 @@ public class BoundaryConditionalEventActivityBehavior extends BoundaryEventActiv
   }
 
   @Override
+  public ConditionalEventDefinition getConditionalEventDefinition() {
+    return conditionalEvent;
+  }
+
+  @Override
   public void leaveOnSatisfiedCondition(final EventSubscriptionEntity eventSubscription,
           final VariableEvent variableEvent, final CommandContext commandContext) {
     final PvmExecutionImpl execution = eventSubscription.getExecution();

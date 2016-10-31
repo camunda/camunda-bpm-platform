@@ -15,6 +15,7 @@
  */
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
+import org.camunda.bpm.engine.impl.bpmn.parser.ConditionalEventDefinition;
 import org.camunda.bpm.engine.impl.core.variable.event.VariableEvent;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
@@ -27,6 +28,13 @@ import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
 public interface ConditionalEventBehavior {
+
+  /**
+   * Returns the current conditional event definition.
+   *
+   * @return the conditional event definition
+   */
+  ConditionalEventDefinition getConditionalEventDefinition();
 
   /**
    * Checks the condition, on satisfaction the activity is leaved.
