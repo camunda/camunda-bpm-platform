@@ -24,8 +24,18 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
  */
 public class SetVariableDelegate implements JavaDelegate {
 
+  private static int instanceCount = 0;
+
+  public SetVariableDelegate() {
+    instanceCount++;
+  }
+
   @Override
   public void execute(DelegateExecution execution) throws Exception {
-    execution.setVariable(AbstractConditionalEventTestCase.VARIABLE_NAME, 1);
+    if (instanceCount < 1000) {
+      execution.setVariable(AbstractConditionalEventTestCase.VARIABLE_NAME, 1);
+    } else {
+      execution.setVariable(AbstractConditionalEventTestCase.VARIABLE_NAME, instanceCount);
+    }
   }
 }

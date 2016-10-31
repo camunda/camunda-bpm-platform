@@ -1115,4 +1115,24 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
     tasksAfterVariableIsSet = taskQuery.list();
     assertEquals(3, tasksAfterVariableIsSet.size());
   }
+
+  @Test
+  @Deployment
+  public void testLoop() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
+    Task task = taskService.createTaskQuery().taskDefinitionKey("Task_1").singleResult();
+
+    // when
+    taskService.complete(task.getId());
+
+    //then process instance will be in endless loop
+    //to end the instance we have a conditional branch in the java delegate
+    //after 1000 instantiations the variable will be set to the instantiation count
+    //execution stays in task 2
+    tasksAfterVariableIsSet = taskService.createTaskQuery().list();
+    assertEquals(1, tasksAfterVariableIsSet.size());
+    assertEquals("Task_2", tasksAfterVariableIsSet.get(0).getTaskDefinitionKey());
+    assertEquals(1000, runtimeService.getVariable(processInstance.getId(), VARIABLE_NAME));
+  }
 }
