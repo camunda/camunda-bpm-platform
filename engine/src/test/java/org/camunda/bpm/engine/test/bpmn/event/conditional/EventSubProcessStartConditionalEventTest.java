@@ -1092,7 +1092,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
     tasksAfterVariableIsSet = taskService.createTaskQuery().list();
   }
 
-  @Ignore
+  @Test
   public void testNonInterruptingSetMultipleVariables() {
     BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
       .startEvent()
