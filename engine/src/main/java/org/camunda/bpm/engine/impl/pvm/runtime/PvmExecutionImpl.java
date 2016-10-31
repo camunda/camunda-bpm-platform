@@ -1959,10 +1959,6 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     return targetScope;
   }
 
-  protected boolean isCompacted(PvmExecutionImpl execution) {
-    return execution.isScope() && execution.getActivity() != null && !execution.getActivity().isScope();
-  }
-
   /**
    * Returns the activity instance id for the given execution.
    *
@@ -1974,7 +1970,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
       return targetScope.getActivityInstanceId();
     } else {
       ActivityImpl targetActivity = targetScope.getActivity();
-      if (!isCompacted(targetScope) && targetActivity != null && targetActivity.getActivities().isEmpty()) {
+      if (targetActivity != null && targetActivity.getActivities().isEmpty()) {
         return targetScope.getActivityInstanceId();
       } else {
         return targetScope.getParentActivityInstanceId();
