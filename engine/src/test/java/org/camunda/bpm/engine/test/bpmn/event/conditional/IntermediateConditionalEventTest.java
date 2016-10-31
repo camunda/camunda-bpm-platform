@@ -71,7 +71,6 @@ public class IntermediateConditionalEventTest extends AbstractConditionalEventTe
              .activityId(CONDITIONAL_EVENT)
              .singleResult();
     assertNotNull(execution);
-    assertEquals(1, conditionEventSubscriptionQuery.list().size());
   }
 
   @Test
@@ -114,7 +113,6 @@ public class IntermediateConditionalEventTest extends AbstractConditionalEventTe
              .activityId(CONDITIONAL_EVENT)
              .singleResult();
     assertNotNull(execution);
-    assertEquals(1, conditionEventSubscriptionQuery.list().size());
 
     //when variable is set to correct value
     runtimeService.setVariable(execution.getId(), VARIABLE_NAME, 1);
@@ -130,7 +128,6 @@ public class IntermediateConditionalEventTest extends AbstractConditionalEventTe
                              .processDefinitionKey(CONDITIONAL_EVENT_PROCESS_KEY)
                              .singleResult();
     assertNull(procInst);
-    assertEquals(0, conditionEventSubscriptionQuery.list().size());
   }
 
   @Test
@@ -149,7 +146,6 @@ public class IntermediateConditionalEventTest extends AbstractConditionalEventTe
              .processInstanceId(procInst.getId())
              .activityId(CONDITIONAL_EVENT + 2)
              .singleResult();
-    assertEquals(2, conditionEventSubscriptionQuery.list().size());
 
     //when variable is set to correct value
     runtimeService.setVariable(execution1.getId(), VARIABLE_NAME, 1);
@@ -160,7 +156,6 @@ public class IntermediateConditionalEventTest extends AbstractConditionalEventTe
              .activityId(CONDITIONAL_EVENT + 1)
              .singleResult();
     assertNull(execution1);
-    assertEquals(1, conditionEventSubscriptionQuery.list().size());
 
     //when second variable is set to correct value
     runtimeService.setVariable(execution2.getId(), VARIABLE_NAME, 2);
@@ -175,7 +170,6 @@ public class IntermediateConditionalEventTest extends AbstractConditionalEventTe
                              .processDefinitionKey(CONDITIONAL_EVENT_PROCESS_KEY)
                              .singleResult();
     assertNull(procInst);
-    assertEquals(0, conditionEventSubscriptionQuery.list().size());
   }
 
 
@@ -291,9 +285,6 @@ public class IntermediateConditionalEventTest extends AbstractConditionalEventTe
              .singleResult();
     assertNotNull(execution);
 
-    //condition subscription is created
-    assertEquals(1, conditionEventSubscriptionQuery.list().size());
-
     //when variable is set to correct value
     runtimeService.setVariable(execution.getId(), VARIABLE_NAME, 1);
 
@@ -301,7 +292,6 @@ public class IntermediateConditionalEventTest extends AbstractConditionalEventTe
     Task task = taskService.createTaskQuery().processInstanceId(procInst.getId()).singleResult();
     assertNotNull(task);
     assertEquals(TASK_AFTER_CONDITION, task.getName());
-    assertEquals(0, conditionEventSubscriptionQuery.list().size());
 
     //and task can be completed which ends process instance
     taskService.complete(task.getId());
@@ -334,7 +324,6 @@ public class IntermediateConditionalEventTest extends AbstractConditionalEventTe
              .activityId(CONDITIONAL_EVENT)
              .singleResult();
     assertNotNull(execution);
-    assertEquals(1, conditionEventSubscriptionQuery.list().size());
 
     //when variable with name `variable1` is set on execution
     runtimeService.setVariable(procInst.getId(), VARIABLE_NAME+1, 1);
@@ -345,7 +334,6 @@ public class IntermediateConditionalEventTest extends AbstractConditionalEventTe
              .activityId(CONDITIONAL_EVENT)
              .singleResult();
     assertNotNull(execution);
-    assertEquals(1, conditionEventSubscriptionQuery.list().size());
 
     //when variable with name `variable` is set on execution
     runtimeService.setVariable(procInst.getId(), VARIABLE_NAME, 1);
@@ -353,7 +341,6 @@ public class IntermediateConditionalEventTest extends AbstractConditionalEventTe
     //then execution is at user task after conditional intermediate event
     Task task = taskQuery.singleResult();
     assertEquals(TASK_AFTER_CONDITION, task.getName());
-    assertEquals(0, conditionEventSubscriptionQuery.list().size());
 
     //and task can be completed which ends process instance
     taskService.complete(task.getId());
@@ -388,7 +375,6 @@ public class IntermediateConditionalEventTest extends AbstractConditionalEventTe
              .activityId(CONDITIONAL_EVENT)
              .singleResult();
     assertNotNull(execution);
-    assertEquals(1, conditionEventSubscriptionQuery.list().size());
 
 
     //when variable with name `variable` is set on execution
@@ -400,7 +386,6 @@ public class IntermediateConditionalEventTest extends AbstractConditionalEventTe
              .activityId(CONDITIONAL_EVENT)
              .singleResult();
     assertNotNull(execution);
-    assertEquals(1, conditionEventSubscriptionQuery.list().size());
 
     //when variable with name `variable1` is updated
     runtimeService.setVariable(procInst.getId(), VARIABLE_NAME+1, 1);
@@ -408,7 +393,6 @@ public class IntermediateConditionalEventTest extends AbstractConditionalEventTe
     //then execution is at user task after conditional intermediate event
     Task task = taskQuery.singleResult();
     assertEquals(TASK_AFTER_CONDITION, task.getName());
-    assertEquals(0, conditionEventSubscriptionQuery.list().size());
 
     //and task can be completed which ends process instance
     taskService.complete(task.getId());
@@ -442,7 +426,6 @@ public class IntermediateConditionalEventTest extends AbstractConditionalEventTe
              .activityId(CONDITIONAL_EVENT)
              .singleResult();
     assertNotNull(execution);
-    assertEquals(1, conditionEventSubscriptionQuery.list().size());
 
 
     //when variable with name `variable` is set on execution
@@ -454,7 +437,6 @@ public class IntermediateConditionalEventTest extends AbstractConditionalEventTe
              .activityId(CONDITIONAL_EVENT)
              .singleResult();
     assertNotNull(execution);
-    assertEquals(1, conditionEventSubscriptionQuery.list().size());
 
     //when variable with name `variable` is updated
     runtimeService.setVariable(procInst.getId(), VARIABLE_NAME, 1);
@@ -462,7 +444,6 @@ public class IntermediateConditionalEventTest extends AbstractConditionalEventTe
     //then execution is at user task after conditional intermediate event
     Task task = taskQuery.singleResult();
     assertEquals(TASK_AFTER_CONDITION, task.getName());
-    assertEquals(0, conditionEventSubscriptionQuery.list().size());
 
     //and task can be completed which ends process instance
     taskService.complete(task.getId());
@@ -523,7 +504,6 @@ public class IntermediateConditionalEventTest extends AbstractConditionalEventTe
     //given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
     TaskQuery taskQuery = taskService.createTaskQuery().processInstanceId(procInst.getId());
-    assertEquals(1, conditionEventSubscriptionQuery.list().size());
     Execution execution = runtimeService.createExecutionQuery()
       .processInstanceId(procInst.getId())
       .activityId(EVENT_BASED_GATEWAY_ID)
@@ -536,7 +516,6 @@ public class IntermediateConditionalEventTest extends AbstractConditionalEventTe
     //then execution is at user task after intermediate conditional event
     Task task = taskQuery.singleResult();
     assertEquals(TASK_AFTER_CONDITION, task.getName());
-    assertEquals(0, conditionEventSubscriptionQuery.list().size());
   }
 
   @Test

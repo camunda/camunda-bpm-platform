@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.engine.impl.bpmn.helper;
 
+import org.camunda.bpm.engine.impl.bpmn.parser.ConditionalEventDefinition;
 import org.camunda.bpm.engine.impl.bpmn.parser.ErrorEventDefinition;
 import org.camunda.bpm.engine.impl.bpmn.parser.EscalationEventDefinition;
 import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
@@ -36,6 +37,7 @@ public class BpmnProperties {
   public static final PropertyKey<String> TYPE = new PropertyKey<String>("type");
 
   public static final PropertyListKey<EscalationEventDefinition> ESCALATION_EVENT_DEFINITIONS = new PropertyListKey<EscalationEventDefinition>("escalationEventDefinitions");
+  public static final PropertyListKey<ConditionalEventDefinition> CONDITIONAL_EVENT_DEFINITIONS = new PropertyListKey<ConditionalEventDefinition>("conditionalEventDefinitions");
 
   public static final PropertyListKey<ErrorEventDefinition> ERROR_EVENT_DEFINITIONS = new PropertyListKey<ErrorEventDefinition>("errorEventDefinitions");
 

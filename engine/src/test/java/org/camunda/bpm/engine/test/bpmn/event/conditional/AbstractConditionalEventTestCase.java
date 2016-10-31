@@ -92,7 +92,6 @@ public abstract class AbstractConditionalEventTestCase {
   protected TaskService taskService;
   protected RepositoryService repositoryService;
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
-  protected EventSubscriptionQueryImpl conditionEventSubscriptionQuery;
 
   @Before
   public void init() {
@@ -100,7 +99,6 @@ public abstract class AbstractConditionalEventTestCase {
     this.taskService = engine.getTaskService();
     this.repositoryService = engine.getRepositoryService();
     this.processEngineConfiguration = engine.getProcessEngineConfiguration();
-    this.conditionEventSubscriptionQuery = new EventSubscriptionQueryImpl(processEngineConfiguration.getCommandExecutorTxRequired()).eventType(EventType.CONDITONAL.name());
   }
 
   @After
@@ -114,7 +112,6 @@ public abstract class AbstractConditionalEventTestCase {
     }
 
     //then
-    assertEquals(0, conditionEventSubscriptionQuery.list().size());
     assertNull(taskService.createTaskQuery().singleResult());
     assertNull(runtimeService.createProcessInstanceQuery().singleResult());
     tasksAfterVariableIsSet = null;

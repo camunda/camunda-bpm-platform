@@ -25,8 +25,11 @@ import java.util.Set;
 import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.bpmn.behavior.ConditionalEventBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.NoneStartEventActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
+import org.camunda.bpm.engine.impl.bpmn.parser.ConditionalEventDefinition;
 import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProvider;
@@ -63,6 +66,7 @@ import org.camunda.bpm.engine.impl.pvm.delegate.CompositeActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
+import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.ActivityInstanceState;
 import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperation;
 import org.camunda.bpm.engine.impl.pvm.runtime.ExecutionStartContext;
@@ -70,9 +74,7 @@ import org.camunda.bpm.engine.impl.pvm.runtime.ProcessInstanceStartContext;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.operation.FoxAtomicOperationDeleteCascadeFireActivityEnd;
 import org.camunda.bpm.engine.impl.pvm.runtime.operation.PvmAtomicOperation;
-import org.camunda.bpm.engine.impl.pvm.runtime.operation.PvmAtomicOperationContinuation;
-import org.camunda.bpm.engine.impl.tree.ExecutionTopDownWalker;
-import org.camunda.bpm.engine.impl.tree.TreeVisitor;
+import org.camunda.bpm.engine.impl.tree.*;
 import org.camunda.bpm.engine.impl.util.BitMaskUtil;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.impl.variable.VariableDeclaration;
@@ -1706,29 +1708,101 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     }
   }
 
-  public void handleConditionalEventOnVariableChange(VariableEvent variableEvent) {
-    List<EventSubscriptionEntity> subScriptions = getEventSubscriptions();
-    for (EventSubscriptionEntity subscription : subScriptions) {
-      if (EventType.CONDITONAL.name().equals(subscription.getEventType())) {
-        subscription.processEventSync(variableEvent);
-      }
+  public void handleConditionalEventOnVariableChange(VariableEvent variableEvent, ScopeImpl activity) {
+    ScopeImpl scopeActivity = activity.isScope() ? activity : activity.getFlowScope();
+    List<ConditionalEventDefinition> conditionalEventDefinitions = scopeActivity.getProperties().get(BpmnProperties.CONDITIONAL_EVENT_DEFINITIONS);
+    for (ConditionalEventDefinition conditionalEventDefinition : conditionalEventDefinitions) {
+      ActivityImpl conditionalActivity = conditionalEventDefinition.getConditionalActivity();
+      ConditionalEventBehavior activityBehavior = (ConditionalEventBehavior) conditionalActivity.getActivityBehavior();
+      activityBehavior.leaveOnSatisfiedCondition(this, variableEvent, conditionalActivity);
     }
+  }
+
+
+  /**
+   * Checks if the current execution is compacted.
+   * Compacted means an execution which corresponds to an scope and to the current activity which is not scope.
+   *
+   * @return true if the execution is compacted
+   */
+  public boolean isCompacted() {
+    return isScope() && getActivity() != null && !getActivity().isScope();
+  }
+
+  /**
+   * Collect all activity-execution tuple, which contains a conditional event.
+   * The collection starts on the given leaf execution and ends on the current execution OR if a visited scope activity
+   * is reached.
+   *
+   * @param leafExecution the leaf execution on which the collection starts
+   * @param visited the already visited scope activities
+   * @return a collection of activity-execution tuple
+   */
+  private List<ActivityExecutionTuple> collectConditionalEvents(PvmExecutionImpl leafExecution, List<ScopeImpl> visited) {
+
+    final boolean targetScopeHasNoActivity = getActivity() == null;
+    //collect all execution activity tuple which have conditional events
+    ConditionalEventCollector conditionalEventCollector = new ConditionalEventCollector(visited, this);
+    ActivityExecutionTupleWalker walker = new ActivityExecutionTupleWalker(leafExecution);
+    walker.addPreVisitor(conditionalEventCollector);
+    walker.addPostVisitor(conditionalEventCollector);
+
+    walker.walkUntil(new ReferenceWalker.WalkCondition<ActivityExecutionTuple>() {
+      @Override
+      public boolean isFulfilled(ActivityExecutionTuple element) {
+        //walk until tuple element is NULL OR tuple scope activity is the process definition OR
+        //if the current execution is not the process instance and the tuple execution reached the parent of the
+        //current execution
+        boolean fulFilled = element == null
+          || element.getScope() == ExecutionEntity.this.getProcessDefinition()
+          || (!ExecutionEntity.this.isProcessInstanceExecution() && element.getExecution() == ExecutionEntity.this.getParent().getFlowScopeExecution());
+        if (!fulFilled) {
+          //If current execution has no activity we have to check whether the current execution was reached.
+          //Has the current execution an activity, we have to check if the tuple scope activity is equal to the current
+          //activity OR if the execution is compacted the tuple scope activity is equal to the flow scope activity.
+          if (targetScopeHasNoActivity) {
+            fulFilled = element.getExecution() == ExecutionEntity.this;
+          } else {
+            fulFilled = ExecutionEntity.this.isCompacted()
+              ? element.getScope() == ExecutionEntity.this.getFlowScope()
+              : element.getScope() == ExecutionEntity.this.getActivity();
+          }
+        }
+        return fulFilled;
+      }
+    });
+    return conditionalEventCollector.getTuples();
   }
 
   @Override
   public void dispatchEvent(VariableEvent variableEvent) {
-    final List<ExecutionEntity> execs = new ArrayList<ExecutionEntity>();
-    new ExecutionTopDownWalker(this).addPreVisitor(new TreeVisitor<ExecutionEntity>() {
-      @Override
-      public void visit(ExecutionEntity obj) {
-        if (!obj.getEventSubscriptions().isEmpty() &&
-          (obj.isInState(ActivityInstanceState.DEFAULT) || !obj.getActivity().isScope())) { // state is default or tree is compacted
-          execs.add(obj);
-        }
+
+    //Collect all leafs of the current execution
+    LeafActivityInstanceExecutionCollector leafCollector = new LeafActivityInstanceExecutionCollector();
+    new ExecutionTopDownWalker(this).addPreVisitor(leafCollector).walkUntil();
+    List<PvmExecutionImpl> leaves = leafCollector.getLeaves();
+
+    final List<ActivityExecutionTuple> tuples = new ArrayList<ActivityExecutionTuple>();
+    final List<ScopeImpl> visited = new ArrayList<ScopeImpl>();
+
+    //walk for each leaf to the current execution OR to already visited scope activity
+    for (PvmExecutionImpl leafExecution : leaves) {
+      // Legacy: concurrent scope executions should not be handled!
+      // Mapping does not work for this kind of executions.
+      if (leafExecution.isConcurrent() && leafExecution.isScope()) {
+        break;
       }
-    }).walkUntil();
-    for (ExecutionEntity execution : execs) {
-      execution.handleConditionalEventOnVariableChange(variableEvent);
+
+      //Since we want to evaluate the conditional event on the highest scope as first
+      //we have to reverse the collected tuples. Conditional events on the same execution tree level
+      //have no deterministic order. It is not clear which one is evaluated at first.
+      List<ActivityExecutionTuple> localTulpes = collectConditionalEvents(leafExecution, visited);
+      Collections.reverse(localTulpes);
+      tuples.addAll(localTulpes);
+    }
+
+    for (ActivityExecutionTuple tuple : tuples) {
+      ((ExecutionEntity) tuple.getExecution()).handleConditionalEventOnVariableChange(variableEvent, (ScopeImpl) tuple.getScope());
     }
   }
 

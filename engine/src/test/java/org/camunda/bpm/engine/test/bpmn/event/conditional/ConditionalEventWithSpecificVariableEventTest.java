@@ -195,7 +195,6 @@ public class ConditionalEventWithSpecificVariableEventTest extends AbstractCondi
     task = taskQuery.singleResult();
     assertNotNull(task);
     assertEquals(TASK_BEFORE_CONDITION, task.getName());
-    assertEquals(1, conditionEventSubscriptionQuery.list().size());
 
     //when variable with name `variable` is set on execution
     taskService.setVariable(task.getId(), VARIABLE_NAME, 1);
@@ -203,7 +202,6 @@ public class ConditionalEventWithSpecificVariableEventTest extends AbstractCondi
     //then execution is at user task after conditional event
     tasksAfterVariableIsSet = taskQuery.list();
     assertEquals(TASK_AFTER_CONDITION, tasksAfterVariableIsSet.get(0).getName());
-    assertEquals(0, conditionEventSubscriptionQuery.list().size());
   }
 
   @Test
@@ -225,7 +223,6 @@ public class ConditionalEventWithSpecificVariableEventTest extends AbstractCondi
     task = taskQuery.singleResult();
     assertNotNull(task);
     assertEquals(TASK_BEFORE_CONDITION, task.getName());
-    assertEquals(1, conditionEventSubscriptionQuery.list().size());
 
     //when variable with name `variable` is updated
     taskService.setVariable(task.getId(), VARIABLE_NAME, 1);
@@ -233,7 +230,6 @@ public class ConditionalEventWithSpecificVariableEventTest extends AbstractCondi
     //then execution is at user task after conditional event
     tasksAfterVariableIsSet = taskQuery.list();
     assertEquals(TASK_AFTER_CONDITION, tasksAfterVariableIsSet.get(0).getName());
-    assertEquals(0, conditionEventSubscriptionQuery.list().size());
   }
 
   @Test
@@ -255,7 +251,6 @@ public class ConditionalEventWithSpecificVariableEventTest extends AbstractCondi
     task = taskQuery.singleResult();
     assertNotNull(task);
     assertEquals(TASK_BEFORE_CONDITION, task.getName());
-    assertEquals(1, conditionEventSubscriptionQuery.list().size());
 
     //when variable with name `variable` is set, updated and deleted
     taskService.setVariable(task.getId(), VARIABLE_NAME, 1); //create
@@ -266,7 +261,6 @@ public class ConditionalEventWithSpecificVariableEventTest extends AbstractCondi
     assertEquals(3, taskService.createTaskQuery().taskName(TASK_AFTER_CONDITION).count());
     tasksAfterVariableIsSet = taskQuery.list();
     assertEquals(4, tasksAfterVariableIsSet.size());
-    assertEquals(1, conditionEventSubscriptionQuery.list().size());
   }
 
   @Test
@@ -290,7 +284,6 @@ public class ConditionalEventWithSpecificVariableEventTest extends AbstractCondi
     assertEquals(2, taskService.createTaskQuery().taskName(TASK_AFTER_CONDITION).count());
     tasksAfterVariableIsSet = taskQuery.list();
     assertEquals(3, tasksAfterVariableIsSet.size());
-    assertEquals(1, conditionEventSubscriptionQuery.list().size());
   }
 
 
@@ -315,7 +308,6 @@ public class ConditionalEventWithSpecificVariableEventTest extends AbstractCondi
     task = taskQuery.singleResult();
     assertNotNull(task);
     assertEquals(TASK_BEFORE_CONDITION, task.getName());
-    assertEquals(1, conditionEventSubscriptionQuery.list().size());
 
     //when variable with name `variable1` is updated
     runtimeService.setVariable(procInst.getId(), VARIABLE_NAME + 1, 1);
@@ -323,7 +315,6 @@ public class ConditionalEventWithSpecificVariableEventTest extends AbstractCondi
     //then execution is at user task after conditional intermediate event
     tasksAfterVariableIsSet = taskQuery.list();
     assertEquals(TASK_AFTER_CONDITION, tasksAfterVariableIsSet.get(0).getName());
-    assertEquals(0, conditionEventSubscriptionQuery.list().size());
   }
 
   @Test
@@ -353,7 +344,6 @@ public class ConditionalEventWithSpecificVariableEventTest extends AbstractCondi
     assertEquals(2, taskQuery.taskName(TASK_AFTER_CONDITION).count());
     tasksAfterVariableIsSet = taskService.createTaskQuery().list();
     assertEquals(3, tasksAfterVariableIsSet.size());
-    assertEquals(1, conditionEventSubscriptionQuery.list().size());
   }
 
 }

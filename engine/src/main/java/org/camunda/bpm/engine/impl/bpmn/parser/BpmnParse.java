@@ -3378,7 +3378,8 @@ public class BpmnParse extends Parse {
 
     ConditionalEventDefinition conditionalEventDefinition = parseConditionalEventDefinition(element, conditionalActivity);
     conditionalEventDefinition.setInterrupting(interrupting);
-    addEventSubscriptionDeclaration(conditionalEventDefinition, conditionalActivity.getEventScope(), element);
+
+    addConditionalEventDefinition(conditionalEventDefinition, conditionalActivity.getEventScope());
 
     for (BpmnParseListener parseListener : parseListeners) {
       parseListener.parseBoundaryConditionalEventDefinition(element, interrupting, conditionalActivity);
@@ -3398,7 +3399,7 @@ public class BpmnParse extends Parse {
     conditionalActivity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.INTERMEDIATE_EVENT_CONDITIONAL);
 
     ConditionalEventDefinition conditionalEventDefinition = parseConditionalEventDefinition(element, conditionalActivity);
-    addEventSubscriptionDeclaration(conditionalEventDefinition, conditionalActivity.getEventScope(), element);
+    addConditionalEventDefinition(conditionalEventDefinition, conditionalActivity.getEventScope());
 
     for (BpmnParseListener parseListener : parseListeners) {
       parseListener.parseIntermediateConditionalEventDefinition(element, conditionalActivity);
@@ -3420,7 +3421,7 @@ public class BpmnParse extends Parse {
 
     ConditionalEventDefinition conditionalEventDefinition = parseConditionalEventDefinition(element, conditionalActivity);
     conditionalEventDefinition.setInterrupting(interrupting);
-    addEventSubscriptionDeclaration(conditionalEventDefinition, conditionalActivity.getEventScope(), element);
+    addConditionalEventDefinition(conditionalEventDefinition, conditionalActivity.getEventScope());
 
     for (BpmnParseListener parseListener : parseListeners) {
       parseListener.parseConditionalStartEventForEventSubprocess(element, conditionalActivity, interrupting);
@@ -3462,6 +3463,10 @@ public class BpmnParse extends Parse {
     }
 
     return conditionalEventDefinition;
+  }
+
+  protected void addConditionalEventDefinition(ConditionalEventDefinition conditionalEventDefinition, ScopeImpl catchingScope) {
+    catchingScope.getProperties().addListItem(BpmnProperties.CONDITIONAL_EVENT_DEFINITIONS, conditionalEventDefinition);
   }
 
   /**

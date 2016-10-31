@@ -198,7 +198,6 @@ public class ConditionalEventTriggeredByExecutionListenerTest extends AbstractCo
     //non interrupting boundary event is triggered
     tasksAfterVariableIsSet = taskQuery.list();
     assertEquals(2, tasksAfterVariableIsSet.size());
-    assertEquals(specifier.expectedSubscriptions(), conditionEventSubscriptionQuery.list().size());
     for (Task task : tasksAfterVariableIsSet) {
       assertTrue(task.getName().equals(specifier.expectedActivityName()) || task.getName().equals(TASK_WITH_CONDITION));
     }
@@ -270,7 +269,6 @@ public class ConditionalEventTriggeredByExecutionListenerTest extends AbstractCo
     //non interrupting boundary event is triggered
     tasksAfterVariableIsSet = taskQuery.list();
     assertEquals(2, tasksAfterVariableIsSet.size());
-    assertEquals(specifier.expectedSubscriptions(), conditionEventSubscriptionQuery.list().size());
   }
 
   @Test
@@ -340,7 +338,7 @@ public class ConditionalEventTriggeredByExecutionListenerTest extends AbstractCo
     //and job was created
     Job job = engine.getManagementService().createJobQuery().singleResult();
     assertNotNull(job);
-    assertEquals(1, conditionEventSubscriptionQuery.list().size());
+
 
     //when job is executed task is created
     engine.getManagementService().executeJob(job.getId());

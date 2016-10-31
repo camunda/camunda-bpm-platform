@@ -29,7 +29,6 @@ public final class EventType {
   public static final EventType MESSAGE = new EventType("message");
   public static final EventType SIGNAL = new EventType("signal");
   public static final EventType COMPENSATE = new EventType("compensate");
-  public static final EventType CONDITONAL = new EventType("conditional");
 
   private final String name;
 

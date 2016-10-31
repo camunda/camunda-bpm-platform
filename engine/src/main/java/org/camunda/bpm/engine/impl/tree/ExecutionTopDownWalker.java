@@ -19,26 +19,27 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 /**
  *
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
-public class ExecutionTopDownWalker extends ReferenceWalker<ExecutionEntity> {
+public class ExecutionTopDownWalker extends ReferenceWalker<PvmExecutionImpl> {
 
-  public ExecutionTopDownWalker(ExecutionEntity initialElement) {
+  public ExecutionTopDownWalker(PvmExecutionImpl initialElement) {
     super(initialElement);
   }
 
-  public ExecutionTopDownWalker(List<ExecutionEntity> initialElements) {
+  public ExecutionTopDownWalker(List<PvmExecutionImpl> initialElements) {
     super(initialElements);
   }
 
   @Override
-  protected Collection<ExecutionEntity> nextElements() {
-    List<ExecutionEntity> executions = getCurrentElement().getExecutions();
+  protected Collection<PvmExecutionImpl> nextElements() {
+    List<? extends  PvmExecutionImpl> executions = getCurrentElement().getExecutions();
     if (executions == null) {
-      executions = new ArrayList<ExecutionEntity>();
+      executions = new ArrayList<PvmExecutionImpl>();
     }
     return (List) executions;
   }

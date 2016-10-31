@@ -17,11 +17,9 @@ package org.camunda.bpm.engine.impl.bpmn.behavior;
 
 import org.camunda.bpm.engine.impl.bpmn.parser.ConditionalEventDefinition;
 import org.camunda.bpm.engine.impl.core.variable.event.VariableEvent;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
-import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 /**
  *
@@ -49,16 +47,16 @@ public class IntermediateConditionalEventBehavior extends IntermediateCatchEvent
   }
 
   @Override
-  public void leaveOnSatisfiedCondition(final EventSubscriptionEntity eventSubscription, final VariableEvent variableEvent, final CommandContext commandContext) {
-    PvmExecutionImpl execution = eventSubscription.getExecution();
+  public void leaveOnSatisfiedCondition(final ExecutionEntity execution,
+                                        final VariableEvent variableEvent,
+                                        final ActivityImpl conditionalActivity) {
 
     if (execution != null && !execution.isEnded()
       && variableEvent != null
       && conditionalEvent.tryEvaluate(variableEvent, execution)
       && execution.isActive() && execution.isScope()) {
       if (isAfterEventBasedGateway) {
-        final ActivityImpl activity = eventSubscription.getActivity();
-        execution.executeEventHandlerActivity(activity);
+        execution.executeEventHandlerActivity(conditionalActivity);
       } else {
         leave(execution);
       }

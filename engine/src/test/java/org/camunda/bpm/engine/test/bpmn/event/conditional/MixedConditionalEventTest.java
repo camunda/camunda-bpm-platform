@@ -808,7 +808,5 @@ public class MixedConditionalEventTest extends AbstractConditionalEventTestCase 
     //-> all non interrupting conditional events are triggered
     tasksAfterVariableIsSet = taskQuery.list();
     assertEquals(5, tasksAfterVariableIsSet.size());
-    //three subscriptions: event sub process in sub process and on process instance level and boundary event of sub process
-    assertEquals(3, conditionEventSubscriptionQuery.count());
   }
 }
