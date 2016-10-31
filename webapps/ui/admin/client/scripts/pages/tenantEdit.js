@@ -16,6 +16,7 @@ var Controller = [
   'Notifications',
   '$location',
   '$modal',
+  'unescape',
   function(
     $scope,
     pageService,
@@ -24,7 +25,8 @@ var Controller = [
     camAPI,
     Notifications,
     $location,
-    $modal
+    $modal,
+    unescape
   ) {
 
     var TenantResource        = camAPI.resource('tenant'),
@@ -52,10 +54,7 @@ var Controller = [
 
     $scope.tenant = null;
     $scope.tenantName = null;
-    $scope.encodedTenantId = $routeParams.tenantId
-                                            .replace(/\//g, '%2F')
-                                            .replace(/\\/g, '%5C');
-
+    $scope.decodedTenantId = unescape(encodeURIComponent($routeParams.tenantId));
     $scope.availableOperations = {};
     $scope.tenantGroupList = null;
     $scope.tenantUserList = null;
@@ -76,7 +75,8 @@ var Controller = [
 
     var loadTenant = $scope.loadTenant = function() {
       $scope.tenantLoadingState = 'LOADING';
-      TenantResource.get($scope.encodedTenantId , function(err, res) {
+
+      TenantResource.get($scope.decodedTenantId, function(err, res) {
         $scope.tenantLoadingState = 'LOADED';
         $scope.tenant = res;
         $scope.tenantName = (res.name ? res.name : res.id);
@@ -127,7 +127,7 @@ var Controller = [
 
       return {
         searchParams : {
-          memberOfTenant : $scope.encodedTenantId
+          memberOfTenant : $scope.decodedTenantId
         },
         pagingParams : {
           firstResult : firstResult,
@@ -172,7 +172,7 @@ var Controller = [
       });
     }
 
-    TenantResource.options($scope.encodedTenantId, function(err, res) {
+    TenantResource.options($scope.decodedTenantId, function(err, res) {
       angular.forEach(res.links, function(link) {
         $scope.availableOperations[link.rel] = true;
       });
@@ -181,7 +181,7 @@ var Controller = [
     $scope.updateTenant = function() {
 
       var updateData = {
-        id: $scope.encodedTenantId,
+        id: $scope.decodedTenantId,
         name: $scope.tenant.name
       };
 
@@ -211,7 +211,7 @@ var Controller = [
           $dialogScope.question = 'Really delete tenant ' + $scope.tenant.id + '?';
         }]
       }).result.then(function() {
-        TenantResource.delete({ id: $scope.encodedTenantId }, function(err) {
+        TenantResource.delete({ id: $scope.decodedTenantId }, function(err) {
           if(err === null) {
             Notifications.addMessage({
               type: 'success',
