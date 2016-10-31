@@ -5,9 +5,11 @@
     ViewsProvider.registerDefaultView('cockpit.decisionInstance.table', {
       id: 'highlightRules',
       initialize: function(data) {
-        for(var i = 0; i < data.decisionInstance.outputs.length; i++) {
-          data.tableControl.highlightRow(data.decisionInstance.outputs[i].ruleId, 'fired');
-        }
+        data.decisionInstance.outputs.forEach(function(output) {
+          if (output.ruleId) {
+            data.tableControl.highlightRow(output.ruleId, 'fired');
+          }
+        });
       }
     });
   }];
