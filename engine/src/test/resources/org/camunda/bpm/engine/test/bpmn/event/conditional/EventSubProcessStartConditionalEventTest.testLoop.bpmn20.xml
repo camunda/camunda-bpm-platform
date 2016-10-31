@@ -23,7 +23,7 @@
         <bpmn:incoming>SequenceFlow_0bh15zs</bpmn:incoming>
       </bpmn:endEvent>
       <bpmn:sequenceFlow id="SequenceFlow_0bh15zs" sourceRef="Task_00ggkkv" targetRef="EndEvent_1mb74qy" />
-      <bpmn:serviceTask id="Task_00ggkkv" camunda:class="org.camunda.bpm.engine.test.bpmn.event.conditional.SetVariableDelegate">
+      <bpmn:serviceTask id="Task_00ggkkv" camunda:class="org.camunda.bpm.engine.test.bpmn.event.conditional.LoopDelegate">
         <bpmn:incoming>SequenceFlow_063kha4</bpmn:incoming>
         <bpmn:outgoing>SequenceFlow_0bh15zs</bpmn:outgoing>
       </bpmn:serviceTask>
@@ -32,7 +32,7 @@
       <bpmn:incoming>SequenceFlow_150zyfl</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_1b7tx74</bpmn:outgoing>
     </bpmn:userTask>
-    <bpmn:serviceTask id="Task_01i9zkd" camunda:class="org.camunda.bpm.engine.test.bpmn.event.conditional.SetVariableDelegate">
+    <bpmn:serviceTask id="Task_01i9zkd" camunda:class="org.camunda.bpm.engine.test.bpmn.event.conditional.LoopDelegate">
       <bpmn:incoming>SequenceFlow_1b7tx74</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_035cxdu</bpmn:outgoing>
     </bpmn:serviceTask>
