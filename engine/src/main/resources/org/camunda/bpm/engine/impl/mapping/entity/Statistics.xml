@@ -712,6 +712,7 @@
       group by
         <if test="isDecisionInstanceIdSet">
           RES.ID_,
+          ROOT_DEC_INST_ID_,
         </if>
         RES.DEC_DEF_KEY_,
         RES.DEC_REQ_ID_,
