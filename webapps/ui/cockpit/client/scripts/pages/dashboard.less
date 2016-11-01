@@ -5,6 +5,20 @@
     padding-left: 0;
     padding-right: 0;
   }
+  
+  section {
+    position: relative;
+  }
+  .section-toggle {
+    position: absolute;
+    z-index: 10;
+    right: 0;
+    top: 0;
+  }
+  section.deployed:not(.no-metrics) .section-toggle {
+    right: @grid-gutter-width * 0.5;
+  }
+
 
   .value,
   .no-value {

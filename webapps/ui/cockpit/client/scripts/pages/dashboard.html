@@ -7,6 +7,11 @@
 
       <section class="actual"
                ng-class="{'loading': loading}">
+        <button tooltip="Toggle this section"
+                class="section-toggle btn btn-link btn-sm"
+                ng-click="toggleSection('actual')">
+          <span class="glyphicon"
+                ng-class="{'glyphicon-eye-open': !actualActive, 'glyphicon-eye-close': actualActive}"></button>
         <div class="inner">
           <header>
             <div class="row">
@@ -14,7 +19,8 @@
             </div>
           </header>
 
-          <div class="row stats">
+          <div class="row stats"
+               ng-if="actualActive">
             <div class="stats-section process-instances col-xs-6 col-lg-3">
               <div class="stats-label">Running Process Inst.</div>
               <a class="value"
@@ -78,18 +84,29 @@
               </a>
             </div>
           </div>
+
+          <div class="help-block text-center"
+               ng-if="!actualActive">
+            Click the <span class="glyphicon glyphicon-eye-open"></span> to show the details.
+          </div>
         </div>
       </section>
 
 
       <section class="metrics"
                ng-if="metricsPlugins.length">
+        <button tooltip="Toggle this section"
+                class="section-toggle btn btn-link btn-sm"
+                ng-click="toggleSection('metrics')">
+          <span class="glyphicon"
+                ng-class="{'glyphicon-eye-open': !metricsActive, 'glyphicon-eye-close': metricsActive}"></button>
         <div class="inner">
           <header>
             <div class="row">
               <h1 class="col-xs-3 section-title">Metrics</h1>
 
-              <div class="col-xs-9 text-right">
+              <div class="col-xs-9 text-right"
+                   ng-if="metricsActive">
                 <ul class="nav nav-tabs">
                   <li ng-class="{active: metricsPeriod === 'day'}">
                     <a ng-click="setMetricsPeriod('day')">Today</a>
@@ -108,7 +125,8 @@
           </header>
 
 
-          <div class="row stats">
+          <div class="row stats"
+               ng-if="metricsActive">
             <div ng-repeat="plugin in metricsPlugins"
                  data-plugin-id="{{ plugin.id }}"
                  class="stats-section col-md-6 col-lg-4 entry">
@@ -120,19 +138,28 @@
             </div>
           </div>
 
-
+          <div class="help-block text-center"
+               ng-if="!metricsActive">
+            Click the <span class="glyphicon glyphicon-eye-open"></span> to show the details.
+          </div>
         </div>
       </section>
 
       <section class="deployed no-metrics"
                ng-class="{'loading': loading}"
                ng-if="!metricsPlugins.length">
+        <button tooltip="Toggle this section"
+                class="section-toggle btn btn-link btn-sm"
+                ng-click="toggleSection('deployed')">
+          <span class="glyphicon"
+                ng-class="{'glyphicon-eye-open': !deployedActive, 'glyphicon-eye-close': deployedActive}"></button>
         <div class="inner">
           <header>
             <h1 class="section-title">Deployed</h1>
           </header>
 
-          <div class="row stats">
+          <div class="row stats"
+               ng-if="deployedActive">
             <div class="stats-section processes col-xs-6 col-lg-3">
               <div class="stats-label">Process Definitions</div>
               <a class="value"
@@ -175,6 +202,11 @@
               </a>
             </div>
           </div>
+
+          <div class="help-block text-center"
+               ng-if="!deployedActive">
+            Click the <span class="glyphicon glyphicon-eye-open"></span> to show the details.
+          </div>
         </div>
       </section>
     </div>
@@ -183,12 +215,18 @@
     <section class="col-xs-12 col-sm-4 col-lg-2 deployed"
              ng-class="{'loading': loading}"
              ng-if="metricsPlugins.length">
+      <button tooltip="Toggle this section"
+              class="section-toggle btn btn-link btn-sm"
+              ng-click="toggleSection('deployed')">
+        <span class="glyphicon"
+              ng-class="{'glyphicon-eye-open': !deployedActive, 'glyphicon-eye-close': deployedActive}"></button>
       <div class="inner">
         <header>
           <h1 class="section-title">Deployed</h1>
         </header>
 
-        <div class="row stats">
+        <div class="row stats"
+             ng-if="deployedActive">
           <div class="stats-section processes col-sm-12 col-md-6 col-lg-12">
             <div class="stats-label">Process Definitions</div>
             <a class="value"
@@ -230,6 +268,11 @@
               {{ data.deployed.deploymentDefinitions | abbreviateNumber }}
             </a>
           </div>
+        </div>
+
+        <div class="help-block text-center"
+             ng-if="!deployedActive">
+          Click the <span class="glyphicon glyphicon-eye-open"></span> to show the details.
         </div>
       </div>
     </section>
