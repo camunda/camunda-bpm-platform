@@ -17,7 +17,7 @@ module.exports = Base.extend({
   },
 
   switchTab: function() {
-    element(by.css('[select="selectTab(\'' + this.tabLabel.toLowerCase() +  '\')"]')).click();
+    element(by.css('[ng-click="selectTab(\'' + this.tabLabel.toLowerCase() +  '\')"]')).click();
   }
 
 });
