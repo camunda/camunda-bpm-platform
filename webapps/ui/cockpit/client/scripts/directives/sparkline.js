@@ -31,6 +31,8 @@ function Sparkline(options) {
 
   this.timespan = options.timespan || 'day';
 
+  this.interval = options.interval || 900;
+
   this.timestampFormat = 'YYYY-MM-DDTHH:mm:ss';
 
   this.timeLabelFormats = {
@@ -95,9 +97,12 @@ proto.min = function(index) {
 
 
 
-proto.setData = function(data, newTimespan) {
+proto.setData = function(data, newTimespan, newInterval) {
   if (newTimespan) {
     this.timespan = newTimespan;
+  }
+  if (newInterval) {
+    this.interval = newInterval;
   }
   var emptyDate = moment();
   var defaultData = [[
@@ -313,14 +318,18 @@ proto.draw = function() {
 
 
 
-  var rounded = this.valueLabels[0];
-  function toPx(val) {
-    return (innerH - ((innerH / rounded) * val)) + padding;
-  }
-
   var labelFrom = this.labelFrom;
   var labelTo = this.labelTo;
   var labelDiff = labelTo - labelFrom;
+  var interval = this.interval;
+
+  var rounded = this.valueLabels[0];
+  function pxFromTop(val) {
+    return (innerH - ((innerH / rounded) * val)) + padding;
+  }
+  function pxFromLeft(mom) {
+    return verticalScaleX + ((mom - labelFrom) / labelDiff) * innerW;
+  }
 
 
   // draw the data
@@ -336,28 +345,35 @@ proto.draw = function() {
     ctx.strokeStyle = color;
 
     ctx.beginPath();
-    set.forEach(function(d) {
-      var mom = moment(d.timestamp);
+    set.forEach(function(item, i) {
+      var mom = moment(item.timestamp);
+      // record is older than the from label
       if (mom <= labelFrom) {
-        skipped = d;
+        skipped = item;
         return;
+      }
+      // first record is after label from, draw a line at 0 until (mom - interval)
+      else if (i === 0 && mom > labelFrom) {
+        ctx.moveTo(verticalScaleX, ctx.canvas.height - horizontalScaleY);
+        ctx.lineTo(pxFromLeft(mom.clone().subtract(interval, 'seconds')), ctx.canvas.height - horizontalScaleY);
       }
 
       if (skipped) {
         right = verticalScaleX;
-        top = toPx(skipped.value);
+        top = pxFromTop(skipped.value);
         ctx.lineTo(right, top);
         skipped = null;
       }
 
-      right = verticalScaleX + ((mom - labelFrom) / (labelDiff)) * innerW;
-      top = toPx(d.value);
+      right = pxFromLeft(mom);
+      top = pxFromTop(item.value);
       ctx.lineTo(right, top);
     });
     ctx.stroke();
+    ctx.closePath();
 
     // draw the starting point
-    if (set.length >= 3) {
+    if (set.length >= 1) {
       ctx.beginPath();
       ctx.fillStyle = color;
       ctx.arc(right, top, lineWidth * 2, 0, 2 * Math.PI);
@@ -377,11 +393,13 @@ module.exports = function() {
     scope: {
       values: '=',
       colors: '=?',
-      timespan: '=?'
+      timespan: '=?',
+      interval: '=?'
     },
 
     link: function($scope, $element) {
       $scope.timespan = $scope.timespan || 'day';
+      $scope.interval = $scope.interval || 900;
 
       var container = $element[0];
       var win = container.ownerDocument.defaultView;
@@ -398,7 +416,7 @@ module.exports = function() {
           cn += ' no-data';
         }
         container.className = cn;
-        sparkline.setData($scope.values, $scope.timespan);
+        sparkline.setData($scope.values, $scope.timespan, $scope.interval);
       });
 
       container.appendChild(sparkline.canvas);
