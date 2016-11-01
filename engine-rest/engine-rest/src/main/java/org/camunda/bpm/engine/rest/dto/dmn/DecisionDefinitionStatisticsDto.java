@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.management.DecisionDefinitionStatistics;
 public class DecisionDefinitionStatisticsDto {
 
   protected String decisionDefinitionId;
+  protected String decisionDefinitionKey;
   protected int evaluations;
 
   public String getDecisionDefinitionId() {
@@ -41,10 +42,19 @@ public class DecisionDefinitionStatisticsDto {
     this.evaluations = evaluations;
   }
 
+  public String getDecisionDefinitionKey() {
+    return decisionDefinitionKey;
+  }
+
+  public void setDecisionDefinitionKey(String decisionDefinitionKey) {
+    this.decisionDefinitionKey = decisionDefinitionKey;
+  }
+
   public static DecisionDefinitionStatisticsDto fromDecisionDefinitionStatistics(DecisionDefinitionStatistics stats) {
     DecisionDefinitionStatisticsDto instance = new DecisionDefinitionStatisticsDto();
     instance.setDecisionDefinitionId(stats.getDecisionDefinitionId());
     instance.setEvaluations(stats.getEvaluations());
+    instance.setDecisionDefinitionKey(stats.getDecisionDefinitionKey());
     return instance;
   }
 }

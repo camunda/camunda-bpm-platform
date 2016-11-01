@@ -71,6 +71,7 @@
 
   <resultMap id="decisionDefinitionStatisticsResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.DecisionDefinitionStatisticsImpl">
     <id property="decisionDefinitionId" column="ID_" jdbcType="VARCHAR" />
+    <id property="decisionDefinitionKey" column="DEC_DEF_KEY_" jdbcType="VARCHAR" />
     <result property="evaluations" column="EVALUATION_COUNT_" jdbcType="INTEGER" />
   </resultMap>
 
@@ -703,6 +704,7 @@
     from (
       select
         RES.DEC_REQ_ID_,
+        RES.DEC_DEF_KEY_,
         RES.DEC_DEF_ID_ as ID_,
         count(*) as EVALUATION_COUNT_
       from
@@ -711,6 +713,7 @@
         <if test="isDecisionInstanceIdSet">
           RES.ID_,
         </if>
+        RES.DEC_DEF_KEY_,
         RES.DEC_REQ_ID_,
         RES.DEC_DEF_ID_
       having

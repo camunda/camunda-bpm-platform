@@ -75,6 +75,7 @@ public class DecisionDefinitionStatisticsQueryImpl extends
       for (DecisionDefinition decision : decisions) {
         DecisionDefinitionStatisticsImpl constructedEmptyStatistics = new DecisionDefinitionStatisticsImpl();
         constructedEmptyStatistics.setDecisionDefinitionId(decision.getId());
+        constructedEmptyStatistics.setDecisionDefinitionKey(decision.getKey());
         statisticsList.add(constructedEmptyStatistics);
       }
     }

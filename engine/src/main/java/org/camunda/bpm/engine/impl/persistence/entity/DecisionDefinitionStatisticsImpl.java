@@ -19,6 +19,7 @@ public class DecisionDefinitionStatisticsImpl implements DecisionDefinitionStati
 
   protected int evaluations;
   protected String decisionDefinitionId;
+  protected String decisionDefinitionKey;
 
   @Override
   public String getDecisionDefinitionId() {
@@ -36,5 +37,14 @@ public class DecisionDefinitionStatisticsImpl implements DecisionDefinitionStati
 
   public void setEvaluations(int evaluations) {
     this.evaluations = evaluations;
+  }
+
+  @Override
+  public String getDecisionDefinitionKey() {
+    return decisionDefinitionKey;
+  }
+
+  public void setDecisionDefinitionKey(String decisionDefinitionKey) {
+    this.decisionDefinitionKey = decisionDefinitionKey;
   }
 }

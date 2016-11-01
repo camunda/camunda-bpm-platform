@@ -32,6 +32,7 @@ import org.junit.Test;
 import org.junit.rules.RuleChain;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
 /**
@@ -88,6 +89,7 @@ public class DecisionDefinitionStatisticsQueryTest {
     assertThat(statisticsQuery.count(), is(3L));
     assertThat(statisticsQuery.list().size(), is(3));
     assertThat(statisticsQuery.list().get(0).getEvaluations(), is(2));
+    assertThat(statisticsQuery.list().get(0).getDecisionDefinitionKey(), is(notNullValue()));
   }
 
   @Test
@@ -121,6 +123,7 @@ public class DecisionDefinitionStatisticsQueryTest {
     assertThat(query.count(), is(3L));
     assertThat(query.list().size(), is(3));
     assertThat(query.list().get(0).getEvaluations(), is(1));
+    assertThat(query.list().get(0).getDecisionDefinitionKey(), is(notNullValue()));
   }
 
   @Test
@@ -169,7 +172,7 @@ public class DecisionDefinitionStatisticsQueryTest {
     assertThat(statisticsQuery.count(), is(1L));
     assertThat(statisticsQuery.list().size(), is(1));
     assertThat(statisticsQuery.list().get(0).getEvaluations(), is(1));
-
+    assertThat(statisticsQuery.list().get(0).getDecisionDefinitionKey(), is(notNullValue()));
   }
 
   @Test
@@ -199,6 +202,7 @@ public class DecisionDefinitionStatisticsQueryTest {
     assertThat(statisticsQuery.count(), is(1L));
     assertThat(statisticsQuery.list().size(), is(1));
     assertThat(statisticsQuery.list().get(0).getEvaluations(), is(1));
+    assertThat(statisticsQuery.list().get(0).getDecisionDefinitionKey(), is(notNullValue()));
   }
 
   @Test
@@ -237,5 +241,6 @@ public class DecisionDefinitionStatisticsQueryTest {
     assertThat("available statistics count", statisticsQuery.count(), is(1L));
     assertThat("available statistics elements", statisticsQuery.list().size(), is(3));
     assertThat(statisticsQuery.list().get(0).getEvaluations(), is(0));
+    assertThat(statisticsQuery.list().get(0).getDecisionDefinitionKey(), is(notNullValue()));
   }
 }

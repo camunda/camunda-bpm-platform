@@ -275,6 +275,7 @@ public class DecisionRequirementsDefinitionRestServiceInteractionTest extends Ab
     Integer evaluations = Integer.parseInt(contentMap.get("evaluations").toString());
     assertThat(evaluations,is(1));
     assertThat(contentMap.get("decisionDefinitionId").toString(),is("test"));
+    assertThat(contentMap.get("decisionDefinitionKey").toString(),is("testKey"));
   }
 
   // DRD retrieval
@@ -318,6 +319,7 @@ public class DecisionRequirementsDefinitionRestServiceInteractionTest extends Ab
     DecisionDefinitionStatisticsImpl decision = new DecisionDefinitionStatisticsImpl();
     decision.setDecisionDefinitionId("test");
     decision.setEvaluations(1);
+    decision.setDecisionDefinitionKey("testKey");
     stats.add(decision);
     when(decisionDefinitionStatisticsQueryMock.decisionInstanceId(anyString())).thenReturn(decisionDefinitionStatisticsQueryMock);
     when(decisionDefinitionStatisticsQueryMock.list()).thenReturn(stats);

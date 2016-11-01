@@ -28,4 +28,9 @@ public interface DecisionDefinitionStatistics {
    * @return count of decision definition evaluations
    */
   int getEvaluations();
+
+  /**
+   * @return key of decision definition
+   */
+  String getDecisionDefinitionKey();
 }
