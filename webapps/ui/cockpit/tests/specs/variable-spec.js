@@ -16,7 +16,7 @@ describe('Cockpit Variable Spec', function() {
       return testHelper(setupFile.setup1, function() {
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
-        dashboardPage.goToSection('processes');
+        dashboardPage.goToSection('Processes');
         processesPage.deployedProcessesList.selectProcess(0);
         definitionPage.processInstancesTab.selectInstanceId(0);
       });

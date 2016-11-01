@@ -18,7 +18,7 @@ describe('Cockpit Process Definition Filter Spec', function() {
       return testHelper(setupFile.setup1, function() {
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
-        dashboardPage.goToSection('processes');
+        dashboardPage.goToSection('Processes');
         processesPage.deployedProcessesList.selectProcess(0);
       });
     });
@@ -55,7 +55,7 @@ describe('Cockpit Process Definition Filter Spec', function() {
       return testHelper(setupFile.setup1, function() {
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
-        dashboardPage.goToSection('processes');
+        dashboardPage.goToSection('Processes');
         processesPage.deployedProcessesList.selectProcess(0);
       });
     });
@@ -90,7 +90,7 @@ describe('Cockpit Process Definition Filter Spec', function() {
       return testHelper(setupFile.setup1, function() {
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
-        dashboardPage.goToSection('processes');
+        dashboardPage.goToSection('Processes');
         processesPage.deployedProcessesList.selectProcess(0);
       });
     });
