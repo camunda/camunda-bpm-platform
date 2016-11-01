@@ -19,10 +19,12 @@ import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDef
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.DecisionDefinitionStatisticsImpl;
+import org.camunda.bpm.engine.impl.util.EnsureUtil;
 import org.camunda.bpm.engine.management.DecisionDefinitionStatistics;
 import org.camunda.bpm.engine.management.DecisionDefinitionStatisticsQuery;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -43,6 +45,7 @@ public class DecisionDefinitionStatisticsQueryImpl extends
 
   @Override
   public long executeCount(CommandContext commandContext) {
+    ensureParameters();
     checkQueryOk();
 
     long count = commandContext
@@ -61,7 +64,9 @@ public class DecisionDefinitionStatisticsQueryImpl extends
 
   @Override
   public List<DecisionDefinitionStatistics> executeList(CommandContext commandContext, Page page) {
+    ensureParameters();
     checkQueryOk();
+
     List<DecisionDefinitionStatistics> statisticsList = commandContext
         .getStatisticsManager()
         .getStatisticsGroupedByDecisionRequirementsDefinition(this, page);
@@ -80,6 +85,13 @@ public class DecisionDefinitionStatisticsQueryImpl extends
       }
     }
     return statisticsList;
+  }
+
+  protected void ensureParameters() {
+    EnsureUtil.ensureNotNull("decisionRequirementsDefinitionId", decisionRequirementsDefinitionId);
+    if (this.isDecisionInstanceIdSet) {
+      EnsureUtil.ensureNotNull("decisionInstanceId", decisionInstanceId);
+    }
   }
 
   public String getDecisionRequirementsDefinitionId() {

@@ -15,10 +15,12 @@
 
 package org.camunda.bpm.engine.test.api.mgmt;
 
+import com.sun.deploy.security.ruleset.ExceptionRule;
 import org.camunda.bpm.engine.DecisionService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.management.DecisionDefinitionStatisticsQuery;
 import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -29,6 +31,7 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -59,6 +62,9 @@ public class DecisionDefinitionStatisticsQueryTest {
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
+
+  @Rule
+  public final ExpectedException thrown = ExpectedException.none();
 
   @Before
   public void setUp() {
@@ -144,15 +150,35 @@ public class DecisionDefinitionStatisticsQueryTest {
     assertThat(query.count(), is(0L));
     assertThat(query.list().size(), is(0));
 
+
+  }
+
+  @Test
+  public void testStatisticForRootDecisionWithNullInstanceConstraintEvaluation() throws Exception {
     //when
-    query = managementService
+    decisionService.evaluateDecisionTableByKey(DISH_DECISION)
+        .variables(Variables.createVariables().putValue(TEMPERATURE, 21).putValue(DAY_TYPE, WEEKEND))
+        .evaluate();
+
+    DecisionRequirementsDefinition decisionRequirementsDefinition = repositoryService.createDecisionRequirementsDefinitionQuery().singleResult();
+    //when
+    DecisionDefinitionStatisticsQuery query = managementService
         .createDecisionRequirementsDefinitionStatisticsQuery(
             decisionRequirementsDefinition.getId())
         .decisionInstanceId(null);
 
     //then
-    assertThat(query.count(), is(0L));
-    assertThat(query.list().size(), is(0));
+    try {
+      query.count();
+    } catch (NullValueException e) {
+      //expected
+    }
+
+    try {
+      query.list();
+    } catch (NullValueException e) {
+      //expected
+    }
   }
 
   @Test
@@ -213,19 +239,24 @@ public class DecisionDefinitionStatisticsQueryTest {
             FAKE).count(), is(0L));
 
     assertThat(
-        "available statistics count of null",
-        managementService.createDecisionRequirementsDefinitionStatisticsQuery(
-            null).count(), is(0L));
-
-    assertThat(
         "available statistics elements of fake",
         managementService.createDecisionRequirementsDefinitionStatisticsQuery(
             FAKE).list().size(), is(0));
 
-    assertThat(
-        "available statistics elements of null",
-        managementService.createDecisionRequirementsDefinitionStatisticsQuery(
-            null).list().size(), is(0));
+  }
+
+  @Test
+  public void testStatisticThrowsExceptionOnNullConstraintsCount() throws Exception {
+    //expect
+    thrown.expect(NullValueException.class);
+    managementService.createDecisionRequirementsDefinitionStatisticsQuery(null).count();
+  }
+
+  @Test
+  public void testStatisticThrowsExceptionOnNullConstraintsList() throws Exception {
+    //expect
+    thrown.expect(NullValueException.class);
+    managementService.createDecisionRequirementsDefinitionStatisticsQuery(null).list();
   }
 
   @Test
