@@ -5,7 +5,7 @@ var Base = require('./tasks-plugin');
 module.exports = Base.extend({
 
   listObject: function() {
-    return element(by.css('.open-tasks'));
+    return element(by.css('.tasks-dashboard'));
   },
 
   taskStatisticsTable: function() {
