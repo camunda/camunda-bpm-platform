@@ -717,9 +717,9 @@
         RES.DEC_REQ_ID_,
         RES.DEC_DEF_ID_
       having
-        RES.DEC_REQ_ID_ = #{decisionRequirementsDefinitionId}
+        RES.DEC_REQ_ID_ = #{decisionRequirementsDefinitionId, jdbcType=VARCHAR}
         <if test="isDecisionInstanceIdSet">
-          and (RES.ID_ = #{decisionInstanceId} or RES.ROOT_DEC_INST_ID_ = #{decisionInstanceId})
+          and (RES.ID_ = #{decisionInstanceId} or RES.ROOT_DEC_INST_ID_ = #{decisionInstanceId, jdbcType=VARCHAR})
         </if>
     ) RES
   </sql>
