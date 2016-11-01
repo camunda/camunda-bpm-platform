@@ -15,7 +15,6 @@
 
 package org.camunda.bpm.engine.test.api.mgmt;
 
-import com.sun.deploy.security.ruleset.ExceptionRule;
 import org.camunda.bpm.engine.DecisionService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
