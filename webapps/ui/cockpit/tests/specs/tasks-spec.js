@@ -16,7 +16,7 @@ describe('Cockpit Tasks Dashboard Spec', function() {
         // when
         tasksPage.navigateToWebapp('Cockpit');
         tasksPage.authentication.userLogin('admin', 'admin');
-        tasksPage.goToSection('tasks');
+        tasksPage.goToSection('Human Tasks');
       });
     });
 
