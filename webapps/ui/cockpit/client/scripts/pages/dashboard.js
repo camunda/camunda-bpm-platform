@@ -18,6 +18,7 @@ function resultsCb(cb) {
 var Controller = [
   '$scope',
   'camAPI',
+  'localConf',
   '$injector',
   'Views',
   'hasPlugin',
@@ -25,6 +26,7 @@ var Controller = [
   function(
   $scope,
   camAPI,
+  localConf,
   $injector,
   Views,
   hasPlugin,
@@ -132,10 +134,22 @@ var Controller = [
     fetchData();
 
   // ----------------------------------------------------------------------------------------
+    [
+      'actual',
+      'metrics',
+      'deployed'
+    ].forEach(function(name) {
+      $scope[name + 'Active'] = localConf.get('dashboardSection:' + name, true);
+    });
+    $scope.toggleSection = function(name) {
+      $scope[name + 'Active'] = !$scope[name + 'Active'];
+      localConf.set('dashboardSection:' + name, $scope[name + 'Active']);
+    };
 
-    $scope.metricsPeriod = 'day';
+    $scope.metricsPeriod = localConf.get('dashboardMetricsPeriod', 'day');
     $scope.setMetricsPeriod = function(period) {
       $scope.metricsPeriod = period;
+      localConf.set('dashboardMetricsPeriod', period);
     };
 
     $scope.metricsVars = { read: [ 'metricsPeriod' ] };
