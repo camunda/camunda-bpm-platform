@@ -422,7 +422,7 @@ module.exports = function() {
       container.appendChild(sparkline.canvas);
 
       var resize = throttle(function() {
-        sparkline.resize(container.clientWidth, container.clientHeight).draw();
+        sparkline.resize(container.clientWidth, Math.min(Math.max(container.clientWidth * 0.75, 180), 300)).draw();
       }, 100);
 
       win.addEventListener('resize', resize);
