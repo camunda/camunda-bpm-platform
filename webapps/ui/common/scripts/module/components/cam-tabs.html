@@ -1,0 +1,15 @@
+<ul class="nav nav-tabs"
+    ng-if="Tabs.providers.length > 1">
+  <li ng-repeat="tabProvider in Tabs.providers"
+      ng-class="{ active: Tabs.isSelected(tabProvider) }">
+    <a href ng-click="Tabs.selectTab(tabProvider)">{{ tabProvider.label }}</a>
+  </li>
+</ul>
+
+<h4 ng-if="Tabs.providers.length === 1">{{ Tabs.providers[0].label }}:</h4>
+
+<div class="ctn-tabbed-content ctn-scroll"
+     ng-if="Tabs.providers.length">
+  <view provider="Tabs.selected"
+        vars="Tabs.vars" />
+</div>
