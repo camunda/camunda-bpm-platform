@@ -33,7 +33,7 @@ public class LoopDelegate implements JavaDelegate {
 
   @Override
   public void execute(DelegateExecution execution) throws Exception {
-    if (instanceCount < 1000) {
+    if (instanceCount < 3) {
       execution.setVariable(AbstractConditionalEventTestCase.VARIABLE_NAME, 1);
     } else {
       execution.setVariable(AbstractConditionalEventTestCase.VARIABLE_NAME, instanceCount);
