@@ -42,7 +42,6 @@ module.exports = Page.extend({
   },
 
   goToSection: function (name) {
-    return browser.get('camunda/app/cockpit/default/#/' + name.toLowerCase());
-    // return this.navbar().element(by.cssContainingText('[ng-transclude] > ul > li a', name)).click();
+    return this.navbar().element(by.cssContainingText('[ng-transclude] > ul > li a', name)).click();
   }
 });
