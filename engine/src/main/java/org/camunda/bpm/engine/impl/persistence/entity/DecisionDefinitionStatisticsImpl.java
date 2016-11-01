@@ -34,4 +34,7 @@ public class DecisionDefinitionStatisticsImpl implements DecisionDefinitionStati
     return evaluations;
   }
 
+  public void setEvaluations(int evaluations) {
+    this.evaluations = evaluations;
+  }
 }
