@@ -336,6 +336,7 @@ proto.draw = function() {
   this.data.forEach(function(set, index) {
     var right;
     var top;
+    var mom;
     var skipped;
     var color = self.lineColors[index];
 
@@ -346,7 +347,7 @@ proto.draw = function() {
 
     ctx.beginPath();
     set.forEach(function(item, i) {
-      var mom = moment(item.timestamp);
+      mom = moment(item.timestamp);
       // record is older than the from label
       if (mom <= labelFrom) {
         skipped = item;
@@ -369,6 +370,16 @@ proto.draw = function() {
       top = pxFromTop(item.value);
       ctx.lineTo(right, top);
     });
+
+    if (moment() - mom >= interval * 1000) {
+      right = pxFromLeft(mom.clone().add(interval, 'seconds'));
+      top = ctx.canvas.height - horizontalScaleY;
+      ctx.lineTo(right, top);
+
+      right = pxFromLeft(moment());
+      ctx.lineTo(right, top);
+    }
+
     ctx.stroke();
     ctx.closePath();
 
