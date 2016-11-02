@@ -28,11 +28,10 @@ import org.camunda.bpm.model.dmn.HitPolicy;
 public class AnyHitPolicyHandler implements DmnHitPolicyHandler {
 
   public static final DmnHitPolicyLogger LOG = DmnLogger.HIT_POLICY_LOGGER;
-  protected static final HitPolicyEntry HIT_POLICY = new HitPolicyEntry(HitPolicy.ANY, null);
 
   @Override
   public HitPolicyEntry getHitPolicyEntry() {
-    return HIT_POLICY;
+    return new HitPolicyEntry(HitPolicy.ANY, null);
   }
 
   public DmnDecisionTableEvaluationEvent apply(DmnDecisionTableEvaluationEvent decisionTableEvaluationEvent) {

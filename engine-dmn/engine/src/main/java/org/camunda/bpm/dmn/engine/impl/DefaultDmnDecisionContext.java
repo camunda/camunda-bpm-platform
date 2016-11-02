@@ -13,6 +13,13 @@
 
 package org.camunda.bpm.dmn.engine.impl;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.camunda.bpm.dmn.engine.DmnDecision;
 import org.camunda.bpm.dmn.engine.DmnDecisionLogic;
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
@@ -28,20 +35,14 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.context.VariableContext;
 import org.camunda.bpm.model.dmn.HitPolicy;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 /**
  * Context which evaluates a decision on a given input
  */
 public class DefaultDmnDecisionContext {
 
   protected static final DmnEngineLogger LOG = DmnEngineLogger.ENGINE_LOGGER;
-  protected static final HitPolicyEntry COLLECT = new HitPolicyEntry(HitPolicy.COLLECT, null);
+
+  protected static final HitPolicyEntry COLLECT_HIT_POLICY = new HitPolicyEntry(HitPolicy.COLLECT, null);
 
   protected final List<DmnDecisionEvaluationListener> evaluationListeners;
 
@@ -127,15 +128,9 @@ public class DefaultDmnDecisionContext {
   protected void addResultToVariableContext(DmnDecisionResult evaluatedResult, VariableMap variableMap, DmnDecision evaluatedDecision) {
     List<Map<String, Object>> resultList = evaluatedResult.getResultList();
 
-    boolean isNotCollectHitPolicy = true;
-    if (evaluatedDecision.isDecisionTable()) {
-      DmnDecisionTableImpl decisionTable = (DmnDecisionTableImpl) evaluatedDecision.getDecisionLogic();
-      isNotCollectHitPolicy = !COLLECT.equals(decisionTable.getHitPolicyHandler().getHitPolicyEntry());
-    }
-
     if (resultList.isEmpty()) {
       return;
-    } else if (resultList.size() == 1 && isNotCollectHitPolicy) {
+    } else if (resultList.size() == 1 && !isDecisionTableWithCollectHitPolicy(evaluatedDecision)) {
       variableMap.putAll(evaluatedResult.getSingleResult());
     } else {
       Set<String> outputs = new HashSet<String>();
@@ -149,6 +144,17 @@ public class DefaultDmnDecisionContext {
         variableMap.put(output, values);
       }
     }
+  }
+
+  protected boolean isDecisionTableWithCollectHitPolicy(DmnDecision evaluatedDecision) {
+    boolean isDecisionTableWithCollectHitPolicy = false;
+
+    if (evaluatedDecision.isDecisionTable()) {
+      DmnDecisionTableImpl decisionTable = (DmnDecisionTableImpl) evaluatedDecision.getDecisionLogic();
+      isDecisionTableWithCollectHitPolicy = COLLECT_HIT_POLICY.equals(decisionTable.getHitPolicyHandler().getHitPolicyEntry());
+    }
+
+    return isDecisionTableWithCollectHitPolicy;
   }
 
   protected void generateDecisionEvaluationEvent(List<DmnDecisionLogicEvaluationEvent> evaluatedEvents) {

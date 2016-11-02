@@ -35,7 +35,7 @@ public interface DmnHitPolicyHandler {
   DmnDecisionTableEvaluationEvent apply(DmnDecisionTableEvaluationEvent decisionTableEvaluationEvent);
 
   /**
-   * @return wrapped HitPolicyEntry representing HitPolicy and Aggregator couple
+   * @return the implemented hit policy and aggregator
    */
   HitPolicyEntry getHitPolicyEntry();
 

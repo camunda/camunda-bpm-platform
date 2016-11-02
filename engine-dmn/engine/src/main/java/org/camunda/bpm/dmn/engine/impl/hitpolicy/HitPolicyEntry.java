@@ -19,16 +19,18 @@ import org.camunda.bpm.model.dmn.BuiltinAggregator;
 import org.camunda.bpm.model.dmn.HitPolicy;
 
 /**
+ * Represents the hit policy and the aggregator of a decision table.
+ *
  * @author Askar Akhmerov
  */
 public class HitPolicyEntry {
 
   protected final HitPolicy hitPolicy;
-  protected final BuiltinAggregator builtinAggregator;
+  protected final BuiltinAggregator aggregator;
 
   public HitPolicyEntry(HitPolicy hitPolicy, BuiltinAggregator builtinAggregator) {
     this.hitPolicy = hitPolicy;
-    this.builtinAggregator = builtinAggregator;
+    this.aggregator = builtinAggregator;
   }
 
   @Override
@@ -39,15 +41,23 @@ public class HitPolicyEntry {
     HitPolicyEntry that = (HitPolicyEntry) o;
 
     if (hitPolicy != that.hitPolicy) return false;
-    return builtinAggregator == that.builtinAggregator;
+    return aggregator == that.aggregator;
 
   }
 
   @Override
   public int hashCode() {
     int result = hitPolicy != null ? hitPolicy.hashCode() : 0;
-    result = 31 * result + (builtinAggregator != null ? builtinAggregator.hashCode() : 0);
+    result = 31 * result + (aggregator != null ? aggregator.hashCode() : 0);
     return result;
+  }
+
+  public HitPolicy getHitPolicy() {
+    return hitPolicy;
+  }
+
+  public BuiltinAggregator getAggregator() {
+    return aggregator;
   }
 
 }
