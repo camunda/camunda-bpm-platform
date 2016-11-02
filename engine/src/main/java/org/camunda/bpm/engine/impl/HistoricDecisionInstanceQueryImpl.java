@@ -35,6 +35,8 @@ public class HistoricDecisionInstanceQueryImpl extends AbstractQuery<HistoricDec
   protected String[] decisionInstanceIdIn;
 
   protected String decisionDefinitionId;
+  protected String[] decisionDefinitionIdIn;
+
   protected String decisionDefinitionKey;
   protected String decisionDefinitionName;
 
@@ -90,6 +92,13 @@ public class HistoricDecisionInstanceQueryImpl extends AbstractQuery<HistoricDec
   public HistoricDecisionInstanceQuery decisionDefinitionId(String decisionDefinitionId) {
     ensureNotNull(NotValidException.class, "decisionDefinitionId", decisionDefinitionId);
     this.decisionDefinitionId = decisionDefinitionId;
+    return this;
+  }
+
+  @Override
+  public HistoricDecisionInstanceQuery decisionDefinitionIdIn(String... decisionDefinitionIdIn) {
+    ensureNotNull(NotValidException.class, "decisionDefinitionIdIn", decisionDefinitionIdIn);
+    this.decisionDefinitionIdIn = decisionDefinitionIdIn;
     return this;
   }
 

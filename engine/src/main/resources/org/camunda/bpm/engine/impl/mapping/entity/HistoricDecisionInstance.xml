@@ -165,6 +165,12 @@
       <if test="decisionDefinitionId != null">
         and RES.DEC_DEF_ID_ = #{decisionDefinitionId}
       </if>
+      <if test="decisionDefinitionIdIn != null and decisionDefinitionIdIn.length > 0">
+        and RES.DEC_DEF_ID_ in
+        <foreach item="item" index="index" collection="decisionDefinitionIdIn" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
       <if test="decisionDefinitionKey != null">
         and RES.DEC_DEF_KEY_ = #{decisionDefinitionKey}
       </if>
