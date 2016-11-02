@@ -514,6 +514,7 @@ public class HistoricDecisionInstanceRestServiceQueryTest extends AbstractRestSe
     parameters.put("decisionDefinitionId", MockProvider.EXAMPLE_DECISION_DEFINITION_ID);
     parameters.put("decisionDefinitionIdIn", MockProvider.EXAMPLE_DECISION_DEFINITION_ID_IN);
     parameters.put("decisionDefinitionKey", MockProvider.EXAMPLE_DECISION_DEFINITION_KEY);
+    parameters.put("decisionDefinitionKeyIn", MockProvider.EXAMPLE_DECISION_DEFINITION_KEY_IN);
     parameters.put("decisionDefinitionName", MockProvider.EXAMPLE_DECISION_DEFINITION_NAME);
     parameters.put("processDefinitionId", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
     parameters.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
@@ -542,6 +543,7 @@ public class HistoricDecisionInstanceRestServiceQueryTest extends AbstractRestSe
     verify(mockedQuery).decisionDefinitionId(stringQueryParameters.get("decisionDefinitionId"));
     verify(mockedQuery).decisionDefinitionIdIn(stringArrayConverter.convertQueryParameterToType(stringQueryParameters.get("decisionDefinitionIdIn")));
     verify(mockedQuery).decisionDefinitionKey(stringQueryParameters.get("decisionDefinitionKey"));
+    verify(mockedQuery).decisionDefinitionKeyIn(stringArrayConverter.convertQueryParameterToType(stringQueryParameters.get("decisionDefinitionKeyIn")));
     verify(mockedQuery).decisionDefinitionName(stringQueryParameters.get("decisionDefinitionName"));
     verify(mockedQuery).processDefinitionId(stringQueryParameters.get("processDefinitionId"));
     verify(mockedQuery).processDefinitionKey(stringQueryParameters.get("processDefinitionKey"));

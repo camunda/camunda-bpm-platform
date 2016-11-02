@@ -729,6 +729,7 @@ public abstract class MockProvider {
   public static final String ANOTHER_EXAMPLE_DECISION_DEFINITION_ID = "anotherDecisionDefinitionId";
   public static final String EXAMPLE_DECISION_DEFINITION_ID_LIST = EXAMPLE_DECISION_DEFINITION_ID + "," + ANOTHER_EXAMPLE_DECISION_DEFINITION_ID;
   public static final String EXAMPLE_DECISION_DEFINITION_KEY = "aDecisionDefinitionKey";
+  public static final String EXAMPLE_DECISION_DEFINITION_KEY_IN = "aDecisionDefinitionKey,anotherDecisionDefinitionKey";
   public static final int EXAMPLE_DECISION_DEFINITION_VERSION = 1;
   public static final String EXAMPLE_DECISION_DEFINITION_CATEGORY = "aDecisionDefinitionCategory";
   public static final String EXAMPLE_DECISION_DEFINITION_NAME = "aDecisionDefinitionName";

@@ -212,6 +212,33 @@ public class HistoricDecisionInstanceQueryTest extends PluggableProcessEngineTes
     }
   }
 
+  @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN, DRG_DMN })
+  public void testQueryByDecisionDefinitionKeyIn() {
+
+    //when
+    startProcessInstanceAndEvaluateDecision();
+    decisionService.evaluateDecisionTableByKey(DISH_DECISION)
+        .variables(Variables.createVariables().putValue("temperature", 21).putValue("dayType", "Weekend"))
+        .evaluate();
+
+    //then
+    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
+
+    assertThat(query.decisionDefinitionKeyIn(DISH_DECISION, DECISION_DEFINITION_KEY).count(), is(2L));
+    assertThat(query.decisionDefinitionKeyIn("other id", "anotherFake").count(), is(0L));
+  }
+
+  @Deployment(resources = {DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN, DRG_DMN})
+  public void testQueryByInvalidDecisionDefinitionKeyIn() {
+    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
+    try {
+      query.decisionDefinitionKeyIn("aFake", null).count();
+      fail("exception expected");
+    } catch (ProcessEngineException e) {
+      //expected
+    }
+  }
+
   @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
   public void testQueryByDecisionDefinitionKey() {
 
