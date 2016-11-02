@@ -39,4 +39,43 @@ describe('Cockpit Dashboard Spec', function() {
     expect(element(by.css('.deployed .cases .value')).getText()).to.eventually.eql('0');
     expect(element(by.css('.deployed .deployments .value')).getText()).to.eventually.eql('1');
   });
+
+
+
+  describe('section toggle buttons', function() {
+    it('can be used to hide a section', function() {
+      var section = element(by.css('section.actual'));
+      var btn = section.element(by.css('.section-toggle'));
+
+      expect(section.element(by.css('.stats')).isPresent()).to.eventually.eql(true);
+      expect(btn.isPresent()).to.eventually.eql(true);
+
+      btn.click();
+
+      expect(section.element(by.css('.stats')).isPresent()).to.eventually.eql(false);
+      expect(section.element(by.css('.help-block')).isPresent()).to.eventually.eql(true);
+    });
+
+
+    it('retains the state after page reload', function() {
+      browser.refresh();
+      var section = element(by.css('section.actual'));
+
+      expect(section.element(by.css('.stats')).isPresent()).to.eventually.eql(false);
+      expect(section.element(by.css('.help-block')).isPresent()).to.eventually.eql(true);
+    });
+
+
+    it('can be used to show the sections again', function() {
+      var section = element(by.css('section.actual'));
+      var btn = section.element(by.css('.section-toggle'));
+
+      expect(section.element(by.css('.stats')).isPresent()).to.eventually.eql(false);
+
+      btn.click();
+
+      expect(section.element(by.css('.stats')).isPresent()).to.eventually.eql(true);
+      expect(section.element(by.css('.help-block')).isPresent()).to.eventually.eql(false);
+    });
+  });
 });
