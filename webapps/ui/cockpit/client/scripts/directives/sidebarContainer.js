@@ -4,8 +4,7 @@ var $ = require('jquery');
 
 require('jquery-ui/draggable');
 
-module.exports = function() {
-
+module.exports = ['localConf', function(localConf) {
   return {
     restrict: 'CA',
     link: function(scope, element, attrs) {
@@ -32,7 +31,7 @@ module.exports = function() {
         }
       }
 
-      var originalCollapsabled = localStorage ? localStorage.getItem('ctnCollapsableParent:collapsed:'+ containerId) : 'no';
+      var originalCollapsabled = localConf.get('ctnCollapsableParent:collapsed:'+ containerId, 'no');
 
         // the main element that compensates the collapsing
       var compensateElement = collapsableElement[direction === 'left' || direction === 'top' ? 'next' : 'prev']();
@@ -67,10 +66,7 @@ module.exports = function() {
           hideHandle.css('display', 'block');
         }
 
-        if (localStorage) {
-            // we need to store something else than a boolean because if it was never "initialized"
-          localStorage.setItem('ctnCollapsableParent:collapsed:'+ containerId, collapsed ? 'yes' : 'no');
-        }
+        localConf.set('ctnCollapsableParent:collapsed:'+ containerId, collapsed ? 'yes' : 'no');
       }
 
       function initResize() {
@@ -104,10 +100,7 @@ module.exports = function() {
 
         var originalCollapsableSize = collapsableElement[changeAttr]();
 
-        if (localStorage) {
-          var storedPos = localStorage.getItem('ctnCollapsableParent:size:'+ containerId);
-          originalCollapsableSize = (storedPos !== null ? storedPos : originalCollapsableSize);
-        }
+        localConf.get('ctnCollapsableParent:size:'+ containerId, originalCollapsableSize);
 
         originalCollapsableSize = Math.max(minWidth, originalCollapsableSize);
 
@@ -157,9 +150,7 @@ module.exports = function() {
               collapsableElement.css(changeAttr, pos);
               compensateElement.css(direction, pos);
 
-              if (localStorage) {
-                localStorage.setItem('ctnCollapsableParent:size:'+ containerId, pos);
-              }
+              localConf.set('ctnCollapsableParent:size:'+ containerId, pos);
             })
             .on('dragstop', function(event) {
               updateResizeHandlePosition();
@@ -196,4 +187,4 @@ module.exports = function() {
       initResize();
     }
   };
-};
+}];
