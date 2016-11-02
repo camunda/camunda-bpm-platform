@@ -16,8 +16,15 @@ package org.camunda.bpm.dmn.engine.impl.hitpolicy;
 import java.util.List;
 
 import org.camunda.bpm.model.dmn.BuiltinAggregator;
+import org.camunda.bpm.model.dmn.HitPolicy;
 
 public class CollectSumHitPolicyHandler extends AbstractCollectNumberHitPolicyHandler {
+  protected static final HitPolicyEntry HIT_POLICY = new HitPolicyEntry(HitPolicy.COLLECT, BuiltinAggregator.SUM);
+
+  @Override
+  public HitPolicyEntry getHitPolicyEntry() {
+    return HIT_POLICY;
+  }
 
   protected BuiltinAggregator getAggregator() {
     return BuiltinAggregator.SUM;

@@ -45,43 +45,8 @@ public class DefaultHitPolicyHandlerRegistry implements DmnHitPolicyHandlerRegis
     return handlers.get(new HitPolicyEntry(hitPolicy, builtinAggregator));
   }
 
-  public static DmnHitPolicyHandler getCorrespondingHandler(HitPolicy hitPolicy, BuiltinAggregator builtinAggregator) {
-    return handlers.get(new HitPolicyEntry(hitPolicy, builtinAggregator));
-  }
-
   public void addHandler(HitPolicy hitPolicy, BuiltinAggregator builtinAggregator, DmnHitPolicyHandler hitPolicyHandler) {
     handlers.put(new HitPolicyEntry(hitPolicy, builtinAggregator), hitPolicyHandler);
-  }
-
-  public static class HitPolicyEntry {
-
-    protected final HitPolicy hitPolicy;
-    protected final BuiltinAggregator builtinAggregator;
-
-    public HitPolicyEntry(HitPolicy hitPolicy, BuiltinAggregator builtinAggregator) {
-      this.hitPolicy = hitPolicy;
-      this.builtinAggregator = builtinAggregator;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-      if (this == o) return true;
-      if (o == null || getClass() != o.getClass()) return false;
-
-      HitPolicyEntry that = (HitPolicyEntry) o;
-
-      if (hitPolicy != that.hitPolicy) return false;
-      return builtinAggregator == that.builtinAggregator;
-
-    }
-
-    @Override
-    public int hashCode() {
-      int result = hitPolicy != null ? hitPolicy.hashCode() : 0;
-      result = 31 * result + (builtinAggregator != null ? builtinAggregator.hashCode() : 0);
-      return result;
-    }
-
   }
 
 }

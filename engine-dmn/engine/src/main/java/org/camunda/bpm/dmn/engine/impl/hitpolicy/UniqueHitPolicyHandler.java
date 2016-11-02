@@ -19,10 +19,12 @@ import org.camunda.bpm.dmn.engine.delegate.DmnDecisionTableEvaluationEvent;
 import org.camunda.bpm.dmn.engine.delegate.DmnEvaluatedDecisionRule;
 import org.camunda.bpm.dmn.engine.impl.DmnLogger;
 import org.camunda.bpm.dmn.engine.impl.spi.hitpolicy.DmnHitPolicyHandler;
+import org.camunda.bpm.model.dmn.HitPolicy;
 
 public class UniqueHitPolicyHandler implements DmnHitPolicyHandler {
 
   public static final DmnHitPolicyLogger LOG = DmnLogger.HIT_POLICY_LOGGER;
+  protected static final HitPolicyEntry HIT_POLICY = new HitPolicyEntry(HitPolicy.UNIQUE, null);
 
   public DmnDecisionTableEvaluationEvent apply(DmnDecisionTableEvaluationEvent decisionTableEvaluationEvent) {
     List<DmnEvaluatedDecisionRule> matchingRules = decisionTableEvaluationEvent.getMatchingRules();
@@ -33,6 +35,11 @@ public class UniqueHitPolicyHandler implements DmnHitPolicyHandler {
     else {
       throw LOG.uniqueHitPolicyOnlyAllowsSingleMatchingRule(matchingRules);
     }
+  }
+
+  @Override
+  public HitPolicyEntry getHitPolicyEntry() {
+    return HIT_POLICY;
   }
 
   @Override

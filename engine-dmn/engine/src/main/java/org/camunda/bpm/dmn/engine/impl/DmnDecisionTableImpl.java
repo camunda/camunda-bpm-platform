@@ -71,17 +71,4 @@ public class DmnDecisionTableImpl implements DmnDecisionLogic {
       ", rules=" + rules +
       '}';
   }
-
-  /**
-   *
-   * @return
-   */
-  public boolean hasCollectHitPolicyWitoutAggregator() {
-    boolean result = false;
-    if (this.hitPolicyHandler != null) {
-      result = this.hitPolicyHandler.equals(
-        DefaultHitPolicyHandlerRegistry.getCorrespondingHandler(HitPolicy.COLLECT, null));
-    }
-    return result;
-  }
 }

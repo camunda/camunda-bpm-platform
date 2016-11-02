@@ -22,9 +22,11 @@ import org.camunda.bpm.dmn.engine.impl.delegate.DmnDecisionEvaluationEventImpl;
 import org.camunda.bpm.dmn.engine.impl.evaluation.DecisionLiteralExpressionEvaluationHandler;
 import org.camunda.bpm.dmn.engine.impl.evaluation.DecisionTableEvaluationHandler;
 import org.camunda.bpm.dmn.engine.impl.evaluation.DmnDecisionLogicEvaluationHandler;
+import org.camunda.bpm.dmn.engine.impl.hitpolicy.HitPolicyEntry;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.context.VariableContext;
+import org.camunda.bpm.model.dmn.HitPolicy;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,6 +41,7 @@ import java.util.Set;
 public class DefaultDmnDecisionContext {
 
   protected static final DmnEngineLogger LOG = DmnEngineLogger.ENGINE_LOGGER;
+  protected static final HitPolicyEntry COLLECT = new HitPolicyEntry(HitPolicy.COLLECT, null);
 
   protected final List<DmnDecisionEvaluationListener> evaluationListeners;
 
@@ -127,7 +130,7 @@ public class DefaultDmnDecisionContext {
     boolean isNotCollectHitPolicy = true;
     if (evaluatedDecision.isDecisionTable()) {
       DmnDecisionTableImpl decisionTable = (DmnDecisionTableImpl) evaluatedDecision.getDecisionLogic();
-      isNotCollectHitPolicy = decisionTable.hasCollectHitPolicyWitoutAggregator() ? false : true;
+      isNotCollectHitPolicy = !COLLECT.equals(decisionTable.getHitPolicyHandler().getHitPolicyEntry());
     }
 
     if (resultList.isEmpty()) {

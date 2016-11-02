@@ -15,6 +15,7 @@ package org.camunda.bpm.dmn.engine.impl.spi.hitpolicy;
 
 import org.camunda.bpm.dmn.engine.DmnEngineException;
 import org.camunda.bpm.dmn.engine.delegate.DmnDecisionTableEvaluationEvent;
+import org.camunda.bpm.dmn.engine.impl.hitpolicy.HitPolicyEntry;
 
 /**
  * Handler for a DMN decision table hit policy.
@@ -32,5 +33,10 @@ public interface DmnHitPolicyHandler {
    *           if the hit policy cannot be applied to the decision outputs
    */
   DmnDecisionTableEvaluationEvent apply(DmnDecisionTableEvaluationEvent decisionTableEvaluationEvent);
+
+  /**
+   * @return wrapped HitPolicyEntry representing HitPolicy and Aggregator couple
+   */
+  HitPolicyEntry getHitPolicyEntry();
 
 }

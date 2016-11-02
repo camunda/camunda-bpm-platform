@@ -15,8 +15,16 @@ package org.camunda.bpm.dmn.engine.impl.hitpolicy;
 
 import org.camunda.bpm.dmn.engine.delegate.DmnDecisionTableEvaluationEvent;
 import org.camunda.bpm.dmn.engine.impl.spi.hitpolicy.DmnHitPolicyHandler;
+import org.camunda.bpm.model.dmn.HitPolicy;
 
 public class RuleOrderHitPolicyHandler implements DmnHitPolicyHandler {
+
+  protected static final HitPolicyEntry HIT_POLICY = new HitPolicyEntry(HitPolicy.RULE_ORDER, null);
+
+  @Override
+  public HitPolicyEntry getHitPolicyEntry() {
+    return HIT_POLICY;
+  }
 
   public DmnDecisionTableEvaluationEvent apply(DmnDecisionTableEvaluationEvent decisionTableEvaluationEvent) {
     return decisionTableEvaluationEvent;
