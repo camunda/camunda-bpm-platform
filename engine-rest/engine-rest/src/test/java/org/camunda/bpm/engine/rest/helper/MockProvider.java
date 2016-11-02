@@ -724,6 +724,7 @@ public abstract class MockProvider {
   public static final Map<String, Object> EXAMPLE_FILTER_PROPERTIES = Collections.singletonMap("color", (Object) "#112233");
 
   // decision definition
+  public static final String EXAMPLE_DECISION_DEFINITION_ID_IN = "aDecisionDefinitionId,anotherDecisionDefinitionId";
   public static final String EXAMPLE_DECISION_DEFINITION_ID = "aDecisionDefinitionId";
   public static final String ANOTHER_EXAMPLE_DECISION_DEFINITION_ID = "anotherDecisionDefinitionId";
   public static final String EXAMPLE_DECISION_DEFINITION_ID_LIST = EXAMPLE_DECISION_DEFINITION_ID + "," + ANOTHER_EXAMPLE_DECISION_DEFINITION_ID;
@@ -773,7 +774,6 @@ public abstract class MockProvider {
   public static final boolean EXAMPLE_HISTORIC_JOB_LOG_IS_DELETION_LOG = true;
 
   // historic decision instance
-
   public static final String EXAMPLE_HISTORIC_DECISION_INSTANCE_ID = "aHistoricDecisionInstanceId";
   public static final String EXAMPLE_HISTORIC_DECISION_INSTANCE_ID_IN = "aHistoricDecisionInstanceId,anotherHistoricDecisionInstanceId";
   public static final String EXAMPLE_HISTORIC_DECISION_INSTANCE_ACTIVITY_ID = "aHistoricDecisionInstanceActivityId";
@@ -845,6 +845,7 @@ public abstract class MockProvider {
   public static final long EXAMPLE_HISTORIC_TASK_INST_DURATION_REPORT_MIN = 5;
   public static final long EXAMPLE_HISTORIC_TASK_INST_DURATION_REPORT_MAX = 15;
   public static final int EXAMPLE_HISTORIC_TASK_INST_DURATION_REPORT_PERIOD = 1;
+
 
   public static Task createMockTask() {
     return mockTask().build();
