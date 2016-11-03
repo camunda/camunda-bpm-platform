@@ -93,6 +93,39 @@
       </section>
 
 
+      <section class="statistics"
+               ng-if="statisticsPlugins.length">
+        <button tooltip="Toggle this section"
+                class="section-toggle btn btn-link btn-sm"
+                ng-click="toggleSection('statistics')">
+          <span class="glyphicon"
+                ng-class="{'glyphicon-eye-open': !statisticsActive, 'glyphicon-eye-close': statisticsActive}"></button>
+        <div class="inner">
+          <header>
+            <h1 class="section-title">Statistics</h1>
+          </header>
+
+
+          <div class="row stats"
+               ng-if="statisticsActive">
+            <div ng-repeat="plugin in statisticsPlugins"
+                 data-plugin-id="{{ plugin.id }}"
+                 class="stats-section col-md-12 col-lg-6 entry">
+              <h4>{{ plugin.label }}</h4>
+              <view vars="statisticsVars"
+                    provider="plugin"
+                    class="row"></view>
+            </div>
+          </div>
+
+          <div class="help-block text-center"
+               ng-if="!statisticsActive">
+            Click the <span class="glyphicon glyphicon-eye-open"></span> to show the details.
+          </div>
+        </div>
+      </section>
+
+
       <section class="metrics"
                ng-if="metricsPlugins.length">
         <button tooltip="Toggle this section"

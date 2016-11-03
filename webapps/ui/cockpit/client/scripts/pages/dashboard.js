@@ -142,6 +142,7 @@ var Controller = [
     [
       'actual',
       'metrics',
+      'statistics',
       'deployed'
     ].forEach(function(name) {
       $scope[name + 'Active'] = localConf.get('dashboardSection:' + name, true);
@@ -166,10 +167,14 @@ var Controller = [
           $scope.metricsPlugins = Views.getProviders({
             component: 'cockpit.dashboard.metrics'
           }).sort(prioritySort);
+
+          $scope.statisticsVars = { read: [] };
+          $scope.statisticsPlugins = Views.getProviders({
+            component: 'cockpit.dashboard.statistics'
+          }).sort(prioritySort);
         }
       });
     }
-
   }];
 
 var RouteConfig = [ '$routeProvider', function($routeProvider) {
