@@ -44,6 +44,12 @@ module.exports = [
           });
           return label || 'Options';
         };
+
+        scope.sortedChoices = function(choices) {
+          return choices.sort(function(a, b) {
+            return a.active ? -1 : (b.active ? 1 : 0);
+          });
+        };
       },
 
       controller: [

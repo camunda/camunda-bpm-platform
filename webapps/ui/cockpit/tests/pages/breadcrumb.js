@@ -16,6 +16,18 @@ module.exports = Base.extend({
     return element(by.css('.cam-breadcrumb li.active > .text'));
   },
 
+  activeCrumbViewSwitcher: function() {
+    return element(by.css('.cam-breadcrumb li.active .switcher'));
+  },
+
+  activeCrumbViewSwitcherCurrent: function() {
+    return element(by.css('.cam-breadcrumb li.active .switcher .current'));
+  },
+
+  activeCrumbViewSwitcherLink: function() {
+    return element(by.css('.cam-breadcrumb li.active .switcher a'));
+  },
+
   activeCrumbDropdown: function () {
     return element(by.css('.cam-breadcrumb li.active > .dropdown'));
   },
