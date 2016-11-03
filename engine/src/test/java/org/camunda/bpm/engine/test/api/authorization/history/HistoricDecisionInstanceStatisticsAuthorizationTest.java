@@ -10,10 +10,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.test.api.authorization;
+package org.camunda.bpm.engine.test.api.authorization.history;
 
 import org.camunda.bpm.engine.DecisionService;
-import org.camunda.bpm.engine.ManagementService;
+import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
@@ -41,7 +41,7 @@ import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSp
  * @author Askar Akhmerov
  */
 @RunWith(Parameterized.class)
-public class DecisionDefinitionStatisticsAuthorizationTest {
+public class HistoricDecisionInstanceStatisticsAuthorizationTest {
 
   protected static final String DISH_DRG_DMN = "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml";
 
@@ -49,7 +49,7 @@ public class DecisionDefinitionStatisticsAuthorizationTest {
   protected AuthorizationTestRule authRule = new AuthorizationTestRule(engineRule);
   protected ProcessEngineTestRule testHelper = new ProcessEngineTestRule(engineRule);
   protected DecisionService decisionService;
-  protected ManagementService managementService;
+  protected HistoryService historyService;
   protected RepositoryService repositoryService;
 
   protected DecisionRequirementsDefinition decisionRequirementsDefinition;
@@ -79,7 +79,7 @@ public class DecisionDefinitionStatisticsAuthorizationTest {
   public void setUp() {
     testHelper.deploy(DISH_DRG_DMN);
     decisionService = engineRule.getDecisionService();
-    managementService = engineRule.getManagementService();
+    historyService = engineRule.getHistoryService();
     repositoryService = engineRule.getRepositoryService();
 
     authRule.createUserAndGroup("userId", "groupId");
@@ -106,7 +106,7 @@ public class DecisionDefinitionStatisticsAuthorizationTest {
         .start();
 
     // when
-    managementService.createDecisionRequirementsDefinitionStatisticsQuery(
+    historyService.createHistoricDecisionInstanceStatisticsQuery(
         decisionRequirementsDefinition.getId()).list();
 
     // then

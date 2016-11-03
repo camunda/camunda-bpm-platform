@@ -13,14 +13,14 @@
  *
  */
 
-package org.camunda.bpm.engine.test.api.mgmt;
+package org.camunda.bpm.engine.test.api.history;
 
 import org.camunda.bpm.engine.DecisionService;
-import org.camunda.bpm.engine.ManagementService;
+import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.exception.NullValueException;
-import org.camunda.bpm.engine.management.DecisionDefinitionStatisticsQuery;
+import org.camunda.bpm.engine.history.HistoricDecisionInstanceStatisticsQuery;
 import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
@@ -41,12 +41,12 @@ import static org.junit.Assert.assertThat;
  * @author Askar Akhmerov
  */
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
-public class DecisionDefinitionStatisticsQueryTest {
+public class HistoricDecisionInstanceStatisticsQueryTest {
 
   protected static final String DISH_DRG_DMN = "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml";
   protected static final String SCORE_DRG_DMN = "org/camunda/bpm/engine/test/dmn/deployment/drdScore.dmn11.xml";
 
-  protected static final String FAKE = "fake";
+  protected static final String NON_EXISTING = "fake";
   protected static final String DISH_DECISION = "dish-decision";
   protected static final String TEMPERATURE = "temperature";
   protected static final String DAY_TYPE = "dayType";
@@ -54,7 +54,7 @@ public class DecisionDefinitionStatisticsQueryTest {
 
   protected DecisionService decisionService;
   protected RepositoryService repositoryService;
-  protected ManagementService managementService;
+  protected HistoryService historyService;
 
   public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
@@ -69,7 +69,7 @@ public class DecisionDefinitionStatisticsQueryTest {
   public void setUp() {
     decisionService = engineRule.getDecisionService();
     repositoryService = engineRule.getRepositoryService();
-    managementService = engineRule.getManagementService();
+    historyService = engineRule.getHistoryService();
     testRule.deploy(DISH_DRG_DMN);
   }
 
@@ -86,8 +86,8 @@ public class DecisionDefinitionStatisticsQueryTest {
 
     DecisionRequirementsDefinition decisionRequirementsDefinition = repositoryService.createDecisionRequirementsDefinitionQuery().singleResult();
 
-    DecisionDefinitionStatisticsQuery statisticsQuery = managementService
-        .createDecisionRequirementsDefinitionStatisticsQuery(
+    HistoricDecisionInstanceStatisticsQuery statisticsQuery = historyService
+        .createHistoricDecisionInstanceStatisticsQuery(
             decisionRequirementsDefinition.getId());
 
     //then
@@ -119,8 +119,8 @@ public class DecisionDefinitionStatisticsQueryTest {
         .get(0)
         .getId();
 
-    DecisionDefinitionStatisticsQuery query = managementService
-        .createDecisionRequirementsDefinitionStatisticsQuery(
+    HistoricDecisionInstanceStatisticsQuery query = historyService
+        .createHistoricDecisionInstanceStatisticsQuery(
             decisionRequirementsDefinition.getId())
         .decisionInstanceId(decisionInstanceId);
 
@@ -140,10 +140,10 @@ public class DecisionDefinitionStatisticsQueryTest {
 
     DecisionRequirementsDefinition decisionRequirementsDefinition = repositoryService.createDecisionRequirementsDefinitionQuery().singleResult();
 
-    DecisionDefinitionStatisticsQuery query = managementService
-        .createDecisionRequirementsDefinitionStatisticsQuery(
+    HistoricDecisionInstanceStatisticsQuery query = historyService
+        .createHistoricDecisionInstanceStatisticsQuery(
             decisionRequirementsDefinition.getId())
-        .decisionInstanceId(FAKE);
+        .decisionInstanceId(NON_EXISTING);
 
     //then
     assertThat(query.count(), is(0L));
@@ -161,8 +161,8 @@ public class DecisionDefinitionStatisticsQueryTest {
 
     DecisionRequirementsDefinition decisionRequirementsDefinition = repositoryService.createDecisionRequirementsDefinitionQuery().singleResult();
     //when
-    DecisionDefinitionStatisticsQuery query = managementService
-        .createDecisionRequirementsDefinitionStatisticsQuery(
+    HistoricDecisionInstanceStatisticsQuery query = historyService
+        .createHistoricDecisionInstanceStatisticsQuery(
             decisionRequirementsDefinition.getId())
         .decisionInstanceId(null);
 
@@ -189,8 +189,8 @@ public class DecisionDefinitionStatisticsQueryTest {
 
     DecisionRequirementsDefinition decisionRequirementsDefinition = repositoryService.createDecisionRequirementsDefinitionQuery().singleResult();
 
-    DecisionDefinitionStatisticsQuery statisticsQuery = managementService
-        .createDecisionRequirementsDefinitionStatisticsQuery(
+    HistoricDecisionInstanceStatisticsQuery statisticsQuery = historyService
+        .createHistoricDecisionInstanceStatisticsQuery(
             decisionRequirementsDefinition.getId());
 
     //then
@@ -219,8 +219,8 @@ public class DecisionDefinitionStatisticsQueryTest {
         .decisionRequirementsDefinitionName("Score")
         .singleResult();
 
-    DecisionDefinitionStatisticsQuery statisticsQuery = managementService
-        .createDecisionRequirementsDefinitionStatisticsQuery(
+    HistoricDecisionInstanceStatisticsQuery statisticsQuery = historyService
+        .createHistoricDecisionInstanceStatisticsQuery(
             decisionRequirementsDefinition.getId());
 
     //then
@@ -234,13 +234,13 @@ public class DecisionDefinitionStatisticsQueryTest {
   public void testStatisticDoesNotExistForFakeId() throws Exception {
     assertThat(
         "available statistics count of fake",
-        managementService.createDecisionRequirementsDefinitionStatisticsQuery(
-            FAKE).count(), is(0L));
+        historyService.createHistoricDecisionInstanceStatisticsQuery(
+            NON_EXISTING).count(), is(0L));
 
     assertThat(
         "available statistics elements of fake",
-        managementService.createDecisionRequirementsDefinitionStatisticsQuery(
-            FAKE).list().size(), is(0));
+        historyService.createHistoricDecisionInstanceStatisticsQuery(
+            NON_EXISTING).list().size(), is(0));
 
   }
 
@@ -248,14 +248,14 @@ public class DecisionDefinitionStatisticsQueryTest {
   public void testStatisticThrowsExceptionOnNullConstraintsCount() throws Exception {
     //expect
     thrown.expect(NullValueException.class);
-    managementService.createDecisionRequirementsDefinitionStatisticsQuery(null).count();
+    historyService.createHistoricDecisionInstanceStatisticsQuery(null).count();
   }
 
   @Test
   public void testStatisticThrowsExceptionOnNullConstraintsList() throws Exception {
     //expect
     thrown.expect(NullValueException.class);
-    managementService.createDecisionRequirementsDefinitionStatisticsQuery(null).list();
+    historyService.createHistoricDecisionInstanceStatisticsQuery(null).list();
   }
 
   @Test
@@ -264,13 +264,11 @@ public class DecisionDefinitionStatisticsQueryTest {
     DecisionRequirementsDefinition decisionRequirementsDefinition =
         repositoryService.createDecisionRequirementsDefinitionQuery().singleResult();
 
-    DecisionDefinitionStatisticsQuery statisticsQuery = managementService.createDecisionRequirementsDefinitionStatisticsQuery(
+    HistoricDecisionInstanceStatisticsQuery statisticsQuery = historyService.createHistoricDecisionInstanceStatisticsQuery(
         decisionRequirementsDefinition.getId());
 
     //then
-    assertThat("available statistics count", statisticsQuery.count(), is(1L));
-    assertThat("available statistics elements", statisticsQuery.list().size(), is(3));
-    assertThat(statisticsQuery.list().get(0).getEvaluations(), is(0));
-    assertThat(statisticsQuery.list().get(0).getDecisionDefinitionKey(), is(notNullValue()));
+    assertThat("available statistics count", statisticsQuery.count(), is(0L));
+    assertThat("available statistics elements", statisticsQuery.list().size(), is(0));
   }
 }

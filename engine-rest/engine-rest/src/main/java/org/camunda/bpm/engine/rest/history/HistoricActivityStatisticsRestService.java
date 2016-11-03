@@ -31,7 +31,8 @@ public interface HistoricActivityStatisticsRestService {
 
   @GET
   @Produces(MediaType.APPLICATION_JSON)
-  public List<HistoricActivityStatisticsDto> getHistoricActivityStatistics(@PathParam("id") String processDefinitionId, @QueryParam("canceled") Boolean includeCanceled,
+  public List<HistoricActivityStatisticsDto> getHistoricActivityStatistics(@PathParam("id") String processDefinitionId,
+                                                                           @QueryParam("canceled") Boolean includeCanceled,
       @QueryParam("finished") Boolean includeFinished, @QueryParam("completeScope") Boolean includeCompleteScope,
       @QueryParam("sortBy") String sortBy, @QueryParam("sortOrder") String sortOrder);
 

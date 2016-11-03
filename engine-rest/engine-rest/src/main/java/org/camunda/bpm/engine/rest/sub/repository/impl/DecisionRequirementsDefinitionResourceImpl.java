@@ -12,28 +12,24 @@
  */
 package org.camunda.bpm.engine.rest.sub.repository.impl;
 
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.util.IoUtil;
-import org.camunda.bpm.engine.management.DecisionDefinitionStatistics;
-import org.camunda.bpm.engine.management.DecisionDefinitionStatisticsQuery;
 import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
-import org.camunda.bpm.engine.rest.dto.dmn.DecisionDefinitionStatisticsDto;
 import org.camunda.bpm.engine.rest.dto.repository.DecisionRequirementsDefinitionDto;
 import org.camunda.bpm.engine.rest.dto.repository.DecisionRequirementsDefinitionXmlDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.sub.repository.DecisionRequirementsDefinitionResource;
-
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 
@@ -110,30 +106,5 @@ public class DecisionRequirementsDefinitionResourceImpl implements DecisionRequi
       return Response.ok(decisionRequirementsDiagram).header("Content-Disposition", "attachment; filename=" + fileName)
           .type(ProcessDefinitionResourceImpl.getMediaTypeForFileSuffix(fileName)).build();
     }
-  }
-
-  @Override
-  public List<DecisionDefinitionStatisticsDto> getStatistics(String decisionInstanceId) {
-    return getDecisionDefinitionStatisticsDtos(decisionInstanceId);
-  }
-
-  @Override
-  public List<DecisionDefinitionStatisticsDto> getStatistics() {
-    return getDecisionDefinitionStatisticsDtos(null);
-  }
-
-  protected List<DecisionDefinitionStatisticsDto> getDecisionDefinitionStatisticsDtos(String decisionInstanceId) {
-    List<DecisionDefinitionStatisticsDto> result = new ArrayList<DecisionDefinitionStatisticsDto>();
-    DecisionDefinitionStatisticsQuery statisticsQuery = engine.getManagementService()
-        .createDecisionRequirementsDefinitionStatisticsQuery(this.decisionRequirementsDefinitionId);
-    if (decisionInstanceId != null) {
-      statisticsQuery.decisionInstanceId(decisionInstanceId);
-    }
-
-    for (DecisionDefinitionStatistics stats : statisticsQuery.list()) {
-      result.add(DecisionDefinitionStatisticsDto.fromDecisionDefinitionStatistics(stats));
-    }
-
-    return result;
   }
 }

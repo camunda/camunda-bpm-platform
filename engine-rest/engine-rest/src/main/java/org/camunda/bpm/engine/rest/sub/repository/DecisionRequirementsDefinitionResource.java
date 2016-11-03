@@ -14,16 +14,12 @@ package org.camunda.bpm.engine.rest.sub.repository;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.camunda.bpm.engine.rest.dto.dmn.DecisionDefinitionStatisticsDto;
 import org.camunda.bpm.engine.rest.dto.repository.DecisionRequirementsDefinitionXmlDto;
 import org.camunda.bpm.engine.rest.dto.repository.DecisionRequirementsDefinitionDto;
-
-import java.util.List;
 
 public interface DecisionRequirementsDefinitionResource {
 
@@ -39,14 +35,4 @@ public interface DecisionRequirementsDefinitionResource {
   @GET
   @Path("/diagram")
   Response getDecisionRequirementsDefinitionDiagram();
-
-  @GET
-  @Path("/statistics/{decisionInstanceId}")
-  @Produces(MediaType.APPLICATION_JSON)
-  List<DecisionDefinitionStatisticsDto> getStatistics(@PathParam("decisionInstanceId") String decisionInstanceId);
-
-  @GET
-  @Path("/statistics")
-  @Produces(MediaType.APPLICATION_JSON)
-  List<DecisionDefinitionStatisticsDto> getStatistics();
 }

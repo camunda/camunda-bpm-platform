@@ -14,7 +14,6 @@ package org.camunda.bpm.engine.rest;
 
 
 import static com.jayway.restassured.RestAssured.given;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
@@ -29,25 +28,17 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
 
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.DecisionService;
-import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
-import org.camunda.bpm.engine.impl.persistence.entity.DecisionDefinitionStatisticsImpl;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
-import org.camunda.bpm.engine.management.DecisionDefinitionStatistics;
-import org.camunda.bpm.engine.management.DecisionDefinitionStatisticsQuery;
 import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
 import org.camunda.bpm.engine.repository.DecisionRequirementsDefinitionQuery;
-import org.camunda.bpm.engine.rest.dto.dmn.DecisionDefinitionStatisticsDto;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
@@ -59,7 +50,7 @@ import org.junit.Test;
 import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.response.Response;
 /**
- * 
+ *
  * @author Deivarayan Azhagappan
  *
  */
@@ -75,24 +66,19 @@ public class DecisionRequirementsDefinitionRestServiceInteractionTest extends Ab
   protected static final String SINGLE_DECISION_REQUIREMENTS_DEFINITION_KEY_AND_TENANT_ID_URL = DECISION_REQUIREMENTS_DEFINITION_URL + "/key/{key}/tenant-id/{tenant-id}";
 
   protected static final String XML_DEFINITION_URL = SINGLE_DECISION_REQUIREMENTS_DEFINITION_ID_URL + "/xml";
-  protected static final String STATISTICS_URL = SINGLE_DECISION_REQUIREMENTS_DEFINITION_ID_URL + "/statistics";
 
   protected static final String DIAGRAM_DEFINITION_URL = SINGLE_DECISION_REQUIREMENTS_DEFINITION_ID_URL + "/diagram";
-  
+
   protected RepositoryService repositoryServiceMock;
-  protected ManagementService managementServiceMock;
   protected DecisionRequirementsDefinitionQuery decisionRequirementsDefinitionQueryMock;
-  protected DecisionDefinitionStatisticsQuery decisionDefinitionStatisticsQueryMock;
   protected DecisionService decisionServiceMock;
- 
+
   @Before
   public void setUpRuntime() throws FileNotFoundException, URISyntaxException {
     DecisionRequirementsDefinition mockDecisionRequirementsDefinition = MockProvider.createMockDecisionRequirementsDefinition();
-    managementServiceMock = mock(ManagementService.class);
 
     setUpRuntimeData(mockDecisionRequirementsDefinition);
     decisionServiceMock = mock(DecisionService.class);
-    when(processEngine.getManagementService()).thenReturn(managementServiceMock);
     when(processEngine.getDecisionService()).thenReturn(decisionServiceMock);
   }
 
@@ -164,7 +150,7 @@ public class DecisionRequirementsDefinitionRestServiceInteractionTest extends Ab
       .thenReturn(decisionRequirementsDefinitionQueryMock);
 
     when(decisionRequirementsDefinitionQueryMock.singleResult()).thenReturn(null);
- 
+
     given()
       .pathParam("key", nonExistingKey)
     .then()
@@ -239,45 +225,6 @@ public class DecisionRequirementsDefinitionRestServiceInteractionTest extends Ab
     Assert.assertTrue(responseContent.contains("<?xml"));
   }
 
-  //statistics request
-  @Test
-  public void decisionRequirementsDefinitionStatisticsRequest() {
-
-    Response response = given()
-        .pathParam("id", MockProvider.EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_ID)
-        .then()
-          .expect()
-          .statusCode(Status.OK.getStatusCode())
-        .when()
-          .get(STATISTICS_URL);
-
-    assertStatisticsBody(response);
-  }
-
-  @Test
-  public void decisionRequirementsDefinitionStatisticsRequestWithDecisionInstance() {
-
-    Response response = given()
-        .pathParam("id", MockProvider.EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_ID)
-        .then()
-          .expect()
-          .statusCode(Status.OK.getStatusCode())
-        .when()
-          .get(STATISTICS_URL + "/anId");
-
-    assertStatisticsBody(response);
-  }
-
-  protected void assertStatisticsBody(Response response) {
-    List responseContent = response.as(List.class);
-    assertThat(responseContent.size(),is(1));
-    LinkedHashMap contentMap = (LinkedHashMap) responseContent.get(0);
-    Integer evaluations = Integer.parseInt(contentMap.get("evaluations").toString());
-    assertThat(evaluations,is(1));
-    assertThat(contentMap.get("decisionDefinitionId").toString(),is("test"));
-    assertThat(contentMap.get("decisionDefinitionKey").toString(),is("testKey"));
-  }
-
   // DRD retrieval
   @Test
   public void decisionRequirementsDiagramRetrieval() throws FileNotFoundException, URISyntaxException {
@@ -303,7 +250,7 @@ public class DecisionRequirementsDefinitionRestServiceInteractionTest extends Ab
     when(repositoryServiceMock.getDecisionRequirementsDefinition(eq(MockProvider.EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_ID))).thenReturn(mockDecisionRequirementsDefinition);
     when(repositoryServiceMock.getDecisionRequirementsModel(eq(MockProvider.EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_ID))).thenReturn(createMockDecisionRequirementsDefinitionDmnXml());
     when(repositoryServiceMock.getDecisionRequirementsDiagram(MockProvider.EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_ID)).thenReturn(createMockDecisionRequirementsDiagram());
-    
+
     decisionRequirementsDefinitionQueryMock = mock(DecisionRequirementsDefinitionQuery.class);
     when(decisionRequirementsDefinitionQueryMock.decisionRequirementsDefinitionKey(MockProvider.EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_KEY)).thenReturn(decisionRequirementsDefinitionQueryMock);
     when(decisionRequirementsDefinitionQueryMock.tenantIdIn(anyString())).thenReturn(decisionRequirementsDefinitionQueryMock);
@@ -312,19 +259,6 @@ public class DecisionRequirementsDefinitionRestServiceInteractionTest extends Ab
     when(decisionRequirementsDefinitionQueryMock.singleResult()).thenReturn(mockDecisionRequirementsDefinition);
     when(decisionRequirementsDefinitionQueryMock.list()).thenReturn(Collections.singletonList(mockDecisionRequirementsDefinition));
     when(repositoryServiceMock.createDecisionRequirementsDefinitionQuery()).thenReturn(decisionRequirementsDefinitionQueryMock);
-
-    decisionDefinitionStatisticsQueryMock = mock(DecisionDefinitionStatisticsQuery.class);
-    List<DecisionDefinitionStatistics> stats = new ArrayList<DecisionDefinitionStatistics>();
-
-    DecisionDefinitionStatisticsImpl decision = new DecisionDefinitionStatisticsImpl();
-    decision.setDecisionDefinitionId("test");
-    decision.setEvaluations(1);
-    decision.setDecisionDefinitionKey("testKey");
-    stats.add(decision);
-    when(decisionDefinitionStatisticsQueryMock.decisionInstanceId(anyString())).thenReturn(decisionDefinitionStatisticsQueryMock);
-    when(decisionDefinitionStatisticsQueryMock.list()).thenReturn(stats);
-    when(managementServiceMock.createDecisionRequirementsDefinitionStatisticsQuery(anyString()))
-        .thenReturn(decisionDefinitionStatisticsQueryMock);
   }
 
   protected InputStream createMockDecisionRequirementsDefinitionDmnXml() {

@@ -19,6 +19,7 @@ import org.camunda.bpm.engine.rest.history.HistoricCaseActivityInstanceRestServi
 import org.camunda.bpm.engine.rest.history.HistoricCaseActivityStatisticsRestService;
 import org.camunda.bpm.engine.rest.history.HistoricCaseInstanceRestService;
 import org.camunda.bpm.engine.rest.history.HistoricDecisionInstanceRestService;
+import org.camunda.bpm.engine.rest.history.HistoricDecisionStatisticsRestService;
 import org.camunda.bpm.engine.rest.history.HistoricDetailRestService;
 import org.camunda.bpm.engine.rest.history.HistoricIdentityLinkLogRestService;
 import org.camunda.bpm.engine.rest.history.HistoricIncidentRestService;
@@ -60,6 +61,10 @@ public class HistoryRestServiceImpl extends AbstractRestProcessEngineAware imple
 
   public HistoricActivityStatisticsRestService getActivityStatisticsService() {
     return new HistoricActivityStatisticsRestServiceImpl(getProcessEngine());
+  }
+
+  public HistoricDecisionStatisticsRestService getDecisionStatisticsService() {
+    return new HistoricDecisionStatisticsRestServiceImpl(getProcessEngine());
   }
 
   public HistoricCaseActivityStatisticsRestService getCaseActivityStatisticsService() {

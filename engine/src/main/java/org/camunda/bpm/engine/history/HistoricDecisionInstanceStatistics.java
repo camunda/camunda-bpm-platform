@@ -1,3 +1,4 @@
+
 /*
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -13,20 +14,20 @@
  *
  */
 
-package org.camunda.bpm.engine.management;
-
-import org.camunda.bpm.engine.query.Query;
+package org.camunda.bpm.engine.history;
 
 /**
  * @author Askar Akhmerov
  */
-public interface DecisionDefinitionStatisticsQuery extends Query<DecisionDefinitionStatisticsQuery, DecisionDefinitionStatistics> {
+public interface HistoricDecisionInstanceStatistics {
 
   /**
-   * Restrict query results to be based only on specified decision instance id
-   *
-   * @param decisionInstanceId - decision instance based on which constraint will be applied
-   * @return - query object to execute
+   * @return count of decision definition evaluations
    */
-  DecisionDefinitionStatisticsQuery decisionInstanceId(String decisionInstanceId);
+  int getEvaluations();
+
+  /**
+   * @return key of decision definition
+   */
+  String getDecisionDefinitionKey();
 }

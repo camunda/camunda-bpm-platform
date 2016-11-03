@@ -13,22 +13,12 @@
 
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-import org.camunda.bpm.engine.management.DecisionDefinitionStatistics;
+import org.camunda.bpm.engine.history.HistoricDecisionInstanceStatistics;
 
-public class DecisionDefinitionStatisticsImpl implements DecisionDefinitionStatistics {
+public class DecisionInstanceStatisticsImpl implements HistoricDecisionInstanceStatistics {
 
   protected int evaluations;
-  protected String decisionDefinitionId;
   protected String decisionDefinitionKey;
-
-  @Override
-  public String getDecisionDefinitionId() {
-    return this.decisionDefinitionId;
-  }
-
-  public void setDecisionDefinitionId(String decisionDefinitionId) {
-    this.decisionDefinitionId = decisionDefinitionId;
-  }
 
   @Override
   public int getEvaluations() {

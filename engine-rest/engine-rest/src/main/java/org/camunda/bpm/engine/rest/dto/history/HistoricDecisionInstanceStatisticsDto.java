@@ -13,26 +13,17 @@
  *
  */
 
-package org.camunda.bpm.engine.rest.dto.dmn;
+package org.camunda.bpm.engine.rest.dto.history;
 
-import org.camunda.bpm.engine.management.DecisionDefinitionStatistics;
+import org.camunda.bpm.engine.history.HistoricDecisionInstanceStatistics;
 
 /**
  * @author Askar Akhmerov
  */
-public class DecisionDefinitionStatisticsDto {
+public class HistoricDecisionInstanceStatisticsDto {
 
-  protected String decisionDefinitionId;
   protected String decisionDefinitionKey;
   protected int evaluations;
-
-  public String getDecisionDefinitionId() {
-    return decisionDefinitionId;
-  }
-
-  public void setDecisionDefinitionId(String decisionDefinitionId) {
-    this.decisionDefinitionId = decisionDefinitionId;
-  }
 
   public int getEvaluations() {
     return evaluations;
@@ -50,9 +41,8 @@ public class DecisionDefinitionStatisticsDto {
     this.decisionDefinitionKey = decisionDefinitionKey;
   }
 
-  public static DecisionDefinitionStatisticsDto fromDecisionDefinitionStatistics(DecisionDefinitionStatistics stats) {
-    DecisionDefinitionStatisticsDto instance = new DecisionDefinitionStatisticsDto();
-    instance.setDecisionDefinitionId(stats.getDecisionDefinitionId());
+  public static HistoricDecisionInstanceStatisticsDto fromDecisionDefinitionStatistics(HistoricDecisionInstanceStatistics stats) {
+    HistoricDecisionInstanceStatisticsDto instance = new HistoricDecisionInstanceStatisticsDto();
     instance.setEvaluations(stats.getEvaluations());
     instance.setDecisionDefinitionKey(stats.getDecisionDefinitionKey());
     return instance;

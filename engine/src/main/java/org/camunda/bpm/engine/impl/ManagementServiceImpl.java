@@ -55,7 +55,6 @@ import org.camunda.bpm.engine.impl.management.UpdateJobDefinitionSuspensionState
 import org.camunda.bpm.engine.impl.management.UpdateJobSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.impl.metrics.MetricsQueryImpl;
 import org.camunda.bpm.engine.management.ActivityStatisticsQuery;
-import org.camunda.bpm.engine.management.DecisionDefinitionStatisticsQuery;
 import org.camunda.bpm.engine.management.DeploymentStatisticsQuery;
 import org.camunda.bpm.engine.management.JobDefinitionQuery;
 import org.camunda.bpm.engine.management.MetricsQuery;
@@ -478,11 +477,6 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
 
   public BatchStatisticsQuery createBatchStatisticsQuery() {
     return new BatchStatisticsQueryImpl(commandExecutor);
-  }
-
-  @Override
-  public DecisionDefinitionStatisticsQuery createDecisionRequirementsDefinitionStatisticsQuery(String decisionRequirementsDefinitionId) {
-    return new DecisionDefinitionStatisticsQueryImpl(decisionRequirementsDefinitionId, commandExecutor);
   }
 
 }

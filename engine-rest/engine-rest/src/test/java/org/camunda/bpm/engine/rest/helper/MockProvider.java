@@ -57,6 +57,7 @@ import org.camunda.bpm.engine.history.HistoricCaseActivityStatistics;
 import org.camunda.bpm.engine.history.HistoricCaseInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInputInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
+import org.camunda.bpm.engine.history.HistoricDecisionInstanceStatistics;
 import org.camunda.bpm.engine.history.HistoricDecisionOutputInstance;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricFormField;
@@ -729,6 +730,7 @@ public abstract class MockProvider {
   public static final String ANOTHER_EXAMPLE_DECISION_DEFINITION_ID = "anotherDecisionDefinitionId";
   public static final String EXAMPLE_DECISION_DEFINITION_ID_LIST = EXAMPLE_DECISION_DEFINITION_ID + "," + ANOTHER_EXAMPLE_DECISION_DEFINITION_ID;
   public static final String EXAMPLE_DECISION_DEFINITION_KEY = "aDecisionDefinitionKey";
+  public static final String ANOTHER_DECISION_DEFINITION_KEY = "anotherDecisionDefinitionKey";
   public static final String EXAMPLE_DECISION_DEFINITION_KEY_IN = "aDecisionDefinitionKey,anotherDecisionDefinitionKey";
   public static final int EXAMPLE_DECISION_DEFINITION_VERSION = 1;
   public static final String EXAMPLE_DECISION_DEFINITION_CATEGORY = "aDecisionDefinitionCategory";
@@ -742,6 +744,7 @@ public abstract class MockProvider {
 
   // decision requirement definition
   public static final String EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_ID = "aDecisionRequirementsDefinitionId";
+  public static final String EXAMPLE_DECISION_INSTANCE_ID = "aDecisionInstanceId";
   public static final String ANOTHER_EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_ID = "anotherDecisionRequirementsDefinitionId";
   public static final String EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_ID_LIST = EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_ID + "," + ANOTHER_EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_ID;
   public static final String EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_KEY = "aDecisionRequirementsDefinitionKey";
@@ -2935,5 +2938,24 @@ public abstract class MockProvider {
     list.add(createMessageCorrelationResult(type));
     list.add(createMessageCorrelationResult(type));
     return list;
+  }
+
+  public static List<HistoricDecisionInstanceStatistics> createMockHistoricDecisionStatistics() {
+    HistoricDecisionInstanceStatistics statistics = mock(HistoricDecisionInstanceStatistics.class);
+
+    when(statistics.getDecisionDefinitionKey()).thenReturn(EXAMPLE_DECISION_DEFINITION_KEY);
+    when(statistics.getEvaluations()).thenReturn(1);
+
+
+    HistoricDecisionInstanceStatistics anotherStatistics = mock(HistoricDecisionInstanceStatistics.class);
+
+    when(anotherStatistics.getDecisionDefinitionKey()).thenReturn(ANOTHER_DECISION_DEFINITION_KEY);
+    when(anotherStatistics.getEvaluations()).thenReturn(2);
+
+    List<HistoricDecisionInstanceStatistics> decisionResults = new ArrayList<HistoricDecisionInstanceStatistics>();
+    decisionResults.add(statistics);
+    decisionResults.add(anotherStatistics);
+
+    return decisionResults;
   }
 }

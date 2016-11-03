@@ -15,7 +15,7 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 
 import org.camunda.bpm.engine.batch.BatchStatistics;
 import org.camunda.bpm.engine.impl.ActivityStatisticsQueryImpl;
-import org.camunda.bpm.engine.impl.DecisionDefinitionStatisticsQueryImpl;
+import org.camunda.bpm.engine.impl.HistoricDecisionInstanceStatisticsQueryImpl;
 import org.camunda.bpm.engine.impl.DeploymentStatisticsQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.ProcessDefinitionStatisticsQueryImpl;
@@ -23,7 +23,7 @@ import org.camunda.bpm.engine.impl.batch.BatchStatisticsQueryImpl;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.management.ActivityStatistics;
-import org.camunda.bpm.engine.management.DecisionDefinitionStatistics;
+import org.camunda.bpm.engine.history.HistoricDecisionInstanceStatistics;
 import org.camunda.bpm.engine.management.DeploymentStatistics;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatistics;
 import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
@@ -112,18 +112,17 @@ public class StatisticsManager extends AbstractManager {
     }
   }
 
-  public long getStatisticsCountGroupedByDecisionRequirementsDefinition(DecisionDefinitionStatisticsQueryImpl decisionRequirementsDefinitionStatisticsQuery) {
+  public long getStatisticsCountGroupedByDecisionRequirementsDefinition(HistoricDecisionInstanceStatisticsQueryImpl decisionRequirementsDefinitionStatisticsQuery) {
     configureQuery(decisionRequirementsDefinitionStatisticsQuery);
     return (Long) getDbEntityManager().selectOne("selectDecisionDefinitionStatisticsCount", decisionRequirementsDefinitionStatisticsQuery);
   }
 
-  protected void configureQuery(DecisionDefinitionStatisticsQueryImpl decisionRequirementsDefinitionStatisticsQuery) {
+  protected void configureQuery(HistoricDecisionInstanceStatisticsQueryImpl decisionRequirementsDefinitionStatisticsQuery) {
     checkReadDecisionRequirementsDefinition(decisionRequirementsDefinitionStatisticsQuery);
-    getAuthorizationManager().configureDecisionRequirementsDefinitionStatisticsQuery(decisionRequirementsDefinitionStatisticsQuery);
     getTenantManager().configureQuery(decisionRequirementsDefinitionStatisticsQuery);
   }
 
-  protected void checkReadDecisionRequirementsDefinition(DecisionDefinitionStatisticsQueryImpl query) {
+  protected void checkReadDecisionRequirementsDefinition(HistoricDecisionInstanceStatisticsQueryImpl query) {
     CommandContext commandContext = getCommandContext();
     if (isAuthorizationEnabled() && getCurrentAuthentication() != null && commandContext.isAuthorizationCheckEnabled()) {
       String decisionRequirementsDefinitionId = query.getDecisionRequirementsDefinitionId();
@@ -133,7 +132,7 @@ public class StatisticsManager extends AbstractManager {
     }
   }
 
-  public List<DecisionDefinitionStatistics> getStatisticsGroupedByDecisionRequirementsDefinition(DecisionDefinitionStatisticsQueryImpl query, Page page) {
+  public List<HistoricDecisionInstanceStatistics> getStatisticsGroupedByDecisionRequirementsDefinition(HistoricDecisionInstanceStatisticsQueryImpl query, Page page) {
     configureQuery(query);
     return getDbEntityManager().selectList("selectDecisionDefinitionStatistics", query, page);
   }
