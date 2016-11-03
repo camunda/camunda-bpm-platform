@@ -12,11 +12,6 @@
  */
 package org.camunda.bpm.qa.performance.engine.query;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Properties;
-
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.model.bpmn.Bpmn;
@@ -29,6 +24,10 @@ import org.camunda.bpm.qa.performance.engine.loadgenerator.tasks.DeployModelInst
 import org.camunda.bpm.qa.performance.engine.loadgenerator.tasks.GenerateMetricsTask;
 import org.camunda.bpm.qa.performance.engine.loadgenerator.tasks.StartProcessInstanceTask;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+
 /**
  * @author Daniel Meyer
  *
@@ -39,6 +38,7 @@ public class DefaultLoadGenerator {
    * The reported ID for the metrics.
    */
   protected static final String REPORTER_ID = "REPORTER_ID";
+  protected static final int NUMBER_OF_PROCESSES = 999;
 
   public static void main(String[] args) throws InterruptedException {
 
@@ -49,33 +49,21 @@ public class DefaultLoadGenerator {
     config.setColor(Boolean.parseBoolean(properties.getProperty("loadGenerator.colorOutput", "false")));
     config.setNumberOfIterations(Integer.parseInt(properties.getProperty("loadGenerator.numberOfIterations", "10000")));
 
-    final List<BpmnModelInstance> modelInstances = createProcesses();
+    final List<BpmnModelInstance> modelInstances = createProcesses(config.getNumberOfIterations());
 
     Runnable[] setupTasks = new Runnable[] {
         new DeployModelInstancesTask(processEngine, modelInstances)
     };
     config.setSetupTasks(setupTasks);
 
-    // auto start all bpmn processes
-    List<String> keys = new ArrayList<String>();
-    for (BpmnModelInstance instance : modelInstances) {
-      Collection<Process> processes = instance.getModelElementsByType(Process.class);
-      for (Process process : processes) {
-        if(process.isExecutable()) {
-          keys.add(process.getId());
-        }
-      }
-    }
-
-
     ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
     processEngineConfiguration.setMetricsEnabled(true);
     processEngineConfiguration.getDbMetricsReporter().setReporterId(REPORTER_ID);
-    final Runnable[] workerRunnables = new Runnable[keys.size()+1];
-    for (int i = 0; i < keys.size(); i++) {
-      workerRunnables[i] = new StartProcessInstanceTask(processEngine, keys.get(i));
-    }
-    workerRunnables[keys.size()] = new GenerateMetricsTask(processEngine);
+    final Runnable[] workerRunnables = new Runnable[2];
+    Process process = modelInstances.get(0).getModelElementsByType(Process.class).iterator().next();
+    String processDefKey = process.getId();
+    workerRunnables[0] = new StartProcessInstanceTask(processEngine, processDefKey);
+    workerRunnables[1] = new GenerateMetricsTask(processEngine);
     config.setWorkerTasks(workerRunnables);
 
     new LoadGenerator(config).execute();
@@ -84,13 +72,24 @@ public class DefaultLoadGenerator {
     processEngineConfiguration.setMetricsEnabled(false);
   }
 
-  static List<BpmnModelInstance> createProcesses() {
+  static List<BpmnModelInstance> createProcesses(int numberOfProcesses) {
 
-    List<BpmnModelInstance> result = new ArrayList<BpmnModelInstance>();
+    List<BpmnModelInstance> result = new ArrayList<BpmnModelInstance>(numberOfProcesses);
 
-    result.add(Bpmn.createExecutableProcess("process1").startEvent().userTask().camundaAssignee("demo").endEvent().done());
-
+    System.out.println("Number of Processes: " + numberOfProcesses);
+    for(int i=0; i<NUMBER_OF_PROCESSES; i++) {
+      result.add(createProcess(i));
+    }
     return result;
+  }
+
+  protected static BpmnModelInstance createProcess(int id){
+    return Bpmn.createExecutableProcess("process"+id)
+                  .startEvent()
+                  .userTask()
+                    .camundaAssignee("demo")
+                  .endEvent()
+                .done();
   }
 
 }
