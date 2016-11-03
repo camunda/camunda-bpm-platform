@@ -1204,4 +1204,17 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
     tasksAfterVariableIsSet = taskService.createTaskQuery().list();
     assertEquals(4, tasksAfterVariableIsSet.size());
   }
+
+  @Test
+  @Deployment
+  public void testNonInterruptingSetMultipleVariableInDelegate()
+  {
+    // when
+    runtimeService.startProcessInstanceByKey("process");
+
+    // then
+    tasksAfterVariableIsSet = taskService.createTaskQuery().list();
+    assertEquals(5, tasksAfterVariableIsSet.size());
+    assertEquals(3, taskService.createTaskQuery().taskDefinitionKey("Task_3").count());
+  }
 }

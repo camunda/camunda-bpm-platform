@@ -1911,15 +1911,14 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     Map<PvmExecutionImpl, String> activityIds = new HashMap<PvmExecutionImpl, String>();
     initActivityIds(delayedEvents, activityInstanceIds, activityIds);
 
-    //on first delayed variable event we have to use the target scope for current and last activity instance id
-    DelayedVariableEvent firstDelayedVariableEvent = delayedEvents.remove(0);
-    PvmExecutionImpl targetScope = getTargetScope(firstDelayedVariableEvent);
-    dispatchOnSameActivity(targetScope, targetScope, activityIds, activityInstanceIds, firstDelayedVariableEvent);
-
-    //on each following event we have to use the replace pointer if exist (for multiple variable setting)
-    //to get the current activity instance id
+    //For each delayed variable event we have to check if the delayed event can be dispatched,
+    //the check will be done with the help of the activity id and activity instance id.
+    //That means it will be checked if the dispatching changed the execution tree in a way that we can't dispatch the
+    //the other delayed variable events. We have to check the target scope with the last activity id and activity instance id
+    //and also the replace pointer if it exist. Because on concurrency the replace pointer will be set on which we have
+    //to check the latest state.
     for (DelayedVariableEvent event : delayedEvents) {
-      targetScope = getTargetScope(event);
+      PvmExecutionImpl targetScope = getTargetScope(event);
       PvmExecutionImpl replaced = targetScope.getReplacedBy() != null ? targetScope.getReplacedBy() : targetScope;
       dispatchOnSameActivity(targetScope, replaced, activityIds, activityInstanceIds, event);
 
@@ -1960,16 +1959,26 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
                                       Map<PvmExecutionImpl, String> activityIds,
                                       Map<PvmExecutionImpl, String> activityInstanceIds,
                                       DelayedVariableEvent delayedVariableEvent) {
-    String currentActivityInstanceId = getActivityInstanceId(replacedBy);
-    String currentActivityId = replacedBy.getActivityId();
+    //check if the target scope has the same activity id and activity instance id
+    //since the dispatching was started
+    String currentActivityInstanceId = getActivityInstanceId(targetScope);
+    String currentActivityId = targetScope.getActivityId();
 
     final String lastActivityInstanceId = activityInstanceIds.get(targetScope);
     final String lastActivityId = activityIds.get(targetScope);
 
+    boolean onSameAct = isOnSameActivity(lastActivityInstanceId, lastActivityId, currentActivityInstanceId, currentActivityId);
+
+    //If not we have to check the replace pointer,
+    //which was set if a concurrent execution was created during the dispatching.
+    if (targetScope != replacedBy && !onSameAct) {
+      currentActivityInstanceId = getActivityInstanceId(replacedBy);
+      currentActivityId = replacedBy.getActivityId();
+      onSameAct = isOnSameActivity(lastActivityInstanceId, lastActivityId, currentActivityInstanceId, currentActivityId);
+    }
+
     //dispatching
-    if (isOnSameActivity(lastActivityInstanceId, lastActivityId,
-      currentActivityInstanceId, currentActivityId)
-      && isOnDispatchableState(targetScope))
+    if (onSameAct && isOnDispatchableState(targetScope))
     {
       targetScope.dispatchEvent(delayedVariableEvent.getEvent());
     }
@@ -2046,7 +2055,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
       return targetScope.getActivityInstanceId();
     } else {
       ActivityImpl targetActivity = targetScope.getActivity();
-      if (targetActivity != null && targetActivity.getActivities().isEmpty()) {
+      if ((targetActivity != null && targetActivity.getActivities().isEmpty()) || targetScope.getActivityInstanceId() != null) {
         return targetScope.getActivityInstanceId();
       } else {
         return targetScope.getParentActivityInstanceId();

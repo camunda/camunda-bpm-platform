@@ -52,8 +52,6 @@ public class ConditionalEventTriggeredByExecutionListenerTest extends AbstractCo
     BpmnModelInstance specifyConditionalProcess(BpmnModelInstance modelInstance, boolean isInterrupting);
 
     String expectedActivityName();
-
-    int expectedSubscriptions();
   }
 
   @Parameterized.Parameters(name = "{index}: {0}")
@@ -80,11 +78,6 @@ public class ConditionalEventTriggeredByExecutionListenerTest extends AbstractCo
         @Override
         public String expectedActivityName() {
           return TASK_AFTER_CONDITION;
-        }
-
-        @Override
-        public int expectedSubscriptions() {
-          return 1;
         }
 
         @Override
@@ -125,11 +118,6 @@ public class ConditionalEventTriggeredByExecutionListenerTest extends AbstractCo
         @Override
         public String expectedActivityName() {
           return TASK_AFTER_CONDITIONAL_START_EVENT;
-        }
-
-        @Override
-        public int expectedSubscriptions() {
-          return 2;
         }
 
         @Override
