@@ -232,4 +232,24 @@ public class FormDataTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/form/FormDataTest.testDoubleQuotesAreEscapedInGeneratedTaskForms.bpmn20.xml")
+  public void testDoubleQuotesAreEscapedInGeneratedTaskForms() {
+
+    // given
+    HashMap<String, Object> variables = new HashMap<String, Object>();
+    variables.put("foo", "This is a \"Test\" message!");
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
+    Task taskWithForm = taskService.createTaskQuery().singleResult();
+
+    // when
+    Object renderedStartForm = formService.getRenderedTaskForm(taskWithForm.getId());
+    assertTrue(renderedStartForm instanceof String);
+
+    // then
+    String renderedForm = (String) renderedStartForm;
+    String expectedFormValueWithEscapedQuotes = "This is a &quot;Test&quot; message!";
+    assertTrue(renderedForm.contains(expectedFormValueWithEscapedQuotes));
+
+  }
+
 }
