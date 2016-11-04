@@ -5,6 +5,9 @@ var $ = window.jQuery = window.$ = require('jquery');
 var commons = require('camunda-commons-ui/lib');
 var sdk = require('camunda-commons-ui/vendor/camunda-bpm-sdk-angular');
 var dataDepend = require('angular-data-depend');
+var camCommon = require('../../../common/scripts/module');
+var moment = require('camunda-commons-ui/vendor/moment');
+var events = require('events');
 
 require('../../../common/scripts/module');
 
@@ -108,9 +111,9 @@ module.exports.exposePackages = function(container) {
   container['camunda-commons-ui'] = commons;
   container['camunda-bpm-sdk-js'] = sdk;
   container['angular-data-depend'] = dataDepend;
-  container['moment'] = require('camunda-commons-ui/vendor/moment');
-  container['events'] = require('events');
-  container['cam-common'] = require('../../../common/scripts/module');
+  container['moment'] = moment;
+  container['events'] = events;
+  container['cam-common'] = camCommon;
 };
 
 

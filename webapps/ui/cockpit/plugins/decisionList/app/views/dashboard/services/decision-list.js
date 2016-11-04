@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = [
-  '$q', 'promisifiedCamAPI',
+  '$q', 'camAPI',
   function($q, camAPI) {
     var decisionDefinitionService = camAPI.resource('decision-definition');
     var drdService = camAPI.resource('drd');

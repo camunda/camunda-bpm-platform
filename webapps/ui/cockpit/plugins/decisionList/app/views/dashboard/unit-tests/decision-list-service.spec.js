@@ -13,19 +13,19 @@ var inject = angular.mock.inject;
 
 describe('cockpit.plugin.decisionList.views.dashboard decisionList service', function() {
   var decisionList;
-  var promisifiedCamAPI;
+  var camAPI;
   var $rootScope;
   var $q;
 
   beforeEach(module(testModule.name));
 
   beforeEach(module(function($provide) {
-    promisifiedCamAPI = {
+    camAPI = {
       list: sinon.stub(),
       resource: sinon.stub().returnsThis()
     };
 
-    $provide.value('promisifiedCamAPI', promisifiedCamAPI);
+    $provide.value('camAPI', camAPI);
   }));
 
   beforeEach(inject(function(_decisionList_, _$rootScope_, _$q_) {
@@ -35,8 +35,8 @@ describe('cockpit.plugin.decisionList.views.dashboard decisionList service', fun
   }));
 
   it('should use decision-definition and drd resources of camAPI', function() {
-    expect(promisifiedCamAPI.resource.calledWith('drd')).to.eql(true);
-    expect(promisifiedCamAPI.resource.calledWith('decision-definition')).to.eql(true);
+    expect(camAPI.resource.calledWith('drd')).to.eql(true);
+    expect(camAPI.resource.calledWith('decision-definition')).to.eql(true);
   });
 
   describe('getDecisionsLists', function() {
@@ -62,8 +62,8 @@ describe('cockpit.plugin.decisionList.views.dashboard decisionList service', fun
         }
       ];
 
-      promisifiedCamAPI.list.onCall(0).returns($q.when(mockDecisions));
-      promisifiedCamAPI.list.onCall(1).returns($q.when(mockDrds));
+      camAPI.list.onCall(0).returns($q.when(mockDecisions));
+      camAPI.list.onCall(1).returns($q.when(mockDrds));
 
       responsePromise = decisionList.getDecisionsLists();
     });
