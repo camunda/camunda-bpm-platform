@@ -1,5 +1,6 @@
 'use strict';
 
+var abbreviateNumber = require('./../filters/abbreviateNumber.js')();
 var throttle = require('lodash').throttle;
 var moment = require('moment');
 
@@ -127,7 +128,7 @@ proto.setData = function(data, newTimespan, newInterval) {
 
   this.valueLabels = [];
   for (var l = this.valueLabelsCount; l >= 0; l--) {
-    this.valueLabels.push((l * rounded) / this.valueLabelsCount);
+    this.valueLabels.push(abbreviateNumber((l * rounded) / this.valueLabelsCount) || 0);
   }
 
 
@@ -220,7 +221,7 @@ proto.draw = function() {
   ctx.font = fontSize + 'px Arial';
 
   valueLabels.forEach(function(l) {
-    verticalScaleX = Math.max(verticalScaleX, ctx.measureText(l).width + (textPadding * 2) + tickSize);
+    verticalScaleX = Math.max(verticalScaleX, ctx.measureText((l) || '0').width + (textPadding * 2) + tickSize);
   });
   verticalScaleX = Math.round(Math.max(verticalScaleX, tickSize + textPadding)) + 0.5;
 
@@ -306,7 +307,7 @@ proto.draw = function() {
   ctx.textBaseline = 'middle';
   for (c = 0; c < valueLabels.length; c++) {
     var ty = Math.round(padding + (step * c)) - 0.5;
-    ctx.fillText(valueLabels[c], verticalScaleX - (tickSize + textPadding), ty);
+    ctx.fillText(abbreviateNumber(valueLabels[c]) || 0, verticalScaleX - (tickSize + textPadding), ty);
 
     if (c < valueLabels.length - 1) {
       ctx.beginPath();
@@ -323,7 +324,8 @@ proto.draw = function() {
   var labelDiff = labelTo - labelFrom;
   var interval = this.interval;
 
-  var rounded = this.valueLabels[0];
+  var max = this.max();
+  var rounded = roundUp(max, this.valueLabelsCount);
   function pxFromTop(val) {
     return (innerH - ((innerH / rounded) * val)) + padding;
   }
