@@ -142,5 +142,23 @@
     <servlet-name>Engine Api</servlet-name>
     <url-pattern>/api/engine/*</url-pattern>
   </servlet-mapping>
+  
+  <!-- welcome rest api -->
+  <servlet>
+    <servlet-name>Welcome Api</servlet-name>
+    <servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
+    <init-param>
+      <param-name>javax.ws.rs.Application</param-name>
+      <param-value>org.camunda.bpm.welcome.impl.web.WelcomeApplication</param-value>
+    </init-param>
+    <init-param>
+      <param-name>resteasy.servlet.mapping.prefix</param-name>
+      <param-value>/api/welcome</param-value>
+    </init-param>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>Welcome Api</servlet-name>
+    <url-pattern>/api/welcome/*</url-pattern>
+  </servlet-mapping>
 
 </web-app>
