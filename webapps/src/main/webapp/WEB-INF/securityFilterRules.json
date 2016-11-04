@@ -4,7 +4,8 @@
       { "path": "/api/engine/.*", "methods" : "*" },
       { "path": "/api/cockpit/.*", "methods" : "*" },
       { "path": "/app/tasklist/{engine}/.*", "methods" : "*" },
-      { "path": "/app/cockpit/{engine}/.*", "methods" : "*" }
+      { "path": "/app/cockpit/{engine}/.*", "methods" : "*" },
+      { "path": "/app/welcome/{engine}/.*", "methods" : "*" }
     ],
     "allowedPaths" : [
       { "path": "/api/engine/engine/", "methods" : "GET" },
@@ -12,7 +13,8 @@
       { "path": "/api/{app:cockpit}/plugin/{plugin}/{engine}/.*", "methods" : "*", "authorizer" : "org.camunda.bpm.webapp.impl.security.filter.EngineRequestAuthorizer" },
       { "path": "/api/engine/engine/{engine}/.*", "methods" : "*", "authorizer" : "org.camunda.bpm.webapp.impl.security.filter.EngineRequestAuthorizer" },
       { "path": "/app/{app:cockpit}/{engine}/.*", "methods" : "*", "authorizer" : "org.camunda.bpm.webapp.impl.security.filter.ApplicationRequestAuthorizer" },
-      { "path": "/app/{app:tasklist}/{engine}/.*", "methods" : "*", "authorizer" : "org.camunda.bpm.webapp.impl.security.filter.ApplicationRequestAuthorizer" }
+      { "path": "/app/{app:tasklist}/{engine}/.*", "methods" : "*", "authorizer" : "org.camunda.bpm.webapp.impl.security.filter.ApplicationRequestAuthorizer" },
+      { "path": "/app/{app:welcome}/{engine}/.*", "methods" : "*", "authorizer" : "org.camunda.bpm.webapp.impl.security.filter.ApplicationRequestAuthorizer" }
     ]
   }
 }
