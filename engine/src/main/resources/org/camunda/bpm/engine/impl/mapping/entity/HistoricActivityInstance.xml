@@ -136,7 +136,7 @@
   <select id="selectHistoricActivityInstancesByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricActivityInstanceQueryImpl" resultMap="historicActivityInstanceResultMap">
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select RES.*
+    select ${distinct} RES.*
     ${limitBetween}
     <include refid="selectHistoricActivityInstancesByQueryCriteriaSql"/>
     ${orderBy}
@@ -144,23 +144,16 @@
   </select>
 
   <select id="selectHistoricActivityInstanceCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricActivityInstanceQueryImpl" resultType="long">
-    select count(*)
+    select count(distinct RES.ID_)
     <include refid="selectHistoricActivityInstancesByQueryCriteriaSql"/>
   </select>
 
   <sql id="selectHistoricActivityInstancesByQueryCriteriaSql">
     from ${prefix}ACT_HI_ACTINST RES
 
-    <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
-      INNER JOIN (
-        SELECT
-            SELF.PROC_DEF_KEY_ AS KEY_
-        FROM
-            (SELECT DISTINCT DKEYS.PROC_DEF_KEY_ from ${prefix}ACT_HI_ACTINST DKEYS) SELF
-        WHERE
-            <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.querySingleAuthorizationCheck" />
-      ) AUTH
-      ON AUTH.KEY_ = RES.PROC_DEF_KEY_
+    <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause"/>
+      AUTH ON (AUTH.RESOURCE_ID_ in (RES.PROC_DEF_KEY_, '*'))
     </if>
 
     <where>
@@ -217,7 +210,8 @@
         </foreach>
       </if>
 
-      <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck"/>
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck"/>
 
     </where>
   </sql>
