@@ -2,8 +2,6 @@
 
 var angular = require('camunda-commons-ui/vendor/angular');
 
-var promisify = require('./services/promisify');
-var promisifiedCamAPI = require('./services/promisified-cam-api');
 var isModuleAvailable = require('./services/is-module-available');
 var exposeScopeProperties = require('./services/expose-scope-properties');
 
@@ -30,8 +28,6 @@ var searchWidgetUtils = require('../util/search-widget-utils');
 var ngModule = angular.module('cam-common', []);
 
 // Services
-ngModule.factory('promisify', promisify);
-ngModule.factory('promisifiedCamAPI', promisifiedCamAPI);
 ngModule.factory('isModuleAvailable', isModuleAvailable);
 ngModule.factory('exposeScopeProperties', exposeScopeProperties);
 

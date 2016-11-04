@@ -1,7 +1,8 @@
 <section ng-if="isDrdAvailable">
   <div class="inner">
     <header>
-      <h1 class="section-title">{{drdsCount}} decision {{ (drdsCount > 1 ? 'requirements' : 'requirement') }}  deployed</h1>
+      <h1 class="section-title">{{drdsCount}} decision requirements
+        {{ (drdsCount > 1 ? 'definitions' : 'definition') }} deployed</h1>
     </header>
 
     <table class="drd-definitions-list cam-table" ng-if="drdsCount">

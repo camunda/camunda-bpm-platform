@@ -10,7 +10,8 @@
           "key": "eq",
           "value": "="
         }
-      ]
+      ],
+      "default": true
     },
     {
       "id": {

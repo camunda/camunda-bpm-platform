@@ -1,7 +1,7 @@
 <section>
   <div class="inner">
     <header>
-      <h1 class="section-title">{{decisionCount}} decision {{ (decisionCount > 1 ? 'tables' : 'table') }}  deployed</h1>
+      <h1 class="section-title">{{decisionCount}} decision {{ (decisionCount > 1 ? 'definitions' : 'definition') }}  deployed</h1>
     </header>
 
     <table class="decision-definitions-list cam-table"
@@ -10,7 +10,7 @@
       <tr>
         <th class="name">Name</th>
         <th class="tenant-id">Tenant ID</th>
-        <th class="tenant-id" ng-if="isDrdAvailable">Decision Requirement Definition</th>
+        <th class="tenant-id" ng-if="isDrdAvailable">Decision Requirements Definition</th>
       </tr>
       </thead>
 

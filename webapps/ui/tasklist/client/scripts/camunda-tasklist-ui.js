@@ -8,6 +8,7 @@ require('angular-data-depend');
 
 var angular = require('camunda-commons-ui/vendor/angular');
 var dataDepend = require('angular-data-depend');
+var camCommon = require('../../../common/scripts/module');
 
   /**
    * @namespace cam
@@ -111,7 +112,7 @@ module.exports.exposePackages = function(container) {
   container['camunda-commons-ui'] = commons;
   container['camunda-bpm-sdk-js'] = sdk;
   container['angular-data-depend'] = dataDepend;
-  container['cam-common'] = require('../../../common/scripts/module');
+  container['cam-common'] = camCommon;
 };
 
   /* live-reload
