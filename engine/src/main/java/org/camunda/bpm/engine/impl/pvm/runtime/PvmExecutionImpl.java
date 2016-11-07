@@ -1802,11 +1802,22 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
    */
   protected transient List<DelayedVariableEvent> delayedEvents = new ArrayList<DelayedVariableEvent>();
 
+  /**
+   * Delays a given variable event with the given target scope.
+   *
+   * @param targetScope the target scope of the variable event
+   * @param variableEvent the variable event which should be delayed
+   */
   public void delayEvent(PvmExecutionImpl targetScope, VariableEvent variableEvent) {
     DelayedVariableEvent delayedVariableEvent = new DelayedVariableEvent(targetScope, variableEvent);
     delayEvent(delayedVariableEvent);
   }
 
+  /**
+   * Delays and stores the given DelayedVariableEvent on the process instance.
+   *
+   * @param delayedVariableEvent the DelayedVariableEvent which should be store on the process instance
+   */
   public void delayEvent(DelayedVariableEvent delayedVariableEvent) {
     if (isProcessInstanceExecution()) {
       delayedEvents.add(delayedVariableEvent);
@@ -1815,6 +1826,11 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     }
   }
 
+  /**
+   * The current delayed variable events.
+   *
+   * @return a list of DelayedVariableEvent objects
+   */
   public List<DelayedVariableEvent> getDelayedEvents() {
     if (isProcessInstanceExecution()) {
       return delayedEvents;
@@ -1822,6 +1838,9 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     return getProcessInstance().getDelayedEvents();
   }
 
+  /**
+   * Cleares the current delayed variable events.
+   */
   public void clearDelayedEvents() {
     if (isProcessInstanceExecution()) {
       delayedEvents.clear();
@@ -1830,6 +1849,12 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     }
   }
 
+  /**
+   * Dispatches the current delayed variable events and performs the given atomic operation
+   * if the current state was not changed.
+   *
+   * @param atomicOperation the atomic operation which should be executed
+   */
   public void dispatchDelayedEventsAndPerformOperation(final PvmAtomicOperation atomicOperation) {
     dispatchDelayedEventsAndPerformOperation(new PvmAtomicOperationContinuation() {
 
@@ -1840,6 +1865,12 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     });
   }
 
+  /**
+   * Dispatches the current delayed variable events and performs the given atomic operation
+   * if the current state was not changed.
+   *
+   * @param continuation the atomic operation continuation which should be executed
+   */
   public void dispatchDelayedEventsAndPerformOperation(PvmAtomicOperationContinuation continuation) {
     PvmExecutionImpl execution = this;
 
@@ -1862,15 +1893,48 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   }
 
 
-
+  /**
+   * Dispatches the current delayed variable events on the scope of the given execution.
+   *
+   * @param execution the execution on which scope the delayed variable should be dispatched
+   */
   protected void dispatchScopeEvents(PvmExecutionImpl execution) {
     PvmExecutionImpl scopeExecution = execution.isScope() ? execution : execution.getParent();
 
     List<DelayedVariableEvent> delayedEvents = new ArrayList<DelayedVariableEvent>(scopeExecution.getDelayedEvents());
     scopeExecution.clearDelayedEvents();
+    if (delayedEvents.isEmpty()) {
+      return;
+    }
 
     Map<PvmExecutionImpl, String> activityInstanceIds = new HashMap<PvmExecutionImpl, String>();
     Map<PvmExecutionImpl, String> activityIds = new HashMap<PvmExecutionImpl, String>();
+    initActivityIds(delayedEvents, activityInstanceIds, activityIds);
+
+    //on first delayed variable event we have to use the target scope for current and last activity instance id
+    DelayedVariableEvent firstDelayedVariableEvent = delayedEvents.remove(0);
+    PvmExecutionImpl targetScope = getTargetScope(firstDelayedVariableEvent);
+    dispatchOnSameActivity(targetScope, targetScope, activityIds, activityInstanceIds, firstDelayedVariableEvent);
+
+    //on each following event we have to use the replace pointer if exist (for multiple variable setting)
+    //to get the current activity instance id
+    for (DelayedVariableEvent event : delayedEvents) {
+      targetScope = getTargetScope(event);
+      PvmExecutionImpl replaced = targetScope.getReplacedBy() != null ? targetScope.getReplacedBy() : targetScope;
+      dispatchOnSameActivity(targetScope, replaced, activityIds, activityInstanceIds, event);
+    }
+  }
+
+  /**
+   * Initializes the given maps with the target scopes and current activity id's and activity instance id's.
+   *
+   * @param delayedEvents the delayed events which contains the information about the target scope
+   * @param activityInstanceIds the map which maps target scope to activity instance id
+   * @param activityIds the map which maps target scope to activity id
+   */
+  protected void initActivityIds(List<DelayedVariableEvent> delayedEvents,
+                                 Map<PvmExecutionImpl, String> activityInstanceIds,
+                                 Map<PvmExecutionImpl, String> activityIds) {
 
     for (DelayedVariableEvent event : delayedEvents) {
       PvmExecutionImpl targetScope = event.getTargetScope();
@@ -1879,23 +1943,34 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
       activityInstanceIds.put(targetScope, targetScopeActivityInstanceId);
       activityIds.put(targetScope, targetScope.getActivityId());
     }
+  }
 
-    for (DelayedVariableEvent event : delayedEvents) {
-      PvmExecutionImpl targetScope = getTargetScope(event);
+  /**
+   * Dispatches the delayed variable event, if the target scope and replaced by scope (if target scope was replaced) have the
+   * same activity Id's and activity instance id's.
+   *
+   * @param targetScope the target scope on which the event should be dispatched
+   * @param replacedBy the replaced by pointer which should have the same state
+   * @param activityIds the map which maps scope to activity id
+   * @param activityInstanceIds the map which maps scope to activity instance id
+   * @param delayedVariableEvent the delayed variable event which should be dispatched
+   */
+  private void dispatchOnSameActivity(PvmExecutionImpl targetScope, PvmExecutionImpl replacedBy,
+                                      Map<PvmExecutionImpl, String> activityIds,
+                                      Map<PvmExecutionImpl, String> activityInstanceIds,
+                                      DelayedVariableEvent delayedVariableEvent) {
+    String currentActivityInstanceId = getActivityInstanceId(replacedBy);
+    String currentActivityId = replacedBy.getActivityId();
 
-      String currentActivityInstanceId = getActivityInstanceId(targetScope);
-      String currentActivityId = targetScope.getActivityId();
+    final String lastActivityInstanceId = activityInstanceIds.get(targetScope);
+    final String lastActivityId = activityIds.get(targetScope);
 
-      final String lastActivityInstanceId = activityInstanceIds.get(targetScope);
-      final String lastActivityId = activityIds.get(targetScope);
-
-      //dispatching
-      if (isOnSameActivity(lastActivityInstanceId, lastActivityId,
-                           currentActivityInstanceId, currentActivityId)
-         && isOnDispatchableState(targetScope))
-      {
-        targetScope.dispatchEvent(event.getEvent());
-      }
+    //dispatching
+    if (isOnSameActivity(lastActivityInstanceId, lastActivityId,
+      currentActivityInstanceId, currentActivityId)
+      && isOnDispatchableState(targetScope))
+    {
+      targetScope.dispatchEvent(delayedVariableEvent.getEvent());
     }
   }
 

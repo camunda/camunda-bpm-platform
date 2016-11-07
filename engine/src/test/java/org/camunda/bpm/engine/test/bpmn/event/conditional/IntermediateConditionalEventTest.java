@@ -40,6 +40,11 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
  */
 public class IntermediateConditionalEventTest extends AbstractConditionalEventTestCase {
 
+  protected static final String EVENT_BASED_GATEWAY_ID = "egw";
+  protected static final String PARALLEL_GATEWAY_ID = "parallelGateway";
+  protected static final String TASK_BEFORE_SERVICE_TASK_ID = "taskBeforeServiceTask";
+  protected static final String TASK_BEFORE_EVENT_BASED_GW_ID = "taskBeforeEGW";
+
   @Override
   public void checkIfProcessCanBeFinished() {
     //override since check is not needed in intermediate test suite
@@ -504,7 +509,7 @@ public class IntermediateConditionalEventTest extends AbstractConditionalEventTe
     BpmnModelInstance modelInstance =
       Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
         .startEvent()
-        .eventBasedGateway()
+        .eventBasedGateway().id(EVENT_BASED_GATEWAY_ID)
         .intermediateCatchEvent(CONDITIONAL_EVENT)
           .conditionalEventDefinition()
           .condition(CONDITION_EXPR)
@@ -519,6 +524,11 @@ public class IntermediateConditionalEventTest extends AbstractConditionalEventTe
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
     TaskQuery taskQuery = taskService.createTaskQuery().processInstanceId(procInst.getId());
     assertEquals(1, conditionEventSubscriptionQuery.list().size());
+    Execution execution = runtimeService.createExecutionQuery()
+      .processInstanceId(procInst.getId())
+      .activityId(EVENT_BASED_GATEWAY_ID)
+      .singleResult();
+    assertNotNull(execution);
 
     //when variable is set on execution
     runtimeService.setVariable(procInst.getId(), VARIABLE_NAME, 1);
@@ -529,5 +539,221 @@ public class IntermediateConditionalEventTest extends AbstractConditionalEventTe
     assertEquals(0, conditionEventSubscriptionQuery.list().size());
   }
 
+  @Test
+  public void testEventBasedGatewayTrueCondition() {
+    BpmnModelInstance modelInstance =
+      Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
+        .startEvent()
+        .userTask(TASK_BEFORE_CONDITION_ID)
+        .name(TASK_BEFORE_CONDITION)
+        .eventBasedGateway()
+        .id(EVENT_BASED_GATEWAY_ID)
+        .intermediateCatchEvent(CONDITIONAL_EVENT)
+        .conditionalEventDefinition()
+        .condition(TRUE_CONDITION)
+        .conditionalEventDefinitionDone()
+        .userTask()
+        .name(TASK_AFTER_CONDITION)
+        .endEvent().done();
 
+    engine.manageDeployment(repositoryService.createDeployment().addModelInstance(CONDITIONAL_MODEL, modelInstance).deploy());
+
+    //given
+    ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
+    TaskQuery taskQuery = taskService.createTaskQuery().processInstanceId(procInst.getId());
+    Task task = taskQuery.singleResult();
+
+    //when task before condition is completed
+    taskService.complete(task.getId());
+
+    //then next wait state is on user task after conditional event, since condition was true
+    Execution execution = runtimeService.createExecutionQuery()
+      .processInstanceId(procInst.getId())
+      .activityId(EVENT_BASED_GATEWAY_ID)
+      .singleResult();
+    assertNull(execution);
+
+    task = taskQuery.singleResult();
+    assertNotNull(task);
+    assertEquals(TASK_AFTER_CONDITION, task.getName());
+  }
+
+
+  @Test
+  public void testEventBasedGatewayWith2ConditionsOneIsTrue() {
+    BpmnModelInstance modelInstance =
+      Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
+        .startEvent()
+        .userTask(TASK_BEFORE_CONDITION_ID)
+        .name(TASK_BEFORE_CONDITION)
+        .eventBasedGateway()
+        .id(EVENT_BASED_GATEWAY_ID)
+        .intermediateCatchEvent()
+        .conditionalEventDefinition()
+        .condition(CONDITION_EXPR)
+        .conditionalEventDefinitionDone()
+        .userTask()
+        .name(TASK_AFTER_CONDITION+1)
+        .endEvent()
+        .moveToLastGateway()
+        .intermediateCatchEvent(CONDITIONAL_EVENT)
+        .conditionalEventDefinition()
+        .condition(TRUE_CONDITION)
+        .conditionalEventDefinitionDone()
+        .userTask()
+        .name(TASK_AFTER_CONDITION+2)
+        .endEvent()
+        .done();
+
+    engine.manageDeployment(repositoryService.createDeployment().addModelInstance(CONDITIONAL_MODEL, modelInstance).deploy());
+
+    //given
+    ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
+    TaskQuery taskQuery = taskService.createTaskQuery().processInstanceId(procInst.getId());
+    Task task = taskQuery.singleResult();
+
+    //when task before condition is completed
+    taskService.complete(task.getId());
+
+    //then next wait state is on user task after true conditional event
+    Execution execution = runtimeService.createExecutionQuery()
+      .processInstanceId(procInst.getId())
+      .activityId(EVENT_BASED_GATEWAY_ID)
+      .singleResult();
+    assertNull(execution);
+
+    task = taskQuery.singleResult();
+    assertNotNull(task);
+    assertEquals(TASK_AFTER_CONDITION+2, task.getName());
+  }
+
+  @Test
+  public void testEventBasedGatewayWith2VarConditions() {
+    BpmnModelInstance modelInstance =
+      Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
+        .startEvent()
+        .eventBasedGateway()
+        .id(EVENT_BASED_GATEWAY_ID)
+        .intermediateCatchEvent()
+        .conditionalEventDefinition()
+        .condition(CONDITION_EXPR)
+        .conditionalEventDefinitionDone()
+        .userTask()
+        .name(TASK_AFTER_CONDITION+1)
+        .endEvent()
+        .moveToLastGateway()
+        .intermediateCatchEvent(CONDITIONAL_EVENT)
+        .conditionalEventDefinition()
+        .condition("${var==2}")
+        .conditionalEventDefinitionDone()
+        .userTask()
+        .name(TASK_AFTER_CONDITION+2)
+        .endEvent()
+        .done();
+
+    engine.manageDeployment(repositoryService.createDeployment().addModelInstance(CONDITIONAL_MODEL, modelInstance).deploy());
+
+    //given
+    ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
+    TaskQuery taskQuery = taskService.createTaskQuery().processInstanceId(procInst.getId());
+    Execution execution = runtimeService.createExecutionQuery()
+      .processInstanceId(procInst.getId())
+      .activityId(EVENT_BASED_GATEWAY_ID)
+      .singleResult();
+    assertNotNull(execution);
+
+    //when wrong value of variable `var` is set
+    runtimeService.setVariable(procInst.getId(), "var", 1);
+
+    //then nothing happens
+    execution = runtimeService.createExecutionQuery()
+      .processInstanceId(procInst.getId())
+      .activityId(EVENT_BASED_GATEWAY_ID)
+      .singleResult();
+    assertNotNull(execution);
+    assertEquals(0, taskQuery.count());
+
+    //when right value is set
+    runtimeService.setVariable(procInst.getId(), "var", 2);
+
+    //then next wait state is on user task after second conditional event
+    Task task = taskQuery.singleResult();
+    assertNotNull(task);
+    assertEquals(TASK_AFTER_CONDITION+2, task.getName());
+  }
+
+  protected void deployParallelProcessWithEventBasedGateway() {
+    BpmnModelInstance modelInstance =
+      Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
+        .startEvent()
+        .parallelGateway()
+        .id(PARALLEL_GATEWAY_ID)
+        .userTask(TASK_BEFORE_EVENT_BASED_GW_ID)
+        .eventBasedGateway()
+        .id(EVENT_BASED_GATEWAY_ID)
+        .intermediateCatchEvent()
+        .conditionalEventDefinition()
+        .condition(CONDITION_EXPR)
+        .conditionalEventDefinitionDone()
+        .userTask()
+        .name(TASK_AFTER_CONDITION)
+        .endEvent()
+        .moveToNode(PARALLEL_GATEWAY_ID)
+        .userTask(TASK_BEFORE_SERVICE_TASK_ID)
+        .serviceTask()
+        .camundaClass(SetVariableDelegate.class.getName())
+        .endEvent()
+        .done();
+
+    engine.manageDeployment(repositoryService.createDeployment().addModelInstance(CONDITIONAL_MODEL, modelInstance).deploy());
+  }
+
+  @Test
+  public void testParallelProcessWithSetVariableBeforeReachingEventBasedGW() {
+    deployParallelProcessWithEventBasedGateway();
+    //given
+    ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
+    TaskQuery taskQuery = taskService.createTaskQuery().processInstanceId(procInst.getId());
+    Task taskBeforeEGW = taskService.createTaskQuery().taskDefinitionKey(TASK_BEFORE_EVENT_BASED_GW_ID).singleResult();
+    Task taskBeforeServiceTask = taskService.createTaskQuery().taskDefinitionKey(TASK_BEFORE_SERVICE_TASK_ID).singleResult();
+
+    //when task before service task is completed and after that task before event based gateway
+    taskService.complete(taskBeforeServiceTask.getId());
+    taskService.complete(taskBeforeEGW.getId());
+
+    //then variable is set before event based gateway is reached
+    //on reaching event based gateway condition of conditional event is also evaluated to true
+    Task task = taskQuery.singleResult();
+    assertNotNull(task);
+    assertEquals(TASK_AFTER_CONDITION, task.getName());
+    //completing this task ends process instance
+    taskService.complete(task.getId());
+    assertNull(taskQuery.singleResult());
+    assertNull(runtimeService.createProcessInstanceQuery().singleResult());
+  }
+
+  @Test
+  public void testParallelProcessWithSetVariableAfterReachingEventBasedGW() {
+    deployParallelProcessWithEventBasedGateway();
+    //given
+    ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
+    TaskQuery taskQuery = taskService.createTaskQuery().processInstanceId(procInst.getId());
+    Task taskBeforeEGW = taskService.createTaskQuery().taskDefinitionKey(TASK_BEFORE_EVENT_BASED_GW_ID).singleResult();
+    Task taskBeforeServiceTask = taskService.createTaskQuery().taskDefinitionKey(TASK_BEFORE_SERVICE_TASK_ID).singleResult();
+
+    //when task before event based gateway is completed and after that task before service task
+    taskService.complete(taskBeforeEGW.getId());
+    taskService.complete(taskBeforeServiceTask.getId());
+
+    //then event based gateway is reached and executions stays there
+    //variable is set after reaching event based gateway
+    //after setting variable the conditional event is triggered and evaluated to true
+    Task task = taskQuery.singleResult();
+    assertNotNull(task);
+    assertEquals(TASK_AFTER_CONDITION, task.getName());
+    //completing this task ends process instance
+    taskService.complete(task.getId());
+    assertNull(taskQuery.singleResult());
+    assertNull(runtimeService.createProcessInstanceQuery().singleResult());
+  }
 }

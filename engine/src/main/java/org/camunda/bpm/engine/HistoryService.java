@@ -52,6 +52,7 @@ import org.camunda.bpm.engine.history.NativeHistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.history.NativeHistoricTaskInstanceQuery;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
+import org.camunda.bpm.engine.history.HistoricDecisionInstanceStatisticsQuery;
 
 import java.util.List;
 
@@ -322,4 +323,12 @@ public interface HistoryService {
    */
   void deleteHistoricBatch(String id);
 
+
+  /**
+   * Query for the statistics of DRD evaluation.
+   *
+   * @param decisionRequirementsDefinitionId - id of decision requirement definition
+   * @since 7.6
+   */
+  HistoricDecisionInstanceStatisticsQuery createHistoricDecisionInstanceStatisticsQuery(String decisionRequirementsDefinitionId);
 }

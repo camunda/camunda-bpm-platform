@@ -50,7 +50,7 @@ import org.junit.Test;
 import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.response.Response;
 /**
- * 
+ *
  * @author Deivarayan Azhagappan
  *
  */
@@ -66,13 +66,13 @@ public class DecisionRequirementsDefinitionRestServiceInteractionTest extends Ab
   protected static final String SINGLE_DECISION_REQUIREMENTS_DEFINITION_KEY_AND_TENANT_ID_URL = DECISION_REQUIREMENTS_DEFINITION_URL + "/key/{key}/tenant-id/{tenant-id}";
 
   protected static final String XML_DEFINITION_URL = SINGLE_DECISION_REQUIREMENTS_DEFINITION_ID_URL + "/xml";
-  
+
   protected static final String DIAGRAM_DEFINITION_URL = SINGLE_DECISION_REQUIREMENTS_DEFINITION_ID_URL + "/diagram";
-  
+
   protected RepositoryService repositoryServiceMock;
   protected DecisionRequirementsDefinitionQuery decisionRequirementsDefinitionQueryMock;
   protected DecisionService decisionServiceMock;
- 
+
   @Before
   public void setUpRuntime() throws FileNotFoundException, URISyntaxException {
     DecisionRequirementsDefinition mockDecisionRequirementsDefinition = MockProvider.createMockDecisionRequirementsDefinition();
@@ -150,7 +150,7 @@ public class DecisionRequirementsDefinitionRestServiceInteractionTest extends Ab
       .thenReturn(decisionRequirementsDefinitionQueryMock);
 
     when(decisionRequirementsDefinitionQueryMock.singleResult()).thenReturn(null);
- 
+
     given()
       .pathParam("key", nonExistingKey)
     .then()
@@ -250,7 +250,7 @@ public class DecisionRequirementsDefinitionRestServiceInteractionTest extends Ab
     when(repositoryServiceMock.getDecisionRequirementsDefinition(eq(MockProvider.EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_ID))).thenReturn(mockDecisionRequirementsDefinition);
     when(repositoryServiceMock.getDecisionRequirementsModel(eq(MockProvider.EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_ID))).thenReturn(createMockDecisionRequirementsDefinitionDmnXml());
     when(repositoryServiceMock.getDecisionRequirementsDiagram(MockProvider.EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_ID)).thenReturn(createMockDecisionRequirementsDiagram());
-    
+
     decisionRequirementsDefinitionQueryMock = mock(DecisionRequirementsDefinitionQuery.class);
     when(decisionRequirementsDefinitionQueryMock.decisionRequirementsDefinitionKey(MockProvider.EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_KEY)).thenReturn(decisionRequirementsDefinitionQueryMock);
     when(decisionRequirementsDefinitionQueryMock.tenantIdIn(anyString())).thenReturn(decisionRequirementsDefinitionQueryMock);

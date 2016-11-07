@@ -13,7 +13,11 @@
 
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
+import org.camunda.bpm.engine.impl.bpmn.parser.ConditionalEventDefinition;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
+import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 
 /**
  * @author Daniel Meyer
@@ -22,7 +26,20 @@ public class EventBasedGatewayActivityBehavior extends FlowNodeActivityBehavior 
 
   @Override
   public void execute(ActivityExecution execution) throws Exception {
-    // wait state
+    // If conditional events exist after the event based gateway they should be evaluated.
+    // If a condition is satisfied the event based gateway should be left,
+    // otherwise the event based gateway is a wait state
+    ActivityImpl eventBasedGateway = (ActivityImpl) execution.getActivity();
+    for (ActivityImpl act : eventBasedGateway.getEventActivities()) {
+      ActivityBehavior activityBehavior = act.getActivityBehavior();
+      if (activityBehavior instanceof ConditionalEventBehavior) {
+        ConditionalEventBehavior conditionalEventBehavior = (ConditionalEventBehavior) activityBehavior;
+        ConditionalEventDefinition conditionalEventDefinition = conditionalEventBehavior.getConditionalEventDefinition();
+        if (conditionalEventDefinition.tryEvaluate(execution)) {
+          ((ExecutionEntity) execution).executeEventHandlerActivity(conditionalEventDefinition.getActivity());
+          return;
+        }
+      }
+    }
   }
-
 }

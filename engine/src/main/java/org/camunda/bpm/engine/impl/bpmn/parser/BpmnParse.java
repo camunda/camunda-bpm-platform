@@ -3442,7 +3442,7 @@ public class BpmnParse extends Parse {
     Element conditionExprElement = element.element(CONDITION);
     if (conditionExprElement != null) {
       Condition condition = parseConditionExpression(conditionExprElement);
-      conditionalEventDefinition = new ConditionalEventDefinition(condition, conditionalActivity.getId());
+      conditionalEventDefinition = new ConditionalEventDefinition(condition, conditionalActivity);
 
       final String variableName = element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "variableName");
       conditionalEventDefinition.setVariableName(variableName);

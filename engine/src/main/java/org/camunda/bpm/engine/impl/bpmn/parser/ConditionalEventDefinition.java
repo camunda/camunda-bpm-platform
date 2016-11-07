@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.Condition;
 import org.camunda.bpm.engine.impl.core.variable.event.VariableEvent;
 import org.camunda.bpm.engine.impl.event.EventType;
+import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 
 /**
  * Represents the conditional event definition corresponding to the
@@ -37,15 +38,21 @@ public class ConditionalEventDefinition extends EventSubscriptionDeclaration imp
   protected boolean interrupting;
   protected String variableName;
   protected Set<String> variableEvents;
+  protected ActivityImpl activity;
 
-  public ConditionalEventDefinition(Condition condition, String activityId) {
+  public ConditionalEventDefinition(Condition condition, ActivityImpl activity) {
     super(null, EventType.CONDITONAL);
-    this.activityId = activityId;
+    this.activityId = activity.getActivityId();
+    this.activity = activity;
     this.condition = condition;
   }
 
-  public Condition getConditionalExpression() {
-    return condition;
+  public ActivityImpl getActivity() {
+    return activity;
+  }
+
+  public void setActivity(ActivityImpl activity) {
+    this.activity = activity;
   }
 
   public boolean isInterrupting() {

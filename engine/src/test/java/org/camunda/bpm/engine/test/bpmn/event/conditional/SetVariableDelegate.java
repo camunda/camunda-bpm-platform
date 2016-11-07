@@ -23,7 +23,6 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
 public class SetVariableDelegate implements JavaDelegate {
-
   @Override
   public void execute(DelegateExecution execution) throws Exception {
     execution.setVariable(AbstractConditionalEventTestCase.VARIABLE_NAME, 1);

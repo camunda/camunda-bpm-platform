@@ -52,7 +52,8 @@ public class AtomicOperationInvocation {
   public void execute(BpmnStackTrace stackTrace) {
 
     if(operation != PvmAtomicOperation.ACTIVITY_START_CANCEL_SCOPE
-        && operation != PvmAtomicOperation.ACTIVITY_START_INTERRUPT_SCOPE) {
+       && operation != PvmAtomicOperation.ACTIVITY_START_INTERRUPT_SCOPE
+       && operation != PvmAtomicOperation.ACTIVITY_START_CONCURRENT) {
       // execution might be replaced in the meantime:
       ExecutionEntity replacedBy = execution.getReplacedBy();
       if(replacedBy != null) {

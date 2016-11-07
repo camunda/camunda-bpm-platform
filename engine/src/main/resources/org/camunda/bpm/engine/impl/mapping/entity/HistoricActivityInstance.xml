@@ -136,7 +136,7 @@
   <select id="selectHistoricActivityInstancesByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricActivityInstanceQueryImpl" resultMap="historicActivityInstanceResultMap">
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select RES.*
+    select ${distinct} RES.*
     ${limitBetween}
     <include refid="selectHistoricActivityInstancesByQueryCriteriaSql"/>
     ${orderBy}
@@ -144,82 +144,79 @@
   </select>
 
   <select id="selectHistoricActivityInstanceCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricActivityInstanceQueryImpl" resultType="long">
-    select count(*)
+    select count(distinct RES.ID_)
     <include refid="selectHistoricActivityInstancesByQueryCriteriaSql"/>
   </select>
 
   <sql id="selectHistoricActivityInstancesByQueryCriteriaSql">
-    from ${prefix}ACT_HI_ACTINST RES
+    from (
 
-    <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
-      INNER JOIN (
-        SELECT
-            SELF.PROC_DEF_KEY_ AS KEY_
-        FROM
-            (SELECT DISTINCT DKEYS.PROC_DEF_KEY_ from ${prefix}ACT_HI_ACTINST DKEYS) SELF
-        WHERE
-            <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.querySingleAuthorizationCheck" />
-      ) AUTH
-      ON AUTH.KEY_ = RES.PROC_DEF_KEY_
+    SELECT SELF.* FROM ${prefix}ACT_HI_ACTINST SELF
+    <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause"/>
+      AUTH ON (AUTH.RESOURCE_ID_ in (SELF.PROC_DEF_KEY_, '*'))
     </if>
 
     <where>
       <if test="processInstanceId != null">
-        RES.PROC_INST_ID_ = #{processInstanceId}
+        SELF.PROC_INST_ID_ = #{processInstanceId}
       </if>
       <if test="activityInstanceId != null">
-        and RES.ID_ = #{activityInstanceId}
+        and SELF.ID_ = #{activityInstanceId}
       </if>
       <if test="executionId != null">
-        and RES.EXECUTION_ID_ = #{executionId}
+        and SELF.EXECUTION_ID_ = #{executionId}
       </if>
       <if test="processDefinitionId != null">
-        and RES.PROC_DEF_ID_ = #{processDefinitionId}
+        and SELF.PROC_DEF_ID_ = #{processDefinitionId}
       </if>
       <if test="activityId != null">
-        and RES.ACT_ID_ = #{activityId}
+        and SELF.ACT_ID_ = #{activityId}
       </if>
       <if test="activityName != null">
-        and RES.ACT_NAME_ = #{activityName}
+        and SELF.ACT_NAME_ = #{activityName}
       </if>
       <if test="activityType != null">
-        and RES.ACT_TYPE_ = #{activityType}
+        and SELF.ACT_TYPE_ = #{activityType}
       </if>
       <if test="assignee != null">
-        and RES.ASSIGNEE_ = #{assignee}
+        and SELF.ASSIGNEE_ = #{assignee}
       </if>
       <if test="unfinished">
-        and RES.END_TIME_ is null
+        and SELF.END_TIME_ is null
       </if>
-      <if test="finished">
-       and RES.END_TIME_ is not null
+      <if test="finished">and SELF.END_TIME_ is not null
       </if>
       <if test="startedBefore != null">
-        and RES.START_TIME_ &lt;= #{startedBefore}
+        and SELF.START_TIME_ &lt;= #{startedBefore}
       </if>
       <if test="startedAfter != null">
-        and RES.START_TIME_ &gt;= #{startedAfter}
+        and SELF.START_TIME_ &gt;= #{startedAfter}
       </if>
       <if test="finishedBefore != null">
-        and RES.END_TIME_ &lt;= #{finishedBefore}
+        and SELF.END_TIME_ &lt;= #{finishedBefore}
       </if>
       <if test="finishedAfter != null">
-        and RES.END_TIME_ &gt;= #{finishedAfter}
+        and SELF.END_TIME_ &gt;= #{finishedAfter}
       </if>
       <if test="activityInstanceState != null">
-        and RES.ACT_INST_STATE_ = #{activityInstanceState.stateCode}
+        and SELF.ACT_INST_STATE_ = #{activityInstanceState.stateCode}
       </if>
       <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
-        and RES.TENANT_ID_ in
+        and SELF.TENANT_ID_ in
         <foreach item="tenantId" index="index" collection="tenantIds"
                  open="(" separator="," close=")">
           #{tenantId}
         </foreach>
       </if>
 
-      <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
+      <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck"/>
+      </if>
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithSelfPrefix"/>
 
     </where>
+    ) RES
   </sql>
 
   <select id="selectHistoricActivityInstanceByNativeQuery" parameterType="java.util.Map" resultMap="historicActivityInstanceResultMap">

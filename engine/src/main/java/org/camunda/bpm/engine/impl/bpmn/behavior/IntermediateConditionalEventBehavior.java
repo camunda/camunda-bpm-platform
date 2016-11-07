@@ -37,6 +37,11 @@ public class IntermediateConditionalEventBehavior extends IntermediateCatchEvent
   }
 
   @Override
+  public ConditionalEventDefinition getConditionalEventDefinition() {
+    return conditionalEvent;
+  }
+
+  @Override
   public void execute(final ActivityExecution execution) throws Exception {
     if (isAfterEventBasedGateway || conditionalEvent.tryEvaluate(execution)) {
       leave(execution);

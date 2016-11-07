@@ -96,10 +96,17 @@ public class HtmlElementWriter {
       writer.write(attribute.getKey());
       if(attribute.getValue() != null) {
         writer.write("=\"");
-        writer.write(attribute.getValue());
+        String attributeValue = escapeQuotes(attribute.getValue());
+        writer.write(attributeValue);
         writer.write("\"");
       }
     }
+  }
+
+  protected String escapeQuotes(String attributeValue){
+    String escapedHtmlQuote = "&quot;";
+    String escapedJavaQuote = "\"";
+    return attributeValue.replaceAll(escapedJavaQuote, escapedHtmlQuote);
   }
 
   protected void writeEndLine(HtmlWriteContext context) {

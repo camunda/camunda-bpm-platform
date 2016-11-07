@@ -13,14 +13,9 @@
 
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-import static org.camunda.bpm.engine.authorization.Permissions.READ;
-import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
-
-import java.util.List;
-
 import org.camunda.bpm.engine.batch.BatchStatistics;
 import org.camunda.bpm.engine.impl.ActivityStatisticsQueryImpl;
+import org.camunda.bpm.engine.impl.HistoricDecisionInstanceStatisticsQueryImpl;
 import org.camunda.bpm.engine.impl.DeploymentStatisticsQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.ProcessDefinitionStatisticsQueryImpl;
@@ -28,8 +23,17 @@ import org.camunda.bpm.engine.impl.batch.BatchStatisticsQueryImpl;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.management.ActivityStatistics;
+import org.camunda.bpm.engine.history.HistoricDecisionInstanceStatistics;
 import org.camunda.bpm.engine.management.DeploymentStatistics;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatistics;
+import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
+
+import java.util.List;
+
+import static org.camunda.bpm.engine.authorization.Permissions.READ;
+import static org.camunda.bpm.engine.authorization.Resources.DECISION_REQUIREMENTS_DEFINITION;
+import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 public class StatisticsManager extends AbstractManager {
 
@@ -100,11 +104,36 @@ public class StatisticsManager extends AbstractManager {
 
   protected void checkReadProcessDefinition(ActivityStatisticsQueryImpl query) {
     CommandContext commandContext = getCommandContext();
-    if(isAuthorizationEnabled() && getCurrentAuthentication() != null && commandContext.isAuthorizationCheckEnabled()) {
+    if (isAuthorizationEnabled() && getCurrentAuthentication() != null && commandContext.isAuthorizationCheckEnabled()) {
       String processDefinitionId = query.getProcessDefinitionId();
       ProcessDefinitionEntity definition = getProcessDefinitionManager().findLatestProcessDefinitionById(processDefinitionId);
       ensureNotNull("no deployed process definition found with id '" + processDefinitionId + "'", "processDefinition", definition);
       getAuthorizationManager().checkAuthorization(READ, PROCESS_DEFINITION, definition.getKey());
     }
+  }
+
+  public long getStatisticsCountGroupedByDecisionRequirementsDefinition(HistoricDecisionInstanceStatisticsQueryImpl decisionRequirementsDefinitionStatisticsQuery) {
+    configureQuery(decisionRequirementsDefinitionStatisticsQuery);
+    return (Long) getDbEntityManager().selectOne("selectDecisionDefinitionStatisticsCount", decisionRequirementsDefinitionStatisticsQuery);
+  }
+
+  protected void configureQuery(HistoricDecisionInstanceStatisticsQueryImpl decisionRequirementsDefinitionStatisticsQuery) {
+    checkReadDecisionRequirementsDefinition(decisionRequirementsDefinitionStatisticsQuery);
+    getTenantManager().configureQuery(decisionRequirementsDefinitionStatisticsQuery);
+  }
+
+  protected void checkReadDecisionRequirementsDefinition(HistoricDecisionInstanceStatisticsQueryImpl query) {
+    CommandContext commandContext = getCommandContext();
+    if (isAuthorizationEnabled() && getCurrentAuthentication() != null && commandContext.isAuthorizationCheckEnabled()) {
+      String decisionRequirementsDefinitionId = query.getDecisionRequirementsDefinitionId();
+      DecisionRequirementsDefinition definition = getDecisionDefinitionManager().findDecisionRequirementsDefinitionById(decisionRequirementsDefinitionId);
+      ensureNotNull("no deployed decision requirements definition found with id '" + decisionRequirementsDefinitionId + "'", "decisionRequirementsDefinition", definition);
+      getAuthorizationManager().checkAuthorization(READ, DECISION_REQUIREMENTS_DEFINITION, definition.getKey());
+    }
+  }
+
+  public List<HistoricDecisionInstanceStatistics> getStatisticsGroupedByDecisionRequirementsDefinition(HistoricDecisionInstanceStatisticsQueryImpl query, Page page) {
+    configureQuery(query);
+    return getDbEntityManager().selectList("selectDecisionDefinitionStatistics", query, page);
   }
 }

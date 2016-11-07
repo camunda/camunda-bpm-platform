@@ -473,7 +473,6 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
 
   public void activateBatchById(String batchId) {
     commandExecutor.execute(new ActivateBatchCmd(batchId));
-
   }
 
   public BatchStatisticsQuery createBatchStatisticsQuery() {
