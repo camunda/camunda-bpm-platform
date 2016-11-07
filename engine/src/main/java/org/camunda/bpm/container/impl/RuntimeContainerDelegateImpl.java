@@ -12,13 +12,6 @@
  */
 package org.camunda.bpm.container.impl;
 
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import javax.management.MBeanServer;
-
 import org.camunda.bpm.ProcessApplicationService;
 import org.camunda.bpm.ProcessEngineService;
 import org.camunda.bpm.application.AbstractProcessApplication;
@@ -40,10 +33,19 @@ import org.camunda.bpm.container.impl.deployment.UndeployProcessArchivesStep;
 import org.camunda.bpm.container.impl.jmx.MBeanServiceContainer;
 import org.camunda.bpm.container.impl.jmx.services.JmxManagedProcessApplication;
 import org.camunda.bpm.container.impl.jmx.services.JmxManagedProcessEngine;
+import org.camunda.bpm.container.impl.spi.DeploymentOperationStep;
 import org.camunda.bpm.container.impl.spi.PlatformServiceContainer;
 import org.camunda.bpm.container.impl.spi.ServiceTypes;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+
+import javax.management.MBeanServer;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * <p>This is the default {@link RuntimeContainerDelegate} implementation that delegates
@@ -52,11 +54,10 @@ import org.camunda.bpm.engine.impl.ProcessEngineLogger;
  * Management Resources.</p>
  *
  * @author Daniel Meyer
- *
  */
 public class RuntimeContainerDelegateImpl implements RuntimeContainerDelegate, ProcessEngineService, ProcessApplicationService {
 
-  private final static ContainerIntegrationLogger LOG = ProcessEngineLogger.CONTAINER_INTEGRATION_LOGGER;
+  protected final static ContainerIntegrationLogger LOG = ProcessEngineLogger.CONTAINER_INTEGRATION_LOGGER;
 
   protected MBeanServiceContainer serviceContainer = new MBeanServiceContainer();
 
@@ -89,19 +90,14 @@ public class RuntimeContainerDelegateImpl implements RuntimeContainerDelegate, P
   public void deployProcessApplication(AbstractProcessApplication processApplication) {
     ensureNotNull("Process application", processApplication);
 
-    final String operationName = "Deployment of Process Application "+processApplication.getName();
+    final String operationName = "Deployment of Process Application " + processApplication.getName();
 
     serviceContainer.createDeploymentOperation(operationName)
       .addAttachment(Attachments.PROCESS_APPLICATION, processApplication)
-      .addStep(new ParseProcessesXmlStep())
-      .addStep(new ProcessesXmlStartProcessEnginesStep())
-      .addStep(new DeployProcessArchivesStep())
-      .addStep(new StartProcessApplicationServiceStep())
-      .addStep(new PostDeployInvocationStep())
+      .addSteps(getDeploymentSteps())
       .execute();
 
     LOG.paDeployed(processApplication.getName());
-
   }
 
   @Override
@@ -111,24 +107,41 @@ public class RuntimeContainerDelegateImpl implements RuntimeContainerDelegate, P
     final String processAppName = processApplication.getName();
 
     // if the process application is not deployed, ignore the request.
-    if(serviceContainer.getService(ServiceTypes.PROCESS_APPLICATION, processAppName) == null) {
+    if (serviceContainer.getService(ServiceTypes.PROCESS_APPLICATION, processAppName) == null) {
       return;
     }
 
-    final String operationName = "Undeployment of Process Application "+processAppName;
+    final String operationName = "Undeployment of Process Application " + processAppName;
 
     // perform the undeployment
     serviceContainer.createUndeploymentOperation(operationName)
       .addAttachment(Attachments.PROCESS_APPLICATION, processApplication)
-      .addStep(new PreUndeployInvocationStep())
-      .addStep(new UndeployProcessArchivesStep())
-      .addStep(new ProcessesXmlStopProcessEnginesStep())
-      .addStep(new StopProcessApplicationServiceStep())
-      .addStep(new NotifyPostProcessApplicationUndeployedStep())
+      .addSteps(getUndeploymentSteps())
       .execute();
 
     LOG.paUndeployed(processApplication.getName());
   }
+
+
+  protected List<DeploymentOperationStep> getDeploymentSteps() {
+    return Arrays.asList(
+      new ParseProcessesXmlStep(),
+      new ProcessesXmlStartProcessEnginesStep(),
+      new DeployProcessArchivesStep(),
+      new StartProcessApplicationServiceStep(),
+      new PostDeployInvocationStep());
+  }
+
+  protected List<DeploymentOperationStep> getUndeploymentSteps() {
+    return Arrays.asList(
+      new PreUndeployInvocationStep(),
+      new UndeployProcessArchivesStep(),
+      new ProcessesXmlStopProcessEnginesStep(),
+      new StopProcessApplicationServiceStep(),
+      new NotifyPostProcessApplicationUndeployedStep()
+    );
+  }
+
 
   @Override
   public ProcessEngineService getProcessEngineService() {
@@ -190,10 +203,9 @@ public class RuntimeContainerDelegateImpl implements RuntimeContainerDelegate, P
 
     JmxManagedProcessApplication processApplicationService = serviceContainer.getServiceValue(ServiceTypes.PROCESS_APPLICATION, processApplicationName);
 
-    if(processApplicationService == null) {
+    if (processApplicationService == null) {
       return null;
-    }
-    else {
+    } else {
       return processApplicationService.getProcessApplicationInfo();
     }
   }
@@ -202,10 +214,9 @@ public class RuntimeContainerDelegateImpl implements RuntimeContainerDelegate, P
   public ProcessApplicationReference getDeployedProcessApplication(String processApplicationName) {
     JmxManagedProcessApplication processApplicationService = serviceContainer.getServiceValue(ServiceTypes.PROCESS_APPLICATION, processApplicationName);
 
-    if(processApplicationService == null) {
+    if (processApplicationService == null) {
       return null;
-    }
-    else {
+    } else {
       return processApplicationService.getProcessApplicationReference();
     }
   }

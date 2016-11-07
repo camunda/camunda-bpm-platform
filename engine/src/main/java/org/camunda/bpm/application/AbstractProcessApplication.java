@@ -12,14 +12,6 @@
  */
 package org.camunda.bpm.application;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.ServiceLoader;
-import java.util.concurrent.Callable;
-
-import javax.script.ScriptEngine;
-
 import org.camunda.bpm.application.impl.DefaultElResolverLookup;
 import org.camunda.bpm.application.impl.ProcessApplicationLogger;
 import org.camunda.bpm.application.impl.ProcessApplicationScriptEnvironment;
@@ -34,10 +26,16 @@ import org.camunda.bpm.engine.impl.util.ClassLoaderUtil;
 import org.camunda.bpm.engine.impl.variable.serializer.VariableSerializers;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 
+import javax.script.ScriptEngine;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.ServiceLoader;
+import java.util.concurrent.Callable;
+
 
 /**
  * @author Daniel Meyer
- *
  */
 public abstract class AbstractProcessApplication implements ProcessApplicationInterface {
 
@@ -54,10 +52,9 @@ public abstract class AbstractProcessApplication implements ProcessApplicationIn
   // deployment /////////////////////////////////////////////////////
 
   public void deploy() {
-    if(isDeployed) {
+    if (isDeployed) {
       LOG.alreadyDeployed();
-    }
-    else {
+    } else {
       // deploy the application
       RuntimeContainerDelegate.INSTANCE.get().deployProcessApplication(this);
       isDeployed = true;
@@ -65,7 +62,7 @@ public abstract class AbstractProcessApplication implements ProcessApplicationIn
   }
 
   public void undeploy() {
-    if(!isDeployed) {
+    if (!isDeployed) {
       LOG.notDeployed();
     } else {
       // delegate stopping of the process application to the runtime container.
@@ -85,7 +82,7 @@ public abstract class AbstractProcessApplication implements ProcessApplicationIn
     String name = null;
 
     ProcessApplication annotation = processApplicationClass.getAnnotation(ProcessApplication.class);
-    if(annotation != null) {
+    if (annotation != null) {
       name = annotation.value();
 
       if (name == null || name.length() == 0) {
@@ -94,7 +91,7 @@ public abstract class AbstractProcessApplication implements ProcessApplicationIn
     }
 
 
-    if(name == null || name.length()==0) {
+    if (name == null || name.length() == 0) {
       name = autodetectProcessApplicationName();
     }
 
@@ -116,11 +113,9 @@ public abstract class AbstractProcessApplication implements ProcessApplicationIn
 
       return callable.call();
 
-    }
-    catch(Exception e) {
+    } catch (Exception e) {
       throw LOG.processApplicationExecutionException(e);
-    }
-    finally {
+    } finally {
       ClassLoaderUtil.setContextClassloader(originalClassloader);
     }
   }
@@ -146,9 +141,9 @@ public abstract class AbstractProcessApplication implements ProcessApplicationIn
   }
 
   public ELResolver getElResolver() {
-    if(processApplicationElResolver == null) {
+    if (processApplicationElResolver == null) {
       synchronized (this) {
-        if(processApplicationElResolver == null) {
+        if (processApplicationElResolver == null) {
           processApplicationElResolver = initProcessApplicationElResolver();
         }
       }
@@ -158,9 +153,9 @@ public abstract class AbstractProcessApplication implements ProcessApplicationIn
   }
 
   public BeanELResolver getBeanElResolver() {
-    if(processApplicationBeanElResolver == null) {
+    if (processApplicationBeanElResolver == null) {
       synchronized (this) {
-        if(processApplicationBeanElResolver == null) {
+        if (processApplicationBeanElResolver == null) {
           processApplicationBeanElResolver = new BeanELResolver();
         }
       }
@@ -171,7 +166,7 @@ public abstract class AbstractProcessApplication implements ProcessApplicationIn
   /**
    * <p>Initializes the process application provided ElResolver. This implementation uses the
    * Java SE {@link ServiceLoader} facilities for resolving implementations of {@link ProcessApplicationElResolver}.</p>
-   *
+   * <p>
    * <p>If you want to provide a custom implementation in your application, place a file named
    * <code>META-INF/org.camunda.bpm.application.ProcessApplicationElResolver</code> inside your application
    * which contains the fully qualified classname of your implementation. Or simply override this method.</p>

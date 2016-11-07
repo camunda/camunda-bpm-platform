@@ -12,12 +12,14 @@
  */
 package org.camunda.bpm.container.impl.spi;
 
+import org.camunda.bpm.container.impl.ContainerIntegrationLogger;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.camunda.bpm.container.impl.ContainerIntegrationLogger;
-import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 
 /**
  * <p>A DeploymentOperation allows bundling multiple deployment steps into a
@@ -183,6 +185,13 @@ public class DeploymentOperation {
 
     public DeploymentOperationBuilder addStep(DeploymentOperationStep step) {
       steps.add(step);
+      return this;
+    }
+
+    public DeploymentOperationBuilder addSteps(Collection<DeploymentOperationStep> steps) {
+      for (DeploymentOperationStep step: steps) {
+        addStep(step);
+      }
       return this;
     }
 

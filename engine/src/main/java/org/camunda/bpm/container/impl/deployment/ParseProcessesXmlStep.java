@@ -46,8 +46,6 @@ public class ParseProcessesXmlStep extends DeploymentOperationStep {
 
   private final static ContainerIntegrationLogger LOG = ProcessEngineLogger.CONTAINER_INTEGRATION_LOGGER;
 
-  private static final String META_INF_PROCESSES_XML = "META-INF/processes.xml";
-
   public String getName() {
     return "Parse processes.xml deployment descriptor files.";
   }
@@ -118,7 +116,7 @@ public class ParseProcessesXmlStep extends DeploymentOperationStep {
   protected String[] getDeploymentDescriptorLocations(AbstractProcessApplication processApplication) {
     ProcessApplication annotation = processApplication.getClass().getAnnotation(ProcessApplication.class);
     if(annotation == null) {
-      return new String[] {META_INF_PROCESSES_XML};
+      return new String[] {ProcessApplication.META_INF_PROCESSES_XML};
 
     } else {
       return annotation.deploymentDescriptors();
