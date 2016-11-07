@@ -12,10 +12,14 @@
  */
 package org.camunda.bpm.container.impl.spi;
 
-import java.util.*;
-
 import org.camunda.bpm.container.impl.ContainerIntegrationLogger;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>A DeploymentOperation allows bundling multiple deployment steps into a

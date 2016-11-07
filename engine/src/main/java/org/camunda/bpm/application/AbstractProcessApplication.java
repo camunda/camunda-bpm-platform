@@ -12,17 +12,10 @@
  */
 package org.camunda.bpm.application;
 
-import java.util.*;
-import java.util.concurrent.Callable;
-
-import javax.script.ScriptEngine;
-
 import org.camunda.bpm.application.impl.DefaultElResolverLookup;
 import org.camunda.bpm.application.impl.ProcessApplicationLogger;
 import org.camunda.bpm.application.impl.ProcessApplicationScriptEnvironment;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
-import org.camunda.bpm.container.impl.deployment.*;
-import org.camunda.bpm.container.impl.spi.DeploymentOperationStep;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
@@ -32,6 +25,13 @@ import org.camunda.bpm.engine.impl.scripting.ExecutableScript;
 import org.camunda.bpm.engine.impl.util.ClassLoaderUtil;
 import org.camunda.bpm.engine.impl.variable.serializer.VariableSerializers;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
+
+import javax.script.ScriptEngine;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.ServiceLoader;
+import java.util.concurrent.Callable;
 
 
 /**

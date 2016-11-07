@@ -12,14 +12,6 @@
  */
 package org.camunda.bpm.container.impl;
 
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
-
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import javax.management.MBeanServer;
-
 import org.camunda.bpm.ProcessApplicationService;
 import org.camunda.bpm.ProcessEngineService;
 import org.camunda.bpm.application.AbstractProcessApplication;
@@ -27,7 +19,17 @@ import org.camunda.bpm.application.ProcessApplicationInfo;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.container.ExecutorService;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
-import org.camunda.bpm.container.impl.deployment.*;
+import org.camunda.bpm.container.impl.deployment.Attachments;
+import org.camunda.bpm.container.impl.deployment.DeployProcessArchivesStep;
+import org.camunda.bpm.container.impl.deployment.NotifyPostProcessApplicationUndeployedStep;
+import org.camunda.bpm.container.impl.deployment.ParseProcessesXmlStep;
+import org.camunda.bpm.container.impl.deployment.PostDeployInvocationStep;
+import org.camunda.bpm.container.impl.deployment.PreUndeployInvocationStep;
+import org.camunda.bpm.container.impl.deployment.ProcessesXmlStartProcessEnginesStep;
+import org.camunda.bpm.container.impl.deployment.ProcessesXmlStopProcessEnginesStep;
+import org.camunda.bpm.container.impl.deployment.StartProcessApplicationServiceStep;
+import org.camunda.bpm.container.impl.deployment.StopProcessApplicationServiceStep;
+import org.camunda.bpm.container.impl.deployment.UndeployProcessArchivesStep;
 import org.camunda.bpm.container.impl.jmx.MBeanServiceContainer;
 import org.camunda.bpm.container.impl.jmx.services.JmxManagedProcessApplication;
 import org.camunda.bpm.container.impl.jmx.services.JmxManagedProcessEngine;
@@ -36,6 +38,14 @@ import org.camunda.bpm.container.impl.spi.PlatformServiceContainer;
 import org.camunda.bpm.container.impl.spi.ServiceTypes;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+
+import javax.management.MBeanServer;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * <p>This is the default {@link RuntimeContainerDelegate} implementation that delegates
