@@ -16,20 +16,28 @@ package org.camunda.bpm.engine.test.api.cfg;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
+import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.commons.utils.cache.Cache;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.*;
@@ -51,17 +59,21 @@ public class DeploymentCacheCfgTest {
 
   protected ProvidedProcessEngineRule cacheFactoryEngineRule = new ProvidedProcessEngineRule(cacheFactoryBootstrapRule);
 
+  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(cacheFactoryEngineRule);
+
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(cacheFactoryBootstrapRule).around(cacheFactoryEngineRule);
+  public RuleChain ruleChain = RuleChain.outerRule(cacheFactoryBootstrapRule).around(cacheFactoryEngineRule).around(testRule);
   RepositoryService repositoryService;
   ProcessEngineConfigurationImpl processEngineConfiguration;
   RuntimeService runtimeService;
+  TaskService taskService;
 
   @Before
   public void initialize() {
     repositoryService = cacheFactoryEngineRule.getRepositoryService();
     processEngineConfiguration = cacheFactoryEngineRule.getProcessEngineConfiguration();
     runtimeService = cacheFactoryEngineRule.getRuntimeService();
+    taskService = cacheFactoryEngineRule.getTaskService();
   }
 
   @Test
@@ -192,5 +204,51 @@ public class DeploymentCacheCfgTest {
     assertEquals("This is a documentation!", processDefinition.getDescription());
   }
 
+  /**
+   * Failing test see issue CAM-6958
+   */
+  public void testLoadProcessDefinitionsFromDBWhenNotInDefaultCache() {
+
+    // given more processes to deploy than capacity in the cache
+    int numberOfProcessesToDeploy = 10;
+    createAndDeployProcesses(numberOfProcessesToDeploy);
+
+    // when we start a process that was already removed from the cache
+    assertNotNull(repositoryService.createProcessDefinitionQuery().processDefinitionKey("process0").singleResult());
+    runtimeService.startProcessInstanceByKey("process0");
+
+    // then we should be able to complete the process
+    Task task = taskService.createTaskQuery().singleResult();
+    taskService.complete(task.getId());
+
+  }
+
+  protected void createAndDeployProcesses(int numberOfProcesses) {
+    DeploymentBuilder deploymentbuilder = processEngineConfiguration.getRepositoryService().createDeployment();
+    List<BpmnModelInstance> modelInstances = createProcesses(numberOfProcesses);
+
+    for (int i = 0; i < modelInstances.size(); i++) {
+      deploymentbuilder.addModelInstance("process" + i + ".bpmn", modelInstances.get(i));
+    }
+
+    testRule.deploy(deploymentbuilder);
+  }
+
+  protected List<BpmnModelInstance> createProcesses(int numberOfProcesses) {
+
+    List<BpmnModelInstance> result = new ArrayList<BpmnModelInstance>(numberOfProcesses);
+    for (int i = 0; i < numberOfProcesses; i++) {
+      result.add(createProcess(i));
+    }
+    return result;
+  }
+
+  protected BpmnModelInstance createProcess(int id) {
+    return Bpmn.createExecutableProcess("process" + id)
+        .startEvent()
+        .userTask("Task")
+        .endEvent()
+        .done();
+  }
 
 }
