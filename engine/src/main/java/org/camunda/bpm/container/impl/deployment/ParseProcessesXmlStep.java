@@ -116,7 +116,7 @@ public class ParseProcessesXmlStep extends DeploymentOperationStep {
   protected String[] getDeploymentDescriptorLocations(AbstractProcessApplication processApplication) {
     ProcessApplication annotation = processApplication.getClass().getAnnotation(ProcessApplication.class);
     if(annotation == null) {
-      return new String[] {ProcessApplication.META_INF_PROCESSES_XML};
+      return new String[] {ProcessApplication.DEFAULT_META_INF_PROCESSES_XML};
 
     } else {
       return annotation.deploymentDescriptors();

@@ -28,7 +28,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface ProcessApplication {
 
-  String META_INF_PROCESSES_XML  = "META-INF/processes.xml";
+  String DEFAULT_META_INF_PROCESSES_XML = "META-INF/processes.xml";
 
   /**
    * Allows specifying the name of the process application.
@@ -51,6 +51,6 @@ public @interface ProcessApplication {
    *
    * @return the location of the <code>processes.xml</code> file.
    */
-  String[] deploymentDescriptors() default { META_INF_PROCESSES_XML };
+  String[] deploymentDescriptors() default {DEFAULT_META_INF_PROCESSES_XML};
 
 }
