@@ -7,7 +7,9 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
     pagePath: '#/batch',
     template: '<!-- nothing to show, but needed -->',
     controller: function() {},
-
+    checkActive: function(path) {
+      return path.endsWith('#/batch');
+    },
     priority: -5
   });
 }];
