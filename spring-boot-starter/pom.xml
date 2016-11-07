@@ -16,15 +16,14 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>extension</module>
     <module>bom</module>
-
+    <module>extension</module>
     <module>examples</module>
     <module>docs</module>
   </modules>
 
   <properties>
-    <spring-boot.version>1.4.0.RELEASE</spring-boot.version>
+    <spring-boot.version>1.4.1.RELEASE</spring-boot.version>
     <camunda.version>7.5.0</camunda.version>
 
     <version.java>1.8</version.java>
