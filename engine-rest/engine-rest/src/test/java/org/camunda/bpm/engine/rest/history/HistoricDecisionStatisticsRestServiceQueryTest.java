@@ -20,9 +20,11 @@ import org.camunda.bpm.engine.history.HistoricDecisionInstanceStatisticsQuery;
 import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import javax.ws.rs.core.Response;
 import java.util.List;
@@ -32,6 +34,7 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -50,6 +53,11 @@ public class HistoricDecisionStatisticsRestServiceQueryTest extends AbstractRest
   @Before
   public void setUpRuntimeData() {
     setupHistoricDecisionStatisticsMock();
+  }
+
+  @After
+  public void tearDown() {
+    Mockito.reset(processEngine.getHistoryService(), historicDecisionInstanceStatisticsQuery);
   }
 
   private void setupHistoricDecisionStatisticsMock() {
@@ -73,6 +81,8 @@ public class HistoricDecisionStatisticsRestServiceQueryTest extends AbstractRest
           .body("decisionDefinitionKey", hasItems(MockProvider.EXAMPLE_DECISION_DEFINITION_KEY, MockProvider.ANOTHER_DECISION_DEFINITION_KEY))
           .body("evaluations", hasItems(1, 2))
         .when().get(HISTORIC_DECISION_STATISTICS_URL);
+
+    verify(processEngine.getHistoryService()).createHistoricDecisionInstanceStatisticsQuery(MockProvider.EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_ID);
   }
 
   @Test
@@ -85,5 +95,8 @@ public class HistoricDecisionStatisticsRestServiceQueryTest extends AbstractRest
           .body("decisionDefinitionKey", hasItems(MockProvider.EXAMPLE_DECISION_DEFINITION_KEY, MockProvider.ANOTHER_DECISION_DEFINITION_KEY))
           .body("evaluations", hasItems(1, 2))
         .when().get(HISTORIC_DECISION_STATISTICS_URL);
+
+    verify(processEngine.getHistoryService()).createHistoricDecisionInstanceStatisticsQuery(MockProvider.EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_ID);
+    verify(historicDecisionInstanceStatisticsQuery).decisionInstanceId(MockProvider.EXAMPLE_DECISION_INSTANCE_ID);
   }
 }
