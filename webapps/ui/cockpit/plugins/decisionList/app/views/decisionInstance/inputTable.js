@@ -2,7 +2,7 @@
 
 var fs = require('fs');
 
-var template = fs.readFileSync(__dirname + '/variable-table.html', 'utf8');
+var template = fs.readFileSync(__dirname + '/input-variable-table.html', 'utf8');
 
 module.exports = [ 'ViewsProvider', function(ViewsProvider) {
 
@@ -13,6 +13,7 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
     controller: [
       '$scope',
       function($scope) {
+        $scope.loadingState = $scope.decisionInstance.inputs > 0 ? 'LOADED' : 'EMPTY';
 
         $scope.variables = $scope.decisionInstance.inputs.map(function(variable) {
           return {
