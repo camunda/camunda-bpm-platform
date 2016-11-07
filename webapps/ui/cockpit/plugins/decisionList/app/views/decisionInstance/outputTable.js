@@ -2,7 +2,7 @@
 
 var fs = require('fs');
 
-var template = fs.readFileSync(__dirname + '/variable-table.html', 'utf8');
+var template = fs.readFileSync(__dirname + '/output-variable-table.html', 'utf8');
 
 module.exports = [ 'ViewsProvider', function(ViewsProvider) {
 
