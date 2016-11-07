@@ -37,16 +37,6 @@ function bootstrapApp() {
 
 module.exports = function(pluginDependencies) {
 
-  function parseUriConfig() {
-    var $baseTag = $('base');
-    var config = {};
-    var names = ['href', 'app-root', 'admin-api', 'tasklist-api', 'engine-api'];
-    for(var i = 0; i < names.length; i++) {
-      config[names[i]] = $baseTag.attr(names[i]);
-    }
-    return config;
-  }
-
   var ngDeps = [
     'cam.commons',
     'pascalprecht.translate',
@@ -66,25 +56,17 @@ module.exports = function(pluginDependencies) {
     return el.ngModuleName;
   }));
 
-  var uriConfig = parseUriConfig();
-
-  if (typeof window.tasklistConf !== 'undefined' && window.tasklistConf.polyfills) {
-    var polyfills = window.tasklistConf.polyfills;
-
-    if (polyfills.indexOf('placeholder') > -1) {
-      var load = window.requirejs;
-      var appRoot = uriConfig['app-root'];
-
-      load([
-        appRoot + '/app/tasklist/scripts/placeholders.utils.js',
-        appRoot + '/app/tasklist/scripts/placeholders.main.js'
-      ], function() {
-        load([
-          appRoot + '/app/tasklist/scripts/placeholders.jquery.js'
-        ], function() {});
-      });
+  function parseUriConfig() {
+    var $baseTag = $('base');
+    var config = {};
+    var names = ['href', 'app-root', 'admin-api', 'tasklist-api', 'engine-api'];
+    for(var i = 0; i < names.length; i++) {
+      config[names[i]] = $baseTag.attr(names[i]);
     }
+    return config;
   }
+
+  var uriConfig = parseUriConfig();
 
   var tasklistApp = angular.module('cam.tasklist', ngDeps);
 
