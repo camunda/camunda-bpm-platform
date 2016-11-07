@@ -31,7 +31,7 @@ describe('Cockpit Decisions Dashboard Spec', function() {
         decisionsPage.navigateTo();
 
         // then
-        expect(decisionsPage.deployedDecisionsList.decisionCountHeader()).to.eventually.eql('1 decision table deployed');
+        expect(decisionsPage.deployedDecisionsList.decisionCountHeader()).to.eventually.eql('1 decision definition deployed');
         expect(decisionsPage.deployedDecisionsList.decisionsList().count()).to.eventually.eql(1);
         expect(decisionsPage.deployedDecisionsList.decisionName(0)).to.eventually.eql('Assign Approver');
       });
@@ -50,7 +50,7 @@ describe('Cockpit Decisions Dashboard Spec', function() {
         decisionsPage.navigateTo();
 
         // then
-        expect(decisionsPage.deployedDecisionsList.decisionCountHeader()).to.eventually.eql('2 decision tables deployed');
+        expect(decisionsPage.deployedDecisionsList.decisionCountHeader()).to.eventually.eql('2 decision definitions deployed');
         expect(decisionsPage.deployedDecisionsList.decisionsList().count()).to.eventually.eql(2);
         expect(decisionsPage.deployedDecisionsList.decisionName(1)).to.eventually.eql('invoice-approver');
       });
