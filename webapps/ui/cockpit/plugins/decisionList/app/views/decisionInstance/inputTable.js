@@ -13,7 +13,7 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
     controller: [
       '$scope',
       function($scope) {
-        $scope.loadingState = $scope.decisionInstance.inputs > 0 ? 'LOADED' : 'EMPTY';
+        $scope.loadingState = $scope.decisionInstance.inputs.length > 0 ? 'LOADED' : 'EMPTY';
 
         $scope.variables = $scope.decisionInstance.inputs.map(function(variable) {
           return {
