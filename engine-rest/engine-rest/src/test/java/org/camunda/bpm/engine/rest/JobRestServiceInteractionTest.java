@@ -1446,6 +1446,26 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
   }
 
   @Test
+  public void testSetRetriesWithNegativeRetries() {
+    doThrow(new BadUserRequestException("retries are negative"))
+        .when(mockManagementService).setJobRetriesAsync(
+        anyListOf(String.class),
+        any(JobQuery.class),
+        eq(-1));
+
+    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    messageBodyJson.put(RETRIES, -1);
+    HistoricProcessInstanceQueryDto query = new HistoricProcessInstanceQueryDto();
+    messageBodyJson.put("jobQuery", query);
+
+    given()
+        .contentType(ContentType.JSON).body(messageBodyJson)
+        .then().expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode())
+        .when().post(JOBS_SET_RETRIES_URL);
+  }
+
+  @Test
   public void testSetRetriesWithoutRetries() {
     Map<String, Object> messageBodyJson = new HashMap<String, Object>();
     messageBodyJson.put("jobIds", null);
