@@ -49,7 +49,7 @@ public class SpringProcessApplication extends AbstractProcessApplication impleme
 
   protected Map<String, String> properties = new HashMap<String, String>();
   protected ApplicationContext applicationContext;
-  private String beanName;
+  protected String beanName;
 
   @Override
   protected String autodetectProcessApplicationName() {
