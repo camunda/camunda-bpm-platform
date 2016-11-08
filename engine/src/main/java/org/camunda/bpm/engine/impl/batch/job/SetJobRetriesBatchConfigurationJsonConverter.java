@@ -38,10 +38,10 @@ public class SetJobRetriesBatchConfigurationJsonConverter extends JsonObjectConv
   }
 
   public SetJobRetriesBatchConfiguration toObject(JSONObject json) {
-    SetJobRetriesBatchConfiguration configuration = new SetJobRetriesBatchConfiguration(readJobIds(json));
-
-    int retries = json.optInt(RETRIES);
-    configuration.setRetries(retries);
+    SetJobRetriesBatchConfiguration configuration = new SetJobRetriesBatchConfiguration(
+        readJobIds(json),
+        json.optInt(RETRIES)
+    );
 
     return configuration;
   }
@@ -50,7 +50,7 @@ public class SetJobRetriesBatchConfigurationJsonConverter extends JsonObjectConv
     List<Object> objects = JsonUtil.jsonArrayAsList(jsonObject.getJSONArray(JOB_IDS));
     List<String> jobIds = new ArrayList<String>();
     for (Object object : objects) {
-      jobIds.add((String) object);
+      jobIds.add(object.toString());
     }
     return jobIds;
   }

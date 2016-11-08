@@ -324,10 +324,7 @@ public class ManagementServiceAsyncOperationsTest extends AbstractAsyncOperation
     JobQuery query = managementService.createJobQuery();
 
     //when
-    Batch batch = managementService.setJobRetriesAsync(query, -1);
-    executeSeedJob(batch);
-    List<Exception> exceptions = executeBatchJobs(batch);
-    //when
-    assertThat(exceptions.size(), is(2));
+    thrown.expect(ProcessEngineException.class);
+    managementService.setJobRetriesAsync(query, -1);
   }
 }

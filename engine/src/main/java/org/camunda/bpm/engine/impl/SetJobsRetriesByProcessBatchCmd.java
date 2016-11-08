@@ -24,23 +24,23 @@ public class SetJobsRetriesByProcessBatchCmd extends AbstractSetJobsRetriesBatch
 
   protected List<String> collectJobIds(CommandContext commandContext) {
     List<String> collectedJobIds = new ArrayList<String>();
-
-    if (this.processInstanceIds != null) {
-      for (String process : this.processInstanceIds) {
-        for (Job job : commandContext.getJobManager().findJobsByProcessInstanceId(process)) {
-          collectedJobIds.add(job.getId());
-        }
-      }
-    }
+    List<String> collectedProcessInstanceIds = new ArrayList<String>();
 
     if (query != null) {
-      for (ProcessInstance process : query.list()) {
-        for (Job job : commandContext.getJobManager().findJobsByProcessInstanceId(process.getId())) {
-          collectedJobIds.add(job.getId());
-        }
+      collectedProcessInstanceIds.addAll(((ProcessInstanceQueryImpl)query).listIds());
+    }
+
+    if (this.processInstanceIds != null) {
+      collectedProcessInstanceIds.addAll(this.processInstanceIds);
+    }
+
+    for (String process : collectedProcessInstanceIds) {
+      for (Job job : commandContext.getJobManager().findJobsByProcessInstanceId(process)) {
+        collectedJobIds.add(job.getId());
       }
     }
 
     return collectedJobIds;
   }
+
 }

@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmd.batch.AbstractIDBasedBatchCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
+import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +41,7 @@ public abstract class AbstractSetJobsRetriesBatchCmd extends AbstractIDBasedBatc
     List<String> jobIds = collectJobIds(commandContext);
 
     ensureNotEmpty(BadUserRequestException.class, "jobIds", jobIds);
+    EnsureUtil.ensureGreaterThanOrEqual("Retries count", retries, 0);
     checkAuthorizations(commandContext);
     writeUserOperationLog(commandContext,
         retries,

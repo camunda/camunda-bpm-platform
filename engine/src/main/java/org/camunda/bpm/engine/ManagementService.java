@@ -872,6 +872,7 @@ public interface ManagementService {
    * @param jobQuery query that identifies which jobs should be modified.
    * @param retries number of retries.
    *
+   * @throws BadUserRequestException if neither jobIds, nor jobQuery is provided or result in empty list
    * @throws AuthorizationException
    *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
    *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION},

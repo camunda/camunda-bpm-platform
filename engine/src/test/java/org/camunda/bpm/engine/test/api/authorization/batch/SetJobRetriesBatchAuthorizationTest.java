@@ -16,6 +16,7 @@ import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario;
 import org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenarioWithCount;
@@ -79,11 +80,6 @@ public class SetJobRetriesBatchAuthorizationTest extends AbstractBatchAuthorizat
     processInstance2 = engineRule.getRuntimeService().startProcessInstanceById(sourceDefinition.getId());
   }
 
-  @Override
-  public void testCleanUp() {
-    engineRule.getRuntimeService().deleteProcessInstances(
-        Arrays.asList(new String[]{processInstance.getId(), processInstance2.getId()}), "test", true, true);
-  }
 
   @Parameterized.Parameters(name = "Scenario {index}")
   public static Collection<AuthorizationScenario[]> scenarios() {
@@ -116,9 +112,9 @@ public class SetJobRetriesBatchAuthorizationTest extends AbstractBatchAuthorizat
   }
 
   @Test
-  public void testWithTwoInvocationsJobsList() {
+  public void testWithTwoInvocationsJobsListBased() {
     engineRule.getProcessEngineConfiguration().setInvocationsPerBatchJob(2);
-    setupAndExecuteJobsListTest();
+    setupAndExecuteJobsListBasedTest();
 
     // then
     assertScenario();
@@ -127,16 +123,9 @@ public class SetJobRetriesBatchAuthorizationTest extends AbstractBatchAuthorizat
   }
 
   @Test
-  public void testJobsList() {
-    setupAndExecuteJobsListTest();
-    // then
-    assertScenario();
-  }
-
-  @Test
-  public void testWithTwoInvocationsProcessList() {
+  public void testWithTwoInvocationsJobsQueryBased() {
     engineRule.getProcessEngineConfiguration().setInvocationsPerBatchJob(2);
-    setupAndExecuteProcessListTest();
+    setupAndExecuteJobsQueryBasedTest();
 
     // then
     assertScenario();
@@ -144,7 +133,43 @@ public class SetJobRetriesBatchAuthorizationTest extends AbstractBatchAuthorizat
     assertRetries(getAllJobIds(), Long.valueOf(getScenario().getCount()).intValue());
   }
 
-  private void setupAndExecuteProcessListTest() {
+  @Test
+  public void testJobsListBased() {
+    setupAndExecuteJobsListBasedTest();
+    // then
+    assertScenario();
+  }
+
+  @Test
+  public void testJobsListQueryBased() {
+    setupAndExecuteJobsQueryBasedTest();
+    // then
+    assertScenario();
+  }
+
+  @Test
+  public void testWithTwoInvocationsProcessListBased() {
+    engineRule.getProcessEngineConfiguration().setInvocationsPerBatchJob(2);
+    setupAndExecuteProcessListBasedTest();
+
+    // then
+    assertScenario();
+
+    assertRetries(getAllJobIds(), Long.valueOf(getScenario().getCount()).intValue());
+  }
+
+  @Test
+  public void testWithTwoInvocationsProcessQueryBased() {
+    engineRule.getProcessEngineConfiguration().setInvocationsPerBatchJob(2);
+    setupAndExecuteJobsQueryBasedTest();
+
+    // then
+    assertScenario();
+
+    assertRetries(getAllJobIds(), Long.valueOf(getScenario().getCount()).intValue());
+  }
+
+  private void setupAndExecuteProcessListBasedTest() {
     //given
     List<String> processInstances = Arrays.asList(new String[]{processInstance.getId(), processInstance2.getId()});
     authRule
@@ -164,12 +189,12 @@ public class SetJobRetriesBatchAuthorizationTest extends AbstractBatchAuthorizat
 
   @Test
   public void testProcessList() {
-    setupAndExecuteProcessListTest();
+    setupAndExecuteProcessListBasedTest();
     // then
     assertScenario();
   }
 
-  protected void setupAndExecuteJobsListTest() {
+  protected void setupAndExecuteJobsListBasedTest() {
     //given
     List<String> allJobIds = getAllJobIds();
     authRule
@@ -183,6 +208,25 @@ public class SetJobRetriesBatchAuthorizationTest extends AbstractBatchAuthorizat
     // when
     batch = managementService.setJobRetriesAsync(
         allJobIds, RETRIES);
+
+    executeSeedAndBatchJobs();
+  }
+
+  protected void setupAndExecuteJobsQueryBasedTest() {
+    //given
+    JobQuery jobQuery = managementService.createJobQuery();
+    authRule
+        .init(scenario)
+        .withUser("userId")
+        .bindResource("Process", sourceDefinition.getKey())
+        .bindResource("processInstance1", processInstance.getId())
+        .bindResource("processInstance2", processInstance2.getId())
+        .start();
+
+    // when
+
+    batch = managementService.setJobRetriesAsync(
+        jobQuery, RETRIES);
 
     executeSeedAndBatchJobs();
   }

@@ -29,10 +29,6 @@ public class SetJobRetriesBatchConfiguration extends BatchConfiguration {
     this.retries = retries;
   }
 
-  public SetJobRetriesBatchConfiguration(List<String> ids) {
-    super(ids);
-  }
-
   public int getRetries() {
     return retries;
   }
