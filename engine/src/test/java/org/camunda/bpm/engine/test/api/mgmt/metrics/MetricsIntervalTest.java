@@ -19,11 +19,14 @@ import java.util.Date;
 import java.util.List;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.metrics.MetricsQueryImpl;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.junit.Test;
 import org.camunda.bpm.engine.management.MetricsQuery;
 import org.camunda.bpm.engine.management.MetricIntervalValue;
 import static junit.framework.TestCase.assertEquals;
 import static org.camunda.bpm.engine.management.Metrics.ACTIVTY_INSTANCE_START;
+import static org.junit.Assert.assertNotEquals;
+
 import org.joda.time.DateTime;
 import org.junit.Assert;
 
@@ -49,7 +52,7 @@ public class MetricsIntervalTest extends AbstractMetricsIntervalTest {
     assertEquals(201, query.getLastRow());
   }
 
-    @Test
+  @Test
   public void testMeterQueryDecreaseLimit() {
     //given metric data
 
@@ -440,5 +443,53 @@ public class MetricsIntervalTest extends AbstractMetricsIntervalTest {
 
     //clean up
     clearLocalMetrics();
+  }
+
+  // NEW DATA AFTER SOME TIME ////////////////////////////////////////////////
+  @Test
+  public void testIntervallQueryWithGeneratedDataAfterSomeTime() {
+    //given metric data and result of interval query
+    List<MetricIntervalValue> metrics = managementService.createMetricsQuery().interval();
+
+    //when time is running and metrics is reported
+    Date lastInterval = metrics.get(0).getTimestamp();
+    long nextTime = lastInterval.getTime() + DEFAULT_INTERVAL_MILLIS;
+    ClockUtil.setCurrentTime(new Date(nextTime));
+
+    reportMetrics();
+
+    //then query returns more results
+    List<MetricIntervalValue> newMetrics = managementService.createMetricsQuery().interval();
+    assertNotEquals(metrics.size(), newMetrics.size());
+    assertEquals(metrics.size() + metricsCount, newMetrics.size());
+    assertEquals(newMetrics.get(0).getTimestamp().getTime(), metrics.get(0).getTimestamp().getTime() + DEFAULT_INTERVAL_MILLIS);
+  }
+
+  @Test
+  public void testIntervallQueryWithGeneratedDataAfterSomeTimeForSpecificMetric() {
+    //given metric data and result of interval query
+    List<MetricIntervalValue> metrics = managementService.createMetricsQuery()
+      .name(ACTIVTY_INSTANCE_START)
+      .startDate(new Date(0))
+      .endDate(new Date(DEFAULT_INTERVAL_MILLIS * 200)).interval();
+
+    //when time is running and metrics is reported
+    Date lastInterval = metrics.get(0).getTimestamp();
+    long nextTime = lastInterval.getTime() + DEFAULT_INTERVAL_MILLIS;
+    ClockUtil.setCurrentTime(new Date(nextTime));
+
+    reportMetrics();
+
+    //then query returns more results
+    List<MetricIntervalValue> newMetrics = managementService.createMetricsQuery()
+      .name(ACTIVTY_INSTANCE_START)
+      .startDate(new Date(0))
+      .endDate(new Date(DEFAULT_INTERVAL_MILLIS * 200)).interval();
+    assertNotEquals(metrics.size(), newMetrics.size());
+    assertEquals(newMetrics.get(0).getTimestamp().getTime(), metrics.get(0).getTimestamp().getTime() + DEFAULT_INTERVAL_MILLIS);
+    assertEquals(metrics.get(0).getValue(), newMetrics.get(1).getValue());
+
+    //clean up
+    clearMetrics();
   }
 }
