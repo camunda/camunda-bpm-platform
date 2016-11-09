@@ -396,10 +396,9 @@ public class TriggerConditionalEventFromDelegationCodeTest extends AbstractCondi
     assertEquals(specifier.getExpectedNonInterruptingCount(), taskQuery.taskName(TASK_AFTER_CONDITION).count());
   }
 
-
-
-  @Ignore
+  @Test
   public void testSetVariableInStartAndEndListener() {
+    //given process with start and end listener on user task
     BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
       .startEvent()
       .userTask(TASK_BEFORE_CONDITION_ID)
@@ -411,17 +410,14 @@ public class TriggerConditionalEventFromDelegationCodeTest extends AbstractCondi
       .done();
     deployConditionalEventSubProcess(modelInstance, true);
 
-    // given
+    //when process is started
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
 
+    //then start listener sets variable and
+    //execution stays in task after conditional event in event sub process
     TaskQuery taskQuery = taskService.createTaskQuery().processInstanceId(procInst.getId());
     Task task = taskQuery.singleResult();
-
-    //when task is completed
-    taskService.complete(task.getId());
-
-    //then start listener sets variable
-    //conditional event is triggered
+    assertEquals(TASK_AFTER_CONDITION, task.getName());
     tasksAfterVariableIsSet = taskQuery.list();
     assertEquals(specifier.getExpectedInterruptingCount(), taskQuery.taskName(TASK_AFTER_CONDITION).count());
   }

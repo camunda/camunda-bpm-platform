@@ -18,10 +18,8 @@ package org.camunda.bpm.engine.impl.bpmn.parser;
 import java.io.Serializable;
 import java.util.Set;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.Condition;
 import org.camunda.bpm.engine.impl.core.variable.event.VariableEvent;
-import org.camunda.bpm.engine.impl.el.Expression;
 import org.camunda.bpm.engine.impl.event.EventType;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 
@@ -31,7 +29,7 @@ import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
  *
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
-public class ConditionalEventDefinition implements Serializable {
+public class ConditionalEventDefinition extends EventSubscriptionDeclaration implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -40,9 +38,9 @@ public class ConditionalEventDefinition implements Serializable {
   protected String variableName;
   protected Set<String> variableEvents;
   protected ActivityImpl conditionalActivity;
-  protected String activityId;
 
   public ConditionalEventDefinition(Condition condition, ActivityImpl conditionalActivity) {
+    super(null, EventType.CONDITONAL);
     this.activityId = conditionalActivity.getActivityId();
     this.conditionalActivity = conditionalActivity;
     this.condition = condition;
@@ -52,8 +50,8 @@ public class ConditionalEventDefinition implements Serializable {
     return conditionalActivity;
   }
 
-  public String getActivityId() {
-    return activityId;
+  public void setConditionalActivity(ActivityImpl conditionalActivity) {
+    this.conditionalActivity = conditionalActivity;
   }
 
   public boolean isInterrupting() {

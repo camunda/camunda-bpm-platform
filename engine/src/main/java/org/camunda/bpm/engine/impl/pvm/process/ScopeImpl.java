@@ -237,6 +237,4 @@ public abstract class ScopeImpl extends CoreActivity implements PvmScope {
     return processDefinition;
   }
 
-
-
 }
