@@ -36,6 +36,7 @@ var Controller = [
   $resource,
   Uri
 ) {
+    var hasMetricsPlugin = hasPlugin('cockpit.dashboard.metrics', 'executed-activity-instances');
     $scope.hasProcessSearch = hasPlugin('cockpit.processes.dashboard', 'search-process-instances');
     $scope.hasCaseSearch = hasPlugin('cockpit.cases.dashboard', 'case-instances-search');
     $scope.hasTaskSearch = hasPlugin('cockpit.tasks.dashboard', 'search-tasks');
@@ -156,18 +157,18 @@ var Controller = [
       localConf.set('dashboardMetricsPeriod', period);
     };
 
-    var pluginLicenseKeyResource = $resource(Uri.appUri('plugin://license/:engine/key'), {}, {
-      save : { method: 'POST' }
-    });
+    if (hasMetricsPlugin) {
+      var pluginLicenseKeyResource = $resource(Uri.appUri('plugin://license/:engine/key'), {}, {});
 
-    pluginLicenseKeyResource.get().$promise.then(function(result) {
-      if(result && result.valid) {
-        $scope.metricsVars = { read: [ 'metricsPeriod' ] };
-        $scope.metricsPlugins = Views.getProviders({
-          component: 'cockpit.dashboard.metrics'
-        }).sort(prioritySort);
-      }
-    });
+      pluginLicenseKeyResource.get().$promise.then(function(result) {
+        if(result && result.valid) {
+          $scope.metricsVars = { read: [ 'metricsPeriod' ] };
+          $scope.metricsPlugins = Views.getProviders({
+            component: 'cockpit.dashboard.metrics'
+          }).sort(prioritySort);
+        }
+      });
+    }
 
   }];
 
