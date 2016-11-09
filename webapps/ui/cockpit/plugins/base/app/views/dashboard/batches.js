@@ -8,7 +8,7 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
     template: '<!-- nothing to show, but needed -->',
     controller: function() {},
     checkActive: function(path) {
-      return path.endsWith('#/batch');
+      return path && path.split('?')[0] && path.split('?')[0].endsWith('#/batch');
     },
     priority: -5
   });
