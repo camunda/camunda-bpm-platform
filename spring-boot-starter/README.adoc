@@ -64,6 +64,7 @@ Check out the https://camunda.github.io/camunda-bpm-spring-boot-starter[Document
 
 * https://github.com/camunda/camunda-bpm-spring-boot-starter/issues[Issue Tracker] - if you have an idea for a new feature or want to file a bug ... this is the place to go.
 * link:./CONTRIBUTE.md[Contributing] - check this if you want to contribute
+* https://forum.camunda.org/c/community-extensions/spring-boot-starter[Discussion Forum] - this extension has it's own sub-category at the camunda forum ... use it! 
 
 ## Releases
 
