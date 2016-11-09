@@ -19,10 +19,12 @@ import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
+import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.builder.UserTaskBuilder;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
@@ -810,5 +812,22 @@ public class MixedConditionalEventTest extends AbstractConditionalEventTestCase 
     assertEquals(5, tasksAfterVariableIsSet.size());
     //three subscriptions: event sub process in sub process and on process instance level and boundary event of sub process
     assertEquals(3, conditionEventSubscriptionQuery.count());
+  }
+
+  @Ignore
+  @Deployment
+  public void testCompensationWithConditionalEvents() {
+    //given process with compensation and conditional events
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertNotNull(task);
+    assertEquals("Before Cancel", task.getName());
+
+    //when task before cancel is completed
+    taskService.complete(task.getId());
+
+    //then compensation is triggered -> which triggers conditional events
+    tasksAfterVariableIsSet = taskService.createTaskQuery().list();
+    assertEquals(4, tasksAfterVariableIsSet.size());
   }
 }
