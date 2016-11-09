@@ -26,6 +26,7 @@ import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.SequenceFlow;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaExecutionListener;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -395,4 +396,33 @@ public class TriggerConditionalEventFromDelegationCodeTest extends AbstractCondi
     assertEquals(specifier.getExpectedNonInterruptingCount(), taskQuery.taskName(TASK_AFTER_CONDITION).count());
   }
 
+
+
+  @Ignore
+  public void testSetVariableInStartAndEndListener() {
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
+      .startEvent()
+      .userTask(TASK_BEFORE_CONDITION_ID)
+      .name(TASK_BEFORE_CONDITION)
+      .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_START, specifier.getDelegateClass().getName())
+      .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_END, specifier.getDelegateClass().getName())
+      .userTask(TASK_WITH_CONDITION_ID)
+      .endEvent()
+      .done();
+    deployConditionalEventSubProcess(modelInstance, true);
+
+    // given
+    ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
+
+    TaskQuery taskQuery = taskService.createTaskQuery().processInstanceId(procInst.getId());
+    Task task = taskQuery.singleResult();
+
+    //when task is completed
+    taskService.complete(task.getId());
+
+    //then start listener sets variable
+    //conditional event is triggered
+    tasksAfterVariableIsSet = taskQuery.list();
+    assertEquals(specifier.getExpectedInterruptingCount(), taskQuery.taskName(TASK_AFTER_CONDITION).count());
+  }
 }

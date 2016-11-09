@@ -16,6 +16,7 @@
 package org.camunda.bpm.engine.test.bpmn.event.conditional;
 
 import org.camunda.bpm.engine.SuspendedEntityInteractionException;
+import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
@@ -1216,5 +1217,45 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
     tasksAfterVariableIsSet = taskService.createTaskQuery().list();
     assertEquals(5, tasksAfterVariableIsSet.size());
     assertEquals(3, taskService.createTaskQuery().taskDefinitionKey("Task_3").count());
+  }
+
+  @Test
+  public void testSetVariableInTriggeredEventSubProcess() {
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
+      .startEvent()
+      .userTask(TASK_WITH_CONDITION_ID).name(TASK_WITH_CONDITION)
+      .serviceTask()
+      .camundaClass(SetVariableDelegate.class.getName())
+      .endEvent()
+      .done();
+
+    modelInstance = modify(modelInstance)
+      .addSubProcessTo(CONDITIONAL_EVENT_PROCESS_KEY)
+      .triggerByEvent()
+      .embeddedSubProcess()
+      .startEvent()
+      .interrupting(true)
+      .conditionalEventDefinition(CONDITIONAL_EVENT)
+      .condition(CONDITION_EXPR)
+      .conditionalEventDefinitionDone()
+      .serviceTask()
+      .camundaClass(LoopDelegate.class.getName())
+      .endEvent().done();
+
+    engine.manageDeployment(repositoryService.createDeployment().addModelInstance(CONDITIONAL_MODEL, modelInstance).deploy());
+
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
+    TaskQuery taskQuery = taskService.createTaskQuery().processInstanceId(processInstance.getId());
+    Task task = taskQuery.singleResult();
+    assertEquals(TASK_WITH_CONDITION, task.getName());
+
+    //when task is completed
+    taskService.complete(task.getId());
+
+    //then variable is set
+    //event sub process is triggered
+    //and service task in event sub process triggers again sub process
+    tasksAfterVariableIsSet = taskService.createTaskQuery().list();
   }
 }

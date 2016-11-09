@@ -48,6 +48,8 @@ import org.camunda.bpm.engine.impl.util.EnsureUtil;
 import java.util.*;
 
 import static org.camunda.bpm.engine.impl.bpmn.helper.CompensationUtil.SIGNAL_COMPENSATION_DONE;
+import static org.camunda.bpm.engine.impl.pvm.runtime.ActivityInstanceState.DEFAULT;
+import static org.camunda.bpm.engine.impl.pvm.runtime.ActivityInstanceState.ENDING;
 
 /**
  * @author Daniel Meyer
@@ -279,8 +281,10 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     PvmActivity activity = getActivity();
     if(isActive && activity != null) {
       // set activity instance state to cancel
-      setCanceled(true);
-      performOperation(PvmAtomicOperation.FIRE_ACTIVITY_END);
+      if (activityInstanceState != ENDING.getStateCode()) {
+        setCanceled(true);
+        performOperation(PvmAtomicOperation.FIRE_ACTIVITY_END);
+      }
       // set activity instance state back to 'default'
       // -> execution will be reused for executing more activities and we want the state to
       // be default initially.
@@ -298,6 +302,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
   public void interrupt(String reason, boolean skipCustomListeners, boolean skipIoMappings) {
     LOG.interruptingExecution(reason, skipCustomListeners);
+
     clearScope(reason, skipCustomListeners, skipIoMappings);
   }
 
@@ -1193,7 +1198,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   }
 
   public void activityInstanceDone() {
-    this.activityInstanceState = ActivityInstanceState.ENDING.getStateCode();
+    this.activityInstanceState = ENDING.getStateCode();
   }
 
   protected abstract String generateActivityInstanceId(String activityId);
@@ -2055,7 +2060,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
       return targetScope.getActivityInstanceId();
     } else {
       ActivityImpl targetActivity = targetScope.getActivity();
-      if ((targetActivity != null && targetActivity.getActivities().isEmpty()) || targetScope.getActivityInstanceId() != null) {
+      if ((targetActivity != null && targetActivity.getActivities().isEmpty())) {
         return targetScope.getActivityInstanceId();
       } else {
         return targetScope.getParentActivityInstanceId();
