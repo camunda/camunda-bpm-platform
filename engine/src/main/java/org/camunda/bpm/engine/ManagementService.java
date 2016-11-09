@@ -818,6 +818,7 @@ public interface ManagementService {
    * @param jobIds ids of the jobs to modify, cannot be null.
    * @param retries number of retries.
    *
+   * @throws BadUserRequestException if jobIds is null
    * @throws AuthorizationException
    *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
    *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
@@ -834,6 +835,7 @@ public interface ManagementService {
    * @param jobIds ids of the jobs to modify, cannot be null.
    * @param retries number of retries.
    *
+   * @throws BadUserRequestException if jobIds is null
    * @throws AuthorizationException
    *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
    *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION},
@@ -851,6 +853,7 @@ public interface ManagementService {
    * @param jobQuery query that identifies which jobs should be modified, cannot be null.
    * @param retries number of retries.
    *
+   * @throws BadUserRequestException if jobQuery is null
    * @throws AuthorizationException
    *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
    *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION},
