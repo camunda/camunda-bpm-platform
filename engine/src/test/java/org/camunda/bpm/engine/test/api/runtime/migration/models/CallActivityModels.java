@@ -54,4 +54,36 @@ public class CallActivityModels {
         .endEvent()
         .done();
   }
+
+  public static BpmnModelInstance oneBpmnCallActivityProcessAsExpression(int processNumber){
+    return ProcessModels.newModel(processNumber)
+        .startEvent()
+        .callActivity()
+          .calledElement("${NextProcess}")
+          .camundaIn("NextProcess", "NextProcess")
+        .endEvent()
+        .done();
+  }
+
+  public static BpmnModelInstance oneBpmnCallActivityProcessAsExpressionAsync(int processNumber){
+    return ProcessModels.newModel(processNumber)
+        .startEvent()
+          .camundaAsyncBefore(true)
+        .callActivity()
+          .calledElement("${NextProcess}")
+          .camundaIn("NextProcess", "NextProcess")
+        .endEvent()
+        .done();
+  }
+
+  public static BpmnModelInstance oneBpmnCallActivityProcessPassingVariables(int processNumber, int calledProcessNumber){
+    return ProcessModels.newModel(processNumber)
+        .startEvent()
+        .callActivity()
+          .calledElement("Process"+calledProcessNumber)
+          .camundaInputParameter("NextProcess", "Process"+(processNumber+1))
+          .camundaIn("NextProcess", "NextProcess")
+        .endEvent()
+        .done();
+  }
 }

@@ -13,37 +13,18 @@
 
 package org.camunda.bpm.engine.test.api.runtime.migration;
 
-import java.util.Collection;
-
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.camunda.bpm.model.bpmn.builder.AbstractActivityBuilder;
-import org.camunda.bpm.model.bpmn.builder.AbstractBaseElementBuilder;
-import org.camunda.bpm.model.bpmn.builder.AbstractFlowNodeBuilder;
-import org.camunda.bpm.model.bpmn.builder.CallActivityBuilder;
-import org.camunda.bpm.model.bpmn.builder.EndEventBuilder;
-import org.camunda.bpm.model.bpmn.builder.IntermediateCatchEventBuilder;
-import org.camunda.bpm.model.bpmn.builder.ServiceTaskBuilder;
-import org.camunda.bpm.model.bpmn.builder.StartEventBuilder;
-import org.camunda.bpm.model.bpmn.builder.SubProcessBuilder;
-import org.camunda.bpm.model.bpmn.builder.UserTaskBuilder;
-import org.camunda.bpm.model.bpmn.instance.Activity;
-import org.camunda.bpm.model.bpmn.instance.Association;
-import org.camunda.bpm.model.bpmn.instance.BaseElement;
-import org.camunda.bpm.model.bpmn.instance.BpmnModelElementInstance;
-import org.camunda.bpm.model.bpmn.instance.Definitions;
-import org.camunda.bpm.model.bpmn.instance.FlowElement;
-import org.camunda.bpm.model.bpmn.instance.FlowNode;
-import org.camunda.bpm.model.bpmn.instance.Message;
-import org.camunda.bpm.model.bpmn.instance.MultiInstanceLoopCharacteristics;
-import org.camunda.bpm.model.bpmn.instance.SequenceFlow;
-import org.camunda.bpm.model.bpmn.instance.Signal;
-import org.camunda.bpm.model.bpmn.instance.SubProcess;
+import org.camunda.bpm.model.bpmn.builder.*;
+import org.camunda.bpm.model.bpmn.instance.*;
+import org.camunda.bpm.model.bpmn.instance.Process;
 import org.camunda.bpm.model.xml.Model;
 import org.camunda.bpm.model.xml.instance.DomDocument;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.ModelElementType;
 import org.camunda.bpm.model.xml.validation.ModelElementValidator;
 import org.camunda.bpm.model.xml.validation.ValidationResults;
+
+import java.util.Collection;
 
 public class ModifiableBpmnModelInstance implements BpmnModelInstance {
 
@@ -176,6 +157,16 @@ public class ModifiableBpmnModelInstance implements BpmnModelInstance {
       }
     }
 
+    return this;
+  }
+
+  public ModifiableBpmnModelInstance addDocumentation(String content) {
+    Collection<Process> processes = modelInstance.getModelElementsByType(Process.class);
+    Documentation documentation = modelInstance.newInstance(Documentation.class);
+    documentation.setTextContent(content);
+    for (Process process : processes) {
+      process.addChildElement(documentation);
+    }
     return this;
   }
 

@@ -30,6 +30,7 @@ import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDef
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
@@ -86,6 +87,17 @@ public class DeploymentCache {
         return null;
       }
     });
+  }
+
+  protected void initDeployment(final DeploymentEntity deployment, String resourceName) {
+    deployment.clearResources();
+    // with the given resource we prevent the deployment of querying
+    // the database which means using all resources that were utilized during the deployment
+    ResourceEntity resource = Context.getCommandContext()
+        .getResourceManager()
+        .findResourceByDeploymentIdAndResourceName(deployment.getId(), resourceName);
+
+    deployment.addResource(resource);
   }
 
   // PROCESS DEFINITION ////////////////////////////////////////////////////////////////////////////////
@@ -175,6 +187,7 @@ public class DeploymentCache {
               .getDeploymentManager()
               .findDeploymentById(deploymentId);
           deployment.setNew(false);
+          initDeployment(deployment, processDefinition.getResourceName());
           deploy(deployment);
           cachedProcessDefinition = processDefinitionEntityCache.get(processDefinitionId);
         }
@@ -362,6 +375,7 @@ public class DeploymentCache {
               .findDeploymentById(deploymentId);
 
           deployment.setNew(false);
+          initDeployment(deployment, caseDefinition.getResourceName());
           deploy(deployment);
           cachedCaseDefinition = caseDefinitionCache.get(caseDefinitionId);
         }
@@ -528,6 +542,7 @@ public class DeploymentCache {
               .findDeploymentById(deploymentId);
 
           deployment.setNew(false);
+          initDeployment(deployment, decisionDefinition.getResourceName());
           deploy(deployment);
           cachedDecisionDefinition = decisionDefinitionCache.get(decisionDefinitionId);
         }
@@ -633,6 +648,7 @@ public class DeploymentCache {
               .findDeploymentById(deploymentId);
 
           deployment.setNew(false);
+          initDeployment(deployment, decisionRequirementsDefinition.getResourceName());
           deploy(deployment);
           cachedDecisionRequirementsDefinition = decisionRequirementsDefinitionCache.get(decisionRequirementsDefinitionId);
         }

@@ -59,6 +59,12 @@ public class DeploymentEntity implements Serializable, Deployment, DbEntity {
     resources.put(resource.getName(), resource);
   }
 
+  public void clearResources() {
+    if(resources!=null){
+      resources.clear();
+    }
+  }
+
   // lazy loading /////////////////////////////////////////////////////////////
   public Map<String, ResourceEntity> getResources() {
     if (resources==null && id!=null) {
