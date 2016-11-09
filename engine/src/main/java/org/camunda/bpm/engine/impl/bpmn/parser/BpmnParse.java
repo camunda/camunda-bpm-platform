@@ -100,6 +100,7 @@ public class BpmnParse extends Parse {
 
   public static final String PROPERTYNAME_DOCUMENTATION = "documentation";
   public static final String PROPERTYNAME_INITIATOR_VARIABLE_NAME = "initiatorVariableName";
+  public static final String PROPERTYNAME_HAS_CONDITIONAL_EVENTS = "hasConditionalEvents";
   public static final String PROPERTYNAME_CONDITION = "condition";
   public static final String PROPERTYNAME_CONDITION_TEXT = "conditionText";
   public static final String PROPERTYNAME_VARIABLE_DECLARATIONS = "variableDeclarations";
@@ -947,7 +948,7 @@ public class BpmnParse extends Parse {
     Element timerEventDefinition = startEventElement.element(TIMER_EVENT_DEFINITION);
     Element compensateEventDefinition = startEventElement.element(COMPENSATE_EVENT_DEFINITION);
     Element escalationEventDefinitionElement = startEventElement.element(ESCALATION_EVENT_DEFINITION);
-    Element conditionalEventDefinitionElment = startEventElement.element(CONDITIONAL_EVENT_DEFINITION);
+    Element conditionalEventDefinitionElement = startEventElement.element(CONDITIONAL_EVENT_DEFINITION);
 
     if (scopeActivity.isTriggeredByEvent()) {
       // event subprocess
@@ -996,9 +997,9 @@ public class BpmnParse extends Parse {
 
         EscalationEventDefinition escalationEventDefinition = createEscalationEventDefinitionForEscalationHandler(escalationEventDefinitionElement, scopeActivity, isInterrupting);
         addEscalationEventDefinition(startEventActivity.getEventScope(), escalationEventDefinition, escalationEventDefinitionElement);
-      } else if (conditionalEventDefinitionElment != null) {
+      } else if (conditionalEventDefinitionElement != null) {
 
-        final ConditionalEventDefinition conditionalEventDef = parseConditionalStartEventForEventSubprocess(conditionalEventDefinitionElment, startEventActivity, isInterrupting);
+        final ConditionalEventDefinition conditionalEventDef = parseConditionalStartEventForEventSubprocess(conditionalEventDefinitionElement, startEventActivity, isInterrupting);
         behavior = new EventSubProcessStartConditionalEventActivityBehavior(conditionalEventDef);
       } else {
         addError("start event of event subprocess must be of type 'error', 'message', 'timer', 'signal', 'compensation' or 'escalation'", startEventElement);
@@ -3444,6 +3445,8 @@ public class BpmnParse extends Parse {
     if (conditionExprElement != null) {
       Condition condition = parseConditionExpression(conditionExprElement);
       conditionalEventDefinition = new ConditionalEventDefinition(condition, conditionalActivity);
+
+      conditionalActivity.getProcessDefinition().setProperty(PROPERTYNAME_HAS_CONDITIONAL_EVENTS, true);
 
       final String variableName = element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "variableName");
       conditionalEventDefinition.setVariableName(variableName);
