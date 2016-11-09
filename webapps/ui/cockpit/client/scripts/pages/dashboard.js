@@ -23,6 +23,8 @@ var Controller = [
   'Views',
   'hasPlugin',
   'page',
+  '$resource',
+  'Uri',
   function(
   $scope,
   camAPI,
@@ -30,7 +32,9 @@ var Controller = [
   $injector,
   Views,
   hasPlugin,
-  page
+  page,
+  $resource,
+  Uri
 ) {
     $scope.hasProcessSearch = hasPlugin('cockpit.processes.dashboard', 'search-process-instances');
     $scope.hasCaseSearch = hasPlugin('cockpit.cases.dashboard', 'case-instances-search');
@@ -152,10 +156,19 @@ var Controller = [
       localConf.set('dashboardMetricsPeriod', period);
     };
 
-    $scope.metricsVars = { read: [ 'metricsPeriod' ] };
-    $scope.metricsPlugins = Views.getProviders({
-      component: 'cockpit.dashboard.metrics'
-    }).sort(prioritySort);
+    var pluginLicenseKeyResource = $resource(Uri.appUri('plugin://license/:engine/key'), {}, {
+      save : { method: 'POST' }
+    });
+
+    pluginLicenseKeyResource.get().$promise.then(function(result) {
+      if(result && result.valid) {
+        $scope.metricsVars = { read: [ 'metricsPeriod' ] };
+        $scope.metricsPlugins = Views.getProviders({
+          component: 'cockpit.dashboard.metrics'
+        }).sort(prioritySort);
+      }
+    });
+
   }];
 
 var RouteConfig = [ '$routeProvider', function($routeProvider) {
