@@ -31,9 +31,12 @@ import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
+
+import org.camunda.bpm.engine.test.bpmn.event.conditional.SetVariableDelegate;
 import org.camunda.bpm.engine.test.bpmn.executionlistener.CurrentActivityExecutionListener.CurrentActivity;
 import org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener.RecordedEvent;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
@@ -425,5 +428,41 @@ public class ExecutionListenerTest {
       RuntimeService runtimeService = execution.getProcessEngineServices().getRuntimeService();
       runtimeService.correlateMessage(MESSAGE);
     }
+  }
+
+  @Test
+  public void testEndExecutionListenerIsCalledOnlyOnce() {
+
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("conditionalProcessKey")
+      .startEvent()
+      .userTask()
+      .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_END, SetVariableDelegate.class.getName())
+      .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_END, RecorderExecutionListener.class.getName())
+      .endEvent()
+      .done();
+
+    modelInstance = modify(modelInstance)
+      .addSubProcessTo("conditionalProcessKey")
+      .triggerByEvent()
+      .embeddedSubProcess()
+      .startEvent()
+      .interrupting(true)
+      .conditionalEventDefinition()
+      .condition("${variable == 1}")
+      .conditionalEventDefinitionDone()
+      .endEvent().done();
+
+    testHelper.deploy(modelInstance);
+
+    // given
+    ProcessInstance procInst = runtimeService.startProcessInstanceByKey("conditionalProcessKey");
+    TaskQuery taskQuery = taskService.createTaskQuery().processInstanceId(procInst.getId());
+
+    //when task is completed
+    taskService.complete(taskQuery.singleResult().getId());
+
+    //then end listener sets variable and triggers conditional event
+    //end listener should called only once
+    assertEquals(1, RecorderExecutionListener.getRecordedEvents().size());
   }
 }
