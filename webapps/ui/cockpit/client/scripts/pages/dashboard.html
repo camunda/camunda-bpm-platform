@@ -89,6 +89,7 @@
 
 
       <section class="statistics"
+               ng-class="{'section-collapsed': !statisticsActive}"
                ng-if="statisticsPlugins.length">
         <button tooltip="Toggle this section"
                 class="section-toggle btn btn-link btn-sm"
@@ -111,11 +112,6 @@
                     provider="plugin"
                     class="row"></view>
             </div>
-          </div>
-
-          <div class="help-block text-center"
-               ng-if="!statisticsActive">
-            Click the <span class="glyphicon glyphicon-eye-open"></span> to show the details.
           </div>
         </div>
       </section>
