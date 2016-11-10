@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.IdentityLink;
@@ -123,9 +124,9 @@ public class InvoiceTestCase extends ProcessEngineTestCase {
     ProcessInstance pi = runtimeService.createProcessInstanceByKey("invoice")
       .setVariables(variables)
       .startBeforeActivity("approveInvoice")
-      .execute();
+      .executeWithVariablesInReturn();
 
-    // givent that the process instance is waiting at task "approveInvoice"
+    // given that the process instance is waiting at task "approveInvoice"
     Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
     assertEquals("approveInvoice", task.getTaskDefinitionKey());
 
@@ -148,6 +149,45 @@ public class InvoiceTestCase extends ProcessEngineTestCase {
     // then the variable "approver" exists and is set to mary
     assertEquals("mary", taskService.getVariable(task.getId(), "approver"));
 
+  }
+  
+  @Deployment(resources = {"invoice.v2.bpmn", "invoice-clarification.cmmn"})
+  public void testInvoiceClarification() {
+    InputStream invoiceInputStream = InvoiceProcessApplication.class.getClassLoader().getResourceAsStream("invoice.pdf");
+
+    VariableMap variables = Variables.createVariables()
+      .putValue("creditor", "Great Pizza for Everyone Inc.")
+      .putValue("amount", 300.0d)
+      .putValue("invoiceCategory", "Travel Expenses")
+      .putValue("invoiceNumber", "GPFE-23232323")
+      .putValue("invoiceDocument", fileValue("invoice.pdf")
+        .file(invoiceInputStream)
+        .mimeType("application/pdf")
+        .create())
+      .putValue("approverGroups", Arrays.asList("sales", "accounting"))
+      .putValue("approved", Boolean.FALSE);
+
+    runtimeService.createProcessInstanceByKey("invoice")
+      .setVariables(variables)
+      .startAfterActivity("approveInvoice")
+      .executeWithVariablesInReturn();
+
+    // given that the process instance is waiting at case "Invoice clarification"
+    Task task = taskService.createTaskQuery().caseDefinitionKey("InvoiceClarificationCase").singleResult();
+    assertEquals("clarifyInvoice", task.getTaskDefinitionKey());
+    
+    // when the task "Assign Reviewer" is manually activated
+    CaseExecution caseExecution = caseService.createCaseExecutionQuery().activityId("assignReviewer").singleResult();
+    caseService.manuallyStartCaseExecution(caseExecution.getId());
+    Task assignReviewer = taskService
+        .createTaskQuery().caseDefinitionKey("InvoiceClarificationCase")
+        .taskDefinitionKey("assignReviewer").singleResult();
+    // and completed
+    taskService.complete(assignReviewer.getId(), Variables.createVariables().putValue("reviewer", "mary"));
+    
+    // then the task "Review Invoice" is active and assigned to mary
+    Task marysTask = taskService.createTaskQuery().taskAssignee("mary").singleResult();
+    assertEquals("reviewInvoice", marysTask.getTaskDefinitionKey());
   }
 
 }

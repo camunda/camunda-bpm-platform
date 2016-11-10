@@ -1,0 +1,149 @@
+<form class="form-horizontal" role="form">
+  <div class="row">
+    <div class="col-xs-7">
+      <p>
+        <strong>Please clarify:</strong><br/>
+      This invoice needs clarification and could not be approved due to missing data.
+      </p>
+  
+      <div class="form-group">
+        <label class="col-md-10">Invoice Document</label>
+        <div class="form-control-static col-md-10">
+          <a cam-file-download="invoiceDocument"></a>
+        </div>
+      </div>
+  
+      <div class="form-group">
+        <label class="col-md-10">Creditor</label>
+        <div class="col-md-10">
+          <input cam-variable-name="creditor"
+                 type="text"
+                 name="creditor"
+                 class="form-control" />
+        </div>
+      </div>
+  
+      <div class="form-group">
+        <label class="col-md-10">Amount</label>
+        <div class="col-md-10">
+          <input cam-variable-name="amount"
+                 type="text"
+                 name="amount"
+                 class="form-control" />
+        </div>
+      </div>
+  
+      <div class="form-group">
+        <label class="col-md-10">Invoice Category</label>
+        <div class="col-md-10">
+          <select cam-variable-name="invoiceCategory"
+                  class="form-control">
+            <option>Travel Expenses</option>
+            <option>Misc</option>
+          </select>
+        </div>
+      </div>
+  
+      <div class="form-group">
+        <label class="col-md-10">Invoice Number</label>
+        <div class="col-md-10">
+          <input cam-variable-name="invoiceNumber"
+                 type="text"
+                 name="invoiceNumber"
+                 class="form-control" />
+        </div>
+      </div>
+  
+      <div class="form-group">
+        <label class="col-md-10">Comment from Reviewer</label>
+        <div class="col-md-10">
+          <textarea cam-variable-name="reviewComment"
+              cam-variable-type="String"
+              class="form-control"
+              readonly></textarea>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="col-md-10">
+          <div class="checkbox">
+            <label>
+              <input cam-variable-name="clarified"
+                     cam-variable-type="Boolean"
+                     type="checkbox"
+                     name="clarified"
+                     class="form-control" />
+              Could you clarify the invoice?
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xs-5">
+      <strong>Available Tasks</strong>
+       <table class="table">
+        <tr ng-repeat="availableTask in availableTasks">
+          <td>{{availableTask.caseActivityName}} </td>
+          <td><button type="button" class="btn btn-xs" ng-click="activateCaseInstance(availableTask.id)">Manual Start</button></td>
+        </tr>
+      </table>
+      <strong>Active Tasks</strong>
+       <table class="table">
+        <tr ng-repeat="activeTask in activeTasks">
+          <td>{{activeTask.caseActivityName}}</td>
+        </tr>
+      </table>
+      <strong>Completed Tasks</strong>
+      <table class="table">
+        <tr ng-repeat="completedTask in completedTasks">
+          <td>{{completedTask.caseActivityName}}</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+   
+  <script cam-script type="text/form-script">
+    // get the angular-data-depend service 'taskData'
+    var getTaskData = function(scope) {
+      if (scope.taskData) {
+        return scope.taskData;
+      }  
+      return scope.$parent && getTaskData(scope.$parent);
+    };
+
+    $scope.taskData = getTaskData($scope);
+
+    inject(['$http', 'Uri', function($http, Uri) {
+      var taskId = camForm.taskId;
+      $scope.activateCaseInstance = function(caseExecutionId) {
+        $http.post(Uri.appUri("engine://engine/:engine/case-execution/"+caseExecutionId+"/manual-start"),{})
+          .success(function(result) {
+            // reload the form with activated task
+            if ($scope.taskData) {
+              $scope.taskData.set('taskId', {taskId: camForm.taskId});
+            }
+          });
+      };
+
+      camForm.on('form-loaded', function() {
+        $http.get(Uri.appUri("engine://engine/:engine/task/"+taskId)).success(function(result){
+          $http.get(Uri.appUri("engine://engine/:engine/history/case-activity-instance/"),{params:{"caseInstanceId":result.caseInstanceId,"enabled":true}}).success(function(result){
+            $scope.availableTasks = result;
+          });
+          $http.get(Uri.appUri("engine://engine/:engine/history/case-activity-instance/"),{params:{"caseInstanceId":result.caseInstanceId,"active":true}}).success(function(result){
+            $scope.activeTasks = result;
+          });
+          $http.get(Uri.appUri("engine://engine/:engine/history/case-activity-instance/"),{params:{"caseInstanceId":result.caseInstanceId,"completed":true}}).success(function(result){
+            $scope.completedTasks = result;
+          });
+        });
+      });
+    }]);
+
+    camForm.on('submit', function(evt) {
+      
+    });
+  </script>
+  
+</form>
+
