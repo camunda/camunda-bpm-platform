@@ -2,6 +2,7 @@
 <div class="reports-wrapper">
   <div class="container-fluid">
     <div class="reports-type-wrapper"
+         ng-class="{dashboard: !selectedReportId}"
          cam-reports-type
          report-data="reportData"
          get-plugin-providers="getPluginProviders"
