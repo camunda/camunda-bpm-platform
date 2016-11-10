@@ -2039,12 +2039,6 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
    */
   private PvmExecutionImpl getTargetScope(DelayedVariableEvent event) {
     PvmExecutionImpl targetScope = event.getTargetScope();
-    PvmExecutionImpl replacedBy = targetScope.getReplacedBy();
-
-    // if tree compacted
-    if (replacedBy != null && targetScope.getParent() == replacedBy) {
-      targetScope = replacedBy;
-    }
     return targetScope;
   }
 

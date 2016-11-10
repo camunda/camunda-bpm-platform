@@ -830,4 +830,20 @@ public class MixedConditionalEventTest extends AbstractConditionalEventTestCase 
     tasksAfterVariableIsSet = taskService.createTaskQuery().list();
     assertEquals(4, tasksAfterVariableIsSet.size());
   }
+
+
+  @Test
+  @Deployment
+  public void testCompactedExecutionTree() {
+    //given process with concurrent execution and conditional events
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
+
+    //when task before cancel is completed
+    taskService.complete(taskService.createTaskQuery().taskName(TASK_BEFORE_CONDITION).singleResult().getId());
+
+    //then conditional events are triggered
+    tasksAfterVariableIsSet = taskService.createTaskQuery().list();
+    assertEquals(1, tasksAfterVariableIsSet.size());
+    assertEquals(TASK_AFTER_CONDITIONAL_START_EVENT, tasksAfterVariableIsSet.get(0).getName());
+  }
 }
