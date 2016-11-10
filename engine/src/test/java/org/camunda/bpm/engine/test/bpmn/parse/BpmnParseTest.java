@@ -39,8 +39,11 @@ import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.test.TestHelper;
+import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.api.runtime.migration.models.CallActivityModels;
+import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.junit.Test;
 
 /**
@@ -573,6 +576,86 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
                                                         .getProcessDefinitionCache()
                                                         .get(processDefinition.getId());
     return cachedProcessDefinition.findActivity(activityId);
+  }
+
+  public void testNoCamundaInSourceThrowsError() {
+    try {
+      String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testNoCamundaInSourceThrowsError");
+      repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
+      fail("Process camunda:in extension element should contain source!");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("Missing parameter 'source' or 'sourceExpression' when passing variables", e.getMessage());
+    }
+  }
+
+  public void testEmptyCamundaInSourceThrowsError() {
+    try {
+      String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testEmptyCamundaInSourceThrowsError");
+      repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
+      fail("Process camunda:in extension element should contain source!");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("Empty attribute 'source' when passing variables", e.getMessage());
+    }
+  }
+
+  public void testNoCamundaInTargetThrowsError() {
+    try {
+      String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testNoCamundaInTargetThrowsError");
+      repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
+      fail("Process camunda:in extension element should contain target!");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("Missing attribute 'target' when attribute 'source' or 'sourceExpression' is set", e.getMessage());
+    }
+  }
+
+  public void testEmptyCamundaInTargetThrowsError() {
+    try {
+      String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testEmptyCamundaInTargetThrowsError");
+      repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
+      fail("Process camunda:in extension element should contain target!");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("Empty attribute 'target' when attribute 'source' or 'sourceExpression' is set", e.getMessage());
+    }
+  }
+
+  public void testNoCamundaOutSourceThrowsError() {
+    try {
+      String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testNoCamundaOutSourceThrowsError");
+      repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
+      fail("Process camunda:out extension element should contain source!");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("Missing parameter 'source' or 'sourceExpression' when passing variables", e.getMessage());
+    }
+  }
+
+  public void testEmptyCamundaOutSourceThrowsError() {
+    try {
+      String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testEmptyCamundaOutSourceThrowsError");
+      repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
+      fail("Process camunda:out extension element should contain source!");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("Empty attribute 'source' when passing variables", e.getMessage());
+    }
+  }
+
+  public void testNoCamundaOutTargetThrowsError() {
+    try {
+      String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testNoCamundaOutTargetThrowsError");
+      repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
+      fail("Process camunda:out extension element should contain target!");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("Missing attribute 'target' when attribute 'source' or 'sourceExpression' is set", e.getMessage());
+    }
+  }
+
+  public void testEmptyCamundaOutTargetThrowsError() {
+    try {
+      String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testEmptyCamundaOutTargetThrowsError");
+      repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
+      fail("Process camunda:out extension element should contain target!");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("Empty attribute 'target' when attribute 'source' or 'sourceExpression' is set", e.getMessage());
+    }
   }
 
 }

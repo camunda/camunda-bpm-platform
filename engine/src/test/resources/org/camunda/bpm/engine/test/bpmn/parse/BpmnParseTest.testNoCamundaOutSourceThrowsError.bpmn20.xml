@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  targetNamespace="Examples">
+
+  <process id="EmptyParam" isExecutable="true">
+  
+  <startEvent id="start" />
+  
+  <sequenceFlow sourceRef="start" targetRef="callActivity" />
+  
+  <callActivity id="callActivity" calledElement="oneTaskProcess">
+    <extensionElements>
+      <camunda:out  />
+    </extensionElements>
+  </callActivity>
+  
+  <sequenceFlow sourceRef="callActivity" targetRef="theEnd" />
+  
+  <endEvent id="theEnd" />
+  
+  </process>
+
+</definitions>

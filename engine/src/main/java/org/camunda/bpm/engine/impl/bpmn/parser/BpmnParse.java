@@ -3711,33 +3711,52 @@ public class BpmnParse extends Parse {
 
     if (ALL.equals(variables)) {
       parameter.setAllVariables(true);
-    }
-    else {
+    } else {
 
-      ParameterValueProvider sourceValueProvider = new NullValueProvider();
-      String source = parameterElement.attribute("source");
-      if (source != null && !source.isEmpty()) {
-        sourceValueProvider = new ConstantValueProvider(source);
-      } else {
+      ParameterValueProvider source = parseSourceOfCallableElementProvider(parameterElement);
+      parameter.setSourceValueProvider(source);
 
-        source = parameterElement.attribute("sourceExpression");
-
-        if (source != null && !source.isEmpty()) {
-          Expression expression = expressionManager.createExpression(source);
-          sourceValueProvider = new ElValueProvider(expression);
-        }
-      }
-      parameter.setSourceValueProvider(sourceValueProvider);
-
-      String target = parameterElement.attribute("target");
-      if (source != null && !source.isEmpty() && target == null) {
-        addError("Missing attribute 'target' when attribute 'source' or 'sourceExpression' is set", parameterElement);
-      }
+      String target = parseTargetOfCallableElementProvider(parameterElement);
       parameter.setTarget(target);
     }
 
     return parameter;
+  }
 
+  protected ParameterValueProvider parseSourceOfCallableElementProvider(Element parameterElement) {
+    ParameterValueProvider sourceValueProvider = new NullValueProvider();
+    String source = parameterElement.attribute("source");
+    if (source != null) {
+      if (source.isEmpty()) {
+        addError("Empty attribute 'source' when passing variables", parameterElement);
+      }
+      sourceValueProvider = new ConstantValueProvider(source);
+    } else {
+      source = parameterElement.attribute("sourceExpression");
+      if (source != null) {
+        if (source.isEmpty()) {
+          addError("Empty attribute 'sourceExpression' when passing variables", parameterElement);
+        }
+        Expression expression = expressionManager.createExpression(source);
+        sourceValueProvider = new ElValueProvider(expression);
+      }
+    }
+
+    if (source == null) {
+      addError("Missing parameter 'source' or 'sourceExpression' when passing variables", parameterElement);
+    }
+
+    return sourceValueProvider;
+  }
+
+  protected String parseTargetOfCallableElementProvider(Element parameterElement) {
+    String target = parameterElement.attribute("target");
+    if (target == null) {
+      addError("Missing attribute 'target' when attribute 'source' or 'sourceExpression' is set", parameterElement);
+    } else if (target.isEmpty()) {
+      addError("Empty attribute 'target' when attribute 'source' or 'sourceExpression' is set", parameterElement);
+    }
+    return target;
   }
 
   /**
