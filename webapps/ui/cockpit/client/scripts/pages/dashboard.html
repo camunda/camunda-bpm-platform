@@ -40,7 +40,7 @@
             <div class="stats-section open-incidents col-xs-6 col-lg-3">
               <div class="stats-label">Open Incidents</div>
               <a class="value"
-                 href="http://localhost:8080/camunda/app/cockpit/default/#/processes?searchQuery=%5B%7B%22type%22:%22PIwithIncidents%22,%22operator%22:%22eq%22,%22value%22:%22%22,%22name%22:%22%22%7D,%7B%22type%22:%22PIincidentStatus%22,%22operator%22:%22eq%22,%22value%22:%22open%22,%22name%22:%22%22%7D%5D"
+                 href="#/processes?searchQuery=%5B%7B%22type%22:%22PIwithIncidents%22,%22operator%22:%22eq%22,%22value%22:%22%22,%22name%22:%22%22%7D,%7B%22type%22:%22PIincidentStatus%22,%22operator%22:%22eq%22,%22value%22:%22open%22,%22name%22:%22%22%7D%5D"
                  ng-if="hasProcessSearch">
                 {{ (!data.actual.openIncidents ? 0 : '') }}
                 {{ data.actual.openIncidents | abbreviateNumber }}
