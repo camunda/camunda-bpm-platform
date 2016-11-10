@@ -9,13 +9,26 @@
 
   section {
     position: relative;
+
+    &.section-collapsed {
+      header {
+        margin-bottom: 0;
+        border-bottom: none;
+      }
+
+      .section-title {
+        margin-bottom: 5px;
+      }
+    }
   }
+
   .section-toggle {
     position: absolute;
     z-index: 10;
     right: 0;
     top: 0;
   }
+
   section.deployed:not(.no-metrics) .section-toggle {
     right: @grid-gutter-width * 0.5;
   }
