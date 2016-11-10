@@ -6,7 +6,7 @@
 
 
       <section class="actual"
-               ng-class="{'loading': loading}">
+               ng-class="{'loading': loading,'section-collapsed': !actualActive}">
         <button tooltip="Toggle this section"
                 class="section-toggle btn btn-link btn-sm"
                 ng-click="toggleSection('actual')">
@@ -84,11 +84,6 @@
               </a>
             </div>
           </div>
-
-          <div class="help-block text-center"
-               ng-if="!actualActive">
-            Click the <span class="glyphicon glyphicon-eye-open"></span> to show the details.
-          </div>
         </div>
       </section>
 
@@ -127,6 +122,7 @@
 
 
       <section class="metrics"
+               ng-class="{'section-collapsed': !metricsActive}"
                ng-if="metricsPlugins.length">
         <button tooltip="Toggle this section"
                 class="section-toggle btn btn-link btn-sm"
@@ -170,16 +166,11 @@
                     class="row"></view>
             </div>
           </div>
-
-          <div class="help-block text-center"
-               ng-if="!metricsActive">
-            Click the <span class="glyphicon glyphicon-eye-open"></span> to show the details.
-          </div>
         </div>
       </section>
 
       <section class="deployed no-metrics"
-               ng-class="{'loading': loading}"
+               ng-class="{'loading': loading,'section-collapsed': !deployedActive}"
                ng-if="!metricsPlugins.length">
         <button tooltip="Toggle this section"
                 class="section-toggle btn btn-link btn-sm"
@@ -246,7 +237,7 @@
 
 
     <section class="col-xs-12 col-sm-4 col-lg-2 deployed"
-             ng-class="{'loading': loading}"
+             ng-class="{'loading': loading, 'section-collapsed': !deployedActive}"
              ng-if="metricsPlugins.length">
       <button tooltip="Toggle this section"
               class="section-toggle btn btn-link btn-sm"
@@ -301,11 +292,6 @@
               {{ data.deployed.deploymentDefinitions | abbreviateNumber }}
             </a>
           </div>
-        </div>
-
-        <div class="help-block text-center"
-             ng-if="!deployedActive">
-          Click the <span class="glyphicon glyphicon-eye-open"></span> to show the details.
         </div>
       </div>
     </section>
