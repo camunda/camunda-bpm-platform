@@ -53,7 +53,6 @@ describe('Cockpit Dashboard Spec', function() {
       btn.click();
 
       expect(section.element(by.css('.stats')).isPresent()).to.eventually.eql(false);
-      expect(section.element(by.css('.help-block')).isPresent()).to.eventually.eql(true);
     });
 
 
@@ -62,7 +61,6 @@ describe('Cockpit Dashboard Spec', function() {
       var section = element(by.css('section.actual'));
 
       expect(section.element(by.css('.stats')).isPresent()).to.eventually.eql(false);
-      expect(section.element(by.css('.help-block')).isPresent()).to.eventually.eql(true);
     });
 
 
