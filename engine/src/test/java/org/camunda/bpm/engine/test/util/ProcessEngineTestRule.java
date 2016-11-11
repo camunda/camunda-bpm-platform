@@ -264,6 +264,14 @@ public class ProcessEngineTestRule extends TestWatcher {
     taskService.complete(tasks.get(0).getId());
   }
 
+  public void setAnyVariable(String executionId) {
+    setVariable(executionId, "any", "any");
+  }
+
+  public void setVariable(String executionId, String varName, Object varValue) {
+    processEngine.getRuntimeService().setVariable(executionId, varName, varValue);
+  }
+
   public void correlateMessage(String messageName) {
     processEngine.getRuntimeService().createMessageCorrelation(messageName).correlate();
   }
