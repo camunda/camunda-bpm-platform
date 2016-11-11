@@ -23,6 +23,8 @@ import org.camunda.bpm.engine.impl.core.model.PropertyMapKey;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 
+import static org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse.PROPERTYNAME_HAS_CONDITIONAL_EVENTS;
+
 /**
  * Properties of bpmn elements.
  *
@@ -56,5 +58,7 @@ public class BpmnProperties {
   public static final PropertyKey<ActivityImpl> INITIAL_ACTIVITY = new PropertyKey<ActivityImpl>("initial");
 
   public static final PropertyKey<Boolean> TRIGGERED_BY_EVENT = new PropertyKey<Boolean>("triggeredByEvent");
+
+  public static final PropertyKey<Boolean> HAS_CONDITIONAL_EVENTS = new PropertyKey<Boolean>(PROPERTYNAME_HAS_CONDITIONAL_EVENTS);
 
 }

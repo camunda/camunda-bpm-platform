@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.impl.pvm.runtime;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
@@ -48,7 +49,6 @@ import org.camunda.bpm.engine.impl.util.EnsureUtil;
 import java.util.*;
 
 import static org.camunda.bpm.engine.impl.bpmn.helper.CompensationUtil.SIGNAL_COMPENSATION_DONE;
-import static org.camunda.bpm.engine.impl.pvm.runtime.ActivityInstanceState.DEFAULT;
 import static org.camunda.bpm.engine.impl.pvm.runtime.ActivityInstanceState.ENDING;
 
 /**
@@ -1824,6 +1824,13 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
    * @param delayedVariableEvent the DelayedVariableEvent which should be store on the process instance
    */
   public void delayEvent(DelayedVariableEvent delayedVariableEvent) {
+
+    //if process definition has no conditional events the variable events does not have to be delayed
+    Boolean hasConditionalEvents = this.getProcessDefinition().getProperties().get(BpmnProperties.HAS_CONDITIONAL_EVENTS);
+    if (hasConditionalEvents == null || !hasConditionalEvents.equals(Boolean.TRUE)) {
+      return;
+    }
+
     if (isProcessInstanceExecution()) {
       delayedEvents.add(delayedVariableEvent);
     } else {
@@ -1879,6 +1886,11 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   public void dispatchDelayedEventsAndPerformOperation(PvmAtomicOperationContinuation continuation) {
     PvmExecutionImpl execution = this;
 
+    if (execution.getDelayedEvents().isEmpty()) {
+      continueExecutionIfNotCanceled(continuation, execution);
+      return;
+    }
+
     String lastActivityId = execution.getActivityId();
     String lastActivityInstanceId = getActivityInstanceId(execution);
 
@@ -1890,13 +1902,16 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
     //if execution was canceled or was changed during the dispatch we should not execute the next operation
     //since another atomic operation was executed during the dispatching
-    if (continuation != null
-        && isOnSameActivity(lastActivityInstanceId, lastActivityId, currentActivityInstanceId, currentActivityId)
-        && !execution.isCanceled()) {
-      continuation.execute(execution);
+    if (isOnSameActivity(lastActivityInstanceId, lastActivityId, currentActivityInstanceId, currentActivityId)) {
+      continueExecutionIfNotCanceled(continuation, execution);
     }
   }
 
+  protected void continueExecutionIfNotCanceled(PvmAtomicOperationContinuation continuation, PvmExecutionImpl execution) {
+    if (continuation != null && !execution.isCanceled()) {
+      continuation.execute(execution);
+    }
+  }
 
   /**
    * Dispatches the current delayed variable events on the scope of the given execution.
@@ -1908,9 +1923,6 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
     List<DelayedVariableEvent> delayedEvents = new ArrayList<DelayedVariableEvent>(scopeExecution.getDelayedEvents());
     scopeExecution.clearDelayedEvents();
-    if (delayedEvents.isEmpty()) {
-      return;
-    }
 
     Map<PvmExecutionImpl, String> activityInstanceIds = new HashMap<PvmExecutionImpl, String>();
     Map<PvmExecutionImpl, String> activityIds = new HashMap<PvmExecutionImpl, String>();

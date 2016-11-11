@@ -87,9 +87,6 @@ import org.camunda.bpm.model.bpmn.instance.FlowElement;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.ModelElementType;
 
-import static org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse.PROPERTYNAME_HAS_CONDITIONAL_EVENTS;
-
-
 /**
  * @author Tom Baeyens
  * @author Daniel Meyer
@@ -1719,12 +1716,6 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
 
   @Override
   public void dispatchEvent(VariableEvent variableEvent) {
-    //if process definition has no conditional events the dispatching must not be executed
-    Object property = this.getProcessDefinition().getProperty(PROPERTYNAME_HAS_CONDITIONAL_EVENTS);
-    if (property == null || !property.equals(Boolean.TRUE)) {
-      return;
-    }
-
     final List<ExecutionEntity> execs = new ArrayList<ExecutionEntity>();
     new ExecutionTopDownWalker(this).addPreVisitor(new TreeVisitor<ExecutionEntity>() {
       @Override

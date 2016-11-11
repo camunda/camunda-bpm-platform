@@ -3445,7 +3445,7 @@ public class BpmnParse extends Parse {
       Condition condition = parseConditionExpression(conditionExprElement);
       conditionalEventDefinition = new ConditionalEventDefinition(condition, conditionalActivity);
 
-      conditionalActivity.getProcessDefinition().setProperty(PROPERTYNAME_HAS_CONDITIONAL_EVENTS, true);
+      conditionalActivity.getProcessDefinition().getProperties().set(BpmnProperties.HAS_CONDITIONAL_EVENTS, true);
 
       final String variableName = element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "variableName");
       conditionalEventDefinition.setVariableName(variableName);

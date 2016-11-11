@@ -17,31 +17,58 @@
 
 package org.camunda.bpm.engine.test.bpmn.event.conditional;
 
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
+import org.camunda.bpm.engine.impl.persistence.entity.DelayedVariableEvent;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessInstanceWithVariablesImpl;
-import org.camunda.bpm.engine.repository.ProcessDefinition;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
-import org.camunda.bpm.engine.runtime.ProcessInstantiationBuilder;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Rule;
 import org.junit.Test;
-import org.omg.CORBA.CODESET_INCOMPATIBLE;
+
+import java.util.List;
 
 import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
-import static org.camunda.bpm.engine.test.bpmn.event.conditional.AbstractConditionalEventTestCase.CONDITIONAL_EVENT_PROCESS_KEY;
-import static org.camunda.bpm.engine.test.bpmn.event.conditional.AbstractConditionalEventTestCase.CONDITIONAL_MODEL;
-import static org.camunda.bpm.engine.test.bpmn.event.conditional.AbstractConditionalEventTestCase.TASK_WITH_CONDITION_ID;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.camunda.bpm.engine.test.bpmn.event.conditional.AbstractConditionalEventTestCase.*;
+import static org.junit.Assert.*;
 
 /**
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
 public class OnlyDispatchVariableEventOnExistingConditionsTest {
+
+  public static class CheckDelayedVariablesDelegate implements JavaDelegate {
+    @Override
+    public void execute(DelegateExecution execution) throws Exception {
+      //given conditional event exist
+
+      //when variable is set
+      execution.setVariable("v", 1);
+
+      //then variable events should be delayed
+      List<DelayedVariableEvent> delayedEvents = ((ExecutionEntity) execution).getDelayedEvents();
+      assertEquals(1, delayedEvents.size());
+      assertEquals("v", delayedEvents.get(0).getEvent().getVariableInstance().getName());
+    }
+  }
+
+  public static class CheckNoDelayedVariablesDelegate implements JavaDelegate {
+    @Override
+    public void execute(DelegateExecution execution) throws Exception {
+      //given no conditional event exist
+
+      //when variable is set
+      execution.setVariable("v", 1);
+
+      //then no variable events should be delayed
+      List<DelayedVariableEvent> delayedEvents = ((ExecutionEntity) execution).getDelayedEvents();
+      assertEquals(0, delayedEvents.size());
+    }
+  }
 
   @Rule
   public ProcessEngineRule rule = new ProvidedProcessEngineRule();
@@ -51,6 +78,8 @@ public class OnlyDispatchVariableEventOnExistingConditionsTest {
     //given
     BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
       .startEvent()
+      .serviceTask()
+      .camundaClass(CheckDelayedVariablesDelegate.class.getName())
       .intermediateCatchEvent()
       .conditionalEventDefinition()
         .condition("${var==1}")
@@ -73,6 +102,8 @@ public class OnlyDispatchVariableEventOnExistingConditionsTest {
     //given
     BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
       .startEvent()
+      .serviceTask()
+      .camundaClass(CheckDelayedVariablesDelegate.class.getName())
       .userTask(TASK_WITH_CONDITION_ID)
       .endEvent()
       .done();
@@ -100,6 +131,8 @@ public class OnlyDispatchVariableEventOnExistingConditionsTest {
     //given
     BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
       .startEvent()
+      .serviceTask()
+      .camundaClass(CheckDelayedVariablesDelegate.class.getName())
       .userTask()
       .endEvent()
       .done();
@@ -129,6 +162,8 @@ public class OnlyDispatchVariableEventOnExistingConditionsTest {
     //given
     BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
       .startEvent()
+      .serviceTask()
+      .camundaClass(CheckNoDelayedVariablesDelegate.class.getName())
       .userTask()
       .endEvent()
       .done();
