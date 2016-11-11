@@ -1935,7 +1935,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     //and also the replace pointer if it exist. Because on concurrency the replace pointer will be set on which we have
     //to check the latest state.
     for (DelayedVariableEvent event : delayedEvents) {
-      PvmExecutionImpl targetScope = getTargetScope(event);
+      PvmExecutionImpl targetScope = event.getTargetScope();
       PvmExecutionImpl replaced = targetScope.getReplacedBy() != null ? targetScope.getReplacedBy() : targetScope;
       dispatchOnSameActivity(targetScope, replaced, activityIds, activityInstanceIds, event);
     }
@@ -2041,17 +2041,6 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
         //if activityInstanceId's are not null the must be equal -> otherwise execution changed
         || (lastActivityInstanceId != null && lastActivityInstanceId.equals(currentActivityInstanceId)));
 
-  }
-
-  /**
-   * Returns the target scope for the given delayed variable event.
-   *
-   * @param event the delayed event for which the target scope is returned
-   * @return the target scope
-   */
-  private PvmExecutionImpl getTargetScope(DelayedVariableEvent event) {
-    PvmExecutionImpl targetScope = event.getTargetScope();
-    return targetScope;
   }
 
   /**

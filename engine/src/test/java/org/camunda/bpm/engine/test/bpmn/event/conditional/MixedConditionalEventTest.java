@@ -836,7 +836,7 @@ public class MixedConditionalEventTest extends AbstractConditionalEventTestCase 
   @Deployment
   public void testCompactedExecutionTree() {
     //given process with concurrent execution and conditional events
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
+    runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
 
     //when task before cancel is completed
     taskService.complete(taskService.createTaskQuery().taskName(TASK_BEFORE_CONDITION).singleResult().getId());
