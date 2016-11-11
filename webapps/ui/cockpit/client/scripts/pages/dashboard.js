@@ -66,6 +66,8 @@ var Controller = [
     var procInstResource = camAPI.resource('process-instance');
     var taskResource = camAPI.resource('task');
 
+    $scope.data = {};
+
     function fetchActual(cb) {
       // 1: GET /process-instance/count (query param for link is "unfinished")
       // 2: GET /history/process-instance/count?withIncidents=true&incidentStatus=open
@@ -92,6 +94,20 @@ var Controller = [
         cb(err, results);
       });
     }
+
+    $scope.$watch('actualActive', function() {
+      if (!$scope.actualActive || $scope.data.actual) { return; }
+
+      $scope.loading = true;
+      fetchActual(function(err, results) {
+        $scope.loading = false;
+        if (err) { throw err; }
+
+        $scope.data.actual = results;
+      });
+    });
+
+
 
     function fetchDeployed(cb) {
       // 5: GET /process-definition/count?latestVersion=true
@@ -123,20 +139,17 @@ var Controller = [
       });
     }
 
-    $scope.loading = false;
-    function fetchData() {
+    $scope.$watch('deployedActive', function() {
+      if (!$scope.deployedActive || $scope.data.deployed) { return; }
+
       $scope.loading = true;
-      series({
-        actual: fetchActual,
-        deployed: fetchDeployed
-      }, function(err, results) {
+      fetchDeployed(function(err, results) {
         $scope.loading = false;
         if (err) { throw err; }
-        $scope.data = results;
-      });
-    }
 
-    fetchData();
+        $scope.data.deployed = results;
+      });
+    });
 
   // ----------------------------------------------------------------------------------------
     [
