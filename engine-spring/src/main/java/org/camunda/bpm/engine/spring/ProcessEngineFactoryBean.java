@@ -45,10 +45,12 @@ public class ProcessEngineFactoryBean implements FactoryBean<ProcessEngine>, Dis
   }
 
   public ProcessEngine getObject() throws Exception {
-    initializeExpressionManager();
-    initializeTransactionExternallyManaged();
+    if (processEngine == null) {
+      initializeExpressionManager();
+      initializeTransactionExternallyManaged();
     
-    processEngine = (ProcessEngineImpl) processEngineConfiguration.buildProcessEngine();
+      processEngine = (ProcessEngineImpl) processEngineConfiguration.buildProcessEngine();
+    }
 
     return processEngine;
   }
