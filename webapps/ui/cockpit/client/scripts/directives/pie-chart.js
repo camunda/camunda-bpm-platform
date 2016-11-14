@@ -1,5 +1,4 @@
 'use strict';
-var abbreviateNumber = require('./../filters/abbreviateNumber.js')();
 var throttle = require('lodash').throttle;
 
 
@@ -8,11 +7,7 @@ function PieChart(options) {
 
   this.rulersColor = options.rulersColor || '#666';
 
-  this.fontSize = options.fontSize || 12;
-
   this.lineWidth = options.lineWidth || 1;
-
-  this.labelMaxChars = options.labelMaxChars || 10;
 
   this.missingData = [{color: '#959595', label: 'No Data', value: 1}];
 
@@ -20,21 +15,6 @@ function PieChart(options) {
 }
 
 var proto = PieChart.prototype;
-
-
-proto.calculateLabelsMaxWidth = function() {
-  this.labelsMaxWidth = 0;
-  var ctx = this.ctx;
-  ctx.font = this.fontSize + 'px sans-serif';
-
-  (this.data || []).forEach(function(item) {
-    var label = item.label.slice(0, this.labelMaxChars);
-    label = label === item.label ? label : label + '…';
-    this.labelsMaxWidth = Math.max(ctx.measureText(abbreviateNumber(item.value) + ' ' + label).width, this.labelsMaxWidth);
-  }, this);
-
-  return this;
-};
 
 
 proto.resize = function(width, height) {
@@ -47,14 +27,10 @@ proto.resize = function(width, height) {
   this.offCanvas.width = width;
   this.offCanvas.height = height;
   this.offCtx = this.offCanvas.getContext('2d');
-  var x = this.x = Math.round(this.ctx.canvas.width * 0.5);
-  var y = this.y = Math.round(this.ctx.canvas.height * 0.5);
+  this.x = this.canvas.width * 0.5;
+  this.y = this.canvas.height * 0.5;
 
-  this.calculateLabelsMaxWidth();
-
-  var widthMinusLabels = x - this.labelsMaxWidth;
-  var heightMinusLabels = y - (this.fontSize * 2);
-  this.radius = Math.max(20, Math.min(widthMinusLabels, heightMinusLabels));
+  this.radius = Math.max(20, Math.min(this.x - 15, this.y - 15));
 
   return this;
 };
@@ -66,15 +42,13 @@ proto.resize = function(width, height) {
 
 proto.setData = function(data) {
   this.data = data;
-  if (!this.data.length) {
+  if (!this.data.length || !this.data[0].value) {
     this.data = this.missingData;
   }
 
   this.total = this.data.reduce(function(prev, curr) {
     return prev + curr.value;
   }, 0);
-
-  this.calculateLabelsMaxWidth();
 
   return this.draw();
 };
@@ -135,23 +109,15 @@ proto.draw = function() {
 
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
-  ctx.font = this.fontSize + 'px sans-serif';
-
-
   var x = this.x;
   var y = this.y;
   var r = this.radius;
   var tt = this.total;
   var prev = Math.PI;
   var rad = Math.PI * 2;
-
-  var lx, ly;
-  var lr = r + this.fontSize; // always the hypotenuse
-  var lc = this.rulersColor;
-  var labelMaxChars = this.labelMaxChars;
-
   data.forEach(function(item) {
     var angle = ((item.value / tt) * rad);
+    console.info('item', item.value, r, angle, prev, x, y);
 
     ctx.fillStyle = item.color;
     ctx.strokeStyle = item.color;
@@ -163,26 +129,6 @@ proto.draw = function() {
     ctx.closePath();
     ctx.fill();
     ctx.stroke();
-    if (data.length === 1) { return; }
-
-    lx = Math.round(x + Math.cos(prev + (angle * 0.5)) * lr);
-    ly = Math.round(y + Math.sin(prev + (angle * 0.5)) * lr);
-
-    var label = item.label.slice(0, labelMaxChars);
-    label = label === item.label ? label : label + '…';
-    label = abbreviateNumber(item.value) + ' ' + label;
-
-    ctx.fillStyle = lc;
-    ctx.textAlign = 'center';
-    if (lx + 3 < x) {
-      ctx.textAlign = 'right';
-    }
-    else if (lx - 3 > x) {
-      ctx.textAlign = 'left';
-    }
-
-    ctx.textBaseline = 'middle';
-    ctx.fillText(label, lx, ly);
 
     prev += angle;
   });
@@ -260,12 +206,12 @@ module.exports = ['$location', function($location) {
     template: '<div class="pie-chart">' +
                 '<div class="canvas-holder"></div>' +
 
-                '<div class="legend-holder help-block text-center" ng-if="values.length > 1">' +
-                  '<span ng-if="hoveredSlice.value" ng-style="{color: hoveredSlice.color}">{{ hoveredSlice.label }}</span>' +
+                '<div class="legend-holder help-block text-center" ng-if="values[0].label !== \'No Data\'">' +
+                  '<span ng-if="hoveredSlice.value" ng-style="{color: hoveredSlice.color}">{{ hoveredSlice.label }} ({{ hoveredSlice.value | abbreviateNumber }})</span>' +
                   '<span ng-if="!hoveredSlice.value">Hover the chart for details</span>' +
                 '</div>' +
 
-                '<div class="legend-holder help-block text-center" ng-if="values.length < 2">' +
+                '<div class="legend-holder help-block text-center" ng-if="values[0].label === \'No Data\'">' +
                   'No Data' +
                 '</div>' +
               '</div>'
