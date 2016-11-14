@@ -54,6 +54,7 @@ public abstract class AbstractConditionalEventTestCase {
   protected static final String TASK_BEFORE_CONDITION = "Before Condition";
   protected static final String TASK_BEFORE_CONDITION_ID = "beforeConditionId";
   protected static final String TASK_AFTER_CONDITION = "After Condition";
+  public static final String TASK_AFTER_CONDITION_ID = "afterConditionId";
   protected static final String TASK_AFTER_SERVICE_TASK = "afterServiceTask";
   protected static final String TASK_IN_SUB_PROCESS_ID = "taskInSubProcess";
   protected static final String TASK_IN_SUB_PROCESS = "Task in Subprocess";

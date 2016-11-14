@@ -16,21 +16,7 @@ package org.camunda.bpm.engine.impl.migration.validation.activity;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.camunda.bpm.engine.impl.bpmn.behavior.BoundaryEventActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.CallActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.CaseCallActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.EventBasedGatewayActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.EventSubProcessActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.EventSubProcessStartEventActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.ExternalTaskActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.InclusiveGatewayActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateCatchEventActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.ParallelGatewayActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.ParallelMultiInstanceActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.ReceiveTaskActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.SequentialMultiInstanceActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.SubProcessActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.*;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 
@@ -61,7 +47,8 @@ public class SupportedActivityValidator implements MigrationActivityValidator {
     SUPPORTED_ACTIVITY_BEHAVIORS.add(EventSubProcessStartEventActivityBehavior.class);
     SUPPORTED_ACTIVITY_BEHAVIORS.add(ExternalTaskActivityBehavior.class);
     SUPPORTED_ACTIVITY_BEHAVIORS.add(ParallelGatewayActivityBehavior.class);
-    SUPPORTED_ACTIVITY_BEHAVIORS.add(InclusiveGatewayActivityBehavior.class);
+    SUPPORTED_ACTIVITY_BEHAVIORS.add(InclusiveGatewayActivityBehavior.class);;
+    SUPPORTED_ACTIVITY_BEHAVIORS.add(IntermediateConditionalEventBehavior.class);
   }
 
   public boolean valid(ActivityImpl activity) {
