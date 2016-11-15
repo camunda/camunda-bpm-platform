@@ -261,7 +261,7 @@
                 <configuration>
                   <tasks>
                     <echo message="Generating load" />
-                    <java classname="org.camunda.bpm.qa.performance.engine.query.DefaultLoadGenerator" classpathref="maven.test.classpath" />
+                    <java classname="org.camunda.bpm.qa.performance.engine.query.DefaultLoadGenerator" classpathref="maven.test.classpath" failonerror="true" />
                   </tasks>
                 </configuration>
               </execution>
