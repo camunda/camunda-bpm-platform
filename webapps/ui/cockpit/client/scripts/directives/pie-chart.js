@@ -3,7 +3,9 @@ var throttle = require('lodash').throttle;
 
 
 function PieChart(options) {
-  this.resize(options.width, options.height);
+  this.canvas = options.canvas || document.createElement('canvas');
+
+  this.resize(options.width || this.canvas.width, options.height || this.canvas.height);
 
   this.rulersColor = options.rulersColor || '#666';
 
@@ -18,7 +20,6 @@ var proto = PieChart.prototype;
 
 
 proto.resize = function(width, height) {
-  this.canvas = this.canvas || document.createElement('canvas');
   this.canvas.width = width;
   this.canvas.height = height;
   this.ctx = this.canvas.getContext('2d');
@@ -58,7 +59,7 @@ proto.punchPie = function(ctx) {
   ctx.strokeStyle = ctx.fillStyle = '#fff';
   ctx.moveTo(this.x, this.y);
   ctx.beginPath();
-  ctx.arc(this.x, this.y, this.radius * 0.75, 0, Math.PI * 2);
+  ctx.arc(this.x, this.y, this.radius * 0.65, 0, Math.PI * 2);
   ctx.closePath();
   ctx.stroke();
   ctx.fill();
@@ -117,10 +118,9 @@ proto.draw = function() {
   var rad = Math.PI * 2;
   data.forEach(function(item) {
     var angle = ((item.value / tt) * rad);
-    console.info('item', item.value, r, angle, prev, x, y);
 
     ctx.fillStyle = item.color;
-    ctx.strokeStyle = item.color;
+    ctx.strokeStyle = '#fff';
     ctx.beginPath();
 
     ctx.moveTo(x, y);
@@ -139,25 +139,25 @@ proto.draw = function() {
   return this;
 };
 
-module.exports = ['$location', function($location) {
+module.exports = ['$location', '$window', function($location, $window) {
   return {
     restrict: 'A',
 
+    transclude: true,
+
     scope: {
-      values: '='
+      values: '=',
+      placeholder: '@'
     },
 
     link: function($scope, $element) {
       var container = $element[0].querySelector('.canvas-holder') || $element[0];
-      var win = container.ownerDocument.defaultView;
 
       var pieChart = new PieChart({
-        width: container.clientWidth,
-        height: container.clientHeight,
+        canvas: $element[0].querySelector('canvas'),
         lineColors: $scope.colors
       });
 
-      container.appendChild(pieChart.canvas);
       function getMousePos(evt) {
         var rect = pieChart.canvas.getBoundingClientRect();
         return {
@@ -179,7 +179,7 @@ module.exports = ['$location', function($location) {
           var pos = getMousePos(evt);
           var slice = pieChart.hoveredSlice(pos.x, pos.y);
           if (slice.url) {
-            $location.path(slice.url);
+            $location.url(slice.url);
           }
         });
       });
@@ -190,29 +190,27 @@ module.exports = ['$location', function($location) {
       });
 
       function resize() {
-        var height = Math.min(Math.max(container.clientWidth * 0.75, 180), 220);
+        var height = Math.min(Math.max(container.clientWidth * 0.75, 150), 220);
         pieChart.resize(container.clientWidth, height).draw();
       }
       resize();
 
       var _resize = throttle(resize, 100);
-      win.addEventListener('resize', _resize);
+      $window.addEventListener('resize', _resize);
 
       $scope.$on('$destroy', function() {
-        win.removeEventListener('resize', _resize);
+        $window.removeEventListener('resize', _resize);
       });
     },
 
     template: '<div class="pie-chart">' +
-                '<div class="canvas-holder"></div>' +
-
-                '<div class="legend-holder help-block text-center" ng-if="values[0].label !== \'No Data\'">' +
-                  '<span ng-if="hoveredSlice.value" ng-style="{color: hoveredSlice.color}">{{ hoveredSlice.label }} ({{ hoveredSlice.value | abbreviateNumber }})</span>' +
-                  '<span ng-if="!hoveredSlice.value">Hover the chart for details</span>' +
+                '<div class="canvas-holder">' +
+                  '<canvas width="150" height="150"></canvas>' +
                 '</div>' +
 
-                '<div class="legend-holder help-block text-center" ng-if="values[0].label === \'No Data\'">' +
-                  'No Data' +
+                '<div class="legend-holder help-block text-center" ng-if="values[0].label !== \'No Data\'">' +
+                  '<span ng-if="hoveredSlice.value" ng-style="{color: hoveredSlice.color}">{{ hoveredSlice.value | abbreviateNumber }}: {{ hoveredSlice.label }}</span>' +
+                  '<span ng-if="!hoveredSlice.value">{{ placeholder }}</span>' +
                 '</div>' +
               '</div>'
   };

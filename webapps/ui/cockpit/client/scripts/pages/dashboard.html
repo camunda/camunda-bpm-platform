@@ -6,12 +6,14 @@
 
 
       <section class="actual"
-               ng-class="{'loading': loading,'section-collapsed': !actualActive}">
+               ng-class="{'loading': loadingActual,'section-collapsed': !actualActive}">
         <button tooltip="Toggle this section"
                 class="section-toggle btn btn-link btn-sm"
                 ng-click="toggleSection('actual')">
           <span class="glyphicon"
-                ng-class="{'glyphicon-eye-open': !actualActive, 'glyphicon-eye-close': actualActive}"></button>
+                ng-class="{'glyphicon-eye-open': !actualActive, 'glyphicon-eye-close': actualActive}"></span>
+        </button>
+
         <div class="inner">
           <header>
             <div class="row">
@@ -21,8 +23,10 @@
 
           <div class="row stats"
                ng-if="actualActive">
-            <div class="stats-section process-instances col-xs-6 col-lg-3">
-              <div class="stats-label">Running Process Inst.</div>
+            <div class="stats-section process-instances col-xs-6 col-md-4">
+              <div cam-pie-chart
+                   values="values.procInst"
+                   placeholder="Running Process Inst."></div>
               <a class="value"
                  href="#/processes?searchQuery=%5B%7B%22type%22:%22PIunfinished%22,%22operator%22:%22eq%22,%22value%22:%22%22,%22name%22:%22%22%7D%5D"
                  ng-if="hasProcessSearch">
@@ -37,8 +41,10 @@
               </a>
             </div>
 
-            <div class="stats-section open-incidents col-xs-6 col-lg-3">
-              <div class="stats-label">Open Incidents</div>
+            <div class="stats-section open-incidents col-xs-6 col-md-4">
+              <div cam-pie-chart
+                   values="values.procIncid"
+                   placeholder="Open Incidents"></div>
               <a class="value"
                  href="#/processes?searchQuery=%5B%7B%22type%22:%22PIwithIncidents%22,%22operator%22:%22eq%22,%22value%22:%22%22,%22name%22:%22%22%7D,%7B%22type%22:%22PIincidentStatus%22,%22operator%22:%22eq%22,%22value%22:%22open%22,%22name%22:%22%22%7D%5D"
                  ng-if="hasProcessSearch">
@@ -53,26 +59,13 @@
               </a>
             </div>
 
-            <div class="stats-section open-cases col-xs-6 col-lg-3">
-              <div class="stats-label">Open Cases</div>
+            <div class="stats-section open-human-tasks col-xs-6 col-md-4">
+              <div cam-pie-chart
+                   values="values.tasks"
+                   placeholder="Open Human Tasks"></div>
               <a class="value"
-                 ng-if="hasCaseSearch"
-                 href="#/cases?searchQuery=%5B%7B%22type%22:%22notClosed%22,%22operator%22:%22eq%22,%22value%22:%22%22,%22name%22:%22%22%7D%5D">
-                {{ (!data.actual.caseInstances ? 0 : '') }}
-                {{ data.actual.caseInstances | abbreviateNumber }}
-              </a>
-              <span class="value"
-                    ng-if="!hasCaseSearch">
-                {{ (!data.actual.caseInstances ? 0 : '') }}
-                {{ data.actual.caseInstances | abbreviateNumber }}
-              </span>
-            </div>
-
-            <div class="stats-section open-human-tasks col-xs-6 col-lg-3">
-              <div class="stats-label">Open Human Tasks</div>
-              <a class="value"
-                 ng-if="hasTaskSearch"
-                 href="#/tasks?searchQuery=%5B%7B%22type%22:%22unfinished%22,%22operator%22:%22eq%22,%22value%22:%22%22,%22name%22:%22%22%7D%5D">
+                 href="#/tasks?searchQuery=%5B%7B%22type%22:%22unfinished%22,%22operator%22:%22eq%22,%22value%22:%22%22,%22name%22:%22%22%7D%5D"
+                 ng-if="hasTaskSearch">
                 {{ (!data.actual.tasks ? 0 : '') }}
                 {{ data.actual.tasks | abbreviateNumber }}
               </a>
@@ -95,12 +88,13 @@
                 class="section-toggle btn btn-link btn-sm"
                 ng-click="toggleSection('statistics')">
           <span class="glyphicon"
-                ng-class="{'glyphicon-eye-open': !statisticsActive, 'glyphicon-eye-close': statisticsActive}"></button>
+                ng-class="{'glyphicon-eye-open': !statisticsActive, 'glyphicon-eye-close': statisticsActive}"></span>
+        </button>
+
         <div class="inner">
           <header>
             <h1 class="section-title">Statistics</h1>
           </header>
-
 
           <div class="row stats"
                ng-if="statisticsActive">
@@ -124,7 +118,9 @@
                 class="section-toggle btn btn-link btn-sm"
                 ng-click="toggleSection('metrics')">
           <span class="glyphicon"
-                ng-class="{'glyphicon-eye-open': !metricsActive, 'glyphicon-eye-close': metricsActive}"></button>
+                ng-class="{'glyphicon-eye-open': !metricsActive, 'glyphicon-eye-close': metricsActive}"></span>
+        </button>
+
         <div class="inner">
           <header>
             <div class="row">
@@ -166,13 +162,15 @@
       </section>
 
       <section class="deployed no-metrics"
-               ng-class="{'loading': loading,'section-collapsed': !deployedActive}"
+               ng-class="{'loading': loadingDeployed,'section-collapsed': !deployedActive}"
                ng-if="!metricsPlugins.length">
         <button tooltip="Toggle this section"
                 class="section-toggle btn btn-link btn-sm"
                 ng-click="toggleSection('deployed')">
           <span class="glyphicon"
-                ng-class="{'glyphicon-eye-open': !deployedActive, 'glyphicon-eye-close': deployedActive}"></button>
+                ng-class="{'glyphicon-eye-open': !deployedActive, 'glyphicon-eye-close': deployedActive}"></span>
+        </button>
+
         <div class="inner">
           <header>
             <h1 class="section-title">Deployed</h1>
@@ -222,24 +220,21 @@
               </a>
             </div>
           </div>
-
-          <div class="help-block text-center"
-               ng-if="!deployedActive">
-            Click the <span class="glyphicon glyphicon-eye-open"></span> to show the details.
-          </div>
         </div>
       </section>
     </div>
 
 
     <section class="col-xs-12 col-sm-4 col-lg-2 deployed"
-             ng-class="{'loading': loading, 'section-collapsed': !deployedActive}"
+             ng-class="{'loading': loadingDeployed, 'section-collapsed': !deployedActive}"
              ng-if="metricsPlugins.length">
       <button tooltip="Toggle this section"
               class="section-toggle btn btn-link btn-sm"
               ng-click="toggleSection('deployed')">
         <span class="glyphicon"
-              ng-class="{'glyphicon-eye-open': !deployedActive, 'glyphicon-eye-close': deployedActive}"></button>
+              ng-class="{'glyphicon-eye-open': !deployedActive, 'glyphicon-eye-close': deployedActive}"></span>
+      </button>
+
       <div class="inner">
         <header>
           <h1 class="section-title">Deployed</h1>
@@ -293,11 +288,34 @@
     </section>
   </div>
 
-  <div ng-repeat="plugin in deprecateDashboardProviders"
-       class="deprecate-dashboard-view row"
-       data-plugin-id="{{ plugin.id }}">
-    <view vars="dashboardVars"
-          provider="plugin"></view>
-  </div>
+
+
+
+  <section ng-if="deprecateDashboardProviders.length"
+           ng-class="{'section-collapsed': !deprecateActive}">
+    <button tooltip="Toggle this section"
+            class="section-toggle btn btn-link btn-sm"
+            ng-click="toggleSection('deprecate')">
+      <span class="glyphicon"
+            ng-class="{'glyphicon-eye-open': !deprecateActive, 'glyphicon-eye-close': deprecateActive}"></span>
+    </button>
+
+    <div class="inner">
+      <header>
+        <div class="row">
+          <h1 class="section-title col-xs-4">Deprecated Plugins</h1>
+          <div class="col-xs-8 text-right"></div>
+        </div>
+      </header>
+
+      <div ng-if="deprecateActive"
+           ng-repeat="plugin in deprecateDashboardProviders"
+           class="deprecate-dashboard-view row"
+           data-plugin-id="{{ plugin.id }}">
+        <view vars="dashboardVars"
+              provider="plugin"></view>
+      </div>
+    </div>
+  </section>
 </div>
 <!-- / CE - camunda-cockpit-ui/client/scripts/pages/dashboard.html -->
