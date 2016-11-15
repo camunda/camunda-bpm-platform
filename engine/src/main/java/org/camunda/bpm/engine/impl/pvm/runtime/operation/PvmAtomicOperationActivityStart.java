@@ -35,7 +35,6 @@ public class PvmAtomicOperationActivityStart extends PvmAtomicOperationActivityI
       execution.disposeExecutionStartContext();
     }
 
-
     execution.dispatchDelayedEventsAndPerformOperation(ACTIVITY_EXECUTE);
   }
 

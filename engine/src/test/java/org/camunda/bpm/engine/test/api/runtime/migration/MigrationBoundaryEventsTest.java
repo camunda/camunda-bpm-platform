@@ -16,7 +16,6 @@ import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
-import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -25,7 +24,6 @@ import org.camunda.bpm.engine.test.api.runtime.FailingDelegate;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.util.ClockTestUtil;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
-import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.joda.time.DateTime;
 import org.junit.Rule;
@@ -44,9 +42,8 @@ public class MigrationBoundaryEventsTest {
   public static final String MESSAGE_NAME = "Message";
   public static final String SIGNAL_NAME = "Signal";
   public static final String TIMER_DATE = "2016-02-11T12:13:14Z";
-  public static final String NEW_TIMER_DATE = "2018-02-11T12:13:14Z";
   protected static final String FALSE_CONDITION = "${false}";
-  protected static final String TRUE_CONDITION = "${true}";
+  protected static final String VAR_CONDITION = "${any=='any'}";
   protected static final String BOUNDARY_ID = "boundary";
   protected static final String USER_TASK_ID = "userTask";
 
@@ -67,7 +64,7 @@ public class MigrationBoundaryEventsTest {
       .moveToActivity("subProcess")
         .boundaryEvent("signalBoundary1").signal(SIGNAL_NAME)
       .moveToActivity("subProcess")
-        .boundaryEvent("conditionalBoundary1").condition(TRUE_CONDITION)
+        .boundaryEvent("conditionalBoundary1").condition(VAR_CONDITION)
       .moveToActivity(USER_TASK_ID)
         .boundaryEvent("timerBoundary2").timerWithDate(TIMER_DATE)
       .moveToActivity(USER_TASK_ID)
@@ -75,7 +72,7 @@ public class MigrationBoundaryEventsTest {
       .moveToActivity(USER_TASK_ID)
         .boundaryEvent("signalBoundary2").signal(SIGNAL_NAME)
       .moveToActivity(USER_TASK_ID)
-      .boundaryEvent("conditionalBoundary2").condition(TRUE_CONDITION)
+      .boundaryEvent("conditionalBoundary2").condition(VAR_CONDITION)
       .done();
 
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(testProcess);
@@ -421,7 +418,7 @@ public class MigrationBoundaryEventsTest {
       .done();
     BpmnModelInstance targetProcess = modify(ProcessModels.ONE_TASK_PROCESS)
       .activityBuilder(USER_TASK_ID)
-      .boundaryEvent(BOUNDARY_ID).condition(TRUE_CONDITION)
+      .boundaryEvent(BOUNDARY_ID).condition(VAR_CONDITION)
       .userTask(AFTER_BOUNDARY_TASK)
       .endEvent()
       .done();
@@ -442,7 +439,7 @@ public class MigrationBoundaryEventsTest {
     testHelper.assertEventSubscriptionMigrated(BOUNDARY_ID, BOUNDARY_ID, null);
 
     // and it is possible to successfully complete the migrated instance
-    rule.getRuntimeService().setVariable(testHelper.snapshotAfterMigration.getProcessInstanceId(), "var", 1);
+    testHelper.setAnyVariable(testHelper.snapshotAfterMigration.getProcessInstanceId());
     testHelper.completeTask(AFTER_BOUNDARY_TASK);
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }

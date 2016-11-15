@@ -108,10 +108,9 @@ public class MixedConditionalEventTest extends AbstractConditionalEventTestCase 
     //when task before is completed
     taskService.complete(task.getId());
 
-    //then conditional boundary event should not triggered also not conditional start event
-    //since variable is only local
+    //then conditional boundary event should triggered with the default evaluation behavior
     tasksAfterVariableIsSet = taskQuery.list();
-    assertEquals(TASK_WITH_CONDITION, tasksAfterVariableIsSet.get(0).getName());
+    assertEquals(TASK_AFTER_CONDITIONAL_BOUNDARY_EVENT, tasksAfterVariableIsSet.get(0).getName());
   }
 
   @Test
@@ -290,11 +289,14 @@ public class MixedConditionalEventTest extends AbstractConditionalEventTestCase 
     //when task before is completed
     taskService.complete(taskQuery.singleResult().getId());
 
-    //then conditional boundary should not triggered but conditional start event
+    //then conditional boundary should triggered via default evaluation behavior
+    //and conditional start event via delayed events
     tasksAfterVariableIsSet = taskQuery.list();
-    assertEquals(2, tasksAfterVariableIsSet.size());
+    assertEquals(3, tasksAfterVariableIsSet.size());
     for (Task task : tasksAfterVariableIsSet) {
-      assertTrue(task.getName().equals(TASK_AFTER_CONDITIONAL_START_EVENT) || task.getName().equals(TASK_WITH_CONDITION));
+      assertTrue(task.getName().equals(TASK_AFTER_CONDITIONAL_START_EVENT)
+                 || task.getName().equals(TASK_AFTER_CONDITIONAL_BOUNDARY_EVENT)
+                 || task.getName().equals(TASK_WITH_CONDITION));
     }
   }
 
@@ -362,10 +364,11 @@ public class MixedConditionalEventTest extends AbstractConditionalEventTestCase 
     //when task before is completed
     taskService.complete(task.getId());
 
-    //then conditional boundary event should not triggered also not conditional start event
+    //then conditional boundary event should triggered via default evaluation behavior
+    //but conditional start event should not
     //since variable is only local
     tasksAfterVariableIsSet = taskQuery.list();
-    assertEquals(TASK_WITH_CONDITION, tasksAfterVariableIsSet.get(0).getName());
+    assertEquals(TASK_AFTER_CONDITIONAL_BOUNDARY_EVENT, tasksAfterVariableIsSet.get(0).getName());
   }
 
   @Test
@@ -556,11 +559,15 @@ public class MixedConditionalEventTest extends AbstractConditionalEventTestCase 
 
     //when start listener sets variable
 
-    //then conditional boundary should not triggered but conditional start event
+    //then conditional boundary and event sub process inside the sub process should triggered via default evaluation behavior
+    //and global conditional start event via delayed events
     tasksAfterVariableIsSet = taskQuery.list();
-    assertEquals(2, tasksAfterVariableIsSet.size());
+    assertEquals(4, tasksAfterVariableIsSet.size());
     for (Task task : tasksAfterVariableIsSet) {
-      assertTrue(task.getName().equals(TASK_AFTER_CONDITIONAL_START_EVENT) || task.getName().equals(TASK_WITH_CONDITION));
+      assertTrue(task.getName().equals(TASK_AFTER_CONDITIONAL_START_EVENT)
+        || task.getName().equals(TASK_AFTER_COND_START_EVENT_IN_SUB_PROCESS)
+        || task.getName().equals(TASK_AFTER_CONDITIONAL_BOUNDARY_EVENT)
+        || task.getName().equals(TASK_WITH_CONDITION));
     }
   }
 
@@ -623,10 +630,12 @@ public class MixedConditionalEventTest extends AbstractConditionalEventTestCase 
 
     //when input mapping sets variable
 
-    //then conditional boundary event should not triggered also not conditional start event
-    //since variable is only local
+    //then conditional boundary event should triggered from the default evaluation behavior
+    // The event sub process inside the sub process should not since the scope is lower than from the boundary.
+    // The global event sub process should not since the variable is only locally.
     tasksAfterVariableIsSet = taskQuery.list();
-    assertEquals(TASK_WITH_CONDITION, tasksAfterVariableIsSet.get(0).getName());
+    assertEquals(1, tasksAfterVariableIsSet.size());
+    assertEquals(TASK_AFTER_CONDITIONAL_BOUNDARY_EVENT, tasksAfterVariableIsSet.get(0).getName());
   }
 
   @Test
@@ -686,10 +695,16 @@ public class MixedConditionalEventTest extends AbstractConditionalEventTestCase 
 
     //when input mapping sets variable
 
-    //then conditional boundary event should not triggered also not conditional start event
+    //then conditional boundary event should triggered and also conditional start event in sub process
+    //via the default evaluation behavior but not the global event sub process
     //since variable is only local
     tasksAfterVariableIsSet = taskQuery.list();
-    assertEquals(TASK_WITH_CONDITION, tasksAfterVariableIsSet.get(0).getName());
+    assertEquals(3, tasksAfterVariableIsSet.size());
+    for (Task task : tasksAfterVariableIsSet) {
+      assertTrue(task.getName().equals(TASK_AFTER_COND_START_EVENT_IN_SUB_PROCESS)
+        || task.getName().equals(TASK_AFTER_CONDITIONAL_BOUNDARY_EVENT)
+        || task.getName().equals(TASK_WITH_CONDITION));
+    }
   }
 
   @Test

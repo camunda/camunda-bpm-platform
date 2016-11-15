@@ -42,12 +42,11 @@ public class BoundaryConditionalEventActivityBehavior extends BoundaryEventActiv
   }
 
   @Override
-  public void leaveOnSatisfiedCondition(final EventSubscriptionEntity eventSubscription,
-          final VariableEvent variableEvent, final CommandContext commandContext) {
+  public void leaveOnSatisfiedCondition(final EventSubscriptionEntity eventSubscription, final VariableEvent variableEvent) {
     final PvmExecutionImpl execution = eventSubscription.getExecution();
 
     if (execution != null && !execution.isEnded() && execution.isScope()
-        && variableEvent != null && conditionalEvent.tryEvaluate(variableEvent, execution)) {
+        && conditionalEvent.tryEvaluate(variableEvent, execution)) {
       execution.executeEventHandlerActivity(eventSubscription.getActivity());
     }
   }

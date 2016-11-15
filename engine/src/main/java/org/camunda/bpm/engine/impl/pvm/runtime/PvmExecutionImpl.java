@@ -1883,7 +1883,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
    *
    * @param continuation the atomic operation continuation which should be executed
    */
-  public void dispatchDelayedEventsAndPerformOperation(PvmAtomicOperationContinuation continuation) {
+  public void dispatchDelayedEventsAndPerformOperation(final PvmAtomicOperationContinuation continuation) {
     PvmExecutionImpl execution = this;
 
     if (execution.getDelayedEvents().isEmpty()) {
@@ -1891,10 +1891,34 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
       return;
     }
 
+    continueIfExecutionDoesNotAffectNextOperation(new DependingOperations() {
+      @Override
+      public void operationWhichCanAffectExecution(PvmExecutionImpl execution) {
+        dispatchScopeEvents(execution);
+      }
+
+      @Override
+      public void continueOperation(PvmExecutionImpl execution) {
+        continueExecutionIfNotCanceled(continuation, execution);
+      }
+    }, execution);
+  }
+
+  /**
+   * Executes the given depending operations with the given execution.
+   * The execution state will be checked with the help of the activity instance id and activity id of the execution before and after
+   * the DependingOperations#operationWhichCanAffectExecution method call. If the id's are not changed the
+   * DependingOperations#continueOperation method is called.
+   *
+   * @param dependingOperations the operations which are depend on each other
+   * @param execution the execution which is used for the execution
+   */
+  public void continueIfExecutionDoesNotAffectNextOperation(DependingOperations dependingOperations, PvmExecutionImpl execution) {
+
     String lastActivityId = execution.getActivityId();
     String lastActivityInstanceId = getActivityInstanceId(execution);
 
-    dispatchScopeEvents(execution);
+    dependingOperations.operationWhichCanAffectExecution(execution);
 
     execution = execution.getReplacedBy() != null ? execution.getReplacedBy() : execution;
     String currentActivityInstanceId = getActivityInstanceId(execution);
@@ -1902,8 +1926,8 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
     //if execution was canceled or was changed during the dispatch we should not execute the next operation
     //since another atomic operation was executed during the dispatching
-    if (isOnSameActivity(lastActivityInstanceId, lastActivityId, currentActivityInstanceId, currentActivityId)) {
-      continueExecutionIfNotCanceled(continuation, execution);
+    if (!execution.isCanceled() && isOnSameActivity(lastActivityInstanceId, lastActivityId, currentActivityInstanceId, currentActivityId)) {
+      dependingOperations.continueOperation(execution);
     }
   }
 
@@ -2038,8 +2062,9 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     return
       //activityInstanceId's can be null on transitions, so the activityId must be equal
       ((lastActivityInstanceId == null && lastActivityInstanceId == currentActivityInstanceId && lastActivityId.equals(currentActivityId))
-        //if activityInstanceId's are not null the must be equal -> otherwise execution changed
-        || (lastActivityInstanceId != null && lastActivityInstanceId.equals(currentActivityInstanceId)));
+        //if activityInstanceId's are not null they must be equal -> otherwise execution changed
+        || (lastActivityInstanceId != null && lastActivityInstanceId.equals(currentActivityInstanceId)
+            && (lastActivityId == null || lastActivityId.equals(currentActivityId))));
 
   }
 

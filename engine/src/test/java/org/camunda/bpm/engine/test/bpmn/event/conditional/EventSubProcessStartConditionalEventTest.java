@@ -27,6 +27,8 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.util.Map;
+
 import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
 import static org.junit.Assert.*;
 
@@ -40,18 +42,12 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
   @Deployment
   public void testTrueCondition() {
     //given process with event sub process conditional start event
+
+    //when process instance is started with true condition
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
 
+    //then event sub process is triggered via default evaluation behavior
     TaskQuery taskQuery = taskService.createTaskQuery().processInstanceId(procInst.getId());
-    Task task = taskQuery.singleResult();
-    assertNotNull(task);
-    assertEquals(TASK_BEFORE_CONDITION, task.getName());
-    assertEquals(1, conditionEventSubscriptionQuery.list().size());
-
-    //when variable is set on task with condition
-    taskService.setVariable(task.getId(), VARIABLE_NAME, 1);
-
-    //then execution is at user task after conditional start event
     tasksAfterVariableIsSet = taskQuery.list();
     assertEquals(TASK_AFTER_CONDITION, tasksAfterVariableIsSet.get(0).getName());
     assertEquals(0, conditionEventSubscriptionQuery.list().size());
@@ -93,6 +89,23 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
     //then execution is at user task after conditional start event
     tasksAfterVariableIsSet = taskQuery.list();
     assertEquals(TASK_AFTER_CONDITION, tasksAfterVariableIsSet.get(0).getName());
+  }
+
+  @Test
+  @Deployment(resources ={ "org/camunda/bpm/engine/test/bpmn/event/conditional/EventSubProcessStartConditionalEventTest.testVariableCondition.bpmn20.xml"})
+  public void testVariableConditionAndStartingWithVar() {
+    //given process with event sub process conditional start event
+    Map<String, Object> vars = Variables.createVariables();
+    vars.put(VARIABLE_NAME, 1);
+
+    //when starting process with variable
+    ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY, vars);
+
+    //then event sub process is triggered via default evaluation behavior
+    TaskQuery taskQuery = taskService.createTaskQuery().processInstanceId(procInst.getId());
+    tasksAfterVariableIsSet = taskQuery.list();
+    assertEquals(TASK_AFTER_CONDITION, tasksAfterVariableIsSet.get(0).getName());
+    assertEquals(0, conditionEventSubscriptionQuery.list().size());
   }
 
   @Test
@@ -495,9 +508,9 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
     taskService.complete(task.getId());
 
     //then input mapping from sub process sets variable
-    //-> interrupting conditional event is not triggered
+    //-> interrupting conditional event is triggered by default evaluation behavior
     tasksAfterVariableIsSet = taskQuery.list();
-    assertEquals(TASK_IN_SUB_PROCESS_ID, tasksAfterVariableIsSet.get(0).getName());
+    assertEquals(TASK_AFTER_CONDITION, tasksAfterVariableIsSet.get(0).getName());
   }
 
   @Test
@@ -527,9 +540,9 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
     taskService.complete(task.getId());
 
     //then input mapping from sub process sets variable
-    //-> non interrupting conditional event is not triggered
+    //-> non interrupting conditional event is triggered via default evaluation behavior
     tasksAfterVariableIsSet = taskQuery.list();
-    assertEquals(1, tasksAfterVariableIsSet.size());
+    assertEquals(2, tasksAfterVariableIsSet.size());
     assertEquals(1, conditionEventSubscriptionQuery.list().size());
   }
 
@@ -1201,17 +1214,14 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
 
     deployConditionalEventSubProcess(modelInstance, false);
 
-    //given
+    //given process with two event sub processes
+
+    //when process is started
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
     TaskQuery taskQuery = taskService.createTaskQuery().processInstanceId(processInstance.getId());
-    Task task = taskQuery.singleResult();
-    assertEquals(TASK_WITH_CONDITION, task.getName());
 
-    //when variable is set
-    runtimeService.setVariable(processInstance.getId(), "var", 1);
-
-    //then event sub process should be triggered
-    task = taskQuery.taskName(TASK_AFTER_CONDITION + 1).singleResult();
+    //then first event sub process is triggered because condition is true
+    Task task = taskQuery.taskName(TASK_AFTER_CONDITION + 1).singleResult();
     assertNotNull(task);
     assertEquals(2, taskService.createTaskQuery().count());
 

@@ -195,7 +195,7 @@ public class MigrationBoundaryEventsParameterizedTest {
             .activityBuilder(activityId)
             .boundaryEvent(BOUNDARY_ID)
             .conditionalEventDefinition()
-              .condition("${true}")
+              .condition("${any=='any'}")
             .conditionalEventDefinitionDone()
             .userTask(AFTER_BOUNDARY_TASK)
             .endEvent()

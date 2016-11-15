@@ -47,38 +47,27 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
   @Deployment
   public void testTrueCondition() {
     //given process with boundary conditional event
+
+    //when process is started and execution arrives user task with boundary event
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
 
+    //then default evaluation behavior triggers boundary event
     TaskQuery taskQuery = taskService.createTaskQuery().processInstanceId(procInst.getId());
-    Task task = taskQuery.singleResult();
-    assertNotNull(task);
-    assertEquals(TASK_WITH_CONDITION, task.getName());
-    assertEquals(1, conditionEventSubscriptionQuery.list().size());
-
-    //when variable is set on task execution
-    runtimeService.setVariable(task.getExecutionId(), VARIABLE_NAME, 1);
-
-    //then execution is at user task after boundary event
     tasksAfterVariableIsSet = taskQuery.list();
     assertEquals(TASK_AFTER_CONDITION, tasksAfterVariableIsSet.get(0).getName());
+    assertEquals(0, conditionEventSubscriptionQuery.list().size());
   }
 
   @Test
   @Deployment
   public void testNonInterruptingTrueCondition() {
     //given process with boundary conditional event
+
+    //when process is started and execution arrives activity with boundary event
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
 
+    //then default evaluation behavior triggers conditional event
     TaskQuery taskQuery = taskService.createTaskQuery().processInstanceId(procInst.getId());
-    Task task = taskQuery.singleResult();
-    assertNotNull(task);
-    assertEquals(TASK_WITH_CONDITION, task.getName());
-    assertEquals(1, conditionEventSubscriptionQuery.list().size());
-
-    //when variable is set on task execution
-    taskService.setVariable(task.getId(), VARIABLE_NAME, 1);
-
-    //then execution is at user task after boundary event and in the task with the boundary event
     tasksAfterVariableIsSet = taskQuery.list();
     assertEquals(2, tasksAfterVariableIsSet.size());
     assertEquals(1, conditionEventSubscriptionQuery.list().size());
@@ -562,9 +551,9 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
     //when task is completed
     taskService.complete(task.getId());
 
-    // input mapping does not trigger boundary event and process ends regularly
+    // input mapping does trigger boundary event with help of default evaluation behavior and process ends regularly
     tasksAfterVariableIsSet = taskQuery.list();
-    assertEquals(0, tasksAfterVariableIsSet.size());
+    assertEquals(TASK_AFTER_CONDITION, tasksAfterVariableIsSet.get(0).getName());
   }
 
   @Test
@@ -676,12 +665,13 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
     //when task is completed
     taskService.complete(task.getId());
 
-    // Then input mapping from sub process sets variable, but
-    // interrupting conditional event is not triggered
+    // Then input mapping from sub process sets variable,
+    // interrupting conditional event is triggered by default evaluation behavior
     tasksAfterVariableIsSet = taskQuery.list();
-    assertEquals(TASK_IN_SUB_PROCESS_ID, tasksAfterVariableIsSet.get(0).getName());
-    assertEquals(1, conditionEventSubscriptionQuery.list().size());
+    assertEquals(TASK_AFTER_CONDITION, tasksAfterVariableIsSet.get(0).getName());
+    assertEquals(0, conditionEventSubscriptionQuery.list().size());
   }
+
 
   @Test
   public void testNonInterruptingSetVariableInInputMappingOfSubProcess() {
@@ -744,11 +734,11 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
     //when task is completed
     taskService.complete(task.getId());
 
-    // Then start listener from sub process sets variable, but
-    // interrupting conditional event is not triggered
+    // Then start listener from sub process sets variable,
+    // interrupting conditional event is triggered by default evaluation behavior
     tasksAfterVariableIsSet = taskQuery.list();
-    assertEquals(TASK_IN_SUB_PROCESS_ID, tasksAfterVariableIsSet.get(0).getName());
-    assertEquals(1, conditionEventSubscriptionQuery.list().size());
+    assertEquals(TASK_AFTER_CONDITION, tasksAfterVariableIsSet.get(0).getName());
+    assertEquals(0, conditionEventSubscriptionQuery.list().size());
   }
 
   @Test
@@ -778,10 +768,10 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
     //when task before is completed
     taskService.complete(task.getId());
 
-    // Then start listener from sub process sets variable, but
-    // non interrupting conditional event is not triggered
+    // Then start listener from sub process sets variable,
+    // non interrupting conditional event is triggered by default evaluation behavior
     tasksAfterVariableIsSet = taskQuery.list();
-    assertEquals(TASK_IN_SUB_PROCESS_ID, tasksAfterVariableIsSet.get(0).getName());
+    assertEquals(2, tasksAfterVariableIsSet.size());
     assertEquals(1, conditionEventSubscriptionQuery.list().size());
   }
 
@@ -838,9 +828,9 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
     taskService.complete(task.getId());
 
     //then output mapping sets variable
-    //boundary event is not triggered
+    //boundary event is triggered by default evaluation behavior
     tasksAfterVariableIsSet = taskQuery.list();
-    assertEquals(TASK_WITH_CONDITION, tasksAfterVariableIsSet.get(0).getName());
+    assertEquals(TASK_AFTER_CONDITION, tasksAfterVariableIsSet.get(0).getName());
   }
 
   @Test
@@ -867,9 +857,9 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
     taskService.complete(task.getId());
 
     //then output mapping sets variable
-    //boundary event is not triggered
+    //boundary event is triggered from default evaluation behavior
     tasksAfterVariableIsSet = taskQuery.list();
-    assertEquals(TASK_WITH_CONDITION, tasksAfterVariableIsSet.get(0).getName());
+    assertEquals(2, tasksAfterVariableIsSet.size());
   }
 
   @Test
@@ -1126,9 +1116,9 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
     taskService.complete(task.getId());
 
     //then start listener sets variable
-    //boundary event is not triggered
+    //boundary event is triggered by default evaluation behavior
     tasksAfterVariableIsSet = taskQuery.list();
-    assertEquals(TASK_WITH_CONDITION, tasksAfterVariableIsSet.get(0).getName());
+    assertEquals(TASK_AFTER_CONDITION, tasksAfterVariableIsSet.get(0).getName());
   }
 
   @Test
@@ -1188,9 +1178,9 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
     taskService.complete(task.getId());
 
     //then take listener sets variable
-    //conditional event is not triggered
+    //non interrupting boundary event is triggered with default evaluation behavior
     tasksAfterVariableIsSet = taskQuery.list();
-    assertEquals(TASK_WITH_CONDITION, tasksAfterVariableIsSet.get(0).getName());
+    assertEquals(TASK_AFTER_CONDITION, tasksAfterVariableIsSet.get(0).getName());
   }
 
   @Test
@@ -1221,9 +1211,9 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
     taskService.complete(task.getId());
 
     //then take listener sets variable
-    //non interrupting boundary event is not triggered
+    //non interrupting boundary event is triggered with default evaluation behavior
     tasksAfterVariableIsSet = taskQuery.list();
-    assertEquals(TASK_WITH_CONDITION, tasksAfterVariableIsSet.get(0).getName());
+    assertEquals(2, tasksAfterVariableIsSet.size());
   }
 
   @Test
@@ -1410,17 +1400,19 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
     taskService.complete(task.getId());
 
     //then multi instance is created
-    //and boundary event is triggered for each multi instance creation
+    //and boundary event is triggered for each multi instance creation and also from the default evaluation behavior
+    //since the condition is true. That means one time from the default behavior and 4 times for the variables which are set:
+    //nrOfInstances, nrOfCompletedInstances, nrOfActiveInstances, loopCounter
     for (int i = 0; i < 3; i++) {
       Task multiInstanceTask = taskQuery.taskDefinitionKey(TASK_WITH_CONDITION_ID).singleResult();
       assertNotNull(multiInstanceTask);
-      assertEquals(i == 0 ? 4 : 4 + i * 2, taskService.createTaskQuery().taskName(TASK_AFTER_CONDITION).count());
+      assertEquals(i == 0 ? 5 : 5 + i * 2, taskService.createTaskQuery().taskName(TASK_AFTER_CONDITION).count());
       taskService.complete(multiInstanceTask.getId());
     }
 
-    //then non boundary events are triggered
+    //then non boundary events are triggered 9 times
     tasksAfterVariableIsSet = taskService.createTaskQuery().list();
-    assertEquals(8, tasksAfterVariableIsSet.size());
+    assertEquals(9, tasksAfterVariableIsSet.size());
     assertEquals(0, conditionEventSubscriptionQuery.list().size());
   }
 
@@ -1605,20 +1597,14 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
   @Deployment
   public void testTrueConditionWithExecutionListener() {
     //given process with boundary conditional event
+
+    //when process is started and execution arrives activity with boundary event
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
 
+    //then default evaluation behavior triggers conditional event
     TaskQuery taskQuery = taskService.createTaskQuery().processInstanceId(procInst.getId());
-    Task task = taskQuery.singleResult();
-    assertNotNull(task);
-    assertEquals(TASK_WITH_CONDITION, task.getName());
-    assertEquals(1, conditionEventSubscriptionQuery.list().size());
-
-    //when task is completed the execution listener is called which sets a variable (equal to output mapping)
-    taskService.complete(task.getId());
-
-    //then conditional event will be not triggered
     tasksAfterVariableIsSet = taskQuery.list();
-    assertEquals(AFTER_TASK, tasksAfterVariableIsSet.get(0).getName());
+    assertEquals(TASK_AFTER_CONDITION, tasksAfterVariableIsSet.get(0).getName());
     assertEquals(0, conditionEventSubscriptionQuery.list().size());
   }
 

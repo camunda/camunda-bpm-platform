@@ -16,7 +16,7 @@
     <bpmn:boundaryEvent id="conditionalEvent" attachedToRef="taskWithCondition">
       <bpmn:outgoing>SequenceFlow_1sf03oo</bpmn:outgoing>
       <bpmn:conditionalEventDefinition>
-        <bpmn:condition xsi:type="bpmn:tFormalExpression">${true}</bpmn:condition>
+        <bpmn:condition xsi:type="bpmn:tFormalExpression">${false}</bpmn:condition>
       </bpmn:conditionalEventDefinition>
     </bpmn:boundaryEvent>
     <bpmn:sequenceFlow id="SequenceFlow_1sf03oo" sourceRef="conditionalEvent" targetRef="Task_0edqijt" />

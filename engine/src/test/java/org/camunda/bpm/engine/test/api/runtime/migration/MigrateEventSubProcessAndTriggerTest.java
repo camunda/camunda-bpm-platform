@@ -137,7 +137,7 @@ public class MigrateEventSubProcessAndTriggerTest {
         new MigrateEventSubProcessAndTriggerTestConfiguration() {
           @Override
           public BpmnModelInstance getBpmnModel() {
-            return EventSubProcessModels.TRUE_CONDITIONAL_EVENT_SUBPROCESS_PROCESS;
+            return EventSubProcessModels.CONDITIONAL_EVENT_SUBPROCESS_PROCESS;
           }
 
 

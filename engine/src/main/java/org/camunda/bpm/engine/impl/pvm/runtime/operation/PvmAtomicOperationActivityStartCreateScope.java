@@ -37,6 +37,5 @@ public class PvmAtomicOperationActivityStartCreateScope extends PvmAtomicOperati
 
   protected void scopeCreated(PvmExecutionImpl execution) {
     execution.performOperation(ACTIVITY_START);
-
   }
 }

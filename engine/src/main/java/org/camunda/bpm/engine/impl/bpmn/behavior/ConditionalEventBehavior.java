@@ -41,8 +41,6 @@ public interface ConditionalEventBehavior {
    *
    * @param eventSubscription the event subscription which contains all necessary informations
    * @param variableEvent the variableEvent to evaluate the condition
-   * @param commandContext the current command context
    */
-  void leaveOnSatisfiedCondition(final EventSubscriptionEntity eventSubscription,
-          final VariableEvent variableEvent, final CommandContext commandContext);
+  void leaveOnSatisfiedCondition(final EventSubscriptionEntity eventSubscription, final VariableEvent variableEvent);
 }

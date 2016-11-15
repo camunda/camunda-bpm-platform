@@ -100,6 +100,6 @@ public class ConditionalEventDefinition extends EventSubscriptionDeclaration imp
   }
 
   public boolean tryEvaluate(VariableEvent variableEvent, DelegateExecution execution) {
-    return shouldEvaluateForVariableEvent(variableEvent) && tryEvaluate(execution);
+    return (variableEvent == null || shouldEvaluateForVariableEvent(variableEvent)) && tryEvaluate(execution);
   }
 }

@@ -24,7 +24,6 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.camunda.bpm.model.bpmn.builder.UserTaskBuilder;
 import org.camunda.bpm.model.bpmn.instance.SequenceFlow;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaExecutionListener;
 import org.junit.Test;
@@ -33,6 +32,7 @@ import org.junit.runners.Parameterized;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
 import static org.junit.Assert.*;
@@ -50,10 +50,9 @@ public class ConditionalEventTriggeredByExecutionListenerTest extends AbstractCo
 
   private interface ConditionalEventProcessSpecifier {
     BpmnModelInstance specifyConditionalProcess(BpmnModelInstance modelInstance, boolean isInterrupting);
-
-    String expectedActivityName();
-
+    void assertTaskNames(List<Task> tasks, boolean isInterrupting);
     int expectedSubscriptions();
+    int expectedTaskCount();
   }
 
   @Parameterized.Parameters(name = "{index}: {0}")
@@ -78,13 +77,23 @@ public class ConditionalEventTriggeredByExecutionListenerTest extends AbstractCo
         }
 
         @Override
-        public String expectedActivityName() {
-          return TASK_AFTER_CONDITION;
+        public void assertTaskNames(List<Task> tasks, boolean isInterrupting) {
+          for (Task task : tasks) {
+            assertTrue(
+              (isInterrupting || task.getTaskDefinitionKey().equals(TASK_WITH_CONDITION_ID))
+              || task.getName().equals(TASK_AFTER_CONDITION)
+            );
+          }
         }
 
         @Override
         public int expectedSubscriptions() {
           return 1;
+        }
+
+        @Override
+        public int expectedTaskCount() {
+          return 2;
         }
 
         @Override
@@ -123,13 +132,24 @@ public class ConditionalEventTriggeredByExecutionListenerTest extends AbstractCo
         }
 
         @Override
-        public String expectedActivityName() {
-          return TASK_AFTER_CONDITIONAL_START_EVENT;
+        public void assertTaskNames(List<Task> tasks, boolean isInterrupting) {
+          assertNotNull(tasks);
+          for (Task task : tasks) {
+            assertTrue(
+              (isInterrupting || task.getTaskDefinitionKey().equals(TASK_WITH_CONDITION_ID)
+               || task.getName().equals(TASK_AFTER_CONDITIONAL_BOUNDARY_EVENT))
+              || task.getName().equals(TASK_AFTER_CONDITIONAL_START_EVENT));
+          }
         }
 
         @Override
         public int expectedSubscriptions() {
           return 2;
+        }
+
+        @Override
+        public int expectedTaskCount() {
+          return 3;
         }
 
         @Override
@@ -170,7 +190,7 @@ public class ConditionalEventTriggeredByExecutionListenerTest extends AbstractCo
     //then start listener sets variable
     //conditional event is triggered
     tasksAfterVariableIsSet = taskQuery.list();
-    assertEquals(specifier.expectedActivityName(), tasksAfterVariableIsSet.get(0).getName());
+    specifier.assertTaskNames(tasksAfterVariableIsSet, true);
   }
 
   @Test
@@ -197,11 +217,9 @@ public class ConditionalEventTriggeredByExecutionListenerTest extends AbstractCo
     //then start listener sets variable
     //non interrupting boundary event is triggered
     tasksAfterVariableIsSet = taskQuery.list();
-    assertEquals(2, tasksAfterVariableIsSet.size());
+    assertEquals(specifier.expectedTaskCount(), tasksAfterVariableIsSet.size());
     assertEquals(specifier.expectedSubscriptions(), conditionEventSubscriptionQuery.list().size());
-    for (Task task : tasksAfterVariableIsSet) {
-      assertTrue(task.getName().equals(specifier.expectedActivityName()) || task.getName().equals(TASK_WITH_CONDITION));
-    }
+    specifier.assertTaskNames(tasksAfterVariableIsSet, false);
   }
 
   @Test
@@ -235,7 +253,7 @@ public class ConditionalEventTriggeredByExecutionListenerTest extends AbstractCo
     //then take listener sets variable
     //conditional event is triggered
     tasksAfterVariableIsSet = taskQuery.list();
-    assertEquals(specifier.expectedActivityName(), tasksAfterVariableIsSet.get(0).getName());
+    specifier.assertTaskNames(tasksAfterVariableIsSet, true);
   }
 
   @Test
@@ -269,8 +287,9 @@ public class ConditionalEventTriggeredByExecutionListenerTest extends AbstractCo
     //then take listener sets variable
     //non interrupting boundary event is triggered
     tasksAfterVariableIsSet = taskQuery.list();
-    assertEquals(2, tasksAfterVariableIsSet.size());
+    assertEquals(specifier.expectedTaskCount(), tasksAfterVariableIsSet.size());
     assertEquals(specifier.expectedSubscriptions(), conditionEventSubscriptionQuery.list().size());
+    specifier.assertTaskNames(tasksAfterVariableIsSet, false);
   }
 
   @Test
@@ -304,7 +323,7 @@ public class ConditionalEventTriggeredByExecutionListenerTest extends AbstractCo
     //then take listener sets variable
     //conditional event is triggered
     tasksAfterVariableIsSet = taskQuery.list();
-    assertEquals(specifier.expectedActivityName(), tasksAfterVariableIsSet.get(0).getName());
+    specifier.assertTaskNames(tasksAfterVariableIsSet, true);
   }
 
   @Test
@@ -334,8 +353,7 @@ public class ConditionalEventTriggeredByExecutionListenerTest extends AbstractCo
 
     //then take listener sets variable
     //non interrupting boundary event is triggered
-    Task task = taskQuery.singleResult();
-    assertEquals(specifier.expectedActivityName(), task.getName());
+    specifier.assertTaskNames(taskQuery.list(), false);
 
     //and job was created
     Job job = engine.getManagementService().createJobQuery().singleResult();
@@ -344,9 +362,10 @@ public class ConditionalEventTriggeredByExecutionListenerTest extends AbstractCo
 
     //when job is executed task is created
     engine.getManagementService().executeJob(job.getId());
-    //when both tasks are completed
-    taskService.complete(task.getId());
-    taskService.complete(taskQuery.singleResult().getId());
+    //when tasks are completed
+    for (Task task : taskQuery.list()) {
+      taskService.complete(task.getId());
+    }
 
     //then no task exist and process instance is ended
     tasksAfterVariableIsSet = taskQuery.list();
@@ -379,7 +398,7 @@ public class ConditionalEventTriggeredByExecutionListenerTest extends AbstractCo
     //then end listener sets variable
     //conditional event is triggered
     tasksAfterVariableIsSet = taskQuery.list();
-    assertEquals(specifier.expectedActivityName(), tasksAfterVariableIsSet.get(0).getName());
+    specifier.assertTaskNames(tasksAfterVariableIsSet, true);
   }
 
   @Test
@@ -406,10 +425,8 @@ public class ConditionalEventTriggeredByExecutionListenerTest extends AbstractCo
     //then end listener sets variable
     //non interrupting boundary event is triggered
     tasksAfterVariableIsSet = taskQuery.list();
-    assertEquals(2, tasksAfterVariableIsSet.size());
-    for (Task task : tasksAfterVariableIsSet) {
-      assertTrue(task.getName().equals(specifier.expectedActivityName()) || task.getName().equals(TASK_WITH_CONDITION));
-    }
+    assertEquals(specifier.expectedTaskCount(), tasksAfterVariableIsSet.size());
+    specifier.assertTaskNames(tasksAfterVariableIsSet, false);
   }
 
   @Test
@@ -448,7 +465,7 @@ public class ConditionalEventTriggeredByExecutionListenerTest extends AbstractCo
     //then start listener sets variable
     //conditional event is triggered
     tasksAfterVariableIsSet = taskQuery.list();
-    assertEquals(specifier.expectedActivityName(), tasksAfterVariableIsSet.get(0).getName());
+    specifier.assertTaskNames(tasksAfterVariableIsSet, true);
   }
 
   @Test
@@ -487,7 +504,7 @@ public class ConditionalEventTriggeredByExecutionListenerTest extends AbstractCo
     //then start listener sets variable
     //non interrupting boundary event is triggered
     tasksAfterVariableIsSet = taskQuery.list();
-    assertEquals(2, tasksAfterVariableIsSet.size());
+    specifier.assertTaskNames(tasksAfterVariableIsSet, false);
   }
 
   @Test
@@ -522,7 +539,7 @@ public class ConditionalEventTriggeredByExecutionListenerTest extends AbstractCo
     //then start listener sets variable
     //conditional event is triggered
     tasksAfterVariableIsSet = taskQuery.list();
-    assertEquals(specifier.expectedActivityName(), tasksAfterVariableIsSet.get(0).getName());
+    specifier.assertTaskNames(tasksAfterVariableIsSet, true);
   }
 
   @Test
@@ -557,7 +574,7 @@ public class ConditionalEventTriggeredByExecutionListenerTest extends AbstractCo
     //then start listener sets variable
     //non interrupting boundary event is triggered
     tasksAfterVariableIsSet = taskQuery.list();
-    assertEquals(2, tasksAfterVariableIsSet.size());
+    specifier.assertTaskNames(tasksAfterVariableIsSet, false);
   }
 
   @Test
@@ -592,7 +609,7 @@ public class ConditionalEventTriggeredByExecutionListenerTest extends AbstractCo
     //then end listener sets variable
     //conditional event is triggered
     tasksAfterVariableIsSet = taskQuery.list();
-    assertEquals(specifier.expectedActivityName(), tasksAfterVariableIsSet.get(0).getName());
+    specifier.assertTaskNames(tasksAfterVariableIsSet, true);
   }
 
   @Test
@@ -627,7 +644,7 @@ public class ConditionalEventTriggeredByExecutionListenerTest extends AbstractCo
     //then end listener sets variable
     //non interrupting boundary event is triggered
     tasksAfterVariableIsSet = taskQuery.list();
-    assertEquals(2, tasksAfterVariableIsSet.size());
+    specifier.assertTaskNames(tasksAfterVariableIsSet, false);
   }
 
 }

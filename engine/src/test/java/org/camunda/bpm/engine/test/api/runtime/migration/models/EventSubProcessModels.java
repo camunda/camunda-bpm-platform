@@ -24,7 +24,7 @@ public class EventSubProcessModels {
 
   public static final String MESSAGE_NAME = "Message";
   public static final String SIGNAL_NAME = "Signal";
-  public static final String TRUE_CONDITION = "${true}";
+  public static final String VAR_CONDITION = "${any=='any'}";
   public static final String FALSE_CONDITION = "${false}";
 
   public static final String EVENT_SUB_PROCESS_TASK_ID = "eventSubProcessTask";
@@ -38,7 +38,18 @@ public class EventSubProcessModels {
     .id(EVENT_SUB_PROCESS_ID)
     .triggerByEvent()
     .embeddedSubProcess()
-    .startEvent(EVENT_SUB_PROCESS_START_ID).condition(TRUE_CONDITION)
+    .startEvent(EVENT_SUB_PROCESS_START_ID).condition(VAR_CONDITION)
+    .userTask(EVENT_SUB_PROCESS_TASK_ID)
+    .endEvent()
+    .subProcessDone()
+    .done();
+
+  public static final BpmnModelInstance CONDITIONAL_EVENT_SUBPROCESS_PROCESS = modify(ProcessModels.ONE_TASK_PROCESS)
+    .addSubProcessTo(ProcessModels.PROCESS_KEY)
+    .id(EVENT_SUB_PROCESS_ID)
+    .triggerByEvent()
+    .embeddedSubProcess()
+    .startEvent(EVENT_SUB_PROCESS_START_ID).condition("${any=='any'}")
     .userTask(EVENT_SUB_PROCESS_TASK_ID)
     .endEvent()
     .subProcessDone()
