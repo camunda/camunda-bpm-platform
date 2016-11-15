@@ -32,22 +32,9 @@
       <span class="glyphicon glyphicon-pause white"></span>
     </span>
 
-    <span ng-if="!!crumb.choices && crumb.choices.length === 1"
-          class="dropdown">
+    <span ng-if="!!crumb.choices && crumb.choices.length === 1">
       <span class="divider">:</span>
-
-      <a class="dropdown-toggle"
-         href>
-        {{ getActiveChoice(crumb.choices) }}
-        <span class="caret"></span>
-      </a>
-
-      <ul class="dropdown-menu dropdown-menu-right">
-        <li ng-repeat="choice in crumb.choices"
-            ng-class="{active: choice.active}">
-          <a href ng-click="selectChoice($event, choice)">{{ choice.label }}</a>
-        </li>
-      </ul>
+      {{ getActiveChoice(crumb.choices) }}
     </span>
 
     <span ng-if="!!crumb.choices && crumb.choices.length === 2"
