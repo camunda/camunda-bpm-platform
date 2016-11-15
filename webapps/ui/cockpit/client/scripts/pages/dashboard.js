@@ -8,33 +8,48 @@ function prioritySort(a, b) {
   return a.priority > b.priority ? 1 : (a.priority < b.priority ? -1 : 0);
 }
 
-function resultsCb(cb) {
-  return function(err, data) {
-    if (err) { return cb(err); }
-    cb(null, data.count);
-  };
+function valuesSort(a, b) {
+  return a.value > b.value ? 1 : (a.value < b.value ? -1 : 0);
+}
+
+function replaceAll(str, obj) {
+  Object.keys(obj).forEach(function(searched) {
+    var replaced = obj[searched];
+    str = str.split('{{' + searched + '}}').join(replaced);
+  });
+  return str;
+}
+
+function color(i, t) {
+  return 'hsl(' + ((360 / t) * i) + ', 70%, 41%)';
+}
+
+function valuesTreshold(l, t) {
+  return l > 12 ? (Math.floor(t / l) * 0.5) : 0;
 }
 
 var Controller = [
   '$scope',
   'camAPI',
   'localConf',
-  '$injector',
   'Views',
   'hasPlugin',
   'page',
   '$resource',
   'Uri',
+  'Data',
+  'dataDepend',
   function(
   $scope,
   camAPI,
   localConf,
-  $injector,
   Views,
   hasPlugin,
   page,
   $resource,
-  Uri
+  Uri,
+  Data,
+  dataDepend
 ) {
     var hasMetricsPlugin = hasPlugin('cockpit.dashboard.metrics', 'executed-activity-instances');
     $scope.hasProcessSearch = hasPlugin('cockpit.processes.dashboard', 'search-process-instances');
@@ -57,53 +72,212 @@ var Controller = [
 
   // ----------------------------------------------------------------------------------------
 
-    var caseDefResource = camAPI.resource('case-definition');
-    var caseInstResource = camAPI.resource('case-instance');
-    var decisionDefResource = camAPI.resource('decision-definition');
-    var deploymentResource = camAPI.resource('deployment');
-    var historyResource = camAPI.resource('history');
-    var procDefResource = camAPI.resource('process-definition');
-    var procInstResource = camAPI.resource('process-instance');
-    var taskResource = camAPI.resource('task');
+    $scope.values = {
+      procInst: [],
+      procIncid: []
+    };
 
-    $scope.data = {};
+    $scope.data = {
+      actual: {}
+    };
 
-    function fetchActual(cb) {
-      // 1: GET /process-instance/count (query param for link is "unfinished")
-      // 2: GET /history/process-instance/count?withIncidents=true&incidentStatus=open
-      // 3: GET /case-instance/count
-      // 4: GET: /task/count
-      series({
-        runningProcessInstances: function(next) {
-          procInstResource.count({}, resultsCb(next));
-        },
-        openIncidents: function(next) {
-          historyResource.processInstanceCount({
-            withIncidents: true,
-            incidentStatus: 'open'
-          }, resultsCb(next));
-        },
-        caseInstances: function(next) {
-          caseInstResource.count({}, next);
-        },
-        tasks: function(next) {
-          taskResource.count({}, next);
+
+
+    $scope.linkBase = {
+      processInstances: '/process-definition/{{id}}',
+      processIncidents: '/process-definition/{{id}}',
+      tasks: '/process-instance/{{processInstanceId}}/runtime?detailsTab=user-tasks-tab'
+    };
+
+    if ($scope.hasProcessSearch) {
+      $scope.linkBase.processInstances = '/processes?searchQuery=%5B%7B%22type%22:%22PIunfinished%22,%22operator%22:%22eq%22,%22value%22:%22%22,%22name%22:%22%22%7D,%7B%22type%22:%22PIprocessDefinitionKey%22,%22operator%22:%22eq%22,%22value%22:%22{{key}}%22,%22name%22:%22%22%7D%5D';
+      $scope.linkBase.processIncidents = '/processes?searchQuery=%5B%7B%22type%22:%22PIwithIncidents%22,%22operator%22:%22eq%22,%22value%22:%22%22,%22name%22:%22%22%7D,%7B%22type%22:%22PIincidentStatus%22,%22operator%22:%22eq%22,%22value%22:%22open%22,%22name%22:%22%22%7D,%7B%22type%22:%22PIprocessDefinitionKey%22,%22operator%22:%22eq%22,%22value%22:%22{{key}}%22,%22name%22:%22%22%7D%5D';
+    }
+
+    function prepareValues(values, total, url) {
+      var treshold = valuesTreshold(values.length, total);
+
+      var belowTreshold = {
+        value: 0,
+        label: 'Others',
+        names: [],
+        url: url
+      };
+
+      values.forEach(function(item) {
+        if (item.value && item.value < treshold) {
+          belowTreshold.value += item.value;
+          belowTreshold.names.push(item.label);
         }
-      }, function(err, results) {
-        if (err) { throw err; }
-        cb(err, results);
+      });
+
+      values = values
+        .filter(function(item) {
+          return item.value && item.value >= treshold;
+        })
+        .sort(valuesSort);
+
+      if (treshold) {
+        values.unshift(belowTreshold);
+      }
+
+      return values.map(function(item, i) {
+        item.color = color(i, values.length);
+        return item;
       });
     }
 
+
+
+    var caseDefResource = camAPI.resource('case-definition');
+    var decisionDefResource = camAPI.resource('decision-definition');
+    var deploymentResource = camAPI.resource('deployment');
+    var processDefinitionService = camAPI.resource('process-definition');
+
+
+    $scope.processData = dataDepend.create($scope);
+    var processData = $scope.processData.newChild($scope);
+    Data.instantiateProviders('cockpit.dashboard.data', {$scope: $scope, processData : processData});
+
+
+    function aggregateInstances(processDefinitionStatistics) {
+      var values = [];
+      var totalInstances = 0;
+
+      processDefinitionStatistics.forEach(function(statistic) {
+        var processDefId = statistic.definition.id;
+        var foundIds = $scope.processDefinitionData.filter(function(pd) {
+          return pd.id === processDefId;
+        });
+
+        var foundObject = foundIds[0];
+        if(foundObject && statistic.instances) {
+          values.push({
+            value: statistic.instances,
+            label: foundObject.name || foundObject.id,
+            url: replaceAll($scope.linkBase.processInstances, foundObject)
+          });
+
+          totalInstances += statistic.instances;
+        }
+      });
+
+      $scope.values.procInst = prepareValues(values, totalInstances, '/processes');
+
+      $scope.data.actual.runningProcessInstances = totalInstances;
+    }
+
+
+    function aggregateIncidents(processDefinitionStatistics) {
+      var values = [];
+      var totalIncidents = 0;
+
+      processDefinitionStatistics.forEach(function(statistic) {
+        var definitionIncidents = 0;
+        statistic.incidents.forEach(function(info) {
+          definitionIncidents += info.incidentCount;
+        });
+
+        values.push({
+          value: definitionIncidents,
+          label: statistic.definition.name || statistic.definition.id,
+          url: replaceAll($scope.linkBase.processIncidents, statistic.definition)
+        });
+
+        totalIncidents += definitionIncidents;
+      });
+
+      $scope.values.procIncid = prepareValues(values, totalIncidents, '/processes');
+
+      $scope.data.actual.openIncidents = totalIncidents;
+    }
+
+
+    var taskResource = camAPI.resource('task');
     $scope.$watch('actualActive', function() {
-      if (!$scope.actualActive || $scope.data.actual) { return; }
+      if (!$scope.actualActive) { return; }
 
-      $scope.loading = true;
-      fetchActual(function(err, results) {
-        $scope.loading = false;
-        if (err) { throw err; }
+      $scope.loadingActual = true;
+      series({
+        processes: function(next) {
+          processDefinitionService.list({
+            latest: true
+          }, function(err, data) {
+            if (err) {
+              return next(err);
+            }
 
-        $scope.data.actual = results;
+            $scope.processDefinitionData = data.items;
+
+            processData.observe('processDefinitionStatistics', function(processDefinitionStatistics) {
+              aggregateInstances(processDefinitionStatistics);
+              aggregateIncidents(processDefinitionStatistics);
+            });
+
+            next();
+          });
+        },
+        tasks: function(next) {
+          taskResource.count({}, function(err, total) {
+            if (err) { return next(); }
+
+            $scope.data.actual.tasks = total;
+
+            series({
+              assignedToUser: function(done) {
+                taskResource.count({
+                  unfinished: true,
+                  assigned: true
+                }, function(err, value) {
+                  done(err, {
+                    label: 'Assigned to a user',
+                    url: '/tasks?searchQuery=%5B%7B%22type%22:%22unfinished%22,%22operator%22:%22eq%22,%22value%22:%22%22,%22name%22:%22%22%7D,%7B%22type%22:%22assigned%22,%22operator%22:%22eq%22,%22value%22:%22%22,%22name%22:%22%22%7D%5D',
+                    value: value
+                  });
+                });
+              },
+              assignedToGroup: function(done) {
+                taskResource.count({
+                  unfinished: true,
+                  unassigned: true,
+                  withCandidateGroups: true
+                }, function(err, value) {
+                  done(err, {
+                    label: 'Assigned to 1 or more groups',
+                    url: '/tasks?searchQuery=%5B%7B%22type%22:%22unfinished%22,%22operator%22:%22eq%22,%22value%22:%22%22,%22name%22:%22%22%7D,%7B%22type%22:%22withCandidateGroups%22,%22operator%22:%22eq%22,%22value%22:%22%22,%22name%22:%22%22%7D,%7B%22type%22:%22unassigned%22,%22operator%22:%22eq%22,%22value%22:%22%22,%22name%22:%22%22%7D%5D',
+                    value: value
+                  });
+                });
+              },
+              unassigned: function(done) {
+                taskResource.count({
+                  unfinished: true,
+                  unassigned: true,
+                  withoutCandidateGroups: true
+                }, function(err, value) {
+                  done(err, {
+                    label: 'Unassigned',
+                    url: '/tasks?searchQuery=%5B%7B%22type%22:%22unfinished%22,%22operator%22:%22eq%22,%22value%22:%22%22,%22name%22:%22%22%7D,%7B%22type%22:%22withoutCandidateGroups%22,%22operator%22:%22eq%22,%22value%22:%22%22,%22name%22:%22%22%7D,%7B%22type%22:%22unassigned%22,%22operator%22:%22eq%22,%22value%22:%22%22,%22name%22:%22%22%7D%5D',
+                    value: value
+                  });
+                });
+              }
+            }, function(err, results) {
+              if (err) { return next(err); }
+
+              var values = [];
+              Object.keys(results).forEach(function(key) {
+                values.push(results[key]);
+              });
+
+              $scope.values.tasks = prepareValues(values, total, '/tasks');
+
+              next(null, total);
+            });
+          });
+        }
+      }, function() {
+        $scope.loadingActual = false;
       });
     });
 
@@ -116,7 +290,7 @@ var Controller = [
       // 8: GET /deployment/count
       series({
         processDefinitions: function(next) {
-          procDefResource.count({
+          processDefinitionService.count({
             latestVersion: true
           }, next);
         },
@@ -142,9 +316,9 @@ var Controller = [
     $scope.$watch('deployedActive', function() {
       if (!$scope.deployedActive || $scope.data.deployed) { return; }
 
-      $scope.loading = true;
+      $scope.loadingDeployed = true;
       fetchDeployed(function(err, results) {
-        $scope.loading = false;
+        $scope.loadingDeployed = false;
         if (err) { throw err; }
 
         $scope.data.deployed = results;
@@ -155,8 +329,8 @@ var Controller = [
     [
       'actual',
       'metrics',
-      'statistics',
-      'deployed'
+      'deployed',
+      'deprecate'
     ].forEach(function(name) {
       $scope[name + 'Active'] = localConf.get('dashboardSection:' + name, true);
     });
@@ -179,11 +353,6 @@ var Controller = [
           $scope.metricsVars = { read: [ 'metricsPeriod' ] };
           $scope.metricsPlugins = Views.getProviders({
             component: 'cockpit.dashboard.metrics'
-          }).sort(prioritySort);
-
-          $scope.statisticsVars = { read: [] };
-          $scope.statisticsPlugins = Views.getProviders({
-            component: 'cockpit.dashboard.statistics'
           }).sort(prioritySort);
         }
       });

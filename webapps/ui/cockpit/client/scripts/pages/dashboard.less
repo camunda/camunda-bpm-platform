@@ -40,6 +40,31 @@
     font-weight: 100;
   }
 
+  .actual .stats-section {
+    .canvas-holder {
+      max-width: 150px;
+      margin: auto;
+      display: block;
+    }
+
+    .legend-holder {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .value {
+      display: block;
+      position: absolute;
+      z-index: 10;
+      top: 55px;
+      left: 50%;
+      width: 60px;
+      margin-left: -30px;
+      text-align: center;
+    }
+  }
+
   .metrics {
     .legend-color {
       display: inline-block;
