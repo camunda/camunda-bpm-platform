@@ -19,6 +19,7 @@
     <module>bom</module>
     <module>extension</module>
     <module>examples</module>
+    <module>maven</module>
     <module>docs</module>
   </modules>
 
