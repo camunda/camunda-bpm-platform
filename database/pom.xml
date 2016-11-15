@@ -24,6 +24,7 @@
     <version.oracle-10>10.2.0.5</version.oracle-10>
     <version.oracle>${version.oracle-11}</version.oracle>
     <version.mariadb>1.1.8</version.mariadb>
+    <version.mariadb.galera>1.5.5</version.mariadb.galera>
     <version.mysql>5.1.21</version.mysql>
     <version.sqlserver.oss>1.3.1</version.sqlserver.oss>
     <version.sqlserver>4.0</version.sqlserver>
@@ -261,6 +262,12 @@
       <properties>
         <database.datasource.class>org.mariadb.jdbc.MySQLDataSource</database.datasource.class>
         <jboss.datasource.filename>mariadb-xa-ds.xml</jboss.datasource.filename>
+      </properties>
+    </profile>
+    <profile>
+      <id>mariadb-galera</id>
+      <properties>
+        <version.mariadb>${version.mariadb.galera}</version.mariadb>
       </properties>
     </profile>
 
