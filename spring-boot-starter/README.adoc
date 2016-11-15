@@ -9,6 +9,8 @@ image::https://www.openhub.net/p/camunda-bpm-spring-boot-starter/widgets/project
 image::https://travis-ci.org/camunda/camunda-bpm-spring-boot-starter.svg?branch=master[link=https://travis-ci.org/camunda/camunda-bpm-spring-boot-starter"]
 
 
+CAUTION: With 2.0.0 a lot of refactorings are being made. Do not switch if you expect/require a stable runtime. If you do switch, be prepared to rearrange your application.properties and imports. We are happy to get feedback.
+
 
 ## Get started
 
