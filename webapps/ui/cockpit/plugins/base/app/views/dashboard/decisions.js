@@ -1,6 +1,6 @@
 'use strict';
 module.exports = [ 'ViewsProvider', function(ViewsProvider) {
-  ViewsProvider.registerDefaultView('cockpit.dashboard.section', {
+  ViewsProvider.registerDefaultView('cockpit.navigation', {
     id: 'decisions',
     label: 'Decisions',
     pagePath: '#/decisions',

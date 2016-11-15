@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = [ 'ViewsProvider', function(ViewsProvider) {
-  ViewsProvider.registerDefaultView('cockpit.dashboard.section', {
+  ViewsProvider.registerDefaultView('cockpit.navigation', {
     id: 'proceses',
     label: 'Processes',
     pagePath: '#/processes',

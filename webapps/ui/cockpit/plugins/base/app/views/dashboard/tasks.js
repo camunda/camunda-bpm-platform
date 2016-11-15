@@ -4,7 +4,7 @@ module.exports = [
   function(
     ViewsProvider
   ) {
-    ViewsProvider.registerDefaultView('cockpit.dashboard.section', {
+    ViewsProvider.registerDefaultView('cockpit.navigation', {
       id: 'tasks',
       label: 'Human Tasks',
       template: '<!-- nothing to show, but needed -->',

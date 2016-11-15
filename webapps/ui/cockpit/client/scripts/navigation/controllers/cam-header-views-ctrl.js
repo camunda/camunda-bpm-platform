@@ -17,7 +17,7 @@ module.exports = [
     $scope.menuActions = [];
     $scope.dropdownActions = [];
 
-    Views.getProviders({ component: 'cockpit.dashboard.section' }).forEach(function(plugin) {
+    Views.getProviders({ component: 'cockpit.navigation' }).forEach(function(plugin) {
       if (angular.isArray(plugin.access)) {
         var fn = $injector.invoke(plugin.access);
 
