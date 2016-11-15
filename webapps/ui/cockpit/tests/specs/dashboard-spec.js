@@ -29,7 +29,6 @@ describe('Cockpit Dashboard Spec', function() {
   it('should display information about actual state', function () {
     expect(element(by.css('.actual .process-instances .value')).getText()).to.eventually.eql('0');
     expect(element(by.css('.actual .open-human-tasks .value')).getText()).to.eventually.eql('0');
-    expect(element(by.css('.actual .open-cases .value')).getText()).to.eventually.eql('0');
     expect(element(by.css('.actual .open-incidents .value')).getText()).to.eventually.eql('0');
   });
 
@@ -73,7 +72,6 @@ describe('Cockpit Dashboard Spec', function() {
       btn.click();
 
       expect(section.element(by.css('.stats')).isPresent()).to.eventually.eql(true);
-      expect(section.element(by.css('.help-block')).isPresent()).to.eventually.eql(false);
     });
   });
 });
