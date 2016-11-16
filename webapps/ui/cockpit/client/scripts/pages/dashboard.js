@@ -35,8 +35,6 @@ var Controller = [
   'Views',
   'hasPlugin',
   'page',
-  '$resource',
-  'Uri',
   'Data',
   'dataDepend',
   function(
@@ -46,8 +44,6 @@ var Controller = [
   Views,
   hasPlugin,
   page,
-  $resource,
-  Uri,
   Data,
   dataDepend
 ) {
