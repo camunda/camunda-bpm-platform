@@ -447,9 +447,6 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
     String expectedResult = "<formField>unicode symbol: \u2200</formField>";
     when(formServiceMock.getRenderedStartForm(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)).thenReturn(expectedResult);
 
-    Charset charset = Charset.defaultCharset();
-    String encoding = charset.displayName();
-
     Response response = given()
         .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
         .then()
