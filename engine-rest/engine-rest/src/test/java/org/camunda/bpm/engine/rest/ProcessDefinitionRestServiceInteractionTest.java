@@ -18,12 +18,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.lang.reflect.Field;
 import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -440,6 +438,28 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
         .get(RENDERED_FORM_URL);
 
     String responseContent = response.asString();
+    System.out.println(responseContent);
+    Assertions.assertThat(responseContent).isEqualTo(expectedResult);
+  }
+
+  @Test
+  public void testGetRenderedStartFormForDifferentPlatformEncoding() throws NoSuchFieldException, IllegalAccessException, UnsupportedEncodingException {
+    String expectedResult = "<formField>unicode symbol: \u2200</formField>";
+    when(formServiceMock.getRenderedStartForm(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)).thenReturn(expectedResult);
+
+    Charset charset = Charset.defaultCharset();
+    String encoding = charset.displayName();
+
+    Response response = given()
+        .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+        .then()
+        .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .contentType(XHTML_XML_CONTENT_TYPE)
+        .when().log().all()
+        .get(RENDERED_FORM_URL);
+
+    String responseContent = new String(response.asByteArray(), "UTF-8");
     System.out.println(responseContent);
     Assertions.assertThat(responseContent).isEqualTo(expectedResult);
   }

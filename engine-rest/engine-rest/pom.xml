@@ -303,6 +303,19 @@
               </excludes>
               <redirectTestOutputToFile>true</redirectTestOutputToFile>
             </configuration>
+            <executions>
+              <execution>
+                <id>encoding-test</id>
+                <phase>test</phase>
+                <goals><goal>test</goal></goals>
+                <configuration>
+                  <argLine>-Dfile.encoding=ISO-8859-1</argLine>
+                  <includes>
+                    <include>**/ProcessDefinitionRestServiceInteractionTest.java</include>
+                  </includes>
+                </configuration>
+              </execution>
+            </executions>
           </plugin>
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
@@ -378,6 +391,21 @@
             <configuration>
               <redirectTestOutputToFile>true</redirectTestOutputToFile>
             </configuration>
+            <executions>
+              <execution>
+                <id>encoding-test</id>
+                <phase>test</phase>
+                <goals>
+                  <goal>test</goal>
+                </goals>
+                <configuration>
+                  <argLine>-Dfile.encoding=ISO-8859-1</argLine>
+                  <includes>
+                    <include>**/ProcessDefinitionRestServiceInteractionTest.java</include>
+                  </includes>
+                </configuration>
+              </execution>
+            </executions>
           </plugin>
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
@@ -449,6 +477,21 @@
               </excludes>
               <redirectTestOutputToFile>true</redirectTestOutputToFile>
             </configuration>
+            <executions>
+              <execution>
+                <id>encoding-test</id>
+                <phase>test</phase>
+                <goals>
+                  <goal>test</goal>
+                </goals>
+                <configuration>
+                  <argLine>-Dfile.encoding=ISO-8859-1</argLine>
+                  <includes>
+                    <include>**/ProcessDefinitionRestServiceInteractionTest.java</include>
+                  </includes>
+                </configuration>
+              </execution>
+            </executions>
           </plugin>
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
@@ -521,6 +564,21 @@
               </excludes>
               <redirectTestOutputToFile>true</redirectTestOutputToFile>
             </configuration>
+            <executions>
+              <execution>
+                <id>encoding-test</id>
+                <phase>test</phase>
+                <goals>
+                  <goal>test</goal>
+                </goals>
+                <configuration>
+                  <argLine>-Dfile.encoding=ISO-8859-1</argLine>
+                  <includes>
+                    <include>**/ProcessDefinitionRestServiceInteractionTest.java</include>
+                  </includes>
+                </configuration>
+              </execution>
+            </executions>
           </plugin>
           <plugin>
             <groupId>org.codehaus.mojo</groupId>

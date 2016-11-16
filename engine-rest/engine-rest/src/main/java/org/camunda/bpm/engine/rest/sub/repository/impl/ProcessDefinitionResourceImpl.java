@@ -311,12 +311,16 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
     return dto;
   }
 
-  public String getRenderedForm() {
+  public byte[] getRenderedForm() {
     FormService formService = engine.getFormService();
 
     Object startForm = formService.getRenderedStartForm(processDefinitionId);
     if(startForm != null) {
-      return startForm.toString();
+      try {
+        return startForm.toString().getBytes("UTF-8");
+      } catch (UnsupportedEncodingException e) {
+        e.printStackTrace();
+      }
     }
 
     throw new InvalidRequestException(Status.NOT_FOUND, "No matching rendered start form for process definition with the id " + processDefinitionId + " found.");
