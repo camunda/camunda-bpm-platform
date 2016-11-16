@@ -1,7 +1,5 @@
 'use strict';
 
-var angular = require('camunda-commons-ui/vendor/angular');
-
 var fs = require('fs');
 
 var template = fs.readFileSync(__dirname + '/cam-cockpit-definitions-plugin.html', 'utf8');
@@ -10,10 +8,12 @@ var Controller = [
   '$scope',
   '$q',
   'camAPI',
+  'hasPlugin',
   function(
     $scope,
     $q,
-    camAPI
+    camAPI,
+    hasPlugin
   ) {
 
     // fields //////////////////////////////////////////////////////
@@ -26,16 +26,12 @@ var Controller = [
 
     var ProcessInstance = camAPI.resource('process-instance');
     var CaseInstance = camAPI.resource('case-instance');
+    var DrdService = camAPI.resource('drd');
 
     var resource;
 
-    $scope.hasCasePlugin = false;
-    try {
-      $scope.hasCasePlugin = !!angular.module('cockpit.plugin.case');
-    }
-    catch (e) {
-      // do nothing
-    }
+    $scope.hasCasePlugin = hasPlugin('cockpit.cases.dashboard', 'case-definition');
+    $scope.hasDrdPlugin = hasPlugin('cockpit.drd.definition.tab', 'decision-instance-table');
 
     // observe //////////////////////////////////////////////////////
 
@@ -45,6 +41,10 @@ var Controller = [
 
       if (definitions && definitions.length && !isDmnResource(resource)) {
         loadInstancesCount(definitions);
+      }
+
+      if(isDmnResource(resource)) {
+        loadDecisionRequirementsDefinition(definitions);
       }
     });
 
@@ -105,6 +105,30 @@ var Controller = [
     };
 
 
+    // drd //////////////////////////////////////////////////////////
+    var loadDecisionRequirementsDefinition = function(definitions) {
+      var drdId = definitions[0].decisionRequirementsDefinitionId;
+
+      $scope.drdLoadingState = drdId ? 'LOADING' : 'EMPTY';
+
+      if (drdId) {
+        DrdService.get(drdId, function(err, result) {
+          if (err) {
+            return $scope.drdTextError = err;
+          }
+
+          $scope.drdLoadingState = 'LOADED';
+          $scope.drd = result;
+
+          var phase = $scope.$root.$$phase;
+          if(phase !== '$apply' && phase !== '$digest') {
+            $scope.$apply();
+          }
+        });
+      }
+    };
+
+
     // link ////////////////////////////////////////////////////////
 
     $scope.getDefinitionLink = function(definition, resource) {
@@ -123,6 +147,12 @@ var Controller = [
         }
 
         return '#/' + path + '/' + definition.id;
+      }
+    };
+
+    $scope.getDrdLink = function(definition) {
+      if (definition) {
+        return '#/decision-requirement/' + definition.id;
       }
     };
 

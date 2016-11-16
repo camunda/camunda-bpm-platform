@@ -68,6 +68,9 @@ module.exports = {
         files: [{
           name: 'assign-approver-groups.dmn',
           content: readResource('assign-approver-groups.dmn')
+        }, {
+          name: 'drd.dmn',
+          content: readResource('drd.dmn')
         }]
       },
       {
@@ -103,18 +106,18 @@ module.exports = {
       }])
 
     ),
-    
+
   multiTenancySetup: combine(
-  		
+
       operation('deployment', 'create', [{
         deploymentName:  'processTenantOne',
-        tenantId: 'tenant1', 
+        tenantId: 'tenant1',
         files: [{
           name: 'user-tasks.bpmn',
           content: readResource('user-tasks.bpmn')
         }]
       }]),
-        
+
       operation('deployment', 'create', [{
         deploymentName:  'processNoTenant',
         files: [{
@@ -123,5 +126,5 @@ module.exports = {
         }]
       }])
   )
-  
+
 };
