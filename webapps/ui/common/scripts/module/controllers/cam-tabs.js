@@ -5,7 +5,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
 module.exports = ['$scope', 'search', 'Views', CamTabs];
 
 function CamTabs($scope, search, Views) {
-  this.providers = Views.getProviders($scope.providerParams);
+  this.providers = this.getProviders(Views, $scope);
   this.selected = this.providers[0];
   this.search = search;
 
@@ -15,6 +15,16 @@ function CamTabs($scope, search, Views) {
 
   $scope.$on('$locationChangeSuccess', this.onLocationChange.bind(this));
   this.onLocationChange();
+}
+
+CamTabs.prototype.getProviders = function(Views, $scope) {
+  return Views
+    .getProviders($scope.providerParams)
+    .sort(compareProviders);
+};
+
+function compareProviders(providerA, providerB) {
+  return (providerB.priority || 0) - (providerA.priority || 0);
 }
 
 CamTabs.prototype.onLocationChange = function() {
