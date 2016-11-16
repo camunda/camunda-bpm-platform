@@ -17,6 +17,10 @@ module.exports = Table.extend({
     return this.tableItem(idx, '.key');
   },
 
+  version: function(idx) {
+    return this.tableItem(idx, '.version');
+  },
+
   instanceCount: function(idx) {
     return this.tableItem(idx, '.instance-count');
   }

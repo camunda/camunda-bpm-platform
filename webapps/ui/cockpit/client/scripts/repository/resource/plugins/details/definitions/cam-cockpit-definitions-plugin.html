@@ -9,6 +9,8 @@
         <th class="key">Key</th>
         <th ng-if="!isDmnResource(resource)"
             class="instance-count">Instance Count</th>
+        <th ng-if="isDmnResource(resource)"
+            class="version">Version</th>
       </tr>
     </thead>
     <tbody>
@@ -40,8 +42,55 @@
           </span>
         </td>
 
+        <td ng-if="isDmnResource(resource)"
+            class="version">
+          <span>
+            {{ definition.version }}
+          </span>
+        </td>
+
       </tr>
     </tbody>
   </table>
+
+  <div ng-if="isDmnResource(resource)">
+    <h4>Decision Requirements Definitions:</h4>
+    <div cam-widget-loader
+         loading-state="{{ drdLoadingState }}"
+         text-empty="No decision requirements definitions matched by current deployment resource."
+         text-error="{{ drdTextError }}">
+      <table class="drd-definitions cam-table">
+        <thead>
+          <tr>
+            <th class="name">Name</th>
+            <th class="key">Key</th>
+            <th class="version">Version</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="name">
+              <a ng-if="hasDrdPlugin"
+                 ng-href="{{ getDrdLink(drd) }}">
+                {{ drd.name || drd.key || drd.id }}
+              </a>
+              <span ng-if="!hasDrdPlugin">
+                {{ drd.name || drd.key || drd.id }}
+              </span>
+            </td>
+
+            <td class="key">
+              {{ drd.key }}
+            </td>
+
+            <td class="version">
+              {{ drd.version }}
+            </td>
+
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 
 </div>

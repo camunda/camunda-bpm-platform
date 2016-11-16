@@ -21,8 +21,12 @@ module.exports = Page.extend({
     return this.formElement().element(by.css('h2.name')).getText();
   },
 
+  resourceVersionElement: function() {
+    return this.formElement().element(by.css('header .version'));
+  },
+
   resourceVersion: function() {
-    return this.formElement().element(by.css('header .version')).getText();
+    return this.resourceVersionElement().getText();
   },
 
   downloadButton: function() {

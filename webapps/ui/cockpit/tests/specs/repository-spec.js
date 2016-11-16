@@ -566,6 +566,25 @@ describe('Repository Spec', function() {
       expect(resourcePage.definitions.key(0).getText()).to.eventually.eql('invoice-assign-approver');
     });
 
+    it('should not display the version for dmn resources in the header', function() {
+      expect(resourcePage.resourceVersionElement().isDisplayed()).to.eventually.be.false;
+    });
+
+    it('should contain the version in the definitions table', function() {
+      expect(resourcePage.definitions.version(0).getText()).to.eventually.eql('1');
+    });
+
+    it('should display deployed decision requirements definitions', function() {
+      resourcesPage.selectResource(1);
+
+      // then
+      expect(resourcePage.definitions.table().count()).to.eventually.eql(2);
+
+      expect(resourcePage.drdTable.name().getText()).to.eventually.eql('camunda');
+      expect(resourcePage.drdTable.key().getText()).to.eventually.eql('definitions');
+      expect(resourcePage.drdTable.version().getText()).to.eventually.eql('1');
+    });
+
   });
 
   describe('multi tenancy', function() {

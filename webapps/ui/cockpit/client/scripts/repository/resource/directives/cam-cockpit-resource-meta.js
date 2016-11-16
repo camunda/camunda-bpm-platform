@@ -24,6 +24,7 @@ module.exports = [
         // fields ////////////////////////////////////////////////////
 
           var resourceMetaData = $scope.resourceData.newChild($scope);
+          $scope.isDmnResource = $scope.control.isDmnResource;
 
 
         // observe //////////////////////////////////////////////////

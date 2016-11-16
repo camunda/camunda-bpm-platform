@@ -123,9 +123,9 @@ module.exports = ['$scope', '$q', 'Uri', 'camAPI', 'Views', function($scope, $q,
       else if (isCmmnResource(resource)) {
         Service = CaseDefinition;
       }
-    else if (isDmnResource(resource)) {
-      Service = DecisionDefinition;
-    }
+      else if (isDmnResource(resource)) {
+        Service = DecisionDefinition;
+      }
 
       if (!Service) {
         deferred.resolve([]);
