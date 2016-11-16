@@ -327,6 +327,28 @@
         </plugins>
       </build>
     </profile>
+
+    <profile>
+      <id>mariadb-galera</id>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <failIfNoTests>false</failIfNoTests>
+              <trimStackTrace>false</trimStackTrace>
+              <redirectTestOutputToFile>true</redirectTestOutputToFile>
+              <excludes combine.children="append">
+                <exclude>**/JdbcStatementTimeoutTest.java</exclude>
+                <exclude>**/CompetingMessageCorrelationTest.java</exclude>
+                <exclude>**/ConcurrentDeploymentTest.java</exclude>
+                <exclude>**/*TestCase.java</exclude>
+              </excludes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
   </profiles>
 
   <dependencies>
