@@ -74,7 +74,7 @@ public interface ProcessDefinitionResource {
   @GET
   @Path("/rendered-form")
   @Produces(MediaType.APPLICATION_XHTML_XML)
-  byte[] getRenderedForm();
+  Response getRenderedForm();
 
   @PUT
   @Path("/suspended")

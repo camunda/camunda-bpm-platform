@@ -12,24 +12,9 @@
  */
 package org.camunda.bpm.engine.rest.sub.repository.impl;
 
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriInfo;
-
-import org.camunda.bpm.engine.AuthorizationException;
-import org.camunda.bpm.engine.FormService;
-import org.camunda.bpm.engine.ManagementService;
-import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.RepositoryService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.camunda.bpm.engine.*;
+import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.form.StartFormData;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.management.ActivityStatistics;
@@ -44,6 +29,7 @@ import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDiagramDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionSuspensionStateDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
+import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceWithVariablesDto;
 import org.camunda.bpm.engine.rest.dto.runtime.StartProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.modification.ProcessInstanceModificationInstructionDto;
 import org.camunda.bpm.engine.rest.dto.task.FormDto;
@@ -52,13 +38,21 @@ import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.sub.repository.ProcessDefinitionResource;
 import org.camunda.bpm.engine.rest.util.ApplicationContextPathUtil;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.ProcessInstanceWithVariables;
 import org.camunda.bpm.engine.runtime.ProcessInstantiationBuilder;
 import org.camunda.bpm.engine.variable.VariableMap;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.camunda.bpm.engine.exception.NotFoundException;
-import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceWithVariablesDto;
-import org.camunda.bpm.engine.runtime.ProcessInstanceWithVariables;
+import javax.ws.rs.HttpMethod;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource {
 
@@ -311,16 +305,15 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
     return dto;
   }
 
-  public byte[] getRenderedForm() {
+  public Response getRenderedForm() {
     FormService formService = engine.getFormService();
 
     Object startForm = formService.getRenderedStartForm(processDefinitionId);
-    if(startForm != null) {
-      try {
-        return startForm.toString().getBytes("UTF-8");
-      } catch (UnsupportedEncodingException e) {
-        e.printStackTrace();
-      }
+    if (startForm != null) {
+      return Response
+          .ok(startForm)
+          .type(MediaType.APPLICATION_XHTML_XML + "; charset=UTF-8")
+          .build();
     }
 
     throw new InvalidRequestException(Status.NOT_FOUND, "No matching rendered start form for process definition with the id " + processDefinitionId + " found.");
