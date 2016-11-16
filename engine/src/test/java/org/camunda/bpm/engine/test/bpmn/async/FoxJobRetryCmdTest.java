@@ -19,6 +19,10 @@ import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.bpm.model.bpmn.instance.MessageEventDefinition;
+import org.junit.Assert;
 
 public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
 
@@ -205,6 +209,40 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
     job = managementService.createJobQuery().singleResult();
 
     assertEquals(4, job.getRetries());
+  }
+
+  public void testRetryOnServiceTaskLikeMessageThrowEvent() {
+    // given
+    BpmnModelInstance bpmnModelInstance = Bpmn.createExecutableProcess("process")
+        .startEvent()
+        .intermediateThrowEvent()
+          .camundaAsyncBefore()
+          .camundaFailedJobRetryTimeCycle("R10/PT5S")
+          .messageEventDefinition("messageDefinition")
+            .message("message")
+          .messageEventDefinitionDone()
+        .endEvent()
+        .done();
+
+    MessageEventDefinition messageDefinition = bpmnModelInstance.getModelElementById("messageDefinition");
+    messageDefinition.setCamundaClass(FailingDelegate.class.getName());
+
+    deployment(bpmnModelInstance);
+
+    runtimeService.startProcessInstanceByKey("process");
+
+    Job job = managementService.createJobQuery().singleResult();
+
+   // when job fails
+    try {
+      managementService.executeJob(job.getId());
+    } catch (Exception e) {
+      // ignore
+    }
+
+    // then
+    job = managementService.createJobQuery().singleResult();
+    Assert.assertEquals(9, job.getRetries());
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/async/FoxJobRetryCmdTest.testFailedServiceTask.bpmn20.xml" })
