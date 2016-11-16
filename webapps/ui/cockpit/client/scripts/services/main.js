@@ -9,8 +9,7 @@ var angular = require('camunda-commons-ui/vendor/angular'),
     page = require('./../../../../common/scripts/services/page'),
     camAPI = require('./../../../../common/scripts/services/cam-api'),
     hasPlugin = require('./../../../../common/scripts/services/has-plugin'),
-    localConf = require('./../../../../common/scripts/services/cam-local-configuration'),
-    loaders = require('./loaders');
+    localConf = require('./../../../../common/scripts/services/cam-local-configuration');
 
 var servicesModule = angular.module('cam.cockpit.services', []);
 
@@ -22,6 +21,5 @@ servicesModule.factory('routeUtil', routeUtil);
 servicesModule.factory('camAPI', camAPI);
 servicesModule.factory('hasPlugin', hasPlugin);
 servicesModule.factory('localConf', localConf);
-servicesModule.factory('Loaders', loaders);
 
 module.exports = servicesModule;
