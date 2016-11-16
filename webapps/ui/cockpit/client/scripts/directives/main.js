@@ -21,9 +21,12 @@ var angular = require('camunda-commons-ui/vendor/angular'),
     processVariable = require('./processVariable'),
     dynamicName = require('./dynamicName'),
     quickFilter = require('./quickFilter'),
-    diagramStatisticsLoader = require('./diagramStatisticsLoader');
+    diagramStatisticsLoader = require('./diagramStatisticsLoader'),
+    camCommon = require('../../../../common/scripts/module');
 
-var directivesModule = angular.module('cam.cockpit.directives', []);
+var directivesModule = angular.module('cam.cockpit.directives', [
+  camCommon.name
+]);
 
 directivesModule.directive('camBreadcrumbsPanel', breadcrumbs);
 directivesModule.directive('numeric', numeric);

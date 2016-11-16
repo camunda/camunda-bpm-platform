@@ -4,6 +4,7 @@ var angular = require('camunda-commons-ui/vendor/angular');
 
 var isModuleAvailable = require('./services/is-module-available');
 var exposeScopeProperties = require('./services/expose-scope-properties');
+var loaders = require('./services/loaders');
 
 var camToolbar = require('./components/cam-toolbar');
 var camPagination = require('./components/cam-pagination');
@@ -30,6 +31,7 @@ var ngModule = angular.module('cam-common', []);
 // Services
 ngModule.factory('isModuleAvailable', isModuleAvailable);
 ngModule.factory('exposeScopeProperties', exposeScopeProperties);
+ngModule.factory('Loaders', loaders);
 
 // Components
 ngModule.directive('camToolbar', camToolbar);
