@@ -28,10 +28,12 @@ describe('cam-common CamTabsController', function() {
 
     providers = [
       {
-        id:'a'
+        id:'a',
+        priority: 1
       },
       {
-        id: 'b'
+        id: 'b',
+        priority: 2
       }
     ];
 
@@ -54,6 +56,14 @@ describe('cam-common CamTabsController', function() {
   it('should fetch providers for cockpit.drd.definition.tab', function() {
     expect(instance.providers).to.eql(providers);
     expect(Views.getProviders.calledWith($scope.providerParams)).to.eql(true);
+  });
+
+  it('should sort providers', function() {
+    var priorities = instance.providers.map(function(provider) {
+      return provider.priority;
+    });
+
+    expect(priorities).to.eql([2, 1]);
   });
 
   it('should select first provider', function() {
@@ -80,7 +90,7 @@ describe('cam-common CamTabsController', function() {
 
     it('should update selected tab when changed', function() {
       var params = {
-        tab: 'b'
+        tab: 'a'
       };
 
       search.returns(params);
