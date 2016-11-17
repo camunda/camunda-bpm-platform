@@ -4,7 +4,7 @@ var $ = require('jquery');
 
 require('jquery-ui/draggable');
 
-module.exports = ['localConf', function(localConf) {
+module.exports = ['localConf', '$rootScope', function(localConf, $rootScope) {
   return {
     restrict: 'CA',
     link: function(scope, element, attrs) {
@@ -163,7 +163,13 @@ module.exports = ['localConf', function(localConf) {
 
           resizeHandle.animate(createOffset(0));
           collapsableElement
-            .animate(createSize(0))
+            .animate(
+              createSize(0),
+              $rootScope.$broadcast.bind($rootScope, 'collapse-change', {
+                direction: direction,
+                collapsed: true
+              })
+            )
             .addClass('collapsed');
           compensateElement.animate(createOffset(0));
         });
@@ -173,7 +179,13 @@ module.exports = ['localConf', function(localConf) {
 
           resizeHandle.animate(createOffset(minWidth || originalCollapsableSize));
           collapsableElement
-            .animate(createSize(minWidth || originalCollapsableSize))
+            .animate(
+              createSize(minWidth || originalCollapsableSize),
+              $rootScope.$broadcast.bind($rootScope, 'collapse-change', {
+                direction: direction,
+                collapsed: false
+              })
+            )
             .removeClass('collapsed');
           compensateElement.animate(createOffset(minWidth || originalCollapsableSize));
         });
