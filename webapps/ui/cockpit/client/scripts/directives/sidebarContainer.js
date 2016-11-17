@@ -162,7 +162,9 @@ module.exports = ['localConf', function(localConf) {
           setCollapsed(true);
 
           resizeHandle.animate(createOffset(0));
-          collapsableElement.animate(createSize(0));
+          collapsableElement
+            .animate(createSize(0))
+            .addClass('collapsed');
           compensateElement.animate(createOffset(0));
         });
 
@@ -170,7 +172,9 @@ module.exports = ['localConf', function(localConf) {
           setCollapsed(false);
 
           resizeHandle.animate(createOffset(minWidth || originalCollapsableSize));
-          collapsableElement.animate(createSize(minWidth || originalCollapsableSize));
+          collapsableElement
+            .animate(createSize(minWidth || originalCollapsableSize))
+            .removeClass('collapsed');
           compensateElement.animate(createOffset(minWidth || originalCollapsableSize));
         });
 
