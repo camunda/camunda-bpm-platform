@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.impl.cmmn.execution.CmmnSentryPart;
 import org.camunda.bpm.engine.impl.test.CmmnProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseExecutionQuery;
+import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.variable.Variables;
 
@@ -860,6 +861,18 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
     CaseExecution caseExecution = queryCaseExecutionByActivityId("PI_HumanTask_1");
     assertTrue(caseExecution.isActive());
 
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/sentry/SentryEntryCriteriaTest.testShouldNotTriggerCompletionTwice.cmmn",
+      "org/camunda/bpm/engine/test/cmmn/sentry/SentryEntryCriteriaTest.noop.bpmn20.xml"
+  })
+  public void testShouldNotTriggerCompletionTwice() {
+    // when
+    CaseInstance ci = caseService.createCaseInstanceByKey("case");
+
+    // then
+    assertTrue(ci.isCompleted());
   }
 
 }

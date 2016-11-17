@@ -51,7 +51,9 @@ public class StageActivityBehavior extends StageOrTaskActivityBehavior implement
         // if "autoComplete == true" and there are no
         // required nor active child activities,
         // then the stage will be completed.
-        checkAndCompleteCaseExecution(execution);
+        if (execution.isActive()) {
+          checkAndCompleteCaseExecution(execution);
+        }
       }
 
     } else {
