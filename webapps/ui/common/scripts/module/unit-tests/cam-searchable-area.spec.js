@@ -24,7 +24,8 @@ describe('cam-common CamSearchAbleAreaController', function() {
       variableTypes: [],
       loadingState: 'load',
       loadingError: 'error',
-      onSearchChange: sinon.spy()
+      onSearchChange: sinon.spy(),
+      textEmpty: 'text-empty'
     };
 
     instance = $controller('CamSearchAbleAreaController', {
@@ -40,6 +41,7 @@ describe('cam-common CamSearchAbleAreaController', function() {
     expect(instance.loadingState).to.equal($scope.loadingState);
     expect(instance.loadingError).to.equal($scope.loadingError);
     expect(instance.onSearchChange).to.equal($scope.onSearchChange);
+    expect(instance.textEmpty).to.equal($scope.textEmpty);
   });
 
   describe('onQueryChange', function() {

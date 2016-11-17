@@ -17,7 +17,8 @@ module.exports = function() {
       loadingError: '=',
       arrayTypes: '=?',
       variableTypes: '=?',
-      onSearchChange: '&'
+      onSearchChange: '&',
+      textEmpty: '@'
     }
   };
 };

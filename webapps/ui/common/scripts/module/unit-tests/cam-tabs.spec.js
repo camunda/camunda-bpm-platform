@@ -118,16 +118,16 @@ describe('cam-common CamTabsController', function() {
       expect(instance.selected).to.eql(selected);
     });
 
-    it('should not update selected tab when params do not have tab', function() {
+    it('should select default when params do not have tab', function() {
       var selected =  {
-        id: 'b',
+        id: 'c',
         extra: 's'
       };
       instance.selected = selected;
 
       instance.onLocationChange();
 
-      expect(instance.selected).to.eql(selected);
+      expect(instance.selected).to.eql(providers[0]);
     });
   });
 

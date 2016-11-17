@@ -10,7 +10,8 @@ function CamSearchAbleArea($scope, exposeScopeProperties) {
     'variableTypes',
     'onSearchChange',
     'loadingError',
-    'loadingState'
+    'loadingState',
+    'textEmpty'
   ]);
 }
 
