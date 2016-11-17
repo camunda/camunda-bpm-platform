@@ -312,6 +312,7 @@
                   <argLine>-Dfile.encoding=ISO-8859-1</argLine>
                   <includes>
                     <include>**/ProcessDefinitionRestServiceInteractionTest.java</include>
+                    <include>**/TaskRestServiceInteractionTest.java</include>
                   </includes>
                 </configuration>
               </execution>
@@ -402,6 +403,7 @@
                   <argLine>-Dfile.encoding=ISO-8859-1</argLine>
                   <includes>
                     <include>**/ProcessDefinitionRestServiceInteractionTest.java</include>
+                    <include>**/TaskRestServiceInteractionTest.java</include>
                   </includes>
                 </configuration>
               </execution>
@@ -488,6 +490,7 @@
                   <argLine>-Dfile.encoding=ISO-8859-1</argLine>
                   <includes>
                     <include>**/ProcessDefinitionRestServiceInteractionTest.java</include>
+                    <include>**/TaskRestServiceInteractionTest.java</include>
                   </includes>
                 </configuration>
               </execution>
@@ -575,6 +578,7 @@
                   <argLine>-Dfile.encoding=ISO-8859-1</argLine>
                   <includes>
                     <include>**/ProcessDefinitionRestServiceInteractionTest.java</include>
+                    <include>**/TaskRestServiceInteractionTest.java</include>
                   </includes>
                 </configuration>
               </execution>

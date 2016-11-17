@@ -28,6 +28,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
+import javax.ws.rs.core.Response;
 
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.rest.dto.task.CompleteTaskDto;
@@ -57,7 +58,7 @@ public interface TaskResource {
   @GET
   @Path("/rendered-form")
   @Produces(MediaType.APPLICATION_XHTML_XML)
-  String getRenderedForm();
+  Response getRenderedForm();
 
   @POST
   @Path("/claim")

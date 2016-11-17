@@ -411,7 +411,6 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
         .get(RENDERED_FORM_URL);
 
     String responseContent = response.asString();
-    System.out.println(responseContent);
     Assertions.assertThat(responseContent).isEqualTo(expectedResult);
   }
 
@@ -423,14 +422,13 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
     Response response = given()
         .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
         .then()
-        .expect()
-        .statusCode(Status.OK.getStatusCode())
-        .contentType(XHTML_XML_CONTENT_TYPE)
-        .when().log().all()
-        .get(RENDERED_FORM_URL);
+          .expect()
+            .statusCode(Status.OK.getStatusCode())
+            .contentType(XHTML_XML_CONTENT_TYPE)
+        .when()
+          .get(RENDERED_FORM_URL);
 
     String responseContent = new String(response.asByteArray(), "UTF-8");
-    System.out.println(responseContent);
     Assertions.assertThat(responseContent).isEqualTo(expectedResult);
   }
 

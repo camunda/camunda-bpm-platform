@@ -12,12 +12,17 @@
  */
 package org.camunda.bpm.engine.rest.sub.task.impl;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.Variant;
 
@@ -206,12 +211,23 @@ public class TaskResourceImpl implements TaskResource {
     return dto;
   }
 
-  public String getRenderedForm() {
+  public Response getRenderedForm() {
     FormService formService = engine.getFormService();
+    Charset charset = Charset.availableCharsets().get("UTF-8");
+
     Object renderedTaskForm = formService.getRenderedTaskForm(taskId);
     if(renderedTaskForm != null) {
-      return renderedTaskForm.toString();
+      String content = renderedTaskForm.toString();
+      if (charset == null) {
+        charset = Charset.defaultCharset();
+      }
+      InputStream stream = new ByteArrayInputStream(content.getBytes(charset));
+      return Response
+          .ok(stream)
+          .type(MediaType.APPLICATION_XHTML_XML)
+          .build();
     }
+
     throw new InvalidRequestException(Status.NOT_FOUND, "No matching rendered form for task with the id " + taskId + " found.");
   }
 

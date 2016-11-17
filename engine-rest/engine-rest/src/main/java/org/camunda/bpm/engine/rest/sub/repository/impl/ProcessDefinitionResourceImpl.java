@@ -47,9 +47,11 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -307,12 +309,18 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
 
   public Response getRenderedForm() {
     FormService formService = engine.getFormService();
+    Charset charset = Charset.availableCharsets().get("UTF-8");
 
     Object startForm = formService.getRenderedStartForm(processDefinitionId);
     if (startForm != null) {
+      String content = startForm.toString();
+      if (charset == null) {
+        charset = Charset.defaultCharset();
+      }
+      InputStream stream = new ByteArrayInputStream(content.getBytes(charset));
       return Response
-          .ok(startForm)
-          .type(MediaType.APPLICATION_XHTML_XML + "; charset=UTF-8")
+          .ok(stream)
+          .type(MediaType.APPLICATION_XHTML_XML)
           .build();
     }
 
