@@ -1,11 +1,12 @@
+<div cam-search="Searchable.config"
+     on-query-change="Searchable.onQueryChange(query)"
+     array-types="Searchable.arrayTypes">
+</div>
+
 <div cam-widget-loader
      text-error="{{Searchable.loadingError}}"
+     text-empty="{{Searchable.textEmpty}}"
      loading-state="{{Searchable.loadingState}}">
-
-  <div cam-search="Searchable.config"
-       on-query-change="Searchable.onQueryChange(query)"
-       array-types="Searchable.arrayTypes">
-  </div>
 
   <div ng-transclude></div>
 

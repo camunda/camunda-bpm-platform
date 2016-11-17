@@ -34,6 +34,8 @@ CamTabs.prototype.onLocationChange = function() {
     this.selected = this.providers.filter(function(provider) {
       return provider.id === params.tab;
     })[0];
+  } else if (!params.tab) {
+    this.selected = this.providers[0];
   }
 };
 
