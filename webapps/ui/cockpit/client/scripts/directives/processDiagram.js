@@ -25,6 +25,11 @@ var DirectiveController = ['$scope', '$compile', 'Views', function( $scope,   $c
 
   $scope.control = {};
 
+  $scope.$on('collapse-change', function() {
+    console.log('bpmn collapse change!');
+    $scope.control.resetZoom();
+  });
+
   /**
   * If the process diagram changes, then the diagram will be rendered.
   */
