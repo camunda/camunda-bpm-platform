@@ -46,13 +46,13 @@ module.exports = ['localConf', '$rootScope', function(localConf, $rootScope) {
           compensateElement
             .children('.show-collapsable')
               .addClass('expand-collapse')
-              .append('<i class="glyphicon glyphicon-chevron-' + (vertical ? 'right' : 'down') + '"></i>');
+              .append('<i class="glyphicon glyphicon-menu-' + (vertical ? 'right' : 'down') + '"></i>');
 
       var hideHandle =
           collapsableElement
             .children('.hide-collapsable')
               .addClass('expand-collapse')
-              .append('<i class="glyphicon glyphicon-chevron-' + (vertical ? 'left' : 'up') + '"></i>');
+              .append('<i class="glyphicon glyphicon-menu-' + (vertical ? 'left' : 'up') + '"></i>');
 
         /**
          * Toggle show / hide handles
