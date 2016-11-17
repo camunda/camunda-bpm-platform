@@ -38,7 +38,7 @@
   }
 
   section {
-    margin: (@grid-gutter-width * 0.5) 0;
+    margin: (@grid-gutter-width * 0.5) 0 @grid-gutter-width 0;
     padding: 0 (@grid-gutter-width * 0.5);
 
     > .inner {
@@ -106,7 +106,7 @@
 .dashboard-row {
   overflow: hidden;
   > section {
-    margin-bottom: 0;
+    margin-bottom: (@grid-gutter-width * 0.5);
   }
 }
 
