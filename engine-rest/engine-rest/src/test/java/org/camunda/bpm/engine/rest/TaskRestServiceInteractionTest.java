@@ -98,6 +98,7 @@ import org.camunda.bpm.engine.rest.helper.ErrorMessageHelper;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.helper.VariableTypeHelper;
 import org.camunda.bpm.engine.rest.helper.variable.EqualsPrimitiveValue;
+import org.camunda.bpm.engine.rest.util.EncodingUtil;
 import org.camunda.bpm.engine.rest.util.VariablesBuilder;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
 import org.camunda.bpm.engine.task.Attachment;
@@ -621,7 +622,7 @@ public class TaskRestServiceInteractionTest extends
         .when()
           .get(RENDERED_FORM_URL);
 
-    String responseContent = new String(response.asByteArray(), "UTF-8");
+    String responseContent = new String(response.asByteArray(), EncodingUtil.DEFAULT_ENCODING);
     Assertions.assertThat(responseContent).isEqualTo(expectedResult);
   }
 

@@ -37,6 +37,7 @@ import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.sub.repository.ProcessDefinitionResource;
 import org.camunda.bpm.engine.rest.util.ApplicationContextPathUtil;
+import org.camunda.bpm.engine.rest.util.EncodingUtil;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceWithVariables;
 import org.camunda.bpm.engine.runtime.ProcessInstantiationBuilder;
@@ -309,15 +310,11 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
 
   public Response getRenderedForm() {
     FormService formService = engine.getFormService();
-    Charset charset = Charset.availableCharsets().get("UTF-8");
 
     Object startForm = formService.getRenderedStartForm(processDefinitionId);
     if (startForm != null) {
       String content = startForm.toString();
-      if (charset == null) {
-        charset = Charset.defaultCharset();
-      }
-      InputStream stream = new ByteArrayInputStream(content.getBytes(charset));
+      InputStream stream = new ByteArrayInputStream(content.getBytes(EncodingUtil.DEFAULT_ENCODING));
       return Response
           .ok(stream)
           .type(MediaType.APPLICATION_XHTML_XML)

@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.rest.helper.variable.EqualsObjectValue;
 import org.camunda.bpm.engine.rest.helper.variable.EqualsPrimitiveValue;
 import org.camunda.bpm.engine.rest.helper.variable.EqualsUntypedValue;
 import org.camunda.bpm.engine.rest.sub.repository.impl.ProcessDefinitionResourceImpl;
+import org.camunda.bpm.engine.rest.util.EncodingUtil;
 import org.camunda.bpm.engine.rest.util.ModificationInstructionBuilder;
 import org.camunda.bpm.engine.rest.util.VariablesBuilder;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
@@ -428,7 +429,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
         .when()
           .get(RENDERED_FORM_URL);
 
-    String responseContent = new String(response.asByteArray(), "UTF-8");
+    String responseContent = new String(response.asByteArray(), EncodingUtil.DEFAULT_ENCODING);
     Assertions.assertThat(responseContent).isEqualTo(expectedResult);
   }
 

@@ -51,6 +51,7 @@ import org.camunda.bpm.engine.rest.sub.task.TaskAttachmentResource;
 import org.camunda.bpm.engine.rest.sub.task.TaskCommentResource;
 import org.camunda.bpm.engine.rest.sub.task.TaskResource;
 import org.camunda.bpm.engine.rest.util.ApplicationContextPathUtil;
+import org.camunda.bpm.engine.rest.util.EncodingUtil;
 import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.variable.VariableMap;
@@ -213,15 +214,11 @@ public class TaskResourceImpl implements TaskResource {
 
   public Response getRenderedForm() {
     FormService formService = engine.getFormService();
-    Charset charset = Charset.availableCharsets().get("UTF-8");
 
     Object renderedTaskForm = formService.getRenderedTaskForm(taskId);
     if(renderedTaskForm != null) {
       String content = renderedTaskForm.toString();
-      if (charset == null) {
-        charset = Charset.defaultCharset();
-      }
-      InputStream stream = new ByteArrayInputStream(content.getBytes(charset));
+      InputStream stream = new ByteArrayInputStream(content.getBytes(EncodingUtil.DEFAULT_ENCODING));
       return Response
           .ok(stream)
           .type(MediaType.APPLICATION_XHTML_XML)
