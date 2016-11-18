@@ -21,7 +21,10 @@ function replaceAll(str, obj) {
 }
 
 function color(i, t) {
-  return 'hsl(' + ((360 / t) * i) + ', 70%, 41%)';
+  var hue = (360 / t) * i;
+  hue += 230;
+  hue = hue > 360 ? hue-360 : hue;
+  return 'hsl(' + hue + ', 70%, 41%)';
 }
 
 function valuesTreshold(l, t) {
