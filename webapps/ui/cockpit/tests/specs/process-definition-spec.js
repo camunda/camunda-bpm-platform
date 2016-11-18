@@ -126,7 +126,7 @@ describe('Cockpit Process Definition Spec', function() {
     it('should keep selection after page refresh', function() {
 
       // when
-      browser.getCurrentUrl().then(function (url) {
+      browser.getCurrentUrl().then(function(url) {
         browser.get(url);
       });
 
