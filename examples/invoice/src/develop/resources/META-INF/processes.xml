@@ -9,6 +9,7 @@
     <properties>
       <property name="jobExecutorActivate">true</property>
       <property name="authorizationEnabled">true</property>
+      <property name="history">full</property>
     </properties>
   </process-engine>
 
