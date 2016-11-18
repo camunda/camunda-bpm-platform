@@ -1,5 +1,9 @@
 'use strict';
 
+/*
+TESTED=dashboard TESTED_APP=cockpit grunt test-e2e --protractorConfig=./ui/common/tests/develop.conf.js
+*/
+
 var chai     = require('chai');
 var promised = require('chai-as-promised');
 chai.use(promised);
