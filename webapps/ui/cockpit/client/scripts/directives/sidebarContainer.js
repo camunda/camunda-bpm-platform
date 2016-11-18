@@ -155,7 +155,7 @@ module.exports = ['localConf', '$rootScope', function(localConf, $rootScope) {
             .on('dragstop', function(event) {
               updateResizeHandlePosition();
 
-              scope.$broadcast('resize', [ event ]);
+              $rootScope.$broadcast('resize', [ event ]);
             });
 
         hideHandle.click(function() {
@@ -165,7 +165,7 @@ module.exports = ['localConf', '$rootScope', function(localConf, $rootScope) {
           collapsableElement
             .animate(
               createSize(0),
-              $rootScope.$broadcast.bind($rootScope, 'collapse-change', {
+              $rootScope.$broadcast.bind($rootScope, 'resize', {
                 direction: direction,
                 collapsed: true
               })
@@ -181,7 +181,7 @@ module.exports = ['localConf', '$rootScope', function(localConf, $rootScope) {
           collapsableElement
             .animate(
               createSize(minWidth || originalCollapsableSize),
-              $rootScope.$broadcast.bind($rootScope, 'collapse-change', {
+              $rootScope.$broadcast.bind($rootScope, 'resize', {
                 direction: direction,
                 collapsed: false
               })

@@ -25,7 +25,7 @@ var DirectiveController = ['$scope', '$compile', 'Views', function( $scope,   $c
 
   $scope.control = {};
 
-  $scope.$on('collapse-change', function() {
+  $scope.$on('resize', function() {
     $scope.control.resetZoom();
   });
 
