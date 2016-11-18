@@ -169,8 +169,7 @@ module.exports = ['localConf', '$rootScope', function(localConf, $rootScope) {
                 direction: direction,
                 collapsed: true
               })
-            )
-            .addClass('collapsed');
+            );
           compensateElement.animate(createOffset(0));
         });
 
@@ -185,8 +184,7 @@ module.exports = ['localConf', '$rootScope', function(localConf, $rootScope) {
                 direction: direction,
                 collapsed: false
               })
-            )
-            .removeClass('collapsed');
+            );
           compensateElement.animate(createOffset(minWidth || originalCollapsableSize));
         });
 
