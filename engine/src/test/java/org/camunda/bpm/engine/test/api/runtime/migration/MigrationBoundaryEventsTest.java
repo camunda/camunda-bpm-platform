@@ -84,6 +84,7 @@ public class MigrationBoundaryEventsTest {
       .mapActivities("timerBoundary1", "timerBoundary1")
       .mapActivities("signalBoundary1", "signalBoundary1")
       .mapActivities("conditionalBoundary1", "conditionalBoundary1")
+      .updateEventTrigger()
       .mapActivities(USER_TASK_ID, USER_TASK_ID)
       .mapActivities("messageBoundary2", "messageBoundary2")
       .build();
@@ -429,7 +430,7 @@ public class MigrationBoundaryEventsTest {
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
       .mapActivities(USER_TASK_ID, USER_TASK_ID)
-      .mapActivities(BOUNDARY_ID, BOUNDARY_ID)//.updateEventTrigger()
+      .mapActivities(BOUNDARY_ID, BOUNDARY_ID).updateEventTrigger()
       .build();
 
     // when process is migrated without update event trigger

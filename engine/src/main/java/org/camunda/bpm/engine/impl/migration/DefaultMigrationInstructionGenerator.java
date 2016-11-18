@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.camunda.bpm.engine.impl.bpmn.behavior.ConditionalEventBehavior;
 import org.camunda.bpm.engine.impl.migration.validation.activity.MigrationActivityValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instruction.CannotAddMultiInstanceInnerActivityValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instruction.CannotRemoveMultiInstanceInnerActivityValidator;
@@ -85,11 +86,15 @@ public class DefaultMigrationInstructionGenerator implements MigrationInstructio
     for (ActivityImpl sourceActivity : sourceActivities) {
       if (!existingInstructions.containsInstructionForSourceScope(sourceActivity)) {
         for (ActivityImpl targetActivity : targetActivities) {
+
+
           if (isValidActivity(sourceActivity)
             && isValidActivity(targetActivity)
             && migrationActivityMatcher.matchActivities(sourceActivity, targetActivity)) {
 
-            boolean updateEventTriggersForInstruction = updateEventTriggers && UpdateEventTriggersValidator.definesPersistentEventTrigger(sourceActivity);
+            //for conditional events the update event trigger must be set
+            boolean updateEventTriggersForInstruction = sourceActivity.getActivityBehavior() instanceof ConditionalEventBehavior ||
+                                                        updateEventTriggers && UpdateEventTriggersValidator.definesPersistentEventTrigger(sourceActivity);
 
             ValidatingMigrationInstruction generatedInstruction = new ValidatingMigrationInstructionImpl(sourceActivity, targetActivity, updateEventTriggersForInstruction);
             generatedInstructions.add(generatedInstruction);

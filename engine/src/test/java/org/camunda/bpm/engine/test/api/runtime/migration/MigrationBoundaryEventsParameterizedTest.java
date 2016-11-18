@@ -17,11 +17,15 @@
 
 package org.camunda.bpm.engine.test.api.runtime.migration;
 
+import org.camunda.bpm.engine.migration.MigrationInstructionBuilder;
 import org.camunda.bpm.engine.migration.MigrationPlan;
+import org.camunda.bpm.engine.migration.MigrationPlanBuilder;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
+import org.camunda.bpm.engine.test.util.BpmnEventTrigger;
+import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Rule;
@@ -32,6 +36,8 @@ import org.junit.runners.Parameterized;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
 import static org.junit.Assert.assertEquals;
@@ -55,18 +61,17 @@ public class MigrationBoundaryEventsParameterizedTest {
   protected static final String MIGRATE_CONDITIONAL_BOUNDARY_EVENT = "MigrateConditionalBoundaryEvent";
   protected static final String USER_TASK_ID = "userTask";
   protected static final String NEW_BOUNDARY_ID = "newBoundary";
+  public static final String USER_TASK_1_ID = "userTask1";
+  public static final String USER_TASK_2_ID = "userTask2";
+  public static final String SUB_PROCESS_ID = "subProcess";
 
-
-  protected static abstract class MigrationBoundaryEventTestConfiguration {
-    public abstract BpmnModelInstance getSourceProcess(BpmnModelInstance modelInstance, String activityId);
+  protected static abstract class MigrationBoundaryEventTestConfiguration extends MigrationTestConfiguration {
     public abstract BpmnModelInstance getTargetProcessWithNewEventName(BpmnModelInstance modelInstance, String activityId);
-    public abstract String getEventName();
 
-    public void assertMigration(MigrationTestRule testHelper, String activityIdBefore, String activityIdAfter) {
-      testHelper.assertEventSubscriptionMigrated(activityIdBefore, activityIdAfter, getEventName());
+    @Override
+    public BpmnEventTrigger addEventSubProcess(BpmnModelInstance modelInstance, String parentId) {
+      return null;
     }
-
-    public abstract void triggerBoundaryEvent(MigrationTestRule testHelper);
   }
 
   @Parameterized.Parameters(name = "{index}: {0}")
@@ -75,13 +80,26 @@ public class MigrationBoundaryEventsParameterizedTest {
       {//message boundary event configuration
       new MigrationBoundaryEventTestConfiguration() {
         @Override
-        public BpmnModelInstance getSourceProcess(BpmnModelInstance modelInstance, String activityId) {
-          return modify(modelInstance)
+        public BpmnEventTrigger addBoundaryEvent(BpmnModelInstance modelInstance, String activityId) {
+          final BpmnModelInstance modifiedModel = modify(modelInstance)
             .activityBuilder(activityId)
             .boundaryEvent(BOUNDARY_ID).message(MESSAGE_NAME)
-            .userTask(AFTER_BOUNDARY_TASK)
-            .endEvent()
+              .userTask(AFTER_BOUNDARY_TASK)
+              .endEvent()
             .done();
+
+          return new BpmnEventTrigger() {
+
+            @Override
+            public void trigger(ProcessEngineTestRule rule) {
+              rule.correlateMessage(MESSAGE_NAME);
+            }
+
+            @Override
+            public BpmnModelInstance getProcessModel() {
+              return modifiedModel;
+            }
+          };
         }
 
         @Override
@@ -89,8 +107,8 @@ public class MigrationBoundaryEventsParameterizedTest {
           return modify(modelInstance)
             .activityBuilder(activityId)
             .boundaryEvent(BOUNDARY_ID).message("new" + MESSAGE_NAME)
-            .userTask(AFTER_BOUNDARY_TASK)
-            .endEvent()
+              .userTask(AFTER_BOUNDARY_TASK)
+              .endEvent()
             .done();
         }
 
@@ -100,24 +118,33 @@ public class MigrationBoundaryEventsParameterizedTest {
         }
 
         @Override
-        public void triggerBoundaryEvent(MigrationTestRule testHelper) {
-          testHelper.correlateMessage(MESSAGE_NAME);
-        }
-
-        @Override
         public String toString() {
           return MIGRATE_MESSAGE_BOUNDARY_EVENT;
         }
       }},
       //signal boundary event configuration
       {new MigrationBoundaryEventTestConfiguration() {
+
         @Override
-        public BpmnModelInstance getSourceProcess(BpmnModelInstance modelInstance, String activityId) {
-          return modify(modelInstance).activityBuilder(activityId)
+        public BpmnEventTrigger addBoundaryEvent(BpmnModelInstance modelInstance, String activityId) {
+          final BpmnModelInstance modifiedModel = modify(modelInstance).activityBuilder(activityId)
             .boundaryEvent(BOUNDARY_ID).signal(SIGNAL_NAME)
-            .userTask(AFTER_BOUNDARY_TASK)
-            .endEvent()
+              .userTask(AFTER_BOUNDARY_TASK)
+              .endEvent()
             .done();
+
+          return new BpmnEventTrigger() {
+
+            @Override
+            public void trigger(ProcessEngineTestRule rule) {
+              rule.sendSignal(SIGNAL_NAME);
+            }
+
+            @Override
+            public BpmnModelInstance getProcessModel() {
+              return modifiedModel;
+            }
+          };
         }
 
         @Override
@@ -125,8 +152,8 @@ public class MigrationBoundaryEventsParameterizedTest {
           return modify(modelInstance)
             .activityBuilder(activityId)
             .boundaryEvent(BOUNDARY_ID).signal("new" + SIGNAL_NAME)
-            .userTask(AFTER_BOUNDARY_TASK)
-            .endEvent()
+              .userTask(AFTER_BOUNDARY_TASK)
+              .endEvent()
             .done();
         }
 
@@ -136,39 +163,50 @@ public class MigrationBoundaryEventsParameterizedTest {
         }
 
         @Override
-        public void triggerBoundaryEvent(MigrationTestRule testHelper) {
-          testHelper.sendSignal(SIGNAL_NAME);
-        }
-
-        @Override
         public String toString() {
           return MIGRATE_SIGNAL_BOUNDARY_EVENT;
         }
       }},
       //timer boundary event configuration
       {new MigrationBoundaryEventTestConfiguration() {
+
         @Override
-        public BpmnModelInstance getSourceProcess(BpmnModelInstance modelInstance, String activityId) {
-          return modify(modelInstance)
+        public BpmnEventTrigger addBoundaryEvent(BpmnModelInstance modelInstance, String activityId) {
+          final BpmnModelInstance modifiedModel = modify(modelInstance)
             .activityBuilder(activityId)
-            .boundaryEvent(BOUNDARY_ID).timerWithDate(TIMER_DATE)
-            .userTask(AFTER_BOUNDARY_TASK)
-            .endEvent()
+            .boundaryEvent(BOUNDARY_ID)
+              .timerWithDate(TIMER_DATE)
+              .userTask(AFTER_BOUNDARY_TASK)
+              .endEvent()
             .done();
+
+          return new BpmnEventTrigger() {
+
+            @Override
+            public void trigger(ProcessEngineTestRule rule) {
+              ((MigrationTestRule) rule).triggerTimer();
+            }
+
+            @Override
+            public BpmnModelInstance getProcessModel() {
+              return modifiedModel;
+            }
+          };
         }
 
         @Override
         public BpmnModelInstance getTargetProcessWithNewEventName(BpmnModelInstance modelInstance, String activityId) {
           return modify(modelInstance)
             .activityBuilder(activityId)
-            .boundaryEvent(BOUNDARY_ID).timerWithDate(NEW_TIMER_DATE)
-            .userTask(AFTER_BOUNDARY_TASK)
-            .endEvent()
+            .boundaryEvent(BOUNDARY_ID)
+              .timerWithDate(NEW_TIMER_DATE)
+              .userTask(AFTER_BOUNDARY_TASK)
+              .endEvent()
             .done();
         }
 
         @Override
-        public void assertMigration(MigrationTestRule testHelper, String activityIdBefore, String activityIdAfter) {
+        public void assertEventSubscriptionMigration(MigrationTestRule testHelper, String activityIdBefore, String activityIdAfter) {
           testHelper.assertBoundaryTimerJobMigrated(activityIdBefore, activityIdAfter);
         }
 
@@ -178,28 +216,37 @@ public class MigrationBoundaryEventsParameterizedTest {
         }
 
         @Override
-        public void triggerBoundaryEvent(MigrationTestRule testHelper) {
-          testHelper.triggerTimer();
-        }
-
-        @Override
         public String toString() {
           return MIGRATE_TIMER_BOUNDARY_EVENT;
         }
       }},
       //conditional boundary event configuration
       {new MigrationBoundaryEventTestConfiguration() {
+
         @Override
-        public BpmnModelInstance getSourceProcess(BpmnModelInstance modelInstance, String activityId) {
-          return modify(modelInstance)
+        public BpmnEventTrigger addBoundaryEvent(BpmnModelInstance modelInstance, String activityId) {
+          final BpmnModelInstance modifiedModel = modify(modelInstance)
             .activityBuilder(activityId)
             .boundaryEvent(BOUNDARY_ID)
-            .conditionalEventDefinition()
-              .condition("${any=='any'}")
-            .conditionalEventDefinitionDone()
-            .userTask(AFTER_BOUNDARY_TASK)
-            .endEvent()
+              .conditionalEventDefinition()
+                .condition("${any=='any'}")
+              .conditionalEventDefinitionDone()
+              .userTask(AFTER_BOUNDARY_TASK)
+              .endEvent()
             .done();
+
+          return new BpmnEventTrigger() {
+
+            @Override
+            public void trigger(ProcessEngineTestRule rule) {
+              rule.setAnyVariable(((MigrationTestRule) rule).snapshotAfterMigration.getProcessInstanceId());
+            }
+
+            @Override
+            public BpmnModelInstance getProcessModel() {
+              return modifiedModel;
+            }
+          };
         }
 
         @Override
@@ -207,11 +254,11 @@ public class MigrationBoundaryEventsParameterizedTest {
           return modify(modelInstance)
             .activityBuilder(activityId)
             .boundaryEvent(BOUNDARY_ID)
-            .conditionalEventDefinition()
-            .condition("${true}")
-            .conditionalEventDefinitionDone()
-            .userTask(AFTER_BOUNDARY_TASK)
-            .endEvent()
+              .conditionalEventDefinition()
+                .condition("${true}")
+              .conditionalEventDefinitionDone()
+              .userTask(AFTER_BOUNDARY_TASK)
+              .endEvent()
             .done();
         }
 
@@ -221,8 +268,16 @@ public class MigrationBoundaryEventsParameterizedTest {
         }
 
         @Override
-        public void triggerBoundaryEvent(MigrationTestRule testHelper) {
-          testHelper.setAnyVariable(testHelper.snapshotAfterMigration.getProcessInstanceId());
+        public MigrationPlanBuilder createMigrationPlanBuilder(ProcessEngineRule rule, String srcProcDefId, String trgProcDefId, Map<String, String> activities) {
+          MigrationPlanBuilder migrationPlanBuilder = createMigrationPlanBuilder(rule, srcProcDefId, trgProcDefId);
+
+          for (String key : activities.keySet()) {
+            MigrationInstructionBuilder migrationInstructionBuilder = migrationPlanBuilder.mapActivities(key, activities.get(key));
+            if (key.contains(BOUNDARY_ID)) {
+              migrationInstructionBuilder.updateEventTrigger();
+            }
+          }
+          return migrationPlanBuilder;
         }
 
         @Override
@@ -248,23 +303,24 @@ public class MigrationBoundaryEventsParameterizedTest {
   @Test
   public void testMigrateMessageBoundaryEventOnUserTask() {
     // given
-    BpmnModelInstance sourceProcess = configuration.getSourceProcess(ProcessModels.ONE_TASK_PROCESS, USER_TASK_ID);
+    BpmnEventTrigger bpmnEventTrigger = configuration.addBoundaryEvent(ProcessModels.ONE_TASK_PROCESS, USER_TASK_ID);
+    BpmnModelInstance sourceProcess = bpmnEventTrigger.getProcessModel();
     BpmnModelInstance targetProcess = modify(sourceProcess).changeElementId(BOUNDARY_ID, NEW_BOUNDARY_ID);
 
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
-    MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities(USER_TASK_ID, USER_TASK_ID)
-      .mapActivities(BOUNDARY_ID, NEW_BOUNDARY_ID)
-      .build();
+    Map<String, String> activities = new HashMap<String, String>();
+    activities.put(USER_TASK_ID, USER_TASK_ID);
+    activities.put(BOUNDARY_ID, NEW_BOUNDARY_ID);
+    MigrationPlan migrationPlan = configuration.createMigrationPlanBuilder(rule, sourceProcessDefinition.getId(),
+                                                                           targetProcessDefinition.getId(), activities).build();
 
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    configuration.assertMigration(testHelper, BOUNDARY_ID, NEW_BOUNDARY_ID);
+    configuration.assertEventSubscriptionMigration(testHelper, BOUNDARY_ID, NEW_BOUNDARY_ID);
 
     // and it is possible to successfully complete the migrated instance
     testHelper.completeTask(USER_TASK_ID);
@@ -274,23 +330,25 @@ public class MigrationBoundaryEventsParameterizedTest {
   @Test
   public void testMigrateMessageBoundaryEventOnUserTaskAndCorrelateMessage() {
     // given
-    BpmnModelInstance sourceProcess = configuration.getSourceProcess(ProcessModels.ONE_TASK_PROCESS, USER_TASK_ID);
+    BpmnEventTrigger bpmnEventTrigger = configuration.addBoundaryEvent(ProcessModels.ONE_TASK_PROCESS, USER_TASK_ID);
+    BpmnModelInstance sourceProcess = bpmnEventTrigger.getProcessModel();
     BpmnModelInstance targetProcess = modify(sourceProcess).changeElementId(BOUNDARY_ID, NEW_BOUNDARY_ID);
 
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
-    MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities(USER_TASK_ID, USER_TASK_ID)
-      .mapActivities(BOUNDARY_ID, NEW_BOUNDARY_ID)
-      .build();
+    Map<String, String> activities = new HashMap<String, String>();
+    activities.put(USER_TASK_ID, USER_TASK_ID);
+    activities.put(BOUNDARY_ID, NEW_BOUNDARY_ID);
+    MigrationPlan migrationPlan = configuration.createMigrationPlanBuilder(rule, sourceProcessDefinition.getId(),
+      targetProcessDefinition.getId(), activities).build();
+
 
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then it is possible to trigger boundary event and successfully complete the migrated instance
-    configuration.triggerBoundaryEvent(testHelper);
+    bpmnEventTrigger.trigger(testHelper);
     testHelper.completeTask(AFTER_BOUNDARY_TASK);
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
@@ -298,23 +356,25 @@ public class MigrationBoundaryEventsParameterizedTest {
   @Test
   public void testMigrateMessageBoundaryEventAndTriggerByOldMessageName() {
     // given
-    BpmnModelInstance sourceProcess = configuration.getSourceProcess(ProcessModels.ONE_TASK_PROCESS, USER_TASK_ID);
+    BpmnEventTrigger bpmnEventTrigger = configuration.addBoundaryEvent(ProcessModels.ONE_TASK_PROCESS, USER_TASK_ID);
+    BpmnModelInstance sourceProcess = bpmnEventTrigger.getProcessModel();
     BpmnModelInstance targetProcess = configuration.getTargetProcessWithNewEventName(ProcessModels.ONE_TASK_PROCESS, USER_TASK_ID);
 
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
-    MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities(USER_TASK_ID, USER_TASK_ID)
-      .mapActivities(BOUNDARY_ID, BOUNDARY_ID)
-      .build();
+    Map<String, String> activities = new HashMap<String, String>();
+    activities.put(USER_TASK_ID, USER_TASK_ID);
+    activities.put(BOUNDARY_ID, BOUNDARY_ID);
+    MigrationPlan migrationPlan = configuration.createMigrationPlanBuilder(rule, sourceProcessDefinition.getId(),
+      targetProcessDefinition.getId(), activities).build();
+
 
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    configuration.assertMigration(testHelper, BOUNDARY_ID, BOUNDARY_ID);
+    configuration.assertEventSubscriptionMigration(testHelper, BOUNDARY_ID, BOUNDARY_ID);
 
     // and no event subscription for the new message name exists
     if (!configuration.toString().equals(MIGRATE_TIMER_BOUNDARY_EVENT)) {
@@ -324,7 +384,7 @@ public class MigrationBoundaryEventsParameterizedTest {
     }
 
     // and it is possible to trigger the event with the old message name and successfully complete the migrated instance
-    configuration.triggerBoundaryEvent(testHelper);
+    bpmnEventTrigger.trigger(testHelper);
     testHelper.completeTask(AFTER_BOUNDARY_TASK);
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
@@ -332,24 +392,24 @@ public class MigrationBoundaryEventsParameterizedTest {
   @Test
   public void testMigrateBoundaryEventOnScopeUserTask() {
     // given
-    BpmnModelInstance sourceProcess = configuration.getSourceProcess(ProcessModels.SCOPE_TASK_PROCESS, USER_TASK_ID);
-    BpmnModelInstance targetProcess = modify(sourceProcess)
-      .changeElementId(BOUNDARY_ID, NEW_BOUNDARY_ID);
+    BpmnEventTrigger bpmnEventTrigger = configuration.addBoundaryEvent(ProcessModels.SCOPE_TASK_PROCESS, USER_TASK_ID);
+    BpmnModelInstance sourceProcess = bpmnEventTrigger.getProcessModel();
+    BpmnModelInstance targetProcess = modify(sourceProcess).changeElementId(BOUNDARY_ID, NEW_BOUNDARY_ID);
 
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
-    MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities(USER_TASK_ID, USER_TASK_ID)
-      .mapActivities(BOUNDARY_ID, NEW_BOUNDARY_ID)
-      .build();
+    Map<String, String> activities = new HashMap<String, String>();
+    activities.put(USER_TASK_ID, USER_TASK_ID);
+    activities.put(BOUNDARY_ID, NEW_BOUNDARY_ID);
+    MigrationPlan migrationPlan = configuration.createMigrationPlanBuilder(rule, sourceProcessDefinition.getId(),
+      targetProcessDefinition.getId(), activities).build();
 
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    configuration.assertMigration(testHelper, BOUNDARY_ID, NEW_BOUNDARY_ID);
+    configuration.assertEventSubscriptionMigration(testHelper, BOUNDARY_ID, NEW_BOUNDARY_ID);
 
     // and it is possible to successfully complete the migrated instance
     testHelper.completeTask(USER_TASK_ID);
@@ -359,24 +419,24 @@ public class MigrationBoundaryEventsParameterizedTest {
   @Test
   public void testMigrateBoundaryEventOnScopeUserTaskAndTriggerEvent() {
     // given
-    BpmnModelInstance sourceProcess = configuration.getSourceProcess(ProcessModels.SCOPE_TASK_PROCESS, USER_TASK_ID);
-    BpmnModelInstance targetProcess = modify(sourceProcess)
-      .changeElementId(BOUNDARY_ID, NEW_BOUNDARY_ID);
+    BpmnEventTrigger bpmnEventTrigger = configuration.addBoundaryEvent(ProcessModels.SCOPE_TASK_PROCESS, USER_TASK_ID);
+    BpmnModelInstance sourceProcess = bpmnEventTrigger.getProcessModel();
+    BpmnModelInstance targetProcess = modify(sourceProcess).changeElementId(BOUNDARY_ID, NEW_BOUNDARY_ID);
 
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
-    MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities(USER_TASK_ID, USER_TASK_ID)
-      .mapActivities(BOUNDARY_ID, NEW_BOUNDARY_ID)
-      .build();
+    Map<String, String> activities = new HashMap<String, String>();
+    activities.put(USER_TASK_ID, USER_TASK_ID);
+    activities.put(BOUNDARY_ID, NEW_BOUNDARY_ID);
+    MigrationPlan migrationPlan = configuration.createMigrationPlanBuilder(rule, sourceProcessDefinition.getId(),
+      targetProcessDefinition.getId(), activities).build();
 
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then it is possible to trigger the event and successfully complete the migrated instance
-    configuration.triggerBoundaryEvent(testHelper);
+    bpmnEventTrigger.trigger(testHelper);
     testHelper.completeTask(AFTER_BOUNDARY_TASK);
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
@@ -384,137 +444,137 @@ public class MigrationBoundaryEventsParameterizedTest {
   @Test
   public void testMigrateBoundaryEventOnConcurrentUserTask() {
     // given
-    BpmnModelInstance sourceProcess = configuration.getSourceProcess(ProcessModels.PARALLEL_GATEWAY_PROCESS, "userTask1");
-    BpmnModelInstance targetProcess = modify(sourceProcess)
-      .changeElementId(BOUNDARY_ID, NEW_BOUNDARY_ID);
+    BpmnEventTrigger bpmnEventTrigger = configuration.addBoundaryEvent(ProcessModels.PARALLEL_GATEWAY_PROCESS, USER_TASK_1_ID);
+    BpmnModelInstance sourceProcess = bpmnEventTrigger.getProcessModel();
+    BpmnModelInstance targetProcess = modify(sourceProcess).changeElementId(BOUNDARY_ID, NEW_BOUNDARY_ID);
 
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
-    MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("userTask1", "userTask1")
-      .mapActivities(BOUNDARY_ID, NEW_BOUNDARY_ID)
-      .mapActivities("userTask2", "userTask2")
-      .build();
+    Map<String, String> activities = new HashMap<String, String>();
+    activities.put(USER_TASK_1_ID, USER_TASK_1_ID);
+    activities.put(BOUNDARY_ID, NEW_BOUNDARY_ID);
+    activities.put(USER_TASK_2_ID, USER_TASK_2_ID);
+    MigrationPlan migrationPlan = configuration.createMigrationPlanBuilder(rule, sourceProcessDefinition.getId(),
+      targetProcessDefinition.getId(), activities).build();
 
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    configuration.assertMigration(testHelper, BOUNDARY_ID, NEW_BOUNDARY_ID);
+    configuration.assertEventSubscriptionMigration(testHelper, BOUNDARY_ID, NEW_BOUNDARY_ID);
 
     // and it is possible to successfully complete the migrated instance
-    testHelper.completeTask("userTask1");
-    testHelper.completeTask("userTask2");
+    testHelper.completeTask(USER_TASK_1_ID);
+    testHelper.completeTask(USER_TASK_2_ID);
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
   @Test
   public void testMigrateBoundaryEventOnConcurrentUserTaskAndTriggerEvent() {
     // given
-    BpmnModelInstance sourceProcess = configuration.getSourceProcess(ProcessModels.PARALLEL_GATEWAY_PROCESS, "userTask1");
-    BpmnModelInstance targetProcess = modify(sourceProcess)
-      .changeElementId(BOUNDARY_ID, NEW_BOUNDARY_ID);
+    BpmnEventTrigger bpmnEventTrigger = configuration.addBoundaryEvent(ProcessModels.PARALLEL_GATEWAY_PROCESS, USER_TASK_1_ID);
+    BpmnModelInstance sourceProcess = bpmnEventTrigger.getProcessModel();
+    BpmnModelInstance targetProcess = modify(sourceProcess).changeElementId(BOUNDARY_ID, NEW_BOUNDARY_ID);
 
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
-    MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("userTask1", "userTask1")
-      .mapActivities(BOUNDARY_ID, NEW_BOUNDARY_ID)
-      .mapActivities("userTask2", "userTask2")
-      .build();
+    Map<String, String> activities = new HashMap<String, String>();
+    activities.put(USER_TASK_1_ID, USER_TASK_1_ID);
+    activities.put(BOUNDARY_ID, NEW_BOUNDARY_ID);
+    activities.put(USER_TASK_2_ID, USER_TASK_2_ID);
+    MigrationPlan migrationPlan = configuration.createMigrationPlanBuilder(rule, sourceProcessDefinition.getId(),
+      targetProcessDefinition.getId(), activities).build();
 
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then it is possible to trigger the event and successfully complete the migrated instance
-    configuration.triggerBoundaryEvent(testHelper);
+    bpmnEventTrigger.trigger(testHelper);
     testHelper.completeTask(AFTER_BOUNDARY_TASK);
-    testHelper.completeTask("userTask2");
+    testHelper.completeTask(USER_TASK_2_ID);
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
   @Test
   public void testMigrateBoundaryEventOnConcurrentScopeUserTask() {
     // given
-    BpmnModelInstance sourceProcess = configuration.getSourceProcess(ProcessModels.PARALLEL_SCOPE_TASKS, "userTask1");
-    BpmnModelInstance targetProcess = modify(sourceProcess)
-      .changeElementId(BOUNDARY_ID, NEW_BOUNDARY_ID);
+    BpmnEventTrigger bpmnEventTrigger = configuration.addBoundaryEvent(ProcessModels.PARALLEL_SCOPE_TASKS, USER_TASK_1_ID);
+    BpmnModelInstance sourceProcess = bpmnEventTrigger.getProcessModel();
+    BpmnModelInstance targetProcess = modify(sourceProcess).changeElementId(BOUNDARY_ID, NEW_BOUNDARY_ID);
 
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
-    MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("userTask1", "userTask1")
-      .mapActivities(BOUNDARY_ID, NEW_BOUNDARY_ID)
-      .mapActivities("userTask2", "userTask2")
-      .build();
+    Map<String, String> activities = new HashMap<String, String>();
+    activities.put(USER_TASK_1_ID, USER_TASK_1_ID);
+    activities.put(BOUNDARY_ID, NEW_BOUNDARY_ID);
+    activities.put(USER_TASK_2_ID, USER_TASK_2_ID);
+    MigrationPlan migrationPlan = configuration.createMigrationPlanBuilder(rule, sourceProcessDefinition.getId(),
+      targetProcessDefinition.getId(), activities).build();
 
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    configuration.assertMigration(testHelper, BOUNDARY_ID, NEW_BOUNDARY_ID);
+    configuration.assertEventSubscriptionMigration(testHelper, BOUNDARY_ID, NEW_BOUNDARY_ID);
 
     // and it is possible to successfully complete the migrated instance
-    testHelper.completeTask("userTask1");
-    testHelper.completeTask("userTask2");
+    testHelper.completeTask(USER_TASK_1_ID);
+    testHelper.completeTask(USER_TASK_2_ID);
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
   @Test
   public void testMigrateBoundaryEventOnConcurrentScopeUserTaskAndTriggerEvent() {
     // given
-    BpmnModelInstance sourceProcess = configuration.getSourceProcess(ProcessModels.PARALLEL_SCOPE_TASKS, "userTask1");
-    BpmnModelInstance targetProcess = modify(sourceProcess)
-      .changeElementId(BOUNDARY_ID, NEW_BOUNDARY_ID);
+    BpmnEventTrigger bpmnEventTrigger = configuration.addBoundaryEvent(ProcessModels.PARALLEL_SCOPE_TASKS, USER_TASK_1_ID);
+    BpmnModelInstance sourceProcess = bpmnEventTrigger.getProcessModel();
+    BpmnModelInstance targetProcess = modify(sourceProcess).changeElementId(BOUNDARY_ID, NEW_BOUNDARY_ID);
 
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
-    MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("userTask1", "userTask1")
-      .mapActivities(BOUNDARY_ID, NEW_BOUNDARY_ID)
-      .mapActivities("userTask2", "userTask2")
-      .build();
+    Map<String, String> activities = new HashMap<String, String>();
+    activities.put(USER_TASK_1_ID, USER_TASK_1_ID);
+    activities.put(BOUNDARY_ID, NEW_BOUNDARY_ID);
+    activities.put(USER_TASK_2_ID, USER_TASK_2_ID);
+    MigrationPlan migrationPlan = configuration.createMigrationPlanBuilder(rule, sourceProcessDefinition.getId(),
+      targetProcessDefinition.getId(), activities).build();
 
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then it is possible to trigger the event and successfully complete the migrated instance
-    configuration.triggerBoundaryEvent(testHelper);
+    bpmnEventTrigger.trigger(testHelper);
     testHelper.completeTask(AFTER_BOUNDARY_TASK);
-    testHelper.completeTask("userTask2");
+    testHelper.completeTask(USER_TASK_2_ID);
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
   @Test
   public void testMigrateBoundaryEventToSubProcess() {
     // given
-    BpmnModelInstance sourceProcess = configuration.getSourceProcess(ProcessModels.SUBPROCESS_PROCESS, "subProcess");
-    BpmnModelInstance targetProcess = modify(sourceProcess)
-      .changeElementId(BOUNDARY_ID, NEW_BOUNDARY_ID);
+    BpmnEventTrigger bpmnEventTrigger = configuration.addBoundaryEvent(ProcessModels.SUBPROCESS_PROCESS, USER_TASK_ID);
+    BpmnModelInstance sourceProcess = bpmnEventTrigger.getProcessModel();
+    BpmnModelInstance targetProcess = modify(sourceProcess).changeElementId(BOUNDARY_ID, NEW_BOUNDARY_ID);
 
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
-    MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("subProcess", "subProcess")
-      .mapActivities(BOUNDARY_ID, NEW_BOUNDARY_ID)
-      .mapActivities(USER_TASK_ID, USER_TASK_ID)
-      .build();
+    Map<String, String> activities = new HashMap<String, String>();
+    activities.put(SUB_PROCESS_ID, SUB_PROCESS_ID);
+    activities.put(BOUNDARY_ID, NEW_BOUNDARY_ID);
+    activities.put(USER_TASK_ID, USER_TASK_ID);
+    MigrationPlan migrationPlan = configuration.createMigrationPlanBuilder(rule, sourceProcessDefinition.getId(),
+      targetProcessDefinition.getId(), activities).build();
 
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    configuration.assertMigration(testHelper, BOUNDARY_ID, NEW_BOUNDARY_ID);
+    configuration.assertEventSubscriptionMigration(testHelper, BOUNDARY_ID, NEW_BOUNDARY_ID);
 
     // and it is possible to successfully complete the migrated instance
     testHelper.completeTask(USER_TASK_ID);
@@ -524,25 +584,25 @@ public class MigrationBoundaryEventsParameterizedTest {
   @Test
   public void testMigrateBoundaryEventToSubProcessAndTriggerEvent() {
     // given
-    BpmnModelInstance sourceProcess = configuration.getSourceProcess(ProcessModels.SUBPROCESS_PROCESS, "subProcess");
-    BpmnModelInstance targetProcess = modify(sourceProcess)
-      .changeElementId(BOUNDARY_ID, NEW_BOUNDARY_ID);
+    BpmnEventTrigger bpmnEventTrigger = configuration.addBoundaryEvent(ProcessModels.SUBPROCESS_PROCESS, USER_TASK_ID);
+    BpmnModelInstance sourceProcess = bpmnEventTrigger.getProcessModel();
+    BpmnModelInstance targetProcess = modify(sourceProcess).changeElementId(BOUNDARY_ID, NEW_BOUNDARY_ID);
 
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
-    MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("subProcess", "subProcess")
-      .mapActivities(BOUNDARY_ID, NEW_BOUNDARY_ID)
-      .mapActivities(USER_TASK_ID, USER_TASK_ID)
-      .build();
+    Map<String, String> activities = new HashMap<String, String>();
+    activities.put(SUB_PROCESS_ID, SUB_PROCESS_ID);
+    activities.put(BOUNDARY_ID, NEW_BOUNDARY_ID);
+    activities.put(USER_TASK_ID, USER_TASK_ID);
+    MigrationPlan migrationPlan = configuration.createMigrationPlanBuilder(rule, sourceProcessDefinition.getId(),
+      targetProcessDefinition.getId(), activities).build();
 
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then it is possible to trigger the event and successfully complete the migrated instance
-    configuration.triggerBoundaryEvent(testHelper);
+    bpmnEventTrigger.trigger(testHelper);
     testHelper.completeTask(AFTER_BOUNDARY_TASK);
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
@@ -550,25 +610,25 @@ public class MigrationBoundaryEventsParameterizedTest {
   @Test
   public void testMigrateBoundaryEventToSubProcessWithScopeUserTask() {
     // given
-    BpmnModelInstance sourceProcess = configuration.getSourceProcess(ProcessModels.SCOPE_TASK_SUBPROCESS_PROCESS, "subProcess");
-    BpmnModelInstance targetProcess = modify(sourceProcess)
-      .changeElementId(BOUNDARY_ID, NEW_BOUNDARY_ID);
+    BpmnEventTrigger bpmnEventTrigger = configuration.addBoundaryEvent(ProcessModels.SCOPE_TASK_SUBPROCESS_PROCESS, USER_TASK_ID);
+    BpmnModelInstance sourceProcess = bpmnEventTrigger.getProcessModel();
+    BpmnModelInstance targetProcess = modify(sourceProcess).changeElementId(BOUNDARY_ID, NEW_BOUNDARY_ID);
 
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
-    MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("subProcess", "subProcess")
-      .mapActivities(BOUNDARY_ID, NEW_BOUNDARY_ID)
-      .mapActivities(USER_TASK_ID, USER_TASK_ID)
-      .build();
+    Map<String, String> activities = new HashMap<String, String>();
+    activities.put(SUB_PROCESS_ID, SUB_PROCESS_ID);
+    activities.put(BOUNDARY_ID, NEW_BOUNDARY_ID);
+    activities.put(USER_TASK_ID, USER_TASK_ID);
+    MigrationPlan migrationPlan = configuration.createMigrationPlanBuilder(rule, sourceProcessDefinition.getId(),
+      targetProcessDefinition.getId(), activities).build();
 
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    configuration.assertMigration(testHelper, BOUNDARY_ID, NEW_BOUNDARY_ID);
+    configuration.assertEventSubscriptionMigration(testHelper, BOUNDARY_ID, NEW_BOUNDARY_ID);
 
     // and it is possible to successfully complete the migrated instance
     testHelper.completeTask(USER_TASK_ID);
@@ -578,25 +638,25 @@ public class MigrationBoundaryEventsParameterizedTest {
   @Test
   public void testMigrateBoundaryEventToSubProcessWithScopeUserTaskAndTriggerEvent() {
     // given
-    BpmnModelInstance sourceProcess = configuration.getSourceProcess(ProcessModels.SCOPE_TASK_SUBPROCESS_PROCESS, "subProcess");
-    BpmnModelInstance targetProcess = modify(sourceProcess)
-      .changeElementId(BOUNDARY_ID, NEW_BOUNDARY_ID);
+    BpmnEventTrigger bpmnEventTrigger = configuration.addBoundaryEvent(ProcessModels.SCOPE_TASK_SUBPROCESS_PROCESS, USER_TASK_ID);
+    BpmnModelInstance sourceProcess = bpmnEventTrigger.getProcessModel();
+    BpmnModelInstance targetProcess = modify(sourceProcess).changeElementId(BOUNDARY_ID, NEW_BOUNDARY_ID);
 
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
-    MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("subProcess", "subProcess")
-      .mapActivities(BOUNDARY_ID, NEW_BOUNDARY_ID)
-      .mapActivities(USER_TASK_ID, USER_TASK_ID)
-      .build();
+    Map<String, String> activities = new HashMap<String, String>();
+    activities.put(SUB_PROCESS_ID, SUB_PROCESS_ID);
+    activities.put(BOUNDARY_ID, NEW_BOUNDARY_ID);
+    activities.put(USER_TASK_ID, USER_TASK_ID);
+    MigrationPlan migrationPlan = configuration.createMigrationPlanBuilder(rule, sourceProcessDefinition.getId(),
+      targetProcessDefinition.getId(), activities).build();
 
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then it is possible to trigger the event and successfully complete the migrated instance
-    configuration.triggerBoundaryEvent(testHelper);
+    bpmnEventTrigger.trigger(testHelper);
     testHelper.completeTask(AFTER_BOUNDARY_TASK);
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
@@ -604,58 +664,58 @@ public class MigrationBoundaryEventsParameterizedTest {
   @Test
   public void testMigrateBoundaryEventToParallelSubProcess() {
     // given
-    BpmnModelInstance sourceProcess = configuration.getSourceProcess(ProcessModels.PARALLEL_SUBPROCESS_PROCESS, "subProcess1");
-    BpmnModelInstance targetProcess = modify(sourceProcess)
-      .changeElementId(BOUNDARY_ID, NEW_BOUNDARY_ID);
+    BpmnEventTrigger bpmnEventTrigger = configuration.addBoundaryEvent(ProcessModels.PARALLEL_SUBPROCESS_PROCESS, "subProcess1");
+    BpmnModelInstance sourceProcess = bpmnEventTrigger.getProcessModel();
+    BpmnModelInstance targetProcess = modify(sourceProcess).changeElementId(BOUNDARY_ID, NEW_BOUNDARY_ID);
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
-    MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("subProcess1", "subProcess1")
-      .mapActivities(BOUNDARY_ID, NEW_BOUNDARY_ID)
-      .mapActivities("subProcess2", "subProcess2")
-      .mapActivities("userTask1", "userTask1")
-      .mapActivities("userTask2", "userTask2")
-      .build();
+    Map<String, String> activities = new HashMap<String, String>();
+    activities.put("subProcess1", "subProcess1");
+    activities.put(BOUNDARY_ID, NEW_BOUNDARY_ID);
+    activities.put("subProcess2", "subProcess2");
+    activities.put(USER_TASK_1_ID, USER_TASK_1_ID);
+    activities.put(USER_TASK_2_ID, USER_TASK_2_ID);
+    MigrationPlan migrationPlan = configuration.createMigrationPlanBuilder(rule, sourceProcessDefinition.getId(),
+      targetProcessDefinition.getId(), activities).build();
 
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    configuration.assertMigration(testHelper, BOUNDARY_ID, NEW_BOUNDARY_ID);
+    configuration.assertEventSubscriptionMigration(testHelper, BOUNDARY_ID, NEW_BOUNDARY_ID);
 
     // and it is possible to successfully complete the migrated instance
-    testHelper.completeTask("userTask1");
-    testHelper.completeTask("userTask2");
+    testHelper.completeTask(USER_TASK_1_ID);
+    testHelper.completeTask(USER_TASK_2_ID);
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
   @Test
   public void testMigrateBoundaryEventToParallelSubProcessAndTriggerEvent() {
     // given
-    BpmnModelInstance sourceProcess = configuration.getSourceProcess(ProcessModels.PARALLEL_SUBPROCESS_PROCESS, "subProcess1");
-    BpmnModelInstance targetProcess = modify(sourceProcess)
-      .changeElementId(BOUNDARY_ID, NEW_BOUNDARY_ID);
+    BpmnEventTrigger bpmnEventTrigger = configuration.addBoundaryEvent(ProcessModels.PARALLEL_SUBPROCESS_PROCESS, "subProcess1");
+    BpmnModelInstance sourceProcess = bpmnEventTrigger.getProcessModel();
+    BpmnModelInstance targetProcess = modify(sourceProcess).changeElementId(BOUNDARY_ID, NEW_BOUNDARY_ID);
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
 
-    MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("subProcess1", "subProcess1")
-      .mapActivities(BOUNDARY_ID, NEW_BOUNDARY_ID)
-      .mapActivities("subProcess2", "subProcess2")
-      .mapActivities("userTask1", "userTask1")
-      .mapActivities("userTask2", "userTask2")
-      .build();
+    Map<String, String> activities = new HashMap<String, String>();
+    activities.put(BOUNDARY_ID, NEW_BOUNDARY_ID);
+    activities.put("subProcess1", "subProcess1");
+    activities.put("subProcess2", "subProcess2");
+    activities.put(USER_TASK_1_ID, USER_TASK_1_ID);
+    activities.put(USER_TASK_2_ID, USER_TASK_2_ID);
+    MigrationPlan migrationPlan = configuration.createMigrationPlanBuilder(rule, sourceProcessDefinition.getId(),
+      targetProcessDefinition.getId(), activities).build();
 
     // when
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then it is possible to trigger the event and successfully complete the migrated instance
-    configuration.triggerBoundaryEvent(testHelper);
+    bpmnEventTrigger.trigger(testHelper);
     testHelper.completeTask(AFTER_BOUNDARY_TASK);
-    testHelper.completeTask("userTask2");
+    testHelper.completeTask(USER_TASK_2_ID);
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 

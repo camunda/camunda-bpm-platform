@@ -37,10 +37,12 @@ public class SupportedPassiveEventTriggerActivityValidator implements MigrationA
     ActivityTypes.BOUNDARY_SIGNAL,
     ActivityTypes.BOUNDARY_TIMER,
     ActivityTypes.BOUNDARY_COMPENSATION,
+    ActivityTypes.BOUNDARY_CONDITIONAL,
     ActivityTypes.START_EVENT_MESSAGE,
     ActivityTypes.START_EVENT_SIGNAL,
     ActivityTypes.START_EVENT_TIMER,
-    ActivityTypes.START_EVENT_COMPENSATION
+    ActivityTypes.START_EVENT_COMPENSATION,
+    ActivityTypes.START_EVENT_CONDITIONAL
   );
 
   public boolean valid(ActivityImpl activity) {

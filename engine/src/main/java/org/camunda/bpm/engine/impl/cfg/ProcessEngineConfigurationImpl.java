@@ -197,17 +197,7 @@ import org.camunda.bpm.engine.impl.migration.validation.instance.NoUnmappedCompe
 import org.camunda.bpm.engine.impl.migration.validation.instance.NoUnmappedLeafInstanceValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instance.SupportedActivityInstanceValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instance.VariableConflictActivityInstanceValidator;
-import org.camunda.bpm.engine.impl.migration.validation.instruction.AdditionalFlowScopeInstructionValidator;
-import org.camunda.bpm.engine.impl.migration.validation.instruction.CannotAddMultiInstanceBodyValidator;
-import org.camunda.bpm.engine.impl.migration.validation.instruction.CannotAddMultiInstanceInnerActivityValidator;
-import org.camunda.bpm.engine.impl.migration.validation.instruction.CannotRemoveMultiInstanceInnerActivityValidator;
-import org.camunda.bpm.engine.impl.migration.validation.instruction.GatewayMappingValidator;
-import org.camunda.bpm.engine.impl.migration.validation.instruction.MigrationInstructionValidator;
-import org.camunda.bpm.engine.impl.migration.validation.instruction.OnlyOnceMappedActivityInstructionValidator;
-import org.camunda.bpm.engine.impl.migration.validation.instruction.SameBehaviorInstructionValidator;
-import org.camunda.bpm.engine.impl.migration.validation.instruction.SameEventScopeInstructionValidator;
-import org.camunda.bpm.engine.impl.migration.validation.instruction.SameEventTypeValidator;
-import org.camunda.bpm.engine.impl.migration.validation.instruction.UpdateEventTriggersValidator;
+import org.camunda.bpm.engine.impl.migration.validation.instruction.*;
 import org.camunda.bpm.engine.impl.persistence.GenericManagerFactory;
 import org.camunda.bpm.engine.impl.persistence.deploy.CacheFactory;
 import org.camunda.bpm.engine.impl.persistence.deploy.DefaultCacheFactory;
@@ -3430,6 +3420,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     migrationInstructionValidators.add(new SameEventScopeInstructionValidator());
     migrationInstructionValidators.add(new UpdateEventTriggersValidator());
     migrationInstructionValidators.add(new AdditionalFlowScopeInstructionValidator());
+    migrationInstructionValidators.add(new ConditionalEventUpdateEventTriggerValidator());
     return migrationInstructionValidators;
   }
 

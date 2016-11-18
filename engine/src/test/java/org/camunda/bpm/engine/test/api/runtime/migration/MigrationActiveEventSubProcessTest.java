@@ -18,11 +18,14 @@
 package org.camunda.bpm.engine.test.api.runtime.migration;
 
 import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventSubprocessJobHandler;
+import org.camunda.bpm.engine.migration.MigrationInstructionBuilder;
 import org.camunda.bpm.engine.migration.MigrationPlan;
+import org.camunda.bpm.engine.migration.MigrationPlanBuilder;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.EventSubProcessModels;
+import org.camunda.bpm.engine.test.util.BpmnEventTrigger;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Rule;
@@ -33,6 +36,12 @@ import org.junit.runners.Parameterized;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.camunda.bpm.engine.test.api.runtime.migration.models.EventSubProcessModels.EVENT_SUB_PROCESS_ID;
+import static org.camunda.bpm.engine.test.api.runtime.migration.models.EventSubProcessModels.EVENT_SUB_PROCESS_START_ID;
+import static org.camunda.bpm.engine.test.api.runtime.migration.models.EventSubProcessModels.EVENT_SUB_PROCESS_TASK_ID;
 
 /**
  * @author Christopher Zell <christopher.zell@camunda.com>
@@ -40,15 +49,21 @@ import java.util.Collection;
 @RunWith(Parameterized.class)
 public class MigrationActiveEventSubProcessTest {
 
-  protected abstract static class MigrationActiveEventSubProcessTestConfiguration {
+  protected abstract static class MigrationActiveEventSubProcessTestConfiguration extends MigrationTestConfiguration {
     public abstract BpmnModelInstance getBpmnModel();
 
-    public abstract String getEventName();
+    @Override
+    public BpmnEventTrigger addBoundaryEvent(BpmnModelInstance modelInstance, String activityId) {
+      return null;
+    }
 
-    public void assertMigration(MigrationTestRule testHelper) {
-      testHelper.assertEventSubscriptionMigrated(EventSubProcessModels.EVENT_SUB_PROCESS_START_ID,
-        EventSubProcessModels.EVENT_SUB_PROCESS_START_ID,
-        getEventName());
+    @Override
+    public BpmnEventTrigger addEventSubProcess(BpmnModelInstance modelInstance, String parentId) {
+      return null;
+    }
+
+    public void assertEventSubscriptionMigration(MigrationTestRule testHelper) {
+      assertEventSubscriptionMigration(testHelper, EVENT_SUB_PROCESS_START_ID, EVENT_SUB_PROCESS_START_ID);
     }
   }
 
@@ -104,9 +119,9 @@ public class MigrationActiveEventSubProcessTest {
           }
 
           @Override
-          public void assertMigration(MigrationTestRule testHelper) {
-            testHelper.assertJobMigrated(EventSubProcessModels.EVENT_SUB_PROCESS_START_ID,
-              EventSubProcessModels.EVENT_SUB_PROCESS_START_ID,
+          public void assertEventSubscriptionMigration(MigrationTestRule testHelper) {
+            testHelper.assertJobMigrated(EVENT_SUB_PROCESS_START_ID,
+              EVENT_SUB_PROCESS_START_ID,
               TimerStartEventSubprocessJobHandler.TYPE);
           }
 
@@ -120,7 +135,20 @@ public class MigrationActiveEventSubProcessTest {
         new MigrationActiveEventSubProcessTestConfiguration() {
           @Override
           public BpmnModelInstance getBpmnModel() {
-            return EventSubProcessModels.TRUE_CONDITIONAL_EVENT_SUBPROCESS_PROCESS;
+            return EventSubProcessModels.CONDITIONAL_EVENT_SUBPROCESS_PROCESS;
+          }
+
+          @Override
+          public MigrationPlanBuilder createMigrationPlanBuilder(ProcessEngineRule rule, String srcProcDefId, String trgProcDefId, Map<String, String> activities) {
+            MigrationPlanBuilder migrationPlanBuilder = createMigrationPlanBuilder(rule, srcProcDefId, trgProcDefId);
+
+            for (String key : activities.keySet()) {
+              MigrationInstructionBuilder migrationInstructionBuilder = migrationPlanBuilder.mapActivities(key, activities.get(key));
+              if (key.contains(EVENT_SUB_PROCESS_START_ID)) {
+                migrationInstructionBuilder.updateEventTrigger();
+              }
+            }
+            return migrationPlanBuilder;
           }
 
           @Override
@@ -154,24 +182,24 @@ public class MigrationActiveEventSubProcessTest {
 
     ProcessInstance processInstance = rule.getRuntimeService()
       .createProcessInstanceById(sourceProcessDefinition.getId())
-      .startBeforeActivity(EventSubProcessModels.EVENT_SUB_PROCESS_TASK_ID)
+      .startBeforeActivity(EVENT_SUB_PROCESS_TASK_ID)
       .execute();
 
-    MigrationPlan migrationPlan = rule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities(EventSubProcessModels.EVENT_SUB_PROCESS_ID, EventSubProcessModels.EVENT_SUB_PROCESS_ID)
-      .mapActivities(EventSubProcessModels.EVENT_SUB_PROCESS_START_ID, EventSubProcessModels.EVENT_SUB_PROCESS_START_ID)
-      .mapActivities(EventSubProcessModels.EVENT_SUB_PROCESS_TASK_ID, EventSubProcessModels.EVENT_SUB_PROCESS_TASK_ID)
-      .build();
+    Map<String, String> activities = new HashMap<String, String>();
+    activities.put(EVENT_SUB_PROCESS_ID, EVENT_SUB_PROCESS_ID);
+    activities.put(EVENT_SUB_PROCESS_START_ID, EVENT_SUB_PROCESS_START_ID);
+    activities.put(EVENT_SUB_PROCESS_TASK_ID, EVENT_SUB_PROCESS_TASK_ID);
+    MigrationPlan migrationPlan = configuration.createMigrationPlanBuilder(rule, sourceProcessDefinition.getId(),
+      targetProcessDefinition.getId(), activities).build();
 
     // when
     testHelper.migrateProcessInstance(migrationPlan, processInstance);
 
     // then
-    configuration.assertMigration(testHelper);
+    configuration.assertEventSubscriptionMigration(testHelper);
 
     // and it is possible to complete the process instance
-    testHelper.completeTask(EventSubProcessModels.EVENT_SUB_PROCESS_TASK_ID);
+    testHelper.completeTask(EVENT_SUB_PROCESS_TASK_ID);
     testHelper.assertProcessEnded(processInstance.getId());
   }
 }
