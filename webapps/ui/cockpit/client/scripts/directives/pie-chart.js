@@ -208,10 +208,10 @@ module.exports = ['$location', '$window', function($location, $window) {
                   '<canvas width="150" height="150"></canvas>' +
                 '</div>' +
 
-                '<div class="legend-holder help-block text-center" ng-if="values[0].label !== \'No Data\'">' +
+                '<h4 class="legend-holder text-center" ng-if="values[0].label !== \'No Data\'">' +
                   '<span ng-if="hoveredSlice.value" ng-style="{color: hoveredSlice.color}">{{ hoveredSlice.value | abbreviateNumber }}: {{ hoveredSlice.label }}</span>' +
                   '<span ng-if="!hoveredSlice.value">{{ placeholder }}</span>' +
-                '</div>' +
+                '</h4>' +
               '</div>'
   };
 }];
