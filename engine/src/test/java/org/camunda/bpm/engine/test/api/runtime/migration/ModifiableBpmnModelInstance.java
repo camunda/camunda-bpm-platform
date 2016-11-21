@@ -34,8 +34,18 @@ public class ModifiableBpmnModelInstance implements BpmnModelInstance {
     this.modelInstance = modelInstance;
   }
 
+  /**
+   * Copies the argument; following modifications are not applied to the original model instance
+   */
   public static ModifiableBpmnModelInstance modify(BpmnModelInstance modelInstance) {
     return new ModifiableBpmnModelInstance(modelInstance.clone());
+  }
+
+  /**
+   * wraps the argument; following modifications are applied to the original model instance
+   */
+  public static ModifiableBpmnModelInstance wrap(BpmnModelInstance modelInstance) {
+    return new ModifiableBpmnModelInstance(modelInstance);
   }
 
   public Definitions getDefinitions() {

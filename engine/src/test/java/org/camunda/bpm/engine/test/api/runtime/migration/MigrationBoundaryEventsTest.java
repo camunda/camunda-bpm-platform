@@ -12,10 +12,20 @@
  */
 package org.camunda.bpm.engine.test.api.runtime.migration;
 
+import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -29,12 +39,6 @@ import org.joda.time.DateTime;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
-
-import java.util.Date;
-import java.util.HashMap;
-
-import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
-import static org.junit.Assert.*;
 
 public class MigrationBoundaryEventsTest {
 
@@ -441,6 +445,98 @@ public class MigrationBoundaryEventsTest {
 
     // and it is possible to successfully complete the migrated instance
     testHelper.setAnyVariable(testHelper.snapshotAfterMigration.getProcessInstanceId());
+    testHelper.completeTask(AFTER_BOUNDARY_TASK);
+    testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
+  }
+
+  @Test
+  public void testMigrateSignalBoundaryEventAndTriggerByOldValue() {
+    // given
+    BpmnModelInstance sourceProcess = modify(ProcessModels.ONE_TASK_PROCESS)
+        .activityBuilder(USER_TASK_ID)
+          .boundaryEvent(BOUNDARY_ID).signal(SIGNAL_NAME)
+          .userTask(AFTER_BOUNDARY_TASK)
+          .endEvent()
+        .done();
+    BpmnModelInstance targetProcess = modify(ProcessModels.ONE_TASK_PROCESS)
+      .activityBuilder(USER_TASK_ID)
+        .boundaryEvent(BOUNDARY_ID).signal("new" + SIGNAL_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
+
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
+
+    Map<String, String> activities = new HashMap<String, String>();
+    activities.put(USER_TASK_ID, USER_TASK_ID);
+    activities.put(BOUNDARY_ID, BOUNDARY_ID);
+
+    MigrationPlan migrationPlan = rule.getRuntimeService().createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities(USER_TASK_ID, USER_TASK_ID)
+        .mapActivities(BOUNDARY_ID, BOUNDARY_ID)
+        .build();
+
+
+    // when
+    testHelper.createProcessInstanceAndMigrate(migrationPlan);
+
+    // then
+    testHelper.assertEventSubscriptionMigrated(BOUNDARY_ID, BOUNDARY_ID, SIGNAL_NAME);
+
+    // and no event subscription for the new message name exists
+    EventSubscription eventSubscription = rule.getRuntimeService().createEventSubscriptionQuery().eventName("new" + SIGNAL_NAME).singleResult();
+    assertNull(eventSubscription);
+    assertEquals(1, rule.getRuntimeService().createEventSubscriptionQuery().count());
+
+    // and it is possible to trigger the event with the old message name and successfully complete the migrated instance
+    rule.getProcessEngine().getRuntimeService().signalEventReceived(SIGNAL_NAME);
+    testHelper.completeTask(AFTER_BOUNDARY_TASK);
+    testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
+  }
+
+  @Test
+  public void testMigrateBoundaryEventAndTriggerByOldValue() {
+    // given
+    BpmnModelInstance sourceProcess = modify(ProcessModels.ONE_TASK_PROCESS)
+        .activityBuilder(USER_TASK_ID)
+          .boundaryEvent(BOUNDARY_ID).message(MESSAGE_NAME)
+          .userTask(AFTER_BOUNDARY_TASK)
+          .endEvent()
+        .done();
+    BpmnModelInstance targetProcess = modify(ProcessModels.ONE_TASK_PROCESS)
+      .activityBuilder(USER_TASK_ID)
+        .boundaryEvent(BOUNDARY_ID).message("new" + MESSAGE_NAME)
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
+
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
+
+    Map<String, String> activities = new HashMap<String, String>();
+    activities.put(USER_TASK_ID, USER_TASK_ID);
+    activities.put(BOUNDARY_ID, BOUNDARY_ID);
+
+    MigrationPlan migrationPlan = rule.getRuntimeService().createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities(USER_TASK_ID, USER_TASK_ID)
+        .mapActivities(BOUNDARY_ID, BOUNDARY_ID)
+        .build();
+
+
+    // when
+    testHelper.createProcessInstanceAndMigrate(migrationPlan);
+
+    // then
+    testHelper.assertEventSubscriptionMigrated(BOUNDARY_ID, BOUNDARY_ID, MESSAGE_NAME);
+
+    // and no event subscription for the new message name exists
+    EventSubscription eventSubscription = rule.getRuntimeService().createEventSubscriptionQuery().eventName("new" + MESSAGE_NAME).singleResult();
+    assertNull(eventSubscription);
+    assertEquals(1, rule.getRuntimeService().createEventSubscriptionQuery().count());
+
+    // and it is possible to trigger the event with the old message name and successfully complete the migrated instance
+    rule.getProcessEngine().getRuntimeService().correlateMessage(MESSAGE_NAME);
     testHelper.completeTask(AFTER_BOUNDARY_TASK);
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }

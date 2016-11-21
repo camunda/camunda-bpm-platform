@@ -17,32 +17,33 @@
 
 package org.camunda.bpm.engine.test.api.runtime.migration;
 
-import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventSubprocessJobHandler;
-import org.camunda.bpm.engine.migration.MigrationInstructionBuilder;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.migration.MigrationPlan;
-import org.camunda.bpm.engine.migration.MigrationPlanBuilder;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
-import org.camunda.bpm.engine.test.api.runtime.migration.models.EventSubProcessModels;
-import org.camunda.bpm.engine.test.util.BpmnEventTrigger;
-import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
+import org.camunda.bpm.engine.test.api.runtime.migration.util.BpmnEventFactory;
+import org.camunda.bpm.engine.test.api.runtime.migration.util.ConditionalEventFactory;
+import org.camunda.bpm.engine.test.api.runtime.migration.util.MessageEventFactory;
+import org.camunda.bpm.engine.test.api.runtime.migration.util.MigratingBpmnEventTrigger;
+import org.camunda.bpm.engine.test.api.runtime.migration.util.SignalEventFactory;
+import org.camunda.bpm.engine.test.api.runtime.migration.util.TimerEventFactory;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.camunda.bpm.engine.test.api.runtime.migration.models.EventSubProcessModels.EVENT_SUB_PROCESS_START_ID;
-import static org.camunda.bpm.engine.test.api.runtime.migration.models.EventSubProcessModels.USER_TASK_ID;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * @author Christopher Zell <christopher.zell@camunda.com>
@@ -50,160 +51,18 @@ import static org.camunda.bpm.engine.test.api.runtime.migration.models.EventSubP
 @RunWith(Parameterized.class)
 public class MigrateEventSubProcessAndTriggerTest {
 
-  protected abstract static class MigrateEventSubProcessAndTriggerTestConfiguration extends MigrationTestConfiguration {
-    @Override
-    public BpmnEventTrigger addBoundaryEvent(BpmnModelInstance modelInstance, String parentId) {
-      return null;
-    }
-
-    public void assertEventSubscriptionMigration(MigrationTestRule testHelper) {
-      assertEventSubscriptionMigration(testHelper, EVENT_SUB_PROCESS_START_ID, EVENT_SUB_PROCESS_START_ID);
-    }
-  }
-
-  @Parameterized.Parameters(name = "{index}: {0}")
+  @Parameters
   public static Collection<Object[]> data() {
-    return Arrays.asList(new Object[][]{
-      {//message event sub process configuration
-        new MigrateEventSubProcessAndTriggerTestConfiguration() {
-
-          @Override
-          public BpmnEventTrigger addEventSubProcess(BpmnModelInstance modelInstance, String activityId) {
-            return new BpmnEventTrigger() {
-              @Override
-              public void trigger(ProcessEngineTestRule rule) {
-                rule.correlateMessage(EventSubProcessModels.MESSAGE_NAME);
-              }
-
-              @Override
-              public BpmnModelInstance getProcessModel() {
-                return EventSubProcessModels.MESSAGE_EVENT_SUBPROCESS_PROCESS;
-              }
-            };
-          }
-
-          @Override
-          public String getEventName() {
-            return EventSubProcessModels.MESSAGE_NAME;
-          }
-
-          @Override
-          public String toString() {
-            return "MigrationTriggerMessageEventSubProcess";
-          }
-        }
-      },//signal event sub process configuration
-      {
-        new MigrateEventSubProcessAndTriggerTestConfiguration() {
-
-          @Override
-          public BpmnEventTrigger addEventSubProcess(BpmnModelInstance modelInstance, String activityId) {
-            return new BpmnEventTrigger() {
-              @Override
-              public void trigger(ProcessEngineTestRule rule) {
-                rule.sendSignal(EventSubProcessModels.SIGNAL_NAME);
-              }
-
-              @Override
-              public BpmnModelInstance getProcessModel() {
-                return EventSubProcessModels.SIGNAL_EVENT_SUBPROCESS_PROCESS;
-              }
-            };
-          }
-
-          @Override
-          public String getEventName() {
-            return EventSubProcessModels.SIGNAL_NAME;
-          }
-
-          @Override
-          public String toString() {
-            return "MigrationTriggerSignalEventSubProcess";
-          }
-        }
-      },
-      {//timer event sub process configuration
-        new MigrateEventSubProcessAndTriggerTestConfiguration() {
-
-          @Override
-          public BpmnEventTrigger addEventSubProcess(BpmnModelInstance modelInstance, String activityId) {
-            return new BpmnEventTrigger() {
-              @Override
-              public void trigger(ProcessEngineTestRule rule) {
-                ((MigrationTestRule) rule).triggerTimer();
-              }
-
-              @Override
-              public BpmnModelInstance getProcessModel() {
-                return EventSubProcessModels.TIMER_EVENT_SUBPROCESS_PROCESS;
-              }
-            };
-          }
-
-          @Override
-          public String getEventName() {
-            return null;
-          }
-
-          @Override
-          public void assertEventSubscriptionMigration(MigrationTestRule testHelper) {
-            testHelper.assertJobMigrated(EVENT_SUB_PROCESS_START_ID,
-              EVENT_SUB_PROCESS_START_ID,
-              TimerStartEventSubprocessJobHandler.TYPE);
-          }
-
-          @Override
-          public String toString() {
-            return "MigrationTriggerTimerEventSubProcess";
-          }
-        }
-      },
-      {//conditional event sub process configuration
-        new MigrateEventSubProcessAndTriggerTestConfiguration() {
-          @Override
-          public BpmnEventTrigger addEventSubProcess(BpmnModelInstance modelInstance, String activityId) {
-            return new BpmnEventTrigger() {
-              @Override
-              public void trigger(ProcessEngineTestRule rule) {
-                rule.setAnyVariable(((MigrationTestRule) rule).snapshotAfterMigration.getProcessInstanceId());
-              }
-
-              @Override
-              public BpmnModelInstance getProcessModel() {
-                return EventSubProcessModels.CONDITIONAL_EVENT_SUBPROCESS_PROCESS;
-              }
-            };
-          }
-
-          @Override
-          public MigrationPlanBuilder createMigrationPlanBuilder(ProcessEngineRule rule, String srcProcDefId, String trgProcDefId, Map<String, String> activities) {
-            MigrationPlanBuilder migrationPlanBuilder = createMigrationPlanBuilder(rule, srcProcDefId, trgProcDefId);
-
-            for (String key : activities.keySet()) {
-              MigrationInstructionBuilder migrationInstructionBuilder = migrationPlanBuilder.mapActivities(key, activities.get(key));
-              if (key.contains(EVENT_SUB_PROCESS_START_ID)) {
-                migrationInstructionBuilder.updateEventTrigger();
-              }
-            }
-            return migrationPlanBuilder;
-          }
-
-          @Override
-          public String getEventName() {
-            return null;
-          }
-
-          @Override
-          public String toString() {
-            return "MigrationTriggerConditionalEventSubProcess";
-          }
-        }
-      }
-    });
+      return Arrays.asList(new Object[][] {
+               new Object[]{ new TimerEventFactory() },
+               new Object[]{ new MessageEventFactory() },
+               new Object[]{ new SignalEventFactory() },
+               new Object[]{ new ConditionalEventFactory() }
+         });
   }
 
-  @Parameterized.Parameter
-  public MigrateEventSubProcessAndTriggerTestConfiguration configuration;
+  @Parameter
+  public BpmnEventFactory eventFactory;
 
   protected ProcessEngineRule rule = new ProvidedProcessEngineRule();
   protected MigrationTestRule testHelper = new MigrationTestRule(rule);
@@ -211,32 +70,47 @@ public class MigrateEventSubProcessAndTriggerTest {
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(rule).around(testHelper);
 
+  @Before
+  public void setUp() {
+    ClockUtil.setCurrentTime(new Date()); // lock time so that timer job is effectively not updated
+  }
+
   @Test
   public void testMigrateEventSubprocessSignalTrigger() {
-    BpmnEventTrigger bpmnEventTrigger = configuration.addEventSubProcess(null, null);
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(bpmnEventTrigger.getProcessModel());
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(bpmnEventTrigger.getProcessModel());
+    BpmnModelInstance processModel = ProcessModels.ONE_TASK_PROCESS.clone();
+    MigratingBpmnEventTrigger eventTrigger = eventFactory.addEventSubProcess(
+        rule.getProcessEngine(),
+        processModel,
+        ProcessModels.PROCESS_KEY,
+        "eventSubProcess",
+        "eventSubProcessStart");
+    ModifiableBpmnModelInstance.wrap(processModel).startEventBuilder("eventSubProcessStart")
+        .userTask("eventSubProcessTask")
+        .endEvent()
+        .done();
+
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(processModel);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(processModel);
 
     ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
 
-    Map<String, String> activities = new HashMap<String, String>();
-    activities.put(USER_TASK_ID, USER_TASK_ID);
-    activities.put(EVENT_SUB_PROCESS_START_ID, EVENT_SUB_PROCESS_START_ID);
-    MigrationPlan migrationPlan = configuration.createMigrationPlanBuilder(rule, sourceProcessDefinition.getId(),
-      targetProcessDefinition.getId(), activities).build();
+    MigrationPlan migrationPlan = rule.getRuntimeService().createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities("userTask", "userTask")
+        .mapActivities("eventSubProcessStart", "eventSubProcessStart").updateEventTrigger()
+        .build();
 
     // when
     testHelper.migrateProcessInstance(migrationPlan, processInstance);
 
     // then
-    configuration.assertEventSubscriptionMigration(testHelper);
+    eventTrigger.assertEventTriggerMigrated(testHelper, "eventSubProcessStart");
 
     // and it is possible to trigger the event subprocess
-    bpmnEventTrigger.trigger(testHelper);
+    eventTrigger.trigger(processInstance.getId());
     Assert.assertEquals(1, rule.getTaskService().createTaskQuery().count());
 
     // and complete the process instance
-    testHelper.completeTask(EventSubProcessModels.EVENT_SUB_PROCESS_TASK_ID);
+    testHelper.completeTask("eventSubProcessTask");
     testHelper.assertProcessEnded(processInstance.getId());
   }
 }
