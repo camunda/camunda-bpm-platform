@@ -19,7 +19,7 @@ import org.camunda.bpm.engine.variable.Variables;
 
 public class InvoiceTestCase extends ProcessEngineTestCase {
 
-  @Deployment(resources= {"invoice.v1.bpmn", "assign-approver-groups.dmn"})
+  @Deployment(resources= {"invoice.v1.bpmn", "invoiceBusinessDecisions.dmn"})
   public void testHappyPathV1() {
     InputStream invoiceInputStream = InvoiceProcessApplication.class.getClassLoader().getResourceAsStream("invoice.pdf");
     VariableMap variables = Variables.createVariables()
@@ -62,7 +62,7 @@ public class InvoiceTestCase extends ProcessEngineTestCase {
     assertProcessEnded(pi.getId());
   }
 
-  @Deployment(resources= {"invoice.v2.bpmn", "assign-approver-groups.dmn"})
+  @Deployment(resources= {"invoice.v2.bpmn", "invoiceBusinessDecisions.dmn"})
   public void testHappyPathV2() {
     InputStream invoiceInputStream = InvoiceProcessApplication.class.getClassLoader().getResourceAsStream("invoice.pdf");
     VariableMap variables = Variables.createVariables()
@@ -105,7 +105,7 @@ public class InvoiceTestCase extends ProcessEngineTestCase {
     assertProcessEnded(pi.getId());
   }
 
-  @Deployment(resources= {"invoice.v2.bpmn", "assign-approver-groups.dmn"})
+  @Deployment(resources= {"invoice.v2.bpmn", "invoiceBusinessDecisions.dmn"})
   public void testApproveInvoiceAssignment() {
     InputStream invoiceInputStream = InvoiceProcessApplication.class.getClassLoader().getResourceAsStream("invoice.pdf");
 
