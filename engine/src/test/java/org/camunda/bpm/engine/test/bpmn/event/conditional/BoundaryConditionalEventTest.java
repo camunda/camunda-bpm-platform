@@ -370,22 +370,6 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
     assertEquals(0, conditionEventSubscriptionQuery.list().size());
   }
 
-  protected void deployBoundaryEventProcessWithVariableIsSetInDelegationCode(BpmnModelInstance model, boolean isInterrupting) {
-    final BpmnModelInstance modelInstance = modify(model)
-            .serviceTaskBuilder(TASK_WITH_CONDITION_ID)
-            .boundaryEvent()
-            .cancelActivity(isInterrupting)
-            .conditionalEventDefinition(CONDITIONAL_EVENT)
-            .condition(CONDITION_EXPR)
-            .conditionalEventDefinitionDone()
-            .userTask()
-            .name(TASK_AFTER_CONDITION)
-            .endEvent()
-            .done();
-
-    engine.manageDeployment(repositoryService.createDeployment().addModelInstance(CONDITIONAL_MODEL, modelInstance).deploy());
-  }
-
   protected void deployBoundaryEventProcess(AbstractActivityBuilder builder, boolean isInterrupting) {
     deployBoundaryEventProcess(builder, CONDITION_EXPR, isInterrupting);
   }
@@ -412,7 +396,7 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
                                                   .serviceTask(TASK_WITH_CONDITION_ID)
                                                     .camundaClass(SetVariableDelegate.class.getName())
                                                   .endEvent().done();
-    deployBoundaryEventProcessWithVariableIsSetInDelegationCode(modelInstance, true);
+    deployConditionalBoundaryEventProcess(modelInstance, TASK_WITH_CONDITION_ID, true);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -440,7 +424,7 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
                                                     .camundaClass(SetVariableDelegate.class.getName())
                                                   .userTask()
                                                   .endEvent().done();
-    deployBoundaryEventProcessWithVariableIsSetInDelegationCode(modelInstance, false);
+    deployConditionalBoundaryEventProcess(modelInstance, TASK_WITH_CONDITION_ID, false);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -538,7 +522,7 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
                                                     .camundaInputParameter(VARIABLE_NAME, "1")
                                                     .camundaExpression(TRUE_CONDITION)
                                                   .endEvent().done();
-    deployBoundaryEventProcessWithVariableIsSetInDelegationCode(modelInstance, true);
+    deployConditionalBoundaryEventProcess(modelInstance, TASK_WITH_CONDITION_ID, true);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -565,7 +549,7 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
                                                     .camundaExpression(TRUE_CONDITION)
                                                   .userTask().name(TASK_AFTER_SERVICE_TASK)
                                                   .endEvent().done();
-    deployBoundaryEventProcessWithVariableIsSetInDelegationCode(modelInstance, false);
+    deployConditionalBoundaryEventProcess(modelInstance, TASK_WITH_CONDITION_ID, false);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -591,7 +575,7 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
                                                   .serviceTask(TASK_WITH_CONDITION_ID)
                                                     .camundaExpression(EXPR_SET_VARIABLE)
                                                   .endEvent().done();
-    deployBoundaryEventProcessWithVariableIsSetInDelegationCode(modelInstance, true);
+    deployConditionalBoundaryEventProcess(modelInstance, TASK_WITH_CONDITION_ID, true);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -619,7 +603,7 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
                                                     .camundaExpression(EXPR_SET_VARIABLE)
                                                   .userTask().name(TASK_AFTER_SERVICE_TASK)
                                                   .endEvent().done();
-    deployBoundaryEventProcessWithVariableIsSetInDelegationCode(modelInstance, false);
+    deployConditionalBoundaryEventProcess(modelInstance, TASK_WITH_CONDITION_ID, false);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -652,7 +636,7 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
                                                   .subProcessDone()
                                                   .endEvent()
                                                   .done();
-    deployBoundaryEventProcess(modify(modelInstance).activityBuilder(SUB_PROCESS_ID), true);
+    deployConditionalBoundaryEventProcess(modelInstance, SUB_PROCESS_ID, true);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -687,7 +671,7 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
                                                   .subProcessDone()
                                                   .endEvent()
                                                   .done();
-    deployBoundaryEventProcess(modify(modelInstance).activityBuilder(SUB_PROCESS_ID), false);
+    deployConditionalBoundaryEventProcess(modelInstance, SUB_PROCESS_ID, false);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -721,7 +705,7 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
       .subProcessDone()
       .endEvent()
       .done();
-    deployBoundaryEventProcess(modify(modelInstance).activityBuilder(SUB_PROCESS_ID), true);
+    deployConditionalBoundaryEventProcess(modelInstance, SUB_PROCESS_ID, true);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -755,7 +739,7 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
       .subProcessDone()
       .endEvent()
       .done();
-    deployBoundaryEventProcess(modify(modelInstance).activityBuilder(SUB_PROCESS_ID), false);
+    deployConditionalBoundaryEventProcess(modelInstance, SUB_PROCESS_ID, false);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -785,7 +769,7 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
                                                   .userTask().name(TASK_AFTER_OUTPUT_MAPPING)
                                                   .endEvent()
                                                   .done();
-    deployBoundaryEventProcess(modify(modelInstance).activityBuilder(TASK_BEFORE_CONDITION_ID), true);
+    deployConditionalBoundaryEventProcess(modelInstance, TASK_BEFORE_CONDITION_ID, true);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -814,7 +798,7 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
                                                   .userTask(TASK_WITH_CONDITION_ID).name(TASK_WITH_CONDITION)
                                                   .endEvent()
                                                   .done();
-    deployBoundaryEventProcess(modify(modelInstance).activityBuilder(TASK_WITH_CONDITION_ID), true);
+    deployConditionalBoundaryEventProcess(modelInstance, TASK_WITH_CONDITION_ID, true);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -843,7 +827,7 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
                                                   .userTask(TASK_WITH_CONDITION_ID).name(TASK_WITH_CONDITION)
                                                   .endEvent()
                                                   .done();
-    deployBoundaryEventProcess(modify(modelInstance).activityBuilder(TASK_WITH_CONDITION_ID), false);
+    deployConditionalBoundaryEventProcess(modelInstance, TASK_WITH_CONDITION_ID, false);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -872,7 +856,7 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
                                                   .userTask().name(TASK_AFTER_OUTPUT_MAPPING)
                                                   .endEvent()
                                                   .done();
-    deployBoundaryEventProcess(modify(modelInstance).activityBuilder(TASK_WITH_CONDITION_ID), false);
+    deployConditionalBoundaryEventProcess(modelInstance, TASK_WITH_CONDITION_ID, false);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -905,7 +889,7 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
                                                   .userTask().name(TASK_AFTER_OUTPUT_MAPPING)
                                                   .endEvent()
                                                   .done();
-    deployBoundaryEventProcess(modify(modelInstance).activityBuilder(TASK_WITH_CONDITION_ID), true);
+    deployConditionalBoundaryEventProcess(modelInstance, TASK_WITH_CONDITION_ID, true);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -938,8 +922,7 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
                                                   .userTask().name(TASK_AFTER_OUTPUT_MAPPING)
                                                   .endEvent()
                                                   .done();
-    deployBoundaryEventProcess(modify(modelInstance).activityBuilder(TASK_WITH_CONDITION_ID), false);
-
+    deployConditionalBoundaryEventProcess(modelInstance, TASK_WITH_CONDITION_ID, false);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -972,7 +955,7 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
       .userTask().name(TASK_AFTER_OUTPUT_MAPPING)
       .endEvent()
       .done();
-    deployBoundaryEventProcess(modify(modelInstance).activityBuilder(TASK_WITH_CONDITION_ID), true);
+    deployConditionalBoundaryEventProcess(modelInstance, TASK_WITH_CONDITION_ID, true);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -1005,8 +988,7 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
       .userTask().name(TASK_AFTER_OUTPUT_MAPPING)
       .endEvent()
       .done();
-    deployBoundaryEventProcess(modify(modelInstance).activityBuilder(TASK_WITH_CONDITION_ID), false);
-
+    deployConditionalBoundaryEventProcess(modelInstance, TASK_WITH_CONDITION_ID, false);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -1040,7 +1022,7 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
       .userTask().name(TASK_AFTER_OUTPUT_MAPPING)
       .endEvent()
       .done();
-    deployBoundaryEventProcess(modify(modelInstance).activityBuilder(TASK_WITH_CONDITION_ID), true);
+    deployConditionalBoundaryEventProcess(modelInstance, TASK_WITH_CONDITION_ID, true);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -1073,7 +1055,7 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
       .userTask().name(TASK_AFTER_OUTPUT_MAPPING)
       .endEvent()
       .done();
-    deployBoundaryEventProcess(modify(modelInstance).activityBuilder(TASK_WITH_CONDITION_ID), false);
+    deployConditionalBoundaryEventProcess(modelInstance, TASK_WITH_CONDITION_ID, false);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -1102,7 +1084,7 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
                                                     .camundaExecutionListenerExpression(ExecutionListener.EVENTNAME_START, EXPR_SET_VARIABLE)
                                                   .endEvent()
                                                   .done();
-    deployBoundaryEventProcess(modify(modelInstance).activityBuilder(TASK_WITH_CONDITION_ID), true);
+    deployConditionalBoundaryEventProcess(modelInstance, TASK_WITH_CONDITION_ID, true);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -1131,7 +1113,7 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
                                                     .camundaExecutionListenerExpression(ExecutionListener.EVENTNAME_START, EXPR_SET_VARIABLE)
                                                   .endEvent()
                                                   .done();
-    deployBoundaryEventProcess(modify(modelInstance).activityBuilder(TASK_WITH_CONDITION_ID), false);
+    deployConditionalBoundaryEventProcess(modelInstance, TASK_WITH_CONDITION_ID, false);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -1164,7 +1146,7 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
     listener.setCamundaEvent(ExecutionListener.EVENTNAME_TAKE);
     listener.setCamundaExpression(EXPR_SET_VARIABLE);
     modelInstance.<SequenceFlow>getModelElementById(FLOW_ID).builder().addExtensionElement(listener);
-    deployBoundaryEventProcess(modify(modelInstance).activityBuilder(TASK_WITH_CONDITION_ID), true);
+    deployConditionalBoundaryEventProcess(modelInstance, TASK_WITH_CONDITION_ID, true);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -1197,7 +1179,7 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
     listener.setCamundaEvent(ExecutionListener.EVENTNAME_TAKE);
     listener.setCamundaExpression(EXPR_SET_VARIABLE);
     modelInstance.<SequenceFlow>getModelElementById(FLOW_ID).builder().addExtensionElement(listener);
-    deployBoundaryEventProcess(modify(modelInstance).activityBuilder(TASK_WITH_CONDITION_ID), false);
+    deployConditionalBoundaryEventProcess(modelInstance, TASK_WITH_CONDITION_ID, false);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -1226,7 +1208,7 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
                                                   .userTask().name(AFTER_TASK)
                                                   .endEvent()
                                                   .done();
-    deployBoundaryEventProcess(modify(modelInstance).activityBuilder(TASK_WITH_CONDITION_ID), true);
+    deployConditionalBoundaryEventProcess(modelInstance, TASK_WITH_CONDITION_ID, true);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -1255,7 +1237,7 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
                                                 .userTask().name(AFTER_TASK)
                                                 .endEvent()
                                                 .done();
-    deployBoundaryEventProcess(modify(modelInstance).activityBuilder(TASK_WITH_CONDITION_ID), false);
+    deployConditionalBoundaryEventProcess(modelInstance, TASK_WITH_CONDITION_ID, false);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -1285,7 +1267,7 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
                                                     .cardinality("3")
                                                     .parallel()
                                                   .done();
-    deployBoundaryEventProcess(modify(modelInstance).activityBuilder(TASK_WITH_CONDITION_ID), "${nrOfInstances == 3}", true);
+    deployConditionalBoundaryEventProcess(modelInstance, TASK_WITH_CONDITION_ID, "${nrOfInstances == 3}", true);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -1315,7 +1297,7 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
                                                     .cardinality("3")
                                                     .parallel()
                                                   .done();
-    deployBoundaryEventProcess(modify(modelInstance).activityBuilder(TASK_WITH_CONDITION_ID), "${nrOfInstances == 3}", false);
+    deployConditionalBoundaryEventProcess(modelInstance, TASK_WITH_CONDITION_ID, "${nrOfInstances == 3}", false);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -1356,7 +1338,7 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
                                                     .cardinality("3")
                                                     .sequential()
                                                 .done();
-    deployBoundaryEventProcess(modify(modelInstance).activityBuilder(TASK_WITH_CONDITION_ID), "${true}", true);
+    deployConditionalBoundaryEventProcess(modelInstance, TASK_WITH_CONDITION_ID, "${true}", true);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -1386,7 +1368,7 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
                                                 .cardinality("3")
                                                 .sequential()
                                                 .done();
-    deployBoundaryEventProcess(modify(modelInstance).activityBuilder(TASK_WITH_CONDITION_ID), "${true}", false);
+    deployConditionalBoundaryEventProcess(modelInstance, TASK_WITH_CONDITION_ID, "${true}", false);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -1429,7 +1411,7 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
                                                   .userTask().name(TASK_AFTER_SERVICE_TASK)
                                                   .endEvent()
                                                   .done();
-    deployBoundaryEventProcess(modify(modelInstance).activityBuilder(TASK_WITH_CONDITION_ID), true);
+    deployConditionalBoundaryEventProcess(modelInstance, TASK_WITH_CONDITION_ID, true);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -1461,7 +1443,7 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
                                                   .userTask().name(TASK_AFTER_SERVICE_TASK)
                                                   .endEvent()
                                                   .done();
-    deployBoundaryEventProcess(modify(modelInstance).activityBuilder(TASK_WITH_CONDITION_ID), false);
+    deployConditionalBoundaryEventProcess(modelInstance, TASK_WITH_CONDITION_ID, false);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -1497,7 +1479,7 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
                                                   .subProcessDone()
                                                   .endEvent()
                                                   .done();
-    deployBoundaryEventProcess(modify(modelInstance).activityBuilder(SUB_PROCESS_ID), true);
+    deployConditionalBoundaryEventProcess(modelInstance, SUB_PROCESS_ID, true);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -1533,7 +1515,7 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
                                                   .subProcessDone()
                                                   .endEvent()
                                                   .done();
-    deployBoundaryEventProcess(modify(modelInstance).activityBuilder(SUB_PROCESS_ID), false);
+    deployConditionalBoundaryEventProcess(modelInstance, SUB_PROCESS_ID, false);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -1616,7 +1598,7 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
       .userTask(TASK_WITH_CONDITION_ID)
       .endEvent().done();
 
-    deployBoundaryEventProcess(modify(modelInstance).activityBuilder(TASK_WITH_CONDITION_ID), true);
+    deployConditionalBoundaryEventProcess(modelInstance, TASK_WITH_CONDITION_ID, true);
 
     // given suspended process
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -1648,7 +1630,7 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
       .userTask(TASK_WITH_CONDITION_ID)
       .endEvent().done();
 
-    deployBoundaryEventProcess(modify(modelInstance).activityBuilder(TASK_WITH_CONDITION_ID), false);
+    deployConditionalBoundaryEventProcess(modelInstance, TASK_WITH_CONDITION_ID, false);
 
     // given suspended process
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);

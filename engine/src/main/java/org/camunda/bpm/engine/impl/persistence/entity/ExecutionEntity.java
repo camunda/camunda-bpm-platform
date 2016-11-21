@@ -25,7 +25,6 @@ import java.util.Set;
 import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
-import org.camunda.bpm.engine.impl.bpmn.behavior.ConditionalEventBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.NoneStartEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
@@ -60,7 +59,6 @@ import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.util.FormPropertyStartContext;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
-import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.CompositeActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
@@ -72,7 +70,6 @@ import org.camunda.bpm.engine.impl.pvm.runtime.ProcessInstanceStartContext;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.operation.FoxAtomicOperationDeleteCascadeFireActivityEnd;
 import org.camunda.bpm.engine.impl.pvm.runtime.operation.PvmAtomicOperation;
-import org.camunda.bpm.engine.impl.pvm.runtime.operation.PvmAtomicOperationContinuation;
 import org.camunda.bpm.engine.impl.tree.ExecutionTopDownWalker;
 import org.camunda.bpm.engine.impl.tree.TreeVisitor;
 import org.camunda.bpm.engine.impl.util.BitMaskUtil;
@@ -1723,7 +1720,8 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
       @Override
       public void visit(ExecutionEntity obj) {
         if (!obj.getEventSubscriptions().isEmpty() &&
-          (obj.isInState(ActivityInstanceState.DEFAULT) || !obj.getActivity().isScope())) { // state is default or tree is compacted
+
+          (obj.isInState(ActivityInstanceState.DEFAULT) || (!obj.getActivity().isScope()))) { // state is default or tree is compacted
           execs.add(obj);
         }
       }

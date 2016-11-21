@@ -50,7 +50,7 @@ public class ConditionalEventTriggeredByExecutionListenerTest extends AbstractCo
 
   private interface ConditionalEventProcessSpecifier {
     BpmnModelInstance specifyConditionalProcess(BpmnModelInstance modelInstance, boolean isInterrupting);
-    void assertTaskNames(List<Task> tasks, boolean isInterrupting);
+    void assertTaskNames(List<Task> tasks, boolean isInterrupting, boolean isAyncBefore);
     int expectedSubscriptions();
     int expectedTaskCount();
   }
@@ -77,13 +77,14 @@ public class ConditionalEventTriggeredByExecutionListenerTest extends AbstractCo
         }
 
         @Override
-        public void assertTaskNames(List<Task> tasks, boolean isInterrupting) {
-          for (Task task : tasks) {
-            assertTrue(
-              (isInterrupting || task.getTaskDefinitionKey().equals(TASK_WITH_CONDITION_ID))
-              || task.getName().equals(TASK_AFTER_CONDITION)
-            );
-          }
+        public void assertTaskNames(List<Task> tasks, boolean isInterrupting, boolean isAyncBefore) {
+            if (isInterrupting || isAyncBefore) {
+              ConditionalEventTriggeredByExecutionListenerTest.assertTaskNames(tasks, TASK_AFTER_CONDITION);
+            } else {
+              ConditionalEventTriggeredByExecutionListenerTest.assertTaskNames(tasks,
+                TASK_WITH_CONDITION,
+                TASK_AFTER_CONDITION);
+            }
         }
 
         @Override
@@ -132,13 +133,16 @@ public class ConditionalEventTriggeredByExecutionListenerTest extends AbstractCo
         }
 
         @Override
-        public void assertTaskNames(List<Task> tasks, boolean isInterrupting) {
+        public void assertTaskNames(List<Task> tasks, boolean isInterrupting, boolean isAyncBefore) {
           assertNotNull(tasks);
-          for (Task task : tasks) {
-            assertTrue(
-              (isInterrupting || task.getTaskDefinitionKey().equals(TASK_WITH_CONDITION_ID)
-               || task.getName().equals(TASK_AFTER_CONDITIONAL_BOUNDARY_EVENT))
-              || task.getName().equals(TASK_AFTER_CONDITIONAL_START_EVENT));
+          if (isInterrupting || isAyncBefore) {
+            ConditionalEventTriggeredByExecutionListenerTest.assertTaskNames(tasks, TASK_AFTER_CONDITIONAL_START_EVENT);
+          } else {
+            ConditionalEventTriggeredByExecutionListenerTest.assertTaskNames(tasks,
+              TASK_WITH_CONDITION,
+              TASK_AFTER_CONDITIONAL_BOUNDARY_EVENT,
+              TASK_AFTER_CONDITIONAL_START_EVENT);
+
           }
         }
 
@@ -168,9 +172,10 @@ public class ConditionalEventTriggeredByExecutionListenerTest extends AbstractCo
     BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
       .startEvent(START_EVENT_ID)
       .userTask(TASK_BEFORE_CONDITION_ID)
-      .name(TASK_BEFORE_CONDITION)
+        .name(TASK_BEFORE_CONDITION)
       .userTask(TASK_WITH_CONDITION_ID)
-      .camundaExecutionListenerExpression(ExecutionListener.EVENTNAME_START, EXPR_SET_VARIABLE)
+        .name(TASK_WITH_CONDITION)
+        .camundaExecutionListenerExpression(ExecutionListener.EVENTNAME_START, EXPR_SET_VARIABLE)
       .endEvent(END_EVENT_ID)
       .done();
     modelInstance = specifier.specifyConditionalProcess(modelInstance, true);
@@ -190,7 +195,7 @@ public class ConditionalEventTriggeredByExecutionListenerTest extends AbstractCo
     //then start listener sets variable
     //conditional event is triggered
     tasksAfterVariableIsSet = taskQuery.list();
-    specifier.assertTaskNames(tasksAfterVariableIsSet, true);
+    specifier.assertTaskNames(tasksAfterVariableIsSet, true, false);
   }
 
   @Test
@@ -198,10 +203,10 @@ public class ConditionalEventTriggeredByExecutionListenerTest extends AbstractCo
     BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
       .startEvent(START_EVENT_ID)
       .userTask(TASK_BEFORE_CONDITION_ID)
-      .name(TASK_BEFORE_CONDITION)
+        .name(TASK_BEFORE_CONDITION)
       .userTask(TASK_WITH_CONDITION_ID)
-      .camundaExecutionListenerExpression(ExecutionListener.EVENTNAME_START, EXPR_SET_VARIABLE)
-      .name(TASK_WITH_CONDITION)
+        .camundaExecutionListenerExpression(ExecutionListener.EVENTNAME_START, EXPR_SET_VARIABLE)
+        .name(TASK_WITH_CONDITION)
       .endEvent(END_EVENT_ID)
       .done();
     modelInstance = specifier.specifyConditionalProcess(modelInstance, false);
@@ -219,7 +224,7 @@ public class ConditionalEventTriggeredByExecutionListenerTest extends AbstractCo
     tasksAfterVariableIsSet = taskQuery.list();
     assertEquals(specifier.expectedTaskCount(), tasksAfterVariableIsSet.size());
     assertEquals(specifier.expectedSubscriptions(), conditionEventSubscriptionQuery.list().size());
-    specifier.assertTaskNames(tasksAfterVariableIsSet, false);
+    specifier.assertTaskNames(tasksAfterVariableIsSet, false, false);
   }
 
   @Test
@@ -227,9 +232,10 @@ public class ConditionalEventTriggeredByExecutionListenerTest extends AbstractCo
     BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
       .startEvent(START_EVENT_ID)
       .userTask(TASK_BEFORE_CONDITION_ID)
-      .name(TASK_BEFORE_CONDITION)
+        .name(TASK_BEFORE_CONDITION)
       .sequenceFlowId(FLOW_ID)
       .userTask(TASK_WITH_CONDITION_ID)
+        .name(TASK_WITH_CONDITION)
       .endEvent(END_EVENT_ID)
       .done();
     CamundaExecutionListener listener = modelInstance.newInstance(CamundaExecutionListener.class);
@@ -253,7 +259,7 @@ public class ConditionalEventTriggeredByExecutionListenerTest extends AbstractCo
     //then take listener sets variable
     //conditional event is triggered
     tasksAfterVariableIsSet = taskQuery.list();
-    specifier.assertTaskNames(tasksAfterVariableIsSet, true);
+    specifier.assertTaskNames(tasksAfterVariableIsSet, true, false);
   }
 
   @Test
@@ -261,9 +267,10 @@ public class ConditionalEventTriggeredByExecutionListenerTest extends AbstractCo
     BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
       .startEvent(START_EVENT_ID)
       .userTask(TASK_BEFORE_CONDITION_ID)
-      .name(TASK_BEFORE_CONDITION)
+        .name(TASK_BEFORE_CONDITION)
       .sequenceFlowId(FLOW_ID)
       .userTask(TASK_WITH_CONDITION_ID)
+        .name(TASK_WITH_CONDITION)
       .endEvent(END_EVENT_ID)
       .done();
     CamundaExecutionListener listener = modelInstance.newInstance(CamundaExecutionListener.class);
@@ -289,7 +296,7 @@ public class ConditionalEventTriggeredByExecutionListenerTest extends AbstractCo
     tasksAfterVariableIsSet = taskQuery.list();
     assertEquals(specifier.expectedTaskCount(), tasksAfterVariableIsSet.size());
     assertEquals(specifier.expectedSubscriptions(), conditionEventSubscriptionQuery.list().size());
-    specifier.assertTaskNames(tasksAfterVariableIsSet, false);
+    specifier.assertTaskNames(tasksAfterVariableIsSet, false, false);
   }
 
   @Test
@@ -297,9 +304,11 @@ public class ConditionalEventTriggeredByExecutionListenerTest extends AbstractCo
     BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
       .startEvent(START_EVENT_ID)
       .userTask(TASK_BEFORE_CONDITION_ID)
-      .name(TASK_BEFORE_CONDITION)
+        .name(TASK_BEFORE_CONDITION)
       .sequenceFlowId(FLOW_ID)
-      .userTask(TASK_WITH_CONDITION_ID).camundaAsyncBefore()
+      .userTask(TASK_WITH_CONDITION_ID)
+        .name(TASK_WITH_CONDITION)
+        .camundaAsyncBefore()
       .endEvent(END_EVENT_ID)
       .done();
     CamundaExecutionListener listener = modelInstance.newInstance(CamundaExecutionListener.class);
@@ -323,7 +332,7 @@ public class ConditionalEventTriggeredByExecutionListenerTest extends AbstractCo
     //then take listener sets variable
     //conditional event is triggered
     tasksAfterVariableIsSet = taskQuery.list();
-    specifier.assertTaskNames(tasksAfterVariableIsSet, true);
+    specifier.assertTaskNames(tasksAfterVariableIsSet, true, false);
   }
 
   @Test
@@ -331,9 +340,11 @@ public class ConditionalEventTriggeredByExecutionListenerTest extends AbstractCo
     BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
       .startEvent(START_EVENT_ID)
       .userTask(TASK_BEFORE_CONDITION_ID)
-      .name(TASK_BEFORE_CONDITION)
+        .name(TASK_BEFORE_CONDITION)
       .sequenceFlowId(FLOW_ID)
-      .userTask(TASK_WITH_CONDITION_ID).camundaAsyncBefore()
+      .userTask(TASK_WITH_CONDITION_ID)
+        .name(TASK_WITH_CONDITION)
+        .camundaAsyncBefore()
       .endEvent(END_EVENT_ID)
       .done();
     CamundaExecutionListener listener = modelInstance.newInstance(CamundaExecutionListener.class);
@@ -353,7 +364,7 @@ public class ConditionalEventTriggeredByExecutionListenerTest extends AbstractCo
 
     //then take listener sets variable
     //non interrupting boundary event is triggered
-    specifier.assertTaskNames(taskQuery.list(), false);
+    specifier.assertTaskNames(taskQuery.list(), false, true);
 
     //and job was created
     Job job = engine.getManagementService().createJobQuery().singleResult();
@@ -378,9 +389,10 @@ public class ConditionalEventTriggeredByExecutionListenerTest extends AbstractCo
     BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
       .startEvent(START_EVENT_ID)
       .userTask(TASK_BEFORE_CONDITION_ID)
-      .name(TASK_BEFORE_CONDITION)
-      .camundaExecutionListenerExpression(ExecutionListener.EVENTNAME_END, EXPR_SET_VARIABLE)
+        .name(TASK_BEFORE_CONDITION)
+        .camundaExecutionListenerExpression(ExecutionListener.EVENTNAME_END, EXPR_SET_VARIABLE)
       .userTask(TASK_WITH_CONDITION_ID)
+        .name(TASK_WITH_CONDITION)
       .endEvent(END_EVENT_ID)
       .done();
     modelInstance = specifier.specifyConditionalProcess(modelInstance, true);
@@ -398,7 +410,7 @@ public class ConditionalEventTriggeredByExecutionListenerTest extends AbstractCo
     //then end listener sets variable
     //conditional event is triggered
     tasksAfterVariableIsSet = taskQuery.list();
-    specifier.assertTaskNames(tasksAfterVariableIsSet, true);
+    specifier.assertTaskNames(tasksAfterVariableIsSet, true, false);
   }
 
   @Test
@@ -406,10 +418,10 @@ public class ConditionalEventTriggeredByExecutionListenerTest extends AbstractCo
     BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
       .startEvent(START_EVENT_ID)
       .userTask(TASK_BEFORE_CONDITION_ID)
-      .name(TASK_BEFORE_CONDITION)
-      .camundaExecutionListenerExpression(ExecutionListener.EVENTNAME_END, EXPR_SET_VARIABLE)
+        .name(TASK_BEFORE_CONDITION)
+        .camundaExecutionListenerExpression(ExecutionListener.EVENTNAME_END, EXPR_SET_VARIABLE)
       .userTask(TASK_WITH_CONDITION_ID)
-      .name(TASK_WITH_CONDITION)
+        .name(TASK_WITH_CONDITION)
       .endEvent(END_EVENT_ID)
       .done();
     modelInstance = specifier.specifyConditionalProcess(modelInstance, false);
@@ -426,7 +438,7 @@ public class ConditionalEventTriggeredByExecutionListenerTest extends AbstractCo
     //non interrupting boundary event is triggered
     tasksAfterVariableIsSet = taskQuery.list();
     assertEquals(specifier.expectedTaskCount(), tasksAfterVariableIsSet.size());
-    specifier.assertTaskNames(tasksAfterVariableIsSet, false);
+    specifier.assertTaskNames(tasksAfterVariableIsSet, false, false);
   }
 
   @Test
@@ -436,11 +448,12 @@ public class ConditionalEventTriggeredByExecutionListenerTest extends AbstractCo
       .subProcess()
       .embeddedSubProcess()
       .startEvent()
-      .userTask(TASK_BEFORE_CONDITION_ID)
-      .name(TASK_BEFORE_CONDITION)
-      .sequenceFlowId(FLOW_ID)
-      .userTask(TASK_WITH_CONDITION_ID)
-      .endEvent()
+        .userTask(TASK_BEFORE_CONDITION_ID)
+          .name(TASK_BEFORE_CONDITION)
+        .sequenceFlowId(FLOW_ID)
+        .userTask(TASK_WITH_CONDITION_ID)
+          .name(TASK_WITH_CONDITION)
+        .endEvent()
       .subProcessDone()
       .endEvent(END_EVENT_ID)
       .done();
@@ -465,7 +478,7 @@ public class ConditionalEventTriggeredByExecutionListenerTest extends AbstractCo
     //then start listener sets variable
     //conditional event is triggered
     tasksAfterVariableIsSet = taskQuery.list();
-    specifier.assertTaskNames(tasksAfterVariableIsSet, true);
+    specifier.assertTaskNames(tasksAfterVariableIsSet, true, false);
   }
 
   @Test
@@ -474,12 +487,13 @@ public class ConditionalEventTriggeredByExecutionListenerTest extends AbstractCo
       .startEvent(START_EVENT_ID)
       .subProcess()
       .embeddedSubProcess()
-      .startEvent()
-      .userTask(TASK_BEFORE_CONDITION_ID)
-      .name(TASK_BEFORE_CONDITION)
-      .sequenceFlowId(FLOW_ID)
-      .userTask(TASK_WITH_CONDITION_ID)
-      .endEvent()
+        .startEvent()
+        .userTask(TASK_BEFORE_CONDITION_ID)
+          .name(TASK_BEFORE_CONDITION)
+        .sequenceFlowId(FLOW_ID)
+          .userTask(TASK_WITH_CONDITION_ID)
+          .name(TASK_WITH_CONDITION)
+        .endEvent()
       .subProcessDone()
       .endEvent(END_EVENT_ID)
       .done();
@@ -504,7 +518,7 @@ public class ConditionalEventTriggeredByExecutionListenerTest extends AbstractCo
     //then start listener sets variable
     //non interrupting boundary event is triggered
     tasksAfterVariableIsSet = taskQuery.list();
-    specifier.assertTaskNames(tasksAfterVariableIsSet, false);
+    specifier.assertTaskNames(tasksAfterVariableIsSet, false, false);
   }
 
   @Test
@@ -513,12 +527,13 @@ public class ConditionalEventTriggeredByExecutionListenerTest extends AbstractCo
       .startEvent(START_EVENT_ID)
       .subProcess()
       .embeddedSubProcess()
-      .startEvent()
-      .userTask(TASK_BEFORE_CONDITION_ID)
-      .name(TASK_BEFORE_CONDITION)
-      .userTask(TASK_WITH_CONDITION_ID)
-      .camundaExecutionListenerExpression(ExecutionListener.EVENTNAME_START, EXPR_SET_VARIABLE_ON_PARENT)
-      .endEvent()
+        .startEvent()
+        .userTask(TASK_BEFORE_CONDITION_ID)
+          .name(TASK_BEFORE_CONDITION)
+        .userTask(TASK_WITH_CONDITION_ID)
+          .name(TASK_WITH_CONDITION)
+          .camundaExecutionListenerExpression(ExecutionListener.EVENTNAME_START, EXPR_SET_VARIABLE_ON_PARENT)
+        .endEvent()
       .subProcessDone()
       .endEvent(END_EVENT_ID)
       .done();
@@ -539,7 +554,7 @@ public class ConditionalEventTriggeredByExecutionListenerTest extends AbstractCo
     //then start listener sets variable
     //conditional event is triggered
     tasksAfterVariableIsSet = taskQuery.list();
-    specifier.assertTaskNames(tasksAfterVariableIsSet, true);
+    specifier.assertTaskNames(tasksAfterVariableIsSet, true, false);
   }
 
   @Test
@@ -548,12 +563,13 @@ public class ConditionalEventTriggeredByExecutionListenerTest extends AbstractCo
       .startEvent(START_EVENT_ID)
       .subProcess()
       .embeddedSubProcess()
-      .startEvent()
-      .userTask(TASK_BEFORE_CONDITION_ID)
-      .name(TASK_BEFORE_CONDITION)
-      .userTask(TASK_WITH_CONDITION_ID)
-      .camundaExecutionListenerExpression(ExecutionListener.EVENTNAME_START, EXPR_SET_VARIABLE_ON_PARENT)
-      .endEvent()
+        .startEvent()
+        .userTask(TASK_BEFORE_CONDITION_ID)
+          .name(TASK_BEFORE_CONDITION)
+        .userTask(TASK_WITH_CONDITION_ID)
+          .name(TASK_WITH_CONDITION)
+          .camundaExecutionListenerExpression(ExecutionListener.EVENTNAME_START, EXPR_SET_VARIABLE_ON_PARENT)
+        .endEvent()
       .subProcessDone()
       .endEvent(END_EVENT_ID)
       .done();
@@ -574,7 +590,7 @@ public class ConditionalEventTriggeredByExecutionListenerTest extends AbstractCo
     //then start listener sets variable
     //non interrupting boundary event is triggered
     tasksAfterVariableIsSet = taskQuery.list();
-    specifier.assertTaskNames(tasksAfterVariableIsSet, false);
+    specifier.assertTaskNames(tasksAfterVariableIsSet, false, false);
   }
 
   @Test
@@ -583,12 +599,13 @@ public class ConditionalEventTriggeredByExecutionListenerTest extends AbstractCo
       .startEvent(START_EVENT_ID)
       .subProcess()
       .embeddedSubProcess()
-      .startEvent()
-      .userTask(TASK_BEFORE_CONDITION_ID)
-      .name(TASK_BEFORE_CONDITION)
-      .camundaExecutionListenerExpression(ExecutionListener.EVENTNAME_END, EXPR_SET_VARIABLE_ON_PARENT)
-      .userTask(TASK_WITH_CONDITION_ID)
-      .endEvent()
+        .startEvent()
+        .userTask(TASK_BEFORE_CONDITION_ID)
+          .name(TASK_BEFORE_CONDITION)
+          .camundaExecutionListenerExpression(ExecutionListener.EVENTNAME_END, EXPR_SET_VARIABLE_ON_PARENT)
+        .userTask(TASK_WITH_CONDITION_ID)
+          .name(TASK_WITH_CONDITION)
+        .endEvent()
       .subProcessDone()
       .endEvent(END_EVENT_ID)
       .done();
@@ -609,7 +626,7 @@ public class ConditionalEventTriggeredByExecutionListenerTest extends AbstractCo
     //then end listener sets variable
     //conditional event is triggered
     tasksAfterVariableIsSet = taskQuery.list();
-    specifier.assertTaskNames(tasksAfterVariableIsSet, true);
+    specifier.assertTaskNames(tasksAfterVariableIsSet, true, false);
   }
 
   @Test
@@ -618,12 +635,13 @@ public class ConditionalEventTriggeredByExecutionListenerTest extends AbstractCo
       .startEvent(START_EVENT_ID)
       .subProcess()
       .embeddedSubProcess()
-      .startEvent()
-      .userTask(TASK_BEFORE_CONDITION_ID)
-      .name(TASK_BEFORE_CONDITION)
-      .camundaExecutionListenerExpression(ExecutionListener.EVENTNAME_END, EXPR_SET_VARIABLE_ON_PARENT)
-      .userTask(TASK_WITH_CONDITION_ID)
-      .endEvent()
+        .startEvent()
+        .userTask(TASK_BEFORE_CONDITION_ID)
+          .name(TASK_BEFORE_CONDITION)
+          .camundaExecutionListenerExpression(ExecutionListener.EVENTNAME_END, EXPR_SET_VARIABLE_ON_PARENT)
+        .userTask(TASK_WITH_CONDITION_ID)
+          .name(TASK_WITH_CONDITION)
+        .endEvent()
       .subProcessDone()
       .endEvent(END_EVENT_ID)
       .done();
@@ -644,7 +662,7 @@ public class ConditionalEventTriggeredByExecutionListenerTest extends AbstractCo
     //then end listener sets variable
     //non interrupting boundary event is triggered
     tasksAfterVariableIsSet = taskQuery.list();
-    specifier.assertTaskNames(tasksAfterVariableIsSet, false);
+    specifier.assertTaskNames(tasksAfterVariableIsSet, false, false);
   }
 
 }

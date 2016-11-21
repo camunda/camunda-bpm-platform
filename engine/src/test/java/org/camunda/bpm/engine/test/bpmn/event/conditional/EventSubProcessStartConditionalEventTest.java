@@ -238,7 +238,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
                                                   .serviceTask()
                                                     .camundaClass(SetVariableDelegate.class.getName())
                                                   .endEvent().done();
-    deployConditionalEventSubProcess(modelInstance, true);
+     deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY, true);
 
     // given process with event sub process conditional start event and service task with delegate class which sets a variable
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -267,7 +267,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
                                                     .camundaClass(SetVariableDelegate.class.getName())
                                                   .userTask()
                                                   .endEvent().done();
-    deployConditionalEventSubProcess(modelInstance, false);
+     deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY, false);
 
     // given process with event sub process conditional start event and service task with delegate class which sets a variable
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -377,7 +377,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
                                                     .camundaExpression(TRUE_CONDITION)
                                                   .userTask().name(TASK_AFTER_SERVICE_TASK)
                                                   .endEvent().done();
-    deployConditionalEventSubProcess(modelInstance, true);
+     deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY, true);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -406,7 +406,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
                                                     .camundaExpression(TRUE_CONDITION)
                                                   .userTask().name(TASK_AFTER_SERVICE_TASK)
                                                   .endEvent().done();
-    deployConditionalEventSubProcess(modelInstance, false);
+     deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY, false);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -434,7 +434,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
                                                     .camundaExpression("${execution.setVariable(\"variable\", 1)}")
                                                   .userTask().name(TASK_AFTER_SERVICE_TASK)
                                                   .endEvent().done();
-    deployConditionalEventSubProcess(modelInstance, true);
+     deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY, true);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -461,7 +461,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
                                                     .camundaExpression("${execution.setVariable(\"variable\", 1)}")
                                                   .userTask().name(TASK_AFTER_SERVICE_TASK)
                                                   .endEvent().done();
-    deployConditionalEventSubProcess(modelInstance, false);
+     deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY, false);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -494,7 +494,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
                                                   .subProcessDone()
                                                   .endEvent()
                                                   .done();
-    deployConditionalEventSubProcess(modelInstance, SUB_PROCESS_ID, true);
+     deployConditionalEventSubProcess(modelInstance, SUB_PROCESS_ID, true);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -526,7 +526,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
                                                   .subProcessDone()
                                                   .endEvent()
                                                   .done();
-    deployConditionalEventSubProcess(modelInstance, SUB_PROCESS_ID, false);
+     deployConditionalEventSubProcess(modelInstance, SUB_PROCESS_ID, false);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -556,7 +556,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
                                                   .userTask()
                                                   .endEvent()
                                                   .done();
-    deployConditionalEventSubProcess(modelInstance, true);
+     deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY, true);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -585,7 +585,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
                                                   .userTask()
                                                   .endEvent()
                                                   .done();
-    deployConditionalEventSubProcess(modelInstance, false);
+     deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY, false);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -619,7 +619,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
                                                   .userTask()
                                                   .endEvent()
                                                   .done();
-    deployConditionalEventSubProcess(modelInstance, true);
+     deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY, true);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -652,7 +652,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
                                                   .userTask()
                                                   .endEvent()
                                                   .done();
-    deployConditionalEventSubProcess(modelInstance, false);
+     deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY, false);
 
 
     // given
@@ -687,7 +687,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
       .userTask().name(TASK_AFTER_OUTPUT_MAPPING)
       .endEvent()
       .done();
-    deployConditionalEventSubProcess(modelInstance, true);
+     deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY, true);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -720,7 +720,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
       .userTask().name(TASK_AFTER_OUTPUT_MAPPING)
       .endEvent()
       .done();
-    deployConditionalEventSubProcess(modelInstance, false);
+     deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY, false);
 
 
     // given
@@ -756,7 +756,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
       .userTask().name(TASK_AFTER_OUTPUT_MAPPING)
       .endEvent()
       .done();
-    deployConditionalEventSubProcess(modelInstance, true);
+     deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY, true);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -789,7 +789,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
       .userTask().name(TASK_AFTER_OUTPUT_MAPPING)
       .endEvent()
       .done();
-    deployConditionalEventSubProcess(modelInstance, false);
+     deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY, false);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -821,7 +821,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
                                                   .userTask().name(TASK_AFTER_SERVICE_TASK)
                                                   .endEvent()
                                                   .done();
-    deployConditionalEventSubProcess(modelInstance, true);
+     deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY, true);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -853,7 +853,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
                                                   .userTask().name(TASK_AFTER_SERVICE_TASK)
                                                   .endEvent()
                                                   .done();
-    deployConditionalEventSubProcess(modelInstance, false);
+     deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY, false);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -889,7 +889,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
                                                   .subProcessDone()
                                                   .endEvent()
                                                   .done();
-    deployConditionalEventSubProcess(modelInstance, SUB_PROCESS_ID, true);
+     deployConditionalEventSubProcess(modelInstance, SUB_PROCESS_ID, true);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -925,7 +925,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
                                                   .subProcessDone()
                                                   .endEvent()
                                                   .done();
-    deployConditionalEventSubProcess(modelInstance, SUB_PROCESS_ID, false);
+     deployConditionalEventSubProcess(modelInstance, SUB_PROCESS_ID, false);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -962,7 +962,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
                                                   .subProcessDone()
                                                   .endEvent()
                                                   .done();
-    deployConditionalEventSubProcess(modelInstance, true);
+     deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY, true);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -998,7 +998,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
                                                   .subProcessDone()
                                                   .endEvent()
                                                   .done();
-    deployConditionalEventSubProcess(modelInstance, false);
+     deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY, false);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -1045,7 +1045,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
       .userTask(TASK_WITH_CONDITION_ID)
       .endEvent().done();
 
-    deployConditionalEventSubProcess(modelInstance, true);
+     deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY, true);
 
     // given suspended process
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -1078,7 +1078,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
       .endEvent().done();
 
 
-    deployConditionalEventSubProcess(modelInstance, false);
+     deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY, false);
 
     // given suspended process
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -1108,7 +1108,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
       .startEvent()
       .userTask(TASK_WITH_CONDITION_ID).name(TASK_WITH_CONDITION)
       .endEvent().done();
-    deployConditionalEventSubProcess(modelInstance, false);
+     deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY, false);
 
     //given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -1168,7 +1168,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
       .name(TASK_AFTER_CONDITION + 1)
       .endEvent().done();
 
-    deployConditionalEventSubProcess(modelInstance, false);
+     deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY, false);
 
     //given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -1212,7 +1212,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
       .name(TASK_AFTER_CONDITION + 1)
       .endEvent().done();
 
-    deployConditionalEventSubProcess(modelInstance, false);
+     deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY, false);
 
     //given process with two event sub processes
 

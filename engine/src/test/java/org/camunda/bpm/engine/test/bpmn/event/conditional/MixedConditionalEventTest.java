@@ -27,6 +27,10 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -191,9 +195,9 @@ public class MixedConditionalEventTest extends AbstractConditionalEventTestCase 
     //then conditional boundary should not triggered but conditional start event
     tasksAfterVariableIsSet = taskQuery.list();
     assertEquals(2, tasksAfterVariableIsSet.size());
-    for (Task task : tasksAfterVariableIsSet) {
-      assertTrue(task.getName().equals(TASK_AFTER_CONDITIONAL_START_EVENT) || task.getName().equals(TASK_AFTER_OUTPUT_MAPPING));
-    }
+    assertTaskNames(tasksAfterVariableIsSet,
+      TASK_AFTER_CONDITIONAL_START_EVENT,
+      TASK_AFTER_OUTPUT_MAPPING);
   }
 
   // sub process testing with event sub process and conditional start event and boundary event on user task
@@ -293,11 +297,10 @@ public class MixedConditionalEventTest extends AbstractConditionalEventTestCase 
     //and conditional start event via delayed events
     tasksAfterVariableIsSet = taskQuery.list();
     assertEquals(3, tasksAfterVariableIsSet.size());
-    for (Task task : tasksAfterVariableIsSet) {
-      assertTrue(task.getName().equals(TASK_AFTER_CONDITIONAL_START_EVENT)
-                 || task.getName().equals(TASK_AFTER_CONDITIONAL_BOUNDARY_EVENT)
-                 || task.getName().equals(TASK_WITH_CONDITION));
-    }
+    assertTaskNames(tasksAfterVariableIsSet,
+      TASK_AFTER_CONDITIONAL_START_EVENT,
+      TASK_AFTER_CONDITIONAL_BOUNDARY_EVENT,
+      TASK_WITH_CONDITION);
   }
 
   @Test
@@ -329,9 +332,9 @@ public class MixedConditionalEventTest extends AbstractConditionalEventTestCase 
     //then conditional boundary should not triggered but conditional start event
     tasksAfterVariableIsSet = taskQuery.list();
     assertEquals(2, tasksAfterVariableIsSet.size());
-    for (Task task : tasksAfterVariableIsSet) {
-      assertTrue(task.getName().equals(TASK_AFTER_CONDITIONAL_START_EVENT) || task.getName().equals(TASK_AFTER_OUTPUT_MAPPING));
-    }
+    assertTaskNames(tasksAfterVariableIsSet,
+      TASK_AFTER_CONDITIONAL_START_EVENT,
+      TASK_AFTER_OUTPUT_MAPPING);
   }
 
   // io mapping in sub process /////////////////////////////////////////////////////////////////////////////////////////
@@ -464,9 +467,9 @@ public class MixedConditionalEventTest extends AbstractConditionalEventTestCase 
     //then conditional boundary should not triggered but conditional start event
     tasksAfterVariableIsSet = taskQuery.list();
     assertEquals(2, tasksAfterVariableIsSet.size());
-    for (Task task : tasksAfterVariableIsSet) {
-      assertTrue(task.getName().equals(TASK_AFTER_CONDITIONAL_START_EVENT) || task.getName().equals(TASK_AFTER_OUTPUT_MAPPING));
-    }
+    assertTaskNames(tasksAfterVariableIsSet,
+      TASK_AFTER_CONDITIONAL_START_EVENT,
+      TASK_AFTER_OUTPUT_MAPPING);
   }
 
 
@@ -563,12 +566,11 @@ public class MixedConditionalEventTest extends AbstractConditionalEventTestCase 
     //and global conditional start event via delayed events
     tasksAfterVariableIsSet = taskQuery.list();
     assertEquals(4, tasksAfterVariableIsSet.size());
-    for (Task task : tasksAfterVariableIsSet) {
-      assertTrue(task.getName().equals(TASK_AFTER_CONDITIONAL_START_EVENT)
-        || task.getName().equals(TASK_AFTER_COND_START_EVENT_IN_SUB_PROCESS)
-        || task.getName().equals(TASK_AFTER_CONDITIONAL_BOUNDARY_EVENT)
-        || task.getName().equals(TASK_WITH_CONDITION));
-    }
+    assertTaskNames(tasksAfterVariableIsSet,
+      TASK_AFTER_CONDITIONAL_START_EVENT,
+      TASK_AFTER_COND_START_EVENT_IN_SUB_PROCESS,
+      TASK_AFTER_CONDITIONAL_BOUNDARY_EVENT,
+      TASK_WITH_CONDITION);
   }
 
   @Test
@@ -700,11 +702,10 @@ public class MixedConditionalEventTest extends AbstractConditionalEventTestCase 
     //since variable is only local
     tasksAfterVariableIsSet = taskQuery.list();
     assertEquals(3, tasksAfterVariableIsSet.size());
-    for (Task task : tasksAfterVariableIsSet) {
-      assertTrue(task.getName().equals(TASK_AFTER_COND_START_EVENT_IN_SUB_PROCESS)
-        || task.getName().equals(TASK_AFTER_CONDITIONAL_BOUNDARY_EVENT)
-        || task.getName().equals(TASK_WITH_CONDITION));
-    }
+    assertTaskNames(tasksAfterVariableIsSet,
+      TASK_AFTER_COND_START_EVENT_IN_SUB_PROCESS,
+      TASK_AFTER_CONDITIONAL_BOUNDARY_EVENT,
+      TASK_WITH_CONDITION);
   }
 
   @Test

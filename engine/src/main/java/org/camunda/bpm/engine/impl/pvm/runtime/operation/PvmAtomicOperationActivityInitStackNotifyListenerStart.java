@@ -31,6 +31,15 @@ import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
  */
 public class PvmAtomicOperationActivityInitStackNotifyListenerStart extends PvmAtomicOperationActivityInstanceStart {
 
+
+  @Override
+  protected PvmExecutionImpl eventNotificationsStarted(PvmExecutionImpl execution) {
+    execution.incrementSequenceCounter();
+    execution.enterActivityInstance();
+
+    return execution;
+  }
+
   public String getCanonicalName() {
     return "activity-init-stack-notify-listener-start";
   }

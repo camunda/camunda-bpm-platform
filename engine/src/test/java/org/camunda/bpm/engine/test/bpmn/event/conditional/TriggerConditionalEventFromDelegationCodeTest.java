@@ -115,30 +115,6 @@ public class TriggerConditionalEventFromDelegationCodeTest extends AbstractCondi
   @Parameterized.Parameter
   public ConditionalEventProcessSpecifier specifier;
 
-  protected void deployConditionalEventSubProcess(BpmnModelInstance model, boolean isInterrupting) {
-    deployConditionalEventSubProcess(model, CONDITIONAL_EVENT_PROCESS_KEY, isInterrupting);
-  }
-
-  protected void deployConditionalEventSubProcess(BpmnModelInstance model, String parentId, boolean isInterrupting) {
-
-    final BpmnModelInstance modelInstance = modify(model)
-      .addSubProcessTo(parentId)
-      .id("eventSubProcess")
-      .triggerByEvent()
-      .embeddedSubProcess()
-      .startEvent()
-      .interrupting(isInterrupting)
-      .conditionalEventDefinition(CONDITIONAL_EVENT)
-      .condition(specifier.getCondition())
-      .conditionalEventDefinitionDone()
-      .userTask("taskAfterCond")
-      .name(TASK_AFTER_CONDITION)
-      .endEvent().done();
-
-    engine.manageDeployment(repositoryService.createDeployment().addModelInstance(CONDITIONAL_MODEL, modelInstance).deploy());
-  }
-
-
   @Test
   public void testSetVariableInStartListener() {
     BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
@@ -149,7 +125,7 @@ public class TriggerConditionalEventFromDelegationCodeTest extends AbstractCondi
       .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_START, specifier.getDelegateClass().getName())
       .endEvent()
       .done();
-    deployConditionalEventSubProcess(modelInstance, true);
+    deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY, specifier.getCondition(), true);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -179,7 +155,7 @@ public class TriggerConditionalEventFromDelegationCodeTest extends AbstractCondi
       .name(TASK_WITH_CONDITION)
       .endEvent()
       .done();
-    deployConditionalEventSubProcess(modelInstance, false);
+    deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY, specifier.getCondition(), false);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -209,7 +185,7 @@ public class TriggerConditionalEventFromDelegationCodeTest extends AbstractCondi
     listener.setCamundaEvent(ExecutionListener.EVENTNAME_TAKE);
     listener.setCamundaClass(specifier.getDelegateClass().getName());
     modelInstance.<SequenceFlow>getModelElementById(FLOW_ID).builder().addExtensionElement(listener);
-    deployConditionalEventSubProcess(modelInstance, true);
+    deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY, specifier.getCondition(), true);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -242,7 +218,7 @@ public class TriggerConditionalEventFromDelegationCodeTest extends AbstractCondi
     listener.setCamundaEvent(ExecutionListener.EVENTNAME_TAKE);
     listener.setCamundaClass(specifier.getDelegateClass().getName());
     modelInstance.<SequenceFlow>getModelElementById(FLOW_ID).builder().addExtensionElement(listener);
-    deployConditionalEventSubProcess(modelInstance, false);
+    deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY, specifier.getCondition(), false);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -276,7 +252,7 @@ public class TriggerConditionalEventFromDelegationCodeTest extends AbstractCondi
     listener.setCamundaEvent(ExecutionListener.EVENTNAME_TAKE);
     listener.setCamundaClass(specifier.getDelegateClass().getName());
     modelInstance.<SequenceFlow>getModelElementById(FLOW_ID).builder().addExtensionElement(listener);
-    deployConditionalEventSubProcess(modelInstance, true);
+    deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY, specifier.getCondition(), true);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -309,7 +285,7 @@ public class TriggerConditionalEventFromDelegationCodeTest extends AbstractCondi
     listener.setCamundaEvent(ExecutionListener.EVENTNAME_TAKE);
     listener.setCamundaClass(specifier.getDelegateClass().getName());
     modelInstance.<SequenceFlow>getModelElementById(FLOW_ID).builder().addExtensionElement(listener);
-    deployConditionalEventSubProcess(modelInstance, false);
+    deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY, specifier.getCondition(), false);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -352,7 +328,7 @@ public class TriggerConditionalEventFromDelegationCodeTest extends AbstractCondi
       .userTask(TASK_WITH_CONDITION_ID)
       .endEvent()
       .done();
-    deployConditionalEventSubProcess(modelInstance, true);
+    deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY, specifier.getCondition(), true);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -380,7 +356,7 @@ public class TriggerConditionalEventFromDelegationCodeTest extends AbstractCondi
       .name(TASK_WITH_CONDITION)
       .endEvent()
       .done();
-    deployConditionalEventSubProcess(modelInstance, false);
+    deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY, specifier.getCondition(), false);
 
     // given
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
@@ -408,7 +384,7 @@ public class TriggerConditionalEventFromDelegationCodeTest extends AbstractCondi
       .userTask(TASK_WITH_CONDITION_ID)
       .endEvent()
       .done();
-    deployConditionalEventSubProcess(modelInstance, true);
+    deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY, specifier.getCondition(), true);
 
     //when process is started
     ProcessInstance procInst = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);

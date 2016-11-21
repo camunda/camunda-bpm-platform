@@ -18,25 +18,21 @@
 package org.camunda.bpm.engine.impl.pvm.runtime;
 
 /**
- * Contains operations which are depending on each other.
- * That means the method/operation `operationWhichCanAffectExecution` is called as first
- * if the execution affects the current state the next method `continueOperation` is not called.
+ * Represents a callback which should be called after work was done. This interface is similar to the
+ * {@link java.util.concurrent.Callable} interface, with the exception that the callback method does not throw any
+ * catching exception. Without this restriction the caller does not have to catch any exception.
  *
+ * @param <P> the type of the callback parameter
+ * @param <R> the type of the callback result
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
-public interface DependingOperations {
+public interface Callback<P, R> {
 
   /**
-   * Contains an operation which can affect the current execution state.
+   * The callback which should be called/executed after work was done.
    *
-   * @param execution the execution which is used for the operation
+   * @param param the parameter for the callback
+   * @return the result of the callback
    */
-  void operationWhichCanAffectExecution(PvmExecutionImpl execution);
-
-  /**
-   * The operation which should be execution afterwards, if the execution state does not change.
-   *
-   * @param execution the execution which is used for the operation
-   */
-  void continueOperation(PvmExecutionImpl execution);
+  R callback(P param);
 }

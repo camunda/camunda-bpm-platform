@@ -54,6 +54,7 @@ public class MigrationCompensationInstanceVisitor extends MigratingProcessElemen
 
       compensationScopeExecution.setActivity((PvmActivity) scope);
       compensationScopeExecution.setActive(false);
+      compensationScopeExecution.activityInstanceStarting();
       compensationScopeExecution.enterActivityInstance();
 
       EventSubscriptionEntity eventSubscription = EventSubscriptionEntity.createAndInsert(parentExecution, EventType.COMPENSATE, (ActivityImpl) scope);

@@ -12,13 +12,14 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import java.io.Serializable;
-
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.camunda.bpm.engine.impl.pvm.runtime.operation.PvmAtomicOperationContinuation;
+import org.camunda.bpm.engine.impl.pvm.runtime.Callback;
+import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
+
+import java.io.Serializable;
 
 /**
  * @author Stefan Hentschel.
@@ -51,7 +52,7 @@ public abstract class AbstractVariableCmd implements Command<Void>, Serializable
 
     ExecutionEntity contextExecution = getContextExecution();
     if (contextExecution != null) {
-      contextExecution.dispatchDelayedEventsAndPerformOperation((PvmAtomicOperationContinuation) null);
+      contextExecution.dispatchDelayedEventsAndPerformOperation((Callback<PvmExecutionImpl, Void>) null);
     }
 
     if(!preventLogUserOperation) {

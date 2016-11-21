@@ -12,14 +12,14 @@
  */
 package org.camunda.bpm.engine.impl.pvm.runtime.operation;
 
-import static org.camunda.bpm.engine.impl.util.ActivityBehaviorUtil.getActivityBehavior;
-
 import org.camunda.bpm.engine.impl.pvm.PvmException;
 import org.camunda.bpm.engine.impl.pvm.PvmLogger;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
-import org.camunda.bpm.engine.impl.pvm.runtime.DependingOperations;
+import org.camunda.bpm.engine.impl.pvm.runtime.Callback;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
+
+import static org.camunda.bpm.engine.impl.util.ActivityBehaviorUtil.getActivityBehavior;
 
 /**
  * @author Tom Baeyens
@@ -35,16 +35,18 @@ public class PvmAtomicOperationActivityExecute implements PvmAtomicOperation {
   public void execute(PvmExecutionImpl execution) {
     execution.activityInstanceStarted();
 
-    execution.continueIfExecutionDoesNotAffectNextOperation(new DependingOperations() {
+    execution.continueIfExecutionDoesNotAffectNextOperation(new Callback<PvmExecutionImpl, Void>() {
       @Override
-      public void operationWhichCanAffectExecution(PvmExecutionImpl execution) {
+      public Void callback(PvmExecutionImpl execution) {
         if (execution.getActivity().isScope()) {
           execution.dispatchEvent(null);
         }
+        return null;
       }
+    }, new Callback<PvmExecutionImpl, Void>() {
 
       @Override
-      public void continueOperation(PvmExecutionImpl execution) {
+      public Void callback(PvmExecutionImpl execution) {
 
         ActivityBehavior activityBehavior = getActivityBehavior(execution);
 
@@ -58,6 +60,7 @@ public class PvmAtomicOperationActivityExecute implements PvmAtomicOperation {
         } catch (Exception e) {
           throw new PvmException("couldn't execute activity <" + activity.getProperty("type") + " id=\"" + activity.getId() + "\" ...>: " + e.getMessage(), e);
         }
+        return null;
       }
     }, execution);
   }
