@@ -19,6 +19,7 @@ package org.camunda.bpm.engine.test.bpmn.event.conditional;
 
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -472,6 +473,47 @@ public class TriggerConditionalEventOnStartAtActivityTest extends AbstractCondit
     assertEquals(1, taskService.createTaskQuery().taskDefinitionKey(TASK_AFTER_CONDITION_ID+3).count());
     assertEquals(1, taskService.createTaskQuery().taskDefinitionKey(TASK_AFTER_CONDITION_ID).count());
     assertEquals(4, conditionEventSubscriptionQuery.count());
+  }
+
+  @Test
+  @Ignore
+  public void testTwoInstructions() {
+    //given
+    BpmnModelInstance modelInstance =  Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
+      .startEvent("start")
+      .subProcess(SUB_PROCESS_ID)
+      .embeddedSubProcess()
+        .startEvent()
+        .userTask(TASK_BEFORE_CONDITION_ID)
+        .name(TASK_BEFORE_CONDITION)
+        .endEvent()
+      .subProcessDone()
+      .endEvent()
+      .moveToNode("start")
+      .subProcess(SUB_PROCESS_ID + 1)
+      .embeddedSubProcess()
+        .startEvent()
+        .userTask(TASK_BEFORE_CONDITION_ID + 1)
+        .name(TASK_BEFORE_CONDITION + 1)
+        .endEvent()
+      .subProcessDone()
+      .endEvent()
+      .done();
+    boolean isInterrupting = true;
+    modelInstance = addConditionalBoundaryEvent(modelInstance, SUB_PROCESS_ID, TASK_AFTER_CONDITION_ID, isInterrupting);
+    modelInstance = addConditionalBoundaryEvent(modelInstance, SUB_PROCESS_ID + 1, TASK_AFTER_CONDITION_ID + 1, isInterrupting);
+    engine.manageDeployment(repositoryService.createDeployment().addModelInstance(CONDITIONAL_MODEL, modelInstance).deploy());
+
+    //when
+    runtimeService.createProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY)
+      .startBeforeActivity(TASK_BEFORE_CONDITION_ID)
+      .setVariable(VARIABLE_NAME, "1")
+      .startBeforeActivity(TASK_BEFORE_CONDITION_ID + 1)
+      .executeWithVariablesInReturn();
+
+    //then
+    tasksAfterVariableIsSet = taskService.createTaskQuery().list();
+    assertTaskNames(tasksAfterVariableIsSet, TASK_AFTER_CONDITION_ID, TASK_AFTER_CONDITION_ID + 1);
   }
 
 
