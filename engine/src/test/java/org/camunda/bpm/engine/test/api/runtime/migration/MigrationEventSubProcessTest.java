@@ -13,7 +13,6 @@
 
 package org.camunda.bpm.engine.test.api.runtime.migration;
 
-import org.camunda.bpm.engine.impl.jobexecutor.TimerExecuteNestedActivityJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventSubprocessJobHandler;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.migration.MigrationPlan;
@@ -32,12 +31,15 @@ import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 import java.util.Date;
 import java.util.HashMap;
 
+import static org.camunda.bpm.engine.impl.migration.validation.instruction.ConditionalEventUpdateEventTriggerValidator.MIGRATION_CONDITIONAL_VALIDATION_ERROR_MSG;
 import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
+import static org.camunda.bpm.engine.test.api.runtime.migration.models.EventSubProcessModels.CONDITIONAL_EVENT_SUBPROCESS_PROCESS;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecutionTree;
 import static org.camunda.bpm.engine.test.util.MigrationPlanValidationReportAssert.assertThat;
@@ -53,6 +55,9 @@ public class MigrationEventSubProcessTest {
 
   protected ProcessEngineRule rule = new ProvidedProcessEngineRule();
   protected MigrationTestRule testHelper = new MigrationTestRule(rule);
+
+  @Rule
+  public ExpectedException exceptionRule = ExpectedException.none();
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(rule).around(testHelper);
@@ -376,6 +381,25 @@ public class MigrationEventSubProcessTest {
   }
 
   @Test
+  public void testMigrateConditionalBoundaryEventKeepTrigger() {
+    // given
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(CONDITIONAL_EVENT_SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(CONDITIONAL_EVENT_SUBPROCESS_PROCESS);
+
+    // expected migration validation exception
+    exceptionRule.expect(MigrationPlanValidationException.class);
+    exceptionRule.expectMessage(MIGRATION_CONDITIONAL_VALIDATION_ERROR_MSG);
+
+    // when conditional event sub process is migrated without update event trigger
+    rule.getRuntimeService()
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapActivities(USER_TASK_ID, USER_TASK_ID)
+      .mapActivities(EVENT_SUB_PROCESS_START_ID, EVENT_SUB_PROCESS_START_ID)
+      .build();
+  }
+
+
+  @Test
   public void testMigrateEventSubprocessChangeStartEventType() {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(EventSubProcessModels.SIGNAL_EVENT_SUBPROCESS_PROCESS);
@@ -643,7 +667,7 @@ public class MigrationEventSubProcessTest {
   public void testUpdateConditionalEventExpression() {
     // given
     BpmnModelInstance sourceProcess = EventSubProcessModels.FALSE_CONDITIONAL_EVENT_SUBPROCESS_PROCESS;
-    BpmnModelInstance targetProcess = modify(EventSubProcessModels.CONDITIONAL_EVENT_SUBPROCESS_PROCESS);
+    BpmnModelInstance targetProcess = modify(CONDITIONAL_EVENT_SUBPROCESS_PROCESS);
 
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);

@@ -29,28 +29,27 @@
  */
 package org.camunda.bpm.engine.test.api.runtime.migration;
 
-import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.migration.MigrationPlan;
+import org.camunda.bpm.engine.migration.MigrationPlanValidationException;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
-import org.camunda.bpm.engine.test.bpmn.event.conditional.SetVariableDelegate;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
-import static org.camunda.bpm.engine.test.api.runtime.migration.models.ConditionalModels.CONDITION_ID;
-import static org.camunda.bpm.engine.test.api.runtime.migration.models.ConditionalModels.USER_TASK_ID;
-import static org.camunda.bpm.engine.test.api.runtime.migration.models.ConditionalModels.VAR_CONDITION;
+import static org.camunda.bpm.engine.impl.migration.validation.instruction.ConditionalEventUpdateEventTriggerValidator.MIGRATION_CONDITIONAL_VALIDATION_ERROR_MSG;
+import static org.camunda.bpm.engine.test.api.runtime.migration.models.ConditionalModels.*;
 import static org.junit.Assert.assertNull;
 
 /**
  * @author Thorben Lindhauer
- *
+ * @author Christopher Zell
  */
 public class MigrationIntermediateConditionalEventTest {
 
@@ -58,9 +57,9 @@ public class MigrationIntermediateConditionalEventTest {
   public static final BpmnModelInstance ONE_CONDITION_PROCESS = ProcessModels.newModel()
     .startEvent()
     .intermediateCatchEvent(CONDITION_ID)
-    .conditionalEventDefinition()
-    .condition(VAR_CONDITION)
-    .conditionalEventDefinitionDone()
+      .conditionalEventDefinition("test")
+        .condition(VAR_CONDITION)
+      .conditionalEventDefinitionDone()
     .userTask(USER_TASK_ID)
     .endEvent()
     .done();
@@ -70,6 +69,9 @@ public class MigrationIntermediateConditionalEventTest {
   protected static final String NEW_VAR_CONDITION = "${variable == 2}";
   protected ProcessEngineRule rule = new ProvidedProcessEngineRule();
   protected MigrationTestRule testHelper = new MigrationTestRule(rule);
+
+  @Rule
+  public ExpectedException exceptionRule = ExpectedException.none();
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(rule).around(testHelper);
@@ -82,7 +84,7 @@ public class MigrationIntermediateConditionalEventTest {
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities(CONDITION_ID, CONDITION_ID)
+      .mapActivities(CONDITION_ID, CONDITION_ID).updateEventTrigger()
       .build();
 
     //when
@@ -98,21 +100,38 @@ public class MigrationIntermediateConditionalEventTest {
   }
 
   @Test
+  public void testMigrateConditionalEventWithoutUpdateTrigger() {
+    // given
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ONE_CONDITION_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(ONE_CONDITION_PROCESS);
+
+    //expect migration validation exception
+    exceptionRule.expect(MigrationPlanValidationException.class);
+    exceptionRule.expectMessage(MIGRATION_CONDITIONAL_VALIDATION_ERROR_MSG);
+
+    //when conditional event is migrated without update event trigger
+    rule.getRuntimeService()
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapActivities(CONDITION_ID, CONDITION_ID)
+      .build();
+  }
+
+  @Test
   public void testMigrateEventSubscriptionChangeCondition() {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(ONE_CONDITION_PROCESS);
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(Bpmn.createExecutableProcess()
       .startEvent()
       .intermediateCatchEvent(NEW_CONDITION_ID)
-      .conditionalEventDefinition()
-        .condition(NEW_VAR_CONDITION)
-      .conditionalEventDefinitionDone()
+        .conditionalEventDefinition()
+          .condition(NEW_VAR_CONDITION)
+        .conditionalEventDefinitionDone()
       .userTask(USER_TASK_ID)
       .done());
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities(CONDITION_ID, NEW_CONDITION_ID)
+      .mapActivities(CONDITION_ID, NEW_CONDITION_ID).updateEventTrigger()
       .build();
 
     // when

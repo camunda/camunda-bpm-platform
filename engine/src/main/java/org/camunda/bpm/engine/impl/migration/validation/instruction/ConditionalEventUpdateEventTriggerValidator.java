@@ -17,11 +17,7 @@
 
 package org.camunda.bpm.engine.impl.migration.validation.instruction;
 
-import org.camunda.bpm.engine.impl.bpmn.behavior.BoundaryEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.ConditionalEventBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.EventSubProcessStartEventActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
-import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 
 /**
@@ -29,23 +25,16 @@ import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
  */
 public class ConditionalEventUpdateEventTriggerValidator implements MigrationInstructionValidator {
 
+  public static final String MIGRATION_CONDITIONAL_VALIDATION_ERROR_MSG = "Conditional event has to migrate with update event trigger.";
+
   @Override
   public void validate(ValidatingMigrationInstruction instruction,
                        ValidatingMigrationInstructions instructions,
                        MigrationInstructionValidationReportImpl report) {
     ActivityImpl sourceActivity = instruction.getSourceActivity();
 
-    if (isEvent(sourceActivity)
-      && sourceActivity.getActivityBehavior() instanceof ConditionalEventBehavior
-      && !instruction.isUpdateEventTrigger()) {
-
-      report.addFailure("Conditional event has to migrate with update event trigger.");
+    if (sourceActivity.getActivityBehavior() instanceof ConditionalEventBehavior && !instruction.isUpdateEventTrigger()) {
+      report.addFailure(MIGRATION_CONDITIONAL_VALIDATION_ERROR_MSG);
     }
-  }
-
-  protected boolean isEvent(ActivityImpl activity) {
-    ActivityBehavior behavior = activity.getActivityBehavior();
-    return behavior instanceof BoundaryEventActivityBehavior
-      || behavior instanceof EventSubProcessStartEventActivityBehavior;
   }
 }

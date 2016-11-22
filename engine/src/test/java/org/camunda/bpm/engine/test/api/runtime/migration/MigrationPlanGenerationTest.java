@@ -13,6 +13,8 @@
 package org.camunda.bpm.engine.test.api.runtime.migration;
 
 import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
+import static org.camunda.bpm.engine.test.api.runtime.migration.models.ConditionalModels.CONDITION_ID;
+import static org.camunda.bpm.engine.test.api.runtime.migration.models.ConditionalModels.CONDITIONAL_PROCESS_KEY;
 import static org.camunda.bpm.engine.test.api.runtime.migration.models.ConditionalModels.BOUNDARY_ID;
 import static org.camunda.bpm.engine.test.api.runtime.migration.models.EventSubProcessModels.*;
 import static org.camunda.bpm.engine.test.util.MigrationPlanAssert.assertThat;
@@ -36,6 +38,7 @@ import org.camunda.bpm.engine.test.api.runtime.migration.models.ServiceTaskModel
 import org.camunda.bpm.engine.test.api.runtime.migration.models.TransactionModels;
 import org.camunda.bpm.engine.test.util.MigrationPlanAssert;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.UserTask;
 import org.junit.Rule;
@@ -945,6 +948,24 @@ public class MigrationPlanGenerationTest {
 
     // should not map eventSubProcess because it active compensation is not supported
   }
+
+  @Test
+  public void testMapIntermediateConditionalEvent() {
+    BpmnModelInstance sourceProcess = Bpmn.createExecutableProcess(CONDITIONAL_PROCESS_KEY)
+      .startEvent()
+      .intermediateCatchEvent(CONDITION_ID)
+        .condition(VAR_CONDITION)
+      .userTask(USER_TASK_ID)
+      .endEvent()
+      .done();
+
+    assertGeneratedMigrationPlan(sourceProcess, sourceProcess, false)
+      .hasInstructions(
+        migrate(CONDITION_ID).to(CONDITION_ID).updateEventTrigger(true),
+        migrate(USER_TASK_ID).to(USER_TASK_ID).updateEventTrigger(false)
+      );
+  }
+
 
   @Test
   public void testMapConditionalEventSubProcess() {

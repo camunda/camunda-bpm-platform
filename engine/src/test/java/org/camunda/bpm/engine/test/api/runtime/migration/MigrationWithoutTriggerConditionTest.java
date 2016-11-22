@@ -59,9 +59,9 @@ public class MigrationWithoutTriggerConditionTest {
       .embeddedSubProcess()
         .startEvent()
         .intermediateCatchEvent(CONDITION_ID)
-        .conditionalEventDefinition()
-         .condition(VAR_CONDITION)
-        .conditionalEventDefinitionDone()
+          .conditionalEventDefinition()
+           .condition(VAR_CONDITION)
+          .conditionalEventDefinitionDone()
         .userTask(TASK_AFTER_CONDITION_ID)
         .endEvent()
       .subProcessDone()
@@ -70,16 +70,16 @@ public class MigrationWithoutTriggerConditionTest {
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(Bpmn.createExecutableProcess()
       .startEvent()
       .intermediateCatchEvent(CONDITION_ID)
-      .conditionalEventDefinition()
-       .condition(VAR_CONDITION)
-      .conditionalEventDefinitionDone()
+        .conditionalEventDefinition()
+         .condition(VAR_CONDITION)
+        .conditionalEventDefinitionDone()
       .userTask(TASK_AFTER_CONDITION_ID)
       .endEvent()
       .done());
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities(CONDITION_ID, CONDITION_ID)
+      .mapActivities(CONDITION_ID, CONDITION_ID).updateEventTrigger()
       .build();
 
     //when sub process is removed, end listener is called and sets variable
