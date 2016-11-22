@@ -1146,48 +1146,45 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
     assertEquals(3, runtimeService.getVariable(processInstance.getId(), VARIABLE_NAME));
   }
 
-  @Ignore
+  @Test
   public void testTriggerAnotherEventSubprocess() {
+    //given process with user task
     BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(CONDITIONAL_EVENT_PROCESS_KEY)
       .startEvent()
       .userTask(TASK_WITH_CONDITION_ID).name(TASK_WITH_CONDITION)
       .endEvent().done();
 
-    //first event sub process
+    //and event sub process with true condition
     modelInstance = modify(modelInstance)
       .addSubProcessTo(CONDITIONAL_EVENT_PROCESS_KEY)
-      .id("eventSubProcess1")
       .triggerByEvent()
       .embeddedSubProcess()
-      .startEvent()
-      .interrupting(true)
-      .conditionalEventDefinition()
-      .condition(TRUE_CONDITION)
-      .conditionalEventDefinitionDone()
-      .userTask("taskAfterCond1")
-      .name(TASK_AFTER_CONDITION + 1)
-      .endEvent().done();
+        .startEvent()
+        .interrupting(true)
+        .conditionalEventDefinition()
+          .condition(TRUE_CONDITION)
+        .conditionalEventDefinitionDone()
+        .userTask(TASK_AFTER_CONDITION_ID + 1)
+          .name(TASK_AFTER_CONDITION + 1)
+        .endEvent()
+      .done();
+    //a second event sub process
+    deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY, false);
 
-     deployConditionalEventSubProcess(modelInstance, CONDITIONAL_EVENT_PROCESS_KEY, false);
-
-    //given
+    //when
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CONDITIONAL_EVENT_PROCESS_KEY);
     TaskQuery taskQuery = taskService.createTaskQuery().processInstanceId(processInstance.getId());
+
+    //then first event sub process is on starting of process instance triggered
     Task task = taskQuery.singleResult();
-    assertEquals(TASK_WITH_CONDITION, task.getName());
-
-    //when variable is set
-    runtimeService.setVariable(processInstance.getId(), "var", 1);
-
-    //then event sub process should be triggered
-    task = taskQuery.singleResult();
     assertEquals(TASK_AFTER_CONDITION + 1, task.getName());
 
-    //when variable is set, second condition becomes true -> second event sub process is triggered
-    runtimeService.setVariable(processInstance.getId(), "variable", 1);
+    //when variable is set, second condition becomes true -> but since first event sub process has
+    // interrupt the process instance the second event sub process can't be triggered
+    runtimeService.setVariable(processInstance.getId(), VARIABLE_NAME, 1);
     tasksAfterVariableIsSet = taskQuery.list();
     assertEquals(1, tasksAfterVariableIsSet.size());
-    assertEquals(TASK_AFTER_CONDITION, tasksAfterVariableIsSet.get(0).getName());
+    assertEquals(TASK_AFTER_CONDITION+1, tasksAfterVariableIsSet.get(0).getName());
   }
 
   @Test
