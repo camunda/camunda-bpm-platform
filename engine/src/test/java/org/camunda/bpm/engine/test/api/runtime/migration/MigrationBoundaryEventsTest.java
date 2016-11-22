@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ManagementService;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerExecuteNestedActivityJobHandler;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -450,7 +451,7 @@ public class MigrationBoundaryEventsTest {
   }
 
   @Test
-  public void testMigrateSignalBoundaryEventAndTriggerByOldValue() {
+  public void testMigrateSignalBoundaryEventKeepTrigger() {
     // given
     BpmnModelInstance sourceProcess = modify(ProcessModels.ONE_TASK_PROCESS)
         .activityBuilder(USER_TASK_ID)
@@ -496,7 +497,7 @@ public class MigrationBoundaryEventsTest {
   }
 
   @Test
-  public void testMigrateBoundaryEventAndTriggerByOldValue() {
+  public void testMigrateMessageBoundaryEventKeepTrigger() {
     // given
     BpmnModelInstance sourceProcess = modify(ProcessModels.ONE_TASK_PROCESS)
         .activityBuilder(USER_TASK_ID)
@@ -541,4 +542,48 @@ public class MigrationBoundaryEventsTest {
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
+
+  @Test
+  public void testMigrateTimerBoundaryEventKeepTrigger() {
+    // given
+    BpmnModelInstance sourceProcess = modify(ProcessModels.ONE_TASK_PROCESS)
+        .activityBuilder(USER_TASK_ID)
+          .boundaryEvent(BOUNDARY_ID).timerWithDuration("PT5S")
+          .userTask(AFTER_BOUNDARY_TASK)
+          .endEvent()
+        .done();
+    BpmnModelInstance targetProcess = modify(ProcessModels.ONE_TASK_PROCESS)
+      .activityBuilder(USER_TASK_ID)
+        .boundaryEvent(BOUNDARY_ID).timerWithDuration("PT10M")
+        .userTask(AFTER_BOUNDARY_TASK)
+        .endEvent()
+      .done();
+
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetProcess);
+
+    Map<String, String> activities = new HashMap<String, String>();
+    activities.put(USER_TASK_ID, USER_TASK_ID);
+    activities.put(BOUNDARY_ID, BOUNDARY_ID);
+
+    MigrationPlan migrationPlan = rule.getRuntimeService().createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapActivities(USER_TASK_ID, USER_TASK_ID)
+        .mapActivities(BOUNDARY_ID, BOUNDARY_ID)
+        .build();
+
+
+    // when
+    testHelper.createProcessInstanceAndMigrate(migrationPlan);
+
+    // then
+    testHelper.assertJobMigrated(BOUNDARY_ID, BOUNDARY_ID, TimerExecuteNestedActivityJobHandler.TYPE);
+
+    // and it is possible to trigger the event and successfully complete the migrated instance
+    ManagementService managementService = rule.getManagementService();
+    Job job = managementService.createJobQuery().singleResult();
+
+    managementService.executeJob(job.getId());
+    testHelper.completeTask(AFTER_BOUNDARY_TASK);
+    testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
+  }
 }

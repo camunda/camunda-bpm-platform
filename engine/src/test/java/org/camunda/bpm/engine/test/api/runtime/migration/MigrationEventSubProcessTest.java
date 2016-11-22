@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.engine.test.api.runtime.migration;
 
+import org.camunda.bpm.engine.impl.jobexecutor.TimerExecuteNestedActivityJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventSubprocessJobHandler;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.migration.MigrationPlan;
@@ -290,7 +291,7 @@ public class MigrationEventSubProcessTest {
   }
 
   @Test
-  public void testMigrateEventSubprocessMessageTrigger() {
+  public void testMigrateEventSubprocessMessageKeepTrigger() {
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(EventSubProcessModels.MESSAGE_EVENT_SUBPROCESS_PROCESS);
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(EventSubProcessModels.MESSAGE_EVENT_SUBPROCESS_PROCESS);
 
@@ -318,7 +319,7 @@ public class MigrationEventSubProcessTest {
   }
 
   @Test
-  public void testMigrateEventSubprocessTimerTrigger() {
+  public void testMigrateEventSubprocessTimerKeepTrigger() {
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(EventSubProcessModels.TIMER_EVENT_SUBPROCESS_PROCESS);
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(EventSubProcessModels.TIMER_EVENT_SUBPROCESS_PROCESS);
 
@@ -347,7 +348,7 @@ public class MigrationEventSubProcessTest {
   }
 
   @Test
-  public void testMigrateEventSubprocessSignalTrigger() {
+  public void testMigrateEventSubprocessSignalKeepTrigger() {
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(EventSubProcessModels.SIGNAL_EVENT_SUBPROCESS_PROCESS);
     ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(EventSubProcessModels.SIGNAL_EVENT_SUBPROCESS_PROCESS);
 
