@@ -26,7 +26,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
-public class TriggerConditionalEventOnStartAtActivity extends AbstractConditionalEventTestCase {
+public class TriggerConditionalEventOnStartAtActivityTest extends AbstractConditionalEventTestCase {
 
   @Test
   public void testTriggerGlobalEventSubProcess() {
