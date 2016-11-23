@@ -115,6 +115,8 @@
             version="v${project.version}"></footer>
 
     <script type="application/javascript">
+      var cockpitConf = window.cockpitConf = {};
+
       window.PLUGIN_DEPENDENCIES = $PLUGIN_DEPENDENCIES || [];
       window.PLUGIN_PACKAGES = $PLUGIN_PACKAGES || [];
 
@@ -124,6 +126,11 @@
     </script>
 
     <script type="text/javascript" src="$APP_ROOT/app/cockpit/scripts/config.js"></script>
+
+    <!--[if lte IE 9]><script type="text/javascript">
+      cockpitConf.polyfills = cockpitConf.polyfills || [];
+      cockpitConf.polyfills.push('placeholder');
+    </script><![endif]-->
 
     <script type="application/javascript"
             src="$APP_ROOT/lib/require.js"></script>
@@ -142,14 +149,5 @@ requirejs(['$APP_ROOT/lib/deps.js'], function () {
   requirejs(['$APP_ROOT/app/cockpit/camunda-cockpit-bootstrap.js'], function(){});
 });
     </script>
-
-    <!--[if lte IE 9]>
-    <script type="text/javascript"
-            src="$APP_ROOT/app/cockpit/scripts/placeholders.utils.js"></script>
-    <script type="text/javascript"
-            src="$APP_ROOT/app/cockpit/scripts/placeholders.main.js"></script>
-    <script type="text/javascript"
-            src="$APP_ROOT/app/cockpit/scripts/placeholders.jquery.js"></script>
-    <![endif]-->
   </body>
 </html>

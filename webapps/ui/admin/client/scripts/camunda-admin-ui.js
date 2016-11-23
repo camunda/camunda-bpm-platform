@@ -115,11 +115,11 @@ module.exports = function(pluginDependencies) {
       var appRoot = $('head base').attr('app-root');
 
       load([
-        appRoot + '/app/tasklist/scripts/placeholders.utils.js',
-        appRoot + '/app/tasklist/scripts/placeholders.main.js'
+        appRoot + '/app/admin/scripts/placeholders.utils.js',
+        appRoot + '/app/admin/scripts/placeholders.main.js'
       ], function() {
         load([
-          appRoot + '/app/tasklist/scripts/placeholders.jquery.js'
+          appRoot + '/app/admin/scripts/placeholders.jquery.js'
         ], function() {});
       });
     }
