@@ -27,16 +27,21 @@ import org.camunda.bpm.engine.impl.history.producer.DmnHistoryEventProducer;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 public class HistoryDecisionEvaluationListener implements DmnDecisionEvaluationListener {
 
   protected DmnHistoryEventProducer eventProducer;
   protected HistoryLevel historyLevel;
 
   public HistoryDecisionEvaluationListener(DmnHistoryEventProducer historyEventProducer, HistoryLevel historyLevel) {
+    ensureNotNull("historyLevel", historyLevel);
+    ensureNotNull("historyEventProducer", historyEventProducer);
     this.eventProducer = historyEventProducer;
     this.historyLevel = historyLevel;
   }
 
+  @Override
   public void notify(DmnDecisionEvaluationEvent evaluationEvent) {
    HistoryEvent historyEvent = createHistoryEvent(evaluationEvent);
 

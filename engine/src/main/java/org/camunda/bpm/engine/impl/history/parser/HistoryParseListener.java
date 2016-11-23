@@ -29,8 +29,11 @@ import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
 import org.camunda.bpm.engine.impl.task.TaskDefinition;
+import org.camunda.bpm.engine.impl.util.EnsureUtil;
 import org.camunda.bpm.engine.impl.util.xml.Element;
 import org.camunda.bpm.engine.impl.variable.VariableDeclaration;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * <p>This class is responsible for wiring history as execution listeners into process execution.
@@ -67,7 +70,10 @@ public class HistoryParseListener implements BpmnParseListener {
   protected HistoryLevel historyLevel;
 
   public HistoryParseListener(HistoryLevel historyLevel, HistoryEventProducer historyEventProducer) {
+    ensureNotNull("historyLevel", historyLevel);
+    ensureNotNull("historyEventProducer", historyEventProducer);
     this.historyLevel = historyLevel;
+
     initExecutionListeners(historyEventProducer, historyLevel);
   }
 
