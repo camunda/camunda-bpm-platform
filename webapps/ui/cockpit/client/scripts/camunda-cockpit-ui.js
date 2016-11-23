@@ -95,6 +95,25 @@ module.exports = function(pluginDependencies) {
       }
     }]);
 
+
+  if (typeof window.cockpitConf !== 'undefined' && window.cockpitConf.polyfills) {
+    var polyfills = window.cockpitConf.polyfills;
+
+    if (polyfills.indexOf('placeholder') > -1) {
+      var load = window.requirejs;
+      var appRoot = $('head base').attr('app-root');
+
+      load([
+        appRoot + '/app/cockpit/scripts/placeholders.utils.js',
+        appRoot + '/app/cockpit/scripts/placeholders.main.js'
+      ], function() {
+        load([
+          appRoot + '/app/cockpit/scripts/placeholders.jquery.js'
+        ], function() {});
+      });
+    }
+  }
+
   angular.bootstrap(document.documentElement, [ appNgModule.name, 'cam.cockpit.custom' ]);
 
   if (top !== window) {
