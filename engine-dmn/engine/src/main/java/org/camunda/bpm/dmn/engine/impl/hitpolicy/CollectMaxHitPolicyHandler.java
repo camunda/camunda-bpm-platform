@@ -17,10 +17,16 @@ import java.util.Collections;
 import java.util.List;
 
 import org.camunda.bpm.model.dmn.BuiltinAggregator;
+import org.camunda.bpm.model.dmn.HitPolicy;
 
 public class CollectMaxHitPolicyHandler extends AbstractCollectNumberHitPolicyHandler {
+  protected static final HitPolicyEntry HIT_POLICY = new HitPolicyEntry(HitPolicy.COLLECT, BuiltinAggregator.MAX);
 
   @Override
+  public HitPolicyEntry getHitPolicyEntry() {
+    return HIT_POLICY;
+  }
+
   protected BuiltinAggregator getAggregator() {
     return BuiltinAggregator.MAX;
   }

@@ -27,18 +27,12 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.camunda.bpm.model.dmn.BuiltinAggregator;
-import org.camunda.bpm.model.dmn.HitPolicy;
 
 public abstract class AbstractCollectNumberHitPolicyHandler implements DmnHitPolicyHandler {
 
   public static final DmnHitPolicyLogger LOG = DmnLogger.HIT_POLICY_LOGGER;
 
   protected abstract BuiltinAggregator getAggregator();
-
-  @Override
-  public HitPolicyEntry getHitPolicyEntry() {
-    return new HitPolicyEntry(HitPolicy.COLLECT, getAggregator());
-  }
 
   public DmnDecisionTableEvaluationEvent apply(DmnDecisionTableEvaluationEvent decisionTableEvaluationEvent) {
     String resultName = getResultName(decisionTableEvaluationEvent);

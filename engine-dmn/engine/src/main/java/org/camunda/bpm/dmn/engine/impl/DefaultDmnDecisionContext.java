@@ -43,6 +43,7 @@ public class DefaultDmnDecisionContext {
   protected static final DmnEngineLogger LOG = DmnEngineLogger.ENGINE_LOGGER;
 
   protected static final HitPolicyEntry COLLECT_HIT_POLICY = new HitPolicyEntry(HitPolicy.COLLECT, null);
+  protected static final HitPolicyEntry RULE_ORDER_HIT_POLICY = new HitPolicyEntry(HitPolicy.RULE_ORDER, null);
 
   protected final List<DmnDecisionEvaluationListener> evaluationListeners;
 
@@ -130,7 +131,7 @@ public class DefaultDmnDecisionContext {
 
     if (resultList.isEmpty()) {
       return;
-    } else if (resultList.size() == 1 && !isDecisionTableWithCollectHitPolicy(evaluatedDecision)) {
+    } else if (resultList.size() == 1 && !isDecisionTableWithCollectOrRuleOrderHitPolicy(evaluatedDecision)) {
       variableMap.putAll(evaluatedResult.getSingleResult());
     } else {
       Set<String> outputs = new HashSet<String>();
@@ -146,12 +147,13 @@ public class DefaultDmnDecisionContext {
     }
   }
 
-  protected boolean isDecisionTableWithCollectHitPolicy(DmnDecision evaluatedDecision) {
+  protected boolean isDecisionTableWithCollectOrRuleOrderHitPolicy(DmnDecision evaluatedDecision) {
     boolean isDecisionTableWithCollectHitPolicy = false;
 
     if (evaluatedDecision.isDecisionTable()) {
       DmnDecisionTableImpl decisionTable = (DmnDecisionTableImpl) evaluatedDecision.getDecisionLogic();
-      isDecisionTableWithCollectHitPolicy = COLLECT_HIT_POLICY.equals(decisionTable.getHitPolicyHandler().getHitPolicyEntry());
+      isDecisionTableWithCollectHitPolicy = COLLECT_HIT_POLICY.equals(decisionTable.getHitPolicyHandler().getHitPolicyEntry())
+        || RULE_ORDER_HIT_POLICY.equals(decisionTable.getHitPolicyHandler().getHitPolicyEntry());
     }
 
     return isDecisionTableWithCollectHitPolicy;

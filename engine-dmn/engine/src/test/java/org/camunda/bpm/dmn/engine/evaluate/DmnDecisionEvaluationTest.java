@@ -47,6 +47,7 @@ public class DmnDecisionEvaluationTest extends DmnEngineTest {
   public static final String DMN_DECISION_WITH_BEAN_INVOCATION_IN_LITERAL_EXPRESSION = "org/camunda/bpm/dmn/engine/evaluate/DecisionWithBeanInvocationInLiteralExpression.dmn";
 
   public static final String DRG_COLLECT_DMN = "org/camunda/bpm/dmn/engine/transform/DrgCollectTest.dmn";
+  public static final String DRG_RULE_ORDER_DMN = "org/camunda/bpm/dmn/engine/transform/DrgRuleOrderTest.dmn";
 
   @Test
   public void shouldEvaluateDrdDishDecisionExample() {
@@ -302,6 +303,18 @@ public class DmnDecisionEvaluationTest extends DmnEngineTest {
   @Test
   public void shouldEvaluateDecisionWithCollectHitPolicyReturningAList() {
     DmnDecisionRequirementsGraph graph = dmnEngine.parseDecisionRequirementsGraph(IoUtil.fileAsStream(DRG_COLLECT_DMN));
+    initVariables();
+    variables.putValue("dayType","WeekDay");
+
+    DmnDecisionResult result = dmnEngine.evaluateDecision(graph.getDecision("dish-decision"), variables);
+    assertThat(result.getSingleEntry())
+      .isNotNull()
+      .isEqualTo("Steak");
+  }
+
+  @Test
+  public void shouldEvaluateDecisionWithRuleOrderHitPolicyReturningAList() {
+    DmnDecisionRequirementsGraph graph = dmnEngine.parseDecisionRequirementsGraph(IoUtil.fileAsStream(DRG_RULE_ORDER_DMN));
     initVariables();
     variables.putValue("dayType","WeekDay");
 

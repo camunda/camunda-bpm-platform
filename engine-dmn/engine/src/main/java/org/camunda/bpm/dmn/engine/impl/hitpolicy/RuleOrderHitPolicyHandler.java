@@ -19,9 +19,11 @@ import org.camunda.bpm.model.dmn.HitPolicy;
 
 public class RuleOrderHitPolicyHandler implements DmnHitPolicyHandler {
 
+  protected static final HitPolicyEntry HIT_POLICY = new HitPolicyEntry(HitPolicy.RULE_ORDER, null);
+
   @Override
   public HitPolicyEntry getHitPolicyEntry() {
-    return new HitPolicyEntry(HitPolicy.RULE_ORDER, null);
+    return HIT_POLICY;
   }
 
   public DmnDecisionTableEvaluationEvent apply(DmnDecisionTableEvaluationEvent decisionTableEvaluationEvent) {
