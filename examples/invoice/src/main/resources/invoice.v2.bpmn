@@ -52,7 +52,7 @@
       <outgoing>reviewNotSuccessful</outgoing>
       <outgoing>reviewSuccessful</outgoing>
     </exclusiveGateway>
-    <userTask id="prepareBankTransfer" name="Prepare&#10;&#10;Bank&#10;&#10;Transfer" camunda:formKey="embedded:app:forms/prepare-bank-transfer.html" camunda:candidateGroups="accounting" camunda:dueDate="${dateTime().plusWeeks(1).toDate()}">
+    <userTask id="prepareBankTransfer" name="Prepare&#10;Bank&#10;Transfer" camunda:formKey="embedded:app:forms/prepare-bank-transfer.html" camunda:candidateGroups="accounting" camunda:dueDate="${dateTime().plusWeeks(1).toDate()}">
       <documentation>Prepare the bank transfer.</documentation>
       <incoming>invoiceApproved</incoming>
       <outgoing>SequenceFlow_2</outgoing>
