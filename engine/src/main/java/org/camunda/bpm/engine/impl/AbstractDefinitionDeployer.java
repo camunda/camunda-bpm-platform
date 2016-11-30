@@ -28,7 +28,7 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.model.Properties;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.Deployer;
-import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
+import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
 import org.camunda.bpm.engine.impl.repository.ResourceDefinitionEntity;
@@ -87,7 +87,7 @@ public abstract class AbstractDefinitionDeployer<DefinitionEntity extends Resour
   }
 
   /**
-   * @return the list of resource suffixes for this deployer
+   * @return the list of resource suffixes for this cacheDeployer
    */
   protected abstract String[] getResourcesSuffixes();
 

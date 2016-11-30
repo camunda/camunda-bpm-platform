@@ -10,22 +10,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.camunda.bpm.engine.impl.persistence.deploy;
-
-
-import org.camunda.commons.utils.cache.Cache;
-import org.camunda.commons.utils.cache.ConcurrentLruCache;
+package org.camunda.bpm.engine.impl.persistence;
 
 /**
- * <p>Provides the default cache implementation for the deployment caches see {@link DeploymentCache}.</p>
- *
- * @author Johannes Heinemann
+ * @author: Johannes Heinemann
  */
-public class DefaultCacheFactory implements CacheFactory{
+public interface AbstractResourceDefinitionManager<T> {
 
-  @Override
-  public <T> Cache<String, T> createCache(int maxNumberOfElementsInCache) {
-    return new ConcurrentLruCache<String, T>(maxNumberOfElementsInCache);
-  }
+  T findLatestDefinitionByKey(String key);
+
+  T findLatestDefinitionById(String id);
+
+  T findLatestDefinitionByKeyAndTenantId(String definitionKey, String tenantId);
+
+  T findDefinitionByKeyVersionAndTenantId(String definitionKey, Integer definitionVersion, String tenantId);
+
+  T findDefinitionByDeploymentAndKey(String deploymentId, String definitionKey);
+
+  T getCachedResourceDefinitionEntity(String definitionId);
+
 }

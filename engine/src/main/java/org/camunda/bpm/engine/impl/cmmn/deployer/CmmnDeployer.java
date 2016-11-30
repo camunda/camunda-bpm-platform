@@ -21,7 +21,7 @@ import org.camunda.bpm.engine.impl.cmmn.transformer.CmmnTransformer;
 import org.camunda.bpm.engine.impl.core.model.Properties;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.persistence.deploy.Deployer;
-import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
+import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
 

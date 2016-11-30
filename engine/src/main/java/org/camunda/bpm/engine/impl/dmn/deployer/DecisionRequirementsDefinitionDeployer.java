@@ -23,10 +23,10 @@ import org.camunda.bpm.engine.impl.AbstractDefinitionDeployer;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.core.model.Properties;
 import org.camunda.bpm.engine.impl.dmn.DecisionLogger;
-import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionManager;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionEntity;
+import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionManager;
 import org.camunda.bpm.engine.impl.persistence.deploy.Deployer;
-import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
+import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
 
@@ -42,7 +42,7 @@ public class DecisionRequirementsDefinitionDeployer extends AbstractDefinitionDe
 
   @Override
   protected String[] getResourcesSuffixes() {
-    // since the DecisionDefinitionDeployer uses the result of this deployer, make sure that
+    // since the DecisionDefinitionDeployer uses the result of this cacheDeployer, make sure that
     // it process the same DMN resources
     return DecisionDefinitionDeployer.DMN_RESOURCE_SUFFIXES;
   }
@@ -67,18 +67,18 @@ public class DecisionRequirementsDefinitionDeployer extends AbstractDefinitionDe
 
   @Override
   protected DecisionRequirementsDefinitionEntity findDefinitionByDeploymentAndKey(String deploymentId, String definitionKey) {
-    return getDecisionDefinitionManager().findDecisionRequirementsDefinitionByDeploymentAndKey(deploymentId, definitionKey);
+    return getDecisionRequirementsDefinitionManager().findDecisionRequirementsDefinitionByDeploymentAndKey(deploymentId, definitionKey);
   }
 
   @Override
   protected DecisionRequirementsDefinitionEntity findLatestDefinitionByKeyAndTenantId(String definitionKey, String tenantId) {
-    return getDecisionDefinitionManager().findLatestDecisionRequirementsDefinitionByKeyAndTenantId(definitionKey, tenantId);
+    return getDecisionRequirementsDefinitionManager().findLatestDecisionRequirementsDefinitionByKeyAndTenantId(definitionKey, tenantId);
   }
 
   @Override
   protected void persistDefinition(DecisionRequirementsDefinitionEntity definition) {
     if (isDecisionRequirementsDefinitionPersistable(definition)) {
-      getDecisionDefinitionManager().insertDecisionRequirementsDefinition(definition);
+      getDecisionRequirementsDefinitionManager().insertDecisionRequirementsDefinition(definition);
     }
   }
 
@@ -118,8 +118,8 @@ public class DecisionRequirementsDefinitionDeployer extends AbstractDefinitionDe
 
   //context ///////////////////////////////////////////////////////////////////////////////////////////
 
-  protected DecisionDefinitionManager getDecisionDefinitionManager() {
-    return getCommandContext().getDecisionDefinitionManager();
+  protected DecisionRequirementsDefinitionManager getDecisionRequirementsDefinitionManager() {
+    return getCommandContext().getDecisionRequirementsDefinitionManager();
   }
 
   // getters/setters ///////////////////////////////////////////////////////////////////////////////////

@@ -13,7 +13,7 @@
 
 package org.camunda.bpm.engine.test.api.cfg;
 
-import org.camunda.bpm.engine.impl.persistence.deploy.DefaultCacheFactory;
+import org.camunda.bpm.engine.impl.persistence.deploy.cache.DefaultCacheFactory;
 import org.camunda.commons.utils.cache.Cache;
 
 /**

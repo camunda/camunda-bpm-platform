@@ -12,23 +12,24 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.entity.repository;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
+import org.camunda.bpm.engine.impl.persistence.AbstractResourceDefinitionManager;
 import org.camunda.bpm.engine.repository.CaseDefinition;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class CaseDefinitionManager extends AbstractManager {
+public class CaseDefinitionManager extends AbstractManager implements AbstractResourceDefinitionManager<CaseDefinitionEntity> {
 
   protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
@@ -130,4 +131,33 @@ public class CaseDefinitionManager extends AbstractManager {
     return getTenantManager().configureQuery(parameter);
   }
 
+  @Override
+  public CaseDefinitionEntity findLatestDefinitionByKey(String key) {
+    return findLatestCaseDefinitionByKey(key);
+  }
+
+  @Override
+  public CaseDefinitionEntity findLatestDefinitionById(String id) {
+    return findCaseDefinitionById(id);
+  }
+
+  @Override
+  public CaseDefinitionEntity getCachedResourceDefinitionEntity(String definitionId) {
+    return getDbEntityManager().getCachedEntity(CaseDefinitionEntity.class, definitionId);
+  }
+
+  @Override
+  public CaseDefinitionEntity findLatestDefinitionByKeyAndTenantId(String definitionKey, String tenantId) {
+    return findLatestCaseDefinitionByKeyAndTenantId(definitionKey, tenantId);
+  }
+
+  @Override
+  public CaseDefinitionEntity findDefinitionByKeyVersionAndTenantId(String definitionKey, Integer definitionVersion, String tenantId) {
+    return findCaseDefinitionByKeyVersionAndTenantId(definitionKey, definitionVersion, tenantId);
+  }
+
+  @Override
+  public CaseDefinitionEntity findDefinitionByDeploymentAndKey(String deploymentId, String definitionKey) {
+    return findCaseDefinitionByDeploymentAndKey(deploymentId, definitionKey);
+  }
 }

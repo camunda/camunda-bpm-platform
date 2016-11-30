@@ -21,7 +21,7 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
+import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
 import org.camunda.bpm.engine.impl.repository.ResourceDefinitionEntity;
 import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
 
@@ -188,8 +188,8 @@ public class DecisionRequirementsDefinitionEntity extends DmnDecisionRequirement
 
     if (decisionRequirementsDefinition == null) {
       CommandContext commandContext = Context.getCommandContext();
-      DecisionDefinitionManager decisionDefinitionManager = commandContext.getDecisionDefinitionManager();
-      decisionRequirementsDefinition = decisionDefinitionManager.findDecisionRequirementsDefinitionById(decisionRequirementsDefinitionId);
+      DecisionRequirementsDefinitionManager manager = commandContext.getDecisionRequirementsDefinitionManager();
+      decisionRequirementsDefinition = manager.findDecisionRequirementsDefinitionById(decisionRequirementsDefinitionId);
 
       if (decisionRequirementsDefinition != null) {
         decisionRequirementsDefinition = deploymentCache.resolveDecisionRequirementsDefinition(decisionRequirementsDefinition);
@@ -217,7 +217,7 @@ public class DecisionRequirementsDefinitionEntity extends DmnDecisionRequirement
     if (previousDecisionRequirementsDefinitionId == null && !firstVersion) {
       previousDecisionRequirementsDefinitionId = Context
           .getCommandContext()
-          .getDecisionDefinitionManager()
+          .getDecisionRequirementsDefinitionManager()
           .findPreviousDecisionRequirementsDefinitionId(key, version, tenantId);
 
       if (previousDecisionRequirementsDefinitionId == null) {

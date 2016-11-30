@@ -13,11 +13,6 @@
 
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl;
@@ -30,8 +25,14 @@ import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.event.EventType;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
+import org.camunda.bpm.engine.impl.persistence.AbstractResourceDefinitionManager;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -40,7 +41,7 @@ import org.camunda.bpm.engine.runtime.Job;
  * @author Saeid Mirzaei
  * @author Christopher Zell
  */
-public class ProcessDefinitionManager extends AbstractManager {
+public class ProcessDefinitionManager extends AbstractManager implements AbstractResourceDefinitionManager<ProcessDefinitionEntity> {
 
   protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
@@ -114,14 +115,14 @@ public class ProcessDefinitionManager extends AbstractManager {
     return (ProcessDefinitionEntity) getDbEntityManager().selectOne("selectProcessDefinitionByDeploymentAndKey", parameters);
   }
 
-  public ProcessDefinition findProcessDefinitionByKeyVersionAndTenantId(String processDefinitionKey, Integer processDefinitionVersion, String tenantId) {
+  public ProcessDefinitionEntity findProcessDefinitionByKeyVersionAndTenantId(String processDefinitionKey, Integer processDefinitionVersion, String tenantId) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("processDefinitionVersion", processDefinitionVersion);
     parameters.put("processDefinitionKey", processDefinitionKey);
     parameters.put("tenantId", tenantId);
 
     @SuppressWarnings("unchecked")
-    List<ProcessDefinition> results = getDbEntityManager().selectList("selectProcessDefinitionByKeyVersionAndTenantId", parameters);
+    List<ProcessDefinitionEntity> results = getDbEntityManager().selectList("selectProcessDefinitionByKeyVersionAndTenantId", parameters);
     if (results.size() == 1) {
       return results.get(0);
     } else if (results.size() > 1) {
@@ -342,4 +343,33 @@ public class ProcessDefinitionManager extends AbstractManager {
     return getTenantManager().configureQuery(parameter);
   }
 
+  @Override
+  public ProcessDefinitionEntity findLatestDefinitionByKey(String key) {
+    return findLatestProcessDefinitionByKey(key);
+  }
+
+  @Override
+  public ProcessDefinitionEntity findLatestDefinitionById(String id) {
+    return findLatestProcessDefinitionById(id);
+  }
+
+  @Override
+  public ProcessDefinitionEntity getCachedResourceDefinitionEntity(String definitionId) {
+    return getDbEntityManager().getCachedEntity(ProcessDefinitionEntity.class, definitionId);
+  }
+
+  @Override
+  public ProcessDefinitionEntity findLatestDefinitionByKeyAndTenantId(String definitionKey, String tenantId) {
+    return findLatestProcessDefinitionByKeyAndTenantId(definitionKey, tenantId);
+  }
+
+  @Override
+  public ProcessDefinitionEntity findDefinitionByKeyVersionAndTenantId(String definitionKey, Integer definitionVersion, String tenantId) {
+    return findProcessDefinitionByKeyVersionAndTenantId(definitionKey, definitionVersion, tenantId);
+  }
+
+  @Override
+  public ProcessDefinitionEntity findDefinitionByDeploymentAndKey(String deploymentId, String definitionKey) {
+    return findProcessDefinitionByDeploymentAndKey(deploymentId, definitionKey);
+  }
 }

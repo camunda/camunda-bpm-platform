@@ -26,7 +26,7 @@ import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntit
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionManager;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.deploy.Deployer;
-import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
+import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
 
@@ -34,7 +34,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
  * {@link Deployer} responsible to parse DMN 1.1 XML files and create the proper
  * {@link DecisionDefinitionEntity}s. Since it uses the result of the
  * {@link DecisionRequirementsDefinitionDeployer} to avoid duplicated parsing, the DecisionRequirementsDefinitionDeployer must
- * process the deployment before this deployer.
+ * process the deployment before this cacheDeployer.
  */
 public class DecisionDefinitionDeployer extends AbstractDefinitionDeployer<DecisionDefinitionEntity> {
 
