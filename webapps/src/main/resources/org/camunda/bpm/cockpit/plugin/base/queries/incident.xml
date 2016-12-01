@@ -25,7 +25,7 @@
     <result property="rootCauseIncidentMessage" column="ROOT_INC_MSG_" jdbcType="VARCHAR" />
     <result property="rootCauseIncidentConfiguration" column="ROOT_INC_CONF_" jdbcType="VARCHAR" />
   </resultMap>
-  
+
   <select id="selectIncidentWithCauseAndRootCauseIncidentsCount" parameterType="org.camunda.bpm.cockpit.impl.plugin.base.dto.query.IncidentQueryDto"
            resultType="long">
     select count(distinct RES.ID_)
@@ -37,7 +37,7 @@
     ${limitBefore}
     select ${distinct} RES.* ${limitBetween}
     <include refid="selectIncidents" />
-    ${orderBy}
+    <if test="orderBy != null">       order by ${orderBy}     </if>
     ${limitAfter}
   </select>
 
@@ -75,14 +75,14 @@
           </if>
 
           <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
-            <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" /> 
+            <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" />
             AUTH ON (AUTH.RESOURCE_ID_ in (RES.PROC_INST_ID_, PROCDEF.KEY_, '*'))
           </if>
 
           <where>
             <!-- processInstanceIds -->
             <if test="processInstanceIdIn != null &amp;&amp; processInstanceIdIn.length > 0">
-              and 
+              and
               <foreach item="item" index="index" collection="processInstanceIdIn"
                        open="(" separator="or" close=")">
                 RES.PROC_INST_ID_ = #{item}
@@ -91,7 +91,7 @@
 
             <!-- activityIds -->
             <if test="activityIdIn != null &amp;&amp; activityIdIn.length > 0">
-              and 
+              and
               <foreach item="item" index="index" collection="activityIdIn"
                        open="(" separator="or" close=")">
                 RES.ACTIVITY_ID_ = #{item}
