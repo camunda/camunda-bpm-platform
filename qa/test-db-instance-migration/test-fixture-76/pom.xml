@@ -167,7 +167,7 @@
                 </goals>
                 <configuration>
                   <propertyPrefix>camunda.current</propertyPrefix>
-                  <versionString>${camunda.version.current}</versionString>
+                  <versionString>7.6.0</versionString>
                 </configuration>
               </execution>
               <execution>
@@ -212,29 +212,6 @@
                     <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}_to_${camunda.current.majorVersion}.${camunda.current.minorVersion}.sql</srcFile>
                     <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_identity_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}_to_${camunda.current.majorVersion}.${camunda.current.minorVersion}.sql</srcFile>
                   </srcFiles>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>exec-maven-plugin</artifactId>
-            <configuration>
-              <cleanupDaemonThreads>false</cleanupDaemonThreads>
-              <includeProjectDependencies>true</includeProjectDependencies>
-              <includePluginDependencies>false</includePluginDependencies>
-              <classpathScope>test</classpathScope>
-            </configuration>
-            <executions>
-              <execution>
-                <id>create-test-fixture</id>
-                <goals>
-                  <goal>java</goal>
-                </goals>
-                <phase>process-test-classes</phase>
-                <configuration>
-                  <mainClass>org.camunda.bpm.qa.upgrade.TestFixture</mainClass>
-                  <includePluginDependencies>true</includePluginDependencies>
                 </configuration>
               </execution>
             </executions>
