@@ -52,7 +52,7 @@
         ${constant.null.startTime}
         </if>
         <include refid="selectProcessInstances"/>
-        <if test="orderBy != null">       order by ${orderBy}     </if>
+        ${orderBy}
         ${innerLimitAfter}
       ) INSTANCE
     <!-- The set of process instances will be (left) joined with a set of incidents. -->
@@ -231,7 +231,7 @@
           resultMap="calledProcessInstanceMap">
     select distinct RES.ID_, EXEC1.ACT_INST_ID_, EXEC1.ACT_ID_, PROC_.ID_ AS SUPER_PROC_DEF_ID_, PROC_.KEY_, PROC_.NAME_
     <include refid="selectCalledProcessInstancesByCriteria" />
-    <if test="orderBy != null">       order by ${orderBy}     </if>
+    ${orderBy}
   </select>
 
   <sql id="selectCalledProcessInstancesByCriteria">

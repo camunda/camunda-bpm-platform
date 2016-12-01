@@ -37,7 +37,7 @@
     ${limitBefore}
     select ${distinct} RES.* ${limitBetween}
     <include refid="selectIncidents" />
-    <if test="orderBy != null">       order by ${orderBy}     </if>
+    ${orderBy}
     ${limitAfter}
   </select>
 

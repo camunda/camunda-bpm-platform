@@ -37,7 +37,7 @@
     select distinct RES.ID_, RES.KEY_, RES.NAME_, RES.VERSION_, EXEC2.ACT_ID_
     <include refid="selectCalledProcesses"/>
     group by RES.ID_, RES.KEY_, RES.NAME_, RES.VERSION_, EXEC2.ACT_ID_
-    <if test="orderBy != null">       order by ${orderBy}     </if>
+    ${orderBy}
   </select>
 
   <sql id="selectCalledProcesses">
