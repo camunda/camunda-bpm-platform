@@ -37,7 +37,7 @@
     select distinct RES.ID_, RES.KEY_, RES.NAME_, RES.VERSION_, EXEC2.ACT_ID_
     <include refid="selectCalledProcesses"/>
     group by RES.ID_, RES.KEY_, RES.NAME_, RES.VERSION_, EXEC2.ACT_ID_
-    ${orderBy}
+    <if test="orderBy != null">       order by ${orderBy}     </if>
   </select>
 
   <sql id="selectCalledProcesses">
@@ -59,7 +59,7 @@
     </if>
 
     <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
-      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" /> 
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" />
       AUTH ON (AUTH.RESOURCE_ID_ in (EXEC2.PROC_INST_ID_, PROCDEF.KEY_, '*'))
     </if>
 
@@ -114,7 +114,7 @@
       <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
       and EXISTS (
         select
-          ID_    
+          ID_
         from
           ${prefix}ACT_RU_VARIABLE
         where
@@ -123,7 +123,7 @@
           and NAME_= #{queryVariableValue.name}
 
         <if test="queryVariableValue.valueConditions != null">
-          and 
+          and
           <if test="queryVariableValue.operatorName.equals('NOT_EQUALS')">NOT</if><!-- NOT_EQUALS uses the same conditions as EQUALS -->
           (
           <foreach collection="queryVariableValue.valueConditions" item="valueCondition" separator="or">
