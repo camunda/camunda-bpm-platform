@@ -31,7 +31,6 @@ import org.camunda.bpm.dmn.engine.impl.spi.el.ElExpression;
 import org.camunda.bpm.dmn.engine.impl.spi.el.ElProvider;
 import org.camunda.bpm.dmn.feel.impl.FeelEngine;
 import org.camunda.bpm.engine.variable.context.VariableContext;
-import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.camunda.commons.utils.StringUtil;
 
 public class ExpressionEvaluationHandler {
@@ -123,7 +122,7 @@ public class ExpressionEvaluationHandler {
     }
   }
 
-  protected TypedValue evaluateFeelSimpleExpression(String expressionText, VariableContext variableContext) {
+  protected Object evaluateFeelSimpleExpression(String expressionText, VariableContext variableContext) {
     return feelEngine.evaluateSimpleExpression(expressionText, variableContext);
   }
 
