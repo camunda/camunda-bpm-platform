@@ -60,7 +60,7 @@
     select ${distinct} RES.* 
     ${limitBetween}
     <include refid="selectUserByQueryCriteriaSql" />
-    <if test="orderBy != null">       order by ${orderBy}     </if>
+    ${orderBy}
     ${limitAfter}
   </select>
   

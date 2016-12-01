@@ -188,7 +188,7 @@
     </if>
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderBySelection"/> 
     <include refid="selectTaskByQueryCriteriaSql"/>
-    <if test="orderBy != null">       order by ${orderBy}     </if>
+    ${orderBy}
     ${limitAfter}
   </select>
 

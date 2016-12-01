@@ -72,7 +72,7 @@ public class DbSqlSessionFactory implements SessionFactory {
 
   static {
 
-    String defaultOrderBy = "${orderBy} ";
+    String defaultOrderBy = " order by ${orderBy} ";
 
     // h2
     databaseSpecificLimitBeforeStatements.put(H2, "");

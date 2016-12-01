@@ -98,7 +98,7 @@
     select RES.*
     ${limitBetween}
     <include refid="selectHistoricDecisionInstancesByQueryCriteriaSql"/>
-    <if test="orderBy != null">       order by ${orderBy}     </if>
+    ${orderBy}
     ${limitAfter}
   </select>
 

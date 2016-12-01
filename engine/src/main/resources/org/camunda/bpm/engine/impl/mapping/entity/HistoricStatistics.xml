@@ -33,7 +33,7 @@
     select RES.*
     ${limitBetween}
     <include refid="selectHistoricActivityStatisticsByQueryCriteriaSql"/>
-    <if test="orderBy != null">       order by ${orderBy}     </if>
+    ${orderBy}
     ${limitAfter}
   </select>
 
@@ -139,7 +139,7 @@
     select RES.*
     ${limitBetween}
     <include refid="selectHistoricCaseActivityStatisticsByQueryCriteriaSql"/>
-    <if test="orderBy != null">       order by ${orderBy}     </if>
+    ${orderBy}
     ${limitAfter}
   </select>
 
