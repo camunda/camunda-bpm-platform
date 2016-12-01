@@ -433,6 +433,11 @@ public class DevProcessApplication extends ServletProcessApplication {
       offset--;
       calendar.add(Calendar.MONTH, 1);
       ClockUtil.setCurrentTime(calendar.getTime());
+
+      if (calendar.get(Calendar.YEAR) > currentYear) {
+        break;
+      }
+
     }
 
     ClockUtil.reset();
