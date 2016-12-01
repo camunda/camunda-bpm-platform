@@ -153,7 +153,7 @@
         )
       </if>
     <if test="parameter.applyOrdering">
-      ${orderBy}
+      <if test="orderBy != null">       order by ${orderBy}     </if>
     </if>
     ${limitAfter}
   </select>
@@ -211,7 +211,7 @@
     select ${distinct} RES.*
     ${limitBetween}
     <include refid="selectJobByQueryCriteriaSql"/>
-    ${orderBy}
+    <if test="orderBy != null">       order by ${orderBy}     </if>
     ${limitAfter}
   </select>
 

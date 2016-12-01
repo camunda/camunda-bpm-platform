@@ -154,7 +154,7 @@
     select ${distinct} RES.*
     ${limitBetween}
     <include refid="selectProcessDefinitionsByQueryCriteriaSql"/>
-    ${orderBy}
+    <if test="orderBy != null">       order by ${orderBy}     </if>
     ${limitAfter}
   </select>
 
@@ -334,7 +334,7 @@
     select ${distinct} RES.*
     ${limitBetween}
     <include refid="selectProcessDefinitionsByQueryCriteriaSql"/>
-    ${orderBy}
+    <if test="orderBy != null">       order by ${orderBy}     </if>
     ${limitAfter}
   </select>
 

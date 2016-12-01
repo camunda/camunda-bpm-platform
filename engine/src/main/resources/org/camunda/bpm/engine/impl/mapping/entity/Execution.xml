@@ -165,7 +165,7 @@
     ${limitBetween}
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderBySelection"/>
     <include refid="selectExecutionsByQueryCriteriaSql"/>
-    ${orderBy}
+    <if test="orderBy != null">       order by ${orderBy}     </if>
     ${limitAfter}
   </select>
   
@@ -181,7 +181,7 @@
     ${limitBetween}
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderBySelection"/>
     <include refid="selectProcessInstanceByQueryCriteriaSql"/>
-    ${orderBy}
+    <if test="orderBy != null">       order by ${orderBy}     </if>
     ${limitAfter}
   </select>
   

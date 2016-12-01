@@ -158,7 +158,7 @@
         and OPERATION_TYPE_ in ('AddAttachment',
                                 'DeleteAttachment')
     ) RES
-    ${orderBy}
+    <if test="orderBy != null">       order by ${orderBy}     </if>
     ${limitAfter}
   </sql>
 
