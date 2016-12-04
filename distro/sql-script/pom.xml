@@ -121,6 +121,10 @@
 
                 <mkdir dir="target/sql/create" />
 
+                <concat destfile="target/sql/create/as400_engine_${project.version}.sql" fixlastline="yes">
+                  <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/create" files="activiti.as400.create.engine.sql activiti.as400.create.case.engine.sql activiti.as400.create.decision.engine.sql activiti.as400.create.history.sql activiti.as400.create.case.history.sql activiti.as400.create.decision.history.sql" />
+                </concat>
+
                 <concat destfile="target/sql/create/db2_engine_${project.version}.sql" fixlastline="yes">
                   <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/create" files="activiti.db2.create.engine.sql activiti.db2.create.case.engine.sql activiti.db2.create.decision.engine.sql activiti.db2.create.history.sql activiti.db2.create.case.history.sql activiti.db2.create.decision.history.sql" />
                 </concat>
@@ -162,6 +166,10 @@
                 <!-- drop -->
 
                 <mkdir dir="target/sql/drop" />
+
+                <concat destfile="target/sql/drop/as400_engine_${project.version}.sql" fixlastline="yes">
+                  <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/drop" files="activiti.as400.drop.decision.engine.sql activiti.as400.drop.case.engine.sql activiti.as400.drop.engine.sql activiti.as400.drop.decision.history.sql activiti.as400.drop.case.history.sql activiti.as400.drop.history.sql" />
+                </concat>
 
                 <concat destfile="target/sql/drop/db2_engine_${project.version}.sql" fixlastline="yes">
                   <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/drop" files="activiti.db2.drop.decision.engine.sql activiti.db2.drop.case.engine.sql activiti.db2.drop.engine.sql activiti.db2.drop.decision.history.sql activiti.db2.drop.case.history.sql activiti.db2.drop.history.sql" />
@@ -223,6 +231,23 @@
             <configuration>
               <target>
                 <!-- create concatenated patch scripts for easier testing -->
+                <!-- as400 patches -->
+                <concat destfile="target/upgrade-test/sql/upgrade/as400_engine_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch.sql" fixlastline="yes">
+                  <fileset dir="upgrade" includes="as400_engine_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch*.sql" />
+                </concat>
+
+                <concat destfile="target/upgrade-test/sql/upgrade/as400_identity_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch.sql" fixlastline="yes">
+                  <fileset dir="upgrade" includes="as400_identity_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch*.sql" />
+                </concat>
+
+                <concat destfile="target/upgrade-test/sql/upgrade/as400_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch.sql" fixlastline="yes">
+                  <fileset dir="upgrade" includes="as400_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch*.sql" />
+                </concat>
+
+                <concat destfile="target/upgrade-test/sql/upgrade/as400_identity_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch.sql" fixlastline="yes">
+                  <fileset dir="upgrade" includes="as400_identity_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch*.sql" />
+                </concat>
+
                 <!-- db2 patches -->
                 <concat destfile="target/upgrade-test/sql/upgrade/db2_engine_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch.sql" fixlastline="yes">
                   <fileset dir="upgrade" includes="db2_engine_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch*.sql" />
