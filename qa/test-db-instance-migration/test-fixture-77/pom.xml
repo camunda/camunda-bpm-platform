@@ -3,13 +3,13 @@
 
   <parent>
     <groupId>org.camunda.bpm.qa.upgrade</groupId>
-    <artifactId>camunda-qa-db-rolling-update</artifactId>
+    <artifactId>camunda-qa-db-instance-migration</artifactId>
     <version>7.7.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>camunda-qa-db-create-new-engine</artifactId>
+  <artifactId>camunda-qa-upgrade-test-fixture-77</artifactId>
   <packaging>jar</packaging>
-  <name>camunda BPM - QA - upgrade - rolling update - create new engine</name>
+  <name>camunda BPM - QA - upgrade - instance migration - test fixture - 7.7.0</name>
 
   <properties>
     <camunda.version.current>${project.version}</camunda.version.current>
@@ -26,7 +26,7 @@
 
     <dependency>
       <groupId>org.camunda.bpm.qa.upgrade</groupId>
-      <artifactId>camunda-qa-db-rolling-update-util</artifactId>
+      <artifactId>camunda-qa-upgrade-scenario-util</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>
@@ -78,7 +78,7 @@
 
   <profiles>
     <profile>
-      <id>rolling-update</id>
+      <id>instance-migration</id>
       <build>
         <plugins>
           <plugin>
@@ -184,33 +184,9 @@
               </execution>
             </executions>
           </plugin>
-
-
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>exec-maven-plugin</artifactId>
-            <configuration>
-              <cleanupDaemonThreads>false</cleanupDaemonThreads>
-              <includeProjectDependencies>true</includeProjectDependencies>
-              <includePluginDependencies>false</includePluginDependencies>
-              <classpathScope>test</classpathScope>
-            </configuration>
-            <executions>
-              <execution>
-                <id>create-test-fixture</id>
-                <goals>
-                  <goal>java</goal>
-                </goals>
-                <phase>process-test-classes</phase>
-                <configuration>
-                  <mainClass>org.camunda.bpm.qa.rolling.update.TestNewEngineMain</mainClass>
-                  <includePluginDependencies>true</includePluginDependencies>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
         </plugins>
       </build>
     </profile>
   </profiles>
+
 </project>

@@ -18,7 +18,7 @@
          See CAM-6338
     -->
     <camunda.version.old>
-      7.5.3-ee
+      7.6.0
     </camunda.version.old>
   </properties>
 

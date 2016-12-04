@@ -19,6 +19,7 @@
     <module>test-fixture-74</module>
     <module>test-fixture-75</module>
     <module>test-fixture-76</module>
+    <module>test-fixture-77</module>
     <module>test-migration</module>
   </modules>
   <build>
@@ -26,7 +27,7 @@
       <plugins>
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
-          <artifactId>sql-maven-plugin</artifactId>       
+          <artifactId>sql-maven-plugin</artifactId>
           <configuration>
             <keepFormat>false</keepFormat>
           </configuration>
