@@ -1238,8 +1238,8 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
 
     ActivityImpl currentActivity = getActivity();
 
-    return !(startContext != null && startContext.isDelayFireHistoricVariableEvents())
-        && !(currentActivity != null && isAsyncStartEvent(currentActivity));
+    return (startContext == null || !startContext.isDelayFireHistoricVariableEvents())
+      && (currentActivity == null || currentActivity.isEntered() || !isAsyncStartEvent(currentActivity));
   }
 
   protected boolean isAsyncStartEvent(ActivityImpl activity) {

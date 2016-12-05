@@ -54,6 +54,7 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
 
   protected boolean isAsyncBefore;
   protected boolean isAsyncAfter;
+  protected boolean isEntered;
 
   public ActivityImpl(String id, ProcessDefinitionImpl processDefinition) {
     super(id, processDefinition);
@@ -160,6 +161,14 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
     if (delegateAsyncAfterUpdate != null)
       delegateAsyncAfterUpdate.updateAsyncAfter(isAsyncAfter, exclusive);
     this.isAsyncAfter = isAsyncAfter;
+  }
+
+  public boolean isEntered() {
+    return isEntered;
+  }
+
+  public void setEntered(boolean entered) {
+    isEntered = entered;
   }
 
   public String getActivityId() {
