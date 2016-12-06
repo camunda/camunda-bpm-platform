@@ -77,12 +77,11 @@
   <!-- Process Definition Statistics -->  
   <select id ="selectProcessDefinitionStatistics" resultMap="processDefinitionStatisticsResultMap" 
     parameterType="org.camunda.bpm.engine.impl.ProcessDefinitionStatisticsQueryImpl">
-    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
     select ${distinct} RES.*
     ${limitBetween}
     <include refid="selectProcessDefinitionStatisticsByQueryCriteriaSql"/>
-    ${orderBy}
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderByStatement"/>
     ${limitAfter}
   </select>
 
@@ -194,12 +193,11 @@
   <!-- Deployment statistics -->
   <select id ="selectDeploymentStatistics" resultMap="deploymentStatisticsResultMap"
     parameterType="org.camunda.bpm.engine.impl.DeploymentStatisticsQueryImpl">
-    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
     select ${distinct} RES.*
     ${limitBetween}
     <include refid="selectDeploymentStatisticsByQueryCriteriaSql"/>
-    ${orderBy}
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderByStatement"/>
     ${limitAfter}
   </select>
 
@@ -355,12 +353,11 @@
 
   <select id ="selectActivityStatistics" resultMap="activityStatisticsResultMap" 
     parameterType="org.camunda.bpm.engine.impl.ActivityStatisticsQueryImpl">
-    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
     select ${distinct} RES.*
     ${limitBetween}
     <include refid="selectActivityStatisticsByQueryCriteriaSql"/>
-    ${orderBy}
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderByStatement"/>
     ${limitAfter}
   </select>
 
@@ -609,12 +606,11 @@
 
   <!-- Batch Statistics -->
   <select id ="selectBatchStatistics" resultMap="batchStatisticsResultMap" parameterType="org.camunda.bpm.engine.impl.batch.BatchStatisticsQueryImpl">
-    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
     select ${distinct} RES.*
     ${limitBetween}
     <include refid="selectBatchStatisticsByQueryCriteriaSql"/>
-    ${orderBy}
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderByStatement"/>
     ${limitAfter}
   </select>
 
@@ -685,12 +681,11 @@
   <!-- DRD Statistics -->
 
   <select id ="selectDecisionDefinitionStatistics" resultMap="decisionDefinitionStatisticsResultMap" parameterType="org.camunda.bpm.engine.impl.HistoricDecisionInstanceStatisticsQueryImpl">
-    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
     select ${distinct} RES.*
     ${limitBetween}
     <include refid="selectDecisionDefinitionStatisticsByQueryCriteriaSql"/>
-    ${orderBy}
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderByStatement"/>
     ${limitAfter}
   </select>
 

@@ -110,12 +110,11 @@
   </select>
 
   <select id="selectUserOperationLogEntriesByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.UserOperationLogQueryImpl" resultMap="UserOperationLogResultMap">
-    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
     select ${distinct} RES.*
     ${limitBetween}
     <include refid="selectUserOperationLogEntriesByQueryCriteriaSql"/>
-    ${orderBy}
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderByStatement"/>
     ${limitAfter}
   </select>
 

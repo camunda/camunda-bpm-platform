@@ -55,12 +55,11 @@
   </select>
 
   <select id="selectDeploymentsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.DeploymentQueryImpl" resultMap="deploymentResultMap">
-  	<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
     select ${distinct} RES.*
     ${limitBetween}
     <include refid="selectDeploymentsByQueryCriteriaSql"/>
-    ${orderBy}
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderByStatement"/>
     ${limitAfter}
   </select>
 
@@ -127,12 +126,11 @@
 
   <!-- mysql specific -->
   <select id="selectDeploymentsByQueryCriteria_mysql" parameterType="org.camunda.bpm.engine.impl.DeploymentQueryImpl" resultMap="deploymentResultMap">
-    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
     select ${distinct} RES.*
     ${limitBetween}
     <include refid="selectDeploymentsByQueryCriteriaSql"/>
-   	${orderBy}
+   	<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderByStatement"/>
     ${limitAfter}
   </select>
 

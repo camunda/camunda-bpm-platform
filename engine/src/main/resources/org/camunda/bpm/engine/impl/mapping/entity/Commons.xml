@@ -81,22 +81,9 @@
   </sql>
   
   <!-- Ordering -->
-  
-  <!-- Input: property "orderingProperties", a collection of OrderingProperty objects -->
-  <!-- Output: property "orderBy", filled with ordering constraints -->
-  <!-- Example Output: V0_TEXT_ asc, RES.ID_ desc, RES.NAME_ asc -->
-  <sql id="bindOrderBy">
-    <foreach collection="orderingProperties" item="orderingProperty" index="index">
-      <bind name="newOrderBy" value="
-        @org.camunda.bpm.engine.impl.db.sql.MybatisJoinHelper@orderBy(orderingProperty, index)" />
-      
-      <if test="index == 0">
-        <bind name="orderBy" value="newOrderBy"/>
-      </if>
-      <if test="index > 0">
-        <bind name="orderBy" value="orderBy + ', ' + newOrderBy"/>
-      </if>
-    </foreach>
+
+  <sql id="orderByStatement">
+    order by ${@org.camunda.bpm.engine.impl.db.sql.MybatisJoinHelper@orderBy(orderingProperties)}
   </sql>
   
   <!-- Input: property "orderingProperties", a collection of OrderingProperty objects -->

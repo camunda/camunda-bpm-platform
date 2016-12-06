@@ -153,12 +153,11 @@
   </select>
 
   <select id="selectHistoricVariableInstanceByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricVariableInstanceQueryImpl" resultMap="historicVariableInstanceResultMap">
-  	<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
     select RES.*
     ${limitBetween}
     <include refid="selectHistoricVariableInstanceByQueryCriteriaSql"/>
-    ${orderBy}
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderByStatement"/>
     ${limitAfter}
   </select>
 
@@ -168,12 +167,11 @@
   </select>
 
   <select id="selectHistoricVariableInstanceByQueryCriteria_postgres" parameterType="org.camunda.bpm.engine.impl.HistoricVariableInstanceQueryImpl" resultMap="historicVariableInstanceResultMap_postgres">
-    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
     select RES.*
     ${limitBetween}
     <include refid="selectHistoricVariableInstanceByQueryCriteriaSql"/>
-    ${orderBy}
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderByStatement"/>
     ${limitAfter}
   </select>
 

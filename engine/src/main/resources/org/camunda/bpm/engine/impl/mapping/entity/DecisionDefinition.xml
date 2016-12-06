@@ -169,12 +169,11 @@
   </select>
 
   <select id="selectDecisionDefinitionsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionQueryImpl" resultMap="decisionDefinitionResultMap">
-    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
     select ${distinct} RES.*
     ${limitBetween}
     <include refid="selectDecisionDefinitionsByQueryCriteriaSql"/>
-    ${orderBy}
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderByStatement"/>
     ${limitAfter}
   </select>
 
@@ -185,12 +184,11 @@
 
   <!-- mysql specific sql -->
   <select id="selectDecisionDefinitionsByQueryCriteria_mysql" parameterType="org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionQueryImpl" resultMap="decisionDefinitionResultMap">
-    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
     select ${distinct} RES.*
     ${limitBetween}
     <include refid="selectDecisionDefinitionsByQueryCriteriaSql"/>
-    ${orderBy}
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderByStatement"/>
     ${limitAfter}
   </select>
 

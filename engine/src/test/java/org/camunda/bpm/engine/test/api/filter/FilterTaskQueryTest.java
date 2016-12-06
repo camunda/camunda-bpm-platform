@@ -918,23 +918,6 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     verifyOrderingProperties(expectedOrderingProperties, query.getOrderingProperties());
   }
 
-  /**
-   * Tests compatibility with serialization format that was used in 7.2
-   */
-  @SuppressWarnings("deprecation")
-  public void testDeprecatedOrderingFormatDeserializationDefault() {
-    String defaultOrderBy = ListQueryParameterObject.DEFAULT_ORDER_BY;
-
-    JsonTaskQueryConverter converter = (JsonTaskQueryConverter) FilterEntity.queryConverter.get(EntityTypes.TASK);
-    JSONObject queryJson = converter.toJsonObject(filter.<TaskQuery>getQuery());
-
-    // when I apply default ordering in its deprecated format (i.e. ORDER_BY property is missing)
-    TaskQueryImpl deserializedTaskQuery = (TaskQueryImpl) converter.toObject(queryJson);
-
-    // then the default ordering is applied to the query
-    assertTrue(deserializedTaskQuery.getOrderingProperties().isEmpty());
-    assertEquals(defaultOrderBy, deserializedTaskQuery.getOrderBy());
-  }
 
   /**
    * Tests compatibility with serialization format that was used in 7.2

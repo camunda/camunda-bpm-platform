@@ -158,7 +158,7 @@
         and OPERATION_TYPE_ in ('AddAttachment',
                                 'DeleteAttachment')
     ) RES
-    ${orderBy}
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderByStatement"/>
     ${limitAfter}
   </sql>
 

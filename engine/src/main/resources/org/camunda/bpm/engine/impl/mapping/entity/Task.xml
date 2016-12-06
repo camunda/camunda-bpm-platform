@@ -178,7 +178,6 @@
   </select>
 
   <select id="selectTaskByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.TaskQueryImpl" resultMap="taskResultMap">
-    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
     select ${distinct}
     <include refid="columnSelection"/>
@@ -188,7 +187,7 @@
     </if>
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderBySelection"/> 
     <include refid="selectTaskByQueryCriteriaSql"/>
-    ${orderBy}
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderByStatement"/>
     ${limitAfter}
   </select>
 

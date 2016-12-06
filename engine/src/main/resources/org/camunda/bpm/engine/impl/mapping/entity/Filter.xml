@@ -87,22 +87,20 @@
   </select>
 
   <select id="selectFilterByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.filter.FilterQueryImpl" resultMap="filterResultMap">
-    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
     select ${distinct} RES.*
     ${limitBetween}
     <include refid="selectFilterByQueryCriteriaSql" />
-    ${orderBy}
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderByStatement"/>
     ${limitAfter}
   </select>
 
   <select id="selectFilterByQueryCriteria_postgres" parameterType="org.camunda.bpm.engine.impl.filter.FilterQueryImpl" resultMap="filterResultMap_postgres">
-    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
     select ${distinct} RES.*
     ${limitBetween}
     <include refid="selectFilterByQueryCriteriaSql" />
-    ${orderBy}
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderByStatement"/>
     ${limitAfter}
   </select>
 
@@ -110,13 +108,12 @@
     <!--
     SEE: https://app.camunda.com/jira/browse/CAM-6014
      -->
-    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     SELECT RES.*, J.QUERY_, J.PROPERTIES_ FROM (
       ${limitBefore}
       select ${distinct} RES.ID_, RES.REV_, RES.RESOURCE_TYPE_, RES.NAME_, RES.OWNER_
       ${limitBetweenFilter}
       <include refid="selectFilterByQueryCriteriaSql" />
-      ${orderBy}
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderByStatement"/>
       ${limitAfter}
     ) RES
     INNER JOIN ${prefix}ACT_RU_FILTER J ON RES.ID_ = J.ID_

@@ -28,12 +28,11 @@
 
   <select id ="selectHistoricActivityStatistics" resultMap="historicActivityStatisticsResultMap" 
     parameterType="org.camunda.bpm.engine.impl.HistoricActivityStatisticsQueryImpl">
-    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
     select RES.*
     ${limitBetween}
     <include refid="selectHistoricActivityStatisticsByQueryCriteriaSql"/>
-    ${orderBy}
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderByStatement"/>
     ${limitAfter}
   </select>
 
@@ -134,12 +133,12 @@
 
   <select id ="selectHistoricCaseActivityStatistics" resultMap="historicCaseActivityStatisticsResultMap" 
     parameterType="org.camunda.bpm.engine.impl.HistoricCaseActivityStatisticsQueryImpl">
-    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
+
     ${limitBefore}
     select RES.*
     ${limitBetween}
     <include refid="selectHistoricCaseActivityStatisticsByQueryCriteriaSql"/>
-    ${orderBy}
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderByStatement"/>
     ${limitAfter}
   </select>
 
