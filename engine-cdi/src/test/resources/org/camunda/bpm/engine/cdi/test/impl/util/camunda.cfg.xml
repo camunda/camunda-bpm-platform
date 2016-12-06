@@ -7,6 +7,7 @@
 	<bean id="processEngineConfiguration"
 		class="org.camunda.bpm.engine.cdi.CdiStandaloneProcessEngineConfiguration">
 
+		<property name="processEngineName" value="myCustomEngine"/>
         <property name="jdbcUrl" value="jdbc:h2:mem:activiti" />
 		<property name="databaseSchemaUpdate" value="true" />				
 		<property name="jobExecutorActivate" value="false" />

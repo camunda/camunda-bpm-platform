@@ -33,6 +33,8 @@ import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 
+import java.util.List;
+
 /**
  * Makes the managed process engine and the provided services available for injection
  *
@@ -49,10 +51,13 @@ public class ProcessEngineServicesProducer {
     ProcessEngine processEngine =  BpmPlatform.getProcessEngineService().getDefaultProcessEngine();
     if(processEngine != null) {
       return processEngine;
-
     } else {
-      return ProcessEngines.getDefaultProcessEngine(false);
-
+      List<ProcessEngine> processEngines = BpmPlatform.getProcessEngineService().getProcessEngines();
+      if (processEngines != null && !processEngines.isEmpty()) {
+        return processEngines.get(0);
+      } else {
+        return ProcessEngines.getDefaultProcessEngine(false);
+      }
     }
 
   }
