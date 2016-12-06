@@ -22,8 +22,8 @@ var AbbreviateNumberFilter = function() {
       // 2 decimal places => 100, 3 => 1000, etc
     decimal = Math.pow(10, decimal);
 
-      // Enumerate number abbreviations
-    var abbreviations = [ 'k', 'm', 'b', 't' ];
+      // Enumerate number abbreviations according to https://en.wikipedia.org/wiki/Yotta-
+    var abbreviations = [ 'k', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y' ];
 
       // Go through the array backwards, so we do the largest first
     for (var i = abbreviations.length - 1; i >= 0; i--) {
