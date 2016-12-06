@@ -37,6 +37,7 @@ var Controller = [ '$scope', 'processData', 'ProcessDefinitionResource',
 
           // iterate over assigned statistics
           angular.forEach(statistics, function(currentStatistic) {
+
             // get the statistics to the definition key of the current item
             var statisticsForDefinition = statisticsResult[currentStatistic.definition.key];
 
@@ -66,27 +67,21 @@ var Controller = [ '$scope', 'processData', 'ProcessDefinitionResource',
               result.push(statistic);
 
             } else {
-              // First save the values of instances, failedJobs and incidents.
-              var currentInstances = statistic.instances;
-              var currentFailedJobs = statistics.failedJobs;
-              var currentIncidents = angular.copy(statistic.incidents);
-
               if (currentStatistic.definition.version > statistic.definition.version) {
                 // if the version of the current statistic, then create copy from them.
-                angular.copy(currentStatistic, statistic);
+                statistic.definition = currentStatistic.definition;
+                statistic.id = currentStatistic.id;
 
-                if (!statistic.definition.name) {
-                  // if there does not exist a name then set definition key
-                  // as the name of the definition.
-                  statistic.definition.name = statistic.definition.key;
-                }
+                // if there does not exist a name then set definition key
+                // as the name of the definition.
+                statistic.definition.name = statistic.definition.name || statistic.definition.key;
               }
 
               // Add the saved values to the corresponding values of the current statistic
-              statistic.instances = currentInstances + currentStatistic.instances;
-              statistic.failedJobs = currentFailedJobs + currentStatistic.failedJobs;
+              statistic.instances += currentStatistic.instances;
+              statistic.failedJobs += currentStatistic.failedJobs;
 
-              angular.forEach(currentIncidents, function(incident) {
+              angular.forEach(currentStatistic.incidents, function(incident) {
                 var incidentType = incident.incidentType;
                 var incidentCount = incident.incidentCount;
 
