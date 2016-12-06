@@ -13,7 +13,6 @@
 
 package org.camunda.bpm.qa.performance.engine.steps;
 
-import org.camunda.bpm.qa.performance.engine.framework.PerfTestRun;
 import org.camunda.bpm.qa.performance.engine.framework.PerfTestRunContext;
 import org.camunda.bpm.qa.performance.engine.framework.PerfTestStepBehavior;
 

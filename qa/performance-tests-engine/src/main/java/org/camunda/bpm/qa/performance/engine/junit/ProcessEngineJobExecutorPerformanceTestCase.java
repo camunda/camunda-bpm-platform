@@ -23,6 +23,7 @@ public abstract class ProcessEngineJobExecutorPerformanceTestCase extends Proces
 
   protected JobExecutor jobExecutor;
 
+  @Override
   @Before
   public void setup() {
     super.setup();

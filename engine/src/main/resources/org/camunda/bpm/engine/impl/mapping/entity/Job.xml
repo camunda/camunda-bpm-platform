@@ -151,25 +151,34 @@
         </if>
         )
       </if>
+
+      and (<include refid="AtomicExclusiveOrNonExclusiveJobs"/>)
+
     <if test="parameter.applyOrdering">
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderByStatement"/>
     </if>
     ${limitAfter}
   </select>
 
-  <select id="selectExclusiveJobsToExecute" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
-  	${limitBefore}
-    select distinct RES.*
-    ${limitBetween}
-    from ${prefix}ACT_RU_JOB RES
-    where (RETRIES_ &gt; 0)
-      and (DUEDATE_ is null or DUEDATE_ &lt;= #{parameter.now, jdbcType=TIMESTAMP})
-      and (LOCK_OWNER_ is null or LOCK_EXP_TIME_ &lt; #{parameter.now, jdbcType=TIMESTAMP})
-      and (EXCLUSIVE_ = ${trueConstant})
-      and (PROCESS_INSTANCE_ID_ = #{parameter.pid})
-      and RES.SUSPENSION_STATE_ = 1
-    ${limitAfter}
-  </select>
+  <sql id="AtomicExclusiveOrNonExclusiveJobs">
+    (<include refid="AtomicExclusiveJobs"/>)
+    or
+    <include refid="NonExclusiveJobs"/>
+  </sql>
+
+  <sql id="AtomicExclusiveJobs">
+    RES.EXCLUSIVE_ = ${trueConstant}
+          and not exists(
+            select J2.* from ${prefix}ACT_RU_JOB J2
+            where J2.PROCESS_INSTANCE_ID_ = RES.PROCESS_INSTANCE_ID_                                           -- from the same proc. inst.
+            and (J2.EXCLUSIVE_ = ${trueConstant})                                                              -- also exclusive
+            and (J2.LOCK_OWNER_ is not null and J2.LOCK_EXP_TIME_ &gt;= #{parameter.now, jdbcType=TIMESTAMP})  -- in progress
+            )
+  </sql>
+
+  <sql id="NonExclusiveJobs">
+    RES.EXCLUSIVE_ = ${falseConstant}
+  </sql>
 
   <select id="selectJobsByConfiguration" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
       select * from ${prefix}ACT_RU_JOB

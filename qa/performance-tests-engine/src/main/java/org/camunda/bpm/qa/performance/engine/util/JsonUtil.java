@@ -67,7 +67,8 @@ public class JsonUtil {
       mapper = new ObjectMapper();
       SerializationConfig config = mapper
           .getSerializationConfig()
-          .withSerializationInclusion(Inclusion.NON_EMPTY);
+          .withSerializationInclusion(Inclusion.NON_EMPTY)
+          .without(SerializationConfig.Feature.FAIL_ON_EMPTY_BEANS);
       mapper.setSerializationConfig(config);
 
     }

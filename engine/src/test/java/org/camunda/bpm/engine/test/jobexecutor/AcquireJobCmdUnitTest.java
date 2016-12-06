@@ -13,18 +13,6 @@
 
 package org.camunda.bpm.engine.test.jobexecutor;
 
-import static org.hamcrest.CoreMatchers.hasItem;
-import static org.hamcrest.CoreMatchers.hasItems;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.cmd.AcquireJobsCmd;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
@@ -36,6 +24,15 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobManager;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Arrays;
+import java.util.List;
+
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 public class AcquireJobCmdUnitTest {
 
   protected final static String PROCESS_INSTANCE_ID_1 = "pi_1";
@@ -43,7 +40,6 @@ public class AcquireJobCmdUnitTest {
 
   protected static final String JOB_ID_1 = "job_1";
   protected static final String JOB_ID_2 = "job_2";
-  protected static final String JOB_ID_3 = "job_3";
 
   protected AcquireJobsCmd acquireJobsCmd;
   protected JobManager jobManager;
@@ -68,32 +64,41 @@ public class AcquireJobCmdUnitTest {
   }
 
   @Test
-  public void nonExclusiveJobs() {
+  public void nonExclusiveJobsSameInstance() {
+    // given: two non-exclusive jobs for a different process instance
     JobEntity job1 = createNonExclusiveJob(JOB_ID_1, PROCESS_INSTANCE_ID_1);
     JobEntity job2 = createNonExclusiveJob(JOB_ID_2, PROCESS_INSTANCE_ID_1);
 
+    // when the job executor acquire new jobs
     when(jobManager.findNextJobsToExecute(any(Page.class))).thenReturn(Arrays.asList(job1, job2));
-    when(jobManager.findExclusiveJobsToExecute(PROCESS_INSTANCE_ID_1)).thenReturn(Collections.<JobEntity> emptyList());
 
-    AcquiredJobs acquiredJobs = acquireJobsCmd.execute(commandContext);
-
-    List<List<String>> jobIdBatches = acquiredJobs.getJobIdBatches();
-    assertThat(jobIdBatches.size(), is(2));
-    assertThat(jobIdBatches.get(0).size(), is(1));
-    assertThat(jobIdBatches.get(0), hasItem(JOB_ID_1));
-    assertThat(jobIdBatches.get(1).size(), is(1));
-    assertThat(jobIdBatches.get(1), hasItem(JOB_ID_2));
+    // then the job executor should acquire job1 and job 2 in different batches
+    checkThatAcquiredJobsInDifferentBatches();
   }
 
   @Test
-  public void exclusiveJobs() {
+  public void nonExclusiveDifferentInstance() {
+    // given: two non-exclusive jobs for the same process instance
+    JobEntity job1 = createNonExclusiveJob(JOB_ID_1, PROCESS_INSTANCE_ID_1);
+    JobEntity job2 = createNonExclusiveJob(JOB_ID_2, PROCESS_INSTANCE_ID_2);
+
+    // when the job executor acquire new jobs
+    when(jobManager.findNextJobsToExecute(any(Page.class))).thenReturn(Arrays.asList(job1, job2));
+
+    // then the job executor should acquire job1 and job 2 in different batches
+    checkThatAcquiredJobsInDifferentBatches();
+  }
+
+  @Test
+  public void exclusiveJobsSameInstance() {
+    // given: two exclusive jobs for the same process instance
     JobEntity job1 = createExclusiveJob(JOB_ID_1, PROCESS_INSTANCE_ID_1);
     JobEntity job2 = createExclusiveJob(JOB_ID_2, PROCESS_INSTANCE_ID_1);
-    List<JobEntity> jobs = Arrays.asList(job1, job2);
 
-    when(jobManager.findNextJobsToExecute(any(Page.class))).thenReturn(jobs);
-    when(jobManager.findExclusiveJobsToExecute(PROCESS_INSTANCE_ID_1)).thenReturn(jobs);
+    // when the job executor acquire new jobs
+    when(jobManager.findNextJobsToExecute(any(Page.class))).thenReturn(Arrays.asList(job1, job2));
 
+    // then the job executor should acquire job1 and job 2 in one batch
     AcquiredJobs acquiredJobs = acquireJobsCmd.execute(commandContext);
 
     List<List<String>> jobIdBatches = acquiredJobs.getJobIdBatches();
@@ -103,48 +108,16 @@ public class AcquireJobCmdUnitTest {
   }
 
   @Test
-  public void exclusiveJobsConcurrentLockSameInstance() {
-    // given: two exclusive jobs for the same process instance and two job executors
-    JobEntity job1 = createExclusiveJob(JOB_ID_1, PROCESS_INSTANCE_ID_1);
-    JobEntity job2 = createExclusiveJob(JOB_ID_2, PROCESS_INSTANCE_ID_1);
-
-    // when the job executor acquire new jobs
-    when(jobManager.findNextJobsToExecute(any(Page.class))).thenReturn(Arrays.asList(job1, job2));
-    // and job2 is locked by the other job executor concurrently
-    when(jobManager.findExclusiveJobsToExecute(PROCESS_INSTANCE_ID_1)).thenReturn(Collections.singletonList(job1));
-    // - note that job1 was not locked by the other job executor because it was locked before. The job execution failed
-    // and the job was unlocked before this job executor starts to acquire jobs.
-
-    // then the job executor should acquire job1
-    AcquiredJobs acquiredJobs = acquireJobsCmd.execute(commandContext);
-
-    List<List<String>> jobIdBatches = acquiredJobs.getJobIdBatches();
-    assertThat(jobIdBatches.size(), is(1));
-    assertThat(jobIdBatches.get(0).size(), is(1));
-    assertThat(jobIdBatches.get(0), hasItem(JOB_ID_1));
-  }
-
-  @Test
-  public void exclusiveJobsConcurrentLockDifferentInstance() {
-    // given: two exclusive jobs for the same process instance and two job executors
+  public void exclusiveJobsDifferentInstance() {
+    // given: two exclusive jobs for a different process instance
     JobEntity job1 = createExclusiveJob(JOB_ID_1, PROCESS_INSTANCE_ID_1);
     JobEntity job2 = createExclusiveJob(JOB_ID_2, PROCESS_INSTANCE_ID_2);
 
     // when the job executor acquire new jobs
     when(jobManager.findNextJobsToExecute(any(Page.class))).thenReturn(Arrays.asList(job1, job2));
-    when(jobManager.findExclusiveJobsToExecute(PROCESS_INSTANCE_ID_1)).thenReturn(Collections.singletonList(job1));
-    // job2 is locked by the other job executor concurrently
-    // and a new job is created which belongs to the same instance as job2
-    JobEntity job3 = createExclusiveJob(JOB_ID_3, PROCESS_INSTANCE_ID_2);
-    when(jobManager.findExclusiveJobsToExecute(PROCESS_INSTANCE_ID_2)).thenReturn(Collections.singletonList(job3));
 
-    // then the job executor should only acquire job1
-    AcquiredJobs acquiredJobs = acquireJobsCmd.execute(commandContext);
-
-    List<List<String>> jobIdBatches = acquiredJobs.getJobIdBatches();
-    assertThat(jobIdBatches.size(), is(1));
-    assertThat(jobIdBatches.get(0).size(), is(1));
-    assertThat(jobIdBatches.get(0), hasItem(JOB_ID_1));
+    // then the job executor should acquire job1 and job 2 in different batches
+    checkThatAcquiredJobsInDifferentBatches();
   }
 
   protected JobEntity createExclusiveJob(String id, String processInstanceId) {
@@ -158,6 +131,15 @@ public class AcquireJobCmdUnitTest {
     when(job.getId()).thenReturn(id);
     when(job.getProcessInstanceId()).thenReturn(processInstanceId);
     return job;
+  }
+
+  protected void checkThatAcquiredJobsInDifferentBatches() {
+    AcquiredJobs acquiredJobs = acquireJobsCmd.execute(commandContext);
+
+    List<List<String>> jobIdBatches = acquiredJobs.getJobIdBatches();
+    assertThat(jobIdBatches.size(), is(2));
+    assertThat(jobIdBatches.get(0).size(), is(1));
+    assertThat(jobIdBatches.get(1).size(), is(1));
   }
 
 }

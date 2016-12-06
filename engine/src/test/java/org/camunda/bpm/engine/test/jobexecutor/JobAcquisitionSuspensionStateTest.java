@@ -1,11 +1,5 @@
 package org.camunda.bpm.engine.test.jobexecutor;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.List;
-
 import org.apache.ibatis.session.SqlSession;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
@@ -17,6 +11,12 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobManager;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.List;
 
 /**
  * <p>This testcase verifies that jobs inserted without suspension state are active by default</p>
@@ -115,7 +115,7 @@ public class JobAcquisitionSuspensionStateTest extends PluggableProcessEngineTes
         assertEquals(myCustomTimerEntity, executableJobs.get(0).getJobHandlerConfigurationRaw());
         assertEquals(SuspensionState.ACTIVE.getStateCode(), executableJobs.get(0).getSuspensionState());
 
-        executableJobs = jobManager.findExclusiveJobsToExecute(processInstanceId);
+        executableJobs = jobManager.findJobsByProcessInstanceId(processInstanceId);
         assertEquals(1, executableJobs.size());
         assertEquals(myCustomTimerEntity, executableJobs.get(0).getJobHandlerConfigurationRaw());
         assertEquals(SuspensionState.ACTIVE.getStateCode(), executableJobs.get(0).getSuspensionState());

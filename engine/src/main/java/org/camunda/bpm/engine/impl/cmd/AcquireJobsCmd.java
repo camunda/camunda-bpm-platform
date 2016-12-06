@@ -12,11 +12,6 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.List;
-
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.entitymanager.OptimisticLockingListener;
@@ -28,6 +23,8 @@ import org.camunda.bpm.engine.impl.jobexecutor.AcquiredJobs;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+
+import java.util.*;
 
 
 /**
@@ -58,19 +55,27 @@ public class AcquireJobsCmd implements Command<AcquiredJobs>, OptimisticLockingL
       .getJobManager()
       .findNextJobsToExecute(new Page(0, numJobsToAcquire));
 
+    Map<String, List<String>> exclusiveJobsByProcessInstance = new HashMap<String, List<String>>();
+
     for (JobEntity job : jobs) {
 
-      if (job != null && !acquiredJobs.contains(job.getId())) {
+      lockJob(job);
 
-        if (job.isExclusive() && job.getProcessInstanceId() != null) {
-          List<String> jobIds = lockExclusiveJobs(commandContext, job);
-          acquiredJobs.addJobIdBatch(jobIds);
-
-        } else {
-          lockJob(job);
-          acquiredJobs.addJobIdBatch(job.getId());
+      if(job.isExclusive()) {
+        List<String> list = exclusiveJobsByProcessInstance.get(job.getProcessInstanceId());
+        if (list == null) {
+          list = new ArrayList<String>();
+          exclusiveJobsByProcessInstance.put(job.getProcessInstanceId(), list);
         }
+        list.add(job.getId());
       }
+      else {
+        acquiredJobs.addJobIdBatch(job.getId());
+      }
+    }
+
+    for (List<String> jobIds : exclusiveJobsByProcessInstance.values()) {
+      acquiredJobs.addJobIdBatch(jobIds);
     }
 
     // register an OptimisticLockingListener which is notified about jobs which cannot be acquired.
@@ -79,27 +84,8 @@ public class AcquireJobsCmd implements Command<AcquiredJobs>, OptimisticLockingL
       .getDbEntityManager()
       .registerOptimisticLockingListener(this);
 
+
     return acquiredJobs;
-  }
-
-  protected List<String> lockExclusiveJobs(CommandContext commandContext, JobEntity job) {
-    List<String> jobIds = new ArrayList<String>();
-
-    // acquire all exclusive jobs in the same process instance
-    // (includes the current job)
-    List<JobEntity> exclusiveJobs = commandContext.getJobManager().findExclusiveJobsToExecute(job.getProcessInstanceId());
-    // ensure that the job is not locked by another job executor concurrently
-    if (exclusiveJobs.contains(job)) {
-
-      for (JobEntity exclusiveJob : exclusiveJobs) {
-
-        if (exclusiveJob != null && !acquiredJobs.contains(exclusiveJob.getId())) {
-          lockJob(exclusiveJob);
-          jobIds.add(exclusiveJob.getId());
-        }
-      }
-    }
-    return jobIds;
   }
 
   protected void lockJob(JobEntity job) {
