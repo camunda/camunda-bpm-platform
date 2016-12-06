@@ -1727,4 +1727,26 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
     assertThat(historyService.createHistoricVariableInstanceQuery().count(), is (2L));
     repositoryService.deleteDeployment(deployment.getId(),true);
   }
+
+  public void testSetVariableInStartListenerOfAsyncStartEvent () throws Exception {
+    //given
+    BpmnModelInstance subProcess = Bpmn.createExecutableProcess("process")
+      .startEvent()
+      .camundaAsyncBefore()
+      .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_START, SubProcessActivityStartListener.class.getName())
+      .endEvent()
+      .done();
+
+    org.camunda.bpm.engine.repository.Deployment deployment = repositoryService.createDeployment()
+      .addModelInstance("process.bpmn", subProcess)
+      .deploy();
+
+    //when
+    runtimeService.startProcessInstanceByKey("process", Variables.createVariables().putValue("executionListenerCounter",1));
+    managementService.executeJob(managementService.createJobQuery().active().singleResult().getId());
+
+    //then
+    assertThat(historyService.createHistoricVariableInstanceQuery().count(), is (2L));
+    repositoryService.deleteDeployment(deployment.getId(),true);
+  }
 }
