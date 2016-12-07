@@ -8,8 +8,7 @@ require('camunda-commons-ui/lib/util/index');
 
 var navigationModule = angular.module('cam.tasklist.navigation', [
   require('camunda-commons-ui/lib/util/index').name,
-  'ui.bootstrap',
-  'cam.tasklist.user'
+  'ui.bootstrap'
 ]);
 
 navigationModule.controller('camHeaderViewsCtrl', camHeaderViewsCtrl);
