@@ -228,6 +228,10 @@
                   <include name="**/module.xml" />
                 </replace>
 
+                <replace dir="target/modules" token="@version.mybatis@" value="${version.mybatis}">
+                  <include name="**/module.xml" />
+                </replace>
+
               </target>
             </configuration>
           </execution>
