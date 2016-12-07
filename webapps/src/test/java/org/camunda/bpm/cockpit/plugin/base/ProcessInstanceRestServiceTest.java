@@ -138,7 +138,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
     queryParameter.setProcessDefinitionId(processDefinitionId);
-    queryParameter.setOrderBy("START_TIME_");
+    queryParameter.setSortBy("startTime");
 
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
     assertThat(result).isNotEmpty();
@@ -162,7 +162,8 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
     queryParameter.setProcessDefinitionId(processDefinitionId);
-    queryParameter.setOrderBy("START_TIME_ asc");
+    queryParameter.setSortBy("startTime");
+    queryParameter.setSortOrder("asc");
 
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
     assertThat(result).isNotEmpty();
@@ -186,7 +187,8 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
 
     ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
     queryParameter.setProcessDefinitionId(processDefinitionId);
-    queryParameter.setOrderBy("START_TIME_ desc");
+    queryParameter.setSortBy("startTime");
+    queryParameter.setSortOrder("desc");
 
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
     assertThat(result).isNotEmpty();
