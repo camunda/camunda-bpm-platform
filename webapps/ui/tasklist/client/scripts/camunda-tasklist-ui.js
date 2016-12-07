@@ -38,11 +38,10 @@ function bootstrapApp() {
 module.exports = function(pluginDependencies) {
 
   var ngDeps = [
-    'cam.commons',
+    commons.name,
     'pascalprecht.translate',
     'ngRoute',
     'dataDepend',
-    require('./user/index').name,
     require('./variable/index').name,
     require('./tasklist/index').name,
     require('./task/index').name,
