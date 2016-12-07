@@ -9,7 +9,7 @@ module.exports = function(config, localesConfig, pathConfig) {
       },
       src: [
         '<%= pkg.gruntConfig.commonsUiDir %>/resources/locales/*.json',
-        '<%= pkg.gruntConfig.commonsUiDir %>/lib/*/locales/*.json',
+        '<%= pkg.gruntConfig.commonsUiDir %>/lib/**/locales/*.json',
         pathConfig.sourceDir + '/scripts/**/locales/*.json'
       ]
   };
