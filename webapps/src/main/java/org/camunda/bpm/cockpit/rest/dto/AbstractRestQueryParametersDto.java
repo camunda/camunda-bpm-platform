@@ -12,6 +12,18 @@
  */
 package org.camunda.bpm.cockpit.rest.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.camunda.bpm.cockpit.db.QueryParameters;
+import org.camunda.bpm.engine.impl.db.sql.MybatisJoinHelper;
+import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
+import org.camunda.bpm.engine.rest.dto.converter.StringToTypeConverter;
+import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.exception.RestException;
+import org.camunda.bpm.engine.variable.Variables;
+
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response.Status;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -19,20 +31,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map.Entry;
-
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response.Status;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.camunda.bpm.cockpit.db.QueryParameters;
-import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
-import org.camunda.bpm.engine.rest.dto.converter.StringToTypeConverter;
-import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-import org.camunda.bpm.engine.rest.exception.RestException;
-import org.camunda.bpm.engine.rest.util.ProvidersUtil;
-import org.camunda.bpm.engine.variable.Variables;
 
 /**
  * @author roman.smirnov
@@ -94,11 +92,11 @@ public abstract class AbstractRestQueryParametersDto<T> extends QueryParameters<
   public String getOrderBy() {
     if (sortBy != null) {
       if (sortOrder == null || sortOrder.isEmpty()) {
-        throw new InvalidRequestException(Status.BAD_REQUEST, "Only a single sorting parameter specified. sortBy and sortOrder required");
+        sortOrder = SORT_ORDER_ASC_VALUE;
       }
       return String.format("%s %s", getOrderByValue(sortBy), sortOrder);
     }
-    return super.getOrderBy();
+    return MybatisJoinHelper.orderBy(super.getOrderingProperties());
   }
 
   protected abstract String getOrderByValue(String sortBy);
