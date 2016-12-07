@@ -45,6 +45,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -75,6 +76,7 @@ import org.camunda.bpm.engine.variable.value.FileValue;
  */
 public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
+  public static final int WORKER_COUNT = 1000;
   private List<String> taskIds;
 
   // The range of Oracle's NUMBER field is limited to ~10e+125
@@ -437,6 +439,30 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     } catch (ProcessEngineException e) {
       // OK
     }
+  }
+
+  public void testQueryByCandidateGroupWithManyThreads() throws Exception{
+    List <Thread> workers = new ArrayList<Thread>();
+    final CountDownLatch barrier = new CountDownLatch(WORKER_COUNT + 1);
+    final List<Exception> errors = new ArrayList<Exception>();
+    for (int i = 0; i < WORKER_COUNT; i++) {
+      Thread worker = new Thread() {
+        @Override
+        public void run() {
+          barrier.countDown();
+          try {
+            taskService.createTaskQuery().taskCandidateGroup("management").list();
+          } catch (Exception e) {
+            errors.add(e);
+          }
+        }
+      };
+      workers.add(worker);
+      worker.start();
+    }
+
+    barrier.countDown();
+    assertThat(errors.size(),is(0));
   }
 
   public void testQueryByCandidateGroup() {
