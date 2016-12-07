@@ -37,7 +37,7 @@
     ${limitBefore}
     select ${distinct} RES.* ${limitBetween}
     <include refid="selectIncidents" />
-    ${orderBy}
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderByStatement"/>
     ${limitAfter}
   </select>
 

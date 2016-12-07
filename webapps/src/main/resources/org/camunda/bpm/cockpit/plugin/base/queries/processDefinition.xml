@@ -37,7 +37,7 @@
     select distinct RES.ID_, RES.KEY_, RES.NAME_, RES.VERSION_, EXEC2.ACT_ID_
     <include refid="selectCalledProcesses"/>
     group by RES.ID_, RES.KEY_, RES.NAME_, RES.VERSION_, EXEC2.ACT_ID_
-    ${orderBy}
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderByStatement"/>
   </select>
 
   <sql id="selectCalledProcesses">
