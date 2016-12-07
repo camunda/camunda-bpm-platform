@@ -12,7 +12,11 @@
  */
 package org.camunda.bpm.engine.impl.persistence.deploy.cache;
 
+import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.persistence.AbstractResourceDefinitionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author: Johannes Heinemann
@@ -24,21 +28,52 @@ public class ProcessDefinitionCache extends ResourceDefinitionCache<ProcessDefin
     super(factory, cacheCapacity, cacheDeployer);
   }
 
-  @Override
-  protected CacheErrorChecker<ProcessDefinitionEntity> createErrorChecker() {
-    return new ProcessCacheErrorChecker();
-  }
-
-  @Override
-  protected DefinitionManagerFactory<ProcessDefinitionEntity> createDefinitionManagerFactory() {
-    return new ProcessDefinitionManagerFactory();
-  }
-
   public ProcessDefinitionEntity resolveDefinition(ProcessDefinitionEntity processDefinition) {
     ProcessDefinitionEntity entity = super.resolveDefinition(processDefinition);
     if (entity != null) {
       entity.updateModifiedFieldsFromEntity(processDefinition);
     }
     return entity;
+  }
+
+  @Override
+  protected AbstractResourceDefinitionManager<ProcessDefinitionEntity> getManager() {
+    return Context.getCommandContext().getProcessDefinitionManager();
+  }
+
+  @Override
+  protected void checkInvalidDefinitionId(String definitionId) {
+    ensureNotNull("Invalid process definition id", "processDefinitionId", definitionId);
+  }
+
+  @Override
+  protected void checkDefinitionFound(String definitionId, ProcessDefinitionEntity definition) {
+    ensureNotNull("no deployed process definition found with id '" + definitionId + "'", "processDefinition", definition);
+  }
+
+  @Override
+  protected void checkInvalidDefinitionByKey(String definitionKey, ProcessDefinitionEntity definition) {
+    ensureNotNull("no processes deployed with key '" + definitionKey + "'", "processDefinition", definition);
+  }
+
+  @Override
+  protected void checkInvalidDefinitionByKeyAndTenantId(String definitionKey, String tenantId, ProcessDefinitionEntity definition) {
+    ensureNotNull("no processes deployed with key '" + definitionKey + "' and tenant-id '" + tenantId + "'", "processDefinition", definition);
+  }
+
+  @Override
+  protected void checkInvalidDefinitionByKeyVersionAndTenantId(String definitionKey, Integer definitionVersion, String tenantId, ProcessDefinitionEntity definition) {
+    ensureNotNull("no processes deployed with key = '" + definitionKey + "', version = '" + definitionVersion
+        + "' and tenant-id = '" + tenantId + "'", "processDefinition", definition);
+  }
+
+  @Override
+  protected void checkInvalidDefinitionByDeploymentAndKey(String deploymentId, String definitionKey, ProcessDefinitionEntity definition) {
+    ensureNotNull("no processes deployed with key = '" + definitionKey + "' in deployment = '" + deploymentId + "'", "processDefinition", definition);
+  }
+
+  @Override
+  protected void checkInvalidDefinitionWasCached(String deploymentId, String definitionId, ProcessDefinitionEntity definition) {
+    ensureNotNull("deployment '" + deploymentId + "' didn't put process definition '" + definitionId + "' in the cache", "cachedProcessDefinition", definition);
   }
 }

@@ -12,7 +12,12 @@
  */
 package org.camunda.bpm.engine.impl.persistence.deploy.cache;
 
+import org.camunda.bpm.engine.exception.cmmn.CaseDefinitionNotFoundException;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
+import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.persistence.AbstractResourceDefinitionManager;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author: Johannes Heinemann
@@ -24,7 +29,7 @@ public class CaseDefinitionCache extends ResourceDefinitionCache<CaseDefinitionE
   }
 
   public CaseDefinitionEntity getCaseDefinitionById(String caseDefinitionId) {
-    errorChecker.checkInvalidDefinitionId(caseDefinitionId);
+    checkInvalidDefinitionId(caseDefinitionId);
     CaseDefinitionEntity caseDefinition = getDefinition(caseDefinitionId);
     if (caseDefinition == null) {
       caseDefinition = findDeployedDefinitionById(caseDefinitionId);
@@ -34,12 +39,43 @@ public class CaseDefinitionCache extends ResourceDefinitionCache<CaseDefinitionE
   }
 
   @Override
-  protected CacheErrorChecker<CaseDefinitionEntity> createErrorChecker() {
-    return new CaseCacheErrorChecker();
+  protected AbstractResourceDefinitionManager<CaseDefinitionEntity> getManager() {
+    return Context.getCommandContext().getCaseDefinitionManager();
   }
 
   @Override
-  protected DefinitionManagerFactory<CaseDefinitionEntity> createDefinitionManagerFactory() {
-    return new CaseDefinitionManagerFactory();
+  protected void checkInvalidDefinitionId(String definitionId) {
+    ensureNotNull("Invalid case definition id", "caseDefinitionId", definitionId);
+  }
+
+  @Override
+  protected void checkDefinitionFound(String definitionId, CaseDefinitionEntity definition) {
+    ensureNotNull(CaseDefinitionNotFoundException.class, "no deployed case definition found with id '" + definitionId + "'", "caseDefinition", definition);
+  }
+
+  @Override
+  protected void checkInvalidDefinitionByKey(String definitionKey, CaseDefinitionEntity definition) {
+    ensureNotNull(CaseDefinitionNotFoundException.class, "no case definition deployed with key '" + definitionKey + "'", "caseDefinition", definition);
+  }
+
+  @Override
+  protected void checkInvalidDefinitionByKeyAndTenantId(String definitionKey, String tenantId, CaseDefinitionEntity definition) {
+    ensureNotNull(CaseDefinitionNotFoundException.class, "no case definition deployed with key '" + definitionKey + "' and tenant-id '" + tenantId + "'", "caseDefinition", definition);
+  }
+
+  @Override
+  protected void checkInvalidDefinitionByKeyVersionAndTenantId(String definitionKey, Integer definitionVersion, String tenantId, CaseDefinitionEntity definition) {
+    ensureNotNull(CaseDefinitionNotFoundException.class, "no case definition deployed with key = '" + definitionKey + "', version = '" + definitionVersion + "'"
+        + " and tenant-id = '" + tenantId + "'", "caseDefinition", definition);
+  }
+
+  @Override
+  protected void checkInvalidDefinitionByDeploymentAndKey(String deploymentId, String definitionKey, CaseDefinitionEntity definition) {
+    ensureNotNull(CaseDefinitionNotFoundException.class, "no case definition deployed with key = '" + definitionKey + "' in deployment = '" + deploymentId + "'", "caseDefinition", definition);
+  }
+
+  @Override
+  protected void checkInvalidDefinitionWasCached(String deploymentId, String definitionId, CaseDefinitionEntity definition) {
+    ensureNotNull("deployment '" + deploymentId + "' didn't put case definition '" + definitionId + "' in the cache", "cachedCaseDefinition", definition);
   }
 }

@@ -36,7 +36,6 @@ public class CacheDeployer {
     this.deployers = deployers;
   }
 
-  @SuppressWarnings("ConstantConditions")
   public void deploy(final DeploymentEntity deployment) {
     Context.getCommandContext().runWithoutAuthorization(new Callable<Void>() {
       public Void call() throws Exception {
@@ -48,7 +47,6 @@ public class CacheDeployer {
     });
   }
 
-  @SuppressWarnings("ConstantConditions")
   public void deployOnlyGivenResourceOfDeployment(final DeploymentEntity deployment, String resourceName) {
     initDeployment(deployment, resourceName);
     Context.getCommandContext().runWithoutAuthorization(new Callable<Void>() {
@@ -61,7 +59,6 @@ public class CacheDeployer {
     });
   }
 
-  @SuppressWarnings("ConstantConditions")
   protected void initDeployment(final DeploymentEntity deployment, String resourceName) {
     deployment.clearResources();
     // with the given resource we prevent the deployment of querying

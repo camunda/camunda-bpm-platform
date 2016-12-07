@@ -57,7 +57,6 @@ public abstract class ModelInstanceCache<InstanceType extends ModelInstance, Def
     return bpmnModelInstance;
   }
 
-  @SuppressWarnings("ConstantConditions")
   protected InstanceType loadAndCacheBpmnModelInstance(final DefinitionType definitionEntity) {
     final CommandContext commandContext = Context.getCommandContext();
     InputStream bpmnResourceInputStream = commandContext.runWithoutAuthorization(new Callable<InputStream>() {

@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl.persistence.deploy.cache;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.AbstractResourceDefinitionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.repository.ResourceDefinition;
 import org.camunda.commons.utils.cache.Cache;
@@ -29,32 +30,25 @@ public abstract class ResourceDefinitionCache<T extends ResourceDefinition> {
 
   protected Cache<String, T> cache;
   protected CacheDeployer cacheDeployer;
-  protected DefinitionManagerFactory<T> managerFactory;
-  protected CacheErrorChecker<T> errorChecker;
 
   public ResourceDefinitionCache(CacheFactory factory, int cacheCapacity, CacheDeployer cacheDeployer) {
     this.cache = factory.createCache(cacheCapacity);
     this.cacheDeployer = cacheDeployer;
-    this.managerFactory = createDefinitionManagerFactory();
-    this.errorChecker = createErrorChecker();
   }
-
-  protected abstract CacheErrorChecker<T> createErrorChecker();
-  protected abstract DefinitionManagerFactory<T> createDefinitionManagerFactory();
 
   public T findDefinitionFromCache(String definitionId) {
     return cache.get(definitionId);
   }
 
   public T findDeployedDefinitionById(String definitionId) {
-    errorChecker.checkInvalidDefinitionId(definitionId);
-    T definition = managerFactory.getManager().getCachedResourceDefinitionEntity(definitionId);
+    checkInvalidDefinitionId(definitionId);
+    T definition = getManager().getCachedResourceDefinitionEntity(definitionId);
     if (definition == null) {
-      definition = managerFactory.getManager()
+      definition = getManager()
           .findLatestDefinitionById(definitionId);
     }
 
-    errorChecker.checkDefinitionFound(definitionId, definition);
+    checkDefinitionFound(definitionId, definition);
     definition = resolveDefinition(definition);
     return definition;
   }
@@ -64,43 +58,41 @@ public abstract class ResourceDefinitionCache<T extends ResourceDefinition> {
    * @throws ProcessEngineException if more than one tenant has a definition with the given key
    */
   public T findDeployedLatestDefinitionByKey(String definitionKey) {
-    T definition = managerFactory.getManager()
+    T definition = getManager()
         .findLatestDefinitionByKey(definitionKey);
-    errorChecker.checkInvalidDefinitionByKey(definitionKey, definition);
+    checkInvalidDefinitionByKey(definitionKey, definition);
     definition = resolveDefinition(definition);
     return definition;
   }
 
   public T findDeployedLatestDefinitionByKeyAndTenantId(String definitionKey, String tenantId) {
-    T definition = managerFactory.getManager()
+    T definition = getManager()
         .findLatestDefinitionByKeyAndTenantId(definitionKey, tenantId);
-    errorChecker.checkInvalidDefinitionByKeyAndTenantId(definitionKey, tenantId, definition);
+    checkInvalidDefinitionByKeyAndTenantId(definitionKey, tenantId, definition);
     definition = resolveDefinition(definition);
     return definition;
   }
 
-  @SuppressWarnings("ConstantConditions")
   public T findDeployedDefinitionByKeyVersionAndTenantId(final String definitionKey, final Integer definitionVersion, final String tenantId) {
     final CommandContext commandContext = Context.getCommandContext();
     T definition = commandContext.runWithoutAuthorization(new Callable<T>() {
       public T call() throws Exception {
-        return managerFactory.getManager().
+        return getManager().
             findDefinitionByKeyVersionAndTenantId(definitionKey, definitionVersion, tenantId);
       }
     });
-    errorChecker.checkInvalidDefinitionByKeyVersionAndTenantId(definitionKey, definitionVersion, tenantId, definition);
+    checkInvalidDefinitionByKeyVersionAndTenantId(definitionKey, definitionVersion, tenantId, definition);
     definition = resolveDefinition(definition);
     return definition;
   }
 
   public T findDeployedDefinitionByDeploymentAndKey(String deploymentId, String definitionKey) {
-    T definition = managerFactory.getManager().findDefinitionByDeploymentAndKey(deploymentId, definitionKey);
-    errorChecker.checkInvalidDefinitionByDeploymentAndKey(deploymentId, definitionKey, definition);
+    T definition = getManager().findDefinitionByDeploymentAndKey(deploymentId, definitionKey);
+    checkInvalidDefinitionByDeploymentAndKey(deploymentId, definitionKey, definition);
     definition = resolveDefinition(definition);
     return definition;
   }
 
-  @SuppressWarnings("ConstantConditions")
   public T resolveDefinition(T definition) {
     String definitionId = definition.getId();
     String deploymentId = definition.getDeploymentId();
@@ -118,7 +110,7 @@ public abstract class ResourceDefinitionCache<T extends ResourceDefinition> {
           cachedDefinition = cache.get(definitionId);
         }
       }
-      errorChecker.checkInvalidDefinitionWasCached(deploymentId, definitionId, cachedDefinition);
+      checkInvalidDefinitionWasCached(deploymentId, definitionId, cachedDefinition);
     }
     return cachedDefinition;
   }
@@ -143,5 +135,20 @@ public abstract class ResourceDefinitionCache<T extends ResourceDefinition> {
     return cache;
   }
 
+  protected abstract AbstractResourceDefinitionManager<T> getManager();
+
+  protected abstract void checkInvalidDefinitionId(String definitionId);
+
+  protected abstract void checkDefinitionFound(String definitionId, T definition);
+
+  protected abstract void checkInvalidDefinitionByKey(String definitionKey, T definition);
+
+  protected abstract void checkInvalidDefinitionByKeyAndTenantId(String definitionKey, String tenantId, T definition);
+
+  protected abstract void checkInvalidDefinitionByKeyVersionAndTenantId(String definitionKey, Integer definitionVersion, String tenantId, T definition);
+
+  protected abstract void checkInvalidDefinitionByDeploymentAndKey(String deploymentId, String definitionKey, T definition);
+
+  protected abstract void checkInvalidDefinitionWasCached(String deploymentId, String definitionId, T definition);
 
 }
