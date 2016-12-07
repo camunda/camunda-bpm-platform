@@ -16,12 +16,17 @@ package org.camunda.bpm.engine.test.api.runtime;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
+import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.AbstractAsyncOperationsTest;
+import org.camunda.bpm.engine.test.api.runtime.migration.MigrationTestRule;
+import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -29,14 +34,12 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+import org.camunda.bpm.engine.test.api.runtime.util.IncrementVariableListener;
+
+import java.util.*;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 
 /**
@@ -47,11 +50,16 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
   public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
+  protected MigrationTestRule migrationRule = new MigrationTestRule(engineRule);
+
   @Rule
   public ExpectedException thrown = ExpectedException.none();
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
+
+  @Rule
+  public RuleChain migrationChain = RuleChain.outerRule(testRule).around(migrationRule);
 
   @Before
   public void initServices() {
@@ -252,6 +260,38 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
 
   protected void assertProcessInstancesAreDeleted() {
     assertThat(runtimeService.createProcessInstanceQuery().list().size(), is(0));
+  }
+
+  @Test
+  public void testInvokeListenersWhenDeletingProcessInstancesAsync() {
+
+    // given
+    BpmnModelInstance instance = ProcessModels.newModel(ONE_TASK_PROCESS)
+        .startEvent()
+        .userTask()
+          .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_END, IncrementVariableListener.class.getName())
+        .endEvent()
+        .done();
+
+    migrationRule.deploy(instance);
+    List<String> processIds = startTestProcesses(1);
+
+    // when
+    String executionId = runtimeService
+        .createExecutionQuery()
+        .processInstanceId(processIds.get(0))
+        .singleResult()
+        .getId();
+    runtimeService.setVariable(executionId, "var", 0);
+    Batch batch = runtimeService.deleteProcessInstancesAsync(processIds, TESTING_INSTANCE_DELETE);
+
+    executeSeedJob(batch);
+    executeBatchJobs(batch);
+
+    // then
+    HistoricVariableInstance variable = historyService.createHistoricVariableInstanceQuery().singleResult();
+    Integer incrementedNumber = (Integer) variable.getValue();
+    assertThat(incrementedNumber, is(1));
   }
 
 }
