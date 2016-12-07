@@ -16,8 +16,7 @@ apiModule.run([ '$rootScope', 'Notifications', '$translate', function($rootScope
     ]).then(function(translations) {
       Notifications.addError({
         status: translations.SESSION_EXPIRED,
-        message: translations.SESSION_EXPIRED_MESSAGE,
-        exclusive: true
+        message: translations.SESSION_EXPIRED_MESSAGE
       });
     });
   });
