@@ -16,10 +16,7 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.ibatis.session.RowBounds;
 import org.camunda.bpm.engine.filter.Filter;
@@ -35,14 +32,22 @@ import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.TablePageQueryImpl;
+import org.camunda.bpm.engine.impl.batch.BatchEntity;
+import org.camunda.bpm.engine.impl.batch.history.HistoricBatchEntity;
+import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
+import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
+import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseSentryPartEntity;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
-import org.camunda.bpm.engine.impl.history.event.HistoricDecisionInstanceEntity;
-import org.camunda.bpm.engine.impl.history.event.HistoricDetailEventEntity;
+import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
+import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionEntity;
+import org.camunda.bpm.engine.impl.history.event.*;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
+import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.management.TableMetaData;
 import org.camunda.bpm.engine.management.TablePage;
+import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -65,6 +70,7 @@ public class TableDataManager extends AbstractManager {
   static {
     // runtime
     persistentObjectToTableNameMap.put(TaskEntity.class, "ACT_RU_TASK");
+    persistentObjectToTableNameMap.put(ExternalTaskEntity.class, "ACT_RU_EXT_TASK");
     persistentObjectToTableNameMap.put(ExecutionEntity.class, "ACT_RU_EXECUTION");
     persistentObjectToTableNameMap.put(IdentityLinkEntity.class, "ACT_RU_IDENTITYLINK");
     persistentObjectToTableNameMap.put(VariableInstanceEntity.class, "ACT_RU_VARIABLE");
@@ -72,16 +78,30 @@ public class TableDataManager extends AbstractManager {
     persistentObjectToTableNameMap.put(JobEntity.class, "ACT_RU_JOB");
     persistentObjectToTableNameMap.put(MessageEntity.class, "ACT_RU_JOB");
     persistentObjectToTableNameMap.put(TimerEntity.class, "ACT_RU_JOB");
+    persistentObjectToTableNameMap.put(JobDefinitionEntity.class, "ACT_RU_JOBDEF");
+    persistentObjectToTableNameMap.put(BatchEntity.class, "ACT_RU_BATCH");
 
     persistentObjectToTableNameMap.put(IncidentEntity.class, "ACT_RU_INCIDENT");
 
-    persistentObjectToTableNameMap.put(EventSubscriptionEntity.class, "ACT_RU_EVENT_SUBSCRIPTION");
+    persistentObjectToTableNameMap.put(EventSubscriptionEntity.class, "ACT_RU_EVENT_SUBSCR");
 
     persistentObjectToTableNameMap.put(FilterEntity.class, "ACT_RU_FILTER");
 
+    persistentObjectToTableNameMap.put(MeterLogEntity.class, "ACT_RU_METER_LOG");
     // repository
     persistentObjectToTableNameMap.put(DeploymentEntity.class, "ACT_RE_DEPLOYMENT");
     persistentObjectToTableNameMap.put(ProcessDefinitionEntity.class, "ACT_RE_PROCDEF");
+
+    // CMMN
+    persistentObjectToTableNameMap.put(CaseDefinitionEntity.class, "ACT_RE_CASE_DEF");
+    persistentObjectToTableNameMap.put(CaseExecutionEntity.class, "ACT_RU_CASE_EXECUTION");
+    persistentObjectToTableNameMap.put(CaseSentryPartEntity.class, "ACT_RU_CASE_SENTRY_PART");
+
+    // DMN
+    persistentObjectToTableNameMap.put(DecisionRequirementsDefinitionEntity.class, "ACT_RE_DECISION_REQ_DEF");
+    persistentObjectToTableNameMap.put(DecisionDefinitionEntity.class, "ACT_RE_DECISION_DEF");
+    persistentObjectToTableNameMap.put(HistoricDecisionInputInstanceEntity.class, "ACT_HI_DEC_IN");
+    persistentObjectToTableNameMap.put(HistoricDecisionOutputInstanceEntity.class, "ACT_HI_DEC_OUT");
 
     // history
     persistentObjectToTableNameMap.put(CommentEntity.class, "ACT_HI_COMMENT");
@@ -90,6 +110,9 @@ public class TableDataManager extends AbstractManager {
     persistentObjectToTableNameMap.put(AttachmentEntity.class, "ACT_HI_ATTACHMENT");
     persistentObjectToTableNameMap.put(HistoricProcessInstanceEntity.class, "ACT_HI_PROCINST");
     persistentObjectToTableNameMap.put(HistoricTaskInstanceEntity.class, "ACT_HI_TASKINST");
+    persistentObjectToTableNameMap.put(HistoricJobLogEventEntity.class, "ACT_HI_JOB_LOG");
+    persistentObjectToTableNameMap.put(HistoricIncidentEventEntity.class, "ACT_HI_INCIDENT");
+    persistentObjectToTableNameMap.put(HistoricBatchEntity.class, "ACT_HI_BATCH");
 
     persistentObjectToTableNameMap.put(HistoricCaseInstanceEntity.class, "ACT_HI_CASEINST");
     persistentObjectToTableNameMap.put(HistoricCaseActivityInstanceEntity.class, "ACT_HI_CASEACTINST");
@@ -97,20 +120,28 @@ public class TableDataManager extends AbstractManager {
     // a couple of stuff goes to the same table
     persistentObjectToTableNameMap.put(HistoricFormPropertyEntity.class, "ACT_HI_DETAIL");
     persistentObjectToTableNameMap.put(HistoricVariableInstanceEntity.class, "ACT_HI_DETAIL");
+    persistentObjectToTableNameMap.put(HistoricVariableInstanceEntity.class, "ACT_HI_VARINST");
     persistentObjectToTableNameMap.put(HistoricDetailEventEntity.class, "ACT_HI_DETAIL");
 
     persistentObjectToTableNameMap.put(HistoricDecisionInstanceEntity.class, "ACT_HI_DECINST");
+    persistentObjectToTableNameMap.put(UserOperationLogEntryEventEntity.class, "ACT_HI_OP_LOG");
+
 
     // Identity module
     persistentObjectToTableNameMap.put(GroupEntity.class, "ACT_ID_GROUP");
     persistentObjectToTableNameMap.put(MembershipEntity.class, "ACT_ID_MEMBERSHIP");
+    persistentObjectToTableNameMap.put(TenantEntity.class, "ACT_ID_TENANT");
+    persistentObjectToTableNameMap.put(TenantMembershipEntity.class, "ACT_ID_TENANT_MEMBER");
     persistentObjectToTableNameMap.put(UserEntity.class, "ACT_ID_USER");
     persistentObjectToTableNameMap.put(IdentityInfoEntity.class, "ACT_ID_INFO");
+    persistentObjectToTableNameMap.put(AuthorizationEntity.class, "ACT_RU_AUTHORIZATION");
+
 
     // general
     persistentObjectToTableNameMap.put(PropertyEntity.class, "ACT_GE_PROPERTY");
     persistentObjectToTableNameMap.put(ByteArrayEntity.class, "ACT_GE_BYTEARRAY");
     persistentObjectToTableNameMap.put(ResourceEntity.class, "ACT_GE_BYTEARRAY");
+    persistentObjectToTableNameMap.put(FilterEntity.class, "ACT_RU_FILTER");
 
     // and now the map for the API types (does not cover all cases)
     apiTypeToTableNameMap.put(Task.class, "ACT_RU_TASK");
@@ -131,6 +162,7 @@ public class TableDataManager extends AbstractManager {
     apiTypeToTableNameMap.put(HistoricFormProperty.class, "ACT_HI_DETAIL");
     apiTypeToTableNameMap.put(HistoricTaskInstance.class, "ACT_HI_TASKINST");
     apiTypeToTableNameMap.put(HistoricVariableInstance.class, "ACT_HI_VARINST");
+
 
     apiTypeToTableNameMap.put(HistoricCaseInstance.class, "ACT_HI_CASEINST");
     apiTypeToTableNameMap.put(HistoricCaseActivityInstance.class, "ACT_HI_CASEACTINST");
@@ -175,6 +207,20 @@ public class TableDataManager extends AbstractManager {
     tablePage.setFirstResult(firstResult);
 
     return tablePage;
+  }
+
+  public List<Class<? extends DbEntity>> getEntities(String tableName) {
+    String databaseTablePrefix = getDbSqlSession().getDbSqlSessionFactory().getDatabaseTablePrefix();
+    List<Class<? extends DbEntity>> entities = new ArrayList<Class<? extends DbEntity>>();
+
+    Set<Class<? extends DbEntity>> entityClasses = persistentObjectToTableNameMap.keySet();
+    for (Class<? extends DbEntity> entityClass : entityClasses) {
+      String entityTableName = persistentObjectToTableNameMap.get(entityClass);
+      if ((databaseTablePrefix + entityTableName).equals(tableName)) {
+        entities.add(entityClass);
+      }
+    }
+    return entities;
   }
 
   public String getTableName(Class<?> entityClass, boolean withPrefix) {

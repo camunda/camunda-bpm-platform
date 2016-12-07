@@ -31,6 +31,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.session.SqlSession;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
@@ -232,9 +233,22 @@ public class DbSqlSession extends AbstractPersistenceSession {
     entityUpdated(dbEntity);
   }
 
-  protected int executeUpdate(String updateStatement, Object parameter) {
+  @Override
+  public int executeUpdate(String updateStatement, Object parameter) {
     updateStatement = dbSqlSessionFactory.mapStatement(updateStatement);
     return sqlSession.update(updateStatement, parameter);
+  }
+
+  @Override
+  public int executeNonEmptyUpdateStmt(String updateStmt, Object parameter) {
+    updateStmt = dbSqlSessionFactory.mapStatement(updateStmt);
+
+    //if mapped statement is empty, which can happens for some databases, we have no need to execute it
+    MappedStatement mappedStatement = sqlSession.getConfiguration().getMappedStatement(updateStmt);
+    if (mappedStatement.getBoundSql(parameter).getSql().isEmpty())
+      return 0;
+
+    return sqlSession.update(updateStmt, parameter);
   }
 
   protected void entityUpdated(final DbEntity entity) {

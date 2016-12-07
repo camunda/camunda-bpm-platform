@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd" xmlns:biodi="http://bpmn.io/schema/dmn/biodi/1.0" xmlns:camunda="http://camunda.org/schema/1.0/dmn" id="testDrd" name="DRD" namespace="http://camunda.org/schema/1.0/dmn">
+  <decision id="decisionId" name="decision">
+    <extensionElements>
+      <biodi:bounds x="200" y="200" width="180" height="80" />
+    </extensionElements>
+    <decisionTable>
+      <input id="InputClause_1btij4c" label="Season" camunda:inputVariable="">
+        <inputExpression id="LiteralExpression_0dkl9x5" typeRef="string">        <text>season</text>
+</inputExpression>
+      </input>
+      <output id="output_1" label="Dish" name="desiredDish" typeRef="string" />
+      <rule id="row-653123107-1">
+        <inputEntry id="UnaryTests_1hyt9lz">        <text><![CDATA["Test"]]></text>
+</inputEntry>
+        <outputEntry id="LiteralExpression_1cmf8fw">        <text><![CDATA["1"]]></text>
+</outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <decision id="literalId" name="literal">
+    <extensionElements>
+      <biodi:bounds x="497" y="195" width="180" height="80" />
+      <biodi:edge source="decisionId">
+        <biodi:waypoints x="380" y="238" />
+        <biodi:waypoints x="497" y="237" />
+      </biodi:edge>
+    </extensionElements>
+    <variable id="InformationItem_0znrr0h" name="key" typeRef="string" />
+    <informationRequirement>
+      <requiredDecision href="#decisionId" />
+    </informationRequirement>
+    <literalExpression id="LiteralExpression_00tzf8f" expressionLanguage="groovy">    <text><![CDATA[key == "value"]]></text>
+</literalExpression>
+  </decision>
+</definitions>

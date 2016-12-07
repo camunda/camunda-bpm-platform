@@ -16,4 +16,14 @@
     </if>
   </select>
 
+  <delete id="deleteTableData" parameterType="map" >
+    DELETE FROM ${tableName}
+  </delete>
+
+  <select id="toggleForeignKey" parameterType="boolean"/>
+
+  <select id="toggleForeignKey_mysql" parameterType="boolean">
+     SET FOREIGN_KEY_CHECKS = #{param}
+  </select>
+
 </mapper>

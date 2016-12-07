@@ -36,6 +36,10 @@ public interface PersistenceSession extends Session {
 
   void lock(String statement, Object parameter);
 
+  int executeUpdate(String updateStatement, Object parameter);
+
+  int executeNonEmptyUpdateStmt(String updateStmt, Object parameter);
+
   void commit();
 
   void rollback();

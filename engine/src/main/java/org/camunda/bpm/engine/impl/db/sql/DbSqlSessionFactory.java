@@ -129,6 +129,8 @@ public class DbSqlSessionFactory implements SessionFactory {
       databaseSpecificTrueConstant.put(mysqlLikeDatabase, "1");
       databaseSpecificFalseConstant.put(mysqlLikeDatabase, "0");
       databaseSpecificIfNull.put(mysqlLikeDatabase, "IFNULL");
+      
+      addDatabaseSpecificStatement(mysqlLikeDatabase, "toggleForeignKey", "toggleForeignKey_mysql");
       addDatabaseSpecificStatement(mysqlLikeDatabase, "selectProcessDefinitionsByQueryCriteria", "selectProcessDefinitionsByQueryCriteria_mysql");
       addDatabaseSpecificStatement(mysqlLikeDatabase, "selectProcessDefinitionCountByQueryCriteria", "selectProcessDefinitionCountByQueryCriteria_mysql");
       addDatabaseSpecificStatement(mysqlLikeDatabase, "selectDeploymentsByQueryCriteria", "selectDeploymentsByQueryCriteria_mysql");
@@ -255,6 +257,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificTrueConstant.put(DB2, "1");
     databaseSpecificFalseConstant.put(DB2, "0");
     databaseSpecificIfNull.put(DB2, "NVL");
+
     addDatabaseSpecificStatement(DB2, "selectMeterLogAggregatedByTimeInterval", "selectMeterLogAggregatedByTimeInterval_db2_or_mssql");
     addDatabaseSpecificStatement(DB2, "selectExecutionByNativeQuery", "selectExecutionByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement(DB2, "selectHistoricActivityInstanceByNativeQuery", "selectHistoricActivityInstanceByNativeQuery_mssql_or_db2");

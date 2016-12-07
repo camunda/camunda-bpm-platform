@@ -17,6 +17,7 @@
   <logger name="org.camunda" level="info" />
 
   <logger name="org.camunda.bpm.engine.test" level="debug" />
+  <logger name="org.camunda.bpm.engine.persistence" level="debug" />
 <!--
 
   <logger name="org.camunda.bpm.engine.impl.persistence.entity" level="debug" />

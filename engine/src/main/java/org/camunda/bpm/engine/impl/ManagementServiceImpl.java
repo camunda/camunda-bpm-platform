@@ -21,36 +21,14 @@ import org.camunda.bpm.engine.batch.BatchStatisticsQuery;
 import org.camunda.bpm.engine.impl.batch.BatchQueryImpl;
 import org.camunda.bpm.engine.impl.batch.BatchStatisticsQueryImpl;
 import org.camunda.bpm.engine.impl.batch.DeleteBatchCmd;
-import org.camunda.bpm.engine.impl.cmd.ActivateBatchCmd;
-import org.camunda.bpm.engine.impl.cmd.DeleteJobCmd;
-import org.camunda.bpm.engine.impl.cmd.DeleteMetricsCmd;
-import org.camunda.bpm.engine.impl.cmd.DeletePropertyCmd;
-import org.camunda.bpm.engine.impl.cmd.GetHistoryLevelCmd;
-import org.camunda.bpm.engine.impl.cmd.GetJobExceptionStacktraceCmd;
-import org.camunda.bpm.engine.impl.cmd.GetProcessApplicationForDeploymentCmd;
-import org.camunda.bpm.engine.impl.cmd.GetPropertiesCmd;
-import org.camunda.bpm.engine.impl.cmd.GetTableCountCmd;
-import org.camunda.bpm.engine.impl.cmd.GetTableMetaDataCmd;
-import org.camunda.bpm.engine.impl.cmd.GetTableNameCmd;
-import org.camunda.bpm.engine.impl.cmd.RegisterDeploymentCmd;
-import org.camunda.bpm.engine.impl.cmd.RegisterProcessApplicationCmd;
-import org.camunda.bpm.engine.impl.cmd.ReportDbMetricsCmd;
-import org.camunda.bpm.engine.impl.cmd.SetJobDefinitionPriorityCmd;
-import org.camunda.bpm.engine.impl.cmd.SetJobDuedateCmd;
-import org.camunda.bpm.engine.impl.cmd.SetJobPriorityCmd;
-import org.camunda.bpm.engine.impl.cmd.SetJobRetriesCmd;
-import org.camunda.bpm.engine.impl.cmd.SetJobsRetriesBatchCmd;
-import org.camunda.bpm.engine.impl.cmd.SetJobsRetriesCmd;
-import org.camunda.bpm.engine.impl.cmd.SetPropertyCmd;
-import org.camunda.bpm.engine.impl.cmd.SuspendBatchCmd;
-import org.camunda.bpm.engine.impl.cmd.UnregisterDeploymentCmd;
-import org.camunda.bpm.engine.impl.cmd.UnregisterProcessApplicationCmd;
+import org.camunda.bpm.engine.impl.cmd.*;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSession;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.ExecuteJobHelper;
+import org.camunda.bpm.engine.impl.management.PurgeReport;
 import org.camunda.bpm.engine.impl.management.UpdateJobDefinitionSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.impl.management.UpdateJobSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.impl.metrics.MetricsQueryImpl;
@@ -200,6 +178,14 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
       }
     });
   }
+
+  /**
+   * Purges the database and the deployment cache.
+   */
+  public PurgeReport purge() {
+    return commandExecutor.execute(new PurgeDatabaseAndCacheCmd());
+  }
+
 
   public ProcessDefinitionStatisticsQuery createProcessDefinitionStatisticsQuery() {
     return new ProcessDefinitionStatisticsQueryImpl(commandExecutor);

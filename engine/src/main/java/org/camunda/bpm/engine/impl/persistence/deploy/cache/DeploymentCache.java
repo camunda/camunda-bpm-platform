@@ -271,6 +271,18 @@ public class DeploymentCache {
     return cmmnModelInstanceCache.getCache();
   }
 
+  public Cache<String, DmnModelInstance> getDmnDefinitionCache() {
+    return dmnModelInstanceCache.getCache();
+  }
+
+  public Cache<String, DecisionDefinitionEntity> getDecisionDefinitionCache() {
+    return decisionDefinitionCache.getCache();
+  }
+
+  public Cache<String, DecisionRequirementsDefinitionEntity> getDecisionRequirementsDefinitionCache() {
+    return decisionRequirementsDefinitionCache.getCache();
+  }
+
   public Cache<String, ProcessDefinitionEntity> getProcessDefinitionCache() {
     return processDefinitionEntityCache.getCache();
   }
@@ -305,6 +317,54 @@ public class DeploymentCache {
             .removeEntryFromDeploymentCacheFailure("decision requirement", decisionRequirementsDefinition.getId(), e);
       }
     }
+  }
+
+  public CachePurgeResult purgeCache() {
+
+    CachePurgeResult result = new CachePurgeResult();
+    Cache<String, ProcessDefinitionEntity> processDefinitionCache = getProcessDefinitionCache();
+    if (!processDefinitionCache.isEmpty()) {
+      result.addPurgeInformation(CachePurgeResult.PROCESS_DEF_CACHE, processDefinitionCache.keySet());
+      processDefinitionCache.clear();
+    }
+
+    Cache<String, BpmnModelInstance> bpmnModelInstanceCache = getBpmnModelInstanceCache();
+    if (!bpmnModelInstanceCache.isEmpty()) {
+      result.addPurgeInformation(CachePurgeResult.BPMN_MODEL_INST_CACHE, bpmnModelInstanceCache.keySet());
+      bpmnModelInstanceCache.clear();
+    }
+
+    Cache<String, CaseDefinitionEntity> caseDefinitionCache = getCaseDefinitionCache();
+    if (!caseDefinitionCache.isEmpty()) {
+      result.addPurgeInformation(CachePurgeResult.CASE_DEF_CACHE, caseDefinitionCache.keySet());
+      caseDefinitionCache.clear();
+    }
+
+    Cache<String, CmmnModelInstance> cmmnModelInstanceCache = getCmmnModelInstanceCache();
+    if (!cmmnModelInstanceCache.isEmpty()) {
+      result.addPurgeInformation(CachePurgeResult.CASE_MODEL_INST_CACHE, cmmnModelInstanceCache.keySet());
+      cmmnModelInstanceCache.clear();
+    }
+
+    Cache<String, DecisionDefinitionEntity> decisionDefinitionCache = getDecisionDefinitionCache();
+    if (!decisionDefinitionCache.isEmpty()) {
+      result.addPurgeInformation(CachePurgeResult.DMN_DEF_CACHE, decisionDefinitionCache.keySet());
+      decisionDefinitionCache.clear();
+    }
+
+    Cache<String, DmnModelInstance> dmnModelInstanceCache = getDmnDefinitionCache();
+    if (!dmnModelInstanceCache.isEmpty()) {
+      result.addPurgeInformation(CachePurgeResult.DMN_MODEL_INST_CACHE, dmnModelInstanceCache.keySet());
+      dmnModelInstanceCache.clear();
+    }
+
+    Cache<String, DecisionRequirementsDefinitionEntity> decisionRequirementsDefinitionCache = getDecisionRequirementsDefinitionCache();
+    if (!decisionRequirementsDefinitionCache.isEmpty()) {
+      result.addPurgeInformation(CachePurgeResult.DMN_REQ_DEF_CACHE, decisionRequirementsDefinitionCache.keySet());
+      decisionRequirementsDefinitionCache.clear();
+    }
+
+    return result;
   }
 
 }
