@@ -9,8 +9,6 @@ image::https://www.openhub.net/p/camunda-bpm-spring-boot-starter/widgets/project
 image::https://travis-ci.org/camunda/camunda-bpm-spring-boot-starter.svg?branch=master[link=https://travis-ci.org/camunda/camunda-bpm-spring-boot-starter"]
 
 
-CAUTION: With 2.0.0 a lot of refactorings are being made. Do not switch if you expect/require a stable runtime. If you do switch, be prepared to rearrange your application.properties and imports. We are happy to get feedback.
-
 
 ## Get started
 
@@ -20,7 +18,7 @@ The extension is published on maven central, so if you are using maven, just add
 <dependency>
   <groupId>org.camunda.bpm.extension.springboot</groupId>
   <artifactId>camunda-bpm-spring-boot-starter([-rest|-webapp])</artifactId>
-  <version>2.0.0-SNAPSHOT</version>
+  <version>2.0.0</version>
 </dependency>
 ```
 
@@ -32,7 +30,7 @@ or use the BOM:
     <dependency>
       <groupId>org.camunda.bpm.extension.springboot</groupId>
       <artifactId>camunda-bpm-spring-boot-starter-bom</artifactId>
-      <version>2.0.0-SNAPSHOT</version>
+      <version>2.0.0</version>
       <type>pom</type>
       <scope>import</scope>
     </dependency>
@@ -49,8 +47,8 @@ and then create a simple process application like this one:
 
 ```java
 @SpringBootApplication
-@ProcessApplication
-public class WebappExampleProcessApplication extends SpringBootProcessApplication {
+@EnableProcessApplication
+public class WebappExampleProcessApplication  {
 
   public static void main(String... args) {
     SpringApplication.run(WebappExampleProcessApplication.class, args);
