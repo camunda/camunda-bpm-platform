@@ -29,6 +29,9 @@
 
     <version.java>1.8</version.java>
     <java.version>${version.java}</java.version>
+
+    <!-- disable javadoc linter for JDK8 to not fail on incomplete javadoc -->
+    <additionalparam>-Xdoclint:none</additionalparam>
   </properties>
 
   <build>
