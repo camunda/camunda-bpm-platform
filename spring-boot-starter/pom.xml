@@ -29,6 +29,7 @@
 
     <version.java>1.8</version.java>
     <java.version>${version.java}</java.version>
+    <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
   </properties>
 
   <build>
