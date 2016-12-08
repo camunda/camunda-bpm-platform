@@ -34,7 +34,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
-import org.camunda.bpm.engine.test.api.runtime.util.IncrementVariableListener;
+import org.camunda.bpm.engine.test.api.runtime.util.IncrementCounterListener;
 
 import java.util.*;
 
@@ -269,7 +269,7 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
     BpmnModelInstance instance = ProcessModels.newModel(ONE_TASK_PROCESS)
         .startEvent()
         .userTask()
-          .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_END, IncrementVariableListener.class.getName())
+          .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_END, IncrementCounterListener.class.getName())
         .endEvent()
         .done();
 
@@ -277,21 +277,12 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
     List<String> processIds = startTestProcesses(1);
 
     // when
-    String executionId = runtimeService
-        .createExecutionQuery()
-        .processInstanceId(processIds.get(0))
-        .singleResult()
-        .getId();
-    runtimeService.setVariable(executionId, "var", 0);
     Batch batch = runtimeService.deleteProcessInstancesAsync(processIds, TESTING_INSTANCE_DELETE);
-
     executeSeedJob(batch);
     executeBatchJobs(batch);
 
     // then
-    HistoricVariableInstance variable = historyService.createHistoricVariableInstanceQuery().singleResult();
-    Integer incrementedNumber = (Integer) variable.getValue();
-    assertThat(incrementedNumber, is(1));
+    assertThat(IncrementCounterListener.counter, is(1));
   }
 
 }

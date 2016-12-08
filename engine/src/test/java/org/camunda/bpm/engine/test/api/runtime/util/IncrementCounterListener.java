@@ -18,11 +18,12 @@ import org.camunda.bpm.engine.delegate.ExecutionListener;
 /**
  * @author: Johannes Heinemann
  */
-public class IncrementVariableListener implements ExecutionListener {
+public class IncrementCounterListener implements ExecutionListener {
+
+  public static int counter = 0;
 
   @Override
   public void notify(DelegateExecution execution) throws Exception {
-    Integer count = (Integer) execution.getVariable("var");
-    execution.setVariable("var", ++count);
+    counter++;
   }
 }
