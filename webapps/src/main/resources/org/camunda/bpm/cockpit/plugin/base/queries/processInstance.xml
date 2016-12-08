@@ -43,6 +43,7 @@
     from
       (
         <!-- This statement selects all process instances to an assigned process definition id (by using pagination!).-->
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
         ${limitBefore}
         select ${distinct} RES.* ${limitBetween},
         <if test="historyEnabled">
@@ -52,7 +53,7 @@
         ${constant.null.startTime}
         </if>
         <include refid="selectProcessInstances"/>
-        <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderByStatement"/>
+        order by ${orderBy}
         ${innerLimitAfter}
       ) INSTANCE
     <!-- The set of process instances will be (left) joined with a set of incidents. -->
@@ -231,7 +232,7 @@
           resultMap="calledProcessInstanceMap">
     select distinct RES.ID_, EXEC1.ACT_INST_ID_, EXEC1.ACT_ID_, PROC_.ID_ AS SUPER_PROC_DEF_ID_, PROC_.KEY_, PROC_.NAME_
     <include refid="selectCalledProcessInstancesByCriteria" />
-    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderByStatement"/>
+    order by ${orderBy}
   </select>
 
   <sql id="selectCalledProcessInstancesByCriteria">

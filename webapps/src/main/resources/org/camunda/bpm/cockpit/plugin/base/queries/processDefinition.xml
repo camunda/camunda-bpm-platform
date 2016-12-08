@@ -34,10 +34,11 @@
 
   <select id="selectCalledProcessDefinitions" parameterType="org.camunda.bpm.cockpit.impl.plugin.base.dto.query.ProcessDefinitionQueryDto"
           resultMap="calledProcessDefinitionMap">
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     select distinct RES.ID_, RES.KEY_, RES.NAME_, RES.VERSION_, EXEC2.ACT_ID_
     <include refid="selectCalledProcesses"/>
     group by RES.ID_, RES.KEY_, RES.NAME_, RES.VERSION_, EXEC2.ACT_ID_
-    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderByStatement"/>
+    order by ${orderBy}
   </select>
 
   <sql id="selectCalledProcesses">
