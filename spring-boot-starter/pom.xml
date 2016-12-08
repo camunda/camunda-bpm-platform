@@ -135,4 +135,14 @@
       <url>https://app.camunda.com/nexus/content/groups/public</url>
     </repository>
   </repositories>
+
+  <!-- requires enterprise credentials and license key -->
+  <profiles>
+    <profile>
+      <id>ee</id>
+      <modules>
+        <module>examples/example-webapp-ee</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>
