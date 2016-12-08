@@ -93,11 +93,12 @@
   </select>
 
   <select id="selectBatchesByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.batch.BatchQueryImpl" resultMap="batchResultMap">
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
     select ${distinct} RES.*
     ${limitBetween}
     <include refid="selectBatchesByQueryCriteriaSql"/>
-    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderByStatement"/>
+    order by ${orderBy}
     ${limitAfter}
   </select>
 

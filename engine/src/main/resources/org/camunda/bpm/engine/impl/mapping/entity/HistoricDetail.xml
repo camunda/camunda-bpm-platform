@@ -178,11 +178,12 @@
   </select>
 
   <select id="selectHistoricDetailsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricDetailQueryImpl" resultMap="historicDetailResultMap">
+  	<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
     select RES.*
     ${limitBetween}
     <include refid="selectHistoricDetailsByQueryCriteriaSql"/>
-    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderByStatement"/>
+    order by ${orderBy}
     ${limitAfter}
   </select>
 

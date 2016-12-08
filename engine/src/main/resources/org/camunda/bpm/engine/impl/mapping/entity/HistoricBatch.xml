@@ -78,11 +78,12 @@
   </select>
 
   <select id="selectHistoricBatchesByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.batch.history.HistoricBatchQueryImpl" resultMap="historicBatchResultMap">
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
     select ${distinct} RES.*
     ${limitBetween}
     <include refid="selectHistoricBatchesByQueryCriteriaSql"/>
-    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderByStatement"/>
+    order by ${orderBy}
     ${limitAfter}
   </select>
 

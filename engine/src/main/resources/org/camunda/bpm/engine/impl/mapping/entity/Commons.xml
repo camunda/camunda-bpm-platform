@@ -81,9 +81,12 @@
   </sql>
   
   <!-- Ordering -->
-
-  <sql id="orderByStatement">
-    order by ${@org.camunda.bpm.engine.impl.db.sql.MybatisJoinHelper@orderBy(orderingProperties)}
+  
+  <!-- Input: property "orderingProperties", a collection of OrderingProperty objects -->
+  <!-- Output: property "orderBy", filled with ordering constraints -->
+  <!-- Example Output: V0_TEXT_ asc, RES.ID_ desc, RES.NAME_ asc -->
+  <sql id="bindOrderBy">
+    <bind name="orderBy" value="@org.camunda.bpm.engine.impl.db.sql.MybatisJoinHelper@orderBy(orderingProperties)"/>
   </sql>
   
   <!-- Input: property "orderingProperties", a collection of OrderingProperty objects -->

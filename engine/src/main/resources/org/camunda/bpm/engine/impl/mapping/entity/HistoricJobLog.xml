@@ -162,11 +162,12 @@
   </select>
 
   <select id="selectHistoricJobLogByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricJobLogQueryImpl" resultMap="historicJobLogMap">
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
     select RES.*
     ${limitBetween}
     <include refid="selectHistoricJobLogByQueryCriteriaSql"/>
-    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderByStatement"/>
+    order by ${orderBy}
     ${limitAfter}
   </select>
 

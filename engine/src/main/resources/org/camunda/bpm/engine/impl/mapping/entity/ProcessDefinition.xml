@@ -149,11 +149,12 @@
   </select>
 
   <select id="selectProcessDefinitionsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl" resultMap="processDefinitionResultMap">
+  	<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
     select ${distinct} RES.*
     ${limitBetween}
     <include refid="selectProcessDefinitionsByQueryCriteriaSql"/>
-    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderByStatement"/>
+    order by ${orderBy}
     ${limitAfter}
   </select>
 
@@ -328,11 +329,12 @@
 
   <!-- mysql specific sql -->
   <select id="selectProcessDefinitionsByQueryCriteria_mysql" parameterType="org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl" resultMap="processDefinitionResultMap">
+  	<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
     select ${distinct} RES.*
     ${limitBetween}
     <include refid="selectProcessDefinitionsByQueryCriteriaSql"/>
-    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderByStatement"/>
+    order by ${orderBy}
     ${limitAfter}
   </select>
 

@@ -46,11 +46,12 @@
   </select>
   
   <select id="selectTenantByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.TenantQueryImpl" resultMap="tenantResultMap">
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
     select ${distinct} RES.* 
     ${limitBetween}
     <include refid="selectTenantByQueryCriteriaSql" />
-    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderByStatement"/>
+    order by ${orderBy}
     ${limitAfter}
   </select>
   

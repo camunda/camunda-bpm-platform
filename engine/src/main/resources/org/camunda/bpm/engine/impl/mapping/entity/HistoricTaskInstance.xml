@@ -168,11 +168,12 @@
   </select>
 
   <select id="selectHistoricTaskInstancesByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricTaskInstanceQueryImpl" resultMap="historicTaskInstanceResultMap">
+  	<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
     select RES.*
     ${limitBetween}
     <include refid="selectHistoricTaskInstancesByQueryCriteriaSql"/>
-    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderByStatement"/>
+    order by ${orderBy}
     ${limitAfter}
   </select>
 

@@ -110,11 +110,12 @@
   </select>
 
   <select id="selectHistoricCaseInstancesByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricCaseInstanceQueryImpl" resultMap="historicCaseInstanceResultMap">
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
     select ${distinct} RES.*
     ${limitBetween}
     <include refid="selectHistoricCaseInstancesByQueryCriteriaSql"/>
-    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderByStatement"/>
+    order by ${orderBy}
     ${limitAfter}
   </select>
 

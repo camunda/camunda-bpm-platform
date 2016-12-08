@@ -129,6 +129,7 @@
 
   <select id="selectNextJobsToExecute" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
     <bind name="orderingProperties" value="parameter.orderingProperties" />
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
     select
       RES.* ${limitBetween}
@@ -155,7 +156,7 @@
       and (<include refid="AtomicExclusiveOrNonExclusiveJobs"/>)
 
     <if test="parameter.applyOrdering">
-      <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderByStatement"/>
+      order by ${orderBy}
     </if>
     ${limitAfter}
   </select>
@@ -214,11 +215,12 @@
   </select>
 
   <select id="selectJobByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.JobQueryImpl" resultMap="jobResultMap">
+  	<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
     select ${distinct} RES.*
     ${limitBetween}
     <include refid="selectJobByQueryCriteriaSql"/>
-    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderByStatement"/>
+    order by ${orderBy}
     ${limitAfter}
   </select>
 

@@ -64,11 +64,12 @@
   </resultMap>
   
   <select id="selectHistoricIdentityLinkByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricIdentityLinkLogQueryImpl" resultMap="historicIdentityLinkResultMap">
+  	<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
     select RES.*
     ${limitBetween}
     <include refid="selectHistoricIdentityLinkByQueryCriteriaSql"/>
-    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderByStatement"/>
+    order by ${orderBy}
     ${limitAfter}
   </select>
 

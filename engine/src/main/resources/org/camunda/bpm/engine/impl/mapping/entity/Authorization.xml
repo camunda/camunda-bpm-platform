@@ -124,11 +124,12 @@
   </select>
 
   <select id="selectAuthorizationByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.AuthorizationQueryImpl" resultMap="authorizationResultMap">
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
     select ${distinct} RES.* 
     ${limitBetween}
     <include refid="selectAuthorizationByQueryCriteriaSql"/>
-    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderByStatement"/>
+    order by ${orderBy}
     ${limitAfter}
   </select>
 

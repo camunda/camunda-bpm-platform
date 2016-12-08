@@ -159,12 +159,13 @@
   </select>
   
   <select id="selectExecutionsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.ExecutionQueryImpl" resultMap="executionResultMap">
+  	<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
     select ${distinct} RES.*
     ${limitBetween}
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderBySelection"/>
     <include refid="selectExecutionsByQueryCriteriaSql"/>
-    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderByStatement"/>
+    order by ${orderBy}
     ${limitAfter}
   </select>
   
@@ -174,12 +175,13 @@
   </select>
   
   <select id="selectProcessInstanceByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl" resultMap="executionResultMap">
+  	<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
     select ${distinct} RES.*
     ${limitBetween}
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderBySelection"/>
     <include refid="selectProcessInstanceByQueryCriteriaSql"/>
-    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderByStatement"/>
+    order by ${orderBy}
     ${limitAfter}
   </select>
   
