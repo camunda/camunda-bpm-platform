@@ -68,21 +68,6 @@ public class DelegatingSqlSession implements SqlSession {
     return wrappedSession.selectMap(statement, parameter, mapKey, rowBounds);
   }
 
-  @Override
-  public <T> Cursor<T> selectCursor(String statement) {
-    return wrappedSession.selectCursor(statement);
-  }
-
-  @Override
-  public <T> Cursor<T> selectCursor(String statement, Object parameter) {
-    return wrappedSession.selectCursor(statement, parameter);
-  }
-
-  @Override
-  public <T> Cursor<T> selectCursor(String statement, Object parameter, RowBounds rowBounds) {
-    return wrappedSession.selectCursor(statement, parameter, rowBounds);
-  }
-
   public void select(String statement, Object parameter, ResultHandler handler) {
     wrappedSession.select(statement, parameter, handler);
   }
