@@ -12,7 +12,6 @@
  */
 package org.camunda.bpm.qa.performance.engine.util;
 
-import org.apache.ibatis.cursor.Cursor;
 import org.apache.ibatis.executor.BatchResult;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.ResultHandler;
