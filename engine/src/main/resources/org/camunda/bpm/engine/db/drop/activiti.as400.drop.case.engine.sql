@@ -1,4 +1,4 @@
-drop index ACT_IDX_CASE_EXEC_BUSKEY;
+drop index ACT_IDX_CASE_EXEC_BUSKEY; 
 
 alter table ACT_RU_CASE_EXECUTION
     drop foreign key ACT_FK_CASE_EXE_CASE_INST;
