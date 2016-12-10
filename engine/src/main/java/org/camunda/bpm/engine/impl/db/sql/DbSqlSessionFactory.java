@@ -306,14 +306,6 @@ public class DbSqlSessionFactory implements SessionFactory {
     dbSpecificConstants.put(DB2, constants);
 
     // as400
-    //databaseSpecificLimitBeforeStatements.put(AS400, "");
-    //databaseSpecificLimitAfterStatements.put(AS400, "LIMIT #{maxResults} OFFSET #{firstResult}");
-    //databaseSpecificInnerLimitAfterStatements.put(AS400, databaseSpecificLimitAfterStatements.get(AS400));
-    //databaseSpecificLimitBetweenStatements.put(AS400, "");
-    //databaseSpecificLimitBetweenFilterStatements.put(AS400, "");
-    //databaseSpecificOrderByStatements.put(AS400, "");
-    //databaseSpecificLimitBeforeNativeQueryStatements.put(AS400, "");
-    //databaseSpecificDistinct.put(AS400, "distinct");
     databaseSpecificLimitBeforeStatements.put(AS400, "SELECT SUB.* FROM (");
     databaseSpecificInnerLimitAfterStatements.put(AS400, ")RES ) SUB WHERE SUB.rnk >= #{firstRow} AND SUB.rnk < #{lastRow}");
     databaseSpecificLimitAfterStatements.put(AS400, databaseSpecificInnerLimitAfterStatements.get(AS400) + " ORDER BY SUB.rnk");
@@ -336,7 +328,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificIfNull.put(AS400, "IFNULL");
    
     // rewrites "select case when exists(select x from y) then 1 else 0 end from sysdummy" 
-    // to "select case when 0 < (select count(*) from (select x from y) then 1 else 0 end from sysdummy) x)"
+    // to "select case when 0 < (select count(*) from (select x from y) x) then 1 else 0 end from sysdummy"
     databaseSpecificExistsStart.put(AS400, "0 < (select count(*) from ("); 
     databaseSpecificExistsEnd.put(AS400, ") x )");
 
