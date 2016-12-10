@@ -76,9 +76,9 @@ alter table ACT_ID_TENANT_MEMBER
     references ACT_ID_GROUP (ID_);
 
 -- labels
-label on table ACT_ID_GROUP as 'ACT_ID_GROUP';
-label on table ACT_ID_MEMBERSHIP as 'ACT_ID_MEMBERSHIP';
-label on table ACT_ID_USER as 'ACT_ID_USER';
-label on table ACT_ID_INFO as 'ACT_ID_INFO';
-label on table ACT_ID_TENANT as 'ACT_ID_TENANT';
-label on table ACT_ID_TENANT_MEMBER as 'ACT_ID_TENANT_MEMBER';
+label on table ACT_ID_GROUP is 'ACT_ID_GROUP';
+label on table ACT_ID_MEMBERSHIP is 'ACT_ID_MEMBERSHIP';
+label on table ACT_ID_USER is 'ACT_ID_USER';
+label on table ACT_ID_INFO is 'ACT_ID_INFO';
+label on table ACT_ID_TENANT is 'ACT_ID_TENANT';
+label on table ACT_ID_TENANT_MEMBER is 'ACT_ID_TENANT_MEMBER';

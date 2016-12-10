@@ -1114,6 +1114,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       properties.put("existsStart", DbSqlSessionFactory.databaseSpecificExistsStart.get(databaseType));
       properties.put("existsEnd", DbSqlSessionFactory.databaseSpecificExistsEnd.get(databaseType));
 
+      properties.put("caseWhenInStart", DbSqlSessionFactory.databaseSpecificCaseWhenInStart.get(databaseType));
+      properties.put("caseWhenInEnd", DbSqlSessionFactory.databaseSpecificCaseWhenInEnd.get(databaseType));
+
       properties.put("trueConstant", DbSqlSessionFactory.databaseSpecificTrueConstant.get(databaseType));
       properties.put("falseConstant", DbSqlSessionFactory.databaseSpecificFalseConstant.get(databaseType));
 

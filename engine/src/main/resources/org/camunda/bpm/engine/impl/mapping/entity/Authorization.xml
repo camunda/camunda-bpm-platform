@@ -207,7 +207,7 @@
       <if test="permCheck.resourceIdQueryParam != null || (permCheck.resourceId != null &amp;&amp; !permCheck.resourceId.equals('*')) ">
         WHEN
           <if test="permCheck.resourceIdQueryParam != null">
-          ${permCheck.resourceIdQueryParam} IN
+          ${caseWhenInStart} ${permCheck.resourceIdQueryParam} IN
           </if>
           <if test="permCheck.resourceId != null">
           ${existsStart}
@@ -230,6 +230,9 @@
           <if test="permCheck.resourceId != null">
           ${existsEnd}
           </if>
+          <if test="permCheck.resourceIdQueryParam != null">
+          ${caseWhenInEnd}
+          </if>
         THEN 1
       </if>
 
@@ -237,7 +240,7 @@
       <if test="revokeAuthorizationCheckEnabled &amp;&amp; (permCheck.resourceIdQueryParam != null || (permCheck.resourceId != null &amp;&amp; !permCheck.resourceId.equals('*'))) ">
         WHEN
           <if test="permCheck.resourceIdQueryParam != null">
-          ${permCheck.resourceIdQueryParam} IN
+          ${caseWhenInStart} ${permCheck.resourceIdQueryParam} IN
           </if>
           <if test="permCheck.resourceId != null">
           ${existsStart}
@@ -259,6 +262,9 @@
             )
           <if test="permCheck.resourceId != null">
           ${existsEnd}
+          </if>
+          <if test="permCheck.resourceIdQueryParam != null">
+          ${caseWhenInEnd}
           </if>
         THEN 0
       </if>
@@ -315,7 +321,7 @@
                 <if test="permCheck.resourceIdQueryParam != null || (permCheck.resourceId != null &amp;&amp; !permCheck.resourceId.equals('*')) ">
                   WHEN
                     <if test="permCheck.resourceIdQueryParam != null">
-                    ${permCheck.resourceIdQueryParam} IN
+                    ${caseWhenInStart} ${permCheck.resourceIdQueryParam} IN
                     </if>
                     <if test="permCheck.resourceId != null">
                     ${existsStart}
@@ -338,6 +344,9 @@
                     <if test="permCheck.resourceId != null">
                     ${existsEnd}
                     </if>
+                    <if test="permCheck.resourceIdQueryParam != null">
+                    ${caseWhenInEnd}
+                    </if>
                   THEN 1
                 </if>
 
@@ -345,7 +354,7 @@
                 <if test="revokeAuthorizationCheckEnabled &amp;&amp; (permCheck.resourceIdQueryParam != null || (permCheck.resourceId != null &amp;&amp; !permCheck.resourceId.equals('*'))) ">
                   WHEN
                     <if test="permCheck.resourceIdQueryParam != null">
-                    ${permCheck.resourceIdQueryParam} IN
+                    ${caseWhenInStart} ${permCheck.resourceIdQueryParam} IN
                     </if>
                     <if test="permCheck.resourceId != null">
                     ${existsStart}
@@ -367,6 +376,9 @@
                       )
                     <if test="permCheck.resourceId != null">
                     ${existsEnd}
+                    </if>
+                    <if test="permCheck.resourceIdQueryParam != null">
+                    ${caseWhenInEnd}
                     </if>
                   THEN 0
                 </if>
@@ -421,7 +433,7 @@
                           <if test="permCheck.resourceIdQueryParam != null || (permCheck.resourceId != null &amp;&amp; !permCheck.resourceId.equals('*')) ">
                             WHEN
                               <if test="permCheck.resourceIdQueryParam != null">
-                              ${permCheck.resourceIdQueryParam} IN
+                              ${caseWhenInStart} ${permCheck.resourceIdQueryParam} IN
                               </if>
                               <if test="permCheck.resourceId != null">
                               ${existsStart}
@@ -444,6 +456,9 @@
                               <if test="permCheck.resourceId != null">
                               ${existsEnd}
                               </if>
+                              <if test="permCheck.resourceIdQueryParam != null">
+                              ${caseWhenInEnd}
+                              </if>
                             THEN 1
                           </if>
 
@@ -451,7 +466,7 @@
                           <if test="revokeAuthorizationCheckEnabled &amp;&amp; (permCheck.resourceIdQueryParam != null || (permCheck.resourceId != null &amp;&amp; !permCheck.resourceId.equals('*'))) ">
                             WHEN
                               <if test="permCheck.resourceIdQueryParam != null">
-                              ${permCheck.resourceIdQueryParam} IN
+                              ${caseWhenInStart} ${permCheck.resourceIdQueryParam} IN
                               </if>
                               <if test="permCheck.resourceId != null">
                               ${existsStart}
@@ -473,6 +488,9 @@
                                 )
                               <if test="permCheck.resourceId != null">
                               ${existsEnd}
+                              </if>
+                              <if test="permCheck.resourceIdQueryParam != null">
+                              ${caseWhenInEnd}
                               </if>
                             THEN 0
                           </if>
