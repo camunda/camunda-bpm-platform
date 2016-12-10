@@ -83,7 +83,7 @@
     select ${distinct} RES.*
     ${limitBetween}
     <include refid="selectHistoricBatchesByQueryCriteriaSql"/>
-    ${orderBy}
+    order by ${orderBy}
     ${limitAfter}
   </select>
 

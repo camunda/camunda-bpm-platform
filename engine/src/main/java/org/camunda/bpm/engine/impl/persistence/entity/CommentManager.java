@@ -17,6 +17,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.impl.Direction;
+import org.camunda.bpm.engine.impl.QueryOrderingProperty;
+import org.camunda.bpm.engine.impl.QueryPropertyImpl;
 import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
@@ -51,7 +54,7 @@ public class CommentManager extends AbstractHistoricManager {
 
     ListQueryParameterObject query = new ListQueryParameterObject();
     query.setParameter(taskId);
-    query.setOrderBy("RES.TIME_ desc");
+    query.getOrderingProperties().add(new QueryOrderingProperty(new QueryPropertyImpl("TIME_"), Direction.DESCENDING));
 
     return getDbEntityManager().selectList("selectEventsByTaskId", query);
   }

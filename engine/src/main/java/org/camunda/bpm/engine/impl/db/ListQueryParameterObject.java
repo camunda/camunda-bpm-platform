@@ -13,7 +13,11 @@
 
 package org.camunda.bpm.engine.impl.db;
 
+import org.camunda.bpm.engine.impl.QueryOrderingProperty;
+
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Daniel Meyer
@@ -22,15 +26,13 @@ public class ListQueryParameterObject implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  public static final String DEFAULT_ORDER_BY = "RES.ID_ asc";
-
   protected AuthorizationCheck authCheck = new AuthorizationCheck();
 
   protected TenantCheck tenantCheck = new TenantCheck();
+  protected List<QueryOrderingProperty> orderingProperties = new ArrayList<QueryOrderingProperty>();
 
   protected int maxResults = Integer.MAX_VALUE;
   protected int firstResult = 0;
-  protected String orderBy;
   protected Object parameter;
   protected String databaseType;
 
@@ -78,26 +80,12 @@ public class ListQueryParameterObject implements Serializable {
     this.parameter = parameter;
   }
 
-  public String getOrderBy() {
-    if(orderBy == null) {
-      // the default order column
-      return DEFAULT_ORDER_BY;
-
-    }else {
-      return orderBy;
-    }
-  }
-
   public void setDatabaseType(String databaseType) {
     this.databaseType = databaseType;
   }
 
   public String getDatabaseType() {
     return databaseType;
-  }
-
-  public void setOrderBy(String orderBy) {
-    this.orderBy = orderBy;
   }
 
   public AuthorizationCheck getAuthCheck() {
@@ -116,4 +104,11 @@ public class ListQueryParameterObject implements Serializable {
     this.tenantCheck = tenantCheck;
   }
 
+  public List<QueryOrderingProperty> getOrderingProperties() {
+    return orderingProperties;
+  }
+
+  public void setOrderingProperties(List<QueryOrderingProperty> orderingProperties) {
+    this.orderingProperties = orderingProperties;
+  }
 }

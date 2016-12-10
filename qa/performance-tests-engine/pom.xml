@@ -160,6 +160,77 @@
 
     </profile>
 
+
+    <!-- the benchmark performs multiple runs of the same process on multiple threads. -->
+    <profile>
+      <id>single-run</id>
+
+      <properties>
+        <!-- default values for properties -->
+        <numberOfThreads>1</numberOfThreads>
+        <numberOfRuns>1</numberOfRuns>
+        <testWatchers></testWatchers>
+        <processEnginePlugins></processEnginePlugins>
+        <watchActivities></watchActivities>
+        <test.excludes>query</test.excludes>
+      </properties>
+
+      <build>
+        <testResources>
+          <testResource>
+            <directory>src/test/resources</directory>
+            <filtering>true</filtering>
+          </testResource>
+        </testResources>
+
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <redirectTestOutputToFile>true</redirectTestOutputToFile>
+              <argLine>-Xmx1024m</argLine>
+              <includes>
+                 <include>%regex[.*(${test.includes}).*Test.*.class]</include>
+              </includes>
+              <excludes>
+                <exclude>**/*TestCase.java</exclude>
+                <exclude>%regex[.*(${test.excludes}).*Test.*.class]</exclude>
+              </excludes>
+            </configuration>
+          </plugin>
+
+          <plugin>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>1.4</version>
+            <executions>
+              <execution>
+                <id>database-test-drop-schema</id>
+                <phase>prepare-package</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <tasks>
+                    <echo message="Generating reports" />
+                    <copy todir="${basedir}/target/reports/images" flatten="true">
+                      <fileset dir="${basedir}/src/test/resources">
+                        <include name="**/*.png"/>
+                      </fileset>
+                    </copy>
+                    <java classname="org.camunda.bpm.qa.performance.engine.benchmark.BenchmarkReport" classpathref="maven.test.classpath" />
+                  </tasks>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
+        </plugins>
+
+      </build>
+
+    </profile>
+
     <!-- Allows to log the process engine's interaction with the database -->
     <profile>
       <id>sql-statementlog</id>

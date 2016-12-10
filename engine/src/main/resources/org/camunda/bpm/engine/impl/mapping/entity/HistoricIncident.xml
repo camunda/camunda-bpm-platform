@@ -111,7 +111,7 @@
     select RES.*
     ${limitBetween}
     <include refid="selectHistoricIncidentByQueryCriteriaSql"/>
-    ${orderBy}
+    order by ${orderBy}
     ${limitAfter}
   </select>
 

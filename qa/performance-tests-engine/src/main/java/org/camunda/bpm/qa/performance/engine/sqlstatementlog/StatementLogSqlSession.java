@@ -284,7 +284,7 @@ public class StatementLogSqlSession extends DelegatingSqlSession {
       try {
         statementParameters = JsonUtil.getMapper().writeValueAsString(parameters).replaceAll("\"", "'");
       } catch (Exception e) {
-        e.printStackTrace();
+//        e.printStackTrace();
       }
     }
 

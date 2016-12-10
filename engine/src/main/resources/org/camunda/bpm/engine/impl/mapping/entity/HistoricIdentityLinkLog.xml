@@ -69,7 +69,7 @@
     select RES.*
     ${limitBetween}
     <include refid="selectHistoricIdentityLinkByQueryCriteriaSql"/>
-    ${orderBy}
+    order by ${orderBy}
     ${limitAfter}
   </select>
 

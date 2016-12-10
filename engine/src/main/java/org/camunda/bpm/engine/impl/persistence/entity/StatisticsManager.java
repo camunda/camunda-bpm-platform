@@ -126,7 +126,7 @@ public class StatisticsManager extends AbstractManager {
     CommandContext commandContext = getCommandContext();
     if (isAuthorizationEnabled() && getCurrentAuthentication() != null && commandContext.isAuthorizationCheckEnabled()) {
       String decisionRequirementsDefinitionId = query.getDecisionRequirementsDefinitionId();
-      DecisionRequirementsDefinition definition = getDecisionDefinitionManager().findDecisionRequirementsDefinitionById(decisionRequirementsDefinitionId);
+      DecisionRequirementsDefinition definition = getDecisionRequirementsDefinitionManager().findDecisionRequirementsDefinitionById(decisionRequirementsDefinitionId);
       ensureNotNull("no deployed decision requirements definition found with id '" + decisionRequirementsDefinitionId + "'", "decisionRequirementsDefinition", definition);
       getAuthorizationManager().checkAuthorization(READ, DECISION_REQUIREMENTS_DEFINITION, definition.getKey());
     }

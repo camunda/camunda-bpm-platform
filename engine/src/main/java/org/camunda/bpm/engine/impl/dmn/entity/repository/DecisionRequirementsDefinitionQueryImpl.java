@@ -191,7 +191,7 @@ public class DecisionRequirementsDefinitionQueryImpl extends AbstractQuery<Decis
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
     return commandContext
-      .getDecisionDefinitionManager()
+      .getDecisionRequirementsDefinitionManager()
       .findDecisionRequirementsDefinitionCountByQueryCriteria(this);
   }
 
@@ -199,7 +199,7 @@ public class DecisionRequirementsDefinitionQueryImpl extends AbstractQuery<Decis
   public List<DecisionRequirementsDefinition> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
     return commandContext
-      .getDecisionDefinitionManager()
+      .getDecisionRequirementsDefinitionManager()
       .findDecisionRequirementsDefinitionsByQueryCriteria(this, page);
   }
 

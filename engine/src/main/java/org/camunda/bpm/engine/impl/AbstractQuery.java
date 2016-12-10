@@ -57,8 +57,6 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
 
   protected ResultType resultType;
 
-  protected List<QueryOrderingProperty> orderingProperties = new ArrayList<QueryOrderingProperty>();
-
   protected Map<String, String> expressions = new HashMap<String, String>();
 
   protected Set<Validator<AbstractQuery<?, ?>>> validators = new HashSet<Validator<AbstractQuery<?, ?>>>();
@@ -213,24 +211,6 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
     return null;
   }
 
-  @Deprecated
-  @Override
-  public String getOrderBy() {
-    if(orderBy == null) {
-      return super.getOrderBy();
-    } else {
-      return orderBy;
-    }
-  }
-
-  public List<QueryOrderingProperty> getOrderingProperties() {
-    return orderingProperties;
-  }
-
-  public void setOrderingProperties(List<QueryOrderingProperty> orderingProperties) {
-    this.orderingProperties = orderingProperties;
-  }
-
   public Map<String, String> getExpressions() {
     return expressions;
   }
@@ -332,6 +312,5 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
   public void removeValidator(Validator<AbstractQuery<?, ?>> validator) {
     validators.remove(validator);
   }
-
 
 }

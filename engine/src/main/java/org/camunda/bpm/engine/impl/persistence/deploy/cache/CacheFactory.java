@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package org.camunda.bpm.engine.impl.persistence.deploy;
+package org.camunda.bpm.engine.impl.persistence.deploy.cache;
 
 import org.camunda.commons.utils.cache.Cache;
 

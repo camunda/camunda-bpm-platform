@@ -12,21 +12,20 @@
  */
 package org.camunda.bpm.qa.performance.engine.util;
 
-import java.sql.Connection;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.ibatis.executor.BatchResult;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.session.SqlSession;
 
+import java.sql.Connection;
+import java.util.List;
+import java.util.Map;
+
 /**
  * <p>Implementation of {@link SqlSession} delegating to a wrapped session</p>
  *
  * @author Daniel Meyer
- *
  */
 public class DelegatingSqlSession implements SqlSession {
 
@@ -143,7 +142,6 @@ public class DelegatingSqlSession implements SqlSession {
   public Connection getConnection() {
     return wrappedSession.getConnection();
   }
-
 
 
 }

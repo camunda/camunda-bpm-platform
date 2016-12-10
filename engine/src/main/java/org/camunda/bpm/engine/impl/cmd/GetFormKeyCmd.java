@@ -23,7 +23,7 @@ import org.camunda.bpm.engine.impl.form.handler.DelegateStartFormHandler;
 import org.camunda.bpm.engine.impl.form.handler.FormHandler;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
+import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.task.TaskDefinition;
 

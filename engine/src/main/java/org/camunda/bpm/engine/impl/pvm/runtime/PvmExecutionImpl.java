@@ -1177,7 +1177,6 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   @Override
   public void enterActivityInstance() {
     ActivityImpl activity = getActivity();
-
     activityInstanceId = generateActivityInstanceId(activity.getId());
 
     LOG.debugEnterActivityInstance(this, getParentActivityInstanceId());

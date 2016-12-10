@@ -167,7 +167,7 @@
     select RES.*
     ${limitBetween}
     <include refid="selectHistoricJobLogByQueryCriteriaSql"/>
-    ${orderBy}
+    order by ${orderBy}
     ${limitAfter}
   </select>
 

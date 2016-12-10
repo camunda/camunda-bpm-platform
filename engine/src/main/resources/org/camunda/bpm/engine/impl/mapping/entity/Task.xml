@@ -186,9 +186,9 @@
     <if test="taskNameCaseInsensitive">
       , lower(RES.NAME_) LOWER_NAME_
     </if>
-    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderBySelection"/> 
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderBySelection"/>
     <include refid="selectTaskByQueryCriteriaSql"/>
-    ${orderBy}
+    order by ${orderBy}
     ${limitAfter}
   </select>
 

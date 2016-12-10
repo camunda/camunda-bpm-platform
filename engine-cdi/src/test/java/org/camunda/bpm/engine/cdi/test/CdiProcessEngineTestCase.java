@@ -100,8 +100,8 @@ public abstract class CdiProcessEngineTestCase {
     }
 
     beanManager = ProgrammaticBeanLookup.lookup(BeanManager.class);
-    processEngine = ProgrammaticBeanLookup.lookup(ProcessEngine.class);
-    processEngineConfiguration = ((ProcessEngineImpl)BpmPlatform.getProcessEngineService().getDefaultProcessEngine()).getProcessEngineConfiguration();
+    processEngine = processEngineRule.getProcessEngine();
+    processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngineRule.getProcessEngine().getProcessEngineConfiguration();
     formService = processEngine.getFormService();
     historyService = processEngine.getHistoryService();
     identityService = processEngine.getIdentityService();

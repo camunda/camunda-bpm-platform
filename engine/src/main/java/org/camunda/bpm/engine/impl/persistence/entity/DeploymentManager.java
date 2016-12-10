@@ -22,8 +22,9 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.auth.ResourceAuthorizationProvider;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionManager;
+import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionManager;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
-import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
+import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
@@ -178,11 +179,12 @@ public class DeploymentManager extends AbstractManager {
   protected void deleteDecisionRequirementDeployment(String deploymentId) {
     ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
     if (processEngineConfiguration.isDmnEnabled()) {
-      DecisionDefinitionManager decisionDefinitionManager = getDecisionDefinitionManager();
-      List<DecisionRequirementsDefinition> decisionRequirementsDefinitions = decisionDefinitionManager.findDecisionRequirementsDefinitionByDeploymentId(deploymentId);
+      DecisionRequirementsDefinitionManager manager = getDecisionRequirementsDefinitionManager();
+      List<DecisionRequirementsDefinition> decisionRequirementsDefinitions =
+          manager.findDecisionRequirementsDefinitionByDeploymentId(deploymentId);
 
       // delete decision requirements definitions from db
-      decisionDefinitionManager.deleteDecisionRequirementsDefinitionsByDeploymentId(deploymentId);
+      manager.deleteDecisionRequirementsDefinitionsByDeploymentId(deploymentId);
 
       DeploymentCache deploymentCache = processEngineConfiguration.getDeploymentCache();
 

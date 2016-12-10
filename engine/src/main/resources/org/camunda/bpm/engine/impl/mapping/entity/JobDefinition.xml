@@ -130,7 +130,7 @@
     select ${distinct} RES.*
     ${limitBetween}
     <include refid="selectJobDefinitionByQueryCriteriaSql"/>
-    ${orderBy}
+    order by ${orderBy}
     ${limitAfter}
   </select>
 

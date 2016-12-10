@@ -12,13 +12,13 @@
  */
 package org.camunda.bpm.engine.impl.jobexecutor;
 
-import java.util.List;
-
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmd.UnlockJobCmd;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+
+import java.util.List;
 
 
 /**
@@ -68,6 +68,11 @@ public class ExecuteJobsRunnable implements Runnable {
 
         }
       }
+
+      // if there were only exclusive jobs then the job executor
+      // does a backoff. In order to avoid too much waiting time
+      // we need to tell him to check once more if there were any jobs added.
+      jobExecutor.jobWasAdded();
 
     } finally {
       Context.removeJobExecutorContext();

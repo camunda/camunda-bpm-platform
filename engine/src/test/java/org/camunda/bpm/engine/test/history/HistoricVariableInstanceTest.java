@@ -1676,7 +1676,7 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
     } catch (NullValueException e) {}
   }
 
-  public void FAILING_testSetVariableInSubProcessStartEventWithEndListener () throws Exception {
+  public void testSetVariableInSubProcessStartEventWithEndListener () throws Exception {
     //given
     BpmnModelInstance topProcess = Bpmn.createExecutableProcess("topProcess")
         .startEvent()
@@ -1703,6 +1703,50 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
 
     //then
     assertThat(historyService.createHistoricVariableInstanceQuery().count(), is (3L));
+    repositoryService.deleteDeployment(deployment.getId(),true);
+  }
+
+  public void testSetVariableInEndListenerOfAsyncStartEvent () throws Exception {
+    //given
+    BpmnModelInstance subProcess = Bpmn.createExecutableProcess("process")
+      .startEvent()
+      .camundaAsyncBefore()
+      .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_END, SubProcessActivityStartListener.class.getName())
+      .endEvent()
+      .done();
+
+    org.camunda.bpm.engine.repository.Deployment deployment = repositoryService.createDeployment()
+      .addModelInstance("process.bpmn", subProcess)
+      .deploy();
+
+    //when
+    runtimeService.startProcessInstanceByKey("process", Variables.createVariables().putValue("executionListenerCounter",1));
+    managementService.executeJob(managementService.createJobQuery().active().singleResult().getId());
+
+    //then
+    assertThat(historyService.createHistoricVariableInstanceQuery().count(), is (2L));
+    repositoryService.deleteDeployment(deployment.getId(),true);
+  }
+
+  public void testSetVariableInStartListenerOfAsyncStartEvent () throws Exception {
+    //given
+    BpmnModelInstance subProcess = Bpmn.createExecutableProcess("process")
+      .startEvent()
+      .camundaAsyncBefore()
+      .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_START, SubProcessActivityStartListener.class.getName())
+      .endEvent()
+      .done();
+
+    org.camunda.bpm.engine.repository.Deployment deployment = repositoryService.createDeployment()
+      .addModelInstance("process.bpmn", subProcess)
+      .deploy();
+
+    //when
+    runtimeService.startProcessInstanceByKey("process", Variables.createVariables().putValue("executionListenerCounter",1));
+    managementService.executeJob(managementService.createJobQuery().active().singleResult().getId());
+
+    //then
+    assertThat(historyService.createHistoricVariableInstanceQuery().count(), is (2L));
     repositoryService.deleteDeployment(deployment.getId(),true);
   }
 }

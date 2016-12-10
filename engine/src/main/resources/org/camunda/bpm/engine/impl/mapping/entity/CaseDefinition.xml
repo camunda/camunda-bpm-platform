@@ -156,7 +156,7 @@
     select ${distinct} RES.*
     ${limitBetween}
     <include refid="selectCaseDefinitionsByQueryCriteriaSql"/>
-    ${orderBy}
+    order by ${orderBy}
     ${limitAfter}
   </select>
 
@@ -172,7 +172,7 @@
     select ${distinct} RES.* 
     ${limitBetween}
     <include refid="selectCaseDefinitionsByQueryCriteriaSql"/>
-    ${orderBy}
+    order by ${orderBy}
     ${limitAfter}
   </select>
 

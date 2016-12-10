@@ -113,6 +113,7 @@
   </select>
 
   <sql id="selectEventsByTaskIdSql">
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
     select distinct RES.* ${limitBetween}
     from (
@@ -158,7 +159,7 @@
         and OPERATION_TYPE_ in ('AddAttachment',
                                 'DeleteAttachment')
     ) RES
-    ${orderBy}
+    order by ${orderBy}
     ${limitAfter}
   </sql>
 

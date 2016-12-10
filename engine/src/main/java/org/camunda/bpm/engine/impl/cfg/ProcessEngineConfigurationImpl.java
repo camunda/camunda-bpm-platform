@@ -103,6 +103,7 @@ import org.camunda.bpm.engine.impl.dmn.configuration.DmnEngineConfigurationBuild
 import org.camunda.bpm.engine.impl.dmn.deployer.DecisionDefinitionDeployer;
 import org.camunda.bpm.engine.impl.dmn.deployer.DecisionRequirementsDefinitionDeployer;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionManager;
+import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionManager;
 import org.camunda.bpm.engine.impl.el.CommandContextFunctionMapper;
 import org.camunda.bpm.engine.impl.el.DateTimeFunctionMapper;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
@@ -199,10 +200,10 @@ import org.camunda.bpm.engine.impl.migration.validation.instance.SupportedActivi
 import org.camunda.bpm.engine.impl.migration.validation.instance.VariableConflictActivityInstanceValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instruction.*;
 import org.camunda.bpm.engine.impl.persistence.GenericManagerFactory;
-import org.camunda.bpm.engine.impl.persistence.deploy.CacheFactory;
-import org.camunda.bpm.engine.impl.persistence.deploy.DefaultCacheFactory;
+import org.camunda.bpm.engine.impl.persistence.deploy.cache.CacheFactory;
+import org.camunda.bpm.engine.impl.persistence.deploy.cache.DefaultCacheFactory;
 import org.camunda.bpm.engine.impl.persistence.deploy.Deployer;
-import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
+import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
 import org.camunda.bpm.engine.impl.persistence.entity.AttachmentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.BatchManager;
@@ -1195,6 +1196,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       addSessionFactory(new GenericManagerFactory(CaseSentryPartManager.class));
 
       addSessionFactory(new GenericManagerFactory(DecisionDefinitionManager.class));
+      addSessionFactory(new GenericManagerFactory(DecisionRequirementsDefinitionManager.class));
       addSessionFactory(new GenericManagerFactory(HistoricDecisionInstanceManager.class));
 
       sessionFactories.put(ReadOnlyIdentityProvider.class, identityProviderSessionFactory);
@@ -1364,7 +1366,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     if (isDmnEnabled()) {
       DecisionRequirementsDefinitionDeployer decisionRequirementsDefinitionDeployer = getDecisionRequirementsDefinitionDeployer();
       DecisionDefinitionDeployer decisionDefinitionDeployer = getDecisionDefinitionDeployer();
-      // the DecisionRequirementsDefinition deployer must be before the DecisionDefinitionDeployer
+      // the DecisionRequirementsDefinition cacheDeployer must be before the DecisionDefinitionDeployer
       defaultDeployers.add(decisionRequirementsDefinitionDeployer);
       defaultDeployers.add(decisionDefinitionDeployer);
     }

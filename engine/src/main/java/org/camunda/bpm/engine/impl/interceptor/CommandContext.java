@@ -12,22 +12,9 @@
  */
 package org.camunda.bpm.engine.impl.interceptor;
 
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Callable;
-
 import org.camunda.bpm.application.InvocationContext;
 import org.camunda.bpm.application.ProcessApplicationReference;
-import org.camunda.bpm.engine.BadUserRequestException;
-import org.camunda.bpm.engine.IdentityService;
-import org.camunda.bpm.engine.OptimisticLockingException;
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.TaskAlreadyClaimedException;
+import org.camunda.bpm.engine.*;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.TransactionContext;
@@ -42,51 +29,18 @@ import org.camunda.bpm.engine.impl.context.ProcessApplicationContextUtil;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSession;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionManager;
+import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionManager;
 import org.camunda.bpm.engine.impl.history.event.HistoricDecisionInstanceManager;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.identity.ReadOnlyIdentityProvider;
 import org.camunda.bpm.engine.impl.identity.WritableIdentityProvider;
 import org.camunda.bpm.engine.impl.jobexecutor.FailedJobCommandFactory;
-import org.camunda.bpm.engine.impl.persistence.entity.AttachmentManager;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
-import org.camunda.bpm.engine.impl.persistence.entity.BatchManager;
-import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayManager;
-import org.camunda.bpm.engine.impl.persistence.entity.CommentManager;
-import org.camunda.bpm.engine.impl.persistence.entity.DeploymentManager;
-import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionManager;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionManager;
-import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskManager;
-import org.camunda.bpm.engine.impl.persistence.entity.FilterManager;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricActivityInstanceManager;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricBatchManager;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricCaseActivityInstanceManager;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricCaseInstanceManager;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailManager;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricIdentityLinkLogManager;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentManager;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogManager;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceManager;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricStatisticsManager;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceManager;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceManager;
-import org.camunda.bpm.engine.impl.persistence.entity.IdentityInfoManager;
-import org.camunda.bpm.engine.impl.persistence.entity.IdentityLinkManager;
-import org.camunda.bpm.engine.impl.persistence.entity.IncidentManager;
-import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionManager;
-import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.JobManager;
-import org.camunda.bpm.engine.impl.persistence.entity.MeterLogManager;
-import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionManager;
-import org.camunda.bpm.engine.impl.persistence.entity.PropertyManager;
-import org.camunda.bpm.engine.impl.persistence.entity.ReportManager;
-import org.camunda.bpm.engine.impl.persistence.entity.ResourceManager;
-import org.camunda.bpm.engine.impl.persistence.entity.StatisticsManager;
-import org.camunda.bpm.engine.impl.persistence.entity.TableDataManager;
-import org.camunda.bpm.engine.impl.persistence.entity.TaskManager;
-import org.camunda.bpm.engine.impl.persistence.entity.TaskReportManager;
-import org.camunda.bpm.engine.impl.persistence.entity.TenantManager;
-import org.camunda.bpm.engine.impl.persistence.entity.UserOperationLogManager;
-import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceManager;
+import org.camunda.bpm.engine.impl.persistence.entity.*;
+
+import java.util.*;
+import java.util.concurrent.Callable;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Tom Baeyens
@@ -458,6 +412,10 @@ public class CommandContext {
 
   public DecisionDefinitionManager getDecisionDefinitionManager() {
     return getSession(DecisionDefinitionManager.class);
+  }
+
+  public DecisionRequirementsDefinitionManager getDecisionRequirementsDefinitionManager() {
+    return getSession(DecisionRequirementsDefinitionManager.class);
   }
 
   public HistoricDecisionInstanceManager getHistoricDecisionInstanceManager() {
