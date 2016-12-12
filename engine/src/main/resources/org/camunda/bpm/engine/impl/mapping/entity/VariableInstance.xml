@@ -218,7 +218,7 @@
     select ${distinct} RES.*
     ${limitBetween}
     <include refid="selectVariableInstanceByQueryCriteriaSql"/>
-    order by ${orderBy}
+    ${orderBy}
     ${limitAfter}
   </select>
 

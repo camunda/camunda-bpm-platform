@@ -98,7 +98,7 @@
     select ${distinct} RES.*
     ${limitBetween}
     <include refid="selectBatchesByQueryCriteriaSql"/>
-    order by ${orderBy}
+    ${orderBy}
     ${limitAfter}
   </select>
 

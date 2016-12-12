@@ -51,7 +51,7 @@
     select ${distinct} RES.* 
     ${limitBetween}
     <include refid="selectTenantByQueryCriteriaSql" />
-    order by ${orderBy}
+    ${orderBy}
     ${limitAfter}
   </select>
   

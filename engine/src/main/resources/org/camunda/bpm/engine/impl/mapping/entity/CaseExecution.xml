@@ -117,7 +117,7 @@
     ${limitBetween}
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderBySelection"/>
     <include refid="selectCaseExecutionsByQueryCriteriaSql"/>
-    order by ${orderBy}
+    ${orderBy}
     ${limitAfter}
   </select>
 
@@ -134,7 +134,7 @@
     ${limitBetween}
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderBySelection"/>
     <include refid="selectCaseExecutionsByQueryCriteriaSql"/>
-    order by ${orderBy}
+    ${orderBy}
     ${limitAfter}
   </select>
 

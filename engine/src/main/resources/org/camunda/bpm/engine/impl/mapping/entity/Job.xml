@@ -156,7 +156,7 @@
       and (<include refid="AtomicExclusiveOrNonExclusiveJobs"/>)
 
     <if test="parameter.applyOrdering">
-      order by ${orderBy}
+      ${orderBy}
     </if>
     ${limitAfter}
   </select>
@@ -220,7 +220,7 @@
     select ${distinct} RES.*
     ${limitBetween}
     <include refid="selectJobByQueryCriteriaSql"/>
-    order by ${orderBy}
+    ${orderBy}
     ${limitAfter}
   </select>
 

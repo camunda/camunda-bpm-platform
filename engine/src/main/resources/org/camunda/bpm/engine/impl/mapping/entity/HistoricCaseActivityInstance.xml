@@ -125,7 +125,7 @@
     select ${distinct} RES.*
     ${limitBetween}
     <include refid="selectHistoricCaseActivityInstancesByQueryCriteriaSql"/>
-    order by ${orderBy}
+    ${orderBy}
     ${limitAfter}
   </select>
 

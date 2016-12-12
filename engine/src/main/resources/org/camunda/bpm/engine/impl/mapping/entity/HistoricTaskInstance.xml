@@ -173,7 +173,7 @@
     select RES.*
     ${limitBetween}
     <include refid="selectHistoricTaskInstancesByQueryCriteriaSql"/>
-    order by ${orderBy}
+    ${orderBy}
     ${limitAfter}
   </select>
 

@@ -115,7 +115,7 @@
     select ${distinct} RES.*
     ${limitBetween}
     <include refid="selectUserOperationLogEntriesByQueryCriteriaSql"/>
-    order by ${orderBy}
+    ${orderBy}
     ${limitAfter}
   </select>
 

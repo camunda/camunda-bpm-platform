@@ -139,7 +139,7 @@
         select ${distinct} RES.*
         ${limitBetween}
         <include refid="selectHistoricProcessInstancesByQueryCriteriaSql"/>
-        order by ${orderBy}
+        ${orderBy}
         ${limitAfter}
     </select>
 

@@ -143,7 +143,7 @@
     select ${distinct} RES.*
     ${limitBetween}
     <include refid="selectDecisionRequirementsDefinitionsByQueryCriteriaSql"/>
-    order by ${orderBy}
+    ${orderBy}
     ${limitAfter}
   </select>
 
@@ -159,7 +159,7 @@
     select ${distinct} RES.*
     ${limitBetween}
     <include refid="selectDecisionRequirementsDefinitionsByQueryCriteriaSql"/>
-    order by ${orderBy}
+    ${orderBy}
     ${limitAfter}
   </select>
 

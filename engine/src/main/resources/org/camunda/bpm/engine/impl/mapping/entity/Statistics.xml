@@ -82,7 +82,7 @@
     select ${distinct} RES.*
     ${limitBetween}
     <include refid="selectProcessDefinitionStatisticsByQueryCriteriaSql"/>
-    order by ${orderBy}
+    ${orderBy}
     ${limitAfter}
   </select>
 
@@ -199,7 +199,7 @@
     select ${distinct} RES.*
     ${limitBetween}
     <include refid="selectDeploymentStatisticsByQueryCriteriaSql"/>
-    order by ${orderBy}
+    ${orderBy}
     ${limitAfter}
   </select>
 
@@ -360,7 +360,7 @@
     select ${distinct} RES.*
     ${limitBetween}
     <include refid="selectActivityStatisticsByQueryCriteriaSql"/>
-    order by ${orderBy}
+    ${orderBy}
     ${limitAfter}
   </select>
 
@@ -614,7 +614,7 @@
     select ${distinct} RES.*
     ${limitBetween}
     <include refid="selectBatchStatisticsByQueryCriteriaSql"/>
-    order by ${orderBy}
+    ${orderBy}
     ${limitAfter}
   </select>
 
@@ -690,7 +690,7 @@
     select ${distinct} RES.*
     ${limitBetween}
     <include refid="selectDecisionDefinitionStatisticsByQueryCriteriaSql"/>
-    order by ${orderBy}
+    ${orderBy}
     ${limitAfter}
   </select>
 

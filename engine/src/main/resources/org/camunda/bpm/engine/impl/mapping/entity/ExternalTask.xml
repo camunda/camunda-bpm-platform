@@ -184,7 +184,7 @@
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
     <if test="parameter.applyOrdering">
-      order by ${orderBy}
+      ${orderBy}
     </if>
     ${limitAfter}
   </select>
@@ -196,7 +196,7 @@
     <include refid="columnSelection"/>
     ${limitBetween}
     <include refid="selectExternalTaskByQueryCriteriaSql"/>
-    order by ${orderBy}
+    ${orderBy}
     ${limitAfter}
   </select>
 

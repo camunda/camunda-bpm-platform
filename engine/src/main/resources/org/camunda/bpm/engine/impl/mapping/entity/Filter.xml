@@ -92,7 +92,7 @@
     select ${distinct} RES.*
     ${limitBetween}
     <include refid="selectFilterByQueryCriteriaSql" />
-    order by ${orderBy}
+    ${orderBy}
     ${limitAfter}
   </select>
 
@@ -102,7 +102,7 @@
     select ${distinct} RES.*
     ${limitBetween}
     <include refid="selectFilterByQueryCriteriaSql" />
-    order by ${orderBy}
+    ${orderBy}
     ${limitAfter}
   </select>
 
@@ -116,7 +116,7 @@
       select ${distinct} RES.ID_, RES.REV_, RES.RESOURCE_TYPE_, RES.NAME_, RES.OWNER_
       ${limitBetweenFilter}
       <include refid="selectFilterByQueryCriteriaSql" />
-      order by ${orderBy}
+      ${orderBy}
       ${limitAfter}
     ) RES
     INNER JOIN ${prefix}ACT_RU_FILTER J ON RES.ID_ = J.ID_
