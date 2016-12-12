@@ -13,33 +13,18 @@
 
 package org.camunda.bpm.engine.test.history;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
-import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.exception.NullValueException;
-import org.camunda.bpm.engine.history.HistoricActivityInstance;
-import org.camunda.bpm.engine.history.HistoricDetail;
-import org.camunda.bpm.engine.history.HistoricTaskInstance;
-import org.camunda.bpm.engine.history.HistoricVariableInstance;
-import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
-import org.camunda.bpm.engine.history.HistoricVariableUpdate;
+import org.camunda.bpm.engine.history.*;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
-import org.camunda.bpm.engine.runtime.CaseExecution;
-import org.camunda.bpm.engine.runtime.CaseInstance;
-import org.camunda.bpm.engine.runtime.Execution;
-import org.camunda.bpm.engine.runtime.Job;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.*;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
@@ -52,6 +37,9 @@ import org.camunda.bpm.engine.variable.value.FileValue;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.Assert;
+
+import java.util.*;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -1748,5 +1736,298 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
     //then
     assertThat(historyService.createHistoricVariableInstanceQuery().count(), is (2L));
     repositoryService.deleteDeployment(deployment.getId(),true);
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/async/AsyncStartEventTest.testAsyncStartEvent.bpmn20.xml")
+  public void testAsyncStartEventHistory() {
+    if(processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+      runtimeService.startProcessInstanceByKey("asyncStartEvent");
+
+      HistoricProcessInstance historicInstance = historyService.createHistoricProcessInstanceQuery().singleResult();
+      Assert.assertNotNull(historicInstance);
+      Assert.assertNotNull(historicInstance.getStartTime());
+
+      HistoricActivityInstance historicStartEvent = historyService.createHistoricActivityInstanceQuery().singleResult();
+      Assert.assertNull(historicStartEvent);
+    }
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/async/AsyncStartEventTest.testAsyncStartEvent.bpmn20.xml")
+  public void testAsyncStartEventVariableHistory() {
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("foo", "bar");
+    String processInstanceId = runtimeService.startProcessInstanceByKey("asyncStartEvent", variables).getId();
+
+    VariableInstance variableFoo = runtimeService.createVariableInstanceQuery().singleResult();
+    assertNotNull(variableFoo);
+    assertEquals("foo", variableFoo.getName());
+    assertEquals("bar", variableFoo.getValue());
+
+    assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+
+    executeAvailableJobs();
+
+    Task task = taskService.createTaskQuery().singleResult();
+    assertNotNull(task);
+
+    taskService.complete(task.getId());
+
+    // assert process instance is ended
+    assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+
+    if(processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
+      HistoricVariableInstance variable = historyService.createHistoricVariableInstanceQuery().singleResult();
+      assertNotNull(variable);
+      assertEquals("foo", variable.getName());
+      assertEquals("bar", variable.getValue());
+      assertEquals(processInstanceId, variable.getActivityInstanceId());
+
+      if(processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
+
+        String startEventId = historyService
+          .createHistoricActivityInstanceQuery()
+          .activityId("startEvent")
+          .singleResult()
+          .getId();
+
+        HistoricDetail historicDetail = historyService
+          .createHistoricDetailQuery()
+          .singleResult();
+
+        assertEquals(startEventId, historicDetail.getActivityInstanceId());
+      }
+    }
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/async/AsyncStartEventTest.testMultipleAsyncStartEvents.bpmn20.xml"})
+  public void testMultipleAsyncStartEventsVariableHistory() {
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("foo", "bar");
+    runtimeService.correlateMessage("newInvoiceMessage", new HashMap<String, Object>(), variables);
+
+    VariableInstance variableFoo = runtimeService.createVariableInstanceQuery().singleResult();
+    assertNotNull(variableFoo);
+    assertEquals("foo", variableFoo.getName());
+    assertEquals("bar", variableFoo.getValue());
+
+    assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+
+    executeAvailableJobs();
+
+    Task task = taskService.createTaskQuery().singleResult();
+    assertNotNull(task);
+    taskService.complete(task.getId());
+
+    // assert process instance is ended
+    assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+
+    if(processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
+
+      String processInstanceId = historyService
+        .createHistoricProcessInstanceQuery()
+        .singleResult()
+        .getId();
+
+      HistoricVariableInstance variable = historyService.createHistoricVariableInstanceQuery().singleResult();
+      assertNotNull(variable);
+      assertEquals("foo", variable.getName());
+      assertEquals("bar", variable.getValue());
+      assertEquals(processInstanceId, variable.getActivityInstanceId());
+
+      if(processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
+
+        String theStartActivityInstanceId = historyService
+          .createHistoricActivityInstanceQuery()
+          .activityId("messageStartEvent")
+          .singleResult()
+          .getId();
+
+        HistoricDetail historicDetail = historyService
+          .createHistoricDetailQuery()
+          .singleResult();
+
+        assertEquals(theStartActivityInstanceId, historicDetail.getActivityInstanceId());
+
+      }
+    }
+  }
+
+  public void testAsyncStartEventWithAddedVariable() {
+    // given a process definition with asynchronous start event
+    deployment(Bpmn.createExecutableProcess("testProcess")
+      .startEvent()
+      .camundaAsyncBefore()
+      .endEvent()
+      .done());
+
+    // when create an instance with a variable
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess",
+      Variables.putValue("var1", "foo"));
+
+    // and add a variable before the instance is created
+    runtimeService.setVariable(processInstance.getId(), "var2", "bar");
+
+    executeAvailableJobs();
+
+    assertProcessEnded(processInstance.getId());
+
+    if (processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
+
+      // then the history contains one entry for each variable
+      HistoricVariableInstanceQuery query = historyService.createHistoricVariableInstanceQuery();
+      assertEquals(query.count(), 2);
+
+      HistoricVariableInstance firstVariable = query.variableName("var1").singleResult();
+      assertNotNull(firstVariable);
+      assertEquals(firstVariable.getValue(), "foo");
+      assertNotNull(firstVariable.getActivityInstanceId());
+
+      HistoricVariableInstance secondVariable = query.variableName("var2").singleResult();
+      assertNotNull(secondVariable);
+      assertEquals(secondVariable.getValue(), "bar");
+      assertNotNull(secondVariable.getActivityInstanceId());
+    }
+  }
+
+
+  public void testAsyncStartEventWithChangedVariable() {
+    // given a process definition with asynchronous start event
+    deployment(Bpmn.createExecutableProcess("testProcess")
+      .startEvent()
+      .camundaAsyncBefore()
+      .endEvent()
+      .done());
+
+    // when create an instance with a variable
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess",
+      Variables.putValue("var", "foo"));
+
+    // and update this variable before the instance is created
+    runtimeService.setVariable(processInstance.getId(), "var", "bar");
+
+    executeAvailableJobs();
+
+    assertProcessEnded(processInstance.getId());
+
+    if (processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
+
+      // then the history contains only one entry for the latest update (value = "bar")
+      // - the entry for the initial value (value = "foo") is lost because of current limitations
+      HistoricVariableInstanceQuery query = historyService.createHistoricVariableInstanceQuery();
+      assertEquals(query.count(), 1);
+
+      HistoricVariableInstance variable = query.singleResult();
+      assertEquals(variable.getValue(), "bar");
+      assertNotNull(variable.getActivityInstanceId());
+    }
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/async/AsyncStartEventTest.testAsyncStartEvent.bpmn20.xml")
+  public void testSubmitForm() {
+
+    String processDefinitionId = repositoryService
+      .createProcessDefinitionQuery()
+      .processDefinitionKey("asyncStartEvent")
+      .singleResult()
+      .getId();
+
+    Map<String, Object> properties = new HashMap<String, Object>();
+    properties.put("foo", "bar");
+
+    formService.submitStartForm(processDefinitionId, properties);
+
+    VariableInstance variableFoo = runtimeService.createVariableInstanceQuery().singleResult();
+    assertNotNull(variableFoo);
+    assertEquals("foo", variableFoo.getName());
+    assertEquals("bar", variableFoo.getValue());
+
+    assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+
+    executeAvailableJobs();
+
+    Task task = taskService.createTaskQuery().singleResult();
+    assertNotNull(task);
+    taskService.complete(task.getId());
+
+    // assert process instance is ended
+    assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+
+    if(processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
+
+      String processInstanceId = historyService
+        .createHistoricProcessInstanceQuery()
+        .singleResult()
+        .getId();
+
+      HistoricVariableInstance variable = historyService.createHistoricVariableInstanceQuery().singleResult();
+      assertNotNull(variable);
+      assertEquals("foo", variable.getName());
+      assertEquals("bar", variable.getValue());
+      assertEquals(processInstanceId, variable.getActivityInstanceId());
+
+      if(processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
+
+        String theStartActivityInstanceId = historyService
+          .createHistoricActivityInstanceQuery()
+          .activityId("startEvent")
+          .singleResult()
+          .getId();
+
+        HistoricFormField historicFormUpdate = (HistoricFormField) historyService
+          .createHistoricDetailQuery()
+          .formFields()
+          .singleResult();
+
+        assertNotNull(historicFormUpdate);
+        assertEquals("bar", historicFormUpdate.getFieldValue());
+
+        HistoricVariableUpdate historicVariableUpdate = (HistoricVariableUpdate) historyService
+          .createHistoricDetailQuery()
+          .variableUpdates()
+          .singleResult();
+
+        assertNotNull(historicVariableUpdate);
+        assertEquals(theStartActivityInstanceId, historicVariableUpdate.getActivityInstanceId());
+        assertEquals("bar", historicVariableUpdate.getValue());
+
+      }
+    }
+  }
+
+  /**
+   * CAM-2828
+   */
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/async/AsyncStartEventTest.testAsyncStartEvent.bpmn20.xml")
+  public void FAILING_testSubmitFormHistoricUpdates() {
+
+    String processDefinitionId = repositoryService
+      .createProcessDefinitionQuery()
+      .processDefinitionKey("asyncStartEvent")
+      .singleResult()
+      .getId();
+
+    Map<String, Object> properties = new HashMap<String, Object>();
+    properties.put("foo", "bar");
+
+    formService.submitStartForm(processDefinitionId, properties);
+    executeAvailableJobs();
+
+    if(processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
+
+      String theStartActivityInstanceId = historyService
+        .createHistoricActivityInstanceQuery()
+        .activityId("startEvent")
+        .singleResult()
+        .getId();
+
+      HistoricDetail historicFormUpdate = historyService
+        .createHistoricDetailQuery()
+        .formFields()
+        .singleResult();
+
+      assertNotNull(historicFormUpdate);
+      assertEquals(theStartActivityInstanceId, historicFormUpdate.getActivityInstanceId());
+
+    }
   }
 }

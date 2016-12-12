@@ -1239,9 +1239,17 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     ActivityImpl currentActivity = getActivity();
 
     return (startContext == null || !startContext.isDelayFireHistoricVariableEvents())
-      && (currentActivity == null || !(activity.getActivityBehavior() instanceof NoneStartEventActivityBehavior)
-          || getActivityInstanceState() != ActivityInstanceState.DEFAULT.getStateCode()
-          || !activity.isAsyncBefore());
+      && (currentActivity == null || isActivityNoStartEvent(currentActivity)
+      || isStartEventInValidStateOrNotAsync(currentActivity));
+  }
+
+  protected boolean isActivityNoStartEvent(ActivityImpl currentActivity) {
+    return !(currentActivity.getActivityBehavior() instanceof NoneStartEventActivityBehavior);
+  }
+
+  protected boolean isStartEventInValidStateOrNotAsync(ActivityImpl currentActivity) {
+    return getActivityInstanceState() != ActivityInstanceState.DEFAULT.getStateCode()
+      || !currentActivity.isAsyncBefore();
   }
 
   public void fireHistoricVariableInstanceCreateEvents() {
