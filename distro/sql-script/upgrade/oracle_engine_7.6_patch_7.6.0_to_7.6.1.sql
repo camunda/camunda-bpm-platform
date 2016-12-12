@@ -1,0 +1,2 @@
+alter table ACT_RU_EVENT_SUBSCR
+  modify ACTIVITY_ID_ NVARCHAR2(255);
