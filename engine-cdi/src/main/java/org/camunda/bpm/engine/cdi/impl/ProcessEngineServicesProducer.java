@@ -53,7 +53,7 @@ public class ProcessEngineServicesProducer {
       return processEngine;
     } else {
       List<ProcessEngine> processEngines = BpmPlatform.getProcessEngineService().getProcessEngines();
-      if (processEngines != null && !processEngines.isEmpty()) {
+      if (processEngines != null && processEngines.size() == 1) {
         return processEngines.get(0);
       } else {
         return ProcessEngines.getDefaultProcessEngine(false);
