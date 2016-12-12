@@ -375,7 +375,7 @@
         </foreach>
       </if>
       <foreach collection="variables" index="index" item="queryVariableValue">
-        and exists (
+        and ${existsStart} (
           select
             ID_
           from
@@ -397,7 +397,7 @@
             and
             <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.variableValueConditions"/>
           </if>
-        )
+        ) ${existsEnd}
       </foreach>
 
       <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">

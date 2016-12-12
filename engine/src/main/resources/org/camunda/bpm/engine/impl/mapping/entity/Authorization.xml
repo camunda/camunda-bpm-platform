@@ -110,7 +110,7 @@
   <select id="selectRevokeAuthorization" resultType="integer">
     SELECT
     CASE
-    WHEN EXISTS
+    WHEN ${existsStart}
     ( SELECT ID_
       FROM ${prefix}ACT_RU_AUTHORIZATION 
       WHERE TYPE_ = 2
@@ -120,7 +120,7 @@
         OR GROUP_ID_ IN <foreach item="item" index="index" collection="authGroupIds" open="(" separator="," close=")">#{item, jdbcType=VARCHAR}</foreach>
         </if>
       )
-    ) THEN 1 ELSE 0 END ${dbSpecificDummyTable}
+    ) ${existsEnd} THEN 1 ELSE 0 END ${dbSpecificDummyTable}
   </select>
 
   <select id="selectAuthorizationByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.AuthorizationQueryImpl" resultMap="authorizationResultMap">
@@ -207,10 +207,10 @@
       <if test="permCheck.resourceIdQueryParam != null || (permCheck.resourceId != null &amp;&amp; !permCheck.resourceId.equals('*')) ">
         WHEN
           <if test="permCheck.resourceIdQueryParam != null">
-          ${permCheck.resourceIdQueryParam} IN
+          ${caseWhenInStart} ${permCheck.resourceIdQueryParam} IN
           </if>
           <if test="permCheck.resourceId != null">
-          EXISTS
+          ${existsStart}
           </if>
             (SELECT
                     A.RESOURCE_ID_
@@ -225,7 +225,14 @@
              AND
                     A.RESOURCE_TYPE_ = #{permCheck.resourceType, jdbcType=INTEGER}
              AND
-                    A.RESOURCE_ID_ = <if test="permCheck.resourceIdQueryParam != null">${permCheck.resourceIdQueryParam}</if><if test="permCheck.resourceId != null">#{permCheck.resourceId, jdbcType=VARCHAR}</if>)
+                    A.RESOURCE_ID_ = <if test="permCheck.resourceIdQueryParam != null">${permCheck.resourceIdQueryParam}</if><if test="permCheck.resourceId != null">#{permCheck.resourceId, jdbcType=VARCHAR}</if>
+            )
+          <if test="permCheck.resourceId != null">
+          ${existsEnd}
+          </if>
+          <if test="permCheck.resourceIdQueryParam != null">
+          ${caseWhenInEnd}
+          </if>
         THEN 1
       </if>
 
@@ -233,10 +240,10 @@
       <if test="revokeAuthorizationCheckEnabled &amp;&amp; (permCheck.resourceIdQueryParam != null || (permCheck.resourceId != null &amp;&amp; !permCheck.resourceId.equals('*'))) ">
         WHEN
           <if test="permCheck.resourceIdQueryParam != null">
-          ${permCheck.resourceIdQueryParam} IN
+          ${caseWhenInStart} ${permCheck.resourceIdQueryParam} IN
           </if>
           <if test="permCheck.resourceId != null">
-          EXISTS
+          ${existsStart}
           </if>
             (SELECT
                     A.RESOURCE_ID_
@@ -251,13 +258,20 @@
              AND
                     A.RESOURCE_TYPE_ = #{permCheck.resourceType, jdbcType=INTEGER}
              AND
-                    A.RESOURCE_ID_ = <if test="permCheck.resourceIdQueryParam != null">${permCheck.resourceIdQueryParam}</if><if test="permCheck.resourceId != null">#{permCheck.resourceId, jdbcType=VARCHAR}</if>)
+                    A.RESOURCE_ID_ = <if test="permCheck.resourceIdQueryParam != null">${permCheck.resourceIdQueryParam}</if><if test="permCheck.resourceId != null">#{permCheck.resourceId, jdbcType=VARCHAR}</if>
+            )
+          <if test="permCheck.resourceId != null">
+          ${existsEnd}
+          </if>
+          <if test="permCheck.resourceIdQueryParam != null">
+          ${caseWhenInEnd}
+          </if>
         THEN 0
       </if>
 
       <!-- User GRANT -->
       WHEN
-        EXISTS
+        ${existsStart}
           (SELECT
                   ID_
            FROM
@@ -272,12 +286,13 @@
                   A.RESOURCE_TYPE_ = #{permCheck.resourceType, jdbcType=INTEGER}
            AND
                   A.RESOURCE_ID_ = '*')
-        THEN 1
+        ${existsEnd}
+      THEN 1
 
       <!-- User REVOKE -->
       <if test="revokeAuthorizationCheckEnabled">
       WHEN
-        EXISTS
+        ${existsStart}
           (SELECT
                   ID_
            FROM
@@ -292,6 +307,7 @@
                   A.RESOURCE_TYPE_ = #{permCheck.resourceType, jdbcType=INTEGER}
            AND
                   A.RESOURCE_ID_ = '*')
+        ${existsEnd}           
       THEN 0
       </if>
 
@@ -305,10 +321,10 @@
                 <if test="permCheck.resourceIdQueryParam != null || (permCheck.resourceId != null &amp;&amp; !permCheck.resourceId.equals('*')) ">
                   WHEN
                     <if test="permCheck.resourceIdQueryParam != null">
-                    ${permCheck.resourceIdQueryParam} IN
+                    ${caseWhenInStart} ${permCheck.resourceIdQueryParam} IN
                     </if>
                     <if test="permCheck.resourceId != null">
-                    EXISTS
+                    ${existsStart}
                     </if>
                       (SELECT
                               A.RESOURCE_ID_
@@ -323,7 +339,14 @@
                        AND
                               A.RESOURCE_TYPE_ = #{permCheck.resourceType, jdbcType=INTEGER}
                        AND
-                              A.RESOURCE_ID_ = <if test="permCheck.resourceIdQueryParam != null">${permCheck.resourceIdQueryParam}</if><if test="permCheck.resourceId != null">#{permCheck.resourceId, jdbcType=VARCHAR}</if>)
+                              A.RESOURCE_ID_ = <if test="permCheck.resourceIdQueryParam != null">${permCheck.resourceIdQueryParam}</if><if test="permCheck.resourceId != null">#{permCheck.resourceId, jdbcType=VARCHAR}</if>
+                      )
+                    <if test="permCheck.resourceId != null">
+                    ${existsEnd}
+                    </if>
+                    <if test="permCheck.resourceIdQueryParam != null">
+                    ${caseWhenInEnd}
+                    </if>
                   THEN 1
                 </if>
 
@@ -331,10 +354,10 @@
                 <if test="revokeAuthorizationCheckEnabled &amp;&amp; (permCheck.resourceIdQueryParam != null || (permCheck.resourceId != null &amp;&amp; !permCheck.resourceId.equals('*'))) ">
                   WHEN
                     <if test="permCheck.resourceIdQueryParam != null">
-                    ${permCheck.resourceIdQueryParam} IN
+                    ${caseWhenInStart} ${permCheck.resourceIdQueryParam} IN
                     </if>
                     <if test="permCheck.resourceId != null">
-                    EXISTS
+                    ${existsStart}
                     </if>
                       (SELECT
                               A.RESOURCE_ID_
@@ -349,13 +372,20 @@
                        AND
                               A.RESOURCE_TYPE_ = #{permCheck.resourceType, jdbcType=INTEGER}
                        AND
-                              A.RESOURCE_ID_ = <if test="permCheck.resourceIdQueryParam != null">${permCheck.resourceIdQueryParam}</if><if test="permCheck.resourceId != null">#{permCheck.resourceId, jdbcType=VARCHAR}</if>)
+                              A.RESOURCE_ID_ = <if test="permCheck.resourceIdQueryParam != null">${permCheck.resourceIdQueryParam}</if><if test="permCheck.resourceId != null">#{permCheck.resourceId, jdbcType=VARCHAR}</if>
+                      )
+                    <if test="permCheck.resourceId != null">
+                    ${existsEnd}
+                    </if>
+                    <if test="permCheck.resourceIdQueryParam != null">
+                    ${caseWhenInEnd}
+                    </if>
                   THEN 0
                 </if>
 
                 <!-- Group GRANTS -->
                 WHEN
-                  EXISTS
+                  ${existsStart}
                     (SELECT
                             ID_
                      FROM
@@ -370,12 +400,13 @@
                             A.RESOURCE_TYPE_ = #{permCheck.resourceType, jdbcType=INTEGER}
                      AND
                             A.RESOURCE_ID_ = '*')
-                  THEN 1
+                  ${existsEnd}
+                THEN 1
 
                 <!-- Group REVOKES -->
                 <if test="revokeAuthorizationCheckEnabled">
                 WHEN
-                  EXISTS
+                  ${existsStart}
                     (SELECT
                             ID_
                      FROM
@@ -390,7 +421,8 @@
                             A.RESOURCE_TYPE_ = #{permCheck.resourceType, jdbcType=INTEGER}
                      AND
                             A.RESOURCE_ID_ = '*')
-                  THEN 0
+                  ${existsEnd}
+                THEN 0
                 </if>
 
                 ELSE (
@@ -401,10 +433,10 @@
                           <if test="permCheck.resourceIdQueryParam != null || (permCheck.resourceId != null &amp;&amp; !permCheck.resourceId.equals('*')) ">
                             WHEN
                               <if test="permCheck.resourceIdQueryParam != null">
-                              ${permCheck.resourceIdQueryParam} IN
+                              ${caseWhenInStart} ${permCheck.resourceIdQueryParam} IN
                               </if>
                               <if test="permCheck.resourceId != null">
-                              EXISTS
+                              ${existsStart}
                               </if>
                                 (SELECT
                                         A.RESOURCE_ID_
@@ -419,7 +451,14 @@
                                  AND
                                         A.RESOURCE_TYPE_ = #{permCheck.resourceType, jdbcType=INTEGER}
                                  AND
-                                        A.RESOURCE_ID_ = <if test="permCheck.resourceIdQueryParam != null">${permCheck.resourceIdQueryParam}</if><if test="permCheck.resourceId != null">#{permCheck.resourceId, jdbcType=VARCHAR}</if>)
+                                        A.RESOURCE_ID_ = <if test="permCheck.resourceIdQueryParam != null">${permCheck.resourceIdQueryParam}</if><if test="permCheck.resourceId != null">#{permCheck.resourceId, jdbcType=VARCHAR}</if>
+                                )
+                              <if test="permCheck.resourceId != null">
+                              ${existsEnd}
+                              </if>
+                              <if test="permCheck.resourceIdQueryParam != null">
+                              ${caseWhenInEnd}
+                              </if>
                             THEN 1
                           </if>
 
@@ -427,10 +466,10 @@
                           <if test="revokeAuthorizationCheckEnabled &amp;&amp; (permCheck.resourceIdQueryParam != null || (permCheck.resourceId != null &amp;&amp; !permCheck.resourceId.equals('*'))) ">
                             WHEN
                               <if test="permCheck.resourceIdQueryParam != null">
-                              ${permCheck.resourceIdQueryParam} IN
+                              ${caseWhenInStart} ${permCheck.resourceIdQueryParam} IN
                               </if>
                               <if test="permCheck.resourceId != null">
-                              EXISTS
+                              ${existsStart}
                               </if>
                                 (SELECT
                                         A.RESOURCE_ID_
@@ -445,13 +484,20 @@
                                  AND
                                         A.RESOURCE_TYPE_ = #{permCheck.resourceType, jdbcType=INTEGER}
                                  AND
-                                        A.RESOURCE_ID_ = <if test="permCheck.resourceIdQueryParam != null">${permCheck.resourceIdQueryParam}</if><if test="permCheck.resourceId != null">#{permCheck.resourceId, jdbcType=VARCHAR}</if>)
+                                        A.RESOURCE_ID_ = <if test="permCheck.resourceIdQueryParam != null">${permCheck.resourceIdQueryParam}</if><if test="permCheck.resourceId != null">#{permCheck.resourceId, jdbcType=VARCHAR}</if>
+                                )
+                              <if test="permCheck.resourceId != null">
+                              ${existsEnd}
+                              </if>
+                              <if test="permCheck.resourceIdQueryParam != null">
+                              ${caseWhenInEnd}
+                              </if>
                             THEN 0
                           </if>
 
                           <!-- GLOBAL GRANTS -->
                           WHEN
-                            EXISTS
+                            ${existsStart}
                               (SELECT
                                       ID_
                                FROM
@@ -466,12 +512,13 @@
                                       A.RESOURCE_TYPE_ = #{permCheck.resourceType, jdbcType=INTEGER}
                                AND
                                       A.RESOURCE_ID_ = '*')
-                            THEN 1
+                            ${existsEnd}
+                          THEN 1
 
                           <!-- GLOBAL REVOKES -->
                           <if test="revokeAuthorizationCheckEnabled">
                           WHEN
-                            EXISTS
+                            ${existsStart}
                               (SELECT
                                       ID_
                                FROM
@@ -486,7 +533,8 @@
                                       A.RESOURCE_TYPE_ = #{permCheck.resourceType, jdbcType=INTEGER}
                                AND
                                       A.RESOURCE_ID_ = '*')
-                            THEN 0
+                            ${existsEnd}
+                          THEN 0
                           </if>
 
                           <!-- No matching authorization found: request is not authorized -->

@@ -226,7 +226,7 @@
           </foreach>
         </if>
         <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
-          and EXISTS (
+          and ${existsStart} (
             select
               ID_
             from
@@ -241,7 +241,7 @@
             and
             <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.variableValueConditions"/>
           </if>
-          )
+          ) ${existsEnd}
         </foreach>
 
         <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />

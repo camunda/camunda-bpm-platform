@@ -960,7 +960,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     databaseTypeMappings.setProperty("DB2/LINUXZ64", "db2");
     databaseTypeMappings.setProperty("DB2/400 SQL", "db2");
     databaseTypeMappings.setProperty("DB2/6000", "db2");
-    databaseTypeMappings.setProperty("DB2 UDB iSeries", "db2");
+    databaseTypeMappings.setProperty("DB2 UDB iSeries", "as400");
+    databaseTypeMappings.setProperty("DB2 UDB for AS/400", "as400");
     databaseTypeMappings.setProperty("DB2/AIX64", "db2");
     databaseTypeMappings.setProperty("DB2/HPUX", "db2");
     databaseTypeMappings.setProperty("DB2/HP64", "db2");
@@ -1110,6 +1111,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       properties.put("datepart1", DbSqlSessionFactory.databaseSpecificDatepart1.get(databaseType));
       properties.put("datepart2", DbSqlSessionFactory.databaseSpecificDatepart2.get(databaseType));
       properties.put("datepart3", DbSqlSessionFactory.databaseSpecificDatepart3.get(databaseType));
+
+      properties.put("existsStart", DbSqlSessionFactory.databaseSpecificExistsStart.get(databaseType));
+      properties.put("existsEnd", DbSqlSessionFactory.databaseSpecificExistsEnd.get(databaseType));
+
+      properties.put("caseWhenInStart", DbSqlSessionFactory.databaseSpecificCaseWhenInStart.get(databaseType));
+      properties.put("caseWhenInEnd", DbSqlSessionFactory.databaseSpecificCaseWhenInEnd.get(databaseType));
 
       properties.put("trueConstant", DbSqlSessionFactory.databaseSpecificTrueConstant.get(databaseType));
       properties.put("falseConstant", DbSqlSessionFactory.databaseSpecificFalseConstant.get(databaseType));

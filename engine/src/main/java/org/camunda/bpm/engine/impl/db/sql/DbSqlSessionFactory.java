@@ -31,6 +31,7 @@ import org.camunda.bpm.engine.impl.util.ClassNameUtil;
  */
 public class DbSqlSessionFactory implements SessionFactory {
 
+  public static final String AS400 = "as400";
   public static final String MSSQL = "mssql";
   public static final String DB2 = "db2";
   public static final String ORACLE = "oracle";
@@ -70,6 +71,12 @@ public class DbSqlSessionFactory implements SessionFactory {
 
   public static final Map<String, Map<String, String>> dbSpecificConstants = new HashMap<String, Map<String, String>>();
 
+  public static final Map<String, String> databaseSpecificExistsStart = new HashMap<String, String>();
+  public static final Map<String, String> databaseSpecificExistsEnd = new HashMap<String, String>();
+
+  public static final Map<String, String> databaseSpecificCaseWhenInStart = new HashMap<String, String>();
+  public static final Map<String, String> databaseSpecificCaseWhenInEnd = new HashMap<String, String>();
+
   static {
 
     String defaultOrderBy = "order by ${orderBy}";
@@ -95,6 +102,10 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificTrueConstant.put(H2, "1");
     databaseSpecificFalseConstant.put(H2, "0");
     databaseSpecificIfNull.put(H2, "IFNULL");
+    databaseSpecificExistsStart.put(H2, "EXISTS(");
+    databaseSpecificExistsEnd.put(H2, ")");
+    databaseSpecificCaseWhenInStart.put(H2, "");
+    databaseSpecificCaseWhenInEnd.put(H2, "");
 
     HashMap<String, String> constants = new HashMap<String, String>();
     constants.put("constant.event", "'event'");
@@ -129,6 +140,11 @@ public class DbSqlSessionFactory implements SessionFactory {
       databaseSpecificTrueConstant.put(mysqlLikeDatabase, "1");
       databaseSpecificFalseConstant.put(mysqlLikeDatabase, "0");
       databaseSpecificIfNull.put(mysqlLikeDatabase, "IFNULL");
+      databaseSpecificExistsStart.put(mysqlLikeDatabase, "EXISTS(");
+      databaseSpecificExistsEnd.put(mysqlLikeDatabase, ")");
+      databaseSpecificCaseWhenInStart.put(mysqlLikeDatabase, "");
+      databaseSpecificCaseWhenInEnd.put(mysqlLikeDatabase, "");
+
       addDatabaseSpecificStatement(mysqlLikeDatabase, "selectProcessDefinitionsByQueryCriteria", "selectProcessDefinitionsByQueryCriteria_mysql");
       addDatabaseSpecificStatement(mysqlLikeDatabase, "selectProcessDefinitionCountByQueryCriteria", "selectProcessDefinitionCountByQueryCriteria_mysql");
       addDatabaseSpecificStatement(mysqlLikeDatabase, "selectDeploymentsByQueryCriteria", "selectDeploymentsByQueryCriteria_mysql");
@@ -165,6 +181,11 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificTrueConstant.put(POSTGRES, "true");
     databaseSpecificFalseConstant.put(POSTGRES, "false");
     databaseSpecificIfNull.put(POSTGRES, "COALESCE");
+    databaseSpecificExistsStart.put(POSTGRES, "EXISTS(");
+    databaseSpecificExistsEnd.put(POSTGRES, ")");
+    databaseSpecificCaseWhenInStart.put(POSTGRES, "");
+    databaseSpecificCaseWhenInEnd.put(POSTGRES, "");
+
     addDatabaseSpecificStatement(POSTGRES, "insertByteArray", "insertByteArray_postgres");
     addDatabaseSpecificStatement(POSTGRES, "updateByteArray", "updateByteArray_postgres");
     addDatabaseSpecificStatement(POSTGRES, "selectByteArray", "selectByteArray_postgres");
@@ -219,6 +240,10 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificTrueConstant.put(ORACLE, "1");
     databaseSpecificFalseConstant.put(ORACLE, "0");
     databaseSpecificIfNull.put(ORACLE, "NVL");
+    databaseSpecificExistsStart.put(ORACLE, "EXISTS(");
+    databaseSpecificExistsEnd.put(ORACLE, ")");
+    databaseSpecificCaseWhenInStart.put(ORACLE, "");
+    databaseSpecificCaseWhenInEnd.put(ORACLE, "");
 
     addDatabaseSpecificStatement(ORACLE, "selectHistoricProcessInstanceDurationReport", "selectHistoricProcessInstanceDurationReport_oracle");
     addDatabaseSpecificStatement(ORACLE, "selectHistoricTaskInstanceDurationReport", "selectHistoricTaskInstanceDurationReport_oracle");
@@ -255,6 +280,11 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificTrueConstant.put(DB2, "1");
     databaseSpecificFalseConstant.put(DB2, "0");
     databaseSpecificIfNull.put(DB2, "NVL");
+    databaseSpecificExistsStart.put(DB2, "EXISTS(");
+    databaseSpecificExistsEnd.put(DB2, ")");
+    databaseSpecificCaseWhenInStart.put(DB2, "");
+    databaseSpecificCaseWhenInEnd.put(DB2, "");
+    
     addDatabaseSpecificStatement(DB2, "selectMeterLogAggregatedByTimeInterval", "selectMeterLogAggregatedByTimeInterval_db2_or_mssql");
     addDatabaseSpecificStatement(DB2, "selectExecutionByNativeQuery", "selectExecutionByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement(DB2, "selectHistoricActivityInstanceByNativeQuery", "selectHistoricActivityInstanceByNativeQuery_mssql_or_db2");
@@ -274,6 +304,58 @@ public class DbSqlSessionFactory implements SessionFactory {
     constants.put("constant.datepart.month", "MONTH");
     constants.put("constant.null.startTime", "CAST(NULL as timestamp) as START_TIME_");
     dbSpecificConstants.put(DB2, constants);
+
+    // as400
+    databaseSpecificLimitBeforeStatements.put(AS400, "SELECT SUB.* FROM (");
+    databaseSpecificInnerLimitAfterStatements.put(AS400, ")RES ) SUB WHERE SUB.rnk >= #{firstRow} AND SUB.rnk < #{lastRow}");
+    databaseSpecificLimitAfterStatements.put(AS400, databaseSpecificInnerLimitAfterStatements.get(AS400) + " ORDER BY SUB.rnk");
+    databaseSpecificLimitBetweenStatements.put(AS400, ", row_number() over (ORDER BY ${orderBy}) rnk FROM ( select distinct RES.* ");
+    databaseSpecificLimitBetweenFilterStatements.put(AS400, ", row_number() over (ORDER BY ${orderBy}) rnk FROM ( select distinct RES.ID_, RES.REV_, RES.RESOURCE_TYPE_, RES.NAME_, RES.OWNER_ ");
+    databaseSpecificOrderByStatements.put(AS400, defaultOrderBy);
+    databaseSpecificLimitBeforeNativeQueryStatements.put(AS400, "SELECT SUB.* FROM ( select RES.* , row_number() over (ORDER BY ${orderBy}) rnk FROM (");
+    databaseSpecificDistinct.put(AS400, "distinct");
+
+    databaseSpecificBitAnd1.put(AS400, "BITAND(");
+    databaseSpecificBitAnd2.put(AS400, ", CAST(");
+    databaseSpecificBitAnd3.put(AS400, " AS Integer))");
+    databaseSpecificDatepart1.put(AS400, "");
+    databaseSpecificDatepart2.put(AS400, "(");
+    databaseSpecificDatepart3.put(AS400, ")");
+
+    databaseSpecificDummyTable.put(AS400, "FROM SYSIBM.SYSDUMMY1");
+    databaseSpecificTrueConstant.put(AS400, "1");
+    databaseSpecificFalseConstant.put(AS400, "0");
+    databaseSpecificIfNull.put(AS400, "IFNULL");
+   
+    // rewrites "select case when exists(select x from y) then 1 else 0 end from sysdummy" 
+    // to "select case when 0 < (select count(*) from (select x from y) x) then 1 else 0 end from sysdummy"
+    databaseSpecificExistsStart.put(AS400, "0 < (select count(*) from ("); 
+    databaseSpecificExistsEnd.put(AS400, ") x )");
+
+    // rewrites "select case when field in (select x from y) then 1 else 0 end from sysdummy" 
+    // to "select case when 1 = (select 1 from sysdummy where field in (select x from y)) then 1 else 0 end from sysdummy"
+    databaseSpecificCaseWhenInStart.put(AS400, "1 = (select 1 " + databaseSpecificDummyTable.get(AS400) + " where " );
+    databaseSpecificCaseWhenInEnd.put(AS400, ")");
+    
+    addDatabaseSpecificStatement(AS400, "selectMeterLogAggregatedByTimeInterval", "selectMeterLogAggregatedByTimeInterval_db2_or_mssql");
+    addDatabaseSpecificStatement(AS400, "selectExecutionByNativeQuery", "selectExecutionByNativeQuery_mssql_or_db2");
+    addDatabaseSpecificStatement(AS400, "selectHistoricActivityInstanceByNativeQuery", "selectHistoricActivityInstanceByNativeQuery_mssql_or_db2");
+    addDatabaseSpecificStatement(AS400, "selectHistoricCaseActivityInstanceByNativeQuery", "selectHistoricCaseActivityInstanceByNativeQuery_mssql_or_db2");
+    addDatabaseSpecificStatement(AS400, "selectHistoricProcessInstanceByNativeQuery", "selectHistoricProcessInstanceByNativeQuery_mssql_or_db2");
+    addDatabaseSpecificStatement(AS400, "selectHistoricCaseInstanceByNativeQuery", "selectHistoricCaseInstanceByNativeQuery_mssql_or_db2");
+    addDatabaseSpecificStatement(AS400, "selectHistoricTaskInstanceByNativeQuery", "selectHistoricTaskInstanceByNativeQuery_mssql_or_db2");
+    addDatabaseSpecificStatement(AS400, "selectTaskByNativeQuery", "selectTaskByNativeQuery_mssql_or_db2");
+    addDatabaseSpecificStatement(AS400, "selectHistoricDecisionInstancesByNativeQuery", "selectHistoricDecisionInstancesByNativeQuery_mssql_or_db2");
+    addDatabaseSpecificStatement(AS400, "selectFilterByQueryCriteria", "selectFilterByQueryCriteria_oracleDb2");
+
+    constants = new HashMap<String, String>();
+    constants.put("constant.event", "'event'");
+    constants.put("constant.op_message", "CAST(CONCAT(CONCAT(COALESCE(NEW_VALUE_,''), '_|_'), COALESCE(PROPERTY_,'')) as varchar(255))");
+    constants.put("constant.for.update", "for read only with rs use and keep exclusive locks");
+    constants.put("constant.datepart.quarter", "QUARTER");
+    constants.put("constant.datepart.month", "MONTH");
+    constants.put("constant.null.startTime", "CAST(NULL as timestamp) as START_TIME_");
+    dbSpecificConstants.put(AS400, constants);
 
     // mssql
     databaseSpecificLimitBeforeStatements.put(MSSQL, "SELECT SUB.* FROM (");
@@ -296,6 +378,11 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificTrueConstant.put(MSSQL, "1");
     databaseSpecificFalseConstant.put(MSSQL, "0");
     databaseSpecificIfNull.put(MSSQL, "ISNULL");
+    databaseSpecificExistsStart.put(MSSQL, "EXISTS(");
+    databaseSpecificExistsEnd.put(MSSQL, ")");
+    databaseSpecificCaseWhenInStart.put(MSSQL, "");
+    databaseSpecificCaseWhenInEnd.put(MSSQL, "");    
+    
     addDatabaseSpecificStatement(MSSQL, "selectMeterLogAggregatedByTimeInterval", "selectMeterLogAggregatedByTimeInterval_db2_or_mssql");
     addDatabaseSpecificStatement(MSSQL, "selectExecutionByNativeQuery", "selectExecutionByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement(MSSQL, "selectHistoricActivityInstanceByNativeQuery", "selectHistoricActivityInstanceByNativeQuery_mssql_or_db2");

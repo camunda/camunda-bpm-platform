@@ -278,7 +278,7 @@
                 CASE_INST_ID_ = #{subCaseInstanceId})
             </if>
             <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
-                and EXISTS (
+                and ${existsStart} (
                 select
                 ID_
                 from
@@ -293,7 +293,7 @@
                     and
                     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.variableValueConditions"/>
                 </if>
-                )
+                ) ${existsEnd}
             </foreach>
             <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
                 and SELF.TENANT_ID_ in
