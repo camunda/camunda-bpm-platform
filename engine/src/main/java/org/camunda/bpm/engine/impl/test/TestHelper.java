@@ -273,7 +273,7 @@ public abstract class TestHelper {
    * @param fail if true the method will throw an {@link AssertionError} if the deployment cache or database is not clean
    * @throws AssertionError if the deployment cache or database was not clean
    */
-  public static void assertAndEnsureCleanDbAndCache(ProcessEngine processEngine, boolean fail) {
+  public static String assertAndEnsureCleanDbAndCache(ProcessEngine processEngine, boolean fail) {
     ProcessEngineConfigurationImpl processEngineConfiguration = ((ProcessEngineImpl) processEngine).getProcessEngineConfiguration();
 
     // clear user operation log in case some operations are
@@ -307,7 +307,51 @@ public abstract class TestHelper {
     if (fail && message.length() > 0) {
       Assert.fail(message.toString());
     }
+    return message.toString();
   }
+
+  /**
+   * Ensures that the deployment cache is empty after a test. If not the cache
+   * will be cleared.
+   *
+   * @param processEngine the {@link ProcessEngine} to test
+   * @throws AssertionError if the deployment cache was not clean
+   */
+  public static void assertAndEnsureCleanDeploymentCache(ProcessEngine processEngine) {
+    assertAndEnsureCleanDeploymentCache(processEngine, true);
+  }
+
+  /**
+   * Ensures that the deployment cache is empty after a test. If not the cache
+   * will be cleared.
+   *
+   * @param processEngine the {@link ProcessEngine} to test
+   * @param fail if true the method will throw an {@link AssertionError} if the deployment cache is not clean
+   * @return the deployment cache summary if fail is set to false or null if deployment cache was clean
+   * @throws AssertionError if the deployment cache was not clean and fail is set to true
+   */
+  public static String assertAndEnsureCleanDeploymentCache(ProcessEngine processEngine, boolean fail) {
+    StringBuilder outputMessage = new StringBuilder();
+    ProcessEngineConfigurationImpl processEngineConfiguration = ((ProcessEngineImpl) processEngine).getProcessEngineConfiguration();
+    CachePurgeResult cachePurgeResult = processEngineConfiguration.getDeploymentCache().purgeCache();
+
+    outputMessage.append(cachePurgeResult.getPurgeReportAsString());
+    if (outputMessage.length() > 0) {
+      outputMessage.insert(0, "Deployment cache not clean:\n");
+      LOG.error(outputMessage.toString());
+
+      if (fail) {
+        Assert.fail(outputMessage.toString());
+      }
+
+      return outputMessage.toString();
+    }
+    else {
+      LOG.debug("Deployment cache was clean");
+      return null;
+    }
+  }
+
 
   public static String assertAndEnsureNoProcessApplicationsRegistered(ProcessEngine processEngine) {
     ProcessEngineConfigurationImpl engineConfiguration = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
