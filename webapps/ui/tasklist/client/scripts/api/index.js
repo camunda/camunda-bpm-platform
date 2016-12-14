@@ -8,20 +8,6 @@ apiModule.value('HttpClient', CamSDK.Client);
 
 apiModule.value('CamForm', CamSDK.Form);
 
-apiModule.run([ '$rootScope', 'Notifications', '$translate', function($rootScope, Notifications, $translate) {
-  $rootScope.$on('authentication.login.required', function() {
-    $translate([
-      'SESSION_EXPIRED',
-      'SESSION_EXPIRED_MESSAGE'
-    ]).then(function(translations) {
-      Notifications.addError({
-        status: translations.SESSION_EXPIRED,
-        message: translations.SESSION_EXPIRED_MESSAGE
-      });
-    });
-  });
-}]);
-
 apiModule.factory('camAPI', [
   'camAPIHttpClient',
   '$window',
