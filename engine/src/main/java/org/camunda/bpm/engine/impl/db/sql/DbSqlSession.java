@@ -488,21 +488,21 @@ public class DbSqlSession extends AbstractPersistenceSession {
           DatabaseMetaData databaseMetaData = connection.getMetaData();
 
           String databaseTablePrefix = getDbSqlSessionFactory().getDatabaseTablePrefix();
-          String tableNameFilter = databaseTablePrefix+"ACT_%";
-
+          String tableNameFilter = "%ACT_%";
           if (DbSqlSessionFactory.POSTGRES.equals(getDbSqlSessionFactory().getDatabaseType())) {
-            tableNameFilter = databaseTablePrefix+"act_%";
+            databaseTablePrefix = databaseTablePrefix.toLowerCase();
+            tableNameFilter = "%act_%";
           }
           tablesRs = databaseMetaData.getTables(null, null, tableNameFilter, DbSqlSession.JDBC_METADATA_TABLE_TYPES);
-
           while (tablesRs.next()) {
             String tableName = tablesRs.getString("TABLE_NAME");
+            if (!databaseTablePrefix.isEmpty()) {
+              tableName = databaseTablePrefix + tableName;
+            }
             tableName = tableName.toUpperCase();
             tableNames.add(tableName);
-
           }
           LOG.fetchDatabaseTables("jdbc metadata", tableNames);
-
         }
       } catch (SQLException se) {
         throw se;

@@ -17,7 +17,6 @@
 
 package org.camunda.bpm.engine.test.standalone.db.entitymanager;
 
-import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.authorization.Authorization;
@@ -26,6 +25,8 @@ import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.Tenant;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.ManagementServiceImpl;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.management.DatabasePurgeReport;
 import org.camunda.bpm.engine.impl.management.PurgeReport;
 import org.camunda.bpm.engine.impl.persistence.deploy.cache.CachePurgeResult;
@@ -33,21 +34,18 @@ import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.identity.TestResource;
-import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.junit.ClassRule;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.List;
 
-import static org.camunda.bpm.engine.authorization.Authorization.ANY;
-import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GLOBAL;
-import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GRANT;
+import static org.camunda.bpm.engine.authorization.Authorization.*;
 import static org.camunda.bpm.engine.authorization.Permissions.ALL;
 import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.impl.test.TestHelper.assertAndEnsureCleanDbAndCache;
@@ -59,15 +57,25 @@ import static org.junit.Assert.assertFalse;
  */
 public class PurgeDatabaseTest {
 
+  protected static final String PROCESS_DEF_KEY = "test";
+  protected static final String PROCESS_MODEL_NAME = "test.bpmn20.xml";
   @Rule
   public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
+  private ProcessEngineConfigurationImpl processEngineConfiguration;
+  private String databaseTablePrefix;
+
+  @Before
+  public void setUp() throws Exception {
+    processEngineConfiguration = engineRule.getProcessEngineConfiguration();
+    databaseTablePrefix = processEngineConfiguration.getDatabaseTablePrefix();
+  }
 
   @Test
   public void testPurge() {
     // given data
-    BpmnModelInstance test = Bpmn.createExecutableProcess("test").startEvent().endEvent().done();
-    engineRule.getRepositoryService().createDeployment().addModelInstance("test.bpmn20.xml", test).deploy();
-    engineRule.getRuntimeService().startProcessInstanceByKey("test");
+    BpmnModelInstance test = Bpmn.createExecutableProcess(PROCESS_DEF_KEY).startEvent().endEvent().done();
+    engineRule.getRepositoryService().createDeployment().addModelInstance(PROCESS_MODEL_NAME, test).deploy();
+    engineRule.getRuntimeService().startProcessInstanceByKey(PROCESS_DEF_KEY);
 
     // when purge is executed
     ManagementServiceImpl managementService = (ManagementServiceImpl) engineRule.getManagementService();
@@ -80,17 +88,17 @@ public class PurgeDatabaseTest {
   @Test
   public void testPurgeWithExistingProcessInstance() {
     //given process with variable and staying process instance in second user task
-    BpmnModelInstance test = Bpmn.createExecutableProcess("test")
+    BpmnModelInstance test = Bpmn.createExecutableProcess(PROCESS_DEF_KEY)
                                  .startEvent()
                                  .userTask()
                                  .userTask()
                                  .endEvent()
                                  .done();
-    engineRule.getRepositoryService().createDeployment().addModelInstance("test.bpmn20.xml", test).deploy();
+    engineRule.getRepositoryService().createDeployment().addModelInstance(PROCESS_MODEL_NAME, test).deploy();
 
     VariableMap variables = Variables.createVariables();
     variables.put("key", "value");
-    engineRule.getRuntimeService().startProcessInstanceByKey("test", variables);
+    engineRule.getRuntimeService().startProcessInstanceByKey(PROCESS_DEF_KEY, variables);
     Task task = engineRule.getTaskService().createTaskQuery().singleResult();
     engineRule.getTaskService().complete(task.getId());
 
@@ -105,18 +113,18 @@ public class PurgeDatabaseTest {
   @Test
   public void testPurgeWithAsyncProcessInstance() {
     // given process with variable and async process instance
-    BpmnModelInstance test = Bpmn.createExecutableProcess("test")
+    BpmnModelInstance test = Bpmn.createExecutableProcess(PROCESS_DEF_KEY)
       .startEvent()
       .camundaAsyncBefore()
       .userTask()
       .userTask()
       .endEvent()
       .done();
-    engineRule.getRepositoryService().createDeployment().addModelInstance("test.bpmn20.xml", test).deploy();
+    engineRule.getRepositoryService().createDeployment().addModelInstance(PROCESS_MODEL_NAME, test).deploy();
 
     VariableMap variables = Variables.createVariables();
     variables.put("key", "value");
-    engineRule.getRuntimeService().startProcessInstanceByKey("test", variables);
+    engineRule.getRuntimeService().startProcessInstanceByKey(PROCESS_DEF_KEY, variables);
     Job job = engineRule.getManagementService().createJobQuery().singleResult();
     engineRule.getManagementService().executeJob(job.getId());
     Task task = engineRule.getTaskService().createTaskQuery().singleResult();
@@ -136,7 +144,7 @@ public class PurgeDatabaseTest {
     // process is executed two times
     // metrics are reported
 
-    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("test")
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(PROCESS_DEF_KEY)
       .startEvent()
         .camundaAsyncBefore()
       .parallelGateway("parallel")
@@ -153,14 +161,14 @@ public class PurgeDatabaseTest {
         .userTask()
       .done();
 
-    engineRule.getProcessEngineConfiguration().setMetricsEnabled(true);
+    processEngineConfiguration.setMetricsEnabled(true);
     createAuthenticationData();
-    engineRule.getRepositoryService().createDeployment().addModelInstance("test.bpmn20.xml", modelInstance).deploy();
+    engineRule.getRepositoryService().createDeployment().addModelInstance(PROCESS_MODEL_NAME, modelInstance).deploy();
 
     executeComplexBpmnProcess(true);
     executeComplexBpmnProcess(false);
 
-    engineRule.getProcessEngineConfiguration().getDbMetricsReporter().reportNow();
+    processEngineConfiguration.getDbMetricsReporter().reportNow();
 
     // when purge is executed
     ManagementServiceImpl managementService = (ManagementServiceImpl) engineRule.getManagementService();
@@ -175,31 +183,35 @@ public class PurgeDatabaseTest {
     assertEquals(1, cachePurgeResult.getReportValue(CachePurgeResult.PROCESS_DEF_CACHE).size());
 
     DatabasePurgeReport databasePurgeReport = purge.getDatabasePurgeReport();
-    assertEquals(2, (int) databasePurgeReport.getReportValue("ACT_ID_TENANT_MEMBER"));
-    assertEquals(1, (int) databasePurgeReport.getReportValue("ACT_RU_EVENT_SUBSCR"));
-    assertEquals(1, (int) databasePurgeReport.getReportValue("ACT_RE_DEPLOYMENT"));
-    assertEquals(9, (int) databasePurgeReport.getReportValue("ACT_HI_ACTINST"));
-    assertEquals(1, (int) databasePurgeReport.getReportValue("ACT_RU_EXT_TASK"));
-    assertEquals(1, (int) databasePurgeReport.getReportValue("ACT_HI_INCIDENT"));
-    assertEquals(1, (int) databasePurgeReport.getReportValue("ACT_ID_MEMBERSHIP"));
-    assertEquals(1, (int) databasePurgeReport.getReportValue("ACT_RU_TASK"));
-    assertEquals(1, (int) databasePurgeReport.getReportValue("ACT_RU_JOB"));
-    assertEquals(1, (int) databasePurgeReport.getReportValue("ACT_GE_BYTEARRAY"));
-    assertEquals(2, (int) databasePurgeReport.getReportValue("ACT_RU_JOBDEF"));
-    assertEquals(2, (int) databasePurgeReport.getReportValue("ACT_HI_PROCINST"));
-    assertEquals(2, (int) databasePurgeReport.getReportValue("ACT_ID_USER"));
-    assertEquals(5, (int) databasePurgeReport.getReportValue("ACT_RU_EXECUTION"));
-    assertEquals(2, (int) databasePurgeReport.getReportValue("ACT_HI_DETAIL"));
-    assertEquals(10, (int) databasePurgeReport.getReportValue("ACT_RU_METER_LOG"));
-    assertEquals(1, (int) databasePurgeReport.getReportValue("ACT_RU_VARIABLE"));
-    assertEquals(1, (int) databasePurgeReport.getReportValue("ACT_RE_PROCDEF"));
-    assertEquals(2, (int) databasePurgeReport.getReportValue("ACT_HI_TASKINST"));
-    assertEquals(7, (int) databasePurgeReport.getReportValue("ACT_HI_JOB_LOG"));
-    assertEquals(2, (int) databasePurgeReport.getReportValue("ACT_ID_TENANT"));
-    assertEquals(2, (int) databasePurgeReport.getReportValue("ACT_HI_VARINST"));
-    assertEquals(1, (int) databasePurgeReport.getReportValue("ACT_ID_GROUP"));
-    assertEquals(2, (int) databasePurgeReport.getReportValue("ACT_RU_AUTHORIZATION"));
-    assertEquals(3, (int) databasePurgeReport.getReportValue("ACT_HI_OP_LOG"));
+    assertEquals(2, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_ID_TENANT_MEMBER"));
+    assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RU_EVENT_SUBSCR"));
+    assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RE_DEPLOYMENT"));
+    assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RU_EXT_TASK"));
+    assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_ID_MEMBERSHIP"));
+    assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RU_TASK"));
+    assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RU_JOB"));
+    assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_GE_BYTEARRAY"));
+    assertEquals(2, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RU_JOBDEF"));
+    assertEquals(2, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_ID_USER"));
+    assertEquals(5, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RU_EXECUTION"));
+    assertEquals(10, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RU_METER_LOG"));
+    assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RU_VARIABLE"));
+    assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RE_PROCDEF"));
+    assertEquals(2, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_ID_TENANT"));
+    assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_ID_GROUP"));
+    assertEquals(2, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RU_AUTHORIZATION"));
+
+    if (!processEngineConfiguration.getHistoryLevel().equals(HistoryLevel.HISTORY_LEVEL_NONE)) {
+      assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_INCIDENT"));
+      assertEquals(9, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_ACTINST"));
+      assertEquals(2, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_PROCINST"));
+      assertEquals(2, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_DETAIL"));
+      assertEquals(2, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_TASKINST"));
+      assertEquals(7, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_JOB_LOG"));
+      assertEquals(2, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_VARINST"));
+      assertEquals(3, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_OP_LOG"));
+    }
+
   }
 
   private void createAuthenticationData() {
@@ -243,7 +255,7 @@ public class PurgeDatabaseTest {
   private void executeComplexBpmnProcess(boolean complete) {
     VariableMap variables = Variables.createVariables();
     variables.put("key", "value");
-    engineRule.getRuntimeService().startProcessInstanceByKey("test", variables);
+    engineRule.getRuntimeService().startProcessInstanceByKey(PROCESS_DEF_KEY, variables);
     //execute start event
     Job job = engineRule.getManagementService().createJobQuery().singleResult();
     engineRule.getManagementService().executeJob(job.getId());
@@ -274,7 +286,7 @@ public class PurgeDatabaseTest {
       .deploy();
     VariableMap variables = Variables.createVariables();
     variables.put("key", "value");
-    engineRule.getCaseService().createCaseInstanceByKey("test", variables);
+    engineRule.getCaseService().createCaseInstanceByKey(PROCESS_DEF_KEY, variables);
 
     // when purge is executed
     ManagementServiceImpl managementService = (ManagementServiceImpl) engineRule.getManagementService();
@@ -289,18 +301,21 @@ public class PurgeDatabaseTest {
     assertEquals(1, cachePurgeResult.getReportValue(CachePurgeResult.CASE_DEF_CACHE).size());
 
     DatabasePurgeReport databasePurgeReport = purge.getDatabasePurgeReport();
-    assertEquals(1, (int) databasePurgeReport.getReportValue("ACT_RE_DEPLOYMENT"));
-    assertEquals(1, (int) databasePurgeReport.getReportValue("ACT_HI_CASEINST"));
-    assertEquals(2, (int) databasePurgeReport.getReportValue("ACT_HI_CASEACTINST"));
-    assertEquals(1, (int) databasePurgeReport.getReportValue("ACT_RU_TASK"));
-    assertEquals(1, (int) databasePurgeReport.getReportValue("ACT_GE_BYTEARRAY"));
-    assertEquals(1, (int) databasePurgeReport.getReportValue("ACT_RE_CASE_DEF"));
-    assertEquals(3, (int) databasePurgeReport.getReportValue("ACT_RU_CASE_EXECUTION"));
-    assertEquals(1, (int) databasePurgeReport.getReportValue("ACT_HI_DETAIL"));
-    assertEquals(1, (int) databasePurgeReport.getReportValue("ACT_RU_VARIABLE"));
-    assertEquals(2, (int) databasePurgeReport.getReportValue("ACT_RU_CASE_SENTRY_PART"));
-    assertEquals(1, (int) databasePurgeReport.getReportValue("ACT_HI_TASKINST"));
-    assertEquals(1, (int) databasePurgeReport.getReportValue("ACT_HI_VARINST"));
+    assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RE_DEPLOYMENT"));
+    assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RU_TASK"));
+    assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_GE_BYTEARRAY"));
+    assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RE_CASE_DEF"));
+    assertEquals(3, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RU_CASE_EXECUTION"));
+    assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RU_VARIABLE"));
+    assertEquals(2, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RU_CASE_SENTRY_PART"));
+
+    if (!processEngineConfiguration.getHistoryLevel().equals(HistoryLevel.HISTORY_LEVEL_NONE)) {
+      assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_DETAIL"));
+      assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_TASKINST"));
+      assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_VARINST"));
+      assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_CASEINST"));
+      assertEquals(2, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_CASEACTINST"));
+    }
   }
 
   // DMN ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -315,7 +330,7 @@ public class PurgeDatabaseTest {
     VariableMap variables = Variables.createVariables()
       .putValue("key", "value")
       .putValue("season", "Test");
-    DmnDecisionResult test = engineRule.getDecisionService().evaluateDecisionByKey("decisionId").variables(variables).evaluate();
+    engineRule.getDecisionService().evaluateDecisionByKey("decisionId").variables(variables).evaluate();
 
     // when purge is executed
     ManagementServiceImpl managementService = (ManagementServiceImpl) engineRule.getManagementService();
@@ -331,12 +346,15 @@ public class PurgeDatabaseTest {
     assertEquals(1, cachePurgeResult.getReportValue(CachePurgeResult.DMN_REQ_DEF_CACHE).size());
 
     DatabasePurgeReport databasePurgeReport = purge.getDatabasePurgeReport();
-    assertEquals(1, (int) databasePurgeReport.getReportValue("ACT_HI_DECINST"));
-    assertEquals(1, (int) databasePurgeReport.getReportValue("ACT_RE_DEPLOYMENT"));
-    assertEquals(1, (int) databasePurgeReport.getReportValue("ACT_HI_DEC_IN"));
-    assertEquals(1, (int) databasePurgeReport.getReportValue("ACT_GE_BYTEARRAY"));
-    assertEquals(1, (int) databasePurgeReport.getReportValue("ACT_RE_DECISION_REQ_DEF"));
-    assertEquals(2, (int) databasePurgeReport.getReportValue("ACT_RE_DECISION_DEF"));
-    assertEquals(1, (int) databasePurgeReport.getReportValue("ACT_HI_DEC_OUT"));
+    assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RE_DEPLOYMENT"));
+    assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_GE_BYTEARRAY"));
+    assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RE_DECISION_REQ_DEF"));
+    assertEquals(2, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RE_DECISION_DEF"));
+
+    if (!processEngineConfiguration.getHistoryLevel().equals(HistoryLevel.HISTORY_LEVEL_NONE)) {
+      assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_DECINST"));
+      assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_DEC_IN"));
+      assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_DEC_OUT"));
+    }
   }
 }
