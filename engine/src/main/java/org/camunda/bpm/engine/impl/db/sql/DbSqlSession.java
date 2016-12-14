@@ -489,7 +489,7 @@ public class DbSqlSession extends AbstractPersistenceSession {
           // preparation for database table prefix
           String databaseTablePrefix = getDbSqlSessionFactory().getDatabaseTablePrefix();
           String tableNameFilter = "ACT_%";
-          String schema = "PUBLIC";
+          String schema = null;
           if (!databaseTablePrefix.isEmpty()) {
             String[] split = databaseTablePrefix.split("\\.");
             if (split.length > 0) {
