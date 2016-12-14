@@ -53,6 +53,7 @@ public class HistoryLevelTest {
   protected ProcessEngineConfigurationImpl createConfig() {
     StandaloneInMemProcessEngineConfiguration configuration = new StandaloneInMemProcessEngineConfiguration();
     configuration.setProcessEngineName("process-engine-HistoryTest");
+    configuration.setDbMetricsReporterActivate(false);
     configuration.setJdbcUrl("jdbc:h2:mem:HistoryTest");
     return configuration;
   }

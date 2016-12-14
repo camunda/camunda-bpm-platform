@@ -485,15 +485,30 @@ public class DbSqlSession extends AbstractPersistenceSession {
           tableNames = getTablesPresentInOracleDatabase();
         } else {
           Connection connection = getSqlSession().getConnection();
-          DatabaseMetaData databaseMetaData = connection.getMetaData();
 
+          // preparation for database table prefix
           String databaseTablePrefix = getDbSqlSessionFactory().getDatabaseTablePrefix();
-          String tableNameFilter = "%ACT_%";
-          if (DbSqlSessionFactory.POSTGRES.equals(getDbSqlSessionFactory().getDatabaseType())) {
-            databaseTablePrefix = databaseTablePrefix.toLowerCase();
-            tableNameFilter = "%act_%";
+          String tableNameFilter = "ACT_%";
+          String schema = "PUBLIC";
+          if (!databaseTablePrefix.isEmpty()) {
+            String[] split = databaseTablePrefix.split("\\.");
+            if (split.length > 0) {
+              schema = split[0];
+              //if property contains also prefix for table
+              if (split.length > 1) {
+                tableNameFilter = split[1] + tableNameFilter;
+              }
+            }
           }
-          tablesRs = databaseMetaData.getTables(null, null, tableNameFilter, DbSqlSession.JDBC_METADATA_TABLE_TYPES);
+
+          // for postgres we have to use lower case
+          if (DbSqlSessionFactory.POSTGRES.equals(getDbSqlSessionFactory().getDatabaseType())) {
+            schema = schema.toLowerCase();
+            tableNameFilter = tableNameFilter.toLowerCase();
+          }
+
+          DatabaseMetaData databaseMetaData = connection.getMetaData();
+          tablesRs = databaseMetaData.getTables(null, schema, tableNameFilter, DbSqlSession.JDBC_METADATA_TABLE_TYPES);
           while (tablesRs.next()) {
             String tableName = tablesRs.getString("TABLE_NAME");
             if (!databaseTablePrefix.isEmpty()) {

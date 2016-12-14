@@ -55,6 +55,7 @@ public class DatabaseTableSchemaTest extends TestCase {
         .setDataSource(pooledDataSource).setDatabaseSchemaUpdate("NO_CHECK");
     config1.setDatabaseTablePrefix(SCHEMA_NAME + ".");
     config1.setDatabaseSchema(SCHEMA_NAME);
+    config1.setDbMetricsReporterActivate(false);
     ProcessEngine engine1 = config1.buildProcessEngine();
 
     // create the tables for the first time
@@ -86,6 +87,7 @@ public class DatabaseTableSchemaTest extends TestCase {
         .setDataSource(pooledDataSource).setDatabaseSchemaUpdate("NO_CHECK");
     config1.setDatabaseTablePrefix(SCHEMA_NAME + "." + PREFIX_NAME);
     config1.setDatabaseSchema(SCHEMA_NAME);
+    config1.setDbMetricsReporterActivate(false);
     ProcessEngine engine = config1.buildProcessEngine();
     CommandExecutor commandExecutor = config1.getCommandExecutorTxRequired();
 

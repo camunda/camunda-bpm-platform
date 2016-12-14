@@ -39,6 +39,7 @@ import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -67,7 +68,13 @@ public class PurgeDatabaseTest {
   @Before
   public void setUp() throws Exception {
     processEngineConfiguration = engineRule.getProcessEngineConfiguration();
+    processEngineConfiguration.setDbMetricsReporterActivate(true);
     databaseTablePrefix = processEngineConfiguration.getDatabaseTablePrefix();
+  }
+
+  @After
+  public void cleanUp() {
+    processEngineConfiguration.setDbMetricsReporterActivate(false);
   }
 
   @Test
@@ -161,7 +168,6 @@ public class PurgeDatabaseTest {
         .userTask()
       .done();
 
-    processEngineConfiguration.setMetricsEnabled(true);
     createAuthenticationData();
     engineRule.getRepositoryService().createDeployment().addModelInstance(PROCESS_MODEL_NAME, modelInstance).deploy();
 
@@ -201,7 +207,7 @@ public class PurgeDatabaseTest {
     assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_ID_GROUP"));
     assertEquals(2, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RU_AUTHORIZATION"));
 
-    if (!processEngineConfiguration.getHistoryLevel().equals(HistoryLevel.HISTORY_LEVEL_NONE)) {
+    if (processEngineConfiguration.getHistoryLevel().equals(HistoryLevel.HISTORY_LEVEL_FULL)) {
       assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_INCIDENT"));
       assertEquals(9, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_ACTINST"));
       assertEquals(2, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_PROCINST"));
@@ -309,7 +315,7 @@ public class PurgeDatabaseTest {
     assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RU_VARIABLE"));
     assertEquals(2, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RU_CASE_SENTRY_PART"));
 
-    if (!processEngineConfiguration.getHistoryLevel().equals(HistoryLevel.HISTORY_LEVEL_NONE)) {
+    if (processEngineConfiguration.getHistoryLevel().equals(HistoryLevel.HISTORY_LEVEL_FULL)) {
       assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_DETAIL"));
       assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_TASKINST"));
       assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_VARINST"));
@@ -351,7 +357,7 @@ public class PurgeDatabaseTest {
     assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RE_DECISION_REQ_DEF"));
     assertEquals(2, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RE_DECISION_DEF"));
 
-    if (!processEngineConfiguration.getHistoryLevel().equals(HistoryLevel.HISTORY_LEVEL_NONE)) {
+    if (processEngineConfiguration.getHistoryLevel().equals(HistoryLevel.HISTORY_LEVEL_FULL)) {
       assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_DECINST"));
       assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_DEC_IN"));
       assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_DEC_OUT"));

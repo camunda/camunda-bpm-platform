@@ -53,6 +53,7 @@ public class DatabaseTablePrefixTest {
     ProcessEngineConfigurationImpl config1 = createCustomProcessEngineConfiguration()
             .setProcessEngineName("DatabaseTablePrefixTest-engine1")
             .setDataSource(pooledDataSource)
+            .setDbMetricsReporterActivate(false)
             .setDatabaseSchemaUpdate("NO_CHECK"); // disable auto create/drop schema
     config1.setDatabaseTablePrefix("SCHEMA1.");
     config1.setUseSharedSqlSessionFactory(true);
@@ -61,6 +62,7 @@ public class DatabaseTablePrefixTest {
     ProcessEngineConfigurationImpl config2 = createCustomProcessEngineConfiguration()
             .setProcessEngineName("DatabaseTablePrefixTest-engine2")
             .setDataSource(pooledDataSource)
+            .setDbMetricsReporterActivate(false)
             .setDatabaseSchemaUpdate("NO_CHECK"); // disable auto create/drop schema
     config2.setDatabaseTablePrefix("SCHEMA2.");
     config2.setUseSharedSqlSessionFactory(true);
