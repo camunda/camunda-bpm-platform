@@ -55,8 +55,4 @@
       });
 
       getUserProfile($scope.authentication);
-
-      $scope.$on('authentication.logout.success', function() {
-        $window.location.reload();
-      });
     }];
