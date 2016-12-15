@@ -77,33 +77,6 @@ public class MybatisJoinHelper {
     return sb.toString();
   }
 
-  /**
-   * this method here is to ensure functioning of webapp, please do not use it
-   * as method in the webapp is deprecate too and should not be used.
-   * @param orderingProperties
-   * @return
-   */
-  @Deprecated
-  public static String orderBy(List<QueryOrderingProperty> orderingProperties) {
-    StringBuilder sb = new StringBuilder();
-    int i = 0;
-    if (orderingProperties != null) {
-      for (QueryOrderingProperty property : orderingProperties) {
-        sb.append(orderBy(property, i));
-        sb.append(",");
-        i = i + 1;
-      }
-      if (sb.length() > 0) {
-        sb.deleteCharAt(sb.length() - 1);
-      }
-    }
-    String result = sb.toString();
-    if (result.trim().isEmpty()) {
-      result = DEFAULT_ORDER;
-    }
-    return result;
-  }
-
   public static String orderBy(QueryOrderingProperty orderingProperty, int index) {
     QueryProperty queryProperty = orderingProperty.getQueryProperty();
 
