@@ -503,7 +503,7 @@ public class DbSqlSession extends AbstractPersistenceSession {
 
           // for postgres we have to use lower case
           if (DbSqlSessionFactory.POSTGRES.equals(getDbSqlSessionFactory().getDatabaseType())) {
-            schema = schema.toLowerCase();
+            schema = schema == null ? schema : schema.toLowerCase();
             tableNameFilter = tableNameFilter.toLowerCase();
           }
 
