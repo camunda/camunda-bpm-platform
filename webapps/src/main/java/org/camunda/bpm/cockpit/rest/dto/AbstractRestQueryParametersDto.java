@@ -36,6 +36,7 @@ import java.util.Map.Entry;
  * @author roman.smirnov
  */
 public abstract class AbstractRestQueryParametersDto<T> extends QueryParameters<T> {
+  protected static final String DEFAULT_ORDER = "RES.ID_ asc";
 
   private static final long serialVersionUID = 1L;
 
@@ -96,7 +97,7 @@ public abstract class AbstractRestQueryParametersDto<T> extends QueryParameters<
       }
       return String.format("%s %s", getOrderByValue(sortBy), sortOrder);
     }
-    return MybatisJoinHelper.orderBy(super.getOrderingProperties());
+    return DEFAULT_ORDER;
   }
 
   protected abstract String getOrderByValue(String sortBy);
