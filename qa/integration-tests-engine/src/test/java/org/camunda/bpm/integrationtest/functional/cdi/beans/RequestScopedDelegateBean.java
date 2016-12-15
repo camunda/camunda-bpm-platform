@@ -1,10 +1,10 @@
 package org.camunda.bpm.integrationtest.functional.cdi.beans;
 
-import javax.enterprise.context.RequestScoped;
-import javax.inject.Named;
-
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
+
+import javax.enterprise.context.RequestScoped;
+import javax.inject.Named;
 
 /**
  * A {@link RequestScoped} bean

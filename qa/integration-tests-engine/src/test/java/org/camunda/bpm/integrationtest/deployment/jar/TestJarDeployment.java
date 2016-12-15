@@ -17,12 +17,18 @@ package org.camunda.bpm.integrationtest.deployment.jar;
 
 import org.camunda.bpm.application.impl.ejb.DefaultEjbProcessApplication;
 import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.integrationtest.deployment.callbacks.PurgeDatabaseServlet;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
+import org.camunda.bpm.integrationtest.util.DeploymentHelper;
+import org.camunda.bpm.integrationtest.util.TestConstants;
+import org.camunda.bpm.integrationtest.util.TestContainer;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OverProtocol;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
+import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,11 +47,27 @@ public class TestJarDeployment extends AbstractFoxPlatformIntegrationTest {
   @Deployment
   @OverProtocol("jmx-as7")
   public static JavaArchive processArchive() {
-    return ShrinkWrap.create(JavaArchive.class)
+    return ShrinkWrap.create(JavaArchive.class, "test.jar")
       .addClass(AbstractFoxPlatformIntegrationTest.class)
       .addClass(DefaultEjbProcessApplication.class)
+      .addClass(PurgeDatabaseServlet.class)
       .addAsResource("META-INF/processes.xml", "META-INF/processes.xml")
       .addAsResource("org/camunda/bpm/integrationtest/testDeployProcessArchive.bpmn20.xml");
+  }
+
+  @Deployment(name = "purge")
+  public static WebArchive purgeArchive() {
+
+    WebArchive archive = ShrinkWrap.create(WebArchive.class, "purge.war")
+      .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
+      .addAsLibraries(DeploymentHelper.getEngineCdi())
+      .addClass(TestJarDeployment.class)
+      .addAsLibraries(purgeDatabaseServlet());
+
+    DEPLOYMENT_NAMES.add("purge");
+
+    TestContainer.addContainerSpecificResources(archive);
+    return archive;
   }
   
   @Test

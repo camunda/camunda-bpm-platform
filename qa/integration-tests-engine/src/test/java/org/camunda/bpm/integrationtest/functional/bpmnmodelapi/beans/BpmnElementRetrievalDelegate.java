@@ -12,13 +12,13 @@
  */
 package org.camunda.bpm.integrationtest.functional.bpmnmodelapi.beans;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Named;
-
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.FlowElement;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Named;
 
 /**
  * @author Daniel Meyer

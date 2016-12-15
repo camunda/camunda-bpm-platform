@@ -13,9 +13,9 @@
 
 package org.camunda.bpm.integrationtest.functional.connect;
 
-import java.util.Map;
-
 import org.camunda.connect.spi.ConnectorResponse;
+
+import java.util.Map;
 
 public class TestConnectorResponse implements ConnectorResponse {
 

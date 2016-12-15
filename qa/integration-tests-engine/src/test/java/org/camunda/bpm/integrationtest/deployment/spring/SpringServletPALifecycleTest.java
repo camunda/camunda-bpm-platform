@@ -38,7 +38,9 @@ public class SpringServletPALifecycleTest extends AbstractFoxPlatformIntegration
       .addClass(CustomSpringServletProcessApplication.class)
       .addAsWebInfResource("org/camunda/bpm/integrationtest/deployment/spring/SpringServletPALifecycleTest-context.xml", "applicationContext.xml")
       .addAsLibraries(DeploymentHelper.getEngineSpring())
+      .addAsLibraries(purgeDatabaseServlet())
       .addAsWebInfResource("org/camunda/bpm/integrationtest/deployment/spring/web.xml", "web.xml");
+
   }
 
   @Test

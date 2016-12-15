@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" id="sid-2c1c7336-0478-4460-906f-d2a2fc8edcd0" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="5.4.0" targetNamespace="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:tns="http://www.omg.org/spec/BPMN/20100524/MODEL">
+<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+             xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd"
+             id="sid-2c1c7336-0478-4460-906f-d2a2fc8edcd0" exporter="Signavio Process Editor, http://www.signavio.com"
+             exporterVersion="5.4.0" targetNamespace="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:tns="http://www.omg.org/spec/BPMN/20100524/MODEL">
   <collaboration id="collaboration_1">
     <participant id="Process_Engine_1" name="invoice-inbound" processRef="invoice-it"/>
   </collaboration>

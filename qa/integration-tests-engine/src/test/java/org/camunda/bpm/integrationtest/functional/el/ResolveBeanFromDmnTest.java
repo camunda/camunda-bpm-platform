@@ -12,8 +12,6 @@
  */
 package org.camunda.bpm.integrationtest.functional.el;
 
-import static org.junit.Assert.assertNotNull;
-
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.integrationtest.functional.el.beans.GreeterBean;
@@ -23,6 +21,8 @@ import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @author Daniel Meyer

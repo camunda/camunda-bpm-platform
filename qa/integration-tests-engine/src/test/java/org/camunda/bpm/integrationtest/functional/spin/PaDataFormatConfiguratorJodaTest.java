@@ -53,10 +53,13 @@ public class PaDataFormatConfiguratorJodaTest extends AbstractFoxPlatformIntegra
         .addAsResource("org/camunda/bpm/integrationtest/oneTaskProcess.bpmn")
         .addClass(JodaJsonSerializable.class)
         .addClass(JodaJsonDataFormatConfigurator.class)
+         .addAsLibraries(purgeDatabaseServlet())
         .addAsServiceProvider(DataFormatConfigurator.class, JodaJsonDataFormatConfigurator.class);
 
     TestContainer.addSpinJacksonJsonDataFormat(webArchive);
     TestContainer.addJodaTimeJacksonModule(webArchive);
+
+    DEPLOYMENT_NAMES.add("PaDataFormatTest");
 
     return webArchive;
 

@@ -1,7 +1,6 @@
 package org.camunda.bpm.integrationtest.functional.transactions;
 
 import org.apache.ibatis.session.SqlSession;
-import org.apache.ibatis.session.TransactionIsolationLevel;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;

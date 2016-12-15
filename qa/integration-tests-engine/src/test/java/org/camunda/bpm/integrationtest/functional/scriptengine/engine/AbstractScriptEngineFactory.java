@@ -12,18 +12,11 @@
  */
 package org.camunda.bpm.integrationtest.functional.scriptengine.engine;
 
+import javax.script.*;
 import java.io.Reader;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-import javax.script.AbstractScriptEngine;
-import javax.script.Bindings;
-import javax.script.ScriptContext;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineFactory;
-import javax.script.ScriptException;
-import javax.script.SimpleBindings;
 
 /**
  * @author Thorben Lindhauer

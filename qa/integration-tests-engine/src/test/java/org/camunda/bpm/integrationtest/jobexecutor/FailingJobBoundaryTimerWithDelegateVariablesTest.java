@@ -12,12 +12,6 @@
  */
 package org.camunda.bpm.integrationtest.jobexecutor;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.List;
-
-import javax.inject.Inject;
-
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.runtime.Job;
@@ -30,6 +24,11 @@ import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import javax.inject.Inject;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
 
 
 /**

@@ -1,10 +1,5 @@
 package org.camunda.bpm.integrationtest.jobexecutor;
 
-import java.util.List;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.cdi.BusinessProcess;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -12,6 +7,10 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import java.util.List;
 
 @Named
 public class SendSignalDelegate implements JavaDelegate {

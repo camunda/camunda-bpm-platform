@@ -12,11 +12,11 @@
  */
 package org.camunda.bpm.integrationtest.functional.cdi.beans;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
 import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.delegate.DelegateCaseExecution;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 
 /**
  * @author Thorben Lindhauer

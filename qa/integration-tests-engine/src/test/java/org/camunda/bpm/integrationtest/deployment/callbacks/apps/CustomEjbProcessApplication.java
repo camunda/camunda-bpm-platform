@@ -12,14 +12,6 @@
  */
 package org.camunda.bpm.integrationtest.deployment.callbacks.apps;
 
-import javax.ejb.ConcurrencyManagement;
-import javax.ejb.ConcurrencyManagementType;
-import javax.ejb.Local;
-import javax.ejb.Singleton;
-import javax.ejb.Startup;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
-
 import org.camunda.bpm.application.PostDeploy;
 import org.camunda.bpm.application.PreUndeploy;
 import org.camunda.bpm.application.ProcessApplication;
@@ -27,6 +19,8 @@ import org.camunda.bpm.application.ProcessApplicationInterface;
 import org.camunda.bpm.application.impl.EjbProcessApplication;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.junit.Assert;
+
+import javax.ejb.*;
 
 /**
  * Custom {@link EjbProcessApplication} with PA lifecycle callbacks

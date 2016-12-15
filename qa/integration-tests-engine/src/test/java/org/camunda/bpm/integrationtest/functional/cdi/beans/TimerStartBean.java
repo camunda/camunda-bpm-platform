@@ -12,13 +12,12 @@
  */
 package org.camunda.bpm.integrationtest.functional.cdi.beans;
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Named;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Named;
 
 /**
  * @author Thorben Lindhauer

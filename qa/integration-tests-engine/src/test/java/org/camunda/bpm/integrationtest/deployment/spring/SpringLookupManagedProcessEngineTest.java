@@ -39,7 +39,8 @@ public class SpringLookupManagedProcessEngineTest extends AbstractFoxPlatformInt
       .addAsWebInfResource("org/camunda/bpm/integrationtest/deployment/spring/SpringLookupManagedProcessEngineTest-context.xml", "applicationContext.xml")
       .addAsLibraries(DeploymentHelper.getEngineSpring())
       .addAsManifestResource("org/camunda/bpm/integrationtest/deployment/spring/jboss-deployment-structure.xml", "jboss-deployment-structure.xml")
-      .addAsWebInfResource("org/camunda/bpm/integrationtest/deployment/spring/web.xml", "web.xml");
+      .addAsWebInfResource("org/camunda/bpm/integrationtest/deployment/spring/web.xml", "web.xml")
+      .addAsLibraries(purgeDatabaseServlet());
   }
   
     

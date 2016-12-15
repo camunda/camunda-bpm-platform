@@ -34,10 +34,13 @@ public class TestWarDeploymentCustomPAName extends AbstractFoxPlatformIntegratio
 
   @Deployment
   public static WebArchive processArchive() {
+    DEPLOYMENT_NAMES.add("pa1");
+
     return ShrinkWrap.create(WebArchive.class, "pa1.war")
         .addAsResource("META-INF/processes.xml")
         .addClass(AbstractFoxPlatformIntegrationTest.class)
         .addClass(CustomNameServletPA.class)
+        .addAsLibraries(purgeDatabaseServlet())
         .addAsResource("org/camunda/bpm/integrationtest/testDeployProcessArchive.bpmn20.xml");
   }
 

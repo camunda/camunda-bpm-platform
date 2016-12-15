@@ -12,7 +12,6 @@
  */
 package org.camunda.bpm.integrationtest.functional.context;
 
-import java.util.Date;
 import org.camunda.bpm.application.InvocationContext;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.EventSubscription;
@@ -31,6 +30,8 @@ import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.Date;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
@@ -43,12 +44,15 @@ public class InvocationContextTest extends AbstractFoxPlatformIntegrationTest {
 
   @Deployment(name = "app")
   public static WebArchive createDeployment() {
+    DEPLOYMENT_NAMES.add("app");
+
     return ShrinkWrap.create(WebArchive.class, "app.war")
         .addAsResource("META-INF/processes.xml")
         .addClass(AbstractFoxPlatformIntegrationTest.class)
         .addClass(ProcessApplicationWithInvocationContext.class)
         .addClass(NoOpJavaDelegate.class)
         .addClass(SignalableTask.class)
+        .addAsLibraries(purgeDatabaseServlet())
         .addAsResource("org/camunda/bpm/integrationtest/functional/context/InvocationContextTest-timer.bpmn")
         .addAsResource("org/camunda/bpm/integrationtest/functional/context/InvocationContextTest-message.bpmn")
         .addAsResource("org/camunda/bpm/integrationtest/functional/context/InvocationContextTest-signalTask.bpmn");

@@ -12,13 +12,13 @@
  */
 package org.camunda.bpm.integrationtest.functional.transactions.beans;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.transaction.UserTransaction;
-
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.transaction.UserTransaction;
 
 @Named
 public class TransactionRollbackDelegate implements JavaDelegate {

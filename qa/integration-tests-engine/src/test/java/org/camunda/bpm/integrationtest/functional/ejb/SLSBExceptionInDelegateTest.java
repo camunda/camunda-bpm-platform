@@ -1,8 +1,5 @@
 package org.camunda.bpm.integrationtest.functional.ejb;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.integrationtest.functional.ejb.beans.SLSBClientDelegate;
@@ -13,6 +10,9 @@ import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 /**
  * Testcase verifying that if an exception is thrown inside an EJB the original

@@ -2,11 +2,7 @@ package org.camunda.bpm.integrationtest.functional.ejb.request;
 
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
-import org.camunda.bpm.integrationtest.functional.ejb.request.beans.InvocationCounter;
-import org.camunda.bpm.integrationtest.functional.ejb.request.beans.InvocationCounterDelegateBean;
-import org.camunda.bpm.integrationtest.functional.ejb.request.beans.InvocationCounterService;
-import org.camunda.bpm.integrationtest.functional.ejb.request.beans.InvocationCounterServiceBean;
-import org.camunda.bpm.integrationtest.functional.ejb.request.beans.InvocationCounterServiceLocal;
+import org.camunda.bpm.integrationtest.functional.ejb.request.beans.*;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;

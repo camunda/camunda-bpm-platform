@@ -1,11 +1,11 @@
 package org.camunda.bpm.integrationtest.functional.ejb.remote.bean;
 
-import javax.inject.Named;
-import javax.naming.InitialContext;
-
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.integrationtest.util.TestConstants;
+
+import javax.inject.Named;
+import javax.naming.InitialContext;
 
 
 /**

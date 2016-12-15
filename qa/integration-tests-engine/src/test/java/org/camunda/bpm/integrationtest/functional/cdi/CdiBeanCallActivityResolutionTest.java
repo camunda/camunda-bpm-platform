@@ -59,9 +59,12 @@ public class CdiBeanCallActivityResolutionTest extends AbstractFoxPlatformIntegr
     WebArchive deployment = ShrinkWrap.create(WebArchive.class, "client.war")
             .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
             .addClass(AbstractFoxPlatformIntegrationTest.class)
+            .addAsLibraries(purgeDatabaseServlet())
             .addAsLibraries(DeploymentHelper.getEngineCdi());
 
     TestContainer.addContainerSpecificResourcesForNonPa(deployment);
+
+    DEPLOYMENT_NAMES.add("client");
 
     return deployment;
   }

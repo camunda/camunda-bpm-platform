@@ -15,17 +15,25 @@
  */
 package org.camunda.bpm.integrationtest.functional.classloading.war;
 
+import org.camunda.bpm.BpmPlatform;
+import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.integrationtest.functional.classloading.beans.ExampleDelegate;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.camunda.bpm.integrationtest.util.TestContainer;
+import org.jboss.arquillian.container.test.api.Deployer;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import java.util.logging.Level;
 
 
 /**
@@ -41,7 +49,11 @@ import org.junit.runner.RunWith;
 @RunWith(Arquillian.class)
 public class JavaDelegateResolutionTest extends AbstractFoxPlatformIntegrationTest {
 
-  @Deployment
+  static {
+    DEPLOYMENT_NAMES.add("test");
+  }
+
+  @Deployment(name="server")
   public static WebArchive createProcessArchiveDeplyoment() {
     return initWebArchiveDeployment()
             .addClass(ExampleDelegate.class)

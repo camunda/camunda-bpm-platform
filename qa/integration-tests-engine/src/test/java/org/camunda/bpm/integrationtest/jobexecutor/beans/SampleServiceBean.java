@@ -1,9 +1,9 @@
 package org.camunda.bpm.integrationtest.jobexecutor.beans;
 
-import javax.enterprise.context.ApplicationScoped;
-
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
+
+import javax.enterprise.context.ApplicationScoped;
 
 /**
  *

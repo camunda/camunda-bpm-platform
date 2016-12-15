@@ -13,9 +13,6 @@
 
 package org.camunda.bpm.integrationtest.functional.connect;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.camunda.connect.Connectors;
@@ -24,6 +21,9 @@ import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * <p>Smoketest Make sure camunda connect can be used in a process application </p>

@@ -13,10 +13,10 @@
 
 package org.camunda.bpm.integrationtest.functional.connect;
 
+import org.camunda.connect.spi.ConnectorRequest;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import org.camunda.connect.spi.ConnectorRequest;
 
 public class TestConnectorRequest implements ConnectorRequest<TestConnectorResponse> {
 

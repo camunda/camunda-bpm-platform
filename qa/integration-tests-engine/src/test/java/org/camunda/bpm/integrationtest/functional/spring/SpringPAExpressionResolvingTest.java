@@ -56,7 +56,9 @@ public class SpringPAExpressionResolvingTest extends AbstractFoxPlatformIntegrat
 
       // spring application context & libs
       .addAsWebInfResource("org/camunda/bpm/integrationtest/functional/spring/SpringPAExpressionResolvingTest-context.xml", "applicationContext.xml")
-      .addAsLibraries(DeploymentHelper.getEngineSpring());
+      .addAsLibraries(DeploymentHelper.getEngineSpring())
+
+      .addAsLibraries(purgeDatabaseServlet());
   }
 
 

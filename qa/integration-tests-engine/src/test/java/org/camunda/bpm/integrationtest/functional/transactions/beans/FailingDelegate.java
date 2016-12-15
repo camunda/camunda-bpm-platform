@@ -1,9 +1,9 @@
 package org.camunda.bpm.integrationtest.functional.transactions.beans;
 
-import javax.inject.Named;
-
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
+
+import javax.inject.Named;
 
 @Named
 public class FailingDelegate implements JavaDelegate {

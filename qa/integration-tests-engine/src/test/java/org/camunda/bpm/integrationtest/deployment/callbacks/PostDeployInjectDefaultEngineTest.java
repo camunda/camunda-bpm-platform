@@ -12,18 +12,17 @@
  */
 package org.camunda.bpm.integrationtest.deployment.callbacks;
 
-import java.util.List;
-
-import org.junit.Assert;
-
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.integrationtest.deployment.callbacks.apps.PostDeployInjectApp;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import java.util.List;
 
 /**
  * @author Daniel Meyer

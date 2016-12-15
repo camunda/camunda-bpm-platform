@@ -44,7 +44,6 @@ import org.junit.runner.RunWith;
 @RunWith(Arquillian.class)
 public class TestFoxPlatformClientAsEjbModule_pasAsEjbModule extends AbstractFoxPlatformIntegrationTest {
 
-  
   /**
    * This only works if EAR classloader isolation is turned OFF (which is the default in AS7)
    * 
@@ -75,7 +74,10 @@ public class TestFoxPlatformClientAsEjbModule_pasAsEjbModule extends AbstractFox
     WebArchive testJar = ShrinkWrap.create(WebArchive.class, "paAsEjbModule-test.war")
       .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
       .addClass(AbstractFoxPlatformIntegrationTest.class)
-      .addClass(TestFoxPlatformClientAsEjbModule_pasAsEjbModule.class);
+      .addClass(TestFoxPlatformClientAsEjbModule_pasAsEjbModule.class)
+      .addAsLibraries(purgeDatabaseServlet());
+
+    DEPLOYMENT_NAMES.add("paAsEjbModule-test");
 
     return ShrinkWrap.create(EnterpriseArchive.class, "paAsEjbModule.ear")            
       .addAsModule(processArchive1Jar)

@@ -13,12 +13,12 @@
 
 package org.camunda.bpm.integrationtest.functional.connect;
 
-import java.util.Collection;
-import java.util.List;
-
 import org.camunda.connect.spi.Connector;
 import org.camunda.connect.spi.ConnectorRequestInterceptor;
 import org.camunda.connect.spi.ConnectorResponse;
+
+import java.util.Collection;
+import java.util.List;
 
 public class TestConnector implements Connector<TestConnectorRequest> {
 

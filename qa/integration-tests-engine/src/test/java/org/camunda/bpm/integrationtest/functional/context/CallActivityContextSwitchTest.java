@@ -15,16 +15,6 @@
  */
 package org.camunda.bpm.integrationtest.functional.context;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
-import javax.enterprise.inject.spi.Bean;
-import javax.enterprise.inject.spi.BeanManager;
-import javax.inject.Inject;
-
-import org.junit.Assert;
-
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.integrationtest.functional.context.beans.CalledProcessDelegate;
 import org.camunda.bpm.integrationtest.functional.context.beans.DelegateAfter;
@@ -34,8 +24,16 @@ import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import javax.enterprise.inject.spi.Bean;
+import javax.enterprise.inject.spi.BeanManager;
+import javax.inject.Inject;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 
 /**
