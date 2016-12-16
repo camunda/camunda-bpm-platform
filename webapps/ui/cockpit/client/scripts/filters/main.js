@@ -3,7 +3,7 @@
 var angular = require('camunda-commons-ui/vendor/angular'),
 
     shorten = require('./shorten'),
-    abbreviateNumber = require('./abbreviateNumber'),
+    abbreviateNumber = require('camunda-commons-ui/lib/filter/abbreviateNumber'),
     duration = require('./duration');
 
 
