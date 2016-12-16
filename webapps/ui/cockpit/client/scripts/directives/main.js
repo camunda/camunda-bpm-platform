@@ -14,7 +14,6 @@ var angular = require('camunda-commons-ui/vendor/angular'),
     variable = require('./variable'),
     focus = require('./focus'),
     viewPills = require('./viewPills'),
-    sparkline = require('./sparkline'),
     pieChart = require('./pie-chart'),
     selectActivity = require('./selectActivity'),
     selectActivityInstance = require('./selectActivityInstance'),
@@ -41,7 +40,6 @@ directivesModule.directive('variable', variable);
 directivesModule.directive('focus', focus);
 directivesModule.directive('viewPills', viewPills);
 directivesModule.directive('camSelectActivity', selectActivity);
-directivesModule.directive('camSparkline', sparkline);
 directivesModule.directive('camPieChart', pieChart);
 directivesModule.directive('camSelectActivityInstance', selectActivityInstance);
 directivesModule.directive('processVariable', processVariable);
