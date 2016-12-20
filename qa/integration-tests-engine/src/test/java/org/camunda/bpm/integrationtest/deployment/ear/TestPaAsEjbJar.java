@@ -21,11 +21,9 @@ import org.camunda.bpm.integrationtest.util.DeploymentHelper;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.asset.ByteArrayAsset;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.EnterpriseArchive;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -57,7 +55,7 @@ public class TestPaAsEjbJar extends AbstractFoxPlatformIntegrationTest {
   @Deployment
   public static EnterpriseArchive paAsEjbModule() throws Exception {
 
-    JavaArchive processArchive1Jar = ShrinkWrap.create(JavaArchive.class, "pa1.jar")
+    JavaArchive processArchive1Jar = ShrinkWrap.create(JavaArchive.class, "pa.jar")
       .addClass(DefaultEjbProcessApplication.class)
       .addClass(NamedCdiBean.class)
       .addClass(AbstractFoxPlatformIntegrationTest.class)
@@ -69,11 +67,6 @@ public class TestPaAsEjbJar extends AbstractFoxPlatformIntegrationTest {
     return ShrinkWrap.create(EnterpriseArchive.class, "paAsEjbModule.ear")
       .addAsModule(processArchive1Jar)
       .addAsLibrary(DeploymentHelper.getEngineCdi());
-  }
-
-  @Deployment(name = "purge")
-  public static WebArchive purgeArchive() {
-    return initWebArchiveDeployment("purge.war").addClass(TestPaAsEjbJar.class);
   }
 
   @Test

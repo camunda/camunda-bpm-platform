@@ -12,6 +12,9 @@
  */
 package org.camunda.bpm.integrationtest.service;
 
+import java.util.Arrays;
+import java.util.Set;
+
 import org.camunda.bpm.BpmPlatform;
 import org.camunda.bpm.ProcessApplicationService;
 import org.camunda.bpm.application.ProcessApplicationInfo;
@@ -23,9 +26,6 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import java.util.Arrays;
-import java.util.Set;
 
 
 /**

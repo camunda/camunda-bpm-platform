@@ -12,6 +12,9 @@
  */
 package org.camunda.bpm.integrationtest.functional.migration;
 
+import java.io.ByteArrayOutputStream;
+import java.util.Arrays;
+
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
@@ -30,9 +33,6 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import java.io.ByteArrayOutputStream;
-import java.util.Arrays;
 
 /**
  * @author Thorben Lindhauer

@@ -12,6 +12,9 @@
  */
 package org.camunda.bpm.integrationtest.functional.scriptengine;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.camunda.bpm.integrationtest.functional.scriptengine.classes.CustomClass;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.camunda.bpm.model.bpmn.Bpmn;
@@ -23,9 +26,6 @@ import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 /**
  * @author Daniel Meyer

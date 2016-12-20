@@ -12,14 +12,14 @@
  */
 package org.camunda.bpm.integrationtest.functional.transactions.beans;
 
+import javax.inject.Named;
+
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.impl.cfg.TransactionListener;
 import org.camunda.bpm.engine.impl.cfg.TransactionState;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-
-import javax.inject.Named;
 
 @Named
 public class FailingTransactionListenerDelegate implements JavaDelegate {

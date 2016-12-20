@@ -12,10 +12,10 @@
  */
 package org.camunda.bpm.integrationtest.functional.classloading.beans;
 
+import javax.inject.Named;
+
 import org.camunda.bpm.engine.delegate.CaseExecutionListener;
 import org.camunda.bpm.engine.delegate.DelegateCaseExecution;
-
-import javax.inject.Named;
 
 /**
  * @author Roman Smirnov

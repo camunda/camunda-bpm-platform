@@ -12,11 +12,11 @@
  */
 package org.camunda.bpm.integrationtest.functional.event.beans;
 
-import org.camunda.bpm.engine.cdi.BusinessProcess;
-import org.camunda.bpm.engine.cdi.BusinessProcessEvent;
-
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
+
+import org.camunda.bpm.engine.cdi.BusinessProcess;
+import org.camunda.bpm.engine.cdi.BusinessProcessEvent;
 
 /**
  * @author Daniel Meyer

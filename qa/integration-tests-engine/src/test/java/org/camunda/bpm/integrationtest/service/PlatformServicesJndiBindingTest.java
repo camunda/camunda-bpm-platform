@@ -12,6 +12,9 @@
  */
 package org.camunda.bpm.integrationtest.service;
 
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.camunda.bpm.integrationtest.util.TestConstants;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -20,9 +23,6 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 
 @RunWith(Arquillian.class)
 public class PlatformServicesJndiBindingTest extends AbstractFoxPlatformIntegrationTest {

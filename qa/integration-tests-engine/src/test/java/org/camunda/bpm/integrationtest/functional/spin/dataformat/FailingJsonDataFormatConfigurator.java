@@ -12,10 +12,10 @@
  */
 package org.camunda.bpm.integrationtest.functional.spin.dataformat;
 
+import java.text.SimpleDateFormat;
+
 import org.camunda.spin.impl.json.jackson.format.JacksonJsonDataFormat;
 import org.camunda.spin.spi.DataFormatConfigurator;
-
-import java.text.SimpleDateFormat;
 
 /**
  * @author Thorben Lindhauer

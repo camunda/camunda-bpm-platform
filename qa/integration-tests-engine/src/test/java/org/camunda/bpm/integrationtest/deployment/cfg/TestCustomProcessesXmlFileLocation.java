@@ -42,9 +42,8 @@ public class TestCustomProcessesXmlFileLocation extends AbstractFoxPlatformInteg
         .addAsResource("org/camunda/bpm/integrationtest/deployment/cfg/processes.xml", "my/alternate/location/processes.xml")
         .addClass(AbstractFoxPlatformIntegrationTest.class)
         .addClass(CustomProcessApplication.class)
-        .addAsResource("org/camunda/bpm/integrationtest/deployment/cfg/invoice-it.bpmn20.xml")
-        .addAsLibraries(purgeDatabaseServlet());
-
+        .addAsResource("org/camunda/bpm/integrationtest/deployment/cfg/invoice-it.bpmn20.xml");
+    
     return archive;
     
   }

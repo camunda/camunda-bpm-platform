@@ -33,7 +33,6 @@ public class EjbPALifecycleCallbacksTest extends AbstractFoxPlatformIntegrationT
 
     WebArchive archive = ShrinkWrap.create(WebArchive.class, "test.war")
         .addClass(CustomEjbProcessApplication.class)
-        .addAsLibraries(purgeDatabaseServlet())
         .addClass(AbstractFoxPlatformIntegrationTest.class);
 
     return archive;

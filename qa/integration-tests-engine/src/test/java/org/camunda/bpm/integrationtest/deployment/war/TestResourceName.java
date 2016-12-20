@@ -144,11 +144,6 @@ public class TestResourceName extends AbstractFoxPlatformIntegrationTest {
     return archive;
   }
 
-  @Deployment(name = "purge")
-  public static WebArchive purgeArchive() {
-    return initWebArchiveDeployment("purge.war").addClass(TestMultipleClasspathRoots.class);
-  }
-
   @Test
   public void testResourceName() {
     ProcessEngine processEngine = ProgrammaticBeanLookup.lookup(ProcessEngine.class);

@@ -52,9 +52,6 @@ public class PaDataFormatProviderTest extends AbstractFoxPlatformIntegrationTest
         .addAsServiceProvider(DataFormatProvider.class, FooDataFormatProvider.class)
         .addClass(ReferenceStoringProcessApplication.class);
 
-    webArchive.addAsLibraries(purgeDatabaseServlet());
-    DEPLOYMENT_NAMES.add("PaDataFormatTest");
-
     return webArchive;
   }
 

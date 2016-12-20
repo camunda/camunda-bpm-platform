@@ -96,11 +96,6 @@ public class TestMultipleClasspathRoots extends AbstractFoxPlatformIntegrationTe
     return archive;
   }
 
-  @Deployment(name = "purge")
-  public static WebArchive purgeArchive() {
-    return initWebArchiveDeployment("purge.war").addClass(TestMultipleClasspathRoots.class);
-  }
-
   @Test
   public void testMultipleClasspathRoots() {
     ProcessEngine processEngine = ProgrammaticBeanLookup.lookup(ProcessEngine.class);

@@ -74,10 +74,9 @@ public class TestFoxPlatformClientAsEjbModule_onePaAsLib extends AbstractFoxPlat
       .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
       .setManifest(new ByteArrayAsset(("Class-Path: " + foxPlatformClientJar.getName()+"\n").getBytes()))
       .addClass(AbstractFoxPlatformIntegrationTest.class)
-      .addClass(TestFoxPlatformClientAsEjbModule_onePaAsLib.class)
-      .addAsLibraries(purgeDatabaseServlet());
+      .addClass(TestFoxPlatformClientAsEjbModule_onePaAsLib.class);
 
-    return ShrinkWrap.create(EnterpriseArchive.class, "onePaAsLib.ear")
+    return ShrinkWrap.create(EnterpriseArchive.class, "onePaAsLib.ear")            
       .addAsLibrary(processArchiveJar)
       .addAsModule(foxPlatformClientJar)
       .addAsModule(testJar)

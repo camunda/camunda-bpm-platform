@@ -61,10 +61,7 @@ public class SpringExpressionResolvingTest extends AbstractFoxPlatformIntegratio
       .addAsLibraries(DeploymentHelper.getEngineSpring())
 
       // adding module dependency on process engine module (jboss only)
-      .addAsManifestResource("org/camunda/bpm/integrationtest/functional/spring/jboss-deployment-structure.xml", "jboss-deployment-structure.xml")
-
-      //purging dependency
-      .addAsLibraries(purgeDatabaseServlet());
+      .addAsManifestResource("org/camunda/bpm/integrationtest/functional/spring/jboss-deployment-structure.xml", "jboss-deployment-structure.xml");
   }
 
 

@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.integrationtest.deployment.cfg;
 
+import java.util.List;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
@@ -26,8 +27,6 @@ import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -49,8 +48,7 @@ public class TestAdditionalResourceSuffixes extends AbstractFoxPlatformIntegrati
         .addClass(DummyProcessApplication.class)
         .addAsResource("org/camunda/bpm/integrationtest/deployment/cfg/invoice-it.bpmn20.xml")
         .addAsResource("org/camunda/bpm/integrationtest/deployment/cfg/hello.groovy")
-        .addAsResource("org/camunda/bpm/integrationtest/deployment/cfg/hello.py")
-        .addAsLibraries(purgeDatabaseServlet());
+        .addAsResource("org/camunda/bpm/integrationtest/deployment/cfg/hello.py");
 
     return archive;
   }

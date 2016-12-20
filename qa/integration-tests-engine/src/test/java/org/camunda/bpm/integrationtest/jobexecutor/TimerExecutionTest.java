@@ -1,5 +1,7 @@
 package org.camunda.bpm.integrationtest.jobexecutor;
 
+import java.util.List;
+
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.integrationtest.jobexecutor.beans.SampleServiceBean;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
@@ -9,8 +11,6 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import java.util.List;
 
 /**
  *

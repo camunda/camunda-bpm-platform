@@ -15,12 +15,11 @@
  */
 package org.camunda.bpm.integrationtest.functional.delegation.beans;
 
+import javax.inject.Named;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.DelegateVariableMapping;
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.variable.VariableMap;
-
-import javax.inject.Named;
 /**
  *
  * @author Christopher Zell <christopher.zell@camunda.com>

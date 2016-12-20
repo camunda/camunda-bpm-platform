@@ -52,14 +52,11 @@ public class PaContextSwitchTest extends AbstractFoxPlatformIntegrationTest {
         .addClass(ProcessApplication1.class)
         .addClass(JsonSerializable.class)
         .addClass(RuntimeServiceDelegate.class)
-        .addAsLibraries(purgeDatabaseServlet())
         .addAsResource("org/camunda/bpm/integrationtest/functional/spin/paContextSwitch.bpmn20.xml")
         .addClass(JsonDataFormatConfigurator.class)
         .addAsServiceProvider(DataFormatConfigurator.class, JsonDataFormatConfigurator.class);
 
     TestContainer.addSpinJacksonJsonDataFormat(webArchive);
-
-    DEPLOYMENT_NAMES.add("pa1");
 
     return webArchive;
   }

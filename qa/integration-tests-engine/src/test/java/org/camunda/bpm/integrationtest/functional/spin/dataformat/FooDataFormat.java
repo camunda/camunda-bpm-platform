@@ -12,12 +12,16 @@
  */
 package org.camunda.bpm.integrationtest.functional.spin.dataformat;
 
-import org.camunda.spin.spi.*;
-
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.regex.Pattern;
+
+import org.camunda.spin.spi.DataFormat;
+import org.camunda.spin.spi.DataFormatMapper;
+import org.camunda.spin.spi.DataFormatReader;
+import org.camunda.spin.spi.DataFormatWriter;
+import org.camunda.spin.spi.TextBasedDataFormatReader;
 
 /**
  * @author Thorben Lindhauer

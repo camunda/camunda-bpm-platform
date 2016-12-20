@@ -97,14 +97,11 @@ public class TestWarDeploymentDeployChangedOnlyWithJarAsLib extends AbstractFoxP
         .addAsLibraries(DeploymentHelper.getEngineCdi())
 
         .addAsLibraries(processArchiveJar)
-        .addAsLibraries(purgeDatabaseServlet())
 
         .addClass(AbstractFoxPlatformIntegrationTest.class)
         .addClass(TestWarDeploymentDeployChangedOnlyWithJarAsLib.class);
 
     TestContainer.addContainerSpecificResources(archive);
-
-    DEPLOYMENT_NAMES.add("pa2");
 
     return archive;
   }

@@ -46,7 +46,6 @@ public class PaDataFormatAndPostDeployTest extends AbstractFoxPlatformIntegratio
         .addClass(FooDataFormat.class)
         .addClass(FooDataFormatProvider.class)
         .addClass(FooSpin.class)
-        .addAsLibraries(purgeDatabaseServlet())
         .addAsServiceProvider(DataFormatProvider.class, FooDataFormatProvider.class);
 
     return archive;

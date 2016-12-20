@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.integrationtest.functional.scriptengine;
 
+import static org.junit.Assert.assertNotEquals;
+
 import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.integrationtest.functional.scriptengine.engine.AbstractScriptEngineFactory;
 import org.camunda.bpm.integrationtest.functional.scriptengine.engine.DummyScriptEngineFactory;
@@ -19,8 +21,6 @@ import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
-
-import static org.junit.Assert.assertNotEquals;
 
 /**
  * @author Roman Smirnov

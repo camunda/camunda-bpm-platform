@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.integrationtest.functional.classloading.deployment;
 
+import org.camunda.bpm.integrationtest.functional.classloading.beans.ExampleDelegate;
 import org.camunda.bpm.integrationtest.functional.classloading.deployment.beans.MyCustomDelegate;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.camunda.bpm.integrationtest.util.TestContainer;

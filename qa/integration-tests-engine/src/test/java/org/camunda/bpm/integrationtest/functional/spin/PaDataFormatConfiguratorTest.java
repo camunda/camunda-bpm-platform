@@ -62,9 +62,6 @@ public class PaDataFormatConfiguratorTest extends AbstractFoxPlatformIntegration
 
     TestContainer.addSpinJacksonJsonDataFormat(webArchive);
 
-    webArchive.addAsLibraries(purgeDatabaseServlet());
-    DEPLOYMENT_NAMES.add("PaDataFormatTest");
-
     return webArchive;
 
   }

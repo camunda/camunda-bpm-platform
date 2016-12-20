@@ -1,5 +1,7 @@
 package org.camunda.bpm.integrationtest.jobexecutor;
 
+import static org.junit.Assert.assertEquals;
+
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -7,8 +9,6 @@ import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import static org.junit.Assert.assertEquals;
 
 
 @RunWith(Arquillian.class)

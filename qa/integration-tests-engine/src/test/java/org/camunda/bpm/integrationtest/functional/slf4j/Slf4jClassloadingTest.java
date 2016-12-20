@@ -39,7 +39,6 @@ public class Slf4jClassloadingTest extends AbstractFoxPlatformIntegrationTest {
     WebArchive webArchive = ShrinkWrap.create(WebArchive.class, "test.war")
         .addAsResource("META-INF/processes.xml")
         .addClass(AbstractFoxPlatformIntegrationTest.class)
-        .addAsLibraries(purgeDatabaseServlet())
         .addClass(TestLogger.class);
 
     TestContainer.addContainerSpecificResourcesWithoutWeld(webArchive);

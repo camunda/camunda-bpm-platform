@@ -12,12 +12,12 @@
  */
 package org.camunda.bpm.integrationtest.functional.context;
 
+import java.util.concurrent.Callable;
+
 import org.camunda.bpm.application.InvocationContext;
 import org.camunda.bpm.application.ProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationExecutionException;
 import org.camunda.bpm.application.impl.ServletProcessApplication;
-
-import java.util.concurrent.Callable;
 
 @ProcessApplication("app")
 public class ProcessApplicationWithInvocationContext extends ServletProcessApplication {

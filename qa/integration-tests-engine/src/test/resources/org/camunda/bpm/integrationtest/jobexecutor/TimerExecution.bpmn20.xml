@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
-             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
-             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
-             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-             xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
-             expressionLanguage="http://www.w3.org/1999/XPath"
-             id="sid-996e5db9-6d63-4134-be9c-6b810964b27e" targetNamespace="Test"
-             typeLanguage="http://www.w3.org/2001/XMLSchema"
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" 
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" 
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" 
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" 
+             xmlns:signavio="http://www.signavio.com" 
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+             xmlns:camunda="http://camunda.org/schema/1.0/bpmn" 
+             expressionLanguage="http://www.w3.org/1999/XPath" 
+             id="sid-996e5db9-6d63-4134-be9c-6b810964b27e" targetNamespace="Test" typeLanguage="http://www.w3.org/2001/XMLSchema" 
              xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
   <process id="TimerExecutionProcess" isExecutable="true">
     <startEvent id="sid-239F9BB2-874B-492C-93F5-5CFE5DFE7850"></startEvent>

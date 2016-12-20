@@ -1,10 +1,10 @@
 package org.camunda.bpm.integrationtest.jobexecutor.beans;
 
-import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.delegate.JavaDelegate;
-
 import javax.ejb.Stateless;
 import javax.inject.Named;
+
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.JavaDelegate;
 
 @Named
 @Stateless

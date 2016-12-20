@@ -13,6 +13,15 @@
 
 package org.camunda.bpm.integrationtest.functional.spin;
 
+import static org.camunda.bpm.engine.variable.Variables.serializedObjectValue;
+import static org.camunda.spin.Spin.JSON;
+import static org.camunda.spin.Spin.XML;
+import static org.junit.Assert.assertEquals;
+
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.List;
+
 import org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.variable.Variables;
@@ -26,15 +35,6 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.List;
-
-import static org.camunda.bpm.engine.variable.Variables.serializedObjectValue;
-import static org.camunda.spin.Spin.JSON;
-import static org.camunda.spin.Spin.XML;
-import static org.junit.Assert.assertEquals;
 
 /**
  * <p>Smoketest Make sure camunda spin can be used in a process application </p>

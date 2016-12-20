@@ -12,11 +12,11 @@
  */
 package org.camunda.bpm.integrationtest.functional.cdi.beans;
 
-import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
-
 import javax.inject.Inject;
 import javax.inject.Named;
+
+import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 
 /**
  * @author Thorben Lindhauer

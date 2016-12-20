@@ -15,10 +15,10 @@
  */
 package org.camunda.bpm.integrationtest.functional.cdi.beans;
 
+import javax.inject.Named;
+
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
-
-import javax.inject.Named;
 
 @Named
 public class ExampleDelegateBean implements JavaDelegate {

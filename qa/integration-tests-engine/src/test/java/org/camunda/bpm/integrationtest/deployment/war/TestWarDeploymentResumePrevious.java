@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 package org.camunda.bpm.integrationtest.deployment.war;
+import java.util.List;
+import java.util.Set;
 
 import org.camunda.bpm.BpmPlatform;
 import org.camunda.bpm.ProcessApplicationService;
@@ -28,9 +30,6 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import java.util.List;
-import java.util.Set;
 
 
 

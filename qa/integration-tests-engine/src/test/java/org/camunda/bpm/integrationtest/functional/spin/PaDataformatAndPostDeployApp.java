@@ -12,12 +12,12 @@
  */
 package org.camunda.bpm.integrationtest.functional.spin;
 
+import static org.junit.Assert.assertNotNull;
+
 import org.camunda.bpm.application.PostDeploy;
 import org.camunda.bpm.application.ProcessApplication;
 import org.camunda.bpm.application.impl.ServletProcessApplication;
 import org.camunda.bpm.engine.ProcessEngine;
-
-import static org.junit.Assert.assertNotNull;
 
 
 /**

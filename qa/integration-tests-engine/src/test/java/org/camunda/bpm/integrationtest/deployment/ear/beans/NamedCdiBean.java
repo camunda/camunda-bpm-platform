@@ -12,10 +12,10 @@
  */
 package org.camunda.bpm.integrationtest.deployment.ear.beans;
 
+import javax.inject.Named;
+
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
-
-import javax.inject.Named;
 
 /**
  * @author Roman Smirnov

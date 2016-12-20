@@ -15,22 +15,21 @@
  */
 package org.camunda.bpm.integrationtest.functional.delegation;
 
+import org.camunda.bpm.integrationtest.functional.delegation.beans.DelegateVarMapping;
+import javax.enterprise.inject.spi.BeanManager;
+import javax.inject.Inject;
+import static junit.framework.TestCase.assertEquals;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
-import org.camunda.bpm.integrationtest.functional.delegation.beans.DelegateVarMapping;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
+import static org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest.initWebArchiveDeployment;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import javax.enterprise.inject.spi.BeanManager;
-import javax.inject.Inject;
-
-import static junit.framework.TestCase.assertEquals;
 
 /**
  *

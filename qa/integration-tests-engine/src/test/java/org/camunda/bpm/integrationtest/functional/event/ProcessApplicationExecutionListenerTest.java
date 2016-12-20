@@ -39,7 +39,6 @@ public class ProcessApplicationExecutionListenerTest extends AbstractFoxPlatform
       .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
       .addAsLibraries(DeploymentHelper.getEngineCdi())
       .addAsResource("META-INF/processes.xml", "META-INF/processes.xml")
-      .addAsLibraries(purgeDatabaseServlet())
       .addClass(AbstractFoxPlatformIntegrationTest.class)
       .addClass(ExecutionListenerProcessApplication.class)
       .addAsResource("org/camunda/bpm/integrationtest/functional/event/ProcessApplicationEventSupportTest.testExecutionListener.bpmn20.xml");

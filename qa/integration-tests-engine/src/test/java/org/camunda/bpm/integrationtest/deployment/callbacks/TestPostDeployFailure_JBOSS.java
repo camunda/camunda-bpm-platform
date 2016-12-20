@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.integrationtest.deployment.callbacks;
 
+import org.junit.Assert;
+
 import org.camunda.bpm.integrationtest.deployment.callbacks.apps.PostDeployFailureApp;
 import org.jboss.arquillian.container.test.api.Deployer;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -19,7 +21,6 @@ import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -34,7 +35,7 @@ public class TestPostDeployFailure_JBOSS {
 
   @ArquillianResource
   private Deployer deployer;
-
+  
   @Deployment(managed=false, name=DEPLOYMENT)
   public static WebArchive createDeployment1() {
     
@@ -49,13 +50,14 @@ public class TestPostDeployFailure_JBOSS {
   
   @Test
   public void test() {
+    
     try {
       deployer.deploy(DEPLOYMENT);
       Assert.fail("failure expected");
     } catch (Exception e) {
       // expected
-    } finally {
     }
+       
   }
   
 }

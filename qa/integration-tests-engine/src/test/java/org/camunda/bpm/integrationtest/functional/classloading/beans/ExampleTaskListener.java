@@ -1,9 +1,9 @@
 package org.camunda.bpm.integrationtest.functional.classloading.beans;
 
+import javax.inject.Named;
+
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.TaskListener;
-
-import javax.inject.Named;
 
 @Named(value = "taskListener")
 public class ExampleTaskListener implements TaskListener {

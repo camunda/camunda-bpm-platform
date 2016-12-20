@@ -12,9 +12,9 @@
  */
 package org.camunda.bpm.integrationtest.functional.spin.dataformat;
 
-import org.camunda.spin.Spin;
-
 import java.io.Writer;
+
+import org.camunda.spin.Spin;
 
 /**
  * @author Thorben Lindhauer

@@ -16,6 +16,8 @@
 
 package org.camunda.bpm.integrationtest.deployment.war;
 
+import org.junit.Assert;
+
 import org.camunda.bpm.engine.repository.DeploymentQuery;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
@@ -29,7 +31,6 @@ import org.jboss.shrinkwrap.api.asset.Asset;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -100,7 +101,6 @@ public class TestWarDeploymentWithMultiplePasAsSubdeployment5 extends AbstractFo
             
             .addAsLibraries(pa2)
             .addAsLibraries(pa3)
-            .addAsLibraries(purgeDatabaseServlet())
             
             .addAsResource(pa1ProcessesXml, "META-INF/processes.xml")
             .addAsResource(processAssets[0], "process0.bpmn")

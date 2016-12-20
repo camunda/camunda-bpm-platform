@@ -1,11 +1,11 @@
 package org.camunda.bpm.integrationtest.jobexecutor;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.camunda.bpm.engine.cdi.BusinessProcess;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
-
-import javax.inject.Inject;
-import javax.inject.Named;
 
 
 @Named

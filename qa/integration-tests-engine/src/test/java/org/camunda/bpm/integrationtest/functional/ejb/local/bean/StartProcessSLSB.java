@@ -1,9 +1,9 @@
 package org.camunda.bpm.integrationtest.functional.ejb.local.bean;
 
-import org.camunda.bpm.BpmPlatform;
-
 import javax.ejb.Local;
 import javax.ejb.Stateless;
+
+import org.camunda.bpm.BpmPlatform;
 
 /**
  * A SLSB with a local business interface

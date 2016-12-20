@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.integrationtest.service;
 
+import javax.naming.InitialContext;
+
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -20,8 +22,6 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import javax.naming.InitialContext;
 
 /**
  * <p>Makes sure that the process engine JNDI bindings are created</p>

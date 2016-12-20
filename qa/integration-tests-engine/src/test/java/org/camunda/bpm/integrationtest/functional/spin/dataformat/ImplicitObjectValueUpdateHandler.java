@@ -12,12 +12,12 @@
  */
 package org.camunda.bpm.integrationtest.functional.spin.dataformat;
 
+import java.util.Date;
+
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.delegate.TaskListener;
-
-import java.util.Date;
 
 /**
  * @author Thorben Lindhauer

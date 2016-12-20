@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 package org.camunda.bpm.integrationtest.functional.classloading.ear;
+import javax.transaction.SystemException;
 
 import org.camunda.bpm.integrationtest.functional.classloading.beans.ExampleDelegate;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
@@ -27,8 +28,6 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import javax.transaction.SystemException;
 
 
 /**

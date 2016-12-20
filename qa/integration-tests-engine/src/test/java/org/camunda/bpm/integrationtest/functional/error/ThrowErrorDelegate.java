@@ -13,11 +13,11 @@
 
 package org.camunda.bpm.integrationtest.functional.error;
 
+import javax.inject.Named;
+
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
-
-import javax.inject.Named;
 
 @Named
 public class ThrowErrorDelegate extends AbstractBpmnActivityBehavior {

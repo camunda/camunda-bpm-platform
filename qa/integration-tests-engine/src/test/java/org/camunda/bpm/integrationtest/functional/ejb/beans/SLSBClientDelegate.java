@@ -1,10 +1,10 @@
 package org.camunda.bpm.integrationtest.functional.ejb.beans;
 
-import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.delegate.JavaDelegate;
-
 import javax.ejb.EJB;
 import javax.inject.Named;
+
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.JavaDelegate;
 
 /**
  * This is a CDI bean delegating to a SLSB from the same deployment

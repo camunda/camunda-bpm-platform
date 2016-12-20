@@ -12,9 +12,10 @@
  */
 package org.camunda.bpm.integrationtest.jobexecutor.beans;
 
+import java.io.Serializable;
+
 import javax.ejb.Stateless;
 import javax.inject.Named;
-import java.io.Serializable;
 
 /**
  * @author Thorben Lindhauer
