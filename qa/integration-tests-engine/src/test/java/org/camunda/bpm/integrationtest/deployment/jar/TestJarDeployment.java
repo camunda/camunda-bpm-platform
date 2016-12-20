@@ -62,6 +62,7 @@ public class TestJarDeployment extends AbstractFoxPlatformIntegrationTest {
       .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
       .addAsLibraries(DeploymentHelper.getEngineCdi())
       .addClass(TestJarDeployment.class)
+      .addClass(AbstractFoxPlatformIntegrationTest.class)
       .addAsLibraries(purgeDatabaseServlet());
 
     DEPLOYMENT_NAMES.add("purge");
