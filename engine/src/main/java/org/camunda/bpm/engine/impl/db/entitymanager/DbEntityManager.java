@@ -297,20 +297,22 @@ public class DbEntityManager implements Session, EntityLoadListener {
       persistenceSession.executeNonEmptyUpdateStmt(TOGGLE_FOREIGN_KEY_STMT, false);
     }
     // execute the flush
-    for (DbOperation dbOperation : operationsToFlush) {
-      try {
-        persistenceSession.executeDbOperation(dbOperation);
+    try {
+      for (DbOperation dbOperation : operationsToFlush) {
+        try {
+          persistenceSession.executeDbOperation(dbOperation);
+        } catch (Exception e) {
+          throw LOG.flushDbOperationException(operationsToFlush, dbOperation, e);
+        }
+        if (dbOperation.isFailed()) {
+          handleOptimisticLockingException(dbOperation);
+        }
       }
-      catch(Exception e) {
-        throw LOG.flushDbOperationException(operationsToFlush, dbOperation, e);
+    } finally {
+      if (isIgnoreForeignKeysForNextFlush) {
+        persistenceSession.executeNonEmptyUpdateStmt(TOGGLE_FOREIGN_KEY_STMT, true);
+        isIgnoreForeignKeysForNextFlush = false;
       }
-      if(dbOperation.isFailed()) {
-        handleOptimisticLockingException(dbOperation);
-      }
-    }
-    if (isIgnoreForeignKeysForNextFlush) {
-      persistenceSession.executeNonEmptyUpdateStmt(TOGGLE_FOREIGN_KEY_STMT, true);
-      isIgnoreForeignKeysForNextFlush = false;
     }
   }
 
