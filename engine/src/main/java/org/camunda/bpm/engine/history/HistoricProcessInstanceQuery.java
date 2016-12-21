@@ -270,4 +270,9 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
   @Deprecated
   HistoricProcessInstanceQuery finishDateOn(Date date);
 
+  /** Only select historic process instances that execute an activity after the given date. */
+  HistoricProcessInstanceQuery executeActivityAfter(Date date);
+
+  /** Only select historic process instances that execute an activity before the given date. */
+  HistoricProcessInstanceQuery executeActivityBefore(Date date);
 }

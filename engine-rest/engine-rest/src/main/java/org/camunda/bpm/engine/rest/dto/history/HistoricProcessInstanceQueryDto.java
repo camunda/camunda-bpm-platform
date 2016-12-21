@@ -76,6 +76,8 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
   private Date startedAfter;
   private Date finishedBefore;
   private Date finishedAfter;
+  private Date executeActivityAfter;
+  private Date executeActivityBefore;
   private String startedBy;
   private String superProcessInstanceId;
   private String subProcessInstanceId;
@@ -227,6 +229,16 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
     this.tenantIds = tenantIds;
   }
 
+  @CamundaQueryParam(value = "executeActivityAfter", converter = DateConverter.class)
+  public void setExecuteActivityAfter(Date executeActivityAfter) {
+    this.executeActivityAfter = executeActivityAfter;
+  }
+
+  @CamundaQueryParam(value = "executeActivityBefore", converter = DateConverter.class)
+  public void setExecuteActivityBefore(Date executeActivityBefore) {
+    this.executeActivityBefore = executeActivityBefore;
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -343,6 +355,14 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
           throw new InvalidRequestException(Status.BAD_REQUEST, "Invalid variable comparator specified: " + op);
         }
       }
+    }
+
+    if (executeActivityAfter != null) {
+      query.executeActivityAfter(executeActivityAfter);
+    }
+
+    if (executeActivityBefore != null) {
+      query.executeActivityBefore(executeActivityBefore);
     }
   }
 

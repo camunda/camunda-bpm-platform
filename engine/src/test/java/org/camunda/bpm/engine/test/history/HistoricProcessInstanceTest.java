@@ -38,6 +38,9 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.Test;
 
 
 /**
@@ -413,6 +416,12 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
                       .incidentMessage("Unknown property used in expression: #{failing}. Cause: Cannot resolve identifier 'failing'")
                       .count()
     );
+
+    //executed activities
+    assertEquals(1, historyService.createHistoricProcessInstanceQuery().executeActivityAfter(hourAgo.getTime()).count());
+    assertEquals(0, historyService.createHistoricProcessInstanceQuery().executeActivityBefore(hourAgo.getTime()).count());
+    assertEquals(1, historyService.createHistoricProcessInstanceQuery().executeActivityBefore(hourFromNow.getTime()).count());
+    assertEquals(0, historyService.createHistoricProcessInstanceQuery().executeActivityAfter(hourFromNow.getTime()).count());
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
@@ -916,7 +925,7 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
   }
 
   @Deployment
-  public void FAILING_testProcessInstanceShouldBeActive() {
+  public void testProcessInstanceShouldBeActive() {
     // given
 
     // when
@@ -945,6 +954,58 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
 
     // then
     assertEquals("The One Task Process", historicProcessInstance.getProcessDefinitionName());
+  }
+
+  @Test
+  public void testHistoricProcInstExecuteActivityAfter() {
+    // given
+    Calendar now = Calendar.getInstance();
+    ClockUtil.setCurrentTime(now.getTime());
+    BpmnModelInstance model = Bpmn.createExecutableProcess("proc").startEvent().endEvent().done();
+    deployment(model);
+
+    Calendar hourFromNow = (Calendar) now.clone();
+    hourFromNow.add(Calendar.HOUR_OF_DAY, 1);
+
+    runtimeService.startProcessInstanceByKey("proc");
+
+    //when query historic process instance which has executed an activity after the start time
+    HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().executeActivityAfter(now.getTime()).singleResult();
+
+    //then query returns result
+    assertNotNull(historicProcessInstance);
+
+    //when query historic proc inst with execute activity after a hour of the starting time
+    historicProcessInstance = historyService.createHistoricProcessInstanceQuery().executeActivityAfter(hourFromNow.getTime()).singleResult();
+
+    //then query returns no result
+    assertNull(historicProcessInstance);
+  }
+
+  @Test
+  public void testHistoricProcInstExecuteActivityBefore() {
+    // given
+    Calendar now = Calendar.getInstance();
+    ClockUtil.setCurrentTime(now.getTime());
+    BpmnModelInstance model = Bpmn.createExecutableProcess("proc").startEvent().endEvent().done();
+    deployment(model);
+
+    Calendar hourBeforNow = (Calendar) now.clone();
+    hourBeforNow.add(Calendar.MILLISECOND, -1);
+
+    runtimeService.startProcessInstanceByKey("proc");
+
+    //when query historic process instance which has executed an activity before the start time
+    HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().executeActivityBefore(now.getTime()).singleResult();
+
+    //then query returns result, since the query is less-then-equal
+    assertNotNull(historicProcessInstance);
+
+    //when query historic proc inst which executes an activity an hour before the starting time
+    historicProcessInstance = historyService.createHistoricProcessInstanceQuery().executeActivityBefore(hourBeforNow.getTime()).singleResult();
+
+    //then query returns no result
+    assertNull(historicProcessInstance);
   }
 
 }

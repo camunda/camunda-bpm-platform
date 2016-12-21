@@ -1255,4 +1255,87 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
         MockProvider.createMockHistoricProcessInstance(MockProvider.ANOTHER_EXAMPLE_TENANT_ID));
   }
 
+  @Test
+  public void testExecuteActivityBeforeAndAfterTimeQuery() {
+    given()
+      .queryParam("executeActivityBefore", MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_STARTED_BEFORE)
+      .queryParam("executeActivityAfter", MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_STARTED_AFTER)
+      .then()
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+      .when()
+      .get(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
+
+    verifyExecuteActivityParameterQueryInvocations();
+  }
+
+  @Test
+  public void testExecuteActivityBeforeAndAfterTimeQueryAsPost() {
+    Map<String, Date> parameters = getCompleteExecuteActivityDateQueryParameters();
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(parameters)
+      .then()
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+      .when()
+      .post(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
+
+    verifyExecuteActivityParameterQueryInvocations();
+  }
+
+  @Test
+  public void testExecuteActivityBeforeAndAfterTimeAsStringQueryAsPost() {
+    Map<String, String> parameters = getCompleteExecuteActivityDateAsStringQueryParameters();
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(parameters)
+      .then()
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+      .when()
+      .post(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
+
+    verifyStringExecuteActivityParameterQueryInvocations();
+  }
+
+
+  private void verifyExecuteActivityParameterQueryInvocations() {
+    Map<String, Date> startDateParameters = getCompleteExecuteActivityDateQueryParameters();
+
+    verify(mockedQuery).executeActivityBefore(startDateParameters.get("executeActivityBefore"));
+    verify(mockedQuery).executeActivityAfter(startDateParameters.get("executeActivityAfter"));
+
+    verify(mockedQuery).list();
+  }
+
+  private void verifyStringExecuteActivityParameterQueryInvocations() {
+    Map<String, String> startDateParameters = getCompleteExecuteActivityDateAsStringQueryParameters();
+
+    verify(mockedQuery).executeActivityBefore(DateTimeUtil.parseDate(startDateParameters.get("executeActivityBefore")));
+    verify(mockedQuery).executeActivityAfter(DateTimeUtil.parseDate(startDateParameters.get("executeActivityAfter")));
+
+    verify(mockedQuery).list();
+  }
+
+  private Map<String, Date> getCompleteExecuteActivityDateQueryParameters() {
+    Map<String, Date> parameters = new HashMap<String, Date>();
+
+    parameters.put("executeActivityBefore", DateTimeUtil.parseDate(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_STARTED_BEFORE));
+    parameters.put("executeActivityAfter", DateTimeUtil.parseDate(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_STARTED_AFTER));
+
+    return parameters;
+  }
+
+  private Map<String, String> getCompleteExecuteActivityDateAsStringQueryParameters() {
+    Map<String, String> parameters = new HashMap<String, String>();
+
+    parameters.put("executeActivityAfter", MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_STARTED_AFTER);
+    parameters.put("executeActivityBefore", MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_STARTED_BEFORE);
+
+    return parameters;
+  }
+
 }

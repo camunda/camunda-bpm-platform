@@ -295,6 +295,22 @@
                 </if>
                 )
             </foreach>
+
+            <if test="executeActivityAfter != null || executeActivityBefore != null">
+              AND EXISTS (
+                SELECT *
+                FROM ${prefix}ACT_HI_ACTINST
+                <where>
+                    <if test="executeActivityAfter != null">
+                        AND (START_TIME_ &gt;= #{executeActivityAfter} OR END_TIME_ &gt;= #{executeActivityAfter})
+                    </if>
+                    <if test="executeActivityBefore != null">
+                        AND (START_TIME_ &lt;= #{executeActivityBefore} OR END_TIME_ &lt;= #{executeActivityBefore})
+                    </if>
+                </where>
+                )
+            </if>
+
             <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
                 and SELF.TENANT_ID_ in
                 <foreach item="tenantId" index="index" collection="tenantIds"
