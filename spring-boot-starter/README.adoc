@@ -1,12 +1,10 @@
-image::./docs/camunda-spring-boot-logo.png[alt="Logo", width="150", align="right"]
+[.right]
+image::./docs/camunda-spring-boot-logo.png[alt="Logo", width="150", float="right"]
+
+
 
 # camunda-bpm-spring-boot-starter
 
-
-
-
-
-[grid="none"]
 |====
 a| image::https://img.shields.io/badge/License-Apache%202.0-blue.svg[link="./LICENSE"] a| image::https://maven-badges.herokuapp.com/maven-central/org.camunda.bpm.extension.springboot/camunda-bpm-spring-boot-starter/badge.svg[link="https://maven-badges.herokuapp.com/maven-central/org.camunda.bpm.extension.springboot"] a|image::https://www.openhub.net/p/camunda-bpm-spring-boot-starter/widgets/project_thin_badge.gif[link="https://www.openhub.net/p/camunda-bpm-spring-boot-starter"] a|image::https://travis-ci.org/camunda/camunda-bpm-spring-boot-starter.svg?branch=master[link=https://travis-ci.org/camunda/camunda-bpm-spring-boot-starter"]
 |====
