@@ -192,14 +192,14 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
    * @param updatingProcessDefinition
    */
   public void updateModifiedFieldsFromEntity(ProcessDefinitionEntity updatingProcessDefinition) {
-    if (!this.key.equals(updatingProcessDefinition.key) || !this.deploymentId.equals(updatingProcessDefinition.deploymentId)) {
-      throw LOG.updateUnrelatedProcessDefinitionEntityException();
+    if (this.key.equals(updatingProcessDefinition.key) && this.deploymentId.equals(updatingProcessDefinition.deploymentId)) {
+      // TODO: add a guard once the mismatch between revisions in deployment cache and database has been resolved
+      this.revision = updatingProcessDefinition.revision;
+      this.suspensionState = updatingProcessDefinition.suspensionState;
     }
-
-    // TODO: add a guard once the mismatch between revisions in deployment cache and database has been resolved
-    this.revision = updatingProcessDefinition.revision;
-    this.suspensionState = updatingProcessDefinition.suspensionState;
-
+    else {
+      LOG.logUpdateUnrelatedProcessDefinitionEntity(this.key, updatingProcessDefinition.key, this.deploymentId, updatingProcessDefinition.deploymentId);
+    }
   }
 
   // previous process definition //////////////////////////////////////////////
