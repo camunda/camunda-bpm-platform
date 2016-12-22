@@ -1338,4 +1338,89 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
     return parameters;
   }
 
+  // ===================================================================================================================
+
+  @Test
+  public void testExecuteJobBeforeAndAfterTimeQuery() {
+    given()
+      .queryParam("executeJobBefore", MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_STARTED_BEFORE)
+      .queryParam("executeJobAfter", MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_STARTED_AFTER)
+      .then()
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+      .when()
+      .get(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
+
+    verifyExecuteJobParameterQueryInvocations();
+  }
+
+  @Test
+  public void testExecuteJobBeforeAndAfterTimeQueryAsPost() {
+    Map<String, Date> parameters = getCompleteExecuteJobDateQueryParameters();
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(parameters)
+      .then()
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+      .when()
+      .post(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
+
+    verifyExecuteJobParameterQueryInvocations();
+  }
+
+  @Test
+  public void testExecuteJobBeforeAndAfterTimeAsStringQueryAsPost() {
+    Map<String, String> parameters = getCompleteExecuteJobDateAsStringQueryParameters();
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(parameters)
+      .then()
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+      .when()
+      .post(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
+
+    verifyStringExecuteJobParameterQueryInvocations();
+  }
+
+
+  private void verifyExecuteJobParameterQueryInvocations() {
+    Map<String, Date> startDateParameters = getCompleteExecuteJobDateQueryParameters();
+
+    verify(mockedQuery).executeJobBefore(startDateParameters.get("executeJobBefore"));
+    verify(mockedQuery).executeJobAfter(startDateParameters.get("executeJobAfter"));
+
+    verify(mockedQuery).list();
+  }
+
+  private void verifyStringExecuteJobParameterQueryInvocations() {
+    Map<String, String> startDateParameters = getCompleteExecuteJobDateAsStringQueryParameters();
+
+    verify(mockedQuery).executeJobBefore(DateTimeUtil.parseDate(startDateParameters.get("executeJobBefore")));
+    verify(mockedQuery).executeJobAfter(DateTimeUtil.parseDate(startDateParameters.get("executeJobAfter")));
+
+    verify(mockedQuery).list();
+  }
+
+  private Map<String, Date> getCompleteExecuteJobDateQueryParameters() {
+    Map<String, Date> parameters = new HashMap<String, Date>();
+
+    parameters.put("executeJobBefore", DateTimeUtil.parseDate(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_STARTED_BEFORE));
+    parameters.put("executeJobAfter", DateTimeUtil.parseDate(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_STARTED_AFTER));
+
+    return parameters;
+  }
+
+  private Map<String, String> getCompleteExecuteJobDateAsStringQueryParameters() {
+    Map<String, String> parameters = new HashMap<String, String>();
+
+    parameters.put("executeJobAfter", MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_STARTED_AFTER);
+    parameters.put("executeJobBefore", MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_STARTED_BEFORE);
+
+    return parameters;
+  }
+
 }

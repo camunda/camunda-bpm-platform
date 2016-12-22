@@ -61,6 +61,8 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   protected Date finishedAfter;
   protected Date executeActivityAfter;
   protected Date executeActivityBefore;
+  protected Date executeJobAfter;
+  protected Date executeJobBefore;
   protected String processDefinitionKey;
   protected Set<String> processInstanceIds;
   protected String[] tenantIds;
@@ -434,6 +436,18 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   @Override
   public HistoricProcessInstanceQuery executeActivityBefore(Date date) {
     this.executeActivityBefore = date;
+    return this;
+  }
+
+  @Override
+  public HistoricProcessInstanceQuery executeJobAfter(Date date) {
+    this.executeJobAfter = date;
+    return this;
+  }
+
+  @Override
+  public HistoricProcessInstanceQuery executeJobBefore(Date date) {
+    this.executeJobBefore = date;
     return this;
   }
 }

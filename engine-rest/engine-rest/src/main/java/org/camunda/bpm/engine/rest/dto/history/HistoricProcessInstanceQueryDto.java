@@ -78,6 +78,8 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
   private Date finishedAfter;
   private Date executeActivityAfter;
   private Date executeActivityBefore;
+  private Date executeJobAfter;
+  private Date executeJobBefore;
   private String startedBy;
   private String superProcessInstanceId;
   private String subProcessInstanceId;
@@ -239,6 +241,16 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
     this.executeActivityBefore = executeActivityBefore;
   }
 
+  @CamundaQueryParam(value = "executeJobAfter", converter = DateConverter.class)
+  public void setExecuteJobAfter(Date executeJobAfter) {
+    this.executeJobAfter = executeJobAfter;
+  }
+
+  @CamundaQueryParam(value = "executeJobBefore", converter = DateConverter.class)
+  public void setExecuteJobBefore(Date executeJobBefore) {
+    this.executeJobBefore = executeJobBefore;
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -363,6 +375,14 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
 
     if (executeActivityBefore != null) {
       query.executeActivityBefore(executeActivityBefore);
+    }
+
+    if (executeJobAfter != null) {
+      query.executeJobAfter(executeJobAfter);
+    }
+
+    if (executeJobBefore != null) {
+      query.executeJobBefore(executeJobBefore);
     }
   }
 

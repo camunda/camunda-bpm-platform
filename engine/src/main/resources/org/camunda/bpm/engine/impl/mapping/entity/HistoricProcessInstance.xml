@@ -312,6 +312,22 @@
                 )
             </if>
 
+            <if test="executeJobAfter != null || executeJobBefore != null">
+                AND EXISTS (
+                SELECT *
+                FROM ${prefix}ACT_HI_JOB_LOG
+                <where>
+                    PROCESS_INSTANCE_ID_ = SELF.ID_
+                    <if test="executeJobAfter != null">
+                        AND TIMESTAMP_ &gt;= #{executeJobAfter}
+                    </if>
+                    <if test="executeJobBefore != null">
+                        AND TIMESTAMP_ &lt;= #{executeJobBefore}
+                    </if>
+                </where>
+                )
+            </if>
+
             <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
                 and SELF.TENANT_ID_ in
                 <foreach item="tenantId" index="index" collection="tenantIds"

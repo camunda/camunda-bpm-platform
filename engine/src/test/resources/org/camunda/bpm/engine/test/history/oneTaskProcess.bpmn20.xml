@@ -6,7 +6,7 @@
 
   <process id="oneTaskProcess" name="The One Task Process" isExecutable="true">
   
-    <startEvent id="theStart" />
+    <startEvent id="theStart" camunda:asyncBefore="true"/>
     <sequenceFlow id="flow1" sourceRef="theStart" targetRef="theTask" />
     <userTask id="theTask" name="my task" />    
     <sequenceFlow id="flow2" sourceRef="theTask" targetRef="theEnd" />

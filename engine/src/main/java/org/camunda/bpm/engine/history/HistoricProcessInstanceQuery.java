@@ -275,4 +275,10 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
 
   /** Only select historic process instances that execute an activity before the given date. */
   HistoricProcessInstanceQuery executeActivityBefore(Date date);
+
+  /** Only select historic process instances that execute an job after the given date. */
+  HistoricProcessInstanceQuery executeJobAfter(Date date);
+
+  /** Only select historic process instances that execute an job before the given date. */
+  HistoricProcessInstanceQuery executeJobBefore(Date date);
 }

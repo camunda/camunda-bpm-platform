@@ -348,6 +348,8 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
 
     ClockUtil.setCurrentTime(startTime.getTime());
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", "businessKey123");
+    Job job = managementService.createJobQuery().singleResult();
+    managementService.executeJob(job.getId());
 
     Calendar hourAgo = Calendar.getInstance();
     hourAgo.add(Calendar.HOUR_OF_DAY, -1);
@@ -417,8 +419,14 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
                       .count()
     );
 
-    //executed activities
+    // execute activities
     assertEquals(1, historyService.createHistoricProcessInstanceQuery().executeActivityAfter(hourAgo.getTime()).count());
+    assertEquals(0, historyService.createHistoricProcessInstanceQuery().executeActivityBefore(hourAgo.getTime()).count());
+    assertEquals(1, historyService.createHistoricProcessInstanceQuery().executeActivityBefore(hourFromNow.getTime()).count());
+    assertEquals(0, historyService.createHistoricProcessInstanceQuery().executeActivityAfter(hourFromNow.getTime()).count());
+
+    // execute jobs
+    assertEquals(1, historyService.createHistoricProcessInstanceQuery().executeJobAfter(hourAgo.getTime()).count());
     assertEquals(0, historyService.createHistoricProcessInstanceQuery().executeActivityBefore(hourAgo.getTime()).count());
     assertEquals(1, historyService.createHistoricProcessInstanceQuery().executeActivityBefore(hourFromNow.getTime()).count());
     assertEquals(0, historyService.createHistoricProcessInstanceQuery().executeActivityAfter(hourFromNow.getTime()).count());
@@ -1043,4 +1051,109 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
     assertNotNull(historicProcessInstance);
   }
 
+  @Test
+  public void testHistoricProcInstExecuteJobAfter() {
+    // given
+    BpmnModelInstance asyncModel = Bpmn.createExecutableProcess("async").startEvent().camundaAsyncBefore().endEvent().done();
+    deployment(asyncModel);
+    BpmnModelInstance model = Bpmn.createExecutableProcess("proc").startEvent().endEvent().done();
+    deployment(model);
+
+    Calendar now = Calendar.getInstance();
+    ClockUtil.setCurrentTime(now.getTime());
+    Calendar hourFromNow = (Calendar) now.clone();
+    hourFromNow.add(Calendar.HOUR_OF_DAY, 1);
+
+    runtimeService.startProcessInstanceByKey("async");
+    Job job = managementService.createJobQuery().singleResult();
+    managementService.executeJob(job.getId());
+    runtimeService.startProcessInstanceByKey("proc");
+
+    //when query historic process instance which has executed an job after the start time
+    HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
+      .executeJobAfter(now.getTime()).singleResult();
+
+    //then query returns only a single process instance
+    assertNotNull(historicProcessInstance);
+
+    //when query historic proc inst with execute job after a hour of the starting time
+    historicProcessInstance = historyService.createHistoricProcessInstanceQuery().executeJobAfter(hourFromNow.getTime()).singleResult();
+
+    //then query returns no result
+    assertNull(historicProcessInstance);
+  }
+
+
+  @Test
+  public void testHistoricProcInstExecuteJobBefore() {
+    // given
+    BpmnModelInstance asyncModel = Bpmn.createExecutableProcess("async").startEvent().camundaAsyncBefore().endEvent().done();
+    deployment(asyncModel);
+    BpmnModelInstance model = Bpmn.createExecutableProcess("proc").startEvent().endEvent().done();
+    deployment(model);
+
+    Calendar now = Calendar.getInstance();
+    ClockUtil.setCurrentTime(now.getTime());
+    Calendar hourBeforeNow = (Calendar) now.clone();
+    hourBeforeNow.add(Calendar.HOUR_OF_DAY, -1);
+
+    runtimeService.startProcessInstanceByKey("async");
+    Job job = managementService.createJobQuery().singleResult();
+    managementService.executeJob(job.getId());
+    runtimeService.startProcessInstanceByKey("proc");
+
+    //when query historic process instance which has executed an job before the start time
+    HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
+      .executeJobBefore(now.getTime()).singleResult();
+
+    //then query returns only a single process instance since before is less-then-equal
+    assertNotNull(historicProcessInstance);
+
+    //when query historic proc inst with execute job before an hour of the starting time
+    historicProcessInstance = historyService.createHistoricProcessInstanceQuery().executeJobBefore(hourBeforeNow.getTime()).singleResult();
+
+    //then query returns no result
+    assertNull(historicProcessInstance);
+  }
+
+  @Test
+  public void testHistoricProcInstExecuteJobWithTwoProcInsts() {
+    // given
+    BpmnModelInstance asyncModel = Bpmn.createExecutableProcess("async").startEvent().camundaAsyncBefore().endEvent().done();
+    deployment(asyncModel);
+
+    BpmnModelInstance model = Bpmn.createExecutableProcess("proc").startEvent().endEvent().done();
+    deployment(model);
+
+    Calendar now = Calendar.getInstance();
+    ClockUtil.setCurrentTime(now.getTime());
+    Calendar hourBeforeNow = (Calendar) now.clone();
+    hourBeforeNow.add(Calendar.HOUR_OF_DAY, -1);
+
+    ClockUtil.setCurrentTime(hourBeforeNow.getTime());
+    runtimeService.startProcessInstanceByKey("async");
+    Job job = managementService.createJobQuery().singleResult();
+    managementService.executeJob(job.getId());
+
+    ClockUtil.setCurrentTime(now.getTime());
+    runtimeService.startProcessInstanceByKey("async");
+    runtimeService.startProcessInstanceByKey("proc");
+
+    //when query execute job between now and an hour ago
+    List<HistoricProcessInstance> list = historyService.createHistoricProcessInstanceQuery()
+      .executeJobAfter(hourBeforeNow.getTime())
+      .executeJobBefore(now.getTime()).list();
+
+    //then the two async historic process instance have to be returned
+    assertEquals(2, list.size());
+
+    //when query execute activity after an half hour before now
+    Calendar halfHour = (Calendar) now.clone();
+    halfHour.add(Calendar.MINUTE, -30);
+    HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
+      .executeJobAfter(halfHour.getTime()).singleResult();
+
+    //then only the latest async historic process instance is returned
+    assertNotNull(historicProcessInstance);
+  }
 }
