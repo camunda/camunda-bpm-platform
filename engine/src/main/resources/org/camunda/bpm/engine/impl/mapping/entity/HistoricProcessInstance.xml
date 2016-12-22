@@ -301,6 +301,7 @@
                 SELECT *
                 FROM ${prefix}ACT_HI_ACTINST
                 <where>
+                    PROC_INST_ID_ = SELF.ID_
                     <if test="executeActivityAfter != null">
                         AND (START_TIME_ &gt;= #{executeActivityAfter} OR END_TIME_ &gt;= #{executeActivityAfter})
                     </if>

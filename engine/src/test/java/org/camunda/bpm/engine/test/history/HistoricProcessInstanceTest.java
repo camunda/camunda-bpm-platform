@@ -1008,4 +1008,39 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
     assertNull(historicProcessInstance);
   }
 
+
+  @Test
+  public void testHistoricProcInstExecuteActivityWithTwoProcInsts() {
+    // given
+    BpmnModelInstance model = Bpmn.createExecutableProcess("proc").startEvent().endEvent().done();
+    deployment(model);
+
+    Calendar now = Calendar.getInstance();
+    Calendar hourBeforeNow = (Calendar) now.clone();
+    hourBeforeNow.add(Calendar.HOUR, -1);
+
+    ClockUtil.setCurrentTime(hourBeforeNow.getTime());
+    runtimeService.startProcessInstanceByKey("proc");
+
+    ClockUtil.setCurrentTime(now.getTime());
+    runtimeService.startProcessInstanceByKey("proc");
+
+    //when query execute activity between now and an hour ago
+    List<HistoricProcessInstance> list = historyService.createHistoricProcessInstanceQuery()
+                                                       .executeActivityAfter(hourBeforeNow.getTime())
+                                                       .executeActivityBefore(now.getTime()).list();
+
+    //then two historic process instance have to be returned
+    assertEquals(2, list.size());
+
+    //when query execute activity after an half hour before now
+    Calendar halfHour = (Calendar) now.clone();
+    halfHour.add(Calendar.MINUTE, -30);
+    HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
+      .executeActivityAfter(halfHour.getTime()).singleResult();
+
+    //then only the latest historic process instance is returned
+    assertNotNull(historicProcessInstance);
+  }
+
 }
