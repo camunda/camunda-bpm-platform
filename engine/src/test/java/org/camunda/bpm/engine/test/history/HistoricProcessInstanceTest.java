@@ -990,8 +990,8 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
     BpmnModelInstance model = Bpmn.createExecutableProcess("proc").startEvent().endEvent().done();
     deployment(model);
 
-    Calendar hourBeforNow = (Calendar) now.clone();
-    hourBeforNow.add(Calendar.MILLISECOND, -1);
+    Calendar hourBeforeNow = (Calendar) now.clone();
+    hourBeforeNow.add(Calendar.HOUR, -1);
 
     runtimeService.startProcessInstanceByKey("proc");
 
@@ -1002,7 +1002,7 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
     assertNotNull(historicProcessInstance);
 
     //when query historic proc inst which executes an activity an hour before the starting time
-    historicProcessInstance = historyService.createHistoricProcessInstanceQuery().executeActivityBefore(hourBeforNow.getTime()).singleResult();
+    historicProcessInstance = historyService.createHistoricProcessInstanceQuery().executeActivityBefore(hourBeforeNow.getTime()).singleResult();
 
     //then query returns no result
     assertNull(historicProcessInstance);
