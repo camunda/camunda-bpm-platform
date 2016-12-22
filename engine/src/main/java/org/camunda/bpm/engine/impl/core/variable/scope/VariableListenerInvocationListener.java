@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 
 /**
  * @author Thorben Lindhauer
+ * @author Ryan Johnston
  *
  */
 public class VariableListenerInvocationListener implements VariableInstanceLifecycleListener<VariableInstanceEntity> {
