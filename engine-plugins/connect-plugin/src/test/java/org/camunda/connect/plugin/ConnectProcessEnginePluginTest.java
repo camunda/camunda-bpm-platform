@@ -115,6 +115,19 @@ public class ConnectProcessEnginePluginTest extends PluggableProcessEngineTestCa
     assertEquals(3 * x, out.getValue());
   }
 
+
+  @Deployment
+  public void testConnectorWithSetVariableInOutputMapping() {
+    // given process with set variable on connector in output mapping
+
+    // when start process
+    runtimeService.startProcessInstanceByKey("testProcess");
+
+    // then variable x is set and no exception is thrown
+    VariableInstance out = runtimeService.createVariableInstanceQuery().variableName("x").singleResult();
+    assertEquals(1, out.getValue());
+  }
+
   @Deployment(resources="org/camunda/connect/plugin/ConnectProcessEnginePluginTest.testConnectorWithThrownExceptionInScriptInputOutputMapping.bpmn")
   public void testConnectorBpmnErrorThrownInScriptInputMappingIsHandledByBoundaryEvent() {
     Map<String, Object> variables = new HashMap<String, Object>();
