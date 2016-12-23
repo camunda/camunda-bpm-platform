@@ -29,6 +29,7 @@ import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
@@ -426,10 +427,13 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
     assertEquals(0, historyService.createHistoricProcessInstanceQuery().executeActivityAfter(hourFromNow.getTime()).count());
 
     // execute jobs
-    assertEquals(1, historyService.createHistoricProcessInstanceQuery().executeJobAfter(hourAgo.getTime()).count());
-    assertEquals(0, historyService.createHistoricProcessInstanceQuery().executeActivityBefore(hourAgo.getTime()).count());
-    assertEquals(1, historyService.createHistoricProcessInstanceQuery().executeActivityBefore(hourFromNow.getTime()).count());
-    assertEquals(0, historyService.createHistoricProcessInstanceQuery().executeActivityAfter(hourFromNow.getTime()).count());
+
+    if (processEngineConfiguration.getHistoryLevel().equals(HistoryLevel.HISTORY_LEVEL_FULL)) {
+      assertEquals(1, historyService.createHistoricProcessInstanceQuery().executeJobAfter(hourAgo.getTime()).count());
+      assertEquals(0, historyService.createHistoricProcessInstanceQuery().executeActivityBefore(hourAgo.getTime()).count());
+      assertEquals(1, historyService.createHistoricProcessInstanceQuery().executeActivityBefore(hourFromNow.getTime()).count());
+      assertEquals(0, historyService.createHistoricProcessInstanceQuery().executeActivityAfter(hourFromNow.getTime()).count());
+    }
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
@@ -1052,6 +1056,7 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
   }
 
   @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testHistoricProcInstExecuteJobAfter() {
     // given
     BpmnModelInstance asyncModel = Bpmn.createExecutableProcess("async").startEvent().camundaAsyncBefore().endEvent().done();
@@ -1085,6 +1090,7 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
 
 
   @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testHistoricProcInstExecuteJobBefore() {
     // given
     BpmnModelInstance asyncModel = Bpmn.createExecutableProcess("async").startEvent().camundaAsyncBefore().endEvent().done();
@@ -1117,6 +1123,7 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
   }
 
   @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testHistoricProcInstExecuteJobWithTwoProcInsts() {
     // given
     BpmnModelInstance asyncModel = Bpmn.createExecutableProcess("async").startEvent().camundaAsyncBefore().endEvent().done();
