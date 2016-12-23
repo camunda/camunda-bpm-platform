@@ -342,7 +342,7 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
     }
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneAsyncTaskProcess.bpmn20.xml"})
   public void testHistoricProcessInstanceQuery() {
     Calendar startTime = Calendar.getInstance();
 
