@@ -13,7 +13,7 @@
   <properties>
     <cargo.timeout>120000</cargo.timeout>
     <cargo.deploy.timeout>60000</cargo.deploy.timeout>
-    <version.chromedriver>2.14</version.chromedriver>
+    <version.chromedriver>2.27</version.chromedriver>
 
     <redirect.test.output>true</redirect.test.output>
   </properties>
