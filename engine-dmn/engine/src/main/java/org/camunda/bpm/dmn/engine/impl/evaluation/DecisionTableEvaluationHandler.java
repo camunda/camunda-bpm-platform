@@ -42,7 +42,6 @@ import org.camunda.bpm.dmn.feel.impl.FeelEngine;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.context.VariableContext;
 import org.camunda.bpm.engine.variable.impl.context.CompositeVariableContext;
-import org.camunda.bpm.engine.variable.impl.context.SingleVariableContext;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 public class DecisionTableEvaluationHandler implements DmnDecisionLogicEvaluationHandler {
@@ -164,12 +163,16 @@ public class DecisionTableEvaluationHandler implements DmnDecisionLogicEvaluatio
 
   protected VariableContext getLocalVariableContext(DmnDecisionTableInputImpl input, DmnEvaluatedInput evaluatedInput, VariableContext variableContext) {
     if (isNonEmptyExpression(input.getExpression())) {
+      String inputVariableName = evaluatedInput.getInputVariable();
+
       return CompositeVariableContext.compose(
-        SingleVariableContext.singleVariable(evaluatedInput.getInputVariable(), evaluatedInput.getValue()),
+        Variables.createVariables()
+            .putValue("inputVariableName", inputVariableName)
+            .putValueTyped(inputVariableName, evaluatedInput.getValue())
+            .asVariableContext(),
         variableContext
       );
-    }
-    else {
+    } else {
       return variableContext;
     }
   }
