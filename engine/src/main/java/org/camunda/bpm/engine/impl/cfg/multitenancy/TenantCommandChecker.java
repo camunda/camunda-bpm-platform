@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.impl.cmd.CommandLogger;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionEntity;
+import org.camunda.bpm.engine.impl.history.event.HistoricExternalTaskLogEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.*;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
@@ -408,5 +409,12 @@ public class TenantCommandChecker implements CommandChecker {
   @Override
   public void checkDeleteUserOperationLog(UserOperationLogEntry entry) {
      // tenant check is not available for user operation log
+  }
+
+  @Override
+  public void checkReadHistoricExternalTaskLog(HistoricExternalTaskLogEntity historicExternalTaskLog) {
+    if (historicExternalTaskLog != null && !getTenantManager().isAuthenticatedTenant(historicExternalTaskLog.getTenantId())) {
+      throw LOG.exceptionCommandWithUnauthorizedTenant("get the historic external task log '"+ historicExternalTaskLog.getId() + "'");
+    }
   }
 }

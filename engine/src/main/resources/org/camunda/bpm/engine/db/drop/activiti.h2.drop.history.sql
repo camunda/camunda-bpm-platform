@@ -44,6 +44,11 @@ drop index ACT_IDX_HI_JOB_LOG_TENANT_ID;
 drop index ACT_IDX_HI_JOB_LOG_JOB_DEF_ID;
 drop index ACT_IDX_HI_JOB_LOG_PROC_DEF_KEY;
 
+drop index ACT_HI_EXT_TASK_LOG_PROCINST;
+drop index ACT_HI_EXT_TASK_LOG_PROCDEF;
+drop index ACT_HI_EXT_TASK_LOG_PROC_DEF_KEY;
+drop index ACT_HI_EXT_TASK_LOG_TENANT_ID;
+
 drop index ACT_IDX_HI_OP_LOG_PROCINST;
 drop index ACT_IDX_HI_OP_LOG_PROCDEF;
 
@@ -59,3 +64,4 @@ drop table ACT_HI_INCIDENT if exists;
 drop table ACT_HI_JOB_LOG if exists;
 drop table ACT_HI_BATCH if exists;
 drop table ACT_HI_IDENTITYLINK if exists;
+drop table ACT_HI_EXT_TASK_LOG if exists;

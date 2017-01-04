@@ -23,7 +23,9 @@ import org.camunda.bpm.engine.history.HistoricCaseActivityInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricCaseActivityStatisticsQuery;
 import org.camunda.bpm.engine.history.HistoricCaseInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricDecisionInstanceQuery;
+import org.camunda.bpm.engine.history.HistoricDecisionInstanceStatisticsQuery;
 import org.camunda.bpm.engine.history.HistoricDetailQuery;
+import org.camunda.bpm.engine.history.HistoricExternalTaskLogQuery;
 import org.camunda.bpm.engine.history.HistoricIncidentQuery;
 import org.camunda.bpm.engine.history.HistoricJobLogQuery;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
@@ -45,11 +47,11 @@ import org.camunda.bpm.engine.impl.cmd.DeleteHistoricProcessInstanceCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteHistoricProcessInstancesCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteHistoricTaskInstanceCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteUserOperationLogEntryCmd;
+import org.camunda.bpm.engine.impl.cmd.GetHistoricExternalTaskLogErrorDetailsCmd;
 import org.camunda.bpm.engine.impl.cmd.GetHistoricJobLogExceptionStacktraceCmd;
 import org.camunda.bpm.engine.impl.cmd.batch.DeleteHistoricProcessInstancesBatchCmd;
 import org.camunda.bpm.engine.impl.dmn.cmd.DeleteHistoricDecisionInstanceByInstanceIdCmd;
 import org.camunda.bpm.engine.impl.dmn.cmd.DeleteHistoricDecisionInstanceByDefinitionIdCmd;
-import org.camunda.bpm.engine.history.HistoricDecisionInstanceStatisticsQuery;
 
 import java.util.List;
 
@@ -207,5 +209,15 @@ public class HistoryServiceImpl extends ServiceImpl implements HistoryService {
   @Override
   public HistoricDecisionInstanceStatisticsQuery createHistoricDecisionInstanceStatisticsQuery(String decisionRequirementsDefinitionId) {
     return new HistoricDecisionInstanceStatisticsQueryImpl(decisionRequirementsDefinitionId, commandExecutor);
+  }
+
+  @Override
+  public HistoricExternalTaskLogQuery createHistoricExternalTaskLogQuery() {
+    return new HistoricExternalTaskLogQueryImpl(commandExecutor);
+  }
+
+  @Override
+  public String getHistoricExternalTaskLogErrorDetails(String historicExternalTaskLogId) {
+    return commandExecutor.execute(new GetHistoricExternalTaskLogErrorDetailsCmd(historicExternalTaskLogId));
   }
 }

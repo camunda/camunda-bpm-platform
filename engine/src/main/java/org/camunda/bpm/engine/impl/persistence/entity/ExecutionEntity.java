@@ -1071,7 +1071,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
 
   protected void removeExternalTasks() {
     for (ExternalTaskEntity externalTask : getExternalTasks()) {
-      externalTask.delete();
+      externalTask.deleteAndProduceHistoryEvent();
     }
   }
 

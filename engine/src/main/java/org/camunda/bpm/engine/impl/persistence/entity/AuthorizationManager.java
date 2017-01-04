@@ -55,6 +55,7 @@ import org.camunda.bpm.engine.impl.ExternalTaskQueryImpl;
 import org.camunda.bpm.engine.impl.HistoricActivityInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.HistoricDecisionInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.HistoricDetailQueryImpl;
+import org.camunda.bpm.engine.impl.HistoricExternalTaskLogQueryImpl;
 import org.camunda.bpm.engine.impl.HistoricIdentityLinkLogQueryImpl;
 import org.camunda.bpm.engine.impl.HistoricIncidentQueryImpl;
 import org.camunda.bpm.engine.impl.HistoricJobLogQueryImpl;
@@ -70,6 +71,7 @@ import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.TaskQueryImpl;
 import org.camunda.bpm.engine.impl.UserOperationLogQueryImpl;
 import org.camunda.bpm.engine.impl.VariableInstanceQueryImpl;
+
 import org.camunda.bpm.engine.impl.batch.BatchQueryImpl;
 import org.camunda.bpm.engine.impl.batch.BatchStatisticsQueryImpl;
 import org.camunda.bpm.engine.impl.batch.history.HistoricBatchQueryImpl;
@@ -626,6 +628,12 @@ public class AuthorizationManager extends AbstractManager {
 
   public void configureHistoricDecisionInstanceQuery(HistoricDecisionInstanceQueryImpl query) {
     configureQuery(query, DECISION_DEFINITION, "SELF.DEC_DEF_KEY_", READ_HISTORY);
+  }
+
+  // external task log query /////////////////////////////////
+
+  public void configureHistoricExternalTaskLogQuery(HistoricExternalTaskLogQueryImpl query) {
+    configureQuery(query, PROCESS_DEFINITION, "SELF.PROCESS_DEF_KEY_", READ_HISTORY);
   }
 
   // user operation log query ///////////////////////////////

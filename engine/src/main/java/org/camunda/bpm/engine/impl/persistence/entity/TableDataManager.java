@@ -113,6 +113,7 @@ public class TableDataManager extends AbstractManager {
     persistentObjectToTableNameMap.put(HistoricJobLogEventEntity.class, "ACT_HI_JOB_LOG");
     persistentObjectToTableNameMap.put(HistoricIncidentEventEntity.class, "ACT_HI_INCIDENT");
     persistentObjectToTableNameMap.put(HistoricBatchEntity.class, "ACT_HI_BATCH");
+    persistentObjectToTableNameMap.put(HistoricExternalTaskLogEntity.class, "ACT_HI_EXT_TASK_LOG");
 
     persistentObjectToTableNameMap.put(HistoricCaseInstanceEntity.class, "ACT_HI_CASEINST");
     persistentObjectToTableNameMap.put(HistoricCaseActivityInstanceEntity.class, "ACT_HI_CASEACTINST");

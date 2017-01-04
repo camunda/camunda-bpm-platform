@@ -18,6 +18,7 @@ import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.VariableScope;
+import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
 import org.camunda.bpm.engine.impl.oplog.UserOperationLogContext;
@@ -283,5 +284,33 @@ public interface HistoryEventProducer {
    * @return
    */
   HistoryEvent createHistoricIdentityLinkDeleteEvent(IdentityLink identityLink);
+
+  /**
+   * Creates the history event when an external task has been <strong>created</strong>.
+   *
+   * @since 7.7
+   */
+  HistoryEvent createHistoricExternalTaskLogCreatedEvt(ExternalTask task);
+
+  /**
+   * Creates the history event when the execution of an external task has <strong>failed</strong>.
+   *
+   * @since 7.7
+   */
+  HistoryEvent createHistoricExternalTaskLogFailedEvt(ExternalTask task);
+
+  /**
+   * Creates the history event when the execution of an external task was <strong>successful</strong>.
+   *
+   * @since 7.7
+   */
+  HistoryEvent createHistoricExternalTaskLogSuccessfulEvt(ExternalTask task);
+
+  /**
+   * Creates the history event when an external task has been <strong>deleted</strong>.
+   *
+   * @since 7.7
+   */
+  HistoryEvent createHistoricExternalTaskLogDeletedEvt(ExternalTask task);
 
 }

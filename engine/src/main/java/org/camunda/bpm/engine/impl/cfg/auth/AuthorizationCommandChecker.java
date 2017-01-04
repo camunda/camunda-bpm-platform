@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.impl.db.PermissionCheck;
 import org.camunda.bpm.engine.impl.db.PermissionCheckBuilder;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionEntity;
+import org.camunda.bpm.engine.impl.history.event.HistoricExternalTaskLogEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.*;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
@@ -621,5 +622,10 @@ public class AuthorizationCommandChecker implements CommandChecker {
     }
   }
 
-
+  @Override
+  public void checkReadHistoricExternalTaskLog(HistoricExternalTaskLogEntity historicExternalTaskLog) {
+    if (historicExternalTaskLog.getProcessDefinitionKey() != null) {
+      getAuthorizationManager().checkAuthorization(READ_HISTORY, PROCESS_DEFINITION, historicExternalTaskLog.getProcessDefinitionKey());
+    }
+  }
 }

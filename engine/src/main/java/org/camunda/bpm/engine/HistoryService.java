@@ -30,6 +30,8 @@ import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricDetailQuery;
+import org.camunda.bpm.engine.history.HistoricExternalTaskLogQuery;
+import org.camunda.bpm.engine.history.HistoricExternalTaskLog;
 import org.camunda.bpm.engine.history.HistoricIdentityLinkLog;
 import org.camunda.bpm.engine.history.HistoricIdentityLinkLogQuery;
 import org.camunda.bpm.engine.history.HistoricIncident;
@@ -331,4 +333,26 @@ public interface HistoryService {
    * @since 7.6
    */
   HistoricDecisionInstanceStatisticsQuery createHistoricDecisionInstanceStatisticsQuery(String decisionRequirementsDefinitionId);
+
+  /**
+   * Creates a new programmatic query to search for {@link HistoricExternalTaskLog historic external task logs}.
+   *
+   * @since 7.7
+   */
+  HistoricExternalTaskLogQuery createHistoricExternalTaskLogQuery();
+
+  /**
+   * Returns the full error details that occurs when the
+   * historic external task log with the given id was last executed. Returns null
+   * when the historic external task log contains no error details.
+   *
+   * @param historicExternalTaskLogId id of the historic external task log, cannot be null.
+   * @throws ProcessEngineException when no historic external task log exists with the given id.
+   *
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#READ_HISTORY} permission on {@link Resources#PROCESS_DEFINITION}.
+   *
+   * @since 7.7
+   */
+  String getHistoricExternalTaskLogErrorDetails(String historicExternalTaskLogId);
 }

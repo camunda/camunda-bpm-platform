@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.impl.batch.BatchEntity;
 import org.camunda.bpm.engine.impl.batch.history.HistoricBatchEntity;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionEntity;
+import org.camunda.bpm.engine.impl.history.event.HistoricExternalTaskLogEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEventEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceEntity;
@@ -269,5 +270,10 @@ public interface CommandChecker {
    * Check if it is allowed to read a case instance of the given case execution.
    */
   void checkReadCaseInstance(CaseExecution caseExecution);
+
+  /**
+   * Checks if it is allowed to read the given historic external task log.
+   */
+  void checkReadHistoricExternalTaskLog(HistoricExternalTaskLogEntity historicExternalTaskLog);
 
 }

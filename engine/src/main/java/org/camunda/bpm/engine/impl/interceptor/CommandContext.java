@@ -374,6 +374,10 @@ public class CommandContext {
     return getSession(HistoricJobLogManager.class);
   }
 
+  public HistoricExternalTaskLogManager getHistoricExternalTaskLogManager() {
+    return getSession(HistoricExternalTaskLogManager.class);
+  }
+
   public ReportManager getHistoricReportManager() {
     return getSession(ReportManager.class);
   }
