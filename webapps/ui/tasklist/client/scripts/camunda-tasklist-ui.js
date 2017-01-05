@@ -42,7 +42,6 @@ module.exports = function(pluginDependencies) {
     'pascalprecht.translate',
     'ngRoute',
     'dataDepend',
-    require('./variable/index').name,
     require('./tasklist/index').name,
     require('./task/index').name,
     require('./process/index').name,

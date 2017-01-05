@@ -96,12 +96,26 @@
             </div>
           </div>
 
+          <div class="task-card-details"
+               ng-class="{expanded: !!expanded[delta]}">
+               <!-- ng-class="{expanded: (expanded[delta] && shownVariablesCount > 2)}"> -->
+            <view ng-repeat="plugin in cardPlugins"
+                  data-plugin-id="{{ plugin.id }}"
+                  class="tasklist-card-plugin"
+                  vars="cardPluginVars"
+                  provider="plugin"></view>
 
-          <div cam-tasklist-variables
-               filter-properties="filterProperties"
-               variables="task._embedded.variable"
-               class="row variables"></div>
-       </div>
+            <div class="shutter actions"
+                 ng-click="toggle(delta, $event)"
+                 tooltip-placement="bottom"
+                 tooltip="{{ (expanded ? 'LESS_VARIABLES' : 'MORE_VARIABLES') | translate }}">
+              <a class="glyphicon"
+                 ng-class="{'glyphicon-menu-up': expanded[delta], 'glyphicon-menu-down': !expanded[delta]}"
+                 href>
+              </a>
+            </div>
+          </div><!-- / details -->
+        </div>
       </li>
     </ol>
   </div>

@@ -1,0 +1,51 @@
+@import (reference) "shared/_mixins";
+
+.task-card-details {
+  overflow: hidden;
+  margin-top: 5px;
+  max-height: 45px;
+  padding-bottom: 0;
+  transition: max-height 0.218s ease, padding-bottom 0.218s ease;
+
+  position: relative;
+
+  .shutter {
+    display: block;
+    position: absolute;
+    z-index: 10;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    text-align: center;
+    height: @grid-gutter-width;
+
+    .gradient(top, fade(@column-center-bg, 0), @column-center-bg);
+    background-position-y: 100%;
+    background-repeat: repeat-x;
+
+    > a.glyphicon {
+      position: absolute;
+      top: auto;
+      bottom: 1px;
+      margin-left: -6px;
+      left: 50%;
+    }
+  }
+
+  &.expanded {
+    max-height: 2000px;
+    padding-bottom: 20px;
+    overflow-y: auto;
+    .shutter {
+      background: none;
+      height: (@grid-gutter-width * 0.5);
+    }
+  }
+
+  &.no-shutter {
+    max-height: auto;
+    .shutter {
+      display: none;
+    }
+  }
+}

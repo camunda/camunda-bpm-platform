@@ -31,14 +31,6 @@ module.exports = [
         scope.expanded = false;
         scope.shownVariablesCount = 0;
 
-        scope.toggle = function($event) {
-          scope.expanded = !scope.expanded;
-          if ($event && $event.preventDefault) {
-            $event.preventDefault();
-          }
-          $event.stopPropagation();
-        };
-
         scope.showValue = function(variable, $event) {
           $event.preventDefault();
           $event.stopPropagation();
