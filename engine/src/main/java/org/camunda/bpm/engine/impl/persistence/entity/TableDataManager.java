@@ -44,10 +44,8 @@ import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntit
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionEntity;
 import org.camunda.bpm.engine.impl.history.event.*;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
-import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.management.TableMetaData;
 import org.camunda.bpm.engine.management.TablePage;
-import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Execution;
