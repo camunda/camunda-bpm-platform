@@ -26,7 +26,7 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.management.DatabasePurgeReport;
 import org.camunda.bpm.engine.impl.management.PurgeReport;
-import org.camunda.bpm.engine.impl.persistence.deploy.cache.CachePurgeResult;
+import org.camunda.bpm.engine.impl.persistence.deploy.cache.CachePurgeReport;
 import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
 
 import java.io.Serializable;
@@ -64,8 +64,8 @@ public class PurgeDatabaseAndCacheCmd implements Command<PurgeReport>, Serializa
 
     // purge the deployment cache
     DeploymentCache deploymentCache = commandContext.getProcessEngineConfiguration().getDeploymentCache();
-    CachePurgeResult cachePurgeResult = deploymentCache.purgeCache();
-    purgeReport.setCachePurgeResult(cachePurgeResult);
+    CachePurgeReport cachePurgeReport = deploymentCache.purgeCache();
+    purgeReport.setCachePurgeReport(cachePurgeReport);
 
     return purgeReport;
   }
@@ -91,7 +91,7 @@ public class PurgeDatabaseAndCacheCmd implements Command<PurgeReport>, Serializa
         Long count = (Long) dbEntityManager.selectOne(SELECT_TABLE_COUNT, param);
 
         if (count > 0) {
-          databasePurgeReport.addPurgeInformation(tableName, count.intValue());
+          databasePurgeReport.addPurgeInformation(tableName, count);
           // Get corresponding entity classes for the table, which contains data
           List<Class<? extends DbEntity>> entities = commandContext.getTableDataManager().getEntities(tableName);
 

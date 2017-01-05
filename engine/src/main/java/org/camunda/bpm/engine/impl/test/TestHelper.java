@@ -27,7 +27,6 @@ import org.camunda.bpm.engine.impl.bpmn.deployer.BpmnDeployer;
 import org.camunda.bpm.engine.impl.cfg.IdGenerator;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmmn.deployer.CmmnDeployer;
-import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.db.DbIdGenerator;
 import org.camunda.bpm.engine.impl.db.PersistenceSession;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
@@ -38,18 +37,13 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.management.DatabasePurgeReport;
 import org.camunda.bpm.engine.impl.management.PurgeReport;
-import org.camunda.bpm.engine.impl.persistence.deploy.cache.CachePurgeResult;
-import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
-import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.camunda.bpm.engine.impl.persistence.deploy.cache.CachePurgeReport;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
 import org.camunda.bpm.engine.impl.util.ClassNameUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
-import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.camunda.bpm.model.cmmn.CmmnModelInstance;
-import org.camunda.commons.utils.cache.Cache;
 import org.junit.Assert;
 import org.junit.runner.Description;
 import org.slf4j.Logger;
@@ -286,10 +280,10 @@ public abstract class TestHelper {
     String paRegistrationMessage = assertAndEnsureNoProcessApplicationsRegistered(processEngine);
 
     StringBuilder message = new StringBuilder();
-    CachePurgeResult cachePurgeResult = purgeReport.getCachePurgeResult();
-    if (!cachePurgeResult.isEmpty()) {
+    CachePurgeReport cachePurgeReport = purgeReport.getCachePurgeReport();
+    if (!cachePurgeReport.isEmpty()) {
       message.append("Deployment cache is not clean:\n")
-             .append(cachePurgeResult.getPurgeReportAsString());
+             .append(cachePurgeReport.getPurgeReportAsString());
     } else {
       LOG.debug("Deployment cache was clean.");
     }
@@ -333,9 +327,9 @@ public abstract class TestHelper {
   public static String assertAndEnsureCleanDeploymentCache(ProcessEngine processEngine, boolean fail) {
     StringBuilder outputMessage = new StringBuilder();
     ProcessEngineConfigurationImpl processEngineConfiguration = ((ProcessEngineImpl) processEngine).getProcessEngineConfiguration();
-    CachePurgeResult cachePurgeResult = processEngineConfiguration.getDeploymentCache().purgeCache();
+    CachePurgeReport cachePurgeReport = processEngineConfiguration.getDeploymentCache().purgeCache();
 
-    outputMessage.append(cachePurgeResult.getPurgeReportAsString());
+    outputMessage.append(cachePurgeReport.getPurgeReportAsString());
     if (outputMessage.length() > 0) {
       outputMessage.insert(0, "Deployment cache not clean:\n");
       LOG.error(outputMessage.toString());

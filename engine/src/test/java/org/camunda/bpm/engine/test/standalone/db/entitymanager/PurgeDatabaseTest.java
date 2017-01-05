@@ -29,7 +29,7 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.management.DatabasePurgeReport;
 import org.camunda.bpm.engine.impl.management.PurgeReport;
-import org.camunda.bpm.engine.impl.persistence.deploy.cache.CachePurgeResult;
+import org.camunda.bpm.engine.impl.persistence.deploy.cache.CachePurgeReport;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -185,37 +185,37 @@ public class PurgeDatabaseTest {
 
     // and report contains deleted data
     assertFalse(purge.isEmpty());
-    CachePurgeResult cachePurgeResult = purge.getCachePurgeResult();
-    assertEquals(1, cachePurgeResult.getReportValue(CachePurgeResult.PROCESS_DEF_CACHE).size());
+    CachePurgeReport cachePurgeReport = purge.getCachePurgeReport();
+    assertEquals(1, cachePurgeReport.getReportValue(CachePurgeReport.PROCESS_DEF_CACHE).size());
 
     DatabasePurgeReport databasePurgeReport = purge.getDatabasePurgeReport();
-    assertEquals(2, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_ID_TENANT_MEMBER"));
-    assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RU_EVENT_SUBSCR"));
-    assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RE_DEPLOYMENT"));
-    assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RU_EXT_TASK"));
-    assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_ID_MEMBERSHIP"));
-    assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RU_TASK"));
-    assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RU_JOB"));
-    assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_GE_BYTEARRAY"));
-    assertEquals(2, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RU_JOBDEF"));
-    assertEquals(2, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_ID_USER"));
-    assertEquals(5, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RU_EXECUTION"));
-    assertEquals(10, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RU_METER_LOG"));
-    assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RU_VARIABLE"));
-    assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RE_PROCDEF"));
-    assertEquals(2, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_ID_TENANT"));
-    assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_ID_GROUP"));
-    assertEquals(2, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RU_AUTHORIZATION"));
+    assertEquals(2, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_ID_TENANT_MEMBER"));
+    assertEquals(1, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RU_EVENT_SUBSCR"));
+    assertEquals(1, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RE_DEPLOYMENT"));
+    assertEquals(1, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RU_EXT_TASK"));
+    assertEquals(1, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_ID_MEMBERSHIP"));
+    assertEquals(1, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RU_TASK"));
+    assertEquals(1, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RU_JOB"));
+    assertEquals(1, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_GE_BYTEARRAY"));
+    assertEquals(2, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RU_JOBDEF"));
+    assertEquals(2, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_ID_USER"));
+    assertEquals(5, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RU_EXECUTION"));
+    assertEquals(10, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RU_METER_LOG"));
+    assertEquals(1, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RU_VARIABLE"));
+    assertEquals(1, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RE_PROCDEF"));
+    assertEquals(2, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_ID_TENANT"));
+    assertEquals(1, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_ID_GROUP"));
+    assertEquals(2, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RU_AUTHORIZATION"));
 
     if (processEngineConfiguration.getHistoryLevel().equals(HistoryLevel.HISTORY_LEVEL_FULL)) {
-      assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_INCIDENT"));
-      assertEquals(9, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_ACTINST"));
-      assertEquals(2, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_PROCINST"));
-      assertEquals(2, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_DETAIL"));
-      assertEquals(2, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_TASKINST"));
-      assertEquals(7, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_JOB_LOG"));
-      assertEquals(2, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_VARINST"));
-      assertEquals(3, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_OP_LOG"));
+      assertEquals(1, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_INCIDENT"));
+      assertEquals(9, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_ACTINST"));
+      assertEquals(2, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_PROCINST"));
+      assertEquals(2, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_DETAIL"));
+      assertEquals(2, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_TASKINST"));
+      assertEquals(7, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_JOB_LOG"));
+      assertEquals(2, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_VARINST"));
+      assertEquals(3, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_OP_LOG"));
     }
 
   }
@@ -303,24 +303,24 @@ public class PurgeDatabaseTest {
 
     // and report contains deleted entities
     assertFalse(purge.isEmpty());
-    CachePurgeResult cachePurgeResult = purge.getCachePurgeResult();
-    assertEquals(1, cachePurgeResult.getReportValue(CachePurgeResult.CASE_DEF_CACHE).size());
+    CachePurgeReport cachePurgeReport = purge.getCachePurgeReport();
+    assertEquals(1, cachePurgeReport.getReportValue(CachePurgeReport.CASE_DEF_CACHE).size());
 
     DatabasePurgeReport databasePurgeReport = purge.getDatabasePurgeReport();
-    assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RE_DEPLOYMENT"));
-    assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RU_TASK"));
-    assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_GE_BYTEARRAY"));
-    assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RE_CASE_DEF"));
-    assertEquals(3, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RU_CASE_EXECUTION"));
-    assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RU_VARIABLE"));
-    assertEquals(2, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RU_CASE_SENTRY_PART"));
+    assertEquals(1, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RE_DEPLOYMENT"));
+    assertEquals(1, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RU_TASK"));
+    assertEquals(1, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_GE_BYTEARRAY"));
+    assertEquals(1, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RE_CASE_DEF"));
+    assertEquals(3, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RU_CASE_EXECUTION"));
+    assertEquals(1, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RU_VARIABLE"));
+    assertEquals(2, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RU_CASE_SENTRY_PART"));
 
     if (processEngineConfiguration.getHistoryLevel().equals(HistoryLevel.HISTORY_LEVEL_FULL)) {
-      assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_DETAIL"));
-      assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_TASKINST"));
-      assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_VARINST"));
-      assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_CASEINST"));
-      assertEquals(2, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_CASEACTINST"));
+      assertEquals(1, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_DETAIL"));
+      assertEquals(1, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_TASKINST"));
+      assertEquals(1, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_VARINST"));
+      assertEquals(1, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_CASEINST"));
+      assertEquals(2, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_CASEACTINST"));
     }
   }
 
@@ -347,20 +347,20 @@ public class PurgeDatabaseTest {
 
     // and report contains deleted entities
     assertFalse(purge.isEmpty());
-    CachePurgeResult cachePurgeResult = purge.getCachePurgeResult();
-    assertEquals(2, cachePurgeResult.getReportValue(CachePurgeResult.DMN_DEF_CACHE).size());
-    assertEquals(1, cachePurgeResult.getReportValue(CachePurgeResult.DMN_REQ_DEF_CACHE).size());
+    CachePurgeReport cachePurgeReport = purge.getCachePurgeReport();
+    assertEquals(2, cachePurgeReport.getReportValue(CachePurgeReport.DMN_DEF_CACHE).size());
+    assertEquals(1, cachePurgeReport.getReportValue(CachePurgeReport.DMN_REQ_DEF_CACHE).size());
 
     DatabasePurgeReport databasePurgeReport = purge.getDatabasePurgeReport();
-    assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RE_DEPLOYMENT"));
-    assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_GE_BYTEARRAY"));
-    assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RE_DECISION_REQ_DEF"));
-    assertEquals(2, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RE_DECISION_DEF"));
+    assertEquals(1, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RE_DEPLOYMENT"));
+    assertEquals(1, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_GE_BYTEARRAY"));
+    assertEquals(1, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RE_DECISION_REQ_DEF"));
+    assertEquals(2, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_RE_DECISION_DEF"));
 
     if (processEngineConfiguration.getHistoryLevel().equals(HistoryLevel.HISTORY_LEVEL_FULL)) {
-      assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_DECINST"));
-      assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_DEC_IN"));
-      assertEquals(1, (int) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_DEC_OUT"));
+      assertEquals(1, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_DECINST"));
+      assertEquals(1, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_DEC_IN"));
+      assertEquals(1, (long) databasePurgeReport.getReportValue(databaseTablePrefix + "ACT_HI_DEC_OUT"));
     }
   }
 }

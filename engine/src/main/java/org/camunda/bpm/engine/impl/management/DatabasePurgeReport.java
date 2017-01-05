@@ -23,21 +23,21 @@ import java.util.Map;
 /**
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
-public class DatabasePurgeReport implements PurgeReporting<Integer> {
+public class DatabasePurgeReport implements PurgeReporting<Long> {
 
   /**
    * Key: table name
    * Value: entity count
    */
-  Map<String, Integer> deletedEntities = new HashMap<String, Integer>();
+  Map<String, Long> deletedEntities = new HashMap<String, Long>();
 
   @Override
-  public void addPurgeInformation(String key, Integer value) {
+  public void addPurgeInformation(String key, Long value) {
     deletedEntities.put(key, value);
   }
 
   @Override
-  public Map<String, Integer> getPurgeReport() {
+  public Map<String, Long> getPurgeReport() {
     return deletedEntities;
   }
 
@@ -53,7 +53,7 @@ public class DatabasePurgeReport implements PurgeReporting<Integer> {
   }
 
   @Override
-  public Integer getReportValue(String key) {
+  public Long getReportValue(String key) {
     return deletedEntities.get(key);
   }
 

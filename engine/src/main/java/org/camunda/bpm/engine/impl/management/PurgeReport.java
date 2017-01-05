@@ -17,7 +17,7 @@
 
 package org.camunda.bpm.engine.impl.management;
 
-import org.camunda.bpm.engine.impl.persistence.deploy.cache.CachePurgeResult;
+import org.camunda.bpm.engine.impl.persistence.deploy.cache.CachePurgeReport;
 
 /**
  * The purge report contains information about the deleted rows for each table
@@ -29,7 +29,7 @@ import org.camunda.bpm.engine.impl.persistence.deploy.cache.CachePurgeResult;
 public class PurgeReport {
 
   private DatabasePurgeReport databasePurgeReport;
-  private CachePurgeResult cachePurgeResult;
+  private CachePurgeReport cachePurgeReport;
 
   public DatabasePurgeReport getDatabasePurgeReport() {
     return databasePurgeReport;
@@ -39,15 +39,15 @@ public class PurgeReport {
     this.databasePurgeReport = databasePurgeReport;
   }
 
-  public CachePurgeResult getCachePurgeResult() {
-    return cachePurgeResult;
+  public CachePurgeReport getCachePurgeReport() {
+    return cachePurgeReport;
   }
 
-  public void setCachePurgeResult(CachePurgeResult cachePurgeResult) {
-    this.cachePurgeResult = cachePurgeResult;
+  public void setCachePurgeReport(CachePurgeReport cachePurgeReport) {
+    this.cachePurgeReport = cachePurgeReport;
   }
 
   public boolean isEmpty() {
-    return cachePurgeResult.isEmpty() && databasePurgeReport.isEmpty();
+    return cachePurgeReport.isEmpty() && databasePurgeReport.isEmpty();
   }
 }

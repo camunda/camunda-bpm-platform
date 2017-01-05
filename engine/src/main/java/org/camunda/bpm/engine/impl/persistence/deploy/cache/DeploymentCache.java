@@ -319,48 +319,48 @@ public class DeploymentCache {
     }
   }
 
-  public CachePurgeResult purgeCache() {
+  public CachePurgeReport purgeCache() {
 
-    CachePurgeResult result = new CachePurgeResult();
+    CachePurgeReport result = new CachePurgeReport();
     Cache<String, ProcessDefinitionEntity> processDefinitionCache = getProcessDefinitionCache();
     if (!processDefinitionCache.isEmpty()) {
-      result.addPurgeInformation(CachePurgeResult.PROCESS_DEF_CACHE, processDefinitionCache.keySet());
+      result.addPurgeInformation(CachePurgeReport.PROCESS_DEF_CACHE, processDefinitionCache.keySet());
       processDefinitionCache.clear();
     }
 
     Cache<String, BpmnModelInstance> bpmnModelInstanceCache = getBpmnModelInstanceCache();
     if (!bpmnModelInstanceCache.isEmpty()) {
-      result.addPurgeInformation(CachePurgeResult.BPMN_MODEL_INST_CACHE, bpmnModelInstanceCache.keySet());
+      result.addPurgeInformation(CachePurgeReport.BPMN_MODEL_INST_CACHE, bpmnModelInstanceCache.keySet());
       bpmnModelInstanceCache.clear();
     }
 
     Cache<String, CaseDefinitionEntity> caseDefinitionCache = getCaseDefinitionCache();
     if (!caseDefinitionCache.isEmpty()) {
-      result.addPurgeInformation(CachePurgeResult.CASE_DEF_CACHE, caseDefinitionCache.keySet());
+      result.addPurgeInformation(CachePurgeReport.CASE_DEF_CACHE, caseDefinitionCache.keySet());
       caseDefinitionCache.clear();
     }
 
     Cache<String, CmmnModelInstance> cmmnModelInstanceCache = getCmmnModelInstanceCache();
     if (!cmmnModelInstanceCache.isEmpty()) {
-      result.addPurgeInformation(CachePurgeResult.CASE_MODEL_INST_CACHE, cmmnModelInstanceCache.keySet());
+      result.addPurgeInformation(CachePurgeReport.CASE_MODEL_INST_CACHE, cmmnModelInstanceCache.keySet());
       cmmnModelInstanceCache.clear();
     }
 
     Cache<String, DecisionDefinitionEntity> decisionDefinitionCache = getDecisionDefinitionCache();
     if (!decisionDefinitionCache.isEmpty()) {
-      result.addPurgeInformation(CachePurgeResult.DMN_DEF_CACHE, decisionDefinitionCache.keySet());
+      result.addPurgeInformation(CachePurgeReport.DMN_DEF_CACHE, decisionDefinitionCache.keySet());
       decisionDefinitionCache.clear();
     }
 
     Cache<String, DmnModelInstance> dmnModelInstanceCache = getDmnDefinitionCache();
     if (!dmnModelInstanceCache.isEmpty()) {
-      result.addPurgeInformation(CachePurgeResult.DMN_MODEL_INST_CACHE, dmnModelInstanceCache.keySet());
+      result.addPurgeInformation(CachePurgeReport.DMN_MODEL_INST_CACHE, dmnModelInstanceCache.keySet());
       dmnModelInstanceCache.clear();
     }
 
     Cache<String, DecisionRequirementsDefinitionEntity> decisionRequirementsDefinitionCache = getDecisionRequirementsDefinitionCache();
     if (!decisionRequirementsDefinitionCache.isEmpty()) {
-      result.addPurgeInformation(CachePurgeResult.DMN_REQ_DEF_CACHE, decisionRequirementsDefinitionCache.keySet());
+      result.addPurgeInformation(CachePurgeReport.DMN_REQ_DEF_CACHE, decisionRequirementsDefinitionCache.keySet());
       decisionRequirementsDefinitionCache.clear();
     }
 

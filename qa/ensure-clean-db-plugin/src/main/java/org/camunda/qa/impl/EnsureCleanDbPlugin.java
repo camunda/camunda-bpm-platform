@@ -19,7 +19,7 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.ManagementServiceImpl;
 import org.camunda.bpm.engine.impl.management.DatabasePurgeReport;
 import org.camunda.bpm.engine.impl.management.PurgeReport;
-import org.camunda.bpm.engine.impl.persistence.deploy.cache.CachePurgeResult;
+import org.camunda.bpm.engine.impl.persistence.deploy.cache.CachePurgeReport;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
@@ -67,9 +67,9 @@ public class EnsureCleanDbPlugin implements BpmPlatformPlugin {
             builder.append(DATABASE_NOT_CLEAN).append(databasePurgeReport.getPurgeReportAsString());
           }
 
-          CachePurgeResult cachePurgeResult = report.getCachePurgeResult();
-          if (!cachePurgeResult.isEmpty()) {
-            builder.append(CACHE_IS_NOT_CLEAN).append(cachePurgeResult.getPurgeReportAsString());
+          CachePurgeReport cachePurgeReport = report.getCachePurgeReport();
+          if (!cachePurgeReport.isEmpty()) {
+            builder.append(CACHE_IS_NOT_CLEAN).append(cachePurgeReport.getPurgeReportAsString());
           }
           logger.log(Level.INFO, builder.toString());
         }
