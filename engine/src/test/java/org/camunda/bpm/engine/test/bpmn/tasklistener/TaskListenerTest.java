@@ -12,12 +12,19 @@
  */
 package org.camunda.bpm.engine.test.bpmn.tasklistener;
 
+import org.camunda.bpm.engine.delegate.DelegateTask;
+import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.bpmn.tasklistener.util.TaskDeleteListener;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.Ignore;
+
+import java.util.Arrays;
 
 import static org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT;
 
@@ -160,4 +167,31 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
     }
   }
 
+
+  public static class TaskCreateListener implements TaskListener {
+    public void notify(DelegateTask delegateTask) {
+      delegateTask.complete();
+    }
+  }
+
+  @Ignore
+  public void FAILING_testCompleteTaskInCreateTaskListener() {
+    // set up
+    BpmnModelInstance modelInstance =
+      Bpmn.createExecutableProcess("startToEnd")
+        .startEvent()
+        .userTask()
+        .camundaTaskListenerClass(TaskListener.EVENTNAME_CREATE, TaskCreateListener.class.getName())
+        .name("userTask")
+        .camundaCandidateUsers(Arrays.asList(new String[]{"users1", "user2"}))
+        .camundaCandidateGroups(Arrays.asList(new String[]{"group1", "group2"}))
+        .endEvent().done();
+
+    deployment(modelInstance);
+
+    // Start process instance.
+    runtimeService.startProcessInstanceByKey("startToEnd");
+
+    assertNull(taskService.createTaskQuery().singleResult());
+  }
 }
