@@ -46,7 +46,7 @@ import java.util.Map;
 public class PurgeDatabaseAndCacheCmd implements Command<PurgeReport>, Serializable {
 
   protected static final String DELETE_TABLE_DATA = "deleteTableData";
-  protected static final String SELECT_TABLE_DATA = "selectTableData";
+  protected static final String SELECT_TABLE_COUNT = "selectTableCount";
   protected static final String TABLE_NAME = "tableName";
   protected static final String EMPTY_STRING = "";
 
@@ -88,10 +88,10 @@ public class PurgeDatabaseAndCacheCmd implements Command<PurgeReport>, Serializa
         // Check if table contains data
         Map<String, String> param = new HashMap<String, String>();
         param.put(TABLE_NAME, tableName);
-        List<?> objects = dbEntityManager.selectListWithRawParameter(SELECT_TABLE_DATA, param, 0, Integer.MAX_VALUE);
+        Long count = (Long) dbEntityManager.selectOne(SELECT_TABLE_COUNT, param);
 
-        if (!objects.isEmpty()) {
-          databasePurgeReport.addPurgeInformation(tableName, objects.size());
+        if (count > 0) {
+          databasePurgeReport.addPurgeInformation(tableName, count.intValue());
           // Get corresponding entity classes for the table, which contains data
           List<Class<? extends DbEntity>> entities = commandContext.getTableDataManager().getEntities(tableName);
 
