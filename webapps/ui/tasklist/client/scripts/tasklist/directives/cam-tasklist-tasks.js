@@ -4,9 +4,7 @@ var fs = require('fs');
 var template = fs.readFileSync(__dirname + '/cam-tasklist-tasks.html', 'utf8');
 
 var angular = require('camunda-commons-ui/vendor/angular');
-
-
-var $ = angular.element;
+var $ = require('jquery');
 
 module.exports = [function() {
 
@@ -20,20 +18,32 @@ module.exports = [function() {
     template: template,
 
     controller: [
+      '$element',
       '$scope',
       '$location',
       'search',
+      'Views',
       '$timeout',
       function(
+        $element,
         $scope,
         $location,
         search,
+        Views,
         $timeout
       ) {
-
         function updateSilently(params) {
           search.updateSilently(params);
         }
+
+        $scope.expanded = {};
+        $scope.toggle = function(delta, $event) {
+          $scope.expanded[delta] = !$scope.expanded[delta];
+          if ($event && $event.preventDefault) {
+            $event.preventDefault();
+          }
+          $event.stopPropagation();
+        };
 
         $scope.pageNum = 1;
         $scope.pageSize = null;
@@ -53,12 +63,31 @@ module.exports = [function() {
           }
         };
 
+
+
+        function updateShutters() {
+          $('.task-card-details').each(function() {
+            var h = 0;
+            $('view', this).each(function() {
+              h += this.clientHeight;
+            });
+
+            if (h <= 20) {
+              $(this).addClass('no-shutter');
+            }
+          });
+        }
+
         var postLoadingJobs = [];
         var executePostLoadingJobs = function() {
+          postLoadingJobs.push(function() {
+            $timeout(updateShutters);
+          });
           postLoadingJobs.forEach(function(job) {
             job();
           });
           postLoadingJobs = [];
+          $scope.expanded = {};
         };
 
 
@@ -202,6 +231,11 @@ module.exports = [function() {
 
           return href;
         };
+
+        $scope.cardPluginVars = { read: [ 'task', 'filterProperties' ] };
+        $scope.cardPlugins = Views.getProviders({
+          component: 'tasklist.card'
+        });
 
         /**
          * invoked when pagination is changed

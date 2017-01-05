@@ -1,0 +1,87 @@
+<div ng-repeat="(delta, info) in variableDefinitions"
+     ng-if="variablesByName[info.name] || filterProperties.showUndefinedVariable"
+     class="col-xs-12 col-lg-6">
+
+  <div class="row variable-item">
+    <span class="col-xs-4 col-lg-12">
+      <strong class="variable-label"
+              ng-class="{'undefined' : !variablesByName[info.name] && filterProperties.showUndefinedVariable}"
+              tooltip-placement="top"
+              tooltip="{{ info.name }}">
+        {{ info.label }}:
+      </strong>
+    </span>
+
+
+    <span class="col-xs-8 col-lg-12"
+          ng-if="!variablesByName[info.name] && filterProperties.showUndefinedVariable">
+      <span class="variable-value undefined"
+            translate="UNDEFINED_VARIABLE">
+        &lt;Undefined&gt;
+      </span>
+    </span>
+
+
+    <span class="col-xs-8 col-lg-12"
+          ng-if="(variablesByName[info.name] && variablesByName[info.name].value !== null) || variablesByName[info.name].type === 'Bytes'"
+          ng-switch="variablesByName[info.name].type">
+      <span class="variable-value"
+            ng-switch-when="Date"
+            tooltip-placement="top"
+            tooltip="{{ variablesByName[info.name].value | camDate }}">
+        {{ variablesByName[info.name].value | camDate }}
+      </span>
+
+      <span class="variable-value"
+            ng-switch-when="Null">
+        {{ variablesByName[info.name].value }}
+      </span>
+
+      <a class="variable-value variable-type"
+         ng-if="!expanded"
+         ng-switch-when="Object"
+         ng-click="showValue(variablesByName[info.name], $event)">
+        {{ variablesByName[info.name].valueInfo.objectTypeName }}
+      </a>
+
+      <a class="variable-value variable-type"
+         ng-if="expanded"
+         ng-switch-when="Object"
+         ng-click="showValue(variablesByName[info.name], $event)"
+         href>
+        {{ variablesByName[info.name].valueInfo.objectTypeName }}
+      </a>
+
+      <a class="variable-value"
+         ng-if="!expanded"
+         ng-switch-when="Bytes"
+         ng-click="download(variablesByName[info.name], $event)">
+        {{ 'DOWNLOAD' | translate }}
+        <span class="glyphicon glyphicon-download"></span>
+      </a>
+
+      <a class="variable-value"
+         ng-if="expanded"
+         ng-switch-when="Bytes"
+         ng-click="download(variablesByName[info.name], $event)"
+         href>
+        {{ 'DOWNLOAD' | translate }}
+        <span class="glyphicon glyphicon-download"></span>
+      </a>
+
+      <span class="variable-value"
+            ng-switch-default
+            tooltip-placement="top"
+            tooltip="{{ variablesByName[info.name].value }}">
+        {{ variablesByName[info.name].value }}
+      </span>
+    </span>
+
+    <span class="col-xs-8 col-lg-12"
+      ng-if="variablesByName[info.name].value === null && variablesByName[info.name].type !== 'Bytes'">
+      <span class="variable-value variable-empty-value"
+            translate="EMPTY_VALUE">Empty</span>
+    </span>
+  </div>
+
+</div>
