@@ -16,9 +16,10 @@ import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.history.HistoricExternalTaskLog;
 import org.camunda.bpm.engine.impl.HistoricExternalTaskLogQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
-import org.camunda.bpm.engine.impl.history.event.HistoricExternalTaskLogEntity;
-import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
-import org.camunda.bpm.engine.impl.history.event.HistoryEventProcessor;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
+import org.camunda.bpm.engine.impl.history.event.*;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
@@ -66,42 +67,56 @@ public class HistoricExternalTaskLogManager extends AbstractManager {
   // fire history events ///////////////////////////////////////////////////////
 
   public void fireExternalTaskCreatedEvent(final ExternalTask externalTask) {
-    HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
-      @Override
-      public HistoryEvent createHistoryEvent(HistoryEventProducer producer) {
-        return producer.createHistoricExternalTaskLogCreatedEvt(externalTask);
-      }
-    });
+    if (isHistoryEventProduced(HistoryEventTypes.EXTERNAL_TASK_CREATE, externalTask)) {
+      HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
+        @Override
+        public HistoryEvent createHistoryEvent(HistoryEventProducer producer) {
+          return producer.createHistoricExternalTaskLogCreatedEvt(externalTask);
+        }
+      });
+    }
   }
 
   public void fireExternalTaskFailedEvent(final ExternalTask externalTask) {
-    HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
-      @Override
-      public HistoryEvent createHistoryEvent(HistoryEventProducer producer) {
-        return producer.createHistoricExternalTaskLogFailedEvt(externalTask);
-      }
-    });
+    if (isHistoryEventProduced(HistoryEventTypes.EXTERNAL_TASK_FAIL, externalTask)) {
+      HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
+        @Override
+        public HistoryEvent createHistoryEvent(HistoryEventProducer producer) {
+          return producer.createHistoricExternalTaskLogFailedEvt(externalTask);
+        }
+      });
+    }
   }
 
   public void fireExternalTaskSuccessfulEvent(final ExternalTask externalTask) {
-    HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
-      @Override
-      public HistoryEvent createHistoryEvent(HistoryEventProducer producer) {
-        return producer.createHistoricExternalTaskLogSuccessfulEvt(externalTask);
-      }
-    });
+    if (isHistoryEventProduced(HistoryEventTypes.EXTERNAL_TASK_SUCCESS, externalTask)) {
+      HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
+        @Override
+        public HistoryEvent createHistoryEvent(HistoryEventProducer producer) {
+          return producer.createHistoricExternalTaskLogSuccessfulEvt(externalTask);
+        }
+      });
+    }
   }
 
   public void fireExternalTaskDeletedEvent(final ExternalTask externalTask) {
-    HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
-      @Override
-      public HistoryEvent createHistoryEvent(HistoryEventProducer producer) {
-        return producer.createHistoricExternalTaskLogDeletedEvt(externalTask);
-      }
-    });
+    if (isHistoryEventProduced(HistoryEventTypes.EXTERNAL_TASK_DELETE, externalTask)) {
+      HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
+        @Override
+        public HistoryEvent createHistoryEvent(HistoryEventProducer producer) {
+          return producer.createHistoricExternalTaskLogDeletedEvt(externalTask);
+        }
+      });
+    }
   }
 
   // helper /////////////////////////////////////////////////////////
+
+  protected boolean isHistoryEventProduced(HistoryEventType eventType, ExternalTask externalTask) {
+    ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
+    HistoryLevel historyLevel = configuration.getHistoryLevel();
+    return historyLevel.isHistoryEventProduced(eventType, externalTask);
+  }
 
   protected void configureQuery(HistoricExternalTaskLogQueryImpl query) {
     getAuthorizationManager().configureHistoricExternalTaskLogQuery(query);

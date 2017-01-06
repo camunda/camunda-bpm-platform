@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.test.history;
 
 import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.HistoryService;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
@@ -22,6 +23,7 @@ import org.camunda.bpm.engine.history.HistoricExternalTaskLogQuery;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.authorization.util.AuthorizationTestRule;
 import org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil;
 import org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.*;
@@ -43,6 +45,7 @@ import static org.camunda.bpm.engine.test.api.runtime.migration.models.builder.D
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+@RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
 public class HistoricExternalTaskLogQuerySortingTest {
 
   protected final String WORKER_ID = "aWorkerId";

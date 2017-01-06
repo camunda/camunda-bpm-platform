@@ -148,7 +148,35 @@ public enum HistoryEventTypes implements HistoryEventType {
    *
    * @since 7.5
    */
-  IDENTITY_LINK_DELETE("identity-link-delete", "delete-identity-link");
+  IDENTITY_LINK_DELETE("identity-link-delete", "delete-identity-link"),
+
+  /**
+   * fired when an external task is created.
+   *
+   * @since 7.7
+   */
+  EXTERNAL_TASK_CREATE("external-task", "create"),
+
+  /**
+   * fired when an external task has failed.
+   *
+   * @since 7.7
+   */
+  EXTERNAL_TASK_FAIL("external-task", "fail"),
+
+  /**
+   * fired when an external task has succeeded.
+   *
+   * @since 7.7
+   */
+  EXTERNAL_TASK_SUCCESS("external-task", "success"),
+
+  /**
+   * fired when an external task is deleted.
+   *
+   * @since 7.7
+   */
+  EXTERNAL_TASK_DELETE("external-task", "delete");
 
   private HistoryEventTypes(String entityType, String eventName) {
     this.entityType = eventName;
