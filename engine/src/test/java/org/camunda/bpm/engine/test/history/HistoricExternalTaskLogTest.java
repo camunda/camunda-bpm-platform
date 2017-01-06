@@ -16,6 +16,7 @@ import org.camunda.bpm.engine.*;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.history.HistoricExternalTaskLog;
 import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskEntity;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -31,6 +32,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
+import java.util.Date;
 import java.util.List;
 
 import static junit.framework.TestCase.*;
@@ -199,6 +201,7 @@ public class HistoricExternalTaskLogTest {
     String firstErrorDetails = "Dummy error details!";
     String secondErrorDetails = ERROR_DETAILS;
     reportExternalTaskFailure(task.getId(), ERROR_MESSAGE, firstErrorDetails);
+    ensureEnoughTimePassedByForTimestampOrdering();
     reportExternalTaskFailure(task.getId(), ERROR_MESSAGE, secondErrorDetails);
 
     // when
@@ -346,4 +349,11 @@ public class HistoricExternalTaskLogTest {
   protected String repeatString(int count, String with) {
     return new String(new char[count]).replace("\0", with);
   }
+
+  protected void ensureEnoughTimePassedByForTimestampOrdering() {
+    long timeToAddInSeconds = 5 * 1000L;
+    Date nowPlus5Seconds = new Date(ClockUtil.getCurrentTime().getTime() + timeToAddInSeconds);
+    ClockUtil.setCurrentTime(nowPlus5Seconds);
+  }
+
 }

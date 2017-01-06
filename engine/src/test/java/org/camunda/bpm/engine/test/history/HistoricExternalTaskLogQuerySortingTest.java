@@ -20,6 +20,7 @@ import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.history.HistoricExternalTaskLog;
 import org.camunda.bpm.engine.history.HistoricExternalTaskLogQuery;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -36,6 +37,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -78,7 +80,7 @@ public class HistoricExternalTaskLogQuerySortingTest {
 
     // given
     int taskCount = 10;
-    startProcessesWithExternalTaskAndReturnTaskList(taskCount);
+    startProcesses(taskCount);
 
     // when
     HistoricExternalTaskLogQuery query = historyService.createHistoricExternalTaskLogQuery();
@@ -95,7 +97,7 @@ public class HistoricExternalTaskLogQuerySortingTest {
 
     // given
     int taskCount = 10;
-    startProcessesWithExternalTaskAndReturnTaskList(taskCount);
+    startProcesses(taskCount);
 
     // when
     HistoricExternalTaskLogQuery query = historyService.createHistoricExternalTaskLogQuery();
@@ -112,7 +114,7 @@ public class HistoricExternalTaskLogQuerySortingTest {
 
     // given
     int taskCount = 10;
-    startProcessesWithExternalTaskAndReturnTaskList(taskCount);
+    startProcesses(taskCount);
 
     // when
     HistoricExternalTaskLogQuery query = historyService.createHistoricExternalTaskLogQuery();
@@ -129,7 +131,7 @@ public class HistoricExternalTaskLogQuerySortingTest {
 
     // given
     int taskCount = 10;
-    startProcessesWithExternalTaskAndReturnTaskList(taskCount);
+    startProcesses(taskCount);
 
     // when
     HistoricExternalTaskLogQuery query = historyService.createHistoricExternalTaskLogQuery();
@@ -146,7 +148,7 @@ public class HistoricExternalTaskLogQuerySortingTest {
 
     // given
     int taskCount = 10;
-    List<ExternalTask> list = startProcessesWithExternalTaskAndReturnTaskList(taskCount);
+    List<ExternalTask> list = startProcesses(taskCount);
     reportExternalTaskFailure(list);
 
     // when
@@ -165,7 +167,7 @@ public class HistoricExternalTaskLogQuerySortingTest {
 
     // given
     int taskCount = 10;
-    List<ExternalTask> list = startProcessesWithExternalTaskAndReturnTaskList(taskCount);
+    List<ExternalTask> list = startProcesses(taskCount);
     reportExternalTaskFailure(list);
 
     // when
@@ -184,7 +186,7 @@ public class HistoricExternalTaskLogQuerySortingTest {
 
     // given
     int taskCount = 10;
-    startProcessesWithExternalTaskAndReturnTaskList(taskCount);
+    startProcesses(taskCount);
 
     // when
     HistoricExternalTaskLogQuery query = historyService.createHistoricExternalTaskLogQuery();
@@ -201,7 +203,7 @@ public class HistoricExternalTaskLogQuerySortingTest {
 
     // given
     int taskCount = 10;
-    startProcessesWithExternalTaskAndReturnTaskList(taskCount);
+    startProcesses(taskCount);
 
     // when
     HistoricExternalTaskLogQuery query = historyService.createHistoricExternalTaskLogQuery();
@@ -252,7 +254,7 @@ public class HistoricExternalTaskLogQuerySortingTest {
 
     // given
     int taskCount = 10;
-    List<ExternalTask> list = startProcessesWithExternalTaskAndReturnTaskList(taskCount);
+    List<ExternalTask> list = startProcesses(taskCount);
     completeExternalTasksWithWorkers(list);
 
     // when
@@ -271,7 +273,7 @@ public class HistoricExternalTaskLogQuerySortingTest {
 
     // given
     int taskCount = 10;
-    List<ExternalTask> list = startProcessesWithExternalTaskAndReturnTaskList(taskCount);
+    List<ExternalTask> list = startProcesses(taskCount);
     completeExternalTasksWithWorkers(list);
 
     // when
@@ -324,7 +326,7 @@ public class HistoricExternalTaskLogQuerySortingTest {
 
     // given
     int taskCount = 10;
-    startProcessesWithExternalTaskAndReturnTaskList(taskCount);
+    startProcesses(taskCount);
 
     // when
     HistoricExternalTaskLogQuery query = historyService.createHistoricExternalTaskLogQuery();
@@ -341,7 +343,7 @@ public class HistoricExternalTaskLogQuerySortingTest {
 
     // given
     int taskCount = 10;
-    startProcessesWithExternalTaskAndReturnTaskList(taskCount);
+    startProcesses(taskCount);
 
     // when
     HistoricExternalTaskLogQuery query = historyService.createHistoricExternalTaskLogQuery();
@@ -358,7 +360,7 @@ public class HistoricExternalTaskLogQuerySortingTest {
 
     // given
     int taskCount = 10;
-    startProcessesWithExternalTaskAndReturnTaskList(taskCount);
+    startProcesses(taskCount);
 
     // when
     HistoricExternalTaskLogQuery query = historyService.createHistoricExternalTaskLogQuery();
@@ -376,7 +378,7 @@ public class HistoricExternalTaskLogQuerySortingTest {
 
     // given
     int taskCount = 10;
-    startProcessesWithExternalTaskAndReturnTaskList(taskCount);
+    startProcesses(taskCount);
 
     // when
     HistoricExternalTaskLogQuery query = historyService.createHistoricExternalTaskLogQuery();
@@ -393,7 +395,7 @@ public class HistoricExternalTaskLogQuerySortingTest {
 
     // given
     int taskCount = 10;
-    startProcessesWithExternalTaskAndReturnTaskList(taskCount);
+    startProcesses(taskCount);
 
     // when
     HistoricExternalTaskLogQuery query = historyService.createHistoricExternalTaskLogQuery();
@@ -411,7 +413,7 @@ public class HistoricExternalTaskLogQuerySortingTest {
 
     // given
     int taskCount = 10;
-    startProcessesWithExternalTaskAndReturnTaskList(taskCount);
+    startProcesses(taskCount);
 
     // when
     HistoricExternalTaskLogQuery query = historyService.createHistoricExternalTaskLogQuery();
@@ -428,7 +430,7 @@ public class HistoricExternalTaskLogQuerySortingTest {
 
     // given
     int taskCount = 8;
-    startProcessesWithExternalTaskAndReturnTaskList(taskCount);
+    startProcesses(taskCount);
 
     // when
     HistoricExternalTaskLogQuery query = historyService.createHistoricExternalTaskLogQuery();
@@ -446,7 +448,7 @@ public class HistoricExternalTaskLogQuerySortingTest {
 
     // given
     int taskCount = 8;
-    startProcessesWithExternalTaskAndReturnTaskList(taskCount);
+    startProcesses(taskCount);
 
     // when
     HistoricExternalTaskLogQuery query = historyService.createHistoricExternalTaskLogQuery();
@@ -536,10 +538,11 @@ public class HistoricExternalTaskLogQuerySortingTest {
     }
   }
 
-  protected List<ExternalTask> startProcessesWithExternalTaskAndReturnTaskList(int count) {
+  protected List<ExternalTask> startProcesses(int count) {
     List<ExternalTask> list = new LinkedList<ExternalTask>();
     for (int ithPrio = 0; ithPrio < count; ithPrio++) {
       list.add(startExternalTaskProcessGivenPriority(ithPrio));
+      ensureEnoughTimePassedByForTimestampOrdering();
     }
     return list;
   }
@@ -602,5 +605,10 @@ public class HistoricExternalTaskLogQuerySortingTest {
     TestOrderingUtil.verifySorting(query.list(), expectedOrdering);
   }
 
+  protected void ensureEnoughTimePassedByForTimestampOrdering() {
+    long timeToAddInSeconds = 5 * 1000L;
+    Date nowPlus5Seconds = new Date(ClockUtil.getCurrentTime().getTime() + timeToAddInSeconds);
+    ClockUtil.setCurrentTime(nowPlus5Seconds);
+  }
 
 }
