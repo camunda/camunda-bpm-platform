@@ -126,7 +126,6 @@ public class HistoricExternalTaskLogEntity extends HistoryEvent implements Histo
     errorDetailsByteArrayId = byteArray.getId();
   }
 
-  @SuppressWarnings("ConstantConditions")
   protected ByteArrayEntity getErrorByteArray() {
     if (errorDetailsByteArrayId != null) {
       return Context
