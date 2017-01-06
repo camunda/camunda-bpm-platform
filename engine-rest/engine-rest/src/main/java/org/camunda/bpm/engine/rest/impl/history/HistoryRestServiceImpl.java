@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.rest.history.HistoricCaseInstanceRestService;
 import org.camunda.bpm.engine.rest.history.HistoricDecisionInstanceRestService;
 import org.camunda.bpm.engine.rest.history.HistoricDecisionStatisticsRestService;
 import org.camunda.bpm.engine.rest.history.HistoricDetailRestService;
+import org.camunda.bpm.engine.rest.history.HistoricExternalTaskLogRestService;
 import org.camunda.bpm.engine.rest.history.HistoricIdentityLinkLogRestService;
 import org.camunda.bpm.engine.rest.history.HistoricIncidentRestService;
 import org.camunda.bpm.engine.rest.history.HistoricJobLogRestService;
@@ -29,6 +30,7 @@ import org.camunda.bpm.engine.rest.history.HistoricTaskInstanceRestService;
 import org.camunda.bpm.engine.rest.history.HistoricVariableInstanceRestService;
 import org.camunda.bpm.engine.rest.history.HistoryRestService;
 import org.camunda.bpm.engine.rest.history.UserOperationLogRestService;
+
 import org.camunda.bpm.engine.rest.impl.AbstractRestProcessEngineAware;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -103,4 +105,8 @@ public class HistoryRestServiceImpl extends AbstractRestProcessEngineAware imple
     return new HistoricBatchRestServiceImpl(getObjectMapper(), getProcessEngine());
   }
 
+  @Override
+  public HistoricExternalTaskLogRestService getExternalTaskLogService() {
+    return new HistoricExternalTaskLogRestServiceImpl(getObjectMapper(), getProcessEngine());
+  }
 }

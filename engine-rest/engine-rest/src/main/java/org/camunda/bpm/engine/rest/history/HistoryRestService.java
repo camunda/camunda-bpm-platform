@@ -71,4 +71,6 @@ public interface HistoryRestService {
   @Path(HistoricBatchRestService.PATH)
   HistoricBatchRestService getBatchService();
 
+  @Path(HistoricExternalTaskLogRestService.PATH)
+  HistoricExternalTaskLogRestService getExternalTaskLogService();
 }

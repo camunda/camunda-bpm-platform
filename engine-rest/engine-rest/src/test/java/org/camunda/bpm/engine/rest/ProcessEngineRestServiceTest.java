@@ -54,6 +54,8 @@ import org.camunda.bpm.engine.history.HistoricActivityStatistics;
 import org.camunda.bpm.engine.history.HistoricActivityStatisticsQuery;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricDetailQuery;
+import org.camunda.bpm.engine.history.HistoricExternalTaskLog;
+import org.camunda.bpm.engine.history.HistoricExternalTaskLogQuery;
 import org.camunda.bpm.engine.history.HistoricIncident;
 import org.camunda.bpm.engine.history.HistoricIncidentQuery;
 import org.camunda.bpm.engine.history.HistoricJobLog;
@@ -150,6 +152,7 @@ public class ProcessEngineRestServiceTest extends
   protected static final String HISTORY_TASK_INSTANCE_URL = HISTORY_URL + "/task";
   protected static final String HISTORY_INCIDENT_URL = HISTORY_URL + "/incident";
   protected static final String HISTORY_JOB_LOG_URL = HISTORY_URL + "/job-log";
+  protected static final String HISTORY_EXTERNAL_TASK_LOG_URL = HISTORY_URL + "/external-task-log";
 
   protected static final String EXAMPLE_ENGINE_NAME = "anEngineName";
 
@@ -213,6 +216,7 @@ public class ProcessEngineRestServiceTest extends
     createHistoricTaskInstanceMock();
     createHistoricIncidentMock();
     createHistoricJobLogMock();
+    createHistoricExternalTaskLogMock();
   }
 
   private void createProcessDefinitionMock() {
@@ -437,6 +441,13 @@ public class ProcessEngineRestServiceTest extends
     List<ExternalTask> tasks = MockProvider.createMockExternalTasks();
     when(query.list()).thenReturn(tasks);
     when(mockExternalTaskService.createExternalTaskQuery()).thenReturn(query);
+  }
+
+  private void createHistoricExternalTaskLogMock() {
+    HistoricExternalTaskLogQuery mockHistoricExternalTaskLogQuery = mock(HistoricExternalTaskLogQuery.class);
+    List<HistoricExternalTaskLog> historicExternalTaskLogs = MockProvider.createMockHistoricExternalTaskLogs();
+    when(mockHistoricExternalTaskLogQuery.list()).thenReturn(historicExternalTaskLogs);
+    when(mockHistoryService.createHistoricExternalTaskLogQuery()).thenReturn(mockHistoricExternalTaskLogQuery);
   }
 
   @Test
@@ -872,6 +883,20 @@ public class ProcessEngineRestServiceTest extends
         .get(EXTERNAL_TASKS_URL);
 
     verify(mockExternalTaskService).createExternalTaskQuery();
+    verifyZeroInteractions(processEngine);
+  }
+
+  @Test
+  public void testHistoryServiceEngineAccess_HistoricExternalTaskLog() {
+    given()
+      .pathParam("name", EXAMPLE_ENGINE_NAME)
+      .then()
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+      .when()
+      .get(HISTORY_EXTERNAL_TASK_LOG_URL);
+
+    verify(mockHistoryService).createHistoricExternalTaskLogQuery();
     verifyZeroInteractions(processEngine);
   }
 }
