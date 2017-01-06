@@ -20,12 +20,20 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.ejb.*;
+import javax.ejb.ConcurrencyManagement;
+import javax.ejb.ConcurrencyManagementType;
+import javax.ejb.Local;
+import javax.ejb.Singleton;
+import javax.ejb.Startup;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 
 import org.camunda.bpm.application.ProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationInterface;
 import org.camunda.bpm.application.impl.EjbProcessApplication;
-
+import org.camunda.bpm.engine.cdi.impl.event.CdiEventListener;
+import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.delegate.TaskListener;
 
 /**
  * 
@@ -35,14 +43,16 @@ import org.camunda.bpm.application.impl.EjbProcessApplication;
  */
 @Singleton
 @Startup
-@ConcurrencyManagement(ConcurrencyManagementType.BEAN) 
+@ConcurrencyManagement(ConcurrencyManagementType.BEAN)
 @TransactionAttribute(TransactionAttributeType.REQUIRED)
 @ProcessApplication
 @Local(ProcessApplicationInterface.class)
 public class DefaultEjbProcessApplication extends EjbProcessApplication {
-  
+
   protected Map<String, String> properties = new HashMap<String, String>();
-  
+
+  private final CdiEventListener cdiEventListener = new CdiEventListener();
+
   @PostConstruct
   public void start() {
     deploy();
@@ -52,9 +62,18 @@ public class DefaultEjbProcessApplication extends EjbProcessApplication {
   public void stop() {
     undeploy();
   }
-  
+
   public Map<String, String> getProperties() {
     return properties;
   }
-    
+
+  @Override
+  public ExecutionListener getExecutionListener() {
+    return cdiEventListener;
+  }
+
+  @Override
+  public TaskListener getTaskListener() {
+    return cdiEventListener;
+  }
 }
