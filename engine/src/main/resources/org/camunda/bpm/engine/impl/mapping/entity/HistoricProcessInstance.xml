@@ -296,33 +296,33 @@
                 )
             </foreach>
 
-            <if test="executeActivityAfter != null || executeActivityBefore != null">
+            <if test="executedActivityAfter != null || executedActivityBefore != null">
               AND EXISTS (
                 SELECT *
                 FROM ${prefix}ACT_HI_ACTINST
                 <where>
                     PROC_INST_ID_ = SELF.ID_
-                    <if test="executeActivityAfter != null">
-                        AND (START_TIME_ &gt;= #{executeActivityAfter} OR END_TIME_ &gt;= #{executeActivityAfter})
+                    <if test="executedActivityAfter != null">
+                        AND (START_TIME_ &gt;= #{executedActivityAfter} OR END_TIME_ &gt;= #{executedActivityAfter})
                     </if>
-                    <if test="executeActivityBefore != null">
-                        AND (START_TIME_ &lt;= #{executeActivityBefore} OR END_TIME_ &lt;= #{executeActivityBefore})
+                    <if test="executedActivityBefore != null">
+                        AND (START_TIME_ &lt;= #{executedActivityBefore} OR END_TIME_ &lt;= #{executedActivityBefore})
                     </if>
                 </where>
                 )
             </if>
 
-            <if test="executeJobAfter != null || executeJobBefore != null">
+            <if test="executedJobAfter != null || executedJobBefore != null">
                 AND EXISTS (
                 SELECT *
                 FROM ${prefix}ACT_HI_JOB_LOG
                 <where>
                     PROCESS_INSTANCE_ID_ = SELF.ID_
-                    <if test="executeJobAfter != null">
-                        AND TIMESTAMP_ &gt;= #{executeJobAfter}
+                    <if test="executedJobAfter != null">
+                        AND TIMESTAMP_ &gt;= #{executedJobAfter}
                     </if>
-                    <if test="executeJobBefore != null">
-                        AND TIMESTAMP_ &lt;= #{executeJobBefore}
+                    <if test="executedJobBefore != null">
+                        AND TIMESTAMP_ &lt;= #{executedJobBefore}
                     </if>
                 </where>
                 )

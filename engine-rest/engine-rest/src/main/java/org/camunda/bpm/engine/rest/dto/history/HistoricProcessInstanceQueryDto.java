@@ -76,10 +76,10 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
   private Date startedAfter;
   private Date finishedBefore;
   private Date finishedAfter;
-  private Date executeActivityAfter;
-  private Date executeActivityBefore;
-  private Date executeJobAfter;
-  private Date executeJobBefore;
+  private Date executedActivityAfter;
+  private Date executedActivityBefore;
+  private Date executedJobAfter;
+  private Date executedJobBefore;
   private String startedBy;
   private String superProcessInstanceId;
   private String subProcessInstanceId;
@@ -231,24 +231,24 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
     this.tenantIds = tenantIds;
   }
 
-  @CamundaQueryParam(value = "executeActivityAfter", converter = DateConverter.class)
-  public void setExecuteActivityAfter(Date executeActivityAfter) {
-    this.executeActivityAfter = executeActivityAfter;
+  @CamundaQueryParam(value = "executedActivityAfter", converter = DateConverter.class)
+  public void setExecutedActivityAfter(Date executedActivityAfter) {
+    this.executedActivityAfter = executedActivityAfter;
   }
 
-  @CamundaQueryParam(value = "executeActivityBefore", converter = DateConverter.class)
-  public void setExecuteActivityBefore(Date executeActivityBefore) {
-    this.executeActivityBefore = executeActivityBefore;
+  @CamundaQueryParam(value = "executedActivityBefore", converter = DateConverter.class)
+  public void setExecutedActivityBefore(Date executedActivityBefore) {
+    this.executedActivityBefore = executedActivityBefore;
   }
 
-  @CamundaQueryParam(value = "executeJobAfter", converter = DateConverter.class)
-  public void setExecuteJobAfter(Date executeJobAfter) {
-    this.executeJobAfter = executeJobAfter;
+  @CamundaQueryParam(value = "executedJobAfter", converter = DateConverter.class)
+  public void setExecutedJobAfter(Date executedJobAfter) {
+    this.executedJobAfter = executedJobAfter;
   }
 
-  @CamundaQueryParam(value = "executeJobBefore", converter = DateConverter.class)
-  public void setExecuteJobBefore(Date executeJobBefore) {
-    this.executeJobBefore = executeJobBefore;
+  @CamundaQueryParam(value = "executedJobBefore", converter = DateConverter.class)
+  public void setExecutedJobBefore(Date executedJobBefore) {
+    this.executedJobBefore = executedJobBefore;
   }
 
   @Override
@@ -369,20 +369,20 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
       }
     }
 
-    if (executeActivityAfter != null) {
-      query.executeActivityAfter(executeActivityAfter);
+    if (executedActivityAfter != null) {
+      query.executedActivityAfter(executedActivityAfter);
     }
 
-    if (executeActivityBefore != null) {
-      query.executeActivityBefore(executeActivityBefore);
+    if (executedActivityBefore != null) {
+      query.executedActivityBefore(executedActivityBefore);
     }
 
-    if (executeJobAfter != null) {
-      query.executeJobAfter(executeJobAfter);
+    if (executedJobAfter != null) {
+      query.executedJobAfter(executedJobAfter);
     }
 
-    if (executeJobBefore != null) {
-      query.executeJobBefore(executeJobBefore);
+    if (executedJobBefore != null) {
+      query.executedJobBefore(executedJobBefore);
     }
   }
 

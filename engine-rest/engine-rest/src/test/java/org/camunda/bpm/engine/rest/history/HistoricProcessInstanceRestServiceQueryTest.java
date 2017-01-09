@@ -47,6 +47,11 @@ import com.jayway.restassured.response.Response;
 
 public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestServiceTest {
 
+  protected static final String QUERY_PARAM_EXECUTED_JOB_BEFORE = "executedJobBefore";
+  protected static final String QUERY_PARAM_EXECUTED_JOB_AFTER = "executedJobAfter";
+  protected static final String QUERY_PARAM_EXECUTED_ACTIVITY_BEFORE = "executedActivityBefore";
+  protected static final String QUERY_PARAM_EXECUTED_ACTIVITY_AFTER = "executedActivityAfter";
+
   @ClassRule
   public static TestContainerRule rule = new TestContainerRule();
 
@@ -1256,22 +1261,22 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
   }
 
   @Test
-  public void testExecuteActivityBeforeAndAfterTimeQuery() {
+  public void testExecutedActivityBeforeAndAfterTimeQuery() {
     given()
-      .queryParam("executeActivityBefore", MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_STARTED_BEFORE)
-      .queryParam("executeActivityAfter", MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_STARTED_AFTER)
+      .queryParam(QUERY_PARAM_EXECUTED_ACTIVITY_BEFORE, MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_STARTED_BEFORE)
+      .queryParam(QUERY_PARAM_EXECUTED_ACTIVITY_AFTER, MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_STARTED_AFTER)
       .then()
       .expect()
       .statusCode(Status.OK.getStatusCode())
       .when()
       .get(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
 
-    verifyExecuteActivityParameterQueryInvocations();
+    verifyExecutedActivityParameterQueryInvocations();
   }
 
   @Test
-  public void testExecuteActivityBeforeAndAfterTimeQueryAsPost() {
-    Map<String, Date> parameters = getCompleteExecuteActivityDateQueryParameters();
+  public void testExecutedActivityBeforeAndAfterTimeQueryAsPost() {
+    Map<String, Date> parameters = getCompleteExecutedActivityDateQueryParameters();
 
     given()
       .contentType(POST_JSON_CONTENT_TYPE)
@@ -1282,12 +1287,12 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
       .when()
       .post(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
 
-    verifyExecuteActivityParameterQueryInvocations();
+    verifyExecutedActivityParameterQueryInvocations();
   }
 
   @Test
-  public void testExecuteActivityBeforeAndAfterTimeAsStringQueryAsPost() {
-    Map<String, String> parameters = getCompleteExecuteActivityDateAsStringQueryParameters();
+  public void testExecutedActivityBeforeAndAfterTimeAsStringQueryAsPost() {
+    Map<String, String> parameters = getCompleteExecutedActivityDateAsStringQueryParameters();
 
     given()
       .contentType(POST_JSON_CONTENT_TYPE)
@@ -1298,42 +1303,42 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
       .when()
       .post(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
 
-    verifyStringExecuteActivityParameterQueryInvocations();
+    verifyStringExecutedActivityParameterQueryInvocations();
   }
 
 
-  private void verifyExecuteActivityParameterQueryInvocations() {
-    Map<String, Date> startDateParameters = getCompleteExecuteActivityDateQueryParameters();
+  private void verifyExecutedActivityParameterQueryInvocations() {
+    Map<String, Date> startDateParameters = getCompleteExecutedActivityDateQueryParameters();
 
-    verify(mockedQuery).executeActivityBefore(startDateParameters.get("executeActivityBefore"));
-    verify(mockedQuery).executeActivityAfter(startDateParameters.get("executeActivityAfter"));
+    verify(mockedQuery).executedActivityBefore(startDateParameters.get(QUERY_PARAM_EXECUTED_ACTIVITY_BEFORE));
+    verify(mockedQuery).executedActivityAfter(startDateParameters.get(QUERY_PARAM_EXECUTED_ACTIVITY_AFTER));
 
     verify(mockedQuery).list();
   }
 
-  private void verifyStringExecuteActivityParameterQueryInvocations() {
-    Map<String, String> startDateParameters = getCompleteExecuteActivityDateAsStringQueryParameters();
+  private void verifyStringExecutedActivityParameterQueryInvocations() {
+    Map<String, String> startDateParameters = getCompleteExecutedActivityDateAsStringQueryParameters();
 
-    verify(mockedQuery).executeActivityBefore(DateTimeUtil.parseDate(startDateParameters.get("executeActivityBefore")));
-    verify(mockedQuery).executeActivityAfter(DateTimeUtil.parseDate(startDateParameters.get("executeActivityAfter")));
+    verify(mockedQuery).executedActivityBefore(DateTimeUtil.parseDate(startDateParameters.get(QUERY_PARAM_EXECUTED_ACTIVITY_BEFORE)));
+    verify(mockedQuery).executedActivityAfter(DateTimeUtil.parseDate(startDateParameters.get(QUERY_PARAM_EXECUTED_ACTIVITY_AFTER)));
 
     verify(mockedQuery).list();
   }
 
-  private Map<String, Date> getCompleteExecuteActivityDateQueryParameters() {
+  private Map<String, Date> getCompleteExecutedActivityDateQueryParameters() {
     Map<String, Date> parameters = new HashMap<String, Date>();
 
-    parameters.put("executeActivityBefore", DateTimeUtil.parseDate(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_STARTED_BEFORE));
-    parameters.put("executeActivityAfter", DateTimeUtil.parseDate(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_STARTED_AFTER));
+    parameters.put(QUERY_PARAM_EXECUTED_ACTIVITY_BEFORE, DateTimeUtil.parseDate(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_STARTED_BEFORE));
+    parameters.put(QUERY_PARAM_EXECUTED_ACTIVITY_AFTER, DateTimeUtil.parseDate(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_STARTED_AFTER));
 
     return parameters;
   }
 
-  private Map<String, String> getCompleteExecuteActivityDateAsStringQueryParameters() {
+  private Map<String, String> getCompleteExecutedActivityDateAsStringQueryParameters() {
     Map<String, String> parameters = new HashMap<String, String>();
 
-    parameters.put("executeActivityAfter", MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_STARTED_AFTER);
-    parameters.put("executeActivityBefore", MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_STARTED_BEFORE);
+    parameters.put(QUERY_PARAM_EXECUTED_ACTIVITY_AFTER, MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_STARTED_AFTER);
+    parameters.put(QUERY_PARAM_EXECUTED_ACTIVITY_BEFORE, MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_STARTED_BEFORE);
 
     return parameters;
   }
@@ -1341,22 +1346,22 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
   // ===================================================================================================================
 
   @Test
-  public void testExecuteJobBeforeAndAfterTimeQuery() {
+  public void testExecutedJobBeforeAndAfterTimeQuery() {
     given()
-      .queryParam("executeJobBefore", MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_STARTED_BEFORE)
-      .queryParam("executeJobAfter", MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_STARTED_AFTER)
+      .queryParam(QUERY_PARAM_EXECUTED_JOB_BEFORE, MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_STARTED_BEFORE)
+      .queryParam(QUERY_PARAM_EXECUTED_JOB_AFTER, MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_STARTED_AFTER)
       .then()
       .expect()
       .statusCode(Status.OK.getStatusCode())
       .when()
       .get(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
 
-    verifyExecuteJobParameterQueryInvocations();
+    verifyExecutedJobParameterQueryInvocations();
   }
 
   @Test
-  public void testExecuteJobBeforeAndAfterTimeQueryAsPost() {
-    Map<String, Date> parameters = getCompleteExecuteJobDateQueryParameters();
+  public void testExecutedJobBeforeAndAfterTimeQueryAsPost() {
+    Map<String, Date> parameters = getCompleteExecutedJobDateQueryParameters();
 
     given()
       .contentType(POST_JSON_CONTENT_TYPE)
@@ -1367,12 +1372,12 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
       .when()
       .post(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
 
-    verifyExecuteJobParameterQueryInvocations();
+    verifyExecutedJobParameterQueryInvocations();
   }
 
   @Test
-  public void testExecuteJobBeforeAndAfterTimeAsStringQueryAsPost() {
-    Map<String, String> parameters = getCompleteExecuteJobDateAsStringQueryParameters();
+  public void testExecutedJobBeforeAndAfterTimeAsStringQueryAsPost() {
+    Map<String, String> parameters = getCompleteExecutedJobDateAsStringQueryParameters();
 
     given()
       .contentType(POST_JSON_CONTENT_TYPE)
@@ -1383,42 +1388,41 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
       .when()
       .post(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
 
-    verifyStringExecuteJobParameterQueryInvocations();
+    verifyStringExecutedJobParameterQueryInvocations();
   }
 
+  private void verifyExecutedJobParameterQueryInvocations() {
+    Map<String, Date> startDateParameters = getCompleteExecutedJobDateQueryParameters();
 
-  private void verifyExecuteJobParameterQueryInvocations() {
-    Map<String, Date> startDateParameters = getCompleteExecuteJobDateQueryParameters();
-
-    verify(mockedQuery).executeJobBefore(startDateParameters.get("executeJobBefore"));
-    verify(mockedQuery).executeJobAfter(startDateParameters.get("executeJobAfter"));
+    verify(mockedQuery).executedJobBefore(startDateParameters.get(QUERY_PARAM_EXECUTED_JOB_BEFORE));
+    verify(mockedQuery).executedJobAfter(startDateParameters.get(QUERY_PARAM_EXECUTED_JOB_AFTER));
 
     verify(mockedQuery).list();
   }
 
-  private void verifyStringExecuteJobParameterQueryInvocations() {
-    Map<String, String> startDateParameters = getCompleteExecuteJobDateAsStringQueryParameters();
+  private void verifyStringExecutedJobParameterQueryInvocations() {
+    Map<String, String> startDateParameters = getCompleteExecutedJobDateAsStringQueryParameters();
 
-    verify(mockedQuery).executeJobBefore(DateTimeUtil.parseDate(startDateParameters.get("executeJobBefore")));
-    verify(mockedQuery).executeJobAfter(DateTimeUtil.parseDate(startDateParameters.get("executeJobAfter")));
+    verify(mockedQuery).executedJobBefore(DateTimeUtil.parseDate(startDateParameters.get(QUERY_PARAM_EXECUTED_JOB_BEFORE)));
+    verify(mockedQuery).executedJobAfter(DateTimeUtil.parseDate(startDateParameters.get(QUERY_PARAM_EXECUTED_JOB_AFTER)));
 
     verify(mockedQuery).list();
   }
 
-  private Map<String, Date> getCompleteExecuteJobDateQueryParameters() {
+  private Map<String, Date> getCompleteExecutedJobDateQueryParameters() {
     Map<String, Date> parameters = new HashMap<String, Date>();
 
-    parameters.put("executeJobBefore", DateTimeUtil.parseDate(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_STARTED_BEFORE));
-    parameters.put("executeJobAfter", DateTimeUtil.parseDate(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_STARTED_AFTER));
+    parameters.put(QUERY_PARAM_EXECUTED_JOB_BEFORE, DateTimeUtil.parseDate(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_STARTED_BEFORE));
+    parameters.put(QUERY_PARAM_EXECUTED_JOB_AFTER, DateTimeUtil.parseDate(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_STARTED_AFTER));
 
     return parameters;
   }
 
-  private Map<String, String> getCompleteExecuteJobDateAsStringQueryParameters() {
+  private Map<String, String> getCompleteExecutedJobDateAsStringQueryParameters() {
     Map<String, String> parameters = new HashMap<String, String>();
 
-    parameters.put("executeJobAfter", MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_STARTED_AFTER);
-    parameters.put("executeJobBefore", MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_STARTED_BEFORE);
+    parameters.put(QUERY_PARAM_EXECUTED_JOB_AFTER, MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_STARTED_AFTER);
+    parameters.put(QUERY_PARAM_EXECUTED_JOB_BEFORE, MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_STARTED_BEFORE);
 
     return parameters;
   }
