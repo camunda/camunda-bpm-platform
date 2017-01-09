@@ -994,7 +994,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
   protected HistoricExternalTaskLogEntity initHistoricExternalTaskLog(ExternalTaskEntity entity, ExternalTaskState state) {
     HistoricExternalTaskLogEntity event = new HistoricExternalTaskLogEntity();
     event.setTimestamp(ClockUtil.getCurrentTime());
-    event.setTaskId(entity.getId());
+    event.setExternalTaskId(entity.getId());
     event.setTopicName(entity.getTopicName());
     event.setWorkerId(entity.getWorkerId());
 

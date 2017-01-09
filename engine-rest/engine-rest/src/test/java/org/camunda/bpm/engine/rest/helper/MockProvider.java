@@ -2997,7 +2997,7 @@ public abstract class MockProvider {
     when(mock.getId()).thenReturn(EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_ID);
     when(mock.getTimestamp()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_TIMESTAMP));
 
-    when(mock.getTaskId()).thenReturn(EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_EXTERNAL_TASK_ID);
+    when(mock.getExternalTaskId()).thenReturn(EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_EXTERNAL_TASK_ID);
     when(mock.getTopicName()).thenReturn(EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_TOPIC_NAME);
     when(mock.getWorkerId()).thenReturn(EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_WORKER_ID);
     when(mock.getRetries()).thenReturn(EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_RETRIES);

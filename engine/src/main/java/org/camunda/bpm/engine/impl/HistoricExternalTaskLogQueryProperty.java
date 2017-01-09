@@ -16,16 +16,16 @@ import org.camunda.bpm.engine.query.QueryProperty;
 
 public interface HistoricExternalTaskLogQueryProperty {
 
-  QueryProperty TASK_ID = new QueryPropertyImpl("TASK_ID_");
+  QueryProperty EXTERNAL_TASK_ID = new QueryPropertyImpl("EXT_TASK_ID_");
   QueryProperty TIMESTAMP = new QueryPropertyImpl("TIMESTAMP_");
   QueryProperty TOPIC_NAME = new QueryPropertyImpl("TOPIC_NAME_");
   QueryProperty WORKER_ID = new QueryPropertyImpl("WORKER_ID_");
   QueryProperty ACTIVITY_ID = new QueryPropertyImpl("ACT_ID_");
   QueryProperty ACTIVITY_INSTANCE_ID = new QueryPropertyImpl("ACT_INST_ID_");
   QueryProperty EXECUTION_ID = new QueryPropertyImpl("EXECUTION_ID_");
-  QueryProperty PROCESS_INSTANCE_ID = new QueryPropertyImpl("PROCESS_INSTANCE_ID_");
-  QueryProperty PROCESS_DEFINITION_ID = new QueryPropertyImpl("PROCESS_DEF_ID_");
-  QueryProperty PROCESS_DEFINITION_KEY = new QueryPropertyImpl("PROCESS_DEF_KEY_");
+  QueryProperty PROCESS_INSTANCE_ID = new QueryPropertyImpl("PROC_INST_ID_");
+  QueryProperty PROCESS_DEFINITION_ID = new QueryPropertyImpl("PROC_DEF_ID_");
+  QueryProperty PROCESS_DEFINITION_KEY = new QueryPropertyImpl("PROC_DEF_KEY_");
   QueryProperty RETRIES = new QueryPropertyImpl("RETRIES_");
   QueryProperty PRIORITY = new QueryPropertyImpl("PRIORITY_");
   QueryProperty TENANT_ID = new QueryPropertyImpl("TENANT_ID_");

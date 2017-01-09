@@ -124,7 +124,7 @@ public class HistoricExternalTaskLogDto {
     result.id = historicExternalTaskLog.getId();
     result.timestamp = historicExternalTaskLog.getTimestamp();
 
-    result.taskId = historicExternalTaskLog.getTaskId();
+    result.taskId = historicExternalTaskLog.getExternalTaskId();
     result.topicName = historicExternalTaskLog.getTopicName();
     result.workerId = historicExternalTaskLog.getWorkerId();
     result.priority = historicExternalTaskLog.getPriority();

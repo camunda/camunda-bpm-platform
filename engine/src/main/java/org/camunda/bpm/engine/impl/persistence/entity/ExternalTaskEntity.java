@@ -272,12 +272,12 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
     }
   }
 
-  public void deleteAndProduceHistoryEvent() {
-    delete();
+  public void delete() {
+    deleteFromExecutionAndRuntimeTable();
     produceHistoricExternalTaskDeletedEvent();
   }
 
-  protected void delete() {
+  protected void deleteFromExecutionAndRuntimeTable() {
     getExecution().removeExternalTask(this);
 
     CommandContext commandContext = Context.getCommandContext();
@@ -301,7 +301,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
       associatedExecution.setVariables(variables);
     }
 
-    delete();
+    deleteFromExecutionAndRuntimeTable();
 
     produceHistoricExternalTaskSuccessfulEvent();
 

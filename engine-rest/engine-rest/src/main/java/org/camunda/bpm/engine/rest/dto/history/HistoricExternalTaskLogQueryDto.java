@@ -194,7 +194,7 @@ public class HistoricExternalTaskLogQueryDto extends AbstractQueryDto<HistoricEx
     }
 
     if (taskId != null) {
-      query.taskId(taskId);
+      query.externalTaskId(taskId);
     }
 
     if (topicName != null) {
@@ -266,7 +266,7 @@ public class HistoricExternalTaskLogQueryDto extends AbstractQueryDto<HistoricEx
     if (sortBy.equals(SORT_BY_TIMESTAMP)) {
       query.orderByTimestamp();
     } else if (sortBy.equals(SORT_BY_EXTERNAL_TASK_ID)) {
-      query.orderByTaskId();
+      query.orderByExternalTaskId();
     } else if (sortBy.equals(SORT_BY_RETRIES)) {
       query.orderByRetries();
     } else if (sortBy.equals(SORT_BY_PRIORITY)) {

@@ -42,7 +42,7 @@ public interface HistoricExternalTaskLog {
   /**
    * Returns the id of the associated external task.
    */
-  String getTaskId();
+  String getExternalTaskId();
 
   /**
    * Returns the retries of the associated external task before the associated external task has

@@ -29,7 +29,7 @@ public class HistoricExternalTaskLogQueryImpl extends AbstractQuery<HistoricExte
   private static final long serialVersionUID = 1L;
 
   protected String id;
-  protected String taskId;
+  protected String externalTaskId;
   protected String topicName;
   protected String workerId;
   protected String errorMessage;
@@ -58,9 +58,9 @@ public class HistoricExternalTaskLogQueryImpl extends AbstractQuery<HistoricExte
   }
 
   @Override
-  public HistoricExternalTaskLogQuery taskId(String taskId) {
-    ensureNotNull(NotValidException.class, "taskId", taskId);
-    this.taskId = taskId;
+  public HistoricExternalTaskLogQuery externalTaskId(String externalTaskId) {
+    ensureNotNull(NotValidException.class, "externalTaskId", externalTaskId);
+    this.externalTaskId = externalTaskId;
     return this;
   }
 
@@ -189,8 +189,8 @@ public class HistoricExternalTaskLogQueryImpl extends AbstractQuery<HistoricExte
   }
 
   @Override
-  public HistoricExternalTaskLogQuery orderByTaskId() {
-    orderBy(HistoricExternalTaskLogQueryProperty.TASK_ID);
+  public HistoricExternalTaskLogQuery orderByExternalTaskId() {
+    orderBy(HistoricExternalTaskLogQueryProperty.EXTERNAL_TASK_ID);
     return this;
   }
 

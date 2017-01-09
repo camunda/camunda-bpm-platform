@@ -8,48 +8,48 @@
 
   <insert id="insertHistoricExternalTaskLog" parameterType="org.camunda.bpm.engine.impl.history.event.HistoricExternalTaskLogEntity">
     insert into ${prefix}ACT_HI_EXT_TASK_LOG (
-    ID_,
-    TIMESTAMP_,
-    TASK_ID_,
-    RETRIES_,
-    TOPIC_NAME_,
-    WORKER_ID_,
-    PRIORITY_,
-    ERROR_MSG_,
-    ERROR_DETAILS_ID_,
-    ACT_ID_,
-    ACT_INST_ID_,
-    EXECUTION_ID_,
-    PROCESS_INSTANCE_ID_,
-    PROCESS_DEF_ID_,
-    PROCESS_DEF_KEY_,
-    TENANT_ID_,
-    STATE_
+      ID_,
+      TIMESTAMP_,
+      EXT_TASK_ID_,
+      RETRIES_,
+      TOPIC_NAME_,
+      WORKER_ID_,
+      PRIORITY_,
+      ERROR_MSG_,
+      ERROR_DETAILS_ID_,
+      ACT_ID_,
+      ACT_INST_ID_,
+      EXECUTION_ID_,
+      PROC_INST_ID_,
+      PROC_DEF_ID_,
+      PROC_DEF_KEY_,
+      TENANT_ID_,
+      STATE_
     )
     values (#{id, jdbcType=VARCHAR},
-    #{timestamp, jdbcType=TIMESTAMP},
-    #{taskId, jdbcType=VARCHAR},
-    #{retries, jdbcType=INTEGER},
-    #{topicName, jdbcType=VARCHAR},
-    #{workerId, jdbcType=VARCHAR},
-    #{priority, jdbcType=BIGINT},
-    #{errorMessage, jdbcType=VARCHAR},
-    #{errorDetailsByteArrayId, jdbcType=VARCHAR},
-    #{activityId, jdbcType=VARCHAR},
-    #{activityInstanceId, jdbcType=VARCHAR},
-    #{executionId, jdbcType=VARCHAR},
-    #{processInstanceId, jdbcType=VARCHAR},
-    #{processDefinitionId, jdbcType=VARCHAR},
-    #{processDefinitionKey, jdbcType=VARCHAR},
-    #{tenantId, jdbcType=VARCHAR},
-    #{state, jdbcType=INTEGER}
+      #{timestamp, jdbcType=TIMESTAMP},
+      #{externalTaskId, jdbcType=VARCHAR},
+      #{retries, jdbcType=INTEGER},
+      #{topicName, jdbcType=VARCHAR},
+      #{workerId, jdbcType=VARCHAR},
+      #{priority, jdbcType=BIGINT},
+      #{errorMessage, jdbcType=VARCHAR},
+      #{errorDetailsByteArrayId, jdbcType=VARCHAR},
+      #{activityId, jdbcType=VARCHAR},
+      #{activityInstanceId, jdbcType=VARCHAR},
+      #{executionId, jdbcType=VARCHAR},
+      #{processInstanceId, jdbcType=VARCHAR},
+      #{processDefinitionId, jdbcType=VARCHAR},
+      #{processDefinitionKey, jdbcType=VARCHAR},
+      #{tenantId, jdbcType=VARCHAR},
+      #{state, jdbcType=INTEGER}
     )
   </insert>
 
   <!-- DELETE -->
 
   <delete id="deleteHistoricExternalTaskLogByProcessInstanceId">
-    delete from ${prefix}ACT_HI_EXT_TASK_LOG where PROCESS_INSTANCE_ID_ = #{processInstanceId}
+    delete from ${prefix}ACT_HI_EXT_TASK_LOG where PROC_INST_ID_ = #{processInstanceId}
   </delete>
 
   <!-- BYTE ARRAY DELETE -->
@@ -57,7 +57,7 @@
   <delete id="deleteErrorDetailsByteArraysByIds">
     delete
     from
-    ${prefix}ACT_GE_BYTEARRAY
+      ${prefix}ACT_GE_BYTEARRAY
     <where>
       ID_ in (<include refid="selectErrorDetailsByteArrayIds"/>)
     </where>
@@ -68,7 +68,7 @@
   <resultMap id="historicExternalTaskLogMap" type="org.camunda.bpm.engine.impl.history.event.HistoricExternalTaskLogEntity">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="timestamp" column="TIMESTAMP_" jdbcType="TIMESTAMP" />
-    <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
+    <result property="externalTaskId" column="EXT_TASK_ID_" jdbcType="VARCHAR" />
     <result property="retries" column="RETRIES_" jdbcType="INTEGER" />
     <result property="topicName" column="TOPIC_NAME_" jdbcType="VARCHAR" />
     <result property="workerId" column="WORKER_ID_" jdbcType="VARCHAR" />
@@ -78,9 +78,9 @@
     <result property="activityId" column="ACT_ID_" jdbcType="VARCHAR" />
     <result property="activityInstanceId" column="ACT_INST_ID_" jdbcType="VARCHAR" />
     <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
-    <result property="processInstanceId" column="PROCESS_INSTANCE_ID_" jdbcType="VARCHAR" />
-    <result property="processDefinitionId" column="PROCESS_DEF_ID_" jdbcType="VARCHAR" />
-    <result property="processDefinitionKey" column="PROCESS_DEF_KEY_" jdbcType="VARCHAR" />
+    <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
+    <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
+    <result property="processDefinitionKey" column="PROC_DEF_KEY_" jdbcType="VARCHAR" />
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     <result property="state" column="STATE_" jdbcType="VARCHAR" />
   </resultMap>
@@ -89,16 +89,16 @@
 
   <sql id="selectErrorDetailsByteArrayIds">
     select
-    ERROR_DETAILS_ID_
+      ERROR_DETAILS_ID_
     from
-    ${prefix}ACT_HI_EXT_TASK_LOG
+      ${prefix}ACT_HI_EXT_TASK_LOG
     <where>
       ERROR_DETAILS_ID_ is not null
       <if test="id != null">
         and ID_ = #{id, jdbcType=VARCHAR}
       </if>
-      <if test="taskId != null">
-        and RES.TASK_ID_ = #{taskId, jdbcType=VARCHAR}
+      <if test="externalTaskId != null">
+        and RES.EXT_TASK_ID_ = #{externalTaskId, jdbcType=VARCHAR}
       </if>
       <if test="topicName != null">
         and RES.TOPIC_NAME_ = #{topicName, jdbcType=VARCHAR}
@@ -110,13 +110,13 @@
         and EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR}
       </if>
       <if test="processInstanceId != null">
-        and PROCESS_INSTANCE_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+        and PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
       </if>
       <if test="processDefinitionId != null">
-        and PROCESS_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR}
+        and PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR}
       </if>
       <if test="processDefinitionKey != null">
-        and PROCESS_DEF_KEY_ = #{processDefinitionKey, jdbcType=VARCHAR}
+        and PROC_DEF_KEY_ = #{processDefinitionKey, jdbcType=VARCHAR}
       </if>
     </where>
   </sql>
@@ -128,7 +128,7 @@
   <select id="selectHistoricExternalTaskLogByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricExternalTaskLogQueryImpl" resultMap="historicExternalTaskLogMap">
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select RES.*
+    select ${distinct} RES.*
     ${limitBetween}
     <include refid="selectHistoricExternalTaskLogByQueryCriteriaSql"/>
     ${orderBy}
@@ -136,96 +136,89 @@
   </select>
 
   <select id="selectHistoricExternalTaskLogCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricExternalTaskLogQueryImpl" resultType="long">
-    select count(RES.ID_)
+    select count(distinct RES.ID_)
     <include refid="selectHistoricExternalTaskLogByQueryCriteriaSql"/>
   </select>
 
   <sql id="selectHistoricExternalTaskLogByQueryCriteriaSql">
-    from ${prefix}ACT_HI_EXT_TASK_LOG RES
+    from (
 
-    <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
-      LEFT JOIN (
-      SELECT
-      SELF.PROCESS_DEF_KEY_ AS KEY_
-      FROM
-      (SELECT DISTINCT DKEYS.PROCESS_DEF_KEY_ from ${prefix}ACT_HI_EXT_TASK_LOG DKEYS) SELF
-      WHERE
-      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.querySingleAuthorizationCheck" />
-      ) AUTH
-      ON AUTH.KEY_ = RES.PROCESS_DEF_KEY_
-    </if>
-
-    <where>
-      <if test="id != null">
-        RES.ID_ = #{id}
-      </if>
-      <if test="taskId != null">
-        and RES.TASK_ID_ = #{taskId}
-      </if>
-      <if test="errorMessage != null">
-        and RES.ERROR_MSG_ = #{errorMessage}
-      </if>
-      <if test="topicName != null">
-        and RES.TOPIC_NAME_ = #{topicName}
-      </if>
-      <if test="workerId != null">
-        and RES.WORKER_ID_ = #{workerId}
-      </if>
-      <if test="activityIds != null &amp;&amp; activityIds.length > 0">
-        and RES.ACT_ID_ in
-        <foreach item="item" index="index" collection="activityIds"
-                 open="(" separator="," close=")">
-          #{item}
-        </foreach>
-      </if>
-      <if test="activityInstanceIds != null &amp;&amp; activityInstanceIds.length > 0">
-        and RES.ACT_INST_ID_ in
-        <foreach item="item" index="index" collection="activityInstanceIds"
-                 open="(" separator="," close=")">
-          #{item}
-        </foreach>
-      </if>
-      <if test="executionIds != null &amp;&amp; executionIds.length > 0">
-        and RES.EXECUTION_ID_ in
-        <foreach item="item" index="index" collection="executionIds"
-                 open="(" separator="," close=")">
-          #{item}
-        </foreach>
-      </if>
-      <if test="processInstanceId != null">
-        and RES.PROCESS_INSTANCE_ID_ = #{processInstanceId}
-      </if>
-      <if test="processDefinitionId != null">
-        and RES.PROCESS_DEF_ID_ = #{processDefinitionId}
-      </if>
-      <if test="processDefinitionKey != null">
-        and RES.PROCESS_DEF_KEY_ = #{processDefinitionKey}
-      </if>
-      <if test="priorityHigherThanOrEqual != null">
-        and RES.PRIORITY_ &gt;= #{priorityHigherThanOrEqual}
-      </if>
-      <if test="priorityLowerThanOrEqual != null">
-        and RES.PRIORITY_ &lt;= #{priorityLowerThanOrEqual}
-      </if>
-      <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
-        and RES.TENANT_ID_ in
-        <foreach item="tenantId" index="index" collection="tenantIds"
-                 open="(" separator="," close=")">
-          #{tenantId}
-        </foreach>
-      </if>
-      <if test="state != null">
-        and RES.STATE_ = #{state.stateCode}
+      SELECT SELF.* FROM ${prefix}ACT_HI_EXT_TASK_LOG SELF
+      <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause"/>
+        AUTH ON (AUTH.RESOURCE_ID_ in (SELF.PROC_DEF_KEY_, '*'))
       </if>
 
-      <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
-        <!-- incident exists in context of a process definition -->
-        and ((RES.PROCESS_DEF_KEY_ is not null and AUTH.KEY_ is not null) or RES.PROCESS_DEF_KEY_ is null)
-      </if>
+      <where>
+        <if test="id != null">
+          SELF.ID_ = #{id}
+        </if>
+        <if test="externalTaskId != null">
+          and SELF.EXT_TASK_ID_ = #{externalTaskId}
+        </if>
+        <if test="errorMessage != null">
+          and SELF.ERROR_MSG_ = #{errorMessage}
+        </if>
+        <if test="topicName != null">
+          and SELF.TOPIC_NAME_ = #{topicName}
+        </if>
+        <if test="workerId != null">
+          and SELF.WORKER_ID_ = #{workerId}
+        </if>
+        <if test="activityIds != null &amp;&amp; activityIds.length > 0">
+          and SELF.ACT_ID_ in
+          <foreach item="item" index="index" collection="activityIds"
+                   open="(" separator="," close=")">
+            #{item}
+          </foreach>
+        </if>
+        <if test="activityInstanceIds != null &amp;&amp; activityInstanceIds.length > 0">
+          and SELF.ACT_INST_ID_ in
+          <foreach item="item" index="index" collection="activityInstanceIds"
+                   open="(" separator="," close=")">
+            #{item}
+          </foreach>
+        </if>
+        <if test="executionIds != null &amp;&amp; executionIds.length > 0">
+          and SELF.EXECUTION_ID_ in
+          <foreach item="item" index="index" collection="executionIds"
+                   open="(" separator="," close=")">
+            #{item}
+          </foreach>
+        </if>
+        <if test="processInstanceId != null">
+          and SELF.PROC_INST_ID_ = #{processInstanceId}
+        </if>
+        <if test="processDefinitionId != null">
+          and SELF.PROC_DEF_ID_ = #{processDefinitionId}
+        </if>
+        <if test="processDefinitionKey != null">
+          and SELF.PROC_DEF_KEY_ = #{processDefinitionKey}
+        </if>
+        <if test="priorityHigherThanOrEqual != null">
+          and SELF.PRIORITY_ &gt;= #{priorityHigherThanOrEqual}
+        </if>
+        <if test="priorityLowerThanOrEqual != null">
+          and SELF.PRIORITY_ &lt;= #{priorityLowerThanOrEqual}
+        </if>
+        <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
+          and SELF.TENANT_ID_ in
+          <foreach item="tenantId" index="index" collection="tenantIds"
+                   open="(" separator="," close=")">
+            #{tenantId}
+          </foreach>
+        </if>
+        <if test="state != null">
+          and SELF.STATE_ = #{state.stateCode}
+        </if>
 
-      <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
+        <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+          <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck"/>
+        </if>
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithSelfPrefix"/>
 
-    </where>
+      </where>
+    ) RES
   </sql>
 
 

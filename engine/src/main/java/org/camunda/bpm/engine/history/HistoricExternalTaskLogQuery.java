@@ -20,7 +20,7 @@ public interface HistoricExternalTaskLogQuery extends Query<HistoricExternalTask
   HistoricExternalTaskLogQuery logId(String historicExternalTaskLogId);
 
   /** Only select historic external task log entries with the given external task id. */
-  HistoricExternalTaskLogQuery taskId(String taskId);
+  HistoricExternalTaskLogQuery externalTaskId(String taskId);
 
   /** Only select historic external task log entries with the given topic name. */
   HistoricExternalTaskLogQuery topicName(String topicName);
@@ -81,7 +81,7 @@ public interface HistoricExternalTaskLogQuery extends Query<HistoricExternalTask
   HistoricExternalTaskLogQuery orderByTimestamp();
 
   /** Order by external task id (needs to be followed by {@link #asc()} or {@link #desc()}). */
-  HistoricExternalTaskLogQuery orderByTaskId();
+  HistoricExternalTaskLogQuery orderByExternalTaskId();
 
   /** Order by external task retries (needs to be followed by {@link #asc()} or {@link #desc()}). */
   HistoricExternalTaskLogQuery orderByRetries();

@@ -172,12 +172,12 @@ public class HistoricExternalTaskLogRestServiceQueryTest extends AbstractRestSer
 
     inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySorting("taskId", "asc", Status.OK);
-    inOrder.verify(mockedQuery).orderByTaskId();
+    inOrder.verify(mockedQuery).orderByExternalTaskId();
     inOrder.verify(mockedQuery).asc();
 
     inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySorting("taskId", "desc", Status.OK);
-    inOrder.verify(mockedQuery).orderByTaskId();
+    inOrder.verify(mockedQuery).orderByExternalTaskId();
     inOrder.verify(mockedQuery).desc();
 
     inOrder = Mockito.inOrder(mockedQuery);
@@ -558,7 +558,7 @@ public class HistoricExternalTaskLogRestServiceQueryTest extends AbstractRestSer
     Map<String, String> stringQueryParameters = getCompleteStringQueryParameters();
 
     verify(mockedQuery).logId(stringQueryParameters.get("logId"));
-    verify(mockedQuery).taskId(stringQueryParameters.get("taskId"));
+    verify(mockedQuery).externalTaskId(stringQueryParameters.get("taskId"));
     verify(mockedQuery).topicName(stringQueryParameters.get("topicName"));
     verify(mockedQuery).workerId(stringQueryParameters.get("workerId"));
     verify(mockedQuery).errorMessage(stringQueryParameters.get("errorMessage"));

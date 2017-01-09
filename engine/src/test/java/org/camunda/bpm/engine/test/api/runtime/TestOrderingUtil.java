@@ -25,7 +25,6 @@ import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.history.HistoricExternalTaskLog;
 import org.camunda.bpm.engine.history.HistoricJobLog;
-import org.camunda.bpm.engine.impl.history.event.HistoricExternalTaskLogEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEventEntity;
 import org.camunda.bpm.engine.query.Query;
@@ -501,11 +500,11 @@ public class TestOrderingUtil {
     });
   }
 
-  public static NullTolerantComparator<HistoricExternalTaskLog> historicExternalTaskLogByTaskId() {
+  public static NullTolerantComparator<HistoricExternalTaskLog> historicExternalTaskLogByExternalTaskId() {
     return propertyComparator(new PropertyAccessor<HistoricExternalTaskLog, String>() {
       @Override
       public String getProperty(HistoricExternalTaskLog obj) {
-        return obj.getTaskId();
+        return obj.getExternalTaskId();
       }
     });
   }

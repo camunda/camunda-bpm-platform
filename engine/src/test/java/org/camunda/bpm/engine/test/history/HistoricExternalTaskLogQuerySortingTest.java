@@ -119,11 +119,11 @@ public class HistoricExternalTaskLogQuerySortingTest {
     // when
     HistoricExternalTaskLogQuery query = historyService.createHistoricExternalTaskLogQuery();
     query
-      .orderByTaskId()
+      .orderByExternalTaskId()
       .asc();
 
     // then
-    verifyQueryWithOrdering(query, taskCount, historicExternalTaskLogByTaskId());
+    verifyQueryWithOrdering(query, taskCount, historicExternalTaskLogByExternalTaskId());
   }
 
   @Test
@@ -136,11 +136,11 @@ public class HistoricExternalTaskLogQuerySortingTest {
     // when
     HistoricExternalTaskLogQuery query = historyService.createHistoricExternalTaskLogQuery();
     query
-      .orderByTaskId()
+      .orderByExternalTaskId()
       .desc();
 
     // then
-    verifyQueryWithOrdering(query, taskCount, inverted(historicExternalTaskLogByTaskId()));
+    verifyQueryWithOrdering(query, taskCount, inverted(historicExternalTaskLogByExternalTaskId()));
   }
 
   @Test

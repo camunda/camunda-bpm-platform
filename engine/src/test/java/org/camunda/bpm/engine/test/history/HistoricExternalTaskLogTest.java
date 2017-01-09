@@ -305,7 +305,7 @@ public class HistoricExternalTaskLogTest {
     assertNotNull(log.getId());
     assertNotNull(log.getTimestamp());
 
-    assertEquals(task.getId(), log.getTaskId());
+    assertEquals(task.getId(), log.getExternalTaskId());
     assertEquals(task.getActivityId(), log.getActivityId());
     assertEquals(task.getActivityInstanceId(), log.getActivityInstanceId());
     assertEquals(task.getTopicName(), log.getTopicName());

@@ -83,7 +83,7 @@ public class HistoricExternalTaskLogQueryTest {
 
     // then
     assertNotNull(log);
-    assertThat(log.getTaskId(), is(task.getId()));
+    assertThat(log.getExternalTaskId(), is(task.getId()));
   }
 
   @Test
@@ -137,24 +137,24 @@ public class HistoricExternalTaskLogQueryTest {
   }
 
   @Test
-  public void testQueryByTaskId() {
+  public void testQueryByExternalTaskId() {
     // given
     startExternalTaskProcesses(2);
-    String logTaskId = retrieveFirstHistoricExternalTaskLog().getTaskId();
+    String logExternalTaskId = retrieveFirstHistoricExternalTaskLog().getExternalTaskId();
 
     // when
     HistoricExternalTaskLog log = historyService
       .createHistoricExternalTaskLogQuery()
-      .taskId(logTaskId)
+      .externalTaskId(logExternalTaskId)
       .singleResult();
 
     // then
     assertNotNull(log);
-    assertThat(log.getTaskId(), is(logTaskId));
+    assertThat(log.getExternalTaskId(), is(logExternalTaskId));
   }
 
   @Test
-  public void testQueryFailsByInvalidTaskId() {
+  public void testQueryFailsByInvalidExternalTaskId() {
 
     // given
     startExternalTaskProcess();
@@ -165,13 +165,13 @@ public class HistoricExternalTaskLogQueryTest {
     // when
     historyService
       .createHistoricExternalTaskLogQuery()
-      .taskId(null)
+      .externalTaskId(null)
       .singleResult();
 
   }
 
   @Test
-  public void testQueryByNonExistingTaskId() {
+  public void testQueryByNonExistingExternalTaskId() {
 
     // given
     startExternalTaskProcess();
@@ -179,7 +179,7 @@ public class HistoricExternalTaskLogQueryTest {
     // when
     HistoricExternalTaskLog log = historyService
       .createHistoricExternalTaskLogQuery()
-      .taskId("foo")
+      .externalTaskId("foo")
       .singleResult();
 
     // then
@@ -202,7 +202,7 @@ public class HistoricExternalTaskLogQueryTest {
 
     // then
     assertNotNull(log);
-    assertThat(log.getTaskId(), is(task.getId()));
+    assertThat(log.getExternalTaskId(), is(task.getId()));
   }
 
   @Test
@@ -254,7 +254,7 @@ public class HistoricExternalTaskLogQueryTest {
 
     // then
     assertNotNull(log);
-    assertThat(log.getTaskId(), is(taskToCheck.getId()));
+    assertThat(log.getExternalTaskId(), is(taskToCheck.getId()));
   }
 
   @Test
@@ -308,7 +308,7 @@ public class HistoricExternalTaskLogQueryTest {
 
     // then
     assertNotNull(log);
-    assertThat(log.getTaskId(), is(taskList.get(1).getId()));
+    assertThat(log.getExternalTaskId(), is(taskList.get(1).getId()));
   }
 
   @Test
@@ -358,7 +358,7 @@ public class HistoricExternalTaskLogQueryTest {
 
     // then
     assertNotNull(log);
-    assertThat(log.getTaskId(), is(task.getId()));
+    assertThat(log.getExternalTaskId(), is(task.getId()));
   }
 
   @Test
@@ -446,7 +446,7 @@ public class HistoricExternalTaskLogQueryTest {
 
     // then
     assertNotNull(log);
-    assertThat(log.getTaskId(), is(task.getId()));
+    assertThat(log.getExternalTaskId(), is(task.getId()));
   }
 
   @Test
@@ -718,7 +718,7 @@ public class HistoricExternalTaskLogQueryTest {
 
     // then
     assertNotNull(log);
-    assertThat(log.getTaskId(), is(task.getId()));
+    assertThat(log.getExternalTaskId(), is(task.getId()));
   }
 
   @Test
@@ -768,7 +768,7 @@ public class HistoricExternalTaskLogQueryTest {
 
     // then
     assertNotNull(log);
-    assertThat(log.getTaskId(), is(task.getId()));
+    assertThat(log.getExternalTaskId(), is(task.getId()));
   }
 
   @Test
@@ -785,7 +785,7 @@ public class HistoricExternalTaskLogQueryTest {
 
     // then
     assertNotNull(log);
-    assertThat(log.getTaskId(), is(task.getId()));
+    assertThat(log.getExternalTaskId(), is(task.getId()));
   }
 
   @Test
@@ -802,7 +802,7 @@ public class HistoricExternalTaskLogQueryTest {
 
     // then
     assertNotNull(log);
-    assertThat(log.getTaskId(), is(task.getId()));
+    assertThat(log.getExternalTaskId(), is(task.getId()));
   }
 
   @Test
@@ -819,7 +819,7 @@ public class HistoricExternalTaskLogQueryTest {
 
     // then
     assertNotNull(log);
-    assertThat(log.getTaskId(), is(task.getId()));
+    assertThat(log.getExternalTaskId(), is(task.getId()));
   }
 
   @Test

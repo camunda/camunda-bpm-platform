@@ -32,7 +32,7 @@ public class HistoricExternalTaskLogEntity extends HistoryEvent implements Histo
 
   protected Date timestamp;
 
-  protected String taskId;
+  protected String externalTaskId;
 
   protected String topicName;
   protected String workerId;
@@ -57,12 +57,12 @@ public class HistoricExternalTaskLogEntity extends HistoryEvent implements Histo
     this.timestamp = timestamp;
   }
 
-  public String getTaskId() {
-    return taskId;
+  public String getExternalTaskId() {
+    return externalTaskId;
   }
 
-  public void setTaskId(String taskId) {
-    this.taskId = taskId;
+  public void setExternalTaskId(String externalTaskId) {
+    this.externalTaskId = externalTaskId;
   }
 
   public String getTopicName() {
