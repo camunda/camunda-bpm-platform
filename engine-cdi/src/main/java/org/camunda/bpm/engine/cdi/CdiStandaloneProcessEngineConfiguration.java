@@ -22,6 +22,7 @@ public class CdiStandaloneProcessEngineConfiguration extends StandaloneProcessEn
   @Override
   protected void initExpressionManager() {
     expressionManager = new CdiExpressionManager();
+    super.initExpressionManager();
   }
 
   @Override

@@ -11,6 +11,7 @@
 		<property name="databaseSchemaUpdate" value="true" />				
 		<property name="jobExecutorActivate" value="false" />
 		<property name="mailServerPort" value="5025" />
+		<property name="enableExpressionsInAdhocQueries" value="true" />
 
         <!-- turn off metrics reporter -->
         <property name="dbMetricsReporterActivate" value="false" />
