@@ -123,7 +123,7 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
   TaskQuery taskDelegationState(DelegationState delegationState);
 
   /**
-   * Only select tasks for which the given user is a candidate.
+   * Only select tasks for which the given user or one of his groups is a candidate.
    *
    * <p>
    * Per default it only selects tasks which are not already assigned

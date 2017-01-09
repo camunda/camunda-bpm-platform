@@ -28,7 +28,6 @@ import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.taskByPro
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.verifySortingAndCount;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 import java.text.ParseException;
@@ -82,6 +81,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
   // max value
   protected static final double MAX_DOUBLE_VALUE = 10E+124;
 
+  @Override
   public void setUp() throws Exception {
 
     identityService.saveUser(identityService.newUser("kermit"));
@@ -98,6 +98,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     taskIds = generateTestTasks();
   }
 
+  @Override
   public void tearDown() throws Exception {
     identityService.deleteGroup("accountancy");
     identityService.deleteGroup("management");
@@ -396,7 +397,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(12, query.count());
     assertEquals(12, query.list().size());
 
-    // fozzie is candidate for 3 tasks, one of them is already assigned
+    // fozzie is candidate for one task and her groups are candidate for 2 tasks, one of them is already assigned
     query = taskService.createTaskQuery().taskCandidateUser("fozzie");
     assertEquals(2, query.count());
     assertEquals(2, query.list().size());
