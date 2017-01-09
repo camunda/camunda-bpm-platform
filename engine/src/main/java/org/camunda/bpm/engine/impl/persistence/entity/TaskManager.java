@@ -81,9 +81,7 @@ public class TaskManager extends AbstractManager {
         ((TaskEntity) subTask).delete(deleteReason, cascade, skipCustomListeners);
       }
 
-      commandContext
-        .getIdentityLinkManager()
-        .deleteIdentityLinksByTaskId(taskId);
+      task.deleteIdentityLinks();
 
       commandContext
         .getVariableInstanceManager()

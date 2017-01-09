@@ -59,13 +59,6 @@ public class IdentityLinkManager extends AbstractManager {
     return getDbEntityManager().selectList("selectIdentityLinkByProcessDefinitionUserAndGroup", parameters);
   }
 
-  public void deleteIdentityLinksByTaskId(String taskId) {
-    List<IdentityLinkEntity> identityLinks = findIdentityLinksByTaskId(taskId);
-    for (IdentityLinkEntity identityLink: identityLinks) {
-      deleteIdentityLink(identityLink);
-    }
-  }
-
   public void deleteIdentityLinksByProcDef(String processDefId) {
     getDbEntityManager().delete(IdentityLinkEntity.class, "deleteIdentityLinkByProcDef", processDefId);
   }

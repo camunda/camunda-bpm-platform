@@ -22,7 +22,6 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.bpmn.tasklistener.util.TaskDeleteListener;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.junit.Ignore;
 
 import java.util.Arrays;
 
@@ -174,9 +173,27 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  @Ignore
-  public void FAILING_testCompleteTaskInCreateTaskListener() {
-    // set up
+  public void testCompleteTaskInCreateTaskListener() {
+    // given process with user task and task create listener
+    BpmnModelInstance modelInstance =
+      Bpmn.createExecutableProcess("startToEnd")
+        .startEvent()
+        .userTask()
+        .camundaTaskListenerClass(TaskListener.EVENTNAME_CREATE, TaskCreateListener.class.getName())
+        .name("userTask")
+        .endEvent().done();
+
+    deployment(modelInstance);
+
+    // when process is started and user task completed in task create listener
+    runtimeService.startProcessInstanceByKey("startToEnd");
+
+    // then task is successfully completed without an exception
+    assertNull(taskService.createTaskQuery().singleResult());
+  }
+
+  public void testCompleteTaskInCreateTaskListenerWithIdentityLinks() {
+    // given process with user task, identity links and task create listener
     BpmnModelInstance modelInstance =
       Bpmn.createExecutableProcess("startToEnd")
         .startEvent()
@@ -189,9 +206,10 @@ public class TaskListenerTest extends PluggableProcessEngineTestCase {
 
     deployment(modelInstance);
 
-    // Start process instance.
+    // when process is started and user task completed in task create listener
     runtimeService.startProcessInstanceByKey("startToEnd");
 
+    // then task is successfully completed without an exception
     assertNull(taskService.createTaskQuery().singleResult());
   }
 }
