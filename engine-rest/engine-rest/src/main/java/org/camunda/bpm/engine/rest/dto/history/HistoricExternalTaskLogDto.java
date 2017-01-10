@@ -21,7 +21,7 @@ public class HistoricExternalTaskLogDto {
   protected String id;
   protected Date timestamp;
 
-  protected String taskId;
+  protected String externalTaskId;
   protected String topicName;
   protected String workerId;
   protected long priority;
@@ -50,8 +50,8 @@ public class HistoricExternalTaskLogDto {
     return timestamp;
   }
 
-  public String getTaskId() {
-    return taskId;
+  public String getExternalTaskId() {
+    return externalTaskId;
   }
 
   public String getTopicName() {
@@ -124,7 +124,7 @@ public class HistoricExternalTaskLogDto {
     result.id = historicExternalTaskLog.getId();
     result.timestamp = historicExternalTaskLog.getTimestamp();
 
-    result.taskId = historicExternalTaskLog.getExternalTaskId();
+    result.externalTaskId = historicExternalTaskLog.getExternalTaskId();
     result.topicName = historicExternalTaskLog.getTopicName();
     result.workerId = historicExternalTaskLog.getWorkerId();
     result.priority = historicExternalTaskLog.getPriority();

@@ -29,7 +29,7 @@ import java.util.Map;
 public class HistoricExternalTaskLogQueryDto extends AbstractQueryDto<HistoricExternalTaskLogQuery> {
 
   protected static final String SORT_BY_TIMESTAMP = "timestamp";
-  protected static final String SORT_BY_EXTERNAL_TASK_ID = "taskId";
+  protected static final String SORT_BY_EXTERNAL_TASK_ID = "externalTaskId";
   protected static final String SORT_BY_RETRIES = "retries";
   protected static final String SORT_BY_PRIORITY = "priority";
   protected static final String SORT_BY_TOPIC_NAME = "topicName";
@@ -62,7 +62,7 @@ public class HistoricExternalTaskLogQueryDto extends AbstractQueryDto<HistoricEx
   }
 
   protected String id;
-  protected String taskId;
+  protected String externalTaskId;
   protected String topicName;
   protected String workerId;
   protected String errorMessage;
@@ -91,9 +91,9 @@ public class HistoricExternalTaskLogQueryDto extends AbstractQueryDto<HistoricEx
     this.id = id;
   }
 
-  @CamundaQueryParam("taskId")
-  public void setTaskId(String taskId) {
-    this.taskId = taskId;
+  @CamundaQueryParam("externalTaskId")
+  public void setExternalTaskId(String externalTaskId) {
+    this.externalTaskId = externalTaskId;
   }
 
   @CamundaQueryParam("topicName")
@@ -193,8 +193,8 @@ public class HistoricExternalTaskLogQueryDto extends AbstractQueryDto<HistoricEx
       query.logId(id);
     }
 
-    if (taskId != null) {
-      query.externalTaskId(taskId);
+    if (externalTaskId != null) {
+      query.externalTaskId(externalTaskId);
     }
 
     if (topicName != null) {

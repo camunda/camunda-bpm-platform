@@ -171,12 +171,12 @@ public class HistoricExternalTaskLogRestServiceQueryTest extends AbstractRestSer
     inOrder.verify(mockedQuery).desc();
 
     inOrder = Mockito.inOrder(mockedQuery);
-    executeAndVerifySorting("taskId", "asc", Status.OK);
+    executeAndVerifySorting("externalTaskId", "asc", Status.OK);
     inOrder.verify(mockedQuery).orderByExternalTaskId();
     inOrder.verify(mockedQuery).asc();
 
     inOrder = Mockito.inOrder(mockedQuery);
-    executeAndVerifySorting("taskId", "desc", Status.OK);
+    executeAndVerifySorting("externalTaskId", "desc", Status.OK);
     inOrder.verify(mockedQuery).orderByExternalTaskId();
     inOrder.verify(mockedQuery).desc();
 
@@ -406,7 +406,7 @@ public class HistoricExternalTaskLogRestServiceQueryTest extends AbstractRestSer
 
     String returnedId = from(content).getString("[0].id");
     String returnedTimestamp = from(content).getString("[0].timestamp");
-    String returnedExternalTaskId = from(content).getString("[0].taskId");
+    String returnedExternalTaskId = from(content).getString("[0].externalTaskId");
     String returnedExternalTaskTopicName = from(content).getString("[0].topicName");
     String returnedExternalTaskWorkerId = from(content).getString("[0].workerId");
     int returnedRetries = from(content).getInt("[0].retries");
@@ -471,7 +471,7 @@ public class HistoricExternalTaskLogRestServiceQueryTest extends AbstractRestSer
 
     String returnedId = from(content).getString("[0].id");
     String returnedTimestamp = from(content).getString("[0].timestamp");
-    String returnedExternalTaskId = from(content).getString("[0].taskId");
+    String returnedExternalTaskId = from(content).getString("[0].externalTaskId");
     String returnedExternalTaskTopicName = from(content).getString("[0].topicName");
     String returnedExternalTaskWorkerId = from(content).getString("[0].workerId");
     int returnedRetries = from(content).getInt("[0].retries");
@@ -543,7 +543,7 @@ public class HistoricExternalTaskLogRestServiceQueryTest extends AbstractRestSer
     Map<String, String> parameters = new HashMap<String, String>();
 
     parameters.put("logId", MockProvider.EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_ID);
-    parameters.put("taskId", MockProvider.EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_EXTERNAL_TASK_ID);
+    parameters.put("externalTaskId", MockProvider.EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_EXTERNAL_TASK_ID);
     parameters.put("topicName", MockProvider.EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_TOPIC_NAME);
     parameters.put("workerId", MockProvider.EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_WORKER_ID);
     parameters.put("errorMessage", MockProvider.EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_ERROR_MSG);
@@ -558,7 +558,7 @@ public class HistoricExternalTaskLogRestServiceQueryTest extends AbstractRestSer
     Map<String, String> stringQueryParameters = getCompleteStringQueryParameters();
 
     verify(mockedQuery).logId(stringQueryParameters.get("logId"));
-    verify(mockedQuery).externalTaskId(stringQueryParameters.get("taskId"));
+    verify(mockedQuery).externalTaskId(stringQueryParameters.get("externalTaskId"));
     verify(mockedQuery).topicName(stringQueryParameters.get("topicName"));
     verify(mockedQuery).workerId(stringQueryParameters.get("workerId"));
     verify(mockedQuery).errorMessage(stringQueryParameters.get("errorMessage"));
