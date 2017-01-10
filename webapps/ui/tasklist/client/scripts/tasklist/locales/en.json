@@ -101,10 +101,10 @@
                     "Serialization Data Format",
   "DOWNLOAD":
                     "Download",
-  "LESS_VARIABLES":
-                    "Show less variables",
-  "MORE_VARIABLES":
-                    "Show more variables",
+  "SHOW_LESS":
+                    "Show less",
+  "SHOW_MORE":
+                    "Show more",
   "UNDEFINED_VARIABLE":
                     "&lt;Undefined&gt;",
   "TOGGLE":
