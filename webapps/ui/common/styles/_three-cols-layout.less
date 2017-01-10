@@ -228,7 +228,6 @@
       position: absolute;
       width: auto;
       min-height: auto;
-      border-width: 0 1px 0 0;
     }
 
     .column-left {
@@ -326,13 +325,16 @@
   }
 
   .column {
-    border-style: solid;
-    border-color: mix(@gray-light, @gray-lighter);
     background-color: @body-bg;
 
+    overflow: hidden;
+    border: none;
+    box-shadow: @box-shadow;
+
     .cell.top {
-      border-bottom: 1px solid @gray-lighter;
+      border: none;
       background-color: @custom-gray-lighter;
+      box-shadow: @box-shadow-lower;
     }
   }
 
@@ -379,7 +381,7 @@
 .three-cols-layout-header() {
   .cell.top {
     min-height: (@column-top-height + (@padding-base-vertical * 2) + @border-thin-width);
-    padding: @padding-base-vertical (@grid-gutter-width * 0.5);
+    padding: calc(@padding-base-vertical + 2px) (@grid-gutter-width * 0.5) calc(@padding-base-vertical - 2px) (@grid-gutter-width * 0.5);
     margin: (0 - (@grid-gutter-width * 0.5))
             (0 - (@grid-gutter-width * 0.5))
             (@grid-gutter-width * 0.5)
