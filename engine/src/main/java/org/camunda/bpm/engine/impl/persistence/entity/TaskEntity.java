@@ -694,15 +694,12 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
 
   public void deleteIdentityLinks() {
     List<IdentityLinkEntity> identityLinkEntities = getIdentityLinks();
-    if (isIdentityLinksInitialized) {
-      for (IdentityLinkEntity identityLinkEntity : identityLinkEntities) {
-        fireDeleteIdentityLinkAuthorizationProvider(identityLinkEntity.getType(),
-          identityLinkEntity.getUserId(),
-          identityLinkEntity.getGroupId());
-        identityLinkEntity.delete();
-      }
-      isIdentityLinksInitialized = false;
+    for (IdentityLinkEntity identityLinkEntity : identityLinkEntities) {
+      fireDeleteIdentityLinkAuthorizationProvider(identityLinkEntity.getType(),
+        identityLinkEntity.getUserId(), identityLinkEntity.getGroupId());
+      identityLinkEntity.delete();
     }
+    isIdentityLinksInitialized = false;
   }
 
   @Override
