@@ -446,4 +446,25 @@ public class MultiTenancyCallActivityTest extends PluggableProcessEngineTestCase
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
   }
 
+  public void testCaseRefTenantIdCompositeExpression() {
+    // given
+    BpmnModelInstance callingProcess = Bpmn.createExecutableProcess("callingProcess")
+      .startEvent()
+      .callActivity()
+      .camundaCaseRef("Case_1")
+      .camundaCaseTenantId("tenant${'1'}")
+      .endEvent()
+      .done();
+
+    deploymentForTenant(TENANT_ONE, CMMN);
+    deployment(callingProcess);
+
+    // when
+    runtimeService.startProcessInstanceByKey("callingProcess");
+
+    // then
+    CaseInstanceQuery query = caseService.createCaseInstanceQuery().caseDefinitionKey("Case_1");
+    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
+  }
+
 }

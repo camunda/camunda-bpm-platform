@@ -302,4 +302,29 @@ public class MultiTenancyBusinessRuleTaskTest extends PluggableProcessEngineTest
     assertThat((String)runtimeService.getVariable(processInstanceOne.getId(), "decisionVar"), is(RESULT_OF_VERSION_ONE));
   }
 
+  public void testEvaluateDecisionTenantIdCompositeExpression() {
+    // given
+    BpmnModelInstance process = Bpmn.createExecutableProcess("process")
+      .startEvent()
+      .businessRuleTask()
+      .camundaDecisionRef("decision")
+      .camundaDecisionRefBinding("latest")
+      .camundaDecisionRefTenantId("tenant${'1'}")
+      .camundaMapDecisionResult("singleEntry")
+      .camundaResultVariable("decisionVar")
+      .camundaAsyncAfter()
+      .endEvent()
+      .done();
+    deploymentForTenant(TENANT_ONE, DMN_FILE);
+    deploymentForTenant(TENANT_TWO, DMN_FILE_VERSION_TWO);
+    deployment(process);
+
+    // when
+    ProcessInstance processInstanceOne = runtimeService.createProcessInstanceByKey("process")
+      .setVariable("status", "gold").execute();
+
+    // then
+    assertThat((String)runtimeService.getVariable(processInstanceOne.getId(), "decisionVar"), is(RESULT_OF_VERSION_ONE));
+  }
+
 }

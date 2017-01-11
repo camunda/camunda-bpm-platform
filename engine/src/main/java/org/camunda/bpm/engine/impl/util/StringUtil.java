@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
+import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.runtime.ProcessElementInstance;
 
 /**
@@ -38,12 +39,28 @@ public final class StringUtil {
   /**
    * Checks whether a {@link String} seams to be an expression or not
    *
+   * Note: In most cases you should check for composite expressions. See
+   * {@link #isCompositeExpression(String, ExpressionManager)} for more information.
+   *
    * @param text the text to check
    * @return true if the text seams to be an expression false otherwise
    */
   public static boolean isExpression(String text) {
     text = text.trim();
     return text.startsWith("${") || text.startsWith("#{");
+  }
+
+  /**
+   * Checks whether a {@link String} seams to be a composite expression or not. In contrast to an eval expression
+   * is the composite expression also allowed to consist of a combination of literal and eval expressions, e.g.,
+   * "Welcome ${customer.name} to our site".
+   *
+   * Note: If you just want to allow eval expression, then the expression must always start with "#{" or "${".
+   * Use {@link #isExpression(String)} to conduct these kind of checks.
+   *
+   */
+  public static boolean isCompositeExpression(String text, ExpressionManager expressionManager) {
+    return !expressionManager.createExpression(text).isLiteralText();
   }
 
   public static String[] split(String text, String regex) {

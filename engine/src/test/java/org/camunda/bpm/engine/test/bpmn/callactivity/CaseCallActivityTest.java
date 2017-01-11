@@ -128,6 +128,33 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {
+    "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivityTest.testCallCaseWithCompositeExpression.bpmn20.xml",
+    "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
+  })
+  public void testCallCaseWithCompositeExpression() {
+    // given
+    // a deployed process definition and case definition
+
+    // when
+    String superProcessInstanceId = startProcessInstanceByKey(PROCESS_DEFINITION_KEY).getId();
+
+    // then
+    String callActivityId = queryExecutionByActivityId(CALL_ACTIVITY_ID).getId();
+
+    CaseExecutionEntity subCaseInstance = (CaseExecutionEntity) queryOneTaskCaseInstance();
+    assertNotNull(subCaseInstance);
+
+    assertEquals(callActivityId, subCaseInstance.getSuperExecutionId());
+
+    // complete
+    String humanTaskId = queryCaseExecutionByActivityId(HUMAN_TASK_ID).getId();
+
+    complete(humanTaskId);
+    close(subCaseInstance.getId());
+    assertProcessEnded(superProcessInstanceId);
+  }
+
+  @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivityTest.testCallLatestCase.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
     })
@@ -583,6 +610,54 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {
+    "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivityTest.testInputSourceAsCompositeExpression.bpmn20.xml",
+    "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
+  })
+  public void testInputSourceAsCompositeExpression() {
+    // given
+    VariableMap parameters = Variables.createVariables()
+      .putValue("aVariable", "abc")
+      .putValue("anotherVariable", 999);
+
+    // when
+    String superProcessInstanceId = startProcessInstanceByKey(PROCESS_DEFINITION_KEY, parameters).getId();
+
+    // then
+    CaseExecutionEntity subCaseInstance = (CaseExecutionEntity) queryOneTaskCaseInstance();
+    assertNotNull(subCaseInstance);
+
+    List<VariableInstance> variables = runtimeService
+      .createVariableInstanceQuery()
+      .caseInstanceIdIn(subCaseInstance.getId())
+      .list();
+
+    assertFalse(variables.isEmpty());
+    assertEquals(2, variables.size());
+
+    for (VariableInstance variable : variables) {
+      String name = variable.getName();
+      if ("aVariable".equals(name)) {
+        assertEquals("aVariable", name);
+        assertEquals("Prefixabc", variable.getValue());
+
+      } else if ("anotherVariable".equals(name)) {
+        assertEquals("anotherVariable", name);
+        assertEquals("Prefix" + (long)1000, variable.getValue());
+
+      } else {
+        fail("Found an unexpected variable: '"+name+"'");
+      }
+    }
+
+    // complete ////////////////////////////////////////////////////////
+    String humanTaskId = queryCaseExecutionByActivityId(HUMAN_TASK_ID).getId();
+
+    complete(humanTaskId);
+    close(subCaseInstance.getId());
+    assertProcessEnded(superProcessInstanceId);
+  }
+
+  @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivityTest.testInputAll.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
     })
@@ -848,6 +923,58 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
       } else if ("anotherVariable".equals(name)) {
         assertEquals("anotherVariable", name);
         assertEquals((long) 1000, variable.getValue());
+      } else {
+        fail("Found an unexpected variable: '"+name+"'");
+      }
+    }
+
+    // complete ////////////////////////////////////////////////////////
+    close(subCaseInstanceId);
+    assertCaseEnded(subCaseInstanceId);
+
+    String taskId = queryTaskByActivityId(USER_TASK_ID).getId();
+    taskService.complete(taskId);
+    assertProcessEnded(superProcessInstanceId);
+
+  }
+
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivityTest.testOutputSourceAsCompositeExpression.bpmn20.xml",
+    "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
+  })
+  public void testOutputSourceAsCompositeExpression() {
+    // given
+    String superProcessInstanceId = startProcessInstanceByKey(PROCESS_DEFINITION_KEY).getId();
+    String subCaseInstanceId = queryOneTaskCaseInstance().getId();
+
+    caseService
+      .withCaseExecution(subCaseInstanceId)
+      .setVariable("aVariable", "abc")
+      .setVariable("anotherVariable", 999)
+      .execute();
+
+    String humanTaskId = queryCaseExecutionByActivityId(HUMAN_TASK_ID).getId();
+
+    // when
+    complete(humanTaskId);
+
+    // then
+    List<VariableInstance> variables = runtimeService
+      .createVariableInstanceQuery()
+      .processInstanceIdIn(superProcessInstanceId)
+      .list();
+
+    assertFalse(variables.isEmpty());
+    assertEquals(2, variables.size());
+
+    for (VariableInstance variable : variables) {
+      String name = variable.getName();
+      if ("aVariable".equals(name)) {
+        assertEquals("aVariable", name);
+        assertEquals("Prefixabc", variable.getValue());
+      } else if ("anotherVariable".equals(name)) {
+        assertEquals("anotherVariable", name);
+        assertEquals("Prefix"+(long) 1000, variable.getValue());
       } else {
         fail("Found an unexpected variable: '"+name+"'");
       }

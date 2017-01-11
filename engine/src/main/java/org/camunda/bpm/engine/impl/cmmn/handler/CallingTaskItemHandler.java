@@ -111,7 +111,7 @@ public abstract class CallingTaskItemHandler extends TaskItemHandler {
     if (value == null) {
       return new NullValueProvider();
 
-    } else if (StringUtil.isExpression(value)) {
+    } else if (!expressionManager.createExpression(value).isLiteralText()) {
       Expression expression = expressionManager.createExpression(value);
       return new ElValueProvider(expression);
 
