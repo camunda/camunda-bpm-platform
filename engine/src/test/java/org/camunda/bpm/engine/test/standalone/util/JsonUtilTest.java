@@ -51,9 +51,10 @@ public class JsonUtilTest {
     jsonObject.put("list", Collections.singletonList("test"));
     jsonObject.put("map", Collections.singletonMap("test", "test"));
     jsonObject.put("date", new Date(0));
+    jsonObject.put("null", JSONObject.NULL);
 
     map = jsonObjectAsMap(jsonObject);
-    assertEquals(8, map.size());
+    assertEquals(9, map.size());
 
     assertEquals(true, map.get("boolean"));
     assertEquals(12, map.get("int"));
@@ -72,6 +73,9 @@ public class JsonUtilTest {
 
     Date embeddedDate = (Date) map.get("date");
     assertEquals(new Date(0), embeddedDate);
+
+    assertTrue(map.containsKey("null"));
+    assertNull(map.get("null"));
   }
 
   @Test
@@ -92,9 +96,10 @@ public class JsonUtilTest {
     jsonArray.put(Collections.singletonList("test"));
     jsonArray.put(Collections.singletonMap("test", "test"));
     jsonArray.put(new Date(0));
+    jsonArray.put(JSONObject.NULL);
 
     list = jsonArrayAsList(jsonArray);
-    assertEquals(8, list.size());
+    assertEquals(9, list.size());
 
     assertEquals(true, list.get(0));
     assertEquals(12, list.get(1));
@@ -113,6 +118,33 @@ public class JsonUtilTest {
 
     Date embeddedDate = (Date) list.get(7);
     assertEquals(new Date(0), embeddedDate);
+
+    Object null_ = list.get(8);
+    assertNull(null_);
+  }
+
+  @Test
+  public void testJsonObjectNullRetained() {
+    String json = "{\"key\":null}";
+
+    JSONObject object = new JSONObject(json);
+    assertTrue(object.has("key"));
+
+    Map<String, Object> map = jsonObjectAsMap(object);
+    assertTrue(map.containsKey("key"));
+    assertNull(map.get("key"));
+  }
+
+  @Test
+  public void testJsonArrayNullRetained() {
+    String json = "[null]";
+
+    JSONArray array = new JSONArray(json);
+    assertEquals(1, array.length());
+
+    List<Object> list = jsonArrayAsList(array);
+    assertEquals(1, list.size());
+    assertNull(list.get(0));
   }
 
 }

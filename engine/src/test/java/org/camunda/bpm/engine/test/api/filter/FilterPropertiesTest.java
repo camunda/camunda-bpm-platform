@@ -32,6 +32,13 @@ public class FilterPropertiesTest extends PluggableProcessEngineTestCase {
     filter = filterService.newTaskFilter("name").setOwner("owner").setProperties(new HashMap<String, Object>());
   }
 
+  protected void tearDown() throws Exception {
+    if (filter.getId() != null)
+    {
+      filterService.deleteFilter(filter.getId());
+    }
+  }
+
 
   public void testPropertiesFromNull() {
     filter.setProperties(null);
@@ -64,8 +71,24 @@ public class FilterPropertiesTest extends PluggableProcessEngineTestCase {
     assertEquals(true, properties.get("userDefined"));
     assertEquals(nestedJsonObject, properties.get("object"));
     assertEquals(nestedJsonArray, properties.get("array"));
+  }
 
-    filterService.deleteFilter(filter.getId());
+  public void testNullProperty() {
+    // given
+    Map<String, Object> properties = new HashMap<String, Object>();
+    properties.put("null", null);
+    filter.setProperties(properties);
+    filterService.saveFilter(filter);
+
+    // when
+    filter = filterService.getFilter(filter.getId());
+
+    // then
+    Map<String, Object> persistentProperties = filter.getProperties();
+    assertEquals(1, persistentProperties.size());
+    assertTrue(persistentProperties.containsKey("null"));
+    assertNull(persistentProperties.get("null"));
+
   }
 
 }
