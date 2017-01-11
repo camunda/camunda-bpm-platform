@@ -630,10 +630,10 @@ public class AuthorizationManager extends AbstractManager {
     configureQuery(query, DECISION_DEFINITION, "SELF.DEC_DEF_KEY_", READ_HISTORY);
   }
 
-  // external task log query /////////////////////////////////
+  // historic external task log query /////////////////////////////////
 
   public void configureHistoricExternalTaskLogQuery(HistoricExternalTaskLogQueryImpl query) {
-    configureQuery(query, PROCESS_DEFINITION, "SELF.PROCESS_DEF_KEY_", READ_HISTORY);
+    configureQuery(query, PROCESS_DEFINITION, "SELF.PROC_DEF_KEY_", READ_HISTORY);
   }
 
   // user operation log query ///////////////////////////////
