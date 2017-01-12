@@ -66,7 +66,7 @@ var Controller = [
 
   // reset breadcrumbs
     page.breadcrumbsClear();
-
+    $scope.$root.showBreadcrumbs = false;
     page.titleSet('Dashboard');
 
   // ----------------------------------------------------------------------------------------
