@@ -25,6 +25,10 @@ module.exports = [
 
     page.breadcrumbsClear();
 
+    page.breadcrumbsAdd({
+      label: 'Deployments'
+    });
+
     page.titleSet('Deployments');
 
     // utilities /////////////////////////////////////////////////////////////////
