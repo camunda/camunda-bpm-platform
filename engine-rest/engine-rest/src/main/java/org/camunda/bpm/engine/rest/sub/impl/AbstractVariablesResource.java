@@ -12,16 +12,9 @@
  */
 package org.camunda.bpm.engine.rest.sub.impl;
 
-import java.io.ByteArrayInputStream;
-import java.nio.charset.Charset;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -35,13 +28,15 @@ import org.camunda.bpm.engine.rest.mapper.MultipartFormData.FormPart;
 import org.camunda.bpm.engine.rest.sub.VariableResource;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
-import org.camunda.bpm.engine.variable.value.BytesValue;
-import org.camunda.bpm.engine.variable.value.FileValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.TypeFactory;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 public abstract class AbstractVariablesResource implements VariableResource {
@@ -99,30 +94,7 @@ public abstract class AbstractVariablesResource implements VariableResource {
 
   public Response getVariableBinary(String variableName) {
     TypedValue typedValue = getTypedValueForVariable(variableName, false);
-
-    if (typedValue instanceof BytesValue) {
-      byte[] valueBytes = ((BytesValue) typedValue).getValue();
-      if (valueBytes == null) {
-        valueBytes = new byte[0];
-      }
-
-      return Response.ok(new ByteArrayInputStream(valueBytes), MediaType.APPLICATION_OCTET_STREAM).build();
-    }
-    else if (typedValue instanceof FileValue) {
-      FileValue fileValue = (FileValue) typedValue;
-      String type = fileValue.getMimeType() != null ? fileValue.getMimeType() : MediaType.APPLICATION_OCTET_STREAM;
-
-      if(fileValue.getEncoding() != null){
-        type += "; charset=" + fileValue.getEncoding();
-      }
-
-      return Response.ok(fileValue.getValue(), type)
-              .header("Content-Disposition", "attachment; filename=" + fileValue.getFilename())
-              .build();
-    } else {
-      throw new InvalidRequestException(Status.BAD_REQUEST, "Variable '" + variableName + "' is not of type 'Bytes' or 'File' but of type '" + typedValue.getType()
-          + "'.");
-    }
+    return new VariableResponseProvider().getResponseForTypedVariable(typedValue, resourceId);
   }
 
   @Override

@@ -12,23 +12,16 @@
  */
 package org.camunda.bpm.engine.rest.sub;
 
-import java.io.ByteArrayInputStream;
-
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-import org.camunda.bpm.engine.variable.type.ValueType;
-import org.camunda.bpm.engine.variable.value.FileValue;
+import org.camunda.bpm.engine.rest.sub.impl.VariableResponseProvider;
 import org.camunda.bpm.engine.variable.value.TypedValue;
+
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 /**
  * Base class to unify the getResource(boolean deserialized) and
@@ -59,45 +52,19 @@ public abstract class AbstractResourceProvider<T extends Query<?, U>, U, DTO> {
     }
   }
 
+
   @GET
   @Path("/data")
   public Response getResourceBinary() {
     U queryResult = baseQueryForBinaryVariable().singleResult();
     if (queryResult != null) {
       TypedValue variableInstance = transformQueryResultIntoTypedValue(queryResult);
-      if (ValueType.BYTES.equals(variableInstance.getType())) {
-        return responseForByteVariable(variableInstance);
-      } else if (ValueType.FILE.equals(variableInstance.getType())) {
-        return responseForFileVariable((FileValue) variableInstance);
-      } else {
-        throw new InvalidRequestException(Status.BAD_REQUEST, String.format("Value of %s %s is not a binary value.", getResourceNameForErrorMessage(), id));
-      }
+      return new VariableResponseProvider().getResponseForTypedVariable(variableInstance, id);
     } else {
       throw new InvalidRequestException(Status.NOT_FOUND, getResourceNameForErrorMessage() + " with Id '" + id + "' does not exist.");
     }
   }
 
-  /**
-   * Creates a response for a variable of type {@link ValueType#FILE}.
-   */
-  protected Response responseForFileVariable(FileValue fileValue) {
-    String type = fileValue.getMimeType() != null ? fileValue.getMimeType() : MediaType.APPLICATION_OCTET_STREAM;
-    if (fileValue.getEncoding() != null) {
-      type += "; charset=" + fileValue.getEncoding();
-    }
-    return Response.ok(fileValue.getValue(), type).header("Content-Disposition", "attachment; filename=" + fileValue.getFilename()).build();
-  }
-
-  /**
-   * Creates a response for a variable of type {@link ValueType#BYTES}.
-   */
-  protected Response responseForByteVariable(TypedValue variableInstance) {
-    byte[] valueBytes = (byte[]) variableInstance.getValue();
-    if (valueBytes == null) {
-      valueBytes = new byte[0];
-    }
-    return Response.ok(new ByteArrayInputStream(valueBytes), MediaType.APPLICATION_OCTET_STREAM).build();
-  }
 
   protected String getId() {
     return id;

@@ -260,7 +260,7 @@ public class VariableInstanceRestServiceInteractionTest extends AbstractRestServ
     given().pathParam("id", MockProvider.EXAMPLE_VARIABLE_INSTANCE_ID)
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body(containsString("Value of Variable instance aVariableInstanceId is not a binary value"))
+      .body(containsString("Value of variable with id aVariableInstanceId is not a binary value"))
     .when().get(VARIABLE_INSTANCE_BINARY_DATA_URL);
 
     verify(variableInstanceQueryMock, never()).disableBinaryFetching();

@@ -330,7 +330,7 @@ public class HistoricDetailRestServiceInteractionTest extends AbstractRestServic
     given().pathParam("id", MockProvider.EXAMPLE_HISTORIC_VAR_UPDATE_ID)
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body(containsString("Value of Historic detail aHistoricVariableUpdateId is not a binary value"))
+      .body(containsString("Value of variable with id aHistoricVariableUpdateId is not a binary value"))
     .when().get(VARIABLE_INSTANCE_BINARY_DATA_URL);
 
     verify(historicDetailQueryMock, never()).disableBinaryFetching();

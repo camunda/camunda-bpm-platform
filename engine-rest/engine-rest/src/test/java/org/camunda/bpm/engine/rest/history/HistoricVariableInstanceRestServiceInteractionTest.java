@@ -298,7 +298,7 @@ public class HistoricVariableInstanceRestServiceInteractionTest extends Abstract
     given().pathParam("id", MockProvider.EXAMPLE_VARIABLE_INSTANCE_ID)
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body(containsString("Value of Historic variable instance "+variableInstanceMock.getId()+" is not a binary value"))
+      .body(containsString("Value of variable with id "+variableInstanceMock.getId()+" is not a binary value"))
     .when().get(VARIABLE_INSTANCE_BINARY_DATA_URL);
 
     verify(variableInstanceQueryMock, never()).disableBinaryFetching();
@@ -339,12 +339,9 @@ public class HistoricVariableInstanceRestServiceInteractionTest extends Abstract
 
     given().pathParam("id", MockProvider.EXAMPLE_VARIABLE_INSTANCE_ID)
     .then().expect().statusCode(Status.OK.getStatusCode())
-    .and()
-      .contentType(ContentType.TEXT)
-      .and()
-        .body(is(equalTo(new String())))
+    .and().contentType(ContentType.TEXT)
+    .and().body(is(equalTo(new String())))
     .when().get(VARIABLE_INSTANCE_BINARY_DATA_URL);
-
   }
 
 }
