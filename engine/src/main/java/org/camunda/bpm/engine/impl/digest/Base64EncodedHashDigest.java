@@ -55,7 +55,7 @@ public abstract class Base64EncodedHashDigest {
       return MessageDigest.getInstance(getAlgorithmName());
 
     } catch (NoSuchAlgorithmException e) {
-      throw new ProcessEngineException("Cannot lookup SHA algorithm");
+      throw new ProcessEngineException("Cannot lookup " + getAlgorithmName() + " algorithm");
 
     }
   }

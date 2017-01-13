@@ -34,6 +34,8 @@ import org.camunda.bpm.engine.impl.persistence.entity.GroupEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TenantEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.UserEntity;
 
+import static org.camunda.bpm.engine.impl.util.EncryptionUtil.saltPassword;
+
 /**
  * <p>Read only implementation of DB-backed identity service</p>
  *
@@ -78,9 +80,10 @@ public class DbReadOnlyIdentityServiceProvider extends AbstractManager implement
   }
 
   protected boolean matchPassword(String password, User user) {
+    String saltedPassword = saltPassword(password, user.getSalt());
     return Context.getProcessEngineConfiguration()
       .getPasswordEncryptor()
-      .check(password, user.getPassword());
+      .check(saltedPassword, user.getPassword());
   }
 
   // groups //////////////////////////////////////////

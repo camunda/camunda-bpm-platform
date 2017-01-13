@@ -6,6 +6,7 @@ package org.camunda.bpm.engine.test.api.identity.plugin;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin;
+import org.camunda.bpm.engine.test.api.identity.MyNullSaltGenerator;
 
 /**
  * @author Simon Jonischkeit
@@ -27,8 +28,7 @@ public class TestDbIdentityServiceProviderPlugin implements ProcessEnginePlugin 
 
   @Override
   public void postInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    // nothing to do here
-
+    processEngineConfiguration.setSaltGenerator(new MyNullSaltGenerator());
   }
 
   @Override

@@ -7,13 +7,14 @@
   <!-- USER INSERT -->
 
   <insert id="insertUser" parameterType="org.camunda.bpm.engine.impl.persistence.entity.UserEntity">
-    insert into ${prefix}ACT_ID_USER (ID_, FIRST_, LAST_, EMAIL_, PWD_, REV_)
+    insert into ${prefix}ACT_ID_USER (ID_, FIRST_, LAST_, EMAIL_, PWD_, SALT_, REV_)
     values (
       #{id ,jdbcType=VARCHAR},
       #{firstName ,jdbcType=VARCHAR},
       #{lastName ,jdbcType=VARCHAR},
       #{email ,jdbcType=VARCHAR},
       #{password ,jdbcType=VARCHAR},
+      #{salt ,jdbcType=VARCHAR},
       1
     )
   </insert>
@@ -26,7 +27,8 @@
       FIRST_ = #{firstName ,jdbcType=VARCHAR},
       LAST_ = #{lastName ,jdbcType=VARCHAR},
       EMAIL_ = #{email ,jdbcType=VARCHAR},
-      PWD_ = #{password ,jdbcType=VARCHAR}
+      PWD_ = #{password ,jdbcType=VARCHAR},
+      SALT_ = #{salt ,jdbcType=VARCHAR}
     where ID_ = #{id}
       and REV_ = #{revision}
   </update>
@@ -46,6 +48,7 @@
     <result property="lastName" column="LAST_" jdbcType="VARCHAR" />
     <result property="email" column="EMAIL_" jdbcType="VARCHAR" />
     <result property="dbPassword" column="PWD_" jdbcType="VARCHAR" />
+    <result property="salt" column="SALT_" jdbcType="VARCHAR" />
   </resultMap>
   
   <!-- USER SELECT -->

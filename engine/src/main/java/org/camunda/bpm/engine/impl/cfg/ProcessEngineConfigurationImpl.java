@@ -97,8 +97,7 @@ import org.camunda.bpm.engine.impl.db.entitymanager.cache.DbEntityCacheKeyMappin
 import org.camunda.bpm.engine.impl.db.sql.DbSqlPersistenceProviderFactory;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.delegate.DefaultDelegateInterceptor;
-import org.camunda.bpm.engine.impl.digest.PasswordEncryptor;
-import org.camunda.bpm.engine.impl.digest.ShaHashDigest;
+import org.camunda.bpm.engine.impl.digest.*;
 import org.camunda.bpm.engine.impl.dmn.configuration.DmnEngineConfigurationBuilder;
 import org.camunda.bpm.engine.impl.dmn.deployer.DecisionDefinitionDeployer;
 import org.camunda.bpm.engine.impl.dmn.deployer.DecisionRequirementsDefinitionDeployer;
@@ -546,6 +545,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected SessionFactory identityProviderSessionFactory;
 
   protected PasswordEncryptor passwordEncryptor;
+
+  protected SaltGenerator saltGenerator;
 
   protected Set<String> registeredDeployments;
 
@@ -1948,6 +1949,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   // password digest //////////////////////////////////////////////////////////
 
   protected void initPasswordDigest() {
+    if(saltGenerator == null) {
+      saltGenerator = new Default16ByteSaltGenerator();
+    }
     if (passwordEncryptor == null) {
       passwordEncryptor = new ShaHashDigest();
     }
@@ -2960,6 +2964,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setIdentityProviderSessionFactory(SessionFactory identityProviderSessionFactory) {
     this.identityProviderSessionFactory = identityProviderSessionFactory;
+  }
+
+  public SaltGenerator getSaltGenerator() {
+    return saltGenerator;
+  }
+
+  public void setSaltGenerator(SaltGenerator saltGenerator) {
+    this.saltGenerator = saltGenerator;
   }
 
   public void setPasswordEncryptor(PasswordEncryptor passwordEncryptor) {
