@@ -4432,7 +4432,7 @@ public class BpmnParse extends Parse {
     if (value == null) {
       return new NullValueProvider();
 
-    } else if (value instanceof String && StringUtil.isCompositeExpression((String) value, expressionManager)) {
+    } else if (value instanceof String) {
       Expression expression = expressionManager.createExpression((String) value);
       return new ElValueProvider(expression);
 

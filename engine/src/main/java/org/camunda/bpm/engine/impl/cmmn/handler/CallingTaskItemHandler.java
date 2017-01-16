@@ -27,6 +27,8 @@ import org.camunda.bpm.engine.impl.util.StringUtil;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.model.cmmn.instance.CmmnElement;
 
+import static org.camunda.bpm.engine.impl.util.StringUtil.isCompositeExpression;
+
 /**
  * @author Roman Smirnov
  *
@@ -111,7 +113,7 @@ public abstract class CallingTaskItemHandler extends TaskItemHandler {
     if (value == null) {
       return new NullValueProvider();
 
-    } else if (!expressionManager.createExpression(value).isLiteralText()) {
+    } else if (isCompositeExpression(value, expressionManager)) {
       Expression expression = expressionManager.createExpression(value);
       return new ElValueProvider(expression);
 

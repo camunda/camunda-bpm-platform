@@ -27,6 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.BpmnError;
+import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -35,6 +36,8 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
 /**
  * Testcase for camunda input / output in BPMN
@@ -1029,6 +1032,55 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
 
     // then
     assertEquals(theTaskInstance.getId(), variableInstance.getActivityInstanceId());
+  }
+
+  public void testCompositeExpressionForInputValue() {
+
+    // given
+    BpmnModelInstance instance = Bpmn.createExecutableProcess("Process")
+      .startEvent()
+      .serviceTask("bla")
+        .camundaExpression("${true}")
+        .camundaInputParameter("var", "Hello World${'!'}")
+      .endEvent("end")
+      .done();
+
+    deployment(instance);
+    runtimeService.startProcessInstanceByKey("Process");
+
+    // when
+    HistoricVariableInstance variableInstance = historyService
+      .createHistoricVariableInstanceQuery()
+      .variableName("var")
+      .singleResult();
+
+    // then
+    assertEquals("Hello World!", variableInstance.getValue());
+  }
+
+  public void testCompositeExpressionForOutputValue() {
+
+    // given
+    BpmnModelInstance instance = Bpmn.createExecutableProcess("Process")
+      .startEvent()
+      .serviceTask("bla")
+        .camundaExpression("${true}")
+        .camundaInputParameter("var1", "World!")
+        .camundaOutputParameter("var2", "Hello ${var1}")
+      .endEvent("end")
+      .done();
+
+    deployment(instance);
+    runtimeService.startProcessInstanceByKey("Process");
+
+    // when
+    HistoricVariableInstance variableInstance = historyService
+      .createHistoricVariableInstanceQuery()
+      .variableName("var2")
+      .singleResult();
+
+    // then
+    assertEquals("Hello World!", variableInstance.getValue());
   }
 
 }
