@@ -1039,8 +1039,7 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     // given
     BpmnModelInstance instance = Bpmn.createExecutableProcess("Process")
       .startEvent()
-      .serviceTask("bla")
-        .camundaExpression("${true}")
+      .receiveTask()
         .camundaInputParameter("var", "Hello World${'!'}")
       .endEvent("end")
       .done();
@@ -1049,8 +1048,8 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     runtimeService.startProcessInstanceByKey("Process");
 
     // when
-    HistoricVariableInstance variableInstance = historyService
-      .createHistoricVariableInstanceQuery()
+    VariableInstance variableInstance = runtimeService
+      .createVariableInstanceQuery()
       .variableName("var")
       .singleResult();
 
@@ -1063,10 +1062,11 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     // given
     BpmnModelInstance instance = Bpmn.createExecutableProcess("Process")
       .startEvent()
-      .serviceTask("bla")
+      .serviceTask()
         .camundaExpression("${true}")
         .camundaInputParameter("var1", "World!")
         .camundaOutputParameter("var2", "Hello ${var1}")
+      .userTask()
       .endEvent("end")
       .done();
 
@@ -1074,8 +1074,8 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     runtimeService.startProcessInstanceByKey("Process");
 
     // when
-    HistoricVariableInstance variableInstance = historyService
-      .createHistoricVariableInstanceQuery()
+    VariableInstance variableInstance = runtimeService
+      .createVariableInstanceQuery()
       .variableName("var2")
       .singleResult();
 
