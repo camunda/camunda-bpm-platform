@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 
 /**
  * @author Thorben Lindhauer
+ * @author Ryan Johnston
  *
  */
 public class VariableListenerInvocationListener implements VariableInstanceLifecycleListener<VariableInstanceEntity> {
@@ -51,13 +52,18 @@ public class VariableListenerInvocationListener implements VariableInstanceLifec
 
     if (sourceScope instanceof ExecutionEntity) {
       addEventToScopeExecution((ExecutionEntity) sourceScope, event);
-    } else if (sourceScope instanceof TaskEntity) {
+    }
+    else if (sourceScope instanceof TaskEntity) {
       TaskEntity task = (TaskEntity) sourceScope;
       ExecutionEntity execution = task.getExecution();
       if (execution != null) {
         addEventToScopeExecution(execution, event);
       }
-    } else {
+    }
+    else if(sourceScope.getParentVariableScope() instanceof ExecutionEntity) {
+      addEventToScopeExecution((ExecutionEntity)sourceScope.getParentVariableScope(), event);
+    }
+    else {
       throw new ProcessEngineException("BPMN execution scope expected");
     }
   }
