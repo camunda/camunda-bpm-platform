@@ -1136,7 +1136,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
       task.setExecution(other);
 
       // update the related local task variables
-      List<VariableInstanceEntity> variables = commandContext.getVariableInstanceManager().findVariableInstancesByTaskId(task.getId());
+      Collection<VariableInstanceEntity> variables = task.getVariablesInternal();
 
       for (VariableInstanceEntity variable : variables) {
         variable.setExecution(other);
