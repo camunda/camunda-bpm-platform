@@ -109,6 +109,7 @@ public class SaltHashingTest {
     user = identityService.createUserQuery().userId("johndoe").singleResult();
 
     // then
+    // obtain the expected value on the command line like so: echo -n password12345678910 | openssl dgst -binary -sha1 | openssl base64
     assertThat(user.getPassword(), is("{SHA}n3fE9/7XOmgD3BkeJlC+JLyb/Qg="));
     identityService.deleteUser("johndoe");
   }

@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.camunda.bpm.engine.test.api.identity.plugin;
 
@@ -13,9 +13,9 @@ import org.camunda.bpm.engine.test.api.identity.MyNullSaltGenerator;
  *
  */
 public class TestDbIdentityServiceProviderPlugin implements ProcessEnginePlugin {
-  
+
   TestDbIdentityServiceProviderFactory testFactory;
-  
+
   public TestDbIdentityServiceProviderPlugin() {
     testFactory = new TestDbIdentityServiceProviderFactory();
   }
