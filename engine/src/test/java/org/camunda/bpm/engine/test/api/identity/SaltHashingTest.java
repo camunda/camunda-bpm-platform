@@ -30,7 +30,7 @@ import static org.hamcrest.core.IsNot.not;
 
 public class SaltHashingTest {
 
-  protected ProcessEngineBootstrapRule cacheFactoryBootstrapRule = new ProcessEngineBootstrapRule() {
+  protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
     public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
       // apply configuration options here
       configuration.setSaltGenerator(new Default16ByteSaltGenerator());
@@ -38,30 +38,23 @@ public class SaltHashingTest {
     }
   };
 
-  protected ProvidedProcessEngineRule cacheFactoryEngineRule = new ProvidedProcessEngineRule(cacheFactoryBootstrapRule);
-
-  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(cacheFactoryEngineRule);
-
+  protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
+  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   protected final static String PASSWORD = "password";
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(cacheFactoryBootstrapRule).around(cacheFactoryEngineRule).around(testRule);
+  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(testRule);
+
   protected IdentityService identityService;
-  RepositoryService repositoryService;
-  ProcessEngineConfigurationImpl processEngineConfiguration;
-  RuntimeService runtimeService;
-  TaskService taskService;
-  ManagementService managementService;
+  protected RuntimeService runtimeService;
+  protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
   @Before
   public void initialize() {
-    repositoryService = cacheFactoryEngineRule.getRepositoryService();
-    processEngineConfiguration = cacheFactoryEngineRule.getProcessEngineConfiguration();
-    runtimeService = cacheFactoryEngineRule.getRuntimeService();
-    taskService = cacheFactoryEngineRule.getTaskService();
-    managementService = cacheFactoryEngineRule.getManagementService();
-    identityService = cacheFactoryEngineRule.getIdentityService();
+    runtimeService = engineRule.getRuntimeService();
+    identityService = engineRule.getIdentityService();
+    processEngineConfiguration = engineRule.getProcessEngineConfiguration();
   }
 
   @Test

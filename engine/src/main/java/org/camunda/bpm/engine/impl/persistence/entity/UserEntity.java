@@ -92,12 +92,9 @@ public class UserEntity implements User, Serializable, DbEntity, HasDbRevision {
     this.newPassword = password;
   }
 
-  @Override
   public String getSalt() {
     return this.salt;
   }
-
-  @Override
   public void setSalt(String salt) {
     this.salt = salt;
   }

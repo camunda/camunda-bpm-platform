@@ -15,15 +15,17 @@
  */
 package org.camunda.bpm.qa.upgrade.scenarios760;
 
-import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.identity.User;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.qa.upgrade.Origin;
 import org.camunda.bpm.qa.upgrade.ScenarioUnderTest;
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsNot.not;
+import static org.hamcrest.core.IsNull.nullValue;
 
 @ScenarioUnderTest("DeployUserWithoutSaltForPasswordHashingScenario")
 @Origin("7.6.0")
@@ -35,8 +37,13 @@ public class DeployUserWithoutSaltForPasswordHashingTest {
   @Test
   public void testDeployProcessWithoutIsExecutableAttribute() {
     // then
-    User user = engineRule.getIdentityService().createUserQuery().singleResult();
-    engineRule.getIdentityService().checkPassword(user.getId(), "password");
+    User user = engineRule.getIdentityService()
+                  .createUserQuery()
+                  .userId("kermit")
+                  .singleResult();
+    assertThat(user, is(not(nullValue())));
+    boolean isPasswordCorrect = engineRule.getIdentityService().checkPassword(user.getId(), "password");
+    assertThat(isPasswordCorrect, is(true));
   }
 
 }

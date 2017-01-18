@@ -28,7 +28,7 @@ public abstract class Base64EncodedSaltGenerator implements SaltGenerator {
     return encodeSalt(byteSalt);
   }
 
-  public byte[] generateByteSalt() {
+  protected byte[] generateByteSalt() {
     byte[] salt = new byte[getSaltLengthInByte()];
     secureRandom.nextBytes(salt);
     return salt;
@@ -38,6 +38,6 @@ public abstract class Base64EncodedSaltGenerator implements SaltGenerator {
     return new String(Base64.encodeBase64(salt));
   }
 
-  abstract Integer getSaltLengthInByte();
+  protected abstract Integer getSaltLengthInByte();
 
 }

@@ -15,7 +15,7 @@ package org.camunda.bpm.engine.impl.digest;
 public class Default16ByteSaltGenerator extends Base64EncodedSaltGenerator {
 
   @Override
-  Integer getSaltLengthInByte() {
+  protected Integer getSaltLengthInByte() {
     return 16;
   }
 }

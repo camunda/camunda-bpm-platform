@@ -71,7 +71,7 @@ public class DbReadOnlyIdentityServiceProvider extends AbstractManager implement
   }
 
   public boolean checkPassword(String userId, String password) {
-    User user = findUserById(userId);
+    UserEntity user = findUserById(userId);
     if ((user != null) && (password != null) && matchPassword(password, user)) {
       return true;
     } else {
@@ -79,7 +79,7 @@ public class DbReadOnlyIdentityServiceProvider extends AbstractManager implement
     }
   }
 
-  protected boolean matchPassword(String password, User user) {
+  protected boolean matchPassword(String password, UserEntity user) {
     String saltedPassword = saltPassword(password, user.getSalt());
     return Context.getProcessEngineConfiguration()
       .getPasswordEncryptor()

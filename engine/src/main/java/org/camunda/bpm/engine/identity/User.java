@@ -37,7 +37,4 @@ public interface User extends Serializable {
   
   String getPassword(); 
   void setPassword(String password);
-
-  String getSalt();
-  void setSalt(String salt);
 }
