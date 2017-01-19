@@ -24,6 +24,7 @@
             Notifications.addMessage({
               duration: 16000,
               status: translated,
+              unsafe: true,
               message: msg.slice(0,-2)
             });
           });
