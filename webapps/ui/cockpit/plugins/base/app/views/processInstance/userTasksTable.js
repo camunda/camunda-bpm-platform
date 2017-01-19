@@ -174,7 +174,7 @@ module.exports = function(ngModule) {
             else {
               message = 'The assignee of the user task \'' +
                          userTask.instance.name +
-                         '\' has been reseted successfully.';
+                         '\' has been reset successfully.';
             }
 
             Notifications.addMessage({
@@ -198,7 +198,7 @@ module.exports = function(ngModule) {
             else {
               message = 'The assignee of the user task \'' +
                          userTask.instance.name +
-                         '\' could not be reseted. ' + error.data.message;
+                         '\' could not be reset. ' + error.data.message;
             }
 
             var err = {
