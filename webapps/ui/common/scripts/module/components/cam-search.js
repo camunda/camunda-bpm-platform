@@ -13,6 +13,7 @@ module.exports = function() {
       config: '=camSearch',
       arrayTypes: '=?',
       variableTypes: '=?',
+      storageGroup: '=?',
       onQueryChange: '&'
     }
   };
