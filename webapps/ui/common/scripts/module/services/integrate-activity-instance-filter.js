@@ -132,7 +132,6 @@ module.exports = [
               activityInstanceIds = activityInstanceIds.concat(instanceIds);
               changed = true;
             }
-
           }
         });
 
@@ -171,7 +170,6 @@ module.exports = [
         // update filter only if actual changes happened above
         // (auto completion took place)
         if (changed) {
-
           // update cached filters
           $scope.filter =  completedFilter;
 
@@ -181,8 +179,7 @@ module.exports = [
 
         // update uri only if filter change is triggered from
         // external view component
-        if (externalUpdate) {
-
+        if (externalUpdate && $scope.filter) {
           // serialize filter to url
           serializeFilterToUri($scope.filter, replace);
         }
