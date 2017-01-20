@@ -31,6 +31,18 @@ function initializePaginationInController($scope, search, updateCallback) {
     updateCallback(newValue, oldValue);
   });
 
+  $scope.$on('$locationChangeSuccess', function() {
+    var currentPage = getCurrentPageFromSearch(search);
+
+    if (pages.current !== currentPage) {
+      var oldPages = angular.extend({}, pages);
+
+      pages.current = currentPage;
+
+      updateCallback(pages, oldPages);
+    }
+  });
+
   return pages;
 }
 
