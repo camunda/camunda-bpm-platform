@@ -508,23 +508,15 @@ public class TaskVariableRestResourceInteractionTest extends
     when(taskServiceMock.getVariableTyped(eq(MockProvider.EXAMPLE_TASK_ID), eq(variableKey), anyBoolean()))
       .thenReturn(variableValue);
 
-    Response response = given()
+    given()
       .pathParam("id", MockProvider.EXAMPLE_TASK_ID)
       .pathParam("varId", variableKey)
       .then().expect()
-      .statusCode(Status.OK.getStatusCode())
-//      .contentType(ContentType.TEXT.toString())
+        .statusCode(Status.OK.getStatusCode())
+        .contentType(ContentType.TEXT.toString())
       .and()
-      .body(is(equalTo("")))
+        .body(is(equalTo("")))
       .when().get(SINGLE_TASK_SINGLE_BINARY_VARIABLE_URL);
-
-
-    String contentType = response.getContentType();
-    System.out.println();
-    response.getBody().print();
-    System.out.println();
-    System.out.println(contentType);
-    System.out.println(response.getHeaders());
   }
 
   @Test

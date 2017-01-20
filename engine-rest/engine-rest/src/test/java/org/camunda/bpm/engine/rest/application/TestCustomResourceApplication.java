@@ -1,19 +1,17 @@
 package org.camunda.bpm.engine.rest.application;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.ws.rs.ApplicationPath;
-import javax.ws.rs.core.Application;
-
 import com.fasterxml.jackson.jaxrs.base.JsonMappingExceptionMapper;
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import com.fasterxml.jackson.jaxrs.base.JsonParseExceptionMapper;
-import org.camunda.bpm.engine.rest.exception.ClientErrorExceptionHandler;
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import org.camunda.bpm.engine.rest.exception.ExceptionHandler;
 import org.camunda.bpm.engine.rest.exception.ProcessEngineExceptionHandler;
 import org.camunda.bpm.engine.rest.exception.RestExceptionHandler;
 import org.camunda.bpm.engine.rest.mapper.JacksonConfigurator;
+
+import javax.ws.rs.ApplicationPath;
+import javax.ws.rs.core.Application;
+import java.util.HashSet;
+import java.util.Set;
 
 @ApplicationPath("/")
 public class TestCustomResourceApplication extends Application {
@@ -37,7 +35,6 @@ public class TestCustomResourceApplication extends Application {
     PROVIDERS.add(ProcessEngineExceptionHandler.class);
     PROVIDERS.add(RestExceptionHandler.class);
     PROVIDERS.add(ExceptionHandler.class);
-    PROVIDERS.add(ClientErrorExceptionHandler.class);
   }
 
   @Override
