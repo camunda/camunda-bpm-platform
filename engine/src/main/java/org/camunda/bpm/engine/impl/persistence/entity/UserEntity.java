@@ -126,7 +126,7 @@ public class UserEntity implements User, Serializable, DbEntity, HasDbRevision {
     } else {
       String saltedPassword = saltPassword(password, salt);
       return Context.getProcessEngineConfiguration()
-        .getPasswordEncryptor()
+        .getPasswordManager()
         .encrypt(saltedPassword);
     }
   }

@@ -35,7 +35,7 @@ public class DeployUserWithoutSaltForPasswordHashingTest {
   public ProcessEngineRule engineRule = new ProcessEngineRule("camunda.cfg.xml");
 
   @Test
-  public void testDeployProcessWithoutIsExecutableAttribute() {
+  public void testDeployUserWithoutSaltForPasswordHashing() {
     // then
     User user = engineRule.getIdentityService()
                   .createUserQuery()

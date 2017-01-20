@@ -12,16 +12,25 @@
  */
 package org.camunda.bpm.engine.impl.digest;
 
+import org.camunda.bpm.engine.ProcessEngineException;
+
 /**
- * <p>{@link PasswordEncryptor} implementation using base64 encoded SHA password hashes</p>
+ * <p>Exception thrown during the encryption process.</p>
  *
- * @author Daniel Meyer
+ * <p><strong>Possible reasons:</strong>
+ * <ul>
+ *  <li>several hashing algorithms with the same prefix are added</li>
+ *  <li>cannot resolve the hash algorithm prefix from a given encrypted password</li>
+ * </ul>
+ * </p>
  *
  */
-public class ShaHashDigest extends Base64EncodedHashDigest implements PasswordEncryptor {
+public class PasswordEncryptionException extends ProcessEngineException {
 
-  @Override
-  public String hashAlgorithmName() {
-    return "SHA";
+  private static final long serialVersionUID = 1L;
+
+  public PasswordEncryptionException(String message) {
+    super(message);
   }
+
 }

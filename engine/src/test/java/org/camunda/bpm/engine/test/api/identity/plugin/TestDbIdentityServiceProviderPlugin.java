@@ -6,7 +6,8 @@ package org.camunda.bpm.engine.test.api.identity.plugin;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin;
-import org.camunda.bpm.engine.test.api.identity.MyNullSaltGenerator;
+import org.camunda.bpm.engine.impl.digest.ShaHashDigest;
+import org.camunda.bpm.engine.test.api.identity.util.MyNullSaltGenerator;
 
 /**
  * @author Simon Jonischkeit
@@ -23,6 +24,7 @@ public class TestDbIdentityServiceProviderPlugin implements ProcessEnginePlugin 
   @Override
   public void preInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
     processEngineConfiguration.setIdentityProviderSessionFactory(testFactory);
+    processEngineConfiguration.setPasswordEncryptor(new ShaHashDigest());
 
   }
 

@@ -82,7 +82,7 @@ public class DbReadOnlyIdentityServiceProvider extends AbstractManager implement
   protected boolean matchPassword(String password, UserEntity user) {
     String saltedPassword = saltPassword(password, user.getSalt());
     return Context.getProcessEngineConfiguration()
-      .getPasswordEncryptor()
+      .getPasswordManager()
       .check(saltedPassword, user.getPassword());
   }
 

@@ -52,10 +52,10 @@ public abstract class Base64EncodedHashDigest {
 
   protected MessageDigest createDigestInstance() {
     try {
-      return MessageDigest.getInstance(getAlgorithmName());
+      return MessageDigest.getInstance(hashAlgorithmName());
 
     } catch (NoSuchAlgorithmException e) {
-      throw new ProcessEngineException("Cannot lookup " + getAlgorithmName() + " algorithm");
+      throw new ProcessEngineException("Cannot lookup " + hashAlgorithmName() + " algorithm");
 
     }
   }
@@ -65,6 +65,6 @@ public abstract class Base64EncodedHashDigest {
   }
 
   /** allows subclasses to select the hash algorithm */
-  protected abstract String getAlgorithmName();
+  protected abstract String hashAlgorithmName();
 
 }

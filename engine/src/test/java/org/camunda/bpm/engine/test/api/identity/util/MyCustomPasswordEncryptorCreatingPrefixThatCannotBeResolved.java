@@ -10,16 +10,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.test.api.identity;
+package org.camunda.bpm.engine.test.api.identity.util;
 
-import org.camunda.bpm.engine.impl.digest.Default16ByteSaltGenerator;
+import org.camunda.bpm.engine.impl.digest.PasswordEncryptor;
 
-public class MyConstantSaltGenerator extends Default16ByteSaltGenerator {
+public class MyCustomPasswordEncryptorCreatingPrefixThatCannotBeResolved implements PasswordEncryptor {
 
-  public static final String SALT = "12345678910";
+  protected int counter = 0;
 
   @Override
-  public String generateSalt() {
-    return "12345678910";
+  public String encrypt(String password) {
+    return "xxx";
+  }
+
+  @Override
+  public boolean check(String password, String encrypted) {
+    return password.equals("xxx");
+  }
+
+  @Override
+  public String hashAlgorithmName() {
+    counter++;
+    return "Bla" + counter;
   }
 }

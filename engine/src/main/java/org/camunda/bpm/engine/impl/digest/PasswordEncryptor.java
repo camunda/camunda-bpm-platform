@@ -39,4 +39,13 @@ public interface PasswordEncryptor {
    * @return
    */
   public boolean check(String password, String encrypted);
+
+  /**
+   * In order to distinguish which algorithm was used to hash the
+   * password, it needs a unique id. In particular, this is needed
+   * for {@link #check}.
+   *
+   * @return the name of the algorithm
+   */
+  public String hashAlgorithmName();
 }

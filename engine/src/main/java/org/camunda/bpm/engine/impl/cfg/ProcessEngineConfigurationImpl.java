@@ -289,14 +289,8 @@ import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Properties;
-import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
@@ -545,6 +539,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected SessionFactory identityProviderSessionFactory;
 
   protected PasswordEncryptor passwordEncryptor;
+
+  protected List<PasswordEncryptor> customPasswordChecker;
+
+  protected PasswordManager passwordManager;
 
   protected SaltGenerator saltGenerator;
 
@@ -1953,8 +1951,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       saltGenerator = new Default16ByteSaltGenerator();
     }
     if (passwordEncryptor == null) {
-      passwordEncryptor = new ShaHashDigest();
+      passwordEncryptor = new Sha512HashDigest();
     }
+    if(customPasswordChecker == null) {
+      customPasswordChecker = Collections.emptyList();
+    }
+    if(passwordManager == null) {
+      passwordManager = new PasswordManager(passwordEncryptor, customPasswordChecker);
+    }
+
   }
 
 
@@ -2980,6 +2985,22 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public PasswordEncryptor getPasswordEncryptor() {
     return passwordEncryptor;
+  }
+
+  public List<PasswordEncryptor> getCustomPasswordChecker() {
+    return customPasswordChecker;
+  }
+
+  public void setCustomPasswordChecker(List<PasswordEncryptor> customPasswordChecker) {
+    this.customPasswordChecker = customPasswordChecker;
+  }
+
+  public PasswordManager getPasswordManager() {
+    return passwordManager;
+  }
+
+  public void setPasswordManager(PasswordManager passwordManager) {
+    this.passwordManager = passwordManager;
   }
 
   public Set<String> getRegisteredDeployments() {

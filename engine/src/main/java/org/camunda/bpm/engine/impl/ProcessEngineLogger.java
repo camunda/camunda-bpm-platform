@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.impl.cmmn.operation.CmmnOperationLogger;
 import org.camunda.bpm.engine.impl.cmmn.transformer.CmmnTransformerLogger;
 import org.camunda.bpm.engine.impl.core.CoreLogger;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
+import org.camunda.bpm.engine.impl.digest.SecurityLogger;
 import org.camunda.bpm.engine.impl.dmn.DecisionLogger;
 import org.camunda.bpm.engine.impl.externaltask.ExternalTaskLogger;
 import org.camunda.bpm.engine.impl.interceptor.ContextLogger;
@@ -117,6 +118,9 @@ public class ProcessEngineLogger extends BaseLogger {
   
   public static final ExternalTaskLogger EXTERNAL_TASK_LOGGER = BaseLogger.createLogger(
     ExternalTaskLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.externaltask", "24");
+
+  public static final SecurityLogger SECURITY_LOGGER = BaseLogger.createLogger(
+    SecurityLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.security", "25");
 
   public void processEngineCreated(String name) {
     logInfo("001", "Process Engine {} created.", name);

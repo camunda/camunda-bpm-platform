@@ -10,18 +10,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.digest;
+package org.camunda.bpm.engine.test.api.identity.util;
 
-/**
- * <p>{@link PasswordEncryptor} implementation using base64 encoded SHA password hashes</p>
- *
- * @author Daniel Meyer
- *
- */
-public class ShaHashDigest extends Base64EncodedHashDigest implements PasswordEncryptor {
+import org.camunda.bpm.engine.impl.digest.Default16ByteSaltGenerator;
+
+public class MyConstantSaltGenerator extends Default16ByteSaltGenerator {
 
   @Override
-  public String hashAlgorithmName() {
-    return "SHA";
+  public String generateSalt() {
+    return "12345678910";
   }
 }
