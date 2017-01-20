@@ -21,7 +21,7 @@ module.exports = [
     page,
     camAPI
   ) {
-    $scope.$root.showBreadcrumbs = true;
+    $scope.$root.showBreadcrumbs = false;
 
     page.breadcrumbsClear();
 
