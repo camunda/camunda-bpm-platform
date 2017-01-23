@@ -24,15 +24,13 @@ import java.util.List;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.impl.util.IoUtil;
-import org.camunda.bpm.engine.repository.DecisionDefinition;
-import org.camunda.bpm.engine.repository.DecisionDefinitionQuery;
-import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
-import org.camunda.bpm.engine.repository.DecisionRequirementsDefinitionQuery;
-import org.camunda.bpm.engine.repository.DeploymentQuery;
+import org.camunda.bpm.engine.repository.*;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.camunda.bpm.model.cmmn.Cmmn;
+import org.camunda.bpm.model.cmmn.CmmnModelInstance;
 import org.camunda.bpm.model.dmn.Dmn;
 import org.camunda.bpm.model.dmn.DmnModelInstance;
 import org.camunda.bpm.model.dmn.HitPolicy;
@@ -393,5 +391,78 @@ public class DecisionDefinitionDeployerTest {
     decisionTable.addChildElement(output);
 
     return modelInstance;
+  }
+
+  @Test
+  public void testDeployAndGetDecisionDefinition() throws Exception {
+
+    // given decision model
+    DmnModelInstance dmnModelInstance = createDmnModelInstance();
+
+    // when decision model is deployed
+    DeploymentBuilder deploymentBuilder = repositoryService.createDeployment().addModelInstance("foo.dmn", dmnModelInstance);
+    org.camunda.bpm.engine.repository.Deployment deployment = testRule.deploy(deploymentBuilder);
+
+    // then deployment contains definition
+    List<DecisionDefinition> deployedDecisionDefinitions = deployment.getDeployedDecisionDefinitions();
+    assertEquals(1, deployedDecisionDefinitions.size());
+    assertNull(deployment.getDeployedDecisionRequirementsDefinitions());
+    assertNull(deployment.getDeployedProcessDefinitions());
+    assertNull(deployment.getDeployedCaseDefinitions());
+
+    // and persisted definition are equal to deployed definition
+    DecisionDefinition persistedDecisionDef = repositoryService.createDecisionDefinitionQuery()
+      .decisionDefinitionResourceName("foo.dmn").singleResult();
+    assertEquals(persistedDecisionDef.getId(), deployedDecisionDefinitions.get(0).getId());
+  }
+
+  @Test
+  public void testDeployEmptyDecisionDefinition() throws Exception {
+
+    // given empty decision model
+    DmnModelInstance modelInstance = Dmn.createEmptyModel();
+    Definitions definitions = modelInstance.newInstance(Definitions.class);
+    definitions.setId(DmnModelConstants.DMN_ELEMENT_DEFINITIONS);
+    definitions.setName(DmnModelConstants.DMN_ELEMENT_DEFINITIONS);
+    definitions.setNamespace(DmnModelConstants.CAMUNDA_NS);
+    modelInstance.setDefinitions(definitions);
+
+    // when decision model is deployed
+    DeploymentBuilder deploymentBuilder = repositoryService.createDeployment().addModelInstance("foo.dmn", modelInstance);
+    org.camunda.bpm.engine.repository.Deployment deployment = testRule.deploy(deploymentBuilder);
+
+    // then deployment contains no definitions
+    assertNull(deployment.getDeployedDecisionDefinitions());
+    assertNull(deployment.getDeployedDecisionRequirementsDefinitions());
+
+    // and there are no persisted definitions
+    assertNull(repositoryService.createDecisionDefinitionQuery()
+      .decisionDefinitionResourceName("foo.dmn").singleResult());
+  }
+
+
+  @Test
+  public void testDeployAndGetDRDDefinition() throws Exception {
+
+    // when decision requirement graph is deployed
+    org.camunda.bpm.engine.repository.Deployment deployment = testRule.deploy(DRD_SCORE_RESOURCE);
+
+    // then deployment contains definitions
+    List<DecisionDefinition> deployedDecisionDefinitions = deployment.getDeployedDecisionDefinitions();
+    assertEquals(2, deployedDecisionDefinitions.size());
+
+    List<DecisionRequirementsDefinition> deployedDecisionRequirementsDefinitions = deployment.getDeployedDecisionRequirementsDefinitions();
+    assertEquals(1, deployedDecisionRequirementsDefinitions.size());
+
+    assertNull(deployment.getDeployedProcessDefinitions());
+    assertNull(deployment.getDeployedCaseDefinitions());
+
+    // and persisted definitions are equal to deployed definitions
+    DecisionRequirementsDefinition persistedDecisionRequirementsDefinition = repositoryService.createDecisionRequirementsDefinitionQuery()
+      .decisionRequirementsDefinitionResourceName(DRD_SCORE_RESOURCE).singleResult();
+    assertEquals(persistedDecisionRequirementsDefinition.getId(), deployedDecisionRequirementsDefinitions.get(0).getId());
+
+    List<DecisionDefinition> persistedDecisionDefinitions = repositoryService.createDecisionDefinitionQuery().decisionDefinitionResourceName(DRD_SCORE_RESOURCE).list();
+    assertEquals(deployedDecisionDefinitions.size(), persistedDecisionDefinitions.size());
   }
 }

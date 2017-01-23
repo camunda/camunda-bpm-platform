@@ -24,13 +24,16 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.repository.DeploymentQuery;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.rest.DeploymentRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.repository.DeploymentDto;
 import org.camunda.bpm.engine.rest.dto.repository.DeploymentQueryDto;
+import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.mapper.MultipartFormData;
 import org.camunda.bpm.engine.rest.mapper.MultipartFormData.FormPart;
@@ -87,6 +90,31 @@ public class DeploymentRestServiceImpl extends AbstractRestProcessEngineAware im
   }
 
   public DeploymentDto createDeployment(UriInfo uriInfo, MultipartFormData payload) {
+    DeploymentBuilder deploymentBuilder = extractDeploymentInformation(payload);
+
+    if(!deploymentBuilder.getResourceNames().isEmpty()) {
+      Deployment deployment = deploymentBuilder.deploy();
+
+      DeploymentDto deploymentDto = DeploymentDto.fromDeployment(deployment);
+
+
+      URI uri = uriInfo.getBaseUriBuilder()
+        .path(relativeRootResourcePath)
+        .path(DeploymentRestService.PATH)
+        .path(deployment.getId())
+        .build();
+
+      // GET
+      deploymentDto.addReflexiveLink(uri, HttpMethod.GET, "self");
+
+      return deploymentDto;
+
+    } else {
+      throw new InvalidRequestException(Status.BAD_REQUEST, "No deployment resources contained in the form upload.");
+    }
+  }
+
+  private DeploymentBuilder extractDeploymentInformation(MultipartFormData payload) {
     DeploymentBuilder deploymentBuilder = getProcessEngine().getRepositoryService().createDeployment();
 
     Set<String> partNames = payload.getPartNames();
@@ -99,32 +127,37 @@ public class DeploymentRestServiceImpl extends AbstractRestProcessEngineAware im
       }
     }
 
-    if (payload.getNamedPart(DEPLOYMENT_NAME) != null) {
-      FormPart part = payload.getNamedPart(DEPLOYMENT_NAME);
-      deploymentBuilder.name(part.getTextContent());
+    FormPart deploymentName = payload.getNamedPart(DEPLOYMENT_NAME);
+    if (deploymentName != null) {
+      deploymentBuilder.name(deploymentName.getTextContent());
     }
 
-    if (payload.getNamedPart(DEPLOYMENT_SOURCE) != null) {
-      FormPart part = payload.getNamedPart(DEPLOYMENT_SOURCE);
-      deploymentBuilder.source(part.getTextContent());
+    FormPart deploymentSource = payload.getNamedPart(DEPLOYMENT_SOURCE);
+    if (deploymentSource != null) {
+      deploymentBuilder.source(deploymentSource.getTextContent());
     }
 
-    if (payload.getNamedPart(TENANT_ID) != null) {
-      FormPart part = payload.getNamedPart(TENANT_ID);
-      deploymentBuilder.tenantId(part.getTextContent());
+    FormPart deploymentTenantId = payload.getNamedPart(TENANT_ID);
+    if (deploymentTenantId != null) {
+      deploymentBuilder.tenantId(deploymentTenantId.getTextContent());
     }
 
+    extractDuplicateFilteringForDeployment(payload, deploymentBuilder);
+    return deploymentBuilder;
+  }
+
+  private void extractDuplicateFilteringForDeployment(MultipartFormData payload, DeploymentBuilder deploymentBuilder) {
     boolean enableDuplicateFiltering = false;
     boolean deployChangedOnly = false;
 
-    if (payload.getNamedPart(ENABLE_DUPLICATE_FILTERING) != null) {
-      FormPart part = payload.getNamedPart(ENABLE_DUPLICATE_FILTERING);
-      enableDuplicateFiltering = Boolean.parseBoolean(part.getTextContent());
+    FormPart deploymentEnableDuplicateFiltering = payload.getNamedPart(ENABLE_DUPLICATE_FILTERING);
+    if (deploymentEnableDuplicateFiltering != null) {
+      enableDuplicateFiltering = Boolean.parseBoolean(deploymentEnableDuplicateFiltering.getTextContent());
     }
 
-    if (payload.getNamedPart(DEPLOY_CHANGED_ONLY) != null) {
-      FormPart part = payload.getNamedPart(DEPLOY_CHANGED_ONLY);
-      deployChangedOnly = Boolean.parseBoolean(part.getTextContent());
+    FormPart deploymentDeployChangedOnly = payload.getNamedPart(DEPLOY_CHANGED_ONLY);
+    if (deploymentDeployChangedOnly != null) {
+      deployChangedOnly = Boolean.parseBoolean(deploymentDeployChangedOnly.getTextContent());
     }
 
     // deployChangedOnly overrides the enableDuplicateFiltering setting
@@ -133,28 +166,6 @@ public class DeploymentRestServiceImpl extends AbstractRestProcessEngineAware im
     } else if (enableDuplicateFiltering) {
       deploymentBuilder.enableDuplicateFiltering(false);
     }
-
-    if(!deploymentBuilder.getResourceNames().isEmpty()) {
-      Deployment deployment = deploymentBuilder.deploy();
-
-      DeploymentDto deploymentDto = DeploymentDto.fromDeployment(deployment);
-
-      URI uri = uriInfo.getBaseUriBuilder()
-        .path(relativeRootResourcePath)
-        .path(DeploymentRestService.PATH)
-        .path(deployment.getId())
-        .build();
-
-      // GET /
-      deploymentDto.addReflexiveLink(uri, HttpMethod.GET, "self");
-
-      return deploymentDto;
-
-    } else {
-      throw new InvalidRequestException(Status.BAD_REQUEST, "No deployment resources contained in the form upload.");
-
-    }
-
   }
 
   private List<Deployment> executePaginatedQuery(DeploymentQuery query, Integer firstResult, Integer maxResults) {

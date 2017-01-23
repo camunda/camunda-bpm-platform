@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.rest.helper;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -1313,6 +1314,17 @@ public abstract class MockProvider {
     when(mockDeployment.getDeploymentTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_DEPLOYMENT_TIME));
     when(mockDeployment.getSource()).thenReturn(EXAMPLE_DEPLOYMENT_SOURCE);
     when(mockDeployment.getTenantId()).thenReturn(tenantId);
+    List<ProcessDefinition> mockDefinitions = createMockDefinitions();
+    when(mockDeployment.getDeployedProcessDefinitions()).thenReturn(mockDefinitions);
+
+    List<CaseDefinition> mockCaseDefinitions = createMockCaseDefinitions();
+    when(mockDeployment.getDeployedCaseDefinitions()).thenReturn(mockCaseDefinitions);
+
+    List<DecisionDefinition> mockDecisionDefinitions = createMockDecisionDefinitions();
+    when(mockDeployment.getDeployedDecisionDefinitions()).thenReturn(mockDecisionDefinitions);
+
+    List<DecisionRequirementsDefinition> mockDecisionRequirementsDefinitions = createMockDecisionRequirementsDefinitions();
+    when(mockDeployment.getDeployedDecisionRequirementsDefinitions()).thenReturn(mockDecisionRequirementsDefinitions);
 
     return mockDeployment;
   }
@@ -2646,6 +2658,12 @@ public abstract class MockProvider {
       .id(ANOTHER_EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_ID)
       .tenantId(ANOTHER_EXAMPLE_TENANT_ID)
       .build();
+  }
+
+  public static List<DecisionRequirementsDefinition> createMockDecisionRequirementsDefinitions() {
+    List<DecisionRequirementsDefinition> mocks = new ArrayList<DecisionRequirementsDefinition>();
+    mocks.add(createMockDecisionRequirementsDefinition());
+    return mocks;
   }
 
   public static List<DecisionRequirementsDefinition> createMockTwoDecisionRequirementsDefinitions() {

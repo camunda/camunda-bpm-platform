@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.impl.pvm.ReadOnlyProcessDefinition;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
+import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.Resource;
 import org.camunda.bpm.engine.test.Deployment;
@@ -371,4 +372,48 @@ public class BpmnDeploymentTest extends PluggableProcessEngineTestCase {
     // then
     assertNotNull(repositoryService.createProcessDefinitionQuery().processDefinitionResourceName("foo.bpmn").singleResult());
   }
+
+  public void testDeployAndGetProcessDefinition() throws Exception {
+
+    // given process model
+    final BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("foo").startEvent().userTask().endEvent().done();
+
+    // when process model is deployed
+    org.camunda.bpm.engine.repository.Deployment deployment = repositoryService.createDeployment()
+      .addModelInstance("foo.bpmn", modelInstance).deploy();
+    deploymentIds.add(deployment.getId());
+
+    // then deployment contains deployed process definitions
+    List<ProcessDefinition> deployedProcessDefinitions = deployment.getDeployedProcessDefinitions();
+    assertEquals(1, deployedProcessDefinitions.size());
+    assertNull(deployment.getDeployedCaseDefinitions());
+    assertNull(deployment.getDeployedDecisionDefinitions());
+    assertNull(deployment.getDeployedDecisionRequirementsDefinitions());
+
+    // and persisted process definition is equal to deployed process definition
+    ProcessDefinition persistedProcDef = repositoryService.createProcessDefinitionQuery()
+                                                          .processDefinitionResourceName("foo.bpmn")
+                                                          .singleResult();
+    assertEquals(persistedProcDef.getId(), deployedProcessDefinitions.get(0).getId());
+  }
+
+  public void testDeployNonExecutableProcess() throws Exception {
+
+    // given non executable process definition
+    final BpmnModelInstance modelInstance = Bpmn.createProcess("foo").startEvent().userTask().endEvent().done();
+
+    // when process model is deployed
+    org.camunda.bpm.engine.repository.Deployment deployment = repositoryService.createDeployment()
+      .addModelInstance("foo.bpmn", modelInstance).deploy();
+    deploymentIds.add(deployment.getId());
+
+    // then deployment contains no deployed process definition
+    assertNull(deployment.getDeployedProcessDefinitions());
+
+    // and there exist no persisted process definitions
+    assertNull(repositoryService.createProcessDefinitionQuery()
+                                .processDefinitionResourceName("foo.bpmn")
+                                .singleResult());
+  }
+
 }

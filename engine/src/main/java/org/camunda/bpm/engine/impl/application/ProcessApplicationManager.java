@@ -192,7 +192,7 @@ public class ProcessApplicationManager {
     CommandContext commandContext = Context.getCommandContext();
 
     // in case deployment was created by this command
-    List<ProcessDefinitionEntity> entities = deployment.getDeployedArtifacts(ProcessDefinitionEntity.class);
+    List<ProcessDefinition> entities = deployment.getDeployedProcessDefinitions();
 
     if (entities == null) {
       String deploymentId = deployment.getId();
@@ -200,7 +200,7 @@ public class ProcessApplicationManager {
       return manager.findProcessDefinitionsByDeploymentId(deploymentId);
     }
 
-    return new ArrayList<ProcessDefinition>(entities);
+    return entities;
 
   }
 
@@ -208,7 +208,7 @@ public class ProcessApplicationManager {
     CommandContext commandContext = Context.getCommandContext();
 
     // in case deployment was created by this command
-    List<CaseDefinitionEntity> entities = deployment.getDeployedArtifacts(CaseDefinitionEntity.class);
+    List<CaseDefinition> entities = deployment.getDeployedCaseDefinitions();
 
     if (entities == null) {
       String deploymentId = deployment.getId();
@@ -216,7 +216,7 @@ public class ProcessApplicationManager {
       return caseDefinitionManager.findCaseDefinitionByDeploymentId(deploymentId);
     }
 
-    return new ArrayList<CaseDefinition>(entities);
+    return entities;
 
   }
 

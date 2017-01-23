@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.test.cmmn.deployment;
 
 import java.io.InputStream;
+import java.util.List;
 
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
@@ -20,7 +21,10 @@ import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
 import org.camunda.bpm.engine.repository.DeploymentQuery;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.cmmn.Cmmn;
 import org.camunda.bpm.model.cmmn.CmmnModelInstance;
 import org.camunda.bpm.model.cmmn.instance.Case;
@@ -164,6 +168,47 @@ public class CmmnDeployerTest extends PluggableProcessEngineTestCase {
     Cmmn.writeModelToStream(System.out, modelInstance);
 
     return modelInstance;
+  }
+
+  public void testDeployAndGetCaseDefinition() throws Exception {
+    // given case model
+    final CmmnModelInstance modelInstance = createCmmnModelInstance();
+
+    // when case model is deployed
+    org.camunda.bpm.engine.repository.Deployment deployment = repositoryService.createDeployment()
+      .addModelInstance("foo.cmmn", modelInstance).deploy();
+    deploymentIds.add(deployment.getId());
+
+    // then deployment contains deployed case definition
+    List<CaseDefinition> deployedCaseDefinitions = deployment.getDeployedCaseDefinitions();
+    assertEquals(1, deployedCaseDefinitions.size());
+    assertNull(deployment.getDeployedProcessDefinitions());
+    assertNull(deployment.getDeployedDecisionDefinitions());
+    assertNull(deployment.getDeployedDecisionRequirementsDefinitions());
+
+    // and persisted case definition is equal to deployed case definition
+    CaseDefinition persistedCaseDefinition = repositoryService.createCaseDefinitionQuery().caseDefinitionResourceName("foo.cmmn").singleResult();
+    assertEquals(persistedCaseDefinition.getId(), deployedCaseDefinitions.get(0).getId());
+  }
+
+  public void testDeployEmptyCaseDefinition() throws Exception {
+
+    // given empty case model
+    final CmmnModelInstance modelInstance = Cmmn.createEmptyModel();
+    org.camunda.bpm.model.cmmn.instance.Definitions definitions = modelInstance.newInstance(org.camunda.bpm.model.cmmn.instance.Definitions.class);
+    definitions.setTargetNamespace("http://camunda.org/examples");
+    modelInstance.setDefinitions(definitions);
+
+    // when case model is deployed
+    org.camunda.bpm.engine.repository.Deployment deployment = repositoryService.createDeployment()
+      .addModelInstance("foo.cmmn", modelInstance).deploy();
+    deploymentIds.add(deployment.getId());
+
+    // then no case definition is deployed
+    assertNull(deployment.getDeployedCaseDefinitions());
+
+    // and there exist not persisted case definition
+    assertNull(repositoryService.createCaseDefinitionQuery().caseDefinitionResourceName("foo.cmmn").singleResult());
   }
 
 }

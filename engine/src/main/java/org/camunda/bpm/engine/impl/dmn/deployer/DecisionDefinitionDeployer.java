@@ -72,6 +72,10 @@ public class DecisionDefinitionDeployer extends AbstractDefinitionDeployer<Decis
       decisions.add(decisionEntity);
     }
 
+    if (!DecisionRequirementsDefinitionDeployer.isDecisionRequirementsDefinitionPersistable(deployedDrd)) {
+      deployment.removeArtifact(deployedDrd);
+    }
+
     return decisions;
   }
 

@@ -493,18 +493,18 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
     if (deploymentBuilder.getProcessDefinitionsActivationDate() != null) {
       RepositoryService repositoryService = commandContext.getProcessEngineConfiguration().getRepositoryService();
 
-      for (ProcessDefinitionEntity processDefinitionEntity : deployment.getDeployedArtifacts(ProcessDefinitionEntity.class)) {
+      for (ProcessDefinition processDefinition: deployment.getDeployedProcessDefinitions()) {
 
         // If activation date is set, we first suspend all the process definition
         repositoryService
           .updateProcessDefinitionSuspensionState()
-          .byProcessDefinitionId(processDefinitionEntity.getId())
+          .byProcessDefinitionId(processDefinition.getId())
           .suspend();
 
         // And we schedule an activation at the provided date
         repositoryService
           .updateProcessDefinitionSuspensionState()
-          .byProcessDefinitionId(processDefinitionEntity.getId())
+          .byProcessDefinitionId(processDefinition.getId())
           .executionDate(deploymentBuilder.getProcessDefinitionsActivationDate())
           .activate();
       }
@@ -575,7 +575,7 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
   }
 
   protected List<? extends ProcessDefinition> getDeployedProcesses(DeploymentEntity deployment) {
-    List<? extends ProcessDefinition> deployedProcessDefinitions = deployment.getDeployedArtifacts(ProcessDefinitionEntity.class);
+    List<? extends ProcessDefinition> deployedProcessDefinitions = deployment.getDeployedProcessDefinitions();
     if (deployedProcessDefinitions == null) {
       // existing deployment
       CommandContext commandContext = Context.getCommandContext();

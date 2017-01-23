@@ -20,9 +20,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
-import org.camunda.bpm.engine.repository.Deployment;
+import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
+import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionEntity;
+import org.camunda.bpm.engine.impl.repository.ResourceDefinitionEntity;
+import org.camunda.bpm.engine.repository.*;
 
 
 /**
@@ -45,8 +49,7 @@ public class DeploymentEntity implements Serializable, Deployment, DbEntity {
    * Will only be used during actual deployment to pass deployed artifacts (eg process definitions).
    * Will be null otherwise.
    */
-  protected Map<Class<?>, List<Object>> deployedArtifacts;
-  protected Map<Class<?>, List<Object>> notdeployedARtifacts;
+  protected Map<Class<?>, List> deployedArtifacts;
 
   public ResourceEntity getResource(String resourceName) {
     return getResources().get(resourceName);
@@ -89,15 +92,15 @@ public class DeploymentEntity implements Serializable, Deployment, DbEntity {
 
   // Deployed artifacts manipulation //////////////////////////////////////////
 
-  public void addDeployedArtifact(Object deployedArtifact) {
+  public void addDeployedArtifact(ResourceDefinitionEntity deployedArtifact) {
     if (deployedArtifacts == null) {
-      deployedArtifacts = new HashMap<Class<?>, List<Object>>();
+      deployedArtifacts = new HashMap<Class<?>, List>();
     }
 
     Class<?> clazz = deployedArtifact.getClass();
-    List<Object> artifacts = deployedArtifacts.get(clazz);
+    List artifacts = deployedArtifacts.get(clazz);
     if (artifacts == null) {
-      artifacts = new ArrayList<Object>();
+      artifacts = new ArrayList();
       deployedArtifacts.put(clazz, artifacts);
     }
 
@@ -110,6 +113,18 @@ public class DeploymentEntity implements Serializable, Deployment, DbEntity {
       return null;
     } else {
       return (List<T>) deployedArtifacts.get(clazz);
+    }
+  }
+
+  public void removeArtifact(ResourceDefinitionEntity notDeployedArtifact) {
+    if (deployedArtifacts != null) {
+      List artifacts = deployedArtifacts.get(notDeployedArtifact.getClass());
+      if (artifacts != null) {
+        artifacts.remove(notDeployedArtifact);
+        if (artifacts.isEmpty()) {
+          deployedArtifacts.remove(notDeployedArtifact.getClass());
+        }
+      }
     }
   }
 
@@ -173,6 +188,26 @@ public class DeploymentEntity implements Serializable, Deployment, DbEntity {
 
   public void setTenantId(String tenantId) {
     this.tenantId = tenantId;
+  }
+
+  @Override
+  public List<ProcessDefinition> getDeployedProcessDefinitions() {
+    return deployedArtifacts == null ? null : deployedArtifacts.get(ProcessDefinitionEntity.class);
+  }
+
+  @Override
+  public List<CaseDefinition> getDeployedCaseDefinitions() {
+    return deployedArtifacts == null ? null : deployedArtifacts.get(CaseDefinitionEntity.class);
+  }
+
+  @Override
+  public List<DecisionDefinition> getDeployedDecisionDefinitions() {
+    return deployedArtifacts == null ? null : deployedArtifacts.get(DecisionDefinitionEntity.class);
+  }
+
+  @Override
+  public List<DecisionRequirementsDefinition> getDeployedDecisionRequirementsDefinitions() {
+    return deployedArtifacts == null ? null : deployedArtifacts.get(DecisionRequirementsDefinitionEntity.class);
   }
 
   @Override
