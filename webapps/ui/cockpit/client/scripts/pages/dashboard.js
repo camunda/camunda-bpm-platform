@@ -2,7 +2,7 @@
 
 var fs = require('fs');
 var template = fs.readFileSync(__dirname + '/dashboard.html', 'utf8');
-var series = require('camunda-commons-ui/node_modules/camunda-bpm-sdk-js').utils.series;
+var series = require('camunda-bpm-sdk-js').utils.series;
 
 function prioritySort(a, b) {
   return a.priority > b.priority ? 1 : (a.priority < b.priority ? -1 : 0);

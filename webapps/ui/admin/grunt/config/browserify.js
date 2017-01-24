@@ -7,7 +7,6 @@ module.exports = function(config, browserifyConfig) {
         standalone: 'CamundaAdminUi',
         debug: true
       },
-      transform: ['brfs'],
       watch: true,
       postBundleCB: function(err, src, next) {
 
@@ -37,7 +36,6 @@ module.exports = function(config, browserifyConfig) {
     options: {
       watch: true,
       transform: [
-        'brfs',
         [ 'exposify',
             {
               expose: {

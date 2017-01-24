@@ -95,7 +95,7 @@ module.exports = function(config, copyConf) {
         // bootstrap fonts
         {
           expand: true,
-          cwd: '<%= pkg.gruntConfig.commonsUiDir %>/node_modules/bootstrap/fonts',
+          cwd: 'node_modules/bootstrap/fonts',
           src: [
             '*.{eot,ttf,svg,woff,woff2}'
           ],
@@ -104,7 +104,7 @@ module.exports = function(config, copyConf) {
         // bpmn fonts
         {
           expand: true,
-          cwd: '<%= pkg.gruntConfig.commonsUiDir %>/node_modules/bpmn-font/dist/font',
+          cwd: 'node_modules/bpmn-font/dist/font',
           src: [
             '*.{eot,ttf,svg,woff}'
           ],
@@ -120,7 +120,7 @@ module.exports = function(config, copyConf) {
         // dmn
         {
           expand: true,
-          cwd: '<%= pkg.gruntConfig.commonsUiDir %>/node_modules/dmn-js/fonts',
+          cwd: 'node_modules/dmn-js/fonts',
           src: ['*.{eot,svg,ttf,woff,woff2}'],
           dest: '<%= pkg.gruntConfig.cockpitBuildTarget %>/fonts/'
         },
