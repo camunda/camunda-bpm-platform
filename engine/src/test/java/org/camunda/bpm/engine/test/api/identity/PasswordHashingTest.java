@@ -36,38 +36,36 @@ import static org.hamcrest.core.IsNot.not;
 
 public class PasswordHashingTest {
 
-  @ClassRule
-  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
-      configuration.setSaltGenerator(new Default16ByteSaltGenerator());
-      configuration.setPasswordEncryptor(new Sha512HashDigest());
-      configuration.setCustomPasswordChecker(Collections.<PasswordEncryptor>emptyList());
-      return configuration;
-    }
-  };
-
-  protected static ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
+  protected static ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected static ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
   public ExpectedException thrown = ExpectedException.none();
 
+  @Rule
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
+
   protected final static String PASSWORD = "password";
   protected final static String USER_NAME = "johndoe";
   protected final static String ALGORITHM_NAME = "awesome";
 
-  @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
-
   protected IdentityService identityService;
   protected RuntimeService runtimeService;
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
+
+  protected PasswordEncryptor camundaDefaultEncryptor;
+  protected List<PasswordEncryptor> camundaDefaultPasswordChecker;
+  protected SaltGenerator camundaDefaultSaltGenerator;
+
 
   @Before
   public void initialize() {
     runtimeService = engineRule.getRuntimeService();
     identityService = engineRule.getIdentityService();
     processEngineConfiguration = engineRule.getProcessEngineConfiguration();
+    camundaDefaultEncryptor = processEngineConfiguration.getPasswordEncryptor();
+    camundaDefaultPasswordChecker = processEngineConfiguration.getCustomPasswordChecker();
+    camundaDefaultSaltGenerator = processEngineConfiguration.getSaltGenerator();
   }
 
   @After
@@ -84,8 +82,8 @@ public class PasswordHashingTest {
   }
 
   protected void resetEngineConfiguration() {
-    processEngineConfiguration.setSaltGenerator(new Default16ByteSaltGenerator());
-    setDefaultEncryptor(new Sha512HashDigest());
+    setEncryptors(camundaDefaultEncryptor, camundaDefaultPasswordChecker);
+    processEngineConfiguration.setSaltGenerator(camundaDefaultSaltGenerator);
   }
 
   @Test
