@@ -10,9 +10,10 @@ module.exports = [
       var processInstance = $scope.processInstance;
 
       // filter
+      $scope.filter = parseFilterFromUri();
       processData.provide('filter', parseFilterFromUri());
 
-      processData.observe([ 'filter', 'instanceIdToInstanceMap', 'activityIdToInstancesMap'], autoCompleteFilter);
+      processData.observe(['filter', 'instanceIdToInstanceMap', 'activityIdToInstancesMap'], autoCompleteFilter);
 
       $scope.$on('$locationChangeSuccess', function() {
         var newFilter = parseFilterFromUri($scope.filter);
@@ -93,7 +94,6 @@ module.exports = [
             // if filter has been changed from outside this component,
             // newFilter is different from cached filter
             externalUpdate = newFilter !== $scope.filter,
-            changed,
             completedFilter,
             replace = newFilter.replace;
 
@@ -106,7 +106,6 @@ module.exports = [
 
           if (idx === -1) {
             activityIds.push(activityId);
-            changed = true;
           }
         });
 
@@ -130,7 +129,6 @@ module.exports = [
 
             if (!foundOne) {
               activityInstanceIds = activityInstanceIds.concat(instanceIds);
-              changed = true;
             }
           }
         });
@@ -154,7 +152,6 @@ module.exports = [
 
           if (newScrollTo !== scrollToBpmnElement) {
             scrollToBpmnElement = newScrollTo;
-            changed = true;
           }
         }
 
@@ -165,13 +162,11 @@ module.exports = [
           page: page
         };
 
-        changed = !angular.equals(completedFilter, newFilter);
-
         // update filter only if actual changes happened above
         // (auto completion took place)
-        if (changed) {
+        if (!angular.equals(completedFilter, $scope.filter)) {
           // update cached filters
-          $scope.filter =  completedFilter;
+          $scope.filter = completedFilter;
 
           // notify external components of filter change
           processData.set('filter', $scope.filter);
