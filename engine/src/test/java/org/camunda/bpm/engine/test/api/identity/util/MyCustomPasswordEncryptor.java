@@ -16,22 +16,26 @@ import org.camunda.bpm.engine.impl.digest.PasswordEncryptor;
 
 public class MyCustomPasswordEncryptor implements PasswordEncryptor {
 
-  public static final String PASSWORD = "xxx";
-  public static final String NAME = "algoName";
+  protected String password;
+  protected String algorithmName;
 
+  public MyCustomPasswordEncryptor(String password, String algorithmName) {
+    this.password = password;
+    this.algorithmName = algorithmName;
+  }
 
   @Override
   public String encrypt(String password) {
-    return PASSWORD;
+    return "xxx";
   }
 
   @Override
   public boolean check(String password, String encrypted) {
-    return password.equals(PASSWORD);
+    return password.equals(this.password);
   }
 
   @Override
   public String hashAlgorithmName() {
-    return NAME;
+    return algorithmName;
   }
 }

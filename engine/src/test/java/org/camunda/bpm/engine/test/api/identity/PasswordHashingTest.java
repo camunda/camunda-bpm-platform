@@ -22,10 +22,7 @@ import org.camunda.bpm.engine.test.api.identity.util.*;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
@@ -39,24 +36,28 @@ import static org.hamcrest.core.IsNot.not;
 
 public class PasswordHashingTest {
 
-  protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
+  @ClassRule
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
     public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
       configuration.setSaltGenerator(new Default16ByteSaltGenerator());
+      configuration.setPasswordEncryptor(new Sha512HashDigest());
+      configuration.setCustomPasswordChecker(Collections.<PasswordEncryptor>emptyList());
       return configuration;
     }
   };
 
-  protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
-  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
+  protected static ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
+  protected static ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
   public ExpectedException thrown = ExpectedException.none();
 
   protected final static String PASSWORD = "password";
   protected final static String USER_NAME = "johndoe";
+  protected final static String ALGORITHM_NAME = "awesome";
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(testRule);
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
   protected IdentityService identityService;
   protected RuntimeService runtimeService;
@@ -70,17 +71,27 @@ public class PasswordHashingTest {
   }
 
   @After
-  public void removeAllUser() {
+  public void cleanUp() {
+    removeAllUser();
+    resetEngineConfiguration();
+  }
+
+  protected void removeAllUser() {
     List<User> list = identityService.createUserQuery().list();
     for (User user : list) {
       identityService.deleteUser(user.getId());
     }
   }
 
+  protected void resetEngineConfiguration() {
+    processEngineConfiguration.setSaltGenerator(new Default16ByteSaltGenerator());
+    setDefaultEncryptor(new Sha512HashDigest());
+  }
+
   @Test
   public void saltHashingOnHashedPasswordWithoutSaltThrowsNoError() {
     // given
-    processEngineConfiguration.setSaltGenerator(new MyNullSaltGenerator());
+    processEngineConfiguration.setSaltGenerator(new MyConstantSaltGenerator(null));
     User user = identityService.newUser(USER_NAME);
     user.setPassword(PASSWORD);
 
@@ -111,7 +122,7 @@ public class PasswordHashingTest {
   public void ensurePasswordIsCorrectlyHashedWithSHA1() {
     // given
     setDefaultEncryptor(new ShaHashDigest());
-    processEngineConfiguration.setSaltGenerator(new MyConstantSaltGenerator());
+    processEngineConfiguration.setSaltGenerator(new MyConstantSaltGenerator("12345678910"));
     User user = identityService.newUser(USER_NAME);
     user.setPassword(PASSWORD);
     identityService.saveUser(user);
@@ -127,7 +138,7 @@ public class PasswordHashingTest {
   @Test
   public void ensurePasswordIsCorrectlyHashedWithSHA512() {
     // given
-    processEngineConfiguration.setSaltGenerator(new MyConstantSaltGenerator());
+    processEngineConfiguration.setSaltGenerator(new MyConstantSaltGenerator("12345678910"));
     User user = identityService.newUser(USER_NAME);
     user.setPassword(PASSWORD);
     identityService.saveUser(user);
@@ -164,20 +175,20 @@ public class PasswordHashingTest {
     User user = identityService.newUser(USER_NAME);
     user.setPassword(PASSWORD);
     identityService.saveUser(user);
+    user = identityService.createUserQuery().userId(USER_NAME).singleResult();
 
     // then
     thrown.expect(PasswordEncryptionException.class);
     thrown.expectMessage("Could not resolve hash algorithm name of a hashed password");
 
     // when
-    user = identityService.createUserQuery().userId(USER_NAME).singleResult();
     identityService.checkPassword(user.getId(), PASSWORD);
   }
 
   @Test
   public void plugInCustomPasswordEncryptor() {
     // given
-    setEncryptors(new MyCustomPasswordEncryptor(), Collections.<PasswordEncryptor>emptyList());
+    setEncryptors(new MyCustomPasswordEncryptor(PASSWORD, ALGORITHM_NAME), Collections.<PasswordEncryptor>emptyList());
     User user = identityService.newUser(USER_NAME);
     user.setPassword(PASSWORD);
     identityService.saveUser(user);
@@ -186,27 +197,28 @@ public class PasswordHashingTest {
     user = identityService.createUserQuery().userId(USER_NAME).singleResult();
 
     // then
-    assertThat(user.getPassword(), is("{" + MyCustomPasswordEncryptor.NAME + "}" + MyCustomPasswordEncryptor.PASSWORD));
+    assertThat(user.getPassword(), is("{" + ALGORITHM_NAME + "}xxx"));
   }
 
   @Test
   public void useSeveralCustomEncryptors() {
 
     // given three users with different hashed passwords
-    processEngineConfiguration.setSaltGenerator(new MyConstantSaltGenerator());
+    processEngineConfiguration.setSaltGenerator(new MyConstantSaltGenerator("12345678910"));
 
     String userName1 = "Kermit";
-    createUserWithEncryptor(userName1, new MyCustomPasswordEncryptor());
+    createUserWithEncryptor(userName1, new MyCustomPasswordEncryptor(PASSWORD, ALGORITHM_NAME));
 
     String userName2 = "Fozzie";
-    createUserWithEncryptor(userName2, new MyCustomPasswordEncryptor2());
+    String anotherAlgorithmName = "marvelousAlgorithm";
+    createUserWithEncryptor(userName2, new MyCustomPasswordEncryptor(PASSWORD, anotherAlgorithmName));
 
     String userName3 = "Gonzo";
     createUserWithEncryptor(userName3, new ShaHashDigest());
 
     List<PasswordEncryptor> additionalEncryptorsForPasswordChecking = new LinkedList<PasswordEncryptor>();
-    additionalEncryptorsForPasswordChecking.add(new MyCustomPasswordEncryptor());
-    additionalEncryptorsForPasswordChecking.add(new MyCustomPasswordEncryptor2());
+    additionalEncryptorsForPasswordChecking.add(new MyCustomPasswordEncryptor(PASSWORD, ALGORITHM_NAME));
+    additionalEncryptorsForPasswordChecking.add(new MyCustomPasswordEncryptor(PASSWORD, anotherAlgorithmName));
     PasswordEncryptor defaultEncryptor = new ShaHashDigest();
     setEncryptors(defaultEncryptor, additionalEncryptorsForPasswordChecking);
 
@@ -216,8 +228,8 @@ public class PasswordHashingTest {
     User user3 = identityService.createUserQuery().userId(userName3).singleResult();
 
     // then
-    assertThat(user1.getPassword(), is("{algoName}xxx"));
-    assertThat(user2.getPassword(), is("{algoName2}xxx"));
+    assertThat(user1.getPassword(), is("{" + ALGORITHM_NAME + "}xxx"));
+    assertThat(user2.getPassword(), is("{" + anotherAlgorithmName + "}xxx"));
     assertThat(user3.getPassword(), is("{SHA}n3fE9/7XOmgD3BkeJlC+JLyb/Qg="));
   }
 

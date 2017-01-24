@@ -16,8 +16,14 @@ import org.camunda.bpm.engine.impl.digest.Default16ByteSaltGenerator;
 
 public class MyConstantSaltGenerator extends Default16ByteSaltGenerator {
 
+  protected String salt;
+
+  public MyConstantSaltGenerator(String salt) {
+    this.salt = salt;
+  }
+
   @Override
   public String generateSalt() {
-    return "12345678910";
+    return salt;
   }
 }

@@ -7,7 +7,7 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin;
 import org.camunda.bpm.engine.impl.digest.ShaHashDigest;
-import org.camunda.bpm.engine.test.api.identity.util.MyNullSaltGenerator;
+import org.camunda.bpm.engine.test.api.identity.util.MyConstantSaltGenerator;
 
 /**
  * @author Simon Jonischkeit
@@ -30,7 +30,7 @@ public class TestDbIdentityServiceProviderPlugin implements ProcessEnginePlugin 
 
   @Override
   public void postInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    processEngineConfiguration.setSaltGenerator(new MyNullSaltGenerator());
+    processEngineConfiguration.setSaltGenerator(new MyConstantSaltGenerator(""));
   }
 
   @Override

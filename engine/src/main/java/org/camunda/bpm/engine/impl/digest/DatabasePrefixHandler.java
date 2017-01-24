@@ -25,7 +25,7 @@ import java.util.regex.Pattern;
  */
 public class DatabasePrefixHandler {
 
-  Pattern pattern = Pattern.compile("^(\\{(.*?)\\})");
+  protected Pattern pattern = Pattern.compile("^\\{(.*?)\\}");
 
   public String generatePrefix(String algorithmName){
     return "{" + algorithmName + "}";
@@ -34,7 +34,7 @@ public class DatabasePrefixHandler {
   public String retrieveAlgorithmName(String encryptedPasswordWithPrefix) {
     Matcher matcher = pattern.matcher(encryptedPasswordWithPrefix);
     if(matcher.find()){
-      return matcher.group(2);
+      return matcher.group(1);
     }
     return null;
   }
