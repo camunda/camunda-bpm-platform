@@ -8,7 +8,6 @@ module.exports = function(config, browserifyConfig) {
         debug: true
       },
       watch: true,
-      transform: ['brfs'],
       postBundleCB: function(err, src, next) {
 
         console.log('post bundling', err);

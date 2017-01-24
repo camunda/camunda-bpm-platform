@@ -1,4 +1,5 @@
 var child_process = require('child_process');
+var fs = require('fs');
 
 module.exports = function(grunt) {
   'use strict';
@@ -228,22 +229,32 @@ grunt.registerTask('build', function(mode, app) {
   });
 
   grunt.registerTask('ensureSelenium', function() {
-
     // set correct webdriver version
-    require('fs').writeFileSync('node_modules/grunt-protractor-runner/node_modules/protractor/config.json',
-'    {\n'+
-'      "webdriverVersions": {\n' +
-'        "selenium": "2.47.1",\n' +
-'        "chromedriver": "2.24",\n' +
-'        "iedriver": "2.47.0"\n' +
-'      }\n' +
-'    }'
+    var done,
+        path;
+
+    if(fs.existsSync('node_modules/grunt-protractor-runner/node_modules/protractor/config.json')) {
+      // npm 2
+      path = 'node_modules/grunt-protractor-runner/node_modules/protractor/';
+    } else if(fs.existsSync('node_modules/protractor/config.json')) {
+      // npm 3+
+      path = 'node_modules/protractor/';
+    }
+
+    fs.writeFileSync(path + 'config.json',
+      '    {\n'+
+      '      "webdriverVersions": {\n' +
+      '        "selenium": "2.47.1",\n' +
+      '        "chromedriver": "2.24",\n' +
+      '        "iedriver": "2.47.0"\n' +
+      '      }\n' +
+      '    }'
     );
 
     // async task
-    var done = this.async();
+    done = this.async();
 
-    child_process.execFile('node', [__dirname + '/node_modules/grunt-protractor-runner/node_modules/protractor/bin/webdriver-manager', '--chrome', 'update'], function(err) {
+    child_process.execFile('node', [__dirname + '/' + path + 'bin/webdriver-manager', '--chrome', 'update'], function(err) {
       done();
     });
   });

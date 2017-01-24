@@ -106,7 +106,7 @@ module.exports = function(config, copyConf) {
         },
         {
           expand: true,
-          cwd: '<%= pkg.gruntConfig.commonsUiDir %>/node_modules/bootstrap/fonts',
+          cwd: 'node_modules/bootstrap/fonts',
           src: ['**'],
           dest: '<%= pkg.gruntConfig.tasklistBuildTarget %>/fonts/'
         },
@@ -119,7 +119,7 @@ module.exports = function(config, copyConf) {
         // bpmn fonts
         {
           expand: true,
-          cwd: '<%= pkg.gruntConfig.commonsUiDir %>/node_modules/bpmn-font/dist/font',
+          cwd: 'node_modules/bpmn-font/dist/font',
           src: [
             '*.{eot,ttf,svg,woff}'
           ],
