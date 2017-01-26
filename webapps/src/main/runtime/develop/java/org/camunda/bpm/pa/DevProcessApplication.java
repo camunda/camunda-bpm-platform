@@ -11,12 +11,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.camunda.bpm.admin.impl.web.SetupResource;
 import org.camunda.bpm.application.PostDeploy;
 import org.camunda.bpm.application.ProcessApplication;
 import org.camunda.bpm.application.impl.ServletProcessApplication;
 import org.camunda.bpm.engine.CaseService;
+import org.camunda.bpm.engine.ExternalTaskService;
+import org.camunda.bpm.engine.externaltask.ExternalTask;
+import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
@@ -243,6 +248,73 @@ public class DevProcessApplication extends ServletProcessApplication {
         ((ProcessEngineImpl) engine).getProcessEngineConfiguration().getJobExecutor().start();
       }
     }.start();
+
+    createExternalTaskDemoData(engine);
+  }
+
+  private void createExternalTaskDemoData(ProcessEngine engine) {
+    RuntimeService runtimeService = engine.getRuntimeService();
+    ExternalTaskService externalTaskService = engine.getExternalTaskService();
+    String workerId = "AWorker";
+    String topicName = "ATopic";
+    long lockDuration = 5 * 60L * 1000L;
+    String errorDetails = "java.lang.RuntimeException: A exception message!\n" +
+      "  at org.camunda.bpm.pa.service.FailingDelegate.execute(FailingDelegate.java:10)\n" +
+      "  at org.camunda.bpm.engine.impl.delegate.JavaDelegateInvocation.invoke(JavaDelegateInvocation.java:34)\n" +
+      "  at org.camunda.bpm.engine.impl.delegate.DelegateInvocation.proceed(DelegateInvocation.java:37)\n" +
+      "  ...\n";
+
+
+    // create 5 tasks
+    for(int i=0; i<5; i++) {
+      runtimeService.startProcessInstanceByKey("SimpleExternalTaskProcess");
+    }
+
+    // complete two tasks
+    List<LockedExternalTask> lockedTasks = externalTaskService.fetchAndLock(2, workerId, false)
+      .topic(topicName, lockDuration)
+      .execute();
+    for(LockedExternalTask task: lockedTasks){
+      externalTaskService.complete(task.getId(), workerId);
+    }
+
+    // fail the remaining 3 tasks
+    lockedTasks = externalTaskService.fetchAndLock(3, workerId, false)
+      .topic(topicName, lockDuration)
+      .execute();
+    for(LockedExternalTask task: lockedTasks){
+      externalTaskService.handleFailure(task.getId(), workerId, "This is an error!", errorDetails, 0, 0L);
+    }
+
+    // create 2 more tasks
+    for(int i=0; i<2; i++) {
+      runtimeService.startProcessInstanceByKey("SimpleExternalTaskProcess");
+    }
+
+    // fail them and then complete them
+    lockedTasks = externalTaskService.fetchAndLock(2, workerId, false)
+      .topic(topicName, lockDuration)
+      .execute();
+    for(LockedExternalTask task: lockedTasks){
+      externalTaskService.handleFailure(task.getId(), workerId, "This is an error!", errorDetails, 1, 0L);
+    }
+    lockedTasks = externalTaskService.fetchAndLock(2, workerId, false)
+      .topic(topicName, lockDuration)
+      .execute();
+    for(LockedExternalTask task: lockedTasks){
+      externalTaskService.complete(task.getId(), workerId);
+    }
+
+    // create 6 more tasks
+    List<ProcessInstance> piList = new LinkedList<ProcessInstance>();
+    for(int i=0; i<6; i++) {
+      piList.add(runtimeService.startProcessInstanceByKey("SimpleExternalTaskProcess"));
+    }
+
+    // delete two of them
+    runtimeService.deleteProcessInstance(piList.get(0).getId(), "This process was annoying!");
+    runtimeService.deleteProcessInstance(piList.get(1).getId(), "This process was annoying!");
+
   }
 
   private void createAdminDemoData(ProcessEngine engine) throws Exception {
