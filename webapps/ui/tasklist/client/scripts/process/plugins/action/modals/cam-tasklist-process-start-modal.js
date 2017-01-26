@@ -168,6 +168,7 @@ module.exports = [
     // start a process view /////////////////////////////////////////////////////////////////
 
     $scope.$invalid = true;
+    $scope.requestInProgress = false;
 
     $scope.$on('embedded.form.rendered', function() {
       $timeout(function() {
@@ -180,6 +181,7 @@ module.exports = [
 
     $scope.back = function() {
       $scope.$invalid = true;
+      $scope.requestInProgress = false;
       $scope.PROCESS_TO_START_SELECTED = false;
       $scope.options = DEFAULT_OPTIONS;
       processStartData.set('currentProcessDefinitionId', { id: null });
@@ -205,6 +207,7 @@ module.exports = [
     // will be called when the form has been submitted
     $scope.completionCallback = function(err, result) {
       if (err) {
+        $scope.requestInProgress = false;
         return errorNotification('PROCESS_START_ERROR', err);
       }
 
@@ -226,6 +229,7 @@ module.exports = [
 
     // will be triggered when the user select on 'Start'
     $scope.startProcessInstance = function() {
+      $scope.requestInProgress = true;
       $scope.triggerOnStart();
     };
 
