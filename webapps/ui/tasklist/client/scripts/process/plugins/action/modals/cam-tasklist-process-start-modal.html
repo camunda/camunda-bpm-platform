@@ -130,7 +130,7 @@
 
       <button class="btn btn-primary"
               type="submit"
-              ng-disabled="$invalid"
+              ng-disabled="$invalid || requestInProgress"
               ng-click="startProcessInstance()">
         {{ 'START' | translate }}
       </button>
