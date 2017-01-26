@@ -17,7 +17,9 @@
         return;
       }
 
-      var x = duration / 1000;
+      var x = duration;
+      var milliseconds = Math.floor(x % 1000);
+      x /= 1000;
       var seconds = Math.floor(x % 60);
       x /= 60;
       var minutes = Math.floor(x % 60);
@@ -32,6 +34,10 @@
       addValue(hours, 'hour', result);
       addValue(minutes, 'minute', result);
       addValue(seconds, 'second', result);
+
+      if (result.length === 0) {
+        addValue(milliseconds, 'millisecond', result);
+      }
 
       return result.join(', ');
 
