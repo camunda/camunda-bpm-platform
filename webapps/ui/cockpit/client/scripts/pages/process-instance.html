@@ -182,19 +182,10 @@
       <div class="ctn-row ctn-content-bottom ctn-tabbed">
         <a class="show-collapsable vertical-collapse"
            title="Hide tabs"></a>
-        <div ng-show="processInstanceTabs.length">
-          <ul class="nav nav-tabs">
-            <li ng-class="{ active: selectedTab == tabProvider }"
-                ng-repeat="tabProvider in processInstanceTabs">
-              <a href
-                 ng-click="selectTab(tabProvider)">{{ tabProvider.label }}</a>
-            </li>
-          </ul>
-
-          <div class="ctn-tabbed-content ctn-scroll">
-            <view provider="selectedTab"
-                  vars="processInstanceVars" />
-          </div>
+        <div cam-tabs="{component: 'cockpit.processInstance.runtime.tab'}"
+             providers="tabs"
+             vars="processInstanceVars"
+             vars-values="initData">
         </div>
       </div>
 

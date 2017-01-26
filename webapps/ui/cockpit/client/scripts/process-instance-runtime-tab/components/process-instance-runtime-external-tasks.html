@@ -1,0 +1,38 @@
+<!-- # EE - src/main/resources-plugin/cockpit/external-tasks/process-instance-runtime-tab/components/process-instance-runtime-external-tasks.html -->
+<div cam-widget-loader
+     loading-state="{{ RuntimeTab.loadingState }}"
+     text-empty="No external tasks for this process instance">
+  <table class="history-job-log cam-table">
+    <thead>
+      <tr>
+        <th class="state">External Task ID</th>
+        <th class="activity">Activity ID</th>
+        <th class="retries">Retries</th>
+        <th class="worker-id">Worker ID</th>
+        <th class="expiration">Lock Expiration Time</th>
+        <th class="topic">Topic</th>
+        <th class="priority">Priority</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="task in RuntimeTab.tasks track by task.id">
+        <td class="state"
+            cam-widget-clipboard="task.id">{{task.id}}</td>
+        <td class="activity">
+          <span external-task-activity-link="task.activityId">
+          </span>
+        </td>
+        <td class="retries">{{task.retries}}</td>
+        <td class="worker-id">{{task.workerId}}</td>
+        <td class="expiration">{{task.lockExpirationTime}}</td>
+        <td class="topic">{{task.topicName}}</td>
+        <td class="priority">{{task.priority}}</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <div cam-pagination="RuntimeTab.onPaginationChange(pages)" total="RuntimeTab.total" >
+  </div>
+</div>
+<!-- / EE - src/main/resources-plugin/cockpit/external-tasks/process-instance-runtime-tab/components/process-instance-runtime-external-tasks.html -->

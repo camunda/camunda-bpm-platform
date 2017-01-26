@@ -11,7 +11,9 @@ module.exports = function() {
     controller: 'CamTabsController as Tabs',
     scope: {
       providerParams: '=camTabs',
-      tabsApi: '='
+      tabsApi: '=?',
+      vars: '=?',
+      varsValues: '=?'
     }
   };
 };

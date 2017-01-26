@@ -29,7 +29,8 @@ module.exports = function(pluginDependencies) {
     require('./pages/main').name,
     require('./resources/main').name,
     require('./services/main').name,
-    require('./navigation/main').name
+    require('./navigation/main').name,
+    require('./process-instance-runtime-tab').name
   ].concat(pluginDependencies.map(function(el) {
     return el.ngModuleName;
   }));

@@ -9,13 +9,21 @@ function CamTabs($scope, search, Views) {
   this.selected = this.providers[0];
   this.search = search;
 
-  this.vars = {
-    read: ['tabsApi']
-  };
+  this.initializeVars($scope);
 
   $scope.$on('$locationChangeSuccess', this.onLocationChange.bind(this));
   this.onLocationChange();
 }
+
+CamTabs.prototype.initializeVars = function($scope) {
+  this.vars = $scope.vars || {
+    read: ['tabsApi']
+  };
+
+  if ($scope.varsValues) {
+    angular.extend($scope, $scope.varsValues);
+  }
+};
 
 CamTabs.prototype.getProviders = function(Views, $scope) {
   return Views

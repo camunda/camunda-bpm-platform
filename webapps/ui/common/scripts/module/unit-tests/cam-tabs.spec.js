@@ -12,6 +12,8 @@ var module = angular.mock.module;
 var inject = angular.mock.inject;
 
 describe('cam-common CamTabsController', function() {
+  var $controller;
+  var $rootScope;
   var $scope;
   var providers;
   var Views;
@@ -21,7 +23,9 @@ describe('cam-common CamTabsController', function() {
 
   beforeEach(module(drdCommon.name));
 
-  beforeEach(inject(function($controller, $rootScope) {
+  beforeEach(inject(function(_$controller_, _$rootScope_) {
+    $controller = _$controller_;
+    $rootScope = _$rootScope_;
     $scope = $rootScope.$new();
     $scope.providerParams = 'providerParams';
     $scope.tabsApi = 'tabsApi';
@@ -74,6 +78,32 @@ describe('cam-common CamTabsController', function() {
     expect($scope.tabsApi).to.eql('tabsApi');
     expect(instance.vars).to.eql({
       read: ['tabsApi']
+    });
+  });
+
+  describe('alternative vars initialization', function() {
+    beforeEach(function() {
+      $scope = $rootScope.$new();
+
+      $scope.providerParams = 'providerParams';
+      $scope.vars = ['a'];
+      $scope.varsValues = {
+        a: 1
+      };
+
+      instance = $controller('CamTabsController', {
+        $scope: $scope,
+        Views: Views,
+        search: search
+      });
+    });
+
+    it('should be possible to override vars from scope', function() {
+      expect(instance.vars).to.eql($scope.vars);
+    });
+
+    it('should copy varsValues to scope', function() {
+      expect($scope.a).to.eql($scope.varsValues.a);
     });
   });
 

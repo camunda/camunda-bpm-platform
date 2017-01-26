@@ -223,11 +223,8 @@ var Controller = [
     }]);
 
     // /////// End definition of process data
+    integrateActivityInstanceFilter($scope, angular.noop);
 
-    integrateActivityInstanceFilter($scope, function(tabs) {
-      pageData.set('activeTab', getDefaultTab(tabs));
-    });
-    
     // /////// Begin usage of definied process data
 
     $scope.processDefinition = processData.observe('processDefinition', function(processDefinition) {
@@ -443,7 +440,6 @@ var Controller = [
     };
 
     $scope.handleActivityInstanceSelection = function(id, activityId, $event) {
-
       if (!id) {
         processData.set('filter', {});
         return;
@@ -504,14 +500,12 @@ var Controller = [
     };
 
     $scope.orderChildrenBy = function() {
-
       return function(elem) {
         var id = elem.id,
             idx = id.indexOf(':');
 
         return idx !== -1 ? id.substr(idx + 1, id.length) : id;
       };
-
     };
 
     $scope.$on('$routeChangeStart', function() {
@@ -519,7 +513,6 @@ var Controller = [
     });
 
     $scope.processInstanceVars = { read: [ 'processInstance', 'processData', 'filter', 'pageData' ] };
-    var processInstanceTabs = Views.getProviders({ component: 'cockpit.processInstance.runtime.tab' });
 
     $scope.processInstanceActions = Views.getProviders({ component: 'cockpit.processInstance.runtime.action' });
 
@@ -539,63 +532,14 @@ var Controller = [
       pageData        : pageData
     };
 
+    $scope.initData = initData;
+
     for(var i = 0; i < instancePlugins.length; i++) {
       if(typeof instancePlugins[i].initialize === 'function') {
         instancePlugins[i].initialize(initData);
       }
     }
-
-    // TABS
-
-    pageData.provide('tabs', processInstanceTabs);
-
-    pageData.provide('activeTab', getDefaultTab(processInstanceTabs));
-
-    pageData.observe(['tabs'], function(tabs) {
-      $scope.processInstanceTabs = tabs;
-      pageData.set('activeTab', getDefaultTab(tabs));
-    });
-
-    pageData.observe('activeTab', function(activeTab) {
-      $scope.selectedTab = activeTab;
-
-      var replace = !search().detailsTab;
-
-      search.updateSilently({
-        detailsTab: activeTab && activeTab.id || null
-      });
-
-      if (replace) {
-        $location.replace();
-      }
-
-    });
-
-    $scope.selectTab = function(tabProvider) {
-      pageData.set('activeTab', tabProvider);
-    };
-
-    function getDefaultTab(tabs) {
-      var selectedTabId = search().detailsTab;
-
-      if (!tabs || !tabs.length) {
-        return;
-      }
-
-      if (selectedTabId) {
-        var provider = Views.getProvider({ component: 'cockpit.processInstance.runtime.tab', id: selectedTabId });
-
-        if (provider && tabs.indexOf(provider) != -1) {
-          return provider;
-        }
-      }
-
-      return tabs[0];
-    }
-
   }];
-
-
 
 ngModule
     .controller('ProcessInstanceFilterController', [
