@@ -18,11 +18,14 @@ import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.rest.IdentityRestService;
+import org.camunda.bpm.engine.rest.dto.identity.BasicUserCredentialsDto;
 import org.camunda.bpm.engine.rest.dto.task.GroupDto;
 import org.camunda.bpm.engine.rest.dto.task.GroupInfoDto;
 import org.camunda.bpm.engine.rest.dto.task.UserDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.security.auth.AuthenticationResult;
 
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -60,6 +63,20 @@ public class IdentityRestServiceImpl extends AbstractRestProcessEngineAware impl
     }
 
     return new GroupInfoDto(allGroups, allGroupUsers);
+  }
+
+  @Override
+  public AuthenticationResult verifyUser(BasicUserCredentialsDto credentialsDto) {
+    if (credentialsDto.getUsername() == null || credentialsDto.getPassword() == null) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, "Username and password are required");
+    }
+    IdentityService identityService = getProcessEngine().getIdentityService();
+    boolean valid = identityService.checkPassword(credentialsDto.getUsername(),credentialsDto.getPassword());
+    if (valid) {
+      return AuthenticationResult.successful(credentialsDto.getUsername());
+    } else {
+      return AuthenticationResult.unsuccessful(credentialsDto.getUsername());
+    }
   }
 
 }

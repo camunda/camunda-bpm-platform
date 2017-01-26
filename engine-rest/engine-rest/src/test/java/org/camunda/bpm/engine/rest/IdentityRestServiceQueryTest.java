@@ -17,6 +17,8 @@ import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.identity.UserQuery;
+import org.camunda.bpm.engine.rest.dto.identity.BasicUserCredentialsDto;
+import org.camunda.bpm.engine.rest.dto.identity.GroupDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
@@ -28,11 +30,14 @@ import com.jayway.restassured.http.ContentType;
 
 public class IdentityRestServiceQueryTest extends AbstractRestServiceTest {
 
+  protected static final String TEST_USERNAME = "testUsername";
+  protected static final String TEST_PASSWORD = "testPassword";
   @ClassRule
   public static TestContainerRule rule = new TestContainerRule();
 
   protected static final String IDENTITY_URL = TEST_RESOURCE_ROOT_PATH + "/identity";
   protected static final String TASK_GROUPS_URL = IDENTITY_URL + "/groups";
+  protected static final String VERIFY_USER_URL = IDENTITY_URL + "/verify";
 
   private User mockUser;
 
@@ -87,5 +92,32 @@ public class IdentityRestServiceQueryTest extends AbstractRestServiceTest {
     .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
     .body("message", equalTo("No user id was supplied"))
     .when().get(TASK_GROUPS_URL);
+  }
+
+  @Test
+  public void verifyUserWithMissingParameter () {
+    given()
+        .body(new BasicUserCredentialsDto()).contentType(ContentType.JSON).
+    expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", equalTo("Username and password are required"))
+        .when().post(VERIFY_USER_URL);
+  }
+
+  @Test
+  public void verifyUser () {
+    when(processEngine.getIdentityService()
+        .checkPassword(TEST_USERNAME, TEST_PASSWORD))
+    .thenReturn(true);
+
+    BasicUserCredentialsDto userCredentialsDto = new BasicUserCredentialsDto();
+    userCredentialsDto.setUsername(TEST_USERNAME);
+    userCredentialsDto.setUsername(TEST_PASSWORD);
+    given()
+        .body(userCredentialsDto).contentType(ContentType.JSON).
+    expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", equalTo("Username and password are required"))
+        .when().post(VERIFY_USER_URL);
   }
 }
