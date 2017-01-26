@@ -101,7 +101,7 @@ public class DeploymentDto extends LinkableDto {
     }
 
     List<DecisionDefinition> deployedDecisionDefinitions = deployment.getDeployedDecisionDefinitions();
-    if (deployedCaseDefinitions != null) {
+    if (deployedDecisionDefinitions != null) {
       dto.deployedDecisionDefinitions = new ArrayList<DecisionDefinitionDto>();
       for (DecisionDefinition decisionDefinition : deployedDecisionDefinitions) {
         dto.deployedDecisionDefinitions.add(DecisionDefinitionDto.fromDecisionDefinition(decisionDefinition));
