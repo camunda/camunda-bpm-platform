@@ -11,6 +11,8 @@
         "Failure",
   "FINISHED":
         "Finished",
+  "DISMISS":
+        "Dismiss",
   "INIT_GROUPS_FAILURE":
         "Loading the groups of the selected task failed. Try to refresh the page to try again.",
   "ADD_GROUP_FAILED":

@@ -20,6 +20,10 @@ module.exports = [ function() {
       '$q',
       '$location',
       '$translate',
+      // not using $timeout here (although it would be better) because... well... i'd rather not give my opinion
+      // https://github.com/angular/protractor/blob/master/docs/timeouts.md#waiting-for-angular
+      '$interval',
+      'camAPI',
       'Notifications',
       'Views',
       'search',
@@ -28,6 +32,8 @@ module.exports = [ function() {
         $q,
         $location,
         $translate,
+        $interval,
+        camAPI,
         Notifications,
         Views,
         search
@@ -230,6 +236,66 @@ module.exports = [ function() {
           setDefaultTaskDetailTab($scope.taskDetailTabs);
         });
 
+
+
+
+
+
+
+
+
+
+        var stop;
+        var taskResource = camAPI.resource('task');
+
+        $scope.dismissTask = function(notification) {
+          clearTask(true);
+          Notifications.clear(notification.status);
+        };
+
+        function removedNotification(src) {
+          $translate(src).then(function(status) {
+            $translate('DISMISS').then(function(dismiss) {
+              Notifications.addMessage({
+                type: 'warning',
+                status: status,
+                unsafe: true,
+                message: '<a href class="dismiss" ng-click="notification.scope.dismissTask(notification)">' + dismiss + '</a>',
+                exclusive: true,
+                scope: $scope
+              });
+            });
+          });
+        }
+
+        function killTimeout() {
+          if (stop) {
+            $interval.cancel(stop);
+            stop = undefined;
+          }
+        }
+
+        function processPollingResponse(err) {
+          if (err) {
+            var src = enhanceErrorMessage(err.message);
+            removedNotification(src, err);
+            killTimeout();
+          }
+        }
+
+        function pollExistence() {
+          killTimeout();
+          if (!$scope.task || !$scope.task.id) {
+            return;
+          }
+          stop = $interval(function() {
+            taskResource.get($scope.task.id, processPollingResponse);
+          }, 2000);
+        }
+
+        $scope.$watch('task.id', pollExistence);
+
+        $scope.$on('$destroy', killTimeout);
       }]
   };
 }];
