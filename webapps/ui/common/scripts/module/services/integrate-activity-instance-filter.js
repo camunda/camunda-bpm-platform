@@ -19,7 +19,7 @@ module.exports = [
         var newFilter = parseFilterFromUri($scope.filter);
 
         if ($location.path().indexOf(processInstance.id) > -1) {
-          if (searchWidgetUtils.shouldUpdateFilter(newFilter, $scope.filter, ['activityIds', 'activityInstanceIds'])) {
+          if (searchWidgetUtils.shouldUpdateFilter(newFilter, $scope.filter, ['activityIds', 'activityInstanceIds', 'page'])) {
             processData.set('filter', newFilter);
           }
 
