@@ -4,9 +4,9 @@ module.exports = function() {
       .keys(query)
       .reduce(function(queryStr, key) {
         const value = query[key];
-        const part = `${key}=${encodeURIComponent(value)}`;
+        const part = key + '=' + encodeURIComponent(value);
 
-        return queryStr.length ? `${queryStr}&${part}` : part;
+        return queryStr.length ? queryStr + '&' + part : part;
       }, '');
   };
 };
