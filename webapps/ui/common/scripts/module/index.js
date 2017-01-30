@@ -8,6 +8,7 @@ var exposeScopeProperties = require('./services/expose-scope-properties');
 var loaders = require('./services/loaders');
 var integrateActivityInstanceFilter = require('./services/integrate-activity-instance-filter');
 var params = require('./services/params');
+var createListQueryFunction = require('./services/create-list-query-function');
 
 // Components
 var camToolbar = require('./components/cam-toolbar');
@@ -36,7 +37,9 @@ var searchWidgetUtils = require('../util/search-widget-utils');
 // Optional Modules
 var externalTasksCommon = require('./external-tasks-common');
 
-var ngModule = angular.module('cam-common', []);
+var ngModule = angular.module('cam-common', [
+  externalTasksCommon.name
+]);
 
 // Services
 ngModule.factory('isModuleAvailable', isModuleAvailable);
@@ -44,6 +47,7 @@ ngModule.factory('exposeScopeProperties', exposeScopeProperties);
 ngModule.factory('Loaders', loaders);
 ngModule.factory('integrateActivityInstanceFilter', integrateActivityInstanceFilter);
 ngModule.factory('params', params);
+ngModule.factory('createListQueryFunction', createListQueryFunction);
 
 // Components
 ngModule.directive('camToolbar', camToolbar);
@@ -68,8 +72,5 @@ ngModule.controller('CamTabsController', CamTabsController);
 ngModule.value('routeUtil', routeUtil);
 ngModule.value('paginationUtils', paginationUtils);
 ngModule.value('searchWidgetUtils', searchWidgetUtils);
-
-// Optional Modules
-ngModule.externalTasksCommon = externalTasksCommon;
 
 module.exports = ngModule;
