@@ -27,7 +27,6 @@ module.exports = [
       template: template,
 
       link : function($scope, $element, attrs, formController) {
-
         var container = $($element[0]).find('.form-container');
         var camForm = null;
         var form = $scope.form = {
@@ -36,7 +35,7 @@ module.exports = [
         };
 
         $scope.$watch('asynchronousFormKey', function(formInfo) {
-          if (formInfo && formInfo.loaded) {            
+          if (formInfo && formInfo.loaded) {
             showForm(container, formInfo, formController.getParams());
           }
           if (formInfo && formInfo.failure) {
@@ -65,6 +64,10 @@ module.exports = [
           delete params.processDefinitionKey;
 
           angular.extend(params, {
+            urlParams: {
+              taskId: params.taskId || null,
+              userId: $scope.$root.authentication.name
+            },
             containerElement: container,
             client: camAPI,
             formUrl: formUrl,
