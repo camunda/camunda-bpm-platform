@@ -17,6 +17,7 @@ import java.util.Collection;
 
 import org.camunda.bpm.model.bpmn.BpmnModelException;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.bpm.model.bpmn.instance.Activity;
 import org.camunda.bpm.model.bpmn.instance.BaseElement;
 import org.camunda.bpm.model.bpmn.instance.BpmnModelElementInstance;
 import org.camunda.bpm.model.bpmn.instance.CompensateEventDefinition;
@@ -25,11 +26,18 @@ import org.camunda.bpm.model.bpmn.instance.Error;
 import org.camunda.bpm.model.bpmn.instance.ErrorEventDefinition;
 import org.camunda.bpm.model.bpmn.instance.Escalation;
 import org.camunda.bpm.model.bpmn.instance.EscalationEventDefinition;
+import org.camunda.bpm.model.bpmn.instance.Event;
 import org.camunda.bpm.model.bpmn.instance.ExtensionElements;
+import org.camunda.bpm.model.bpmn.instance.FlowNode;
+import org.camunda.bpm.model.bpmn.instance.Gateway;
 import org.camunda.bpm.model.bpmn.instance.Message;
 import org.camunda.bpm.model.bpmn.instance.MessageEventDefinition;
 import org.camunda.bpm.model.bpmn.instance.Signal;
 import org.camunda.bpm.model.bpmn.instance.SignalEventDefinition;
+import org.camunda.bpm.model.bpmn.instance.SubProcess;
+import org.camunda.bpm.model.bpmn.instance.bpmndi.BpmnPlane;
+import org.camunda.bpm.model.bpmn.instance.bpmndi.BpmnShape;
+import org.camunda.bpm.model.bpmn.instance.dc.Bounds;
 
 /**
  * @author Sebastian Menski
@@ -133,7 +141,7 @@ public abstract class AbstractBaseElementBuilder<B extends AbstractBaseElementBu
     messageEventDefinition.setMessage(message);
     return messageEventDefinition;
   }
-  
+
   protected MessageEventDefinition createEmptyMessageEventDefinition() {
     return createInstance(MessageEventDefinition.class);
   }
@@ -167,12 +175,12 @@ public abstract class AbstractBaseElementBuilder<B extends AbstractBaseElementBu
     for(ErrorEventDefinition definition: definitions) {
       Error error = definition.getError();
       if(error != null && error.getErrorCode().equals(errorCode)) {
-          return definition;     
+          return definition;
       }
     }
     return null;
   }
-  
+
   protected Error findErrorForNameAndCode(String errorCode) {
     Collection<Error> errors = modelInstance.getModelElementsByType(Error.class);
     for (Error error : errors) {
@@ -252,5 +260,41 @@ public abstract class AbstractBaseElementBuilder<B extends AbstractBaseElementBu
     extensionElements.addChildElement(extensionElement);
     return myself;
   }
+
+  public void createBpmnShape(FlowNode node){
+    BpmnPlane bpmnPlane = findBpmnPlane();
+    if (bpmnPlane != null) {
+      BpmnShape bpmnShape = modelInstance.newInstance(BpmnShape.class);
+      bpmnShape.setBpmnElement(node);
+      Bounds nodeBounds = modelInstance.newInstance(Bounds.class);
+      nodeBounds.setX(0.0);
+      nodeBounds.setY(0.0);
+
+      if (node instanceof SubProcess) {
+        bpmnShape.setExpanded(true);
+        nodeBounds.setWidth(350);
+        nodeBounds.setHeight(200);
+      } else if (node instanceof Activity) {
+        nodeBounds.setWidth(100);
+        nodeBounds.setHeight(80);
+      } else if (node instanceof Event) {
+        nodeBounds.setWidth(36);
+        nodeBounds.setHeight(36);
+      } else if (node instanceof Gateway) {
+        nodeBounds.setWidth(50);
+        nodeBounds.setHeight(50);
+      }
+      bpmnShape.addChildElement(nodeBounds);
+      bpmnPlane.addChildElement(bpmnShape);
+
+    }
+  }
+
+  protected BpmnPlane findBpmnPlane() {
+    Collection<BpmnPlane> planes = modelInstance.getModelElementsByType(BpmnPlane.class);
+    return planes.iterator().next();
+  }
+
+
 
 }

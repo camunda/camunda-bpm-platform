@@ -75,6 +75,8 @@ import org.camunda.bpm.model.bpmn.impl.instance.di.StyleImpl;
 import org.camunda.bpm.model.bpmn.impl.instance.di.WaypointImpl;
 import org.camunda.bpm.model.bpmn.instance.Definitions;
 import org.camunda.bpm.model.bpmn.instance.Process;
+import org.camunda.bpm.model.bpmn.instance.bpmndi.BpmnDiagram;
+import org.camunda.bpm.model.bpmn.instance.bpmndi.BpmnPlane;
 import org.camunda.bpm.model.xml.Model;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.ModelException;
@@ -189,6 +191,15 @@ public class Bpmn {
     modelInstance.setDefinitions(definitions);
     Process process = modelInstance.newInstance(Process.class);
     definitions.addChildElement(process);
+
+    BpmnDiagram bpmnDiagram = modelInstance.newInstance(BpmnDiagram.class);
+
+    BpmnPlane bpmnPlane = modelInstance.newInstance(BpmnPlane.class);
+    bpmnPlane.setBpmnElement(process);
+
+    bpmnDiagram.addChildElement(bpmnPlane);
+    definitions.addChildElement(bpmnDiagram);
+
     return process.builder();
   }
 

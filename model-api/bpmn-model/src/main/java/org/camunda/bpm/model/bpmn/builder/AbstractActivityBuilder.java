@@ -37,6 +37,7 @@ public abstract class AbstractActivityBuilder<B extends AbstractActivityBuilder<
   public BoundaryEventBuilder boundaryEvent(String id) {
     BoundaryEvent boundaryEvent = createSibling(BoundaryEvent.class, id);
     boundaryEvent.setAttachedTo(element);
+    createBpmnShape(boundaryEvent);
     return boundaryEvent.builder();
   }
 

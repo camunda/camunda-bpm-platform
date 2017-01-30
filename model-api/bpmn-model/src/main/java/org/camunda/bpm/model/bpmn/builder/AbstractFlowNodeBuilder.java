@@ -41,6 +41,7 @@ import org.camunda.bpm.model.bpmn.instance.camunda.CamundaExecutionListener;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaFailedJobRetryTimeCycle;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 
+
 /**
  * @author Sebastian Menski
  */
@@ -90,6 +91,7 @@ public abstract class AbstractFlowNodeBuilder<B extends AbstractFlowNodeBuilder<
   private <T extends FlowNode> T createTarget(Class<T> typeClass, String identifier) {
     T target = createSibling(typeClass, identifier);
     connectTarget(target);
+    createBpmnShape(target);
     return target;
   }
 
