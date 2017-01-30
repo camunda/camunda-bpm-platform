@@ -1,0 +1,13 @@
+<!-- # EE - ui/common/scripts/module/external-tasks-common/components/external-tasks-tab.html -->
+<div cam-widget-loader
+     loading-state="{{ TasksTab.loadingState }}"
+     text-empty="No external tasks for this process instance">
+
+  <!-- transclustion target -->
+  <div ng-transclude></div>
+  <!-- / transclustion target -->
+
+  <div cam-pagination="TasksTab.onPaginationChange(pages)" total="TasksTab.total" >
+  </div>
+</div>
+<!-- / EE - ui/common/scripts/module/external-tasks-common/components/external-tasks-tab.html -->

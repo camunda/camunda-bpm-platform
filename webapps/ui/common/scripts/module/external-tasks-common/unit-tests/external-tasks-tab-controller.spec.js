@@ -10,15 +10,15 @@ require('angular-mocks');
 var module = angular.mock.module;
 var inject = angular.mock.inject;
 
-describe('cockpit.plugin.external-tasks.process-instance-runtime-tab ProcessInstanceRuntimeExternalTasksController', function() {
+describe('cam-common.external-tasks ExternalTasksTabController', function() {
   var $rootScope;
   var $q;
   var $scope;
   var processData;
   var count;
   var tasks;
-  var externalTasks;
   var instance;
+  var onLoad;
 
   beforeEach(module(testModule.name));
 
@@ -36,27 +36,19 @@ describe('cockpit.plugin.external-tasks.process-instance-runtime-tab ProcessInst
       id: 'p-instance-id-01'
     };
 
+    onLoad = sinon.stub().returns($q.when({
+      count,
+      list: tasks
+    }));
+    $scope.onLoad = onLoad;
+
     count = 20;
     tasks = ['a'];
 
-    externalTasks = {
-      getActiveExternalTasksForProcess: sinon
-        .stub()
-        .returns($q.when({
-          count: count,
-          tasks: tasks
-        }))
-    };
-
-    instance = $controller('ProcessInstanceRuntimeExternalTasksController', {
-      $scope: $scope,
-      externalTasks: externalTasks
+    instance = $controller('ExternalTasksTabController', {
+      $scope: $scope
     });
   }));
-
-  it('should expose process instance', function() {
-    expect(instance.processInstance).to.eql($scope.processInstance);
-  });
 
   it('should create new instance of data depend for $scope', function() {
     expect(processData.newChild.calledWith($scope)).to.eql(true);
@@ -187,29 +179,20 @@ describe('cockpit.plugin.external-tasks.process-instance-runtime-tab ProcessInst
       expect(instance.loadingState).to.eql('LOADING');
     });
 
-    it('should execute query to backend with process id, pagination and filterParams', function() {
-      expect(externalTasks.getActiveExternalTasksForProcess.calledWith(
-        $scope.processInstance.id,
-        pages,
-        filterParams
-      )).to.eql(true);
-    });
-
     it('should set loading state to loaded', function() {
       $rootScope.$digest();
 
       expect(instance.loadingState).to.eql('LOADED');
     });
 
-    it('should set tasks and total on instance', function() {
+    it('should set total on instance', function() {
       $rootScope.$digest();
 
-      expect(instance.tasks).to.eql(tasks);
       expect(instance.total).to.eql(count);
     });
 
     it('should set loading state to EMPTY when tasks are not returned', function() {
-      externalTasks.getActiveExternalTasksForProcess.returns(
+      onLoad.returns(
         $q.when({
           count: count
         })

@@ -10,7 +10,7 @@ require('angular-mocks');
 var module = angular.mock.module;
 var inject = angular.mock.inject;
 
-describe('cam-common.external-tasks externalTasks', function() {
+describe('cockpit.plugin.process-instance-runtime-tab.external-tasks externalTasks', function() {
   var externalTasksResource;
   var externalTasks;
   var $rootScope;
@@ -83,7 +83,7 @@ describe('cam-common.external-tasks externalTasks', function() {
     it('should return response with count and tasks', function(done) {
       promise.then(function(response) {
         expect(response.count).to.be.eql(count);
-        expect(response.tasks).to.be.eql(list);
+        expect(response.list).to.be.eql(list);
 
         done();
       });

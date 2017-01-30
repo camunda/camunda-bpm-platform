@@ -1,7 +1,6 @@
-<!-- # EE - src/main/resources-plugin/cockpit/external-tasks/process-instance-runtime-tab/components/process-instance-runtime-external-tasks.html -->
-<div cam-widget-loader
-     loading-state="{{ RuntimeTab.loadingState }}"
-     text-empty="No external tasks for this process instance">
+<!-- # CE - ui/cockpit/plugins/external-tasks-process-instance-runtime-tab/process-instance-runtime-external-tasks.html -->
+<div external-tasks-tab="RuntimeTab.onLoad(pages, params)"
+     process-data="RuntimeTab.processData">
   <table class="history-job-log cam-table">
     <thead>
       <tr>
@@ -30,9 +29,5 @@
       </tr>
     </tbody>
   </table>
-
-
-  <div cam-pagination="RuntimeTab.onPaginationChange(pages)" total="RuntimeTab.total" >
-  </div>
 </div>
-<!-- / EE - src/main/resources-plugin/cockpit/external-tasks/process-instance-runtime-tab/components/process-instance-runtime-external-tasks.html -->
+<!-- / CE - ui/cockpit/plugins/external-tasks-process-instance-runtime-tab/process-instance-runtime-external-tasks.html -->
