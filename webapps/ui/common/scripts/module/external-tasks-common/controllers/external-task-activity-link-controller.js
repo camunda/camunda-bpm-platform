@@ -8,7 +8,7 @@ module.exports = [
 ];
 
 function ExternalTaskActivityLink($scope, exposeScopeProperties, search, $location, params) {
-  exposeScopeProperties($scope, this, ['activityId']);
+  exposeScopeProperties($scope, this, ['activityId', 'bpmnElements']);
 
   this.search = search;
   this.params = params;
@@ -23,4 +23,14 @@ ExternalTaskActivityLink.prototype.getLink = function() {
   params.activityIds = this.activityId;
 
   return '#' + this.path + '?' + this.params(params);
+};
+
+ExternalTaskActivityLink.prototype.getActivityName = function() {
+  var activityId = this.activityId;
+
+  if (this.bpmnElements[activityId] && this.bpmnElements[activityId].name) {
+    return this.bpmnElements[activityId].name;
+  }
+
+  return activityId;
 };

@@ -16,6 +16,7 @@ describe('cockpit.plugin.process-instance-runtime-tab ProcessInstanceRuntimeTabC
   var $scope;
   var tasks;
   var externalTasks;
+  var observeBpmnElements;
   var instance;
 
   beforeEach(module(testModule.name));
@@ -39,11 +40,18 @@ describe('cockpit.plugin.process-instance-runtime-tab ProcessInstanceRuntimeTabC
       )
     };
 
+    observeBpmnElements = sinon.spy();
+
     instance = $controller('ProcessInstanceRuntimeTabController', {
       $scope: $scope,
-      externalTasks: externalTasks
+      externalTasks: externalTasks,
+      observeBpmnElements: observeBpmnElements
     });
   }));
+
+  it('should observe bpmn elements', function() {
+    expect(observeBpmnElements.calledWith($scope, instance)).to.eql(true);
+  });
 
   it('should expose processInstance, processData on instance', function() {
     expect(instance.processInstance).to.equal($scope.processInstance);
