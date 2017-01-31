@@ -10,7 +10,8 @@ module.exports = function() {
     template: template,
     controller: 'ExternalTaskActivityLinkController as Link',
     scope: {
-      activityId: '=externalTaskActivityLink'
+      activityId: '=externalTaskActivityLink',
+      bpmnElements: '='
     }
   };
 };

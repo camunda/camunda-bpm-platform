@@ -1,14 +1,15 @@
 'use strict';
 
 module.exports = [
-  '$scope', 'exposeScopeProperties', 'externalTasks',
+  '$scope', 'exposeScopeProperties', 'externalTasks', 'observeBpmnElements',
   ProcessInstanceRuntimeTab
 ];
 
-function ProcessInstanceRuntimeTab($scope, exposeScopeProperties, externalTasks) {
+function ProcessInstanceRuntimeTab($scope, exposeScopeProperties, externalTasks, observeBpmnElements) {
   exposeScopeProperties($scope, this, ['processInstance', 'processData']);
-
   this.externalTasks = externalTasks;
+
+  observeBpmnElements($scope, this);
 }
 
 ProcessInstanceRuntimeTab.prototype.onLoad = function(pages, params) {

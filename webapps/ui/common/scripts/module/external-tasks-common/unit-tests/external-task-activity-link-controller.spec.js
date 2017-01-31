@@ -23,6 +23,11 @@ describe('cam-common.external-tasks ExternalTaskActivityLinkController', functio
   beforeEach(inject(function($rootScope, $controller) {
     $scope = $rootScope.$new();
     $scope.activityId = 'act-id';
+    $scope.bpmnElements = {
+      'act-id': {
+        name: 'd'
+      }
+    };
 
     params = {
       a: 1
@@ -41,8 +46,9 @@ describe('cam-common.external-tasks ExternalTaskActivityLinkController', functio
     });
   }));
 
-  it('should expose activityId', function() {
+  it('should expose activityId and bpmnElements', function() {
     expect(instance.activityId).to.eql($scope.activityId);
+    expect(instance.bpmnElements).to.eql($scope.bpmnElements);
   });
 
   it('should get current path', function() {
@@ -66,6 +72,18 @@ describe('cam-common.external-tasks ExternalTaskActivityLinkController', functio
 
     it('should start with hash fallowed by path', function() {
       expect(link.substr(0, path.length +  1)).to.eql('#' + path);
+    });
+  });
+
+  describe('getActivityName', function() {
+    it('should return name of known activity', function() {
+      expect(instance.getActivityName()).to.eql('d');
+    });
+
+    it('should return activity id when activity is unknown', function() {
+      instance.activityId = 'some-other-act';
+
+      expect(instance.getActivityName()).to.eql('some-other-act');
     });
   });
 });
