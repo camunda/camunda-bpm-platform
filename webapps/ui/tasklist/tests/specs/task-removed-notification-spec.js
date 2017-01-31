@@ -1,7 +1,7 @@
 'use strict';
 
 var testHelper = require('../../../common/tests/test-helper');
-var setupFile = require('./task-vanishing-setup');
+var setupFile = require('./task-removed-notification-setup');
 var dashboardPage = require('../pages/dashboard');
 
 describe('Task Vanishing Spec', function() {
@@ -37,24 +37,21 @@ describe('Task Vanishing Spec', function() {
         xhr.send('{"variables":{}}');
       })
       .then(function() {
-        browser.sleep(2500);
-
-        // refresh!
-        tasklistItems = element.all(by.css('.tasks-list > li'));
-        expect(tasklistItems.count()).to.eventually.eql(1);
-
-        expect(element(by.css('.task-details .names > h2')).isPresent()).to.eventually.eql(true);
-
-        var status = element(by.css('.page-notifications .status'));
-        expect(status.isPresent()).to.eventually.eql(true);
-        expect(status.getText()).to.eventually.eql('The task does not exist anymore');
-
-        var dismissButton = element(by.css('.page-notifications a.dismiss'));
-        dismissButton.click();
+        browser.sleep(10500);
 
         // refresh!
         tasklistItems = element.all(by.css('.tasks-list > li'));
         expect(tasklistItems.count()).to.eventually.eql(0);
+
+        var completeButton = element(by.css('.task-details .tabbed-content .form-actions button[ng-click="complete()"]'));
+        expect(completeButton.isEnabled()).to.eventually.eql(false);
+
+        expect(element(by.css('.task-details .names > h2')).isPresent()).to.eventually.eql(true);
+
+        var alertMessage = element(by.css('.task-removed-alert .alert'));
+        expect(alertMessage.isDisplayed()).to.eventually.eql(true);
+        var dismissButton = alertMessage.element(by.css('button'));
+        dismissButton.click();
 
         expect(element(by.css('.task-details .names > h2')).isPresent()).to.eventually.eql(false);
       });

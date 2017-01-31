@@ -11,8 +11,10 @@
         "Failure",
   "FINISHED":
         "Finished",
-  "DISMISS":
-        "Dismiss",
+  "CLOSE_TASK":
+        "Close task",
+  "TASK_HAS_BEEN_REMOVED":
+        "The task has been removed.",
   "INIT_GROUPS_FAILURE":
         "Loading the groups of the selected task failed. Try to refresh the page to try again.",
   "ADD_GROUP_FAILED":

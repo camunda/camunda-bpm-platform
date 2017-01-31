@@ -16,11 +16,13 @@
     'camAPI',
     'configuration',
     '$window',
+    '$interval',
     '$scope',
     function(
     camAPI,
     configuration,
     $window,
+    $interval,
     $scope
   ) {
 
@@ -55,4 +57,13 @@
       });
 
       getUserProfile($scope.authentication);
+
+      // app wide refresh event triggering
+      var refreshInterval = $interval(function() {
+        $scope.$root.$broadcast('refresh');
+      }, 10000);
+
+      $scope.$on('$destroy', function() {
+        $interval.cancel(refreshInterval);
+      });
     }];

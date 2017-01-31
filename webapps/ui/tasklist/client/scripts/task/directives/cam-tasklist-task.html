@@ -13,7 +13,8 @@
   </div>
 
   <section ng-if="task"
-           class="task-card">
+           class="task-card"
+           ng-class="{'task-removed': !taskExists}">
     <header class="row">
       <div class="col-xs-12">
         <div class="tenant-id"
@@ -39,6 +40,18 @@
              error-handler="errorHandler"></div>
       </div>
     </header>
+
+    <div class="task-removed-alert">
+      <div class="alert alert-info row">
+        <div class="col-xs-8 text-padded">
+          {{ 'TASK_HAS_BEEN_REMOVED' | translate }}
+        </div>
+        <div class="col-xs-4 text-right">
+          <button class="btn btn-default"
+                  ng-click="dismissTask()">{{ 'CLOSE_TASK' | translate }}</button>
+        </div>
+      </div>
+    </div>
 
     <div class="row tabbed-content">
 
