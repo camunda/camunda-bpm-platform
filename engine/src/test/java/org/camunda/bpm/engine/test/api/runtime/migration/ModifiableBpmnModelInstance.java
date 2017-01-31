@@ -17,7 +17,9 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.builder.*;
 import org.camunda.bpm.model.bpmn.instance.*;
 import org.camunda.bpm.model.bpmn.instance.Process;
+import org.camunda.bpm.model.bpmn.instance.bpmndi.BpmnShape;
 import org.camunda.bpm.model.xml.Model;
+import org.camunda.bpm.model.xml.ModelInstance;
 import org.camunda.bpm.model.xml.instance.DomDocument;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.ModelElementType;
@@ -228,6 +230,16 @@ public class ModifiableBpmnModelInstance implements BpmnModelInstance {
         scope.removeChildElement(association);
       }
     }
+
+    Collection<BpmnShape> bpmnShapes = modelInstance.getModelElementsByType(BpmnShape.class);
+    for (BpmnShape shape : bpmnShapes) {
+      if (shape.getBpmnElement().equals(flowNode)) {
+        ModelElementInstance bpmnPlane = shape.getParentElement();
+        bpmnPlane.removeChildElement(shape);
+        break;
+      }
+    }
+
     scope.removeChildElement(flowNode);
 
     return this;
