@@ -2,14 +2,6 @@
 
 var angular = require('camunda-commons-ui/vendor/angular');
 
-function getRefreshProvider(tasklistData) {
-  return {
-    refreshTaskList : function() {
-      tasklistData.changed('taskList');
-    }
-  };
-}
-
 module.exports = [
   '$scope',
   '$q',
@@ -37,17 +29,8 @@ module.exports = [
       search.updateSilently(params);
     }
 
-    $scope.$on('$destroy', function() {
-      $scope.tasklistApp.refreshProvider = null;
-    });
-
     // init data depend for task list data
     var tasklistData = $scope.tasklistData = dataDepend.create($scope);
-
-    // init taslist app with a refresh provider
-    if ($scope.tasklistApp) {
-      $scope.tasklistApp.refreshProvider = getRefreshProvider(tasklistData);
-    }
 
     // get current task id from location
     var taskId = getPropertyFromLocation('task');
@@ -226,26 +209,8 @@ module.exports = [
      * automatically refresh the taskList every 10 seconds so that changes
      * (such as claims) are represented in realtime
      */
-    var intervalPromise;
-    tasklistData.observe('currentFilter', function(currentFilter) {
-      // stop current refresh
-      if(intervalPromise) {
-        $interval.cancel(intervalPromise);
-      }
-
-      if(currentFilter && currentFilter.properties.refresh) {
-        intervalPromise = $interval(function() {
-
-          if($scope.tasklistApp && $scope.tasklistApp.refreshProvider) {
-            $scope.tasklistApp.refreshProvider.refreshTaskList();
-
-          }
-          else {
-            $interval.cancel(intervalPromise);
-          }
-
-        }, 10000);
-      }
+    $scope.$on('refresh', function() {
+      tasklistData.changed('taskList');
     });
 
     // routeChanged listener ////////////////////////////////////////////////////////////////

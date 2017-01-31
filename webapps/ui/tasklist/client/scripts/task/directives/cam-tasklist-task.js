@@ -201,6 +201,7 @@ module.exports = [ function() {
         $scope.selectedTaskDetailTab = $scope.taskDetailTabs[0];
 
         $scope.selectTaskDetailTab = function(tab) {
+          if (!$scope.taskExists) return;
           $scope.selectedTaskDetailTab = tab;
 
           search.updateSilently({
@@ -241,61 +242,29 @@ module.exports = [ function() {
 
 
 
+        // handling removed task
 
-
-
-
-        var stop;
         var taskResource = camAPI.resource('task');
 
-        $scope.dismissTask = function(notification) {
+        $scope.taskExists = false;
+        $scope.$watch('task.id', function(newVal) {
+          $scope.taskExists = !!newVal;
+        });
+
+        $scope.dismissTask = function() {
           clearTask(true);
-          Notifications.clear(notification.status);
         };
 
-        function removedNotification(src) {
-          $translate(src).then(function(status) {
-            $translate('DISMISS').then(function(dismiss) {
-              Notifications.addMessage({
-                type: 'warning',
-                status: status,
-                unsafe: true,
-                message: '<a href class="dismiss" ng-click="notification.scope.dismissTask(notification)">' + dismiss + '</a>',
-                exclusive: true,
-                scope: $scope
-              });
-            });
+        $scope.$on('refresh', function() {
+          if (!$scope.task || !$scope.taskExists) return;
+
+          taskResource.get($scope.task.id, function(err) {
+            if (err) {
+              $scope.taskExists = false;
+              $scope.$broadcast('taskremoved');
+            }
           });
-        }
-
-        function killTimeout() {
-          if (stop) {
-            $interval.cancel(stop);
-            stop = undefined;
-          }
-        }
-
-        function processPollingResponse(err) {
-          if (err) {
-            var src = enhanceErrorMessage(err.message);
-            removedNotification(src, err);
-            killTimeout();
-          }
-        }
-
-        function pollExistence() {
-          killTimeout();
-          if (!$scope.task || !$scope.task.id) {
-            return;
-          }
-          stop = $interval(function() {
-            taskResource.get($scope.task.id, processPollingResponse);
-          }, 2000);
-        }
-
-        $scope.$watch('task.id', pollExistence);
-
-        $scope.$on('$destroy', killTimeout);
+        });
       }]
   };
 }];

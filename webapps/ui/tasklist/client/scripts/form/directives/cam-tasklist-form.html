@@ -4,7 +4,9 @@
   {{ 'LOADING' | translate }}
 </div>
 
-<div ng-if="tasklistForm.type" ng-show="tasklistForm && $loaded" ng-class="{ 'disabled-form' : options.disableForm}">
+<div ng-if="tasklistForm.type"
+     ng-show="tasklistForm && $loaded"
+     ng-class="{ 'disabled-form': options.disableForm, 'task-removed': taskRemoved}">
 
   <div ng-show="tasklistForm.$error" class="alert alert-danger" role="alert">
     <span class="glyphicon glyphicon-exclamation-sign"></span>
@@ -12,7 +14,8 @@
     <span class="message">{{ tasklistForm.$error.message | translate }}</span>
   </div>
 
-  <div ng-switch="tasklistForm.type" ng-show="!tasklistForm.$error">
+  <div ng-switch="tasklistForm.type"
+       ng-show="!tasklistForm.$error">
 
     <div ng-switch-when="embedded">
       <div cam-tasklist-form-embedded>

@@ -4,10 +4,6 @@
     z-index: 15;
   }
 
-  .task-card {
-
-  }
-
   h2 {
     margin-top: 0;
   }
@@ -35,6 +31,26 @@
     form.form > .form-group {
       margin-left: 0;
       margin-right: 0;
+    }
+  }
+
+  .task-removed-alert {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.218s ease;
+    padding: 0 (@grid-gutter-width * 0.5);
+    > .alert {
+      padding: (@grid-gutter-width * 0.5) 0;
+    }
+  }
+
+  .task-removed {
+    h2 {
+      text-decoration: line-through;
+    }
+
+    .task-removed-alert {
+      max-height: 120px;
     }
   }
 }

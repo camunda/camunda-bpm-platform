@@ -84,10 +84,8 @@ var Controller = [
       });
 
       modalInstance.result.then(function() {
-        if ($scope.tasklistApp && $scope.tasklistApp.refreshProvider) {
-          $scope.tasklistApp.refreshProvider.refreshTaskList();
-          document.querySelector('.start-process-action a').focus();
-        }
+        $scope.$root.$broadcast('refresh');
+        document.querySelector('.start-process-action a').focus();
       }, function() {
         document.querySelector('.start-process-action a').focus();
       });

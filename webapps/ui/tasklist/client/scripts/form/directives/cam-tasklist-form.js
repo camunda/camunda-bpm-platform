@@ -72,6 +72,10 @@ module.exports = [function() {
         Uri,
         camAPI
       ) {
+        $scope.taskRemoved = false;
+        $scope.$on('taskremoved', function() {
+          $scope.taskRemoved = true;
+        });
 
         var processDefinitionResource = camAPI.resource('process-definition');
         var caseDefinitionResource = camAPI.resource('case-definition');
@@ -94,6 +98,7 @@ module.exports = [function() {
           $scope.$loaded = false;
           if (value) {
             parseForm(value);
+            $scope.taskRemoved = false;
           }
         });
 
@@ -222,7 +227,7 @@ module.exports = [function() {
         };
 
         $scope.disableCompleteButton = function() {
-          return $scope.completeInProgress || $scope.$invalid ||
+          return $scope.taskRemoved || $scope.completeInProgress || $scope.$invalid ||
             ($scope.options && $scope.options.disableCompleteButton);
         };
 
