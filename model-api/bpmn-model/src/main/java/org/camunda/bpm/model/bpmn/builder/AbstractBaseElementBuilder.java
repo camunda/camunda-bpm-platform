@@ -264,9 +264,9 @@ public abstract class AbstractBaseElementBuilder<B extends AbstractBaseElementBu
   public void createBpmnShape(FlowNode node){
     BpmnPlane bpmnPlane = findBpmnPlane();
     if (bpmnPlane != null) {
-      BpmnShape bpmnShape = modelInstance.newInstance(BpmnShape.class);
+      BpmnShape bpmnShape = createInstance(BpmnShape.class);
       bpmnShape.setBpmnElement(node);
-      Bounds nodeBounds = modelInstance.newInstance(Bounds.class);
+      Bounds nodeBounds = createInstance(Bounds.class);
       nodeBounds.setX(0.0);
       nodeBounds.setY(0.0);
 
