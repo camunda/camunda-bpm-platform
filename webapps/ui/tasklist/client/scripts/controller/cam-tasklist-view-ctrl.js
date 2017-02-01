@@ -210,6 +210,7 @@ module.exports = [
      * (such as claims) are represented in realtime
      */
     $scope.$on('refresh', function() {
+      if (!currentFilter || !currentFilter.properties.refresh) return;
       tasklistData.changed('taskList');
     });
 
