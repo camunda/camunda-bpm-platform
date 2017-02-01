@@ -199,7 +199,7 @@ describe('common/utils searchWidgetUtils', function() {
     });
 
     it('should contain simple query properties with eq operator', function() {
-      expect(query.a).to.equal(1);
+      expect(query.a).to.equal('1');
     });
 
     it('should contain properties with Like operator', function() {
@@ -211,7 +211,7 @@ describe('common/utils searchWidgetUtils', function() {
     });
 
     it('should contain array properties', function() {
-      expect(query.arr1).to.eql([1, 2]);
+      expect(query.arr1).to.eql(['1', '2']);
     });
 
     it('should contain variable properties', function() {
