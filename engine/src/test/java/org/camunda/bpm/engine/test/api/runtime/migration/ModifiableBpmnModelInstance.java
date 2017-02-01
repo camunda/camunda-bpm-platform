@@ -13,10 +13,12 @@
 
 package org.camunda.bpm.engine.test.api.runtime.migration;
 
+import org.camunda.bpm.engine.repository.DiagramElement;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.builder.*;
 import org.camunda.bpm.model.bpmn.instance.*;
 import org.camunda.bpm.model.bpmn.instance.Process;
+import org.camunda.bpm.model.bpmn.instance.bpmndi.BpmnEdge;
 import org.camunda.bpm.model.bpmn.instance.bpmndi.BpmnShape;
 import org.camunda.bpm.model.xml.Model;
 import org.camunda.bpm.model.xml.ModelInstance;
@@ -219,18 +221,39 @@ public class ModifiableBpmnModelInstance implements BpmnModelInstance {
     ModelElementInstance scope = flowNode.getParentElement();
 
     for (SequenceFlow outgoingFlow : flowNode.getOutgoing()) {
+      removeBpmnEdge(outgoingFlow);
       scope.removeChildElement(outgoingFlow);
     }
     for (SequenceFlow incomingFlow : flowNode.getIncoming()) {
+      removeBpmnEdge(incomingFlow);
       scope.removeChildElement(incomingFlow);
     }
     Collection<Association> associations = scope.getChildElementsByType(Association.class);
     for (Association association : associations) {
       if (flowNode.equals(association.getSource()) || flowNode.equals(association.getTarget())) {
+        removeBpmnEdge(association);
         scope.removeChildElement(association);
       }
     }
 
+    removeBpmnShape(flowNode);
+    scope.removeChildElement(flowNode);
+
+    return this;
+  }
+
+  protected void removeBpmnEdge(BaseElement element) {
+    Collection<BpmnEdge> edges = modelInstance.getModelElementsByType(BpmnEdge.class);
+    for (BpmnEdge edge : edges) {
+      if (edge.getBpmnElement().equals(element)) {
+        ModelElementInstance bpmnPlane = edge.getParentElement();
+        bpmnPlane.removeChildElement(edge);
+        break;
+      }
+    }
+  }
+
+  protected void removeBpmnShape(FlowNode flowNode) {
     Collection<BpmnShape> bpmnShapes = modelInstance.getModelElementsByType(BpmnShape.class);
     for (BpmnShape shape : bpmnShapes) {
       if (shape.getBpmnElement().equals(flowNode)) {
@@ -239,10 +262,6 @@ public class ModifiableBpmnModelInstance implements BpmnModelInstance {
         break;
       }
     }
-
-    scope.removeChildElement(flowNode);
-
-    return this;
   }
 
   public ModifiableBpmnModelInstance asyncBeforeInnerMiActivity(String activityId) {
