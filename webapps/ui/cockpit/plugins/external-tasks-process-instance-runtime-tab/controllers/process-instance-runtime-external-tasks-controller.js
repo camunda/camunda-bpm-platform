@@ -12,14 +12,24 @@ function ProcessInstanceRuntimeTab($scope, exposeScopeProperties, externalTasks,
   observeBpmnElements($scope, this);
 }
 
-ProcessInstanceRuntimeTab.prototype.onLoad = function(pages, params) {
+ProcessInstanceRuntimeTab.prototype.onLoad = function(pages, activityIds) {
   return this.externalTasks.getActiveExternalTasksForProcess(
     this.processInstance.id,
     pages,
-    params
+    this.getActivityParams(activityIds)
   ).then((function(data) {
     this.tasks = data.list;
 
     return data;
   }).bind(this));
+};
+
+ProcessInstanceRuntimeTab.prototype.getActivityParams = function(activityIds) {
+  if (!activityIds || !activityIds.length) {
+    return {};
+  }
+
+  return {
+    activityId: activityIds[0]
+  };
 };

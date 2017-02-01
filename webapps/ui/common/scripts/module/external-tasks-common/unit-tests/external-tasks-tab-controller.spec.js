@@ -160,17 +160,17 @@ describe('cam-common.external-tasks ExternalTasksTabController', function() {
   });
 
   describe('loadTasks', function() {
-    var filterParams;
     var pages;
+    var activityIds;
 
     beforeEach(function() {
       pages = 'pages';
       instance.pages = pages;
 
-      filterParams = 'filter-params';
-      instance.getFilterParams = sinon
-        .stub()
-        .returns(filterParams);
+      activityIds = ['a'];
+      instance.filter = {
+        activityIds: activityIds
+      };
 
       instance.loadTasks();
     });
@@ -202,35 +202,12 @@ describe('cam-common.external-tasks ExternalTasksTabController', function() {
 
       expect(instance.loadingState).to.eql('EMPTY');
     });
-  });
 
-  describe('getFilterParams', function() {
-    it('should return empty object if filter is undefined', function() {
-      expect(instance.getFilterParams()).to.eql({});
-    });
-
-    it('should return empty object if filter has no activityIds property', function() {
-      instance.filter = {};
-
-      expect(instance.getFilterParams()).to.eql({});
-    });
-
-    it('should return empty object if filter has empty acitivityIds array', function() {
-      instance.filter = {
-        activityIds: []
-      };
-
-      expect(instance.getFilterParams()).to.eql({});
-    });
-
-    it('should return object with first activity id', function() {
-      instance.filter = {
-        activityIds: ['a', 'b']
-      };
-
-      expect(instance.getFilterParams()).to.eql({
-        activityId: 'a'
-      });
+    it('should pass pages and activityIds to onLoad', function() {
+      expect(onLoad.calledWith({
+        pages: pages,
+        activityIds: activityIds
+      })).to.eql(true);
     });
   });
 });
