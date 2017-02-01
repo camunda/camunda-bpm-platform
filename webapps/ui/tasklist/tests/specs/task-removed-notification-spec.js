@@ -4,7 +4,7 @@ var testHelper = require('../../../common/tests/test-helper');
 var setupFile = require('./task-removed-notification-setup');
 var dashboardPage = require('../pages/dashboard');
 
-describe('Task Vanishing Spec', function() {
+describe.skip('Task Removal Notification Spec', function() {
   describe('a task that has been removed or completed', function() {
     var tasklistItems;
 
