@@ -5,6 +5,7 @@
         "key": "businessKey",
         "value": "Business Key"
       },
+      "default": true,
       "operators": [
         {
           "key": "eq",

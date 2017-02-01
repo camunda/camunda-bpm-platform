@@ -5,6 +5,7 @@
         "key": "variableName",
         "value": "Variable Name"
       },
+      "default": true,
       "operators": [
         {
           "key": "eq",
