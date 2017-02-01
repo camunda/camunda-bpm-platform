@@ -60,21 +60,23 @@ describe('cockpit.plugin.process-instance-runtime-tab ProcessInstanceRuntimeTabC
 
   describe('onLoad', function() {
     var pages;
-    var params;
+    var activityIds;
     var promise;
 
     beforeEach(() => {
       pages = 'pages';
-      params = 'params';
+      activityIds = ['params'];
 
-      promise = instance.onLoad(pages, params);
+      promise = instance.onLoad(pages, activityIds);
     });
 
-    it('should call externalTasks.getActiveExternalTasksForProcess with process instance id, pages and params', function() {
+    it('should call externalTasks.getActiveExternalTasksForProcess with process instance id, pages and activityId', function() {
       expect(externalTasks.getActiveExternalTasksForProcess.calledWith(
         $scope.processInstance.id,
         pages,
-        params
+        {
+          activityId: activityIds[0]
+        }
       )).to.eql(true);
     });
 
@@ -86,6 +88,18 @@ describe('cockpit.plugin.process-instance-runtime-tab ProcessInstanceRuntimeTabC
       });
 
       $rootScope.$digest();
+    });
+
+    it('should call externalTasks.getActiveExternalTasksForProcess with process instance id, pages when activityIds is empty', function() {
+      externalTasks.getActiveExternalTasksForProcess.reset();
+
+      instance.onLoad(pages, []);
+
+      expect(externalTasks.getActiveExternalTasksForProcess.calledWith(
+        $scope.processInstance.id,
+        pages,
+        {}
+      )).to.eql(true);
     });
   });
 });

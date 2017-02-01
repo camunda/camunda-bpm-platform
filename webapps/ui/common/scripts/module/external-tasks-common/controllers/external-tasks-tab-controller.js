@@ -28,10 +28,10 @@ ExternalTasksTabController.prototype.onFilterChanged = function(filter) {
 };
 
 ExternalTasksTabController.prototype.isFilterChanged = function(filter) {
-  var lastActivity = getActivityIdFromFilter(this.filter);
-  var currentActivity = getActivityIdFromFilter(filter);
+  var lastActivities = getActivityIdsFromFilter(this.filter);
+  var currentActivities = getActivityIdsFromFilter(filter);
 
-  return !this.filter || lastActivity !== currentActivity;
+  return !this.filter || !angular.equals(lastActivities, currentActivities);
 };
 
 ExternalTasksTabController.prototype.onPaginationChange = function(pages) {
@@ -47,7 +47,7 @@ ExternalTasksTabController.prototype.loadTasks = function() {
 
   this.onLoad({
     pages: angular.copy(this.pages), //just a defensive copy
-    params: this.getFilterParams()
+    activityIds: getActivityIdsFromFilter(this.filter)
   })
   .then((function(data) {
     this.total = data.count;
@@ -60,22 +60,10 @@ ExternalTasksTabController.prototype.loadTasks = function() {
   }).bind(this));
 };
 
-ExternalTasksTabController.prototype.getFilterParams = function() {
-  var activityId = getActivityIdFromFilter(this.filter);
-
-  if (!activityId) {
-    return {};
-  }
-
-  return {
-    activityId: activityId
-  };
-};
-
-function getActivityIdFromFilter(filter) {
+function getActivityIdsFromFilter(filter) {
   if (!filter || !filter.activityIds || !filter.activityIds.length) {
     return null;
   }
 
-  return filter.activityIds[0];
+  return filter.activityIds;
 }
