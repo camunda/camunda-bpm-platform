@@ -69,4 +69,8 @@ public abstract class AbstractBpmnModelElementBuilder<B extends AbstractBpmnMode
       throw new BpmnModelException("Unable to find a parent transaction.");
     }
   }
+
+  protected E getElement() {
+    return element;
+  }
 }
