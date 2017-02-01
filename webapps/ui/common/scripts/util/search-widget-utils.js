@@ -248,7 +248,7 @@ function getSearchValue(search) {
     return true;
   }
 
-  return sanitizeValue(parseValue(search.value.value), search.operator.value.key);
+  return sanitizeValue(search.value.value, search.operator.value.key);
 }
 
 function sanitizeValue(value, operator) {
@@ -282,7 +282,7 @@ function createVariableValue(search, value) {
   return {
     name: search.name.value,
     operator: search.operator.value.key,
-    value: value
+    value: parseValue(value)
   };
 }
 
