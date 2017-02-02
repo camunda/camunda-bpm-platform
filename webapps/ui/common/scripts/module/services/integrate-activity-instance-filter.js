@@ -5,9 +5,11 @@ var angular = require('camunda-commons-ui/vendor/angular');
 module.exports = [
   'search',  '$location', 'searchWidgetUtils',
   function(search, $location, searchWidgetUtils) {
-    return function($scope, setDefaultTab) {
+    return function($scope, setDefaultTab, options) {
       var processData = $scope.processData;
       var processInstance = $scope.processInstance;
+
+      options = options || {};
 
       // filter
       $scope.filter = parseFilterFromUri();
@@ -104,7 +106,7 @@ module.exports = [
               activityId = instance.activityId || instance.targetActivityId,
               idx = activityIds.indexOf(activityId);
 
-          if (idx === -1) {
+          if (idx === -1 && activityId) {
             activityIds.push(activityId);
           }
         });
@@ -134,10 +136,12 @@ module.exports = [
         });
 
         // delete activity and activity instances which do not exist
-        for(var i = 0; i < activityIds.length; i++) {
-          if(!activityIdToInstancesMap[activityIds[i]]) {
-            activityIds.splice(i, 1);
-            i--;
+        if (options.shouldRemoveActivityIds) {
+          for(var i = 0; i < activityIds.length; i++) {
+            if(!activityIdToInstancesMap[activityIds[i]]) {
+              activityIds.splice(i, 1);
+              i--;
+            }
           }
         }
         for(i = 0; i < activityInstanceIds.length; i++) {
