@@ -464,6 +464,66 @@ public class ExternalTaskRestServiceQueryTest extends AbstractRestServiceTest {
         MockProvider.mockExternalTask().buildExternalTask(),
         MockProvider.mockExternalTask().tenantId(MockProvider.ANOTHER_EXAMPLE_TENANT_ID).buildExternalTask());
   }
+
+  @Test
+  public void testQueryByActivityIdListGet() {
+    mockQuery = setUpMockExternalTaskQuery(createMockExternalTasksTwoActivityIds());
+
+    Response response = given()
+        .queryParam("activityIdIn", MockProvider.EXAMPLE_ACTIVITY_ID_LIST)
+        .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+        .when()
+        .get(EXTERNAL_TASK_QUERY_URL);
+
+    verify(mockQuery).activityIdIn(MockProvider.EXAMPLE_ACTIVITY_ID, MockProvider.ANOTHER_EXAMPLE_ACTIVITY_ID);
+    verify(mockQuery).list();
+
+    String content = response.asString();
+    List<String> executions = from(content).getList("");
+    assertThat(executions).hasSize(2);
+
+    String returnedActivityId1 = from(content).getString("[0].activityId");
+    String returnedActivityId2 = from(content).getString("[1].activityId");
+
+    assertThat(returnedActivityId1).isEqualTo(MockProvider.EXAMPLE_ACTIVITY_ID);
+    assertThat(returnedActivityId2).isEqualTo(MockProvider.ANOTHER_EXAMPLE_ACTIVITY_ID);
+  }
+
+  @Test
+  public void testQueryByActivityIdListPost() {
+    mockQuery = setUpMockExternalTaskQuery(createMockExternalTasksTwoActivityIds());
+
+    Map<String, Object> queryParameters = new HashMap<String, Object>();
+    queryParameters.put("activityIdIn", MockProvider.EXAMPLE_ACTIVITY_ID_LIST.split(","));
+
+    Response response = given()
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(queryParameters)
+        .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .when()
+        .post(EXTERNAL_TASK_QUERY_URL);
+
+    verify(mockQuery).activityIdIn(MockProvider.EXAMPLE_ACTIVITY_ID, MockProvider.ANOTHER_EXAMPLE_ACTIVITY_ID);
+    verify(mockQuery).list();
+
+    String content = response.asString();
+    List<String> executions = from(content).getList("");
+    assertThat(executions).hasSize(2);
+
+    String returnedActivityId1 = from(content).getString("[0].activityId");
+    String returnedActivityId2 = from(content).getString("[1].activityId");
+
+    assertThat(returnedActivityId1).isEqualTo(MockProvider.EXAMPLE_ACTIVITY_ID);
+    assertThat(returnedActivityId2).isEqualTo(MockProvider.ANOTHER_EXAMPLE_ACTIVITY_ID);
+  }
+
+  private List<ExternalTask> createMockExternalTasksTwoActivityIds() {
+    return Arrays.asList(
+        MockProvider.mockExternalTask().buildExternalTask(),
+        MockProvider.mockExternalTask().activityId(MockProvider.ANOTHER_EXAMPLE_ACTIVITY_ID).buildExternalTask());
+  }
   
   @Test
   public void testQueryByPriorityListGet() {

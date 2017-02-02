@@ -19,17 +19,15 @@ import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.externalT
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.externalTaskByProcessInstanceId;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.inverted;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.verifySorting;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
-import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -165,6 +163,35 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(3, tasks.size());
     for (ExternalTask task : tasks) {
       assertEquals("externalTask2", task.getActivityId());
+    }
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/parallelExternalTaskProcess.bpmn20.xml")
+  public void testQueryByActivityIdIn() {
+    // given
+    startInstancesByKey("parallelExternalTaskProcess", 3);
+
+    List<String> activityIds = Arrays.asList("externalTask1", "externalTask2");
+
+    // when
+    List<ExternalTask> tasks = externalTaskService
+        .createExternalTaskQuery()
+        .activityIdIn((String[])activityIds.toArray())
+        .list();
+
+    // then
+    assertEquals(6, tasks.size());
+    for (ExternalTask task : tasks) {
+      assertTrue(activityIds.contains(task.getActivityId()));
+    }
+  }
+
+  public void testFailQueryByActivityIdInNull() {
+    try {
+      externalTaskService.createExternalTaskQuery()
+          .activityIdIn((String) null);
+      fail("expected exception");
+    } catch (NullValueException e) {
     }
   }
 

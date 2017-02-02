@@ -58,6 +58,7 @@ public class ExternalTaskQueryDto extends AbstractQueryDto<ExternalTaskQuery> {
 
   protected String externalTaskId;
   protected String activityId;
+  protected List<String> activityIdIn;
   protected Date lockExpirationBefore;
   protected Date lockExpirationAfter;
   protected String topicName;
@@ -90,6 +91,11 @@ public class ExternalTaskQueryDto extends AbstractQueryDto<ExternalTaskQuery> {
   @CamundaQueryParam("activityId")
   public void setActivityId(String activityId) {
     this.activityId = activityId;
+  }
+
+  @CamundaQueryParam(value = "activityIdIn", converter = StringListConverter.class)
+  public void setActivityIdIn(List<String> activityIdIn) {
+    this.activityIdIn = activityIdIn;
   }
 
   @CamundaQueryParam(value = "lockExpirationBefore", converter = DateConverter.class)
@@ -188,6 +194,9 @@ public class ExternalTaskQueryDto extends AbstractQueryDto<ExternalTaskQuery> {
     }
     if (activityId != null) {
       query.activityId(activityId);
+    }
+    if (activityIdIn != null && !activityIdIn.isEmpty()) {
+      query.activityIdIn(activityIdIn.toArray(new String[activityIdIn.size()]));
     }
     if (lockExpirationBefore != null) {
       query.lockExpirationBefore(lockExpirationBefore);

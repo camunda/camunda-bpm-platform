@@ -78,6 +78,11 @@ public interface ExternalTaskQuery extends Query<ExternalTaskQuery, ExternalTask
    * Only select external tasks that belong to an instance of the given activity
    */
   ExternalTaskQuery activityId(String activityId);
+
+  /**
+   * Only select external tasks that belong to an instances of the given activities.
+   */
+  ExternalTaskQuery activityIdIn(String... activityIdIn);
   
   /**
    * Only select external tasks with a priority that is higher than or equal to the given priority.

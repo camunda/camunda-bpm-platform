@@ -216,7 +216,7 @@
         AND ${bitand1}AUTH.PERMS_${bitand2}2${bitand3} = 2)
       OR
        (AUTH.RESOURCE_TYPE_ = 6 
-        AND AUTH.RESOURCE_ID_ in (RES.PROC_DEF_KEY_, '*') 
+        AND AUTH.RESOURCE_ID_ in (RES.PROC_DEF_KEY_, '*')
         AND ${bitand1}AUTH.PERMS_${bitand2}512${bitand3} = 512) 
       )
     </if>
@@ -255,6 +255,13 @@
       </if>
       <if test="activityId != null">
         and RES.ACT_ID_ = #{activityId}
+      </if>
+      <if test="activityIdIn != null &amp;&amp; activityIdIn.length > 0">
+        and RES.ACT_ID_ in
+        <foreach item="activityId" index="index" collection="activityIdIn"
+                 open="(" separator="," close=")">
+          #{activityId}
+        </foreach>
       </if>
       <if test="retriesLeft != null &amp;&amp; retriesLeft">
         and (RES.RETRIES_ is null
