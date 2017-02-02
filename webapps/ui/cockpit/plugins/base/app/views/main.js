@@ -4,7 +4,7 @@
 'use strict';
 
 var angular = require('angular'),
-
+    camCommon = require('cam-common'),
     // dashboard
     dashboardDeployments = require('./dashboard/deployments'),
     dashboardReports = require('./dashboard/reports'),
@@ -41,7 +41,9 @@ var angular = require('angular'),
     incidentJobRetryAction = require('./processInstance/incidentJobRetryAction'),
     incidentExternalTaskRetryAction = require('./processInstance/incident-externalTask-retry-action');
 
-var ngModule = angular.module('cockpit.plugin.base.views', []);
+var ngModule = angular.module('cockpit.plugin.base.views', [
+  camCommon.name
+]);
 
 ngModule.config(dashboardDeployments);
 ngModule.config(dashboardReports);
