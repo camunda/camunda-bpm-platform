@@ -18,6 +18,7 @@ describe('cam-common integrateActivityInstanceFilter', function() {
   var $location;
   var searchWidgetUtils;
   var processData;
+  var options;
   var $scope;
   var setDefaultTab;
 
@@ -59,8 +60,9 @@ describe('cam-common integrateActivityInstanceFilter', function() {
       }
     };
     setDefaultTab = sinon.spy();
+    options = {};
 
-    integrateActivityInstanceFilter($scope, setDefaultTab);
+    integrateActivityInstanceFilter($scope, setDefaultTab, options);
   }));
 
   it('should set filter on $scope', function() {
@@ -153,7 +155,20 @@ describe('cam-common integrateActivityInstanceFilter', function() {
       expect($scope.filter.activityInstanceIds).to.eql(['a1', 'a1-b']);
     });
 
-    it('should remove non existing ids from filter', function() {
+    it('should remove non existing ids from filter if options has shouldRemoveActivityIds set to true', function() {
+      var filter = {
+        activityIds: ['b', 'a1-activity'],
+        activityInstanceIds: ['c', 'a1', 'a1-b']
+      };
+      options.shouldRemoveActivityIds = true;
+
+      autoCompleteFilter(filter, instanceIdToInstanceMap, activityIdToInstancesMap);
+
+      expect($scope.filter.activityIds).to.eql([instanceIdToInstanceMap.a1.activityId]);
+      expect($scope.filter.activityInstanceIds).to.eql(['a1', 'a1-b']);
+    });
+
+    it('should not remove non existing ids from filter if options has no shouldRemoveActivityIds', function() {
       var filter = {
         activityIds: ['b', 'a1-activity'],
         activityInstanceIds: ['c', 'a1', 'a1-b']
@@ -161,9 +176,10 @@ describe('cam-common integrateActivityInstanceFilter', function() {
 
       autoCompleteFilter(filter, instanceIdToInstanceMap, activityIdToInstancesMap);
 
-      expect($scope.filter.activityIds).to.eql([instanceIdToInstanceMap.a1.activityId]);
+      expect($scope.filter.activityIds).to.eql(['b', 'a1-activity']);
       expect($scope.filter.activityInstanceIds).to.eql(['a1', 'a1-b']);
     });
+
 
     it('should scroll to last selected activity', function() {
       var filter = {

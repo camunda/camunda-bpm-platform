@@ -223,7 +223,9 @@ var Controller = [
     }]);
 
     // /////// End definition of process data
-    integrateActivityInstanceFilter($scope, angular.noop);
+    integrateActivityInstanceFilter($scope, angular.noop, {
+      shouldRemoveActivityIds: true
+    });
 
     // /////// Begin usage of definied process data
 
