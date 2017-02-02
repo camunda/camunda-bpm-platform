@@ -85,7 +85,7 @@ var Controller = [
     $scope.linkBase = {
       processInstances: '/process-definition/{{id}}',
       processIncidents: '/process-definition/{{id}}',
-      tasks: '/process-instance/{{processInstanceId}}/runtime?detailsTab=user-tasks-tab'
+      tasks: '/process-instance/{{processInstanceId}}/runtime?tab=user-tasks-tab'
     };
 
     if ($scope.hasProcessSearch) {

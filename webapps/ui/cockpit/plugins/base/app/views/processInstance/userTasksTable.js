@@ -144,7 +144,7 @@ module.exports = function(ngModule) {
 
       $scope.getHref = function(userTask) {
         if(userTask.instance) {
-          return '#/process-instance/' + processInstance.id + '/runtime?detailsTab=user-tasks-tab&' +
+          return '#/process-instance/' + processInstance.id + '/runtime?tab=user-tasks-tab&' +
             $scope.getSearchQueryForSearchType(userTask.instance.id);
         }
 
