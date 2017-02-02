@@ -102,8 +102,10 @@
 
                     <mkdir dir="${current.sql.upgrade.dir}/" />
 
-                    <!-- patches for previous minor version if any -->
-                    <!--<touch file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}_patch_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}.x_to_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}.y.sql" />-->
+                    <!-- concanated patches for last minor version -->
+                    <!-- 7.6.0 is on a clean state so we can again use the concanated patches -->
+                    <touch file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}_patch.sql"/>
+                    <touch file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_identity_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}_patch.sql"/>
 
                     <!-- minor version upgrade from previous to current version -->
                     <touch file="${current.sql.upgrade.dir}/${minor.version.upgrade.script.previous.to.current.engine}" />
@@ -165,6 +167,8 @@
                   <srcFiles>
                     <!-- now patch old version of the schema -->
                     <!--<srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}_patch_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}.x_to_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}.y.sql</srcFile>-->
+                    <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}_patch.sql</srcFile>
+                    <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_identity_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}_patch.sql</srcFile>
                   </srcFiles>
                 </configuration>
               </execution>
