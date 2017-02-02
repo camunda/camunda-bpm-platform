@@ -11,7 +11,8 @@ module.exports = function() {
     controller: 'ExternalTaskActivityLinkController as Link',
     scope: {
       activityId: '=externalTaskActivityLink',
-      bpmnElements: '='
+      bpmnElements: '=',
+      searchQueryType: '=?'
     }
   };
 };

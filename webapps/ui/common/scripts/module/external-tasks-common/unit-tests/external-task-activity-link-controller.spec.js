@@ -73,6 +73,36 @@ describe('cam-common.external-tasks ExternalTaskActivityLinkController', functio
     it('should start with hash fallowed by path', function() {
       expect(link.substr(0, path.length +  1)).to.eql('#' + path);
     });
+
+    it('should modify search query when searchQueryType is set', function() {
+      var params = {
+        searchQuery: JSON.stringify([
+          {
+            type: 'activityIdIn',
+            operator: 'eq',
+            value: 'ab1'
+          }
+        ])
+      };
+
+      search.returns(params);
+      instance.searchQueryType = 'activityIdIn';
+
+      var link = instance.getLink();
+
+      expect(link).to.contain(
+        'searchQuery=' +
+        encodeURIComponent(
+          JSON.stringify([
+            {
+              type: 'activityIdIn',
+              operator: 'eq',
+              value: $scope.activityId
+            }
+          ])
+        )
+      );
+    });
   });
 
   describe('getActivityName', function() {
