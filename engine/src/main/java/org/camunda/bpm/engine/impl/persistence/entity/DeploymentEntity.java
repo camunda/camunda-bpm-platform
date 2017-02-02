@@ -32,7 +32,7 @@ import org.camunda.bpm.engine.repository.*;
 /**
  * @author Tom Baeyens
  */
-public class DeploymentEntity implements Serializable, Deployment, DbEntity {
+public class DeploymentEntity implements Serializable, DeploymentWithDefinitions, DbEntity {
 
   private static final long serialVersionUID = 1L;
 

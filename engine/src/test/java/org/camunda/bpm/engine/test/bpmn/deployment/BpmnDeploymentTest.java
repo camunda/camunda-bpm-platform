@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.camunda.bpm.engine.repository.CaseDefinition;
+import org.camunda.bpm.engine.repository.DeploymentWithDefinitions;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.Resource;
 import org.camunda.bpm.engine.test.Deployment;
@@ -379,8 +380,8 @@ public class BpmnDeploymentTest extends PluggableProcessEngineTestCase {
     final BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("foo").startEvent().userTask().endEvent().done();
 
     // when process model is deployed
-    org.camunda.bpm.engine.repository.Deployment deployment = repositoryService.createDeployment()
-      .addModelInstance("foo.bpmn", modelInstance).deploy();
+    DeploymentWithDefinitions deployment = repositoryService.createDeployment()
+      .addModelInstance("foo.bpmn", modelInstance).deployAndReturnDefinitions();
     deploymentIds.add(deployment.getId());
 
     // then deployment contains deployed process definitions
@@ -403,8 +404,8 @@ public class BpmnDeploymentTest extends PluggableProcessEngineTestCase {
     final BpmnModelInstance modelInstance = Bpmn.createProcess("foo").startEvent().userTask().endEvent().done();
 
     // when process model is deployed
-    org.camunda.bpm.engine.repository.Deployment deployment = repositoryService.createDeployment()
-      .addModelInstance("foo.bpmn", modelInstance).deploy();
+    DeploymentWithDefinitions deployment = repositoryService.createDeployment()
+      .addModelInstance("foo.bpmn", modelInstance).deployAndReturnDefinitions();
     deploymentIds.add(deployment.getId());
 
     // then deployment contains no deployed process definition

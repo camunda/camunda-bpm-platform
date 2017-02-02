@@ -401,7 +401,7 @@ public class DecisionDefinitionDeployerTest {
 
     // when decision model is deployed
     DeploymentBuilder deploymentBuilder = repositoryService.createDeployment().addModelInstance("foo.dmn", dmnModelInstance);
-    org.camunda.bpm.engine.repository.Deployment deployment = testRule.deploy(deploymentBuilder);
+    DeploymentWithDefinitions deployment = testRule.deploy(deploymentBuilder);
 
     // then deployment contains definition
     List<DecisionDefinition> deployedDecisionDefinitions = deployment.getDeployedDecisionDefinitions();
@@ -429,7 +429,7 @@ public class DecisionDefinitionDeployerTest {
 
     // when decision model is deployed
     DeploymentBuilder deploymentBuilder = repositoryService.createDeployment().addModelInstance("foo.dmn", modelInstance);
-    org.camunda.bpm.engine.repository.Deployment deployment = testRule.deploy(deploymentBuilder);
+    DeploymentWithDefinitions deployment = testRule.deploy(deploymentBuilder);
 
     // then deployment contains no definitions
     assertNull(deployment.getDeployedDecisionDefinitions());
@@ -445,7 +445,7 @@ public class DecisionDefinitionDeployerTest {
   public void testDeployAndGetDRDDefinition() throws Exception {
 
     // when decision requirement graph is deployed
-    org.camunda.bpm.engine.repository.Deployment deployment = testRule.deploy(DRD_SCORE_RESOURCE);
+    DeploymentWithDefinitions deployment = testRule.deploy(DRD_SCORE_RESOURCE);
 
     // then deployment contains definitions
     List<DecisionDefinition> deployedDecisionDefinitions = deployment.getDeployedDecisionDefinitions();

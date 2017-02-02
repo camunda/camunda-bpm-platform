@@ -18,10 +18,7 @@ import java.util.List;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.IoUtil;
-import org.camunda.bpm.engine.repository.CaseDefinition;
-import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
-import org.camunda.bpm.engine.repository.DeploymentQuery;
-import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.repository.*;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
@@ -175,8 +172,8 @@ public class CmmnDeployerTest extends PluggableProcessEngineTestCase {
     final CmmnModelInstance modelInstance = createCmmnModelInstance();
 
     // when case model is deployed
-    org.camunda.bpm.engine.repository.Deployment deployment = repositoryService.createDeployment()
-      .addModelInstance("foo.cmmn", modelInstance).deploy();
+    DeploymentWithDefinitions deployment = repositoryService.createDeployment()
+      .addModelInstance("foo.cmmn", modelInstance).deployAndReturnDefinitions();
     deploymentIds.add(deployment.getId());
 
     // then deployment contains deployed case definition
@@ -200,8 +197,8 @@ public class CmmnDeployerTest extends PluggableProcessEngineTestCase {
     modelInstance.setDefinitions(definitions);
 
     // when case model is deployed
-    org.camunda.bpm.engine.repository.Deployment deployment = repositoryService.createDeployment()
-      .addModelInstance("foo.cmmn", modelInstance).deploy();
+    DeploymentWithDefinitions deployment = repositoryService.createDeployment()
+      .addModelInstance("foo.cmmn", modelInstance).deployAndReturnDefinitions();
     deploymentIds.add(deployment.getId());
 
     // then no case definition is deployed

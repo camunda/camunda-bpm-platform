@@ -36,6 +36,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
+import org.camunda.bpm.engine.repository.DeploymentWithDefinitions;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.Job;
@@ -91,16 +92,16 @@ public class ProcessEngineTestRule extends TestWatcher {
         caseInstance, is(nullValue()));
   }
 
-  public Deployment deploy(BpmnModelInstance... bpmnModelInstances) {
+  public DeploymentWithDefinitions deploy(BpmnModelInstance... bpmnModelInstances) {
     return deploy(createDeploymentBuilder(), Arrays.asList(bpmnModelInstances), Collections.<String> emptyList());
   }
 
-  public Deployment deploy(String... resources) {
+  public DeploymentWithDefinitions deploy(String... resources) {
     return deploy(createDeploymentBuilder(), Collections.<BpmnModelInstance> emptyList(), Arrays.asList(resources));
   }
 
-  public Deployment deploy(DeploymentBuilder deploymentBuilder) {
-    Deployment deployment = deploymentBuilder.deploy();
+  public DeploymentWithDefinitions deploy(DeploymentBuilder deploymentBuilder) {
+    DeploymentWithDefinitions deployment = deploymentBuilder.deployAndReturnDefinitions();
 
     processEngineRule.manageDeployment(deployment);
 
@@ -136,7 +137,7 @@ public class ProcessEngineTestRule extends TestWatcher {
       .singleResult();
   }
 
-  protected Deployment deploy(DeploymentBuilder deploymentBuilder, List<BpmnModelInstance> bpmnModelInstances, List<String> resources) {
+  protected DeploymentWithDefinitions deploy(DeploymentBuilder deploymentBuilder, List<BpmnModelInstance> bpmnModelInstances, List<String> resources) {
     int i = 0;
     for (BpmnModelInstance bpmnModelInstance : bpmnModelInstances) {
       deploymentBuilder.addModelInstance(i + "_" + DEFAULT_BPMN_RESOURCE_NAME, bpmnModelInstance);

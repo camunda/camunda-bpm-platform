@@ -25,14 +25,12 @@ import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
-import org.camunda.bpm.engine.repository.Deployment;
-import org.camunda.bpm.engine.repository.DeploymentBuilder;
-import org.camunda.bpm.engine.repository.DeploymentQuery;
-import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.repository.*;
 import org.camunda.bpm.engine.rest.DeploymentRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.repository.DeploymentDto;
 import org.camunda.bpm.engine.rest.dto.repository.DeploymentQueryDto;
+import org.camunda.bpm.engine.rest.dto.repository.DeploymentWithDefinitionsDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.mapper.MultipartFormData;
@@ -89,13 +87,13 @@ public class DeploymentRestServiceImpl extends AbstractRestProcessEngineAware im
     return deployments;
   }
 
-  public DeploymentDto createDeployment(UriInfo uriInfo, MultipartFormData payload) {
+  public DeploymentWithDefinitionsDto createDeployment(UriInfo uriInfo, MultipartFormData payload) {
     DeploymentBuilder deploymentBuilder = extractDeploymentInformation(payload);
 
     if(!deploymentBuilder.getResourceNames().isEmpty()) {
-      Deployment deployment = deploymentBuilder.deploy();
+      DeploymentWithDefinitions deployment = deploymentBuilder.deployAndReturnDefinitions();
 
-      DeploymentDto deploymentDto = DeploymentDto.fromDeployment(deployment);
+      DeploymentWithDefinitionsDto deploymentDto = DeploymentWithDefinitionsDto.fromDeployment(deployment);
 
 
       URI uri = uriInfo.getBaseUriBuilder()

@@ -154,7 +154,7 @@ public class ConcurrentDeploymentTest extends ConcurrencyTestCase {
     public Void execute(CommandContext commandContext) {
       monitor.sync();  // thread will block here until makeContinue() is called form main thread
 
-      new DeployCmd<Deployment>((DeploymentBuilderImpl) deploymentBuilder).execute(commandContext);
+      new DeployCmd((DeploymentBuilderImpl) deploymentBuilder).execute(commandContext);
 
       monitor.sync();  // thread will block here until waitUntilDone() is called form main thread
 

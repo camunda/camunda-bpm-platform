@@ -151,7 +151,7 @@ public interface DeploymentBuilder {
   DeploymentBuilder source(String source);
 
   /**
-   * Deploys all provided sources to the process engine.
+   * Deploys all provided sources to the process engine and returns the created deployment.
    *
    * @throws NotFoundException thrown
    *  <ul>
@@ -168,8 +168,33 @@ public interface DeploymentBuilder {
    *     <li>{@link Permissions#CREATE} on {@link Resources#DEPLOYMENT}</li>
    *     <li>{@link Permissions#READ} on {@link Resources#DEPLOYMENT} (if resources from previous deployments are redeployed)</li>
    *   </ul>
+   * @return the created deployment
+   * @deprecated use {@link #deployAndReturnDefinitions()} instead.
    */
+  @Deprecated
   Deployment deploy();
+
+  /**
+   * Deploys all provided sources to the process engine and returns the created deployment with the deployed definitions.
+   *
+   * @throws NotFoundException thrown
+   *  <ul>
+   *    <li>if the deployment specified by {@link #nameFromDeployment(String)} does not exist or</li>
+   *    <li>if at least one of given deployments provided by {@link #addDeploymentResources(String)} does not exist.</li>
+   *  </ul>
+   *
+   * @throws NotValidException
+   *    if there are duplicate resource names from different deployments to re-deploy.
+   *
+   * @throws AuthorizationException
+   *  thrown if the current user does not possess the following permissions:
+   *   <ul>
+   *     <li>{@link Permissions#CREATE} on {@link Resources#DEPLOYMENT}</li>
+   *     <li>{@link Permissions#READ} on {@link Resources#DEPLOYMENT} (if resources from previous deployments are redeployed)</li>
+   *   </ul>
+   * @return the created deployment, contains the deployed definitions
+   */
+  DeploymentWithDefinitions deployAndReturnDefinitions();
 
   /**
    *  @return the names of the resources which were added to this builder.

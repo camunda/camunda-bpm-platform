@@ -24,10 +24,10 @@ import org.camunda.bpm.engine.repository.*;
  */
 public class ProcessApplicationDeploymentImpl implements ProcessApplicationDeployment {
 
-  protected Deployment deployment;
+  protected DeploymentWithDefinitions deployment;
   protected ProcessApplicationRegistration registration;
 
-  public ProcessApplicationDeploymentImpl(Deployment deployment, ProcessApplicationRegistration registration) {
+  public ProcessApplicationDeploymentImpl(DeploymentWithDefinitions deployment, ProcessApplicationRegistration registration) {
     this.deployment = deployment;
     this.registration = registration;
   }

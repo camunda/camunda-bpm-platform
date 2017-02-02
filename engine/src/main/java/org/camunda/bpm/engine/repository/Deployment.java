@@ -12,12 +12,7 @@
  */
 package org.camunda.bpm.engine.repository;
 
-import org.camunda.bpm.dmn.engine.impl.spi.type.DmnTypeDefinition;
-import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
-import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionEntity;
-
 import java.util.Date;
-import java.util.List;
 
 /**
  * Represents a deployment that is already present in the process repository.
@@ -34,7 +29,6 @@ import java.util.List;
  *
  * @author Tom Baeyens
  * @author Joram Barrez
- * @author Christopher Zell
  */
 public interface Deployment {
 
@@ -45,34 +39,6 @@ public interface Deployment {
   Date getDeploymentTime();
 
   String getSource();
-
-  /**
-   * Returns the process definitions, which are deployed with that deployment.
-   *
-   * @return the process definitions which are deployed
-   */
-  List<ProcessDefinition> getDeployedProcessDefinitions();
-
-  /**
-   * Returns the case definitions, which are deployed with that deployment.
-   *
-   * @return the case definitions, which are deployed
-   */
-  List<CaseDefinition> getDeployedCaseDefinitions();
-
-  /**
-   * Returns the decision definitions, which are deployed with that deployment
-   *
-   * @return the decision definitions, which are deployed
-   */
-  List<DecisionDefinition> getDeployedDecisionDefinitions();
-
-  /**
-   * Returns the decision requirements definitions, which are deployed with that deployment
-   *
-   * @return the decision definitions, which are deployed
-   */
-  List<DecisionRequirementsDefinition> getDeployedDecisionRequirementsDefinitions();
 
   /**
    * Returns the id of the tenant this deployment belongs to. Can be <code>null</code>

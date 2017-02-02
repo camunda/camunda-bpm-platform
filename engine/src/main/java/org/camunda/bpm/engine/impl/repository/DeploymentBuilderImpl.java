@@ -42,6 +42,7 @@ import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
+import org.camunda.bpm.engine.repository.DeploymentWithDefinitions;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.cmmn.Cmmn;
@@ -240,8 +241,13 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
   }
 
   public Deployment deploy() {
-    return repositoryService.deploy(this);
+    return deployAndReturnDefinitions();
   }
+
+  public DeploymentWithDefinitions deployAndReturnDefinitions() {
+    return repositoryService.deployAndReturnDefinitions(this);
+  }
+
 
   public Collection<String> getResourceNames() {
     if(deployment.getResources() == null) {

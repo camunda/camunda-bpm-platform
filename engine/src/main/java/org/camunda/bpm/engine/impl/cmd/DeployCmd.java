@@ -56,11 +56,7 @@ import org.camunda.bpm.engine.impl.repository.DeploymentBuilderImpl;
 import org.camunda.bpm.engine.impl.repository.ProcessApplicationDeploymentBuilderImpl;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.StringUtil;
-import org.camunda.bpm.engine.repository.Deployment;
-import org.camunda.bpm.engine.repository.ProcessApplicationDeployment;
-import org.camunda.bpm.engine.repository.ProcessApplicationDeploymentBuilder;
-import org.camunda.bpm.engine.repository.ProcessDefinition;
-import org.camunda.bpm.engine.repository.ResumePreviousBy;
+import org.camunda.bpm.engine.repository.*;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.Process;
@@ -74,7 +70,7 @@ import org.camunda.bpm.model.cmmn.instance.Case;
  * @author Thorben Lindhauer
  * @author Daniel Meyer
  */
-public class DeployCmd<T> implements Command<Deployment>, Serializable {
+public class DeployCmd implements Command<DeploymentWithDefinitions>, Serializable {
 
   private final static CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
   private final static TransactionLogger TX_LOG = ProcessEngineLogger.TX_LOGGER;
@@ -88,7 +84,7 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
   }
 
   @Override
-  public Deployment execute(final CommandContext commandContext) {
+  public DeploymentWithDefinitions execute(final CommandContext commandContext) {
     // ensure serial processing of multiple deployments on the same node.
     // We experienced deadlock situations with highly concurrent deployment of multiple
     // applications on Jboss & Wildfly
@@ -97,7 +93,7 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
     }
   }
 
-  protected Deployment doExecute(final CommandContext commandContext) {
+  protected DeploymentWithDefinitions doExecute(final CommandContext commandContext) {
     DeploymentManager deploymentManager = commandContext.getDeploymentManager();
 
     Set<String> deploymentIds = getAllDeploymentIds(deploymentBuilder);
@@ -124,9 +120,9 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
     }
 
     // perform deployment
-    Deployment deployment = commandContext.runWithoutAuthorization(new Callable<Deployment>() {
+    DeploymentWithDefinitions deployment = commandContext.runWithoutAuthorization(new Callable<DeploymentWithDefinitions>() {
       @Override
-      public Deployment call() throws Exception {
+      public DeploymentWithDefinitions call() throws Exception {
         acquireExclusiveLock(commandContext);
         DeploymentEntity deployment = initDeployment();
         Map<String, ResourceEntity> resourcesToDeploy = resolveResourcesToDeploy(commandContext, deployment);

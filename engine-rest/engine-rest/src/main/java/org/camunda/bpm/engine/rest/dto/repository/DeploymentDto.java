@@ -12,9 +12,7 @@
  */
 package org.camunda.bpm.engine.rest.dto.repository;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import org.camunda.bpm.engine.repository.*;
 import org.camunda.bpm.engine.rest.dto.LinkableDto;
@@ -26,10 +24,6 @@ public class DeploymentDto extends LinkableDto {
   protected String source;
   protected Date deploymentTime;
   protected String tenantId;
-  protected List<ProcessDefinitionDto> deployedProcessDefinitions;
-  protected List<CaseDefinitionDto> deployedCaseDefinitions;
-  protected List<DecisionDefinitionDto> deployedDecisionDefinitions;
-  protected List<DecisionRequirementsDefinitionDto> deployedDecisionRequirementsDefinitions;
 
   public DeploymentDto() {
   }
@@ -54,22 +48,6 @@ public class DeploymentDto extends LinkableDto {
     return tenantId;
   }
 
-  public List<ProcessDefinitionDto> getDeployedProcessDefinitions() {
-    return deployedProcessDefinitions;
-  }
-
-  public List<CaseDefinitionDto> getDeployedCaseDefinitions() {
-    return deployedCaseDefinitions;
-  }
-
-  public List<DecisionDefinitionDto> getDeployedDecisionDefinitions() {
-    return deployedDecisionDefinitions;
-  }
-
-  public List<DecisionRequirementsDefinitionDto> getDeployedDecisionRequirementsDefinitions() {
-    return deployedDecisionRequirementsDefinitions;
-  }
-
   public static DeploymentDto fromDeployment(Deployment deployment) {
     DeploymentDto dto = new DeploymentDto();
     dto.id = deployment.getId();
@@ -77,44 +55,7 @@ public class DeploymentDto extends LinkableDto {
     dto.source = deployment.getSource();
     dto.deploymentTime = deployment.getDeploymentTime();
     dto.tenantId = deployment.getTenantId();
-
-    initDeployedResourceLists(deployment, dto);
-
     return dto;
-  }
-
-  private static void initDeployedResourceLists(Deployment deployment, DeploymentDto dto) {
-    List<ProcessDefinition> deployedProcessDefinitions = deployment.getDeployedProcessDefinitions();
-    if (deployedProcessDefinitions != null) {
-      dto.deployedProcessDefinitions = new ArrayList<ProcessDefinitionDto>();
-      for (ProcessDefinition processDefinition : deployedProcessDefinitions) {
-        dto.deployedProcessDefinitions.add(ProcessDefinitionDto.fromProcessDefinition(processDefinition));
-      }
-    }
-
-    List<CaseDefinition> deployedCaseDefinitions = deployment.getDeployedCaseDefinitions();
-    if (deployedCaseDefinitions != null) {
-      dto.deployedCaseDefinitions = new ArrayList<CaseDefinitionDto>();
-      for (CaseDefinition caseDefinition : deployedCaseDefinitions) {
-        dto.deployedCaseDefinitions.add(CaseDefinitionDto.fromCaseDefinition(caseDefinition));
-      }
-    }
-
-    List<DecisionDefinition> deployedDecisionDefinitions = deployment.getDeployedDecisionDefinitions();
-    if (deployedDecisionDefinitions != null) {
-      dto.deployedDecisionDefinitions = new ArrayList<DecisionDefinitionDto>();
-      for (DecisionDefinition decisionDefinition : deployedDecisionDefinitions) {
-        dto.deployedDecisionDefinitions.add(DecisionDefinitionDto.fromDecisionDefinition(decisionDefinition));
-      }
-    }
-
-    List<DecisionRequirementsDefinition> deployedDecisionRequirementsDefinitions = deployment.getDeployedDecisionRequirementsDefinitions();
-    if (deployedDecisionRequirementsDefinitions != null) {
-      dto.deployedDecisionRequirementsDefinitions = new ArrayList<DecisionRequirementsDefinitionDto>();
-      for (DecisionRequirementsDefinition drd : deployedDecisionRequirementsDefinitions) {
-        dto.deployedDecisionRequirementsDefinitions.add(DecisionRequirementsDefinitionDto.fromDecisionRequirementsDefinition(drd));
-      }
-    }
   }
 
 }

@@ -26,8 +26,10 @@ import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
+import org.camunda.bpm.engine.repository.DeploymentWithDefinitions;
 import org.camunda.bpm.engine.rest.DeploymentRestService;
 import org.camunda.bpm.engine.rest.dto.repository.DeploymentDto;
+import org.camunda.bpm.engine.rest.dto.repository.DeploymentWithDefinitionsDto;
 import org.camunda.bpm.engine.rest.dto.repository.RedeploymentDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.impl.AbstractRestProcessEngineAware;
@@ -62,7 +64,7 @@ public class DeploymentResourceImpl extends AbstractRestProcessEngineAware imple
   }
 
   public DeploymentDto redeploy(UriInfo uriInfo, RedeploymentDto redeployment) {
-    Deployment deployment = null;
+    DeploymentWithDefinitions deployment = null;
     try {
       deployment = tryToRedeploy(redeployment);
 
@@ -73,7 +75,7 @@ public class DeploymentResourceImpl extends AbstractRestProcessEngineAware imple
       throw createInvalidRequestException("redeploy", Status.BAD_REQUEST, e);
     }
 
-    DeploymentDto deploymentDto = DeploymentDto.fromDeployment(deployment);
+    DeploymentWithDefinitionsDto deploymentDto = DeploymentWithDefinitionsDto.fromDeployment(deployment);
 
     URI uri = uriInfo.getBaseUriBuilder()
       .path(relativeRootResourcePath)
@@ -87,7 +89,7 @@ public class DeploymentResourceImpl extends AbstractRestProcessEngineAware imple
     return deploymentDto;
   }
 
-  protected Deployment tryToRedeploy(RedeploymentDto redeployment) {
+  protected DeploymentWithDefinitions tryToRedeploy(RedeploymentDto redeployment) {
     RepositoryService repositoryService = getProcessEngine().getRepositoryService();
 
     DeploymentBuilder builder = repositoryService.createDeployment();
@@ -104,7 +106,7 @@ public class DeploymentResourceImpl extends AbstractRestProcessEngineAware imple
       builder.addDeploymentResources(deploymentId);
     }
 
-    return builder.deploy();
+    return builder.deployAndReturnDefinitions();
   }
 
   protected DeploymentBuilder addRedeploymentResources(DeploymentBuilder builder, RedeploymentDto redeployment) {
