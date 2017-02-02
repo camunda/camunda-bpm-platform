@@ -18,7 +18,7 @@
     <tbody>
       <tr ng-repeat="incident in incidents">
         <td class="message"
-            ng-show="incident.incidentType === 'failedJob'">
+            ng-if="incident.incidentType === 'failedJob'">
           <!--
             it would be great to be able to copy the stacktrace from here
             using the clipboard widget but it comes from an API endpoint...
@@ -40,7 +40,20 @@
           </a>
         </td>
         <td class="message"
-            ng-if="incident.incidentType !== 'failedJob' && incident.rootCauseIncidentMessage">
+            tooltip="Open stacktrace in new window"
+            tooltip-placement="top"
+            ng-if="incident.incidentType === 'failedExternalTask'">
+          <span external-task-error-message-link="incident.rootCauseIncidentConfiguration">
+            <span ng-show="incident.rootCauseIncidentMessage">
+              {{ incident.rootCauseIncidentMessage }}
+            </span>
+            <span ng-show="!incident.rootCauseIncidentMessage">
+              <i>Message is null.</i>
+            </span>
+          </span>
+        </td>
+        <td class="message"
+            ng-if="['failedExternalTask', 'failedJob'].indexOf(incident.incidentType) === -1 && incident.rootCauseIncidentMessage">
           <div class="auto-cutoff"
                cam-widget-clipboard="incident.rootCauseIncidentMessage">
             {{ incident.rootCauseIncidentMessage }}
