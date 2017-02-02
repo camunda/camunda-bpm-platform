@@ -11,7 +11,8 @@ module.exports = function() {
     transclude: true,
     controller: 'ExternalTaskErrorMessageLinkController as Link',
     scope: {
-      taskId: '=externalTaskErrorMessageLink'
+      taskId: '=externalTaskErrorMessageLink',
+      historic: '=?'
     }
   };
 };

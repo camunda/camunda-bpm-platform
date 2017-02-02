@@ -60,7 +60,7 @@
           </div>
         </td>
         <td class="message"
-            ng-if="incident.incidentType !== 'failedJob' && !incident.rootCauseIncidentMessage">
+            ng-if="['failedExternalTask', 'failedJob'].indexOf(incident.incidentType) === -1 && !incident.rootCauseIncidentMessage">
           <i>Message is null.</i>
         </td>
 
