@@ -45,7 +45,7 @@ public class DiGeneratorForFlowNodesTest {
   public void shouldGeneratePlaneForProcess() {
 
     // when
-    instance = Bpmn.createExecutableProcess().done();
+    instance = Bpmn.createExecutableProcess("process").done();
 
     // then
     Collection<BpmnDiagram> bpmnDiagrams = instance.getModelElementsByType(BpmnDiagram.class);
@@ -55,7 +55,7 @@ public class DiGeneratorForFlowNodesTest {
     assertNotNull(diagram.getId());
 
     assertNotNull(diagram.getBpmnPlane());
-
+    assertEquals(diagram.getBpmnPlane().getBpmnElement(), instance.getModelElementById("process"));
   }
 
   @Test
@@ -318,7 +318,7 @@ public class DiGeneratorForFlowNodesTest {
   }
 
   @Test
-  public void shouldGenerateShapeForSubProcess() {
+  public void shouldGenerateShapesForNestedFlowNodes() {
 
     // given
     ProcessBuilder processBuilder = Bpmn.createExecutableProcess();
@@ -349,7 +349,8 @@ public class DiGeneratorForFlowNodesTest {
   }
 
   @Test
-  public void shouldGenerateShapeForEventSubProcess(){
+  public void shouldGenerateShapeForEventSubProcess() {
+
     // given
     ProcessBuilder processBuilder = Bpmn.createExecutableProcess();
 
@@ -378,7 +379,8 @@ public class DiGeneratorForFlowNodesTest {
   }
 
   @Test
-  public void shouldGenerateShapeForCallActivity(){
+  public void shouldGenerateShapeForCallActivity() {
+
     // given
     ProcessBuilder processBuilder = Bpmn.createExecutableProcess();
 
@@ -397,7 +399,8 @@ public class DiGeneratorForFlowNodesTest {
   }
 
   @Test
-  public void shouldGenerateShapeForTransaction(){
+  public void shouldGenerateShapeForTransaction() {
+
     // given
     ProcessBuilder processBuilder = Bpmn.createExecutableProcess();
 
@@ -507,19 +510,19 @@ public class DiGeneratorForFlowNodesTest {
     assertGatewayShapeProperties("or");
   }
 
-  public void assertTaskShapeProperties(String id) {
+  protected void assertTaskShapeProperties(String id) {
     BpmnShape bpmnShapeTask = findBpmnShape(id);
     assertNotNull(bpmnShapeTask);
     assertActivitySize(bpmnShapeTask);
   }
 
-  public void assertEventShapeProperties(String id) {
+  protected void assertEventShapeProperties(String id) {
     BpmnShape bpmnShapeEvent = findBpmnShape(id);
     assertNotNull(bpmnShapeEvent);
     assertEventSize(bpmnShapeEvent);
   }
 
-  public void assertGatewayShapeProperties(String id) {
+  protected void assertGatewayShapeProperties(String id) {
     BpmnShape bpmnShapeGateway = findBpmnShape(id);
     assertNotNull(bpmnShapeGateway);
     assertGatewaySize(bpmnShapeGateway);
@@ -538,11 +541,11 @@ public class DiGeneratorForFlowNodesTest {
     return null;
   }
 
-  protected void assertEventSize(BpmnShape shape){
+  protected void assertEventSize(BpmnShape shape) {
     assertSize(shape, 36, 36);
   }
 
-  protected void assertGatewaySize(BpmnShape shape){
+  protected void assertGatewaySize(BpmnShape shape) {
     assertSize(shape, 50, 50);
   }
 
