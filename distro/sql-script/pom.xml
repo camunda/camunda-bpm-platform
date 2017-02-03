@@ -291,6 +291,23 @@
                   <fileset dir="upgrade" includes="mysql_identity_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch*.sql" />
                 </concat>
 
+                <!-- mariadb patches -->
+                <concat destfile="target/upgrade-test/sql/upgrade/mariadb_engine_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch.sql" fixlastline="yes">
+                  <fileset dir="upgrade" includes="mariadb_engine_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch*.sql" />
+                </concat>
+
+                <concat destfile="target/upgrade-test/sql/upgrade/mariadb_identity_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch.sql" fixlastline="yes">
+                  <fileset dir="upgrade" includes="mariadb_identity_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch*.sql" />
+                </concat>
+
+                <concat destfile="target/upgrade-test/sql/upgrade/mariadb_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch.sql" fixlastline="yes">
+                  <fileset dir="upgrade" includes="mariadb_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch*.sql" />
+                </concat>
+
+                <concat destfile="target/upgrade-test/sql/upgrade/mariadb_identity_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch.sql" fixlastline="yes">
+                  <fileset dir="upgrade" includes="mariadb_identity_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch*.sql" />
+                </concat>
+
                 <!-- oracle patches -->
                 <concat destfile="target/upgrade-test/sql/upgrade/oracle_engine_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch.sql" fixlastline="yes">
                   <fileset dir="upgrade" includes="oracle_engine_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch*.sql" />
