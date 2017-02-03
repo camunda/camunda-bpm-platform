@@ -14,8 +14,10 @@ var uploadTemplate = require('../../../../../client/scripts/components/variables
 
 module.exports = function(ngModule) {
   ngModule.controller('VariableInstancesController', [
-    '$scope', '$sce', '$http', 'search', 'Uri', 'LocalExecutionVariableResource', 'Notifications', '$modal', '$q', 'camAPI',
-    function($scope,   $sce,   $http,   search,   Uri,   LocalExecutionVariableResource,   Notifications,   $modal,   $q,   camAPI) {
+    '$scope', '$sce', '$http', 'search', 'Uri', 'LocalExecutionVariableResource',
+    'Notifications', '$modal', '$q', 'camAPI', 'createIsSearchQueryChangedFunction',
+    function($scope, $sce, $http, search, Uri, LocalExecutionVariableResource,
+      Notifications, $modal, $q, camAPI, createIsSearchQueryChangedFunction) {
 
         // input: processInstance, processData
 
@@ -27,8 +29,10 @@ module.exports = function(ngModule) {
       var executionService = camAPI.resource('execution'),
           taskService = camAPI.resource('task');
 
+      var isSearchQueryChanged = createIsSearchQueryChangedFunction();
+
       var pages = paginationUtils.initializePaginationInController($scope, search, function(newValue, oldValue) {
-        if (!angular.equals(newValue, oldValue)) {
+        if (!angular.equals(newValue, oldValue) && !isSearchQueryChanged()) {
           updateView($scope.instanceIdToInstanceMap, $scope.searchConfig.searches);
         }
       });

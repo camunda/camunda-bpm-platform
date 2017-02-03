@@ -9,6 +9,7 @@ var loaders = require('./services/loaders');
 var integrateActivityInstanceFilter = require('./services/integrate-activity-instance-filter');
 var params = require('./services/params');
 var createListQueryFunction = require('./services/create-list-query-function');
+var createIsSearchQueryChangedFunction = require('./services/create-is-search-query-changed-function');
 
 // Components
 var camToolbar = require('./components/cam-toolbar');
@@ -48,6 +49,7 @@ ngModule.factory('Loaders', loaders);
 ngModule.factory('integrateActivityInstanceFilter', integrateActivityInstanceFilter);
 ngModule.factory('params', params);
 ngModule.factory('createListQueryFunction', createListQueryFunction);
+ngModule.factory('createIsSearchQueryChangedFunction', createIsSearchQueryChangedFunction);
 
 // Components
 ngModule.directive('camToolbar', camToolbar);
