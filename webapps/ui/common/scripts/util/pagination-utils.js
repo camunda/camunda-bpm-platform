@@ -22,7 +22,11 @@ function initializePaginationInController($scope, search, updateCallback) {
   pages.current = getCurrentPageFromSearch(search);
 
   $scope.$watch('pages.current', function(newValue, oldValue) {
-    if (newValue == oldValue) {
+    // Used for checking if current page change is due to $locationChangeSuccess event
+    // If so this change was already passed to updateCallback, so it can be ignored
+    var searchCurrentPage = getCurrentPageFromSearch(search);
+
+    if (newValue == oldValue || newValue === searchCurrentPage) {
       return;
     }
 
@@ -35,11 +39,11 @@ function initializePaginationInController($scope, search, updateCallback) {
     var currentPage = getCurrentPageFromSearch(search);
 
     if (+pages.current !== +currentPage) {
-      var oldPages = angular.extend({}, pages);
+      var oldCurrent = pages.current;
 
       pages.current = currentPage;
 
-      updateCallback(pages, oldPages);
+      updateCallback(pages.current, oldCurrent);
     }
   });
 
