@@ -140,7 +140,7 @@ describe('Task Claiming Spec', function() {
     it('should change assigne by entering user name', function() {
 
       // when
-      dashboardPage.currentTask.editClaimedUser('Montgomery QA');
+      dashboardPage.currentTask.editClaimedUser('test');
 
       // then
       expect(dashboardPage.currentTask.claimedUser()).to.eventually.eql('Montgomery QA');
@@ -153,10 +153,32 @@ describe('Task Claiming Spec', function() {
       dashboardPage.currentTask.clickClaimedUserField();
 
       // then
-      expect(dashboardPage.currentTask.claimedUserFieldEditMode().getAttribute('value')).to.eventually.eql('Montgomery QA');
+      expect(dashboardPage.currentTask.claimedUserFieldEditMode().getAttribute('value')).to.eventually.eql('test');
 
       // finally
       dashboardPage.currentTask.cancelEditClaimedUser();
+    });
+
+
+    it('does not change the assignee if it does not exists', function() {
+
+      // when
+      dashboardPage.currentTask.editClaimedUser('test');
+
+      // then
+      expect(dashboardPage.currentTask.claimedUser()).to.eventually.eql('Montgomery QA');
+
+      // when
+      dashboardPage.currentTask.editClaimedUser('testa');
+
+      // then
+      expect(dashboardPage.currentTask.claimedUser()).to.eventually.eql('Montgomery QA');
+
+      // when
+      dashboardPage.currentTask.clickClaimedUserField();
+
+      // then
+      expect(dashboardPage.currentTask.claimedUserFieldEditMode().getAttribute('value')).to.eventually.eql('test');
     });
 
   });

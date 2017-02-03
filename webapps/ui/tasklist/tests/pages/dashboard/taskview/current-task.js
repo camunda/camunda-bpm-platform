@@ -85,14 +85,14 @@ module.exports = Page.extend({
   },
 
   clickClaimedUserField: function() {
-    element(by.css('[class="set-value ng-isolate-scope"] [ng-click*="startEditing()"]')).click();
+    element(by.css('.set-value [ng-click*="startEditing()"]')).click();
   },
 
   editClaimedUser: function(userName) {
     this.clickClaimedUserField();
     this.claimedUserFieldEditMode().clear();
     this.claimedUserFieldEditMode().sendKeys(userName);
-    element(by.css('[ng-click*="applyChange($event)"]')).click();
+    element(by.css('body > .cam-widget-inline-field > [ng-click="applyChange($event);"]')).click();
   },
 
   cancelEditClaimedUser: function() {
