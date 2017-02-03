@@ -6,6 +6,8 @@ var editGroupsFormTemplate = fs.readFileSync(__dirname + '/../modals/cam-tasklis
 
 var angular = require('camunda-commons-ui/vendor/angular');
 
+var debounce = require('lodash.debounce');
+
 module.exports = [
   '$modal',
   '$timeout',
@@ -184,9 +186,31 @@ module.exports = [
             }
           };
 
+          $scope.validAssignee = true; // we assume it's valid, good idea?
+
+          var userResource = camAPI.resource('user');
+          function validateAssignee(newId, done) {
+            done = done || angular.noop;
+
+            $scope.validAssignee = false;
+            if (!newId) {
+              // dunno... should it be false?
+              $scope.validAssignee = true;
+              return done();
+            }
+
+            userResource.profile(newId, function(err) {
+              $scope.validAssignee = !err;
+              done();
+            });
+          }
+          $scope.checkAssignee = debounce(function(evt) {
+            validateAssignee(evt.target.value);
+          }, 100);
+
           $scope.editAssignee = function(evt) {
             if(evt.keyCode === 13 && evt.target === evt.currentTarget) {
-            // we can not trigger events in an event handler, because 'apply is already in progress' ;)
+              // we can not trigger events in an event handler, because 'apply is already in progress' ;)
               $timeout(function() {
                 evt.target.firstChild.click();
               });
@@ -217,24 +241,28 @@ module.exports = [
           $scope.cancelEditingAssignee = notifyOnCancelEditing('assignee');
 
           $scope.assign = function(inlineFieldScope) {
-            setEditingState('assignee', false);
+            var original = $scope.assignee ? $scope.assignee.id : '';
+            validateAssignee(inlineFieldScope.varValue, function() {
+              if (!$scope.validAssignee) {
+                inlineFieldScope.varValue = original;
+                return;
+              }
+              setEditingState('assignee', false);
 
-            var newAssignee = inlineFieldScope.varValue.trim();
+              var newAssignee = inlineFieldScope.varValue.trim();
 
-            if (!newAssignee) {
-
-              if ($scope.isAssignee) {
-                unclaim();
+              if (!newAssignee) {
+                if ($scope.isAssignee) {
+                  unclaim();
+                }
+                else {
+                  resetAssignee();
+                }
               }
               else {
-                resetAssignee();
+                setAssignee(newAssignee);
               }
-
-            }
-            else {
-              setAssignee(newAssignee);
-            }
-
+            });
           };
 
           var claim = $scope.claim = function() {
