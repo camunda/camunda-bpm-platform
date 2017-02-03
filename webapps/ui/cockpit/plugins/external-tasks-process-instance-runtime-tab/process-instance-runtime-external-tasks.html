@@ -7,7 +7,6 @@
         <th class="state">External Task ID</th>
         <th class="activity">Activity</th>
         <th class="retries">Retries</th>
-        <th class="error-message">Error Message</th>
         <th class="worker-id">Worker ID</th>
         <th class="expiration">Lock Expiration Time</th>
         <th class="topic">Topic</th>
@@ -24,10 +23,6 @@
           </span>
         </td>
         <td class="retries">{{task.retries}}</td>
-        <td class="retries"
-            external-task-error-message-link="task.id">
-          {{task.errorMessage}}
-        </td>
         <td class="worker-id">{{task.workerId}}</td>
         <td class="expiration">{{task.lockExpirationTime}}</td>
         <td class="topic">{{task.topicName}}</td>
