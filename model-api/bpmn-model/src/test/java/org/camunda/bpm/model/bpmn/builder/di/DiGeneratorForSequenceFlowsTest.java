@@ -14,9 +14,7 @@ import java.util.Iterator;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.builder.ProcessBuilder;
-import org.camunda.bpm.model.bpmn.instance.SequenceFlow;
 import org.camunda.bpm.model.bpmn.instance.bpmndi.BpmnEdge;
-import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.junit.After;
 import org.junit.Test;
 
@@ -153,15 +151,7 @@ public class DiGeneratorForSequenceFlowsTest {
     assertBpmnEdgeExists("s4");
   }
 
-  protected SequenceFlow findSequenceFlow(String id) {
-    ModelElementInstance sequenceFlow = instance.getModelElementById(id);
-    if (!(sequenceFlow instanceof SequenceFlow)) {
-      return null;
-    }
-    return (SequenceFlow) sequenceFlow;
-  }
-
-  protected BpmnEdge findBpmnEdge(String sequenceFlowId){
+  protected BpmnEdge findBpmnEdge(String sequenceFlowId) {
     Collection<BpmnEdge> allEdges = instance.getModelElementsByType(BpmnEdge.class);
     Iterator<BpmnEdge> iterator = allEdges.iterator();
 
@@ -174,9 +164,8 @@ public class DiGeneratorForSequenceFlowsTest {
     return null;
   }
 
-  protected void assertBpmnEdgeExists(String id){
-    SequenceFlow sequenceFlow = findSequenceFlow(id);
-    assertNotNull(sequenceFlow);
-    assertNotNull(findBpmnEdge(id));
+  protected void assertBpmnEdgeExists(String id) {
+    BpmnEdge edge = findBpmnEdge(id);
+    assertNotNull(edge);
   }
 }

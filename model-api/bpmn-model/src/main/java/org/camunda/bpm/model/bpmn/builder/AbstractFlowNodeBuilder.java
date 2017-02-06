@@ -37,11 +37,8 @@ import org.camunda.bpm.model.bpmn.instance.ServiceTask;
 import org.camunda.bpm.model.bpmn.instance.SubProcess;
 import org.camunda.bpm.model.bpmn.instance.Transaction;
 import org.camunda.bpm.model.bpmn.instance.UserTask;
-import org.camunda.bpm.model.bpmn.instance.bpmndi.BpmnEdge;
-import org.camunda.bpm.model.bpmn.instance.bpmndi.BpmnPlane;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaExecutionListener;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaFailedJobRetryTimeCycle;
-import org.camunda.bpm.model.bpmn.instance.di.Waypoint;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 
 
@@ -80,22 +77,7 @@ public abstract class AbstractFlowNodeBuilder<B extends AbstractFlowNodeBuilder<
       .to(target);
 
     SequenceFlow sequenceFlow = getCurrentSequenceFlowBuilder().getElement();
-
-    BpmnEdge edge = createInstance(BpmnEdge.class);
-    edge.setBpmnElement(sequenceFlow);
-    Waypoint w1 = createInstance(Waypoint.class);
-    w1.setX(0.0);
-    w1.setY(0.0);
-    Waypoint w2 = createInstance(Waypoint.class);
-    w2.setX(0.0);
-    w2.setY(0.0);
-    edge.addChildElement(w1);
-    edge.addChildElement(w2);
-
-    BpmnPlane bpmnPlane = findBpmnPlane();
-
-    bpmnPlane.addChildElement(edge);
-
+    createBpmnEdge(sequenceFlow);
     currentSequenceFlowBuilder = null;
   }
 

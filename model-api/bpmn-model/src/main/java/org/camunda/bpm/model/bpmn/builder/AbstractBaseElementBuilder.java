@@ -32,12 +32,15 @@ import org.camunda.bpm.model.bpmn.instance.FlowNode;
 import org.camunda.bpm.model.bpmn.instance.Gateway;
 import org.camunda.bpm.model.bpmn.instance.Message;
 import org.camunda.bpm.model.bpmn.instance.MessageEventDefinition;
+import org.camunda.bpm.model.bpmn.instance.SequenceFlow;
 import org.camunda.bpm.model.bpmn.instance.Signal;
 import org.camunda.bpm.model.bpmn.instance.SignalEventDefinition;
 import org.camunda.bpm.model.bpmn.instance.SubProcess;
+import org.camunda.bpm.model.bpmn.instance.bpmndi.BpmnEdge;
 import org.camunda.bpm.model.bpmn.instance.bpmndi.BpmnPlane;
 import org.camunda.bpm.model.bpmn.instance.bpmndi.BpmnShape;
 import org.camunda.bpm.model.bpmn.instance.dc.Bounds;
+import org.camunda.bpm.model.bpmn.instance.di.Waypoint;
 
 /**
  * @author Sebastian Menski
@@ -287,6 +290,24 @@ public abstract class AbstractBaseElementBuilder<B extends AbstractBaseElementBu
       bpmnShape.addChildElement(nodeBounds);
       bpmnPlane.addChildElement(bpmnShape);
 
+    }
+  }
+
+  public void createBpmnEdge(SequenceFlow sequenceFlow) {
+    BpmnPlane bpmnPlane = findBpmnPlane();
+    if (bpmnPlane != null) {
+      BpmnEdge edge = createInstance(BpmnEdge.class);
+      edge.setBpmnElement(sequenceFlow);
+      Waypoint w1 = createInstance(Waypoint.class);
+      w1.setX(0.0);
+      w1.setY(0.0);
+      Waypoint w2 = createInstance(Waypoint.class);
+      w2.setX(0.0);
+      w2.setY(0.0);
+      edge.addChildElement(w1);
+      edge.addChildElement(w2);
+
+      bpmnPlane.addChildElement(edge);
     }
   }
 
