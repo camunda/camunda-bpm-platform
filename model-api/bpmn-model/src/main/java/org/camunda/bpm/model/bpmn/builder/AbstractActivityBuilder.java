@@ -13,13 +13,19 @@
 
 package org.camunda.bpm.model.bpmn.builder;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.Activity;
 import org.camunda.bpm.model.bpmn.instance.BoundaryEvent;
 import org.camunda.bpm.model.bpmn.instance.MultiInstanceLoopCharacteristics;
+import org.camunda.bpm.model.bpmn.instance.bpmndi.BpmnShape;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaInputOutput;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaInputParameter;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaOutputParameter;
+import org.camunda.bpm.model.bpmn.instance.dc.Bounds;
 
 /**
  * @author Sebastian Menski
@@ -37,7 +43,18 @@ public abstract class AbstractActivityBuilder<B extends AbstractActivityBuilder<
   public BoundaryEventBuilder boundaryEvent(String id) {
     BoundaryEvent boundaryEvent = createSibling(BoundaryEvent.class, id);
     boundaryEvent.setAttachedTo(element);
-    createBpmnShape(boundaryEvent);
+    Bounds elemBounds = findBpmnShape(element).getBounds();
+
+    BpmnShape boundaryEventBpmnShape = createBpmnShape(boundaryEvent);
+    Bounds bounds = boundaryEventBpmnShape.getBounds();
+
+    double x = generateXCoordinateForBoundaryEvent(bounds);
+    double y = elemBounds.getY() + elemBounds.getHeight() - 18;
+
+
+    bounds.setX(x);
+    bounds.setY(y);
+
     return boundaryEvent.builder();
   }
 
@@ -82,6 +99,28 @@ public abstract class AbstractActivityBuilder<B extends AbstractActivityBuilder<
     camundaOutputParameter.setTextContent(value);
 
     return myself;
+  }
+
+  public double generateXCoordinateForBoundaryEvent(Bounds boundaryEventBounds) {
+    Bounds elemBounds = findBpmnShape(element).getBounds();
+    Collection<BoundaryEvent> boundaryEvents = element.getParentElement().getChildElementsByType(BoundaryEvent.class);
+    Collection<BoundaryEvent> boundaryEventsOfCurrentElement = new ArrayList<BoundaryEvent>();
+
+    Iterator<BoundaryEvent> iterator = boundaryEvents.iterator();
+    BoundaryEvent tmp;
+
+    while(iterator.hasNext()) {
+      tmp = iterator.next();
+      if(tmp.getAttachedTo().equals(element)) {
+        boundaryEventsOfCurrentElement.add(tmp);
+      }
+    }
+
+    switch (boundaryEventsOfCurrentElement.size()){
+    case 2 : return elemBounds.getX() + elemBounds.getWidth() / 2 + boundaryEventBounds.getWidth() / 2;
+    case 3 : return elemBounds.getX() + elemBounds.getWidth() / 2 - 1.5* boundaryEventBounds.getWidth();
+    default : return elemBounds.getX() + elemBounds.getWidth() / 2 - boundaryEventBounds.getWidth() / 2 ;
+    }
   }
 
 }

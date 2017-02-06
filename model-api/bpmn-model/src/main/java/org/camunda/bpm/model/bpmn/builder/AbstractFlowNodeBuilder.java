@@ -73,7 +73,7 @@ public abstract class AbstractFlowNodeBuilder<B extends AbstractFlowNodeBuilder<
     return myself;
   }
 
-  private void connectTarget(FlowNode target) {
+  protected void connectTarget(FlowNode target) {
     getCurrentSequenceFlowBuilder()
       .from(element)
       .to(target);
@@ -92,7 +92,7 @@ public abstract class AbstractFlowNodeBuilder<B extends AbstractFlowNodeBuilder<
     return createTarget(typeClass, null);
   }
 
-  private <T extends FlowNode> T createTarget(Class<T> typeClass, String identifier) {
+  protected <T extends FlowNode> T createTarget(Class<T> typeClass, String identifier) {
     T target = createSibling(typeClass, identifier);
 
     Bounds elemBounds = findBpmnShape(element).getBounds();

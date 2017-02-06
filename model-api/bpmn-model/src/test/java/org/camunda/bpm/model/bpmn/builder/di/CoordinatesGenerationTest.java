@@ -488,6 +488,271 @@ public class CoordinatesGenerationTest {
 
   }
 
+  @Test
+  public void shouldPlaceBoundaryEventForTask() {
+    ProcessBuilder builder = Bpmn.createExecutableProcess();
+
+    instance = builder
+        .startEvent(START_EVENT_ID)
+        .userTask(USER_TASK_ID)
+        .boundaryEvent("boundary")
+        .sequenceFlowId(SEQUENCE_FLOW_ID)
+        .endEvent(END_EVENT_ID)
+        .moveToActivity(USER_TASK_ID)
+        .endEvent()
+        .done();
+
+    Bounds boundaryEventBounds = findBpmnShape("boundary").getBounds();
+    assertShapeCoordinates(boundaryEventBounds, 218, 140);
+
+  }
+
+  @Test
+  public void shouldPlaceFollowingFlowNodeProperlyForTask() {
+    ProcessBuilder builder = Bpmn.createExecutableProcess();
+
+    instance = builder
+        .startEvent(START_EVENT_ID)
+        .userTask(USER_TASK_ID)
+        .boundaryEvent("boundary")
+        .sequenceFlowId(SEQUENCE_FLOW_ID)
+        .endEvent(END_EVENT_ID)
+        .moveToActivity(USER_TASK_ID)
+        .endEvent()
+        .done();
+
+    Bounds endEventBounds = findBpmnShape(END_EVENT_ID).getBounds();
+    assertShapeCoordinates(endEventBounds, 304, 190);
+
+    Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge(SEQUENCE_FLOW_ID).getWaypoints();
+    Iterator<Waypoint> iterator = sequenceFlowWaypoints.iterator();
+
+    Waypoint waypoint = iterator.next();
+    assertWaypointCoordinates(waypoint, 236, 176);
+
+    while(iterator.hasNext()){
+      waypoint = iterator.next();
+    }
+
+    assertWaypointCoordinates(waypoint, 304, 208);
+  }
+
+  @Test
+  public void shouldPlaceTwoBoundaryEventsForTask() {
+    ProcessBuilder builder = Bpmn.createExecutableProcess();
+
+    instance = builder
+        .startEvent(START_EVENT_ID)
+        .userTask(USER_TASK_ID)
+        .boundaryEvent("boundary1")
+        .sequenceFlowId(SEQUENCE_FLOW_ID)
+        .endEvent(END_EVENT_ID)
+        .moveToActivity(USER_TASK_ID)
+        .endEvent()
+        .moveToActivity(USER_TASK_ID)
+        .boundaryEvent("boundary2")
+        .done();
+
+    Bounds boundaryEvent1Bounds = findBpmnShape("boundary1").getBounds();
+    assertShapeCoordinates(boundaryEvent1Bounds, 218, 140);
+
+    Bounds boundaryEvent2Bounds = findBpmnShape("boundary2").getBounds();
+    assertShapeCoordinates(boundaryEvent2Bounds, 254, 140);
+
+  }
+
+  @Test
+  public void shouldPlaceThreeBoundaryEventsForTask() {
+    ProcessBuilder builder = Bpmn.createExecutableProcess();
+
+    instance = builder
+        .startEvent(START_EVENT_ID)
+        .userTask(USER_TASK_ID)
+        .boundaryEvent("boundary1")
+        .sequenceFlowId(SEQUENCE_FLOW_ID)
+        .endEvent(END_EVENT_ID)
+        .moveToActivity(USER_TASK_ID)
+        .endEvent()
+        .moveToActivity(USER_TASK_ID)
+        .boundaryEvent("boundary2")
+        .moveToActivity(USER_TASK_ID)
+        .boundaryEvent("boundary3")
+        .done();
+
+    Bounds boundaryEvent1Bounds = findBpmnShape("boundary1").getBounds();
+    assertShapeCoordinates(boundaryEvent1Bounds, 218, 140);
+
+    Bounds boundaryEvent2Bounds = findBpmnShape("boundary2").getBounds();
+    assertShapeCoordinates(boundaryEvent2Bounds, 254, 140);
+
+    Bounds boundaryEvent3Bounds = findBpmnShape("boundary3").getBounds();
+    assertShapeCoordinates(boundaryEvent3Bounds, 182, 140);
+
+  }
+
+  @Test
+  public void shouldPlaceManyBoundaryEventsForTask() {
+    ProcessBuilder builder = Bpmn.createExecutableProcess();
+
+    instance = builder
+        .startEvent(START_EVENT_ID)
+        .userTask(USER_TASK_ID)
+        .boundaryEvent("boundary1")
+        .sequenceFlowId(SEQUENCE_FLOW_ID)
+        .endEvent(END_EVENT_ID)
+        .moveToActivity(USER_TASK_ID)
+        .endEvent()
+        .moveToActivity(USER_TASK_ID)
+        .boundaryEvent("boundary2")
+        .moveToActivity(USER_TASK_ID)
+        .boundaryEvent("boundary3")
+        .moveToActivity(USER_TASK_ID)
+        .boundaryEvent("boundary4")
+        .done();
+
+    Bounds boundaryEvent1Bounds = findBpmnShape("boundary1").getBounds();
+    assertShapeCoordinates(boundaryEvent1Bounds, 218, 140);
+
+    Bounds boundaryEvent2Bounds = findBpmnShape("boundary2").getBounds();
+    assertShapeCoordinates(boundaryEvent2Bounds, 254, 140);
+
+    Bounds boundaryEvent3Bounds = findBpmnShape("boundary3").getBounds();
+    assertShapeCoordinates(boundaryEvent3Bounds, 182, 140);
+
+    Bounds boundaryEvent4Bounds = findBpmnShape("boundary4").getBounds();
+    assertShapeCoordinates(boundaryEvent4Bounds, 218, 140);
+
+  }
+
+  @Test
+  public void shouldPlaceBoundaryEventForSubProcess() {
+    ProcessBuilder builder = Bpmn.createExecutableProcess();
+
+    instance = builder
+        .startEvent(START_EVENT_ID)
+        .subProcess(SUB_PROCESS_ID)
+        .boundaryEvent("boundary")
+        .sequenceFlowId(SEQUENCE_FLOW_ID)
+        .endEvent(END_EVENT_ID)
+        .moveToActivity(SUB_PROCESS_ID)
+        .endEvent()
+        .done();
+
+    Bounds boundaryEventBounds = findBpmnShape("boundary").getBounds();
+    assertShapeCoordinates(boundaryEventBounds, 343, 200);
+
+  }
+
+  @Test
+  public void shouldPlaceFollowingFlowNodeForSubProcess() {
+    ProcessBuilder builder = Bpmn.createExecutableProcess();
+
+    instance = builder
+        .startEvent(START_EVENT_ID)
+        .subProcess(SUB_PROCESS_ID)
+        .boundaryEvent("boundary")
+        .sequenceFlowId(SEQUENCE_FLOW_ID)
+        .endEvent(END_EVENT_ID)
+        .moveToActivity(SUB_PROCESS_ID)
+        .endEvent()
+        .done();
+
+    Bounds endEventBounds = findBpmnShape(END_EVENT_ID).getBounds();
+    assertShapeCoordinates(endEventBounds, 429, 250);
+
+    Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge(SEQUENCE_FLOW_ID).getWaypoints();
+    Iterator<Waypoint> iterator = sequenceFlowWaypoints.iterator();
+
+    Waypoint waypoint = iterator.next();
+    assertWaypointCoordinates(waypoint, 361, 236);
+
+    while(iterator.hasNext()){
+      waypoint = iterator.next();
+    }
+
+    assertWaypointCoordinates(waypoint, 429, 268);
+  }
+
+
+  @Test
+  public void shouldPlaceTwoBoundaryEventsForSubProcess() {
+    ProcessBuilder builder = Bpmn.createExecutableProcess();
+
+    instance = builder
+        .startEvent(START_EVENT_ID)
+        .subProcess(SUB_PROCESS_ID)
+        .boundaryEvent("boundary1")
+        .moveToActivity(SUB_PROCESS_ID)
+        .boundaryEvent("boundary2")
+        .moveToActivity(SUB_PROCESS_ID)
+        .endEvent()
+        .done();
+
+    Bounds boundaryEvent1Bounds = findBpmnShape("boundary1").getBounds();
+    assertShapeCoordinates(boundaryEvent1Bounds, 343, 200);
+
+    Bounds boundaryEvent2Bounds = findBpmnShape("boundary2").getBounds();
+    assertShapeCoordinates(boundaryEvent2Bounds, 379, 200);
+
+  }
+
+  @Test
+  public void shouldPlaceThreeBoundaryEventsForSubProcess() {
+    ProcessBuilder builder = Bpmn.createExecutableProcess();
+
+    instance = builder
+        .startEvent(START_EVENT_ID)
+        .subProcess(SUB_PROCESS_ID)
+        .boundaryEvent("boundary1")
+        .moveToActivity(SUB_PROCESS_ID)
+        .boundaryEvent("boundary2")
+        .moveToActivity(SUB_PROCESS_ID)
+        .boundaryEvent("boundary3")
+        .moveToActivity(SUB_PROCESS_ID)
+        .endEvent()
+        .done();
+
+    Bounds boundaryEvent1Bounds = findBpmnShape("boundary1").getBounds();
+    assertShapeCoordinates(boundaryEvent1Bounds, 343, 200);
+
+    Bounds boundaryEvent2Bounds = findBpmnShape("boundary2").getBounds();
+    assertShapeCoordinates(boundaryEvent2Bounds, 379, 200);
+
+    Bounds boundaryEvent3Bounds = findBpmnShape("boundary3").getBounds();
+    assertShapeCoordinates(boundaryEvent3Bounds, 307, 200);
+  }
+
+  @Test
+  public void shouldPlaceManyBoundaryEventsForSubProcess() {
+    ProcessBuilder builder = Bpmn.createExecutableProcess();
+
+    instance = builder
+        .startEvent(START_EVENT_ID)
+        .subProcess(SUB_PROCESS_ID)
+        .boundaryEvent("boundary1")
+        .moveToActivity(SUB_PROCESS_ID)
+        .boundaryEvent("boundary2")
+        .moveToActivity(SUB_PROCESS_ID)
+        .boundaryEvent("boundary3")
+        .moveToActivity(SUB_PROCESS_ID)
+        .boundaryEvent("boundary4")
+        .moveToActivity(SUB_PROCESS_ID)
+        .endEvent()
+        .done();
+
+    Bounds boundaryEvent1Bounds = findBpmnShape("boundary1").getBounds();
+    assertShapeCoordinates(boundaryEvent1Bounds, 343, 200);
+
+    Bounds boundaryEvent2Bounds = findBpmnShape("boundary2").getBounds();
+    assertShapeCoordinates(boundaryEvent2Bounds, 379, 200);
+
+    Bounds boundaryEvent3Bounds = findBpmnShape("boundary3").getBounds();
+    assertShapeCoordinates(boundaryEvent3Bounds, 307, 200);
+
+    Bounds boundaryEvent4Bounds = findBpmnShape("boundary4").getBounds();
+    assertShapeCoordinates(boundaryEvent4Bounds, 343, 200);
+  }
+
   protected BpmnShape findBpmnShape(String id) {
     Collection<BpmnShape> allShapes = instance.getModelElementsByType(BpmnShape.class);
 
