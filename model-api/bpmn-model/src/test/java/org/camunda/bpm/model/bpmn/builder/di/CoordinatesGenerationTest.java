@@ -36,7 +36,7 @@ public class CoordinatesGenerationTest {
         .done();
 
     Bounds startBounds = findBpmnShape(START_EVENT_ID).getBounds();
-    assertShapeBounds(startBounds, 100, 100);
+    assertShapeCoordinates(startBounds, 100, 100);
   }
 
   @Test
@@ -51,10 +51,19 @@ public class CoordinatesGenerationTest {
         .done();
 
     Bounds userTaskBounds = findBpmnShape(USER_TASK_ID).getBounds();
-    Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge(SEQUENCE_FLOW_ID).getWaypoints();
+    assertShapeCoordinates(userTaskBounds, 186, 78);
 
-    assertShapeBounds(userTaskBounds, 186, 78);
-    assertEdgeBounds(136, 118, 186, 118, sequenceFlowWaypoints);
+    Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge(SEQUENCE_FLOW_ID).getWaypoints();
+    Iterator<Waypoint> iterator = sequenceFlowWaypoints.iterator();
+
+    Waypoint waypoint = iterator.next();
+    assertWaypointCoordinates(waypoint, 136, 118);
+
+    while(iterator.hasNext()){
+      waypoint = iterator.next();
+    }
+
+    assertWaypointCoordinates(waypoint, 186, 118);
 
   }
 
@@ -70,10 +79,19 @@ public class CoordinatesGenerationTest {
         .done();
 
     Bounds sendTaskBounds = findBpmnShape(SEND_TASK_ID).getBounds();
-    Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge(SEQUENCE_FLOW_ID).getWaypoints();
+    assertShapeCoordinates(sendTaskBounds, 186, 78);
 
-    assertShapeBounds(sendTaskBounds, 186, 78);
-    assertEdgeBounds(136, 118, 186, 118, sequenceFlowWaypoints);
+    Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge(SEQUENCE_FLOW_ID).getWaypoints();
+    Iterator<Waypoint> iterator = sequenceFlowWaypoints.iterator();
+
+    Waypoint waypoint = iterator.next();
+    assertWaypointCoordinates(waypoint, 136, 118);
+
+    while(iterator.hasNext()){
+      waypoint = iterator.next();
+    }
+
+    assertWaypointCoordinates(waypoint, 186, 118);
 
   }
 
@@ -89,10 +107,19 @@ public class CoordinatesGenerationTest {
         .done();
 
     Bounds serviceTaskBounds = findBpmnShape(SERVICE_TASK_ID).getBounds();
-    Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge(SEQUENCE_FLOW_ID).getWaypoints();
+    assertShapeCoordinates(serviceTaskBounds, 186, 78);
 
-    assertShapeBounds(serviceTaskBounds, 186, 78);
-    assertEdgeBounds(136, 118, 186, 118, sequenceFlowWaypoints);
+    Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge(SEQUENCE_FLOW_ID).getWaypoints();
+    Iterator<Waypoint> iterator = sequenceFlowWaypoints.iterator();
+
+    Waypoint waypoint = iterator.next();
+    assertWaypointCoordinates(waypoint, 136, 118);
+
+    while(iterator.hasNext()){
+      waypoint = iterator.next();
+    }
+
+    assertWaypointCoordinates(waypoint, 186, 118);
 
   }
 
@@ -108,10 +135,19 @@ public class CoordinatesGenerationTest {
         .done();
 
     Bounds receiveTaskBounds = findBpmnShape(TASK_ID).getBounds();
-    Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge(SEQUENCE_FLOW_ID).getWaypoints();
+    assertShapeCoordinates(receiveTaskBounds, 186, 78);
 
-    assertShapeBounds(receiveTaskBounds, 186, 78);
-    assertEdgeBounds(136, 118, 186, 118, sequenceFlowWaypoints);
+    Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge(SEQUENCE_FLOW_ID).getWaypoints();
+    Iterator<Waypoint> iterator = sequenceFlowWaypoints.iterator();
+
+    Waypoint waypoint = iterator.next();
+    assertWaypointCoordinates(waypoint, 136, 118);
+
+    while(iterator.hasNext()){
+      waypoint = iterator.next();
+    }
+
+    assertWaypointCoordinates(waypoint, 186, 118);
 
   }
 
@@ -127,10 +163,19 @@ public class CoordinatesGenerationTest {
         .done();
 
     Bounds manualTaskBounds = findBpmnShape(TASK_ID).getBounds();
-    Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge(SEQUENCE_FLOW_ID).getWaypoints();
+    assertShapeCoordinates(manualTaskBounds, 186, 78);
 
-    assertShapeBounds(manualTaskBounds, 186, 78);
-    assertEdgeBounds(136, 118, 186, 118, sequenceFlowWaypoints);
+    Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge(SEQUENCE_FLOW_ID).getWaypoints();
+    Iterator<Waypoint> iterator = sequenceFlowWaypoints.iterator();
+
+    Waypoint waypoint = iterator.next();
+    assertWaypointCoordinates(waypoint, 136, 118);
+
+    while(iterator.hasNext()){
+      waypoint = iterator.next();
+    }
+
+    assertWaypointCoordinates(waypoint, 186, 118);
 
   }
 
@@ -146,10 +191,19 @@ public class CoordinatesGenerationTest {
         .done();
 
     Bounds businessRuleTaskBounds = findBpmnShape(TASK_ID).getBounds();
-    Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge(SEQUENCE_FLOW_ID).getWaypoints();
+    assertShapeCoordinates(businessRuleTaskBounds, 186, 78);
 
-    assertShapeBounds(businessRuleTaskBounds, 186, 78);
-    assertEdgeBounds(136, 118, 186, 118, sequenceFlowWaypoints);
+    Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge(SEQUENCE_FLOW_ID).getWaypoints();
+    Iterator<Waypoint> iterator = sequenceFlowWaypoints.iterator();
+
+    Waypoint waypoint = iterator.next();
+    assertWaypointCoordinates(waypoint, 136, 118);
+
+    while(iterator.hasNext()){
+      waypoint = iterator.next();
+    }
+
+    assertWaypointCoordinates(waypoint, 186, 118);
 
   }
 
@@ -165,10 +219,19 @@ public class CoordinatesGenerationTest {
         .done();
 
     Bounds scriptTaskBounds = findBpmnShape(TASK_ID).getBounds();
-    Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge(SEQUENCE_FLOW_ID).getWaypoints();
+    assertShapeCoordinates(scriptTaskBounds, 186, 78);
 
-    assertShapeBounds(scriptTaskBounds, 186, 78);
-    assertEdgeBounds(136, 118, 186, 118, sequenceFlowWaypoints);
+    Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge(SEQUENCE_FLOW_ID).getWaypoints();
+    Iterator<Waypoint> iterator = sequenceFlowWaypoints.iterator();
+
+    Waypoint waypoint = iterator.next();
+    assertWaypointCoordinates(waypoint, 136, 118);
+
+    while(iterator.hasNext()){
+      waypoint = iterator.next();
+    }
+
+    assertWaypointCoordinates(waypoint, 186, 118);
 
   }
 
@@ -184,10 +247,19 @@ public class CoordinatesGenerationTest {
         .done();
 
     Bounds catchEventBounds = findBpmnShape("id").getBounds();
-    Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge(SEQUENCE_FLOW_ID).getWaypoints();
+    assertShapeCoordinates(catchEventBounds, 186, 100);
 
-    assertShapeBounds(catchEventBounds, 186, 100);
-    assertEdgeBounds(136, 118, 186, 118, sequenceFlowWaypoints);
+    Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge(SEQUENCE_FLOW_ID).getWaypoints();
+    Iterator<Waypoint> iterator = sequenceFlowWaypoints.iterator();
+
+    Waypoint waypoint = iterator.next();
+    assertWaypointCoordinates(waypoint, 136, 118);
+
+    while(iterator.hasNext()){
+      waypoint = iterator.next();
+    }
+
+    assertWaypointCoordinates(waypoint, 186, 118);
 
   }
 
@@ -203,10 +275,19 @@ public class CoordinatesGenerationTest {
         .done();
 
     Bounds throwEventBounds = findBpmnShape("id").getBounds();
-    Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge(SEQUENCE_FLOW_ID).getWaypoints();
+    assertShapeCoordinates(throwEventBounds, 186, 100);
 
-    assertShapeBounds(throwEventBounds, 186, 100);
-    assertEdgeBounds(136, 118, 186, 118, sequenceFlowWaypoints);
+    Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge(SEQUENCE_FLOW_ID).getWaypoints();
+    Iterator<Waypoint> iterator = sequenceFlowWaypoints.iterator();
+
+    Waypoint waypoint = iterator.next();
+    assertWaypointCoordinates(waypoint, 136, 118);
+
+    while(iterator.hasNext()){
+      waypoint = iterator.next();
+    }
+
+    assertWaypointCoordinates(waypoint, 186, 118);
 
   }
 
@@ -222,10 +303,19 @@ public class CoordinatesGenerationTest {
         .done();
 
     Bounds endEventBounds = findBpmnShape(END_EVENT_ID).getBounds();
-    Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge(SEQUENCE_FLOW_ID).getWaypoints();
+    assertShapeCoordinates(endEventBounds, 186, 100);
 
-    assertShapeBounds(endEventBounds, 186, 100);
-    assertEdgeBounds(136, 118, 186, 118, sequenceFlowWaypoints);
+    Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge(SEQUENCE_FLOW_ID).getWaypoints();
+    Iterator<Waypoint> iterator = sequenceFlowWaypoints.iterator();
+
+    Waypoint waypoint = iterator.next();
+    assertWaypointCoordinates(waypoint, 136, 118);
+
+    while(iterator.hasNext()){
+      waypoint = iterator.next();
+    }
+
+    assertWaypointCoordinates(waypoint, 186, 118);
 
   }
 
@@ -241,15 +331,24 @@ public class CoordinatesGenerationTest {
         .done();
 
     Bounds callActivityBounds = findBpmnShape("id").getBounds();
-    Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge(SEQUENCE_FLOW_ID).getWaypoints();
+    assertShapeCoordinates(callActivityBounds, 186, 78);
 
-    assertShapeBounds(callActivityBounds, 186, 78);
-    assertEdgeBounds(136, 118, 186, 118, sequenceFlowWaypoints);
+    Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge(SEQUENCE_FLOW_ID).getWaypoints();
+    Iterator<Waypoint> iterator = sequenceFlowWaypoints.iterator();
+
+    Waypoint waypoint = iterator.next();
+    assertWaypointCoordinates(waypoint, 136, 118);
+
+    while(iterator.hasNext()){
+      waypoint = iterator.next();
+    }
+
+    assertWaypointCoordinates(waypoint, 186, 118);
 
   }
 
   @Test
-  public void shouldPlaceGateway() {
+  public void shouldPlaceExclusiveGateway() {
 
     ProcessBuilder builder = Bpmn.createExecutableProcess();
 
@@ -260,10 +359,104 @@ public class CoordinatesGenerationTest {
         .done();
 
     Bounds gatewayBounds = findBpmnShape("id").getBounds();
-    Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge(SEQUENCE_FLOW_ID).getWaypoints();
+    assertShapeCoordinates(gatewayBounds, 186, 93);
 
-    assertShapeBounds(gatewayBounds, 186, 93);
-    assertEdgeBounds(136, 118, 186, 118, sequenceFlowWaypoints);
+    Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge(SEQUENCE_FLOW_ID).getWaypoints();
+    Iterator<Waypoint> iterator = sequenceFlowWaypoints.iterator();
+
+    Waypoint waypoint = iterator.next();
+    assertWaypointCoordinates(waypoint, 136, 118);
+
+    while(iterator.hasNext()){
+      waypoint = iterator.next();
+    }
+
+    assertWaypointCoordinates(waypoint, 186, 118);
+
+  }
+
+  @Test
+  public void shouldPlaceInclusiveGateway() {
+
+    ProcessBuilder builder = Bpmn.createExecutableProcess();
+
+    instance = builder
+        .startEvent(START_EVENT_ID)
+        .sequenceFlowId(SEQUENCE_FLOW_ID)
+        .inclusiveGateway("id")
+        .done();
+
+    Bounds gatewayBounds = findBpmnShape("id").getBounds();
+    assertShapeCoordinates(gatewayBounds, 186, 93);
+
+    Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge(SEQUENCE_FLOW_ID).getWaypoints();
+    Iterator<Waypoint> iterator = sequenceFlowWaypoints.iterator();
+
+    Waypoint waypoint = iterator.next();
+    assertWaypointCoordinates(waypoint, 136, 118);
+
+    while(iterator.hasNext()){
+      waypoint = iterator.next();
+    }
+
+    assertWaypointCoordinates(waypoint, 186, 118);
+
+  }
+
+  @Test
+  public void shouldPlaceParallelGateway() {
+
+    ProcessBuilder builder = Bpmn.createExecutableProcess();
+
+    instance = builder
+        .startEvent(START_EVENT_ID)
+        .sequenceFlowId(SEQUENCE_FLOW_ID)
+        .parallelGateway("id")
+        .done();
+
+    Bounds gatewayBounds = findBpmnShape("id").getBounds();
+    assertShapeCoordinates(gatewayBounds, 186, 93);
+
+    Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge(SEQUENCE_FLOW_ID).getWaypoints();
+    Iterator<Waypoint> iterator = sequenceFlowWaypoints.iterator();
+
+    Waypoint waypoint = iterator.next();
+    assertWaypointCoordinates(waypoint, 136, 118);
+
+    while(iterator.hasNext()){
+      waypoint = iterator.next();
+    }
+
+    assertWaypointCoordinates(waypoint, 186, 118);
+
+  }
+
+  @Test
+  public void shouldPlaceEventBasedGateway() {
+
+    ProcessBuilder builder = Bpmn.createExecutableProcess();
+
+    instance = builder
+        .startEvent(START_EVENT_ID)
+        .sequenceFlowId(SEQUENCE_FLOW_ID)
+        .eventBasedGateway()
+          .id("id")
+        .done();
+
+    Bounds gatewayBounds = findBpmnShape("id").getBounds();
+    assertShapeCoordinates(gatewayBounds, 186, 93);
+
+    Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge(SEQUENCE_FLOW_ID).getWaypoints();
+    Iterator<Waypoint> iterator = sequenceFlowWaypoints.iterator();
+
+    Waypoint waypoint = iterator.next();
+    assertWaypointCoordinates(waypoint, 136, 118);
+
+    while(iterator.hasNext()){
+      waypoint = iterator.next();
+    }
+
+    assertWaypointCoordinates(waypoint, 186, 118);
 
   }
 
@@ -279,10 +472,19 @@ public class CoordinatesGenerationTest {
         .done();
 
     Bounds subProcessBounds = findBpmnShape(SUB_PROCESS_ID).getBounds();
-    Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge(SEQUENCE_FLOW_ID).getWaypoints();
+    assertShapeCoordinates(subProcessBounds, 186, 18);
 
-    assertShapeBounds(subProcessBounds, 186, 18);
-    assertEdgeBounds(136, 118, 186, 118, sequenceFlowWaypoints);
+    Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge(SEQUENCE_FLOW_ID).getWaypoints();
+    Iterator<Waypoint> iterator = sequenceFlowWaypoints.iterator();
+
+    Waypoint waypoint = iterator.next();
+    assertWaypointCoordinates(waypoint, 136, 118);
+
+    while(iterator.hasNext()){
+      waypoint = iterator.next();
+    }
+
+    assertWaypointCoordinates(waypoint, 186, 118);
 
   }
 
@@ -312,24 +514,14 @@ public class CoordinatesGenerationTest {
     return null;
   }
 
-  protected void assertShapeBounds(Bounds bounds, double x, double y){
+  protected void assertShapeCoordinates(Bounds bounds, double x, double y){
     assertThat(bounds.getX()).isEqualTo(x);
     assertThat(bounds.getY()).isEqualTo(y);
   }
 
-  protected void assertEdgeBounds(double x1, double y1, double x2, double y2, Collection<Waypoint> edgeWaypoints){
-    Iterator<Waypoint> iterator = edgeWaypoints.iterator();
-    Waypoint tmp = iterator.next();
 
-    assertThat(x1).isEqualTo(tmp.getX());
-    assertThat(y1).isEqualTo(tmp.getY());
-
-    tmp = iterator.next();
-
-    while(iterator.hasNext()){
-      tmp = iterator.next();
-    }
-    assertThat(x2).isEqualTo(tmp.getX());
-    assertThat(y2).isEqualTo(tmp.getY());
+  protected void assertWaypointCoordinates(Waypoint waypoint, double x, double y){
+    assertThat(x).isEqualTo(waypoint.getX());
+    assertThat(y).isEqualTo(waypoint.getY());
   }
 }
