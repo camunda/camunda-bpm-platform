@@ -291,6 +291,18 @@ a.expand-collapse {
   border-bottom: 1px solid @custom-gray-light;
 }
 
+// makes the tabs scroll horizontally when too wide
+.ctn-content-bottom ul.nav-tabs {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-height: 37px + 16px;
+  white-space: nowrap;
+  > li {
+    display: inline-block;
+    float: none;
+  }
+}
+
 .resize-handle {
   position: absolute;
   background: transparent;
