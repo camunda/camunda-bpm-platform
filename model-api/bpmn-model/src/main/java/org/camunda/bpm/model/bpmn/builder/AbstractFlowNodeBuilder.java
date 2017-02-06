@@ -39,6 +39,7 @@ import org.camunda.bpm.model.bpmn.instance.Transaction;
 import org.camunda.bpm.model.bpmn.instance.UserTask;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaExecutionListener;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaFailedJobRetryTimeCycle;
+import org.camunda.bpm.model.bpmn.instance.dc.Bounds;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 
 
@@ -92,8 +93,11 @@ public abstract class AbstractFlowNodeBuilder<B extends AbstractFlowNodeBuilder<
 
   private <T extends FlowNode> T createTarget(Class<T> typeClass, String identifier) {
     T target = createSibling(typeClass, identifier);
+
+    Bounds elemBounds = findBpmnShape(element).getBounds();
+    createBpmnShape(target, elemBounds.getX() + elemBounds.getWidth() + 50, elemBounds.getY() + elemBounds.getHeight() / 2);
+
     connectTarget(target);
-    createBpmnShape(target);
     return target;
   }
 

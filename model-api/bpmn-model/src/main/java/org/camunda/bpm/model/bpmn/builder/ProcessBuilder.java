@@ -28,13 +28,13 @@ public class ProcessBuilder extends AbstractProcessBuilder<ProcessBuilder> {
 
   public StartEventBuilder startEvent() {
     StartEvent start = createChild(StartEvent.class);
-    createBpmnShape(start);
+    createBpmnShape(start, 100, 100);
     return start.builder();
   }
 
   public StartEventBuilder startEvent(String id) {
     StartEvent start = createChild(StartEvent.class, id);
-    createBpmnShape(start);
+    createBpmnShape(start, 100, 100);
     return start.builder();
   }
 }

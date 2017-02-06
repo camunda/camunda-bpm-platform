@@ -14,6 +14,7 @@
 package org.camunda.bpm.model.bpmn.builder;
 
 import java.util.Collection;
+import java.util.Iterator;
 
 import org.camunda.bpm.model.bpmn.BpmnModelException;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
@@ -264,14 +265,16 @@ public abstract class AbstractBaseElementBuilder<B extends AbstractBaseElementBu
     return myself;
   }
 
-  public void createBpmnShape(FlowNode node){
+  public void createBpmnShape(FlowNode node) {
+    createBpmnShape(node, 0, 0);
+  }
+
+  public void createBpmnShape(FlowNode node, double x, double y) {
     BpmnPlane bpmnPlane = findBpmnPlane();
     if (bpmnPlane != null) {
       BpmnShape bpmnShape = createInstance(BpmnShape.class);
       bpmnShape.setBpmnElement(node);
       Bounds nodeBounds = createInstance(Bounds.class);
-      nodeBounds.setX(0.0);
-      nodeBounds.setY(0.0);
 
       if (node instanceof SubProcess) {
         bpmnShape.setExpanded(true);
@@ -287,6 +290,10 @@ public abstract class AbstractBaseElementBuilder<B extends AbstractBaseElementBu
         nodeBounds.setWidth(50);
         nodeBounds.setHeight(50);
       }
+
+      nodeBounds.setX(x);
+      nodeBounds.setY(y - nodeBounds.getHeight() / 2);
+
       bpmnShape.addChildElement(nodeBounds);
       bpmnPlane.addChildElement(bpmnShape);
 
@@ -296,19 +303,24 @@ public abstract class AbstractBaseElementBuilder<B extends AbstractBaseElementBu
   public void createBpmnEdge(SequenceFlow sequenceFlow) {
     BpmnPlane bpmnPlane = findBpmnPlane();
     if (bpmnPlane != null) {
-      BpmnEdge edge = createInstance(BpmnEdge.class);
-      edge.setBpmnElement(sequenceFlow);
-      Waypoint w1 = createInstance(Waypoint.class);
-      w1.setX(0.0);
-      w1.setY(0.0);
-      Waypoint w2 = createInstance(Waypoint.class);
-      w2.setX(0.0);
-      w2.setY(0.0);
-      edge.addChildElement(w1);
-      edge.addChildElement(w2);
+       Bounds elemBounds = findBpmnShape(sequenceFlow.getSource()).getBounds();
+       Bounds targetBounds = findBpmnShape(sequenceFlow.getTarget()).getBounds();
 
-      bpmnPlane.addChildElement(edge);
+       BpmnEdge edge = createInstance(BpmnEdge.class);
+       edge.setBpmnElement(sequenceFlow);
+       Waypoint w1 = createInstance(Waypoint.class);
+       w1.setX(elemBounds.getX() + elemBounds.getWidth());
+       w1.setY(elemBounds.getY() + elemBounds.getHeight() / 2);
+
+       Waypoint w2 = createInstance(Waypoint.class);
+       w2.setX(targetBounds.getX());
+       w2.setY(targetBounds.getY() + targetBounds.getHeight() / 2);
+       edge.addChildElement(w1);
+       edge.addChildElement(w2);
+
+       bpmnPlane.addChildElement(edge);
     }
+
   }
 
   protected BpmnPlane findBpmnPlane() {
@@ -316,6 +328,16 @@ public abstract class AbstractBaseElementBuilder<B extends AbstractBaseElementBu
     return planes.iterator().next();
   }
 
+  protected BpmnShape findBpmnShape(FlowNode node) {
+    Collection<BpmnShape> allShapes = modelInstance.getModelElementsByType(BpmnShape.class);
 
-
+    Iterator<BpmnShape> iterator = allShapes.iterator();
+    while (iterator.hasNext()) {
+      BpmnShape shape = iterator.next();
+      if (shape.getBpmnElement().equals(node)) {
+        return shape;
+      }
+    }
+    return null;
+  }
 }
