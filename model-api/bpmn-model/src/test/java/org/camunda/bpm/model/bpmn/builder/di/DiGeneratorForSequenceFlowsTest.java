@@ -30,7 +30,7 @@ public class DiGeneratorForSequenceFlowsTest {
   }
 
   @Test
-  public void shouldGenerateEdgeForSequenceFlow(){
+  public void shouldGenerateEdgeForSequenceFlow() {
 
     ProcessBuilder builder = Bpmn.createExecutableProcess();
 
@@ -47,7 +47,7 @@ public class DiGeneratorForSequenceFlowsTest {
   }
 
   @Test
-  public void shouldGenerateEdgesForSequenceFlowsUsingGateway(){
+  public void shouldGenerateEdgesForSequenceFlowsUsingGateway() {
 
     ProcessBuilder builder = Bpmn.createExecutableProcess();
 
@@ -71,7 +71,7 @@ public class DiGeneratorForSequenceFlowsTest {
   }
 
   @Test
-  public void shouldGenerateEdgesWhenUsingMoveToActivity(){
+  public void shouldGenerateEdgesWhenUsingMoveToActivity() {
 
     ProcessBuilder builder = Bpmn.createExecutableProcess();
 
@@ -98,7 +98,7 @@ public class DiGeneratorForSequenceFlowsTest {
   }
 
   @Test
-  public void shouldGenerateEdgesWhenUsingMoveToNode(){
+  public void shouldGenerateEdgesWhenUsingMoveToNode() {
 
     ProcessBuilder builder = Bpmn.createExecutableProcess();
 
@@ -125,7 +125,7 @@ public class DiGeneratorForSequenceFlowsTest {
   }
 
   @Test
-  public void shouldGenerateEdgesWhenUsingConnectTo(){
+  public void shouldGenerateEdgesWhenUsingConnectTo() {
 
     ProcessBuilder builder = Bpmn.createExecutableProcess();
 
