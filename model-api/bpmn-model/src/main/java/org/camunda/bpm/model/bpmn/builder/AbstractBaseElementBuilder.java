@@ -265,11 +265,7 @@ public abstract class AbstractBaseElementBuilder<B extends AbstractBaseElementBu
     return myself;
   }
 
-  public void createBpmnShape(FlowNode node) {
-    createBpmnShape(node, 0, 0);
-  }
-
-  public void createBpmnShape(FlowNode node, double x, double y) {
+  public BpmnShape createBpmnShape(FlowNode node) {
     BpmnPlane bpmnPlane = findBpmnPlane();
     if (bpmnPlane != null) {
       BpmnShape bpmnShape = createInstance(BpmnShape.class);
@@ -291,16 +287,18 @@ public abstract class AbstractBaseElementBuilder<B extends AbstractBaseElementBu
         nodeBounds.setHeight(50);
       }
 
-      nodeBounds.setX(x);
-      nodeBounds.setY(y - nodeBounds.getHeight() / 2);
+      nodeBounds.setX(0);
+      nodeBounds.setY(0);
 
       bpmnShape.addChildElement(nodeBounds);
       bpmnPlane.addChildElement(bpmnShape);
 
+      return bpmnShape;
     }
+    return null;
   }
 
-  public void createBpmnEdge(SequenceFlow sequenceFlow) {
+  public BpmnEdge createBpmnEdge(SequenceFlow sequenceFlow) {
     BpmnPlane bpmnPlane = findBpmnPlane();
     if (bpmnPlane != null) {
        Bounds elemBounds = findBpmnShape(sequenceFlow.getSource()).getBounds();
@@ -319,7 +317,9 @@ public abstract class AbstractBaseElementBuilder<B extends AbstractBaseElementBu
        edge.addChildElement(w2);
 
        bpmnPlane.addChildElement(edge);
+       return edge;
     }
+    return null;
 
   }
 

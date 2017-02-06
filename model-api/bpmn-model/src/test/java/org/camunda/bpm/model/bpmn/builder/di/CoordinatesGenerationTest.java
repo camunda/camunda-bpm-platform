@@ -1,8 +1,13 @@
 package org.camunda.bpm.model.bpmn.builder.di;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.END_EVENT_ID;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.SEND_TASK_ID;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.SEQUENCE_FLOW_ID;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.SERVICE_TASK_ID;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.START_EVENT_ID;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.SUB_PROCESS_ID;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TASK_ID;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.USER_TASK_ID;
 
 import java.util.Collection;
@@ -22,7 +27,7 @@ public class CoordinatesGenerationTest {
   private BpmnModelInstance instance;
 
   @Test
-  public void shouldPlaceStartEvent(){
+  public void shouldPlaceStartEvent() {
 
     ProcessBuilder builder = Bpmn.createExecutableProcess();
 
@@ -31,11 +36,11 @@ public class CoordinatesGenerationTest {
         .done();
 
     Bounds startBounds = findBpmnShape(START_EVENT_ID).getBounds();
-    assertShapeBounds(startBounds, 100, 82);
+    assertShapeBounds(startBounds, 100, 100);
   }
 
   @Test
-  public void shouldPlaceUserTask(){
+  public void shouldPlaceUserTask() {
 
     ProcessBuilder builder = Bpmn.createExecutableProcess();
 
@@ -45,12 +50,239 @@ public class CoordinatesGenerationTest {
         .userTask(USER_TASK_ID)
         .done();
 
-    Bounds startBounds = findBpmnShape(START_EVENT_ID).getBounds();
     Bounds userTaskBounds = findBpmnShape(USER_TASK_ID).getBounds();
     Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge(SEQUENCE_FLOW_ID).getWaypoints();
 
-    assertShapeBounds(userTaskBounds, 186, 60);
-    assertEdgeBounds(startBounds, userTaskBounds, sequenceFlowWaypoints);
+    assertShapeBounds(userTaskBounds, 186, 78);
+    assertEdgeBounds(136, 118, 186, 118, sequenceFlowWaypoints);
+
+  }
+
+  @Test
+  public void shouldPlaceSendTask() {
+
+    ProcessBuilder builder = Bpmn.createExecutableProcess();
+
+    instance = builder
+        .startEvent(START_EVENT_ID)
+        .sequenceFlowId(SEQUENCE_FLOW_ID)
+        .sendTask(SEND_TASK_ID)
+        .done();
+
+    Bounds sendTaskBounds = findBpmnShape(SEND_TASK_ID).getBounds();
+    Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge(SEQUENCE_FLOW_ID).getWaypoints();
+
+    assertShapeBounds(sendTaskBounds, 186, 78);
+    assertEdgeBounds(136, 118, 186, 118, sequenceFlowWaypoints);
+
+  }
+
+  @Test
+  public void shouldPlaceServiceTask() {
+
+    ProcessBuilder builder = Bpmn.createExecutableProcess();
+
+    instance = builder
+        .startEvent(START_EVENT_ID)
+        .sequenceFlowId(SEQUENCE_FLOW_ID)
+        .serviceTask(SERVICE_TASK_ID)
+        .done();
+
+    Bounds serviceTaskBounds = findBpmnShape(SERVICE_TASK_ID).getBounds();
+    Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge(SEQUENCE_FLOW_ID).getWaypoints();
+
+    assertShapeBounds(serviceTaskBounds, 186, 78);
+    assertEdgeBounds(136, 118, 186, 118, sequenceFlowWaypoints);
+
+  }
+
+  @Test
+  public void shouldPlaceReceiveTask() {
+
+    ProcessBuilder builder = Bpmn.createExecutableProcess();
+
+    instance = builder
+        .startEvent(START_EVENT_ID)
+        .sequenceFlowId(SEQUENCE_FLOW_ID)
+        .receiveTask(TASK_ID)
+        .done();
+
+    Bounds receiveTaskBounds = findBpmnShape(TASK_ID).getBounds();
+    Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge(SEQUENCE_FLOW_ID).getWaypoints();
+
+    assertShapeBounds(receiveTaskBounds, 186, 78);
+    assertEdgeBounds(136, 118, 186, 118, sequenceFlowWaypoints);
+
+  }
+
+  @Test
+  public void shouldPlaceManualTask() {
+
+    ProcessBuilder builder = Bpmn.createExecutableProcess();
+
+    instance = builder
+        .startEvent(START_EVENT_ID)
+        .sequenceFlowId(SEQUENCE_FLOW_ID)
+        .manualTask(TASK_ID)
+        .done();
+
+    Bounds manualTaskBounds = findBpmnShape(TASK_ID).getBounds();
+    Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge(SEQUENCE_FLOW_ID).getWaypoints();
+
+    assertShapeBounds(manualTaskBounds, 186, 78);
+    assertEdgeBounds(136, 118, 186, 118, sequenceFlowWaypoints);
+
+  }
+
+  @Test
+  public void shouldPlaceBusinessRuleTask() {
+
+    ProcessBuilder builder = Bpmn.createExecutableProcess();
+
+    instance = builder
+        .startEvent(START_EVENT_ID)
+        .sequenceFlowId(SEQUENCE_FLOW_ID)
+        .businessRuleTask(TASK_ID)
+        .done();
+
+    Bounds businessRuleTaskBounds = findBpmnShape(TASK_ID).getBounds();
+    Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge(SEQUENCE_FLOW_ID).getWaypoints();
+
+    assertShapeBounds(businessRuleTaskBounds, 186, 78);
+    assertEdgeBounds(136, 118, 186, 118, sequenceFlowWaypoints);
+
+  }
+
+  @Test
+  public void shouldPlaceScriptTask() {
+
+    ProcessBuilder builder = Bpmn.createExecutableProcess();
+
+    instance = builder
+        .startEvent(START_EVENT_ID)
+        .sequenceFlowId(SEQUENCE_FLOW_ID)
+        .scriptTask(TASK_ID)
+        .done();
+
+    Bounds scriptTaskBounds = findBpmnShape(TASK_ID).getBounds();
+    Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge(SEQUENCE_FLOW_ID).getWaypoints();
+
+    assertShapeBounds(scriptTaskBounds, 186, 78);
+    assertEdgeBounds(136, 118, 186, 118, sequenceFlowWaypoints);
+
+  }
+
+  @Test
+  public void shouldPlaceCatchingIntermediateEvent() {
+
+    ProcessBuilder builder = Bpmn.createExecutableProcess();
+
+    instance = builder
+        .startEvent(START_EVENT_ID)
+        .sequenceFlowId(SEQUENCE_FLOW_ID)
+        .intermediateCatchEvent("id")
+        .done();
+
+    Bounds catchEventBounds = findBpmnShape("id").getBounds();
+    Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge(SEQUENCE_FLOW_ID).getWaypoints();
+
+    assertShapeBounds(catchEventBounds, 186, 100);
+    assertEdgeBounds(136, 118, 186, 118, sequenceFlowWaypoints);
+
+  }
+
+  @Test
+  public void shouldPlaceThrowingIntermediateEvent() {
+
+    ProcessBuilder builder = Bpmn.createExecutableProcess();
+
+    instance = builder
+        .startEvent(START_EVENT_ID)
+        .sequenceFlowId(SEQUENCE_FLOW_ID)
+        .intermediateThrowEvent("id")
+        .done();
+
+    Bounds throwEventBounds = findBpmnShape("id").getBounds();
+    Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge(SEQUENCE_FLOW_ID).getWaypoints();
+
+    assertShapeBounds(throwEventBounds, 186, 100);
+    assertEdgeBounds(136, 118, 186, 118, sequenceFlowWaypoints);
+
+  }
+
+  @Test
+  public void shouldPlaceEndEvent() {
+
+    ProcessBuilder builder = Bpmn.createExecutableProcess();
+
+    instance = builder
+        .startEvent(START_EVENT_ID)
+        .sequenceFlowId(SEQUENCE_FLOW_ID)
+        .endEvent(END_EVENT_ID)
+        .done();
+
+    Bounds endEventBounds = findBpmnShape(END_EVENT_ID).getBounds();
+    Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge(SEQUENCE_FLOW_ID).getWaypoints();
+
+    assertShapeBounds(endEventBounds, 186, 100);
+    assertEdgeBounds(136, 118, 186, 118, sequenceFlowWaypoints);
+
+  }
+
+  @Test
+  public void shouldPlaceCallActivity() {
+
+    ProcessBuilder builder = Bpmn.createExecutableProcess();
+
+    instance = builder
+        .startEvent(START_EVENT_ID)
+        .sequenceFlowId(SEQUENCE_FLOW_ID)
+        .callActivity("id")
+        .done();
+
+    Bounds callActivityBounds = findBpmnShape("id").getBounds();
+    Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge(SEQUENCE_FLOW_ID).getWaypoints();
+
+    assertShapeBounds(callActivityBounds, 186, 78);
+    assertEdgeBounds(136, 118, 186, 118, sequenceFlowWaypoints);
+
+  }
+
+  @Test
+  public void shouldPlaceGateway() {
+
+    ProcessBuilder builder = Bpmn.createExecutableProcess();
+
+    instance = builder
+        .startEvent(START_EVENT_ID)
+        .sequenceFlowId(SEQUENCE_FLOW_ID)
+        .exclusiveGateway("id")
+        .done();
+
+    Bounds gatewayBounds = findBpmnShape("id").getBounds();
+    Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge(SEQUENCE_FLOW_ID).getWaypoints();
+
+    assertShapeBounds(gatewayBounds, 186, 93);
+    assertEdgeBounds(136, 118, 186, 118, sequenceFlowWaypoints);
+
+  }
+
+  @Test
+  public void shouldPlaceBlankSubProcess() {
+
+    ProcessBuilder builder = Bpmn.createExecutableProcess();
+
+    instance = builder
+        .startEvent(START_EVENT_ID)
+        .sequenceFlowId(SEQUENCE_FLOW_ID)
+        .subProcess(SUB_PROCESS_ID)
+        .done();
+
+    Bounds subProcessBounds = findBpmnShape(SUB_PROCESS_ID).getBounds();
+    Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge(SEQUENCE_FLOW_ID).getWaypoints();
+
+    assertShapeBounds(subProcessBounds, 186, 18);
+    assertEdgeBounds(136, 118, 186, 118, sequenceFlowWaypoints);
 
   }
 
@@ -85,19 +317,19 @@ public class CoordinatesGenerationTest {
     assertThat(bounds.getY()).isEqualTo(y);
   }
 
-  protected void assertEdgeBounds(Bounds sourceBounds, Bounds targetBounds, Collection<Waypoint> edgeWaypoints){
+  protected void assertEdgeBounds(double x1, double y1, double x2, double y2, Collection<Waypoint> edgeWaypoints){
     Iterator<Waypoint> iterator = edgeWaypoints.iterator();
     Waypoint tmp = iterator.next();
 
-    assertThat(sourceBounds.getX() + sourceBounds.getWidth()).isEqualTo(tmp.getX());
-    assertThat(sourceBounds.getY() + sourceBounds.getHeight()/2).isEqualTo(tmp.getY());
+    assertThat(x1).isEqualTo(tmp.getX());
+    assertThat(y1).isEqualTo(tmp.getY());
 
     tmp = iterator.next();
 
     while(iterator.hasNext()){
       tmp = iterator.next();
     }
-    assertThat(targetBounds.getX()).isEqualTo(tmp.getX());
-    assertThat(targetBounds.getY() + targetBounds.getHeight()/2).isEqualTo(tmp.getY());
+    assertThat(x2).isEqualTo(tmp.getX());
+    assertThat(y2).isEqualTo(tmp.getY());
   }
 }

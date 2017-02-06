@@ -16,6 +16,8 @@ package org.camunda.bpm.model.bpmn.builder;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.Process;
 import org.camunda.bpm.model.bpmn.instance.StartEvent;
+import org.camunda.bpm.model.bpmn.instance.bpmndi.BpmnShape;
+import org.camunda.bpm.model.bpmn.instance.dc.Bounds;
 
 /**
  * @author Sebastian Menski
@@ -27,14 +29,15 @@ public class ProcessBuilder extends AbstractProcessBuilder<ProcessBuilder> {
   }
 
   public StartEventBuilder startEvent() {
-    StartEvent start = createChild(StartEvent.class);
-    createBpmnShape(start, 100, 100);
-    return start.builder();
+    return startEvent(null);
   }
 
   public StartEventBuilder startEvent(String id) {
     StartEvent start = createChild(StartEvent.class, id);
-    createBpmnShape(start, 100, 100);
+    BpmnShape bpmnShape = createBpmnShape(start);
+    Bounds bounds = bpmnShape.getBounds();
+    bounds.setX(100);
+    bounds.setY(100);
     return start.builder();
   }
 }
