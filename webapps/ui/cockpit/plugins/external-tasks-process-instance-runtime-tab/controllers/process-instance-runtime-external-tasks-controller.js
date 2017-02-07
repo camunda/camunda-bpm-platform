@@ -30,6 +30,6 @@ ProcessInstanceRuntimeTab.prototype.getActivityParams = function(activityIds) {
   }
 
   return {
-    activityId: activityIds[0]
+    activityIdIn: activityIds
   };
 };

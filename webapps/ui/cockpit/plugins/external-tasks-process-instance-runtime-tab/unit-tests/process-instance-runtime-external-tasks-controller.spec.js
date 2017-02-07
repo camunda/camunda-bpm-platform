@@ -65,7 +65,7 @@ describe('cockpit.plugin.process-instance-runtime-tab ProcessInstanceRuntimeTabC
 
     beforeEach(() => {
       pages = 'pages';
-      activityIds = ['params'];
+      activityIds = ['params', 'd1'];
 
       promise = instance.onLoad(pages, activityIds);
     });
@@ -75,7 +75,7 @@ describe('cockpit.plugin.process-instance-runtime-tab ProcessInstanceRuntimeTabC
         $scope.processInstance.id,
         pages,
         {
-          activityId: activityIds[0]
+          activityIdIn: activityIds
         }
       )).to.eql(true);
     });
