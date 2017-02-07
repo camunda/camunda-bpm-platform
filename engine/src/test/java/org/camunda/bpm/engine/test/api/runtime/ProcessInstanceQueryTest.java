@@ -12,14 +12,6 @@
  */
 package org.camunda.bpm.engine.test.api.runtime;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,7 +23,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -58,6 +49,16 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.processInstanceByProcessDefinitionId;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.processInstanceByProcessInstanceId;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.verifySorting;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author Joram Barrez
@@ -292,8 +293,14 @@ public class ProcessInstanceQueryTest {
 
   @Test
   public void testQuerySorting() {
-    assertEquals(5, runtimeService.createProcessInstanceQuery().orderByProcessInstanceId().asc().list().size());
-    assertEquals(5, runtimeService.createProcessInstanceQuery().orderByProcessDefinitionId().asc().list().size());
+    List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().orderByProcessInstanceId().asc().list();
+    assertEquals(5, processInstances.size());
+    verifySorting(processInstances, processInstanceByProcessInstanceId());
+
+    processInstances = runtimeService.createProcessInstanceQuery().orderByProcessDefinitionId().asc().list();
+    assertEquals(5, processInstances.size());
+    verifySorting(processInstances, processInstanceByProcessDefinitionId());
+
     assertEquals(5, runtimeService.createProcessInstanceQuery().orderByProcessDefinitionKey().asc().list().size());
 
     assertEquals(5, runtimeService.createProcessInstanceQuery().orderByProcessInstanceId().desc().list().size());

@@ -26,4 +26,14 @@ public class HistoricProcessInstanceEntity extends HistoricProcessInstanceEventE
 
   private static final long serialVersionUID = 1L;
 
+  protected Integer processDefinitionVersion;
+
+  @Override
+  public Integer getProcessDefinitionVersion() {
+    return processDefinitionVersion;
+  }
+
+  public void setProcessDefinitionVersion(Integer processDefinitionVersion) {
+    this.processDefinitionVersion = processDefinitionVersion;
+  }
 }

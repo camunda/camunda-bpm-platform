@@ -104,6 +104,7 @@
         <result property="processDefinitionKey" column="PROC_DEF_KEY_" jdbcType="VARCHAR"/>
         <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR"/>
         <result property="processDefinitionName" column="NAME_" jdbcType="VARCHAR"/>
+        <result property="processDefinitionVersion" column="VERSION_" jdbcType="INTEGER"/>
         <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP"/>
         <result property="endTime" column="END_TIME_" jdbcType="TIMESTAMP"/>
         <result property="durationInMillis" column="DURATION_" jdbcType="BIGINT"/>
@@ -152,7 +153,7 @@
     <sql id="selectHistoricProcessInstancesByQueryCriteriaSql">
         from (
 
-        SELECT SELF.*, DEF.NAME_
+        SELECT SELF.*, DEF.NAME_, DEF.VERSION_
         FROM ${prefix}ACT_HI_PROCINST SELF
 
         LEFT JOIN ${prefix}ACT_RE_PROCDEF DEF

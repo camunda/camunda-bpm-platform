@@ -13,21 +13,19 @@
 
 package org.camunda.bpm.engine.impl;
 
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotContainsEmptyString;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotContainsNull;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
-
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
-
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.util.CompareUtil;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotContainsEmptyString;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotContainsNull;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Tom Baeyens
@@ -246,6 +244,18 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
 
   public HistoricProcessInstanceQuery orderByProcessDefinitionId() {
     return orderBy(HistoricProcessInstanceQueryProperty.PROCESS_DEFINITION_ID);
+  }
+
+  public HistoricProcessInstanceQuery orderByProcessDefinitionKey() {
+    return orderBy(HistoricProcessInstanceQueryProperty.PROCESS_DEFINITION_KEY);
+  }
+
+  public HistoricProcessInstanceQuery orderByProcessDefinitionName() {
+    return orderBy(HistoricProcessInstanceQueryProperty.PROCESS_DEFINITION_NAME);
+  }
+
+  public HistoricProcessInstanceQuery orderByProcessDefinitionVersion() {
+    return orderBy(HistoricProcessInstanceQueryProperty.PROCESS_DEFINITION_VERSION);
   }
 
   public HistoricProcessInstanceQuery orderByProcessInstanceId() {

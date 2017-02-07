@@ -12,14 +12,6 @@
  */
 package org.camunda.bpm.engine.rest.history;
 
-import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
-import org.camunda.bpm.engine.rest.dto.CountResultDto;
-import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
-import org.camunda.bpm.engine.rest.dto.history.DeleteHistoricProcessInstancesDto;
-import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceDto;
-import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceQueryDto;
-import org.camunda.bpm.engine.rest.sub.history.HistoricProcessInstanceResource;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -33,6 +25,13 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.util.List;
+import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
+import org.camunda.bpm.engine.rest.dto.CountResultDto;
+import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
+import org.camunda.bpm.engine.rest.dto.history.DeleteHistoricProcessInstancesDto;
+import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceDto;
+import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceQueryDto;
+import org.camunda.bpm.engine.rest.sub.history.HistoricProcessInstanceResource;
 
 @Path(HistoricProcessInstanceRestService.PATH)
 @Produces(MediaType.APPLICATION_JSON)
@@ -47,7 +46,7 @@ public interface HistoricProcessInstanceRestService {
    * Exposes the {@link HistoricProcessInstanceQuery} interface as a REST
    * service.
    *
-   * @param query
+   * @param uriInfo
    * @param firstResult
    * @param maxResults
    * @return

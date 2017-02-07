@@ -1,19 +1,7 @@
 package org.camunda.bpm.engine.rest.history;
 
-import static com.jayway.restassured.RestAssured.expect;
-import static com.jayway.restassured.RestAssured.given;
-import static com.jayway.restassured.path.json.JsonPath.from;
-import static org.fest.assertions.Assertions.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.Matchers.argThat;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
-
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response.Status;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -22,10 +10,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response.Status;
-
+import com.jayway.restassured.http.ContentType;
+import com.jayway.restassured.response.Response;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
@@ -41,9 +27,19 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
-
-import com.jayway.restassured.http.ContentType;
-import com.jayway.restassured.response.Response;
+import static com.jayway.restassured.RestAssured.expect;
+import static com.jayway.restassured.RestAssured.given;
+import static com.jayway.restassured.path.json.JsonPath.from;
+import static org.fest.assertions.Assertions.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.Matchers.argThat;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestServiceTest {
 
@@ -215,6 +211,21 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
     inOrder.verify(mockedQuery).desc();
 
     inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySorting("definitionKey", "desc", Status.OK);
+    inOrder.verify(mockedQuery).orderByProcessDefinitionKey();
+    inOrder.verify(mockedQuery).desc();
+
+    inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySorting("definitionName", "desc", Status.OK);
+    inOrder.verify(mockedQuery).orderByProcessDefinitionName();
+    inOrder.verify(mockedQuery).desc();
+
+    inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySorting("definitionVersion", "desc", Status.OK);
+    inOrder.verify(mockedQuery).orderByProcessDefinitionVersion();
+    inOrder.verify(mockedQuery).desc();
+
+    inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySorting("businessKey", "asc", Status.OK);
     inOrder.verify(mockedQuery).orderByProcessInstanceBusinessKey();
     inOrder.verify(mockedQuery).asc();
@@ -378,6 +389,7 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
     String returnedProcessDefinitionId = from(content).getString("[0].processDefinitionId");
     String returnedProcessDefinitionKey = from(content).getString("[0].processDefinitionKey");
     String returnedProcessDefinitionName = from(content).getString("[0].processDefinitionName");
+    int returnedProcessDefinitionVersion= from(content).getInt("[0].processDefinitionVersion");
     String returnedStartTime = from(content).getString("[0].startTime");
     String returnedEndTime = from(content).getString("[0].endTime");
     long returnedDurationInMillis = from(content).getLong("[0].durationInMillis");
@@ -395,8 +407,9 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, returnedProcessDefinitionId);
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY, returnedProcessDefinitionKey);
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_NAME, returnedProcessDefinitionName);
-    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_START_TIME.toString(), returnedStartTime);
-    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_END_TIME.toString(), returnedEndTime);
+    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_VERSION, returnedProcessDefinitionVersion);
+    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_START_TIME, returnedStartTime);
+    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_END_TIME, returnedEndTime);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_DURATION_MILLIS, returnedDurationInMillis);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_START_USER_ID, returnedStartUserId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_START_ACTIVITY_ID, returnedStartActivityId);

@@ -15,7 +15,6 @@
 package org.camunda.bpm.engine.history;
 
 import java.util.Date;
-
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 
@@ -47,6 +46,9 @@ public interface HistoricProcessInstance {
 
   /** The process definition name. */
   String getProcessDefinitionName();
+
+  /** The process definition version. */
+  Integer getProcessDefinitionVersion();
 
   /** The time the process was started. */
   Date getStartTime();

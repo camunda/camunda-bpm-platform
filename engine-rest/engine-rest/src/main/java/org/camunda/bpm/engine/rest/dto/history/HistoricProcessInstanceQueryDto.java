@@ -12,15 +12,14 @@
  */
 package org.camunda.bpm.engine.rest.dto.history;
 
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response.Status;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response.Status;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
@@ -33,8 +32,6 @@ import org.camunda.bpm.engine.rest.dto.converter.StringSetConverter;
 import org.camunda.bpm.engine.rest.dto.converter.VariableListConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricProcessInstanceQuery> {
 
   private static final String SORT_BY_PROCESS_INSTANCE_ID_VALUE = "instanceId";
@@ -43,6 +40,10 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
   private static final String SORT_BY_PROCESS_INSTANCE_START_TIME_VALUE = "startTime";
   private static final String SORT_BY_PROCESS_INSTANCE_END_TIME_VALUE = "endTime";
   private static final String SORT_BY_PROCESS_INSTANCE_DURATION_VALUE = "duration";
+  private static final String SORT_BY_PROCESS_DEFINITION_KEY_VALUE = "definitionKey";
+  private static final String SORT_BY_PROCESS_DEFINITION_NAME_VALUE = "definitionName";
+  private static final String SORT_BY_PROCESS_DEFINITION_VERSION_VALUE = "definitionVersion";
+
   private static final String SORT_BY_TENANT_ID = "tenantId";
 
   private static final List<String> VALID_SORT_BY_VALUES;
@@ -54,6 +55,9 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
     VALID_SORT_BY_VALUES.add(SORT_BY_PROCESS_INSTANCE_START_TIME_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_PROCESS_INSTANCE_END_TIME_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_PROCESS_INSTANCE_DURATION_VALUE);
+    VALID_SORT_BY_VALUES.add(SORT_BY_PROCESS_DEFINITION_KEY_VALUE);
+    VALID_SORT_BY_VALUES.add(SORT_BY_PROCESS_DEFINITION_NAME_VALUE);
+    VALID_SORT_BY_VALUES.add(SORT_BY_PROCESS_DEFINITION_VERSION_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_TENANT_ID);
   }
 
@@ -392,6 +396,12 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
       query.orderByProcessInstanceId();
     } else if (sortBy.equals(SORT_BY_PROCESS_DEFINITION_ID_VALUE)) {
       query.orderByProcessDefinitionId();
+    } else if (sortBy.equals(SORT_BY_PROCESS_DEFINITION_KEY_VALUE)) {
+      query.orderByProcessDefinitionKey();
+    } else if (sortBy.equals(SORT_BY_PROCESS_DEFINITION_NAME_VALUE)) {
+      query.orderByProcessDefinitionName();
+    } else if (sortBy.equals(SORT_BY_PROCESS_DEFINITION_VERSION_VALUE)) {
+      query.orderByProcessDefinitionVersion();
     } else if (sortBy.equals(SORT_BY_PROCESS_INSTANCE_BUSINESS_KEY_VALUE)) {
       query.orderByProcessInstanceBusinessKey();
     } else if (sortBy.equals(SORT_BY_PROCESS_INSTANCE_START_TIME_VALUE)) {
