@@ -51,7 +51,8 @@
     <dependency>
       <groupId>org.glassfish.jersey.containers</groupId>
       <artifactId>jersey-container-servlet</artifactId>
-      <version>2.25.1</version>
+      <version>${version.jersey2}</version>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 
