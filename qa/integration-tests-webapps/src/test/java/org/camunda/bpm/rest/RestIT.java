@@ -19,9 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class RestIT extends AbstractWebappIntegrationTest {
 
@@ -239,6 +237,25 @@ public class RestIT extends AbstractWebappIntegrationTest {
       assertEquals("Invoice Receipt", definition.getString("name"));
       assertFalse(definition.getBoolean("suspended"));
     }
+  }
+
+  @Test
+  public void testOptionsRequest() {
+    //since WAS 9 contains patched cxf, which does not support OPTIONS request, we have to test this
+    String resourcePath = APP_BASE_PATH + FILTER_PATH;
+    log.info("Send OPTIONS request to " + resourcePath);
+
+    // given
+    WebResource resource = client.resource(resourcePath);
+
+    // when
+    ClientResponse response = resource.options(ClientResponse.class);
+
+    // then
+    assertNotNull(response);
+    assertEquals(200, response.getStatus());
+    JSONObject entity = response.getEntity(JSONObject.class);
+    assertNotNull(entity.has("links"));
   }
 
   protected JSONObject getFirstTask() throws JSONException {
