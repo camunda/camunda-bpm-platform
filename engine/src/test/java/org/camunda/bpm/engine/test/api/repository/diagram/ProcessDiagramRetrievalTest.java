@@ -44,10 +44,7 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -164,6 +161,29 @@ public class ProcessDiagramRetrievalTest {
 //      writeToFile(repositoryService.getProcessDiagram(processDefinition.getId()),
 //              new File("src/test/resources/org/camunda/bpm/engine/test/api/repository/diagram/" + imageFileName + ".actual.png"));
       assertTrue(isEqual(expectedStream, actualStream));
+    } else {
+      // some test diagrams do not contain executable processes
+      // and are therefore ignored by the engine
+    }
+  }
+
+  @Ignore
+  public void testGetProcessDiagramAfterCacheWasCleaned() {
+    if (1 == processDefinitionQuery.count()) {
+      activitiRule.getProcessEngineConfiguration().getDeploymentCache().discardProcessDefinitionCache();
+      // given
+      ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+
+      // when
+      InputStream stream = repositoryService.getProcessDiagram(processDefinition.getId());
+
+      // then
+      assertNotNull(processDefinition.getDiagramResourceName());
+
+      //is null since cache was empty and deployment is redeployed with
+      //only the process definition as resource -> BUG that only the process definition is added
+      //as resource to the deployment
+      assertNotNull(stream);
     } else {
       // some test diagrams do not contain executable processes
       // and are therefore ignored by the engine
