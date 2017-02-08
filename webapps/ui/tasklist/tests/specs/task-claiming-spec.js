@@ -178,6 +178,7 @@ describe('Task Claiming Spec', function() {
       dashboardPage.currentTask.clickClaimedUserField();
 
       // then
+      expect(dashboardPage.currentTask.claimedUserFieldEditMode().getAttribute('class')).not.to.eventually.include('error');
       expect(dashboardPage.currentTask.claimedUserFieldEditMode().getAttribute('value')).to.eventually.eql('test');
     });
 
