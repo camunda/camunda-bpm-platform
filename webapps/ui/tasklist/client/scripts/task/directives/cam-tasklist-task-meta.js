@@ -133,6 +133,11 @@ module.exports = [
 
           function notifyOnStartEditing(property) {
             return function() {
+              if (property === 'assignee') {
+                return validateAssignee($scope.assignee.id, function() {
+                  setEditingState(property, true);
+                });
+              }
               setEditingState(property, true);
             };
           }
