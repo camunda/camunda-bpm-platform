@@ -3,8 +3,8 @@ module.exports = function() {
     return Object
       .keys(query)
       .reduce(function(queryStr, key) {
-        const value = query[key];
-        const part = key + '=' + encodeURIComponent(value);
+        var value = query[key];
+        var part = key + '=' + encodeURIComponent(value);
 
         return queryStr.length ? queryStr + '&' + part : part;
       }, '');
