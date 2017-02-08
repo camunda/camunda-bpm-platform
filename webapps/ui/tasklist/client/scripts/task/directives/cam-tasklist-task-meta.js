@@ -199,8 +199,11 @@ module.exports = [
               return done();
             }
 
-            userResource.profile(newId, function(err) {
-              $scope.validAssignee = !err;
+            userResource.list({
+              maxResults: 1,// we don't do suggestions, yet
+              id: newId
+            }, function(err, results) {
+              $scope.validAssignee = !err && results.length;
               done();
             });
           }
@@ -245,6 +248,7 @@ module.exports = [
             validateAssignee(inlineFieldScope.varValue, function() {
               if (!$scope.validAssignee) {
                 inlineFieldScope.varValue = original;
+                $scope.validAssignee = true;
                 return;
               }
               setEditingState('assignee', false);
