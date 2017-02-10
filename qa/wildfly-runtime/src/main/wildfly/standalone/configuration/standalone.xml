@@ -141,21 +141,6 @@
           <driver name="h2" module="com.h2database.h2">
             <xa-datasource-class>org.h2.jdbcx.JdbcDataSource</xa-datasource-class>
           </driver>
-          <driver name="db2" module="com.ibm.db2.jcc.db2jcc4">
-            <xa-datasource-class>com.ibm.db2.jcc.DB2XADataSource</xa-datasource-class>
-          </driver>
-          <driver name="com.microsoft.sqlserver" module="com.microsoft.sqlserver.sqljdbc4">
-            <xa-datasource-class>com.microsoft.sqlserver.jdbc.SQLServerXADataSource</xa-datasource-class>
-          </driver>
-          <driver name="org.mariadb" module="org.mariadb.jdbc.mariadb-java-client">
-            <xa-datasource-class>org.mariadb.jdbc.MySQLDataSource</xa-datasource-class>
-          </driver>
-          <driver name="com.mysql" module="mysql.mysql-connector-java">
-            <xa-datasource-class>com.mysql.jdbc.jdbc2.optional.MysqlXADataSource</xa-datasource-class>
-          </driver>
-          <driver name="com.oracle.jdbc.ojdbc6" module="com.oracle.jdbc.ojdbc6">
-            <xa-datasource-class>oracle.jdbc.xa.client.OracleXADataSource</xa-datasource-class>
-          </driver>
           <driver name="postgresql" module="org.postgresql.postgresql">
             <xa-datasource-class>org.postgresql.xa.PGXADataSource</xa-datasource-class>
           </driver>

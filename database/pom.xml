@@ -154,8 +154,6 @@
         <database.type>db2</database.type>
         <database.driver>com.ibm.db2.jcc.DB2Driver</database.driver>
         <database.datasource.class>com.ibm.db2.jcc.DB2SimpleDataSource</database.datasource.class>
-        <jboss.datasource.filename>db2-ds.xml</jboss.datasource.filename>
-        <hibernate.dialect>org.hibernate.dialect.DB2Dialect</hibernate.dialect>
       </properties>
 
       <dependencies>
@@ -165,13 +163,6 @@
           <scope>test</scope>
         </dependency>
       </dependencies>
-    </profile>
-    <profile>
-      <id>db2-xa</id>
-      <properties>
-        <database.datasource.class>com.ibm.db2.jcc.DB2XADataSource</database.datasource.class>
-        <jboss.datasource.filename>db2-xa-ds.xml</jboss.datasource.filename>
-      </properties>
     </profile>
     <profile>
       <id>db2-105</id>
@@ -245,8 +236,6 @@
         <database.type>mariadb</database.type>
         <database.driver>org.mariadb.jdbc.Driver</database.driver>
         <database.datasource.class>org.mariadb.jdbc.MySQLDataSource</database.datasource.class>
-        <jboss.datasource.filename>mariadb-ds.xml</jboss.datasource.filename>
-        <hibernate.dialect>org.hibernate.dialect.MySQL5InnoDBDialect</hibernate.dialect>
       </properties>
 
       <dependencies>
@@ -256,13 +245,6 @@
           <scope>test</scope>
         </dependency>
       </dependencies>
-    </profile>
-    <profile>
-      <id>mariadb-xa</id>
-      <properties>
-        <database.datasource.class>org.mariadb.jdbc.MySQLDataSource</database.datasource.class>
-        <jboss.datasource.filename>mariadb-xa-ds.xml</jboss.datasource.filename>
-      </properties>
     </profile>
     <profile>
       <id>mariadb-galera</id>
@@ -277,8 +259,6 @@
         <database.type>mysql</database.type>
         <database.driver>com.mysql.jdbc.Driver</database.driver>
         <database.datasource.class>com.mysql.jdbc.jdbc2.optional.MysqlDataSource</database.datasource.class>
-        <jboss.datasource.filename>mysql-ds.xml</jboss.datasource.filename>
-        <hibernate.dialect>org.hibernate.dialect.MySQL5InnoDBDialect</hibernate.dialect>
       </properties>
 
       <dependencies>
@@ -289,13 +269,6 @@
         </dependency>
       </dependencies>
     </profile>
-    <profile>
-      <id>mysql-xa</id>
-      <properties>
-        <database.datasource.class>com.mysql.jdbc.jdbc2.optional.MysqlXADataSource</database.datasource.class>
-        <jboss.datasource.filename>mysql-xa-ds.xml</jboss.datasource.filename>
-      </properties>
-    </profile>
 
     <profile>
       <id>oracle</id>
@@ -303,21 +276,10 @@
         <database.type>oracle</database.type>
         <database.driver>oracle.jdbc.OracleDriver</database.driver>
         <database.datasource.class>oracle.jdbc.pool.OracleDataSource</database.datasource.class>
-        <jboss.datasource.filename>oracle-ds.xml</jboss.datasource.filename>
-      </properties>
-    </profile>
-    <profile>
-      <id>oracle-xa</id>
-      <properties>
-        <database.datasource.class>oracle.jdbc.xa.client.OracleXADataSource</database.datasource.class>
-        <jboss.datasource.filename>oracle-xa-ds.xml</jboss.datasource.filename>
       </properties>
     </profile>
     <profile>
       <id>oracle-10</id>
-      <properties>
-        <hibernate.dialect>org.hibernate.dialect.Oracle10gDialect</hibernate.dialect>
-      </properties>
       <dependencies>
         <dependency>
           <groupId>com.oracle.jdbc</groupId>
@@ -330,7 +292,6 @@
       <id>oracle-11</id>
       <properties>
         <version.oracle>${version.oracle-11}</version.oracle>
-        <hibernate.dialect>org.hibernate.dialect.Oracle10gDialect</hibernate.dialect>
       </properties>
       <dependencies>
         <dependency>
@@ -344,7 +305,6 @@
       <id>oracle-12</id>
       <properties>
         <version.oracle>${version.oracle-12}</version.oracle>
-        <hibernate.dialect>org.hibernate.dialect.Oracle10gDialect</hibernate.dialect>
       </properties>
       <dependencies>
         <dependency>
@@ -387,8 +347,6 @@
         <database.type>mssql</database.type>
         <database.driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</database.driver>
         <database.datasource.class>com.microsoft.sqlserver.jdbc.SQLServerDataSource</database.datasource.class>
-        <jboss.datasource.filename>sqlserver-ds.xml</jboss.datasource.filename>
-        <hibernate.dialect>org.hibernate.dialect.SQLServer2008Dialect</hibernate.dialect>
       </properties>
 
       <dependencies>
@@ -398,13 +356,6 @@
           <scope>test</scope>
         </dependency>
       </dependencies>
-    </profile>
-    <profile>
-      <id>sqlserver-xa</id>
-      <properties>
-        <database.datasource.class>com.microsoft.sqlserver.jdbc.SQLServerXADataSource</database.datasource.class>
-        <jboss.datasource.filename>sqlserver-xa-ds.xml</jboss.datasource.filename>
-      </properties>
     </profile>
   </profiles>
 

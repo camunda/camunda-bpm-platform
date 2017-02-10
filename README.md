@@ -81,7 +81,7 @@ Add the following lines to it:
 </activeProfiles>
 ```
 
-Apache Maven 3 and Java JDK 6 or 7 are prerequisites for building camunda BPM platform. Once you have setup Java and Maven, run
+Apache Maven 3 and Java JDK 6/7/8 are prerequisites for building camunda BPM platform. Once you have setup Java and Maven, run
 
 ```
 mvn clean install
@@ -105,7 +105,7 @@ In order to run the integration tests, first perform a full install build. Then 
 We have different maven profiles for selecting
 * *Runtime containers & environments*: jboss, tomcat, wildfly
 * *The testsuite*: engine-integration, webapps-integration
-* *The database*: h2,h2-xa,db2,db2-xa,sqlserver,sqlserver-xa,oracle,oracle-xa,postgresql,postgresql-xa,mysql,mysql-xa (XA is only supported on JBoss / Wildfly atm)
+* *The database*: h2,h2-xa,db2,sqlserver,oracle,postgresql,postgresql-xa,mysql (Only h2 / postgresql is supported in engine-integration tests)
 
 In order to configure the build, compose the profiles for runtime container, testsuite, database. Example:
 
@@ -128,7 +128,7 @@ mvn clean install -Pengine-integration,jboss,postgresql,postgresql-xa
 You can select multiple testsuites but only a single database and a single runtime container. This is valid:
 
 ```
-mvn clean install -Pengine-integration,webapps-integration,tomcat,db2
+mvn clean install -Pengine-integration,webapps-integration,tomcat,postgresql
 ```
 
 There is a special profile for JBoss Application Server:

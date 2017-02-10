@@ -31,31 +31,6 @@
       we deploy all and only activate one with a *-ds.xml database deployment
     -->
     <dependency>
-      <groupId>org.mariadb.jdbc</groupId>
-      <artifactId>mariadb-java-client</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>mysql</groupId>
-      <artifactId>mysql-connector-java</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.ibm.db2.jcc</groupId>
-      <artifactId>db2jcc4</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.oracle.jdbc</groupId>
-      <artifactId>ojdbc6</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.microsoft.sqlserver</groupId>
-      <artifactId>sqljdbc4</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
       <scope>runtime</scope>
@@ -230,13 +205,8 @@
                     <replace dir="${jboss.runtime.location}/modules">
                       <include name="**/module.xml" />
                       <replacefilter token="@project.version@" value="${project.version}" />
-                      <replacefilter token="@version.db2@" value="${version.db2}" />
                       <replacefilter token="@version.h2@" value="${version.h2}" />
-                      <replacefilter token="@version.mariadb@" value="${version.mariadb}" />
-                      <replacefilter token="@version.mysql@" value="${version.mysql}" />
-                      <replacefilter token="@version.oracle@" value="${version.oracle}" />
                       <replacefilter token="@version.postgresql@" value="${version.postgresql}" />
-                      <replacefilter token="@version.sqlserver@" value="${version.sqlserver}" />
                     </replace>
 
                   </target>
@@ -339,13 +309,8 @@
                     <replace dir="${jboss.runtime.location}/modules">
                       <include name="**/module.xml" />
                       <replacefilter token="@project.version@" value="${project.version}" />
-                      <replacefilter token="@version.db2@" value="${version.db2}" />
                       <replacefilter token="@version.h2@" value="${version.h2}" />
-                      <replacefilter token="@version.mariadb@" value="${version.mariadb}" />
-                      <replacefilter token="@version.mysql@" value="${version.mysql}" />
-                      <replacefilter token="@version.oracle@" value="${version.oracle}" />
                       <replacefilter token="@version.postgresql@" value="${version.postgresql}" />
-                      <replacefilter token="@version.sqlserver@" value="${version.sqlserver}" />
                     </replace>
 
                   </target>
