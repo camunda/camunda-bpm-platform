@@ -119,7 +119,7 @@ public interface Task {
 	Date getFollowUpDate();
 
 	/** Change follow-up date of the task. */
-	void setFollowUpDate(Date dueDate);
+	void setFollowUpDate(Date followUpDate);
 
 	/** delegates this task to the given user and sets the {@link #getDelegationState() delegationState} to {@link DelegationState#PENDING}.
 	 * If no owner is set on the task, the owner is set to the current assignee of the task. */
