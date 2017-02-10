@@ -159,16 +159,17 @@ public class HistoryServiceTest extends PluggableProcessEngineTestCase {
     assertEquals(historicProcessInstanceSuper.getId(), historicProcessInstanceSub.getSuperProcessInstanceId());
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml", "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess2.bpmn20.xml"})
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/runtime/otherOneTaskProcess.bpmn20.xml" })
   public void testHistoricProcessInstanceQueryByProcessInstanceIds() {
     HashSet<String> processInstanceIds = new HashSet<String>();
     for (int i = 0; i < 4; i++) {
       processInstanceIds.add(runtimeService.startProcessInstanceByKey(ONE_TASK_PROCESS, i + "").getId());
     }
-    processInstanceIds.add(runtimeService.startProcessInstanceByKey("oneTaskProcess2", "1").getId());
+    processInstanceIds.add(runtimeService.startProcessInstanceByKey("otherOneTaskProcess", "1").getId());
 
     // start an instance that will not be part of the query
-    runtimeService.startProcessInstanceByKey("oneTaskProcess2", "2");
+    runtimeService.startProcessInstanceByKey("otherOneTaskProcess", "2");
 
     HistoricProcessInstanceQuery processInstanceQuery = historyService.createHistoricProcessInstanceQuery().processInstanceIds(processInstanceIds);
     assertEquals(5, processInstanceQuery.count());

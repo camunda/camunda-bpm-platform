@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions
-  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
-  targetNamespace="org.camunda.bpm.engine.test.enginge.test.api.runtime">
+        xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+        targetNamespace="org.camunda.bpm.engine.test.enginge.test.api.runtime">
 
-  <process id="oneTaskProcess2" isExecutable="true">
+  <process id="otherOneTaskProcess" isExecutable="true">
   
     <startEvent id="theStart" />
     <sequenceFlow id="flow1" sourceRef="theStart" targetRef="theTask" />
