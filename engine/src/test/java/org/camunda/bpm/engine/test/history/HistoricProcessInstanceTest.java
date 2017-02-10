@@ -31,7 +31,6 @@ import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
-import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
@@ -440,14 +439,14 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
     }
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml",
-      "org/camunda/bpm/engine/test/history/HistoricActivityInstanceTest.testSorting.bpmn20.xml"})
   public void testHistoricProcessInstanceSorting() {
-    
+
+    deployment("org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml");
+    deployment("org/camunda/bpm/engine/test/history/HistoricActivityInstanceTest.testSorting.bpmn20.xml");
+
     //deploy second version of the same process definition
-    String deploymentId = processEngine.getRepositoryService()
-        .createDeployment().addClasspathResource("org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml")
-        .deploy().getId();
+    deployment("org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml");
+
     List<ProcessDefinition> processDefinitions = processEngine.getRepositoryService().createProcessDefinitionQuery().processDefinitionKey("oneTaskProcess").list();
     for (ProcessDefinition processDefinition: processDefinitions) {
       runtimeService.startProcessInstanceById(processDefinition.getId());
@@ -501,8 +500,6 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
     assertEquals(3, historyService.createHistoricProcessInstanceQuery().orderByProcessDefinitionId().desc().count());
     assertEquals(3, historyService.createHistoricProcessInstanceQuery().orderByProcessInstanceBusinessKey().desc().count());
 
-    //remove manual deployment
-    TestHelper.deleteDeployment(processEngine, deploymentId);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/superProcess.bpmn20.xml",

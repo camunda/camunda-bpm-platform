@@ -100,6 +100,9 @@ public class HistoryEvent implements Serializable, DbEntity {
   /** the name of the process definition */
   protected String processDefinitionName;
 
+  /** the version of the process definition */
+  protected Integer processDefinitionVersion;
+
   /** the case instance in which the event has happened */
   protected String caseInstanceId;
 
@@ -163,6 +166,14 @@ public class HistoryEvent implements Serializable, DbEntity {
 
   public void setProcessDefinitionName(String processDefinitionName) {
     this.processDefinitionName = processDefinitionName;
+  }
+
+  public Integer getProcessDefinitionVersion() {
+    return processDefinitionVersion;
+  }
+
+  public void setProcessDefinitionVersion(Integer processDefinitionVersion) {
+    this.processDefinitionVersion = processDefinitionVersion;
   }
 
   public String getCaseDefinitionName() {
