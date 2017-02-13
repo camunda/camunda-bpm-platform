@@ -391,6 +391,19 @@ public abstract class AbstractBaseElementBuilder<B extends AbstractBaseElementBu
     return null;
   }
 
+  protected BpmnEdge findBpmnEdge(BaseElement sequenceFlow){
+    Collection<BpmnEdge> allEdges = modelInstance.getModelElementsByType(BpmnEdge.class);
+    Iterator<BpmnEdge> iterator = allEdges.iterator();
+
+    while (iterator.hasNext()) {
+      BpmnEdge edge = iterator.next();
+      if(edge.getBpmnElement().equals(sequenceFlow)) {
+        return edge;
+      }
+    }
+    return null;
+  }
+
   protected void adjustSubProcess(BpmnShape newShape) {
     BaseElement newElement = newShape.getBpmnElement();
     Bounds newShapeBounds = newShape.getBounds();
@@ -398,7 +411,7 @@ public abstract class AbstractBaseElementBuilder<B extends AbstractBaseElementBu
     BpmnShape subProcess = null;
     double newWidth = 0;
     double newHeight = 0;
-    int count = 0;
+    double delta = 0;
 
     while (newElement.getParentElement() instanceof SubProcess) {
 
@@ -406,8 +419,9 @@ public abstract class AbstractBaseElementBuilder<B extends AbstractBaseElementBu
       subProcessBounds = subProcess.getBounds();
       newWidth = newShapeBounds.getX() + newShapeBounds.getWidth() + SPACE;
       newHeight = newShapeBounds.getY() + newShapeBounds.getHeight() + SPACE;
+      delta = subProcessBounds.getWidth();
 
-      if (newElement instanceof SubProcess && count == 0) {
+      if (newShapeBounds.getY().equals(subProcessBounds.getY())) {
         subProcessBounds.setY(subProcessBounds.getY() - SPACE);
         subProcessBounds.setHeight(subProcessBounds.getHeight() + SPACE);
       }
@@ -422,9 +436,45 @@ public abstract class AbstractBaseElementBuilder<B extends AbstractBaseElementBu
         subProcessBounds.setHeight(newHeight);
       }
 
+      delta = Math.abs(delta - subProcessBounds.getWidth());
       newElement = subProcess.getBpmnElement();
       newShapeBounds = subProcessBounds;
-      count ++;
+
+      if (delta != 0) {
+        shiftFollowingShapes(delta, (FlowNode) newElement, newShapeBounds);
+      }
+    }
+  }
+
+  protected void shiftFollowingShapes(double delta, FlowNode subProcess, Bounds subProcessBounds) {
+    Collection<SequenceFlow> outgoings = subProcess.getOutgoing();
+    BpmnShape followNode = null;
+    Bounds followNodeBounds = null;
+    SequenceFlow tmpSeq = null;
+    Collection<Waypoint> waypoints = null;
+    Waypoint tmpWay = null;
+
+
+    if (outgoings.size() > 0) {
+      Iterator<SequenceFlow> iteratorSeq = outgoings.iterator();
+
+      while (iteratorSeq.hasNext()) {
+        tmpSeq = iteratorSeq.next();
+        waypoints = findBpmnEdge(tmpSeq).getWaypoints();
+        subProcessBounds = findBpmnShape(tmpSeq.getSource()).getBounds();
+        followNode = findBpmnShape(tmpSeq.getTarget());
+        followNodeBounds = followNode.getBounds();
+        followNodeBounds.setX(followNodeBounds.getX() + delta);
+        Iterator<Waypoint> iteratorWay = waypoints.iterator();
+
+        while (iteratorWay.hasNext()) {
+          tmpWay = iteratorWay.next();
+          tmpWay.setX(tmpWay.getX() + delta);
+        }
+
+        shiftFollowingShapes(delta, (FlowNode) followNode.getBpmnElement(), followNodeBounds);
+        adjustSubProcess(followNode);
+      }
     }
   }
 

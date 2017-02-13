@@ -1312,6 +1312,29 @@ public class CoordinatesGenerationTest {
     assertThat(subProcessBounds.getHeight()).isEqualTo(376);
   }
 
+  @Test
+  public void shouldMoveFollowingElements() {
+
+    ProcessBuilder builder = Bpmn.createExecutableProcess();
+
+    instance = builder
+        .startEvent(START_EVENT_ID)
+        .subProcess(SUB_PROCESS_ID)
+          .embeddedSubProcess()
+          .startEvent("innerStartEvent")
+        .subProcessDone()
+        .endEvent(END_EVENT_ID)
+        .moveToNode("innerStartEvent")
+        .userTask()
+        .userTask()
+        .endEvent()
+        .done();
+
+    Bounds outterEndEventBounds = findBpmnShape(END_EVENT_ID).getBounds();
+    assertThat(outterEndEventBounds.getX()).isEqualTo(758);
+
+  }
+
   protected BpmnShape findBpmnShape(String id) {
     Collection<BpmnShape> allShapes = instance.getModelElementsByType(BpmnShape.class);
 
