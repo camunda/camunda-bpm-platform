@@ -416,32 +416,37 @@ public abstract class AbstractBaseElementBuilder<B extends AbstractBaseElementBu
     while (newElement.getParentElement() instanceof SubProcess) {
 
       subProcess = findBpmnShape((BaseElement) newElement.getParentElement());
-      subProcessBounds = subProcess.getBounds();
-      newWidth = newShapeBounds.getX() + newShapeBounds.getWidth() + SPACE;
-      newHeight = newShapeBounds.getY() + newShapeBounds.getHeight() + SPACE;
-      delta = subProcessBounds.getWidth();
+      if (subProcess != null) {
+        subProcessBounds = subProcess.getBounds();
+        newWidth = newShapeBounds.getX() + newShapeBounds.getWidth() + SPACE;
+        newHeight = newShapeBounds.getY() + newShapeBounds.getHeight() + SPACE;
+        delta = subProcessBounds.getWidth();
 
-      if (newShapeBounds.getY().equals(subProcessBounds.getY())) {
-        subProcessBounds.setY(subProcessBounds.getY() - SPACE);
-        subProcessBounds.setHeight(subProcessBounds.getHeight() + SPACE);
+        if (newShapeBounds.getY().equals(subProcessBounds.getY())) {
+          subProcessBounds.setY(subProcessBounds.getY() - SPACE);
+          subProcessBounds.setHeight(subProcessBounds.getHeight() + SPACE);
+        }
+
+        if (newWidth >= subProcessBounds.getX() + subProcessBounds.getWidth()) {
+          newWidth = newWidth - subProcessBounds.getX();
+          subProcessBounds.setWidth(newWidth);
+        }
+
+        if (newHeight >= subProcessBounds.getY() + subProcessBounds.getHeight()) {
+          newHeight = newHeight - subProcessBounds.getY();
+          subProcessBounds.setHeight(newHeight);
+        }
+
+        delta = Math.abs(delta - subProcessBounds.getWidth());
+        newElement = subProcess.getBpmnElement();
+        newShapeBounds = subProcessBounds;
+
+        if (delta != 0) {
+          shiftFollowingShapes(delta, (FlowNode) newElement, newShapeBounds);
+        }
       }
-
-      if (newWidth >= subProcessBounds.getX() + subProcessBounds.getWidth()) {
-        newWidth = newWidth - subProcessBounds.getX();
-        subProcessBounds.setWidth(newWidth);
-      }
-
-      if (newHeight >= subProcessBounds.getY() + subProcessBounds.getHeight()) {
-        newHeight = newHeight - subProcessBounds.getY();
-        subProcessBounds.setHeight(newHeight);
-      }
-
-      delta = Math.abs(delta - subProcessBounds.getWidth());
-      newElement = subProcess.getBpmnElement();
-      newShapeBounds = subProcessBounds;
-
-      if (delta != 0) {
-        shiftFollowingShapes(delta, (FlowNode) newElement, newShapeBounds);
+      else {
+        break;
       }
     }
   }

@@ -34,10 +34,13 @@ public class EmbeddedSubProcessBuilder extends AbstractEmbeddedSubProcessBuilder
   public StartEventBuilder startEvent(String id) {
     StartEvent start = subProcessBuilder.createChild(StartEvent.class, id);
     BpmnShape bpmnShape = subProcessBuilder.createBpmnShape(start);
-    Bounds elemBounds = subProcessBuilder.findBpmnShape(subProcessBuilder.element).getBounds();
-    Bounds startBounds = bpmnShape.getBounds();
-    startBounds.setX(elemBounds.getX() + subProcessBuilder.SPACE);
-    startBounds.setY(elemBounds.getY() + elemBounds.getHeight() / 2 - startBounds.getHeight() / 2);
+    BpmnShape subProcessShape = subProcessBuilder.findBpmnShape(subProcessBuilder.element);
+    if (subProcessShape != null) {
+      Bounds elemBounds = subProcessShape.getBounds();
+      Bounds startBounds = bpmnShape.getBounds();
+      startBounds.setX(elemBounds.getX() + subProcessBuilder.SPACE);
+      startBounds.setY(elemBounds.getY() + elemBounds.getHeight() / 2 - startBounds.getHeight() / 2);
+    }
     return start.builder();
   }
 }
