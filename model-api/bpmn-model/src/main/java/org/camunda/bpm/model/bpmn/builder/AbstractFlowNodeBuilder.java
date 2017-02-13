@@ -40,9 +40,7 @@ import org.camunda.bpm.model.bpmn.instance.UserTask;
 import org.camunda.bpm.model.bpmn.instance.bpmndi.BpmnShape;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaExecutionListener;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaFailedJobRetryTimeCycle;
-import org.camunda.bpm.model.bpmn.instance.dc.Bounds;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
-
 
 /**
  * @author Sebastian Menski
@@ -74,9 +72,7 @@ public abstract class AbstractFlowNodeBuilder<B extends AbstractFlowNodeBuilder<
   }
 
   protected void connectTarget(FlowNode target) {
-    getCurrentSequenceFlowBuilder()
-      .from(element)
-      .to(target);
+    getCurrentSequenceFlowBuilder().from(element).to(target);
 
     SequenceFlow sequenceFlow = getCurrentSequenceFlowBuilder().getElement();
     createBpmnEdge(sequenceFlow);
@@ -95,15 +91,9 @@ public abstract class AbstractFlowNodeBuilder<B extends AbstractFlowNodeBuilder<
   protected <T extends FlowNode> T createTarget(Class<T> typeClass, String identifier) {
     T target = createSibling(typeClass, identifier);
 
-    Bounds elemBounds = findBpmnShape(element).getBounds();
-
     BpmnShape targetBpmnShape = createBpmnShape(target);
-    Bounds bounds = targetBpmnShape.getBounds();
-    double x = elemBounds.getX() + elemBounds.getWidth() + 50;
-    double y = elemBounds.getY() + elemBounds.getHeight() / 2 - bounds.getHeight() / 2;
-    bounds.setX(x);
-    bounds.setY(y);
-
+    setTargetCoordinates(targetBpmnShape);
+    adjustSubProcess(targetBpmnShape);
     connectTarget(target);
     return target;
   }
@@ -250,8 +240,7 @@ public abstract class AbstractFlowNodeBuilder<B extends AbstractFlowNodeBuilder<
         if (lastGateway instanceof Gateway) {
           return (Gateway) lastGateway;
         }
-      }
-      catch(BpmnModelException e) {
+      } catch (BpmnModelException e) {
         throw new BpmnModelException("Unable to determine an unique previous gateway of " + lastGateway.getId(), e);
       }
     }
@@ -267,19 +256,17 @@ public abstract class AbstractFlowNodeBuilder<B extends AbstractFlowNodeBuilder<
     ModelElementInstance instance = modelInstance.getModelElementById(identifier);
     if (instance != null && instance instanceof FlowNode) {
       return ((FlowNode) instance).builder();
-    }
-    else {
+    } else {
       throw new BpmnModelException("Flow node not found for id " + identifier);
     }
   }
 
-  @SuppressWarnings({"rawtypes", "unchecked"})
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   public <T extends AbstractActivityBuilder> T moveToActivity(String identifier) {
     ModelElementInstance instance = modelInstance.getModelElementById(identifier);
     if (instance != null && instance instanceof Activity) {
       return (T) ((Activity) instance).builder();
-    }
-    else {
+    } else {
       throw new BpmnModelException("Activity not found for id " + identifier);
     }
   }
@@ -289,11 +276,9 @@ public abstract class AbstractFlowNodeBuilder<B extends AbstractFlowNodeBuilder<
     ModelElementInstance target = modelInstance.getModelElementById(identifier);
     if (target == null) {
       throw new BpmnModelException("Unable to connect " + element.getId() + " to element " + identifier + " cause it not exists.");
-    }
-    else if (!(target instanceof FlowNode)) {
+    } else if (!(target instanceof FlowNode)) {
       throw new BpmnModelException("Unable to connect " + element.getId() + " to element " + identifier + " cause its not a flow node.");
-    }
-    else {
+    } else {
       FlowNode targetNode = (FlowNode) target;
       connectTarget(targetNode);
       return targetNode.builder();
@@ -303,7 +288,8 @@ public abstract class AbstractFlowNodeBuilder<B extends AbstractFlowNodeBuilder<
   /**
    * Sets the Camunda AsyncBefore attribute for the build flow node.
    *
-   * @param asyncBefore boolean value to set
+   * @param asyncBefore
+   *          boolean value to set
    * @return the builder object
    */
   public B camundaAsyncBefore(boolean asyncBefore) {
@@ -324,7 +310,8 @@ public abstract class AbstractFlowNodeBuilder<B extends AbstractFlowNodeBuilder<
   /**
    * Sets the Camunda asyncAfter attribute for the build flow node.
    *
-   * @param asyncAfter boolean value to set
+   * @param asyncAfter
+   *          boolean value to set
    * @return the builder object
    */
   public B camundaAsyncAfter(boolean asyncAfter) {
@@ -355,7 +342,8 @@ public abstract class AbstractFlowNodeBuilder<B extends AbstractFlowNodeBuilder<
   /**
    * Sets the camunda exclusive attribute for the build flow node.
    *
-   * @param exclusive boolean value to set
+   * @param exclusive
+   *          boolean value to set
    * @return the builder object
    */
   public B camundaExclusive(boolean exclusive) {
@@ -371,7 +359,8 @@ public abstract class AbstractFlowNodeBuilder<B extends AbstractFlowNodeBuilder<
   /**
    * Sets the camunda failedJobRetryTimeCycle attribute for the build flow node.
    *
-   * @param retryTimeCycle the retry time cycle value to set
+   * @param retryTimeCycle
+   *          the retry time cycle value to set
    * @return the builder object
    */
   public B camundaFailedJobRetryTimeCycle(String retryTimeCycle) {
@@ -412,5 +401,4 @@ public abstract class AbstractFlowNodeBuilder<B extends AbstractFlowNodeBuilder<
 
     return myself;
   }
-
 }

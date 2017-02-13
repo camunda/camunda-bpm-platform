@@ -43,17 +43,9 @@ public abstract class AbstractActivityBuilder<B extends AbstractActivityBuilder<
   public BoundaryEventBuilder boundaryEvent(String id) {
     BoundaryEvent boundaryEvent = createSibling(BoundaryEvent.class, id);
     boundaryEvent.setAttachedTo(element);
-    Bounds elemBounds = findBpmnShape(element).getBounds();
 
     BpmnShape boundaryEventBpmnShape = createBpmnShape(boundaryEvent);
-    Bounds bounds = boundaryEventBpmnShape.getBounds();
-
-    double x = generateXCoordinateForBoundaryEvent(bounds);
-    double y = elemBounds.getY() + elemBounds.getHeight() - 18;
-
-
-    bounds.setX(x);
-    bounds.setY(y);
+    setBoundaryEventCoordinates(boundaryEventBpmnShape);
 
     return boundaryEvent.builder();
   }
@@ -121,6 +113,15 @@ public abstract class AbstractActivityBuilder<B extends AbstractActivityBuilder<
     case 3 : return elemBounds.getX() + elemBounds.getWidth() / 2 - 1.5* boundaryEventBounds.getWidth();
     default : return elemBounds.getX() + elemBounds.getWidth() / 2 - boundaryEventBounds.getWidth() / 2 ;
     }
+  }
+
+  protected void setBoundaryEventCoordinates(BpmnShape targetBpmnShape) {
+      Bounds elemBounds = findBpmnShape(element).getBounds();
+      Bounds bounds = targetBpmnShape.getBounds();
+      double x = generateXCoordinateForBoundaryEvent(bounds);
+      double y = elemBounds.getY() + elemBounds.getHeight() - bounds.getHeight() / 2;
+      bounds.setX(x);
+      bounds.setY(y);
   }
 
 }

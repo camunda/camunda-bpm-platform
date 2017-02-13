@@ -673,7 +673,6 @@ public class CoordinatesGenerationTest {
     assertWaypointCoordinates(waypoint, 429, 268);
   }
 
-
   @Test
   public void shouldPlaceTwoBoundaryEventsForSubProcess() {
     ProcessBuilder builder = Bpmn.createExecutableProcess();
@@ -753,6 +752,566 @@ public class CoordinatesGenerationTest {
     assertShapeCoordinates(boundaryEvent4Bounds, 343, 200);
   }
 
+  @Test
+  public void shouldPlaceTwoBranchesForParallelGateway() {
+    ProcessBuilder builder = Bpmn.createExecutableProcess();
+
+    instance = builder
+        .startEvent(START_EVENT_ID)
+        .parallelGateway("id")
+        .sequenceFlowId("s1")
+        .userTask(USER_TASK_ID)
+        .moveToNode("id")
+        .sequenceFlowId("s2")
+        .endEvent(END_EVENT_ID)
+        .done();
+
+    Bounds userTaskBounds = findBpmnShape(USER_TASK_ID).getBounds();
+    assertShapeCoordinates(userTaskBounds, 286, 78);
+
+    Bounds endEventBounds = findBpmnShape(END_EVENT_ID).getBounds();
+    assertShapeCoordinates(endEventBounds, 286, 208);
+
+    Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge("s2").getWaypoints();
+    Iterator<Waypoint> iterator = sequenceFlowWaypoints.iterator();
+
+    Waypoint waypoint = iterator.next();
+    assertWaypointCoordinates(waypoint, 211, 143);
+
+    while(iterator.hasNext()){
+      waypoint = iterator.next();
+    }
+
+    assertWaypointCoordinates(waypoint, 286, 226);
+  }
+
+  @Test
+  public void shouldPlaceThreeBranchesForParallelGateway() {
+    ProcessBuilder builder = Bpmn.createExecutableProcess();
+
+    instance = builder
+        .startEvent(START_EVENT_ID)
+        .parallelGateway("id")
+        .userTask(USER_TASK_ID)
+        .moveToNode("id")
+        .endEvent(END_EVENT_ID)
+        .moveToNode("id")
+        .sequenceFlowId("s1")
+        .serviceTask(SERVICE_TASK_ID)
+        .done();
+
+    Bounds userTaskBounds = findBpmnShape(USER_TASK_ID).getBounds();
+    assertShapeCoordinates(userTaskBounds, 286, 78);
+
+    Bounds endEventBounds = findBpmnShape(END_EVENT_ID).getBounds();
+    assertShapeCoordinates(endEventBounds, 286, 208);
+
+    Bounds serviceTaskBounds = findBpmnShape(SERVICE_TASK_ID).getBounds();
+    assertShapeCoordinates(serviceTaskBounds, 286, 294);
+
+    Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge("s1").getWaypoints();
+    Iterator<Waypoint> iterator = sequenceFlowWaypoints.iterator();
+
+    Waypoint waypoint = iterator.next();
+    assertWaypointCoordinates(waypoint, 211, 143);
+
+    while(iterator.hasNext()){
+      waypoint = iterator.next();
+    }
+
+    assertWaypointCoordinates(waypoint, 286, 334);
+  }
+
+  @Test
+  public void shouldPlaceManyBranchesForParallelGateway() {
+    ProcessBuilder builder = Bpmn.createExecutableProcess();
+
+    instance = builder
+        .startEvent(START_EVENT_ID)
+        .parallelGateway("id")
+        .userTask(USER_TASK_ID)
+        .moveToNode("id")
+        .endEvent(END_EVENT_ID)
+        .moveToNode("id")
+        .serviceTask(SERVICE_TASK_ID)
+        .moveToNode("id")
+        .sequenceFlowId("s1")
+        .sendTask(SEND_TASK_ID)
+        .done();
+
+    Bounds userTaskBounds = findBpmnShape(USER_TASK_ID).getBounds();
+    assertShapeCoordinates(userTaskBounds, 286, 78);
+
+    Bounds endEventBounds = findBpmnShape(END_EVENT_ID).getBounds();
+    assertShapeCoordinates(endEventBounds, 286, 208);
+
+    Bounds serviceTaskBounds = findBpmnShape(SERVICE_TASK_ID).getBounds();
+    assertShapeCoordinates(serviceTaskBounds, 286, 294);
+
+    Bounds sendTaskBounds = findBpmnShape(SEND_TASK_ID).getBounds();
+    assertShapeCoordinates(sendTaskBounds, 286, 424);
+
+    Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge("s1").getWaypoints();
+    Iterator<Waypoint> iterator = sequenceFlowWaypoints.iterator();
+
+    Waypoint waypoint = iterator.next();
+    assertWaypointCoordinates(waypoint, 211, 143);
+
+    while(iterator.hasNext()){
+      waypoint = iterator.next();
+    }
+
+    assertWaypointCoordinates(waypoint, 286, 464);
+  }
+
+  @Test
+  public void shouldPlaceTwoBranchesForExclusiveGateway() {
+    ProcessBuilder builder = Bpmn.createExecutableProcess();
+
+    instance = builder
+        .startEvent(START_EVENT_ID)
+        .exclusiveGateway("id")
+        .sequenceFlowId("s1")
+        .userTask(USER_TASK_ID)
+        .moveToNode("id")
+        .sequenceFlowId("s2")
+        .endEvent(END_EVENT_ID)
+        .done();
+
+    Bounds userTaskBounds = findBpmnShape(USER_TASK_ID).getBounds();
+    assertShapeCoordinates(userTaskBounds, 286, 78);
+
+    Bounds endEventBounds = findBpmnShape(END_EVENT_ID).getBounds();
+    assertShapeCoordinates(endEventBounds, 286, 208);
+
+    Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge("s2").getWaypoints();
+    Iterator<Waypoint> iterator = sequenceFlowWaypoints.iterator();
+
+    Waypoint waypoint = iterator.next();
+    assertWaypointCoordinates(waypoint, 211, 143);
+
+    while(iterator.hasNext()){
+      waypoint = iterator.next();
+    }
+
+    assertWaypointCoordinates(waypoint, 286, 226);
+  }
+
+  @Test
+  public void shouldPlaceThreeBranchesForExclusiveGateway() {
+    ProcessBuilder builder = Bpmn.createExecutableProcess();
+
+    instance = builder
+        .startEvent(START_EVENT_ID)
+        .exclusiveGateway("id")
+        .userTask(USER_TASK_ID)
+        .moveToNode("id")
+        .endEvent(END_EVENT_ID)
+        .moveToNode("id")
+        .sequenceFlowId("s1")
+        .serviceTask(SERVICE_TASK_ID)
+        .done();
+
+    Bounds userTaskBounds = findBpmnShape(USER_TASK_ID).getBounds();
+    assertShapeCoordinates(userTaskBounds, 286, 78);
+
+    Bounds endEventBounds = findBpmnShape(END_EVENT_ID).getBounds();
+    assertShapeCoordinates(endEventBounds, 286, 208);
+
+    Bounds serviceTaskBounds = findBpmnShape(SERVICE_TASK_ID).getBounds();
+    assertShapeCoordinates(serviceTaskBounds, 286, 294);
+
+    Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge("s1").getWaypoints();
+    Iterator<Waypoint> iterator = sequenceFlowWaypoints.iterator();
+
+    Waypoint waypoint = iterator.next();
+    assertWaypointCoordinates(waypoint, 211, 143);
+
+    while(iterator.hasNext()){
+      waypoint = iterator.next();
+    }
+
+    assertWaypointCoordinates(waypoint, 286, 334);
+  }
+
+  @Test
+  public void shouldPlaceManyBranchesForExclusiveGateway() {
+    ProcessBuilder builder = Bpmn.createExecutableProcess();
+
+    instance = builder
+        .startEvent(START_EVENT_ID)
+        .exclusiveGateway("id")
+        .userTask(USER_TASK_ID)
+        .moveToNode("id")
+        .endEvent(END_EVENT_ID)
+        .moveToNode("id")
+        .serviceTask(SERVICE_TASK_ID)
+        .moveToNode("id")
+        .sequenceFlowId("s1")
+        .sendTask(SEND_TASK_ID)
+        .done();
+
+    Bounds userTaskBounds = findBpmnShape(USER_TASK_ID).getBounds();
+    assertShapeCoordinates(userTaskBounds, 286, 78);
+
+    Bounds endEventBounds = findBpmnShape(END_EVENT_ID).getBounds();
+    assertShapeCoordinates(endEventBounds, 286, 208);
+
+    Bounds serviceTaskBounds = findBpmnShape(SERVICE_TASK_ID).getBounds();
+    assertShapeCoordinates(serviceTaskBounds, 286, 294);
+
+    Bounds sendTaskBounds = findBpmnShape(SEND_TASK_ID).getBounds();
+    assertShapeCoordinates(sendTaskBounds, 286, 424);
+
+    Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge("s1").getWaypoints();
+    Iterator<Waypoint> iterator = sequenceFlowWaypoints.iterator();
+
+    Waypoint waypoint = iterator.next();
+    assertWaypointCoordinates(waypoint, 211, 143);
+
+    while(iterator.hasNext()){
+      waypoint = iterator.next();
+    }
+
+    assertWaypointCoordinates(waypoint, 286, 464);
+  }
+
+  @Test
+  public void shouldPlaceTwoBranchesForEventBasedGateway() {
+    ProcessBuilder builder = Bpmn.createExecutableProcess();
+
+    instance = builder
+        .startEvent(START_EVENT_ID)
+        .eventBasedGateway()
+          .id("id")
+        .sequenceFlowId("s1")
+        .userTask(USER_TASK_ID)
+        .moveToNode("id")
+        .sequenceFlowId("s2")
+        .endEvent(END_EVENT_ID)
+        .done();
+
+    Bounds userTaskBounds = findBpmnShape(USER_TASK_ID).getBounds();
+    assertShapeCoordinates(userTaskBounds, 286, 78);
+
+    Bounds endEventBounds = findBpmnShape(END_EVENT_ID).getBounds();
+    assertShapeCoordinates(endEventBounds, 286, 208);
+
+    Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge("s2").getWaypoints();
+    Iterator<Waypoint> iterator = sequenceFlowWaypoints.iterator();
+
+    Waypoint waypoint = iterator.next();
+    assertWaypointCoordinates(waypoint, 211, 143);
+
+    while(iterator.hasNext()){
+      waypoint = iterator.next();
+    }
+
+    assertWaypointCoordinates(waypoint, 286, 226);
+  }
+
+  @Test
+  public void shouldPlaceThreeBranchesForEventBasedGateway() {
+    ProcessBuilder builder = Bpmn.createExecutableProcess();
+
+    instance = builder
+        .startEvent(START_EVENT_ID)
+        .eventBasedGateway()
+          .id("id")
+        .userTask(USER_TASK_ID)
+        .moveToNode("id")
+        .endEvent(END_EVENT_ID)
+        .moveToNode("id")
+        .sequenceFlowId("s1")
+        .serviceTask(SERVICE_TASK_ID)
+        .done();
+
+    Bounds userTaskBounds = findBpmnShape(USER_TASK_ID).getBounds();
+    assertShapeCoordinates(userTaskBounds, 286, 78);
+
+    Bounds endEventBounds = findBpmnShape(END_EVENT_ID).getBounds();
+    assertShapeCoordinates(endEventBounds, 286, 208);
+
+    Bounds serviceTaskBounds = findBpmnShape(SERVICE_TASK_ID).getBounds();
+    assertShapeCoordinates(serviceTaskBounds, 286, 294);
+
+    Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge("s1").getWaypoints();
+    Iterator<Waypoint> iterator = sequenceFlowWaypoints.iterator();
+
+    Waypoint waypoint = iterator.next();
+    assertWaypointCoordinates(waypoint, 211, 143);
+
+    while(iterator.hasNext()){
+      waypoint = iterator.next();
+    }
+
+    assertWaypointCoordinates(waypoint, 286, 334);
+  }
+
+  @Test
+  public void shouldPlaceManyBranchesForEventBasedGateway() {
+    ProcessBuilder builder = Bpmn.createExecutableProcess();
+
+    instance = builder
+        .startEvent(START_EVENT_ID)
+        .eventBasedGateway()
+          .id("id")
+        .userTask(USER_TASK_ID)
+        .moveToNode("id")
+        .endEvent(END_EVENT_ID)
+        .moveToNode("id")
+        .serviceTask(SERVICE_TASK_ID)
+        .moveToNode("id")
+        .sequenceFlowId("s1")
+        .sendTask(SEND_TASK_ID)
+        .done();
+
+    Bounds userTaskBounds = findBpmnShape(USER_TASK_ID).getBounds();
+    assertShapeCoordinates(userTaskBounds, 286, 78);
+
+    Bounds endEventBounds = findBpmnShape(END_EVENT_ID).getBounds();
+    assertShapeCoordinates(endEventBounds, 286, 208);
+
+    Bounds serviceTaskBounds = findBpmnShape(SERVICE_TASK_ID).getBounds();
+    assertShapeCoordinates(serviceTaskBounds, 286, 294);
+
+    Bounds sendTaskBounds = findBpmnShape(SEND_TASK_ID).getBounds();
+    assertShapeCoordinates(sendTaskBounds, 286, 424);
+
+    Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge("s1").getWaypoints();
+    Iterator<Waypoint> iterator = sequenceFlowWaypoints.iterator();
+
+    Waypoint waypoint = iterator.next();
+    assertWaypointCoordinates(waypoint, 211, 143);
+
+    while(iterator.hasNext()){
+      waypoint = iterator.next();
+    }
+
+    assertWaypointCoordinates(waypoint, 286, 464);
+  }
+
+  @Test
+  public void shouldPlaceTwoBranchesForInclusiveGateway() {
+    ProcessBuilder builder = Bpmn.createExecutableProcess();
+
+    instance = builder
+        .startEvent(START_EVENT_ID)
+        .inclusiveGateway("id")
+        .sequenceFlowId("s1")
+        .userTask(USER_TASK_ID)
+        .moveToNode("id")
+        .sequenceFlowId("s2")
+        .endEvent(END_EVENT_ID)
+        .done();
+
+    Bounds userTaskBounds = findBpmnShape(USER_TASK_ID).getBounds();
+    assertShapeCoordinates(userTaskBounds, 286, 78);
+
+    Bounds endEventBounds = findBpmnShape(END_EVENT_ID).getBounds();
+    assertShapeCoordinates(endEventBounds, 286, 208);
+
+    Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge("s2").getWaypoints();
+    Iterator<Waypoint> iterator = sequenceFlowWaypoints.iterator();
+
+    Waypoint waypoint = iterator.next();
+    assertWaypointCoordinates(waypoint, 211, 143);
+
+    while(iterator.hasNext()){
+      waypoint = iterator.next();
+    }
+
+    assertWaypointCoordinates(waypoint, 286, 226);
+  }
+
+  @Test
+  public void shouldPlaceThreeBranchesForInclusiveGateway() {
+    ProcessBuilder builder = Bpmn.createExecutableProcess();
+
+    instance = builder
+        .startEvent(START_EVENT_ID)
+        .inclusiveGateway("id")
+        .userTask(USER_TASK_ID)
+        .moveToNode("id")
+        .endEvent(END_EVENT_ID)
+        .moveToNode("id")
+        .sequenceFlowId("s1")
+        .serviceTask(SERVICE_TASK_ID)
+        .done();
+
+    Bounds userTaskBounds = findBpmnShape(USER_TASK_ID).getBounds();
+    assertShapeCoordinates(userTaskBounds, 286, 78);
+
+    Bounds endEventBounds = findBpmnShape(END_EVENT_ID).getBounds();
+    assertShapeCoordinates(endEventBounds, 286, 208);
+
+    Bounds serviceTaskBounds = findBpmnShape(SERVICE_TASK_ID).getBounds();
+    assertShapeCoordinates(serviceTaskBounds, 286, 294);
+
+    Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge("s1").getWaypoints();
+    Iterator<Waypoint> iterator = sequenceFlowWaypoints.iterator();
+
+    Waypoint waypoint = iterator.next();
+    assertWaypointCoordinates(waypoint, 211, 143);
+
+    while(iterator.hasNext()){
+      waypoint = iterator.next();
+    }
+
+    assertWaypointCoordinates(waypoint, 286, 334);
+  }
+
+  @Test
+  public void shouldPlaceManyBranchesForInclusiveGateway() {
+    ProcessBuilder builder = Bpmn.createExecutableProcess();
+
+    instance = builder
+        .startEvent(START_EVENT_ID)
+        .inclusiveGateway("id")
+        .userTask(USER_TASK_ID)
+        .moveToNode("id")
+        .endEvent(END_EVENT_ID)
+        .moveToNode("id")
+        .serviceTask(SERVICE_TASK_ID)
+        .moveToNode("id")
+        .sequenceFlowId("s1")
+        .sendTask(SEND_TASK_ID)
+        .done();
+
+    Bounds userTaskBounds = findBpmnShape(USER_TASK_ID).getBounds();
+    assertShapeCoordinates(userTaskBounds, 286, 78);
+
+    Bounds endEventBounds = findBpmnShape(END_EVENT_ID).getBounds();
+    assertShapeCoordinates(endEventBounds, 286, 208);
+
+    Bounds serviceTaskBounds = findBpmnShape(SERVICE_TASK_ID).getBounds();
+    assertShapeCoordinates(serviceTaskBounds, 286, 294);
+
+    Bounds sendTaskBounds = findBpmnShape(SEND_TASK_ID).getBounds();
+    assertShapeCoordinates(sendTaskBounds, 286, 424);
+
+    Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge("s1").getWaypoints();
+    Iterator<Waypoint> iterator = sequenceFlowWaypoints.iterator();
+
+    Waypoint waypoint = iterator.next();
+    assertWaypointCoordinates(waypoint, 211, 143);
+
+    while(iterator.hasNext()){
+      waypoint = iterator.next();
+    }
+
+    assertWaypointCoordinates(waypoint, 286, 464);
+  }
+
+  public void shouldPlaceStartEventWithinSubProcess() {
+
+    ProcessBuilder builder = Bpmn.createExecutableProcess();
+
+    instance = builder
+        .startEvent(START_EVENT_ID)
+        .subProcess(SUB_PROCESS_ID)
+          .embeddedSubProcess()
+          .startEvent("innerStartEvent")
+          .done();
+
+    Bounds startEventBounds = findBpmnShape("innerStartEvent").getBounds();
+    assertShapeCoordinates(startEventBounds, 236, 100);
+  }
+
+  @Test
+  public void shouldAdjustSubProcessWidth() {
+
+    ProcessBuilder builder = Bpmn.createExecutableProcess();
+
+    instance = builder
+        .startEvent(START_EVENT_ID)
+        .subProcess(SUB_PROCESS_ID)
+          .embeddedSubProcess()
+          .startEvent("innerStartEvent")
+          .parallelGateway("innerParallelGateway")
+          .userTask("innerUserTask")
+          .endEvent("innerEndEvent")
+        .subProcessDone()
+        .done();
+
+    Bounds subProcessBounds = findBpmnShape(SUB_PROCESS_ID).getBounds();
+    assertThat(subProcessBounds.getWidth()).isEqualTo(472);
+  }
+
+  @Test
+  public void shouldAdjustSubProcessWidthWithEmbeddedSubProcess() {
+
+    ProcessBuilder builder = Bpmn.createExecutableProcess();
+
+    instance = builder
+        .startEvent(START_EVENT_ID)
+        .subProcess(SUB_PROCESS_ID)
+          .embeddedSubProcess()
+          .startEvent("innerStartEvent")
+          .subProcess("innerSubProcess")
+            .embeddedSubProcess()
+            .startEvent()
+            .userTask()
+            .userTask()
+            .endEvent()
+          .subProcessDone()
+          .endEvent("innerEndEvent")
+        .subProcessDone()
+        .done();
+
+    Bounds subProcessBounds = findBpmnShape(SUB_PROCESS_ID).getBounds();
+    assertThat(subProcessBounds.getWidth()).isEqualTo(794);
+  }
+
+  @Test
+  public void shouldAdjustSubProcessHeight() {
+
+    ProcessBuilder builder = Bpmn.createExecutableProcess();
+
+    instance = builder
+        .startEvent(START_EVENT_ID)
+        .subProcess(SUB_PROCESS_ID)
+          .embeddedSubProcess()
+          .startEvent("innerStartEvent")
+          .parallelGateway("innerParallelGateway")
+          .endEvent("innerEndEvent")
+          .moveToNode("innerParallelGateway")
+          .userTask("innerUserTask")
+        .subProcessDone()
+        .done();
+
+    Bounds subProcessBounds = findBpmnShape(SUB_PROCESS_ID).getBounds();
+    assertThat(subProcessBounds.getHeight()).isEqualTo(298);
+  }
+
+  @Test
+  public void shouldAdjustSubProcessHeightWithEmbeddedProcess() {
+
+    ProcessBuilder builder = Bpmn.createExecutableProcess();
+
+    instance = builder
+        .startEvent(START_EVENT_ID)
+        .subProcess(SUB_PROCESS_ID)
+          .embeddedSubProcess()
+          .startEvent("innerStartEvent")
+          .subProcess()
+            .embeddedSubProcess()
+              .startEvent()
+              .exclusiveGateway("id")
+              .userTask()
+              .moveToNode("id")
+              .endEvent()
+          .subProcessDone()
+          .endEvent("innerEndEvent")
+        .subProcessDone()
+        .endEvent()
+        .done();
+
+    Bounds subProcessBounds = findBpmnShape(SUB_PROCESS_ID).getBounds();
+    assertThat(subProcessBounds.getY()).isEqualTo(-32);
+    assertThat(subProcessBounds.getHeight()).isEqualTo(376);
+  }
+
   protected BpmnShape findBpmnShape(String id) {
     Collection<BpmnShape> allShapes = instance.getModelElementsByType(BpmnShape.class);
 
@@ -783,7 +1342,6 @@ public class CoordinatesGenerationTest {
     assertThat(bounds.getX()).isEqualTo(x);
     assertThat(bounds.getY()).isEqualTo(y);
   }
-
 
   protected void assertWaypointCoordinates(Waypoint waypoint, double x, double y){
     assertThat(x).isEqualTo(waypoint.getX());
