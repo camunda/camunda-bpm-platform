@@ -172,14 +172,7 @@ describe('Task Claiming Spec', function() {
       dashboardPage.currentTask.editClaimedUser('testa');
 
       // then
-      expect(dashboardPage.currentTask.claimedUser()).to.eventually.eql('Montgomery QA');
-
-      // when
-      dashboardPage.currentTask.clickClaimedUserField();
-
-      // then
-      expect(dashboardPage.currentTask.claimedUserField().element(by.css('.set-value')).getAttribute('class')).not.to.eventually.include('has-error');
-      expect(dashboardPage.currentTask.claimedUserFieldEditMode().getAttribute('value')).to.eventually.eql('test');
+      expect(dashboardPage.currentTask.claimedUserField().isDisplayed()).to.eventually.eql(true);
     });
 
   });

@@ -107,7 +107,7 @@
           tabindex="0"
           ng-keydown="editAssignee($event)"
           ng-keyup="checkAssignee($event)"
-          ng-class="{'has-error': !validAssignee}"
+          ng-class="{'has-error': !validAssignee, 'validating': validatingAssignee}"
           class="set-value"
           type="text"
           validate="validateUser(this)"

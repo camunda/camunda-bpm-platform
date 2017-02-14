@@ -65,6 +65,29 @@
       }
     }
   }
+
+  .assignee .validating {
+    &:before {
+      content: '\e031';
+      position: absolute;
+      color: @gray-light;
+      top: 6px;
+      right: 4px;
+      font-family: 'Glyphicons Halflings';
+      font-style: normal;
+      font-weight: normal;
+      font-size: smaller;
+      line-height: 1;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      .animation(~"spin 1s infinite linear");
+    }
+    input {
+      color: @gray-light;
+      cursor: wait;
+      cursor: progress;
+    }
+  }
 }
 
 // S+
