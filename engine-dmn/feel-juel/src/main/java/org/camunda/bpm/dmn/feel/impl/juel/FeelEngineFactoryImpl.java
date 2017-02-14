@@ -13,6 +13,8 @@
 
 package org.camunda.bpm.dmn.feel.impl.juel;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
 
 import javax.el.ELException;
@@ -23,6 +25,7 @@ import org.camunda.bpm.dmn.feel.impl.FeelEngineFactory;
 import org.camunda.bpm.dmn.feel.impl.juel.el.ElContextFactory;
 import org.camunda.bpm.dmn.feel.impl.juel.el.FeelElContextFactory;
 import org.camunda.bpm.dmn.feel.impl.juel.el.FeelTypeConverter;
+import org.camunda.bpm.dmn.feel.impl.juel.transform.FeelToJuelFunctionTransformer;
 import org.camunda.bpm.dmn.feel.impl.juel.transform.FeelToJuelTransform;
 import org.camunda.bpm.dmn.feel.impl.juel.transform.FeelToJuelTransformImpl;
 import org.camunda.commons.utils.cache.Cache;
@@ -39,13 +42,23 @@ public class FeelEngineFactoryImpl implements FeelEngineFactory {
   protected final FeelEngine feelEngine;
 
   protected final int expressionCacheSize;
+  protected final List<FeelToJuelFunctionTransformer> customFunctionTransformers;
 
   public FeelEngineFactoryImpl() {
     this(DEFAULT_EXPRESSION_CACHE_SIZE);
   }
 
   public FeelEngineFactoryImpl(int expressionCacheSize) {
+      this(expressionCacheSize, Collections.<FeelToJuelFunctionTransformer> emptyList());
+  }
+
+  public FeelEngineFactoryImpl(List<FeelToJuelFunctionTransformer> customFunctionTransformers) {
+      this(DEFAULT_EXPRESSION_CACHE_SIZE, customFunctionTransformers);
+  }
+
+  public FeelEngineFactoryImpl(int expressionCacheSize, List<FeelToJuelFunctionTransformer> customFunctionTransformers) {
     this.expressionCacheSize = expressionCacheSize;
+    this.customFunctionTransformers = customFunctionTransformers;
 
     feelEngine = createFeelEngine();
   }
@@ -63,7 +76,13 @@ public class FeelEngineFactoryImpl implements FeelEngineFactory {
   }
 
   protected FeelToJuelTransform createFeelToJuelTransform() {
-    return new FeelToJuelTransformImpl();
+    FeelToJuelTransformImpl transformer = new FeelToJuelTransformImpl();
+
+    for (FeelToJuelFunctionTransformer functionTransformer : customFunctionTransformers) {
+      transformer.addCustomFunctionTransformer(functionTransformer);
+    }
+
+    return transformer;
   }
 
   protected ExpressionFactory createExpressionFactory() {
@@ -83,7 +102,13 @@ public class FeelEngineFactoryImpl implements FeelEngineFactory {
   }
 
   protected ElContextFactory createElContextFactory() {
-    return new FeelElContextFactory();
+    FeelElContextFactory factory = new FeelElContextFactory();
+
+    for (FeelToJuelFunctionTransformer functionTransformer : customFunctionTransformers) {
+      factory.addCustomFunction(functionTransformer.getName(), functionTransformer.getMethod());
+    }
+
+    return factory;
   }
 
   protected Cache<TransformExpressionCacheKey, String> createTransformExpressionCache() {

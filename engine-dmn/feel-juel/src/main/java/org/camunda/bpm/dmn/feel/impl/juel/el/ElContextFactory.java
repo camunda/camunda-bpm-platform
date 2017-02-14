@@ -13,6 +13,8 @@
 
 package org.camunda.bpm.dmn.feel.impl.juel.el;
 
+import java.lang.reflect.Method;
+
 import javax.el.ELContext;
 import javax.el.ExpressionFactory;
 
@@ -28,5 +30,13 @@ public interface ElContextFactory {
    * @return the {@link ELContext} instance
    */
   ELContext createContext(ExpressionFactory expressionFactory, VariableContext variableContext);
+
+  /**
+   * Add a custom function which can be used by the context.
+   *
+   * @param name the name of the function
+   * @param method the method reference of the function
+   */
+  void addCustomFunction(String name, Method method);
 
 }

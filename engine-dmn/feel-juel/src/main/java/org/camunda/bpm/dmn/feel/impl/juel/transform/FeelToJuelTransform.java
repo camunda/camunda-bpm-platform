@@ -51,4 +51,11 @@ public interface FeelToJuelTransform {
    */
   String transformEndpoint(String endpoint, String inputName);
 
+  /**
+   * Add a transformer for a custom function.
+   *
+   * @param functionTransformer the transformer for the custom function
+   */
+  void addCustomFunctionTransformer(FeelToJuelTransformer functionTransformer);
+
 }
