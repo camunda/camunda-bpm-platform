@@ -92,9 +92,9 @@ public abstract class AbstractFlowNodeBuilder<B extends AbstractFlowNodeBuilder<
     T target = createSibling(typeClass, identifier);
 
     BpmnShape targetBpmnShape = createBpmnShape(target);
-    setTargetCoordinates(targetBpmnShape);
-    adjustSubProcess(targetBpmnShape);
+    setCoordinates(targetBpmnShape);
     connectTarget(target);
+    resizeSubProcess(targetBpmnShape);
     return target;
   }
 

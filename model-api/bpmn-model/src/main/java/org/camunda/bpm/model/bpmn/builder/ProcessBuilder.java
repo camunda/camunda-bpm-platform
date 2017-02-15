@@ -35,12 +35,12 @@ public class ProcessBuilder extends AbstractProcessBuilder<ProcessBuilder> {
   public StartEventBuilder startEvent(String id) {
     StartEvent start = createChild(StartEvent.class, id);
     BpmnShape bpmnShape = createBpmnShape(start);
-    setTargetCoordinates(bpmnShape);
+    setCoordinates(bpmnShape);
     return start.builder();
   }
 
   @Override
-  protected void setTargetCoordinates(BpmnShape targetBpmnShape){
+  protected void setCoordinates(BpmnShape targetBpmnShape){
     Bounds bounds = targetBpmnShape.getBounds();
     bounds.setX(100);
     bounds.setY(100);

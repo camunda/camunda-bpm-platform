@@ -17,6 +17,7 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.BoundaryEvent;
 import org.camunda.bpm.model.bpmn.instance.ErrorEventDefinition;
 import org.camunda.bpm.model.bpmn.instance.EscalationEventDefinition;
+import org.camunda.bpm.model.bpmn.instance.FlowNode;
 import org.camunda.bpm.model.bpmn.instance.SequenceFlow;
 import org.camunda.bpm.model.bpmn.instance.bpmndi.BpmnEdge;
 import org.camunda.bpm.model.bpmn.instance.bpmndi.BpmnShape;
@@ -126,34 +127,60 @@ public abstract class AbstractBoundaryEventBuilder<B extends AbstractBoundaryEve
 
 
   @Override
-  protected void setTargetCoordinates(BpmnShape targetBpmnShape) {
-    Bounds elemBounds = findBpmnShape(element).getBounds();
+  protected void setCoordinates(BpmnShape targetBpmnShape) {
+    BpmnShape source = findBpmnShape(element);
     Bounds targetBounds = targetBpmnShape.getBounds();
-    double x = elemBounds.getX() + elemBounds.getWidth() + SPACE;
-    double y = elemBounds.getY() + elemBounds.getHeight() / 2 - targetBounds.getHeight() / 2 + SPACE;
+    double x = 0;
+    double y = 0;
+
+    if (source != null) {
+      Bounds sourceBounds = source.getBounds();
+      Double sourceX = sourceBounds.getX();
+      Double sourceWidth = sourceBounds.getWidth();
+      Double sourceY = sourceBounds.getY();
+      Double sourceHeight = sourceBounds.getHeight();
+      Double targetHeight = targetBounds.getHeight();
+
+      x = sourceX + sourceWidth + SPACE;
+      y = sourceY + sourceHeight / 2 - targetHeight / 2 + SPACE;
+    }
     targetBounds.setX(x);
     targetBounds.setY(y);
   }
 
   @Override
   protected void setWaypoints(BpmnEdge edge) {
-    Bounds elemBounds = findBpmnShape(( (SequenceFlow) edge.getBpmnElement()).getSource()).getBounds();
-    Bounds targetBounds = findBpmnShape(( (SequenceFlow) edge.getBpmnElement()).getTarget()).getBounds();
+    FlowNode sourceFlowNode = ((SequenceFlow) edge.getBpmnElement()).getSource();
+    FlowNode targetFlowNode = ((SequenceFlow) edge.getBpmnElement()).getTarget();
+    BpmnShape source = findBpmnShape(sourceFlowNode);
+    BpmnShape target = findBpmnShape(targetFlowNode);
 
-    Waypoint w1 = createInstance(Waypoint.class);
-    w1.setX(elemBounds.getX() + elemBounds.getWidth() / 2);
-    w1.setY(elemBounds.getY() + elemBounds.getHeight());
+    if (source != null && target != null) {
+      Bounds sourceBounds = source.getBounds();
+      Bounds targetBounds = target.getBounds();
+      Double sourceX = sourceBounds.getX();
+      Double sourceWidth = sourceBounds.getWidth();
+      Double sourceY = sourceBounds.getY();
+      Double sourceHeight = sourceBounds.getHeight();
+      Double targetX = targetBounds.getX();
+      Double targetY = targetBounds.getY();
+      Double targetHeight = targetBounds.getHeight();
 
-    Waypoint w2 = createInstance(Waypoint.class);
-    w2.setX(elemBounds.getX() + elemBounds.getWidth() / 2);
-    w2.setY(elemBounds.getY() + elemBounds.getHeight() / 2 + SPACE);
+      Waypoint w1 = createInstance(Waypoint.class);
+      w1.setX(sourceX + sourceWidth / 2);
+      w1.setY(sourceY + sourceHeight);
 
-    Waypoint w3 = createInstance(Waypoint.class);
-    w3.setX(targetBounds.getX());
-    w3.setY(targetBounds.getY() + targetBounds.getHeight() / 2);
+      Waypoint w2 = createInstance(Waypoint.class);
+      w2.setX(sourceX + sourceWidth / 2);
+      w2.setY(sourceY + sourceHeight / 2 + SPACE);
 
-    edge.addChildElement(w1);
-    edge.addChildElement(w2);
-    edge.addChildElement(w3);
- }
+      Waypoint w3 = createInstance(Waypoint.class);
+      w3.setX(targetX);
+      w3.setY(targetY + targetHeight / 2);
+
+      edge.addChildElement(w1);
+      edge.addChildElement(w2);
+      edge.addChildElement(w3);
+    }
+  }
 }
