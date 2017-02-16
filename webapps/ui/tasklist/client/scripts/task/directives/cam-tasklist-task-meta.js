@@ -181,8 +181,9 @@ module.exports = [
           }
         };
 
-        var userResource = camAPI.resource('user');
+        // ------------ START VALIDATION LOGIC --------------
 
+        var userResource = camAPI.resource('user');
         $scope.validAssignee = true; // we assume it's valid, good idea?
         $scope.validationInProgress = false; // not yet started the validation
 
@@ -193,16 +194,16 @@ module.exports = [
           if ($scope.validationInProgress || previousAssigneeInput === newId) {
             return done();
           }
-          previousAssigneeInput = newId;
-
-          $scope.validAssignee = false;
-          $scope.validationInProgress = true;
 
           if (!newId) {
             $scope.validAssignee = true; // dunno... should it be false?
             $scope.validationInProgress = false;
             return done();
           }
+
+          previousAssigneeInput = newId;
+          $scope.validAssignee = false;
+          $scope.validationInProgress = true;
 
           userResource.list({
             maxResults: 1, // we don't do suggestions, yet
@@ -221,7 +222,7 @@ module.exports = [
         }
 
         // this is used by the inline-field widget to allow or reject the change
-        $scope.validateUser = function() {
+        $scope.isInvalidUser = function() {
           // must wait for 'validationInProgress' to be back to 'false'
           return $scope.validationInProgress || !$scope.validAssignee;
         };
@@ -236,6 +237,8 @@ module.exports = [
             });
           });
         };
+
+        // ------------ END VALIDATION LOGIC --------------
 
         var notifications = {
 
