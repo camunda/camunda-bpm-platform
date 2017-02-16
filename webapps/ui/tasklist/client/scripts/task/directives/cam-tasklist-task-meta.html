@@ -106,8 +106,7 @@
     <span cam-widget-inline-field
           tabindex="0"
           ng-keydown="editAssignee($event)"
-          ng-keyup="checkAssignee($event)"
-          ng-class="{'has-error': !validAssignee, 'validating': validatingAssignee}"
+          ng-class="{'has-error': !validAssignee, 'validating': validationInProgress}"
           class="set-value"
           type="text"
           validate="validateUser(this)"
