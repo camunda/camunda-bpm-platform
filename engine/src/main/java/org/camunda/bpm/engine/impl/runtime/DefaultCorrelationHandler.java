@@ -88,6 +88,13 @@ public class DefaultCorrelationHandler implements CorrelationHandler {
       }
     }
 
+    Map<String, Object> localCorrelationKeys = correlationSet.getLocalCorrelationKeys();
+    if (localCorrelationKeys != null) {
+      for (Map.Entry<String, Object> correlationKey : localCorrelationKeys.entrySet()) {
+        query.variableValueEquals(correlationKey.getKey(), correlationKey.getValue());
+      }
+    }
+
     String businessKey = correlationSet.getBusinessKey();
     if (businessKey != null) {
       query.processInstanceBusinessKey(businessKey);

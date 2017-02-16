@@ -63,6 +63,24 @@ public interface MessageCorrelationBuilder {
   MessageCorrelationBuilder processInstanceVariablesEqual(Map<String, Object> variables);
 
   /**
+   * <p>Correlate the message such that the execution has a local variable with the given name and value.</p>
+   *
+   * @param variableName the name of the local variable to correlate on.
+   * @param variableValue the value of the local variable to correlate on.
+   * @return the builder
+   */
+  MessageCorrelationBuilder localVariableEquals(String variableName, Object variableValue);
+
+  /**
+   * <p>Correlate the message such that the execution has the given variables as local variables.
+   * </p>
+   *
+   * @param variables the local variables of the execution to correlate on.
+   * @return the builder
+   */
+  MessageCorrelationBuilder localVariablesEqual(Map<String, Object> variables);
+
+  /**
    * <p>Correlate the message such that a process instance with the given id is selected.</p>
    *
    * @param id the id of the process instance to correlate on.

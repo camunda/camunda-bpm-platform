@@ -50,6 +50,7 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
   protected String processDefinitionId;
 
   protected VariableMap correlationProcessInstanceVariables;
+  protected VariableMap correlationLocalVariables;
   protected VariableMap payloadProcessInstanceVariables;
 
   protected String tenantId = null;
@@ -93,9 +94,31 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
     return this;
   }
 
+  public MessageCorrelationBuilder localVariableEquals(String variableName, Object variableValue) {
+    ensureNotNull("variableName", variableName);
+    ensureCorrelationLocalVariablesInitialized();
+
+    correlationLocalVariables.put(variableName, variableValue);
+    return this;
+  }
+
+  public MessageCorrelationBuilder localVariablesEqual(Map<String, Object> variables) {
+    ensureNotNull("variables", variables);
+    ensureCorrelationLocalVariablesInitialized();
+
+    correlationLocalVariables.putAll(variables);
+    return this;
+  }
+
   protected void ensureCorrelationProcessInstanceVariablesInitialized() {
     if(correlationProcessInstanceVariables == null) {
       correlationProcessInstanceVariables = new VariableMapImpl();
+    }
+  }
+
+  protected void ensureCorrelationLocalVariablesInitialized() {
+    if(correlationLocalVariables == null) {
+      correlationLocalVariables = new VariableMapImpl();
     }
   }
 
@@ -201,7 +224,7 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
   }
 
   protected void ensureCorrelationVariablesNotSet() {
-    if (correlationProcessInstanceVariables != null) {
+    if (correlationProcessInstanceVariables != null || correlationLocalVariables != null) {
       throw LOG.exceptionCorrelateStartMessageWithCorrelationVariables();
     }
   }
@@ -248,6 +271,10 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
 
   public Map<String, Object> getCorrelationProcessInstanceVariables() {
     return correlationProcessInstanceVariables;
+  }
+
+  public Map<String, Object> getCorrelationLocalVariables() {
+    return correlationLocalVariables;
   }
 
   public Map<String, Object> getPayloadProcessInstanceVariables() {

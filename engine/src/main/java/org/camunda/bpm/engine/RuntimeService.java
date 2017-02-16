@@ -1068,7 +1068,7 @@ public interface RuntimeService {
 
   /**
    * Returns a {@link TypedValue} for the variable. Searching for the variable is done in all scopes that are visible
-   * to the given execution (including parent scopes). Returns null when no variable value is found with the given name.
+   * to the given execution (and not searching parent scopes). Returns null when no variable value is found with the given name.
    *
    * @param executionId id of process instance or execution, cannot be null.
    * @param variableName name of variable, cannot be null.

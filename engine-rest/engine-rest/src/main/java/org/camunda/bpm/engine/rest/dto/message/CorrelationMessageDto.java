@@ -21,6 +21,7 @@ public class CorrelationMessageDto {
   private String messageName;
   private String businessKey;
   private Map<String, VariableValueDto> correlationKeys;
+  private Map<String, VariableValueDto> localCorrelationKeys;
   private Map<String, VariableValueDto> processVariables;
   private String tenantId;
   private boolean withoutTenantId;
@@ -51,6 +52,14 @@ public class CorrelationMessageDto {
 
   public void setCorrelationKeys(Map<String, VariableValueDto> correlationKeys) {
     this.correlationKeys = correlationKeys;
+  }
+
+  public Map<String, VariableValueDto> getLocalCorrelationKeys() {
+    return localCorrelationKeys;
+  }
+
+  public void setLocalCorrelationKeys(Map<String, VariableValueDto> localCorrelationKeys) {
+    this.localCorrelationKeys = localCorrelationKeys;
   }
 
   public Map<String, VariableValueDto> getProcessVariables() {

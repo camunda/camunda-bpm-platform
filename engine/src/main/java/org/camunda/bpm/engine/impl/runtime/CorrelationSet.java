@@ -21,6 +21,7 @@ public class CorrelationSet {
 
   protected final String businessKey;
   protected final Map<String, Object> correlationKeys;
+  protected final Map<String, Object> localCorrelationKeys;
   protected final String processInstanceId;
   protected final String processDefinitionId;
   protected final String tenantId;
@@ -30,6 +31,7 @@ public class CorrelationSet {
     this.businessKey = builder.getBusinessKey();
     this.processInstanceId = builder.getProcessInstanceId();
     this.correlationKeys = builder.getCorrelationProcessInstanceVariables();
+    this.localCorrelationKeys = builder.getCorrelationLocalVariables();
     this.processDefinitionId = builder.getProcessDefinitionId();
     this.tenantId = builder.getTenantId();
     this.isTenantIdSet = builder.isTenantIdSet();
@@ -41,6 +43,10 @@ public class CorrelationSet {
 
   public Map<String, Object> getCorrelationKeys() {
     return correlationKeys;
+  }
+
+  public Map<String, Object> getLocalCorrelationKeys() {
+    return localCorrelationKeys;
   }
 
   public String getProcessInstanceId() {
@@ -62,7 +68,7 @@ public class CorrelationSet {
   @Override
   public String toString() {
     return "CorrelationSet [businessKey=" + businessKey + ", processInstanceId=" + processInstanceId + ", processDefinitionId=" + processDefinitionId
-        + ", correlationKeys=" + correlationKeys + ", tenantId=" + tenantId + ", isTenantIdSet=" + isTenantIdSet + "]";
+        + ", correlationKeys=" + correlationKeys + ", localCorrelationKeys=" + localCorrelationKeys + ", tenantId=" + tenantId + ", isTenantIdSet=" + isTenantIdSet + "]";
   }
 
 }

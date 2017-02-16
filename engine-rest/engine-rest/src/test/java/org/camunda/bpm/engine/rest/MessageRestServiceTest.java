@@ -102,9 +102,15 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
         .variable("anotherKey", 1)
         .variable("aThirdKey", true).getVariables();
 
+    Map<String, Object> localCorrelationKeys = VariablesBuilder.create()
+        .variable("aLocalKey", "aValue")
+        .variable("anotherLocalKey", 1)
+        .variable("aThirdLocalKey", false).getVariables();
+
     Map<String, Object> messageParameters = new HashMap<String, Object>();
     messageParameters.put("messageName", messageName);
     messageParameters.put("correlationKeys", correlationKeys);
+    messageParameters.put("localCorrelationKeys", localCorrelationKeys);
     messageParameters.put("processVariables", variables);
     messageParameters.put("businessKey", businessKey);
 
@@ -117,6 +123,11 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
     expectedCorrelationKeys.put("anotherKey", 1);
     expectedCorrelationKeys.put("aThirdKey", true);
 
+    Map<String, Object> expectedLocalCorrelationKeys = new HashMap<String, Object>();
+    expectedLocalCorrelationKeys.put("aLocalKey", "aValue");
+    expectedLocalCorrelationKeys.put("anotherLocalKey", 1);
+    expectedLocalCorrelationKeys.put("aThirdLocalKey", false);
+
     Map<String, Object> expectedVariables = new HashMap<String, Object>();
     expectedVariables.put("aKey", "aValue");
 
@@ -128,6 +139,12 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
       String name = expectedKey.getKey();
       Object value = expectedKey.getValue();
       verify(messageCorrelationBuilderMock).processInstanceVariableEquals(name, value);
+    }
+
+    for (Entry<String, Object> expectedLocalKey : expectedLocalCorrelationKeys.entrySet()) {
+      String name = expectedLocalKey.getKey();
+      Object value = expectedLocalKey.getValue();
+      verify(messageCorrelationBuilderMock).localVariableEquals(name, value);
     }
 
     verify(messageCorrelationBuilderMock).correlateWithResult();
@@ -224,9 +241,15 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
         .variable("anotherKey", 1)
         .variable("aThirdKey", true).getVariables();
 
+    Map<String, Object> localCorrelationKeys = VariablesBuilder.create()
+        .variable("aLocalKey", "aValue")
+        .variable("anotherLocalKey", 1)
+        .variable("aThirdLocalKey", false).getVariables();
+
     Map<String, Object> messageParameters = new HashMap<String, Object>();
     messageParameters.put("messageName", messageName);
     messageParameters.put("correlationKeys", correlationKeys);
+    messageParameters.put("localCorrelationKeys", localCorrelationKeys);
     messageParameters.put("processVariables", variables);
     messageParameters.put("businessKey", businessKey);
     messageParameters.put("all", true);
@@ -240,6 +263,11 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
     expectedCorrelationKeys.put("anotherKey", 1);
     expectedCorrelationKeys.put("aThirdKey", true);
 
+    Map<String, Object> expectedLocalCorrelationKeys = new HashMap<String, Object>();
+    expectedLocalCorrelationKeys.put("aLocalKey", "aValue");
+    expectedLocalCorrelationKeys.put("anotherLocalKey", 1);
+    expectedLocalCorrelationKeys.put("aThirdLocalKey", false);
+
     Map<String, Object> expectedVariables = new HashMap<String, Object>();
     expectedVariables.put("aKey", "aValue");
 
@@ -251,6 +279,12 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
       String name = expectedKey.getKey();
       Object value = expectedKey.getValue();
       verify(messageCorrelationBuilderMock).processInstanceVariableEquals(name, value);
+    }
+
+    for (Entry<String, Object> expectedLocalKey : expectedLocalCorrelationKeys.entrySet()) {
+      String name = expectedLocalKey.getKey();
+      Object value = expectedLocalKey.getValue();
+      verify(messageCorrelationBuilderMock).localVariableEquals(name, value);
     }
 
     verify(messageCorrelationBuilderMock).correlateAllWithResult();
@@ -574,6 +608,28 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
   }
 
   @Test
+  public void testFailingDueToUnparseableIntegerInLocalCorrelationKeys() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String variableType = "Integer";
+
+    Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+
+    String messageName = "aMessageName";
+
+    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    messageParameters.put("messageName", messageName);
+    messageParameters.put("localCorrelationKeys", variableJson);
+
+    given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters)
+        .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", equalTo("Cannot deliver message: "
+            + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Integer.class)))
+        .when().post(MESSAGE_URL);
+  }
+
+  @Test
   public void testFailingDueToUnparseableShortInCorrelationKeys() {
     String variableKey = "aVariableKey";
     String variableValue = "1abc";
@@ -593,6 +649,28 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
     .body("message", equalTo("Cannot deliver message: "
         + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Short.class)))
     .when().post(MESSAGE_URL);
+  }
+
+  @Test
+  public void testFailingDueToUnparseableShortInLocalCorrelationKeys() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String variableType = "Short";
+
+    Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+
+    String messageName = "aMessageName";
+
+    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    messageParameters.put("messageName", messageName);
+    messageParameters.put("localCorrelationKeys", variableJson);
+
+    given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters)
+        .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", equalTo("Cannot deliver message: "
+            + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Short.class)))
+        .when().post(MESSAGE_URL);
   }
 
   @Test
@@ -618,6 +696,28 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
   }
 
   @Test
+  public void testFailingDueToUnparseableLongInLocalCorrelationKeys() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String variableType = "Long";
+
+    Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+
+    String messageName = "aMessageName";
+
+    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    messageParameters.put("messageName", messageName);
+    messageParameters.put("localCorrelationKeys", variableJson);
+
+    given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters)
+        .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", equalTo("Cannot deliver message: "
+            + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Long.class)))
+        .when().post(MESSAGE_URL);
+  }
+
+  @Test
   public void testFailingDueToUnparseableDoubleInCorrelationKeys() {
     String variableKey = "aVariableKey";
     String variableValue = "1abc";
@@ -637,6 +737,28 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
     .body("message", equalTo("Cannot deliver message: "
         + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Double.class)))
     .when().post(MESSAGE_URL);
+  }
+
+  @Test
+  public void testFailingDueToUnparseableDoubleInLocalCorrelationKeys() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String variableType = "Double";
+
+    Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+
+    String messageName = "aMessageName";
+
+    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    messageParameters.put("messageName", messageName);
+    messageParameters.put("localCorrelationKeys", variableJson);
+
+    given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters)
+        .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", equalTo("Cannot deliver message: "
+            + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Double.class)))
+        .when().post(MESSAGE_URL);
   }
 
   @Test
@@ -662,6 +784,28 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
   }
 
   @Test
+  public void testFailingDueToUnparseableDateInLocalCorrelationKeys() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String variableType = "Date";
+
+    Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+
+    String messageName = "aMessageName";
+
+    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    messageParameters.put("messageName", messageName);
+    messageParameters.put("localCorrelationKeys", variableJson);
+
+    given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters)
+        .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", equalTo("Cannot deliver message: "
+            + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Date.class)))
+        .when().post(MESSAGE_URL);
+  }
+
+  @Test
   public void testFailingDueToNotSupportedTypeInCorrelationKeys() {
     String variableKey = "aVariableKey";
     String variableValue = "1abc";
@@ -680,6 +824,27 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
     .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
     .body("message", equalTo("Cannot deliver message: Unsupported value type 'X'"))
     .when().post(MESSAGE_URL);
+  }
+
+  @Test
+  public void testFailingDueToNotSupportedTypeInLocalCorrelationKeys() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String variableType = "X";
+
+    Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+
+    String messageName = "aMessageName";
+
+    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    messageParameters.put("messageName", messageName);
+    messageParameters.put("localCorrelationKeys", variableJson);
+
+    given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters)
+        .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", equalTo("Cannot deliver message: Unsupported value type 'X'"))
+        .when().post(MESSAGE_URL);
   }
 
   @Test
