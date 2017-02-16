@@ -186,13 +186,15 @@ module.exports = [
         $scope.validAssignee = true; // we assume it's valid, good idea?
         $scope.validationInProgress = false; // not yet started the validation
 
+        var previousAssigneeInput;
         function validateAssignee(targetElement, done) {
           done = done || angular.noop;
           var newId = targetElement.value;
-          console.info('validateAssignee called (in progress %s, newId: %s)', $scope.validationInProgress, newId);
-          if ($scope.validationInProgress) {
-            return;
+          if ($scope.validationInProgress || previousAssigneeInput === newId) {
+            return done();
           }
+          previousAssigneeInput = newId;
+
           $scope.validAssignee = false;
           $scope.validationInProgress = true;
 
@@ -206,7 +208,6 @@ module.exports = [
             maxResults: 1, // we don't do suggestions, yet
             id: newId
           }, function(err, results) {
-            console.info('validateAssignee response', $scope.validationInProgress, !!err, results.length);
             if (newId !== targetElement.value) {
               $scope.validationInProgress = false;
               return validateAssignee(targetElement, done);
@@ -219,25 +220,17 @@ module.exports = [
           });
         }
 
-        $scope.checkAssignee = function(evt) {
-          validateAssignee(evt.target);
-        };
-
         // this is used by the inline-field widget to allow or reject the change
         $scope.validateUser = function() {
-          console.info('validateUser! called', !$scope.validationInProgress, !$scope.validAssignee, !$scope.validationInProgress && !$scope.validAssignee);
           // must wait for 'validationInProgress' to be back to 'false'
-          return !$scope.validationInProgress && $scope.validAssignee;
+          return $scope.validationInProgress || !$scope.validAssignee;
         };
 
-
+        // used on keydown
         $scope.editAssignee = function(evt) {
           $timeout(function() {
             validateAssignee(evt.target, function() {
               if(evt.keyCode === 13 && evt.target === evt.currentTarget) {
-                // // we can not trigger events in an event handler, because 'apply is already in progress' ;)
-                // $timeout(function() {
-                // });
                 evt.target.firstChild.click();
               }
             });
@@ -269,7 +262,6 @@ module.exports = [
 
         $scope.assign = function(inlineFieldScope) {
           var original = $scope.assignee ? $scope.assignee.id : '';
-          console.info('$scope.assign', $scope.validationInProgress);
 
           validateAssignee($element.find('.assignee input')[0], function() {
             if (!$scope.validAssignee) {
