@@ -42,6 +42,7 @@ import org.camunda.bpm.model.bpmn.instance.bpmndi.BpmnPlane;
 import org.camunda.bpm.model.bpmn.instance.bpmndi.BpmnShape;
 import org.camunda.bpm.model.bpmn.instance.dc.Bounds;
 import org.camunda.bpm.model.bpmn.instance.di.Waypoint;
+import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 
 /**
  * @author Sebastian Menski
@@ -300,41 +301,49 @@ public abstract class AbstractBaseElementBuilder<B extends AbstractBaseElementBu
     return null;
   }
 
-  protected void setCoordinates(BpmnShape targetBpmnShape) {
+  protected void setCoordinates(BpmnShape shape) {
     BpmnShape source = findBpmnShape(element);
-    Bounds targetBounds = targetBpmnShape.getBounds();
+    Bounds shapeBounds = shape.getBounds();
+
     double x = 0;
     double y = 0;
 
     if (source != null) {
       Bounds sourceBounds = source.getBounds();
 
-      Double sourceX = sourceBounds.getX();
-      Double sourceWidth = sourceBounds.getWidth();
+      double sourceX = sourceBounds.getX();
+      double sourceWidth = sourceBounds.getWidth();
       x = sourceX + sourceWidth + SPACE;
 
       if (element instanceof FlowNode) {
+
         FlowNode flowNode = (FlowNode) element;
         Collection<SequenceFlow> outgoing = flowNode.getOutgoing();
+
         if (outgoing.size() == 0) {
           double sourceY = sourceBounds.getY();
           double sourceHeight = sourceBounds.getHeight();
-          double targetHeight = targetBounds.getHeight();
+          double targetHeight = shapeBounds.getHeight();
           y = sourceY + sourceHeight / 2 - targetHeight / 2;
-        } else {
-          SequenceFlow last = (SequenceFlow) outgoing.toArray()[outgoing.size() - 1];
-          FlowNode target = last.getTarget();
-          BpmnShape lastBpmnShape = findBpmnShape(target);
-          if (lastBpmnShape != null) {
-            Double lastY = lastBpmnShape.getBounds().getY();
-            Double lastHeight = lastBpmnShape.getBounds().getHeight();
+        }
+        else {
+          SequenceFlow[] sequenceFlows = outgoing.toArray(new SequenceFlow[outgoing.size()]);
+          SequenceFlow last = sequenceFlows[outgoing.size() - 1];
+
+          BpmnShape targetShape = findBpmnShape(last.getTarget());
+          if (targetShape != null) {
+            Bounds targetBounds = targetShape.getBounds();
+            double lastY = targetBounds.getY();
+            double lastHeight = targetBounds.getHeight();
             y = lastY + lastHeight + SPACE;
           }
+
         }
       }
     }
-    targetBounds.setX(x);
-    targetBounds.setY(y);
+
+    shapeBounds.setX(x);
+    shapeBounds.setY(y);
   }
 
   public BpmnEdge createBpmnEdge(SequenceFlow sequenceFlow) {
@@ -353,35 +362,38 @@ public abstract class AbstractBaseElementBuilder<B extends AbstractBaseElementBu
 
   }
 
-
   protected void setWaypoints(BpmnEdge edge) {
     SequenceFlow sequenceFlow = (SequenceFlow) edge.getBpmnElement();
 
-    BpmnShape source = findBpmnShape(sequenceFlow.getSource());
-    BpmnShape target = findBpmnShape(sequenceFlow.getTarget());
+    FlowNode sequenceFlowSource = sequenceFlow.getSource();
+    FlowNode sequenceFlowTarget = sequenceFlow.getTarget();
+
+    BpmnShape source = findBpmnShape(sequenceFlowSource);
+    BpmnShape target = findBpmnShape(sequenceFlowTarget);
 
     if (source != null && target != null) {
 
       Bounds sourceBounds = source.getBounds();
       Bounds targetBounds = target.getBounds();
 
+      double sourceX = sourceBounds.getX();
+      double sourceY = sourceBounds.getY();
+      double sourceWidth = sourceBounds.getWidth();
+      double sourceHeight = sourceBounds.getHeight();
+
+      double targetX = targetBounds.getX();
+      double targetY = targetBounds.getY();
+      double targetHeight = targetBounds.getHeight();
+
       Waypoint w1 = createInstance(Waypoint.class);
 
-      Double sourceX = sourceBounds.getX();
-      Double sourceY = sourceBounds.getY();
-      Double sourceWidth = sourceBounds.getWidth();
-      Double sourceHeight = sourceBounds.getHeight();
-
-      Double targetX = targetBounds.getX();
-      Double targetY = targetBounds.getY();
-      Double targetHeight = targetBounds.getHeight();
-
-      if (sequenceFlow.getSource().getOutgoing().size() == 1) {
+      if (sequenceFlowSource.getOutgoing().size() == 1) {
         w1.setX(sourceX + sourceWidth);
         w1.setY(sourceY + sourceHeight / 2);
 
         edge.addChildElement(w1);
-      } else {
+      }
+      else {
         w1.setX(sourceX + sourceWidth / 2);
         w1.setY(sourceY + sourceHeight);
 
@@ -434,43 +446,50 @@ public abstract class AbstractBaseElementBuilder<B extends AbstractBaseElementBu
   }
 
   protected void resizeSubProcess(BpmnShape innerShape) {
+
     BaseElement innerElement = innerShape.getBpmnElement();
     Bounds innerShapeBounds = innerShape.getBounds();
-    Bounds subProcessBounds = null;
-    BpmnShape subProcess = null;
-    double tmpWidth, tmpHeight, subProcessWidth, innerX, innerWidth, innerY,
-             innerHeight, subProcessY, subProcessHeight, subProcessX = 0;
 
-    while (innerElement.getParentElement() instanceof SubProcess) {
-      subProcess = findBpmnShape((BaseElement) innerElement.getParentElement());
-      if (subProcess != null) {
-        subProcessBounds = subProcess.getBounds();
-        innerX = innerShapeBounds.getX();
-        innerWidth = innerShapeBounds.getWidth();
-        innerY = innerShapeBounds.getY();
-        innerHeight = innerShapeBounds.getHeight();
-        subProcessY = subProcessBounds.getY();
-        subProcessHeight = subProcessBounds.getHeight();
-        subProcessX = subProcessBounds.getX();
-        subProcessWidth = subProcessBounds.getWidth();
+    ModelElementInstance parent = innerElement.getParentElement();
 
-        tmpWidth = innerX + innerWidth + SPACE;
-        tmpHeight = innerY + innerHeight + SPACE;
+    while (parent instanceof SubProcess) {
+
+      BpmnShape subProcessShape = findBpmnShape((SubProcess) parent);
+
+      if (subProcessShape != null) {
+
+        Bounds subProcessBounds = subProcessShape.getBounds();
+        double innerX = innerShapeBounds.getX();
+        double innerWidth = innerShapeBounds.getWidth();
+        double innerY = innerShapeBounds.getY();
+        double innerHeight = innerShapeBounds.getHeight();
+
+        double subProcessY = subProcessBounds.getY();
+        double subProcessHeight = subProcessBounds.getHeight();
+        double subProcessX = subProcessBounds.getX();
+        double subProcessWidth = subProcessBounds.getWidth();
+
+        double tmpWidth = innerX + innerWidth + SPACE;
+        double tmpHeight = innerY + innerHeight + SPACE;
 
         if (innerY == subProcessY) {
           subProcessBounds.setY(subProcessY - SPACE);
           subProcessBounds.setHeight(subProcessHeight + SPACE);
         }
+
         if (tmpWidth >= subProcessX + subProcessWidth) {
           double newWidth = tmpWidth - subProcessX;
           subProcessBounds.setWidth(newWidth);
         }
+
         if (tmpHeight >= subProcessY + subProcessHeight) {
-          tmpHeight = tmpHeight - subProcessY;
-          subProcessBounds.setHeight(tmpHeight);
+          double newHeight = tmpHeight - subProcessY;
+          subProcessBounds.setHeight(newHeight);
         }
-        innerElement = subProcess.getBpmnElement();
+
+        innerElement = (SubProcess) parent;
         innerShapeBounds = subProcessBounds;
+        parent = innerElement.getParentElement();
       }
       else {
         break;

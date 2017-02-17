@@ -93,52 +93,68 @@ public abstract class AbstractActivityBuilder<B extends AbstractActivityBuilder<
     return myself;
   }
 
-  public double generateXCoordinateForBoundaryEvent(Bounds boundaryEventBounds) {
-    BpmnShape activity = findBpmnShape(element);
-    if (activity != null) {
-      Bounds elemBounds = activity.getBounds();
-      Collection<BoundaryEvent> boundaryEvents = element.getParentElement().getChildElementsByType(BoundaryEvent.class);
-      Collection<BoundaryEvent> boundaryEventsOfCurrentElement = new ArrayList<BoundaryEvent>();
-      Iterator<BoundaryEvent> iterator = boundaryEvents.iterator();
-      BoundaryEvent tmp;
+  protected double calculateXCoordinate(Bounds boundaryEventBounds) {
+    BpmnShape attachedToElement = findBpmnShape(element);
 
+    double x = 0;
+
+    if (attachedToElement != null) {
+
+      Bounds attachedToBounds = attachedToElement.getBounds();
+
+      Collection<BoundaryEvent> boundaryEvents = element.getParentElement().getChildElementsByType(BoundaryEvent.class);
+      Collection<BoundaryEvent> attachedBoundaryEvents = new ArrayList<BoundaryEvent>();
+
+      Iterator<BoundaryEvent> iterator = boundaryEvents.iterator();
       while (iterator.hasNext()) {
-        tmp = iterator.next();
+        BoundaryEvent tmp = iterator.next();
         if (tmp.getAttachedTo().equals(element)) {
-          boundaryEventsOfCurrentElement.add(tmp);
+          attachedBoundaryEvents.add(tmp);
         }
       }
-      Double activityX = elemBounds.getX();
-      Double activityWidth = elemBounds.getWidth();
-      Double boundaryWidth = boundaryEventBounds.getWidth();
 
-      switch (boundaryEventsOfCurrentElement.size()) {
-      case 2:
-        return activityX + activityWidth / 2 + boundaryWidth / 2;
-      case 3:
-        return activityX + activityWidth / 2 - 1.5 * boundaryWidth;
-      default:
-        return activityX + activityWidth / 2 - boundaryWidth / 2;
+      double attachedToX = attachedToBounds.getX();
+      double attachedToWidth = attachedToBounds.getWidth();
+      double boundaryWidth = boundaryEventBounds.getWidth();
+
+      switch (attachedBoundaryEvents.size()) {
+        case 2: {
+          x = attachedToX + attachedToWidth / 2 + boundaryWidth / 2;
+          break;
+        }
+        case 3: {
+          x = attachedToX + attachedToWidth / 2 - 1.5 * boundaryWidth;
+          break;
+        }
+        default: {
+          x = attachedToX + attachedToWidth / 2 - boundaryWidth / 2;
+          break;
+        }
       }
+
     }
-    else return 0;
+
+    return x;
   }
 
-  protected void setBoundaryEventCoordinates(BpmnShape targetBpmnShape) {
+  protected void setBoundaryEventCoordinates(BpmnShape bpmnShape) {
     BpmnShape activity = findBpmnShape(element);
-    Bounds boundaryBounds = targetBpmnShape.getBounds();
+    Bounds boundaryBounds = bpmnShape.getBounds();
+
     double x = 0;
     double y = 0;
 
     if (activity != null) {
       Bounds activityBounds = activity.getBounds();
-      Double activityY = activityBounds.getY();
-      Double activityHeight = activityBounds.getHeight();
-      Double boundaryHeight = boundaryBounds.getHeight();
-      x = generateXCoordinateForBoundaryEvent(boundaryBounds);
+      double activityY = activityBounds.getY();
+      double activityHeight = activityBounds.getHeight();
+      double boundaryHeight = boundaryBounds.getHeight();
+      x = calculateXCoordinate(boundaryBounds);
       y = activityY + activityHeight - boundaryHeight / 2;
     }
+
     boundaryBounds.setX(x);
     boundaryBounds.setY(y);
   }
+
 }

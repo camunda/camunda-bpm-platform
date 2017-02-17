@@ -127,44 +127,52 @@ public abstract class AbstractBoundaryEventBuilder<B extends AbstractBoundaryEve
 
 
   @Override
-  protected void setCoordinates(BpmnShape targetBpmnShape) {
+  protected void setCoordinates(BpmnShape shape) {
     BpmnShape source = findBpmnShape(element);
-    Bounds targetBounds = targetBpmnShape.getBounds();
+    Bounds shapeBounds = shape.getBounds();
+
     double x = 0;
     double y = 0;
 
     if (source != null) {
       Bounds sourceBounds = source.getBounds();
-      Double sourceX = sourceBounds.getX();
-      Double sourceWidth = sourceBounds.getWidth();
-      Double sourceY = sourceBounds.getY();
-      Double sourceHeight = sourceBounds.getHeight();
-      Double targetHeight = targetBounds.getHeight();
+
+      double sourceX = sourceBounds.getX();
+      double sourceWidth = sourceBounds.getWidth();
+      double sourceY = sourceBounds.getY();
+      double sourceHeight = sourceBounds.getHeight();
+      double targetHeight = shapeBounds.getHeight();
 
       x = sourceX + sourceWidth + SPACE;
       y = sourceY + sourceHeight / 2 - targetHeight / 2 + SPACE;
     }
-    targetBounds.setX(x);
-    targetBounds.setY(y);
+
+    shapeBounds.setX(x);
+    shapeBounds.setY(y);
   }
 
   @Override
   protected void setWaypoints(BpmnEdge edge) {
-    FlowNode sourceFlowNode = ((SequenceFlow) edge.getBpmnElement()).getSource();
-    FlowNode targetFlowNode = ((SequenceFlow) edge.getBpmnElement()).getTarget();
+    SequenceFlow sequenceFlow = (SequenceFlow) edge.getBpmnElement();
+
+    FlowNode sourceFlowNode = sequenceFlow.getSource();
+    FlowNode targetFlowNode = sequenceFlow.getTarget();
+
     BpmnShape source = findBpmnShape(sourceFlowNode);
     BpmnShape target = findBpmnShape(targetFlowNode);
 
     if (source != null && target != null) {
       Bounds sourceBounds = source.getBounds();
       Bounds targetBounds = target.getBounds();
-      Double sourceX = sourceBounds.getX();
-      Double sourceWidth = sourceBounds.getWidth();
-      Double sourceY = sourceBounds.getY();
-      Double sourceHeight = sourceBounds.getHeight();
-      Double targetX = targetBounds.getX();
-      Double targetY = targetBounds.getY();
-      Double targetHeight = targetBounds.getHeight();
+
+      double sourceX = sourceBounds.getX();
+      double sourceY = sourceBounds.getY();
+      double sourceWidth = sourceBounds.getWidth();
+      double sourceHeight = sourceBounds.getHeight();
+
+      double targetX = targetBounds.getX();
+      double targetY = targetBounds.getY();
+      double targetHeight = targetBounds.getHeight();
 
       Waypoint w1 = createInstance(Waypoint.class);
       w1.setX(sourceX + sourceWidth / 2);
