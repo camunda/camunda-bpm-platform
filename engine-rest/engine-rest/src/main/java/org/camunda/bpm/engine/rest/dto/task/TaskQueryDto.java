@@ -182,6 +182,8 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   private String candidateGroupsExpression;
   protected Boolean withCandidateGroups;
   protected Boolean withoutCandidateGroups;
+  protected Boolean withCandidateUsers;
+  protected Boolean withoutCandidateUsers;
 
   private List<VariableQueryParameterDto> taskVariables;
   private List<VariableQueryParameterDto> processVariables;
@@ -300,6 +302,16 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     this.withoutCandidateGroups = withoutCandidateGroups;
   }
 
+  @CamundaQueryParam(value = "withCandidateUsers", converter = BooleanConverter.class)
+  public void setWithCandidateUsers(Boolean withCandidateUsers) {
+    this.withCandidateUsers = withCandidateUsers;
+  }
+
+  @CamundaQueryParam(value = "withoutCandidateUsers", converter = BooleanConverter.class)
+  public void setWithoutCandidateUsers(Boolean withoutCandidateUsers) {
+    this.withoutCandidateUsers = withoutCandidateUsers;
+  }
+
   @CamundaQueryParam("candidateUser")
   public void setCandidateUser(String candidateUser) {
     this.candidateUser = candidateUser;
@@ -394,7 +406,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   public void setAssigned(Boolean assigned) {
     this.assigned = assigned;
   }
-  
+
   @CamundaQueryParam(value = "unassigned", converter = BooleanConverter.class)
   public void setUnassigned(Boolean unassigned) {
     this.unassigned = unassigned;
@@ -963,11 +975,17 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     if (candidateGroupExpression != null) {
       query.taskCandidateGroupExpression(candidateGroupExpression);
     }
-    if (withCandidateGroups != null) {
+    if (withCandidateGroups != null && withCandidateGroups) {
       query.withCandidateGroups();
     }
-    if (withoutCandidateGroups != null) {
+    if (withoutCandidateGroups != null && withoutCandidateGroups) {
       query.withoutCandidateGroups();
+    }
+    if (withCandidateUsers != null && withCandidateUsers) {
+      query.withCandidateUsers();
+    }
+    if (withoutCandidateUsers != null && withoutCandidateUsers) {
+      query.withoutCandidateUsers();
     }
     if (candidateUser != null) {
       query.taskCandidateUser(candidateUser);

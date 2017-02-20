@@ -10,6 +10,7 @@ import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -471,6 +472,8 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     parameters.put("withoutTenantId", true);
     parameters.put("withCandidateGroups", true);
     parameters.put("withoutCandidateGroups", true);
+    parameters.put("withCandidateUsers", true);
+    parameters.put("withoutCandidateUsers", true);
 
     return parameters;
   }
@@ -525,6 +528,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     verify(mockQuery).active();
     verify(mockQuery).suspended();
     verify(mockQuery).withoutTenantId();
+    verify(mockQuery).withCandidateUsers();
   }
 
   @Test
@@ -1476,4 +1480,63 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
 
   }
 
+  @Test
+  public void testQueryWithCandidateUsers() {
+    given().queryParam("withCandidateUsers", true)
+    .accept(MediaType.APPLICATION_JSON)
+    .then().expect().statusCode(Status.OK.getStatusCode())
+    .when().get(TASK_QUERY_URL);
+
+    verify(mockQuery).withCandidateUsers();
+  }
+
+  @Test
+  public void testQueryWithoutCandidateUsers() {
+    given().queryParam("withoutCandidateUsers", true)
+    .accept(MediaType.APPLICATION_JSON)
+    .then().expect().statusCode(Status.OK.getStatusCode())
+    .when().get(TASK_QUERY_URL);
+
+    verify(mockQuery).withoutCandidateUsers();
+  }
+
+  @Test
+  public void testNeverQueryWithCandidateUsers() {
+    given().queryParam("withCandidateUsers", false)
+    .accept(MediaType.APPLICATION_JSON)
+    .then().expect().statusCode(Status.OK.getStatusCode())
+    .when().get(TASK_QUERY_URL);
+
+    verify(mockQuery, never()).withCandidateUsers();
+  }
+
+  @Test
+  public void testNeverQueryWithoutCandidateUsers() {
+    given().queryParam("withoutCandidateUsers", false)
+    .accept(MediaType.APPLICATION_JSON)
+    .then().expect().statusCode(Status.OK.getStatusCode())
+    .when().get(TASK_QUERY_URL);
+
+    verify(mockQuery, never()).withoutCandidateUsers();
+  }
+
+  @Test
+  public void testNeverQueryWithCandidateGroups() {
+    given().queryParam("withCandidateGroups", false)
+    .accept(MediaType.APPLICATION_JSON)
+    .then().expect().statusCode(Status.OK.getStatusCode())
+    .when().get(TASK_QUERY_URL);
+
+    verify(mockQuery, never()).withCandidateGroups();
+  }
+
+  @Test
+  public void testNeverQueryWithoutCandidateGroups() {
+    given().queryParam("withoutCandidateGroups", false)
+    .accept(MediaType.APPLICATION_JSON)
+    .then().expect().statusCode(Status.OK.getStatusCode())
+    .when().get(TASK_QUERY_URL);
+
+    verify(mockQuery, never()).withoutCandidateGroups();
+  }
 }

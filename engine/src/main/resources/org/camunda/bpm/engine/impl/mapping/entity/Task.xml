@@ -207,7 +207,7 @@
 
   <sql id="selectTaskByQueryCriteriaSql">
     from ${prefix}ACT_RU_TASK RES
-    <if test="candidateUser != null || candidateGroups != null || involvedUser != null || withCandidateGroups">
+    <if test="candidateUser != null || candidateGroups != null || involvedUser != null || withCandidateGroups || withCandidateUsers">
       inner join ${prefix}ACT_RU_IDENTITYLINK I on I.TASK_ID_ = RES.ID_
     </if>
     <if test="processDefinitionKey != null || processDefinitionName != null || processDefinitionNameLike != null ||
@@ -431,7 +431,7 @@
           and RES.TENANT_ID_ is null
         </if>
       </if>
-      <if test="candidateUser != null || candidateGroups != null || withCandidateGroups">
+      <if test="candidateUser != null || candidateGroups != null || withCandidateGroups || withCandidateUsers">
         <if test="!includeAssignedTasks">
           and RES.ASSIGNEE_ is null
         </if>
@@ -459,9 +459,13 @@
           and I.GROUP_ID_ is not null
         </if>
 
+        <if test="withCandidateUsers">
+          and I.USER_ID_ is not null
+        </if>
+
       </if>
 
-      <if test="withoutCandidateGroups">
+      <if test="withoutCandidateGroups || withoutCandidateUsers">
         <if test="!includeAssignedTasks">
           and RES.ASSIGNEE_ is null
         </if>
@@ -471,11 +475,17 @@
           from
             ${prefix}ACT_RU_IDENTITYLINK ARIEL
           <where>
-            ARIEL.TYPE_ = 'candidate' and ARIEL.GROUP_ID_ is not null
+            ARIEL.TYPE_ = 'candidate' 
+            <if test="withoutCandidateGroups"> 
+                and ARIEL.GROUP_ID_ is not null
+            </if>
+            <if test="withoutCandidateUsers"> 
+                and ARIEL.USER_ID_ is not null
+            </if>
           </where>
         )
       </if>
-
+      
       <if test="involvedUser != null">
         and I.USER_ID_ = #{involvedUser}
       </if>

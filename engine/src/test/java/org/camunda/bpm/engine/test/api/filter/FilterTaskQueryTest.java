@@ -13,6 +13,9 @@
 
 package org.camunda.bpm.engine.test.api.filter;
 
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -30,7 +33,6 @@ import org.camunda.bpm.engine.impl.QueryOrderingProperty;
 import org.camunda.bpm.engine.impl.TaskQueryImpl;
 import org.camunda.bpm.engine.impl.TaskQueryProperty;
 import org.camunda.bpm.engine.impl.TaskQueryVariableValue;
-import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.json.JsonTaskQueryConverter;
 import org.camunda.bpm.engine.impl.persistence.entity.FilterEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
@@ -44,9 +46,6 @@ import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
-
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 
 /**
  * @author Sebastian Menski
@@ -73,6 +72,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
 
   protected JsonTaskQueryConverter queryConverter;
 
+  @Override
   public void setUp() {
     filter = filterService.newTaskFilter("name").setOwner("owner").setQuery(taskService.createTaskQuery()).setProperties(new HashMap<String, Object>());
     testUser = identityService.newUser("user");
@@ -91,6 +91,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     queryConverter = new JsonTaskQueryConverter();
   }
 
+  @Override
   public void tearDown() {
     for (Filter filter : filterService.createTaskFilterQuery().list()) {
       filterService.deleteFilter(filter.getId());
@@ -142,6 +143,8 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     query.taskCandidateGroupInExpression(testString);
     query.withCandidateGroups();
     query.withoutCandidateGroups();
+    query.withCandidateUsers();
+    query.withoutCandidateUsers();
     query.processInstanceId(testString);
     query.executionId(testString);
     query.activityInstanceIdIn(testActivityInstances);
@@ -232,6 +235,8 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(testCandidateGroups, query.getCandidateGroups());
     assertTrue(query.isWithCandidateGroups());
     assertTrue(query.isWithoutCandidateGroups());
+    assertTrue(query.isWithCandidateUsers());
+    assertTrue(query.isWithoutCandidateUsers());
     assertEquals(testString, query.getExpressions().get("taskCandidateGroupIn"));
     assertEquals(testString, query.getProcessInstanceId());
     assertEquals(testString, query.getExecutionId());

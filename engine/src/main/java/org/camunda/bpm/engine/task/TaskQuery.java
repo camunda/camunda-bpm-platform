@@ -194,6 +194,12 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
   /** Only select tasks which have no candidate group */
   TaskQuery withoutCandidateGroups();
 
+  /** Only select tasks which have a candidate user */
+  TaskQuery withCandidateUsers();
+
+  /** Only select tasks which have no candidate user */
+  TaskQuery withoutCandidateUsers();
+
   /**
    *  Only select tasks for which users in the given group are candidates.
    *

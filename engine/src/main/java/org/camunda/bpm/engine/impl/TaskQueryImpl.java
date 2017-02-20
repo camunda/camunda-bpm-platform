@@ -64,6 +64,8 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   protected List<String> candidateGroups;
   protected Boolean withCandidateGroups;
   protected Boolean withoutCandidateGroups;
+  protected Boolean withCandidateUsers;
+  protected Boolean withoutCandidateUsers;
   protected Boolean includeAssignedTasks;
   protected String processInstanceId;
   protected String executionId;
@@ -303,6 +305,18 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   }
 
   @Override
+  public TaskQuery withCandidateUsers() {
+    this.withCandidateUsers = true;
+    return this;
+  }
+
+  @Override
+  public TaskQuery withoutCandidateUsers() {
+    this.withoutCandidateUsers = true;
+    return this;
+  }
+
+  @Override
   public TaskQueryImpl taskCandidateGroup(String candidateGroup) {
     ensureNotNull("Candidate group", candidateGroup);
 
@@ -365,10 +379,10 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQuery includeAssignedTasks() {
-    if (candidateUser == null && candidateGroup == null && candidateGroups == null && !isWithCandidateGroups() && !isWithoutCandidateGroups()
+    if (candidateUser == null && candidateGroup == null && candidateGroups == null && !isWithCandidateGroups() && !isWithoutCandidateGroups() && !isWithCandidateUsers() && !isWithoutCandidateUsers()
         && !expressions.containsKey("taskCandidateUser") && !expressions.containsKey("taskCandidateGroup")
         && !expressions.containsKey("taskCandidateGroupIn")) {
-      throw new ProcessEngineException("Invalid query usage: candidateUser, candidateGroup, candidateGroupIn, withCandidateGroups, withoutCandidateGroups has to be called before 'includeAssignedTasks'.");
+      throw new ProcessEngineException("Invalid query usage: candidateUser, candidateGroup, candidateGroupIn, withCandidateGroups, withoutCandidateGroups, withCandidateUsers, withoutCandidateUsers has to be called before 'includeAssignedTasks'.");
     }
 
     includeAssignedTasks = true;
@@ -867,8 +881,20 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     }
   }
 
+  public Boolean isWithCandidateUsers() {
+    if (withCandidateUsers == null) {
+      return false;
+    } else {
+      return withCandidateUsers;
+    }
+  }
+
   public Boolean isWithCandidateGroupsInternal() {
     return withCandidateGroups;
+  }
+
+  public Boolean isWithCandidateUsersInternal() {
+    return withCandidateUsers;
   }
 
   public Boolean isWithoutCandidateGroups() {
@@ -879,13 +905,26 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     }
   }
 
+  public Boolean isWithoutCandidateUsers() {
+    if (withoutCandidateUsers == null) {
+      return false;
+    } else {
+      return withoutCandidateUsers;
+    }
+  }
+
   public Boolean isWithoutCandidateGroupsInternal() {
     return withoutCandidateGroups;
+  }
+
+  public Boolean isWithoutCandidateUsersInternal() {
+    return withoutCandidateUsers;
   }
 
   public List<String> getCandidateGroupsInternal() {
     return candidateGroups;
   }
+
 
   protected List<String> getGroupsForCandidateUser(String candidateUser) {
     List<Group> groups = Context

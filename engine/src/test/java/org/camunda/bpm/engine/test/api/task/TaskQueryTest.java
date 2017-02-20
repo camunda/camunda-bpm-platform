@@ -66,6 +66,8 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.FileValue;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
 /**
  * @author Joram Barrez
@@ -4116,6 +4118,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     List<ProcessInstance> instances = new ArrayList<ProcessInstance>(expectedProcessInstances);
 
     Collections.sort(instances, new Comparator<ProcessInstance>() {
+      @Override
       public int compare(ProcessInstance p1, ProcessInstance p2) {
         return p1.getId().compareTo(p2.getId());
       }
@@ -4339,6 +4342,93 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(taskDefinitionKey, key[0]);
   }
 
+  public void testQueryWithCandidateUsers() {
+
+    BpmnModelInstance process = Bpmn.createExecutableProcess("process")
+      .startEvent()
+      .userTask()
+        .camundaCandidateUsers("anna")
+      .endEvent()
+      .done();
+
+    deployment(process);
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    List<Task> tasks = taskService.createTaskQuery()
+        .processInstanceId(processInstance.getId())
+        .withCandidateUsers()
+        .list();
+    assertEquals(1, tasks.size());
+  }
+
+  public void testQueryWithoutCandidateUsers() {
+
+    BpmnModelInstance process = Bpmn.createExecutableProcess("proce")
+      .startEvent()
+      .userTask()
+        .camundaCandidateGroups("sales")
+      .endEvent()
+      .done();
+
+    deployment(process);
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("proce");
+
+    List<Task> tasks = taskService.createTaskQuery()
+        .processInstanceId(processInstance.getId())
+        .withoutCandidateUsers()
+        .list();
+    assertEquals(1, tasks.size());
+  }
+
+  public void testQueryAssignedTasksWithCandidateUsers() {
+
+    BpmnModelInstance process = Bpmn.createExecutableProcess("proce")
+      .startEvent()
+      .userTask()
+        .camundaCandidateGroups("sales")
+      .endEvent()
+      .done();
+
+    deployment(process);
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("proce");
+
+    try{
+      taskService.createTaskQuery()
+        .processInstanceId(processInstance.getId())
+        .includeAssignedTasks()
+        .withCandidateUsers()
+        .list();
+       fail("exception expected");
+    } catch (ProcessEngineException e) {}
+  }
+
+
+  public void testQueryAssignedTasksWithoutCandidateUsers() {
+
+    BpmnModelInstance process = Bpmn.createExecutableProcess("proce")
+      .startEvent()
+      .userTask()
+        .camundaCandidateGroups("sales")
+      .endEvent()
+      .done();
+
+    deployment(process);
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("proce");
+
+    try{
+       taskService.createTaskQuery()
+        .processInstanceId(processInstance.getId())
+        .includeAssignedTasks()
+        .withoutCandidateUsers()
+        .list();
+       fail("exception expected");
+    } catch (ProcessEngineException e) {}
+  }
+
   /**
    * Generates some test tasks.
    * - 6 tasks where kermit is a candidate
@@ -4410,4 +4500,5 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
     return ids;
   }
+
 }
