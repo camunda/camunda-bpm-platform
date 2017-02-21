@@ -15,6 +15,9 @@ package org.camunda.bpm.model.bpmn.builder;
 
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.Event;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaInputOutput;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaInputParameter;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaOutputParameter;
 
 /**
  * @author Sebastian Menski
@@ -24,4 +27,41 @@ public abstract class AbstractEventBuilder<B extends  AbstractEventBuilder<B, E>
   protected AbstractEventBuilder(BpmnModelInstance modelInstance, E element, Class<?> selfType) {
     super(modelInstance, element, selfType);
   }
+
+  /**
+   * Creates a new camunda input parameter extension element with the
+   * given name and value.
+   *
+   * @param name the name of the input parameter
+   * @param value the value of the input parameter
+   * @return the builder object
+   */
+  public B camundaInputParameter(String name, String value) {
+    CamundaInputOutput camundaInputOutput = getCreateSingleExtensionElement(CamundaInputOutput.class);
+
+    CamundaInputParameter camundaInputParameter = createChild(camundaInputOutput, CamundaInputParameter.class);
+    camundaInputParameter.setCamundaName(name);
+    camundaInputParameter.setTextContent(value);
+
+    return myself;
+  }
+
+  /**
+   * Creates a new camunda output parameter extension element with the
+   * given name and value.
+   *
+   * @param name the name of the output parameter
+   * @param value the value of the output parameter
+   * @return the builder object
+   */
+  public B camundaOutputParameter(String name, String value) {
+    CamundaInputOutput camundaInputOutput = getCreateSingleExtensionElement(CamundaInputOutput.class);
+
+    CamundaOutputParameter camundaOutputParameter = createChild(camundaInputOutput, CamundaOutputParameter.class);
+    camundaOutputParameter.setCamundaName(name);
+    camundaOutputParameter.setTextContent(value);
+
+    return myself;
+  }
+
 }
