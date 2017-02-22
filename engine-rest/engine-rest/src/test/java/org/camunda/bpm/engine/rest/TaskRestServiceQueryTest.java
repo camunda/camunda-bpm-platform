@@ -447,7 +447,9 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     parameters.put("descriptionLike", "aDescLike");
     parameters.put("involvedUser", "anInvolvedPerson");
     parameters.put("name", "aName");
+    parameters.put("nameNotEqual", "aNameNotEqual");
     parameters.put("nameLike", "aNameLike");
+    parameters.put("nameNotLike", "aNameNotLike");
     parameters.put("owner", "anOwner");
     parameters.put("caseDefinitionKey", "aCaseDefKey");
     parameters.put("caseDefinitionId", "aCaseDefId");
@@ -499,7 +501,9 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     verify(mockQuery).taskDescriptionLike(stringQueryParameters.get("descriptionLike"));
     verify(mockQuery).taskInvolvedUser(stringQueryParameters.get("involvedUser"));
     verify(mockQuery).taskName(stringQueryParameters.get("name"));
+    verify(mockQuery).taskNameNotEqual(stringQueryParameters.get("nameNotEqual"));
     verify(mockQuery).taskNameLike(stringQueryParameters.get("nameLike"));
+    verify(mockQuery).taskNameNotLike(stringQueryParameters.get("nameNotLike"));
     verify(mockQuery).taskOwner(stringQueryParameters.get("owner"));
     verify(mockQuery).caseDefinitionKey(stringQueryParameters.get("caseDefinitionKey"));
     verify(mockQuery).caseDefinitionId(stringQueryParameters.get("caseDefinitionId"));
@@ -1542,4 +1546,5 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
 
     verify(mockQuery, never()).withoutCandidateGroups();
   }
+
 }

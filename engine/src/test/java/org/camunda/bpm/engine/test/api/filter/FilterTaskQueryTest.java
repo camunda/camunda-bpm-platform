@@ -122,7 +122,9 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     TaskQueryImpl query = new TaskQueryImpl();
     query.taskId(testString);
     query.taskName(testString);
+    query.taskNameNotEqual(testString);
     query.taskNameLike(testString);
+    query.taskNameNotLike(testString);
     query.taskDescription(testString);
     query.taskDescriptionLike(testString);
     query.taskPriority(testInteger);
@@ -215,6 +217,8 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     query = filter.getQuery();
     assertEquals(testString, query.getTaskId());
     assertEquals(testString, query.getName());
+    assertEquals(testString, query.getNameNotEqual());
+    assertEquals(testString, query.getNameNotLike());
     assertEquals(testString, query.getNameLike());
     assertEquals(testString, query.getDescription());
     assertEquals(testString, query.getDescriptionLike());

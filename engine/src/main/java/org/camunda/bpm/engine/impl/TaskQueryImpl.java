@@ -45,7 +45,9 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   private static final long serialVersionUID = 1L;
   protected String taskId;
   protected String name;
+  protected String nameNotEqual;
   protected String nameLike;
+  protected String nameNotLike;
   protected String description;
   protected String descriptionLike;
   protected Integer priority;
@@ -1125,8 +1127,16 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     return name;
   }
 
+  public String getNameNotEqual() {
+    return nameNotEqual;
+  }
+
   public String getNameLike() {
     return nameLike;
+  }
+
+  public String getNameNotLike() {
+    return nameNotLike;
   }
 
   public String getAssignee() {
@@ -1402,6 +1412,20 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
       extendedQuery.taskNameLike(this.getNameLike());
     }
 
+    if (extendingQuery.getNameNotEqual() != null) {
+      extendedQuery.taskNameNotEqual(extendingQuery.getNameNotEqual());
+    }
+    else if (this.getNameNotEqual() != null) {
+      extendedQuery.taskNameNotEqual(this.getNameNotEqual());
+    }
+
+    if (extendingQuery.getNameNotLike() != null) {
+      extendedQuery.taskNameNotLike(extendingQuery.getNameNotLike());
+    }
+    else if (this.getNameNotLike() != null) {
+      extendedQuery.taskNameNotLike(this.getNameNotLike());
+    }
+
     if (extendingQuery.getAssignee() != null) {
       extendedQuery.taskAssignee(extendingQuery.getAssignee());
     }
@@ -1463,8 +1487,16 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
       extendedQuery.withCandidateGroups();
     }
 
+    if (extendingQuery.isWithCandidateUsers() || this.isWithCandidateUsers()) {
+      extendedQuery.withCandidateUsers();
+    }
+
     if (extendingQuery.isWithoutCandidateGroups() || this.isWithoutCandidateGroups()) {
       extendedQuery.withoutCandidateGroups();
+    }
+
+    if (extendingQuery.isWithoutCandidateUsers() || this.isWithoutCandidateUsers()) {
+      extendedQuery.withoutCandidateUsers();
     }
 
     if (extendingQuery.getCandidateGroupsInternal() != null) {
@@ -1856,5 +1888,18 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   public boolean isFollowUpNullAccepted() {
     return followUpNullAccepted;
+  }
+
+  @Override
+  public TaskQuery taskNameNotEqual(String name) {
+    this.nameNotEqual = name;
+    return this;
+  }
+
+  @Override
+  public TaskQuery taskNameNotLike(String nameNotLike) {
+    ensureNotNull("Task nameNotLike", nameNotLike);
+    this.nameNotLike = nameNotLike;
+    return this;
   }
 }

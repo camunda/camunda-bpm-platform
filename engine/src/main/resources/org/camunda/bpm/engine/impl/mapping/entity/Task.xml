@@ -255,9 +255,15 @@
         <!-- based on CAM-6363 compare name case insensitive -->
         and UPPER(RES.NAME_) = UPPER(#{name})
       </if>
+      <if test="nameNotEqual != null">
+        and UPPER(RES.NAME_) != UPPER(#{nameNotEqual})
+      </if>
       <if test="nameLike != null">
         <!-- based on CAM-6165 compare name like case insensitive -->
         and UPPER(RES.NAME_) like UPPER(#{nameLike})
+      </if>
+      <if test="nameNotLike != null">
+        and UPPER(RES.NAME_) not like UPPER(#{nameNotLike})
       </if>
       <if test="description != null">
         and RES.DESCRIPTION_ = #{description}

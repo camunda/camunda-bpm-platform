@@ -4424,6 +4424,17 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     } catch (ProcessEngineException e) {}
   }
 
+  public void testQueryByNameNotEqual() {
+    TaskQuery query = taskService.createTaskQuery().taskNameNotEqual("gonzoTask");
+    assertEquals(11, query.list().size());
+  }
+
+  public void testQueryByNameNotLike() {
+    TaskQuery query = taskService.createTaskQuery().taskNameNotLike("management%");
+    assertEquals(9, query.list().size());
+    assertEquals(9, query.count());
+  }
+
   /**
    * Generates some test tasks.
    * - 6 tasks where kermit is a candidate

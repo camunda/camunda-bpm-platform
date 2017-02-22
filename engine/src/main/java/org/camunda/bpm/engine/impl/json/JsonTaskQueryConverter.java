@@ -43,7 +43,9 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
   public static final String ID = "id";
   public static final String TASK_ID = "taskId";
   public static final String NAME = "name";
+  public static final String NAME_NOT_EQUAL = "nameNotEqual";
   public static final String NAME_LIKE = "nameLike";
+  public static final String NAME_NOT_LIKE = "nameNotLike";
   public static final String DESCRIPTION = "description";
   public static final String DESCRIPTION_LIKE = "descriptionLike";
   public static final String PRIORITY = "priority";
@@ -125,7 +127,9 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
 
     addField(json, TASK_ID, query.getTaskId());
     addField(json, NAME, query.getName());
+    addField(json, NAME_NOT_EQUAL, query.getNameNotEqual());
     addField(json, NAME_LIKE, query.getNameLike());
+    addField(json, NAME_NOT_LIKE, query.getNameNotLike());
     addField(json, DESCRIPTION, query.getDescription());
     addField(json, DESCRIPTION_LIKE, query.getDescriptionLike());
     addField(json, PRIORITY, query.getPriority());
@@ -256,8 +260,14 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     if (json.has(NAME)) {
       query.taskName(json.getString(NAME));
     }
+    if (json.has(NAME_NOT_EQUAL)) {
+      query.taskNameNotEqual(json.getString(NAME_NOT_EQUAL));
+    }
     if (json.has(NAME_LIKE)) {
       query.taskNameLike(json.getString(NAME_LIKE));
+    }
+    if (json.has(NAME_NOT_LIKE)) {
+      query.taskNameNotLike(json.getString(NAME_NOT_LIKE));
     }
     if (json.has(DESCRIPTION)) {
       query.taskDescription(json.getString(DESCRIPTION));

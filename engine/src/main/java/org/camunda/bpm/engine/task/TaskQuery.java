@@ -39,9 +39,16 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
   /** Only select tasks with the given name */
   TaskQuery taskName(String name);
 
+  /** Only select tasks with a name not matching the given name */
+  TaskQuery taskNameNotEqual(String name);
+
   /** Only select tasks with a name matching the parameter.
    *  The syntax is that of SQL: for example usage: nameLike(%activiti%)*/
   TaskQuery taskNameLike(String nameLike);
+
+  /** Only select tasks with a name not matching the parameter.
+   *  The syntax is that of SQL: for example usage: nameNotLike(%activiti%)*/
+  TaskQuery taskNameNotLike(String nameNotLike);
 
   /** Only select tasks with the given description. */
   TaskQuery taskDescription(String description);
