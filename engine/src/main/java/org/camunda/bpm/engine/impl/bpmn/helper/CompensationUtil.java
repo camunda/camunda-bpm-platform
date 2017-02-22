@@ -72,13 +72,11 @@ public class CompensationUtil {
       compensatingExecution.setConcurrent(true);
     }
 
-    // signal compensation events in order of their 'created' timestamp
-    // order will be reversed again in command context with the effect that they are
-    // actually be started in correct order :)
+    // signal compensation events in REVERSE order of their 'created' timestamp
     Collections.sort(eventSubscriptions, new Comparator<EventSubscriptionEntity>() {
       @Override
       public int compare(EventSubscriptionEntity o1, EventSubscriptionEntity o2) {
-        return o1.getCreated().compareTo(o2.getCreated());
+        return o2.getCreated().compareTo(o1.getCreated());
       }
     });
 
