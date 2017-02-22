@@ -27,7 +27,7 @@ import org.camunda.bpm.engine.impl.history.event.HistoryEventProcessor;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventType;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
-import org.camunda.bpm.engine.impl.persistence.AbstractManager;
+import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 import org.camunda.bpm.engine.runtime.Job;
 
@@ -35,7 +35,7 @@ import org.camunda.bpm.engine.runtime.Job;
  * @author Roman Smirnov
  *
  */
-public class HistoricJobLogManager extends AbstractManager {
+public class HistoricJobLogManager extends AbstractHistoricManager {
 
   // select /////////////////////////////////////////////////////////////////
 
@@ -62,38 +62,52 @@ public class HistoricJobLogManager extends AbstractManager {
   // delete ///////////////////////////////////////////////////////////////////
 
   public void deleteHistoricJobLogById(String id) {
-    deleteExceptionByteArrayByParameterMap("id", id);
-    getDbEntityManager().delete(HistoricJobLogEventEntity.class, "deleteHistoricJobLogById", id);
+    if (isHistoryEnabled()) {
+      deleteExceptionByteArrayByParameterMap("id", id);
+      getDbEntityManager().delete(HistoricJobLogEventEntity.class, "deleteHistoricJobLogById", id);
+    }
   }
 
   public void deleteHistoricJobLogByJobId(String jobId) {
-    deleteExceptionByteArrayByParameterMap("jobId", jobId);
-    getDbEntityManager().delete(HistoricJobLogEventEntity.class, "deleteHistoricJobLogByJobId", jobId);
+    if (isHistoryEnabled()) {
+      deleteExceptionByteArrayByParameterMap("jobId", jobId);
+      getDbEntityManager().delete(HistoricJobLogEventEntity.class, "deleteHistoricJobLogByJobId", jobId);
+    }
   }
 
   public void deleteHistoricJobLogsByProcessInstanceId(String processInstanceId) {
-    deleteExceptionByteArrayByParameterMap("processInstanceId", processInstanceId);
-    getDbEntityManager().delete(HistoricJobLogEventEntity.class, "deleteHistoricJobLogByProcessInstanceId", processInstanceId);
+    if (isHistoryEnabled()) {
+      deleteExceptionByteArrayByParameterMap("processInstanceId", processInstanceId);
+      getDbEntityManager().delete(HistoricJobLogEventEntity.class, "deleteHistoricJobLogByProcessInstanceId", processInstanceId);
+    }
   }
 
   public void deleteHistoricJobLogsByProcessDefinitionId(String processDefinitionId) {
-    deleteExceptionByteArrayByParameterMap("processDefinitionId", processDefinitionId);
-    getDbEntityManager().delete(HistoricJobLogEventEntity.class, "deleteHistoricJobLogByProcessDefinitionId", processDefinitionId);
+    if (isHistoryEnabled()) {
+      deleteExceptionByteArrayByParameterMap("processDefinitionId", processDefinitionId);
+      getDbEntityManager().delete(HistoricJobLogEventEntity.class, "deleteHistoricJobLogByProcessDefinitionId", processDefinitionId);
+    }
   }
 
   public void deleteHistoricJobLogsByDeploymentId(String deploymentId) {
-    deleteExceptionByteArrayByParameterMap("deploymentId", deploymentId);
-    getDbEntityManager().delete(HistoricJobLogEventEntity.class, "deleteHistoricJobLogByDeploymentId", deploymentId);
+    if (isHistoryEnabled()) {
+      deleteExceptionByteArrayByParameterMap("deploymentId", deploymentId);
+      getDbEntityManager().delete(HistoricJobLogEventEntity.class, "deleteHistoricJobLogByDeploymentId", deploymentId);
+    }
   }
 
   public void deleteHistoricJobLogsByHandlerType(String handlerType) {
-    deleteExceptionByteArrayByParameterMap("handlerType", handlerType);
-    getDbEntityManager().delete(HistoricJobLogEventEntity.class, "deleteHistoricJobLogByHandlerType", handlerType);
+    if (isHistoryEnabled()) {
+      deleteExceptionByteArrayByParameterMap("handlerType", handlerType);
+      getDbEntityManager().delete(HistoricJobLogEventEntity.class, "deleteHistoricJobLogByHandlerType", handlerType);
+    }
   }
 
   public void deleteHistoricJobLogsByJobDefinitionId(String jobDefinitionId) {
-    deleteExceptionByteArrayByParameterMap("jobDefinitionId", jobDefinitionId);
-    getDbEntityManager().delete(HistoricJobLogEventEntity.class, "deleteHistoricJobLogByJobDefinitionId", jobDefinitionId);
+    if (isHistoryEnabled()) {
+      deleteExceptionByteArrayByParameterMap("jobDefinitionId", jobDefinitionId);
+      getDbEntityManager().delete(HistoricJobLogEventEntity.class, "deleteHistoricJobLogByJobDefinitionId", jobDefinitionId);
+    }
   }
 
   // byte array delete ////////////////////////////////////////////////////////
