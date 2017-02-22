@@ -62,12 +62,13 @@ public class CacheDeployer {
   protected void initDeployment(final DeploymentEntity deployment, String... resourceNames) {
     deployment.clearResources();
     for (String resourceName : resourceNames) {
-      // with the given resource we prevent the deployment of querying
-      // the database which means using all resources that were utilized during the deployment
-      ResourceEntity resource = Context.getCommandContext().getResourceManager()
-          .findResourceByDeploymentIdAndResourceName(deployment.getId(), resourceName);
+      if (resourceName != null) {
+        // with the given resource we prevent the deployment of querying
+        // the database which means using all resources that were utilized during the deployment
+        ResourceEntity resource = Context.getCommandContext().getResourceManager().findResourceByDeploymentIdAndResourceName(deployment.getId(), resourceName);
 
-      deployment.addResource(resource);
+        deployment.addResource(resource);
+      }
     }
   }
 }
