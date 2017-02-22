@@ -893,10 +893,6 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     return withCandidateGroups;
   }
 
-  public Boolean isWithCandidateUsersInternal() {
-    return withCandidateUsers;
-  }
-
   public Boolean isWithoutCandidateGroups() {
     if (withoutCandidateGroups == null) {
       return false;
@@ -917,14 +913,9 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     return withoutCandidateGroups;
   }
 
-  public Boolean isWithoutCandidateUsersInternal() {
-    return withoutCandidateUsers;
-  }
-
   public List<String> getCandidateGroupsInternal() {
     return candidateGroups;
   }
-
 
   protected List<String> getGroupsForCandidateUser(String candidateUser) {
     List<Group> groups = Context

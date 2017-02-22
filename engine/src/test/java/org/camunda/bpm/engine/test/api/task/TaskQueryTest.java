@@ -4118,7 +4118,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     List<ProcessInstance> instances = new ArrayList<ProcessInstance>(expectedProcessInstances);
 
     Collections.sort(instances, new Comparator<ProcessInstance>() {
-      @Override
       public int compare(ProcessInstance p1, ProcessInstance p2) {
         return p1.getId().compareTo(p2.getId());
       }
@@ -4343,7 +4342,6 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
   }
 
   public void testQueryWithCandidateUsers() {
-
     BpmnModelInstance process = Bpmn.createExecutableProcess("process")
       .startEvent()
       .userTask()
@@ -4363,8 +4361,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
   }
 
   public void testQueryWithoutCandidateUsers() {
-
-    BpmnModelInstance process = Bpmn.createExecutableProcess("proce")
+    BpmnModelInstance process = Bpmn.createExecutableProcess("process")
       .startEvent()
       .userTask()
         .camundaCandidateGroups("sales")
@@ -4373,7 +4370,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
     deployment(process);
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("proce");
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
     List<Task> tasks = taskService.createTaskQuery()
         .processInstanceId(processInstance.getId())
@@ -4383,8 +4380,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
   }
 
   public void testQueryAssignedTasksWithCandidateUsers() {
-
-    BpmnModelInstance process = Bpmn.createExecutableProcess("proce")
+    BpmnModelInstance process = Bpmn.createExecutableProcess("process")
       .startEvent()
       .userTask()
         .camundaCandidateGroups("sales")
@@ -4393,7 +4389,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
     deployment(process);
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("proce");
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
     try{
       taskService.createTaskQuery()
@@ -4407,8 +4403,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
 
   public void testQueryAssignedTasksWithoutCandidateUsers() {
-
-    BpmnModelInstance process = Bpmn.createExecutableProcess("proce")
+    BpmnModelInstance process = Bpmn.createExecutableProcess("process")
       .startEvent()
       .userTask()
         .camundaCandidateGroups("sales")
@@ -4417,7 +4412,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
     deployment(process);
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("proce");
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
     try{
        taskService.createTaskQuery()

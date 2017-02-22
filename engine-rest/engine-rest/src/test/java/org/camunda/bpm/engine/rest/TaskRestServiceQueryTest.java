@@ -528,7 +528,10 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     verify(mockQuery).active();
     verify(mockQuery).suspended();
     verify(mockQuery).withoutTenantId();
+    verify(mockQuery).withCandidateGroups();
+    verify(mockQuery).withoutCandidateGroups();
     verify(mockQuery).withCandidateUsers();
+    verify(mockQuery).withoutCandidateUsers();
   }
 
   @Test
