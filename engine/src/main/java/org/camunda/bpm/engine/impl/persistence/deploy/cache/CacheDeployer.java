@@ -47,8 +47,8 @@ public class CacheDeployer {
     });
   }
 
-  public void deployOnlyGivenResourceOfDeployment(final DeploymentEntity deployment, String resourceName) {
-    initDeployment(deployment, resourceName);
+  public void deployOnlyGivenResourcesOfDeployment(final DeploymentEntity deployment, String... resourceNames) {
+    initDeployment(deployment, resourceNames);
     Context.getCommandContext().runWithoutAuthorization(new Callable<Void>() {
       public Void call() throws Exception {
         for (Deployer deployer : deployers) {
@@ -59,15 +59,15 @@ public class CacheDeployer {
     });
   }
 
-  protected void initDeployment(final DeploymentEntity deployment, String resourceName) {
+  protected void initDeployment(final DeploymentEntity deployment, String... resourceNames) {
     deployment.clearResources();
-    // with the given resource we prevent the deployment of querying
-    // the database which means using all resources that were utilized during the deployment
-    ResourceEntity resource = Context
-        .getCommandContext()
-        .getResourceManager()
-        .findResourceByDeploymentIdAndResourceName(deployment.getId(), resourceName);
+    for (String resourceName : resourceNames) {
+      // with the given resource we prevent the deployment of querying
+      // the database which means using all resources that were utilized during the deployment
+      ResourceEntity resource = Context.getCommandContext().getResourceManager()
+          .findResourceByDeploymentIdAndResourceName(deployment.getId(), resourceName);
 
-    deployment.addResource(resource);
+      deployment.addResource(resource);
+    }
   }
 }

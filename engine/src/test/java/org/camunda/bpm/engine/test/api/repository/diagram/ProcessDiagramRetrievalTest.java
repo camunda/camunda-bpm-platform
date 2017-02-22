@@ -167,7 +167,7 @@ public class ProcessDiagramRetrievalTest {
     }
   }
 
-  @Ignore
+  @Test
   public void testGetProcessDiagramAfterCacheWasCleaned() {
     if (1 == processDefinitionQuery.count()) {
       activitiRule.getProcessEngineConfiguration().getDeploymentCache().discardProcessDefinitionCache();
@@ -179,10 +179,6 @@ public class ProcessDiagramRetrievalTest {
 
       // then
       assertNotNull(processDefinition.getDiagramResourceName());
-
-      //is null since cache was empty and deployment is redeployed with
-      //only the process definition as resource -> BUG that only the process definition is added
-      //as resource to the deployment
       assertNotNull(stream);
     } else {
       // some test diagrams do not contain executable processes

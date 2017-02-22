@@ -106,7 +106,7 @@ public abstract class ResourceDefinitionCache<T extends ResourceDefinition> {
               .getDeploymentManager()
               .findDeploymentById(deploymentId);
           deployment.setNew(false);
-          cacheDeployer.deployOnlyGivenResourceOfDeployment(deployment, definition.getResourceName());
+          cacheDeployer.deployOnlyGivenResourcesOfDeployment(deployment, definition.getResourceName(), definition.getDiagramResourceName());
           cachedDefinition = cache.get(definitionId);
         }
       }
