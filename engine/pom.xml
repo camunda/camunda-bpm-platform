@@ -637,6 +637,7 @@
                      it can be excluded for this test profile as it tests
                      the same except for the whole unit test suite -->
                 <exclude>**/DatabaseTablePrefixTest.java</exclude>
+                <exclude>**/DeploymentTest.java</exclude>
               </excludes>
             </configuration>
           </plugin>
