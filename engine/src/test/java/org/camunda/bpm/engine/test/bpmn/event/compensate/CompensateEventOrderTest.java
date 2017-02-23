@@ -1,8 +1,10 @@
 package org.camunda.bpm.engine.test.bpmn.event.compensate;
 
 import java.util.List;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.bpmn.event.compensate.helper.SleepServiceTask;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.model.bpmn.AssociationDirection;
@@ -21,6 +23,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Svetlana Dorokhova
  */
+@RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
 public class CompensateEventOrderTest {
 
   @Rule public ProcessEngineRule engineRule = new ProcessEngineRule();
