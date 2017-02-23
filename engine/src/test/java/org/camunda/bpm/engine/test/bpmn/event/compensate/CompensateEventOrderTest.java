@@ -1,5 +1,6 @@
 package org.camunda.bpm.engine.test.bpmn.event.compensate;
 
+import java.util.Date;
 import java.util.List;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
@@ -7,6 +8,7 @@ import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.bpmn.event.compensate.helper.IncreaseCurrentTimeServiceTask;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.AssociationDirection;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
@@ -58,7 +60,7 @@ public class CompensateEventOrderTest {
     testHelper.deploy(model);
 
     //when
-    engineRule.getRuntimeService().startProcessInstanceByKey("Process_1");
+    engineRule.getRuntimeService().startProcessInstanceByKey("Process_1", Variables.createVariables().putValue("currentTime", new Date()));
 
     //then compensation activities are executed in the reverse order
     List<HistoricActivityInstance> list = engineRule.getHistoryService().createHistoricActivityInstanceQuery()
