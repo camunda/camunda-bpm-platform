@@ -5,7 +5,7 @@ import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
-import org.camunda.bpm.engine.test.bpmn.event.compensate.helper.SleepServiceTask;
+import org.camunda.bpm.engine.test.bpmn.event.compensate.helper.IncreaseCurrentTimeServiceTask;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.model.bpmn.AssociationDirection;
 import org.camunda.bpm.model.bpmn.Bpmn;
@@ -16,7 +16,6 @@ import org.camunda.bpm.model.bpmn.instance.BoundaryEvent;
 import org.camunda.bpm.model.bpmn.instance.ServiceTask;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -28,7 +27,6 @@ public class CompensateEventOrderTest {
 
   @Rule public ProcessEngineRule engineRule = new ProcessEngineRule();
   @Rule public ProcessEngineTestRule testHelper = new ProcessEngineTestRule(engineRule);
-  @Rule public ExpectedException thrown = ExpectedException.none();
 
   @Test
   public void testTwoCompensateEventsInReverseOrder() {
@@ -36,13 +34,13 @@ public class CompensateEventOrderTest {
     BpmnModelInstance model = Bpmn.createExecutableProcess("Process_1")
         .startEvent()
           .serviceTask("serviceTask1")
-            .camundaClass(SleepServiceTask.class.getName())
+            .camundaClass(IncreaseCurrentTimeServiceTask.class.getName())
             .boundaryEvent("compensationBoundary1")
             .compensateEventDefinition()
             .compensateEventDefinitionDone()
           .moveToActivity("serviceTask1")
           .serviceTask("serviceTask2")
-            .camundaClass(SleepServiceTask.class.getName())
+            .camundaClass(IncreaseCurrentTimeServiceTask.class.getName())
             .boundaryEvent("compensationBoundary2")
             .compensateEventDefinition()
             .compensateEventDefinitionDone()
@@ -95,7 +93,7 @@ public class CompensateEventOrderTest {
     ServiceTask compensationHandler = modelInstance.newInstance(ServiceTask.class);
     compensationHandler.setId(compensationHandlerId);
     compensationHandler.setForCompensation(true);
-    compensationHandler.setCamundaClass(SleepServiceTask.class.getName());
+    compensationHandler.setCamundaClass(IncreaseCurrentTimeServiceTask.class.getName());
     scope.addChildElement(compensationHandler);
 
     Association association = modelInstance.newInstance(Association.class);
