@@ -316,7 +316,7 @@ public class ParallelMultiInstanceCompensationScenarioTest {
         // non-deterministic behavior (i.e. depends on order that executions are returned from database)
         // traversing the tree from pre-migration compensation handling executions, the mi-body execution misses
         // traversing the tree from the post-migration compensation handling executions, the mi-body execution exists
-        .beginScope("subProcess", "userTask#multiInstanceBody")
+        .beginScope("subProcess", "userTask#multiInstanceBody", "subProcess#multiInstanceBody")
           .beginScope("subProcess")
             .activity("undoTask")
           .endScope()
