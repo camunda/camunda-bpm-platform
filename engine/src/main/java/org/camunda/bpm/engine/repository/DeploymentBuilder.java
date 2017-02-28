@@ -17,7 +17,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.zip.ZipInputStream;
-
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
@@ -28,15 +27,37 @@ import org.camunda.bpm.model.cmmn.CmmnModelInstance;
 import org.camunda.bpm.model.dmn.DmnModelInstance;
 
 /**
- * Builder for creating new deployments.
+ * <p>Builder for creating new deployments.</p>
  *
- * A builder instance can be obtained through {@link org.camunda.bpm.engine.RepositoryService#createDeployment()}.
+ * <p>A builder instance can be obtained through {@link org.camunda.bpm.engine.RepositoryService#createDeployment()}.</p>
  *
- * Multiple resources can be added to one deployment before calling the {@link #deploy()}
- * operation.
+ * <p>Multiple resources can be added to one deployment before calling the {@link #deploy()}
+ * operation.</p>
  *
- * After deploying, no more changes can be made to the returned deployment
- * and the builder instance can be disposed.
+ * <p>After deploying, no more changes can be made to the returned deployment
+ * and the builder instance can be disposed.</p>
+ *
+ * <p>Valid resource extensions:</p>
+ * <table>
+ * <thead>
+ *   <tr><th>Extension</th><th>Expected content</th></tr>
+ * <thead>
+ * <tbody>
+ *    <tr>
+ *      <td>*.bpmn20.xml, *.bpmn</td><td>BPMN process definition</td>
+ *    </tr>
+ *    <tr>
+ *      <td>*.cmmn11.xml, *.cmmn10.xml, *.cmmn</td><td>CMMN case definition</td>
+ *    </tr>
+ *    <tr>
+ *      <td>*.dmn11.xml, *.dmn</td><td>DMN decision table</td>
+ *    </tr>
+ *    <tr>
+ *      <td>*.png, *.jpg, *.gif, *.svg</td><td>Diagram image. The diagram file is considered to represent the specific diagram model
+ *      by file name, e.g. bpmnDiagram1.png will be considered to be a diagram for bpmnDiagram1.bpmn20.xml</td>
+ *    </tr>
+ * </tbody>
+ * </table>
  *
  * @author Tom Baeyens
  * @author Joram Barrez
