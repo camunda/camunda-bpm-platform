@@ -107,6 +107,10 @@ public class DeploymentEntity implements Serializable, DeploymentWithDefinitions
     artifacts.add(deployedArtifact);
   }
 
+  public Map<Class<?>, List> getDeployedArtifacts() {
+    return deployedArtifacts;
+  }
+
   @SuppressWarnings("unchecked")
   public <T> List<T> getDeployedArtifacts(Class<T> clazz) {
     if(deployedArtifacts == null) {

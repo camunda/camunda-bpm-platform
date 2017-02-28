@@ -216,4 +216,9 @@ public class CommandLogger extends ProcessEngineLogger {
         command
         ));
   }
+
+  public void warnDeploymentResourceWasIgnored(String resourceName) {
+    logWarn(
+        "035", String.format("Deployment resource '%s' was not processed during deployment. Hint: check file extention.", resourceName));
+  }
 }

@@ -12,19 +12,26 @@
  */
 package org.camunda.bpm.engine.impl.persistence.deploy.cache;
 
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.cmd.CommandLogger;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.persistence.deploy.Deployer;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
+import org.camunda.bpm.engine.impl.repository.ResourceDefinitionEntity;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
 
 /**
  * @author: Johannes Heinemann
  */
 public class CacheDeployer {
+
+  private final static CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
 
   protected List<Deployer> deployers;
 
@@ -45,6 +52,33 @@ public class CacheDeployer {
         return null;
       }
     });
+    checkDeployedResources(deployment);
+  }
+
+  /**
+   * Checks if all the passed resources were processed by deployment and logs warning on those that were not.
+   * @param deployment deployment
+   */
+  private void checkDeployedResources(DeploymentEntity deployment) {
+    Set<String> deployedResources = new HashSet<String>();
+    if (deployment.getDeployedArtifacts() != null) {
+      for (List artifactList : deployment.getDeployedArtifacts().values()) {
+        for (Object artifact : artifactList) {
+          if (artifact instanceof ResourceDefinitionEntity) {
+            ResourceDefinitionEntity resourceDefinitionEntity = (ResourceDefinitionEntity) artifact;
+            deployedResources.add(resourceDefinitionEntity.getResourceName());
+            if (resourceDefinitionEntity.getDiagramResourceName() != null) {
+              deployedResources.add(resourceDefinitionEntity.getDiagramResourceName());
+            }
+          }
+        }
+      }
+      for (String resourceName : deployment.getResources().keySet()) {
+        if (!deployedResources.contains(resourceName)) {
+          LOG.warnDeploymentResourceWasIgnored(resourceName);
+        }
+      }
+    }
   }
 
   public void deployOnlyGivenResourcesOfDeployment(final DeploymentEntity deployment, String... resourceNames) {
