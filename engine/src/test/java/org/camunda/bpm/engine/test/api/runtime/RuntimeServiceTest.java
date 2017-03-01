@@ -43,8 +43,11 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.ProcessEngines;
+import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
@@ -78,6 +81,8 @@ import org.camunda.bpm.engine.test.util.TestExecutionListener;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
 /**
  * @author Frederik Heremans
@@ -2290,6 +2295,56 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
     }
 
     assertEquals(0, runtimeService.createExecutionQuery().count());
+
+  }
+
+  public void FAILING_testGetActivityInstanceForCompletedInstanceInDelegate() {
+    // given
+    BpmnModelInstance deletingProcess = Bpmn.createExecutableProcess("process1")
+        .startEvent()
+        .userTask()
+        .serviceTask()
+        .camundaClass(DeleteInstanceDelegate.class.getName())
+        .userTask()
+        .endEvent()
+        .done();
+    BpmnModelInstance processToDelete = Bpmn.createExecutableProcess("process2")
+        .startEvent()
+        .userTask()
+        .endEvent()
+        .done();
+
+    deployment(deletingProcess, processToDelete);
+
+    ProcessInstance instanceToDelete = runtimeService.startProcessInstanceByKey("process2");
+    ProcessInstance deletingInstance = runtimeService.startProcessInstanceByKey("process1",
+        Variables.createVariables().putValue("instanceToComplete", instanceToDelete.getId()));
+
+    Task deleteTrigger = taskService.createTaskQuery().processInstanceId(deletingInstance.getId()).singleResult();
+
+    // when
+    taskService.complete(deleteTrigger.getId());
+
+    // then
+    boolean activityInstanceRetrieved =
+        (Boolean) runtimeService.getVariable(deletingInstance.getId(), "activityInstancePresent");
+    assertTrue(activityInstanceRetrieved);
+  }
+
+  public static class DeleteInstanceDelegate implements JavaDelegate {
+
+    @Override
+    public void execute(DelegateExecution execution) throws Exception {
+      RuntimeService runtimeService = execution.getProcessEngineServices().getRuntimeService();
+      TaskService taskService = execution.getProcessEngineServices().getTaskService();
+
+      String instanceToDelete = (String) execution.getVariable("instanceToComplete");
+      Task taskToTrigger = taskService.createTaskQuery().processInstanceId(instanceToDelete).singleResult();
+      taskService.complete(taskToTrigger.getId());
+
+      ActivityInstance activityInstance = runtimeService.getActivityInstance(instanceToDelete);
+      execution.setVariable("activityInstancePresent", activityInstance != null);
+    }
 
   }
 
