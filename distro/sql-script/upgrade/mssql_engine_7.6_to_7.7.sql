@@ -29,6 +29,3 @@ create index ACT_HI_EXT_TASK_LOG_TENANT_ID on ACT_HI_EXT_TASK_LOG(TENANT_ID_);
 -- salt for password hashing
 ALTER TABLE ACT_ID_USER
   ADD SALT_ nvarchar(255);
-
---https://app.camunda.com/jira/browse/CAM-7442
-drop index ACT_IDX_JOB_HANDLER on ACT_RU_JOB;
