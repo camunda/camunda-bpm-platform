@@ -18,6 +18,7 @@ import java.util.Map;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
+import org.camunda.bpm.engine.identity.NativeUserQuery;
 import org.camunda.bpm.engine.identity.Picture;
 import org.camunda.bpm.engine.identity.Tenant;
 import org.camunda.bpm.engine.identity.TenantQuery;
@@ -27,6 +28,7 @@ import org.camunda.bpm.engine.impl.cmd.CheckPassword;
 import org.camunda.bpm.engine.impl.cmd.CreateGroupCmd;
 import org.camunda.bpm.engine.impl.cmd.CreateGroupQueryCmd;
 import org.camunda.bpm.engine.impl.cmd.CreateMembershipCmd;
+import org.camunda.bpm.engine.impl.cmd.CreateNativeUserQueryCmd;
 import org.camunda.bpm.engine.impl.cmd.CreateTenantCmd;
 import org.camunda.bpm.engine.impl.cmd.CreateTenantGroupMembershipCmd;
 import org.camunda.bpm.engine.impl.cmd.CreateTenantQueryCmd;
@@ -96,6 +98,11 @@ public class IdentityServiceImpl extends ServiceImpl implements IdentityService 
 
   public UserQuery createUserQuery() {
     return commandExecutor.execute(new CreateUserQueryCmd());
+  }
+
+  @Override
+  public NativeUserQuery createNativeUserQuery() {
+    return commandExecutor.execute(new CreateNativeUserQueryCmd());
   }
 
   public GroupQuery createGroupQuery() {

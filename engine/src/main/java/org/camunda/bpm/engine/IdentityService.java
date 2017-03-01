@@ -19,6 +19,7 @@ import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
+import org.camunda.bpm.engine.identity.NativeUserQuery;
 import org.camunda.bpm.engine.identity.Picture;
 import org.camunda.bpm.engine.identity.Tenant;
 import org.camunda.bpm.engine.identity.TenantQuery;
@@ -112,6 +113,12 @@ public interface IdentityService {
    * @throws AuthorizationException if the user has no {@link Permissions#CREATE} permissions on {@link Resources#GROUP}.
    */
   Group newGroup(String groupId);
+
+  /**
+   * Creates a {@link NativeUserQuery} that allows to select users with native queries.
+   * @return NativeUserQuery
+   */
+  NativeUserQuery createNativeUserQuery();
 
   /**
    * Creates a {@link GroupQuery} thats allows to programmatically query the groups.

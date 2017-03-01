@@ -36,10 +36,12 @@ import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
 import javax.naming.ldap.SortControl;
 
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
+import org.camunda.bpm.engine.identity.NativeUserQuery;
 import org.camunda.bpm.engine.identity.Tenant;
 import org.camunda.bpm.engine.identity.TenantQuery;
 import org.camunda.bpm.engine.identity.User;
@@ -143,6 +145,11 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
 
   public UserQueryImpl createUserQuery(CommandContext commandContext) {
     return new LdapUserQueryImpl();
+  }
+
+  @Override
+  public NativeUserQuery createNativeUserQuery() {
+    throw new BadUserRequestException("Native user queries are not supported for LDAP identity service provider.");
   }
 
   public long findUserCountByQueryCriteria(LdapUserQueryImpl query) {

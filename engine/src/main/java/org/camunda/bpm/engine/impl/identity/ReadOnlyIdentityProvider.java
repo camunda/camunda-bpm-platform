@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.impl.identity;
 
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
+import org.camunda.bpm.engine.identity.NativeUserQuery;
 import org.camunda.bpm.engine.identity.Tenant;
 import org.camunda.bpm.engine.identity.TenantQuery;
 import org.camunda.bpm.engine.identity.User;
@@ -53,6 +54,12 @@ public interface ReadOnlyIdentityProvider extends Session {
    * @throws IdentityProviderException in case an error occurs
    */
   public UserQuery createUserQuery(CommandContext commandContext);
+
+  /**
+   * Creates a {@link NativeUserQuery} that allows to select users with native queries.
+   * @return NativeUserQuery
+   */
+  public NativeUserQuery createNativeUserQuery();
 
   /**
    * @return 'true' if the password matches the

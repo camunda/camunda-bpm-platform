@@ -20,6 +20,7 @@ import static org.camunda.bpm.engine.authorization.Resources.USER;
 import java.util.List;
 import java.util.Set;
 
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Resource;
@@ -234,6 +235,16 @@ public class LdapUserQueryTest extends LdapIdentityProviderTest {
       }
 
     }
+  }
+
+  public void testNativeQueryFail() {
+    try {
+      identityService.createNativeUserQuery();
+      fail("Native queries are not supported in LDAP case.");
+    } catch (BadUserRequestException ex) {
+      assertTrue("Wrong exception", ex.getMessage().contains("Native user queries are not supported for LDAP"));
+    }
+
   }
 
   protected void createGrantAuthorization(Resource resource, String resourceId, String userId, Permission... permissions) {
