@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import java.util.Arrays;
 import org.camunda.bpm.application.impl.ProcessApplicationIdentifier;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
@@ -217,8 +218,8 @@ public class CommandLogger extends ProcessEngineLogger {
         ));
   }
 
-  public void warnDeploymentResourceWasIgnored(String resourceName) {
+  public void warnDeploymentResourceHasWroneName(String resourceName, String[] suffixes) {
     logWarn(
-        "035", String.format("Deployment resource '%s' was not processed during deployment. Hint: check file extention.", resourceName));
+        "035", String.format("Deployment resource '%s' will be ignored as its name must have one of suffixes %s.", resourceName, Arrays.toString(suffixes)));
   }
 }

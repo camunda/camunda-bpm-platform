@@ -52,33 +52,6 @@ public class CacheDeployer {
         return null;
       }
     });
-    checkDeployedResources(deployment);
-  }
-
-  /**
-   * Checks if all the passed resources were processed by deployment and logs warning on those that were not.
-   * @param deployment deployment
-   */
-  private void checkDeployedResources(DeploymentEntity deployment) {
-    Set<String> deployedResources = new HashSet<String>();
-    if (deployment.getDeployedArtifacts() != null) {
-      for (List artifactList : deployment.getDeployedArtifacts().values()) {
-        for (Object artifact : artifactList) {
-          if (artifact instanceof ResourceDefinitionEntity) {
-            ResourceDefinitionEntity resourceDefinitionEntity = (ResourceDefinitionEntity) artifact;
-            deployedResources.add(resourceDefinitionEntity.getResourceName());
-            if (resourceDefinitionEntity.getDiagramResourceName() != null) {
-              deployedResources.add(resourceDefinitionEntity.getDiagramResourceName());
-            }
-          }
-        }
-      }
-      for (String resourceName : deployment.getResources().keySet()) {
-        if (!deployedResources.contains(resourceName)) {
-          LOG.warnDeploymentResourceWasIgnored(resourceName);
-        }
-      }
-    }
   }
 
   public void deployOnlyGivenResourcesOfDeployment(final DeploymentEntity deployment, String... resourceNames) {

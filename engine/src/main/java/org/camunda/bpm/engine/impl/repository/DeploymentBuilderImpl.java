@@ -18,9 +18,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.Serializable;
-import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -34,12 +32,18 @@ import java.util.zip.ZipInputStream;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotValidException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.RepositoryServiceImpl;
+import org.camunda.bpm.engine.impl.bpmn.deployer.BpmnDeployer;
+import org.camunda.bpm.engine.impl.cmd.CommandLogger;
+import org.camunda.bpm.engine.impl.cmmn.deployer.CmmnDeployer;
+import org.camunda.bpm.engine.impl.dmn.deployer.DecisionDefinitionDeployer;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
+import org.camunda.bpm.engine.impl.util.StringUtil;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.repository.DeploymentWithDefinitions;
@@ -57,6 +61,8 @@ import org.camunda.bpm.model.dmn.DmnModelInstance;
 public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
 
   private static final long serialVersionUID = 1L;
+
+  private final static CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
 
   protected transient RepositoryServiceImpl repositoryService;
   protected DeploymentEntity deployment = new DeploymentEntity();
@@ -99,6 +105,8 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
   public DeploymentBuilder addModelInstance(String resourceName, CmmnModelInstance modelInstance) {
     ensureNotNull("modelInstance", modelInstance);
 
+    validateResouceName(resourceName, CmmnDeployer.CMMN_RESOURCE_SUFFIXES);
+
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     Cmmn.writeModelToStream(outputStream, modelInstance);
 
@@ -107,6 +115,8 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
 
   public DeploymentBuilder addModelInstance(String resourceName, BpmnModelInstance modelInstance) {
     ensureNotNull("modelInstance", modelInstance);
+
+    validateResouceName(resourceName, BpmnDeployer.BPMN_RESOURCE_SUFFIXES);
 
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     Bpmn.writeModelToStream(outputStream, modelInstance);
@@ -117,10 +127,18 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
   public DeploymentBuilder addModelInstance(String resourceName, DmnModelInstance modelInstance) {
     ensureNotNull("modelInstance", modelInstance);
 
+    validateResouceName(resourceName, DecisionDefinitionDeployer.DMN_RESOURCE_SUFFIXES);
+
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     Dmn.writeModelToStream(outputStream, modelInstance);
 
     return addBytes(resourceName, outputStream.toByteArray());
+  }
+
+  private void validateResouceName(String resourceName, String[] resourceSuffixes) {
+    if (!StringUtil.hasAnySuffix(resourceName, resourceSuffixes)) {
+      LOG.warnDeploymentResourceHasWroneName(resourceName, resourceSuffixes);
+    }
   }
 
   protected DeploymentBuilder addBytes(String resourceName, byte[] bytes) {
