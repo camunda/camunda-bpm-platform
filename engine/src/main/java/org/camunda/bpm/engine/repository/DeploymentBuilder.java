@@ -37,27 +37,26 @@ import org.camunda.bpm.model.dmn.DmnModelInstance;
  * <p>After deploying, no more changes can be made to the returned deployment
  * and the builder instance can be disposed.</p>
  *
- * <p>Valid resource extensions:</p>
+ * <p>In order the resources to be processed as definitions, their names must have one of allowed suffixes (file extensions in case of file reference).</p>
  * <table>
  * <thead>
- *   <tr><th>Extension</th><th>Expected content</th></tr>
+ *   <tr><th>Resource name suffix</th><th>Will be treated as</th></tr>
  * <thead>
  * <tbody>
  *    <tr>
- *      <td>*.bpmn20.xml, *.bpmn</td><td>BPMN process definition</td>
+ *      <td>.bpmn20.xml, .bpmn</td><td>BPMN process definition</td>
  *    </tr>
  *    <tr>
- *      <td>*.cmmn11.xml, *.cmmn10.xml, *.cmmn</td><td>CMMN case definition</td>
+ *      <td>.cmmn11.xml, .cmmn10.xml, .cmmn</td><td>CMMN case definition</td>
  *    </tr>
  *    <tr>
- *      <td>*.dmn11.xml, *.dmn</td><td>DMN decision table</td>
- *    </tr>
- *    <tr>
- *      <td>*.png, *.jpg, *.gif, *.svg</td><td>Diagram image. The diagram file is considered to represent the specific diagram model
- *      by file name, e.g. bpmnDiagram1.png will be considered to be a diagram for bpmnDiagram1.bpmn20.xml</td>
+ *      <td>.dmn11.xml, .dmn</td><td>DMN decision table</td>
  *    </tr>
  * </tbody>
  * </table>
+ *
+ * <p>Additionally resources with resource name suffixes .png, .jpg, .gif and .svg can be treated as diagram images. The deployment resource is considered
+ * to represent the specific model diagram by file name, e.g. bpmnDiagram1.png will be considered to be a diagram image for bpmnDiagram1.bpmn20.xml.</p>
  *
  * @author Tom Baeyens
  * @author Joram Barrez
@@ -67,8 +66,29 @@ public interface DeploymentBuilder {
   DeploymentBuilder addInputStream(String resourceName, InputStream inputStream);
   DeploymentBuilder addClasspathResource(String resource);
   DeploymentBuilder addString(String resourceName, String text);
+
+  /**
+   * Adds a BPMN model to the deployment.
+   * @param resourceName resource name. See suffix requirements for resource names: {@see DeploymentBuilder}.
+   * @param modelInstance model instance
+   * @return
+   */
   DeploymentBuilder addModelInstance(String resourceName, BpmnModelInstance modelInstance);
+
+  /**
+   * Adds a DMN model to the deployment.
+   * @param resourceName resource name. See suffix requirements for resource names: {@see DeploymentBuilder}.
+   * @param modelInstance model instance
+   * @return
+   */
   DeploymentBuilder addModelInstance(String resourceName, DmnModelInstance modelInstance);
+
+  /**
+   * Adds a CMMN model to the deployment.
+   * @param resourceName resource name. See suffix requirements for resource names: {@see DeploymentBuilder}.
+   * @param modelInstance model instance
+   * @return
+   */
   DeploymentBuilder addModelInstance(String resourceName, CmmnModelInstance modelInstance);
 
   DeploymentBuilder addZipInputStream(ZipInputStream zipInputStream);
