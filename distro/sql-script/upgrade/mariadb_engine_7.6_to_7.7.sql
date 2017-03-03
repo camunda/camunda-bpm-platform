@@ -29,3 +29,7 @@ create index ACT_HI_EXT_TASK_LOG_TENANT_ID on ACT_HI_EXT_TASK_LOG(TENANT_ID_);
 -- salt for password hashing
 ALTER TABLE ACT_ID_USER
   ADD SALT_ varchar(255);
+
+-- operationId column to link records with those from ACT_HI_OP_LOG
+ALTER TABLE ACT_HI_DETAIL
+  ADD OPERATION_ID_ varchar(64);

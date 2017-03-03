@@ -120,6 +120,7 @@ create table ACT_HI_DETAIL (
     TEXT2_ NVARCHAR2(2000),
     SEQUENCE_COUNTER_ NUMBER(19,0),
     TENANT_ID_ NVARCHAR2(64),
+    OPERATION_ID_ NVARCHAR2(64),
     primary key (ID_)
 );
 

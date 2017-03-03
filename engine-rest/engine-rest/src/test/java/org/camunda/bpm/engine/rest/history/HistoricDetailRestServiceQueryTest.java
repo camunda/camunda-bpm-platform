@@ -339,6 +339,7 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
           .body("[0].caseInstanceId", equalTo(historicUpdateBuilder.getCaseInstanceId()))
           .body("[0].caseExecutionId", equalTo(historicUpdateBuilder.getCaseExecutionId()))
           .body("[0].tenantId", equalTo(historicUpdateBuilder.getTenantId()))
+          .body("[0].operationId", equalTo(historicUpdateBuilder.getOperationId()))
         .when()
           .get(HISTORIC_DETAIL_RESOURCE_URL);
 
@@ -369,6 +370,7 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
     String returnedCaseInstanceId2 = from(content).getString("[1].caseInstanceId");
     String returnedCaseExecutionId2 = from(content).getString("[1].caseExecutionId");
     String returnedTenantId2 = from(content).getString("[1].tenantId");
+    String returnedOperationId2 = from(content).getString("[1].operationId");
 
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_FORM_FIELD_ID, returnedId2);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_FORM_FIELD_PROC_DEF_KEY, returnedProcessDefinitionKey2);
@@ -386,6 +388,8 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_FORM_FIELD_CASE_INST_ID, returnedCaseInstanceId2);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_FORM_FIELD_CASE_EXEC_ID, returnedCaseExecutionId2);
     Assert.assertEquals(MockProvider.EXAMPLE_TENANT_ID, returnedTenantId2);
+    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_FORM_FIELD_EXEC_ID, returnedExecutionId2);
+    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_FORM_FIELD_OPERATION_ID, returnedOperationId2);
 
   }
 
@@ -460,6 +464,17 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
       .when().get(HISTORIC_DETAIL_RESOURCE_URL);
 
     verify(mockedQuery).executionId(executionId);
+  }
+
+  @Test
+  public void testQueryByOperationId() {
+    String operationId = MockProvider.EXAMPLE_HISTORIC_VAR_UPDATE_OPERATION_ID;
+    given()
+        .queryParam("operationId", operationId)
+        .then().expect().statusCode(Status.OK.getStatusCode())
+        .when().get(HISTORIC_DETAIL_RESOURCE_URL);
+
+    verify(mockedQuery).operationId(operationId);
   }
 
   @Test

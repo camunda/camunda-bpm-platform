@@ -45,6 +45,7 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
   protected String type;
   protected String variableInstanceId;
   protected String[] tenantIds;
+  protected String operationId;
 
   protected boolean excludeTaskRelated = false;
   protected boolean isByteArrayFetchingEnabled = true;
@@ -124,6 +125,11 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
   public HistoricDetailQuery tenantIdIn(String... tenantIds) {
     ensureNotNull("tenantIds", (Object[]) tenantIds);
     this.tenantIds = tenantIds;
+    return this;
+  }
+
+  public HistoricDetailQuery operationId(String operationId) {
+    this.operationId = operationId;
     return this;
   }
 

@@ -570,6 +570,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_HISTORIC_VAR_UPDATE_PROC_INST_ID = "aProcInst";
   public static final String EXAMPLE_HISTORIC_VAR_UPDATE_ACT_INST_ID = "anActInst";
   public static final String EXAMPLE_HISTORIC_VAR_UPDATE_EXEC_ID = "anExecutionId";
+  public static final String EXAMPLE_HISTORIC_VAR_UPDATE_OPERATION_ID = "anOperationId";
   public static final String EXAMPLE_HISTORIC_VAR_UPDATE_TASK_ID = "aTaskId";
   public static final String EXAMPLE_HISTORIC_VAR_UPDATE_TIME = "2014-01-01T00:00:00";
   public static final String EXAMPLE_HISTORIC_VAR_UPDATE_NAME = "aVariableName";
@@ -589,6 +590,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_HISTORIC_FORM_FIELD_PROC_INST_ID = "aProcInst";
   public static final String EXAMPLE_HISTORIC_FORM_FIELD_ACT_INST_ID = "anActInst";
   public static final String EXAMPLE_HISTORIC_FORM_FIELD_EXEC_ID = "anExecutionId";
+  public static final String EXAMPLE_HISTORIC_FORM_FIELD_OPERATION_ID = "anOperationId";
   public static final String EXAMPLE_HISTORIC_FORM_FIELD_TASK_ID = "aTaskId";
   public static final String EXAMPLE_HISTORIC_FORM_FIELD_TIME = "2014-01-01T00:00:00";
   public static final String EXAMPLE_HISTORIC_FORM_FIELD_FIELD_ID = "aFormFieldId";
@@ -2276,6 +2278,7 @@ public abstract class MockProvider {
     when(historicFromField.getCaseInstanceId()).thenReturn(EXAMPLE_HISTORIC_FORM_FIELD_CASE_INST_ID);
     when(historicFromField.getCaseExecutionId()).thenReturn(EXAMPLE_HISTORIC_FORM_FIELD_CASE_EXEC_ID);
     when(historicFromField.getTenantId()).thenReturn(tenantId);
+    when(historicFromField.getOperationId()).thenReturn(EXAMPLE_HISTORIC_FORM_FIELD_OPERATION_ID);
 
     return historicFromField;
   }

@@ -120,6 +120,7 @@ create table ACT_HI_DETAIL (
     TEXT2_ varchar(4000),
     SEQUENCE_COUNTER_ bigint,
     TENANT_ID_ varchar(64),
+    OPERATION_ID_ varchar(64),
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 

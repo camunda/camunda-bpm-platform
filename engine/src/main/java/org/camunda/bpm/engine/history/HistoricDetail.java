@@ -65,4 +65,9 @@ public interface HistoricDetail {
    * if the historic detail belongs to no single tenant.
    */
   String getTenantId();
+
+  /**
+   * The id of operation. Helps to link records in different historic tables.
+   */
+  String getOperationId();
 }

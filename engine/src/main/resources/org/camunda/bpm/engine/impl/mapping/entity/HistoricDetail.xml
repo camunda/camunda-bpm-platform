@@ -35,7 +35,8 @@
       NAME_,
       TEXT_,
       SEQUENCE_COUNTER_,
-      TENANT_ID_
+      TENANT_ID_,
+      OPERATION_ID_
     )
     values (
       #{id, jdbcType=VARCHAR},
@@ -50,7 +51,8 @@
       #{propertyId, jdbcType=VARCHAR},
       #{propertyValue, jdbcType=VARCHAR},
       #{sequenceCounter, jdbcType=BIGINT},
-      #{tenantId, jdbcType=VARCHAR}
+      #{tenantId, jdbcType=VARCHAR},
+      #{operationId, jdbcType=VARCHAR}
     )
   </insert>
 
@@ -81,7 +83,8 @@
       TEXT_,
       TEXT2_,
       SEQUENCE_COUNTER_,
-      TENANT_ID_
+      TENANT_ID_,
+      OPERATION_ID_
     )
     values (
       #{id, jdbcType=VARCHAR},
@@ -107,7 +110,8 @@
       #{textValue, jdbcType=VARCHAR},
       #{textValue2, jdbcType=VARCHAR},
       #{sequenceCounter, jdbcType=BIGINT},
-      #{tenantId, jdbcType=VARCHAR}
+      #{tenantId, jdbcType=VARCHAR},
+      #{operationId, jdbcType=VARCHAR}
     )
   </insert>
 
@@ -137,6 +141,7 @@
     <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
     <result property="sequenceCounter" column="SEQUENCE_COUNTER_" jdbcType="BIGINT" />
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+    <result property="operationId" column="OPERATION_ID_" jdbcType="VARCHAR" />
     <discriminator javaType="string" column="TYPE_">
       <case value="VariableUpdate" resultMap="historicVariableUpdateResultMap"/>
       <case value="FormProperty" resultMap="historicFormPropertyResultMap"/>
@@ -253,6 +258,10 @@
                  open="(" separator="," close=")">
           #{tenantId}
         </foreach>
+      </if>
+
+      <if test="operationId != null">
+        RES.OPERATION_ID_ = #{operationId}
       </if>
 
       <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">

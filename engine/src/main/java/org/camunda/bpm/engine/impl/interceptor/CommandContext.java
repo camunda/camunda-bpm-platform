@@ -67,6 +67,8 @@ public class CommandContext {
 
   protected List<CommandContextListener> commandContextListeners = new LinkedList<CommandContextListener>();
 
+  protected String operationId;
+
   public CommandContext(ProcessEngineConfigurationImpl processEngineConfiguration) {
     this(processEngineConfiguration, processEngineConfiguration.getTransactionContextFactory());
   }
@@ -562,5 +564,16 @@ public class CommandContext {
 
   public void setRestrictUserOperationLogToAuthenticatedUsers(boolean restrictUserOperationLogToAuthenticatedUsers) {
     this.restrictUserOperationLogToAuthenticatedUsers = restrictUserOperationLogToAuthenticatedUsers;
+  }
+
+  public String getOperationId() {
+    if (operationId == null) {
+      operationId = Context.getProcessEngineConfiguration().getIdGenerator().getNextId();
+    }
+    return operationId;
+  }
+
+  public void setOperationId(String operationId) {
+    this.operationId = operationId;
   }
 }

@@ -44,6 +44,7 @@ public class MockHistoricVariableUpdateBuilder {
   protected String caseInstanceId;
   protected String caseExecutionId;
   protected String tenantId;
+  protected String operationId;
 
   public MockHistoricVariableUpdateBuilder id(String id) {
     this.id = id;
@@ -135,6 +136,11 @@ public class MockHistoricVariableUpdateBuilder {
     return this;
   }
 
+  public MockHistoricVariableUpdateBuilder operationId(String operationId) {
+    this.operationId = operationId;
+    return this;
+  }
+
   public HistoricVariableUpdate build() {
     HistoricVariableUpdate mockVariable = mock(HistoricVariableUpdate.class);
     when(mockVariable.getId()).thenReturn(id);
@@ -169,6 +175,7 @@ public class MockHistoricVariableUpdateBuilder {
     when(mockVariable.getCaseInstanceId()).thenReturn(caseInstanceId);
     when(mockVariable.getCaseExecutionId()).thenReturn(caseExecutionId);
     when(mockVariable.getTenantId()).thenReturn(tenantId);
+    when(mockVariable.getOperationId()).thenReturn(operationId);
 
     return mockVariable;
   }
@@ -243,6 +250,10 @@ public class MockHistoricVariableUpdateBuilder {
 
   public String getCaseExecutionId() {
     return caseExecutionId;
+  }
+
+  public String getOperationId() {
+    return operationId;
   }
 
   public String getTenantId() {

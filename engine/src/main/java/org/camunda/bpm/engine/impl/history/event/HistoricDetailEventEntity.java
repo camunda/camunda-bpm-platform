@@ -29,6 +29,7 @@ public class HistoricDetailEventEntity extends HistoryEvent  {
   protected String taskId;
   protected Date timestamp;
   protected String tenantId;
+  protected String operationId;
 
   // getters and setters //////////////////////////////////////////////////////
 
@@ -64,6 +65,14 @@ public class HistoricDetailEventEntity extends HistoryEvent  {
     this.tenantId = tenantId;
   }
 
+  public String getOperationId() {
+    return operationId;
+  }
+
+  public void setOperationId(String operationId) {
+    this.operationId = operationId;
+  }
+
   public void delete() {
     Context
       .getCommandContext()
@@ -83,6 +92,7 @@ public class HistoricDetailEventEntity extends HistoryEvent  {
            + ", processInstanceId=" + processInstanceId
            + ", id=" + id
            + ", tenantId=" + tenantId
+           + ", operationId=" + operationId
            + "]";
   }
 
