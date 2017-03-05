@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.impl;
 
 import java.util.Map;
+import java.util.Date;
 
 import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
@@ -31,7 +32,7 @@ public class ExternalTaskServiceImpl extends ServiceImpl implements ExternalTask
   public ExternalTaskQueryBuilder fetchAndLock(int maxTasks, String workerId) {
     return fetchAndLock(maxTasks, workerId, false);
   }
-  
+
   @Override
   public ExternalTaskQueryBuilder fetchAndLock(int maxTasks, String workerId, boolean usePriority) {
     return new ExternalTaskQueryTopicBuilderImpl(commandExecutor, workerId, maxTasks, usePriority);
@@ -52,7 +53,7 @@ public class ExternalTaskServiceImpl extends ServiceImpl implements ExternalTask
   public void handleFailure(String externalTaskId, String workerId, String errorMessage, String errorDetails, int retries, long retryDuration) {
     commandExecutor.execute(new HandleExternalTaskFailureCmd(externalTaskId, workerId, errorMessage, errorDetails, retries, retryDuration));
   }
-  
+
   @Override
   public void handleBpmnError(String externalTaskId, String workerId, String errorCode) {
     commandExecutor.execute(new HandleExternalTaskBpmnErrorCmd(externalTaskId, workerId, errorCode));
@@ -64,13 +65,17 @@ public class ExternalTaskServiceImpl extends ServiceImpl implements ExternalTask
 
   public void setRetries(String externalTaskId, int retries) {
     commandExecutor.execute(new SetExternalTaskRetriesCmd(externalTaskId, retries));
-  }  
-  
+  }
+
   @Override
   public void setPriority(String externalTaskId, long priority) {
     commandExecutor.execute(new SetExternalTaskPriorityCmd(externalTaskId, priority));
   }
-  
+
+  public void setExpiration(String externalTaskId, Date expiration) {
+    commandExecutor.execute(new SetExternalTaskExpirationCmd(externalTaskId, expiration));
+  }
+
   public ExternalTaskQuery createExternalTaskQuery() {
     return new ExternalTaskQueryImpl(commandExecutor);
   }

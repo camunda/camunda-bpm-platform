@@ -75,6 +75,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
   protected String activityInstanceId;
   protected String tenantId;
   protected long priority;
+  protected Date expiration;
 
   protected ExecutionEntity execution;
 
@@ -184,6 +185,14 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
 
   public void setPriority(long priority) {
     this.priority = priority;
+  }
+
+  public Date getExpiration() {
+    return expiration;
+  }
+
+  public void setExpiration(Date expiration) {
+    this.expiration = expiration;
   }
 
   public Object getPersistentState() {
@@ -328,17 +337,17 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
     setRetriesAndManageIncidents(retries);
     produceHistoricExternalTaskFailedEvent();
   }
-  
+
   public void bpmnError(String errorCode) {
     ensureActive();
     ActivityExecution activityExecution = getExecution();
     BpmnError bpmnError = new BpmnError(errorCode);
-    try {      
+    try {
       ExternalTaskActivityBehavior behavior = ((ExternalTaskActivityBehavior) activityExecution.getActivity().getActivityBehavior());
-      behavior.propagateBpmnError(bpmnError, activityExecution);      
+      behavior.propagateBpmnError(bpmnError, activityExecution);
     } catch (Exception ex) {
       throw ProcessEngineLogger.CMD_LOGGER.exceptionBpmnErrorPropagationFailed(errorCode, ex);
-    }    
+    }
   }
 
   public void setRetriesAndManageIncidents(int retries) {
@@ -408,7 +417,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
       throw LOG.suspendedEntityException(EntityTypes.EXTERNAL_TASK, id);
     }
   }
-  
+
   @Override
   public String toString() {
     return "ExternalTaskEntity ["
