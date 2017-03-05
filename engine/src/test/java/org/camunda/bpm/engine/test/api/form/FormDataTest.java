@@ -252,4 +252,25 @@ public class FormDataTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Deployment
+  public void testTwoTasksWithSameFormFieldId() {
+
+    // start process
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("FormDataTest.testTwoTasksWithSameFormFieldId");
+    assertNotNull(processInstance);
+
+    // submit task form for first task
+    Task userTask1 = taskService.createTaskQuery().singleResult();
+    assertEquals("userTask1", userTask1.getTaskDefinitionKey());
+    Map<String, Object> formValues = new HashMap<String, Object>();
+    formValues.put("actions", "postpone");
+    formService.submitTaskForm(userTask1.getId(), formValues);
+
+    assertEquals(formValues, runtimeService.getVariables(processInstance.getId()));
+
+    // try to get form data for second task
+    Task userTask2 = taskService.createTaskQuery().singleResult();
+    assertEquals("userTask2", userTask2.getTaskDefinitionKey());
+    formService.getTaskFormData(userTask2.getId());
+  }
 }
