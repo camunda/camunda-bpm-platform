@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.test.api.variables;
 
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 /**

@@ -47,7 +47,16 @@ public class JPAVariableSerializer extends AbstractTypedValueSerializer<ObjectVa
   }
 
   protected boolean canWriteValue(TypedValue value) {
-    return value.getValue() == null || mappings.isJPAEntity(value.getValue());
+    if (isDeserializedObjectValue(value) || value instanceof UntypedValueImpl) {
+      return value.getValue() == null || mappings.isJPAEntity(value.getValue());
+    }
+    else {
+      return false;
+    }
+  }
+
+  protected boolean isDeserializedObjectValue(TypedValue value) {
+    return value instanceof ObjectValue && ((ObjectValue) value).isDeserialized();
   }
 
   public ObjectValue convertToTypedValue(UntypedValueImpl untypedValue) {

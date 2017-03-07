@@ -15,6 +15,9 @@ package org.camunda.bpm.engine.test.standalone.jpa;
 
 
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Calendar;
@@ -32,11 +35,19 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
 import org.camunda.bpm.engine.impl.test.AbstractProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.util.StringUtil;
 import org.camunda.bpm.engine.impl.variable.serializer.jpa.EntityManagerSession;
 import org.camunda.bpm.engine.impl.variable.serializer.jpa.EntityManagerSessionFactory;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.api.variables.JavaSerializable;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.Variables.SerializationDataFormats;
+import org.camunda.bpm.engine.variable.value.ObjectValue;
+import org.camunda.bpm.engine.variable.value.SerializationDataFormat;
 import org.junit.Assert;
 import org.junit.Ignore;
 
@@ -46,6 +57,7 @@ import org.junit.Ignore;
  */
 public class JPAVariableTest extends AbstractProcessEngineTestCase {
 
+  protected static final String ONE_TASK_PROCESS = "org/camunda/bpm/engine/test/api/variables/oneTaskProcess.bpmn20.xml";
   protected static ProcessEngine cachedProcessEngine;
 
   private FieldAccessJPAEntity simpleEntityFieldAccess;
@@ -483,6 +495,29 @@ public class JPAVariableTest extends AbstractProcessEngineTestCase {
     Object updatedEntity = runtimeService.getVariable(processInstance.getId(), "entityToUpdate");
     assertTrue(updatedEntity instanceof FieldAccessJPAEntity);
     assertEquals("updatedValue", ((FieldAccessJPAEntity)updatedEntity).getValue());
+  }
+
+  @Deployment(resources = ONE_TASK_PROCESS)
+  public void testFailSerializationForUnknownSerializedValueType() throws IOException {
+    // given
+    JavaSerializable pojo = new JavaSerializable("foo");
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    new ObjectOutputStream(baos).writeObject(pojo);
+    String serializedObject = StringUtil.fromBytes(Base64.encodeBase64(baos.toByteArray()), processEngine);
+
+    ObjectValue serializedObjectValue = Variables
+      .serializedObjectValue(serializedObject)
+      .serializationDataFormat(SerializationDataFormats.JAVA)
+      .objectTypeName(pojo.getClass().getName())
+      .create();
+    VariableMap variables = Variables.createVariables().putValueTyped("var", serializedObjectValue);
+
+    // when
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
+
+    // then
+    JavaSerializable returnedPojo = (JavaSerializable) runtimeService.getVariable(processInstance.getId(), "var");
+    assertEquals(pojo, returnedPojo);
   }
 
 }
