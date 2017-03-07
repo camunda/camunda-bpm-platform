@@ -458,6 +458,43 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
   }
 
   @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+  public void testQueryByNameAndVariableValueLikeWithEscape_String() {
+    // given
+    Map<String, Object> variables1 = new HashMap<String, Object>();
+    variables1.put("stringVar", "test_123");
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
+
+    Map<String, Object> variables2 = new HashMap<String, Object>();
+    variables2.put("stringVar", "test%456");
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables2);
+
+    // when
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueLike("stringVar", "test\\_%");
+    verifyQueryResult(query, "test_123");
+
+    query = runtimeService.createVariableInstanceQuery().variableValueLike("stringVar", "test\\%%");
+    verifyQueryResult(query, "test%456");
+
+  }
+
+  private void verifyQueryResult(VariableInstanceQuery query, String varValue) {
+    // then
+    List<VariableInstance> result = query.list();
+    assertFalse(result.isEmpty());
+    assertEquals(1, result.size());
+
+    assertEquals(1, query.count());
+
+    for (VariableInstance var : result) {
+      assertEquals("stringVar", var.getName());
+      assertEquals("string", var.getTypeName());
+
+      assertEquals(varValue, var.getValue());
+    }
+  }
+
+  @Test
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
   public void testQueryByNameAndVariableValueEquals_Integer() {
     // given

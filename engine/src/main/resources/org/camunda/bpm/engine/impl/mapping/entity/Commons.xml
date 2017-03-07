@@ -22,6 +22,7 @@
   
   <!-- This snippet is used by all queries that allow filtering by variable values -->
   <sql id="variableValueConditions">
+    <bind name="escapeChar" value="'\\'"/>
     <if test="queryVariableValue.operatorName.equals('NOT_EQUALS')">NOT</if><!-- NOT_EQUALS uses the same conditions as EQUALS -->
     (
     <foreach collection="queryVariableValue.valueConditions" item="valueCondition" separator="or">
@@ -33,19 +34,21 @@
          
         <if test="valueCondition.textValue != null &amp;&amp; valueCondition.longValue == null &amp;&amp; valueCondition.doubleValue == null">
           and ${varPrefix}TEXT_ is not null and ${varPrefix}TEXT_
-        <choose>
-          <when test="queryVariableValue.operatorName.equals('LIKE')">LIKE</when>
-          <otherwise><include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.executionVariableOperator" /></otherwise>
-        </choose>
+          <choose>
+            <when test="queryVariableValue.operatorName.equals('LIKE')">LIKE</when>
+            <otherwise><include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.executionVariableOperator" /></otherwise>
+          </choose>
           #{valueCondition.textValue}
+          <if test="queryVariableValue.operatorName.equals('LIKE')">ESCAPE #{escapeChar}</if>
         </if>
         <if test="valueCondition.textValue2 != null">
           and ${varPrefix}TEXT2_ is not null and ${varPrefix}TEXT2_
-        <choose>
-          <when test="queryVariableValue.operatorName.equals('LIKE')">LIKE</when>
-          <otherwise><include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.executionVariableOperator" /></otherwise>
-        </choose>
+          <choose>
+            <when test="queryVariableValue.operatorName.equals('LIKE')">LIKE</when>
+            <otherwise><include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.executionVariableOperator" /></otherwise>
+          </choose>
           #{valueCondition.textValue2}
+          <if test="queryVariableValue.operatorName.equals('LIKE')">ESCAPE #{escapeChar}</if>
         </if>
     
         <if test="valueCondition.longValue != null">
@@ -68,7 +71,7 @@
     </foreach>
     )
   </sql>
-  
+
   <sql id="executionVariableOperator">
     <choose>
       <when test="queryVariableValue.operatorName.equals('EQUALS')">=</when>
