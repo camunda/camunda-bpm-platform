@@ -1,14 +1,22 @@
-# camunda-feel-integration
+# FEEL Engine Factory
 
-Provide an integration of the [FEEL Engine](https://github.com/saig0/feel) into camunda BPM using the SPI of the [camunda DMN engine](https://github.com/camunda/camunda-engine-dmn). 
+Provide an integration of the FEEL engine for Camunda BPM using the SPI of the [Camunda DMN engine](https://github.com/camunda/camunda-engine-dmn). 
 
-## Goal
+## How to use it?
 
-Using the FEEL engine to evaluate expressions of DMN decision tables that are evaluated by the camunda DMN engine.
+Add the factory including the FEEL engine to your project by copying the jar file or adding the project as dependency.
 
-## How to use
+```xml
+<dependency>
+  <groupId>org.camunda.bpm.extension.feel.scala</groupId>
+  <artifactId>feel-engine-factory</artifactId>
+  <version>1.0.0</version>
+</dependency>
+```
 
-If you use Java to build the camunda DMN engine then you have to set the FEEL Engine Factory:
+Then, replace the default FEEL engine factory in your DMN engine configuration.
+
+### DMN Engine Configuration
 
 ```java
 DefaultDmnEngineConfiguration dmnEngineConfig = (DefaultDmnEngineConfiguration) DmnEngineConfiguration.createDefaultDmnEngineConfiguration(); 
@@ -17,12 +25,28 @@ dmnEngineConfig.setFeelEngineFactory(new CamundaFeelEngineFactory());
 DmnEngine engine = dmnEngineConfig.buildEngine();
 ```
 
-## How to build
+### Process Engine Spring XML Configuration
 
-> Requirements
-* [SBT](http://www.scala-sbt.org) to build and test the application
+```xml
+<bean id="processEngineConfiguration" class="org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration">
+  
+  <property name="dmnEngineConfiguration">
+    <bean class="org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration">
+      <property name="feelEngineFactory">
+        <bean class="org.camunda.feel.integration.CamundaFeelEngineFactory" />
+      </property>
+    </bean>
+  </property>  
+  
+  <!-- more configs -->
+</bean>
+```
 
-First, make sure that you have built the [FEEL Engine](https://github.com/saig0/feel#how-to-build). It is not available on public repository yet.
+## How to build it?
+
+You can build the project with [SBT](http://www.scala-sbt.org) or [Maven](http://maven.apache.org).
+
+### Using SBT
 
 Run the tests with
 ```
@@ -32,4 +56,16 @@ sbt test
 Build the jar including all dependencies with
 ```
 sbt assemply
+```
+
+### Using Maven
+
+Run the tests with
+```
+mvn test
+```
+
+Build the jar including all dependencies with
+```
+mvn install
 ```
