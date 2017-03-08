@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn11.xsd" id="definitions" name="definitions" namespace="http://camunda.org/schema/1.0/dmn">
+  <decision id="decision" name="Programming Languages">
+    <decisionTable id="decisionTable">
+      <input id="input1" label="programming language">
+        <inputExpression id="inputExpression1" typeRef="string">        <text>language</text>
+</inputExpression>
+      </input>
+      <output id="output1" label="" name="" typeRef="string" />
+      <rule id="row-476846033-1">
+        <inputEntry id="UnaryTests_1vs4du1">        <text><![CDATA["java"]]></text>
+</inputEntry>
+        <outputEntry id="LiteralExpression_07ggctx">        <text><![CDATA["not cool but solid and with a large community"]]></text>
+</outputEntry>
+      </rule>
+      <rule id="row-476846033-2">
+        <inputEntry id="UnaryTests_14pd0tf">        <text><![CDATA["scala"]]></text>
+</inputEntry>
+        <outputEntry id="LiteralExpression_0xco4u0">        <text><![CDATA["just cool"]]></text>
+</outputEntry>
+      </rule>
+      <rule id="row-476846033-3">
+        <inputEntry id="UnaryTests_1wg28im">        <text><![CDATA["haskell"]]></text>
+</inputEntry>
+        <outputEntry id="LiteralExpression_0tdr67j">        <text><![CDATA["unusal, complex but somehow interesting"]]></text>
+</outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>
