@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd" xmlns:biodi="http://bpmn.io/schema/dmn/biodi/1.0" id="definitions_0vxrqp6" name="Decision" namespace="http://camunda.org/schema/1.0/dmn">
+  <decision id="validation" name="validation">
+    <extensionElements>
+      <biodi:bounds x="200" y="200" width="180" height="80" />
+    </extensionElements>
+    <variable id="InformationItem_1bt4e1v" name="valid" />
+    <literalExpression id="LiteralExpression_1bhob81" expressionLanguage="feel">    <text><![CDATA[if applicant.maritalStatus in ("M","S") then "valid" else "not valid"]]></text>
+</literalExpression>
+  </decision>
+</definitions>

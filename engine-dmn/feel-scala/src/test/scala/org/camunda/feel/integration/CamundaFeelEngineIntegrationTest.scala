@@ -11,7 +11,7 @@ class CamundaFeelEngineIntegrationTest extends FlatSpec with Matchers {
   
   val camundaFeelEngineFactory = new CamundaFeelEngineFactory  
   
-  "A camunda Feel Engine Factory" should "create a new Feel Engine" in {
+  "A Camunda FEEL Engine Factory" should "create a new FEEL Engine" in {
     
     val camundaFeelEngine = camundaFeelEngineFactory.createInstance()
     
@@ -19,20 +19,22 @@ class CamundaFeelEngineIntegrationTest extends FlatSpec with Matchers {
     camundaFeelEngine.getClass should be (classOf[CamundaFeelEngine])
   }
   
-  "A camunda Feel Engine" should "evaluate a simple unary test" in {
+  "A Camunda FEEL Engine" should "evaluate simple unary tests" in {
     
     val camundaFeelEngine = camundaFeelEngineFactory.createInstance()
-    val context = new SimpleTestContext(Map("input" -> 2))
+    val context = new SimpleTestContext(Map("input" -> 3))
     
-    camundaFeelEngine.evaluateSimpleUnaryTests("< 4", "input", context) should be(true)
+    camundaFeelEngine.evaluateSimpleUnaryTests("< 2", "input", context) should be(false)
+    camundaFeelEngine.evaluateSimpleUnaryTests("[2..5]", "input", context) should be(true)
   }
   
   it should "evaluate a simple expression" in {
     
     val camundaFeelEngine = camundaFeelEngineFactory.createInstance()
-    val context = new SimpleTestContext(Map())
+    val context = new SimpleTestContext(Map("a" -> 2))
     
-    camundaFeelEngine.evaluateSimpleExpression[Int]("2+4", context) should be(6)
+    camundaFeelEngine.evaluateSimpleExpression[Int]("a + 2", context) should be(4)
+    camundaFeelEngine.evaluateSimpleExpression[Int]("a * 4", context) should be(8)
   }
   
 }

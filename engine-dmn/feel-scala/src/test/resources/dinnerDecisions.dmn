@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd" xmlns:camunda="http://camunda.org/schema/1.0/dmn" xmlns:biodi="http://bpmn.io/schema/dmn/biodi/1.0" id="dinnerDecisions" name="Dinner Decisions" namespace="http://camunda.org/schema/1.0/dmn">
+  <decision id="dish" name="Dish">
+    <extensionElements>
+      <biodi:bounds x="200" y="200" width="180" height="80" />
+    </extensionElements>
+    <decisionTable id="decisionTable">
+      <input id="input1" label="Season" camunda:inputVariable="">
+        <inputExpression id="inputExpression1" typeRef="string">        <text>season</text>
+</inputExpression>
+      </input>
+      <input id="InputClause_0rwlbk7" label="How many guests" camunda:inputVariable="">
+        <inputExpression id="LiteralExpression_0h5951a" typeRef="integer">        <text>guestCount</text>
+</inputExpression>
+      </input>
+      <output id="output1" label="Dish" name="desiredDish" typeRef="string" />
+      <rule id="row-129502239-1">
+        <inputEntry id="UnaryTests_0e47zyl">        <text><![CDATA["Fall"]]></text>
+</inputEntry>
+        <inputEntry id="UnaryTests_1132erh">        <text><![CDATA[<= 8]]></text>
+</inputEntry>
+        <outputEntry id="LiteralExpression_0wv4x30">        <text><![CDATA["Spareribs"]]></text>
+</outputEntry>
+      </rule>
+      <rule id="row-129502239-2">
+        <inputEntry id="UnaryTests_0iwabd6">        <text><![CDATA["Winter"]]></text>
+</inputEntry>
+        <inputEntry id="UnaryTests_10qbns7">        <text><![CDATA[<= 8]]></text>
+</inputEntry>
+        <outputEntry id="LiteralExpression_0ysj59c">        <text><![CDATA["Roastbeef"]]></text>
+</outputEntry>
+      </rule>
+      <rule id="row-129502239-3">
+        <inputEntry id="UnaryTests_1nu2fxo">        <text><![CDATA["Spring"]]></text>
+</inputEntry>
+        <inputEntry id="UnaryTests_1b4mcpz">        <text><![CDATA[<= 4]]></text>
+</inputEntry>
+        <outputEntry id="LiteralExpression_1osqv9r">        <text><![CDATA["Dry Aged Gourmet Steak"]]></text>
+</outputEntry>
+      </rule>
+      <rule id="row-129502239-4">
+        <description>Save money</description>
+        <inputEntry id="UnaryTests_0vux2zw">        <text><![CDATA["Spring"]]></text>
+</inputEntry>
+        <inputEntry id="UnaryTests_07v2n3t">        <text>[5..8]</text>
+</inputEntry>
+        <outputEntry id="LiteralExpression_11v4xrs">        <text><![CDATA["Steak"]]></text>
+</outputEntry>
+      </rule>
+      <rule id="row-129502239-5">
+        <description>Less effort</description>
+        <inputEntry id="UnaryTests_0p7gr7e">        <text><![CDATA["Fall","Winter","Spring"]]></text>
+</inputEntry>
+        <inputEntry id="UnaryTests_0zebpmx">        <text><![CDATA[> 8]]></text>
+</inputEntry>
+        <outputEntry id="LiteralExpression_0maai06">        <text><![CDATA["Stew"]]></text>
+</outputEntry>
+      </rule>
+      <rule id="row-129502239-6">
+        <description>Hey, why not?</description>
+        <inputEntry id="UnaryTests_1e1us67">        <text><![CDATA["Summer"]]></text>
+</inputEntry>
+        <inputEntry id="UnaryTests_0q3acue">        <text></text>
+</inputEntry>
+        <outputEntry id="LiteralExpression_0ewtv5x">        <text><![CDATA["Light Salad and nice Steak"]]></text>
+</outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <decision id="beverages" name="Beverages">
+    <extensionElements>
+      <biodi:bounds x="345" y="46" width="180" height="80" />
+      <biodi:edge source="dish">
+        <biodi:waypoints x="328" y="200" />
+        <biodi:waypoints x="397" y="126" />
+      </biodi:edge>
+    </extensionElements>
+    <informationRequirement>
+      <requiredDecision href="#dish" />
+    </informationRequirement>
+    <decisionTable id="DecisionTable_0n1o3g4" hitPolicy="COLLECT">
+      <input id="InputClause_0skwcje" label="Dish" camunda:inputVariable="">
+        <inputExpression id="LiteralExpression_01v6t5t" typeRef="string">        <text>desiredDish</text>
+</inputExpression>
+      </input>
+      <input id="InputClause_1bhd3gv" label="Guests with children" camunda:inputVariable="">
+        <inputExpression id="LiteralExpression_10to6n2" typeRef="boolean">        <text>guestsWithChildren</text>
+</inputExpression>
+      </input>
+      <output id="OutputClause_049b7j0" label="Beverages" name="beverages" typeRef="string" />
+      <rule id="row-404681711-1">
+        <description>Tough Stuff</description>
+        <inputEntry id="UnaryTests_0vdq9pn">        <text><![CDATA["Spareribs"]]></text>
+</inputEntry>
+        <inputEntry id="UnaryTests_0ci2hhb">        <text></text>
+</inputEntry>
+        <outputEntry id="LiteralExpression_0zed443">        <text><![CDATA["Aecht Schlenkerla Rauchbier"]]></text>
+</outputEntry>
+      </rule>
+      <rule id="row-404681711-2">
+        <description></description>
+        <inputEntry id="UnaryTests_0bptjdp">        <text><![CDATA["Stew"]]></text>
+</inputEntry>
+        <inputEntry id="UnaryTests_0u6brtj">        <text></text>
+</inputEntry>
+        <outputEntry id="LiteralExpression_183be6t">        <text><![CDATA["Guiness"]]></text>
+</outputEntry>
+      </rule>
+      <rule id="row-404681711-3">
+        <description></description>
+        <inputEntry id="UnaryTests_0oa7svh">        <text><![CDATA["Roastbeef"]]></text>
+</inputEntry>
+        <inputEntry id="UnaryTests_0wm71cr">        <text></text>
+</inputEntry>
+        <outputEntry id="LiteralExpression_16q3ufb">        <text><![CDATA["Bordeaux"]]></text>
+</outputEntry>
+      </rule>
+      <rule id="row-404681711-4">
+        <description></description>
+        <inputEntry id="UnaryTests_1ab21mx">        <text><![CDATA["Steak","Dry Aged Gourmet Steak","Light Salad and nice Steak"]]></text>
+</inputEntry>
+        <inputEntry id="UnaryTests_1u26czq">        <text></text>
+</inputEntry>
+        <outputEntry id="LiteralExpression_07ihpvs">        <text><![CDATA["Pinot Noir"]]></text>
+</outputEntry>
+      </rule>
+      <rule id="row-404681711-5">
+        <description></description>
+        <inputEntry id="UnaryTests_0ba11qk">        <text></text>
+</inputEntry>
+        <inputEntry id="UnaryTests_0ylmxu9">        <text>true</text>
+</inputEntry>
+        <outputEntry id="LiteralExpression_12m0kr3">        <text><![CDATA["Apple Juice"]]></text>
+</outputEntry>
+      </rule>
+      <rule id="row-404681711-6">
+        <description></description>
+        <inputEntry id="UnaryTests_1lqnfpc">        <text></text>
+</inputEntry>
+        <inputEntry id="UnaryTests_0p29bdu">        <text></text>
+</inputEntry>
+        <outputEntry id="LiteralExpression_12791am">        <text><![CDATA["Water"]]></text>
+</outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>
