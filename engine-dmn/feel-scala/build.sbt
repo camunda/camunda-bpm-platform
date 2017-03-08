@@ -18,3 +18,4 @@ libraryDependencies ++= List(
 	"org.camunda.bpm.dmn" % "camunda-engine-dmn" % "7.7.0-alpha1" % "test"
 )
 
+assemblyJarName in assembly :=  s"${name.value}-${version.value}-complete.jar"
