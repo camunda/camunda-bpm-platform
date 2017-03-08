@@ -1,6 +1,6 @@
 # FEEL Engine Factory
 
-Provide an integration of the FEEL engine for Camunda BPM using the SPI of the [Camunda DMN engine](https://github.com/camunda/camunda-engine-dmn). 
+Provide an integration of the FEEL engine for Camunda BPM using the SPI of the [Camunda DMN engine](https://github.com/camunda/camunda-engine-dmn). It can be used for the standalone or the embedded DMN engine.
 
 ## How to use it?
 
@@ -10,13 +10,13 @@ Add the factory including the FEEL engine to your project by copying the jar fil
 <dependency>
   <groupId>org.camunda.bpm.extension.feel.scala</groupId>
   <artifactId>feel-engine-factory</artifactId>
-  <version>1.0.0</version>
+  <version>${VERSION}</version>
 </dependency>
 ```
 
 Then, replace the default FEEL engine factory in your DMN engine configuration.
 
-### DMN Engine Configuration
+### Using the DMN Engine Configuration
 
 ```java
 DefaultDmnEngineConfiguration dmnEngineConfig = (DefaultDmnEngineConfiguration) DmnEngineConfiguration.createDefaultDmnEngineConfiguration(); 
@@ -25,7 +25,7 @@ dmnEngineConfig.setFeelEngineFactory(new CamundaFeelEngineFactory());
 DmnEngine engine = dmnEngineConfig.buildEngine();
 ```
 
-### Process Engine Spring XML Configuration
+### Using the Process Engine Spring XML Configuration
 
 ```xml
 <bean id="processEngineConfiguration" class="org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration">
