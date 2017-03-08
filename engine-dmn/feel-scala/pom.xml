@@ -8,7 +8,7 @@
     <version>1.0.0-SNAPSHOT</version>
   </parent>
   
-  <artifactId>camunda-feel-engine-factory</artifactId>
+  <artifactId>feel-engine-factory</artifactId>
   
   <name>FEEL Scala Engine Factory</name>
   
