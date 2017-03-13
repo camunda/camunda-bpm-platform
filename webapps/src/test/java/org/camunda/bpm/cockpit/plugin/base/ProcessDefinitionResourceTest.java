@@ -485,12 +485,12 @@ public class ProcessDefinitionResourceTest extends AbstractCockpitPluginTest {
     // given
     Map<String, Object> vars1 = new HashMap<String, Object>();
     vars1.put("callProcess", "userTaskProcess");
-    vars1.put("aVariableName", "test123");
+    vars1.put("aVariableName", "test_123");
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("DynamicCallActivity", vars1);
 
     Map<String, Object> vars2 = new HashMap<String, Object>();
     vars2.put("callProcess", "anotherUserTaskProcess");
-    vars1.put("aVariableName", "test456");
+    vars1.put("aVariableName", "test_456");
     runtimeService.startProcessInstanceByKey("DynamicCallActivity", vars2);
 
     resource = new ProcessDefinitionResource(getProcessEngine().getName(), processInstance.getProcessDefinitionId());
@@ -501,7 +501,7 @@ public class ProcessDefinitionResourceTest extends AbstractCockpitPluginTest {
         .singleResult();
 
     // when
-    VariableQueryParameterDto variable = createVariableParameter("aVariableName", EQUALS_OPERATOR_NAME, "test123");
+    VariableQueryParameterDto variable = createVariableParameter("aVariableName", LIKE_OPERATOR_NAME, "test\\_1%");
 
     ProcessDefinitionQueryDto queryParameter = new ProcessDefinitionQueryDto();
     queryParameter.setVariables(Arrays.asList(variable));

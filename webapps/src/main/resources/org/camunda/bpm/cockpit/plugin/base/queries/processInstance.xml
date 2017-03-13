@@ -79,6 +79,7 @@
   </select>
 
   <sql id="selectProcessInstances">
+    <bind name="escapeChar" value="'\\'"/>
     from
       ${prefix}ACT_RU_EXECUTION RES
 
@@ -189,6 +190,7 @@
                 <otherwise><include refid="executionVariableOperator" /></otherwise>
               </choose>
                 #{valueCondition.textValue}
+                <if test="queryVariableValue.operatorName.equals('LIKE')">ESCAPE #{escapeChar}</if>
               </if>
               <if test="valueCondition.textValue2 != null">
                 and TEXT2_
@@ -197,6 +199,7 @@
                 <otherwise><include refid="executionVariableOperator" /></otherwise>
               </choose>
                 #{valueCondition.textValue2}
+                <if test="queryVariableValue.operatorName.equals('LIKE')">ESCAPE #{escapeChar}</if>
               </if>
 
               <if test="valueCondition.longValue != null">
