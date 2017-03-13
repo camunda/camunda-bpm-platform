@@ -134,6 +134,7 @@
   </select>
 
   <sql id="selectFilterByQueryCriteriaSql">
+    <bind name="escapeChar" value="'\\'"/>
     from ${prefix}ACT_RU_FILTER RES
     
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoin" /> 
@@ -149,7 +150,7 @@
         and RES.NAME_ = #{name}
       </if>
       <if test="nameLike != null">
-        and RES.NAME_ like #{nameLike}
+        and RES.NAME_ like #{nameLike} ESCAPE #{escapeChar}
       </if>
       <if test="owner != null">
         and RES.OWNER_ = #{owner}

@@ -10,13 +10,13 @@
     
     <sequenceFlow id="flow1" sourceRef="start" targetRef="task" />
 
-    <userTask id="task" name="Clean up">
+    <userTask id="task" name="Clean_up">
       <documentation>
-        Historic task description
+        Historic task_description
       </documentation>
       <humanPerformer>
         <resourceAssignmentExpression>
-          <formalExpression>kermit</formalExpression>
+          <formalExpression>ker_mit</formalExpression>
         </resourceAssignmentExpression>
       </humanPerformer>
     </userTask>

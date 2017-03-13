@@ -1245,7 +1245,7 @@ public class ExecutionQueryTest extends PluggableProcessEngineTestCase {
 
     List<Execution> executionList = runtimeService
         .createExecutionQuery()
-        .incidentMessageLike("%exception%").list();
+        .incidentMessageLike("%\\_exception%").list();
 
     assertEquals(1, executionList.size());
   }

@@ -125,6 +125,7 @@
   </select>
 
   <sql id="selectHistoricCaseInstancesByQueryCriteriaSql">
+    <bind name="escapeChar" value="'\\'"/>
     from (
 
       SELECT RES.*, DEF.NAME_, DEF.KEY_
@@ -157,13 +158,13 @@
           and DEF.NAME_ = #{caseDefinitionName}
         </if>
         <if test="caseDefinitionNameLike != null">
-          and DEF.NAME_ like #{caseDefinitionNameLike}
+          and DEF.NAME_ like #{caseDefinitionNameLike} ESCAPE #{escapeChar}
         </if>
         <if test="businessKey != null">
           and RES.BUSINESS_KEY_ = #{businessKey}
         </if>
         <if test="businessKeyLike != null">
-          and RES.BUSINESS_KEY_ like #{businessKeyLike}
+          and RES.BUSINESS_KEY_ like #{businessKeyLike} ESCAPE #{escapeChar}
         </if>
 
         <if test="createdBefore != null">
@@ -180,7 +181,7 @@
         </if>
         <if test="caseKeyNotIn != null">
           <foreach collection="caseKeyNotIn" index="index" item="caseDefKey">
-          and DEF.KEY_ not like #{caseDefKey}
+          and DEF.KEY_ not like #{caseDefKey} ESCAPE #{escapeChar}
         </foreach>
         </if>
 

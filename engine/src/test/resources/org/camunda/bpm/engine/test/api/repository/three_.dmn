@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd"
+             id="definitions-two"
+             name="camunda"
+             namespace="xyz_">
+  <decision id="xyz_" name="Xyz_">
+    <decisionTable id="decisionTable">
+      <input id="clause1" label="Input">
+        <inputExpression id="inputExpression1" typeRef="string">
+          <text>status</text>
+        </inputExpression>
+        <inputValues>
+          <text>"a","b"</text>
+        </inputValues>
+      </input>
+      <output id="clause2" label="Output" name="result" typeRef="string">
+        <outputValues>
+          <text>"ok","notok"</text>
+        </outputValues>
+      </output>
+      <rule id="rule1">
+        <inputEntry id="inputEntry1">
+          <text>"a"</text>
+        </inputEntry>
+        <outputEntry id="outputEntry1">
+          <text>"notok"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule2">
+        <inputEntry id="inputEntry2">
+          <text>"b"</text>
+        </inputEntry>
+        <outputEntry id="outputEntry2">
+          <text>"ok"</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>

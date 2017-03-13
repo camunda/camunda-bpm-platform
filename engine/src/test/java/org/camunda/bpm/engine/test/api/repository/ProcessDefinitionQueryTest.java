@@ -28,12 +28,30 @@ import java.util.List;
  */
 public class ProcessDefinitionQueryTest extends AbstractDefinitionQueryTest {
 
+  private String deploymentThreeId;
+
   protected String getResourceOnePath() {
     return "org/camunda/bpm/engine/test/repository/one.bpmn20.xml";
   }
 
   protected String getResourceTwoPath() {
     return "org/camunda/bpm/engine/test/repository/two.bpmn20.xml";
+  }
+
+  protected String getResourceThreePath() {
+    return "org/camunda/bpm/engine/test/repository/three_.bpmn20.xml";
+  }
+
+  @Override
+  protected void setUp() throws Exception {
+    deploymentThreeId = repositoryService.createDeployment().name("thirdDeployment").addClasspathResource(getResourceThreePath()).deploy().getId();
+    super.setUp();
+  }
+
+  @Override
+  protected void tearDown() throws Exception {
+    super.tearDown();
+    repositoryService.deleteDeployment(deploymentThreeId, true);
   }
 
   public void testProcessDefinitionProperties() {
@@ -106,6 +124,8 @@ public class ProcessDefinitionQueryTest extends AbstractDefinitionQueryTest {
   public void testQueryByNameLike() {
     ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery().processDefinitionNameLike("%w%");
     verifyQueryResults(query, 1);
+    query = query.processDefinitionNameLike("%z\\_%");
+    verifyQueryResults(query, 1);
   }
 
   public void testQueryByInvalidNameLike() {
@@ -138,6 +158,8 @@ public class ProcessDefinitionQueryTest extends AbstractDefinitionQueryTest {
   public void testQueryByKeyLike() {
     ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery().processDefinitionKeyLike("%o%");
     verifyQueryResults(query, 3);
+    query = query.processDefinitionKeyLike("%z\\_%");
+    verifyQueryResults(query, 1);
   }
 
   public void testQueryByInvalidKeyLike() {
@@ -146,6 +168,23 @@ public class ProcessDefinitionQueryTest extends AbstractDefinitionQueryTest {
 
     try {
       repositoryService.createProcessDefinitionQuery().processDefinitionKeyLike(null);
+      fail();
+    } catch (ProcessEngineException e) {
+      // Expected Exception
+    }
+  }
+
+  public void testQueryByResourceNameLike() {
+    ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery().processDefinitionResourceNameLike("%ee\\_%");
+    verifyQueryResults(query, 1);
+  }
+
+  public void testQueryByInvalidResourceNameLike() {
+    ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery().processDefinitionResourceNameLike("%invalid%");
+    verifyQueryResults(query, 0);
+
+    try {
+      repositoryService.createProcessDefinitionQuery().processDefinitionResourceNameLike(null);
       fail();
     } catch (ProcessEngineException e) {
       // Expected Exception
@@ -163,6 +202,9 @@ public class ProcessDefinitionQueryTest extends AbstractDefinitionQueryTest {
 
     query = repositoryService.createProcessDefinitionQuery().processDefinitionCategoryLike("%amples2");
     verifyQueryResults(query, 1);
+
+    query = repositoryService.createProcessDefinitionQuery().processDefinitionCategoryLike("%z\\_%");
+    verifyQueryResults(query, 1);
   }
 
   public void testQueryByVersion() {
@@ -170,7 +212,7 @@ public class ProcessDefinitionQueryTest extends AbstractDefinitionQueryTest {
     verifyQueryResults(query, 1);
 
     query = repositoryService.createProcessDefinitionQuery().processDefinitionVersion(1);
-    verifyQueryResults(query, 2);
+    verifyQueryResults(query, 3);
   }
 
   public void testQueryByInvalidVersion() {
@@ -205,7 +247,7 @@ public class ProcessDefinitionQueryTest extends AbstractDefinitionQueryTest {
 
   public void testQueryByLatest() {
     ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery().latestVersion();
-    verifyQueryResults(query, 2);
+    verifyQueryResults(query, 3);
 
     query = repositoryService.createProcessDefinitionQuery().processDefinitionKey("one").latestVersion();
     verifyQueryResults(query, 1);
@@ -242,35 +284,35 @@ public class ProcessDefinitionQueryTest extends AbstractDefinitionQueryTest {
     // asc
 
     ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery().orderByProcessDefinitionId().asc();
-    verifyQueryResults(query, 3);
+    verifyQueryResults(query, 4);
 
     query = repositoryService.createProcessDefinitionQuery().orderByDeploymentId().asc();
-    verifyQueryResults(query, 3);
+    verifyQueryResults(query, 4);
 
     query = repositoryService.createProcessDefinitionQuery().orderByProcessDefinitionKey().asc();
-    verifyQueryResults(query, 3);
+    verifyQueryResults(query, 4);
 
     query = repositoryService.createProcessDefinitionQuery().orderByProcessDefinitionVersion().asc();
-    verifyQueryResults(query, 3);
+    verifyQueryResults(query, 4);
 
     // desc
 
     query = repositoryService.createProcessDefinitionQuery().orderByProcessDefinitionId().desc();
-    verifyQueryResults(query, 3);
+    verifyQueryResults(query, 4);
 
     query = repositoryService.createProcessDefinitionQuery().orderByDeploymentId().desc();
-    verifyQueryResults(query, 3);
+    verifyQueryResults(query, 4);
 
     query = repositoryService.createProcessDefinitionQuery().orderByProcessDefinitionKey().desc();
-    verifyQueryResults(query, 3);
+    verifyQueryResults(query, 4);
 
     query = repositoryService.createProcessDefinitionQuery().orderByProcessDefinitionVersion().desc();
-    verifyQueryResults(query, 3);
+    verifyQueryResults(query, 4);
 
     // Typical use case
     query = repositoryService.createProcessDefinitionQuery().orderByProcessDefinitionKey().asc().orderByProcessDefinitionVersion().desc();
     List<ProcessDefinition> processDefinitions = query.list();
-    assertEquals(3, processDefinitions.size());
+    assertEquals(4, processDefinitions.size());
 
     assertEquals("one", processDefinitions.get(0).getKey());
     assertEquals(2, processDefinitions.get(0).getVersion());
@@ -422,6 +464,12 @@ public class ProcessDefinitionQueryTest extends AbstractDefinitionQueryTest {
     ProcessDefinitionQuery query = repositoryService
         .createProcessDefinitionQuery()
         .incidentMessageLike("%expected%");
+
+    verifyQueryResults(query, 1);
+
+    query = repositoryService
+        .createProcessDefinitionQuery()
+        .incidentMessageLike("%\\_expected%");
 
     verifyQueryResults(query, 1);
   }
@@ -603,14 +651,14 @@ public class ProcessDefinitionQueryTest extends AbstractDefinitionQueryTest {
   @org.camunda.bpm.engine.test.Deployment(resources={"org/camunda/bpm/engine/test/api/repository/failingProcessCreateOneIncident.bpmn20.xml"})
   public void testQueryByVersionTag() {
     assertEquals(1, repositoryService.createProcessDefinitionQuery()
-      .versionTag("ver-tag-2")
+      .versionTag("ver_tag_2")
       .count());
   }
 
   @org.camunda.bpm.engine.test.Deployment(resources={"org/camunda/bpm/engine/test/api/repository/failingProcessCreateOneIncident.bpmn20.xml"})
   public void testQueryByVersionTagLike() {
     assertEquals(1, repositoryService.createProcessDefinitionQuery()
-      .versionTagLike("ver-tag-%")
+      .versionTagLike("ver\\_tag\\_%")
       .count());
   }
 
@@ -620,12 +668,12 @@ public class ProcessDefinitionQueryTest extends AbstractDefinitionQueryTest {
   })
   public void testQueryOrderByVersionTag() {
     List<ProcessDefinition> processDefinitionList = repositoryService.createProcessDefinitionQuery()
-      .versionTagLike("ver-tag-%")
+      .versionTagLike("ver%tag%")
       .orderByVersionTag()
       .asc()
       .list();
 
-    assertEquals("ver-tag-2", processDefinitionList.get(1).getVersionTag());
+    assertEquals("ver_tag_2", processDefinitionList.get(1).getVersionTag());
   }
 
 

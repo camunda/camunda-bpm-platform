@@ -140,19 +140,19 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
     assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskId("unexistingtaskid").count());
 
     // Name
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskName("Clean up").count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskName("Clean_up").count());
     assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskName("unexistingname").count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskNameLike("Clean u%").count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskNameLike("%lean up").count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskNameLike("%lean u%").count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskNameLike("Clean\\_u%").count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskNameLike("%lean\\_up").count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskNameLike("%lean\\_u%").count());
     assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskNameLike("%unexistingname%").count());
 
 
     // Description
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskDescription("Historic task description").count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskDescription("Historic task_description").count());
     assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskDescription("unexistingdescription").count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskDescriptionLike("%task description").count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskDescriptionLike("Historic task %").count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskDescriptionLike("%task\\_description").count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskDescriptionLike("Historic task%").count());
     assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskDescriptionLike("%task%").count());
     assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskDescriptionLike("%unexistingdescripton%").count());
 
@@ -178,11 +178,11 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
 
 
     // Assignee
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskAssignee("kermit").count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskAssignee("ker_mit").count());
     assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskAssignee("johndoe").count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskAssigneeLike("%ermit").count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskAssigneeLike("kermi%").count());
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskAssigneeLike("%ermi%").count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskAssigneeLike("%er\\_mit").count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskAssigneeLike("ker\\_mi%").count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskAssigneeLike("%er\\_mi%").count());
     assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskAssigneeLike("%johndoe%").count());
 
     // Delete reason

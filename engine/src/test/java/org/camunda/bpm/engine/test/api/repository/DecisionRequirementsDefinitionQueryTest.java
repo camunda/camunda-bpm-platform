@@ -34,6 +34,7 @@ public class DecisionRequirementsDefinitionQueryTest {
 
   protected static final String DRD_SCORE_RESOURCE = "org/camunda/bpm/engine/test/dmn/deployment/drdScore.dmn11.xml";
   protected static final String DRD_DISH_RESOURCE = "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml";
+  protected static final String DRD_XYZ_RESOURCE = "org/camunda/bpm/engine/test/api/repository/drdXyz_.dmn11.xml";
 
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
@@ -46,6 +47,7 @@ public class DecisionRequirementsDefinitionQueryTest {
   protected String decisionRequirementsDefinitionId;
   protected String firstDeploymentId;
   protected String secondDeploymentId;
+  protected String thirdDeploymentId;
 
   @Before
   public void init() {
@@ -53,6 +55,7 @@ public class DecisionRequirementsDefinitionQueryTest {
 
     firstDeploymentId = testRule.deploy(DRD_DISH_RESOURCE, DRD_SCORE_RESOURCE).getId();
     secondDeploymentId = testRule.deploy(DRD_DISH_RESOURCE).getId();
+    thirdDeploymentId = testRule.deploy(DRD_XYZ_RESOURCE).getId();
 
     decisionRequirementsDefinitionId = repositoryService
         .createDecisionRequirementsDefinitionQuery()
@@ -139,6 +142,8 @@ public class DecisionRequirementsDefinitionQueryTest {
     assertThat(query.decisionRequirementsDefinitionCategoryLike("%notExisting%").count(), is(0L));
 
     assertThat(query.decisionRequirementsDefinitionCategoryLike("%test%").count(), is(3L));
+
+    assertThat(query.decisionRequirementsDefinitionCategoryLike("%z\\_").count(), is(1L));
   }
 
   @Test
@@ -157,14 +162,21 @@ public class DecisionRequirementsDefinitionQueryTest {
 
     assertThat(query.decisionRequirementsDefinitionResourceNameLike("%notExisting%").count(), is(0L));
 
-    assertThat(query.decisionRequirementsDefinitionResourceNameLike("%.dmn11.xml%").count(), is(3L));
+    assertThat(query.decisionRequirementsDefinitionResourceNameLike("%.dmn11.xml%").count(), is(4L));
+  }
+
+  @Test
+  public void queryByResourceNameLikeEscape() {
+    DecisionRequirementsDefinitionQuery query = repositoryService.createDecisionRequirementsDefinitionQuery();
+
+    assertThat(query.decisionRequirementsDefinitionResourceNameLike("%z\\_.%").count(), is(1L));
   }
 
   @Test
   public void queryByVersion() {
     DecisionRequirementsDefinitionQuery query = repositoryService.createDecisionRequirementsDefinitionQuery();
 
-    assertThat(query.decisionRequirementsDefinitionVersion(1).count(), is(2L));
+    assertThat(query.decisionRequirementsDefinitionVersion(1).count(), is(3L));
     assertThat(query.decisionRequirementsDefinitionVersion(2).count(), is(1L));
     assertThat(query.decisionRequirementsDefinitionVersion(3).count(), is(0L));
   }
@@ -173,7 +185,7 @@ public class DecisionRequirementsDefinitionQueryTest {
   public void queryByLatest() {
     DecisionRequirementsDefinitionQuery query = repositoryService.createDecisionRequirementsDefinitionQuery();
 
-    assertThat(query.latestVersion().count(), is(2L));
+    assertThat(query.latestVersion().count(), is(3L));
     assertThat(query.decisionRequirementsDefinitionKey("score").latestVersion().count(), is(1L));
   }
 
@@ -192,17 +204,19 @@ public class DecisionRequirementsDefinitionQueryTest {
     List<DecisionRequirementsDefinition> decisionRequirementsDefinitions = repositoryService.createDecisionRequirementsDefinitionQuery()
         .orderByDecisionRequirementsDefinitionId().asc().list();
 
-    assertThat(decisionRequirementsDefinitions.size(), is(3));
+    assertThat(decisionRequirementsDefinitions.size(), is(4));
     assertThat(decisionRequirementsDefinitions.get(0).getId(), startsWith("dish:1"));
     assertThat(decisionRequirementsDefinitions.get(1).getId(), startsWith("dish:2"));
     assertThat(decisionRequirementsDefinitions.get(2).getId(), startsWith("score:1"));
+    assertThat(decisionRequirementsDefinitions.get(3).getId(), startsWith("xyz:1"));
 
     decisionRequirementsDefinitions = repositoryService.createDecisionRequirementsDefinitionQuery()
         .orderByDecisionRequirementsDefinitionId().desc().list();
 
-    assertThat(decisionRequirementsDefinitions.get(0).getId(), startsWith("score:1"));
-    assertThat(decisionRequirementsDefinitions.get(1).getId(), startsWith("dish:2"));
-    assertThat(decisionRequirementsDefinitions.get(2).getId(), startsWith("dish:1"));
+    assertThat(decisionRequirementsDefinitions.get(0).getId(), startsWith("xyz:1"));
+    assertThat(decisionRequirementsDefinitions.get(1).getId(), startsWith("score:1"));
+    assertThat(decisionRequirementsDefinitions.get(2).getId(), startsWith("dish:2"));
+    assertThat(decisionRequirementsDefinitions.get(3).getId(), startsWith("dish:1"));
   }
 
   @Test
@@ -210,17 +224,19 @@ public class DecisionRequirementsDefinitionQueryTest {
     List<DecisionRequirementsDefinition> decisionRequirementsDefinitions = repositoryService.createDecisionRequirementsDefinitionQuery()
         .orderByDecisionRequirementsDefinitionKey().asc().list();
 
-    assertThat(decisionRequirementsDefinitions.size(), is(3));
+    assertThat(decisionRequirementsDefinitions.size(), is(4));
     assertThat(decisionRequirementsDefinitions.get(0).getKey(), is("dish"));
     assertThat(decisionRequirementsDefinitions.get(1).getKey(), is("dish"));
     assertThat(decisionRequirementsDefinitions.get(2).getKey(), is("score"));
+    assertThat(decisionRequirementsDefinitions.get(3).getKey(), is("xyz"));
 
     decisionRequirementsDefinitions = repositoryService.createDecisionRequirementsDefinitionQuery()
         .orderByDecisionRequirementsDefinitionKey().desc().list();
 
-    assertThat(decisionRequirementsDefinitions.get(0).getKey(), is("score"));
-    assertThat(decisionRequirementsDefinitions.get(1).getKey(), is("dish"));
+    assertThat(decisionRequirementsDefinitions.get(0).getKey(), is("xyz"));
+    assertThat(decisionRequirementsDefinitions.get(1).getKey(), is("score"));
     assertThat(decisionRequirementsDefinitions.get(2).getKey(), is("dish"));
+    assertThat(decisionRequirementsDefinitions.get(3).getKey(), is("dish"));
   }
 
   @Test
@@ -228,17 +244,19 @@ public class DecisionRequirementsDefinitionQueryTest {
     List<DecisionRequirementsDefinition> decisionRequirementsDefinitions = repositoryService.createDecisionRequirementsDefinitionQuery()
         .orderByDecisionRequirementsDefinitionName().asc().list();
 
-    assertThat(decisionRequirementsDefinitions.size(), is(3));
+    assertThat(decisionRequirementsDefinitions.size(), is(4));
     assertThat(decisionRequirementsDefinitions.get(0).getName(), is("Dish"));
     assertThat(decisionRequirementsDefinitions.get(1).getName(), is("Dish"));
     assertThat(decisionRequirementsDefinitions.get(2).getName(), is("Score"));
+    assertThat(decisionRequirementsDefinitions.get(3).getName(), is("Xyz"));
 
     decisionRequirementsDefinitions = repositoryService.createDecisionRequirementsDefinitionQuery()
         .orderByDecisionRequirementsDefinitionName().desc().list();
 
-    assertThat(decisionRequirementsDefinitions.get(0).getName(), is("Score"));
-    assertThat(decisionRequirementsDefinitions.get(1).getName(), is("Dish"));
+    assertThat(decisionRequirementsDefinitions.get(0).getName(), is("Xyz"));
+    assertThat(decisionRequirementsDefinitions.get(1).getName(), is("Score"));
     assertThat(decisionRequirementsDefinitions.get(2).getName(), is("Dish"));
+    assertThat(decisionRequirementsDefinitions.get(3).getName(), is("Dish"));
   }
 
   @Test
@@ -246,17 +264,19 @@ public class DecisionRequirementsDefinitionQueryTest {
     List<DecisionRequirementsDefinition> decisionRequirementsDefinitions = repositoryService.createDecisionRequirementsDefinitionQuery()
         .orderByDecisionRequirementsDefinitionCategory().asc().list();
 
-    assertThat(decisionRequirementsDefinitions.size(), is(3));
+    assertThat(decisionRequirementsDefinitions.size(), is(4));
     assertThat(decisionRequirementsDefinitions.get(0).getCategory(), is("test-drd-1"));
     assertThat(decisionRequirementsDefinitions.get(1).getCategory(), is("test-drd-2"));
     assertThat(decisionRequirementsDefinitions.get(2).getCategory(), is("test-drd-2"));
+    assertThat(decisionRequirementsDefinitions.get(3).getCategory(), is("xyz_"));
 
     decisionRequirementsDefinitions = repositoryService.createDecisionRequirementsDefinitionQuery()
         .orderByDecisionRequirementsDefinitionCategory().desc().list();
 
-    assertThat(decisionRequirementsDefinitions.get(0).getCategory(), is("test-drd-2"));
+    assertThat(decisionRequirementsDefinitions.get(0).getCategory(), is("xyz_"));
     assertThat(decisionRequirementsDefinitions.get(1).getCategory(), is("test-drd-2"));
-    assertThat(decisionRequirementsDefinitions.get(2).getCategory(), is("test-drd-1"));
+    assertThat(decisionRequirementsDefinitions.get(2).getCategory(), is("test-drd-2"));
+    assertThat(decisionRequirementsDefinitions.get(3).getCategory(), is("test-drd-1"));
   }
 
   @Test
@@ -264,10 +284,11 @@ public class DecisionRequirementsDefinitionQueryTest {
     List<DecisionRequirementsDefinition> decisionRequirementsDefinitions = repositoryService.createDecisionRequirementsDefinitionQuery()
         .orderByDecisionRequirementsDefinitionVersion().asc().list();
 
-    assertThat(decisionRequirementsDefinitions.size(), is(3));
+    assertThat(decisionRequirementsDefinitions.size(), is(4));
     assertThat(decisionRequirementsDefinitions.get(0).getVersion(), is(1));
     assertThat(decisionRequirementsDefinitions.get(1).getVersion(), is(1));
-    assertThat(decisionRequirementsDefinitions.get(2).getVersion(), is(2));
+    assertThat(decisionRequirementsDefinitions.get(2).getVersion(), is(1));
+    assertThat(decisionRequirementsDefinitions.get(3).getVersion(), is(2));
 
     decisionRequirementsDefinitions = repositoryService.createDecisionRequirementsDefinitionQuery()
         .orderByDecisionRequirementsDefinitionVersion().desc().list();
@@ -282,17 +303,19 @@ public class DecisionRequirementsDefinitionQueryTest {
     List<DecisionRequirementsDefinition> decisionRequirementsDefinitions = repositoryService.createDecisionRequirementsDefinitionQuery()
         .orderByDeploymentId().asc().list();
 
-    assertThat(decisionRequirementsDefinitions.size(), is(3));
+    assertThat(decisionRequirementsDefinitions.size(), is(4));
     assertThat(decisionRequirementsDefinitions.get(0).getDeploymentId(), is(firstDeploymentId));
     assertThat(decisionRequirementsDefinitions.get(1).getDeploymentId(), is(firstDeploymentId));
     assertThat(decisionRequirementsDefinitions.get(2).getDeploymentId(), is(secondDeploymentId));
+    assertThat(decisionRequirementsDefinitions.get(3).getDeploymentId(), is(thirdDeploymentId));
 
     decisionRequirementsDefinitions = repositoryService.createDecisionRequirementsDefinitionQuery()
         .orderByDeploymentId().desc().list();
 
-    assertThat(decisionRequirementsDefinitions.get(0).getDeploymentId(), is(secondDeploymentId));
-    assertThat(decisionRequirementsDefinitions.get(1).getDeploymentId(), is(firstDeploymentId));
+    assertThat(decisionRequirementsDefinitions.get(0).getDeploymentId(), is(thirdDeploymentId));
+    assertThat(decisionRequirementsDefinitions.get(1).getDeploymentId(), is(secondDeploymentId));
     assertThat(decisionRequirementsDefinitions.get(2).getDeploymentId(), is(firstDeploymentId));
+    assertThat(decisionRequirementsDefinitions.get(3).getDeploymentId(), is(firstDeploymentId));
   }
 
 }

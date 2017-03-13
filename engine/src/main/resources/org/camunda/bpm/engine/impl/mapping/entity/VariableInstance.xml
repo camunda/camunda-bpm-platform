@@ -256,6 +256,7 @@
   </sql>
 
   <sql id="selectVariableInstanceByQueryCriteriaSql">
+    <bind name="escapeChar" value="'\\'"/>
     from (
           select
             RES.*,
@@ -309,7 +310,7 @@
 
             <!-- variableNameLike -->
             <if test="variableNameLike != null">
-              and RES.NAME_ like #{variableNameLike}
+              and RES.NAME_ like #{variableNameLike} ESCAPE #{escapeChar}
             </if>
 
             <!-- executionIds -->

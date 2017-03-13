@@ -20,7 +20,7 @@
       <bpmn:incoming>SequenceFlow_0o3gkqj</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0faew6n</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:serviceTask id="ServiceTask_2" camunda:asyncBefore="true" camunda:expression="${incidentTrigger2}">
+    <bpmn:serviceTask id="ServiceTask_2" camunda:asyncBefore="true" camunda:expression="${incident_Trigger2}">
       <bpmn:extensionElements>
         <camunda:failedJobRetryTimeCycle>R1/PT1M</camunda:failedJobRetryTimeCycle>
       </bpmn:extensionElements>

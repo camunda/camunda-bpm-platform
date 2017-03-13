@@ -126,7 +126,7 @@ public class IncidentQueryTest {
 
   @Test
   public void testQueryByIncidentMessage() {
-    IncidentQuery query = runtimeService.createIncidentQuery().incidentMessage("Expected exception.");
+    IncidentQuery query = runtimeService.createIncidentQuery().incidentMessage("Expected_exception.");
     assertEquals(4, query.count());
 
     List<Incident> incidents = query.list();

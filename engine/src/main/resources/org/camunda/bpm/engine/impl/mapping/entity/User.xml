@@ -73,6 +73,7 @@
   </select>
   
   <sql id="selectUserByQueryCriteriaSql">
+    <bind name="escapeChar" value="'\\'"/>
     from ${prefix}ACT_ID_USER RES 
     <if test="groupId != null">
       inner join ${prefix}ACT_ID_MEMBERSHIP M on RES.ID_ = M.USER_ID_
@@ -99,19 +100,19 @@
         and RES.FIRST_ = #{firstName}
       </if>
       <if test="firstNameLike != null">
-        and RES.FIRST_ like #{firstNameLike}
+        and RES.FIRST_ like #{firstNameLike} ESCAPE #{escapeChar}
       </if>
       <if test="lastName != null">
         and RES.LAST_ = #{lastName}
       </if>
       <if test="lastNameLike != null">
-        and RES.LAST_ like #{lastNameLike}
+        and RES.LAST_ like #{lastNameLike} ESCAPE #{escapeChar}
       </if>
       <if test="email != null">
         and RES.EMAIL_ = #{email}
       </if>
       <if test="emailLike != null">
-        and RES.EMAIL_ like #{emailLike}
+        and RES.EMAIL_ like #{emailLike} ESCAPE #{escapeChar}
       </if>
       <if test="groupId != null">
         and G.ID_ = #{groupId}

@@ -29,7 +29,7 @@ public class VersionTagTest extends PluggableProcessEngineTestCase {
       .asc()
       .singleResult();
 
-    assertEquals("ver-tag-1", process.getVersionTag());
+    assertEquals("ver_tag_1", process.getVersionTag());
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/repository/processOne.bpmn20.xml"})

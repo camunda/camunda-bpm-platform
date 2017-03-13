@@ -46,7 +46,7 @@ public class DeploymentQueryTest extends PluggableProcessEngineTestCase {
 
     deploymentTwoId = repositoryService
       .createDeployment()
-      .name("org/camunda/bpm/engine/test/repository/two.bpmn20.xml")
+      .name("org/camunda/bpm/engine/test/repository/two_.bpmn20.xml")
       .addClasspathResource("org/camunda/bpm/engine/test/repository/two.bpmn20.xml")
       .deploy()
       .getId();
@@ -92,7 +92,7 @@ public class DeploymentQueryTest extends PluggableProcessEngineTestCase {
   }
 
   public void testQueryByName() {
-    DeploymentQuery query = repositoryService.createDeploymentQuery().deploymentName("org/camunda/bpm/engine/test/repository/two.bpmn20.xml");
+    DeploymentQuery query = repositoryService.createDeploymentQuery().deploymentName("org/camunda/bpm/engine/test/repository/two_.bpmn20.xml");
     assertNotNull(query.singleResult());
     assertEquals(1, query.list().size());
     assertEquals(1, query.count());
@@ -115,10 +115,10 @@ public class DeploymentQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(2, query.list().size());
     assertEquals(2, query.count());
 
-    query = repositoryService.createDeploymentQuery().deploymentNameLike("%one%");
+    query = repositoryService.createDeploymentQuery().deploymentNameLike("%two\\_%");
     assertEquals(1, query.list().size());
     assertEquals(1, query.count());
-    assertEquals("org/camunda/bpm/engine/test/repository/one.bpmn20.xml", query.singleResult().getName());
+    assertEquals("org/camunda/bpm/engine/test/repository/two_.bpmn20.xml", query.singleResult().getName());
   }
 
   public void testQueryByInvalidNameLike() {
@@ -241,7 +241,7 @@ public class DeploymentQueryTest extends PluggableProcessEngineTestCase {
     assertNull(deploymentOne.getTenantId());
 
     Deployment deploymentTwo = deployments.get(1);
-    assertEquals("org/camunda/bpm/engine/test/repository/two.bpmn20.xml", deploymentTwo.getName());
+    assertEquals("org/camunda/bpm/engine/test/repository/two_.bpmn20.xml", deploymentTwo.getName());
     assertEquals(deploymentTwoId, deploymentTwo.getId());
     assertNull(deploymentTwo.getSource());
     assertNull(deploymentTwo.getTenantId());

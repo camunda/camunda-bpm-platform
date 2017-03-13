@@ -167,11 +167,11 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
   public void testQueryByVariableNameLike() {
     // given
     Map<String, Object> variables = new HashMap<String, Object>();
-    variables.put("stringVar", "test");
+    variables.put("string%Var", "test");
     runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
 
     // when
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableNameLike("%ingV%");
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableNameLike("%ing\\%V%");
 
     // then
     List<VariableInstance> result = query.list();
@@ -181,7 +181,7 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(1, query.count());
 
     VariableInstance var = result.get(0);
-    assertEquals("stringVar", var.getName());
+    assertEquals("string%Var", var.getName());
     assertEquals("test", var.getValue());
     assertEquals("string", var.getTypeName());
   }

@@ -191,11 +191,13 @@ public class HistoricCaseInstanceTest extends CmmnProcessEngineTestCase {
 
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn",
-    "org/camunda/bpm/engine/test/api/cmmn/twoTaskCase.cmmn"
+    "org/camunda/bpm/engine/test/api/cmmn/twoTaskCase.cmmn",
+    "org/camunda/bpm/engine/test/api/repository/three_.cmmn"
   })
   public void testHistoricCaseInstanceQuery() {
     CaseInstance oneTaskCase = createCaseInstanceByKey("oneTaskCase", "oneBusiness");
     CaseInstance twoTaskCase = createCaseInstanceByKey("twoTaskCase", "twoBusiness");
+    createCaseInstanceByKey("xyz_", "xyz_");
 
     assertCount(1, historicQuery().caseInstanceId(oneTaskCase.getId()));
     assertCount(1, historicQuery().caseInstanceId(twoTaskCase.getId()));
@@ -213,9 +215,9 @@ public class HistoricCaseInstanceTest extends CmmnProcessEngineTestCase {
 
     assertCount(1, historicQuery().caseDefinitionKey("oneTaskCase"));
 
-    assertCount(2, historicQuery().caseDefinitionKeyNotIn(Arrays.asList("unknown")));
-    assertCount(1, historicQuery().caseDefinitionKeyNotIn(Arrays.asList("oneTaskCase")));
-    assertCount(0, historicQuery().caseDefinitionKeyNotIn(Arrays.asList("oneTaskCase", "twoTaskCase")));
+    assertCount(3, historicQuery().caseDefinitionKeyNotIn(Arrays.asList("unknown")));
+    assertCount(2, historicQuery().caseDefinitionKeyNotIn(Arrays.asList("oneTaskCase")));
+    assertCount(1, historicQuery().caseDefinitionKeyNotIn(Arrays.asList("oneTaskCase", "twoTaskCase")));
     assertCount(0, historicQuery().caseDefinitionKeyNotIn(Arrays.asList("oneTaskCase")).caseDefinitionKey("oneTaskCase"));
 
 
@@ -234,12 +236,14 @@ public class HistoricCaseInstanceTest extends CmmnProcessEngineTestCase {
     assertCount(2, historicQuery().caseDefinitionNameLike("%T%"));
     assertCount(1, historicQuery().caseDefinitionNameLike("One%"));
     assertCount(0, historicQuery().caseDefinitionNameLike("%Process%"));
+    assertCount(1, historicQuery().caseDefinitionNameLike("%z\\_"));
 
     assertCount(1, historicQuery().caseInstanceBusinessKey("oneBusiness"));
 
     assertCount(2, historicQuery().caseInstanceBusinessKeyLike("%Business"));
     assertCount(1, historicQuery().caseInstanceBusinessKeyLike("one%"));
     assertCount(0, historicQuery().caseInstanceBusinessKeyLike("%unknown%"));
+    assertCount(1, historicQuery().caseInstanceBusinessKeyLike("%z\\_"));
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})

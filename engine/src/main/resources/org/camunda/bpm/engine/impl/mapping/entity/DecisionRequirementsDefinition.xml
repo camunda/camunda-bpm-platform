@@ -169,6 +169,7 @@
   </select>
 
   <sql id="selectDecisionRequirementsDefinitionsByQueryCriteriaSql">
+    <bind name="escapeChar" value="'\\'"/>
     from ${prefix}ACT_RE_DECISION_REQ_DEF RES
     <if test="latest">
       inner join
@@ -203,25 +204,25 @@
         and RES.CATEGORY_ = #{category}
       </if>
       <if test="categoryLike != null">
-        and RES.CATEGORY_ like #{categoryLike}
+        and RES.CATEGORY_ like #{categoryLike} ESCAPE #{escapeChar}
       </if>
       <if test="name != null">
         and RES.NAME_ = #{name}
       </if>
       <if test="nameLike != null">
-        and RES.NAME_ like #{nameLike}
+        and RES.NAME_ like #{nameLike} ESCAPE #{escapeChar}
       </if>
       <if test="key != null">
         and RES.KEY_ = #{key}
       </if>
       <if test="keyLike != null">
-        and RES.KEY_ like #{keyLike}
+        and RES.KEY_ like #{keyLike} ESCAPE #{escapeChar}
       </if>
       <if test="resourceName != null">
         and RES.RESOURCE_NAME_ = #{resourceName}
       </if>
       <if test="resourceNameLike != null">
-        and RES.RESOURCE_NAME_ like #{resourceNameLike}
+        and RES.RESOURCE_NAME_ like #{resourceNameLike} ESCAPE #{escapeChar}
       </if>
       <if test="version != null">
         and RES.VERSION_ = #{version}

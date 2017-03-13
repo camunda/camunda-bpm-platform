@@ -61,6 +61,7 @@
   </select>
   
   <sql id="selectTenantByQueryCriteriaSql">
+    <bind name="escapeChar" value="'\\'"/>
     from ${prefix}ACT_ID_TENANT RES
     <if test="userId != null || groupId != null">
       inner join ${prefix}ACT_ID_TENANT_MEMBER TM on RES.ID_ = TM.TENANT_ID_
@@ -82,7 +83,7 @@
         and RES.NAME_ = #{name}
       </if>
       <if test="nameLike != null">
-        and RES.NAME_ like #{nameLike}
+        and RES.NAME_ like #{nameLike} ESCAPE #{escapeChar}
       </if>      
       <if test="userId != null">
         and (TM.USER_ID_ = #{userId}

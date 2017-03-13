@@ -81,6 +81,7 @@
   </select>
   
   <sql id="selectGroupByQueryCriteriaSql">
+    <bind name="escapeChar" value="'\\'"/>
     from ${prefix}ACT_ID_GROUP RES
     <if test="userId != null">
       inner join ${prefix}ACT_ID_MEMBERSHIP M on RES.ID_ = M.GROUP_ID_
@@ -107,7 +108,7 @@
         and RES.NAME_ = #{name}
       </if>
       <if test="nameLike != null">
-        and RES.NAME_ like #{nameLike}
+        and RES.NAME_ like #{nameLike} ESCAPE #{escapeChar}
       </if>
       <if test="type != null">
         and RES.TYPE_ = #{type}

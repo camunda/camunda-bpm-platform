@@ -40,7 +40,7 @@ public class FilterQueryTest extends PluggableProcessEngineTestCase {
     saveFilter("b", "b");
     saveFilter("d", "d");
     saveFilter("a", "a");
-    saveFilter("c", "c");
+    saveFilter("c_", "c");
   }
 
   protected void saveFilter(String name, String owner) {
@@ -128,6 +128,13 @@ public class FilterQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(1, query.count());
   }
 
+  public void testQueryByNameLike() {
+    FilterQuery query = filterService.createFilterQuery().filterNameLike("%\\_");
+    assertNotNull(query.singleResult());
+    assertEquals(1, query.list().size());
+    assertEquals(1, query.count());
+  }
+
   public void testQueryByInvalidName() {
     FilterQuery query = filterService.createFilterQuery().filterName("invalid");
     assertNull(query.singleResult());
@@ -207,7 +214,7 @@ public class FilterQueryTest extends PluggableProcessEngineTestCase {
     Assert.assertThat(filterService.createFilterQuery().orderByFilterName().asc().list(),
         contains(hasProperty("name", equalTo("a")),
             hasProperty("name", equalTo("b")),
-            hasProperty("name", equalTo("c")),
+            hasProperty("name", equalTo("c_")),
             hasProperty("name", equalTo("d"))));
 
     assertEquals(4, filterService.createFilterQuery().orderByFilterOwner().asc().list().size());
@@ -234,14 +241,14 @@ public class FilterQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(4, filterService.createFilterQuery().orderByFilterName().desc().list().size());
     Assert.assertThat(filterService.createFilterQuery().orderByFilterName().desc().list(),
         contains(hasProperty("name", equalTo("d")),
-            hasProperty("name", equalTo("c")),
+            hasProperty("name", equalTo("c_")),
             hasProperty("name", equalTo("b")),
             hasProperty("name", equalTo("a"))));
 
     assertEquals(4, filterService.createFilterQuery().orderByFilterOwner().desc().list().size());
     Assert.assertThat(filterService.createFilterQuery().orderByFilterOwner().desc().list(),
         contains(hasProperty("name", equalTo("d")),
-            hasProperty("name", equalTo("c")),
+            hasProperty("name", equalTo("c_")),
             hasProperty("name", equalTo("b")),
             hasProperty("name", equalTo("a"))));
 

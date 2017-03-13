@@ -151,6 +151,7 @@
     </select>
 
     <sql id="selectHistoricProcessInstancesByQueryCriteriaSql">
+        <bind name="escapeChar" value="'\\'"/>
         from (
 
         SELECT SELF.*, DEF.NAME_, DEF.VERSION_
@@ -192,13 +193,13 @@
                 and DEF.NAME_ = #{processDefinitionName}
             </if>
             <if test="processDefinitionNameLike != null">
-                and DEF.NAME_ like #{processDefinitionNameLike}
+                and DEF.NAME_ like #{processDefinitionNameLike} ESCAPE #{escapeChar}
             </if>
             <if test="businessKey != null">
                 and SELF.BUSINESS_KEY_ = #{businessKey}
             </if>
             <if test="businessKeyLike != null">
-                and SELF.BUSINESS_KEY_ like #{businessKeyLike}
+                and SELF.BUSINESS_KEY_ like #{businessKeyLike} ESCAPE #{escapeChar}
             </if>
 
             <if test="startedBefore != null">
@@ -215,7 +216,7 @@
             </if>
             <if test="processKeyNotIn != null">
                 <foreach collection="processKeyNotIn" index="index" item="procDefKey">
-                    and DEF.KEY_ not like #{procDefKey}
+                    and DEF.KEY_ not like #{procDefKey} ESCAPE #{escapeChar}
                 </foreach>
             </if>
 
@@ -250,7 +251,7 @@
             </if>
 
             <if test="incidentMessageLike != null">
-                and INC.INCIDENT_MSG_ like #{incidentMessageLike}
+                and INC.INCIDENT_MSG_ like #{incidentMessageLike} ESCAPE #{escapeChar}
             </if>
 
             <if test="incidentStatus == 'open'">

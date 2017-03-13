@@ -1342,7 +1342,7 @@ public class ProcessInstanceQueryTest {
 
     List<ProcessInstance> processInstanceList = runtimeService
         .createProcessInstanceQuery()
-        .incidentMessageLike("%exception%").list();
+        .incidentMessageLike("%\\_exception%").list();
 
     assertEquals(1, processInstanceList.size());
   }

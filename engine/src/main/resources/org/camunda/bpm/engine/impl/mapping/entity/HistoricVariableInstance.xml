@@ -178,6 +178,7 @@
   </select>
 
   <sql id="selectHistoricVariableInstanceByQueryCriteriaSql">
+    <bind name="escapeChar" value="'\\'"/>
     from ${prefix}ACT_HI_VARINST RES
 
     <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
@@ -211,7 +212,7 @@
         and RES.NAME_ = #{variableName}
       </if>
       <if test="variableNameLike != null">
-        and RES.NAME_ like #{variableNameLike}
+        and RES.NAME_ like #{variableNameLike} ESCAPE #{escapeChar}
       </if>
 
       <!-- processInstanceIds -->

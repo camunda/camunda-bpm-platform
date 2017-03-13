@@ -164,6 +164,7 @@
   </select>
 
   <sql id="selectProcessDefinitionsByQueryCriteriaSql">
+    <bind name="escapeChar" value="'\\'"/>
     from ${prefix}ACT_RE_PROCDEF RES
     <if test="eventSubscriptionType != null">
     	inner join ${prefix}ACT_RU_EVENT_SUBSCR EVT on RES.ID_ = EVT.CONFIGURATION_
@@ -202,25 +203,25 @@
         and RES.CATEGORY_ = #{category}
       </if>
       <if test="categoryLike != null">
-        and RES.CATEGORY_ like #{categoryLike}
+        and RES.CATEGORY_ like #{categoryLike} ESCAPE #{escapeChar}
       </if>
       <if test="name != null">
         and RES.NAME_ = #{name}
       </if>
       <if test="nameLike != null">
-        and RES.NAME_ like #{nameLike}
+        and RES.NAME_ like #{nameLike} ESCAPE #{escapeChar}
       </if>
       <if test="key != null">
         and RES.KEY_ = #{key}
       </if>
       <if test="keyLike != null">
-        and RES.KEY_ like #{keyLike}
+        and RES.KEY_ like #{keyLike} ESCAPE #{escapeChar}
       </if>
       <if test="resourceName != null">
         and RES.RESOURCE_NAME_ = #{resourceName}
       </if>
       <if test="resourceNameLike != null">
-        and RES.RESOURCE_NAME_ like #{resourceNameLike}
+        and RES.RESOURCE_NAME_ like #{resourceNameLike} ESCAPE #{escapeChar}
       </if>
       <if test="version != null">
         and RES.VERSION_ = #{version}
@@ -253,7 +254,7 @@
         and INC.INCIDENT_MSG_ = #{incidentMessage}
       </if>
       <if test="incidentMessageLike != null">
-        and INC.INCIDENT_MSG_ like #{incidentMessageLike}
+        and INC.INCIDENT_MSG_ like #{incidentMessageLike} ESCAPE #{escapeChar}
       </if>
       <if test="isTenantIdSet">
         <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
@@ -275,7 +276,7 @@
         and RES.VERSION_TAG_ = #{versionTag}
       </if>
       <if test="versionTagLike != null">
-        and RES.VERSION_TAG_ like #{versionTagLike}
+        and RES.VERSION_TAG_ like #{versionTagLike} ESCAPE #{escapeChar}
       </if>
 
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />

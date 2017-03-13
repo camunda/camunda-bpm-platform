@@ -196,6 +196,7 @@
   </select>
 
   <sql id="selectProcessInstanceByQueryCriteriaSql">
+    <bind name="escapeChar" value="'\\'"/>
     from ${prefix}ACT_RU_EXECUTION RES
     <if test="incidentType != null || incidentId != null || incidentMessage != null || incidentMessageLike != null">
       inner join ${prefix}ACT_RU_INCIDENT INC on RES.ID_ = INC.PROC_INST_ID_
@@ -291,7 +292,7 @@
         and INC.INCIDENT_MSG_ = #{incidentMessage}
       </if>
       <if test="incidentMessageLike != null">
-        and INC.INCIDENT_MSG_ like #{incidentMessageLike}
+        and INC.INCIDENT_MSG_ like #{incidentMessageLike} ESCAPE #{escapeChar}
       </if>
       <if test="isTenantIdSet">
         <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
@@ -321,6 +322,7 @@
   </sql>
 
   <sql id="selectExecutionsByQueryCriteriaSql">
+    <bind name="escapeChar" value="'\\'"/>
     from ${prefix}ACT_RU_EXECUTION RES
     <if test="businessKey != null">
       inner join ${prefix}ACT_RU_EXECUTION INST on RES.PROC_INST_ID_ = INST.ID_
@@ -407,7 +409,7 @@
         and INC.INCIDENT_MSG_ = #{incidentMessage}
       </if>
       <if test="incidentMessageLike != null">
-        and INC.INCIDENT_MSG_ like #{incidentMessageLike}
+        and INC.INCIDENT_MSG_ like #{incidentMessageLike} ESCAPE #{escapeChar}
       </if>
       <if test="isTenantIdSet">
         <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">

@@ -206,6 +206,7 @@
   </sql>
 
   <sql id="selectTaskByQueryCriteriaSql">
+    <bind name="escapeChar" value="'\\'"/>
     from ${prefix}ACT_RU_TASK RES
     <if test="candidateUser != null || candidateGroups != null || involvedUser != null || withCandidateGroups || withCandidateUsers">
       inner join ${prefix}ACT_RU_IDENTITYLINK I on I.TASK_ID_ = RES.ID_
@@ -260,16 +261,16 @@
       </if>
       <if test="nameLike != null">
         <!-- based on CAM-6165 compare name like case insensitive -->
-        and UPPER(RES.NAME_) like UPPER(#{nameLike})
+        and UPPER(RES.NAME_) like UPPER(#{nameLike}) ESCAPE #{escapeChar}
       </if>
       <if test="nameNotLike != null">
-        and UPPER(RES.NAME_) not like UPPER(#{nameNotLike})
+        and UPPER(RES.NAME_) not like UPPER(#{nameNotLike}) ESCAPE #{escapeChar}
       </if>
       <if test="description != null">
         and RES.DESCRIPTION_ = #{description}
       </if>
       <if test="descriptionLike != null">
-        and RES.DESCRIPTION_ like #{descriptionLike}
+        and RES.DESCRIPTION_ like #{descriptionLike} ESCAPE #{escapeChar}
       </if>
       <if test="priority != null">
         and RES.PRIORITY_ = #{priority}
@@ -284,7 +285,7 @@
         and RES.ASSIGNEE_ = #{assignee}
       </if>
       <if test="assigneeLike != null">
-        and RES.ASSIGNEE_ like #{assigneeLike}
+        and RES.ASSIGNEE_ like #{assigneeLike} ESCAPE #{escapeChar}
       </if>
       <if test="owner != null">
         and RES.OWNER_ = #{owner}
@@ -315,7 +316,7 @@
         </foreach>
       </if>
       <if test="processInstanceBusinessKeyLike != null">
-        and E.BUSINESS_KEY_ like #{processInstanceBusinessKeyLike}
+        and E.BUSINESS_KEY_ like #{processInstanceBusinessKeyLike} ESCAPE #{escapeChar}
       </if>
       <if test="executionId != null">
         and RES.EXECUTION_ID_ = #{executionId}
@@ -327,7 +328,7 @@
         and CE.BUSINESS_KEY_ = #{caseInstanceBusinessKey}
       </if>
       <if test="caseInstanceBusinessKeyLike != null">
-        and CE.BUSINESS_KEY_ like #{caseInstanceBusinessKeyLike}
+        and CE.BUSINESS_KEY_ like #{caseInstanceBusinessKeyLike} ESCAPE #{escapeChar}
       </if>
       <if test="caseExecutionId != null">
         and RES.CASE_EXECUTION_ID_ = #{caseExecutionId}
@@ -345,7 +346,7 @@
         and RES.TASK_DEF_KEY_ = #{key}
       </if>
       <if test="keyLike != null">
-        and RES.TASK_DEF_KEY_ like #{keyLike}
+        and RES.TASK_DEF_KEY_ like #{keyLike} ESCAPE #{escapeChar}
       </if>
       <if test="parentTaskId != null">
         and RES.PARENT_TASK_ID_ = #{parentTaskId}
@@ -374,7 +375,7 @@
         and D.NAME_ = #{processDefinitionName}
       </if>
       <if test="processDefinitionNameLike != null">
-        and D.NAME_ like #{processDefinitionNameLike}
+        and D.NAME_ like #{processDefinitionNameLike} ESCAPE #{escapeChar}
       </if>
       <if test="caseDefinitionId != null">
         and RES.CASE_DEF_ID_ = #{caseDefinitionId}
@@ -386,7 +387,7 @@
         and CD.NAME_ = #{caseDefinitionName}
       </if>
       <if test="caseDefinitionNameLike != null">
-        and CD.NAME_ like #{caseDefinitionNameLike}
+        and CD.NAME_ like #{caseDefinitionNameLike} ESCAPE #{escapeChar}
       </if>
       <if test="dueDate != null">
         and RES.DUE_DATE_ = #{dueDate}

@@ -48,8 +48,8 @@ public class TenantQueryTest {
   public void setUp() {
     identityService = engineRule.getIdentityService();
 
-    createTenant(TENANT_ONE, "Tenant 1");
-    createTenant(TENANT_TWO, "Tenant 2");
+    createTenant(TENANT_ONE, "Tenant_1");
+    createTenant(TENANT_TWO, "Tenant_2");
 
     User user = identityService.newUser(USER);
     identityService.saveUser(user);
@@ -72,7 +72,7 @@ public class TenantQueryTest {
 
     Tenant tenant = query.singleResult();
     assertThat(tenant, is(notNullValue()));
-    assertThat(tenant.getName(), is("Tenant 1"));
+    assertThat(tenant.getName(), is("Tenant_1"));
   }
 
   @Test
@@ -95,8 +95,8 @@ public class TenantQueryTest {
     TenantQuery query = identityService.createTenantQuery();
 
     assertThat(query.tenantName("nonExisting").count(), is(0L));
-    assertThat(query.tenantName("Tenant 1").count(), is(1L));
-    assertThat(query.tenantName("Tenant 2").count(), is(1L));
+    assertThat(query.tenantName("Tenant_1").count(), is(1L));
+    assertThat(query.tenantName("Tenant_2").count(), is(1L));
   }
 
   @Test
@@ -104,7 +104,7 @@ public class TenantQueryTest {
     TenantQuery query = identityService.createTenantQuery();
 
     assertThat(query.tenantNameLike("%nonExisting%").count(), is(0L));
-    assertThat(query.tenantNameLike("%Tenant 1%").count(), is(1L));
+    assertThat(query.tenantNameLike("%Tenant\\_1%").count(), is(1L));
     assertThat(query.tenantNameLike("%Tenant%").count(), is(2L));
   }
 
@@ -156,14 +156,14 @@ public class TenantQueryTest {
     List<Tenant> tenants = identityService.createTenantQuery().orderByTenantName().asc().list();
     assertThat(tenants.size(), is(2));
 
-    assertThat(tenants.get(0).getName(), is("Tenant 1"));
-    assertThat(tenants.get(1).getName(), is("Tenant 2"));
+    assertThat(tenants.get(0).getName(), is("Tenant_1"));
+    assertThat(tenants.get(1).getName(), is("Tenant_2"));
 
     // descending
     tenants = identityService.createTenantQuery().orderByTenantName().desc().list();
 
-    assertThat(tenants.get(0).getName(), is("Tenant 2"));
-    assertThat(tenants.get(1).getName(), is("Tenant 1"));
+    assertThat(tenants.get(0).getName(), is("Tenant_2"));
+    assertThat(tenants.get(1).getName(), is("Tenant_1"));
   }
 
   protected Tenant createTenant(String id, String name) {

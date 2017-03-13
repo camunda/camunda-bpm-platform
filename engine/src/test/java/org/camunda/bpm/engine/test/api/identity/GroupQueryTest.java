@@ -30,7 +30,7 @@ public class GroupQueryTest extends PluggableProcessEngineTestCase {
   protected void setUp() throws Exception {
     super.setUp();
 
-    createGroup("muppets", "Muppet show characters", "user");
+    createGroup("muppets", "Muppet show characters_", "user");
     createGroup("frogs", "Famous frogs", "user");
     createGroup("mammals", "Famous mammals from eighties", "user");
     createGroup("admin", "Administrators", "security");
@@ -122,7 +122,7 @@ public class GroupQueryTest extends PluggableProcessEngineTestCase {
   }
 
   public void testQueryByName() {
-    GroupQuery query = identityService.createGroupQuery().groupName("Muppet show characters");
+    GroupQuery query = identityService.createGroupQuery().groupName("Muppet show characters_");
     verifyQueryResults(query, 1);
 
     query = identityService.createGroupQuery().groupName("Famous frogs");
@@ -147,6 +147,9 @@ public class GroupQueryTest extends PluggableProcessEngineTestCase {
     verifyQueryResults(query, 2);
 
     query = identityService.createGroupQuery().groupNameLike("%show%");
+    verifyQueryResults(query, 1);
+
+    query = identityService.createGroupQuery().groupNameLike("%ters\\_");
     verifyQueryResults(query, 1);
   }
 

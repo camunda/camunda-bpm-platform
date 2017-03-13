@@ -197,12 +197,12 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callSimpleSubProcess");
     assertProcessEnded(processInstance.getId());
 
-    assertEquals(4, historyService.createHistoricVariableInstanceQuery().count());
-    assertEquals(4, historyService.createHistoricVariableInstanceQuery().list().size());
-    assertEquals(4, historyService.createHistoricVariableInstanceQuery().orderByProcessInstanceId().asc().count());
-    assertEquals(4, historyService.createHistoricVariableInstanceQuery().orderByProcessInstanceId().asc().list().size());
-    assertEquals(4, historyService.createHistoricVariableInstanceQuery().orderByVariableName().asc().count());
-    assertEquals(4, historyService.createHistoricVariableInstanceQuery().orderByVariableName().asc().list().size());
+    assertEquals(5, historyService.createHistoricVariableInstanceQuery().count());
+    assertEquals(5, historyService.createHistoricVariableInstanceQuery().list().size());
+    assertEquals(5, historyService.createHistoricVariableInstanceQuery().orderByProcessInstanceId().asc().count());
+    assertEquals(5, historyService.createHistoricVariableInstanceQuery().orderByProcessInstanceId().asc().list().size());
+    assertEquals(5, historyService.createHistoricVariableInstanceQuery().orderByVariableName().asc().count());
+    assertEquals(5, historyService.createHistoricVariableInstanceQuery().orderByVariableName().asc().list().size());
 
     assertEquals(2, historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).count());
     assertEquals(2, historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).list().size());
@@ -210,9 +210,11 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
     assertEquals(2, historyService.createHistoricVariableInstanceQuery().variableName("myVar").list().size());
     assertEquals(2, historyService.createHistoricVariableInstanceQuery().variableNameLike("myVar1").count());
     assertEquals(2, historyService.createHistoricVariableInstanceQuery().variableNameLike("myVar1").list().size());
+    assertEquals(1, historyService.createHistoricVariableInstanceQuery().variableNameLike("my\\_Var%").count());
+    assertEquals(1, historyService.createHistoricVariableInstanceQuery().variableNameLike("my\\_Var%").list().size());
 
     List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery().list();
-    assertEquals(4, variables.size());
+    assertEquals(5, variables.size());
 
     assertEquals(1, historyService.createHistoricVariableInstanceQuery().variableValueEquals("myVar", "test123").count());
     assertEquals(1, historyService.createHistoricVariableInstanceQuery().variableValueEquals("myVar", "test123").list().size());
@@ -226,7 +228,7 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
     assertEquals(8, historyService.createHistoricActivityInstanceQuery().count());
 
     if (isFullHistoryEnabled()) {
-      assertEquals(5, historyService.createHistoricDetailQuery().count());
+      assertEquals(6, historyService.createHistoricDetailQuery().count());
     }
 
     // non-existing id:
