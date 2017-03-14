@@ -4,7 +4,7 @@ Provide an integration of the FEEL engine for Camunda BPM using the SPI of the [
 
 ## How to use it?
 
-Add the factory including the FEEL engine to your project by copying the jar file or adding the project as dependency.
+Add the factory including the FEEL engine to your project by copying the [jar file](https://github.com/camunda/feel-scala/releases) _(feel-engine-factory-${VERSION}-complete.jar)_ or adding the project as dependency.
 
 ```xml
 <dependency>
