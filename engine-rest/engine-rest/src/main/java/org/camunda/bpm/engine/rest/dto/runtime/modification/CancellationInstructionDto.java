@@ -16,6 +16,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.runtime.ModificationBuilder;
 import org.camunda.bpm.engine.runtime.ProcessInstanceModificationBuilder;
 import org.camunda.bpm.engine.runtime.ProcessInstantiationBuilder;
 
@@ -43,6 +44,16 @@ public class CancellationInstructionDto extends ProcessInstanceModificationInstr
     else if (transitionInstanceId != null) {
       builder.cancelTransitionInstance(transitionInstanceId);
     }
+
+  }
+
+  @Override
+  public void applyTo(ModificationBuilder builder, ProcessEngine processEngine, ObjectMapper objectMapper) {
+
+    if (activityId == null) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, buildErrorMessage("'activityId' must be set"));
+    }
+    builder.cancelAllForActivity(activityId);
 
   }
 
@@ -76,4 +87,6 @@ public class CancellationInstructionDto extends ProcessInstanceModificationInstr
     // cannot be applied to instantiation
 
   }
+
+
 }

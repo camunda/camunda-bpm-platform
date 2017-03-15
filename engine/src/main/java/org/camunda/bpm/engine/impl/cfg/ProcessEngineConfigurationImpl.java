@@ -14,6 +14,29 @@
 package org.camunda.bpm.engine.impl.cfg;
 
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.Charset;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Properties;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
+
+import javax.naming.InitialContext;
+import javax.sql.DataSource;
+
 import org.apache.ibatis.builder.xml.XMLConfigBuilder;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.apache.ibatis.mapping.Environment;
@@ -53,6 +76,7 @@ import org.camunda.bpm.engine.impl.FormServiceImpl;
 import org.camunda.bpm.engine.impl.HistoryServiceImpl;
 import org.camunda.bpm.engine.impl.IdentityServiceImpl;
 import org.camunda.bpm.engine.impl.ManagementServiceImpl;
+import org.camunda.bpm.engine.impl.ModificationBatchJobHandler;
 import org.camunda.bpm.engine.impl.PriorityProvider;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.RepositoryServiceImpl;
@@ -97,7 +121,11 @@ import org.camunda.bpm.engine.impl.db.entitymanager.cache.DbEntityCacheKeyMappin
 import org.camunda.bpm.engine.impl.db.sql.DbSqlPersistenceProviderFactory;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.delegate.DefaultDelegateInterceptor;
-import org.camunda.bpm.engine.impl.digest.*;
+import org.camunda.bpm.engine.impl.digest.Default16ByteSaltGenerator;
+import org.camunda.bpm.engine.impl.digest.PasswordEncryptor;
+import org.camunda.bpm.engine.impl.digest.PasswordManager;
+import org.camunda.bpm.engine.impl.digest.SaltGenerator;
+import org.camunda.bpm.engine.impl.digest.Sha512HashDigest;
 import org.camunda.bpm.engine.impl.dmn.configuration.DmnEngineConfigurationBuilder;
 import org.camunda.bpm.engine.impl.dmn.deployer.DecisionDefinitionDeployer;
 import org.camunda.bpm.engine.impl.dmn.deployer.DecisionRequirementsDefinitionDeployer;
@@ -197,11 +225,22 @@ import org.camunda.bpm.engine.impl.migration.validation.instance.NoUnmappedCompe
 import org.camunda.bpm.engine.impl.migration.validation.instance.NoUnmappedLeafInstanceValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instance.SupportedActivityInstanceValidator;
 import org.camunda.bpm.engine.impl.migration.validation.instance.VariableConflictActivityInstanceValidator;
-import org.camunda.bpm.engine.impl.migration.validation.instruction.*;
+import org.camunda.bpm.engine.impl.migration.validation.instruction.AdditionalFlowScopeInstructionValidator;
+import org.camunda.bpm.engine.impl.migration.validation.instruction.CannotAddMultiInstanceBodyValidator;
+import org.camunda.bpm.engine.impl.migration.validation.instruction.CannotAddMultiInstanceInnerActivityValidator;
+import org.camunda.bpm.engine.impl.migration.validation.instruction.CannotRemoveMultiInstanceInnerActivityValidator;
+import org.camunda.bpm.engine.impl.migration.validation.instruction.ConditionalEventUpdateEventTriggerValidator;
+import org.camunda.bpm.engine.impl.migration.validation.instruction.GatewayMappingValidator;
+import org.camunda.bpm.engine.impl.migration.validation.instruction.MigrationInstructionValidator;
+import org.camunda.bpm.engine.impl.migration.validation.instruction.OnlyOnceMappedActivityInstructionValidator;
+import org.camunda.bpm.engine.impl.migration.validation.instruction.SameBehaviorInstructionValidator;
+import org.camunda.bpm.engine.impl.migration.validation.instruction.SameEventScopeInstructionValidator;
+import org.camunda.bpm.engine.impl.migration.validation.instruction.SameEventTypeValidator;
+import org.camunda.bpm.engine.impl.migration.validation.instruction.UpdateEventTriggersValidator;
 import org.camunda.bpm.engine.impl.persistence.GenericManagerFactory;
+import org.camunda.bpm.engine.impl.persistence.deploy.Deployer;
 import org.camunda.bpm.engine.impl.persistence.deploy.cache.CacheFactory;
 import org.camunda.bpm.engine.impl.persistence.deploy.cache.DefaultCacheFactory;
-import org.camunda.bpm.engine.impl.persistence.deploy.Deployer;
 import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
 import org.camunda.bpm.engine.impl.persistence.entity.AttachmentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
@@ -279,21 +318,6 @@ import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
-
-import javax.naming.InitialContext;
-import javax.sql.DataSource;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.nio.charset.Charset;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.SQLException;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.concurrent.CopyOnWriteArraySet;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -763,6 +787,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
       MigrationBatchJobHandler migrationHandler = new MigrationBatchJobHandler();
       batchHandlers.put(migrationHandler.getType(), migrationHandler);
+
+      ModificationBatchJobHandler modificationHandler = new ModificationBatchJobHandler();
+      batchHandlers.put(modificationHandler.getType(), modificationHandler);
 
       DeleteProcessInstancesJobHandler deleteProcessJobHandler = new DeleteProcessInstancesJobHandler();
       batchHandlers.put(deleteProcessJobHandler.getType(), deleteProcessJobHandler);

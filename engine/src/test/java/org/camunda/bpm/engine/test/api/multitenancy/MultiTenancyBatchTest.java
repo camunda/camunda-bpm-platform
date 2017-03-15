@@ -139,7 +139,7 @@ public class MultiTenancyBatchTest {
     Batch batch = batchHelper.migrateProcessInstanceAsync(tenant1Definition, tenant1Definition);
 
     // then
-    JobDefinition migrationJobDefinition = batchHelper.getMigrationJobDefinition(batch);
+    JobDefinition migrationJobDefinition = batchHelper.getExecutionJobDefinition(batch);
     Assert.assertEquals(TENANT_ONE, migrationJobDefinition.getTenantId());
 
     JobDefinition monitorJobDefinition = batchHelper.getMonitorJobDefinition(batch);
@@ -160,7 +160,7 @@ public class MultiTenancyBatchTest {
 
     batchHelper.executeSeedJob(batch);
 
-    List<Job> migrationJob = batchHelper.getMigrationJobs(batch);
+    List<Job> migrationJob = batchHelper.getExecutionJobs(batch);
     Assert.assertEquals(TENANT_ONE, migrationJob.get(0).getTenantId());
 
     Job monitorJob = batchHelper.getMonitorJob(batch);

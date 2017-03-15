@@ -39,6 +39,7 @@ public class ActivityBeforeInstantiationCmd extends AbstractInstantiationCmd {
     this.activityId = activityId;
   }
 
+  @Override
   public Void execute(CommandContext commandContext) {
     ExecutionEntity processInstance = commandContext.getExecutionManager().findExecutionById(processInstanceId);
     ProcessDefinitionImpl processDefinition = processInstance.getProcessDefinition();
@@ -54,20 +55,24 @@ public class ActivityBeforeInstantiationCmd extends AbstractInstantiationCmd {
     return super.execute(commandContext);
   }
 
+  @Override
   protected ScopeImpl getTargetFlowScope(ProcessDefinitionImpl processDefinition) {
     PvmActivity activity = processDefinition.findActivity(activityId);
     return activity.getFlowScope();
   }
 
+  @Override
   protected CoreModelElement getTargetElement(ProcessDefinitionImpl processDefinition) {
     ActivityImpl activity = processDefinition.findActivity(activityId);
     return activity;
   }
 
-  protected String getTargetElementId() {
+  @Override
+  public String getTargetElementId() {
     return activityId;
   }
 
+  @Override
   protected String describe() {
     StringBuilder sb = new StringBuilder();
     sb.append("Start before activity '");

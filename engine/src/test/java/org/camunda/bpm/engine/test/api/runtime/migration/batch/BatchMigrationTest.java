@@ -256,7 +256,7 @@ public class BatchMigrationTest {
     assertEquals(BatchSeedJobHandler.TYPE, seedJobDefinition.getJobType());
 
     // and there exists a migration job definition
-    JobDefinition migrationJobDefinition = helper.getMigrationJobDefinition(batch);
+    JobDefinition migrationJobDefinition = helper.getExecutionJobDefinition(batch);
     assertNotNull(migrationJobDefinition);
     assertEquals(Batch.TYPE_PROCESS_INSTANCE_MIGRATION, migrationJobDefinition.getJobType());
 
@@ -272,7 +272,7 @@ public class BatchMigrationTest {
     assertNull(seedJob.getExecutionId());
 
     // but no migration jobs where created
-    List<Job> migrationJobs = helper.getMigrationJobs(batch);
+    List<Job> migrationJobs = helper.getExecutionJobs(batch);
     assertEquals(0, migrationJobs.size());
   }
 
@@ -283,7 +283,7 @@ public class BatchMigrationTest {
 
     Batch batch = helper.migrateProcessInstancesAsync(20);
     JobDefinition seedJobDefinition = helper.getSeedJobDefinition(batch);
-    JobDefinition migrationJobDefinition = helper.getMigrationJobDefinition(batch);
+    JobDefinition migrationJobDefinition = helper.getExecutionJobDefinition(batch);
     String sourceDeploymentId = helper.getSourceProcessDefinition().getDeploymentId();
 
     // when
@@ -334,7 +334,7 @@ public class BatchMigrationTest {
   public void testMigrationJobsExecution() {
     Batch batch = helper.migrateProcessInstancesAsync(10);
     helper.executeSeedJob(batch);
-    List<Job> migrationJobs = helper.getMigrationJobs(batch);
+    List<Job> migrationJobs = helper.getExecutionJobs(batch);
 
     // when
     for (Job migrationJob : migrationJobs) {
@@ -346,7 +346,7 @@ public class BatchMigrationTest {
     assertEquals(10, helper.countTargetProcessInstances());
 
     // and the no migration jobs exist
-    assertEquals(0, helper.getMigrationJobs(batch).size());
+    assertEquals(0, helper.getExecutionJobs(batch).size());
 
     // but a monitor job exists
     assertNotNull(helper.getMonitorJob(batch));
@@ -386,19 +386,19 @@ public class BatchMigrationTest {
     helper.executeSeedJob(batch);
 
     // then the default number of jobs was created
-    assertEquals(batch.getBatchJobsPerSeed(), helper.getMigrationJobs(batch).size());
+    assertEquals(batch.getBatchJobsPerSeed(), helper.getExecutionJobs(batch).size());
 
     // when the seed job is executed a second time
     helper.executeSeedJob(batch);
 
     // then the same amount of jobs was created
-    assertEquals(2 * batch.getBatchJobsPerSeed(), helper.getMigrationJobs(batch).size());
+    assertEquals(2 * batch.getBatchJobsPerSeed(), helper.getExecutionJobs(batch).size());
 
     // when the seed job is executed a third time
     helper.executeSeedJob(batch);
 
     // then the all jobs where created
-    assertEquals(2 * batch.getBatchJobsPerSeed() + 4, helper.getMigrationJobs(batch).size());
+    assertEquals(2 * batch.getBatchJobsPerSeed() + 4, helper.getExecutionJobs(batch).size());
 
     // and the seed job is removed
     assertNull(helper.getSeedJob(batch));
@@ -432,13 +432,13 @@ public class BatchMigrationTest {
     helper.executeSeedJob(batch);
 
     // then there exist the first batch of migration jobs
-    assertEquals(2, helper.getMigrationJobs(batch).size());
+    assertEquals(2, helper.getExecutionJobs(batch).size());
 
     // when the seed job is executed a second time
     helper.executeSeedJob(batch);
 
     // then the full batch of migration jobs exist
-    assertEquals(4, helper.getMigrationJobs(batch).size());
+    assertEquals(4, helper.getExecutionJobs(batch).size());
 
     // and the seed job is removed
     assertNull(helper.getSeedJob(batch));
@@ -470,7 +470,7 @@ public class BatchMigrationTest {
   public void testMonitorJobRemovesBatchAfterCompletion() {
     Batch batch = helper.migrateProcessInstancesAsync(10);
     helper.executeSeedJob(batch);
-    helper.executeMigrationJobs(batch);
+    helper.executeJobs(batch);
 
     // when
     helper.executeMonitorJob(batch);
@@ -540,7 +540,7 @@ public class BatchMigrationTest {
     helper.executeSeedJob(batch);
 
     // create incidents
-    List<Job> migrationJobs = helper.getMigrationJobs(batch);
+    List<Job> migrationJobs = helper.getExecutionJobs(batch);
     for (Job migrationJob : migrationJobs) {
       managementService.setJobRetries(migrationJob.getId(), 0);
     }
@@ -580,14 +580,14 @@ public class BatchMigrationTest {
 
     // when
     runtimeService.deleteProcessInstance(deletedProcessInstanceId, "test");
-    helper.executeMigrationJobs(batch);
+    helper.executeJobs(batch);
 
     // then the remaining process instance was migrated
     assertEquals(0, helper.countSourceProcessInstances());
     assertEquals(1, helper.countTargetProcessInstances());
 
     // and one batch job failed and has 2 retries left
-    List<Job> migrationJobs = helper.getMigrationJobs(batch);
+    List<Job> migrationJobs = helper.getExecutionJobs(batch);
     assertEquals(1, migrationJobs.size());
 
     Job failedJob = migrationJobs.get(0);
@@ -683,7 +683,7 @@ public class BatchMigrationTest {
     helper.executeSeedJob(batch);
 
     // when
-    helper.executeMigrationJobs(batch);
+    helper.executeJobs(batch);
 
     // then
     List<DelegateEvent> recordedEvents = DelegateEvent.getEvents();
@@ -722,7 +722,7 @@ public class BatchMigrationTest {
     helper.executeSeedJob(batch);
 
     // when
-    helper.executeMigrationJobs(batch);
+    helper.executeJobs(batch);
 
     // then
     assertEquals(0, DelegateEvent.getEvents().size());
@@ -751,7 +751,7 @@ public class BatchMigrationTest {
     helper.executeSeedJob(batch);
 
     // when
-    helper.executeMigrationJobs(batch);
+    helper.executeJobs(batch);
 
     // then
     VariableInstance inputVariable = engineRule.getRuntimeService().createVariableInstanceQuery().singleResult();
@@ -787,7 +787,7 @@ public class BatchMigrationTest {
     helper.executeSeedJob(batch);
 
     // when
-    helper.executeMigrationJobs(batch);
+    helper.executeJobs(batch);
 
     // then
     assertEquals(0, engineRule.getRuntimeService().createVariableInstanceQuery().count());
@@ -816,7 +816,7 @@ public class BatchMigrationTest {
     helper.executeSeedJob(batch);
 
     // when
-    helper.executeMigrationJobs(batch);
+    helper.executeJobs(batch);
 
     // then the message event subscription's event name was changed
     EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().singleResult();
@@ -829,7 +829,7 @@ public class BatchMigrationTest {
     Batch batch = helper.createMigrationBatchWithSize(1);
     helper.executeSeedJob(batch);
 
-    JobEntity migrationJob = (JobEntity) helper.getMigrationJobs(batch).get(0);
+    JobEntity migrationJob = (JobEntity) helper.getExecutionJobs(batch).get(0);
     String byteArrayId = migrationJob.getJobHandlerConfigurationRaw();
 
     ByteArrayEntity byteArrayEntity = engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired()
@@ -863,7 +863,7 @@ public class BatchMigrationTest {
       .executeAsync();
 
     helper.executeSeedJob(batch);
-    helper.executeMigrationJobs(batch);
+    helper.executeJobs(batch);
     helper.executeMonitorJob(batch);
 
     // then

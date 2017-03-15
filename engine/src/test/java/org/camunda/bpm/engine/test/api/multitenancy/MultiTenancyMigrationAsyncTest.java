@@ -76,7 +76,7 @@ public class MultiTenancyMigrationAsyncTest {
     batchHelper.executeSeedJob(batch);
 
     // when
-    batchHelper.executeMigrationJobs(batch);
+    batchHelper.executeJobs(batch);
 
     // then
     assertMigratedTo(processInstance, targetDefinition);
@@ -101,10 +101,10 @@ public class MultiTenancyMigrationAsyncTest {
     batchHelper.executeSeedJob(batch);
 
     // when
-    batchHelper.executeMigrationJobs(batch);
+    batchHelper.executeJobs(batch);
 
     // then
-    Job migrationJob = batchHelper.getMigrationJobs(batch).get(0);
+    Job migrationJob = batchHelper.getExecutionJobs(batch).get(0);
     Assert.assertThat(migrationJob.getExceptionMessage(),
         CoreMatchers.containsString("Cannot migrate process instance '" + processInstance.getId()
             + "' without tenant to a process definition with a tenant ('tenant1')"));

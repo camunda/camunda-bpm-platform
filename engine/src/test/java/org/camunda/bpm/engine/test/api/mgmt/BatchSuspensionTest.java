@@ -198,10 +198,10 @@ public class BatchSuspensionTest {
     managementService.suspendBatchById(batch.getId());
 
     // then
-    JobDefinition migrationJobDefinition = helper.getMigrationJobDefinition(batch);
+    JobDefinition migrationJobDefinition = helper.getExecutionJobDefinition(batch);
     assertTrue(migrationJobDefinition.isSuspended());
 
-    Job migrationJob = helper.getMigrationJobs(batch).get(0);
+    Job migrationJob = helper.getExecutionJobs(batch).get(0);
     assertTrue(migrationJob.isSuspended());
   }
 
@@ -215,7 +215,7 @@ public class BatchSuspensionTest {
     helper.executeSeedJob(batch);
 
     // then
-    Job migrationJob = helper.getMigrationJobs(batch).get(0);
+    Job migrationJob = helper.getExecutionJobs(batch).get(0);
     assertTrue(migrationJob.isSuspended());
   }
 
@@ -349,10 +349,10 @@ public class BatchSuspensionTest {
     managementService.activateBatchById(batch.getId());
 
     // then
-    JobDefinition migrationJobDefinition = helper.getMigrationJobDefinition(batch);
+    JobDefinition migrationJobDefinition = helper.getExecutionJobDefinition(batch);
     assertFalse(migrationJobDefinition.isSuspended());
 
-    Job migrationJob = helper.getMigrationJobs(batch).get(0);
+    Job migrationJob = helper.getExecutionJobs(batch).get(0);
     assertFalse(migrationJob.isSuspended());
   }
 
@@ -365,7 +365,7 @@ public class BatchSuspensionTest {
     helper.executeSeedJob(batch);
 
     // then
-    Job migrationJob = helper.getMigrationJobs(batch).get(0);
+    Job migrationJob = helper.getExecutionJobs(batch).get(0);
     assertFalse(migrationJob.isSuspended());
   }
 

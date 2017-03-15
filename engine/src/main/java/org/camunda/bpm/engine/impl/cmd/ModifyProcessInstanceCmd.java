@@ -35,18 +35,27 @@ public class ModifyProcessInstanceCmd implements Command<Void> {
   private final static CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
 
   protected ProcessInstanceModificationBuilderImpl builder;
+  protected boolean writeOperationLog;
 
   public ModifyProcessInstanceCmd(ProcessInstanceModificationBuilderImpl processInstanceModificationBuilder) {
-    this.builder = processInstanceModificationBuilder;
+    this(processInstanceModificationBuilder, true);
   }
 
+  public ModifyProcessInstanceCmd(ProcessInstanceModificationBuilderImpl processInstanceModificationBuilder, boolean writeOperationLog) {
+    this.builder = processInstanceModificationBuilder;
+    this.writeOperationLog = writeOperationLog;
+  }
+
+
+  @Override
   public Void execute(CommandContext commandContext) {
     String processInstanceId = builder.getProcessInstanceId();
 
     ExecutionManager executionManager = commandContext.getExecutionManager();
     ExecutionEntity processInstance = executionManager.findExecutionById(processInstanceId);
 
-    
+    ensureProcessInstanceExist(processInstanceId, processInstance);
+
     checkUpdateProcessInstance(processInstance, commandContext);
 
     processInstance.setPreserveScope(true);
@@ -76,13 +85,21 @@ public class ModifyProcessInstanceCmd implements Command<Void> {
       }
     }
 
-    commandContext.getOperationLogManager().logProcessInstanceOperation(getLogEntryOperation(),
+    if (writeOperationLog) {
+      commandContext.getOperationLogManager().logProcessInstanceOperation(getLogEntryOperation(),
         processInstanceId,
         null,
         null,
         Collections.singletonList(PropertyChange.EMPTY_CHANGE));
+    }
 
     return null;
+  }
+
+  protected void ensureProcessInstanceExist(String processInstanceId, ExecutionEntity processInstance) {
+    if (processInstance == null) {
+      throw LOG.processInstanceDoesNotExist(processInstanceId);
+    }
   }
 
   protected String getLogEntryOperation() {

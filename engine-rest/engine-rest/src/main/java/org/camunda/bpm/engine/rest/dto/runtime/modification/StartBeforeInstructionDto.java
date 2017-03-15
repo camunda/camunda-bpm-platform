@@ -16,6 +16,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.runtime.ModificationBuilder;
 import org.camunda.bpm.engine.runtime.ProcessInstanceModificationBuilder;
 import org.camunda.bpm.engine.runtime.ProcessInstanceModificationInstantiationBuilder;
 import org.camunda.bpm.engine.runtime.ProcessInstantiationBuilder;
@@ -47,6 +48,15 @@ public class StartBeforeInstructionDto extends ProcessInstanceModificationInstru
 
   }
 
+ @Override
+  public void applyTo(ModificationBuilder builder, ProcessEngine processEngine, ObjectMapper objectMapper) {
+    checkValidity();
+
+    if (activityId != null) {
+      builder.startBeforeActivity(activityId);
+    }
+  }
+
   @Override
   public void applyTo(ProcessInstantiationBuilder builder, ProcessEngine engine, ObjectMapper mapper) {
     checkValidity();
@@ -61,4 +71,6 @@ public class StartBeforeInstructionDto extends ProcessInstanceModificationInstru
           buildErrorMessage("'activityId' must be set"));
     }
   }
+
+
 }

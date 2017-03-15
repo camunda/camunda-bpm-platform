@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.util.Arrays;
+
 import org.camunda.bpm.application.impl.ProcessApplicationIdentifier;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
@@ -220,6 +221,18 @@ public class CommandLogger extends ProcessEngineLogger {
 
   public void warnDeploymentResourceHasWroneName(String resourceName, String[] suffixes) {
     logWarn(
-        "035", String.format("Deployment resource '%s' will be ignored as its name must have one of suffixes %s.", resourceName, Arrays.toString(suffixes)));
+        "035",
+        String.format("Deployment resource '%s' will be ignored as its name must have one of suffixes %s.",
+            resourceName,
+            Arrays.toString(suffixes)
+            ));
+
+  }
+
+  public ProcessEngineException processInstanceDoesNotExist(String processInstanceId) {
+    return new ProcessEngineException(exceptionMessage(
+        "036",
+        "Process instance '{}' cannot be modified. The process instance does not exist",
+        processInstanceId));
   }
 }

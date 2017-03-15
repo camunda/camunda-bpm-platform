@@ -113,7 +113,7 @@ public class BatchPriorityTest {
     helper.executeSeedJob(batch);
 
     // then
-    Job executionJob = helper.getMigrationJobs(batch).get(0);
+    Job executionJob = helper.getExecutionJobs(batch).get(0);
     assertEquals(DefaultJobPriorityProvider.DEFAULT_PRIORITY, executionJob.getPriority());
   }
 
@@ -154,7 +154,7 @@ public class BatchPriorityTest {
     helper.executeSeedJob(batch);
 
     // then
-    Job executionJob = helper.getMigrationJobs(batch).get(0);
+    Job executionJob = helper.getExecutionJobs(batch).get(0);
     assertEquals(CUSTOM_PRIORITY, executionJob.getPriority());
   }
 
@@ -221,14 +221,14 @@ public class BatchPriorityTest {
   public void executionJobShouldGetPriorityFromOverridingJobDefinitionPriority() {
     // given
     Batch batch = helper.migrateProcessInstancesAsync(1);
-    JobDefinition executionJobDefinition = helper.getMigrationJobDefinition(batch);
+    JobDefinition executionJobDefinition = helper.getExecutionJobDefinition(batch);
     managementService.setOverridingJobPriorityForJobDefinition(executionJobDefinition.getId(), CUSTOM_PRIORITY, true);
 
     // when
     helper.executeSeedJob(batch);
 
     // then
-    Job executionJob = helper.getMigrationJobs(batch).get(0);
+    Job executionJob = helper.getExecutionJobs(batch).get(0);
     assertEquals(CUSTOM_PRIORITY, executionJob.getPriority());
   }
 
@@ -236,14 +236,14 @@ public class BatchPriorityTest {
   public void executionJobShouldGetPriorityFromOverridingJobDefinitionPriorityWithCascade() {
     // given
     Batch batch = helper.migrateProcessInstancesAsync(1);
-    JobDefinition executionJobDefinition = helper.getMigrationJobDefinition(batch);
+    JobDefinition executionJobDefinition = helper.getExecutionJobDefinition(batch);
     helper.executeSeedJob(batch);
 
     // when
     managementService.setOverridingJobPriorityForJobDefinition(executionJobDefinition.getId(), CUSTOM_PRIORITY, true);
 
     // then
-    Job executionJob = helper.getMigrationJobs(batch).get(0);
+    Job executionJob = helper.getExecutionJobs(batch).get(0);
     assertEquals(CUSTOM_PRIORITY, executionJob.getPriority());
   }
 

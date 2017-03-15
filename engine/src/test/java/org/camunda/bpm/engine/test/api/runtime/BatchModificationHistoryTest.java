@@ -1,27 +1,14 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package org.camunda.bpm.engine.test.api.runtime.migration.batch;
+package org.camunda.bpm.engine.test.api.runtime;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.camunda.bpm.engine.HistoryService;
-import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
@@ -30,13 +17,15 @@ import org.camunda.bpm.engine.history.HistoricJobLog;
 import org.camunda.bpm.engine.impl.batch.BatchMonitorJobHandler;
 import org.camunda.bpm.engine.impl.batch.BatchSeedJobHandler;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
-import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
-import org.camunda.bpm.engine.test.api.runtime.migration.MigrationTestRule;
+import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -44,30 +33,24 @@ import org.junit.Test;
 import org.junit.rules.RuleChain;
 
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
-public class BatchMigrationHistoryTest {
+public class BatchModificationHistoryTest {
 
-  protected static final Date START_DATE = new Date(1457326800000L);
-
-  protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
-  protected MigrationTestRule migrationRule = new MigrationTestRule(engineRule);
-  protected BatchMigrationHelper helper = new BatchMigrationHelper(engineRule, migrationRule);
+  protected ProcessEngineRule rule = new ProvidedProcessEngineRule();
+  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(rule);
+  protected BatchModificationHelper helper = new BatchModificationHelper(rule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(migrationRule);
+  public RuleChain ruleChain = RuleChain.outerRule(rule).around(testRule);
 
-  protected ProcessEngineConfigurationImpl configuration;
   protected RuntimeService runtimeService;
-  protected ManagementService managementService;
-  protected HistoryService historyService;
-
-  protected ProcessDefinition sourceProcessDefinition;
-  protected ProcessDefinition targetProcessDefinition;
+  protected BpmnModelInstance instance;
+  private int defaultBatchJobsPerSeed;
+  private int defaultInvocationsPerBatchJob;
+  protected static final Date START_DATE = new Date(1457326800000L);
 
   @Before
   public void initServices() {
-    runtimeService = engineRule.getRuntimeService();
-    managementService = engineRule.getManagementService();
-    historyService = engineRule.getHistoryService();
+    runtimeService = rule.getRuntimeService();
   }
 
   @Before
@@ -75,9 +58,39 @@ public class BatchMigrationHistoryTest {
     ClockUtil.setCurrentTime(START_DATE);
   }
 
+  @Before
+  public void createBpmnModelInstance() {
+    this.instance = Bpmn.createExecutableProcess("process1")
+        .startEvent("start")
+        .userTask("user1")
+        .sequenceFlowId("seq")
+        .userTask("user2")
+        .endEvent("end")
+        .done();
+  }
+
   @After
   public void resetClock() {
     ClockUtil.reset();
+  }
+
+  @Before
+  public void storeEngineSettings() {
+    ProcessEngineConfigurationImpl configuration = rule.getProcessEngineConfiguration();
+    defaultBatchJobsPerSeed = configuration.getBatchJobsPerSeed();
+    defaultInvocationsPerBatchJob = configuration.getInvocationsPerBatchJob();
+  }
+
+  @After
+  public void restoreEngineSettings() {
+    ProcessEngineConfigurationImpl configuration = rule.getProcessEngineConfiguration();
+    configuration.setBatchJobsPerSeed(defaultBatchJobsPerSeed);
+    configuration.setInvocationsPerBatchJob(defaultInvocationsPerBatchJob);
+  }
+
+  @After
+  public void removeInstanceIds() {
+    helper.currentProcessInstances = new ArrayList<String>();
   }
 
   @After
@@ -88,7 +101,9 @@ public class BatchMigrationHistoryTest {
   @Test
   public void testHistoricBatchCreation() {
     // when
-    Batch batch = helper.migrateProcessInstancesAsync(10);
+    rule.getProcessEngineConfiguration().setHistoryLevel(HistoryLevel.HISTORY_LEVEL_FULL);
+    testRule.deploy(instance);
+    Batch batch = helper.startAfterAsync("process1", 10, "user1");
 
     // then a historic batch was created
     HistoricBatch historicBatch = helper.getHistoricBatch(batch);
@@ -107,7 +122,8 @@ public class BatchMigrationHistoryTest {
 
   @Test
   public void testHistoricBatchCompletion() {
-    Batch batch = helper.migrateProcessInstancesAsync(1);
+    testRule.deploy(instance);
+    Batch batch = helper.startAfterAsync("process1", 1, "user1");
     helper.executeSeedJob(batch);
     helper.executeJobs(batch);
 
@@ -125,7 +141,8 @@ public class BatchMigrationHistoryTest {
   @Test
   public void testHistoricSeedJobLog() {
     // when
-    Batch batch = helper.migrateProcessInstancesAsync(1);
+    testRule.deploy(instance);
+    Batch batch = helper.cancelAllAsync("process1", 1, "user1");
 
     // then a historic job log exists for the seed job
     HistoricJobLog jobLog = helper.getHistoricSeedJobLog(batch).get(0);
@@ -161,7 +178,8 @@ public class BatchMigrationHistoryTest {
 
   @Test
   public void testHistoricMonitorJobLog() {
-    Batch batch = helper.migrateProcessInstancesAsync(1);
+    testRule.deploy(instance);
+    Batch batch = helper.startAfterAsync("process1", 1, "user1");
 
     // when the seed job is executed
     helper.executeSeedJob(batch);
@@ -203,7 +221,7 @@ public class BatchMigrationHistoryTest {
     assertEquals(executionDate, jobLog.getTimestamp());
     assertEquals(monitorJobDueDate, jobLog.getJobDueDate());
 
-    // when the migration and monitor jobs are executed
+    // when the modification and monitor jobs are executed
     executionDate = helper.addSecondsToClock(15);
     helper.executeJobs(batch);
     helper.executeMonitorJob(batch);
@@ -221,10 +239,9 @@ public class BatchMigrationHistoryTest {
 
   @Test
   public void testHistoricBatchJobLog() {
-    Batch batch = helper.migrateProcessInstancesAsync(1);
+    testRule.deploy(instance);
+    Batch batch = helper.startAfterAsync("process1", 1, "user1");
     helper.executeSeedJob(batch);
-
-    String sourceDeploymentId = helper.getSourceProcessDefinition().getDeploymentId();
 
     // when
     Date executionDate = helper.addSecondsToClock(12);
@@ -235,10 +252,10 @@ public class BatchMigrationHistoryTest {
     assertNotNull(jobLog);
     assertTrue(jobLog.isCreationLog());
     assertEquals(batch.getBatchJobDefinitionId(), jobLog.getJobDefinitionId());
-    assertEquals(Batch.TYPE_PROCESS_INSTANCE_MIGRATION, jobLog.getJobDefinitionType());
+    assertEquals(Batch.TYPE_PROCESS_INSTANCE_MODIFICATION, jobLog.getJobDefinitionType());
     assertEquals(batch.getId(), jobLog.getJobDefinitionConfiguration());
     assertEquals(START_DATE, jobLog.getTimestamp());
-    assertEquals(sourceDeploymentId, jobLog.getDeploymentId());
+    assertNull(jobLog.getDeploymentId());
     assertNull(jobLog.getProcessDefinitionId());
     assertNull(jobLog.getExecutionId());
     assertNull(jobLog.getJobDueDate());
@@ -247,10 +264,10 @@ public class BatchMigrationHistoryTest {
     assertNotNull(jobLog);
     assertTrue(jobLog.isSuccessLog());
     assertEquals(batch.getBatchJobDefinitionId(), jobLog.getJobDefinitionId());
-    assertEquals(Batch.TYPE_PROCESS_INSTANCE_MIGRATION, jobLog.getJobDefinitionType());
+    assertEquals(Batch.TYPE_PROCESS_INSTANCE_MODIFICATION, jobLog.getJobDefinitionType());
     assertEquals(batch.getId(), jobLog.getJobDefinitionConfiguration());
     assertEquals(executionDate, jobLog.getTimestamp());
-    assertEquals(sourceDeploymentId, jobLog.getDeploymentId());
+    assertNull(jobLog.getDeploymentId());
     assertNull(jobLog.getProcessDefinitionId());
     assertNull(jobLog.getExecutionId());
     assertNull(jobLog.getJobDueDate());
@@ -258,11 +275,12 @@ public class BatchMigrationHistoryTest {
 
   @Test
   public void testHistoricBatchForBatchDeletion() {
-    Batch batch = helper.migrateProcessInstancesAsync(1);
+    testRule.deploy(instance);
+    Batch batch = helper.startTransitionAsync("process1", 1, "seq");
 
     // when
     Date deletionDate = helper.addSecondsToClock(12);
-    managementService.deleteBatch(batch.getId(), false);
+    rule.getManagementService().deleteBatch(batch.getId(), false);
 
     // then the end time was set for the historic batch
     HistoricBatch historicBatch = helper.getHistoricBatch(batch);
@@ -272,11 +290,12 @@ public class BatchMigrationHistoryTest {
 
   @Test
   public void testHistoricSeedJobLogForBatchDeletion() {
-    Batch batch = helper.migrateProcessInstancesAsync(1);
+    testRule.deploy(instance);
+    Batch batch = helper.startBeforeAsync("process1", 1, "user1");
 
     // when
     Date deletionDate = helper.addSecondsToClock(12);
-    managementService.deleteBatch(batch.getId(), false);
+    rule.getManagementService().deleteBatch(batch.getId(), false);
 
     // then a deletion historic job log was added
     HistoricJobLog jobLog = helper.getHistoricSeedJobLog(batch).get(1);
@@ -287,12 +306,13 @@ public class BatchMigrationHistoryTest {
 
   @Test
   public void testHistoricMonitorJobLogForBatchDeletion() {
-    Batch batch = helper.migrateProcessInstancesAsync(1);
+    testRule.deploy(instance);
+    Batch batch = helper.startAfterAsync("process1", 1, "user1");
     helper.executeSeedJob(batch);
 
     // when
     Date deletionDate = helper.addSecondsToClock(12);
-    managementService.deleteBatch(batch.getId(), false);
+    rule.getManagementService().deleteBatch(batch.getId(), false);
 
     // then a deletion historic job log was added
     HistoricJobLog jobLog = helper.getHistoricMonitorJobLog(batch).get(1);
@@ -303,12 +323,13 @@ public class BatchMigrationHistoryTest {
 
   @Test
   public void testHistoricBatchJobLogForBatchDeletion() {
-    Batch batch = helper.migrateProcessInstancesAsync(1);
+    testRule.deploy(instance);
+    Batch batch = helper.startBeforeAsync("process1", 1, "user2");
     helper.executeSeedJob(batch);
 
     // when
     Date deletionDate = helper.addSecondsToClock(12);
-    managementService.deleteBatch(batch.getId(), false);
+    rule.getManagementService().deleteBatch(batch.getId(), false);
 
     // then a deletion historic job log was added
     HistoricJobLog jobLog = helper.getHistoricBatchJobLog(batch).get(1);
@@ -319,14 +340,15 @@ public class BatchMigrationHistoryTest {
 
   @Test
   public void testDeleteHistoricBatch() {
-    Batch batch = helper.migrateProcessInstancesAsync(1);
+    testRule.deploy(instance);
+    Batch batch = helper.startTransitionAsync("process1", 1, "seq");
     helper.executeSeedJob(batch);
     helper.executeJobs(batch);
     helper.executeMonitorJob(batch);
 
     // when
     HistoricBatch historicBatch = helper.getHistoricBatch(batch);
-    historyService.deleteHistoricBatch(historicBatch.getId());
+    rule.getHistoryService().deleteHistoricBatch(historicBatch.getId());
 
     // then the historic batch was removed and all job logs
     assertNull(helper.getHistoricBatch(batch));
@@ -338,55 +360,58 @@ public class BatchMigrationHistoryTest {
   @Test
   public void testHistoricSeedJobIncidentDeletion() {
     // given
-    Batch batch = helper.migrateProcessInstancesAsync(1);
+    testRule.deploy(instance);
+    Batch batch = helper.startBeforeAsync("process1", 1, "user2");
 
     Job seedJob = helper.getSeedJob(batch);
-    managementService.setJobRetries(seedJob.getId(), 0);
+    rule.getManagementService().setJobRetries(seedJob.getId(), 0);
 
-    managementService.deleteBatch(batch.getId(), false);
+    rule.getManagementService().deleteBatch(batch.getId(), false);
 
     // when
-    historyService.deleteHistoricBatch(batch.getId());
+    rule.getHistoryService().deleteHistoricBatch(batch.getId());
 
     // then the historic incident was deleted
-    long historicIncidents = historyService.createHistoricIncidentQuery().count();
+    long historicIncidents = rule.getHistoryService().createHistoricIncidentQuery().count();
     assertEquals(0, historicIncidents);
   }
 
   @Test
   public void testHistoricMonitorJobIncidentDeletion() {
     // given
-    Batch batch = helper.migrateProcessInstancesAsync(1);
+    testRule.deploy(instance);
+    Batch batch = helper.startTransitionAsync("process1", 1, "seq");
 
     helper.executeSeedJob(batch);
     Job monitorJob = helper.getMonitorJob(batch);
-    managementService.setJobRetries(monitorJob.getId(), 0);
+    rule.getManagementService().setJobRetries(monitorJob.getId(), 0);
 
-    managementService.deleteBatch(batch.getId(), false);
+    rule.getManagementService().deleteBatch(batch.getId(), false);
 
     // when
-    historyService.deleteHistoricBatch(batch.getId());
+    rule.getHistoryService().deleteHistoricBatch(batch.getId());
 
     // then the historic incident was deleted
-    long historicIncidents = historyService.createHistoricIncidentQuery().count();
+    long historicIncidents = rule.getHistoryService().createHistoricIncidentQuery().count();
     assertEquals(0, historicIncidents);
   }
 
   @Test
   public void testHistoricBatchJobLogIncidentDeletion() {
     // given
-    Batch batch = helper.migrateProcessInstancesAsync(3);
+    testRule.deploy(instance);
+    Batch batch = helper.startAfterAsync("process1", 3, "user1");
 
     helper.executeSeedJob(batch);
     helper.failExecutionJobs(batch, 3);
 
-    managementService.deleteBatch(batch.getId(), false);
+    rule.getManagementService().deleteBatch(batch.getId(), false);
 
     // when
-    historyService.deleteHistoricBatch(batch.getId());
+    rule.getHistoryService().deleteHistoricBatch(batch.getId());
 
     // then the historic incident was deleted
-    long historicIncidents = historyService.createHistoricIncidentQuery().count();
+    long historicIncidents = rule.getHistoryService().createHistoricIncidentQuery().count();
     assertEquals(0, historicIncidents);
   }
 
@@ -399,6 +424,4 @@ public class BatchMigrationHistoryTest {
     assertNull(jobLog.getProcessDefinitionId());
     assertNull(jobLog.getExecutionId());
   }
-
-
 }

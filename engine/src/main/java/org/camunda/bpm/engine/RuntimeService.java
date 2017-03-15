@@ -12,6 +12,10 @@
  */
 package org.camunda.bpm.engine;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
@@ -21,14 +25,26 @@ import org.camunda.bpm.engine.migration.MigrationPlanBuilder;
 import org.camunda.bpm.engine.migration.MigrationPlanExecutionBuilder;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
-import org.camunda.bpm.engine.runtime.*;
+import org.camunda.bpm.engine.runtime.ActivityInstance;
+import org.camunda.bpm.engine.runtime.EventSubscriptionQuery;
+import org.camunda.bpm.engine.runtime.Execution;
+import org.camunda.bpm.engine.runtime.ExecutionQuery;
+import org.camunda.bpm.engine.runtime.IncidentQuery;
+import org.camunda.bpm.engine.runtime.MessageCorrelationBuilder;
+import org.camunda.bpm.engine.runtime.ModificationBuilder;
+import org.camunda.bpm.engine.runtime.NativeExecutionQuery;
+import org.camunda.bpm.engine.runtime.NativeProcessInstanceQuery;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.ProcessInstanceModificationBuilder;
+import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
+import org.camunda.bpm.engine.runtime.ProcessInstantiationBuilder;
+import org.camunda.bpm.engine.runtime.SignalEventReceivedBuilder;
+import org.camunda.bpm.engine.runtime.UpdateProcessInstanceSuspensionStateBuilder;
+import org.camunda.bpm.engine.runtime.UpdateProcessInstanceSuspensionStateSelectBuilder;
+import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.value.SerializableValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 
 
 /** Service which provides access to {@link Deployment}s,
@@ -1809,4 +1825,23 @@ public interface RuntimeService {
    */
   MigrationPlanExecutionBuilder newMigration(MigrationPlan migrationPlan);
 
+  /**
+   * Creates a modification of multiple process instances in terms of activity cancellations
+   * and instantiations via a fluent builder. Returns a fluent builder that can be used to specify
+   * modification instructions and set process instances that should be modified.
+   *
+   * The modification can
+   * either be executed synchronously or asynchronously. A synchronously modification
+   * blocks the caller until the modification was completed. The modification can only be
+   * successfully completed if all process instances can be modified.
+   *
+   * If the modification is executed asynchronously a {@link Batch} is immediately returned.
+   * The modification is then executed as jobs from the process engine and the batch can
+   * be used to track the progress of the modification. The Batch splits the modification
+   * in smaller chunks which will be executed independently.
+   *
+   * @return a fluent builder
+   */
+
+  ModificationBuilder createModification();
 }

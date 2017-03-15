@@ -12,7 +12,22 @@
  */
 package org.camunda.bpm.engine.rest;
 
+import java.util.List;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriInfo;
+
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
+import org.camunda.bpm.engine.rest.dto.ModificationExecutionDto;
 import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
@@ -21,13 +36,6 @@ import org.camunda.bpm.engine.rest.dto.runtime.SetJobRetriesByProcessDto;
 import org.camunda.bpm.engine.rest.dto.runtime.batch.DeleteProcessInstancesDto;
 import org.camunda.bpm.engine.rest.sub.runtime.ProcessInstanceResource;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
-
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
-import java.util.List;
 
 @Produces(MediaType.APPLICATION_JSON)
 public interface ProcessInstanceRestService {
@@ -96,4 +104,14 @@ public interface ProcessInstanceRestService {
   @Produces(MediaType.APPLICATION_JSON)
   BatchDto setRetriesByProcess (SetJobRetriesByProcessDto setJobRetriesDto);
 
+  @POST
+  @Path("/modification")
+  @Consumes(MediaType.APPLICATION_JSON)
+  void executeModificationPlan(ModificationExecutionDto modificationExecutionDto);
+
+  @POST
+  @Path("modification-async")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  BatchDto executeModificationPlanAsync(ModificationExecutionDto modificationExecutionDto);
 }

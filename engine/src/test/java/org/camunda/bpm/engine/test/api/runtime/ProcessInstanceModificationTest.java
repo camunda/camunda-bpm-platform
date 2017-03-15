@@ -16,6 +16,9 @@ import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecutionTree;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.startsWith;
+import static org.junit.Assert.assertThat;
 
 import java.util.Collections;
 import java.util.List;
@@ -35,7 +38,6 @@ import org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListe
 import org.camunda.bpm.engine.test.bpmn.tasklistener.util.RecorderTaskListener;
 import org.camunda.bpm.engine.test.util.ExecutionTree;
 import org.camunda.bpm.engine.variable.Variables;
-import org.junit.Ignore;
 
 /**
  * @author Thorben Lindhauer
@@ -67,26 +69,17 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
 
     ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
 
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .cancelActivityInstance(getInstanceIdForActivity(tree, "task1"))
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId()).cancelActivityInstance(getInstanceIdForActivity(tree, "task1")).execute();
 
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-    assertThat(updatedTree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .activity("task2")
-      .done());
+    assertThat(updatedTree).hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId()).activity("task2").done());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
-    assertThat(executionTree)
-    .matches(
-      describeExecutionTree("task2").scope()
-        .done());
+    assertThat(executionTree).matches(describeExecutionTree("task2").scope().done());
 
     // complete the process
     completeTasksInOrder("task2");
@@ -99,13 +92,16 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
 
     ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
 
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .cancelActivityInstance(getInstanceIdForActivity(tree, "task1"))
-      .cancelActivityInstance(getInstanceIdForActivity(tree, "task2"))
-      .execute();
+    try {
+      runtimeService.createProcessInstanceModification("foo")
+        .cancelActivityInstance(getInstanceIdForActivity(tree, "task1"))
+        .cancelActivityInstance(getInstanceIdForActivity(tree, "task2"))
+        .execute();
 
-    assertProcessEnded(processInstance.getId());
+    } catch (ProcessEngineException e) {
+      assertThat(e.getMessage(), startsWith("ENGINE-13036"));
+      assertThat(e.getMessage(), containsString("Process instance '" + "foo" + "' cannot be modified"));
+    }
   }
 
   @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
@@ -113,29 +109,18 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("exclusiveGateway");
     String processInstanceId = processInstance.getId();
 
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .startBeforeActivity("task2")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId()).startBeforeActivity("task2").execute();
 
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-    assertThat(updatedTree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .activity("task1")
-        .activity("task2")
-      .done());
+    assertThat(updatedTree).hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId()).activity("task1").activity("task2").done());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
     assertThat(executionTree)
-    .matches(
-      describeExecutionTree(null).scope()
-        .child("task1").concurrent().noScope().up()
-        .child("task2").concurrent().noScope()
-      .done());
+        .matches(describeExecutionTree(null).scope().child("task1").concurrent().noScope().up().child("task2").concurrent().noScope().done());
 
     assertEquals(2, taskService.createTaskQuery().count());
 
@@ -151,29 +136,18 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
 
     ActivityInstance tree = runtimeService.getActivityInstance(processInstanceId);
 
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .startBeforeActivity("task2", tree.getId())
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId()).startBeforeActivity("task2", tree.getId()).execute();
 
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-    assertThat(updatedTree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .activity("task1")
-        .activity("task2")
-      .done());
+    assertThat(updatedTree).hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId()).activity("task1").activity("task2").done());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
     assertThat(executionTree)
-    .matches(
-      describeExecutionTree(null).scope()
-        .child("task1").concurrent().noScope().up()
-        .child("task2").concurrent().noScope()
-      .done());
+        .matches(describeExecutionTree(null).scope().child("task1").concurrent().noScope().up().child("task2").concurrent().noScope().done());
 
     assertEquals(2, taskService.createTaskQuery().count());
 
@@ -188,70 +162,47 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("doubleNestedSubprocess");
     String processInstanceId = processInstance.getId();
 
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .startBeforeActivity("subProcess")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId()).startBeforeActivity("subProcess").execute();
 
     // when I start the inner subprocess task without explicit ancestor
     try {
-      runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .startBeforeActivity("innerSubProcessTask")
-      .execute();
+      runtimeService.createProcessInstanceModification(processInstance.getId()).startBeforeActivity("innerSubProcessTask").execute();
       // then the command fails
       fail("should not succeed because the ancestors are ambiguous");
     } catch (ProcessEngineException e) {
       // happy path
     }
 
-    // when I start the inner subprocess task with an explicit ancestor activity instance id
+    // when I start the inner subprocess task with an explicit ancestor activity
+    // instance id
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
     ActivityInstance randomSubProcessInstance = getChildInstanceForActivity(updatedTree, "subProcess");
 
     // then the command suceeds
-    runtimeService.createProcessInstanceModification(processInstanceId)
-      .startBeforeActivity("innerSubProcessTask", randomSubProcessInstance.getId())
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstanceId).startBeforeActivity("innerSubProcessTask", randomSubProcessInstance.getId()).execute();
 
     // and the trees are correct
     updatedTree = runtimeService.getActivityInstance(processInstanceId);
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-    assertThat(updatedTree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .beginScope("subProcess")
-          .activity("subProcessTask")
-        .endScope()
-        .beginScope("subProcess")
-          .activity("subProcessTask")
-          .beginScope("innerSubProcess")
-            .activity("innerSubProcessTask")
-      .done());
+    assertThat(updatedTree)
+        .hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId()).beginScope("subProcess").activity("subProcessTask").endScope()
+            .beginScope("subProcess").activity("subProcessTask").beginScope("innerSubProcess").activity("innerSubProcessTask").done());
 
     ActivityInstance innerSubProcessInstance = getChildInstanceForActivity(updatedTree, "innerSubProcess");
     assertEquals(randomSubProcessInstance.getId(), innerSubProcessInstance.getParentActivityInstanceId());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
-    assertThat(executionTree)
-    .matches(
-      describeExecutionTree(null).scope()
-        .child(null).concurrent().noScope()
-          .child("subProcessTask").scope().up().up()
-        .child(null).concurrent().noScope()
-          .child(null).scope()
-            .child("subProcessTask").concurrent().noScope().up()
-            .child(null).concurrent().noScope()
-              .child("innerSubProcessTask").scope()
-      .done());
+    assertThat(executionTree).matches(describeExecutionTree(null).scope().child(null).concurrent().noScope().child("subProcessTask").scope().up().up()
+        .child(null).concurrent().noScope().child(null).scope().child("subProcessTask").concurrent().noScope().up().child(null).concurrent().noScope()
+        .child("innerSubProcessTask").scope().done());
 
     assertEquals(3, taskService.createTaskQuery().count());
 
     // complete the process
-    completeTasksInOrder("subProcessTask", "subProcessTask",
-        "innerSubProcessTask", "innerSubProcessTask", "innerSubProcessTask");
+    completeTasksInOrder("subProcessTask", "subProcessTask", "innerSubProcessTask", "innerSubProcessTask", "innerSubProcessTask");
     assertProcessEnded(processInstanceId);
   }
 
@@ -261,25 +212,17 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("doubleNestedSubprocess");
     String processInstanceId = processInstance.getId();
 
-
     try {
-      runtimeService
-        .createProcessInstanceModification(processInstance.getId())
-        .startBeforeActivity("subProcess", "noValidActivityInstanceId")
-        .execute();
+      runtimeService.createProcessInstanceModification(processInstance.getId()).startBeforeActivity("subProcess", "noValidActivityInstanceId").execute();
       fail();
     } catch (NotValidException e) {
       // happy path
-      assertTextPresent("Cannot perform instruction: "
-          + "Start before activity 'subProcess' with ancestor activity instance 'noValidActivityInstanceId'; "
+      assertTextPresent("Cannot perform instruction: " + "Start before activity 'subProcess' with ancestor activity instance 'noValidActivityInstanceId'; "
           + "Ancestor activity instance 'noValidActivityInstanceId' does not exist", e.getMessage());
     }
 
     try {
-      runtimeService
-        .createProcessInstanceModification(processInstance.getId())
-        .startBeforeActivity("subProcess", null)
-        .execute();
+      runtimeService.createProcessInstanceModification(processInstance.getId()).startBeforeActivity("subProcess", null).execute();
       fail();
     } catch (NotValidException e) {
       // happy path
@@ -290,17 +233,12 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     String subProcessTaskId = getInstanceIdForActivity(tree, "subProcessTask");
 
     try {
-      runtimeService
-        .createProcessInstanceModification(processInstance.getId())
-        .startBeforeActivity("subProcess", subProcessTaskId)
-        .execute();
+      runtimeService.createProcessInstanceModification(processInstance.getId()).startBeforeActivity("subProcess", subProcessTaskId).execute();
       fail("should not succeed because subProcessTask is a child of subProcess");
     } catch (NotValidException e) {
       // happy path
-      assertTextPresent("Cannot perform instruction: "
-          + "Start before activity 'subProcess' with ancestor activity instance '" + subProcessTaskId + "'; "
-          + "Scope execution for '" + subProcessTaskId + "' cannot be found in parent hierarchy of flow element 'subProcess'",
-          e.getMessage());
+      assertTextPresent("Cannot perform instruction: " + "Start before activity 'subProcess' with ancestor activity instance '" + subProcessTaskId + "'; "
+          + "Scope execution for '" + subProcessTaskId + "' cannot be found in parent hierarchy of flow element 'subProcess'", e.getMessage());
     }
   }
 
@@ -311,10 +249,7 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
 
     try {
       // when
-      runtimeService
-        .createProcessInstanceModification(instance.getId())
-        .startBeforeActivity("someNonExistingActivity")
-        .execute();
+      runtimeService.createProcessInstanceModification(instance.getId()).startBeforeActivity("someNonExistingActivity").execute();
       fail("should not succeed");
     } catch (NotValidException e) {
       // then
@@ -332,26 +267,16 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
 
     ActivityInstance tree = runtimeService.getActivityInstance(processInstanceId);
 
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .cancelActivityInstance(getInstanceIdForActivity(tree, "task1"))
-      .startAfterActivity("task1")
-      .startBeforeActivity("task1")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId()).cancelActivityInstance(getInstanceIdForActivity(tree, "task1"))
+        .startAfterActivity("task1").startBeforeActivity("task1").execute();
 
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
 
-    assertThat(updatedTree).hasStructure(
-        describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-          .activity("task1")
-        .done());
+    assertThat(updatedTree).hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId()).activity("task1").done());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
-    assertThat(executionTree)
-    .matches(
-      describeExecutionTree("task1").scope()
-      .done());
+    assertThat(executionTree).matches(describeExecutionTree("task1").scope().done());
 
     assertEquals(1, taskService.createTaskQuery().count());
 
@@ -365,29 +290,18 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("exclusiveGateway");
     String processInstanceId = processInstance.getId();
 
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .startTransition("flow4")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId()).startTransition("flow4").execute();
 
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-    assertThat(updatedTree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .activity("task1")
-        .activity("task2")
-      .done());
+    assertThat(updatedTree).hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId()).activity("task1").activity("task2").done());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
     assertThat(executionTree)
-    .matches(
-      describeExecutionTree(null).scope()
-        .child("task1").concurrent().noScope().up()
-        .child("task2").concurrent().noScope()
-      .done());
+        .matches(describeExecutionTree(null).scope().child("task1").concurrent().noScope().up().child("task2").concurrent().noScope().done());
 
     assertEquals(2, taskService.createTaskQuery().count());
 
@@ -403,29 +317,18 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
 
     ActivityInstance tree = runtimeService.getActivityInstance(processInstanceId);
 
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .startTransition("flow4", tree.getId())
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId()).startTransition("flow4", tree.getId()).execute();
 
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-    assertThat(updatedTree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .activity("task1")
-        .activity("task2")
-      .done());
+    assertThat(updatedTree).hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId()).activity("task1").activity("task2").done());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
     assertThat(executionTree)
-    .matches(
-      describeExecutionTree(null).scope()
-        .child("task1").concurrent().noScope().up()
-        .child("task2").concurrent().noScope()
-      .done());
+        .matches(describeExecutionTree(null).scope().child("task1").concurrent().noScope().up().child("task2").concurrent().noScope().done());
 
     assertEquals(2, taskService.createTaskQuery().count());
 
@@ -440,70 +343,47 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("doubleNestedSubprocess");
     String processInstanceId = processInstance.getId();
 
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .startBeforeActivity("subProcess")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId()).startBeforeActivity("subProcess").execute();
 
     // when I start the inner subprocess task without explicit ancestor
     try {
-      runtimeService
-        .createProcessInstanceModification(processInstance.getId())
-        .startTransition("flow5")
-        .execute();
+      runtimeService.createProcessInstanceModification(processInstance.getId()).startTransition("flow5").execute();
       // then the command fails
       fail("should not succeed because the ancestors are ambiguous");
     } catch (ProcessEngineException e) {
       // happy path
     }
 
-    // when I start the inner subprocess task with an explicit ancestor activity instance id
+    // when I start the inner subprocess task with an explicit ancestor activity
+    // instance id
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
     ActivityInstance randomSubProcessInstance = getChildInstanceForActivity(updatedTree, "subProcess");
 
     // then the command suceeds
-    runtimeService.createProcessInstanceModification(processInstanceId)
-      .startTransition("flow5", randomSubProcessInstance.getId())
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstanceId).startTransition("flow5", randomSubProcessInstance.getId()).execute();
 
     // and the trees are correct
     updatedTree = runtimeService.getActivityInstance(processInstanceId);
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-    assertThat(updatedTree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .beginScope("subProcess")
-          .activity("subProcessTask")
-        .endScope()
-        .beginScope("subProcess")
-          .activity("subProcessTask")
-          .beginScope("innerSubProcess")
-            .activity("innerSubProcessTask")
-      .done());
+    assertThat(updatedTree)
+        .hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId()).beginScope("subProcess").activity("subProcessTask").endScope()
+            .beginScope("subProcess").activity("subProcessTask").beginScope("innerSubProcess").activity("innerSubProcessTask").done());
 
     ActivityInstance innerSubProcessInstance = getChildInstanceForActivity(updatedTree, "innerSubProcess");
     assertEquals(randomSubProcessInstance.getId(), innerSubProcessInstance.getParentActivityInstanceId());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
-    assertThat(executionTree)
-    .matches(
-      describeExecutionTree(null).scope()
-        .child(null).concurrent().noScope()
-          .child("subProcessTask").scope().up().up()
-        .child(null).concurrent().noScope()
-          .child(null).scope()
-            .child("subProcessTask").concurrent().noScope().up()
-            .child(null).concurrent().noScope()
-              .child("innerSubProcessTask").scope()
-      .done());
+    assertThat(executionTree).matches(describeExecutionTree(null).scope().child(null).concurrent().noScope().child("subProcessTask").scope().up().up()
+        .child(null).concurrent().noScope().child(null).scope().child("subProcessTask").concurrent().noScope().up().child(null).concurrent().noScope()
+        .child("innerSubProcessTask").scope().done());
 
     assertEquals(3, taskService.createTaskQuery().count());
 
     // complete the process
-    completeTasksInOrder("subProcessTask", "subProcessTask",
-        "innerSubProcessTask", "innerSubProcessTask", "innerSubProcessTask");
+    completeTasksInOrder("subProcessTask", "subProcessTask", "innerSubProcessTask", "innerSubProcessTask", "innerSubProcessTask");
     assertProcessEnded(processInstanceId);
   }
 
@@ -514,23 +394,16 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     String processInstanceId = processInstance.getId();
 
     try {
-      runtimeService
-        .createProcessInstanceModification(processInstance.getId())
-        .startTransition("flow5", "noValidActivityInstanceId")
-        .execute();
+      runtimeService.createProcessInstanceModification(processInstance.getId()).startTransition("flow5", "noValidActivityInstanceId").execute();
       fail();
     } catch (NotValidException e) {
       // happy path
-      assertTextPresent("Cannot perform instruction: "
-          + "Start transition 'flow5' with ancestor activity instance 'noValidActivityInstanceId'; "
+      assertTextPresent("Cannot perform instruction: " + "Start transition 'flow5' with ancestor activity instance 'noValidActivityInstanceId'; "
           + "Ancestor activity instance 'noValidActivityInstanceId' does not exist", e.getMessage());
     }
 
     try {
-      runtimeService
-        .createProcessInstanceModification(processInstance.getId())
-        .startTransition("flow5", null)
-        .execute();
+      runtimeService.createProcessInstanceModification(processInstance.getId()).startTransition("flow5", null).execute();
       fail();
     } catch (NotValidException e) {
       // happy path
@@ -541,17 +414,12 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     String subProcessTaskId = getInstanceIdForActivity(tree, "subProcessTask");
 
     try {
-      runtimeService
-        .createProcessInstanceModification(processInstance.getId())
-        .startTransition("flow5", subProcessTaskId)
-        .execute();
+      runtimeService.createProcessInstanceModification(processInstance.getId()).startTransition("flow5", subProcessTaskId).execute();
       fail("should not succeed because subProcessTask is a child of subProcess");
     } catch (NotValidException e) {
       // happy path
-      assertTextPresent("Cannot perform instruction: "
-          + "Start transition 'flow5' with ancestor activity instance '" + subProcessTaskId + "'; "
-          + "Scope execution for '" + subProcessTaskId + "' cannot be found in parent hierarchy of flow element 'flow5'",
-          e.getMessage());
+      assertTextPresent("Cannot perform instruction: " + "Start transition 'flow5' with ancestor activity instance '" + subProcessTaskId + "'; "
+          + "Scope execution for '" + subProcessTaskId + "' cannot be found in parent hierarchy of flow element 'flow5'", e.getMessage());
     }
   }
 
@@ -560,29 +428,18 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("exclusiveGateway");
     String processInstanceId = processInstance.getId();
 
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .startTransition("flow2")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId()).startTransition("flow2").execute();
 
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-    assertThat(updatedTree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .activity("task1")
-        .activity("task1")
-      .done());
+    assertThat(updatedTree).hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId()).activity("task1").activity("task1").done());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
     assertThat(executionTree)
-    .matches(
-      describeExecutionTree(null).scope()
-        .child("task1").concurrent().noScope().up()
-        .child("task1").concurrent().noScope()
-      .done());
+        .matches(describeExecutionTree(null).scope().child("task1").concurrent().noScope().up().child("task1").concurrent().noScope().done());
 
     assertEquals(2, taskService.createTaskQuery().count());
 
@@ -597,19 +454,14 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     String processInstanceId = processInstance.getId();
 
     try {
-      runtimeService
-        .createProcessInstanceModification(processInstanceId)
-        .startTransition("invalidFlowId")
-        .execute();
+      runtimeService.createProcessInstanceModification(processInstanceId).startTransition("invalidFlowId").execute();
 
       fail("should not suceed");
 
     } catch (ProcessEngineException e) {
       // happy path
-      assertTextPresent("Cannot perform instruction: "
-          + "Start transition 'invalidFlowId'; "
-          + "Element 'invalidFlowId' does not exist in process '" + processInstance.getProcessDefinitionId() + "'",
-          e.getMessage());
+      assertTextPresent("Cannot perform instruction: " + "Start transition 'invalidFlowId'; " + "Element 'invalidFlowId' does not exist in process '"
+          + processInstance.getProcessDefinitionId() + "'", e.getMessage());
     }
   }
 
@@ -618,29 +470,18 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("exclusiveGateway");
     String processInstanceId = processInstance.getId();
 
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .startAfterActivity("theStart")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId()).startAfterActivity("theStart").execute();
 
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-    assertThat(updatedTree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .activity("task1")
-        .activity("task1")
-      .done());
+    assertThat(updatedTree).hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId()).activity("task1").activity("task1").done());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
     assertThat(executionTree)
-    .matches(
-      describeExecutionTree(null).scope()
-        .child("task1").concurrent().noScope().up()
-        .child("task1").concurrent().noScope()
-      .done());
+        .matches(describeExecutionTree(null).scope().child("task1").concurrent().noScope().up().child("task1").concurrent().noScope().done());
 
     assertEquals(2, taskService.createTaskQuery().count());
 
@@ -656,29 +497,18 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
 
     ActivityInstance tree = runtimeService.getActivityInstance(processInstanceId);
 
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .startAfterActivity("theStart", tree.getId())
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId()).startAfterActivity("theStart", tree.getId()).execute();
 
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-    assertThat(updatedTree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .activity("task1")
-        .activity("task1")
-      .done());
+    assertThat(updatedTree).hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId()).activity("task1").activity("task1").done());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
     assertThat(executionTree)
-    .matches(
-      describeExecutionTree(null).scope()
-        .child("task1").concurrent().noScope().up()
-        .child("task1").concurrent().noScope()
-      .done());
+        .matches(describeExecutionTree(null).scope().child("task1").concurrent().noScope().up().child("task1").concurrent().noScope().done());
 
     assertEquals(2, taskService.createTaskQuery().count());
 
@@ -693,70 +523,47 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("doubleNestedSubprocess");
     String processInstanceId = processInstance.getId();
 
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .startBeforeActivity("subProcess")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId()).startBeforeActivity("subProcess").execute();
 
     // when I start the inner subprocess task without explicit ancestor
     try {
-      runtimeService
-        .createProcessInstanceModification(processInstance.getId())
-        .startAfterActivity("innerSubProcessStart")
-        .execute();
+      runtimeService.createProcessInstanceModification(processInstance.getId()).startAfterActivity("innerSubProcessStart").execute();
       // then the command fails
       fail("should not succeed because the ancestors are ambiguous");
     } catch (ProcessEngineException e) {
       // happy path
     }
 
-    // when I start the inner subprocess task with an explicit ancestor activity instance id
+    // when I start the inner subprocess task with an explicit ancestor activity
+    // instance id
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
     ActivityInstance randomSubProcessInstance = getChildInstanceForActivity(updatedTree, "subProcess");
 
     // then the command suceeds
-    runtimeService.createProcessInstanceModification(processInstanceId)
-      .startAfterActivity("innerSubProcessStart", randomSubProcessInstance.getId())
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstanceId).startAfterActivity("innerSubProcessStart", randomSubProcessInstance.getId()).execute();
 
     // and the trees are correct
     updatedTree = runtimeService.getActivityInstance(processInstanceId);
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-    assertThat(updatedTree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .beginScope("subProcess")
-          .activity("subProcessTask")
-        .endScope()
-        .beginScope("subProcess")
-          .activity("subProcessTask")
-          .beginScope("innerSubProcess")
-            .activity("innerSubProcessTask")
-      .done());
+    assertThat(updatedTree)
+        .hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId()).beginScope("subProcess").activity("subProcessTask").endScope()
+            .beginScope("subProcess").activity("subProcessTask").beginScope("innerSubProcess").activity("innerSubProcessTask").done());
 
     ActivityInstance innerSubProcessInstance = getChildInstanceForActivity(updatedTree, "innerSubProcess");
     assertEquals(randomSubProcessInstance.getId(), innerSubProcessInstance.getParentActivityInstanceId());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
-    assertThat(executionTree)
-    .matches(
-      describeExecutionTree(null).scope()
-        .child(null).concurrent().noScope()
-          .child("subProcessTask").scope().up().up()
-        .child(null).concurrent().noScope()
-          .child(null).scope()
-            .child("subProcessTask").concurrent().noScope().up()
-            .child(null).concurrent().noScope()
-              .child("innerSubProcessTask").scope()
-      .done());
+    assertThat(executionTree).matches(describeExecutionTree(null).scope().child(null).concurrent().noScope().child("subProcessTask").scope().up().up()
+        .child(null).concurrent().noScope().child(null).scope().child("subProcessTask").concurrent().noScope().up().child(null).concurrent().noScope()
+        .child("innerSubProcessTask").scope().done());
 
     assertEquals(3, taskService.createTaskQuery().count());
 
     // complete the process
-    completeTasksInOrder("subProcessTask", "subProcessTask",
-        "innerSubProcessTask", "innerSubProcessTask", "innerSubProcessTask");
+    completeTasksInOrder("subProcessTask", "subProcessTask", "innerSubProcessTask", "innerSubProcessTask", "innerSubProcessTask");
     assertProcessEnded(processInstanceId);
   }
 
@@ -766,25 +573,20 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("doubleNestedSubprocess");
     String processInstanceId = processInstance.getId();
 
-
     try {
-      runtimeService
-        .createProcessInstanceModification(processInstance.getId())
-        .startAfterActivity("innerSubProcessStart", "noValidActivityInstanceId")
-        .execute();
+      runtimeService.createProcessInstanceModification(processInstance.getId()).startAfterActivity("innerSubProcessStart", "noValidActivityInstanceId")
+          .execute();
       fail();
     } catch (NotValidException e) {
       // happy path
-      assertTextPresent("Cannot perform instruction: "
-          + "Start after activity 'innerSubProcessStart' with ancestor activity instance 'noValidActivityInstanceId'; "
-          + "Ancestor activity instance 'noValidActivityInstanceId' does not exist", e.getMessage());
+      assertTextPresent(
+          "Cannot perform instruction: " + "Start after activity 'innerSubProcessStart' with ancestor activity instance 'noValidActivityInstanceId'; "
+              + "Ancestor activity instance 'noValidActivityInstanceId' does not exist",
+          e.getMessage());
     }
 
     try {
-      runtimeService
-        .createProcessInstanceModification(processInstance.getId())
-        .startAfterActivity("innerSubProcessStart", null)
-        .execute();
+      runtimeService.createProcessInstanceModification(processInstance.getId()).startAfterActivity("innerSubProcessStart", null).execute();
       fail();
     } catch (NotValidException e) {
       // happy path
@@ -795,17 +597,12 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     String subProcessTaskId = getInstanceIdForActivity(tree, "subProcessTask");
 
     try {
-      runtimeService
-        .createProcessInstanceModification(processInstance.getId())
-        .startAfterActivity("innerSubProcessStart", subProcessTaskId)
-        .execute();
+      runtimeService.createProcessInstanceModification(processInstance.getId()).startAfterActivity("innerSubProcessStart", subProcessTaskId).execute();
       fail("should not succeed because subProcessTask is a child of subProcess");
     } catch (NotValidException e) {
       // happy path
-      assertTextPresent("Cannot perform instruction: "
-          + "Start after activity 'innerSubProcessStart' with ancestor activity instance '" + subProcessTaskId + "'; "
-          + "Scope execution for '" + subProcessTaskId + "' cannot be found in parent hierarchy of flow element 'flow5'",
-          e.getMessage());
+      assertTextPresent("Cannot perform instruction: " + "Start after activity 'innerSubProcessStart' with ancestor activity instance '" + subProcessTaskId
+          + "'; " + "Scope execution for '" + subProcessTaskId + "' cannot be found in parent hierarchy of flow element 'flow5'", e.getMessage());
     }
   }
 
@@ -815,10 +612,7 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     String processInstanceId = processInstance.getId();
 
     try {
-      runtimeService
-        .createProcessInstanceModification(processInstanceId)
-        .startAfterActivity("fork")
-        .execute();
+      runtimeService.createProcessInstanceModification(processInstanceId).startAfterActivity("fork").execute();
 
       fail("should not suceed since 'fork' has more than one outgoing sequence flow");
 
@@ -834,10 +628,7 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     String processInstanceId = processInstance.getId();
 
     try {
-      runtimeService
-        .createProcessInstanceModification(processInstanceId)
-        .startAfterActivity("theEnd")
-        .execute();
+      runtimeService.createProcessInstanceModification(processInstanceId).startAfterActivity("theEnd").execute();
 
       fail("should not suceed since 'theEnd' has no outgoing sequence flow");
 
@@ -854,17 +645,12 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
 
     try {
       // when
-      runtimeService
-        .createProcessInstanceModification(instance.getId())
-        .startAfterActivity("someNonExistingActivity")
-        .execute();
+      runtimeService.createProcessInstanceModification(instance.getId()).startAfterActivity("someNonExistingActivity").execute();
       fail("should not succeed");
     } catch (NotValidException e) {
       // then
-      assertTextPresentIgnoreCase("Cannot perform instruction: "
-          + "Start after activity 'someNonExistingActivity'; "
-          + "Activity 'someNonExistingActivity' does not exist: activity is null",
-          e.getMessage());
+      assertTextPresentIgnoreCase("Cannot perform instruction: " + "Start after activity 'someNonExistingActivity'; "
+          + "Activity 'someNonExistingActivity' does not exist: activity is null", e.getMessage());
     }
   }
 
@@ -873,31 +659,18 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
     String processInstanceId = processInstance.getId();
 
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .startBeforeActivity("theTask")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId()).startBeforeActivity("theTask").execute();
 
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-    assertThat(updatedTree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .activity("theTask")
-        .activity("theTask")
-      .done());
+    assertThat(updatedTree).hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId()).activity("theTask").activity("theTask").done());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
-    assertThat(executionTree)
-    .matches(
-      describeExecutionTree(null).scope()
-        .child(null).concurrent().noScope()
-          .child("theTask").scope().up().up()
-        .child(null).concurrent().noScope()
-          .child("theTask").scope()
-      .done());
+    assertThat(executionTree).matches(describeExecutionTree(null).scope().child(null).concurrent().noScope().child("theTask").scope().up().up().child(null)
+        .concurrent().noScope().child("theTask").scope().done());
 
     assertEquals(2, taskService.createTaskQuery().count());
     completeTasksInOrder("theTask", "theTask");
@@ -909,77 +682,49 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
     String processInstanceId = processInstance.getId();
 
-    // when starting after the task, essentially nothing changes in the process instance
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .startAfterActivity("theTask")
-      .execute();
+    // when starting after the task, essentially nothing changes in the process
+    // instance
+    runtimeService.createProcessInstanceModification(processInstance.getId()).startAfterActivity("theTask").execute();
 
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-    assertThat(updatedTree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .activity("theTask")
-      .done());
+    assertThat(updatedTree).hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId()).activity("theTask").done());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
-    assertThat(executionTree)
-    .matches(
-      describeExecutionTree(null).scope()
-        .child("theTask").scope()
-      .done());
+    assertThat(executionTree).matches(describeExecutionTree(null).scope().child("theTask").scope().done());
 
     // when starting after the start event, regular concurrency happens
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .startAfterActivity("theStart")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId()).startAfterActivity("theStart").execute();
 
     updatedTree = runtimeService.getActivityInstance(processInstanceId);
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-    assertThat(updatedTree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .activity("theTask")
-        .activity("theTask")
-      .done());
+    assertThat(updatedTree).hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId()).activity("theTask").activity("theTask").done());
 
     executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
-    assertThat(executionTree)
-    .matches(
-      describeExecutionTree(null).scope()
-        .child(null).concurrent().noScope()
-          .child("theTask").scope().up().up()
-        .child(null).concurrent().noScope()
-          .child("theTask").scope()
-      .done());
+    assertThat(executionTree).matches(describeExecutionTree(null).scope().child(null).concurrent().noScope().child("theTask").scope().up().up().child(null)
+        .concurrent().noScope().child("theTask").scope().done());
 
     completeTasksInOrder("theTask", "theTask");
     assertProcessEnded(processInstanceId);
   }
 
-
-
   @Deployment(resources = SUBPROCESS_BOUNDARY_EVENTS_PROCESS)
   public void testStartBeforeEventSubscription() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subprocess");
 
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .startBeforeActivity("innerTask")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId()).startBeforeActivity("innerTask").execute();
 
     // then two timer jobs should have been created
     assertEquals(2, managementService.createJobQuery().count());
     Job innerJob = managementService.createJobQuery().activityId("innerTimer").singleResult();
     assertNotNull(innerJob);
-    assertEquals(runtimeService.createExecutionQuery().activityId("innerTask").singleResult().getId(),
-        innerJob.getExecutionId());
+    assertEquals(runtimeService.createExecutionQuery().activityId("innerTask").singleResult().getId(), innerJob.getExecutionId());
 
     Job outerJob = managementService.createJobQuery().activityId("outerTimer").singleResult();
     assertNotNull(outerJob);
@@ -995,25 +740,20 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     Task outerBoundaryTask = taskService.createTaskQuery().taskDefinitionKey("outerAfterBoundaryTask").singleResult();
     assertNotNull(outerBoundaryTask);
 
-
   }
 
   @Deployment(resources = SUBPROCESS_LISTENER_PROCESS)
   public void testActivityExecutionListenerInvocation() {
     RecorderExecutionListener.clear();
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(
-        "subprocess",
-        Collections.<String, Object>singletonMap("listener", new RecorderExecutionListener()));
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subprocess",
+        Collections.<String, Object> singletonMap("listener", new RecorderExecutionListener()));
 
     String processInstanceId = processInstance.getId();
 
     assertTrue(RecorderExecutionListener.getRecordedEvents().isEmpty());
 
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .startBeforeActivity("innerTask")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId()).startBeforeActivity("innerTask").execute();
 
     // assert activity instance tree
     ActivityInstance activityInstanceTree = runtimeService.getActivityInstance(processInstanceId);
@@ -1021,11 +761,7 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     assertEquals(processInstanceId, activityInstanceTree.getProcessInstanceId());
 
     assertThat(activityInstanceTree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .activity("outerTask")
-        .beginScope("subProcess")
-          .activity("innerTask")
-      .done());
+        describeActivityInstanceTree(processInstance.getProcessDefinitionId()).activity("outerTask").beginScope("subProcess").activity("innerTask").done());
 
     // assert listener invocations
     List<RecordedEvent> recordedEvents = RecorderExecutionListener.getRecordedEvents();
@@ -1047,10 +783,7 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
 
     RecorderExecutionListener.clear();
 
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .cancelActivityInstance(innerTaskInstance.getId())
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId()).cancelActivityInstance(innerTaskInstance.getId()).execute();
 
     assertEquals(2, RecorderExecutionListener.getRecordedEvents().size());
   }
@@ -1059,19 +792,15 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
   public void testSkipListenerInvocation() {
     RecorderExecutionListener.clear();
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(
-        "subprocess",
-        Collections.<String, Object>singletonMap("listener", new RecorderExecutionListener()));
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subprocess",
+        Collections.<String, Object> singletonMap("listener", new RecorderExecutionListener()));
 
     String processInstanceId = processInstance.getId();
 
     assertTrue(RecorderExecutionListener.getRecordedEvents().isEmpty());
 
     // when I start an activity with "skip listeners" setting
-    runtimeService
-      .createProcessInstanceModification(processInstanceId)
-      .startBeforeActivity("innerTask")
-      .execute(true, false);
+    runtimeService.createProcessInstanceModification(processInstanceId).startBeforeActivity("innerTask").execute(true, false);
 
     // then no listeners are invoked
     assertTrue(RecorderExecutionListener.getRecordedEvents().isEmpty());
@@ -1079,19 +808,15 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     // when I cancel an activity with "skip listeners" setting
     ActivityInstance activityInstanceTree = runtimeService.getActivityInstance(processInstanceId);
 
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .cancelActivityInstance(getChildInstanceForActivity(activityInstanceTree, "innerTask").getId())
-      .execute(true, false);
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+        .cancelActivityInstance(getChildInstanceForActivity(activityInstanceTree, "innerTask").getId()).execute(true, false);
 
     // then no listeners are invoked
     assertTrue(RecorderExecutionListener.getRecordedEvents().isEmpty());
 
     // when I cancel an activity that ends the process instance
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .cancelActivityInstance(getChildInstanceForActivity(activityInstanceTree, "outerTask").getId())
-      .execute(true, false);
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+        .cancelActivityInstance(getChildInstanceForActivity(activityInstanceTree, "outerTask").getId()).execute(true, false);
 
     // then no listeners are invoked
     assertTrue(RecorderExecutionListener.getRecordedEvents().isEmpty());
@@ -1099,19 +824,15 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
 
   @Deployment(resources = TASK_LISTENER_PROCESS)
   public void testSkipTaskListenerInvocation() {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(
-        "taskListenerProcess",
-        Collections.<String, Object>singletonMap("listener", new RecorderTaskListener()));
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskListenerProcess",
+        Collections.<String, Object> singletonMap("listener", new RecorderTaskListener()));
 
     String processInstanceId = processInstance.getId();
 
     RecorderTaskListener.clear();
 
     // when I start an activity with "skip listeners" setting
-    runtimeService
-      .createProcessInstanceModification(processInstanceId)
-      .startBeforeActivity("task")
-      .execute(true, false);
+    runtimeService.createProcessInstanceModification(processInstanceId).startBeforeActivity("task").execute(true, false);
 
     // then no listeners are invoked
     assertTrue(RecorderTaskListener.getRecordedEvents().isEmpty());
@@ -1119,10 +840,8 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     // when I cancel an activity with "skip listeners" setting
     ActivityInstance activityInstanceTree = runtimeService.getActivityInstance(processInstanceId);
 
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .cancelActivityInstance(getChildInstanceForActivity(activityInstanceTree, "task").getId())
-      .execute(true, false);
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+        .cancelActivityInstance(getChildInstanceForActivity(activityInstanceTree, "task").getId()).execute(true, false);
 
     // then no listeners are invoked
     assertTrue(RecorderTaskListener.getRecordedEvents().isEmpty());
@@ -1133,9 +852,7 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("ioMappingProcess");
 
     // when I start task2
-    runtimeService.createProcessInstanceModification(processInstance.getId())
-      .startBeforeActivity("task2")
-      .execute(false, true);
+    runtimeService.createProcessInstanceModification(processInstance.getId()).startBeforeActivity("task2").execute(false, true);
 
     // then the input mapping should not have executed
     Execution task2Execution = runtimeService.createExecutionQuery().activityId("task2").singleResult();
@@ -1144,9 +861,7 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     assertNull(runtimeService.getVariable(task2Execution.getId(), "inputMappingExecuted"));
 
     // when I cancel task2
-    runtimeService.createProcessInstanceModification(processInstance.getId())
-      .cancelAllForActivity("task2")
-      .execute(false, true);
+    runtimeService.createProcessInstanceModification(processInstance.getId()).cancelAllForActivity("task2").execute(false, true);
 
     // then the output mapping should not have executed
     assertNull(runtimeService.getVariable(processInstance.getId(), "outputMappingExecuted"));
@@ -1156,26 +871,22 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
   public void testSkipIoMappingsOnSubProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
-    runtimeService.createProcessInstanceModification(processInstance.getId())
-      .startBeforeActivity("boundaryEvent")
-      .execute(false, true);
+    runtimeService.createProcessInstanceModification(processInstance.getId()).startBeforeActivity("boundaryEvent").execute(false, true);
 
     // then the output mapping should not have executed
     assertNull(runtimeService.getVariable(processInstance.getId(), "outputMappingExecuted"));
   }
 
   /**
-   * should also skip io mappings that are defined on already instantiated ancestor
-   * scopes and that may be executed due to the ancestor scope completing within the
-   * modification command.
+   * should also skip io mappings that are defined on already instantiated
+   * ancestor scopes and that may be executed due to the ancestor scope
+   * completing within the modification command.
    */
   @Deployment(resources = IO_MAPPING_ON_SUB_PROCESS_AND_NESTED_SUB_PROCESS)
   public void testSkipIoMappingsOnSubProcessNested() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
-    runtimeService.createProcessInstanceModification(processInstance.getId())
-      .startBeforeActivity("boundaryEvent")
-      .execute(false, true);
+    runtimeService.createProcessInstanceModification(processInstance.getId()).startBeforeActivity("boundaryEvent").execute(false, true);
 
     // then the output mapping should not have executed
     assertNull(runtimeService.getVariable(processInstance.getId(), "outputMappingExecuted"));
@@ -1188,9 +899,7 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process",
         Variables.createVariables().putValue("listener", new RecorderExecutionListener()));
 
-    runtimeService.createProcessInstanceModification(processInstance.getId())
-      .startBeforeActivity("boundaryEvent")
-      .execute(true, false);
+    runtimeService.createProcessInstanceModification(processInstance.getId()).startBeforeActivity("boundaryEvent").execute(true, false);
 
     assertProcessEnded(processInstance.getId());
 
@@ -1205,9 +914,7 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("transitionListenerProcess",
         Variables.createVariables().putValue("listener", new RecorderExecutionListener()));
 
-    runtimeService.createProcessInstanceModification(instance.getId())
-      .startTransition("flow2")
-      .execute();
+    runtimeService.createProcessInstanceModification(instance.getId()).startTransition("flow2").execute();
 
     // transition listener should have been invoked
     List<RecordedEvent> events = RecorderExecutionListener.getRecordedEvents();
@@ -1222,20 +929,12 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     assertNotNull(updatedTree);
     assertEquals(instance.getId(), updatedTree.getProcessInstanceId());
 
-    assertThat(updatedTree).hasStructure(
-      describeActivityInstanceTree(instance.getProcessDefinitionId())
-        .activity("task1")
-        .activity("task2")
-      .done());
+    assertThat(updatedTree).hasStructure(describeActivityInstanceTree(instance.getProcessDefinitionId()).activity("task1").activity("task2").done());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(instance.getId(), processEngine);
 
     assertThat(executionTree)
-      .matches(
-        describeExecutionTree(null).scope()
-          .child("task1").concurrent().noScope().up()
-          .child("task2").concurrent().noScope()
-        .done());
+        .matches(describeExecutionTree(null).scope().child("task1").concurrent().noScope().up().child("task2").concurrent().noScope().done());
 
     completeTasksInOrder("task1", "task2", "task2");
     assertProcessEnded(instance.getId());
@@ -1248,9 +947,7 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("transitionListenerProcess",
         Variables.createVariables().putValue("listener", new RecorderExecutionListener()));
 
-    runtimeService.createProcessInstanceModification(instance.getId())
-      .startTransition("flow2")
-      .execute();
+    runtimeService.createProcessInstanceModification(instance.getId()).startTransition("flow2").execute();
 
     // transition listener should have been invoked
     List<RecordedEvent> events = RecorderExecutionListener.getRecordedEvents();
@@ -1265,20 +962,12 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     assertNotNull(updatedTree);
     assertEquals(instance.getId(), updatedTree.getProcessInstanceId());
 
-    assertThat(updatedTree).hasStructure(
-      describeActivityInstanceTree(instance.getProcessDefinitionId())
-        .activity("task1")
-        .activity("task2")
-      .done());
+    assertThat(updatedTree).hasStructure(describeActivityInstanceTree(instance.getProcessDefinitionId()).activity("task1").activity("task2").done());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(instance.getId(), processEngine);
 
     assertThat(executionTree)
-      .matches(
-        describeExecutionTree(null).scope()
-          .child("task1").concurrent().noScope().up()
-          .child("task2").concurrent().noScope()
-        .done());
+        .matches(describeExecutionTree(null).scope().child("task1").concurrent().noScope().up().child("task2").concurrent().noScope().done());
 
     completeTasksInOrder("task1", "task2", "task2");
     assertProcessEnded(instance.getId());
@@ -1288,22 +977,13 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
   public void testStartBeforeWithVariables() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("exclusiveGateway");
 
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .startBeforeActivity("task2")
-      .setVariable("procInstVar", "procInstValue")
-      .setVariableLocal("localVar", "localValue")
-      .setVariables(Variables.createVariables().putValue("procInstMapVar", "procInstMapValue"))
-      .setVariablesLocal(Variables.createVariables().putValue("localMapVar", "localMapValue"))
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId()).startBeforeActivity("task2").setVariable("procInstVar", "procInstValue")
+        .setVariableLocal("localVar", "localValue").setVariables(Variables.createVariables().putValue("procInstMapVar", "procInstMapValue"))
+        .setVariablesLocal(Variables.createVariables().putValue("localMapVar", "localMapValue")).execute();
 
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstance.getId());
     assertNotNull(updatedTree);
-    assertThat(updatedTree).hasStructure(
-        describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-          .activity("task1")
-          .activity("task2")
-        .done());
+    assertThat(updatedTree).hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId()).activity("task1").activity("task2").done());
 
     ActivityInstance task2Instance = getChildInstanceForActivity(updatedTree, "task2");
     assertNotNull(task2Instance);
@@ -1327,27 +1007,18 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
 
     ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
 
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .cancelActivityInstance(getInstanceIdForActivity(tree, "task1"))
-      .startBeforeActivity("task2")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId()).cancelActivityInstance(getInstanceIdForActivity(tree, "task1"))
+        .startBeforeActivity("task2").execute();
 
     ActivityInstance activityInstanceTree = runtimeService.getActivityInstance(processInstanceId);
     assertNotNull(activityInstanceTree);
     assertEquals(processInstanceId, activityInstanceTree.getProcessInstanceId());
 
-    assertThat(activityInstanceTree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .activity("task2")
-      .done());
+    assertThat(activityInstanceTree).hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId()).activity("task2").done());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
-    assertThat(executionTree)
-    .matches(
-      describeExecutionTree("task2").scope()
-      .done());
+    assertThat(executionTree).matches(describeExecutionTree("task2").scope().done());
 
     completeTasksInOrder("task2");
     assertProcessEnded(processInstanceId);
@@ -1367,10 +1038,7 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
 
     // when innerTask2 is cancelled
     ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .cancelActivityInstance(getInstanceIdForActivity(tree, "innerTask2"))
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId()).cancelActivityInstance(getInstanceIdForActivity(tree, "innerTask2")).execute();
 
     // then the innerTask compensation should be removed
     assertEquals(0, runtimeService.createEventSubscriptionQuery().count());
@@ -1380,10 +1048,7 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
   public void testCompensationCreation() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensationProcess");
 
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .startBeforeActivity("innerTask")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId()).startBeforeActivity("innerTask").execute();
 
     Execution task2Execution = runtimeService.createExecutionQuery().activityId("innerTask").singleResult();
     Task task = taskService.createTaskQuery().executionId(task2Execution.getId()).singleResult();
@@ -1417,12 +1082,8 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     // one on outerTask, one on innerTask
     assertEquals(2, taskService.createTaskQuery().count());
 
-
     // when inner task is cancelled
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .cancelActivityInstance(getInstanceIdForActivity(tree, "innerTask"))
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId()).cancelActivityInstance(getInstanceIdForActivity(tree, "innerTask")).execute();
 
     // then no compensation event subscription exists
     assertEquals(0, runtimeService.createEventSubscriptionQuery().count());
@@ -1447,36 +1108,20 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     assertEquals("undoTask", task.getTaskDefinitionKey());
 
     ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
-    assertThat(tree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .beginScope("tx")
-          .activity("txEnd")
-          .activity("undoTask")
-        .done());
+    assertThat(tree)
+        .hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId()).beginScope("tx").activity("txEnd").activity("undoTask").done());
 
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .startBeforeActivity("userTask")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId()).startBeforeActivity("userTask").execute();
 
     tree = runtimeService.getActivityInstance(processInstance.getId());
-    assertThat(tree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .beginScope("tx")
-          .activity("txEnd")
-          .activity("undoTask")
-          .activity("userTask")
-        .done());
+    assertThat(tree).hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId()).beginScope("tx").activity("txEnd").activity("undoTask")
+        .activity("userTask").done());
 
     completeTasksInOrder("userTask");
 
     tree = runtimeService.getActivityInstance(processInstance.getId());
-    assertThat(tree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .beginScope("tx")
-          .activity("txEnd")
-          .activity("undoTask")
-        .done());
+    assertThat(tree)
+        .hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId()).beginScope("tx").activity("txEnd").activity("undoTask").done());
 
     Task newTask = taskService.createTaskQuery().singleResult();
     assertNotSame(task.getId(), newTask.getId());
@@ -1495,31 +1140,16 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     assertEquals("undoTask", task.getTaskDefinitionKey());
 
     ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
-    assertThat(tree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .beginScope("tx")
-          .activity("txEnd")
-          .activity("undoTask")
-        .done());
+    assertThat(tree)
+        .hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId()).beginScope("tx").activity("txEnd").activity("undoTask").done());
 
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .startBeforeActivity("userTask", processInstance.getId())
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId()).startBeforeActivity("userTask", processInstance.getId()).execute();
 
     completeTasksInOrder("userTask");
 
     tree = runtimeService.getActivityInstance(processInstance.getId());
-    assertThat(tree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .beginScope("tx")
-          .activity("txEnd")
-          .activity("undoTask")
-        .endScope()
-        .beginScope("tx")
-          .activity("txEnd")
-          .activity("undoTask")
-        .done());
+    assertThat(tree).hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId()).beginScope("tx").activity("txEnd").activity("undoTask")
+        .endScope().beginScope("tx").activity("txEnd").activity("undoTask").done());
 
     completeTasksInOrder("undoTask", "undoTask", "afterCancel", "afterCancel");
     assertProcessEnded(processInstance.getId());
@@ -1534,10 +1164,7 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     Task task = taskService.createTaskQuery().singleResult();
     assertEquals("undoTask", task.getTaskDefinitionKey());
 
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .startAfterActivity("userTask")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId()).startAfterActivity("userTask").execute();
 
     task = taskService.createTaskQuery().singleResult();
     assertEquals("afterCancel", task.getTaskDefinitionKey());
@@ -1553,10 +1180,7 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
 
     ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
 
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .cancelActivityInstance(getInstanceIdForActivity(tree, "undoTask"))
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId()).cancelActivityInstance(getInstanceIdForActivity(tree, "undoTask")).execute();
 
     assertProcessEnded(processInstance.getId());
   }
@@ -1568,18 +1192,11 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
 
     ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
 
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .cancelActivityInstance(getInstanceIdForActivity(tree, "undoTask"))
-      .startBeforeActivity("userTask")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId()).cancelActivityInstance(getInstanceIdForActivity(tree, "undoTask"))
+        .startBeforeActivity("userTask").execute();
 
     tree = runtimeService.getActivityInstance(processInstance.getId());
-    assertThat(tree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .beginScope("tx")
-          .activity("userTask")
-        .done());
+    assertThat(tree).hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId()).beginScope("tx").activity("userTask").done());
 
     completeTasksInOrder("userTask", "undoTask", "afterCancel");
 
@@ -1593,18 +1210,11 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
 
     ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
 
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .cancelActivityInstance(getInstanceIdForActivity(tree, "undoTask"))
-      .startBeforeActivity("userTask", processInstance.getId())
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId()).cancelActivityInstance(getInstanceIdForActivity(tree, "undoTask"))
+        .startBeforeActivity("userTask", processInstance.getId()).execute();
 
     tree = runtimeService.getActivityInstance(processInstance.getId());
-    assertThat(tree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .beginScope("tx")
-          .activity("userTask")
-        .done());
+    assertThat(tree).hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId()).beginScope("tx").activity("userTask").done());
 
     completeTasksInOrder("userTask", "undoTask", "afterCancel");
 
@@ -1618,18 +1228,11 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
 
     ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
 
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .startBeforeActivity("userTask")
-      .cancelActivityInstance(getInstanceIdForActivity(tree, "undoTask"))
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId()).startBeforeActivity("userTask")
+        .cancelActivityInstance(getInstanceIdForActivity(tree, "undoTask")).execute();
 
     tree = runtimeService.getActivityInstance(processInstance.getId());
-    assertThat(tree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .beginScope("tx")
-          .activity("userTask")
-        .done());
+    assertThat(tree).hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId()).beginScope("tx").activity("userTask").done());
 
     completeTasksInOrder("userTask", "undoTask", "afterCancel");
 
@@ -1640,10 +1243,7 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
   public void testStartCompensatingTask() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
 
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .startBeforeActivity("undoTask")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId()).startBeforeActivity("undoTask").execute();
 
     completeTasksInOrder("undoTask");
 
@@ -1662,19 +1262,11 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
 
     Task firstUndoTask = taskService.createTaskQuery().singleResult();
 
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .startBeforeActivity("undoTask")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId()).startBeforeActivity("undoTask").execute();
 
     ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
-    assertThat(tree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .beginScope("tx")
-        .activity("txEnd")
-        .activity("undoTask")
-        .activity("undoTask")
-        .done());
+    assertThat(tree).hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId()).beginScope("tx").activity("txEnd").activity("undoTask")
+        .activity("undoTask").done());
 
     taskService.complete(firstUndoTask.getId());
 
@@ -1693,20 +1285,11 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
 
     Task firstUndoTask = taskService.createTaskQuery().taskDefinitionKey("undoTask").singleResult();
 
-    runtimeService
-      .createProcessInstanceModification(processInstance.getId())
-      .startBeforeActivity("undoTask")
-      .setVariableLocal("new", true)
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId()).startBeforeActivity("undoTask").setVariableLocal("new", true).execute();
 
     ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
-    assertThat(tree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .beginScope("tx")
-          .activity("txEnd")
-          .activity("undoTask")
-          .activity("undoTask")
-        .done());
+    assertThat(tree).hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId()).beginScope("tx").activity("txEnd").activity("undoTask")
+        .activity("undoTask").done());
 
     String taskExecutionId = runtimeService.createExecutionQuery().variableValueEquals("new", true).singleResult().getId();
     Task secondUndoTask = taskService.createTaskQuery().executionId(taskExecutionId).singleResult();
@@ -1716,12 +1299,8 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     taskService.complete(secondUndoTask.getId());
 
     tree = runtimeService.getActivityInstance(processInstance.getId());
-    assertThat(tree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .beginScope("tx")
-          .activity("txEnd")
-          .activity("undoTask")
-        .done());
+    assertThat(tree)
+        .hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId()).beginScope("tx").activity("txEnd").activity("undoTask").done());
 
     completeTasksInOrder("undoTask", "afterCancel");
 
@@ -1733,24 +1312,18 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
 
     try {
-      runtimeService.createProcessInstanceModification(processInstance.getId())
-        .startBeforeActivity("compensateBoundaryEvent")
-        .execute();
+      runtimeService.createProcessInstanceModification(processInstance.getId()).startBeforeActivity("compensateBoundaryEvent").execute();
 
       fail("should not succeed");
-    }
-    catch (ProcessEngineException e) {
+    } catch (ProcessEngineException e) {
       assertTextPresent("compensation boundary event", e.getMessage());
     }
 
     try {
-      runtimeService.createProcessInstanceModification(processInstance.getId())
-        .startAfterActivity("compensateBoundaryEvent")
-        .execute();
+      runtimeService.createProcessInstanceModification(processInstance.getId()).startAfterActivity("compensateBoundaryEvent").execute();
 
       fail("should not succeed");
-    }
-    catch (ProcessEngineException e) {
+    } catch (ProcessEngineException e) {
       assertTextPresent("no outgoing sequence flow", e.getMessage());
     }
   }
@@ -1760,9 +1333,7 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
     completeTasksInOrder("userTask");
 
-    runtimeService.createProcessInstanceModification(processInstance.getId())
-      .startBeforeActivity("txEnd")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId()).startBeforeActivity("txEnd").execute();
 
     Task task = taskService.createTaskQuery().singleResult();
     assertEquals("afterCancel", task.getTaskDefinitionKey());
@@ -1777,9 +1348,7 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
     completeTasksInOrder("userTask");
 
-    runtimeService.createProcessInstanceModification(processInstance.getId())
-      .startBeforeActivity("catchCancelTx")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId()).startBeforeActivity("catchCancelTx").execute();
 
     Task task = taskService.createTaskQuery().singleResult();
     assertEquals("afterCancel", task.getTaskDefinitionKey());
@@ -1794,19 +1363,11 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
     completeTasksInOrder("userTask");
 
-    runtimeService.createProcessInstanceModification(processInstance.getId())
-      .startBeforeActivity("afterCancel")
-      .execute();
+    runtimeService.createProcessInstanceModification(processInstance.getId()).startBeforeActivity("afterCancel").execute();
 
     ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
-    assertThat(tree).hasStructure(
-      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .beginScope("tx")
-          .activity("txEnd")
-          .activity("undoTask")
-        .endScope()
-        .activity("afterCancel")
-        .done());
+    assertThat(tree).hasStructure(describeActivityInstanceTree(processInstance.getProcessDefinitionId()).beginScope("tx").activity("txEnd").activity("undoTask")
+        .endScope().activity("afterCancel").done());
 
     completeTasksInOrder("afterCancel", "undoTask", "afterCancel");
 
@@ -1820,9 +1381,7 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
 
     // when - then throw exception
     try {
-      runtimeService.createProcessInstanceModification(instance.getId())
-        .cancelActivityInstance("nonExistingActivityInstance")
-        .execute();
+      runtimeService.createProcessInstanceModification(instance.getId()).cancelActivityInstance("nonExistingActivityInstance").execute();
       fail("should not succeed");
     } catch (NotValidException e) {
       assertTextPresent("Cannot perform instruction: Cancel activity instance 'nonExistingActivityInstance'; "
@@ -1838,9 +1397,7 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
 
     // when - then throw exception
     try {
-      runtimeService.createProcessInstanceModification(instance.getId())
-        .cancelTransitionInstance("nonExistingActivityInstance")
-        .execute();
+      runtimeService.createProcessInstanceModification(instance.getId()).cancelTransitionInstance("nonExistingActivityInstance").execute();
       fail("should not succeed");
     } catch (NotValidException e) {
       assertTextPresent("Cannot perform instruction: Cancel transition instance 'nonExistingActivityInstance'; "
@@ -1849,10 +1406,7 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
 
   }
 
-  @Deployment(resources = {
-    CALL_ACTIVITY_PARENT_PROCESS,
-    CALL_ACTIVITY_CHILD_PROCESS
-  })
+  @Deployment(resources = { CALL_ACTIVITY_PARENT_PROCESS, CALL_ACTIVITY_CHILD_PROCESS })
   public void FAILING_testCancelCallActivityInstance() {
     // given
     ProcessInstance parentprocess = runtimeService.startProcessInstanceByKey("parentprocess");
@@ -1861,10 +1415,8 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     ActivityInstance subProcessActivityInst = runtimeService.getActivityInstance(subProcess.getId());
 
     // when
-    runtimeService.createProcessInstanceModification(subProcess.getId())
-      .startBeforeActivity("childEnd", subProcess.getId())
-      .cancelActivityInstance(getInstanceIdForActivity(subProcessActivityInst, "innerTask"))
-      .execute();
+    runtimeService.createProcessInstanceModification(subProcess.getId()).startBeforeActivity("childEnd", subProcess.getId())
+        .cancelActivityInstance(getInstanceIdForActivity(subProcessActivityInst, "innerTask")).execute();
 
     // then
     assertProcessEnded(parentprocess.getId());
@@ -1872,17 +1424,15 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
 
   public void testModifyNullProcessInstance() {
     try {
-      runtimeService
-        .createProcessInstanceModification(null)
-        .startBeforeActivity("someActivity")
-        .execute();
+      runtimeService.createProcessInstanceModification(null).startBeforeActivity("someActivity").execute();
       fail("should not succeed");
     } catch (NotValidException e) {
       assertTextPresent("processInstanceId is null", e.getMessage());
     }
   }
 
-  // TODO: check if starting with a non-existing activity/transition id is handled properly
+  // TODO: check if starting with a non-existing activity/transition id is
+  // handled properly
 
   protected String getInstanceIdForActivity(ActivityInstance activityInstance, String activityId) {
     ActivityInstance instance = getChildInstanceForActivity(activityInstance, activityId);

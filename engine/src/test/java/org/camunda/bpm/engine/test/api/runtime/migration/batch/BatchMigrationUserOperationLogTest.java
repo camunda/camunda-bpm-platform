@@ -140,7 +140,7 @@ public class BatchMigrationUserOperationLogTest {
 
     // when
     engineRule.getIdentityService().setAuthenticatedUserId(USER_ID);
-    batchHelper.executeMigrationJobs(batch);
+    batchHelper.executeJobs(batch);
     engineRule.getIdentityService().clearAuthentication();
 
     // then

@@ -35,20 +35,24 @@ public class TransitionInstantiationCmd extends AbstractInstantiationCmd {
     this.transitionId = transitionId;
   }
 
+  @Override
   protected ScopeImpl getTargetFlowScope(ProcessDefinitionImpl processDefinition) {
     TransitionImpl transition = processDefinition.findTransition(transitionId);
     return transition.getSource().getFlowScope();
   }
 
+  @Override
   protected CoreModelElement getTargetElement(ProcessDefinitionImpl processDefinition) {
     TransitionImpl transition = processDefinition.findTransition(transitionId);
     return transition;
   }
 
-  protected String getTargetElementId() {
+  @Override
+  public String getTargetElementId() {
     return transitionId;
   }
 
+  @Override
   protected String describe() {
     StringBuilder sb = new StringBuilder();
     sb.append("Start transition '");

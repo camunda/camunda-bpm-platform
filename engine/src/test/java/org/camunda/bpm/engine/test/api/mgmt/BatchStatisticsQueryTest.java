@@ -345,7 +345,7 @@ public class BatchStatisticsQueryTest {
 
     // when
     helper.completeSeedJobs(batch);
-    helper.completeMigrationJobs(batch, 1);
+    helper.completeJobs(batch, 1);
 
     // then
     BatchStatistics batchStatistics = managementService.createBatchStatisticsQuery()
@@ -365,7 +365,7 @@ public class BatchStatisticsQueryTest {
 
     // when
     helper.completeSeedJobs(batch);
-    helper.failMigrationJobs(batch, 1);
+    helper.failExecutionJobs(batch, 1);
 
     // then
     BatchStatistics batchStatistics = managementService.createBatchStatisticsQuery()
@@ -385,8 +385,8 @@ public class BatchStatisticsQueryTest {
 
     // when
     helper.completeSeedJobs(batch);
-    helper.completeMigrationJobs(batch, 1);
-    helper.failMigrationJobs(batch, 1);
+    helper.completeJobs(batch, 1);
+    helper.failExecutionJobs(batch, 1);
 
     // then
     BatchStatistics batchStatistics = managementService.createBatchStatisticsQuery()
@@ -406,7 +406,7 @@ public class BatchStatisticsQueryTest {
 
     // when
     helper.completeSeedJobs(batch);
-    helper.failMigrationJobs(batch, 3);
+    helper.failExecutionJobs(batch, 3);
 
     // then
     BatchStatistics batchStatistics = managementService.createBatchStatisticsQuery()
@@ -420,7 +420,7 @@ public class BatchStatisticsQueryTest {
 
     // when
     helper.setRetries(batch, 3, 1);
-    helper.completeMigrationJobs(batch, 3);
+    helper.completeJobs(batch, 3);
 
     // then
     batchStatistics = managementService.createBatchStatisticsQuery()
@@ -460,8 +460,8 @@ public class BatchStatisticsQueryTest {
 
     // when
     helper.executeJob(helper.getSeedJob(batch));
-    helper.completeMigrationJobs(batch, 2);
-    helper.failMigrationJobs(batch, 2);
+    helper.completeJobs(batch, 2);
+    helper.failExecutionJobs(batch, 2);
 
     // then
     BatchStatistics batchStatistics = managementService.createBatchStatisticsQuery()
@@ -483,14 +483,14 @@ public class BatchStatisticsQueryTest {
 
     // when
     helper.executeJob(helper.getSeedJob(batch2));
-    helper.completeMigrationJobs(batch2, 2);
-    helper.failMigrationJobs(batch2, 3);
+    helper.completeJobs(batch2, 2);
+    helper.failExecutionJobs(batch2, 3);
 
     helper.executeJob(helper.getSeedJob(batch3));
     deleteMigrationJobs(batch3);
     helper.executeJob(helper.getSeedJob(batch3));
-    helper.completeMigrationJobs(batch3, 2);
-    helper.failMigrationJobs(batch3, 3);
+    helper.completeJobs(batch3, 2);
+    helper.failExecutionJobs(batch3, 3);
 
     // then
     List<BatchStatistics> batchStatisticsList = managementService.createBatchStatisticsQuery()
@@ -600,7 +600,7 @@ public class BatchStatisticsQueryTest {
   }
 
   protected void deleteMigrationJobs(Batch batch) {
-    for (Job migrationJob: helper.getMigrationJobs(batch)) {
+    for (Job migrationJob: helper.getExecutionJobs(batch)) {
       managementService.deleteJob(migrationJob.getId());
     }
   }
