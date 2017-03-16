@@ -323,7 +323,7 @@ public class UserQueryTest extends PluggableProcessEngineTestCase {
   }
 
   public void testNativeQueryOrLike() {
-    String searchPattern = "'%frog'";
+    String searchPattern = "%frog";
 
     String fromWhereClauses = String.format("FROM %s WHERE FIRST_ LIKE #{searchPattern} OR LAST_ LIKE #{searchPattern} OR EMAIL_ LIKE #{searchPattern}",
         managementService.getTableName(UserEntity.class));
