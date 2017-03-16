@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.runtime.CorrelationSet;
 import org.camunda.bpm.engine.impl.util.ClassNameUtil;
 
@@ -234,5 +235,15 @@ public class CommandLogger extends ProcessEngineLogger {
         "036",
         "Process instance '{}' cannot be modified. The process instance does not exist",
         processInstanceId));
+  }
+
+  public ProcessEngineException processDefinitionOfInstanceDoesNotMatchModification(ExecutionEntity processInstance, String processDefinitionId) {
+    return new ProcessEngineException(exceptionMessage(
+      "037",
+      "Process instance '{}' cannot be modified. Its process definition '{}' does not match the process definition of the modification '{}'",
+      processInstance.getId(),
+      processInstance.getProcessDefinitionId(),
+      processDefinitionId
+    ));
   }
 }

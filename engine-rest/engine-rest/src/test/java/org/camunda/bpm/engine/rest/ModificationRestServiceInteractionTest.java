@@ -64,15 +64,15 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
     Batch batchMock = createMockBatch();
     when(modificationBuilderMock.executeAsync()).thenReturn(batchMock);
 
-    when(runtimeServiceMock.createModification()).thenReturn(modificationBuilderMock);
+    when(runtimeServiceMock.createModification(anyString())).thenReturn(modificationBuilderMock);
   }
 
   @Test
   public void executeModificationSync() {
-
     Map<String, Object> json = new HashMap<String, Object>();
     json.put("skipCustomListeners", true);
     json.put("skipIoMappings", true);
+    json.put("processDefinitionId", "processDefinitionId");
     json.put("processInstanceIds", Arrays.asList("100", "20"));
     List<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
 
@@ -92,7 +92,77 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
       .when()
         .post(EXECUTE_MODIFICATION_SYNC_URL);
 
-    verify(runtimeServiceMock).createModification();
+    verify(runtimeServiceMock).createModification("processDefinitionId");
+    verify(modificationBuilderMock).cancelAllForActivity("activityId");
+    verify(modificationBuilderMock).startBeforeActivity("activityId");
+    verify(modificationBuilderMock).startAfterActivity("activityId");
+    verify(modificationBuilderMock).startTransition("transitionId");
+    verify(modificationBuilderMock).skipCustomListeners();
+    verify(modificationBuilderMock).skipIoMappings();
+    verify(modificationBuilderMock).execute();
+  }
+
+  @Test
+  public void executeModificationWithNullProcessDefinitionIdAsync() {
+    doThrow(new BadUserRequestException("processDefinitionId must be set")).when(modificationBuilderMock).executeAsync();
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("skipCustomListeners", true);
+    json.put("skipIoMappings", true);
+    json.put("processInstanceIds", Arrays.asList("100", "20"));
+    List<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
+
+    instructions.add(ModificationInstructionBuilder.cancellation().activityId("activityId").getJson());
+    instructions.add(ModificationInstructionBuilder.startBefore().activityId("activityId").getJson());
+    instructions.add(ModificationInstructionBuilder.startAfter().activityId("activityId").getJson());
+    instructions.add(ModificationInstructionBuilder.startTransition().transitionId("transitionId").getJson());
+
+    json.put("instructions", instructions);
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(json)
+    .then()
+      .expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .when()
+        .post(EXECUTE_MODIFICATION_ASYNC_URL);
+
+    verify(modificationBuilderMock).cancelAllForActivity("activityId");
+    verify(modificationBuilderMock).startBeforeActivity("activityId");
+    verify(modificationBuilderMock).startAfterActivity("activityId");
+    verify(modificationBuilderMock).startTransition("transitionId");
+    verify(modificationBuilderMock).skipCustomListeners();
+    verify(modificationBuilderMock).skipIoMappings();
+    verify(modificationBuilderMock).executeAsync();
+  }
+
+  @Test
+  public void executeModificationWithNullProcessDefinitionIdSync() {
+    doThrow(new BadUserRequestException("processDefinitionId must be set")).when(modificationBuilderMock).execute();
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("skipCustomListeners", true);
+    json.put("skipIoMappings", true);
+    json.put("processInstanceIds", Arrays.asList("100", "20"));
+    List<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
+
+    instructions.add(ModificationInstructionBuilder.cancellation().activityId("activityId").getJson());
+    instructions.add(ModificationInstructionBuilder.startBefore().activityId("activityId").getJson());
+    instructions.add(ModificationInstructionBuilder.startAfter().activityId("activityId").getJson());
+    instructions.add(ModificationInstructionBuilder.startTransition().transitionId("transitionId").getJson());
+
+    json.put("instructions", instructions);
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(json)
+    .then()
+      .expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .when()
+        .post(EXECUTE_MODIFICATION_SYNC_URL);
+
     verify(modificationBuilderMock).cancelAllForActivity("activityId");
     verify(modificationBuilderMock).startBeforeActivity("activityId");
     verify(modificationBuilderMock).startAfterActivity("activityId");
@@ -112,7 +182,7 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
     List<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
     instructions.add(ModificationInstructionBuilder.startAfter().activityId(EXAMPLE_ACTIVITY_ID).getJson());
     instructions.add(ModificationInstructionBuilder.startTransition().transitionId("transitionId").getJson());
-
+    json.put("processDefinitionId", "processDefinitionId");
     json.put("instructions", instructions);
 
     given()
@@ -133,7 +203,7 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
     instructions.add(ModificationInstructionBuilder.startBefore().activityId("activityId").getJson());
     instructions.add(ModificationInstructionBuilder.startAfter().activityId("activityId").getJson());
     instructions.add(ModificationInstructionBuilder.cancellation().activityId("activityId").getJson());
-
+    json.put("processDefinitionId", "processDefinitionId");
     json.put("instructions", instructions);
 
     given()
@@ -145,7 +215,7 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
     .when()
     .post(EXECUTE_MODIFICATION_ASYNC_URL);
 
-    verify(runtimeServiceMock).createModification();
+    verify(runtimeServiceMock).createModification("processDefinitionId");
     verify(modificationBuilderMock).cancelAllForActivity("activityId");
     verify(modificationBuilderMock).startBeforeActivity("activityId");
     verify(modificationBuilderMock).startAfterActivity("activityId");
@@ -186,6 +256,7 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
 
     List<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
     instructions.add(ModificationInstructionBuilder.startAfter().activityId("acivityId").getJson());
+    json.put("processDefinitionId", "processDefinitionId");
 
     ProcessInstanceQueryDto processInstanceQuery = new ProcessInstanceQueryDto();
     json.put("processInstanceQuery", processInstanceQuery);
@@ -213,6 +284,7 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
     ProcessInstanceQueryDto processInstanceQuery = new ProcessInstanceQueryDto();
     json.put("processInstanceQuery", processInstanceQuery);
     json.put("instructions", instructions);
+    json.put("processDefinitionId", "processDefinitionId");
 
     given()
       .contentType(ContentType.JSON)
@@ -240,6 +312,7 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
     ProcessInstanceQueryDto processInstanceQuery = new ProcessInstanceQueryDto();
     json.put("processInstanceQuery", processInstanceQuery);
     json.put("instructions", instructions);
+    json.put("processDefinitionId", "processDefinitionId");
 
     given()
       .contentType(ContentType.JSON)
@@ -263,6 +336,7 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
     ProcessInstanceQueryDto processInstanceQuery = new ProcessInstanceQueryDto();
     json.put("processInstanceQuery", processInstanceQuery);
     json.put("instructions", instructions);
+    json.put("processDefinitionId", "processDefinitionId");
 
     given()
       .contentType(ContentType.JSON)
@@ -280,6 +354,7 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
     Map<String, Object> json = new HashMap<String, Object>();
     json.put("processInstanceIds", Arrays.asList("200", "11"));
     json.put("skipIoMappings", true);
+    json.put("processDefinitionId", "processDefinitionId");
 
     given()
       .contentType(ContentType.JSON)
@@ -298,6 +373,7 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
     Map<String, Object> json = new HashMap<String, Object>();
     json.put("processInstanceIds", Arrays.asList("200", "11"));
     json.put("skipIoMappings", true);
+    json.put("processDefinitionId", "processDefinitionId");
 
     given()
       .contentType(ContentType.JSON)
@@ -330,6 +406,8 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
 
     json.put("instructions", instructions);
     json.put("processInstanceIds", Arrays.asList("200", "323"));
+    json.put("processDefinitionId", "processDefinitionId");
+
     given()
       .contentType(ContentType.JSON)
       .body(json)
@@ -351,6 +429,8 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
     json.put("processInstanceIds", Arrays.asList("200", "100"));
     instructions.add(ModificationInstructionBuilder.startAfter().getJson());
     json.put("instructions", instructions);
+    json.put("processDefinitionId", "processDefinitionId");
+
     given()
       .contentType(ContentType.JSON)
       .body(json)
@@ -372,6 +452,8 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
     json.put("processInstanceIds", Arrays.asList("200", "100"));
     instructions.add(ModificationInstructionBuilder.startAfter().getJson());
     json.put("instructions", instructions);
+    json.put("processDefinitionId", "processDefinitionId");
+
     given()
       .contentType(ContentType.JSON)
       .body(json)
@@ -393,6 +475,7 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
     json.put("processInstanceIds", Arrays.asList("200", "100"));
     instructions.add(ModificationInstructionBuilder.startBefore().getJson());
     json.put("instructions", instructions);
+    json.put("processDefinitionId", "processDefinitionId");
 
     given()
       .contentType(ContentType.JSON)
@@ -415,6 +498,7 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
     json.put("processInstanceIds", Arrays.asList("200", "100"));
     instructions.add(ModificationInstructionBuilder.startBefore().getJson());
     json.put("instructions", instructions);
+    json.put("processDefinitionId", "processDefinitionId");
 
     given()
       .contentType(ContentType.JSON)
@@ -437,6 +521,8 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
     json.put("processInstanceIds", Arrays.asList("200", "100"));
     instructions.add(ModificationInstructionBuilder.startTransition().getJson());
     json.put("instructions", instructions);
+    json.put("processDefinitionId", "processDefinitionId");
+
     given()
       .contentType(ContentType.JSON)
       .body(json)
@@ -458,6 +544,8 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
     json.put("processInstanceIds", Arrays.asList("200", "100"));
     instructions.add(ModificationInstructionBuilder.startTransition().getJson());
     json.put("instructions", instructions);
+    json.put("processDefinitionId", "processDefinitionId");
+
     given()
       .contentType(ContentType.JSON)
       .body(json)
@@ -479,6 +567,8 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
     json.put("processInstanceIds", Arrays.asList("200", "100"));
     instructions.add(ModificationInstructionBuilder.cancellation().getJson());
     json.put("instructions", instructions);
+    json.put("processDefinitionId", "processDefinitionId");
+
     given()
       .contentType(ContentType.JSON)
       .body(json)
@@ -500,6 +590,8 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
     json.put("processInstanceIds", Arrays.asList("200", "100"));
     instructions.add(ModificationInstructionBuilder.cancellation().getJson());
     json.put("instructions", instructions);
+    json.put("processDefinitionId", "processDefinitionId");
+
     given()
       .contentType(ContentType.JSON)
       .body(json)
@@ -511,4 +603,5 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
     .when()
       .post(EXECUTE_MODIFICATION_ASYNC_URL);
   }
+
 }

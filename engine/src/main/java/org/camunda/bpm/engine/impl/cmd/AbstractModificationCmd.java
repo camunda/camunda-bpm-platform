@@ -11,7 +11,9 @@ import org.camunda.bpm.engine.impl.ModificationBuilderImpl;
 import org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
 
 public abstract class AbstractModificationCmd<T> implements Command<T> {
 
@@ -39,6 +41,7 @@ public abstract class AbstractModificationCmd<T> implements Command<T> {
   }
 
   protected void writeUserOperationLog(CommandContext commandContext,
+      ProcessDefinition processDefinition,
       int numInstances,
       boolean async) {
 
@@ -51,10 +54,17 @@ public abstract class AbstractModificationCmd<T> implements Command<T> {
     commandContext.getOperationLogManager()
       .logProcessInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_MODIFY_PROCESS_INSTANCE,
           null,
-          null,
-          null,
+          processDefinition.getId(),
+          processDefinition.getKey(),
           propertyChanges);
   }
 
+  protected ProcessDefinitionEntity getProcessDefinition(CommandContext commandContext, String processDefinitionId) {
+
+    return commandContext
+        .getProcessEngineConfiguration()
+        .getDeploymentCache()
+        .findDeployedProcessDefinitionById(processDefinitionId);
+  }
 
 }

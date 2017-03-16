@@ -21,40 +21,40 @@ public class BatchModificationHelper extends BatchHelper {
     currentProcessInstances = new ArrayList<String>();
   }
 
-  public Batch startAfterAsync(String key, int numberOfProcessInstances, String activityId) {
+  public Batch startAfterAsync(String key, int numberOfProcessInstances, String activityId, String processDefinitionId) {
     RuntimeService runtimeService = engineRule.getRuntimeService();
 
     List<String> processInstanceIds = startInstances(key, numberOfProcessInstances);
 
     return runtimeService
-      .createModification()
+      .createModification(processDefinitionId)
       .startAfterActivity(activityId)
       .processInstanceIds(processInstanceIds)
       .executeAsync();
   }
 
-  public Batch startBeforeAsync(String key, int numberOfProcessInstances, String activityId) {
+  public Batch startBeforeAsync(String key, int numberOfProcessInstances, String activityId, String processDefinitionId) {
     RuntimeService runtimeService = engineRule.getRuntimeService();
 
     List<String> processInstanceIds = startInstances(key, numberOfProcessInstances);
 
-    return runtimeService.createModification().startBeforeActivity(activityId).processInstanceIds(processInstanceIds).executeAsync();
+    return runtimeService.createModification(processDefinitionId).startBeforeActivity(activityId).processInstanceIds(processInstanceIds).executeAsync();
   }
 
-  public Batch startTransitionAsync(String key, int numberOfProcessInstances, String transitionId) {
+  public Batch startTransitionAsync(String key, int numberOfProcessInstances, String transitionId, String processDefinitionId) {
     RuntimeService runtimeService = engineRule.getRuntimeService();
 
     List<String> processInstanceIds = startInstances(key, numberOfProcessInstances);
 
-    return runtimeService.createModification().startTransition(transitionId).processInstanceIds(processInstanceIds).executeAsync();
+    return runtimeService.createModification(processDefinitionId).startTransition(transitionId).processInstanceIds(processInstanceIds).executeAsync();
   }
 
-  public Batch cancelAllAsync(String key, int numberOfProcessInstances, String activityId) {
+  public Batch cancelAllAsync(String key, int numberOfProcessInstances, String activityId, String processDefinitionId) {
     RuntimeService runtimeService = engineRule.getRuntimeService();
 
     List<String> processInstanceIds = startInstances(key, numberOfProcessInstances);
 
-    return runtimeService.createModification().cancelAllForActivity(activityId).processInstanceIds(processInstanceIds).executeAsync();
+    return runtimeService.createModification(processDefinitionId).cancelAllForActivity(activityId).processInstanceIds(processInstanceIds).executeAsync();
   }
 
   public List<String> startInstances(String key, int numOfInstances) {

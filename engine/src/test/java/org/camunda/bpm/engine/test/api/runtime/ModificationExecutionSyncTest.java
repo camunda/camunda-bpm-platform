@@ -65,7 +65,7 @@ public class ModificationExecutionSyncTest {
 
     List<String> processInstanceIds = helper.startInstances("process1", 2);
 
-    runtimeService.createModification().startBeforeActivity("user2").processInstanceIds(processInstanceIds).execute();
+    runtimeService.createModification(definition.getId()).startBeforeActivity("user2").processInstanceIds(processInstanceIds).execute();
 
     for (String processInstanceId : processInstanceIds) {
       ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
@@ -88,7 +88,7 @@ public class ModificationExecutionSyncTest {
 
     List<String> processInstanceIds = helper.startInstances("process1", 2);
 
-    runtimeService.createModification().startAfterActivity("user2").processInstanceIds(processInstanceIds).execute();
+    runtimeService.createModification(definition.getId()).startAfterActivity("user2").processInstanceIds(processInstanceIds).execute();
 
     for (String processInstanceId : processInstanceIds) {
       ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
@@ -106,7 +106,7 @@ public class ModificationExecutionSyncTest {
 
     List<String> processInstanceIds = helper.startInstances("process1", 2);
 
-    runtimeService.createModification().startTransition("seq").processInstanceIds(processInstanceIds).execute();
+    runtimeService.createModification(definition.getId()).startTransition("seq").processInstanceIds(processInstanceIds).execute();
 
     for (String processInstanceId : processInstanceIds) {
       ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
@@ -119,10 +119,10 @@ public class ModificationExecutionSyncTest {
 
   @Test
   public void testCancelAll() {
-    testRule.deploy(instance);
+    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
     List<String> processInstanceIds = helper.startInstances("process1", 2);
 
-    runtimeService.createModification().cancelAllForActivity("user1").processInstanceIds(processInstanceIds).execute();
+    runtimeService.createModification(processDefinition.getId()).cancelAllForActivity("user1").processInstanceIds(processInstanceIds).execute();
 
     for (String processInstanceId : processInstanceIds) {
       ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
@@ -137,7 +137,7 @@ public class ModificationExecutionSyncTest {
 
     List<String> processInstanceIds = helper.startInstances("process1", 2);
 
-    runtimeService.createModification().cancelAllForActivity("user1").startBeforeActivity("user2").processInstanceIds(processInstanceIds).execute();
+    runtimeService.createModification(definition.getId()).cancelAllForActivity("user1").startBeforeActivity("user2").processInstanceIds(processInstanceIds).execute();
 
     for (String processInstanceId : processInstanceIds) {
       ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
@@ -160,7 +160,7 @@ public class ModificationExecutionSyncTest {
     List<String> anotherProcessInstanceIds = helper.startInstances("process1", 2);
     processInstanceIds.addAll(anotherProcessInstanceIds);
 
-    runtimeService.createModification().cancelAllForActivity("user1").processInstanceIds(processInstanceIds).execute();
+    runtimeService.createModification(definition.getId()).cancelAllForActivity("user1").processInstanceIds(processInstanceIds).execute();
 
     ActivityInstance updatedTree = null;
     String processInstanceId = processInstanceIds.get(0);

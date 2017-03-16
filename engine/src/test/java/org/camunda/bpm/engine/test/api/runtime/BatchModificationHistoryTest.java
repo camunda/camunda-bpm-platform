@@ -19,6 +19,7 @@ import org.camunda.bpm.engine.impl.batch.BatchSeedJobHandler;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
@@ -102,8 +103,8 @@ public class BatchModificationHistoryTest {
   public void testHistoricBatchCreation() {
     // when
     rule.getProcessEngineConfiguration().setHistoryLevel(HistoryLevel.HISTORY_LEVEL_FULL);
-    testRule.deploy(instance);
-    Batch batch = helper.startAfterAsync("process1", 10, "user1");
+    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
+    Batch batch = helper.startAfterAsync("process1", 10, "user1", processDefinition.getId());
 
     // then a historic batch was created
     HistoricBatch historicBatch = helper.getHistoricBatch(batch);
@@ -122,8 +123,8 @@ public class BatchModificationHistoryTest {
 
   @Test
   public void testHistoricBatchCompletion() {
-    testRule.deploy(instance);
-    Batch batch = helper.startAfterAsync("process1", 1, "user1");
+    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
+    Batch batch = helper.startAfterAsync("process1", 1, "user1", processDefinition.getId());
     helper.executeSeedJob(batch);
     helper.executeJobs(batch);
 
@@ -141,8 +142,8 @@ public class BatchModificationHistoryTest {
   @Test
   public void testHistoricSeedJobLog() {
     // when
-    testRule.deploy(instance);
-    Batch batch = helper.cancelAllAsync("process1", 1, "user1");
+    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
+    Batch batch = helper.cancelAllAsync("process1", 1, "user1", processDefinition.getId());
 
     // then a historic job log exists for the seed job
     HistoricJobLog jobLog = helper.getHistoricSeedJobLog(batch).get(0);
@@ -178,8 +179,8 @@ public class BatchModificationHistoryTest {
 
   @Test
   public void testHistoricMonitorJobLog() {
-    testRule.deploy(instance);
-    Batch batch = helper.startAfterAsync("process1", 1, "user1");
+    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
+    Batch batch = helper.startAfterAsync("process1", 1, "user1", processDefinition.getId());
 
     // when the seed job is executed
     helper.executeSeedJob(batch);
@@ -239,8 +240,8 @@ public class BatchModificationHistoryTest {
 
   @Test
   public void testHistoricBatchJobLog() {
-    testRule.deploy(instance);
-    Batch batch = helper.startAfterAsync("process1", 1, "user1");
+    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
+    Batch batch = helper.startAfterAsync("process1", 1, "user1", processDefinition.getId());
     helper.executeSeedJob(batch);
 
     // when
@@ -255,7 +256,7 @@ public class BatchModificationHistoryTest {
     assertEquals(Batch.TYPE_PROCESS_INSTANCE_MODIFICATION, jobLog.getJobDefinitionType());
     assertEquals(batch.getId(), jobLog.getJobDefinitionConfiguration());
     assertEquals(START_DATE, jobLog.getTimestamp());
-    assertNull(jobLog.getDeploymentId());
+    assertEquals(processDefinition.getDeploymentId(), jobLog.getDeploymentId());
     assertNull(jobLog.getProcessDefinitionId());
     assertNull(jobLog.getExecutionId());
     assertNull(jobLog.getJobDueDate());
@@ -267,7 +268,7 @@ public class BatchModificationHistoryTest {
     assertEquals(Batch.TYPE_PROCESS_INSTANCE_MODIFICATION, jobLog.getJobDefinitionType());
     assertEquals(batch.getId(), jobLog.getJobDefinitionConfiguration());
     assertEquals(executionDate, jobLog.getTimestamp());
-    assertNull(jobLog.getDeploymentId());
+    assertEquals(processDefinition.getDeploymentId(), jobLog.getDeploymentId());
     assertNull(jobLog.getProcessDefinitionId());
     assertNull(jobLog.getExecutionId());
     assertNull(jobLog.getJobDueDate());
@@ -275,8 +276,8 @@ public class BatchModificationHistoryTest {
 
   @Test
   public void testHistoricBatchForBatchDeletion() {
-    testRule.deploy(instance);
-    Batch batch = helper.startTransitionAsync("process1", 1, "seq");
+    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
+    Batch batch = helper.startTransitionAsync("process1", 1, "seq", processDefinition.getId());
 
     // when
     Date deletionDate = helper.addSecondsToClock(12);
@@ -290,8 +291,8 @@ public class BatchModificationHistoryTest {
 
   @Test
   public void testHistoricSeedJobLogForBatchDeletion() {
-    testRule.deploy(instance);
-    Batch batch = helper.startBeforeAsync("process1", 1, "user1");
+    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
+    Batch batch = helper.startBeforeAsync("process1", 1, "user1", processDefinition.getId());
 
     // when
     Date deletionDate = helper.addSecondsToClock(12);
@@ -306,8 +307,8 @@ public class BatchModificationHistoryTest {
 
   @Test
   public void testHistoricMonitorJobLogForBatchDeletion() {
-    testRule.deploy(instance);
-    Batch batch = helper.startAfterAsync("process1", 1, "user1");
+    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
+    Batch batch = helper.startAfterAsync("process1", 1, "user1", processDefinition.getId());
     helper.executeSeedJob(batch);
 
     // when
@@ -323,8 +324,8 @@ public class BatchModificationHistoryTest {
 
   @Test
   public void testHistoricBatchJobLogForBatchDeletion() {
-    testRule.deploy(instance);
-    Batch batch = helper.startBeforeAsync("process1", 1, "user2");
+    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
+    Batch batch = helper.startBeforeAsync("process1", 1, "user2", processDefinition.getId());
     helper.executeSeedJob(batch);
 
     // when
@@ -340,8 +341,8 @@ public class BatchModificationHistoryTest {
 
   @Test
   public void testDeleteHistoricBatch() {
-    testRule.deploy(instance);
-    Batch batch = helper.startTransitionAsync("process1", 1, "seq");
+    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
+    Batch batch = helper.startTransitionAsync("process1", 1, "seq", processDefinition.getId());
     helper.executeSeedJob(batch);
     helper.executeJobs(batch);
     helper.executeMonitorJob(batch);
@@ -360,8 +361,8 @@ public class BatchModificationHistoryTest {
   @Test
   public void testHistoricSeedJobIncidentDeletion() {
     // given
-    testRule.deploy(instance);
-    Batch batch = helper.startBeforeAsync("process1", 1, "user2");
+    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
+    Batch batch = helper.startBeforeAsync("process1", 1, "user2", processDefinition.getId());
 
     Job seedJob = helper.getSeedJob(batch);
     rule.getManagementService().setJobRetries(seedJob.getId(), 0);
@@ -379,8 +380,8 @@ public class BatchModificationHistoryTest {
   @Test
   public void testHistoricMonitorJobIncidentDeletion() {
     // given
-    testRule.deploy(instance);
-    Batch batch = helper.startTransitionAsync("process1", 1, "seq");
+    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
+    Batch batch = helper.startTransitionAsync("process1", 1, "seq", processDefinition.getId());
 
     helper.executeSeedJob(batch);
     Job monitorJob = helper.getMonitorJob(batch);
@@ -399,8 +400,8 @@ public class BatchModificationHistoryTest {
   @Test
   public void testHistoricBatchJobLogIncidentDeletion() {
     // given
-    testRule.deploy(instance);
-    Batch batch = helper.startAfterAsync("process1", 3, "user1");
+    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
+    Batch batch = helper.startAfterAsync("process1", 3, "user1", processDefinition.getId());
 
     helper.executeSeedJob(batch);
     helper.failExecutionJobs(batch, 3);

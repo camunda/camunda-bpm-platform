@@ -106,7 +106,7 @@ public class BatchModificationAuthorizationTest {
   public void createBatchModification() {
     //given
     BpmnModelInstance instance = Bpmn.createExecutableProcess("process1").startEvent().userTask("user1").userTask("user2").endEvent().done();
-    testRule.deploy(instance);
+    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
 
     List<String> instances = new ArrayList<String>();
     for (int i = 0; i < 2; i++) {
@@ -123,7 +123,7 @@ public class BatchModificationAuthorizationTest {
 
     // when
 
-    engineRule.getRuntimeService().createModification().startAfterActivity("user1").processInstanceIds(instances).executeAsync();
+    engineRule.getRuntimeService().createModification(processDefinition.getId()).startAfterActivity("user1").processInstanceIds(instances).executeAsync();
 
     // then
     authRule.assertScenario(scenario);

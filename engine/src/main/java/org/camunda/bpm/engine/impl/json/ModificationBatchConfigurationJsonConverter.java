@@ -14,6 +14,7 @@ public class ModificationBatchConfigurationJsonConverter extends JsonObjectConve
   public static final String PROCESS_INSTANCE_IDS = "processInstanceIds";
   public static final String SKIP_LISTENERS = "skipListeners";
   public static final String SKIP_IO_MAPPINGS = "skipIoMappings";
+  public static final String PROCESS_DEFINITION_ID = "processDefinitionId";
 
   @Override
   public JSONObject toJsonObject(ModificationBatchConfiguration configuration) {
@@ -21,6 +22,7 @@ public class ModificationBatchConfigurationJsonConverter extends JsonObjectConve
 
     JsonUtil.addListField(json, INSTRUCTIONS, ModificationCmdJsonConverter.INSTANCE, configuration.getInstructions());
     JsonUtil.addListField(json, PROCESS_INSTANCE_IDS, configuration.getIds());
+    JsonUtil.addField(json, PROCESS_DEFINITION_ID, configuration.getProcessDefinitionId());
     JsonUtil.addField(json, SKIP_LISTENERS, configuration.isSkipCustomListeners());
     JsonUtil.addField(json, SKIP_IO_MAPPINGS, configuration.isSkipIoMappings());
 
@@ -29,7 +31,7 @@ public class ModificationBatchConfigurationJsonConverter extends JsonObjectConve
 
   @Override
   public ModificationBatchConfiguration toObject(JSONObject json) {
-    ModificationBatchConfiguration configuration = new ModificationBatchConfiguration(readProcessInstanceIds(json));
+    ModificationBatchConfiguration configuration = new ModificationBatchConfiguration(readProcessInstanceIds(json), json.getString(PROCESS_DEFINITION_ID));
 
     configuration.setInstructions(JsonUtil.jsonArrayAsList(json.getJSONArray(INSTRUCTIONS), ModificationCmdJsonConverter.INSTANCE));
     configuration.setSkipCustomListeners(json.getBoolean(SKIP_LISTENERS));

@@ -14,10 +14,9 @@ public class ModificationExecutionDto {
   protected List<ProcessInstanceModificationInstructionDto> instructions;
   protected List<String> processInstanceIds;
   protected ProcessInstanceQueryDto processInstanceQuery;
+  protected String processDefinitionId;
   protected boolean skipIoMappings;
   protected boolean skipCustomListeners;
-
-
 
   public List<ProcessInstanceModificationInstructionDto> getInstructions() {
     return instructions;
@@ -25,6 +24,14 @@ public class ModificationExecutionDto {
 
   public void setInstructions(List<ProcessInstanceModificationInstructionDto> instructions) {
     this.instructions = instructions;
+  }
+
+  public String getProcessDefinitionId() {
+    return processDefinitionId;
+  }
+
+  public void setProcessDefinitionId(String processDefinitionId) {
+    this.processDefinitionId = processDefinitionId;
   }
 
   public List<String> getProcessInstanceIds() {

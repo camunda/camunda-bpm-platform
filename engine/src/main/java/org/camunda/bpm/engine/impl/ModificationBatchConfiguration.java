@@ -10,17 +10,19 @@ public class ModificationBatchConfiguration extends BatchConfiguration {
   protected List<AbstractProcessInstanceModificationCommand> instructions;
   protected boolean skipCustomListeners;
   protected boolean skipIoMappings;
+  protected String processDefinitionId;
 
-  public ModificationBatchConfiguration(List<String> ids, List<AbstractProcessInstanceModificationCommand> instructions,
+  public ModificationBatchConfiguration(List<String> ids, String processDefinitionId, List<AbstractProcessInstanceModificationCommand> instructions,
       boolean skipCustomListeners, boolean skipIoMappings) {
     super(ids);
     this.instructions = instructions;
+    this.processDefinitionId = processDefinitionId;
     this.skipCustomListeners = skipCustomListeners;
     this.skipIoMappings = skipIoMappings;
   }
 
-  public ModificationBatchConfiguration(List<String> ids) {
-    this(ids, null, false, false);
+  public ModificationBatchConfiguration(List<String> ids, String processDefinitionId) {
+    this(ids, processDefinitionId,  null, false, false);
   }
 
   public List<AbstractProcessInstanceModificationCommand> getInstructions() {
@@ -29,6 +31,14 @@ public class ModificationBatchConfiguration extends BatchConfiguration {
 
   public void setInstructions(List<AbstractProcessInstanceModificationCommand> instructions) {
     this.instructions = instructions;
+  }
+
+  public String getProcessDefinitionId() {
+    return processDefinitionId;
+  }
+
+  public void setProcessDefinitionId(String processDefinitionId) {
+    this.processDefinitionId = processDefinitionId;
   }
 
   public boolean isSkipCustomListeners() {

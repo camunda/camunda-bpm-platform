@@ -1843,5 +1843,5 @@ public interface RuntimeService {
    * @return a fluent builder
    */
 
-  ModificationBuilder createModification();
+  ModificationBuilder createModification(String processDefinitionId);
 }

@@ -26,12 +26,15 @@ public class ModificationBuilderImpl implements ModificationBuilder {
   protected ProcessInstanceQuery processInstanceQuery;
   protected List<String> processInstanceIds;
   protected List<AbstractProcessInstanceModificationCommand> instructions;
+  protected String processDefinitionId;
 
   protected boolean skipCustomListeners;
   protected boolean skipIoMappings;
 
-  public ModificationBuilderImpl(CommandExecutor commandExecutor) {
+  public ModificationBuilderImpl(CommandExecutor commandExecutor, String processDefinitionId) {
     this.commandExecutor = commandExecutor;
+    ensureNotNull(NotValidException.class,"processDefinitionId", processDefinitionId);
+    this.processDefinitionId = processDefinitionId;
     processInstanceIds = new ArrayList<String>();
     instructions = new ArrayList<AbstractProcessInstanceModificationCommand>();
   }
@@ -52,7 +55,7 @@ public class ModificationBuilderImpl implements ModificationBuilder {
 
   @Override
   public ModificationBuilder startTransition(String transitionId) {
-    ensureNotNull(NotValidException.class, "activityId", transitionId);
+    ensureNotNull(NotValidException.class, "transitionId", transitionId);
     instructions.add(new TransitionInstantiationCmd(null, transitionId));
     return this;
   }
@@ -119,6 +122,14 @@ public class ModificationBuilderImpl implements ModificationBuilder {
 
   public List<String> getProcessInstanceIds() {
     return processInstanceIds;
+  }
+
+  public String getProcessDefinitionId() {
+    return processDefinitionId;
+  }
+
+  public void setProcessDefinitionId(String processDefinitionId) {
+    this.processDefinitionId = processDefinitionId;
   }
 
   public List<AbstractProcessInstanceModificationCommand> getInstructions() {

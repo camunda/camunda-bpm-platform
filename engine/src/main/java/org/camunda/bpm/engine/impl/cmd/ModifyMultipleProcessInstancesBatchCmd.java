@@ -19,6 +19,7 @@ import org.camunda.bpm.engine.impl.batch.BatchEntity;
 import org.camunda.bpm.engine.impl.batch.BatchJobHandler;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 
 public class ModifyMultipleProcessInstancesBatchCmd extends AbstractModificationCmd<Batch> {
 
@@ -39,7 +40,9 @@ public class ModifyMultipleProcessInstancesBatchCmd extends AbstractModification
 
     commandContext.getAuthorizationManager().checkAuthorization(Permissions.CREATE, Resources.BATCH);
 
-    writeUserOperationLog(commandContext,
+    ProcessDefinitionEntity processDefinition = getProcessDefinition(commandContext, builder.getProcessDefinitionId());
+
+    writeUserOperationLog(commandContext, processDefinition,
         processInstanceIds.size(),
         true);
 
@@ -58,7 +61,7 @@ public class ModifyMultipleProcessInstancesBatchCmd extends AbstractModification
     ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
     BatchJobHandler<ModificationBatchConfiguration> batchJobHandler = getBatchJobHandler(processEngineConfiguration);
 
-    ModificationBatchConfiguration configuration = new ModificationBatchConfiguration(new ArrayList<String>(processInstanceIds), instructions,
+    ModificationBatchConfiguration configuration = new ModificationBatchConfiguration(new ArrayList<String>(processInstanceIds), builder.getProcessDefinitionId(), instructions,
         builder.isSkipCustomListeners(), builder.isSkipIoMappings());
 
     BatchEntity batch = new BatchEntity();

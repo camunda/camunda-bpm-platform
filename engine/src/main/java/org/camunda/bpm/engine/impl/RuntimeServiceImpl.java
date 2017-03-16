@@ -616,8 +616,8 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
   }
 
   @Override
-  public ModificationBuilder createModification() {
-    return new ModificationBuilderImpl(commandExecutor);
+  public ModificationBuilder createModification(String processDefinitionId) {
+    return new ModificationBuilderImpl(commandExecutor, processDefinitionId);
   }
 
 }

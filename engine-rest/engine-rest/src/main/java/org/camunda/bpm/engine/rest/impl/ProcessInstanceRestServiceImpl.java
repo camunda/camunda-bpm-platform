@@ -193,7 +193,7 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
   }
 
   private ModificationBuilder createModificationBuilder(ModificationExecutionDto dto) {
-    ModificationBuilder builder = getProcessEngine().getRuntimeService().createModification();
+    ModificationBuilder builder = getProcessEngine().getRuntimeService().createModification(dto.getProcessDefinitionId());
 
     if (dto.getInstructions() != null && !dto.getInstructions().isEmpty()) {
       dto.applyTo(builder, getProcessEngine(), objectMapper);

@@ -7,11 +7,13 @@ import org.camunda.bpm.engine.impl.batch.AbstractBatchJobHandler;
 import org.camunda.bpm.engine.impl.batch.BatchJobConfiguration;
 import org.camunda.bpm.engine.impl.batch.BatchJobContext;
 import org.camunda.bpm.engine.impl.batch.BatchJobDeclaration;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
 import org.camunda.bpm.engine.impl.json.ModificationBatchConfigurationJsonConverter;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.runtime.ModificationBuilder;
@@ -26,6 +28,13 @@ public class ModificationBatchJobHandler extends AbstractBatchJobHandler<Modific
   }
 
   @Override
+  protected void postProcessJob(ModificationBatchConfiguration configuration, JobEntity job) {
+    CommandContext commandContext = Context.getCommandContext();
+    ProcessDefinitionEntity processDefinitionEntity = commandContext.getProcessEngineConfiguration().getDeploymentCache().findDeployedProcessDefinitionById(configuration.getProcessDefinitionId());
+    job.setDeploymentId(processDefinitionEntity.getDeploymentId());
+  }
+
+  @Override
   public void execute(BatchJobConfiguration configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
     ByteArrayEntity configurationEntity = commandContext
         .getDbEntityManager()
@@ -35,7 +44,7 @@ public class ModificationBatchJobHandler extends AbstractBatchJobHandler<Modific
 
     ModificationBuilder executionBuilder = commandContext.getProcessEngineConfiguration()
         .getRuntimeService()
-        .createModification()
+        .createModification(batchConfiguration.getProcessDefinitionId())
         .processInstanceIds(batchConfiguration.getIds());
 
     executionBuilder.setInstructions(batchConfiguration.getInstructions());
@@ -62,6 +71,7 @@ public class ModificationBatchJobHandler extends AbstractBatchJobHandler<Modific
   protected ModificationBatchConfiguration createJobConfiguration(ModificationBatchConfiguration configuration, List<String> processIdsForJob) {
     return new ModificationBatchConfiguration(
         processIdsForJob,
+        configuration.getProcessDefinitionId(),
         configuration.getInstructions(),
         configuration.isSkipCustomListeners(),
         configuration.isSkipIoMappings()

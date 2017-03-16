@@ -30,7 +30,6 @@ import org.junit.rules.RuleChain;
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
 public class ModificationUserOperationLogTest {
 
-
   protected ProcessEngineRule rule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(rule);
   protected BatchModificationHelper helper = new BatchModificationHelper(rule);
@@ -80,11 +79,11 @@ public class ModificationUserOperationLogTest {
   @Test
   public void testLogCreation() {
     // given
-    testRule.deploy(instance);
+    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
     rule.getIdentityService().setAuthenticatedUserId("userId");
 
     // when
-    helper.startBeforeAsync("process1", 10, "user2");
+    helper.startBeforeAsync("process1", 10, "user2", processDefinition.getId());
     rule.getIdentityService().clearAuthentication();
 
     // then
@@ -98,8 +97,8 @@ public class ModificationUserOperationLogTest {
     Assert.assertNotNull(asyncEntry);
     Assert.assertEquals("ProcessInstance", asyncEntry.getEntityType());
     Assert.assertEquals("ModifyProcessInstance", asyncEntry.getOperationType());
-    Assert.assertNull(asyncEntry.getProcessDefinitionId());
-    Assert.assertNull(asyncEntry.getProcessDefinitionKey());
+    Assert.assertEquals(processDefinition.getId(), asyncEntry.getProcessDefinitionId());
+    Assert.assertEquals(processDefinition.getKey(), asyncEntry.getProcessDefinitionKey());
     Assert.assertNull(asyncEntry.getProcessInstanceId());
     Assert.assertNull(asyncEntry.getOrgValue());
     Assert.assertEquals("true", asyncEntry.getNewValue());
@@ -108,8 +107,8 @@ public class ModificationUserOperationLogTest {
     Assert.assertNotNull(numInstancesEntry);
     Assert.assertEquals("ProcessInstance", numInstancesEntry.getEntityType());
     Assert.assertEquals("ModifyProcessInstance", numInstancesEntry.getOperationType());
-    Assert.assertNull(numInstancesEntry.getProcessDefinitionId());
-    Assert.assertNull(numInstancesEntry.getProcessDefinitionKey());
+    Assert.assertEquals(processDefinition.getId(), numInstancesEntry.getProcessDefinitionId());
+    Assert.assertEquals(processDefinition.getKey(), numInstancesEntry.getProcessDefinitionKey());
     Assert.assertNull(numInstancesEntry.getProcessInstanceId());
     Assert.assertNull(numInstancesEntry.getOrgValue());
     Assert.assertEquals("10", numInstancesEntry.getNewValue());
@@ -124,7 +123,7 @@ public class ModificationUserOperationLogTest {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
 
-    Batch batch = runtimeService.createModification()
+    Batch batch = runtimeService.createModification(processDefinition.getId())
       .startAfterActivity("user2")
       .processInstanceIds(Arrays.asList(processInstance.getId()))
       .executeAsync();
@@ -152,7 +151,7 @@ public class ModificationUserOperationLogTest {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
 
-    runtimeService.createModification()
+    runtimeService.createModification(processDefinition.getId())
       .cancelAllForActivity("user1")
       .processInstanceIds(Arrays.asList(processInstance.getId()))
       .executeAsync();
