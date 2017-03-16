@@ -31,8 +31,8 @@ import org.camunda.bpm.engine.impl.cmd.TransitionInstanceCancellationCmd;
 import org.camunda.bpm.engine.impl.cmd.TransitionInstantiationCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
-import org.camunda.bpm.engine.runtime.ProcessInstanceModificationInstantiationBuilder;
 import org.camunda.bpm.engine.runtime.ProcessInstanceModificationBuilder;
+import org.camunda.bpm.engine.runtime.ProcessInstanceModificationInstantiationBuilder;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.impl.VariableMapImpl;
 
@@ -73,24 +73,28 @@ public class ProcessInstanceModificationBuilderImpl implements ProcessInstanceMo
   public ProcessInstanceModificationBuilderImpl() {
   }
 
+  @Override
   public ProcessInstanceModificationBuilder cancelActivityInstance(String activityInstanceId) {
     ensureNotNull(NotValidException.class, "activityInstanceId", activityInstanceId);
     operations.add(new ActivityInstanceCancellationCmd(processInstanceId, activityInstanceId));
     return this;
   }
 
+  @Override
   public ProcessInstanceModificationBuilder cancelTransitionInstance(String transitionInstanceId) {
     ensureNotNull(NotValidException.class, "transitionInstanceId", transitionInstanceId);
     operations.add(new TransitionInstanceCancellationCmd(processInstanceId, transitionInstanceId));
     return this;
   }
 
+  @Override
   public ProcessInstanceModificationBuilder cancelAllForActivity(String activityId) {
     ensureNotNull(NotValidException.class, "activityId", activityId);
     operations.add(new ActivityCancellationCmd(processInstanceId, activityId));
     return this;
   }
 
+  @Override
   public ProcessInstanceModificationInstantiationBuilder startBeforeActivity(String activityId) {
     ensureNotNull(NotValidException.class, "activityId", activityId);
     AbstractInstantiationCmd currentInstantiation = new ActivityBeforeInstantiationCmd(processInstanceId, activityId);
@@ -98,6 +102,7 @@ public class ProcessInstanceModificationBuilderImpl implements ProcessInstanceMo
     return this;
   }
 
+  @Override
   public ProcessInstanceModificationInstantiationBuilder startBeforeActivity(String activityId, String ancestorActivityInstanceId) {
     ensureNotNull(NotValidException.class, "activityId", activityId);
     ensureNotNull(NotValidException.class, "ancestorActivityInstanceId", ancestorActivityInstanceId);
@@ -106,6 +111,7 @@ public class ProcessInstanceModificationBuilderImpl implements ProcessInstanceMo
     return this;
   }
 
+  @Override
   public ProcessInstanceModificationInstantiationBuilder startAfterActivity(String activityId) {
     ensureNotNull(NotValidException.class, "activityId", activityId);
     AbstractInstantiationCmd currentInstantiation = new ActivityAfterInstantiationCmd(processInstanceId, activityId);
@@ -113,6 +119,7 @@ public class ProcessInstanceModificationBuilderImpl implements ProcessInstanceMo
     return this;
   }
 
+  @Override
   public ProcessInstanceModificationInstantiationBuilder startAfterActivity(String activityId, String ancestorActivityInstanceId) {
     ensureNotNull(NotValidException.class, "activityId", activityId);
     ensureNotNull(NotValidException.class, "ancestorActivityInstanceId", ancestorActivityInstanceId);
@@ -121,6 +128,7 @@ public class ProcessInstanceModificationBuilderImpl implements ProcessInstanceMo
     return this;
   }
 
+  @Override
   public ProcessInstanceModificationInstantiationBuilder startTransition(String transitionId) {
     ensureNotNull(NotValidException.class, "transitionId", transitionId);
     AbstractInstantiationCmd currentInstantiation = new TransitionInstantiationCmd(processInstanceId, transitionId);
@@ -128,6 +136,7 @@ public class ProcessInstanceModificationBuilderImpl implements ProcessInstanceMo
     return this;
   }
 
+  @Override
   public ProcessInstanceModificationInstantiationBuilder startTransition(String transitionId, String ancestorActivityInstanceId) {
     ensureNotNull(NotValidException.class, "transitionId", transitionId);
     ensureNotNull(NotValidException.class, "ancestorActivityInstanceId", ancestorActivityInstanceId);
@@ -151,6 +160,7 @@ public class ProcessInstanceModificationBuilderImpl implements ProcessInstanceMo
     return (AbstractInstantiationCmd) lastInstantiationCmd;
   }
 
+  @Override
   public ProcessInstanceModificationInstantiationBuilder setVariable(String name, Object value) {
     ensureNotNull(NotValidException.class, "Variable name must not be null", "name", name);
 
@@ -165,6 +175,7 @@ public class ProcessInstanceModificationBuilderImpl implements ProcessInstanceMo
     return this;
   }
 
+  @Override
   public ProcessInstanceModificationInstantiationBuilder setVariableLocal(String name, Object value) {
     ensureNotNull(NotValidException.class, "Variable name must not be null", "name", name);
 
@@ -179,6 +190,7 @@ public class ProcessInstanceModificationBuilderImpl implements ProcessInstanceMo
     return this;
   }
 
+  @Override
   public ProcessInstanceModificationInstantiationBuilder setVariables(Map<String, Object> variables) {
     ensureNotNull(NotValidException.class, "Variable map must not be null", "variables", variables);
 
@@ -192,6 +204,7 @@ public class ProcessInstanceModificationBuilderImpl implements ProcessInstanceMo
     return this;
   }
 
+  @Override
   public ProcessInstanceModificationInstantiationBuilder setVariablesLocal(Map<String, Object> variables) {
     ensureNotNull(NotValidException.class, "Variable map must not be null", "variablesLocal", variables);
 
@@ -206,10 +219,12 @@ public class ProcessInstanceModificationBuilderImpl implements ProcessInstanceMo
   }
 
 
+  @Override
   public void execute() {
     execute(false, false);
   }
 
+  @Override
   public void execute(boolean skipCustomListeners, boolean skipIoMappings) {
     this.skipCustomListeners = skipCustomListeners;
     this.skipIoMappings = skipIoMappings;
@@ -236,6 +251,10 @@ public class ProcessInstanceModificationBuilderImpl implements ProcessInstanceMo
 
   public List<AbstractProcessInstanceModificationCommand> getModificationOperations() {
     return operations;
+  }
+
+  public void setModificationOperations(List<AbstractProcessInstanceModificationCommand> operations) {
+    this.operations = operations;
   }
 
   public boolean isSkipCustomListeners() {
