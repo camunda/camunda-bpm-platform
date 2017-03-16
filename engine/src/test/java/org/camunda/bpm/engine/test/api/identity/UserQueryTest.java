@@ -323,13 +323,13 @@ public class UserQueryTest extends PluggableProcessEngineTestCase {
   }
 
   public void testNativeQueryOrLike() {
-    String searchPattern = "'%\\_frog'";
+    String searchPattern = "'%frog'";
 
-    String fromWhereClauses = String.format("FROM %s WHERE FIRST_ LIKE %s ESCAPE '\\' OR LAST_ LIKE %s ESCAPE '\\' OR EMAIL_ LIKE %s ESCAPE '\\'",
-        managementService.getTableName(UserEntity.class), searchPattern, searchPattern, searchPattern);
+    String fromWhereClauses = String.format("FROM %s WHERE FIRST_ LIKE #{searchPattern} OR LAST_ LIKE #{searchPattern} OR EMAIL_ LIKE #{searchPattern}",
+        managementService.getTableName(UserEntity.class));
 
-    assertEquals(1, identityService.createNativeUserQuery().sql("SELECT * " + fromWhereClauses).list().size());
-    assertEquals(1, identityService.createNativeUserQuery().sql("SELECT count(*) " + fromWhereClauses).count());
+    assertEquals(1, identityService.createNativeUserQuery().sql("SELECT * " + fromWhereClauses).parameter("searchPattern", searchPattern).list().size());
+    assertEquals(1, identityService.createNativeUserQuery().sql("SELECT count(*) " + fromWhereClauses).parameter("searchPattern", searchPattern).count());
   }
 
   public void testNativeQueryPaging() {
