@@ -66,7 +66,7 @@ public class HistoricDetailQueryDto extends AbstractQueryDto<HistoricDetailQuery
   protected Boolean variableUpdates;
   protected Boolean excludeTaskDetails;
   protected List<String> tenantIds;
-  protected String operationId;
+  protected String userOperationId;
 
   public HistoricDetailQueryDto() {
   }
@@ -130,9 +130,9 @@ public class HistoricDetailQueryDto extends AbstractQueryDto<HistoricDetailQuery
     this.tenantIds = tenantIds;
   }
 
-  @CamundaQueryParam(value = "operationId")
-  public void setOperationId(String operationId) {
-    this.operationId = operationId;
+  @CamundaQueryParam(value = "userOperationId")
+  public void setUserOperationId(String userOperationId) {
+    this.userOperationId = userOperationId;
   }
 
   @Override
@@ -180,8 +180,8 @@ public class HistoricDetailQueryDto extends AbstractQueryDto<HistoricDetailQuery
     if (tenantIds != null && !tenantIds.isEmpty()) {
       query.tenantIdIn(tenantIds.toArray(new String[tenantIds.size()]));
     }
-    if (operationId != null) {
-      query.operationId(operationId);
+    if (userOperationId != null) {
+      query.userOperationId(userOperationId);
     }
   }
 

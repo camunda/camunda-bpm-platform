@@ -104,9 +104,9 @@ public interface HistoricDetailQuery extends Query<HistoricDetailQuery, Historic
   HistoricDetailQuery tenantIdIn(String... tenantIds);
 
   /**
-   * Select historic details related with given operationId.
+   * Select historic details related with given userOperationId.
    */
-  HistoricDetailQuery operationId(String operationId);
+  HistoricDetailQuery userOperationId(String userOperationId);
 
   /**
    * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).

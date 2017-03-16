@@ -250,7 +250,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setVariableName(variableInstance.getName());
     evt.setSerializerName(variableInstance.getSerializerName());
     evt.setTenantId(variableInstance.getTenantId());
-    evt.setOperationId(Context.getCommandContext().getOperationId());
+    evt.setUserOperationId(Context.getCommandContext().getOperationId());
 
     ExecutionEntity execution = variableInstance.getExecution();
     if (execution != null) {
@@ -732,7 +732,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     historicFormPropertyEntity.setPropertyValue(propertyValue);
     historicFormPropertyEntity.setTaskId(taskId);
     historicFormPropertyEntity.setTenantId(execution.getTenantId());
-    historicFormPropertyEntity.setOperationId(Context.getCommandContext().getOperationId());
+    historicFormPropertyEntity.setUserOperationId(Context.getCommandContext().getOperationId());
 
     ProcessDefinitionEntity definition = execution.getProcessDefinition();
     if (definition != null) {

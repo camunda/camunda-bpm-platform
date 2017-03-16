@@ -339,7 +339,7 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
           .body("[0].caseInstanceId", equalTo(historicUpdateBuilder.getCaseInstanceId()))
           .body("[0].caseExecutionId", equalTo(historicUpdateBuilder.getCaseExecutionId()))
           .body("[0].tenantId", equalTo(historicUpdateBuilder.getTenantId()))
-          .body("[0].operationId", equalTo(historicUpdateBuilder.getOperationId()))
+          .body("[0].userOperationId", equalTo(historicUpdateBuilder.getUserOperationId()))
         .when()
           .get(HISTORIC_DETAIL_RESOURCE_URL);
 
@@ -370,7 +370,7 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
     String returnedCaseInstanceId2 = from(content).getString("[1].caseInstanceId");
     String returnedCaseExecutionId2 = from(content).getString("[1].caseExecutionId");
     String returnedTenantId2 = from(content).getString("[1].tenantId");
-    String returnedOperationId2 = from(content).getString("[1].operationId");
+    String returnedOperationId2 = from(content).getString("[1].userOperationId");
 
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_FORM_FIELD_ID, returnedId2);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_FORM_FIELD_PROC_DEF_KEY, returnedProcessDefinitionKey2);
@@ -470,11 +470,11 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
   public void testQueryByOperationId() {
     String operationId = MockProvider.EXAMPLE_HISTORIC_VAR_UPDATE_OPERATION_ID;
     given()
-        .queryParam("operationId", operationId)
+        .queryParam("userOperationId", operationId)
         .then().expect().statusCode(Status.OK.getStatusCode())
         .when().get(HISTORIC_DETAIL_RESOURCE_URL);
 
-    verify(mockedQuery).operationId(operationId);
+    verify(mockedQuery).userOperationId(operationId);
   }
 
   @Test

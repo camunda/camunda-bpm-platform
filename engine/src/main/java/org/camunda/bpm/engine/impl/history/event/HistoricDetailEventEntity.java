@@ -29,7 +29,7 @@ public class HistoricDetailEventEntity extends HistoryEvent  {
   protected String taskId;
   protected Date timestamp;
   protected String tenantId;
-  protected String operationId;
+  protected String userOperationId;
 
   // getters and setters //////////////////////////////////////////////////////
 
@@ -65,12 +65,12 @@ public class HistoricDetailEventEntity extends HistoryEvent  {
     this.tenantId = tenantId;
   }
 
-  public String getOperationId() {
-    return operationId;
+  public String getUserOperationId() {
+    return userOperationId;
   }
 
-  public void setOperationId(String operationId) {
-    this.operationId = operationId;
+  public void setUserOperationId(String userOperationId) {
+    this.userOperationId = userOperationId;
   }
 
   public void delete() {
@@ -92,7 +92,7 @@ public class HistoricDetailEventEntity extends HistoryEvent  {
            + ", processInstanceId=" + processInstanceId
            + ", id=" + id
            + ", tenantId=" + tenantId
-           + ", operationId=" + operationId
+           + ", userOperationId=" + userOperationId
            + "]";
   }
 

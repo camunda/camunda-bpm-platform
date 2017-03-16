@@ -52,7 +52,7 @@
       #{propertyValue, jdbcType=VARCHAR},
       #{sequenceCounter, jdbcType=BIGINT},
       #{tenantId, jdbcType=VARCHAR},
-      #{operationId, jdbcType=VARCHAR}
+      #{userOperationId, jdbcType=VARCHAR}
     )
   </insert>
 
@@ -111,7 +111,7 @@
       #{textValue2, jdbcType=VARCHAR},
       #{sequenceCounter, jdbcType=BIGINT},
       #{tenantId, jdbcType=VARCHAR},
-      #{operationId, jdbcType=VARCHAR}
+      #{userOperationId, jdbcType=VARCHAR}
     )
   </insert>
 
@@ -141,7 +141,7 @@
     <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
     <result property="sequenceCounter" column="SEQUENCE_COUNTER_" jdbcType="BIGINT" />
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
-    <result property="operationId" column="OPERATION_ID_" jdbcType="VARCHAR" />
+    <result property="userOperationId" column="OPERATION_ID_" jdbcType="VARCHAR" />
     <discriminator javaType="string" column="TYPE_">
       <case value="VariableUpdate" resultMap="historicVariableUpdateResultMap"/>
       <case value="FormProperty" resultMap="historicFormPropertyResultMap"/>
@@ -260,8 +260,8 @@
         </foreach>
       </if>
 
-      <if test="operationId != null">
-        RES.OPERATION_ID_ = #{operationId}
+      <if test="userOperationId != null">
+        RES.OPERATION_ID_ = #{userOperationId}
       </if>
 
       <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">

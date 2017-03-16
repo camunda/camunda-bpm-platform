@@ -89,7 +89,10 @@ public class HistoricIncidentQueryTest {
   }
 
   @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneFailingServiceProcess.bpmn20.xml"})
   public void testQueryByInvalidIncidentId() {
+    startProcessInstance(PROCESS_DEFINITION_KEY);
+
     HistoricIncidentQuery query = historyService.createHistoricIncidentQuery();
 
     assertEquals(0, query.incidentId("invalid").list().size());

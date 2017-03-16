@@ -68,6 +68,7 @@ public interface HistoricDetail {
 
   /**
    * The id of operation. Helps to link records in different historic tables.
+   * References operationId of user operation log entry.
    */
-  String getOperationId();
+  String getUserOperationId();
 }
