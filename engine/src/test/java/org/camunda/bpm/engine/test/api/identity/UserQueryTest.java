@@ -322,6 +322,16 @@ public class UserQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(userCount, identityService.createNativeUserQuery().sql("SELECT count(*) FROM " + managementService.getTableName(UserEntity.class)).count());
   }
 
+  public void testNativeQueryOrLike() {
+    String searchPattern = "'%\\_frog'";
+
+    String fromWhereClauses = String.format("FROM %s WHERE FIRST_ LIKE %s OR LAST_ LIKE %s OR EMAIL_ LIKE %s",
+        managementService.getTableName(UserEntity.class), searchPattern, searchPattern, searchPattern);
+
+    assertEquals(1, identityService.createNativeUserQuery().sql("SELECT * " + fromWhereClauses).list().size());
+    assertEquals(1, identityService.createNativeUserQuery().sql("SELECT count(*) " + fromWhereClauses).count());
+  }
+
   public void testNativeQueryPaging() {
     assertEquals(2, identityService.createNativeUserQuery().sql("SELECT * FROM " + managementService.getTableName(UserEntity.class)).listPage(1, 2).size());
     assertEquals(1, identityService.createNativeUserQuery().sql("SELECT * FROM " + managementService.getTableName(UserEntity.class)).listPage(2, 1).size());
