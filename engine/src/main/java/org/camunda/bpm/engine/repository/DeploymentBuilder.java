@@ -192,7 +192,14 @@ public interface DeploymentBuilder {
   DeploymentBuilder source(String source);
 
   /**
-   * Deploys all provided sources to the process engine and returns the created deployment.
+   * <p>Deploys all provided sources to the process engine and returns the created deployment.</p>
+   *
+   *
+   * <p> The returned {@link Deployment} instance has no information about the definitions, which are deployed
+   * with that deployment. To access this information you can use the {@link #deployAndReturnDefinitions()} method.
+   * This method will return an instance of {@link DeploymentWithDefinitions}, which contains the information
+   * about the successful deployed definitions.
+   * </p>
    *
    * @throws NotFoundException thrown
    *  <ul>
@@ -210,9 +217,7 @@ public interface DeploymentBuilder {
    *     <li>{@link Permissions#READ} on {@link Resources#DEPLOYMENT} (if resources from previous deployments are redeployed)</li>
    *   </ul>
    * @return the created deployment
-   * @deprecated use {@link #deployAndReturnDefinitions()} instead.
    */
-  @Deprecated
   Deployment deploy();
 
   /**
