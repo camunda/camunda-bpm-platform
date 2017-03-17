@@ -20,6 +20,8 @@ import java.util.List;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.impl.HistoricDetailQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
+import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.history.event.HistoricDetailEventEntity;
 import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
 
@@ -31,6 +33,38 @@ public class HistoricDetailManager extends AbstractHistoricManager {
 
   public void deleteHistoricDetailsByProcessInstanceId(String historicProcessInstanceId) {
     deleteHistoricDetailsByProcessCaseInstanceId(historicProcessInstanceId, null);
+  }
+
+  public void deleteHistoricDetailsByProcessInstanceIds(List<String> historicProcessInstanceIds) {
+    ListQueryParameterObject parameter = new ListQueryParameterObject();
+    parameter.setParameter(historicProcessInstanceIds);
+
+    List<String> contentIds = findHistoricDetailByteArrayIdsByProcessInstanceIds(parameter);
+    if (contentIds != null && !contentIds.isEmpty()) {
+      getByteArrayManager().deleteByteArrayByIds(contentIds);
+    }
+    Context.getCommandContext().getDbEntityManager()
+        .deletePreserveOrder(HistoricDetailEventEntity.class, "deleteHistoricDetailsByProcessInstanceIds", parameter);
+  }
+
+  public void deleteHistoricDetailsByTaskProcessInstanceIds(List<String> historicProcessInstanceIds) {
+    ListQueryParameterObject parameter = new ListQueryParameterObject();
+    parameter.setParameter(historicProcessInstanceIds);
+
+    List<String> contentIds = findHistoricDetailByteArrayIdsByTaskProcessInstanceIds(parameter);
+    if (contentIds != null && !contentIds.isEmpty()) {
+      getByteArrayManager().deleteByteArrayByIds(contentIds);
+    }
+    Context.getCommandContext().getDbEntityManager()
+        .deletePreserveOrder(HistoricDetailEventEntity.class, "deleteHistoricDetailsByTaskProcessInstanceIds", parameter);
+  }
+
+  protected List<String> findHistoricDetailByteArrayIdsByProcessInstanceIds(ListQueryParameterObject parameter) {
+    return getDbEntityManager().selectList("selectHistoricDetailByteArrayIdsByProcessInstanceIds", parameter);
+  }
+
+  protected List<String> findHistoricDetailByteArrayIdsByTaskProcessInstanceIds(ListQueryParameterObject parameter) {
+    return getDbEntityManager().selectList("selectHistoricDetailByteArrayIdsByTaskProcessInstanceIds", parameter);
   }
 
   public void deleteHistoricDetailsByCaseInstanceId(String historicCaseInstanceId) {

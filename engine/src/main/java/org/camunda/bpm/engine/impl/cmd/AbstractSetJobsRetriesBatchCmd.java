@@ -85,8 +85,8 @@ public abstract class AbstractSetJobsRetriesBatchCmd extends AbstractIDBasedBatc
   protected abstract List<String> collectJobIds(CommandContext commandContext);
 
   @Override
-  protected SetJobRetriesBatchConfiguration getAbstractIdsBatchConfiguration(List<String> processInstanceIds) {
-    return new SetJobRetriesBatchConfiguration(processInstanceIds, retries);
+  protected SetJobRetriesBatchConfiguration getAbstractIdsBatchConfiguration(List<String> ids) {
+    return new SetJobRetriesBatchConfiguration(ids, retries);
   }
 
   @Override

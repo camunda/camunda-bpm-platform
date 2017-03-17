@@ -46,6 +46,11 @@
     delete from ${prefix}ACT_HI_DEC_OUT where ID_ = #{id}
   </delete>
 
+  <delete id="deleteHistoricDecisionOutputInstanceByProcessInstanceIds" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
+    delete from ${prefix}ACT_HI_DEC_OUT
+      <include refid="selectHistoricDecisionInstancIdsByProcessInstanceIdsSql"/>
+  </delete>
+
   <!-- result map -->
 
   <resultMap id="historicDecisionOutputInstanceResultMap" type="org.camunda.bpm.engine.impl.history.event.HistoricDecisionOutputInstanceEntity">
@@ -68,10 +73,15 @@
   <!-- select -->
 
   <select id="selectHistoricDecisionOutputInstancesByDecisionInstanceId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="historicDecisionOutputInstanceResultMap">
-    select * from ${prefix}ACT_HI_DEC_OUT 
+    select * from ${prefix}ACT_HI_DEC_OUT
     where DEC_INST_ID_ = #{parameter, jdbcType=VARCHAR}
   </select>
-  
+
+  <select id="selectHistoricDecisionOutputInstance" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="historicDecisionOutputInstanceResultMap">
+    select * from ${prefix}ACT_HI_DEC_OUT
+    where ID_ = #{parameter, jdbcType=VARCHAR}
+  </select>
+
   <select id="selectHistoricDecisionOutputInstancesByDecisionInstanceIds" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="historicDecisionOutputInstanceResultMap">
     select * from ${prefix}ACT_HI_DEC_OUT
     where DEC_INST_ID_ in 
@@ -80,5 +90,22 @@
     </foreach>
     order by RULE_ORDER_, CLAUSE_ID_
   </select>
+
+  <select id="selectHistoricDecisionOutputByteArrayIdsByProcessInstanceIds" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
+    select distinct BYTEARRAY_ID_
+    from ${prefix}ACT_HI_DEC_OUT
+    <include refid="selectHistoricDecisionInstancIdsByProcessInstanceIdsSql"/>
+      and BYTEARRAY_ID_ is not NULL
+  </select>
+
+  <sql id="selectHistoricDecisionInstancIdsByProcessInstanceIdsSql">
+    where DEC_INST_ID_ in
+    (select ID_ from ${prefix}ACT_HI_DECINST
+    where PROC_INST_ID_ in
+    <foreach item="processInstanceId" index="index" collection="parameter" open="(" separator="," close=")">
+        #{processInstanceId}
+    </foreach>
+    )
+  </sql>
   
 </mapper>

@@ -22,7 +22,14 @@ import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
 import org.camunda.bpm.engine.impl.variable.serializer.AbstractTypedValueSerializer;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Data base operations for {@link HistoricDecisionInstanceEntity}.
@@ -78,6 +85,28 @@ public class HistoricDecisionInstanceManager extends AbstractHistoricManager {
       decisionInstance.delete();
       deleteHistoricDecisionInputAndOutputInstances(historicDecisionInstanceId);
     }
+  }
+
+  public void deleteHistoricDecisionInstanceByProcessInstanceIds(List<String> processInstanceIds) {
+    ListQueryParameterObject parameter = new ListQueryParameterObject();
+    parameter.setParameter(processInstanceIds);
+
+    List<String> contentIds = findDecisionInputByteArrayIds(parameter);
+    contentIds.addAll(findDecisionOutputByteArrayIds(parameter));
+    if (contentIds != null && !contentIds.isEmpty()) {
+      getByteArrayManager().deleteByteArrayByIds(contentIds);
+    }
+    getDbEntityManager().deletePreserveOrder(HistoricDecisionInputInstanceEntity.class, "deleteHistoricDecisionInputInstanceByProcessInstanceIds", parameter);
+    getDbEntityManager().deletePreserveOrder(HistoricDecisionOutputInstanceEntity.class, "deleteHistoricDecisionOutputInstanceByProcessInstanceIds", parameter);
+    getDbEntityManager().deletePreserveOrder(HistoricDecisionInstanceEntity.class, "deleteHistoricDecisionInstanceByProcessInstanceIds", processInstanceIds);
+  }
+
+  protected List<String> findDecisionInputByteArrayIds(ListQueryParameterObject parameter) {
+    return getDbEntityManager().selectList("selectHistoricDecisionInputByteArrayIdsByProcessInstanceIds", parameter);
+  }
+
+  protected List<String> findDecisionOutputByteArrayIds(ListQueryParameterObject parameter) {
+    return getDbEntityManager().selectList("selectHistoricDecisionOutputByteArrayIdsByProcessInstanceIds", parameter);
   }
 
   protected void deleteHistoricDecisionInputAndOutputInstances(String historicDecisionInstanceId) {

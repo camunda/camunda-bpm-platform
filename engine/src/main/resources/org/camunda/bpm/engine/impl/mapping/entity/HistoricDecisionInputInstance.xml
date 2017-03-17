@@ -40,6 +40,11 @@
     delete from ${prefix}ACT_HI_DEC_IN where ID_ = #{id}
   </delete>
 
+  <delete id="deleteHistoricDecisionInputInstanceByProcessInstanceIds" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
+    delete from ${prefix}ACT_HI_DEC_IN
+      <include refid="selectHistoricDecisionInstancIdsByProcessInstanceIdsSql"/>
+  </delete>
+
   <!-- result map -->
 
   <resultMap id="historicDecisionInputInstanceResultMap" type="org.camunda.bpm.engine.impl.history.event.HistoricDecisionInputInstanceEntity">
@@ -62,7 +67,12 @@
     select * from ${prefix}ACT_HI_DEC_IN 
     where DEC_INST_ID_ = #{parameter, jdbcType=VARCHAR}
   </select>
-  
+
+  <select id="selectHistoricDecisionInputInstance" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="historicDecisionInputInstanceResultMap">
+    select * from ${prefix}ACT_HI_DEC_IN
+    where ID_ = #{parameter, jdbcType=VARCHAR}
+  </select>
+
   <select id="selectHistoricDecisionInputInstancesByDecisionInstanceIds" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="historicDecisionInputInstanceResultMap">
     select * from ${prefix}ACT_HI_DEC_IN 
     where DEC_INST_ID_ in
@@ -71,5 +81,22 @@
     </foreach>
     order by CLAUSE_ID_
   </select>
+
+  <select id="selectHistoricDecisionInputByteArrayIdsByProcessInstanceIds" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
+    select distinct BYTEARRAY_ID_
+    from ${prefix}ACT_HI_DEC_IN
+    <include refid="selectHistoricDecisionInstancIdsByProcessInstanceIdsSql"/>
+      and BYTEARRAY_ID_ is not NULL
+  </select>
+
+  <sql id="selectHistoricDecisionInstancIdsByProcessInstanceIdsSql">
+    where DEC_INST_ID_ in
+      (select ID_ from ${prefix}ACT_HI_DECINST
+      where PROC_INST_ID_ in
+        <foreach item="processInstanceId" index="index" collection="parameter" open="(" separator="," close=")">
+          #{processInstanceId}
+        </foreach>
+      )
+  </sql>
   
 </mapper>

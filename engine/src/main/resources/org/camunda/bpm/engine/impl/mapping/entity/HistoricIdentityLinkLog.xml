@@ -46,6 +46,17 @@
   <delete id="deleteHistoricIdentityLinksByTaskId">
     delete from ${prefix}ACT_HI_IDENTITYLINK where TASK_ID_ = #{taskId}
   </delete>
+
+  <delete id="deleteHistoricIdentityLinksByTaskProcessInstanceIds">
+    delete from ${prefix}ACT_HI_IDENTITYLINK
+    where TASK_ID_ IN
+    (select distinct ID_ from ${prefix}ACT_HI_TASKINST
+      where PROC_INST_ID_ in
+      <foreach item="processInstanceId" index="index" collection="list" open="(" separator="," close=")">
+        #{processInstanceId}
+      </foreach>
+    )
+  </delete>
   
   <!-- HISTORIC IDENTITY LINK RESULTMAP -->
 

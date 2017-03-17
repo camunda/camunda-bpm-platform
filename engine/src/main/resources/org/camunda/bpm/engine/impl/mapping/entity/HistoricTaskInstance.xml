@@ -113,6 +113,13 @@
     delete from ${prefix}ACT_HI_TASKINST where ID_ = #{id}
   </delete>
 
+  <delete id="deleteHistoricTaskInstanceByProcessInstanceIds">
+    delete from ${prefix}ACT_HI_TASKINST where PROC_INST_ID_ IN
+    <foreach item="processInstanceId" index="index" collection="list" open="(" separator="," close=")">
+      #{processInstanceId}
+    </foreach>
+  </delete>
+
   <!-- HISTORIC TASK INSTANCE RESULT MAP -->
 
   <resultMap id="historicTaskInstanceResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceEntity">

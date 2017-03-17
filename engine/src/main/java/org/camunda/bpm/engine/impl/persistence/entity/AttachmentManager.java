@@ -17,6 +17,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
 import org.camunda.bpm.engine.task.Attachment;
 
@@ -49,6 +52,42 @@ public class AttachmentManager extends AbstractHistoricManager {
       }
       getDbEntityManager().delete(attachment);
     }
+  }
+
+  public void deleteAttachmentsByProcessInstanceIds(List<String> processInstanceIds) {
+    CommandContext commandContext = Context.getCommandContext();
+
+    ListQueryParameterObject parameter = new ListQueryParameterObject();
+    parameter.setParameter(processInstanceIds);
+
+    List<String> contentIds = findAttachmentContentIdsByProcessInstanceIds(parameter);
+    if (contentIds != null && !contentIds.isEmpty()) {
+      getByteArrayManager().deleteByteArrayByIds(contentIds);
+    }
+    commandContext
+        .getDbEntityManager().deletePreserveOrder(AttachmentEntity.class, "deleteAttachmentByProcessInstanceIds", parameter);
+  }
+
+  public void deleteAttachmentsByTaskProcessInstanceIds(List<String> processInstanceIds) {
+    CommandContext commandContext = Context.getCommandContext();
+
+    ListQueryParameterObject parameter = new ListQueryParameterObject();
+    parameter.setParameter(processInstanceIds);
+
+    List<String> contentIds = findAttachmentContentIdsByTaskProcessInstanceIds(parameter);
+    if (contentIds != null && !contentIds.isEmpty()) {
+      getByteArrayManager().deleteByteArrayByIds(contentIds);
+    }
+    commandContext
+        .getDbEntityManager().deletePreserveOrder(AttachmentEntity.class, "deleteAttachmentByTaskProcessInstanceIds", parameter);
+  }
+
+  protected List<String> findAttachmentContentIdsByProcessInstanceIds(ListQueryParameterObject parameter) {
+    return getDbEntityManager().selectList("selectContentIdsByProcessInstanceIds", parameter);
+  }
+
+  protected List<String> findAttachmentContentIdsByTaskProcessInstanceIds(ListQueryParameterObject parameter) {
+    return getDbEntityManager().selectList("selectContentIdsByTaskProcessInstanceIds", parameter);
   }
 
   public Attachment findAttachmentByTaskIdAndAttachmentId(String taskId, String attachmentId) {

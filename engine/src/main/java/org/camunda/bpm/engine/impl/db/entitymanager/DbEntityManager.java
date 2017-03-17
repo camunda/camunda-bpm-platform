@@ -439,11 +439,52 @@ public class DbEntityManager implements Session, EntityLoadListener {
     performBulkOperation(entityType, statement, parameter, UPDATE_BULK);
   }
 
+  /**
+   * Several update operations added by this method will be executed preserving the order of method calls, no matter what entity type they refer to.
+   * They will though be executed after all "not-bulk" operations (e.g. {@link DbEntityManager#insert(DbEntity)} or {@link DbEntityManager#merge(DbEntity)})
+   * and after those updates added by {@link DbEntityManager#update(Class, String, Object)}.
+   * @param entityType
+   * @param statement
+   * @param parameter
+   */
+  public void updatePreserveOrder(Class<? extends DbEntity> entityType, String statement, Object parameter) {
+    performBulkOperationPreserveOrder(entityType, statement, parameter, UPDATE_BULK);
+  }
+
   public void delete(Class<? extends DbEntity> entityType, String statement, Object parameter) {
     performBulkOperation(entityType, statement, parameter, DELETE_BULK);
   }
 
+  /**
+   * Several delete operations added by this method will be executed preserving the order of method calls, no matter what entity type they refer to.
+   * They will though be executed after all "not-bulk" operations (e.g. {@link DbEntityManager#insert(DbEntity)} or {@link DbEntityManager#merge(DbEntity)})
+   * and after those deletes added by {@link DbEntityManager#delete(Class, String, Object)}.
+   * @param entityType
+   * @param statement
+   * @param parameter
+   */
+  public void deletePreserveOrder(Class<? extends DbEntity> entityType, String statement, Object parameter) {
+    performBulkOperationPreserveOrder(entityType, statement, parameter, DELETE_BULK);
+  }
+
   protected DbBulkOperation performBulkOperation(Class<? extends DbEntity> entityType, String statement, Object parameter, DbOperationType operationType) {
+    // create operation
+    DbBulkOperation bulkOperation = createDbBulkOperation(entityType, statement, parameter, operationType);
+
+    // schedule operation
+    dbOperationManager.addOperation(bulkOperation);
+    return bulkOperation;
+  }
+
+  protected DbBulkOperation performBulkOperationPreserveOrder(Class<? extends DbEntity> entityType, String statement, Object parameter, DbOperationType operationType) {
+    DbBulkOperation bulkOperation = createDbBulkOperation(entityType, statement, parameter, operationType);
+
+    // schedule operation
+    dbOperationManager.addOperationPreservOrder(bulkOperation);
+    return bulkOperation;
+  }
+
+  private DbBulkOperation createDbBulkOperation(Class<? extends DbEntity> entityType, String statement, Object parameter, DbOperationType operationType) {
     // create operation
     DbBulkOperation bulkOperation = new DbBulkOperation();
 
@@ -452,9 +493,6 @@ public class DbEntityManager implements Session, EntityLoadListener {
     bulkOperation.setEntityType(entityType);
     bulkOperation.setStatement(statement);
     bulkOperation.setParameter(parameter);
-
-    // schedule operation
-    dbOperationManager.addOperation(bulkOperation);
     return bulkOperation;
   }
 

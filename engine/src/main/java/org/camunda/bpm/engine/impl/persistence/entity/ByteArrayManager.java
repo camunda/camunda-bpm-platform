@@ -15,6 +15,8 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 
+import java.util.List;
+
 /**
  * @author Joram Barrez
  */
@@ -28,6 +30,10 @@ public class ByteArrayManager extends AbstractManager {
    */
   public void deleteByteArrayById(String byteArrayEntityId) {
     getDbEntityManager().delete(ByteArrayEntity.class, "deleteByteArrayNoRevisionCheck", byteArrayEntityId);
+  }
+
+  public void deleteByteArrayByIds(List<String> byteArrayEntityIds) {
+    getDbEntityManager().delete(ByteArrayEntity.class, "deleteByteArraysByIds", byteArrayEntityIds);
   }
 
 }

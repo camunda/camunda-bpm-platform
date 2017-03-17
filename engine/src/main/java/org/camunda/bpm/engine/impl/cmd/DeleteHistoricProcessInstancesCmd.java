@@ -13,6 +13,7 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.HistoricProcessInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
@@ -40,12 +41,12 @@ public class DeleteHistoricProcessInstancesCmd implements Command<Void>, Seriali
 
   @Override
   public Void execute(CommandContext commandContext) {
-    ensureNotEmpty("processInstanceIds", processInstanceIds);
+    ensureNotEmpty(BadUserRequestException.class,"processInstanceIds", processInstanceIds);
     // Check if process instance is still running
     List<HistoricProcessInstance> instances = new HistoricProcessInstanceQueryImpl()
         .processInstanceIds(new HashSet<String>(this.processInstanceIds)).list();
 
-    ensureNotEmpty("No historic process instances found ", instances);
+    ensureNotEmpty(BadUserRequestException.class,"No historic process instances found ", instances);
     ensureNumberOfElements("historic process instances", instances, processInstanceIds.size());
 
     for (HistoricProcessInstance historicProcessInstance : instances) {

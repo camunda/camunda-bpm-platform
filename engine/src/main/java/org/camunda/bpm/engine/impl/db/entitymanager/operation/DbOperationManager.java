@@ -17,6 +17,7 @@ import static org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -61,6 +62,9 @@ public class DbOperationManager {
 
   /** bulk modifications (DELETE, UPDATE) on an entity collection */
   public SortedMap<Class<?>, SortedSet<DbBulkOperation>> bulkOperations = new TreeMap<Class<?>, SortedSet<DbBulkOperation>>(MODIFICATION_TYPE_COMPARATOR);
+
+  /** bulk modifications (DELETE, UPDATE) for which order of execution is important */
+  public LinkedHashSet<DbBulkOperation> bulkOperationsInsertionOrder = new LinkedHashSet<DbBulkOperation>();
 
   public boolean addOperation(DbEntityOperation newOperation) {
     if(newOperation.getOperationType() == INSERT) {
@@ -115,6 +119,10 @@ public class DbOperationManager {
     return bulksByType.add(newOperation);
   }
 
+  public boolean addOperationPreservOrder(DbBulkOperation newOperation) {
+    return bulkOperationsInsertionOrder.add(newOperation);
+  }
+
   public List<DbOperation> calculateFlush() {
     List<DbOperation> flush = new ArrayList<DbOperation>();
     // first INSERTs
@@ -159,7 +167,11 @@ public class DbOperationManager {
       if(bulkOperationsForType != null) {
         flush.addAll(bulkOperationsForType);
       }
+    }
 
+    //the very last perform bulk operations for which the order is important
+    if(bulkOperationsInsertionOrder != null) {
+      flush.addAll(bulkOperationsInsertionOrder);
     }
   }
 

@@ -82,10 +82,27 @@ public class HistoricProcessInstanceManager extends AbstractHistoricManager {
       getHistoricExternalTaskLogManager()
         .deleteHistoricExternalTaskLogsByProcessInstanceId(historicProcessInstanceId);
 
-
       commandContext.getDbEntityManager().delete(HistoricProcessInstanceEntity.class, "deleteHistoricProcessInstance", historicProcessInstanceId);
 
     }
+  }
+
+  public void deleteHistoricProcessInstanceByIds(List<String> processInstanceIds) {
+    CommandContext commandContext = Context.getCommandContext();
+
+    commandContext.getHistoricDetailManager().deleteHistoricDetailsByProcessInstanceIds(processInstanceIds);
+    commandContext.getHistoricVariableInstanceManager().deleteHistoricVariableInstanceByProcessInstanceIds(processInstanceIds);
+    commandContext.getCommentManager().deleteCommentsByProcessInstanceIds(processInstanceIds);
+    commandContext.getAttachmentManager().deleteAttachmentsByProcessInstanceIds(processInstanceIds);
+    commandContext.getHistoricTaskInstanceManager().deleteHistoricTaskInstancesByProcessInstanceIds(processInstanceIds);
+    commandContext.getHistoricActivityInstanceManager().deleteHistoricActivityInstancesByProcessInstanceIds(processInstanceIds);
+    commandContext.getHistoricIncidentManager().deleteHistoricIncidentsByProcessInstanceIds(processInstanceIds);
+    commandContext.getHistoricJobLogManager().deleteHistoricJobLogsByProcessInstanceIds(processInstanceIds);
+    commandContext.getHistoricExternalTaskLogManager().deleteHistoricExternalTaskLogsByProcessInstanceIds(processInstanceIds);
+
+    commandContext.getHistoricDecisionInstanceManager().deleteHistoricDecisionInstanceByProcessInstanceIds(processInstanceIds);
+
+    commandContext.getDbEntityManager().deletePreserveOrder(HistoricProcessInstanceEntity.class, "deleteHistoricProcessInstances", processInstanceIds);
   }
 
   public long findHistoricProcessInstanceCountByQueryCriteria(HistoricProcessInstanceQueryImpl historicProcessInstanceQuery) {

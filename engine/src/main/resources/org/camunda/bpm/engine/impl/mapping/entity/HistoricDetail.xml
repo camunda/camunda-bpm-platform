@@ -125,6 +125,16 @@
     delete from ${prefix}ACT_HI_DETAIL where ID_ = #{id}
   </delete>
 
+  <delete id="deleteHistoricDetailsByProcessInstanceIds" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
+    delete from ${prefix}ACT_HI_DETAIL
+    <include refid="selectHistoricDetailsByProcessInstanceIdsSql"/>
+  </delete>
+
+  <delete id="deleteHistoricDetailsByTaskProcessInstanceIds" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
+    delete from ${prefix}ACT_HI_DETAIL
+    <include refid="selectHistoricDetailsByTaskProcessInstanceIdsSql"/>
+  </delete>
+
   <!-- HISTORIC DETAILS RESULTMAP -->
   <resultMap id="historicDetailResultMap" type="org.camunda.bpm.engine.impl.history.event.HistoricDetailEventEntity">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
@@ -195,6 +205,20 @@
   <select id="selectHistoricDetailCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricDetailQueryImpl" resultType="long">
     select count(*)
     <include refid="selectHistoricDetailsByQueryCriteriaSql"/>
+  </select>
+
+  <select id="selectHistoricDetailByteArrayIdsByProcessInstanceIds" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
+    select DISTINCT BYTEARRAY_ID_
+    from ${prefix}ACT_HI_DETAIL RES
+    <include refid="selectHistoricDetailsByProcessInstanceIdsSql"/>
+      and BYTEARRAY_ID_ is not NULL
+  </select>
+
+  <select id="selectHistoricDetailByteArrayIdsByTaskProcessInstanceIds" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
+    select DISTINCT BYTEARRAY_ID_
+    from ${prefix}ACT_HI_DETAIL RES
+    <include refid="selectHistoricDetailsByTaskProcessInstanceIdsSql"/>
+      and BYTEARRAY_ID_ is not NULL
   </select>
 
   <sql id="selectHistoricDetailsByQueryCriteriaSql">
@@ -271,6 +295,23 @@
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
 
     </where>
+  </sql>
+
+  <sql id="selectHistoricDetailsByProcessInstanceIdsSql">
+    where PROC_INST_ID_ IN
+      <foreach item="processInstanceId" index="index" collection="parameter" open="(" separator="," close=")">
+        #{processInstanceId}
+      </foreach>
+  </sql>
+
+  <sql id="selectHistoricDetailsByTaskProcessInstanceIdsSql">
+    where TASK_ID_ IN
+      (select distinct ID_ from ${prefix}ACT_HI_TASKINST
+      where PROC_INST_ID_ in
+        <foreach item="processInstanceId" index="index" collection="parameter" open="(" separator="," close=")">
+          #{processInstanceId}
+        </foreach>
+      )
   </sql>
 
 </mapper>

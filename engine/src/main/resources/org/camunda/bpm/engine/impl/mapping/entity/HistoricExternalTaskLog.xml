@@ -52,6 +52,13 @@
     delete from ${prefix}ACT_HI_EXT_TASK_LOG where PROC_INST_ID_ = #{processInstanceId}
   </delete>
 
+  <delete id="deleteHistoricExternalTaskLogByProcessInstanceIds">
+    delete from ${prefix}ACT_HI_EXT_TASK_LOG where PROC_INST_ID_ IN
+    <foreach item="processInstanceId" index="index" collection="list" open="(" separator="," close=")">
+      #{processInstanceId}
+    </foreach>
+  </delete>
+
   <!-- BYTE ARRAY DELETE -->
 
   <delete id="deleteErrorDetailsByteArraysByIds">
@@ -111,6 +118,13 @@
       </if>
       <if test="processInstanceId != null">
         and PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+      </if>
+      <if test="processInstanceIdIn != null &amp;&amp; processInstanceIdIn.length > 0">
+        and PROC_INST_ID_ in
+        <foreach item="item" index="index" collection="processInstanceIdIn"
+                 open="(" separator="," close=")">
+          #{item}
+        </foreach>
       </if>
       <if test="processDefinitionId != null">
         and PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR}

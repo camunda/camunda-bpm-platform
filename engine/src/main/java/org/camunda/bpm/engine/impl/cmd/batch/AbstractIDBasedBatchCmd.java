@@ -53,7 +53,7 @@ public abstract class AbstractIDBasedBatchCmd<T> extends AbstractBatchCmd<T> {
     return (int) Math.ceil(processInstanceCount / invocationsPerBatchJob);
   }
 
-  protected abstract BatchConfiguration getAbstractIdsBatchConfiguration(List<String> processInstanceIds);
+  protected abstract BatchConfiguration getAbstractIdsBatchConfiguration(List<String> ids);
 
   protected abstract BatchJobHandler getBatchJobHandler(ProcessEngineConfigurationImpl processEngineConfiguration);
 }

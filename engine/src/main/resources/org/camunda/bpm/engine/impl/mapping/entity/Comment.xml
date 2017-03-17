@@ -58,6 +58,24 @@
     delete from ${prefix}ACT_HI_COMMENT where TASK_ID_ = #{taskId} 
   </delete>
 
+  <delete id="deleteCommentsByTaskProcessInstanceIds">
+    delete from ${prefix}ACT_HI_COMMENT
+    where TASK_ID_ IN
+      (select distinct ID_ from ${prefix}ACT_HI_TASKINST
+          where PROC_INST_ID_ in
+          <foreach item="processInstanceId" index="index" collection="list" open="(" separator="," close=")">
+              #{processInstanceId}
+          </foreach>
+      )
+  </delete>
+  <delete id="deleteCommentsByProcessInstanceIds">
+    delete from ${prefix}ACT_HI_COMMENT
+    where PROC_INST_ID_ in
+      <foreach item="processInstanceId" index="index" collection="list" open="(" separator="," close=")">
+          #{processInstanceId}
+      </foreach>
+  </delete>
+
   <!-- COMMENT RESULTMAP -->
 
   <resultMap id="commentResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.CommentEntity">
