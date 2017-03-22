@@ -17,6 +17,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.TaskListener;
 
@@ -34,11 +35,13 @@ public class RecorderTaskListener implements TaskListener, Serializable {
     protected String taskId;
     protected String executionId;
     protected String event;
+    protected String activityInstanceId;
 
-    public RecordedTaskEvent(String taskId, String executionId, String event) {
+    public RecordedTaskEvent(String taskId, String executionId, String event, String activityInstanceId) {
       this.executionId = executionId;
       this.taskId = taskId;
       this.event = event;
+      this.activityInstanceId = activityInstanceId;
     }
 
     public String getExecutionId() {
@@ -53,10 +56,15 @@ public class RecorderTaskListener implements TaskListener, Serializable {
       return event;
     }
 
+    public String getActivityInstanceId() {
+      return activityInstanceId;
+    }
+
   }
 
   public void notify(DelegateTask task) {
-    recordedEvents.add(new RecordedTaskEvent(task.getId(), task.getExecutionId(), task.getEventName()));
+    DelegateExecution execution = task.getExecution();
+    recordedEvents.add(new RecordedTaskEvent(task.getId(), task.getExecutionId(), task.getEventName(), execution.getActivityInstanceId()));
   }
 
   public static void clear() {
