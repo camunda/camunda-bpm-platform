@@ -100,6 +100,12 @@ public class CommandContextInterceptor extends CommandInterceptor {
       Context.setCommandContext(context);
       Context.setProcessEngineConfiguration(processEngineConfiguration);
 
+      if (openNew) {
+        if (Context.getCommandContext().getOperationLogManager().isUserOperationLogEnabled()) {
+          Context.getCommandContext().setOperationId(Context.getProcessEngineConfiguration().getIdGenerator().getNextId());
+        }
+      }
+
       // delegate to next interceptor in chain
       return next.execute(command);
 

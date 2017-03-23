@@ -567,9 +567,6 @@ public class CommandContext {
   }
 
   public String getOperationId() {
-    if (operationId == null) {
-      operationId = Context.getProcessEngineConfiguration().getIdGenerator().getNextId();
-    }
     return operationId;
   }
 
