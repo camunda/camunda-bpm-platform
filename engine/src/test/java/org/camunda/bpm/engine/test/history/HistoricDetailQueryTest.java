@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.test.history;
 
 import org.camunda.bpm.engine.HistoryService;
+import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -55,6 +56,7 @@ public class HistoricDetailQueryTest {
   protected ManagementService managementService;
   protected HistoryService historyService;
   protected TaskService taskService;
+  private IdentityService identityService;
 
   @Before
   public void initServices() {
@@ -62,12 +64,15 @@ public class HistoricDetailQueryTest {
     managementService = engineRule.getManagementService();
     historyService = engineRule.getHistoryService();
     taskService = engineRule.getTaskService();
+    identityService = engineRule.getIdentityService();
   }
 
   @Test
   @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   public void testQueryByUserOperationId() {
     startProcessInstance(PROCESS_KEY);
+
+    identityService.setAuthenticatedUserId("demo");
 
     String taskId = taskService.createTaskQuery().singleResult().getId();
 
