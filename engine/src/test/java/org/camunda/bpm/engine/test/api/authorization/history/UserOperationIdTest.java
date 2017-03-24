@@ -14,29 +14,30 @@ package org.camunda.bpm.engine.test.api.authorization.history;
 
 import java.util.List;
 
-import org.camunda.bpm.engine.FormService;
-import org.camunda.bpm.engine.HistoryService;
-import org.camunda.bpm.engine.IdentityService;
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
-import org.camunda.bpm.engine.RepositoryService;
-import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.*;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
+import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.camunda.bpm.engine.test.api.authorization.AuthorizationTest;
+import org.camunda.bpm.engine.test.history.DecisionServiceDelegate;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-
+import static org.camunda.bpm.engine.authorization.Permissions.READ_HISTORY;
+import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
+import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_TASK;
+import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
+import static org.camunda.bpm.engine.authorization.Resources.TASK;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -73,13 +74,13 @@ public class UserOperationIdTest {
     formService = engineRule.getFormService();
     identityService = engineRule.getIdentityService();
 
+    identityService.setAuthenticatedUserId("demo");
   }
 
   @Test
   @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   public void testResolveTaskOperationId() {
     // given
-    identityService.setAuthenticatedUserId("demo");
     runtimeService.startProcessInstanceByKey(PROCESS_KEY);
     String taskId = taskService.createTaskQuery().singleResult().getId();
 
@@ -99,7 +100,6 @@ public class UserOperationIdTest {
   @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   public void testSubmitTaskFormOperationId() {
     // given
-    identityService.setAuthenticatedUserId("demo");
     runtimeService.startProcessInstanceByKey(PROCESS_KEY);
     String taskId = taskService.createTaskQuery().singleResult().getId();
 
@@ -119,7 +119,6 @@ public class UserOperationIdTest {
   @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   public void testSetTaskVariablesOperationId() {
     // given
-    identityService.setAuthenticatedUserId("demo");
     runtimeService.startProcessInstanceByKey(PROCESS_KEY);
     String taskId = taskService.createTaskQuery().singleResult().getId();
 
@@ -133,28 +132,6 @@ public class UserOperationIdTest {
         .list();
     List<HistoricDetail> historicDetails = historyService.createHistoricDetailQuery().list();
     verifySameOperationId(userOperationLogEntries, historicDetails);
-  }
-
-  @Test
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
-  public void testWithoutAuthentication() {
-    // given
-    runtimeService.startProcessInstanceByKey(PROCESS_KEY);
-    String taskId = taskService.createTaskQuery().singleResult().getId();
-
-    // when
-    taskService.resolveTask(taskId, getVariables());
-
-    //then
-    List<UserOperationLogEntry> userOperationLogEntries = historyService.createUserOperationLogQuery()
-        .list();
-    assertEquals(0, userOperationLogEntries.size());
-    List<HistoricDetail> historicDetails = historyService.createHistoricDetailQuery().list();
-    assertTrue(historicDetails.size() > 0);
-    //history detail records must have null userOperationId as user operation log was not created
-    for (HistoricDetail historicDetail: historicDetails) {
-      assertNull(historicDetail.getUserOperationId());
-    }
   }
 
   private void verifySameOperationId(List<UserOperationLogEntry> userOperationLogEntries, List<HistoricDetail> historicDetails) {
