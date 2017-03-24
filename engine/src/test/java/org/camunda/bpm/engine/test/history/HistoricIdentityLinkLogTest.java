@@ -14,6 +14,8 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 
+import static org.junit.Assert.assertNotEquals;
+
 /**
  *
  * @author Deivarayan Azhagappan
@@ -379,6 +381,26 @@ public class HistoricIdentityLinkLogTest extends PluggableProcessEngineTestCase 
     assertEquals(query.processDefinitionKey(PROCESS_DEFINITION_KEY).count(), 2);
 
     taskService.deleteTask(taskAssigneeId, true);
+  }
+
+  //CAM-7456
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+  public void testShouldNotDeleteIdentityLinkForTaskCompletion() {
+    //given
+    List<HistoricIdentityLinkLog> historicIdentityLinks = historyService.createHistoricIdentityLinkLogQuery().list();
+    assertEquals(historicIdentityLinks.size(), 0);
+    startProcessInstance(PROCESS_DEFINITION_KEY);
+
+    Task task = taskService.createTaskQuery().singleResult();
+    taskService.addCandidateUser(task.getId(), "demo");
+
+    //when
+    taskService.complete(task.getId());
+
+    //then
+    List<HistoricIdentityLinkLog> historicIdentityLinkLogs = historyService.createHistoricIdentityLinkLogQuery().list();
+    assertEquals(1, historicIdentityLinkLogs.size());
+    assertNotEquals(IDENTITY_LINK_DELETE, historicIdentityLinkLogs.get(0).getOperationType());
   }
 
   public void addAndDeleteUserWithAssigner(String taskId, String identityLinkType) {

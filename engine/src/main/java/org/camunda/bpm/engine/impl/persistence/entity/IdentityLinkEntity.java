@@ -79,11 +79,17 @@ public class IdentityLinkEntity implements Serializable, IdentityLink, DbEntity 
   }
 
   public void delete() {
+    delete(true);
+  }
+
+  public void delete(boolean withHistory) {
     Context
-      .getCommandContext()
-      .getDbEntityManager()
-      .delete(this);
-    fireHistoricIdentityLinkEvent(HistoryEventTypes.IDENTITY_LINK_DELETE);
+        .getCommandContext()
+        .getDbEntityManager()
+        .delete(this);
+    if (withHistory) {
+      fireHistoricIdentityLinkEvent(HistoryEventTypes.IDENTITY_LINK_DELETE);
+    }
   }
 
   public boolean isUser() {
