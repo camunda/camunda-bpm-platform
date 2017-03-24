@@ -299,7 +299,7 @@ public class UserOperationLogManager extends AbstractHistoricManager {
 
   }
 
-  protected boolean isUserOperationLogEnabled() {
+  public boolean isUserOperationLogEnabled() {
     return isHistoryLevelFullEnabled() &&
         ((isUserOperationLogEnabledOnCommandContext() && isUserAuthenticated()) ||
             !writeUserOperationLogOnlyWithLoggedInUser());
