@@ -372,6 +372,11 @@ public abstract class AbstractFlowNodeBuilder<B extends AbstractFlowNodeBuilder<
     return myself;
   }
 
+  @SuppressWarnings("rawtypes")
+  public B camundaExecutionListenerClass(String eventName, Class listenerClass) {
+    return camundaExecutionListenerClass(eventName, listenerClass.getName());
+  }
+  
   public B camundaExecutionListenerClass(String eventName, String fullQualifiedClassName) {
     CamundaExecutionListener executionListener = createInstance(CamundaExecutionListener.class);
     executionListener.setCamundaEvent(eventName);

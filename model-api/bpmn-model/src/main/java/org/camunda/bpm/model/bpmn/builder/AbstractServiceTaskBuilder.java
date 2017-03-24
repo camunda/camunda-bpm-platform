@@ -44,8 +44,19 @@ public abstract class AbstractServiceTaskBuilder<B extends AbstractServiceTaskBu
    * @param camundaClass  the class name to set
    * @return the builder object
    */
-  public B camundaClass(String camundaClass) {
-    element.setCamundaClass(camundaClass);
+  @SuppressWarnings("rawtypes")
+  public B camundaClass(Class camundaClass) {
+    return camundaClass(camundaClass.getName());
+  }
+
+  /**
+   * Sets the camunda class attribute.
+   *
+   * @param camundaClass  the class name to set
+   * @return the builder object
+   */
+  public B camundaClass(String fullQualifiedClassName) {
+    element.setCamundaClass(fullQualifiedClassName);
     return myself;
   }
 

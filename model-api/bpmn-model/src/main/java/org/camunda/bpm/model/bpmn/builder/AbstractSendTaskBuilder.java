@@ -79,8 +79,18 @@ public abstract class AbstractSendTaskBuilder<B extends AbstractSendTaskBuilder<
    * @param camundaClass  the class name to set
    * @return the builder object
    */
-  public B camundaClass(String camundaClass) {
-    element.setCamundaClass(camundaClass);
+  public B camundaClass(Class delegateClass) {
+    return camundaClass(delegateClass.getName());
+  }
+
+  /**
+   * Sets the camunda class attribute.
+   *
+   * @param camundaClass  the class name to set
+   * @return the builder object
+   */
+  public B camundaClass(String fullQualifiedClassName) {
+    element.setCamundaClass(fullQualifiedClassName);
     return myself;
   }
 

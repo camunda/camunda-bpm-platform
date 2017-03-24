@@ -127,8 +127,19 @@ public abstract class AbstractUserTaskBuilder<B extends AbstractUserTaskBuilder<
    * @param camundaFormHandlerClass  the class name of the form handler
    * @return the builder object
    */
-  public B camundaFormHandlerClass(String camundaFormHandlerClass) {
-    element.setCamundaFormHandlerClass(camundaFormHandlerClass);
+  @SuppressWarnings("rawtypes")
+  public B camundaFormHandlerClass(Class camundaFormHandlerClass) {
+    return camundaFormHandlerClass(camundaFormHandlerClass.getName());
+  }
+  
+  /**
+   * Sets the camunda form handler class attribute.
+   *
+   * @param camundaFormHandlerClass  the class name of the form handler
+   * @return the builder object
+   */
+  public B camundaFormHandlerClass(String fullQualifiedClassName) {
+    element.setCamundaFormHandlerClass(fullQualifiedClassName);
     return myself;
   }
 
@@ -165,6 +176,18 @@ public abstract class AbstractUserTaskBuilder<B extends AbstractUserTaskBuilder<
     return new CamundaUserTaskFormFieldBuilder(modelInstance, element, camundaFormField);
   }
 
+  /**
+   * Add a class based task listener with specified event name
+   *
+   * @param eventName - event names to listen to
+   * @param fullQualifiedClassName - a string representing a class
+   * @return the builder object
+   */
+  @SuppressWarnings("rawtypes")
+  public B camundaTaskListenerClass(String eventName, Class listenerClass) {
+    return camundaTaskListenerClass(eventName, listenerClass.getName());
+  }
+  
   /**
    * Add a class based task listener with specified event name
    *

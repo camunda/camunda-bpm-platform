@@ -534,6 +534,19 @@ public class ProcessBuilderTest {
 
     assertCamundaFailedJobRetryTimeCycle(serviceTask);
   }
+  
+  @Test
+  public void testServiceTaskCamundaClass() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .serviceTask(TASK_ID)
+        .camundaClass(getClass().getName())       
+      .done();
+
+    ServiceTask serviceTask = modelInstance.getModelElementById(TASK_ID);
+    assertThat(serviceTask.getCamundaClass()).isEqualTo(getClass().getName());
+  }
+
 
   @Test
   public void testSendTaskCamundaExtensions() {
@@ -561,6 +574,19 @@ public class ProcessBuilderTest {
     assertThat(sendTask.getCamundaTaskPriority()).isEqualTo(TEST_SERVICE_TASK_PRIORITY);
 
     assertCamundaFailedJobRetryTimeCycle(sendTask);
+  }
+
+  @Test
+  public void testSendTaskCamundaClass() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .sendTask(TASK_ID)
+        .camundaClass(this.getClass())
+      .endEvent()
+      .done();
+
+    SendTask sendTask = modelInstance.getModelElementById(TASK_ID);
+    assertThat(sendTask.getCamundaClass()).isEqualTo(this.getClass().getName());
   }
 
   @Test
@@ -631,6 +657,19 @@ public class ProcessBuilderTest {
     assertThat(businessRuleTask.getCamundaTaskPriority()).isEqualTo(TEST_SERVICE_TASK_PRIORITY);
 
     assertCamundaFailedJobRetryTimeCycle(businessRuleTask);
+  }
+
+  @Test
+  public void testBusinessRuleTaskCamundaClass() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .businessRuleTask(TASK_ID)
+        .camundaClass(Bpmn.class)
+      .endEvent()
+      .done();
+
+    BusinessRuleTask businessRuleTask = modelInstance.getModelElementById(TASK_ID);
+    assertThat(businessRuleTask.getCamundaClass()).isEqualTo("org.camunda.bpm.model.bpmn.Bpmn");
   }
 
   @Test
@@ -749,6 +788,19 @@ public class ProcessBuilderTest {
     assertThat(callActivity.getCamundaVariableMappingClass()).isEqualTo(TEST_CLASS_API);
     assertThat(callActivity.getCamundaVariableMappingDelegateExpression()).isEqualTo(TEST_DELEGATE_EXPRESSION_API);
     assertCamundaFailedJobRetryTimeCycle(callActivity);
+  }
+
+  @Test
+  public void testCallActivityCamundaVariableMappingClass() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .callActivity(CALL_ACTIVITY_ID)
+        .camundaVariableMappingClass(this.getClass())
+      .endEvent()
+      .done();
+
+    CallActivity callActivity = modelInstance.getModelElementById(CALL_ACTIVITY_ID);
+    assertThat(callActivity.getCamundaVariableMappingClass()).isEqualTo(this.getClass().getName());
   }
 
   @Test
@@ -1460,7 +1512,7 @@ public class ProcessBuilderTest {
   }
 
   @Test
-  public void testCamundaTaskListenerByClass() {
+  public void testCamundaTaskListenerByClassName() {
     modelInstance = Bpmn.createProcess()
         .startEvent()
           .userTask("task")
@@ -1475,6 +1527,25 @@ public class ProcessBuilderTest {
 
     CamundaTaskListener taskListener = taskListeners.iterator().next();
     assertThat(taskListener.getCamundaClass()).isEqualTo("aClass");
+    assertThat(taskListener.getCamundaEvent()).isEqualTo("start");
+  }
+
+  @Test
+  public void testCamundaTaskListenerByClass() {
+    modelInstance = Bpmn.createProcess()
+        .startEvent()
+          .userTask("task")
+            .camundaTaskListenerClass("start", this.getClass())
+        .endEvent()
+        .done();
+
+    UserTask userTask = modelInstance.getModelElementById("task");
+    ExtensionElements extensionElements = userTask.getExtensionElements();
+    Collection<CamundaTaskListener> taskListeners = extensionElements.getChildElementsByType(CamundaTaskListener.class);
+    assertThat(taskListeners).hasSize(1);
+
+    CamundaTaskListener taskListener = taskListeners.iterator().next();
+    assertThat(taskListener.getCamundaClass()).isEqualTo(this.getClass().getName());
     assertThat(taskListener.getCamundaEvent()).isEqualTo("start");
   }
 
@@ -1517,7 +1588,7 @@ public class ProcessBuilderTest {
   }
 
   @Test
-  public void testCamundaExecutionListenerByClass() {
+  public void testCamundaExecutionListenerByClassName() {
     modelInstance = Bpmn.createProcess()
       .startEvent()
       .userTask("task")
@@ -1532,6 +1603,25 @@ public class ProcessBuilderTest {
 
     CamundaExecutionListener executionListener = executionListeners.iterator().next();
     assertThat(executionListener.getCamundaClass()).isEqualTo("aClass");
+    assertThat(executionListener.getCamundaEvent()).isEqualTo("start");
+  }
+
+  @Test
+  public void testCamundaExecutionListenerByClass() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .userTask("task")
+      .camundaExecutionListenerClass("start", this.getClass())
+      .endEvent()
+      .done();
+
+    UserTask userTask = modelInstance.getModelElementById("task");
+    ExtensionElements extensionElements = userTask.getExtensionElements();
+    Collection<CamundaExecutionListener> executionListeners = extensionElements.getChildElementsByType(CamundaExecutionListener.class);
+    assertThat(executionListeners).hasSize(1);
+
+    CamundaExecutionListener executionListener = executionListeners.iterator().next();
+    assertThat(executionListener.getCamundaClass()).isEqualTo(this.getClass().getName());
     assertThat(executionListener.getCamundaEvent()).isEqualTo("start");
   }
 
