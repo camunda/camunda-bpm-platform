@@ -41,6 +41,7 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
   private static final long serialVersionUID = 1L;
   protected String processInstanceId;
   protected String businessKey;
+  protected String businessKeyLike;
   protected String processDefinitionId;
   protected Set<String> processInstanceIds;
   protected String processDefinitionKey;
@@ -89,6 +90,11 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     ensureNotNull("Business key", businessKey);
     this.businessKey = businessKey;
     this.processDefinitionKey = processDefinitionKey;
+    return this;
+  }
+
+  public ProcessInstanceQuery processInstanceBusinessKeyLike(String businessKeyLike) {
+    this.businessKeyLike = businessKeyLike;
     return this;
   }
 
@@ -269,6 +275,10 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
 
   public String getBusinessKey() {
     return businessKey;
+  }
+
+  public String getBusinessKeyLike() {
+    return businessKeyLike;
   }
 
   public String getProcessDefinitionId() {

@@ -234,6 +234,9 @@
       <if test="businessKey != null">
         and RES.BUSINESS_KEY_ = #{businessKey}
       </if>
+      <if test="businessKeyLike != null">
+        and RES.BUSINESS_KEY_ like #{businessKeyLike} ESCAPE #{escapeChar}
+      </if>
       <if test="superProcessInstanceId != null">
         <!-- A sub process instance is stored under a certain *execution*, potentially nested.
              A sub process instance is NOT stored under the process instance, hence the following: -->

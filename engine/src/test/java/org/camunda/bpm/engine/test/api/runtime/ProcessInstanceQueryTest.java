@@ -128,7 +128,7 @@ public class ProcessInstanceQueryTest {
     for (int i = 0; i < 4; i++) {
       processInstanceIds.add(runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY, i + "").getId());
     }
-    processInstanceIds.add(runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY_2, "1").getId());
+    processInstanceIds.add(runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY_2, "businessKey_123").getId());
   }
 
 
@@ -192,13 +192,21 @@ public class ProcessInstanceQueryTest {
     assertEquals(1, runtimeService.createProcessInstanceQuery().processInstanceBusinessKey("1", PROCESS_DEFINITION_KEY).count());
     assertEquals(1, runtimeService.createProcessInstanceQuery().processInstanceBusinessKey("2", PROCESS_DEFINITION_KEY).count());
     assertEquals(1, runtimeService.createProcessInstanceQuery().processInstanceBusinessKey("3", PROCESS_DEFINITION_KEY).count());
-    assertEquals(1, runtimeService.createProcessInstanceQuery().processInstanceBusinessKey("1", PROCESS_DEFINITION_KEY_2).count());
+    assertEquals(1, runtimeService.createProcessInstanceQuery().processInstanceBusinessKey("businessKey_123", PROCESS_DEFINITION_KEY_2).count());
   }
 
   @Test
   public void testQueryByBusinessKey() {
     assertEquals(1, runtimeService.createProcessInstanceQuery().processInstanceBusinessKey("0").count());
-    assertEquals(2, runtimeService.createProcessInstanceQuery().processInstanceBusinessKey("1").count());
+    assertEquals(1, runtimeService.createProcessInstanceQuery().processInstanceBusinessKey("1").count());
+    assertEquals(1, runtimeService.createProcessInstanceQuery().processInstanceBusinessKey("businessKey_123").count());
+  }
+
+  @Test
+  public void testQueryByBusinessKeyLike(){
+    assertEquals(1, runtimeService.createProcessInstanceQuery().processInstanceBusinessKeyLike("business%").count());
+    assertEquals(1, runtimeService.createProcessInstanceQuery().processInstanceBusinessKeyLike("%sinessKey\\_123").count());
+    assertEquals(1, runtimeService.createProcessInstanceQuery().processInstanceBusinessKeyLike("%siness%").count());
   }
 
   @Test

@@ -40,6 +40,14 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
   ProcessInstanceQuery processInstanceBusinessKey(String processInstanceBusinessKey, String processDefinitionKey);
 
   /**
+   * Select process instances with a business key like the given value.
+   *
+   * @param processInstanceBusinessKeyLike The string can include the wildcard character '%' to express
+   *    like-strategy: starts with (string%), ends with (%string) or contains (%string%).
+   */
+  ProcessInstanceQuery processInstanceBusinessKeyLike(String processInstanceBusinessKeyLike);
+
+  /**
    * Select the process instances which are defined by a process definition with
    * the given key.
    */
