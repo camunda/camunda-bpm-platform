@@ -41,6 +41,7 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
   private static final String SORT_BY_DEFINITION_KEY_VALUE = "definitionKey";
   private static final String SORT_BY_DEFINITION_ID_VALUE = "definitionId";
   private static final String SORT_BY_TENANT_ID = "tenantId";
+  private static final String SORT_BY_BUSINESS_KEY = "businessKey";
 
   private static final List<String> VALID_SORT_BY_VALUES;
   static {
@@ -49,6 +50,7 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
     VALID_SORT_BY_VALUES.add(SORT_BY_DEFINITION_KEY_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_DEFINITION_ID_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_TENANT_ID);
+    VALID_SORT_BY_VALUES.add(SORT_BY_BUSINESS_KEY);
   }
 
   private String deploymentId;
@@ -368,6 +370,8 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
       query.orderByProcessDefinitionId();
     } else if (sortBy.equals(SORT_BY_TENANT_ID)) {
       query.orderByTenantId();
+    } else if (sortBy.equals(SORT_BY_BUSINESS_KEY)) {
+      query.orderByProcessBusinessKey();
     }
   }
 
