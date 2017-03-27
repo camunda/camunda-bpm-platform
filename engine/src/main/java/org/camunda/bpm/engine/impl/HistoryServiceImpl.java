@@ -42,7 +42,7 @@ import org.camunda.bpm.engine.history.NativeHistoricTaskInstanceQuery;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.impl.batch.history.DeleteHistoricBatchCmd;
 import org.camunda.bpm.engine.impl.batch.history.HistoricBatchQueryImpl;
-import org.camunda.bpm.engine.impl.cmd.BulkDeleteHistoricProcessInstancesCmd;
+import org.camunda.bpm.engine.impl.cmd.DeleteHistoricProcessInstancesBulkCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteHistoricCaseInstanceCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteHistoricProcessInstanceCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteHistoricProcessInstancesCmd;
@@ -127,8 +127,8 @@ public class HistoryServiceImpl extends ServiceImpl implements HistoryService {
     commandExecutor.execute(new DeleteHistoricProcessInstancesCmd(processInstanceIds));
   }
 
-  public void bulkDeleteHistoricProcessInstances(List<String> processInstanceIds){
-    commandExecutor.execute(new BulkDeleteHistoricProcessInstancesCmd(processInstanceIds));
+  public void deleteHistoricProcessInstancesBulk(List<String> processInstanceIds){
+    commandExecutor.execute(new DeleteHistoricProcessInstancesBulkCmd(processInstanceIds));
   }
 
   public Batch deleteHistoricProcessInstancesAsync(List<String> processInstanceIds, String deleteReason) {

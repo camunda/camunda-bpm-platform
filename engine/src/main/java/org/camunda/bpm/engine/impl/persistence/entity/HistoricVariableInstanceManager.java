@@ -36,37 +36,21 @@ public class HistoricVariableInstanceManager extends AbstractHistoricManager {
   }
 
   public void deleteHistoricVariableInstanceByProcessInstanceIds(List<String> historicProcessInstanceIds) {
-    ListQueryParameterObject parameter = new ListQueryParameterObject();
-    parameter.setParameter(historicProcessInstanceIds);
-
-    List<String> contentIds = findHistoricVarialbleInstanceByteArrayIdsByProcessInstanceIds(parameter);
-    if (contentIds != null && !contentIds.isEmpty()) {
-      getByteArrayManager().deleteByteArrayByIds(contentIds);
-    }
     Context
         .getCommandContext()
-        .getDbEntityManager().deletePreserveOrder(HistoricVariableInstanceEntity.class, "deleteHistoricVariableInstanceByProcessInstanceIds", parameter);
+        .getDbEntityManager().deletePreserveOrder(ByteArrayEntity.class, "deleteHistoricVariableInstanceByteArraysByProcessInstanceIds", historicProcessInstanceIds);
+    Context
+        .getCommandContext()
+        .getDbEntityManager().deletePreserveOrder(HistoricVariableInstanceEntity.class, "deleteHistoricVariableInstanceByProcessInstanceIds", historicProcessInstanceIds);
   }
 
   public void deleteHistoricVariableInstancesByTaskProcessInstanceIds(List<String> historicProcessInstanceIds) {
-    ListQueryParameterObject parameter = new ListQueryParameterObject();
-    parameter.setParameter(historicProcessInstanceIds);
-
-    List<String> contentIds = findHistoricVarialbleInstanceByteArrayIdsByTaskProcessInstanceIds(parameter);
-    if (contentIds != null && !contentIds.isEmpty()) {
-      getByteArrayManager().deleteByteArrayByIds(contentIds);
-    }
     Context
         .getCommandContext()
-        .getDbEntityManager().deletePreserveOrder(HistoricVariableInstanceEntity.class, "deleteHistoricVariableInstanceByTaskProcessInstanceIds", parameter);
-  }
-
-  protected List<String> findHistoricVarialbleInstanceByteArrayIdsByProcessInstanceIds(ListQueryParameterObject parameter) {
-    return getDbEntityManager().selectList("selectHistoricVariableInstanceByteArrayIdsByProcessInstanceIds", parameter);
-  }
-
-  protected List<String> findHistoricVarialbleInstanceByteArrayIdsByTaskProcessInstanceIds(ListQueryParameterObject parameter) {
-    return getDbEntityManager().selectList("selectHistoricVariableInstanceByteArrayIdsByProcessInstanceIds", parameter);
+        .getDbEntityManager().deletePreserveOrder(ByteArrayEntity.class, "deleteHistoricVariableInstanceByteArraysByTaskProcessInstanceIds", historicProcessInstanceIds);
+    Context
+        .getCommandContext()
+        .getDbEntityManager().deletePreserveOrder(HistoricVariableInstanceEntity.class, "deleteHistoricVariableInstanceByTaskProcessInstanceIds", historicProcessInstanceIds);
   }
 
   public void deleteHistoricVariableInstanceByCaseInstanceId(String historicCaseInstanceId) {

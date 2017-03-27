@@ -40,6 +40,7 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.camunda.bpm.engine.test.dmn.businessruletask.TestPojo;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
@@ -99,7 +100,7 @@ public class BulkHistoryDeleteTest {
     runtimeService.deleteProcessInstances(ids, null, true, true);
 
     //when
-    historyService.bulkDeleteHistoricProcessInstances(ids);
+    historyService.deleteHistoricProcessInstancesBulk(ids);
 
     //then
     assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());
@@ -115,7 +116,7 @@ public class BulkHistoryDeleteTest {
     runtimeService.deleteProcessInstances(ids, null, true, true);
 
     //when
-    historyService.bulkDeleteHistoricProcessInstances(ids);
+    historyService.deleteHistoricProcessInstancesBulk(ids);
 
     //then
     assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());
@@ -138,7 +139,7 @@ public class BulkHistoryDeleteTest {
     runtimeService.deleteProcessInstances(ids, null, true, true);
 
     //when
-    historyService.bulkDeleteHistoricProcessInstances(ids);
+    historyService.deleteHistoricProcessInstancesBulk(ids);
 
     //then
     assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());
@@ -166,7 +167,7 @@ public class BulkHistoryDeleteTest {
     runtimeService.deleteProcessInstances(ids, null, true, true);
 
     //when
-    historyService.bulkDeleteHistoricProcessInstances(ids);
+    historyService.deleteHistoricProcessInstancesBulk(ids);
 
     //then
     assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());
@@ -206,7 +207,7 @@ public class BulkHistoryDeleteTest {
     runtimeService.deleteProcessInstances(ids, null, true, true);
 
     //when
-    historyService.bulkDeleteHistoricProcessInstances(ids);
+    historyService.deleteHistoricProcessInstancesBulk(ids);
 
     //then
     assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());
@@ -225,7 +226,7 @@ public class BulkHistoryDeleteTest {
     runtimeService.deleteProcessInstances(ids, null, true, true);
 
     //when
-    historyService.bulkDeleteHistoricProcessInstances(ids);
+    historyService.deleteHistoricProcessInstancesBulk(ids);
 
     //then
     assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());
@@ -246,7 +247,7 @@ public class BulkHistoryDeleteTest {
     runtimeService.deleteProcessInstances(ids, null, true, true);
 
     //when
-    historyService.bulkDeleteHistoricProcessInstances(ids);
+    historyService.deleteHistoricProcessInstancesBulk(ids);
 
     //then
     assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());
@@ -269,7 +270,7 @@ public class BulkHistoryDeleteTest {
     }
 
     //when
-    historyService.bulkDeleteHistoricProcessInstances(ids);
+    historyService.deleteHistoricProcessInstancesBulk(ids);
 
     //then
     assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());
@@ -294,7 +295,7 @@ public class BulkHistoryDeleteTest {
     runtimeService.deleteProcessInstances(ids, null, true, true);
 
     //when
-    historyService.bulkDeleteHistoricProcessInstances(ids);
+    historyService.deleteHistoricProcessInstancesBulk(ids);
 
     //then
     assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());
@@ -322,7 +323,7 @@ public class BulkHistoryDeleteTest {
     runtimeService.deleteProcessInstances(ids, null, true, true);
 
     //when
-    historyService.bulkDeleteHistoricProcessInstances(ids);
+    historyService.deleteHistoricProcessInstancesBulk(ids);
 
     //then
     assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKey("failingProcess").count());
@@ -344,7 +345,7 @@ public class BulkHistoryDeleteTest {
     List<String> byteArrayIds = findExceptionByteArrayIds();
 
     //when
-    historyService.bulkDeleteHistoricProcessInstances(ids);
+    historyService.deleteHistoricProcessInstancesBulk(ids);
 
     //then
     assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKey("failingProcess").count());
@@ -366,11 +367,11 @@ public class BulkHistoryDeleteTest {
   }
 
   @Test
-  @Deployment(resources = { "org/camunda/bpm/engine/test/history/HistoricDecisionInstanceTest.processWithBusinessRuleTask.bpmn20.xml",
-      "org/camunda/bpm/engine/test/history/HistoricDecisionInstanceTest.decisionSingleOutput.dmn11.xml" })
+  @Deployment(resources = {"org/camunda/bpm/engine/test/dmn/businessruletask/DmnBusinessRuleTaskTest.testDecisionRef.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/history/testDmnWithPojo.dmn11.xml" })
   public void testCleanupHistoryDecisionData() {
     //given
-    List<String> ids = prepareHistoricProcesses("testProcess", Variables.createVariables().putValue("input1", "aValue"));
+    List<String> ids = prepareHistoricProcesses("testProcess", Variables.createVariables().putValue("pojo", new TestPojo("okay", 13.37)));
 
     runtimeService.deleteProcessInstances(ids, null, true, true);
 
@@ -380,7 +381,7 @@ public class BulkHistoryDeleteTest {
     final List<String> historicDecisionOutputIds = collectHistoricDecisionOutputIds(historicDecisionInstances);
 
     //when
-    historyService.bulkDeleteHistoricProcessInstances(ids);
+    historyService.deleteHistoricProcessInstancesBulk(ids);
 
     //then
     assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKey("testProcess").count());
@@ -409,13 +410,13 @@ public class BulkHistoryDeleteTest {
     runtimeService.deleteProcessInstances(ids, null, true, true);
 
     try {
-      historyService.bulkDeleteHistoricProcessInstances(null);
+      historyService.deleteHistoricProcessInstancesBulk(null);
       fail("Empty process instance ids exception was expected");
     } catch (BadUserRequestException ex) {
     }
 
     try {
-      historyService.bulkDeleteHistoricProcessInstances(new ArrayList<String>());
+      historyService.deleteHistoricProcessInstancesBulk(new ArrayList<String>());
       fail("Empty process instance ids exception was expected");
     } catch (BadUserRequestException ex) {
     }
@@ -430,7 +431,7 @@ public class BulkHistoryDeleteTest {
     runtimeService.deleteProcessInstances(ids.subList(1, ids.size()), null, true, true);
 
     try {
-      historyService.bulkDeleteHistoricProcessInstances(ids);
+      historyService.deleteHistoricProcessInstancesBulk(ids);
       fail("Not all processes are finished exception was expected");
     } catch (BadUserRequestException ex) {
     }
@@ -494,7 +495,9 @@ public class BulkHistoryDeleteTest {
   }
 
   private VariableMap getVariables() {
-    return Variables.createVariables().putValue("aVariableName", "aVariableValue").putValue("anotherVariableName", "anotherVariableValue");
+    return Variables.createVariables()
+        .putValue("aVariableName", "aVariableValue")
+        .putValue("pojoVariableName", new TestPojo("someValue", 111.));
   }
 
 }

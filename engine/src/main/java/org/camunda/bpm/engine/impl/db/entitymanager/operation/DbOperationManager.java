@@ -119,7 +119,7 @@ public class DbOperationManager {
     return bulksByType.add(newOperation);
   }
 
-  public boolean addOperationPreservOrder(DbBulkOperation newOperation) {
+  public boolean addOperationPreserveOrder(DbBulkOperation newOperation) {
     return bulkOperationsInsertionOrder.add(newOperation);
   }
 

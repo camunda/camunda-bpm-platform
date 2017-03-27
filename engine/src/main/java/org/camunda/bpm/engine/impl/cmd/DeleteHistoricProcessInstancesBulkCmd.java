@@ -30,11 +30,11 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 /**
  * @author Svetlana Dorokhova
  */
-public class BulkDeleteHistoricProcessInstancesCmd implements Command<Void>, Serializable {
+public class DeleteHistoricProcessInstancesBulkCmd implements Command<Void>, Serializable {
 
   protected final List<String> processInstanceIds;
 
-  public BulkDeleteHistoricProcessInstancesCmd(List<String> processInstanceIds) {
+  public DeleteHistoricProcessInstancesBulkCmd(List<String> processInstanceIds) {
     this.processInstanceIds = processInstanceIds;
   }
 

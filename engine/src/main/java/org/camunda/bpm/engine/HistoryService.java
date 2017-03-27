@@ -161,7 +161,7 @@ public interface HistoryService {
    * @throws AuthorizationException
    *          If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#PROCESS_DEFINITION}.
    */
-  void bulkDeleteHistoricProcessInstances(List<String> processInstanceIds);
+  void deleteHistoricProcessInstancesBulk(List<String> processInstanceIds);
 
   /**
    * Deletes historic process instances asynchronously. All historic activities, historic task and

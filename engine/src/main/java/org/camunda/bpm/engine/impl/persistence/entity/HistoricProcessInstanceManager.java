@@ -94,7 +94,7 @@ public class HistoricProcessInstanceManager extends AbstractHistoricManager {
     commandContext.getHistoricVariableInstanceManager().deleteHistoricVariableInstanceByProcessInstanceIds(processInstanceIds);
     commandContext.getCommentManager().deleteCommentsByProcessInstanceIds(processInstanceIds);
     commandContext.getAttachmentManager().deleteAttachmentsByProcessInstanceIds(processInstanceIds);
-    commandContext.getHistoricTaskInstanceManager().deleteHistoricTaskInstancesByProcessInstanceIds(processInstanceIds);
+    commandContext.getHistoricTaskInstanceManager().deleteHistoricTaskInstancesByProcessInstanceIds(processInstanceIds, false);
     commandContext.getHistoricActivityInstanceManager().deleteHistoricActivityInstancesByProcessInstanceIds(processInstanceIds);
     commandContext.getHistoricIncidentManager().deleteHistoricIncidentsByProcessInstanceIds(processInstanceIds);
     commandContext.getHistoricJobLogManager().deleteHistoricJobLogsByProcessInstanceIds(processInstanceIds);

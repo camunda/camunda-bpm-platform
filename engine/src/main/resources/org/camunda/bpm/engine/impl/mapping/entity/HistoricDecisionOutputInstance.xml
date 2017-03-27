@@ -48,7 +48,16 @@
 
   <delete id="deleteHistoricDecisionOutputInstanceByProcessInstanceIds" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
     delete from ${prefix}ACT_HI_DEC_OUT
-      <include refid="selectHistoricDecisionInstancIdsByProcessInstanceIdsSql"/>
+      <include refid="selectHistoricDecisionInstanceIdsByProcessInstanceIdsSql"/>
+  </delete>
+
+  <delete id="deleteHistoricDecisionOutputInstanceByteArraysByProcessInstanceIds">
+    delete from ${prefix}ACT_GE_BYTEARRAY
+    where ID_ in
+      (select distinct BYTEARRAY_ID_
+      from ${prefix}ACT_HI_DEC_OUT
+        <include refid="selectHistoricDecisionInstanceIdsByProcessInstanceIdsSql"/>
+        and BYTEARRAY_ID_ is not NULL)
   </delete>
 
   <!-- result map -->
@@ -91,18 +100,11 @@
     order by RULE_ORDER_, CLAUSE_ID_
   </select>
 
-  <select id="selectHistoricDecisionOutputByteArrayIdsByProcessInstanceIds" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
-    select distinct BYTEARRAY_ID_
-    from ${prefix}ACT_HI_DEC_OUT
-    <include refid="selectHistoricDecisionInstancIdsByProcessInstanceIdsSql"/>
-      and BYTEARRAY_ID_ is not NULL
-  </select>
-
-  <sql id="selectHistoricDecisionInstancIdsByProcessInstanceIdsSql">
+  <sql id="selectHistoricDecisionInstanceIdsByProcessInstanceIdsSql">
     where DEC_INST_ID_ in
     (select ID_ from ${prefix}ACT_HI_DECINST
     where PROC_INST_ID_ in
-    <foreach item="processInstanceId" index="index" collection="parameter" open="(" separator="," close=")">
+    <foreach item="processInstanceId" index="index" collection="list" open="(" separator="," close=")">
         #{processInstanceId}
     </foreach>
     )

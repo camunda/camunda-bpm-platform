@@ -20,6 +20,7 @@ import org.camunda.bpm.engine.impl.HistoricDecisionInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
+import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.variable.serializer.AbstractTypedValueSerializer;
 
 import java.util.ArrayList;
@@ -88,25 +89,11 @@ public class HistoricDecisionInstanceManager extends AbstractHistoricManager {
   }
 
   public void deleteHistoricDecisionInstanceByProcessInstanceIds(List<String> processInstanceIds) {
-    ListQueryParameterObject parameter = new ListQueryParameterObject();
-    parameter.setParameter(processInstanceIds);
-
-    List<String> contentIds = findDecisionInputByteArrayIds(parameter);
-    contentIds.addAll(findDecisionOutputByteArrayIds(parameter));
-    if (contentIds != null && !contentIds.isEmpty()) {
-      getByteArrayManager().deleteByteArrayByIds(contentIds);
-    }
-    getDbEntityManager().deletePreserveOrder(HistoricDecisionInputInstanceEntity.class, "deleteHistoricDecisionInputInstanceByProcessInstanceIds", parameter);
-    getDbEntityManager().deletePreserveOrder(HistoricDecisionOutputInstanceEntity.class, "deleteHistoricDecisionOutputInstanceByProcessInstanceIds", parameter);
+    getDbEntityManager().deletePreserveOrder(ByteArrayEntity.class, "deleteHistoricDecisionInputInstanceByteArraysByProcessInstanceIds", processInstanceIds);
+    getDbEntityManager().deletePreserveOrder(ByteArrayEntity.class, "deleteHistoricDecisionOutputInstanceByteArraysByProcessInstanceIds", processInstanceIds);
+    getDbEntityManager().deletePreserveOrder(HistoricDecisionInputInstanceEntity.class, "deleteHistoricDecisionInputInstanceByProcessInstanceIds", processInstanceIds);
+    getDbEntityManager().deletePreserveOrder(HistoricDecisionOutputInstanceEntity.class, "deleteHistoricDecisionOutputInstanceByProcessInstanceIds", processInstanceIds);
     getDbEntityManager().deletePreserveOrder(HistoricDecisionInstanceEntity.class, "deleteHistoricDecisionInstanceByProcessInstanceIds", processInstanceIds);
-  }
-
-  protected List<String> findDecisionInputByteArrayIds(ListQueryParameterObject parameter) {
-    return getDbEntityManager().selectList("selectHistoricDecisionInputByteArrayIdsByProcessInstanceIds", parameter);
-  }
-
-  protected List<String> findDecisionOutputByteArrayIds(ListQueryParameterObject parameter) {
-    return getDbEntityManager().selectList("selectHistoricDecisionOutputByteArrayIdsByProcessInstanceIds", parameter);
   }
 
   protected void deleteHistoricDecisionInputAndOutputInstances(String historicDecisionInstanceId) {

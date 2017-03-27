@@ -480,7 +480,7 @@ public class DbEntityManager implements Session, EntityLoadListener {
     DbBulkOperation bulkOperation = createDbBulkOperation(entityType, statement, parameter, operationType);
 
     // schedule operation
-    dbOperationManager.addOperationPreservOrder(bulkOperation);
+    dbOperationManager.addOperationPreserveOrder(bulkOperation);
     return bulkOperation;
   }
 

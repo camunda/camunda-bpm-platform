@@ -121,7 +121,7 @@ public class BulkHistoryDeleteAuthorizationTest {
         .start();
 
     //when
-    historyService.bulkDeleteHistoricProcessInstances(ids);
+    historyService.deleteHistoricProcessInstancesBulk(ids);
 
     if (authRule.assertScenario(scenario)) {
       assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());

@@ -44,11 +44,21 @@ public class HistoricTaskInstanceManager extends AbstractHistoricManager {
   }
 
   public void deleteHistoricTaskInstancesByProcessInstanceIds(List<String> processInstanceIds) {
+    deleteHistoricTaskInstancesByProcessInstanceIds(processInstanceIds, true);
+  }
+
+  /**
+   * Deletes all data related with tasks, which belongs to specified process instance ids.
+   * @param processInstanceIds
+   * @param deleteVariableInstances when true, will also delete variable instances. Can be false when variable instances were deleted separately.
+   */
+  public void deleteHistoricTaskInstancesByProcessInstanceIds(List<String> processInstanceIds, boolean deleteVariableInstances) {
 
     CommandContext commandContext = Context.getCommandContext();
 
-    getHistoricVariableInstanceManager()
-        .deleteHistoricVariableInstancesByTaskProcessInstanceIds(processInstanceIds);
+    if (deleteVariableInstances) {
+      getHistoricVariableInstanceManager().deleteHistoricVariableInstancesByTaskProcessInstanceIds(processInstanceIds);
+    }
 
     getHistoricDetailManager()
         .deleteHistoricDetailsByTaskProcessInstanceIds(processInstanceIds);

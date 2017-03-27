@@ -36,35 +36,17 @@ public class HistoricDetailManager extends AbstractHistoricManager {
   }
 
   public void deleteHistoricDetailsByProcessInstanceIds(List<String> historicProcessInstanceIds) {
-    ListQueryParameterObject parameter = new ListQueryParameterObject();
-    parameter.setParameter(historicProcessInstanceIds);
-
-    List<String> contentIds = findHistoricDetailByteArrayIdsByProcessInstanceIds(parameter);
-    if (contentIds != null && !contentIds.isEmpty()) {
-      getByteArrayManager().deleteByteArrayByIds(contentIds);
-    }
     Context.getCommandContext().getDbEntityManager()
-        .deletePreserveOrder(HistoricDetailEventEntity.class, "deleteHistoricDetailsByProcessInstanceIds", parameter);
+        .deletePreserveOrder(ByteArrayEntity.class,  "deleteHistoricDetailByteArraysByByProcessInstanceIds", historicProcessInstanceIds);
+    Context.getCommandContext().getDbEntityManager()
+        .deletePreserveOrder(HistoricDetailEventEntity.class, "deleteHistoricDetailsByProcessInstanceIds", historicProcessInstanceIds);
   }
 
   public void deleteHistoricDetailsByTaskProcessInstanceIds(List<String> historicProcessInstanceIds) {
-    ListQueryParameterObject parameter = new ListQueryParameterObject();
-    parameter.setParameter(historicProcessInstanceIds);
-
-    List<String> contentIds = findHistoricDetailByteArrayIdsByTaskProcessInstanceIds(parameter);
-    if (contentIds != null && !contentIds.isEmpty()) {
-      getByteArrayManager().deleteByteArrayByIds(contentIds);
-    }
     Context.getCommandContext().getDbEntityManager()
-        .deletePreserveOrder(HistoricDetailEventEntity.class, "deleteHistoricDetailsByTaskProcessInstanceIds", parameter);
-  }
-
-  protected List<String> findHistoricDetailByteArrayIdsByProcessInstanceIds(ListQueryParameterObject parameter) {
-    return getDbEntityManager().selectList("selectHistoricDetailByteArrayIdsByProcessInstanceIds", parameter);
-  }
-
-  protected List<String> findHistoricDetailByteArrayIdsByTaskProcessInstanceIds(ListQueryParameterObject parameter) {
-    return getDbEntityManager().selectList("selectHistoricDetailByteArrayIdsByTaskProcessInstanceIds", parameter);
+        .deletePreserveOrder(ByteArrayEntity.class,  "deleteHistoricDetailByteArraysByTaskProcessInstanceIds", historicProcessInstanceIds);
+    Context.getCommandContext().getDbEntityManager()
+        .deletePreserveOrder(HistoricDetailEventEntity.class, "deleteHistoricDetailsByTaskProcessInstanceIds", historicProcessInstanceIds);
   }
 
   public void deleteHistoricDetailsByCaseInstanceId(String historicCaseInstanceId) {

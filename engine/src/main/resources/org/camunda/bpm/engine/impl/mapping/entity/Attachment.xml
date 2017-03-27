@@ -65,6 +65,24 @@
     <include refid="selectAttachmentsByTaskProcessInstanceIdsSql"/>
   </delete>
 
+  <delete id="deleteAttachmentByteArraysByProcessInstanceIds">
+    delete from ${prefix}ACT_GE_BYTEARRAY
+    where ID_ in
+      (select distinct CONTENT_ID_
+      from ${prefix}ACT_HI_ATTACHMENT
+        <include refid="selectAttachmentsByProcessInstanceIdsSql"/>
+        and CONTENT_ID_ is not NULL)
+  </delete>
+
+  <delete id="deleteAttachmentByteArraysByTaskProcessInstanceIds">
+    delete from ${prefix}ACT_GE_BYTEARRAY
+    where ID_ in
+      (select distinct CONTENT_ID_
+      from ${prefix}ACT_HI_ATTACHMENT
+        <include refid="selectAttachmentsByTaskProcessInstanceIdsSql"/>
+        and CONTENT_ID_ is not NULL)
+  </delete>
+
   <delete id="deleteByteArraysByIds">
     delete
     from
@@ -91,21 +109,6 @@
   </resultMap>
   
   <!-- ATTACHMENT SELECT -->
-
-  <select id="selectContentIdsByProcessInstanceIds" resultType="string">
-    select distinct CONTENT_ID_
-    from ${prefix}ACT_HI_ATTACHMENT
-    <include refid="selectAttachmentsByProcessInstanceIdsSql"/>
-      and CONTENT_ID_ is not NULL
-  </select>
-
-  <select id="selectContentIdsByTaskProcessInstanceIds" resultType="string">
-    select distinct CONTENT_ID_
-    from ${prefix}ACT_HI_ATTACHMENT
-    <include refid="selectAttachmentsByTaskProcessInstanceIdsSql"/>
-    and CONTENT_ID_ is not NULL
-  </select>
-
   <select id="selectAttachment" parameterType="string" resultMap="attachmentResultMap">
     select * from ${prefix}ACT_HI_ATTACHMENT where ID_ = #{id,jdbcType=VARCHAR}
   </select>
@@ -126,7 +129,7 @@
 
   <sql id="selectAttachmentsByProcessInstanceIdsSql">
     where PROC_INST_ID_ IN
-    <foreach item="processInstanceId" index="index" collection="parameter" open="(" separator="," close=")">
+    <foreach item="processInstanceId" index="index" collection="list" open="(" separator="," close=")">
       #{processInstanceId}
     </foreach>
   </sql>
@@ -135,7 +138,7 @@
     where TASK_ID_ IN
       (select distinct ID_ from ${prefix}ACT_HI_TASKINST
       where PROC_INST_ID_ in
-        <foreach item="processInstanceId" index="index" collection="parameter" open="(" separator="," close=")">
+        <foreach item="processInstanceId" index="index" collection="list" open="(" separator="," close=")">
           #{processInstanceId}
         </foreach>
       )

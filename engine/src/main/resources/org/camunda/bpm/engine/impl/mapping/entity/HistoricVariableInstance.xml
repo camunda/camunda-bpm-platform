@@ -98,10 +98,28 @@
     <include refid="selectHistoricVariableInstanceByProcessInstanceIdsSql"/>
   </delete>
 
+  <select id="deleteHistoricVariableInstanceByteArraysByProcessInstanceIds">
+    delete from ${prefix}ACT_GE_BYTEARRAY
+    where ID_ in
+      (select DISTINCT BYTEARRAY_ID_
+      from ${prefix}ACT_HI_VARINST RES
+        <include refid="selectHistoricVariableInstanceByProcessInstanceIdsSql"/>
+        and BYTEARRAY_ID_ is not NULL)
+  </select>
+
   <delete id="deleteHistoricVariableInstanceByTaskProcessInstanceIds">
     delete from ${prefix}ACT_HI_VARINST
     <include refid="selectHistoricVariableInstanceByTaskProcessInstanceIdsSql"/>
   </delete>
+
+  <select id="deleteHistoricVariableInstanceByteArraysByTaskProcessInstanceIds">
+    delete from ${prefix}ACT_GE_BYTEARRAY
+    where ID_ in
+      (select DISTINCT BYTEARRAY_ID_
+      from ${prefix}ACT_HI_VARINST RES
+        <include refid="selectHistoricVariableInstanceByTaskProcessInstanceIdsSql"/>
+        and BYTEARRAY_ID_ is not NULL)
+  </select>
 
   <!-- HISTORIC PROCESS VARIABLE RESULTMAP -->
   <resultMap id="historicVariableInstanceResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity">
@@ -314,23 +332,9 @@
     select * from ${prefix}ACT_HI_VARINST where ID_ = #{variableInstanceId}
   </select>
 
-  <select id="selectHistoricVariableInstanceByteArrayIdsByProcessInstanceIds" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
-    select DISTINCT BYTEARRAY_ID_
-    from ${prefix}ACT_HI_VARINST RES
-    <include refid="selectHistoricVariableInstanceByProcessInstanceIdsSql"/>
-    and BYTEARRAY_ID_ is not NULL
-  </select>
-
-  <select id="selectHistoricVariableInstanceByteArrayIdsByTaskProcessInstanceIds" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
-    select DISTINCT BYTEARRAY_ID_
-    from ${prefix}ACT_HI_VARINST RES
-    <include refid="selectHistoricVariableInstanceByTaskProcessInstanceIdsSql"/>
-    and BYTEARRAY_ID_ is not NULL
-  </select>
-
   <sql id="selectHistoricVariableInstanceByProcessInstanceIdsSql">
     where PROC_INST_ID_ IN
-    <foreach item="processInstanceId" index="index" collection="parameter" open="(" separator="," close=")">
+    <foreach item="processInstanceId" index="index" collection="list" open="(" separator="," close=")">
       #{processInstanceId}
     </foreach>
   </sql>
@@ -339,7 +343,7 @@
     where TASK_ID_ IN
     (select distinct ID_ from ${prefix}ACT_HI_TASKINST
     where PROC_INST_ID_ in
-    <foreach item="processInstanceId" index="index" collection="parameter" open="(" separator="," close=")">
+    <foreach item="processInstanceId" index="index" collection="list" open="(" separator="," close=")">
       #{processInstanceId}
     </foreach>
     )

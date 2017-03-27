@@ -56,38 +56,19 @@ public class AttachmentManager extends AbstractHistoricManager {
 
   public void deleteAttachmentsByProcessInstanceIds(List<String> processInstanceIds) {
     CommandContext commandContext = Context.getCommandContext();
-
-    ListQueryParameterObject parameter = new ListQueryParameterObject();
-    parameter.setParameter(processInstanceIds);
-
-    List<String> contentIds = findAttachmentContentIdsByProcessInstanceIds(parameter);
-    if (contentIds != null && !contentIds.isEmpty()) {
-      getByteArrayManager().deleteByteArrayByIds(contentIds);
-    }
     commandContext
-        .getDbEntityManager().deletePreserveOrder(AttachmentEntity.class, "deleteAttachmentByProcessInstanceIds", parameter);
+        .getDbEntityManager().deletePreserveOrder(ByteArrayEntity.class, "deleteAttachmentByteArraysByProcessInstanceIds", processInstanceIds);
+    commandContext
+        .getDbEntityManager().deletePreserveOrder(AttachmentEntity.class, "deleteAttachmentByProcessInstanceIds", processInstanceIds);
   }
 
   public void deleteAttachmentsByTaskProcessInstanceIds(List<String> processInstanceIds) {
     CommandContext commandContext = Context.getCommandContext();
 
-    ListQueryParameterObject parameter = new ListQueryParameterObject();
-    parameter.setParameter(processInstanceIds);
-
-    List<String> contentIds = findAttachmentContentIdsByTaskProcessInstanceIds(parameter);
-    if (contentIds != null && !contentIds.isEmpty()) {
-      getByteArrayManager().deleteByteArrayByIds(contentIds);
-    }
     commandContext
-        .getDbEntityManager().deletePreserveOrder(AttachmentEntity.class, "deleteAttachmentByTaskProcessInstanceIds", parameter);
-  }
-
-  protected List<String> findAttachmentContentIdsByProcessInstanceIds(ListQueryParameterObject parameter) {
-    return getDbEntityManager().selectList("selectContentIdsByProcessInstanceIds", parameter);
-  }
-
-  protected List<String> findAttachmentContentIdsByTaskProcessInstanceIds(ListQueryParameterObject parameter) {
-    return getDbEntityManager().selectList("selectContentIdsByTaskProcessInstanceIds", parameter);
+        .getDbEntityManager().deletePreserveOrder(ByteArrayEntity.class, "deleteAttachmentByteArraysByTaskProcessInstanceIds", processInstanceIds);
+    commandContext
+        .getDbEntityManager().deletePreserveOrder(AttachmentEntity.class, "deleteAttachmentByTaskProcessInstanceIds", processInstanceIds);
   }
 
   public Attachment findAttachmentByTaskIdAndAttachmentId(String taskId, String attachmentId) {
