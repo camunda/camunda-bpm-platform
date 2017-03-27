@@ -225,4 +225,7 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
    * Note that the ordering of process instances without tenant id is database-specific.
    */
   ProcessInstanceQuery orderByTenantId();
+
+  /** Order by the business key (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  ProcessInstanceQuery orderByProcessBusinessKey();
 }

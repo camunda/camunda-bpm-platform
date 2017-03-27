@@ -28,5 +28,6 @@ public interface ProcessInstanceQueryProperty {
   public static final QueryProperty PROCESS_DEFINITION_KEY = new QueryPropertyImpl("KEY_");
   public static final QueryProperty PROCESS_DEFINITION_ID = new QueryPropertyImpl("ID_");
   public static final QueryProperty TENANT_ID = new QueryPropertyImpl("TENANT_ID_");
+  public static final QueryProperty BUSINESS_KEY = new QueryPropertyImpl("BUSINESS_KEY_");
 
 }

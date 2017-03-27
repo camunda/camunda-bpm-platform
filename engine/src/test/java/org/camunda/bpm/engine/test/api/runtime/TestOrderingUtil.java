@@ -102,6 +102,14 @@ public class TestOrderingUtil {
     });
   }
 
+  public static NullTolerantComparator<ProcessInstance> processInstanceByBusinessKey() {
+    return propertyComparator(new PropertyAccessor<ProcessInstance, String>() {
+      @Override public String getProperty(ProcessInstance obj) {
+        return obj.getBusinessKey();
+      }
+    });
+  }
+
   //HISTORIC PROCESS INSTANCE
 
   public static NullTolerantComparator<HistoricProcessInstance> historicProcessInstanceByProcessDefinitionId() {

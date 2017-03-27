@@ -160,6 +160,11 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     return this;
   }
 
+  public ProcessInstanceQuery orderByProcessBusinessKey() {
+    orderBy(ProcessInstanceQueryProperty.BUSINESS_KEY);
+    return this;
+  }
+
   public ProcessInstanceQuery active() {
     this.suspensionState = SuspensionState.ACTIVE;
     return this;
