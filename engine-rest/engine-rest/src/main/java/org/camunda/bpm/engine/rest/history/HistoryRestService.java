@@ -12,12 +12,16 @@
  */
 package org.camunda.bpm.engine.rest.history;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import org.camunda.bpm.engine.rest.dto.runtime.JobDto;
 
-import org.camunda.bpm.engine.history.HistoricDecisionInstance;
-
+@Path(HistoryRestService.PATH)
 @Produces(MediaType.APPLICATION_JSON)
 public interface HistoryRestService {
 
@@ -73,4 +77,11 @@ public interface HistoryRestService {
 
   @Path(HistoricExternalTaskLogRestService.PATH)
   HistoricExternalTaskLogRestService getExternalTaskLogService();
+
+  @POST
+  @Path("/cleanup")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  JobDto cleanupAsync(@QueryParam("executeAtOnce") @DefaultValue("true") boolean executeAtOnce);
+
 }

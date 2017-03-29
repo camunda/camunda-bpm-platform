@@ -43,6 +43,7 @@ import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.impl.batch.history.DeleteHistoricBatchCmd;
 import org.camunda.bpm.engine.impl.batch.history.HistoricBatchQueryImpl;
 import org.camunda.bpm.engine.impl.cmd.DeleteHistoricProcessInstancesBulkCmd;
+import org.camunda.bpm.engine.impl.cmd.HistoryCleanupCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteHistoricCaseInstanceCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteHistoricProcessInstanceCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteHistoricProcessInstancesCmd;
@@ -53,6 +54,7 @@ import org.camunda.bpm.engine.impl.cmd.GetHistoricJobLogExceptionStacktraceCmd;
 import org.camunda.bpm.engine.impl.cmd.batch.DeleteHistoricProcessInstancesBatchCmd;
 import org.camunda.bpm.engine.impl.dmn.cmd.DeleteHistoricDecisionInstanceByInstanceIdCmd;
 import org.camunda.bpm.engine.impl.dmn.cmd.DeleteHistoricDecisionInstanceByDefinitionIdCmd;
+import org.camunda.bpm.engine.runtime.Job;
 
 import java.util.List;
 
@@ -129,6 +131,14 @@ public class HistoryServiceImpl extends ServiceImpl implements HistoryService {
 
   public void deleteHistoricProcessInstancesBulk(List<String> processInstanceIds){
     commandExecutor.execute(new DeleteHistoricProcessInstancesBulkCmd(processInstanceIds));
+  }
+
+  public Job cleanUpHistoryAsync() {
+    return cleanUpHistoryAsync(false);
+  }
+
+  public Job cleanUpHistoryAsync(boolean executeAtOnce) {
+    return commandExecutor.execute(new HistoryCleanupCmd(executeAtOnce));
   }
 
   public Batch deleteHistoricProcessInstancesAsync(List<String> processInstanceIds, String deleteReason) {

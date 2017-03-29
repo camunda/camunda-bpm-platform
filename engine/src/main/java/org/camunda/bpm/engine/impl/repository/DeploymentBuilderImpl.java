@@ -137,7 +137,7 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
 
   private void validateResouceName(String resourceName, String[] resourceSuffixes) {
     if (!StringUtil.hasAnySuffix(resourceName, resourceSuffixes)) {
-      LOG.warnDeploymentResourceHasWroneName(resourceName, resourceSuffixes);
+      LOG.warnDeploymentResourceHasWrongName(resourceName, resourceSuffixes);
     }
   }
 

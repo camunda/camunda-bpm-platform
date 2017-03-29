@@ -123,6 +123,13 @@ public abstract class JobDeclaration<S, T extends JobEntity> implements Serializ
   }
 
   /**
+   * Re-initialize configuration part.
+    */
+  public T reconfigure(S context, T job) {
+    return job;
+  }
+
+  /**
    * general callback to override any configuration after the defaults have been applied
    */
   protected void postInitialize(S context, T job) {

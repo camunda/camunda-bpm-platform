@@ -63,6 +63,7 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
   protected int suspensionState = SuspensionState.ACTIVE.getStateCode();
   protected String tenantId;
   protected String versionTag;
+  protected Integer timeToLive = 5;     //TODO svt CAM-7542
   protected boolean isIdentityLinksInitialized = false;
   protected List<IdentityLinkEntity> definitionIdentityLinkEntities = new ArrayList<IdentityLinkEntity>();
   protected Set<Expression> candidateStarterUserIdExpressions = new HashSet<Expression>();
@@ -445,5 +446,13 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
 
   public void setVersionTag(String versionTag) {
     this.versionTag = versionTag;
+  }
+
+  public Integer getTimeToLive() {
+    return timeToLive;
+  }
+
+  public void setTimeToLive(Integer timeToLive) {
+    this.timeToLive = timeToLive;
   }
 }

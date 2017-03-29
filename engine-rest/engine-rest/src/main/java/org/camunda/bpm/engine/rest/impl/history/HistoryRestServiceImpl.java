@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.rest.impl.history;
 
+import org.camunda.bpm.engine.rest.dto.runtime.JobDto;
 import org.camunda.bpm.engine.rest.history.HistoricActivityInstanceRestService;
 import org.camunda.bpm.engine.rest.history.HistoricActivityStatisticsRestService;
 import org.camunda.bpm.engine.rest.history.HistoricBatchRestService;
@@ -32,6 +33,7 @@ import org.camunda.bpm.engine.rest.history.HistoryRestService;
 import org.camunda.bpm.engine.rest.history.UserOperationLogRestService;
 
 import org.camunda.bpm.engine.rest.impl.AbstractRestProcessEngineAware;
+import org.camunda.bpm.engine.runtime.Job;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -108,5 +110,11 @@ public class HistoryRestServiceImpl extends AbstractRestProcessEngineAware imple
   @Override
   public HistoricExternalTaskLogRestService getExternalTaskLogService() {
     return new HistoricExternalTaskLogRestServiceImpl(getObjectMapper(), getProcessEngine());
+  }
+
+  @Override
+  public JobDto cleanupAsync(boolean executeAtOnce) {
+    Job job = processEngine.getHistoryService().cleanUpHistoryAsync(executeAtOnce);
+    return JobDto.fromJob(job);
   }
 }

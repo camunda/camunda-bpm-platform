@@ -25,11 +25,16 @@ import java.util.Map;
 import org.camunda.bpm.engine.impl.json.JsonObjectConverter;
 import org.camunda.bpm.engine.impl.util.json.JSONArray;
 import org.camunda.bpm.engine.impl.util.json.JSONObject;
+import org.joda.time.LocalTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 /**
  * @author Sebastian Menski
  */
 public final class JsonUtil {
+
+  private static final DateTimeFormatter LOCAL_TIME_FORMATTER = DateTimeFormat.forPattern("HH:mm:ss.SSS");
 
   /**
    * Converts a {@link JSONObject} to a {@link Map}. It supports nested {@link JSONObject}
@@ -148,6 +153,19 @@ public final class JsonUtil {
     if (date != null) {
       json.put(name, date.getTime());
     }
+  }
+
+  public static void addLocalTimeField(JSONObject json, String name, LocalTime localTime) {
+    if (localTime != null) {
+      json.put(name, LOCAL_TIME_FORMATTER.print(localTime));
+    }
+  }
+
+  public static LocalTime getLocalTimeField(JSONObject json, String name) {
+    if (json.get(name) != null) {
+      return LOCAL_TIME_FORMATTER.parseLocalTime(json.getString(name));
+    }
+    return null;
   }
 
   public static <T> List<T> jsonArrayAsList(JSONArray jsonArray, JsonObjectConverter<T> converter) {

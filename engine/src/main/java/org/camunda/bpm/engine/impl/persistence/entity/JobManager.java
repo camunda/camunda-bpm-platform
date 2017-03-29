@@ -46,6 +46,10 @@ public class JobManager extends AbstractManager {
     JOB_DUEDATE_ORDERING_PROPERTY.setDirection(Direction.ASCENDING);
   }
 
+  public void updateJob(JobEntity job) {
+    getDbEntityManager().merge(job);
+  }
+
   public void insertJob(JobEntity job) {
     getDbEntityManager().insert(job);
     getHistoricJobLogManager().fireJobCreatedEvent(job);
@@ -81,17 +85,30 @@ public class JobManager extends AbstractManager {
   public void schedule(TimerEntity timer) {
     Date duedate = timer.getDuedate();
     ensureNotNull("duedate", duedate);
-
     timer.insert();
+    hintJobExecutorIfNeeded(timer, duedate);
+  }
 
+  public void reschedule(JobEntity jobEntity, Date newDuedate) {
+    ensureNotNull("duedate", newDuedate);
+    jobEntity.init(Context.getCommandContext());
+    jobEntity.setSuspensionState(SuspensionState.ACTIVE.getStateCode());
+    jobEntity.setDuedate(newDuedate);
+    jobEntity.update();
+    hintJobExecutorIfNeeded(jobEntity, newDuedate);
+
+    //TODO svt do we need specific event for rescheduling?
+    //getHistoricJobLogManager().fireJobCreatedEvent(job);
+  }
+
+  private void hintJobExecutorIfNeeded(JobEntity jobEntity, Date duedate) {
     // Check if this timer fires before the next time the job executor will check for new timers to fire.
     // This is highly unlikely because normally waitTimeInMillis is 5000 (5 seconds)
     // and timers are usually set further in the future
-
     JobExecutor jobExecutor = Context.getProcessEngineConfiguration().getJobExecutor();
     int waitTimeInMillis = jobExecutor.getWaitTimeInMillis();
     if (duedate.getTime() < (ClockUtil.getCurrentTime().getTime() + waitTimeInMillis)) {
-      hintJobExecutor(timer);
+      hintJobExecutor(jobEntity);
     }
   }
 
@@ -192,6 +209,11 @@ public class JobManager extends AbstractManager {
   @SuppressWarnings("unchecked")
   public List<JobEntity> findJobsByJobDefinitionId(String jobDefinitionId) {
     return getDbEntityManager().selectList("selectJobsByJobDefinitionId", jobDefinitionId);
+  }
+
+  @SuppressWarnings("unchecked")
+  public JobEntity findJobByHandlerType(String handlerType) {
+    return (JobEntity)getDbEntityManager().selectOne("selectJobsByHandlerType", handlerType);
   }
 
   @SuppressWarnings("unchecked")

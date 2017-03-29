@@ -48,6 +48,7 @@ public class EntityTypeComparatorForModifications implements Comparator<Class<?>
     TYPE_ORDER.put(JobEntity.class, 1);
     TYPE_ORDER.put(MessageEntity.class, 1);
     TYPE_ORDER.put(TimerEntity.class, 1);
+    TYPE_ORDER.put(EverLivingJobEntity.class, 1);
 
     TYPE_ORDER.put(MembershipEntity.class, 1);
     TYPE_ORDER.put(TenantMembershipEntity.class, 1);

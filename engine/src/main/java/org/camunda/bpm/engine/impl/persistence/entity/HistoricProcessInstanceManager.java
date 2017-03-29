@@ -21,10 +21,11 @@ import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.HistoricProcessInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
-
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 
 /**
  * @author Tom Baeyens
@@ -136,4 +137,17 @@ public class HistoricProcessInstanceManager extends AbstractHistoricManager {
     getTenantManager().configureQuery(query);
   }
 
+  public List<String> findHistoricProcessInstanceIdsForCleanup(Integer batchSize) {
+    ListQueryParameterObject parameterObject = new ListQueryParameterObject();
+    parameterObject.setParameter(ClockUtil.getCurrentTime());
+    parameterObject.setFirstResult(0);
+    parameterObject.setMaxResults(batchSize);
+    return (List<String>) getDbEntityManager().selectList("selectHistoricProcessInstanceIdsForCleanup", parameterObject);
+  }
+
+  public Long findHistoricProcessInstanceIdsForCleanupCount() {
+    ListQueryParameterObject parameterObject = new ListQueryParameterObject();
+    parameterObject.setParameter(ClockUtil.getCurrentTime());
+    return (Long) getDbEntityManager().selectOne("selectHistoricProcessInstanceIdsForCleanupCount", parameterObject);
+  }
 }

@@ -17,6 +17,9 @@ values ('next.dbid', '1', 1);
 insert into ACT_GE_PROPERTY
 values ('deployment.lock', '0', 1);
 
+insert into ACT_GE_PROPERTY
+values ('history.cleanup.job.lock', '0', 1);
+
 create table ACT_GE_BYTEARRAY (
     ID_ nvarchar(64),
     REV_ int,
@@ -115,6 +118,7 @@ create table ACT_RE_PROCDEF (
     SUSPENSION_STATE_ tinyint,
     TENANT_ID_ nvarchar(64),
     VERSION_TAG_ nvarchar(64),
+    TTL_ int,
     primary key (ID_)
 );
 

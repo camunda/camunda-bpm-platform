@@ -33,3 +33,11 @@ ALTER TABLE ACT_ID_USER
 -- operationId column to link records with those from ACT_HI_OP_LOG
 ALTER TABLE ACT_HI_DETAIL
   ADD OPERATION_ID_ NVARCHAR2(64);
+
+-- insert history.cleanup.job.lock in property table
+insert into ACT_GE_PROPERTY
+values ('history.cleanup.job.lock', '0', 1);
+
+-- timeToLive column for history cleanup
+ALTER TABLE ACT_RE_PROCDEF
+  ADD TTL_ INTEGER;

@@ -5,6 +5,7 @@ import java.util.TimeZone;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.joda.time.LocalTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
@@ -27,12 +28,21 @@ public class DateTimeUtil {
 
   private static DateTimeFormatter DATE_TIME_FORMATER;
 
+  private static DateTimeFormatter LOCAL_TIME_WITHOUT_SECONDS_FORMATER;
+
   private static DateTimeFormatter getDataTimeFormater() {
     if (DATE_TIME_FORMATER == null) {
       DATE_TIME_FORMATER = ISODateTimeFormat.dateTimeParser().withZone(JVM_DEFAULT_DATE_TIME_ZONE);
     }
 
     return DATE_TIME_FORMATER;
+  }
+
+  public static DateTimeFormatter getLocalTimeWithoutSecondsFormater() {
+    if (LOCAL_TIME_WITHOUT_SECONDS_FORMATER == null) {
+      LOCAL_TIME_WITHOUT_SECONDS_FORMATER = ISODateTimeFormat.hourMinute().withZone(JVM_DEFAULT_DATE_TIME_ZONE);
+    }
+    return LOCAL_TIME_WITHOUT_SECONDS_FORMATER;
   }
 
   public static DateTime now() {
@@ -45,6 +55,10 @@ public class DateTimeUtil {
 
   public static Date parseDate(String date) {
     return parseDateTime(date).toDate();
+  }
+
+  public static LocalTime parseLocalTimeWithoutSeconds(String time) {
+    return getLocalTimeWithoutSecondsFormater().parseLocalTime(time);
   }
 
 }

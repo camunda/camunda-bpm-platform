@@ -17,6 +17,9 @@ values ('next.dbid', '1', 1);
 insert into ACT_GE_PROPERTY
 values ('deployment.lock', '0', 1);
 
+insert into ACT_GE_PROPERTY
+values ('history.cleanup.job.lock', '0', 1);
+
 create table ACT_GE_BYTEARRAY (
     ID_ varchar(64),
     REV_ integer,
@@ -115,6 +118,7 @@ create table ACT_RE_PROCDEF (
     SUSPENSION_STATE_ integer,
     TENANT_ID_ varchar(64),
     VERSION_TAG_ varchar(64),
+    TTL_ integer,
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 

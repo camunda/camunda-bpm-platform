@@ -65,4 +65,12 @@
     SELECT * FROM ${prefix}ACT_GE_PROPERTY WITH (XLOCK, ROWLOCK) WHERE NAME_ = 'deployment.lock'
   </update>
 
+  <update id="lockHistoryCleanupJobLockProperty">
+    SELECT * FROM ${prefix}ACT_GE_PROPERTY WHERE NAME_ = 'history.cleanup.job.lock' ${constant.for.update}
+  </update>
+
+  <update id="lockHistoryCleanupJobLockProperty_mssql">
+    SELECT * FROM ${prefix}ACT_GE_PROPERTY WITH (XLOCK, ROWLOCK) WHERE NAME_ = 'history.cleanup.job.lock'
+  </update>
+
 </mapper>

@@ -200,6 +200,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventSubprocessJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendJobDefinitionHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendProcessDefinitionHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupJobHandler;
 import org.camunda.bpm.engine.impl.metrics.MetricsRegistry;
 import org.camunda.bpm.engine.impl.metrics.MetricsReporterIdProvider;
 import org.camunda.bpm.engine.impl.metrics.SimpleIpBasedProvider;
@@ -668,6 +669,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected Permission defaultUserPermissionForTask;
 
   protected boolean isUseSharedSqlSessionFactory = false;
+
+  //History cleanup configuration
+  private String batchWindowStartTime;
+  private String batchWindowEndTime = "00:00";
+  private int historyCleanupBatchSize = 500;
+  private int historyCleanupBatchThreshold = 10;
 
   // buildProcessEngine ///////////////////////////////////////////////////////
 
@@ -1545,6 +1552,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     BatchMonitorJobHandler batchMonitorJobHandler = new BatchMonitorJobHandler();
     jobHandlers.put(batchMonitorJobHandler.getType(), batchMonitorJobHandler);
 
+    HistoryCleanupJobHandler historyCleanupJobHandler = new HistoryCleanupJobHandler();
+    jobHandlers.put(historyCleanupJobHandler.getType(), historyCleanupJobHandler);
+
     for (JobHandler batchHandler : batchHandlers.values()) {
       jobHandlers.put(batchHandler.getType(), batchHandler);
     }
@@ -1708,6 +1718,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     metricsRegistry.createMeter(Metrics.JOB_EXECUTION_REJECTED);
 
     metricsRegistry.createMeter(Metrics.EXECUTED_DECISION_ELEMENTS);
+
+    metricsRegistry.createMeter(Metrics.HISTORIC_PROCESS_INSTANCES_FOR_CLEANUP);
   }
 
   protected void initSerialization() {
@@ -3568,4 +3580,35 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     this.disableStrictCallActivityValidation = disableStrictCallActivityValidation;
   }
 
+  public String getBatchWindowStartTime() {
+    return batchWindowStartTime;
+  }
+
+  public void setBatchWindowStartTime(String batchWindowStartTime) {
+    this.batchWindowStartTime = batchWindowStartTime;
+  }
+
+  public String getBatchWindowEndTime() {
+    return batchWindowEndTime;
+  }
+
+  public void setBatchWindowEndTime(String batchWindowEndTime) {
+    this.batchWindowEndTime = batchWindowEndTime;
+  }
+
+  public int getHistoryCleanupBatchSize() {
+    return historyCleanupBatchSize;
+  }
+
+  public void setHistoryCleanupBatchSize(int historyCleanupBatchSize) {
+    this.historyCleanupBatchSize = historyCleanupBatchSize;
+  }
+
+  public int getHistoryCleanupBatchThreshold() {
+    return historyCleanupBatchThreshold;
+  }
+
+  public void setHistoryCleanupBatchThreshold(int historyCleanupBatchThreshold) {
+    this.historyCleanupBatchThreshold = historyCleanupBatchThreshold;
+  }
 }

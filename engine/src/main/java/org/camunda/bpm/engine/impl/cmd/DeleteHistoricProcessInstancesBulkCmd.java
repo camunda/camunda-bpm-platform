@@ -38,7 +38,8 @@ public class DeleteHistoricProcessInstancesBulkCmd implements Command<Void>, Ser
     this.processInstanceIds = processInstanceIds;
   }
 
-  @Override public Void execute(CommandContext commandContext) {
+  @Override
+  public Void execute(CommandContext commandContext) {
     commandContext.getAuthorizationManager().checkAuthorization(Permissions.DELETE_HISTORY, Resources.PROCESS_DEFINITION);
 
     ensureNotEmpty(BadUserRequestException.class, "processInstanceIds", processInstanceIds);
