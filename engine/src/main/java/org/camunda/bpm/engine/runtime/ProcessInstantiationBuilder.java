@@ -55,9 +55,8 @@ public interface ProcessInstantiationBuilder
    *           {@link Resources#PROCESS_INSTANCE} and no
    *           {@link Permissions#CREATE_INSTANCE} permission on
    *           {@link Resources#PROCESS_DEFINITION}.
-   * @deprecated use {@link #executeWithVariablesInReturn()} instead.
+   * @see also {@link #executeWithVariablesInReturn()}.
    */
-  @Deprecated
   ProcessInstance execute();
 
   /**
@@ -72,9 +71,8 @@ public interface ProcessInstantiationBuilder
    *          invoked throughout the transaction when executing the
    *          instructions. Only supported for instructions.
    * @return the newly created process instance
-   * @deprecated use {@link #executeWithVariablesInReturn(boolean, boolean)} instead.
+   * @see also {@link #executeWithVariablesInReturn(boolean, boolean)}.
    */
-  @Deprecated
   ProcessInstance execute(boolean skipCustomListeners, boolean skipIoMappings);
 
   /**
