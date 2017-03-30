@@ -12,6 +12,11 @@
  */
 package org.camunda.bpm.engine.test.api.authorization.history;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.List;
 
 import org.camunda.bpm.engine.FormService;
@@ -23,21 +28,19 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
+import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Tests the operationId field in historic tables, which helps to correlate records from different tables.
@@ -155,6 +158,32 @@ public class UserOperationIdTest {
     for (HistoricDetail historicDetail: historicDetails) {
       assertNull(historicDetail.getUserOperationId());
     }
+  }
+
+  @Test
+  @Ignore("CAM-6669")
+  public void testSetTaskVariablesInServiceTask() {
+    // given
+    BpmnModelInstance bpmnModelInstance = Bpmn.createExecutableProcess(PROCESS_KEY)
+        .startEvent()
+        .userTask()
+        .serviceTask()
+          .camundaExpression("${execution.setVariable('foo', 'bar')}")
+        .endEvent()
+        .done();
+    testRule.deploy(bpmnModelInstance);
+
+    identityService.setAuthenticatedUserId("demo");
+    runtimeService.startProcessInstanceByKey(PROCESS_KEY);
+    Task task = taskService.createTaskQuery().singleResult();
+
+    // when
+    taskService.complete(task.getId());
+
+    //then
+    HistoricDetail historicDetail = historyService.createHistoricDetailQuery().singleResult();
+    // no user operation log id is set for this update, as it is not written as part of the user operation
+    assertNull(historicDetail.getUserOperationId());
   }
 
   private void verifySameOperationId(List<UserOperationLogEntry> userOperationLogEntries, List<HistoricDetail> historicDetails) {
