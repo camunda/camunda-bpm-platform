@@ -34,8 +34,6 @@
     <skip.frontend.build>false</skip.frontend.build>
 
     <authorizationCheckRevokes>auto</authorizationCheckRevokes>
-
-    <project.parent.basedir>./</project.parent.basedir>
   </properties>
 
   <dependencyManagement>
@@ -421,6 +419,12 @@
       </build>
     </profile>
 
+    <profile>
+      <id>h2</id>
+      <properties>
+        <database.host>./target/h2/</database.host>
+      </properties>
+    </profile>
 
     <profile>
       <id>dev-e2e</id>
