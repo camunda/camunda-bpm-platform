@@ -34,6 +34,8 @@
     <skip.frontend.build>false</skip.frontend.build>
 
     <authorizationCheckRevokes>auto</authorizationCheckRevokes>
+
+    <project.parent.basedir>./</project.parent.basedir>
   </properties>
 
   <dependencyManagement>
