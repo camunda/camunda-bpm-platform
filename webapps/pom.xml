@@ -422,7 +422,7 @@
     <profile>
       <id>h2</id>
       <properties>
-        <database.host>./target/h2/</database.host>
+        <project.parent.basedir>./</project.parent.basedir>
       </properties>
     </profile>
 
