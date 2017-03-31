@@ -234,7 +234,6 @@
                 <phase>process-test-classes</phase>
                 <configuration>
                   <mainClass>org.camunda.bpm.qa.upgrade.TestFixture</mainClass>
-                  <includePluginDependencies>true</includePluginDependencies>
                 </configuration>
               </execution>
             </executions>

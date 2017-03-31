@@ -23,7 +23,7 @@
         <groupId>org.camunda.bpm.model</groupId>
         <artifactId>camunda-bpmn-model</artifactId>
         <version>7.2.0</version>
-    </dependency>    
+    </dependency>
     <dependency>
       <groupId>org.camunda.bpm.model</groupId>
       <artifactId>camunda-cmmn-model</artifactId>
@@ -45,7 +45,7 @@
       <artifactId>camunda-engine</artifactId>
       <version>7.2.0</version>
     </dependency>
-    
+
     <dependency>
       <groupId>org.camunda.bpm.qa.upgrade</groupId>
       <artifactId>camunda-qa-upgrade-scenario-util</artifactId>
@@ -91,7 +91,6 @@
                 <phase>process-test-classes</phase>
                 <configuration>
                   <mainClass>org.camunda.bpm.qa.upgrade.TestFixture</mainClass>
-                  <includePluginDependencies>true</includePluginDependencies>
                 </configuration>
               </execution>
             </executions>

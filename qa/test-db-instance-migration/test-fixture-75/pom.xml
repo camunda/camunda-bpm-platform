@@ -16,7 +16,7 @@
   </properties>
 
   <dependencyManagement>
-    <dependencies>     
+    <dependencies>
       <dependency>
         <groupId>org.camunda.bpm</groupId>
         <artifactId>camunda-bom</artifactId>
@@ -258,7 +258,6 @@
                 <phase>process-test-classes</phase>
                 <configuration>
                   <mainClass>org.camunda.bpm.qa.upgrade.TestFixture</mainClass>
-                  <includePluginDependencies>true</includePluginDependencies>
                 </configuration>
               </execution>
             </executions>
