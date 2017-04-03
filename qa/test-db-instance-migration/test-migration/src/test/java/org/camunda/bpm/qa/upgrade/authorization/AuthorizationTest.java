@@ -67,6 +67,14 @@ public class AuthorizationTest {
 
   @Test
   public void testDefaultAuthorizationForCamundaAdminOnUpgrade() {
+
+    // The below test cases are skipped for H2 as there is a bug in H2 version 1.3 (Query does not return the expected output)
+    // This H2 exclusion check will be removed as part of CAM-6044, when the H2 database is upgraded to the version 1.4 (Bug was fixed)
+    // Update: Upgrading to 1.4.190 did not help, still failing -> CAM-
+    if (DbSqlSessionFactory.H2.equals(processEngineConfiguration.getDatabaseType())) {
+      return;
+    }
+
     processEngineConfiguration.setAuthorizationEnabled(true);
     assertEquals(true,authorizationService.isUserAuthorized(null, Collections.singletonList(Groups.CAMUNDA_ADMIN), Permissions.ALL, Resources.TENANT));
     assertEquals(true,authorizationService.isUserAuthorized(null, Collections.singletonList(Groups.CAMUNDA_ADMIN), Permissions.ALL, Resources.TENANT_MEMBERSHIP));

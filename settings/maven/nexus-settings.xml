@@ -26,7 +26,7 @@
     <profile>
       <id>h2</id>
       <properties>
-        <database.host>./${project.parent.basedir}/target/h2/</database.host>
+        <database.host>${project.parent.basedir}/target/h2/</database.host>
         <database.port>9999</database.port>
         <database.name>process-engine</database.name>
         <database.username>sa</database.username>
