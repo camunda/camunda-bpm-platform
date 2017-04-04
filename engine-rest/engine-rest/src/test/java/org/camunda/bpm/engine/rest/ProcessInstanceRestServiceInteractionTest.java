@@ -604,6 +604,22 @@ public class ProcessInstanceRestServiceInteractionTest extends
   }
 
   @Test
+  public void testDeleteProcessInstanceSkipCustomListeners() {
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).queryParams("skipCustomListeners", true).then().expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode()).when().delete(SINGLE_PROCESS_INSTANCE_URL);
+
+    verify(runtimeServiceMock).deleteProcessInstance(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, null, true, true);
+  }
+
+  @Test
+  public void testDeleteProcessInstanceWithCustomListeners() {
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).queryParams("skipCustomListeners", false).then().expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode()).when().delete(SINGLE_PROCESS_INSTANCE_URL);
+
+    verify(runtimeServiceMock).deleteProcessInstance(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, null, false, true);
+  }
+
+  @Test
   public void testVariableModification() {
     String variableKey = "aKey";
     int variableValue = 123;
