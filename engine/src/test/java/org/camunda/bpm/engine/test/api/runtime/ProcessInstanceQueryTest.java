@@ -310,7 +310,7 @@ public class ProcessInstanceQueryTest {
     assertEquals(5, processInstances.size());
     verifySorting(processInstances, processInstanceByProcessDefinitionId());
 
-    processInstances = runtimeService.createProcessInstanceQuery().orderByProcessBusinessKey().asc().list();
+    processInstances = runtimeService.createProcessInstanceQuery().orderByBusinessKey().asc().list();
     assertEquals(5, processInstances.size());
     verifySorting(processInstances, processInstanceByBusinessKey());
 
@@ -319,7 +319,7 @@ public class ProcessInstanceQueryTest {
     assertEquals(5, runtimeService.createProcessInstanceQuery().orderByProcessInstanceId().desc().list().size());
     assertEquals(5, runtimeService.createProcessInstanceQuery().orderByProcessDefinitionId().desc().list().size());
     assertEquals(5, runtimeService.createProcessInstanceQuery().orderByProcessDefinitionKey().desc().list().size());
-    assertEquals(5, runtimeService.createProcessInstanceQuery().orderByProcessBusinessKey().desc().list().size());
+    assertEquals(5, runtimeService.createProcessInstanceQuery().orderByBusinessKey().desc().list().size());
 
     assertEquals(4, runtimeService.createProcessInstanceQuery().processDefinitionKey(PROCESS_DEFINITION_KEY).orderByProcessInstanceId().asc().list().size());
     assertEquals(4, runtimeService.createProcessInstanceQuery().processDefinitionKey(PROCESS_DEFINITION_KEY).orderByProcessInstanceId().desc().list().size());

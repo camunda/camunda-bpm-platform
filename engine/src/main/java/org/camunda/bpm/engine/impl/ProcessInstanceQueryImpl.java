@@ -166,7 +166,7 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     return this;
   }
 
-  public ProcessInstanceQuery orderByProcessBusinessKey() {
+  public ProcessInstanceQuery orderByBusinessKey() {
     orderBy(ProcessInstanceQueryProperty.BUSINESS_KEY);
     return this;
   }
