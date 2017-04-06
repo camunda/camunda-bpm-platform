@@ -205,6 +205,7 @@ public class ProcessInstanceRestServiceQueryTest extends
 
     verify(mockedQuery).caseInstanceId(queryParameters.get("caseInstanceId"));
     verify(mockedQuery).processInstanceBusinessKey(queryParameters.get("businessKey"));
+    verify(mockedQuery).processInstanceBusinessKeyLike(queryParameters.get("businessKeyLike"));
     verify(mockedQuery).processDefinitionKey(queryParameters.get("processDefinitionKey"));
     verify(mockedQuery).processDefinitionId(queryParameters.get("processDefinitionId"));
     verify(mockedQuery).deploymentId(queryParameters.get("deploymentId"));
@@ -225,6 +226,7 @@ public class ProcessInstanceRestServiceQueryTest extends
     Map<String, String> parameters = new HashMap<String, String>();
 
     parameters.put("businessKey", "aBusinessKey");
+    parameters.put("businessKeyLike", "aKeyLike");
     parameters.put("processDefinitionKey", "aProcDefKey");
     parameters.put("processDefinitionId", "aProcDefId");
     parameters.put("deploymentId", "deploymentId");
@@ -402,6 +404,7 @@ public class ProcessInstanceRestServiceQueryTest extends
 
     verify(mockedQuery).caseInstanceId(queryParameters.get("caseInstanceId"));
     verify(mockedQuery).processInstanceBusinessKey(queryParameters.get("businessKey"));
+    verify(mockedQuery).processInstanceBusinessKeyLike(queryParameters.get("businessKeyLike"));
     verify(mockedQuery).processDefinitionKey(queryParameters.get("processDefinitionKey"));
     verify(mockedQuery).processDefinitionId(queryParameters.get("processDefinitionId"));
     verify(mockedQuery).deploymentId(queryParameters.get("deploymentId"));
