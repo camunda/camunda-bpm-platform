@@ -371,7 +371,7 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
     } else if (sortBy.equals(SORT_BY_TENANT_ID)) {
       query.orderByTenantId();
     } else if (sortBy.equals(SORT_BY_BUSINESS_KEY)) {
-      query.orderByProcessBusinessKey();
+      query.orderByBusinessKey();
     }
   }
 

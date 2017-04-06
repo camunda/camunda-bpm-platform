@@ -580,7 +580,7 @@ public class ProcessInstanceRestServiceQueryTest extends
 
     inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySorting("businessKey", "asc", Status.OK);
-    inOrder.verify(mockedQuery).orderByProcessBusinessKey();
+    inOrder.verify(mockedQuery).orderByBusinessKey();
     inOrder.verify(mockedQuery).asc();
   }
 
