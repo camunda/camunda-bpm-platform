@@ -192,6 +192,10 @@ public class LdapTestEnvironment {
     String dnRoman = createUserUid("roman", "office-berlin", "Roman", "Smirnov", "roman@camunda.org");
     String dnRobert = createUserUid("robert", "office-berlin", "Robert", "Gimbel", "robert@camunda.org");
     String dnDaniel = createUserUid("daniel", "office-berlin", "Daniel", "Meyer", "daniel@camunda.org");
+    String dnGonzo = createUserUid("gonzo", "office-berlin", "Gonzo", "The Great", "gonzo@camunda.org");
+    String dnRowlf = createUserUid("rowlf", "office-berlin", "Rowlf", "The Dog", "rowlf@camunda.org");
+    String dnPepe = createUserUid("pepe", "office-berlin", "Pepe", "The King Prawn", "pepe@camunda.org");
+    String dnRizzo = createUserUid("rizzo", "office-berlin", "Rizzo", "The Rat", "rizzo@camunda.org");
 
     createGroup("office-london");
     String dnOscar = createUserUid("oscar", "office-london", "Oscar", "The Crouch", "oscar@camunda.org");
@@ -212,6 +216,7 @@ public class LdapTestEnvironment {
     createRole("consulting", dnRuecker);
     createRole("sales", dnRuecker, dnMonster, dnDavid);
     createRole("external", dnFozzie);
+    createRole("all", dnRuecker, dnRobert, dnDaniel, dnRoman, dnOscar, dnMonster, dnDavid, dnFozzie, dnGonzo, dnRowlf, dnPepe, dnRizzo);
   }
 
   protected String createUserUid(String user, String group, String firstname, String lastname, String email) throws Exception {

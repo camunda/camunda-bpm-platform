@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.identity.User;
 import static org.camunda.bpm.identity.impl.ldap.LdapTestUtilities.checkPagingResults;
 import static org.camunda.bpm.identity.impl.ldap.LdapTestUtilities.testUserPaging;
+import static org.camunda.bpm.identity.impl.ldap.LdapTestUtilities.testUserPagingWithMemberOfGroup;
 
 /**
  * @author Daniel Meyer
@@ -36,7 +37,7 @@ public class LdapUserQueryTest extends LdapIdentityProviderTest {
 
   public void testQueryNoFilter() {
     List<User> result = identityService.createUserQuery().list();
-    assertEquals(8, result.size());
+    assertEquals(12, result.size());
   }
 
   public void testFilterByUserId() {
@@ -95,7 +96,7 @@ public class LdapUserQueryTest extends LdapIdentityProviderTest {
   public void testFilterByLastnameLike() {
     User user = identityService.createUserQuery().userLastNameLike("The Cro*").singleResult();
     assertNotNull(user);
-    user = identityService.createUserQuery().userLastNameLike("The*").singleResult();
+    user = identityService.createUserQuery().userLastNameLike("The C*").singleResult();
     assertNotNull(user);
 
     user = identityService.createUserQuery().userLastNameLike("non-exist*").singleResult();
@@ -189,6 +190,10 @@ public class LdapUserQueryTest extends LdapIdentityProviderTest {
 
   public void testPagination() {
     testUserPaging(identityService);
+  }
+
+  public void testPaginationWithMemberOfGroup() {
+    testUserPagingWithMemberOfGroup(identityService);
   }
 
   public void testPaginationWithAuthenticatedUser() {
