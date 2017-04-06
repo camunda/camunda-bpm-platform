@@ -188,7 +188,7 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
           NamingEnumeration<?> allMembers = memberAttribute.getAll();
 
           // iterate group members
-          while (allMembers.hasMoreElements() && groupMemberList.size() < query.getMaxResults()) {
+          while (allMembers.hasMoreElements()) {
             groupMemberList.add((String) allMembers.nextElement());
           }
         }
@@ -196,14 +196,18 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
 
       List<User> userList = new ArrayList<User>();
       String userBaseDn = composeDn(ldapConfiguration.getUserSearchBase(), ldapConfiguration.getBaseDn());
+      int memberCount = 0;
       for (String memberId : groupMemberList) {
-        if (ldapConfiguration.isUsePosixGroups()) {
-          query.userId(memberId);
+        if (userList.size() < query.getMaxResults() && memberCount >= query.getFirstResult()) {
+          if (ldapConfiguration.isUsePosixGroups()) {
+            query.userId(memberId);
+          }
+          List<User> users = ldapConfiguration.isUsePosixGroups() ? findUsersWithoutGroupId(query, userBaseDn) : findUsersWithoutGroupId(query, memberId);
+          if (users.size() > 0) {
+            userList.add(users.get(0));
+          }
         }
-        List<User> users = ldapConfiguration.isUsePosixGroups() ? findUsersWithoutGroupId(query, userBaseDn) : findUsersWithoutGroupId(query, memberId);
-        if (users.size() > 0) {
-          userList.add(users.get(0));
-        }
+        memberCount++;
       }
 
       return userList;
@@ -244,7 +248,7 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
 
         if(isAuthenticatedUser(user) || isAuthorized(READ, USER, user.getId())) {
 
-          if(resultCount >= query.getFirstResult()) {
+          if(resultCount >= query.getFirstResult() || query.getGroupId() != null) {
             userList.add(user);
           }
 
