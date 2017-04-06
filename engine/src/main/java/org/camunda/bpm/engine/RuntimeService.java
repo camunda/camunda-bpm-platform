@@ -688,6 +688,27 @@ public interface RuntimeService {
    *          or no {@link Permissions#DELETE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void deleteProcessInstances(List<String> processInstanceIds, String deleteReason, boolean skipCustomListeners, boolean externallyTerminated);
+
+  /**
+   * Delete an existing runtime process instance.
+   *
+   * @param processInstanceId id of process instance to delete, cannot be null.
+   * @param deleteReason reason for deleting, which will be stored in the history. Can be null.
+   * @param skipCustomListeners if true, only the built-in {@link ExecutionListener}s
+   * are notified with the {@link ExecutionListener#EVENTNAME_END} event.
+   * @param externallyTerminated indicator if deletion triggered from external context, for instance
+   *                             REST API call
+   * @param skipIoMappings specifies whether input/output mappings for tasks should be invoked
+   *
+   *
+   * @throws BadUserRequestException
+   *          when no process instance is found with the given id or id is null.
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#DELETE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#DELETE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   */
+  void deleteProcessInstance(String processInstanceId, String deleteReason, boolean skipCustomListeners, boolean externallyTerminated, boolean skipIoMappings);
+
   /**
    * Finds the activity ids for all executions that are waiting in activities.
    * This is a list because a single activity can be active multiple times.
@@ -1844,4 +1865,5 @@ public interface RuntimeService {
    */
 
   ModificationBuilder createModification(String processDefinitionId);
+
 }

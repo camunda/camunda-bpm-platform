@@ -25,20 +25,27 @@ public class DeleteProcessInstanceCmd extends AbstractDeleteProcessInstanceCmd i
 
   private static final long serialVersionUID = 1L;
   protected String processInstanceId;
+  protected boolean skipIoMappings;
 
   public DeleteProcessInstanceCmd(String processInstanceId, String deleteReason, boolean skipCustomListeners) {
     this(processInstanceId, deleteReason, skipCustomListeners, false);
   }
 
   public DeleteProcessInstanceCmd(String processInstanceId, String deleteReason, boolean skipCustomListeners, boolean externallyTerminated) {
+    this(processInstanceId, deleteReason, skipCustomListeners, externallyTerminated, false);
+  }
+
+  public DeleteProcessInstanceCmd(String processInstanceId, String deleteReason, boolean skipCustomListeners, boolean externallyTerminated,
+      boolean skipIoMappings) {
     this.processInstanceId = processInstanceId;
     this.deleteReason = deleteReason;
     this.skipCustomListeners = skipCustomListeners;
     this.externallyTerminated = externallyTerminated;
+    this.skipIoMappings = skipIoMappings;
   }
 
   public Void execute(CommandContext commandContext) {
-    deleteProcessInstance(commandContext, processInstanceId, deleteReason, skipCustomListeners, externallyTerminated);
+    deleteProcessInstance(commandContext, processInstanceId, deleteReason, skipCustomListeners, externallyTerminated, skipIoMappings);
 
     return null;
   }

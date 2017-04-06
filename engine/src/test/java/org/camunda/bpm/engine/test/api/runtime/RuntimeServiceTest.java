@@ -327,6 +327,39 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={
+      "org/camunda/bpm/engine/test/api/oneTaskProcessWithIoMappings.bpmn20.xml" })
+  public void testDeleteProcessInstanceSkipIoMappings() {
+
+    // given a process instance
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("ioMappingProcess");
+
+    // when the process instance is deleted and we do skip the io mappings
+    runtimeService.deleteProcessInstance(instance.getId(), null, false, true, true);
+
+    // then
+    assertProcessEnded(instance.getId());
+    assertEquals(1, historyService.createHistoricVariableInstanceQuery().processInstanceId(instance.getId()).list().size());
+    assertEquals(1, historyService.createHistoricVariableInstanceQuery().variableName("inputMappingExecuted").count());
+  }
+
+  @Deployment(resources = { 
+      "org/camunda/bpm/engine/test/api/oneTaskProcessWithIoMappings.bpmn20.xml" })
+  public void testDeleteProcessInstanceWithoutSkipIoMappings() {
+
+    // given a process instance
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("ioMappingProcess");
+
+    // when the process instance is deleted and we do not skip the io mappings
+    runtimeService.deleteProcessInstance(instance.getId(), null, false, true, false);
+
+    // then
+    assertProcessEnded(instance.getId());
+    assertEquals(2, historyService.createHistoricVariableInstanceQuery().processInstanceId(instance.getId()).list().size());
+    assertEquals(1, historyService.createHistoricVariableInstanceQuery().variableName("inputMappingExecuted").count());
+    assertEquals(1, historyService.createHistoricVariableInstanceQuery().variableName("outputMappingExecuted").count());
+  }
+
+  @Deployment(resources={
     "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   public void testDeleteProcessInstanceNullReason() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");

@@ -69,10 +69,11 @@ public class ExecutionManager extends AbstractManager {
   }
 
   public void deleteProcessInstance(String processInstanceId, String deleteReason, boolean cascade, boolean skipCustomListeners) {
-    deleteProcessInstance(processInstanceId,deleteReason,cascade,skipCustomListeners,false);
+    deleteProcessInstance(processInstanceId,deleteReason,cascade,skipCustomListeners,false,false);
   }
 
-  public void deleteProcessInstance(String processInstanceId, String deleteReason, boolean cascade, boolean skipCustomListeners, boolean externallyTerminated) {
+  public void deleteProcessInstance(String processInstanceId, String deleteReason, boolean cascade, boolean skipCustomListeners, boolean externallyTerminated,
+      boolean skipIoMappings) {
     ExecutionEntity execution = findExecutionById(processInstanceId);
 
     if(execution == null) {
@@ -82,7 +83,7 @@ public class ExecutionManager extends AbstractManager {
     getTaskManager().deleteTasksByProcessInstanceId(processInstanceId, deleteReason, cascade, skipCustomListeners);
 
     // delete the execution BEFORE we delete the history, otherwise we will produce orphan HistoricVariableInstance instances
-    execution.deleteCascade(deleteReason, skipCustomListeners, false, externallyTerminated);
+    execution.deleteCascade(deleteReason, skipCustomListeners, skipIoMappings, externallyTerminated);
 
     if (cascade) {
       getHistoricProcessInstanceManager().deleteHistoricProcessInstanceById(processInstanceId);

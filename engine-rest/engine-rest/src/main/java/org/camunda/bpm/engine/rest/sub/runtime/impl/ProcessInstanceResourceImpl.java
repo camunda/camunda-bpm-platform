@@ -57,10 +57,10 @@ public class ProcessInstanceResourceImpl implements ProcessInstanceResource {
   }
 
   @Override
-  public void deleteProcessInstance(boolean skipCustomListeners) {
+  public void deleteProcessInstance(boolean skipCustomListeners, boolean skipIoMappings) {
     RuntimeService runtimeService = engine.getRuntimeService();
     try {
-      runtimeService.deleteProcessInstance(processInstanceId, null, skipCustomListeners, true);
+      runtimeService.deleteProcessInstance(processInstanceId, null, skipCustomListeners, true, skipIoMappings);
     } catch (AuthorizationException e) {
       throw e;
     } catch (ProcessEngineException e) {

@@ -40,7 +40,7 @@ public class DeleteProcessInstancesCmd extends AbstractDeleteProcessInstanceCmd 
 
   public Void execute(CommandContext commandContext) {
     for (String processInstanceId : this.processInstanceIds) {
-      deleteProcessInstance(commandContext, processInstanceId, deleteReason, skipCustomListeners, externallyTerminated);
+      deleteProcessInstance(commandContext, processInstanceId, deleteReason, skipCustomListeners, externallyTerminated, false);
     }
     return null;
   }

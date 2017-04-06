@@ -47,7 +47,8 @@ public abstract class AbstractDeleteProcessInstanceCmd {
       String processInstanceId,
       String deleteReason,
       boolean skipCustomListeners,
-      boolean externallyTerminated) {
+      boolean externallyTerminated,
+      boolean skipIoMappings) {
     ensureNotNull(BadUserRequestException.class, "processInstanceId is null", "processInstanceId", processInstanceId);
 
     // fetch process instance
@@ -61,7 +62,7 @@ public abstract class AbstractDeleteProcessInstanceCmd {
     // delete process instance
     commandContext
         .getExecutionManager()
-        .deleteProcessInstance(processInstanceId, deleteReason, false, skipCustomListeners, externallyTerminated);
+        .deleteProcessInstance(processInstanceId, deleteReason, false, skipCustomListeners, externallyTerminated, skipIoMappings);
 
     // create user operation log
     commandContext.getOperationLogManager()
