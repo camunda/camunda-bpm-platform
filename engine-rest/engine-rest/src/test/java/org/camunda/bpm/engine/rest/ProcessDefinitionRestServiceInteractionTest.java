@@ -2810,6 +2810,16 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
   }
 
   @Test
+  public void testSimpleProcessInstantiationWithoutBody_ByKey() {
+    given().pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
+            .contentType(POST_JSON_CONTENT_TYPE)
+            .then().expect()
+            .statusCode(Status.OK.getStatusCode())
+            .body("id", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
+            .when().post(START_PROCESS_INSTANCE_BY_KEY_URL);
+  }
+
+  @Test
   public void testProcessInstantiationWithParameters_ByKey() throws IOException {
     Map<String, Object> parameters = VariablesBuilder.create()
         .variable("aBoolean", Boolean.TRUE)
