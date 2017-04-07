@@ -24,7 +24,7 @@
   </modules>
 
   <properties>
-    <spring-boot.version>1.4.4.RELEASE</spring-boot.version>
+    <spring-boot.version>1.5.2.RELEASE</spring-boot.version>
     <camunda.version>7.6.0</camunda.version>
 
     <version.java>1.8</version.java>
