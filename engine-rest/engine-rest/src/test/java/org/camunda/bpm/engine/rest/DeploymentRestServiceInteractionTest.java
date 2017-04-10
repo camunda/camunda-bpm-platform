@@ -1298,7 +1298,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
     .when()
       .delete(DEPLOYMENT_URL);
 
-    verify(mockRepositoryService).deleteDeployment(MockProvider.EXAMPLE_DEPLOYMENT_ID, false, false);
+    verify(mockRepositoryService).deleteDeployment(MockProvider.EXAMPLE_DEPLOYMENT_ID, false, false, false);
   }
 
   @Test
@@ -1312,7 +1312,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
     .when()
       .delete(DEPLOYMENT_URL);
 
-    verify(mockRepositoryService).deleteDeployment(MockProvider.EXAMPLE_DEPLOYMENT_ID, true, false);
+    verify(mockRepositoryService).deleteDeployment(MockProvider.EXAMPLE_DEPLOYMENT_ID, true, false, false);
   }
 
   @Test
@@ -1326,7 +1326,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
     .when()
       .delete(DEPLOYMENT_URL);
 
-    verify(mockRepositoryService).deleteDeployment(MockProvider.EXAMPLE_DEPLOYMENT_ID, false, false);
+    verify(mockRepositoryService).deleteDeployment(MockProvider.EXAMPLE_DEPLOYMENT_ID, false, false, false);
   }
 
   @Test
@@ -1340,7 +1340,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
     .when()
       .delete(DEPLOYMENT_URL);
 
-    verify(mockRepositoryService).deleteDeployment(MockProvider.EXAMPLE_DEPLOYMENT_ID, false, false);
+    verify(mockRepositoryService).deleteDeployment(MockProvider.EXAMPLE_DEPLOYMENT_ID, false, false, false);
   }
 
   @Test
@@ -1354,7 +1354,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
     .when()
       .delete(DEPLOYMENT_URL);
 
-    verify(mockRepositoryService).deleteDeployment(MockProvider.EXAMPLE_DEPLOYMENT_ID, false, true);
+    verify(mockRepositoryService).deleteDeployment(MockProvider.EXAMPLE_DEPLOYMENT_ID, false, true, false);
   }
 
   @Test
@@ -1368,7 +1368,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
     .when()
       .delete(DEPLOYMENT_URL);
 
-    verify(mockRepositoryService).deleteDeployment(MockProvider.EXAMPLE_DEPLOYMENT_ID, false, false);
+    verify(mockRepositoryService).deleteDeployment(MockProvider.EXAMPLE_DEPLOYMENT_ID, false, false, false);
   }
 
   @Test
@@ -1382,7 +1382,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
     .when()
       .delete(DEPLOYMENT_URL);
 
-    verify(mockRepositoryService).deleteDeployment(MockProvider.EXAMPLE_DEPLOYMENT_ID, false, false);
+    verify(mockRepositoryService).deleteDeployment(MockProvider.EXAMPLE_DEPLOYMENT_ID, false, false, false);
   }
 
   @Test
@@ -1397,7 +1397,22 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
     .when()
       .delete(DEPLOYMENT_URL);
 
-    verify(mockRepositoryService).deleteDeployment(MockProvider.EXAMPLE_DEPLOYMENT_ID, true, true);
+    verify(mockRepositoryService).deleteDeployment(MockProvider.EXAMPLE_DEPLOYMENT_ID, true, true, false);
+  }
+  
+  @Test
+  public void testDeleteDeploymentSkipIoMappings() {
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_DEPLOYMENT_ID)
+      .queryParam("cascade", true)
+      .queryParam("skipIoMappings", true)
+    .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .delete(DEPLOYMENT_URL);
+
+    verify(mockRepositoryService).deleteDeployment(MockProvider.EXAMPLE_DEPLOYMENT_ID, true, false, true);
   }
 
   @Test
@@ -1418,7 +1433,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
   @Test
   public void testDeleteDeploymentThrowsAuthorizationException() {
     String message = "expected exception";
-    doThrow(new AuthorizationException(message)).when(mockRepositoryService).deleteDeployment(MockProvider.EXAMPLE_DEPLOYMENT_ID, false, false);
+    doThrow(new AuthorizationException(message)).when(mockRepositoryService).deleteDeployment(MockProvider.EXAMPLE_DEPLOYMENT_ID, false, false, false);
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_DEPLOYMENT_ID)

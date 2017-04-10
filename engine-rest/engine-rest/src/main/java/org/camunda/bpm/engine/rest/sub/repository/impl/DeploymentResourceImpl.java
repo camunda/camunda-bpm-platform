@@ -143,8 +143,9 @@ public class DeploymentResourceImpl extends AbstractRestProcessEngineAware imple
 
     boolean cascade = isQueryPropertyEnabled(uriInfo, CASCADE);
     boolean skipCustomListeners = isQueryPropertyEnabled(uriInfo, "skipCustomListeners");
+    boolean skipIoMappings = isQueryPropertyEnabled(uriInfo, "skipIoMappings");
 
-    repositoryService.deleteDeployment(deploymentId, cascade, skipCustomListeners);
+    repositoryService.deleteDeployment(deploymentId, cascade, skipCustomListeners, skipIoMappings);
   }
 
   protected boolean isQueryPropertyEnabled(UriInfo uriInfo, String property) {
