@@ -101,7 +101,9 @@ public class HistoricProcessInstanceManager extends AbstractHistoricManager {
     commandContext.getHistoricJobLogManager().deleteHistoricJobLogsByProcessInstanceIds(processInstanceIds);
     commandContext.getHistoricExternalTaskLogManager().deleteHistoricExternalTaskLogsByProcessInstanceIds(processInstanceIds);
 
-    commandContext.getHistoricDecisionInstanceManager().deleteHistoricDecisionInstanceByProcessInstanceIds(processInstanceIds);
+    if (commandContext.getProcessEngineConfiguration().isDmnEnabled()) {
+      commandContext.getHistoricDecisionInstanceManager().deleteHistoricDecisionInstanceByProcessInstanceIds(processInstanceIds);
+    }
 
     commandContext.getDbEntityManager().deletePreserveOrder(HistoricProcessInstanceEntity.class, "deleteHistoricProcessInstances", processInstanceIds);
   }
