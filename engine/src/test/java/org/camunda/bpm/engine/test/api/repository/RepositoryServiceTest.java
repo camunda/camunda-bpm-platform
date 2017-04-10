@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
@@ -56,8 +57,10 @@ import org.camunda.bpm.engine.repository.DecisionRequirementsDefinitionQuery;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.bpmn.tasklistener.util.RecorderTaskListener;
 import org.camunda.bpm.engine.test.util.TestExecutionListener;
 import org.camunda.bpm.model.bpmn.Bpmn;
@@ -220,6 +223,19 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
     repositoryService.deleteDeployment(deploymentId, true, true);
     assertTrue(RecorderTaskListener.getRecordedEvents().isEmpty());
     RecorderTaskListener.clear();
+  }
+
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  public void testDeleteDeploymentSkipIoMappings() {
+    DeploymentBuilder deploymentBuilder = repositoryService.createDeployment()
+        .addClasspathResource("org/camunda/bpm/engine/test/api/oneTaskProcessWithIoMappings.bpmn20.xml");
+
+    String deploymentId = deploymentBuilder.deploy().getId();
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("ioMappingProcess");
+
+    // Try to delete the deployment, no exception should be thrown
+    repositoryService.deleteDeployment(deploymentId, true, false, true);
+    assertEquals(0, historyService.createHistoricVariableInstanceQuery().processInstanceId(instance.getId()).list().size());
   }
 
   public void testDeleteDeploymentNullDeploymentId() {

@@ -55,10 +55,10 @@ public class DeploymentManager extends AbstractManager {
   }
 
   public void deleteDeployment(String deploymentId, boolean cascade) {
-    deleteDeployment(deploymentId, cascade, false);
+    deleteDeployment(deploymentId, cascade, false, false);
   }
 
-  public void deleteDeployment(String deploymentId, boolean cascade, boolean skipCustomListeners) {
+  public void deleteDeployment(String deploymentId, boolean cascade, boolean skipCustomListeners, boolean skipIoMappings) {
     List<ProcessDefinition> processDefinitions = getProcessDefinitionManager().findProcessDefinitionsByDeploymentId(deploymentId);
     if (cascade) {
       // *NOTE*:
@@ -83,7 +83,7 @@ public class DeploymentManager extends AbstractManager {
       for (ProcessDefinition processDefinition: processDefinitions) {
         String processDefinitionId = processDefinition.getId();
         getProcessInstanceManager()
-          .deleteProcessInstancesByProcessDefinition(processDefinitionId, "deleted deployment", true, skipCustomListeners);
+          .deleteProcessInstancesByProcessDefinition(processDefinitionId, "deleted deployment", true, skipCustomListeners, skipIoMappings);
       }
       // delete historic job logs (for example for timer start event jobs)
       getHistoricJobLogManager().deleteHistoricJobLogsByDeploymentId(deploymentId);

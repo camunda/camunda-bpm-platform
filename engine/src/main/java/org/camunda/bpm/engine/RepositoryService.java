@@ -116,6 +116,21 @@ public interface RepositoryService {
    *          If the user has no {@link Permissions#DELETE} permission on {@link Resources#DEPLOYMENT}.
    */
   void deleteDeployment(String deploymentId, boolean cascade, boolean skipCustomListeners);
+  
+  /**
+   * Deletes the given deployment and cascade deletion to process instances,
+   * history process instances and jobs.
+   *
+   * @param deploymentId id of the deployment, cannot be null.
+   * @param cascade if set to true, all process instances (including) history are deleted
+   * @param skipCustomListeners if true, only the built-in {@link ExecutionListener}s
+   * are notified with the {@link ExecutionListener#EVENTNAME_END} event.
+   * @param skipIoMappings specifies whether input/output mappings for tasks should be invoked
+   *
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#DELETE} permission on {@link Resources#DEPLOYMENT}.
+   */
+  void deleteDeployment(String deploymentId, boolean cascade, boolean skipCustomListeners, boolean skipIoMappings);
 
 
   /**

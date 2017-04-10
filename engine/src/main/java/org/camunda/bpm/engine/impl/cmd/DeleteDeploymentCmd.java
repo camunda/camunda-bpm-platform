@@ -47,11 +47,13 @@ public class DeleteDeploymentCmd implements Command<Void>, Serializable {
   protected boolean cascade;
 
   protected boolean skipCustomListeners;
+  protected boolean skipIoMappings;
 
-  public DeleteDeploymentCmd(String deploymentId, boolean cascade, boolean skipCustomListeners) {
+  public DeleteDeploymentCmd(String deploymentId, boolean cascade, boolean skipCustomListeners, boolean skipIoMappings) {
     this.deploymentId = deploymentId;
     this.cascade = cascade;
     this.skipCustomListeners = skipCustomListeners;
+    this.skipIoMappings = skipIoMappings;
   }
 
   public Void execute(final CommandContext commandContext) {
@@ -67,7 +69,7 @@ public class DeleteDeploymentCmd implements Command<Void>, Serializable {
 
     commandContext
       .getDeploymentManager()
-      .deleteDeployment(deploymentId, cascade, skipCustomListeners);
+      .deleteDeployment(deploymentId, cascade, skipCustomListeners, skipIoMappings);
 
     ProcessApplicationReference processApplicationReference = Context
       .getProcessEngineConfiguration()

@@ -196,7 +196,7 @@ public class ProcessDefinitionManager extends AbstractManager implements Abstrac
    */
   protected void cascadeDeleteProcessInstancesForProcessDefinition(String processDefinitionId, boolean skipCustomListeners) {
     getProcessInstanceManager()
-            .deleteProcessInstancesByProcessDefinition(processDefinitionId, "deleted process definition", true, skipCustomListeners);
+        .deleteProcessInstancesByProcessDefinition(processDefinitionId, "deleted process definition", true, skipCustomListeners, false);
   }
 
   /**
