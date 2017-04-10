@@ -37,6 +37,7 @@ import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -150,6 +151,7 @@ public class UserOperationIdTest {
 
     //then
     List<UserOperationLogEntry> userOperationLogEntries = historyService.createUserOperationLogQuery()
+        .taskId(taskId)
         .list();
     assertEquals(0, userOperationLogEntries.size());
     List<HistoricDetail> historicDetails = historyService.createHistoricDetailQuery().list();
@@ -161,7 +163,6 @@ public class UserOperationIdTest {
   }
 
   @Test
-  @Ignore("CAM-6669")
   public void testSetTaskVariablesInServiceTask() {
     // given
     BpmnModelInstance bpmnModelInstance = Bpmn.createExecutableProcess(PROCESS_KEY)

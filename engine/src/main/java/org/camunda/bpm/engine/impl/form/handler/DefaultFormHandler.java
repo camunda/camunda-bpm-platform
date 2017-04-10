@@ -279,6 +279,9 @@ public class DefaultFormHandler implements FormHandler {
   }
 
   public void submitFormVariables(VariableMap properties, VariableScope variableScope) {
+    boolean userOperationLogEnabled = Context.getCommandContext().isUserOperationLogEnabled();
+    Context.getCommandContext().enableUserOperationLog();
+
     VariableMap propertiesCopy = new VariableMapImpl(properties);
 
     // support legacy form properties
@@ -299,6 +302,8 @@ public class DefaultFormHandler implements FormHandler {
     }
 
     fireFormPropertyHistoryEvents(properties, variableScope);
+
+    Context.getCommandContext().setLogUserOperationEnabled(userOperationLogEnabled);
   }
 
   protected void fireFormPropertyHistoryEvents(VariableMap properties, VariableScope variableScope) {

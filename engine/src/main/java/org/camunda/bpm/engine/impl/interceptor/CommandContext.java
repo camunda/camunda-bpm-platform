@@ -567,14 +567,13 @@ public class CommandContext {
   }
 
   public String getOperationId() {
-    initOperationId();
-    return operationId;
-  }
-
-  public void initOperationId() {
-    if (operationId == null && getOperationLogManager().isUserOperationLogEnabled()) {
+    if (!getOperationLogManager().isUserOperationLogEnabled()) {
+      return null;
+    }
+    if (operationId == null) {
       operationId = Context.getProcessEngineConfiguration().getIdGenerator().getNextId();
     }
+    return operationId;
   }
 
   public void setOperationId(String operationId) {

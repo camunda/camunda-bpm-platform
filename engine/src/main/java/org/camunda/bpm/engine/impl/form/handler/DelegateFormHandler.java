@@ -44,8 +44,6 @@ public abstract class DelegateFormHandler {
   }
 
   protected <T> T performContextSwitch(final Callable<T> callable) {
-    //initialize operationId (won't be possible after context is switched, as it will disable user operation log)
-    Context.getCommandContext().initOperationId();
 
     ProcessApplicationReference targetProcessApplication = ProcessApplicationContextUtil.getTargetProcessApplication(deploymentId);
 
