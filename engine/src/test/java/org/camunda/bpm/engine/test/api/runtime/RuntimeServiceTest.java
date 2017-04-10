@@ -72,6 +72,7 @@ import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 import org.camunda.bpm.engine.task.Attachment;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.runtime.util.SimpleSerializableBean;
 import org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener;
 import org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener.RecordedEvent;
@@ -328,6 +329,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={
       "org/camunda/bpm/engine/test/api/oneTaskProcessWithIoMappings.bpmn20.xml" })
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testDeleteProcessInstanceSkipIoMappings() {
 
     // given a process instance
@@ -344,6 +346,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = { 
       "org/camunda/bpm/engine/test/api/oneTaskProcessWithIoMappings.bpmn20.xml" })
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testDeleteProcessInstanceWithoutSkipIoMappings() {
 
     // given a process instance
