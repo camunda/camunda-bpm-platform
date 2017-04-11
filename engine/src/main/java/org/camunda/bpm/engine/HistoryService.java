@@ -178,6 +178,12 @@ public interface HistoryService {
   Job cleanUpHistoryAsync(boolean executeAtOnce);
 
   /**
+   * Finds history cleanup job if present.
+   * @return job entity
+   */
+  Job findHistoryCleanupJob();
+
+  /**
    * Deletes historic process instances asynchronously. All historic activities, historic task and
    * historic details (variable updates, form properties) are deleted as well.
    *

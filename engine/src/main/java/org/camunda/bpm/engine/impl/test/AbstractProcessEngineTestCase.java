@@ -38,7 +38,10 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.interceptor.Command;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
@@ -128,6 +131,8 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
 
       deleteDeployments();
 
+      deleteHistoryCleanupJob();
+
       // only fail if no test failure was recorded
       TestHelper.assertAndEnsureCleanDbAndCache(processEngine, exception == null);
       TestHelper.resetIdGenerator(processEngineConfiguration);
@@ -137,6 +142,18 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
       // of the super.runBare
       closeDownProcessEngine();
       clearServiceReferences();
+    }
+  }
+
+  private void deleteHistoryCleanupJob() {
+    final Job job = historyService.findHistoryCleanupJob();
+    if (job != null) {
+      processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
+        public Void execute(CommandContext commandContext) {
+            commandContext.getJobManager().deleteJob((JobEntity) job);
+          return null;
+        }
+      });
     }
   }
 

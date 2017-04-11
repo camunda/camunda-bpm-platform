@@ -49,6 +49,7 @@ import org.junit.Test;
 import org.junit.rules.RuleChain;
 import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -133,14 +134,28 @@ public class HistoryCleanupTest {
       //given
     prepareData(15);
 
-      ClockUtil.setCurrentTime(new Date());
+    ClockUtil.setCurrentTime(new Date());
       //when
-      String jobId = historyService.cleanUpHistoryAsync(true).getId();
+    String jobId = historyService.cleanUpHistoryAsync(true).getId();
 
-      ExecuteJobHelper.executeJob(jobId, engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired());
+    ExecuteJobHelper.executeJob(jobId, engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired());
 
       //then
-      assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());
+    assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());
+  }
+
+  @Test
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
+  public void testFindHistoryCleanupJob() {
+    //given
+    String jobId = historyService.cleanUpHistoryAsync(true).getId();
+
+    //when
+    Job historyCleanupJob = historyService.findHistoryCleanupJob();
+
+    //then
+    assertNotNull(historyCleanupJob);
+    assertEquals(jobId, historyCleanupJob.getId());
   }
 
   @Test
