@@ -2,6 +2,7 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotContainsNull;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.Collection;
 import java.util.List;
@@ -35,9 +36,11 @@ public class ModifyMultipleProcessInstancesCmd extends AbstractModificationCmd<V
     ensureNotContainsNull(BadUserRequestException.class, "Process instance ids cannot be null", "Process instance ids", processInstanceIds);
 
     ProcessDefinitionEntity processDefinition = getProcessDefinition(commandContext, builder.getProcessDefinitionId());
+    ensureNotNull(BadUserRequestException.class, "Process definition id cannot be null", processDefinition);
 
-    if (writeUserOperationLog)
+    if (writeUserOperationLog) {
       writeUserOperationLog(commandContext, processDefinition, processInstanceIds.size(), false);
+    }
 
     for (String processInstanceId : processInstanceIds) {
       ExecutionEntity processInstance = commandContext.getExecutionManager().findExecutionById(processInstanceId);
@@ -48,7 +51,7 @@ public class ModifyMultipleProcessInstancesCmd extends AbstractModificationCmd<V
       ProcessInstanceModificationBuilderImpl builder = new ProcessInstanceModificationBuilderImpl(commandContext, processInstanceId);
       builder.setSkipCustomListeners(this.builder.isSkipCustomListeners());
       builder.setSkipIoMappings(this.builder.isSkipIoMappings());
-      List<AbstractProcessInstanceModificationCommand> commands = generateOperationCmds(instructions, processInstanceId);
+      List<AbstractProcessInstanceModificationCommand> commands = setProcessInstanceId(instructions, processInstanceId);
       builder.setModificationOperations(commands);
       new ModifyProcessInstanceCmd(builder, false).execute(commandContext);
     }
@@ -56,11 +59,9 @@ public class ModifyMultipleProcessInstancesCmd extends AbstractModificationCmd<V
     return null;
   }
 
-  private List<AbstractProcessInstanceModificationCommand> generateOperationCmds(List<AbstractProcessInstanceModificationCommand> instructions, String processInstanceId) {
+  protected List<AbstractProcessInstanceModificationCommand> setProcessInstanceId(List<AbstractProcessInstanceModificationCommand> instructions, String processInstanceId) {
     for (AbstractProcessInstanceModificationCommand operationCmd : instructions) {
       operationCmd.setProcessInstanceId(processInstanceId);
-      operationCmd.setSkipCustomListeners(builder.isSkipCustomListeners());
-      operationCmd.setSkipIoMappings(builder.isSkipIoMappings());
     }
     return instructions;
   }

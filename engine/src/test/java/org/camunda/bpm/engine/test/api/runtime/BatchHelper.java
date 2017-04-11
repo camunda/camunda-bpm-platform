@@ -53,7 +53,10 @@ public abstract class BatchHelper {
 
   public JobDefinition getSeedJobDefinition(Batch batch) {
     return engineRule.getManagementService()
-      .createJobDefinitionQuery().jobDefinitionId(batch.getSeedJobDefinitionId()).jobType(BatchSeedJobHandler.TYPE).singleResult();
+      .createJobDefinitionQuery()
+      .jobDefinitionId(batch.getSeedJobDefinitionId())
+      .jobType(BatchSeedJobHandler.TYPE)
+      .singleResult();
   }
 
   public Job getSeedJob(Batch batch) {
@@ -96,8 +99,8 @@ public abstract class BatchHelper {
   }
 
   public void executeJobs(Batch batch) {
-    for (Job migrationJob : getExecutionJobs(batch)) {
-      executeJob(migrationJob);
+    for (Job job : getExecutionJobs(batch)) {
+      executeJob(job);
     }
   }
 

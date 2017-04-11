@@ -33,6 +33,8 @@ import org.camunda.bpm.engine.test.api.authorization.util.AuthorizationTestRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -134,6 +136,31 @@ public class BatchCreationAuthorizationTest {
     List<String> processInstanceIds = Collections.singletonList(processInstance.getId());
     runtimeService.deleteProcessInstancesAsync(
         processInstanceIds, null, TEST_REASON);
+
+    // then
+    authRule.assertScenario(scenario);
+  }
+  
+  @Test
+  public void createBatchModification() {
+    //given
+    BpmnModelInstance instance = Bpmn.createExecutableProcess("process1").startEvent().userTask("user1").userTask("user2").endEvent().done();
+    ProcessDefinition processDefinition = testHelper.deployAndGetDefinition(instance);
+
+    List<String> instances = new ArrayList<String>();
+    for (int i = 0; i < 2; i++) {
+      ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey("process1");
+      instances.add(processInstance.getId());
+    }
+
+    authRule
+        .init(scenario)
+        .withUser("userId")
+        .bindResource("batchId", "*")
+        .start();
+
+    // when
+    engineRule.getRuntimeService().createModification(processDefinition.getId()).startAfterActivity("user1").processInstanceIds(instances).executeAsync();
 
     // then
     authRule.assertScenario(scenario);

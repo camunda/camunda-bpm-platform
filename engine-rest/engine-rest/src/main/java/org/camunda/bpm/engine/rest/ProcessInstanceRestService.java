@@ -27,7 +27,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
-import org.camunda.bpm.engine.rest.dto.ModificationExecutionDto;
 import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
@@ -104,14 +103,4 @@ public interface ProcessInstanceRestService {
   @Produces(MediaType.APPLICATION_JSON)
   BatchDto setRetriesByProcess (SetJobRetriesByProcessDto setJobRetriesDto);
 
-  @POST
-  @Path("/modification")
-  @Consumes(MediaType.APPLICATION_JSON)
-  void executeModificationPlan(ModificationExecutionDto modificationExecutionDto);
-
-  @POST
-  @Path("modification-async")
-  @Consumes(MediaType.APPLICATION_JSON)
-  @Produces(MediaType.APPLICATION_JSON)
-  BatchDto executeModificationPlanAsync(ModificationExecutionDto modificationExecutionDto);
 }

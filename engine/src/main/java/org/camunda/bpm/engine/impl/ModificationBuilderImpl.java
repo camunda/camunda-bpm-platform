@@ -4,9 +4,9 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
-import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.cmd.AbstractProcessInstanceModificationCommand;
@@ -75,8 +75,12 @@ public class ModificationBuilderImpl implements ModificationBuilder {
 
   @Override
   public ModificationBuilder processInstanceIds(String... processInstanceIds) {
-    ensureNotNull(BadUserRequestException.class, "Process instance ids", processInstanceIds);
-    this.processInstanceIds = Arrays.asList(processInstanceIds);
+    if (processInstanceIds == null) {
+      this.processInstanceIds = Collections.emptyList();
+    }
+    else {
+      this.processInstanceIds = Arrays.asList(processInstanceIds);
+    }
     return this;
   }
 
@@ -136,7 +140,6 @@ public class ModificationBuilderImpl implements ModificationBuilder {
     return instructions;
   }
 
-  @Override
   public void setInstructions(List<AbstractProcessInstanceModificationCommand> instructions) {
     this.instructions = instructions;
   }

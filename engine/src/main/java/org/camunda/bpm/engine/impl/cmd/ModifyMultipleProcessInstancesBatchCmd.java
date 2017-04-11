@@ -2,6 +2,7 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotContainsNull;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -41,12 +42,13 @@ public class ModifyMultipleProcessInstancesBatchCmd extends AbstractModification
     commandContext.getAuthorizationManager().checkAuthorization(Permissions.CREATE, Resources.BATCH);
 
     ProcessDefinitionEntity processDefinition = getProcessDefinition(commandContext, builder.getProcessDefinitionId());
+    ensureNotNull(BadUserRequestException.class, "Process definition id cannot be null", processDefinition);
 
     writeUserOperationLog(commandContext, processDefinition,
         processInstanceIds.size(),
         true);
 
-    BatchEntity batch = createBatch(commandContext, instructions, processInstanceIds);
+    BatchEntity batch = createBatch(commandContext, instructions, processInstanceIds, processDefinition);
     batch.createSeedJobDefinition();
     batch.createMonitorJobDefinition();
     batch.createBatchJobDefinition();
@@ -57,7 +59,8 @@ public class ModifyMultipleProcessInstancesBatchCmd extends AbstractModification
     return batch;
   }
 
-  protected BatchEntity createBatch(CommandContext commandContext, List<AbstractProcessInstanceModificationCommand> instructions, Collection<String> processInstanceIds) {
+  protected BatchEntity createBatch(CommandContext commandContext, List<AbstractProcessInstanceModificationCommand> instructions,
+      Collection<String> processInstanceIds, ProcessDefinitionEntity processDefinition) {
     ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
     BatchJobHandler<ModificationBatchConfiguration> batchJobHandler = getBatchJobHandler(processEngineConfiguration);
 
@@ -70,6 +73,7 @@ public class ModifyMultipleProcessInstancesBatchCmd extends AbstractModification
     batch.setBatchJobsPerSeed(processEngineConfiguration.getBatchJobsPerSeed());
     batch.setInvocationsPerBatchJob(processEngineConfiguration.getInvocationsPerBatchJob());
     batch.setConfigurationBytes(batchJobHandler.writeConfiguration(configuration));
+    batch.setTenantId(processDefinition.getTenantId());
     commandContext.getBatchManager().insert(batch);
 
     return batch;

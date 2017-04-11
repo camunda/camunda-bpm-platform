@@ -135,11 +135,6 @@ public class ModificationUserOperationLogTest {
     helper.executeJobs(batch);
     rule.getIdentityService().clearAuthentication();
 
-
-    List<UserOperationLogEntry> list = rule.getHistoryService().createUserOperationLogQuery().list();
-    for (UserOperationLogEntry e : list) {
-      System.out.println(e);
-    }
     // then
     Assert.assertEquals(0, rule.getHistoryService().createUserOperationLogQuery().count());
   }

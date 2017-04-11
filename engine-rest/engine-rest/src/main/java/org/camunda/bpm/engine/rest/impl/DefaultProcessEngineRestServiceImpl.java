@@ -35,6 +35,7 @@ import org.camunda.bpm.engine.rest.JobRestService;
 import org.camunda.bpm.engine.rest.MessageRestService;
 import org.camunda.bpm.engine.rest.MetricsRestService;
 import org.camunda.bpm.engine.rest.MigrationRestService;
+import org.camunda.bpm.engine.rest.ModificationRestService;
 import org.camunda.bpm.engine.rest.ProcessDefinitionRestService;
 import org.camunda.bpm.engine.rest.ProcessInstanceRestService;
 import org.camunda.bpm.engine.rest.TaskRestService;
@@ -167,6 +168,12 @@ public class DefaultProcessEngineRestServiceImpl extends AbstractProcessEngineRe
   public MigrationRestService getMigrationRestService() {
     return super.getMigrationRestService(null);
   }
+  
+  @Path(ModificationRestService.PATH)
+  public ModificationRestService getModificationRestService() {
+    return super.getModificationRestService(null);
+  }
+
 
   @Path(BatchRestService.PATH)
   public BatchRestService getBatchRestService() {

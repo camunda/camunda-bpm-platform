@@ -42,9 +42,9 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
   @ClassRule
   public static TestContainerRule rule = new TestContainerRule();
 
-  protected static final String PROCESS_INSTANCE_URL = TEST_RESOURCE_ROOT_PATH + "/process-instance";
-  protected static final String EXECUTE_MODIFICATION_SYNC_URL  = PROCESS_INSTANCE_URL + "/modification";
-  protected static final String EXECUTE_MODIFICATION_ASYNC_URL = PROCESS_INSTANCE_URL + "/modification-async";
+  protected static final String PROCESS_INSTANCE_URL = TEST_RESOURCE_ROOT_PATH + "/modification";
+  protected static final String EXECUTE_MODIFICATION_SYNC_URL  = PROCESS_INSTANCE_URL + "/execute";
+  protected static final String EXECUTE_MODIFICATION_ASYNC_URL = PROCESS_INSTANCE_URL + "/executeAsync";
 
   protected RuntimeService runtimeServiceMock;
   protected ModificationBuilder modificationBuilderMock;

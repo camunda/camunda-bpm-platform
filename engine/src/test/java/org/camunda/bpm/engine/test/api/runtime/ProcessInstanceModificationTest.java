@@ -92,11 +92,26 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
 
     ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
 
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+      .cancelActivityInstance(getInstanceIdForActivity(tree, "task1"))
+      .cancelActivityInstance(getInstanceIdForActivity(tree, "task2"))
+      .execute();
+      
+    assertProcessEnded(processInstance.getId());
+  }
+
+  @Deployment(resources = PARALLEL_GATEWAY_PROCESS)
+  public void testCancellationWithWrongProcessInstanceId() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("parallelGateway");
+
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
+
     try {
       runtimeService.createProcessInstanceModification("foo")
         .cancelActivityInstance(getInstanceIdForActivity(tree, "task1"))
         .cancelActivityInstance(getInstanceIdForActivity(tree, "task2"))
         .execute();
+      assertProcessEnded(processInstance.getId());
 
     } catch (ProcessEngineException e) {
       assertThat(e.getMessage(), startsWith("ENGINE-13036"));

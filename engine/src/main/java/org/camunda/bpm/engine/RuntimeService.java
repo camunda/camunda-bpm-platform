@@ -1861,6 +1861,7 @@ public interface RuntimeService {
    * be used to track the progress of the modification. The Batch splits the modification
    * in smaller chunks which will be executed independently.
    *
+   * @param processDefinitionId the process definition that instances are modified of
    * @return a fluent builder
    */
 

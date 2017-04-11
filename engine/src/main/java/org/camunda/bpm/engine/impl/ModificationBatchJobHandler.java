@@ -16,7 +16,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
-import org.camunda.bpm.engine.runtime.ModificationBuilder;
 
 public class ModificationBatchJobHandler extends AbstractBatchJobHandler<ModificationBatchConfiguration>{
 
@@ -42,7 +41,7 @@ public class ModificationBatchJobHandler extends AbstractBatchJobHandler<Modific
 
     ModificationBatchConfiguration batchConfiguration = readConfiguration(configurationEntity.getBytes());
 
-    ModificationBuilder executionBuilder = commandContext.getProcessEngineConfiguration()
+    ModificationBuilderImpl executionBuilder = (ModificationBuilderImpl) commandContext.getProcessEngineConfiguration()
         .getRuntimeService()
         .createModification(batchConfiguration.getProcessDefinitionId())
         .processInstanceIds(batchConfiguration.getIds());
@@ -56,7 +55,7 @@ public class ModificationBatchJobHandler extends AbstractBatchJobHandler<Modific
       executionBuilder.skipIoMappings();
     }
 
-    ((ModificationBuilderImpl) executionBuilder).execute(false);
+    executionBuilder.execute(false);
 
     commandContext.getByteArrayManager().delete(configurationEntity);
 

@@ -240,7 +240,7 @@ public class CommandLogger extends ProcessEngineLogger {
   public ProcessEngineException processDefinitionOfInstanceDoesNotMatchModification(ExecutionEntity processInstance, String processDefinitionId) {
     return new ProcessEngineException(exceptionMessage(
       "037",
-      "Process instance '{}' cannot be modified. Its process definition '{}' does not match the process definition of the modification '{}'",
+      "Process instance '{}' cannot be modified. Its process definition '{}' does not match given process definition '{}'",
       processInstance.getId(),
       processInstance.getProcessDefinitionId(),
       processDefinitionId

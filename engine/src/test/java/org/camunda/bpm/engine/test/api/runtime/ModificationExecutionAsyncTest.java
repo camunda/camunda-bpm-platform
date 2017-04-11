@@ -32,6 +32,7 @@ import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.runtime.VariableInstance;
+import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.bpmn.multiinstance.DelegateEvent;
 import org.camunda.bpm.engine.test.bpmn.multiinstance.DelegateExecutionListener;
@@ -48,7 +49,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 
-public class ModificationBatchTest {
+public class ModificationExecutionAsyncTest {
 
   protected ProcessEngineRule rule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(rule);
@@ -171,9 +172,9 @@ public class ModificationBatchTest {
 
     try {
       runtimeService.createModification("processDefinitionId").startAfterActivity("user1").processInstanceIds((String[]) null).executeAsync();
-      fail("Should not be able to migrate");
+      fail("Should not be able to modify");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), CoreMatchers.containsString("Process instance ids is null"));
+      assertThat(e.getMessage(), CoreMatchers.containsString("Process instance ids is empty"));
     }
   }
 
@@ -182,7 +183,7 @@ public class ModificationBatchTest {
 
     try {
       runtimeService.createModification("processDefinitionId").cancelAllForActivity("user1").processInstanceIds("foo", null, "bar").executeAsync();
-      fail("Should not be able to migrate");
+      fail("Should not be able to modify");
     } catch (ProcessEngineException e) {
       assertThat(e.getMessage(), containsString("Process instance ids contains null value"));
     }
@@ -198,7 +199,21 @@ public class ModificationBatchTest {
       assertThat(e.getMessage(), containsString("Process instance ids is empty"));
     }
   }
+  
+  @Test
+  public void createModificationWithNotMatchingProcessDefinitionId() {
+    DeploymentWithDefinitions deployment = testRule.deploy(instance);
+    deployment.getDeployedProcessDefinitions().get(0);
 
+    List<String> processInstanceIds = helper.startInstances("process1", 2);
+    try {
+      runtimeService.createModification("foo").cancelAllForActivity("activityId").processInstanceIds(processInstanceIds).executeAsync();
+      fail("Should not succed");
+    } catch (ProcessEngineException e) {
+      assertThat(e.getMessage(), containsString("processDefinition is null"));
+    }
+  }
+  
   @Test
   public void createSeedJob() {
     // when
@@ -526,6 +541,52 @@ public class ModificationBatchTest {
     // but a monitor job exists
     assertNotNull(helper.getMonitorJob(batch));
   }
+  
+  @Test
+  public void executeModificationJobsForProcessInstancesWithDifferentStates() {
+
+    DeploymentWithDefinitions deployment = testRule.deploy(instance);
+    ProcessDefinition processDefinition = deployment.getDeployedProcessDefinitions().get(0);
+
+    List<String> processInstanceIds = helper.startInstances("process1", 1);
+    Task task = rule.getTaskService().createTaskQuery().singleResult();
+    rule.getTaskService().complete(task.getId());
+    
+    List<String> anotherProcessInstanceIds = helper.startInstances("process1", 2);
+    processInstanceIds.addAll(anotherProcessInstanceIds);
+    
+    Batch batch = runtimeService.createModification(processDefinition.getId()).cancelAllForActivity("user1").processInstanceIds(processInstanceIds).executeAsync();
+
+    helper.executeSeedJob(batch);
+    List<Job> modificationJobs = helper.getExecutionJobs(batch);
+
+    // when
+    for (Job modificationJob : modificationJobs) {
+      helper.executeJob(modificationJob);
+    }
+
+    // then all process instances where modified
+    ActivityInstance updatedTree = null;
+    String processInstanceId = processInstanceIds.get(0);
+    updatedTree = runtimeService.getActivityInstance(processInstanceId);
+    assertNotNull(updatedTree);
+    assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
+    assertThat(updatedTree).hasStructure(describeActivityInstanceTree(processDefinition.getId()).activity("user2").done());
+
+    processInstanceId = processInstanceIds.get(1);
+    updatedTree = runtimeService.getActivityInstance(processInstanceId);
+    assertNull(updatedTree);
+
+    processInstanceId = processInstanceIds.get(2);
+    updatedTree = runtimeService.getActivityInstance(processInstanceId);
+    assertNull(updatedTree);
+
+    // and the no modification jobs exist
+    assertEquals(0, helper.getExecutionJobs(batch).size());
+
+    // but a monitor job exists
+    assertNotNull(helper.getMonitorJob(batch));
+  }
 
   @Test
   public void testMonitorJobPollingForCompletion() {
@@ -623,7 +684,7 @@ public class ModificationBatchTest {
   }
 
   @Test
-  public void testBatchWithFailedMigrationJobDeletionWithCascade() {
+  public void testBatchWithFailedModificationJobDeletionWithCascade() {
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
     Batch batch = helper.startAfterAsync("process1", 2, "user1", processDefinition.getId());
     helper.executeSeedJob(batch);
@@ -781,7 +842,7 @@ public class ModificationBatchTest {
   }
 
   @Test
-  public void testListenerInvocationForNewlyCreatedScope() {
+  public void testListenerInvocation() {
     // given
     DelegateEvent.clearEvents();
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(modify(instance)
@@ -815,7 +876,7 @@ public class ModificationBatchTest {
   }
 
   @Test
-  public void testSkipListenerInvocationForNewlyCreatedScope() {
+  public void testSkipListenerInvocationF() {
     // given
     DelegateEvent.clearEvents();
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(modify(instance)
@@ -842,7 +903,7 @@ public class ModificationBatchTest {
   }
 
   @Test
-  public void testIoMappingInvocationForNewlyCreatedScope() {
+  public void testIoMappingInvocation() {
     // given
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(modify(instance)
       .activityBuilder("user1")
@@ -874,7 +935,7 @@ public class ModificationBatchTest {
   }
 
   @Test
-  public void testSkipIoMappingInvocationForNewlyCreatedScope() {
+  public void testSkipIoMappingInvocation() {
     // given
 
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(modify(instance)
