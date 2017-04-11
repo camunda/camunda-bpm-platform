@@ -164,7 +164,7 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
       return findUsersByGroupId(query);
     } else {
       String userBaseDn = composeDn(ldapConfiguration.getUserSearchBase(), ldapConfiguration.getBaseDn());
-      return findUsersWithoutGroupId(query, userBaseDn);
+      return findUsersWithoutGroupId(query, userBaseDn, false);
     }
   }
 
@@ -202,7 +202,7 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
           if (ldapConfiguration.isUsePosixGroups()) {
             query.userId(memberId);
           }
-          List<User> users = ldapConfiguration.isUsePosixGroups() ? findUsersWithoutGroupId(query, userBaseDn) : findUsersWithoutGroupId(query, memberId);
+          List<User> users = ldapConfiguration.isUsePosixGroups() ? findUsersWithoutGroupId(query, userBaseDn, true) : findUsersWithoutGroupId(query, memberId, true);
           if (users.size() > 0) {
             userList.add(users.get(0));
           }
@@ -226,7 +226,7 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
     }
   }
 
-  public List<User> findUsersWithoutGroupId(LdapUserQueryImpl query, String userBaseDn) {
+  public List<User> findUsersWithoutGroupId(LdapUserQueryImpl query, String userBaseDn, Boolean ignorePagination) {
 
     if(ldapConfiguration.isSortControlSupported()) {
       applyRequestControls(query);
@@ -248,7 +248,7 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
 
         if(isAuthenticatedUser(user) || isAuthorized(READ, USER, user.getId())) {
 
-          if(resultCount >= query.getFirstResult() || query.getGroupId() != null) {
+          if(resultCount >= query.getFirstResult() || ignorePagination) {
             userList.add(user);
           }
 

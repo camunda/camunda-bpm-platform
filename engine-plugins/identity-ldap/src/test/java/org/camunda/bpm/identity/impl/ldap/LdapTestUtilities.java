@@ -96,9 +96,8 @@ public final class LdapTestUtilities {
     checkPagingResults(userNames, users.get(0).getId(), users.get(1).getId());
 
     users = identityService.createUserQuery().memberOfGroup("all").listPage(11, 2);
-    assertFalse(userNames.contains(users.get(0).getId()));
-    userNames.add(users.get(0).getId());
     assertEquals(1, users.size());
+    assertFalse(userNames.contains(users.get(0).getId()));
 
     users = identityService.createUserQuery().memberOfGroup("all").listPage(12, 2);
     assertEquals(0, users.size());
