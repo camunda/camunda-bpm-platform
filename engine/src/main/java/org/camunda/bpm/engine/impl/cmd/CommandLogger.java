@@ -252,4 +252,9 @@ public class CommandLogger extends ProcessEngineLogger {
         exceptionMessage("038", "History cleanup won't be scheduled. Either configure batch window or call it with executeAtOnce = true."));
 
   }
+
+  public void warnWrongConfiguration(String configParameterName) {
+    logWarn("039", String
+        .format("Something went wrong when applying configuration parameter %s. Please check the value.", configParameterName));
+  }
 }

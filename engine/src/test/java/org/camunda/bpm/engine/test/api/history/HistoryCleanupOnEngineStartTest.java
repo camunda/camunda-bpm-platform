@@ -13,10 +13,9 @@
 
 package org.camunda.bpm.engine.test.api.history;
 
+import java.text.ParseException;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
-import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupJobHandlerConfiguration;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
@@ -47,14 +46,14 @@ public class HistoryCleanupOnEngineStartTest extends ResourceProcessEngineTestCa
   }
 
   @Test
-  public void testHistoryCleanupJob() {
+  public void testHistoryCleanupJob() throws ParseException {
     Job historyCleanupJob = historyService.findHistoryCleanupJob();
     assertNotNull(historyCleanupJob);
     HistoryCleanupJobHandlerConfiguration configuration = getConfiguration((JobEntity) historyCleanupJob);
     assertEquals(444, configuration.getBatchSize());
     assertEquals(11, configuration.getBatchSizeThreshold());
-    assertEquals(DateTimeUtil.getLocalTimeWithoutSecondsFormater().parseDateTime("23:00"), configuration.getBatchWindowStartTime());
-    assertEquals(DateTimeUtil.getLocalTimeWithoutSecondsFormater().parseDateTime("01:00"), configuration.getBatchWindowEndTime());
+    assertEquals(HistoryCleanupJobHandlerConfiguration.parseTimeConfiguration("23:00"), configuration.getBatchWindowStartTime());
+    assertEquals(HistoryCleanupJobHandlerConfiguration.parseTimeConfiguration("01:00"), configuration.getBatchWindowEndTime());
 
     assertEquals(configuration.getNextRunWithinBatchWindow(ClockUtil.getCurrentTime()), historyCleanupJob.getDuedate());
   }

@@ -17,6 +17,8 @@ import org.camunda.bpm.engine.impl.util.JsonUtil;
 import org.camunda.bpm.engine.impl.util.json.JSONObject;
 import org.joda.time.LocalTime;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -37,9 +39,19 @@ public class HistoryCleanupJobHandlerConfiguration implements JobHandlerConfigur
   public static final String JOB_CONFIG_COUNT_EMPTY_RUNS = "countEmptyRuns";
   public static final String JOB_CONFIG_EXECUTE_AT_ONCE = "executeAtOnce";
 
-  private LocalTime batchWindowStartTime;
+  private static final SimpleDateFormat TIME_FORMAT_WITHOUT_SECONDS = new SimpleDateFormat("HH:mm");
 
-  private LocalTime batchWindowEndTime;
+  /**
+   * Batch window start time.
+   * Only time fields are meaningful, other fields (date, month, year) are being ignored
+   */
+  private Date batchWindowStartTime;
+
+  /**
+   * Batch window end time.
+   * Only time fields are meaningful, other fields (date, month, year) are being ignored
+   */
+  private Date batchWindowEndTime;
 
   private int batchSize = MAX_BATCH_SIZE;
 
@@ -61,25 +73,25 @@ public class HistoryCleanupJobHandlerConfiguration implements JobHandlerConfigur
   public HistoryCleanupJobHandlerConfiguration() {
   }
 
-  public HistoryCleanupJobHandlerConfiguration(LocalTime batchWindowStartTime, LocalTime batchWindowEndTime, Integer historyCleanupBatchSize) {
+  public HistoryCleanupJobHandlerConfiguration(Date batchWindowStartTime, Date batchWindowEndTime, Integer historyCleanupBatchSize) {
     this.batchWindowStartTime = batchWindowStartTime;
     this.batchWindowEndTime = batchWindowEndTime;
     this.batchSize = Math.min(historyCleanupBatchSize, MAX_BATCH_SIZE);
   }
 
-  public LocalTime getBatchWindowStartTime() {
+  public Date getBatchWindowStartTime() {
     return batchWindowStartTime;
   }
 
-  public void setBatchWindowStartTime(LocalTime batchWindowStartTime) {
+  public void setBatchWindowStartTime(Date batchWindowStartTime) {
     this.batchWindowStartTime = batchWindowStartTime;
   }
 
-  public LocalTime getBatchWindowEndTime() {
+  public Date getBatchWindowEndTime() {
     return batchWindowEndTime;
   }
 
-  public void setBatchWindowEndTime(LocalTime batchWindowEndTime) {
+  public void setBatchWindowEndTime(Date batchWindowEndTime) {
     this.batchWindowEndTime = batchWindowEndTime;
   }
 
@@ -95,8 +107,8 @@ public class HistoryCleanupJobHandlerConfiguration implements JobHandlerConfigur
   public String toCanonicalString() {
     JSONObject json = new JSONObject();
 
-    JsonUtil.addLocalTimeField(json, JOB_CONFIG_BATCH_WINDOW_START_TIME, batchWindowStartTime);
-    JsonUtil.addLocalTimeField(json, JOB_CONFIG_BATCH_WINDOW_END_TIME, batchWindowEndTime);
+    JsonUtil.addDateField(json, JOB_CONFIG_BATCH_WINDOW_START_TIME, batchWindowStartTime);
+    JsonUtil.addDateField(json, JOB_CONFIG_BATCH_WINDOW_END_TIME, batchWindowEndTime);
     json.put(JOB_CONFIG_BATCH_SIZE_THRESHOLD, batchSizeThreshold);
     json.put(JOB_CONFIG_BATCH_SIZE, batchSize);
     json.put(JOB_CONFIG_COUNT_EMPTY_RUNS, countEmptyRuns);
@@ -108,10 +120,10 @@ public class HistoryCleanupJobHandlerConfiguration implements JobHandlerConfigur
   public static HistoryCleanupJobHandlerConfiguration fromJson(JSONObject jsonObject) {
     HistoryCleanupJobHandlerConfiguration config = new HistoryCleanupJobHandlerConfiguration();
     if (jsonObject.has(JOB_CONFIG_BATCH_WINDOW_START_TIME)) {
-      config.setBatchWindowStartTime(JsonUtil.getLocalTimeField(jsonObject, JOB_CONFIG_BATCH_WINDOW_START_TIME));
+      config.setBatchWindowStartTime(JsonUtil.getDateField(jsonObject, JOB_CONFIG_BATCH_WINDOW_START_TIME));
     }
     if (jsonObject.has(JOB_CONFIG_BATCH_WINDOW_END_TIME)) {
-      config.setBatchWindowEndTime(JsonUtil.getLocalTimeField(jsonObject, JOB_CONFIG_BATCH_WINDOW_END_TIME));
+      config.setBatchWindowEndTime(JsonUtil.getDateField(jsonObject, JOB_CONFIG_BATCH_WINDOW_END_TIME));
     }
     if (jsonObject.has(JOB_CONFIG_BATCH_SIZE_THRESHOLD)) {
       config.setBatchSizeThreshold(jsonObject.getInt(JOB_CONFIG_BATCH_SIZE_THRESHOLD));
@@ -153,13 +165,15 @@ public class HistoryCleanupJobHandlerConfiguration implements JobHandlerConfigur
     return result;
   }
 
-  private Date updateTime(Date now, LocalTime newTime) {
+  private Date updateTime(Date now, Date newTime) {
     Calendar c = Calendar.getInstance();
     c.setTime(now);
-    c.set(Calendar.HOUR_OF_DAY, newTime.getHourOfDay());
-    c.set(Calendar.MINUTE, newTime.getMinuteOfHour());
-    c.set(Calendar.SECOND, newTime.getSecondOfMinute());
-    c.set(Calendar.MILLISECOND, newTime.getMillisOfSecond());
+    Calendar newTimeCalendar = Calendar.getInstance();
+    newTimeCalendar.setTime(newTime);
+    c.set(Calendar.HOUR_OF_DAY, newTimeCalendar.get(Calendar.HOUR_OF_DAY));
+    c.set(Calendar.MINUTE, newTimeCalendar.get(Calendar.MINUTE));
+    c.set(Calendar.SECOND, newTimeCalendar.get(Calendar.SECOND));
+    c.set(Calendar.MILLISECOND, newTimeCalendar.get(Calendar.MILLISECOND));
     return c.getTime();
   }
 
@@ -224,4 +238,9 @@ public class HistoryCleanupJobHandlerConfiguration implements JobHandlerConfigur
   public void setExecuteAtOnce(boolean executeAtOnce) {
     this.executeAtOnce = executeAtOnce;
   }
+
+  public static Date parseTimeConfiguration(String time) throws ParseException {
+    return TIME_FORMAT_WITHOUT_SECONDS.parse(time);
+  }
 }
+

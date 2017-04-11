@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.test.api.history;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import org.apache.commons.lang.time.DateUtils;
@@ -29,6 +30,7 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.ExecuteJobHelper;
 import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupJobHandlerConfiguration;
+import org.camunda.bpm.engine.impl.metrics.Meter;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
@@ -107,6 +109,16 @@ public class HistoryCleanupTest {
       historyService.deleteHistoricProcessInstance(historicProcessInstance.getId());
     }
 
+    clearMetrics();
+
+  }
+
+  protected void clearMetrics() {
+    Collection<Meter> meters = engineRule.getProcessEngineConfiguration().getMetricsRegistry().getMeters().values();
+    for (Meter meter : meters) {
+      meter.getAndClear();
+    }
+    engineRule.getManagementService().deleteMetrics(null);
   }
 
   @Test

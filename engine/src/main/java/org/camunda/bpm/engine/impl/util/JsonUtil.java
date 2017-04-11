@@ -34,8 +34,6 @@ import org.joda.time.format.DateTimeFormatter;
  */
 public final class JsonUtil {
 
-  private static final DateTimeFormatter LOCAL_TIME_FORMATTER = DateTimeFormat.forPattern("HH:mm:ss.SSS");
-
   /**
    * Converts a {@link JSONObject} to a {@link Map}. It supports nested {@link JSONObject}
    * and {@link JSONArray}.
@@ -155,17 +153,8 @@ public final class JsonUtil {
     }
   }
 
-  public static void addLocalTimeField(JSONObject json, String name, LocalTime localTime) {
-    if (localTime != null) {
-      json.put(name, LOCAL_TIME_FORMATTER.print(localTime));
-    }
-  }
-
-  public static LocalTime getLocalTimeField(JSONObject json, String name) {
-    if (json.get(name) != null) {
-      return LOCAL_TIME_FORMATTER.parseLocalTime(json.getString(name));
-    }
-    return null;
+  public static Date getDateField(JSONObject json, String name) {
+    return new Date(json.getLong(name));
   }
 
   public static <T> List<T> jsonArrayAsList(JSONArray jsonArray, JsonObjectConverter<T> converter) {

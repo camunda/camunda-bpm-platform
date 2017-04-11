@@ -1,19 +1,23 @@
 package org.camunda.bpm.engine.impl.jobexecutor.historycleanup;
 
-import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
+import java.text.ParseException;
+import java.util.Date;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.cmd.CommandLogger;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
 import org.camunda.bpm.engine.impl.persistence.entity.EverLivingJobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
-import org.joda.time.LocalTime;
 
 /**
  * Job declaration for history cleanup.
  * @author Svetlana Dorokhova
  */
 public class HistoryCleanupJobDeclaration extends JobDeclaration<HistoryCleanupContext, EverLivingJobEntity> {
+
+  private final static CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
 
   public HistoryCleanupJobDeclaration() {
     super(HistoryCleanupJobHandler.TYPE);
@@ -56,13 +60,21 @@ public class HistoryCleanupJobDeclaration extends JobDeclaration<HistoryCleanupC
   @Override
   protected HistoryCleanupJobHandlerConfiguration resolveJobHandlerConfiguration(HistoryCleanupContext context) {
     ProcessEngineConfigurationImpl processEngineConfiguration = Context.getCommandContext().getProcessEngineConfiguration();
-    LocalTime batchWindowStartTime = null;
+    Date batchWindowStartTime = null;
     if (processEngineConfiguration.getBatchWindowStartTime() != null) {
-      batchWindowStartTime = DateTimeUtil.parseLocalTimeWithoutSeconds(processEngineConfiguration.getBatchWindowStartTime());
+      try {
+        batchWindowStartTime = HistoryCleanupJobHandlerConfiguration.parseTimeConfiguration(processEngineConfiguration.getBatchWindowStartTime());
+      } catch (ParseException e) {
+        LOG.warnWrongConfiguration("batchWindowStartTime");
+      }
     }
-    LocalTime batchWindowEndTime = null;
+    Date batchWindowEndTime = null;
     if (processEngineConfiguration.getBatchWindowEndTime() != null) {
-      batchWindowEndTime = DateTimeUtil.parseLocalTimeWithoutSeconds(processEngineConfiguration.getBatchWindowEndTime());
+      try {
+        batchWindowEndTime = HistoryCleanupJobHandlerConfiguration.parseTimeConfiguration(processEngineConfiguration.getBatchWindowEndTime());
+      } catch (ParseException e) {
+        LOG.warnWrongConfiguration("batchWindowEndTime");
+      }
     }
     HistoryCleanupJobHandlerConfiguration config = new HistoryCleanupJobHandlerConfiguration(batchWindowStartTime,
         batchWindowEndTime, processEngineConfiguration.getHistoryCleanupBatchSize());
