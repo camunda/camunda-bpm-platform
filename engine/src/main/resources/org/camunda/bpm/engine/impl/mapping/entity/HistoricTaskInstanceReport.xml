@@ -253,7 +253,7 @@
         AND END_TIME_ &gt;= #{completedAfter}
       </if>
 
-      <bind name="columnPrefix" value="'HPI.'"/>
+      <bind name="columnPrefix" value="'HTI.'"/>
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithPrefix" />
     </where>
   </sql>
