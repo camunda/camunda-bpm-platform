@@ -226,7 +226,7 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
     }
   }
 
-  public List<User> findUsersWithoutGroupId(LdapUserQueryImpl query, String userBaseDn, Boolean ignorePagination) {
+  public List<User> findUsersWithoutGroupId(LdapUserQueryImpl query, String userBaseDn, boolean ignorePagination) {
 
     if(ldapConfiguration.isSortControlSupported()) {
       applyRequestControls(query);
@@ -241,7 +241,7 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
       // perform client-side paging
       int resultCount = 0;
       List<User> userList = new ArrayList<User>();
-      while (enumeration.hasMoreElements() && userList.size() < query.getMaxResults()) {
+      while (enumeration.hasMoreElements() && (userList.size() < query.getMaxResults() || ignorePagination)) {
         SearchResult result = enumeration.nextElement();
 
         UserEntity user = transformUser(result);
