@@ -43,6 +43,7 @@ import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.variable.VariableMap;
@@ -1024,4 +1025,15 @@ public class FormServiceTest extends PluggableProcessEngineTestCase {
     assertTrue(formField.isBusinessKey());
   }
 
+  @Deployment
+  public void testSubmitStartFormWithFormFieldMarkedAsBusinessKey() {
+    String procDefId = repositoryService.createProcessDefinitionQuery().singleResult().getId();// runtimeService.startProcessInstanceByKey("FormPropertyDefaultValueTest.testDefaultValue");
+    ProcessInstance pi = formService.submitStartForm(procDefId, "foo", Variables.createVariables().putValue("secondParam", "bar"));
+
+    assertEquals("foo", pi.getBusinessKey());
+
+    List<VariableInstance> result = runtimeService.createVariableInstanceQuery().list();
+    assertEquals(1, result.size());
+    assert (result.get(0).getName().equals("secondParam"));
+  }
 }

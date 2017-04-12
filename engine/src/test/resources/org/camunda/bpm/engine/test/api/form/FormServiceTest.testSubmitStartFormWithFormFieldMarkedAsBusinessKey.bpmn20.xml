@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="1.7.2">
+  <bpmn:process id="paramAsBusinesskey" name="Test Param As Businesskey" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:extensionElements>
+        <camunda:formData businessKey="firstParam">
+          <camunda:formField id="firstParam" label="My first parameter (will be businesskey as well)" type="string" defaultValue="0815" />
+          <camunda:formField id="secondParam" label="My second parameter" type="string" defaultValue="42" />
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:outgoing>SequenceFlow_1rccg3p</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_0wgr1hm" sourceRef="Task_1driejz" targetRef="EndEvent_1ffg6x9" />
+    <bpmn:endEvent id="EndEvent_1ffg6x9" camunda:asyncBefore="true">
+      <bpmn:incoming>SequenceFlow_0wgr1hm</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_1rccg3p" sourceRef="StartEvent_1" targetRef="Task_1driejz" />
+    <bpmn:userTask id="Task_1driejz" name="Log parameter values" />
+  </bpmn:process>
+</bpmn:definitions>
