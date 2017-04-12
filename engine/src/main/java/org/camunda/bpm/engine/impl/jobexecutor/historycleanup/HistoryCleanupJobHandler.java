@@ -39,14 +39,13 @@ public class HistoryCleanupJobHandler implements JobHandler<HistoryCleanupJobHan
       //find data to delete
       List<String> processInstanceIds = getProcessInstanceIds(configuration, commandContext);
       if (!processInstanceIds.isEmpty() && processInstanceIds.size() >= configuration.getBatchSizeThreshold()) {
-          //TODO CAM-7604
-//        insertMetric(commandContext);
+        insertMetric(commandContext);
 
         //delete bunch of data
         commandContext.getHistoricProcessInstanceManager().deleteHistoricProcessInstanceByIds(processInstanceIds);
 
         //TODO svt does not work as the removal is not flushed to the database yet CAM-7604
-//        insertMetric(commandContext);
+        insertMetric(commandContext);
 
         //reschedule now
         commandContext.getJobManager().reschedule(jobEntity, ClockUtil.getCurrentTime());
