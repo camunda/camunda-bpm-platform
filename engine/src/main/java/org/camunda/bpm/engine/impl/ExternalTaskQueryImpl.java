@@ -13,11 +13,14 @@
 package org.camunda.bpm.engine.impl;
 
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
+import org.camunda.bpm.engine.impl.AbstractQuery.ResultType;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
@@ -215,6 +218,24 @@ public class ExternalTaskQueryImpl extends AbstractQuery<ExternalTaskQuery, Exte
     return commandContext
       .getExternalTaskManager()
       .findExternalTasksByQueryCriteria(this);
+  }
+
+  public List<String> listIds() {
+    this.resultType = ResultType.LIST;
+    return evaluateExpressionsAndExecuteIdsList(Context.getCommandContext());
+  }
+
+  public List<String> evaluateExpressionsAndExecuteIdsList(CommandContext commandContext) {
+    validate();
+    evaluateExpressions();
+    return !hasExcludingConditions() ? executeIdsList(commandContext) : new ArrayList<String>();
+  }
+
+  public List<String> executeIdsList(CommandContext commandContext) {
+    checkQueryOk();
+    return commandContext
+      .getExternalTaskManager()
+      .findExternalTaskIdsByQueryCriteria(this);
   }
 
   public String getExternalTaskId() {

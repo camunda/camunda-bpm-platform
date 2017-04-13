@@ -102,6 +102,7 @@ public interface UserOperationLogEntry {
   public static String OPERATION_TYPE_SUSPEND_JOB = "SuspendJob";
   public static String OPERATION_TYPE_ACTIVATE_JOB = "ActivateJob";
   public static String OPERATION_TYPE_SET_JOB_RETRIES = "SetJobRetries";
+  public static String OPERATION_TYPE_SET_EXTERNAL_TASK_RETRIES = "SetExternalTaskRetries";
   public static String OPERATION_TYPE_SET_VARIABLE = "SetVariable";
 
   public static String OPERATION_TYPE_REMOVE_VARIABLE = "RemoveVariable";

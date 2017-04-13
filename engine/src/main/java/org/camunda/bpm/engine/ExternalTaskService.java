@@ -12,14 +12,17 @@
  */
 package org.camunda.bpm.engine;
 
+import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
+import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryBuilder;
+import org.camunda.bpm.engine.runtime.JobQuery;
 
 /**
  * Service that provides access to {@link ExternalTask} instances. External tasks
@@ -228,6 +231,46 @@ public interface ExternalTaskService {
    *   </ul>
    */
   public void setRetries(String externalTaskId, int retries);
+
+  /**
+   * Sets the retries for external tasks. If the new value is 0, a new incident with a <code>null</code>
+   * message is created. If the old value is 0 and the new value is greater than 0, an existing incident
+   * is resolved.
+   *
+   * @param externalTaskIds the ids of the tasks to set the
+   * @param retries
+   * @param externalTaskQuery a query which selects the external tasks to set the retries for.
+   * @throws NotFoundException if no external task with one of the given id exists
+   * @throws BadUserRequestException if the ids are null or the number of retries is negative 
+   * @throws AuthorizationException thrown if the current user does not possess any of the following permissions:
+   *   <ul>
+   *     <li>{@link Permissions#UPDATE} on {@link Resources#PROCESS_INSTANCE}</li>
+   *     <li>{@link Permissions#UPDATE_INSTANCE} on {@link Resources#PROCESS_DEFINITION}</li>
+   *   </ul>
+   */
+  public void setRetriesSync(List<String> externalTaskIds, ExternalTaskQuery externalTaskQuery, int retries);
+
+  /**
+   * Sets the retries for external tasks asynchronously as batch. The returned batch
+   * can be used to track the progress. If the new value is 0, a new incident with a <code>null</code>
+   * message is created. If the old value is 0 and the new value is greater than 0, an existing incident
+   * is resolved.
+   *
+   *
+   * @return the batch
+   *
+   * @param externalTaskIds the ids of the tasks to set the
+   * @param retries
+   * @param externalTaskQuery a query which selects the external tasks to set the retries for.
+   * @throws NotFoundException if no external task with one of the given id exists
+   * @throws BadUserRequestException if the ids are null or the number of retries is negative 
+   * @throws AuthorizationException thrown if the current user does not possess any of the following permissions:
+   *   <ul>
+   *     <li>{@link Permissions#UPDATE} on {@link Resources#PROCESS_INSTANCE}</li>
+   *     <li>{@link Permissions#UPDATE_INSTANCE} on {@link Resources#PROCESS_DEFINITION}</li>
+   *   </ul>
+   */
+  public Batch setRetriesAsync(List<String> externalTaskIds, ExternalTaskQuery externalTaskQuery, int retries);
 
   /**
    * Sets the priority for an external task. 

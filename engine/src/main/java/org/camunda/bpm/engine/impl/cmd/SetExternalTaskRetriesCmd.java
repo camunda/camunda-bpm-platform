@@ -12,7 +12,14 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
 /**
@@ -22,19 +29,32 @@ import org.camunda.bpm.engine.impl.util.EnsureUtil;
 public class SetExternalTaskRetriesCmd extends ExternalTaskCmd {
 
   protected int retries;
+  protected boolean writeUserOperationLog;
 
-  public SetExternalTaskRetriesCmd(String externalTaskId, int retries) {
+  public SetExternalTaskRetriesCmd(String externalTaskId, int retries, boolean writeUserOperationLog) {
     super(externalTaskId);
     this.retries = retries;
+    this.writeUserOperationLog = writeUserOperationLog;
   }
   
   @Override
   protected void validateInput() {
-    EnsureUtil.ensureGreaterThanOrEqual("retries", retries, 0);
+    EnsureUtil.ensureGreaterThanOrEqual(BadUserRequestException.class, "The number of retries cannot be negative", "retries", retries, 0);
   }
 
   @Override
   protected void execute(ExternalTaskEntity externalTask) {
+    if (writeUserOperationLog) {
+      List<PropertyChange> propertyChanges = new ArrayList<PropertyChange>();
+      propertyChanges.add(new PropertyChange("retries", null, retries));
+
+      Context.getCommandContext().getOperationLogManager()
+          .logProcessInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_SET_EXTERNAL_TASK_RETRIES,
+              null,
+              null,
+              null,
+              propertyChanges);
+    }
     externalTask.setRetriesAndManageIncidents(retries);
   }
 }

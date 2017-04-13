@@ -15,6 +15,8 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -37,10 +39,10 @@ public abstract class ExternalTaskCmd implements Command<Void> {
   protected String externalTaskId;
 
   public ExternalTaskCmd(String externalTaskId) {
+    ensureNotNull(NotFoundException.class, "Cannot find external task with id null", "externalTask", externalTaskId);
     this.externalTaskId = externalTaskId;
   }
-  
-  
+
   @Override
   public Void execute(CommandContext commandContext) {
     EnsureUtil.ensureNotNull("externalTaskId", externalTaskId);
@@ -53,22 +55,22 @@ public abstract class ExternalTaskCmd implements Command<Void> {
     for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
       checker.checkUpdateProcessInstanceById(externalTask.getProcessInstanceId());
     }
-    
+
     execute(externalTask);
-    
+
     return null;
   }
-  
+
   /**
    * Executes the specific external task commands, which belongs to the current sub class.
    * 
    * @param externalTask the external task which is used for the command execution
    */
   protected abstract void execute(ExternalTaskEntity externalTask);
-  
+
   /**
    * Validates the current input of the command.
    */
   protected abstract void validateInput();  
-  
+
 }

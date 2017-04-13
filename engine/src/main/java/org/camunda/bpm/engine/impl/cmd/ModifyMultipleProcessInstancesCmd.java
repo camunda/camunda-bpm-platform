@@ -51,19 +51,18 @@ public class ModifyMultipleProcessInstancesCmd extends AbstractModificationCmd<V
       ProcessInstanceModificationBuilderImpl builder = new ProcessInstanceModificationBuilderImpl(commandContext, processInstanceId);
       builder.setSkipCustomListeners(this.builder.isSkipCustomListeners());
       builder.setSkipIoMappings(this.builder.isSkipIoMappings());
-      List<AbstractProcessInstanceModificationCommand> commands = setProcessInstanceId(instructions, processInstanceId);
-      builder.setModificationOperations(commands);
+      setProcessInstanceId(instructions, processInstanceId);
+      builder.setModificationOperations(instructions);
       new ModifyProcessInstanceCmd(builder, false).execute(commandContext);
     }
 
     return null;
   }
 
-  protected List<AbstractProcessInstanceModificationCommand> setProcessInstanceId(List<AbstractProcessInstanceModificationCommand> instructions, String processInstanceId) {
+  protected void setProcessInstanceId(List<AbstractProcessInstanceModificationCommand> instructions, String processInstanceId) {
     for (AbstractProcessInstanceModificationCommand operationCmd : instructions) {
       operationCmd.setProcessInstanceId(processInstanceId);
     }
-    return instructions;
   }
 
   protected void ensureSameProcessDefinition(ExecutionEntity processInstance, String processDefinitionId) {

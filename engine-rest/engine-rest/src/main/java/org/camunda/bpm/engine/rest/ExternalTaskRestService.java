@@ -17,6 +17,7 @@ import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -26,10 +27,12 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
+import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
 import org.camunda.bpm.engine.rest.dto.externaltask.ExternalTaskDto;
 import org.camunda.bpm.engine.rest.dto.externaltask.ExternalTaskQueryDto;
 import org.camunda.bpm.engine.rest.dto.externaltask.FetchExternalTasksDto;
 import org.camunda.bpm.engine.rest.dto.externaltask.LockedExternalTaskDto;
+import org.camunda.bpm.engine.rest.dto.externaltask.SetRetriesForExternalTasksDto;
 import org.camunda.bpm.engine.rest.sub.externaltask.ExternalTaskResource;
 
 /**
@@ -72,4 +75,15 @@ public interface ExternalTaskRestService {
 
   @Path("/{id}")
   ExternalTaskResource getExternalTask(@PathParam("id") String externalTaskId);
+
+  @PUT
+  @Path("/retries-sync")
+  @Consumes(MediaType.APPLICATION_JSON)
+  void setRetries(SetRetriesForExternalTasksDto retriesDto);
+
+  @POST
+  @Path("/retries-async")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  BatchDto setRetriesAsync(SetRetriesForExternalTasksDto retriesDto);
 }

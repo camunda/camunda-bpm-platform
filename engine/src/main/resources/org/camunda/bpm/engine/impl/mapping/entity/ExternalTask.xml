@@ -200,6 +200,17 @@
     ${limitAfter}
   </select>
 
+   <select id="selectExternalTaskIdsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.ExternalTaskQueryImpl" resultType="string">
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
+    ${limitBefore}
+    select ${distinct}
+    ID_
+    ${limitBetween}
+    <include refid="selectExternalTaskByQueryCriteriaSql"/>
+    ${orderBy}
+    ${limitAfter}
+  </select>
+
   <select id="selectExternalTaskCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.ExternalTaskQueryImpl" resultType="long">
     select count(distinct RES.ID_)
     <include refid="selectExternalTaskByQueryCriteriaSql"/>

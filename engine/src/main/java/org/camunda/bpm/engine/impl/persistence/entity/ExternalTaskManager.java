@@ -83,6 +83,11 @@ public class ExternalTaskManager extends AbstractManager {
     return getDbEntityManager().selectList("selectExternalTaskByQueryCriteria", externalTaskQuery);
   }
 
+  public List<String> findExternalTaskIdsByQueryCriteria(ExternalTaskQueryImpl externalTaskQuery) {
+    configureQuery(externalTaskQuery);
+    return getDbEntityManager().selectList("selectExternalTaskIdsByQueryCriteria", externalTaskQuery);
+  }
+
   public long findExternalTaskCountByQueryCriteria(ExternalTaskQueryImpl externalTaskQuery) {
     configureQuery(externalTaskQuery);
     return (Long) getDbEntityManager().selectOne("selectExternalTaskCountByQueryCriteria", externalTaskQuery);
@@ -133,5 +138,4 @@ public class ExternalTaskManager extends AbstractManager {
   protected ListQueryParameterObject configureParameterizedQuery(Object parameter) {
     return getTenantManager().configureQuery(parameter);
   }
-
 }

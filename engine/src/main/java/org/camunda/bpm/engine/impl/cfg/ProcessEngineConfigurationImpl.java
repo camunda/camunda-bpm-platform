@@ -89,6 +89,7 @@ import org.camunda.bpm.engine.impl.batch.BatchMonitorJobHandler;
 import org.camunda.bpm.engine.impl.batch.BatchSeedJobHandler;
 import org.camunda.bpm.engine.impl.batch.deletion.DeleteHistoricProcessInstancesJobHandler;
 import org.camunda.bpm.engine.impl.batch.deletion.DeleteProcessInstancesJobHandler;
+import org.camunda.bpm.engine.impl.batch.externaltask.SetExternalTaskRetriesJobHandler;
 import org.camunda.bpm.engine.impl.batch.job.SetJobRetriesJobHandler;
 import org.camunda.bpm.engine.impl.bpmn.behavior.ExternalTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.deployer.BpmnDeployer;
@@ -806,6 +807,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
       SetJobRetriesJobHandler setJobRetriesJobHandler = new SetJobRetriesJobHandler();
       batchHandlers.put(setJobRetriesJobHandler.getType(), setJobRetriesJobHandler);
+
+      SetExternalTaskRetriesJobHandler setExternalTaskRetriesJobHandler = new SetExternalTaskRetriesJobHandler();
+      batchHandlers.put(setExternalTaskRetriesJobHandler.getType(), setExternalTaskRetriesJobHandler);
     }
 
     if (customBatchJobHandlers != null) {

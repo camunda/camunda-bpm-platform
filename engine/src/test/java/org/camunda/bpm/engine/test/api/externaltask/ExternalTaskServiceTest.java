@@ -13,6 +13,8 @@
 package org.camunda.bpm.engine.test.api.externaltask;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
+import static org.hamcrest.CoreMatchers.containsString;
+
 import org.apache.ibatis.jdbc.RuntimeSqlException;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -36,6 +38,7 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.joda.time.DateTime;
 import org.junit.Assert;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -1008,7 +1011,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
       externalTaskService.unlock(null);
       fail("expected exception");
     } catch (ProcessEngineException e) {
-      assertTextPresent("externalTaskId is null", e.getMessage());
+      Assert.assertThat(e.getMessage(), containsString("Cannot find external task with id null"));
     }
   }
 
@@ -1458,10 +1461,10 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
 
   public void testSetRetriesNullTaskId() {
     try {
-      externalTaskService.setRetries(null, 5);
+      externalTaskService.setRetries((String)null, 5);
       fail("expected exception");
-    } catch (NullValueException e) {
-      assertTextPresent("externalTaskId is null", e.getMessage());
+    } catch (NotFoundException e) {
+      Assert.assertThat(e.getMessage(), containsString("Cannot find external task with id null"));
     }
   }
 
@@ -1498,8 +1501,8 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
     try {
       externalTaskService.setPriority(null, 5);
       fail("expected exception");
-    } catch (NullValueException e) {
-      assertTextPresent("externalTaskId is null", e.getMessage());
+    } catch (NotFoundException e) {
+      Assert.assertThat(e.getMessage(), containsString("Cannot find external task with id null"));
     }
   }
 

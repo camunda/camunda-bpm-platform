@@ -98,7 +98,7 @@ public class BatchCreationAuthorizationTest {
   }
 
   @Before
-  public void deployProcessesAndCreateMigrationPlan() {
+  public void deployProcesses() {
     ProcessDefinition sourceDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
     processInstance = engineRule.getRuntimeService().startProcessInstanceById(sourceDefinition.getId());
   }

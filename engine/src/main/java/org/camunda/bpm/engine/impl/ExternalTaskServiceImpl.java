@@ -12,9 +12,11 @@
  */
 package org.camunda.bpm.engine.impl;
 
+import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ExternalTaskService;
+import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryBuilder;
 import org.camunda.bpm.engine.impl.cmd.*;
@@ -62,9 +64,13 @@ public class ExternalTaskServiceImpl extends ServiceImpl implements ExternalTask
     commandExecutor.execute(new UnlockExternalTaskCmd(externalTaskId));
   }
 
+  public void setRetries(String externalTaskId, int retries, boolean writeUserOperationLog) {
+    commandExecutor.execute(new SetExternalTaskRetriesCmd(externalTaskId, retries, writeUserOperationLog));
+  }
+
   public void setRetries(String externalTaskId, int retries) {
-    commandExecutor.execute(new SetExternalTaskRetriesCmd(externalTaskId, retries));
-  }  
+    setRetries(externalTaskId, retries, true);
+  }
   
   @Override
   public void setPriority(String externalTaskId, long priority) {
@@ -75,9 +81,23 @@ public class ExternalTaskServiceImpl extends ServiceImpl implements ExternalTask
     return new ExternalTaskQueryImpl(commandExecutor);
   }
 
-
-  @Override
   public String getExternalTaskErrorDetails(String externalTaskId) {
     return commandExecutor.execute(new GetExternalTaskErrorDetailsCmd(externalTaskId));
+  }
+
+  public void setRetriesSync(List<String> externalTaskIds, ExternalTaskQuery externalTaskQuery, int retries) {
+    commandExecutor.execute(new SetExternalTasksRetriesCmd(externalTaskIds, externalTaskQuery, retries));
+  }
+
+  public Batch setRetriesAsync(List<String> externalTaskIds, int retries) {
+    return setRetriesAsync(externalTaskIds, null, retries);
+  }
+
+  public Batch setRetriesAsync(ExternalTaskQuery externalTaskQuery, int retries) {
+    return setRetriesAsync(null, externalTaskQuery, retries);
+  }
+
+  public Batch setRetriesAsync(List<String> externalTaskIds, ExternalTaskQuery externalTaskQuery, int retries) {
+    return commandExecutor.execute(new SetExternalTasksRetriesBatchCmd(externalTaskIds, externalTaskQuery, retries));
   }
 }
