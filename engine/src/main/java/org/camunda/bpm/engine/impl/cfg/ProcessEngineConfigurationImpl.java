@@ -318,6 +318,7 @@ import org.camunda.bpm.engine.impl.variable.serializer.jpa.JPAVariableSerializer
 import org.camunda.bpm.engine.management.Metrics;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.runtime.Incident;
+import org.camunda.bpm.engine.test.mock.MocksResolverFactory;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
 
@@ -1812,6 +1813,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected void initScripting() {
     if (resolverFactories == null) {
       resolverFactories = new ArrayList<ResolverFactory>();
+      resolverFactories.add(new MocksResolverFactory());
       resolverFactories.add(new VariableScopeResolverFactory());
       resolverFactories.add(new BeansResolverFactory());
     }

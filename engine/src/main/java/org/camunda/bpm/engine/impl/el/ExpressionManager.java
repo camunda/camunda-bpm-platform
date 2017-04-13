@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.impl.javax.el.ListELResolver;
 import org.camunda.bpm.engine.impl.javax.el.MapELResolver;
 import org.camunda.bpm.engine.impl.javax.el.ValueExpression;
 import org.camunda.bpm.engine.impl.juel.ExpressionFactoryImpl;
+import org.camunda.bpm.engine.test.mock.MockElResolver;
 import org.camunda.bpm.engine.variable.context.VariableContext;
 
 
@@ -130,6 +131,7 @@ public class ExpressionManager {
     CompositeELResolver elResolver = new CompositeELResolver();
     elResolver.add(new VariableScopeElResolver());
     elResolver.add(new VariableContextElResolver());
+    elResolver.add(new MockElResolver());
 
     if(beans != null) {
       // ACT-1102: Also expose all beans in configuration when using standalone engine, not

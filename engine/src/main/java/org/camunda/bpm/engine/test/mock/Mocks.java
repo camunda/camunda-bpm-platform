@@ -30,7 +30,7 @@ public class Mocks {
 
   private static ThreadLocal<Map<String, Object>> mockContainer = new ThreadLocal<Map<String, Object>>();
 
-  private static Map<String, Object> getMocks() {
+  public static Map<String, Object> getMocks() {
     Map<String, Object> mocks = mockContainer.get();
     if (mocks == null) {
       mocks = new HashMap<String, Object>();
