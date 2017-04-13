@@ -432,6 +432,13 @@ public interface RepositoryService {
   UpdateProcessDefinitionSuspensionStateSelectBuilder updateProcessDefinitionSuspensionState();
 
   /**
+   * Updates time to live of process definition. The field is used within history cleanup process.
+   * @param processDefinitionId
+   * @param timeToLive
+   */
+  void updateProcessDefinitionTimeToLive(String processDefinitionId, Integer timeToLive);
+
+  /**
    * Gives access to a deployed process model, e.g., a BPMN 2.0 XML file,
    * through a stream of bytes.
    *

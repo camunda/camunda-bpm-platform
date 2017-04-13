@@ -758,4 +758,45 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Deployment
+  public void testParseProcessDefinitionTtl() {
+    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
+    assertNotNull(processDefinitions);
+    assertEquals(1, processDefinitions.size());
+
+    Integer timeToLive = processDefinitions.get(0).getTimeToLive();
+    assertNotNull(timeToLive);
+    assertEquals(5, timeToLive.intValue());
+  }
+
+  @Deployment
+  public void testParseProcessDefinitionEmptyTtl() {
+    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
+    assertNotNull(processDefinitions);
+    assertEquals(1, processDefinitions.size());
+
+    Integer timeToLive = processDefinitions.get(0).getTimeToLive();
+    assertNull(timeToLive);
+  }
+
+  @Deployment
+  public void testParseProcessDefinitionWithoutTtl() {
+    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
+    assertNotNull(processDefinitions);
+    assertEquals(1, processDefinitions.size());
+
+    Integer timeToLive = processDefinitions.get(0).getTimeToLive();
+    assertNull(timeToLive);
+  }
+
+  public void testInvalidProcessDefinitionTtl() {
+    try {
+      String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testInvalidProcessDefinitionTtl");
+      repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
+      fail("Exception expected: Process definition timeToLive value can not be parsed.");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("Cannot parse timeToLive", e.getMessage());
+    }
+  }
+
 }

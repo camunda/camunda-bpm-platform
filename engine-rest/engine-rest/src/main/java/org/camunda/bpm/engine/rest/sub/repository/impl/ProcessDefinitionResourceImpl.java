@@ -13,7 +13,13 @@
 package org.camunda.bpm.engine.rest.sub.repository.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.camunda.bpm.engine.*;
+
+import org.camunda.bpm.engine.AuthorizationException;
+import org.camunda.bpm.engine.FormService;
+import org.camunda.bpm.engine.ManagementService;
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.form.StartFormData;
 import org.camunda.bpm.engine.impl.util.IoUtil;
@@ -22,6 +28,7 @@ import org.camunda.bpm.engine.management.ActivityStatisticsQuery;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.rest.ProcessInstanceRestService;
 import org.camunda.bpm.engine.rest.dto.StatisticsResultDto;
+import org.camunda.bpm.engine.rest.dto.TimeToLiveDto;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 import org.camunda.bpm.engine.rest.dto.repository.ActivityStatisticsResultDto;
@@ -52,7 +59,6 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -334,6 +340,15 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
       String message = String.format("The suspension state of Process Definition with id %s could not be updated due to: %s", processDefinitionId, e.getMessage());
       throw new InvalidRequestException(Status.BAD_REQUEST, e, message);
     }
+  }
+
+  @Override
+  public void updateTimeToLive(TimeToLiveDto timeToLiveDto) {
+    Integer timeToLive = null;
+    if (timeToLiveDto != null) {
+      timeToLive = timeToLiveDto.getTimeToLive();
+    }
+    engine.getRepositoryService().updateProcessDefinitionTimeToLive(processDefinitionId, timeToLive);
   }
 
   public Map<String, VariableValueDto> getFormVariables(String variableNames, boolean deserializeValues) {

@@ -28,6 +28,7 @@ public class ProcessDefinitionDto {
   protected boolean suspended;
   protected String tenantId;
   protected String versionTag;
+  protected Integer timeToLive;
 
   public String getId() {
     return id;
@@ -77,6 +78,10 @@ public class ProcessDefinitionDto {
     return versionTag;
   }
 
+  public Integer getTimeToLive() {
+    return timeToLive;
+  }
+
   public static ProcessDefinitionDto fromProcessDefinition(ProcessDefinition definition) {
     ProcessDefinitionDto dto = new ProcessDefinitionDto();
     dto.id = definition.getId();
@@ -91,7 +96,7 @@ public class ProcessDefinitionDto {
     dto.suspended = definition.isSuspended();
     dto.tenantId = definition.getTenantId();
     dto.versionTag = definition.getVersionTag();
-
+    dto.timeToLive = definition.getTimeToLive();
     return dto;
   }
 

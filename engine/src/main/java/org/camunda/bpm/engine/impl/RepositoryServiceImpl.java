@@ -43,6 +43,7 @@ import org.camunda.bpm.engine.impl.cmd.GetDeploymentResourceForIdCmd;
 import org.camunda.bpm.engine.impl.cmd.GetDeploymentResourceNamesCmd;
 import org.camunda.bpm.engine.impl.cmd.GetDeploymentResourcesCmd;
 import org.camunda.bpm.engine.impl.cmd.GetIdentityLinksForProcessDefinitionCmd;
+import org.camunda.bpm.engine.impl.cmd.UpdateProcessDefinitionTimeToLiveCmd;
 import org.camunda.bpm.engine.impl.cmmn.cmd.GetDeploymentCaseDefinitionCmd;
 import org.camunda.bpm.engine.impl.cmmn.cmd.GetDeploymentCaseDiagramCmd;
 import org.camunda.bpm.engine.impl.cmmn.cmd.GetDeploymentCaseModelCmd;
@@ -236,6 +237,10 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
 
   public UpdateProcessDefinitionSuspensionStateSelectBuilder updateProcessDefinitionSuspensionState() {
     return new UpdateProcessDefinitionSuspensionStateBuilderImpl(commandExecutor);
+  }
+
+  public void updateProcessDefinitionTimeToLive(String processDefinitionId, Integer timeToLive){
+    commandExecutor.execute(new UpdateProcessDefinitionTimeToLiveCmd(processDefinitionId, timeToLive));
   }
 
   public InputStream getProcessModel(String processDefinitionId) {

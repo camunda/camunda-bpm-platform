@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.rest.exception;
 
 import org.camunda.bpm.engine.AuthorizationException;
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.migration.MigratingProcessInstanceValidationException;
 import org.camunda.bpm.engine.migration.MigrationPlanValidationException;
@@ -82,6 +83,14 @@ public class ProcessEngineExceptionHandler implements ExceptionMapper<ProcessEng
         .entity(dto)
         .type(MediaType.APPLICATION_JSON_TYPE)
         .build();
+    }
+    else if (exception instanceof BadUserRequestException) {
+      ExceptionDto dto = ExceptionDto.fromException(exception);
+      return Response
+          .status(Status.BAD_REQUEST)
+          .entity(dto)
+          .type(MediaType.APPLICATION_JSON_TYPE)
+          .build();
     }
     else {
 

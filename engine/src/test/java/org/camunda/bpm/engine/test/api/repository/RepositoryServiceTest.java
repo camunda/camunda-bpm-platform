@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
@@ -41,6 +42,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerActivateProcessDefinitionHandler;
 import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmTransition;
 import org.camunda.bpm.engine.impl.pvm.ReadOnlyProcessDefinition;
@@ -793,6 +795,56 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
     assertEquals(2, processDefinitions.size());
 
     repositoryService.deleteDeployment(deploymentId);
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testProcessDefinitionUpdateTimeToLive() {
+    //given
+    ProcessDefinitionEntity processDefinition = findOnlyProcessDefinition();
+
+    //when
+    repositoryService.updateProcessDefinitionTimeToLive(processDefinition.getId(), 6);
+
+    //then
+    processDefinition = findOnlyProcessDefinition();
+    assertEquals(6, processDefinition.getTimeToLive().intValue());
+
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testProcessDefinitionUpdateTimeToLiveNull() {
+    //given
+    ProcessDefinitionEntity processDefinition = findOnlyProcessDefinition();
+
+    //when
+    repositoryService.updateProcessDefinitionTimeToLive(processDefinition.getId(), null);
+
+    //then
+    processDefinition = findOnlyProcessDefinition();
+    assertEquals(null, processDefinition.getTimeToLive());
+
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testProcessDefinitionUpdateTimeToLiveNegative() {
+    //given
+    ProcessDefinitionEntity processDefinition = findOnlyProcessDefinition();
+
+    //when
+    try {
+      repositoryService.updateProcessDefinitionTimeToLive(processDefinition.getId(), -1);
+      fail("Exception is expected, that negative velue is not allowed.");
+    } catch (BadUserRequestException ex) {
+      assertTrue(ex.getMessage().contains("greater than"));
+    }
+
+  }
+
+  private ProcessDefinitionEntity findOnlyProcessDefinition() {
+    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
+    assertNotNull(processDefinitions);
+    assertEquals(1, processDefinitions.size());
+    return (ProcessDefinitionEntity)processDefinitions.get(0);
   }
 
   public void testProcessDefinitionIntrospection() {

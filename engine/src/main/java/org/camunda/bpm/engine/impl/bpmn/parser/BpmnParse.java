@@ -538,6 +538,8 @@ public class BpmnParse extends Parse {
     processDefinition.setVersionTag(
       processElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "versionTag")
     );
+    processDefinition.setTimeToLive(parseIntegerAttribute(processElement, "timeToLive",
+        processElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "timeToLive"), false));
 
     LOG.parsingElement("process", processDefinition.getKey());
 
@@ -4311,6 +4313,21 @@ public class BpmnParse extends Parse {
       }
     }
     return -1.0;
+  }
+
+  public Integer parseIntegerAttribute(Element element, String attributeName, String integerText, boolean required) {
+    if (required && (integerText == null || integerText.isEmpty())) {
+      addError(attributeName + " is required", element);
+    } else {
+      if (integerText != null && !integerText.isEmpty()) {
+        try {
+          return Integer.parseInt(integerText);
+        } catch (NumberFormatException e) {
+          addError("Cannot parse " + attributeName + ": " + e.getMessage(), element);
+        }
+      }
+    }
+    return null;
   }
 
   protected boolean isExclusive(Element element) {
