@@ -28,6 +28,7 @@ import java.util.List;
  */
 public class DeleteProcessInstanceBatchConfiguration extends BatchConfiguration {
   protected String deleteReason;
+  protected boolean skipCustomListeners;
 
   public DeleteProcessInstanceBatchConfiguration(List<String> ids) {
     super(ids);
@@ -38,12 +39,31 @@ public class DeleteProcessInstanceBatchConfiguration extends BatchConfiguration 
     this.deleteReason = deleteReason;
   }
 
+  public DeleteProcessInstanceBatchConfiguration(List<String> ids, String deleteReason, boolean skipCustomListeners) {
+    super(ids);
+    this.deleteReason = deleteReason;
+    this.skipCustomListeners = skipCustomListeners;
+  }
+
+  public DeleteProcessInstanceBatchConfiguration(List<String> ids, boolean skipCustomListeners) {
+    super(ids);
+    this.skipCustomListeners = skipCustomListeners;
+  }
+
   public String getDeleteReason() {
     return deleteReason;
   }
 
   public void setDeleteReason(String deleteReason) {
     this.deleteReason = deleteReason;
+  }
+
+  public boolean isSkipCustomListeners() {
+    return skipCustomListeners;
+  }
+
+  public void setSkipCustomListeners(boolean skipCustomListeners) {
+    this.skipCustomListeners = skipCustomListeners;
   }
 
 }

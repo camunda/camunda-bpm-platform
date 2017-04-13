@@ -262,6 +262,24 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
     assertThat(runtimeService.createProcessInstanceQuery().list().size(), is(0));
   }
 
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
+  @Test
+  public void testDeleteProcessInstancesAsyncWithSkipCustomListeners(){
+    // given
+    List<String> processIds = startTestProcesses(2);
+
+    // when
+    Batch batch = runtimeService.deleteProcessInstancesAsync(processIds, null, TESTING_INSTANCE_DELETE, true);
+
+    executeSeedJob(batch);
+    executeBatchJobs(batch);
+
+    // then
+    assertHistoricTaskDeletionPresent(processIds, TESTING_INSTANCE_DELETE, testRule);
+    assertHistoricBatchExists(testRule);
+    assertProcessInstancesAreDeleted();
+  }
+
   @Test
   public void testInvokeListenersWhenDeletingProcessInstancesAsync() {
 

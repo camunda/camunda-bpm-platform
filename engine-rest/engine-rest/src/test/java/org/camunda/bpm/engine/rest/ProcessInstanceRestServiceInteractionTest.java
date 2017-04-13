@@ -282,6 +282,21 @@ public class ProcessInstanceRestServiceInteractionTest extends
   }
 
   @Test
+  public void testDeleteAsyncWithSkipCustomListeners() {
+    when(runtimeServiceMock.deleteProcessInstancesAsync(anyListOf(String.class), any(ProcessInstanceQuery.class), anyString(), anyBoolean())).thenReturn(new BatchEntity());
+    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    messageBodyJson.put("deleteReason", TEST_DELETE_REASON);
+    messageBodyJson.put("processInstanceIds", Arrays.asList("processInstanceId1", "processInstanceId2"));
+    messageBodyJson.put("skipCustomListeners", true);
+
+    given()
+        .contentType(ContentType.JSON).body(messageBodyJson)
+        .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+        .when().post(DELETE_PROCESS_INSTANCES_ASYNC_URL);
+  }
+
+  @Test
   public void testGetVariablesWithNullValue() {
     Response response = given().pathParam("id", EXAMPLE_PROCESS_INSTANCE_ID_WITH_NULL_VALUE_AS_VARIABLE)
       .then().expect().statusCode(Status.OK.getStatusCode())

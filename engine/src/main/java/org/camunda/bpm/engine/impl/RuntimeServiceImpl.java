@@ -164,17 +164,21 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
 
   @Override
   public Batch deleteProcessInstancesAsync(List<String> processInstanceIds, ProcessInstanceQuery processInstanceQuery, String deleteReason) {
-    return commandExecutor.execute(new DeleteProcessInstanceBatchCmd(processInstanceIds, processInstanceQuery, deleteReason));
+    return deleteProcessInstancesAsync(processInstanceIds, processInstanceQuery, deleteReason, false);
   }
 
   @Override
   public Batch deleteProcessInstancesAsync(List<String> processInstanceIds, String deleteReason) {
-    return commandExecutor.execute(new DeleteProcessInstanceBatchCmd(processInstanceIds, null, deleteReason));
+    return deleteProcessInstancesAsync(processInstanceIds, null, deleteReason, false);
   }
 
   @Override
   public Batch deleteProcessInstancesAsync(ProcessInstanceQuery processInstanceQuery, String deleteReason) {
-    return commandExecutor.execute(new DeleteProcessInstanceBatchCmd(null, processInstanceQuery, deleteReason));
+    return deleteProcessInstancesAsync(null, processInstanceQuery, deleteReason, false);
+  }
+
+  public Batch deleteProcessInstancesAsync(List<String> processInstanceIds, ProcessInstanceQuery processInstanceQuery, String deleteReason, boolean skipCustomListeners) {
+    return commandExecutor.execute(new DeleteProcessInstanceBatchCmd(processInstanceIds, processInstanceQuery, deleteReason, skipCustomListeners));
   }
 
   @Override

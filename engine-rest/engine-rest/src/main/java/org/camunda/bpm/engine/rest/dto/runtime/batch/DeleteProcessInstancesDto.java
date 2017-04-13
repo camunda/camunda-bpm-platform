@@ -11,7 +11,7 @@ public class DeleteProcessInstancesDto {
   protected List<String> processInstanceIds;
   protected ProcessInstanceQueryDto processInstanceQuery;
   protected String deleteReason;
-
+  protected boolean skipCustomListeners;
 
   public List<String> getProcessInstanceIds() {
     return processInstanceIds;
@@ -36,4 +36,13 @@ public class DeleteProcessInstancesDto {
   public void setDeleteReason(String deleteReason) {
     this.deleteReason = deleteReason;
   }
+
+  public boolean isSkipCustomListeners() {
+    return skipCustomListeners;
+  }
+
+  public void setSkipCustomListeners(boolean skipCustomListeners) {
+    this.skipCustomListeners = skipCustomListeners;
+  }
+
 }
