@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<definitions id="definitions"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             targetNamespace="Examples">
+
+    <process id="mocksTest"
+             isExecutable="true">
+
+        <startEvent id="theStart" />
+
+        <sequenceFlow sourceRef="theStart"
+                      targetRef="exclusiveGateway" />
+
+        <exclusiveGateway id="exclusiveGateway" />
+
+        <sequenceFlow sourceRef="exclusiveGateway"
+                      targetRef="redTask">
+            <conditionExpression xsi:type="tFormalExpression">
+                ${myMock.getTask() == 'red'}
+            </conditionExpression>
+        </sequenceFlow>
+
+        <sequenceFlow sourceRef="exclusiveGateway"
+                      targetRef="yellowTask">
+            <conditionExpression xsi:type="tFormalExpression">
+                ${myMock.getTask() == 'yellow'}
+            </conditionExpression>
+        </sequenceFlow>
+
+        <sequenceFlow sourceRef="exclusiveGateway"
+                      targetRef="greenTask">
+            <conditionExpression xsi:type="tFormalExpression">
+                ${myMock.getTask() == 'green'}
+            </conditionExpression>
+        </sequenceFlow>
+
+        <userTask id="redTask"
+                  name="A Red Task" />
+
+        <userTask id="yellowTask"
+                  name="A Yellow Task" />
+
+        <userTask id="greenTask"
+                  name="A Green Task" />
+
+    </process>
+
+</definitions>
