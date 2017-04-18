@@ -20,7 +20,7 @@
             #{suspensionState, jdbcType=INTEGER},
             #{tenantId, jdbcType=VARCHAR},
             #{versionTag, jdbcType=VARCHAR},
-            #{timeToLive, jdbcType=VARCHAR},
+            #{timeToLive, jdbcType=INTEGER},
             1
            )
   </insert>
