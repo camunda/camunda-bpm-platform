@@ -31,7 +31,7 @@
     update ${prefix}ACT_RE_PROCDEF set
       REV_ = #{revisionNext, jdbcType=INTEGER},
       SUSPENSION_STATE_ = #{suspensionState, jdbcType=INTEGER},
-      TTL_ = #{timeToLive, jdbcType=VARCHAR}
+      TTL_ = #{timeToLive, jdbcType=INTEGER}
     where ID_ = #{id, jdbcType=VARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
   </update>
