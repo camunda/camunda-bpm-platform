@@ -1414,6 +1414,21 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
 
     verify(mockRepositoryService).deleteDeployment(MockProvider.EXAMPLE_DEPLOYMENT_ID, true, false, true);
   }
+  
+  @Test
+  public void testDeleteDeploymentSkipIoMappingsFalse() {
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_DEPLOYMENT_ID)
+      .queryParam("cascade", true)
+      .queryParam("skipIoMappings", false)
+    .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .delete(DEPLOYMENT_URL);
+
+    verify(mockRepositoryService).deleteDeployment(MockProvider.EXAMPLE_DEPLOYMENT_ID, true, false, false);
+  }
 
   @Test
   public void testDeleteNonExistingDeployment() {
