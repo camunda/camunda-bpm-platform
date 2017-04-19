@@ -107,7 +107,6 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
 
   @Override
   public ProcessInstanceDto startProcessInstance(UriInfo context, StartProcessInstanceDto parameters) {
-    parameters = parameters == null ? new StartProcessInstanceDto() : parameters;
     ProcessInstanceWithVariables instance = null;
     try {
       instance = startProcessInstanceAtActivities(parameters);
