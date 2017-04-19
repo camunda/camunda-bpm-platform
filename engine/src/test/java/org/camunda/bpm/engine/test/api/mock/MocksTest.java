@@ -15,32 +15,55 @@ package org.camunda.bpm.engine.test.api.mock;
 import java.util.HashMap;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.mock.Mocks;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertNull;
+import static junit.framework.TestCase.assertTrue;
+import static junit.framework.TestCase.fail;
 
 /**
  * @author Tassilo Weidner
  */
-public class MocksTest extends PluggableProcessEngineTestCase {
+public class MocksTest {
+  @Rule
+  public ProcessEngineRule rule = new ProvidedProcessEngineRule();
 
+  protected RuntimeService runtimeService;
+  protected TaskService taskService;
+
+  @Before
+  public void initServices() {
+    runtimeService = rule.getRuntimeService();
+    taskService = rule.getTaskService();
+  }
+
+  @Test
   public void testMethodsOfMocksAPI() {
     //given
     HashMap<String, Object> map = new HashMap<String, Object>();
 
-    for(int i = 0; i < 5; i++) {
+    for (int i = 0; i < 5; i++) {
       map.put("key" + i, new Object());
     }
 
     //when
-    for(String key : map.keySet()) {
+    for (String key : map.keySet()) {
       Mocks.register(key, map.get(key));
     }
 
     //then
-    for(String key : map.keySet()) {
+    for (String key : map.keySet()) {
       assertEquals(map.get(key), Mocks.get(key));
     }
 
@@ -48,13 +71,14 @@ public class MocksTest extends PluggableProcessEngineTestCase {
 
     Mocks.reset();
 
-    for(String key : map.keySet()) {
+    for (String key : map.keySet()) {
       assertNull(Mocks.get(key));
     }
 
     assertEquals(0, Mocks.getMocks().size());
   }
 
+  @Test
   @Deployment
   public void testUnknownMethodInCamundaExpressionAppliedOnServiceTask() {
     //given
@@ -72,6 +96,7 @@ public class MocksTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   @Deployment
   public void testCamundaExpressionAppliedOnServiceTask() {
     //given
@@ -95,6 +120,7 @@ public class MocksTest extends PluggableProcessEngineTestCase {
     assertEquals("testValue", runtimeService.getVariable(pi.getId(), "testVar"));
   }
 
+  @Test
   @Deployment
   public void testConditionExpressionAppliedOnExclusiveGateway() {
     //given
