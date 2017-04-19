@@ -1,7 +1,9 @@
   'use strict';
   module.exports = [
-    '$scope', '$location', 'Notifications', 'ProcessInstanceResource', '$modalInstance', 'processInstance', 'processData', 'Views',
-    function($scope,   $location,   Notifications,   ProcessInstanceResource,   $modalInstance,   processInstance,   processData,   Views) {
+    '$scope', '$location', 'Notifications', 'ProcessInstanceResource',
+    '$modalInstance', 'processInstance', 'processData', 'Views',
+    function($scope,   $location,   Notifications,   ProcessInstanceResource,
+      $modalInstance,   processInstance,   processData,   Views) {
 
       var BEFORE_CANCEL = 'beforeCancellation',
           PERFORM_CANCEL = 'performCancellation',
@@ -11,6 +13,10 @@
       $scope.processInstance = processInstance;
 
       var cancelProcessInstanceData = processData.newChild($scope);
+
+      $scope.options = {
+        skipCustomListeners: false
+      };
 
       $scope.$on('$routeChangeStart', function() {
         $modalInstance.close($scope.status);
@@ -32,7 +38,7 @@
         }).$promise;
       });
 
-      cancelProcessInstanceData.observe([ 'subProcessInstancesCount', 'subProcessInstances' ], function(subProcessInstancesCount, subProcessInstances) {
+      cancelProcessInstanceData.observe(['subProcessInstancesCount', 'subProcessInstances'], function(subProcessInstancesCount, subProcessInstances) {
         $scope.subProcessInstancesCount = subProcessInstancesCount.count;
         $scope.subProcessInstances = subProcessInstances;
 
@@ -42,7 +48,7 @@
       $scope.cancelProcessInstance = function() {
         $scope.status = PERFORM_CANCEL;
 
-        $scope.processInstance.$delete(function() {
+        $scope.processInstance.$delete($scope.options, function() {
         // success
           $scope.status = CANCEL_SUCCESS;
           Notifications.addMessage({'status': 'Canceled', 'message': 'The cancellation of the process instance was successful.'});
