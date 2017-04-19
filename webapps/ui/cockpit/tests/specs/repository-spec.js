@@ -77,7 +77,7 @@ describe('Repository Spec', function() {
 
   });
 
-  describe('deployments search', function() {
+  describe.skip('deployments search', function() {
 
     before(function() {
       return testHelper(setupFile.setup1, function() {

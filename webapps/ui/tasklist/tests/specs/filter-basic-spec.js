@@ -7,7 +7,7 @@ var dashboardPage = require('../pages/dashboard');
 var editModalPage = dashboardPage.taskFilters.editFilterPage;
 
 
-describe('Tasklist Filter Basic Spec', function() {
+describe.skip('Tasklist Filter Basic Spec', function() {
 
   describe('initial validation', function() {
 

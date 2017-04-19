@@ -8,7 +8,7 @@ var taskViewPage = dashboardPage.currentTask;
 var taskListPage = dashboardPage.taskList;
 
 
-describe('Task Dates Spec', function() {
+describe.skip('Task Dates Spec', function() {
 
   describe('follow-up dates', function() {
 

@@ -10,7 +10,7 @@ var dashboardPage = require('../pages/dashboard');
 var createTaskDialogPage = dashboardPage.createTask;
 
 
-describe('Tasklist Create Task Spec', function () {
+describe.skip('Tasklist Create Task Spec', function () {
 
   describe('create task without tenant', function() {
 
