@@ -20,6 +20,7 @@
     <module>extension</module>
     <module>examples</module>
     <module>maven</module>
+    <module>gradle</module>
     <module>docs</module>
   </modules>
 
