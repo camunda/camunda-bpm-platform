@@ -47,6 +47,32 @@
       </table>
     </div>
 
+    <form class="form-horizontal"
+          name="deleteDeploymentForm"
+          novalidate
+          request-aware>
+      <div class="form-group skip-custom-listener">
+
+        <label class="control-label col-xs-5"
+               for="skipCustomListeners">
+          Skip Custom Listeners
+          <span class="glyphicon glyphicon-question-sign"
+                tooltip="If the value is enabled, only built-in listeners will be notified with the end event."
+                tooltip-placement="right">
+          </span>
+        </label>
+
+        <div class="col-xs-7">
+          <label class="checkbox">
+            <input name="skipCustomListeners"
+                   type="checkbox"
+                   ng-model="options.skipCustomListeners">
+          </label>
+        </div>
+
+      </div>
+    </form>
+
     <p>Do you really want to cancel this process instance?</p>
   </div>
 
