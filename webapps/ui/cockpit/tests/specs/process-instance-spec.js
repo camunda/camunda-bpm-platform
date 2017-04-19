@@ -11,7 +11,7 @@ var definitionPage = require('../pages/process-definition');
 var instancePage = require('../pages/process-instance');
 
 
-describe('Cockpit Process Instance Spec', function() {
+describe.skip('Cockpit Process Instance Spec', function() {
 
   describe('page navigation', function() {
 

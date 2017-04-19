@@ -10,7 +10,7 @@ var dashboardPage = require('../pages/dashboard');
 var startDialogPage = dashboardPage.startProcess;
 
 
-describe('Tasklist Start Spec', function () {
+describe.skip('Tasklist Start Spec', function () {
 
   describe('start process dialog', function() {
 
