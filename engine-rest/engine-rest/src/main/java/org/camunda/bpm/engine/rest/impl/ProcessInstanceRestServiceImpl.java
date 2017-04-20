@@ -133,19 +133,12 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
     Batch batch = null;
 
     try {
-      if (dto.isSkipCustomListeners()) {
+
         batch = runtimeService.deleteProcessInstancesAsync(
         dto.getProcessInstanceIds(),
         processInstanceQuery,
         dto.getDeleteReason(),
         dto.isSkipCustomListeners());
-      }
-      else {
-        batch = runtimeService.deleteProcessInstancesAsync(
-            dto.getProcessInstanceIds(),
-            processInstanceQuery,
-            dto.getDeleteReason());
-      }
 
       return BatchDto.fromBatch(batch);
     }
@@ -153,7 +146,6 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
       throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());
     }
   }
-
 
   @Override
   public BatchDto setRetriesByProcess(SetJobRetriesByProcessDto setJobRetriesDto) {

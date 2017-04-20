@@ -45,11 +45,6 @@ public class DeleteProcessInstanceBatchConfiguration extends BatchConfiguration 
     this.skipCustomListeners = skipCustomListeners;
   }
 
-  public DeleteProcessInstanceBatchConfiguration(List<String> ids, boolean skipCustomListeners) {
-    super(ids);
-    this.skipCustomListeners = skipCustomListeners;
-  }
-
   public String getDeleteReason() {
     return deleteReason;
   }
