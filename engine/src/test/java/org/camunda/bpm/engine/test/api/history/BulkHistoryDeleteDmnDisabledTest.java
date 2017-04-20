@@ -18,15 +18,17 @@ import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.impl.ProcessEngineImpl;
-import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
-import org.camunda.bpm.engine.impl.test.TestHelper;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
+import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.RuleChain;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -35,26 +37,26 @@ import static org.junit.Assert.assertEquals;
  */
 public class BulkHistoryDeleteDmnDisabledTest {
 
-  private ProcessEngineImpl processEngineImpl;
-  private RepositoryService repositoryService;
+  protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
+    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+      configuration.setDmnEnabled(false);
+      return configuration;
+    }
+  };
+
+  protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
+  public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
+
+  @Rule
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
+
   private RuntimeService runtimeService;
   private HistoryService historyService;
 
   @Before
   public void createProcessEngine() {
-    processEngineImpl = createProcessEngineImpl(false);
-    repositoryService = processEngineImpl.getRepositoryService();
-    runtimeService = processEngineImpl.getRuntimeService();
-    historyService = processEngineImpl.getHistoryService();
-
-  }
-
-  // make sure schema is dropped
-  @After
-  public void cleanup() {
-    TestHelper.dropSchema(processEngineImpl.getProcessEngineConfiguration());
-    processEngineImpl.close();
-    processEngineImpl = null;
+    runtimeService = engineRule.getRuntimeService();
+    historyService = engineRule.getHistoryService();
 
   }
 
@@ -65,7 +67,7 @@ public class BulkHistoryDeleteDmnDisabledTest {
           .userTask("userTask")
         .endEvent()
         .done();
-    repositoryService.createDeployment().addModelInstance("process.bpmn", model).deploy();
+    testRule.deploy(model);
     List<String> ids = prepareHistoricProcesses("someProcess");
     runtimeService.deleteProcessInstances(ids, null, true, true);
 
@@ -85,19 +87,6 @@ public class BulkHistoryDeleteDmnDisabledTest {
     }
 
     return processInstanceIds;
-  }
-
-  protected ProcessEngineImpl createProcessEngineImpl(boolean dmnEnabled) {
-    StandaloneInMemProcessEngineConfiguration config =
-        (StandaloneInMemProcessEngineConfiguration) new StandaloneInMemProcessEngineConfiguration()
-               .setProcessEngineName("database-dmn-test-engine")
-               .setDatabaseSchemaUpdate("true")
-               .setHistory(ProcessEngineConfiguration.HISTORY_FULL)
-               .setJdbcUrl("jdbc:h2:mem:DatabaseDmnTest");
-
-    config.setDmnEnabled(dmnEnabled);
-
-    return (ProcessEngineImpl) config.buildProcessEngine();
   }
 
 }
