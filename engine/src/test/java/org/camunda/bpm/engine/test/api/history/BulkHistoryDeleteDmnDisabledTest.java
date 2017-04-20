@@ -16,10 +16,10 @@ import java.util.ArrayList;
 import java.util.List;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
-import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
@@ -35,6 +35,7 @@ import static org.junit.Assert.assertEquals;
  * @author Svetlana Dorokhova
  *
  */
+@RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
 public class BulkHistoryDeleteDmnDisabledTest {
 
   protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
