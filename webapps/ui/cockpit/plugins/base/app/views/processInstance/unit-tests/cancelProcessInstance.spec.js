@@ -22,7 +22,6 @@ describe('cockpit.plugin.process-instance-runtime-tab ProcessInstanceRuntimeTabC
   var processInstance;
   var processData;
   var Views;
-  var instance;
 
   beforeEach(module(testModule.name));
 
@@ -71,7 +70,7 @@ describe('cockpit.plugin.process-instance-runtime-tab ProcessInstanceRuntimeTabC
       getProvider: sinon.stub().returnsThis()
     };
 
-    instance = $controller(cancelInstanceDialog, {
+    $controller(cancelInstanceDialog, {
       $scope: $scope,
       $location: $location,
       Notifications: Notifications,
