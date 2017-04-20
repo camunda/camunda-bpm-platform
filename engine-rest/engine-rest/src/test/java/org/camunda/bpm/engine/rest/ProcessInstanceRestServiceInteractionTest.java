@@ -62,7 +62,6 @@ import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.FileValue;
 import org.camunda.bpm.engine.variable.value.LongValue;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
-import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -293,6 +292,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
         .then().expect()
         .statusCode(Status.OK.getStatusCode())
         .when().post(DELETE_PROCESS_INSTANCES_ASYNC_URL);
+
+    verify(runtimeServiceMock).deleteProcessInstancesAsync(anyListOf(String.class), Mockito.any(ProcessInstanceQuery.class), Mockito.eq(TEST_DELETE_REASON), Mockito.eq(true));
   }
 
   @Test

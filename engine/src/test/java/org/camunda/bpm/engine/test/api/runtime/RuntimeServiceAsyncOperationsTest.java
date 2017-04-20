@@ -16,6 +16,7 @@ package org.camunda.bpm.engine.test.api.runtime;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
@@ -35,6 +36,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 import org.camunda.bpm.engine.test.api.runtime.util.IncrementCounterListener;
+import org.camunda.bpm.engine.test.bpmn.multiinstance.RecordInvocationListener;
 
 import java.util.*;
 
@@ -262,11 +264,19 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
     assertThat(runtimeService.createProcessInstanceQuery().list().size(), is(0));
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   @Test
-  public void testDeleteProcessInstancesAsyncWithSkipCustomListeners(){
+  public void testDeleteProcessInstancesAsyncWithSkipCustomListeners() {
+
     // given
-    List<String> processIds = startTestProcesses(2);
+    BpmnModelInstance instance = ProcessModels.newModel(ONE_TASK_PROCESS)
+        .startEvent()
+        .userTask()
+          .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_END, RecordInvocationListener.class.getName())
+        .endEvent()
+        .done();
+
+    testRule.deploy(instance);
+    List<String> processIds = startTestProcesses(1);
 
     // when
     Batch batch = runtimeService.deleteProcessInstancesAsync(processIds, null, TESTING_INSTANCE_DELETE, true);
@@ -278,6 +288,7 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
     assertHistoricTaskDeletionPresent(processIds, TESTING_INSTANCE_DELETE, testRule);
     assertHistoricBatchExists(testRule);
     assertProcessInstancesAreDeleted();
+    assertThat(RecordInvocationListener.INVOCATIONS.size(), is(0));
   }
 
   @Test
