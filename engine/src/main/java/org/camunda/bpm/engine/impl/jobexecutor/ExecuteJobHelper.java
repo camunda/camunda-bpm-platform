@@ -12,8 +12,11 @@
  */
 package org.camunda.bpm.engine.impl.jobexecutor;
 
+import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmd.ExecuteJobsCmd;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 
@@ -54,12 +57,37 @@ public class ExecuteJobHelper {
     if(jobFailureCollector.getJobId() != null) {
       if (jobFailureCollector.getFailure() != null) {
         // the failed job listener is responsible for decrementing the retries and logging the exception to the DB.
+
         FailedJobListener failedJobListener = createFailedJobListener(commandExecutor, jobFailureCollector.getFailure(), jobFailureCollector.getJobId());
-        commandExecutor.execute(failedJobListener);
+
+        //in case of OptimisticLockException we retry the FailedJobListener for configured amount of times
+        boolean succeeded = false;
+        OptimisticLockingException exception = null;
+        int failedJobListenerMaxRetries = getFailedJobListenerMaxRetries();
+        while (!succeeded && failedJobListener.getCountRetries() < failedJobListenerMaxRetries) {
+          try {
+            commandExecutor.execute(failedJobListener);
+            succeeded = true;
+          } catch (OptimisticLockingException ex) {
+            failedJobListener.incrementCountRetries();
+            exception = ex;
+          }
+        }
+        if (!succeeded) {
+          throw exception;
+        }
       } else {
         SuccessfulJobListener successListener = createSuccessfulJobListener(commandExecutor);
         commandExecutor.execute(successListener);
       }
+    }
+  }
+
+  private static int getFailedJobListenerMaxRetries() {
+    if (Context.getJobExecutorContext() != null) {
+      return Context.getJobExecutorContext().getFailedJobListenerMaxRetries();
+    } else {
+      return ProcessEngineConfigurationImpl.DEFAULT_FAILED_JOB_LISTENER_MAX_RETRIES;
     }
   }
 

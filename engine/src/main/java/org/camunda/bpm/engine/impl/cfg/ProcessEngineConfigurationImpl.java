@@ -342,6 +342,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public static final String DEFAULT_MYBATIS_MAPPING_FILE = "org/camunda/bpm/engine/impl/mapping/mappings.xml";
 
+  public static final int DEFAULT_FAILED_JOB_LISTENER_MAX_RETRIES = 3;
+
   public static SqlSessionFactory cachedSqlSessionFactory;
 
   // SERVICES /////////////////////////////////////////////////////////////////
@@ -677,6 +679,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   private String batchWindowEndTime = "00:00";
   private int historyCleanupBatchSize = 500;
   private int historyCleanupBatchThreshold = 10;
+
+  private int failedJobListenerMaxRetries = DEFAULT_FAILED_JOB_LISTENER_MAX_RETRIES;
 
   // buildProcessEngine ///////////////////////////////////////////////////////
 
@@ -3616,5 +3620,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setHistoryCleanupBatchThreshold(int historyCleanupBatchThreshold) {
     this.historyCleanupBatchThreshold = historyCleanupBatchThreshold;
+  }
+
+  public int getFailedJobListenerMaxRetries() {
+    return failedJobListenerMaxRetries;
+  }
+
+  public void setFailedJobListenerMaxRetries(int failedJobListenerMaxRetries) {
+    this.failedJobListenerMaxRetries = failedJobListenerMaxRetries;
   }
 }

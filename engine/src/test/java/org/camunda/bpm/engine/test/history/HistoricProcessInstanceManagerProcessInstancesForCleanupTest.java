@@ -71,7 +71,7 @@ public class HistoricProcessInstanceManagerProcessInstancesForCleanupTest {
   public int daysPassedAfterProcessEnd;
 
   @Parameterized.Parameter(5)
-  public int bunchSize;
+  public int batchSize;
 
   @Parameterized.Parameter(6)
   public int resultCount;
@@ -84,7 +84,7 @@ public class HistoricProcessInstanceManagerProcessInstancesForCleanupTest {
         { 3, 5, 3, 7, 2, 50, 0 },
         //all historic process instances are old enough to be cleaned up
         { 3, 5, 3, 7, 6, 50, 10 },
-        //bunchSize will reduce the result
+        //batchSize will reduce the result
         { 3, 5, 3, 7, 6, 4, 4 }
     });
   }
@@ -117,7 +117,8 @@ public class HistoricProcessInstanceManagerProcessInstancesForCleanupTest {
       @Override
       public Object execute(CommandContext commandContext) {
         //when
-        List<String> historicProcessInstanceIdsForCleanup = commandContext.getHistoricProcessInstanceManager().findHistoricProcessInstanceIdsForCleanup(bunchSize);
+        List<String> historicProcessInstanceIdsForCleanup = commandContext.getHistoricProcessInstanceManager().findHistoricProcessInstanceIdsForCleanup(
+            batchSize);
 
         //then
         assertEquals(resultCount, historicProcessInstanceIdsForCleanup.size());

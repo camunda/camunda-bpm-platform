@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl.jobexecutor;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.db.entitymanager.cache.DbEntityCache;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 
@@ -30,6 +31,8 @@ public class JobExecutorContext {
 
   /** reusable cache */
   protected DbEntityCache entityCache;
+
+  protected int failedJobListenerMaxRetries = ProcessEngineConfigurationImpl.DEFAULT_FAILED_JOB_LISTENER_MAX_RETRIES;
 
   public List<String> getCurrentProcessorJobQueue() {
     return currentProcessorJobQueue;
@@ -55,4 +58,11 @@ public class JobExecutorContext {
     this.entityCache = entityCache;
   }
 
+  public int getFailedJobListenerMaxRetries() {
+    return failedJobListenerMaxRetries;
+  }
+
+  public void setFailedJobListenerMaxRetries(int failedJobListenerMaxRetries) {
+    this.failedJobListenerMaxRetries = failedJobListenerMaxRetries;
+  }
 }

@@ -30,6 +30,7 @@ public class FailedJobListener implements Command<Void> {
   protected String jobId;
   protected Throwable exception;
   private final static JobExecutorLogger LOG = ProcessEngineLogger.JOB_EXECUTOR_LOGGER;
+  private Integer countRetries = 0;
 
   public FailedJobListener(CommandExecutor commandExecutor, String jobId, Throwable exception) {
     this.commandExecutor = commandExecutor;
@@ -84,4 +85,11 @@ public class FailedJobListener implements Command<Void> {
     }
   }
 
+  public Integer getCountRetries() {
+    return countRetries;
+  }
+
+  public void incrementCountRetries() {
+    this.countRetries++;
+  }
 }
