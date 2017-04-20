@@ -1027,13 +1027,13 @@ public class FormServiceTest extends PluggableProcessEngineTestCase {
 
   @Deployment
   public void testSubmitStartFormWithFormFieldMarkedAsBusinessKey() {
-    String procDefId = repositoryService.createProcessDefinitionQuery().singleResult().getId();// runtimeService.startProcessInstanceByKey("FormPropertyDefaultValueTest.testDefaultValue");
+    String procDefId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
     ProcessInstance pi = formService.submitStartForm(procDefId, "foo", Variables.createVariables().putValue("secondParam", "bar"));
 
     assertEquals("foo", pi.getBusinessKey());
 
     List<VariableInstance> result = runtimeService.createVariableInstanceQuery().list();
     assertEquals(1, result.size());
-    assert (result.get(0).getName().equals("secondParam"));
+    assertTrue(result.get(0).getName().equals("secondParam"));
   }
 }
