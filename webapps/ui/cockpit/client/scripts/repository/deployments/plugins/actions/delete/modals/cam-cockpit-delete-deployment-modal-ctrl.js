@@ -24,7 +24,8 @@ module.exports = [
 
     var options = $scope.options = {
       cascade: false,
-      skipCustomListeners: true
+      skipCustomListeners: true,
+      skipIoMappings: true
     };
 
     $scope.deployment = deployment;
