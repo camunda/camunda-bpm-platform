@@ -67,6 +67,27 @@
 
       </div>
 
+      <div class="form-group skip-custom-listener">
+
+        <label class="control-label col-xs-5"
+               for="skipIoMappings">
+          Skip IO Mappings
+          <span class="glyphicon glyphicon-question-sign"
+                tooltip="If the value is enabled IO mappings will be skipped during deployment removal."
+                tooltip-placement="right">
+          </span>
+        </label>
+
+        <div class="col-xs-7">
+          <label class="checkbox">
+            <input name="skipIoMappings"
+                   type="checkbox"
+                   ng-model="options.skipIoMappings">
+          </label>
+        </div>
+
+      </div>
+
     </form>
 
     Are you sure to delete the given deployment?
