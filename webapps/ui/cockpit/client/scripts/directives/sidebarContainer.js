@@ -1,6 +1,7 @@
 'use strict';
 
 var $ = require('jquery');
+var angular = require('camunda-commons-ui/vendor/angular');
 
 require('jquery-ui/draggable');
 
@@ -31,7 +32,8 @@ module.exports = ['localConf', '$rootScope', function(localConf, $rootScope) {
         }
       }
 
-      var originalCollapsabled = localConf.get('ctnCollapsableParent:collapsed:'+ containerId, 'no');
+      var previouslyCollapsed = localConf.get('ctnCollapsableParent:collapsed:'+ containerId, 'no');
+      var previouslyMaximized = localConf.get('ctnCollapsableParent:maximized:'+ containerId, 'no');
 
         // the main element that compensates the collapsing
       var compensateElement = collapsableElement[direction === 'left' || direction === 'top' ? 'next' : 'prev']();
@@ -54,23 +56,47 @@ module.exports = ['localConf', '$rootScope', function(localConf, $rootScope) {
               .addClass('expand-collapse')
               .append('<i class="glyphicon glyphicon-menu-' + (vertical ? 'left' : 'up') + '"></i>');
 
+      var maximizeHandle =
+          collapsableElement
+            .children('.maximize-collapsable')
+              .addClass('expand-collapse')
+              .append('<i class="glyphicon glyphicon-resize-full"></i>');
+
+      var maximizeDirection = maximizeHandle.attr('maximize-parent-direction');
+
+      var restoreHandle =
+          collapsableElement
+            .children('.restore-collapsable')
+              .addClass('expand-collapse')
+              .append('<i class="glyphicon glyphicon-resize-small"></i>');
+
         /**
          * Toggle show / hide handles
          */
-      function setCollapsed(collapsed) {
+      function setCollapsed(collapsed, maximized) {
         if (collapsed) {
           hideHandle.hide();
+          maximizeHandle.hide();
+          restoreHandle.hide();
           showHandle.css('display', 'block');
         } else {
           showHandle.hide();
           hideHandle.css('display', 'block');
         }
 
+        if (maximized) {
+          maximizeHandle.hide();
+          restoreHandle.css('display', 'block');
+        } else if (!collapsed) {
+          maximizeHandle.css('display', 'block');
+          restoreHandle.hide();
+        }
+
         localConf.set('ctnCollapsableParent:collapsed:'+ containerId, collapsed ? 'yes' : 'no');
+        localConf.set('ctnCollapsableParent:maximized:'+ containerId, maximized ? 'yes' : 'no');
       }
 
       function initResize() {
-
         var changeAttr = vertical ? 'width' : 'height';
         var resizeHandleAttachAttr = vertical ? 'left' : 'top';
         var changeAxis = vertical ? 'x' : 'y';
@@ -104,13 +130,23 @@ module.exports = ['localConf', '$rootScope', function(localConf, $rootScope) {
 
         originalCollapsableSize = Math.max(minWidth, originalCollapsableSize);
 
-        if (originalCollapsabled === 'yes') {
+        if (previouslyCollapsed === 'yes') {
           collapsableElement.css(changeAttr, 0);
           compensateElement.css(direction, 0);
         }
         else {
           collapsableElement.css(changeAttr, originalCollapsableSize);
           compensateElement.css(direction, originalCollapsableSize +'px');
+        }
+
+        if (previouslyMaximized === 'yes') {
+          var maxSize = element[changeAttr]();
+
+          setCollapsed(false, true);
+
+          resizeHandle.css(createOffset(maxSize));
+          collapsableElement.css(createSize(maxSize));
+          compensateElement.css(createOffset(maxSize));
         }
 
         function updateResizeHandlePosition() {
@@ -129,52 +165,44 @@ module.exports = ['localConf', '$rootScope', function(localConf, $rootScope) {
         $(resizeHandle)
             .draggable({ axis: changeAxis, containment: 'parent'})
             .on('drag', function() {
-              var position = resizeHandle.position();
-              var pos = position[direction];
-
-              if (direction === 'right') {
-                pos = container.width() - position.left;
-              }
-
-              if (direction === 'bottom') {
-                pos = container.height() - position.top;
-              }
-
-              if(pos < minWidth) {
-                pos = 0;
-              }
+              var pos = getPos();
 
               // update collapsed state on drag
-              setCollapsed(pos < 10);
+              setCollapsed(isCollapsed(), isCurrentlyMaximized());
 
               collapsableElement.css(changeAttr, pos);
               compensateElement.css(direction, pos);
 
               localConf.set('ctnCollapsableParent:size:'+ containerId, pos);
             })
-            .on('dragstop', function(event) {
+            .on('dragstop', function() {
               updateResizeHandlePosition();
 
-              $rootScope.$broadcast('resize', [ event ]);
+              $rootScope.$broadcast('resize', {
+                direction: direction,
+                collapsed: isCollapsed()
+              });
             });
 
         hideHandle.click(function() {
-          setCollapsed(true);
+          var targetSize = isCurrentlyMaximized() ? minWidth || originalCollapsableSize : 0;
 
-          resizeHandle.animate(createOffset(0));
+          setCollapsed(targetSize === 0, false);
+
+          resizeHandle.animate(createOffset(targetSize));
           collapsableElement
             .animate(
-              createSize(0),
+              createSize(targetSize),
               $rootScope.$broadcast.bind($rootScope, 'resize', {
                 direction: direction,
                 collapsed: true
               })
             );
-          compensateElement.animate(createOffset(0));
+          compensateElement.animate(createOffset(targetSize));
         });
 
         showHandle.click(function() {
-          setCollapsed(false);
+          setCollapsed(false, false);
 
           resizeHandle.animate(createOffset(minWidth || originalCollapsableSize));
           collapsableElement
@@ -188,16 +216,139 @@ module.exports = ['localConf', '$rootScope', function(localConf, $rootScope) {
           compensateElement.animate(createOffset(minWidth || originalCollapsableSize));
         });
 
+        maximizeHandle.click(function() {
+          $rootScope.$broadcast('maximize', {
+            source: element,
+            direction: maximizeDirection
+          });
+
+          maximize(
+            $rootScope.$broadcast.bind($rootScope, 'resize', {
+              direction: direction,
+              collapsed: false
+            })
+          );
+        });
+
+        restoreHandle.click(function() {
+          $rootScope.$broadcast('restore', {
+            source: element
+          });
+
+          restore(
+            $rootScope.$broadcast.bind($rootScope, 'resize', {
+              direction: direction,
+              collapsed: false
+            })
+          );
+        });
+
+        function maximize(callback) {
+          callback = callback || angular.noop;
+          var maxSize = element[changeAttr]();
+
+          setCollapsed(false, true);
+
+          resizeHandle.animate(createOffset(maxSize));
+          collapsableElement
+            .animate(
+              createSize(maxSize),
+              callback
+            );
+          compensateElement.animate(createOffset(maxSize));
+        }
+
+        function minimize(callback) {
+          callback = callback || angular.noop;
+          var minSize = 0;
+
+          setCollapsed(true, false);
+
+          resizeHandle.animate(createOffset(minSize));
+          collapsableElement
+            .animate(
+              createSize(minSize),
+              callback
+            );
+          compensateElement.animate(createOffset(minSize));
+        }
+
+        function restore(callback) {
+          setCollapsed(false, false);
+
+          resizeHandle.animate(createOffset(minWidth || originalCollapsableSize));
+          collapsableElement
+            .animate(
+              createSize(minWidth || originalCollapsableSize),
+              callback
+            );
+          compensateElement.animate(createOffset(minWidth || originalCollapsableSize));
+        }
+
         $(window).on('resize', updateResizeHandlePosition);
 
         scope.$on('$destroy', function() {
           $(window).off('resize', updateResizeHandlePosition);
         });
 
+        $rootScope.$on('restore', function(event, data) {
+          if (element !== data.source) {
+            restore();
+          }
+        });
+
+        $rootScope.$on('maximize', function(event, data) {
+          if (element !== data.source) {
+            if (data.direction === direction) {
+              minimize();
+            } else {
+              maximize();
+            }
+          }
+        });
+
+        $rootScope.$on('resize', function(event, data) {
+          if (data.direction === maximizeDirection) {
+            setCollapsed(isCollapsed(), data.collapsed && isCurrentlyMaximized());
+          }
+        });
+
+        function isCurrentlyMaximized() {
+          var pos = getPos();
+          var maxSize = element[changeAttr]();
+
+          return maxSize - Math.ceil(pos) < 10;
+        }
+
+        function isCollapsed() {
+          var pos = getPos();
+
+          return pos < 10;
+        }
+
         updateResizeHandlePosition();
+
+        function getPos() {
+          var position = resizeHandle.position();
+          var pos = position[direction];
+
+          if (direction === 'right') {
+            pos = container.width() - position.left;
+          }
+
+          if (direction === 'bottom') {
+            pos = container.height() - position.top;
+          }
+
+          if(pos < minWidth) {
+            pos = 0;
+          }
+
+          return pos;
+        }
       }
 
-      setCollapsed(originalCollapsabled === 'yes');
+      setCollapsed(previouslyCollapsed === 'yes', previouslyMaximized === 'yes');
       initResize();
     }
   };
