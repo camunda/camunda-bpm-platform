@@ -15,7 +15,8 @@
       var cancelProcessInstanceData = processData.newChild($scope);
 
       $scope.options = {
-        skipCustomListeners: true
+        skipCustomListeners: true,
+        skipIoMappings: true
       };
 
       $scope.$on('$routeChangeStart', function() {
