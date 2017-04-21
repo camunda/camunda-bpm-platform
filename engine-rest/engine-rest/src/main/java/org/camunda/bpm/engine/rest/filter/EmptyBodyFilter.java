@@ -19,7 +19,6 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -33,9 +32,12 @@ public class EmptyBodyFilter implements Filter {
   public void doFilter(final ServletRequest REQ, final ServletResponse RESP, FilterChain chain) throws IOException, ServletException {
 
     HttpServletRequest request = (HttpServletRequest) REQ;
-    Matcher matcher = CONTENT_TYPE_JSON_PATTERN.matcher(request.getContentType());
 
-    if ("POST".equals(request.getMethod()) && matcher.find() && request.getContentLength() <= 0) {
+    boolean isContentTypeJSON = CONTENT_TYPE_JSON_PATTERN
+      .matcher(request.getContentType() == null ? "" : request.getContentType())
+      .find();
+
+    if ("POST".equals(request.getMethod()) && isContentTypeJSON && request.getContentLength() == 0) {
 
       request = new HttpServletRequestWrapper(request) {
 
