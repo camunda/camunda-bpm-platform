@@ -56,8 +56,4 @@ public class Metrics {
    */
   public final static String EXECUTED_DECISION_ELEMENTS = "executed-decision-elements";
 
-  /**
-   * Number of historic process instances available for cleanup.
-   */
-  public final static String HISTORIC_PROCESS_INSTANCES_FOR_CLEANUP = "historic-process-instances-for-cleanup";
 }

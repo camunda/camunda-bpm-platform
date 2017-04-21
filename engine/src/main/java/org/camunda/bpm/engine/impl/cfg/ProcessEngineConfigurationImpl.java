@@ -1764,8 +1764,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     metricsRegistry.createMeter(Metrics.JOB_EXECUTION_REJECTED);
 
     metricsRegistry.createMeter(Metrics.EXECUTED_DECISION_ELEMENTS);
-
-    metricsRegistry.createMeter(Metrics.HISTORIC_PROCESS_INSTANCES_FOR_CLEANUP);
   }
 
   protected void initSerialization() {

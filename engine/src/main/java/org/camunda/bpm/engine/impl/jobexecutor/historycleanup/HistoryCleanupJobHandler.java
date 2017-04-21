@@ -41,13 +41,9 @@ public class HistoryCleanupJobHandler implements JobHandler<HistoryCleanupJobHan
       //find data to delete
       List<String> processInstanceIds = getProcessInstanceIds(commandContext);
       if (!processInstanceIds.isEmpty() && processInstanceIds.size() >= getBatchSizeThreshold(commandContext)) {
-        insertMetric(commandContext);
 
         //delete bunch of data
         commandContext.getHistoricProcessInstanceManager().deleteHistoricProcessInstanceByIds(processInstanceIds);
-
-        //TODO svt does not work as the removal is not flushed to the database yet CAM-7604
-        insertMetric(commandContext);
 
         //reschedule now
         commandContext.getJobManager().reschedule(jobEntity, ClockUtil.getCurrentTime());
@@ -97,12 +93,6 @@ public class HistoryCleanupJobHandler implements JobHandler<HistoryCleanupJobHan
   private void cancelCountEmptyRuns(HistoryCleanupJobHandlerConfiguration configuration, JobEntity jobEntity) {
     configuration.setCountEmptyRuns(0);
     jobEntity.setJobHandlerConfiguration(configuration);
-  }
-
-  private void insertMetric(CommandContext commandContext) {
-    long count = commandContext.getHistoricProcessInstanceManager().findHistoricProcessInstanceIdsForCleanupCount();
-    commandContext.getProcessEngineConfiguration().getMetricsRegistry().markValue(Metrics.HISTORIC_PROCESS_INSTANCES_FOR_CLEANUP, count);
-    commandContext.getProcessEngineConfiguration().getDbMetricsReporter().reportNow();
   }
 
   private List<String> getProcessInstanceIds(CommandContext commandContext) {

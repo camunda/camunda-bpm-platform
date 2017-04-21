@@ -38,10 +38,6 @@ public class Meter {
     counter.addAndGet(times);
   }
 
-  public void markValue(long times) {
-    counter.set(times);
-  }
-
   public String getName() {
     return name;
   }

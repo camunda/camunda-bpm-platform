@@ -43,14 +43,6 @@ public class MetricsRegistry {
     }
   }
 
-  public void markValue(String name, long value) {
-    Meter meter = meters.get(name);
-
-    if (meter != null) {
-      meter.markValue(value);
-    }
-  }
-
   public Meter createMeter(String name) {
     Meter meter = new Meter(name);
     meters.put(name, meter);
