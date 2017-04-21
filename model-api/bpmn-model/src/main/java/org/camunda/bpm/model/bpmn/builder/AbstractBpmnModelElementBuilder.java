@@ -70,7 +70,7 @@ public abstract class AbstractBpmnModelElementBuilder<B extends AbstractBpmnMode
     }
   }
 
-  protected E getElement() {
+  public E getElement() {
     return element;
   }
 }

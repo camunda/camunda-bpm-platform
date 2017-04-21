@@ -36,6 +36,7 @@ import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_USERS_API;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_USERS_LIST_API;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TRANSACTION_ID;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN20_NS;
+import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -160,6 +161,13 @@ public class ProcessBuilderTest {
 
     Process process = (Process) processes.iterator().next();
     assertThat(process.getId()).isNotNull();
+  }
+
+  @Test
+  public void testGetElement() {
+    // Make sure this method is publicly available
+    Process process = Bpmn.createProcess().getElement();
+    assertThat(process).isNotNull();
   }
 
   @Test
