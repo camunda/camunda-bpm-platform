@@ -268,10 +268,12 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
   public void testDeleteProcessInstancesAsyncWithSkipCustomListeners() {
 
     // given
+    IncrementCounterListener.counter = 0;
+
     BpmnModelInstance instance = ProcessModels.newModel(ONE_TASK_PROCESS)
         .startEvent()
         .userTask()
-          .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_END, RecordInvocationListener.class.getName())
+          .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_END, IncrementCounterListener.class.getName())
         .endEvent()
         .done();
 
@@ -280,21 +282,19 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
 
     // when
     Batch batch = runtimeService.deleteProcessInstancesAsync(processIds, null, TESTING_INSTANCE_DELETE, true);
-
     executeSeedJob(batch);
     executeBatchJobs(batch);
 
     // then
-    assertHistoricTaskDeletionPresent(processIds, TESTING_INSTANCE_DELETE, testRule);
-    assertHistoricBatchExists(testRule);
-    assertProcessInstancesAreDeleted();
-    assertThat(RecordInvocationListener.INVOCATIONS.size(), is(0));
+    assertThat(IncrementCounterListener.counter, is(0));
   }
 
   @Test
   public void testInvokeListenersWhenDeletingProcessInstancesAsync() {
 
     // given
+    IncrementCounterListener.counter = 0;
+
     BpmnModelInstance instance = ProcessModels.newModel(ONE_TASK_PROCESS)
         .startEvent()
         .userTask()
