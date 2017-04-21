@@ -15,22 +15,19 @@ package org.camunda.bpm.engine.test.api.history;
 
 import java.text.ParseException;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
-import org.camunda.bpm.engine.history.HistoricIncident;
-import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupJobHandlerConfiguration;
+import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupHelper;
 import org.camunda.bpm.engine.impl.metrics.Meter;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
-import org.camunda.bpm.engine.impl.util.json.JSONObject;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
@@ -40,7 +37,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author Svetlana Dorokhova
@@ -100,18 +96,10 @@ public class HistoryCleanupOnEngineStartTest extends ResourceProcessEngineTestCa
   public void testHistoryCleanupJob() throws ParseException {
     Job historyCleanupJob = historyService.findHistoryCleanupJob();
     assertNotNull(historyCleanupJob);
-    HistoryCleanupJobHandlerConfiguration configuration = getConfiguration((JobEntity) historyCleanupJob);
-    assertEquals(444, configuration.getBatchSize());
-    assertEquals(11, configuration.getBatchSizeThreshold());
-    assertEquals(HistoryCleanupJobHandlerConfiguration.parseTimeConfiguration("23:00"), configuration.getBatchWindowStartTime());
-    assertEquals(HistoryCleanupJobHandlerConfiguration.parseTimeConfiguration("01:00"), configuration.getBatchWindowEndTime());
-
-    assertEquals(configuration.getNextRunWithinBatchWindow(ClockUtil.getCurrentTime()), historyCleanupJob.getDuedate());
-  }
-
-  private HistoryCleanupJobHandlerConfiguration getConfiguration(JobEntity jobEntity) {
-    String jobHandlerConfigurationRaw = jobEntity.getJobHandlerConfigurationRaw();
-    return HistoryCleanupJobHandlerConfiguration.fromJson(new JSONObject(jobHandlerConfigurationRaw));
+    Date historyCleanupBatchWindowStartTime = ((ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration())
+        .getHistoryCleanupBatchWindowStartTimeAsDate();
+    assertEquals(HistoryCleanupHelper.getNextRunWithinBatchWindow(ClockUtil.getCurrentTime(),
+        historyCleanupBatchWindowStartTime), historyCleanupJob.getDuedate());
   }
 
 }

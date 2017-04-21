@@ -49,7 +49,7 @@ public class HistoryRestServiceInteractionTest extends AbstractRestServiceTest {
   }
 
   @Test
-  public void testHistoryCleanupExecuteAtOnceDefault() {
+  public void testHistoryCleanupImmediatelyDueDefault() {
     given().contentType(ContentType.JSON)
         .then()
         .expect().statusCode(Status.OK.getStatusCode())
@@ -59,9 +59,9 @@ public class HistoryRestServiceInteractionTest extends AbstractRestServiceTest {
   }
 
   @Test
-  public void testHistoryCleanupExecuteAtOnce() {
+  public void testHistoryCleanupImmediatelyDue() {
     given().contentType(ContentType.JSON)
-        .queryParam("executeAtOnce", true)
+        .queryParam("immediatelyDue", true)
         .then().expect().statusCode(Status.OK.getStatusCode())
         .when().post(HISTORY_CLEANUP_ASYNC_URL);
 
@@ -70,7 +70,7 @@ public class HistoryRestServiceInteractionTest extends AbstractRestServiceTest {
 
   @Test
   public void testHistoryCleanup() {
-    given().contentType(ContentType.JSON).queryParam("executeAtOnce", false)
+    given().contentType(ContentType.JSON).queryParam("immediatelyDue", false)
         .then().expect().statusCode(Status.OK.getStatusCode())
         .when().post(HISTORY_CLEANUP_ASYNC_URL);
 

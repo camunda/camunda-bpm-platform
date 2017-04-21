@@ -64,4 +64,10 @@ public class ConfigurationLogger extends ProcessEngineLogger {
         "Invalid value '{}' for configuration property 'defaultUserPermissionNameForTask'. Valid values are: '{}'", defaultUserPermissionNameForTask, validPermissionNames));
   }
 
+  public ProcessEngineException invalidPropertyValue(String propertyName, String propertyValue) {
+    return new ProcessEngineException(exceptionMessage(
+        "008",
+        "Invalid value '{}' for configuration property '{}'.", propertyValue, propertyName));
+  }
+
 }

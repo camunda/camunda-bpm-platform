@@ -247,14 +247,8 @@ public class CommandLogger extends ProcessEngineLogger {
     ));
   }
 
-  public BadUserRequestException exceptionHistoryCleanupWrongConfiguration() {
-    return new BadUserRequestException(
-        exceptionMessage("038", "History cleanup won't be scheduled. Either configure batch window or call it with executeAtOnce = true."));
-
+  public void warnHistoryCleanupWrongConfiguration() {
+    logWarn("038", "History cleanup won't be scheduled. Either configure batch window or call it with immediatelyDue = true.");
   }
 
-  public void warnWrongConfiguration(String configParameterName) {
-    logWarn("039", String
-        .format("Something went wrong when applying configuration parameter %s. Please check the value.", configParameterName));
-  }
 }

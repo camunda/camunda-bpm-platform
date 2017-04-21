@@ -90,15 +90,16 @@ public class JobManager extends AbstractManager {
   }
 
   public void reschedule(JobEntity jobEntity, Date newDuedate) {
-    ensureNotNull("duedate", newDuedate);
-    jobEntity.init(Context.getCommandContext());
-    jobEntity.setSuspensionState(SuspensionState.ACTIVE.getStateCode());
-    jobEntity.setDuedate(newDuedate);
-    jobEntity.update();
-    hintJobExecutorIfNeeded(jobEntity, newDuedate);
+    if (newDuedate == null) {
+      jobEntity.setDuedate(null);
+      jobEntity.setSuspensionState(SuspensionState.SUSPENDED.getStateCode());
+    } else {
+      jobEntity.init(Context.getCommandContext());
+      jobEntity.setSuspensionState(SuspensionState.ACTIVE.getStateCode());
+      jobEntity.setDuedate(newDuedate);
+      hintJobExecutorIfNeeded(jobEntity, newDuedate);
 
-    //TODO svt do we need specific event for rescheduling?
-    //getHistoricJobLogManager().fireJobCreatedEvent(job);
+    }
   }
 
   private void hintJobExecutorIfNeeded(JobEntity jobEntity, Date duedate) {

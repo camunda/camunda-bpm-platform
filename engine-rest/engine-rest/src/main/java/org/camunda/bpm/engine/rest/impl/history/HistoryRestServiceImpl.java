@@ -113,8 +113,8 @@ public class HistoryRestServiceImpl extends AbstractRestProcessEngineAware imple
   }
 
   @Override
-  public JobDto cleanupAsync(boolean executeAtOnce) {
-    Job job = processEngine.getHistoryService().cleanUpHistoryAsync(executeAtOnce);
+  public JobDto cleanupAsync(boolean immediatelyDue) {
+    Job job = processEngine.getHistoryService().cleanUpHistoryAsync(immediatelyDue);
     return JobDto.fromJob(job);
   }
 }

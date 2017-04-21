@@ -121,9 +121,7 @@ public class ProcessEngineImpl implements ProcessEngine {
     }
 
     //create history cleanup job
-    if (processEngineConfiguration.getBatchWindowStartTime() != null && !processEngineConfiguration.getBatchWindowStartTime().isEmpty()) {
-      processEngineConfiguration.getHistoryService().cleanUpHistoryAsync();
-    }
+    processEngineConfiguration.getHistoryService().cleanUpHistoryAsync();
 
   }
 

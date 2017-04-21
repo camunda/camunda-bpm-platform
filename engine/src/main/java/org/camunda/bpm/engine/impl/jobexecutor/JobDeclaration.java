@@ -183,7 +183,7 @@ public abstract class JobDeclaration<S, T extends JobEntity> implements Serializ
     return Context.getProcessEngineConfiguration().getDefaultNumberOfRetries();
   }
 
-  protected Date resolveDueDate(S context) {
+  public Date resolveDueDate(S context) {
     ProcessEngineConfiguration processEngineConfiguration = Context.getProcessEngineConfiguration();
     if (processEngineConfiguration != null && processEngineConfiguration.isJobExecutorAcquireByDueDate()) {
       return ClockUtil.getCurrentTime();

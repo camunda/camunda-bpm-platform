@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmd.CommandLogger;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -19,9 +20,9 @@ import org.camunda.bpm.engine.management.Metrics;
  */
 public class HistoryCleanupJobHandler implements JobHandler<HistoryCleanupJobHandlerConfiguration> {
 
-  private final static CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
-
   public static final String TYPE = "history-cleanup";
+
+  private final static int MAX_BATCH_SIZE = 500;
 
   @Override
   public String getType() {
@@ -35,10 +36,11 @@ public class HistoryCleanupJobHandler implements JobHandler<HistoryCleanupJobHan
 
     boolean rescheduled = false;
 
-    if (configuration.isExecuteAtOnce() || !configuration.isBatchWindowConfigured() || configuration.isWithinBatchWindow(ClockUtil.getCurrentTime())) {
+    if (configuration.isImmediatelyDue() || !HistoryCleanupHelper.isBatchWindowConfigured(commandContext)
+        || HistoryCleanupHelper.isWithinBatchWindow(ClockUtil.getCurrentTime(), commandContext)) {
       //find data to delete
-      List<String> processInstanceIds = getProcessInstanceIds(configuration, commandContext);
-      if (!processInstanceIds.isEmpty() && processInstanceIds.size() >= configuration.getBatchSizeThreshold()) {
+      List<String> processInstanceIds = getProcessInstanceIds(commandContext);
+      if (!processInstanceIds.isEmpty() && processInstanceIds.size() >= getBatchSizeThreshold(commandContext)) {
         insertMetric(commandContext);
 
         //delete bunch of data
@@ -52,11 +54,15 @@ public class HistoryCleanupJobHandler implements JobHandler<HistoryCleanupJobHan
         rescheduled = true;
         cancelCountEmptyRuns(configuration, jobEntity);
       } else {
-        //no data for cleanup was found
-        if (configuration.isWithinBatchWindow(ClockUtil.getCurrentTime())) {
+        //still have something to delete
+        if (!processInstanceIds.isEmpty()) {
+          commandContext.getHistoricProcessInstanceManager().deleteHistoricProcessInstanceByIds(processInstanceIds);
+        }
+        //not enough data for cleanup was found
+        if (HistoryCleanupHelper.isWithinBatchWindow(ClockUtil.getCurrentTime(), commandContext)) {
           //reschedule after some delay
           Date nextRunDate = configuration.getNextRunWithDelay(ClockUtil.getCurrentTime());
-          if (configuration.isWithinBatchWindow(nextRunDate)) {
+          if (HistoryCleanupHelper.isWithinBatchWindow(nextRunDate, commandContext)) {
             commandContext.getJobManager().reschedule(jobEntity, nextRunDate);
             rescheduled = true;
             incrementCountEmptyRuns(configuration, jobEntity);
@@ -65,8 +71,8 @@ public class HistoryCleanupJobHandler implements JobHandler<HistoryCleanupJobHan
       }
     }
     if (!rescheduled) {
-      if (configuration.isBatchWindowConfigured()) {
-        rescheduleRegularCall(configuration, commandContext, jobEntity);
+      if (HistoryCleanupHelper.isBatchWindowConfigured(commandContext)) {
+        rescheduleRegularCall(commandContext, jobEntity);
       } else {
         //nothing more to do, suspend the job
         suspendJob(jobEntity);
@@ -75,25 +81,22 @@ public class HistoryCleanupJobHandler implements JobHandler<HistoryCleanupJobHan
     }
   }
 
-  private void rescheduleRegularCall(HistoryCleanupJobHandlerConfiguration configuration, CommandContext commandContext, JobEntity jobEntity) {
-    commandContext.getJobManager().reschedule(jobEntity, configuration.getNextRunWithinBatchWindow(ClockUtil.getCurrentTime()));
+  private void rescheduleRegularCall(CommandContext commandContext, JobEntity jobEntity) {
+    commandContext.getJobManager().reschedule(jobEntity, HistoryCleanupHelper.getNextRunWithinBatchWindow(ClockUtil.getCurrentTime(), commandContext));
   }
 
   private void suspendJob(JobEntity jobEntity) {
     jobEntity.setSuspensionState(SuspensionState.SUSPENDED.getStateCode());
-    jobEntity.update();
   }
 
   private void incrementCountEmptyRuns(HistoryCleanupJobHandlerConfiguration configuration, JobEntity jobEntity) {
     configuration.setCountEmptyRuns(configuration.getCountEmptyRuns() + 1);
     jobEntity.setJobHandlerConfiguration(configuration);
-    jobEntity.update();
   }
 
   private void cancelCountEmptyRuns(HistoryCleanupJobHandlerConfiguration configuration, JobEntity jobEntity) {
     configuration.setCountEmptyRuns(0);
     jobEntity.setJobHandlerConfiguration(configuration);
-    jobEntity.update();
   }
 
   private void insertMetric(CommandContext commandContext) {
@@ -102,8 +105,8 @@ public class HistoryCleanupJobHandler implements JobHandler<HistoryCleanupJobHan
     commandContext.getProcessEngineConfiguration().getDbMetricsReporter().reportNow();
   }
 
-  private List<String> getProcessInstanceIds(HistoryCleanupJobHandlerConfiguration configuration, CommandContext commandContext) {
-    return commandContext.getHistoricProcessInstanceManager().findHistoricProcessInstanceIdsForCleanup(configuration.getBatchSize());
+  private List<String> getProcessInstanceIds(CommandContext commandContext) {
+    return commandContext.getHistoricProcessInstanceManager().findHistoricProcessInstanceIdsForCleanup(getBatchSize(commandContext));
   }
 
   @Override
@@ -114,5 +117,14 @@ public class HistoryCleanupJobHandler implements JobHandler<HistoryCleanupJobHan
 
   @Override
   public void onDelete(HistoryCleanupJobHandlerConfiguration configuration, JobEntity jobEntity) {
+  }
+
+  public Integer getBatchSizeThreshold(CommandContext commandContext) {
+    return commandContext.getProcessEngineConfiguration().getHistoryCleanupBatchThreshold();
+  }
+
+  public Integer getBatchSize(CommandContext commandContext) {
+    int historyCleanupBatchSize = commandContext.getProcessEngineConfiguration().getHistoryCleanupBatchSize();
+    return Math.min(historyCleanupBatchSize, MAX_BATCH_SIZE);
   }
 }

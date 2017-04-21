@@ -80,8 +80,7 @@ public interface HistoryRestService {
 
   @POST
   @Path("/cleanup")
-  @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
-  JobDto cleanupAsync(@QueryParam("executeAtOnce") @DefaultValue("true") boolean executeAtOnce);
+  JobDto cleanupAsync(@QueryParam("immediatelyDue") @DefaultValue("true") boolean immediatelyDue);
 
 }

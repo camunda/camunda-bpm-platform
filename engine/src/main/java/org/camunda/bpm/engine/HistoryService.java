@@ -55,6 +55,7 @@ import org.camunda.bpm.engine.history.NativeHistoricTaskInstanceQuery;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.history.HistoricDecisionInstanceStatisticsQuery;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
 
 import java.util.List;
@@ -164,18 +165,26 @@ public interface HistoryService {
   void deleteHistoricProcessInstancesBulk(List<String> processInstanceIds);
 
   /**
-   * Schedules history cleanup at batch window start time.
+   * Schedules history cleanup job at batch window start time. The job will delete historic data for finished processes
+   * taking into account {@link ProcessDefinition#getTimeToLive()} value.
    *
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#PROCESS_DEFINITION}
+   * @return history cleanup job. Job id can be used to check job logs, incident etc.
    */
   Job cleanUpHistoryAsync();
 
   /**
-   * Schedules history cleanup.
+   * Schedules history cleanup job. The job will delete historic data for finished processes
+   * taking into account {@link ProcessDefinition#getTimeToLive()} value.
    *
-   * @param executeAtOnce must be true if cleanup must be scheduled at once, otherwise is will be scheduled according to configured batch window
+   * @param immediatelyDue must be true if cleanup must be scheduled at once, otherwise is will be scheduled according to configured batch window
+   * @throws AuthorizationException
+   *      If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#PROCESS_DEFINITION}
+   * @return history cleanup job. Job id can be used to check job logs, incident etc.
    *
    */
-  Job cleanUpHistoryAsync(boolean executeAtOnce);
+  Job cleanUpHistoryAsync(boolean immediatelyDue);
 
   /**
    * Finds history cleanup job if present.

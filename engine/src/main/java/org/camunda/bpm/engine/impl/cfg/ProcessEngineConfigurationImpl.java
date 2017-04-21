@@ -23,9 +23,11 @@ import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -201,6 +203,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventSubprocessJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendJobDefinitionHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendProcessDefinitionHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupHelper;
 import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupJobHandler;
 import org.camunda.bpm.engine.impl.metrics.MetricsRegistry;
 import org.camunda.bpm.engine.impl.metrics.MetricsReporterIdProvider;
@@ -675,9 +678,16 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected boolean isUseSharedSqlSessionFactory = false;
 
   //History cleanup configuration
-  private String batchWindowStartTime;
-  private String batchWindowEndTime = "00:00";
+  private String historyCleanupBatchWindowStartTime;
+  private String historyCleanupBatchWindowEndTime = "00:00";
+
+  private Date historyCleanupBatchWindowStartTimeAsDate;
+  private Date historyCleanupBatchWindowEndTimeAsDate;
+  
   private int historyCleanupBatchSize = 500;
+  /**
+   * Indicates the minimal amount of data to trigger the history cleanup.
+   */
   private int historyCleanupBatchThreshold = 10;
 
   private int failedJobListenerMaxRetries = DEFAULT_FAILED_JOB_LISTENER_MAX_RETRIES;
@@ -742,7 +752,34 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initMigration();
     initCommandCheckers();
     initDefaultUserPermissionForTask();
+    initHistoryCleanupBatchWindow();
     invokePostInit();
+  }
+
+  private void initHistoryCleanupBatchWindow() {
+    if (historyCleanupBatchWindowStartTime != null) {
+      initHistoryCleanupBatchWindowStartTime();
+    }
+
+    if (historyCleanupBatchWindowEndTime != null) {
+      initHistoryCleanupBatchWindowEndTime();
+    }
+  }
+
+  private void initHistoryCleanupBatchWindowEndTime() {
+    try {
+      historyCleanupBatchWindowEndTimeAsDate = HistoryCleanupHelper.parseTimeConfiguration(historyCleanupBatchWindowEndTime);
+    } catch (ParseException e) {
+      throw LOG.invalidPropertyValue("historyCleanupBatchWindowEndTime", historyCleanupBatchWindowEndTime);
+    }
+  }
+
+  private void initHistoryCleanupBatchWindowStartTime() {
+    try {
+      historyCleanupBatchWindowStartTimeAsDate = HistoryCleanupHelper.parseTimeConfiguration(historyCleanupBatchWindowStartTime);
+    } catch (ParseException e) {
+      throw LOG.invalidPropertyValue("historyCleanupBatchWindowStartTime", historyCleanupBatchWindowStartTime);
+    }
   }
 
   protected void invokePreInit() {
@@ -3590,20 +3627,36 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     this.disableStrictCallActivityValidation = disableStrictCallActivityValidation;
   }
 
-  public String getBatchWindowStartTime() {
-    return batchWindowStartTime;
+  public String getHistoryCleanupBatchWindowStartTime() {
+    return historyCleanupBatchWindowStartTime;
   }
 
-  public void setBatchWindowStartTime(String batchWindowStartTime) {
-    this.batchWindowStartTime = batchWindowStartTime;
+  public void setHistoryCleanupBatchWindowStartTime(String historyCleanupBatchWindowStartTime) {
+    this.historyCleanupBatchWindowStartTime = historyCleanupBatchWindowStartTime;
+    this.historyCleanupBatchWindowStartTimeAsDate = null;
   }
 
-  public String getBatchWindowEndTime() {
-    return batchWindowEndTime;
+  public String getHistoryCleanupBatchWindowEndTime() {
+    return historyCleanupBatchWindowEndTime;
   }
 
-  public void setBatchWindowEndTime(String batchWindowEndTime) {
-    this.batchWindowEndTime = batchWindowEndTime;
+  public void setHistoryCleanupBatchWindowEndTime(String historyCleanupBatchWindowEndTime) {
+    this.historyCleanupBatchWindowEndTime = historyCleanupBatchWindowEndTime;
+    this.historyCleanupBatchWindowEndTimeAsDate = null;
+  }
+
+  public Date getHistoryCleanupBatchWindowStartTimeAsDate() {
+    if (historyCleanupBatchWindowStartTime != null && historyCleanupBatchWindowStartTimeAsDate == null) {
+      initHistoryCleanupBatchWindowStartTime();
+    }
+    return historyCleanupBatchWindowStartTimeAsDate;
+  }
+
+  public Date getHistoryCleanupBatchWindowEndTimeAsDate() {
+    if (historyCleanupBatchWindowEndTime != null && historyCleanupBatchWindowEndTimeAsDate == null) {
+      initHistoryCleanupBatchWindowEndTime();
+    }
+    return historyCleanupBatchWindowEndTimeAsDate;
   }
 
   public int getHistoryCleanupBatchSize() {

@@ -62,7 +62,6 @@ public class EverLivingJobEntity extends JobEntity {
     //clean the lock information
     setLockOwner(null);
     setLockExpirationTime(null);
-    update();
 
     if (exceptionByteArrayIdToDelete != null) {
       ByteArrayEntity byteArray = commandContext.getDbEntityManager().selectById(ByteArrayEntity.class, exceptionByteArrayIdToDelete);

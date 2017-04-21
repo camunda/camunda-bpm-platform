@@ -5,17 +5,17 @@ package org.camunda.bpm.engine.impl.jobexecutor.historycleanup;
  */
 public class HistoryCleanupContext {
 
-  private boolean executeAtOnce;
+  private boolean immediatelyDue;
 
-  public HistoryCleanupContext(boolean executeAtOnce) {
-    this.executeAtOnce = executeAtOnce;
+  public HistoryCleanupContext(boolean immediatelyDue) {
+    this.immediatelyDue = immediatelyDue;
   }
 
-  public boolean isExecuteAtOnce() {
-    return executeAtOnce;
+  public boolean isImmediatelyDue() {
+    return immediatelyDue;
   }
 
-  public void setExecuteAtOnce(boolean executeAtOnce) {
-    this.executeAtOnce = executeAtOnce;
+  public void setImmediatelyDue(boolean immediatelyDue) {
+    this.immediatelyDue = immediatelyDue;
   }
 }

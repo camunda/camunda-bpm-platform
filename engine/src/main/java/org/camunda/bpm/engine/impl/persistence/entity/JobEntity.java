@@ -161,12 +161,6 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
       .insertJob(this);
   }
 
-  public void update() {
-    Context.getCommandContext()
-        .getJobManager()
-        .updateJob(this);
-  }
-
   public void delete() {
     delete(false);
   }

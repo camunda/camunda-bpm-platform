@@ -138,8 +138,8 @@ public class HistoryServiceImpl extends ServiceImpl implements HistoryService {
     return cleanUpHistoryAsync(false);
   }
 
-  public Job cleanUpHistoryAsync(boolean executeAtOnce) {
-    return commandExecutor.execute(new HistoryCleanupCmd(executeAtOnce));
+  public Job cleanUpHistoryAsync(boolean immediatelyDue) {
+    return commandExecutor.execute(new HistoryCleanupCmd(immediatelyDue));
   }
 
   @Override
