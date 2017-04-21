@@ -4,7 +4,16 @@
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
 
   <display-name>camunda bpm rest api</display-name>
-  
+
+  <filter>
+    <filter-name>EmptyBodyFilter</filter-name>
+    <filter-class>org.camunda.bpm.engine.rest.filter.EmptyBodyFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>EmptyBodyFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
   <filter>
     <filter-name>CacheControlFilter</filter-name>
     <filter-class>org.camunda.bpm.engine.rest.filter.CacheControlFilter</filter-class>    
