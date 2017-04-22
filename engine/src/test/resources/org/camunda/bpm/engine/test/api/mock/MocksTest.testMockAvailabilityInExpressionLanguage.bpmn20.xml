@@ -13,7 +13,7 @@
                       targetRef="serviceTask" />
 
         <serviceTask id="serviceTask"
-                     camunda:expression="#{myMock.testMethod()}" />
+                     camunda:expression="#{myMock.testMethod(execution, myMock.test)}" />
         <sequenceFlow sourceRef="serviceTask"
                       targetRef="waitState" />
 

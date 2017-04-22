@@ -24,15 +24,23 @@ import java.util.Set;
 public class MocksResolverFactory implements ResolverFactory, Resolver {
 
   @Override
-  public Resolver createResolver(VariableScope variableScope) { return this; }
+  public Resolver createResolver(VariableScope variableScope) {
+    return this;
+  }
 
   @Override
-  public boolean containsKey(Object key) { return Mocks.get(key) != null; }
+  public boolean containsKey(Object key) {
+    return Mocks.get(key) != null;
+  }
 
   @Override
-  public Object get(Object key) { return Mocks.get(key); }
+  public Object get(Object key) {
+    return Mocks.get(key);
+  }
 
   @Override
-  public Set<String> keySet() { return Mocks.getMocks().keySet(); }
+  public Set<String> keySet() {
+    return Mocks.getMocks().keySet();
+  }
 
 }

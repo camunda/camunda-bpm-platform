@@ -14,7 +14,6 @@ package org.camunda.bpm.engine.test.api.mock;
 
 import java.util.HashMap;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -29,8 +28,6 @@ import org.junit.Test;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNull;
-import static junit.framework.TestCase.assertTrue;
-import static junit.framework.TestCase.fail;
 
 /**
  * @author Tassilo Weidner
@@ -80,90 +77,39 @@ public class MocksTest {
 
   @Test
   @Deployment
-  public void testUnknownMethodInCamundaExpressionAppliedOnServiceTask() {
-    //given
-    Mocks.register("myMock", new Object() {});
-
-    try {
-      //when
-      runtimeService.startProcessInstanceByKey("mocksTest");
-      fail();
-    } catch (ProcessEngineException e) {
-      //then
-      assertTrue(e.getMessage().contains("Unknown method used in expression: #{myMock.testMethod()}."));
-    } finally {
-      Mocks.reset();
-    }
+  public void testMockAvailabilityInScriptTask() {
+    testMockAvailability();
   }
 
   @Test
   @Deployment
-  public void testCamundaExpressionAppliedOnServiceTask() {
+  public void testMockAvailabilityInExpressionLanguage() {
+    testMockAvailability();
+  }
+
+  //helper ////////////////////////////////////////////////////////////
+  private void testMockAvailability() {
     //given
+    final String testStr = "testValue";
+
     Mocks.register("myMock", new Object() {
+
       public String getTest() {
-        return "testValue";
+        return testStr;
       }
 
       public void testMethod(DelegateExecution execution, String str) {
         execution.setVariable("testVar", str);
       }
+
     });
 
     //when
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("mocksTest");
-    runtimeService.setVariable(pi.getId(), "myVar", 42);
     Mocks.reset();
 
     //then
-    assertEquals(42, runtimeService.getVariable(pi.getId(), "myVar"));
-    assertEquals("testValue", runtimeService.getVariable(pi.getId(), "testVar"));
-  }
-
-  @Test
-  @Deployment
-  public void testConditionExpressionAppliedOnExclusiveGateway() {
-    //given
-    TaskChooser taskChooser = new TaskChooser();
-    Mocks.register("myMock", taskChooser);
-
-    //when
-    taskChooser.setTask("red");
-    ProcessInstance piWithRedTaskChosen = runtimeService.startProcessInstanceByKey("mocksTest");
-
-    taskChooser.setTask("yellow");
-    ProcessInstance piWithYellowTaskChosen = runtimeService.startProcessInstanceByKey("mocksTest");
-
-    taskChooser.setTask("green");
-    ProcessInstance piWithGreenTaskChosen = runtimeService.startProcessInstanceByKey("mocksTest");
-
-    Mocks.reset();
-
-    //then
-    assertEquals("A Red Task", getTaskName(piWithRedTaskChosen.getId()));
-    assertEquals("A Yellow Task", getTaskName(piWithYellowTaskChosen.getId()));
-    assertEquals("A Green Task", getTaskName(piWithGreenTaskChosen.getId()));
-  }
-
-  //helper ////////////////////////////////////////////////////////////
-  private String getTaskName(String id) {
-    return taskService
-            .createTaskQuery()
-            .processInstanceId(id)
-            .singleResult()
-            .getName();
-  }
-
-  class TaskChooser {
-    private String taskName = null;
-
-    public String getTask() {
-      return taskName;
-    }
-
-    private void setTask(String taskName) {
-      this.taskName = taskName;
-    }
+    assertEquals(testStr, runtimeService.getVariable(pi.getId(), "testVar"));
   }
 
 }
