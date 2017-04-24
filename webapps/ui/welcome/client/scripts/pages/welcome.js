@@ -7,7 +7,7 @@ var RouteConfig = [ '$routeProvider', function($routeProvider) {
   $routeProvider.when('/welcome', {
     template: template,
     // controller: Controller,
-    controller: ['$scope', 'Views', function($scope, Views) {
+    controller: ['$scope', 'Views', 'Uri', function($scope, Views, Uri) {
       var auth = $scope.$root.authentication;
 
       $scope.canAccessApp = function(appName) {
@@ -21,6 +21,8 @@ var RouteConfig = [ '$routeProvider', function($routeProvider) {
       $scope.plugins = Views.getProviders({
         component: 'welcome.dashboard'
       });
+
+      $scope.currentEngine = Uri.appUri(':engine');
     }],
     authentication: 'required',
     reloadOnSearch: false
