@@ -737,9 +737,11 @@ public class HistoryCleanupTest {
   }
 
   private void prepareData(int processInstanceCount, String businesskey) {
+    Date oldCurrentTime = ClockUtil.getCurrentTime();
     ClockUtil.setCurrentTime(DateUtils.addDays(new Date(), -6));
-    final List<String> ids = prepareHistoricProcesses(businesskey, getVariables(), processInstanceCount);  //two batch sizes
+    final List<String> ids = prepareHistoricProcesses(businesskey, getVariables(), processInstanceCount);
     runtimeService.deleteProcessInstances(ids, null, true, true);
+    ClockUtil.setCurrentTime(oldCurrentTime);
   }
 
   private List<String> prepareHistoricProcesses(String businessKey, VariableMap variables, Integer processInstanceCount) {

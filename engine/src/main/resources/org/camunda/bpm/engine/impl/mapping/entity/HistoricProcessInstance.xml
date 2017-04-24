@@ -415,7 +415,7 @@
         SELECT PROC_INST_ID_
         FROM (SELECT pi.PROC_INST_ID_, ROW_NUMBER() OVER(ORDER BY #{parameter} - pi.END_TIME_ DESC) as rownumber
         <include refid="selectHistoricProcessInstanceIdsForCleanupSql"/>
-        AND pi.END_TIME_ + pd.TTL_ DAYS &lt; #{parameter}) as SUB
+        AND pi.END_TIME_ + pd.TTL_ DAYS &lt;= #{parameter}) as SUB
         where rownumber between 1 and #{maxResults}
     </select>
 
@@ -426,14 +426,14 @@
         pi.PROC_DEF_ID_ = pd.ID_
         AND not pi.END_TIME_ is NULL
         AND not pd.TTL_ is NULL
-        AND pi.END_TIME_ + pd.TTL_ DAYS &lt; #{parameter}
+        AND pi.END_TIME_ + pd.TTL_ DAYS &lt;= #{parameter}
     </select>
 
     <select id="selectHistoricProcessInstanceIdsForCleanup_oracle" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
         ${limitBefore}
         SELECT pi.PROC_INST_ID_
         <include refid="selectHistoricProcessInstanceIdsForCleanupSql"/>
-        AND pi.END_TIME_ + pd.TTL_ &lt; #{parameter}
+        AND pi.END_TIME_ + pd.TTL_ &lt;= #{parameter}
         ORDER BY #{parameter} - pi.END_TIME_ DESC
         ${limitAfter}
     </select>
@@ -441,14 +441,14 @@
     <select id="selectHistoricProcessInstanceIdsForCleanupCount_oracle" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="long">
         SELECT count(pi.PROC_INST_ID_)
         <include refid="selectHistoricProcessInstanceIdsForCleanupSql"/>
-        AND pi.END_TIME_ + pd.TTL_ &lt; #{parameter}
+        AND pi.END_TIME_ + pd.TTL_ &lt;= #{parameter}
     </select>
 
     <select id="selectHistoricProcessInstanceIdsForCleanup_postgres" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
         ${limitBefore}
         SELECT pi.PROC_INST_ID_
         <include refid="selectHistoricProcessInstanceIdsForCleanupSql"/>
-        AND extract (day from #{parameter} - pi.END_TIME_) &gt; pd.TTL_
+        AND extract (day from #{parameter} - pi.END_TIME_) &gt;= pd.TTL_
         ORDER BY #{parameter} - pi.END_TIME_ DESC
         ${limitAfter}
     </select>
@@ -456,7 +456,7 @@
     <select id="selectHistoricProcessInstanceIdsForCleanupCount_postgres" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="long">
         SELECT count(pi.PROC_INST_ID_)
         <include refid="selectHistoricProcessInstanceIdsForCleanupSql"/>
-        AND extract (day from #{parameter} - pi.END_TIME_) &gt; pd.TTL_
+        AND extract (day from #{parameter} - pi.END_TIME_) &gt;= pd.TTL_
     </select>
 
     <select id="selectHistoricProcessInstanceIdsForCleanup_mysql" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">

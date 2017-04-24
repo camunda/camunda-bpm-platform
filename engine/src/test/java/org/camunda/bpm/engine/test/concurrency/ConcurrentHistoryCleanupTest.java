@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.test.concurrency;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmd.HistoryCleanupCmd;
@@ -56,7 +58,20 @@ public class ConcurrentHistoryCleanupTest extends ConcurrencyTestCase {
   protected void runTest() throws Throwable {
     String databaseType = processEngineConfiguration.getDbSqlSessionFactory().getDatabaseType();
 
-    if("h2".equals(databaseType)) {
+    final Integer[] transactionIsolation = new Integer[1];
+    ((ProcessEngineConfigurationImpl)processEngine.getProcessEngineConfiguration()).getCommandExecutorTxRequired().execute(new Command<Object>() {
+      @Override
+      public Object execute(CommandContext commandContext) {
+        try {
+          transactionIsolation[0] = commandContext.getDbSqlSession().getSqlSession().getConnection().getTransactionIsolation();
+        } catch (SQLException e) {
+
+        }
+        return null;
+      }
+    });
+
+    if ("h2".equals(databaseType) || (transactionIsolation[0] != null && transactionIsolation[0] != Connection.TRANSACTION_READ_COMMITTED)) {
       // skip test method - if database is H2
     } else {
       // invoke the test method
