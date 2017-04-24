@@ -4,13 +4,9 @@ import static com.jayway.restassured.RestAssured.given;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.createMockBatch;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,7 +26,6 @@ import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.util.ModificationInstructionBuilder;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
 import org.camunda.bpm.engine.runtime.ModificationBuilder;
-import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -43,7 +38,7 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
   public static TestContainerRule rule = new TestContainerRule();
 
   protected static final String PROCESS_INSTANCE_URL = TEST_RESOURCE_ROOT_PATH + "/modification";
-  protected static final String EXECUTE_MODIFICATION_SYNC_URL  = PROCESS_INSTANCE_URL + "/execute";
+  protected static final String EXECUTE_MODIFICATION_SYNC_URL = PROCESS_INSTANCE_URL + "/execute";
   protected static final String EXECUTE_MODIFICATION_ASYNC_URL = PROCESS_INSTANCE_URL + "/executeAsync";
 
   protected RuntimeService runtimeServiceMock;
@@ -88,9 +83,9 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
       .body(json)
     .then()
       .expect()
-        .statusCode(Status.NO_CONTENT.getStatusCode())
-      .when()
-        .post(EXECUTE_MODIFICATION_SYNC_URL);
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .post(EXECUTE_MODIFICATION_SYNC_URL);
 
     verify(runtimeServiceMock).createModification("processDefinitionId");
     verify(modificationBuilderMock).cancelAllForActivity("activityId");
@@ -104,7 +99,8 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
 
   @Test
   public void executeModificationWithNullProcessDefinitionIdAsync() {
-    doThrow(new BadUserRequestException("processDefinitionId must be set")).when(modificationBuilderMock).executeAsync();
+    doThrow(new BadUserRequestException("processDefinitionId must be set"))
+    .when(modificationBuilderMock).executeAsync();
 
     Map<String, Object> json = new HashMap<String, Object>();
     json.put("skipCustomListeners", true);
@@ -124,9 +120,9 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
       .body(json)
     .then()
       .expect()
-        .statusCode(Status.BAD_REQUEST.getStatusCode())
-      .when()
-        .post(EXECUTE_MODIFICATION_ASYNC_URL);
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+    .when()
+      .post(EXECUTE_MODIFICATION_ASYNC_URL);
 
     verify(modificationBuilderMock).cancelAllForActivity("activityId");
     verify(modificationBuilderMock).startBeforeActivity("activityId");
@@ -139,7 +135,8 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
 
   @Test
   public void executeModificationWithNullProcessDefinitionIdSync() {
-    doThrow(new BadUserRequestException("processDefinitionId must be set")).when(modificationBuilderMock).execute();
+    doThrow(new BadUserRequestException("processDefinitionId must be set"))
+    .when(modificationBuilderMock).execute();
 
     Map<String, Object> json = new HashMap<String, Object>();
     json.put("skipCustomListeners", true);
@@ -159,9 +156,9 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
       .body(json)
     .then()
       .expect()
-        .statusCode(Status.BAD_REQUEST.getStatusCode())
-      .when()
-        .post(EXECUTE_MODIFICATION_SYNC_URL);
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+    .when()
+      .post(EXECUTE_MODIFICATION_SYNC_URL);
 
     verify(modificationBuilderMock).cancelAllForActivity("activityId");
     verify(modificationBuilderMock).startBeforeActivity("activityId");
@@ -188,7 +185,8 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
     given()
       .contentType(POST_JSON_CONTENT_TYPE)
       .body(json)
-    .then().expect()
+    .then()
+      .expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
       .body("message", is(message))
     .when()
@@ -207,13 +205,13 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
     json.put("instructions", instructions);
 
     given()
-    .contentType(POST_JSON_CONTENT_TYPE)
-    .body(json)
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(json)
     .then()
-    .expect()
-    .statusCode(Status.OK.getStatusCode())
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
     .when()
-    .post(EXECUTE_MODIFICATION_ASYNC_URL);
+      .post(EXECUTE_MODIFICATION_ASYNC_URL);
 
     verify(runtimeServiceMock).createModification("processDefinitionId");
     verify(modificationBuilderMock).cancelAllForActivity("activityId");
@@ -240,7 +238,8 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
     given()
       .contentType(POST_JSON_CONTENT_TYPE)
       .body(json)
-    .then().expect()
+    .then()
+      .expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
       .body("message", is(message))
     .when()
@@ -251,97 +250,113 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
   public void executeModificationWithValidProcessInstanceQuerySync() {
 
     when(runtimeServiceMock.createProcessInstanceQuery()).thenReturn(new ProcessInstanceQueryImpl());
-    when(modificationBuilderMock.processInstanceQuery(any(ProcessInstanceQuery.class))).thenReturn(modificationBuilderMock);
     Map<String, Object> json = new HashMap<String, Object>();
 
     List<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
-    instructions.add(ModificationInstructionBuilder.startAfter().activityId("acivityId").getJson());
+    instructions.add(ModificationInstructionBuilder.startAfter().activityId("activityId").getJson());
     json.put("processDefinitionId", "processDefinitionId");
 
-    ProcessInstanceQueryDto processInstanceQuery = new ProcessInstanceQueryDto();
-    json.put("processInstanceQuery", processInstanceQuery);
+    ProcessInstanceQueryDto processInstanceQueryDto = new ProcessInstanceQueryDto();
+    processInstanceQueryDto.setBusinessKey("foo");
+
+    json.put("processInstanceQuery", processInstanceQueryDto);
     json.put("instructions", instructions);
 
     given()
       .contentType(ContentType.JSON)
       .body(json)
-    .then().expect()
+    .then()
+      .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
       .post(EXECUTE_MODIFICATION_SYNC_URL);
+
+    verify(runtimeServiceMock, times(1)).createProcessInstanceQuery();
+    verify(modificationBuilderMock).startAfterActivity("activityId");
+    verify(modificationBuilderMock).processInstanceQuery(processInstanceQueryDto.toQuery(processEngine));
+    verify(modificationBuilderMock).execute();
   }
 
   @Test
   public void executeModificationWithValidProcessInstanceQueryAsync() {
 
     when(runtimeServiceMock.createProcessInstanceQuery()).thenReturn(new ProcessInstanceQueryImpl());
-    when(modificationBuilderMock.processInstanceQuery(any(ProcessInstanceQuery.class))).thenReturn(modificationBuilderMock);
     Map<String, Object> json = new HashMap<String, Object>();
 
     List<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
-    instructions.add(ModificationInstructionBuilder.startAfter().activityId("acivityId").getJson());
+    instructions.add(ModificationInstructionBuilder.startAfter().activityId("activityId").getJson());
 
-    ProcessInstanceQueryDto processInstanceQuery = new ProcessInstanceQueryDto();
-    json.put("processInstanceQuery", processInstanceQuery);
+    ProcessInstanceQueryDto processInstanceQueryDto = new ProcessInstanceQueryDto();
+    processInstanceQueryDto.setBusinessKey("foo");
+
+    json.put("processInstanceQuery", processInstanceQueryDto);
     json.put("instructions", instructions);
     json.put("processDefinitionId", "processDefinitionId");
 
     given()
       .contentType(ContentType.JSON)
       .body(json)
-    .then().expect()
+    .then()
+      .expect()
       .statusCode(Status.OK.getStatusCode())
     .when()
       .post(EXECUTE_MODIFICATION_ASYNC_URL);
+
+    verify(runtimeServiceMock, times(1)).createProcessInstanceQuery();
+    verify(modificationBuilderMock).startAfterActivity("activityId");
+    verify(modificationBuilderMock).processInstanceQuery(processInstanceQueryDto.toQuery(processEngine));
+    verify(modificationBuilderMock).executeAsync();
   }
 
   @Test
   public void executeModificationWithInvalidProcessInstanceQuerySync() {
 
     when(runtimeServiceMock.createProcessInstanceQuery()).thenReturn(new ProcessInstanceQueryImpl());
-    when(modificationBuilderMock.processInstanceQuery(any(ProcessInstanceQuery.class))).thenReturn(modificationBuilderMock);
     Map<String, Object> json = new HashMap<String, Object>();
 
     String message = "Process instance ids is null";
-    doThrow(new BadUserRequestException(message))
-      .when(modificationBuilderMock).execute();
+    doThrow(new BadUserRequestException(message)).when(modificationBuilderMock).execute();
 
     List<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
     instructions.add(ModificationInstructionBuilder.startAfter().activityId("acivityId").getJson());
 
-    ProcessInstanceQueryDto processInstanceQuery = new ProcessInstanceQueryDto();
-    json.put("processInstanceQuery", processInstanceQuery);
+    ProcessInstanceQueryDto processInstanceQueryDto = new ProcessInstanceQueryDto();
+    processInstanceQueryDto.setBusinessKey("foo");
+    json.put("processInstanceQuery", processInstanceQueryDto);
     json.put("instructions", instructions);
     json.put("processDefinitionId", "processDefinitionId");
 
     given()
       .contentType(ContentType.JSON)
       .body(json)
-    .then().expect()
+    .then()
+      .expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
     .when()
       .post(EXECUTE_MODIFICATION_SYNC_URL);
+
   }
 
   @Test
   public void executeModificationWithInvalidProcessInstanceQueryAsync() {
 
     when(runtimeServiceMock.createProcessInstanceQuery()).thenReturn(new ProcessInstanceQueryImpl());
-    when(modificationBuilderMock.processInstanceQuery(any(ProcessInstanceQuery.class))).thenReturn(modificationBuilderMock);
     Map<String, Object> json = new HashMap<String, Object>();
 
     List<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
     instructions.add(ModificationInstructionBuilder.startAfter().activityId("acivityId").getJson());
 
-    ProcessInstanceQueryDto processInstanceQuery = new ProcessInstanceQueryDto();
-    json.put("processInstanceQuery", processInstanceQuery);
+    ProcessInstanceQueryDto processInstanceQueryDto = new ProcessInstanceQueryDto();
+    processInstanceQueryDto.setBusinessKey("foo");
+    json.put("processInstanceQuery", processInstanceQueryDto);
     json.put("instructions", instructions);
     json.put("processDefinitionId", "processDefinitionId");
 
     given()
       .contentType(ContentType.JSON)
       .body(json)
-    .then().expect()
+    .then()
+      .expect()
       .statusCode(Status.OK.getStatusCode())
     .when()
       .post(EXECUTE_MODIFICATION_ASYNC_URL);
@@ -349,7 +364,8 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
 
   @Test
   public void executeModificationWithNullInstructionsSync() {
-    doThrow(new BadUserRequestException("Instructions must be set")).when(modificationBuilderMock).execute();;
+    doThrow(new BadUserRequestException("Instructions must be set")).when(modificationBuilderMock).execute();
+    ;
 
     Map<String, Object> json = new HashMap<String, Object>();
     json.put("processInstanceIds", Arrays.asList("200", "11"));
@@ -359,7 +375,8 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
     given()
       .contentType(ContentType.JSON)
       .body(json)
-    .then().expect()
+    .then()
+      .expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
       .body("message", equalTo("Instructions must be set"))
@@ -378,7 +395,8 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
     given()
       .contentType(ContentType.JSON)
       .body(json)
-    .then().expect()
+    .then()
+      .expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
       .body("message", equalTo("Instructions must be set"))
@@ -395,14 +413,8 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
 
     List<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
 
-    instructions.add(
-        ModificationInstructionBuilder.startBefore()
-          .activityId("activityId")
-          .getJson());
-    instructions.add(
-        ModificationInstructionBuilder.startAfter()
-          .activityId("activityId")
-          .getJson());
+    instructions.add(ModificationInstructionBuilder.startBefore().activityId("activityId").getJson());
+    instructions.add(ModificationInstructionBuilder.startAfter().activityId("activityId").getJson());
 
     json.put("instructions", instructions);
     json.put("processInstanceIds", Arrays.asList("200", "323"));
@@ -411,7 +423,8 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
     given()
       .contentType(ContentType.JSON)
       .body(json)
-    .then().expect()
+    .then()
+      .expect()
       .statusCode(Status.FORBIDDEN.getStatusCode())
       .contentType(ContentType.JSON)
       .body("type", equalTo(AuthorizationException.class.getSimpleName()))
@@ -434,7 +447,8 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
     given()
       .contentType(ContentType.JSON)
       .body(json)
-    .then().expect()
+    .then()
+      .expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
       .contentType(ContentType.JSON)
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
@@ -457,7 +471,8 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
     given()
       .contentType(ContentType.JSON)
       .body(json)
-    .then().expect()
+    .then()
+      .expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
       .contentType(ContentType.JSON)
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
@@ -480,7 +495,8 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
     given()
       .contentType(ContentType.JSON)
       .body(json)
-    .then().expect()
+    .then()
+      .expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
       .contentType(ContentType.JSON)
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
@@ -503,7 +519,8 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
     given()
       .contentType(ContentType.JSON)
       .body(json)
-    .then().expect()
+    .then()
+      .expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
       .contentType(ContentType.JSON)
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
@@ -526,7 +543,8 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
     given()
       .contentType(ContentType.JSON)
       .body(json)
-    .then().expect()
+    .then()
+      .expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
       .contentType(ContentType.JSON)
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
@@ -549,7 +567,8 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
     given()
       .contentType(ContentType.JSON)
       .body(json)
-    .then().expect()
+    .then()
+      .expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
       .contentType(ContentType.JSON)
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
@@ -572,7 +591,8 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
     given()
       .contentType(ContentType.JSON)
       .body(json)
-    .then().expect()
+    .then()
+      .expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
       .contentType(ContentType.JSON)
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
@@ -595,7 +615,8 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
     given()
       .contentType(ContentType.JSON)
       .body(json)
-    .then().expect()
+    .then()
+      .expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
       .contentType(ContentType.JSON)
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))

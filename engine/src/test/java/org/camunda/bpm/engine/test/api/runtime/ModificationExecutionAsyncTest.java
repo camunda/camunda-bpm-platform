@@ -201,7 +201,7 @@ public class ModificationExecutionAsyncTest {
   }
   
   @Test
-  public void createModificationWithNotMatchingProcessDefinitionId() {
+  public void createModificationWithNonExistingProcessDefinitionId() {
     DeploymentWithDefinitions deployment = testRule.deploy(instance);
     deployment.getDeployedProcessDefinitions().get(0);
 
@@ -552,10 +552,10 @@ public class ModificationExecutionAsyncTest {
     Task task = rule.getTaskService().createTaskQuery().singleResult();
     rule.getTaskService().complete(task.getId());
     
-    List<String> anotherProcessInstanceIds = helper.startInstances("process1", 2);
+    List<String> anotherProcessInstanceIds = helper.startInstances("process1", 1);
     processInstanceIds.addAll(anotherProcessInstanceIds);
     
-    Batch batch = runtimeService.createModification(processDefinition.getId()).cancelAllForActivity("user1").processInstanceIds(processInstanceIds).executeAsync();
+    Batch batch = runtimeService.createModification(processDefinition.getId()).startBeforeActivity("user2").processInstanceIds(processInstanceIds).executeAsync();
 
     helper.executeSeedJob(batch);
     List<Job> modificationJobs = helper.getExecutionJobs(batch);
@@ -571,15 +571,12 @@ public class ModificationExecutionAsyncTest {
     updatedTree = runtimeService.getActivityInstance(processInstanceId);
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
-    assertThat(updatedTree).hasStructure(describeActivityInstanceTree(processDefinition.getId()).activity("user2").done());
+    assertThat(updatedTree).hasStructure(describeActivityInstanceTree(processDefinition.getId()).activity("user2").activity("user2").done());
 
     processInstanceId = processInstanceIds.get(1);
     updatedTree = runtimeService.getActivityInstance(processInstanceId);
-    assertNull(updatedTree);
-
-    processInstanceId = processInstanceIds.get(2);
-    updatedTree = runtimeService.getActivityInstance(processInstanceId);
-    assertNull(updatedTree);
+    assertNotNull(updatedTree);
+    assertThat(updatedTree).hasStructure(describeActivityInstanceTree(processDefinition.getId()).activity("user1").activity("user2").done());
 
     // and the no modification jobs exist
     assertEquals(0, helper.getExecutionJobs(batch).size());

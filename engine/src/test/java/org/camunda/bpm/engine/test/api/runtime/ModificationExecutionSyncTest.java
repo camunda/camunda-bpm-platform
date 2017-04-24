@@ -51,6 +51,7 @@ public class ModificationExecutionSyncTest {
         .userTask("user1")
         .sequenceFlowId("seq")
         .userTask("user2")
+        .userTask("user3")
         .endEvent("end")
         .done();
   }
@@ -207,7 +208,7 @@ public class ModificationExecutionSyncTest {
       assertNotNull(updatedTree);
       assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-      assertThat(updatedTree).hasStructure(describeActivityInstanceTree(definition.getId()).activity("user1").done());
+      assertThat(updatedTree).hasStructure(describeActivityInstanceTree(definition.getId()).activity("user1").activity("user3").done());
     }
   }
 
@@ -269,24 +270,22 @@ public class ModificationExecutionSyncTest {
     Task task = rule.getTaskService().createTaskQuery().singleResult();
     rule.getTaskService().complete(task.getId());
 
-    List<String> anotherProcessInstanceIds = helper.startInstances("process1", 2);
+    List<String> anotherProcessInstanceIds = helper.startInstances("process1", 1);
     processInstanceIds.addAll(anotherProcessInstanceIds);
 
-    runtimeService.createModification(definition.getId()).cancelAllForActivity("user1").processInstanceIds(processInstanceIds).execute();
+    runtimeService.createModification(definition.getId()).startBeforeActivity("user3").processInstanceIds(processInstanceIds).execute();
 
     ActivityInstance updatedTree = null;
     String processInstanceId = processInstanceIds.get(0);
     updatedTree = runtimeService.getActivityInstance(processInstanceId);
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
-    assertThat(updatedTree).hasStructure(describeActivityInstanceTree(definition.getId()).activity("user2").done());
+    assertThat(updatedTree).hasStructure(describeActivityInstanceTree(definition.getId()).activity("user2").activity("user3").done());
 
     processInstanceId = processInstanceIds.get(1);
     updatedTree = runtimeService.getActivityInstance(processInstanceId);
-    assertNull(updatedTree);
-
-    processInstanceId = processInstanceIds.get(2);
-    updatedTree = runtimeService.getActivityInstance(processInstanceId);
-    assertNull(updatedTree);
+    assertNotNull(updatedTree);
+    assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
+    assertThat(updatedTree).hasStructure(describeActivityInstanceTree(definition.getId()).activity("user1").activity("user3").done());
   }
 }

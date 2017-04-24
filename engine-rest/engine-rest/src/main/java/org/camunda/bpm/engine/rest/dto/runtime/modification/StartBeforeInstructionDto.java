@@ -51,10 +51,7 @@ public class StartBeforeInstructionDto extends ProcessInstanceModificationInstru
  @Override
   public void applyTo(ModificationBuilder builder, ProcessEngine processEngine, ObjectMapper objectMapper) {
     checkValidity();
-
-    if (activityId != null) {
-      builder.startBeforeActivity(activityId);
-    }
+    builder.startBeforeActivity(activityId);
   }
 
   @Override
