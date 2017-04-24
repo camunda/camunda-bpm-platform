@@ -34,6 +34,7 @@ import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -93,6 +94,7 @@ public class HistoryCleanupOnEngineStartTest extends ResourceProcessEngineTestCa
 
 
   @Test
+  @Ignore("CAM-7541")
   public void testHistoryCleanupJob() throws ParseException {
     Job historyCleanupJob = historyService.findHistoryCleanupJob();
     assertNotNull(historyCleanupJob);
