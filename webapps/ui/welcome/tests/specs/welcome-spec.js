@@ -21,6 +21,26 @@ describe('Welcome Welcome page Spec', function() {
       expect(page.cockpitWebappLink().isDisplayed()).to.eventually.eql(true);
       expect(page.tasklistWebappLink().isDisplayed()).to.eventually.eql(true);
     });
+
+    it('link should lead to current engine', function(done) {
+      element(by.css('.engine-select'))
+        .getText()
+        .then(function(currentEngine) {
+          currentEngine = currentEngine.trim();
+
+          expect(
+            page.adminWebappLink().element(by.css('a')).getAttribute('href')
+          ).to.eventually.contain(currentEngine);
+          expect(
+            page.cockpitWebappLink().element(by.css('a')).getAttribute('href')
+          ).to.eventually.contain(currentEngine);
+          expect(
+            page.tasklistWebappLink().element(by.css('a')).getAttribute('href')
+          ).to.eventually.contain(currentEngine);
+
+          done();
+        });
+    });
   });
 
 
