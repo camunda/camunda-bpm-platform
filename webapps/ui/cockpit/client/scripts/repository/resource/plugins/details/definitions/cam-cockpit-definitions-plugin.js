@@ -70,7 +70,7 @@ var Controller = [
           }
 
           definition.instances.$loaded = true;
-          definition.instances.count = result.count || '0';
+          definition.instances.count = !isNaN(+result) ? result : result.count || '0';
 
           var phase = $scope.$root.$$phase;
           if(phase !== '$apply' && phase !== '$digest') {
