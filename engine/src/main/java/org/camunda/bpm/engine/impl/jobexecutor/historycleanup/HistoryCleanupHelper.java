@@ -14,7 +14,7 @@ public abstract class HistoryCleanupHelper {
 
   private static final SimpleDateFormat TIME_FORMAT_WITHOUT_SECONDS = new SimpleDateFormat("HH:mm");
 
-  public static final SimpleDateFormat TIME_FORMAT_WITHOUT_SECONDS_WITH_TIMEZONE = new SimpleDateFormat("HH:mmX");
+  public static final SimpleDateFormat TIME_FORMAT_WITHOUT_SECONDS_WITH_TIMEZONE = new SimpleDateFormat("HH:mmZ");
 
   public static Date getNextRunWithinBatchWindow(Date date, CommandContext commandContext) {
     return getNextRunWithinBatchWindow(date, getBatchWindowStartTime(commandContext));

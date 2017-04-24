@@ -646,7 +646,7 @@ public class HistoryCleanupTest {
 
   @Test
   public void testConfiguration() {
-    engineRule.getProcessEngineConfiguration().setHistoryCleanupBatchWindowStartTime("23:00+02");
+    engineRule.getProcessEngineConfiguration().setHistoryCleanupBatchWindowStartTime("23:00+0200");
     Calendar c = Calendar.getInstance(TimeZone.getTimeZone("GMT+2:00"));
     Date startTime = engineRule.getProcessEngineConfiguration().getHistoryCleanupBatchWindowStartTimeAsDate();
     c.setTime(startTime);
@@ -662,7 +662,7 @@ public class HistoryCleanupTest {
     assertEquals(0, c.get(Calendar.MINUTE));
     assertEquals(0, c.get(Calendar.SECOND));
 
-    engineRule.getProcessEngineConfiguration().setHistoryCleanupBatchWindowEndTime("01:35-08:00");
+    engineRule.getProcessEngineConfiguration().setHistoryCleanupBatchWindowEndTime("01:35-0800");
     c = Calendar.getInstance(TimeZone.getTimeZone("GMT-8:00"));
     Date endTime = engineRule.getProcessEngineConfiguration().getHistoryCleanupBatchWindowEndTimeAsDate();
     c.setTime(endTime);
