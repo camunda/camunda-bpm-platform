@@ -191,8 +191,11 @@
   </select>
 
   <select id="selectProcessInstanceIdsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl" resultType="string">
-    select distinct RES.ID_
-    <include refid="selectProcessInstanceByQueryCriteriaSql"/>
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
+    select distinct RES.ID_, RES.DEPLOYMENT_ID_
+    from (select RES.ID_, P.DEPLOYMENT_ID_
+    <include refid="selectProcessInstanceByQueryCriteriaSql"/>) RES
+    ${orderBy}
   </select>
 
   <sql id="selectProcessInstanceByQueryCriteriaSql">

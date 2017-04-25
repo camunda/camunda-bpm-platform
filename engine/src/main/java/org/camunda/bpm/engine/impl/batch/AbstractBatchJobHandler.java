@@ -57,6 +57,19 @@ public abstract class AbstractBatchJobHandler<T extends BatchConfiguration> impl
     // view of process instances to process
     List<String> processIds = ids.subList(0, numberOfItemsToProcess);
 
+    int createdJobs = createJobEntities(batch, byteArrayManager, jobManager, configuration, invocationsPerBatchJob, processIds);
+
+    // update created jobs for batch
+    batch.setJobsCreated(batch.getJobsCreated() + createdJobs);
+
+    // update batch configuration
+    batch.setConfigurationBytes(writeConfiguration(configuration));
+
+    return ids.isEmpty();
+  }
+
+  protected int createJobEntities(BatchEntity batch, ByteArrayManager byteArrayManager, JobManager jobManager, T configuration, int invocationsPerBatchJob,
+      List<String> processIds) {
     int createdJobs = 0;
     while (!processIds.isEmpty()) {
       int lastIdIndex = Math.min(invocationsPerBatchJob, processIds.size());
@@ -74,13 +87,7 @@ public abstract class AbstractBatchJobHandler<T extends BatchConfiguration> impl
       createdJobs++;
     }
 
-    // update created jobs for batch
-    batch.setJobsCreated(batch.getJobsCreated() + createdJobs);
-
-    // update batch configuration
-    batch.setConfigurationBytes(writeConfiguration(configuration));
-
-    return ids.isEmpty();
+    return createdJobs;
   }
 
   protected abstract T createJobConfiguration(T configuration, List<String> processIdsForJob);

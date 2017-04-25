@@ -16,9 +16,10 @@ package org.camunda.bpm.engine.test.api.runtime;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
-import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
-import org.camunda.bpm.engine.history.HistoricVariableInstance;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -42,6 +43,7 @@ import java.util.*;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
+import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
 
 
 /**
@@ -81,6 +83,8 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
     if (historicBatch != null) {
       historyService.deleteHistoricBatch(historicBatch.getId());
     }
+
+    engineRule.getProcessEngineConfiguration().setInvocationsPerBatchJob(1);
   }
 
   @Deployment(resources = {
@@ -314,4 +318,51 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
     assertThat(IncrementCounterListener.counter, is(1));
   }
 
+  @Test
+  public void testDeleteProcessInstancesAsyncWithListInDifferentDeployments() {
+    ProcessDefinition sourceDefinition = testRule
+        .deployAndGetDefinition(modify(ProcessModels.ONE_TASK_PROCESS).changeElementId(ProcessModels.PROCESS_KEY, "ONE_TASK_PROCESS"));
+    ProcessDefinition sourceDefinition2 = testRule
+        .deployAndGetDefinition(modify(ProcessModels.TWO_TASKS_PROCESS).changeElementId(ProcessModels.PROCESS_KEY, "TWO_TASKS_PROCESS"));
+    ProcessInstance processInstance1 = engineRule.getRuntimeService().startProcessInstanceById(sourceDefinition.getId());
+    ProcessInstance processInstance2 = engineRule.getRuntimeService().startProcessInstanceById(sourceDefinition2.getId());
+    ProcessInstance processInstance3 = engineRule.getRuntimeService().startProcessInstanceById(sourceDefinition.getId());
+    ProcessInstance processInstance4 = engineRule.getRuntimeService().startProcessInstanceById(sourceDefinition2.getId());
+    ProcessInstance processInstance5 = engineRule.getRuntimeService().startProcessInstanceById(sourceDefinition.getId());
+
+    // given
+    List<String> processInstanceIds = Arrays.asList(processInstance1.getId(), processInstance2.getId(), processInstance3.getId(), processInstance4.getId(),
+        processInstance5.getId());
+    engineRule.getProcessEngineConfiguration().setInvocationsPerBatchJob(2);
+
+    // when
+    Batch batch = runtimeService.deleteProcessInstancesAsync(processInstanceIds, null, "test_reason");
+
+    String seedJobDefinitionId = batch.getSeedJobDefinitionId();
+    Job seedJob = managementService.createJobQuery().jobDefinitionId(seedJobDefinitionId).singleResult();
+    assertNotNull(seedJob);
+    // seed job
+    managementService.executeJob(seedJob.getId());
+
+    // then
+    List<Job> list = managementService.createJobQuery().jobDefinitionId(batch.getBatchJobDefinitionId()).list();
+    assertEquals(4, list.size());
+    assertEquals(sourceDefinition.getDeploymentId(), list.get(0).getDeploymentId());
+    assertEquals(sourceDefinition2.getDeploymentId(), list.get(3).getDeploymentId());
+
+    managementService.executeJob(list.get(0).getId());
+    int jobNumToBeExecuted;
+    if (list.get(1).getDeploymentId().equals(sourceDefinition.getDeploymentId())) {
+      managementService.executeJob(list.get(1).getId());
+      jobNumToBeExecuted = 2;
+    } else {
+      managementService.executeJob(list.get(2).getId());
+      jobNumToBeExecuted = 1;
+    }
+    assertEquals(2, runtimeService.createProcessInstanceQuery().count());
+    assertHistoricTaskDeletionPresent(Arrays.asList(processInstance1.getId(), processInstance3.getId(), processInstance5.getId()), "test_reason", testRule);
+    managementService.executeJob(list.get(jobNumToBeExecuted).getId());
+    managementService.executeJob(list.get(3).getId());
+    assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+  }
 }
