@@ -17,6 +17,7 @@ import java.sql.SQLException;
 import java.util.List;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmd.HistoryCleanupCmd;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
@@ -51,13 +52,23 @@ public class ConcurrentHistoryCleanupTest extends ConcurrencyTestCase {
     super.tearDown();
   }
 
-  /**
-   * hook into test method invocation - after the process engine is initialized
-   */
   @Override
   protected void runTest() throws Throwable {
-    String databaseType = processEngineConfiguration.getDbSqlSessionFactory().getDatabaseType();
+    final Integer transactionIsolationLevel = getTransactionIsolationLevel();
 
+    if (DbSqlSessionFactory.H2.equals(getDatabaseType()) || DbSqlSessionFactory.MARIADB.equals(getDatabaseType()) || (transactionIsolationLevel != null && !transactionIsolationLevel.equals(Connection.TRANSACTION_READ_COMMITTED))) {
+      // skip test method - if database is H2
+    } else {
+      // invoke the test method
+      super.runTest();
+    }
+  }
+
+  private String getDatabaseType() {
+    return processEngineConfiguration.getDbSqlSessionFactory().getDatabaseType();
+  }
+
+  private Integer getTransactionIsolationLevel() {
     final Integer[] transactionIsolation = new Integer[1];
     ((ProcessEngineConfigurationImpl)processEngine.getProcessEngineConfiguration()).getCommandExecutorTxRequired().execute(new Command<Object>() {
       @Override
@@ -70,13 +81,7 @@ public class ConcurrentHistoryCleanupTest extends ConcurrencyTestCase {
         return null;
       }
     });
-
-    if ("h2".equals(databaseType) || (transactionIsolation[0] != null && transactionIsolation[0] != Connection.TRANSACTION_READ_COMMITTED)) {
-      // skip test method - if database is H2
-    } else {
-      // invoke the test method
-      super.runTest();
-    }
+    return transactionIsolation[0];
   }
 
   public void testRunTwoHistoryCleanups() throws InterruptedException {
