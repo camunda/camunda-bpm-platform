@@ -19,58 +19,64 @@ import java.util.Date;
 import java.util.List;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
-import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupHelper;
 import org.camunda.bpm.engine.impl.metrics.Meter;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
-import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.Job;
-import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @author Svetlana Dorokhova
  */
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
-public class HistoryCleanupOnEngineStartTest extends ResourceProcessEngineTestCase {
+public class HistoryCleanupOnEngineStartTest {
 
   protected static final String ONE_TASK_PROCESS = "oneTaskProcess";
 
-  private HistoryService historyService;
+  protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(
+      "org/camunda/bpm/engine/test/api/history/historyCleanupConfigurationTest.cfg.xml") {
+    @Override
+    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+      configuration.setHistoryLevel(HistoryLevel.HISTORY_LEVEL_FULL);
+      return configuration;
+    }
+  };
 
-  public HistoryCleanupOnEngineStartTest() {
-    super("org/camunda/bpm/engine/test/api/history/historyCleanupConfigurationTest.cfg.xml");
-  }
-
-  public ProcessEngineRule engineRule = new ProcessEngineRule(true);
+  protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
+  private HistoryService historyService;
+
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
+  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(testRule);
 
   @Before
   public void init() {
-    historyService = processEngine.getHistoryService();
+    historyService = engineRule.getProcessEngine().getHistoryService();
   }
 
   @After
   public void clearDatabase(){
-    ProcessEngineConfigurationImpl processEngineConfiguration = ((ProcessEngineImpl) processEngine).getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl)engineRule.getProcessEngine().getProcessEngineConfiguration();
     processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
       public Void execute(CommandContext commandContext) {
 
-        List<Job> jobs = processEngine.getManagementService().createJobQuery().list();
+        List<Job> jobs = engineRule.getProcessEngine().getManagementService().createJobQuery().list();
         if (jobs.size() > 0) {
           assertEquals(1, jobs.size());
           String jobId = jobs.get(0).getId();
@@ -88,17 +94,16 @@ public class HistoryCleanupOnEngineStartTest extends ResourceProcessEngineTestCa
     for (Meter meter : meters) {
       meter.getAndClear();
     }
-    processEngine.getManagementService().deleteMetrics(null);
+    engineRule.getProcessEngine().getManagementService().deleteMetrics(null);
 
   }
 
 
   @Test
-  @Ignore("CAM-7541")
   public void testHistoryCleanupJob() throws ParseException {
     Job historyCleanupJob = historyService.findHistoryCleanupJob();
     assertNotNull(historyCleanupJob);
-    Date historyCleanupBatchWindowStartTime = ((ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration())
+    Date historyCleanupBatchWindowStartTime = ((ProcessEngineConfigurationImpl) engineRule.getProcessEngine().getProcessEngineConfiguration())
         .getHistoryCleanupBatchWindowStartTimeAsDate();
     assertEquals(HistoryCleanupHelper.getNextRunWithinBatchWindow(ClockUtil.getCurrentTime(),
         historyCleanupBatchWindowStartTime), historyCleanupJob.getDuedate());
