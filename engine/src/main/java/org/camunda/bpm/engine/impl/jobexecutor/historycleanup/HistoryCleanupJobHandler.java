@@ -36,8 +36,10 @@ public class HistoryCleanupJobHandler implements JobHandler<HistoryCleanupJobHan
 
     boolean rescheduled = false;
 
-    if (configuration.isImmediatelyDue() || !HistoryCleanupHelper.isBatchWindowConfigured(commandContext)
-        || HistoryCleanupHelper.isWithinBatchWindow(ClockUtil.getCurrentTime(), commandContext)) {
+    if (configuration.isImmediatelyDue()
+        || (commandContext.getProcessEngineConfiguration().isEnableAutoHistoryCleanup()
+            && HistoryCleanupHelper.isBatchWindowConfigured(commandContext)
+            && HistoryCleanupHelper.isWithinBatchWindow(ClockUtil.getCurrentTime(), commandContext)) ) {
       //find data to delete
       List<String> processInstanceIds = getProcessInstanceIds(commandContext);
       if (!processInstanceIds.isEmpty() && processInstanceIds.size() >= getBatchSizeThreshold(commandContext)) {

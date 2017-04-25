@@ -121,7 +121,7 @@ public class ProcessEngineImpl implements ProcessEngine {
     }
 
     //create history cleanup job
-//|TODO CAM-7541    processEngineConfiguration.getHistoryService().cleanUpHistoryAsync();
+    processEngineConfiguration.getHistoryService().cleanUpHistoryAsync();
 
   }
 

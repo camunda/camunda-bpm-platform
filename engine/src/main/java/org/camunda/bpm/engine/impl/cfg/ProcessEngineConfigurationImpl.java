@@ -678,6 +678,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected boolean isUseSharedSqlSessionFactory = false;
 
   //History cleanup configuration
+  private boolean enableAutoHistoryCleanup = false;
+
   private String historyCleanupBatchWindowStartTime;
   private String historyCleanupBatchWindowEndTime = "00:00";
 
@@ -3623,6 +3625,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setDisableStrictCallActivityValidation(boolean disableStrictCallActivityValidation) {
     this.disableStrictCallActivityValidation = disableStrictCallActivityValidation;
+  }
+
+  public boolean isEnableAutoHistoryCleanup() {
+    return enableAutoHistoryCleanup;
+  }
+
+  public void setEnableAutoHistoryCleanup(boolean enableAutoHistoryCleanup) {
+    this.enableAutoHistoryCleanup = enableAutoHistoryCleanup;
   }
 
   public String getHistoryCleanupBatchWindowStartTime() {

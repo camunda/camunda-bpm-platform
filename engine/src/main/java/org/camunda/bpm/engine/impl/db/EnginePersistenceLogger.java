@@ -618,5 +618,9 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
         ));
   }
 
+  public void noHistoryCleanupLockPropertyFound() {
+    logError(
+        "078", "No history cleanup lock property found in databse");
+  }
 
 }

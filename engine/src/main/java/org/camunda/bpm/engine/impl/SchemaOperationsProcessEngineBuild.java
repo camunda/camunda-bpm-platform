@@ -61,6 +61,7 @@ public final class SchemaOperationsProcessEngineBuild implements SchemaOperation
     DbEntityManager entityManager = commandContext.getSession(DbEntityManager.class);
     checkHistoryLevel(entityManager);
     checkDeploymentLockExists(entityManager);
+    checkHistoryCleanupLockExists(entityManager);
 
     return null;
   }
@@ -134,4 +135,12 @@ public final class SchemaOperationsProcessEngineBuild implements SchemaOperation
       LOG.noDeploymentLockPropertyFound();
     }
   }
+
+  public void checkHistoryCleanupLockExists(DbEntityManager entityManager) {
+    PropertyEntity historyCleanupLockProperty = entityManager.selectById(PropertyEntity.class, "history.cleanup.job.lock");
+    if (historyCleanupLockProperty == null) {
+      LOG.noHistoryCleanupLockPropertyFound();
+    }
+  }
+
 }

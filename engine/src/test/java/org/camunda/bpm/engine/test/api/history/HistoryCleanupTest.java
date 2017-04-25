@@ -73,6 +73,7 @@ public class HistoryCleanupTest {
     public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
       configuration.setHistoryCleanupBatchSize(20);
       configuration.setHistoryCleanupBatchThreshold(10);
+      configuration.setEnableAutoHistoryCleanup(true);
       return configuration;
     }
   };
@@ -92,6 +93,7 @@ public class HistoryCleanupTest {
     runtimeService = engineRule.getRuntimeService();
     historyService = engineRule.getHistoryService();
     managementService = engineRule.getManagementService();
+    testRule.deploy("org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml");
   }
 
   @After
@@ -136,8 +138,7 @@ public class HistoryCleanupTest {
   }
 
   @Test
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
-  public void testHistoryCleanupJob() {
+  public void testHistoryCleanupManualRun() {
       //given
     prepareData(15);
 
@@ -152,7 +153,68 @@ public class HistoryCleanupTest {
   }
 
   @Test
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
+  public void testHistoryCleanupWithinBatchWindow() {
+    //given
+    prepareData(15);
+
+    //we're within batch window
+    Date now = new Date();
+    ClockUtil.setCurrentTime(now);
+    engineRule.getProcessEngineConfiguration().setHistoryCleanupBatchWindowStartTime(new SimpleDateFormat("HH:mm").format(now));
+    engineRule.getProcessEngineConfiguration().setHistoryCleanupBatchWindowEndTime(new SimpleDateFormat("HH:mm").format(DateUtils.addHours(now, 5)));
+
+    //when
+    String jobId = historyService.cleanUpHistoryAsync(false).getId();
+
+    managementService.executeJob(jobId);
+
+    //then
+    assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());
+  }
+
+  @Test
+  public void testAutoHistoryCleanupDisabledJobIsNotCreated() {
+    //given
+    prepareData(15);
+
+    //we're within batch window
+    Date now = new Date();
+    ClockUtil.setCurrentTime(now);
+    engineRule.getProcessEngineConfiguration().setEnableAutoHistoryCleanup(false);
+    engineRule.getProcessEngineConfiguration().setHistoryCleanupBatchWindowStartTime(new SimpleDateFormat("HH:mm").format(now));
+    engineRule.getProcessEngineConfiguration().setHistoryCleanupBatchWindowEndTime(new SimpleDateFormat("HH:mm").format(DateUtils.addHours(now, 5)));
+
+    //when
+    final Job job = historyService.cleanUpHistoryAsync(false);
+
+    //then
+    assertNull(job);
+    assertEquals(15, historyService.createHistoricProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());
+  }
+
+  @Test
+  public void testAutoHistoryCleanupDisabledJobIsNotExecuted() {
+    //given
+    prepareData(15);
+
+    //we're within batch window
+    Date now = new Date();
+    ClockUtil.setCurrentTime(now);
+    engineRule.getProcessEngineConfiguration().setHistoryCleanupBatchWindowStartTime(new SimpleDateFormat("HH:mm").format(now));
+    engineRule.getProcessEngineConfiguration().setHistoryCleanupBatchWindowEndTime(new SimpleDateFormat("HH:mm").format(DateUtils.addHours(now, 5)));
+
+    final String jobId = historyService.cleanUpHistoryAsync(false).getId();
+
+    engineRule.getProcessEngineConfiguration().setEnableAutoHistoryCleanup(false);
+
+    //when
+    managementService.executeJob(jobId);
+
+    //then
+    assertEquals(15, historyService.createHistoricProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());
+  }
+
+  @Test
   public void testHistoryCleanupJobNullTTL() {
     //given
     List<ProcessDefinition> processDefinitions = engineRule.getRepositoryService().createProcessDefinitionQuery().processDefinitionKey(ONE_TASK_PROCESS).list();
@@ -190,7 +252,6 @@ public class HistoryCleanupTest {
   }
 
   @Test
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testFindHistoryCleanupJob() {
     //given
     String jobId = historyService.cleanUpHistoryAsync(true).getId();
@@ -205,7 +266,6 @@ public class HistoryCleanupTest {
 
 
   @Test
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testRescheduleForNever() {
     //given
 
@@ -231,7 +291,6 @@ public class HistoryCleanupTest {
   }
 
   @Test
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testHistoryCleanupJobResolveIncident() {
     //given
     String jobId = historyService.cleanUpHistoryAsync(true).getId();
@@ -261,7 +320,6 @@ public class HistoryCleanupTest {
   }
 
   @Test
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testLessThanThresholdManualRun() {
     //given
     prepareData(5);
@@ -280,7 +338,6 @@ public class HistoryCleanupTest {
   }
 
   @Test
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testNotEnoughTimeToDeleteEverything() {
     //given
     //we have something to cleanup
@@ -306,14 +363,38 @@ public class HistoryCleanupTest {
   }
 
   @Test
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
+  public void testManualRunDoesNotRespectDisabledHistoryCleanup() {
+    //given
+    prepareData(40);
+
+    //we're within batch window
+    Date now = new Date();
+    ClockUtil.setCurrentTime(now);
+    engineRule.getProcessEngineConfiguration().setEnableAutoHistoryCleanup(false);
+    engineRule.getProcessEngineConfiguration().setHistoryCleanupBatchWindowStartTime(new SimpleDateFormat("HH:mm").format(now));
+    engineRule.getProcessEngineConfiguration().setHistoryCleanupBatchWindowEndTime(new SimpleDateFormat("HH:mm").format(DateUtils.addHours(now, 5)));
+
+    //when
+    //job is executed before batch window start
+    String jobId = historyService.cleanUpHistoryAsync(true).getId();
+    managementService.executeJob(jobId);
+
+    //the job is called for the second time after batch window end
+    ClockUtil.setCurrentTime(DateUtils.addHours(now, 6)); //now + 6 hours
+    managementService.executeJob(jobId);
+
+    //then
+    assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());
+  }
+
+  @Test
   public void testManualRunDoesNotRespectBatchWindow() {
     //given
     //we have something to cleanup
     int processInstanceCount = 40;
     prepareData(processInstanceCount);
-    //we call history cleanup outside batch window
 
+    //we call history cleanup outside batch window
     Date now = new Date();
     ClockUtil.setCurrentTime(now);
     engineRule.getProcessEngineConfiguration().setHistoryCleanupBatchWindowStartTime(new SimpleDateFormat("HH:mm").format(DateUtils.addHours(now, 1))); //now + 1 hour
@@ -332,8 +413,8 @@ public class HistoryCleanupTest {
     assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());
   }
 
+
   @Test
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testLessThanThresholdWithinBatchWindow() {
     //given
     prepareData(5);
@@ -378,7 +459,6 @@ public class HistoryCleanupTest {
   }
 
   @Test
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testLessThanThresholdWithinBatchWindowAgain() {
     //given
     prepareData(5);
@@ -413,7 +493,6 @@ public class HistoryCleanupTest {
   }
 
   @Test
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testLessThanThresholdWithinBatchWindowMaxDelayReached() {
     //given
     prepareData(5);
@@ -447,7 +526,6 @@ public class HistoryCleanupTest {
   }
 
   @Test
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testLessThanThresholdCloseToBatchWindowEndTime() {
     //given
     prepareData(5);
@@ -480,7 +558,6 @@ public class HistoryCleanupTest {
   }
 
   @Test
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testLessThanThresholdOutsideBatchWindow() {
     //given
     prepareData(5);
@@ -513,7 +590,6 @@ public class HistoryCleanupTest {
   }
 
   @Test
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testLessThanThresholdOutsideBatchWindowAfterMidnight() {
     //given
     prepareData(5);
@@ -545,7 +621,6 @@ public class HistoryCleanupTest {
   }
 
   @Test
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testLessThanThresholdOutsideBatchWindowBeforeMidnight() {
     //given
     prepareData(5);
@@ -577,7 +652,6 @@ public class HistoryCleanupTest {
   }
 
   @Test
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testLessThanThresholdWithinBatchWindowBeforeMidnight() {
     //given
     prepareData(5);
@@ -611,7 +685,6 @@ public class HistoryCleanupTest {
   }
 
   @Test
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testLessThanThresholdWithinBatchWindowAfterMidnight() {
     //given
     prepareData(5);
