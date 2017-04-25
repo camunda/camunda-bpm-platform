@@ -86,7 +86,7 @@ public class HistoryCleanupTest {
   private ManagementService managementService;
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
+  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(testRule);
   
   @Before
   public void init() {
