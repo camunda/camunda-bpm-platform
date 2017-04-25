@@ -9,7 +9,8 @@ function CamSearch($scope, exposeScopeProperties, searchWidgetUtils) {
     'config',
     'onQueryChange',
     'arrayTypes',
-    'variableTypes'
+    'variableTypes',
+    'total'
   ]);
 
   this.init($scope);

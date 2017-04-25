@@ -14,7 +14,8 @@ module.exports = function() {
       arrayTypes: '=?',
       variableTypes: '=?',
       storageGroup: '=?',
-      onQueryChange: '&'
+      onQueryChange: '&',
+      total: '=?'
     }
   };
 };
