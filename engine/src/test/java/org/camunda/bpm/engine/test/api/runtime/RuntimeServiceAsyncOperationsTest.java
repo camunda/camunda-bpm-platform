@@ -320,15 +320,15 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
 
   @Test
   public void testDeleteProcessInstancesAsyncWithListInDifferentDeployments() {
-    ProcessDefinition sourceDefinition = testRule
+    ProcessDefinition sourceDefinition1 = testRule
         .deployAndGetDefinition(modify(ProcessModels.ONE_TASK_PROCESS).changeElementId(ProcessModels.PROCESS_KEY, "ONE_TASK_PROCESS"));
     ProcessDefinition sourceDefinition2 = testRule
         .deployAndGetDefinition(modify(ProcessModels.TWO_TASKS_PROCESS).changeElementId(ProcessModels.PROCESS_KEY, "TWO_TASKS_PROCESS"));
-    ProcessInstance processInstance1 = engineRule.getRuntimeService().startProcessInstanceById(sourceDefinition.getId());
+    ProcessInstance processInstance1 = engineRule.getRuntimeService().startProcessInstanceById(sourceDefinition1.getId());
     ProcessInstance processInstance2 = engineRule.getRuntimeService().startProcessInstanceById(sourceDefinition2.getId());
-    ProcessInstance processInstance3 = engineRule.getRuntimeService().startProcessInstanceById(sourceDefinition.getId());
+    ProcessInstance processInstance3 = engineRule.getRuntimeService().startProcessInstanceById(sourceDefinition1.getId());
     ProcessInstance processInstance4 = engineRule.getRuntimeService().startProcessInstanceById(sourceDefinition2.getId());
-    ProcessInstance processInstance5 = engineRule.getRuntimeService().startProcessInstanceById(sourceDefinition.getId());
+    ProcessInstance processInstance5 = engineRule.getRuntimeService().startProcessInstanceById(sourceDefinition1.getId());
 
     // given
     List<String> processInstanceIds = Arrays.asList(processInstance1.getId(), processInstance2.getId(), processInstance3.getId(), processInstance4.getId(),
@@ -345,24 +345,26 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
     managementService.executeJob(seedJob.getId());
 
     // then
-    List<Job> list = managementService.createJobQuery().jobDefinitionId(batch.getBatchJobDefinitionId()).list();
-    assertEquals(4, list.size());
-    assertEquals(sourceDefinition.getDeploymentId(), list.get(0).getDeploymentId());
-    assertEquals(sourceDefinition2.getDeploymentId(), list.get(3).getDeploymentId());
+    List<Job> jobs = managementService.createJobQuery().jobDefinitionId(batch.getBatchJobDefinitionId()).list();
+    assertEquals(4, jobs.size());
+    assertEquals(sourceDefinition1.getDeploymentId(), jobs.get(0).getDeploymentId());
+    assertEquals(sourceDefinition2.getDeploymentId(), jobs.get(3).getDeploymentId());
 
-    managementService.executeJob(list.get(0).getId());
-    int jobNumToBeExecuted;
-    if (list.get(1).getDeploymentId().equals(sourceDefinition.getDeploymentId())) {
-      managementService.executeJob(list.get(1).getId());
-      jobNumToBeExecuted = 2;
-    } else {
-      managementService.executeJob(list.get(2).getId());
-      jobNumToBeExecuted = 1;
+    List<Integer> jobsToBeExecuted = new ArrayList<Integer>();
+    for (int i = 0; i < jobs.size(); i++) {
+
+      if (jobs.get(i).getDeploymentId().equals(sourceDefinition1.getDeploymentId())) {
+        managementService.executeJob(jobs.get(i).getId());
+      } else {
+        jobsToBeExecuted.add(i);
+      }
     }
     assertEquals(2, runtimeService.createProcessInstanceQuery().count());
     assertHistoricTaskDeletionPresent(Arrays.asList(processInstance1.getId(), processInstance3.getId(), processInstance5.getId()), "test_reason", testRule);
-    managementService.executeJob(list.get(jobNumToBeExecuted).getId());
-    managementService.executeJob(list.get(3).getId());
+    assertHistoricTaskDeletionPresent(Arrays.asList(processInstance2.getId(), processInstance4.getId()), null, testRule);
+    for (int i = 0; i < jobsToBeExecuted.size(); i++) {
+      managementService.executeJob(jobs.get(jobsToBeExecuted.get(i)).getId());
+    }
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
   }
 }

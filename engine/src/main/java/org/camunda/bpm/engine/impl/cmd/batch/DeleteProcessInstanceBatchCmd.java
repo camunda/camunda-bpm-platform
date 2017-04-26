@@ -70,7 +70,11 @@ public class DeleteProcessInstanceBatchCmd extends AbstractIDBasedBatchCmd<Batch
     final List<String> result = new ArrayList<String>();
     
     if (collectedProcessInstanceIds.size() > 2) {
-
+      /*
+       * Optimisation related to #CAM-7519. In order to improve the performance
+       * of job execution the Process instances are been ordered by Deployment
+       * id. That way we reduce the number of created batch jobs.
+       */
       final ProcessInstanceQueryImpl processInstanceQueryToBeProcess = new ProcessInstanceQueryImpl();
       processInstanceQueryToBeProcess.processInstanceIds(collectedProcessInstanceIds);
       processInstanceQueryToBeProcess.orderBy(new QueryPropertyImpl("DEPLOYMENT_ID_")).asc();
