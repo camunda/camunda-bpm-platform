@@ -40,7 +40,7 @@ public class PvmAtomicOperationDeleteCascade implements PvmAtomicOperation {
     }
 
     if (firstLeaf.getSubProcessInstance()!=null) {
-      firstLeaf.getSubProcessInstance().deleteCascade(execution.getDeleteReason(), firstLeaf.isSkipCustomListeners());
+      firstLeaf.getSubProcessInstance().deleteCascade(execution.getDeleteReason(), firstLeaf.isSkipCustomListeners(), firstLeaf.isSkipIoMappings());
     }
 
     firstLeaf.performOperation(DELETE_CASCADE_FIRE_ACTIVITY_END);
