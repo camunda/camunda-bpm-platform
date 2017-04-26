@@ -3,18 +3,17 @@ image::./docs/camunda-spring-boot-logo.png[alt="Logo", width="150", float="right
 
 # camunda-bpm-spring-boot-starter
 
-[cols="a,a,a,a,a"]
+[cols="a,a,a,a"]
 ,====
 // mvn travis
-image::https://travis-ci.org/camunda/camunda-bpm-spring-boot-starter.svg?branch=master[link="https://travis-ci.org/camunda/camunda-bpm-spring-boot"]
+image::https://travis-ci.org/camunda/camunda-bpm-spring-boot-starter.svg?branch=master[link="https://travis-ci.org/camunda/camunda-bpm-spring-boot-starter"]
 // license
 image::https://img.shields.io/badge/License-Apache%202.0-blue.svg[link="./LICENSE"]
-// mvn-central
+// mvn central
 image::https://maven-badges.herokuapp.com/maven-central/org.camunda.bpm.extension.springboot/camunda-bpm-spring-boot-starter/badge.svg[link="https://maven-badges.herokuapp.com/maven-central/org.camunda.bpm.extension.springboot/camunda-bpm-spring-boot-starter"]
 // openhub
 image::https://www.openhub.net/p/camunda-bpm-spring-boot-starter/widgets/project_thin_badge.gif[link="https://www.openhub.net/p/camunda-bpm-spring-boot-starter"]
 ,====
-
 
 
 ## Get started
@@ -94,10 +93,6 @@ If you have implemented an `CamundaConfiguration` you have to switch to `Process
 
 * https://github.com/camunda/camunda-bpm-spring-boot-starter/milestone/5?closed=1[Release Notes 1.2.1]
 * https://blog.camunda.org/post/2016/06/camunda-spring-boot-1.2.0-released/[Blog Article for release 1.2.0]
-
-## Roadmap
-
-* https://github.com/camunda/camunda-bpm-spring-boot-starter/milestone/3[Milestone 2.0.0] - Java8 + Spring Boot 1.4
 
 ## Maintainer
 
