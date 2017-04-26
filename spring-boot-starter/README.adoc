@@ -68,9 +68,10 @@ Check out the https://camunda.github.io/camunda-bpm-spring-boot-starter[Document
 
 ## Releases
 
-### 2.0.0
+### 2.x
 
-include::docs/src/main/asciidoc/changelog/200.adoc[]
+* link:docs/src/main/asciidoc/changelog/210.adoc[Release Notes 2.1.0]
+* link:docs/src/main/asciidoc/changelog/200.adoc[Release Notes 2.0.0]
 
 ### 1.3.0
 
