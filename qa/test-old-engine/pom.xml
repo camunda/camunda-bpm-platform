@@ -59,34 +59,34 @@
           <dependency>
             <groupId>org.camunda.bpm</groupId>
             <artifactId>camunda-bom</artifactId>
-            <version>${camunda.old.engine.version}</version>
+            <version>7.6.0</version>
             <scope>import</scope>
             <type>pom</type>
           </dependency>
           <dependency>
             <groupId>org.camunda.bpm</groupId>
             <artifactId>camunda-engine</artifactId>
-            <version>${camunda.old.engine.version}</version>
+            <version>7.6.0</version>
           </dependency>
           <dependency>
             <groupId>org.camunda.bpm.model</groupId>
             <artifactId>camunda-xml-model</artifactId>
-            <version>${camunda.old.engine.version}</version>
+            <version>7.6.0</version>
           </dependency>
           <dependency>
             <groupId>org.camunda.bpm.model</groupId>
             <artifactId>camunda-bpmn-model</artifactId>
-            <version>${camunda.old.engine.version}</version>
+            <version>7.6.0</version>
           </dependency>
           <dependency>
             <groupId>org.camunda.bpm.model</groupId>
             <artifactId>camunda-cmmn-model</artifactId>
-            <version>${camunda.old.engine.version}</version>
+            <version>7.6.0</version>
           </dependency>
           <dependency>
             <groupId>org.camunda.bpm.model</groupId>
             <artifactId>camunda-dmn-model</artifactId>
-            <version>${camunda.old.engine.version}</version>
+            <version>7.6.0</version>
           </dependency>
          </dependencies>
       </dependencyManagement>
@@ -168,7 +168,7 @@
         <dependency>
           <groupId>org.camunda.bpm</groupId>
           <artifactId>camunda-engine</artifactId>
-          <version>${camunda.old.engine.version}</version>
+          <version>7.6.0</version>
           <scope>test</scope>
         </dependency>
         <dependency>
@@ -306,6 +306,8 @@
                 
                 <exclude>**/ProcessDiagramRetrievalTest.java</exclude>
 
+                <!-- ManagementServiceTest must be included back after 7.6.5 released -> CAM-7696 -->
+                <exclude>**/ManagementServiceTest.java</exclude>
                 <exclude>**/ManagementServiceTableCountTest.java</exclude>
               </excludes>
               <testFailureIgnore>false</testFailureIgnore>
