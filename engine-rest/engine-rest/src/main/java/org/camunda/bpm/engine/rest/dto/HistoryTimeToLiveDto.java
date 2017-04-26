@@ -15,22 +15,22 @@ package org.camunda.bpm.engine.rest.dto;
 /**
  * @author Svetlana Dorokhova
  */
-public class TimeToLiveDto {
+public class HistoryTimeToLiveDto {
 
-  private Integer timeToLive;
+  private Integer historyTimeToLive;
 
-  public TimeToLiveDto() {
+  public HistoryTimeToLiveDto() {
   }
 
-  public TimeToLiveDto(Integer timeToLive) {
-    this.timeToLive = timeToLive;
+  public HistoryTimeToLiveDto(Integer historyTimeToLive) {
+    this.historyTimeToLive = historyTimeToLive;
   }
 
-  public Integer getTimeToLive() {
-    return timeToLive;
+  public Integer getHistoryTimeToLive() {
+    return historyTimeToLive;
   }
 
-  public void setTimeToLive(Integer timeToLive) {
-    this.timeToLive = timeToLive;
+  public void setHistoryTimeToLive(Integer historyTimeToLive) {
+    this.historyTimeToLive = historyTimeToLive;
   }
 }

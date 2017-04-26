@@ -28,7 +28,7 @@ import org.camunda.bpm.engine.management.ActivityStatisticsQuery;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.rest.ProcessInstanceRestService;
 import org.camunda.bpm.engine.rest.dto.StatisticsResultDto;
-import org.camunda.bpm.engine.rest.dto.TimeToLiveDto;
+import org.camunda.bpm.engine.rest.dto.HistoryTimeToLiveDto;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 import org.camunda.bpm.engine.rest.dto.repository.ActivityStatisticsResultDto;
@@ -342,12 +342,12 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
   }
 
   @Override
-  public void updateTimeToLive(TimeToLiveDto timeToLiveDto) {
+  public void updateHistoryTimeToLive(HistoryTimeToLiveDto historyTimeToLiveDto) {
     Integer timeToLive = null;
-    if (timeToLiveDto != null) {
-      timeToLive = timeToLiveDto.getTimeToLive();
+    if (historyTimeToLiveDto != null) {
+      timeToLive = historyTimeToLiveDto.getHistoryTimeToLive();
     }
-    engine.getRepositoryService().updateProcessDefinitionTimeToLive(processDefinitionId, timeToLive);
+    engine.getRepositoryService().updateProcessDefinitionHistoryTimeToLive(processDefinitionId, timeToLive);
   }
 
   public Map<String, VariableValueDto> getFormVariables(String variableNames, boolean deserializeValues) {

@@ -24,28 +24,28 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 /**
  * @author Svetlana Dorokhova
  */
-public class UpdateProcessDefinitionTimeToLiveCmd implements Command<Void>, Serializable {
+public class UpdateProcessDefinitionHistoryTimeToLiveCmd implements Command<Void>, Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	protected String processDefinitionId;
-  protected Integer timeToLive;
+  protected Integer historyTimeToLive;
 
-	public UpdateProcessDefinitionTimeToLiveCmd(String processDefinitionId, Integer timeToLive) {
+	public UpdateProcessDefinitionHistoryTimeToLiveCmd(String processDefinitionId, Integer historyTimeToLive) {
 		this.processDefinitionId = processDefinitionId;
-		this.timeToLive = timeToLive;
+		this.historyTimeToLive = historyTimeToLive;
 	}
 
 	public Void execute(CommandContext commandContext) {
     checkAuthorization(commandContext);
 
     ensureNotNull(BadUserRequestException.class, "processDefinitionId", processDefinitionId);
-    if (timeToLive != null) {
-      ensureGreaterThanOrEqual(BadUserRequestException.class, "", "historyTimeToLive", timeToLive, 0);
+    if (historyTimeToLive != null) {
+      ensureGreaterThanOrEqual(BadUserRequestException.class, "", "historyTimeToLive", historyTimeToLive, 0);
     }
 
     ProcessDefinitionEntity processDefinitionEntity = commandContext.getDbEntityManager().selectById(ProcessDefinitionEntity.class, processDefinitionId);
-    processDefinitionEntity.setHistoryTimeToLive(timeToLive);
+    processDefinitionEntity.setHistoryTimeToLive(historyTimeToLive);
     commandContext.getProcessDefinitionManager().updateProcessDefinition(processDefinitionEntity);
 
     return null;

@@ -803,7 +803,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
     ProcessDefinitionEntity processDefinition = findOnlyProcessDefinition();
 
     //when
-    repositoryService.updateProcessDefinitionTimeToLive(processDefinition.getId(), 6);
+    repositoryService.updateProcessDefinitionHistoryTimeToLive(processDefinition.getId(), 6);
 
     //then
     processDefinition = findOnlyProcessDefinition();
@@ -817,7 +817,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
     ProcessDefinitionEntity processDefinition = findOnlyProcessDefinition();
 
     //when
-    repositoryService.updateProcessDefinitionTimeToLive(processDefinition.getId(), null);
+    repositoryService.updateProcessDefinitionHistoryTimeToLive(processDefinition.getId(), null);
 
     //then
     processDefinition = findOnlyProcessDefinition();
@@ -832,7 +832,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
 
     //when
     try {
-      repositoryService.updateProcessDefinitionTimeToLive(processDefinition.getId(), -1);
+      repositoryService.updateProcessDefinitionHistoryTimeToLive(processDefinition.getId(), -1);
       fail("Exception is expected, that negative velue is not allowed.");
     } catch (BadUserRequestException ex) {
       assertTrue(ex.getMessage().contains("greater than"));

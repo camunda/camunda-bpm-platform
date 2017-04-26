@@ -14,7 +14,7 @@ import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
-import org.camunda.bpm.engine.rest.dto.TimeToLiveDto;
+import org.camunda.bpm.engine.rest.dto.HistoryTimeToLiveDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.helper.*;
@@ -86,7 +86,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   protected static final String SINGLE_PROCESS_DEFINITION_SUSPENDED_URL = SINGLE_PROCESS_DEFINITION_URL + "/suspended";
   protected static final String SINGLE_PROCESS_DEFINITION_BY_KEY_SUSPENDED_URL = SINGLE_PROCESS_DEFINITION_BY_KEY_URL + "/suspended";
-  protected static final String SINGLE_PROCESS_DEFINITION_TIMETOLIVE_URL = SINGLE_PROCESS_DEFINITION_URL + "/time-to-live";
+  protected static final String SINGLE_PROCESS_DEFINITION_HISTORY_TIMETOLIVE_URL = SINGLE_PROCESS_DEFINITION_URL + "/history-time-to-live";
   protected static final String PROCESS_DEFINITION_SUSPENDED_URL = PROCESS_DEFINITION_URL + "/suspended";
 
   private RuntimeService runtimeServiceMock;
@@ -3149,88 +3149,88 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
 
   @Test
-  public void testUpdateTimeToLive() {
+  public void testUpdateHistoryTimeToLive() {
     given()
         .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
-        .content(new TimeToLiveDto(5))
+        .content(new HistoryTimeToLiveDto(5))
         .contentType(ContentType.JSON)
         .then().expect()
           .statusCode(Status.NO_CONTENT.getStatusCode())
         .when()
-          .put(SINGLE_PROCESS_DEFINITION_TIMETOLIVE_URL);
+          .put(SINGLE_PROCESS_DEFINITION_HISTORY_TIMETOLIVE_URL);
 
-    verify(repositoryServiceMock).updateProcessDefinitionTimeToLive(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, 5);
+    verify(repositoryServiceMock).updateProcessDefinitionHistoryTimeToLive(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, 5);
   }
 
   @Test
-  public void testUpdateTimeToLiveAbsentValue() {
+  public void testUpdateHistoryTimeToLiveAbsentValue() {
     given()
         .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
         .contentType(ContentType.JSON)
         .then().expect()
           .statusCode(Status.NO_CONTENT.getStatusCode())
         .when()
-          .put(SINGLE_PROCESS_DEFINITION_TIMETOLIVE_URL);
+          .put(SINGLE_PROCESS_DEFINITION_HISTORY_TIMETOLIVE_URL);
 
-    verify(repositoryServiceMock).updateProcessDefinitionTimeToLive(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, null);
+    verify(repositoryServiceMock).updateProcessDefinitionHistoryTimeToLive(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, null);
   }
 
   @Test
-  public void testUpdateTimeToLiveNullValue() {
+  public void testUpdateHistoryTimeToLiveNullValue() {
     given()
         .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
-        .content(new TimeToLiveDto())
+        .content(new HistoryTimeToLiveDto())
         .contentType(ContentType.JSON)
         .then().expect()
           .statusCode(Status.NO_CONTENT.getStatusCode())
         .when()
-          .put(SINGLE_PROCESS_DEFINITION_TIMETOLIVE_URL);
+          .put(SINGLE_PROCESS_DEFINITION_HISTORY_TIMETOLIVE_URL);
 
-    verify(repositoryServiceMock).updateProcessDefinitionTimeToLive(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, null);
+    verify(repositoryServiceMock).updateProcessDefinitionHistoryTimeToLive(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, null);
   }
 
   @Test
-  public void testUpdateTimeToLiveNegativeValue() {
+  public void testUpdateHistoryTimeToLiveNegativeValue() {
     String expectedMessage = "expectedMessage";
 
     doThrow(new BadUserRequestException(expectedMessage))
         .when(repositoryServiceMock)
-        .updateProcessDefinitionTimeToLive(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID), eq(-1));
+        .updateProcessDefinitionHistoryTimeToLive(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID), eq(-1));
 
     given()
         .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
-        .content(new TimeToLiveDto(-1))
+        .content(new HistoryTimeToLiveDto(-1))
         .contentType(ContentType.JSON)
         .then().expect()
           .statusCode(Status.BAD_REQUEST.getStatusCode())
           .body("type", is(BadUserRequestException.class.getSimpleName()))
           .body("message", containsString(expectedMessage))
         .when()
-          .put(SINGLE_PROCESS_DEFINITION_TIMETOLIVE_URL);
+          .put(SINGLE_PROCESS_DEFINITION_HISTORY_TIMETOLIVE_URL);
 
-    verify(repositoryServiceMock).updateProcessDefinitionTimeToLive(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, -1);
+    verify(repositoryServiceMock).updateProcessDefinitionHistoryTimeToLive(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, -1);
   }
 
   @Test
-  public void testUpdateTimeToLiveAuthorizationException() {
+  public void testUpdateHistoryTimeToLiveAuthorizationException() {
     String expectedMessage = "expectedMessage";
 
     doThrow(new AuthorizationException(expectedMessage))
         .when(repositoryServiceMock)
-        .updateProcessDefinitionTimeToLive(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID), eq(5));
+        .updateProcessDefinitionHistoryTimeToLive(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID), eq(5));
 
     given()
         .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
-        .content(new TimeToLiveDto(5))
+        .content(new HistoryTimeToLiveDto(5))
         .contentType(ContentType.JSON)
         .then().expect()
         .statusCode(Status.FORBIDDEN.getStatusCode())
         .body("type", is(AuthorizationException.class.getSimpleName()))
         .body("message", containsString(expectedMessage))
         .when()
-        .put(SINGLE_PROCESS_DEFINITION_TIMETOLIVE_URL);
+        .put(SINGLE_PROCESS_DEFINITION_HISTORY_TIMETOLIVE_URL);
 
-    verify(repositoryServiceMock).updateProcessDefinitionTimeToLive(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, 5);
+    verify(repositoryServiceMock).updateProcessDefinitionHistoryTimeToLive(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, 5);
   }
 
   @Test

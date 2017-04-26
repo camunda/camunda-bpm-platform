@@ -221,7 +221,7 @@ public class HistoryCleanupTest {
     assertEquals(1, processDefinitions.size());
     String id = processDefinitions.get(0).getId();
 
-    engineRule.getRepositoryService().updateProcessDefinitionTimeToLive(id, null);
+    engineRule.getRepositoryService().updateProcessDefinitionHistoryTimeToLive(id, null);
 
     prepareData(15);
 

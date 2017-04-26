@@ -13,7 +13,7 @@
 package org.camunda.bpm.engine.rest.sub.repository;
 
 import org.camunda.bpm.engine.rest.dto.StatisticsResultDto;
-import org.camunda.bpm.engine.rest.dto.TimeToLiveDto;
+import org.camunda.bpm.engine.rest.dto.HistoryTimeToLiveDto;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDiagramDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto;
@@ -83,9 +83,9 @@ public interface ProcessDefinitionResource {
   void updateSuspensionState(ProcessDefinitionSuspensionStateDto dto);
 
   @PUT
-  @Path("/time-to-live")
+  @Path("/history-time-to-live")
   @Consumes(MediaType.APPLICATION_JSON)
-  void updateTimeToLive(TimeToLiveDto timeToLiveDto);
+  void updateHistoryTimeToLive(HistoryTimeToLiveDto historyTimeToLiveDto);
 
   @GET
   @Path("/form-variables")

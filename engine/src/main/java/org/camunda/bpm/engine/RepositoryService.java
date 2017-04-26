@@ -434,9 +434,9 @@ public interface RepositoryService {
   /**
    * Updates time to live of process definition. The field is used within history cleanup process.
    * @param processDefinitionId
-   * @param timeToLive
+   * @param historyTimeToLive
    */
-  void updateProcessDefinitionTimeToLive(String processDefinitionId, Integer timeToLive);
+  void updateProcessDefinitionHistoryTimeToLive(String processDefinitionId, Integer historyTimeToLive);
 
   /**
    * Gives access to a deployed process model, e.g., a BPMN 2.0 XML file,
