@@ -41,11 +41,11 @@ public class UpdateProcessDefinitionTimeToLiveCmd implements Command<Void>, Seri
 
     ensureNotNull(BadUserRequestException.class, "processDefinitionId", processDefinitionId);
     if (timeToLive != null) {
-      ensureGreaterThanOrEqual(BadUserRequestException.class, "", "timeToLive", timeToLive, 0);
+      ensureGreaterThanOrEqual(BadUserRequestException.class, "", "historyTimeToLive", timeToLive, 0);
     }
 
     ProcessDefinitionEntity processDefinitionEntity = commandContext.getDbEntityManager().selectById(ProcessDefinitionEntity.class, processDefinitionId);
-    processDefinitionEntity.setTimeToLive(timeToLive);
+    processDefinitionEntity.setHistoryTimeToLive(timeToLive);
     commandContext.getProcessDefinitionManager().updateProcessDefinition(processDefinitionEntity);
 
     return null;

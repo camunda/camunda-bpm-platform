@@ -96,7 +96,7 @@ public class ProcessDefinitionDto {
     dto.suspended = definition.isSuspended();
     dto.tenantId = definition.getTenantId();
     dto.versionTag = definition.getVersionTag();
-    dto.timeToLive = definition.getTimeToLive();
+    dto.timeToLive = definition.getHistoryTimeToLive();
     return dto;
   }
 

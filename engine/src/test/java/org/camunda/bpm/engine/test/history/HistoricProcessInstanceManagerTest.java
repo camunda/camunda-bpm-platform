@@ -85,7 +85,7 @@ public class HistoricProcessInstanceManagerTest {
     List<ProcessDefinition> processDefinitions = engineRule.getRepositoryService().createProcessDefinitionQuery().processDefinitionKey(businessKey).list();
     assertEquals(1, processDefinitions.size());
     ProcessDefinitionEntity processDefinition1 = (ProcessDefinitionEntity) processDefinitions.get(0);
-    processDefinition1.setTimeToLive(timeToLive);
+    processDefinition1.setHistoryTimeToLive(timeToLive);
     commandContext.getDbEntityManager().merge(processDefinition1);
   }
 

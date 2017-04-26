@@ -7,7 +7,7 @@
   <!-- PROCESSDEFINITION INSERT -->
 
   <insert id="insertProcessDefinition" parameterType="org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity">
-    insert into ${prefix}ACT_RE_PROCDEF(ID_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, RESOURCE_NAME_, DGRM_RESOURCE_NAME_, HAS_START_FORM_KEY_, SUSPENSION_STATE_, TENANT_ID_, VERSION_TAG_, TTL_, REV_)
+    insert into ${prefix}ACT_RE_PROCDEF(ID_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, RESOURCE_NAME_, DGRM_RESOURCE_NAME_, HAS_START_FORM_KEY_, SUSPENSION_STATE_, TENANT_ID_, VERSION_TAG_, HISTORY_TTL_, REV_)
     values (#{id, jdbcType=VARCHAR},
             #{category, jdbcType=VARCHAR},
             #{name, jdbcType=VARCHAR},
@@ -20,7 +20,7 @@
             #{suspensionState, jdbcType=INTEGER},
             #{tenantId, jdbcType=VARCHAR},
             #{versionTag, jdbcType=VARCHAR},
-            #{timeToLive, jdbcType=INTEGER},
+            #{historyTimeToLive, jdbcType=INTEGER},
             1
            )
   </insert>
@@ -31,7 +31,7 @@
     update ${prefix}ACT_RE_PROCDEF set
       REV_ = #{revisionNext, jdbcType=INTEGER},
       SUSPENSION_STATE_ = #{suspensionState, jdbcType=INTEGER},
-      TTL_ = #{timeToLive, jdbcType=INTEGER}
+      HISTORY_TTL_ = #{historyTimeToLive, jdbcType=INTEGER}
     where ID_ = #{id, jdbcType=VARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
   </update>
@@ -85,7 +85,7 @@
     <result property="suspensionState" column="SUSPENSION_STATE_" jdbcType="INTEGER"/>
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     <result property="versionTag" column="VERSION_TAG_" jdbcType="VARCHAR" />
-    <result property="timeToLive" column="TTL_" jdbcType="INTEGER" />
+    <result property="historyTimeToLive" column="HISTORY_TTL_" jdbcType="INTEGER" />
   </resultMap>
 
   <!-- PROCESSDEFINITION SELECT -->

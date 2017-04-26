@@ -118,7 +118,7 @@ create table ACT_RE_PROCDEF (
     SUSPENSION_STATE_ INTEGER,
     TENANT_ID_ NVARCHAR2(64),
     VERSION_TAG_ NVARCHAR2(64),
-    TTL_ integer,
+    HISTORY_TTL_ integer,
     primary key (ID_)
 );
 

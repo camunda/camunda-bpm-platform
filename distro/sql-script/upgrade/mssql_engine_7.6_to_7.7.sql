@@ -38,6 +38,6 @@ ALTER TABLE ACT_HI_DETAIL
 insert into ACT_GE_PROPERTY
 values ('history.cleanup.job.lock', '0', 1);
 
--- timeToLive column for history cleanup
+-- historyTimeToLive column for history cleanup
 ALTER TABLE ACT_RE_PROCDEF
-  ADD TTL_ INT;
+  ADD HISTORY_TTL_ INT;

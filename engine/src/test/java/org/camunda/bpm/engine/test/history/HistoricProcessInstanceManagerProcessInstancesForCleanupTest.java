@@ -134,7 +134,7 @@ public class HistoricProcessInstanceManagerProcessInstancesForCleanupTest {
                 .processDefinitionId(historicProcessInstance.getProcessDefinitionId()).list();
             assertEquals(1, processDefinitions.size());
             ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) processDefinitions.get(0);
-            assertTrue(historicProcessInstance.getEndTime().before(DateUtils.addDays(ClockUtil.getCurrentTime(), processDefinition.getTimeToLive())));
+            assertTrue(historicProcessInstance.getEndTime().before(DateUtils.addDays(ClockUtil.getCurrentTime(), processDefinition.getHistoryTimeToLive())));
           }
         }
 
@@ -148,7 +148,7 @@ public class HistoricProcessInstanceManagerProcessInstancesForCleanupTest {
     List<ProcessDefinition> processDefinitions = engineRule.getRepositoryService().createProcessDefinitionQuery().processDefinitionKey(businessKey).list();
     assertEquals(1, processDefinitions.size());
     ProcessDefinitionEntity processDefinition1 = (ProcessDefinitionEntity) processDefinitions.get(0);
-    processDefinition1.setTimeToLive(timeToLive);
+    processDefinition1.setHistoryTimeToLive(timeToLive);
     commandContext.getDbEntityManager().merge(processDefinition1);
   }
 

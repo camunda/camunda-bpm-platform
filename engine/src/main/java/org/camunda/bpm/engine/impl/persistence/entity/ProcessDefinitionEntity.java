@@ -63,7 +63,7 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
   protected int suspensionState = SuspensionState.ACTIVE.getStateCode();
   protected String tenantId;
   protected String versionTag;
-  protected Integer timeToLive;
+  protected Integer historyTimeToLive;
   protected boolean isIdentityLinksInitialized = false;
   protected List<IdentityLinkEntity> definitionIdentityLinkEntities = new ArrayList<IdentityLinkEntity>();
   protected Set<Expression> candidateStarterUserIdExpressions = new HashSet<Expression>();
@@ -197,7 +197,7 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
       // TODO: add a guard once the mismatch between revisions in deployment cache and database has been resolved
       this.revision = updatingProcessDefinition.revision;
       this.suspensionState = updatingProcessDefinition.suspensionState;
-      this.timeToLive = updatingProcessDefinition.timeToLive;
+      this.historyTimeToLive = updatingProcessDefinition.historyTimeToLive;
     }
     else {
       LOG.logUpdateUnrelatedProcessDefinitionEntity(this.key, updatingProcessDefinition.key, this.deploymentId, updatingProcessDefinition.deploymentId);
@@ -449,11 +449,11 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
     this.versionTag = versionTag;
   }
 
-  public Integer getTimeToLive() {
-    return timeToLive;
+  public Integer getHistoryTimeToLive() {
+    return historyTimeToLive;
   }
 
-  public void setTimeToLive(Integer timeToLive) {
-    this.timeToLive = timeToLive;
+  public void setHistoryTimeToLive(Integer historyTimeToLive) {
+    this.historyTimeToLive = historyTimeToLive;
   }
 }

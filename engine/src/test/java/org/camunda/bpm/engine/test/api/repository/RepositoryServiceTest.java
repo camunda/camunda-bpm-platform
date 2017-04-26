@@ -807,7 +807,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
 
     //then
     processDefinition = findOnlyProcessDefinition();
-    assertEquals(6, processDefinition.getTimeToLive().intValue());
+    assertEquals(6, processDefinition.getHistoryTimeToLive().intValue());
 
   }
 
@@ -821,7 +821,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
 
     //then
     processDefinition = findOnlyProcessDefinition();
-    assertEquals(null, processDefinition.getTimeToLive());
+    assertEquals(null, processDefinition.getHistoryTimeToLive());
 
   }
 

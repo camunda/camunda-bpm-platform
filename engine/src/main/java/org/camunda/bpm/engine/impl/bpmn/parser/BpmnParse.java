@@ -538,8 +538,8 @@ public class BpmnParse extends Parse {
     processDefinition.setVersionTag(
       processElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "versionTag")
     );
-    processDefinition.setTimeToLive(parseIntegerAttribute(processElement, "timeToLive",
-        processElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "timeToLive"), false));
+    processDefinition.setHistoryTimeToLive(parseIntegerAttribute(processElement, "historyTimeToLive",
+        processElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "historyTimeToLive"), false));
 
     LOG.parsingElement("process", processDefinition.getKey());
 

@@ -39,11 +39,8 @@ import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.test.TestHelper;
-import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.test.Deployment;
-import org.camunda.bpm.engine.test.api.runtime.migration.models.CallActivityModels;
-import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.junit.Test;
 
 /**
@@ -764,7 +761,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
     assertNotNull(processDefinitions);
     assertEquals(1, processDefinitions.size());
 
-    Integer timeToLive = processDefinitions.get(0).getTimeToLive();
+    Integer timeToLive = processDefinitions.get(0).getHistoryTimeToLive();
     assertNotNull(timeToLive);
     assertEquals(5, timeToLive.intValue());
   }
@@ -775,7 +772,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
     assertNotNull(processDefinitions);
     assertEquals(1, processDefinitions.size());
 
-    Integer timeToLive = processDefinitions.get(0).getTimeToLive();
+    Integer timeToLive = processDefinitions.get(0).getHistoryTimeToLive();
     assertNull(timeToLive);
   }
 
@@ -785,7 +782,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
     assertNotNull(processDefinitions);
     assertEquals(1, processDefinitions.size());
 
-    Integer timeToLive = processDefinitions.get(0).getTimeToLive();
+    Integer timeToLive = processDefinitions.get(0).getHistoryTimeToLive();
     assertNull(timeToLive);
   }
 
@@ -793,9 +790,9 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
     try {
       String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testInvalidProcessDefinitionTtl");
       repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
-      fail("Exception expected: Process definition timeToLive value can not be parsed.");
+      fail("Exception expected: Process definition historyTimeToLive value can not be parsed.");
     } catch (ProcessEngineException e) {
-      assertTextPresent("Cannot parse timeToLive", e.getMessage());
+      assertTextPresent("Cannot parse historyTimeToLive", e.getMessage());
     }
   }
 
