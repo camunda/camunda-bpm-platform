@@ -786,9 +786,19 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
     assertNull(timeToLive);
   }
 
-  public void testInvalidProcessDefinitionTtl() {
+  public void testParseProcessDefinitionInvalidTtl() {
     try {
-      String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testInvalidProcessDefinitionTtl");
+      String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testParseProcessDefinitionInvalidTtl");
+      repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
+      fail("Exception expected: Process definition historyTimeToLive value can not be parsed.");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("Cannot parse historyTimeToLive", e.getMessage());
+    }
+  }
+
+  public void testParseProcessDefinitionNegativTtl() {
+    try {
+      String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testParseProcessDefinitionNegativeTtl");
       repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
       fail("Exception expected: Process definition historyTimeToLive value can not be parsed.");
     } catch (ProcessEngineException e) {

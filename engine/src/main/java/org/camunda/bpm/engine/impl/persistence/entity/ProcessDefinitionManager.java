@@ -185,10 +185,6 @@ public class ProcessDefinitionManager extends AbstractManager implements Abstrac
     getDbEntityManager().update(ProcessDefinitionEntity.class, "updateProcessDefinitionSuspensionStateByParameters", configureParameterizedQuery(parameters));
   }
 
-  public void updateProcessDefinition(ProcessDefinitionEntity processDefinition) {
-    getDbEntityManager().merge(processDefinition);
-  }
-
   // delete  ///////////////////////////////////////////////////////////
 
   /**

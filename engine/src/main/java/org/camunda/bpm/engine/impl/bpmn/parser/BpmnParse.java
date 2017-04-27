@@ -538,8 +538,7 @@ public class BpmnParse extends Parse {
     processDefinition.setVersionTag(
       processElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "versionTag")
     );
-    processDefinition.setHistoryTimeToLive(parseIntegerAttribute(processElement, "historyTimeToLive",
-        processElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "historyTimeToLive"), false));
+    parseHistoryTimeToLive(processElement, processDefinition);
 
     LOG.parsingElement("process", processDefinition.getKey());
 
@@ -561,6 +560,16 @@ public class BpmnParse extends Parse {
       activity.setDelegateAsyncBeforeUpdate(null);
     }
     return processDefinition;
+  }
+
+  private void parseHistoryTimeToLive(Element processElement, ProcessDefinitionEntity processDefinition) {
+    final Integer historyTimeToLive = parseIntegerAttribute(processElement, "historyTimeToLive",
+        processElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "historyTimeToLive"), false);
+    if (historyTimeToLive != null && historyTimeToLive < 0) {
+      addError("Cannot parse historyTimeToLive: negative value is not allowed", processElement);
+    } else {
+      processDefinition.setHistoryTimeToLive(historyTimeToLive);
+    }
   }
 
   protected void parseLaneSets(Element parentElement, ProcessDefinitionEntity processDefinition) {

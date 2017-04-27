@@ -14,10 +14,12 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.Serializable;
 import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureGreaterThanOrEqual;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
@@ -44,9 +46,9 @@ public class UpdateProcessDefinitionHistoryTimeToLiveCmd implements Command<Void
       ensureGreaterThanOrEqual(BadUserRequestException.class, "", "historyTimeToLive", historyTimeToLive, 0);
     }
 
-    ProcessDefinitionEntity processDefinitionEntity = commandContext.getDbEntityManager().selectById(ProcessDefinitionEntity.class, processDefinitionId);
+    ProcessDefinitionEntity processDefinitionEntity = commandContext.getProcessDefinitionManager().findLatestProcessDefinitionById(processDefinitionId);
+    logUserOperation(commandContext, processDefinitionEntity);
     processDefinitionEntity.setHistoryTimeToLive(historyTimeToLive);
-    commandContext.getProcessDefinitionManager().updateProcessDefinition(processDefinitionEntity);
 
     return null;
   }
@@ -55,6 +57,13 @@ public class UpdateProcessDefinitionHistoryTimeToLiveCmd implements Command<Void
     for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
         checker.checkUpdateProcessDefinitionById(processDefinitionId);
     }
+  }
+
+  protected void logUserOperation(CommandContext commandContext, ProcessDefinitionEntity processDefinitionEntity) {
+    PropertyChange propertyChange = new PropertyChange("historyTimeToLive", processDefinitionEntity.getHistoryTimeToLive(), historyTimeToLive);
+    commandContext.getOperationLogManager()
+        .logProcessDefinitionOperation(UserOperationLogEntry.OPERATION_TYPE_UPDATE_HISTORY_TIME_TO_LIVE, processDefinitionId, processDefinitionEntity.getKey(),
+            propertyChange);
   }
 
 }

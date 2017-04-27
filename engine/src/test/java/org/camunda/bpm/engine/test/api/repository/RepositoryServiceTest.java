@@ -33,10 +33,12 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NotValidException;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.RepositoryServiceImpl;
 import org.camunda.bpm.engine.impl.bpmn.deployer.BpmnDeployer;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration;
+import org.camunda.bpm.engine.impl.history.event.UserOperationLogEntryEventEntity;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
@@ -64,6 +66,7 @@ import org.camunda.bpm.engine.test.bpmn.tasklistener.util.RecorderTaskListener;
 import org.camunda.bpm.engine.test.util.TestExecutionListener;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.Assert;
 
 /**
  * @author Frederik Heremans
@@ -833,10 +836,35 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
     //when
     try {
       repositoryService.updateProcessDefinitionHistoryTimeToLive(processDefinition.getId(), -1);
-      fail("Exception is expected, that negative velue is not allowed.");
+      fail("Exception is expected, that negative value is not allowed.");
     } catch (BadUserRequestException ex) {
       assertTrue(ex.getMessage().contains("greater than"));
     }
+
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testProcessDefinitionUpdateTimeToLiveUserOperationLog() {
+    //given
+    ProcessDefinitionEntity processDefinition = findOnlyProcessDefinition();
+    Integer timeToLiveOrgValue = processDefinition.getHistoryTimeToLive();
+    processEngine.getIdentityService().setAuthenticatedUserId("userId");
+
+    //when
+    Integer timeToLiveNewValue = 6;
+    repositoryService.updateProcessDefinitionHistoryTimeToLive(processDefinition.getId(), timeToLiveNewValue);
+
+    //then
+    List<UserOperationLogEntry> opLogEntries = processEngine.getHistoryService().createUserOperationLogQuery().list();
+    Assert.assertEquals(1, opLogEntries.size());
+    final UserOperationLogEntryEventEntity userOperationLogEntry = (UserOperationLogEntryEventEntity)opLogEntries.get(0);
+
+    assertEquals(UserOperationLogEntry.OPERATION_TYPE_UPDATE_HISTORY_TIME_TO_LIVE, userOperationLogEntry.getOperationType());
+    assertEquals(processDefinition.getKey(), userOperationLogEntry.getProcessDefinitionKey());
+    assertEquals(processDefinition.getId(), userOperationLogEntry.getProcessDefinitionId());
+    assertEquals("historyTimeToLive", userOperationLogEntry.getProperty());
+    assertEquals(timeToLiveOrgValue, Integer.valueOf(userOperationLogEntry.getOrgValue()));
+    assertEquals(timeToLiveNewValue, Integer.valueOf(userOperationLogEntry.getNewValue()));
 
   }
 

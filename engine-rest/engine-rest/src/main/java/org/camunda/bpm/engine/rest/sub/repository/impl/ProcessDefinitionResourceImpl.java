@@ -343,11 +343,7 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
 
   @Override
   public void updateHistoryTimeToLive(HistoryTimeToLiveDto historyTimeToLiveDto) {
-    Integer timeToLive = null;
-    if (historyTimeToLiveDto != null) {
-      timeToLive = historyTimeToLiveDto.getHistoryTimeToLive();
-    }
-    engine.getRepositoryService().updateProcessDefinitionHistoryTimeToLive(processDefinitionId, timeToLive);
+    engine.getRepositoryService().updateProcessDefinitionHistoryTimeToLive(processDefinitionId, historyTimeToLiveDto.getHistoryTimeToLive());
   }
 
   public Map<String, VariableValueDto> getFormVariables(String variableNames, boolean deserializeValues) {

@@ -282,6 +282,7 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
   public Object getPersistentState() {
     Map<String, Object> persistentState = new HashMap<String, Object>();
     persistentState.put("suspensionState", this.suspensionState);
+    persistentState.put("historyTimeToLive", this.historyTimeToLive);
     return persistentState;
   }
 
