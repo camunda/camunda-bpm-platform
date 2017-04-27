@@ -756,7 +756,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     invokePostInit();
   }
 
-  private void initHistoryCleanupBatchWindow() {
+  public void initHistoryCleanupBatchWindow() {
     if (historyCleanupBatchWindowStartTime != null) {
       initHistoryCleanupBatchWindowStartTime();
     }
@@ -3643,6 +3643,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public Date getHistoryCleanupBatchWindowStartTimeAsDate() {
     return historyCleanupBatchWindowStartTimeAsDate;
+  }
+
+  public void setHistoryCleanupBatchWindowStartTimeAsDate(Date historyCleanupBatchWindowStartTimeAsDate) {
+    this.historyCleanupBatchWindowStartTimeAsDate = historyCleanupBatchWindowStartTimeAsDate;
+  }
+
+  public void setHistoryCleanupBatchWindowEndTimeAsDate(Date historyCleanupBatchWindowEndTimeAsDate) {
+    this.historyCleanupBatchWindowEndTimeAsDate = historyCleanupBatchWindowEndTimeAsDate;
   }
 
   public Date getHistoryCleanupBatchWindowEndTimeAsDate() {

@@ -51,7 +51,6 @@ public class HistoryCleanupOnEngineStartTest {
   protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
     @Override
     public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
-      configuration.setHistoryLevel(HistoryLevel.HISTORY_LEVEL_FULL);
       configuration.setHistoryCleanupBatchWindowStartTime("23:00");
       configuration.setHistoryCleanupBatchWindowEndTime("01:00");
       return configuration;
