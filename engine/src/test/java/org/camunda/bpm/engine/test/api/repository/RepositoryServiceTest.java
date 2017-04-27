@@ -27,6 +27,7 @@ import java.util.Set;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
@@ -62,6 +63,7 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.bpmn.tasklistener.util.RecorderTaskListener;
 import org.camunda.bpm.engine.test.util.TestExecutionListener;
 import org.camunda.bpm.model.bpmn.Bpmn;
@@ -843,6 +845,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   public void testProcessDefinitionUpdateTimeToLiveUserOperationLog() {
     //given
