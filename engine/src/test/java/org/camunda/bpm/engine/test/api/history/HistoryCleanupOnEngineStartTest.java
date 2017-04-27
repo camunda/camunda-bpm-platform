@@ -48,11 +48,12 @@ public class HistoryCleanupOnEngineStartTest {
 
   protected static final String ONE_TASK_PROCESS = "oneTaskProcess";
 
-  protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(
-      "org/camunda/bpm/engine/test/api/history/historyCleanupConfigurationTest.cfg.xml") {
+  protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
     @Override
     public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
       configuration.setHistoryLevel(HistoryLevel.HISTORY_LEVEL_FULL);
+      configuration.setHistoryCleanupBatchWindowStartTime("23:00");
+      configuration.setHistoryCleanupBatchWindowEndTime("01:00");
       return configuration;
     }
   };
