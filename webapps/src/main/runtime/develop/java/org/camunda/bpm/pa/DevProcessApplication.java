@@ -63,6 +63,9 @@ public class DevProcessApplication extends ServletProcessApplication {
         catch(Exception e) {
           LOGGER.log(Level.WARNING, "Exception while generating demo data", e);
         }
+        finally {
+          ClockUtil.reset();
+        }
       }
     }.start();
   }
