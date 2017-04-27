@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang.time.DateUtils;
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
@@ -29,6 +30,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.FailedJobCommandFactory;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
@@ -49,7 +51,7 @@ public class FailedJobListenerWithRetriesTest {
   protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
     public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
       configuration.setFailedJobCommandFactory(new OLEFailedJobCommandFactory());
-      configuration.setFailedJobListenerMaxRetries(3);
+      configuration.setFailedJobListenerMaxRetries(5);
       return configuration;
     }
   };
@@ -79,9 +81,9 @@ public class FailedJobListenerWithRetriesTest {
   @Parameterized.Parameters
   public static Collection<Object[]> scenarios() {
     return Arrays.asList(new Object[][] {
-        { 2, 0, false },
+        { 4, 0, false },
         //all retries are depleted without success -> the job is still locked
-        { 3, 1, true }
+        { 5, 1, true }
     });
   }
 
@@ -95,7 +97,7 @@ public class FailedJobListenerWithRetriesTest {
     Job job = getJob();
     while (job.getRetries() > 0 && ((JobEntity)job).getLockOwner() == null ) {
       try {
-        lockTheJob();
+        lockTheJob(job.getId());
         engineRule.getManagementService().executeJob(job.getId());
       } catch (Exception ex) {
       }
@@ -114,21 +116,13 @@ public class FailedJobListenerWithRetriesTest {
     }
   }
 
-  void lockTheJob() {
+  void lockTheJob(final String jobId) {
     engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequiresNew().execute(new Command<Object>() {
       @Override
       public Object execute(CommandContext commandContext) {
-        new AcquireJobsCmd(new JobExecutor() {
-          @Override
-          protected void startExecutingJobs() {
-          }
-          @Override
-          protected void stopExecutingJobs() {
-          }
-          @Override
-          public void executeJobs(List<String> jobIds, ProcessEngineImpl processEngine) {
-          }
-        }).execute(commandContext);
+        final JobEntity job = commandContext.getJobManager().findJobById(jobId);
+        job.setLockOwner("someLockOwner");
+        job.setLockExpirationTime(DateUtils.addHours(ClockUtil.getCurrentTime(), 1));
         return null;
       }
     });

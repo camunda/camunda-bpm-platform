@@ -14,9 +14,7 @@ package org.camunda.bpm.engine.impl.jobexecutor;
 
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmd.ExecuteJobsCmd;
-import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 
@@ -60,22 +58,11 @@ public class ExecuteJobHelper {
 
         FailedJobListener failedJobListener = createFailedJobListener(commandExecutor, jobFailureCollector.getFailure(), jobFailureCollector.getJobId());
 
-        //in case of OptimisticLockException we retry the FailedJobListener for configured amount of times
-        boolean succeeded = false;
-        OptimisticLockingException exception = null;
-        int failedJobListenerMaxRetries = getFailedJobListenerMaxRetries();
-        while (!succeeded && failedJobListener.getCountRetries() < failedJobListenerMaxRetries) {
-          try {
-            commandExecutor.execute(failedJobListener);
-            succeeded = true;
-          } catch (OptimisticLockingException ex) {
-            failedJobListener.incrementCountRetries();
-            exception = ex;
-          }
-        }
-        if (!succeeded) {
+        OptimisticLockingException exception = callFailedJobListenerWithRetries(commandExecutor, failedJobListener);
+        if (exception != null) {
           throw exception;
         }
+
       } else {
         SuccessfulJobListener successListener = createSuccessfulJobListener(commandExecutor);
         commandExecutor.execute(successListener);
@@ -83,11 +70,21 @@ public class ExecuteJobHelper {
     }
   }
 
-  private static int getFailedJobListenerMaxRetries() {
-    if (Context.getJobExecutorContext() != null) {
-      return Context.getJobExecutorContext().getFailedJobListenerMaxRetries();
-    } else {
-      return ProcessEngineConfigurationImpl.DEFAULT_FAILED_JOB_LISTENER_MAX_RETRIES;
+  /**
+   * Calls FailedJobListener, in case of OptimisticLockException retries configured amount of times.
+   *
+   * @return exception or null if succeeded
+   */
+  private static OptimisticLockingException callFailedJobListenerWithRetries(CommandExecutor commandExecutor, FailedJobListener failedJobListener) {
+    try {
+      commandExecutor.execute(failedJobListener);
+      return null;
+    } catch (OptimisticLockingException ex) {
+      failedJobListener.incrementCountRetries();
+      if (failedJobListener.getRetriesLeft() > 0) {
+        return callFailedJobListenerWithRetries(commandExecutor, failedJobListener);
+      }
+      return ex;
     }
   }
 

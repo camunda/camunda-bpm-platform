@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.impl.jobexecutor;
 
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -30,7 +31,8 @@ public class FailedJobListener implements Command<Void> {
   protected String jobId;
   protected Throwable exception;
   private final static JobExecutorLogger LOG = ProcessEngineLogger.JOB_EXECUTOR_LOGGER;
-  private Integer countRetries = 0;
+  private int countRetries = 0;
+  private int totalRetries = ProcessEngineConfigurationImpl.DEFAULT_FAILED_JOB_LISTENER_MAX_RETRIES;
 
   public FailedJobListener(CommandExecutor commandExecutor, String jobId, Throwable exception) {
     this.commandExecutor = commandExecutor;
@@ -39,6 +41,8 @@ public class FailedJobListener implements Command<Void> {
   }
 
   public Void execute(CommandContext commandContext) {
+    initTotalRetries(commandContext);
+
     logJobFailure(commandContext);
 
     FailedJobCommandFactory failedJobCommandFactory = commandContext.getFailedJobCommandFactory();
@@ -64,6 +68,10 @@ public class FailedJobListener implements Command<Void> {
     return null;
   }
 
+  private void initTotalRetries(CommandContext commandContext) {
+    totalRetries = commandContext.getProcessEngineConfiguration().getFailedJobListenerMaxRetries();
+  }
+
   protected void fireHistoricJobFailedEvt(JobEntity job) {
     CommandContext commandContext = Context.getCommandContext();
 
@@ -85,11 +93,11 @@ public class FailedJobListener implements Command<Void> {
     }
   }
 
-  public Integer getCountRetries() {
-    return countRetries;
-  }
-
   public void incrementCountRetries() {
     this.countRetries++;
+  }
+
+  public int getRetriesLeft() {
+    return Math.max(0, totalRetries - countRetries);
   }
 }

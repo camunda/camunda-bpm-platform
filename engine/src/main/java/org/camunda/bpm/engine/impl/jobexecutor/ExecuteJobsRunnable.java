@@ -41,7 +41,6 @@ public class ExecuteJobsRunnable implements Runnable {
 
   public void run() {
     final JobExecutorContext jobExecutorContext = new JobExecutorContext();
-    jobExecutorContext.setFailedJobListenerMaxRetries(processEngine.getProcessEngineConfiguration().getFailedJobListenerMaxRetries());
 
     final List<String> currentProcessorJobQueue = jobExecutorContext.getCurrentProcessorJobQueue();
     CommandExecutor commandExecutor = processEngine.getProcessEngineConfiguration().getCommandExecutorTxRequired();
