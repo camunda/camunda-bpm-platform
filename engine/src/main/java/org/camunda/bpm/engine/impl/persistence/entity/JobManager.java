@@ -90,16 +90,10 @@ public class JobManager extends AbstractManager {
   }
 
   public void reschedule(JobEntity jobEntity, Date newDuedate) {
-    if (newDuedate == null) {
-      jobEntity.setDuedate(null);
-      jobEntity.setSuspensionState(SuspensionState.SUSPENDED.getStateCode());
-    } else {
-      jobEntity.init(Context.getCommandContext());
-      jobEntity.setSuspensionState(SuspensionState.ACTIVE.getStateCode());
-      jobEntity.setDuedate(newDuedate);
-      hintJobExecutorIfNeeded(jobEntity, newDuedate);
-
-    }
+    jobEntity.init(Context.getCommandContext());
+    jobEntity.setSuspensionState(SuspensionState.ACTIVE.getStateCode());
+    jobEntity.setDuedate(newDuedate);
+    hintJobExecutorIfNeeded(jobEntity, newDuedate);
   }
 
   private void hintJobExecutorIfNeeded(JobEntity jobEntity, Date duedate) {

@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupHelp
 import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupJobDeclaration;
 import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupJobHandler;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 import org.camunda.bpm.engine.runtime.Job;
 
 /**
@@ -53,40 +54,42 @@ public class HistoryCleanupCmd implements Command<Job>, Serializable {
       LOG.warnHistoryCleanupWrongConfiguration();
     }
 
-    JobEntity historyCleanupJob = null;
-    boolean justCreated = false;
-    if (commandContext.getProcessEngineConfiguration().isEnableAutoHistoryCleanup()
-        || immediatelyDue) {
-      //find job instance
+    //find job instance
+    JobEntity historyCleanupJob = commandContext.getJobManager().findJobByHandlerType(HistoryCleanupJobHandler.TYPE);
+
+    boolean createJob = historyCleanupJob == null && willBeScheduled(commandContext);
+
+    boolean reconfigureJob = historyCleanupJob != null && willBeScheduled(commandContext);
+
+    boolean suspendJob = historyCleanupJob != null && !willBeScheduled(commandContext);
+
+    if (createJob) {
+      //exclusive lock
+      commandContext.getPropertyManager().acquireExclusiveLockForHistoryCleanupJob();
+
+      //check again after lock
       historyCleanupJob = commandContext.getJobManager().findJobByHandlerType(HistoryCleanupJobHandler.TYPE);
-      if (historyCleanupJob == null && willBeScheduled(commandContext)) {
-        //exclusive lock
-        commandContext.getPropertyManager().acquireExclusiveLockForHistoryCleanupJob();
 
-        //check again after lock
-        historyCleanupJob = commandContext.getJobManager().findJobByHandlerType(HistoryCleanupJobHandler.TYPE);
-
-        if (historyCleanupJob == null) {
-          historyCleanupJob = HISTORY_CLEANUP_JOB_DECLARATION.createJobInstance(new HistoryCleanupContext(immediatelyDue));
-          Context.getCommandContext().getJobManager().insertAndHintJobExecutor(historyCleanupJob);
-          justCreated = true;
-        }
+      if (historyCleanupJob == null) {
+        historyCleanupJob = HISTORY_CLEANUP_JOB_DECLARATION.createJobInstance(new HistoryCleanupContext(immediatelyDue));
+        Context.getCommandContext().getJobManager().insertAndHintJobExecutor(historyCleanupJob);
       }
-      if (!justCreated && historyCleanupJob != null) {
-        //apply new configuration
-        HistoryCleanupContext historyCleanupContext = new HistoryCleanupContext(immediatelyDue);
-        HISTORY_CLEANUP_JOB_DECLARATION.reconfigure(historyCleanupContext, historyCleanupJob);
-        Date newDueDate = HISTORY_CLEANUP_JOB_DECLARATION.resolveDueDate(historyCleanupContext);
-        commandContext.getJobManager().reschedule(historyCleanupJob, newDueDate);
-      }
+    } else if (reconfigureJob) {
+      //apply new configuration
+      HistoryCleanupContext historyCleanupContext = new HistoryCleanupContext(immediatelyDue);
+      HISTORY_CLEANUP_JOB_DECLARATION.reconfigure(historyCleanupContext, historyCleanupJob);
+      Date newDueDate = HISTORY_CLEANUP_JOB_DECLARATION.resolveDueDate(historyCleanupContext);
+      commandContext.getJobManager().reschedule(historyCleanupJob, newDueDate);
+    } else if (suspendJob) {
+      historyCleanupJob.setDuedate(null);
+      historyCleanupJob.setSuspensionState(SuspensionState.SUSPENDED.getStateCode());
     }
 
     return historyCleanupJob;
   }
 
   private boolean willBeScheduled(CommandContext commandContext) {
-    return HistoryCleanupHelper.isBatchWindowConfigured(commandContext)
-          || immediatelyDue;
+    return immediatelyDue || HistoryCleanupHelper.isBatchWindowConfigured(commandContext);
   }
 
 }

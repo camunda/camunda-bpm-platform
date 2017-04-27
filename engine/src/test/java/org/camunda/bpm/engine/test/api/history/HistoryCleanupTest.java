@@ -73,7 +73,6 @@ public class HistoryCleanupTest {
     public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
       configuration.setHistoryCleanupBatchSize(20);
       configuration.setHistoryCleanupBatchThreshold(10);
-      configuration.setEnableAutoHistoryCleanup(true);
       return configuration;
     }
   };
@@ -170,48 +169,6 @@ public class HistoryCleanupTest {
 
     //then
     assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());
-  }
-
-  @Test
-  public void testAutoHistoryCleanupDisabledJobIsNotCreated() {
-    //given
-    prepareData(15);
-
-    //we're within batch window
-    Date now = new Date();
-    ClockUtil.setCurrentTime(now);
-    engineRule.getProcessEngineConfiguration().setEnableAutoHistoryCleanup(false);
-    engineRule.getProcessEngineConfiguration().setHistoryCleanupBatchWindowStartTime(new SimpleDateFormat("HH:mm").format(now));
-    engineRule.getProcessEngineConfiguration().setHistoryCleanupBatchWindowEndTime(new SimpleDateFormat("HH:mm").format(DateUtils.addHours(now, 5)));
-
-    //when
-    final Job job = historyService.cleanUpHistoryAsync(false);
-
-    //then
-    assertNull(job);
-    assertEquals(15, historyService.createHistoricProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());
-  }
-
-  @Test
-  public void testAutoHistoryCleanupDisabledJobIsNotExecuted() {
-    //given
-    prepareData(15);
-
-    //we're within batch window
-    Date now = new Date();
-    ClockUtil.setCurrentTime(now);
-    engineRule.getProcessEngineConfiguration().setHistoryCleanupBatchWindowStartTime(new SimpleDateFormat("HH:mm").format(now));
-    engineRule.getProcessEngineConfiguration().setHistoryCleanupBatchWindowEndTime(new SimpleDateFormat("HH:mm").format(DateUtils.addHours(now, 5)));
-
-    final String jobId = historyService.cleanUpHistoryAsync(false).getId();
-
-    engineRule.getProcessEngineConfiguration().setEnableAutoHistoryCleanup(false);
-
-    //when
-    managementService.executeJob(jobId);
-
-    //then
-    assertEquals(15, historyService.createHistoricProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());
   }
 
   @Test
@@ -360,31 +317,6 @@ public class HistoryCleanupTest {
     //then
     //second execution was not abe to delete rest data
     assertEquals(20, historyService.createHistoricProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());
-  }
-
-  @Test
-  public void testManualRunDoesNotRespectDisabledHistoryCleanup() {
-    //given
-    prepareData(40);
-
-    //we're within batch window
-    Date now = new Date();
-    ClockUtil.setCurrentTime(now);
-    engineRule.getProcessEngineConfiguration().setEnableAutoHistoryCleanup(false);
-    engineRule.getProcessEngineConfiguration().setHistoryCleanupBatchWindowStartTime(new SimpleDateFormat("HH:mm").format(now));
-    engineRule.getProcessEngineConfiguration().setHistoryCleanupBatchWindowEndTime(new SimpleDateFormat("HH:mm").format(DateUtils.addHours(now, 5)));
-
-    //when
-    //job is executed before batch window start
-    String jobId = historyService.cleanUpHistoryAsync(true).getId();
-    managementService.executeJob(jobId);
-
-    //the job is called for the second time after batch window end
-    ClockUtil.setCurrentTime(DateUtils.addHours(now, 6)); //now + 6 hours
-    managementService.executeJob(jobId);
-
-    //then
-    assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());
   }
 
   @Test

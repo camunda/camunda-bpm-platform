@@ -19,7 +19,6 @@
     <!-- job executor configurations -->
     <property name="jobExecutorActivate" value="false" />
 
-    <property name="enableAutoHistoryCleanup" value="true"/>
     <property name="historyCleanupBatchWindowStartTime" value="23:00"/>
     <property name="historyCleanupBatchWindowEndTime" value="01:00"/>
     <property name="historyCleanupBatchSize" value = "444"/>

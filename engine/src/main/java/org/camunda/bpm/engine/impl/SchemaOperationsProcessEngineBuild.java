@@ -63,6 +63,12 @@ public final class SchemaOperationsProcessEngineBuild implements SchemaOperation
     checkDeploymentLockExists(entityManager);
     checkHistoryCleanupLockExists(entityManager);
 
+    //create history cleanup job
+    String tablePrefix = Context.getProcessEngineConfiguration().getDatabaseTablePrefix();
+    if (Context.getProcessEngineConfiguration().getManagementService().getTableMetaData(tablePrefix + "ACT_RU_JOB") != null) {
+      Context.getProcessEngineConfiguration().getHistoryService().cleanUpHistoryAsync();
+    }
+
     return null;
   }
 

@@ -60,11 +60,8 @@ public class HistoryCleanupJobDeclaration extends JobDeclaration<HistoryCleanupC
     CommandContext commandContext = Context.getCommandContext();
     if (isImmediatelyDue) {
       return ClockUtil.getCurrentTime();
-    } else if (HistoryCleanupHelper.isBatchWindowConfigured(commandContext)) {
-      return HistoryCleanupHelper.getNextRunWithinBatchWindow(ClockUtil.getCurrentTime(), commandContext);
     } else {
-      //no due date found
-      return null;
+      return HistoryCleanupHelper.getNextRunWithinBatchWindow(ClockUtil.getCurrentTime(), commandContext);
     }
   }
 }

@@ -107,6 +107,9 @@ public class ConcurrentHistoryCleanupTest extends ConcurrencyTestCase {
     Job historyCleanupJob = processEngine.getHistoryService().findHistoryCleanupJob();
     assertNotNull(historyCleanupJob);
 
+    assertNull(thread1.getException());
+    assertNull(thread2.getException());
+
   }
 
   protected static class ControllableHistoryCleanupCommand extends ControllableCommand<Void> {
