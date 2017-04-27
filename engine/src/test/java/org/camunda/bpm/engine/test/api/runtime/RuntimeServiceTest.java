@@ -69,7 +69,6 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.TransitionInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
-import org.camunda.bpm.engine.task.Attachment;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
@@ -358,6 +357,45 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
     // then
     assertProcessEnded(instance.getId());
     assertEquals(2, historyService.createHistoricVariableInstanceQuery().processInstanceId(instance.getId()).list().size());
+    assertEquals(1, historyService.createHistoricVariableInstanceQuery().variableName("inputMappingExecuted").count());
+    assertEquals(1, historyService.createHistoricVariableInstanceQuery().variableName("outputMappingExecuted").count());
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/RuntimeServiceTest.testCascadingDeleteSubprocessInstanceSkipIoMappings.Calling.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/runtime/RuntimeServiceTest.testCascadingDeleteSubprocessInstanceSkipIoMappings.Called.bpmn20.xml" })
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  public void testCascadingDeleteSubprocessInstanceSkipIoMappings() {
+
+    // given a process instance
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("callingProcess");
+
+    ProcessInstance instance2 = runtimeService.createProcessInstanceQuery().superProcessInstanceId(instance.getId()).singleResult();
+
+    // when the process instance is deleted and we do not skip the io mappings
+    runtimeService.deleteProcessInstance(instance.getId(), "test_purposes", false, true, true);
+
+    // then
+    assertProcessEnded(instance.getId());
+    assertEquals(1, historyService.createHistoricVariableInstanceQuery().processInstanceId(instance2.getId()).list().size());
+    assertEquals(1, historyService.createHistoricVariableInstanceQuery().variableName("inputMappingExecuted").count());
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/RuntimeServiceTest.testCascadingDeleteSubprocessInstanceSkipIoMappings.Calling.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/runtime/RuntimeServiceTest.testCascadingDeleteSubprocessInstanceSkipIoMappings.Called.bpmn20.xml" })
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  public void testCascadingDeleteSubprocessInstanceWithoutSkipIoMappings() {
+
+    // given a process instance
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("callingProcess");
+
+    ProcessInstance instance2 = runtimeService.createProcessInstanceQuery().superProcessInstanceId(instance.getId()).singleResult();
+
+    // when the process instance is deleted and we do not skip the io mappings
+    runtimeService.deleteProcessInstance(instance.getId(), "test_purposes", false, true, false);
+
+    // then
+    assertProcessEnded(instance.getId());
+    assertEquals(2, historyService.createHistoricVariableInstanceQuery().processInstanceId(instance2.getId()).list().size());
     assertEquals(1, historyService.createHistoricVariableInstanceQuery().variableName("inputMappingExecuted").count());
     assertEquals(1, historyService.createHistoricVariableInstanceQuery().variableName("outputMappingExecuted").count());
   }
