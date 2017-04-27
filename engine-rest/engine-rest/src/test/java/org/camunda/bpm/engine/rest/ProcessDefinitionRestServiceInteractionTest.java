@@ -3163,19 +3163,6 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
   }
 
   @Test
-  public void testUpdateHistoryTimeToLiveAbsentValue() {
-    given()
-        .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
-        .contentType(ContentType.JSON)
-        .then().expect()
-          .statusCode(Status.NO_CONTENT.getStatusCode())
-        .when()
-          .put(SINGLE_PROCESS_DEFINITION_HISTORY_TIMETOLIVE_URL);
-
-    verify(repositoryServiceMock).updateProcessDefinitionHistoryTimeToLive(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, null);
-  }
-
-  @Test
   public void testUpdateHistoryTimeToLiveNullValue() {
     given()
         .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
