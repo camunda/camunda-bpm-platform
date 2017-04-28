@@ -143,7 +143,11 @@
   <select id="selectHistoricActivityInstancesByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricActivityInstanceQueryImpl" resultMap="historicActivityInstanceResultMap">
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select ${distinct} RES.*
+    select
+    <if test="authCheck.isAuthorizationCheckEnabled">
+    ${distinct}
+    </if>
+    RES.*
     ${limitBetween}
     <include refid="selectHistoricActivityInstancesByQueryCriteriaSql"/>
     ${orderBy}
@@ -151,7 +155,11 @@
   </select>
 
   <select id="selectHistoricActivityInstanceCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricActivityInstanceQueryImpl" resultType="long">
-    select count(distinct RES.ID_)
+    select count(
+    <if test="authCheck.isAuthorizationCheckEnabled">
+    distinct
+    </if>
+    RES.ID_)
     <include refid="selectHistoricActivityInstancesByQueryCriteriaSql"/>
   </select>
 
