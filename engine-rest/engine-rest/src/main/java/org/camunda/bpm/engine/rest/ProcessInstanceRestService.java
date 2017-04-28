@@ -28,6 +28,7 @@ import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
+import org.camunda.bpm.engine.rest.dto.history.DeleteHistoricProcessInstancesDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceSuspensionStateDto;
@@ -96,6 +97,12 @@ public interface ProcessInstanceRestService {
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   BatchDto deleteAsync(DeleteProcessInstancesDto dto);
+
+  @POST
+  @Path("/delete-historic-query-based")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  BatchDto deleteAsyncHistoricQueryBased(DeleteHistoricProcessInstancesDto dto);
 
   @POST
   @Path("/job-retries")
