@@ -1,5 +1,7 @@
 package org.camunda.bpm.engine.rest.dto.runtime;
 
+import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceQueryDto;
+
 import java.util.List;
 
 /**
@@ -8,6 +10,7 @@ import java.util.List;
 public class SetJobRetriesByProcessDto {
   protected List<String> processInstances;
   protected ProcessInstanceQueryDto processInstanceQuery;
+  protected HistoricProcessInstanceQueryDto historicProcessInstanceQuery;
 
   protected Integer retries;
 
@@ -33,5 +36,13 @@ public class SetJobRetriesByProcessDto {
 
   public void setProcessInstanceQuery(ProcessInstanceQueryDto processInstanceQuery) {
     this.processInstanceQuery = processInstanceQuery;
+  }
+
+  public void setHistoricProcessInstanceQuery(HistoricProcessInstanceQueryDto historicProcessInstanceQuery) {
+    this.historicProcessInstanceQuery = historicProcessInstanceQuery;
+  }
+
+  public HistoricProcessInstanceQueryDto getHistoricProcessInstanceQuery() {
+    return historicProcessInstanceQuery;
   }
 }

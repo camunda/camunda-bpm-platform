@@ -19,6 +19,7 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
@@ -218,4 +219,52 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
       throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());
     }
   }
+
+  @Override
+  public BatchDto setRetriesByProcessHistoricQueryBased(SetJobRetriesByProcessDto setJobRetriesDto) {
+    ManagementService managementService = getProcessEngine().getManagementService();
+
+    try {
+      EnsureUtil.ensureNotNull("setJobRetriesDto", setJobRetriesDto);
+      EnsureUtil.ensureNotNull("historicProcessInstanceQuery", setJobRetriesDto.getHistoricProcessInstanceQuery());
+      EnsureUtil.ensureNotNull("retries", setJobRetriesDto.getRetries());
+    } catch (NullValueException e) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());
+    }
+
+    List<HistoricProcessInstance> historicProcessInstances = setJobRetriesDto
+      .getHistoricProcessInstanceQuery()
+      .toQuery(getProcessEngine()).list();
+
+    List<String> processInstanceIds = null;
+    for (HistoricProcessInstance historicProcessInstance : historicProcessInstances) {
+      if (HistoricProcessInstance.STATE_ACTIVE.equals(historicProcessInstance.getState())) {
+        if (processInstanceIds == null) {
+          processInstanceIds = new ArrayList<String>();
+        }
+
+        processInstanceIds.add(historicProcessInstance.getId());
+      }
+    }
+
+    Batch batch = null;
+
+    try {
+
+      batch = managementService.setJobRetriesAsync(
+        processInstanceIds,
+        setJobRetriesDto.getRetries());
+
+      return BatchDto.fromBatch(batch);
+    } catch (BadUserRequestException e) {
+      String message = e.getMessage();
+
+      if ("jobIds is empty".equals(message)) {
+        message = "no jobIds found";
+      }
+
+      throw new InvalidRequestException(Status.BAD_REQUEST, message);
+    }
+  }
+
 }

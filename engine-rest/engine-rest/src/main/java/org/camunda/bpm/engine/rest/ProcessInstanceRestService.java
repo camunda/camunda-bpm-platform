@@ -108,6 +108,11 @@ public interface ProcessInstanceRestService {
   @Path("/job-retries")
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
-  BatchDto setRetriesByProcess (SetJobRetriesByProcessDto setJobRetriesDto);
+  BatchDto setRetriesByProcess(SetJobRetriesByProcessDto setJobRetriesDto);
 
+  @POST
+  @Path("/job-retries-historic-query-based")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  BatchDto setRetriesByProcessHistoricQueryBased(SetJobRetriesByProcessDto setJobRetriesDto);
 }

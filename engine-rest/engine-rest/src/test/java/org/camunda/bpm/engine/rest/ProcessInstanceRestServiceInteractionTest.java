@@ -37,6 +37,7 @@ import org.camunda.bpm.engine.rest.dto.history.DeleteHistoricProcessInstancesDto
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceSuspensionStateDto;
+import org.camunda.bpm.engine.rest.dto.runtime.SetJobRetriesByProcessDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.helper.EqualsList;
@@ -93,6 +94,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
   protected static final String DELETE_PROCESS_INSTANCES_ASYNC_URL = PROCESS_INSTANCE_URL + "/delete";
   protected static final String DELETE_PROCESS_INSTANCES_ASYNC_HIST_QUERY_URL = PROCESS_INSTANCE_URL + "/delete-historic-query-based";
   protected static final String SET_JOB_RETRIES_ASYNC_URL = PROCESS_INSTANCE_URL + "/job-retries";
+  protected static final String SET_JOB_RETRIES_ASYNC_HIST_QUERY_URL = PROCESS_INSTANCE_URL + "/job-retries-historic-query-based";
   protected static final String SINGLE_PROCESS_INSTANCE_VARIABLE_URL = PROCESS_INSTANCE_VARIABLES_URL + "/{varId}";
   protected static final String SINGLE_PROCESS_INSTANCE_BINARY_VARIABLE_URL = SINGLE_PROCESS_INSTANCE_VARIABLE_URL + "/data";
   protected static final String PROCESS_INSTANCE_ACTIVIY_INSTANCES_URL = SINGLE_PROCESS_INSTANCE_URL + "/activity-instances";
@@ -335,6 +337,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
         null,
         MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_DELETE_REASON);
   }
+
   @Test
   public void testDeleteAsyncHistoricQueryBasedWithQueryAndStateNotActive() {
     when(runtimeServiceMock.deleteProcessInstancesAsync(
@@ -2630,7 +2633,6 @@ public class ProcessInstanceRestServiceInteractionTest extends
         eq((List<String>) null), any(ProcessInstanceQuery.class), Mockito.eq(5));
   }
 
-
   @Test
   public void testSetRetriesByProcessWithBadRequestQuery() {
     doThrow(new BadUserRequestException("job ids are empty"))
@@ -2679,6 +2681,97 @@ public class ProcessInstanceRestServiceInteractionTest extends
         .when().post(SET_JOB_RETRIES_ASYNC_URL);
   }
 
+  @Test
+  public void testSetRetriesByProcessAsyncHistoricQueryBasedWithQuery() {
+    Batch batchEntity = MockProvider.createMockBatch();
+    when(mockManagementService.setJobRetriesAsync(
+      anyListOf(String.class),
+      anyInt())
+    ).thenReturn(batchEntity);
+
+    HistoricProcessInstanceQuery mockedHistoricProcessInstanceQuery = mock(HistoricProcessInstanceQuery.class);
+    when(historyServiceMock.createHistoricProcessInstanceQuery()).thenReturn(mockedHistoricProcessInstanceQuery);
+    List<HistoricProcessInstance> historicProcessInstances = MockProvider.createMockRunningHistoricProcessInstances();
+    when(mockedHistoricProcessInstanceQuery.list()).thenReturn(historicProcessInstances);
+    when(mockedHistoricProcessInstanceQuery.list().get(0).getState()).thenReturn(HistoricProcessInstance.STATE_ACTIVE);
+
+    SetJobRetriesByProcessDto body = new SetJobRetriesByProcessDto();
+    body.setRetries(MockProvider.EXAMPLE_JOB_RETRIES);
+    body.setHistoricProcessInstanceQuery(new HistoricProcessInstanceQueryDto());
+
+    Response response = given()
+      .contentType(ContentType.JSON).body(body)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when().post(SET_JOB_RETRIES_ASYNC_HIST_QUERY_URL);
+
+    verifyBatchJson(response.asString());
+
+    verify(mockManagementService, times(1)).setJobRetriesAsync(
+      eq(Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)), eq(MockProvider.EXAMPLE_JOB_RETRIES));
+  }
+
+  @Test
+  public void testSetRetriesByProcessAsyncHistoricQueryBasedWithBadRequestQuery() {
+    doThrow(new BadUserRequestException("no jobIds found"))
+      .when(mockManagementService).setJobRetriesAsync(eq((List<String>) null), anyInt());
+
+    SetJobRetriesByProcessDto body = new SetJobRetriesByProcessDto();
+    body.setRetries(MockProvider.EXAMPLE_JOB_RETRIES);
+
+    given()
+      .contentType(ContentType.JSON).body(body)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+    .when().post(SET_JOB_RETRIES_ASYNC_HIST_QUERY_URL);
+  }
+
+  @Test
+  public void testSetRetriesByProcessAsyncHistoricQueryBasedWithoutQuery() {
+    SetJobRetriesByProcessDto body = new SetJobRetriesByProcessDto();
+
+    given()
+      .contentType(ContentType.JSON).body(body)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+    .when().post(SET_JOB_RETRIES_ASYNC_HIST_QUERY_URL);
+  }
+
+  @Test
+  public void testSetRetriesByProcessAsyncHistoricQueryBasedWithoutRetries() {
+    SetJobRetriesByProcessDto body = new SetJobRetriesByProcessDto();
+    body.setHistoricProcessInstanceQuery(new HistoricProcessInstanceQueryDto());
+
+    given()
+      .contentType(ContentType.JSON).body(body)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+    .when().post(SET_JOB_RETRIES_ASYNC_HIST_QUERY_URL);
+  }
+
+  @Test
+  public void testSetRetriesByProcessAsyncHistoricQueryBasedWithNegativeRetries() {
+    doThrow(new BadUserRequestException("retries are negative"))
+      .when(mockManagementService).setJobRetriesAsync(
+        anyListOf(String.class),
+        eq(MockProvider.EXAMPLE_NEGATIVE_JOB_RETRIES));
+
+    HistoricProcessInstanceQuery mockedHistoricProcessInstanceQuery = mock(HistoricProcessInstanceQuery.class);
+    when(historyServiceMock.createHistoricProcessInstanceQuery()).thenReturn(mockedHistoricProcessInstanceQuery);
+    List<HistoricProcessInstance> historicProcessInstances = MockProvider.createMockRunningHistoricProcessInstances();
+    when(mockedHistoricProcessInstanceQuery.list()).thenReturn(historicProcessInstances);
+    when(mockedHistoricProcessInstanceQuery.list().get(0).getState()).thenReturn(HistoricProcessInstance.STATE_ACTIVE);
+
+    SetJobRetriesByProcessDto body = new SetJobRetriesByProcessDto();
+    body.setRetries(MockProvider.EXAMPLE_NEGATIVE_JOB_RETRIES);
+    body.setHistoricProcessInstanceQuery(new HistoricProcessInstanceQueryDto());
+
+    given()
+      .contentType(ContentType.JSON).body(body)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+    .when().post(SET_JOB_RETRIES_ASYNC_HIST_QUERY_URL);
+  }
 
   @SuppressWarnings("unchecked")
   protected ProcessInstanceModificationInstantiationBuilder setUpMockModificationBuilder() {
