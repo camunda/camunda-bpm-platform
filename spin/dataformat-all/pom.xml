@@ -56,6 +56,14 @@
                   <pattern>com.jayway</pattern>
                   <shadedPattern>spinjar.com.jayway</shadedPattern>
                 </relocation>
+                <relocation>
+                  <pattern>net.minidev</pattern>
+                  <shadedPattern>spinjar.com.minidev</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>org.objectweb</pattern>
+                  <shadedPattern>spinjar.com.objectweb</shadedPattern>
+                </relocation>
               </relocations>
               <transformers>
                 <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />

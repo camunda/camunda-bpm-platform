@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.fail;
 import static org.camunda.spin.Spin.JSON;
 import static org.camunda.spin.json.JsonTestConstants.EXAMPLE_JSON;
 
+import com.jayway.jsonpath.InvalidPathException;
 import org.camunda.spin.SpinList;
 import org.camunda.spin.json.SpinJsonDataFormatException;
 import org.camunda.spin.json.SpinJsonNode;

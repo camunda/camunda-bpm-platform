@@ -13,6 +13,7 @@
 
 package org.camunda.spin.impl.json.jackson.query;
 
+import com.jayway.jsonpath.InvalidPathException;
 import org.camunda.spin.SpinList;
 import org.camunda.spin.impl.json.jackson.JacksonJsonLogger;
 import org.camunda.spin.impl.json.jackson.JacksonJsonNode;
@@ -55,6 +56,8 @@ public class JacksonJsonPathQuery implements SpinJsonPathQuery {
       throw LOG.unableToEvaluateJsonPathExpressionOnNode(spinJsonNode, pex);
     } catch (ClassCastException cex) {
       throw LOG.unableToCastJsonPathResultTo(SpinJsonNode.class, cex);
+    } catch(InvalidPathException iex) {
+      throw LOG.invalidJsonPath(SpinJsonNode.class, iex);
     }
   }
 
