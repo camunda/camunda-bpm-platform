@@ -1,6 +1,6 @@
 module.exports = ['$window', function($window) {
   return function() {
-    const {FileReader} = $window;
+    var FileReader = $window.FileReader;
 
     return typeof FileReader === 'function' && typeof FileReader.prototype.readAsText === 'function';
   };
