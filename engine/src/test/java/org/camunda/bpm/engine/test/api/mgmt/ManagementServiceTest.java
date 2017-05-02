@@ -722,9 +722,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
 
   public void testGetTableMetaData() {
 
-    String tablePrefix = processEngineConfiguration.getDatabaseTablePrefix();
-
-    TableMetaData tableMetaData = managementService.getTableMetaData(tablePrefix + "ACT_RU_TASK");
+    TableMetaData tableMetaData = managementService.getTableMetaData("ACT_RU_TASK");
     assertEquals(tableMetaData.getColumnNames().size(), tableMetaData.getColumnTypes().size());
     assertEquals(21, tableMetaData.getColumnNames().size());
 

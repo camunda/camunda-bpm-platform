@@ -486,20 +486,9 @@ public class DbSqlSession extends AbstractPersistenceSession {
         } else {
           Connection connection = getSqlSession().getConnection();
 
-          // preparation for database table prefix
           String databaseTablePrefix = getDbSqlSessionFactory().getDatabaseTablePrefix();
-          String tableNameFilter = "ACT_%";
-          String schema = null;
-          if (!databaseTablePrefix.isEmpty()) {
-            String[] split = databaseTablePrefix.split("\\.");
-            if (split.length > 0) {
-              schema = split[0];
-              //if property contains also prefix for table
-              if (split.length > 1) {
-                tableNameFilter = split[1] + tableNameFilter;
-              }
-            }
-          }
+          String schema = getDbSqlSessionFactory().getDatabaseSchema();
+          String tableNameFilter = prependDatabaseTablePrefix("ACT_%");
 
           // for postgres we have to use lower case
           if (DbSqlSessionFactory.POSTGRES.equals(getDbSqlSessionFactory().getDatabaseType())) {
@@ -570,7 +559,7 @@ public class DbSqlSession extends AbstractPersistenceSession {
   }
 
 
-  protected String prependDatabaseTablePrefix(String tableName) {
+  public String prependDatabaseTablePrefix(String tableName) {
     String prefixWithoutSchema = dbSqlSessionFactory.getDatabaseTablePrefix();
     String schema = dbSqlSessionFactory.getDatabaseSchema();
     if (prefixWithoutSchema == null) {

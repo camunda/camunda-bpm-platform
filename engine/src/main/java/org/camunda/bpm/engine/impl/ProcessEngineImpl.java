@@ -121,8 +121,7 @@ public class ProcessEngineImpl implements ProcessEngine {
     }
 
     //create history cleanup job
-    String tablePrefix = processEngineConfiguration.getDatabaseTablePrefix();
-    if (managementService.getTableMetaData(tablePrefix + "ACT_RU_JOB") != null) {
+    if (managementService.getTableMetaData("ACT_RU_JOB") != null) {
       processEngineConfiguration.getHistoryService().cleanUpHistoryAsync();
     }
 

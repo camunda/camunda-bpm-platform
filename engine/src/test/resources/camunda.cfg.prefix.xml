@@ -44,6 +44,7 @@
     <!--<property name="idGenerator" ref="uuidGenerator" />-->
 
     <property name="databaseTablePrefix" value="SCHEMA1." />
+    <property name="databaseSchema" value="SCHEMA1" />
 
   </bean>
 

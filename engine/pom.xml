@@ -630,9 +630,6 @@
                      the DbSchemaPrefixTestHelper will first drop the schema. So
                      it cannot be used with this profile at the moment -->
                 <exclude>**/DeploymentAwareJobExecutorTest.java</exclude>
-                <!-- include after CAM-6041 was fixed -->
-                <exclude>**/ManagementServiceTest.java</exclude>
-                <exclude>**/ManagementAuthorizationTest.java</exclude>
                 <!-- this test drops the database an creates two schemas and
                      it can be excluded for this test profile as it tests
                      the same except for the whole unit test suite -->

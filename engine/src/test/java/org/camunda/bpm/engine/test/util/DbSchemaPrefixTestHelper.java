@@ -55,6 +55,7 @@ public class DbSchemaPrefixTestHelper implements InitializingBean, DisposableBea
             .setDbMetricsReporterActivate(false)
             .setDatabaseSchemaUpdate("NO_CHECK"); // disable auto create/drop schema
     config1.setDatabaseTablePrefix("SCHEMA1.");
+    config1.setDatabaseSchema("SCHEMA1");
     ProcessEngine engine1 = config1.buildProcessEngine();
 
     // create the tables in SCHEMA1
