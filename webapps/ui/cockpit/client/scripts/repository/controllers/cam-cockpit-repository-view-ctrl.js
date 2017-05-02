@@ -249,6 +249,7 @@ module.exports = [
       return deferred.promise;
     }]);
 
+    $scope.onDeployed = repositoryData.changed.bind(repositoryData, 'deploymentsQuery');
 
     $scope.$on('$routeChanged', function() {
       var oldDeploymentsSortBy = deploymentsSortBy;

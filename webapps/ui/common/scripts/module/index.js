@@ -10,6 +10,10 @@ var integrateActivityInstanceFilter = require('./services/integrate-activity-ins
 var params = require('./services/params');
 var createListQueryFunction = require('./services/create-list-query-function');
 var createIsSearchQueryChangedFunction = require('./services/create-is-search-query-changed-function');
+var readFiles = require('./services/read-files');
+var upload = require('./services/upload');
+var getDeploymentUrl = require('./services/get-deployment-url');
+var isFileUploadSupported = require('./services/is-file-upload-supported');
 
 // Components
 var camToolbar = require('./components/cam-toolbar');
@@ -22,6 +26,7 @@ var camTabs = require('./components/cam-tabs');
 var camHoverArea = require('./directives/cam-hover-area');
 var camHoverTrigger = require('./directives/cam-hover-trigger');
 var camHoverableTitle = require('./directives/cam-hoverable-title');
+var camFile = require('./directives/cam-file');
 
 // Controllers
 var HoverAreaController = require('./controllers/hover-area');
@@ -50,6 +55,10 @@ ngModule.factory('integrateActivityInstanceFilter', integrateActivityInstanceFil
 ngModule.factory('params', params);
 ngModule.factory('createListQueryFunction', createListQueryFunction);
 ngModule.factory('createIsSearchQueryChangedFunction', createIsSearchQueryChangedFunction);
+ngModule.factory('readFiles', readFiles);
+ngModule.factory('upload', upload);
+ngModule.factory('getDeploymentUrl', getDeploymentUrl);
+ngModule.factory('isFileUploadSupported', isFileUploadSupported);
 
 // Components
 ngModule.directive('camToolbar', camToolbar);
@@ -62,6 +71,7 @@ ngModule.directive('camTabs', camTabs);
 ngModule.directive('camHoverArea', camHoverArea);
 ngModule.directive('camHoverTrigger', camHoverTrigger);
 ngModule.directive('camHoverableTitle', camHoverableTitle);
+ngModule.directive('camFile', camFile);
 
 // Controllers
 ngModule.controller('HoverAreaController', HoverAreaController);
