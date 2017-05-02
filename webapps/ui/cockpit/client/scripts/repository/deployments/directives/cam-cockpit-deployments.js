@@ -10,7 +10,8 @@ module.exports = [function() {
 
     restrict: 'A',
     scope: {
-      deploymentsData: '='
+      deploymentsData: '=',
+      totalItems: '='
     },
 
     template: template,

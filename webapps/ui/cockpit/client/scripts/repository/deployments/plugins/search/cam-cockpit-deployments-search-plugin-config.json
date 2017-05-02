@@ -115,7 +115,7 @@
     ]
   },
   "tooltips": {
-    "inputPlaceholder": "Add filtering criteria",
+    "inputPlaceholder": "Add criteria",
     "invalid": "This filtering query is not valid",
     "deleteSearch": "Remove filters",
     "type": "Type",
