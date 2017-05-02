@@ -24,7 +24,7 @@ The extension is published on maven central, so if you are using maven, just add
 <dependency>
   <groupId>org.camunda.bpm.extension.springboot</groupId>
   <artifactId>camunda-bpm-spring-boot-starter([-rest|-webapp])</artifactId>
-  <version>2.0.0</version>
+  <version>2.1.2</version>
 </dependency>
 ```
 
@@ -36,7 +36,7 @@ or use the BOM:
     <dependency>
       <groupId>org.camunda.bpm.extension.springboot</groupId>
       <artifactId>camunda-bpm-spring-boot-starter-bom</artifactId>
-      <version>2.0.0</version>
+      <version>2.1.2</version>
       <type>pom</type>
       <scope>import</scope>
     </dependency>
