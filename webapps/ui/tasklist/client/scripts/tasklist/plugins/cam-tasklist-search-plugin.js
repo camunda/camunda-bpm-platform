@@ -137,6 +137,9 @@ var Controller = [
       });
     });
 
+    searchData.observe('taskList', function(taskList) {
+      $scope.totalItems = taskList.count;
+    });
   }];
 
 var Configuration = function PluginConfiguration(ViewsProvider) {
