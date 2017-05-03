@@ -51,4 +51,8 @@ public interface Decision extends DrgElement {
 
   void setExpression(Expression expression);
 
+  // camunda extensions
+  Integer getCamundaHistoryTimeToLive();
+
+  void setCamundaHistoryTimeToLive(Integer inputVariable);
 }

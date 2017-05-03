@@ -18,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.camunda.bpm.model.dmn.instance.Decision;
 import org.camunda.bpm.model.dmn.instance.Input;
 import org.junit.After;
 import org.junit.Before;
@@ -29,8 +30,6 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith(Parameterized.class)
 public class CamundaExtensionsTest {
 
-  private Input input;
-  
   private final DmnModelInstance originalModelInstance;
   private DmnModelInstance modelInstance;
   
@@ -50,14 +49,23 @@ public class CamundaExtensionsTest {
   @Before
   public void parseModel() {  
     modelInstance = originalModelInstance.clone();
-    input = modelInstance.getModelElementById("input");
+
   }
 
   @Test
   public void testCamundaClauseOutput() {
+    Input input = modelInstance.getModelElementById("input");
     assertThat(input.getCamundaInputVariable()).isEqualTo("myVariable");
     input.setCamundaInputVariable("foo");
     assertThat(input.getCamundaInputVariable()).isEqualTo("foo");
+  }
+
+  @Test
+  public void testCamundaHistoryTimeToLive() {
+    Decision decision = modelInstance.getModelElementById("decision");
+    assertThat(decision.getCamundaHistoryTimeToLive()).isEqualTo(5);
+    decision.setCamundaHistoryTimeToLive(6);
+    assertThat(decision.getCamundaHistoryTimeToLive()).isEqualTo(6);
   }
 
   @After

@@ -151,5 +151,6 @@ public final class DmnModelConstants {
   /** camunda extensions */
 
   public static final String CAMUNDA_ATTRIBUTE_INPUT_VARIABLE = "inputVariable";
+  public static final String CAMUNDA_ATTRIBUTE_HISTORY_TIME_TO_LIVE = "historyTimeToLive";
 
 }
