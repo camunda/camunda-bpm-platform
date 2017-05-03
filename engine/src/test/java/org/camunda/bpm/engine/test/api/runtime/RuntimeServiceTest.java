@@ -371,7 +371,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
 
     ProcessInstance instance2 = runtimeService.createProcessInstanceQuery().superProcessInstanceId(instance.getId()).singleResult();
 
-    // when the process instance is deleted and we do not skip the io mappings
+    // when the process instance is deleted and we do skip the io mappings
     runtimeService.deleteProcessInstance(instance.getId(), "test_purposes", false, true, true);
 
     // then

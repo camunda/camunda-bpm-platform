@@ -9,11 +9,7 @@
 
 		<sequenceFlow id="flow1" sourceRef="theStart" targetRef="callSubProcess" />
 
-		<callActivity id="callSubProcess" calledElement="calledProcess">
-			<extensionElements>
-				<camunda:out sourceExpression="#{aStringValue}" target="outVar" />
-			</extensionElements>
-		</callActivity>
+		<callActivity id="callSubProcess" calledElement="calledProcess"/>
 
 		<sequenceFlow id="flow4" sourceRef="callSubProcess" targetRef="theEnd" />
 
