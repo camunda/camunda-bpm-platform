@@ -1,5 +1,6 @@
 package org.camunda.bpm.engine.rest.dto.runtime.batch;
 
+import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 
 import java.util.List;
@@ -12,6 +13,7 @@ public class DeleteProcessInstancesDto {
   protected ProcessInstanceQueryDto processInstanceQuery;
   protected String deleteReason;
   protected boolean skipCustomListeners;
+  protected HistoricProcessInstanceQueryDto historicProcessInstanceQuery;
 
   public List<String> getProcessInstanceIds() {
     return processInstanceIds;
@@ -43,6 +45,14 @@ public class DeleteProcessInstancesDto {
 
   public void setSkipCustomListeners(boolean skipCustomListeners) {
     this.skipCustomListeners = skipCustomListeners;
+  }
+
+  public void setHistoricProcessInstanceQuery(HistoricProcessInstanceQueryDto historicProcessInstanceQuery) {
+    this.historicProcessInstanceQuery = historicProcessInstanceQuery;
+  }
+
+  public HistoricProcessInstanceQueryDto getHistoricProcessInstanceQuery() {
+    return historicProcessInstanceQuery;
   }
 
 }

@@ -102,7 +102,7 @@ public interface ProcessInstanceRestService {
   @Path("/delete-historic-query-based")
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
-  BatchDto deleteAsyncHistoricQueryBased(DeleteHistoricProcessInstancesDto dto);
+  BatchDto deleteAsyncHistoricQueryBased(DeleteProcessInstancesDto dto);
 
   @POST
   @Path("/job-retries")

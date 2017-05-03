@@ -151,27 +151,29 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
   }
 
   @Override
-  public BatchDto deleteAsyncHistoricQueryBased(DeleteHistoricProcessInstancesDto dto) {
+  public BatchDto deleteAsyncHistoricQueryBased(DeleteProcessInstancesDto deleteProcessInstancesDto) {
+    try {
+      EnsureUtil.ensureNotNull("deleteProcessInstancesDto", deleteProcessInstancesDto);
+    } catch (NullValueException e) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());
+    }
+
     RuntimeService runtimeService = getProcessEngine().getRuntimeService();
 
     List<HistoricProcessInstance> historicProcessInstances = null;
-    if (dto.getHistoricProcessInstanceQuery() != null) {
-      historicProcessInstances = dto.getHistoricProcessInstanceQuery().toQuery(getProcessEngine()).list();
+    if (deleteProcessInstancesDto.getHistoricProcessInstanceQuery() != null) {
+      historicProcessInstances = deleteProcessInstancesDto.getHistoricProcessInstanceQuery().toQuery(getProcessEngine()).list();
     }
 
-    List<String> processInstanceIds = null;
+    List<String> processInstanceIds = new ArrayList<String>();
     if (historicProcessInstances != null) {
-      processInstanceIds = null;
-
       for (HistoricProcessInstance historicProcessInstance: historicProcessInstances) {
-        if (HistoricProcessInstance.STATE_ACTIVE.equals(historicProcessInstance.getState())) {
-          if (processInstanceIds == null) {
-            processInstanceIds = new ArrayList<String>();
-          }
-
-          processInstanceIds.add(historicProcessInstance.getId());
-        }
+        processInstanceIds.add(historicProcessInstance.getId());
       }
+    }
+
+    if (deleteProcessInstancesDto.getProcessInstanceIds() != null) {
+      processInstanceIds.addAll(deleteProcessInstancesDto.getProcessInstanceIds());
     }
 
     Batch batch = null;
@@ -179,19 +181,14 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
     try {
 
       batch = runtimeService.deleteProcessInstancesAsync(
-        processInstanceIds,
+        processInstanceIds.isEmpty() ? null : processInstanceIds,
         null,
-        dto.getDeleteReason());
+        deleteProcessInstancesDto.getDeleteReason(),
+        deleteProcessInstancesDto.isSkipCustomListeners());
 
       return BatchDto.fromBatch(batch);
     } catch (BadUserRequestException e) {
-      String message = e.getMessage();
-
-      if ("processInstanceIds is empty".equals(message)) {
-        message = "no processInstanceIds found";
-      }
-
-      throw new InvalidRequestException(Status.BAD_REQUEST, message);
+      throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());
     }
   }
 
