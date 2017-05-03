@@ -14,7 +14,9 @@
 
 // M
 @media (min-width: @screen-md-min) and (max-width: @screen-md-max) {
-  .three-cols-layout(220px, 220px * 1.618);
+  // On medium proportion between first and second column is bit different
+  // So that there is space for header buttons. 
+  .three-cols-layout(240px, 240px * 1.418);
 }
 
 
