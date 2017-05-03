@@ -43,6 +43,7 @@ import org.camunda.bpm.engine.impl.cmd.GetDeploymentResourceForIdCmd;
 import org.camunda.bpm.engine.impl.cmd.GetDeploymentResourceNamesCmd;
 import org.camunda.bpm.engine.impl.cmd.GetDeploymentResourcesCmd;
 import org.camunda.bpm.engine.impl.cmd.GetIdentityLinksForProcessDefinitionCmd;
+import org.camunda.bpm.engine.impl.cmd.UpdateDecisionDefinitionHistoryTimeToLiveCmd;
 import org.camunda.bpm.engine.impl.cmd.UpdateProcessDefinitionHistoryTimeToLiveCmd;
 import org.camunda.bpm.engine.impl.cmmn.cmd.GetDeploymentCaseDefinitionCmd;
 import org.camunda.bpm.engine.impl.cmmn.cmd.GetDeploymentCaseDiagramCmd;
@@ -241,6 +242,10 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
 
   public void updateProcessDefinitionHistoryTimeToLive(String processDefinitionId, Integer historyTimeToLive){
     commandExecutor.execute(new UpdateProcessDefinitionHistoryTimeToLiveCmd(processDefinitionId, historyTimeToLive));
+  }
+
+  public void updateDecisionDefinitionHistoryTimeToLive(String decisionDefinitionId, Integer historyTimeToLive){
+    commandExecutor.execute(new UpdateDecisionDefinitionHistoryTimeToLiveCmd(decisionDefinitionId, historyTimeToLive));
   }
 
   public InputStream getProcessModel(String processDefinitionId) {

@@ -39,6 +39,7 @@ import org.camunda.bpm.engine.impl.RepositoryServiceImpl;
 import org.camunda.bpm.engine.impl.bpmn.deployer.BpmnDeployer;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration;
+import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
 import org.camunda.bpm.engine.impl.history.event.UserOperationLogEntryEventEntity;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -802,6 +803,49 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
     repositoryService.deleteDeployment(deploymentId);
   }
 
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/dmn/Example.dmn"})
+  public void testDecisionDefinitionUpdateTimeToLive() {
+    //given
+    DecisionDefinitionEntity decisionDefinition = findOnlyDecisionDefinition();
+
+    //when
+    repositoryService.updateDecisionDefinitionHistoryTimeToLive(decisionDefinition.getId(), 6);
+
+    //then
+    decisionDefinition = findOnlyDecisionDefinition();
+    assertEquals(6, decisionDefinition.getHistoryTimeToLive().intValue());
+
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/dmn/Example.dmn"})
+  public void testDecisionDefinitionUpdateTimeToLiveNull() {
+    //given
+    DecisionDefinitionEntity decisionDefinition = findOnlyDecisionDefinition();
+
+    //when
+    repositoryService.updateDecisionDefinitionHistoryTimeToLive(decisionDefinition.getId(), null);
+
+    //then
+    decisionDefinition = findOnlyDecisionDefinition();
+    assertEquals(null, decisionDefinition.getHistoryTimeToLive());
+
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/dmn/Example.dmn"})
+  public void testDecisionDefinitionUpdateTimeToLiveNegative() {
+    //given
+    DecisionDefinitionEntity decisionDefinition = findOnlyDecisionDefinition();
+
+    //when
+    try {
+      repositoryService.updateDecisionDefinitionHistoryTimeToLive(decisionDefinition.getId(), -1);
+      fail("Exception is expected, that negative value is not allowed.");
+    } catch (BadUserRequestException ex) {
+      assertTrue(ex.getMessage().contains("greater than"));
+    }
+
+  }
+
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   public void testProcessDefinitionUpdateTimeToLive() {
     //given
@@ -876,6 +920,13 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
     assertNotNull(processDefinitions);
     assertEquals(1, processDefinitions.size());
     return (ProcessDefinitionEntity)processDefinitions.get(0);
+  }
+
+  private DecisionDefinitionEntity findOnlyDecisionDefinition() {
+    List<DecisionDefinition> decisionDefinitions = repositoryService.createDecisionDefinitionQuery().list();
+    assertNotNull(decisionDefinitions);
+    assertEquals(1, decisionDefinitions.size());
+    return (DecisionDefinitionEntity)decisionDefinitions.get(0);
   }
 
   public void testProcessDefinitionIntrospection() {

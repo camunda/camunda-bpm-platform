@@ -298,6 +298,16 @@ public class TenantCommandChecker implements CommandChecker {
     }
   }
 
+  @Override
+  public void checkUpdateDecisionDefinitionById(String decisionDefinitionId) {
+    if (getTenantManager().isTenantCheckEnabled()) {
+      DecisionDefinitionEntity decisionDefinition = findLatestDecisionDefinitionById(decisionDefinitionId);
+      if (decisionDefinition != null && !getTenantManager().isAuthenticatedTenant(decisionDefinition.getTenantId())) {
+        throw LOG.exceptionCommandWithUnauthorizedTenant("update the decision definition '"+ decisionDefinitionId + "'");
+      }
+    }
+  }
+
   public void checkReadDecisionRequirementsDefinition(DecisionRequirementsDefinitionEntity decisionRequirementsDefinition) {
     if (decisionRequirementsDefinition != null && !getTenantManager().isAuthenticatedTenant(decisionRequirementsDefinition.getTenantId())) {
       throw LOG.exceptionCommandWithUnauthorizedTenant("get the decision requirements definition '"+ decisionRequirementsDefinition.getId() + "'");
@@ -396,6 +406,10 @@ public class TenantCommandChecker implements CommandChecker {
 
   protected ProcessDefinitionEntity findLatestProcessDefinitionById(String processDefinitionId) {
     return Context.getCommandContext().getProcessDefinitionManager().findLatestProcessDefinitionById(processDefinitionId);
+  }
+
+  protected DecisionDefinitionEntity findLatestDecisionDefinitionById(String decisionDefinitionId) {
+    return Context.getCommandContext().getDecisionDefinitionManager().findDecisionDefinitionById(decisionDefinitionId);
   }
 
   protected ExecutionEntity findExecutionById(String processInstanceId) {

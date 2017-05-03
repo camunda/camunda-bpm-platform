@@ -71,6 +71,11 @@ public interface CommandChecker {
   void checkUpdateProcessInstanceByProcessDefinitionId(String processDefinitionId);
 
   /**
+   * Checks if it is allowed to update a decision definition with given id.
+   */
+  void checkUpdateDecisionDefinitionById(String decisionDefinitionId);
+
+  /**
    * Checks if it is allowed to update a process definition of the given process definition key.
    */
   void checkUpdateProcessDefinitionByKey(String processDefinitionKey);

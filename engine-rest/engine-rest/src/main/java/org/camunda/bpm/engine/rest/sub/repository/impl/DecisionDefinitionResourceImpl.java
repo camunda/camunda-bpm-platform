@@ -34,6 +34,7 @@ import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
+import org.camunda.bpm.engine.rest.dto.HistoryTimeToLiveDto;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.rest.dto.dmn.EvaluateDecisionDto;
 import org.camunda.bpm.engine.rest.dto.repository.DecisionDefinitionDiagramDto;
@@ -157,6 +158,11 @@ public class DecisionDefinitionResourceImpl implements DecisionDefinitionResourc
       String errorMessage = String.format("Cannot evaluate decision %s: %s", decisionDefinitionId, e.getMessage());
       throw new RestException(Status.INTERNAL_SERVER_ERROR, e, errorMessage);
     }
+  }
+
+  @Override
+  public void updateHistoryTimeToLive(HistoryTimeToLiveDto historyTimeToLiveDto) {
+    engine.getRepositoryService().updateDecisionDefinitionHistoryTimeToLive(decisionDefinitionId, historyTimeToLiveDto.getHistoryTimeToLive());
   }
 
   protected List<Map<String, VariableValueDto>> createDecisionResultDto(DmnDecisionResult decisionResult) {

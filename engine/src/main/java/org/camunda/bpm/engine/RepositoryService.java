@@ -435,8 +435,19 @@ public interface RepositoryService {
    * Updates time to live of process definition. The field is used within history cleanup process.
    * @param processDefinitionId
    * @param historyTimeToLive
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void updateProcessDefinitionHistoryTimeToLive(String processDefinitionId, Integer historyTimeToLive);
+
+  /**
+   * Updates time to live of process definition. The field is used within history cleanup process.
+   * @param decisionDefinitionId
+   * @param historyTimeToLive
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#DECISION_DEFINITION}.
+   */
+  void updateDecisionDefinitionHistoryTimeToLive(String decisionDefinitionId, Integer historyTimeToLive);
 
   /**
    * Gives access to a deployed process model, e.g., a BPMN 2.0 XML file,

@@ -12,6 +12,7 @@ create table ACT_RE_DECISION_DEF (
     DEC_REQ_ID_ varchar(64),
     DEC_REQ_KEY_ varchar(255),
     TENANT_ID_ varchar(64),
+    HISTORY_TTL_ integer,
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 

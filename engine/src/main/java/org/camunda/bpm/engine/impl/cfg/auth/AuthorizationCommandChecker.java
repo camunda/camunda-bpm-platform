@@ -79,6 +79,16 @@ public class AuthorizationCommandChecker implements CommandChecker {
   }
 
   @Override
+  public void checkUpdateDecisionDefinitionById(String decisionDefinitionId) {
+    if (getAuthorizationManager().isAuthorizationEnabled()) {
+      DecisionDefinitionEntity decisionDefinition = findLatestDecisionDefinitionById(decisionDefinitionId);
+      if (decisionDefinition != null) {
+        checkUpdateDecisionDefinition(decisionDefinition);
+      }
+    }
+  }
+
+  @Override
   public void checkUpdateProcessDefinitionByKey(String processDefinitionKey) {
     getAuthorizationManager().checkAuthorization(UPDATE, PROCESS_DEFINITION, processDefinitionKey);
   }
@@ -418,6 +428,10 @@ public class AuthorizationCommandChecker implements CommandChecker {
     getAuthorizationManager().checkAuthorization(READ, DECISION_DEFINITION, decisionDefinition.getKey());
   }
 
+  public void checkUpdateDecisionDefinition(DecisionDefinitionEntity decisionDefinition) {
+    getAuthorizationManager().checkAuthorization(UPDATE, DECISION_DEFINITION, decisionDefinition.getKey());
+  }
+
   public void checkReadDecisionRequirementsDefinition(DecisionRequirementsDefinitionEntity decisionRequirementsDefinition) {
     getAuthorizationManager().checkAuthorization(READ, DECISION_REQUIREMENTS_DEFINITION, decisionRequirementsDefinition.getKey());
   }
@@ -487,6 +501,10 @@ public class AuthorizationCommandChecker implements CommandChecker {
 
   protected ProcessDefinitionEntity findLatestProcessDefinitionById(String processDefinitionId) {
     return Context.getCommandContext().getProcessDefinitionManager().findLatestProcessDefinitionById(processDefinitionId);
+  }
+
+  protected DecisionDefinitionEntity findLatestDecisionDefinitionById(String decisionDefinitionId) {
+    return Context.getCommandContext().getDecisionDefinitionManager().findDecisionDefinitionById(decisionDefinitionId);
   }
 
   protected ExecutionEntity findExecutionById(String processInstanceId) {

@@ -41,3 +41,6 @@ values ('history.cleanup.job.lock', '0', 1);
 -- historyTimeToLive column for history cleanup
 ALTER TABLE ACT_RE_PROCDEF
   ADD HISTORY_TTL_ INTEGER;
+
+ALTER TABLE ACT_RE_DECISION_DEF
+  ADD HISTORY_TTL_ INTEGER;

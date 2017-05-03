@@ -33,6 +33,8 @@ public class DecisionDefinitionHandler extends DmnDecisionTransformHandler {
     String category = context.getModelInstance().getDefinitions().getNamespace();
     decisionDefinition.setCategory(category);
 
+    decisionDefinition.setHistoryTimeToLive(decision.getCamundaHistoryTimeToLive());
+
     return decisionDefinition;
   }
 

@@ -13,6 +13,8 @@
 package org.camunda.bpm.engine.impl.dmn.entity.repository;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -45,6 +47,8 @@ public class DecisionDefinitionEntity extends DmnDecisionImpl implements Decisio
   // this definition does not have any previous definitions
   protected boolean firstVersion = false;
   protected String previousDecisionDefinitionId;
+
+  protected Integer historyTimeToLive;
 
   public DecisionDefinitionEntity() {
 
@@ -156,7 +160,9 @@ public class DecisionDefinitionEntity extends DmnDecisionImpl implements Decisio
   }
 
   public Object getPersistentState() {
-    return DecisionDefinitionEntity.class;
+    Map<String, Object> persistentState = new HashMap<String, Object>();
+    persistentState.put("historyTimeToLive", this.historyTimeToLive);
+    return persistentState;
   }
 
   // previous decision definition //////////////////////////////////////////////
@@ -232,6 +238,14 @@ public class DecisionDefinitionEntity extends DmnDecisionImpl implements Decisio
     }
   }
 
+  public Integer getHistoryTimeToLive() {
+    return historyTimeToLive;
+  }
+
+  public void setHistoryTimeToLive(Integer historyTimeToLive) {
+    this.historyTimeToLive = historyTimeToLive;
+  }
+
   @Override
   public String toString() {
     return "DecisionDefinitionEntity{" +
@@ -244,6 +258,7 @@ public class DecisionDefinitionEntity extends DmnDecisionImpl implements Decisio
       ", decisionRequirementsDefinitionKey='" + decisionRequirementsDefinitionKey + '\'' +
       ", deploymentId='" + deploymentId + '\'' +
       ", tenantId='" + tenantId + '\'' +
+      ", historyTimeToLive=" + historyTimeToLive +
       '}';
   }
 

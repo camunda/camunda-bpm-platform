@@ -19,6 +19,7 @@
       DEC_REQ_ID_,
       DEC_REQ_KEY_,
       TENANT_ID_,
+      HISTORY_TTL_,
       REV_)
     values (#{id, jdbcType=VARCHAR},
             #{category, jdbcType=VARCHAR},
@@ -31,6 +32,7 @@
             #{decisionRequirementsDefinitionId, jdbcType=VARCHAR},
             #{decisionRequirementsDefinitionKey, jdbcType=VARCHAR},
             #{tenantId, jdbcType=VARCHAR},
+            #{historyTimeToLive, jdbcType=INTEGER},
             1
            )
   </insert>
@@ -39,7 +41,8 @@
 
   <update id="updateDecisionDefinition" parameterType="org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity">
     update ${prefix}ACT_RE_DECISION_DEF set
-      REV_ = #{revisionNext, jdbcType=INTEGER}
+      REV_ = #{revisionNext, jdbcType=INTEGER},
+      HISTORY_TTL_ = #{historyTimeToLive, jdbcType=INTEGER}
     where ID_ = #{id, jdbcType=VARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
   </update>
@@ -65,6 +68,7 @@
     <result property="decisionRequirementsDefinitionId" column="DEC_REQ_ID_" jdbcType="VARCHAR"/>
     <result property="decisionRequirementsDefinitionKey" column="DEC_REQ_KEY_" jdbcType="VARCHAR"/>
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR"/>
+    <result property="historyTimeToLive" column="HISTORY_TTL_" jdbcType="INTEGER" />
   </resultMap>
 
   <!-- DECISIONDEFINITION SELECT -->
