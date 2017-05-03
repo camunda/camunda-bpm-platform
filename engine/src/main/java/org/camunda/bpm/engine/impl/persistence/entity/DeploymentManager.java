@@ -230,6 +230,11 @@ public class DeploymentManager extends AbstractManager {
     return getDbEntityManager().selectList("selectResourceNamesByDeploymentId", deploymentId);
   }
 
+  @SuppressWarnings("unchecked")
+  public List<String> findDeploymentIdsByProcessInstances(List<String> processInstanceIds) {
+    return getDbEntityManager().selectList("selectDeploymentIdsByProcessInstances", processInstanceIds);
+  }
+
   @Override
   public void close() {
   }

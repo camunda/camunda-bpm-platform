@@ -191,14 +191,8 @@
   </select>
 
   <select id="selectProcessInstanceIdsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl" resultType="string">
-    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
-    ${limitBefore}
-    select distinct RES.ID_, RES.DEPLOYMENT_ID_
-    ${limitBetween}
-    from (select RES.ID_, P.DEPLOYMENT_ID_
-    <include refid="selectProcessInstanceByQueryCriteriaSql"/>) RES
-    ${orderBy}
-    ${limitAfter}
+    select distinct RES.ID_
+    <include refid="selectProcessInstanceByQueryCriteriaSql"/>
   </select>
 
   <sql id="selectProcessInstanceByQueryCriteriaSql">

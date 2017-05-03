@@ -17,13 +17,11 @@ import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl;
-import org.camunda.bpm.engine.impl.QueryPropertyImpl;
 import org.camunda.bpm.engine.impl.batch.BatchConfiguration;
 import org.camunda.bpm.engine.impl.batch.BatchEntity;
 import org.camunda.bpm.engine.impl.batch.BatchJobHandler;
 import org.camunda.bpm.engine.impl.batch.deletion.DeleteProcessInstanceBatchConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
@@ -32,7 +30,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Callable;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 
@@ -66,38 +63,8 @@ public class DeleteProcessInstanceBatchCmd extends AbstractIDBasedBatchCmd<Batch
     if (processInstanceQuery != null) {
       collectedProcessInstanceIds.addAll(processInstanceQuery.listIds());
     }
-    
-    final List<String> result = new ArrayList<String>();
-    
-    if (collectedProcessInstanceIds.size() > 2) {
-      /*
-       * Optimisation related to #CAM-7519. In order to improve the performance
-       * of job execution the Process instances are been ordered by Deployment
-       * id. That way we reduce the number of created batch jobs.
-       */
-      final ProcessInstanceQueryImpl processInstanceQueryToBeProcess = new ProcessInstanceQueryImpl();
-      processInstanceQueryToBeProcess.processInstanceIds(collectedProcessInstanceIds);
-      processInstanceQueryToBeProcess.orderBy(new QueryPropertyImpl("DEPLOYMENT_ID_")).asc();
 
-      Context.getCommandContext().runWithoutAuthorization(new Callable<Void>() {
-        @Override
-        public Void call() throws Exception {
-          result.addAll(processInstanceQueryToBeProcess.listIds());
-          return null;
-        }
-      });
-    }
-    else {
-      result.addAll(collectedProcessInstanceIds);
-    }
-    
-    for (String id : collectedProcessInstanceIds) {
-      if (!result.contains(id)) {
-        result.add(id);
-      }
-    }
-
-    return result;
+    return new ArrayList<String>(collectedProcessInstanceIds);
   }
 
   public List<String> getProcessInstanceIds() {
