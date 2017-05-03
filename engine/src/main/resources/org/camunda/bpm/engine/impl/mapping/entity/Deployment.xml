@@ -144,7 +144,7 @@
   </select>
 
   <select id="selectDeploymentIdsByProcessInstances" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
-    select ${distinct} P.DEPLOYMENT_ID_
+    select distinct P.DEPLOYMENT_ID_
     from ${prefix}ACT_RU_EXECUTION RES
     inner join ${prefix}ACT_RE_PROCDEF P
     on RES.PROC_DEF_ID_ = P.ID_
