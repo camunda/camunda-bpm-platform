@@ -15,7 +15,6 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
-import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
@@ -117,9 +116,9 @@ public class SetExternalTaskRetriesUserOperationLogTest {
     Assert.assertNotNull(retriesEntry);
     Assert.assertEquals("ProcessInstance", retriesEntry.getEntityType());
     Assert.assertEquals("SetExternalTaskRetries", retriesEntry.getOperationType());
-    Assert.assertNull(retriesEntry.getProcessDefinitionId());
-    Assert.assertNull(retriesEntry.getProcessDefinitionKey());
-    Assert.assertNull(retriesEntry.getProcessInstanceId());
+    Assert.assertEquals(externalTask.getProcessInstanceId(), retriesEntry.getProcessInstanceId());
+    Assert.assertEquals(externalTask.getProcessDefinitionId(), retriesEntry.getProcessDefinitionId());
+    Assert.assertEquals(externalTask.getProcessDefinitionKey(), retriesEntry.getProcessDefinitionKey());
     Assert.assertNull(retriesEntry.getOrgValue());
     Assert.assertEquals("5", retriesEntry.getNewValue());
   }
@@ -128,9 +127,15 @@ public class SetExternalTaskRetriesUserOperationLogTest {
   public void testLogCreationSync() {
     // given
     rule.getIdentityService().setAuthenticatedUserId("userId");
+    List<ExternalTask> list = externalTaskService.createExternalTaskQuery().list();
+    List<String> externalTaskIds = new ArrayList<String>();
+
+    for (ExternalTask task : list) {
+      externalTaskIds.add(task.getId());
+    }
 
     // when
-    externalTaskService.setRetriesSync(null, externalTaskService.createExternalTaskQuery(), 5);
+    externalTaskService.setRetries(externalTaskIds, 5);
     rule.getIdentityService().clearAuthentication();
     // then
     List<UserOperationLogEntry> opLogEntries = rule.getHistoryService().createUserOperationLogQuery().list();

@@ -7,13 +7,14 @@ import org.camunda.bpm.engine.impl.batch.AbstractBatchJobHandler;
 import org.camunda.bpm.engine.impl.batch.BatchJobConfiguration;
 import org.camunda.bpm.engine.impl.batch.BatchJobContext;
 import org.camunda.bpm.engine.impl.batch.BatchJobDeclaration;
+import org.camunda.bpm.engine.impl.batch.SetRetriesBatchConfiguration;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 
-public class SetExternalTaskRetriesJobHandler extends AbstractBatchJobHandler<SetExternalTaskRetriesBatchConfiguration> {
+public class SetExternalTaskRetriesJobHandler extends AbstractBatchJobHandler<SetRetriesBatchConfiguration> {
 
   public static final BatchJobDeclaration JOB_DECLARATION = new BatchJobDeclaration(Batch.TYPE_SET_EXTERNAL_TASK_RETRIES);
   
@@ -28,7 +29,7 @@ public class SetExternalTaskRetriesJobHandler extends AbstractBatchJobHandler<Se
         .getDbEntityManager()
         .selectById(ByteArrayEntity.class, configuration.getConfigurationByteArrayId());
 
-    SetExternalTaskRetriesBatchConfiguration batchConfiguration = readConfiguration(configurationEntity.getBytes());
+    SetRetriesBatchConfiguration batchConfiguration = readConfiguration(configurationEntity.getBytes());
 
     boolean initialLegacyRestrictions = commandContext.isRestrictUserOperationLogToAuthenticatedUsers();
     commandContext.disableUserOperationLog();
@@ -36,7 +37,7 @@ public class SetExternalTaskRetriesJobHandler extends AbstractBatchJobHandler<Se
     try {
       commandContext.getProcessEngineConfiguration()
           .getExternalTaskService()
-          .setRetriesSync(batchConfiguration.getIds(), null, batchConfiguration.getRetries());
+          .setRetries(batchConfiguration.getIds(), batchConfiguration.getRetries());
     } finally {
       commandContext.enableUserOperationLog();
       commandContext.setRestrictUserOperationLogToAuthenticatedUsers(initialLegacyRestrictions);
@@ -52,9 +53,9 @@ public class SetExternalTaskRetriesJobHandler extends AbstractBatchJobHandler<Se
   }
 
   @Override
-  protected SetExternalTaskRetriesBatchConfiguration createJobConfiguration(SetExternalTaskRetriesBatchConfiguration configuration,
+  protected SetRetriesBatchConfiguration createJobConfiguration(SetRetriesBatchConfiguration configuration,
       List<String> processIdsForJob) {
-    return new SetExternalTaskRetriesBatchConfiguration(processIdsForJob, configuration.getRetries());
+    return new SetRetriesBatchConfiguration(processIdsForJob, configuration.getRetries());
   }
 
   @Override

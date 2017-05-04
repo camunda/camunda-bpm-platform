@@ -100,7 +100,7 @@ public class SetExternalTasksRetriesAuthorizationTest {
     externalTaskIds.add(tasks.get(0).getId());
     externalTaskIds.add(tasks.get(1).getId());
     
-    engineRule.getExternalTaskService().setRetriesSync(externalTaskIds, null, 5);
+    engineRule.getExternalTaskService().setRetries(externalTaskIds, 5);
 
     // then
     if (authRule.assertScenario(scenario)) {

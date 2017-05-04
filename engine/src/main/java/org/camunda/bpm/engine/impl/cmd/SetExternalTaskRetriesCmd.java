@@ -50,9 +50,9 @@ public class SetExternalTaskRetriesCmd extends ExternalTaskCmd {
 
       Context.getCommandContext().getOperationLogManager()
           .logProcessInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_SET_EXTERNAL_TASK_RETRIES,
-              null,
-              null,
-              null,
+              externalTask.getProcessInstanceId(),
+              externalTask.getProcessDefinitionId(),
+              externalTask.getProcessDefinitionKey(),
               propertyChanges);
     }
     externalTask.setRetriesAndManageIncidents(retries);

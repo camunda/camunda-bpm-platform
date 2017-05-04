@@ -19,25 +19,27 @@ public abstract class AbstractSetExternalTaskRetriesCmd<T> implements Command<T>
 
   protected List<String> externalTaskIds;
   protected ExternalTaskQuery externalTaskQuery;
+  protected int retries;
 
-  public AbstractSetExternalTaskRetriesCmd(List<String> externalTaskIds, ExternalTaskQuery externalTaskQuery) {
+  public AbstractSetExternalTaskRetriesCmd(List<String> externalTaskIds, ExternalTaskQuery externalTaskQuery, int retries) {
     this.externalTaskIds = externalTaskIds;
     this.externalTaskQuery = externalTaskQuery;
+    this.retries = retries;
   }
 
   protected List<String> collectExternalTaskIds() {
 
-    Set<String> collectedJobIds = new HashSet<String>();
+    Set<String> collectedIds = new HashSet<String>();
 
     if (externalTaskIds != null) {
       ensureNotContainsNull(BadUserRequestException.class, "External task id cannot be null", "externalTaskIds", externalTaskIds);
-      collectedJobIds.addAll(externalTaskIds);
+      collectedIds.addAll(externalTaskIds);
     }
 
     if (externalTaskQuery != null) {
-      collectedJobIds.addAll(((ExternalTaskQueryImpl) externalTaskQuery).listIds());
+      collectedIds.addAll(((ExternalTaskQueryImpl) externalTaskQuery).listIds());
     }
-    return new ArrayList<String>(collectedJobIds);
+    return new ArrayList<String>(collectedIds);
   }
 
   protected void writeUserOperationLog(CommandContext commandContext, int retries, int numInstances, boolean async) {

@@ -96,7 +96,7 @@ public class SetExternalTasksRetriesTest {
       externalTaskIds.add(task.getId());
     }
     // when  
-    externalTaskService.setRetriesSync(externalTaskIds, null, 10);
+    externalTaskService.setRetries(externalTaskIds, 10);
     
     // then     
     externalTasks = externalTaskService.createExternalTaskQuery().list();
@@ -117,7 +117,7 @@ public class SetExternalTasksRetriesTest {
     externalTaskIds.add("nonExistingExternalTaskId");
     
     try {
-      externalTaskService.setRetriesSync(externalTaskIds, null, 10);
+      externalTaskService.setRetries(externalTaskIds, 10);
       fail("exception expected");
     } catch (NotFoundException e) {
       Assert.assertThat(e.getMessage(), containsString("Cannot find external task with id nonExistingExternalTaskId"));
@@ -136,7 +136,7 @@ public class SetExternalTasksRetriesTest {
     externalTaskIds.add(null);
     
     try {
-      externalTaskService.setRetriesSync(externalTaskIds, null, 10);
+      externalTaskService.setRetries(externalTaskIds, 10);
       fail("exception expected");
     } catch (BadUserRequestException e) {
       Assert.assertThat(e.getMessage(), containsString("External task id cannot be null"));
@@ -146,7 +146,7 @@ public class SetExternalTasksRetriesTest {
   @Test
   public void shouldFailForNullExternalTaskIdsSync() {
     try {
-      externalTaskService.setRetriesSync((List<String>) null, null, 10);
+      externalTaskService.setRetries((List<String>) null, 10);
       fail("exception expected");
     } catch (BadUserRequestException e) {
       Assert.assertThat(e.getMessage(), containsString("externalTaskIds is empty"));
@@ -210,7 +210,7 @@ public class SetExternalTasksRetriesTest {
     List<String> externalTaskIds = Arrays.asList("externalTaskId");
  
     try {
-      externalTaskService.setRetriesSync(externalTaskIds, null, -10);
+      externalTaskService.setRetries(externalTaskIds, -10);
       fail("exception expected");
     } catch (BadUserRequestException e) {
       Assert.assertThat(e.getMessage(), containsString("The number of retries cannot be negative"));
@@ -228,19 +228,6 @@ public class SetExternalTasksRetriesTest {
       fail("exception expected");
     } catch (BadUserRequestException e) {
       Assert.assertThat(e.getMessage(), containsString("The number of retries cannot be negative"));
-    }
-  }
-  
-  @Test
-  public void shouldSetExternalTaskRetriesWithQuerySync() {
-
-    ExternalTaskQuery externalTaskQuery = engineRule.getExternalTaskService().createExternalTaskQuery();
-    
-
-    externalTaskService.setRetriesSync(null, externalTaskQuery, 5);
-    
-    for (ExternalTask task : externalTaskQuery.list()) {
-      Assert.assertEquals(5, (int) task.getRetries());
     }
   }
   

@@ -12,17 +12,14 @@ import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
 import org.camunda.bpm.engine.impl.batch.BatchEntity;
 import org.camunda.bpm.engine.impl.batch.BatchJobHandler;
-import org.camunda.bpm.engine.impl.batch.externaltask.SetExternalTaskRetriesBatchConfiguration;
+import org.camunda.bpm.engine.impl.batch.SetRetriesBatchConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
 public class SetExternalTasksRetriesBatchCmd extends AbstractSetExternalTaskRetriesCmd<Batch> {
-
-  protected int retries;
   
   public SetExternalTasksRetriesBatchCmd(List<String> externalTaskIds, ExternalTaskQuery externalTaskQuery, int retries) {
-    super(externalTaskIds, externalTaskQuery);
-    this.retries = retries;
+    super(externalTaskIds, externalTaskQuery, retries);
   }
 
   @Override
@@ -53,9 +50,9 @@ public class SetExternalTasksRetriesBatchCmd extends AbstractSetExternalTaskRetr
   
   protected BatchEntity createBatch(CommandContext commandContext, Collection<String> processInstanceIds) {
     ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
-    BatchJobHandler<SetExternalTaskRetriesBatchConfiguration> batchJobHandler = getBatchJobHandler(processEngineConfiguration);
+    BatchJobHandler<SetRetriesBatchConfiguration> batchJobHandler = getBatchJobHandler(processEngineConfiguration);
 
-    SetExternalTaskRetriesBatchConfiguration configuration = new SetExternalTaskRetriesBatchConfiguration(new ArrayList<String>(processInstanceIds), retries);
+    SetRetriesBatchConfiguration configuration = new SetRetriesBatchConfiguration(new ArrayList<String>(processInstanceIds), retries);
     
     BatchEntity batch = new BatchEntity();
     batch.setType(batchJobHandler.getType());
@@ -68,14 +65,14 @@ public class SetExternalTasksRetriesBatchCmd extends AbstractSetExternalTaskRetr
     return batch;
   }
   
-  protected int calculateSize(ProcessEngineConfigurationImpl engineConfiguration, SetExternalTaskRetriesBatchConfiguration batchConfiguration) {
+  protected int calculateSize(ProcessEngineConfigurationImpl engineConfiguration, SetRetriesBatchConfiguration batchConfiguration) {
     int invocationsPerBatchJob = engineConfiguration.getInvocationsPerBatchJob();
     int processInstanceCount = batchConfiguration.getIds().size();
 
     return (int) Math.ceil(processInstanceCount / invocationsPerBatchJob);
   }
 
-  protected BatchJobHandler<SetExternalTaskRetriesBatchConfiguration> getBatchJobHandler(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    return (BatchJobHandler<SetExternalTaskRetriesBatchConfiguration>) processEngineConfiguration.getBatchHandlers().get(Batch.TYPE_SET_EXTERNAL_TASK_RETRIES);
+  protected BatchJobHandler<SetRetriesBatchConfiguration> getBatchJobHandler(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    return (BatchJobHandler<SetRetriesBatchConfiguration>) processEngineConfiguration.getBatchHandlers().get(Batch.TYPE_SET_EXTERNAL_TASK_RETRIES);
   }
 }

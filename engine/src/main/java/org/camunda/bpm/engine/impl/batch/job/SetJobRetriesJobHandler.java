@@ -18,6 +18,7 @@ import org.camunda.bpm.engine.impl.batch.AbstractBatchJobHandler;
 import org.camunda.bpm.engine.impl.batch.BatchJobConfiguration;
 import org.camunda.bpm.engine.impl.batch.BatchJobContext;
 import org.camunda.bpm.engine.impl.batch.BatchJobDeclaration;
+import org.camunda.bpm.engine.impl.batch.SetRetriesBatchConfiguration;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
@@ -30,7 +31,7 @@ import java.util.List;
 /**
  * @author Askar Akhmerov
  */
-public class SetJobRetriesJobHandler extends AbstractBatchJobHandler<SetJobRetriesBatchConfiguration> {
+public class SetJobRetriesJobHandler extends AbstractBatchJobHandler<SetRetriesBatchConfiguration> {
   public static final BatchJobDeclaration JOB_DECLARATION = new BatchJobDeclaration(Batch.TYPE_SET_JOB_RETRIES);
 
   @Override
@@ -48,8 +49,8 @@ public class SetJobRetriesJobHandler extends AbstractBatchJobHandler<SetJobRetri
   }
 
   @Override
-  protected SetJobRetriesBatchConfiguration createJobConfiguration(SetJobRetriesBatchConfiguration configuration, List<String> jobIds) {
-    return new SetJobRetriesBatchConfiguration(jobIds, configuration.getRetries());
+  protected SetRetriesBatchConfiguration createJobConfiguration(SetRetriesBatchConfiguration configuration, List<String> jobIds) {
+    return new SetRetriesBatchConfiguration(jobIds, configuration.getRetries());
   }
 
   @Override
@@ -58,7 +59,7 @@ public class SetJobRetriesJobHandler extends AbstractBatchJobHandler<SetJobRetri
         .getDbEntityManager()
         .selectById(ByteArrayEntity.class, configuration.getConfigurationByteArrayId());
 
-    SetJobRetriesBatchConfiguration batchConfiguration = readConfiguration(configurationEntity.getBytes());
+    SetRetriesBatchConfiguration batchConfiguration = readConfiguration(configurationEntity.getBytes());
 
     boolean initialLegacyRestrictions = commandContext.isRestrictUserOperationLogToAuthenticatedUsers();
     commandContext.disableUserOperationLog();

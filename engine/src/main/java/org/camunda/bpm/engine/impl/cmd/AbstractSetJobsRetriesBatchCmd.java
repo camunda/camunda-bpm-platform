@@ -18,7 +18,7 @@ import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.batch.BatchEntity;
 import org.camunda.bpm.engine.impl.batch.BatchJobHandler;
-import org.camunda.bpm.engine.impl.batch.job.SetJobRetriesBatchConfiguration;
+import org.camunda.bpm.engine.impl.batch.SetRetriesBatchConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmd.batch.AbstractIDBasedBatchCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -85,12 +85,12 @@ public abstract class AbstractSetJobsRetriesBatchCmd extends AbstractIDBasedBatc
   protected abstract List<String> collectJobIds(CommandContext commandContext);
 
   @Override
-  protected SetJobRetriesBatchConfiguration getAbstractIdsBatchConfiguration(List<String> ids) {
-    return new SetJobRetriesBatchConfiguration(ids, retries);
+  protected SetRetriesBatchConfiguration getAbstractIdsBatchConfiguration(List<String> ids) {
+    return new SetRetriesBatchConfiguration(ids, retries);
   }
 
   @Override
-  protected BatchJobHandler<SetJobRetriesBatchConfiguration> getBatchJobHandler(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    return (BatchJobHandler<SetJobRetriesBatchConfiguration>) processEngineConfiguration.getBatchHandlers().get(Batch.TYPE_SET_JOB_RETRIES);
+  protected BatchJobHandler<SetRetriesBatchConfiguration> getBatchJobHandler(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    return (BatchJobHandler<SetRetriesBatchConfiguration>) processEngineConfiguration.getBatchHandlers().get(Batch.TYPE_SET_JOB_RETRIES);
   }
 }

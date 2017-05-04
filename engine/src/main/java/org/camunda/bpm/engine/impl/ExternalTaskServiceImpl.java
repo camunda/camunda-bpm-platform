@@ -85,8 +85,8 @@ public class ExternalTaskServiceImpl extends ServiceImpl implements ExternalTask
     return commandExecutor.execute(new GetExternalTaskErrorDetailsCmd(externalTaskId));
   }
 
-  public void setRetriesSync(List<String> externalTaskIds, ExternalTaskQuery externalTaskQuery, int retries) {
-    commandExecutor.execute(new SetExternalTasksRetriesCmd(externalTaskIds, externalTaskQuery, retries));
+  public void setRetries(List<String> externalTaskIds, int retries) {
+    commandExecutor.execute(new SetExternalTasksRetriesCmd(externalTaskIds, retries));
   }
 
   public Batch setRetriesAsync(List<String> externalTaskIds, int retries) {
