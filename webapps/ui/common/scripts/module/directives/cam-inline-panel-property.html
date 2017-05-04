@@ -1,0 +1,8 @@
+<span cam-widget-inline-field
+  class="set-value"
+  type="{{type}}"
+  change="onChange()"
+  value="property">
+  <span ng-show="!property" class="null-value">null</span>
+  <span ng-show="property">{{format({property: property}) || property}}</span>
+</span>
