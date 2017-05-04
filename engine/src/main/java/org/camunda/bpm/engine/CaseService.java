@@ -889,4 +889,12 @@ public interface CaseService {
    */
   void removeVariableLocal(String caseExecutionId, String variableName);
 
+  /**
+   * Updates history time to live of case definition. The field is used within
+   * history cleanup process.
+   *
+   * @param caseDefinitionId
+   * @param historyTimeToLive
+   */
+  void updateCaseDefinitionHistoryTimeToLive(String caseDefinitionId, Integer historyTimeToLive);
 }

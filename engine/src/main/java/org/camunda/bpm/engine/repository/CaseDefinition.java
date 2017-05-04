@@ -18,4 +18,6 @@ package org.camunda.bpm.engine.repository;
  */
 public interface CaseDefinition extends ResourceDefinition {
 
+  /** History time to live is taken into account in history cleanup. */
+  Integer getHistoryTimeToLive();
 }

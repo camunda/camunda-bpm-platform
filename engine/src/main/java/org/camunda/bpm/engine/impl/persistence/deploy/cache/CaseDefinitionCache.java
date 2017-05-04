@@ -38,6 +38,14 @@ public class CaseDefinitionCache extends ResourceDefinitionCache<CaseDefinitionE
     return caseDefinition;
   }
 
+  public CaseDefinitionEntity resolveDefinition(CaseDefinitionEntity caseDefinition){
+    CaseDefinitionEntity entity = super.resolveDefinition(caseDefinition);
+    if(entity!=null){
+      entity.updateModifiedFieldsFromEntity(caseDefinition);
+    }
+    return entity;
+  }
+
   @Override
   protected AbstractResourceDefinitionManager<CaseDefinitionEntity> getManager() {
     return Context.getCommandContext().getCaseDefinitionManager();

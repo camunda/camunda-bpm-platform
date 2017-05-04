@@ -623,4 +623,15 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
         "078", "No history cleanup lock property found in databse");
   }
 
+  public void logUpdateUnrelatedCaseDefinitionEntity(String thisKey, String thatKey, String thisDeploymentId, String thatDeploymentId) {
+    logDebug(
+      "044",
+      "Cannot update entity from an unrelated case definition: this key '{}', that key '{}', this deploymentId '{}', that deploymentId '{}'",
+      thisKey,
+      thatKey,
+      thisDeploymentId,
+      thatDeploymentId
+    );
+  }
+
 }

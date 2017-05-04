@@ -104,4 +104,28 @@ public class CaseHandlerTest extends CmmnElementHandlerTest {
     assertEquals(deploymentId, activity.getDeploymentId());
   }
 
+  @Test
+  public void testHistoryTimeToLiveNull() {
+    // given: a caseDefinition
+
+    // when
+    CaseDefinitionEntity activity = (CaseDefinitionEntity) handler.handleElement(caseDefinition, context);
+
+    // then
+    assertNull(activity.getHistoryTimeToLive());
+  }
+
+  @Test
+  public void testHistoryTimeToLive() {
+    // given: a caseDefinition
+    Integer historyTimeToLive = 6;
+    caseDefinition.setCamundaHistoryTimeToLive(historyTimeToLive);
+
+    // when
+    CaseDefinitionEntity activity = (CaseDefinitionEntity) handler.handleElement(caseDefinition, context);
+
+    // then
+    assertEquals(Integer.valueOf(historyTimeToLive), activity.getHistoryTimeToLive());
+  }
+
 }

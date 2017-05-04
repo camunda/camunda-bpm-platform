@@ -320,6 +320,12 @@ public class TenantCommandChecker implements CommandChecker {
     }
   }
 
+  public void checkUpdateCaseDefinition(CaseDefinition caseDefinition) {
+    if (caseDefinition != null && !getTenantManager().isAuthenticatedTenant(caseDefinition.getTenantId())) {
+      throw LOG.exceptionCommandWithUnauthorizedTenant("get the case definition '" + caseDefinition.getId() + "'");
+    }
+  }
+
   @Override
   public void checkDeleteHistoricTaskInstance(HistoricTaskInstanceEntity task) {
     if (task != null && !getTenantManager().isAuthenticatedTenant(task.getTenantId())) {

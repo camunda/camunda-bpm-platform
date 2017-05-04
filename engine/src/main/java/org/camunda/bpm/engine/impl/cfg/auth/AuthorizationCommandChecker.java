@@ -440,6 +440,10 @@ public class AuthorizationCommandChecker implements CommandChecker {
   public void checkReadCaseDefinition(CaseDefinition caseDefinition) {
   }
 
+  @Override
+  public void checkUpdateCaseDefinition(CaseDefinition caseDefinition) {
+  }
+
   // delete permission ////////////////////////////////////////
 
   public void checkDeleteHistoricTaskInstance(HistoricTaskInstanceEntity task) {

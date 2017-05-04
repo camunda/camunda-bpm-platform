@@ -221,6 +221,11 @@ public interface CommandChecker {
   void checkReadCaseDefinition(CaseDefinition caseDefinition);
 
   /**
+   * Checks if it is allowed to update the given case definition.
+   */
+  void checkUpdateCaseDefinition(CaseDefinition caseDefinition);
+
+  /**
    * Checks if it is allowed to delete the given historic task instance.
    */
   void checkDeleteHistoricTaskInstance(HistoricTaskInstanceEntity task);

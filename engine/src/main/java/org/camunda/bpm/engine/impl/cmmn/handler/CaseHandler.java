@@ -12,11 +12,16 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.handler;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureGreaterThanOrEqual;
+
 import java.util.HashMap;
 
+import org.camunda.bpm.engine.exception.NotValidException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
+import org.camunda.bpm.engine.impl.cmmn.transformer.CmmnTransformerLogger;
 import org.camunda.bpm.engine.impl.task.TaskDefinition;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.model.cmmn.CmmnModelInstance;
@@ -29,6 +34,8 @@ import org.camunda.bpm.model.cmmn.instance.Definitions;
  *
  */
 public class CaseHandler extends CmmnElementHandler<Case, CmmnCaseDefinition> {
+
+  protected static final CmmnTransformerLogger LOG = ProcessEngineLogger.CMMN_TRANSFORMER_LOGGER;
 
   public CmmnCaseDefinition handleElement(Case element, CmmnHandlerContext context) {
     CaseDefinitionEntity definition = createActivity(element, context);
@@ -47,6 +54,11 @@ public class CaseHandler extends CmmnElementHandler<Case, CmmnCaseDefinition> {
     definition.setName(element.getName());
     definition.setDeploymentId(deployment.getId());
     definition.setTaskDefinitions(new HashMap<String, TaskDefinition>());
+    Integer camundaHistoryTimeToLive = element.getCamundaHistoryTimeToLive();
+    if (camundaHistoryTimeToLive != null) {
+      ensureGreaterThanOrEqual(NotValidException.class, "", "historyTimeToLive", camundaHistoryTimeToLive, 0);
+    }
+    definition.setHistoryTimeToLive(camundaHistoryTimeToLive);
 
     CmmnModelInstance model = context.getModel();
 
