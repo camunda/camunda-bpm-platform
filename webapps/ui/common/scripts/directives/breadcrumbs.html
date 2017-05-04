@@ -8,37 +8,43 @@
   <li ng-repeat="(index, crumb) in breadcrumbs"
       ng-class="{ active: !!$last }"
       data-index="{{ index }}">
-    <span class="divider">{{ crumb.divider || divider }}</span>
+    <span class="divider" ng-click="crumb.hidden = !crumb.hidden">{{ crumb.divider || divider }}</span>
 
     <a ng-if="!!crumb.href && !$last"
+       ng-show="!crumb.hidden"
        href="{{ getHref(crumb) }}"
        class="text">{{ crumb.label }}</a>
 
     <span ng-if="!!crumb.href && !!$last"
+          ng-show="!crumb.hidden"
           class="text">{{ crumb.label }}</span>
 
     <a ng-if="!crumb.href && !!crumb.callback"
+       ng-show="!crumb.hidden"
        ng-click="crumb.callback(index, breadcrumbs)"
        href
        class="text">{{ crumb.label }}</a>
 
     <span ng-if="!crumb.href && !crumb.callback"
+          ng-show="!crumb.hidden"
           class="text">{{ crumb.label }}</span>
 
     <span ng-if="(crumb.type === 'processDefinition' && crumb.processDefinition.suspended) || (crumb.type === 'processInstance' && crumb.processInstance.suspended)"
+          ng-show="!crumb.hidden"
           class="badge badge-warning badge-suspended"
           tooltip="Currently suspended"
           tooltip-placement="bottom">
       <span class="glyphicon glyphicon-pause white"></span>
     </span>
 
-    <span ng-if="!!crumb.choices && crumb.choices.length === 1">
+    <span ng-if="!!crumb.choices && crumb.choices.length === 1" ng-show="!crumb.hidden">
       <span class="divider">:</span>
       {{ getActiveChoice(crumb.choices) }}
     </span>
 
     <span ng-if="!!crumb.choices && crumb.choices.length === 2"
           class="switcher"
+          ng-show="!crumb.hidden"
           ng-init="choices = sortedChoices(crumb.choices)">
       <span class="divider">:</span>
 
@@ -48,16 +54,18 @@
     </span>
 
     <span ng-if="!!crumb.choices && crumb.choices.length > 2"
+          ng-show="!crumb.hidden"
           class="dropdown">
       <span class="divider">:</span>
 
       <a class="dropdown-toggle"
+         ng-show="!crumb.hidden"
          href>
         {{ getActiveChoice(crumb.choices) }}
         <span class="caret"></span>
       </a>
 
-      <ul class="dropdown-menu dropdown-menu-right">
+      <ul class="dropdown-menu dropdown-menu-right" ng-show="!crumb.hidden">
         <li ng-repeat="choice in crumb.choices"
             ng-class="{active: choice.active}">
           <a href ng-click="selectChoice($event, choice)">{{ choice.label }}</a>
