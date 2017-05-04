@@ -44,6 +44,6 @@ public interface ProcessDefinition extends ResourceDefinition {
   /** Version tag of the process definition. */
   String getVersionTag();
 
-  /** Time to live. Is taken into account in history cleanup. */
+  /** History time to live. Is taken into account in history cleanup. */
   Integer getHistoryTimeToLive();
 }

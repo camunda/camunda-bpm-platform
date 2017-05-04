@@ -26,6 +26,7 @@ public class DecisionDefinitionDto {
   protected String tenantId;
   protected String decisionRequirementsDefinitionId;
   protected String decisionRequirementsDefinitionKey;
+  protected Integer historyTimeToLive;
 
   public String getId() {
     return id;
@@ -67,6 +68,10 @@ public class DecisionDefinitionDto {
     return decisionRequirementsDefinitionKey;
   }
 
+  public Integer getHistoryTimeToLive() {
+    return historyTimeToLive;
+  }
+
   public static DecisionDefinitionDto fromDecisionDefinition(DecisionDefinition definition) {
     DecisionDefinitionDto dto = new DecisionDefinitionDto();
 
@@ -80,6 +85,7 @@ public class DecisionDefinitionDto {
     dto.decisionRequirementsDefinitionId = definition.getDecisionRequirementsDefinitionId();
     dto.decisionRequirementsDefinitionKey = definition.getDecisionRequirementsDefinitionKey();
     dto.tenantId = definition.getTenantId();
+    dto.historyTimeToLive = definition.getHistoryTimeToLive();
 
     return dto;
   }
