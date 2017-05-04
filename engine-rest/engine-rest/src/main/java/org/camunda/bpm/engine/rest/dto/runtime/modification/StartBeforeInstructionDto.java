@@ -16,6 +16,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.runtime.InstantiationBuilder;
 import org.camunda.bpm.engine.runtime.ModificationBuilder;
 import org.camunda.bpm.engine.runtime.ProcessInstanceModificationBuilder;
 import org.camunda.bpm.engine.runtime.ProcessInstanceModificationInstantiationBuilder;
@@ -48,18 +49,15 @@ public class StartBeforeInstructionDto extends ProcessInstanceModificationInstru
 
   }
 
- @Override
-  public void applyTo(ModificationBuilder builder, ProcessEngine processEngine, ObjectMapper objectMapper) {
-    checkValidity();
-    builder.startBeforeActivity(activityId);
-  }
-
   @Override
-  public void applyTo(ProcessInstantiationBuilder builder, ProcessEngine engine, ObjectMapper mapper) {
+  public void applyTo(InstantiationBuilder<?> builder, ProcessEngine engine, ObjectMapper mapper) {
     checkValidity();
 
     builder.startBeforeActivity(activityId);
-    applyVariables(builder, engine, mapper);
+
+    if (builder instanceof ProcessInstantiationBuilder) {
+      applyVariables((ProcessInstantiationBuilder) builder, engine, mapper);
+    }
   }
 
   protected void checkValidity() {

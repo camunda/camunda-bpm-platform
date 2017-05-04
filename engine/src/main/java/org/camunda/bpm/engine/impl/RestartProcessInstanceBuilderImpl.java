@@ -36,7 +36,7 @@ public class RestartProcessInstanceBuilderImpl implements RestartProcessInstance
     this.processDefinitionId = processDefinitionId;
     processInstanceIds = new ArrayList<String>();
   }
-  
+
   @Override
   public RestartProcessInstanceBuilder startBeforeActivity(String activityId) {
     ensureNotNull(NotValidException.class, "activityId", activityId);
@@ -61,7 +61,7 @@ public class RestartProcessInstanceBuilderImpl implements RestartProcessInstance
   public void execute() {
     execute(true);
   }
-  
+
   public Batch executeAsync() {
     return commandExecutor.execute(new RestartProcessInstancesBatchCmd(commandExecutor, this));
   }
@@ -74,7 +74,6 @@ public class RestartProcessInstanceBuilderImpl implements RestartProcessInstance
     return processInstanceIds;
   }
 
-
   @Override
   public RestartProcessInstanceBuilder processInstanceIds(String... processInstanceIds) {
     this.processInstanceIds.addAll(Arrays.asList(processInstanceIds));
@@ -86,7 +85,7 @@ public class RestartProcessInstanceBuilderImpl implements RestartProcessInstance
     this.query = query;
     return this;
   }
-  
+
   public HistoricProcessInstanceQuery getHistoricProcessInstanceQuery() {
     return query;
   }

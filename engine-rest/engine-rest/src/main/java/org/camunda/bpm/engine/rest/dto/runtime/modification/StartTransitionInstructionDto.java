@@ -16,6 +16,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.runtime.InstantiationBuilder;
 import org.camunda.bpm.engine.runtime.ModificationBuilder;
 import org.camunda.bpm.engine.runtime.ProcessInstanceModificationBuilder;
 import org.camunda.bpm.engine.runtime.ProcessInstanceModificationInstantiationBuilder;
@@ -48,11 +49,13 @@ public class StartTransitionInstructionDto extends ProcessInstanceModificationIn
   }
 
   @Override
-  public void applyTo(ProcessInstantiationBuilder builder, ProcessEngine engine, ObjectMapper mapper) {
+  public void applyTo(InstantiationBuilder<?> builder, ProcessEngine engine, ObjectMapper mapper) {
     checkValidity();
 
     builder.startTransition(transitionId);
-    applyVariables(builder, engine, mapper);
+    if (builder instanceof ProcessInstantiationBuilder) {
+      applyVariables((ProcessInstantiationBuilder) builder, engine, mapper);
+    }
   }
 
   protected void checkValidity() {
@@ -60,11 +63,5 @@ public class StartTransitionInstructionDto extends ProcessInstanceModificationIn
       throw new InvalidRequestException(Status.BAD_REQUEST,
           buildErrorMessage("'transitionId' must be set"));
     }
-  }
-
-  @Override
-  public void applyTo(ModificationBuilder builder, ProcessEngine processEngine, ObjectMapper objectMapper) {
-    checkValidity();
-    builder.startTransition(transitionId);
   }
 }

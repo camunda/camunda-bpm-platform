@@ -17,9 +17,8 @@ import java.util.Map;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.rest.dto.runtime.TriggerVariableValueDto;
 import org.camunda.bpm.engine.runtime.ActivityInstantiationBuilder;
-import org.camunda.bpm.engine.runtime.ModificationBuilder;
+import org.camunda.bpm.engine.runtime.InstantiationBuilder;
 import org.camunda.bpm.engine.runtime.ProcessInstanceModificationBuilder;
-import org.camunda.bpm.engine.runtime.ProcessInstantiationBuilder;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -97,9 +96,7 @@ public abstract class ProcessInstanceModificationInstructionDto {
 
   public abstract void applyTo(ProcessInstanceModificationBuilder builder, ProcessEngine engine, ObjectMapper mapper);
 
-  public abstract void applyTo(ProcessInstantiationBuilder builder, ProcessEngine engine, ObjectMapper mapper);
-
-  public abstract void applyTo(ModificationBuilder builder, ProcessEngine processEngine, ObjectMapper objectMapper);
+  public abstract void applyTo(InstantiationBuilder<?> builder, ProcessEngine engine, ObjectMapper mapper);
 
   protected String buildErrorMessage(String message) {
     return "For instruction type '" + type + "': " +  message;

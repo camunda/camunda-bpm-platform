@@ -33,6 +33,7 @@ import org.camunda.bpm.engine.rest.dto.history.DeleteHistoricProcessInstancesDto
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceSuspensionStateDto;
+import org.camunda.bpm.engine.rest.dto.runtime.RestartProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.SetJobRetriesByProcessDto;
 import org.camunda.bpm.engine.rest.dto.runtime.batch.DeleteProcessInstancesDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
@@ -40,6 +41,7 @@ import org.camunda.bpm.engine.rest.sub.runtime.ProcessInstanceResource;
 import org.camunda.bpm.engine.rest.sub.runtime.impl.ProcessInstanceResourceImpl;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
+import org.camunda.bpm.engine.runtime.RestartProcessInstanceBuilder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -262,6 +264,38 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
 
       throw new InvalidRequestException(Status.BAD_REQUEST, message);
     }
+  }
+
+  @Override
+  public void restartProcessInstance(RestartProcessInstanceDto restartProcessInstanceDto) {
+    try {
+      createRestartProcessInstanceBuilder(restartProcessInstanceDto).execute();
+    } catch (BadUserRequestException e) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());
+    }
+  }
+
+  @Override
+  public BatchDto restartProcessInstanceAsync(RestartProcessInstanceDto restartProcessInstanceDto) {
+    Batch batch = null;
+    try {
+       batch = createRestartProcessInstanceBuilder(restartProcessInstanceDto).executeAsync();
+    } catch (BadUserRequestException e) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());
+    }
+    return BatchDto.fromBatch(batch);
+  }
+
+  private RestartProcessInstanceBuilder createRestartProcessInstanceBuilder(RestartProcessInstanceDto restartProcessInstanceDto) {
+    RuntimeService runtimeService = getProcessEngine().getRuntimeService();
+    RestartProcessInstanceBuilder builder = runtimeService
+        .restartProcessInstances(restartProcessInstanceDto.getProcessDefinitionId())
+        .processInstanceIds(restartProcessInstanceDto.getProcessInstanceIds());
+    if (restartProcessInstanceDto.getHistoricProcessInstanceQuery() != null) {
+      builder.historicProcessInstanceQuery(restartProcessInstanceDto.getHistoricProcessInstanceQuery().toQuery(processEngine));
+    }
+    restartProcessInstanceDto.applyTo(builder, getProcessEngine(), objectMapper);
+    return builder;
   }
 
 }

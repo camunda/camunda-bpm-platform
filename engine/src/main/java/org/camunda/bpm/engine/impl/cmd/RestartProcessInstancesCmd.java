@@ -47,7 +47,7 @@ public class RestartProcessInstancesCmd extends AbstractRestartProcessInstanceCm
     } catch (NullValueException e) {
       throw new BadUserRequestException(e.getMessage());
     }
-    ensureNotNull(BadUserRequestException.class, "Process definition id cannot be null", processDefinition);
+    ensureNotNull(BadUserRequestException.class, "Process definition cannot be found", "processDefinition", processDefinition);
     if (writeUserOperationLog) {
       writeUserOperationLog(commandContext, processDefinition, processInstanceIds.size(), false);
     }
