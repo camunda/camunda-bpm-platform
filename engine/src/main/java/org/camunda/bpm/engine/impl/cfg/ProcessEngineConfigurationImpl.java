@@ -1302,6 +1302,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     dbSqlSessionFactory.setCmmnEnabled(cmmnEnabled);
     dbSqlSessionFactory.setDmnEnabled(dmnEnabled);
     dbSqlSessionFactory.setDatabaseTablePrefix(databaseTablePrefix);
+
+    //hack for the case when schema is defined via databaseTablePrefix parameter and not via databaseSchema parameter
+    if (databaseTablePrefix != null && databaseSchema == null && databaseTablePrefix.contains(".")) {
+      databaseSchema = databaseTablePrefix.split("\\.")[0];
+    }
     dbSqlSessionFactory.setDatabaseSchema(databaseSchema);
     addSessionFactory(dbSqlSessionFactory);
     addSessionFactory(new DbSqlPersistenceProviderFactory());
