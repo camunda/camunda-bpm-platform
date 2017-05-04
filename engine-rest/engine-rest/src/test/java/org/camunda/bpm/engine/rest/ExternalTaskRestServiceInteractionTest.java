@@ -859,7 +859,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     .when()
      .put(RETRIES_EXTERNAL_TASKS_SYNC_URL);
 
-    verify(externalTaskService).setRetriesSync(externalTaskIds, null, 5);
+    verify(externalTaskService).setRetries(externalTaskIds, 5);
     verifyNoMoreInteractions(externalTaskService);
   }
 
@@ -885,7 +885,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
 
   @Test
   public void testSetRetriesForExternalTasksWithNullExternalTaskIdsSync() {
-    doThrow(BadUserRequestException.class).when(externalTaskService).setRetriesSync(anyListOf(String.class), any(ExternalTaskQuery.class), anyInt());
+    doThrow(BadUserRequestException.class).when(externalTaskService).setRetries(anyListOf(String.class), anyInt());
 
     List<String> externalTaskIds = null;
     Map<String, Object> parameters = new HashMap<String, Object>();
@@ -901,7 +901,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     .when()
      .put(RETRIES_EXTERNAL_TASKS_SYNC_URL);
 
-    verify(externalTaskService).setRetriesSync(externalTaskIds, null, 5);
+    verify(externalTaskService).setRetries(externalTaskIds, 5);
     verifyNoMoreInteractions(externalTaskService);
   }
 
@@ -929,7 +929,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
 
   @Test
   public void testSetNegativeRetriesForExternalTasksSync() {
-    doThrow(BadUserRequestException.class).when(externalTaskService).setRetriesSync(anyListOf(String.class), any(ExternalTaskQuery.class), anyInt());
+    doThrow(BadUserRequestException.class).when(externalTaskService).setRetries(anyListOf(String.class), anyInt());
 
     List<String> externalTaskIds = null;
     Map<String, Object> parameters = new HashMap<String, Object>();
@@ -945,7 +945,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     .when()
      .put(RETRIES_EXTERNAL_TASKS_SYNC_URL);
 
-    verify(externalTaskService).setRetriesSync(externalTaskIds, null, -5);
+    verify(externalTaskService).setRetries(externalTaskIds, -5);
     verifyNoMoreInteractions(externalTaskService);
   }
 
