@@ -17,6 +17,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.InputStream;
 import java.util.List;
@@ -29,8 +30,6 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
-import org.camunda.bpm.model.cmmn.Cmmn;
-import org.camunda.bpm.model.cmmn.CmmnModelInstance;
 import org.camunda.bpm.model.dmn.Dmn;
 import org.camunda.bpm.model.dmn.DmnModelInstance;
 import org.camunda.bpm.model.dmn.HitPolicy;
@@ -353,6 +352,36 @@ public class DecisionDefinitionDeployerTest {
         .decisionDefinitionResourceName("foo.dmn").singleResult());
   }
 
+  @Test
+  public void testDeployDmnModelInstanceNegativeHistoryTimeToLive() throws Exception {
+    // given
+    DmnModelInstance dmnModelInstance = createDmnModelInstanceNegativeHistoryTimeToLive();
+
+    try {
+      testRule.deploy(repositoryService.createDeployment().addModelInstance("foo.dmn", dmnModelInstance));
+      fail("Exception for negative time to live value is expected.");
+    } catch (ProcessEngineException ex) {
+      assertTrue(ex.getCause().getMessage().contains("greater than or equal to 0"));
+    }
+  }
+
+  protected static DmnModelInstance createDmnModelInstanceNegativeHistoryTimeToLive() {
+    DmnModelInstance modelInstance = Dmn.createEmptyModel();
+    Definitions definitions = modelInstance.newInstance(Definitions.class);
+    definitions.setId(DmnModelConstants.DMN_ELEMENT_DEFINITIONS);
+    definitions.setName(DmnModelConstants.DMN_ELEMENT_DEFINITIONS);
+    definitions.setNamespace(DmnModelConstants.CAMUNDA_NS);
+    modelInstance.setDefinitions(definitions);
+
+    Decision decision = modelInstance.newInstance(Decision.class);
+    decision.setId("Decision-1");
+    decision.setName("foo");
+    decision.setCamundaHistoryTimeToLive(-5);
+    modelInstance.getDefinitions().addChildElement(decision);
+
+    return modelInstance;
+  }
+
   protected static DmnModelInstance createDmnModelInstance() {
     DmnModelInstance modelInstance = Dmn.createEmptyModel();
     Definitions definitions = modelInstance.newInstance(Definitions.class);
@@ -364,6 +393,7 @@ public class DecisionDefinitionDeployerTest {
     Decision decision = modelInstance.newInstance(Decision.class);
     decision.setId("Decision-1");
     decision.setName("foo");
+    decision.setCamundaHistoryTimeToLive(5);
     modelInstance.getDefinitions().addChildElement(decision);
 
     DecisionTable decisionTable = modelInstance.newInstance(DecisionTable.class);
