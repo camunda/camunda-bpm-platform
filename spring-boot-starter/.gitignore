@@ -8,6 +8,7 @@
 .factorypath
 .idea/
 *.iml
+.DS_Store
 #
 # MAVEN
 #
