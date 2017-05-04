@@ -27,6 +27,7 @@ var camHoverArea = require('./directives/cam-hover-area');
 var camHoverTrigger = require('./directives/cam-hover-trigger');
 var camHoverableTitle = require('./directives/cam-hoverable-title');
 var camFile = require('./directives/cam-file');
+var camInlinePanelProperty = require('./directives/cam-inline-panel-property');
 
 // Controllers
 var HoverAreaController = require('./controllers/hover-area');
@@ -72,6 +73,7 @@ ngModule.directive('camHoverArea', camHoverArea);
 ngModule.directive('camHoverTrigger', camHoverTrigger);
 ngModule.directive('camHoverableTitle', camHoverableTitle);
 ngModule.directive('camFile', camFile);
+ngModule.directive('camInlinePanelProperty', camInlinePanelProperty);
 
 // Controllers
 ngModule.controller('HoverAreaController', HoverAreaController);
