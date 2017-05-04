@@ -257,5 +257,6 @@ public class CmmnModelConstants {
   public static final String CAMUNDA_ATTRIBUTE_DECISION_TENANT_ID = "decisionTenantId";
   public static final String CAMUNDA_ATTRIBUTE_MAP_DECISION_RESULT = "mapDecisionResult";
   public static final String CAMUNDA_ATTRIBUTE_VARIABLE_NAME = "variableName";
+  public static final String CAMUNDA_ATTRIBUTE_HISTORY_TIME_TO_LIVE = "historyTimeToLive";
 
 }

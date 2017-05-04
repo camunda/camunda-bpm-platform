@@ -12,9 +12,7 @@
  */
 package org.camunda.bpm.model.cmmn.impl.instance;
 
-import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN11_NS;
-import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ATTRIBUTE_NAME;
-import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_CASE;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.*;
 
 import java.util.Collection;
 
@@ -42,6 +40,7 @@ import org.camunda.bpm.model.xml.type.child.SequenceBuilder;
 public class CaseImpl extends CmmnElementImpl implements Case {
 
   protected static Attribute<String> nameAttribute;
+  protected static Attribute<Integer> camundaHistoryTimeToLive;
 
   protected static ChildElement<CaseFileModel> caseFileModelChild;
   protected static ChildElement<CasePlanModel> casePlanModelChild;
@@ -103,6 +102,14 @@ public class CaseImpl extends CmmnElementImpl implements Case {
     caseFileModelChild.setChild(this, caseFileModel);
   }
 
+  public Integer getCamundaHistoryTimeToLive() {
+    return camundaHistoryTimeToLive.getValue(this);
+  }
+
+  public void setCamundaHistoryTimeToLive(Integer historyTimeToLive) {
+    camundaHistoryTimeToLive.setValue(this, historyTimeToLive);
+  }
+
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(Case.class, CMMN_ELEMENT_CASE)
         .extendsType(CmmnElement.class)
@@ -114,6 +121,10 @@ public class CaseImpl extends CmmnElementImpl implements Case {
         });
 
     nameAttribute = typeBuilder.stringAttribute(CMMN_ATTRIBUTE_NAME)
+        .build();
+
+    camundaHistoryTimeToLive = typeBuilder.integerAttribute(CAMUNDA_ATTRIBUTE_HISTORY_TIME_TO_LIVE)
+        .namespace(CAMUNDA_NS)
         .build();
 
     SequenceBuilder sequenceBuilder = typeBuilder.sequence();
