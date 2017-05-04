@@ -19,6 +19,7 @@ import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
@@ -251,4 +252,13 @@ public class CommandLogger extends ProcessEngineLogger {
     logWarn("038", "History cleanup won't be scheduled. Either configure batch window or call it with immediatelyDue = true.");
   }
 
+  public ProcessEngineException processDefinitionOfHistoricInstanceDoesNotMatchTheGivenOne(HistoricProcessInstance historicProcessInstance, String processDefinitionId) {
+    return new ProcessEngineException(exceptionMessage(
+      "039",
+      "Historic process instance '{}' cannot be restarted. Its process definition '{}' does not match given process definition '{}'",
+      historicProcessInstance.getId(),
+      historicProcessInstance.getProcessDefinitionId(),
+      processDefinitionId
+    ));
+  }
 }

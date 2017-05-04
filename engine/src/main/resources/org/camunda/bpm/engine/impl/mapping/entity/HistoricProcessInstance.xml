@@ -151,6 +151,18 @@
         ${limitAfter}
     </select>
 
+    <select id="selectHistoricProcessInstanceIdsByQueryCriteria"
+            parameterType="org.camunda.bpm.engine.impl.HistoricProcessInstanceQueryImpl"
+            resultType="string">
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
+        ${limitBefore}
+        select ${distinct} RES.ID_
+        ${limitBetween}
+        <include refid="selectHistoricProcessInstancesByQueryCriteriaSql"/>
+        ${orderBy}
+        ${limitAfter}
+    </select>
+
     <select id="selectHistoricProcessInstanceCountByQueryCriteria"
             parameterType="org.camunda.bpm.engine.impl.HistoricProcessInstanceQueryImpl" resultType="long">
         select count(distinct RES.ID_)

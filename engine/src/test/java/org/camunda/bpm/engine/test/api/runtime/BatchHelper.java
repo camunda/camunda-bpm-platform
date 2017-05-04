@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Date;
 import java.util.List;
 
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.batch.Batch;
@@ -45,6 +46,9 @@ public abstract class BatchHelper {
     assertNotNull("Job to execute does not exist", job);
     try {
       engineRule.getManagementService().executeJob(job.getId());
+    }
+    catch (BadUserRequestException e) {
+      throw e;
     }
     catch (Exception e) {
       // ignore

@@ -152,4 +152,9 @@ public class HistoricProcessInstanceManager extends AbstractHistoricManager {
     parameterObject.setParameter(ClockUtil.getCurrentTime());
     return (Long) getDbEntityManager().selectOne("selectHistoricProcessInstanceIdsForCleanupCount", parameterObject);
   }
+
+  public List<String> findHistoricProcessInstanceIds(HistoricProcessInstanceQueryImpl historicProcessInstanceQueryImpl) {
+
+    return (List<String>) getDbEntityManager().selectList("selectHistoricProcessInstanceIdsByQueryCriteria", historicProcessInstanceQueryImpl);
+  }
 }

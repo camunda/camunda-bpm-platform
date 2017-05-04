@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Set;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.util.CompareUtil;
@@ -280,6 +281,14 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     return commandContext
       .getHistoricProcessInstanceManager()
       .findHistoricProcessInstancesByQueryCriteria(this, page);
+  }
+
+  public List<String> listIds() {
+    checkQueryOk();
+    ensureVariablesInitialized();
+    return Context.getCommandContext()
+        .getHistoricProcessInstanceManager()
+        .findHistoricProcessInstanceIds(this);
   }
 
   public String getBusinessKey() {

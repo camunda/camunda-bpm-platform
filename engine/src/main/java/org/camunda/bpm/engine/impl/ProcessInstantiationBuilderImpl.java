@@ -20,6 +20,7 @@ import org.camunda.bpm.engine.impl.cmd.CommandLogger;
 import org.camunda.bpm.engine.impl.cmd.StartProcessInstanceAtActivitiesCmd;
 import org.camunda.bpm.engine.impl.cmd.StartProcessInstanceCmd;
 import org.camunda.bpm.engine.impl.interceptor.Command;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceWithVariables;
@@ -47,7 +48,7 @@ public class ProcessInstantiationBuilderImpl implements ProcessInstantiationBuil
 
   protected ProcessInstanceModificationBuilderImpl modificationBuilder;
 
-  private ProcessInstantiationBuilderImpl(CommandExecutor commandExecutor) {
+  protected ProcessInstantiationBuilderImpl(CommandExecutor commandExecutor) {
     modificationBuilder = new ProcessInstanceModificationBuilderImpl();
 
     this.commandExecutor = commandExecutor;
@@ -186,6 +187,10 @@ public class ProcessInstantiationBuilderImpl implements ProcessInstantiationBuil
 
   public boolean isTenantIdSet() {
     return isTenantIdSet;
+  }
+
+  public void setModificationBuilder(ProcessInstanceModificationBuilderImpl modificationBuilder) {
+    this.modificationBuilder = modificationBuilder;
   }
 
   public static ProcessInstantiationBuilder createProcessInstanceById(CommandExecutor commandExecutor, String processDefinitionId) {
