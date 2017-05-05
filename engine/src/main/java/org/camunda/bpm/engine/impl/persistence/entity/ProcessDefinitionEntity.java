@@ -43,7 +43,7 @@ import org.camunda.bpm.engine.task.IdentityLinkType;
  * @author Tom Baeyens
  * @author Daniel Meyer
  */
-public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements ProcessDefinition, ResourceDefinitionEntity, DbEntity, HasDbRevision {
+public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements ProcessDefinition, ResourceDefinitionEntity<ProcessDefinitionEntity>, DbEntity, HasDbRevision {
 
   private static final long serialVersionUID = 1L;
   protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
@@ -192,7 +192,8 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
    * Updates all modifiable fields from another process definition entity.
    * @param updatingProcessDefinition
    */
-  public void updateModifiedFieldsFromEntity(ProcessDefinitionEntity updatingProcessDefinition) {
+  @Override
+  public void updateModifiableFieldsFromEntity(ProcessDefinitionEntity updatingProcessDefinition) {
     if (this.key.equals(updatingProcessDefinition.key) && this.deploymentId.equals(updatingProcessDefinition.deploymentId)) {
       // TODO: add a guard once the mismatch between revisions in deployment cache and database has been resolved
       this.revision = updatingProcessDefinition.revision;

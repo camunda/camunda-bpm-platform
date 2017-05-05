@@ -28,7 +28,7 @@ import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
 import org.camunda.bpm.engine.impl.repository.ResourceDefinitionEntity;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 
-public class DecisionDefinitionEntity extends DmnDecisionImpl implements DecisionDefinition, ResourceDefinitionEntity, DbEntity, HasDbRevision, Serializable {
+public class DecisionDefinitionEntity extends DmnDecisionImpl implements DecisionDefinition, ResourceDefinitionEntity<DecisionDefinitionEntity>, DbEntity, HasDbRevision, Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -169,19 +169,20 @@ public class DecisionDefinitionEntity extends DmnDecisionImpl implements Decisio
     return persistentState;
   }
 
-    /**
-     * Updates all modifiable fields from another decision definition entity.
-     * @param updatingDecisionDefinition
-     */
-    public void updateModifiedFieldsFromEntity(DecisionDefinitionEntity updatingDecisionDefinition) {
-      if (this.key.equals(updatingDecisionDefinition.key) && this.deploymentId.equals(updatingDecisionDefinition.deploymentId)) {
-        this.revision = updatingDecisionDefinition.revision;
-        this.historyTimeToLive = updatingDecisionDefinition.historyTimeToLive;
-      }
-      else {
-        LOG.logUpdateUnrelatedDecisionDefinitionEntity(this.key, updatingDecisionDefinition.key, this.deploymentId, updatingDecisionDefinition.deploymentId);
-      }
+  /**
+   * Updates all modifiable fields from another decision definition entity.
+   *
+   * @param updatingDecisionDefinition
+   */
+  @Override
+  public void updateModifiableFieldsFromEntity(DecisionDefinitionEntity updatingDecisionDefinition) {
+    if (this.key.equals(updatingDecisionDefinition.key) && this.deploymentId.equals(updatingDecisionDefinition.deploymentId)) {
+      this.revision = updatingDecisionDefinition.revision;
+      this.historyTimeToLive = updatingDecisionDefinition.historyTimeToLive;
+    } else {
+      LOG.logUpdateUnrelatedDecisionDefinitionEntity(this.key, updatingDecisionDefinition.key, this.deploymentId, updatingDecisionDefinition.deploymentId);
     }
+  }
 
   // previous decision definition //////////////////////////////////////////////
 
@@ -256,6 +257,7 @@ public class DecisionDefinitionEntity extends DmnDecisionImpl implements Decisio
     }
   }
 
+  @Override
   public Integer getHistoryTimeToLive() {
     return historyTimeToLive;
   }

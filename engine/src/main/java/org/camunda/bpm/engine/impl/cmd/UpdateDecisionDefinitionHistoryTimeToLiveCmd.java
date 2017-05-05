@@ -26,17 +26,17 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
  */
 public class UpdateDecisionDefinitionHistoryTimeToLiveCmd implements Command<Void>, Serializable {
 
-	private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-	protected String decisionDefinitionId;
+  protected String decisionDefinitionId;
   protected Integer historyTimeToLive;
 
-	public UpdateDecisionDefinitionHistoryTimeToLiveCmd(String decisionDefinitionId, Integer historyTimeToLive) {
-		this.decisionDefinitionId = decisionDefinitionId;
-		this.historyTimeToLive = historyTimeToLive;
-	}
+  public UpdateDecisionDefinitionHistoryTimeToLiveCmd(String decisionDefinitionId, Integer historyTimeToLive) {
+    this.decisionDefinitionId = decisionDefinitionId;
+    this.historyTimeToLive = historyTimeToLive;
+  }
 
-	public Void execute(CommandContext commandContext) {
+  public Void execute(CommandContext commandContext) {
     checkAuthorization(commandContext);
 
     ensureNotNull(BadUserRequestException.class, "decisionDefinitionId", decisionDefinitionId);

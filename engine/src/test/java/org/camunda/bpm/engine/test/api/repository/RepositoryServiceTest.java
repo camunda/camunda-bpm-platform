@@ -806,7 +806,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/dmn/Example.dmn"})
   public void testDecisionDefinitionUpdateTimeToLive() {
     //given
-    DecisionDefinitionEntity decisionDefinition = findOnlyDecisionDefinition();
+    DecisionDefinition decisionDefinition = findOnlyDecisionDefinition();
 
     //when
     repositoryService.updateDecisionDefinitionHistoryTimeToLive(decisionDefinition.getId(), 6);
@@ -820,7 +820,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/dmn/Example.dmn"})
   public void testDecisionDefinitionUpdateTimeToLiveNull() {
     //given
-    DecisionDefinitionEntity decisionDefinition = findOnlyDecisionDefinition();
+    DecisionDefinition decisionDefinition = findOnlyDecisionDefinition();
 
     //when
     repositoryService.updateDecisionDefinitionHistoryTimeToLive(decisionDefinition.getId(), null);
@@ -834,7 +834,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/dmn/Example.dmn"})
   public void testDecisionDefinitionUpdateTimeToLiveNegative() {
     //given
-    DecisionDefinitionEntity decisionDefinition = findOnlyDecisionDefinition();
+    DecisionDefinition decisionDefinition = findOnlyDecisionDefinition();
 
     //when
     try {
@@ -849,7 +849,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   public void testProcessDefinitionUpdateTimeToLive() {
     //given
-    ProcessDefinitionEntity processDefinition = findOnlyProcessDefinition();
+    ProcessDefinition processDefinition = findOnlyProcessDefinition();
 
     //when
     repositoryService.updateProcessDefinitionHistoryTimeToLive(processDefinition.getId(), 6);
@@ -863,7 +863,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   public void testProcessDefinitionUpdateTimeToLiveNull() {
     //given
-    ProcessDefinitionEntity processDefinition = findOnlyProcessDefinition();
+    ProcessDefinition processDefinition = findOnlyProcessDefinition();
 
     //when
     repositoryService.updateProcessDefinitionHistoryTimeToLive(processDefinition.getId(), null);
@@ -877,7 +877,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   public void testProcessDefinitionUpdateTimeToLiveNegative() {
     //given
-    ProcessDefinitionEntity processDefinition = findOnlyProcessDefinition();
+    ProcessDefinition processDefinition = findOnlyProcessDefinition();
 
     //when
     try {
@@ -893,7 +893,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   public void testProcessDefinitionUpdateTimeToLiveUserOperationLog() {
     //given
-    ProcessDefinitionEntity processDefinition = findOnlyProcessDefinition();
+    ProcessDefinition processDefinition = findOnlyProcessDefinition();
     Integer timeToLiveOrgValue = processDefinition.getHistoryTimeToLive();
     processEngine.getIdentityService().setAuthenticatedUserId("userId");
 
@@ -987,18 +987,18 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
     return caseDefinitions.get(0);
   }
 
-  private ProcessDefinitionEntity findOnlyProcessDefinition() {
+  private ProcessDefinition findOnlyProcessDefinition() {
     List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
     assertNotNull(processDefinitions);
     assertEquals(1, processDefinitions.size());
-    return (ProcessDefinitionEntity)processDefinitions.get(0);
+    return processDefinitions.get(0);
   }
 
-  private DecisionDefinitionEntity findOnlyDecisionDefinition() {
+  private DecisionDefinition findOnlyDecisionDefinition() {
     List<DecisionDefinition> decisionDefinitions = repositoryService.createDecisionDefinitionQuery().list();
     assertNotNull(decisionDefinitions);
     assertEquals(1, decisionDefinitions.size());
-    return (DecisionDefinitionEntity)decisionDefinitions.get(0);
+    return decisionDefinitions.get(0);
   }
 
   public void testProcessDefinitionIntrospection() {

@@ -18,7 +18,7 @@ import org.camunda.bpm.engine.repository.ResourceDefinition;
 /**
  * Entity of a deployed resource definition
  */
-public interface ResourceDefinitionEntity extends ResourceDefinition {
+public interface ResourceDefinitionEntity<T extends ResourceDefinition> extends ResourceDefinition {
 
   void setId(String id);
 
@@ -39,5 +39,7 @@ public interface ResourceDefinitionEntity extends ResourceDefinition {
   void setTenantId(String tenantId);
 
   ResourceDefinitionEntity getPreviousDefinition();
+
+  void updateModifiableFieldsFromEntity(T updatingDefinition);
 
 }

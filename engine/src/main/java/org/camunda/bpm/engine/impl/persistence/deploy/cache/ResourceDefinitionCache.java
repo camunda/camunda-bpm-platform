@@ -17,7 +17,7 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.AbstractResourceDefinitionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
-import org.camunda.bpm.engine.repository.ResourceDefinition;
+import org.camunda.bpm.engine.impl.repository.ResourceDefinitionEntity;
 import org.camunda.commons.utils.cache.Cache;
 
 import java.util.concurrent.Callable;
@@ -26,7 +26,7 @@ import java.util.concurrent.Callable;
 /**
  * @author: Johannes Heinemann
  */
-public abstract class ResourceDefinitionCache<T extends ResourceDefinition> {
+public abstract class ResourceDefinitionCache<T extends ResourceDefinitionEntity> {
 
   protected Cache<String, T> cache;
   protected CacheDeployer cacheDeployer;
@@ -111,6 +111,9 @@ public abstract class ResourceDefinitionCache<T extends ResourceDefinition> {
         }
       }
       checkInvalidDefinitionWasCached(deploymentId, definitionId, cachedDefinition);
+    }
+    if (cachedDefinition != null) {
+      cachedDefinition.updateModifiableFieldsFromEntity(definition);
     }
     return cachedDefinition;
   }

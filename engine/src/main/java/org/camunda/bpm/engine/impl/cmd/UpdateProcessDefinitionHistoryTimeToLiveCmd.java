@@ -28,17 +28,17 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
  */
 public class UpdateProcessDefinitionHistoryTimeToLiveCmd implements Command<Void>, Serializable {
 
-	private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-	protected String processDefinitionId;
+  protected String processDefinitionId;
   protected Integer historyTimeToLive;
 
-	public UpdateProcessDefinitionHistoryTimeToLiveCmd(String processDefinitionId, Integer historyTimeToLive) {
-		this.processDefinitionId = processDefinitionId;
-		this.historyTimeToLive = historyTimeToLive;
-	}
+  public UpdateProcessDefinitionHistoryTimeToLiveCmd(String processDefinitionId, Integer historyTimeToLive) {
+    this.processDefinitionId = processDefinitionId;
+    this.historyTimeToLive = historyTimeToLive;
+  }
 
-	public Void execute(CommandContext commandContext) {
+  public Void execute(CommandContext commandContext) {
     checkAuthorization(commandContext);
 
     ensureNotNull(BadUserRequestException.class, "processDefinitionId", processDefinitionId);

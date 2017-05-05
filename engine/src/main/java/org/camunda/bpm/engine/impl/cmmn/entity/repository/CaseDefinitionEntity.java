@@ -34,7 +34,7 @@ import org.camunda.bpm.engine.repository.CaseDefinition;
  * @author Roman Smirnov
  *
  */
-public class CaseDefinitionEntity extends CmmnCaseDefinition implements CaseDefinition, ResourceDefinitionEntity, DbEntity, HasDbRevision {
+public class CaseDefinitionEntity extends CmmnCaseDefinition implements CaseDefinition, ResourceDefinitionEntity<CaseDefinitionEntity>, DbEntity, HasDbRevision {
 
   private static final long serialVersionUID = 1L;
   protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
@@ -137,6 +137,7 @@ public class CaseDefinitionEntity extends CmmnCaseDefinition implements CaseDefi
     this.tenantId = tenantId;
   }
 
+  @Override
   public Integer getHistoryTimeToLive() {
     return historyTimeToLive;
   }
@@ -248,7 +249,8 @@ public class CaseDefinitionEntity extends CmmnCaseDefinition implements CaseDefi
    * Updates all modifiable fields from another case definition entity.
    * @param updatingCaseDefinition
    */
-  public void updateModifiedFieldsFromEntity(CaseDefinitionEntity updatingCaseDefinition) {
+  @Override
+  public void updateModifiableFieldsFromEntity(CaseDefinitionEntity updatingCaseDefinition) {
     if (this.key.equals(updatingCaseDefinition.key) && this.deploymentId.equals(updatingCaseDefinition.deploymentId)) {
       this.revision = updatingCaseDefinition.revision;
       this.historyTimeToLive = updatingCaseDefinition.historyTimeToLive;

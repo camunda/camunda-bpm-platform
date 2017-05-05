@@ -50,4 +50,7 @@ public interface ResourceDefinition {
    */
   String getTenantId();
 
+  /** History time to live. Is taken into account in history cleanup. */
+  Integer getHistoryTimeToLive();
+
 }

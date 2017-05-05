@@ -31,7 +31,7 @@ public class ProcessDefinitionCache extends ResourceDefinitionCache<ProcessDefin
   public ProcessDefinitionEntity resolveDefinition(ProcessDefinitionEntity processDefinition) {
     ProcessDefinitionEntity entity = super.resolveDefinition(processDefinition);
     if (entity != null) {
-      entity.updateModifiedFieldsFromEntity(processDefinition);
+      entity.updateModifiableFieldsFromEntity(processDefinition);
     }
     return entity;
   }

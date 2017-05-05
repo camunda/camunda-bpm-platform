@@ -33,7 +33,4 @@ public interface DecisionDefinition extends ResourceDefinition {
    */
   String getDecisionRequirementsDefinitionKey();
 
-  /** History time to live. Is taken into account in history cleanup. */
-  Integer getHistoryTimeToLive();
-
 }

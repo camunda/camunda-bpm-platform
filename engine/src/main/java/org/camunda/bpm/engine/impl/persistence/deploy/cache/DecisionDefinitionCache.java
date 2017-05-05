@@ -40,15 +40,6 @@ public class DecisionDefinitionCache extends ResourceDefinitionCache<DecisionDef
   }
 
   @Override
-  public DecisionDefinitionEntity resolveDefinition(DecisionDefinitionEntity decisionDefinition) {
-    DecisionDefinitionEntity entity = super.resolveDefinition(decisionDefinition);
-    if (entity != null) {
-      entity.updateModifiedFieldsFromEntity(decisionDefinition);
-    }
-    return entity;
-  }
-
-  @Override
   protected AbstractResourceDefinitionManager<DecisionDefinitionEntity> getManager() {
     return Context.getCommandContext().getDecisionDefinitionManager();
   }
