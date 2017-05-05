@@ -562,13 +562,13 @@ public class BpmnParse extends Parse {
     return processDefinition;
   }
 
-  private void parseHistoryTimeToLive(Element processElement, ProcessDefinitionEntity processDefinition) {
+  protected void parseHistoryTimeToLive(Element processElement, ProcessDefinitionEntity processDefinition) {
     final Integer historyTimeToLive = parseIntegerAttribute(processElement, "historyTimeToLive",
         processElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "historyTimeToLive"), false);
-    if (historyTimeToLive != null && historyTimeToLive < 0) {
-      addError("Cannot parse historyTimeToLive: negative value is not allowed", processElement);
-    } else {
+    if (historyTimeToLive == null || historyTimeToLive >= 0) {
       processDefinition.setHistoryTimeToLive(historyTimeToLive);
+    } else {
+      addError("Cannot parse historyTimeToLive: negative value is not allowed", processElement);
     }
   }
 

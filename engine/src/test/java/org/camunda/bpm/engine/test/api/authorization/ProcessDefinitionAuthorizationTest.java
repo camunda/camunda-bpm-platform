@@ -17,6 +17,7 @@ import static org.camunda.bpm.engine.authorization.Permissions.ALL;
 import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_INSTANCE;
+import static org.camunda.bpm.engine.authorization.Resources.DECISION_DEFINITION;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
 
@@ -819,6 +820,40 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
 
     ProcessInstance instance = selectSingleProcessInstance();
     assertFalse(instance.isSuspended());
+  }
+
+
+  public void testProcessDefinitionUpdateTimeToLive() {
+
+    // given
+    createGrantAuthorization(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, UPDATE);
+    ProcessDefinition definition = selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY);
+
+    // when
+    repositoryService.updateProcessDefinitionHistoryTimeToLive(definition.getId(), 6);
+
+    // then
+    definition = selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY);
+    assertEquals(6, definition.getHistoryTimeToLive().intValue());
+
+  }
+
+  public void testDecisionDefinitionUpdateTimeToLiveWithoutAuthorizations() {
+    //given
+    ProcessDefinition definition = selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY);
+    try {
+      //when
+      repositoryService.updateProcessDefinitionHistoryTimeToLive(definition.getId(), 6);
+      fail("Exception expected");
+    } catch (AuthorizationException e) {
+      // then
+      String message = e.getMessage();
+      assertTextPresent(userId, message);
+      assertTextPresent(UPDATE.getName(), message);
+      assertTextPresent(ONE_TASK_PROCESS_KEY, message);
+      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+    }
+
   }
 
   // helper /////////////////////////////////////////////////////////////////////

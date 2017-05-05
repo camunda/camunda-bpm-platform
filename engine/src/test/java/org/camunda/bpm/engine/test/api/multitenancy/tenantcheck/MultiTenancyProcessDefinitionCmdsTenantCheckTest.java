@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
+import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DiagramLayout;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -331,6 +332,43 @@ public class MultiTenancyProcessDefinitionCmdsTenantCheckTest {
     }
     assertThat(repositoryService.createProcessDefinitionQuery().count(), is(1L));
     assertThat(repositoryService.createProcessDefinitionQuery().tenantIdIn(TENANT_ONE).count(), is(1L));
+  }
+
+
+  @Test
+  public void updateHistoryTimeToLiveWithAuthenticatedTenant() {
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+
+    repositoryService.updateProcessDefinitionHistoryTimeToLive(processDefinitionId, 6);
+
+    ProcessDefinition definition = repositoryService.getProcessDefinition(processDefinitionId);
+
+    assertThat(definition.getTenantId(), is(TENANT_ONE));
+    assertThat(definition.getHistoryTimeToLive(), is(6));
+  }
+
+  @Test
+  public void updateHistoryTimeToLiveDisabledTenantCheck() {
+    processEngineConfiguration.setTenantCheckEnabled(false);
+    identityService.setAuthentication("user", null, null);
+
+    repositoryService.updateProcessDefinitionHistoryTimeToLive(processDefinitionId, 6);
+
+    ProcessDefinition definition = repositoryService.getProcessDefinition(processDefinitionId);
+
+    assertThat(definition.getTenantId(), is(TENANT_ONE));
+    assertThat(definition.getHistoryTimeToLive(), is(6));
+  }
+
+  @Test
+  public void updateHistoryTimeToLiveNoAuthenticatedTenants() {
+    identityService.setAuthentication("user", null, null);
+
+    // declare expected exception
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("Cannot update the process definition");
+
+    repositoryService.updateProcessDefinitionHistoryTimeToLive(processDefinitionId, 6);
   }
 
 }
