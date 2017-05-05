@@ -3,6 +3,6 @@
   type="{{type}}"
   change="onChange()"
   value="property">
-  <span ng-show="!property" class="null-value">null</span>
-  <span ng-show="property">{{format({property: property}) || property}}</span>
+  <span ng-show="property == null" class="null-value">null</span>
+  <span ng-show="property != null">{{format({property: property}) || property}}</span>
 </span>
