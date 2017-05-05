@@ -78,8 +78,13 @@ public interface DeploymentQuery extends Query<DeploymentQuery, Deployment>{
   /** Order by deployment name (needs to be followed by {@link #asc()} or {@link #desc()}). */
   DeploymentQuery orderByDeploymentName();
 
-  /** Order by deployment time (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  /** Order by deployment time (needs to be followed by {@link #asc()} or {@link #desc()}).
+   * @deprecated Use {@link #orderByDeploymentTime()} instead</p>*/
+  @Deprecated
   DeploymentQuery orderByDeploymenTime();
+
+  /** Order by deployment time (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  DeploymentQuery orderByDeploymentTime();
 
   /** Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
    * Note that the ordering of process instances without tenant id is database-specific. */

@@ -122,6 +122,10 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
     return orderBy(DeploymentQueryProperty.DEPLOY_TIME);
   }
 
+  public DeploymentQuery orderByDeploymentTime() {
+    return orderBy(DeploymentQueryProperty.DEPLOY_TIME);
+  }
+
   public DeploymentQuery orderByDeploymentName() {
     return orderBy(DeploymentQueryProperty.DEPLOYMENT_NAME);
   }
