@@ -61,6 +61,15 @@
         <dd class="definition-name"
             ng-if="!decisionDefinition.name || decisionDefinition.name === decisionDefinition.key"><span class="null-value">null</span></dd>
 
+
+        <dt cam-widget-clipboard="decisionDefinition.historyTimeToLive"
+            cam-hoverable-title="history-time-to-live">
+            History Time To Live:
+        </dt>
+        <dd class="history-time-to-live" cam-hover-trigger="history-time-to-live">
+          <span time-to-live="decisionDefinition" resource="decision-definition"></span>
+        </dd>
+
         <dt ng-if="decisionDefinition.tenantId"
             cam-widget-clipboard="decisionDefinition.tenantId"
             cam-hoverable-title="tenant-id">Tenant ID:</dt>
