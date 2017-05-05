@@ -17,9 +17,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionImpl;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
+import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
@@ -29,6 +31,8 @@ import org.camunda.bpm.engine.repository.DecisionDefinition;
 public class DecisionDefinitionEntity extends DmnDecisionImpl implements DecisionDefinition, ResourceDefinitionEntity, DbEntity, HasDbRevision, Serializable {
 
   private static final long serialVersionUID = 1L;
+
+  protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
   protected String id;
   protected int revision = 1;
@@ -164,6 +168,20 @@ public class DecisionDefinitionEntity extends DmnDecisionImpl implements Decisio
     persistentState.put("historyTimeToLive", this.historyTimeToLive);
     return persistentState;
   }
+
+    /**
+     * Updates all modifiable fields from another decision definition entity.
+     * @param updatingDecisionDefinition
+     */
+    public void updateModifiedFieldsFromEntity(DecisionDefinitionEntity updatingDecisionDefinition) {
+      if (this.key.equals(updatingDecisionDefinition.key) && this.deploymentId.equals(updatingDecisionDefinition.deploymentId)) {
+        this.revision = updatingDecisionDefinition.revision;
+        this.historyTimeToLive = updatingDecisionDefinition.historyTimeToLive;
+      }
+      else {
+        LOG.logUpdateUnrelatedDecisionDefinitionEntity(this.key, updatingDecisionDefinition.key, this.deploymentId, updatingDecisionDefinition.deploymentId);
+      }
+    }
 
   // previous decision definition //////////////////////////////////////////////
 

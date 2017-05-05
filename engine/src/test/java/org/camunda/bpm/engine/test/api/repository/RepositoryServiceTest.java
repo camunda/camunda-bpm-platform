@@ -826,7 +826,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
     repositoryService.updateDecisionDefinitionHistoryTimeToLive(decisionDefinition.getId(), null);
 
     //then
-    decisionDefinition = findOnlyDecisionDefinition();
+    decisionDefinition = (DecisionDefinitionEntity) repositoryService.getDecisionDefinition(decisionDefinition.getId());
     assertEquals(null, decisionDefinition.getHistoryTimeToLive());
 
   }

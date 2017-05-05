@@ -634,4 +634,14 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
     );
   }
 
+  public void logUpdateUnrelatedDecisionDefinitionEntity(String thisKey, String thatKey, String thisDeploymentId, String thatDeploymentId) {
+    logDebug(
+        "079",
+        "Cannot update entity from an unrelated decision definition: this key '{}', that key '{}', this deploymentId '{}', that deploymentId '{}'",
+        thisKey,
+        thatKey,
+        thisDeploymentId,
+        thatDeploymentId);
+  }
+
 }

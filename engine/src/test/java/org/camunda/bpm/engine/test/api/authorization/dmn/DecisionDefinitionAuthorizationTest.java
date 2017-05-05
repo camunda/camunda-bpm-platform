@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.test.api.authorization.dmn;
 
 import static org.camunda.bpm.engine.authorization.Authorization.ANY;
 import static org.camunda.bpm.engine.authorization.Permissions.READ;
+import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
 import static org.camunda.bpm.engine.authorization.Resources.DECISION_DEFINITION;
 
 import java.io.InputStream;
@@ -218,6 +219,38 @@ public class DecisionDefinitionAuthorizationTest extends AuthorizationTest {
 
     // then
     assertNotNull(modelInstance);
+  }
+
+  public void testDecisionDefinitionUpdateTimeToLive() {
+    //given
+    String decisionDefinitionId = selectDecisionDefinitionByKey(DECISION_DEFINITION_KEY).getId();
+    createGrantAuthorization(DECISION_DEFINITION, DECISION_DEFINITION_KEY, userId, UPDATE);
+
+    //when
+    repositoryService.updateDecisionDefinitionHistoryTimeToLive(decisionDefinitionId, 6);
+
+    //then
+    assertEquals(6, selectDecisionDefinitionByKey(DECISION_DEFINITION_KEY).getHistoryTimeToLive().intValue());
+
+  }
+
+  public void testDecisionDefinitionUpdateTimeToLiveWithoutAuthorizations() {
+    //given
+    String decisionDefinitionId = selectDecisionDefinitionByKey(DECISION_DEFINITION_KEY).getId();
+    try {
+      //when
+      repositoryService.updateDecisionDefinitionHistoryTimeToLive(decisionDefinitionId, 6);
+      fail("Exception expected");
+
+    } catch (AuthorizationException e) {
+      // then
+      String message = e.getMessage();
+      assertTextPresent(userId, message);
+      assertTextPresent(UPDATE.getName(), message);
+      assertTextPresent(DECISION_DEFINITION_KEY, message);
+      assertTextPresent(DECISION_DEFINITION.resourceName(), message);
+    }
+
   }
 
 }

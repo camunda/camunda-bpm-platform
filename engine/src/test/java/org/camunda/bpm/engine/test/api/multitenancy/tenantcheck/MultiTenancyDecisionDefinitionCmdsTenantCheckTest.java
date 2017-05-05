@@ -179,6 +179,42 @@ public class MultiTenancyDecisionDefinitionCmdsTenantCheckTest {
   }
 
   @Test
+  public void updateHistoryTimeToLiveWithAuthenticatedTenant() {
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+
+    repositoryService.updateDecisionDefinitionHistoryTimeToLive(decisionDefinitionId, 6);
+
+    DecisionDefinition definition = repositoryService.getDecisionDefinition(decisionDefinitionId);
+
+    assertThat(definition.getTenantId(), is(TENANT_ONE));
+    assertThat(definition.getHistoryTimeToLive(), is(6));
+  }
+
+  @Test
+  public void updateHistoryTimeToLiveDisabledTenantCheck() {
+    processEngineConfiguration.setTenantCheckEnabled(false);
+    identityService.setAuthentication("user", null, null);
+
+    repositoryService.updateDecisionDefinitionHistoryTimeToLive(decisionDefinitionId, 6);
+
+    DecisionDefinition definition = repositoryService.getDecisionDefinition(decisionDefinitionId);
+
+    assertThat(definition.getTenantId(), is(TENANT_ONE));
+    assertThat(definition.getHistoryTimeToLive(), is(6));
+  }
+
+  @Test
+  public void updateHistoryTimeToLiveNoAuthenticatedTenants() {
+    identityService.setAuthentication("user", null, null);
+
+    // declare expected exception
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("Cannot update the decision definition");
+
+    repositoryService.updateDecisionDefinitionHistoryTimeToLive(decisionDefinitionId, 6);
+  }
+
+  @Test
   public void getDmnModelInstanceWithAuthenticatedTenant() {
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
