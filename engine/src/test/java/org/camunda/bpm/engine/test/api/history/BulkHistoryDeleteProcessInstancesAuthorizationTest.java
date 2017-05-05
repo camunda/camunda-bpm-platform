@@ -48,7 +48,7 @@ import static org.junit.Assert.assertEquals;
  */
 @RunWith(Parameterized.class)
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
-public class BulkHistoryDeleteAuthorizationTest {
+public class BulkHistoryDeleteProcessInstancesAuthorizationTest {
 
   protected static final String ONE_TASK_PROCESS = "oneTaskProcess";
 

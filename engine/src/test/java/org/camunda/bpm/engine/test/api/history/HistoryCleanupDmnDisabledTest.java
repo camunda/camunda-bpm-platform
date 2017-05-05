@@ -13,18 +13,25 @@
 package org.camunda.bpm.engine.test.api.history;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import org.apache.commons.lang.time.DateUtils;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.interceptor.Command;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
-import org.camunda.bpm.model.bpmn.Bpmn;
-import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -36,7 +43,7 @@ import static org.junit.Assert.assertEquals;
  *
  */
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
-public class BulkHistoryDeleteDmnDisabledTest {
+public class HistoryCleanupDmnDisabledTest {
 
   protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
     public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
@@ -61,33 +68,56 @@ public class BulkHistoryDeleteDmnDisabledTest {
 
   }
 
-  @Test
-  public void bulkHistoryDeleteWithDisabledDmn() {
-    BpmnModelInstance model = Bpmn.createExecutableProcess("someProcess")
-        .startEvent()
-          .userTask("userTask")
-        .endEvent()
-        .done();
-    testRule.deploy(model);
-    List<String> ids = prepareHistoricProcesses("someProcess");
-    runtimeService.deleteProcessInstances(ids, null, true, true);
+  @After
+  public void clearDatabase(){
+    engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired().execute(new Command<Void>() {
+      public Void execute(CommandContext commandContext) {
 
-    //when
-    historyService.deleteHistoricProcessInstancesBulk(ids);
+        List<Job> jobs = engineRule.getManagementService().createJobQuery().list();
+        if (jobs.size() > 0) {
+          assertEquals(1, jobs.size());
+          String jobId = jobs.get(0).getId();
+          commandContext.getJobManager().deleteJob((JobEntity) jobs.get(0));
+          commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(jobId);
+        }
 
-    //then
-    assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKey("someProcess").count());
+        return null;
+      }
+    });
+
   }
 
-  private List<String> prepareHistoricProcesses(String businessKey) {
+  @Test
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void historyCleanupWithDisabledDmn() {
+
+    prepareHistoricProcesses("oneTaskProcess");
+
+    ClockUtil.setCurrentTime(new Date());
+    //when
+    String jobId = historyService.cleanUpHistoryAsync(true).getId();
+
+    engineRule.getManagementService().executeJob(jobId);
+
+    //then
+    assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
+  }
+
+  private void prepareHistoricProcesses(String businessKey) {
+    Date oldCurrentTime = ClockUtil.getCurrentTime();
+    ClockUtil.setCurrentTime(DateUtils.addDays(new Date(), -6));
+
     List<String> processInstanceIds = new ArrayList<String>();
 
     for (int i = 0; i < 5; i++) {
       ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(businessKey);
       processInstanceIds.add(processInstance.getId());
     }
+    runtimeService.deleteProcessInstances(processInstanceIds, null, true, true);
 
-    return processInstanceIds;
+    ClockUtil.setCurrentTime(oldCurrentTime);
+
   }
 
 }

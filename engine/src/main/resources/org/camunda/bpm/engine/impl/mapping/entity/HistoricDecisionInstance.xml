@@ -62,6 +62,13 @@
       </foreach>
   </delete>
 
+  <delete id="deleteHistoricDecisionInstanceByIds">
+    delete from ${prefix}ACT_HI_DECINST where ID_ IN
+    <foreach item="decisionInstanceId" index="index" collection="list" open="(" separator="," close=")">
+      #{decisionInstanceId}
+    </foreach>
+  </delete>
+
   <!-- result map -->
 
  <resultMap id="historicDecisionInstanceResultMap" type="org.camunda.bpm.engine.impl.history.event.HistoricDecisionInstanceEntity">
@@ -263,5 +270,64 @@
 
     </where>
   </sql>
+
+  <!-- Select ids for async history cleanup -->
+  <sql id="selectHistoricDecisionInstanceIdsForCleanupSql">
+        FROM ${prefix}ACT_HI_DECINST di, ${prefix}ACT_RE_DECISION_DEF dd
+        where
+        di.DEC_DEF_ID_ = dd.ID_
+        AND not dd.HISTORY_TTL_ is NULL
+    </sql>
+
+  <select id="selectHistoricDecisionInstanceIdsForCleanup" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
+    ${limitBefore}
+    SELECT di.ID_
+    <include refid="selectHistoricDecisionInstanceIdsForCleanupSql"/>
+    AND DATEDIFF(day, di.EVAL_TIME_, #{parameter}) &gt;= dd.HISTORY_TTL_
+    ORDER BY DATEDIFF(day, di.EVAL_TIME_, #{parameter}) DESC
+    ${limitAfter}
+  </select>
+
+  <select id="selectHistoricDecisionInstanceIdsForCleanup_mssql" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
+    SELECT TOP (#{maxResults}) di.ID_
+    <include refid="selectHistoricDecisionInstanceIdsForCleanupSql"/>
+    AND DATEDIFF(day, di.EVAL_TIME_, #{parameter}) &gt;= dd.HISTORY_TTL_
+    ORDER BY DATEDIFF(day, di.EVAL_TIME_, #{parameter}) DESC
+  </select>
+
+  <select id="selectHistoricDecisionInstanceIdsForCleanup_db2" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
+    SELECT ID_
+    FROM (SELECT di.PROC_INST_ID_, ROW_NUMBER() OVER(ORDER BY #{parameter} - di.EVAL_TIME_ DESC) as rownumber
+    <include refid="selectHistoricDecisionInstanceIdsForCleanupSql"/>
+    AND di.EVAL_TIME_ + dd.HISTORY_TTL_ DAYS &lt;= #{parameter}) as SUB
+    where rownumber between 1 and #{maxResults}
+  </select>
+
+  <select id="selectHistoricDecisionInstanceIdsForCleanup_oracle" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
+    ${limitBefore}
+    SELECT di.ID_
+    <include refid="selectHistoricDecisionInstanceIdsForCleanupSql"/>
+    AND di.EVAL_TIME_ + dd.HISTORY_TTL_ &lt;= #{parameter}
+    ORDER BY #{parameter} - di.EVAL_TIME_ DESC
+    ${limitAfter}
+  </select>
+
+  <select id="selectHistoricDecisionInstanceIdsForCleanup_postgres" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
+    ${limitBefore}
+    SELECT di.ID_
+    <include refid="selectHistoricDecisionInstanceIdsForCleanupSql"/>
+    AND extract (day from #{parameter} - di.EVAL_TIME_) &gt;= dd.HISTORY_TTL_
+    ORDER BY #{parameter} - di.EVAL_TIME_ DESC
+    ${limitAfter}
+  </select>
+
+  <select id="selectHistoricDecisionInstanceIdsForCleanup_mysql" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
+    ${limitBefore}
+    SELECT di.ID_
+    <include refid="selectHistoricDecisionInstanceIdsForCleanupSql"/>
+    AND DATEDIFF(#{parameter}, di.EVAL_TIME_) &gt;= dd.HISTORY_TTL_
+    ORDER BY DATEDIFF(#{parameter}, di.EVAL_TIME_) DESC
+    ${limitAfter}
+  </select>
 
 </mapper>

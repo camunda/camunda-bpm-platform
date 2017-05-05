@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.variable.serializer.AbstractTypedValueSerializer;
 
 import java.util.ArrayList;
@@ -86,6 +87,14 @@ public class HistoricDecisionInstanceManager extends AbstractHistoricManager {
       decisionInstance.delete();
       deleteHistoricDecisionInputAndOutputInstances(historicDecisionInstanceId);
     }
+  }
+
+  public void deleteHistoricDecisionInstanceByIds(List<String> decisionInstanceIds) {
+    getDbEntityManager().deletePreserveOrder(ByteArrayEntity.class, "deleteHistoricDecisionInputInstanceByteArraysByDecisionInstanceIds", decisionInstanceIds);
+    getDbEntityManager().deletePreserveOrder(ByteArrayEntity.class, "deleteHistoricDecisionOutputInstanceByteArraysByDecisionInstanceIds", decisionInstanceIds);
+    getDbEntityManager().deletePreserveOrder(HistoricDecisionInputInstanceEntity.class, "deleteHistoricDecisionInputInstanceByDecisionInstanceIds", decisionInstanceIds);
+    getDbEntityManager().deletePreserveOrder(HistoricDecisionOutputInstanceEntity.class, "deleteHistoricDecisionOutputInstanceByDecisionInstanceIds", decisionInstanceIds);
+    getDbEntityManager().deletePreserveOrder(HistoricDecisionInstanceEntity.class, "deleteHistoricDecisionInstanceByIds", decisionInstanceIds);
   }
 
   public void deleteHistoricDecisionInstanceByProcessInstanceIds(List<String> processInstanceIds) {
@@ -166,6 +175,14 @@ public class HistoricDecisionInstanceManager extends AbstractHistoricManager {
     } else {
       return Collections.emptyList();
     }
+  }
+
+  public List<String> findHistoricDecisionInstanceIdsForCleanup(Integer batchSize) {
+    ListQueryParameterObject parameterObject = new ListQueryParameterObject();
+    parameterObject.setParameter(ClockUtil.getCurrentTime());
+    parameterObject.setFirstResult(0);
+    parameterObject.setMaxResults(batchSize);
+    return (List<String>) getDbEntityManager().selectList("selectHistoricDecisionInstanceIdsForCleanup", parameterObject);
   }
 
   protected void appendHistoricDecisionInputInstances(Map<String, HistoricDecisionInstanceEntity> decisionInstancesById, HistoricDecisionInstanceQueryImpl query) {

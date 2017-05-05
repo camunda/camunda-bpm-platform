@@ -14,6 +14,7 @@
 package org.camunda.bpm.engine.test.api.history;
 
 import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.DecisionService;
 import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.HistoryService;
@@ -76,6 +77,7 @@ public class BulkHistoryDeleteTest {
   private RuntimeService runtimeService;
   private FormService formService;
   private ExternalTaskService externalTaskService;
+  private DecisionService decisionService;
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
@@ -87,6 +89,7 @@ public class BulkHistoryDeleteTest {
     taskService = engineRule.getTaskService();
     formService = engineRule.getFormService();
     externalTaskService = engineRule.getExternalTaskService();
+    decisionService = engineRule.getDecisionService();
   }
 
   @Test
@@ -400,6 +403,51 @@ public class BulkHistoryDeleteTest {
       }
     });
 
+  }
+
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/history/testDmnWithPojo.dmn11.xml" })
+  public void testCleanupHistoryStandaloneDecisionData() {
+    //given
+    for (int i = 0; i < 5; i++) {
+      decisionService.evaluateDecisionByKey("testDecision").variables(Variables.createVariables().putValue("pojo", new TestPojo("okay", 13.37))).evaluate();
+    }
+
+    //remember input and output ids
+    List<HistoricDecisionInstance> historicDecisionInstances = historyService.createHistoricDecisionInstanceQuery().includeInputs().includeOutputs().list();
+    final List<String> historicDecisionInputIds = collectHistoricDecisionInputIds(historicDecisionInstances);
+    final List<String> historicDecisionOutputIds = collectHistoricDecisionOutputIds(historicDecisionInstances);
+
+    List<String> decisionInstanceIds = extractIds(historicDecisionInstances);
+
+    //when
+    historyService.deleteHistoricDecisionInstancesBulk(decisionInstanceIds);
+
+    //then
+    assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKey("testProcess").count());
+    assertEquals(0, historyService.createHistoricDecisionInstanceQuery().count());
+
+    //check that decision inputs and outputs were removed
+    engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired().execute(new Command<Void>() {
+      public Void execute(CommandContext commandContext) {
+        for (String inputId : historicDecisionInputIds) {
+          assertNull(commandContext.getDbEntityManager().selectById(HistoricDecisionInputInstanceEntity.class, inputId));
+        }
+        for (String outputId : historicDecisionOutputIds) {
+          assertNull(commandContext.getDbEntityManager().selectById(HistoricDecisionOutputInstanceEntity.class, outputId));
+        }
+        return null;
+      }
+    });
+
+  }
+
+  private List<String> extractIds(List<HistoricDecisionInstance> historicDecisionInstances) {
+    List<String> decisionInstanceIds = new ArrayList<String>();
+    for (HistoricDecisionInstance historicDecisionInstance: historicDecisionInstances) {
+      decisionInstanceIds.add(historicDecisionInstance.getId());
+    }
+    return decisionInstanceIds;
   }
 
   @Test

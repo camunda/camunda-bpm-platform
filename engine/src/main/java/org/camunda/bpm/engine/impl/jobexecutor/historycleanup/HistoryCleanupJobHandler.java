@@ -1,10 +1,6 @@
 package org.camunda.bpm.engine.impl.jobexecutor.historycleanup;
 
 import java.util.Date;
-import java.util.List;
-import org.camunda.bpm.engine.impl.ProcessEngineLogger;
-import org.camunda.bpm.engine.impl.cmd.CommandLogger;
-import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -12,7 +8,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.json.JSONObject;
-import org.camunda.bpm.engine.management.Metrics;
 
 /**
  * Job handler for history cleanup job.
@@ -21,8 +16,6 @@ import org.camunda.bpm.engine.management.Metrics;
 public class HistoryCleanupJobHandler implements JobHandler<HistoryCleanupJobHandlerConfiguration> {
 
   public static final String TYPE = "history-cleanup";
-
-  private final static int MAX_BATCH_SIZE = 500;
 
   @Override
   public String getType() {
@@ -40,11 +33,11 @@ public class HistoryCleanupJobHandler implements JobHandler<HistoryCleanupJobHan
         || (HistoryCleanupHelper.isBatchWindowConfigured(commandContext)
             && HistoryCleanupHelper.isWithinBatchWindow(ClockUtil.getCurrentTime(), commandContext)) ) {
       //find data to delete
-      List<String> processInstanceIds = getProcessInstanceIds(commandContext);
-      if (!processInstanceIds.isEmpty() && processInstanceIds.size() >= getBatchSizeThreshold(commandContext)) {
+      final HistoryCleanupBatch nextBatch = HistoryCleanupHelper.getNextBatch(commandContext);
+      if (nextBatch.size() >= getBatchSizeThreshold(commandContext)) {
 
         //delete bunch of data
-        commandContext.getHistoricProcessInstanceManager().deleteHistoricProcessInstanceByIds(processInstanceIds);
+        nextBatch.performCleanup();
 
         //reschedule now
         commandContext.getJobManager().reschedule(jobEntity, ClockUtil.getCurrentTime());
@@ -52,8 +45,8 @@ public class HistoryCleanupJobHandler implements JobHandler<HistoryCleanupJobHan
         cancelCountEmptyRuns(configuration, jobEntity);
       } else {
         //still have something to delete
-        if (!processInstanceIds.isEmpty()) {
-          commandContext.getHistoricProcessInstanceManager().deleteHistoricProcessInstanceByIds(processInstanceIds);
+        if (nextBatch.size() > 0) {
+          nextBatch.performCleanup();
         }
         //not enough data for cleanup was found
         if (HistoryCleanupHelper.isWithinBatchWindow(ClockUtil.getCurrentTime(), commandContext)) {
@@ -96,10 +89,6 @@ public class HistoryCleanupJobHandler implements JobHandler<HistoryCleanupJobHan
     jobEntity.setJobHandlerConfiguration(configuration);
   }
 
-  private List<String> getProcessInstanceIds(CommandContext commandContext) {
-    return commandContext.getHistoricProcessInstanceManager().findHistoricProcessInstanceIdsForCleanup(getBatchSize(commandContext));
-  }
-
   @Override
   public HistoryCleanupJobHandlerConfiguration newConfiguration(String canonicalString) {
     JSONObject jsonObject = new JSONObject(canonicalString);
@@ -114,8 +103,4 @@ public class HistoryCleanupJobHandler implements JobHandler<HistoryCleanupJobHan
     return commandContext.getProcessEngineConfiguration().getHistoryCleanupBatchThreshold();
   }
 
-  public Integer getBatchSize(CommandContext commandContext) {
-    int historyCleanupBatchSize = commandContext.getProcessEngineConfiguration().getHistoryCleanupBatchSize();
-    return Math.min(historyCleanupBatchSize, MAX_BATCH_SIZE);
-  }
 }

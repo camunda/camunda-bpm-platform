@@ -261,6 +261,16 @@ public interface HistoryService {
   void deleteHistoricDecisionInstance(String decisionDefinitionId);
 
   /**
+   * Deletes decision process instances and all related historic data in bulk manner.
+   *
+   * @param decisionInstanceIds list of decision instance ids for removal
+   *
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#DECISION_DEFINITION}.
+   */
+  void deleteHistoricDecisionInstancesBulk(List<String> decisionInstanceIds);
+
+  /**
    * Deletes historic decision instances of a decision definition. All historic
    * decision inputs and outputs are deleted as well.
    *

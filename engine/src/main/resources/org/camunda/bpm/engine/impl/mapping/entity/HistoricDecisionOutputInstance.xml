@@ -60,6 +60,26 @@
         and BYTEARRAY_ID_ is not NULL)
   </delete>
 
+  <delete id="deleteHistoricDecisionOutputInstanceByDecisionInstanceIds" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
+    delete from ${prefix}ACT_HI_DEC_OUT
+    where DEC_INST_ID_ in
+      <foreach item="decisionInstanceId" index="index" collection="list" open="(" separator="," close=")">
+        #{decisionInstanceId}
+      </foreach>
+  </delete>
+
+  <delete id="deleteHistoricDecisionOutputInstanceByteArraysByDecisionInstanceIds">
+    delete from ${prefix}ACT_GE_BYTEARRAY
+    where ID_ in
+      (select distinct BYTEARRAY_ID_
+      from ${prefix}ACT_HI_DEC_OUT
+      where DEC_INST_ID_ in
+          <foreach item="decisionInstanceId" index="index" collection="list" open="(" separator="," close=")">
+            #{decisionInstanceId}
+          </foreach>
+        and BYTEARRAY_ID_ is not NULL)
+  </delete>
+
   <!-- result map -->
 
   <resultMap id="historicDecisionOutputInstanceResultMap" type="org.camunda.bpm.engine.impl.history.event.HistoricDecisionOutputInstanceEntity">

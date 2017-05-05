@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricIncident;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -40,6 +41,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.ExceptionUtil;
 import org.camunda.bpm.engine.impl.util.json.JSONObject;
+import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -68,6 +70,7 @@ import static org.junit.Assert.assertTrue;
 public class HistoryCleanupTest {
 
   protected static final String ONE_TASK_PROCESS = "oneTaskProcess";
+  protected static final String DECISION = "decision";
 
   protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
     public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
@@ -92,7 +95,7 @@ public class HistoryCleanupTest {
     runtimeService = engineRule.getRuntimeService();
     historyService = engineRule.getHistoryService();
     managementService = engineRule.getManagementService();
-    testRule.deploy("org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml");
+    testRule.deploy("org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml", "org/camunda/bpm/engine/test/api/dmn/Example.dmn");
   }
 
   @After
@@ -124,6 +127,11 @@ public class HistoryCleanupTest {
       historyService.deleteHistoricProcessInstance(historicProcessInstance.getId());
     }
 
+    List<HistoricDecisionInstance> historicDecisionInstances = engineRule.getHistoryService().createHistoricDecisionInstanceQuery().list();
+    for (HistoricDecisionInstance historicDecisionInstance: historicDecisionInstances) {
+      historyService.deleteHistoricDecisionInstanceByInstanceId(historicDecisionInstance.getId());
+    }
+
     clearMetrics();
 
   }
@@ -147,8 +155,8 @@ public class HistoryCleanupTest {
 
     managementService.executeJob(jobId);
 
-      //then
-    assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());
+    //then
+    assertResult(0);
   }
 
   @Test
@@ -169,17 +177,13 @@ public class HistoryCleanupTest {
     managementService.executeJob(jobId);
 
     //then
-    assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());
+    assertResult(0);
   }
 
   @Test
   public void testHistoryCleanupJobNullTTL() {
     //given
-    List<ProcessDefinition> processDefinitions = engineRule.getRepositoryService().createProcessDefinitionQuery().processDefinitionKey(ONE_TASK_PROCESS).list();
-    assertEquals(1, processDefinitions.size());
-    String id = processDefinitions.get(0).getId();
-
-    engineRule.getRepositoryService().updateProcessDefinitionHistoryTimeToLive(id, null);
+    removeHistoryTimeToLive();
 
     prepareData(15);
 
@@ -190,14 +194,24 @@ public class HistoryCleanupTest {
     managementService.executeJob(jobId);
 
     //then
-    assertEquals(15, historyService.createHistoricProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());
+    assertResult(15);
+  }
+
+  private void removeHistoryTimeToLive() {
+    List<ProcessDefinition> processDefinitions = engineRule.getRepositoryService().createProcessDefinitionQuery().processDefinitionKey(ONE_TASK_PROCESS).list();
+    assertEquals(1, processDefinitions.size());
+    engineRule.getRepositoryService().updateProcessDefinitionHistoryTimeToLive(processDefinitions.get(0).getId(), null);
+
+    final List<DecisionDefinition> decisionDefinitions = engineRule.getRepositoryService().createDecisionDefinitionQuery().decisionDefinitionKey(DECISION).list();
+    assertEquals(1, decisionDefinitions.size());
+    engineRule.getRepositoryService().updateDecisionDefinitionHistoryTimeToLive(decisionDefinitions.get(0).getId(), null);
   }
 
   @Test
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/twoTasksProcess.bpmn20.xml" })
   public void testHistoryCleanupJobDefaultTTL() {
     //given
-    prepareData(15, "twoTasksProcess");
+    prepareBPMNData(15, "twoTasksProcess");
 
     ClockUtil.setCurrentTime(new Date());
     //when
@@ -206,7 +220,7 @@ public class HistoryCleanupTest {
     managementService.executeJob(jobId);
 
     //then
-    assertEquals(15, historyService.createHistoricProcessInstanceQuery().processDefinitionKey("twoTasksProcess").count());
+    assertResult(15);
   }
 
   @Test
@@ -318,8 +332,8 @@ public class HistoryCleanupTest {
     managementService.executeJob(jobId);
 
     //then
-    //second execution was not abe to delete rest data
-    assertEquals(20, historyService.createHistoricProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());
+    //second execution was not able to delete rest data
+    assertResult(20);
   }
 
   @Test
@@ -346,7 +360,7 @@ public class HistoryCleanupTest {
     managementService.executeJob(jobId);
 
     //then
-    assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());
+    assertResult(0);
   }
 
 
@@ -381,7 +395,7 @@ public class HistoryCleanupTest {
     assertEquals(1, configuration.getCountEmptyRuns());
 
     //data is still removed
-    assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());
+    assertResult(0);
   }
 
   private Date getNextRunWithDelay(Date date, int countEmptyRuns) {
@@ -427,7 +441,7 @@ public class HistoryCleanupTest {
     assertEquals(6, configuration.getCountEmptyRuns());
 
     //data is still removed
-    assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());
+    assertResult(0);
   }
 
   @Test
@@ -461,7 +475,7 @@ public class HistoryCleanupTest {
     assertEquals(11, configuration.getCountEmptyRuns());
 
     //data is still removed
-    assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());
+    assertResult(0);
   }
 
   @Test
@@ -494,7 +508,7 @@ public class HistoryCleanupTest {
     assertEquals(0, configuration.getCountEmptyRuns());
 
     //data is still removed
-    assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());
+    assertResult(0);
   }
 
   @Test
@@ -527,7 +541,7 @@ public class HistoryCleanupTest {
     assertEquals(0, configuration.getCountEmptyRuns());
 
     //nothing was removed
-    assertEquals(5, historyService.createHistoricProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());
+    assertResult(5);
   }
 
   @Test
@@ -559,7 +573,7 @@ public class HistoryCleanupTest {
     assertEquals(0, configuration.getCountEmptyRuns());
 
     //nothing was removed
-    assertEquals(5, historyService.createHistoricProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());
+    assertResult(5);
   }
 
   @Test
@@ -591,7 +605,7 @@ public class HistoryCleanupTest {
     assertEquals(0, configuration.getCountEmptyRuns());
 
     //nothing was removed
-    assertEquals(5, historyService.createHistoricProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());
+    assertResult(5);
   }
 
   @Test
@@ -625,7 +639,7 @@ public class HistoryCleanupTest {
     assertEquals(1, configuration.getCountEmptyRuns());
 
     //data is still removed
-    assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());
+    assertResult(0);
   }
 
   @Test
@@ -659,7 +673,7 @@ public class HistoryCleanupTest {
     assertEquals(1, configuration.getCountEmptyRuns());
 
     //data is still removed
-    assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());
+    assertResult(0);
   }
 
   @Test
@@ -756,15 +770,26 @@ public class HistoryCleanupTest {
   }
 
 
-  private void prepareData(int processInstanceCount) {
-    prepareData(processInstanceCount, ONE_TASK_PROCESS);
+  private void prepareData(int instanceCount) {
+    int createdInstances = instanceCount / 2;
+    prepareBPMNData(createdInstances, ONE_TASK_PROCESS);
+    prepareDMNData(instanceCount - createdInstances);
   }
 
-  private void prepareData(int processInstanceCount, String businesskey) {
+  private void prepareBPMNData(int instanceCount, String businesskey) {
     Date oldCurrentTime = ClockUtil.getCurrentTime();
     ClockUtil.setCurrentTime(DateUtils.addDays(new Date(), -6));
-    final List<String> ids = prepareHistoricProcesses(businesskey, getVariables(), processInstanceCount);
+    final List<String> ids = prepareHistoricProcesses(businesskey, getVariables(), instanceCount);
     runtimeService.deleteProcessInstances(ids, null, true, true);
+    ClockUtil.setCurrentTime(oldCurrentTime);
+  }
+
+  private void prepareDMNData(int instanceCount) {
+    Date oldCurrentTime = ClockUtil.getCurrentTime();
+    ClockUtil.setCurrentTime(DateUtils.addDays(new Date(), -6));
+    for (int i = 0; i < instanceCount; i++) {
+      engineRule.getDecisionService().evaluateDecisionByKey(DECISION).variables(getDMNVariables()).evaluate();
+    }
     ClockUtil.setCurrentTime(oldCurrentTime);
   }
 
@@ -781,6 +806,16 @@ public class HistoryCleanupTest {
 
   private VariableMap getVariables() {
     return Variables.createVariables().putValue("aVariableName", "aVariableValue").putValue("anotherVariableName", "anotherVariableValue");
+  }
+
+  protected VariableMap getDMNVariables() {
+    return Variables.createVariables().putValue("status", "silver").putValue("sum", 723);
+  }
+
+  private void assertResult(long expectedInstanceCount) {
+    long count = historyService.createHistoricProcessInstanceQuery().count();
+    count = count + historyService.createHistoricDecisionInstanceQuery().count();
+    assertEquals(expectedInstanceCount, count);
   }
 
 }

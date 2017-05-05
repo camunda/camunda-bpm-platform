@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
@@ -15,6 +16,8 @@ public abstract class HistoryCleanupHelper {
   private static final SimpleDateFormat TIME_FORMAT_WITHOUT_SECONDS = new SimpleDateFormat("HH:mm");
 
   public static final SimpleDateFormat TIME_FORMAT_WITHOUT_SECONDS_WITH_TIMEZONE = new SimpleDateFormat("HH:mmZ");
+
+  private final static int MAX_BATCH_SIZE = 500;
 
   public static Date getNextRunWithinBatchWindow(Date date, CommandContext commandContext) {
     return getNextRunWithinBatchWindow(date, getBatchWindowStartTime(commandContext));
@@ -92,5 +95,42 @@ public abstract class HistoryCleanupHelper {
       return TIME_FORMAT_WITHOUT_SECONDS.parse(time);
     }
   }
+
+  private static Integer getHistoryCleanupBatchSize(CommandContext commandContext) {
+    final int configuredHistoryCleanupBatchSize = commandContext.getProcessEngineConfiguration().getHistoryCleanupBatchSize();
+    return Math.min(configuredHistoryCleanupBatchSize, MAX_BATCH_SIZE);
+  }
+
+  /**
+   * Creates next batch object for history cleanup. First searches for historic process instances ready for cleanup. If there is still some place left in batch
+   * (configured batch size was not reached), searches for historic decision instances and also adds them to the batch.
+   * @param commandContext
+   * @return
+   */
+  public static HistoryCleanupBatch getNextBatch(CommandContext commandContext) {
+    final Integer batchSize = getHistoryCleanupBatchSize(commandContext);
+    HistoryCleanupBatch historyCleanupBatch = new HistoryCleanupBatch();
+
+    //add process instance ids
+    final List<String> historicProcessInstanceIds = commandContext.getHistoricProcessInstanceManager()
+        .findHistoricProcessInstanceIdsForCleanup(batchSize);
+    if (historicProcessInstanceIds != null && historicProcessInstanceIds.size() > 0) {
+      historyCleanupBatch.setHistoricProcessInstanceIds(historicProcessInstanceIds);
+    }
+
+    //if batch is not full, add decision instance ids
+    if (historyCleanupBatch.size() < batchSize && commandContext.getProcessEngineConfiguration().isDmnEnabled()) {
+      final List<String> historicDecisionInstanceIds = commandContext.getHistoricDecisionInstanceManager()
+          .findHistoricDecisionInstanceIdsForCleanup(batchSize - historyCleanupBatch.size());
+      if (historicDecisionInstanceIds != null && historicDecisionInstanceIds.size() > 0) {
+        historyCleanupBatch.setHistoricDecisionInstanceIds(historicDecisionInstanceIds);
+      }
+    }
+
+    //TODO case instances
+
+    return historyCleanupBatch;
+  }
+
 
 }
