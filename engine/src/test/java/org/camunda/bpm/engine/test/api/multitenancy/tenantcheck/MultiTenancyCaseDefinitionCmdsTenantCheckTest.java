@@ -192,4 +192,40 @@ public class MultiTenancyCaseDefinitionCmdsTenantCheckTest {
     assertThat(modelInstance, notNullValue());
   }
 
+  @Test
+  public void updateHistoryTimeToLiveWithAuthenticatedTenant() {
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+
+    repositoryService.updateCaseDefinitionHistoryTimeToLive(caseDefinitionId, 6);
+
+    CaseDefinition definition = repositoryService.getCaseDefinition(caseDefinitionId);
+
+    assertThat(definition.getTenantId(), is(TENANT_ONE));
+    assertThat(definition.getHistoryTimeToLive(), is(6));
+  }
+
+  @Test
+  public void updateHistoryTimeToLiveDisabledTenantCheck() {
+    processEngineConfiguration.setTenantCheckEnabled(false);
+    identityService.setAuthentication("user", null, null);
+
+    repositoryService.updateCaseDefinitionHistoryTimeToLive(caseDefinitionId, 6);
+
+    CaseDefinition definition = repositoryService.getCaseDefinition(caseDefinitionId);
+
+    assertThat(definition.getTenantId(), is(TENANT_ONE));
+    assertThat(definition.getHistoryTimeToLive(), is(6));
+  }
+
+  @Test
+  public void updateHistoryTimeToLiveNoAuthenticatedTenants(){
+    identityService.setAuthentication("user", null, null);
+
+    // declare expected exception
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("Cannot update the case definition");
+
+    repositoryService.updateCaseDefinitionHistoryTimeToLive(caseDefinitionId, 6);
+  }
+
 }

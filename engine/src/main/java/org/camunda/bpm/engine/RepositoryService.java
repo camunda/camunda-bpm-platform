@@ -116,7 +116,7 @@ public interface RepositoryService {
    *          If the user has no {@link Permissions#DELETE} permission on {@link Resources#DEPLOYMENT}.
    */
   void deleteDeployment(String deploymentId, boolean cascade, boolean skipCustomListeners);
-  
+
   /**
    * Deletes the given deployment and cascade deletion to process instances,
    * history process instances and jobs.
@@ -441,13 +441,20 @@ public interface RepositoryService {
   void updateProcessDefinitionHistoryTimeToLive(String processDefinitionId, Integer historyTimeToLive);
 
   /**
-   * Updates time to live of process definition. The field is used within history cleanup process.
+   * Updates time to live of decision definition. The field is used within history cleanup process.
    * @param decisionDefinitionId
    * @param historyTimeToLive
    * @throws AuthorizationException
    *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#DECISION_DEFINITION}.
    */
   void updateDecisionDefinitionHistoryTimeToLive(String decisionDefinitionId, Integer historyTimeToLive);
+
+  /**
+   * Updates time to live of case definition. The field is used within history cleanup process.
+   * @param caseDefinitionId
+   * @param historyTimeToLive
+   */
+  void updateCaseDefinitionHistoryTimeToLive(String caseDefinitionId, Integer historyTimeToLive);
 
   /**
    * Gives access to a deployed process model, e.g., a BPMN 2.0 XML file,

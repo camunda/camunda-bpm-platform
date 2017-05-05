@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
@@ -2504,77 +2503,5 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
         .list();
 
     assertEquals(1, caseInstances.size());
-  }
-
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
-  public void testUpdateHistoryTimeToLive() {
-    // given
-    // there exists a deployment containing a case definition with key "oneTaskCase"
-
-    CaseDefinition caseDefinition = findOnlyCaseDefinition();
-
-    // when
-    caseService.updateCaseDefinitionHistoryTimeToLive(caseDefinition.getId(), 6);
-
-    // then
-    caseDefinition = findOnlyCaseDefinition();
-
-    assertEquals(6, caseDefinition.getHistoryTimeToLive().intValue());
-  }
-
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
-  public void testUpdateHistoryTimeToLiveNull() {
-    // given
-    // there exists a deployment containing a case definition with key "oneTaskCase"
-
-    CaseDefinition caseDefinition = findOnlyCaseDefinition();
-
-    // when
-    caseService.updateCaseDefinitionHistoryTimeToLive(caseDefinition.getId(), null);
-
-    // then
-    caseDefinition = findOnlyCaseDefinition();
-
-    assertEquals(null, caseDefinition.getHistoryTimeToLive());
-  }
-
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
-  public void testUpdateHistoryTimeToLiveNegative() {
-    // given
-    // there exists a deployment containing a case definition with key "oneTaskCase"
-
-    CaseDefinition caseDefinition = findOnlyCaseDefinition();
-
-    // when
-    try {
-      caseService.updateCaseDefinitionHistoryTimeToLive(caseDefinition.getId(), -1);
-      fail("Exception is expected, that negative value is not allowed.");
-    } catch (BadUserRequestException ex) {
-      assertTrue(ex.getMessage().contains("greater than"));
-    }
-  }
-
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
-  public void testUpdateHistoryTimeToLiveInCache() {
-    // given
-    // there exists a deployment containing a case definition with key "oneTaskCase"
-
-    CaseDefinition caseDefinition = findOnlyCaseDefinition();
-
-    // assume
-    assertNull(caseDefinition.getHistoryTimeToLive());
-
-    // when
-    caseService.updateCaseDefinitionHistoryTimeToLive(caseDefinition.getId(), 10);
-
-    CaseDefinition definition = repositoryService.getCaseDefinition(caseDefinition.getId());
-    assertEquals(Integer.valueOf(10), definition.getHistoryTimeToLive());
-  }
-
-  private CaseDefinition findOnlyCaseDefinition() {
-    List<CaseDefinition> caseDefinitions = repositoryService.createCaseDefinitionQuery().list();
-    assertNotNull(caseDefinitions);
-    assertEquals(1, caseDefinitions.size());
-    return caseDefinitions.get(0);
   }
 }

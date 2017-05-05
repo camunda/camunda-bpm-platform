@@ -34,7 +34,7 @@ public class UpdateCaseDefinitionHistoryTimeToLiveCmd implements Command<Void>, 
     CaseDefinitionEntity caseDefinitionEntity = commandContext.getCaseDefinitionManager().findLatestDefinitionById(caseDefinitionId);
 
     for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
-      checker.checkReadCaseDefinition(caseDefinitionEntity);
+      checker.checkUpdateCaseDefinition(caseDefinitionEntity);
     }
 
     caseDefinitionEntity.setHistoryTimeToLive(historyTimeToLive);

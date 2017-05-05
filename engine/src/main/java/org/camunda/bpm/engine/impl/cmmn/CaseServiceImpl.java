@@ -271,9 +271,4 @@ public class CaseServiceImpl extends ServiceImpl implements CaseService {
   public void terminateCaseExecution(String caseExecutionId, Map<String, Object> variables) {
     withCaseExecution(caseExecutionId).setVariables(variables).terminate();
   }
-
-  @Override
-  public void updateCaseDefinitionHistoryTimeToLive(String caseDefinitionId, Integer historyTimeToLive) {
-    commandExecutor.execute(new UpdateCaseDefinitionHistoryTimeToLiveCmd(caseDefinitionId, historyTimeToLive));
-  }
 }

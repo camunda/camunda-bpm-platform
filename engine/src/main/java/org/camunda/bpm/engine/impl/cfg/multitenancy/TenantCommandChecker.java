@@ -322,7 +322,7 @@ public class TenantCommandChecker implements CommandChecker {
 
   public void checkUpdateCaseDefinition(CaseDefinition caseDefinition) {
     if (caseDefinition != null && !getTenantManager().isAuthenticatedTenant(caseDefinition.getTenantId())) {
-      throw LOG.exceptionCommandWithUnauthorizedTenant("get the case definition '" + caseDefinition.getId() + "'");
+      throw LOG.exceptionCommandWithUnauthorizedTenant("update the case definition '" + caseDefinition.getId() + "'");
     }
   }
 

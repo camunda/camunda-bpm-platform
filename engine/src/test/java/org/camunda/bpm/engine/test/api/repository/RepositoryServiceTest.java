@@ -264,7 +264,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
 
     repositoryService.deleteDeployment(deploymentId, true, false, true);
   }
-    
+
   public void testDeleteDeploymentNullDeploymentId() {
     try {
       repositoryService.deleteDeployment(null);
@@ -913,6 +913,78 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
     assertEquals(timeToLiveOrgValue, Integer.valueOf(userOperationLogEntry.getOrgValue()));
     assertEquals(timeToLiveNewValue, Integer.valueOf(userOperationLogEntry.getNewValue()));
 
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testUpdateHistoryTimeToLive() {
+    // given
+    // there exists a deployment containing a case definition with key "oneTaskCase"
+
+    CaseDefinition caseDefinition = findOnlyCaseDefinition();
+
+    // when
+    repositoryService.updateCaseDefinitionHistoryTimeToLive(caseDefinition.getId(), 6);
+
+    // then
+    caseDefinition = findOnlyCaseDefinition();
+
+    assertEquals(6, caseDefinition.getHistoryTimeToLive().intValue());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testUpdateHistoryTimeToLiveNull() {
+    // given
+    // there exists a deployment containing a case definition with key "oneTaskCase"
+
+    CaseDefinition caseDefinition = findOnlyCaseDefinition();
+
+    // when
+    repositoryService.updateCaseDefinitionHistoryTimeToLive(caseDefinition.getId(), null);
+
+    // then
+    caseDefinition = findOnlyCaseDefinition();
+
+    assertEquals(null, caseDefinition.getHistoryTimeToLive());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testUpdateHistoryTimeToLiveNegative() {
+    // given
+    // there exists a deployment containing a case definition with key "oneTaskCase"
+
+    CaseDefinition caseDefinition = findOnlyCaseDefinition();
+
+    // when
+    try {
+      repositoryService.updateCaseDefinitionHistoryTimeToLive(caseDefinition.getId(), -1);
+      fail("Exception is expected, that negative value is not allowed.");
+    } catch (BadUserRequestException ex) {
+      assertTrue(ex.getMessage().contains("greater than"));
+    }
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testUpdateHistoryTimeToLiveInCache() {
+    // given
+    // there exists a deployment containing a case definition with key "oneTaskCase"
+
+    CaseDefinition caseDefinition = findOnlyCaseDefinition();
+
+    // assume
+    assertNull(caseDefinition.getHistoryTimeToLive());
+
+    // when
+    repositoryService.updateCaseDefinitionHistoryTimeToLive(caseDefinition.getId(), 10);
+
+    CaseDefinition definition = repositoryService.getCaseDefinition(caseDefinition.getId());
+    assertEquals(Integer.valueOf(10), definition.getHistoryTimeToLive());
+  }
+
+  private CaseDefinition findOnlyCaseDefinition() {
+    List<CaseDefinition> caseDefinitions = repositoryService.createCaseDefinitionQuery().list();
+    assertNotNull(caseDefinitions);
+    assertEquals(1, caseDefinitions.size());
+    return caseDefinitions.get(0);
   }
 
   private ProcessDefinitionEntity findOnlyProcessDefinition() {
