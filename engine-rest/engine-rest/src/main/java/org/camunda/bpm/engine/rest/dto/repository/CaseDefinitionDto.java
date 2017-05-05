@@ -29,6 +29,7 @@ public class CaseDefinitionDto {
   protected String resource;
   protected String deploymentId;
   protected String tenantId;
+  protected Integer historyTimeToLive;
 
   public String getId() {
     return id;
@@ -62,6 +63,10 @@ public class CaseDefinitionDto {
     return tenantId;
   }
 
+  public Integer getHistoryTimeToLive() {
+    return historyTimeToLive;
+  }
+
   public static CaseDefinitionDto fromCaseDefinition(CaseDefinition definition) {
     CaseDefinitionDto dto = new CaseDefinitionDto();
 
@@ -73,6 +78,7 @@ public class CaseDefinitionDto {
     dto.resource = definition.getResourceName();
     dto.deploymentId = definition.getDeploymentId();
     dto.tenantId = definition.getTenantId();
+    dto.historyTimeToLive = definition.getHistoryTimeToLive();
 
     return dto;
   }

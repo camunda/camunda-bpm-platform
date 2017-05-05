@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.rest.CaseInstanceRestService;
+import org.camunda.bpm.engine.rest.dto.HistoryTimeToLiveDto;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.rest.dto.repository.CaseDefinitionDiagramDto;
 import org.camunda.bpm.engine.rest.dto.repository.CaseDefinitionDto;
@@ -171,6 +172,11 @@ public class CaseDefinitionResourceImpl implements CaseDefinitionResource {
       return Response.ok(caseDiagram).header("Content-Disposition", "attachment; filename=" + fileName)
           .type(ProcessDefinitionResourceImpl.getMediaTypeForFileSuffix(fileName)).build();
     }
+  }
+
+  @Override
+  public void updateHistoryTimeToLive(HistoryTimeToLiveDto historyTimeToLiveDto) {
+    engine.getRepositoryService().updateCaseDefinitionHistoryTimeToLive(caseDefinitionId, historyTimeToLiveDto.getHistoryTimeToLive());
   }
 
 }

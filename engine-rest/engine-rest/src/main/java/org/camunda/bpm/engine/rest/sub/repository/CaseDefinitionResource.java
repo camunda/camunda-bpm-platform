@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.rest.sub.repository;
 
+import org.camunda.bpm.engine.rest.dto.HistoryTimeToLiveDto;
 import org.camunda.bpm.engine.rest.dto.repository.CaseDefinitionDiagramDto;
 import org.camunda.bpm.engine.rest.dto.repository.CaseDefinitionDto;
 import org.camunda.bpm.engine.rest.dto.runtime.CaseInstanceDto;
@@ -48,4 +49,8 @@ public interface CaseDefinitionResource {
   @Path("/diagram")
   Response getCaseDefinitionDiagram();
 
+  @PUT
+  @Path("/history-time-to-live")
+  @Consumes(MediaType.APPLICATION_JSON)
+  void updateHistoryTimeToLive(HistoryTimeToLiveDto historyTimeToLiveDto);
 }

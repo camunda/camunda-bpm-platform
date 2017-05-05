@@ -20,6 +20,7 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -35,6 +36,8 @@ import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
 
+import org.camunda.bpm.engine.AuthorizationException;
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
@@ -42,6 +45,7 @@ import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
+import org.camunda.bpm.engine.rest.dto.HistoryTimeToLiveDto;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.helper.EqualsVariableMap;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
@@ -81,6 +85,8 @@ public class CaseDefinitionRestServiceInteractionTest extends AbstractRestServic
   protected static final String CREATE_INSTANCE_BY_KEY_AND_TENANT_ID_URL = SINGLE_CASE_DEFINITION_BY_KEY_AND_TENANT_ID_URL + "/create";
 
   protected static final String DIAGRAM_DEFINITION_URL = SINGLE_CASE_DEFINITION_URL + "/diagram";
+
+  protected static final String UPDATE_HISTORY_TIME_TO_LIVE_URL = SINGLE_CASE_DEFINITION_URL + "/history-time-to-live";
 
   @ClassRule
   public static TestContainerRule rule = new TestContainerRule();
@@ -619,4 +625,79 @@ public class CaseDefinitionRestServiceInteractionTest extends AbstractRestServic
     Assert.assertEquals("application/octet-stream", ProcessDefinitionResourceImpl.getMediaTypeForFileSuffix("process.UNKNOWN"));
   }
 
+  @Test
+  public void testUpdateHistoryTimeToLive() {
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_CASE_DEFINITION_ID)
+      .content(new HistoryTimeToLiveDto(5))
+      .contentType(ContentType.JSON)
+    .then()
+      .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .put(UPDATE_HISTORY_TIME_TO_LIVE_URL);
+
+    verify(repositoryServiceMock).updateCaseDefinitionHistoryTimeToLive(MockProvider.EXAMPLE_CASE_DEFINITION_ID, 5);
+  }
+
+  @Test
+  public void testUpdateHistoryTimeToLiveNullValue() {
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_CASE_DEFINITION_ID)
+      .content(new HistoryTimeToLiveDto())
+      .contentType(ContentType.JSON)
+    .then()
+      .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .put(UPDATE_HISTORY_TIME_TO_LIVE_URL);
+
+    verify(repositoryServiceMock).updateCaseDefinitionHistoryTimeToLive(MockProvider.EXAMPLE_CASE_DEFINITION_ID, null);
+  }
+
+  @Test
+  public void testUpdateHistoryTimeToLiveNegativeValue() {
+    String expectedMessage = "expectedMessage";
+
+    doThrow(new BadUserRequestException(expectedMessage))
+        .when(repositoryServiceMock)
+        .updateCaseDefinitionHistoryTimeToLive(eq(MockProvider.EXAMPLE_CASE_DEFINITION_ID), eq(-1));
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_CASE_DEFINITION_ID)
+      .content(new HistoryTimeToLiveDto(-1))
+      .contentType(ContentType.JSON)
+    .then()
+      .expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode())
+        .body("type", is(BadUserRequestException.class.getSimpleName()))
+        .body("message", containsString(expectedMessage))
+    .when()
+      .put(UPDATE_HISTORY_TIME_TO_LIVE_URL);
+
+    verify(repositoryServiceMock).updateCaseDefinitionHistoryTimeToLive(MockProvider.EXAMPLE_CASE_DEFINITION_ID, -1);
+  }
+
+  @Test
+  public void testUpdateHistoryTimeToLiveAuthorizationException() {
+    String expectedMessage = "expectedMessage";
+
+    doThrow(new AuthorizationException(expectedMessage))
+        .when(repositoryServiceMock)
+        .updateCaseDefinitionHistoryTimeToLive(eq(MockProvider.EXAMPLE_CASE_DEFINITION_ID), eq(5));
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_CASE_DEFINITION_ID)
+      .content(new HistoryTimeToLiveDto(5))
+      .contentType(ContentType.JSON)
+    .then()
+      .expect()
+        .statusCode(Status.FORBIDDEN.getStatusCode())
+        .body("type", is(AuthorizationException.class.getSimpleName()))
+        .body("message", containsString(expectedMessage))
+    .when()
+      .put(UPDATE_HISTORY_TIME_TO_LIVE_URL);
+
+    verify(repositoryServiceMock).updateCaseDefinitionHistoryTimeToLive(MockProvider.EXAMPLE_CASE_DEFINITION_ID, 5);
+  }
 }
