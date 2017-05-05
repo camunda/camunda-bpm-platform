@@ -25,7 +25,7 @@ import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
 import org.camunda.bpm.engine.impl.repository.ResourceDefinitionEntity;
 import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
 
-public class DecisionRequirementsDefinitionEntity extends DmnDecisionRequirementsGraphImpl implements DecisionRequirementsDefinition, ResourceDefinitionEntity, DbEntity, HasDbRevision, Serializable {
+public class DecisionRequirementsDefinitionEntity extends DmnDecisionRequirementsGraphImpl implements DecisionRequirementsDefinition, ResourceDefinitionEntity<DecisionRequirementsDefinitionEntity>, DbEntity, HasDbRevision, Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -88,6 +88,11 @@ public class DecisionRequirementsDefinitionEntity extends DmnDecisionRequirement
   @Override
   public String getTenantId() {
     return tenantId;
+  }
+
+  @Override
+  public Integer getHistoryTimeToLive() {
+    return null;
   }
 
   @Override
@@ -175,6 +180,10 @@ public class DecisionRequirementsDefinitionEntity extends DmnDecisionRequirement
     }
 
     return previousDecisionDefinition;
+  }
+
+  @Override
+  public void updateModifiableFieldsFromEntity(DecisionRequirementsDefinitionEntity updatingDefinition) {
   }
 
   /**

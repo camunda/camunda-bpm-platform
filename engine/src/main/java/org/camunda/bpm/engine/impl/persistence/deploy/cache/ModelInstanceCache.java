@@ -17,6 +17,7 @@ import org.camunda.bpm.engine.impl.cmd.GetDeploymentResourceCmd;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.repository.ResourceDefinitionEntity;
 import org.camunda.bpm.engine.repository.ResourceDefinition;
 import org.camunda.bpm.model.xml.ModelInstance;
 import org.camunda.commons.utils.cache.Cache;
@@ -28,7 +29,7 @@ import java.util.concurrent.Callable;
 /**
  * @author: Johannes Heinemann
  */
-public abstract class ModelInstanceCache<InstanceType extends ModelInstance, DefinitionType extends ResourceDefinition> {
+public abstract class ModelInstanceCache<InstanceType extends ModelInstance, DefinitionType extends ResourceDefinitionEntity> {
 
   protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
