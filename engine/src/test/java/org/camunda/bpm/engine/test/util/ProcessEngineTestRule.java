@@ -101,7 +101,7 @@ public class ProcessEngineTestRule extends TestWatcher {
   }
 
   public DeploymentWithDefinitions deploy(DeploymentBuilder deploymentBuilder) {
-    DeploymentWithDefinitions deployment = deploymentBuilder.deployAndReturnDefinitions();
+    DeploymentWithDefinitions deployment = deploymentBuilder.deployWithResult();
 
     processEngineRule.manageDeployment(deployment);
 

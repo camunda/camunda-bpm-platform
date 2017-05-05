@@ -106,7 +106,7 @@ public class DeploymentResourceImpl extends AbstractRestProcessEngineAware imple
       builder.addDeploymentResources(deploymentId);
     }
 
-    return builder.deployAndReturnDefinitions();
+    return builder.deployWithResult();
   }
 
   protected DeploymentBuilder addRedeploymentResources(DeploymentBuilder builder, RedeploymentDto redeployment) {

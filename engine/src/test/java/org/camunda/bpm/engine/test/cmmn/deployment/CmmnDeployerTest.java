@@ -173,7 +173,7 @@ public class CmmnDeployerTest extends PluggableProcessEngineTestCase {
 
     // when case model is deployed
     DeploymentWithDefinitions deployment = repositoryService.createDeployment()
-      .addModelInstance("foo.cmmn", modelInstance).deployAndReturnDefinitions();
+      .addModelInstance("foo.cmmn", modelInstance).deployWithResult();
     deploymentIds.add(deployment.getId());
 
     // then deployment contains deployed case definition
@@ -198,7 +198,7 @@ public class CmmnDeployerTest extends PluggableProcessEngineTestCase {
 
     // when case model is deployed
     DeploymentWithDefinitions deployment = repositoryService.createDeployment()
-      .addModelInstance("foo.cmmn", modelInstance).deployAndReturnDefinitions();
+      .addModelInstance("foo.cmmn", modelInstance).deployWithResult();
     deploymentIds.add(deployment.getId());
 
     // then no case definition is deployed

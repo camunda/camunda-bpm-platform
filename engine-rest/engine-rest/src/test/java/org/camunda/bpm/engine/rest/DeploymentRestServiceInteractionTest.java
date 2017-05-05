@@ -102,7 +102,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
     when(mockDeploymentBuilder.source(anyString())).thenReturn(mockDeploymentBuilder);
     when(mockDeploymentBuilder.tenantId(anyString())).thenReturn(mockDeploymentBuilder);
     when(mockDeploymentBuilder.getResourceNames()).thenReturn(resourceNames);
-    when(mockDeploymentBuilder.deployAndReturnDefinitions()).thenReturn(mockDeploymentWithDefinitions);
+    when(mockDeploymentBuilder.deployWithResult()).thenReturn(mockDeploymentWithDefinitions);
   }
 
   private byte[] createMockDeploymentResourceByteData() {
@@ -1024,7 +1024,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
     when(mockDeployment.getDeployedDecisionDefinitions()).thenReturn(null);
     when(mockDeployment.getDeployedCaseDefinitions()).thenReturn(null);
     when(mockDeployment.getDeployedDecisionRequirementsDefinitions()).thenReturn(null);
-    when(mockDeploymentBuilder.deployAndReturnDefinitions()).thenReturn(mockDeployment);
+    when(mockDeploymentBuilder.deployWithResult()).thenReturn(mockDeployment);
 
     // when
     resourceNames.addAll(Arrays.asList("data", "more-data"));
@@ -1054,7 +1054,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
     when(mockDeployment.getDeployedDecisionDefinitions()).thenReturn(null);
     when(mockDeployment.getDeployedProcessDefinitions()).thenReturn(null);
     when(mockDeployment.getDeployedDecisionRequirementsDefinitions()).thenReturn(null);
-    when(mockDeploymentBuilder.deployAndReturnDefinitions()).thenReturn(mockDeployment);
+    when(mockDeploymentBuilder.deployWithResult()).thenReturn(mockDeployment);
 
     // when
     resourceNames.addAll(Arrays.asList("data", "more-data"));
@@ -1084,7 +1084,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
     when(mockDeployment.getDeployedCaseDefinitions()).thenReturn(null);
     when(mockDeployment.getDeployedProcessDefinitions()).thenReturn(null);
     when(mockDeployment.getDeployedDecisionRequirementsDefinitions()).thenReturn(null);
-    when(mockDeploymentBuilder.deployAndReturnDefinitions()).thenReturn(mockDeployment);
+    when(mockDeploymentBuilder.deployWithResult()).thenReturn(mockDeployment);
 
     // when
     resourceNames.addAll(Arrays.asList("data", "more-data"));
@@ -1113,7 +1113,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
     DeploymentWithDefinitions mockDeployment = MockProvider.createMockDeploymentWithDefinitions();
     when(mockDeployment.getDeployedCaseDefinitions()).thenReturn(null);
     when(mockDeployment.getDeployedProcessDefinitions()).thenReturn(null);
-    when(mockDeploymentBuilder.deployAndReturnDefinitions()).thenReturn(mockDeployment);
+    when(mockDeploymentBuilder.deployWithResult()).thenReturn(mockDeployment);
 
     // when
     resourceNames.addAll(Arrays.asList("data", "more-data"));
@@ -1145,7 +1145,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
     when(mockDeployment.getDeployedCaseDefinitions()).thenReturn(null);
     when(mockDeployment.getDeployedProcessDefinitions()).thenReturn(null);
     when(mockDeployment.getDeployedDecisionRequirementsDefinitions()).thenReturn(null);
-    when(mockDeploymentBuilder.deployAndReturnDefinitions()).thenReturn(mockDeployment);
+    when(mockDeploymentBuilder.deployWithResult()).thenReturn(mockDeployment);
 
     // when
     resourceNames.addAll(Arrays.asList("data", "more-data"));
@@ -1271,7 +1271,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
   @Test
   public void testCreateDeploymentThrowsAuthorizationException() {
     String message = "expected exception";
-    when(mockDeploymentBuilder.deployAndReturnDefinitions()).thenThrow(new AuthorizationException(message));
+    when(mockDeploymentBuilder.deployWithResult()).thenThrow(new AuthorizationException(message));
 
     resourceNames.addAll( Arrays.asList("data", "more-data") );
 
@@ -1493,7 +1493,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
     verify(mockDeploymentBuilder, never()).addDeploymentResourceByName(anyString(), anyString());
     verify(mockDeploymentBuilder).addDeploymentResourcesByName(eq(MockProvider.EXAMPLE_DEPLOYMENT_ID), eq(resourceNames));
     verify(mockDeploymentBuilder).source(MockProvider.EXAMPLE_DEPLOYMENT_SOURCE);
-    verify(mockDeploymentBuilder).deployAndReturnDefinitions();
+    verify(mockDeploymentBuilder).deployWithResult();
 
     verifyDeployment(mockDeployment, response);
   }
@@ -1516,7 +1516,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
     verify(mockDeploymentBuilder, never()).addDeploymentResourceByName(anyString(), anyString());
     verify(mockDeploymentBuilder, never()).addDeploymentResourcesByName(anyString(), anyListOf(String.class));
     verify(mockDeploymentBuilder, never()).source(anyString());
-    verify(mockDeploymentBuilder).deployAndReturnDefinitions();
+    verify(mockDeploymentBuilder).deployWithResult();
 
     verifyDeployment(mockDeployment, response);
   }
@@ -1540,7 +1540,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
     verify(mockDeploymentBuilder, never()).addDeploymentResourceByName(anyString(), anyString());
     verify(mockDeploymentBuilder, never()).addDeploymentResourcesByName(eq(MockProvider.EXAMPLE_DEPLOYMENT_ID), anyListOf(String.class));
     verify(mockDeploymentBuilder).source(null);
-    verify(mockDeploymentBuilder).deployAndReturnDefinitions();
+    verify(mockDeploymentBuilder).deployWithResult();
 
     verifyDeployment(mockDeployment, response);
   }
@@ -1571,7 +1571,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
     verify(mockDeploymentBuilder, never()).addDeploymentResourceByName(anyString(), anyString());
     verify(mockDeploymentBuilder, never()).addDeploymentResourcesByName(eq(MockProvider.EXAMPLE_DEPLOYMENT_ID), anyListOf(String.class));
     verify(mockDeploymentBuilder).source(null);
-    verify(mockDeploymentBuilder).deployAndReturnDefinitions();
+    verify(mockDeploymentBuilder).deployWithResult();
 
     verifyDeployment(mockDeployment, response);
   }
@@ -1602,7 +1602,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
     verify(mockDeploymentBuilder, never()).addDeploymentResourceByName(anyString(), anyString());
     verify(mockDeploymentBuilder).addDeploymentResourcesByName(eq(MockProvider.EXAMPLE_DEPLOYMENT_ID), eq(resourceNames));
     verify(mockDeploymentBuilder).source(null);
-    verify(mockDeploymentBuilder).deployAndReturnDefinitions();
+    verify(mockDeploymentBuilder).deployWithResult();
 
     verifyDeployment(mockDeployment, response);
   }
@@ -1629,7 +1629,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
     verify(mockDeploymentBuilder, never()).addDeploymentResourceByName(anyString(), anyString());
     verify(mockDeploymentBuilder, never()).addDeploymentResourcesByName(anyString(), anyListOf(String.class));
     verify(mockDeploymentBuilder).source(eq(MockProvider.EXAMPLE_DEPLOYMENT_SOURCE));
-    verify(mockDeploymentBuilder).deployAndReturnDefinitions();
+    verify(mockDeploymentBuilder).deployWithResult();
 
     verifyDeployment(mockDeployment, response);
   }
@@ -1649,7 +1649,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
 
     verify(mockDeploymentBuilder).addDeploymentResources(eq(MockProvider.EXAMPLE_DEPLOYMENT_ID));
     verify(mockDeploymentBuilder, never()).tenantId(any(String.class));
-    verify(mockDeploymentBuilder).deployAndReturnDefinitions();
+    verify(mockDeploymentBuilder).deployWithResult();
 
     verifyDeployment(mockDeployment, response);
   }
@@ -1669,7 +1669,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
 
     verify(mockDeploymentBuilder).addDeploymentResources(eq(MockProvider.EXAMPLE_DEPLOYMENT_ID));
     verify(mockDeploymentBuilder).tenantId(eq(MockProvider.EXAMPLE_TENANT_ID));
-    verify(mockDeploymentBuilder).deployAndReturnDefinitions();
+    verify(mockDeploymentBuilder).deployWithResult();
 
     verifyDeployment(mockDeployment, response);
   }
@@ -1677,7 +1677,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
   @Test
   public void testRedeployThrowsNotFoundException() {
     String message = "deployment not found";
-    doThrow(new NotFoundException(message)).when(mockDeploymentBuilder).deployAndReturnDefinitions();
+    doThrow(new NotFoundException(message)).when(mockDeploymentBuilder).deployWithResult();
 
     String expected = "Cannot redeploy deployment '" + MockProvider.EXAMPLE_DEPLOYMENT_ID + "': " + message;
 
@@ -1695,7 +1695,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
   @Test
   public void testRedeployThrowsNotValidException() {
     String message = "not valid";
-    doThrow(new NotValidException(message)).when(mockDeploymentBuilder).deployAndReturnDefinitions();
+    doThrow(new NotValidException(message)).when(mockDeploymentBuilder).deployWithResult();
 
     String expected = "Cannot redeploy deployment '" + MockProvider.EXAMPLE_DEPLOYMENT_ID + "': " + message;
 
@@ -1713,7 +1713,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
   @Test
   public void testRedeployThrowsProcessEngineException() {
     String message = "something went wrong";
-    doThrow(new ProcessEngineException(message)).when(mockDeploymentBuilder).deployAndReturnDefinitions();
+    doThrow(new ProcessEngineException(message)).when(mockDeploymentBuilder).deployWithResult();
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_DEPLOYMENT_ID)
@@ -1729,7 +1729,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
   @Test
   public void testRedeployThrowsAuthorizationException() {
     String message = "missing authorization";
-    doThrow(new AuthorizationException(message)).when(mockDeploymentBuilder).deployAndReturnDefinitions();
+    doThrow(new AuthorizationException(message)).when(mockDeploymentBuilder).deployWithResult();
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_DEPLOYMENT_ID)

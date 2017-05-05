@@ -196,7 +196,7 @@ public interface DeploymentBuilder {
    *
    *
    * <p> The returned {@link Deployment} instance has no information about the definitions, which are deployed
-   * with that deployment. To access this information you can use the {@link #deployAndReturnDefinitions()} method.
+   * with that deployment. To access this information you can use the {@link #deployWithResult()} method.
    * This method will return an instance of {@link DeploymentWithDefinitions}, which contains the information
    * about the successful deployed definitions.
    * </p>
@@ -240,7 +240,7 @@ public interface DeploymentBuilder {
    *   </ul>
    * @return the created deployment, contains the deployed definitions
    */
-  DeploymentWithDefinitions deployAndReturnDefinitions();
+  DeploymentWithDefinitions deployWithResult();
 
   /**
    *  @return the names of the resources which were added to this builder.

@@ -259,10 +259,10 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
   }
 
   public Deployment deploy() {
-    return deployAndReturnDefinitions();
+    return deployWithResult();
   }
 
-  public DeploymentWithDefinitions deployAndReturnDefinitions() {
+  public DeploymentWithDefinitions deployWithResult() {
     return repositoryService.deployAndReturnDefinitions(this);
   }
 

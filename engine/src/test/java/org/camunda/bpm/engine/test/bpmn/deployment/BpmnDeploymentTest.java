@@ -381,7 +381,7 @@ public class BpmnDeploymentTest extends PluggableProcessEngineTestCase {
 
     // when process model is deployed
     DeploymentWithDefinitions deployment = repositoryService.createDeployment()
-      .addModelInstance("foo.bpmn", modelInstance).deployAndReturnDefinitions();
+      .addModelInstance("foo.bpmn", modelInstance).deployWithResult();
     deploymentIds.add(deployment.getId());
 
     // then deployment contains deployed process definitions
@@ -405,7 +405,7 @@ public class BpmnDeploymentTest extends PluggableProcessEngineTestCase {
 
     // when process model is deployed
     DeploymentWithDefinitions deployment = repositoryService.createDeployment()
-      .addModelInstance("foo.bpmn", modelInstance).deployAndReturnDefinitions();
+      .addModelInstance("foo.bpmn", modelInstance).deployWithResult();
     deploymentIds.add(deployment.getId());
 
     // then deployment contains no deployed process definition

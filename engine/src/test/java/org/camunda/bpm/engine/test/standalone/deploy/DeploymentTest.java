@@ -43,7 +43,7 @@ public class DeploymentTest {
      DeploymentWithDefinitions deployment = engineRule.getRepositoryService()
          .createDeployment()
          .addModelInstance("foo.bpmn", instance)
-         .deployAndReturnDefinitions();
+         .deployWithResult();
 
      engineRule.getRepositoryService().deleteDeployment(deployment.getId(), true);
 

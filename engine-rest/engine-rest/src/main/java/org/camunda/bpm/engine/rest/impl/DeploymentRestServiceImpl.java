@@ -91,7 +91,7 @@ public class DeploymentRestServiceImpl extends AbstractRestProcessEngineAware im
     DeploymentBuilder deploymentBuilder = extractDeploymentInformation(payload);
 
     if(!deploymentBuilder.getResourceNames().isEmpty()) {
-      DeploymentWithDefinitions deployment = deploymentBuilder.deployAndReturnDefinitions();
+      DeploymentWithDefinitions deployment = deploymentBuilder.deployWithResult();
 
       DeploymentWithDefinitionsDto deploymentDto = DeploymentWithDefinitionsDto.fromDeployment(deployment);
 
