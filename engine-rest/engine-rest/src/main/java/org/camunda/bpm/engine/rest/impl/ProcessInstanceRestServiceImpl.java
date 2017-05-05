@@ -29,7 +29,6 @@ import org.camunda.bpm.engine.impl.util.EnsureUtil;
 import org.camunda.bpm.engine.rest.ProcessInstanceRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
-import org.camunda.bpm.engine.rest.dto.history.DeleteHistoricProcessInstancesDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceSuspensionStateDto;
@@ -221,29 +220,29 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
 
   @Override
   public BatchDto setRetriesByProcessHistoricQueryBased(SetJobRetriesByProcessDto setJobRetriesDto) {
-    ManagementService managementService = getProcessEngine().getManagementService();
-
     try {
       EnsureUtil.ensureNotNull("setJobRetriesDto", setJobRetriesDto);
-      EnsureUtil.ensureNotNull("historicProcessInstanceQuery", setJobRetriesDto.getHistoricProcessInstanceQuery());
       EnsureUtil.ensureNotNull("retries", setJobRetriesDto.getRetries());
     } catch (NullValueException e) {
       throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());
     }
 
-    List<HistoricProcessInstance> historicProcessInstances = setJobRetriesDto
-      .getHistoricProcessInstanceQuery()
-      .toQuery(getProcessEngine()).list();
+    ManagementService managementService = getProcessEngine().getManagementService();
 
-    List<String> processInstanceIds = null;
-    for (HistoricProcessInstance historicProcessInstance : historicProcessInstances) {
-      if (HistoricProcessInstance.STATE_ACTIVE.equals(historicProcessInstance.getState())) {
-        if (processInstanceIds == null) {
-          processInstanceIds = new ArrayList<String>();
-        }
+    List<HistoricProcessInstance> historicProcessInstances = null;
+    if (setJobRetriesDto.getHistoricProcessInstanceQuery() != null) {
+      historicProcessInstances = setJobRetriesDto.getHistoricProcessInstanceQuery().toQuery(getProcessEngine()).list();
+    }
 
+    List<String> processInstanceIds = new ArrayList<String>();
+    if (historicProcessInstances != null) {
+      for (HistoricProcessInstance historicProcessInstance: historicProcessInstances) {
         processInstanceIds.add(historicProcessInstance.getId());
       }
+    }
+
+    if (setJobRetriesDto.getProcessInstances() != null) {
+      processInstanceIds.addAll(setJobRetriesDto.getProcessInstances());
     }
 
     Batch batch = null;
@@ -251,18 +250,12 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
     try {
 
       batch = managementService.setJobRetriesAsync(
-        processInstanceIds,
+        processInstanceIds.isEmpty() ? null : processInstanceIds,
         setJobRetriesDto.getRetries());
 
       return BatchDto.fromBatch(batch);
     } catch (BadUserRequestException e) {
-      String message = e.getMessage();
-
-      if ("jobIds is empty".equals(message)) {
-        message = "no jobIds found";
-      }
-
-      throw new InvalidRequestException(Status.BAD_REQUEST, message);
+      throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());
     }
   }
 
