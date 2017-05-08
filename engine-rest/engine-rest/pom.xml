@@ -15,7 +15,7 @@
     <!-- pin tomcat version for engine-rest -->
     <version.tomcat>7.0.50</version.tomcat>
     <rest.http.port>38080</rest.http.port>
-    <jackson.version>2.6.3</jackson.version>
+    <jackson.version>2.8.8</jackson.version>
     <!-- use inherited version as default -->
     <resteasy.version>${version.resteasy}</resteasy.version>
     <resteasy.netty.version>2.3.6.Final</resteasy.netty.version>
