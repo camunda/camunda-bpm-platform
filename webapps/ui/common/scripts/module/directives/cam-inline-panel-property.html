@@ -4,5 +4,10 @@
   change="onChange()"
   value="property">
   <span ng-show="property == null" class="null-value">null</span>
-  <span ng-show="property != null">{{format({property: property}) || property}}</span>
+  <span ng-show="property != null">
+    {{format({property: property}) || property}}
+    <button type="button" class="btn btn-link btn-xs" ng-click="remove($event)">
+      <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+    </button>
+  </span>
 </span>

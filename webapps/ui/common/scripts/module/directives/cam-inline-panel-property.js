@@ -12,7 +12,16 @@ module.exports = function() {
       property: '=camInlinePanelProperty',
       format: '&',
       onChange: '&',
+      onRemove: '&',
       type: '@'
+    },
+    link: function($scope) {
+      $scope.remove = function($event) {
+        $event.preventDefault();
+        $event.stopPropagation();
+
+        $scope.onRemove();
+      };
     }
   };
 };
