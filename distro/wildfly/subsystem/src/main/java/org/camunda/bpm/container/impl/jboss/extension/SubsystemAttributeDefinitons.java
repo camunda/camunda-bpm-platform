@@ -4,6 +4,7 @@ import org.camunda.bpm.container.impl.jboss.config.ManagedJtaProcessEngineConfig
 import org.camunda.bpm.container.impl.jboss.util.CustomMarshaller;
 import org.camunda.bpm.container.impl.jboss.util.FixedObjectTypeAttributeDefinition;
 import org.jboss.as.controller.*;
+import org.jboss.as.controller.registry.AttributeAccess;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
 
@@ -21,25 +22,25 @@ public class SubsystemAttributeDefinitons {
   public static final boolean DEFAULT_ALLOW_CORE_TIMEOUT = true;
 
   // general
-  public static final SimpleAttributeDefinition NAME = new SimpleAttributeDefinition(ModelConstants.NAME, new ModelNode("default"), ModelType.STRING, false);
-  public static final SimpleMapAttributeDefinition PROPERTIES = new SimpleMapAttributeDefinition.Builder(ModelConstants.PROPERTIES, true).build();
+  public static final SimpleAttributeDefinition NAME = new SimpleAttributeDefinition(ModelConstants.NAME, new ModelNode("default"), ModelType.STRING, false, AttributeAccess.Flag.RESTART_ALL_SERVICES);
+  public static final SimpleMapAttributeDefinition PROPERTIES = new SimpleMapAttributeDefinition.Builder(ModelConstants.PROPERTIES, true).setRestartAllServices().build();
 
   // process engine
-  public static final SimpleAttributeDefinition DEFAULT = new SimpleAttributeDefinition(ModelConstants.DEFAULT, new ModelNode(false), ModelType.BOOLEAN, true);
-  public static final SimpleAttributeDefinition DATASOURCE = new SimpleAttributeDefinition(ModelConstants.DATASOURCE, new ModelNode(DEFAULT_DATASOURCE), ModelType.STRING, false);
-  public static final SimpleAttributeDefinition HISTORY_LEVEL = new SimpleAttributeDefinition(ModelConstants.HISTORY_LEVEL, new ModelNode(DEFAULT_HISTORY_LEVEL), ModelType.STRING, true);
-  public static final SimpleAttributeDefinition CONFIGURATION = new SimpleAttributeDefinition(ModelConstants.CONFIGURATION, new ModelNode(DEFAULT_PROCESS_ENGINE_CONFIGURATION_CLASS), ModelType.STRING, true);
+  public static final SimpleAttributeDefinition DEFAULT = new SimpleAttributeDefinition(ModelConstants.DEFAULT, new ModelNode(false), ModelType.BOOLEAN, true, AttributeAccess.Flag.RESTART_ALL_SERVICES);
+  public static final SimpleAttributeDefinition DATASOURCE = new SimpleAttributeDefinition(ModelConstants.DATASOURCE, new ModelNode(DEFAULT_DATASOURCE), ModelType.STRING, false, AttributeAccess.Flag.RESTART_ALL_SERVICES);
+  public static final SimpleAttributeDefinition HISTORY_LEVEL = new SimpleAttributeDefinition(ModelConstants.HISTORY_LEVEL, new ModelNode(DEFAULT_HISTORY_LEVEL), ModelType.STRING, true, AttributeAccess.Flag.RESTART_ALL_SERVICES);
+  public static final SimpleAttributeDefinition CONFIGURATION = new SimpleAttributeDefinition(ModelConstants.CONFIGURATION, new ModelNode(DEFAULT_PROCESS_ENGINE_CONFIGURATION_CLASS), ModelType.STRING, true, AttributeAccess.Flag.RESTART_ALL_SERVICES);
 
   // job executor
   @Deprecated
-  public static final SimpleAttributeDefinition THREAD_POOL_NAME = new SimpleAttributeDefinition(ModelConstants.THREAD_POOL_NAME, new ModelNode(DEFAULT_JOB_EXECUTOR_THREADPOOL_NAME), ModelType.STRING, true);
-  public static final SimpleAttributeDefinition CORE_THREADS = new SimpleAttributeDefinition(ModelConstants.CORE_THREADS, new ModelNode(DEFAULT_CORE_THREADS), ModelType.INT, false);
-  public static final SimpleAttributeDefinition MAX_THREADS = new SimpleAttributeDefinition(ModelConstants.MAX_THREADS, new ModelNode(DEFAULT_MAX_THREADS), ModelType.INT, false);
-  public static final SimpleAttributeDefinition QUEUE_LENGTH = new SimpleAttributeDefinition(ModelConstants.QUEUE_LENGTH, new ModelNode(DEFAULT_QUEUE_LENGTH), ModelType.INT, false);
-  public static final SimpleAttributeDefinition KEEPALIVE_TIME = new SimpleAttributeDefinition(ModelConstants.KEEPALIVE_TIME, new ModelNode(DEFAULT_KEEPALIVE_TIME), ModelType.INT, true);
-  public static final SimpleAttributeDefinition ALLOW_CORE_TIMEOUT = new SimpleAttributeDefinition(ModelConstants.ALLOW_CORE_TIMEOUT, new ModelNode(DEFAULT_ALLOW_CORE_TIMEOUT), ModelType.BOOLEAN, true);
+  public static final SimpleAttributeDefinition THREAD_POOL_NAME = new SimpleAttributeDefinition(ModelConstants.THREAD_POOL_NAME, new ModelNode(DEFAULT_JOB_EXECUTOR_THREADPOOL_NAME), ModelType.STRING, true, AttributeAccess.Flag.RESTART_ALL_SERVICES);
+  public static final SimpleAttributeDefinition CORE_THREADS = new SimpleAttributeDefinition(ModelConstants.CORE_THREADS, new ModelNode(DEFAULT_CORE_THREADS), ModelType.INT, false, AttributeAccess.Flag.RESTART_ALL_SERVICES);
+  public static final SimpleAttributeDefinition MAX_THREADS = new SimpleAttributeDefinition(ModelConstants.MAX_THREADS, new ModelNode(DEFAULT_MAX_THREADS), ModelType.INT, false, AttributeAccess.Flag.RESTART_ALL_SERVICES);
+  public static final SimpleAttributeDefinition QUEUE_LENGTH = new SimpleAttributeDefinition(ModelConstants.QUEUE_LENGTH, new ModelNode(DEFAULT_QUEUE_LENGTH), ModelType.INT, false, AttributeAccess.Flag.RESTART_ALL_SERVICES);
+  public static final SimpleAttributeDefinition KEEPALIVE_TIME = new SimpleAttributeDefinition(ModelConstants.KEEPALIVE_TIME, new ModelNode(DEFAULT_KEEPALIVE_TIME), ModelType.INT, true, AttributeAccess.Flag.RESTART_ALL_SERVICES);
+  public static final SimpleAttributeDefinition ALLOW_CORE_TIMEOUT = new SimpleAttributeDefinition(ModelConstants.ALLOW_CORE_TIMEOUT, new ModelNode(DEFAULT_ALLOW_CORE_TIMEOUT), ModelType.BOOLEAN, true, AttributeAccess.Flag.RESTART_ALL_SERVICES);
   @Deprecated
-  public static final SimpleAttributeDefinition ACQUISITION_STRATEGY = new SimpleAttributeDefinition(ModelConstants.ACQUISITION_STRATEGY, new ModelNode(DEFAULT_ACQUISITION_STRATEGY), ModelType.STRING, true);
+  public static final SimpleAttributeDefinition ACQUISITION_STRATEGY = new SimpleAttributeDefinition(ModelConstants.ACQUISITION_STRATEGY, new ModelNode(DEFAULT_ACQUISITION_STRATEGY), ModelType.STRING, true, AttributeAccess.Flag.RESTART_ALL_SERVICES);
 
   public static final SimpleAttributeDefinition PLUGIN_CLASS = SimpleAttributeDefinitionBuilder.create(ModelConstants.PLUGIN_CLASS, ModelType.STRING, true)
       .setAttributeMarshaller(CustomMarshaller.ATTRIBUTE_AS_ELEMENT)
@@ -55,12 +56,14 @@ public class SubsystemAttributeDefinitons {
       .setAttributeParser(AttributeParser.LIST)
       .setRequires(ModelConstants.PLUGIN_CLASS)
       .setAllowNull(true)
+      .setRestartAllServices()
       .build();
 
   public static final ObjectListAttributeDefinition PLUGINS = ObjectListAttributeDefinition.Builder.of(ModelConstants.PLUGINS, PLUGIN)
       .setAttributeMarshaller(CustomMarshaller.OBJECT_LIST)
       .setAllowNull(true)
       .setAllowExpression(true)
+      .setRestartAllServices()
       .build();
 
   public static final AttributeDefinition[] JOB_EXECUTOR_ATTRIBUTES = new AttributeDefinition[] {
