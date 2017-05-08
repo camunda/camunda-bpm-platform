@@ -602,6 +602,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected boolean isDeploymentLockUsed = true;
 
   /**
+   * If true then several deployments may be processed in parallel on one engine node.
+   */
+  protected boolean isParallelDeploymentsEnabled = false;
+
+  /**
    * Allows setting whether the process engine should try reusing the first level entity cache.
    * Default setting is false, enabling it improves performance of asynchronous continuations.
    */
@@ -3237,6 +3242,21 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
    */
   public void setDeploymentLockUsed(boolean isDeploymentLockUsed) {
     this.isDeploymentLockUsed = isDeploymentLockUsed;
+  }
+
+  /**
+   * @return true if it's allowed to process several deployments in parallel on one engine node.
+   */
+  public boolean isParallelDeploymentsEnabled() {
+    return isParallelDeploymentsEnabled;
+  }
+
+  /**
+   * Sets if it's allowed to processed several deployments in parallel on one engine node.
+   * @param parallelDeploymentsEnabled true when allowed.
+   */
+  public void setParallelDeploymentsEnabled(boolean parallelDeploymentsEnabled) {
+    isParallelDeploymentsEnabled = parallelDeploymentsEnabled;
   }
 
   public boolean isCmmnEnabled() {

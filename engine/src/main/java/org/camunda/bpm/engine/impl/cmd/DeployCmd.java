@@ -46,7 +46,6 @@ import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentFailListener;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessApplicationDeploymentImpl;
-import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
@@ -85,11 +84,15 @@ public class DeployCmd implements Command<DeploymentWithDefinitions>, Serializab
 
   @Override
   public DeploymentWithDefinitions execute(final CommandContext commandContext) {
-    // ensure serial processing of multiple deployments on the same node.
-    // We experienced deadlock situations with highly concurrent deployment of multiple
-    // applications on Jboss & Wildfly
-    synchronized (ProcessEngine.class) {
+    if (commandContext.getProcessEngineConfiguration().isParallelDeploymentsEnabled()) {
       return doExecute(commandContext);
+    } else {
+      // ensure serial processing of multiple deployments on the same node.
+      // We experienced deadlock situations with highly concurrent deployment of multiple
+      // applications on Jboss & Wildfly
+      synchronized (ProcessEngine.class) {
+        return doExecute(commandContext);
+      }
     }
   }
 
