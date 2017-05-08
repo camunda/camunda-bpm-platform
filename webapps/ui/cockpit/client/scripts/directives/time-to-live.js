@@ -13,24 +13,22 @@ module.exports = ['camAPI', '$window' , 'Notifications', function(camAPI, $windo
       resource: '@'
     },
     link: function($scope) {
+      var lastValue = getAndCorrectTimeToLiveValue();
       var resource = camAPI.resource($scope.resource);
 
       $scope.onChange = function() {
         $window.setTimeout(function() {
           var timeToLive = getAndCorrectTimeToLiveValue();
 
-          resource.updateHistoryTimeToLive(
-            $scope.definition.id,
-            {
-              historyTimeToLive: timeToLive
-            }
-          ).catch(function(error) {
-            Notifications.addError({
-              status: 'Failed to update history time to live',
-              message: error
-            });
-          });
+          updateValue(timeToLive);
         });
+      };
+
+      $scope.onRemove = function() {
+        updateValue(null)
+          .then(function() {
+            $scope.definition.historyTimeToLive = null;
+          });
       };
 
       $scope.format = function(property) {
@@ -41,20 +39,31 @@ module.exports = ['camAPI', '$window' , 'Notifications', function(camAPI, $windo
         return property + ' days';
       };
 
+      function updateValue(timeToLive) {
+        return resource.updateHistoryTimeToLive(
+          $scope.definition.id,
+          {
+            historyTimeToLive: timeToLive
+          }
+        ).catch(function(error) {
+          $scope.definition.historyTimeToLive = lastValue;
+
+          Notifications.addError({
+            status: 'Failed to update history time to live',
+            message: error
+          });
+        })
+        .then(function() {
+          lastValue = getAndCorrectTimeToLiveValue();
+        });
+      }
 
       function getAndCorrectTimeToLiveValue() {
         if ($scope.definition.historyTimeToLive === null) {
           return null;
         }
 
-        var timeToLive = +$scope.definition.historyTimeToLive;
-
-        if (isNaN(timeToLive) || timeToLive < 0) {
-          timeToLive = null;
-          $scope.definition.historyTimeToLive = null;
-        }
-
-        return timeToLive;
+        return +$scope.definition.historyTimeToLive;
       }
     }
   };
