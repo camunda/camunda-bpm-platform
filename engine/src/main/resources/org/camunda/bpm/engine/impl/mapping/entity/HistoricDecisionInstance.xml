@@ -277,6 +277,7 @@
         where
         di.DEC_DEF_ID_ = dd.ID_
         AND not dd.HISTORY_TTL_ is NULL
+        AND di.PROC_INST_ID_ is NULL
     </sql>
 
   <select id="selectHistoricDecisionInstanceIdsForCleanup" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
@@ -297,7 +298,7 @@
 
   <select id="selectHistoricDecisionInstanceIdsForCleanup_db2" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
     SELECT ID_
-    FROM (SELECT di.PROC_INST_ID_, ROW_NUMBER() OVER(ORDER BY #{parameter} - di.EVAL_TIME_ DESC) as rownumber
+    FROM (SELECT di.ID_, ROW_NUMBER() OVER(ORDER BY #{parameter} - di.EVAL_TIME_ DESC) as rownumber
     <include refid="selectHistoricDecisionInstanceIdsForCleanupSql"/>
     AND di.EVAL_TIME_ + dd.HISTORY_TTL_ DAYS &lt;= #{parameter}) as SUB
     where rownumber between 1 and #{maxResults}

@@ -19,6 +19,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 import org.apache.commons.lang.time.DateUtils;
 import org.camunda.bpm.engine.HistoryService;
@@ -47,6 +48,7 @@ import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.camunda.bpm.engine.test.dmn.businessruletask.TestPojo;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
@@ -157,6 +159,90 @@ public class HistoryCleanupTest {
 
     //then
     assertResult(0);
+  }
+
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/dmn/businessruletask/DmnBusinessRuleTaskTest.testDecisionRef.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/history/testDmnWithPojo.dmn11.xml" })
+  public void testHistoryCleanupStandaloneDesicionInstances() {
+    //given
+    prepareDecisionInstances(null, 5);
+
+    ClockUtil.setCurrentTime(new Date());
+    //when
+    String jobId = historyService.cleanUpHistoryAsync(true).getId();
+
+    managementService.executeJob(jobId);
+
+    //then
+    assertResult(6);
+    assertEquals(3, historyService.createHistoricDecisionInstanceQuery().count());
+  }
+
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/dmn/businessruletask/DmnBusinessRuleTaskTest.testDecisionRef.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/history/testDmnWithPojo.dmn11.xml" })
+  public void testHistoryCleanupStandaloneDesicionInstancesNotRemoved() {
+    //given
+    prepareDecisionInstances(5, null);
+
+    ClockUtil.setCurrentTime(new Date());
+    //when
+    String jobId = historyService.cleanUpHistoryAsync(true).getId();
+
+    managementService.executeJob(jobId);
+
+    //then
+    assertResult(10);
+    assertEquals(10, historyService.createHistoricDecisionInstanceQuery().count());
+  }
+
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/dmn/businessruletask/DmnBusinessRuleTaskTest.testDecisionRef.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/history/testDmnWithPojo.dmn11.xml" })
+  public void testHistoryCleanupStandaloneDesicionInstancesEverythingRemoved() {
+    //given
+    prepareDecisionInstances(5, 5);
+
+    ClockUtil.setCurrentTime(new Date());
+    //when
+    String jobId = historyService.cleanUpHistoryAsync(true).getId();
+
+    managementService.executeJob(jobId);
+
+    //then
+    assertResult(0);
+  }
+
+  private void prepareDecisionInstances(Integer processInstanceTimeToLive, Integer decisionTimeToLive) {
+    //update time to live
+    List<ProcessDefinition> processDefinitions = engineRule.getRepositoryService().createProcessDefinitionQuery().processDefinitionKey("testProcess").list();
+    assertEquals(1, processDefinitions.size());
+    engineRule.getRepositoryService().updateProcessDefinitionHistoryTimeToLive(processDefinitions.get(0).getId(), processInstanceTimeToLive);
+
+    final List<DecisionDefinition> decisionDefinitions = engineRule.getRepositoryService().createDecisionDefinitionQuery().decisionDefinitionKey("testDecision").list();
+    assertEquals(1, decisionDefinitions.size());
+    engineRule.getRepositoryService().updateDecisionDefinitionHistoryTimeToLive(decisionDefinitions.get(0).getId(), decisionTimeToLive);
+
+    Date oldCurrentTime = ClockUtil.getCurrentTime();
+    ClockUtil.setCurrentTime(DateUtils.addDays(new Date(), -6));
+
+    //create 3 process instances
+    List<String> processInstanceIds = new ArrayList<String>();
+    Map<String, Object> variables = Variables.createVariables().putValue("pojo", new TestPojo("okay", 13.37));
+    for (int i = 0; i < 3; i++) {
+      ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess", variables);
+      processInstanceIds.add(processInstance.getId());
+    }
+    runtimeService.deleteProcessInstances(processInstanceIds, null, true, true);
+
+    //+10 standalone decisions
+    for (int i = 0; i < 10; i++) {
+      engineRule.getDecisionService().evaluateDecisionByKey("testDecision").variables(variables).evaluate();
+    }
+
+    ClockUtil.setCurrentTime(oldCurrentTime);
+
   }
 
   @Test
