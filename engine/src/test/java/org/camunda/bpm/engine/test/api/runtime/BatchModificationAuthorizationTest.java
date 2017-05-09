@@ -2,8 +2,8 @@ package org.camunda.bpm.engine.test.api.runtime;
 
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario.scenario;
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSpec.grant;
+
 import java.util.Collection;
-import java.util.List;
 
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
@@ -18,8 +18,6 @@ import org.camunda.bpm.engine.test.api.authorization.util.AuthorizationTestRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
-import org.camunda.bpm.model.bpmn.Bpmn;
-import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -31,15 +29,12 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public class BatchModificationAuthorizationTest {
 
-  protected static final String TEST_REASON = "test reason";
-  protected static final String JOB_EXCEPTION_DEFINITION_XML = "org/camunda/bpm/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml";
-
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected AuthorizationTestRule authRule = new AuthorizationTestRule(engineRule);
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
   protected BatchModificationHelper helper = new BatchModificationHelper(engineRule);
-  
-  protected ProcessInstance processInstance;
+
+  protected ProcessDefinition processDefinition;
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(authRule).around(testRule);
@@ -70,8 +65,7 @@ public class BatchModificationAuthorizationTest {
 
   @Before
   public void deployProcess() {
-    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
-    processInstance = engineRule.getRuntimeService().startProcessInstanceById(processDefinition.getId());
+    processDefinition = testRule.deployAndGetDefinition(ProcessModels.TWO_TASKS_PROCESS);
   }
 
   @After
@@ -93,48 +87,70 @@ public class BatchModificationAuthorizationTest {
           historicBatch.getId());
     }
   }
-  
+
   @After
   public void removeBatches() {
     helper.removeAllRunningAndHistoricBatches();
   }
-  
 
   @Test
-  public void executeBatchModification() {
+  public void executeAsyncModification() {
     //given
-    BpmnModelInstance instance = Bpmn.createExecutableProcess("process1").startEvent().userTask("user1").userTask("user2").endEvent().done();
-    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
-    
-    ProcessInstance processInstance1 = engineRule.getRuntimeService().startProcessInstanceByKey("process1");
-    ProcessInstance processInstance2 = engineRule.getRuntimeService().startProcessInstanceByKey("process1");
-    
+    ProcessInstance processInstance1 = engineRule.getRuntimeService().startProcessInstanceByKey(ProcessModels.PROCESS_KEY);
+    ProcessInstance processInstance2 = engineRule.getRuntimeService().startProcessInstanceByKey(ProcessModels.PROCESS_KEY);
+
     authRule
         .init(scenario)
         .withUser("userId")
         .bindResource("processInstance1", processInstance1.getId())
         .bindResource("processInstance2", processInstance2.getId())
-        .bindResource("processDefinition", "process1")
+        .bindResource("processDefinition", ProcessModels.PROCESS_KEY)
         .bindResource("batchId", "*")
         .start();
-    
+
     Batch batch = engineRule.getRuntimeService()
         .createModification(processDefinition.getId())
         .processInstanceIds(processInstance1.getId(), processInstance2.getId())
-        .startAfterActivity("user2")
+        .startAfterActivity("userTask2")
         .executeAsync();
 
     Job job = engineRule.getManagementService().createJobQuery()
         .jobDefinitionId(batch.getSeedJobDefinitionId())
         .singleResult();
-    
+
     //seed job
     engineRule.getManagementService().executeJob(job.getId());
 
     for (Job pending : engineRule.getManagementService().createJobQuery().jobDefinitionId(batch.getBatchJobDefinitionId()).list()) {
       engineRule.getManagementService().executeJob(pending.getId());
     }
-    
+
+    // then
+    authRule.assertScenario(scenario);
+  }
+
+  @Test
+  public void executeModification() {
+    //given
+    ProcessInstance processInstance1 = engineRule.getRuntimeService().startProcessInstanceByKey(ProcessModels.PROCESS_KEY);
+    ProcessInstance processInstance2 = engineRule.getRuntimeService().startProcessInstanceByKey(ProcessModels.PROCESS_KEY);
+
+    authRule
+        .init(scenario)
+        .withUser("userId")
+        .bindResource("processInstance1", processInstance1.getId())
+        .bindResource("processInstance2", processInstance2.getId())
+        .bindResource("processDefinition", ProcessModels.PROCESS_KEY)
+        .bindResource("batchId", "*")
+        .start();
+
+    // when
+    engineRule.getRuntimeService()
+        .createModification(processDefinition.getId())
+        .processInstanceIds(processInstance1.getId(), processInstance2.getId())
+        .startAfterActivity("userTask2")
+        .execute();
+
     // then
     authRule.assertScenario(scenario);
   }

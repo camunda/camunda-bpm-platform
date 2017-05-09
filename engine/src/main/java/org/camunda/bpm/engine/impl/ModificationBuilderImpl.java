@@ -13,8 +13,8 @@ import org.camunda.bpm.engine.impl.cmd.AbstractProcessInstanceModificationComman
 import org.camunda.bpm.engine.impl.cmd.ActivityAfterInstantiationCmd;
 import org.camunda.bpm.engine.impl.cmd.ActivityBeforeInstantiationCmd;
 import org.camunda.bpm.engine.impl.cmd.ActivityCancellationCmd;
-import org.camunda.bpm.engine.impl.cmd.ModifyMultipleProcessInstancesBatchCmd;
-import org.camunda.bpm.engine.impl.cmd.ModifyMultipleProcessInstancesCmd;
+import org.camunda.bpm.engine.impl.cmd.ProcessInstanceModificationBatchCmd;
+import org.camunda.bpm.engine.impl.cmd.ProcessInstanceModificationCmd;
 import org.camunda.bpm.engine.impl.cmd.TransitionInstantiationCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.runtime.ModificationBuilder;
@@ -42,28 +42,28 @@ public class ModificationBuilderImpl implements ModificationBuilder {
   @Override
   public ModificationBuilder startBeforeActivity(String activityId) {
     ensureNotNull(NotValidException.class, "activityId", activityId);
-    instructions.add(new ActivityBeforeInstantiationCmd(null, activityId));
+    instructions.add(new ActivityBeforeInstantiationCmd(activityId));
     return this;
   }
 
   @Override
   public ModificationBuilder startAfterActivity(String activityId) {
     ensureNotNull(NotValidException.class, "activityId", activityId);
-    instructions.add(new ActivityAfterInstantiationCmd(null, activityId));
+    instructions.add(new ActivityAfterInstantiationCmd(activityId));
     return this;
   }
 
   @Override
   public ModificationBuilder startTransition(String transitionId) {
     ensureNotNull(NotValidException.class, "transitionId", transitionId);
-    instructions.add(new TransitionInstantiationCmd(null, transitionId));
+    instructions.add(new TransitionInstantiationCmd(transitionId));
     return this;
   }
 
   @Override
   public ModificationBuilder cancelAllForActivity(String activityId) {
     ensureNotNull(NotValidException.class, "activityId", activityId);
-    instructions.add(new ActivityCancellationCmd(null, activityId));
+    instructions.add(new ActivityCancellationCmd(activityId));
     return this;
   }
 
@@ -103,7 +103,7 @@ public class ModificationBuilderImpl implements ModificationBuilder {
   }
 
   public void execute(boolean writeUserOperationLog) {
-    commandExecutor.execute(new ModifyMultipleProcessInstancesCmd(this, writeUserOperationLog));
+    commandExecutor.execute(new ProcessInstanceModificationCmd(this, writeUserOperationLog));
   }
 
   @Override
@@ -113,7 +113,7 @@ public class ModificationBuilderImpl implements ModificationBuilder {
 
   @Override
   public Batch executeAsync() {
-    return commandExecutor.execute(new ModifyMultipleProcessInstancesBatchCmd(this));
+    return commandExecutor.execute(new ProcessInstanceModificationBatchCmd(this));
   }
 
   public CommandExecutor getCommandExecutor() {

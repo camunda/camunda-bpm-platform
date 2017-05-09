@@ -6,7 +6,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import org.camunda.bpm.engine.rest.dto.ModificationExecutionDto;
+import org.camunda.bpm.engine.rest.dto.ModificationDto;
 import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
 
 @Produces(MediaType.APPLICATION_JSON)
@@ -17,11 +17,11 @@ public interface ModificationRestService {
   @POST
   @Path("/execute")
   @Consumes(MediaType.APPLICATION_JSON)
-  void executeModificationPlan(ModificationExecutionDto modificationExecutionDto);
+  void executeModification(ModificationDto modificationExecutionDto);
 
   @POST
   @Path("/executeAsync")
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
-  BatchDto executeModificationPlanAsync(ModificationExecutionDto modificationExecutionDto);
+  BatchDto executeModificationAsync(ModificationDto modificationExecutionDto);
 }

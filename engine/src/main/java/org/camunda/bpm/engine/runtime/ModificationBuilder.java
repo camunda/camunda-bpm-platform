@@ -6,6 +6,7 @@ import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
+import org.camunda.bpm.engine.migration.MigratingProcessInstanceValidationException;
 
 public interface ModificationBuilder extends InstantiationBuilder<ModificationBuilder>{
 
@@ -52,6 +53,12 @@ public interface ModificationBuilder extends InstantiationBuilder<ModificationBu
 
   /**
    * Execute the modification synchronously.
+   *
+   * @throws AuthorizationException
+   *   if the user has not all of the following permissions
+   *   <ul>
+   *      <li>if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE} or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *   </ul>
    */
   void execute();
 

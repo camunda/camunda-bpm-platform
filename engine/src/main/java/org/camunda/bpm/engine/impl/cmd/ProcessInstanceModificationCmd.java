@@ -15,16 +15,15 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 
-public class ModifyMultipleProcessInstancesCmd extends AbstractModificationCmd<Void> {
+public class ProcessInstanceModificationCmd extends AbstractModificationCmd<Void> {
 
   private final static CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
   protected boolean writeUserOperationLog;
 
-  public ModifyMultipleProcessInstancesCmd(ModificationBuilderImpl modificationBuilderImpl, boolean writeUserOperationLog) {
+  public ProcessInstanceModificationCmd(ModificationBuilderImpl modificationBuilderImpl, boolean writeUserOperationLog) {
     super(modificationBuilderImpl);
     this.writeUserOperationLog = writeUserOperationLog;
    }
-
 
   @Override
   public Void execute(final CommandContext commandContext) {
@@ -42,6 +41,9 @@ public class ModifyMultipleProcessInstancesCmd extends AbstractModificationCmd<V
       writeUserOperationLog(commandContext, processDefinition, processInstanceIds.size(), false);
     }
 
+    boolean skipCustomListeners = builder.isSkipCustomListeners();
+    boolean skipIoMappings = builder.isSkipIoMappings();
+
     for (String processInstanceId : processInstanceIds) {
       ExecutionEntity processInstance = commandContext.getExecutionManager().findExecutionById(processInstanceId);
 
@@ -49,11 +51,10 @@ public class ModifyMultipleProcessInstancesCmd extends AbstractModificationCmd<V
       ensureSameProcessDefinition(processInstance, processDefinition.getId());
 
       ProcessInstanceModificationBuilderImpl builder = new ProcessInstanceModificationBuilderImpl(commandContext, processInstanceId);
-      builder.setSkipCustomListeners(this.builder.isSkipCustomListeners());
-      builder.setSkipIoMappings(this.builder.isSkipIoMappings());
       setProcessInstanceId(instructions, processInstanceId);
       builder.setModificationOperations(instructions);
-      new ModifyProcessInstanceCmd(builder, false).execute(commandContext);
+
+      builder.execute(false, skipCustomListeners, skipIoMappings);
     }
 
     return null;
@@ -76,4 +77,5 @@ public class ModifyMultipleProcessInstancesCmd extends AbstractModificationCmd<V
       throw LOG.processInstanceDoesNotExist(processInstanceId);
     }
   }
+
 }

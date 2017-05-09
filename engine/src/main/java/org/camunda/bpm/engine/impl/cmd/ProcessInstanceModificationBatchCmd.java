@@ -22,11 +22,11 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 
-public class ModifyMultipleProcessInstancesBatchCmd extends AbstractModificationCmd<Batch> {
+public class ProcessInstanceModificationBatchCmd extends AbstractModificationCmd<Batch> {
 
   protected static final CommandLogger LOGGER = ProcessEngineLogger.CMD_LOGGER;
 
-  public ModifyMultipleProcessInstancesBatchCmd(ModificationBuilderImpl modificationBuilderImpl) {
+  public ProcessInstanceModificationBatchCmd(ModificationBuilderImpl modificationBuilderImpl) {
     super(modificationBuilderImpl);
   }
 
@@ -61,6 +61,7 @@ public class ModifyMultipleProcessInstancesBatchCmd extends AbstractModification
 
   protected BatchEntity createBatch(CommandContext commandContext, List<AbstractProcessInstanceModificationCommand> instructions,
       Collection<String> processInstanceIds, ProcessDefinitionEntity processDefinition) {
+
     ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
     BatchJobHandler<ModificationBatchConfiguration> batchJobHandler = getBatchJobHandler(processEngineConfiguration);
 
@@ -68,6 +69,7 @@ public class ModifyMultipleProcessInstancesBatchCmd extends AbstractModification
         builder.isSkipCustomListeners(), builder.isSkipIoMappings());
 
     BatchEntity batch = new BatchEntity();
+
     batch.setType(batchJobHandler.getType());
     batch.setTotalJobs(calculateSize(processEngineConfiguration, configuration));
     batch.setBatchJobsPerSeed(processEngineConfiguration.getBatchJobsPerSeed());
@@ -91,6 +93,5 @@ public class ModifyMultipleProcessInstancesBatchCmd extends AbstractModification
     Map<String, BatchJobHandler<?>> batchHandlers = processEngineConfiguration.getBatchHandlers();
     return (BatchJobHandler<ModificationBatchConfiguration>) batchHandlers.get(Batch.TYPE_PROCESS_INSTANCE_MODIFICATION);
   }
-
 
 }

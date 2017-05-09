@@ -226,10 +226,14 @@ public class ProcessInstanceModificationBuilderImpl implements ProcessInstanceMo
 
   @Override
   public void execute(boolean skipCustomListeners, boolean skipIoMappings) {
+    execute(true, skipCustomListeners, skipIoMappings);
+  }
+
+  public void execute(boolean writeUserOperationLog, boolean skipCustomListeners, boolean skipIoMappings) {
     this.skipCustomListeners = skipCustomListeners;
     this.skipIoMappings = skipIoMappings;
 
-    ModifyProcessInstanceCmd cmd = new ModifyProcessInstanceCmd(this);
+    ModifyProcessInstanceCmd cmd = new ModifyProcessInstanceCmd(this, writeUserOperationLog);
     if (commandExecutor != null) {
       commandExecutor.execute(cmd);
     } else {

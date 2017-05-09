@@ -40,23 +40,22 @@ public class ModificationCmdJsonConverter extends JsonObjectConverter<AbstractPr
   @Override
   public AbstractProcessInstanceModificationCommand toObject(JSONObject json) {
 
+    AbstractProcessInstanceModificationCommand cmd = null;
+
     if (json.has(START_BEFORE)) {
-      return new ActivityBeforeInstantiationCmd(null, json.getString(START_BEFORE));
+      cmd = new ActivityBeforeInstantiationCmd(json.getString(START_BEFORE));
+    }
+    else if (json.has(START_AFTER)) {
+      cmd = new ActivityAfterInstantiationCmd(json.getString(START_AFTER));
+    }
+    else if (json.has(START_TRANSITION)) {
+      cmd = new TransitionInstantiationCmd(json.getString(START_TRANSITION));
+    }
+    else if (json.has(CANCEL_ALL)) {
+      cmd = new ActivityCancellationCmd(json.getString(CANCEL_ALL));
     }
 
-    if (json.has(START_AFTER)) {
-      return new ActivityAfterInstantiationCmd(null, json.getString(START_AFTER));
-    }
-
-    if (json.has(START_TRANSITION)) {
-      return new TransitionInstantiationCmd(null, json.getString(START_TRANSITION));
-    }
-
-    if (json.has(CANCEL_ALL)) {
-      return new ActivityCancellationCmd(null, json.getString(CANCEL_ALL));
-    }
-
-    return null;
+    return cmd;
   }
 
 }

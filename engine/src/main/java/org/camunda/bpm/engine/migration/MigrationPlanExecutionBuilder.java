@@ -60,7 +60,8 @@ public interface MigrationPlanExecutionBuilder {
    * @throws AuthorizationException
    *   if the user has not all of the following permissions
    *   <ul>
-   *     <li>{@link Permissions#MIGRATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION} for source and target</li>
+   *      <li>if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE} or</li>
+   *      <li>no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
    *   </ul>
    */
   void execute();

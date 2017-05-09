@@ -29,6 +29,10 @@ public class ActivityBeforeInstantiationCmd extends AbstractInstantiationCmd {
 
   protected String activityId;
 
+  public ActivityBeforeInstantiationCmd(String activityId) {
+    this(null, activityId);
+  }
+
   public ActivityBeforeInstantiationCmd(String processInstanceId, String activityId) {
     this(processInstanceId, activityId, null);
   }

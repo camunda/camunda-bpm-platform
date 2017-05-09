@@ -7,7 +7,7 @@ import javax.ws.rs.core.Response.Status;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.rest.ModificationRestService;
-import org.camunda.bpm.engine.rest.dto.ModificationExecutionDto;
+import org.camunda.bpm.engine.rest.dto.ModificationDto;
 import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
@@ -23,7 +23,7 @@ public class ModificationRestServiceImpl extends AbstractRestProcessEngineAware 
   }
 
   @Override
-  public void executeModificationPlan(ModificationExecutionDto modificationExecutionDto) {
+  public void executeModification(ModificationDto modificationExecutionDto) {
      try {
        createModificationBuilder(modificationExecutionDto).execute();
      } catch (BadUserRequestException e) {
@@ -32,7 +32,7 @@ public class ModificationRestServiceImpl extends AbstractRestProcessEngineAware 
   }
 
   @Override
-  public BatchDto executeModificationPlanAsync(ModificationExecutionDto modificationExecutionDto) {
+  public BatchDto executeModificationAsync(ModificationDto modificationExecutionDto) {
     Batch batch = null;
     try {
       batch = createModificationBuilder(modificationExecutionDto).executeAsync();
@@ -42,7 +42,7 @@ public class ModificationRestServiceImpl extends AbstractRestProcessEngineAware 
     return BatchDto.fromBatch(batch);
   }
 
-  private ModificationBuilder createModificationBuilder(ModificationExecutionDto dto) {
+  private ModificationBuilder createModificationBuilder(ModificationDto dto) {
     ModificationBuilder builder = getProcessEngine().getRuntimeService().createModification(dto.getProcessDefinitionId());
 
     if (dto.getInstructions() != null && !dto.getInstructions().isEmpty()) {

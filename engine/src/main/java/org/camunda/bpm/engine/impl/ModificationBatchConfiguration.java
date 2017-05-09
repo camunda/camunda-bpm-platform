@@ -21,40 +21,20 @@ public class ModificationBatchConfiguration extends BatchConfiguration {
     this.skipIoMappings = skipIoMappings;
   }
 
-  public ModificationBatchConfiguration(List<String> ids, String processDefinitionId) {
-    this(ids, processDefinitionId,  null, false, false);
-  }
-
   public List<AbstractProcessInstanceModificationCommand> getInstructions() {
     return instructions;
-  }
-
-  public void setInstructions(List<AbstractProcessInstanceModificationCommand> instructions) {
-    this.instructions = instructions;
   }
 
   public String getProcessDefinitionId() {
     return processDefinitionId;
   }
 
-  public void setProcessDefinitionId(String processDefinitionId) {
-    this.processDefinitionId = processDefinitionId;
-  }
-
   public boolean isSkipCustomListeners() {
     return skipCustomListeners;
   }
 
-  public void setSkipCustomListeners(boolean skipCustomListeners) {
-    this.skipCustomListeners = skipCustomListeners;
-  }
-
   public boolean isSkipIoMappings() {
     return skipIoMappings;
-  }
-
-  public void setSkipIoMappings(boolean skipIoMappings) {
-    this.skipIoMappings = skipIoMappings;
   }
 
 }

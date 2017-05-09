@@ -9,7 +9,7 @@ import org.camunda.bpm.engine.runtime.ModificationBuilder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class ModificationExecutionDto {
+public class ModificationDto {
 
   protected List<ProcessInstanceModificationInstructionDto> instructions;
   protected List<String> processInstanceIds;

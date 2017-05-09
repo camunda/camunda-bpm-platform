@@ -25,6 +25,10 @@ public class TransitionInstantiationCmd extends AbstractInstantiationCmd {
 
   protected String transitionId;
 
+  public TransitionInstantiationCmd(String transitionId) {
+    this(null, transitionId);
+  }
+
   public TransitionInstantiationCmd(String processInstanceId, String transitionId) {
     this(processInstanceId, transitionId, null);
   }

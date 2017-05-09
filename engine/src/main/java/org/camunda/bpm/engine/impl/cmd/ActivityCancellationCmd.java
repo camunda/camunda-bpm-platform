@@ -34,11 +34,13 @@ public class ActivityCancellationCmd extends AbstractProcessInstanceModification
 
   protected String activityId;
 
+  public ActivityCancellationCmd(String activityId) {
+    this(null, activityId);
+  }
 
   public ActivityCancellationCmd(String processInstanceId, String activityId) {
     super(processInstanceId);
     this.activityId = activityId;
-
   }
 
   @Override

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.ModificationBatchConfiguration;
+import org.camunda.bpm.engine.impl.cmd.AbstractProcessInstanceModificationCommand;
 import org.camunda.bpm.engine.impl.util.JsonUtil;
 import org.camunda.bpm.engine.impl.util.json.JSONObject;
 
@@ -31,13 +32,20 @@ public class ModificationBatchConfigurationJsonConverter extends JsonObjectConve
 
   @Override
   public ModificationBatchConfiguration toObject(JSONObject json) {
-    ModificationBatchConfiguration configuration = new ModificationBatchConfiguration(readProcessInstanceIds(json), json.getString(PROCESS_DEFINITION_ID));
 
-    configuration.setInstructions(JsonUtil.jsonArrayAsList(json.getJSONArray(INSTRUCTIONS), ModificationCmdJsonConverter.INSTANCE));
-    configuration.setSkipCustomListeners(json.getBoolean(SKIP_LISTENERS));
-    configuration.setSkipIoMappings(json.getBoolean(SKIP_IO_MAPPINGS));
+    List<String> processInstanceIds = readProcessInstanceIds(json);
+    String processDefinitionId = json.getString(PROCESS_DEFINITION_ID);
+    List<AbstractProcessInstanceModificationCommand> instructions = JsonUtil.jsonArrayAsList(json.getJSONArray(INSTRUCTIONS),
+        ModificationCmdJsonConverter.INSTANCE);
+    boolean skipCustomListeners = json.getBoolean(SKIP_LISTENERS);
+    boolean skipIoMappings = json.getBoolean(SKIP_IO_MAPPINGS);
 
-    return configuration;
+    return new ModificationBatchConfiguration(
+        processInstanceIds,
+        processDefinitionId,
+        instructions,
+        skipCustomListeners,
+        skipIoMappings);
   }
 
   protected List<String> readProcessInstanceIds(JSONObject jsonObject) {

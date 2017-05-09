@@ -23,7 +23,6 @@ import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.ActivityExecutionTreeMapping;
 import org.camunda.bpm.engine.impl.bpmn.behavior.SequentialMultiInstanceActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
-import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.core.delegate.CoreActivityBehavior;
 import org.camunda.bpm.engine.impl.core.model.CoreModelElement;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -219,7 +218,7 @@ public abstract class AbstractInstantiationCmd extends AbstractProcessInstanceMo
         PvmActivity initialActivity = topMostActivity.getProperties().get(BpmnProperties.INITIAL_ACTIVITY);
         PvmActivity secondTopMostActivity = null;
         if (activitiesToInstantiate.size() > 1) {
-          secondTopMostActivity = (PvmActivity) activitiesToInstantiate.get(1);
+          secondTopMostActivity = activitiesToInstantiate.get(1);
         }
         else if (ActivityImpl.class.isAssignableFrom(elementToInstantiate.getClass())) {
           secondTopMostActivity = (PvmActivity) elementToInstantiate;
