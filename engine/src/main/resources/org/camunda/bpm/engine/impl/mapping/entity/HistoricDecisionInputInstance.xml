@@ -40,20 +40,6 @@
     delete from ${prefix}ACT_HI_DEC_IN where ID_ = #{id}
   </delete>
 
-  <delete id="deleteHistoricDecisionInputInstanceByProcessInstanceIds" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
-    delete from ${prefix}ACT_HI_DEC_IN
-      <include refid="selectHistoricDecisionInstanceIdsByProcessInstanceIdsSql"/>
-  </delete>
-
-  <delete id="deleteHistoricDecisionInputInstanceByteArraysByProcessInstanceIds">
-    delete from ${prefix}ACT_GE_BYTEARRAY
-    where ID_ in
-      (select distinct BYTEARRAY_ID_
-      from ${prefix}ACT_HI_DEC_IN
-          <include refid="selectHistoricDecisionInstanceIdsByProcessInstanceIdsSql"/>
-          and BYTEARRAY_ID_ is not NULL)
-  </delete>
-
   <delete id="deleteHistoricDecisionInputInstanceByDecisionInstanceIds" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
     delete from ${prefix}ACT_HI_DEC_IN
     where DEC_INST_ID_ in
@@ -110,15 +96,5 @@
     </foreach>
     order by CLAUSE_ID_
   </select>
-
-  <sql id="selectHistoricDecisionInstanceIdsByProcessInstanceIdsSql">
-    where DEC_INST_ID_ in
-      (select ID_ from ${prefix}ACT_HI_DECINST
-      where PROC_INST_ID_ in
-        <foreach item="processInstanceId" index="index" collection="list" open="(" separator="," close=")">
-          #{processInstanceId}
-        </foreach>
-      )
-  </sql>
 
 </mapper>

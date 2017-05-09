@@ -384,10 +384,9 @@ public class BulkHistoryDeleteTest {
     final List<String> historicDecisionOutputIds = collectHistoricDecisionOutputIds(historicDecisionInstances);
 
     //when
-    historyService.deleteHistoricProcessInstancesBulk(ids);
+    historyService.deleteHistoricDecisionInstancesBulk(extractIds(historicDecisionInstances));
 
     //then
-    assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKey("testProcess").count());
     assertEquals(0, historyService.createHistoricDecisionInstanceQuery().count());
 
     //check that decision inputs and outputs were removed

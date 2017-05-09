@@ -97,14 +97,6 @@ public class HistoricDecisionInstanceManager extends AbstractHistoricManager {
     getDbEntityManager().deletePreserveOrder(HistoricDecisionInstanceEntity.class, "deleteHistoricDecisionInstanceByIds", decisionInstanceIds);
   }
 
-  public void deleteHistoricDecisionInstanceByProcessInstanceIds(List<String> processInstanceIds) {
-    getDbEntityManager().deletePreserveOrder(ByteArrayEntity.class, "deleteHistoricDecisionInputInstanceByteArraysByProcessInstanceIds", processInstanceIds);
-    getDbEntityManager().deletePreserveOrder(ByteArrayEntity.class, "deleteHistoricDecisionOutputInstanceByteArraysByProcessInstanceIds", processInstanceIds);
-    getDbEntityManager().deletePreserveOrder(HistoricDecisionInputInstanceEntity.class, "deleteHistoricDecisionInputInstanceByProcessInstanceIds", processInstanceIds);
-    getDbEntityManager().deletePreserveOrder(HistoricDecisionOutputInstanceEntity.class, "deleteHistoricDecisionOutputInstanceByProcessInstanceIds", processInstanceIds);
-    getDbEntityManager().deletePreserveOrder(HistoricDecisionInstanceEntity.class, "deleteHistoricDecisionInstanceByProcessInstanceIds", processInstanceIds);
-  }
-
   protected void deleteHistoricDecisionInputAndOutputInstances(String historicDecisionInstanceId) {
     Set<String> decisionInstanceIds = new HashSet<String>();
     decisionInstanceIds.add(historicDecisionInstanceId);

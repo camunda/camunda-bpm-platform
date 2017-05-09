@@ -164,7 +164,7 @@ public class HistoryCleanupTest {
   @Test
   @Deployment(resources = {"org/camunda/bpm/engine/test/dmn/businessruletask/DmnBusinessRuleTaskTest.testDecisionRef.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/history/testDmnWithPojo.dmn11.xml" })
-  public void testHistoryCleanupStandaloneDesicionInstances() {
+  public void testHistoryCleanupWithDesicionInstancesOnlyDecisionInstancesRemoved() {
     //given
     prepareDecisionInstances(null, 5);
 
@@ -175,14 +175,14 @@ public class HistoryCleanupTest {
     managementService.executeJob(jobId);
 
     //then
-    assertResult(6);
-    assertEquals(3, historyService.createHistoricDecisionInstanceQuery().count());
+    assertEquals(3, historyService.createHistoricProcessInstanceQuery().count());
+    assertEquals(0, historyService.createHistoricDecisionInstanceQuery().count());
   }
 
   @Test
   @Deployment(resources = {"org/camunda/bpm/engine/test/dmn/businessruletask/DmnBusinessRuleTaskTest.testDecisionRef.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/history/testDmnWithPojo.dmn11.xml" })
-  public void testHistoryCleanupStandaloneDesicionInstancesNotRemoved() {
+  public void testHistoryCleanupWithDesicionInstancesOnlyProcessInstancesRemoved() {
     //given
     prepareDecisionInstances(5, null);
 
@@ -193,14 +193,14 @@ public class HistoryCleanupTest {
     managementService.executeJob(jobId);
 
     //then
-    assertResult(10);
-    assertEquals(10, historyService.createHistoricDecisionInstanceQuery().count());
+    assertEquals(0, historyService.createHistoricProcessInstanceQuery().count());
+    assertEquals(13, historyService.createHistoricDecisionInstanceQuery().count());
   }
 
   @Test
   @Deployment(resources = {"org/camunda/bpm/engine/test/dmn/businessruletask/DmnBusinessRuleTaskTest.testDecisionRef.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/history/testDmnWithPojo.dmn11.xml" })
-  public void testHistoryCleanupStandaloneDesicionInstancesEverythingRemoved() {
+  public void testHistoryCleanupWithDesicionInstancesEverythingRemoved() {
     //given
     prepareDecisionInstances(5, 5);
 

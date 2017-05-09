@@ -55,13 +55,6 @@
     delete from ${prefix}ACT_HI_DECINST where ID_ = #{id}
   </delete>
 
-  <delete id="deleteHistoricDecisionInstanceByProcessInstanceIds">
-      delete from ${prefix}ACT_HI_DECINST where PROC_INST_ID_ IN
-      <foreach item="processInstanceId" index="index" collection="list" open="(" separator="," close=")">
-          #{processInstanceId}
-      </foreach>
-  </delete>
-
   <delete id="deleteHistoricDecisionInstanceByIds">
     delete from ${prefix}ACT_HI_DECINST where ID_ IN
     <foreach item="decisionInstanceId" index="index" collection="list" open="(" separator="," close=")">
@@ -277,7 +270,6 @@
         where
         di.DEC_DEF_ID_ = dd.ID_
         AND not dd.HISTORY_TTL_ is NULL
-        AND di.PROC_INST_ID_ is NULL
     </sql>
 
   <select id="selectHistoricDecisionInstanceIdsForCleanup" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
