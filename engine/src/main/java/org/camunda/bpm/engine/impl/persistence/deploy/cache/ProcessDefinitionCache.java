@@ -28,14 +28,6 @@ public class ProcessDefinitionCache extends ResourceDefinitionCache<ProcessDefin
     super(factory, cacheCapacity, cacheDeployer);
   }
 
-  public ProcessDefinitionEntity resolveDefinition(ProcessDefinitionEntity processDefinition) {
-    ProcessDefinitionEntity entity = super.resolveDefinition(processDefinition);
-    if (entity != null) {
-      entity.updateModifiableFieldsFromEntity(processDefinition);
-    }
-    return entity;
-  }
-
   @Override
   protected AbstractResourceDefinitionManager<ProcessDefinitionEntity> getManager() {
     return Context.getCommandContext().getProcessDefinitionManager();
