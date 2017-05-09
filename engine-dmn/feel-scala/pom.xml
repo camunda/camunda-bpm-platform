@@ -20,6 +20,7 @@
     <dependency>
       <groupId>org.camunda.bpm.dmn</groupId>
       <artifactId>camunda-engine-feel-api</artifactId>
+      <scope>provided</scope>
     </dependency>
     
     <dependency>
