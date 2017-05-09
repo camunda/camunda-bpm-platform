@@ -84,15 +84,15 @@ public class DeployCmd implements Command<DeploymentWithDefinitions>, Serializab
 
   @Override
   public DeploymentWithDefinitions execute(final CommandContext commandContext) {
-    if (commandContext.getProcessEngineConfiguration().isParallelDeploymentsEnabled()) {
-      return doExecute(commandContext);
-    } else {
+    if (commandContext.getProcessEngineConfiguration().isDeploymentSynchronized()) {
       // ensure serial processing of multiple deployments on the same node.
       // We experienced deadlock situations with highly concurrent deployment of multiple
       // applications on Jboss & Wildfly
       synchronized (ProcessEngine.class) {
         return doExecute(commandContext);
       }
+    } else {
+      return doExecute(commandContext);
     }
   }
 
@@ -539,7 +539,7 @@ public class DeployCmd implements Command<DeploymentWithDefinitions>, Serializab
    *          the current deployment
    * @param processKeysToRegisterFor
    *          the process keys this process application wants to register
-   * @param deploymentsToRegister
+   * @param deployment
    *          the set where to add further deployments this process application
    *          should be registered for
    * @return a set of deployment ids that contain versions of the

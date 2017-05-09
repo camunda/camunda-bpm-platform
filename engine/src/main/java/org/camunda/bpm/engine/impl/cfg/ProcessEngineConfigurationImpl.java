@@ -602,9 +602,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected boolean isDeploymentLockUsed = true;
 
   /**
-   * If true then several deployments may be processed in parallel on one engine node.
+   * If true then several deployments will be processed strictly sequentally. When false they may be processed in parallel.
    */
-  protected boolean isParallelDeploymentsEnabled = false;
+  protected boolean isDeploymentSynchronized = true;
 
   /**
    * Allows setting whether the process engine should try reusing the first level entity cache.
@@ -3245,18 +3245,19 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   }
 
   /**
-   * @return true if it's allowed to process several deployments in parallel on one engine node.
+   * @return true if deployment processing must be synchronized
    */
-  public boolean isParallelDeploymentsEnabled() {
-    return isParallelDeploymentsEnabled;
+  public boolean isDeploymentSynchronized() {
+    return isDeploymentSynchronized;
   }
 
   /**
-   * Sets if it's allowed to processed several deployments in parallel on one engine node.
-   * @param parallelDeploymentsEnabled true when allowed.
+   * Sets if deployment processing must be synchronized.
+   * @param deploymentSynchronized {@code true} when deployment must be synchronized,
+   * {@code false} when several depoloyments may be processed in parallel
    */
-  public void setParallelDeploymentsEnabled(boolean parallelDeploymentsEnabled) {
-    isParallelDeploymentsEnabled = parallelDeploymentsEnabled;
+  public void setDeploymentSynchronized(boolean deploymentSynchronized) {
+    isDeploymentSynchronized = deploymentSynchronized;
   }
 
   public boolean isCmmnEnabled() {
