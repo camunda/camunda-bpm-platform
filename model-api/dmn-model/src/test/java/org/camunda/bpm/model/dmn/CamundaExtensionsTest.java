@@ -32,7 +32,7 @@ public class CamundaExtensionsTest {
 
   private final DmnModelInstance originalModelInstance;
   private DmnModelInstance modelInstance;
-  
+
    @Parameters(name="Namespace: {0}")
    public static Collection<Object[]> parameters(){
      return Arrays.asList(new Object[][]{
@@ -47,7 +47,7 @@ public class CamundaExtensionsTest {
   }
 
   @Before
-  public void parseModel() {  
+  public void parseModel() {
     modelInstance = originalModelInstance.clone();
 
   }
@@ -66,6 +66,14 @@ public class CamundaExtensionsTest {
     assertThat(decision.getCamundaHistoryTimeToLive()).isEqualTo(5);
     decision.setCamundaHistoryTimeToLive(6);
     assertThat(decision.getCamundaHistoryTimeToLive()).isEqualTo(6);
+  }
+
+  @Test
+  public void testCamundaVersionTag() {
+    Decision decision = modelInstance.getModelElementById("decision");
+    assertThat(decision.getVersionTag()).isEqualTo("1.0.0");
+    decision.setVersionTag("1.1.0");
+    assertThat(decision.getVersionTag()).isEqualTo("1.1.0");
   }
 
   @After

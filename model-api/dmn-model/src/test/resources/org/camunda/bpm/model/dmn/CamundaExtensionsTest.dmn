@@ -4,7 +4,7 @@
              id="definitions"
              name="definitions"
              namespace="http://camunda.org/schema/1.0/dmn">
-  <decision id="decision" name="Check Order" camunda:historyTimeToLive="5">
+  <decision id="decision" name="Check Order" camunda:historyTimeToLive="5" camunda:versionTag="1.0.0">
     <decisionTable id="decisionTable">
       <input id="input" camunda:inputVariable="myVariable">
         <inputExpression/>

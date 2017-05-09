@@ -55,4 +55,8 @@ public interface Decision extends DrgElement {
   Integer getCamundaHistoryTimeToLive();
 
   void setCamundaHistoryTimeToLive(Integer inputVariable);
+
+  String getVersionTag();
+
+  void setVersionTag(String inputValue);
 }

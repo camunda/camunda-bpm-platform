@@ -43,7 +43,9 @@ public class DecisionTest extends DmnModelElementInstanceTest {
 
   public Collection<AttributeAssumption> getAttributesAssumptions() {
     return Arrays.asList(
-        new AttributeAssumption(CAMUNDA_NS, "historyTimeToLive"));
+      new AttributeAssumption(CAMUNDA_NS, "versionTag"),
+      new AttributeAssumption(CAMUNDA_NS, "historyTimeToLive")
+    );
   }
 
 }
