@@ -125,7 +125,7 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
     .when()
       .post(EXECUTE_MODIFICATION_ASYNC_URL);
 
-    verify(runtimeServiceMock).createModification("processDefinitionId");
+    verify(runtimeServiceMock).createModification(null);
     verify(modificationBuilderMock).processInstanceIds(eq(Arrays.asList("100", "20")));
     verify(modificationBuilderMock).cancelAllForActivity("activityId");
     verify(modificationBuilderMock).startBeforeActivity("activityId");
@@ -163,7 +163,7 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
     .when()
       .post(EXECUTE_MODIFICATION_SYNC_URL);
 
-    verify(runtimeServiceMock).createModification("processDefinitionId");
+    verify(runtimeServiceMock).createModification(null);
     verify(modificationBuilderMock).processInstanceIds(eq(Arrays.asList("100", "20")));
     verify(modificationBuilderMock).cancelAllForActivity("activityId");
     verify(modificationBuilderMock).startBeforeActivity("activityId");
