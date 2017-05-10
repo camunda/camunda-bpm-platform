@@ -75,6 +75,7 @@ public final class BpmnTestConstants {
   public static final String TEST_PROCESS_JOB_PRIORITY = "15";
   public static final String TEST_PROCESS_TASK_PRIORITY = "13";
   public static final String TEST_SERVICE_TASK_PRIORITY = "${test}";
+  public static final Integer TEST_HISTORY_TIME_TO_LIVE = 5;
 
   public static final String TEST_CONDITION = "${true}";
   public static final String TEST_CONDITIONAL_VARIABLE_NAME = "variable";

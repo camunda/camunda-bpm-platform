@@ -47,6 +47,7 @@ public class ProcessTest extends BpmnModelElementInstanceTest {
     );
   }
 
+  @Override
   public Collection<AttributeAssumption> getAttributesAssumptions() {
     return Arrays.asList(
       new AttributeAssumption("processType", false, false, ProcessType.None),
@@ -57,7 +58,8 @@ public class ProcessTest extends BpmnModelElementInstanceTest {
       new AttributeAssumption(CAMUNDA_NS, "candidateStarterGroups"),
       new AttributeAssumption(CAMUNDA_NS, "candidateStarterUsers"),
       new AttributeAssumption(CAMUNDA_NS, "jobPriority"),
-      new AttributeAssumption(CAMUNDA_NS, "taskPriority")
+      new AttributeAssumption(CAMUNDA_NS, "taskPriority"),
+      new AttributeAssumption(CAMUNDA_NS, "historyTimeToLive")
     );
   }
 
@@ -80,5 +82,16 @@ public class ProcessTest extends BpmnModelElementInstanceTest {
     proc.setCamundaTaskPriority(BpmnTestConstants.TEST_PROCESS_TASK_PRIORITY);
     //then
     assertThat(proc.getCamundaTaskPriority()).isEqualTo(BpmnTestConstants.TEST_PROCESS_TASK_PRIORITY);    
+  }
+
+  @Test
+  public void testCamundaHistoryTimeToLive() {
+    //given
+    Process proc = modelInstance.newInstance(Process.class);
+    assertThat(proc.getCamundaHistoryTimeToLive()).isNull();
+    //when
+    proc.setCamundaHistoryTimeToLive(BpmnTestConstants.TEST_HISTORY_TIME_TO_LIVE);
+    //then
+    assertThat(proc.getCamundaHistoryTimeToLive()).isEqualTo(BpmnTestConstants.TEST_HISTORY_TIME_TO_LIVE);
   }
 }

@@ -59,8 +59,11 @@ public class CompatabilityTest {
     String priority = "9000";
     process.setCamundaJobPriority(priority);
     process.setCamundaTaskPriority(priority);
+    Integer historyTimeToLive = 10;
+    process.setCamundaHistoryTimeToLive(historyTimeToLive);
     assertThat(process.getAttributeValueNs(BpmnModelConstants.ACTIVITI_NS, "jobPriority"), is(priority));
     assertThat(process.getAttributeValueNs(BpmnModelConstants.ACTIVITI_NS, "taskPriority"), is(priority));
+    assertThat(process.getAttributeValueNs(BpmnModelConstants.ACTIVITI_NS, "historyTimeToLive"), is(historyTimeToLive.toString()));
   }
 
 }

@@ -75,4 +75,15 @@ public abstract class AbstractProcessBuilder<B extends AbstractProcessBuilder<B>
     return myself;
   }
 
+  /**
+   * Sets the camunda history time to live.
+   *
+   * @param historyTimeToLive value for history time to live, must be either null or non-negative integer.
+   * @return the builder object
+   */
+  public B camundaHistoryTimeToLive(Integer historyTimeToLive) {
+    element.setCamundaHistoryTimeToLive(historyTimeToLive);
+    return myself;
+  }
+
 }

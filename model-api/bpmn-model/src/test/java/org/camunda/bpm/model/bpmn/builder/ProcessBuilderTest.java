@@ -28,6 +28,7 @@ import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_EXPRESSION_API;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_FOLLOW_UP_DATE_API;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_GROUPS_API;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_GROUPS_LIST_API;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_HISTORY_TIME_TO_LIVE;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_PRIORITY_API;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_PROCESS_TASK_PRIORITY;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_SERVICE_TASK_PRIORITY;
@@ -485,6 +486,7 @@ public class ProcessBuilderTest {
     modelInstance = Bpmn.createProcess(PROCESS_ID)
       .camundaJobPriority("${somePriority}")
       .camundaTaskPriority(TEST_PROCESS_TASK_PRIORITY)
+      .camundaHistoryTimeToLive(TEST_HISTORY_TIME_TO_LIVE)
       .startEvent()
       .endEvent()
       .done();
@@ -492,6 +494,7 @@ public class ProcessBuilderTest {
     Process process = modelInstance.getModelElementById(PROCESS_ID);
     assertThat(process.getCamundaJobPriority()).isEqualTo("${somePriority}");
     assertThat(process.getCamundaTaskPriority()).isEqualTo(TEST_PROCESS_TASK_PRIORITY);
+    assertThat(process.getCamundaHistoryTimeToLive()).isEqualTo(TEST_HISTORY_TIME_TO_LIVE);
   }
 
   @Test

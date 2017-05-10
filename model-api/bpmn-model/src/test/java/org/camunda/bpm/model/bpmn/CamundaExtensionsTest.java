@@ -38,6 +38,7 @@ import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_GROUPS_API;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_GROUPS_LIST_API;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_GROUPS_LIST_XML;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_GROUPS_XML;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_HISTORY_TIME_TO_LIVE;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_PRIORITY_API;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_PRIORITY_XML;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_PROCESS_JOB_PRIORITY;
@@ -240,6 +241,11 @@ public class CamundaExtensionsTest {
   @Test
   public void testProcessTaskPriority() {
     assertThat(process.getCamundaTaskPriority()).isEqualTo(TEST_PROCESS_TASK_PRIORITY);
+  }
+
+  @Test
+  public void testHistoryTimeToLive() {
+    assertThat(process.getCamundaHistoryTimeToLive()).isEqualTo(TEST_HISTORY_TIME_TO_LIVE);
   }
 
   @Test
