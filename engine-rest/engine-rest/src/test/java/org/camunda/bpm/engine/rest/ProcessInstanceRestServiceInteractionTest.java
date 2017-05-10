@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
+import org.camunda.bpm.engine.impl.HistoricProcessInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.HistoryServiceImpl;
 import org.camunda.bpm.engine.impl.ManagementServiceImpl;
 import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
@@ -316,10 +317,9 @@ public class ProcessInstanceRestServiceInteractionTest extends
       anyBoolean()))
     .thenReturn(new BatchEntity());
 
-    HistoricProcessInstanceQuery mockedHistoricProcessInstanceQuery = mock(HistoricProcessInstanceQuery.class);
+    HistoricProcessInstanceQuery mockedHistoricProcessInstanceQuery = mock(HistoricProcessInstanceQueryImpl.class);
     when(historyServiceMock.createHistoricProcessInstanceQuery()).thenReturn(mockedHistoricProcessInstanceQuery);
-    List<HistoricProcessInstance> historicProcessInstances = MockProvider.createMockRunningHistoricProcessInstances();
-    when(mockedHistoricProcessInstanceQuery.list()).thenReturn(historicProcessInstances);
+    when(((HistoricProcessInstanceQueryImpl) mockedHistoricProcessInstanceQuery).listIds()).thenReturn(Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID));
 
     DeleteProcessInstancesDto body = new DeleteProcessInstancesDto();
     body.setHistoricProcessInstanceQuery(new HistoricProcessInstanceQueryDto());
@@ -373,14 +373,13 @@ public class ProcessInstanceRestServiceInteractionTest extends
       anyBoolean()))
     .thenReturn(new BatchEntity());
 
-    HistoricProcessInstanceQuery mockedHistoricProcessInstanceQuery = mock(HistoricProcessInstanceQuery.class);
+    HistoricProcessInstanceQuery mockedHistoricProcessInstanceQuery = mock(HistoricProcessInstanceQueryImpl.class);
     when(historyServiceMock.createHistoricProcessInstanceQuery()).thenReturn(mockedHistoricProcessInstanceQuery);
-    List<HistoricProcessInstance> historicProcessInstances = MockProvider.createMockRunningHistoricProcessInstances();
-    when(mockedHistoricProcessInstanceQuery.list()).thenReturn(historicProcessInstances);
+    when(((HistoricProcessInstanceQueryImpl) mockedHistoricProcessInstanceQuery).listIds()).thenReturn(Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID));
 
     DeleteProcessInstancesDto body = new DeleteProcessInstancesDto();
     body.setHistoricProcessInstanceQuery(new HistoricProcessInstanceQueryDto());
-    body.setProcessInstanceIds(Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID));
+    body.setProcessInstanceIds(Arrays.asList(MockProvider.ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID));
 
     given()
       .contentType(ContentType.JSON).body(body)
@@ -390,7 +389,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
     verify(runtimeServiceMock,
       times(1)).deleteProcessInstancesAsync(
-      Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, MockProvider.EXAMPLE_PROCESS_INSTANCE_ID),
+      Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, MockProvider.ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID),
       null,
       null,
       false);
@@ -400,7 +399,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
   public void testDeleteAsyncHistoricQueryBasedWithoutQueryAndWithoutProcessInstanceIds() {
     doThrow(new BadUserRequestException("processInstanceIds is empty"))
       .when(runtimeServiceMock).deleteProcessInstancesAsync(
-        eq((List<String>) null),
+        anyListOf(String.class),
         eq((ProcessInstanceQuery) null),
         anyString(),
         anyBoolean());
@@ -413,7 +412,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
     verify(runtimeServiceMock,
       times(1)).deleteProcessInstancesAsync(
-        null,
+        new ArrayList<String>(),
         null,
         null,
         false);
@@ -439,7 +438,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
     verify(runtimeServiceMock,
       times(1)).deleteProcessInstancesAsync(
-        null,
+        new ArrayList<String>(),
         null,
         MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_DELETE_REASON,
         false);
@@ -465,7 +464,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
     verify(runtimeServiceMock,
       times(1)).deleteProcessInstancesAsync(
-      null,
+      new ArrayList<String>(),
       null,
       null,
       true);

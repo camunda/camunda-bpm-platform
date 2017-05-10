@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
+import org.camunda.bpm.engine.impl.HistoricProcessInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 import org.camunda.bpm.engine.rest.ProcessInstanceRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
@@ -153,24 +154,10 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
 
   @Override
   public BatchDto deleteAsyncHistoricQueryBased(DeleteProcessInstancesDto deleteProcessInstancesDto) {
-    try {
-      EnsureUtil.ensureNotNull("deleteProcessInstancesDto", deleteProcessInstancesDto);
-    } catch (NullValueException e) {
-      throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());
-    }
-
-    RuntimeService runtimeService = getProcessEngine().getRuntimeService();
-
-    List<HistoricProcessInstance> historicProcessInstances = null;
-    if (deleteProcessInstancesDto.getHistoricProcessInstanceQuery() != null) {
-      historicProcessInstances = deleteProcessInstancesDto.getHistoricProcessInstanceQuery().toQuery(getProcessEngine()).list();
-    }
-
     List<String> processInstanceIds = new ArrayList<String>();
-    if (historicProcessInstances != null) {
-      for (HistoricProcessInstance historicProcessInstance: historicProcessInstances) {
-        processInstanceIds.add(historicProcessInstance.getId());
-      }
+    if (deleteProcessInstancesDto.getHistoricProcessInstanceQuery() != null) {
+      processInstanceIds.addAll(((HistoricProcessInstanceQueryImpl) deleteProcessInstancesDto
+        .getHistoricProcessInstanceQuery().toQuery(getProcessEngine())).listIds());
     }
 
     if (deleteProcessInstancesDto.getProcessInstanceIds() != null) {
@@ -181,8 +168,8 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
 
     try {
 
-      batch = runtimeService.deleteProcessInstancesAsync(
-        processInstanceIds.isEmpty() ? null : processInstanceIds,
+      batch = getProcessEngine().getRuntimeService().deleteProcessInstancesAsync(
+        processInstanceIds,
         null,
         deleteProcessInstancesDto.getDeleteReason(),
         deleteProcessInstancesDto.isSkipCustomListeners());
