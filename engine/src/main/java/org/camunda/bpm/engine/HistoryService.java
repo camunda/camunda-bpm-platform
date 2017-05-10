@@ -244,6 +244,13 @@ public interface HistoryService {
   void deleteHistoricCaseInstance(String caseInstanceId);
 
   /**
+   * Deletes historic case instances and all related historic data in bulk manner.
+   *
+   * @param caseInstanceIds list of case instance ids for removal
+   */
+  void deleteHistoricCaseInstancesBulk(List<String> caseInstanceIds);
+
+  /**
    * Deletes historic decision instances of a decision definition. All historic
    * decision inputs and outputs are deleted as well.
    *
@@ -286,7 +293,7 @@ public interface HistoryService {
   /**
    * Deletes historic decision instances by its id. All historic
    * decision inputs and outputs are deleted as well.
-   * 
+   *
    * @param historicDecisionInstanceId
    *          the id of the historic decision instance
    * @throws AuthorizationException

@@ -21,7 +21,7 @@ import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.impl.HistoricDetailQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
+import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.history.event.HistoricDetailEventEntity;
 import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
 
@@ -51,6 +51,13 @@ public class HistoricDetailManager extends AbstractHistoricManager {
 
   public void deleteHistoricDetailsByCaseInstanceId(String historicCaseInstanceId) {
     deleteHistoricDetailsByProcessCaseInstanceId(null, historicCaseInstanceId);
+  }
+
+  public void deleteHistoricDetailsByCaseInstanceIds(List<String> historicCaseInstanceIds) {
+    DbEntityManager dbEntityManager = Context.getCommandContext().getDbEntityManager();
+
+    dbEntityManager.deletePreserveOrder(ByteArrayEntity.class,  "deleteHistoricDetailByteArraysByCaseInstanceIds", historicCaseInstanceIds);
+    dbEntityManager.deletePreserveOrder(HistoricDetailEventEntity.class, "deleteHistoricDetailsByCaseInstanceIds", historicCaseInstanceIds);
   }
 
   public void deleteHistoricDetailsByProcessCaseInstanceId(String historicProcessInstanceId, String historicCaseInstanceId) {

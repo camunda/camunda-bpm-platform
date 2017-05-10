@@ -139,6 +139,20 @@
         and BYTEARRAY_ID_ is not NULL)
   </delete>
 
+  <delete id="deleteHistoricDetailsByCaseInstanceIds" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
+    delete from ${prefix}ACT_HI_DETAIL
+    <include refid="selectHistoricDetailsByCaseInstanceIdsSql"/>
+  </delete>
+
+  <delete id="deleteHistoricDetailByteArraysByCaseInstanceIds">
+    delete from ${prefix}ACT_GE_BYTEARRAY
+    where ID_ in
+      (select DISTINCT BYTEARRAY_ID_
+      from ${prefix}ACT_HI_DETAIL RES
+        <include refid="selectHistoricDetailsByCaseInstanceIdsSql"/>
+        and BYTEARRAY_ID_ is not NULL)
+  </delete>
+
   <delete id="deleteHistoricDetailsByTaskProcessInstanceIds" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
     delete from ${prefix}ACT_HI_DETAIL
     <include refid="selectHistoricDetailsByTaskProcessInstanceIdsSql"/>
@@ -305,6 +319,13 @@
     where PROC_INST_ID_ IN
       <foreach item="processInstanceId" index="index" collection="list" open="(" separator="," close=")">
         #{processInstanceId}
+      </foreach>
+  </sql>
+
+  <sql id="selectHistoricDetailsByCaseInstanceIdsSql">
+    where CASE_INST_ID_ IN
+      <foreach item="caseInstanceId" index="index" collection="list" open="(" separator="," close=")">
+        #{caseInstanceId}
       </foreach>
   </sql>
 

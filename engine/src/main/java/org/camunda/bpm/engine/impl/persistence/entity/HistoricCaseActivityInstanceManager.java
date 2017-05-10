@@ -34,6 +34,12 @@ public class HistoricCaseActivityInstanceManager extends AbstractHistoricManager
     }
   }
 
+  public void deleteHistoricCaseActivityInstancesByCaseInstanceIds(List<String> historicCaseInstanceIds) {
+    if (isHistoryEnabled()) {
+      getDbEntityManager().delete(HistoricCaseActivityInstanceEntity.class, "deleteHistoricCaseActivityInstancesByCaseInstanceIds", historicCaseInstanceIds);
+    }
+  }
+
   public void insertHistoricCaseActivityInstance(HistoricCaseActivityInstanceEntity historicCaseActivityInstance) {
     getDbEntityManager().insert(historicCaseActivityInstance);
   }

@@ -57,7 +57,17 @@
       </foreach>
     )
   </delete>
-  
+
+  <delete id="deleteHistoricIdentityLinksByTaskCaseInstanceIds">
+    delete from ${prefix}ACT_HI_IDENTITYLINK
+    where TASK_ID_ IN
+    (select distinct ID_ from ${prefix}ACT_HI_TASKINST
+      where CASE_INST_ID_ in
+      <foreach item="caseInstanceId" index="index" collection="list" open="(" separator="," close=")">
+        #{caseInstanceId}
+      </foreach>
+    )
+  </delete>
   <!-- HISTORIC IDENTITY LINK RESULTMAP -->
 
   <resultMap id="historicIdentityLinkResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.HistoricIdentityLinkLogEntity">

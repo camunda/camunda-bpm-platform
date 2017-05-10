@@ -72,6 +72,10 @@ public class CommentManager extends AbstractHistoricManager {
     getDbEntityManager().deletePreserveOrder(CommentEntity.class, "deleteCommentsByTaskProcessInstanceIds", processInstanceIds);
   }
 
+  public void deleteCommentsByTaskCaseInstanceIds(List<String> historicCaseInstanceIds) {
+    getDbEntityManager().deletePreserveOrder(CommentEntity.class, "deleteCommentsByTaskCaseInstanceIds", historicCaseInstanceIds);
+  }
+
   @SuppressWarnings("unchecked")
   public List<Comment> findCommentsByProcessInstanceId(String processInstanceId) {
     checkHistoryEnabled();

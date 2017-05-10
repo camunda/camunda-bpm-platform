@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
+import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
 import org.camunda.bpm.engine.task.Attachment;
@@ -69,6 +69,13 @@ public class AttachmentManager extends AbstractHistoricManager {
         .getDbEntityManager().deletePreserveOrder(ByteArrayEntity.class, "deleteAttachmentByteArraysByTaskProcessInstanceIds", processInstanceIds);
     commandContext
         .getDbEntityManager().deletePreserveOrder(AttachmentEntity.class, "deleteAttachmentByTaskProcessInstanceIds", processInstanceIds);
+  }
+
+  public void deleteAttachmentsByTaskCaseInstanceIds(List<String> caseInstanceIds) {
+    DbEntityManager entityManager = Context.getCommandContext().getDbEntityManager();
+
+    entityManager.deletePreserveOrder(ByteArrayEntity.class, "deleteAttachmentByteArraysByTaskCaseInstanceIds", caseInstanceIds);
+    entityManager.deletePreserveOrder(AttachmentEntity.class, "deleteAttachmentByTaskCaseInstanceIds", caseInstanceIds);
   }
 
   public Attachment findAttachmentByTaskIdAndAttachmentId(String taskId, String attachmentId) {

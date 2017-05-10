@@ -127,10 +127,15 @@ public abstract class HistoryCleanupHelper {
       }
     }
 
-    //TODO case instances
+    //if batch is not full, add case instance ids
+    if (historyCleanupBatch.size() < batchSize && commandContext.getProcessEngineConfiguration().isCmmnEnabled()) {
+      final List<String> historicCaseInstanceIds = commandContext.getHistoricCaseInstanceManager()
+          .findHistoricCaseInstanceIdsForCleanup(batchSize - historyCleanupBatch.size());
+      if (historicCaseInstanceIds != null && historicCaseInstanceIds.size() > 0) {
+        historyCleanupBatch.setHistoricCaseInstanceIds(historicCaseInstanceIds);
+      }
+    }
 
     return historyCleanupBatch;
   }
-
-
 }

@@ -21,9 +21,11 @@ import org.camunda.bpm.engine.history.HistoricCaseInstance;
 import org.camunda.bpm.engine.impl.HistoricCaseInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.history.event.HistoricCaseInstanceEventEntity;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 
 
 /**
@@ -82,6 +84,31 @@ public class HistoricCaseInstanceManager extends AbstractHistoricManager {
     }
   }
 
+  public void deleteHistoricCaseInstancesByIds(List<String> historicCaseInstanceIds) {
+    if (isHistoryEnabled()) {
+      CommandContext commandContext = Context.getCommandContext();
+
+      commandContext
+        .getHistoricDetailManager()
+        .deleteHistoricDetailsByCaseInstanceIds(historicCaseInstanceIds);
+
+      commandContext
+        .getHistoricVariableInstanceManager()
+        .deleteHistoricVariableInstancesByCaseInstanceIds(historicCaseInstanceIds);
+
+      commandContext
+        .getHistoricCaseActivityInstanceManager()
+        .deleteHistoricCaseActivityInstancesByCaseInstanceIds(historicCaseInstanceIds);
+
+      commandContext
+        .getHistoricTaskInstanceManager()
+        .deleteHistoricTaskInstancesByCaseInstanceIds(historicCaseInstanceIds);
+
+      commandContext.getDbEntityManager().delete(HistoricCaseInstanceEntity.class, "deleteHistoricCaseInstancesByIds", historicCaseInstanceIds);
+
+    }
+  }
+
   public long findHistoricCaseInstanceCountByQueryCriteria(HistoricCaseInstanceQueryImpl historicCaseInstanceQuery) {
     if (isHistoryEnabled()) {
       configureHistoricCaseInstanceQuery(historicCaseInstanceQuery);
@@ -110,6 +137,14 @@ public class HistoricCaseInstanceManager extends AbstractHistoricManager {
 
   protected void configureHistoricCaseInstanceQuery(HistoricCaseInstanceQueryImpl query) {
     getTenantManager().configureQuery(query);
+  }
+
+  public List<String> findHistoricCaseInstanceIdsForCleanup(int batchSize) {
+    ListQueryParameterObject parameterObject = new ListQueryParameterObject();
+    parameterObject.setParameter(ClockUtil.getCurrentTime());
+    parameterObject.setFirstResult(0);
+    parameterObject.setMaxResults(batchSize);
+    return (List<String>) getDbEntityManager().selectList("selectHistoricCaseInstanceIdsForCleanup", parameterObject);
   }
 
 }

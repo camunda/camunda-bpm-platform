@@ -36,8 +36,12 @@ public class HistoricIdentityLinkLogManager extends AbstractHistoricManager {
     }
   }
 
-  public void deleteHistoricIdentityLinksLogByTaskProcessInstanceIds(List<String> ProcessInstanceIds) {
-    getDbEntityManager().deletePreserveOrder(HistoricIdentityLinkLogEntity.class, "deleteHistoricIdentityLinksByTaskProcessInstanceIds", ProcessInstanceIds);
+  public void deleteHistoricIdentityLinksLogByTaskProcessInstanceIds(List<String> processInstanceIds) {
+    getDbEntityManager().deletePreserveOrder(HistoricIdentityLinkLogEntity.class, "deleteHistoricIdentityLinksByTaskProcessInstanceIds", processInstanceIds);
+  }
+
+  public void deleteHistoricIdentityLinksLogByTaskCaseInstanceIds(List<String> caseInstanceIds) {
+    getDbEntityManager().deletePreserveOrder(HistoricIdentityLinkLogEntity.class, "deleteHistoricIdentityLinksByTaskCaseInstanceIds", caseInstanceIds);
   }
 
   protected void configureQuery(HistoricIdentityLinkLogQueryImpl query) {

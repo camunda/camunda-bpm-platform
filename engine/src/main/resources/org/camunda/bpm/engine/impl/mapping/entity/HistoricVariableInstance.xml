@@ -107,6 +107,20 @@
         and BYTEARRAY_ID_ is not NULL)
   </select>
 
+  <delete id="deleteHistoricVariableInstanceByCaseInstanceIds">
+    delete from ${prefix}ACT_HI_VARINST
+    <include refid="selectHistoricVariableInstanceByCaseInstanceIdsSql"/>
+  </delete>
+
+  <select id="deleteHistoricVariableInstanceByteArraysByCaseInstanceIds">
+    delete from ${prefix}ACT_GE_BYTEARRAY
+    where ID_ in
+      (select DISTINCT BYTEARRAY_ID_
+      from ${prefix}ACT_HI_VARINST RES
+        <include refid="selectHistoricVariableInstanceByCaseInstanceIdsSql"/>
+        and BYTEARRAY_ID_ is not NULL)
+  </select>
+
   <delete id="deleteHistoricVariableInstanceByTaskProcessInstanceIds">
     delete from ${prefix}ACT_HI_VARINST
     <include refid="selectHistoricVariableInstanceByTaskProcessInstanceIdsSql"/>
@@ -118,6 +132,20 @@
       (select DISTINCT BYTEARRAY_ID_
       from ${prefix}ACT_HI_VARINST RES
         <include refid="selectHistoricVariableInstanceByTaskProcessInstanceIdsSql"/>
+        and BYTEARRAY_ID_ is not NULL)
+  </select>
+
+  <delete id="deleteHistoricVariableInstanceByTaskCaseInstanceIds">
+    delete from ${prefix}ACT_HI_VARINST
+    <include refid="selectHistoricVariableInstanceByTaskCaseInstanceIdsSql"/>
+  </delete>
+
+  <select id="deleteHistoricVariableInstanceByteArraysByTaskCaseInstanceIds">
+    delete from ${prefix}ACT_GE_BYTEARRAY
+    where ID_ in
+      (select DISTINCT BYTEARRAY_ID_
+      from ${prefix}ACT_HI_VARINST RES
+        <include refid="selectHistoricVariableInstanceByTaskCaseInstanceIdsSql"/>
         and BYTEARRAY_ID_ is not NULL)
   </select>
 
@@ -339,12 +367,29 @@
     </foreach>
   </sql>
 
+  <sql id="selectHistoricVariableInstanceByCaseInstanceIdsSql">
+    where Case_INST_ID_ IN
+    <foreach item="caseInstanceId" index="index" collection="list" open="(" separator="," close=")">
+      #{caseInstanceId}
+    </foreach>
+  </sql>
+
   <sql id="selectHistoricVariableInstanceByTaskProcessInstanceIdsSql">
     where TASK_ID_ IN
     (select distinct ID_ from ${prefix}ACT_HI_TASKINST
     where PROC_INST_ID_ in
     <foreach item="processInstanceId" index="index" collection="list" open="(" separator="," close=")">
       #{processInstanceId}
+    </foreach>
+    )
+  </sql>
+
+  <sql id="selectHistoricVariableInstanceByTaskCaseInstanceIdsSql">
+    where TASK_ID_ IN
+    (select distinct ID_ from ${prefix}ACT_HI_TASKINST
+    where CASE_INST_ID_ in
+    <foreach item="caseInstanceId" index="index" collection="list" open="(" separator="," close=")">
+      #{caseInstanceId}
     </foreach>
     )
   </sql>

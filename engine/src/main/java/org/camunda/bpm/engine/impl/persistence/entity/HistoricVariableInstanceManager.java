@@ -22,7 +22,7 @@ import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.impl.HistoricVariableInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
+import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
 
 
@@ -55,6 +55,20 @@ public class HistoricVariableInstanceManager extends AbstractHistoricManager {
 
   public void deleteHistoricVariableInstanceByCaseInstanceId(String historicCaseInstanceId) {
     deleteHistoricVariableInstancesByProcessCaseInstanceId(null, historicCaseInstanceId);
+  }
+
+  public void deleteHistoricVariableInstancesByCaseInstanceIds(List<String> historicCaseInstanceIds) {
+    DbEntityManager dbEntityManager = Context.getCommandContext().getDbEntityManager();
+
+    dbEntityManager.deletePreserveOrder(ByteArrayEntity.class, "deleteHistoricVariableInstanceByteArraysByCaseInstanceIds", historicCaseInstanceIds);
+    dbEntityManager.deletePreserveOrder(HistoricVariableInstanceEntity.class, "deleteHistoricVariableInstanceByCaseInstanceIds", historicCaseInstanceIds);
+  }
+
+  public void deleteHistoricVariableInstancesByTaskCaseInstanceIds(List<String> historicCaseInstanceIds) {
+    DbEntityManager dbEntityManager = Context.getCommandContext().getDbEntityManager();
+
+    dbEntityManager.deletePreserveOrder(ByteArrayEntity.class, "deleteHistoricVariableInstanceByteArraysByTaskCaseInstanceIds", historicCaseInstanceIds);
+    dbEntityManager.deletePreserveOrder(HistoricVariableInstanceEntity.class, "deleteHistoricVariableInstanceByTaskCaseInstanceIds", historicCaseInstanceIds);
   }
 
   protected void deleteHistoricVariableInstancesByProcessCaseInstanceId(String historicProcessInstanceId, String historicCaseInstanceId) {

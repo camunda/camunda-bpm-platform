@@ -68,6 +68,18 @@
           </foreach>
       )
   </delete>
+
+  <delete id="deleteCommentsByTaskCaseInstanceIds">
+    delete from ${prefix}ACT_HI_COMMENT
+    where TASK_ID_ IN
+      (select distinct ID_ from ${prefix}ACT_HI_TASKINST
+          where CASE_INST_ID_ in
+          <foreach item="caseInstanceId" index="index" collection="list" open="(" separator="," close=")">
+              #{caseInstanceId}
+          </foreach>
+      )
+  </delete>
+
   <delete id="deleteCommentsByProcessInstanceIds">
     delete from ${prefix}ACT_HI_COMMENT
     where PROC_INST_ID_ in

@@ -65,6 +65,11 @@
     <include refid="selectAttachmentsByTaskProcessInstanceIdsSql"/>
   </delete>
 
+  <delete id="deleteAttachmentByTaskCaseInstanceIds">
+    delete from ${prefix}ACT_HI_ATTACHMENT
+    <include refid="selectAttachmentsByTaskCaseInstanceIdsSql"/>
+  </delete>
+
   <delete id="deleteAttachmentByteArraysByProcessInstanceIds">
     delete from ${prefix}ACT_GE_BYTEARRAY
     where ID_ in
@@ -80,6 +85,15 @@
       (select distinct CONTENT_ID_
       from ${prefix}ACT_HI_ATTACHMENT
         <include refid="selectAttachmentsByTaskProcessInstanceIdsSql"/>
+        and CONTENT_ID_ is not NULL)
+  </delete>
+
+  <delete id="deleteAttachmentByteArraysByTaskCaseInstanceIds">
+    delete from ${prefix}ACT_GE_BYTEARRAY
+    where ID_ in
+      (select distinct CONTENT_ID_
+      from ${prefix}ACT_HI_ATTACHMENT
+        <include refid="selectAttachmentsByTaskCaseInstanceIdsSql"/>
         and CONTENT_ID_ is not NULL)
   </delete>
 
@@ -140,6 +154,16 @@
       where PROC_INST_ID_ in
         <foreach item="processInstanceId" index="index" collection="list" open="(" separator="," close=")">
           #{processInstanceId}
+        </foreach>
+      )
+  </sql>
+
+  <sql id="selectAttachmentsByTaskCaseInstanceIdsSql">
+    where TASK_ID_ IN
+      (select distinct ID_ from ${prefix}ACT_HI_TASKINST
+      where CASE_INST_ID_ in
+        <foreach item="caseInstanceId" index="index" collection="list" open="(" separator="," close=")">
+          #{caseInstanceId}
         </foreach>
       )
   </sql>

@@ -14,7 +14,7 @@
 package org.camunda.bpm.engine.test.api.history;
 
 import org.camunda.bpm.engine.BadUserRequestException;
-import org.camunda.bpm.engine.DecisionService;
+import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.HistoryService;
@@ -22,11 +22,16 @@ import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
+import org.camunda.bpm.engine.history.HistoricCaseActivityInstance;
+import org.camunda.bpm.engine.history.HistoricCaseInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInputInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionOutputInstance;
+import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricExternalTaskLog;
 import org.camunda.bpm.engine.history.HistoricJobLog;
+import org.camunda.bpm.engine.history.HistoricTaskInstance;
+import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.impl.history.event.HistoricDecisionInputInstanceEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricDecisionOutputInstanceEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricExternalTaskLogEntity;
@@ -34,8 +39,10 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.AttachmentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEventEntity;
+import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Attachment;
+import org.camunda.bpm.engine.task.Comment;
 import org.camunda.bpm.engine.task.IdentityLinkType;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
@@ -52,6 +59,7 @@ import org.junit.rules.RuleChain;
 
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -77,7 +85,7 @@ public class BulkHistoryDeleteTest {
   private RuntimeService runtimeService;
   private FormService formService;
   private ExternalTaskService externalTaskService;
-  private DecisionService decisionService;
+  private CaseService caseService;
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
@@ -89,7 +97,7 @@ public class BulkHistoryDeleteTest {
     taskService = engineRule.getTaskService();
     formService = engineRule.getFormService();
     externalTaskService = engineRule.getExternalTaskService();
-    decisionService = engineRule.getDecisionService();
+    caseService = engineRule.getCaseService();
   }
 
   @Test
@@ -409,7 +417,7 @@ public class BulkHistoryDeleteTest {
   public void testCleanupHistoryStandaloneDecisionData() {
     //given
     for (int i = 0; i < 5; i++) {
-      decisionService.evaluateDecisionByKey("testDecision").variables(Variables.createVariables().putValue("pojo", new TestPojo("okay", 13.37))).evaluate();
+      engineRule.getDecisionService().evaluateDecisionByKey("testDecision").variables(Variables.createVariables().putValue("pojo", new TestPojo("okay", 13.37))).evaluate();
     }
 
     //remember input and output ids
@@ -547,4 +555,204 @@ public class BulkHistoryDeleteTest {
         .putValue("pojoVariableName", new TestPojo("someValue", 111.));
   }
 
+  @Test
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/BulkHistoryDeleteTest.testCleanupHistoryCaseInstance.cmmn" })
+  public void testCleanupHistoryCaseInstance() {
+    // given
+    // create case instances
+    int instanceCount = 10;
+    List<String> caseInstanceIds = prepareHistoricCaseInstance(instanceCount);
+
+    // assume
+    List<HistoricCaseInstance> caseInstanceList = historyService.createHistoricCaseInstanceQuery().list();
+    assertEquals(instanceCount, caseInstanceList.size());
+
+    // when
+    historyService.deleteHistoricCaseInstancesBulk(caseInstanceIds);
+
+    // then
+    assertEquals(0, historyService.createHistoricCaseInstanceQuery().count());
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery().count());
+  }
+
+  @Test
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/BulkHistoryDeleteTest.testCleanupHistoryCaseInstance.cmmn" })
+  public void testCleanupHistoryCaseActivityInstance() {
+    // given
+    // create case instance
+    CaseInstance caseInstance = caseService.createCaseInstanceByKey("oneTaskCase");
+
+    // assume
+    List<HistoricCaseActivityInstance> activityInstances = historyService.createHistoricCaseActivityInstanceQuery().list();
+    assertEquals(1, activityInstances.size());
+
+    // when
+    historyService.deleteHistoricCaseInstancesBulk(Arrays.asList(caseInstance.getId()));
+
+    // then
+    activityInstances = historyService.createHistoricCaseActivityInstanceQuery().list();
+    assertEquals(0, activityInstances.size());
+  }
+
+  @Test
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/BulkHistoryDeleteTest.testCleanupHistoryCaseInstance.cmmn" })
+  public void testCleanupHistoryCaseInstanceTask() {
+    // given
+    // create case instance
+    CaseInstance caseInstance = caseService.createCaseInstanceByKey("oneTaskCase");
+
+    // assume
+    List<HistoricTaskInstance> taskInstances = historyService.createHistoricTaskInstanceQuery().list();
+    assertEquals(1, taskInstances.size());
+
+    // when
+    historyService.deleteHistoricCaseInstancesBulk(Arrays.asList(caseInstance.getId()));
+
+    // then
+    taskInstances = historyService.createHistoricTaskInstanceQuery().list();
+    assertEquals(0, taskInstances.size());
+  }
+
+  @Test
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/BulkHistoryDeleteTest.testCleanupHistoryCaseInstance.cmmn" })
+  public void testCleanupHistoryCaseInstanceTaskComment() {
+    // given
+    // create case instance
+    CaseInstance caseInstance = caseService.createCaseInstanceByKey("oneTaskCase");
+
+    Task task = taskService.createTaskQuery().singleResult();
+    taskService.createComment(task.getId(), null, "This is a comment...");
+
+    // assume
+    List<Comment> comments = taskService.getTaskComments(task.getId());
+    assertEquals(1, comments.size());
+
+    // when
+    historyService.deleteHistoricCaseInstancesBulk(Arrays.asList(caseInstance.getId()));
+
+    // then
+    comments = taskService.getTaskComments(task.getId());
+    assertEquals(0, comments.size());
+  }
+
+  @Test
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/BulkHistoryDeleteTest.testCleanupHistoryCaseInstance.cmmn" })
+  public void testCleanupHistoryCaseInstanceTaskAttachmentByteArray() {
+    // given
+    // create case instance
+    CaseInstance caseInstance = caseService.createCaseInstanceByKey("oneTaskCase");
+
+    Task task = taskService.createTaskQuery().singleResult();
+    String taskId = task.getId();
+    taskService.createAttachment("foo", taskId, null, "something", null, new ByteArrayInputStream("someContent".getBytes()));
+
+    // assume
+    List<Attachment> attachments = taskService.getTaskAttachments(taskId);
+    assertEquals(1, attachments.size());
+    String contentId = findAttachmentContentId(attachments);
+
+    // when
+    historyService.deleteHistoricCaseInstancesBulk(Arrays.asList(caseInstance.getId()));
+
+    // then
+    attachments = taskService.getTaskAttachments(taskId);
+    assertEquals(0, attachments.size());
+    verifyByteArraysWereRemoved(contentId);
+  }
+
+  @Test
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/BulkHistoryDeleteTest.testCleanupHistoryCaseInstance.cmmn" })
+  public void testCleanupHistoryCaseInstanceTaskAttachmentUrl() {
+    // given
+    // create case instance
+    CaseInstance caseInstance = caseService.createCaseInstanceByKey("oneTaskCase");
+
+    Task task = taskService.createTaskQuery().singleResult();
+    taskService.createAttachment("foo", task.getId(), null, "something", null, "http://camunda.org");
+
+    // assume
+    List<Attachment> attachments = taskService.getTaskAttachments(task.getId());
+    assertEquals(1, attachments.size());
+
+    // when
+    historyService.deleteHistoricCaseInstancesBulk(Arrays.asList(caseInstance.getId()));
+
+    // then
+    attachments = taskService.getTaskAttachments(task.getId());
+    assertEquals(0, attachments.size());
+  }
+
+  @Test
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/BulkHistoryDeleteTest.testCleanupHistoryCaseInstance.cmmn" })
+  public void testCleanupHistoryCaseInstanceVariables() {
+    // given
+    // create case instances
+    List<String> caseInstanceIds = new ArrayList<String>();
+    int instanceCount = 10;
+    for (int i = 0; i < instanceCount; i++) {
+      CaseInstance caseInstance = caseService.createCaseInstanceByKey("oneTaskCase", Variables.createVariables().putValue("name" + i, "theValue"));
+      caseInstanceIds.add(caseInstance.getId());
+    }
+    // assume
+    List<HistoricVariableInstance> variablesInstances = historyService.createHistoricVariableInstanceQuery().list();
+    assertEquals(instanceCount, variablesInstances.size());
+
+    // when
+    historyService.deleteHistoricCaseInstancesBulk(caseInstanceIds);
+
+    // then
+    variablesInstances = historyService.createHistoricVariableInstanceQuery().list();
+    assertEquals(0, variablesInstances.size());
+  }
+
+  @Test
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/BulkHistoryDeleteTest.testCleanupHistoryCaseInstance.cmmn" })
+  public void testCleanupHistoryCaseInstanceComplexVariable() {
+    // given
+    // create case instances
+    CaseInstance caseInstance = caseService.createCaseInstanceByKey("oneTaskCase", Variables.createVariables().putValue("pojo", new TestPojo("okay", 13.37)));
+
+    // assume
+    List<HistoricVariableInstance> variablesInstances = historyService.createHistoricVariableInstanceQuery().list();
+    assertEquals(1, variablesInstances.size());
+
+    // when
+    historyService.deleteHistoricCaseInstancesBulk(Arrays.asList(caseInstance.getId()));
+
+    // then
+    variablesInstances = historyService.createHistoricVariableInstanceQuery().list();
+    assertEquals(0, variablesInstances.size());
+  }
+
+  @Test
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/BulkHistoryDeleteTest.testCleanupHistoryCaseInstance.cmmn" })
+  public void testCleanupHistoryCaseInstanceDetails() {
+    // given
+    // create case instances
+    String variableNameCase1 = "varName1";
+    CaseInstance caseInstance1 = caseService.createCaseInstanceByKey("oneTaskCase", Variables.createVariables().putValue(variableNameCase1, "value1"));
+    CaseInstance caseInstance2 = caseService.createCaseInstanceByKey("oneTaskCase", Variables.createVariables().putValue("varName2", "value2"));
+
+    caseService.setVariable(caseInstance1.getId(), variableNameCase1, "theValue");
+
+    // assume
+    List<HistoricDetail> detailsList = historyService.createHistoricDetailQuery().list();
+    assertEquals(3, detailsList.size());
+
+    // when
+    historyService.deleteHistoricCaseInstancesBulk(Arrays.asList(caseInstance1.getId(), caseInstance2.getId()));
+
+    // then
+    detailsList = historyService.createHistoricDetailQuery().list();
+    assertEquals(0, detailsList.size());
+  }
+
+  private List<String> prepareHistoricCaseInstance(int instanceCount) {
+    List<String> caseInstanceIds = new ArrayList<String>();
+    for (int i = 0; i < instanceCount; i++) {
+      CaseInstance caseInstance = caseService.createCaseInstanceByKey("oneTaskCase");
+      caseInstanceIds.add(caseInstance.getId());
+    }
+    return caseInstanceIds;
+  }
 }
