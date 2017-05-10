@@ -19,6 +19,9 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PushbackInputStream;
+import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.regex.Pattern;
 
 /**
@@ -29,39 +32,65 @@ public class EmptyBodyFilter implements Filter {
   protected static final Pattern CONTENT_TYPE_JSON_PATTERN = Pattern.compile("^application\\/json((;)(.*)?)?$", Pattern.CASE_INSENSITIVE);
 
   @Override
-  public void doFilter(final ServletRequest REQ, final ServletResponse RESP, FilterChain chain) throws IOException, ServletException {
+  public void doFilter(final ServletRequest req, final ServletResponse resp, FilterChain chain) throws IOException, ServletException {
 
-    HttpServletRequest request = (HttpServletRequest) REQ;
+    final boolean IS_CONTENT_TYPE_JSON =
+      CONTENT_TYPE_JSON_PATTERN.matcher(req.getContentType() == null ? "" : req.getContentType()).find();
+    final ByteArrayInputStream EMPTY_JSON_OBJECT = new ByteArrayInputStream("{}".getBytes(Charset.forName("UTF-8")));
+    final PushbackInputStream REQUEST_BODY = new PushbackInputStream(req.getInputStream());
+    int firstByte = REQUEST_BODY.read();
+    final boolean IS_BODY_EMPTY = firstByte == -1;
+    REQUEST_BODY.unread(firstByte);
 
-    boolean isContentTypeJSON = CONTENT_TYPE_JSON_PATTERN
-      .matcher(request.getContentType() == null ? "" : request.getContentType())
-      .find();
+    HttpServletRequestWrapper wrappedRequest = new HttpServletRequestWrapper((HttpServletRequest) req) {
 
-    if ("POST".equals(request.getMethod()) && isContentTypeJSON && request.getContentLength() == 0) {
+      @Override
+      public ServletInputStream getInputStream() throws IOException {
+        return new ServletInputStream() {
 
-      request = new HttpServletRequestWrapper(request) {
+          InputStream inputStream = IS_BODY_EMPTY && IS_CONTENT_TYPE_JSON ? EMPTY_JSON_OBJECT : REQUEST_BODY;
 
-        @Override
-        public ServletInputStream getInputStream() throws IOException {
-          final ByteArrayInputStream BYTE_ARRAY_INPUT_STREAM = new ByteArrayInputStream("{}".getBytes());
+          @Override
+          public int read() throws IOException {
+            return inputStream.read();
+          }
 
-          return new ServletInputStream() {
-            public int read() throws IOException {
-              return BYTE_ARRAY_INPUT_STREAM.read();
-            }
-          };
-        }
+          @Override
+          public int available() throws IOException {
+            return inputStream.available();
+          }
 
-        @Override
-        public BufferedReader getReader() throws IOException {
-          return new BufferedReader(new InputStreamReader(this.getInputStream()));
-        }
+          @Override
+          public void close() throws IOException {
+            inputStream.close();
+          }
 
-      };
+          @Override
+          public synchronized void mark(int readlimit) {
+            inputStream.mark(readlimit);
+          }
 
-    }
+          @Override
+          public synchronized void reset() throws IOException {
+            inputStream.reset();
+          }
 
-    chain.doFilter(request, RESP);
+          @Override
+          public boolean markSupported() {
+            return inputStream.markSupported();
+          }
+
+        };
+      }
+
+      @Override
+      public BufferedReader getReader() throws IOException {
+        return new BufferedReader(new InputStreamReader(this.getInputStream()));
+      }
+
+    };
+
+    chain.doFilter(wrappedRequest, resp);
   }
 
   @Override

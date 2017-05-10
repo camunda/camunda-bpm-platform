@@ -258,6 +258,16 @@ public class RestIT extends AbstractWebappIntegrationTest {
     assertNotNull(entity.has("links"));
   }
 
+  @Test
+  public void testEmptyBodyFilterIsActive() throws JSONException {
+    ClientResponse response = client.resource(APP_BASE_PATH + FILTER_PATH + "/create").accept(MediaType.APPLICATION_JSON)
+      .entity(null, MediaType.APPLICATION_JSON_TYPE)
+      .post(ClientResponse.class);
+
+    assertEquals(400, response.getStatus());
+    response.close();
+  }
+
   protected JSONObject getFirstTask() throws JSONException {
     ClientResponse response = client.resource(APP_BASE_PATH + TASK_PATH).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
     JSONArray tasks = response.getEntity(JSONArray.class);

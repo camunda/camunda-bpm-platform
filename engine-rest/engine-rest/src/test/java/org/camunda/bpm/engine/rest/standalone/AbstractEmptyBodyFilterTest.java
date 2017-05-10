@@ -12,33 +12,38 @@
  */
 package org.camunda.bpm.engine.rest.standalone;
 
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.json.JSONConfiguration;
+import com.sun.jersey.client.apache4.ApacheHttpClient4;
+import com.sun.jersey.client.apache4.config.DefaultApacheHttpClient4Config;
+import org.apache.http.entity.ContentType;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
-import org.camunda.bpm.engine.rest.helper.EqualsMap;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
-import org.camunda.bpm.engine.rest.util.VariablesBuilder;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
 import org.camunda.bpm.engine.runtime.ProcessInstanceWithVariables;
 import org.camunda.bpm.engine.runtime.ProcessInstantiationBuilder;
-import org.hamcrest.Matchers;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response.Status;
-import java.util.HashMap;
 import java.util.Map;
 
-import static com.jayway.restassured.RestAssured.given;
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.mockito.Matchers.*;
-import static org.mockito.Matchers.argThat;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -51,14 +56,19 @@ public abstract class AbstractEmptyBodyFilterTest extends AbstractRestServiceTes
 
   protected static final String TEST_RESOURCE_ROOT_PATH = "/rest-test/rest";
   protected static final String PROCESS_DEFINITION_URL = TEST_RESOURCE_ROOT_PATH + "/process-definition";
-  protected static final String SINGLE_PROCESS_DEFINITION_BY_KEY_URL = PROCESS_DEFINITION_URL + "/key/{key}";
+  protected static final String SINGLE_PROCESS_DEFINITION_BY_KEY_URL = PROCESS_DEFINITION_URL + "/key/" + MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY;
   protected static final String START_PROCESS_INSTANCE_BY_KEY_URL = SINGLE_PROCESS_DEFINITION_BY_KEY_URL + "/start";
 
   protected ProcessInstantiationBuilder mockInstantiationBuilder;
   protected RuntimeService runtimeServiceMock;
 
+  protected ApacheHttpClient4 client;
+  protected final String BASE_URL = "http://localhost:38080";
+
   @Before
   public void setUpRuntimeData() {
+    setUpApacheHTTPClient();
+
     ProcessDefinition mockDefinition = MockProvider.createMockDefinition();
 
     runtimeServiceMock = mock(RuntimeService.class);
@@ -84,89 +94,74 @@ public abstract class AbstractEmptyBodyFilterTest extends AbstractRestServiceTes
     when(repositoryServiceMock.createProcessDefinitionQuery()).thenReturn(processDefinitionQueryMock);
   }
 
-  @Test
-  public void testBodyIsEmpty() {
-    given().pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
-      .contentType(POST_JSON_CONTENT_TYPE).body("")
-      .then().expect()
-        .statusCode(Status.OK.getStatusCode())
-        .body("id", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
-      .when().post(START_PROCESS_INSTANCE_BY_KEY_URL);
+  private void setUpApacheHTTPClient() {
+    DefaultApacheHttpClient4Config clientConfig = new DefaultApacheHttpClient4Config();
+    clientConfig.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
+    client = ApacheHttpClient4.create(clientConfig);
+
+    DefaultHttpClient defaultHttpClient = (DefaultHttpClient) client.getClientHandler().getHttpClient();
+    HttpParams params = defaultHttpClient.getParams();
+    HttpConnectionParams.setConnectionTimeout(params, 3 * 60 * 1000);
+    HttpConnectionParams.setSoTimeout(params, 10 * 60 * 1000);
+  }
+
+  @After
+  public void destroyApacheHttpClient() {
+    client.destroy();
   }
 
   @Test
-  public void testBodyIsNull() {
-    given().pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
-      .contentType(POST_JSON_CONTENT_TYPE)
-      .then().expect()
-        .statusCode(Status.OK.getStatusCode())
-        .body("id", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
-      .when().post(START_PROCESS_INSTANCE_BY_KEY_URL);
+  public void testBodyIsEmpty() throws JSONException {
+    ClientResponse response = client.resource(BASE_URL + START_PROCESS_INSTANCE_BY_KEY_URL)
+      .accept(MediaType.APPLICATION_JSON)
+      .entity("", MediaType.APPLICATION_JSON)
+      .post(ClientResponse.class);
+
+    assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, response.getEntity(JSONObject.class).get("id"));
+    response.close();
   }
 
   @Test
-  public void testBodyIsNullAndContentTypeIsNull() {
-    given().pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
-      .then().expect()
-        .statusCode(Status.UNSUPPORTED_MEDIA_TYPE.getStatusCode())
-      .when().post(START_PROCESS_INSTANCE_BY_KEY_URL);
+  public void testBodyIsNull() throws JSONException {
+    ClientResponse response = client.resource(BASE_URL + START_PROCESS_INSTANCE_BY_KEY_URL)
+      .accept(MediaType.APPLICATION_JSON)
+      .entity(null, MediaType.APPLICATION_JSON)
+      .post(ClientResponse.class);
+
+    assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, response.getEntity(JSONObject.class).get("id"));
+    response.close();
   }
 
   @Test
-  public void testBodyIsNullAndContentTypeHasISOCharset() {
-    given().pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
-      .contentType(MediaType.APPLICATION_JSON + "; charset=iso-8859-1")
-      .then().expect()
-        .statusCode(Status.OK.getStatusCode())
-        .body("id", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
-      .when().post(START_PROCESS_INSTANCE_BY_KEY_URL);
+  public void testBodyIsNullAndMediaTypeIsNull() throws JSONException {
+    ClientResponse response = client.resource(BASE_URL + START_PROCESS_INSTANCE_BY_KEY_URL)
+      .entity(null, (MediaType) null)
+      .post(ClientResponse.class);
+
+    assertEquals(415, response.getStatus());
+    response.close();
   }
 
   @Test
-  public void testBodyIsNullAndContentTypeHasNoCharset() {
-    given().pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
-      .contentType(MediaType.APPLICATION_JSON)
-      .then().expect()
-        .statusCode(Status.OK.getStatusCode())
-        .body("id", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
-      .when().post(START_PROCESS_INSTANCE_BY_KEY_URL);
+  public void testBodyIsNullAndMediaTypeHasISOCharset() throws JSONException {
+    ClientResponse response = client.resource(BASE_URL + START_PROCESS_INSTANCE_BY_KEY_URL)
+      .accept(MediaType.APPLICATION_JSON)
+      .entity(null, ContentType.create(MediaType.APPLICATION_JSON, "iso-8859-1").toString())
+      .post(ClientResponse.class);
+
+    assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, response.getEntity(JSONObject.class).get("id"));
+    response.close();
   }
 
   @Test
-  public void testBodyIsEmptyJSONObject() {
-    given().pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
-      .contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
-      .then().expect()
-        .statusCode(Status.OK.getStatusCode())
-        .body("id", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
-      .when().post(START_PROCESS_INSTANCE_BY_KEY_URL);
-  }
+  public void testBodyIsEmptyJSONObject() throws JSONException {
+    ClientResponse response = client.resource(BASE_URL + START_PROCESS_INSTANCE_BY_KEY_URL)
+      .accept(MediaType.APPLICATION_JSON)
+      .entity(EMPTY_JSON_OBJECT, POST_JSON_CONTENT_TYPE)
+      .post(ClientResponse.class);
 
-  @Test
-  public void testBodyIsJSONObject() {
-    Map<String, Object> parameters = VariablesBuilder.create()
-      .variable("aBoolean", Boolean.TRUE)
-      .variable("aString", "aStringVariableValue")
-      .variable("anInteger", 42).getVariables();
-
-    Map<String, Object> json = new HashMap<String, Object>();
-    json.put("variables", parameters);
-
-    given().pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
-      .contentType(POST_JSON_CONTENT_TYPE).body(json)
-      .then().expect()
-        .statusCode(Status.OK.getStatusCode())
-        .body("id", Matchers.equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
-      .when().post(START_PROCESS_INSTANCE_BY_KEY_URL);
-
-    Map<String, Object> expectedParameters = new HashMap<String, Object>();
-    expectedParameters.put("aBoolean", Boolean.TRUE);
-    expectedParameters.put("aString", "aStringVariableValue");
-    expectedParameters.put("anInteger", 42);
-
-    verify(runtimeServiceMock).createProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID));
-    verify(mockInstantiationBuilder).setVariables(argThat(new EqualsMap(expectedParameters)));
-    verify(mockInstantiationBuilder).executeWithVariablesInReturn(anyBoolean(), anyBoolean());
+    assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, response.getEntity(JSONObject.class).get("id"));
+    response.close();
   }
 
 }
