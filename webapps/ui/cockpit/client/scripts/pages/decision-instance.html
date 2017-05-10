@@ -48,15 +48,15 @@
         <dd class="definition-name"
             ng-if="!decisionInstance.decisionDefinitionName || decisionInstance.decisionDefinitionName === decisionInstance.key"><span class="null-value">null</span></dd>
 
-        <dt ng-if="decisionDefinition.tenantId"
-            cam-widget-clipboard="decisionDefinition.tenantId"
+        <dt ng-if="decisionInstance.tenantId"
+            cam-widget-clipboard="decisionInstance.tenantId"
             cam-hoverable-title="tenant-id">Tenant ID:</dt>
         <dd class="tenant-id"
-            ng-if="decisionDefinition.tenantId"
-            cam-hover-trigger="tenant-id">{{ decisionDefinition.tenantId }}</dd>
-        <dt ng-if="!decisionDefinition.tenantId">Tenant ID:</dt>
+            ng-if="decisionInstance.tenantId"
+            cam-hover-trigger="tenant-id">{{ decisionInstance.tenantId }}</dd>
+        <dt ng-if="!decisionInstance.tenantId">Tenant ID:</dt>
         <dd class="tenant-id"
-            ng-if="!decisionDefinition.tenantId"><span class="null-value">null</span></dd>
+            ng-if="!decisionInstance.tenantId"><span class="null-value">null</span></dd>
 
         <dt cam-widget-clipboard="decisionDefinition.deploymentId"
             cam-hoverable-title="deployment-id">Deployment ID:</dt>
