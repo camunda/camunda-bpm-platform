@@ -87,58 +87,60 @@ public class DeleteProcessInstancesJobHandler extends AbstractBatchJobHandler<De
   public boolean createJobs(BatchEntity batch) {
     DeleteProcessInstanceBatchConfiguration configuration = readConfiguration(batch.getConfigurationBytes());
 
-    final List<String> ids = configuration.getIds();
+    List<String> ids = configuration.getIds();
     final CommandContext commandContext = Context.getCommandContext();
+
+    int batchJobsPerSeed = batch.getBatchJobsPerSeed();
+    int invocationsPerBatchJob = batch.getInvocationsPerBatchJob();
+
+    int numberOfItemsToProcess = Math.min(invocationsPerBatchJob * batchJobsPerSeed, ids.size());
+    // view of process instances to process
+    final List<String> processIds = ids.subList(0, numberOfItemsToProcess);
 
     List<String> deploymentIds = commandContext.runWithoutAuthorization(new Callable<List<String>>() {
       @Override
       public List<String> call() throws Exception {
-        return commandContext.getDeploymentManager().findDeploymentIdsByProcessInstances(ids);
+        return commandContext.getDeploymentManager().findDeploymentIdsByProcessInstances(processIds);
       }
     });
 
     for (final String deploymentId : deploymentIds) {
 
-      List<String> processInstancesToHandle = commandContext.runWithoutAuthorization(new Callable<List<String>>() {
+      List<String> processIdsPerDeployment = commandContext.runWithoutAuthorization(new Callable<List<String>>() {
         @Override
         public List<String> call() throws Exception {
           final ProcessInstanceQueryImpl processInstanceQueryToBeProcess = new ProcessInstanceQueryImpl();
-          processInstanceQueryToBeProcess.processInstanceIds(new HashSet<String>(ids)).deploymentId(deploymentId);
+          processInstanceQueryToBeProcess.processInstanceIds(new HashSet<String>(processIds)).deploymentId(deploymentId);
           return commandContext.getExecutionManager().findProcessInstancesIdsByQueryCriteria(processInstanceQueryToBeProcess);
         }
       });
 
-      ids.removeAll(processInstancesToHandle);
+      processIds.removeAll(processIdsPerDeployment);
 
-      createJobEntities(batch, configuration, deploymentId, processInstancesToHandle);
+      createJobEntities(batch, configuration, deploymentId, processIdsPerDeployment, invocationsPerBatchJob);
     }
 
     // when there are non existing process instance ids
-    if (!ids.isEmpty()) {
-      createJobEntities(batch, configuration, null, ids);
+    if (!processIds.isEmpty()) {
+      createJobEntities(batch, configuration, null, processIds, invocationsPerBatchJob);
     }
 
     return ids.isEmpty();
   }
 
   protected void createJobEntities(BatchEntity batch, DeleteProcessInstanceBatchConfiguration configuration, String deploymentId,
-      List<String> processInstancesToHandle) {
-    int batchJobsPerSeed = batch.getBatchJobsPerSeed();
-    int invocationsPerBatchJob = batch.getInvocationsPerBatchJob();
+      List<String> processInstancesToHandle, int invocationsPerBatchJob) {
 
-    int numberOfItemsToProcess = Math.min(invocationsPerBatchJob * batchJobsPerSeed, processInstancesToHandle.size());
-    // view of process instances to process
-    List<String> processIds = processInstancesToHandle.subList(0, numberOfItemsToProcess);
 
     CommandContext commandContext = Context.getCommandContext();
     ByteArrayManager byteArrayManager = commandContext.getByteArrayManager();
     JobManager jobManager = commandContext.getJobManager();
 
     int createdJobs = 0;
-    while (!processIds.isEmpty()) {
-      int lastIdIndex = Math.min(invocationsPerBatchJob, processIds.size());
+    while (!processInstancesToHandle.isEmpty()) {
+      int lastIdIndex = Math.min(invocationsPerBatchJob, processInstancesToHandle.size());
       // view of process instances for this job
-      List<String> idsForJob = processIds.subList(0, lastIdIndex);
+      List<String> idsForJob = processInstancesToHandle.subList(0, lastIdIndex);
 
       DeleteProcessInstanceBatchConfiguration jobConfiguration = createJobConfiguration(configuration, idsForJob);
       ByteArrayEntity configurationEntity = saveConfiguration(byteArrayManager, jobConfiguration);

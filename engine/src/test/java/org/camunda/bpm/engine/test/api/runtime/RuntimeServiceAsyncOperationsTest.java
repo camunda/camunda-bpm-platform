@@ -17,9 +17,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
-import org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl;
-import org.camunda.bpm.engine.impl.interceptor.Command;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -58,6 +56,9 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
 
   protected MigrationTestRule migrationRule = new MigrationTestRule(engineRule);
 
+  private int defaultBatchJobsPerSeed;
+  private int defaultInvocationsPerBatchJob;
+
   @Rule
   public ExpectedException thrown = ExpectedException.none();
 
@@ -85,8 +86,20 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
     if (historicBatch != null) {
       historyService.deleteHistoricBatch(historicBatch.getId());
     }
+  }
 
-    engineRule.getProcessEngineConfiguration().setInvocationsPerBatchJob(1);
+  @Before
+  public void storeEngineSettings() {
+    ProcessEngineConfigurationImpl configuration = engineRule.getProcessEngineConfiguration();
+    defaultBatchJobsPerSeed = configuration.getBatchJobsPerSeed();
+    defaultInvocationsPerBatchJob = configuration.getInvocationsPerBatchJob();
+  }
+
+  @After
+  public void restoreEngineSettings() {
+    ProcessEngineConfigurationImpl configuration = engineRule.getProcessEngineConfiguration();
+    configuration.setBatchJobsPerSeed(defaultBatchJobsPerSeed);
+    configuration.setInvocationsPerBatchJob(defaultInvocationsPerBatchJob);
   }
 
   @Deployment(resources = {
@@ -327,30 +340,39 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
         .deployAndGetDefinition(modify(ProcessModels.ONE_TASK_PROCESS).changeElementId(ProcessModels.PROCESS_KEY, "ONE_TASK_PROCESS"));
     ProcessDefinition sourceDefinition2 = testRule
         .deployAndGetDefinition(modify(ProcessModels.TWO_TASKS_PROCESS).changeElementId(ProcessModels.PROCESS_KEY, "TWO_TASKS_PROCESS"));
-    ProcessInstance processInstance1 = runtimeService.startProcessInstanceById(sourceDefinition1.getId());
-    ProcessInstance processInstance2 = runtimeService.startProcessInstanceById(sourceDefinition2.getId());
-    ProcessInstance processInstance3 = runtimeService.startProcessInstanceById(sourceDefinition1.getId());
-    ProcessInstance processInstance4 = runtimeService.startProcessInstanceById(sourceDefinition2.getId());
-    ProcessInstance processInstance5 = runtimeService.startProcessInstanceById(sourceDefinition1.getId());
+    List<String> processInstanceIds = new ArrayList<String>();
+    for (int i = 0; i < 15; i++) {
+      ProcessInstance processInstance1 = runtimeService.startProcessInstanceById(sourceDefinition1.getId());
+      processInstanceIds.add(processInstance1.getId());
+      if (i < 10) {
+        ProcessInstance processInstance2 = runtimeService.startProcessInstanceById(sourceDefinition2.getId());
+        processInstanceIds.add(processInstance2.getId());
+      }
+    }
     final String firstDeploymentId = sourceDefinition1.getDeploymentId();
     final String secondDeploymentId = sourceDefinition2.getDeploymentId();
 
     List<String> processInstanceIdsFromFirstDeployment = getProcessInstanceIdsByDeploymentId(firstDeploymentId);
     List<String> processInstanceIdsFromSecondDeployment = getProcessInstanceIdsByDeploymentId(secondDeploymentId);
 
-    List<String> processInstanceIds = Arrays.asList(processInstance1.getId(), processInstance2.getId(), processInstance3.getId(), processInstance4.getId(),
-        processInstance5.getId());
-
     engineRule.getProcessEngineConfiguration().setInvocationsPerBatchJob(2);
+    engineRule.getProcessEngineConfiguration().setBatchJobsPerSeed(3);
 
     // when
     Batch batch = runtimeService.deleteProcessInstancesAsync(processInstanceIds, null, "test_reason");
 
     String seedJobDefinitionId = batch.getSeedJobDefinitionId();
-    Job seedJob = managementService.createJobQuery().jobDefinitionId(seedJobDefinitionId).singleResult();
-    assertNotNull(seedJob);
-    // seed job
-    managementService.executeJob(seedJob.getId());
+    // seed jobs
+    for (int i = 0; i < 6; i++) {
+      Job seedJob = managementService.createJobQuery().jobDefinitionId(seedJobDefinitionId).singleResult();
+      if (i != 5) {
+        assertNotNull(seedJob);
+        managementService.executeJob(seedJob.getId());
+      } else {
+        //the fifth seed job should not create another seed job
+        assertNull(seedJob);
+      }
+    }
 
     // then
     List<Job> jobs = managementService.createJobQuery().jobDefinitionId(batch.getBatchJobDefinitionId()).list();
@@ -369,7 +391,7 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
     assertEquals(processInstanceIdsFromSecondDeployment.size(), runtimeService.createProcessInstanceQuery().deploymentId(secondDeploymentId).count());
     assertHistoricTaskDeletionPresent(processInstanceIdsFromSecondDeployment, null, testRule);
 
-    // execute jobs related to the second deployment 
+    // execute jobs related to the second deployment
     List<String> jobIdsForSecondDeployment = getJobIdsByDeployment(jobs, secondDeploymentId);
     assertNotNull(jobIdsForSecondDeployment);
     for (String jobId : jobIdsForSecondDeployment) {
@@ -381,14 +403,12 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
   }
 
   private List<String> getProcessInstanceIdsByDeploymentId(final String deploymentId) {
-    List<String> processInstanceIdsFromFirstDeployment = engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired()
-        .execute(new Command<List<String>>() {
-          public List<String> execute(CommandContext commandContext) {
-
-            return ((ProcessInstanceQueryImpl) runtimeService.createProcessInstanceQuery().deploymentId(deploymentId)).listIds();
-          }
-        });
-    return processInstanceIdsFromFirstDeployment;
+    List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().deploymentId(deploymentId).list();
+    List<String> processInstanceIds = new ArrayList<String>();
+    for (ProcessInstance processInstance : processInstances) {
+      processInstanceIds.add(processInstance.getId());
+    }
+    return processInstanceIds;
   }
 
   private List<String> getJobIdsByDeployment(List<Job> jobs, String deploymentId) {
