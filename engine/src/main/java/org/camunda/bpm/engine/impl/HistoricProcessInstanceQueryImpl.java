@@ -283,9 +283,8 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
       .findHistoricProcessInstancesByQueryCriteria(this, page);
   }
 
-  public List<String> listIds() {
+  public List<String> executeIdsList(CommandContext commandContext) {
     checkQueryOk();
-    ensureVariablesInitialized();
     return Context.getCommandContext()
         .getHistoricProcessInstanceManager()
         .findHistoricProcessInstanceIds(this);

@@ -76,7 +76,7 @@ public class RestartProcessInstanceUserOperationLogTest {
     helper.removeAllRunningAndHistoricBatches();
   }
   @Test
-  public void testLogCreation() {
+  public void testLogCreationAsync() {
     // given
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
     rule.getIdentityService().setAuthenticatedUserId("userId");
@@ -107,6 +107,52 @@ public class RestartProcessInstanceUserOperationLogTest {
     Assert.assertNull(asyncEntry.getProcessInstanceId());
     Assert.assertNull(asyncEntry.getOrgValue());
     Assert.assertEquals("true", asyncEntry.getNewValue());
+
+    UserOperationLogEntry numInstancesEntry = entries.get("nrOfInstances");
+    Assert.assertNotNull(numInstancesEntry);
+    Assert.assertEquals("ProcessInstance", numInstancesEntry.getEntityType());
+    Assert.assertEquals("RestartProcessInstance", numInstancesEntry.getOperationType());
+    Assert.assertEquals(processDefinition.getId(), numInstancesEntry.getProcessDefinitionId());
+    Assert.assertEquals(processDefinition.getKey(), numInstancesEntry.getProcessDefinitionKey());
+    Assert.assertNull(numInstancesEntry.getProcessInstanceId());
+    Assert.assertNull(numInstancesEntry.getOrgValue());
+    Assert.assertEquals("2", numInstancesEntry.getNewValue());
+
+    Assert.assertEquals(asyncEntry.getOperationId(), numInstancesEntry.getOperationId());
+  }
+
+  @Test
+  public void testLogCreationSync() {
+    // given
+    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
+    rule.getIdentityService().setAuthenticatedUserId("userId");
+
+    ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("process1");
+    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("process1");
+
+    runtimeService.deleteProcessInstance(processInstance1.getId(), "test");
+    runtimeService.deleteProcessInstance(processInstance2.getId(), "test");
+
+    // when
+    runtimeService.restartProcessInstances(processDefinition.getId()).startAfterActivity("user1").processInstanceIds(processInstance1.getId(), processInstance2.getId()).execute();
+    rule.getIdentityService().clearAuthentication();
+
+    // then
+    List<UserOperationLogEntry> opLogEntries = rule.getHistoryService().createUserOperationLogQuery().operationType("RestartProcessInstance").list();
+    Assert.assertEquals(2, opLogEntries.size());
+
+    Map<String, UserOperationLogEntry> entries = asMap(opLogEntries);
+
+
+    UserOperationLogEntry asyncEntry = entries.get("async");
+    Assert.assertNotNull(asyncEntry);
+    Assert.assertEquals("ProcessInstance", asyncEntry.getEntityType());
+    Assert.assertEquals("RestartProcessInstance", asyncEntry.getOperationType());
+    Assert.assertEquals(processDefinition.getId(), asyncEntry.getProcessDefinitionId());
+    Assert.assertEquals(processDefinition.getKey(), asyncEntry.getProcessDefinitionKey());
+    Assert.assertNull(asyncEntry.getProcessInstanceId());
+    Assert.assertNull(asyncEntry.getOrgValue());
+    Assert.assertEquals("false", asyncEntry.getNewValue());
 
     UserOperationLogEntry numInstancesEntry = entries.get("nrOfInstances");
     Assert.assertNotNull(numInstancesEntry);

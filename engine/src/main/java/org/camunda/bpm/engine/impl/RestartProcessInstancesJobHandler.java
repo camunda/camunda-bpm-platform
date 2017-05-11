@@ -46,7 +46,19 @@ public class RestartProcessInstancesJobHandler extends AbstractBatchJobHandler<R
           .processInstanceIds(batchConfiguration.getIds());
       
       builder.setInstructions(batchConfiguration.getInstructions());
-      
+
+      if (batchConfiguration.isInitialVariables()) {
+        builder.initialSetOfVariables();
+      }
+
+      if (batchConfiguration.isSkipCustomListeners()) {
+        builder.skipCustomListeners();
+      }
+
+      if (batchConfiguration.isSkipIoMappings()) {
+        builder.skipIoMappings();
+      }
+
       builder.execute(false);
       
     } finally {
@@ -66,7 +78,8 @@ public class RestartProcessInstancesJobHandler extends AbstractBatchJobHandler<R
   @Override
   protected RestartProcessInstancesBatchConfiguration createJobConfiguration(RestartProcessInstancesBatchConfiguration configuration,
       List<String> processIdsForJob) {
-    return new RestartProcessInstancesBatchConfiguration(processIdsForJob, configuration.getInstructions(), configuration.getProcessDefinitionId());
+    return new RestartProcessInstancesBatchConfiguration(processIdsForJob, configuration.getInstructions(), configuration.getProcessDefinitionId(),
+        configuration.isInitialVariables(), configuration.isSkipCustomListeners(), configuration.isSkipIoMappings());
   }
 
   @Override

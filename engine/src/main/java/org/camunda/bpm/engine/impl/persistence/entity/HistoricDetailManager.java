@@ -25,7 +25,6 @@ import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.history.event.HistoricDetailEventEntity;
 import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
 
-
 /**
  * @author Tom Baeyens
  */
@@ -138,6 +137,12 @@ public class HistoricDetailManager extends AbstractHistoricManager {
   protected void configureQuery(HistoricDetailQueryImpl query) {
     getAuthorizationManager().configureHistoricDetailQuery(query);
     getTenantManager().configureQuery(query);
+  }
+
+  @SuppressWarnings("unchecked")
+  public List<HistoricDetail> findHistoricDetailsWithInitialVariablesOfProcessInstance(HistoricDetailQueryImpl historicDetailQueryImpl) {
+    configureQuery(historicDetailQueryImpl);
+    return getDbEntityManager().selectList("selectHistoricDetailWithInitialVariablesOfProcessInstance", historicDetailQueryImpl);
   }
 
 }

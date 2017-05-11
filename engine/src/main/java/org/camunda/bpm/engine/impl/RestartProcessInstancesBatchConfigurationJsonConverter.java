@@ -16,6 +16,9 @@ public class RestartProcessInstancesBatchConfigurationJsonConverter extends Json
   public static final String PROCESS_INSTANCE_IDS = "processInstanceIds";
   public static final String INSTRUCTIONS = "instructions";
   public static final String PROCESS_DEFINITION_ID = "processDefinitionId";
+  public static final String INITIAL_VARIABLES = "initialVariables";
+  public static final String SKIP_CUSTOM_LISTENERS = "skipCustomListeners";
+  public static final String SKIP_IO_MAPPINGS = "skipIoMappings";
 
   @Override
   public JSONObject toJsonObject(RestartProcessInstancesBatchConfiguration configuration) {
@@ -24,6 +27,9 @@ public class RestartProcessInstancesBatchConfigurationJsonConverter extends Json
     JsonUtil.addListField(json, PROCESS_INSTANCE_IDS, configuration.getIds());
     JsonUtil.addField(json, PROCESS_DEFINITION_ID, configuration.getProcessDefinitionId());
     JsonUtil.addListField(json, INSTRUCTIONS, ModificationCmdJsonConverter.INSTANCE, configuration.getInstructions());
+    JsonUtil.addField(json, INITIAL_VARIABLES, configuration.isInitialVariables());
+    JsonUtil.addField(json, SKIP_CUSTOM_LISTENERS, configuration.isSkipCustomListeners());
+    JsonUtil.addField(json, SKIP_IO_MAPPINGS, configuration.isSkipIoMappings());
     
     return json;
   }
@@ -33,7 +39,8 @@ public class RestartProcessInstancesBatchConfigurationJsonConverter extends Json
     List<String> processInstanceIds = readProcessInstanceIds(json);
     List<AbstractProcessInstanceModificationCommand> instructions = JsonUtil.jsonArrayAsList(json.getJSONArray(INSTRUCTIONS), ModificationCmdJsonConverter.INSTANCE);
     
-    return new RestartProcessInstancesBatchConfiguration(processInstanceIds, instructions, json.getString(PROCESS_DEFINITION_ID));
+    return new RestartProcessInstancesBatchConfiguration(processInstanceIds, instructions, json.getString(PROCESS_DEFINITION_ID),
+        json.getBoolean(INITIAL_VARIABLES), json.getBoolean(SKIP_CUSTOM_LISTENERS), json.getBoolean(SKIP_IO_MAPPINGS));
   }
 
   protected List<String> readProcessInstanceIds(JSONObject jsonObject) {

@@ -313,4 +313,19 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
     validators.remove(validator);
   }
 
+  public List<String> listIds() {
+    this.resultType = ResultType.LIST;
+    return evaluateExpressionsAndExecuteIdsList(Context.getCommandContext());
+  }
+
+  public List<String> evaluateExpressionsAndExecuteIdsList(CommandContext commandContext) {
+    validate();
+    evaluateExpressions();
+    return !hasExcludingConditions() ? executeIdsList(commandContext) : new ArrayList<String>();
+  }
+
+  public List<String> executeIdsList(CommandContext commandContext) {
+    throw new UnsupportedOperationException();
+  }
+
 }

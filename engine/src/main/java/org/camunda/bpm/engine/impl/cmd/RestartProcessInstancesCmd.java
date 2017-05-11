@@ -8,9 +8,14 @@ import java.util.List;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.HistoryService;
+import org.camunda.bpm.engine.authorization.Permissions;
+import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.exception.NullValueException;
+import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
+import org.camunda.bpm.engine.history.HistoricVariableUpdate;
+import org.camunda.bpm.engine.impl.HistoricDetailQueryImpl;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.ProcessInstanceModificationBuilderImpl;
 import org.camunda.bpm.engine.impl.ProcessInstantiationBuilderImpl;
@@ -52,14 +57,22 @@ public class RestartProcessInstancesCmd extends AbstractRestartProcessInstanceCm
       writeUserOperationLog(commandContext, processDefinition, processInstanceIds.size(), false);
     }
 
+    commandContext.getAuthorizationManager().checkAuthorization(Permissions.READ_HISTORY, Resources.PROCESS_DEFINITION, processDefinition.getKey());
+
     for (String processInstanceId : processInstanceIds) {
       HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
       ensureNotNull(BadUserRequestException.class, "the historic process instance cannot be found", "historicProcessInstanceId", historicProcessInstance);
       String processDefinitionId = builder.getProcessDefinitionId();
       ensureSameProcessDefinition(historicProcessInstance, processDefinitionId);
 
-      ProcessInstantiationBuilderImpl instantiationBuilder = (ProcessInstantiationBuilderImpl) ProcessInstantiationBuilderImpl
-          .createProcessInstanceById(commandExecutor, processDefinitionId);
+      ProcessInstantiationBuilderImpl instantiationBuilder = null;
+      if (historicProcessInstance.getTenantId() != null) {
+        instantiationBuilder = (ProcessInstantiationBuilderImpl) ProcessInstantiationBuilderImpl
+          .createProcessInstanceByKey(commandExecutor, processDefinition.getKey());
+      } else {
+        instantiationBuilder = (ProcessInstantiationBuilderImpl) ProcessInstantiationBuilderImpl
+            .createProcessInstanceById(commandExecutor, processDefinitionId);
+      }
 
       ProcessInstanceModificationBuilderImpl modificationBuilder = new ProcessInstanceModificationBuilderImpl();
       modificationBuilder.setModificationOperations(instructions);
@@ -67,12 +80,24 @@ public class RestartProcessInstancesCmd extends AbstractRestartProcessInstanceCm
       instantiationBuilder.caseInstanceId(historicProcessInstance.getCaseInstanceId());
       instantiationBuilder.businessKey(historicProcessInstance.getBusinessKey());
 
-      List<HistoricVariableInstance> historicVariables = historyService.createHistoricVariableInstanceQuery().executionIdIn(processInstanceId).list();
-      for (HistoricVariableInstance historicVariable : historicVariables) {
-        instantiationBuilder.setVariable(historicVariable.getName(), historicVariable.getValue());
+      if (historicProcessInstance.getTenantId() != null) {
+        instantiationBuilder.processDefinitionTenantId(historicProcessInstance.getTenantId());
       }
 
-      instantiationBuilder.execute();
+      if (builder.isInitialVariables()) {
+         List<HistoricDetail> historicDetails = ((HistoricDetailQueryImpl) historyService.createHistoricDetailQuery().processInstanceId(processInstanceId).variableUpdates()).getInitialVariables();
+         for (HistoricDetail detail : historicDetails) {
+           instantiationBuilder.setVariable(((HistoricVariableUpdate) detail).getVariableName(),((HistoricVariableUpdate) detail).getValue());
+         }
+      }
+      else {
+        List<HistoricVariableInstance> historicVariables = historyService.createHistoricVariableInstanceQuery().executionIdIn(processInstanceId).list();
+         for (HistoricVariableInstance historicVariable : historicVariables) {
+           instantiationBuilder.setVariable(historicVariable.getName(), historicVariable.getValue());
+         }
+      }
+
+      instantiationBuilder.execute(builder.isSkipCustomListeners(), builder.isSkipIoMappings());
     }
     return null;
   }

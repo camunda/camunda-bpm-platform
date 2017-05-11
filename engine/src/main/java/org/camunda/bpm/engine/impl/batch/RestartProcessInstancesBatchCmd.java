@@ -39,7 +39,7 @@ public class RestartProcessInstancesBatchCmd extends AbstractRestartProcessInsta
     List<AbstractProcessInstanceModificationCommand> instructions = builder.getInstructions();
     Collection<String> processInstanceIds = collectProcessInstanceIds();
 
-    ensureNotEmpty(BadUserRequestException.class, "Modification instructions cannot be empty", instructions);
+    ensureNotEmpty(BadUserRequestException.class, "Modification instructions cannot be empty", "instructions", instructions);
     ensureNotEmpty(BadUserRequestException.class, "Process instance ids cannot be empty", "processInstanceIds", processInstanceIds);
     ensureNotContainsNull(BadUserRequestException.class, "Process instance ids cannot be null", "processInstanceIds", processInstanceIds);
 
@@ -73,7 +73,8 @@ public class RestartProcessInstancesBatchCmd extends AbstractRestartProcessInsta
     ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
     BatchJobHandler<RestartProcessInstancesBatchConfiguration> batchJobHandler = getBatchJobHandler(processEngineConfiguration);
 
-    RestartProcessInstancesBatchConfiguration configuration = new RestartProcessInstancesBatchConfiguration(processInstanceIds, instructions, builder.getProcessDefinitionId());
+    RestartProcessInstancesBatchConfiguration configuration = new RestartProcessInstancesBatchConfiguration(
+        processInstanceIds, instructions, builder.getProcessDefinitionId(), builder.isInitialVariables(), builder.isSkipCustomListeners(), builder.isSkipIoMappings());
 
     BatchEntity batch = new BatchEntity();
     batch.setType(batchJobHandler.getType());

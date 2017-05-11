@@ -15,11 +15,13 @@ package org.camunda.bpm.engine.impl;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricDetailQuery;
 import org.camunda.bpm.engine.impl.cmd.CommandLogger;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
@@ -264,5 +266,23 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
 
   public String getDetailId() {
     return detailId;
+  }
+
+  public List<HistoricDetail> getInitialVariables() {
+    this.resultType = ResultType.LIST;
+    return evaluateExpressionsAndExecuteList(Context.getCommandContext());
+  }
+
+  public List<HistoricDetail> evaluateExpressionsAndExecuteList(CommandContext commandContext) {
+    validate();
+    evaluateExpressions();
+    return !hasExcludingConditions() ? executeList(commandContext) : new ArrayList<HistoricDetail>();
+  }
+
+  public List<HistoricDetail> executeList(CommandContext commandContext) {
+    checkQueryOk();
+    return commandContext
+      .getHistoricDetailManager()
+      .findHistoricDetailsWithInitialVariablesOfProcessInstance(this);
   }
 }

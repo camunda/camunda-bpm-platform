@@ -28,6 +28,9 @@ public class RestartProcessInstanceBuilderImpl implements RestartProcessInstance
   protected List<AbstractProcessInstanceModificationCommand> instructions;
   protected String processDefinitionId;
   protected HistoricProcessInstanceQuery query;
+  protected boolean initialVariables;
+  protected boolean skipCustomListeners;
+  protected boolean skipIoMappings;
   
   public RestartProcessInstanceBuilderImpl(CommandExecutor commandExecutor, String processDefinitionId) {
     this.commandExecutor = commandExecutor;
@@ -112,4 +115,33 @@ public class RestartProcessInstanceBuilderImpl implements RestartProcessInstance
     commandExecutor.execute(new RestartProcessInstancesCmd(commandExecutor, this, writeUserOperationLog));
   }
 
+  @Override
+  public RestartProcessInstanceBuilder initialSetOfVariables() {
+    this.initialVariables = true;
+    return this;
+  }
+
+  public boolean isInitialVariables() {
+    return initialVariables;
+  }
+
+  @Override
+  public RestartProcessInstanceBuilder skipCustomListeners() {
+    this.skipCustomListeners = true;
+    return this;
+  }
+
+  @Override
+  public RestartProcessInstanceBuilder skipIoMappings() {
+    this.skipIoMappings = true;
+    return this;
+  }
+
+  public boolean isSkipCustomListeners() {
+    return skipCustomListeners;
+  }
+
+  public boolean isSkipIoMappings() {
+    return skipIoMappings;
+  }
 }

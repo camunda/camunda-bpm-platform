@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.HistoricProcessInstanceQueryImpl;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.util.ModificationInstructionBuilder;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
 import org.camunda.bpm.engine.runtime.RestartProcessInstanceBuilder;
@@ -37,9 +38,10 @@ public class RestartProcessInstanceRestServiceTest extends AbstractRestServiceTe
   @ClassRule
   public static TestContainerRule rule = new TestContainerRule();
   
-  protected static final String PROCESS_INSTANCE_URL = TEST_RESOURCE_ROOT_PATH + "/process-instance";
-  protected static final String RESTART_PROCESS_INSTANCE_URL = PROCESS_INSTANCE_URL + "/restart-process-instance";
-  protected static final String RESTART_PROCESS_INSTANCE_ASYNC_URL = PROCESS_INSTANCE_URL + "/restart-process-instance-async";
+  protected static final String PROCESS_DEFINITION_URL = TEST_RESOURCE_ROOT_PATH + "/process-definition";
+  protected static final String SINGLE_PROCESS_DEFINITION_URL = PROCESS_DEFINITION_URL + "/{id}";
+  protected static final String RESTART_PROCESS_INSTANCE_URL = SINGLE_PROCESS_DEFINITION_URL + "/restart";
+  protected static final String RESTART_PROCESS_INSTANCE_ASYNC_URL = SINGLE_PROCESS_DEFINITION_URL + "/restart-async";
 
   RuntimeService runtimeServiceMock;
   HistoryService historyServiceMock;
@@ -59,6 +61,9 @@ public class RestartProcessInstanceRestServiceTest extends AbstractRestServiceTe
     when(builderMock.startTransition(anyString())).thenReturn(builderMock);
     when(builderMock.processInstanceIds(anyListOf(String.class))).thenReturn(builderMock);
     when(builderMock.historicProcessInstanceQuery(any(HistoricProcessInstanceQuery.class))).thenReturn(builderMock);
+    when(builderMock.skipCustomListeners()).thenReturn(builderMock);
+    when(builderMock.skipIoMappings()).thenReturn(builderMock);
+    when(builderMock.initialSetOfVariables()).thenReturn(builderMock);
 
     Batch batchMock = createMockBatch();
     when(builderMock.executeAsync()).thenReturn(batchMock);
@@ -77,6 +82,7 @@ public class RestartProcessInstanceRestServiceTest extends AbstractRestServiceTe
     json.put("processInstanceIds", Arrays.asList("processInstanceId1", "processInstanceId2"));
     
     given()
+    .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
     .contentType(ContentType.JSON)
     .body(json)
     .then().expect()
@@ -100,6 +106,7 @@ public class RestartProcessInstanceRestServiceTest extends AbstractRestServiceTe
     json.put("processInstanceIds", Arrays.asList("processInstanceId1", "processInstanceId2"));
     
     given()
+    .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
     .contentType(ContentType.JSON)
     .body(json)
     .then().expect()
@@ -112,45 +119,7 @@ public class RestartProcessInstanceRestServiceTest extends AbstractRestServiceTe
     verify(builderMock).processInstanceIds(Arrays.asList("processInstanceId1", "processInstanceId2"));
     verify(builderMock).executeAsync();
   }
-  
-  @Test
-  public void testRestartProcessInstanceWithNullProcessDefinitionSync() {
-    doThrow(new BadUserRequestException("processDefinitionId is null")).when(builderMock).execute();
-    
-    HashMap<String, Object> json = new HashMap<String, Object>();
-    List<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
-    instructions.add(ModificationInstructionBuilder.startAfter().activityId("activityId").getJson());
-    json.put("instuctions", instructions);
-    json.put("processInstanceIds", "processInstanceId");
 
-    given()
-    .contentType(ContentType.JSON)
-    .body(json)
-    .then().expect()
-    .statusCode(Status.BAD_REQUEST.getStatusCode())
-    .when()
-    .post(RESTART_PROCESS_INSTANCE_URL);
-  }
-  
-  @Test
-  public void testRestartProcessInstanceWithNullProcessDefinitionAsync() {
-    doThrow(new BadUserRequestException("processDefinitionId is null")).when(builderMock).executeAsync();
-    
-    HashMap<String, Object> json = new HashMap<String, Object>();
-    List<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
-    instructions.add(ModificationInstructionBuilder.startAfter().activityId("activityId").getJson());
-    json.put("instuctions", instructions);
-    json.put("processInstanceIds", "processInstanceId");
-
-    given()
-    .contentType(ContentType.JSON)
-    .body(json)
-    .then().expect()
-    .statusCode(Status.BAD_REQUEST.getStatusCode())
-    .when()
-    .post(RESTART_PROCESS_INSTANCE_ASYNC_URL);
-  }
-  
   @Test
   public void testRestartProcessInstanceWithNullProcessInstanceIdsSync() {
     doThrow(new BadUserRequestException("processInstanceIds is null")).when(builderMock).execute();
@@ -162,6 +131,7 @@ public class RestartProcessInstanceRestServiceTest extends AbstractRestServiceTe
     json.put("instructions", instructions);
     
     given()
+    .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
     .contentType(ContentType.JSON)
     .body(json)
     .then().expect()
@@ -181,6 +151,7 @@ public class RestartProcessInstanceRestServiceTest extends AbstractRestServiceTe
     json.put("instructions", instructions);
     
     given()
+    .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
     .contentType(ContentType.JSON)
     .body(json)
     .then().expect()
@@ -204,6 +175,7 @@ public class RestartProcessInstanceRestServiceTest extends AbstractRestServiceTe
     json.put("processDefinitionId", "processDefinitionId");
     
     given()
+    .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
     .contentType(ContentType.JSON)
     .body(json)
     .then().expect()
@@ -232,6 +204,7 @@ public class RestartProcessInstanceRestServiceTest extends AbstractRestServiceTe
     json.put("processDefinitionId", "processDefinitionId");
     
     given()
+    .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
     .contentType(ContentType.JSON)
     .body(json)
     .then().expect()
@@ -254,12 +227,13 @@ public class RestartProcessInstanceRestServiceTest extends AbstractRestServiceTe
     json.put("processInstanceIds", "processInstanceId");
     
     given()
-    .contentType(ContentType.JSON)
-    .body(json)
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+      .contentType(ContentType.JSON)
+      .body(json)
     .then().expect()
-    .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
     .when()
-    .post(RESTART_PROCESS_INSTANCE_URL);
+      .post(RESTART_PROCESS_INSTANCE_URL);
   }
   
   @Test
@@ -271,12 +245,13 @@ public class RestartProcessInstanceRestServiceTest extends AbstractRestServiceTe
     json.put("processInstanceIds", "processInstanceId");
     
     given()
-    .contentType(ContentType.JSON)
-    .body(json)
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+      .contentType(ContentType.JSON)
+      .body(json)
     .then().expect()
-    .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
     .when()
-    .post(RESTART_PROCESS_INSTANCE_ASYNC_URL);
+      .post(RESTART_PROCESS_INSTANCE_ASYNC_URL);
   }
   
   @Test
@@ -290,6 +265,7 @@ public class RestartProcessInstanceRestServiceTest extends AbstractRestServiceTe
     json.put("processDefinitionId", "processDefinitionId");
 
     given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
       .contentType(ContentType.JSON)
       .body(json)
     .then()
@@ -313,6 +289,7 @@ public class RestartProcessInstanceRestServiceTest extends AbstractRestServiceTe
     json.put("processDefinitionId", "processDefinitionId");
 
     given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
       .contentType(ContentType.JSON)
       .body(json)
     .then()
@@ -336,6 +313,7 @@ public class RestartProcessInstanceRestServiceTest extends AbstractRestServiceTe
     json.put("processDefinitionId", "processDefinitionId");
 
     given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
       .contentType(ContentType.JSON)
       .body(json)
     .then()
@@ -359,6 +337,7 @@ public class RestartProcessInstanceRestServiceTest extends AbstractRestServiceTe
     json.put("processDefinitionId", "processDefinitionId");
 
     given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
       .contentType(ContentType.JSON)
       .body(json)
     .then()
@@ -382,6 +361,7 @@ public class RestartProcessInstanceRestServiceTest extends AbstractRestServiceTe
     json.put("processDefinitionId", "processDefinitionId");
 
     given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
       .contentType(ContentType.JSON)
       .body(json)
     .then()
@@ -405,6 +385,7 @@ public class RestartProcessInstanceRestServiceTest extends AbstractRestServiceTe
     json.put("processDefinitionId", "processDefinitionId");
 
     given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
       .contentType(ContentType.JSON)
       .body(json)
     .then()
@@ -415,5 +396,170 @@ public class RestartProcessInstanceRestServiceTest extends AbstractRestServiceTe
       .body("message", equalTo("For instruction type 'startTransition': 'transitionId' must be set"))
     .when()
       .post(RESTART_PROCESS_INSTANCE_ASYNC_URL);
+  }
+
+  @Test
+  public void testRestartProcessInstanceWithInitialVariablesAsync() {
+    Map<String, Object> json = new HashMap<String, Object>();
+    List<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
+
+    json.put("processInstanceIds", Arrays.asList("processInstance1", "processInstance2"));
+    instructions.add(ModificationInstructionBuilder.startBefore().activityId("activityId").getJson());
+    json.put("instructions", instructions);
+    json.put("processDefinitionId", "processDefinitionId");
+    json.put("initialVariables", true);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+      .contentType(ContentType.JSON)
+      .body(json)
+    .then()
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+      .contentType(ContentType.JSON)
+     .when()
+       .post(RESTART_PROCESS_INSTANCE_ASYNC_URL);
+
+    verify(builderMock).processInstanceIds(Arrays.asList("processInstance1", "processInstance2"));
+    verify(builderMock).initialSetOfVariables();
+    verify(builderMock).startBeforeActivity("activityId");
+    verify(builderMock).executeAsync();
+  }
+
+  @Test
+  public void testRestartProcessInstanceWithInitialVariablesSync() {
+    Map<String, Object> json = new HashMap<String, Object>();
+    List<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
+
+    json.put("processInstanceIds", Arrays.asList("processInstance1", "processInstance2"));
+    instructions.add(ModificationInstructionBuilder.startBefore().activityId("activityId").getJson());
+    json.put("instructions", instructions);
+    json.put("processDefinitionId", "processDefinitionId");
+    json.put("initialVariables", true);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+      .contentType(ContentType.JSON)
+      .body(json)
+    .then()
+      .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+     .when()
+       .post(RESTART_PROCESS_INSTANCE_URL);
+
+    verify(builderMock).processInstanceIds(Arrays.asList("processInstance1", "processInstance2"));
+    verify(builderMock).initialSetOfVariables();
+    verify(builderMock).startBeforeActivity("activityId");
+    verify(builderMock).execute();
+  }
+
+  @Test
+  public void testRestartProcessInstanceWithSkipCustomListenersAsync() {
+    Map<String, Object> json = new HashMap<String, Object>();
+    List<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
+
+    json.put("processInstanceIds", Arrays.asList("processInstance1", "processInstance2"));
+    instructions.add(ModificationInstructionBuilder.startBefore().activityId("activityId").getJson());
+    json.put("instructions", instructions);
+    json.put("processDefinitionId", "processDefinitionId");
+    json.put("skipCustomListeners", true);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+      .contentType(ContentType.JSON)
+      .body(json)
+    .then()
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+      .contentType(ContentType.JSON)
+     .when()
+       .post(RESTART_PROCESS_INSTANCE_ASYNC_URL);
+
+    verify(builderMock).processInstanceIds(Arrays.asList("processInstance1", "processInstance2"));
+    verify(builderMock).skipCustomListeners();
+    verify(builderMock).startBeforeActivity("activityId");
+    verify(builderMock).executeAsync();
+  }
+
+  @Test
+  public void testRestartProcessInstanceWithSkipCustomListenersSync() {
+    Map<String, Object> json = new HashMap<String, Object>();
+    List<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
+
+    json.put("processInstanceIds", Arrays.asList("processInstance1", "processInstance2"));
+    instructions.add(ModificationInstructionBuilder.startBefore().activityId("activityId").getJson());
+    json.put("instructions", instructions);
+    json.put("processDefinitionId", "processDefinitionId");
+    json.put("skipCustomListeners", true);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+      .contentType(ContentType.JSON)
+      .body(json)
+    .then()
+      .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+     .when()
+       .post(RESTART_PROCESS_INSTANCE_URL);
+
+    verify(builderMock).processInstanceIds(Arrays.asList("processInstance1", "processInstance2"));
+    verify(builderMock).skipCustomListeners();
+    verify(builderMock).startBeforeActivity("activityId");
+    verify(builderMock).execute();
+  }
+
+  @Test
+  public void testRestartProcessInstanceWithSkipIoMappingsAsync() {
+    Map<String, Object> json = new HashMap<String, Object>();
+    List<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
+
+    json.put("processInstanceIds", Arrays.asList("processInstance1", "processInstance2"));
+    instructions.add(ModificationInstructionBuilder.startBefore().activityId("activityId").getJson());
+    json.put("instructions", instructions);
+    json.put("processDefinitionId", "processDefinitionId");
+    json.put("skipIoMappings", true);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+      .contentType(ContentType.JSON)
+      .body(json)
+    .then()
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+      .contentType(ContentType.JSON)
+     .when()
+       .post(RESTART_PROCESS_INSTANCE_ASYNC_URL);
+
+    verify(builderMock).processInstanceIds(Arrays.asList("processInstance1", "processInstance2"));
+    verify(builderMock).skipIoMappings();
+    verify(builderMock).startBeforeActivity("activityId");
+    verify(builderMock).executeAsync();
+  }
+
+  @Test
+  public void testRestartProcessInstanceWithSkipIoMappingsSync() {
+    Map<String, Object> json = new HashMap<String, Object>();
+    List<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
+
+    json.put("processInstanceIds", Arrays.asList("processInstance1", "processInstance2"));
+    instructions.add(ModificationInstructionBuilder.startBefore().activityId("activityId").getJson());
+    json.put("instructions", instructions);
+    json.put("processDefinitionId", "processDefinitionId");
+    json.put("skipIoMappings", true);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+      .contentType(ContentType.JSON)
+      .body(json)
+    .then()
+      .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+     .when()
+       .post(RESTART_PROCESS_INSTANCE_URL);
+
+    verify(builderMock).processInstanceIds(Arrays.asList("processInstance1", "processInstance2"));
+    verify(builderMock).skipIoMappings();
+    verify(builderMock).startBeforeActivity("activityId");
+    verify(builderMock).execute();
   }
 }

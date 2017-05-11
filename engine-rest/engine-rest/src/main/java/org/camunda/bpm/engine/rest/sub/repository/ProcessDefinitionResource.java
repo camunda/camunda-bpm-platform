@@ -15,10 +15,12 @@ package org.camunda.bpm.engine.rest.sub.repository;
 import org.camunda.bpm.engine.rest.dto.StatisticsResultDto;
 import org.camunda.bpm.engine.rest.dto.HistoryTimeToLiveDto;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
+import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDiagramDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionSuspensionStateDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
+import org.camunda.bpm.engine.rest.dto.runtime.RestartProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.StartProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.task.FormDto;
 import org.camunda.bpm.engine.rest.sub.VariableResource;
@@ -55,6 +57,17 @@ public interface ProcessDefinitionResource {
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   ProcessInstanceDto startProcessInstance(@Context UriInfo context, StartProcessInstanceDto parameters);
+
+  @POST
+  @Path("/restart")
+  @Consumes(MediaType.APPLICATION_JSON)
+  void restartProcessInstance(RestartProcessInstanceDto restartProcessInstanceDto);
+
+  @POST
+  @Path("/restart-async")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  BatchDto restartProcessInstanceAsync(RestartProcessInstanceDto restartProcessInstanceDto);
 
   @POST
   @Path("/submit-form")

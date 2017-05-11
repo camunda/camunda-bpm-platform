@@ -15,11 +15,14 @@ package org.camunda.bpm.engine.rest.sub.repository.impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.camunda.bpm.engine.AuthorizationException;
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.form.StartFormData;
 import org.camunda.bpm.engine.impl.util.IoUtil;
@@ -30,6 +33,7 @@ import org.camunda.bpm.engine.rest.ProcessInstanceRestService;
 import org.camunda.bpm.engine.rest.dto.StatisticsResultDto;
 import org.camunda.bpm.engine.rest.dto.HistoryTimeToLiveDto;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
+import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
 import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 import org.camunda.bpm.engine.rest.dto.repository.ActivityStatisticsResultDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDiagramDto;
@@ -37,6 +41,7 @@ import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionSuspensionStateDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceWithVariablesDto;
+import org.camunda.bpm.engine.rest.dto.runtime.RestartProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.StartProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.modification.ProcessInstanceModificationInstructionDto;
 import org.camunda.bpm.engine.rest.dto.task.FormDto;
@@ -48,6 +53,7 @@ import org.camunda.bpm.engine.rest.util.EncodingUtil;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceWithVariables;
 import org.camunda.bpm.engine.runtime.ProcessInstantiationBuilder;
+import org.camunda.bpm.engine.runtime.RestartProcessInstanceBuilder;
 import org.camunda.bpm.engine.variable.VariableMap;
 
 import javax.ws.rs.HttpMethod;
@@ -359,5 +365,49 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
     VariableMap startFormVariables = formService.getStartFormVariables(processDefinitionId, formVariables, deserializeValues);
 
     return VariableValueDto.fromVariableMap(startFormVariables);
+  }
+
+  @Override
+  public void restartProcessInstance(RestartProcessInstanceDto restartProcessInstanceDto) {
+    try {
+      createRestartProcessInstanceBuilder(restartProcessInstanceDto).execute();
+    } catch (BadUserRequestException e) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());
+    }
+  }
+
+  @Override
+  public BatchDto restartProcessInstanceAsync(RestartProcessInstanceDto restartProcessInstanceDto) {
+    Batch batch = null;
+    try {
+       batch = createRestartProcessInstanceBuilder(restartProcessInstanceDto).executeAsync();
+    } catch (BadUserRequestException e) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());
+    }
+    return BatchDto.fromBatch(batch);
+  }
+
+  private RestartProcessInstanceBuilder createRestartProcessInstanceBuilder(RestartProcessInstanceDto restartProcessInstanceDto) {
+    RuntimeService runtimeService = engine.getRuntimeService();
+    RestartProcessInstanceBuilder builder = runtimeService
+        .restartProcessInstances(restartProcessInstanceDto.getProcessDefinitionId())
+        .processInstanceIds(restartProcessInstanceDto.getProcessInstanceIds());
+    if (restartProcessInstanceDto.getHistoricProcessInstanceQuery() != null) {
+      builder.historicProcessInstanceQuery(restartProcessInstanceDto.getHistoricProcessInstanceQuery().toQuery(engine));
+    }
+
+    if (restartProcessInstanceDto.isInitialVariables()) {
+      builder.initialSetOfVariables();
+    }
+
+    if (restartProcessInstanceDto.isSkipCustomListeners()) {
+      builder.skipCustomListeners();
+    }
+
+    if (restartProcessInstanceDto.isSkipIoMappings()) {
+      builder.skipIoMappings();
+    }
+    restartProcessInstanceDto.applyTo(builder, engine, objectMapper);
+    return builder;
   }
 }

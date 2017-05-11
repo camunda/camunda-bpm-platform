@@ -14,11 +14,19 @@ public class RestartProcessInstancesBatchConfiguration extends BatchConfiguratio
 
   protected List<AbstractProcessInstanceModificationCommand> instructions;
   protected String processDefinitionId;
+  protected boolean initialVariables;
+  protected boolean skipCustomListeners;
+  protected boolean skipIoMappings;
 
-  public RestartProcessInstancesBatchConfiguration(List<String> processInstanceIds, List<AbstractProcessInstanceModificationCommand> instructions, String processDefinitionId) {
+  public RestartProcessInstancesBatchConfiguration(List<String> processInstanceIds,
+      List<AbstractProcessInstanceModificationCommand> instructions, String processDefinitionId,
+      boolean initialVariables, boolean skipCustomListeners, boolean skipIoMappings) {
     super(processInstanceIds);
     this.instructions = instructions;
     this.processDefinitionId = processDefinitionId;
+    this.initialVariables = initialVariables;
+    this.skipCustomListeners = skipCustomListeners;
+    this.skipIoMappings = skipIoMappings;
   }
 
   public List<AbstractProcessInstanceModificationCommand> getInstructions() {
@@ -35,5 +43,29 @@ public class RestartProcessInstancesBatchConfiguration extends BatchConfiguratio
 
   public void setProcessDefinitionId(String processDefinitionId) {
     this.processDefinitionId = processDefinitionId;
+  }
+
+  public boolean isInitialVariables() {
+    return initialVariables;
+  }
+
+  public void setInitialVariables(boolean initialVariables) {
+    this.initialVariables = initialVariables;
+  }
+
+  public boolean isSkipCustomListeners() {
+    return skipCustomListeners;
+  }
+
+  public void setSkipCustomListeners(boolean skipCustomListeners) {
+    this.skipCustomListeners = skipCustomListeners;
+  }
+
+  public boolean isSkipIoMappings() {
+    return skipIoMappings;
+  }
+
+  public void setSkipIoMappings(boolean skipIoMappings) {
+    this.skipIoMappings = skipIoMappings;
   }
 }

@@ -20,6 +20,9 @@ public class RestartProcessInstanceDto {
   protected List<ProcessInstanceModificationInstructionDto> instructions;
   protected String processDefinitionId;
   protected HistoricProcessInstanceQueryDto historicProcessInstanceQuery;
+  protected boolean initialVariables;
+  protected boolean skipCustomListeners;
+  protected boolean skipIoMappings;
 
   public List<String> getProcessInstanceIds() {
     return processInstanceIds;
@@ -51,6 +54,30 @@ public class RestartProcessInstanceDto {
 
   public void setHistoricProcessInstanceQuery(HistoricProcessInstanceQueryDto historicProcessInstanceQuery) {
     this.historicProcessInstanceQuery = historicProcessInstanceQuery;
+  }
+
+  public boolean isInitialVariables() {
+    return initialVariables;
+  }
+
+  public void setInitialVariables(boolean initialVariables) {
+    this.initialVariables = initialVariables;
+  }
+
+  public boolean isSkipCustomListeners() {
+    return skipCustomListeners;
+  }
+
+  public void setSkipCustomListeners(boolean skipCustomListeners) {
+    this.skipCustomListeners = skipCustomListeners;
+  }
+
+  public boolean isSkipIoMappings() {
+    return skipIoMappings;
+  }
+
+  public void setSkipIoMappings(boolean skipIoMappings) {
+    this.skipIoMappings = skipIoMappings;
   }
 
   public void applyTo(RestartProcessInstanceBuilder builder, ProcessEngine processEngine, ObjectMapper objectMapper) {
