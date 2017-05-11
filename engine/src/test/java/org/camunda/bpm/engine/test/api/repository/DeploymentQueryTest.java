@@ -265,6 +265,12 @@ public class DeploymentQueryTest extends PluggableProcessEngineTestCase {
       .asc()
       .list()
       .size());
+
+    assertEquals(2, repositoryService.createDeploymentQuery()
+      .orderByDeploymentTime()
+      .asc()
+      .list()
+      .size());
   }
 
 }

@@ -172,7 +172,7 @@ public class DeploymentQueryDto extends AbstractQueryDto<DeploymentQuery> {
     } else if (sortBy.equals(SORT_BY_NAME_VALUE)) {
       query.orderByDeploymentName();
     } else if (sortBy.equals(SORT_BY_DEPLOYMENT_TIME_VALUE)) {
-      query.orderByDeploymenTime();
+      query.orderByDeploymentTime();
     } else if (sortBy.equals(SORT_BY_TENANT_ID)) {
       query.orderByTenantId();
     }

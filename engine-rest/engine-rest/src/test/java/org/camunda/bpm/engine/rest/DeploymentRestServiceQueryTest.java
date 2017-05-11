@@ -318,12 +318,12 @@ public class DeploymentRestServiceQueryTest extends AbstractRestServiceTest {
 
     inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySuccessfulSorting("deploymentTime", "asc", Status.OK);
-    inOrder.verify(mockedQuery).orderByDeploymenTime();
+    inOrder.verify(mockedQuery).orderByDeploymentTime();
     inOrder.verify(mockedQuery).asc();
 
     inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySuccessfulSorting("deploymentTime", "desc", Status.OK);
-    inOrder.verify(mockedQuery).orderByDeploymenTime();
+    inOrder.verify(mockedQuery).orderByDeploymentTime();
     inOrder.verify(mockedQuery).desc();
 
     inOrder = Mockito.inOrder(mockedQuery);
