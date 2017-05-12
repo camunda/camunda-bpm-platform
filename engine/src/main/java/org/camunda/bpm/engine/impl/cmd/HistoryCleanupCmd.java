@@ -51,7 +51,7 @@ public class HistoryCleanupCmd implements Command<Job>, Serializable {
 
     //validate
     if (!willBeScheduled(commandContext)) {
-      LOG.warnHistoryCleanupWrongConfiguration();
+      LOG.debugHistoryCleanupWrongConfiguration();
     }
 
     //find job instance

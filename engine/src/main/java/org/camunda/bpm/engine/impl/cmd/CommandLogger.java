@@ -248,8 +248,8 @@ public class CommandLogger extends ProcessEngineLogger {
     ));
   }
 
-  public void warnHistoryCleanupWrongConfiguration() {
-    logWarn("038", "History cleanup won't be scheduled. Either configure batch window or call it with immediatelyDue = true.");
+  public void debugHistoryCleanupWrongConfiguration() {
+    logDebug("038", "History cleanup won't be scheduled. Either configure batch window or call it with immediatelyDue = true.");
   }
 
   public ProcessEngineException processDefinitionOfHistoricInstanceDoesNotMatchTheGivenOne(HistoricProcessInstance historicProcessInstance, String processDefinitionId) {
