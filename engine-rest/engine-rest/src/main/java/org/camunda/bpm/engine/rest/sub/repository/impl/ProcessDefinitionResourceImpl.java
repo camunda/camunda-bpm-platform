@@ -390,7 +390,7 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
   private RestartProcessInstanceBuilder createRestartProcessInstanceBuilder(RestartProcessInstanceDto restartProcessInstanceDto) {
     RuntimeService runtimeService = engine.getRuntimeService();
     RestartProcessInstanceBuilder builder = runtimeService
-        .restartProcessInstances(restartProcessInstanceDto.getProcessDefinitionId())
+        .restartProcessInstances(processDefinitionId)
         .processInstanceIds(restartProcessInstanceDto.getProcessInstanceIds());
     if (restartProcessInstanceDto.getHistoricProcessInstanceQuery() != null) {
       builder.historicProcessInstanceQuery(restartProcessInstanceDto.getHistoricProcessInstanceQuery().toQuery(engine));

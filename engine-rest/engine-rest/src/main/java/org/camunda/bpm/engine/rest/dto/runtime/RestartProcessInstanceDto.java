@@ -18,7 +18,6 @@ public class RestartProcessInstanceDto {
 
   protected List<String> processInstanceIds;
   protected List<ProcessInstanceModificationInstructionDto> instructions;
-  protected String processDefinitionId;
   protected HistoricProcessInstanceQueryDto historicProcessInstanceQuery;
   protected boolean initialVariables;
   protected boolean skipCustomListeners;
@@ -38,14 +37,6 @@ public class RestartProcessInstanceDto {
 
   public void setInstructions(List<ProcessInstanceModificationInstructionDto> instructions) {
     this.instructions = instructions;
-  }
-
-  public String getProcessDefinitionId() {
-    return processDefinitionId;
-  }
-
-  public void setProcessDefinitionId(String processDefinitionId) {
-    this.processDefinitionId = processDefinitionId;
   }
 
   public HistoricProcessInstanceQueryDto getHistoricProcessInstanceQuery() {

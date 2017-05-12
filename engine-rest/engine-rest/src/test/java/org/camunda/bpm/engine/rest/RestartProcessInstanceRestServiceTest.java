@@ -7,14 +7,13 @@ import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
+import com.jayway.restassured.http.ContentType;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.ws.rs.core.Response.Status;
-
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.RuntimeService;
@@ -30,8 +29,6 @@ import org.camunda.bpm.engine.runtime.RestartProcessInstanceBuilder;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
-
-import com.jayway.restassured.http.ContentType;
 
 public class RestartProcessInstanceRestServiceTest extends AbstractRestServiceTest {
   
@@ -75,7 +72,6 @@ public class RestartProcessInstanceRestServiceTest extends AbstractRestServiceTe
   public void testRestartProcessInstanceSync() {
 
     HashMap<String, Object> json = new HashMap<String, Object>();
-    json.put("processDefinitionId", "processDefinitionId");
     ArrayList<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
     instructions.add(ModificationInstructionBuilder.startAfter().activityId("activityId").getJson());
     json.put("instructions", instructions);
@@ -90,7 +86,7 @@ public class RestartProcessInstanceRestServiceTest extends AbstractRestServiceTe
     .when()
     .post(RESTART_PROCESS_INSTANCE_URL);
     
-    verify(runtimeServiceMock).restartProcessInstances("processDefinitionId");
+    verify(runtimeServiceMock).restartProcessInstances(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
     verify(builderMock).startAfterActivity("activityId");
     verify(builderMock).processInstanceIds(Arrays.asList("processInstanceId1", "processInstanceId2"));
     verify(builderMock).execute();
@@ -99,7 +95,6 @@ public class RestartProcessInstanceRestServiceTest extends AbstractRestServiceTe
   @Test
   public void testRestartProcessInstanceAsync() {
     HashMap<String, Object> json = new HashMap<String, Object>();
-    json.put("processDefinitionId", "processDefinitionId");
     ArrayList<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
     instructions.add(ModificationInstructionBuilder.startAfter().activityId("activityId").getJson());
     json.put("instructions", instructions);
@@ -114,7 +109,7 @@ public class RestartProcessInstanceRestServiceTest extends AbstractRestServiceTe
     .when()
     .post(RESTART_PROCESS_INSTANCE_ASYNC_URL);
     
-    verify(runtimeServiceMock).restartProcessInstances("processDefinitionId");
+    verify(runtimeServiceMock).restartProcessInstances(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
     verify(builderMock).startAfterActivity("activityId");
     verify(builderMock).processInstanceIds(Arrays.asList("processInstanceId1", "processInstanceId2"));
     verify(builderMock).executeAsync();
@@ -127,7 +122,6 @@ public class RestartProcessInstanceRestServiceTest extends AbstractRestServiceTe
     HashMap<String, Object> json = new HashMap<String, Object>();
     List<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
     instructions.add(ModificationInstructionBuilder.startBefore().activityId("activityId").getJson());
-    json.put("processDefinitionId", "processDefinitionId");
     json.put("instructions", instructions);
     
     given()
@@ -147,7 +141,6 @@ public class RestartProcessInstanceRestServiceTest extends AbstractRestServiceTe
     HashMap<String, Object> json = new HashMap<String, Object>();
     List<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
     instructions.add(ModificationInstructionBuilder.startBefore().activityId("activityId").getJson());
-    json.put("processDefinitionId", "processDefinitionId");
     json.put("instructions", instructions);
     
     given()
@@ -172,8 +165,7 @@ public class RestartProcessInstanceRestServiceTest extends AbstractRestServiceTe
     query.setProcessInstanceBusinessKey("businessKey");
     
     json.put("historicProcessInstanceQuery", query);
-    json.put("processDefinitionId", "processDefinitionId");
-    
+
     given()
     .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
     .contentType(ContentType.JSON)
@@ -183,7 +175,7 @@ public class RestartProcessInstanceRestServiceTest extends AbstractRestServiceTe
     .when()
     .post(RESTART_PROCESS_INSTANCE_URL);
     
-    verify(runtimeServiceMock).restartProcessInstances("processDefinitionId");
+    verify(runtimeServiceMock).restartProcessInstances(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
     verify(builderMock).startBeforeActivity("activityId");
     verify(builderMock).historicProcessInstanceQuery(query.toQuery(processEngine));
     verify(builderMock).execute();
@@ -201,8 +193,7 @@ public class RestartProcessInstanceRestServiceTest extends AbstractRestServiceTe
     query.setProcessInstanceBusinessKey("businessKey");
     
     json.put("historicProcessInstanceQuery", query);
-    json.put("processDefinitionId", "processDefinitionId");
-    
+
     given()
     .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
     .contentType(ContentType.JSON)
@@ -212,7 +203,7 @@ public class RestartProcessInstanceRestServiceTest extends AbstractRestServiceTe
     .when()
     .post(RESTART_PROCESS_INSTANCE_ASYNC_URL);
     
-    verify(runtimeServiceMock).restartProcessInstances("processDefinitionId");
+    verify(runtimeServiceMock).restartProcessInstances(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
     verify(builderMock).startBeforeActivity("activityId");
     verify(builderMock).historicProcessInstanceQuery(query.toQuery(processEngine));
     verify(builderMock).executeAsync();
@@ -223,7 +214,6 @@ public class RestartProcessInstanceRestServiceTest extends AbstractRestServiceTe
     doThrow(new BadUserRequestException("instructions is null")).when(builderMock).execute();
     
     HashMap<String, Object> json = new HashMap<String, Object>();
-    json.put("processDefinitionId", "processDefinitionId");
     json.put("processInstanceIds", "processInstanceId");
     
     given()
@@ -241,7 +231,6 @@ public class RestartProcessInstanceRestServiceTest extends AbstractRestServiceTe
     doThrow(new BadUserRequestException("instructions is null")).when(builderMock).executeAsync();
     
     HashMap<String, Object> json = new HashMap<String, Object>();
-    json.put("processDefinitionId", "processDefinitionId");
     json.put("processInstanceIds", "processInstanceId");
     
     given()
@@ -262,7 +251,6 @@ public class RestartProcessInstanceRestServiceTest extends AbstractRestServiceTe
     json.put("processInstanceIds", Arrays.asList("200", "100"));
     instructions.add(ModificationInstructionBuilder.startAfter().getJson());
     json.put("instructions", instructions);
-    json.put("processDefinitionId", "processDefinitionId");
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
@@ -286,7 +274,6 @@ public class RestartProcessInstanceRestServiceTest extends AbstractRestServiceTe
     json.put("processInstanceIds", Arrays.asList("200", "100"));
     instructions.add(ModificationInstructionBuilder.startAfter().getJson());
     json.put("instructions", instructions);
-    json.put("processDefinitionId", "processDefinitionId");
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
@@ -310,7 +297,6 @@ public class RestartProcessInstanceRestServiceTest extends AbstractRestServiceTe
     json.put("processInstanceIds", Arrays.asList("200", "100"));
     instructions.add(ModificationInstructionBuilder.startBefore().getJson());
     json.put("instructions", instructions);
-    json.put("processDefinitionId", "processDefinitionId");
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
@@ -334,7 +320,6 @@ public class RestartProcessInstanceRestServiceTest extends AbstractRestServiceTe
     json.put("processInstanceIds", Arrays.asList("200", "100"));
     instructions.add(ModificationInstructionBuilder.startBefore().getJson());
     json.put("instructions", instructions);
-    json.put("processDefinitionId", "processDefinitionId");
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
@@ -358,7 +343,6 @@ public class RestartProcessInstanceRestServiceTest extends AbstractRestServiceTe
     json.put("processInstanceIds", Arrays.asList("200", "100"));
     instructions.add(ModificationInstructionBuilder.startTransition().getJson());
     json.put("instructions", instructions);
-    json.put("processDefinitionId", "processDefinitionId");
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
@@ -382,7 +366,6 @@ public class RestartProcessInstanceRestServiceTest extends AbstractRestServiceTe
     json.put("processInstanceIds", Arrays.asList("200", "100"));
     instructions.add(ModificationInstructionBuilder.startTransition().getJson());
     json.put("instructions", instructions);
-    json.put("processDefinitionId", "processDefinitionId");
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
@@ -406,7 +389,6 @@ public class RestartProcessInstanceRestServiceTest extends AbstractRestServiceTe
     json.put("processInstanceIds", Arrays.asList("processInstance1", "processInstance2"));
     instructions.add(ModificationInstructionBuilder.startBefore().activityId("activityId").getJson());
     json.put("instructions", instructions);
-    json.put("processDefinitionId", "processDefinitionId");
     json.put("initialVariables", true);
 
     given()
@@ -434,7 +416,6 @@ public class RestartProcessInstanceRestServiceTest extends AbstractRestServiceTe
     json.put("processInstanceIds", Arrays.asList("processInstance1", "processInstance2"));
     instructions.add(ModificationInstructionBuilder.startBefore().activityId("activityId").getJson());
     json.put("instructions", instructions);
-    json.put("processDefinitionId", "processDefinitionId");
     json.put("initialVariables", true);
 
     given()
@@ -461,7 +442,6 @@ public class RestartProcessInstanceRestServiceTest extends AbstractRestServiceTe
     json.put("processInstanceIds", Arrays.asList("processInstance1", "processInstance2"));
     instructions.add(ModificationInstructionBuilder.startBefore().activityId("activityId").getJson());
     json.put("instructions", instructions);
-    json.put("processDefinitionId", "processDefinitionId");
     json.put("skipCustomListeners", true);
 
     given()
@@ -489,7 +469,6 @@ public class RestartProcessInstanceRestServiceTest extends AbstractRestServiceTe
     json.put("processInstanceIds", Arrays.asList("processInstance1", "processInstance2"));
     instructions.add(ModificationInstructionBuilder.startBefore().activityId("activityId").getJson());
     json.put("instructions", instructions);
-    json.put("processDefinitionId", "processDefinitionId");
     json.put("skipCustomListeners", true);
 
     given()
@@ -516,7 +495,6 @@ public class RestartProcessInstanceRestServiceTest extends AbstractRestServiceTe
     json.put("processInstanceIds", Arrays.asList("processInstance1", "processInstance2"));
     instructions.add(ModificationInstructionBuilder.startBefore().activityId("activityId").getJson());
     json.put("instructions", instructions);
-    json.put("processDefinitionId", "processDefinitionId");
     json.put("skipIoMappings", true);
 
     given()
@@ -544,7 +522,6 @@ public class RestartProcessInstanceRestServiceTest extends AbstractRestServiceTe
     json.put("processInstanceIds", Arrays.asList("processInstance1", "processInstance2"));
     instructions.add(ModificationInstructionBuilder.startBefore().activityId("activityId").getJson());
     json.put("instructions", instructions);
-    json.put("processDefinitionId", "processDefinitionId");
     json.put("skipIoMappings", true);
 
     given()
