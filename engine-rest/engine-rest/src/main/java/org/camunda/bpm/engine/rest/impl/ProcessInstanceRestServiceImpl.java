@@ -208,22 +208,11 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
 
   @Override
   public BatchDto setRetriesByProcessHistoricQueryBased(SetJobRetriesByProcessDto setJobRetriesDto) {
-    try {
-      EnsureUtil.ensureNotNull("setJobRetriesDto", setJobRetriesDto);
-      EnsureUtil.ensureNotNull("retries", setJobRetriesDto.getRetries());
-    } catch (NullValueException e) {
-      throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());
-    }
-
-    ManagementService managementService = getProcessEngine().getManagementService();
-
-    List<HistoricProcessInstance> historicProcessInstances = null;
-    if (setJobRetriesDto.getHistoricProcessInstanceQuery() != null) {
-      historicProcessInstances = setJobRetriesDto.getHistoricProcessInstanceQuery().toQuery(getProcessEngine()).list();
-    }
-
     List<String> processInstanceIds = new ArrayList<String>();
-    if (historicProcessInstances != null) {
+    if (setJobRetriesDto.getHistoricProcessInstanceQuery() != null) {
+      List<HistoricProcessInstance> historicProcessInstances = setJobRetriesDto
+        .getHistoricProcessInstanceQuery().toQuery(getProcessEngine()).list();
+
       for (HistoricProcessInstance historicProcessInstance: historicProcessInstances) {
         processInstanceIds.add(historicProcessInstance.getId());
       }
@@ -237,8 +226,8 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
 
     try {
 
-      batch = managementService.setJobRetriesAsync(
-        processInstanceIds.isEmpty() ? null : processInstanceIds,
+      batch = getProcessEngine().getManagementService().setJobRetriesAsync(
+        processInstanceIds,
         setJobRetriesDto.getRetries());
 
       return BatchDto.fromBatch(batch);

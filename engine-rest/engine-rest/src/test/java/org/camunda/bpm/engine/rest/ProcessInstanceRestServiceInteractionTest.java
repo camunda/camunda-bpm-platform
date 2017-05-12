@@ -2796,7 +2796,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
     SetJobRetriesByProcessDto body = new SetJobRetriesByProcessDto();
     body.setRetries(MockProvider.EXAMPLE_JOB_RETRIES);
-    body.setProcessInstances(Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID));
+    body.setProcessInstances(Arrays.asList(MockProvider.ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID));
     body.setHistoricProcessInstanceQuery(new HistoricProcessInstanceQueryDto());
 
     given()
@@ -2806,29 +2806,20 @@ public class ProcessInstanceRestServiceInteractionTest extends
     .when().post(SET_JOB_RETRIES_ASYNC_HIST_QUERY_URL);
 
     verify(mockManagementService, times(1)).setJobRetriesAsync(
-      eq(Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)),
+      eq(Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, MockProvider.ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID)),
       eq(MockProvider.EXAMPLE_JOB_RETRIES));
   }
 
   @Test
   public void testSetRetriesByProcessAsyncHistoricQueryBasedWithBadRequestQuery() {
     doThrow(new BadUserRequestException("jobIds is empty"))
-      .when(mockManagementService).setJobRetriesAsync(eq((List<String>) null), anyInt());
+      .when(mockManagementService).setJobRetriesAsync(eq(new ArrayList<String>()), anyInt());
 
     SetJobRetriesByProcessDto body = new SetJobRetriesByProcessDto();
     body.setRetries(MockProvider.EXAMPLE_JOB_RETRIES);
 
     given()
       .contentType(ContentType.JSON).body(body)
-    .then().expect()
-      .statusCode(Status.BAD_REQUEST.getStatusCode())
-    .when().post(SET_JOB_RETRIES_ASYNC_HIST_QUERY_URL);
-  }
-
-  @Test
-  public void testSetRetriesByProcessAsyncHistoricQueryBasedWithoutRetries() {
-    given()
-      .contentType(ContentType.JSON).body(new SetJobRetriesByProcessDto())
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
     .when().post(SET_JOB_RETRIES_ASYNC_HIST_QUERY_URL);
