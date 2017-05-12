@@ -153,8 +153,12 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
   public BatchDto deleteAsyncHistoricQueryBased(DeleteProcessInstancesDto deleteProcessInstancesDto) {
     List<String> processInstanceIds = new ArrayList<String>();
     if (deleteProcessInstancesDto.getHistoricProcessInstanceQuery() != null) {
-      processInstanceIds.addAll(((HistoricProcessInstanceQueryImpl) deleteProcessInstancesDto
-        .getHistoricProcessInstanceQuery().toQuery(getProcessEngine())).listIds());
+      List<HistoricProcessInstance> historicProcessInstances = deleteProcessInstancesDto
+        .getHistoricProcessInstanceQuery().toQuery(getProcessEngine()).list();
+
+      for (HistoricProcessInstance historicProcessInstance: historicProcessInstances) {
+        processInstanceIds.add(historicProcessInstance.getId());
+      }
     }
 
     if (deleteProcessInstancesDto.getProcessInstanceIds() != null) {

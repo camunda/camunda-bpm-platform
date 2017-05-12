@@ -319,7 +319,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
     HistoricProcessInstanceQuery mockedHistoricProcessInstanceQuery = mock(HistoricProcessInstanceQueryImpl.class);
     when(historyServiceMock.createHistoricProcessInstanceQuery()).thenReturn(mockedHistoricProcessInstanceQuery);
-    when(((HistoricProcessInstanceQueryImpl) mockedHistoricProcessInstanceQuery).listIds()).thenReturn(Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID));
+    List<HistoricProcessInstance> historicProcessInstances = MockProvider.createMockRunningHistoricProcessInstances();
+    when(mockedHistoricProcessInstanceQuery.list()).thenReturn(historicProcessInstances);
 
     DeleteProcessInstancesDto body = new DeleteProcessInstancesDto();
     body.setHistoricProcessInstanceQuery(new HistoricProcessInstanceQueryDto());
@@ -375,7 +376,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
     HistoricProcessInstanceQuery mockedHistoricProcessInstanceQuery = mock(HistoricProcessInstanceQueryImpl.class);
     when(historyServiceMock.createHistoricProcessInstanceQuery()).thenReturn(mockedHistoricProcessInstanceQuery);
-    when(((HistoricProcessInstanceQueryImpl) mockedHistoricProcessInstanceQuery).listIds()).thenReturn(Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID));
+    List<HistoricProcessInstance> historicProcessInstances = MockProvider.createMockRunningHistoricProcessInstances();
+    when(mockedHistoricProcessInstanceQuery.list()).thenReturn(historicProcessInstances);
 
     DeleteProcessInstancesDto body = new DeleteProcessInstancesDto();
     body.setHistoricProcessInstanceQuery(new HistoricProcessInstanceQueryDto());
