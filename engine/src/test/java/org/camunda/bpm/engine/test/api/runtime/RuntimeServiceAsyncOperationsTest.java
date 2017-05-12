@@ -340,15 +340,7 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
         .deployAndGetDefinition(modify(ProcessModels.ONE_TASK_PROCESS).changeElementId(ProcessModels.PROCESS_KEY, "ONE_TASK_PROCESS"));
     ProcessDefinition sourceDefinition2 = testRule
         .deployAndGetDefinition(modify(ProcessModels.TWO_TASKS_PROCESS).changeElementId(ProcessModels.PROCESS_KEY, "TWO_TASKS_PROCESS"));
-    List<String> processInstanceIds = new ArrayList<String>();
-    for (int i = 0; i < 15; i++) {
-      ProcessInstance processInstance1 = runtimeService.startProcessInstanceById(sourceDefinition1.getId());
-      processInstanceIds.add(processInstance1.getId());
-      if (i < 10) {
-        ProcessInstance processInstance2 = runtimeService.startProcessInstanceById(sourceDefinition2.getId());
-        processInstanceIds.add(processInstance2.getId());
-      }
-    }
+    List<String> processInstanceIds = createProcessInstances(sourceDefinition1, sourceDefinition2, 15, 10);
     final String firstDeploymentId = sourceDefinition1.getDeploymentId();
     final String secondDeploymentId = sourceDefinition2.getDeploymentId();
 
@@ -363,16 +355,8 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
 
     String seedJobDefinitionId = batch.getSeedJobDefinitionId();
     // seed jobs
-    for (int i = 0; i < 6; i++) {
-      Job seedJob = managementService.createJobQuery().jobDefinitionId(seedJobDefinitionId).singleResult();
-      if (i != 5) {
-        assertNotNull(seedJob);
-        managementService.executeJob(seedJob.getId());
-      } else {
-        //the fifth seed job should not create another seed job
-        assertNull(seedJob);
-      }
-    }
+    int expectedSeedJobsCount = 5;
+    createAndExecuteSeedJobs(seedJobDefinitionId, expectedSeedJobsCount);
 
     // then
     List<Job> jobs = managementService.createJobQuery().jobDefinitionId(batch.getBatchJobDefinitionId()).list();
@@ -402,6 +386,19 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
   }
 
+  private List<String> createProcessInstances(ProcessDefinition sourceDefinition1, ProcessDefinition sourceDefinition2, int instanceCountDef1, int instanceCountDef2) {
+    List<String> processInstanceIds = new ArrayList<String>();
+    for (int i = 0; i < instanceCountDef1; i++) {
+      ProcessInstance processInstance1 = runtimeService.startProcessInstanceById(sourceDefinition1.getId());
+      processInstanceIds.add(processInstance1.getId());
+      if (i < instanceCountDef2) {
+        ProcessInstance processInstance2 = runtimeService.startProcessInstanceById(sourceDefinition2.getId());
+        processInstanceIds.add(processInstance2.getId());
+      }
+    }
+    return processInstanceIds;
+  }
+
   private List<String> getProcessInstanceIdsByDeploymentId(final String deploymentId) {
     List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().deploymentId(deploymentId).list();
     List<String> processInstanceIds = new ArrayList<String>();
@@ -419,5 +416,18 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
       }
     }
     return jobIdsForDeployment;
+  }
+
+  private void createAndExecuteSeedJobs(String seedJobDefinitionId, int expectedSeedJobsCount) {
+    for (int i = 0; i <= expectedSeedJobsCount; i++) {
+      Job seedJob = managementService.createJobQuery().jobDefinitionId(seedJobDefinitionId).singleResult();
+      if (i != expectedSeedJobsCount) {
+        assertNotNull(seedJob);
+        managementService.executeJob(seedJob.getId());
+      } else {
+        //the last seed job should not trigger another seed job
+        assertNull(seedJob);
+      }
+    }
   }
 }
