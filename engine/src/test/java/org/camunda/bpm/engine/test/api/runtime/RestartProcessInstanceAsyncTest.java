@@ -759,7 +759,7 @@ public class RestartProcessInstanceAsyncTest {
   }
 
   @Test
-  public void shouldRestartProcessInstanceWithBusinessKey() {
+  public void shouldRestartProcessInstanceWithoutBusinessKey() {
     // given
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(ProcessModels.TWO_TASKS_PROCESS);
     ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("Process", "businessKey1", (String) null);
@@ -779,13 +779,12 @@ public class RestartProcessInstanceAsyncTest {
     List<ProcessInstance> restartedProcessInstances = runtimeService.createProcessInstanceQuery().processDefinitionId(processDefinition.getId()).active().list();
     ProcessInstance restartedProcessInstance1 = restartedProcessInstances.get(0);
     ProcessInstance restartedProcessInstance2 = restartedProcessInstances.get(1);
-    assertNotNull(restartedProcessInstance1.getBusinessKey());
-    assertNotNull(restartedProcessInstance2.getBusinessKey());
-    assertNotEquals(restartedProcessInstance1.getBusinessKey(), restartedProcessInstance2.getBusinessKey());
+    assertNull(restartedProcessInstance1.getBusinessKey());
+    assertNull(restartedProcessInstance2.getBusinessKey());
   }
 
   @Test
-  public void shouldRestartProcessInstanceWithCaseInstanceId() {
+  public void shouldRestartProcessInstanceWithoutCaseInstanceId() {
     // given
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(ProcessModels.TWO_TASKS_PROCESS);
     ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("Process", null, "caseInstanceId1");
@@ -805,9 +804,8 @@ public class RestartProcessInstanceAsyncTest {
     List<ProcessInstance> restartedProcessInstances = runtimeService.createProcessInstanceQuery().processDefinitionId(processDefinition.getId()).active().list();
     ProcessInstance restartedProcessInstance1 = restartedProcessInstances.get(0);
     ProcessInstance restartedProcessInstance2 = restartedProcessInstances.get(1);
-    assertNotNull(restartedProcessInstance1.getCaseInstanceId());
-    assertNotNull(restartedProcessInstance2.getCaseInstanceId());
-    assertNotEquals(restartedProcessInstance1.getCaseInstanceId(), restartedProcessInstance2.getCaseInstanceId());
+    assertNull(restartedProcessInstance1.getCaseInstanceId());
+    assertNull(restartedProcessInstance2.getCaseInstanceId());
   }
 
   @Test

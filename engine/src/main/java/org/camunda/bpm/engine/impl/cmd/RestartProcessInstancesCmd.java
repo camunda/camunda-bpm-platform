@@ -77,8 +77,6 @@ public class RestartProcessInstancesCmd extends AbstractRestartProcessInstanceCm
       ProcessInstanceModificationBuilderImpl modificationBuilder = new ProcessInstanceModificationBuilderImpl();
       modificationBuilder.setModificationOperations(instructions);
       instantiationBuilder.setModificationBuilder(modificationBuilder);
-      instantiationBuilder.caseInstanceId(historicProcessInstance.getCaseInstanceId());
-      instantiationBuilder.businessKey(historicProcessInstance.getBusinessKey());
 
       if (historicProcessInstance.getTenantId() != null) {
         instantiationBuilder.processDefinitionTenantId(historicProcessInstance.getTenantId());

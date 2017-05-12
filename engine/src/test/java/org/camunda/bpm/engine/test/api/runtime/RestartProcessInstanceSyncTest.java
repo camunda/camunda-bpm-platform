@@ -370,7 +370,7 @@ public class RestartProcessInstanceSyncTest {
   }
 
   @Test
-  public void shouldRestartProcessInstanceWithBusinessKey() {
+  public void shouldRestartProcessInstanceWithoutBusinessKey() {
     // given
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(ProcessModels.TWO_TASKS_PROCESS);
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process", "businessKey", (String) null);
@@ -384,11 +384,11 @@ public class RestartProcessInstanceSyncTest {
 
     // then
     ProcessInstance restartedProcessInstance = runtimeService.createProcessInstanceQuery().processDefinitionId(processDefinition.getId()).active().singleResult();
-    assertEquals(restartedProcessInstance.getBusinessKey(), processInstance.getBusinessKey());
+    assertNull(restartedProcessInstance.getBusinessKey());
   }
 
   @Test
-  public void shouldRestartProcessInstanceWithCaseInstanceId() {
+  public void shouldRestartProcessInstanceWithoutCaseInstanceId() {
     // given
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(ProcessModels.TWO_TASKS_PROCESS);
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process", null, "caseInstanceId");
@@ -402,7 +402,7 @@ public class RestartProcessInstanceSyncTest {
 
     // then
     ProcessInstance restartedProcessInstance = runtimeService.createProcessInstanceQuery().processDefinitionId(processDefinition.getId()).active().singleResult();
-    assertEquals(restartedProcessInstance.getCaseInstanceId(), processInstance.getCaseInstanceId());
+    assertNull(restartedProcessInstance.getCaseInstanceId());
   }
 
   @Test
