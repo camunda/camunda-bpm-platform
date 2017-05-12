@@ -25,11 +25,12 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
-import org.camunda.bpm.engine.impl.HistoricProcessInstanceQueryImpl;
+import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 import org.camunda.bpm.engine.rest.ProcessInstanceRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
+import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceSuspensionStateDto;
@@ -152,9 +153,11 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
   @Override
   public BatchDto deleteAsyncHistoricQueryBased(DeleteProcessInstancesDto deleteProcessInstancesDto) {
     List<String> processInstanceIds = new ArrayList<String>();
-    if (deleteProcessInstancesDto.getHistoricProcessInstanceQuery() != null) {
-      List<HistoricProcessInstance> historicProcessInstances = deleteProcessInstancesDto
-        .getHistoricProcessInstanceQuery().toQuery(getProcessEngine()).list();
+
+    HistoricProcessInstanceQueryDto queryDto = deleteProcessInstancesDto.getHistoricProcessInstanceQuery();
+    if (queryDto != null) {
+      HistoricProcessInstanceQuery query = queryDto.toQuery(getProcessEngine());
+      List<HistoricProcessInstance> historicProcessInstances = query.list();
 
       for (HistoricProcessInstance historicProcessInstance: historicProcessInstances) {
         processInstanceIds.add(historicProcessInstance.getId());
@@ -165,11 +168,9 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
       processInstanceIds.addAll(deleteProcessInstancesDto.getProcessInstanceIds());
     }
 
-    Batch batch = null;
-
     try {
-
-      batch = getProcessEngine().getRuntimeService().deleteProcessInstancesAsync(
+      RuntimeService runtimeService = getProcessEngine().getRuntimeService();
+      Batch batch = runtimeService.deleteProcessInstancesAsync(
         processInstanceIds,
         null,
         deleteProcessInstancesDto.getDeleteReason(),
@@ -209,9 +210,11 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
   @Override
   public BatchDto setRetriesByProcessHistoricQueryBased(SetJobRetriesByProcessDto setJobRetriesDto) {
     List<String> processInstanceIds = new ArrayList<String>();
-    if (setJobRetriesDto.getHistoricProcessInstanceQuery() != null) {
-      List<HistoricProcessInstance> historicProcessInstances = setJobRetriesDto
-        .getHistoricProcessInstanceQuery().toQuery(getProcessEngine()).list();
+
+    HistoricProcessInstanceQueryDto queryDto = setJobRetriesDto.getHistoricProcessInstanceQuery();
+    if (queryDto != null) {
+      HistoricProcessInstanceQuery query = queryDto.toQuery(getProcessEngine());
+      List<HistoricProcessInstance> historicProcessInstances = query.list();
 
       for (HistoricProcessInstance historicProcessInstance: historicProcessInstances) {
         processInstanceIds.add(historicProcessInstance.getId());
@@ -222,11 +225,9 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
       processInstanceIds.addAll(setJobRetriesDto.getProcessInstances());
     }
 
-    Batch batch = null;
-
     try {
-
-      batch = getProcessEngine().getManagementService().setJobRetriesAsync(
+      ManagementService managementService = getProcessEngine().getManagementService();
+      Batch batch = managementService.setJobRetriesAsync(
         processInstanceIds,
         setJobRetriesDto.getRetries());
 
