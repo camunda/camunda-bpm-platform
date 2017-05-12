@@ -638,7 +638,8 @@ public class DeployCmd implements Command<DeploymentWithDefinitions>, Serializab
       new RegisterDeploymentCmd(deployment.getId()).execute(commandContext);
 
     } finally {
-      DeploymentFailListener listener = new DeploymentFailListener(deployment.getId());
+      DeploymentFailListener listener = new DeploymentFailListener(deployment.getId(),
+        Context.getProcessEngineConfiguration().getCommandExecutorTxRequiresNew());
 
       try {
         commandContext.getTransactionContext().addTransactionListener(TransactionState.ROLLED_BACK, listener);

@@ -109,9 +109,11 @@ public class ProcessApplicationManager {
 
   protected void createJobExecutorRegistrations(Set<String> deploymentIds) {
     try {
+      final DeploymentFailListener deploymentFailListener = new DeploymentFailListener(deploymentIds,
+        Context.getProcessEngineConfiguration().getCommandExecutorTxRequiresNew());
       Context.getCommandContext()
         .getTransactionContext()
-        .addTransactionListener(TransactionState.ROLLED_BACK, new DeploymentFailListener(deploymentIds));
+        .addTransactionListener(TransactionState.ROLLED_BACK, deploymentFailListener);
 
       Set<String> registeredDeployments = Context.getProcessEngineConfiguration().getRegisteredDeployments();
       registeredDeployments.addAll(deploymentIds);
