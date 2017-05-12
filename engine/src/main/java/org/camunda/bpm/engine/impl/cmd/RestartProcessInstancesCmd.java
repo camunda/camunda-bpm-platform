@@ -65,22 +65,12 @@ public class RestartProcessInstancesCmd extends AbstractRestartProcessInstanceCm
       String processDefinitionId = builder.getProcessDefinitionId();
       ensureSameProcessDefinition(historicProcessInstance, processDefinitionId);
 
-      ProcessInstantiationBuilderImpl instantiationBuilder = null;
-      if (historicProcessInstance.getTenantId() != null) {
-        instantiationBuilder = (ProcessInstantiationBuilderImpl) ProcessInstantiationBuilderImpl
-          .createProcessInstanceByKey(commandExecutor, processDefinition.getKey());
-      } else {
-        instantiationBuilder = (ProcessInstantiationBuilderImpl) ProcessInstantiationBuilderImpl
-            .createProcessInstanceById(commandExecutor, processDefinitionId);
-      }
+      ProcessInstantiationBuilderImpl instantiationBuilder = (ProcessInstantiationBuilderImpl) ProcessInstantiationBuilderImpl
+        .createProcessInstanceById(commandExecutor, processDefinitionId);
 
       ProcessInstanceModificationBuilderImpl modificationBuilder = new ProcessInstanceModificationBuilderImpl();
       modificationBuilder.setModificationOperations(instructions);
       instantiationBuilder.setModificationBuilder(modificationBuilder);
-
-      if (historicProcessInstance.getTenantId() != null) {
-        instantiationBuilder.processDefinitionTenantId(historicProcessInstance.getTenantId());
-      }
 
       if (builder.isInitialVariables()) {
          List<HistoricDetail> historicDetails = ((HistoricDetailQueryImpl) historyService.createHistoricDetailQuery().processInstanceId(processInstanceId).variableUpdates()).getInitialVariables();
