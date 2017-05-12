@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureEquals;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
@@ -44,8 +45,14 @@ public class DeleteHistoricProcessInstancesBulkCmd implements Command<Void>, Ser
 
     ensureNotEmpty(BadUserRequestException.class, "processInstanceIds", processInstanceIds);
     // Check if process instances are all finished
-    ensureEquals(BadUserRequestException.class, "FinishedProcessInstanceIds",
-        new HistoricProcessInstanceQueryImpl().finished().processInstanceIds(new HashSet<String>(this.processInstanceIds)).count(), processInstanceIds.size());
+    commandContext.runWithoutAuthorization(new Callable<Void>() {
+      @Override
+      public Void call() throws Exception {
+        ensureEquals(BadUserRequestException.class, "FinishedProcessInstanceIds",
+          new HistoricProcessInstanceQueryImpl().finished().processInstanceIds(new HashSet<String>(processInstanceIds)).count(), processInstanceIds.size());
+        return null;
+      }
+    });
 
     commandContext.getHistoricProcessInstanceManager().deleteHistoricProcessInstanceByIds(processInstanceIds);
 

@@ -77,16 +77,12 @@ public class BulkHistoryDeleteProcessInstancesAuthorizationTest {
   public static Collection<AuthorizationScenario[]> scenarios() {
     return AuthorizationTestRule.asParameters(
         scenario()
-            .withAuthorizations(
-                grant(Resources.PROCESS_DEFINITION, "*", "demo", Permissions.READ_HISTORY)
-            )
             .failsDueToRequired(
                 grant(Resources.PROCESS_DEFINITION, "*", "demo", Permissions.DELETE_HISTORY)
             )
                 ,
         scenario()
             .withAuthorizations(
-                grant(Resources.PROCESS_DEFINITION, "*", "demo", Permissions.READ_HISTORY),
                 grant(Resources.PROCESS_DEFINITION, "someId", "demo", Permissions.DELETE_HISTORY)
             )
             .failsDueToRequired(
@@ -95,7 +91,7 @@ public class BulkHistoryDeleteProcessInstancesAuthorizationTest {
         ,
         scenario()
             .withAuthorizations(
-                grant(Resources.PROCESS_DEFINITION, "*", "demo", Permissions.READ_HISTORY, Permissions.DELETE_HISTORY)
+                grant(Resources.PROCESS_DEFINITION, "*", "demo", Permissions.DELETE_HISTORY)
             )
             .succeeds()
     );

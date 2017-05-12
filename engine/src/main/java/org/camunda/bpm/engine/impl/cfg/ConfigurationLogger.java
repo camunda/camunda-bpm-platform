@@ -70,4 +70,10 @@ public class ConfigurationLogger extends ProcessEngineLogger {
         "Invalid value '{}' for configuration property '{}'.", propertyValue, propertyName));
   }
 
+  public ProcessEngineException invalidPropertyValue(String propertyName, String propertyValue, String reason) {
+    return new ProcessEngineException(exceptionMessage(
+      "009",
+      "Invalid value '{}' for configuration property '{}': {}.", propertyValue, propertyName, reason));
+  }
+
 }

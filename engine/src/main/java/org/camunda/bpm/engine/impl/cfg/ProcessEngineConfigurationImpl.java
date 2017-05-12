@@ -204,6 +204,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventSubprocessJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendJobDefinitionHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendProcessDefinitionHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupBatch;
 import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupHelper;
 import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupJobHandler;
 import org.camunda.bpm.engine.impl.metrics.MetricsRegistry;
@@ -689,7 +690,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   private Date historyCleanupBatchWindowStartTimeAsDate;
   private Date historyCleanupBatchWindowEndTimeAsDate;
-  
+
+  /**
+   * Size of batch in which history cleanup data will be deleted. {@link HistoryCleanupBatch#MAX_BATCH_SIZE} must be respected.
+   */
   private int historyCleanupBatchSize = 500;
   /**
    * Indicates the minimal amount of data to trigger the history cleanup.
@@ -758,17 +762,22 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initMigration();
     initCommandCheckers();
     initDefaultUserPermissionForTask();
-    initHistoryCleanupBatchWindow();
+    initHistoryCleanup();
     invokePostInit();
   }
 
-  public void initHistoryCleanupBatchWindow() {
+  public void initHistoryCleanup() {
     if (historyCleanupBatchWindowStartTime != null) {
       initHistoryCleanupBatchWindowStartTime();
     }
 
     if (historyCleanupBatchWindowEndTime != null) {
       initHistoryCleanupBatchWindowEndTime();
+    }
+
+    if (historyCleanupBatchSize > HistoryCleanupBatch.MAX_BATCH_SIZE) {
+      throw LOG.invalidPropertyValue("historyCleanupBatchSize", String.valueOf(historyCleanupBatchSize),
+        String.format("maximum value for batch size is %s", HistoryCleanupBatch.MAX_BATCH_SIZE));
     }
   }
 

@@ -153,7 +153,8 @@ public interface HistoryService {
   void deleteHistoricProcessInstances(List<String> processInstanceIds);
 
   /**
-   * Deletes historic process instances and all related historic data in bulk manner.
+   * Deletes historic process instances and all related historic data in bulk manner. DELETE SQL statement will be created for each entity type. They will have list
+   * of given process instance ids in IN clause. Therefore, DB limitation for number of values in IN clause must be taken into account.
    *
    * @param processInstanceIds list of process instance ids for removal
    *
@@ -244,7 +245,8 @@ public interface HistoryService {
   void deleteHistoricCaseInstance(String caseInstanceId);
 
   /**
-   * Deletes historic case instances and all related historic data in bulk manner.
+   * Deletes historic case instances and all related historic data in bulk manner. DELETE SQL statement will be created for each entity type. They will have list
+   * of given case instance ids in IN clause. Therefore, DB limitation for number of values in IN clause must be taken into account.
    *
    * @param caseInstanceIds list of case instance ids for removal
    */
@@ -268,9 +270,10 @@ public interface HistoryService {
   void deleteHistoricDecisionInstance(String decisionDefinitionId);
 
   /**
-   * Deletes decision process instances and all related historic data in bulk manner.
+   * Deletes decision instances and all related historic data in bulk manner. DELETE SQL statement will be created for each entity type. They will have list
+   * of given decision instance ids in IN clause. Therefore, DB limitation for number of values in IN clause must be taken into account.
    *
-   * @param decisionInstanceIds list of decision instance ids for removal
+   * @param decisionInstanceIds list of decision instance ids for removal.
    *
    * @throws AuthorizationException
    *          If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#DECISION_DEFINITION}.

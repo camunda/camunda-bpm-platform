@@ -38,6 +38,7 @@ import org.camunda.bpm.engine.impl.history.event.HistoricExternalTaskLogEntity;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.AttachmentEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEventEntity;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -388,8 +389,13 @@ public class BulkHistoryDeleteTest {
 
     //remember input and output ids
     List<HistoricDecisionInstance> historicDecisionInstances = historyService.createHistoricDecisionInstanceQuery().includeInputs().includeOutputs().list();
-    final List<String> historicDecisionInputIds = collectHistoricDecisionInputIds(historicDecisionInstances);
-    final List<String> historicDecisionOutputIds = collectHistoricDecisionOutputIds(historicDecisionInstances);
+    final List<String> inputIds = new ArrayList<String>();
+    final List<String> inputByteArrayIds = new ArrayList<String>();
+    collectHistoricDecisionInputIds(historicDecisionInstances, inputIds, inputByteArrayIds);
+
+    final List<String> outputIds = new ArrayList<String>();
+    final List<String> outputByteArrayIds = new ArrayList<String>();
+    collectHistoricDecisionOutputIds(historicDecisionInstances, outputIds, outputByteArrayIds);
 
     //when
     historyService.deleteHistoricDecisionInstancesBulk(extractIds(historicDecisionInstances));
@@ -398,18 +404,29 @@ public class BulkHistoryDeleteTest {
     assertEquals(0, historyService.createHistoricDecisionInstanceQuery().count());
 
     //check that decision inputs and outputs were removed
+    assertDataDeleted(inputIds, inputByteArrayIds, outputIds, outputByteArrayIds);
+
+  }
+
+  void assertDataDeleted(final List<String> inputIds, final List<String> inputByteArrayIds, final List<String> outputIds,
+    final List<String> outputByteArrayIds) {
     engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired().execute(new Command<Void>() {
       public Void execute(CommandContext commandContext) {
-        for (String inputId : historicDecisionInputIds) {
+        for (String inputId : inputIds) {
           assertNull(commandContext.getDbEntityManager().selectById(HistoricDecisionInputInstanceEntity.class, inputId));
         }
-        for (String outputId : historicDecisionOutputIds) {
+        for (String inputByteArrayId : inputByteArrayIds) {
+          assertNull(commandContext.getDbEntityManager().selectById(ByteArrayEntity.class, inputByteArrayId));
+        }
+        for (String outputId : outputIds) {
           assertNull(commandContext.getDbEntityManager().selectById(HistoricDecisionOutputInstanceEntity.class, outputId));
+        }
+        for (String outputByteArrayId : outputByteArrayIds) {
+          assertNull(commandContext.getDbEntityManager().selectById(ByteArrayEntity.class, outputByteArrayId));
         }
         return null;
       }
     });
-
   }
 
   @Test
@@ -422,8 +439,13 @@ public class BulkHistoryDeleteTest {
 
     //remember input and output ids
     List<HistoricDecisionInstance> historicDecisionInstances = historyService.createHistoricDecisionInstanceQuery().includeInputs().includeOutputs().list();
-    final List<String> historicDecisionInputIds = collectHistoricDecisionInputIds(historicDecisionInstances);
-    final List<String> historicDecisionOutputIds = collectHistoricDecisionOutputIds(historicDecisionInstances);
+    final List<String> inputIds = new ArrayList<String>();
+    final List<String> inputByteArrayIds = new ArrayList<String>();
+    collectHistoricDecisionInputIds(historicDecisionInstances, inputIds, inputByteArrayIds);
+
+    final List<String> outputIds = new ArrayList<String>();
+    final List<String> outputByteArrayIds = new ArrayList<String>();
+    collectHistoricDecisionOutputIds(historicDecisionInstances, outputIds, outputByteArrayIds);
 
     List<String> decisionInstanceIds = extractIds(historicDecisionInstances);
 
@@ -435,17 +457,7 @@ public class BulkHistoryDeleteTest {
     assertEquals(0, historyService.createHistoricDecisionInstanceQuery().count());
 
     //check that decision inputs and outputs were removed
-    engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired().execute(new Command<Void>() {
-      public Void execute(CommandContext commandContext) {
-        for (String inputId : historicDecisionInputIds) {
-          assertNull(commandContext.getDbEntityManager().selectById(HistoricDecisionInputInstanceEntity.class, inputId));
-        }
-        for (String outputId : historicDecisionOutputIds) {
-          assertNull(commandContext.getDbEntityManager().selectById(HistoricDecisionOutputInstanceEntity.class, outputId));
-        }
-        return null;
-      }
-    });
+    assertDataDeleted(inputIds, inputByteArrayIds, outputIds, outputByteArrayIds);
 
   }
 
@@ -493,26 +505,30 @@ public class BulkHistoryDeleteTest {
 
   }
 
-  private List<String> collectHistoricDecisionInputIds(List<HistoricDecisionInstance> historicDecisionInstances) {
-    List<String> result = new ArrayList<String>();
+  private void collectHistoricDecisionInputIds(List<HistoricDecisionInstance> historicDecisionInstances, List<String> historicDecisionInputIds, List<String> inputByteArrayIds) {
     for (HistoricDecisionInstance historicDecisionInstance : historicDecisionInstances) {
       for (HistoricDecisionInputInstance inputInstanceEntity : historicDecisionInstance.getInputs()) {
-        result.add(inputInstanceEntity.getId());
+        historicDecisionInputIds.add(inputInstanceEntity.getId());
+        final String byteArrayValueId = ((HistoricDecisionInputInstanceEntity) inputInstanceEntity).getByteArrayValueId();
+        if (byteArrayValueId != null) {
+          inputByteArrayIds.add(byteArrayValueId);
+        }
       }
     }
-    assertEquals(PROCESS_INSTANCE_COUNT, result.size());
-    return result;
+    assertEquals(PROCESS_INSTANCE_COUNT, historicDecisionInputIds.size());
   }
 
-  private List<String> collectHistoricDecisionOutputIds(List<HistoricDecisionInstance> historicDecisionInstances) {
-    List<String> result = new ArrayList<String>();
+  private void collectHistoricDecisionOutputIds(List<HistoricDecisionInstance> historicDecisionInstances, List<String> historicDecisionOutputIds, List<String> outputByteArrayId) {
     for (HistoricDecisionInstance historicDecisionInstance : historicDecisionInstances) {
       for (HistoricDecisionOutputInstance outputInstanceEntity : historicDecisionInstance.getOutputs()) {
-        result.add(outputInstanceEntity.getId());
+        historicDecisionOutputIds.add(outputInstanceEntity.getId());
+        final String byteArrayValueId = ((HistoricDecisionOutputInstanceEntity) outputInstanceEntity).getByteArrayValueId();
+        if (byteArrayValueId != null) {
+          outputByteArrayId.add(byteArrayValueId);
+        }
       }
     }
-    assertEquals(PROCESS_INSTANCE_COUNT, result.size());
-    return result;
+    assertEquals(PROCESS_INSTANCE_COUNT, historicDecisionOutputIds.size());
   }
 
   private List<String> prepareHistoricProcesses() {

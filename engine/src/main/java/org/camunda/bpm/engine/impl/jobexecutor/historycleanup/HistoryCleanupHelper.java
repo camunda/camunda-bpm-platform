@@ -17,8 +17,6 @@ public abstract class HistoryCleanupHelper {
 
   public static final SimpleDateFormat TIME_FORMAT_WITHOUT_SECONDS_WITH_TIMEZONE = new SimpleDateFormat("HH:mmZ");
 
-  private final static int MAX_BATCH_SIZE = 500;
-
   public static Date getNextRunWithinBatchWindow(Date date, CommandContext commandContext) {
     return getNextRunWithinBatchWindow(date, getBatchWindowStartTime(commandContext));
   }
@@ -97,8 +95,7 @@ public abstract class HistoryCleanupHelper {
   }
 
   private static Integer getHistoryCleanupBatchSize(CommandContext commandContext) {
-    final int configuredHistoryCleanupBatchSize = commandContext.getProcessEngineConfiguration().getHistoryCleanupBatchSize();
-    return Math.min(configuredHistoryCleanupBatchSize, MAX_BATCH_SIZE);
+    return commandContext.getProcessEngineConfiguration().getHistoryCleanupBatchSize();
   }
 
   /**

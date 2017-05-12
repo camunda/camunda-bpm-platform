@@ -11,6 +11,11 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
  */
 public class HistoryCleanupBatch {
 
+  /**
+   * Maximum allowed batch size.
+   */
+  public final static int MAX_BATCH_SIZE = 500;
+
   private List<String> historicProcessInstanceIds = new ArrayList<String>();
   private List<String> historicDecisionInstanceIds = new ArrayList<String>();
   private List<String> historicCaseInstanceIds = new ArrayList<String>();

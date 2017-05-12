@@ -364,7 +364,7 @@ public class HistoryCleanupTest {
     ClockUtil.setCurrentTime(now);
     processEngineConfiguration.setHistoryCleanupBatchWindowStartTime(new SimpleDateFormat("HH:mm").format(now));
     processEngineConfiguration.setHistoryCleanupBatchWindowEndTime(new SimpleDateFormat("HH:mm").format(DateUtils.addHours(now, HISTORY_TIME_TO_LIVE)));
-    processEngineConfiguration.initHistoryCleanupBatchWindow();
+    processEngineConfiguration.initHistoryCleanup();
 
     //when
     String jobId = historyService.cleanUpHistoryAsync(false).getId();
@@ -447,7 +447,7 @@ public class HistoryCleanupTest {
 
     processEngineConfiguration.setHistoryCleanupBatchWindowStartTime(null);
     processEngineConfiguration.setHistoryCleanupBatchWindowStartTime(null);
-    processEngineConfiguration.initHistoryCleanupBatchWindow();
+    processEngineConfiguration.initHistoryCleanup();
 
     ClockUtil.setCurrentTime(new Date());
 
@@ -518,7 +518,7 @@ public class HistoryCleanupTest {
     ClockUtil.setCurrentTime(now);
     processEngineConfiguration.setHistoryCleanupBatchWindowStartTime(new SimpleDateFormat("HH:mm").format(now));
     processEngineConfiguration.setHistoryCleanupBatchWindowEndTime(new SimpleDateFormat("HH:mm").format(DateUtils.addHours(now, HISTORY_TIME_TO_LIVE)));
-    processEngineConfiguration.initHistoryCleanupBatchWindow();
+    processEngineConfiguration.initHistoryCleanup();
     String jobId = historyService.cleanUpHistoryAsync().getId();
     //job is executed once within batch window
     managementService.executeJob(jobId);
@@ -546,7 +546,7 @@ public class HistoryCleanupTest {
     ClockUtil.setCurrentTime(now);
     processEngineConfiguration.setHistoryCleanupBatchWindowStartTime(new SimpleDateFormat("HH:mm").format(DateUtils.addHours(now, 1))); //now + 1 hour
     processEngineConfiguration.setHistoryCleanupBatchWindowEndTime(new SimpleDateFormat("HH:mm").format(DateUtils.addHours(now, HISTORY_TIME_TO_LIVE)));   //now + 5 hours
-    processEngineConfiguration.initHistoryCleanupBatchWindow();
+    processEngineConfiguration.initHistoryCleanup();
 
     //when
     //job is executed before batch window start
@@ -572,7 +572,7 @@ public class HistoryCleanupTest {
     ClockUtil.setCurrentTime(now);
     processEngineConfiguration.setHistoryCleanupBatchWindowStartTime(new SimpleDateFormat("HH:mm").format(now));
     processEngineConfiguration.setHistoryCleanupBatchWindowEndTime(new SimpleDateFormat("HH:mm").format(DateUtils.addHours(now, HISTORY_TIME_TO_LIVE)));
-    processEngineConfiguration.initHistoryCleanupBatchWindow();
+    processEngineConfiguration.initHistoryCleanup();
 
     //when
     String jobId = historyService.cleanUpHistoryAsync().getId();
@@ -617,7 +617,7 @@ public class HistoryCleanupTest {
     ClockUtil.setCurrentTime(now);
     processEngineConfiguration.setHistoryCleanupBatchWindowStartTime(new SimpleDateFormat("HH:mm").format(now));
     processEngineConfiguration.setHistoryCleanupBatchWindowEndTime(new SimpleDateFormat("HH:mm").format(DateUtils.addHours(now, 1)));
-    processEngineConfiguration.initHistoryCleanupBatchWindow();
+    processEngineConfiguration.initHistoryCleanup();
 
     //when
     String jobId = historyService.cleanUpHistoryAsync().getId();
@@ -652,7 +652,7 @@ public class HistoryCleanupTest {
     ClockUtil.setCurrentTime(now);
     processEngineConfiguration.setHistoryCleanupBatchWindowStartTime(new SimpleDateFormat("HH:mm").format(now));
     processEngineConfiguration.setHistoryCleanupBatchWindowEndTime(new SimpleDateFormat("HH:mm").format(DateUtils.addHours(now, 2)));
-    processEngineConfiguration.initHistoryCleanupBatchWindow();
+    processEngineConfiguration.initHistoryCleanup();
 
     //when
     String jobId = historyService.cleanUpHistoryAsync().getId();
@@ -686,7 +686,7 @@ public class HistoryCleanupTest {
     ClockUtil.setCurrentTime(now);
     processEngineConfiguration.setHistoryCleanupBatchWindowStartTime(new SimpleDateFormat("HH:mm").format(now));
     processEngineConfiguration.setHistoryCleanupBatchWindowEndTime(new SimpleDateFormat("HH:mm").format(DateUtils.addMinutes(now, 30)));
-    processEngineConfiguration.initHistoryCleanupBatchWindow();
+    processEngineConfiguration.initHistoryCleanup();
 
     //when
     String jobId = historyService.cleanUpHistoryAsync().getId();
@@ -718,7 +718,7 @@ public class HistoryCleanupTest {
     Date twoHoursAgo = new Date();
     processEngineConfiguration.setHistoryCleanupBatchWindowStartTime(new SimpleDateFormat("HH:mm").format(twoHoursAgo));
     processEngineConfiguration.setHistoryCleanupBatchWindowEndTime(new SimpleDateFormat("HH:mm").format(DateUtils.addHours(twoHoursAgo, 1)));
-    processEngineConfiguration.initHistoryCleanupBatchWindow();
+    processEngineConfiguration.initHistoryCleanup();
     ClockUtil.setCurrentTime(DateUtils.addHours(twoHoursAgo, 2));
 
     //when
@@ -752,7 +752,7 @@ public class HistoryCleanupTest {
     ClockUtil.setCurrentTime(DateUtils.setMinutes(DateUtils.setHours(date, 1), 10));  //01:10
     processEngineConfiguration.setHistoryCleanupBatchWindowStartTime("23:00");
     processEngineConfiguration.setHistoryCleanupBatchWindowEndTime("01:00");
-    processEngineConfiguration.initHistoryCleanupBatchWindow();
+    processEngineConfiguration.initHistoryCleanup();
 
     //when
     String jobId = historyService.cleanUpHistoryAsync().getId();
@@ -784,7 +784,7 @@ public class HistoryCleanupTest {
     ClockUtil.setCurrentTime(DateUtils.setMinutes(DateUtils.setHours(date, 22), 10));  //22:10
     processEngineConfiguration.setHistoryCleanupBatchWindowStartTime("23:00");
     processEngineConfiguration.setHistoryCleanupBatchWindowEndTime("01:00");
-    processEngineConfiguration.initHistoryCleanupBatchWindow();
+    processEngineConfiguration.initHistoryCleanup();
 
     //when
     String jobId = historyService.cleanUpHistoryAsync().getId();
@@ -816,7 +816,7 @@ public class HistoryCleanupTest {
     ClockUtil.setCurrentTime(DateUtils.setMinutes(DateUtils.setHours(date, 23), 10));  //23:10
     processEngineConfiguration.setHistoryCleanupBatchWindowStartTime("23:00");
     processEngineConfiguration.setHistoryCleanupBatchWindowEndTime("01:00");
-    processEngineConfiguration.initHistoryCleanupBatchWindow();
+    processEngineConfiguration.initHistoryCleanup();
 
     //when
     String jobId = historyService.cleanUpHistoryAsync().getId();
@@ -850,7 +850,7 @@ public class HistoryCleanupTest {
     ClockUtil.setCurrentTime(DateUtils.setMinutes(DateUtils.setHours(date, 0), 10));  //00:10
     processEngineConfiguration.setHistoryCleanupBatchWindowStartTime("23:00");
     processEngineConfiguration.setHistoryCleanupBatchWindowEndTime("01:00");
-    processEngineConfiguration.initHistoryCleanupBatchWindow();
+    processEngineConfiguration.initHistoryCleanup();
 
     //when
     String jobId = historyService.cleanUpHistoryAsync().getId();
@@ -877,7 +877,7 @@ public class HistoryCleanupTest {
   @Test
   public void testConfiguration() {
     processEngineConfiguration.setHistoryCleanupBatchWindowStartTime("23:00+0200");
-    processEngineConfiguration.initHistoryCleanupBatchWindow();
+    processEngineConfiguration.initHistoryCleanup();
     Calendar c = Calendar.getInstance(TimeZone.getTimeZone("GMT+2:00"));
     Date startTime = processEngineConfiguration.getHistoryCleanupBatchWindowStartTimeAsDate();
     c.setTime(startTime);
@@ -886,7 +886,7 @@ public class HistoryCleanupTest {
     assertEquals(0, c.get(Calendar.SECOND));
 
     processEngineConfiguration.setHistoryCleanupBatchWindowStartTime("23:00");
-    processEngineConfiguration.initHistoryCleanupBatchWindow();
+    processEngineConfiguration.initHistoryCleanup();
     c = Calendar.getInstance();
     startTime = processEngineConfiguration.getHistoryCleanupBatchWindowStartTimeAsDate();
     c.setTime(startTime);
@@ -895,7 +895,7 @@ public class HistoryCleanupTest {
     assertEquals(0, c.get(Calendar.SECOND));
 
     processEngineConfiguration.setHistoryCleanupBatchWindowEndTime("01:35-0800");
-    processEngineConfiguration.initHistoryCleanupBatchWindow();
+    processEngineConfiguration.initHistoryCleanup();
     c = Calendar.getInstance(TimeZone.getTimeZone("GMT-8:00"));
     Date endTime = processEngineConfiguration.getHistoryCleanupBatchWindowEndTimeAsDate();
     c.setTime(endTime);
@@ -904,13 +904,17 @@ public class HistoryCleanupTest {
     assertEquals(0, c.get(Calendar.SECOND));
 
     processEngineConfiguration.setHistoryCleanupBatchWindowEndTime("01:35");
-    processEngineConfiguration.initHistoryCleanupBatchWindow();
+    processEngineConfiguration.initHistoryCleanup();
     c = Calendar.getInstance();
     endTime = processEngineConfiguration.getHistoryCleanupBatchWindowEndTimeAsDate();
     c.setTime(endTime);
     assertEquals(1, c.get(Calendar.HOUR_OF_DAY));
     assertEquals(35, c.get(Calendar.MINUTE));
     assertEquals(0, c.get(Calendar.SECOND));
+
+    processEngineConfiguration.setHistoryCleanupBatchSize(500);
+    processEngineConfiguration.initHistoryCleanup();
+    assertEquals(processEngineConfiguration.getHistoryCleanupBatchSize(), 500);
   }
 
   @Test
@@ -918,7 +922,7 @@ public class HistoryCleanupTest {
     try {
       processEngineConfiguration.setHistoryCleanupBatchWindowStartTime("23");
       processEngineConfiguration.setHistoryCleanupBatchWindowEndTime("01:00");
-      processEngineConfiguration.initHistoryCleanupBatchWindow();
+      processEngineConfiguration.initHistoryCleanup();
       fail("Exception expected.");
     } catch (ProcessEngineException ex) {
       assertTrue(ex.getMessage().contains("historyCleanupBatchWindowStartTime"));
@@ -927,10 +931,18 @@ public class HistoryCleanupTest {
     try {
       processEngineConfiguration.setHistoryCleanupBatchWindowStartTime("23:00");
       processEngineConfiguration.setHistoryCleanupBatchWindowEndTime("wrongValue");
-      processEngineConfiguration.initHistoryCleanupBatchWindow();
+      processEngineConfiguration.initHistoryCleanup();
       fail("Exception expected.");
     } catch (ProcessEngineException ex) {
       assertTrue(ex.getMessage().contains("historyCleanupBatchWindowEndTime"));
+    }
+
+    try {
+      processEngineConfiguration.setHistoryCleanupBatchSize(501);
+      processEngineConfiguration.initHistoryCleanup();
+      fail("Exception expected.");
+    } catch (ProcessEngineException ex) {
+      assertTrue(ex.getMessage().contains("historyCleanupBatchSize"));
     }
   }
 
