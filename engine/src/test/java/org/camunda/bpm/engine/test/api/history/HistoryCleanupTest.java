@@ -63,8 +63,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
-import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -93,6 +93,9 @@ public class HistoryCleanupTest {
   protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
+  @Rule
+  public ExpectedException thrown = ExpectedException.none();
+
   private HistoryService historyService;
   private RuntimeService runtimeService;
   private ManagementService managementService;
@@ -115,7 +118,16 @@ public class HistoryCleanupTest {
   }
 
   @After
-  public void clearDatabase(){
+  public void clearDatabase() {
+    //reset configuration changes
+    String defaultStartTime = processEngineConfiguration.getHistoryCleanupBatchWindowStartTime();
+    String defaultEndTime = processEngineConfiguration.getHistoryCleanupBatchWindowEndTime();
+    int defaultBatchSize = processEngineConfiguration.getHistoryCleanupBatchSize();
+
+    processEngineConfiguration.setHistoryCleanupBatchWindowStartTime(defaultStartTime);
+    processEngineConfiguration.setHistoryCleanupBatchWindowEndTime(defaultEndTime);
+    processEngineConfiguration.setHistoryCleanupBatchSize(defaultBatchSize);
+
     processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
       public Void execute(CommandContext commandContext) {
 
@@ -129,7 +141,7 @@ public class HistoryCleanupTest {
 
         List<HistoricIncident> historicIncidents = historyService.createHistoricIncidentQuery().list();
         for (HistoricIncident historicIncident : historicIncidents) {
-          commandContext.getDbEntityManager().delete((HistoricIncidentEntity)historicIncident);
+          commandContext.getDbEntityManager().delete((HistoricIncidentEntity) historicIncident);
         }
 
         commandContext.getMeterLogManager().deleteAll();
@@ -918,48 +930,35 @@ public class HistoryCleanupTest {
   }
 
   @Test
-  public void testConfigurationFailure() {
-    String defaultStartTime = processEngineConfiguration.getHistoryCleanupBatchWindowStartTime();
-    String defaultEndTime = processEngineConfiguration.getHistoryCleanupBatchWindowEndTime();
-    int defaultBatchSize = processEngineConfiguration.getHistoryCleanupBatchSize();
+  public void testConfigurationFailureWrongStartTime() {
+    processEngineConfiguration.setHistoryCleanupBatchWindowStartTime("23");
+    processEngineConfiguration.setHistoryCleanupBatchWindowEndTime("01:00");
 
-    try {
-      processEngineConfiguration.setHistoryCleanupBatchWindowStartTime("23");
-      processEngineConfiguration.setHistoryCleanupBatchWindowEndTime("01:00");
-      processEngineConfiguration.initHistoryCleanup();
-      fail("Exception expected.");
-    } catch (ProcessEngineException ex) {
-      assertTrue(ex.getMessage().contains("historyCleanupBatchWindowStartTime"));
-    } finally {
-      processEngineConfiguration.setHistoryCleanupBatchWindowStartTime(defaultStartTime);
-      processEngineConfiguration.setHistoryCleanupBatchWindowEndTime(defaultEndTime);
-      processEngineConfiguration.setHistoryCleanupBatchSize(defaultBatchSize);
-    }
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("historyCleanupBatchWindowStartTime");
 
-    try {
-      processEngineConfiguration.setHistoryCleanupBatchWindowStartTime("23:00");
-      processEngineConfiguration.setHistoryCleanupBatchWindowEndTime("wrongValue");
-      processEngineConfiguration.initHistoryCleanup();
-      fail("Exception expected.");
-    } catch (ProcessEngineException ex) {
-      assertTrue(ex.getMessage().contains("historyCleanupBatchWindowEndTime"));
-    } finally {
-      processEngineConfiguration.setHistoryCleanupBatchWindowStartTime(defaultStartTime);
-      processEngineConfiguration.setHistoryCleanupBatchWindowEndTime(defaultEndTime);
-      processEngineConfiguration.setHistoryCleanupBatchSize(defaultBatchSize);
-    }
+    processEngineConfiguration.initHistoryCleanup();
+  }
 
-    try {
-      processEngineConfiguration.setHistoryCleanupBatchSize(501);
-      processEngineConfiguration.initHistoryCleanup();
-      fail("Exception expected.");
-    } catch (ProcessEngineException ex) {
-      assertTrue(ex.getMessage().contains("historyCleanupBatchSize"));
-    } finally {
-      processEngineConfiguration.setHistoryCleanupBatchWindowStartTime(defaultStartTime);
-      processEngineConfiguration.setHistoryCleanupBatchWindowEndTime(defaultEndTime);
-      processEngineConfiguration.setHistoryCleanupBatchSize(defaultBatchSize);
-    }
+  @Test
+  public void testConfigurationFailureWrongEndTime() {
+    processEngineConfiguration.setHistoryCleanupBatchWindowStartTime("23:00");
+    processEngineConfiguration.setHistoryCleanupBatchWindowEndTime("wrongValue");
+
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("historyCleanupBatchWindowEndTime");
+
+    processEngineConfiguration.initHistoryCleanup();
+  }
+
+  @Test
+  public void testConfigurationFailureWrongBatchSize() {
+    processEngineConfiguration.setHistoryCleanupBatchSize(501);
+
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("historyCleanupBatchSize");
+
+    processEngineConfiguration.initHistoryCleanup();
   }
 
   private Date getNextRunWithinBatchWindow(Date currentTime) {
