@@ -4,7 +4,6 @@ import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSc
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSpec.grant;
 
 import java.util.Collection;
-
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
@@ -29,7 +28,6 @@ import org.junit.runners.Parameterized;
 public class RestartAuthorizationTest {
 
   protected static final String TEST_REASON = "test reason";
-  protected static final String JOB_EXCEPTION_DEFINITION_XML = "org/camunda/bpm/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml";
 
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected AuthorizationTestRule authRule = new AuthorizationTestRule(engineRule);
@@ -44,24 +42,24 @@ public class RestartAuthorizationTest {
   @Parameterized.Parameters(name = "Scenario {index}")
   public static Collection<AuthorizationScenario[]> scenarios() {
     return AuthorizationTestRule.asParameters(
-        scenario()
-            .withAuthorizations(
-                grant(Resources.PROCESS_DEFINITION, "processDefinition", "userId", Permissions.READ_HISTORY, Permissions.CREATE_INSTANCE),
-                grant(Resources.PROCESS_INSTANCE, "*", "userId", Permissions.CREATE)
-            ).succeeds(),
-        scenario()
-            .withAuthorizations(
-                grant(Resources.PROCESS_DEFINITION, "processDefinition", "userId", Permissions.READ_HISTORY, Permissions.CREATE_INSTANCE)
-            ).failsDueToRequired(
-                grant(Resources.PROCESS_INSTANCE, "*", "userId", Permissions.CREATE))
-            .succeeds(),
-        scenario()
-            .withAuthorizations(
-                grant(Resources.PROCESS_INSTANCE, "*", "userId", Permissions.CREATE),
-                grant(Resources.PROCESS_DEFINITION, "processDefinition", "userId", Permissions.CREATE_INSTANCE)
-            ).failsDueToRequired(
-                grant(Resources.PROCESS_DEFINITION, "processDefinition", "userId", Permissions.READ_HISTORY))
-            .succeeds()
+      scenario()
+        .withoutAuthorizations()
+        .failsDueToRequired(
+          grant(Resources.PROCESS_DEFINITION, "Process", "userId", Permissions.READ_HISTORY)
+        ),
+      scenario()
+        .withAuthorizations(
+          grant(Resources.PROCESS_DEFINITION, "Process", "userId", Permissions.READ_HISTORY)
+        )
+        .failsDueToRequired(
+          grant(Resources.PROCESS_INSTANCE, "*", "userId", Permissions.CREATE)
+        ),
+      scenario()
+        .withAuthorizations(
+          grant(Resources.PROCESS_DEFINITION, "Process", "userId", Permissions.READ_HISTORY, Permissions.CREATE_INSTANCE),
+          grant(Resources.PROCESS_INSTANCE, "*", "userId", Permissions.CREATE)
+        )
+        .succeeds()
     );
   }
 
