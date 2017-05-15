@@ -20,7 +20,6 @@ import org.camunda.bpm.engine.impl.cmd.CommandLogger;
 import org.camunda.bpm.engine.impl.cmd.StartProcessInstanceAtActivitiesCmd;
 import org.camunda.bpm.engine.impl.cmd.StartProcessInstanceCmd;
 import org.camunda.bpm.engine.impl.interceptor.Command;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceWithVariables;
@@ -42,9 +41,10 @@ public class ProcessInstantiationBuilderImpl implements ProcessInstantiationBuil
 
   protected String businessKey;
   protected String caseInstanceId;
+  protected String tenantId;
 
   protected String processDefinitionTenantId;
-  protected boolean isTenantIdSet = false;
+  protected boolean isProcessDefinitionTenantIdSet = false;
 
   protected ProcessInstanceModificationBuilderImpl modificationBuilder;
 
@@ -103,15 +103,20 @@ public class ProcessInstantiationBuilderImpl implements ProcessInstantiationBuil
     return this;
   }
 
+  public ProcessInstantiationBuilder tenantId(String tenantId) {
+    this.tenantId = tenantId;
+    return this;
+  }
+
   public ProcessInstantiationBuilder processDefinitionTenantId(String tenantId) {
     this.processDefinitionTenantId = tenantId;
-    isTenantIdSet = true;
+    isProcessDefinitionTenantIdSet = true;
     return this;
   }
 
   public ProcessInstantiationBuilder processDefinitionWithoutTenantId() {
     this.processDefinitionTenantId = null;
-    isTenantIdSet = true;
+    isProcessDefinitionTenantIdSet = true;
     return this;
   }
 
@@ -132,7 +137,7 @@ public class ProcessInstantiationBuilderImpl implements ProcessInstantiationBuil
   public ProcessInstanceWithVariables executeWithVariablesInReturn(boolean skipCustomListeners, boolean skipIoMappings) {
     ensureOnlyOneNotNull("either process definition id or key must be set", processDefinitionId, processDefinitionKey);
 
-    if (isTenantIdSet && processDefinitionId != null) {
+    if (isProcessDefinitionTenantIdSet && processDefinitionId != null) {
       throw LOG.exceptionStartProcessInstanceByIdAndTenantId();
     }
 
@@ -181,12 +186,16 @@ public class ProcessInstantiationBuilderImpl implements ProcessInstantiationBuil
     return modificationBuilder.getProcessVariables();
   }
 
+  public String getTenantId() {
+    return tenantId;
+  }
+
   public String getProcessDefinitionTenantId() {
     return processDefinitionTenantId;
   }
 
-  public boolean isTenantIdSet() {
-    return isTenantIdSet;
+  public boolean isProcessDefinitionTenantIdSet() {
+    return isProcessDefinitionTenantIdSet;
   }
 
   public void setModificationBuilder(ProcessInstanceModificationBuilderImpl modificationBuilder) {

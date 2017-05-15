@@ -17,6 +17,10 @@ import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
+import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProvider;
+import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProviderCaseInstanceContext;
+import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProviderHistoricDecisionInstanceContext;
+import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProviderProcessInstanceContext;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -31,6 +35,7 @@ import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -49,17 +54,24 @@ public class RestartProcessInstanceSyncTest {
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
+  @Rule
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
+
   protected RuntimeService runtimeService;
   protected TaskService taskService;
+  protected TenantIdProvider defaultTenantIdProvider;
 
   @Before
   public void init() {
     runtimeService = engineRule.getRuntimeService();
     taskService = engineRule.getTaskService();
+    defaultTenantIdProvider = engineRule.getProcessEngineConfiguration().getTenantIdProvider();
   }
 
-  @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
+  @After
+  public void reset() {
+    engineRule.getProcessEngineConfiguration().setTenantIdProvider(defaultTenantIdProvider);
+  }
 
   @Test
   public void shouldRestartSimpleProcessInstance() {
@@ -467,6 +479,61 @@ public class RestartProcessInstanceSyncTest {
     assertNull(runtimeService.getVariable(task1Execution.getId(), "foo"));
   }
 
+  @Test
+  public void shouldRetainTenantIdOfSharedProcessDefinition() {
+    // given
+    engineRule.getProcessEngineConfiguration()
+      .setTenantIdProvider(new TestTenantIdProvider());
+
+    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
+    assertEquals(processInstance.getTenantId(), TestTenantIdProvider.TENANT_ID);
+    runtimeService.deleteProcessInstance(processInstance.getId(), "test");
+
+    // when
+    runtimeService.restartProcessInstances(processDefinition.getId())
+        .startBeforeActivity(ProcessModels.USER_TASK_ID)
+        .processInstanceIds(processInstance.getId())
+        .execute();
+
+    // then
+    ProcessInstance restartedInstance = runtimeService.createProcessInstanceQuery().active()
+        .processDefinitionId(processDefinition.getId()).singleResult();
+
+    assertNotNull(restartedInstance);
+    assertEquals(restartedInstance.getTenantId(), TestTenantIdProvider.TENANT_ID);
+  }
+
+  @Test
+  public void shouldSkipTenantIdProviderOnRestart() {
+    // given
+    engineRule.getProcessEngineConfiguration()
+        .setTenantIdProvider(new TestTenantIdProvider());
+
+    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
+    assertEquals(processInstance.getTenantId(), TestTenantIdProvider.TENANT_ID);
+    runtimeService.deleteProcessInstance(processInstance.getId(), "test");
+
+    // set tenant id provider to fail to verify it is not called during instantiation
+    engineRule.getProcessEngineConfiguration()
+        .setTenantIdProvider(new FailingTenantIdProvider());
+
+    // when
+    runtimeService.restartProcessInstances(processDefinition.getId())
+      .startBeforeActivity(ProcessModels.USER_TASK_ID)
+      .processInstanceIds(processInstance.getId())
+      .execute();
+
+    // then
+    ProcessInstance restartedInstance = runtimeService.createProcessInstanceQuery().active()
+      .processDefinitionId(processDefinition.getId()).singleResult();
+
+    assertNotNull(restartedInstance);
+    assertEquals(restartedInstance.getTenantId(), TestTenantIdProvider.TENANT_ID);
+  }
+
+
   public static class SetVariableExecutionListenerImpl implements ExecutionListener {
 
     @Override
@@ -474,4 +541,34 @@ public class RestartProcessInstanceSyncTest {
       execution.setVariable("var", "foo");
     }
   }
+
+  public static class TestTenantIdProvider extends FailingTenantIdProvider {
+
+    static final String TENANT_ID = "testTenantId";
+
+    @Override
+    public String provideTenantIdForProcessInstance(TenantIdProviderProcessInstanceContext ctx) {
+      return TENANT_ID;
+    }
+
+  }
+
+  public static class FailingTenantIdProvider implements TenantIdProvider {
+
+    @Override
+    public String provideTenantIdForProcessInstance(TenantIdProviderProcessInstanceContext ctx) {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String provideTenantIdForCaseInstance(TenantIdProviderCaseInstanceContext ctx) {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String provideTenantIdForHistoricDecisionInstance(TenantIdProviderHistoricDecisionInstanceContext ctx) {
+      throw new UnsupportedOperationException();
+    }
+  }
+
 }

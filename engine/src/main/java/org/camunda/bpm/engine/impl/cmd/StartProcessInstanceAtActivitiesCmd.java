@@ -67,6 +67,11 @@ public class StartProcessInstanceAtActivitiesCmd implements Command<ProcessInsta
 
     ExecutionEntity processInstance = processDefinition
         .createProcessInstance(instantiationBuilder.getBusinessKey(), instantiationBuilder.getCaseInstanceId(), initialActivity);
+
+    if (instantiationBuilder.getTenantId() != null) {
+      processInstance.setTenantId(instantiationBuilder.getTenantId());
+    }
+
     processInstance.setSkipCustomListeners(modificationBuilder.isSkipCustomListeners());
     VariableMap variables = modificationBuilder.getProcessVariables();
 

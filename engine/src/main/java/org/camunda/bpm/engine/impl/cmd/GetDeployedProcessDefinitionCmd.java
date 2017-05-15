@@ -41,7 +41,7 @@ public class GetDeployedProcessDefinitionCmd implements Command<ProcessDefinitio
     this.processDefinitionId = instantiationBuilder.getProcessDefinitionId();
     this.processDefinitionKey = instantiationBuilder.getProcessDefinitionKey();
     this.processDefinitionTenantId = instantiationBuilder.getProcessDefinitionTenantId();
-    this.isTenantIdSet = instantiationBuilder.isTenantIdSet();
+    this.isTenantIdSet = instantiationBuilder.isProcessDefinitionTenantIdSet();
     this.checkReadPermission = checkReadPermission;
   }
 
