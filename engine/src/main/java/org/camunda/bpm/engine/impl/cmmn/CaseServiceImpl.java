@@ -24,7 +24,6 @@ import org.camunda.bpm.engine.impl.ServiceImpl;
 import org.camunda.bpm.engine.impl.cmmn.cmd.GetCaseExecutionVariableCmd;
 import org.camunda.bpm.engine.impl.cmmn.cmd.GetCaseExecutionVariableTypedCmd;
 import org.camunda.bpm.engine.impl.cmmn.cmd.GetCaseExecutionVariablesCmd;
-import org.camunda.bpm.engine.impl.cmmn.cmd.UpdateCaseDefinitionHistoryTimeToLiveCmd;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionQueryImpl;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseInstanceQueryImpl;
 import org.camunda.bpm.engine.runtime.CaseExecutionCommandBuilder;

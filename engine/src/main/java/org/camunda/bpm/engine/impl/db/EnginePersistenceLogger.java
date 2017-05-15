@@ -625,7 +625,7 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
 
   public void logUpdateUnrelatedCaseDefinitionEntity(String thisKey, String thatKey, String thisDeploymentId, String thatDeploymentId) {
     logDebug(
-      "044",
+      "079",
       "Cannot update entity from an unrelated case definition: this key '{}', that key '{}', this deploymentId '{}', that deploymentId '{}'",
       thisKey,
       thatKey,
@@ -636,7 +636,7 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
 
   public void logUpdateUnrelatedDecisionDefinitionEntity(String thisKey, String thatKey, String thisDeploymentId, String thatDeploymentId) {
     logDebug(
-        "079",
+        "080",
         "Cannot update entity from an unrelated decision definition: this key '{}', that key '{}', this deploymentId '{}', that deploymentId '{}'",
         thisKey,
         thatKey,

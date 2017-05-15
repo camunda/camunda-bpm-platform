@@ -128,4 +128,17 @@ public class CaseHandlerTest extends CmmnElementHandlerTest {
     assertEquals(Integer.valueOf(historyTimeToLive), activity.getHistoryTimeToLive());
   }
 
+  @Test
+  public void testHistoryTimeToLiveNegative() {
+    // given: a caseDefinition
+    Integer historyTimeToLive = -6;
+    caseDefinition.setCamundaHistoryTimeToLive(historyTimeToLive);
+
+    // when
+    CaseDefinitionEntity activity = (CaseDefinitionEntity) handler.handleElement(caseDefinition, context);
+
+    // then
+    assertEquals(Integer.valueOf(historyTimeToLive), activity.getHistoryTimeToLive());
+  }
+
 }
