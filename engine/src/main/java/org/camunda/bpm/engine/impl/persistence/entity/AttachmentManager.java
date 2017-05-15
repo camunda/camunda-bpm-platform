@@ -17,9 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
 import org.camunda.bpm.engine.task.Attachment;
 
@@ -55,27 +52,27 @@ public class AttachmentManager extends AbstractHistoricManager {
   }
 
   public void deleteAttachmentsByProcessInstanceIds(List<String> processInstanceIds) {
-    CommandContext commandContext = Context.getCommandContext();
-    commandContext
-        .getDbEntityManager().deletePreserveOrder(ByteArrayEntity.class, "deleteAttachmentByteArraysByProcessInstanceIds", processInstanceIds);
-    commandContext
-        .getDbEntityManager().deletePreserveOrder(AttachmentEntity.class, "deleteAttachmentByProcessInstanceIds", processInstanceIds);
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("processInstanceIds", processInstanceIds);
+
+    getDbEntityManager().deletePreserveOrder(ByteArrayEntity.class, "deleteAttachmentByteArraysByIds", parameters);
+    getDbEntityManager().deletePreserveOrder(AttachmentEntity.class, "deleteAttachmentByIds", parameters);
   }
 
   public void deleteAttachmentsByTaskProcessInstanceIds(List<String> processInstanceIds) {
-    CommandContext commandContext = Context.getCommandContext();
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("taskProcessInstanceIds", processInstanceIds);
 
-    commandContext
-        .getDbEntityManager().deletePreserveOrder(ByteArrayEntity.class, "deleteAttachmentByteArraysByTaskProcessInstanceIds", processInstanceIds);
-    commandContext
-        .getDbEntityManager().deletePreserveOrder(AttachmentEntity.class, "deleteAttachmentByTaskProcessInstanceIds", processInstanceIds);
+    getDbEntityManager().deletePreserveOrder(ByteArrayEntity.class, "deleteAttachmentByteArraysByIds", parameters);
+    getDbEntityManager().deletePreserveOrder(AttachmentEntity.class, "deleteAttachmentByIds", parameters);
   }
 
   public void deleteAttachmentsByTaskCaseInstanceIds(List<String> caseInstanceIds) {
-    DbEntityManager entityManager = Context.getCommandContext().getDbEntityManager();
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("caseInstanceIds", caseInstanceIds);
 
-    entityManager.deletePreserveOrder(ByteArrayEntity.class, "deleteAttachmentByteArraysByTaskCaseInstanceIds", caseInstanceIds);
-    entityManager.deletePreserveOrder(AttachmentEntity.class, "deleteAttachmentByTaskCaseInstanceIds", caseInstanceIds);
+    getDbEntityManager().deletePreserveOrder(ByteArrayEntity.class, "deleteAttachmentByteArraysByIds", parameters);
+    getDbEntityManager().deletePreserveOrder(AttachmentEntity.class, "deleteAttachmentByIds", parameters);
   }
 
   public Attachment findAttachmentByTaskIdAndAttachmentId(String taskId, String attachmentId) {

@@ -29,6 +29,7 @@ import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionOutputInstance;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricExternalTaskLog;
+import org.camunda.bpm.engine.history.HistoricIdentityLinkLog;
 import org.camunda.bpm.engine.history.HistoricJobLog;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
@@ -62,6 +63,7 @@ import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -572,7 +574,7 @@ public class BulkHistoryDeleteTest {
   }
 
   @Test
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/BulkHistoryDeleteTest.testCleanupHistoryCaseInstance.cmmn" })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
   public void testCleanupHistoryCaseInstance() {
     // given
     // create case instances
@@ -592,18 +594,19 @@ public class BulkHistoryDeleteTest {
   }
 
   @Test
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/BulkHistoryDeleteTest.testCleanupHistoryCaseInstance.cmmn" })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
   public void testCleanupHistoryCaseActivityInstance() {
     // given
     // create case instance
-    CaseInstance caseInstance = caseService.createCaseInstanceByKey("oneTaskCase");
+    String caseInstanceId = caseService.createCaseInstanceByKey("oneTaskCase").getId();
+    terminateAndCloseCaseInstance(caseInstanceId, null);
 
     // assume
     List<HistoricCaseActivityInstance> activityInstances = historyService.createHistoricCaseActivityInstanceQuery().list();
     assertEquals(1, activityInstances.size());
 
     // when
-    historyService.deleteHistoricCaseInstancesBulk(Arrays.asList(caseInstance.getId()));
+    historyService.deleteHistoricCaseInstancesBulk(Arrays.asList(caseInstanceId));
 
     // then
     activityInstances = historyService.createHistoricCaseActivityInstanceQuery().list();
@@ -611,18 +614,19 @@ public class BulkHistoryDeleteTest {
   }
 
   @Test
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/BulkHistoryDeleteTest.testCleanupHistoryCaseInstance.cmmn" })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
   public void testCleanupHistoryCaseInstanceTask() {
     // given
     // create case instance
-    CaseInstance caseInstance = caseService.createCaseInstanceByKey("oneTaskCase");
+    String caseInstanceId = caseService.createCaseInstanceByKey("oneTaskCase").getId();
+    terminateAndCloseCaseInstance(caseInstanceId, null);
 
     // assume
     List<HistoricTaskInstance> taskInstances = historyService.createHistoricTaskInstanceQuery().list();
     assertEquals(1, taskInstances.size());
 
     // when
-    historyService.deleteHistoricCaseInstancesBulk(Arrays.asList(caseInstance.getId()));
+    historyService.deleteHistoricCaseInstancesBulk(Arrays.asList(caseInstanceId));
 
     // then
     taskInstances = historyService.createHistoricTaskInstanceQuery().list();
@@ -630,11 +634,11 @@ public class BulkHistoryDeleteTest {
   }
 
   @Test
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/BulkHistoryDeleteTest.testCleanupHistoryCaseInstance.cmmn" })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
   public void testCleanupHistoryCaseInstanceTaskComment() {
     // given
     // create case instance
-    CaseInstance caseInstance = caseService.createCaseInstanceByKey("oneTaskCase");
+    String caseInstanceId = caseService.createCaseInstanceByKey("oneTaskCase").getId();
 
     Task task = taskService.createTaskQuery().singleResult();
     taskService.createComment(task.getId(), null, "This is a comment...");
@@ -642,9 +646,10 @@ public class BulkHistoryDeleteTest {
     // assume
     List<Comment> comments = taskService.getTaskComments(task.getId());
     assertEquals(1, comments.size());
+    terminateAndCloseCaseInstance(caseInstanceId, null);
 
     // when
-    historyService.deleteHistoricCaseInstancesBulk(Arrays.asList(caseInstance.getId()));
+    historyService.deleteHistoricCaseInstancesBulk(Arrays.asList(caseInstanceId));
 
     // then
     comments = taskService.getTaskComments(task.getId());
@@ -652,7 +657,57 @@ public class BulkHistoryDeleteTest {
   }
 
   @Test
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/BulkHistoryDeleteTest.testCleanupHistoryCaseInstance.cmmn" })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
+  public void testCleanupHistoryCaseInstanceTaskDetails() {
+    // given
+    // create case instance
+    CaseInstance caseInstance = caseService.createCaseInstanceByKey("oneTaskCase");
+
+    Task task = taskService.createTaskQuery().singleResult();
+
+    taskService.setVariable(task.getId(), "boo", new TestPojo("foo", 123.0));
+    taskService.setVariable(task.getId(), "goo", 9);
+    taskService.setVariable(task.getId(), "boo", new TestPojo("foo", 321.0));
+
+
+    // assume
+    List<HistoricDetail> detailsList = historyService.createHistoricDetailQuery().list();
+    assertEquals(3, detailsList.size());
+    terminateAndCloseCaseInstance(caseInstance.getId(), taskService.getVariables(task.getId()));
+
+    // when
+    historyService.deleteHistoricCaseInstancesBulk(Arrays.asList(caseInstance.getId()));
+
+    // then
+    detailsList = historyService.createHistoricDetailQuery().list();
+    assertEquals(0, detailsList.size());
+  }
+
+  @Test
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
+  public void testCleanupHistoryCaseInstanceTaskIdentityLink() {
+    // given
+    // create case instance
+    String caseInstanceId = caseService.createCaseInstanceByKey("oneTaskCase").getId();
+
+    Task task = taskService.createTaskQuery().singleResult();
+
+    // assume
+    taskService.addGroupIdentityLink(task.getId(), "accounting", IdentityLinkType.CANDIDATE);
+    int identityLinksForTask = taskService.getIdentityLinksForTask(task.getId()).size();
+    assertEquals(1, identityLinksForTask);
+    terminateAndCloseCaseInstance(caseInstanceId, null);
+
+    // when
+    historyService.deleteHistoricCaseInstancesBulk(Arrays.asList(caseInstanceId));
+
+    // then
+    List<HistoricIdentityLinkLog> historicIdentityLinkLog = historyService.createHistoricIdentityLinkLogQuery().list();
+    assertEquals(0, historicIdentityLinkLog.size());
+  }
+
+  @Test
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
   public void testCleanupHistoryCaseInstanceTaskAttachmentByteArray() {
     // given
     // create case instance
@@ -666,6 +721,7 @@ public class BulkHistoryDeleteTest {
     List<Attachment> attachments = taskService.getTaskAttachments(taskId);
     assertEquals(1, attachments.size());
     String contentId = findAttachmentContentId(attachments);
+    terminateAndCloseCaseInstance(caseInstance.getId(), null);
 
     // when
     historyService.deleteHistoricCaseInstancesBulk(Arrays.asList(caseInstance.getId()));
@@ -677,11 +733,11 @@ public class BulkHistoryDeleteTest {
   }
 
   @Test
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/BulkHistoryDeleteTest.testCleanupHistoryCaseInstance.cmmn" })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
   public void testCleanupHistoryCaseInstanceTaskAttachmentUrl() {
     // given
     // create case instance
-    CaseInstance caseInstance = caseService.createCaseInstanceByKey("oneTaskCase");
+    String caseInstanceId = caseService.createCaseInstanceByKey("oneTaskCase").getId();
 
     Task task = taskService.createTaskQuery().singleResult();
     taskService.createAttachment("foo", task.getId(), null, "something", null, "http://camunda.org");
@@ -689,9 +745,10 @@ public class BulkHistoryDeleteTest {
     // assume
     List<Attachment> attachments = taskService.getTaskAttachments(task.getId());
     assertEquals(1, attachments.size());
+    terminateAndCloseCaseInstance(caseInstanceId, null);
 
     // when
-    historyService.deleteHistoricCaseInstancesBulk(Arrays.asList(caseInstance.getId()));
+    historyService.deleteHistoricCaseInstancesBulk(Arrays.asList(caseInstanceId));
 
     // then
     attachments = taskService.getTaskAttachments(task.getId());
@@ -699,15 +756,17 @@ public class BulkHistoryDeleteTest {
   }
 
   @Test
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/BulkHistoryDeleteTest.testCleanupHistoryCaseInstance.cmmn" })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
   public void testCleanupHistoryCaseInstanceVariables() {
     // given
     // create case instances
     List<String> caseInstanceIds = new ArrayList<String>();
     int instanceCount = 10;
     for (int i = 0; i < instanceCount; i++) {
-      CaseInstance caseInstance = caseService.createCaseInstanceByKey("oneTaskCase", Variables.createVariables().putValue("name" + i, "theValue"));
+      VariableMap variables = Variables.createVariables();
+      CaseInstance caseInstance = caseService.createCaseInstanceByKey("oneTaskCase", variables.putValue("name" + i, "theValue"));
       caseInstanceIds.add(caseInstance.getId());
+      terminateAndCloseCaseInstance(caseInstance.getId(), variables);
     }
     // assume
     List<HistoricVariableInstance> variablesInstances = historyService.createHistoricVariableInstanceQuery().list();
@@ -722,15 +781,21 @@ public class BulkHistoryDeleteTest {
   }
 
   @Test
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/BulkHistoryDeleteTest.testCleanupHistoryCaseInstance.cmmn" })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
   public void testCleanupHistoryCaseInstanceComplexVariable() {
     // given
     // create case instances
-    CaseInstance caseInstance = caseService.createCaseInstanceByKey("oneTaskCase", Variables.createVariables().putValue("pojo", new TestPojo("okay", 13.37)));
+    VariableMap variables = Variables.createVariables();
+    CaseInstance caseInstance = caseService.createCaseInstanceByKey("oneTaskCase", variables.putValue("pojo", new TestPojo("okay", 13.37)));
+
+    caseService.setVariable(caseInstance.getId(), "pojo", "theValue");
 
     // assume
     List<HistoricVariableInstance> variablesInstances = historyService.createHistoricVariableInstanceQuery().list();
     assertEquals(1, variablesInstances.size());
+    List<HistoricDetail> detailsList = historyService.createHistoricDetailQuery().list();
+    assertEquals(2, detailsList.size());
+    terminateAndCloseCaseInstance(caseInstance.getId(), variables);
 
     // when
     historyService.deleteHistoricCaseInstancesBulk(Arrays.asList(caseInstance.getId()));
@@ -738,10 +803,12 @@ public class BulkHistoryDeleteTest {
     // then
     variablesInstances = historyService.createHistoricVariableInstanceQuery().list();
     assertEquals(0, variablesInstances.size());
+    detailsList = historyService.createHistoricDetailQuery().list();
+    assertEquals(0, detailsList.size());
   }
 
   @Test
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/BulkHistoryDeleteTest.testCleanupHistoryCaseInstance.cmmn" })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
   public void testCleanupHistoryCaseInstanceDetails() {
     // given
     // create case instances
@@ -754,6 +821,10 @@ public class BulkHistoryDeleteTest {
     // assume
     List<HistoricDetail> detailsList = historyService.createHistoricDetailQuery().list();
     assertEquals(3, detailsList.size());
+    caseService.terminateCaseExecution(caseInstance1.getId(), caseService.getVariables(caseInstance1.getId()));
+    caseService.terminateCaseExecution(caseInstance2.getId(), caseService.getVariables(caseInstance2.getId()));
+    caseService.closeCaseInstance(caseInstance1.getId());
+    caseService.closeCaseInstance(caseInstance2.getId());
 
     // when
     historyService.deleteHistoricCaseInstancesBulk(Arrays.asList(caseInstance1.getId(), caseInstance2.getId()));
@@ -767,8 +838,19 @@ public class BulkHistoryDeleteTest {
     List<String> caseInstanceIds = new ArrayList<String>();
     for (int i = 0; i < instanceCount; i++) {
       CaseInstance caseInstance = caseService.createCaseInstanceByKey("oneTaskCase");
-      caseInstanceIds.add(caseInstance.getId());
+      String caseInstanceId = caseInstance.getId();
+      caseInstanceIds.add(caseInstanceId);
+      terminateAndCloseCaseInstance(caseInstanceId, null);
     }
     return caseInstanceIds;
+  }
+
+  private void terminateAndCloseCaseInstance(String caseInstanceId, Map<String, Object> variables) {
+    if (variables==null) {
+      caseService.terminateCaseExecution(caseInstanceId, variables);
+    }else {
+      caseService.terminateCaseExecution(caseInstanceId);
+    }
+    caseService.closeCaseInstance(caseInstanceId);
   }
 }

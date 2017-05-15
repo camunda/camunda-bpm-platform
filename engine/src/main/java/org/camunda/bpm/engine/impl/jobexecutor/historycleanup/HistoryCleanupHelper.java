@@ -111,7 +111,7 @@ public abstract class HistoryCleanupHelper {
     //add process instance ids
     final List<String> historicProcessInstanceIds = commandContext.getHistoricProcessInstanceManager()
         .findHistoricProcessInstanceIdsForCleanup(batchSize);
-    if (historicProcessInstanceIds != null && historicProcessInstanceIds.size() > 0) {
+    if (historicProcessInstanceIds.size() > 0) {
       historyCleanupBatch.setHistoricProcessInstanceIds(historicProcessInstanceIds);
     }
 
@@ -119,7 +119,7 @@ public abstract class HistoryCleanupHelper {
     if (historyCleanupBatch.size() < batchSize && commandContext.getProcessEngineConfiguration().isDmnEnabled()) {
       final List<String> historicDecisionInstanceIds = commandContext.getHistoricDecisionInstanceManager()
           .findHistoricDecisionInstanceIdsForCleanup(batchSize - historyCleanupBatch.size());
-      if (historicDecisionInstanceIds != null && historicDecisionInstanceIds.size() > 0) {
+      if (historicDecisionInstanceIds.size() > 0) {
         historyCleanupBatch.setHistoricDecisionInstanceIds(historicDecisionInstanceIds);
       }
     }
@@ -128,7 +128,7 @@ public abstract class HistoryCleanupHelper {
     if (historyCleanupBatch.size() < batchSize && commandContext.getProcessEngineConfiguration().isCmmnEnabled()) {
       final List<String> historicCaseInstanceIds = commandContext.getHistoricCaseInstanceManager()
           .findHistoricCaseInstanceIdsForCleanup(batchSize - historyCleanupBatch.size());
-      if (historicCaseInstanceIds != null && historicCaseInstanceIds.size() > 0) {
+      if (historicCaseInstanceIds.size() > 0) {
         historyCleanupBatch.setHistoricCaseInstanceIds(historicCaseInstanceIds);
       }
     }

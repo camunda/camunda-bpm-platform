@@ -1,6 +1,6 @@
 package org.camunda.bpm.engine.impl.jobexecutor.historycleanup;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -16,20 +16,16 @@ public class HistoryCleanupBatch {
    */
   public final static int MAX_BATCH_SIZE = 500;
 
-  private List<String> historicProcessInstanceIds = new ArrayList<String>();
-  private List<String> historicDecisionInstanceIds = new ArrayList<String>();
-  private List<String> historicCaseInstanceIds = new ArrayList<String>();
+  private List<String> historicProcessInstanceIds = Collections.emptyList();
+  private List<String> historicDecisionInstanceIds = Collections.emptyList();
+  private List<String> historicCaseInstanceIds = Collections.emptyList();
 
   public List<String> getHistoricProcessInstanceIds() {
     return historicProcessInstanceIds;
   }
 
   public void setHistoricProcessInstanceIds(List<String> historicProcessInstanceIds) {
-    if (historicProcessInstanceIds != null) {
-      this.historicProcessInstanceIds = historicProcessInstanceIds;
-    } else {
-      this.historicProcessInstanceIds = new ArrayList<String>();
-    }
+    this.historicProcessInstanceIds = historicProcessInstanceIds;
   }
 
   public List<String> getHistoricDecisionInstanceIds() {
@@ -37,11 +33,7 @@ public class HistoryCleanupBatch {
   }
 
   public void setHistoricDecisionInstanceIds(List<String> historicDecisionInstanceIds) {
-    if (historicDecisionInstanceIds != null) {
-      this.historicDecisionInstanceIds = historicDecisionInstanceIds;
-    } else {
-      this.historicDecisionInstanceIds = new ArrayList<String>();
-    }
+    this.historicDecisionInstanceIds = historicDecisionInstanceIds;
   }
 
   public List<String> getHistoricCaseInstanceIds() {
@@ -49,18 +41,14 @@ public class HistoryCleanupBatch {
   }
 
   public void setHistoricCaseInstanceIds(List<String> historicCaseInstanceIds) {
-    if (historicCaseInstanceIds != null) {
-      this.historicCaseInstanceIds = historicCaseInstanceIds;
-    } else {
-      this.historicCaseInstanceIds = new ArrayList<String>();
-    }
+    this.historicCaseInstanceIds = historicCaseInstanceIds;
   }
 
   /**
    * Size of the batch.
    */
   public int size() {
-    return historicProcessInstanceIds.size() + historicDecisionInstanceIds.size() + + historicCaseInstanceIds.size();
+    return historicProcessInstanceIds.size() + historicDecisionInstanceIds.size() + historicCaseInstanceIds.size();
   }
 
   public void performCleanup() {

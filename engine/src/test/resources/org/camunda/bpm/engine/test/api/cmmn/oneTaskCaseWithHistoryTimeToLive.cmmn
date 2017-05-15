@@ -3,7 +3,7 @@
                   xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
                   xmlns:camunda="http://camunda.org/schema/1.0/cmmn"
                   targetNamespace="Examples">
-  <case id="oneTaskCase" name="One Task Case" camunda:historyTimeToLive="5">
+  <case id="case" name="One Task Case" camunda:historyTimeToLive="5">
 
     <casePlanModel id="CasePlanModel_1">
       <planItem id="PI_HumanTask_1" definitionRef="HumanTask_1" />

@@ -25,16 +25,15 @@ import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
-import org.camunda.bpm.engine.history.HistoricIncident;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.metrics.Meter;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
@@ -43,8 +42,6 @@ import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.Variables;
-import org.camunda.bpm.model.bpmn.Bpmn;
-import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -74,7 +71,6 @@ public class BulkHistoryDeleteCmmnDisabledTest {
   public void createProcessEngine() {
     runtimeService = engineRule.getRuntimeService();
     historyService = engineRule.getHistoryService();
-
   }
 
   @After
@@ -88,11 +84,6 @@ public class BulkHistoryDeleteCmmnDisabledTest {
           String jobId = jobs.get(0).getId();
           commandContext.getJobManager().deleteJob((JobEntity) jobs.get(0));
           commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(jobId);
-        }
-
-        List<HistoricIncident> historicIncidents = historyService.createHistoricIncidentQuery().list();
-        for (HistoricIncident historicIncident : historicIncidents) {
-          commandContext.getDbEntityManager().delete((HistoricIncidentEntity) historicIncident);
         }
 
         commandContext.getMeterLogManager().deleteAll();
@@ -124,25 +115,11 @@ public class BulkHistoryDeleteCmmnDisabledTest {
   }
 
   @Test
-  public void bulkHistoryProcessDeleteWithDisabledCmmn() {
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml", "org/camunda/bpm/engine/test/api/dmn/Example.dmn" })
+  public void historyCleanUpWithDisabledCmmn() {
     // given
-    BpmnModelInstance model = Bpmn.createExecutableProcess("someProcess").startEvent().userTask("userTask").endEvent().done();
-    testRule.deploy(model);
-    List<String> ids = prepareHistoricProcesses("someProcess");
-    runtimeService.deleteProcessInstances(ids, null, true, true);
-
-    // when
-    historyService.deleteHistoricProcessInstancesBulk(ids);
-
-    // then
-    assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKey("someProcess").count());
-  }
-
-  @Test
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/dmn/Example.dmn" })
-  public void bulkHistoryDecisionDeleteWithDisabledCmmn() {
-    // given
-    prepareDMNData(5);
+    prepareHistoricProcesses(5);
+    prepareHistoricDecisions(5);
 
     ClockUtil.setCurrentTime(new Date());
     // when
@@ -155,7 +132,23 @@ public class BulkHistoryDeleteCmmnDisabledTest {
     assertEquals(0, historyService.createHistoricDecisionInstanceQuery().count());
   }
 
-  private void prepareDMNData(int instanceCount) {
+  private void prepareHistoricProcesses(int instanceCount) {
+    Date oldCurrentTime = ClockUtil.getCurrentTime();
+    List<String> processInstanceIds = new ArrayList<String>();
+
+    for (int i = 0; i < instanceCount; i++) {
+      ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+      processInstanceIds.add(processInstance.getId());
+    }
+    List<ProcessDefinition> processDefinitions = engineRule.getRepositoryService().createProcessDefinitionQuery().list();
+    assertEquals(1, processDefinitions.size());
+    engineRule.getRepositoryService().updateProcessDefinitionHistoryTimeToLive(processDefinitions.get(0).getId(), 5);
+    ClockUtil.setCurrentTime(DateUtils.addDays(new Date(), -6));
+    runtimeService.deleteProcessInstances(processInstanceIds, null, true, true);
+    ClockUtil.setCurrentTime(oldCurrentTime);
+  }
+
+  private void prepareHistoricDecisions(int instanceCount) {
     Date oldCurrentTime = ClockUtil.getCurrentTime();
     List<DecisionDefinition> decisionDefinitions = engineRule.getRepositoryService().createDecisionDefinitionQuery().decisionDefinitionKey("decision").list();
     assertEquals(1, decisionDefinitions.size());
@@ -167,16 +160,5 @@ public class BulkHistoryDeleteCmmnDisabledTest {
           .evaluate();
     }
     ClockUtil.setCurrentTime(oldCurrentTime);
-  }
-
-  private List<String> prepareHistoricProcesses(String businessKey) {
-    List<String> processInstanceIds = new ArrayList<String>();
-
-    for (int i = 0; i < 5; i++) {
-      ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(businessKey);
-      processInstanceIds.add(processInstance.getId());
-    }
-
-    return processInstanceIds;
   }
 }

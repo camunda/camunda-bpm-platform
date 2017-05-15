@@ -76,11 +76,15 @@ import static org.junit.Assert.assertTrue;
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
 public class HistoryCleanupTest {
 
+  private static final int PROCESS_INSTANCES_COUNT = 3;
+  private static final int DECISIONS_IN_PROCESS_INSTANCES = 3;
+  private static final int DECISION_INSTANCES_COUNT = 10;
+  private static final int CASE_INSTANCES_COUNT = 4;
   private static final int HISTORY_TIME_TO_LIVE = 5;
   private static final int DAYS_IN_THE_PAST = -6;
   protected static final String ONE_TASK_PROCESS = "oneTaskProcess";
   protected static final String DECISION = "decision";
-  protected static final String ONE_TASK_CASE = "oneTaskCase";
+  protected static final String ONE_TASK_CASE = "case";
 
   protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
     public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
@@ -193,59 +197,157 @@ public class HistoryCleanupTest {
   }
 
   @Test
-  @Deployment(resources = {"org/camunda/bpm/engine/test/dmn/businessruletask/DmnBusinessRuleTaskTest.testDecisionRef.bpmn20.xml",
-      "org/camunda/bpm/engine/test/api/history/testDmnWithPojo.dmn11.xml" })
-  public void testHistoryCleanupWithDesicionInstancesOnlyDecisionInstancesRemoved() {
-    //given
-    prepareDecisionInstances(null, HISTORY_TIME_TO_LIVE);
+  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/businessruletask/DmnBusinessRuleTaskTest.testDecisionRef.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/history/testDmnWithPojo.dmn11.xml", "org/camunda/bpm/engine/test/api/authorization/oneTaskCase.cmmn" })
+  public void testHistoryCleanupOnlyDecisionInstancesRemoved() {
+    // given
+    prepareInstances(null, HISTORY_TIME_TO_LIVE, null);
 
     ClockUtil.setCurrentTime(new Date());
-    //when
+    // when
     String jobId = historyService.cleanUpHistoryAsync(true).getId();
 
     managementService.executeJob(jobId);
 
-    //then
-    assertEquals(3, historyService.createHistoricProcessInstanceQuery().count());
+    // then
+    assertEquals(PROCESS_INSTANCES_COUNT, historyService.createHistoricProcessInstanceQuery().count());
     assertEquals(0, historyService.createHistoricDecisionInstanceQuery().count());
+    assertEquals(CASE_INSTANCES_COUNT, historyService.createHistoricCaseInstanceQuery().count());
   }
 
   @Test
-  @Deployment(resources = {"org/camunda/bpm/engine/test/dmn/businessruletask/DmnBusinessRuleTaskTest.testDecisionRef.bpmn20.xml",
-      "org/camunda/bpm/engine/test/api/history/testDmnWithPojo.dmn11.xml" })
-  public void testHistoryCleanupWithDesicionInstancesOnlyProcessInstancesRemoved() {
-    //given
-    prepareDecisionInstances(HISTORY_TIME_TO_LIVE, null);
+  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/businessruletask/DmnBusinessRuleTaskTest.testDecisionRef.bpmn20.xml", "org/camunda/bpm/engine/test/api/history/testDmnWithPojo.dmn11.xml", "org/camunda/bpm/engine/test/api/authorization/oneTaskCase.cmmn"})
+  public void testHistoryCleanupOnlyProcessInstancesRemoved() {
+    // given
+    prepareInstances(HISTORY_TIME_TO_LIVE, null, null);
 
     ClockUtil.setCurrentTime(new Date());
-    //when
+    // when
     String jobId = historyService.cleanUpHistoryAsync(true).getId();
 
     managementService.executeJob(jobId);
 
-    //then
+    // then
     assertEquals(0, historyService.createHistoricProcessInstanceQuery().count());
-    assertEquals(13, historyService.createHistoricDecisionInstanceQuery().count());
+    assertEquals(DECISION_INSTANCES_COUNT + DECISIONS_IN_PROCESS_INSTANCES, historyService.createHistoricDecisionInstanceQuery().count());
+    assertEquals(CASE_INSTANCES_COUNT, historyService.createHistoricCaseInstanceQuery().count());
   }
 
   @Test
-  @Deployment(resources = {"org/camunda/bpm/engine/test/dmn/businessruletask/DmnBusinessRuleTaskTest.testDecisionRef.bpmn20.xml",
-      "org/camunda/bpm/engine/test/api/history/testDmnWithPojo.dmn11.xml" })
-  public void testHistoryCleanupWithDesicionInstancesEverythingRemoved() {
-    //given
-    prepareDecisionInstances(HISTORY_TIME_TO_LIVE, HISTORY_TIME_TO_LIVE);
+  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/businessruletask/DmnBusinessRuleTaskTest.testDecisionRef.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/history/testDmnWithPojo.dmn11.xml", "org/camunda/bpm/engine/test/api/authorization/oneTaskCase.cmmn" })
+  public void testHistoryCleanupOnlyCaseInstancesRemoved() {
+    // given
+    prepareInstances(null, null, HISTORY_TIME_TO_LIVE);
 
     ClockUtil.setCurrentTime(new Date());
-    //when
+
+    // when
     String jobId = historyService.cleanUpHistoryAsync(true).getId();
 
     managementService.executeJob(jobId);
 
-    //then
+    // then
+    assertEquals(PROCESS_INSTANCES_COUNT, historyService.createHistoricProcessInstanceQuery().count());
+    assertEquals(DECISION_INSTANCES_COUNT + DECISIONS_IN_PROCESS_INSTANCES, historyService.createHistoricDecisionInstanceQuery().count());
+    assertEquals(0, historyService.createHistoricCaseInstanceQuery().count());
+  }
+
+  @Test
+  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/businessruletask/DmnBusinessRuleTaskTest.testDecisionRef.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/history/testDmnWithPojo.dmn11.xml", "org/camunda/bpm/engine/test/api/authorization/oneTaskCase.cmmn" })
+  public void testHistoryCleanupOnlyDecisionInstancesNotRemoved() {
+    // given
+    prepareInstances(HISTORY_TIME_TO_LIVE, null, HISTORY_TIME_TO_LIVE);
+
+    ClockUtil.setCurrentTime(new Date());
+    // when
+    String jobId = historyService.cleanUpHistoryAsync(true).getId();
+
+    managementService.executeJob(jobId);
+
+    // then
+    assertEquals(0, historyService.createHistoricProcessInstanceQuery().count());
+    assertEquals(DECISION_INSTANCES_COUNT + DECISIONS_IN_PROCESS_INSTANCES, historyService.createHistoricDecisionInstanceQuery().count());
+    assertEquals(0, historyService.createHistoricCaseInstanceQuery().count());
+  }
+
+  @Test
+  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/businessruletask/DmnBusinessRuleTaskTest.testDecisionRef.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/history/testDmnWithPojo.dmn11.xml", "org/camunda/bpm/engine/test/api/authorization/oneTaskCase.cmmn" })
+  public void testHistoryCleanupOnlyProcessInstancesNotRemoved() {
+    // given
+    prepareInstances(null, HISTORY_TIME_TO_LIVE, HISTORY_TIME_TO_LIVE);
+
+    ClockUtil.setCurrentTime(new Date());
+    // when
+    String jobId = historyService.cleanUpHistoryAsync(true).getId();
+
+    managementService.executeJob(jobId);
+
+    // then
+    assertEquals(PROCESS_INSTANCES_COUNT, historyService.createHistoricProcessInstanceQuery().count());
+    assertEquals(0, historyService.createHistoricDecisionInstanceQuery().count());
+    assertEquals(0, historyService.createHistoricCaseInstanceQuery().count());
+  }
+
+  @Test
+  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/businessruletask/DmnBusinessRuleTaskTest.testDecisionRef.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/history/testDmnWithPojo.dmn11.xml", "org/camunda/bpm/engine/test/api/authorization/oneTaskCase.cmmn" })
+  public void testHistoryCleanupOnlyCaseInstancesNotRemoved() {
+    // given
+    prepareInstances(HISTORY_TIME_TO_LIVE, HISTORY_TIME_TO_LIVE, null);
+
+    ClockUtil.setCurrentTime(new Date());
+
+    // when
+    String jobId = historyService.cleanUpHistoryAsync(true).getId();
+
+    managementService.executeJob(jobId);
+
+    // then
+    assertEquals(0, historyService.createHistoricProcessInstanceQuery().count());
+    assertEquals(0, historyService.createHistoricDecisionInstanceQuery().count());
+    assertEquals(CASE_INSTANCES_COUNT, historyService.createHistoricCaseInstanceQuery().count());
+  }
+
+  @Test
+  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/businessruletask/DmnBusinessRuleTaskTest.testDecisionRef.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/history/testDmnWithPojo.dmn11.xml", "org/camunda/bpm/engine/test/api/authorization/oneTaskCase.cmmn" })
+  public void testHistoryCleanupEverythingRemoved() {
+    // given
+    prepareInstances(HISTORY_TIME_TO_LIVE, HISTORY_TIME_TO_LIVE, HISTORY_TIME_TO_LIVE);
+
+    ClockUtil.setCurrentTime(new Date());
+    // when
+    String jobId = historyService.cleanUpHistoryAsync(true).getId();
+
+    managementService.executeJob(jobId);
+
+    // then
     assertResult(0);
   }
 
-  private void prepareDecisionInstances(Integer processInstanceTimeToLive, Integer decisionTimeToLive) {
+  @Test
+  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/businessruletask/DmnBusinessRuleTaskTest.testDecisionRef.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/history/testDmnWithPojo.dmn11.xml", "org/camunda/bpm/engine/test/api/authorization/oneTaskCase.cmmn" })
+  public void testHistoryCleanupNothingRemoved() {
+    // given
+    prepareInstances(null, null, null);
+
+    ClockUtil.setCurrentTime(new Date());
+    // when
+    String jobId = historyService.cleanUpHistoryAsync(true).getId();
+
+    managementService.executeJob(jobId);
+
+    // then
+    assertEquals(PROCESS_INSTANCES_COUNT, historyService.createHistoricProcessInstanceQuery().count());
+    assertEquals(DECISION_INSTANCES_COUNT + DECISIONS_IN_PROCESS_INSTANCES, historyService.createHistoricDecisionInstanceQuery().count());
+    assertEquals(CASE_INSTANCES_COUNT, historyService.createHistoricCaseInstanceQuery().count());
+  }
+
+  private void prepareInstances(Integer processInstanceTimeToLive, Integer decisionTimeToLive, Integer caseTimeToLive) {
     //update time to live
     List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().processDefinitionKey("testProcess").list();
     assertEquals(1, processDefinitions.size());
@@ -255,111 +357,33 @@ public class HistoryCleanupTest {
     assertEquals(1, decisionDefinitions.size());
     repositoryService.updateDecisionDefinitionHistoryTimeToLive(decisionDefinitions.get(0).getId(), decisionTimeToLive);
 
+    List<CaseDefinition> caseDefinitions = repositoryService.createCaseDefinitionQuery().caseDefinitionKey("oneTaskCase").list();
+    assertEquals(1, caseDefinitions.size());
+    repositoryService.updateCaseDefinitionHistoryTimeToLive(caseDefinitions.get(0).getId(), caseTimeToLive);
+
     Date oldCurrentTime = ClockUtil.getCurrentTime();
     ClockUtil.setCurrentTime(DateUtils.addDays(new Date(), DAYS_IN_THE_PAST));
 
     //create 3 process instances
     List<String> processInstanceIds = new ArrayList<String>();
     Map<String, Object> variables = Variables.createVariables().putValue("pojo", new TestPojo("okay", 13.37));
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < PROCESS_INSTANCES_COUNT; i++) {
       ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess", variables);
       processInstanceIds.add(processInstance.getId());
     }
     runtimeService.deleteProcessInstances(processInstanceIds, null, true, true);
 
     //+10 standalone decisions
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < DECISION_INSTANCES_COUNT; i++) {
       engineRule.getDecisionService().evaluateDecisionByKey("testDecision").variables(variables).evaluate();
     }
 
-    ClockUtil.setCurrentTime(oldCurrentTime);
-
-  }
-
-  @Test
-  public void testHistoryCleanupOnlyCaseInstances() {
-    // given
-
-    // update time to live
-    List<CaseDefinition> caseDefinitions = repositoryService.createCaseDefinitionQuery().list();
-    assertEquals(1, caseDefinitions.size());
-    repositoryService.updateCaseDefinitionHistoryTimeToLive(caseDefinitions.get(0).getId(), HISTORY_TIME_TO_LIVE);
-
-    ClockUtil.setCurrentTime(DateUtils.addDays(new Date(), DAYS_IN_THE_PAST));
-    for (int i = 0; i < 10; i++) {
-      CaseInstance caseInstance = caseService.createCaseInstanceByKey(ONE_TASK_CASE);
-      caseService.terminateCaseExecution(caseInstance.getId());
-      caseService.closeCaseInstance(caseInstance.getId());
-    }
-
-    ClockUtil.setCurrentTime(new Date());
-
-    // when
-    String jobId = historyService.cleanUpHistoryAsync(true).getId();
-
-    managementService.executeJob(jobId);
-
-    // then
-    assertEquals(0, historyService.createHistoricCaseInstanceQuery().count());
-  }
-
-  @Test
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/history/testDmnWithPojo.dmn11.xml" })
-  public void testHistoryCleanupWithDesicionAndCaseInstancesOnlyDecisionInstancesRemoved() {
-    // given
-    prepareCaseInstances(null, HISTORY_TIME_TO_LIVE);
-
-    ClockUtil.setCurrentTime(new Date());
-    // when
-    String jobId = historyService.cleanUpHistoryAsync(true).getId();
-
-    managementService.executeJob(jobId);
-
-    // then
-    assertResult(3);
-  }
-
-  @Test
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/history/testDmnWithPojo.dmn11.xml" })
-  public void testHistoryCleanupWithDesicionAndCaseInstancesOnlyCaseInstancesRemoved() {
-    // given
-    prepareCaseInstances(HISTORY_TIME_TO_LIVE, null);
-
-    ClockUtil.setCurrentTime(new Date());
-    // when
-    String jobId = historyService.cleanUpHistoryAsync(true).getId();
-
-    managementService.executeJob(jobId);
-
-    // then
-    assertResult(10);
-  }
-
-  private void prepareCaseInstances(Integer caseTimeToLive, Integer decisionTimeToLive) {
-    // update time to live
-    List<CaseDefinition> caseDefinitions = repositoryService.createCaseDefinitionQuery().caseDefinitionKey(ONE_TASK_CASE).list();
-    assertEquals(1, caseDefinitions.size());
-    repositoryService.updateCaseDefinitionHistoryTimeToLive(caseDefinitions.get(0).getId(), caseTimeToLive);
-
-    List<DecisionDefinition> decisionDefinitions = repositoryService.createDecisionDefinitionQuery().decisionDefinitionKey("testDecision").list();
-    assertEquals(1, decisionDefinitions.size());
-    repositoryService.updateDecisionDefinitionHistoryTimeToLive(decisionDefinitions.get(0).getId(), decisionTimeToLive);
-
-    Date oldCurrentTime = ClockUtil.getCurrentTime();
-    ClockUtil.setCurrentTime(DateUtils.addDays(new Date(), DAYS_IN_THE_PAST));
-
-    // create 3 case instances
-    Map<String, Object> variables = Variables.createVariables().putValue("pojo", new TestPojo("okay", 13.37));
-    for (int i = 0; i < 3; i++) {
-      CaseInstance caseInstance = caseService.createCaseInstanceByKey(ONE_TASK_CASE,
+    // create 4 process instances
+    for (int i = 0; i < CASE_INSTANCES_COUNT; i++) {
+      CaseInstance caseInstance = caseService.createCaseInstanceByKey("oneTaskCase",
           Variables.createVariables().putValue("pojo", new TestPojo("okay", 13.37 + i)));
       caseService.terminateCaseExecution(caseInstance.getId());
       caseService.closeCaseInstance(caseInstance.getId());
-    }
-
-    // +10 standalone decisions
-    for (int i = 0; i < 10; i++) {
-      engineRule.getDecisionService().evaluateDecisionByKey("testDecision").variables(variables).evaluate();
     }
 
     ClockUtil.setCurrentTime(oldCurrentTime);
@@ -610,7 +634,7 @@ public class HistoryCleanupTest {
 
   private Date getNextRunWithDelay(Date date, int countEmptyRuns) {
     //ignore milliseconds because MySQL does not support them, and it's not important for test
-    Date result = DateUtils.setMilliseconds(DateUtils.addSeconds(date, Math.min((int)(Math.pow(2., (double)countEmptyRuns) * HistoryCleanupJobHandlerConfiguration.START_DELAY),
+    Date result = DateUtils.setMilliseconds(DateUtils.addSeconds(date, Math.min((int)(Math.pow(2., countEmptyRuns) * HistoryCleanupJobHandlerConfiguration.START_DELAY),
         HistoryCleanupJobHandlerConfiguration.MAX_DELAY)), 0);
     return result;
   }

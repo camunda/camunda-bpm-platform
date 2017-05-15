@@ -125,45 +125,17 @@
     delete from ${prefix}ACT_HI_DETAIL where ID_ = #{id}
   </delete>
 
-  <delete id="deleteHistoricDetailsByProcessInstanceIds" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
+  <delete id="deleteHistoricDetailsByIds" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
     delete from ${prefix}ACT_HI_DETAIL
-    <include refid="selectHistoricDetailsByProcessInstanceIdsSql"/>
+    <include refid="selectHistoricDetailsByIdsSql"/>
   </delete>
 
-  <delete id="deleteHistoricDetailByteArraysByByProcessInstanceIds">
-    delete from ${prefix}ACT_GE_BYTEARRAY
-    where ID_ in
-      (select DISTINCT BYTEARRAY_ID_
-      from ${prefix}ACT_HI_DETAIL RES
-        <include refid="selectHistoricDetailsByProcessInstanceIdsSql"/>
-        and BYTEARRAY_ID_ is not NULL)
-  </delete>
-
-  <delete id="deleteHistoricDetailsByCaseInstanceIds" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
-    delete from ${prefix}ACT_HI_DETAIL
-    <include refid="selectHistoricDetailsByCaseInstanceIdsSql"/>
-  </delete>
-
-  <delete id="deleteHistoricDetailByteArraysByCaseInstanceIds">
-    delete from ${prefix}ACT_GE_BYTEARRAY
-    where ID_ in
-      (select DISTINCT BYTEARRAY_ID_
-      from ${prefix}ACT_HI_DETAIL RES
-        <include refid="selectHistoricDetailsByCaseInstanceIdsSql"/>
-        and BYTEARRAY_ID_ is not NULL)
-  </delete>
-
-  <delete id="deleteHistoricDetailsByTaskProcessInstanceIds" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
-    delete from ${prefix}ACT_HI_DETAIL
-    <include refid="selectHistoricDetailsByTaskProcessInstanceIdsSql"/>
-  </delete>
-
-  <delete id="deleteHistoricDetailByteArraysByTaskProcessInstanceIds">
+  <delete id="deleteHistoricDetailByteArraysByIds">
     delete from ${prefix}ACT_GE_BYTEARRAY
     where ID_ in
     (select DISTINCT BYTEARRAY_ID_
     from ${prefix}ACT_HI_DETAIL RES
-    <include refid="selectHistoricDetailsByTaskProcessInstanceIdsSql"/>
+    <include refid="selectHistoricDetailsByIdsSql"/>
     and BYTEARRAY_ID_ is not NULL)
   </delete>
 
@@ -326,28 +298,29 @@
     </where>
   </sql>
 
-  <sql id="selectHistoricDetailsByProcessInstanceIdsSql">
-    where PROC_INST_ID_ IN
-      <foreach item="processInstanceId" index="index" collection="list" open="(" separator="," close=")">
+  <sql id="selectHistoricDetailsByIdsSql">
+    WHERE
+    <if test="processInstanceIds != null &amp;&amp; processInstanceIds.size() > 0">
+      PROC_INST_ID_ IN
+      <foreach item="processInstanceId" index="index" collection="processInstanceIds" open="(" separator="," close=")">
         #{processInstanceId}
       </foreach>
-  </sql>
-
-  <sql id="selectHistoricDetailsByCaseInstanceIdsSql">
-    where CASE_INST_ID_ IN
-      <foreach item="caseInstanceId" index="index" collection="list" open="(" separator="," close=")">
+    </if>
+    <if test="caseInstanceIds != null &amp;&amp; caseInstanceIds.size() > 0">
+      CASE_INST_ID_ IN
+      <foreach item="caseInstanceId" index="index" collection="caseInstanceIds" open="(" separator="," close=")">
         #{caseInstanceId}
       </foreach>
-  </sql>
-
-  <sql id="selectHistoricDetailsByTaskProcessInstanceIdsSql">
-    where TASK_ID_ IN
+    </if>
+    <if test="taskProcessInstanceIds != null &amp;&amp; taskProcessInstanceIds.size() > 0">
+      TASK_ID_ IN
       (select distinct ID_ from ${prefix}ACT_HI_TASKINST
       where PROC_INST_ID_ in
-        <foreach item="processInstanceId" index="index" collection="list" open="(" separator="," close=")">
-          #{processInstanceId}
-        </foreach>
+      <foreach item="processInstanceId" index="index" collection="taskProcessInstanceIds" open="(" separator="," close=")">
+        #{processInstanceId}
+      </foreach>
       )
+    </if>
   </sql>
 
 </mapper>

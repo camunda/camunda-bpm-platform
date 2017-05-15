@@ -20,10 +20,8 @@ import java.util.Map;
 import org.camunda.bpm.engine.history.HistoricCaseInstance;
 import org.camunda.bpm.engine.impl.HistoricCaseInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
-import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.history.event.HistoricCaseInstanceEventEntity;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 
@@ -61,51 +59,29 @@ public class HistoricCaseInstanceManager extends AbstractHistoricManager {
 
   public void deleteHistoricCaseInstanceById(String historicCaseInstanceId) {
     if (isHistoryEnabled()) {
-      CommandContext commandContext = Context.getCommandContext();
+      getHistoricDetailManager().deleteHistoricDetailsByCaseInstanceId(historicCaseInstanceId);
 
-      commandContext
-        .getHistoricDetailManager()
-        .deleteHistoricDetailsByCaseInstanceId(historicCaseInstanceId);
+      getHistoricVariableInstanceManager().deleteHistoricVariableInstanceByCaseInstanceId(historicCaseInstanceId);
 
-      commandContext
-        .getHistoricVariableInstanceManager()
-        .deleteHistoricVariableInstanceByCaseInstanceId(historicCaseInstanceId);
+      getHistoricCaseActivityInstanceManager().deleteHistoricCaseActivityInstancesByCaseInstanceId(historicCaseInstanceId);
 
-      commandContext
-        .getHistoricCaseActivityInstanceManager()
-        .deleteHistoricCaseActivityInstancesByCaseInstanceId(historicCaseInstanceId);
+      getHistoricTaskInstanceManager().deleteHistoricTaskInstancesByCaseInstanceId(historicCaseInstanceId);
 
-      commandContext
-        .getHistoricTaskInstanceManager()
-        .deleteHistoricTaskInstancesByCaseInstanceId(historicCaseInstanceId);
-
-      commandContext.getDbEntityManager().delete(HistoricCaseInstanceEntity.class, "deleteHistoricCaseInstance", historicCaseInstanceId);
-
+      getDbEntityManager().delete(HistoricCaseInstanceEntity.class, "deleteHistoricCaseInstance", historicCaseInstanceId);
     }
   }
 
   public void deleteHistoricCaseInstancesByIds(List<String> historicCaseInstanceIds) {
     if (isHistoryEnabled()) {
-      CommandContext commandContext = Context.getCommandContext();
+      getHistoricDetailManager().deleteHistoricDetailsByCaseInstanceIds(historicCaseInstanceIds);
 
-      commandContext
-        .getHistoricDetailManager()
-        .deleteHistoricDetailsByCaseInstanceIds(historicCaseInstanceIds);
+      getHistoricVariableInstanceManager().deleteHistoricVariableInstancesByCaseInstanceIds(historicCaseInstanceIds);
 
-      commandContext
-        .getHistoricVariableInstanceManager()
-        .deleteHistoricVariableInstancesByCaseInstanceIds(historicCaseInstanceIds);
+      getHistoricCaseActivityInstanceManager().deleteHistoricCaseActivityInstancesByCaseInstanceIds(historicCaseInstanceIds);
 
-      commandContext
-        .getHistoricCaseActivityInstanceManager()
-        .deleteHistoricCaseActivityInstancesByCaseInstanceIds(historicCaseInstanceIds);
+      getHistoricTaskInstanceManager().deleteHistoricTaskInstancesByCaseInstanceIds(historicCaseInstanceIds);
 
-      commandContext
-        .getHistoricTaskInstanceManager()
-        .deleteHistoricTaskInstancesByCaseInstanceIds(historicCaseInstanceIds);
-
-      commandContext.getDbEntityManager().delete(HistoricCaseInstanceEntity.class, "deleteHistoricCaseInstancesByIds", historicCaseInstanceIds);
-
+      getDbEntityManager().delete(HistoricCaseInstanceEntity.class, "deleteHistoricCaseInstancesByIds", historicCaseInstanceIds);
     }
   }
 
@@ -139,12 +115,13 @@ public class HistoricCaseInstanceManager extends AbstractHistoricManager {
     getTenantManager().configureQuery(query);
   }
 
+  @SuppressWarnings("unchecked")
   public List<String> findHistoricCaseInstanceIdsForCleanup(int batchSize) {
     ListQueryParameterObject parameterObject = new ListQueryParameterObject();
     parameterObject.setParameter(ClockUtil.getCurrentTime());
     parameterObject.setFirstResult(0);
     parameterObject.setMaxResults(batchSize);
-    return (List<String>) getDbEntityManager().selectList("selectHistoricCaseInstanceIdsForCleanup", parameterObject);
+    return getDbEntityManager().selectList("selectHistoricCaseInstanceIdsForCleanup", parameterObject);
   }
 
 }
