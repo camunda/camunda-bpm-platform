@@ -51,7 +51,7 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
   public static final String SORTORDER_DESC = "desc";
 
   protected enum ResultType {
-    LIST, LIST_PAGE, SINGLE_RESULT, COUNT
+    LIST, LIST_PAGE, LIST_IDS, SINGLE_RESULT, COUNT
   }
   protected transient CommandExecutor commandExecutor;
 
@@ -165,6 +165,8 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
       return executeSingleResult(commandContext);
     } else if (resultType==ResultType.LIST_PAGE) {
       return evaluateExpressionsAndExecuteList(commandContext, null);
+    } else if (resultType == ResultType.LIST_IDS) {
+      return evaluateExpressionsAndExecuteIdsList(commandContext);
     } else {
       return evaluateExpressionsAndExecuteCount(commandContext);
     }
@@ -313,8 +315,12 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
     validators.remove(validator);
   }
 
+  @SuppressWarnings("unchecked")
   public List<String> listIds() {
-    this.resultType = ResultType.LIST;
+    this.resultType = ResultType.LIST_IDS;
+    if (commandExecutor != null) {
+      return (List<String>) commandExecutor.execute(this);
+    }
     return evaluateExpressionsAndExecuteIdsList(Context.getCommandContext());
   }
 

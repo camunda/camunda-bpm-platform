@@ -14,6 +14,7 @@ import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.history.HistoricJobLog;
 import org.camunda.bpm.engine.impl.batch.BatchMonitorJobHandler;
 import org.camunda.bpm.engine.impl.batch.BatchSeedJobHandler;
+import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.runtime.Job;
@@ -22,14 +23,19 @@ import org.camunda.bpm.engine.test.ProcessEngineRule;
 public abstract class BatchHelper {
 
   protected ProcessEngineRule engineRule;
+  protected PluggableProcessEngineTestCase testCase;
 
   public BatchHelper(ProcessEngineRule engineRule) {
     this.engineRule = engineRule;
   }
 
+  public BatchHelper(PluggableProcessEngineTestCase testCase) {
+    this.testCase = testCase;
+  }
+
   public Job getJobForDefinition(JobDefinition jobDefinition) {
     if (jobDefinition != null) {
-      return engineRule.getManagementService()
+      return getManagementService()
         .createJobQuery().jobDefinitionId(jobDefinition.getId()).singleResult();
     }
     else {
@@ -38,14 +44,14 @@ public abstract class BatchHelper {
   }
 
   public List<Job> getJobsForDefinition(JobDefinition jobDefinition) {
-    return engineRule.getManagementService()
+    return getManagementService()
       .createJobQuery().jobDefinitionId(jobDefinition.getId()).list();
   }
 
   public void executeJob(Job job) {
     assertNotNull("Job to execute does not exist", job);
     try {
-      engineRule.getManagementService().executeJob(job.getId());
+      getManagementService().executeJob(job.getId());
     }
     catch (BadUserRequestException e) {
       throw e;
@@ -56,7 +62,7 @@ public abstract class BatchHelper {
   }
 
   public JobDefinition getSeedJobDefinition(Batch batch) {
-    return engineRule.getManagementService()
+    return getManagementService()
       .createJobDefinitionQuery()
       .jobDefinitionId(batch.getSeedJobDefinitionId())
       .jobType(BatchSeedJobHandler.TYPE)
@@ -72,7 +78,7 @@ public abstract class BatchHelper {
   }
 
   public JobDefinition getMonitorJobDefinition(Batch batch) {
-    return engineRule.getManagementService()
+    return getManagementService()
       .createJobDefinitionQuery().jobDefinitionId(batch.getMonitorJobDefinitionId()).jobType(BatchMonitorJobHandler.TYPE).singleResult();
   }
 
@@ -130,7 +136,7 @@ public abstract class BatchHelper {
     List<Job> jobs = getExecutionJobs(batch);
     assertTrue(jobs.size() >= count);
 
-    ManagementService managementService = engineRule.getManagementService();
+    ManagementService managementService = getManagementService();
     for (int i = 0; i < count; i++) {
       managementService.setJobRetries(jobs.get(i).getId(), retries);
     }
@@ -142,15 +148,15 @@ public abstract class BatchHelper {
       executeJobs(batch);
     }
   }
+
   public HistoricBatch getHistoricBatch(Batch batch) {
-    return engineRule.getHistoryService()
+    return getHistoryService()
       .createHistoricBatchQuery()
       .batchId(batch.getId())
       .singleResult();
   }
-
   public List<HistoricJobLog> getHistoricSeedJobLog(Batch batch) {
-    return engineRule.getHistoryService()
+    return getHistoryService()
       .createHistoricJobLogQuery()
       .jobDefinitionId(batch.getSeedJobDefinitionId())
       .orderPartiallyByOccurrence()
@@ -159,7 +165,7 @@ public abstract class BatchHelper {
   }
 
   public List<HistoricJobLog> getHistoricMonitorJobLog(Batch batch) {
-    return engineRule.getHistoryService()
+    return getHistoryService()
       .createHistoricJobLogQuery()
       .jobDefinitionId(batch.getMonitorJobDefinitionId())
       .orderPartiallyByOccurrence()
@@ -168,7 +174,7 @@ public abstract class BatchHelper {
   }
 
   public List<HistoricJobLog> getHistoricMonitorJobLog(Batch batch, Job monitorJob) {
-    return engineRule.getHistoryService()
+    return getHistoryService()
       .createHistoricJobLogQuery()
       .jobDefinitionId(batch.getMonitorJobDefinitionId())
       .jobId(monitorJob.getId())
@@ -178,7 +184,7 @@ public abstract class BatchHelper {
   }
 
   public List<HistoricJobLog> getHistoricBatchJobLog(Batch batch) {
-    return engineRule.getHistoryService()
+    return getHistoryService()
       .createHistoricJobLogQuery()
       .jobDefinitionId(batch.getBatchJobDefinitionId())
       .orderPartiallyByOccurrence()
@@ -200,8 +206,8 @@ public abstract class BatchHelper {
    * Remove all batches and historic batches. Usually called in {@link org.junit.After} method.
    */
   public void removeAllRunningAndHistoricBatches() {
-    HistoryService historyService = engineRule.getHistoryService();
-    ManagementService managementService = engineRule.getManagementService();
+    HistoryService historyService = getHistoryService();
+    ManagementService managementService = getManagementService();
 
     for (Batch batch : managementService.createBatchQuery().list()) {
       managementService.deleteBatch(batch.getId(), true);
@@ -212,6 +218,24 @@ public abstract class BatchHelper {
       historyService.deleteHistoricBatch(historicBatch.getId());
     }
 
+  }
+
+  protected ManagementService getManagementService() {
+    if (engineRule != null) {
+      return engineRule.getManagementService();
+    }
+    else {
+      return testCase.getProcessEngine().getManagementService();
+    }
+  }
+
+  protected HistoryService getHistoryService() {
+    if (engineRule != null) {
+      return engineRule.getHistoryService();
+    }
+    else {
+      return testCase.getProcessEngine().getHistoryService();
+    }
   }
 
 }
