@@ -46,7 +46,7 @@ public class SetExternalTaskRetriesCmd extends ExternalTaskCmd {
   protected void execute(ExternalTaskEntity externalTask) {
     if (writeUserOperationLog) {
       List<PropertyChange> propertyChanges = new ArrayList<PropertyChange>();
-      propertyChanges.add(new PropertyChange("retries", null, retries));
+      propertyChanges.add(new PropertyChange("retries", externalTask.getRetries(), retries));
 
       Context.getCommandContext().getOperationLogManager()
           .logProcessInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_SET_EXTERNAL_TASK_RETRIES,

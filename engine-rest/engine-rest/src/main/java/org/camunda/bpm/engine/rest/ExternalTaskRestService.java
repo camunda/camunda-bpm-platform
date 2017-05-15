@@ -76,11 +76,6 @@ public interface ExternalTaskRestService {
   @Path("/{id}")
   ExternalTaskResource getExternalTask(@PathParam("id") String externalTaskId);
 
-  @PUT
-  @Path("/retries-sync")
-  @Consumes(MediaType.APPLICATION_JSON)
-  void setRetries(SetRetriesForExternalTasksDto retriesDto);
-
   @POST
   @Path("/retries-async")
   @Consumes(MediaType.APPLICATION_JSON)

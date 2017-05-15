@@ -42,7 +42,6 @@ public class SetExternalTaskRetriesUserOperationLogTest {
   private static String PROCESS_DEFINITION_KEY_2 = "twoExternalTaskWithPriorityProcess";
 
   protected RuntimeService runtimeService;
-  protected RepositoryService repositoryService;
   protected ManagementService managementService;
   protected ExternalTaskService externalTaskService;
   protected static final Date START_DATE = new Date(1457326800000L);
@@ -71,7 +70,6 @@ public class SetExternalTaskRetriesUserOperationLogTest {
       processInstanceIds.add(runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY, i + "").getId());
     }
     processInstanceIds.add(runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY_2).getId());
-    Context.setProcessEngineConfiguration(rule.getProcessEngineConfiguration());
   }
 
   @Before

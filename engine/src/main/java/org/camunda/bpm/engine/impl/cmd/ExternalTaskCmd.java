@@ -39,7 +39,6 @@ public abstract class ExternalTaskCmd implements Command<Void> {
   protected String externalTaskId;
 
   public ExternalTaskCmd(String externalTaskId) {
-    ensureNotNull(NotFoundException.class, "Cannot find external task with id null", "externalTask", externalTaskId);
     this.externalTaskId = externalTaskId;
   }
 

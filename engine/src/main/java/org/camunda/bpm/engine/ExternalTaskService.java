@@ -245,7 +245,6 @@ public interface ExternalTaskService {
    *   <ul>
    *     <li>{@link Permissions#UPDATE} on {@link Resources#PROCESS_INSTANCE}</li>
    *     <li>{@link Permissions#UPDATE_INSTANCE} on {@link Resources#PROCESS_DEFINITION}</li>
-   *      <li>{@link Permissions#CREATE} on {@link Resources#BATCH}</li>
    *   </ul>
    */
   public void setRetries(List<String> externalTaskIds, int retries);
@@ -268,6 +267,7 @@ public interface ExternalTaskService {
    *   <ul>
    *     <li>{@link Permissions#UPDATE} on {@link Resources#PROCESS_INSTANCE}</li>
    *     <li>{@link Permissions#UPDATE_INSTANCE} on {@link Resources#PROCESS_DEFINITION}</li>
+   *     <li>{@link Permissions#CREATE} on {@link Resources#BATCH}</li>
    *   </ul>
    */
   public Batch setRetriesAsync(List<String> externalTaskIds, ExternalTaskQuery externalTaskQuery, int retries);

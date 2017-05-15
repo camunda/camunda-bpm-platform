@@ -69,7 +69,6 @@ public class SetExternalTasksRetriesTest {
       processInstanceIds.add(runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY, i + "").getId());
     }
     processInstanceIds.add(runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY_2).getId());
-    Context.setProcessEngineConfiguration(engineRule.getProcessEngineConfiguration());
   }
   
   @After
@@ -152,7 +151,7 @@ public class SetExternalTasksRetriesTest {
       Assert.assertThat(e.getMessage(), containsString("externalTaskIds is empty"));
     }
   }
-  
+
   @Test
   public void shouldFailForNonExistingExternalTaskIdAsync() {
     
@@ -286,6 +285,29 @@ public class SetExternalTasksRetriesTest {
     externalTasks = externalTaskService.createExternalTaskQuery().list();
     for (ExternalTask task : externalTasks) {
       Assert.assertEquals(5, (int) task.getRetries());
+    }
+  }
+
+  @Test
+  public void shouldSetExternalTaskRetriesWithDifferentListAndQueryAsync() {
+    // given
+    ExternalTaskQuery externalTaskQuery = externalTaskService.createExternalTaskQuery().processInstanceId(processInstanceIds.get(0));
+    List<ExternalTask> externalTasks = externalTaskService.createExternalTaskQuery().processInstanceId(processInstanceIds.get(processInstanceIds.size()-1)).list();
+    ArrayList<String> externalTaskIds = new ArrayList<String>();
+    for (ExternalTask task : externalTasks) {
+      externalTaskIds.add(task.getId());
+    }
+
+    // when
+    Batch batch = externalTaskService.setRetriesAsync(externalTaskIds, externalTaskQuery, 8);
+    executeSeedAndBatchJobs(batch);
+
+    // then
+    ExternalTask task = externalTaskService.createExternalTaskQuery().processInstanceId(processInstanceIds.get(0)).singleResult();
+    Assert.assertEquals(8, (int) task.getRetries());
+    List<ExternalTask> tasks = externalTaskService.createExternalTaskQuery().processInstanceId(processInstanceIds.get(processInstanceIds.size()-1)).list();
+    for (ExternalTask t : tasks) {
+      Assert.assertEquals(8, (int) t.getRetries());
     }
   }
 

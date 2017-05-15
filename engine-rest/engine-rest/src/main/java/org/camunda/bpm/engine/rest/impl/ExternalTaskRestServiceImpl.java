@@ -144,19 +144,6 @@ public class ExternalTaskRestServiceImpl extends AbstractRestProcessEngineAware 
   }
 
   @Override
-  public void setRetries(SetRetriesForExternalTasksDto retriesDto) {
-    ExternalTaskService externalTaskService = getProcessEngine().getExternalTaskService();
-
-    try {
-      externalTaskService.setRetries(retriesDto.getExternalTaskIds(), retriesDto.getRetries());
-    } catch (NotFoundException e) {
-      throw new InvalidRequestException(Status.NOT_FOUND, e.getMessage());
-    } catch (BadUserRequestException e) {
-      throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());
-    }
-  }
-
-  @Override
   public BatchDto setRetriesAsync(SetRetriesForExternalTasksDto retriesDto) {
 
     ExternalTaskService externalTaskService = getProcessEngine().getExternalTaskService();

@@ -6,11 +6,13 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.ExternalTaskQueryImpl;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
@@ -37,7 +39,15 @@ public abstract class AbstractSetExternalTaskRetriesCmd<T> implements Command<T>
     }
 
     if (externalTaskQuery != null) {
-      collectedIds.addAll(((ExternalTaskQueryImpl) externalTaskQuery).listIds());
+      List<String> ids = Context.getCommandContext().runWithoutAuthorization(new Callable<List<String>>(){
+
+        @Override
+        public List<String> call() throws Exception {
+          return ((ExternalTaskQueryImpl) externalTaskQuery).listIds();
+        }
+      });
+
+      collectedIds.addAll(ids);
     }
     return new ArrayList<String>(collectedIds);
   }

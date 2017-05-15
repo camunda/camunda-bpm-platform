@@ -79,7 +79,6 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
   protected static final String HANDLE_EXTERNAL_TASK_BPMN_ERROR_URL = SINGLE_EXTERNAL_TASK_URL + "/bpmnError";
   protected static final String UNLOCK_EXTERNAL_TASK_URL = SINGLE_EXTERNAL_TASK_URL + "/unlock";
   protected static final String RETRIES_EXTERNAL_TASK_URL = SINGLE_EXTERNAL_TASK_URL + "/retries";
-  protected static final String RETRIES_EXTERNAL_TASKS_SYNC_URL = EXTERNAL_TASK_URL + "/retries-sync";
   protected static final String RETRIES_EXTERNAL_TASKS_ASYNC_URL = EXTERNAL_TASK_URL + "/retries-async";
   protected static final String PRIORITY_EXTERNAL_TASK_URL = SINGLE_EXTERNAL_TASK_URL + "/priority";
 
@@ -844,26 +843,6 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
   }
 
   @Test
-  public void testSetRetriesForExternalTasksSync() {
-    List<String> externalTaskIds = Arrays.asList("externalTaskId1", "externalTaskId2");
-    Map<String, Object> parameters = new HashMap<String, Object>();
-    parameters.put("retries", "5");
-    parameters.put("externalTaskIds", externalTaskIds);
-
-    given()
-     .contentType(POST_JSON_CONTENT_TYPE)
-     .body(parameters)
-    .then()
-     .expect()
-     .statusCode(Status.NO_CONTENT.getStatusCode())
-    .when()
-     .put(RETRIES_EXTERNAL_TASKS_SYNC_URL);
-
-    verify(externalTaskService).setRetries(externalTaskIds, 5);
-    verifyNoMoreInteractions(externalTaskService);
-  }
-
-  @Test
   public void testSetRetriesForExternalTasksAsync() {
     List<String> externalTaskIds = Arrays.asList("externalTaskId1", "externalTaskId2");
     Map<String, Object> parameters = new HashMap<String, Object>();
@@ -880,28 +859,6 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
      .post(RETRIES_EXTERNAL_TASKS_ASYNC_URL);
 
     verify(externalTaskService).setRetriesAsync(externalTaskIds, null, 5);
-    verifyNoMoreInteractions(externalTaskService);
-  }
-
-  @Test
-  public void testSetRetriesForExternalTasksWithNullExternalTaskIdsSync() {
-    doThrow(BadUserRequestException.class).when(externalTaskService).setRetries(anyListOf(String.class), anyInt());
-
-    List<String> externalTaskIds = null;
-    Map<String, Object> parameters = new HashMap<String, Object>();
-    parameters.put("retries", "5");
-    parameters.put("externalTaskIds", externalTaskIds);
-
-    given()
-     .contentType(POST_JSON_CONTENT_TYPE)
-     .body(parameters)
-    .then()
-     .expect()
-     .statusCode(Status.BAD_REQUEST.getStatusCode())
-    .when()
-     .put(RETRIES_EXTERNAL_TASKS_SYNC_URL);
-
-    verify(externalTaskService).setRetries(externalTaskIds, 5);
     verifyNoMoreInteractions(externalTaskService);
   }
 
@@ -924,28 +881,6 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
      .post(RETRIES_EXTERNAL_TASKS_ASYNC_URL);
 
     verify(externalTaskService).setRetriesAsync(externalTaskIds, null, 5);
-    verifyNoMoreInteractions(externalTaskService);
-  }
-
-  @Test
-  public void testSetNegativeRetriesForExternalTasksSync() {
-    doThrow(BadUserRequestException.class).when(externalTaskService).setRetries(anyListOf(String.class), anyInt());
-
-    List<String> externalTaskIds = null;
-    Map<String, Object> parameters = new HashMap<String, Object>();
-    parameters.put("retries", "-5");
-    parameters.put("externalTaskIds", externalTaskIds);
-
-    given()
-     .contentType(POST_JSON_CONTENT_TYPE)
-     .body(parameters)
-    .then()
-     .expect()
-     .statusCode(Status.BAD_REQUEST.getStatusCode())
-    .when()
-     .put(RETRIES_EXTERNAL_TASKS_SYNC_URL);
-
-    verify(externalTaskService).setRetries(externalTaskIds, -5);
     verifyNoMoreInteractions(externalTaskService);
   }
 

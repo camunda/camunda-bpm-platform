@@ -4,7 +4,6 @@ import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSc
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSpec.grant;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -13,13 +12,15 @@ import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
+import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
-import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario;
-import org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSpec;
 import org.camunda.bpm.engine.test.api.authorization.util.AuthorizationTestRule;
+import org.camunda.bpm.engine.test.api.runtime.migration.models.ExternalTaskModels;
+import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.After;
 import org.junit.Assert;
@@ -37,9 +38,11 @@ public class SetExternalTasksRetriesBatchAuthorizationTest {
 
   public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   public AuthorizationTestRule authRule = new AuthorizationTestRule(engineRule);
+  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
+
 
   @Rule
-  public RuleChain chain = RuleChain.outerRule(engineRule).around(authRule);
+  public RuleChain chain = RuleChain.outerRule(engineRule).around(authRule).around(testRule);
 
   @Parameter
   public AuthorizationScenario scenario;
@@ -50,61 +53,19 @@ public class SetExternalTasksRetriesBatchAuthorizationTest {
       scenario()
         .withoutAuthorizations()
         .failsDueToRequired(
-          grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE)),
+            grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE)),
       scenario()
         .withAuthorizations(
-          grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE),
-          grant(Resources.PROCESS_INSTANCE, "processInstanceId2", "userId", Permissions.UPDATE))
-        .withoutAuthorizations()
-        .failsDueToRequired(
-          grant(Resources.PROCESS_INSTANCE, "processInstanceId1", "userId", Permissions.UPDATE),
-          grant(Resources.PROCESS_DEFINITION, "oneExternalTaskProcess", "userId", Permissions.UPDATE_INSTANCE)),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE),
-          grant(Resources.PROCESS_INSTANCE, "processInstanceId1", "userId", Permissions.UPDATE),
-          grant(Resources.PROCESS_INSTANCE, "processInstanceId2", "userId", Permissions.UPDATE))
+            grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE),
+            grant(Resources.PROCESS_DEFINITION, "processDefinition", "userId", Permissions.UPDATE_INSTANCE))
         .succeeds(),
       scenario()
         .withAuthorizations(
-          grant(Resources.PROCESS_INSTANCE, "processInstanceId1", "userId", Permissions.UPDATE),
-          grant(Resources.PROCESS_INSTANCE, "processInstanceId2", "userId", Permissions.UPDATE))
+            grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE))
         .withoutAuthorizations()
         .failsDueToRequired(
-          grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE)),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE),
-          grant(Resources.PROCESS_INSTANCE, "*", "userId", Permissions.UPDATE))
-        .succeeds(),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.PROCESS_INSTANCE, "*", "userId", Permissions.UPDATE))
-        .withoutAuthorizations()
-        .failsDueToRequired(
-          grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE)),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE),
-          grant(Resources.PROCESS_DEFINITION, "processDefinitionKey", "userId", Permissions.UPDATE_INSTANCE))
-        .succeeds(),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.PROCESS_DEFINITION, "processDefinitionKey", "userId", Permissions.UPDATE_INSTANCE))
-        .withoutAuthorizations()
-        .failsDueToRequired(
-          grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE)),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE),
-          grant(Resources.PROCESS_DEFINITION, "*", "userId", Permissions.UPDATE_INSTANCE))
-        .succeeds(),
-      scenario()
-        .withAuthorizations(
-          grant(Resources.PROCESS_DEFINITION, "*", "userId", Permissions.UPDATE_INSTANCE))
-        .withoutAuthorizations()
-        .failsDueToRequired(
-         grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE))
+            grant(Resources.PROCESS_DEFINITION, "processDefinition", "userId", Permissions.UPDATE_INSTANCE),
+            grant(Resources.PROCESS_INSTANCE, "processInstance1", "userId", Permissions.UPDATE))
       );
   }
 
@@ -134,12 +95,12 @@ public class SetExternalTasksRetriesBatchAuthorizationTest {
   }
   
   @Test
-  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
   public void testSetRetriesAsync() {
 
     // given
-    ProcessInstance processInstance1 = engineRule.getRuntimeService().startProcessInstanceByKey("oneExternalTaskProcess");
-    ProcessInstance processInstance2 = engineRule.getRuntimeService().startProcessInstanceByKey("oneExternalTaskProcess");
+    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(ExternalTaskModels.ONE_EXTERNAL_TASK_PROCESS);
+    ProcessInstance processInstance1 = engineRule.getRuntimeService().startProcessInstanceByKey("Process");
+    ProcessInstance processInstance2 = engineRule.getRuntimeService().startProcessInstanceByKey("Process");
     List<ExternalTask> externalTasks = engineRule.getExternalTaskService().createExternalTaskQuery().list();
     
     ArrayList<String> externalTaskIds = new ArrayList<String>();
@@ -153,9 +114,9 @@ public class SetExternalTasksRetriesBatchAuthorizationTest {
       .init(scenario)
       .withUser("userId")
       .bindResource("batchId", "*")
-      .bindResource("processInstanceId1", processInstance1.getId())
-      .bindResource("processInstanceId2", processInstance2.getId())
-      .bindResource("processDefinitionKey", "oneExternalTaskProcess")
+      .bindResource("processInstance1", processInstance1.getId())
+      .bindResource("processInstance2", processInstance2.getId())
+      .bindResource("processDefinition", processDefinition.getKey())
       .start();
 
     Batch batch = engineRule.getExternalTaskService().setRetriesAsync(externalTaskIds, null, 5);
@@ -171,7 +132,42 @@ public class SetExternalTasksRetriesBatchAuthorizationTest {
       }  
     }
   }
-  
+
+  @Test
+  public void testSetRetriesWithQueryAsync() {
+
+    // given
+    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(ExternalTaskModels.ONE_EXTERNAL_TASK_PROCESS);
+    ProcessInstance processInstance1 = engineRule.getRuntimeService().startProcessInstanceByKey("Process");
+    ProcessInstance processInstance2 = engineRule.getRuntimeService().startProcessInstanceByKey("Process");
+    List<ExternalTask> externalTasks = engineRule.getExternalTaskService().createExternalTaskQuery().list();
+
+    ExternalTaskQuery externalTaskQuery = engineRule.getExternalTaskService().createExternalTaskQuery();
+
+    // when
+    authRule
+      .init(scenario)
+      .withUser("userId")
+      .bindResource("batchId", "*")
+      .bindResource("processInstance1", processInstance1.getId())
+      .bindResource("processInstance2", processInstance2.getId())
+      .bindResource("processDefinition", processDefinition.getKey())
+      .start();
+
+    Batch batch = engineRule.getExternalTaskService().setRetriesAsync(null, externalTaskQuery, 5);
+    if (batch != null) {
+      executeSeedAndBatchJobs(batch);
+    }
+
+    // then
+    if (authRule.assertScenario(scenario)) {
+      externalTasks = engineRule.getExternalTaskService().createExternalTaskQuery().list();
+      for ( ExternalTask task : externalTasks) {
+      Assert.assertEquals(5, (int) task.getRetries());
+      }
+    }
+  }
+
   public void executeSeedAndBatchJobs(Batch batch) {
     Job job = engineRule.getManagementService().createJobQuery().jobDefinitionId(batch.getSeedJobDefinitionId()).singleResult();
     // seed job

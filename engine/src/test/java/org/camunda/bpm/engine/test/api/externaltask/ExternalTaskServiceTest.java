@@ -1011,7 +1011,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
       externalTaskService.unlock(null);
       fail("expected exception");
     } catch (ProcessEngineException e) {
-      Assert.assertThat(e.getMessage(), containsString("Cannot find external task with id null"));
+      Assert.assertThat(e.getMessage(), containsString("externalTaskId is null"));
     }
   }
 
@@ -1463,8 +1463,8 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
     try {
       externalTaskService.setRetries((String)null, 5);
       fail("expected exception");
-    } catch (NotFoundException e) {
-      Assert.assertThat(e.getMessage(), containsString("Cannot find external task with id null"));
+    } catch (NullValueException e) {
+      Assert.assertThat(e.getMessage(), containsString("externalTaskId is null"));
     }
   }
 
@@ -1501,8 +1501,8 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
     try {
       externalTaskService.setPriority(null, 5);
       fail("expected exception");
-    } catch (NotFoundException e) {
-      Assert.assertThat(e.getMessage(), containsString("Cannot find external task with id null"));
+    } catch (NullValueException e) {
+      Assert.assertThat(e.getMessage(), containsString("externalTaskId is null"));
     }
   }
 
