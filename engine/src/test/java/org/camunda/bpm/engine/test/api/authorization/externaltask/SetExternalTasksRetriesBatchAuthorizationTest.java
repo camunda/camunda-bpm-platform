@@ -100,7 +100,6 @@ public class SetExternalTasksRetriesBatchAuthorizationTest {
     // given
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(ExternalTaskModels.ONE_EXTERNAL_TASK_PROCESS);
     ProcessInstance processInstance1 = engineRule.getRuntimeService().startProcessInstanceByKey("Process");
-    ProcessInstance processInstance2 = engineRule.getRuntimeService().startProcessInstanceByKey("Process");
     List<ExternalTask> externalTasks = engineRule.getExternalTaskService().createExternalTaskQuery().list();
     
     ArrayList<String> externalTaskIds = new ArrayList<String>();
@@ -115,7 +114,6 @@ public class SetExternalTasksRetriesBatchAuthorizationTest {
       .withUser("userId")
       .bindResource("batchId", "*")
       .bindResource("processInstance1", processInstance1.getId())
-      .bindResource("processInstance2", processInstance2.getId())
       .bindResource("processDefinition", processDefinition.getKey())
       .start();
 
@@ -139,7 +137,6 @@ public class SetExternalTasksRetriesBatchAuthorizationTest {
     // given
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(ExternalTaskModels.ONE_EXTERNAL_TASK_PROCESS);
     ProcessInstance processInstance1 = engineRule.getRuntimeService().startProcessInstanceByKey("Process");
-    ProcessInstance processInstance2 = engineRule.getRuntimeService().startProcessInstanceByKey("Process");
     List<ExternalTask> externalTasks = engineRule.getExternalTaskService().createExternalTaskQuery().list();
 
     ExternalTaskQuery externalTaskQuery = engineRule.getExternalTaskService().createExternalTaskQuery();
@@ -150,7 +147,6 @@ public class SetExternalTasksRetriesBatchAuthorizationTest {
       .withUser("userId")
       .bindResource("batchId", "*")
       .bindResource("processInstance1", processInstance1.getId())
-      .bindResource("processInstance2", processInstance2.getId())
       .bindResource("processDefinition", processDefinition.getKey())
       .start();
 
