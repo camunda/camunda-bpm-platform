@@ -10,6 +10,8 @@
       data-index="{{ index }}">
     <span class="divider" ng-click="crumb.hidden = !crumb.hidden">{{ crumb.divider || divider }}</span>
 
+    <!-- using ng-show to separate logic of creating breadcrumbs elements from
+         logic of dynamically showing and hidding them -->
     <a ng-if="!!crumb.href && !$last"
        ng-show="!crumb.hidden"
        href="{{ getHref(crumb) }}"
