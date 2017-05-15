@@ -22,8 +22,8 @@ import org.springframework.test.context.ContextConfiguration;
  * @author Svetlana Dorokhova
  */
 
-@ContextConfiguration("classpath:org/camunda/bpm/engine/spring/test/transaction/SpringTransactionIntegrationCommandFailTest-context.xml")
-public class SpringTransactionIntegrationCommandFailTest extends SpringProcessEngineTestCase {
+@ContextConfiguration("classpath:org/camunda/bpm/engine/spring/test/transaction/SpringTransactionIntegrationDeploymentFailTest-context.xml")
+public class SpringTransactionIntegrationDeploymentFailTest extends SpringProcessEngineTestCase {
 
   @Override
   protected void tearDown() throws Exception {

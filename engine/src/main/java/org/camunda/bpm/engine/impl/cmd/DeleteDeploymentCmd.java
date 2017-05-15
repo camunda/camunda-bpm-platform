@@ -76,7 +76,8 @@ public class DeleteDeploymentCmd implements Command<Void>, Serializable {
       .getProcessApplicationManager()
       .getProcessApplicationForDeployment(deploymentId);
 
-    DeleteDeploymentFailListener listener = new DeleteDeploymentFailListener(deploymentId, processApplicationReference);
+    DeleteDeploymentFailListener listener = new DeleteDeploymentFailListener(deploymentId, processApplicationReference,
+      Context.getProcessEngineConfiguration().getCommandExecutorTxRequiresNew());
 
     try {
       commandContext.runWithoutAuthorization(new Callable<Void>() {

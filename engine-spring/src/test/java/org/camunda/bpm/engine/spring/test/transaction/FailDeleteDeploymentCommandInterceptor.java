@@ -13,22 +13,21 @@
 package org.camunda.bpm.engine.spring.test.transaction;
 
 import org.camunda.bpm.engine.impl.cmd.DeleteDeploymentCmd;
-import org.camunda.bpm.engine.impl.cmd.DeployCmd;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandInterceptor;
 
 /**
- * @author Thorben Lindhauer
+ * @author Svetlana Dorokhova
  *
  */
-public class FailDeploymentCommandInterceptor extends CommandInterceptor {
+public class FailDeleteDeploymentCommandInterceptor extends CommandInterceptor {
 
   @Override
   public <T> T execute(Command<T> command) {
 
     T result = next.execute(command);
 
-    if (command instanceof DeployCmd) {
+    if (command instanceof DeleteDeploymentCmd) {
       throw new RuntimeException("roll back transaction");
     }
 

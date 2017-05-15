@@ -12,27 +12,46 @@
  */
 package org.camunda.bpm.engine.impl.persistence.deploy;
 
+import java.util.concurrent.Callable;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.engine.impl.cfg.TransactionListener;
 import org.camunda.bpm.engine.impl.cmd.RegisterDeploymentCmd;
 import org.camunda.bpm.engine.impl.cmd.RegisterProcessApplicationCmd;
+import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 
 public class DeleteDeploymentFailListener implements TransactionListener {
 
   protected String deploymentId;
   protected ProcessApplicationReference processApplicationReference;
+  protected CommandExecutor commandExecutor;
 
-  public DeleteDeploymentFailListener(String deploymentId, ProcessApplicationReference processApplicationReference) {
+  public DeleteDeploymentFailListener(String deploymentId, ProcessApplicationReference processApplicationReference, CommandExecutor commandExecutor) {
     this.deploymentId = deploymentId;
     this.processApplicationReference = processApplicationReference;
+    this.commandExecutor = commandExecutor;
   }
 
   public void execute(CommandContext commandContext) {
-    new RegisterDeploymentCmd(deploymentId).execute(commandContext);
-    if (processApplicationReference != null) {
-      new RegisterProcessApplicationCmd(deploymentId, processApplicationReference).execute(commandContext);
-    }
+
+    //we can not use commandContext parameter here, as it can be in inconsistent state
+    commandExecutor.execute(new Command<Void>() {
+      @Override
+      public Void execute(final CommandContext commandContext) {
+        commandContext.runWithoutAuthorization(new Callable<Void>() {
+          @Override
+          public Void call() throws Exception {
+            new RegisterDeploymentCmd(deploymentId).execute(commandContext);
+            if (processApplicationReference != null) {
+              new RegisterProcessApplicationCmd(deploymentId, processApplicationReference).execute(commandContext);
+            }
+            return null;
+          }
+        });
+        return null;
+      }
+    });
   }
 
 }
