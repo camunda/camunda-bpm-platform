@@ -919,6 +919,10 @@ public class HistoryCleanupTest {
 
   @Test
   public void testConfigurationFailure() {
+    String defaultStartTime = processEngineConfiguration.getHistoryCleanupBatchWindowStartTime();
+    String defaultEndTime = processEngineConfiguration.getHistoryCleanupBatchWindowEndTime();
+    int defaultBatchSize = processEngineConfiguration.getHistoryCleanupBatchSize();
+
     try {
       processEngineConfiguration.setHistoryCleanupBatchWindowStartTime("23");
       processEngineConfiguration.setHistoryCleanupBatchWindowEndTime("01:00");
@@ -926,6 +930,10 @@ public class HistoryCleanupTest {
       fail("Exception expected.");
     } catch (ProcessEngineException ex) {
       assertTrue(ex.getMessage().contains("historyCleanupBatchWindowStartTime"));
+    } finally {
+      processEngineConfiguration.setHistoryCleanupBatchWindowStartTime(defaultStartTime);
+      processEngineConfiguration.setHistoryCleanupBatchWindowEndTime(defaultEndTime);
+      processEngineConfiguration.setHistoryCleanupBatchSize(defaultBatchSize);
     }
 
     try {
@@ -935,6 +943,10 @@ public class HistoryCleanupTest {
       fail("Exception expected.");
     } catch (ProcessEngineException ex) {
       assertTrue(ex.getMessage().contains("historyCleanupBatchWindowEndTime"));
+    } finally {
+      processEngineConfiguration.setHistoryCleanupBatchWindowStartTime(defaultStartTime);
+      processEngineConfiguration.setHistoryCleanupBatchWindowEndTime(defaultEndTime);
+      processEngineConfiguration.setHistoryCleanupBatchSize(defaultBatchSize);
     }
 
     try {
@@ -943,6 +955,10 @@ public class HistoryCleanupTest {
       fail("Exception expected.");
     } catch (ProcessEngineException ex) {
       assertTrue(ex.getMessage().contains("historyCleanupBatchSize"));
+    } finally {
+      processEngineConfiguration.setHistoryCleanupBatchWindowStartTime(defaultStartTime);
+      processEngineConfiguration.setHistoryCleanupBatchWindowEndTime(defaultEndTime);
+      processEngineConfiguration.setHistoryCleanupBatchSize(defaultBatchSize);
     }
   }
 
