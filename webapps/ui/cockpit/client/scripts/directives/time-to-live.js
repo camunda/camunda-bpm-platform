@@ -27,6 +27,7 @@ module.exports = ['camAPI', '$window' , 'Notifications', function(camAPI, $windo
       $scope.onRemove = function() {
         updateValue(null)
           .then(function() {
+            lastValue = null;
             $scope.definition.historyTimeToLive = null;
           });
       };
