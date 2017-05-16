@@ -77,9 +77,10 @@ public class RestartProcessInstancesCmd extends AbstractRestartProcessInstanceCm
       instantiationBuilder.setModificationBuilder(modificationBuilder);
 
       if (builder.isInitialVariables()) {
-         List<HistoricDetail> historicDetails = ((HistoricDetailQueryImpl) historyService.createHistoricDetailQuery().processInstanceId(processInstanceId).variableUpdates()).getInitialVariables();
+         List<HistoricDetail> historicDetails = ((HistoricDetailQueryImpl) historyService.createHistoricDetailQuery().processInstanceId(processInstanceId).variableUpdates()).sequenceCounter(1).list();
          for (HistoricDetail detail : historicDetails) {
-           instantiationBuilder.setVariable(((HistoricVariableUpdate) detail).getVariableName(),((HistoricVariableUpdate) detail).getValue());
+           HistoricVariableUpdate variableUpdate = (HistoricVariableUpdate) detail;
+           instantiationBuilder.setVariable(variableUpdate.getVariableName(), variableUpdate.getValue());
          }
       }
       else {

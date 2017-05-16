@@ -142,10 +142,4 @@ public class HistoricDetailManager extends AbstractHistoricManager {
     getTenantManager().configureQuery(query);
   }
 
-  @SuppressWarnings("unchecked")
-  public List<HistoricDetail> findHistoricDetailsWithInitialVariablesOfProcessInstance(HistoricDetailQueryImpl historicDetailQueryImpl) {
-    configureQuery(historicDetailQueryImpl);
-    return getDbEntityManager().selectList("selectHistoricDetailWithInitialVariablesOfProcessInstance", historicDetailQueryImpl);
-  }
-
 }

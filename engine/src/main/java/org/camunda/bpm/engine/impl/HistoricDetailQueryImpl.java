@@ -48,6 +48,7 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
   protected String variableInstanceId;
   protected String[] tenantIds;
   protected String userOperationId;
+  protected Long sequenceCounter;
 
   protected boolean excludeTaskRelated = false;
   protected boolean isByteArrayFetchingEnabled = true;
@@ -133,6 +134,11 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
   public HistoricDetailQuery userOperationId(String userOperationId) {
     ensureNotNull("userOperationId", userOperationId);
     this.userOperationId = userOperationId;
+    return this;
+  }
+
+  public HistoricDetailQueryImpl sequenceCounter(long sequenceCounter) {
+    this.sequenceCounter = sequenceCounter;
     return this;
   }
 
@@ -268,21 +274,4 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
     return detailId;
   }
 
-  public List<HistoricDetail> getInitialVariables() {
-    this.resultType = ResultType.LIST;
-    return evaluateExpressionsAndExecuteList(Context.getCommandContext());
-  }
-
-  public List<HistoricDetail> evaluateExpressionsAndExecuteList(CommandContext commandContext) {
-    validate();
-    evaluateExpressions();
-    return !hasExcludingConditions() ? executeList(commandContext) : new ArrayList<HistoricDetail>();
-  }
-
-  public List<HistoricDetail> executeList(CommandContext commandContext) {
-    checkQueryOk();
-    return commandContext
-      .getHistoricDetailManager()
-      .findHistoricDetailsWithInitialVariablesOfProcessInstance(this);
-  }
 }

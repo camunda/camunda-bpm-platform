@@ -211,17 +211,6 @@
     <include refid="selectHistoricDetailsByQueryCriteriaSql"/>
   </select>
 
-   <select id="selectHistoricDetailWithInitialVariablesOfProcessInstance" parameterType="org.camunda.bpm.engine.impl.HistoricDetailQueryImpl" resultMap="historicDetailResultMap">
-    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
-    ${limitBefore}
-    select RES.*
-    ${limitBetween}
-    <include refid="selectHistoricDetailsByQueryCriteriaSql"/>
-    AND RES.SEQUENCE_COUNTER_ = 1
-    ${orderBy}
-    ${limitAfter}
-  </select>
-
   <sql id="selectHistoricDetailsByQueryCriteriaSql">
     from ${prefix}ACT_HI_DETAIL RES
 
@@ -287,6 +276,10 @@
 
       <if test="userOperationId != null">
         RES.OPERATION_ID_ = #{userOperationId}
+      </if>
+
+      <if test="sequenceCounter != null">
+        and RES.SEQUENCE_COUNTER_ = #{sequenceCounter}
       </if>
 
       <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
