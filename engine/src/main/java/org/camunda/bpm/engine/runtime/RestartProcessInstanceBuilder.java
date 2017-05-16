@@ -30,7 +30,7 @@ public interface RestartProcessInstanceBuilder extends InstantiationBuilder<Rest
   /**
    * @param processInstanceIds the process instance ids to restart.
    */
-  RestartProcessInstanceBuilder processInstanceIds(List<String> ids);
+  RestartProcessInstanceBuilder processInstanceIds(List<String> processInstanceIds);
 
   /**
    * Sets the initial set of variables during restart. By default, the last set of variables is used

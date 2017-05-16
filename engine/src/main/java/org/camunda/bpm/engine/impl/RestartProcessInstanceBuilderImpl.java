@@ -106,8 +106,8 @@ public class RestartProcessInstanceBuilderImpl implements RestartProcessInstance
   }
 
   @Override
-  public RestartProcessInstanceBuilder processInstanceIds(List<String> ids) {
-    processInstanceIds.addAll(ids);
+  public RestartProcessInstanceBuilder processInstanceIds(List<String> processInstanceIds) {
+    this.processInstanceIds.addAll(processInstanceIds);
     return this;
   }
 
