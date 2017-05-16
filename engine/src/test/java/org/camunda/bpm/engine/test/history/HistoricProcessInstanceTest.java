@@ -1017,6 +1017,51 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
   }
 
   @Test
+  public void testHistoricProcInstExecutedActivityInInterval() {
+    // given proc instance with wait state
+    Calendar now = Calendar.getInstance();
+    ClockUtil.setCurrentTime(now.getTime());
+    BpmnModelInstance model = Bpmn.createExecutableProcess("proc")
+                                  .startEvent()
+                                    .userTask()
+                                  .endEvent()
+                                  .done();
+    deployment(model);
+
+    Calendar hourFromNow = (Calendar) now.clone();
+    hourFromNow.add(Calendar.HOUR_OF_DAY, 1);
+
+    runtimeService.startProcessInstanceByKey("proc");
+
+    //when query historic process instance which has executed an activity after the start time
+    // and before a hour after start time
+    HistoricProcessInstance historicProcessInstance =
+      historyService.createHistoricProcessInstanceQuery()
+        .executedActivityAfter(now.getTime())
+        .executedActivityBefore(hourFromNow.getTime())
+        .singleResult();
+
+
+    //then query returns result
+    assertNotNull(historicProcessInstance);
+
+
+    // when proc inst is not in interval
+    Calendar sixHoursFromNow = (Calendar) now.clone();
+    sixHoursFromNow.add(Calendar.HOUR_OF_DAY, 6);
+
+
+    historicProcessInstance =
+      historyService.createHistoricProcessInstanceQuery()
+        .executedActivityAfter(hourFromNow.getTime())
+        .executedActivityBefore(sixHoursFromNow.getTime())
+        .singleResult();
+
+    //then query should return NO result
+    assertNull(historicProcessInstance);
+  }
+
+  @Test
   public void testHistoricProcInstExecutedActivityAfter() {
     // given
     Calendar now = Calendar.getInstance();
