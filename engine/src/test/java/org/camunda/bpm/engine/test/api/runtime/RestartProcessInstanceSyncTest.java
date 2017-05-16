@@ -286,6 +286,33 @@ public class RestartProcessInstanceSyncTest {
   }
 
   @Test
+  public void shouldNotSetInitialVersionOfLocalVariables() {
+    // given
+    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(ProcessModels.SUBPROCESS_PROCESS);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process");
+
+    Execution subProcess = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("userTask").singleResult();
+    runtimeService.setVariableLocal(subProcess.getId(), "local", "foo");
+    runtimeService.setVariable(processInstance.getId(), "var", "bar");
+
+    runtimeService.deleteProcessInstance(processInstance.getId(), "test");
+
+    // when
+    runtimeService.restartProcessInstances(processDefinition.getId())
+      .startBeforeActivity("userTask")
+      .processInstanceIds(processInstance.getId())
+      .initialSetOfVariables()
+      .execute();
+
+    // then
+    ProcessInstance restartedProcessInstance = runtimeService.createProcessInstanceQuery().processDefinitionId(processDefinition.getId()).active().singleResult();
+    List<VariableInstance> variables = runtimeService.createVariableInstanceQuery().processInstanceIdIn(restartedProcessInstance.getId()).list();
+    assertEquals(1, variables.size());
+    assertEquals("var", variables.get(0).getName());
+    assertEquals("bar", variables.get(0).getValue());
+  }
+
+  @Test
   public void shouldRestartProcessInstanceUsingHistoricProcessInstanceQuery() {
     // given
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(ProcessModels.TWO_TASKS_PROCESS);
