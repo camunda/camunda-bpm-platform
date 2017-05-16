@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.ProcessEngines;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
@@ -40,7 +41,7 @@ import org.camunda.bpm.engine.impl.metrics.reporter.DbMetricsReporter;
 /**
  * @author Tom Baeyens
  */
-public class ProcessEngineImpl implements ProcessEngine {
+public class ProcessEngineImpl implements ProcessEngine, ProcessEngineServices {
 
   private final static ProcessEngineLogger LOG = ProcessEngineLogger.INSTANCE;
 
