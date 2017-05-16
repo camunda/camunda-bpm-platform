@@ -21,26 +21,19 @@ import static org.junit.Assert.assertThat;
 import java.util.Arrays;
 import java.util.Collections;
 import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
-import org.camunda.bpm.engine.impl.test.AbstractProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
-import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
-import org.camunda.bpm.engine.test.ProcessEngineRule;
-import org.camunda.bpm.engine.test.api.runtime.BatchHelper;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.runtime.BatchRestartHelper;
-import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
-import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.hamcrest.CoreMatchers;
 import org.junit.After;
-import org.junit.Assert;
-import org.junit.Rule;
 
 
 public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngineTestCase {
@@ -379,6 +372,7 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testRestartProcessInstanceSyncWithTenantId() {
     // given
     ProcessInstance processInstance = startAndDeleteProcessInstance(TENANT_ONE, PROCESS);
@@ -399,6 +393,7 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
     assertEquals(restartedInstance.getTenantId(), TENANT_ONE);
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testRestartProcessInstanceAsyncWithTenantId() {
     // given
     ProcessInstance processInstance = startAndDeleteProcessInstance(TENANT_ONE, PROCESS);
@@ -421,6 +416,7 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
     assertEquals(restartedInstance.getTenantId(), TENANT_ONE);
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testFailToRestartProcessInstanceSyncWithOtherTenantId() {
     // given
     ProcessInstance processInstance = startAndDeleteProcessInstance(TENANT_ONE, PROCESS);
@@ -441,6 +437,7 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
     }
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testFailToRestartProcessInstanceAsyncWithOtherTenantId() {
     // given
     ProcessInstance processInstance = startAndDeleteProcessInstance(TENANT_ONE, PROCESS);
@@ -460,6 +457,7 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
 
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testRestartProcessInstanceSyncWithTenantIdByHistoricProcessInstanceQuery() {
     // given
     ProcessInstance processInstance = startAndDeleteProcessInstance(TENANT_ONE, PROCESS);
@@ -481,6 +479,7 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
     assertEquals(restartedInstance.getTenantId(), TENANT_ONE);
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testRestartProcessInstanceAsyncWithTenantIdByHistoricProcessInstanceQuery() {
     // given
     ProcessInstance processInstance = startAndDeleteProcessInstance(TENANT_ONE, PROCESS);
@@ -504,6 +503,7 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
     assertEquals(restartedInstance.getTenantId(), TENANT_ONE);
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testFailToRestartProcessInstanceSyncWithOtherTenantIdByHistoricProcessInstanceQuery() {
     // given
     ProcessInstance processInstance = startAndDeleteProcessInstance(TENANT_ONE, PROCESS);
@@ -525,6 +525,7 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
     }
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testFailToRestartProcessInstanceAsyncWithOtherTenantIdByHistoricProcessInstanceQuery() {
     // given
     ProcessInstance processInstance = startAndDeleteProcessInstance(TENANT_ONE, PROCESS);
