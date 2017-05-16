@@ -14,7 +14,10 @@ package org.camunda.bpm.engine.test.cmmn.handler;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.handler.CaseHandler;
@@ -134,11 +137,13 @@ public class CaseHandlerTest extends CmmnElementHandlerTest {
     Integer historyTimeToLive = -6;
     caseDefinition.setCamundaHistoryTimeToLive(historyTimeToLive);
 
-    // when
-    CaseDefinitionEntity activity = (CaseDefinitionEntity) handler.handleElement(caseDefinition, context);
-
-    // then
-    assertEquals(Integer.valueOf(historyTimeToLive), activity.getHistoryTimeToLive());
+    try {
+      // when
+      handler.handleElement(caseDefinition, context);
+      fail("Exception is expected, that negative value is not allowed.");
+    } catch (NotValidException ex) {
+      assertTrue(ex.getMessage().contains("greater than"));
+    }
   }
 
 }
