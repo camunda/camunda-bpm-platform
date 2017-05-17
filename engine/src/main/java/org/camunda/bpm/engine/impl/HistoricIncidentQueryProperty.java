@@ -32,5 +32,6 @@ public interface HistoricIncidentQueryProperty {
   public static final QueryProperty ROOT_CAUSE_INCIDENT_ID = new QueryPropertyImpl("ROOT_CAUSE_INCIDENT_ID_");
   public static final QueryProperty CONFIGURATION = new QueryPropertyImpl("CONFIGURATION_");
   public static final QueryProperty TENANT_ID = new QueryPropertyImpl("TENANT_ID_");
+  public static final QueryProperty INCIDENT_STATE = new QueryPropertyImpl("INCIDENT_STATE_");
 
 }

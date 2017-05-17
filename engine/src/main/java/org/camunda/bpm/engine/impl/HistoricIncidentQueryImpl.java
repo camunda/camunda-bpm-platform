@@ -205,6 +205,11 @@ public class HistoricIncidentQueryImpl extends AbstractVariableQueryImpl<Histori
     return this;
   }
 
+  public HistoricIncidentQuery orderByIncidentState() {
+    orderBy(HistoricIncidentQueryProperty.INCIDENT_STATE);
+    return this;
+  }
+
   public HistoricIncidentQuery orderByTenantId() {
     return orderBy(HistoricIncidentQueryProperty.TENANT_ID);
   }

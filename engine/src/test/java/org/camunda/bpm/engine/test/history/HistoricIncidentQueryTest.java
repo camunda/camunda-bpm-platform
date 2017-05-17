@@ -531,6 +531,7 @@ public class HistoricIncidentQueryTest {
     assertEquals(4, historyService.createHistoricIncidentQuery().orderByCauseIncidentId().asc().list().size());
     assertEquals(4, historyService.createHistoricIncidentQuery().orderByRootCauseIncidentId().asc().list().size());
     assertEquals(4, historyService.createHistoricIncidentQuery().orderByConfiguration().asc().list().size());
+    assertEquals(4, historyService.createHistoricIncidentQuery().orderByIncidentState().asc().list().size());
 
     assertEquals(4, historyService.createHistoricIncidentQuery().orderByIncidentId().desc().list().size());
     assertEquals(4, historyService.createHistoricIncidentQuery().orderByCreateTime().desc().list().size());
@@ -543,6 +544,7 @@ public class HistoricIncidentQueryTest {
     assertEquals(4, historyService.createHistoricIncidentQuery().orderByCauseIncidentId().desc().list().size());
     assertEquals(4, historyService.createHistoricIncidentQuery().orderByRootCauseIncidentId().desc().list().size());
     assertEquals(4, historyService.createHistoricIncidentQuery().orderByConfiguration().desc().list().size());
+    assertEquals(4, historyService.createHistoricIncidentQuery().orderByIncidentState().desc().list().size());
   }
 
   protected void startProcessInstance(String key) {

@@ -45,6 +45,7 @@ public class HistoricIncidentQueryDto extends AbstractQueryDto<HistoricIncidentQ
   private static final String SORT_BY_ROOT_CAUSE_INCIDENT_ID = "rootCauseIncidentId";
   private static final String SORT_BY_CONFIGURATION = "configuration";
   private static final String SORT_BY_TENANT_ID = "tenantId";
+  private static final String SORT_BY_INCIDENT_STATE = "incidentState";
 
   private static final List<String> VALID_SORT_BY_VALUES;
   static {
@@ -61,6 +62,7 @@ public class HistoricIncidentQueryDto extends AbstractQueryDto<HistoricIncidentQ
     VALID_SORT_BY_VALUES.add(SORT_BY_ROOT_CAUSE_INCIDENT_ID);
     VALID_SORT_BY_VALUES.add(SORT_BY_CONFIGURATION);
     VALID_SORT_BY_VALUES.add(SORT_BY_TENANT_ID);
+    VALID_SORT_BY_VALUES.add(SORT_BY_INCIDENT_STATE);
   }
 
   protected String incidentId;
@@ -245,6 +247,8 @@ public class HistoricIncidentQueryDto extends AbstractQueryDto<HistoricIncidentQ
       query.orderByConfiguration();
     } else if (sortBy.equals(SORT_BY_TENANT_ID)) {
       query.orderByTenantId();
+    } else if (sortBy.equals(SORT_BY_INCIDENT_STATE)) {
+      query.orderByIncidentState();
     }
   }
 

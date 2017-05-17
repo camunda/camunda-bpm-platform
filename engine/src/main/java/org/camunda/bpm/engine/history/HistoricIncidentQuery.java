@@ -98,6 +98,9 @@ public interface HistoricIncidentQuery extends Query<HistoricIncidentQuery, Hist
   /** Order by configuration (needs to be followed by {@link #asc()} or {@link #desc()}). */
   HistoricIncidentQuery orderByConfiguration();
 
+  /** Order by incidentState (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  HistoricIncidentQuery orderByIncidentState();
+
   /**
    * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
    * Note that the ordering of incidents without tenant id is database-specific.
