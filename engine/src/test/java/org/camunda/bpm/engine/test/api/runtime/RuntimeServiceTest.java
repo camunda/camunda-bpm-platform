@@ -343,7 +343,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
     assertEquals(1, historyService.createHistoricVariableInstanceQuery().variableName("inputMappingExecuted").count());
   }
 
-  @Deployment(resources = { 
+  @Deployment(resources = {
       "org/camunda/bpm/engine/test/api/oneTaskProcessWithIoMappings.bpmn20.xml" })
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testDeleteProcessInstanceWithoutSkipIoMappings() {
@@ -2400,9 +2400,9 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
     taskService.complete(deleteTrigger.getId());
 
     // then
-    boolean activityInstanceRetrieved =
-        (Boolean) runtimeService.getVariable(deletingInstance.getId(), "activityInstancePresent");
-    assertFalse(activityInstanceRetrieved);
+    boolean activityInstanceNull =
+        (Boolean) runtimeService.getVariable(deletingInstance.getId(), "activityInstanceNull");
+    assertTrue(activityInstanceNull);
   }
 
   public static class DeleteInstanceDelegate implements JavaDelegate {
@@ -2417,7 +2417,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
       taskService.complete(taskToTrigger.getId());
 
       ActivityInstance activityInstance = runtimeService.getActivityInstance(instanceToDelete);
-      execution.setVariable("activityInstancePresent", activityInstance != null);
+      execution.setVariable("activityInstanceNull", activityInstance == null);
     }
 
   }
