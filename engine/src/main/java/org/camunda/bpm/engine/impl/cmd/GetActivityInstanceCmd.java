@@ -86,6 +86,10 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
 
     ExecutionEntity processInstance = filterProcessInstance(executionList);
 
+    if (processInstance.isEnded()) {
+      return null;
+    }
+
     // create act instance for process instance
     ActivityInstanceImpl processActInst = createActivityInstance(
       processInstance,

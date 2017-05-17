@@ -2372,7 +2372,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
 
   }
 
-  public void FAILING_testGetActivityInstanceForCompletedInstanceInDelegate() {
+  public void testGetActivityInstanceForCompletedInstanceInDelegate() {
     // given
     BpmnModelInstance deletingProcess = Bpmn.createExecutableProcess("process1")
         .startEvent()
@@ -2402,7 +2402,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
     // then
     boolean activityInstanceRetrieved =
         (Boolean) runtimeService.getVariable(deletingInstance.getId(), "activityInstancePresent");
-    assertTrue(activityInstanceRetrieved);
+    assertFalse(activityInstanceRetrieved);
   }
 
   public static class DeleteInstanceDelegate implements JavaDelegate {
