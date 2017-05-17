@@ -37,29 +37,34 @@ public class HistoricDetailManager extends AbstractHistoricManager {
   public void deleteHistoricDetailsByProcessInstanceIds(List<String> historicProcessInstanceIds) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("processInstanceIds", historicProcessInstanceIds);
-
-    getDbEntityManager().deletePreserveOrder(ByteArrayEntity.class, "deleteHistoricDetailByteArraysByIds", parameters);
-    getDbEntityManager().deletePreserveOrder(HistoricDetailEventEntity.class, "deleteHistoricDetailsByIds", parameters);
+    deleteHistoricDetails(parameters);
   }
 
   public void deleteHistoricDetailsByTaskProcessInstanceIds(List<String> historicProcessInstanceIds) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("taskProcessInstanceIds", historicProcessInstanceIds);
+    deleteHistoricDetails(parameters);
+  }
 
+  public void deleteHistoricDetailsByCaseInstanceIds(List<String> historicCaseInstanceIds) {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("caseInstanceIds", historicCaseInstanceIds);
+    deleteHistoricDetails(parameters);
+  }
+
+  public void deleteHistoricDetailsByCaseTaskInstanceIds(List<String> historicCaseInstanceIds) {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("taskCaseInstanceIds", historicCaseInstanceIds);
+    deleteHistoricDetails(parameters);
+  }
+
+  public void deleteHistoricDetails(Map<String, Object> parameters) {
     getDbEntityManager().deletePreserveOrder(ByteArrayEntity.class, "deleteHistoricDetailByteArraysByIds", parameters);
     getDbEntityManager().deletePreserveOrder(HistoricDetailEventEntity.class, "deleteHistoricDetailsByIds", parameters);
   }
 
   public void deleteHistoricDetailsByCaseInstanceId(String historicCaseInstanceId) {
     deleteHistoricDetailsByProcessCaseInstanceId(null, historicCaseInstanceId);
-  }
-
-  public void deleteHistoricDetailsByCaseInstanceIds(List<String> historicCaseInstanceIds) {
-    Map<String, Object> parameters = new HashMap<String, Object>();
-    parameters.put("caseInstanceIds", historicCaseInstanceIds);
-
-    getDbEntityManager().deletePreserveOrder(ByteArrayEntity.class, "deleteHistoricDetailByteArraysByIds", parameters);
-    getDbEntityManager().deletePreserveOrder(HistoricDetailEventEntity.class, "deleteHistoricDetailsByIds", parameters);
   }
 
   public void deleteHistoricDetailsByProcessCaseInstanceId(String historicProcessInstanceId, String historicCaseInstanceId) {

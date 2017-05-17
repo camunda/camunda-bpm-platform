@@ -85,7 +85,7 @@ public class HistoricTaskInstanceManager extends AbstractHistoricManager {
     CommandContext commandContext = Context.getCommandContext();
 
     getHistoricDetailManager()
-        .deleteHistoricDetailsByCaseInstanceIds(caseInstanceIds);
+        .deleteHistoricDetailsByCaseTaskInstanceIds(caseInstanceIds);
 
     commandContext
         .getCommentManager()

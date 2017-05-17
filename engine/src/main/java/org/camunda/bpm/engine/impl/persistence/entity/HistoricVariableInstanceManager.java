@@ -38,17 +38,13 @@ public class HistoricVariableInstanceManager extends AbstractHistoricManager {
   public void deleteHistoricVariableInstanceByProcessInstanceIds(List<String> historicProcessInstanceIds) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("processInstanceIds", historicProcessInstanceIds);
-
-    getDbEntityManager().deletePreserveOrder(ByteArrayEntity.class, "deleteHistoricVariableInstanceByteArraysByIds", parameters);
-    getDbEntityManager().deletePreserveOrder(HistoricVariableInstanceEntity.class, "deleteHistoricVariableInstanceByIds", parameters);
+    deleteHistoricVariableInstances(parameters);
   }
 
   public void deleteHistoricVariableInstancesByTaskProcessInstanceIds(List<String> historicProcessInstanceIds) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("taskProcessInstanceIds", historicProcessInstanceIds);
-
-    getDbEntityManager().deletePreserveOrder(ByteArrayEntity.class, "deleteHistoricVariableInstanceByteArraysByIds", parameters);
-    getDbEntityManager().deletePreserveOrder(HistoricVariableInstanceEntity.class, "deleteHistoricVariableInstanceByIds", parameters);
+    deleteHistoricVariableInstances(parameters);
   }
 
   public void deleteHistoricVariableInstanceByCaseInstanceId(String historicCaseInstanceId) {
@@ -58,15 +54,16 @@ public class HistoricVariableInstanceManager extends AbstractHistoricManager {
   public void deleteHistoricVariableInstancesByCaseInstanceIds(List<String> historicCaseInstanceIds) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("caseInstanceIds", historicCaseInstanceIds);
-
-    getDbEntityManager().deletePreserveOrder(ByteArrayEntity.class, "deleteHistoricVariableInstanceByteArraysByIds", parameters);
-    getDbEntityManager().deletePreserveOrder(HistoricVariableInstanceEntity.class, "deleteHistoricVariableInstanceByIds", parameters);
+    deleteHistoricVariableInstances(parameters);
   }
 
   public void deleteHistoricVariableInstancesByTaskCaseInstanceIds(List<String> historicCaseInstanceIds) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("taskCaseInstanceIds", historicCaseInstanceIds);
+    deleteHistoricVariableInstances(parameters);
+  }
 
+  protected void deleteHistoricVariableInstances(Map<String, Object> parameters) {
     getDbEntityManager().deletePreserveOrder(ByteArrayEntity.class, "deleteHistoricVariableInstanceByteArraysByIds", parameters);
     getDbEntityManager().deletePreserveOrder(HistoricVariableInstanceEntity.class, "deleteHistoricVariableInstanceByIds", parameters);
   }

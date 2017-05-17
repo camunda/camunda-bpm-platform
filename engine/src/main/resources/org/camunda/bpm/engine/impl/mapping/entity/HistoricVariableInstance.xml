@@ -93,12 +93,12 @@
     delete from ${prefix}ACT_HI_VARINST where ID_ = #{id}
   </delete>
 
-  <delete id="deleteHistoricVariableInstanceByIds">
+  <delete id="deleteHistoricVariableInstanceByIds" parameterType="java.util.Map">
     delete from ${prefix}ACT_HI_VARINST
     <include refid="selectHistoricVariableInstanceByIdsSql"/>
   </delete>
 
-  <select id="deleteHistoricVariableInstanceByteArraysByIds">
+  <select id="deleteHistoricVariableInstanceByteArraysByIds" parameterType="java.util.Map">
     delete from ${prefix}ACT_GE_BYTEARRAY
     where ID_ in
       (select DISTINCT BYTEARRAY_ID_

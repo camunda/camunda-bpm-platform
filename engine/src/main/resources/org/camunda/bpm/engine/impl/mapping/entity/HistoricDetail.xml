@@ -125,12 +125,12 @@
     delete from ${prefix}ACT_HI_DETAIL where ID_ = #{id}
   </delete>
 
-  <delete id="deleteHistoricDetailsByIds" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
+  <delete id="deleteHistoricDetailsByIds" parameterType="java.util.Map">
     delete from ${prefix}ACT_HI_DETAIL
     <include refid="selectHistoricDetailsByIdsSql"/>
   </delete>
 
-  <delete id="deleteHistoricDetailByteArraysByIds">
+  <delete id="deleteHistoricDetailByteArraysByIds" parameterType="java.util.Map">
     delete from ${prefix}ACT_GE_BYTEARRAY
     where ID_ in
     (select DISTINCT BYTEARRAY_ID_
@@ -311,6 +311,15 @@
       where PROC_INST_ID_ in
       <foreach item="processInstanceId" index="index" collection="taskProcessInstanceIds" open="(" separator="," close=")">
         #{processInstanceId}
+      </foreach>
+      )
+    </if>
+    <if test="taskCaseInstanceIds != null &amp;&amp; taskCaseInstanceIds.size() > 0">
+      TASK_ID_ IN
+      (select distinct ID_ from ${prefix}ACT_HI_TASKINST
+      where CASE_INST_ID_ in
+      <foreach item="caseInstanceId" index="index" collection="taskCaseInstanceIds" open="(" separator="," close=")">
+        #{caseInstanceId}
       </foreach>
       )
     </if>

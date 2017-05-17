@@ -67,22 +67,24 @@ public class CommentManager extends AbstractHistoricManager {
   public void deleteCommentsByProcessInstanceIds(List<String> processInstanceIds) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("processInstanceIds", processInstanceIds);
-
-    getDbEntityManager().deletePreserveOrder(CommentEntity.class, "deleteCommentsByIds", parameters);
+    deleteComments(parameters);
   }
 
   public void deleteCommentsByTaskProcessInstanceIds(List<String> processInstanceIds) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("taskProcessInstanceIds", processInstanceIds);
-
-    getDbEntityManager().deletePreserveOrder(CommentEntity.class, "deleteCommentsByIds", parameters);
+    deleteComments(parameters);
   }
 
   public void deleteCommentsByTaskCaseInstanceIds(List<String> caseInstanceIds) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("taskCaseInstanceIds", caseInstanceIds);
+    deleteComments(parameters);
+  }
 
-    getDbEntityManager().deletePreserveOrder(CommentEntity.class, "deleteCommentsByIds", parameters);  }
+  protected void deleteComments(Map<String, Object> parameters) {
+    getDbEntityManager().deletePreserveOrder(CommentEntity.class, "deleteCommentsByIds", parameters);
+  }
 
   @SuppressWarnings("unchecked")
   public List<Comment> findCommentsByProcessInstanceId(String processInstanceId) {

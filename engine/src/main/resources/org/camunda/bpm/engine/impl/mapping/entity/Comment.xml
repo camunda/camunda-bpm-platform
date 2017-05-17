@@ -58,13 +58,9 @@
     delete from ${prefix}ACT_HI_COMMENT where TASK_ID_ = #{taskId} 
   </delete>
 
-  <delete id="deleteCommentsByIds">
+  <delete id="deleteCommentsByIds" parameterType="java.util.Map">
     delete from ${prefix}ACT_HI_COMMENT
     where 
-    <include refid="deleteCommentsByTaskByIdsSql"/>
-  </delete>
-
-  <sql id="deleteCommentsByTaskByIdsSql">
     <if test="taskProcessInstanceIds != null &amp;&amp; taskProcessInstanceIds.size() > 0">
       TASK_ID_ IN
       (select distinct ID_ from ${prefix}ACT_HI_TASKINST
@@ -89,7 +85,7 @@
         #{processInstanceId}
       </foreach>
     </if>
-  </sql>
+  </delete>
 
   <!-- COMMENT RESULTMAP -->
 
