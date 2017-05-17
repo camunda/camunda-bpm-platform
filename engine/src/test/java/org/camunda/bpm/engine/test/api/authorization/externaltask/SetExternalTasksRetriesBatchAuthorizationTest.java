@@ -61,8 +61,12 @@ public class SetExternalTasksRetriesBatchAuthorizationTest {
         .succeeds(),
       scenario()
         .withAuthorizations(
+          grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE),
+          grant(Resources.PROCESS_INSTANCE, "processInstance1", "userId", Permissions.UPDATE))
+        .succeeds(),
+      scenario()
+        .withAuthorizations(
             grant(Resources.BATCH, "batchId", "userId", Permissions.CREATE))
-        .withoutAuthorizations()
         .failsDueToRequired(
             grant(Resources.PROCESS_DEFINITION, "processDefinition", "userId", Permissions.UPDATE_INSTANCE),
             grant(Resources.PROCESS_INSTANCE, "processInstance1", "userId", Permissions.UPDATE))
@@ -137,7 +141,7 @@ public class SetExternalTasksRetriesBatchAuthorizationTest {
     // given
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(ExternalTaskModels.ONE_EXTERNAL_TASK_PROCESS);
     ProcessInstance processInstance1 = engineRule.getRuntimeService().startProcessInstanceByKey("Process");
-    List<ExternalTask> externalTasks = engineRule.getExternalTaskService().createExternalTaskQuery().list();
+    List<ExternalTask> externalTasks;
 
     ExternalTaskQuery externalTaskQuery = engineRule.getExternalTaskService().createExternalTaskQuery();
 
@@ -159,7 +163,7 @@ public class SetExternalTasksRetriesBatchAuthorizationTest {
     if (authRule.assertScenario(scenario)) {
       externalTasks = engineRule.getExternalTaskService().createExternalTaskQuery().list();
       for ( ExternalTask task : externalTasks) {
-      Assert.assertEquals(5, (int) task.getRetries());
+        Assert.assertEquals(5, (int) task.getRetries());
       }
     }
   }
