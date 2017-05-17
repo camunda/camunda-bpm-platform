@@ -34,63 +34,68 @@ public class EmptyBodyFilter implements Filter {
   @Override
   public void doFilter(final ServletRequest req, final ServletResponse resp, FilterChain chain) throws IOException, ServletException {
 
-    final boolean IS_CONTENT_TYPE_JSON =
+    final boolean isContentTypeJson =
       CONTENT_TYPE_JSON_PATTERN.matcher(req.getContentType() == null ? "" : req.getContentType()).find();
-    final ByteArrayInputStream EMPTY_JSON_OBJECT = new ByteArrayInputStream("{}".getBytes(Charset.forName("UTF-8")));
-    final PushbackInputStream REQUEST_BODY = new PushbackInputStream(req.getInputStream());
-    int firstByte = REQUEST_BODY.read();
-    final boolean IS_BODY_EMPTY = firstByte == -1;
-    REQUEST_BODY.unread(firstByte);
 
-    HttpServletRequestWrapper wrappedRequest = new HttpServletRequestWrapper((HttpServletRequest) req) {
+    if (isContentTypeJson) {
+      final PushbackInputStream requestBody = new PushbackInputStream(req.getInputStream());
+      int firstByte = requestBody.read();
+      final boolean isBodyEmpty = firstByte == -1;
+      requestBody.unread(firstByte);
 
-      @Override
-      public ServletInputStream getInputStream() throws IOException {
-        return new ServletInputStream() {
+      HttpServletRequestWrapper wrappedRequest = new HttpServletRequestWrapper((HttpServletRequest) req) {
 
-          InputStream inputStream = IS_BODY_EMPTY && IS_CONTENT_TYPE_JSON ? EMPTY_JSON_OBJECT : REQUEST_BODY;
+        @Override
+        public ServletInputStream getInputStream() throws IOException {
 
-          @Override
-          public int read() throws IOException {
-            return inputStream.read();
-          }
+          return new ServletInputStream() {
 
-          @Override
-          public int available() throws IOException {
-            return inputStream.available();
-          }
+            InputStream inputStream = isBodyEmpty ? new ByteArrayInputStream("{}".getBytes(Charset.forName("UTF-8"))) : requestBody;
 
-          @Override
-          public void close() throws IOException {
-            inputStream.close();
-          }
+            @Override
+            public int read() throws IOException {
+              return inputStream.read();
+            }
 
-          @Override
-          public synchronized void mark(int readlimit) {
-            inputStream.mark(readlimit);
-          }
+            @Override
+            public int available() throws IOException {
+              return inputStream.available();
+            }
 
-          @Override
-          public synchronized void reset() throws IOException {
-            inputStream.reset();
-          }
+            @Override
+            public void close() throws IOException {
+              inputStream.close();
+            }
 
-          @Override
-          public boolean markSupported() {
-            return inputStream.markSupported();
-          }
+            @Override
+            public synchronized void mark(int readlimit) {
+              inputStream.mark(readlimit);
+            }
 
-        };
-      }
+            @Override
+            public synchronized void reset() throws IOException {
+              inputStream.reset();
+            }
 
-      @Override
-      public BufferedReader getReader() throws IOException {
-        return new BufferedReader(new InputStreamReader(this.getInputStream()));
-      }
+            @Override
+            public boolean markSupported() {
+              return inputStream.markSupported();
+            }
 
-    };
+          };
+        }
 
-    chain.doFilter(wrappedRequest, resp);
+        @Override
+        public BufferedReader getReader() throws IOException {
+          return new BufferedReader(new InputStreamReader(this.getInputStream()));
+        }
+
+      };
+
+      chain.doFilter(wrappedRequest, resp);
+    } else {
+      chain.doFilter(req, resp);
+    }
   }
 
   @Override

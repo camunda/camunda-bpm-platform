@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.rest.standalone;
 
+import org.apache.http.HttpEntity;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -68,7 +69,7 @@ public abstract class AbstractEmptyBodyFilterTest extends AbstractRestServiceTes
   protected final String BASE_URL = "http://localhost:38080";
 
   @Before
-  public void setUpRuntimeData() {
+  public void setUpHttpClientAndRuntimeData() {
     client = HttpClients.createDefault();
     reqConfig = RequestConfig.custom().setConnectTimeout(3 * 60 * 1000).setSocketTimeout(10 * 60 * 1000).build();
 
@@ -104,73 +105,48 @@ public abstract class AbstractEmptyBodyFilterTest extends AbstractRestServiceTes
 
   @Test
   public void testBodyIsEmpty() throws IOException {
-    HttpPost post = new HttpPost(BASE_URL + START_PROCESS_INSTANCE_BY_KEY_URL);
-    post.setConfig(reqConfig);
-    post.setHeader(HttpHeaders.CONTENT_TYPE, ContentType.create(MediaType.APPLICATION_JSON).toString());
-    post.setEntity(new ByteArrayEntity("".getBytes("UTF-8")));
-
-    CloseableHttpResponse response = client.execute(post);
-
-    assertEquals(200, response.getStatusLine().getStatusCode());
-    assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID,
-      new JSONObject(EntityUtils.toString(response.getEntity(), "UTF-8")).get("id"));
-    response.close();
+    evaluatePostRequest(new ByteArrayEntity("".getBytes("UTF-8")), ContentType.create(MediaType.APPLICATION_JSON).toString(), 200, true);
   }
 
   @Test
   public void testBodyIsNull() throws IOException {
-    HttpPost post = new HttpPost(BASE_URL + START_PROCESS_INSTANCE_BY_KEY_URL);
-    post.setConfig(reqConfig);
-    post.setHeader(HttpHeaders.CONTENT_TYPE, ContentType.create(MediaType.APPLICATION_JSON).toString());
-    post.setEntity(null);
-
-    CloseableHttpResponse response = client.execute(post);
-
-    assertEquals(200, response.getStatusLine().getStatusCode());
-    assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID,
-      new JSONObject(EntityUtils.toString(response.getEntity(), "UTF-8")).get("id"));
-    response.close();
+    evaluatePostRequest(null, ContentType.create(MediaType.APPLICATION_JSON).toString(), 200, true);
   }
 
   @Test
   public void testBodyIsNullAndContentTypeIsNull() throws IOException {
-    HttpPost post = new HttpPost(BASE_URL + START_PROCESS_INSTANCE_BY_KEY_URL);
-    post.setConfig(reqConfig);
-    post.setEntity(null);
-
-    CloseableHttpResponse response = client.execute(post);
-
-    assertEquals(415, response.getStatusLine().getStatusCode());
-    response.close();
+    evaluatePostRequest(null, null, 415, false);
   }
 
   @Test
   public void testBodyIsNullAndContentTypeHasISOCharset() throws IOException {
-    HttpPost post = new HttpPost(BASE_URL + START_PROCESS_INSTANCE_BY_KEY_URL);
-    post.setConfig(reqConfig);
-    post.setHeader(HttpHeaders.CONTENT_TYPE, ContentType.create(MediaType.APPLICATION_JSON, "iso-8859-1").toString());
-    post.setEntity(null);
-
-    CloseableHttpResponse response = client.execute(post);
-
-    assertEquals(200, response.getStatusLine().getStatusCode());
-    assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID,
-      new JSONObject(EntityUtils.toString(response.getEntity(), "UTF-8")).get("id"));
-    response.close();
+    evaluatePostRequest(null, ContentType.create(MediaType.APPLICATION_JSON, "iso-8859-1").toString(), 200, true);
   }
 
   @Test
   public void testBodyIsEmptyJSONObject() throws IOException {
+    evaluatePostRequest(new ByteArrayEntity(EMPTY_JSON_OBJECT.getBytes("UTF-8")), ContentType.create(MediaType.APPLICATION_JSON).toString(), 200, true);
+  }
+
+  private void evaluatePostRequest(HttpEntity reqBody, String reqContentType, int expectedStatusCode, boolean assertResponseBody) throws IOException {
     HttpPost post = new HttpPost(BASE_URL + START_PROCESS_INSTANCE_BY_KEY_URL);
     post.setConfig(reqConfig);
-    post.setHeader(HttpHeaders.CONTENT_TYPE, ContentType.create(MediaType.APPLICATION_JSON, "iso-8859-1").toString());
-    post.setEntity(new ByteArrayEntity(EMPTY_JSON_OBJECT.getBytes("UTF-8")));
+
+    if(reqContentType != null) {
+      post.setHeader(HttpHeaders.CONTENT_TYPE, reqContentType);
+    }
+
+    post.setEntity(reqBody);
 
     CloseableHttpResponse response = client.execute(post);
 
-    assertEquals(200, response.getStatusLine().getStatusCode());
-    assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID,
-      new JSONObject(EntityUtils.toString(response.getEntity(), "UTF-8")).get("id"));
+    assertEquals(expectedStatusCode, response.getStatusLine().getStatusCode());
+
+    if(assertResponseBody) {
+      assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID,
+        new JSONObject(EntityUtils.toString(response.getEntity(), "UTF-8")).get("id"));
+    }
+
     response.close();
   }
 
