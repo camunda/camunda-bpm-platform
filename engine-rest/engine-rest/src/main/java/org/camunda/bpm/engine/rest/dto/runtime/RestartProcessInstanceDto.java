@@ -22,6 +22,7 @@ public class RestartProcessInstanceDto {
   protected boolean initialVariables;
   protected boolean skipCustomListeners;
   protected boolean skipIoMappings;
+  protected boolean withoutBusinessKey;
 
   public List<String> getProcessInstanceIds() {
     return processInstanceIds;
@@ -69,6 +70,14 @@ public class RestartProcessInstanceDto {
 
   public void setSkipIoMappings(boolean skipIoMappings) {
     this.skipIoMappings = skipIoMappings;
+  }
+
+  public boolean isWithoutBusinessKey() {
+    return withoutBusinessKey;
+  }
+
+  public void setWithoutBusinessKey(boolean withoutBusinessKey) {
+    this.withoutBusinessKey = withoutBusinessKey;
   }
 
   public void applyTo(RestartProcessInstanceBuilder builder, ProcessEngine processEngine, ObjectMapper objectMapper) {

@@ -41,6 +41,7 @@ import org.camunda.bpm.engine.test.api.runtime.util.IncrementCounterListener;
 import org.camunda.bpm.engine.test.util.ClockTestUtil;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.After;
@@ -288,11 +289,10 @@ public class RestartProcessInstanceAsyncTest {
         .done();
 
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
-    ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("Process");
-    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("Process");
-    // initial variables
-    runtimeService.setVariable(processInstance1.getId(), "var", "bar");
-    runtimeService.setVariable(processInstance2.getId(), "var", "bar");
+
+     // initial variables
+    ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("Process", Variables.createVariables().putValue("var", "bar"));
+    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("Process", Variables.createVariables().putValue("var", "bar"));
 
     // variables update
     List<Task> tasks = taskService.createTaskQuery().processDefinitionId(processDefinition.getId()).active().list();
@@ -780,6 +780,7 @@ public class RestartProcessInstanceAsyncTest {
     Batch batch = runtimeService.restartProcessInstances(processDefinition.getId())
     .startBeforeActivity("userTask1")
     .processInstanceIds(processInstance1.getId(), processInstance2.getId())
+    .withoutBusinessKey()
     .executeAsync();
 
     helper.completeBatch(batch);
@@ -789,6 +790,31 @@ public class RestartProcessInstanceAsyncTest {
     ProcessInstance restartedProcessInstance2 = restartedProcessInstances.get(1);
     assertNull(restartedProcessInstance1.getBusinessKey());
     assertNull(restartedProcessInstance2.getBusinessKey());
+  }
+
+  @Test
+  public void shouldRestartProcessInstanceWithBusinessKey() {
+    // given
+    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(ProcessModels.TWO_TASKS_PROCESS);
+    ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("Process", "businessKey1", (String) null);
+    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("Process", "businessKey2", (String) null);
+
+    runtimeService.deleteProcessInstance(processInstance1.getId(), "test");
+    runtimeService.deleteProcessInstance(processInstance2.getId(), "test");
+
+    // when
+    Batch batch = runtimeService.restartProcessInstances(processDefinition.getId())
+    .startBeforeActivity("userTask1")
+    .processInstanceIds(processInstance1.getId(), processInstance2.getId())
+    .executeAsync();
+
+    helper.completeBatch(batch);
+    // then
+    List<ProcessInstance> restartedProcessInstances = runtimeService.createProcessInstanceQuery().processDefinitionId(processDefinition.getId()).active().list();
+    ProcessInstance restartedProcessInstance1 = restartedProcessInstances.get(0);
+    ProcessInstance restartedProcessInstance2 = restartedProcessInstances.get(1);
+    assertNotNull(restartedProcessInstance1.getBusinessKey());
+    assertNotNull(restartedProcessInstance2.getBusinessKey());
   }
 
   @Test
@@ -955,6 +981,38 @@ public class RestartProcessInstanceAsyncTest {
     assertEquals(restartedInstance.getTenantId(), TestTenantIdProvider.TENANT_ID);
   }
 
+  @Test
+  public void shouldNotSetInitialVariablesIfThereIsNoUniqueStartActivity() {
+    // given
+    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(ProcessModels.TWO_TASKS_PROCESS);
+    ProcessInstance processInstance1 = runtimeService.createProcessInstanceById(processDefinition.getId())
+        .startBeforeActivity("userTask2")
+        .startBeforeActivity("userTask1")
+        .execute();
+
+    ProcessInstance processInstance2 = runtimeService.createProcessInstanceById(processDefinition.getId())
+        .startBeforeActivity("userTask1")
+        .startBeforeActivity("userTask2")
+        .setVariable("foo", "bar")
+        .execute();
+
+    runtimeService.deleteProcessInstance(processInstance1.getId(), "test");
+    runtimeService.deleteProcessInstance(processInstance2.getId(), "test");
+
+    // when
+    Batch batch = runtimeService.restartProcessInstances(processDefinition.getId())
+    .startBeforeActivity("userTask1")
+    .initialSetOfVariables()
+    .processInstanceIds(processInstance1.getId(), processInstance2.getId())
+    .executeAsync();
+
+    helper.completeBatch(batch);
+ 
+    // then
+    List<ProcessInstance> restartedProcessInstances = runtimeService.createProcessInstanceQuery().processDefinitionId(processDefinition.getId()).list();
+    List<VariableInstance> variables = runtimeService.createVariableInstanceQuery().processInstanceIdIn(restartedProcessInstances.get(0).getId(), restartedProcessInstances.get(1).getId()).list();
+    Assert.assertEquals(0, variables.size());
+  }
 
   protected void assertBatchCreated(Batch batch, int processInstanceCount) {
     assertNotNull(batch);

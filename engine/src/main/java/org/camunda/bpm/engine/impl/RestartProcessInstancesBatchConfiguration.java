@@ -17,16 +17,18 @@ public class RestartProcessInstancesBatchConfiguration extends BatchConfiguratio
   protected boolean initialVariables;
   protected boolean skipCustomListeners;
   protected boolean skipIoMappings;
+  protected boolean withoutBusinessKey;
 
   public RestartProcessInstancesBatchConfiguration(List<String> processInstanceIds,
       List<AbstractProcessInstanceModificationCommand> instructions, String processDefinitionId,
-      boolean initialVariables, boolean skipCustomListeners, boolean skipIoMappings) {
+      boolean initialVariables, boolean skipCustomListeners, boolean skipIoMappings, boolean withoutBusinessKey) {
     super(processInstanceIds);
     this.instructions = instructions;
     this.processDefinitionId = processDefinitionId;
     this.initialVariables = initialVariables;
     this.skipCustomListeners = skipCustomListeners;
     this.skipIoMappings = skipIoMappings;
+    this.withoutBusinessKey = withoutBusinessKey;
   }
 
   public List<AbstractProcessInstanceModificationCommand> getInstructions() {
@@ -67,5 +69,13 @@ public class RestartProcessInstancesBatchConfiguration extends BatchConfiguratio
 
   public void setSkipIoMappings(boolean skipIoMappings) {
     this.skipIoMappings = skipIoMappings;
+  }
+
+  public boolean isWithoutBusinessKey() {
+    return withoutBusinessKey;
+  }
+
+  public void setWithoutBusinessKey(boolean withoutBusinessKey) {
+    this.withoutBusinessKey = withoutBusinessKey;
   }
 }

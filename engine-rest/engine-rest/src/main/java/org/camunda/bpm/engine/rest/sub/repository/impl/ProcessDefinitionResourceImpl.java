@@ -400,6 +400,10 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
       builder.initialSetOfVariables();
     }
 
+    if (restartProcessInstanceDto.isWithoutBusinessKey()) {
+      builder.withoutBusinessKey();
+    }
+
     if (restartProcessInstanceDto.isSkipCustomListeners()) {
       builder.skipCustomListeners();
     }

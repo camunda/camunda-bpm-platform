@@ -19,6 +19,7 @@ public class RestartProcessInstancesBatchConfigurationJsonConverter extends Json
   public static final String INITIAL_VARIABLES = "initialVariables";
   public static final String SKIP_CUSTOM_LISTENERS = "skipCustomListeners";
   public static final String SKIP_IO_MAPPINGS = "skipIoMappings";
+  public static final String WITHOUT_BUSINESS_KEY = "withoutBusinessKey";
 
   @Override
   public JSONObject toJsonObject(RestartProcessInstancesBatchConfiguration configuration) {
@@ -30,6 +31,7 @@ public class RestartProcessInstancesBatchConfigurationJsonConverter extends Json
     JsonUtil.addField(json, INITIAL_VARIABLES, configuration.isInitialVariables());
     JsonUtil.addField(json, SKIP_CUSTOM_LISTENERS, configuration.isSkipCustomListeners());
     JsonUtil.addField(json, SKIP_IO_MAPPINGS, configuration.isSkipIoMappings());
+    JsonUtil.addField(json, WITHOUT_BUSINESS_KEY, configuration.isWithoutBusinessKey());
     
     return json;
   }
@@ -40,7 +42,7 @@ public class RestartProcessInstancesBatchConfigurationJsonConverter extends Json
     List<AbstractProcessInstanceModificationCommand> instructions = JsonUtil.jsonArrayAsList(json.getJSONArray(INSTRUCTIONS), ModificationCmdJsonConverter.INSTANCE);
     
     return new RestartProcessInstancesBatchConfiguration(processInstanceIds, instructions, json.getString(PROCESS_DEFINITION_ID),
-        json.getBoolean(INITIAL_VARIABLES), json.getBoolean(SKIP_CUSTOM_LISTENERS), json.getBoolean(SKIP_IO_MAPPINGS));
+        json.getBoolean(INITIAL_VARIABLES), json.getBoolean(SKIP_CUSTOM_LISTENERS), json.getBoolean(SKIP_IO_MAPPINGS), json.getBoolean(WITHOUT_BUSINESS_KEY));
   }
 
   protected List<String> readProcessInstanceIds(JSONObject jsonObject) {

@@ -55,6 +55,10 @@ public class RestartProcessInstancesJobHandler extends AbstractBatchJobHandler<R
         builder.skipCustomListeners();
       }
 
+      if (batchConfiguration.isWithoutBusinessKey()) {
+        builder.withoutBusinessKey();
+      }
+
       if (batchConfiguration.isSkipIoMappings()) {
         builder.skipIoMappings();
       }
@@ -79,7 +83,7 @@ public class RestartProcessInstancesJobHandler extends AbstractBatchJobHandler<R
   protected RestartProcessInstancesBatchConfiguration createJobConfiguration(RestartProcessInstancesBatchConfiguration configuration,
       List<String> processIdsForJob) {
     return new RestartProcessInstancesBatchConfiguration(processIdsForJob, configuration.getInstructions(), configuration.getProcessDefinitionId(),
-        configuration.isInitialVariables(), configuration.isSkipCustomListeners(), configuration.isSkipIoMappings());
+        configuration.isInitialVariables(), configuration.isSkipCustomListeners(), configuration.isSkipIoMappings(), configuration.isWithoutBusinessKey());
   }
 
   @Override

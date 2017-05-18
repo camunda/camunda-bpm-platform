@@ -79,7 +79,7 @@ public class RestartProcessInstancesBatchCmd extends AbstractRestartProcessInsta
     BatchJobHandler<RestartProcessInstancesBatchConfiguration> batchJobHandler = getBatchJobHandler(processEngineConfiguration);
 
     RestartProcessInstancesBatchConfiguration configuration = new RestartProcessInstancesBatchConfiguration(
-        processInstanceIds, instructions, builder.getProcessDefinitionId(), builder.isInitialVariables(), builder.isSkipCustomListeners(), builder.isSkipIoMappings());
+        processInstanceIds, instructions, builder.getProcessDefinitionId(), builder.isInitialVariables(), builder.isSkipCustomListeners(), builder.isSkipIoMappings(), builder.isWithoutBusinessKey());
 
     BatchEntity batch = new BatchEntity();
     batch.setType(batchJobHandler.getType());

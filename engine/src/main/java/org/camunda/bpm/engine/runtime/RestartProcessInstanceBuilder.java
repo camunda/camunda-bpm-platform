@@ -38,6 +38,11 @@ public interface RestartProcessInstanceBuilder extends InstantiationBuilder<Rest
   RestartProcessInstanceBuilder initialSetOfVariables();
 
   /**
+   * Does not take over the business key of the historic process instance
+   */
+  RestartProcessInstanceBuilder withoutBusinessKey();
+
+  /**
    * Skips custom execution listeners when creating activity instances during restart
    */
   RestartProcessInstanceBuilder skipCustomListeners();
@@ -65,4 +70,5 @@ public interface RestartProcessInstanceBuilder extends InstantiationBuilder<Rest
    *   </ul>
    */
   Batch executeAsync();
+
 }

@@ -11,6 +11,7 @@ import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.exception.NullValueException;
+import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
@@ -23,6 +24,7 @@ import org.camunda.bpm.engine.impl.RestartProcessInstanceBuilderImpl;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
 /**
  * 
@@ -76,12 +78,19 @@ public class RestartProcessInstancesCmd extends AbstractRestartProcessInstanceCm
       modificationBuilder.setModificationOperations(instructions);
       instantiationBuilder.setModificationBuilder(modificationBuilder);
 
+      if (!builder.isWithoutBusinessKey()) {
+        instantiationBuilder.businessKey(historicProcessInstance.getBusinessKey());
+      }
+
       if (builder.isInitialVariables()) {
-         List<HistoricDetail> historicDetails = ((HistoricDetailQueryImpl) historyService.createHistoricDetailQuery().executionId(processInstanceId).variableUpdates()).sequenceCounter(1).list();
-         for (HistoricDetail detail : historicDetails) {
-           HistoricVariableUpdate variableUpdate = (HistoricVariableUpdate) detail;
-           instantiationBuilder.setVariable(variableUpdate.getVariableName(), variableUpdate.getValue());
-         }
+        String startActivityId = historicProcessInstance.getStartActivityId();
+        String startActivityInstanceId = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstanceId).activityId(startActivityId).singleResult().getId();
+        List<HistoricDetail> historicDetails = ((HistoricDetailQueryImpl) historyService.createHistoricDetailQuery().executionId(processInstanceId).activityInstanceId(startActivityInstanceId)
+            ).sequenceCounter(1).list();
+        for (HistoricDetail detail : historicDetails) {
+          HistoricVariableUpdate variableUpdate = (HistoricVariableUpdate) detail;
+          instantiationBuilder.setVariable(variableUpdate.getVariableName(), variableUpdate.getValue());
+        }
       }
       else {
         List<HistoricVariableInstance> historicVariables = historyService.createHistoricVariableInstanceQuery().executionIdIn(processInstanceId).list();

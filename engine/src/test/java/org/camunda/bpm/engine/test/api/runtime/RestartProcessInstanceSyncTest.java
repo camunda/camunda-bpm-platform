@@ -33,6 +33,7 @@ import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.api.runtime.util.IncrementCounterListener;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.After;
@@ -224,7 +225,7 @@ public class RestartProcessInstanceSyncTest {
   public void shouldRestartProcessInstanceWithInitialVariables() {
     // given
     BpmnModelInstance instance = Bpmn.createExecutableProcess("Process")
-        .startEvent()
+        .startEvent("startEvent")
         .userTask("userTask1")
         .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_END, SetVariableExecutionListenerImpl.class.getName())
         .userTask("userTask2")
@@ -232,9 +233,8 @@ public class RestartProcessInstanceSyncTest {
         .done();
 
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process");
     // initial variable
-    runtimeService.setVariable(processInstance.getId(), "var", "bar");
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process", Variables.createVariables().putValue("var", "bar"));
 
     // variable update
     Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).active().singleResult();
@@ -289,11 +289,10 @@ public class RestartProcessInstanceSyncTest {
   public void shouldNotSetInitialVersionOfLocalVariables() {
     // given
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(ProcessModels.SUBPROCESS_PROCESS);
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process");
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process", Variables.createVariables().putValue("var", "bar"));
 
     Execution subProcess = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("userTask").singleResult();
     runtimeService.setVariableLocal(subProcess.getId(), "local", "foo");
-    runtimeService.setVariable(processInstance.getId(), "var", "bar");
 
     runtimeService.deleteProcessInstance(processInstance.getId(), "test");
 
@@ -419,11 +418,31 @@ public class RestartProcessInstanceSyncTest {
     runtimeService.restartProcessInstances(processDefinition.getId())
     .startBeforeActivity("userTask1")
     .processInstanceIds(processInstance.getId())
+    .withoutBusinessKey()
     .execute();
 
     // then
     ProcessInstance restartedProcessInstance = runtimeService.createProcessInstanceQuery().processDefinitionId(processDefinition.getId()).active().singleResult();
     assertNull(restartedProcessInstance.getBusinessKey());
+  }
+
+  @Test
+  public void shouldRestartProcessInstanceWithBusinessKey() {
+    // given
+    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(ProcessModels.TWO_TASKS_PROCESS);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process", "businessKey", (String) null);
+    runtimeService.deleteProcessInstance(processInstance.getId(), "test");
+
+    // when
+    runtimeService.restartProcessInstances(processDefinition.getId())
+    .startBeforeActivity("userTask1")
+    .processInstanceIds(processInstance.getId())
+    .execute();
+
+    // then
+    ProcessInstance restartedProcessInstance = runtimeService.createProcessInstanceQuery().processDefinitionId(processDefinition.getId()).active().singleResult();
+    assertNotNull(restartedProcessInstance.getBusinessKey());
+    assertEquals("businessKey", restartedProcessInstance.getBusinessKey());
   }
 
   @Test
@@ -560,6 +579,31 @@ public class RestartProcessInstanceSyncTest {
     assertEquals(restartedInstance.getTenantId(), TestTenantIdProvider.TENANT_ID);
   }
 
+  @Test
+  public void shouldNotSetInitialVariablesIfThereIsNoUniqueStartActivity() {
+    // given
+    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(ProcessModels.TWO_TASKS_PROCESS);
+
+    ProcessInstance processInstance = runtimeService.createProcessInstanceById(processDefinition.getId())
+        .startBeforeActivity("userTask1")
+        .startBeforeActivity("userTask2")
+        .setVariable("foo", "bar")
+        .execute();
+
+    runtimeService.deleteProcessInstance(processInstance.getId(), "test");
+
+    // when
+    runtimeService.restartProcessInstances(processDefinition.getId())
+    .startBeforeActivity("userTask1")
+    .initialSetOfVariables()
+    .processInstanceIds(processInstance.getId())
+    .execute();
+ 
+    // then
+    ProcessInstance restartedProcessInstance = runtimeService.createProcessInstanceQuery().processDefinitionId(processDefinition.getId()).singleResult();
+    List<VariableInstance> variables = runtimeService.createVariableInstanceQuery().processInstanceIdIn(restartedProcessInstance.getId()).list();
+    Assert.assertEquals(0, variables.size());
+  }
 
   public static class SetVariableExecutionListenerImpl implements ExecutionListener {
 

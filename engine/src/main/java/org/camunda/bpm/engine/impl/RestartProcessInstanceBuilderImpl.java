@@ -31,6 +31,7 @@ public class RestartProcessInstanceBuilderImpl implements RestartProcessInstance
   protected boolean initialVariables;
   protected boolean skipCustomListeners;
   protected boolean skipIoMappings;
+  protected boolean withoutBusinessKey;
   
   public RestartProcessInstanceBuilderImpl(CommandExecutor commandExecutor, String processDefinitionId) {
     this.commandExecutor = commandExecutor;
@@ -143,5 +144,15 @@ public class RestartProcessInstanceBuilderImpl implements RestartProcessInstance
 
   public boolean isSkipIoMappings() {
     return skipIoMappings;
+  }
+
+  @Override
+  public RestartProcessInstanceBuilder withoutBusinessKey() {
+    withoutBusinessKey = true;
+    return this;
+  }
+
+  public boolean isWithoutBusinessKey() {
+    return withoutBusinessKey;
   }
 }

@@ -61,6 +61,7 @@ public class RestartProcessInstanceRestServiceTest extends AbstractRestServiceTe
     when(builderMock.skipCustomListeners()).thenReturn(builderMock);
     when(builderMock.skipIoMappings()).thenReturn(builderMock);
     when(builderMock.initialSetOfVariables()).thenReturn(builderMock);
+    when(builderMock.withoutBusinessKey()).thenReturn(builderMock);
 
     Batch batchMock = createMockBatch();
     when(builderMock.executeAsync()).thenReturn(batchMock);
@@ -536,6 +537,32 @@ public class RestartProcessInstanceRestServiceTest extends AbstractRestServiceTe
 
     verify(builderMock).processInstanceIds(Arrays.asList("processInstance1", "processInstance2"));
     verify(builderMock).skipIoMappings();
+    verify(builderMock).startBeforeActivity("activityId");
+    verify(builderMock).execute();
+  }
+
+  @Test
+  public void testRestartProcessInstanceWithoutBusinessKey() {
+    Map<String, Object> json = new HashMap<String, Object>();
+    List<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
+
+    json.put("processInstanceIds", Arrays.asList("processInstance1", "processInstance2"));
+    instructions.add(ModificationInstructionBuilder.startBefore().activityId("activityId").getJson());
+    json.put("instructions", instructions);
+    json.put("withoutBusinessKey", true);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+      .contentType(ContentType.JSON)
+      .body(json)
+    .then()
+      .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+     .when()
+       .post(RESTART_PROCESS_INSTANCE_URL);
+
+    verify(builderMock).processInstanceIds(Arrays.asList("processInstance1", "processInstance2"));
+    verify(builderMock).withoutBusinessKey();
     verify(builderMock).startBeforeActivity("activityId");
     verify(builderMock).execute();
   }
