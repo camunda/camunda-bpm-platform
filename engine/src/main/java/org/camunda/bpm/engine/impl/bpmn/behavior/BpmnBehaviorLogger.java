@@ -258,4 +258,13 @@ public class BpmnBehaviorLogger extends ProcessEngineLogger {
       exceptionMessage("041", "Class '{}' doesn't implement '{}'.", className, delegateVarMapping));
   }
 
+  public ProcessEngineException missingBoundaryCatchEventError(String executionId, String errorCode) {
+    return new ProcessEngineException(
+      exceptionMessage(
+        "042",
+        "Execution with id '{}' throws an error event with errorCode '{}', but no error handler was defined. ",
+        executionId,
+        errorCode));
+  }
+
 }
