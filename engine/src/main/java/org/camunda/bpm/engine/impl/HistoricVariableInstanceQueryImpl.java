@@ -83,14 +83,13 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
   @Override
   public HistoricVariableInstanceQuery variableTypeIn(String... variableTypes) {
     ensureNotNull("Variable types", (Object[]) variableTypes);
-    this.variableTypes = lowerCaseTheFirstLetter(variableTypes);
+    this.variableTypes = lowerCase(variableTypes);
     return this;
   }
 
-  private String[] lowerCaseTheFirstLetter(String... variableTypes) {
-    for (int i=0; i<variableTypes.length; i++) {
-      variableTypes[i] =
-        variableTypes[i].substring(0, 1).toLowerCase() + variableTypes[i].substring(1);
+  private String[] lowerCase(String... variableTypes) {
+    for (int i = 0; i < variableTypes.length; i++) {
+      variableTypes[i] = variableTypes[i].toLowerCase();
     }
     return variableTypes;
   }

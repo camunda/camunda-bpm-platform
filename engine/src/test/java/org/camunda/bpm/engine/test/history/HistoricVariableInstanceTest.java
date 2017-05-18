@@ -31,6 +31,7 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.runtime.util.CustomSerializable;
 import org.camunda.bpm.engine.test.api.runtime.util.FailingSerializable;
+import org.camunda.bpm.engine.test.cmmn.decisiontask.TestPojo;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.FileValue;
@@ -523,8 +524,7 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
     runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
 
     // when
-    HistoricVariableInstanceQuery query = historyService.createHistoricVariableInstanceQuery();
-    query.variableTypeIn("string");
+    HistoricVariableInstanceQuery query = historyService.createHistoricVariableInstanceQuery().variableTypeIn("string");
 
     // then
     assertEquals(1, query.list().size());
@@ -557,15 +557,17 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
     variables1.put("stringVar", "test");
     variables1.put("boolVar", true);
     variables1.put("intVar", 5);
+    variables1.put("nullVar", null);
+    variables1.put("pojoVar", new TestPojo("str", .0));
     runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
 
     // when
     HistoricVariableInstanceQuery query = historyService.createHistoricVariableInstanceQuery();
-    query.variableTypeIn("boolean", "integer");
+    query.variableTypeIn("BooLEAN", "string", "Serializable");
 
     // then
-    assertEquals(2, query.list().size());
-    assertEquals(2, query.count());
+    assertEquals(3, query.list().size());
+    assertEquals(3, query.count());
   }
 
   public void testQueryByInvalidVariableTypeIn() {
