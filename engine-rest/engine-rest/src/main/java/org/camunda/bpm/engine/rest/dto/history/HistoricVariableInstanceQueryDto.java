@@ -48,6 +48,7 @@ public class HistoricVariableInstanceQueryDto extends AbstractQueryDto<HistoricV
   protected String variableName;
   protected String variableNameLike;
   protected Object variableValue;
+  protected String[] variableTypeIn;
   protected String[] executionIdIn;
   protected String[] taskIdIn;
   protected String[] activityInstanceIdIn;
@@ -86,6 +87,11 @@ public class HistoricVariableInstanceQueryDto extends AbstractQueryDto<HistoricV
   @CamundaQueryParam("variableValue")
   public void setVariableValue(Object variableValue) {
     this.variableValue = variableValue;
+  }
+
+  @CamundaQueryParam(value="variableTypeIn", converter = StringArrayConverter.class)
+  public void setVariableTypeIn(String[] variableTypeIn) {
+    this.variableTypeIn = variableTypeIn;
   }
 
   @CamundaQueryParam(value="executionIdIn", converter = StringArrayConverter.class)
@@ -155,6 +161,10 @@ public class HistoricVariableInstanceQueryDto extends AbstractQueryDto<HistoricV
             "Only a single variable value parameter specified: variable name and value are required to be able to query after a specific variable value.");
       }
     }
+    if (variableTypeIn != null && variableTypeIn.length > 0) {
+      query.variableTypeIn(variableTypeIn);
+    }
+
     if (executionIdIn != null && executionIdIn.length > 0) {
       query.executionIdIn(executionIdIn);
     }

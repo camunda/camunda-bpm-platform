@@ -43,6 +43,7 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
   protected String variableName;
   protected String variableNameLike;
   protected QueryVariableValue queryVariableValue;
+  protected String[] variableTypes;
   protected String[] taskIds;
   protected String[] executionIds;
   protected String[] caseExecutionIds;
@@ -77,6 +78,21 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
     ensureNotNull("caseInstanceId", caseInstanceId);
     this.caseInstanceId = caseInstanceId;
     return this;
+  }
+
+  @Override
+  public HistoricVariableInstanceQuery variableTypeIn(String... variableTypes) {
+    ensureNotNull("Variable types", (Object[]) variableTypes);
+    this.variableTypes = lowerCaseTheFirstLetter(variableTypes);
+    return this;
+  }
+
+  private String[] lowerCaseTheFirstLetter(String... variableTypes) {
+    for (int i=0; i<variableTypes.length; i++) {
+      variableTypes[i] =
+        variableTypes[i].substring(0, 1).toLowerCase() + variableTypes[i].substring(1);
+    }
+    return variableTypes;
   }
 
   /** Only select historic process variables with the given process instance ids. */

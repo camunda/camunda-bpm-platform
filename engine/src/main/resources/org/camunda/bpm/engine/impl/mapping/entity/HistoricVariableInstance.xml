@@ -247,6 +247,15 @@
         </foreach>
       </if>
 
+      <!-- variableTypes -->
+      <if test="variableTypes != null &amp;&amp; variableTypes.length > 0">
+        and RES.VAR_TYPE_ in
+        <foreach item="item" index="index" collection="variableTypes"
+                 open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
+
       <!-- executionIds -->
       <if test="executionIds != null &amp;&amp; executionIds.length > 0">
         and RES.EXECUTION_ID_ in

@@ -514,6 +514,87 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
     } catch (ProcessEngineException e) {}
   }
 
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  public void testQueryByVariableTypeIn() {
+    // given
+    Map<String, Object> variables1 = new HashMap<String, Object>();
+    variables1.put("stringVar", "test");
+    variables1.put("boolVar", true);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
+
+    // when
+    HistoricVariableInstanceQuery query = historyService.createHistoricVariableInstanceQuery();
+    query.variableTypeIn("string");
+
+    // then
+    assertEquals(1, query.list().size());
+    assertEquals(1, query.count());
+    assertEquals(query.list().get(0).getName(), "stringVar");
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  public void testQueryByVariableTypeInWithCapitalLetter() {
+    // given
+    Map<String, Object> variables1 = new HashMap<String, Object>();
+    variables1.put("stringVar", "test");
+    variables1.put("boolVar", true);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
+
+    // when
+    HistoricVariableInstanceQuery query = historyService.createHistoricVariableInstanceQuery();
+    query.variableTypeIn("Boolean");
+
+    // then
+    assertEquals(1, query.list().size());
+    assertEquals(1, query.count());
+    assertEquals(query.list().get(0).getName(), "boolVar");
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  public void testQueryByVariableTypeInWithSeveralTypes() {
+    // given
+    Map<String, Object> variables1 = new HashMap<String, Object>();
+    variables1.put("stringVar", "test");
+    variables1.put("boolVar", true);
+    variables1.put("intVar", 5);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
+
+    // when
+    HistoricVariableInstanceQuery query = historyService.createHistoricVariableInstanceQuery();
+    query.variableTypeIn("boolean", "integer");
+
+    // then
+    assertEquals(2, query.list().size());
+    assertEquals(2, query.count());
+  }
+
+  public void testQueryByInvalidVariableTypeIn() {
+    // given
+    HistoricVariableInstanceQuery query = historyService.createHistoricVariableInstanceQuery();
+
+    // when
+    query.variableTypeIn("invalid");
+
+    // then
+    assertEquals(0, query.count());
+
+    try {
+      // when
+      query.variableTypeIn(null);
+      fail("A ProcessEngineException was expected.");
+    } catch (ProcessEngineException e) {
+      // then fails
+    }
+
+    try {
+      // when
+      query.variableTypeIn((String)null);
+      fail("A ProcessEngineException was expected.");
+    } catch (ProcessEngineException e) {
+      // then fails
+    }
+  }
+
   public void testBinaryFetchingEnabled() {
 
     // by default, binary fetching is enabled

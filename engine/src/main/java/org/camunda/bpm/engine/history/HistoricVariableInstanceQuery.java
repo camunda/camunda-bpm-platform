@@ -40,6 +40,9 @@ public interface HistoricVariableInstanceQuery extends Query<HistoricVariableIns
   /** Only select historic process variables where the given variable name is like. */
   HistoricVariableInstanceQuery variableNameLike(String variableNameLike);
 
+  /** Only select historic process variables which match one of the given variable types. */
+  HistoricVariableInstanceQuery variableTypeIn(String... variableTypes);
+
   /**
    * only select historic process variables with the given name and value
    */

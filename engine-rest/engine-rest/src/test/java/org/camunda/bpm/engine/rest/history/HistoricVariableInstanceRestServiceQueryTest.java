@@ -1,28 +1,7 @@
 package org.camunda.bpm.engine.rest.history;
 
-import static com.jayway.restassured.RestAssured.expect;
-import static com.jayway.restassured.RestAssured.given;
-import static com.jayway.restassured.path.json.JsonPath.from;
-import static org.fest.assertions.Assertions.assertThat;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response.Status;
-
+import com.jayway.restassured.http.ContentType;
+import com.jayway.restassured.response.Response;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
@@ -42,8 +21,27 @@ import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 
-import com.jayway.restassured.http.ContentType;
-import com.jayway.restassured.response.Response;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response.Status;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static com.jayway.restassured.RestAssured.expect;
+import static com.jayway.restassured.RestAssured.given;
+import static com.jayway.restassured.path.json.JsonPath.from;
+import static org.fest.assertions.Assertions.assertThat;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 public class HistoricVariableInstanceRestServiceQueryTest extends AbstractRestServiceTest {
 
@@ -328,6 +326,38 @@ public class HistoricVariableInstanceRestServiceQueryTest extends AbstractRestSe
     InOrder inOrder = inOrder(mockedQuery);
     inOrder.verify(mockedQuery).variableNameLike(variableNameLike);
     inOrder.verify(mockedQuery).list();
+  }
+
+  @Test
+  public void testHistoricVariableQueryByVariableTypeIn() {
+    String aVariableType = "string";
+    String anotherVariableType = "integer";
+
+    given()
+      .queryParam("variableTypeIn", aVariableType + "," + anotherVariableType)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().get(HISTORIC_VARIABLE_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).variableTypeIn(aVariableType, anotherVariableType);
+  }
+
+  @Test
+  public void testHistoricVariableQueryByVariableTypeInAsPost() {
+    String aVariableType = "string";
+    String anotherVariableType = "integer";
+
+    List<String> variableTypeIn= new ArrayList<String>();
+    variableTypeIn.add(aVariableType);
+    variableTypeIn.add(anotherVariableType);
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variableTypeIn", variableTypeIn);
+
+    given().contentType(POST_JSON_CONTENT_TYPE).body(json)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().post(HISTORIC_VARIABLE_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).variableTypeIn(aVariableType, anotherVariableType);
   }
 
   @Test
