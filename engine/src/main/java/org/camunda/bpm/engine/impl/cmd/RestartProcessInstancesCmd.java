@@ -1,5 +1,6 @@
 package org.camunda.bpm.engine.impl.cmd;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotContainsNull;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
@@ -10,7 +11,6 @@ import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
-import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
@@ -21,20 +21,24 @@ import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.ProcessInstanceModificationBuilderImpl;
 import org.camunda.bpm.engine.impl.ProcessInstantiationBuilderImpl;
 import org.camunda.bpm.engine.impl.RestartProcessInstanceBuilderImpl;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
-import org.camunda.bpm.engine.impl.util.EnsureUtil;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.impl.VariableMapImpl;
 
 /**
- * 
+ *
  * @author Anna Pazola
  *
  */
 public class RestartProcessInstancesCmd extends AbstractRestartProcessInstanceCmd<Void> {
 
-  protected boolean writeUserOperationLog;
   private final static CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
+
+  protected boolean writeUserOperationLog;
 
   public RestartProcessInstancesCmd(CommandExecutor commandExecutor, RestartProcessInstanceBuilderImpl builder, boolean writeUserOperationLog) {
     super(commandExecutor, builder);
@@ -43,65 +47,54 @@ public class RestartProcessInstancesCmd extends AbstractRestartProcessInstanceCm
 
   @Override
   public Void execute(CommandContext commandContext) {
-    HistoryService historyService = commandContext.getProcessEngineConfiguration().getHistoryService();
     Collection<String> processInstanceIds = collectProcessInstanceIds();
     List<AbstractProcessInstanceModificationCommand> instructions = builder.getInstructions();
-    ensureNotEmpty(BadUserRequestException.class, "instructions", instructions);
 
-    ProcessDefinitionEntity processDefinition;
-    try {
-      processDefinition = getProcessDefinition(commandContext, builder.getProcessDefinitionId());
-    } catch (NullValueException e) {
-      throw new BadUserRequestException(e.getMessage());
-    }
-    ensureNotNull(BadUserRequestException.class, "Process definition cannot be found", "processDefinition", processDefinition);
+    ensureNotEmpty(BadUserRequestException.class, "Restart instructions cannot be empty", "instructions", instructions);
+    ensureNotEmpty(BadUserRequestException.class, "Process instance ids cannot be empty", "Process instance ids", processInstanceIds);
+    ensureNotContainsNull(BadUserRequestException.class, "Process instance ids cannot be null", "Process instance ids", processInstanceIds);
+
+    ProcessDefinitionEntity processDefinition = getProcessDefinition(commandContext, builder.getProcessDefinitionId());
+    ensureNotNull("Process definition cannot be found", "processDefinition", processDefinition);
+
+    checkAuthorization(commandContext, processDefinition);
+
     if (writeUserOperationLog) {
       writeUserOperationLog(commandContext, processDefinition, processInstanceIds.size(), false);
     }
 
-    commandContext.getAuthorizationManager().checkAuthorization(Permissions.READ_HISTORY, Resources.PROCESS_DEFINITION, processDefinition.getKey());
+    String processDefinitionId = builder.getProcessDefinitionId();
 
     for (String processInstanceId : processInstanceIds) {
-      HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
-      ensureNotNull(BadUserRequestException.class, "the historic process instance cannot be found", "historicProcessInstanceId", historicProcessInstance);
-      String processDefinitionId = builder.getProcessDefinitionId();
+      HistoricProcessInstance historicProcessInstance = getHistoricProcessInstance(commandContext, processInstanceId);
+
+      ensureNotNull(BadUserRequestException.class, "Historic process instance cannot be found", "historicProcessInstanceId", historicProcessInstance);
+      ensureHistoricProcessInstanceNotActive(historicProcessInstance);
       ensureSameProcessDefinition(historicProcessInstance, processDefinitionId);
 
-      ProcessInstantiationBuilderImpl instantiationBuilder = (ProcessInstantiationBuilderImpl) ProcessInstantiationBuilderImpl
-        .createProcessInstanceById(commandExecutor, processDefinitionId);
+      ProcessInstantiationBuilderImpl instantiationBuilder = getProcessInstantiationBuilder(commandExecutor, processDefinitionId);
+      applyProperties(instantiationBuilder, processDefinition, historicProcessInstance);
 
-      if (processDefinition.getTenantId() == null && historicProcessInstance.getTenantId() != null) {
-        instantiationBuilder.tenantId(historicProcessInstance.getTenantId());
-      }
-
-      ProcessInstanceModificationBuilderImpl modificationBuilder = new ProcessInstanceModificationBuilderImpl();
+      ProcessInstanceModificationBuilderImpl modificationBuilder = instantiationBuilder.getModificationBuilder();
       modificationBuilder.setModificationOperations(instructions);
-      instantiationBuilder.setModificationBuilder(modificationBuilder);
 
-      if (!builder.isWithoutBusinessKey()) {
-        instantiationBuilder.businessKey(historicProcessInstance.getBusinessKey());
-      }
-
-      if (builder.isInitialVariables()) {
-        String startActivityId = historicProcessInstance.getStartActivityId();
-        String startActivityInstanceId = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstanceId).activityId(startActivityId).singleResult().getId();
-        List<HistoricDetail> historicDetails = ((HistoricDetailQueryImpl) historyService.createHistoricDetailQuery().executionId(processInstanceId).activityInstanceId(startActivityInstanceId)
-            ).sequenceCounter(1).list();
-        for (HistoricDetail detail : historicDetails) {
-          HistoricVariableUpdate variableUpdate = (HistoricVariableUpdate) detail;
-          instantiationBuilder.setVariable(variableUpdate.getVariableName(), variableUpdate.getValue());
-        }
-      }
-      else {
-        List<HistoricVariableInstance> historicVariables = historyService.createHistoricVariableInstanceQuery().executionIdIn(processInstanceId).list();
-         for (HistoricVariableInstance historicVariable : historicVariables) {
-           instantiationBuilder.setVariable(historicVariable.getName(), historicVariable.getValue());
-         }
-      }
+      VariableMap variables = collectVariables(commandContext, historicProcessInstance);
+      instantiationBuilder.setVariables(variables);
 
       instantiationBuilder.execute(builder.isSkipCustomListeners(), builder.isSkipIoMappings());
     }
     return null;
+  }
+
+  protected void checkAuthorization(CommandContext commandContext, ProcessDefinition processDefinition) {
+    commandContext.getAuthorizationManager().checkAuthorization(Permissions.READ_HISTORY, Resources.PROCESS_DEFINITION, processDefinition.getKey());
+  }
+
+  protected HistoricProcessInstance getHistoricProcessInstance(CommandContext commandContext, String processInstanceId) {
+    HistoryService historyService = commandContext.getProcessEngineConfiguration().getHistoryService();
+    return historyService.createHistoricProcessInstanceQuery()
+        .processInstanceId(processInstanceId)
+        .singleResult();
   }
 
   protected void ensureSameProcessDefinition(HistoricProcessInstance instance, String processDefinitionId) {
@@ -109,4 +102,100 @@ public class RestartProcessInstancesCmd extends AbstractRestartProcessInstanceCm
       throw LOG.processDefinitionOfHistoricInstanceDoesNotMatchTheGivenOne(instance, processDefinitionId);
     }
   }
+
+  protected void ensureHistoricProcessInstanceNotActive(HistoricProcessInstance instance) {
+    if (instance.getEndTime() == null) {
+      throw LOG.historicProcessInstanceActive(instance);
+    }
+  }
+
+  protected ProcessInstantiationBuilderImpl getProcessInstantiationBuilder(CommandExecutor commandExecutor, String processDefinitionId) {
+    return (ProcessInstantiationBuilderImpl) ProcessInstantiationBuilderImpl.createProcessInstanceById(commandExecutor, processDefinitionId);
+  }
+
+  protected void applyProperties(ProcessInstantiationBuilderImpl instantiationBuilder, ProcessDefinition processDefinition, HistoricProcessInstance processInstance) {
+    String tenantId = processInstance.getTenantId();
+    if (processDefinition.getTenantId() == null && tenantId != null) {
+      instantiationBuilder.tenantId(tenantId);
+    }
+
+    if (!builder.isWithoutBusinessKey()) {
+      instantiationBuilder.businessKey(processInstance.getBusinessKey());
+    }
+
+  }
+
+  protected VariableMap collectVariables(CommandContext commandContext, HistoricProcessInstance processInstance) {
+    VariableMap variables = null;
+
+    if (builder.isInitialVariables()) {
+      variables = collectInitialVariables(commandContext, processInstance);
+    }
+    else {
+      variables = collectLastVariables(commandContext, processInstance);
+    }
+
+    return variables;
+  }
+
+  protected VariableMap collectInitialVariables(CommandContext commandContext, HistoricProcessInstance processInstance) {
+    HistoryService historyService = commandContext.getProcessEngineConfiguration().getHistoryService();
+
+    HistoricActivityInstance startActivityInstance = resolveStartActivityInstance(processInstance);
+
+    HistoricDetailQueryImpl query = (HistoricDetailQueryImpl) historyService.createHistoricDetailQuery()
+        .variableUpdates()
+        .executionId(processInstance.getId())
+        .activityInstanceId(startActivityInstance.getId());
+
+    List<HistoricDetail> historicDetails = query
+        .sequenceCounter(1)
+        .list();
+
+    VariableMap variables = new VariableMapImpl();
+    for (HistoricDetail detail : historicDetails) {
+      HistoricVariableUpdate variableUpdate = (HistoricVariableUpdate) detail;
+      variables.putValueTyped(variableUpdate.getVariableName(), variableUpdate.getTypedValue());
+    }
+
+    return variables;
+  }
+
+  protected VariableMap collectLastVariables(CommandContext commandContext, HistoricProcessInstance processInstance) {
+    HistoryService historyService = commandContext.getProcessEngineConfiguration().getHistoryService();
+
+    List<HistoricVariableInstance> historicVariables = historyService.createHistoricVariableInstanceQuery()
+        .executionIdIn(processInstance.getId())
+        .list();
+
+    VariableMap variables = new VariableMapImpl();
+    for (HistoricVariableInstance variable : historicVariables) {
+      variables.putValueTyped(variable.getName(), variable.getTypedValue());
+    }
+
+    return variables;
+  }
+
+  protected HistoricActivityInstance resolveStartActivityInstance(HistoricProcessInstance processInstance) {
+    HistoryService historyService = Context.getProcessEngineConfiguration().getHistoryService();
+
+    String processInstanceId = processInstance.getId();
+    String startActivityId = processInstance.getStartActivityId();
+
+    ensureNotNull("startActivityId", startActivityId);
+
+    List<HistoricActivityInstance> historicActivityInstances = historyService
+        .createHistoricActivityInstanceQuery()
+        .processInstanceId(processInstanceId)
+        .activityId(startActivityId)
+        .orderPartiallyByOccurrence()
+        .asc()
+        .list();
+
+    ensureNotEmpty("historicActivityInstances", historicActivityInstances);
+
+    HistoricActivityInstance startActivityInstance = historicActivityInstances.get(0);
+    return startActivityInstance;
+  }
+
 }

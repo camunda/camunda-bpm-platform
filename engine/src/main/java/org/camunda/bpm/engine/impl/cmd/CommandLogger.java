@@ -261,4 +261,13 @@ public class CommandLogger extends ProcessEngineLogger {
       processDefinitionId
     ));
   }
+
+  public ProcessEngineException historicProcessInstanceActive(HistoricProcessInstance historicProcessInstance) {
+    return new ProcessEngineException(exceptionMessage(
+      "040",
+      "Historic process instance '{}' cannot be restarted. It is not completed or terminated.",
+      historicProcessInstance.getId(),
+      historicProcessInstance.getProcessDefinitionId()
+    ));
+  }
 }

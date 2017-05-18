@@ -433,7 +433,7 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
       fail("expected exception");
     } catch (BadUserRequestException e) {
       // then
-      assertThat(e.getMessage(), containsString("the historic process instance cannot be found: historicProcessInstanceId is null"));
+      assertThat(e.getMessage(), containsString("Historic process instance cannot be found: historicProcessInstanceId is null"));
     }
   }
 

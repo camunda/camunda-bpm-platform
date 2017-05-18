@@ -52,7 +52,7 @@ import org.junit.Test;
 import org.junit.rules.RuleChain;
 
 /**
- * 
+ *
  * @author Anna Pazola
  *
  */
@@ -86,7 +86,7 @@ public class RestartProcessInstanceAsyncTest {
     helper.removeAllRunningAndHistoricBatches();
     engineRule.getProcessEngineConfiguration().setTenantIdProvider(defaultTenantIdProvider);
   }
-  
+
   @After
   public void resetClock() {
     ClockUtil.reset();
@@ -161,7 +161,7 @@ public class RestartProcessInstanceAsyncTest {
       Assert.assertThat(e.getMessage(), containsString("processInstanceIds contains null value"));
     }
   }
-  
+
   @Test
   public void restartNotExistingProcessInstance() {
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
@@ -174,7 +174,7 @@ public class RestartProcessInstanceAsyncTest {
       helper.executeJobs(batch);
       fail("exception expected");
     } catch (BadUserRequestException e) {
-      Assert.assertThat(e.getMessage(), containsString("the historic process instance cannot be found"));
+      Assert.assertThat(e.getMessage(), containsString("Historic process instance cannot be found"));
     }
   }
 
@@ -204,7 +204,7 @@ public class RestartProcessInstanceAsyncTest {
     ProcessInstance restartedProcessInstance = restartedProcessInstances.get(0);
     Task restartedTask = engineRule.getTaskService().createTaskQuery().processInstanceId(restartedProcessInstance.getId()).active().singleResult();
     Assert.assertEquals(task1.getTaskDefinitionKey(), restartedTask.getTaskDefinitionKey());
-    
+
     restartedProcessInstance = restartedProcessInstances.get(1);
     restartedTask = engineRule.getTaskService().createTaskQuery().processInstanceId(restartedProcessInstance.getId()).active().singleResult();
     Assert.assertEquals(task2.getTaskDefinitionKey(), restartedTask.getTaskDefinitionKey());
@@ -276,7 +276,7 @@ public class RestartProcessInstanceAsyncTest {
           .done());
     }
   }
-  
+
   @Test
   public void shouldRestartProcessInstanceWithInitialVariables() {
     // given
@@ -341,7 +341,7 @@ public class RestartProcessInstanceAsyncTest {
     ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("Process");
 
     // variables are set at the beginning
-    runtimeService.setVariable(processInstance1.getId(), "var", "bar"); 
+    runtimeService.setVariable(processInstance1.getId(), "var", "bar");
     runtimeService.setVariable(processInstance2.getId(), "var", "bb");
 
     // variables are changed
@@ -448,7 +448,7 @@ public class RestartProcessInstanceAsyncTest {
     restartedTask = taskService.createTaskQuery().processInstanceId(restartedProcessInstance.getId()).active().singleResult();
     Assert.assertEquals(task2.getTaskDefinitionKey(), restartedTask.getTaskDefinitionKey());
   }
-  
+
   @Test
   public void testBatchCreationWithOverlappingProcessInstanceIdsAndQuery() {
     // given
@@ -590,7 +590,7 @@ public class RestartProcessInstanceAsyncTest {
         .startTransition("flow1")
         .processInstanceIds(processInstance1.getId(), processInstance2.getId())
         .executeAsync();
-    
+
     helper.executeSeedJob(batch);
 
     engineRule.getManagementService().deleteBatch(batch.getId(), false);
@@ -748,6 +748,7 @@ public class RestartProcessInstanceAsyncTest {
     // given
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(ProcessModels.TWO_TASKS_PROCESS);
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process");
+    runtimeService.deleteProcessInstance(processInstance.getId(), null);
     BpmnModelInstance instance2 = Bpmn.createExecutableProcess().done();
     ProcessDefinition processDefinition2 = testRule.deployAndGetDefinition(instance2);
 
@@ -756,9 +757,9 @@ public class RestartProcessInstanceAsyncTest {
         .startBeforeActivity("userTask1")
         .processInstanceIds(processInstance.getId())
         .executeAsync();
-    
-    try { 
-      helper.completeBatch(batch); 
+
+    try {
+      helper.completeBatch(batch);
       fail("exception expected");
     } catch (ProcessEngineException e) {
       // then
@@ -1007,7 +1008,7 @@ public class RestartProcessInstanceAsyncTest {
     .executeAsync();
 
     helper.completeBatch(batch);
- 
+
     // then
     List<ProcessInstance> restartedProcessInstances = runtimeService.createProcessInstanceQuery().processDefinitionId(processDefinition.getId()).list();
     List<VariableInstance> variables = runtimeService.createVariableInstanceQuery().processInstanceIdIn(restartedProcessInstances.get(0).getId(), restartedProcessInstances.get(1).getId()).list();

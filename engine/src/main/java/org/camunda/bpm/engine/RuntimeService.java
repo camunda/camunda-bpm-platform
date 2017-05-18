@@ -1885,19 +1885,20 @@ public interface RuntimeService {
 
   ModificationBuilder createModification(String processDefinitionId);
 
-  /** Restarts process instances that were canceled or terminated with the initial or last set of variables.
-  *
-  * @param processDefinitionId the id of the process definition, cannot be null.
-  *
-  * @throws ProcessEngineException
-  *          when no process definition is deployed with the given key.
-  * @throws AuthorizationException
-  *          if the user has not all of the following permissions
-  *     <ul>
-  *       <li>{@link Permissions#CREATE} permission on {@link Resources#PROCESS_INSTANCE}</li>
-  *       <li>{@link Permissions#CREATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
-  *       <li>{@link Permissions#READ_HISTORY} permission on {@link Resources#PROCESS_DEFINITION}</li>
-  *     </ul>
-  */
+  /**
+   * Restarts process instances that are completed or deleted with the initial or last set of variables.
+   *
+   * @param processDefinitionId the id of the process definition, cannot be null.
+   *
+   * @throws ProcessEngineException
+   *          when no process definition is deployed with the given key or a process instance is still active.
+   * @throws AuthorizationException
+   *          if the user has not all of the following permissions
+   *     <ul>
+   *       <li>{@link Permissions#CREATE} permission on {@link Resources#PROCESS_INSTANCE}</li>
+   *       <li>{@link Permissions#CREATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *       <li>{@link Permissions#READ_HISTORY} permission on {@link Resources#PROCESS_DEFINITION}</li>
+   *     </ul>
+   */
   RestartProcessInstanceBuilder restartProcessInstances(String processDefinitionId);
 }

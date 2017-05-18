@@ -13,7 +13,6 @@ import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
-import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
@@ -41,11 +40,11 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
-
 /**
- * 
+ *
  * @author Anna Pazola
  *
  */
@@ -54,6 +53,9 @@ public class RestartProcessInstanceSyncTest {
 
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
+
+  @Rule
+  public ExpectedException thrown = ExpectedException.none();
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
@@ -119,7 +121,7 @@ public class RestartProcessInstanceSyncTest {
     ProcessInstance restartedProcessInstance = runtimeService.createProcessInstanceQuery().active().singleResult();
     Task restartedTask = taskService.createTaskQuery().processInstanceId(restartedProcessInstance.getId()).active().singleResult();
     Assert.assertEquals(userTask2.getTaskDefinitionKey(), restartedTask.getTaskDefinitionKey());
-    
+
     ActivityInstance updatedTree = runtimeService.getActivityInstance(restartedProcessInstance.getId());
     assertNotNull(updatedTree);
     assertEquals(restartedProcessInstance.getId(), updatedTree.getProcessInstanceId());
@@ -183,7 +185,7 @@ public class RestartProcessInstanceSyncTest {
         .activity("userTask")
         .done());
   }
-  
+
   @Test
   public void shouldRestartProcessInstanceWithVariables() {
     // given
@@ -220,7 +222,7 @@ public class RestartProcessInstanceSyncTest {
     assertEquals("var", variableInstance.getName());
     assertEquals("foo", variableInstance.getValue());
   }
-  
+
   @Test
   public void shouldRestartProcessInstanceWithInitialVariables() {
     // given
@@ -312,6 +314,30 @@ public class RestartProcessInstanceSyncTest {
   }
 
   @Test
+  public void shouldNotSetInitialVersionOfVariables() {
+    // given
+    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(ProcessModels.SUBPROCESS_PROCESS);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process", Variables.createVariables().putValue("var", "bar"));
+    runtimeService.setVariable(processInstance.getId(), "bar", "foo");
+
+    runtimeService.deleteProcessInstance(processInstance.getId(), "test");
+
+    // when
+    runtimeService.restartProcessInstances(processDefinition.getId())
+      .startBeforeActivity("userTask")
+      .processInstanceIds(processInstance.getId())
+      .initialSetOfVariables()
+      .execute();
+
+    // then
+    ProcessInstance restartedProcessInstance = runtimeService.createProcessInstanceQuery().processDefinitionId(processDefinition.getId()).active().singleResult();
+    List<VariableInstance> variables = runtimeService.createVariableInstanceQuery().processInstanceIdIn(restartedProcessInstance.getId()).list();
+    assertEquals(1, variables.size());
+    assertEquals("var", variables.get(0).getName());
+    assertEquals("bar", variables.get(0).getValue());
+  }
+
+  @Test
   public void shouldRestartProcessInstanceUsingHistoricProcessInstanceQuery() {
     // given
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(ProcessModels.TWO_TASKS_PROCESS);
@@ -340,7 +366,7 @@ public class RestartProcessInstanceSyncTest {
         .activity("userTask1")
         .done());
   }
-  
+
   @Test
   public void restartProcessInstanceWithNullProcessDefinitionId() {
     try {
@@ -350,7 +376,7 @@ public class RestartProcessInstanceSyncTest {
       Assert.assertThat(e.getMessage(), containsString("processDefinitionId is null"));
     }
   }
-  
+
   @Test
   public void restartProcessInstanceWithoutProcessInstanceIds() {
     try {
@@ -367,7 +393,7 @@ public class RestartProcessInstanceSyncTest {
       runtimeService.restartProcessInstances("foo").processInstanceIds("bar").execute();
       fail("exception expected");
     } catch (BadUserRequestException e) {
-      Assert.assertThat(e.getMessage(), containsString("instructions is empty"));
+      Assert.assertThat(e.getMessage(), containsString("Restart instructions cannot be empty"));
     }
   }
 
@@ -378,10 +404,10 @@ public class RestartProcessInstanceSyncTest {
       runtimeService.restartProcessInstances(processDefinition.getId()).startAfterActivity("bar").processInstanceIds((String) null).execute();
       fail("exception expected");
     } catch (BadUserRequestException e) {
-      Assert.assertThat(e.getMessage(), containsString("historicProcessInstanceId is null"));
+      Assert.assertThat(e.getMessage(), containsString("Process instance ids cannot be null"));
     }
   }
-  
+
   @Test
   public void restartNotExistingProcessInstance() {
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
@@ -389,16 +415,17 @@ public class RestartProcessInstanceSyncTest {
       runtimeService.restartProcessInstances(processDefinition.getId()).startBeforeActivity("bar").processInstanceIds("aaa").execute();
       fail("exception expected");
     } catch (BadUserRequestException e) {
-      Assert.assertThat(e.getMessage(), containsString("the historic process instance cannot be found"));
+      Assert.assertThat(e.getMessage(), containsString("Historic process instance cannot be found"));
     }
   }
-  
+
   @Test
   public void restartProcessInstanceWithNotMatchingProcessDefinition() {
     BpmnModelInstance instance = Bpmn.createExecutableProcess("Process2").startEvent().userTask().endEvent().done();
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
     ProcessDefinition processDefinition2 = testRule.deployAndGetDefinition(ProcessModels.TWO_TASKS_PROCESS);
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process");
+    runtimeService.deleteProcessInstance(processInstance.getId(), null);
     try {
       runtimeService.restartProcessInstances(processDefinition.getId()).startBeforeActivity("userTask").processInstanceIds(processInstance.getId()).execute();
       fail("exception expected");
@@ -598,11 +625,28 @@ public class RestartProcessInstanceSyncTest {
     .initialSetOfVariables()
     .processInstanceIds(processInstance.getId())
     .execute();
- 
+
     // then
     ProcessInstance restartedProcessInstance = runtimeService.createProcessInstanceQuery().processDefinitionId(processDefinition.getId()).singleResult();
     List<VariableInstance> variables = runtimeService.createVariableInstanceQuery().processInstanceIdIn(restartedProcessInstance.getId()).list();
     Assert.assertEquals(0, variables.size());
+  }
+
+  @Test
+  public void shouldNotRestartActiveProcessInstance() {
+    // given
+    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(ProcessModels.TWO_TASKS_PROCESS);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
+
+    // then
+    thrown.expect(ProcessEngineException.class);
+
+    // when
+    runtimeService.restartProcessInstances(processDefinition.getId())
+      .startBeforeActivity("userTask1")
+      .initialSetOfVariables()
+      .processInstanceIds(processInstance.getId())
+      .execute();
   }
 
   public static class SetVariableExecutionListenerImpl implements ExecutionListener {

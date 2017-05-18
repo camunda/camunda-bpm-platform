@@ -26,7 +26,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 
 /**
- * 
+ *
  * @author Anna Pazola
  *
  */
@@ -43,18 +43,14 @@ public class RestartProcessInstancesBatchCmd extends AbstractRestartProcessInsta
     List<AbstractProcessInstanceModificationCommand> instructions = builder.getInstructions();
     Collection<String> processInstanceIds = collectProcessInstanceIds();
 
-    ensureNotEmpty(BadUserRequestException.class, "Modification instructions cannot be empty", "instructions", instructions);
+    ensureNotEmpty(BadUserRequestException.class, "Restart instructions cannot be empty", "instructions", instructions);
     ensureNotEmpty(BadUserRequestException.class, "Process instance ids cannot be empty", "processInstanceIds", processInstanceIds);
     ensureNotContainsNull(BadUserRequestException.class, "Process instance ids cannot be null", "processInstanceIds", processInstanceIds);
 
     commandContext.getAuthorizationManager().checkAuthorization(Permissions.CREATE, Resources.BATCH);
-    ProcessDefinitionEntity processDefinition;
-    try {
-       processDefinition = getProcessDefinition(commandContext, builder.getProcessDefinitionId());
-    } catch (NullValueException e) {
-      throw new BadUserRequestException(e.getMessage());
-    }
-    ensureNotNull(BadUserRequestException.class, "Process definition id cannot be null", processDefinition);
+    ProcessDefinitionEntity processDefinition = getProcessDefinition(commandContext, builder.getProcessDefinitionId());;
+
+    ensureNotNull(BadUserRequestException.class, "Process definition cannot be null", processDefinition);
     ensureTenantAuthorized(commandContext, processDefinition);
 
     writeUserOperationLog(commandContext, processDefinition, processInstanceIds.size(), true);
