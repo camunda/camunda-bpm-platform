@@ -42,7 +42,7 @@ import static org.junit.Assert.assertEquals;
  * @author Svetlana Dorokhova
  *
  */
-@RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+@RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
 public class HistoryCleanupDmnDisabledTest {
 
   protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {

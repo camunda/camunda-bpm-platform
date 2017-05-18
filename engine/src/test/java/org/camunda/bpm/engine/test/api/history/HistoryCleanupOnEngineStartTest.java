@@ -43,7 +43,7 @@ import static org.junit.Assert.assertNotNull;
 /**
  * @author Svetlana Dorokhova
  */
-@RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+@RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
 public class HistoryCleanupOnEngineStartTest {
 
   protected static final String ONE_TASK_PROCESS = "oneTaskProcess";
@@ -84,18 +84,9 @@ public class HistoryCleanupOnEngineStartTest {
           commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(jobId);
         }
 
-        commandContext.getMeterLogManager().deleteAll();
-
         return null;
       }
     });
-
-    Collection<Meter> meters = processEngineConfiguration.getMetricsRegistry().getMeters().values();
-    for (Meter meter : meters) {
-      meter.getAndClear();
-    }
-    engineRule.getProcessEngine().getManagementService().deleteMetrics(null);
-
   }
 
 

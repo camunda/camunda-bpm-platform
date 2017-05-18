@@ -16,10 +16,8 @@ package org.camunda.bpm.engine.test.api.history;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-
 import org.apache.commons.lang.time.DateUtils;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
@@ -29,7 +27,6 @@ import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.metrics.Meter;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
@@ -48,7 +45,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 
-@RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+@RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
 public class BulkHistoryDeleteCmmnDisabledTest {
 
   protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
@@ -102,16 +99,6 @@ public class BulkHistoryDeleteCmmnDisabledTest {
       historyService.deleteHistoricDecisionInstanceByInstanceId(historicDecisionInstance.getId());
     }
 
-    clearMetrics();
-
-  }
-
-  protected void clearMetrics() {
-    Collection<Meter> meters = engineRule.getProcessEngineConfiguration().getMetricsRegistry().getMeters().values();
-    for (Meter meter : meters) {
-      meter.getAndClear();
-    }
-    engineRule.getManagementService().deleteMetrics(null);
   }
 
   @Test

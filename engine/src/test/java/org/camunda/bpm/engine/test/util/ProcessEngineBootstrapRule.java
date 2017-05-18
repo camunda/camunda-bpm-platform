@@ -17,6 +17,10 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngines;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.interceptor.Command;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
+import org.camunda.bpm.engine.runtime.Job;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 
@@ -49,9 +53,23 @@ public class ProcessEngineBootstrapRule extends TestWatcher {
 
   @Override
   protected void finished(Description description) {
+    deleteHistoryCleanupJob();
     processEngine.close();
     ProcessEngines.unregister(processEngine);
     processEngine = null;
+  }
+
+  private void deleteHistoryCleanupJob() {
+    final Job job = processEngine.getHistoryService().findHistoryCleanupJob();
+    if (job != null) {
+      ((ProcessEngineConfigurationImpl)processEngine.getProcessEngineConfiguration()).getCommandExecutorTxRequired().execute(new Command<Void>() {
+        public Void execute(CommandContext commandContext) {
+          commandContext.getJobManager().deleteJob((JobEntity) job);
+          commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(job.getId());
+          return null;
+        }
+      });
+    }
   }
 
 }
