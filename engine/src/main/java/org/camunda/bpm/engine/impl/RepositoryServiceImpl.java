@@ -95,7 +95,7 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
     return new ProcessApplicationDeploymentBuilderImpl(this, processApplication);
   }
 
-  public DeploymentWithDefinitions deployAndReturnDefinitions(DeploymentBuilderImpl deploymentBuilder) {
+  public DeploymentWithDefinitions deployWithResult(DeploymentBuilderImpl deploymentBuilder) {
     return commandExecutor.execute(new DeployCmd(deploymentBuilder));
   }
 
