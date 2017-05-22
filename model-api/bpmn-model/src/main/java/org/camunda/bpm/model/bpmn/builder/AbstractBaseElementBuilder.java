@@ -18,25 +18,8 @@ import java.util.Iterator;
 
 import org.camunda.bpm.model.bpmn.BpmnModelException;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.camunda.bpm.model.bpmn.instance.Activity;
-import org.camunda.bpm.model.bpmn.instance.BaseElement;
-import org.camunda.bpm.model.bpmn.instance.BpmnModelElementInstance;
-import org.camunda.bpm.model.bpmn.instance.CompensateEventDefinition;
-import org.camunda.bpm.model.bpmn.instance.Definitions;
+import org.camunda.bpm.model.bpmn.instance.*;
 import org.camunda.bpm.model.bpmn.instance.Error;
-import org.camunda.bpm.model.bpmn.instance.ErrorEventDefinition;
-import org.camunda.bpm.model.bpmn.instance.Escalation;
-import org.camunda.bpm.model.bpmn.instance.EscalationEventDefinition;
-import org.camunda.bpm.model.bpmn.instance.Event;
-import org.camunda.bpm.model.bpmn.instance.ExtensionElements;
-import org.camunda.bpm.model.bpmn.instance.FlowNode;
-import org.camunda.bpm.model.bpmn.instance.Gateway;
-import org.camunda.bpm.model.bpmn.instance.Message;
-import org.camunda.bpm.model.bpmn.instance.MessageEventDefinition;
-import org.camunda.bpm.model.bpmn.instance.SequenceFlow;
-import org.camunda.bpm.model.bpmn.instance.Signal;
-import org.camunda.bpm.model.bpmn.instance.SignalEventDefinition;
-import org.camunda.bpm.model.bpmn.instance.SubProcess;
 import org.camunda.bpm.model.bpmn.instance.bpmndi.BpmnEdge;
 import org.camunda.bpm.model.bpmn.instance.bpmndi.BpmnPlane;
 import org.camunda.bpm.model.bpmn.instance.bpmndi.BpmnShape;
@@ -346,13 +329,13 @@ public abstract class AbstractBaseElementBuilder<B extends AbstractBaseElementBu
     shapeBounds.setY(y);
   }
 
-  public BpmnEdge createBpmnEdge(SequenceFlow sequenceFlow) {
+  public BpmnEdge createBpmnEdge(BaseElement baseElement) {
     BpmnPlane bpmnPlane = findBpmnPlane();
     if (bpmnPlane != null) {
 
 
        BpmnEdge edge = createInstance(BpmnEdge.class);
-       edge.setBpmnElement(sequenceFlow);
+       edge.setBpmnElement(baseElement);
        setWaypoints(edge);
 
        bpmnPlane.addChildElement(edge);
@@ -363,13 +346,28 @@ public abstract class AbstractBaseElementBuilder<B extends AbstractBaseElementBu
   }
 
   protected void setWaypoints(BpmnEdge edge) {
-    SequenceFlow sequenceFlow = (SequenceFlow) edge.getBpmnElement();
+    BaseElement bpmnElement = edge.getBpmnElement();
 
-    FlowNode sequenceFlowSource = sequenceFlow.getSource();
-    FlowNode sequenceFlowTarget = sequenceFlow.getTarget();
+    FlowNode edgeSource = null;
+    FlowNode edgeTarget = null;
+    if (bpmnElement instanceof SequenceFlow) {
 
-    BpmnShape source = findBpmnShape(sequenceFlowSource);
-    BpmnShape target = findBpmnShape(sequenceFlowTarget);
+      SequenceFlow sequenceFlow = (SequenceFlow) bpmnElement;
+
+      edgeSource = sequenceFlow.getSource();
+      edgeTarget = sequenceFlow.getTarget();
+
+    }else if(bpmnElement instanceof Association){
+      Association association = (Association) bpmnElement;
+
+      edgeSource = (FlowNode) association.getSource();
+      edgeTarget = (FlowNode) association.getTarget();
+    }else{
+      throw new RuntimeException("Bpmn element type not supported");
+    }
+
+    BpmnShape source = findBpmnShape(edgeSource);
+    BpmnShape target = findBpmnShape(edgeTarget);
 
     if (source != null && target != null) {
 
@@ -387,13 +385,12 @@ public abstract class AbstractBaseElementBuilder<B extends AbstractBaseElementBu
 
       Waypoint w1 = createInstance(Waypoint.class);
 
-      if (sequenceFlowSource.getOutgoing().size() == 1) {
+      if (edgeSource.getOutgoing().size() == 1) {
         w1.setX(sourceX + sourceWidth);
         w1.setY(sourceY + sourceHeight / 2);
 
         edge.addChildElement(w1);
-      }
-      else {
+      } else {
         w1.setX(sourceX + sourceWidth / 2);
         w1.setY(sourceY + sourceHeight);
 

@@ -13,30 +13,10 @@
 
 package org.camunda.bpm.model.bpmn.builder;
 
+import org.camunda.bpm.model.bpmn.AssociationDirection;
 import org.camunda.bpm.model.bpmn.BpmnModelException;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.camunda.bpm.model.bpmn.instance.Activity;
-import org.camunda.bpm.model.bpmn.instance.BusinessRuleTask;
-import org.camunda.bpm.model.bpmn.instance.CallActivity;
-import org.camunda.bpm.model.bpmn.instance.ConditionExpression;
-import org.camunda.bpm.model.bpmn.instance.EndEvent;
-import org.camunda.bpm.model.bpmn.instance.EventBasedGateway;
-import org.camunda.bpm.model.bpmn.instance.ExclusiveGateway;
-import org.camunda.bpm.model.bpmn.instance.FlowNode;
-import org.camunda.bpm.model.bpmn.instance.Gateway;
-import org.camunda.bpm.model.bpmn.instance.InclusiveGateway;
-import org.camunda.bpm.model.bpmn.instance.IntermediateCatchEvent;
-import org.camunda.bpm.model.bpmn.instance.IntermediateThrowEvent;
-import org.camunda.bpm.model.bpmn.instance.ManualTask;
-import org.camunda.bpm.model.bpmn.instance.ParallelGateway;
-import org.camunda.bpm.model.bpmn.instance.ReceiveTask;
-import org.camunda.bpm.model.bpmn.instance.ScriptTask;
-import org.camunda.bpm.model.bpmn.instance.SendTask;
-import org.camunda.bpm.model.bpmn.instance.SequenceFlow;
-import org.camunda.bpm.model.bpmn.instance.ServiceTask;
-import org.camunda.bpm.model.bpmn.instance.SubProcess;
-import org.camunda.bpm.model.bpmn.instance.Transaction;
-import org.camunda.bpm.model.bpmn.instance.UserTask;
+import org.camunda.bpm.model.bpmn.instance.*;
 import org.camunda.bpm.model.bpmn.instance.bpmndi.BpmnShape;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaExecutionListener;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaFailedJobRetryTimeCycle;
@@ -48,6 +28,7 @@ import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 public abstract class AbstractFlowNodeBuilder<B extends AbstractFlowNodeBuilder<B, E>, E extends FlowNode> extends AbstractFlowElementBuilder<B, E> {
 
   private SequenceFlowBuilder currentSequenceFlowBuilder;
+  protected BoundaryEvent compensateBoundaryEvent;
 
   protected AbstractFlowNodeBuilder(BpmnModelInstance modelInstance, E element, Class<?> selfType) {
     super(modelInstance, element, selfType);
@@ -72,11 +53,47 @@ public abstract class AbstractFlowNodeBuilder<B extends AbstractFlowNodeBuilder<
   }
 
   protected void connectTarget(FlowNode target) {
+    // check if boundary event is set
+    if (compensateBoundaryEvent != null) {
+      // check that you are only creating new tasks from the compensate boundary event
+      if (element instanceof BoundaryEvent) {
+        // the activity is ready for for compensation
+        if (target instanceof Activity) {
+          ((Activity) target).setForCompensation(true);
+        }
+        // connect the target via association instead of sequence flow
+        connectTargetWithAssociation(target);
+        return;
+      } else {
+        throw new RuntimeException("Compensate events can only contain one task");
+      }
+    }
+    connectTargetWithSequenceFlow(target);
+  }
+
+  protected void connectTargetWithSequenceFlow(FlowNode target) {
     getCurrentSequenceFlowBuilder().from(element).to(target);
 
     SequenceFlow sequenceFlow = getCurrentSequenceFlowBuilder().getElement();
     createBpmnEdge(sequenceFlow);
     currentSequenceFlowBuilder = null;
+  }
+
+  protected void connectTargetWithAssociation(FlowNode target) {
+    Association association = modelInstance.newInstance(Association.class);
+    association.setTarget(target);
+    association.setSource(element);
+    association.setAssociationDirection(AssociationDirection.One);
+    element.getParentElement().addChildElement(association);
+
+    createBpmnEdge(association);
+  }
+
+  public AbstractFlowNodeBuilder compensationDone(){
+    if(compensateBoundaryEvent != null){
+      return compensateBoundaryEvent.getAttachedTo().builder();
+    }
+    throw new RuntimeException("Compensation not initialized.");
   }
 
   public B sequenceFlowId(String sequenceFlowId) {
@@ -98,60 +115,75 @@ public abstract class AbstractFlowNodeBuilder<B extends AbstractFlowNodeBuilder<
     return target;
   }
 
+  @SuppressWarnings("unchecked")
+  protected <T extends AbstractFlowNodeBuilder, F extends FlowNode> T createTargetBuilder(Class<F> typeClass) {
+    AbstractFlowNodeBuilder builder = createTarget(typeClass).builder();
+    builder.compensateBoundaryEvent = compensateBoundaryEvent;
+    return (T) builder;
+  }
+
+  @SuppressWarnings("unchecked")
+  protected <T extends AbstractFlowNodeBuilder, F extends FlowNode> T createTargetBuilder(Class<F> typeClass, String id) {
+    AbstractFlowNodeBuilder builder = createTarget(typeClass, id).builder();
+    builder.compensateBoundaryEvent = compensateBoundaryEvent;
+    return (T) builder;
+
+  }
+
   public ServiceTaskBuilder serviceTask() {
-    return createTarget(ServiceTask.class).builder();
+    return createTargetBuilder(ServiceTask.class);
   }
 
   public ServiceTaskBuilder serviceTask(String id) {
-    return createTarget(ServiceTask.class, id).builder();
+    return createTargetBuilder(ServiceTask.class, id);
   }
 
   public SendTaskBuilder sendTask() {
-    return createTarget(SendTask.class).builder();
+    return createTargetBuilder(SendTask.class);
   }
 
   public SendTaskBuilder sendTask(String id) {
-    return createTarget(SendTask.class, id).builder();
+    return createTargetBuilder(SendTask.class, id);
   }
 
   public UserTaskBuilder userTask() {
-    return createTarget(UserTask.class).builder();
+    return createTargetBuilder(UserTask.class);
   }
 
   public UserTaskBuilder userTask(String id) {
-    return createTarget(UserTask.class, id).builder();
+    return createTargetBuilder(UserTask.class, id);
   }
 
   public BusinessRuleTaskBuilder businessRuleTask() {
-    return createTarget(BusinessRuleTask.class).builder();
+    return createTargetBuilder(BusinessRuleTask.class);
   }
 
   public BusinessRuleTaskBuilder businessRuleTask(String id) {
-    return createTarget(BusinessRuleTask.class, id).builder();
+    return createTargetBuilder(BusinessRuleTask.class, id);
   }
 
   public ScriptTaskBuilder scriptTask() {
-    return createTarget(ScriptTask.class).builder();
+    return createTargetBuilder(ScriptTask.class);
   }
 
   public ScriptTaskBuilder scriptTask(String id) {
-    return createTarget(ScriptTask.class, id).builder();
+    return createTargetBuilder(ScriptTask.class, id);
   }
 
   public ReceiveTaskBuilder receiveTask() {
-    return createTarget(ReceiveTask.class).builder();
+    return createTargetBuilder(ReceiveTask.class);
   }
 
   public ReceiveTaskBuilder receiveTask(String id) {
-    return createTarget(ReceiveTask.class, id).builder();
+    return createTargetBuilder(ReceiveTask.class, id);
   }
 
   public ManualTaskBuilder manualTask() {
-    return createTarget(ManualTask.class).builder();
+    return createTargetBuilder(ManualTask.class);
   }
 
   public ManualTaskBuilder manualTask(String id) {
-    return createTarget(ManualTask.class, id).builder();
+    return createTargetBuilder(ManualTask.class, id);
   }
 
   public EndEventBuilder endEvent() {
@@ -406,4 +438,24 @@ public abstract class AbstractFlowNodeBuilder<B extends AbstractFlowNodeBuilder<
 
     return myself;
   }
+
+  public B compensationStart() {
+    if (element instanceof BoundaryEvent) {
+      BoundaryEvent boundaryEvent = (BoundaryEvent) element;
+      for (EventDefinition eventDefinition : boundaryEvent.getEventDefinitions()) {
+        if(eventDefinition instanceof CompensateEventDefinition) {
+          // if the boundary event is defined as a compensate event then
+          // save the boundary event as compensateBoundaryEvent
+
+          compensateBoundaryEvent =boundaryEvent;
+          return myself;
+        }
+        // Compensate Event was not defined
+        throw new RuntimeException("No compensate event definition found in boundary event");
+      }
+    }
+    // Was not a boundary event
+    throw new RuntimeException("Not a boundary event");
+  }
+
 }

@@ -39,14 +39,14 @@ import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TRANSACTION_ID;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN20_NS;
 import static org.junit.Assert.assertNotNull;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.camunda.bpm.model.bpmn.Bpmn;
-import org.camunda.bpm.model.bpmn.BpmnModelException;
-import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.bpm.model.bpmn.*;
+
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.BOUNDARY_ID;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.CATCH_ID;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.CONDITION_ID;
@@ -55,48 +55,10 @@ import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_CONDITIONAL_VARI
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_CONDITIONAL_VARIABLE_EVENTS_LIST;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_CONDITIONAL_VARIABLE_NAME;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.USER_TASK_ID;
-import org.camunda.bpm.model.bpmn.GatewayDirection;
-import org.camunda.bpm.model.bpmn.TransactionMethod;
-import org.camunda.bpm.model.bpmn.instance.Activity;
-import org.camunda.bpm.model.bpmn.instance.BaseElement;
-import org.camunda.bpm.model.bpmn.instance.BoundaryEvent;
-import org.camunda.bpm.model.bpmn.instance.BpmnModelElementInstance;
-import org.camunda.bpm.model.bpmn.instance.BusinessRuleTask;
-import org.camunda.bpm.model.bpmn.instance.CallActivity;
-import org.camunda.bpm.model.bpmn.instance.CompensateEventDefinition;
-import org.camunda.bpm.model.bpmn.instance.ConditionalEventDefinition;
-import org.camunda.bpm.model.bpmn.instance.Definitions;
-import org.camunda.bpm.model.bpmn.instance.EndEvent;
+
+import org.camunda.bpm.model.bpmn.instance.*;
 import org.camunda.bpm.model.bpmn.instance.Error;
-import org.camunda.bpm.model.bpmn.instance.ErrorEventDefinition;
-import org.camunda.bpm.model.bpmn.instance.Escalation;
-import org.camunda.bpm.model.bpmn.instance.EscalationEventDefinition;
-import org.camunda.bpm.model.bpmn.instance.Event;
-import org.camunda.bpm.model.bpmn.instance.EventDefinition;
-import org.camunda.bpm.model.bpmn.instance.ExtensionElements;
-import org.camunda.bpm.model.bpmn.instance.FlowNode;
-import org.camunda.bpm.model.bpmn.instance.Gateway;
-import org.camunda.bpm.model.bpmn.instance.InclusiveGateway;
-import org.camunda.bpm.model.bpmn.instance.Message;
-import org.camunda.bpm.model.bpmn.instance.MessageEventDefinition;
-import org.camunda.bpm.model.bpmn.instance.MultiInstanceLoopCharacteristics;
 import org.camunda.bpm.model.bpmn.instance.Process;
-import org.camunda.bpm.model.bpmn.instance.ReceiveTask;
-import org.camunda.bpm.model.bpmn.instance.ScriptTask;
-import org.camunda.bpm.model.bpmn.instance.SendTask;
-import org.camunda.bpm.model.bpmn.instance.SequenceFlow;
-import org.camunda.bpm.model.bpmn.instance.ServiceTask;
-import org.camunda.bpm.model.bpmn.instance.Signal;
-import org.camunda.bpm.model.bpmn.instance.SignalEventDefinition;
-import org.camunda.bpm.model.bpmn.instance.StartEvent;
-import org.camunda.bpm.model.bpmn.instance.SubProcess;
-import org.camunda.bpm.model.bpmn.instance.Task;
-import org.camunda.bpm.model.bpmn.instance.TimeCycle;
-import org.camunda.bpm.model.bpmn.instance.TimeDate;
-import org.camunda.bpm.model.bpmn.instance.TimeDuration;
-import org.camunda.bpm.model.bpmn.instance.TimerEventDefinition;
-import org.camunda.bpm.model.bpmn.instance.Transaction;
-import org.camunda.bpm.model.bpmn.instance.UserTask;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaExecutionListener;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaFailedJobRetryTimeCycle;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaFormData;
@@ -1963,6 +1925,57 @@ public class ProcessBuilderTest {
     ErrorEventDefinition errorEventDefinition = assertAndGetSingleEventDefinition("boundary", ErrorEventDefinition.class);
     assertThat(errorEventDefinition.getError()).isNull();
   }
+
+  @Test
+  public void testCompensationTask() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .userTask("task")
+      .boundaryEvent("boundary")
+        .compensateEventDefinition().compensateEventDefinitionDone()
+        .compensationStart()
+        .userTask("compensate").name("compensate")
+        .compensationDone()
+      .endEvent("theend")
+      .done();
+
+    // Checking Association
+    Collection<Association> associations = modelInstance.getModelElementsByType(Association.class);
+    assertThat(associations).hasSize(1);
+    Association association = associations.iterator().next();
+    assertThat(association.getSource().getId()).isEqualTo("boundary");
+    assertThat(association.getTarget().getId()).isEqualTo("compensate");
+    assertThat(association.getAssociationDirection()).isEqualTo(AssociationDirection.One);
+
+    // Checking Sequence flow
+    UserTask task = modelInstance.getModelElementById("task");
+    Collection<SequenceFlow> outgoing = task.getOutgoing();
+    assertThat(outgoing).hasSize(1);
+    SequenceFlow flow = outgoing.iterator().next();
+    assertThat(flow.getSource().getId()).isEqualTo("task");
+    assertThat(flow.getTarget().getId()).isEqualTo("theend");
+
+  }
+
+  @Test
+  public void testOnlyOneCompensateBoundaryEventAllowed() {
+    UserTaskBuilder builder = Bpmn.createProcess()
+      .startEvent()
+      .userTask("task")
+      .boundaryEvent("boundary")
+      .compensateEventDefinition().compensateEventDefinitionDone()
+      .compensationStart()
+      .userTask("compensate").name("compensate");
+
+    try {
+      builder.userTask();
+      fail("Exception Expected");
+    } catch(RuntimeException e) {
+      assertThat(e).hasMessage("Compensate events can only contain one task");
+    }
+  }
+
+
 
   @Test
   public void testErrorBoundaryEvent() {

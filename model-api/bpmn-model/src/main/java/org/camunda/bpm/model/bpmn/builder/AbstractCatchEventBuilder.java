@@ -14,9 +14,11 @@
 package org.camunda.bpm.model.bpmn.builder;
 
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.bpm.model.bpmn.instance.BoundaryEvent;
 import org.camunda.bpm.model.bpmn.instance.CatchEvent;
 import org.camunda.bpm.model.bpmn.instance.CompensateEventDefinition;
 import org.camunda.bpm.model.bpmn.instance.ConditionalEventDefinition;
+import org.camunda.bpm.model.bpmn.instance.EventDefinition;
 import org.camunda.bpm.model.bpmn.instance.MessageEventDefinition;
 import org.camunda.bpm.model.bpmn.instance.SignalEventDefinition;
 import org.camunda.bpm.model.bpmn.instance.TimeCycle;

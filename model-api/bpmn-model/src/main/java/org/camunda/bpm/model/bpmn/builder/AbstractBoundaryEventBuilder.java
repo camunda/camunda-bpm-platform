@@ -14,11 +14,7 @@
 package org.camunda.bpm.model.bpmn.builder;
 
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.camunda.bpm.model.bpmn.instance.BoundaryEvent;
-import org.camunda.bpm.model.bpmn.instance.ErrorEventDefinition;
-import org.camunda.bpm.model.bpmn.instance.EscalationEventDefinition;
-import org.camunda.bpm.model.bpmn.instance.FlowNode;
-import org.camunda.bpm.model.bpmn.instance.SequenceFlow;
+import org.camunda.bpm.model.bpmn.instance.*;
 import org.camunda.bpm.model.bpmn.instance.bpmndi.BpmnEdge;
 import org.camunda.bpm.model.bpmn.instance.bpmndi.BpmnShape;
 import org.camunda.bpm.model.bpmn.instance.dc.Bounds;
@@ -153,13 +149,31 @@ public abstract class AbstractBoundaryEventBuilder<B extends AbstractBoundaryEve
 
   @Override
   protected void setWaypoints(BpmnEdge edge) {
-    SequenceFlow sequenceFlow = (SequenceFlow) edge.getBpmnElement();
 
-    FlowNode sourceFlowNode = sequenceFlow.getSource();
-    FlowNode targetFlowNode = sequenceFlow.getTarget();
 
-    BpmnShape source = findBpmnShape(sourceFlowNode);
-    BpmnShape target = findBpmnShape(targetFlowNode);
+    BaseElement bpmnElement = edge.getBpmnElement();
+
+    FlowNode edgeSource = null;
+    FlowNode edgeTarget = null;
+    if (bpmnElement instanceof SequenceFlow) {
+
+      SequenceFlow sequenceFlow = (SequenceFlow) bpmnElement;
+
+      edgeSource = sequenceFlow.getSource();
+      edgeTarget = sequenceFlow.getTarget();
+
+    }else if(bpmnElement instanceof Association){
+      Association association = (Association) bpmnElement;
+
+      edgeSource = (FlowNode) association.getSource();
+      edgeTarget = (FlowNode) association.getTarget();
+    }else{
+      throw new RuntimeException("Bpmn element type not supported");
+    }
+
+
+    BpmnShape source = findBpmnShape(edgeSource);
+    BpmnShape target = findBpmnShape(edgeTarget);
 
     if (source != null && target != null) {
       Bounds sourceBounds = source.getBounds();

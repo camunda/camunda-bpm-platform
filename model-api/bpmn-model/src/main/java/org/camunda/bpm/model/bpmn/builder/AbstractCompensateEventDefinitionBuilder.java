@@ -18,8 +18,10 @@ package org.camunda.bpm.model.bpmn.builder;
 import org.camunda.bpm.model.bpmn.BpmnModelException;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.Activity;
+import org.camunda.bpm.model.bpmn.instance.BoundaryEvent;
 import org.camunda.bpm.model.bpmn.instance.CompensateEventDefinition;
 import org.camunda.bpm.model.bpmn.instance.Event;
+import org.camunda.bpm.model.bpmn.instance.EventDefinition;
 
 public abstract class AbstractCompensateEventDefinitionBuilder<B extends AbstractCompensateEventDefinitionBuilder<B>> extends AbstractRootElementBuilder<B, CompensateEventDefinition>{
 
