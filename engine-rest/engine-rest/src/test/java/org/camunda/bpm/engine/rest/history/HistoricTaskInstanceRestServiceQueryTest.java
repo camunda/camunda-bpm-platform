@@ -1528,6 +1528,121 @@ public class HistoricTaskInstanceRestServiceQueryTest extends AbstractRestServic
     verify(mockedQuery).taskFollowUpAfter(DateTimeUtil.parseDate(followUp));
   }
 
+    @Test
+    public void testQueryByStartedBefore() {
+      String startedBefore = MockProvider.EXAMPLE_HISTORIC_TASK_INST_START_TIME;
+
+      given()
+        .queryParam("startedBefore", startedBefore)
+        .then().expect().statusCode(Status.OK.getStatusCode())
+        .when().get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+
+      verify(mockedQuery).startedBefore(DateTimeUtil.parseDate(startedBefore));
+    }
+
+    @Test
+    public void testQueryByStartedBeforeAsPost() {
+      String startedBefore = MockProvider.EXAMPLE_HISTORIC_TASK_INST_START_TIME;
+
+      Map<String, Object> params = new HashMap<String, Object>();
+      params.put("startedBefore", DateTimeUtil.parseDate(startedBefore));
+
+      given()
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(params)
+        .then().expect().statusCode(Status.OK.getStatusCode())
+        .when().post(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+
+      verify(mockedQuery).startedBefore(DateTimeUtil.parseDate(startedBefore));
+    }
+
+
+    @Test
+    public void testQueryByStartedAfter() {
+      String startedAfter = MockProvider.EXAMPLE_HISTORIC_TASK_INST_START_TIME;
+
+      given()
+        .queryParam("startedAfter", startedAfter)
+        .then().expect().statusCode(Status.OK.getStatusCode())
+        .when().get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+
+      verify(mockedQuery).startedAfter(DateTimeUtil.parseDate(startedAfter));
+    }
+
+    @Test
+    public void testQueryByStartedAfterAsPost() {
+      String startedAfter = MockProvider.EXAMPLE_HISTORIC_TASK_INST_START_TIME;
+
+      Map<String, Object> params = new HashMap<String, Object>();
+      params.put("startedAfter", DateTimeUtil.parseDate(startedAfter));
+
+      given()
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(params)
+        .then().expect().statusCode(Status.OK.getStatusCode())
+        .when().post(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+
+      verify(mockedQuery).startedAfter(DateTimeUtil.parseDate(startedAfter));
+    }
+
+
+    @Test
+    public void testQueryByFinishedBefore() {
+      String finishedBefore = MockProvider.EXAMPLE_HISTORIC_TASK_INST_END_TIME;
+
+      given()
+        .queryParam("finishedBefore", finishedBefore)
+        .then().expect().statusCode(Status.OK.getStatusCode())
+        .when().get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+
+      verify(mockedQuery).finishedBefore(DateTimeUtil.parseDate(finishedBefore));
+    }
+
+    @Test
+    public void testQueryByFinishedBeforeAsPost() {
+      String finishedBefore = MockProvider.EXAMPLE_HISTORIC_TASK_INST_END_TIME;
+
+      Map<String, Object> params = new HashMap<String, Object>();
+      params.put("finishedBefore", DateTimeUtil.parseDate(finishedBefore));
+
+      given()
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(params)
+        .then().expect().statusCode(Status.OK.getStatusCode())
+        .when().post(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+
+      verify(mockedQuery).finishedBefore(DateTimeUtil.parseDate(finishedBefore));
+    }
+
+
+    @Test
+    public void testQueryByFinishedAfter() {
+      String finishedAfter = MockProvider.EXAMPLE_HISTORIC_TASK_INST_END_TIME;
+
+      given()
+        .queryParam("finishedAfter", finishedAfter)
+        .then().expect().statusCode(Status.OK.getStatusCode())
+        .when().get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+
+      verify(mockedQuery).finishedAfter(DateTimeUtil.parseDate(finishedAfter));
+    }
+
+    @Test
+    public void testQueryByFinishedAfterAsPost() {
+      String finishedAfter = MockProvider.EXAMPLE_HISTORIC_TASK_INST_END_TIME;
+
+      Map<String, Object> params = new HashMap<String, Object>();
+      params.put("finishedAfter", DateTimeUtil.parseDate(finishedAfter));
+
+      given()
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(params)
+        .then().expect().statusCode(Status.OK.getStatusCode())
+        .when().post(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+
+      verify(mockedQuery).finishedAfter(DateTimeUtil.parseDate(finishedAfter));
+    }
+
   @Test
   public void testQueryByTaskVariable() {
     String variableName = "varName";
