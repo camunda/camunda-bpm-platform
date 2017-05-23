@@ -226,6 +226,16 @@ public class DecisionDefinitionRestServiceQueryTest extends AbstractRestServiceT
     executeAndVerifySorting("tenantId", "desc", Status.OK);
     inOrder.verify(mockedQuery).orderByTenantId();
     inOrder.verify(mockedQuery).desc();
+
+    inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySorting("versionTag", "asc", Status.OK);
+    inOrder.verify(mockedQuery).orderByVersionTag();
+    inOrder.verify(mockedQuery).asc();
+
+    inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySorting("versionTag", "desc", Status.OK);
+    inOrder.verify(mockedQuery).orderByVersionTag();
+    inOrder.verify(mockedQuery).asc();
   }
 
   @Test
@@ -391,6 +401,8 @@ public class DecisionDefinitionRestServiceQueryTest extends AbstractRestServiceT
     verify(mockedQuery).decisionDefinitionResourceNameLike(queryParameters.get("resourceNameLike"));
     verify(mockedQuery).decisionRequirementsDefinitionId(queryParameters.get("decisionRequirementsDefinitionId"));
     verify(mockedQuery).decisionRequirementsDefinitionKey(queryParameters.get("decisionRequirementsDefinitionKey"));
+    verify(mockedQuery).versionTag(queryParameters.get("versionTag"));
+    verify(mockedQuery).versionTagLike(queryParameters.get("versionTagLike"));
     verify(mockedQuery).withoutDecisionRequirementsDefinition();
     verify(mockedQuery).list();
   }
@@ -482,6 +494,24 @@ public class DecisionDefinitionRestServiceQueryTest extends AbstractRestServiceT
     verify(mockedQuery).count();
   }
 
+  @Test
+  public void testDecisionDefinitionVersionTag() {
+    List<DecisionDefinition> decisionDefinitions = Arrays.asList(
+      MockProvider.mockDecisionDefinition().versionTag(MockProvider.EXAMPLE_VERSION_TAG).build(),
+      MockProvider.mockDecisionDefinition().id(MockProvider.ANOTHER_EXAMPLE_DECISION_DEFINITION_ID).versionTag(MockProvider.ANOTHER_EXAMPLE_VERSION_TAG).build());
+    mockedQuery = createMockDecisionDefinitionQuery(decisionDefinitions);
+
+    given()
+      .queryParam("versionTag", MockProvider.EXAMPLE_VERSION_TAG)
+      .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .when()
+      .get(DECISION_DEFINITION_QUERY_URL);
+
+    verify(mockedQuery).versionTag(MockProvider.EXAMPLE_VERSION_TAG);
+    verify(mockedQuery).list();
+  }
+
   private Map<String, String> getCompleteQueryParameters() {
     Map<String, String> parameters = new HashMap<String, String>();
 
@@ -500,6 +530,8 @@ public class DecisionDefinitionRestServiceQueryTest extends AbstractRestServiceT
     parameters.put("decisionRequirementsDefinitionId", MockProvider.EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_ID);
     parameters.put("decisionRequirementsDefinitionKey", MockProvider.EXAMPLE_DECISION_REQUIREMENTS_DEFINITION_KEY);
     parameters.put("withoutDecisionRequirementsDefinition", "true");
+    parameters.put("versionTag", "semVer");
+    parameters.put("versionTagLike", "semVerLike");
 
     return parameters;
   }

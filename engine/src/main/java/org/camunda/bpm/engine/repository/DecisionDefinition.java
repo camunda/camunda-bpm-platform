@@ -33,4 +33,7 @@ public interface DecisionDefinition extends ResourceDefinition {
    */
   String getDecisionRequirementsDefinitionKey();
 
+  /** Version tag of the decision definition. */
+  String getVersionTag();
+
 }

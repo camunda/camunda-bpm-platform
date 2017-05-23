@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.test.api.repository;
 
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.test.Deployment;
 
@@ -41,5 +42,27 @@ public class VersionTagTest extends PluggableProcessEngineTestCase {
       .singleResult();
 
     assertEquals(null, process.getVersionTag());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/repository/versionTag.dmn"})
+  public void testParsingVersionTagDecisionDefinition() {
+    DecisionDefinition decision = repositoryService
+    .createDecisionDefinitionQuery()
+    .orderByDecisionDefinitionVersion()
+    .asc()
+    .singleResult();
+
+    assertEquals("1.0.0", decision.getVersionTag());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/repository/noVersionTag.dmn"})
+  public void testParsingNullVersionTagDecisionDefinition() {
+    DecisionDefinition decision = repositoryService
+      .createDecisionDefinitionQuery()
+    .orderByDecisionDefinitionVersion()
+    .asc()
+    .singleResult();
+
+    assertEquals(null, decision.getVersionTag());
   }
 }

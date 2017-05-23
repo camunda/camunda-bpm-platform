@@ -51,6 +51,9 @@ public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitio
   protected String[] tenantIds;
   protected boolean includeDefinitionsWithoutTenantId = false;
 
+  protected String versionTag;
+  protected String versionTagLike;
+
   public DecisionDefinitionQueryImpl() {
   }
 
@@ -149,6 +152,20 @@ public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitio
     return this;
   }
 
+  @Override
+  public DecisionDefinitionQuery versionTag(String versionTag) {
+    ensureNotNull(NotValidException.class, "versionTag", versionTag);
+    this.versionTag = versionTag;
+    return this;
+  }
+
+  @Override
+  public DecisionDefinitionQuery versionTagLike(String versionTagLike) {
+    ensureNotNull(NotValidException.class, "versionTagLike", versionTagLike);
+    this.versionTagLike = versionTagLike;
+    return this;
+  }
+
   public DecisionDefinitionQuery withoutDecisionRequirementsDefinition() {
     withoutDecisionRequirementsDefinition = true;
     return this;
@@ -204,6 +221,11 @@ public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitio
 
   public DecisionDefinitionQuery orderByTenantId() {
     return orderBy(DecisionDefinitionQueryProperty.TENANT_ID);
+  }
+
+  @Override
+  public DecisionDefinitionQuery orderByVersionTag() {
+    return orderBy(DecisionDefinitionQueryProperty.VERSION_TAG);
   }
 
   //results ////////////////////////////////////////////
@@ -284,8 +306,15 @@ public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitio
     return version;
   }
 
+  public String getVersionTag() {
+    return versionTag;
+  }
+
+  public String getVersionTagLike() {
+    return versionTagLike;
+  }
+
   public boolean isLatest() {
     return latest;
   }
-
 }

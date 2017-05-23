@@ -30,6 +30,7 @@ public class MockDecisionDefinitionBuilder {
   private String tenantId = null;
   private String decisionRequirementsDefinitionId = null;
   private String decisionRequirementsDefinitionKey = null;
+  private String versionTag = null;
 
   public MockDecisionDefinitionBuilder id(String id) {
     this.id = id;
@@ -86,6 +87,11 @@ public class MockDecisionDefinitionBuilder {
     return this;
   }
 
+  public MockDecisionDefinitionBuilder versionTag(String versionTag) {
+    this.versionTag = versionTag;
+    return this;
+  }
+
   public DecisionDefinition build() {
     DecisionDefinition mockDefinition = mock(DecisionDefinition.class);
 
@@ -100,6 +106,7 @@ public class MockDecisionDefinitionBuilder {
     when(mockDefinition.getTenantId()).thenReturn(tenantId);
     when(mockDefinition.getDecisionRequirementsDefinitionId()).thenReturn(decisionRequirementsDefinitionId);
     when(mockDefinition.getDecisionRequirementsDefinitionKey()).thenReturn(decisionRequirementsDefinitionKey);
+    when(mockDefinition.getVersionTag()).thenReturn(versionTag);
 
     return mockDefinition;
   }

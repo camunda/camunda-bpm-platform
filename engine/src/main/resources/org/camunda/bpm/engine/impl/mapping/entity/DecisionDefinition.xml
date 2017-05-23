@@ -20,6 +20,7 @@
       DEC_REQ_KEY_,
       TENANT_ID_,
       HISTORY_TTL_,
+      VERSION_TAG_,
       REV_)
     values (#{id, jdbcType=VARCHAR},
             #{category, jdbcType=VARCHAR},
@@ -33,6 +34,7 @@
             #{decisionRequirementsDefinitionKey, jdbcType=VARCHAR},
             #{tenantId, jdbcType=VARCHAR},
             #{historyTimeToLive, jdbcType=INTEGER},
+            #{versionTag, jdbcType=VARCHAR},
             1
            )
   </insert>
@@ -69,6 +71,7 @@
     <result property="decisionRequirementsDefinitionKey" column="DEC_REQ_KEY_" jdbcType="VARCHAR"/>
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR"/>
     <result property="historyTimeToLive" column="HISTORY_TTL_" jdbcType="INTEGER" />
+    <result property="versionTag" column="VERSION_TAG_" jdbcType="VARCHAR" />
   </resultMap>
 
   <!-- DECISIONDEFINITION SELECT -->
@@ -244,6 +247,12 @@
       </if>
       <if test="name != null">
         and RES.NAME_ = #{name}
+      </if>
+      <if test="versionTag != null">
+        and RES.VERSION_TAG_ = #{versionTag}
+      </if>
+      <if test="versionTagLike != null">
+        and RES.VERSION_TAG_ like #{versionTagLike} ESCAPE #{escapeChar}
       </if>
       <if test="nameLike != null">
         and RES.NAME_ like #{nameLike} ESCAPE #{escapeChar}

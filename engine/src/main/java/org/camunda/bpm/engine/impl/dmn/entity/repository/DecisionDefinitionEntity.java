@@ -53,6 +53,7 @@ public class DecisionDefinitionEntity extends DmnDecisionImpl implements Decisio
   protected String previousDecisionDefinitionId;
 
   protected Integer historyTimeToLive;
+  protected String versionTag;
 
   public DecisionDefinitionEntity() {
 
@@ -267,6 +268,15 @@ public class DecisionDefinitionEntity extends DmnDecisionImpl implements Decisio
   }
 
   @Override
+  public String getVersionTag() {
+    return versionTag;
+  }
+
+  public void setVersionTag(String versionTag) {
+    this.versionTag = versionTag;
+  }
+
+  @Override
   public String toString() {
     return "DecisionDefinitionEntity{" +
       "id='" + id + '\'' +
@@ -274,6 +284,7 @@ public class DecisionDefinitionEntity extends DmnDecisionImpl implements Decisio
       ", category='" + category + '\'' +
       ", key='" + key + '\'' +
       ", version=" + version +
+      ", versionTag=" + versionTag +
       ", decisionRequirementsDefinitionId='" + decisionRequirementsDefinitionId + '\'' +
       ", decisionRequirementsDefinitionKey='" + decisionRequirementsDefinitionKey + '\'' +
       ", deploymentId='" + deploymentId + '\'' +
