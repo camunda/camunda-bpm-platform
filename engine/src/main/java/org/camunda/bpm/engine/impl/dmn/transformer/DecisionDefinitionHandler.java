@@ -37,7 +37,8 @@ public class DecisionDefinitionHandler extends DmnDecisionTransformHandler {
     final Integer historyTimeToLive = decision.getCamundaHistoryTimeToLive();
     validateHistoryTimeToLive(historyTimeToLive);
     decisionDefinition.setHistoryTimeToLive(historyTimeToLive);
-
+    decisionDefinition.setVersionTag(decision.getVersionTag());
+    
     return decisionDefinition;
   }
 
