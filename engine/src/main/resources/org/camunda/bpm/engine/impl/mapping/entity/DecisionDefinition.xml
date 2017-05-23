@@ -248,6 +248,12 @@
       <if test="name != null">
         and RES.NAME_ = #{name}
       </if>
+      <if test="versionTag != null">
+        and RES.VERSION_TAG_ = #{versionTag}
+      </if>
+      <if test="versionTagLike != null">
+        and RES.VERSION_TAG_ like #{versionTagLike} ESCAPE #{escapeChar}
+      </if>
       <if test="nameLike != null">
         and RES.NAME_ like #{nameLike} ESCAPE #{escapeChar}
       </if>

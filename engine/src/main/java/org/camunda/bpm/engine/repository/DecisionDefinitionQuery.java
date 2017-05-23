@@ -148,6 +148,16 @@ public interface DecisionDefinitionQuery extends Query<DecisionDefinitionQuery, 
    * combination with {@link #tenantIdIn(String...)}.
    */
   DecisionDefinitionQuery includeDecisionDefinitionsWithoutTenantId();
+  
+  /**
+   * Only selects decision definitions with a specific version tag
+   */
+  DecisionDefinitionQuery versionTag(String versionTag);
+
+  /**
+   * Only selects decision definitions with a version tag like the given
+   */
+  DecisionDefinitionQuery versionTagLike(String versionTagLike);
 
   // ordering ////////////////////////////////////////////////////////////
 
@@ -178,5 +188,14 @@ public interface DecisionDefinitionQuery extends Query<DecisionDefinitionQuery, 
   /** Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
    * Note that the ordering of decision definitions without tenant id is database-specific. */
   DecisionDefinitionQuery orderByTenantId();
+  
+  /**
+   * Order by version tag (needs to be followed by {@link #asc()} or {@link #desc()}).
+   *
+   * <strong>Note:</strong> sorting by versionTag is a string based sort.
+   * There is no interpretation of the version which can lead to a sorting like:
+   * v0.1.0 v0.10.0 v0.2.0.
+   */
+  DecisionDefinitionQuery orderByVersionTag();
 
 }
