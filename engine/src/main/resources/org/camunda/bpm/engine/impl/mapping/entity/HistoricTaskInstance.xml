@@ -358,6 +358,15 @@
       <if test="processUnfinished">
         and HPI.END_TIME_ is null
       </if>
+      <if test="createdAfter != null">
+        and RES.START_TIME_ > #{createdAfter}
+      </if>
+      <if test="finishedBefore != null">
+        and RES.END_TIME_ &lt;= #{finishedBefore}
+      </if>
+      <if test="finishedAfter != null">
+        and RES.END_TIME_ >= #{finishedAfter}
+      </if>
       <if test="dueDate != null">
         and RES.DUE_DATE_ = #{dueDate}
       </if>

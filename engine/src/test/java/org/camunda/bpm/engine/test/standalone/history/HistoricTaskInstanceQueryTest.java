@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.test.standalone.history;
 
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 
@@ -319,6 +320,51 @@ public class HistoricTaskInstanceQueryTest extends PluggableProcessEngineTestCas
     taskService.deleteTask("taskOne",true);
     taskService.deleteTask("taskTwo",true);
     taskService.deleteTask("taskThree",true);
+  }
+
+
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+  public void testTaskReturnedBeforeEndTime() {
+    // given
+    Task taskOne = taskService.newTask("taskOne");
+
+    // when
+    taskOne.setAssignee("aUserId");
+    taskService.saveTask(taskOne);
+    taskService.complete(taskOne.getId());
+
+
+    List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery()
+            .finishedBefore(Calendar.getInstance().getTime()).list();
+
+    // then
+    assertEquals(list.size(), 1);
+
+    // cleanup
+    taskService.deleteTask("taskOne",true);
+  }
+
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+  public void testTaskReturnedAfterEndTime() {
+    // given
+    Task taskOne = taskService.newTask("taskOne");
+
+    // when
+    taskOne.setAssignee("aUserId");
+    taskService.saveTask(taskOne);
+    taskService.complete(taskOne.getId());
+
+
+    List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery()
+            .finishedAfter(Calendar.getInstance().getTime()).list();
+
+    // then
+    assertEquals(list.size(), 0);
+
+    // cleanup
+    taskService.deleteTask("taskOne",true);
   }
 
 }
