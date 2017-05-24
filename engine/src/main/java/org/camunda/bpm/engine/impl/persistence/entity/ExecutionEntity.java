@@ -516,6 +516,14 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     removeEventSubscriptionsExceptCompensation();
   }
 
+  public void removeAllTasks() {
+    // delete all the tasks
+    removeTasks(null);
+
+    // delete external tasks
+    removeExternalTasks();
+  }
+
   protected void clearExecution() {
     //call the onRemove method of the execution observers
     //so they can do some clean up before
@@ -526,11 +534,8 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     // delete all the variable instances
     removeVariablesLocalInternal();
 
-    // delete all the tasks
-    removeTasks(null);
-
-    // delete external tasks
-    removeExternalTasks();
+    // delete all the tasks and external tasks
+    removeAllTasks();
 
     // remove all jobs
     removeJobs();

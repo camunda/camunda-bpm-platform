@@ -41,7 +41,6 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -124,7 +123,7 @@ public class TaskListenerTest {
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/tasklistener/TaskListenerTest.bpmn20.xml"})
   public void testTaskDeleteListenerByBoundaryEvent() {
     TaskDeleteListener.clear();
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskListenerProcess");
+    runtimeService.startProcessInstanceByKey("taskListenerProcess");
 
     assertEquals(0, TaskDeleteListener.eventCounter);
     assertNull(TaskDeleteListener.lastTaskDefinitionKey);
@@ -260,7 +259,6 @@ public class TaskListenerTest {
     assertNull(taskService.createTaskQuery().singleResult());
   }
 
-  @Ignore("CAM-7562")
   @Test
   public void testActivityInstanceIdOnDeleteInCalledProcess() {
     // given
@@ -296,7 +294,6 @@ public class TaskListenerTest {
     assertEquals(createActivityInstanceId, deleteActivityInstanceId);
   }
 
-  @Ignore("CAM-7562")
   @Test
   public void testVariableAccessOnDeleteInCalledProcess() {
     // given
@@ -305,6 +302,7 @@ public class TaskListenerTest {
     BpmnModelInstance callActivityProcess = Bpmn.createExecutableProcess("calling")
         .startEvent()
         .callActivity()
+          .camundaIn("foo", "foo")
           .calledElement("called")
         .endEvent()
         .done();

@@ -257,6 +257,9 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     setScope(false);
   }
 
+  public void removeAllTasks() {
+  }
+
   protected void removeEventScopes() {
     List<PvmExecutionImpl> childExecutions = new ArrayList<PvmExecutionImpl>(getEventScopeExecutions());
     for (PvmExecutionImpl childExecution : childExecutions) {
