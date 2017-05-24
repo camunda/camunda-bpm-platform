@@ -2801,4 +2801,56 @@ public class ProcessBuilderTest {
     assertThat(camundaFailedJobRetryTimeCycle).isNotNull();
     assertThat(camundaFailedJobRetryTimeCycle.getTextContent()).isEqualTo(FAILED_JOB_RETRY_TIME_CYCLE);
   }
+
+  @Test
+  public void testCreateEventSubProcess() {
+    ProcessBuilder process = Bpmn.createProcess();
+    modelInstance = process
+      .startEvent()
+      .sendTask()
+      .endEvent()
+      .done();
+
+    EventSubProcessBuilder eventSubProcess = process.eventSubProcess();
+    eventSubProcess
+      .startEvent()
+      .userTask()
+      .endEvent();
+
+
+
+    // no input or output from the sub process
+    assertThat(eventSubProcess.getElement().getDataInputAssociations().size() == 0);
+    assertThat(eventSubProcess.getElement().getDataOutputAssociations().size() == 0);
+    // subProcess was triggered by event
+    assertThat(eventSubProcess.getElement().triggeredByEvent());
+
+  }
+
+  @Test
+  public void testCreateEventSubProcessError() {
+    ProcessBuilder process = Bpmn.createProcess();
+    modelInstance = process
+      .startEvent()
+      .sendTask()
+      .endEvent()
+      .done();
+
+    EventSubProcessBuilder eventSubProcess = process.eventSubProcess();
+    eventSubProcess
+      .startEvent()
+      .userTask()
+      .endEvent();
+
+
+    try {
+      eventSubProcess.subProcessDone();
+      fail("eventSubProcess has returned a builder after completion");
+    } catch (BpmnModelException e) {
+      assertThat(e).hasMessageContaining("Unable to find a parent subProcess.");
+
+    }
+
+
+  }
 }

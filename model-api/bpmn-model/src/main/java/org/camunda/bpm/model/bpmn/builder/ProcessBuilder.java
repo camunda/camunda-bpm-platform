@@ -16,6 +16,7 @@ package org.camunda.bpm.model.bpmn.builder;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.Process;
 import org.camunda.bpm.model.bpmn.instance.StartEvent;
+import org.camunda.bpm.model.bpmn.instance.SubProcess;
 import org.camunda.bpm.model.bpmn.instance.bpmndi.BpmnShape;
 import org.camunda.bpm.model.bpmn.instance.dc.Bounds;
 
@@ -37,6 +38,22 @@ public class ProcessBuilder extends AbstractProcessBuilder<ProcessBuilder> {
     BpmnShape bpmnShape = createBpmnShape(start);
     setCoordinates(bpmnShape);
     return start.builder();
+  }
+
+  public EventSubProcessBuilder eventSubProcess(){
+    // Create a subprocess, triggered by an event, and add it to modelInstance
+    SubProcess subProcess = createChild(SubProcess.class, null);
+    subProcess.setTriggeredByEvent(true);
+
+    // Create Bpmn shape so subprocess will be drawn
+    BpmnShape targetBpmnShape = createBpmnShape(subProcess);
+    setCoordinates(targetBpmnShape);
+    resizeSubProcess(targetBpmnShape);
+
+    // Return the eventSubProcessBuilder
+    EventSubProcessBuilder eventSubProcessBuilder = new EventSubProcessBuilder(modelInstance, subProcess);
+    return eventSubProcessBuilder;
+
   }
 
   @Override
