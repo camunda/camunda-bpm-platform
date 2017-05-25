@@ -4,6 +4,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.jboss.as.connector.util.AbstractParser;
 import org.jboss.as.connector.util.ParserException;
 import org.jboss.as.controller.AttributeDefinition;
+import org.jboss.as.controller.PropertiesAttributeDefinition;
 import org.jboss.as.controller.SimpleAttributeDefinition;
 import org.jboss.as.controller.parsing.ParseUtils;
 import org.jboss.as.controller.persistence.SubsystemMarshallingContext;
@@ -129,7 +130,7 @@ public class BpmPlatformParser1_1 extends AbstractParser {
           break;
         }
         case PROPERTIES: {
-          parseProperties(reader, operations, addProcessEngineOp);
+          parseProperties(ModelConstants.PROPERTY, reader, addProcessEngineOp, SubsystemAttributeDefinitons.PROPERTIES);
           break;
         }
         case PLUGINS: {
@@ -176,7 +177,7 @@ public class BpmPlatformParser1_1 extends AbstractParser {
           break;
         }
         case PROPERTIES: {
-          parseProperties(reader, operations, plugin);
+          parseProperties(ModelConstants.PROPERTY, reader, plugin, SubsystemAttributeDefinitons.PROPERTIES);
           break;
         }
         default: {
@@ -188,24 +189,19 @@ public class BpmPlatformParser1_1 extends AbstractParser {
     plugins.add(plugin);
   }
 
-  protected void parseProperties(XMLExtendedStreamReader reader, List<ModelNode> operations, ModelNode parentAddress) throws XMLStreamException {
-    requireNoAttributes(reader);
+  private void parseProperties(String childElementName, XMLExtendedStreamReader reader, ModelNode node, PropertiesAttributeDefinition attribute) throws XMLStreamException {
+      requireNoAttributes(reader);
 
-    while (reader.hasNext() && reader.nextTag() != END_ELEMENT) {
-      final Element element = Element.forName(reader.getLocalName());
-      switch (element) {
-        case PROPERTY: {
-          String name = reader.getAttributeValue(0);
-          String value = rawElementText(reader);
-
-          SubsystemAttributeDefinitons.PROPERTIES.parseAndAddParameterElement(name, value, parentAddress, reader);
-          break;
-        }
-        default: {
-          throw unexpectedElement(reader);
-        }
+      while (reader.hasNext() && reader.nextTag() != END_ELEMENT) {
+          final Element element = Element.forName(reader.getLocalName());
+          if (childElementName.equals(element.getLocalName())) {
+              final String[] array = requireAttributes(reader, org.jboss.as.controller.parsing.Attribute.NAME.getLocalName(), org.jboss.as.controller.parsing.Attribute.VALUE.getLocalName());
+              attribute.parseAndAddParameterElement(array[0], array[1], node, reader);
+          } else {
+              throw unexpectedElement(reader);
+          }
+          requireNoContent(reader);
       }
-    }
   }
 
   protected void parseJobExecutor(XMLExtendedStreamReader reader, List<ModelNode> operations, ModelNode parentAddress) throws XMLStreamException {
@@ -334,7 +330,7 @@ public class BpmPlatformParser1_1 extends AbstractParser {
         case START_ELEMENT: {
           switch (Element.forName(reader.getLocalName())) {
             case PROPERTIES: {
-              parseProperties(reader, operations, addJobAcquisitionOp);
+              parseProperties(ModelConstants.PROPERTY, reader, addJobAcquisitionOp, SubsystemAttributeDefinitons.PROPERTIES);
               break;
             }
             case ACQUISITION_STRATEGY: {
