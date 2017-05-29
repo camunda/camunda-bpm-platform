@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -53,38 +54,8 @@ public class HistoricProcessInstanceManager extends AbstractHistoricManager {
         .selectList("selectHistoricProcessInstanceIdsByProcessDefinitionId", processDefinitionId);
 
       for (String historicProcessInstanceId: historicProcessInstanceIds) {
-        deleteHistoricProcessInstanceById(historicProcessInstanceId);
+        deleteHistoricProcessInstanceByIds(Arrays.asList(historicProcessInstanceId));
       }
-    }
-  }
-
-  public void deleteHistoricProcessInstanceById(String historicProcessInstanceId) {
-    if (isHistoryEnabled()) {
-      CommandContext commandContext = Context.getCommandContext();
-
-      getHistoricDetailManager()
-        .deleteHistoricDetailsByProcessInstanceId(historicProcessInstanceId);
-
-      getHistoricVariableInstanceManager()
-        .deleteHistoricVariableInstanceByProcessInstanceId(historicProcessInstanceId);
-
-      getHistoricActivityInstanceManager()
-        .deleteHistoricActivityInstancesByProcessInstanceId(historicProcessInstanceId);
-
-      getHistoricTaskInstanceManager()
-        .deleteHistoricTaskInstancesByProcessInstanceId(historicProcessInstanceId);
-
-      getHistoricIncidentManager()
-        .deleteHistoricIncidentsByProcessInstanceId(historicProcessInstanceId);
-
-      getHistoricJobLogManager()
-        .deleteHistoricJobLogsByProcessInstanceId(historicProcessInstanceId);
-
-      getHistoricExternalTaskLogManager()
-        .deleteHistoricExternalTaskLogsByProcessInstanceId(historicProcessInstanceId);
-
-      commandContext.getDbEntityManager().delete(HistoricProcessInstanceEntity.class, "deleteHistoricProcessInstance", historicProcessInstanceId);
-
     }
   }
 

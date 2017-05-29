@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -86,7 +87,7 @@ public class ExecutionManager extends AbstractManager {
     execution.deleteCascade(deleteReason, skipCustomListeners, skipIoMappings, externallyTerminated);
 
     if (cascade) {
-      getHistoricProcessInstanceManager().deleteHistoricProcessInstanceById(processInstanceId);
+      getHistoricProcessInstanceManager().deleteHistoricProcessInstanceByIds(Arrays.asList(processInstanceId));
     }
   }
 

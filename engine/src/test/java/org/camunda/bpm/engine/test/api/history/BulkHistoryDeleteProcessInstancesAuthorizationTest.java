@@ -18,6 +18,7 @@ import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -78,20 +79,12 @@ public class BulkHistoryDeleteProcessInstancesAuthorizationTest {
     return AuthorizationTestRule.asParameters(
         scenario()
             .failsDueToRequired(
-                grant(Resources.PROCESS_DEFINITION, "*", "demo", Permissions.DELETE_HISTORY)
+                grant(Resources.PROCESS_DEFINITION, "processDefinition", "demo", Permissions.DELETE_HISTORY)
             )
                 ,
         scenario()
             .withAuthorizations(
-                grant(Resources.PROCESS_DEFINITION, "someId", "demo", Permissions.DELETE_HISTORY)
-            )
-            .failsDueToRequired(
-                grant(Resources.PROCESS_DEFINITION, "*", "demo", Permissions.DELETE_HISTORY)
-            )
-        ,
-        scenario()
-            .withAuthorizations(
-                grant(Resources.PROCESS_DEFINITION, "*", "demo", Permissions.DELETE_HISTORY)
+                grant(Resources.PROCESS_DEFINITION, "processDefinition", "demo", Permissions.DELETE_HISTORY)
             )
             .succeeds()
     );
@@ -113,6 +106,7 @@ public class BulkHistoryDeleteProcessInstancesAuthorizationTest {
     // when
     authRule
         .init(scenario)
+        .bindResource("processDefinition", "oneTaskProcess")
         .withUser("demo")
         .start();
 

@@ -868,7 +868,7 @@ public class FullHistoryTest {
     } catch(ProcessEngineException ae) {
       // Expected exception
       Assert.assertThat(ae.getMessage(),
-          CoreMatchers.containsString("No historic process instance found with id: unexisting"));
+          CoreMatchers.containsString("No historic process instances found"));
     }
   }
 
