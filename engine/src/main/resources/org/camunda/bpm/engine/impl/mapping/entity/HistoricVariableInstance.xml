@@ -42,7 +42,6 @@
       LONG_,
       TEXT_,
       TEXT2_,
-      STATE_
     ) values (
       #{id, jdbcType=VARCHAR},
       #{processDefinitionKey, jdbcType=VARCHAR},
@@ -64,7 +63,6 @@
       #{longValue, jdbcType=BIGINT},
       #{textValue, jdbcType=VARCHAR},
       #{textValue2, jdbcType=VARCHAR},
-      #{state, jdbcType=VARCHAR}
     )
   </insert>
 
@@ -81,7 +79,6 @@
       LONG_ = #{longValue, jdbcType=BIGINT},
       TEXT_ = #{textValue, jdbcType=VARCHAR},
       TEXT2_ = #{textValue2, jdbcType=VARCHAR},
-      STATE_ = #{state, jdbcType=VARCHAR}
     where ID_ = #{id, jdbcType=VARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
   </update>
@@ -132,7 +129,6 @@
     <result property="textValue" column="TEXT_" jdbcType="VARCHAR" />
     <result property="textValue2" column="TEXT2_" jdbcType="VARCHAR" />
     <result property="longValue" column="LONG_" jdbcType="BIGINT" />
-    <result property="state" column="STATE_" jdbcType="VARCHAR" />
   </resultMap>
 
   <resultMap id="historicVariableInstanceResultMap_postgres" type="org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity">
@@ -156,7 +152,6 @@
     <result property="textValue" column="TEXT_" jdbcType="VARCHAR" />
     <result property="textValue2" column="TEXT2_" jdbcType="VARCHAR" />
     <result property="longValue" column="LONG_" jdbcType="BIGINT" />
-    <result property="state" column="STATE_" jdbcType="VARCHAR" />
   </resultMap>
 
   <!-- HISTORIC VARIABLE SELECT -->
