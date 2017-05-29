@@ -988,6 +988,26 @@ public class HistoryCleanupTest {
     processEngineConfiguration.initHistoryCleanup();
   }
 
+  @Test
+  public void testConfigurationFailureWrongBatchSize2() {
+    processEngineConfiguration.setHistoryCleanupBatchSize(-5);
+
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("historyCleanupBatchSize");
+
+    processEngineConfiguration.initHistoryCleanup();
+  }
+
+  @Test
+  public void testConfigurationFailureWrongBatchThreshold() {
+    processEngineConfiguration.setHistoryCleanupBatchThreshold(-1);
+
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("historyCleanupBatchThreshold");
+
+    processEngineConfiguration.initHistoryCleanup();
+  }
+
   private Date getNextRunWithinBatchWindow(Date currentTime) {
     Date batchWindowStartTime = processEngineConfiguration.getHistoryCleanupBatchWindowStartTimeAsDate();
     return getNextRunWithinBatchWindow(currentTime, batchWindowStartTime);

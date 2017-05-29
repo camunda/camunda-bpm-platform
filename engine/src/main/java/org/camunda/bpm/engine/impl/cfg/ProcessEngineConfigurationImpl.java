@@ -775,9 +775,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       initHistoryCleanupBatchWindowEndTime();
     }
 
-    if (historyCleanupBatchSize > HistoryCleanupBatch.MAX_BATCH_SIZE) {
+    if (historyCleanupBatchSize > HistoryCleanupBatch.MAX_BATCH_SIZE || historyCleanupBatchSize <= 0) {
       throw LOG.invalidPropertyValue("historyCleanupBatchSize", String.valueOf(historyCleanupBatchSize),
-        String.format("maximum value for batch size is %s", HistoryCleanupBatch.MAX_BATCH_SIZE));
+          String.format("value for batch size should be between 1 and %s", HistoryCleanupBatch.MAX_BATCH_SIZE));
+    }
+
+    if (historyCleanupBatchThreshold < 0) {
+      throw LOG.invalidPropertyValue("historyCleanupBatchThreshold", String.valueOf(historyCleanupBatchThreshold),
+          "History cleanup batch threshold cannot be negative.");
     }
   }
 
