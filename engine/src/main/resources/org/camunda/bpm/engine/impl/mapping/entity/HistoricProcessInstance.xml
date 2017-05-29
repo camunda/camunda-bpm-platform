@@ -196,7 +196,7 @@
             <if test="processInstanceIds != null and !processInstanceIds.isEmpty()">
                 and SELF.PROC_INST_ID_ in
                 <foreach item="item" index="index" collection="processInstanceIds" open="(" separator="," close=")">
-                    #{item}
+                    #{item, jdbcType=VARCHAR}
                 </foreach>
             </if>
             <if test="caseInstanceId != null">
