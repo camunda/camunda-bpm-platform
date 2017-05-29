@@ -74,7 +74,10 @@ import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.ModelElementType;
 import org.junit.After;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
+
 
 /**
  * @author Sebastian Menski
@@ -86,6 +89,9 @@ public class ProcessBuilderTest {
   public static final String TIMER_CYCLE = "R3/PT10H";
 
   public static final String FAILED_JOB_RETRY_TIME_CYCLE = "R5/PT1M";
+
+  @Rule
+  public ExpectedException thrown = ExpectedException.none();
 
   private BpmnModelInstance modelInstance;
   private static ModelElementType taskType;
@@ -1959,6 +1965,7 @@ public class ProcessBuilderTest {
 
   @Test
   public void testOnlyOneCompensateBoundaryEventAllowed() {
+    // given
     UserTaskBuilder builder = Bpmn.createProcess()
       .startEvent()
       .userTask("task")
@@ -1967,15 +1974,43 @@ public class ProcessBuilderTest {
       .compensationStart()
       .userTask("compensate").name("compensate");
 
-    try {
-      builder.userTask();
-      fail("Exception Expected");
-    } catch(RuntimeException e) {
-      assertThat(e).hasMessage("Compensate events can only contain one task");
-    }
+    // then
+    thrown.expect(BpmnModelException.class);
+    thrown.expectMessage("Only single compensation handler allowed. Call compensationDone() to continue main flow.");
+
+    // when
+    builder.userTask();
   }
 
+  @Test
+  public void testInvalidCompensationStartCall() {
+    // given
+    StartEventBuilder builder = Bpmn.createProcess().startEvent();
 
+    // then
+    thrown.expect(BpmnModelException.class);
+    thrown.expectMessage("Compensation can only be started on a boundary event with a compensation event definition");
+
+    // when
+    builder.compensationStart();
+  }
+
+  @Test
+  public void testInvalidCompensationDoneCall() {
+    // given
+    AbstractFlowNodeBuilder builder = Bpmn.createProcess()
+      .startEvent()
+      .userTask("task")
+      .boundaryEvent("boundary")
+      .compensateEventDefinition().compensateEventDefinitionDone();
+
+    // then
+    thrown.expect(BpmnModelException.class);
+    thrown.expectMessage("No compensation in progress. Call compensationStart() first.");
+
+    // when
+    builder.compensationDone();
+  }
 
   @Test
   public void testErrorBoundaryEvent() {

@@ -148,30 +148,7 @@ public abstract class AbstractBoundaryEventBuilder<B extends AbstractBoundaryEve
   }
 
   @Override
-  protected void setWaypoints(BpmnEdge edge) {
-
-
-    BaseElement bpmnElement = edge.getBpmnElement();
-
-    FlowNode edgeSource = null;
-    FlowNode edgeTarget = null;
-    if (bpmnElement instanceof SequenceFlow) {
-
-      SequenceFlow sequenceFlow = (SequenceFlow) bpmnElement;
-
-      edgeSource = sequenceFlow.getSource();
-      edgeTarget = sequenceFlow.getTarget();
-
-    }else if(bpmnElement instanceof Association){
-      Association association = (Association) bpmnElement;
-
-      edgeSource = (FlowNode) association.getSource();
-      edgeTarget = (FlowNode) association.getTarget();
-    }else{
-      throw new RuntimeException("Bpmn element type not supported");
-    }
-
-
+  protected void setWaypoints(BpmnEdge edge, FlowNode edgeSource, FlowNode edgeTarget) {
     BpmnShape source = findBpmnShape(edgeSource);
     BpmnShape target = findBpmnShape(edgeTarget);
 

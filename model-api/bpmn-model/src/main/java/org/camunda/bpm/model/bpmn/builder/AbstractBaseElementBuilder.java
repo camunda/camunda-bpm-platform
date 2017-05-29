@@ -348,8 +348,8 @@ public abstract class AbstractBaseElementBuilder<B extends AbstractBaseElementBu
   protected void setWaypoints(BpmnEdge edge) {
     BaseElement bpmnElement = edge.getBpmnElement();
 
-    FlowNode edgeSource = null;
-    FlowNode edgeTarget = null;
+    FlowNode edgeSource;
+    FlowNode edgeTarget;
     if (bpmnElement instanceof SequenceFlow) {
 
       SequenceFlow sequenceFlow = (SequenceFlow) bpmnElement;
@@ -357,15 +357,19 @@ public abstract class AbstractBaseElementBuilder<B extends AbstractBaseElementBu
       edgeSource = sequenceFlow.getSource();
       edgeTarget = sequenceFlow.getTarget();
 
-    }else if(bpmnElement instanceof Association){
+    } else if (bpmnElement instanceof Association){
       Association association = (Association) bpmnElement;
 
       edgeSource = (FlowNode) association.getSource();
       edgeTarget = (FlowNode) association.getTarget();
-    }else{
+    } else {
       throw new RuntimeException("Bpmn element type not supported");
     }
 
+    setWaypoints(edge, edgeSource, edgeTarget);
+  }
+
+  protected void setWaypoints(BpmnEdge edge, FlowNode edgeSource, FlowNode edgeTarget) {
     BpmnShape source = findBpmnShape(edgeSource);
     BpmnShape target = findBpmnShape(edgeTarget);
 

@@ -28,6 +28,8 @@ import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 public abstract class AbstractFlowNodeBuilder<B extends AbstractFlowNodeBuilder<B, E>, E extends FlowNode> extends AbstractFlowElementBuilder<B, E> {
 
   private SequenceFlowBuilder currentSequenceFlowBuilder;
+
+  protected boolean compensationStarted;
   protected BoundaryEvent compensateBoundaryEvent;
 
   protected AbstractFlowNodeBuilder(BpmnModelInstance modelInstance, E element, Class<?> selfType) {
@@ -53,22 +55,24 @@ public abstract class AbstractFlowNodeBuilder<B extends AbstractFlowNodeBuilder<
   }
 
   protected void connectTarget(FlowNode target) {
-    // check if boundary event is set
-    if (compensateBoundaryEvent != null) {
-      // check that you are only creating new tasks from the compensate boundary event
-      if (element instanceof BoundaryEvent) {
-        // the activity is ready for for compensation
+    // check if compensation was started
+    if (isBoundaryEventWithStartedCompensation()) {
+        // the target activity should be marked for compensation
         if (target instanceof Activity) {
           ((Activity) target).setForCompensation(true);
         }
+
         // connect the target via association instead of sequence flow
         connectTargetWithAssociation(target);
-        return;
-      } else {
-        throw new RuntimeException("Compensate events can only contain one task");
-      }
     }
-    connectTargetWithSequenceFlow(target);
+    else if (isCompensationHandler()) {
+      // cannot connect to a compensation handler
+      throw new BpmnModelException("Only single compensation handler allowed. Call compensationDone() to continue main flow.");
+    }
+    else {
+      // connect as sequence flow by default
+      connectTargetWithSequenceFlow(target);
+    }
   }
 
   protected void connectTargetWithSequenceFlow(FlowNode target) {
@@ -90,10 +94,12 @@ public abstract class AbstractFlowNodeBuilder<B extends AbstractFlowNodeBuilder<
   }
 
   public AbstractFlowNodeBuilder compensationDone(){
-    if(compensateBoundaryEvent != null){
+    if (compensateBoundaryEvent != null) {
       return compensateBoundaryEvent.getAttachedTo().builder();
     }
-    throw new RuntimeException("Compensation not initialized.");
+    else {
+      throw new BpmnModelException("No compensation in progress. Call compensationStart() first.");
+    }
   }
 
   public B sequenceFlowId(String sequenceFlowId) {
@@ -115,17 +121,19 @@ public abstract class AbstractFlowNodeBuilder<B extends AbstractFlowNodeBuilder<
     return target;
   }
 
-  @SuppressWarnings("unchecked")
   protected <T extends AbstractFlowNodeBuilder, F extends FlowNode> T createTargetBuilder(Class<F> typeClass) {
-    AbstractFlowNodeBuilder builder = createTarget(typeClass).builder();
-    builder.compensateBoundaryEvent = compensateBoundaryEvent;
-    return (T) builder;
+    return createTargetBuilder(typeClass, null);
   }
 
   @SuppressWarnings("unchecked")
   protected <T extends AbstractFlowNodeBuilder, F extends FlowNode> T createTargetBuilder(Class<F> typeClass, String id) {
     AbstractFlowNodeBuilder builder = createTarget(typeClass, id).builder();
-    builder.compensateBoundaryEvent = compensateBoundaryEvent;
+
+    if (compensationStarted) {
+      // pass on current boundary event to return after compensationDone call
+      builder.compensateBoundaryEvent = compensateBoundaryEvent;
+    }
+
     return (T) builder;
 
   }
@@ -444,18 +452,26 @@ public abstract class AbstractFlowNodeBuilder<B extends AbstractFlowNodeBuilder<
       BoundaryEvent boundaryEvent = (BoundaryEvent) element;
       for (EventDefinition eventDefinition : boundaryEvent.getEventDefinitions()) {
         if(eventDefinition instanceof CompensateEventDefinition) {
-          // if the boundary event is defined as a compensate event then
-          // save the boundary event as compensateBoundaryEvent
+          // if the boundary event contains a compensate event definition then
+          // save the boundary event to later return to it and start a compensation
 
-          compensateBoundaryEvent =boundaryEvent;
+          compensateBoundaryEvent = boundaryEvent;
+          compensationStarted = true;
+
           return myself;
         }
-        // Compensate Event was not defined
-        throw new RuntimeException("No compensate event definition found in boundary event");
       }
     }
-    // Was not a boundary event
-    throw new RuntimeException("Not a boundary event");
+
+    throw new BpmnModelException("Compensation can only be started on a boundary event with a compensation event definition");
+  }
+
+  protected boolean isBoundaryEventWithStartedCompensation() {
+    return compensationStarted && compensateBoundaryEvent != null;
+  }
+
+  protected boolean isCompensationHandler() {
+    return !compensationStarted && compensateBoundaryEvent != null;
   }
 
 }
