@@ -90,6 +90,7 @@ public class HistoryCleanupTest {
     public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
       configuration.setHistoryCleanupBatchSize(20);
       configuration.setHistoryCleanupBatchThreshold(10);
+      configuration.setDefaultNumberOfRetries(5);
       return configuration;
     }
   };
@@ -503,12 +504,14 @@ public class HistoryCleanupTest {
     String jobId = historyService.cleanUpHistoryAsync(true).getId();
     imitateFailedJob(jobId);
 
+    assertEquals(5, processEngineConfiguration.getDefaultNumberOfRetries());
     //when
     //call to cleanup history means that incident was resolved
     jobId = historyService.cleanUpHistoryAsync(true).getId();
 
     //then
     JobEntity jobEntity = getJobEntity(jobId);
+    assertEquals(5, jobEntity.getRetries());
     assertEquals(null, jobEntity.getExceptionByteArrayId());
     assertEquals(null, jobEntity.getExceptionMessage());
 

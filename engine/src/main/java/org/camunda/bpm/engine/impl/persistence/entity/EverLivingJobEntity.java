@@ -50,7 +50,7 @@ public class EverLivingJobEntity extends JobEntity {
     }
 
     //cancel the retries -> will resolve job incident if present
-    setRetries(DEFAULT_RETRIES);
+    setRetries(commandContext.getProcessEngineConfiguration().getDefaultNumberOfRetries());
 
     //delete the job's exception byte array and exception message
     String exceptionByteArrayIdToDelete =null;
