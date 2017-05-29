@@ -12,7 +12,11 @@
  */
 package org.camunda.bpm.engine.rest.impl.history;
 
+import javax.ws.rs.core.Response.Status;
+
 import org.camunda.bpm.engine.rest.dto.runtime.JobDto;
+import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.history.HistoricActivityInstanceRestService;
 import org.camunda.bpm.engine.rest.history.HistoricActivityStatisticsRestService;
 import org.camunda.bpm.engine.rest.history.HistoricBatchRestService;
@@ -115,6 +119,15 @@ public class HistoryRestServiceImpl extends AbstractRestProcessEngineAware imple
   @Override
   public JobDto cleanupAsync(boolean immediatelyDue) {
     Job job = processEngine.getHistoryService().cleanUpHistoryAsync(immediatelyDue);
+    return JobDto.fromJob(job);
+  }
+
+  @Override
+  public JobDto findCleanupJob() {
+    Job job = processEngine.getHistoryService().findHistoryCleanupJob();
+    if (job == null) {
+      throw new RestException(Status.NOT_FOUND, "History cleanup job does not exist");
+    }
     return JobDto.fromJob(job);
   }
 }

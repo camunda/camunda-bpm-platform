@@ -34,6 +34,7 @@ public class HistoryRestServiceInteractionTest extends AbstractRestServiceTest {
   public static TestContainerRule rule = new TestContainerRule();
   
   protected static final String HISTORY_CLEANUP_ASYNC_URL = TEST_RESOURCE_ROOT_PATH + "/history/cleanup";
+  protected static final String FIND_HISTORY_CLEANUP_JOB_URL = TEST_RESOURCE_ROOT_PATH + "/history/find-cleanup-job";
 
   private HistoryService historyServiceMock;
 
@@ -43,9 +44,34 @@ public class HistoryRestServiceInteractionTest extends AbstractRestServiceTest {
     Job mockJob = MockProvider.createMockJob();
     when(historyServiceMock.cleanUpHistoryAsync(anyBoolean()))
         .thenReturn(mockJob);
+    when(historyServiceMock.findHistoryCleanupJob())
+        .thenReturn(mockJob);
 
     // runtime service
     when(processEngine.getHistoryService()).thenReturn(historyServiceMock);
+  }
+
+  @Test
+  public void testFindHistoryCleanupJob() {
+    given().contentType(ContentType.JSON)
+        .then()
+        .expect().statusCode(Status.OK.getStatusCode())
+        .when().get(FIND_HISTORY_CLEANUP_JOB_URL);
+
+   verify(historyServiceMock).findHistoryCleanupJob();
+  }
+
+  @Test
+  public void testFindNoHistoryCleanupJob() {
+    when(historyServiceMock.findHistoryCleanupJob())
+        .thenReturn(null);
+
+    given().contentType(ContentType.JSON)
+        .then()
+        .expect().statusCode(Status.NOT_FOUND.getStatusCode())
+        .when().get(FIND_HISTORY_CLEANUP_JOB_URL);
+
+   verify(historyServiceMock).findHistoryCleanupJob();
   }
 
   @Test
