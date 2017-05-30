@@ -41,7 +41,7 @@
       DOUBLE_,
       LONG_,
       TEXT_,
-      TEXT2_,
+      TEXT2_
     ) values (
       #{id, jdbcType=VARCHAR},
       #{processDefinitionKey, jdbcType=VARCHAR},
@@ -62,7 +62,7 @@
       #{doubleValue, jdbcType=DOUBLE},
       #{longValue, jdbcType=BIGINT},
       #{textValue, jdbcType=VARCHAR},
-      #{textValue2, jdbcType=VARCHAR},
+      #{textValue2, jdbcType=VARCHAR}
     )
   </insert>
 
@@ -78,7 +78,7 @@
       DOUBLE_ = #{doubleValue, jdbcType=DOUBLE},
       LONG_ = #{longValue, jdbcType=BIGINT},
       TEXT_ = #{textValue, jdbcType=VARCHAR},
-      TEXT2_ = #{textValue2, jdbcType=VARCHAR},
+      TEXT2_ = #{textValue2, jdbcType=VARCHAR}
     where ID_ = #{id, jdbcType=VARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
   </update>
