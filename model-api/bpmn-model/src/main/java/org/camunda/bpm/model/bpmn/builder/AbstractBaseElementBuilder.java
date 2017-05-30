@@ -329,6 +329,10 @@ public abstract class AbstractBaseElementBuilder<B extends AbstractBaseElementBu
     shapeBounds.setY(y);
   }
 
+  public BpmnEdge createBpmnEdge(SequenceFlow sequenceFlow) {
+    return createBpmnEdge((BaseElement) sequenceFlow);
+  }
+
   public BpmnEdge createBpmnEdge(BaseElement baseElement) {
     BpmnPlane bpmnPlane = findBpmnPlane();
     if (bpmnPlane != null) {
@@ -366,10 +370,10 @@ public abstract class AbstractBaseElementBuilder<B extends AbstractBaseElementBu
       throw new RuntimeException("Bpmn element type not supported");
     }
 
-    setWaypoints(edge, edgeSource, edgeTarget);
+    setWaypointsWithSourceAndTarget(edge, edgeSource, edgeTarget);
   }
 
-  protected void setWaypoints(BpmnEdge edge, FlowNode edgeSource, FlowNode edgeTarget) {
+  protected void setWaypointsWithSourceAndTarget(BpmnEdge edge, FlowNode edgeSource, FlowNode edgeTarget) {
     BpmnShape source = findBpmnShape(edgeSource);
     BpmnShape target = findBpmnShape(edgeTarget);
 

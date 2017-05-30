@@ -148,7 +148,7 @@ public abstract class AbstractBoundaryEventBuilder<B extends AbstractBoundaryEve
   }
 
   @Override
-  protected void setWaypoints(BpmnEdge edge, FlowNode edgeSource, FlowNode edgeTarget) {
+  protected void setWaypointsWithSourceAndTarget(BpmnEdge edge, FlowNode edgeSource, FlowNode edgeTarget) {
     BpmnShape source = findBpmnShape(edgeSource);
     BpmnShape target = findBpmnShape(edgeTarget);
 
