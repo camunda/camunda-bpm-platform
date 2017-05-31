@@ -79,7 +79,7 @@ public abstract class AbstractFlowNodeBuilder<B extends AbstractFlowNodeBuilder<
     getCurrentSequenceFlowBuilder().from(element).to(target);
 
     SequenceFlow sequenceFlow = getCurrentSequenceFlowBuilder().getElement();
-    createBpmnEdge(sequenceFlow);
+    createEdge(sequenceFlow);
     currentSequenceFlowBuilder = null;
   }
 
@@ -90,7 +90,7 @@ public abstract class AbstractFlowNodeBuilder<B extends AbstractFlowNodeBuilder<
     association.setAssociationDirection(AssociationDirection.One);
     element.getParentElement().addChildElement(association);
 
-    createBpmnEdge(association);
+    createEdge(association);
   }
 
   public AbstractFlowNodeBuilder compensationDone(){

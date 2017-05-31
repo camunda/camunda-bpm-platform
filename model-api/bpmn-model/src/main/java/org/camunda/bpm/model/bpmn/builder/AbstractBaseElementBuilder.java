@@ -329,11 +329,15 @@ public abstract class AbstractBaseElementBuilder<B extends AbstractBaseElementBu
     shapeBounds.setY(y);
   }
 
+  /**
+   * @deprecated use {@link #createEdge(BaseElement)} instead
+   */
+  @Deprecated
   public BpmnEdge createBpmnEdge(SequenceFlow sequenceFlow) {
-    return createBpmnEdge((BaseElement) sequenceFlow);
+    return createEdge(sequenceFlow);
   }
 
-  public BpmnEdge createBpmnEdge(BaseElement baseElement) {
+  public BpmnEdge createEdge(BaseElement baseElement) {
     BpmnPlane bpmnPlane = findBpmnPlane();
     if (bpmnPlane != null) {
 
