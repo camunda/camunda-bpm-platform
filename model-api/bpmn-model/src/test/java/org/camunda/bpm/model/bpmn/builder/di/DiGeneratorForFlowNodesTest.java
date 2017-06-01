@@ -525,6 +525,9 @@ public class DiGeneratorForFlowNodesTest {
   protected void assertGatewayShapeProperties(String id) {
     BpmnShape bpmnShapeGateway = findBpmnShape(id);
     assertNotNull(bpmnShapeGateway);
+    if (id.equals("or")) {
+      assertTrue(bpmnShapeGateway.isMarkerVisible());
+    }
     assertGatewaySize(bpmnShapeGateway);
   }
 
