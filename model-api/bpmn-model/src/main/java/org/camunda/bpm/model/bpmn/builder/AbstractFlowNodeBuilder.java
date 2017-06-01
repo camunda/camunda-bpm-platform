@@ -115,9 +115,6 @@ public abstract class AbstractFlowNodeBuilder<B extends AbstractFlowNodeBuilder<
     T target = createSibling(typeClass, identifier);
 
     BpmnShape targetBpmnShape = createBpmnShape(target);
-    if (target instanceof ExclusiveGateway) {
-      targetBpmnShape.setMarkerVisible(true);
-    }
     setCoordinates(targetBpmnShape);
     connectTarget(target);
     resizeSubProcess(targetBpmnShape);

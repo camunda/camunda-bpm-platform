@@ -271,6 +271,9 @@ public abstract class AbstractBaseElementBuilder<B extends AbstractBaseElementBu
       } else if (node instanceof Gateway) {
         nodeBounds.setWidth(50);
         nodeBounds.setHeight(50);
+        if (node instanceof ExclusiveGateway) {
+          bpmnShape.setMarkerVisible(true);
+        }
       }
 
       nodeBounds.setX(0);

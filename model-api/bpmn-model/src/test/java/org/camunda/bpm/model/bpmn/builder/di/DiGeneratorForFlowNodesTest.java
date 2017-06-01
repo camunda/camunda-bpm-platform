@@ -508,6 +508,8 @@ public class DiGeneratorForFlowNodesTest {
     assertEquals(3, allShapes.size());
 
     assertGatewayShapeProperties("or");
+    BpmnShape bpmnShape = findBpmnShape("or");
+    assertTrue(bpmnShape.isMarkerVisible());
   }
 
   protected void assertTaskShapeProperties(String id) {
@@ -525,9 +527,6 @@ public class DiGeneratorForFlowNodesTest {
   protected void assertGatewayShapeProperties(String id) {
     BpmnShape bpmnShapeGateway = findBpmnShape(id);
     assertNotNull(bpmnShapeGateway);
-    if (id.equals("or")) {
-      assertTrue(bpmnShapeGateway.isMarkerVisible());
-    }
     assertGatewaySize(bpmnShapeGateway);
   }
 
