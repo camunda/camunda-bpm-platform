@@ -566,4 +566,58 @@ public class RestartProcessInstanceRestServiceTest extends AbstractRestServiceTe
     verify(builderMock).startBeforeActivity("activityId");
     verify(builderMock).execute();
   }
+
+  @Test
+  public void testRestartProcessInstanceWithoutProcessInstanceIdsSync() {
+    when(historyServiceMock.createHistoricProcessInstanceQuery()).thenReturn(new HistoricProcessInstanceQueryImpl());
+    Map<String, Object> json = new HashMap<String, Object>();
+    List<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
+    HistoricProcessInstanceQueryDto query = new HistoricProcessInstanceQueryDto();
+    query.setFinished(true);
+    json.put("historicProcessInstanceQuery", query);
+    instructions.add(ModificationInstructionBuilder.startBefore().activityId("activityId").getJson());
+    json.put("instructions", instructions);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+      .contentType(ContentType.JSON)
+      .body(json)
+    .then()
+      .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+     .when()
+       .post(RESTART_PROCESS_INSTANCE_URL);
+
+    verify(builderMock).startBeforeActivity("activityId");
+    verify(builderMock).historicProcessInstanceQuery(query.toQuery(processEngine));
+    verify(builderMock).execute();
+    verifyNoMoreInteractions(builderMock);
+  }
+
+  @Test
+  public void testRestartProcessInstanceWithoutProcessInstanceIdsAsync() {
+    when(historyServiceMock.createHistoricProcessInstanceQuery()).thenReturn(new HistoricProcessInstanceQueryImpl());
+    Map<String, Object> json = new HashMap<String, Object>();
+    List<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
+    HistoricProcessInstanceQueryDto query = new HistoricProcessInstanceQueryDto();
+    query.setFinished(true);
+    json.put("historicProcessInstanceQuery", query);
+    instructions.add(ModificationInstructionBuilder.startBefore().activityId("activityId").getJson());
+    json.put("instructions", instructions);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+      .contentType(ContentType.JSON)
+      .body(json)
+    .then()
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+     .when()
+       .post(RESTART_PROCESS_INSTANCE_ASYNC_URL);
+
+    verify(builderMock).startBeforeActivity("activityId");
+    verify(builderMock).historicProcessInstanceQuery(query.toQuery(processEngine));
+    verify(builderMock).executeAsync();
+    verifyNoMoreInteractions(builderMock);
+  }
 }
