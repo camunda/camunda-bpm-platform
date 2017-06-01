@@ -17,6 +17,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.impl.cmd.CommandLogger;
@@ -51,6 +52,8 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
   protected String[] activityInstanceIds;
   protected String[] tenantIds;
   protected String[] processInstanceIds;
+
+  protected boolean includeDeleted = false;
 
   protected boolean isByteArrayFetchingEnabled = true;
   protected boolean isCustomObjectDeserializationEnabled = true;
@@ -275,4 +278,9 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
     return queryVariableValue;
   }
 
+  @Override
+  public HistoricVariableInstanceQuery includeDeleted() {
+    includeDeleted = true;
+    return this;
+  }
 }

@@ -92,6 +92,7 @@ create table ACT_HI_VARINST (
     TEXT_ varchar(4000),
     TEXT2_ varchar(4000),
     TENANT_ID_ varchar(64),
+    STATE_ varchar(20),
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 

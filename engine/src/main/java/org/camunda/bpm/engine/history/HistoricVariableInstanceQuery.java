@@ -96,4 +96,6 @@ public interface HistoricVariableInstanceQuery extends Query<HistoricVariableIns
    */
   HistoricVariableInstanceQuery disableCustomObjectDeserialization();
 
+  HistoricVariableInstanceQuery includeDeleted();
+
 }

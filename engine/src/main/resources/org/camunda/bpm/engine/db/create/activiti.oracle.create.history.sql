@@ -92,6 +92,7 @@ create table ACT_HI_VARINST (
     TEXT_ NVARCHAR2(2000),
     TEXT2_ NVARCHAR2(2000),
     TENANT_ID_ NVARCHAR2(64),
+    STATE_ NVARCHAR2(20),
     primary key (ID_)
 );
 

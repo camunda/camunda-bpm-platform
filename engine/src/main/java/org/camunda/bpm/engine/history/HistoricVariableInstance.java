@@ -135,4 +135,9 @@ public interface HistoricVariableInstance {
    * if the variable belongs to no single tenant.
    */
   String getTenantId();
+
+  /**
+   * The current state of the variable. Can be 'CREATED' or 'DELETED'
+   */
+  String getState();
 }

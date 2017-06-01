@@ -776,10 +776,24 @@ public class HistoricVariableInstanceRestServiceQueryTest extends AbstractRestSe
     verify(mockedQuery).caseActivityIdIn(MockProvider.EXAMPLE_CASE_ACTIVITY_ID, MockProvider.ANOTHER_EXAMPLE_CASE_ACTIVITY_ID);
   }
 
+  @Test
+  public void testIncludeDeletedVariables() {
+    when(mockedQuery.includeDeleted()).thenReturn(mockedQuery);
+
+    given()
+      .queryParam("includeDeleted", true)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(HISTORIC_VARIABLE_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).includeDeleted();
+  }
+
   private List<HistoricVariableInstance> createMockHistoricVariableInstancesTwoTenants() {
     return Arrays.asList(
         MockProvider.mockHistoricVariableInstance(MockProvider.EXAMPLE_TENANT_ID).build(),
         MockProvider.mockHistoricVariableInstance(MockProvider.ANOTHER_EXAMPLE_TENANT_ID).build());
   }
-
 }

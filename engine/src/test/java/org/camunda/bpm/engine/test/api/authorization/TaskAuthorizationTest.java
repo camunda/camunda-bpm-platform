@@ -27,18 +27,28 @@ import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_TASK;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Resources.TASK;
+import static org.junit.Assert.assertEquals;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.authorization.*;
+import org.camunda.bpm.engine.history.HistoricIncident;
+import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.TaskServiceImpl;
 import org.camunda.bpm.engine.impl.cfg.auth.DefaultAuthorizationProvider;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
+import org.camunda.bpm.engine.impl.interceptor.Command;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
+import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.engine.task.IdentityLinkType;
@@ -47,6 +57,7 @@ import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.value.TypedValue;
+import org.junit.Assert;
 
 /**
  * @author Roman Smirnov
@@ -77,6 +88,17 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   public void tearDown() {
     super.tearDown();
     deleteDeployment(deploymentId);
+
+    processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
+      public Void execute(CommandContext commandContext) {
+
+        List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery().includeDeleted().list();
+        for (HistoricVariableInstance variable : variables) {
+          commandContext.getDbEntityManager().delete((HistoricVariableInstanceEntity) variable);
+        }
+        return null;
+      }
+    });
   }
 
   // task query ///////////////////////////////////////////////////////
@@ -8799,6 +8821,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     enableAuthorization();
 
     deleteTask(taskId, true);
+    HistoricVariableInstance deletedVariable = historyService.createHistoricVariableInstanceQuery().includeDeleted().singleResult();
+    Assert.assertEquals("DELETED", deletedVariable.getState());
   }
 
   public void testStandaloneTaskRemoveVariableLocalWithReadPermissionOnAnyTask() {
@@ -8821,6 +8845,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     enableAuthorization();
 
     deleteTask(taskId, true);
+    HistoricVariableInstance deletedVariable = historyService.createHistoricVariableInstanceQuery().includeDeleted().singleResult();
+    Assert.assertEquals("DELETED", deletedVariable.getState());
   }
 
   // TaskService#removeVariableLocal() (process task) ////////////////////////////////////////////
@@ -9155,6 +9181,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     enableAuthorization();
 
     deleteTask(taskId, true);
+    HistoricVariableInstance deletedVariable = historyService.createHistoricVariableInstanceQuery().includeDeleted().singleResult();
+    Assert.assertEquals("DELETED", deletedVariable.getState());
   }
 
   public void testStandaloneTaskRemoveVariablesLocalWithReadPermissionOnAnyTask() {
@@ -9177,6 +9205,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     enableAuthorization();
 
     deleteTask(taskId, true);
+    HistoricVariableInstance deletedVariable = historyService.createHistoricVariableInstanceQuery().includeDeleted().singleResult();
+    Assert.assertEquals("DELETED", deletedVariable.getState());
   }
 
   // TaskService#removeVariablesLocal() (process task) ////////////////////////////////////////////
@@ -9385,6 +9415,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     enableAuthorization();
 
     deleteTask(taskId, true);
+    List<HistoricVariableInstance> deletedVariables = historyService.createHistoricVariableInstanceQuery().includeDeleted().list();
+    Assert.assertEquals("DELETED", deletedVariables.get(0).getState());
+    Assert.assertEquals("DELETED", deletedVariables.get(1).getState());
   }
 
   public void testStandaloneTaskUpdateVariablesLocalWithReadPermissionOnAnyTask() {
@@ -9419,6 +9452,9 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     enableAuthorization();
 
     deleteTask(taskId, true);
+    List<HistoricVariableInstance> deletedVariables = historyService.createHistoricVariableInstanceQuery().includeDeleted().list();
+    Assert.assertEquals("DELETED", deletedVariables.get(0).getState());
+    Assert.assertEquals("DELETED", deletedVariables.get(1).getState());
   }
 
   // TaskServiceImpl#updateVariablesLocal() (process task) ////////////////////////////////////////////

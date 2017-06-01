@@ -343,5 +343,4 @@ public class HistoricVariableInstanceRestServiceInteractionTest extends Abstract
     .and().body(is(equalTo(new String())))
     .when().get(VARIABLE_INSTANCE_BINARY_DATA_URL);
   }
-
 }
