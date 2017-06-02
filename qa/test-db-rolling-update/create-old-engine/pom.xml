@@ -99,7 +99,7 @@
                 <phase>process-test-classes</phase>
                 <configuration>
                   <mainClass>org.camunda.bpm.qa.rolling.update.CreateOldEngineMain</mainClass>
-                  <includePluginDependencies>true</includePluginDependencies>
+                  <includePluginDependencies>false</includePluginDependencies>
                 </configuration>
               </execution>
             </executions>
