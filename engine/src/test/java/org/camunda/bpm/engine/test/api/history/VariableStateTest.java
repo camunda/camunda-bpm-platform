@@ -5,12 +5,14 @@ import static org.junit.Assert.assertEquals;
 import java.util.List;
 
 import org.camunda.bpm.engine.HistoryService;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.variable.Variables;
@@ -20,6 +22,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 
+@RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
 public class VariableStateTest {
 
   public ProcessEngineRule engineRule = new ProcessEngineRule(true);
