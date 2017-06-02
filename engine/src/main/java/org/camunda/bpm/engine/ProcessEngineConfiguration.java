@@ -267,6 +267,15 @@ public abstract class ProcessEngineConfiguration {
 
   protected String authorizationCheckRevokes = AUTHORIZATION_CHECK_REVOKE_AUTO;
 
+  /**
+   * If the value of this flag is set <code>true</code> then the process engine
+   * throws {@link ProcessEngineException} when no catching boundary event was
+   * defined for an error event.
+   *
+   * <p>The default value is <code>false</code>.</p>
+   */
+  protected boolean enableExceptionsAfterUnhandledBpmnError = false;
+
   /** use one of the static createXxxx methods instead */
   protected ProcessEngineConfiguration() {
   }
@@ -739,5 +748,13 @@ public abstract class ProcessEngineConfiguration {
 
   public String getAuthorizationCheckRevokes() {
     return authorizationCheckRevokes;
+  }
+
+  public boolean isEnableExceptionsAfterUnhandledBpmnError() {
+    return enableExceptionsAfterUnhandledBpmnError;
+  }
+
+  public void setEnableExceptionsAfterUnhandledBpmnError(boolean enableExceptionsAfterUnhandledBpmnError) {
+    this.enableExceptionsAfterUnhandledBpmnError = enableExceptionsAfterUnhandledBpmnError;
   }
 }

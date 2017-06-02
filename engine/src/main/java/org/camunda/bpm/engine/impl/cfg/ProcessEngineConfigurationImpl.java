@@ -497,7 +497,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected boolean enableScriptCompilation = true;
   protected boolean enableScriptEngineCaching = true;
   protected boolean enableFetchScriptEngineFromProcessApplication = true;
-  protected boolean enableExceptionsAfterUnhandledBpmnError = false;
 
   protected boolean cmmnEnabled = true;
   protected boolean dmnEnabled = true;
@@ -3279,14 +3278,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
    */
   public void setDeploymentSynchronized(boolean deploymentSynchronized) {
     isDeploymentSynchronized = deploymentSynchronized;
-  }
-
-  public boolean isEnableExceptionsAfterUnhandledBpmnError() {
-    return enableExceptionsAfterUnhandledBpmnError;
-  }
-
-  public void setEnableExceptionsAfterUnhandledBpmnError(boolean enableExceptionsAfterUnhandledBpmnError) {
-    this.enableExceptionsAfterUnhandledBpmnError = enableExceptionsAfterUnhandledBpmnError;
   }
 
   public boolean isCmmnEnabled() {
