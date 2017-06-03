@@ -84,7 +84,8 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
 
   protected Date finishedAfter;
   protected Date finishedBefore;
-  protected Date createdAfter;
+  protected Date startedAfter;
+  protected Date startedBefore;
 
   public HistoricTaskInstanceQueryImpl() {
   }
@@ -360,7 +361,7 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
     return super.hasExcludingConditions()
       || (finished && unfinished)
       ||(processFinished && processUnfinished)
-      || CompareUtil.areNotInAscendingOrder(createdAfter)
+      || CompareUtil.areNotInAscendingOrder(startedAfter, startedBefore)
       || CompareUtil.areNotInAscendingOrder(finishedAfter, finishedBefore)
       || CompareUtil.areNotInAscendingOrder(dueAfter, dueDate, dueBefore)
       || CompareUtil.areNotInAscendingOrder(followUpAfter, followUpDate, followUpBefore);
@@ -483,8 +484,14 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
   }
 
   @Override
-  public HistoricTaskInstanceQuery createdAfter(Date date) {
-    this.createdAfter = date;
+  public HistoricTaskInstanceQuery startedAfter(Date date) {
+    this.startedAfter = date;
+    return this;
+  }
+
+  @Override
+  public HistoricTaskInstanceQuery startedBefore(Date date) {
+    this.startedBefore = date;
     return this;
   }
 
@@ -619,8 +626,11 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
     return finishedBefore;
   }
 
-  public Date getCreatedAfter() {
-    return createdAfter;
+  public Date getStartedAfter() {
+    return startedAfter;
   }
 
+  public Date getStartedBefore() {
+    return startedBefore;
+  }
 }

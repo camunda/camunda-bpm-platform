@@ -350,9 +350,14 @@ public interface HistoricTaskInstanceQuery  extends Query<HistoricTaskInstanceQu
   HistoricTaskInstanceQuery finishedBefore(Date date);
 
   /**
-   * Only select tasks where created after given date
+   * Only select tasks where started after given date
    */
-  HistoricTaskInstanceQuery createdAfter(Date date);
+  HistoricTaskInstanceQuery startedAfter(Date date);
+
+  /**
+   * Only select tasks where started before given date
+   */
+  HistoricTaskInstanceQuery startedBefore(Date date);
 
 
 }

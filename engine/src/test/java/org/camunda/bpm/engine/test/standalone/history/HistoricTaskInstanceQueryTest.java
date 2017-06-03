@@ -20,6 +20,7 @@ import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
@@ -332,28 +333,40 @@ public class HistoricTaskInstanceQueryTest extends PluggableProcessEngineTestCas
     // when
     taskOne.setAssignee("aUserId");
     taskService.saveTask(taskOne);
+
+    Calendar hourAgo = Calendar.getInstance();
+    hourAgo.add(Calendar.HOUR_OF_DAY, -1);
+    ClockUtil.setCurrentTime(hourAgo.getTime());
+
+
     taskService.complete(taskOne.getId());
 
 
     List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery()
-            .finishedBefore(Calendar.getInstance().getTime()).list();
+            .finishedBefore(hourAgo.getTime()).list();
 
     // then
-    assertEquals(list.size(), 1);
+    assertEquals(1, list.size());
 
     // cleanup
     taskService.deleteTask("taskOne",true);
+    ClockUtil.reset();
   }
 
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
-  public void testTaskReturnedAfterEndTime() {
+  public void testTaskNotReturnedAfterEndTime() {
     // given
     Task taskOne = taskService.newTask("taskOne");
 
     // when
     taskOne.setAssignee("aUserId");
     taskService.saveTask(taskOne);
+
+    Calendar hourAgo = Calendar.getInstance();
+    hourAgo.add(Calendar.HOUR_OF_DAY, -1);
+    ClockUtil.setCurrentTime(hourAgo.getTime());
+
     taskService.complete(taskOne.getId());
 
 
@@ -361,10 +374,13 @@ public class HistoricTaskInstanceQueryTest extends PluggableProcessEngineTestCas
             .finishedAfter(Calendar.getInstance().getTime()).list();
 
     // then
-    assertEquals(list.size(), 0);
+    assertEquals(0, list.size());
 
     // cleanup
     taskService.deleteTask("taskOne",true);
+
+    ClockUtil.reset();
   }
+
 
 }

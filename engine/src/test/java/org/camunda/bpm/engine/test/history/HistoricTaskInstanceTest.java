@@ -226,19 +226,21 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
     assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskDueBefore(anHourAgo.getTime()).taskDueAfter(anHourLater.getTime()).count());
 
 
-    //End time before
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery().finishedBefore(Calendar.getInstance().getTime()).count());
+    Calendar hourAgo = Calendar.getInstance();
+    hourAgo.add(Calendar.HOUR_OF_DAY, -1);
+    Calendar hourFromNow = Calendar.getInstance();
+    hourFromNow.add(Calendar.HOUR_OF_DAY, 1);
 
-    //End time after
-    assertEquals(0, historyService.createHistoricTaskInstanceQuery().finishedAfter(Calendar.getInstance().getTime()).count());
-
-    //Tasks completed in the last 7 days
-    Calendar sevenDaysAgo = Calendar.getInstance();
-    sevenDaysAgo.add(Calendar.DAY_OF_MONTH, -7);
-    assertEquals(1, historyService.createHistoricTaskInstanceQuery()
-            .createdAfter(sevenDaysAgo.getTime())
-            .finishedBefore(Calendar.getInstance().getTime()).count());
-
+    // Start/end dates
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery().finishedBefore(hourAgo.getTime()).count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().finishedBefore(hourFromNow.getTime()).count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().finishedAfter(hourAgo.getTime()).count());
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery().finishedAfter(hourFromNow.getTime()).count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().startedBefore(hourFromNow.getTime()).count());
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery().startedBefore(hourAgo.getTime()).count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().startedAfter(hourAgo.getTime()).count());
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery().startedAfter(hourFromNow.getTime()).count());
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery().startedAfter(hourFromNow.getTime()).startedBefore(hourAgo.getTime()).count());
 
 
     // Finished and Unfinished - Add anther other instance that has a running task (unfinished)
