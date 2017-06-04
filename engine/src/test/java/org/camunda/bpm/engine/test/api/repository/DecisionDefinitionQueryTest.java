@@ -614,46 +614,45 @@ public class DecisionDefinitionQueryTest {
     assertEquals(expectedCount, query.list().size());
   }
   
-	@Deployment(resources = { 
-			"org/camunda/bpm/engine/test/api/repository/versionTag.dmn",
-			"org/camunda/bpm/engine/test/api/repository/versionTagHigher.dmn" })
-	@Test
-	public void testQueryOrderByVersionTag() {
-		List<DecisionDefinition> decisionDefinitionList = repositoryService
-															.createDecisionDefinitionQuery()
-															.versionTagLike("1%")
-															.orderByVersionTag()
-															.asc()
-															.list();
+  @Deployment(resources = { 
+    "org/camunda/bpm/engine/test/api/repository/versionTag.dmn",
+	"org/camunda/bpm/engine/test/api/repository/versionTagHigher.dmn" })
+  @Test
+  public void testQueryOrderByVersionTag() {
+    List<DecisionDefinition> decisionDefinitionList = repositoryService
+	  .createDecisionDefinitionQuery()
+	  .versionTagLike("1%")
+	  .orderByVersionTag()
+	  .asc()
+	  .list();
 
-		assertEquals("1.1.0", decisionDefinitionList.get(1).getVersionTag());
-	}
+	assertEquals("1.1.0", decisionDefinitionList.get(1).getVersionTag());
+  }
 	
-	@Deployment(resources = { 
-			"org/camunda/bpm/engine/test/api/repository/versionTag.dmn",
-			"org/camunda/bpm/engine/test/api/repository/versionTagHigher.dmn" })
-	@Test
-	public void testQueryByVersionTag() {
-		DecisionDefinition decisionDefinition = repositoryService
-															.createDecisionDefinitionQuery()
-															.versionTag("1.0.0")
-															.singleResult();
-
-		assertEquals("versionTag", decisionDefinition.getKey());
-		assertEquals("1.0.0", decisionDefinition.getVersionTag());
-	}
+  @Deployment(resources = { 
+    "org/camunda/bpm/engine/test/api/repository/versionTag.dmn",
+    "org/camunda/bpm/engine/test/api/repository/versionTagHigher.dmn" })
+  @Test
+  public void testQueryByVersionTag() {
+    DecisionDefinition decisionDefinition = repositoryService
+	  .createDecisionDefinitionQuery()
+      .versionTag("1.0.0")
+	   .singleResult();
+  
+    assertEquals("versionTag", decisionDefinition.getKey());
+	assertEquals("1.0.0", decisionDefinition.getVersionTag());
+  }
 	
-	@Deployment(resources = { 
-			"org/camunda/bpm/engine/test/api/repository/versionTag.dmn",
-			"org/camunda/bpm/engine/test/api/repository/versionTagHigher.dmn" })
-	@Test
-	public void testQueryByVersionTagLike() {
-		List<DecisionDefinition> decisionDefinitionList = repositoryService
-															.createDecisionDefinitionQuery()
-															.versionTagLike("1%")
-															.list();
+  @Deployment(resources = { 
+    "org/camunda/bpm/engine/test/api/repository/versionTag.dmn",
+	"org/camunda/bpm/engine/test/api/repository/versionTagHigher.dmn" })
+  @Test
+  public void testQueryByVersionTagLike() {
+    List<DecisionDefinition> decisionDefinitionList = repositoryService
+	  .createDecisionDefinitionQuery()
+	  .versionTagLike("1%")
+	  .list();
 
-		assertEquals(2, decisionDefinitionList.size());
-	}
-
+    assertEquals(2, decisionDefinitionList.size());
+  }
 }

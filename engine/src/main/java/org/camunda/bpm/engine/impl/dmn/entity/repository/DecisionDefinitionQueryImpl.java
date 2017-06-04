@@ -154,7 +154,7 @@ public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitio
   
   @Override
   public DecisionDefinitionQuery versionTag(String versionTag) {
-	ensureNotNull(NotValidException.class, "versionTag", versionTag);
+    ensureNotNull(NotValidException.class, "versionTag", versionTag);
 	this.versionTag = versionTag;
   	return this;
   }
@@ -225,7 +225,7 @@ public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitio
 
   @Override
   public DecisionDefinitionQuery orderByVersionTag() {
-	  return orderBy(DecisionDefinitionQueryProperty.VERSION_TAG);
+    return orderBy(DecisionDefinitionQueryProperty.VERSION_TAG);
   }
   
   //results ////////////////////////////////////////////
@@ -307,11 +307,11 @@ public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitio
   }
   
   public String getVersionTag() {
-	 return versionTag;
+    return versionTag;
   }
   
   public String getVersionTagLike() {
-	 return versionTagLike;
+    return versionTagLike;
   }
   
   public boolean isLatest() {
