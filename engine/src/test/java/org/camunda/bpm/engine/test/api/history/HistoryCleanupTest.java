@@ -211,9 +211,9 @@ public class HistoryCleanupTest {
     managementService.executeJob(jobId);
 
     //then
-    final long removedProcessInstances = managementService.createMetricsQuery().name(Metrics.HISTORY_REMOVED_PROCESS_INSTANCES).sum();
-    final long removedDecisionInstances = managementService.createMetricsQuery().name(Metrics.HISTORY_REMOVED_CASE_INSTANCES).sum();
-    final long removedCaseInstances = managementService.createMetricsQuery().name(Metrics.HISTORY_REMOVED_DECISION_INSTANCES).sum();
+    final long removedProcessInstances = managementService.createMetricsQuery().name(Metrics.HISTORY_CLEANUP_REMOVED_PROCESS_INSTANCES).sum();
+    final long removedDecisionInstances = managementService.createMetricsQuery().name(Metrics.HISTORY_CLEANUP_REMOVED_CASE_INSTANCES).sum();
+    final long removedCaseInstances = managementService.createMetricsQuery().name(Metrics.HISTORY_CLEANUP_REMOVED_DECISION_INSTANCES).sum();
 
     assertTrue(removedProcessInstances > 0);
     assertTrue(removedDecisionInstances > 0);

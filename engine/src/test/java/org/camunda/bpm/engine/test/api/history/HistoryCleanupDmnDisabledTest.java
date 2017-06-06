@@ -13,15 +13,18 @@
 package org.camunda.bpm.engine.test.api.history;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import org.apache.commons.lang.time.DateUtils;
 import org.camunda.bpm.engine.HistoryService;
+import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.metrics.Meter;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.Job;
@@ -60,11 +63,15 @@ public class HistoryCleanupDmnDisabledTest {
 
   private RuntimeService runtimeService;
   private HistoryService historyService;
+  private ProcessEngineConfigurationImpl processEngineConfiguration;
+  private ManagementService managementService;
 
   @Before
   public void createProcessEngine() {
     runtimeService = engineRule.getRuntimeService();
     historyService = engineRule.getHistoryService();
+    managementService = engineRule.getManagementService();
+    processEngineConfiguration = engineRule.getProcessEngineConfiguration();
 
   }
 
@@ -85,6 +92,16 @@ public class HistoryCleanupDmnDisabledTest {
       }
     });
 
+    clearMetrics();
+
+  }
+
+  protected void clearMetrics() {
+    Collection<Meter> meters = processEngineConfiguration.getMetricsRegistry().getMeters().values();
+    for (Meter meter : meters) {
+      meter.getAndClear();
+    }
+    managementService.deleteMetrics(null);
   }
 
   @Test

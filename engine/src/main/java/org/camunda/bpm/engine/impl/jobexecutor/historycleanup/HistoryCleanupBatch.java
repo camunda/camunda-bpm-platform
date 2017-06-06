@@ -57,15 +57,15 @@ public class HistoryCleanupBatch {
     final CommandContext commandContext = Context.getCommandContext();
     if (historicProcessInstanceIds.size() > 0) {
       commandContext.getHistoricProcessInstanceManager().deleteHistoricProcessInstanceByIds(historicProcessInstanceIds);
-      recordValue(Metrics.HISTORY_REMOVED_PROCESS_INSTANCES, historicProcessInstanceIds.size());
+      recordValue(Metrics.HISTORY_CLEANUP_REMOVED_PROCESS_INSTANCES, historicProcessInstanceIds.size());
     }
     if (historicDecisionInstanceIds.size() > 0) {
       commandContext.getHistoricDecisionInstanceManager().deleteHistoricDecisionInstanceByIds(historicDecisionInstanceIds);
-      recordValue(Metrics.HISTORY_REMOVED_DECISION_INSTANCES, historicDecisionInstanceIds.size());
+      recordValue(Metrics.HISTORY_CLEANUP_REMOVED_DECISION_INSTANCES, historicDecisionInstanceIds.size());
     }
     if (historicCaseInstanceIds.size() > 0){
       commandContext.getHistoricCaseInstanceManager().deleteHistoricCaseInstancesByIds(historicCaseInstanceIds);
-      recordValue(Metrics.HISTORY_REMOVED_CASE_INSTANCES, historicCaseInstanceIds.size());
+      recordValue(Metrics.HISTORY_CLEANUP_REMOVED_CASE_INSTANCES, historicCaseInstanceIds.size());
     }
   }
 

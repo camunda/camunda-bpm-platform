@@ -59,7 +59,7 @@ public class Metrics {
   /**
    * Number of instances removed by history coleanup.
    */
-  public final static String HISTORY_REMOVED_PROCESS_INSTANCES = "history-removed-process-instances";
-  public final static String HISTORY_REMOVED_CASE_INSTANCES = "history-removed-case-instances";
-  public final static String HISTORY_REMOVED_DECISION_INSTANCES = "history-removed-decision-instances";
+  public final static String HISTORY_CLEANUP_REMOVED_PROCESS_INSTANCES = "history-cleanup-removed-process-instances";
+  public final static String HISTORY_CLEANUP_REMOVED_CASE_INSTANCES = "history-cleanup-removed-case-instances";
+  public final static String HISTORY_CLEANUP_REMOVED_DECISION_INSTANCES = "history-cleanup-removed-decision-instances";
 }
