@@ -13,15 +13,6 @@
 
 package org.camunda.bpm.engine.test.history;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
@@ -31,15 +22,16 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.history.event.HistoricActivityInstanceEventEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
-import org.camunda.bpm.engine.runtime.EventSubscriptionQuery;
-import org.camunda.bpm.engine.runtime.Execution;
-import org.camunda.bpm.engine.runtime.Job;
-import org.camunda.bpm.engine.runtime.JobQuery;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.*;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+
+import java.util.*;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 /**
  * @author Tom Baeyens
@@ -754,6 +746,7 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
     HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery();
 
     HistoricActivityInstance miBodyInstance = query.activityId("userTask#multiInstanceBody").singleResult();
+    assertEquals("multiInstanceUserTask", miBodyInstance.getActivityName());
 
     query.activityId("userTask");
     assertEquals(5, query.count());
@@ -779,6 +772,7 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
 
     HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery();
     HistoricActivityInstance miBodyInstance = query.activityId("receiveTask#multiInstanceBody").singleResult();
+    assertEquals("multiInstanceUserTask", miBodyInstance.getActivityName());
 
     query.activityId("receiveTask");
     assertEquals(5, query.count());

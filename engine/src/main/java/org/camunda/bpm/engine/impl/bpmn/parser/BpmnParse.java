@@ -1641,7 +1641,8 @@ public class BpmnParse extends Parse {
       id = getIdForMiBody(id);
       ActivityImpl miBodyScope = scope.createActivity(id);
       setActivityAsyncDelegates(miBodyScope);
-      miBodyScope.setProperty(PROPERTYNAME_TYPE, ActivityTypes.MULTI_INSTANCE_BODY);
+      miBodyScope.setProperty("name", activityElement.attribute("name"));
+      miBodyScope.getProperties().set(BpmnProperties.TYPE, ActivityTypes.MULTI_INSTANCE_BODY);
       miBodyScope.setScope(true);
 
       boolean isSequential = parseBooleanAttribute(miLoopCharacteristics.attribute("isSequential"), false);
