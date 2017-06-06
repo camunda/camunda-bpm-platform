@@ -701,6 +701,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
    */
   private int historyCleanupBatchThreshold = 10;
 
+  private boolean historyCleanupMetricsEnabled = true;
+
   private int failedJobListenerMaxRetries = DEFAULT_FAILED_JOB_LISTENER_MAX_RETRIES;
 
   // buildProcessEngine ///////////////////////////////////////////////////////
@@ -3724,6 +3726,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setHistoryCleanupBatchThreshold(int historyCleanupBatchThreshold) {
     this.historyCleanupBatchThreshold = historyCleanupBatchThreshold;
+  }
+
+  public boolean isHistoryCleanupMetricsEnabled() {
+    return historyCleanupMetricsEnabled;
+  }
+
+  public void setHistoryCleanupMetricsEnabled(boolean historyCleanupMetricsEnabled) {
+    this.historyCleanupMetricsEnabled = historyCleanupMetricsEnabled;
   }
 
   public int getFailedJobListenerMaxRetries() {

@@ -2,8 +2,10 @@ package org.camunda.bpm.engine.impl.jobexecutor.historycleanup;
 
 import java.util.Collections;
 import java.util.List;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.management.Metrics;
 
 /**
  * Batch of work for history cleanup.
@@ -55,12 +57,22 @@ public class HistoryCleanupBatch {
     final CommandContext commandContext = Context.getCommandContext();
     if (historicProcessInstanceIds.size() > 0) {
       commandContext.getHistoricProcessInstanceManager().deleteHistoricProcessInstanceByIds(historicProcessInstanceIds);
+      recordValue(Metrics.HISTORY_REMOVED_PROCESS_INSTANCES, historicProcessInstanceIds.size());
     }
     if (historicDecisionInstanceIds.size() > 0) {
       commandContext.getHistoricDecisionInstanceManager().deleteHistoricDecisionInstanceByIds(historicDecisionInstanceIds);
+      recordValue(Metrics.HISTORY_REMOVED_DECISION_INSTANCES, historicDecisionInstanceIds.size());
     }
     if (historicCaseInstanceIds.size() > 0){
       commandContext.getHistoricCaseInstanceManager().deleteHistoricCaseInstancesByIds(historicCaseInstanceIds);
+      recordValue(Metrics.HISTORY_REMOVED_CASE_INSTANCES, historicCaseInstanceIds.size());
+    }
+  }
+
+  protected void recordValue(String name, long value) {
+    final ProcessEngineConfigurationImpl processEngineConfiguration = Context.getCommandContext().getProcessEngineConfiguration();
+    if (processEngineConfiguration.isHistoryCleanupMetricsEnabled()) {
+      processEngineConfiguration.getDbMetricsReporter().reportValueAtOnce(name, value);
     }
   }
 

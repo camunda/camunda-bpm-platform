@@ -45,6 +45,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.ExceptionUtil;
 import org.camunda.bpm.engine.impl.util.json.JSONObject;
+import org.camunda.bpm.engine.management.Metrics;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -195,6 +196,30 @@ public class HistoryCleanupTest {
 
     //then
     assertResult(0);
+  }
+
+  @Test
+  public void testHistoryCleanupMetrics() {
+    //given
+    processEngineConfiguration.setHistoryCleanupMetricsEnabled(true);
+    prepareData(15);
+
+    ClockUtil.setCurrentTime(new Date());
+    //when
+    String jobId = historyService.cleanUpHistoryAsync(true).getId();
+
+    managementService.executeJob(jobId);
+
+    //then
+    final long removedProcessInstances = managementService.createMetricsQuery().name(Metrics.HISTORY_REMOVED_PROCESS_INSTANCES).sum();
+    final long removedDecisionInstances = managementService.createMetricsQuery().name(Metrics.HISTORY_REMOVED_CASE_INSTANCES).sum();
+    final long removedCaseInstances = managementService.createMetricsQuery().name(Metrics.HISTORY_REMOVED_DECISION_INSTANCES).sum();
+
+    assertTrue(removedProcessInstances > 0);
+    assertTrue(removedDecisionInstances > 0);
+    assertTrue(removedCaseInstances > 0);
+
+    assertEquals(15, removedProcessInstances + removedCaseInstances + removedDecisionInstances);
   }
 
   @Test

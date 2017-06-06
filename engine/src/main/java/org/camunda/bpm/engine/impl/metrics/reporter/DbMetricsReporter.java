@@ -15,8 +15,12 @@ package org.camunda.bpm.engine.impl.metrics.reporter;
 
 import java.util.Timer;
 
+import org.camunda.bpm.engine.impl.interceptor.Command;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.metrics.MetricsRegistry;
+import org.camunda.bpm.engine.impl.persistence.entity.MeterLogEntity;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 
 /**
  * @author Daniel Meyer
@@ -67,6 +71,16 @@ public class DbMetricsReporter {
     if(metricsCollectionTask != null) {
       metricsCollectionTask.run();
     }
+  }
+
+  public void reportValueAtOnce(final String name, final long value) {
+    commandExecutor.execute(new Command<Void>() {
+      @Override
+      public Void execute(CommandContext commandContext) {
+        commandContext.getMeterLogManager().insert(new MeterLogEntity(name, reporterId, value, ClockUtil.getCurrentTime()));
+        return null;
+      }
+    });
   }
 
   public long getReportingIntervalInSeconds() {
