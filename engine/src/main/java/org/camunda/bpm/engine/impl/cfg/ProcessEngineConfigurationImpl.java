@@ -1507,7 +1507,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected List<BpmnParseListener> getDefaultBPMNParseListeners() {
     List<BpmnParseListener> defaultListeners = new ArrayList<BpmnParseListener>();
-    if (!HistoryLevel.HISTORY_LEVEL_NONE.equals(historyLevel)) {
+    // do not add if history==none or history==auto
+    if (!HistoryLevel.HISTORY_LEVEL_NONE.equals(historyLevel) && !ProcessEngineConfiguration.HISTORY_AUTO.equals(history)) {
       defaultListeners.add(new HistoryParseListener(historyLevel, historyEventProducer));
     }
     if (isMetricsEnabled) {
@@ -1902,7 +1903,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
   }
 
-  protected void initDmnEngine() {
+  public void initDmnEngine() {
     if (dmnEngine == null) {
 
       if (dmnEngineConfiguration == null) {
@@ -3492,6 +3493,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   public boolean isBpmnStacktraceVerbose() {
     return this.isBpmnStacktraceVerbose;
   }
+
+
 
   public boolean isForceCloseMybatisConnectionPool() {
     return forceCloseMybatisConnectionPool;

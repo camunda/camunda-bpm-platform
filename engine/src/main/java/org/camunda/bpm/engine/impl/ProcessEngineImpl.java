@@ -90,7 +90,7 @@ public class ProcessEngineImpl implements ProcessEngine {
     this.databaseSchemaUpdate = processEngineConfiguration.getDatabaseSchemaUpdate();
     this.jobExecutor = processEngineConfiguration.getJobExecutor();
     this.commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
-    commandExecutorSchemaOperations = processEngineConfiguration.getCommandExecutorSchemaOperations();
+    this.commandExecutorSchemaOperations = processEngineConfiguration.getCommandExecutorSchemaOperations();
     this.sessionFactories = processEngineConfiguration.getSessionFactories();
     this.historyLevel = processEngineConfiguration.getHistoryLevel();
     this.transactionContextFactory = processEngineConfiguration.getTransactionContextFactory();
@@ -156,8 +156,8 @@ public class ProcessEngineImpl implements ProcessEngine {
   public String getName() {
     return name;
   }
-  
-  @Override  
+
+  @Override
   public ProcessEngineConfigurationImpl getProcessEngineConfiguration() {
     return processEngineConfiguration;
   }

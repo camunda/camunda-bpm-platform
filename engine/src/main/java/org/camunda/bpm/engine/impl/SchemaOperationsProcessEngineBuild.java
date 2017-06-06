@@ -15,6 +15,9 @@ package org.camunda.bpm.engine.impl;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.SchemaOperationsCommand;
+import org.camunda.bpm.engine.impl.bpmn.deployer.BpmnDeployer;
+import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
+import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParser;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmd.DetermineHistoryLevelCmd;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -22,9 +25,12 @@ import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.PersistenceSession;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
-import org.camunda.bpm.engine.impl.interceptor.Command;
+import org.camunda.bpm.engine.impl.history.parser.HistoryParseListener;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.deploy.Deployer;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
+
+import java.util.List;
 
 /**
  * @author Tom Baeyens
@@ -36,6 +42,7 @@ public final class SchemaOperationsProcessEngineBuild implements SchemaOperation
 
   private final static EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
+  @Override
   public Void execute(CommandContext commandContext) {
     String databaseSchemaUpdate = Context.getProcessEngineConfiguration().getDatabaseSchemaUpdate();
     PersistenceSession persistenceSession = commandContext.getSession(PersistenceSession.class);
@@ -46,7 +53,7 @@ public final class SchemaOperationsProcessEngineBuild implements SchemaOperation
         // ignore
       }
     }
-    if ( ProcessEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP.equals(databaseSchemaUpdate)
+    if (ProcessEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP.equals(databaseSchemaUpdate)
       || ProcessEngineConfigurationImpl.DB_SCHEMA_UPDATE_DROP_CREATE.equals(databaseSchemaUpdate)
       || ProcessEngineConfigurationImpl.DB_SCHEMA_UPDATE_CREATE.equals(databaseSchemaUpdate)
       ) {
@@ -74,13 +81,18 @@ public final class SchemaOperationsProcessEngineBuild implements SchemaOperation
   public static void dbCreateHistoryLevel(DbEntityManager entityManager) {
     ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
     HistoryLevel configuredHistoryLevel = processEngineConfiguration.getHistoryLevel();
-    PropertyEntity property = new PropertyEntity("historyLevel", Integer.toString(configuredHistoryLevel.getId()));
-    entityManager.insert(property);
-    LOG.creatingHistoryLevelPropertyInDatabase(configuredHistoryLevel);
+
+    insertHistoryLevel(entityManager, configuredHistoryLevel);
   }
 
+  public static void insertHistoryLevel(DbEntityManager entityManager, HistoryLevel historyLevel) {
+    PropertyEntity property = new PropertyEntity("historyLevel", Integer.toString(historyLevel.getId()));
+    entityManager.insert(property);
+    LOG.creatingHistoryLevelPropertyInDatabase(historyLevel);
+  }
+
+
   /**
-   *
    * @param entityManager entoty manager for db query
    * @return Integer value representing the history level or <code>null</code> if none found
    */
@@ -89,8 +101,7 @@ public final class SchemaOperationsProcessEngineBuild implements SchemaOperation
     try {
       PropertyEntity historyLevelProperty = entityManager.selectById(PropertyEntity.class, "historyLevel");
       return historyLevelProperty != null ? new Integer(historyLevelProperty.getValue()) : null;
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       LOG.couldNotSelectHistoryLevel(e.getMessage());
       return null;
     }
@@ -98,14 +109,14 @@ public final class SchemaOperationsProcessEngineBuild implements SchemaOperation
   }
 
   public void checkHistoryLevel(DbEntityManager entityManager) {
-    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl engineConfiguration = Context.getProcessEngineConfiguration();
 
 
-    HistoryLevel databaseHistoryLevel = new DetermineHistoryLevelCmd(processEngineConfiguration.getHistoryLevels())
+    HistoryLevel databaseHistoryLevel = new DetermineHistoryLevelCmd(engineConfiguration.getHistoryLevels())
       .execute(Context.getCommandContext());
-    determineAutoHistoryLevel(processEngineConfiguration, databaseHistoryLevel);
+    determineAutoHistoryLevel(engineConfiguration, databaseHistoryLevel);
 
-    HistoryLevel configuredHistoryLevel = processEngineConfiguration.getHistoryLevel();
+    HistoryLevel configuredHistoryLevel = engineConfiguration.getHistoryLevel();
 
     if (databaseHistoryLevel == null) {
       LOG.noHistoryLevelPropertyFound();
@@ -113,25 +124,50 @@ public final class SchemaOperationsProcessEngineBuild implements SchemaOperation
     } else {
       if (!((Integer) configuredHistoryLevel.getId()).equals(databaseHistoryLevel.getId())) {
         throw new ProcessEngineException("historyLevel mismatch: configuration says " + configuredHistoryLevel
-            + " and database says " + databaseHistoryLevel);
+          + " and database says " + databaseHistoryLevel);
       }
     }
+
+
+    // add ParseListener depending on history level
+    for (Deployer deployer : engineConfiguration.getDeployers()) {
+      if (deployer instanceof BpmnDeployer) {
+        BpmnParser parser = ((BpmnDeployer) deployer).getBpmnParser();
+        BpmnParseListener historyParseListener = findHistoryParseListener(parser.getParseListeners());
+        if (historyParseListener == null) {
+          parser.getParseListeners().add(new HistoryParseListener(engineConfiguration.getHistoryLevel(), engineConfiguration.getHistoryEventProducer()));
+        }
+      }
+    }
+
+    // init dmn engine again for historyLevel
+    engineConfiguration.setDmnEngine(null);
+    engineConfiguration.initDmnEngine();
   }
 
   protected void determineAutoHistoryLevel(ProcessEngineConfigurationImpl engineConfiguration, HistoryLevel databaseHistoryLevel) {
     HistoryLevel configuredHistoryLevel = engineConfiguration.getHistoryLevel();
 
     if (configuredHistoryLevel == null
-        && ProcessEngineConfiguration.HISTORY_AUTO.equals(engineConfiguration.getHistory())) {
+      && ProcessEngineConfiguration.HISTORY_AUTO.equals(engineConfiguration.getHistory())) {
 
       // automatically determine history level or use default AUDIT
       if (databaseHistoryLevel != null) {
         engineConfiguration.setHistoryLevel(databaseHistoryLevel);
-      }
-      else {
+      } else {
         engineConfiguration.setHistoryLevel(engineConfiguration.getDefaultHistoryLevel());
       }
     }
+
+  }
+
+  private static BpmnParseListener findHistoryParseListener(List<BpmnParseListener> parseListeners) {
+    for (BpmnParseListener listener : parseListeners) {
+      if (listener instanceof HistoryParseListener) {
+        return listener;
+      }
+    }
+    return null;
   }
 
   public void checkDeploymentLockExists(DbEntityManager entityManager) {

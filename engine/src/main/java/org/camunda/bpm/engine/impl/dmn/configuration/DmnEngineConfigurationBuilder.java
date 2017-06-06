@@ -13,10 +13,6 @@
 
 package org.camunda.bpm.engine.impl.dmn.configuration;
 
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
-
-import java.util.List;
-
 import org.camunda.bpm.dmn.engine.delegate.DmnDecisionEvaluationListener;
 import org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration;
 import org.camunda.bpm.dmn.engine.impl.spi.el.DmnScriptEngineResolver;
@@ -31,6 +27,10 @@ import org.camunda.bpm.engine.impl.history.producer.DmnHistoryEventProducer;
 import org.camunda.bpm.engine.impl.metrics.dmn.MetricsDecisionEvaluationListener;
 import org.camunda.bpm.model.dmn.instance.Decision;
 import org.camunda.bpm.model.dmn.instance.Definitions;
+
+import java.util.List;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * Modify the given DMN engine configuration so that the DMN engine can be used
@@ -114,14 +114,15 @@ public class DmnEngineConfigurationBuilder {
 
   protected List<DmnDecisionEvaluationListener> createCustomPostDecisionEvaluationListeners() {
     ensureNotNull("dmnHistoryEventProducer", dmnHistoryEventProducer);
-    // note that the history level may be null - see CAM-5165
-
-    HistoryDecisionEvaluationListener historyDecisionEvaluationListener = new HistoryDecisionEvaluationListener(dmnHistoryEventProducer, historyLevel);
 
     List<DmnDecisionEvaluationListener> customPostDecisionEvaluationListeners = dmnEngineConfiguration
-        .getCustomPostDecisionEvaluationListeners();
+      .getCustomPostDecisionEvaluationListeners();
     customPostDecisionEvaluationListeners.add(new MetricsDecisionEvaluationListener());
-    customPostDecisionEvaluationListeners.add(historyDecisionEvaluationListener);
+
+    // note that the history level may be null - see CAM-5165
+    if (historyLevel != null) {
+      customPostDecisionEvaluationListeners.add(new HistoryDecisionEvaluationListener(dmnHistoryEventProducer, historyLevel));
+    }
 
     return customPostDecisionEvaluationListeners;
   }
