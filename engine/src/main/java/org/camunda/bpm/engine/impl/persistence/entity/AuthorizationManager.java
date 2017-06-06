@@ -668,7 +668,6 @@ public class AuthorizationManager extends AbstractManager {
       secondProcessInstancePermissionCheck.setResource(PROCESS_DEFINITION);
       secondProcessInstancePermissionCheck.setPermission(READ_INSTANCE);
       secondProcessInstancePermissionCheck.setResourceIdQueryParam("PROCDEF.KEY_");
-      secondProcessInstancePermissionCheck.setAuthorizationNotFoundReturnValue(0l);
 
       query.addProcessInstancePermissionCheck(firstProcessInstancePermissionCheck);
       query.addProcessInstancePermissionCheck(secondProcessInstancePermissionCheck);
@@ -683,7 +682,6 @@ public class AuthorizationManager extends AbstractManager {
         secondJobPermissionCheck.setResource(PROCESS_DEFINITION);
         secondJobPermissionCheck.setPermission(READ_INSTANCE);
         secondJobPermissionCheck.setResourceIdQueryParam("JOB.PROCESS_DEF_KEY_");
-        secondJobPermissionCheck.setAuthorizationNotFoundReturnValue(0l);
 
         query.addJobPermissionCheck(firstJobPermissionCheck);
         query.addJobPermissionCheck(secondJobPermissionCheck);
@@ -699,7 +697,6 @@ public class AuthorizationManager extends AbstractManager {
         secondIncidentPermissionCheck.setResource(PROCESS_DEFINITION);
         secondIncidentPermissionCheck.setPermission(READ_INSTANCE);
         secondIncidentPermissionCheck.setResourceIdQueryParam("PROCDEF.KEY_");
-        secondIncidentPermissionCheck.setAuthorizationNotFoundReturnValue(0l);
 
         query.addIncidentPermissionCheck(firstIncidentPermissionCheck);
         query.addIncidentPermissionCheck(secondIncidentPermissionCheck);
@@ -730,7 +727,6 @@ public class AuthorizationManager extends AbstractManager {
       secondProcessInstancePermissionCheck.setResource(PROCESS_DEFINITION);
       secondProcessInstancePermissionCheck.setPermission(READ_INSTANCE);
       secondProcessInstancePermissionCheck.setResourceIdQueryParam("P.KEY_");
-      secondProcessInstancePermissionCheck.setAuthorizationNotFoundReturnValue(0l);
 
       query.addProcessInstancePermissionCheck(firstProcessInstancePermissionCheck);
       query.addProcessInstancePermissionCheck(secondProcessInstancePermissionCheck);
@@ -745,7 +741,6 @@ public class AuthorizationManager extends AbstractManager {
         secondJobPermissionCheck.setResource(PROCESS_DEFINITION);
         secondJobPermissionCheck.setPermission(READ_INSTANCE);
         secondJobPermissionCheck.setResourceIdQueryParam("JOB.PROCESS_DEF_KEY_");
-        secondJobPermissionCheck.setAuthorizationNotFoundReturnValue(0l);
 
         query.addJobPermissionCheck(firstJobPermissionCheck);
         query.addJobPermissionCheck(secondJobPermissionCheck);
@@ -761,7 +756,6 @@ public class AuthorizationManager extends AbstractManager {
         secondIncidentPermissionCheck.setResource(PROCESS_DEFINITION);
         secondIncidentPermissionCheck.setPermission(READ_INSTANCE);
         secondIncidentPermissionCheck.setResourceIdQueryParam("PROCDEF.KEY_");
-        secondIncidentPermissionCheck.setAuthorizationNotFoundReturnValue(0l);
 
         query.addIncidentPermissionCheck(firstIncidentPermissionCheck);
         query.addIncidentPermissionCheck(secondIncidentPermissionCheck);
