@@ -19,18 +19,18 @@ import java.util.List;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.HistoricProcessInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl;
-import org.camunda.bpm.engine.impl.SuspensionBuilderImpl;
+import org.camunda.bpm.engine.impl.UpdateProcessInstancesSuspensionStationBuilderImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 
-public abstract class AbstractSuspendProcessInstancesCmd<T> implements Command<T> {
-  protected SuspensionBuilderImpl builder;
+public abstract class AbstractUpdateProcessInstancesSuspendStateCmd<T> implements Command<T> {
+  protected UpdateProcessInstancesSuspensionStationBuilderImpl builder;
   protected CommandExecutor commandExecutor;
 
-  public AbstractSuspendProcessInstancesCmd(CommandExecutor commandExecutor, SuspensionBuilderImpl builder) {
+  public AbstractUpdateProcessInstancesSuspendStateCmd(CommandExecutor commandExecutor, UpdateProcessInstancesSuspensionStationBuilderImpl builder) {
     this.commandExecutor = commandExecutor;
     this.builder = builder;
   }

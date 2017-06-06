@@ -12,24 +12,16 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
-import org.camunda.bpm.engine.impl.HistoricProcessInstanceQueryImpl;
-import org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl;
-import org.camunda.bpm.engine.impl.SuspensionBuilderImpl;
-import org.camunda.bpm.engine.impl.interceptor.Command;
+import org.camunda.bpm.engine.impl.UpdateProcessInstancesSuspensionStationBuilderImpl;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.runtime.UpdateProcessInstanceSuspensionStateBuilderImpl;
-import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 
-public class SuspendProcessInstancesCmd extends AbstractSuspendProcessInstancesCmd<Void>  {
+public class UpdateProcessInstancesSuspendStateCmd extends AbstractUpdateProcessInstancesSuspendStateCmd<Void> {
 
 
-  public SuspendProcessInstancesCmd(CommandExecutor commandExecutor, SuspensionBuilderImpl builder) {
+  public UpdateProcessInstancesSuspendStateCmd(CommandExecutor commandExecutor, UpdateProcessInstancesSuspensionStationBuilderImpl builder) {
     super(commandExecutor, builder);
   }
 

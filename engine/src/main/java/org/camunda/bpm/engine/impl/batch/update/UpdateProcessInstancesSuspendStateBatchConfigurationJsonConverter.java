@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.batch.suspension;
+package org.camunda.bpm.engine.impl.batch.update;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,12 +18,12 @@ import org.camunda.bpm.engine.impl.json.JsonObjectConverter;
 import org.camunda.bpm.engine.impl.util.JsonUtil;
 import org.camunda.bpm.engine.impl.util.json.JSONObject;
 
-public class SuspendProcessInstanceBatchConfigurationJsonConverter extends JsonObjectConverter<SuspendProcessInstanceBatchConfiguration> {
-  public static final SuspendProcessInstanceBatchConfigurationJsonConverter INSTANCE = new SuspendProcessInstanceBatchConfigurationJsonConverter();
+public class UpdateProcessInstancesSuspendStateBatchConfigurationJsonConverter extends JsonObjectConverter<UpdateProcessInstancesSuspendStateBatchConfiguration> {
+  public static final UpdateProcessInstancesSuspendStateBatchConfigurationJsonConverter INSTANCE = new UpdateProcessInstancesSuspendStateBatchConfigurationJsonConverter();
 
   public static final String PROCESS_INSTANCE_IDS = "processInstanceIds";
 
-  public JSONObject toJsonObject(SuspendProcessInstanceBatchConfiguration configuration) {
+  public JSONObject toJsonObject(UpdateProcessInstancesSuspendStateBatchConfiguration configuration) {
     JSONObject json = new JSONObject();
 
     JsonUtil.addListField(json, PROCESS_INSTANCE_IDS, configuration.getIds());
@@ -31,9 +31,9 @@ public class SuspendProcessInstanceBatchConfigurationJsonConverter extends JsonO
     return json;
   }
 
-  public SuspendProcessInstanceBatchConfiguration toObject(JSONObject json) {
-    SuspendProcessInstanceBatchConfiguration configuration =
-      new SuspendProcessInstanceBatchConfiguration(readProcessInstanceIds(json), json.getBoolean("suspended"));
+  public UpdateProcessInstancesSuspendStateBatchConfiguration toObject(JSONObject json) {
+    UpdateProcessInstancesSuspendStateBatchConfiguration configuration =
+      new UpdateProcessInstancesSuspendStateBatchConfiguration(readProcessInstanceIds(json), json.getBoolean("suspended"));
 
     return configuration;
   }

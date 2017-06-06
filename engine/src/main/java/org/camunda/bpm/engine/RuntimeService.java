@@ -41,7 +41,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstantiationBuilder;
 import org.camunda.bpm.engine.runtime.RestartProcessInstanceBuilder;
 import org.camunda.bpm.engine.runtime.SignalEventReceivedBuilder;
-import org.camunda.bpm.engine.runtime.SuspensionBuilder;
+import org.camunda.bpm.engine.runtime.UpdateProcessInstancesSuspensionStateBuilder;
 import org.camunda.bpm.engine.runtime.UpdateProcessInstanceSuspensionStateBuilder;
 import org.camunda.bpm.engine.runtime.UpdateProcessInstanceSuspensionStateSelectBuilder;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
@@ -1903,106 +1903,4 @@ public interface RuntimeService {
    *     </ul>
    */
   RestartProcessInstanceBuilder restartProcessInstances(String processDefinitionId);
-
-
-
-   /**
-   * Suspends processes Instances when given in the form of a list of processId's, processInstanceQuery or a HistoricProcessInstanceQuery
-   */
-  public SuspensionBuilder suspendProcessInstances();
-
-   /**
-   * Activates processes Instances when given in the form of a list of processId's, processInstanceQuery or a HistoricProcessInstanceQuery
-   */
-  public SuspensionBuilder activateProcessInstances();
-
-  /**
-   * Suspend an existing runtime process instances asynchronously using Batch operation.
-   *
-   * @param processInstanceIds
-   * a List<ProcessInstanceId> which defines all ProcessInstance's that are to be suspended
-   *
-   * @throws BadUserRequestException
-   *          when no process instance is found with the given id or id is null.
-   * @throws AuthorizationException
-   *          if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}
-   *          or no {@link Permissions#UPDATE} permission on {@link Resources#BATCH}.
-   */
-  public Batch suspendProcessInstancesAsync(List<String> processInstanceIds);
-
-   /**
-   * Activate an existing runtime process instances asynchronously using Batch operation.
-   *
-   * @param processInstanceIds
-   * a List<ProcessInstanceId> which defines all ProcessInstance's that are to be activated.
-   *
-   * @throws BadUserRequestException
-   *          when no process instance is found with the given id or id is null.
-   * @throws AuthorizationException
-   *          if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}
-   *          or no {@link Permissions#UPDATE} permission on {@link Resources#BATCH}.
-   */
-  public Batch activateProcessInstancesAsync(List<String> processInstanceIds);
-
-  /**
-   * Suspend an existing runtime process instances asynchronously using Batch operation.
-   *
-   * @param processInstanceQuery
-   * a ProcessInstanceQuery which defines all ProcessInstance's that are to be suspended.
-   *
-   * @throws BadUserRequestException
-   *          when no process instance is found with the given id or id is null.
-   * @throws AuthorizationException
-   *          if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}
-   *          or no {@link Permissions#UPDATE} permission on {@link Resources#BATCH}.
-   */
-  public Batch suspendProcessInstancesAsync(ProcessInstanceQuery processInstanceQuery);
-
-  /**
-   * Activate an existing runtime process instances asynchronously using Batch operation.
-   *
-   * @param processInstanceQuery
-   * a ProcessInstanceQuery which defines all ProcessInstance's that are to be activated.
-   *
-   * @throws BadUserRequestException
-   *          when no process instance is found with the given id or id is null.
-   * @throws AuthorizationException
-   *          if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}
-   *          or no {@link Permissions#UPDATE} permission on {@link Resources#BATCH}.
-   */
-  public Batch activateProcessInstancesAsync(ProcessInstanceQuery processInstanceQuery);
-
-  /**
-   * Suspend an existing runtime process instances asynchronously using Batch operation.
-   *
-   * @param historicProcessInstanceQuery
-   * a HistoricProcessInstanceQuery which defines all ProcessInstance's that are to be suspended.
-   *
-   * @throws BadUserRequestException
-   *          when no process instance is found with the given id or id is null.
-   * @throws AuthorizationException
-   *          if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}
-   *          or no {@link Permissions#UPDATE} permission on {@link Resources#BATCH}.
-   */
-  public Batch suspendProcessInstancesAsync(HistoricProcessInstanceQuery historicProcessInstanceQuery);
-
-  /**
-   * Activate an existing runtime process instances asynchronously using Batch operation.
-   *
-   * @param historicProcessInstanceQuery
-   * a HistoricProcessInstanceQuery which defines all ProcessInstance's that are to be activated.
-   *
-   * @throws BadUserRequestException
-   *          when no process instance is found with the given id or id is null.
-   * @throws AuthorizationException
-   *          if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}
-   *          or no {@link Permissions#UPDATE} permission on {@link Resources#BATCH}.
-   */
-  public Batch activateProcessInstancesAsync(HistoricProcessInstanceQuery historicProcessInstanceQuery);
 }

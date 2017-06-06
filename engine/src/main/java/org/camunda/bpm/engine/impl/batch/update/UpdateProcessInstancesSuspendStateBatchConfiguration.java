@@ -10,17 +10,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.batch.suspension;
+package org.camunda.bpm.engine.impl.batch.update;
 
 import java.util.List;
 import org.camunda.bpm.engine.impl.batch.BatchConfiguration;
 
-public class SuspendProcessInstanceBatchConfiguration extends BatchConfiguration {
+public class UpdateProcessInstancesSuspendStateBatchConfiguration extends BatchConfiguration {
 
 
   protected final boolean suspended;
 
-  public SuspendProcessInstanceBatchConfiguration(List<String> ids, boolean suspended) {
+  public UpdateProcessInstancesSuspendStateBatchConfiguration(List<String> ids, boolean suspended) {
     super(ids);
     this.suspended = suspended;
   }

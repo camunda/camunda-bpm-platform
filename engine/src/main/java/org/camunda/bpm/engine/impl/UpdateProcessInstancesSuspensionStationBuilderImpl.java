@@ -15,13 +15,15 @@ package org.camunda.bpm.engine.impl;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
-import org.camunda.bpm.engine.impl.cmd.SuspendProcessInstancesCmd;
+import org.camunda.bpm.engine.impl.cmd.UpdateProcessInstancesSuspendStateBatchCmd;
+import org.camunda.bpm.engine.impl.cmd.UpdateProcessInstancesSuspendStateCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
-import org.camunda.bpm.engine.runtime.SuspensionBuilder;
+import org.camunda.bpm.engine.runtime.UpdateProcessInstancesSuspensionStateBuilder;
 
-public class SuspensionBuilderImpl implements SuspensionBuilder {
+public class UpdateProcessInstancesSuspensionStationBuilderImpl implements UpdateProcessInstancesSuspensionStateBuilder {
 
   protected List<String> processInstanceIds;
   protected ProcessInstanceQuery processInstanceQuery;
@@ -30,20 +32,20 @@ public class SuspensionBuilderImpl implements SuspensionBuilder {
   protected String processDefinitionId;
   protected boolean suspend;
 
-  public SuspensionBuilderImpl(CommandExecutor commandExecutor, boolean suspend) {
+  public UpdateProcessInstancesSuspensionStationBuilderImpl(CommandExecutor commandExecutor, boolean suspend) {
     this.processInstanceIds = new ArrayList<String>();
     this.commandExecutor = commandExecutor;
     this.suspend = suspend;
   }
 
   @Override
-  public SuspensionBuilder processInstanceIds(List<String> processInstanceIds) {
+  public UpdateProcessInstancesSuspensionStateBuilder byProcessInstanceIds(List<String> processInstanceIds) {
     this.processInstanceIds.addAll(processInstanceIds);
     return this;
   }
 
   @Override
-  public SuspensionBuilder processInstanceIds(String... processInstanceIds) {
+  public UpdateProcessInstancesSuspensionStateBuilder byProcessInstanceIds(String... processInstanceIds) {
     this.processInstanceIds.addAll(Arrays.asList(processInstanceIds));
     return this;
   }
@@ -51,16 +53,41 @@ public class SuspensionBuilderImpl implements SuspensionBuilder {
 
 
   @Override
-  public SuspensionBuilder processInstanceQuery(ProcessInstanceQuery processInstanceQuery) {
+  public UpdateProcessInstancesSuspensionStateBuilder byProcessInstanceQuery(ProcessInstanceQuery processInstanceQuery) {
     this.processInstanceQuery = processInstanceQuery;
     return this;
 
   }
 
   @Override
-  public SuspensionBuilder historicProcessInstanceQuery(HistoricProcessInstanceQuery historicProcessInstanceQuery) {
+  public UpdateProcessInstancesSuspensionStateBuilder byHistoricProcessInstanceQuery(HistoricProcessInstanceQuery historicProcessInstanceQuery) {
     this.historicProcessInstanceQuery = historicProcessInstanceQuery;
     return this;
+
+  }
+
+  @Override
+  public void suspend() {
+    this.suspend = true;
+    commandExecutor.execute(new UpdateProcessInstancesSuspendStateCmd(commandExecutor, this));
+  }
+
+  @Override
+  public void activate() {
+    this.suspend = false;
+    commandExecutor.execute(new UpdateProcessInstancesSuspendStateCmd(commandExecutor, this));
+  }
+
+  @Override
+  public Batch suspendAsync() {
+    this.suspend = true;
+    return commandExecutor.execute(new UpdateProcessInstancesSuspendStateBatchCmd(commandExecutor, this, this.suspend));
+  }
+
+  @Override
+  public Batch activateAsync() {
+    this.suspend = false;
+    return commandExecutor.execute(new UpdateProcessInstancesSuspendStateBatchCmd(commandExecutor, this, this.suspend));
 
   }
 
@@ -84,14 +111,8 @@ public class SuspensionBuilderImpl implements SuspensionBuilder {
     return processDefinitionId;
   }
 
-  @Override
   public void setSuspendState(boolean suspend) {
     this.suspend = suspend;
   }
 
-  @Override
-  public void execute() {
-    commandExecutor.execute(new SuspendProcessInstancesCmd(commandExecutor, this));
-
-  }
 }

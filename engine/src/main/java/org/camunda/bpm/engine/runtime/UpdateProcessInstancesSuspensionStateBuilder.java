@@ -13,18 +13,19 @@
 package org.camunda.bpm.engine.runtime;
 
 import java.util.List;
+import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 
-public interface SuspensionBuilder {
-  SuspensionBuilder processInstanceIds(List<String> processInstanceIds);
+public interface UpdateProcessInstancesSuspensionStateBuilder extends UpdateProcessInstanceSuspensionStateBuilder {
+  UpdateProcessInstancesSuspensionStateBuilder byProcessInstanceIds(List<String> processInstanceIds);
 
-  SuspensionBuilder processInstanceIds(String... processInstanceIds);
+  UpdateProcessInstancesSuspensionStateBuilder byProcessInstanceIds(String... processInstanceIds);
 
-  SuspensionBuilder processInstanceQuery(ProcessInstanceQuery processInstanceQuery);
+  UpdateProcessInstancesSuspensionStateBuilder byProcessInstanceQuery(ProcessInstanceQuery processInstanceQuery);
 
-  SuspensionBuilder historicProcessInstanceQuery(HistoricProcessInstanceQuery historicProcessInstanceQuery);
+  UpdateProcessInstancesSuspensionStateBuilder byHistoricProcessInstanceQuery(HistoricProcessInstanceQuery historicProcessInstanceQuery);
 
-  void setSuspendState(boolean suspend);
+  Batch activateAsync();
 
-  void execute();
+  Batch suspendAsync();
 }

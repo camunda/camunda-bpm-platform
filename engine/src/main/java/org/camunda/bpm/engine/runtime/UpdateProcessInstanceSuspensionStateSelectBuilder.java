@@ -13,10 +13,21 @@
 
 package org.camunda.bpm.engine.runtime;
 
+import java.util.List;
+import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
+
 /**
  * Fluent builder to update the suspension state of process instances.
  */
 public interface UpdateProcessInstanceSuspensionStateSelectBuilder {
+
+  UpdateProcessInstancesSuspensionStateBuilder byProcessInstanceIds(List<String> processInstanceIds);
+
+  UpdateProcessInstancesSuspensionStateBuilder byProcessInstanceIds(String... processInstanceIds);
+
+  UpdateProcessInstancesSuspensionStateBuilder byProcessInstanceQuery(ProcessInstanceQuery processInstanceQuery);
+
+  UpdateProcessInstancesSuspensionStateBuilder byHistoricProcessInstanceQuery(HistoricProcessInstanceQuery historicProcessInstanceQuery);
 
   /**
    * Selects the process instance with the given id.

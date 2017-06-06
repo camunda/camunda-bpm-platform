@@ -23,7 +23,6 @@ import java.util.Map;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.form.FormData;
-import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.cmd.DeleteProcessInstanceCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteProcessInstancesCmd;
@@ -38,7 +37,7 @@ import org.camunda.bpm.engine.impl.cmd.PatchExecutionVariablesCmd;
 import org.camunda.bpm.engine.impl.cmd.RemoveExecutionVariablesCmd;
 import org.camunda.bpm.engine.impl.cmd.SetExecutionVariablesCmd;
 import org.camunda.bpm.engine.impl.cmd.SignalCmd;
-import org.camunda.bpm.engine.impl.cmd.SuspendProcessInstancesBatchCmd;
+import org.camunda.bpm.engine.impl.cmd.UpdateProcessInstancesSuspendStateBatchCmd;
 import org.camunda.bpm.engine.impl.cmd.batch.DeleteProcessInstanceBatchCmd;
 import org.camunda.bpm.engine.impl.migration.MigrationPlanBuilderImpl;
 import org.camunda.bpm.engine.impl.migration.MigrationPlanExecutionBuilderImpl;
@@ -60,7 +59,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstantiationBuilder;
 import org.camunda.bpm.engine.runtime.RestartProcessInstanceBuilder;
 import org.camunda.bpm.engine.runtime.SignalEventReceivedBuilder;
-import org.camunda.bpm.engine.runtime.SuspensionBuilder;
+import org.camunda.bpm.engine.runtime.UpdateProcessInstancesSuspensionStateBuilder;
 import org.camunda.bpm.engine.runtime.UpdateProcessInstanceSuspensionStateSelectBuilder;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 import org.camunda.bpm.engine.variable.VariableMap;
@@ -638,64 +637,4 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
   public RestartProcessInstanceBuilder restartProcessInstances(String processDefinitionId) {
     return new RestartProcessInstanceBuilderImpl(commandExecutor, processDefinitionId);
   }
-
-   @Override
-  public SuspensionBuilder suspendProcessInstances() {
-    return new SuspensionBuilderImpl(commandExecutor, true);
-  }
-
-  @Override
-  public SuspensionBuilder activateProcessInstances() {
-    return new SuspensionBuilderImpl(commandExecutor, false);
-  }
-
-  @Override
-  public Batch suspendProcessInstancesAsync(List<String> processInstanceIds) {
-    boolean suspend = true;
-    SuspensionBuilderImpl builder = new SuspensionBuilderImpl(commandExecutor, suspend);
-    builder.processInstanceIds(processInstanceIds);
-    return commandExecutor.execute(new SuspendProcessInstancesBatchCmd(commandExecutor, builder, suspend));
-  }
-
-  @Override
-  public Batch activateProcessInstancesAsync(List<String> processInstanceIds) {
-    boolean suspend = false;
-    SuspensionBuilderImpl builder = new SuspensionBuilderImpl(commandExecutor, suspend);
-    builder.processInstanceIds(processInstanceIds);
-    return commandExecutor.execute(new SuspendProcessInstancesBatchCmd(commandExecutor, builder, suspend));
-  }
-
-
-  @Override
-  public Batch suspendProcessInstancesAsync(ProcessInstanceQuery processInstanceQuery) {
-    boolean suspend = true;
-    SuspensionBuilderImpl builder = new SuspensionBuilderImpl(commandExecutor, suspend);
-    builder.processInstanceQuery(processInstanceQuery);
-    return commandExecutor.execute(new SuspendProcessInstancesBatchCmd(commandExecutor, builder, suspend));
-  }
-
-  @Override
-  public Batch activateProcessInstancesAsync(ProcessInstanceQuery processInstanceQuery) {
-    boolean suspend = false;
-    SuspensionBuilderImpl builder = new SuspensionBuilderImpl(commandExecutor, suspend);
-    builder.processInstanceQuery(processInstanceQuery);
-    return commandExecutor.execute(new SuspendProcessInstancesBatchCmd(commandExecutor, builder, suspend));
-  }
-
-  @Override
-  public Batch suspendProcessInstancesAsync(HistoricProcessInstanceQuery historicProcessInstanceQuery) {
-    boolean suspend = true;
-    SuspensionBuilderImpl builder = new SuspensionBuilderImpl(commandExecutor, suspend);
-    builder.historicProcessInstanceQuery(historicProcessInstanceQuery);
-    return commandExecutor.execute(new SuspendProcessInstancesBatchCmd(commandExecutor, builder, suspend));
-  }
-
-  @Override
-  public Batch activateProcessInstancesAsync(HistoricProcessInstanceQuery historicProcessInstanceQuery) {
-    boolean suspend = false;
-    SuspensionBuilderImpl builder = new SuspensionBuilderImpl(commandExecutor, suspend);
-    builder.historicProcessInstanceQuery(historicProcessInstanceQuery);
-    return commandExecutor.execute(new SuspendProcessInstancesBatchCmd(commandExecutor, builder, suspend));
-  }
-
 }

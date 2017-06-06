@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.batch.suspension;
+package org.camunda.bpm.engine.impl.batch.update;
 
 import java.util.HashSet;
 import java.util.List;
@@ -32,17 +32,17 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobManager;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 
-public class SuspendProcessInstancesJobHandler extends AbstractBatchJobHandler<SuspendProcessInstanceBatchConfiguration> {
+public class UpdateProcessInstancesSuspendStateJobHandler extends AbstractBatchJobHandler<UpdateProcessInstancesSuspendStateBatchConfiguration> {
 
-  public static final BatchJobDeclaration JOB_DECLARATION = new BatchJobDeclaration(Batch.TYPE_PROCESS_INSTANCE_SUSPENSION);
+  public static final BatchJobDeclaration JOB_DECLARATION = new BatchJobDeclaration(Batch.TYPE_PROCESS_INSTANCE_UPDATE);
 
   @Override
   public String getType() {
-    return Batch.TYPE_PROCESS_INSTANCE_SUSPENSION;
+    return Batch.TYPE_PROCESS_INSTANCE_UPDATE;
   }
 
-  protected SuspendProcessInstanceBatchConfigurationJsonConverter getJsonConverterInstance() {
-    return SuspendProcessInstanceBatchConfigurationJsonConverter.INSTANCE;
+  protected UpdateProcessInstancesSuspendStateBatchConfigurationJsonConverter getJsonConverterInstance() {
+    return UpdateProcessInstancesSuspendStateBatchConfigurationJsonConverter.INSTANCE;
   }
 
   @Override
@@ -51,8 +51,8 @@ public class SuspendProcessInstancesJobHandler extends AbstractBatchJobHandler<S
   }
 
   @Override
-  protected SuspendProcessInstanceBatchConfiguration createJobConfiguration(SuspendProcessInstanceBatchConfiguration configuration, List<String> processIdsForJob) {
-    return new SuspendProcessInstanceBatchConfiguration(processIdsForJob, configuration.getSuspended());
+  protected UpdateProcessInstancesSuspendStateBatchConfiguration createJobConfiguration(UpdateProcessInstancesSuspendStateBatchConfiguration configuration, List<String> processIdsForJob) {
+    return new UpdateProcessInstancesSuspendStateBatchConfiguration(processIdsForJob, configuration.getSuspended());
   }
 
   @Override
@@ -61,7 +61,7 @@ public class SuspendProcessInstancesJobHandler extends AbstractBatchJobHandler<S
       .getDbEntityManager()
       .selectById(ByteArrayEntity.class, configuration.getConfigurationByteArrayId());
 
-    SuspendProcessInstanceBatchConfiguration batchConfiguration = readConfiguration(configurationEntity.getBytes());
+    UpdateProcessInstancesSuspendStateBatchConfiguration batchConfiguration = readConfiguration(configurationEntity.getBytes());
 
     boolean initialLegacyRestrictions = commandContext.isRestrictUserOperationLogToAuthenticatedUsers();
     commandContext.disableUserOperationLog();
@@ -70,11 +70,11 @@ public class SuspendProcessInstancesJobHandler extends AbstractBatchJobHandler<S
       if(batchConfiguration.getSuspended()) {
         commandContext.getProcessEngineConfiguration()
           .getRuntimeService()
-          .suspendProcessInstances().processInstanceIds(batchConfiguration.getIds()).execute();
+          .updateProcessInstanceSuspensionState().byProcessInstanceIds(batchConfiguration.getIds()).suspend();
       } else {
          commandContext.getProcessEngineConfiguration()
-          .getRuntimeService()
-          .activateProcessInstances().processInstanceIds(batchConfiguration.getIds()).execute();
+           .getRuntimeService()
+           .updateProcessInstanceSuspensionState().byProcessInstanceIds(batchConfiguration.getIds()).activate();
       }
     } finally {
       commandContext.enableUserOperationLog();
@@ -85,7 +85,7 @@ public class SuspendProcessInstancesJobHandler extends AbstractBatchJobHandler<S
 
   @Override
   public boolean createJobs(BatchEntity batch) {
-    SuspendProcessInstanceBatchConfiguration configuration = readConfiguration(batch.getConfigurationBytes());
+    UpdateProcessInstancesSuspendStateBatchConfiguration configuration = readConfiguration(batch.getConfigurationBytes());
 
     List<String> ids = configuration.getIds();
     final CommandContext commandContext = Context.getCommandContext();
@@ -131,7 +131,7 @@ public class SuspendProcessInstancesJobHandler extends AbstractBatchJobHandler<S
 
   }
 
-  protected void createJobEntities(BatchEntity batch, SuspendProcessInstanceBatchConfiguration configuration, String deploymentId,
+  protected void createJobEntities(BatchEntity batch, UpdateProcessInstancesSuspendStateBatchConfiguration configuration, String deploymentId,
                                    List<String> processInstancesToHandle, int invocationsPerBatchJob) {
 
 
@@ -145,7 +145,7 @@ public class SuspendProcessInstancesJobHandler extends AbstractBatchJobHandler<S
       // view of process instances for this job
       List<String> idsForJob = processInstancesToHandle.subList(0, lastIdIndex);
 
-      SuspendProcessInstanceBatchConfiguration jobConfiguration = createJobConfiguration(configuration, idsForJob);
+      UpdateProcessInstancesSuspendStateBatchConfiguration jobConfiguration = createJobConfiguration(configuration, idsForJob);
       ByteArrayEntity configurationEntity = saveConfiguration(byteArrayManager, jobConfiguration);
 
       JobEntity job = createBatchJob(batch, configurationEntity);

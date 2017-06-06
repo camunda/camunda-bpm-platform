@@ -94,7 +94,7 @@ import org.camunda.bpm.engine.impl.batch.deletion.DeleteHistoricProcessInstances
 import org.camunda.bpm.engine.impl.batch.deletion.DeleteProcessInstancesJobHandler;
 import org.camunda.bpm.engine.impl.batch.externaltask.SetExternalTaskRetriesJobHandler;
 import org.camunda.bpm.engine.impl.batch.job.SetJobRetriesJobHandler;
-import org.camunda.bpm.engine.impl.batch.suspension.SuspendProcessInstancesJobHandler;
+import org.camunda.bpm.engine.impl.batch.update.UpdateProcessInstancesSuspendStateJobHandler;
 import org.camunda.bpm.engine.impl.bpmn.behavior.ExternalTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.deployer.BpmnDeployer;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
@@ -872,7 +872,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       RestartProcessInstancesJobHandler restartProcessInstancesJobHandler = new RestartProcessInstancesJobHandler();
       batchHandlers.put(restartProcessInstancesJobHandler.getType(), restartProcessInstancesJobHandler);
 
-      SuspendProcessInstancesJobHandler suspendProcessInstancesJobHandler = new SuspendProcessInstancesJobHandler();
+      UpdateProcessInstancesSuspendStateJobHandler suspendProcessInstancesJobHandler = new UpdateProcessInstancesSuspendStateJobHandler();
       batchHandlers.put(suspendProcessInstancesJobHandler.getType(), suspendProcessInstancesJobHandler);
     }
 
