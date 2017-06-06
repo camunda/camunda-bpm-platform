@@ -937,6 +937,7 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
     }
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testImplicitVariableUpdateAndScopeDestroyedInOneTransaction() {
     deployment(Bpmn.createExecutableProcess("process1")
       .startEvent("start")
