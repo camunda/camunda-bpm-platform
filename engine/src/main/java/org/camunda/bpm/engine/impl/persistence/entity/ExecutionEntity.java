@@ -503,7 +503,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
    */
   @Override
   public void destroy() {
-    super.destroy();
+
     ensureParentInitialized();
 
     // execute Output Mappings (if they exist).
@@ -513,6 +513,9 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     }
 
     clearExecution();
+
+    super.destroy();
+
     removeEventSubscriptionsExceptCompensation();
   }
 

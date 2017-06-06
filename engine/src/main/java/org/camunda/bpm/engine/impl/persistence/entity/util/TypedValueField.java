@@ -162,6 +162,10 @@ public class TypedValueField implements DbEntityLifecycleAware, CommandContextLi
 
   @Override
   public void onCommandContextClose(CommandContext commandContext) {
+    notifyImplicitValueUpdate();
+  }
+
+  public void notifyImplicitValueUpdate() {
     if (isValuedImplicitlyUpdated()) {
       for (TypedValueUpdateListener typedValueImplicitUpdateListener : updateListeners) {
         typedValueImplicitUpdateListener.onImplicitValueUpdate(cachedValue);

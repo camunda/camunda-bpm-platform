@@ -40,6 +40,7 @@ import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Assert;
 
+import java.io.Serializable;
 import java.util.*;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -933,6 +934,46 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
 
       assertNotNull(value3);
       assertTrue(value3.isEmpty());
+    }
+  }
+
+  public void testImplicitVariableUpdateAndScopeDestroyedInOneTransaction() {
+    deployment(Bpmn.createExecutableProcess("process1")
+      .startEvent("start")
+      .serviceTask("task1").camundaExpression("${var.setValue(\"newValue\")}")
+      .endEvent("end")
+      .done());
+
+    processEngine.getRuntimeService().startProcessInstanceByKey("process1", Variables.createVariables().putValue("var", new CustomVar("initialValue")));
+
+    final HistoricVariableInstance historicVariableInstance = processEngine.getHistoryService().createHistoricVariableInstanceQuery().list().get(0);
+    CustomVar var = (CustomVar) historicVariableInstance.getTypedValue().getValue();
+
+    assertEquals("newValue", var.getValue());
+
+    final List<HistoricDetail> historicDetails = processEngine.getHistoryService().createHistoricDetailQuery().list();
+    assertEquals(2, historicDetails.size());
+    for (HistoricDetail historicDetail: historicDetails) {
+      if (((HistoryEvent)historicDetail).getSequenceCounter() == 2) {
+        final CustomVar typedValue = (CustomVar)((HistoricVariableUpdate) historicDetail).getTypedValue().getValue();
+        assertEquals("newValue", typedValue.getValue());
+      }
+    }
+  }
+
+  public static class CustomVar implements Serializable {
+    private String value;
+
+    public CustomVar(String value) {
+      this.value = value;
+    }
+
+    public String getValue() {
+      return value;
+    }
+
+    public void setValue(String value) {
+      this.value = value;
     }
   }
 

@@ -137,6 +137,11 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
   }
 
   public void delete() {
+
+    if (!isTransient()) {
+      typedValueField.notifyImplicitValueUpdate();
+    }
+
     // clear value
     clearValueFields();
 
