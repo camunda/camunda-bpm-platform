@@ -34,7 +34,7 @@ public class HistoryRestServiceInteractionTest extends AbstractRestServiceTest {
   public static TestContainerRule rule = new TestContainerRule();
   
   protected static final String HISTORY_CLEANUP_ASYNC_URL = TEST_RESOURCE_ROOT_PATH + "/history/cleanup";
-  protected static final String FIND_HISTORY_CLEANUP_JOB_URL = TEST_RESOURCE_ROOT_PATH + "/history/find-cleanup-job";
+  protected static final String FIND_HISTORY_CLEANUP_JOB_URL = TEST_RESOURCE_ROOT_PATH + "/history/cleanup-job";
 
   private HistoryService historyServiceMock;
 

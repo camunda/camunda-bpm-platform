@@ -85,7 +85,7 @@ public interface HistoryRestService {
   JobDto cleanupAsync(@QueryParam("immediatelyDue") @DefaultValue("true") boolean immediatelyDue);
 
   @GET
-  @Path("/find-cleanup-job")
+  @Path("/cleanup-job")
   @Produces(MediaType.APPLICATION_JSON)
   JobDto findCleanupJob();
 }
