@@ -21,6 +21,7 @@ import static org.camunda.bpm.engine.rest.dto.ConditionQueryParameterDto.LIKE_OP
 import static org.camunda.bpm.engine.rest.dto.ConditionQueryParameterDto.NOT_EQUALS_OPERATOR_NAME;
 import static org.fest.assertions.Assertions.assertThat;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -224,6 +225,84 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     result = resource.queryProcessInstances(queryParameter, 3, 1);
     assertThat(result).isNotEmpty();
     assertThat(result).hasSize(1);
+  }
+
+  @Test
+  @Deployment(resources = {
+    "processes/user-task-process.bpmn"
+  })
+  public void testQueryPaginationWithOrderByStartTimeDesc() {
+    startProcessInstancesDelayed("userTaskProcess", 8);
+
+    String processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
+
+    ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
+    queryParameter.setProcessDefinitionId(processDefinitionId);
+    queryParameter.setSortBy("startTime");
+    queryParameter.setSortOrder("desc");
+
+    List<ProcessInstanceDto> allResults = new ArrayList<ProcessInstanceDto>();
+
+    List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, 0, 3);
+    assertThat(result).isNotEmpty();
+    assertThat(result).hasSize(3);
+    allResults.addAll(result);
+
+    result = resource.queryProcessInstances(queryParameter, 3, 3);
+    assertThat(result).isNotEmpty();
+    assertThat(result).hasSize(3);
+    allResults.addAll(result);
+
+    result = resource.queryProcessInstances(queryParameter, 6, 3);
+    assertThat(result).isNotEmpty();
+    assertThat(result).hasSize(2);
+    allResults.addAll(result);
+
+    for (int i=1; i < allResults.size(); i++) {
+      Date previousStartTime = allResults.get(i - 1).getStartTime();
+      Date startTime = allResults.get(i).getStartTime();
+      assertThat(startTime.before(previousStartTime)).isTrue();
+    }
+
+  }
+
+  @Test
+  @Deployment(resources = {
+    "processes/user-task-process.bpmn"
+  })
+  public void testQueryPaginationWithOrderByStartTimeAsc() {
+    startProcessInstancesDelayed("userTaskProcess", 8);
+
+    String processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
+
+    ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
+    queryParameter.setProcessDefinitionId(processDefinitionId);
+    queryParameter.setSortBy("startTime");
+    queryParameter.setSortOrder("asc");
+
+    List<ProcessInstanceDto> allResults = new ArrayList<ProcessInstanceDto>();
+
+    List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, 0, 3);
+    assertThat(result).isNotEmpty();
+    assertThat(result).hasSize(3);
+    allResults.addAll(result);
+
+    result = resource.queryProcessInstances(queryParameter, 3, 3);
+    assertThat(result).isNotEmpty();
+    assertThat(result).hasSize(3);
+    allResults.addAll(result);
+
+    result = resource.queryProcessInstances(queryParameter, 6, 3);
+    assertThat(result).isNotEmpty();
+    assertThat(result).hasSize(2);
+    allResults.addAll(result);
+
+    for (int i=1; i < allResults.size(); i++) {
+      Date previousStartTime = allResults.get(i - 1).getStartTime();
+      Date startTime = allResults.get(i).getStartTime();
+      assertThat(startTime.after(previousStartTime)).isTrue();
+    }
+
   }
 
   @Test
