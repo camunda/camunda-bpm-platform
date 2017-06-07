@@ -2,7 +2,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,17 +10,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.runtime;
 
 import java.util.List;
+import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 
-/**
- * Fluent builder to update the suspension state of process instances.
- */
-public interface UpdateProcessInstanceSuspensionStateSelectBuilder {
-
+public interface UpdateProcessInstancesSuspensionStateBuilder extends UpdateProcessInstanceSuspensionStateBuilder {
   UpdateProcessInstancesSuspensionStateBuilder byProcessInstanceIds(List<String> processInstanceIds);
 
   UpdateProcessInstancesSuspensionStateBuilder byProcessInstanceIds(String... processInstanceIds);
@@ -29,31 +25,7 @@ public interface UpdateProcessInstanceSuspensionStateSelectBuilder {
 
   UpdateProcessInstancesSuspensionStateBuilder byHistoricProcessInstanceQuery(HistoricProcessInstanceQuery historicProcessInstanceQuery);
 
-  /**
-   * Selects the process instance with the given id.
-   *
-   * @param processInstanceId
-   *          id of the process instance
-   * @return the builder
-   */
-  UpdateProcessInstanceSuspensionStateBuilder byProcessInstanceId(String processInstanceId);
+  Batch activateAsync();
 
-  /**
-   * Selects the instances of the process definition with the given id.
-   *
-   * @param processDefinitionId
-   *          id of the process definition
-   * @return the builder
-   */
-  UpdateProcessInstanceSuspensionStateBuilder byProcessDefinitionId(String processDefinitionId);
-
-  /**
-   * Selects the instances of the process definitions with the given key.
-   *
-   * @param processDefinitionKey
-   *          key of the process definition
-   * @return the builder
-   */
-  UpdateProcessInstanceSuspensionStateTenantBuilder byProcessDefinitionKey(String processDefinitionKey);
-
+  Batch suspendAsync();
 }

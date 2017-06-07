@@ -72,13 +72,7 @@ public abstract class ResourceDefinitionCache<T extends ResourceDefinitionEntity
     definition = resolveDefinition(definition);
     return definition;
   }
-
-  public T findDeployedDefinitionByKeyVersionAndTenantId(final String definitionKey, final Integer definitionVersion, final String tenantId) {
-    final CommandContext commandContext = Context.getCommandContext();
-    T definition = commandContext.runWithoutAuthorization(new Callable<T>() {
-      public T call() throws Exception {
-        return getManager().
-            findDefinitionByKeyVersionAndTenantId(definitionKey, definitionVersion, tenantId);
+public T findDeployedDefinitionByKeyVersionAndTenantId(final String definitionKey, final Integer definitionVersion, final String tenantId) { final CommandContext commandContext = Context.getCommandContext(); T definition = commandContext.runWithoutAuthorization(new Callable<T>() { public T call() throws Exception { return getManager(). findDefinitionByKeyVersionAndTenantId(definitionKey, definitionVersion, tenantId);
       }
     });
     checkInvalidDefinitionByKeyVersionAndTenantId(definitionKey, definitionVersion, tenantId, definition);
