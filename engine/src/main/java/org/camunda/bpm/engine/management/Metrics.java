@@ -57,7 +57,7 @@ public class Metrics {
   public final static String EXECUTED_DECISION_ELEMENTS = "executed-decision-elements";
 
   /**
-   * Number of instances removed by history coleanup.
+   * Number of instances removed by history cleanup.
    */
   public final static String HISTORY_CLEANUP_REMOVED_PROCESS_INSTANCES = "history-cleanup-removed-process-instances";
   public final static String HISTORY_CLEANUP_REMOVED_CASE_INSTANCES = "history-cleanup-removed-case-instances";
