@@ -2817,15 +2817,68 @@ public class ProcessBuilderTest {
       .userTask()
       .endEvent();
 
-
+    SubProcess subProcess = eventSubProcess.getElement();
 
     // no input or output from the sub process
-    assertThat(eventSubProcess.getElement().getDataInputAssociations().size() == 0);
-    assertThat(eventSubProcess.getElement().getDataOutputAssociations().size() == 0);
+    assertThat(subProcess.getIncoming().isEmpty());
+    assertThat(subProcess.getOutgoing().isEmpty());
+
     // subProcess was triggered by event
     assertThat(eventSubProcess.getElement().triggeredByEvent());
 
+    // subProcess contains startEvent, sendTask and endEvent
+    assertThat(subProcess.getChildElementsByType(StartEvent.class)).isNotNull();
+    assertThat(subProcess.getChildElementsByType(UserTask.class)).isNotNull();
+    assertThat(subProcess.getChildElementsByType(EndEvent.class)).isNotNull();
   }
+
+
+  @Test
+  public void testCreateEventSubProcessInSubProcess() {
+    ProcessBuilder process = Bpmn.createProcess();
+    modelInstance = process
+      .startEvent()
+      .subProcess("mysubprocess")
+      .embeddedSubProcess()
+      .startEvent()
+      .userTask()
+      .endEvent()
+      .subProcessDone()
+      .userTask()
+      .endEvent()
+      .done();
+
+    SubProcess embeddedSubProcess = modelInstance.getModelElementById("mysubprocess");
+    embeddedSubProcess
+      .builder()
+      .embeddedSubProcess()
+      .eventSubProcess("myeventsubprocess");
+
+    SubProcess eventSubProcess = modelInstance.getModelElementById("myeventsubprocess");
+    eventSubProcess
+      .builder()
+      .embeddedSubProcess()
+      .startEvent()
+      .userTask()
+      .endEvent()
+      .subProcessDone();
+
+
+    // no input or output from the sub process
+    assertThat(eventSubProcess.getIncoming().isEmpty());
+    assertThat(eventSubProcess.getOutgoing().isEmpty());
+
+    // subProcess was triggered by event
+    assertThat(eventSubProcess.triggeredByEvent());
+
+    // subProcess contains startEvent, sendTask and endEvent
+    assertThat(eventSubProcess.getChildElementsByType(StartEvent.class)).isNotNull();
+    assertThat(eventSubProcess.getChildElementsByType(UserTask.class)).isNotNull();
+    assertThat(eventSubProcess.getChildElementsByType(EndEvent.class)).isNotNull();
+  }
+
+
+
 
   @Test
   public void testCreateEventSubProcessError() {
@@ -2843,6 +2896,8 @@ public class ProcessBuilderTest {
       .endEvent();
 
 
+
+    System.out.println(Bpmn.convertToString(modelInstance));
     try {
       eventSubProcess.subProcessDone();
       fail("eventSubProcess has returned a builder after completion");

@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.model.bpmn.builder;
 
+import java.util.Collection;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.Process;
 import org.camunda.bpm.model.bpmn.instance.StartEvent;
@@ -41,13 +42,20 @@ public class ProcessBuilder extends AbstractProcessBuilder<ProcessBuilder> {
   }
 
   public EventSubProcessBuilder eventSubProcess(){
+    return eventSubProcess(null);
+  }
+
+  public EventSubProcessBuilder eventSubProcess(String id) {
     // Create a subprocess, triggered by an event, and add it to modelInstance
-    SubProcess subProcess = createChild(SubProcess.class, null);
+    SubProcess subProcess = createChild(SubProcess.class, id);
     subProcess.setTriggeredByEvent(true);
 
     // Create Bpmn shape so subprocess will be drawn
     BpmnShape targetBpmnShape = createBpmnShape(subProcess);
-    setCoordinates(targetBpmnShape);
+    //find the lowest shape in the process
+    // place event sub process underneath
+    setEventSubProcessCoordinates(targetBpmnShape);
+
     resizeSubProcess(targetBpmnShape);
 
     // Return the eventSubProcessBuilder
@@ -57,9 +65,32 @@ public class ProcessBuilder extends AbstractProcessBuilder<ProcessBuilder> {
   }
 
   @Override
-  protected void setCoordinates(BpmnShape targetBpmnShape){
+  protected void setCoordinates(BpmnShape targetBpmnShape) {
     Bounds bounds = targetBpmnShape.getBounds();
     bounds.setX(100);
     bounds.setY(100);
+  }
+
+  protected void setEventSubProcessCoordinates(BpmnShape targetBpmnShape) {
+    SubProcess eventSubProcess = (SubProcess) targetBpmnShape.getBpmnElement();
+    Bounds targetBounds = targetBpmnShape.getBounds();
+    double lowestheight = 0;
+
+    // find the lowest element in the model
+    Collection<BpmnShape> allShapes = modelInstance.getModelElementsByType(BpmnShape.class);
+    for (BpmnShape shape : allShapes) {
+      Bounds bounds = shape.getBounds();
+      double bottom = bounds.getY() + bounds.getHeight();
+      if(bottom > lowestheight) {
+        lowestheight = bottom;
+      }
+    }
+
+    Double ycoord = lowestheight + 50.0;
+    Double xcoord = 100.0;
+
+    // move target
+    targetBounds.setY(ycoord);
+    targetBounds.setX(xcoord);
   }
 }

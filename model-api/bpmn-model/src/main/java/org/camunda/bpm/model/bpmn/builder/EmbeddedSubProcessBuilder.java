@@ -16,8 +16,10 @@ package org.camunda.bpm.model.bpmn.builder;
 import static org.camunda.bpm.model.bpmn.builder.AbstractBaseElementBuilder.SPACE;
 
 import org.camunda.bpm.model.bpmn.instance.StartEvent;
+import org.camunda.bpm.model.bpmn.instance.SubProcess;
 import org.camunda.bpm.model.bpmn.instance.bpmndi.BpmnShape;
 import org.camunda.bpm.model.bpmn.instance.dc.Bounds;
+import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 
 /**
  * @author Sebastian Menski
@@ -53,5 +55,58 @@ public class EmbeddedSubProcessBuilder extends AbstractEmbeddedSubProcessBuilder
     }
 
     return start.builder();
+  }
+
+
+  public EventSubProcessBuilder eventSubProcess() {
+    return eventSubProcess(null);
+  }
+
+  public EventSubProcessBuilder eventSubProcess(String id) {
+    // Create a subprocess, triggered by an event, and add it to modelInstance
+    SubProcess subProcess = subProcessBuilder.createChild(SubProcess.class, id);
+    subProcess.setTriggeredByEvent(true);
+
+    // Create Bpmn shape so subprocess will be drawn
+    BpmnShape targetBpmnShape = subProcessBuilder.createBpmnShape(subProcess);
+    //find the lowest shape in the process
+    // place event sub process underneath
+    setCoordinates(targetBpmnShape);
+
+    subProcessBuilder.resizeSubProcess(targetBpmnShape);
+
+    // Return the eventSubProcessBuilder
+    EventSubProcessBuilder eventSubProcessBuilder = new EventSubProcessBuilder(subProcessBuilder.modelInstance, subProcess);
+    return eventSubProcessBuilder;
+
+  }
+
+  protected void setCoordinates(BpmnShape targetBpmnShape) {
+
+    SubProcess eventSubProcess = (SubProcess) targetBpmnShape.getBpmnElement();
+    SubProcess parentSubProcess = (SubProcess) eventSubProcess.getParentElement();
+    BpmnShape parentBpmnShape = subProcessBuilder.findBpmnShape(parentSubProcess);
+
+
+    Bounds targetBounds = targetBpmnShape.getBounds();
+    Bounds parentBounds = parentBpmnShape.getBounds();
+
+    // these should just be offsets maybe
+    Double ycoord = parentBounds.getHeight() + parentBounds.getY();
+
+
+    Double xcoord = (parentBounds.getWidth()/2) - (targetBounds.getWidth()/2) + parentBounds.getX();
+    if(xcoord-parentBounds.getX() < 50.0) {
+      xcoord = 50.0+parentBounds.getX();
+    }
+
+    // move target
+    targetBounds.setY(ycoord);
+    targetBounds.setX(xcoord);
+
+    // parent expands automatically
+
+    // nodes surrounding the parent subprocess will not be moved
+    // they may end up inside the subprocess (but only graphically)
   }
 }
