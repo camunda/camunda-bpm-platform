@@ -34,7 +34,6 @@
 
   <select id="selectIncidentWithCauseAndRootCauseIncidents" parameterType="org.camunda.bpm.cockpit.impl.plugin.base.dto.query.IncidentQueryDto"
           resultMap="incidentResultMap">
-    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
     select ${distinct} RES.* ${limitBetween}
     <include refid="selectIncidents" />
