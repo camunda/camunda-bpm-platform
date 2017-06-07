@@ -179,7 +179,7 @@
     where (EVENT_TYPE_ = #{parameter.eventType})
     	and (EXECUTION_ID_ = #{parameter.executionId})
     <if test="parameter.lockResult">
-      ${constant.for.update}
+      ${constant_for_update}
     </if>
   </select>
 
@@ -228,7 +228,7 @@
     	and (EVENT_NAME_ = #{parameter.eventName})
     	and (EXECUTION_ID_ = #{parameter.executionId})
     <if test="parameter.lockResult">
-      ${constant.for.update}
+      ${constant_for_update}
     </if>
   </select>
 

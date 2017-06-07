@@ -58,7 +58,7 @@
   </select>
 
   <update id="lockDeploymentLockProperty">
-    SELECT * FROM ${prefix}ACT_GE_PROPERTY WHERE NAME_ = 'deployment.lock' ${constant.for.update}
+    SELECT * FROM ${prefix}ACT_GE_PROPERTY WHERE NAME_ = 'deployment.lock' ${constant_for_update}
   </update>
 
   <update id="lockDeploymentLockProperty_mssql">
@@ -66,7 +66,7 @@
   </update>
 
   <update id="lockHistoryCleanupJobLockProperty">
-    SELECT * FROM ${prefix}ACT_GE_PROPERTY WHERE NAME_ = 'history.cleanup.job.lock' ${constant.for.update}
+    SELECT * FROM ${prefix}ACT_GE_PROPERTY WHERE NAME_ = 'history.cleanup.job.lock' ${constant_for_update}
   </update>
 
   <update id="lockHistoryCleanupJobLockProperty_mssql">

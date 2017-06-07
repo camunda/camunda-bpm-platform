@@ -99,7 +99,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     HashMap<String, String> constants = new HashMap<String, String>();
     constants.put("constant.event", "'event'");
     constants.put("constant.op_message", "NEW_VALUE_ || '_|_' || PROPERTY_");
-    constants.put("constant.for.update", "for update");
+    constants.put("constant_for_update", "for update");
     constants.put("constant.datepart.quarter", "QUARTER");
     constants.put("constant.datepart.month", "MONTH");
     constants.put("constant.null.startTime", "null START_TIME_");
@@ -143,7 +143,7 @@ public class DbSqlSessionFactory implements SessionFactory {
       constants = new HashMap<String, String>();
       constants.put("constant.event", "'event'");
       constants.put("constant.op_message", "CONCAT(NEW_VALUE_, '_|_', PROPERTY_)");
-      constants.put("constant.for.update", "for update");
+      constants.put("constant_for_update", "for update");
       constants.put("constant.datepart.quarter", "QUARTER");
       constants.put("constant.datepart.month", "MONTH");
       constants.put("constant.null.startTime", "null START_TIME_");
@@ -202,7 +202,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     constants = new HashMap<String, String>();
     constants.put("constant.event", "'event'");
     constants.put("constant.op_message", "NEW_VALUE_ || '_|_' || PROPERTY_");
-    constants.put("constant.for.update", "for update");
+    constants.put("constant_for_update", "for update");
     constants.put("constant.datepart.quarter", "QUARTER");
     constants.put("constant.datepart.month", "MONTH");
     constants.put("constant.null.startTime", "null START_TIME_");
@@ -242,7 +242,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     constants = new HashMap<String, String>();
     constants.put("constant.event", "cast('event' as nvarchar2(255))");
     constants.put("constant.op_message", "NEW_VALUE_ || '_|_' || PROPERTY_");
-    constants.put("constant.for.update", "for update");
+    constants.put("constant_for_update", "for update");
     constants.put("constant.datepart.quarter", "'Q'");
     constants.put("constant.datepart.month", "'MM'");
     constants.put("constant.null.startTime", "null START_TIME_");
@@ -289,7 +289,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     constants = new HashMap<String, String>();
     constants.put("constant.event", "'event'");
     constants.put("constant.op_message", "CAST(CONCAT(CONCAT(COALESCE(NEW_VALUE_,''), '_|_'), COALESCE(PROPERTY_,'')) as varchar(255))");
-    constants.put("constant.for.update", "for read only with rs use and keep update locks");
+    constants.put("constant_for_update", "for read only with rs use and keep update locks");
     constants.put("constant.datepart.quarter", "QUARTER");
     constants.put("constant.datepart.month", "MONTH");
     constants.put("constant.null.startTime", "CAST(NULL as timestamp) as START_TIME_");
