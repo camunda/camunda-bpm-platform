@@ -51,12 +51,12 @@ public class CreateAndResolveIncidentTest {
     Incident incident = runtimeService.createIncident("foo", processInstance.getId(), "userTask1", "bar");
 
     // then
-    HistoricIncident historicIncident = historyService.createHistoricIncidentQuery().executionId(processInstance.getId()).singleResult();
-    assertEquals(historicIncident.getId(), incident.getId());
-    assertEquals("userTask1", historicIncident.getActivityId());
-    assertEquals("foo", historicIncident.getIncidentType());
-    assertEquals("bar", historicIncident.getConfiguration());
-    assertEquals(processInstance.getId(), historicIncident.getExecutionId());
+    Incident incident2 = runtimeService.createIncidentQuery().executionId(processInstance.getId()).singleResult();
+    assertEquals(incident2.getId(), incident.getId());
+    assertEquals("userTask1", incident2.getActivityId());
+    assertEquals("foo", incident2.getIncidentType());
+    assertEquals("bar", incident2.getConfiguration());
+    assertEquals(processInstance.getId(), incident2.getExecutionId());
   }
 
   @Test
