@@ -20,6 +20,7 @@ import java.util.Set;
 
 import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
@@ -325,6 +326,18 @@ public class DelegateEvent implements DelegateExecution {
     throw notYetImplemented();
   }
 
+  @Override
+  public Incident createIncident(String incidentType, String configuration) {
+    throw notYetImplemented();
+  }
 
+  @Override
+  public void resolveIncident(String incidentId) {
+    throw notYetImplemented();
+  }
 
+  @Override
+  public Incident createIncident(String incidentType, String configuration, String message) {
+    throw notYetImplemented();
+  }
 }

@@ -20,7 +20,6 @@ import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
-import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.migration.MigrationPlanBuilder;
 import org.camunda.bpm.engine.migration.MigrationPlanExecutionBuilder;
@@ -30,6 +29,7 @@ import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.EventSubscriptionQuery;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
+import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.IncidentQuery;
 import org.camunda.bpm.engine.runtime.MessageCorrelationBuilder;
 import org.camunda.bpm.engine.runtime.ModificationBuilder;
@@ -1903,4 +1903,34 @@ public interface RuntimeService {
    *     </ul>
    */
   RestartProcessInstanceBuilder restartProcessInstances(String processDefinitionId);
+
+  /**
+   * Create an incident
+   *
+   * @param incidentType the type of incident, cannot be null
+   * @param executionId execution id, cannot be null
+   * @param activityId activity id
+   * @param configuration
+   * @return a new incident
+   */
+  Incident createIncident(String incidentType, String executionId, String activityId, String configuration);
+
+  /**
+   * Create an incident
+   *
+   * @param incidentType the type of incident, cannot be null
+   * @param executionId execution id, cannot be null
+   * @param activityId activity id
+   * @param configuration
+   * @param message
+   * @return a new incident
+   */
+  Incident createIncident(String incidentType, String executionId, String activityId, String configuration, String message);
+
+  /**
+   * Resolve and remove an incident
+   *
+   * @param incidentId the id of an incident to resolve
+   */
+  void resolveIncident(String incidentId);
 }

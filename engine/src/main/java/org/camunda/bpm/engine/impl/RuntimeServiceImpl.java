@@ -23,7 +23,7 @@ import java.util.Map;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.form.FormData;
-import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
+import org.camunda.bpm.engine.impl.cmd.CreateIncidentCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteProcessInstanceCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteProcessInstancesCmd;
 import org.camunda.bpm.engine.impl.cmd.FindActiveActivityIdsCmd;
@@ -35,6 +35,7 @@ import org.camunda.bpm.engine.impl.cmd.GetStartFormCmd;
 import org.camunda.bpm.engine.impl.cmd.MessageEventReceivedCmd;
 import org.camunda.bpm.engine.impl.cmd.PatchExecutionVariablesCmd;
 import org.camunda.bpm.engine.impl.cmd.RemoveExecutionVariablesCmd;
+import org.camunda.bpm.engine.impl.cmd.ResolveIncidentCmd;
 import org.camunda.bpm.engine.impl.cmd.SetExecutionVariablesCmd;
 import org.camunda.bpm.engine.impl.cmd.SignalCmd;
 import org.camunda.bpm.engine.impl.cmd.UpdateProcessInstancesSuspendStateBatchCmd;
@@ -48,6 +49,7 @@ import org.camunda.bpm.engine.migration.MigrationPlanExecutionBuilder;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.EventSubscriptionQuery;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
+import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.IncidentQuery;
 import org.camunda.bpm.engine.runtime.MessageCorrelationBuilder;
 import org.camunda.bpm.engine.runtime.ModificationBuilder;
@@ -636,5 +638,17 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
   @Override
   public RestartProcessInstanceBuilder restartProcessInstances(String processDefinitionId) {
     return new RestartProcessInstanceBuilderImpl(commandExecutor, processDefinitionId);
+  }
+
+  public Incident createIncident(String incidentType, String executionId, String activityId, String configuration) {
+    return createIncident(incidentType, executionId, activityId, configuration, null);
+  }
+
+  public Incident createIncident(String incidentType, String executionId, String activityId, String configuration, String message) {
+    return commandExecutor.execute(new CreateIncidentCmd(incidentType, executionId, activityId, configuration, message));
+  }
+
+  public void resolveIncident(String incidentId) {
+    commandExecutor.execute(new ResolveIncidentCmd(incidentId));
   }
 }

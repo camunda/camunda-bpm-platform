@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.impl.pvm.runtime;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.IncidentQueryImpl;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
@@ -20,7 +21,9 @@ import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.core.variable.event.VariableEvent;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
+import org.camunda.bpm.engine.impl.incident.IncidentContext;
 import org.camunda.bpm.engine.impl.persistence.entity.DelayedVariableEvent;
+import org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity;
 import org.camunda.bpm.engine.impl.pvm.*;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.CompositeActivityBehavior;
@@ -31,6 +34,7 @@ import org.camunda.bpm.engine.impl.pvm.runtime.operation.FoxAtomicOperationDelet
 import org.camunda.bpm.engine.impl.pvm.runtime.operation.PvmAtomicOperation;
 import org.camunda.bpm.engine.impl.tree.*;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
+import org.camunda.bpm.engine.runtime.Incident;
 
 import java.util.*;
 
@@ -2094,4 +2098,28 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     }
   }
 
+  @Override
+  public Incident createIncident(String incidentType, String configuration) {
+    return createIncident(incidentType, configuration, null);
+  }
+
+  public Incident createIncident(String incidentType, String configuration, String message) {
+    IncidentContext incidentContext = new IncidentContext();
+
+    incidentContext.setTenantId(this.getTenantId());
+    incidentContext.setProcessDefinitionId(this.getProcessDefinitionId());
+    incidentContext.setExecutionId(this.getId());
+    incidentContext.setActivityId(this.getActivityId());
+    incidentContext.setConfiguration(configuration);
+
+    IncidentEntity newIncident = IncidentEntity.createAndInsertIncident(incidentType, incidentContext, message);
+    newIncident.createRecursiveIncidents();
+    return newIncident;
+  }
+
+  @Override
+  public void resolveIncident(String incidentId) {
+    IncidentEntity incident = (IncidentEntity) new IncidentQueryImpl().incidentId(incidentId).singleResult();
+    incident.resolve();
+  }
 }

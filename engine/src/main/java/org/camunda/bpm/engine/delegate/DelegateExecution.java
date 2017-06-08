@@ -14,6 +14,7 @@
 package org.camunda.bpm.engine.delegate;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.runtime.Incident;
 
 /**
  * Execution used in {@link JavaDelegate}s and {@link ExecutionListener}s.
@@ -104,4 +105,29 @@ public interface DelegateExecution extends BaseDelegateExecution, BpmnModelExecu
    */
   void setVariable (String variableName, Object value, String activityId);
 
+  /**
+   * Create an incident associated with this execution
+   *
+   * @param incidentType the type of incident
+   * @param configuration
+   * @return a new incident
+   */
+  Incident createIncident(String incidentType, String configuration);
+
+  /**
+   * Create an incident associated with this execution
+   *
+   * @param incidentType the type of incident
+   * @param configuration
+   * @param message
+   * @return a new incident
+   */
+  Incident createIncident(String incidentType, String configuration, String message);
+
+  /**
+   * Resolve and remove an incident with given id
+   *
+   * @param incidentId
+   */
+  void resolveIncident(String incidentId);
 }
