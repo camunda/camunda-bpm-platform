@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.impl.history.handler;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.history.event.HistoricDecisionEvaluationEvent;
@@ -122,7 +123,7 @@ public class DbHistoryEventHandler implements HistoryEventHandler {
     } else if(historyEvent.isEventOfType(HistoryEventTypes.VARIABLE_INSTANCE_DELETE)) {
       HistoricVariableInstanceEntity historicVariableInstanceEntity = dbEntityManager.selectById(HistoricVariableInstanceEntity.class, historyEvent.getVariableInstanceId());
       if(historicVariableInstanceEntity != null) {
-        historicVariableInstanceEntity.deleteButRemain();
+        historicVariableInstanceEntity.setState(HistoricVariableInstance.STATE_DELETED);
       }
     }
   }

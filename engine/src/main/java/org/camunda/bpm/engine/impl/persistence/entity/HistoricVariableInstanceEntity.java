@@ -113,16 +113,6 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
       .delete(this);
   }
 
-  public void deleteButRemain() {
-    byteArrayField.deleteByteArrayValue();
-    this.setState("DELETED");
-
-    Context
-      .getCommandContext()
-      .getDbEntityManager()
-      .forceUpdate(this);
-  }
-
   public Object getPersistentState() {
     List<Object> state = new ArrayList<Object>(8);
     state.add(getSerializerName());

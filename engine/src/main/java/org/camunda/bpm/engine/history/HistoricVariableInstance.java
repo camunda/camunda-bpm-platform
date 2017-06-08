@@ -23,6 +23,9 @@ import org.camunda.bpm.engine.variable.value.TypedValue;
  */
 public interface HistoricVariableInstance {
 
+  String STATE_CREATED = "CREATED";
+  String STATE_DELETED = "DELETED";
+
   /**
    * @return the Id of this variable instance
    */
