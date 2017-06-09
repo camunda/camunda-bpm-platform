@@ -20,7 +20,7 @@ Simple API for connecting HTTP Services and other things.
 # Using a Connector
 
 camunda Connect API aims at two usage scenarios, usage in a generic system such as camunda BPM
-process engine and standalone usage via API. Please see the [official documentation](http://docs.camunda.org/latest/api-references/connect/) for more information.
+process engine and standalone usage via API. Please see the [official documentation](https://docs.camunda.org/manual/latest/reference/connect/) for more information.
 
 # Contributing
 
