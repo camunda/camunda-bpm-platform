@@ -95,15 +95,15 @@
           <bind name="newOrderBy" value="@org.camunda.bpm.engine.impl.db.sql.MybatisJoinHelper@orderBy(orderingProperty, index)" />
 
           <if test="index == 0">
-            <bind name="orderBy" value="newOrderBy"/>
+            <bind name="internalOrderBy" value="newOrderBy"/>
           </if>
           <if test="index > 0">
-            <bind name="orderBy" value="orderBy + ', ' + newOrderBy"/>
+            <bind name="internalOrderBy" value="internalOrderBy + ', ' + newOrderBy"/>
           </if>
         </foreach>
       </when>
       <otherwise>
-        <bind name="orderBy" value="'RES.ID_ asc'"/>
+        <bind name="internalOrderBy" value="'RES.ID_ asc'"/>
       </otherwise>
     </choose>
 

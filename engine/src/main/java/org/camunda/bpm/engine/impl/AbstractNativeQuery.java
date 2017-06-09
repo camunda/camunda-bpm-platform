@@ -118,7 +118,7 @@ public abstract class AbstractNativeQuery<T extends NativeQuery< ? , ? >, U> imp
       parameterMap.put("resultType", "LIST_PAGE");
       parameterMap.put("firstResult", firstResult);
       parameterMap.put("maxResults", maxResults);
-      parameterMap.put("orderBy", "RES.ID_ asc");
+      parameterMap.put("internalOrderBy", "RES.ID_ asc");
 
       int firstRow = firstResult + 1;
       parameterMap.put("firstRow", firstRow);
