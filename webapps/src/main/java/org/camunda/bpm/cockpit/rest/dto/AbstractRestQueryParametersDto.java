@@ -90,6 +90,11 @@ public abstract class AbstractRestQueryParametersDto<T> extends QueryParameters<
     return (sortBy != null && sortOrder != null) || (sortBy == null && sortOrder == null);
   }
 
+  public String getInternalOrderBy() {
+    return getOrderBy();
+  }
+
+  @Deprecated
   public String getOrderBy() {
     if (sortBy != null) {
       if (sortOrder == null || sortOrder.isEmpty()) {
