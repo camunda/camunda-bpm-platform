@@ -39,7 +39,8 @@ public class DecisionDefinitionQueryDto extends AbstractQueryDto<DecisionDefinit
   private static final String SORT_BY_DEPLOYMENT_ID_VALUE = "deploymentId";
   private static final String SORT_BY_CATEGORY_VALUE = "category";
   private static final String SORT_BY_TENANT_ID = "tenantId";
-
+  private static final String SORT_BY_VERSION_TAG = "versionTag";
+  
   private static final List<String> VALID_SORT_BY_VALUES;
 
   static {
@@ -52,7 +53,7 @@ public class DecisionDefinitionQueryDto extends AbstractQueryDto<DecisionDefinit
     VALID_SORT_BY_VALUES.add(SORT_BY_VERSION_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_DEPLOYMENT_ID_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_TENANT_ID);
-
+    VALID_SORT_BY_VALUES.add(SORT_BY_VERSION_TAG);
   }
 
   protected String decisionDefinitionId;
@@ -74,7 +75,9 @@ public class DecisionDefinitionQueryDto extends AbstractQueryDto<DecisionDefinit
   protected List<String> tenantIds;
   protected Boolean withoutTenantId;
   protected Boolean includeDefinitionsWithoutTenantId;
-
+  private String versionTag;
+  private String versionTagLike;
+  
   public DecisionDefinitionQueryDto() {}
 
   public DecisionDefinitionQueryDto(ObjectMapper objectMapper, MultivaluedMap<String, String> queryParameters) {
@@ -175,6 +178,16 @@ public class DecisionDefinitionQueryDto extends AbstractQueryDto<DecisionDefinit
   public void setIncludeDecisionDefinitionsWithoutTenantId(Boolean includeDefinitionsWithoutTenantId) {
     this.includeDefinitionsWithoutTenantId = includeDefinitionsWithoutTenantId;
   }
+  
+  @CamundaQueryParam(value = "versionTag")
+  public void setVersionTag(String versionTag) {
+    this.versionTag = versionTag;
+  }
+
+  @CamundaQueryParam(value = "versionTagLike")
+  public void setVersionTagLike(String versionTagLike) {
+    this.versionTagLike = versionTagLike;
+  }
 
   @Override
   protected boolean isValidSortByValue(String value) {
@@ -245,6 +258,12 @@ public class DecisionDefinitionQueryDto extends AbstractQueryDto<DecisionDefinit
     if (TRUE.equals(includeDefinitionsWithoutTenantId)) {
       query.includeDecisionDefinitionsWithoutTenantId();
     }
+    if( versionTag != null) {
+      query.versionTag(versionTag);
+    }
+    if( versionTagLike != null) {
+      query.versionTagLike(versionTagLike);
+    }
   }
 
   @Override
@@ -263,6 +282,8 @@ public class DecisionDefinitionQueryDto extends AbstractQueryDto<DecisionDefinit
       query.orderByDeploymentId();
     } else if (sortBy.equals(SORT_BY_TENANT_ID)) {
       query.orderByTenantId();
+    } else if (sortBy.equals(SORT_BY_VERSION_TAG)) {
+      query.orderByVersionTag();
     }
   }
 

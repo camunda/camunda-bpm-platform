@@ -13,6 +13,7 @@ create table ACT_RE_DECISION_DEF (
     DEC_REQ_KEY_ NVARCHAR2(255),
     TENANT_ID_ NVARCHAR2(64),
     HISTORY_TTL_ integer,
+    VERSION_TAG_ NVARCHAR2(64),
     primary key (ID_)
 );
 

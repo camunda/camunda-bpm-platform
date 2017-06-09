@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd" xmlns:camunda="http://camunda.org/schema/1.0/dmn" id="definitions" name="definitions" namespace="http://camunda.org/schema/1.0/dmn">
+  <decision id="versionTag" name="VersionTag DMN" camunda:versionTag="1.0.0">
+    <decisionTable id="decisionTable">
+      <input id="input1" label="">
+        <inputExpression id="inputExpression1" typeRef="string">        <text></text>
+</inputExpression>
+      </input>
+      <output id="output1" label="" name="" typeRef="string" />
+    </decisionTable>
+  </decision>
+</definitions>

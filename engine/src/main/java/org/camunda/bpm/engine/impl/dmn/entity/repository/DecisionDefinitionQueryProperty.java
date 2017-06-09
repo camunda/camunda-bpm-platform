@@ -27,5 +27,5 @@ public interface DecisionDefinitionQueryProperty {
   public static final QueryProperty DECISION_DEFINITION_CATEGORY = new QueryPropertyImpl("CATEGORY_");
   public static final QueryProperty DEPLOYMENT_ID = new QueryPropertyImpl("DEPLOYMENT_ID_");
   public static final QueryProperty TENANT_ID = new QueryPropertyImpl("TENANT_ID_");
-
+  public static final QueryProperty VERSION_TAG = new QueryPropertyImpl("VERSION_TAG_");
 }
