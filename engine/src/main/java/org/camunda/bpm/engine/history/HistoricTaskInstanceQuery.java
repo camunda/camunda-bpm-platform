@@ -338,4 +338,26 @@ public interface HistoricTaskInstanceQuery  extends Query<HistoricTaskInstanceQu
 
   /** Order by case execution id (needs to be followed by {@link #asc()} or {@link #desc()}). */
   HistoricTaskInstanceQuery orderByCaseExecutionId();
+
+  /**
+   * Only select tasks where end time is after given date
+   */
+  HistoricTaskInstanceQuery finishedAfter(Date date);
+
+  /**
+   * Only select tasks where end time is before given date
+   */
+  HistoricTaskInstanceQuery finishedBefore(Date date);
+
+  /**
+   * Only select tasks where started after given date
+   */
+  HistoricTaskInstanceQuery startedAfter(Date date);
+
+  /**
+   * Only select tasks where started before given date
+   */
+  HistoricTaskInstanceQuery startedBefore(Date date);
+
+
 }

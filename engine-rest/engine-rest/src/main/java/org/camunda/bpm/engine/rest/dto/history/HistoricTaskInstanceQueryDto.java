@@ -125,6 +125,11 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
   protected Date taskFollowUpDateAfter;
   private List<String> tenantIds;
 
+  protected Date startedBefore;
+  protected Date startedAfter;
+  protected Date finishedBefore;
+  protected Date finishedAfter;
+
   protected String caseDefinitionId;
   protected String caseDefinitionKey;
   protected String caseDefinitionName;
@@ -380,6 +385,26 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
     this.withoutCandidateGroups = withoutCandidateGroups;
   }
 
+  @CamundaQueryParam(value="startedBefore", converter=DateConverter.class)
+  public void setStartedBefore(Date startedBefore) {
+    this.startedBefore = startedBefore;
+  }
+
+  @CamundaQueryParam(value="startedAfter", converter=DateConverter.class)
+  public void setStartedAfter(Date startedAfter) {
+    this.startedAfter = startedAfter;
+  }
+
+  @CamundaQueryParam(value="finishedBefore", converter=DateConverter.class)
+  public void setFinishedBefore(Date finishedBefore) {
+    this.finishedBefore = finishedBefore;
+  }
+
+  @CamundaQueryParam(value="finishedAfter", converter=DateConverter.class)
+  public void setFinishedAfter(Date finishedAfter) {
+    this.finishedAfter = finishedAfter;
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -527,6 +552,23 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
     if (withoutCandidateGroups != null) {
       query.withoutCandidateGroups();
     }
+
+    if (finishedAfter != null) {
+      query.finishedAfter(finishedAfter);
+    }
+
+    if (finishedBefore != null) {
+      query.finishedBefore(finishedBefore);
+    }
+
+    if (startedAfter != null) {
+      query.startedAfter(startedAfter);
+    }
+
+    if (startedBefore != null) {
+      query.startedBefore(startedBefore);
+    }
+
     if (taskVariables != null) {
       for (VariableQueryParameterDto variableQueryParam : taskVariables) {
         String variableName = variableQueryParam.getName();

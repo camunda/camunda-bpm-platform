@@ -82,6 +82,11 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
   protected String caseInstanceId;
   protected String caseExecutionId;
 
+  protected Date finishedAfter;
+  protected Date finishedBefore;
+  protected Date startedAfter;
+  protected Date startedBefore;
+
   public HistoricTaskInstanceQueryImpl() {
   }
 
@@ -356,6 +361,8 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
     return super.hasExcludingConditions()
       || (finished && unfinished)
       ||(processFinished && processUnfinished)
+      || CompareUtil.areNotInAscendingOrder(startedAfter, startedBefore)
+      || CompareUtil.areNotInAscendingOrder(finishedAfter, finishedBefore)
       || CompareUtil.areNotInAscendingOrder(dueAfter, dueDate, dueBefore)
       || CompareUtil.areNotInAscendingOrder(followUpAfter, followUpDate, followUpBefore);
   }
@@ -461,6 +468,33 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
     orderBy(HistoricTaskInstanceQueryProperty.CASE_EXECUTION_ID);
     return this;
   }
+
+  @Override
+  public HistoricTaskInstanceQuery finishedAfter(Date date) {
+    finished = true;
+    this.finishedAfter = date;
+    return this;
+  }
+
+  @Override
+  public HistoricTaskInstanceQuery finishedBefore(Date date) {
+    finished = true;
+    this.finishedBefore = date;
+    return this;
+  }
+
+  @Override
+  public HistoricTaskInstanceQuery startedAfter(Date date) {
+    this.startedAfter = date;
+    return this;
+  }
+
+  @Override
+  public HistoricTaskInstanceQuery startedBefore(Date date) {
+    this.startedBefore = date;
+    return this;
+  }
+
 
   public HistoricTaskInstanceQuery orderByTenantId() {
     return orderBy(HistoricTaskInstanceQueryProperty.TENANT_ID);
@@ -584,4 +618,19 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
     return caseExecutionId;
   }
 
+  public Date getFinishedAfter() {
+    return finishedAfter;
+  }
+
+  public Date getFinishedBefore() {
+    return finishedBefore;
+  }
+
+  public Date getStartedAfter() {
+    return startedAfter;
+  }
+
+  public Date getStartedBefore() {
+    return startedBefore;
+  }
 }
