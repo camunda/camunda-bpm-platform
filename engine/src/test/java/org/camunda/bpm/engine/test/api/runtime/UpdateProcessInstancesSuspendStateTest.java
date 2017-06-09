@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.test.api.runtime;
 
 import java.util.Arrays;
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
@@ -22,6 +23,7 @@ import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -31,7 +33,9 @@ import org.python.google.common.collect.Sets;
 
 
 import static junit.framework.TestCase.assertFalse;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class UpdateProcessInstancesSuspendStateTest {
 
@@ -241,4 +245,77 @@ public class UpdateProcessInstancesSuspendStateTest {
     assertFalse(p2c.isSuspended());
 
   }
+
+
+  @Test
+  public void testEmptyProcessInstanceListSuspend() {
+    // given
+    // nothing
+
+    // when
+    try {
+      runtimeService.updateProcessInstanceSuspensionState().byProcessInstanceIds().suspend();
+      fail("exception expected");
+    } catch (BadUserRequestException e) {
+      // then
+      Assert.assertThat(e.getMessage(), containsString("No process instance ids given" ));
+    }
+
+  }
+
+  @Test
+  public void testEmptyProcessInstanceListActivate() {
+    // given
+    // nothing
+
+    // when
+    try {
+      runtimeService.updateProcessInstanceSuspensionState().byProcessInstanceIds().activate();
+      fail("exception expected");
+    } catch (BadUserRequestException e) {
+      // then
+      Assert.assertThat(e.getMessage(), containsString("No process instance ids given" ));
+    }
+
+  }
+
+
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
+    "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskProcess.bpmn20.xml"})
+  public void testNullProcessInstanceListActivate() {
+    // given
+    ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("twoExternalTaskProcess");
+
+    // when
+    try {
+      runtimeService.updateProcessInstanceSuspensionState().byProcessInstanceIds(Arrays.asList(processInstance1.getId(), processInstance2.getId(), null)).activate();
+      fail("exception expected");
+    } catch (BadUserRequestException e) {
+      // then
+      Assert.assertThat(e.getMessage(), containsString("Cannot be null" ));
+    }
+
+  }
+
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
+    "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskProcess.bpmn20.xml"})
+  public void testNullProcessInstanceListSuspend() {
+    // given
+    ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("twoExternalTaskProcess");
+
+    // when
+    try {
+      runtimeService.updateProcessInstanceSuspensionState().byProcessInstanceIds(Arrays.asList(processInstance1.getId(), processInstance2.getId(), null)).suspend();
+      fail("exception expected");
+    } catch (BadUserRequestException e) {
+      // then
+      Assert.assertThat(e.getMessage(), containsString("Cannot be null" ));
+    }
+
+  }
+
 }

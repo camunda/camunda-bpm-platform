@@ -23,7 +23,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.runtime.UpdateProcessInstancesSuspensionStateBuilder;
 
-public class UpdateProcessInstancesSuspensionStationBuilderImpl implements UpdateProcessInstancesSuspensionStateBuilder {
+public class UpdateProcessInstancesSuspensionStateBuilderImpl implements UpdateProcessInstancesSuspensionStateBuilder {
 
   protected List<String> processInstanceIds;
   protected ProcessInstanceQuery processInstanceQuery;
@@ -32,7 +32,7 @@ public class UpdateProcessInstancesSuspensionStationBuilderImpl implements Updat
   protected String processDefinitionId;
   protected boolean suspend;
 
-  public UpdateProcessInstancesSuspensionStationBuilderImpl(CommandExecutor commandExecutor, boolean suspend) {
+  public UpdateProcessInstancesSuspensionStateBuilderImpl(CommandExecutor commandExecutor, boolean suspend) {
     this.processInstanceIds = new ArrayList<String>();
     this.commandExecutor = commandExecutor;
     this.suspend = suspend;
@@ -69,13 +69,13 @@ public class UpdateProcessInstancesSuspensionStationBuilderImpl implements Updat
   @Override
   public void suspend() {
     this.suspend = true;
-    commandExecutor.execute(new UpdateProcessInstancesSuspendStateCmd(commandExecutor, this));
+    commandExecutor.execute(new UpdateProcessInstancesSuspendStateCmd(commandExecutor, this, suspend));
   }
 
   @Override
   public void activate() {
     this.suspend = false;
-    commandExecutor.execute(new UpdateProcessInstancesSuspendStateCmd(commandExecutor, this));
+    commandExecutor.execute(new UpdateProcessInstancesSuspendStateCmd(commandExecutor, this, suspend));
   }
 
   @Override
@@ -101,18 +101,6 @@ public class UpdateProcessInstancesSuspensionStationBuilderImpl implements Updat
 
   public HistoricProcessInstanceQuery getHistoricProcessInstanceQuery() {
     return historicProcessInstanceQuery;
-  }
-
-  public boolean getSuspendState() {
-    return suspend;
-  }
-
-  public String getProcessDefinitionId() {
-    return processDefinitionId;
-  }
-
-  public void setSuspendState(boolean suspend) {
-    this.suspend = suspend;
   }
 
 }

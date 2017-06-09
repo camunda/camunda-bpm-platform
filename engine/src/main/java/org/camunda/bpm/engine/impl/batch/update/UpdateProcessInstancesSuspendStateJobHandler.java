@@ -12,33 +12,25 @@
  */
 package org.camunda.bpm.engine.impl.batch.update;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.Callable;
 import org.camunda.bpm.engine.batch.Batch;
-import org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.batch.AbstractBatchJobHandler;
-import org.camunda.bpm.engine.impl.batch.BatchEntity;
 import org.camunda.bpm.engine.impl.batch.BatchJobConfiguration;
 import org.camunda.bpm.engine.impl.batch.BatchJobContext;
 import org.camunda.bpm.engine.impl.batch.BatchJobDeclaration;
-import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.JobManager;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 
 public class UpdateProcessInstancesSuspendStateJobHandler extends AbstractBatchJobHandler<UpdateProcessInstancesSuspendStateBatchConfiguration> {
 
-  public static final BatchJobDeclaration JOB_DECLARATION = new BatchJobDeclaration(Batch.TYPE_PROCESS_INSTANCE_UPDATE);
+  public static final BatchJobDeclaration JOB_DECLARATION = new BatchJobDeclaration(Batch.TYPE_PROCESS_INSTANCE_UPDATE_SUSPENSION_STATE);
 
   @Override
   public String getType() {
-    return Batch.TYPE_PROCESS_INSTANCE_UPDATE;
+    return Batch.TYPE_PROCESS_INSTANCE_UPDATE_SUSPENSION_STATE;
   }
 
   protected UpdateProcessInstancesSuspendStateBatchConfigurationJsonConverter getJsonConverterInstance() {
@@ -83,84 +75,4 @@ public class UpdateProcessInstancesSuspendStateJobHandler extends AbstractBatchJ
 
   }
 
-  @Override
-  public boolean createJobs(BatchEntity batch) {
-    UpdateProcessInstancesSuspendStateBatchConfiguration configuration = readConfiguration(batch.getConfigurationBytes());
-
-    List<String> ids = configuration.getIds();
-    final CommandContext commandContext = Context.getCommandContext();
-
-
-
-    int batchJobsPerSeed = batch.getBatchJobsPerSeed();
-    int invocationsPerBatchJob = batch.getInvocationsPerBatchJob();
-
-    int numberOfItemsToProcess = Math.min(invocationsPerBatchJob * batchJobsPerSeed, ids.size());
-    // view of process instances to process
-    final List<String> processIds = ids.subList(0, numberOfItemsToProcess);
-
-    List<String> deploymentIds = commandContext.runWithoutAuthorization(new Callable<List<String>>() {
-      @Override
-      public List<String> call() throws Exception {
-        return commandContext.getDeploymentManager().findDeploymentIdsByProcessInstances(processIds);
-      }
-    });
-
-    for (final String deploymentId : deploymentIds) {
-
-      List<String> processIdsPerDeployment = commandContext.runWithoutAuthorization(new Callable<List<String>>() {
-        @Override
-        public List<String> call() throws Exception {
-          final ProcessInstanceQueryImpl processInstanceQueryToBeProcess = new ProcessInstanceQueryImpl();
-          processInstanceQueryToBeProcess.processInstanceIds(new HashSet<String>(processIds)).deploymentId(deploymentId);
-          return commandContext.getExecutionManager().findProcessInstancesIdsByQueryCriteria(processInstanceQueryToBeProcess);
-        }
-      });
-
-      processIds.removeAll(processIdsPerDeployment);
-
-      createJobEntities(batch, configuration, deploymentId, processIdsPerDeployment, invocationsPerBatchJob);
-    }
-
-    // when there are non existing process instance ids
-    if (!processIds.isEmpty()) {
-      createJobEntities(batch, configuration, null, processIds, invocationsPerBatchJob);
-    }
-
-    return ids.isEmpty();
-
-  }
-
-  protected void createJobEntities(BatchEntity batch, UpdateProcessInstancesSuspendStateBatchConfiguration configuration, String deploymentId,
-                                   List<String> processInstancesToHandle, int invocationsPerBatchJob) {
-
-
-    CommandContext commandContext = Context.getCommandContext();
-    ByteArrayManager byteArrayManager = commandContext.getByteArrayManager();
-    JobManager jobManager = commandContext.getJobManager();
-
-    int createdJobs = 0;
-    while (!processInstancesToHandle.isEmpty()) {
-      int lastIdIndex = Math.min(invocationsPerBatchJob, processInstancesToHandle.size());
-      // view of process instances for this job
-      List<String> idsForJob = processInstancesToHandle.subList(0, lastIdIndex);
-
-      UpdateProcessInstancesSuspendStateBatchConfiguration jobConfiguration = createJobConfiguration(configuration, idsForJob);
-      ByteArrayEntity configurationEntity = saveConfiguration(byteArrayManager, jobConfiguration);
-
-      JobEntity job = createBatchJob(batch, configurationEntity);
-      job.setDeploymentId(deploymentId);
-
-      jobManager.insertAndHintJobExecutor(job);
-      createdJobs++;
-
-      idsForJob.clear();
-    }
-
-    // update created jobs for batch
-    batch.setJobsCreated(batch.getJobsCreated() + createdJobs);
-
-    // update batch configuration
-    batch.setConfigurationBytes(writeConfiguration(configuration));
-  }
 }

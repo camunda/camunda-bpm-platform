@@ -19,18 +19,17 @@ import java.util.List;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.HistoricProcessInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl;
-import org.camunda.bpm.engine.impl.UpdateProcessInstancesSuspensionStationBuilderImpl;
+import org.camunda.bpm.engine.impl.UpdateProcessInstancesSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
-import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 
 public abstract class AbstractUpdateProcessInstancesSuspendStateCmd<T> implements Command<T> {
-  protected UpdateProcessInstancesSuspensionStationBuilderImpl builder;
+  protected UpdateProcessInstancesSuspensionStateBuilderImpl builder;
   protected CommandExecutor commandExecutor;
 
-  public AbstractUpdateProcessInstancesSuspendStateCmd(CommandExecutor commandExecutor, UpdateProcessInstancesSuspensionStationBuilderImpl builder) {
+  public AbstractUpdateProcessInstancesSuspendStateCmd(CommandExecutor commandExecutor, UpdateProcessInstancesSuspensionStateBuilderImpl builder) {
     this.commandExecutor = commandExecutor;
     this.builder = builder;
   }
@@ -85,12 +84,4 @@ public abstract class AbstractUpdateProcessInstancesSuspendStateCmd<T> implement
           propertyChanges);
     }
   }
-  protected ProcessDefinitionEntity getProcessDefinition(CommandContext commandContext, String processDefinitionId) {
-
-    return commandContext
-      .getProcessEngineConfiguration()
-      .getDeploymentCache()
-      .findDeployedProcessDefinitionById(processDefinitionId);
-  }
-
 }

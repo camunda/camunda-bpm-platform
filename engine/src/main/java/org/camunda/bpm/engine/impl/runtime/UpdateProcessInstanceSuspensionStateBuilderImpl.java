@@ -20,7 +20,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureOnlyOneNotNull;
 import java.util.List;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
-import org.camunda.bpm.engine.impl.UpdateProcessInstancesSuspensionStationBuilderImpl;
+import org.camunda.bpm.engine.impl.UpdateProcessInstancesSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.impl.cmd.ActivateProcessInstanceCmd;
 import org.camunda.bpm.engine.impl.cmd.CommandLogger;
 import org.camunda.bpm.engine.impl.cmd.SuspendProcessInstanceCmd;
@@ -64,28 +64,28 @@ public class UpdateProcessInstanceSuspensionStateBuilderImpl implements UpdatePr
 
   @Override
   public UpdateProcessInstancesSuspensionStateBuilder byProcessInstanceIds(List<String> processInstanceIds){
-    UpdateProcessInstancesSuspensionStateBuilder builder = new UpdateProcessInstancesSuspensionStationBuilderImpl(commandExecutor, true)
+    UpdateProcessInstancesSuspensionStateBuilder builder = new UpdateProcessInstancesSuspensionStateBuilderImpl(commandExecutor, true)
       .byProcessInstanceIds(processInstanceIds);
     return builder;
   }
 
   @Override
   public UpdateProcessInstancesSuspensionStateBuilder byProcessInstanceIds(String... processInstanceIds) {
-    UpdateProcessInstancesSuspensionStateBuilder builder = new UpdateProcessInstancesSuspensionStationBuilderImpl(commandExecutor, true)
+    UpdateProcessInstancesSuspensionStateBuilder builder = new UpdateProcessInstancesSuspensionStateBuilderImpl(commandExecutor, true)
       .byProcessInstanceIds(processInstanceIds);
     return builder;
   }
 
   @Override
   public UpdateProcessInstancesSuspensionStateBuilder byProcessInstanceQuery(ProcessInstanceQuery processInstanceQuery) {
-    UpdateProcessInstancesSuspensionStateBuilder builder = new UpdateProcessInstancesSuspensionStationBuilderImpl(commandExecutor, true)
+    UpdateProcessInstancesSuspensionStateBuilder builder = new UpdateProcessInstancesSuspensionStateBuilderImpl(commandExecutor, true)
       .byProcessInstanceQuery(processInstanceQuery);
     return builder;
   }
 
   @Override
   public UpdateProcessInstancesSuspensionStateBuilder byHistoricProcessInstanceQuery(HistoricProcessInstanceQuery historicProcessInstanceQuery) {
-    UpdateProcessInstancesSuspensionStateBuilder builder = new UpdateProcessInstancesSuspensionStationBuilderImpl(commandExecutor, true)
+    UpdateProcessInstancesSuspensionStateBuilder builder = new UpdateProcessInstancesSuspensionStateBuilderImpl(commandExecutor, true)
       .byHistoricProcessInstanceQuery(historicProcessInstanceQuery);
     return builder;
   }
