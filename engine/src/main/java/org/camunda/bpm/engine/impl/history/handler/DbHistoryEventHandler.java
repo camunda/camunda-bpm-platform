@@ -110,6 +110,7 @@ public class DbHistoryEventHandler implements HistoryEventHandler {
       HistoricVariableInstanceEntity historicVariableInstanceEntity = dbEntityManager.selectById(HistoricVariableInstanceEntity.class, historyEvent.getVariableInstanceId());
       if(historicVariableInstanceEntity != null) {
         historicVariableInstanceEntity.updateFromEvent(historyEvent);
+        historicVariableInstanceEntity.setState(HistoricVariableInstance.STATE_CREATED);
 
       } else {
         // #CAM-1344 / #SUPPORT-688

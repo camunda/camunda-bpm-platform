@@ -21,10 +21,13 @@ import java.util.Map;
 import java.util.Set;
 
 import org.camunda.bpm.engine.delegate.VariableScope;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableInstance;
 import org.camunda.bpm.engine.impl.core.variable.event.VariableEvent;
 import org.camunda.bpm.engine.impl.core.variable.event.VariableEventDispatcher;
+import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.javax.el.ELContext;
+import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.impl.VariableMapImpl;
@@ -311,6 +314,17 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
       CoreVariableInstance existingInstance = variableStore.getVariable(variableName);
       existingInstance.setValue(value);
       invokeVariableLifecycleListenersUpdate(existingInstance, sourceActivityExecution);
+    }
+    else if (variableStore.isRemoved(variableName)) {
+
+      CoreVariableInstance existingInstance = variableStore.getRemovedVariable(variableName);
+
+      existingInstance.setValue(value);
+      getVariableStore().addVariable(existingInstance);
+      invokeVariableLifecycleListenersUpdate(existingInstance, sourceActivityExecution);
+
+      DbEntityManager dbEntityManager = Context.getCommandContext().getDbEntityManager();
+      dbEntityManager.undoDelete((VariableInstanceEntity) existingInstance);
     }
     else {
       CoreVariableInstance variableValue = getVariableInstanceFactory().build(variableName, value, false);

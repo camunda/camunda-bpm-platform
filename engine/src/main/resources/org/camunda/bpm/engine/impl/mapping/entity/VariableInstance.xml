@@ -121,7 +121,7 @@
         EXECUTION.PARENT_ID_ = PARENT_EXECUTION.ID_
 
     WHERE
-        ID_ = #{id, jdbcType=VARCHAR}
+        RES.ID_ = #{id, jdbcType=VARCHAR}
   </select>
 
 	<select id="selectVariablesByExecutionId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="variableInstanceResultMap">
