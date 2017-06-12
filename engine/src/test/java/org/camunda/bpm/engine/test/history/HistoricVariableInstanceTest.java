@@ -2162,12 +2162,12 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/twoTasksProcess.bpmn20.xml"})
-  public void shouldSetDifferentStates() {
+  public void testSetDifferentStates() {
     //given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksProcess", Variables.createVariables().putValue("initial", "foo"));
-    List<Task> taskList = taskService.createTaskQuery().list();
-    taskService.setVariables(taskList.get(0).getId(), Variables.createVariables().putValue("bar", "abc"));
-    taskService.complete(taskList.get(0).getId());
+    Task task = taskService.createTaskQuery().singleResult();
+    taskService.setVariables(task.getId(), Variables.createVariables().putValue("bar", "abc"));
+    taskService.complete(task.getId());
 
     //when
     runtimeService.removeVariable(processInstance.getId(), "bar");
@@ -2176,31 +2176,30 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
     List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery().includeDeleted().list();
     Assert.assertEquals(2, variables.size());
 
-    int createrCounter = 0;
+    int createdCounter = 0;
     int deletedCounter = 0;
 
     for (HistoricVariableInstance variable : variables) {
       if (variable.getName().equals("initial")) {
         Assert.assertEquals(HistoricVariableInstance.STATE_CREATED, variable.getState());
-        createrCounter += 1;
+        createdCounter += 1;
       } else if (variable.getName().equals("bar")) {
         Assert.assertEquals(HistoricVariableInstance.STATE_DELETED, variable.getState());
         deletedCounter += 1;
       }
     }
 
-    Assert.assertEquals(1, createrCounter);
+    Assert.assertEquals(1, createdCounter);
     Assert.assertEquals(1, deletedCounter);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/twoTasksProcess.bpmn20.xml"})
-  public void shouldNotIncludeDeleted() {
+  public void testQueryNotIncludeDeleted() {
     //given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksProcess", Variables.createVariables().putValue("initial", "foo"));
-    List<Task> taskList = taskService.createTaskQuery().list();
-    System.out.println(taskList.get(0));
-    taskService.setVariables(taskList.get(0).getId(), Variables.createVariables().putValue("bar", "abc"));
-    taskService.complete(taskList.get(0).getId());
+    Task task = taskService.createTaskQuery().singleResult();
+    taskService.setVariables(task.getId(), Variables.createVariables().putValue("bar", "abc"));
+    taskService.complete(task.getId());
 
     //when
     runtimeService.removeVariable(processInstance.getId(), "bar");
