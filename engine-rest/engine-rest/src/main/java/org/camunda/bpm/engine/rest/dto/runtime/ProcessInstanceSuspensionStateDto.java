@@ -12,14 +12,18 @@
  */
 package org.camunda.bpm.engine.rest.dto.runtime;
 
+import java.util.List;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.rest.dto.SuspensionStateDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.runtime.UpdateProcessInstanceSuspensionStateBuilder;
 import org.camunda.bpm.engine.runtime.UpdateProcessInstanceSuspensionStateSelectBuilder;
 import org.camunda.bpm.engine.runtime.UpdateProcessInstanceSuspensionStateTenantBuilder;
+import org.camunda.bpm.engine.runtime.UpdateProcessInstancesSuspensionStateBuilder;
 
 /**
  * @author roman.smirnov
@@ -29,6 +33,10 @@ public class ProcessInstanceSuspensionStateDto extends SuspensionStateDto {
   private String processInstanceId;
   private String processDefinitionId;
   private String processDefinitionKey;
+
+  private List<String> processInstanceIds;
+  private ProcessInstanceQuery processInstanceQuery;
+  private HistoricProcessInstanceQuery historicProcessInstanceQuery;
 
   private String processDefinitionTenantId;
   private boolean processDefinitionWithoutTenantId;
@@ -49,6 +57,18 @@ public class ProcessInstanceSuspensionStateDto extends SuspensionStateDto {
     this.processDefinitionKey = processDefinitionKey;
   }
 
+  public void setProcessInstanceIds(List<String> processInstanceIds) {
+    this.processInstanceIds = processInstanceIds;
+  }
+
+  public void setProcessInstanceQuery(ProcessInstanceQuery processInstanceQuery) {
+    this.processInstanceQuery = processInstanceQuery;
+  }
+
+  public void setHistoricProcessInstanceQuery(HistoricProcessInstanceQuery historicProcessInstanceQuery) {
+    this.historicProcessInstanceQuery = historicProcessInstanceQuery;
+  }
+
   public void setProcessDefinitionTenantId(String processDefinitionTenantId) {
     this.processDefinitionTenantId = processDefinitionTenantId;
   }
@@ -60,23 +80,51 @@ public class ProcessInstanceSuspensionStateDto extends SuspensionStateDto {
   @Override
   public void updateSuspensionState(ProcessEngine engine) {
     int params = (processInstanceId != null ? 1 : 0)
-               + (processDefinitionId != null ? 1 : 0)
-               + (processDefinitionKey != null ? 1 : 0);
+      + (processDefinitionId != null ? 1 : 0)
+      + (processDefinitionKey != null ? 1 : 0);
 
-    if (params > 1) {
+    int syncParams = (processInstanceIds != null ? 1 : 0)
+      + (processInstanceQuery != null ? 1 : 0)
+      + (historicProcessInstanceQuery != null ? 1 : 0);
+
+    if (params >= 1 && syncParams >= 1) {
+      String message = "Choose either a single processInstance with processInstanceId, processDefinitionId or processDefinitionKey or a group of processInstances with processInstanceIds, procesInstanceQuery or historicProcessInstanceQuery.";
+      throw new InvalidRequestException(Status.BAD_REQUEST, message);
+    } else if (params > 1) {
       String message = "Only one of processInstanceId, processDefinitionId or processDefinitionKey should be set to update the suspension state.";
       throw new InvalidRequestException(Status.BAD_REQUEST, message);
-    } else if(params == 0) {
+    } else if (syncParams > 1) {
+      String message = "Only one of processInstanceIds, processInstanceQuery or historicProcessInstanceQuery should be set to update the suspension state.";
+      throw new InvalidRequestException(Status.BAD_REQUEST, message);
+    } else if(params == 0 && syncParams == 0) {
       String message = "Either processInstanceId, processDefinitionId or processDefinitionKey should be set to update the suspension state.";
       throw new InvalidRequestException(Status.BAD_REQUEST, message);
     }
 
     UpdateProcessInstanceSuspensionStateBuilder updateSuspensionStateBuilder = createUpdateSuspensionStateBuilder(engine);
-
-    if (getSuspended()) {
-      updateSuspensionStateBuilder.suspend();
+    if (syncParams > 0) {
+      UpdateProcessInstancesSuspensionStateBuilder updateProcessInstancesSuspensionStateBuilder = (UpdateProcessInstancesSuspensionStateBuilder) updateSuspensionStateBuilder;
+      if (getSuspended()) {
+        updateProcessInstancesSuspensionStateBuilder.suspend();
+      } else {
+        updateProcessInstancesSuspensionStateBuilder.activate();
+      }
     } else {
-      updateSuspensionStateBuilder.activate();
+
+      if (getSuspended()) {
+        updateSuspensionStateBuilder.suspend();
+      } else {
+        updateSuspensionStateBuilder.activate();
+      }
+    }
+  }
+
+  public void updateSuspensionStateAsync(ProcessEngine engine) {
+    UpdateProcessInstancesSuspensionStateBuilder updateSuspensionStateBuilder = (UpdateProcessInstancesSuspensionStateBuilder) createUpdateSuspensionStateBuilder(engine);
+    if (getSuspended()) {
+      updateSuspensionStateBuilder.suspendAsync();
+    } else {
+      updateSuspensionStateBuilder.activateAsync();
     }
   }
 
@@ -89,7 +137,7 @@ public class ProcessInstanceSuspensionStateDto extends SuspensionStateDto {
     } else if (processDefinitionId != null) {
       return selectBuilder.byProcessDefinitionId(processDefinitionId);
 
-    } else {
+    } else if (processDefinitionKey != null) {
       UpdateProcessInstanceSuspensionStateTenantBuilder tenantBuilder = selectBuilder.byProcessDefinitionKey(processDefinitionKey);
 
       if (processDefinitionTenantId != null) {
@@ -100,6 +148,12 @@ public class ProcessInstanceSuspensionStateDto extends SuspensionStateDto {
       }
 
       return tenantBuilder;
+    } else if (processInstanceIds != null) {
+      return selectBuilder.byProcessInstanceIds(processInstanceIds);
+    } else if (processInstanceQuery != null) {
+      return selectBuilder.byProcessInstanceQuery(processInstanceQuery);
+    } else {
+      return selectBuilder.byHistoricProcessInstanceQuery(historicProcessInstanceQuery);
     }
   }
 

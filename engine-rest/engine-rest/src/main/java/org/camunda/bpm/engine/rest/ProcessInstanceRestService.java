@@ -91,6 +91,11 @@ public interface ProcessInstanceRestService {
   @Consumes(MediaType.APPLICATION_JSON)
   void updateSuspensionState(ProcessInstanceSuspensionStateDto dto);
 
+  @PUT
+  @Path("/suspended-async")
+  @Consumes(MediaType.APPLICATION_JSON)
+  void updateSuspensionStateAsync(ProcessInstanceSuspensionStateDto dto);
+
   @POST
   @Path("/delete")
   @Consumes(MediaType.APPLICATION_JSON)

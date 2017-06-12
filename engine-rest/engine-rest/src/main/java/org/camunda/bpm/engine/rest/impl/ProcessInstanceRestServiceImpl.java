@@ -116,12 +116,20 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
 
   @Override
   public void updateSuspensionState(ProcessInstanceSuspensionStateDto dto) {
+    // need to also check for group of processIds
+    // what are we checking here
     if (dto.getProcessInstanceId() != null) {
       String message = "Either processDefinitionId or processDefinitionKey can be set to update the suspension state.";
       throw new InvalidRequestException(Status.BAD_REQUEST, message);
     }
 
     dto.updateSuspensionState(getProcessEngine());
+  }
+
+  @Override
+  public void updateSuspensionStateAsync(ProcessInstanceSuspensionStateDto dto){
+    // maybe do some checks here
+    dto.updateSuspensionStateAsync(getProcessEngine());
   }
 
   @Override
