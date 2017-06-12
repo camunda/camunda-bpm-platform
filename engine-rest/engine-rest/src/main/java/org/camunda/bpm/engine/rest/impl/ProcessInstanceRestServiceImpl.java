@@ -237,6 +237,7 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
       ManagementService managementService = getProcessEngine().getManagementService();
       Batch batch = managementService.setJobRetriesAsync(
         processInstanceIds,
+        (ProcessInstanceQuery) null,
         setJobRetriesDto.getRetries());
 
       return BatchDto.fromBatch(batch);
