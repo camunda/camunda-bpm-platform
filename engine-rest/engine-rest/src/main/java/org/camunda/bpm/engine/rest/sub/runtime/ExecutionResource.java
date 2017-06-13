@@ -12,8 +12,10 @@
  */
 package org.camunda.bpm.engine.rest.sub.runtime;
 
+import org.camunda.bpm.engine.rest.dto.CreateIncidentDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ExecutionDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ExecutionTriggerDto;
+import org.camunda.bpm.engine.rest.dto.runtime.IncidentDto;
 import org.camunda.bpm.engine.rest.sub.VariableResource;
 
 import javax.ws.rs.*;
@@ -36,4 +38,10 @@ public interface ExecutionResource {
   
   @Path("/messageSubscriptions/{messageName}")
   EventSubscriptionResource getMessageEventSubscription(@PathParam("messageName") String messageName);
+
+  @POST
+  @Path("/create-incident")
+  @Produces(MediaType.APPLICATION_JSON)
+  @Consumes(MediaType.APPLICATION_JSON)
+  IncidentDto createIncident(CreateIncidentDto createIncidentDto);
 }

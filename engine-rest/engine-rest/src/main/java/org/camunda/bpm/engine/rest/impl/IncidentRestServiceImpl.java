@@ -17,6 +17,8 @@ import org.camunda.bpm.engine.rest.IncidentRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.runtime.IncidentDto;
 import org.camunda.bpm.engine.rest.dto.runtime.IncidentQueryDto;
+import org.camunda.bpm.engine.rest.sub.repository.impl.IncidentResourceImpl;
+import org.camunda.bpm.engine.rest.sub.runtime.IncidentResource;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.IncidentQuery;
 
@@ -77,4 +79,8 @@ public class IncidentRestServiceImpl extends AbstractRestProcessEngineAware impl
     return query.listPage(firstResult, maxResults);
   }
 
+  @Override
+  public IncidentResource getIncident(String incidentId) {
+    return new IncidentResourceImpl(getProcessEngine(), incidentId, getObjectMapper());
+  }
 }

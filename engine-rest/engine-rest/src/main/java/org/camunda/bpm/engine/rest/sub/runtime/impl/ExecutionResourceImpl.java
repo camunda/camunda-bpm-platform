@@ -15,18 +15,22 @@ package org.camunda.bpm.engine.rest.sub.runtime.impl;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.AuthorizationException;
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.rest.dto.CreateIncidentDto;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ExecutionDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ExecutionTriggerDto;
+import org.camunda.bpm.engine.rest.dto.runtime.IncidentDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.sub.VariableResource;
 import org.camunda.bpm.engine.rest.sub.runtime.EventSubscriptionResource;
 import org.camunda.bpm.engine.rest.sub.runtime.ExecutionResource;
 import org.camunda.bpm.engine.runtime.Execution;
+import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.variable.VariableMap;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -85,4 +89,16 @@ public class ExecutionResourceImpl implements ExecutionResource {
     return new MessageEventSubscriptionResource(engine, executionId, messageName, objectMapper);
   }
 
+  @Override
+  public IncidentDto createIncident(CreateIncidentDto createIncidentDto) {
+    Incident newIncident = null;
+
+    try {
+      newIncident = engine.getRuntimeService().createIncident(createIncidentDto.getIncidentType(), executionId, createIncidentDto.getActivityId(),
+          createIncidentDto.getConfiguration(), createIncidentDto.getMessage());
+    } catch (BadUserRequestException e) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());
+    }
+    return IncidentDto.fromIncident(newIncident);
+  }
 }

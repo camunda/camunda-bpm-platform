@@ -14,10 +14,12 @@ package org.camunda.bpm.engine.rest;
 
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.runtime.IncidentDto;
+import org.camunda.bpm.engine.rest.sub.runtime.IncidentResource;
 import org.camunda.bpm.engine.runtime.IncidentQuery;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
@@ -51,4 +53,6 @@ public interface IncidentRestService {
   @Produces(MediaType.APPLICATION_JSON)
   CountResultDto getIncidentsCount(@Context UriInfo uriInfo);
 
+  @Path("/{id}")
+  IncidentResource getIncident(@PathParam("id") String incidentId);
 }

@@ -52,6 +52,7 @@ import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.EventSubscriptionQuery;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
+import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.SerializableValueType;
 import org.camunda.bpm.engine.variable.type.ValueType;
@@ -81,6 +82,7 @@ public class ExecutionRestServiceInteractionTest extends AbstractRestServiceTest
   protected static final String SINGLE_EXECUTION_LOCAL_BINARY_VARIABLE_URL = SINGLE_EXECUTION_LOCAL_VARIABLE_URL + "/data";
   protected static final String MESSAGE_SUBSCRIPTION_URL = EXECUTION_URL + "/messageSubscriptions/{messageName}";
   protected static final String TRIGGER_MESSAGE_SUBSCRIPTION_URL = EXECUTION_URL + "/messageSubscriptions/{messageName}/trigger";
+  protected static final String CREATE_INCIDENT_URL = EXECUTION_URL + "/create-incident";
 
   private RuntimeServiceImpl runtimeServiceMock;
 
@@ -1537,5 +1539,32 @@ public class ExecutionRestServiceInteractionTest extends AbstractRestServiceTest
       .body("message", is(message))
     .when()
       .post(TRIGGER_MESSAGE_SUBSCRIPTION_URL);
+  }
+
+  @Test
+  public void testCreateIncident() {
+    when(runtimeServiceMock.createIncident(anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn(mock(Incident.class));
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("activityId", "activityId");
+    json.put("incidentType", "incidentType");
+    json.put("configuration", "configuration");
+    json.put("message", "message");
+
+    given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).contentType(ContentType.JSON).body(json).then().expect().statusCode(Status.OK.getStatusCode())
+        .when().post(CREATE_INCIDENT_URL);
+
+    verify(runtimeServiceMock).createIncident("incidentType", MockProvider.EXAMPLE_EXECUTION_ID, "activityId", "configuration", "message");
+  }
+
+  @Test
+  public void testCreateIncidentWithNullIncidentType() {
+    doThrow(new BadUserRequestException()).when(runtimeServiceMock).createIncident(anyString(), anyString(), anyString(), anyString(), anyString());
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("activiyId", "activityId");
+    json.put("configuration", "configuration");
+    json.put("message", "message");
+
+    given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).contentType(ContentType.JSON).body(json).then().expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode()).when().post(CREATE_INCIDENT_URL);
   }
 }
