@@ -22,18 +22,19 @@ public class UpdateProcessInstancesSuspendStateBatchConfigurationJsonConverter e
   public static final UpdateProcessInstancesSuspendStateBatchConfigurationJsonConverter INSTANCE = new UpdateProcessInstancesSuspendStateBatchConfigurationJsonConverter();
 
   public static final String PROCESS_INSTANCE_IDS = "processInstanceIds";
+  public static final String SUSPENDING = "suspended";
 
   public JSONObject toJsonObject(UpdateProcessInstancesSuspendStateBatchConfiguration configuration) {
     JSONObject json = new JSONObject();
 
     JsonUtil.addListField(json, PROCESS_INSTANCE_IDS, configuration.getIds());
-    JsonUtil.addField(json, "suspended", configuration.getSuspended());
+    JsonUtil.addField(json, SUSPENDING, configuration.getSuspended());
     return json;
   }
 
   public UpdateProcessInstancesSuspendStateBatchConfiguration toObject(JSONObject json) {
     UpdateProcessInstancesSuspendStateBatchConfiguration configuration =
-      new UpdateProcessInstancesSuspendStateBatchConfiguration(readProcessInstanceIds(json), json.getBoolean("suspended"));
+      new UpdateProcessInstancesSuspendStateBatchConfiguration(readProcessInstanceIds(json), json.getBoolean(SUSPENDING));
 
     return configuration;
   }

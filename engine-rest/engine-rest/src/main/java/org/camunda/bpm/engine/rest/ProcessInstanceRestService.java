@@ -26,6 +26,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
+import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
@@ -91,10 +92,11 @@ public interface ProcessInstanceRestService {
   @Consumes(MediaType.APPLICATION_JSON)
   void updateSuspensionState(ProcessInstanceSuspensionStateDto dto);
 
-  @PUT
+  @POST
   @Path("/suspended-async")
   @Consumes(MediaType.APPLICATION_JSON)
-  void updateSuspensionStateAsync(ProcessInstanceSuspensionStateDto dto);
+  @Produces(MediaType.APPLICATION_JSON)
+  BatchDto updateSuspensionStateAsync(ProcessInstanceSuspensionStateDto dto);
 
   @POST
   @Path("/delete")

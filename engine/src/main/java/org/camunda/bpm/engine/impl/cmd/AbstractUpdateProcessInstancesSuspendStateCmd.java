@@ -28,10 +28,12 @@ import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 public abstract class AbstractUpdateProcessInstancesSuspendStateCmd<T> implements Command<T> {
   protected UpdateProcessInstancesSuspensionStateBuilderImpl builder;
   protected CommandExecutor commandExecutor;
+  protected boolean suspending;
 
-  public AbstractUpdateProcessInstancesSuspendStateCmd(CommandExecutor commandExecutor, UpdateProcessInstancesSuspensionStateBuilderImpl builder) {
+  public AbstractUpdateProcessInstancesSuspendStateCmd(CommandExecutor commandExecutor, UpdateProcessInstancesSuspensionStateBuilderImpl builder, boolean suspending) {
     this.commandExecutor = commandExecutor;
     this.builder = builder;
+    this.suspending = suspending;
   }
 
 
@@ -59,8 +61,7 @@ public abstract class AbstractUpdateProcessInstancesSuspendStateCmd<T> implement
 
   protected void writeUserOperationLog(CommandContext commandContext,
                                        int numInstances,
-                                       boolean async,
-                                       boolean suspending) {
+                                       boolean async) {
 
     List<PropertyChange> propertyChanges = new ArrayList<PropertyChange>();
     propertyChanges.add(new PropertyChange("nrOfInstances",
@@ -68,20 +69,18 @@ public abstract class AbstractUpdateProcessInstancesSuspendStateCmd<T> implement
       numInstances));
     propertyChanges.add(new PropertyChange("async", null, async));
 
+    String operationType;
     if(suspending) {
-      commandContext.getOperationLogManager()
-        .logProcessInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_SUSPEND_JOB,
-          null,
-          null,
-          null,
-          propertyChanges);
+      operationType = UserOperationLogEntry.OPERATION_TYPE_SUSPEND_JOB;
+
     } else {
-      commandContext.getOperationLogManager()
-        .logProcessInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_ACTIVATE_JOB,
+      operationType = UserOperationLogEntry.OPERATION_TYPE_ACTIVATE_JOB;
+    }
+    commandContext.getOperationLogManager()
+        .logProcessInstanceOperation(operationType,
           null,
           null,
           null,
           propertyChanges);
-    }
   }
 }

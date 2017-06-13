@@ -32,16 +32,9 @@ import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
 public class UpdateProcessInstancesSuspendStateBatchCmd extends AbstractUpdateProcessInstancesSuspendStateCmd<Batch> {
 
-  protected CommandExecutor commandExecutor;
-  protected UpdateProcessInstancesSuspensionStateBuilderImpl builder;
-  protected List<String> processInstanceIds;
-  protected static boolean suspending;
 
   public UpdateProcessInstancesSuspendStateBatchCmd(CommandExecutor commandExecutor, UpdateProcessInstancesSuspensionStateBuilderImpl builder, boolean suspending) {
-    super(commandExecutor, builder);
-    this.commandExecutor = commandExecutor;
-    this.builder = builder;
-    this.suspending = suspending;
+    super(commandExecutor, builder, suspending);
   }
 
   public Batch execute(CommandContext commandContext) {
@@ -50,7 +43,7 @@ public class UpdateProcessInstancesSuspendStateBatchCmd extends AbstractUpdatePr
     EnsureUtil.ensureNotEmpty(BadUserRequestException.class, "No process instance ids given", "process Instance Ids", processInstanceIds);
     EnsureUtil.ensureNotContainsNull(BadUserRequestException.class, "Cannot be null.", "Process Instance ids", processInstanceIds);
     checkAuthorizations(commandContext);
-    writeUserOperationLog(commandContext, processInstanceIds.size(), true, suspending);
+    writeUserOperationLog(commandContext, processInstanceIds.size(), true);
     BatchEntity batch = createBatch(commandContext, processInstanceIds);
 
     batch.createSeedJobDefinition();

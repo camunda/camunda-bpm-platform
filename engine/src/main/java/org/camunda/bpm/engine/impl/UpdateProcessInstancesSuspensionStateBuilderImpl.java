@@ -81,13 +81,13 @@ public class UpdateProcessInstancesSuspensionStateBuilderImpl implements UpdateP
   @Override
   public Batch suspendAsync() {
     this.suspend = true;
-    return commandExecutor.execute(new UpdateProcessInstancesSuspendStateBatchCmd(commandExecutor, this, this.suspend));
+    return commandExecutor.execute(new UpdateProcessInstancesSuspendStateBatchCmd(commandExecutor, this, suspend));
   }
 
   @Override
   public Batch activateAsync() {
     this.suspend = false;
-    return commandExecutor.execute(new UpdateProcessInstancesSuspendStateBatchCmd(commandExecutor, this, this.suspend));
+    return commandExecutor.execute(new UpdateProcessInstancesSuspendStateBatchCmd(commandExecutor, this, suspend));
 
   }
 

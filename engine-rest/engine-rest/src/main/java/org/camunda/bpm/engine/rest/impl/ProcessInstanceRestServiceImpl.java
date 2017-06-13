@@ -42,6 +42,7 @@ import org.camunda.bpm.engine.rest.sub.runtime.impl.ProcessInstanceResourceImpl;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.camunda.bpm.engine.runtime.UpdateProcessInstancesSuspensionStateBuilder;
 
 public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAware implements
     ProcessInstanceRestService {
@@ -116,8 +117,6 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
 
   @Override
   public void updateSuspensionState(ProcessInstanceSuspensionStateDto dto) {
-    // need to also check for group of processIds
-    // what are we checking here
     if (dto.getProcessInstanceId() != null) {
       String message = "Either processDefinitionId or processDefinitionKey can be set to update the suspension state.";
       throw new InvalidRequestException(Status.BAD_REQUEST, message);
@@ -127,9 +126,15 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
   }
 
   @Override
-  public void updateSuspensionStateAsync(ProcessInstanceSuspensionStateDto dto){
-    // maybe do some checks here
-    dto.updateSuspensionStateAsync(getProcessEngine());
+  public BatchDto updateSuspensionStateAsync(ProcessInstanceSuspensionStateDto dto){
+    Batch batch = null;
+    try {
+      batch = dto.updateSuspensionStateAsync(getProcessEngine());
+      return BatchDto.fromBatch(batch);
+
+    } catch (BadUserRequestException e) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());
+    }
   }
 
   @Override

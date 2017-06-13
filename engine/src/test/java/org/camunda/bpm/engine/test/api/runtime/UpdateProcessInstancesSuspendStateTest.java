@@ -253,30 +253,23 @@ public class UpdateProcessInstancesSuspendStateTest {
     // given
     // nothing
 
-    // when
-    try {
-      runtimeService.updateProcessInstanceSuspensionState().byProcessInstanceIds().suspend();
-      fail("exception expected");
-    } catch (BadUserRequestException e) {
-      // then
-      Assert.assertThat(e.getMessage(), containsString("No process instance ids given" ));
-    }
+    thrown.expect(BadUserRequestException.class);
+    thrown.expectMessage("No process instance ids given");
 
+    // when
+    runtimeService.updateProcessInstanceSuspensionState().byProcessInstanceIds().suspend();
   }
 
   @Test
-  public void testEmptyProcessInstanceListActivate() {
+  public void testEmptyProcessInstanceListActivateUpdateProcessInstancesSuspendStateAsyncTest() {
     // given
     // nothing
 
-    // when
-    try {
-      runtimeService.updateProcessInstanceSuspensionState().byProcessInstanceIds().activate();
-      fail("exception expected");
-    } catch (BadUserRequestException e) {
-      // then
-      Assert.assertThat(e.getMessage(), containsString("No process instance ids given" ));
-    }
+    thrown.expect(BadUserRequestException.class);
+    thrown.expectMessage("No process instance ids given");
+
+  // when
+    runtimeService.updateProcessInstanceSuspensionState().byProcessInstanceIds().activate();
 
   }
 
@@ -289,14 +282,11 @@ public class UpdateProcessInstancesSuspendStateTest {
     ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
     ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("twoExternalTaskProcess");
 
+    thrown.expect(BadUserRequestException.class);
+    thrown.expectMessage("Cannot be null");
+
     // when
-    try {
-      runtimeService.updateProcessInstanceSuspensionState().byProcessInstanceIds(Arrays.asList(processInstance1.getId(), processInstance2.getId(), null)).activate();
-      fail("exception expected");
-    } catch (BadUserRequestException e) {
-      // then
-      Assert.assertThat(e.getMessage(), containsString("Cannot be null" ));
-    }
+    runtimeService.updateProcessInstanceSuspensionState().byProcessInstanceIds(Arrays.asList(processInstance1.getId(), processInstance2.getId(), null)).activate();
 
   }
 
@@ -308,14 +298,11 @@ public class UpdateProcessInstancesSuspendStateTest {
     ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
     ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("twoExternalTaskProcess");
 
+    thrown.expect(BadUserRequestException.class);
+    thrown.expectMessage("Cannot be null");
+
     // when
-    try {
-      runtimeService.updateProcessInstanceSuspensionState().byProcessInstanceIds(Arrays.asList(processInstance1.getId(), processInstance2.getId(), null)).suspend();
-      fail("exception expected");
-    } catch (BadUserRequestException e) {
-      // then
-      Assert.assertThat(e.getMessage(), containsString("Cannot be null" ));
-    }
+    runtimeService.updateProcessInstanceSuspensionState().byProcessInstanceIds(Arrays.asList(processInstance1.getId(), processInstance2.getId(), null)).suspend();
 
   }
 

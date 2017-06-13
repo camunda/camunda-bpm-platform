@@ -16,8 +16,10 @@ import java.util.List;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.rest.dto.SuspensionStateDto;
+import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.runtime.UpdateProcessInstanceSuspensionStateBuilder;
@@ -35,8 +37,8 @@ public class ProcessInstanceSuspensionStateDto extends SuspensionStateDto {
   private String processDefinitionKey;
 
   private List<String> processInstanceIds;
-  private ProcessInstanceQuery processInstanceQuery;
-  private HistoricProcessInstanceQuery historicProcessInstanceQuery;
+  private ProcessInstanceQueryDto processInstanceQuery;
+  private HistoricProcessInstanceQueryDto historicProcessInstanceQuery;
 
   private String processDefinitionTenantId;
   private boolean processDefinitionWithoutTenantId;
@@ -61,14 +63,21 @@ public class ProcessInstanceSuspensionStateDto extends SuspensionStateDto {
     this.processInstanceIds = processInstanceIds;
   }
 
-  public void setProcessInstanceQuery(ProcessInstanceQuery processInstanceQuery) {
+  public void setProcessInstanceQuery(ProcessInstanceQueryDto processInstanceQuery) {
     this.processInstanceQuery = processInstanceQuery;
   }
 
-  public void setHistoricProcessInstanceQuery(HistoricProcessInstanceQuery historicProcessInstanceQuery) {
+  public ProcessInstanceQueryDto getProcessInstanceQuery(){
+    return processInstanceQuery;
+  }
+
+  public void setHistoricProcessInstanceQuery(HistoricProcessInstanceQueryDto historicProcessInstanceQuery) {
     this.historicProcessInstanceQuery = historicProcessInstanceQuery;
   }
 
+  public HistoricProcessInstanceQueryDto getHistoricProcessInstanceQuery() {
+    return historicProcessInstanceQuery;
+  }
   public void setProcessDefinitionTenantId(String processDefinitionTenantId) {
     this.processDefinitionTenantId = processDefinitionTenantId;
   }
@@ -119,12 +128,25 @@ public class ProcessInstanceSuspensionStateDto extends SuspensionStateDto {
     }
   }
 
-  public void updateSuspensionStateAsync(ProcessEngine engine) {
+  public Batch updateSuspensionStateAsync(ProcessEngine engine) {
+
+    int params = (processInstanceIds != null ? 1 : 0)
+      + (processInstanceQuery != null ? 1 : 0)
+      + (historicProcessInstanceQuery != null ? 1 : 0);
+
+    if (params == 0) {
+       String message = "Either processInstanceIds, processInstanceQuery or historicProcessInstanceQuery should be set to update the suspension state.";
+      throw new InvalidRequestException(Status.BAD_REQUEST, message);
+    } else if (params > 1) {
+      String message = "Only one of processInstanceIds, processInstanceQuery or historicProcessInstanceQuery should be set to update the suspension state.";
+      throw new InvalidRequestException(Status.BAD_REQUEST, message);
+    }
+
     UpdateProcessInstancesSuspensionStateBuilder updateSuspensionStateBuilder = (UpdateProcessInstancesSuspensionStateBuilder) createUpdateSuspensionStateBuilder(engine);
     if (getSuspended()) {
-      updateSuspensionStateBuilder.suspendAsync();
+      return updateSuspensionStateBuilder.suspendAsync();
     } else {
-      updateSuspensionStateBuilder.activateAsync();
+      return updateSuspensionStateBuilder.activateAsync();
     }
   }
 
@@ -151,9 +173,9 @@ public class ProcessInstanceSuspensionStateDto extends SuspensionStateDto {
     } else if (processInstanceIds != null) {
       return selectBuilder.byProcessInstanceIds(processInstanceIds);
     } else if (processInstanceQuery != null) {
-      return selectBuilder.byProcessInstanceQuery(processInstanceQuery);
+      return selectBuilder.byProcessInstanceQuery(processInstanceQuery.toQuery(engine));
     } else {
-      return selectBuilder.byHistoricProcessInstanceQuery(historicProcessInstanceQuery);
+      return selectBuilder.byHistoricProcessInstanceQuery(historicProcessInstanceQuery.toQuery(engine));
     }
   }
 

@@ -34,6 +34,7 @@ import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
 import org.camunda.bpm.engine.impl.batch.BatchEntity;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
+import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceSuspensionStateDto;
@@ -61,6 +62,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstanceModificationInstantiationBu
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.runtime.UpdateProcessInstanceSuspensionStateSelectBuilder;
 import org.camunda.bpm.engine.runtime.UpdateProcessInstanceSuspensionStateTenantBuilder;
+import org.camunda.bpm.engine.runtime.UpdateProcessInstancesSuspensionStateBuilder;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.SerializableValueType;
@@ -102,6 +104,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
   protected static final String EXAMPLE_PROCESS_INSTANCE_ID_WITH_NULL_VALUE_AS_VARIABLE = "aProcessInstanceWithNullValueAsVariable";
   protected static final String SINGLE_PROCESS_INSTANCE_SUSPENDED_URL = SINGLE_PROCESS_INSTANCE_URL + "/suspended";
   protected static final String PROCESS_INSTANCE_SUSPENDED_URL = PROCESS_INSTANCE_URL + "/suspended";
+  protected static final String PROCESS_INSTANCE_SUSPENDED_ASYNC_URL = PROCESS_INSTANCE_URL + "/suspended-async";
   protected static final String PROCESS_INSTANCE_MODIFICATION_URL = SINGLE_PROCESS_INSTANCE_URL + "/modification";
 
   protected static final VariableMap EXAMPLE_OBJECT_VARIABLES = Variables.createVariables();
@@ -122,6 +125,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
   private UpdateProcessInstanceSuspensionStateTenantBuilder mockUpdateSuspensionStateBuilder;
   private UpdateProcessInstanceSuspensionStateSelectBuilder mockUpdateSuspensionStateSelectBuilder;
+  private UpdateProcessInstancesSuspensionStateBuilder mockUpdateProcessInstancesSuspensionStateBuilder;
 
   @Before
   public void setUpRuntimeData() {
@@ -144,6 +148,11 @@ public class ProcessInstanceRestServiceInteractionTest extends
     when(mockUpdateSuspensionStateSelectBuilder.byProcessInstanceId(anyString())).thenReturn(mockUpdateSuspensionStateBuilder);
     when(mockUpdateSuspensionStateSelectBuilder.byProcessDefinitionId(anyString())).thenReturn(mockUpdateSuspensionStateBuilder);
     when(mockUpdateSuspensionStateSelectBuilder.byProcessDefinitionKey(anyString())).thenReturn(mockUpdateSuspensionStateBuilder);
+
+    mockUpdateProcessInstancesSuspensionStateBuilder = mock(UpdateProcessInstancesSuspensionStateBuilder.class);
+    when(mockUpdateSuspensionStateSelectBuilder.byProcessInstanceIds(anyList())).thenReturn(mockUpdateProcessInstancesSuspensionStateBuilder);
+    when(mockUpdateSuspensionStateSelectBuilder.byProcessInstanceQuery(any(ProcessInstanceQuery.class))).thenReturn(mockUpdateProcessInstancesSuspensionStateBuilder);
+    when(mockUpdateSuspensionStateSelectBuilder.byHistoricProcessInstanceQuery(any(HistoricProcessInstanceQuery.class))).thenReturn(mockUpdateProcessInstancesSuspensionStateBuilder);
 
     // runtime service
     when(processEngine.getRuntimeService()).thenReturn(runtimeServiceMock);
@@ -2380,6 +2389,325 @@ public class ProcessInstanceRestServiceInteractionTest extends
         .body("message", is(message))
       .when()
         .put(PROCESS_INSTANCE_SUSPENDED_URL);
+  }
+
+
+  @Test
+  public void testSuspendInstances() {
+    List<String> ids = Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
+    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    messageBodyJson.put("processInstanceIds", ids);
+    messageBodyJson.put("suspended", true);
+    given()
+      .contentType(ContentType.JSON)
+      .body(messageBodyJson)
+    .then()
+      .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+      .when()
+        .put(PROCESS_INSTANCE_SUSPENDED_URL);
+
+    verify(mockUpdateSuspensionStateSelectBuilder).byProcessInstanceIds(ids);
+    verify(mockUpdateProcessInstancesSuspensionStateBuilder).suspend();
+  }
+
+
+  @Test
+  public void testActivateInstances() {
+    List<String> ids = Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
+    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    messageBodyJson.put("processInstanceIds", ids);
+    messageBodyJson.put("suspended", false);
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(messageBodyJson)
+    .then()
+      .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+      .when()
+        .put(PROCESS_INSTANCE_SUSPENDED_URL);
+
+    verify(mockUpdateSuspensionStateSelectBuilder).byProcessInstanceIds(ids);
+    verify(mockUpdateProcessInstancesSuspensionStateBuilder).activate();
+  }
+
+  @Test
+  public void testSuspendInstancesMultipleGroupOperations() {
+    List<String> ids = Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
+    ProcessInstanceQueryDto query = new ProcessInstanceQueryDto();
+    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    messageBodyJson.put("processInstanceIds", ids);
+    messageBodyJson.put("processInstanceQuery", query);
+    messageBodyJson.put("suspended", true);
+
+    String message = "Only one of processInstanceIds, processInstanceQuery or historicProcessInstanceQuery should be set to update the suspension state.";
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(messageBodyJson)
+      .then()
+      .expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", is(InvalidRequestException.class.getSimpleName()))
+      .body("message", is(message))
+      .when()
+      .put(PROCESS_INSTANCE_SUSPENDED_URL);
+
+  }
+
+
+  @Test
+  public void testSuspendProcessInstanceQuery() {
+    ProcessInstanceQueryDto query = new ProcessInstanceQueryDto();
+    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    messageBodyJson.put("processInstanceQuery", query);
+    messageBodyJson.put("suspended", true);
+    given()
+      .contentType(ContentType.JSON)
+      .body(messageBodyJson)
+    .then()
+      .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+      .when()
+        .put(PROCESS_INSTANCE_SUSPENDED_URL);
+
+    verify(mockUpdateSuspensionStateSelectBuilder).byProcessInstanceQuery(query.toQuery(processEngine));
+    verify(mockUpdateProcessInstancesSuspensionStateBuilder).suspend();
+  }
+
+
+  @Test
+  public void testActivateProcessInstanceQuery() {
+    ProcessInstanceQueryDto query = new ProcessInstanceQueryDto();
+    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    messageBodyJson.put("processInstanceQuery", query);
+    messageBodyJson.put("suspended", false);
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(messageBodyJson)
+    .then()
+      .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+      .when()
+        .put(PROCESS_INSTANCE_SUSPENDED_URL);
+
+    verify(mockUpdateSuspensionStateSelectBuilder).byProcessInstanceQuery(query.toQuery(processEngine));
+    verify(mockUpdateProcessInstancesSuspensionStateBuilder).activate();
+  }
+
+
+  @Test
+  public void testSuspendHistoricProcessInstanceQuery() {
+    HistoricProcessInstanceQueryDto query = new HistoricProcessInstanceQueryDto();
+    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    messageBodyJson.put("historicProcessInstanceQuery", query);
+    messageBodyJson.put("suspended", true);
+    given()
+      .contentType(ContentType.JSON)
+      .body(messageBodyJson)
+    .then()
+      .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+      .when()
+        .put(PROCESS_INSTANCE_SUSPENDED_URL);
+
+    verify(mockUpdateSuspensionStateSelectBuilder).byHistoricProcessInstanceQuery(any(HistoricProcessInstanceQuery.class));
+    verify(mockUpdateProcessInstancesSuspensionStateBuilder).suspend();
+  }
+
+
+  @Test
+  public void testActivateHistoricProcessInstanceQuery() {
+    HistoricProcessInstanceDto query = new HistoricProcessInstanceDto();
+    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    messageBodyJson.put("historicProcessInstanceQuery", query);
+    messageBodyJson.put("suspended", false);
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(messageBodyJson)
+    .then()
+      .expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+      .when()
+        .put(PROCESS_INSTANCE_SUSPENDED_URL);
+
+    verify(mockUpdateSuspensionStateSelectBuilder).byHistoricProcessInstanceQuery(any(HistoricProcessInstanceQuery.class));
+    verify(mockUpdateProcessInstancesSuspensionStateBuilder).activate();
+  }
+
+  @Test
+  public void testSuspendAsyncWithProcessInstances() {
+    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    List<String> ids = Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
+    messageBodyJson.put("processInstanceIds", ids);
+    messageBodyJson.put("suspended", true);
+
+    when(mockUpdateProcessInstancesSuspensionStateBuilder.suspendAsync()).thenReturn(new BatchEntity());
+    given()
+      .contentType(ContentType.JSON)
+      .body(messageBodyJson)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .post(PROCESS_INSTANCE_SUSPENDED_ASYNC_URL);
+
+    verify(mockUpdateSuspensionStateSelectBuilder).byProcessInstanceIds(ids);
+    verify(mockUpdateProcessInstancesSuspensionStateBuilder).suspendAsync();
+  }
+
+  @Test
+  public void testActivateAsyncWithProcessInstances() {
+    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    List<String> ids = Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
+    messageBodyJson.put("processInstanceIds", ids);
+    messageBodyJson.put("suspended", false);
+
+    when(mockUpdateProcessInstancesSuspensionStateBuilder.activateAsync()).thenReturn(new BatchEntity());
+    given()
+      .contentType(ContentType.JSON)
+      .body(messageBodyJson)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .post(PROCESS_INSTANCE_SUSPENDED_ASYNC_URL);
+
+    verify(mockUpdateSuspensionStateSelectBuilder).byProcessInstanceIds(ids);
+    verify(mockUpdateProcessInstancesSuspensionStateBuilder).activateAsync();
+  }
+
+  @Test
+  public void testSuspendAsyncWithProcessInstanceQuery() {
+    ProcessInstanceQueryDto query = new ProcessInstanceQueryDto();
+    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    messageBodyJson.put("processInstanceQuery", query);
+    messageBodyJson.put("suspended", true);
+
+
+    when(mockUpdateProcessInstancesSuspensionStateBuilder.suspendAsync()).thenReturn(new BatchEntity());
+    given()
+      .contentType(ContentType.JSON)
+      .body(messageBodyJson)
+      .then()
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+      .when()
+      .post(PROCESS_INSTANCE_SUSPENDED_ASYNC_URL);
+
+    verify(mockUpdateSuspensionStateSelectBuilder).byProcessInstanceQuery(query.toQuery(processEngine));
+    verify(mockUpdateProcessInstancesSuspensionStateBuilder).suspendAsync();
+  }
+
+  @Test
+  public void testActivateAsyncWithProcessInstanceQuery() {
+    ProcessInstanceQueryDto query = new ProcessInstanceQueryDto();
+    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    messageBodyJson.put("processInstanceQuery", query);
+    messageBodyJson.put("suspended", false);
+
+    when(mockUpdateProcessInstancesSuspensionStateBuilder.activateAsync()).thenReturn(new BatchEntity());
+    given()
+      .contentType(ContentType.JSON)
+      .body(messageBodyJson)
+      .then()
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+      .when()
+      .post(PROCESS_INSTANCE_SUSPENDED_ASYNC_URL);
+
+    verify(mockUpdateSuspensionStateSelectBuilder).byProcessInstanceQuery(query.toQuery(processEngine));
+    verify(mockUpdateProcessInstancesSuspensionStateBuilder).activateAsync();
+  }
+
+  @Test
+  public void testSuspendAsyncWithHistoricProcessInstanceQuery() {
+    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    List<String> ids = Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
+    messageBodyJson.put("processInstanceIds", ids);
+    messageBodyJson.put("suspended", true);
+
+    when(mockUpdateProcessInstancesSuspensionStateBuilder.suspendAsync()).thenReturn(new BatchEntity());
+    given()
+      .contentType(ContentType.JSON)
+      .body(messageBodyJson)
+      .then()
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+      .when()
+      .post(PROCESS_INSTANCE_SUSPENDED_ASYNC_URL);
+
+    verify(mockUpdateSuspensionStateSelectBuilder).byProcessInstanceIds(ids);
+    verify(mockUpdateProcessInstancesSuspensionStateBuilder).suspendAsync();
+  }
+
+  @Test
+  public void testActivateAsyncWithHistoricProcessInstanceQuery() {
+    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    List<String> ids = Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
+    messageBodyJson.put("processInstanceIds", ids);
+    messageBodyJson.put("suspended", false);
+
+    when(mockUpdateProcessInstancesSuspensionStateBuilder.activateAsync()).thenReturn(new BatchEntity());
+    given()
+      .contentType(ContentType.JSON)
+      .body(messageBodyJson)
+      .then()
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+      .when()
+      .post(PROCESS_INSTANCE_SUSPENDED_ASYNC_URL);
+
+    verify(mockUpdateSuspensionStateSelectBuilder).byProcessInstanceIds(ids);
+    verify(mockUpdateProcessInstancesSuspensionStateBuilder).activateAsync();
+  }
+
+  @Test
+  public void testSuspendAsyncWithMultipleGroupOperations() {
+    List<String> ids = Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
+    ProcessInstanceQueryDto query = new ProcessInstanceQueryDto();
+    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    messageBodyJson.put("processInstanceIds", ids);
+    messageBodyJson.put("processInstanceQuery", query);
+    messageBodyJson.put("suspended", true);
+
+    String message = "Only one of processInstanceIds, processInstanceQuery or historicProcessInstanceQuery should be set to update the suspension state.";
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(messageBodyJson)
+      .then()
+      .expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", is(InvalidRequestException.class.getSimpleName()))
+      .body("message", is(message))
+      .when()
+      .post(PROCESS_INSTANCE_SUSPENDED_ASYNC_URL);
+
+  }
+
+
+  @Test
+  public void testSuspendAsyncWithNothing() {
+    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    messageBodyJson.put("suspended", true);
+
+    String message = "Either processInstanceIds, processInstanceQuery or historicProcessInstanceQuery should be set to update the suspension state.";
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(messageBodyJson)
+      .then()
+      .expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", is(InvalidRequestException.class.getSimpleName()))
+      .body("message", is(message))
+      .when()
+      .post(PROCESS_INSTANCE_SUSPENDED_ASYNC_URL);
+
   }
 
   @Test

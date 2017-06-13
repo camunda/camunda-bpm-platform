@@ -22,11 +22,9 @@ import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
 public class UpdateProcessInstancesSuspendStateCmd extends AbstractUpdateProcessInstancesSuspendStateCmd<Void> {
 
-  boolean suspendstate;
 
   public UpdateProcessInstancesSuspendStateCmd(CommandExecutor commandExecutor, UpdateProcessInstancesSuspensionStateBuilderImpl builder, boolean suspendstate) {
-    super(commandExecutor, builder);
-    this.suspendstate = suspendstate;
+    super(commandExecutor, builder, suspendstate);
   }
 
 
@@ -39,10 +37,10 @@ public class UpdateProcessInstancesSuspendStateCmd extends AbstractUpdateProcess
     EnsureUtil.ensureNotEmpty(BadUserRequestException.class, "No process instance ids given", "Process Instance ids", processInstanceIds);
     EnsureUtil.ensureNotContainsNull(BadUserRequestException.class, "Cannot be null.", "Process Instance ids", processInstanceIds);
 
-    writeUserOperationLog(commandContext, processInstanceIds.size(), false, suspendstate);
+    writeUserOperationLog(commandContext, processInstanceIds.size(), false);
 
     UpdateProcessInstanceSuspensionStateBuilderImpl suspensionStateBuilder = new UpdateProcessInstanceSuspensionStateBuilderImpl(commandExecutor);
-    if (suspendstate) {
+    if (suspending) {
       // suspending
       for (String processInstanceId : processInstanceIds) {
         suspensionStateBuilder.byProcessInstanceId(processInstanceId).suspend();

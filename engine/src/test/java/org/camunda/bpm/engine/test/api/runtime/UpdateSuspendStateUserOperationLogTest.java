@@ -12,9 +12,9 @@
  */
 package org.camunda.bpm.engine.test.api.runtime;
 
-import java.util.ArrayList;
+import static org.junit.Assert.*;
+
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,10 +29,7 @@ import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
-import org.camunda.bpm.model.bpmn.Bpmn;
-import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -49,24 +46,11 @@ public class UpdateSuspendStateUserOperationLogTest {
 
   protected RuntimeService runtimeService;
   protected HistoryService historyService;
-  protected BpmnModelInstance instance;
 
   @Before
   public void initServices() {
     runtimeService = rule.getRuntimeService();
     historyService = rule.getHistoryService();
-  }
-
-  @Before
-  public void createBpmnModelInstance() {
-    this.instance = Bpmn.createExecutableProcess("process1")
-      .startEvent("start")
-      .userTask("user1")
-      .sequenceFlowId("seq")
-      .userTask("user2")
-      .endEvent("end")
-      .done();
-
   }
 
   @After
@@ -77,7 +61,7 @@ public class UpdateSuspendStateUserOperationLogTest {
   @Test
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
     "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskProcess.bpmn20.xml"})
-  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testLogCreation() {
 
 
@@ -94,37 +78,37 @@ public class UpdateSuspendStateUserOperationLogTest {
 
     // then
     List<UserOperationLogEntry> opLogEntries = rule.getHistoryService().createUserOperationLogQuery().list();
-    Assert.assertEquals(2, opLogEntries.size());
+    assertEquals(2, opLogEntries.size());
 
     Map<String, UserOperationLogEntry> entries = asMap(opLogEntries);
 
 
 
     UserOperationLogEntry asyncEntry = entries.get("async");
-    Assert.assertNotNull(asyncEntry);
-    Assert.assertEquals("ProcessInstance", asyncEntry.getEntityType());
-    Assert.assertEquals("SuspendJob", asyncEntry.getOperationType());
-    Assert.assertNull(asyncEntry.getProcessInstanceId());
-    Assert.assertNull(asyncEntry.getOrgValue());
-    Assert.assertEquals("true", asyncEntry.getNewValue());
+    assertNotNull(asyncEntry);
+    assertEquals("ProcessInstance", asyncEntry.getEntityType());
+    assertEquals("SuspendJob", asyncEntry.getOperationType());
+    assertNull(asyncEntry.getProcessInstanceId());
+    assertNull(asyncEntry.getOrgValue());
+    assertEquals("true", asyncEntry.getNewValue());
 
     UserOperationLogEntry numInstancesEntry = entries.get("nrOfInstances");
-    Assert.assertNotNull(numInstancesEntry);
-    Assert.assertEquals("ProcessInstance", numInstancesEntry.getEntityType());
-    Assert.assertEquals("SuspendJob", numInstancesEntry.getOperationType());
-    Assert.assertNull(numInstancesEntry.getProcessInstanceId());
-    Assert.assertNull(numInstancesEntry.getProcessDefinitionKey());
-    Assert.assertNull(numInstancesEntry.getProcessDefinitionId());
-    Assert.assertNull(numInstancesEntry.getOrgValue());
-    Assert.assertEquals("2", numInstancesEntry.getNewValue());
+    assertNotNull(numInstancesEntry);
+    assertEquals("ProcessInstance", numInstancesEntry.getEntityType());
+    assertEquals("SuspendJob", numInstancesEntry.getOperationType());
+    assertNull(numInstancesEntry.getProcessInstanceId());
+    assertNull(numInstancesEntry.getProcessDefinitionKey());
+    assertNull(numInstancesEntry.getProcessDefinitionId());
+    assertNull(numInstancesEntry.getOrgValue());
+    assertEquals("2", numInstancesEntry.getNewValue());
 
-    Assert.assertEquals(asyncEntry.getOperationId(), numInstancesEntry.getOperationId());
+    assertEquals(asyncEntry.getOperationId(), numInstancesEntry.getOperationId());
   }
 
   @Test
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
     "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskProcess.bpmn20.xml"})
-  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testNoCreationOnSyncBatchJobExecution() {
     // given
     ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
@@ -141,7 +125,7 @@ public class UpdateSuspendStateUserOperationLogTest {
     rule.getIdentityService().clearAuthentication();
 
     // then
-    Assert.assertEquals(0, rule.getHistoryService().createUserOperationLogQuery().count());
+    assertEquals(0, rule.getHistoryService().createUserOperationLogQuery().count());
   }
 
   protected Map<String, UserOperationLogEntry> asMap(List<UserOperationLogEntry> logEntries) {
@@ -151,7 +135,7 @@ public class UpdateSuspendStateUserOperationLogTest {
 
       UserOperationLogEntry previousValue = map.put(entry.getProperty(), entry);
       if (previousValue != null) {
-        Assert.fail("expected only entry for every property");
+        fail("expected only entry for every property");
       }
     }
 
