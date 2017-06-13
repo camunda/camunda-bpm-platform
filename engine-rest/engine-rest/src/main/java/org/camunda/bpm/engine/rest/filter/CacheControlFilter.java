@@ -34,7 +34,7 @@ public class CacheControlFilter implements Filter {
     final HttpServletRequest request = (HttpServletRequest) req;
     final HttpServletResponse response = (HttpServletResponse) resp;
     
-    if("GET".equals(request.getMethod())) {
+    if("GET".equals(request.getMethod()) && !request.getRequestURI().endsWith("xml")) {
       response.setHeader("Cache-Control", "no-cache");
     }
     
