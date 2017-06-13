@@ -32,7 +32,7 @@
     "camunda-bpm-sdk-js": "git://github.com/camunda/camunda-bpm-sdk-js#master",
     "camunda-commons-ui": "git://github.com/camunda/camunda-commons-ui#master",
     "diagram-js": "0.18.2",
-    "dmn-js": "0.8.6",
+    "dmn-js": "0.9.1",
     "events": "1.1.0",
     "jquery": "2.1.1",
     "jquery-ui": "1.10.5",
