@@ -373,4 +373,14 @@ public class DbEntityCache {
     }
   }
 
+  public void undoDelete(DbEntity dbEntity) {
+    CachedDbEntity cachedEntity = getCachedEntity(dbEntity);
+    if (cachedEntity.getEntityState() == DbEntityState.DELETED_TRANSIENT) {
+      cachedEntity.setEntityState(DbEntityState.TRANSIENT);
+    }
+    else {
+      cachedEntity.setEntityState(DbEntityState.MERGED);
+    }
+  }
+
 }

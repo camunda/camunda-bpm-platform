@@ -435,6 +435,10 @@ public class DbEntityManager implements Session, EntityLoadListener {
     dbEntityCache.setDeleted(dbEntity);
   }
 
+  public void undoDelete(DbEntity entity){
+    dbEntityCache.undoDelete(entity);
+  }
+
   public void update(Class<? extends DbEntity> entityType, String statement, Object parameter) {
     performBulkOperation(entityType, statement, parameter, UPDATE_BULK);
   }

@@ -3,5 +3,6 @@
 ALTER TABLE ACT_HI_VARINST
   ADD STATE_ varchar(20);
 
+-- semantic version --
 ALTER TABLE ACT_RE_DECISION_DEF
-  VERSION_TAG_ varchar(64);
+  ADD VERSION_TAG_ varchar(64);
