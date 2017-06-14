@@ -35,8 +35,8 @@ public class CustomJacksonDateFormatTest extends AbstractRestServiceTest {
   protected static final String PROCESS_INSTANCE_VARIABLES_URL = SINGLE_PROCESS_INSTANCE_URL + "/variables";
   protected static final String SINGLE_PROCESS_INSTANCE_VARIABLE_URL = PROCESS_INSTANCE_VARIABLES_URL + "/{varId}";
 
-  protected static final SimpleDateFormat testDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-  protected static final Date testDate = new Date(1450282812345L);
+  protected static final SimpleDateFormat testDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+  protected static final Date testDate = new Date(1450282812000L);
   protected static final String testDateFormatted = testDateFormat.format(testDate);
 
   protected RuntimeServiceImpl runtimeServiceMock;

@@ -29,7 +29,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 @Produces({MediaType.APPLICATION_JSON, Hal.APPLICATION_HAL_JSON})
 public class JacksonConfigurator implements ContextResolver<ObjectMapper> {
 
-  public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
+  public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
   public static String dateFormatString = DEFAULT_DATE_FORMAT;
 
   public static ObjectMapper configureObjectMapper(ObjectMapper mapper) {
