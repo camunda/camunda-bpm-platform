@@ -88,6 +88,11 @@
             <artifactId>camunda-dmn-model</artifactId>
             <version>7.7.0</version>
           </dependency>
+          <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis</artifactId>
+            <version>3.2.8</version>
+          </dependency>
          </dependencies>
       </dependencyManagement>
 
@@ -291,6 +296,7 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
+              <forkCount>0</forkCount>
               <excludes>
                 <exclude>**/*TestCase.java</exclude>
 
