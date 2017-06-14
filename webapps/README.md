@@ -145,7 +145,7 @@ In place of a guide, just follow the formatting of existing code (and / or use t
 
 * [Documentation](http://docs.camunda.org/latest/)
 * [Forum](https://forum.camunda.org)
-* [Stackoverflow](stackoverflow.com/questions/tagged/camunda)
+* [Stackoverflow](https://stackoverflow.com/questions/tagged/camunda)
 
 ## License
 
