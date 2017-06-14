@@ -403,10 +403,10 @@
                     <datasource>java:jboss/datasources/ProcessEngine</datasource>
                     <history-level>full</history-level>
                     <properties>
-                        <property name="jobExecutorAcquisitionName">default</property>
-                        <property name="isAutoSchemaUpdate">true</property>
-                        <property name="authorizationEnabled">true</property>
-                        <property name="jobExecutorDeploymentAware">true</property>
+                        <property name="jobExecutorAcquisitionName" value="default"/>
+                        <property name="isAutoSchemaUpdate" value="true"/>
+                        <property name="authorizationEnabled" value="true"/>
+                        <property name="jobExecutorDeploymentAware" value="true"/>
                     </properties>
                     <plugins>
 
@@ -433,29 +433,29 @@
                                 <class>org.camunda.bpm.identity.impl.ldap.plugin.LdapIdentityProviderPlugin</class>
 
                                 <properties>
-                                    <property name="serverUrl">ldaps://localhost:4334/</property>
-                                    <property name="acceptUntrustedCertificates">false</property>
-                                    <property name="managerDn">uid=jonny,ou=office-berlin,o=camunda,c=org</property>
-                                    <property name="managerPassword">s3cr3t</property>
+                                    <property name="serverUrl" value="ldaps://localhost:4334/"/>
+                                    <property name="acceptUntrustedCertificates" value="false"/>
+                                    <property name="managerDn" value="uid=jonny,ou=office-berlin,o=camunda,c=org"/>
+                                    <property name="managerPassword" value="s3cr3t"/>
 
-                                    <property name="baseDn">o=camunda,c=org</property>
+                                    <property name="baseDn" value="o=camunda,c=org"/>
 
-                                    <property name="userSearchBase">ou=employees</property>
-                                    <property name="userSearchFilter">(objectclass=person)</property>
+                                    <property name="userSearchBase" value="ou=employees"/>
+                                    <property name="userSearchFilter" vlaue="(objectclass=person)"/>
 
-                                    <property name="userIdAttribute">uid</property>
-                                    <property name="userFirstnameAttribute">cn</property>
-                                    <property name="userLastnameAttribute">sn</property>
-                                    <property name="userEmailAttribute">mail</property>
-                                    <property name="userPasswordAttribute">userpassword</property>
+                                    <property name="userIdAttribute" value="uid"/>
+                                    <property name="userFirstnameAttribute" value="cn"/>
+                                    <property name="userLastnameAttribute" value="sn"/>
+                                    <property name="userEmailAttribute" value="mail"/>
+                                    <property name="userPasswordAttribute" value="userpassword"/>
 
-                                    <property name="groupSearchBase">ou=roles</property>
-                                    <property name="groupSearchFilter">(objectclass=groupOfNames)</property>
-                                    <property name="groupIdAttribute">cn</property>
-                                    <property name="groupNameAttribute">cn</property>
+                                    <property name="groupSearchBase" value="ou=roles"/>
+                                    <property name="groupSearchFilter" value="(objectclass=groupOfNames)"/>
+                                    <property name="groupIdAttribute" value="cn"/>
+                                    <property name="groupNameAttribute" value="cn"/>
 
-                                    <property name="groupMemberAttribute">member</property>
-                                    <property name="sortControlSupported">false</property>
+                                    <property name="groupMemberAttribute" value="member"/>
+                                    <property name="sortControlSupported" value="false"/>
                                 </properties>
                             </plugin>
                         -->
@@ -466,7 +466,7 @@
                             <plugin>
                                 <class>org.camunda.bpm.engine.impl.plugin.AdministratorAuthorizationPlugin</class>
                                 <properties>
-                                    <property name="administratorUserName">admin</property>
+                                    <property name="administratorUserName" value="admin"/>
                                 </properties>
                              </plugin>
                          -->
@@ -480,9 +480,9 @@
                 <job-acquisitions>
                     <job-acquisition name="default">
                         <properties>
-                            <property name="lockTimeInMillis">300000</property>
-                            <property name="waitTimeInMillis">5000</property>
-                            <property name="maxJobsPerAcquisition">3</property>
+                            <property name="lockTimeInMillis" value="300000"/>
+                            <property name="waitTimeInMillis" value="5000"/>
+                            <property name="maxJobsPerAcquisition" value="3"/>
                         </properties>
                     </job-acquisition>
                 </job-acquisitions>

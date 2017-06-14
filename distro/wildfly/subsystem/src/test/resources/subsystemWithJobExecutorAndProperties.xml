@@ -8,14 +8,14 @@
       </job-acquisition>
       <job-acquisition name="anders">
         <properties>
-          <property name="lockTimeInMillis">600000</property>
-          <property name="waitTimeInMillis">10000</property>
-          <property name="maxJobsPerAcquisition">5</property>
+          <property name="lockTimeInMillis" value="600000"/>
+          <property name="waitTimeInMillis" value="10000"/>
+          <property name="maxJobsPerAcquisition" value="5"/>
         </properties>
       </job-acquisition>
       <job-acquisition name="mixed">
         <properties>
-          <property name="lockTimeInMillis">500000</property>
+          <property name="lockTimeInMillis" value="500000"/>
         </properties>
       </job-acquisition>
     </job-acquisitions>

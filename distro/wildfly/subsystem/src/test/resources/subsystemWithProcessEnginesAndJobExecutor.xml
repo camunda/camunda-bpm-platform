@@ -5,9 +5,9 @@
 			<history-level>audit</history-level>
 			<configuration>org.camunda.bpm.container.impl.jboss.config.ManagedJtaProcessEngineConfiguration</configuration>
 			<properties>
-				<property name="job-acquisition-name">default</property>
-				<property name="job-acquisition">default</property>
-				<property name="job-name">default</property>
+				<property name="job-acquisition-name" value="default"/>
+				<property name="job-acquisition" value="default"/>
+				<property name="job-name" value="default"/>
 			</properties>
 		</process-engine>
 		<process-engine name="__test" default="false">
@@ -15,7 +15,7 @@
 			<history-level>full</history-level>
 			<configuration>org.camunda.bpm.container.impl.jboss.config.ManagedJtaProcessEngineConfiguration</configuration>
 			<properties>
-				<property name="job-acquisition-name">default</property>
+				<property name="job-acquisition-name" value="default"/>
 			</properties>
 		</process-engine>
 	</process-engines>
@@ -28,9 +28,9 @@
 			<job-acquisition name="default">
 				<acquisition-strategy>SEQUENTIAL</acquisition-strategy>
 				<properties>
-					<property name="lockTimeInMillis">300000</property>
-					<property name="waitTimeInMillis">5000</property>
-					<property name="maxJobsPerAcquisition">3</property>
+					<property name="lockTimeInMillis" value="300000"/>
+					<property name="waitTimeInMillis" value="5000"/>
+					<property name="maxJobsPerAcquisition" value="3"/>
 				</properties>
 			</job-acquisition>
 			<job-acquisition name="anders">
