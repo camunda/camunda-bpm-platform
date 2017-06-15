@@ -37,7 +37,6 @@ import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_USERS_API;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_USERS_LIST_API;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TRANSACTION_ID;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN20_NS;
-import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -2839,30 +2838,26 @@ public class ProcessBuilderTest {
     modelInstance = process
       .startEvent()
       .subProcess("mysubprocess")
-      .embeddedSubProcess()
-      .startEvent()
-      .userTask()
-      .endEvent()
-      .subProcessDone()
+        .embeddedSubProcess()
+        .startEvent()
+        .userTask()
+        .endEvent()
+        .subProcessDone()
       .userTask()
       .endEvent()
       .done();
 
-    SubProcess embeddedSubProcess = modelInstance.getModelElementById("mysubprocess");
-    embeddedSubProcess
+    SubProcess subprocess = modelInstance.getModelElementById("mysubprocess");
+    subprocess
       .builder()
       .embeddedSubProcess()
-      .eventSubProcess("myeventsubprocess");
+        .eventSubProcess("myeventsubprocess")
+        .startEvent()
+        .userTask()
+        .endEvent()
+        .subProcessDone();
 
     SubProcess eventSubProcess = modelInstance.getModelElementById("myeventsubprocess");
-    eventSubProcess
-      .builder()
-      .embeddedSubProcess()
-      .startEvent()
-      .userTask()
-      .endEvent()
-      .subProcessDone();
-
 
     // no input or output from the sub process
     assertThat(eventSubProcess.getIncoming().isEmpty());
@@ -2876,9 +2871,6 @@ public class ProcessBuilderTest {
     assertThat(eventSubProcess.getChildElementsByType(UserTask.class)).isNotNull();
     assertThat(eventSubProcess.getChildElementsByType(EndEvent.class)).isNotNull();
   }
-
-
-
 
   @Test
   public void testCreateEventSubProcessError() {
@@ -2895,9 +2887,6 @@ public class ProcessBuilderTest {
       .userTask()
       .endEvent();
 
-
-
-    System.out.println(Bpmn.convertToString(modelInstance));
     try {
       eventSubProcess.subProcessDone();
       fail("eventSubProcess has returned a builder after completion");
@@ -2905,7 +2894,6 @@ public class ProcessBuilderTest {
       assertThat(e).hasMessageContaining("Unable to find a parent subProcess.");
 
     }
-
-
   }
+
 }
