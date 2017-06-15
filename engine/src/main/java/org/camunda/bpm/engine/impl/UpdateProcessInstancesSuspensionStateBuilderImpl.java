@@ -30,12 +30,10 @@ public class UpdateProcessInstancesSuspensionStateBuilderImpl implements UpdateP
   protected HistoricProcessInstanceQuery historicProcessInstanceQuery;
   protected CommandExecutor commandExecutor;
   protected String processDefinitionId;
-  protected boolean suspend;
 
-  public UpdateProcessInstancesSuspensionStateBuilderImpl(CommandExecutor commandExecutor, boolean suspend) {
+  public UpdateProcessInstancesSuspensionStateBuilderImpl(CommandExecutor commandExecutor) {
     this.processInstanceIds = new ArrayList<String>();
     this.commandExecutor = commandExecutor;
-    this.suspend = suspend;
   }
 
   @Override
@@ -68,26 +66,22 @@ public class UpdateProcessInstancesSuspensionStateBuilderImpl implements UpdateP
 
   @Override
   public void suspend() {
-    this.suspend = true;
-    commandExecutor.execute(new UpdateProcessInstancesSuspendStateCmd(commandExecutor, this, suspend));
+    commandExecutor.execute(new UpdateProcessInstancesSuspendStateCmd(commandExecutor, this, true));
   }
 
   @Override
   public void activate() {
-    this.suspend = false;
-    commandExecutor.execute(new UpdateProcessInstancesSuspendStateCmd(commandExecutor, this, suspend));
+    commandExecutor.execute(new UpdateProcessInstancesSuspendStateCmd(commandExecutor, this, false));
   }
 
   @Override
   public Batch suspendAsync() {
-    this.suspend = true;
-    return commandExecutor.execute(new UpdateProcessInstancesSuspendStateBatchCmd(commandExecutor, this, suspend));
+    return commandExecutor.execute(new UpdateProcessInstancesSuspendStateBatchCmd(commandExecutor, this, true));
   }
 
   @Override
   public Batch activateAsync() {
-    this.suspend = false;
-    return commandExecutor.execute(new UpdateProcessInstancesSuspendStateBatchCmd(commandExecutor, this, suspend));
+    return commandExecutor.execute(new UpdateProcessInstancesSuspendStateBatchCmd(commandExecutor, this, false));
 
   }
 

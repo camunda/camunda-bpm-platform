@@ -64,28 +64,28 @@ public class UpdateProcessInstanceSuspensionStateBuilderImpl implements UpdatePr
 
   @Override
   public UpdateProcessInstancesSuspensionStateBuilder byProcessInstanceIds(List<String> processInstanceIds){
-    UpdateProcessInstancesSuspensionStateBuilder builder = new UpdateProcessInstancesSuspensionStateBuilderImpl(commandExecutor, true)
+    UpdateProcessInstancesSuspensionStateBuilder builder = new UpdateProcessInstancesSuspensionStateBuilderImpl(commandExecutor)
       .byProcessInstanceIds(processInstanceIds);
     return builder;
   }
 
   @Override
   public UpdateProcessInstancesSuspensionStateBuilder byProcessInstanceIds(String... processInstanceIds) {
-    UpdateProcessInstancesSuspensionStateBuilder builder = new UpdateProcessInstancesSuspensionStateBuilderImpl(commandExecutor, true)
+    UpdateProcessInstancesSuspensionStateBuilder builder = new UpdateProcessInstancesSuspensionStateBuilderImpl(commandExecutor)
       .byProcessInstanceIds(processInstanceIds);
     return builder;
   }
 
   @Override
   public UpdateProcessInstancesSuspensionStateBuilder byProcessInstanceQuery(ProcessInstanceQuery processInstanceQuery) {
-    UpdateProcessInstancesSuspensionStateBuilder builder = new UpdateProcessInstancesSuspensionStateBuilderImpl(commandExecutor, true)
+    UpdateProcessInstancesSuspensionStateBuilder builder = new UpdateProcessInstancesSuspensionStateBuilderImpl(commandExecutor)
       .byProcessInstanceQuery(processInstanceQuery);
     return builder;
   }
 
   @Override
   public UpdateProcessInstancesSuspensionStateBuilder byHistoricProcessInstanceQuery(HistoricProcessInstanceQuery historicProcessInstanceQuery) {
-    UpdateProcessInstancesSuspensionStateBuilder builder = new UpdateProcessInstancesSuspensionStateBuilderImpl(commandExecutor, true)
+    UpdateProcessInstancesSuspensionStateBuilder builder = new UpdateProcessInstancesSuspensionStateBuilderImpl(commandExecutor)
       .byHistoricProcessInstanceQuery(historicProcessInstanceQuery);
     return builder;
   }
