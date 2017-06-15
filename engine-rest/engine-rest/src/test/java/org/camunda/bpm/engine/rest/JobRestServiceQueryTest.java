@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.rest;
 import static com.jayway.restassured.RestAssured.expect;
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.path.json.JsonPath.from;
+import static org.camunda.bpm.engine.rest.util.DateTimeUtils.withTimezone;
 import static org.fest.assertions.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.inOrder;
@@ -172,7 +173,7 @@ public class JobRestServiceQueryTest extends AbstractRestServiceTest {
   @Test
   public void testInvalidDueDateComparator() {
 
-    String variableValue = "2013-05-05T00:00:00";
+    String variableValue = withTimezone("2013-05-05T00:00:00");
     String invalidComparator = "bt";
 
     String queryValue = invalidComparator + "_" + variableValue;
@@ -192,7 +193,7 @@ public class JobRestServiceQueryTest extends AbstractRestServiceTest {
 
     Map<String, Object> conditionJson = new HashMap<String, Object>();
     conditionJson.put("operator", invalidComparator);
-    conditionJson.put("value", "2013-05-05T00:00:00");
+    conditionJson.put("value", withTimezone("2013-05-05T00:00:00"));
 
     List<Map<String, Object>> conditions = new ArrayList<Map<String, Object>>();
     conditions.add(conditionJson);
@@ -367,7 +368,7 @@ public class JobRestServiceQueryTest extends AbstractRestServiceTest {
 
   @Test
   public void testDueDateParameters() {
-    String variableValue = "2013-05-05T00:00:00";
+    String variableValue = withTimezone("2013-05-05T00:00:00");
     Date date = DateTimeUtil.parseDate(variableValue);
 
     String queryValue = "lt_" + variableValue;
@@ -391,8 +392,8 @@ public class JobRestServiceQueryTest extends AbstractRestServiceTest {
 
   @Test
   public void testDueDateParametersAsPost() {
-    String value = "2013-05-18T00:00:00";
-    String anotherValue = "2013-05-05T00:00:00";
+    String value = withTimezone("2013-05-18T00:00:00");
+    String anotherValue = withTimezone("2013-05-05T00:00:00");
 
     Date date = DateTimeUtil.parseDate(value);
     Date anotherDate = DateTimeUtil.parseDate(anotherValue);
@@ -422,10 +423,10 @@ public class JobRestServiceQueryTest extends AbstractRestServiceTest {
 
   @Test
   public void testMultipleDueDateParameters() {
-    String variableValue1 =  "2012-05-05T00:00:00";
+    String variableValue1 =  withTimezone("2012-05-05T00:00:00");
     String variableParameter1 = "gt_" + variableValue1;
 
-    String variableValue2 = "2013-02-02T00:00:00";
+    String variableValue2 = withTimezone("2013-02-02T00:00:00");
     String variableParameter2 = "lt_" + variableValue2;
 
     Date date = DateTimeUtil.parseDate(variableValue1);

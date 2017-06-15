@@ -2,6 +2,7 @@ package org.camunda.bpm.engine.rest;
 
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.path.json.JsonPath.from;
+import static org.camunda.bpm.engine.rest.util.DateTimeUtils.withTimezone;
 import static org.camunda.bpm.engine.rest.util.QueryParamUtils.arrayAsCommaSeperatedList;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Matchers.any;
@@ -587,9 +588,9 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
   @Test
   public void testDeprecatedDateParameters() {
     Map<String, String> queryParameters = new HashMap<String, String>();
-    queryParameters.put("due", "2013-01-23T14:42:44");
-    queryParameters.put("created", "2013-01-23T14:42:47");
-    queryParameters.put("followUp", "2013-01-23T14:42:50");
+    queryParameters.put("due", withTimezone("2013-01-23T14:42:44"));
+    queryParameters.put("created", withTimezone("2013-01-23T14:42:47"));
+    queryParameters.put("followUp", withTimezone("2013-01-23T14:42:50"));
 
     given()
       .queryParams(queryParameters)
@@ -606,16 +607,16 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
 
   private Map<String, String> getDateParameters() {
     Map<String, String> parameters = new HashMap<String, String>();
-    parameters.put("dueAfter", "2013-01-23T14:42:42");
-    parameters.put("dueBefore", "2013-01-23T14:42:43");
-    parameters.put("dueDate", "2013-01-23T14:42:44");
-    parameters.put("createdAfter", "2013-01-23T14:42:45");
-    parameters.put("createdBefore", "2013-01-23T14:42:46");
-    parameters.put("createdOn", "2013-01-23T14:42:47");
-    parameters.put("followUpAfter", "2013-01-23T14:42:48");
-    parameters.put("followUpBefore", "2013-01-23T14:42:49");
-    parameters.put("followUpBeforeOrNotExistent", "2013-01-23T14:42:49");
-    parameters.put("followUpDate", "2013-01-23T14:42:50");
+    parameters.put("dueAfter", withTimezone("2013-01-23T14:42:42"));
+    parameters.put("dueBefore", withTimezone("2013-01-23T14:42:43"));
+    parameters.put("dueDate", withTimezone("2013-01-23T14:42:44"));
+    parameters.put("createdAfter", withTimezone("2013-01-23T14:42:45"));
+    parameters.put("createdBefore", withTimezone("2013-01-23T14:42:46"));
+    parameters.put("createdOn", withTimezone("2013-01-23T14:42:47"));
+    parameters.put("followUpAfter", withTimezone("2013-01-23T14:42:48"));
+    parameters.put("followUpBefore", withTimezone("2013-01-23T14:42:49"));
+    parameters.put("followUpBeforeOrNotExistent", withTimezone("2013-01-23T14:42:49"));
+    parameters.put("followUpDate", withTimezone("2013-01-23T14:42:50"));
     return parameters;
   }
 

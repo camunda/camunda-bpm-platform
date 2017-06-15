@@ -2,6 +2,7 @@ package org.camunda.bpm.engine.rest;
 
 import static com.jayway.restassured.RestAssured.given;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_ID;
+import static org.camunda.bpm.engine.rest.util.DateTimeUtils.DATE_FORMAT_WITH_TIMEZONE;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.containsString;
@@ -19,7 +20,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -940,13 +940,12 @@ public class ExecutionRestServiceInteractionTest extends AbstractRestServiceTest
   @Test
   public void testPutSingleVariableWithTypeDate() throws Exception {
     Date now = new Date();
-    SimpleDateFormat pattern = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
     String variableKey = "aVariableKey";
-    String variableValue = pattern.format(now);
+    String variableValue = DATE_FORMAT_WITH_TIMEZONE.format(now);
     String type = "Date";
 
-    Date expectedValue = pattern.parse(variableValue);
+    Date expectedValue = DATE_FORMAT_WITH_TIMEZONE.parse(variableValue);
 
     Map<String, Object> variableJson = VariablesBuilder.getVariableValueMap(variableValue, type);
 

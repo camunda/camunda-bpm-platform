@@ -29,7 +29,6 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.persistence.entity.ActivityInstanceImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.TransitionInstanceImpl;
 import org.camunda.bpm.engine.rest.hal.Hal;
-import org.camunda.bpm.engine.rest.mapper.JacksonConfigurator;
 import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
 import org.camunda.bpm.engine.rest.spi.impl.MockedProcessEngineProvider;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
@@ -140,7 +139,6 @@ public abstract class AbstractRestServiceTest {
 
   @BeforeClass
   public static void setUp() throws IOException {
-    JacksonConfigurator.setDateFormatString("yyyy-MM-dd'T'HH:mm:ss");
     setupTestScenario();
   }
 

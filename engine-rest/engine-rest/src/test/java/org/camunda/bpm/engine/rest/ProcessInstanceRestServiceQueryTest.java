@@ -3,6 +3,7 @@ package org.camunda.bpm.engine.rest;
 import static com.jayway.restassured.RestAssured.expect;
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.path.json.JsonPath.from;
+import static org.camunda.bpm.engine.rest.util.DateTimeUtils.withTimezone;
 import static org.fest.assertions.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
@@ -348,7 +349,7 @@ public class ProcessInstanceRestServiceQueryTest extends
   @Test
   public void testDateVariableParameter() {
     String variableName = "varName";
-    String variableValue = "2014-06-16T10:00:00";
+    String variableValue = withTimezone("2014-06-16T10:00:00");
     String queryValue = variableName + "_eq_" + variableValue;
 
     given()
@@ -367,7 +368,7 @@ public class ProcessInstanceRestServiceQueryTest extends
   @Test
   public void testDateVariableParameterAsPost() {
     String variableName = "varName";
-    String variableValue = "2014-06-16T10:00:00";
+    String variableValue = withTimezone("2014-06-16T10:00:00");
 
     Map<String, Object> variableJson = new HashMap<String, Object>();
     variableJson.put("name", variableName);

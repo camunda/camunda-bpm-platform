@@ -23,6 +23,7 @@ import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_PAREN
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_USER_ID;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.NON_EXISTING_ID;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.createMockHistoricTaskInstance;
+import static org.camunda.bpm.engine.rest.util.DateTimeUtils.withTimezone;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.containsString;
@@ -2672,8 +2673,8 @@ public class TaskRestServiceInteractionTest extends
     json.put("assignee", "demo");
     json.put("owner", "mary");
     json.put("delegationState", "PENDING");
-    json.put("due", "2014-01-01T00:00:00");
-    json.put("followUp", "2014-01-01T00:00:00");
+    json.put("due", withTimezone("2014-01-01T00:00:00"));
+    json.put("followUp", withTimezone("2014-01-01T00:00:00"));
     json.put("parentTaskId", "aParentTaskId");
     json.put("caseInstanceId", "aCaseInstanceId");
     json.put("tenantId", MockProvider.EXAMPLE_TENANT_ID);
@@ -2713,7 +2714,7 @@ public class TaskRestServiceInteractionTest extends
     json.put("description", "Some description");
     json.put("assignee", "demo");
     json.put("owner", "mary");
-    json.put("due", "2014-01-01T00:00:00");
+    json.put("due", withTimezone("2014-01-01T00:00:00"));
     json.put("parentTaskId", "aParentTaskId");
 
     Task newTask = mock(Task.class);
@@ -2911,8 +2912,8 @@ public class TaskRestServiceInteractionTest extends
     json.put("assignee", "demo");
     json.put("owner", "mary");
     json.put("delegationState", "PENDING");
-    json.put("due", "2014-01-01T00:00:00");
-    json.put("followUp", "2014-01-01T00:00:00");
+    json.put("due", withTimezone("2014-01-01T00:00:00"));
+    json.put("followUp", withTimezone("2014-01-01T00:00:00"));
     json.put("parentTaskId", "aParentTaskId");
     json.put("caseInstanceId", "aCaseInstanceId");
     json.put("tenantId", MockProvider.EXAMPLE_TENANT_ID);
@@ -2949,7 +2950,7 @@ public class TaskRestServiceInteractionTest extends
     json.put("description", "Some description");
     json.put("assignee", "demo");
     json.put("owner", "mary");
-    json.put("due", "2014-01-01T00:00:00");
+    json.put("due", withTimezone("2014-01-01T00:00:00"));
     json.put("parentTaskId", "aParentTaskId");
 
     given()

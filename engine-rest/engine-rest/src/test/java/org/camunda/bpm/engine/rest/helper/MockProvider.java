@@ -81,7 +81,6 @@ import org.camunda.bpm.engine.management.ProcessDefinitionStatistics;
 import org.camunda.bpm.engine.query.PeriodUnit;
 import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.repository.*;
-import org.camunda.bpm.engine.rest.dto.repository.DecisionDefinitionDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskQueryDto;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
@@ -108,6 +107,7 @@ import org.camunda.bpm.engine.variable.value.BytesValue;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.bpm.engine.variable.value.StringValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
+import static org.camunda.bpm.engine.rest.util.DateTimeUtils.withTimezone;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doThrow;
@@ -154,9 +154,9 @@ public abstract class MockProvider {
   public static final String EXAMPLE_TASK_ID = "anId";
   public static final String EXAMPLE_TASK_NAME = "aName";
   public static final String EXAMPLE_TASK_ASSIGNEE_NAME = "anAssignee";
-  public static final String EXAMPLE_TASK_CREATE_TIME = "2013-01-23T13:42:42";
-  public static final String EXAMPLE_TASK_DUE_DATE = "2013-01-23T13:42:43";
-  public static final String EXAMPLE_FOLLOW_UP_DATE = "2013-01-23T13:42:44";
+  public static final String EXAMPLE_TASK_CREATE_TIME = withTimezone("2013-01-23T13:42:42");
+  public static final String EXAMPLE_TASK_DUE_DATE = withTimezone("2013-01-23T13:42:43");
+  public static final String EXAMPLE_FOLLOW_UP_DATE = withTimezone("2013-01-23T13:42:44");
   public static final DelegationState EXAMPLE_TASK_DELEGATION_STATE = DelegationState.RESOLVED;
   public static final String EXAMPLE_TASK_DESCRIPTION = "aDescription";
   public static final String EXAMPLE_TASK_EXECUTION_ID = "anExecution";
@@ -169,7 +169,7 @@ public abstract class MockProvider {
   // task comment
   public static final String EXAMPLE_TASK_COMMENT_ID = "aTaskCommentId";
   public static final String EXAMPLE_TASK_COMMENT_FULL_MESSAGE = "aTaskCommentFullMessage";
-  public static final String EXAMPLE_TASK_COMMENT_TIME = "2014-04-24T14:10:44";
+  public static final String EXAMPLE_TASK_COMMENT_TIME = withTimezone("2014-04-24T14:10:44");
 
   // task attachment
   public static final String EXAMPLE_TASK_ATTACHMENT_ID = "aTaskAttachmentId";
@@ -246,7 +246,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_EVENT_SUBSCRIPTION_ID = "anEventSubscriptionId";
   public static final String EXAMPLE_EVENT_SUBSCRIPTION_TYPE = "message";
   public static final String EXAMPLE_EVENT_SUBSCRIPTION_NAME = "anEvent";
-  public static final String EXAMPLE_EVENT_SUBSCRIPTION_CREATION_DATE = "2013-01-23T13:59:43";
+  public static final String EXAMPLE_EVENT_SUBSCRIPTION_CREATION_DATE = withTimezone("2013-01-23T13:59:43");
 
   // process definition
   public static final String EXAMPLE_PROCESS_DEFINITION_ID = "aProcDefId";
@@ -272,17 +272,17 @@ public abstract class MockProvider {
   public static final String EXAMPLE_ACTIVITY_INSTANCE_ID = "anActivityInstanceId";
   public static final String EXAMPLE_ACTIVITY_NAME = "anActivityName";
   public static final String EXAMPLE_ACTIVITY_TYPE = "anActivityType";
-  public static final String EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION = "2013-04-23T13:42:43";
+  public static final String EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION = withTimezone("2013-04-23T13:42:43");
 
   // deployment
   public static final String NON_EXISTING_DEPLOYMENT_ID = "aNonExistingDeploymentId";
   public static final String EXAMPLE_DEPLOYMENT_NAME = "aName";
   public static final String EXAMPLE_DEPLOYMENT_NAME_LIKE = "aNameLike";
   public static final String EXAMPLE_DEPLOYMENT_SOURCE = "aDeploymentSource";
-  public static final String EXAMPLE_DEPLOYMENT_TIME = "2013-01-23T13:59:43";
-  public static final String EXAMPLE_DEPLOYMENT_TIME_BEFORE = "2013-01-03T13:59:43";
-  public static final String EXAMPLE_DEPLOYMENT_TIME_AFTER = "2013-03-23T13:59:43";
-  public static final String NON_EXISTING_DEPLOYMENT_TIME = "2013-04-23T13:42:43";
+  public static final String EXAMPLE_DEPLOYMENT_TIME = withTimezone("2013-01-23T13:59:43");
+  public static final String EXAMPLE_DEPLOYMENT_TIME_BEFORE = withTimezone("2013-01-03T13:59:43");
+  public static final String EXAMPLE_DEPLOYMENT_TIME_AFTER = withTimezone("2013-03-23T13:59:43");
+  public static final String NON_EXISTING_DEPLOYMENT_TIME = withTimezone("2013-04-23T13:42:43");
 
   // deployment resources
   public static final String EXAMPLE_DEPLOYMENT_RESOURCE_ID = "aDeploymentResourceId";
@@ -424,7 +424,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_JOB_TYPE = "aJobType";
   public static final String EXAMPLE_JOB_CONFIG = "aJobConfig";
   public static final boolean EXAMPLE_JOB_DEFINITION_IS_SUSPENDED = true;
-  public static final String EXAMPLE_JOB_DEFINITION_DELAYED_EXECUTION = "2013-04-23T13:42:43";
+  public static final String EXAMPLE_JOB_DEFINITION_DELAYED_EXECUTION = withTimezone("2013-04-23T13:42:43");
   public static final long EXAMPLE_JOB_DEFINITION_PRIORITY = Integer.MAX_VALUE + 52l;
 
   // Jobs
@@ -436,7 +436,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_JOB_NO_EXCEPTION_MESSAGE = "";
   public static final String EXAMPLE_EXCEPTION_MESSAGE = "aExceptionMessage";
   public static final String EXAMPLE_EMPTY_JOB_ID = "";
-  public static final String EXAMPLE_DUE_DATE =  "2013-04-23T13:42:43";
+  public static final String EXAMPLE_DUE_DATE =  withTimezone("2013-04-23T13:42:43");
   public static final Boolean EXAMPLE_WITH_RETRIES_LEFT = true;
   public static final Boolean EXAMPLE_EXECUTABLE = true;
   public static final Boolean EXAMPLE_TIMERS = true;
@@ -466,8 +466,8 @@ public abstract class MockProvider {
   // Historic Process Instance
   public static final String EXAMPLE_HISTORIC_PROCESS_INSTANCE_DELETE_REASON = "aDeleteReason";
   public static final long EXAMPLE_HISTORIC_PROCESS_INSTANCE_DURATION_MILLIS = 2000l;
-  public static final String EXAMPLE_HISTORIC_PROCESS_INSTANCE_START_TIME = "2013-04-23T13:42:43";
-  public static final String EXAMPLE_HISTORIC_PROCESS_INSTANCE_END_TIME = "2013-04-23T13:42:43";
+  public static final String EXAMPLE_HISTORIC_PROCESS_INSTANCE_START_TIME = withTimezone("2013-04-23T13:42:43");
+  public static final String EXAMPLE_HISTORIC_PROCESS_INSTANCE_END_TIME = withTimezone("2013-04-23T13:42:43");
   public static final String EXAMPLE_HISTORIC_PROCESS_INSTANCE_START_USER_ID = "aStartUserId";
   public static final String EXAMPLE_HISTORIC_PROCESS_INSTANCE_START_ACTIVITY_ID = "aStartActivityId";
   public static final String EXAMPLE_HISTORIC_PROCESS_INSTANCE_SUPER_PROCESS_INSTANCE_ID = "aSuperProcessInstanceId";
@@ -477,10 +477,10 @@ public abstract class MockProvider {
   public static final String EXAMPLE_HISTORIC_PROCESS_INSTANCE_SUB_CASE_INSTANCE_ID = "aSubCaseInstanceId";
   public static final String EXAMPLE_HISTORIC_PROCESS_INSTANCE_STATE = "aState";
 
-  public static final String EXAMPLE_HISTORIC_PROCESS_INSTANCE_STARTED_AFTER = "2013-04-23T13:42:43";
-  public static final String EXAMPLE_HISTORIC_PROCESS_INSTANCE_STARTED_BEFORE = "2013-01-23T13:42:43";
-  public static final String EXAMPLE_HISTORIC_PROCESS_INSTANCE_FINISHED_AFTER = "2013-01-23T13:42:43";
-  public static final String EXAMPLE_HISTORIC_PROCESS_INSTANCE_FINISHED_BEFORE = "2013-04-23T13:42:43";
+  public static final String EXAMPLE_HISTORIC_PROCESS_INSTANCE_STARTED_AFTER = withTimezone("2013-04-23T13:42:43");
+  public static final String EXAMPLE_HISTORIC_PROCESS_INSTANCE_STARTED_BEFORE = withTimezone("2013-01-23T13:42:43");
+  public static final String EXAMPLE_HISTORIC_PROCESS_INSTANCE_FINISHED_AFTER = withTimezone("2013-01-23T13:42:43");
+  public static final String EXAMPLE_HISTORIC_PROCESS_INSTANCE_FINISHED_BEFORE = withTimezone("2013-04-23T13:42:43");
 
   // historic process instance duration report
   public static final long EXAMPLE_HISTORIC_PROC_INST_DURATION_REPORT_AVG = 10;
@@ -490,18 +490,18 @@ public abstract class MockProvider {
 
   // Historic Case Instance
   public static final long EXAMPLE_HISTORIC_CASE_INSTANCE_DURATION_MILLIS = 2000l;
-  public static final String EXAMPLE_HISTORIC_CASE_INSTANCE_CREATE_TIME = "2013-04-23T13:42:43";
-  public static final String EXAMPLE_HISTORIC_CASE_INSTANCE_CLOSE_TIME = "2013-04-23T13:42:43";
+  public static final String EXAMPLE_HISTORIC_CASE_INSTANCE_CREATE_TIME = withTimezone("2013-04-23T13:42:43");
+  public static final String EXAMPLE_HISTORIC_CASE_INSTANCE_CLOSE_TIME = withTimezone("2013-04-23T13:42:43");
   public static final String EXAMPLE_HISTORIC_CASE_INSTANCE_CREATE_USER_ID = "aCreateUserId";
   public static final String EXAMPLE_HISTORIC_CASE_INSTANCE_SUPER_CASE_INSTANCE_ID = "aSuperCaseInstanceId";
   public static final String EXAMPLE_HISTORIC_CASE_INSTANCE_SUB_CASE_INSTANCE_ID = "aSubCaseInstanceId";
   public static final String EXAMPLE_HISTORIC_CASE_INSTANCE_SUPER_PROCESS_INSTANCE_ID = "aSuperProcessInstanceId";
   public static final String EXAMPLE_HISTORIC_CASE_INSTANCE_SUB_PROCESS_INSTANCE_ID = "aSuperProcessInstanceId";
 
-  public static final String EXAMPLE_HISTORIC_CASE_INSTANCE_CREATED_AFTER = "2013-04-23T13:42:43";
-  public static final String EXAMPLE_HISTORIC_CASE_INSTANCE_CREATED_BEFORE = "2013-01-23T13:42:43";
-  public static final String EXAMPLE_HISTORIC_CASE_INSTANCE_CLOSED_AFTER = "2013-01-23T13:42:43";
-  public static final String EXAMPLE_HISTORIC_CASE_INSTANCE_CLOSED_BEFORE = "2013-04-23T13:42:43";
+  public static final String EXAMPLE_HISTORIC_CASE_INSTANCE_CREATED_AFTER = withTimezone("2013-04-23T13:42:43");
+  public static final String EXAMPLE_HISTORIC_CASE_INSTANCE_CREATED_BEFORE = withTimezone("2013-01-23T13:42:43");
+  public static final String EXAMPLE_HISTORIC_CASE_INSTANCE_CLOSED_AFTER = withTimezone("2013-01-23T13:42:43");
+  public static final String EXAMPLE_HISTORIC_CASE_INSTANCE_CLOSED_BEFORE = withTimezone("2013-04-23T13:42:43");
 
   public static final boolean EXAMPLE_HISTORIC_CASE_INSTANCE_IS_ACTIVE = true;
   public static final boolean EXAMPLE_HISTORIC_CASE_INSTANCE_IS_COMPLETED = true;
@@ -513,13 +513,13 @@ public abstract class MockProvider {
   public static final String EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_PARENT_ACTIVITY_INSTANCE_ID = "aHistoricParentActivityInstanceId";
   public static final String EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_CALLED_PROCESS_INSTANCE_ID = "aHistoricCalledProcessInstanceId";
   public static final String EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_CALLED_CASE_INSTANCE_ID = "aHistoricCalledCaseInstanceId";
-  public static final String EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_START_TIME = "2013-04-23T13:42:43";
-  public static final String EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_END_TIME = "2013-04-23T18:42:43";
+  public static final String EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_START_TIME = withTimezone("2013-04-23T13:42:43");
+  public static final String EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_END_TIME = withTimezone("2013-04-23T18:42:43");
   public static final long EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_DURATION = 2000l;
-  public static final String EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_STARTED_AFTER = "2013-04-23T13:42:43";
-  public static final String EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_STARTED_BEFORE = "2013-01-23T13:42:43";
-  public static final String EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_FINISHED_AFTER = "2013-01-23T13:42:43";
-  public static final String EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_FINISHED_BEFORE = "2013-04-23T13:42:43";
+  public static final String EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_STARTED_AFTER = withTimezone("2013-04-23T13:42:43");
+  public static final String EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_STARTED_BEFORE = withTimezone("2013-01-23T13:42:43");
+  public static final String EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_FINISHED_AFTER = withTimezone("2013-01-23T13:42:43");
+  public static final String EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_FINISHED_BEFORE = withTimezone("2013-04-23T13:42:43");
   public static final boolean EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_IS_CANCELED = true;
   public static final boolean EXAMPLE_HISTORIC_ACTIVITY_INSTANCE_IS_COMPLETE_SCOPE = true;
 
@@ -533,8 +533,8 @@ public abstract class MockProvider {
   public static final String EXAMPLE_HISTORIC_CASE_ACTIVITY_TYPE = "aCaseActivityType";
   public static final String EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_CALLED_PROCESS_INSTANCE_ID = "aCalledProcessInstanceId";
   public static final String EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_CALLED_CASE_INSTANCE_ID = "aCalledCaseInstanceId";
-  public static final String EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_CREATE_TIME = "2014-04-23T18:42:42";
-  public static final String EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_END_TIME = "2014-04-23T18:42:43";
+  public static final String EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_CREATE_TIME = withTimezone("2014-04-23T18:42:42");
+  public static final String EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_END_TIME = withTimezone("2014-04-23T18:42:43");
   public static final long EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_DURATION = 2000l;
   public static final boolean EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_REQUIRED = true;
   public static final boolean EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_AVAILABLE = true;
@@ -548,10 +548,10 @@ public abstract class MockProvider {
   public static final boolean EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_UNFINISHED = true;
   public static final boolean EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_FINISHED = true;
 
-  public static final String EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_CREATED_AFTER = "2014-04-23T18:41:42";
-  public static final String EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_CREATED_BEFORE = "2014-04-23T18:43:42";
-  public static final String EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_ENDED_AFTER = "2014-04-23T18:41:43";
-  public static final String EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_ENDED_BEFORE = "2014-04-23T18:43:43";
+  public static final String EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_CREATED_AFTER = withTimezone("2014-04-23T18:41:42");
+  public static final String EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_CREATED_BEFORE = withTimezone("2014-04-23T18:43:42");
+  public static final String EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_ENDED_AFTER = withTimezone("2014-04-23T18:41:43");
+  public static final String EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_ENDED_BEFORE = withTimezone("2014-04-23T18:43:43");
 
   // user operation log
   public static final String EXAMPLE_USER_OPERATION_LOG_ID = "userOpLogId";
@@ -561,7 +561,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_USER_OPERATION_PROPERTY = "opProperty";
   public static final String EXAMPLE_USER_OPERATION_ORG_VALUE = "orgValue";
   public static final String EXAMPLE_USER_OPERATION_NEW_VALUE = "newValue";
-  public static final String EXAMPLE_USER_OPERATION_TIMESTAMP = "2014-02-20T16:53:37";
+  public static final String EXAMPLE_USER_OPERATION_TIMESTAMP = withTimezone("2014-02-20T16:53:37");
 
   // historic detail
   public static final String EXAMPLE_HISTORIC_VAR_UPDATE_ID = "aHistoricVariableUpdateId";
@@ -572,7 +572,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_HISTORIC_VAR_UPDATE_EXEC_ID = "anExecutionId";
   public static final String EXAMPLE_HISTORIC_VAR_UPDATE_OPERATION_ID = "anOperationId";
   public static final String EXAMPLE_HISTORIC_VAR_UPDATE_TASK_ID = "aTaskId";
-  public static final String EXAMPLE_HISTORIC_VAR_UPDATE_TIME = "2014-01-01T00:00:00";
+  public static final String EXAMPLE_HISTORIC_VAR_UPDATE_TIME = withTimezone("2014-01-01T00:00:00");
   public static final String EXAMPLE_HISTORIC_VAR_UPDATE_NAME = "aVariableName";
   public static final String EXAMPLE_HISTORIC_VAR_UPDATE_TYPE_NAME = "String";
   public static final String EXAMPLE_HISTORIC_VAR_UPDATE_VALUE_TYPE_NAME = "String";
@@ -592,7 +592,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_HISTORIC_FORM_FIELD_EXEC_ID = "anExecutionId";
   public static final String EXAMPLE_HISTORIC_FORM_FIELD_OPERATION_ID = "anOperationId";
   public static final String EXAMPLE_HISTORIC_FORM_FIELD_TASK_ID = "aTaskId";
-  public static final String EXAMPLE_HISTORIC_FORM_FIELD_TIME = "2014-01-01T00:00:00";
+  public static final String EXAMPLE_HISTORIC_FORM_FIELD_TIME = withTimezone("2014-01-01T00:00:00");
   public static final String EXAMPLE_HISTORIC_FORM_FIELD_FIELD_ID = "aFormFieldId";
   public static final String EXAMPLE_HISTORIC_FORM_FIELD_VALUE = "aFormFieldValue";
   public static final String EXAMPLE_HISTORIC_FORM_FIELD_CASE_DEF_KEY = "aCaseDefKey";
@@ -612,13 +612,13 @@ public abstract class MockProvider {
   public static final String EXAMPLE_HISTORIC_TASK_INST_DELETE_REASON = "aDeleteReason";
   public static final String EXAMPLE_HISTORIC_TASK_INST_OWNER = "anOwner";
   public static final String EXAMPLE_HISTORIC_TASK_INST_ASSIGNEE = "anAssignee";
-  public static final String EXAMPLE_HISTORIC_TASK_INST_START_TIME = "2014-01-01T00:00:00";
-  public static final String EXAMPLE_HISTORIC_TASK_INST_END_TIME = "2014-01-01T00:00:00";
+  public static final String EXAMPLE_HISTORIC_TASK_INST_START_TIME = withTimezone("2014-01-01T00:00:00");
+  public static final String EXAMPLE_HISTORIC_TASK_INST_END_TIME = withTimezone("2014-01-01T00:00:00");
   public static final Long EXAMPLE_HISTORIC_TASK_INST_DURATION = 5000L;
   public static final String EXAMPLE_HISTORIC_TASK_INST_DEF_KEY = "aTaskDefinitionKey";
   public static final int EXAMPLE_HISTORIC_TASK_INST_PRIORITY = 60;
-  public static final String EXAMPLE_HISTORIC_TASK_INST_DUE_DATE = "2014-01-01T00:00:00";
-  public static final String EXAMPLE_HISTORIC_TASK_INST_FOLLOW_UP_DATE = "2014-01-01T00:00:00";
+  public static final String EXAMPLE_HISTORIC_TASK_INST_DUE_DATE = withTimezone("2014-01-01T00:00:00");
+  public static final String EXAMPLE_HISTORIC_TASK_INST_FOLLOW_UP_DATE = withTimezone("2014-01-01T00:00:00");
   public static final String EXAMPLE_HISTORIC_TASK_INST_PARENT_TASK_ID = "aParentTaskId";
   public static final String EXAMPLE_HISTORIC_TASK_INST_CASE_DEF_KEY = "aCaseDefinitionKey";
   public static final String EXAMPLE_HISTORIC_TASK_INST_CASE_DEF_ID = "aCaseDefinitionId";
@@ -630,7 +630,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_HISTORIC_TASK_INST_TASK_HAD_CANDIDATE_GROUP = "cGroupId";
   // Incident
   public static final String EXAMPLE_INCIDENT_ID = "anIncidentId";
-  public static final String EXAMPLE_INCIDENT_TIMESTAMP = "2014-01-01T00:00:00";
+  public static final String EXAMPLE_INCIDENT_TIMESTAMP = withTimezone("2014-01-01T00:00:00");
   public static final String EXAMPLE_INCIDENT_TYPE = "anIncidentType";
   public static final String EXAMPLE_INCIDENT_EXECUTION_ID = "anExecutionId";
   public static final String EXAMPLE_INCIDENT_ACTIVITY_ID = "anActivityId";
@@ -646,8 +646,8 @@ public abstract class MockProvider {
 
   // Historic Incident
   public static final String EXAMPLE_HIST_INCIDENT_ID = "anIncidentId";
-  public static final String EXAMPLE_HIST_INCIDENT_CREATE_TIME = "2014-01-01T00:00:00";
-  public static final String EXAMPLE_HIST_INCIDENT_END_TIME = "2014-01-01T00:00:00";
+  public static final String EXAMPLE_HIST_INCIDENT_CREATE_TIME = withTimezone("2014-01-01T00:00:00");
+  public static final String EXAMPLE_HIST_INCIDENT_END_TIME = withTimezone("2014-01-01T00:00:00");
   public static final String EXAMPLE_HIST_INCIDENT_TYPE = "anIncidentType";
   public static final String EXAMPLE_HIST_INCIDENT_EXECUTION_ID = "anExecutionId";
   public static final String EXAMPLE_HIST_INCIDENT_ACTIVITY_ID = "anActivityId";
@@ -665,9 +665,9 @@ public abstract class MockProvider {
   // Historic Identity Link
   public static final String EXAMPLE_HIST_IDENTITY_LINK_TYPE = "assignee";
   public static final String EXAMPLE_HIST_IDENTITY_LINK_OPERATION_TYPE = "add";
-  public static final String EXAMPLE_HIST_IDENTITY_LINK_TIME = "2014-01-05T00:00:00";
-  public static final String EXAMPLE_HIST_IDENTITY_LINK_DATE_BEFORE = "2014-01-01T00:00:00";
-  public static final String EXAMPLE_HIST_IDENTITY_LINK_DATE_AFTER = "2014-01-06T00:00:00";
+  public static final String EXAMPLE_HIST_IDENTITY_LINK_TIME = withTimezone("2014-01-05T00:00:00");
+  public static final String EXAMPLE_HIST_IDENTITY_LINK_DATE_BEFORE = withTimezone("2014-01-01T00:00:00");
+  public static final String EXAMPLE_HIST_IDENTITY_LINK_DATE_AFTER = withTimezone("2014-01-06T00:00:00");
   public static final String EXAMPLE_HIST_IDENTITY_LINK_ASSIGNER_ID = "aAssignerId";
   public static final String EXAMPLE_HIST_IDENTITY_LINK_TASK_ID = "aTaskId";
   public static final String EXAMPLE_HIST_IDENTITY_LINK_USER_ID = "aUserId";
@@ -754,9 +754,10 @@ public abstract class MockProvider {
   // historic job log
 
   public static final String EXAMPLE_HISTORIC_JOB_LOG_ID = "aHistoricJobLogId";
-  public static final String EXAMPLE_HISTORIC_JOB_LOG_TIMESTAMP = "2015-01-01T00:00:00";
+  public static final String EXAMPLE_HISTORIC_JOB_LOG_TIMESTAMP = withTimezone(withTimezone("2015-01-01T00:00:00"));
+
   public static final String EXAMPLE_HISTORIC_JOB_LOG_JOB_ID = "aJobId";
-  public static final String EXAMPLE_HISTORIC_JOB_LOG_JOB_DUE_DATE = "2015-10-01T00:00:00";
+  public static final String EXAMPLE_HISTORIC_JOB_LOG_JOB_DUE_DATE = withTimezone("2015-10-01T00:00:00");
   public static final int EXAMPLE_HISTORIC_JOB_LOG_JOB_RETRIES = 5;
   public static final long EXAMPLE_HISTORIC_JOB_LOG_JOB_PRIORITY = Integer.MAX_VALUE + 42l;
   public static final String EXAMPLE_HISTORIC_JOB_LOG_JOB_EXCEPTION_MSG = "aJobExceptionMsg";
@@ -781,9 +782,9 @@ public abstract class MockProvider {
   public static final String EXAMPLE_HISTORIC_DECISION_INSTANCE_ACTIVITY_ID_IN = "aHistoricDecisionInstanceActivityId,anotherHistoricDecisionInstanceActivityId";
   public static final String EXAMPLE_HISTORIC_DECISION_INSTANCE_ACTIVITY_INSTANCE_ID = "aHistoricDecisionInstanceActivityInstanceId";
   public static final String EXAMPLE_HISTORIC_DECISION_INSTANCE_ACTIVITY_INSTANCE_ID_IN = "aHistoricDecisionInstanceActivityInstanceId,anotherHistoricDecisionInstanceActivityInstanceId";
-  public static final String EXAMPLE_HISTORIC_DECISION_INSTANCE_EVALUATION_TIME = "2015-09-07T11:00:00";
-  public static final String EXAMPLE_HISTORIC_DECISION_INSTANCE_EVALUATED_BEFORE = "2015-09-08T11:00:00";
-  public static final String EXAMPLE_HISTORIC_DECISION_INSTANCE_EVALUATED_AFTER = "2015-09-06T11:00:00";
+  public static final String EXAMPLE_HISTORIC_DECISION_INSTANCE_EVALUATION_TIME = withTimezone("2015-09-07T11:00:00");
+  public static final String EXAMPLE_HISTORIC_DECISION_INSTANCE_EVALUATED_BEFORE = withTimezone("2015-09-08T11:00:00");
+  public static final String EXAMPLE_HISTORIC_DECISION_INSTANCE_EVALUATED_AFTER = withTimezone("2015-09-06T11:00:00");
   public static final String EXAMPLE_HISTORIC_DECISION_INSTANCE_USER_ID = "aUserId";
   public static final Double EXAMPLE_HISTORIC_DECISION_INSTANCE_COLLECT_RESULT_VALUE = 42.0;
   public static final String EXAMPLE_HISTORIC_DECISION_INPUT_INSTANCE_ID = "aDecisionInputInstanceId";
@@ -800,15 +801,15 @@ public abstract class MockProvider {
   public static final StringValue EXAMPLE_HISTORIC_DECISION_STRING_VALUE = Variables.stringValue("test");
 
   // metrics
-  public static final String EXAMPLE_METRICS_START_DATE = "2015-01-01T00:00:00";
-  public static final String EXAMPLE_METRICS_END_DATE = "2015-02-01T00:00:00";
+  public static final String EXAMPLE_METRICS_START_DATE = withTimezone("2015-01-01T00:00:00");
+  public static final String EXAMPLE_METRICS_END_DATE = withTimezone("2015-02-01T00:00:00");
   public static final String EXAMPLE_METRICS_REPORTER = "REPORTER";
   public static final String EXAMPLE_METRICS_NAME = "metricName";
 
   // external task
   public static final String EXTERNAL_TASK_ID = "anExternalTaskId";
   public static final String EXTERNAL_TASK_ERROR_MESSAGE = "some error";
-  public static final String EXTERNAL_TASK_LOCK_EXPIRATION_TIME = "2015-10-05T13:25:00";
+  public static final String EXTERNAL_TASK_LOCK_EXPIRATION_TIME = withTimezone("2015-10-05T13:25:00");
   public static final Integer EXTERNAL_TASK_RETRIES = new Integer(5);
   public static final boolean EXTERNAL_TASK_SUSPENDED = true;
   public static final String EXTERNAL_TASK_TOPIC_NAME = "aTopic";
@@ -825,8 +826,8 @@ public abstract class MockProvider {
   public static final String EXAMPLE_SEED_JOB_DEFINITION_ID = "aSeedJobDefinitionId";
   public static final String EXAMPLE_MONITOR_JOB_DEFINITION_ID = "aMonitorJobDefinitionId";
   public static final String EXAMPLE_BATCH_JOB_DEFINITION_ID = "aBatchJobDefinitionId";
-  public static final String EXAMPLE_HISTORIC_BATCH_START_TIME = "2016-04-12T15:29:33";
-  public static final String EXAMPLE_HISTORIC_BATCH_END_TIME = "2016-04-12T16:23:34";
+  public static final String EXAMPLE_HISTORIC_BATCH_START_TIME = withTimezone("2016-04-12T15:29:33");
+  public static final String EXAMPLE_HISTORIC_BATCH_END_TIME = withTimezone("2016-04-12T16:23:34");
   public static final int EXAMPLE_BATCH_REMAINING_JOBS = 21;
   public static final int EXAMPLE_BATCH_COMPLETED_JOBS = 22;
   public static final int EXAMPLE_BATCH_FAILED_JOBS = 23;
@@ -835,8 +836,8 @@ public abstract class MockProvider {
   public static final Long EXAMPLE_HISTORIC_TASK_REPORT_COUNT = 12L;
   public static final String EXAMPLE_HISTORIC_TASK_REPORT_DEFINITION = "aTaskDefinition";
   public static final String EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEFINITION = "aProcessDefinition";
-  public static final String EXAMPLE_HISTORIC_TASK_START_TIME = "2016-04-12T15:29:33";
-  public static final String EXAMPLE_HISTORIC_TASK_END_TIME = "2016-04-12T16:23:34";
+  public static final String EXAMPLE_HISTORIC_TASK_START_TIME = withTimezone("2016-04-12T15:29:33");
+  public static final String EXAMPLE_HISTORIC_TASK_END_TIME = withTimezone("2016-04-12T16:23:34");
   public static final String EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEF_ID = "aProcessDefinitionId:1:1";
   public static final String EXAMPLE_HISTORIC_TASK_REPORT_PROC_DEF_NAME = "aProcessDefinitionName";
   public static final String EXAMPLE_HISTORIC_TASK_REPORT_TASK_NAME = "aTaskName";
@@ -849,7 +850,7 @@ public abstract class MockProvider {
 
   // historic external task log
   public static final String EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_ID = "aHistoricExternalTaskLogId";
-  public static final String EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_TIMESTAMP = "2015-01-01T00:00:00";
+  public static final String EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_TIMESTAMP = withTimezone("2015-01-01T00:00:00");
   public static final String EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_EXTERNAL_TASK_ID = "anExternalTaskId";
   public static final String EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_TOPIC_NAME = "aTopicName";
   public static final String EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_WORKER_ID = "aWorkerId";
@@ -866,7 +867,6 @@ public abstract class MockProvider {
   public static final boolean EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_IS_FAILURE_LOG = true;
   public static final boolean EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_IS_SUCCESS_LOG = true;
   public static final boolean EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_IS_DELETION_LOG = true;
-
 
   public static Task createMockTask() {
     return mockTask().build();

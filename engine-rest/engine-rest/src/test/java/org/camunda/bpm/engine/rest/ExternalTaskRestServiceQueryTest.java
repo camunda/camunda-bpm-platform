@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.rest;
 
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.path.json.JsonPath.from;
+import static org.camunda.bpm.engine.rest.util.DateTimeUtils.withTimezone;
 import static org.fest.assertions.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.mock;
@@ -159,8 +160,8 @@ public class ExternalTaskRestServiceQueryTest extends AbstractRestServiceTest {
 
     parameters.put("externalTaskId", "someExternalTaskId");
     parameters.put("activityId", "someActivityId");
-    parameters.put("lockExpirationBefore", "2013-01-23T14:42:42");
-    parameters.put("lockExpirationAfter", "2013-01-23T15:52:52");
+    parameters.put("lockExpirationBefore", withTimezone("2013-01-23T14:42:42"));
+    parameters.put("lockExpirationAfter", withTimezone("2013-01-23T15:52:52"));
     parameters.put("topicName", "someTopic");
     parameters.put("locked", "true");
     parameters.put("notLocked", "true");
@@ -183,8 +184,8 @@ public class ExternalTaskRestServiceQueryTest extends AbstractRestServiceTest {
 
     verify(mockQuery).externalTaskId("someExternalTaskId");
     verify(mockQuery).activityId("someActivityId");
-    verify(mockQuery).lockExpirationBefore(DateTimeUtil.parseDate("2013-01-23T14:42:42"));
-    verify(mockQuery).lockExpirationAfter(DateTimeUtil.parseDate("2013-01-23T15:52:52"));
+    verify(mockQuery).lockExpirationBefore(DateTimeUtil.parseDate(withTimezone("2013-01-23T14:42:42")));
+    verify(mockQuery).lockExpirationAfter(DateTimeUtil.parseDate(withTimezone("2013-01-23T15:52:52")));
     verify(mockQuery).topicName("someTopic");
     verify(mockQuery).locked();
     verify(mockQuery).notLocked();
@@ -206,8 +207,8 @@ public class ExternalTaskRestServiceQueryTest extends AbstractRestServiceTest {
 
     parameters.put("externalTaskId", "someExternalTaskId");
     parameters.put("activityId", "someActivityId");
-    parameters.put("lockExpirationBefore", "2013-01-23T14:42:42");
-    parameters.put("lockExpirationAfter", "2013-01-23T15:52:52");
+    parameters.put("lockExpirationBefore", withTimezone("2013-01-23T14:42:42"));
+    parameters.put("lockExpirationAfter", withTimezone("2013-01-23T15:52:52"));
     parameters.put("topicName", "someTopic");
     parameters.put("locked", "true");
     parameters.put("notLocked", "true");
@@ -231,8 +232,8 @@ public class ExternalTaskRestServiceQueryTest extends AbstractRestServiceTest {
 
     verify(mockQuery).externalTaskId("someExternalTaskId");
     verify(mockQuery).activityId("someActivityId");
-    verify(mockQuery).lockExpirationBefore(DateTimeUtil.parseDate("2013-01-23T14:42:42"));
-    verify(mockQuery).lockExpirationAfter(DateTimeUtil.parseDate("2013-01-23T15:52:52"));
+    verify(mockQuery).lockExpirationBefore(DateTimeUtil.parseDate(withTimezone("2013-01-23T14:42:42")));
+    verify(mockQuery).lockExpirationAfter(DateTimeUtil.parseDate(withTimezone("2013-01-23T15:52:52")));
     verify(mockQuery).topicName("someTopic");
     verify(mockQuery).locked();
     verify(mockQuery).notLocked();
