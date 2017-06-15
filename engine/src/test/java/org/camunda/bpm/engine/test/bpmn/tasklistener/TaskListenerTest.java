@@ -40,6 +40,7 @@ import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -328,6 +329,31 @@ public class TaskListenerTest {
     assertEquals("bar", collectedVariables.get("foo"));
   }
 
+  @Test
+  public void testTestCompleteListenerWithFollowingCallActivity() {
+    final BpmnModelInstance subProcess = Bpmn.createExecutableProcess("subProc")
+        .startEvent()
+        .userTask("calledTask")
+        .endEvent()
+        .done();
+
+    final BpmnModelInstance instance = Bpmn.createExecutableProcess("mainProc")
+        .startEvent()
+        .userTask("mainTask")
+        .camundaTaskListenerClass(TaskListener.EVENTNAME_CREATE, CreateTaskListener.class.getName())
+        .callActivity().calledElement("subProc")
+        .endEvent()
+        .done();
+
+    testRule.deploy(subProcess);
+    testRule.deploy(instance);
+
+    engineRule.getRuntimeService().startProcessInstanceByKey("mainProc");
+    Task task = engineRule.getTaskService().createTaskQuery().singleResult();
+
+    Assert.assertEquals(task.getTaskDefinitionKey(), "calledTask");
+  }
+
   public static class VariablesCollectingListener implements TaskListener {
 
     protected static VariableMap collectedVariables;
@@ -347,6 +373,10 @@ public class TaskListenerTest {
 
   }
 
+  public static class CreateTaskListener implements TaskListener {
 
-
+      public void notify(DelegateTask delegateTask) {
+          delegateTask.getProcessEngineServices().getTaskService().complete(delegateTask.getId());
+      }
+  }
 }

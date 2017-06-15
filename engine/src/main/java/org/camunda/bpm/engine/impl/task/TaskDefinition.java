@@ -162,7 +162,14 @@ public class TaskDefinition {
   }
 
   public void addBuiltInTaskListener(String eventName, TaskListener taskListener) {
-    CollectionUtil.addToMapOfLists(taskListeners, eventName, taskListener);
+    List<TaskListener> listeners = taskListeners.get(eventName);
+    if (listeners == null) {
+      listeners = new ArrayList<TaskListener>();
+      taskListeners.put(eventName, listeners);
+    }
+
+    listeners.add(0, taskListener);
+
     CollectionUtil.addToMapOfLists(builtinTaskListeners, eventName, taskListener);
   }
 
