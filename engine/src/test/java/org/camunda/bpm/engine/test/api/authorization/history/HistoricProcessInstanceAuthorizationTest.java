@@ -17,16 +17,24 @@ import static org.camunda.bpm.engine.authorization.Permissions.DELETE_HISTORY;
 import static org.camunda.bpm.engine.authorization.Permissions.READ_HISTORY;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang.time.DateUtils;
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.authorization.MissingAuthorization;
+import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.history.DurationReportResult;
+import org.camunda.bpm.engine.history.HistoricFinishedProcessInstanceReportResult;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.AbstractQuery;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.query.PeriodUnit;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.authorization.AuthorizationTest;
@@ -353,10 +361,83 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
     assertEquals(1, result.size());
   }
 
+  public void testHistoryCleanupReportWithPermissions() {
+    // given
+    prepareProcessInstances(PROCESS_KEY, -6, 5, 10);
+
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, Permissions.READ, Permissions.READ_HISTORY);
+
+    List<HistoricFinishedProcessInstanceReportResult> reportResults = historyService.createHistoricFinishedProcessInstanceReport().count();
+
+    // then
+    assertEquals(1, reportResults.size());
+    assertEquals(10, reportResults.get(0).getCleanableProcessInstanceCount().longValue());
+    assertEquals(10, reportResults.get(0).getFinishedProcessInstanceCount().longValue());
+  }
+
+  public void testHistoryCleanupReportWithReadPermissionOnly() {
+    // given
+    prepareProcessInstances(PROCESS_KEY, -6, 5, 10);
+
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, Permissions.READ);
+
+    // when
+    List<HistoricFinishedProcessInstanceReportResult> reportResults = historyService.createHistoricFinishedProcessInstanceReport().count();
+
+    // then
+    assertEquals(0, reportResults.size());
+  }
+
+  public void testHistoryCleanupReportWithReadHistoryPermissionOnly() {
+    // given
+    prepareProcessInstances(PROCESS_KEY, -6, 5, 10);
+
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, Permissions.READ_HISTORY);
+
+    // when
+    List<HistoricFinishedProcessInstanceReportResult> reportResults = historyService.createHistoricFinishedProcessInstanceReport().count();
+
+    // then
+    assertEquals(0, reportResults.size());
+  }
+
+  public void testHistoryCleanupReportWithoutPermissions() {
+    // given
+    prepareProcessInstances(PROCESS_KEY, -6, 5, 10);
+
+    // when
+    List<HistoricFinishedProcessInstanceReportResult> reportResults = historyService.createHistoricFinishedProcessInstanceReport().count();
+
+    // then
+    assertEquals(0, reportResults.size());
+  }
+
   // helper ////////////////////////////////////////////////////////
 
   protected void verifyQueryResults(HistoricProcessInstanceQuery query, int countExpected) {
     verifyQueryResults((AbstractQuery<?, ?>) query, countExpected);
+  }
+
+  protected void prepareProcessInstances(String key, int daysInThePast, Integer historyTimeToLive, int instanceCount) {
+    ProcessDefinition processDefinition = selectProcessDefinitionByKey(key);
+    disableAuthorization();
+    repositoryService.updateProcessDefinitionHistoryTimeToLive(processDefinition.getId(), historyTimeToLive);
+    enableAuthorization();
+
+    Date oldCurrentTime = ClockUtil.getCurrentTime();
+    ClockUtil.setCurrentTime(DateUtils.addDays(new Date(), daysInThePast));
+
+    List<String> processInstanceIds = new ArrayList<String>();
+    for (int i = 0; i < instanceCount; i++) {
+      ProcessInstance processInstance = startProcessInstanceByKey(key);
+      processInstanceIds.add(processInstance.getId());
+    }
+
+    disableAuthorization();
+    runtimeService.deleteProcessInstances(processInstanceIds, null, true, true);
+    enableAuthorization();
+
+    ClockUtil.setCurrentTime(oldCurrentTime);
   }
 
 }

@@ -404,7 +404,7 @@ public class HistoryCleanupTest {
       engineRule.getDecisionService().evaluateDecisionByKey("testDecision").variables(variables).evaluate();
     }
 
-    // create 4 process instances
+    // create 4 case instances
     for (int i = 0; i < CASE_INSTANCES_COUNT; i++) {
       CaseInstance caseInstance = caseService.createCaseInstanceByKey("oneTaskCase",
           Variables.createVariables().putValue("pojo", new TestPojo("okay", 13.37 + i)));

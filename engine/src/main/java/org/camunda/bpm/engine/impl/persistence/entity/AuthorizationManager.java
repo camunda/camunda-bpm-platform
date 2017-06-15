@@ -359,6 +359,18 @@ public class AuthorizationManager extends AbstractManager {
     }
   }
 
+  public void configureQuery(ListQueryParameterObject query, Resource resource, String queryParam, Permission... permission) {
+    configureQuery(query);
+
+    for (int i = 0; i < permission.length; i++) {
+      PermissionCheck check = new PermissionCheck();
+      check.setResource(resource);
+      check.setResourceIdQueryParam(queryParam);
+      check.setPermission(permission[i]);
+      query.getAuthCheck().getPermissionChecks().addAtomicCheck(check);
+    }
+  }
+
   public void enableQueryAuthCheck(AuthorizationCheck authCheck) {
     List<String> authGroupIds = authCheck.getAuthGroupIds();
     String authUserId = authCheck.getAuthUserId();

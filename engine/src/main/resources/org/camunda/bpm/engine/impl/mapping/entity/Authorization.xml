@@ -587,7 +587,27 @@
     </if>  
     )
   </sql>
-  
+
+  <sql id="authCheckConjunctiveJoinWithoutOnClause">
+    left JOIN (
+    SELECT A.*
+    FROM ${prefix}ACT_RU_AUTHORIZATION A
+    WHERE A.TYPE_ &lt; 2
+    AND ( A.USER_ID_ in ( #{authCheck.authUserId, jdbcType=VARCHAR}, '*')
+    <if test="authCheck.authGroupIds != null &amp;&amp; authCheck.authGroupIds.size() > 0">
+      OR A.GROUP_ID_ IN <foreach item="item" index="index" collection="authCheck.authGroupIds" open="(" separator="," close=")">#{item}</foreach>
+    </if>
+    )
+    <if test="authCheck.permissionChecks.atomicChecks != null &amp;&amp; authCheck.permissionChecks.atomicChecks.size() > 0">
+      AND (
+      <foreach item="permCheck" index="index" collection="authCheck.permissionChecks.atomicChecks" open="(" separator="AND" close=")">
+        A.RESOURCE_TYPE_ = #{permCheck.resourceType, jdbcType=INTEGER} AND ${bitand1}A.PERMS_${bitand2}#{permCheck.perms, jdbcType=INTEGER}${bitand3} = #{permCheck.perms,  jdbcType=INTEGER}
+      </foreach>
+      )
+    </if>
+    )
+  </sql>
+
   <!-- 
    input: "permissionChecks": an instance of CompositePermissionCheck
   -->
