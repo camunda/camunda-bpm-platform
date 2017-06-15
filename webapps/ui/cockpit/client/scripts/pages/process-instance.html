@@ -30,7 +30,7 @@
       </ul>
 
       <div class="tab-content"
-           ng-show="sidebarTab === 'info'">
+           ng-if="sidebarTab === 'info'">
         <dl class="process-information">
           <dt cam-widget-clipboard="processInstance.id"
               ng-class="{hovered: hovered === 'instance-id'}">
@@ -118,7 +118,7 @@
       </div>
 
       <div class="tab-content filters"
-           ng-show="sidebarTab === 'filters'">
+           ng-if="sidebarTab === 'filters'">
         <h5>
           Filter
           <span class="glyphicon glyphicon-info-sign"
