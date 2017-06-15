@@ -12,15 +12,32 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.Callable;
 import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
+import org.camunda.bpm.engine.impl.ActivityExecutionTreeMapping;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 
 import java.util.Collections;
+import org.camunda.bpm.engine.impl.pvm.delegate.ModificationObserverBehavior;
+import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
+import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
+import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
+import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
+import org.camunda.bpm.engine.impl.util.EnsureUtil;
+import org.camunda.bpm.engine.runtime.ActivityInstance;
+import org.camunda.bpm.engine.runtime.Execution;
+
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
@@ -63,6 +80,11 @@ public abstract class AbstractDeleteProcessInstanceCmd {
     commandContext
         .getExecutionManager()
         .deleteProcessInstance(processInstanceId, deleteReason, false, skipCustomListeners, externallyTerminated, skipIoMappings);
+
+    ExecutionEntity superExecution = execution.getSuperExecution();
+    if (superExecution != null) {
+      new ActivityInstanceCancellationCmd(superExecution.getProcessInstanceId(), superExecution.getActivityInstanceId()).execute(commandContext);
+    }
 
     // create user operation log
     commandContext.getOperationLogManager()

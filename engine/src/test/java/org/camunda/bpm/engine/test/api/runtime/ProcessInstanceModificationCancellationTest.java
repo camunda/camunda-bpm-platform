@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.TransitionInstance;
 import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener;
 import org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener.RecordedEvent;
@@ -62,6 +63,11 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
   protected static final String FAILING_OUTPUT_MAPPINGS_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.failingOutputMappingProcess.bpmn20.xml";
 
   protected static final String INTERRUPTING_EVENT_SUBPROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.interruptingEventSubProcess.bpmn20.xml";
+
+  protected static final String CALL_ACTIVITY_PROCESS = "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testCallSimpleSubProcess.bpmn20.xml";
+  protected static final String SIMPLE_SUBPROCESS = "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml";
+
+
 
   @Deployment(resources = ONE_TASK_PROCESS)
   public void testCancellationInOneTaskProcess() {
@@ -1534,5 +1540,66 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
     }
 
     return null;
+  }
+
+  /**
+   * Test case for checking cancellation of process instances in call activity subprocesses
+   */
+  @Deployment(resources = {
+    SIMPLE_SUBPROCESS,
+    CALL_ACTIVITY_PROCESS
+  })
+  public void testCancellationInCallActivitySubProcess() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callSimpleSubProcess");
+    String processInstanceId = processInstance.getId();
+
+    // one task in the subprocess should be active after starting the process instance
+    TaskQuery taskQuery = taskService.createTaskQuery();
+    Task taskBeforeSubProcess = taskQuery.singleResult();
+
+    // Completing the task continues the process which leads to calling the subprocess
+    taskService.complete(taskBeforeSubProcess.getId());
+    Task taskInSubProcess = taskQuery.singleResult();
+
+
+    List<ProcessInstance> instanceList = runtimeService.createProcessInstanceQuery().list();
+    assertNotNull(instanceList);
+    assertEquals(2, instanceList.size());
+
+    List<Task> taskList = taskService.createTaskQuery().list();
+    assertNotNull(taskList);
+    assertEquals(1, taskList.size());
+
+    List<String> activeActivityIds = runtimeService.getActiveActivityIds(taskInSubProcess.getProcessInstanceId());
+    assertNotNull(activeActivityIds);
+    assertEquals(1, activeActivityIds.size());
+
+
+    ActivityInstance tree = runtimeService.getActivityInstance(taskInSubProcess.getProcessInstanceId());
+    // when
+    runtimeService
+      .createProcessInstanceModification(taskInSubProcess.getProcessInstanceId())
+      .cancelActivityInstance(getInstanceIdForActivity(tree, "task"))
+      .execute();
+
+
+    // then
+    assertProcessEnded(processInstanceId);
+
+    // How many process Instances
+    instanceList = runtimeService.createProcessInstanceQuery().list();
+    assertNotNull(instanceList);
+    assertEquals(0, instanceList.size());
+
+    // How many sub tasks
+    taskList = taskService.createTaskQuery().list();
+    assertNotNull(taskList);
+    assertEquals(0, taskList.size());
+
+
+
+
+
   }
 }

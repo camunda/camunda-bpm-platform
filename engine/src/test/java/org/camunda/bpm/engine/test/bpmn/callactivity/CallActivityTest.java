@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.test.bpmn.callactivity;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertThat;
 
 import java.util.HashMap;
@@ -26,6 +27,7 @@ import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
+import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.EventSubscriptionQuery;
 import org.camunda.bpm.engine.runtime.Job;
@@ -1482,4 +1484,216 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
     assertEquals("Prepare and Ship", prepareAndShipTask.getName());
   }
 
+  /**
+   * Test case for checking deletion of process instancess in call activity subprocesses
+   */
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testCallSimpleSubProcess.bpmn20.xml",
+    "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"
+  })
+  public void testDeleteProcessInstanceInCallActivity() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callSimpleSubProcess");
+
+
+    // one task in the subprocess should be active after starting the process instance
+    TaskQuery taskQuery = taskService.createTaskQuery();
+    Task taskBeforeSubProcess = taskQuery.singleResult();
+
+    // Completing the task continues the process which leads to calling the subprocess
+    taskService.complete(taskBeforeSubProcess.getId());
+    Task taskInSubProcess = taskQuery.singleResult();
+
+
+    List<ProcessInstance> instanceList = runtimeService.createProcessInstanceQuery().list();
+    assertNotNull(instanceList);
+    assertEquals(2, instanceList.size());
+
+    List<Task> taskList = taskService.createTaskQuery().list();
+    assertNotNull(taskList);
+    assertEquals(1, taskList.size());
+
+    List<String> activeActivityIds = runtimeService.getActiveActivityIds(processInstance.getProcessInstanceId());
+    assertNotNull(activeActivityIds);
+    assertEquals(1, activeActivityIds.size());
+
+
+    // when
+    // Delete the ProcessInstance in the sub process
+    runtimeService.deleteProcessInstance(taskInSubProcess.getProcessInstanceId(), "Test upstream deletion");
+
+    // then
+
+    // How many process Instances
+    instanceList = runtimeService.createProcessInstanceQuery().list();
+    assertNotNull(instanceList);
+    assertEquals(0, instanceList.size());
+
+    // How many sub tasks
+    taskList = taskService.createTaskQuery().list();
+    assertNotNull(taskList);
+    assertEquals(0, taskList.size());
+  }
+
+  /**
+   * Test case for checking deletion of process instances in call activity subprocesses
+   */
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testTwoSubProcesses.bpmn20.xml",
+    "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"})
+  public void testSingleDeletionWithTwoSubProcesses() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callTwoSubProcesses");
+
+    List<ProcessInstance> instanceList = runtimeService.createProcessInstanceQuery().list();
+    assertNotNull(instanceList);
+    assertEquals(3, instanceList.size());
+
+    List<Task> taskList = taskService.createTaskQuery().list();
+    assertNotNull(taskList);
+    assertEquals(2, taskList.size());
+
+    List<String> activeActivityIds = runtimeService.getActiveActivityIds(processInstance.getProcessInstanceId());
+    assertNotNull(activeActivityIds);
+    assertEquals(2, activeActivityIds.size());
+
+    // when
+    runtimeService.deleteProcessInstance(taskList.get(0).getProcessInstanceId(), "Test upstream deletion");
+
+    // then
+    // How many process Instances
+    instanceList = runtimeService.createProcessInstanceQuery().list();
+    assertNotNull(instanceList);
+    assertEquals(2, instanceList.size());
+
+    // How many sub tasks
+    taskList = taskService.createTaskQuery().list();
+    assertNotNull(taskList);
+    assertEquals(1, taskList.size());
+
+    // How man call activities
+    activeActivityIds = runtimeService.getActiveActivityIds(processInstance.getProcessInstanceId());
+    assertNotNull(activeActivityIds);
+    assertEquals(1, activeActivityIds.size());
+  }
+
+  /**
+  * Test case for checking deletion of process instances in nested call activity subprocesses
+  */
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testCallSimpleSubProcess.bpmn20.xml",
+    "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testNestedCallActivity.bpmn20.xml",
+    "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"
+  })
+  public void testDeleteMultilevelProcessInstanceInCallActivity() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nestedCallActivity");
+
+    // one task in the subprocess should be active after starting the process instance
+    TaskQuery taskQuery = taskService.createTaskQuery();
+    Task taskBeforeSubProcess = taskQuery.singleResult();
+
+    // Completing the task continues the process which leads to calling the subprocess
+    taskService.complete(taskBeforeSubProcess.getId());
+    Task taskInSubProcess = taskQuery.singleResult();
+
+    // Completing the task continues the sub process which leads to calling the deeper subprocess
+    taskService.complete(taskInSubProcess.getId());
+    Task taskInNestedSubProcess = taskQuery.singleResult();
+
+    List<ProcessInstance> instanceList = runtimeService.createProcessInstanceQuery().list();
+    assertNotNull(instanceList);
+    assertEquals(3, instanceList.size());
+
+
+    List<Task> taskList = taskService.createTaskQuery().list();
+    assertNotNull(taskList);
+    assertEquals(1, taskList.size());
+
+    List<String> activeActivityIds = runtimeService.getActiveActivityIds(processInstance.getProcessInstanceId());
+    assertNotNull(activeActivityIds);
+    assertEquals(1, activeActivityIds.size());
+
+
+    // when
+
+    // Delete the ProcessInstance in the sub process
+    runtimeService.deleteProcessInstance(taskInNestedSubProcess.getProcessInstanceId(), "Test cascading upstream deletion");
+
+
+    // then
+
+    // How many process Instances
+    instanceList = runtimeService.createProcessInstanceQuery().list();
+    assertNotNull(instanceList);
+    assertEquals(0, instanceList.size());
+
+    // How many sub tasks
+    taskList = taskService.createTaskQuery().list();
+    assertNotNull(taskList);
+    assertEquals(0, taskList.size());
+  }
+
+  /**
+  * Test case for checking deletion of process instances in nested call activity subprocesses
+  */
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testCallSimpleSubProcess.bpmn20.xml",
+    "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testNestedCallActivity.bpmn20.xml",
+    "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testDoubleNestedCallActivity.bpmn20.xml",
+    "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"
+  })
+  public void testDeleteDoubleNestedProcessInstanceInCallActivity() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("doubleNestedCallActivity");
+
+    // one task in the subprocess should be active after starting the process instance
+    TaskQuery taskQuery = taskService.createTaskQuery();
+    Task taskBeforeSubProcess = taskQuery.singleResult();
+
+    // Completing the task continues the process which leads to calling the subprocess
+    taskService.complete(taskBeforeSubProcess.getId());
+    Task taskInSubProcess = taskQuery.singleResult();
+
+    // Completing the task continues the sub process which leads to calling the deeper subprocess
+    taskService.complete(taskInSubProcess.getId());
+    Task taskInNestedSubProcess = taskQuery.singleResult();
+
+
+    // Completing the task continues the sub process which leads to calling the deeper subprocess
+    taskService.complete(taskInNestedSubProcess.getId());
+    Task taskInDoubleNestedSubProcess = taskQuery.singleResult();
+
+
+    List<ProcessInstance> instanceList = runtimeService.createProcessInstanceQuery().list();
+    assertNotNull(instanceList);
+    assertEquals(4, instanceList.size());
+
+    List<Task> taskList = taskService.createTaskQuery().list();
+    assertNotNull(taskList);
+    assertEquals(1, taskList.size());
+
+    List<String> activeActivityIds = runtimeService.getActiveActivityIds(processInstance.getProcessInstanceId());
+    assertNotNull(activeActivityIds);
+    assertEquals(1, activeActivityIds.size());
+
+    // when
+
+    // Delete the ProcessInstance in the sub process
+    runtimeService.deleteProcessInstance(taskInDoubleNestedSubProcess.getProcessInstanceId(), "Test cascading upstream deletion");
+
+
+    // then
+
+    // How many process Instances
+    instanceList = runtimeService.createProcessInstanceQuery().list();
+    assertNotNull(instanceList);
+    assertEquals(0, instanceList.size());
+
+    // How many sub tasks
+    taskList = taskService.createTaskQuery().list();
+    assertNotNull(taskList);
+    assertEquals(0, taskList.size());
+
+  }
 }

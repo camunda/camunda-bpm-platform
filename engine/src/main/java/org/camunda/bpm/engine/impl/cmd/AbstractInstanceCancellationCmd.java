@@ -42,11 +42,31 @@ public abstract class AbstractInstanceCancellationCmd extends AbstractProcessIns
     ExecutionEntity topmostCancellableExecution = sourceInstanceExecution;
     ExecutionEntity parentScopeExecution = (ExecutionEntity) topmostCancellableExecution.getParentScopeExecution(false);
 
+    // Check for super execution
+    if(parentScopeExecution == null) {
+      ExecutionEntity superExecution = topmostCancellableExecution.getSuperExecution();
+      if (superExecution != null) {
+        topmostCancellableExecution = superExecution;
+        parentScopeExecution = (ExecutionEntity) topmostCancellableExecution.getParentScopeExecution(false);
+      }
+
+    }
+
     // if topmostCancellableExecution's scope execution has no other non-event-scope children,
     // we have reached the correct execution
     while (parentScopeExecution != null && (parentScopeExecution.getNonEventScopeExecutions().size() <= 1)) {
       topmostCancellableExecution = parentScopeExecution;
       parentScopeExecution = (ExecutionEntity) topmostCancellableExecution.getParentScopeExecution(false);
+
+      // Check for super execution
+      if(parentScopeExecution == null) {
+        ExecutionEntity superExecution = topmostCancellableExecution.getSuperExecution();
+        if (superExecution != null) {
+          topmostCancellableExecution = superExecution;
+          parentScopeExecution = (ExecutionEntity) topmostCancellableExecution.getParentScopeExecution(false);
+        }
+
+      }
     }
 
     if (topmostCancellableExecution.isPreserveScope()) {
@@ -74,6 +94,9 @@ public abstract class AbstractInstanceCancellationCmd extends AbstractProcessIns
 
     // must be set due to deleteCascade behavior
     ActivityImpl activity = removedExecution.getActivity();
+    if (activity == null) {
+      return;
+    }
     ScopeImpl flowScope = activity.getFlowScope();
 
     PvmExecutionImpl scopeExecution = removedExecution.getParentScopeExecution(false);
