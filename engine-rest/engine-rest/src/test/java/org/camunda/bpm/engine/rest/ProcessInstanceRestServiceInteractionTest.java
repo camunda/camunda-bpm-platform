@@ -2440,19 +2440,17 @@ public class ProcessInstanceRestServiceInteractionTest extends
     messageBodyJson.put("processInstanceQuery", query);
     messageBodyJson.put("suspended", true);
 
-    String message = "Only one of processInstanceIds, processInstanceQuery or historicProcessInstanceQuery should be set to update the suspension state.";
 
     given()
       .contentType(ContentType.JSON)
       .body(messageBodyJson)
       .then()
       .expect()
-      .statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body("type", is(InvalidRequestException.class.getSimpleName()))
-      .body("message", is(message))
+      .statusCode(Status.NO_CONTENT.getStatusCode())
       .when()
       .put(PROCESS_INSTANCE_SUSPENDED_URL);
 
+    verify(mockUpdateProcessInstancesSuspensionStateBuilder).suspend();
   }
 
 
@@ -2673,19 +2671,18 @@ public class ProcessInstanceRestServiceInteractionTest extends
     messageBodyJson.put("processInstanceQuery", query);
     messageBodyJson.put("suspended", true);
 
-    String message = "Only one of processInstanceIds, processInstanceQuery or historicProcessInstanceQuery should be set to update the suspension state.";
-
+    when(mockUpdateProcessInstancesSuspensionStateBuilder.suspendAsync()).thenReturn(new BatchEntity());
     given()
       .contentType(ContentType.JSON)
       .body(messageBodyJson)
       .then()
       .expect()
-      .statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body("type", is(InvalidRequestException.class.getSimpleName()))
-      .body("message", is(message))
+      .statusCode(Status.OK.getStatusCode())
       .when()
       .post(PROCESS_INSTANCE_SUSPENDED_ASYNC_URL);
 
+    verify(mockUpdateSuspensionStateSelectBuilder).byProcessInstanceIds(ids);
+    verify(mockUpdateProcessInstancesSuspensionStateBuilder).suspendAsync();
   }
 
 

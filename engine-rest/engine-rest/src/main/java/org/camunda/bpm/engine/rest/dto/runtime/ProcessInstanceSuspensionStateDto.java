@@ -102,9 +102,6 @@ public class ProcessInstanceSuspensionStateDto extends SuspensionStateDto {
     } else if (params > 1) {
       String message = "Only one of processInstanceId, processDefinitionId or processDefinitionKey should be set to update the suspension state.";
       throw new InvalidRequestException(Status.BAD_REQUEST, message);
-    } else if (syncParams > 1) {
-      String message = "Only one of processInstanceIds, processInstanceQuery or historicProcessInstanceQuery should be set to update the suspension state.";
-      throw new InvalidRequestException(Status.BAD_REQUEST, message);
     } else if(params == 0 && syncParams == 0) {
       String message = "Either processInstanceId, processDefinitionId or processDefinitionKey should be set to update the suspension state.";
       throw new InvalidRequestException(Status.BAD_REQUEST, message);
@@ -137,9 +134,6 @@ public class ProcessInstanceSuspensionStateDto extends SuspensionStateDto {
     if (params == 0) {
        String message = "Either processInstanceIds, processInstanceQuery or historicProcessInstanceQuery should be set to update the suspension state.";
       throw new InvalidRequestException(Status.BAD_REQUEST, message);
-    } else if (params > 1) {
-      String message = "Only one of processInstanceIds, processInstanceQuery or historicProcessInstanceQuery should be set to update the suspension state.";
-      throw new InvalidRequestException(Status.BAD_REQUEST, message);
     }
 
     UpdateProcessInstancesSuspensionStateBuilder updateSuspensionStateBuilder = (UpdateProcessInstancesSuspensionStateBuilder) createUpdateSuspensionStateBuilder(engine);
@@ -170,13 +164,30 @@ public class ProcessInstanceSuspensionStateDto extends SuspensionStateDto {
       }
 
       return tenantBuilder;
-    } else if (processInstanceIds != null) {
-      return selectBuilder.byProcessInstanceIds(processInstanceIds);
-    } else if (processInstanceQuery != null) {
-      return selectBuilder.byProcessInstanceQuery(processInstanceQuery.toQuery(engine));
-    } else {
-      return selectBuilder.byHistoricProcessInstanceQuery(historicProcessInstanceQuery.toQuery(engine));
     }
+
+    UpdateProcessInstancesSuspensionStateBuilder groupBuilder = null;
+    if (processInstanceIds != null) {
+      groupBuilder = selectBuilder.byProcessInstanceIds(processInstanceIds);
+    }
+
+    if (processInstanceQuery != null) {
+      if (groupBuilder == null) {
+        groupBuilder = selectBuilder.byProcessInstanceQuery(processInstanceQuery.toQuery(engine));
+      } else {
+        groupBuilder.byProcessInstanceQuery(processInstanceQuery.toQuery(engine));
+      }
+    }
+
+    if (historicProcessInstanceQuery != null) {
+      if (groupBuilder == null) {
+        groupBuilder = selectBuilder.byHistoricProcessInstanceQuery(historicProcessInstanceQuery.toQuery(engine));
+      } else {
+        groupBuilder.byHistoricProcessInstanceQuery(historicProcessInstanceQuery.toQuery(engine));
+      }
+    }
+
+    return groupBuilder;
   }
 
 }
