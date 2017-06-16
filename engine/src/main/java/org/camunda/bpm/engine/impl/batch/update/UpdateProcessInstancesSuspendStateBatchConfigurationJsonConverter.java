@@ -19,6 +19,7 @@ import org.camunda.bpm.engine.impl.util.JsonUtil;
 import org.camunda.bpm.engine.impl.util.json.JSONObject;
 
 public class UpdateProcessInstancesSuspendStateBatchConfigurationJsonConverter extends JsonObjectConverter<UpdateProcessInstancesSuspendStateBatchConfiguration> {
+
   public static final UpdateProcessInstancesSuspendStateBatchConfigurationJsonConverter INSTANCE = new UpdateProcessInstancesSuspendStateBatchConfigurationJsonConverter();
 
   public static final String PROCESS_INSTANCE_IDS = "processInstanceIds";

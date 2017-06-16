@@ -32,7 +32,6 @@ import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
 public class UpdateProcessInstancesSuspendStateBatchCmd extends AbstractUpdateProcessInstancesSuspendStateCmd<Batch> {
 
-
   public UpdateProcessInstancesSuspendStateBatchCmd(CommandExecutor commandExecutor, UpdateProcessInstancesSuspensionStateBuilderImpl builder, boolean suspending) {
     super(commandExecutor, builder, suspending);
   }
@@ -69,7 +68,7 @@ public class UpdateProcessInstancesSuspendStateBatchCmd extends AbstractUpdatePr
     batch.setTotalJobs(calculateSize(processEngineConfiguration, (UpdateProcessInstancesSuspendStateBatchConfiguration) configuration));
     batch.setBatchJobsPerSeed(processEngineConfiguration.getBatchJobsPerSeed());
     batch.setInvocationsPerBatchJob(processEngineConfiguration.getInvocationsPerBatchJob());
-    batch.setConfigurationBytes(batchJobHandler.writeConfiguration((UpdateProcessInstancesSuspendStateBatchConfiguration)configuration));
+    batch.setConfigurationBytes(batchJobHandler.writeConfiguration(configuration));
     commandContext.getBatchManager().insert(batch);
 
     return batch;
@@ -94,4 +93,5 @@ public class UpdateProcessInstancesSuspendStateBatchCmd extends AbstractUpdatePr
   protected void checkAuthorizations(CommandContext commandContext) {
     commandContext.getAuthorizationManager().checkAuthorization(Permissions.CREATE, Resources.BATCH);
   }
+
 }

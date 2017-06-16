@@ -48,20 +48,16 @@ public class UpdateProcessInstancesSuspensionStateBuilderImpl implements UpdateP
     return this;
   }
 
-
-
   @Override
   public UpdateProcessInstancesSuspensionStateBuilder byProcessInstanceQuery(ProcessInstanceQuery processInstanceQuery) {
     this.processInstanceQuery = processInstanceQuery;
     return this;
-
   }
 
   @Override
   public UpdateProcessInstancesSuspensionStateBuilder byHistoricProcessInstanceQuery(HistoricProcessInstanceQuery historicProcessInstanceQuery) {
     this.historicProcessInstanceQuery = historicProcessInstanceQuery;
     return this;
-
   }
 
   @Override
@@ -82,7 +78,6 @@ public class UpdateProcessInstancesSuspensionStateBuilderImpl implements UpdateP
   @Override
   public Batch activateAsync() {
     return commandExecutor.execute(new UpdateProcessInstancesSuspendStateBatchCmd(commandExecutor, this, false));
-
   }
 
   public List<String> getProcessInstanceIds() {

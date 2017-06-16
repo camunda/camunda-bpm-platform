@@ -59,35 +59,24 @@ public class UpdateProcessInstanceSuspensionStateBuilderImpl implements UpdatePr
     this(null);
   }
 
-
-
-
   @Override
   public UpdateProcessInstancesSuspensionStateBuilder byProcessInstanceIds(List<String> processInstanceIds){
-    UpdateProcessInstancesSuspensionStateBuilder builder = new UpdateProcessInstancesSuspensionStateBuilderImpl(commandExecutor)
-      .byProcessInstanceIds(processInstanceIds);
-    return builder;
+    return new UpdateProcessInstancesSuspensionStateBuilderImpl(commandExecutor).byProcessInstanceIds(processInstanceIds);
   }
 
   @Override
   public UpdateProcessInstancesSuspensionStateBuilder byProcessInstanceIds(String... processInstanceIds) {
-    UpdateProcessInstancesSuspensionStateBuilder builder = new UpdateProcessInstancesSuspensionStateBuilderImpl(commandExecutor)
-      .byProcessInstanceIds(processInstanceIds);
-    return builder;
+    return new UpdateProcessInstancesSuspensionStateBuilderImpl(commandExecutor).byProcessInstanceIds(processInstanceIds);
   }
 
   @Override
   public UpdateProcessInstancesSuspensionStateBuilder byProcessInstanceQuery(ProcessInstanceQuery processInstanceQuery) {
-    UpdateProcessInstancesSuspensionStateBuilder builder = new UpdateProcessInstancesSuspensionStateBuilderImpl(commandExecutor)
-      .byProcessInstanceQuery(processInstanceQuery);
-    return builder;
+    return new UpdateProcessInstancesSuspensionStateBuilderImpl(commandExecutor).byProcessInstanceQuery(processInstanceQuery);
   }
 
   @Override
   public UpdateProcessInstancesSuspensionStateBuilder byHistoricProcessInstanceQuery(HistoricProcessInstanceQuery historicProcessInstanceQuery) {
-    UpdateProcessInstancesSuspensionStateBuilder builder = new UpdateProcessInstancesSuspensionStateBuilderImpl(commandExecutor)
-      .byHistoricProcessInstanceQuery(historicProcessInstanceQuery);
-    return builder;
+    return new UpdateProcessInstancesSuspensionStateBuilderImpl(commandExecutor).byHistoricProcessInstanceQuery(historicProcessInstanceQuery);
   }
 
 

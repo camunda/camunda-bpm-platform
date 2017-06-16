@@ -12,15 +12,13 @@
  */
 package org.camunda.bpm.engine.runtime;
 
-import java.util.List;
 import org.camunda.bpm.engine.AuthorizationException;
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
-import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 
-public interface UpdateProcessInstancesSuspensionStateBuilder extends UpdateProcessInstanceSuspensionStateBuilder, UpdateProcessInstancesRequest{
+public interface UpdateProcessInstancesSuspensionStateBuilder extends UpdateProcessInstanceSuspensionStateBuilder, UpdateProcessInstancesRequest {
+
   /**
    * <p>
    * Activates the provided process instances asynchronously.

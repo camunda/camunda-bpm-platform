@@ -41,7 +41,6 @@ import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstantiationBuilder;
 import org.camunda.bpm.engine.runtime.RestartProcessInstanceBuilder;
 import org.camunda.bpm.engine.runtime.SignalEventReceivedBuilder;
-import org.camunda.bpm.engine.runtime.UpdateProcessInstancesSuspensionStateBuilder;
 import org.camunda.bpm.engine.runtime.UpdateProcessInstanceSuspensionStateBuilder;
 import org.camunda.bpm.engine.runtime.UpdateProcessInstanceSuspensionStateSelectBuilder;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;

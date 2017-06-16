@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 
 public abstract class AbstractUpdateProcessInstancesSuspendStateCmd<T> implements Command<T> {
+
   protected UpdateProcessInstancesSuspensionStateBuilderImpl builder;
   protected CommandExecutor commandExecutor;
   protected boolean suspending;
@@ -35,7 +36,6 @@ public abstract class AbstractUpdateProcessInstancesSuspendStateCmd<T> implement
     this.builder = builder;
     this.suspending = suspending;
   }
-
 
   protected Collection<String> collectProcessInstanceIds() {
     HashSet<String> allProcessInstanceIds = new HashSet<String>();
@@ -57,7 +57,6 @@ public abstract class AbstractUpdateProcessInstancesSuspendStateCmd<T> implement
 
     return allProcessInstanceIds;
   }
-
 
   protected void writeUserOperationLog(CommandContext commandContext,
                                        int numInstances,

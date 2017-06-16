@@ -72,7 +72,6 @@ public class UpdateProcessInstancesSuspendStateJobHandler extends AbstractBatchJ
       commandContext.enableUserOperationLog();
       commandContext.setRestrictUserOperationLogToAuthenticatedUsers(initialLegacyRestrictions);
     }
-
   }
 
 }

@@ -22,13 +22,9 @@ import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
 public class UpdateProcessInstancesSuspendStateCmd extends AbstractUpdateProcessInstancesSuspendStateCmd<Void> {
 
-
   public UpdateProcessInstancesSuspendStateCmd(CommandExecutor commandExecutor, UpdateProcessInstancesSuspensionStateBuilderImpl builder, boolean suspendstate) {
     super(commandExecutor, builder, suspendstate);
   }
-
-
-
 
   public Void execute(CommandContext commandContext) {
 
@@ -51,6 +47,7 @@ public class UpdateProcessInstancesSuspendStateCmd extends AbstractUpdateProcess
         suspensionStateBuilder.byProcessInstanceId(processInstanceId).activate();
       }
     }
+
     return null;
   }
 
