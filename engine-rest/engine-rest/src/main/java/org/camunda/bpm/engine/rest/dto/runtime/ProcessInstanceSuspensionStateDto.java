@@ -109,11 +109,11 @@ public class ProcessInstanceSuspensionStateDto extends SuspensionStateDto {
 
     UpdateProcessInstanceSuspensionStateBuilder updateSuspensionStateBuilder = createUpdateSuspensionStateBuilder(engine);
     if (syncParams > 0) {
-      UpdateProcessInstancesSuspensionStateBuilder updateProcessInstancesSuspensionStateBuilder = (UpdateProcessInstancesSuspensionStateBuilder) updateSuspensionStateBuilder;
+      //UpdateProcessInstancesSuspensionStateBuilder updateProcessInstancesSuspensionStateBuilder = (UpdateProcessInstancesSuspensionStateBuilder) updateSuspensionStateBuilder;
       if (getSuspended()) {
-        updateProcessInstancesSuspensionStateBuilder.suspend();
+        ((UpdateProcessInstancesSuspensionStateBuilder)updateSuspensionStateBuilder).suspend();
       } else {
-        updateProcessInstancesSuspensionStateBuilder.activate();
+        ((UpdateProcessInstancesSuspensionStateBuilder)updateSuspensionStateBuilder).activate();
       }
     } else {
 

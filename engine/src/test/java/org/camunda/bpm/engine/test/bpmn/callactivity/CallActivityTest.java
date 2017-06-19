@@ -1509,14 +1509,6 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
     assertNotNull(instanceList);
     assertEquals(2, instanceList.size());
 
-    List<Task> taskList = taskService.createTaskQuery().list();
-    assertNotNull(taskList);
-    assertEquals(1, taskList.size());
-
-    List<String> activeActivityIds = runtimeService.getActiveActivityIds(processInstance.getProcessInstanceId());
-    assertNotNull(activeActivityIds);
-    assertEquals(1, activeActivityIds.size());
-
 
     // when
     // Delete the ProcessInstance in the sub process
@@ -1528,15 +1520,14 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
     instanceList = runtimeService.createProcessInstanceQuery().list();
     assertNotNull(instanceList);
     assertEquals(0, instanceList.size());
-
-    // How many sub tasks
-    taskList = taskService.createTaskQuery().list();
-    assertNotNull(taskList);
-    assertEquals(0, taskList.size());
   }
 
   /**
    * Test case for checking deletion of process instances in call activity subprocesses
+   *
+   * Checks that deletion of process Instance will resepct other process instances in the scope
+   * and stop its upward deletion propagation will stop at this point
+   *
    */
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testTwoSubProcesses.bpmn20.xml",
@@ -1566,11 +1557,6 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
     assertNotNull(instanceList);
     assertEquals(2, instanceList.size());
 
-    // How many sub tasks
-    taskList = taskService.createTaskQuery().list();
-    assertNotNull(taskList);
-    assertEquals(1, taskList.size());
-
     // How man call activities
     activeActivityIds = runtimeService.getActiveActivityIds(processInstance.getProcessInstanceId());
     assertNotNull(activeActivityIds);
@@ -1578,8 +1564,11 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
   }
 
   /**
-  * Test case for checking deletion of process instances in nested call activity subprocesses
-  */
+   * Test case for checking deletion of process instances in nested call activity subprocesses
+   *
+   * Checking that nested call activities will propagate upward over multiple nested levels
+   *
+   */
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testCallSimpleSubProcess.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testNestedCallActivity.bpmn20.xml",
@@ -1605,38 +1594,30 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
     assertNotNull(instanceList);
     assertEquals(3, instanceList.size());
 
-
-    List<Task> taskList = taskService.createTaskQuery().list();
-    assertNotNull(taskList);
-    assertEquals(1, taskList.size());
-
-    List<String> activeActivityIds = runtimeService.getActiveActivityIds(processInstance.getProcessInstanceId());
-    assertNotNull(activeActivityIds);
-    assertEquals(1, activeActivityIds.size());
-
-
     // when
-
     // Delete the ProcessInstance in the sub process
     runtimeService.deleteProcessInstance(taskInNestedSubProcess.getProcessInstanceId(), "Test cascading upstream deletion");
 
 
     // then
-
     // How many process Instances
     instanceList = runtimeService.createProcessInstanceQuery().list();
     assertNotNull(instanceList);
     assertEquals(0, instanceList.size());
 
-    // How many sub tasks
-    taskList = taskService.createTaskQuery().list();
-    assertNotNull(taskList);
-    assertEquals(0, taskList.size());
   }
 
   /**
-  * Test case for checking deletion of process instances in nested call activity subprocesses
-  */
+   * Test case for checking deletion of process instances in nested call activity subprocesses
+   *
+   * The test defines a process waiting on three nested call activities to complete
+   *
+   * At each nested level there is only one process instance, which is waiting on the next level to complete
+   *
+   * When we delete the process instance of the most inner call activity sub process the expected behaviour is that
+   * the delete will propagate upward and delete all process instances.
+   *
+   */
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testCallSimpleSubProcess.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testNestedCallActivity.bpmn20.xml",
@@ -1669,31 +1650,16 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
     assertNotNull(instanceList);
     assertEquals(4, instanceList.size());
 
-    List<Task> taskList = taskService.createTaskQuery().list();
-    assertNotNull(taskList);
-    assertEquals(1, taskList.size());
-
-    List<String> activeActivityIds = runtimeService.getActiveActivityIds(processInstance.getProcessInstanceId());
-    assertNotNull(activeActivityIds);
-    assertEquals(1, activeActivityIds.size());
-
     // when
-
     // Delete the ProcessInstance in the sub process
     runtimeService.deleteProcessInstance(taskInDoubleNestedSubProcess.getProcessInstanceId(), "Test cascading upstream deletion");
 
 
     // then
-
     // How many process Instances
     instanceList = runtimeService.createProcessInstanceQuery().list();
     assertNotNull(instanceList);
     assertEquals(0, instanceList.size());
-
-    // How many sub tasks
-    taskList = taskService.createTaskQuery().list();
-    assertNotNull(taskList);
-    assertEquals(0, taskList.size());
 
   }
 }

@@ -1,5 +1,4 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/* Licensed under the Apache License, Version 2.0 (the "License"); * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
@@ -66,6 +65,9 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
 
   protected static final String CALL_ACTIVITY_PROCESS = "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testCallSimpleSubProcess.bpmn20.xml";
   protected static final String SIMPLE_SUBPROCESS = "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml";
+  protected static final String TWO_SUBPROCESSES = "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testTwoSubProcesses.bpmn20.xml";
+  protected static final String NESTED_CALL_ACTIVITY = "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testNestedCallActivity.bpmn20.xml";
+
 
 
 
@@ -1544,6 +1546,9 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
 
   /**
    * Test case for checking cancellation of process instances in call activity subprocesses
+   *
+   * Test should propagate upward and destroy all process instances
+   *
    */
   @Deployment(resources = {
     SIMPLE_SUBPROCESS,
@@ -1567,15 +1572,6 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
     assertNotNull(instanceList);
     assertEquals(2, instanceList.size());
 
-    List<Task> taskList = taskService.createTaskQuery().list();
-    assertNotNull(taskList);
-    assertEquals(1, taskList.size());
-
-    List<String> activeActivityIds = runtimeService.getActiveActivityIds(taskInSubProcess.getProcessInstanceId());
-    assertNotNull(activeActivityIds);
-    assertEquals(1, activeActivityIds.size());
-
-
     ActivityInstance tree = runtimeService.getActivityInstance(taskInSubProcess.getProcessInstanceId());
     // when
     runtimeService
@@ -1591,15 +1587,106 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
     instanceList = runtimeService.createProcessInstanceQuery().list();
     assertNotNull(instanceList);
     assertEquals(0, instanceList.size());
+  }
 
-    // How many sub tasks
-    taskList = taskService.createTaskQuery().list();
+
+
+  /**
+   * Test case for checking cancellation of process instances in call activity subprocesses
+   *
+   * Test that upward cancellation respects other process instances
+   *
+   */
+  @Deployment(resources = {
+    SIMPLE_SUBPROCESS,
+    TWO_SUBPROCESSES
+  })
+  public void testSingleCancellationWithTwoSubProcess() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callTwoSubProcesses");
+    List<ProcessInstance> instanceList = runtimeService.createProcessInstanceQuery().list();
+    assertNotNull(instanceList);
+    assertEquals(3, instanceList.size());
+
+    List<Task> taskList = taskService.createTaskQuery().list();
     assertNotNull(taskList);
-    assertEquals(0, taskList.size());
+    assertEquals(2, taskList.size());
+
+    List<String> activeActivityIds = runtimeService.getActiveActivityIds(processInstance.getProcessInstanceId());
+    assertNotNull(activeActivityIds);
+    assertEquals(2, activeActivityIds.size());
 
 
+    ActivityInstance tree = runtimeService.getActivityInstance(taskList.get(0).getProcessInstanceId());
+    // when
+    runtimeService
+      .createProcessInstanceModification(taskList.get(0).getProcessInstanceId())
+      .cancelActivityInstance(getInstanceIdForActivity(tree, "task"))
+      .execute();
 
 
+    // then
+    //assertProcessEnded(processInstanceId);
+
+    // How many process Instances
+    instanceList = runtimeService.createProcessInstanceQuery().list();
+    assertNotNull(instanceList);
+    assertEquals(2, instanceList.size());
+
+    // How man call activities
+    activeActivityIds = runtimeService.getActiveActivityIds(processInstance.getProcessInstanceId());
+    assertNotNull(activeActivityIds);
+    assertEquals(1, activeActivityIds.size());
+  }
+
+  /**
+   * Test case for checking deletion of process instances in nested call activity subprocesses
+   *
+   * Checking that nested call activities will propagate upward over multiple nested levels
+   *
+   */
+  @Deployment(resources = {
+    SIMPLE_SUBPROCESS,
+    NESTED_CALL_ACTIVITY,
+    CALL_ACTIVITY_PROCESS
+  })
+  public void testCancellationMultilevelProcessInstanceInCallActivity() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nestedCallActivity");
+
+    // one task in the subprocess should be active after starting the process instance
+    TaskQuery taskQuery = taskService.createTaskQuery();
+    Task taskBeforeSubProcess = taskQuery.singleResult();
+
+    // Completing the task continues the process which leads to calling the subprocess
+    taskService.complete(taskBeforeSubProcess.getId());
+    Task taskInSubProcess = taskQuery.singleResult();
+
+    // Completing the task continues the sub process which leads to calling the deeper subprocess
+    taskService.complete(taskInSubProcess.getId());
+    Task taskInNestedSubProcess = taskQuery.singleResult();
+
+    List<ProcessInstance> instanceList = runtimeService.createProcessInstanceQuery().list();
+    assertNotNull(instanceList);
+    assertEquals(3, instanceList.size());
+
+    ActivityInstance tree = runtimeService.getActivityInstance(taskInNestedSubProcess.getProcessInstanceId());
+
+    // when
+    runtimeService
+      .createProcessInstanceModification(taskInNestedSubProcess.getProcessInstanceId())
+      .cancelActivityInstance(getInstanceIdForActivity(tree, "task"))
+      .execute();
+
+
+    // then
+
+    // How many process Instances
+    instanceList = runtimeService.createProcessInstanceQuery().list();
+    assertNotNull(instanceList);
+    assertEquals(0, instanceList.size());
 
   }
+
+
 }
