@@ -574,6 +574,8 @@ public interface RuntimeService {
   /**
    * Delete an existing runtime process instance.
    *
+   * Deletion propagates upward as far as necessary.
+   *
    * @param processInstanceId id of process instance to delete, cannot be null.
    * @param deleteReason reason for deleting, which will be stored in the history. Can be null.
    *
@@ -587,6 +589,8 @@ public interface RuntimeService {
 
   /**
    * Delete an existing runtime process instances asynchronously using Batch operation.
+   *
+   * Deletion propagates upward as far as necessary.
    *
    * @param processInstanceIds id's of process instances to delete, cannot be null if processInstanceQuery is null.
    * @param processInstanceQuery query that will be used to fetch affected process instances.
@@ -605,6 +609,8 @@ public interface RuntimeService {
   /**
    * Delete an existing runtime process instances asynchronously using Batch operation.
    *
+   * Deletion propagates upward as far as necessary.
+   *
    * @param processInstanceIds id's of process instances to delete, cannot be null if processInstanceQuery is null.
    * @param processInstanceQuery query that will be used to fetch affected process instances.
    *                             Cannot be null if processInstanceIds are null.
@@ -622,6 +628,8 @@ public interface RuntimeService {
   /**
    * Delete an existing runtime process instances asynchronously using Batch operation.
    *
+   * Deletion propagates upward as far as necessary.
+   *
    * @param processInstanceQuery query that will be used to fetch affected process instances.
    *                             Cannot be null.
    * @param deleteReason reason for deleting, which will be stored in the history. Can be null.
@@ -637,6 +645,8 @@ public interface RuntimeService {
 
   /**
    * Delete an existing runtime process instances asynchronously using Batch operation.
+   *
+   * Deletion propagates upward as far as necessary.
    *
    * If both process instances list and query are provided, process instances containing in both sets
    * will be deleted.
@@ -656,6 +666,8 @@ public interface RuntimeService {
   /**
    * Delete an existing runtime process instance.
    *
+   * Deletion propagates upward as far as necessary.
+   *
    * @param processInstanceId id of process instance to delete, cannot be null.
    * @param deleteReason reason for deleting, which will be stored in the history. Can be null.
    * @param skipCustomListeners if true, only the built-in {@link ExecutionListener}s
@@ -671,6 +683,8 @@ public interface RuntimeService {
 
   /**
    * Delete an existing runtime process instance.
+   *
+   * Deletion propagates upward as far as necessary.
    *
    * @param processInstanceId id of process instance to delete, cannot be null.
    * @param deleteReason reason for deleting, which will be stored in the history. Can be null.
@@ -692,6 +706,8 @@ public interface RuntimeService {
   /**
    * Delete existing runtime process instances.
    *
+   * Deletion propagates upward as far as necessary.
+   *
    * @param processInstanceIds ids of process instance to delete, cannot be null.
    * @param deleteReason reason for deleting, which will be stored in the history. Can be null.
    * @param skipCustomListeners if true, only the built-in {@link ExecutionListener}s
@@ -710,6 +726,8 @@ public interface RuntimeService {
 
   /**
    * Delete an existing runtime process instance.
+   *
+   * Deletion propagates upward as far as necessary.
    *
    * @param processInstanceId id of process instance to delete, cannot be null.
    * @param deleteReason reason for deleting, which will be stored in the history. Can be null.
@@ -731,6 +749,8 @@ public interface RuntimeService {
   /**
    * Finds the activity ids for all executions that are waiting in activities.
    * This is a list because a single activity can be active multiple times.
+   *
+   * Deletion propagates upward as far as necessary.
    *
    * @param executionId id of the process instance or the execution, cannot be null.
    *

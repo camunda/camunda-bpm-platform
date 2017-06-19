@@ -82,6 +82,9 @@ public interface ProcessInstanceModificationBuilder extends
    * <p>Cancel an activity instance in a process. If this instance has child activity instances
    * (e.g. in a subprocess instance), these children, their grandchildren, etc. are cancelled as well.</p>
    *
+   * <p>Process instance cancellation will propagate upward, removing any parent process instances that are
+   * only waiting on the cancelled process to complete.</p>
+   *
    * @param activityInstanceId the id of the activity instance to cancel
    */
   ProcessInstanceModificationBuilder cancelActivityInstance(String activityInstanceId);
