@@ -14,10 +14,12 @@
 package org.camunda.bpm.engine.test.api.task;
 
 import org.camunda.bpm.engine.CaseService;
+import org.camunda.bpm.engine.FilterService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.TaskQueryImpl;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
@@ -49,6 +51,7 @@ public class TaskQueryOrTest {
   protected TaskService taskService;
   protected CaseService caseService;
   protected RepositoryService repositoryService;
+  protected FilterService filterService;
 
   @Before
   public void init() {
@@ -56,6 +59,7 @@ public class TaskQueryOrTest {
     taskService = rule.getTaskService();
     caseService = rule.getCaseService();
     repositoryService = rule.getRepositoryService();
+    filterService = rule.getFilterService();
   }
 
   @After
@@ -564,6 +568,137 @@ public class TaskQueryOrTest {
 
     // then
     assertEquals(2, tasks.size());
+  }
+
+  @Test
+  public void shouldReturnTasksByExtendingQuery_OrInExtendingQuery() {
+    // given
+    TaskQuery extendedQuery = taskService.createTaskQuery()
+      .taskCandidateGroup("sales");
+
+    TaskQuery extendingQuery = taskService.createTaskQuery()
+      .startOr()
+        .taskName("aTaskName")
+        .taskNameLike("anotherTaskName")
+      .endOr();
+
+    // when
+    TaskQueryImpl result =  (TaskQueryImpl)((TaskQueryImpl)extendedQuery).extend(extendingQuery);
+
+    // then
+    assertEquals("aTaskName", result.getOrQuery().getName());
+    assertEquals("anotherTaskName", result.getOrQuery().getNameLike());
+    assertEquals("sales", result.getCandidateGroup());
+  }
+
+  @Test
+  public void shouldReturnTasksByExtendingQuery_OrInExtendedQuery() {
+    // given
+    TaskQuery extendedQuery = taskService.createTaskQuery()
+      .startOr()
+        .taskName("aTaskName")
+        .taskNameLike("anotherTaskName")
+      .endOr();
+
+    TaskQuery extendingQuery = taskService.createTaskQuery()
+      .taskCandidateGroup("sales");
+
+    // when
+    TaskQueryImpl result =  (TaskQueryImpl)((TaskQueryImpl)extendedQuery).extend(extendingQuery);
+
+    // then
+    assertEquals("aTaskName", result.getOrQuery().getName());
+    assertEquals("anotherTaskName", result.getOrQuery().getNameLike());
+    assertEquals("sales", result.getCandidateGroup());
+  }
+
+  @Test
+  public void shouldReturnTasksByExtendingQuery_OrInBothExtendedAndExtendingQuery() {
+    // given
+    TaskQuery extendedQuery = taskService.createTaskQuery()
+      .startOr()
+        .taskName("aTaskName")
+        .taskNameLike("anotherTaskName")
+      .endOr();
+
+    TaskQuery extendingQuery = taskService.createTaskQuery()
+      .startOr()
+        .taskCandidateGroup("aCandidateGroup")
+        .taskCandidateUser("aCandidateUser")
+      .endOr();
+
+    // when
+    TaskQueryImpl result =  (TaskQueryImpl)((TaskQueryImpl)extendedQuery).extend(extendingQuery);
+
+    // then
+    assertEquals("aTaskName", result.getOrQuery().getName());
+    assertEquals("anotherTaskName", result.getOrQuery().getNameLike());
+    assertEquals("aCandidateGroup", result.getOrQuery().getCandidateGroup());
+    assertEquals("aCandidateUser", result.getOrQuery().getCandidateUser());
+  }
+
+  @Test
+  public void shouldReturnTasksWithVariablesByExtendingQuery_OrInExtendingQuery() {
+    // given
+    TaskQuery extendedQuery = taskService.createTaskQuery()
+      .taskVariableValueEquals("aLongValue", 789L)
+      .taskVariableValueGreaterThan("anEvenLongerValue", 999L);
+
+    TaskQuery extendingQuery = taskService.createTaskQuery()
+      .startOr()
+        .taskVariableValueEquals("anotherLongValue", 789L)
+        .taskVariableValueGreaterThan("anotherEvenLongerValue", 999L)
+      .endOr();
+
+    // when
+    TaskQueryImpl result =  (TaskQueryImpl)((TaskQueryImpl)extendedQuery).extend(extendingQuery);
+
+    // then
+    assertEquals(2, result.getVariables().size());
+    assertEquals(2, result.getOrQuery().getVariables().size());
+  }
+
+  @Test
+  public void shouldReturnTasksWithVariablesByExtendingQuery_OrInExtendedQuery() {
+    // given
+    TaskQuery extendedQuery = taskService.createTaskQuery()
+      .startOr()
+        .taskVariableValueEquals("aLongValue", 789L)
+        .taskVariableValueGreaterThan("anEvenLongerValue", 999L)
+      .endOr();
+
+    TaskQuery extendingQuery = taskService.createTaskQuery()
+      .taskVariableValueEquals("anotherLongValue", 789L)
+      .taskVariableValueGreaterThan("anotherEvenLongerValue", 999L);
+
+    // when
+    TaskQueryImpl result = (TaskQueryImpl)((TaskQueryImpl)extendedQuery).extend(extendingQuery);
+
+    // then
+    assertEquals(2, result.getVariables().size());
+    assertEquals(2, result.getOrQuery().getVariables().size());
+  }
+
+  @Test
+  public void shouldReturnTasksWithVariablesByExtendingQuery_OrInBothExtendedAndExtendingQuery() {
+    // given
+    TaskQuery extendedQuery = taskService.createTaskQuery()
+      .startOr()
+        .taskVariableValueEquals("aLongValue", 789L)
+        .taskVariableValueGreaterThan("anEvenLongerValue", 999L)
+      .endOr();
+
+    TaskQuery extendingQuery = taskService.createTaskQuery()
+      .startOr()
+        .taskVariableValueEquals("anotherLongValue", 789L)
+        .taskVariableValueGreaterThan("anotherEvenLongerValue", 999L)
+      .endOr();
+
+    // when
+    TaskQueryImpl result =  (TaskQueryImpl)((TaskQueryImpl)extendedQuery).extend(extendingQuery);
+
+    // then
+    assertEquals(4, result.getOrQuery().getVariables().size());
   }
 
 }

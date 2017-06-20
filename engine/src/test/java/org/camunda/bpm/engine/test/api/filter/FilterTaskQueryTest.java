@@ -1197,6 +1197,113 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     runtimeService.deleteProcessInstance(instance3.getId(), null);
   }
 
+  public void testExtendTaskQuery_ORInExtendingQuery() {
+    // given
+    Task task1 = taskService.newTask();
+    task1.setName("taskForOr1");
+    taskService.saveTask(task1);
+
+    Task task2 = taskService.newTask();
+    task2.setName("taskForOr2");
+    taskService.saveTask(task2);
+
+    Task task3 = taskService.newTask();
+    task3.setName("taskForOr3");
+    taskService.saveTask(task3);
+
+    // when
+    TaskQuery extendedQuery = taskService.createTaskQuery()
+      .taskNameLike("taskForOr%");
+
+    Filter extendedFilter = filterService.newTaskFilter("extendedOrFilter");
+    extendedFilter.setQuery(extendedQuery);
+    filterService.saveFilter(extendedFilter);
+
+    TaskQuery extendingQuery = taskService.createTaskQuery()
+      .startOr()
+        .taskName("taskForOr1")
+        .taskNameLike("taskForOr2")
+      .endOr();
+
+    // then
+    assertEquals(2, filterService.list(extendedFilter.getId(), extendingQuery).size());
+  }
+
+  public void testExtendTaskQuery_ORInExtendedQuery() {
+    // given
+    Task task1 = taskService.newTask();
+    task1.setName("taskForOr1");
+    taskService.saveTask(task1);
+
+    Task task2 = taskService.newTask();
+    task2.setName("taskForOr2");
+    taskService.saveTask(task2);
+
+    Task task3 = taskService.newTask();
+    task3.setName("taskForOr3");
+    taskService.saveTask(task3);
+
+    // when
+    TaskQuery extendedQuery = taskService.createTaskQuery()
+      .startOr()
+        .taskName("taskForOr1")
+        .taskNameLike("taskForOr2")
+      .endOr();
+
+    Filter extendedFilter = filterService.newTaskFilter("extendedOrFilter");
+    extendedFilter.setQuery(extendedQuery);
+    filterService.saveFilter(extendedFilter);
+
+    TaskQuery extendingQuery = taskService.createTaskQuery()
+      .taskNameLike("taskForOr%");
+
+    // then
+    assertEquals(2, filterService.list(extendedFilter.getId(), extendingQuery).size());
+  }
+
+  public void testExtendTaskQuery_ORInBothExtendedAndExtendingQuery() {
+    // given
+    Task task1 = taskService.newTask();
+    task1.setName("taskForOr1");
+    taskService.saveTask(task1);
+
+    Task task2 = taskService.newTask();
+    task2.setName("taskForOr2");
+    taskService.saveTask(task2);
+
+    Task task3 = taskService.newTask();
+    task3.setDescription("aTaskDescription");
+    taskService.saveTask(task3);
+
+    Task task4 = taskService.newTask();
+    task4.setDescription("anotherTaskDescription");
+    taskService.saveTask(task4);
+
+    // when
+    TaskQuery extendedQuery = taskService.createTaskQuery()
+      .startOr()
+        .taskName("taskForOr1")
+        .taskNameLike("taskForOr2")
+      .endOr();
+
+    assertEquals(2, extendedQuery.count());
+
+    Filter extendedFilter = filterService.newTaskFilter("extendedOrFilter");
+    extendedFilter.setQuery(extendedQuery);
+    filterService.saveFilter(extendedFilter);
+
+    TaskQuery extendingQuery = taskService.createTaskQuery()
+      .startOr()
+        .taskDescription("aTaskDescription")
+        .taskDescriptionLike("anotherTaskDescription")
+      .endOr();
+
+    assertEquals(2, extendingQuery.count());
+
+    // then
+    assertEquals(4, filterService.list(extendedFilter.getId(), extendingQuery).size());
+  }
+
   protected void saveQuery(Query query) {
     filter.setQuery(query);
     filterService.saveFilter(filter);

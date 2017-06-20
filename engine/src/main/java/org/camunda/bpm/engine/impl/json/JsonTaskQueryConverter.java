@@ -111,6 +111,7 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
   public static final String TENANT_IDS = "tenantIds";
   public static final String WITHOUT_TENANT_ID = "withoutTenantId";
   public static final String ORDERING_PROPERTIES = "orderingProperties";
+  public static final String OR_QUERY = "orQuery";
 
   /**
    * Exists for backwards compatibility with 7.2; deprecated since 7.3
@@ -188,6 +189,10 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     addField(json, CASE_EXECUTION_ID, query.getCaseExecutionId());
     addTenantIdFields(json, query);
 
+    if (query.getOrQuery() != null && query.getOrQuery().getIsOrQueryActive() && query.getOrQuery() != query) {
+      addField(json, OR_QUERY, toJsonObject(query.getOrQuery()));
+    }
+
     if (query.getOrderingProperties() != null && !query.getOrderingProperties().isEmpty()) {
       addField(json, ORDERING_PROPERTIES,
           JsonQueryOrderingPropertyConverter.ARRAY_CONVERTER.toJsonArray(query.getOrderingProperties()));
@@ -252,8 +257,18 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
 
   @Override
   public TaskQuery toObject(JSONObject json) {
+    return toObject(json, false);
+  }
+
+  public TaskQuery toObject(JSONObject json, boolean isOrQuery) {
     TaskQueryImpl query = new TaskQueryImpl();
 
+    if (isOrQuery) {
+      query.setOrQueryActive();
+    }
+    if (json.has(OR_QUERY)) {
+      query.setOrQuery((TaskQueryImpl) toObject(json.getJSONObject(OR_QUERY), true));
+    }
     if (json.has(TASK_ID)) {
       query.taskId(json.getString(TASK_ID));
     }
