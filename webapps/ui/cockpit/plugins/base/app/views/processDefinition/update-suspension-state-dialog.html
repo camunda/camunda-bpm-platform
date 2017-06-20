@@ -83,27 +83,27 @@
               Delayed
             </label>
           </div>
-
+        </div>
+        <div class="form-group"
+             ng-show="!data.executeImmediately">
           <label class="control-label col-xs-4"
-                 for="executionDateValue"
-                 ng-show="!data.executeImmediately">
+                 for="executionDateValue">
             Schedule at
           </label>
 
-          <div class="col-xs-8"
-               ng-show="!data.executeImmediately">
+          <div class="col-xs-8">
             <input date
                    name="executionDateValue"
                    ng-model="data.executionDate"
+                   class="form-control"
                    type="text"
                    required />
 
             <p class="invalid"
                ng-show="this.updateSuspensionStateForm.executionDateValue.$error.date">
-              Supported pattern 'yyyy-MM-ddTHH:mm:ss'.
+              Supported pattern 'yyyy-MM-ddTHH:mm:ss.SSSZ'.
             </p>
           </div>
-
         </div><!-- /.form-group -->
 
       </fieldset>

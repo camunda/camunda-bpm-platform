@@ -85,7 +85,7 @@ module.exports = function(pluginDependencies) {
         monthName: 'MMMM',
         day: 'DD',
         abbr: 'lll',
-        normal: 'YYYY-MM-DD[T]HH:mm:ss', // yyyy-MM-dd'T'HH:mm:ss => 2013-01-23T14:42:45
+        normal: 'YYYY-MM-DD[T]HH:mm:ss.000ZZ', // yyyy-MM-dd'T'HH:mm:ss.000Z => 2013-01-23T14:42:45.000+0200
         long: 'LLLL',
         short: 'LL'
       };

@@ -83,8 +83,8 @@ describe('Admin system Spec', function() {
       systemPage.executionMetrics.startDateField().clear();
       systemPage.executionMetrics.endDateField().clear();
 
-      systemPage.executionMetrics.startDateField('2014-01-01T00:00:00');
-      systemPage.executionMetrics.endDateField('2014-12-31T23:59:59');
+      systemPage.executionMetrics.startDateField('2014-01-01T00:00:00.000+0200');
+      systemPage.executionMetrics.endDateField('2014-12-31T23:59:59.000+0200');
       systemPage.executionMetrics.refreshButton().click();
 
       // then

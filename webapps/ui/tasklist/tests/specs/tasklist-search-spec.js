@@ -68,7 +68,7 @@ describe('Tasklist Search', function() {
       it('should add Date search and find one task', function() {
 
         // when
-        page.taskList.taskSearch.createSearch('Task Variable', 'testDate', 'before', '2013-11-30T10:03:00');
+        page.taskList.taskSearch.createSearch('Task Variable', 'testDate', 'before', '2013-11-30T10:03:00.000+0200');
 
         // then
         expect(page.taskList.taskList().count()).to.eventually.eql(1);

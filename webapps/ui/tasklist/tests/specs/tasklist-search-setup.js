@@ -93,13 +93,13 @@ module.exports = {
       {
         id: '1',
         varId: 'testDate',
-        value: '2013-11-30T10:03:01',
+        value: '2013-11-30T10:03:01.000+0200',
         type: 'Date'
       },
       {
         id: '2',
         varId: 'testDate',
-        value: '2013-11-30T10:03:00',
+        value: '2013-11-30T10:03:00.000+0200',
         type: 'Date'
       },
       {
@@ -116,7 +116,7 @@ module.exports = {
       }])
 
     ),
-    
+
     multiTenancySetup:
 
       combine(

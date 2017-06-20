@@ -8,9 +8,6 @@ var angular = require('camunda-commons-ui/vendor/angular'),
   /* directives */
     camTasklistTasks = require('./directives/cam-tasklist-tasks'),
 
-  /* filters */
-    camQueryComponent = require('./filters/cam-query-component'),
-
   /* plugins */
     camTasklistSearchPlugin = require('./plugins/cam-tasklist-search-plugin');
 
@@ -23,9 +20,6 @@ ngModule.controller('camListCtrl', camTasklistListCtrl);
 
   /* directives */
 ngModule.directive('camTasks', camTasklistTasks);
-
-  /* filters */
-ngModule.filter('camQueryComponent', camQueryComponent);
 
   /* plugins */
 ngModule.config(camTasklistSearchPlugin);
