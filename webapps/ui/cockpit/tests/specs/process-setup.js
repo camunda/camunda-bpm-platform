@@ -64,7 +64,7 @@ module.exports = {
               type: 'String'
           },
           myDate : {
-              value: '2011-11-11T11:11:11',
+              value: '2011-11-11T11:11:11.000+0200',
               type: 'Date'
           }
         }

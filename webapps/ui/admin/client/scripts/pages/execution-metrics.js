@@ -15,8 +15,8 @@ var Controller = [
 
 
     var now = new Date();
-    $scope.startDate = now.getFullYear() + '-01-01T00:00:00';
-    $scope.endDate = now.getFullYear() + '-12-31T23:59:59';
+    $scope.startDate = now.getFullYear() + '-01-01T00:00:00.000+0000';
+    $scope.endDate = now.getFullYear() + '-12-31T23:59:59.999+0000';
     $scope.loadingState = 'INITIAL';
 
     $scope.load = function() {
