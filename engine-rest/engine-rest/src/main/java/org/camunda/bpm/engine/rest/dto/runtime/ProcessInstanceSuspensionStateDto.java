@@ -88,13 +88,8 @@ public class ProcessInstanceSuspensionStateDto extends SuspensionStateDto {
 
   @Override
   public void updateSuspensionState(ProcessEngine engine) {
-    int params = (processInstanceId != null ? 1 : 0)
-      + (processDefinitionId != null ? 1 : 0)
-      + (processDefinitionKey != null ? 1 : 0);
-
-    int syncParams = (processInstanceIds != null ? 1 : 0)
-      + (processInstanceQuery != null ? 1 : 0)
-      + (historicProcessInstanceQuery != null ? 1 : 0);
+    int params = parameterCount(processInstanceId, processDefinitionId, processDefinitionKey);
+    int syncParams = parameterCount(processInstanceIds, processInstanceQuery, historicProcessInstanceQuery);
 
     if (params >= 1 && syncParams >= 1) {
       String message = "Choose either a single processInstance with processInstanceId, processDefinitionId or processDefinitionKey or a group of processInstances with processInstanceIds, procesInstanceQuery or historicProcessInstanceQuery.";
@@ -109,7 +104,6 @@ public class ProcessInstanceSuspensionStateDto extends SuspensionStateDto {
 
     UpdateProcessInstanceSuspensionStateBuilder updateSuspensionStateBuilder = createUpdateSuspensionStateBuilder(engine);
     if (syncParams > 0) {
-      //UpdateProcessInstancesSuspensionStateBuilder updateProcessInstancesSuspensionStateBuilder = (UpdateProcessInstancesSuspensionStateBuilder) updateSuspensionStateBuilder;
       if (getSuspended()) {
         ((UpdateProcessInstancesSuspensionStateBuilder)updateSuspensionStateBuilder).suspend();
       } else {
@@ -127,20 +121,18 @@ public class ProcessInstanceSuspensionStateDto extends SuspensionStateDto {
 
   public Batch updateSuspensionStateAsync(ProcessEngine engine) {
 
-    int params = (processInstanceIds != null ? 1 : 0)
-      + (processInstanceQuery != null ? 1 : 0)
-      + (historicProcessInstanceQuery != null ? 1 : 0);
+    int params = parameterCount(processInstanceIds, processInstanceQuery, historicProcessInstanceQuery);
 
     if (params == 0) {
        String message = "Either processInstanceIds, processInstanceQuery or historicProcessInstanceQuery should be set to update the suspension state.";
       throw new InvalidRequestException(Status.BAD_REQUEST, message);
     }
 
-    UpdateProcessInstancesSuspensionStateBuilder updateSuspensionStateBuilder = (UpdateProcessInstancesSuspensionStateBuilder) createUpdateSuspensionStateBuilder(engine);
+    UpdateProcessInstanceSuspensionStateBuilder updateSuspensionStateBuilder = createUpdateSuspensionStateBuilder(engine);
     if (getSuspended()) {
-      return updateSuspensionStateBuilder.suspendAsync();
+      return ((UpdateProcessInstancesSuspensionStateBuilder)updateSuspensionStateBuilder).suspendAsync();
     } else {
-      return updateSuspensionStateBuilder.activateAsync();
+      return ((UpdateProcessInstancesSuspensionStateBuilder)updateSuspensionStateBuilder).activateAsync();
     }
   }
 
@@ -188,6 +180,10 @@ public class ProcessInstanceSuspensionStateDto extends SuspensionStateDto {
     }
 
     return groupBuilder;
+  }
+
+  protected int parameterCount (Object o1, Object o2, Object o3){
+    return (( o1 != null ? 1 : 0 ) + ( o2 != null ? 1 : 0 ) + ( o3 != null ? 1 : 0 ));
   }
 
 }

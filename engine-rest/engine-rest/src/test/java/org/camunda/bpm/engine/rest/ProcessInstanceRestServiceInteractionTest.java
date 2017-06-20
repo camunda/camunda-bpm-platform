@@ -2450,6 +2450,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .when()
       .put(PROCESS_INSTANCE_SUSPENDED_URL);
 
+    verify(mockUpdateSuspensionStateSelectBuilder).byProcessInstanceIds(ids);
+    verify(mockUpdateProcessInstancesSuspensionStateBuilder).byProcessInstanceQuery(query.toQuery(processEngine));
     verify(mockUpdateProcessInstancesSuspensionStateBuilder).suspend();
   }
 
@@ -2682,6 +2684,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .post(PROCESS_INSTANCE_SUSPENDED_ASYNC_URL);
 
     verify(mockUpdateSuspensionStateSelectBuilder).byProcessInstanceIds(ids);
+    verify(mockUpdateProcessInstancesSuspensionStateBuilder).byProcessInstanceQuery(query.toQuery(processEngine));
     verify(mockUpdateProcessInstancesSuspensionStateBuilder).suspendAsync();
   }
 
