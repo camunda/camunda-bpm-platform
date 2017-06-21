@@ -531,7 +531,7 @@
         LEFT JOIN (
             SELECT COUNT(PI.ID_) AS FINISHED_
                 ,PI.PROC_DEF_ID_
-            FROM ACT_HI_PROCINST PI
+            FROM ${prefix}ACT_HI_PROCINST PI
             WHERE PI.END_TIME_ IS NOT NULL
             GROUP BY PI.PROC_DEF_ID_
             ) F ON F.PROC_DEF_ID_ = PI.PROC_DEF_ID_
