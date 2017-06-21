@@ -43,8 +43,8 @@ public interface HistoryRestService {
   @Path(HistoricVariableInstanceRestService.PATH)
   HistoricVariableInstanceRestService getVariableInstanceService();
 
-  @Path(HistoricActivityStatisticsRestService.PATH)
-  HistoricActivityStatisticsRestService getActivityStatisticsService();
+  @Path(HistoricProcessDefinitionRestService.PATH)
+  HistoricProcessDefinitionRestService getActivityStatisticsService();
 
   @Path(HistoricCaseActivityStatisticsRestService.PATH)
   HistoricCaseActivityStatisticsRestService getCaseActivityStatisticsService();

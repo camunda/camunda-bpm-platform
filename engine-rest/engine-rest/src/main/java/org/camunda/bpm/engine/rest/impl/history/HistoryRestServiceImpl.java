@@ -18,7 +18,7 @@ import org.camunda.bpm.engine.rest.dto.runtime.JobDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.history.HistoricActivityInstanceRestService;
-import org.camunda.bpm.engine.rest.history.HistoricActivityStatisticsRestService;
+import org.camunda.bpm.engine.rest.history.HistoricProcessDefinitionRestService;
 import org.camunda.bpm.engine.rest.history.HistoricBatchRestService;
 import org.camunda.bpm.engine.rest.history.HistoricCaseActivityInstanceRestService;
 import org.camunda.bpm.engine.rest.history.HistoricCaseActivityStatisticsRestService;
@@ -67,8 +67,8 @@ public class HistoryRestServiceImpl extends AbstractRestProcessEngineAware imple
     return new HistoricVariableInstanceRestServiceImpl(getObjectMapper(), getProcessEngine());
   }
 
-  public HistoricActivityStatisticsRestService getActivityStatisticsService() {
-    return new HistoricActivityStatisticsRestServiceImpl(getProcessEngine());
+  public HistoricProcessDefinitionRestService getActivityStatisticsService() {
+    return new HistoricProcessDefinitionRestServiceImpl(getProcessEngine());
   }
 
   public HistoricDecisionStatisticsRestService getDecisionStatisticsService() {

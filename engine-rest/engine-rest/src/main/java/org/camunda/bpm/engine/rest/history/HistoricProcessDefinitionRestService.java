@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.rest.history;
 
 import org.camunda.bpm.engine.rest.dto.history.HistoricActivityStatisticsDto;
+import org.camunda.bpm.engine.rest.dto.history.HistoricFinishedProcessInstanceReportDto;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -23,17 +24,22 @@ import java.util.List;
 * @author Roman Smirnov
 *
 */
-@Path(HistoricActivityStatisticsRestService.PATH)
+@Path(HistoricProcessDefinitionRestService.PATH)
 @Produces(MediaType.APPLICATION_JSON)
-public interface HistoricActivityStatisticsRestService {
+public interface HistoricProcessDefinitionRestService {
 
-  public static final String PATH = "/process-definition/{id}/statistics";
+  public static final String PATH = "/process-definition";
 
   @GET
+  @Path("/{id}/statistics")
   @Produces(MediaType.APPLICATION_JSON)
   public List<HistoricActivityStatisticsDto> getHistoricActivityStatistics(@PathParam("id") String processDefinitionId,
                                                                            @QueryParam("canceled") Boolean includeCanceled,
       @QueryParam("finished") Boolean includeFinished, @QueryParam("completeScope") Boolean includeCompleteScope,
       @QueryParam("sortBy") String sortBy, @QueryParam("sortOrder") String sortOrder);
 
+  @GET
+  @Path("/finished-process-instance-report")
+  @Produces(MediaType.APPLICATION_JSON)
+  public List<HistoricFinishedProcessInstanceReportDto> getHistoricFinishedProcessInstanceReport();
 }
