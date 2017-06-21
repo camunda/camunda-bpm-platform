@@ -66,6 +66,7 @@ public class ModifyProcessInstanceCmd implements Command<Void> {
       AbstractProcessInstanceModificationCommand instruction = instructions.get(i);
       LOG.debugModificationInstruction(processInstanceId, i + 1, instruction.describe());
 
+
       instruction.setSkipCustomListeners(builder.isSkipCustomListeners());
       instruction.setSkipIoMappings(builder.isSkipIoMappings());
       instruction.execute(commandContext);
@@ -74,7 +75,7 @@ public class ModifyProcessInstanceCmd implements Command<Void> {
     processInstance = executionManager.findExecutionById(processInstanceId);
 
     if (!processInstance.hasChildren()) {
-      if (processInstance.getActivity() == null) {
+      if (!(processInstance.getActivity() != null && !processInstance.getId().equals(processInstance.getActivityInstanceId()))) {
         // process instance was cancelled
         checkDeleteProcessInstance(processInstance, commandContext);
         processInstance.deleteCascade("Cancellation due to process instance modification", builder.isSkipCustomListeners(), builder.isSkipIoMappings());

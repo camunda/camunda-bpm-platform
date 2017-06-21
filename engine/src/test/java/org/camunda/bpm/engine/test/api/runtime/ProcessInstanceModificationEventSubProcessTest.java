@@ -16,6 +16,9 @@ import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecutionTree;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 
 import java.util.List;
 
@@ -23,9 +26,11 @@ import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.ProcessInstanceModificationBuilder;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.util.ExecutionTree;
+import org.junit.Test;
 
 /**
  * @author Roman Smirnov
@@ -37,6 +42,7 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
   protected static final String NON_INTERRUPTING_EVENT_SUBPROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.nonInterruptingEventSubProcess.bpmn20.xml";
   protected static final String INTERRUPTING_EVENT_SUBPROCESS_INSIDE_SUBPROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.interruptingEventSubProcessInsideSubProcess.bpmn20.xml";
   protected static final String NON_INTERRUPTING_EVENT_SUBPROCESS_INSIDE_SUBPROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.nonInterruptingEventSubProcessInsideSubProcess.bpmn20.xml";
+  protected static final String CANCEL_AND_RESTART = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationEventSubProcessTest.testCancelAndRestart.bpmn20.xml";
 
   @Deployment(resources = INTERRUPTING_EVENT_SUBPROCESS)
   public void testStartBeforeTaskInsideEventSubProcess() {
@@ -802,6 +808,38 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
 
     assertEquals(timerJob.getId(), remainingTimerJob.getId());
     assertEquals(timerJob.getDuedate(), remainingTimerJob.getDuedate());
+
+  }
+
+
+  @Deployment(resources = CANCEL_AND_RESTART)
+  public void testProcessInstanceModificationInEventSubProcessCancellationAndRestart() {
+    String processDefinition = "ProcessWithEventSubProcess";
+    String businessKey = "businessKey";
+    String userTaskMainProcess = "UserTaskMainProcess";
+    String userTaskEventSubProcess = "UserTaskEventSubProcess";
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(processDefinition,
+      businessKey);
+
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey(userTaskMainProcess).singleResult();
+    assertNotNull(task);
+    taskService.complete(task.getId());
+
+    task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey(userTaskEventSubProcess).singleResult();
+    assertNotNull(task);
+
+    List<String> activeActivityIds = runtimeService.getActiveActivityIds(processInstance.getId());
+
+    assert (activeActivityIds.contains(userTaskEventSubProcess));
+
+    ProcessInstanceModificationBuilder processInstanceModification = runtimeService.createProcessInstanceModification(
+      processInstance.getId());
+    processInstanceModification.cancelAllForActivity(userTaskEventSubProcess);
+    processInstanceModification.startAfterActivity(userTaskEventSubProcess);
+    processInstanceModification.execute();
+
+    assertNull(runtimeService.createProcessInstanceQuery().singleResult());
 
   }
 
