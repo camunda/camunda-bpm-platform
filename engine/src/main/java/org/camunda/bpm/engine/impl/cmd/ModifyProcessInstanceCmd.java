@@ -63,9 +63,15 @@ public class ModifyProcessInstanceCmd implements Command<Void> {
     List<AbstractProcessInstanceModificationCommand> instructions = builder.getModificationOperations();
 
     for (int i = 0; i < instructions.size(); i++) {
+      if (i == instructions.size()-1) {
+        // if this is a process instance in a call activity and there is a super execution link we need to consider
+        // also need to make sure it doesn't just destroy process instances because it feels like doing that
+        ///maybe write a clean up function.... if process instance doesn't have any current activities
+
+      }
+
       AbstractProcessInstanceModificationCommand instruction = instructions.get(i);
       LOG.debugModificationInstruction(processInstanceId, i + 1, instruction.describe());
-
 
       instruction.setSkipCustomListeners(builder.isSkipCustomListeners());
       instruction.setSkipIoMappings(builder.isSkipIoMappings());
@@ -78,7 +84,7 @@ public class ModifyProcessInstanceCmd implements Command<Void> {
       if (!(processInstance.getActivity() != null && !processInstance.getId().equals(processInstance.getActivityInstanceId()))) {
         // process instance was cancelled
         checkDeleteProcessInstance(processInstance, commandContext);
-        processInstance.deleteCascade("Cancellation due to process instance modification", builder.isSkipCustomListeners(), builder.isSkipIoMappings());
+        processInstance.deletePropagate("Cancellation due to process instance modifcation", builder.isSkipCustomListeners(), builder.isSkipIoMappings());
       }
       else if (processInstance.isEnded()) {
         // process instance has ended regularly

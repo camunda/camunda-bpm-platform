@@ -547,6 +547,16 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     deleteCascade(deleteReason, skipCustomListeners, skipIoMappings, false);
   }
 
+  public void deletePropagate(String deleteReason, boolean skipCustomListeners, boolean skipIoMappings) {
+    PvmExecutionImpl topmostCancellableExecution = this;
+    PvmExecutionImpl parentScopeExecution = this.getParentScopeExecution(true);
+    while (parentScopeExecution != null && (parentScopeExecution.getNonEventScopeExecutions().size() <= 1)) {
+        topmostCancellableExecution = parentScopeExecution;
+        parentScopeExecution = topmostCancellableExecution.getParentScopeExecution(true);
+    }
+    topmostCancellableExecution.deleteCascade(deleteReason, skipCustomListeners, skipIoMappings, false);
+  }
+
   public void deleteCascade(String deleteReason, boolean skipCustomListeners, boolean skipIoMappings, boolean externallyTerminated) {
     this.deleteReason = deleteReason;
     this.deleteRoot = true;

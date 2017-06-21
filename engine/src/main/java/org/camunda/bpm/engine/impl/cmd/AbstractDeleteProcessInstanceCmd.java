@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.ActivityExecutionTreeMapping;
+import org.camunda.bpm.engine.impl.ProcessInstanceModificationBuilderImpl;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -60,12 +61,12 @@ public abstract class AbstractDeleteProcessInstanceCmd {
   }
 
   protected void deleteProcessInstance(
-      CommandContext commandContext,
+      final CommandContext commandContext,
       String processInstanceId,
       String deleteReason,
-      boolean skipCustomListeners,
+      final boolean skipCustomListeners,
       boolean externallyTerminated,
-      boolean skipIoMappings) {
+      final boolean skipIoMappings) {
     ensureNotNull(BadUserRequestException.class, "processInstanceId is null", "processInstanceId", processInstanceId);
 
     // fetch process instance
@@ -81,9 +82,17 @@ public abstract class AbstractDeleteProcessInstanceCmd {
         .getExecutionManager()
         .deleteProcessInstance(processInstanceId, deleteReason, false, skipCustomListeners, externallyTerminated, skipIoMappings);
 
-    ExecutionEntity superExecution = execution.getSuperExecution();
+    final ExecutionEntity superExecution = execution.getSuperExecution();
     if (superExecution != null) {
-      new ActivityInstanceCancellationCmd(superExecution.getProcessInstanceId(), superExecution.getActivityInstanceId()).execute(commandContext);
+      commandContext.runWithoutAuthorization(new Callable<Void>() {
+        public Void call() {
+          ProcessInstanceModificationBuilderImpl builder = (ProcessInstanceModificationBuilderImpl) new ProcessInstanceModificationBuilderImpl(commandContext, superExecution.getProcessInstanceId())
+            .cancelActivityInstance(superExecution.getActivityInstanceId());
+          builder.execute(false, skipCustomListeners, skipIoMappings);
+          return null;
+        }
+      });
+
     }
 
     // create user operation log
