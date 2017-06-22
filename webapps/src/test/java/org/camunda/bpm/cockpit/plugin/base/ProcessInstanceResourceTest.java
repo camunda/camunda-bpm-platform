@@ -17,6 +17,7 @@ import static org.fest.assertions.Assertions.assertThat;
 import java.util.List;
 
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.CalledProcessInstanceDto;
+import org.camunda.bpm.cockpit.impl.plugin.base.dto.IncidentStatisticsDto;
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.ProcessInstanceDto;
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.query.CalledProcessInstanceQueryDto;
 import org.camunda.bpm.cockpit.impl.plugin.base.sub.resources.ProcessInstanceResource;
@@ -153,6 +154,68 @@ public class ProcessInstanceResourceTest extends AbstractCockpitPluginTest {
     List<CalledProcessInstanceDto> result3 = resource.queryCalledProcessInstances(queryParameter3);
     assertThat(result3).isNotEmpty();
     assertThat(result3).hasSize(2);
+  }
+
+  @Test
+  @Deployment(resources = {
+    "processes/call-activity.bpmn",
+    "processes/failing-process.bpmn"
+  })
+  public void testCalledProcessIntancesIncidents() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("CallActivity");
+
+    resource = new ProcessInstanceResource(getProcessEngine().getName(), processInstance.getId());
+
+    ActivityInstance processInstanceActivityInstance = runtimeService.getActivityInstance(processInstance.getId());
+
+    String callActivityId = repositoryService
+      .createProcessDefinitionQuery()
+      .processDefinitionKey("CallActivity")
+      .singleResult()
+      .getId();
+
+    String failingProcessId = repositoryService
+      .createProcessDefinitionQuery()
+      .processDefinitionKey("FailingProcess")
+      .singleResult()
+      .getId();
+
+    executeAvailableJobs();
+
+
+
+    String[] activityInstanceIds1 = {callActivityId};
+
+    CalledProcessInstanceQueryDto queryParameter1 = new CalledProcessInstanceQueryDto();
+    queryParameter1.setProcessDefinitionId(callActivityId);
+
+    List<CalledProcessInstanceDto> callActivityInstances = resource.queryCalledProcessInstances(queryParameter1);
+    assertThat(callActivityInstances).isNotEmpty();
+    assertThat(callActivityInstances).hasSize(1);
+
+    List<IncidentStatisticsDto> incidents1 = callActivityInstances.get(0).getIncidents();
+    assertThat(incidents1).isNotEmpty();
+    assertThat(incidents1).hasSize(1);
+
+    assertThat(incidents1.get(0).getIncidentCount()).isEqualTo(1);
+    assertThat(incidents1.get(0).getIncidentType()).isEqualTo("failedJob");
+
+    String[] activityInstanceIds2 = {failingProcessId};
+
+    CalledProcessInstanceQueryDto queryParameter2 = new CalledProcessInstanceQueryDto();
+    queryParameter2.setProcessDefinitionId(failingProcessId);
+
+    List<CalledProcessInstanceDto> failingProcessInstance = resource.queryCalledProcessInstances(queryParameter2);
+    assertThat(failingProcessInstance).isNotEmpty();
+    assertThat(failingProcessInstance).hasSize(1);
+
+    List<IncidentStatisticsDto> incidents2 = failingProcessInstance.get(0).getIncidents();
+    assertThat(incidents2).isNotEmpty();
+    assertThat(incidents2).hasSize(1);
+
+    assertThat(incidents2.get(0).getIncidentCount()).isEqualTo(1);
+    assertThat(incidents2.get(0).getIncidentType()).isEqualTo("failedJob");
+
   }
 
 }

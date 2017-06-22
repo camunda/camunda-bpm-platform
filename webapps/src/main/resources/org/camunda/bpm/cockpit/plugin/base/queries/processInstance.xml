@@ -22,6 +22,10 @@
     <result property="processDefinitionName" column="NAME_" jdbcType="VARCHAR"/>
     <result property="callActivityInstanceId" column="ACT_INST_ID_" jdbcType="VARCHAR"/>
     <result property="callActivityId" column="ACT_ID_" jdbcType="VARCHAR"/>
+    <collection property="incidents" javaType="java.util.ArrayList" ofType="org.camunda.bpm.cockpit.impl.plugin.base.dto.IncidentStatisticsDto">
+      <result property="incidentType" column="INCIDENT_TYPE_" jdbcType="VARCHAR" />
+      <result property="incidentCount" column="INCIDENT_COUNT_" jdbcType="INTEGER"/>
+    </collection>
   </resultMap>
 
   <select id="selectRunningProcessInstancesCount" parameterType="org.camunda.bpm.cockpit.impl.plugin.base.dto.query.ProcessInstanceQueryDto"
@@ -232,7 +236,7 @@
 
   <select id="selectCalledProcessInstances" parameterType="org.camunda.bpm.cockpit.impl.plugin.base.dto.query.ProcessInstanceQueryDto"
           resultMap="calledProcessInstanceMap">
-    select distinct RES.ID_, EXEC1.ACT_INST_ID_, EXEC1.ACT_ID_, PROC_.ID_ AS SUPER_PROC_DEF_ID_, PROC_.KEY_, PROC_.NAME_
+    select distinct RES.ID_, EXEC1.ACT_INST_ID_, EXEC1.ACT_ID_, PROC_.ID_ AS SUPER_PROC_DEF_ID_, PROC_.KEY_, PROC_.NAME_, INCIDENT.INCIDENT_TYPE_, INCIDENT.INCIDENT_COUNT_
     <include refid="selectCalledProcessInstancesByCriteria" />
     ${orderBy}
   </select>
@@ -254,6 +258,20 @@
     on
         EXEC1.PROC_DEF_ID_ = PROCDEF.ID_
     </if>
+    <!-- The set of process instances will be (left) joined with a set of incidents. -->
+    left join
+    (
+    <!-- to avoid to have a list of incidents with only one item which type is null and count is zero an extra subselect is needed -->
+    <!-- this subselect selects all incidents to the assigned process definition id -->
+    select
+    INCIDENT.PROC_INST_ID_, INCIDENT.INCIDENT_TYPE_, count(INCIDENT.ID_) INCIDENT_COUNT_
+    from
+    ${prefix}ACT_RU_INCIDENT INCIDENT
+    group by
+    INCIDENT.PROC_INST_ID_, INCIDENT.INCIDENT_TYPE_
+    ) INCIDENT
+    on
+    RES.PROC_INST_ID_ = INCIDENT.PROC_INST_ID_
 
     <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" />
