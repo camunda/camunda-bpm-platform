@@ -63,12 +63,6 @@ public class ModifyProcessInstanceCmd implements Command<Void> {
     List<AbstractProcessInstanceModificationCommand> instructions = builder.getModificationOperations();
 
     for (int i = 0; i < instructions.size(); i++) {
-      if (i == instructions.size()-1) {
-        // if this is a process instance in a call activity and there is a super execution link we need to consider
-        // also need to make sure it doesn't just destroy process instances because it feels like doing that
-        ///maybe write a clean up function.... if process instance doesn't have any current activities
-
-      }
 
       AbstractProcessInstanceModificationCommand instruction = instructions.get(i);
       LOG.debugModificationInstruction(processInstanceId, i + 1, instruction.describe());
@@ -84,7 +78,7 @@ public class ModifyProcessInstanceCmd implements Command<Void> {
       if (!(processInstance.getActivity() != null && !processInstance.getId().equals(processInstance.getActivityInstanceId()))) {
         // process instance was cancelled
         checkDeleteProcessInstance(processInstance, commandContext);
-        processInstance.deletePropagate("Cancellation due to process instance modifcation", builder.isSkipCustomListeners(), builder.isSkipIoMappings());
+        deletePropagate(processInstance,"Cancellation due to process instance modifcation", builder.isSkipCustomListeners(), builder.isSkipIoMappings());
       }
       else if (processInstance.isEnded()) {
         // process instance has ended regularly
@@ -123,5 +117,19 @@ public class ModifyProcessInstanceCmd implements Command<Void> {
     for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
       checker.checkDeleteProcessInstance(execution);
     }
+  }
+
+
+  protected void deletePropagate(ExecutionEntity processInstance, String deleteReason, boolean skipCustomListeners, boolean skipIoMappings) {
+
+
+    ExecutionEntity topmostCancellableExecution = processInstance;
+    ExecutionEntity parentScopeExecution = (ExecutionEntity) topmostCancellableExecution.getParentScopeExecution(true);
+
+    while (parentScopeExecution != null && (parentScopeExecution.getNonEventScopeExecutions().size() <= 1)) {
+        topmostCancellableExecution = parentScopeExecution;
+        parentScopeExecution = (ExecutionEntity) topmostCancellableExecution.getParentScopeExecution(true);
+    }
+    topmostCancellableExecution.deleteCascade(deleteReason, skipCustomListeners, skipIoMappings, false);
   }
 }
