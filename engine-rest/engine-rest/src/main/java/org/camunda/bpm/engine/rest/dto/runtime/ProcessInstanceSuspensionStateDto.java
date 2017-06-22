@@ -17,11 +17,9 @@ import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.batch.Batch;
-import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.rest.dto.SuspensionStateDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.runtime.UpdateProcessInstanceSuspensionStateBuilder;
 import org.camunda.bpm.engine.runtime.UpdateProcessInstanceSuspensionStateSelectBuilder;
 import org.camunda.bpm.engine.runtime.UpdateProcessInstanceSuspensionStateTenantBuilder;
@@ -102,20 +100,16 @@ public class ProcessInstanceSuspensionStateDto extends SuspensionStateDto {
       throw new InvalidRequestException(Status.BAD_REQUEST, message);
     }
 
-    UpdateProcessInstanceSuspensionStateBuilder updateSuspensionStateBuilder = createUpdateSuspensionStateBuilder(engine);
-    if (syncParams > 0) {
-      if (getSuspended()) {
-        ((UpdateProcessInstancesSuspensionStateBuilder)updateSuspensionStateBuilder).suspend();
-      } else {
-        ((UpdateProcessInstancesSuspensionStateBuilder)updateSuspensionStateBuilder).activate();
-      }
-    } else {
+    UpdateProcessInstanceSuspensionStateBuilder updateSuspensionStateBuilder = null;
+    if (params > 1)
+      updateSuspensionStateBuilder = createUpdateSuspensionStateBuilder(engine);
+    else if (syncParams > 1)
+      updateSuspensionStateBuilder = createUpdateSuspensionStateGroupBuilder(engine);
 
-      if (getSuspended()) {
-        updateSuspensionStateBuilder.suspend();
-      } else {
-        updateSuspensionStateBuilder.activate();
-      }
+    if (getSuspended()) {
+      updateSuspensionStateBuilder.suspend();
+    } else {
+      updateSuspensionStateBuilder.activate();
     }
   }
 
@@ -128,11 +122,11 @@ public class ProcessInstanceSuspensionStateDto extends SuspensionStateDto {
       throw new InvalidRequestException(Status.BAD_REQUEST, message);
     }
 
-    UpdateProcessInstanceSuspensionStateBuilder updateSuspensionStateBuilder = createUpdateSuspensionStateBuilder(engine);
+    UpdateProcessInstancesSuspensionStateBuilder updateSuspensionStateBuilder = createUpdateSuspensionStateGroupBuilder(engine);
     if (getSuspended()) {
-      return ((UpdateProcessInstancesSuspensionStateBuilder)updateSuspensionStateBuilder).suspendAsync();
+      return updateSuspensionStateBuilder.suspendAsync();
     } else {
-      return ((UpdateProcessInstancesSuspensionStateBuilder)updateSuspensionStateBuilder).activateAsync();
+      return updateSuspensionStateBuilder.activateAsync();
     }
   }
 
@@ -145,7 +139,7 @@ public class ProcessInstanceSuspensionStateDto extends SuspensionStateDto {
     } else if (processDefinitionId != null) {
       return selectBuilder.byProcessDefinitionId(processDefinitionId);
 
-    } else if (processDefinitionKey != null) {
+    } else { //processDefinitionKey != null
       UpdateProcessInstanceSuspensionStateTenantBuilder tenantBuilder = selectBuilder.byProcessDefinitionKey(processDefinitionKey);
 
       if (processDefinitionTenantId != null) {
@@ -157,7 +151,10 @@ public class ProcessInstanceSuspensionStateDto extends SuspensionStateDto {
 
       return tenantBuilder;
     }
+  }
 
+  protected UpdateProcessInstancesSuspensionStateBuilder createUpdateSuspensionStateGroupBuilder(ProcessEngine engine) {
+    UpdateProcessInstanceSuspensionStateSelectBuilder selectBuilder = engine.getRuntimeService().updateProcessInstanceSuspensionState();
     UpdateProcessInstancesSuspensionStateBuilder groupBuilder = null;
     if (processInstanceIds != null) {
       groupBuilder = selectBuilder.byProcessInstanceIds(processInstanceIds);
@@ -182,8 +179,14 @@ public class ProcessInstanceSuspensionStateDto extends SuspensionStateDto {
     return groupBuilder;
   }
 
-  protected int parameterCount (Object o1, Object o2, Object o3){
-    return (( o1 != null ? 1 : 0 ) + ( o2 != null ? 1 : 0 ) + ( o3 != null ? 1 : 0 ));
+
+
+  protected int parameterCount (Object... o){
+    int count = 0;
+    for (Object o1 : o) {
+      count += (o1 != null ? 1 : 0);
+    }
+    return count;
   }
 
 }
