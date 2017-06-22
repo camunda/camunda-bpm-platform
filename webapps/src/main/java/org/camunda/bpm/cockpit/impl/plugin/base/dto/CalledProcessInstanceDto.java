@@ -12,15 +12,18 @@
  */
 package org.camunda.bpm.cockpit.impl.plugin.base.dto;
 
+import java.util.List;
+
 public class CalledProcessInstanceDto extends ProcessInstanceDto {
 
   protected String processDefinitionId;
   protected String processDefinitionKey;
   protected String processDefinitionName;
-  
+  protected List<IncidentStatisticsDto> incidents;
+
   protected String callActivityInstanceId;
   protected String callActivityId;
-  
+
   public CalledProcessInstanceDto() {}
 
   public String getId() {
@@ -50,5 +53,13 @@ public class CalledProcessInstanceDto extends ProcessInstanceDto {
   public String getProcessDefinitionName() {
     return processDefinitionName;
   }
-  
+
+  public List<IncidentStatisticsDto> getIncidents() {
+    return incidents;
+  }
+
+  public void setIncidents(List<IncidentStatisticsDto> incidents) {
+    this.incidents = incidents;
+  }
+
 }
