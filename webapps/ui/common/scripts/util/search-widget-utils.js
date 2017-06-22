@@ -11,7 +11,8 @@ module.exports = {
   shouldUpdateFilter: shouldUpdateFilter,
   createSearchesForActivityIds: createSearchesForActivityIds,
   encodeQuery: encodeQuery,
-  updateSearchValuesForTypeInCtrlMode: updateSearchValuesForTypeInCtrlMode
+  updateSearchValuesForTypeInCtrlMode: updateSearchValuesForTypeInCtrlMode,
+  prepareObjectForComparing: prepareObjectForComparing
 };
 
 /**
