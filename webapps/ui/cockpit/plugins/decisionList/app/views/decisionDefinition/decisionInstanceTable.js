@@ -61,34 +61,25 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
 
         $scope.decisionSearchConfig = angular.copy(decisionSearchConfig);
 
-        $scope.$on('$routeChanged', function() {
-          pages.current = search().page || 1;
-        });
-
         $scope.$watch('decisionSearchConfig.searches', function(newValue, oldValue) {
-          if (newValue !== oldValue) {
+          if (!angular.equals(newValue, oldValue)) {
             updateView();
           }
         }, true);
 
         var historyService = camAPI.resource('history');
 
-        var DEFAULT_PAGES = { size: 50, total: 0, current: search().page || 1 };
+        $scope.onPaginationChange = function(pages) {
+          $scope.pages = pages;
 
-        var pages = $scope.pages = angular.copy(DEFAULT_PAGES);
-
-        $scope.$watch('pages.current', function(newValue, oldValue) {
-          if (newValue == oldValue) {
-            return;
+          if ($scope.decisionSearchConfig.searches) {
+            updateView();
           }
-
-          search('page', !newValue || newValue == 1 ? null : newValue);
-          updateView();
-        });
+        };
 
         function updateView() {
-          var page = pages.current,
-              count = pages.size,
+          var page = $scope.pages.current,
+              count = $scope.pages.size,
               firstResult = (page - 1) * count,
               searchQuery = createSearchQueryForSearchWidget($scope.decisionSearchConfig.searches,
                 ['activityIdIn', 'activityInstanceIdIn']);
@@ -125,7 +116,7 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
           );
 
           historyService.decisionInstanceCount(countQuery, function(err, data) {
-            pages.total = data.count;
+            $scope.pages.total = data.count;
 
             var phase = $rootScope.$$phase;
             if(phase !== '$apply' && phase !== '$digest') {
