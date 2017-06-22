@@ -12,7 +12,6 @@
  */
 package org.camunda.bpm.engine.rest.history;
 
-import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -44,7 +43,10 @@ public interface HistoryRestService {
   HistoricVariableInstanceRestService getVariableInstanceService();
 
   @Path(HistoricProcessDefinitionRestService.PATH)
-  HistoricProcessDefinitionRestService getActivityStatisticsService();
+  HistoricProcessDefinitionRestService getProcessDefinitionService();
+
+  @Path(HistoricDecisionDefinitionRestService.PATH)
+  HistoricDecisionDefinitionRestService getDecisionDefinitionService();
 
   @Path(HistoricCaseActivityStatisticsRestService.PATH)
   HistoricCaseActivityStatisticsRestService getCaseActivityStatisticsService();

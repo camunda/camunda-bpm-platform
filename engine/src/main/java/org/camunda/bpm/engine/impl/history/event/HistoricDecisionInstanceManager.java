@@ -13,9 +13,11 @@
 
 package org.camunda.bpm.engine.impl.history.event;
 
+import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.history.HistoricDecisionInputInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionOutputInstance;
+import org.camunda.bpm.engine.history.HistoricFinishedDecisionInstanceReportResult;
 import org.camunda.bpm.engine.impl.HistoricDecisionInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
@@ -291,6 +293,15 @@ public class HistoricDecisionInstanceManager extends AbstractHistoricManager {
 
   protected ListQueryParameterObject configureParameterizedQuery(Object parameter) {
     return getTenantManager().configureQuery(parameter);
+  }
+
+  @SuppressWarnings("unchecked")
+  public List<HistoricFinishedDecisionInstanceReportResult> findFinishedDecisionInstancesReportResults() {
+    ListQueryParameterObject parameterObject = new ListQueryParameterObject();
+    parameterObject.setParameter(ClockUtil.getCurrentTime());
+    getAuthorizationManager().configureQueryHistoricFinishedInstanceReport(parameterObject, Resources.DECISION_DEFINITION);
+    getTenantManager().configureQuery(parameterObject);
+    return (List<HistoricFinishedDecisionInstanceReportResult>) getDbEntityManager().selectList("selectFinishedDecisionInstancesReportEntities", parameterObject);
   }
 
 }

@@ -15,7 +15,6 @@ package org.camunda.bpm.engine.rest.impl.history;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.rest.dto.runtime.JobDto;
-import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.history.HistoricActivityInstanceRestService;
 import org.camunda.bpm.engine.rest.history.HistoricProcessDefinitionRestService;
@@ -23,6 +22,7 @@ import org.camunda.bpm.engine.rest.history.HistoricBatchRestService;
 import org.camunda.bpm.engine.rest.history.HistoricCaseActivityInstanceRestService;
 import org.camunda.bpm.engine.rest.history.HistoricCaseActivityStatisticsRestService;
 import org.camunda.bpm.engine.rest.history.HistoricCaseInstanceRestService;
+import org.camunda.bpm.engine.rest.history.HistoricDecisionDefinitionRestService;
 import org.camunda.bpm.engine.rest.history.HistoricDecisionInstanceRestService;
 import org.camunda.bpm.engine.rest.history.HistoricDecisionStatisticsRestService;
 import org.camunda.bpm.engine.rest.history.HistoricDetailRestService;
@@ -67,8 +67,12 @@ public class HistoryRestServiceImpl extends AbstractRestProcessEngineAware imple
     return new HistoricVariableInstanceRestServiceImpl(getObjectMapper(), getProcessEngine());
   }
 
-  public HistoricProcessDefinitionRestService getActivityStatisticsService() {
+  public HistoricProcessDefinitionRestService getProcessDefinitionService() {
     return new HistoricProcessDefinitionRestServiceImpl(getProcessEngine());
+  }
+
+  public HistoricDecisionDefinitionRestService getDecisionDefinitionService() {
+    return new HistoricDecisionDefinitionRestServiceImpl(getProcessEngine());
   }
 
   public HistoricDecisionStatisticsRestService getDecisionStatisticsService() {

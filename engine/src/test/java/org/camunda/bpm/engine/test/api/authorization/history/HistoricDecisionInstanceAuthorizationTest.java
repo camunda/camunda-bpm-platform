@@ -13,14 +13,22 @@
 
 package org.camunda.bpm.engine.test.api.authorization.history;
 
+import org.apache.commons.lang.time.DateUtils;
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInstanceQuery;
+import org.camunda.bpm.engine.history.HistoricFinishedDecisionInstanceReportResult;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.authorization.AuthorizationTest;
+import org.camunda.bpm.engine.variable.Variables;
 
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.camunda.bpm.engine.authorization.Authorization.ANY;
@@ -186,10 +194,82 @@ public class HistoricDecisionInstanceAuthorizationTest extends AuthorizationTest
     verifyQueryResults(query, 0);
   }
 
+  public void testHistoryCleanupReportWithoutAuthorization() {
+    // given
+    prepareDecisionInstances(DECISION_DEFINITION_KEY, -6, 5, 10);
+
+    // when
+    List<HistoricFinishedDecisionInstanceReportResult> reportResults = historyService.createHistoricFinishedDecisionInstanceReport().list();
+
+    // then
+    assertEquals(0, reportResults.size());
+  }
+
+  public void testHistoryCleanupReportWithAuthorization() {
+    // given
+    prepareDecisionInstances(DECISION_DEFINITION_KEY, -6, 5, 10);
+
+    createGrantAuthorization(DECISION_DEFINITION, DECISION_DEFINITION_KEY, userId, Permissions.READ, Permissions.READ_HISTORY);
+    createGrantAuthorizationGroup(DECISION_DEFINITION, DECISION_DEFINITION_KEY, groupId, Permissions.READ, Permissions.READ_HISTORY);
+
+    // when
+    List<HistoricFinishedDecisionInstanceReportResult> reportResults = historyService.createHistoricFinishedDecisionInstanceReport().list();
+
+    // then
+    assertEquals(1, reportResults.size());
+    assertEquals(10, reportResults.get(0).getCleanableDecisionInstanceCount());
+    assertEquals(10, reportResults.get(0).getFinishedDecisionInstanceCount());
+  }
+
+  public void testHistoryCleanupReportWithReadPermissionOnly() {
+    // given
+    prepareDecisionInstances(DECISION_DEFINITION_KEY, -6, 5, 10);
+
+    createGrantAuthorization(DECISION_DEFINITION, DECISION_DEFINITION_KEY, userId, Permissions.READ);
+
+    // when
+    List<HistoricFinishedDecisionInstanceReportResult> reportResults = historyService.createHistoricFinishedDecisionInstanceReport().list();
+
+    // then
+    assertEquals(0, reportResults.size());
+  }
+
+  public void testHistoryCleanupReportWithReadHistoryPermissionOnly() {
+    // given
+    prepareDecisionInstances(DECISION_DEFINITION_KEY, -6, 5, 10);
+
+    createGrantAuthorization(DECISION_DEFINITION, DECISION_DEFINITION_KEY, userId, Permissions.READ_HISTORY);
+
+    // when
+    List<HistoricFinishedDecisionInstanceReportResult> reportResults = historyService.createHistoricFinishedDecisionInstanceReport().list();
+
+    // then
+    assertEquals(0, reportResults.size());
+  }
+
   protected void startProcessInstanceAndEvaluateDecision() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("input1", null);
     startProcessInstanceByKey(PROCESS_KEY, variables);
+  }
+
+  protected void prepareDecisionInstances(String key, int daysInThePast, Integer historyTimeToLive, int instanceCount) {
+    DecisionDefinition decisionDefinition = selectDecisionDefinitionByKey(key);
+    disableAuthorization();
+    repositoryService.updateDecisionDefinitionHistoryTimeToLive(decisionDefinition.getId(), historyTimeToLive);
+    enableAuthorization();
+
+    Date oldCurrentTime = ClockUtil.getCurrentTime();
+    ClockUtil.setCurrentTime(DateUtils.addDays(oldCurrentTime, daysInThePast));
+
+    Map<String, Object> variables = Variables.createVariables().putValue("input1", null);
+    for (int i = 0; i < instanceCount; i++) {
+      disableAuthorization();
+      decisionService.evaluateDecisionByKey(key).variables(variables).evaluate();
+      enableAuthorization();
+    }
+
+    ClockUtil.setCurrentTime(oldCurrentTime);
   }
 
 }
