@@ -362,12 +362,15 @@ public class AuthorizationManager extends AbstractManager {
   public void configureQuery(ListQueryParameterObject query, Resource resource, String queryParam, Permission... permission) {
     configureQuery(query);
 
+    CompositePermissionCheck compositePermissionCheck = new CompositePermissionCheck(false);
+    query.getAuthCheck().setPermissionChecks(compositePermissionCheck);
+
     for (int i = 0; i < permission.length; i++) {
       PermissionCheck check = new PermissionCheck();
       check.setResource(resource);
       check.setResourceIdQueryParam(queryParam);
       check.setPermission(permission[i]);
-      query.getAuthCheck().getPermissionChecks().addAtomicCheck(check);
+      compositePermissionCheck.addAtomicCheck(check);
     }
   }
 
