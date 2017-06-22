@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        targetNamespace="Examples" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+        xmlns:camunda="http://camunda.org/schema/1.0/bpmn" >
+
+  <process id="processWithTimer" isExecutable="true">
+    <startEvent id="start"/>
+    <intermediateCatchEvent id="timer" camunda:asyncBefore="true">
+      <timerEventDefinition>
+        <timeDuration>PT5M</timeDuration>
+      </timerEventDefinition>
+    </intermediateCatchEvent>
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="timer" />
+    <exclusiveGateway id="exclusiveGateway"/>
+    <sequenceFlow id="flow2" sourceRef="timer" targetRef="exclusiveGateway" />
+    <endEvent id="end1"/>
+    <endEvent id="end2"/>
+
+    <sequenceFlow id="flow3" sourceRef="exclusiveGateway" targetRef="end1" >
+      <conditionExpression xsi:type="tFormalExpression">${testObject.property=="jonny"}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow4" sourceRef="exclusiveGateway" targetRef="end2">
+      <conditionExpression xsi:type="tFormalExpression">${testObject.property!="jonny"}</conditionExpression>
+    </sequenceFlow>
+
+  </process>
+
+</definitions>
