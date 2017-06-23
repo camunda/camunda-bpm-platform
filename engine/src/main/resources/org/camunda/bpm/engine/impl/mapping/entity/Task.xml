@@ -208,33 +208,74 @@
   <sql id="selectTaskByQueryCriteriaSql">
     <bind name="escapeChar" value="'\\'"/>
     from ${prefix}ACT_RU_TASK RES
-    <if test="candidateUser != null || candidateGroups != null || involvedUser != null || withCandidateGroups || withCandidateUsers ||
-              (orQuery != null &amp;&amp; (orQuery.candidateUser != null || orQuery.candidateGroups != null || orQuery.involvedUser != null))">
-      inner join ${prefix}ACT_RU_IDENTITYLINK I on I.TASK_ID_ = RES.ID_
+    <bind name="I_JOIN" value="false" />
+    <bind name="D_JOIN" value="false" />
+    <bind name="E_JOIN" value="false" />
+    <bind name="CD_JOIN" value="false" />
+    <bind name="CE_JOIN" value="false" />
+    <bind name="E1_JOIN" value="false" />
+
+    <if test="candidateUser != null || candidateGroups != null || involvedUser != null || withCandidateGroups || withCandidateUsers">
+      <bind name="I_JOIN" value="true" />
     </if>
     <if test="processDefinitionKey != null || processDefinitionName != null || processDefinitionNameLike != null ||
-              (processDefinitionKeys != null &amp;&amp; processDefinitionKeys.length > 0) ||
-              (orQuery != null &amp;&amp; (orQuery.processDefinitionKey != null || orQuery.processDefinitionName != null || orQuery.processDefinitionNameLike != null ||
-              (orQuery.processDefinitionKeys != null &amp;&amp; orQuery.processDefinitionKeys.length > 0)))">
-      inner join ${prefix}ACT_RE_PROCDEF D on RES.PROC_DEF_ID_ = D.ID_
+              (processDefinitionKeys != null &amp;&amp; processDefinitionKeys.length > 0)">
+      <bind name="D_JOIN" value="true" />
     </if>
     <if test="processInstanceBusinessKey != null || processInstanceBusinessKeyLike != null ||
-              (processInstanceBusinessKeys != null &amp;&amp; processInstanceBusinessKeys.length > 0) ||
-              (orQuery != null &amp;&amp; (orQuery.processInstanceBusinessKey != null || orQuery.processInstanceBusinessKeyLike != null ||
-              (orQuery.processInstanceBusinessKeys != null &amp;&amp; orQuery.processInstanceBusinessKeys.length > 0)))">
-        inner join ${prefix}ACT_RU_EXECUTION E on RES.PROC_INST_ID_ = E.ID_
+              (processInstanceBusinessKeys != null &amp;&amp; processInstanceBusinessKeys.length > 0)">
+      <bind name="E_JOIN" value="true" />
     </if>
-    <if test="caseDefinitionKey != null || caseDefinitionName != null || caseDefinitionNameLike != null ||
-              (orQuery != null &amp;&amp; (orQuery.caseDefinitionKey != null || orQuery.caseDefinitionName != null || orQuery.caseDefinitionNameLike != null))">
+    <if test="caseDefinitionKey != null || caseDefinitionName != null || caseDefinitionNameLike != null">
+      <bind name="CD_JOIN" value="true" />
+    </if>
+    <if test="caseInstanceBusinessKey != null || caseInstanceBusinessKeyLike != null">
+      <bind name="CE_JOIN" value="true" />
+    </if>
+    <if test="activityInstanceIdIn != null &amp;&amp; activityInstanceIdIn.length > 0">
+      <bind name="E1_JOIN" value="true" />
+    </if>
+
+    <foreach collection="orQueries" item="orQuery">
+      <if test="orQuery != null &amp;&amp; (orQuery.candidateUser != null || orQuery.candidateGroups != null || orQuery.involvedUser != null)">
+        <bind name="I_JOIN" value="true" />
+      </if>
+      <if test="orQuery != null &amp;&amp; (orQuery.processDefinitionKey != null || orQuery.processDefinitionName != null || orQuery.processDefinitionNameLike != null ||
+              (orQuery.processDefinitionKeys != null &amp;&amp; orQuery.processDefinitionKeys.length > 0))">
+        <bind name="D_JOIN" value="true" />
+      </if>
+      <if test="orQuery != null &amp;&amp; (orQuery.processInstanceBusinessKey != null || orQuery.processInstanceBusinessKeyLike != null ||
+              (orQuery.processInstanceBusinessKeys != null &amp;&amp; orQuery.processInstanceBusinessKeys.length > 0))">
+        <bind name="E_JOIN" value="true" />
+      </if>
+      <if test="orQuery != null &amp;&amp; (orQuery.caseDefinitionKey != null || orQuery.caseDefinitionName != null || orQuery.caseDefinitionNameLike != null)">
+        <bind name="CD_JOIN" value="true" />
+      </if>
+      <if test="orQuery != null &amp;&amp; (orQuery.caseInstanceBusinessKey != null || orQuery.caseInstanceBusinessKeyLike != null)">
+        <bind name="CE_JOIN" value="true" />
+      </if>
+      <if test="orQuery != null &amp;&amp; (orQuery.activityInstanceIdIn != null &amp;&amp; orQuery.activityInstanceIdIn.length > 0)">
+        <bind name="E1_JOIN" value="true" />
+      </if>
+    </foreach>
+
+    <if test="I_JOIN">
+      inner join ${prefix}ACT_RU_IDENTITYLINK I on I.TASK_ID_ = RES.ID_
+    </if>
+    <if test="D_JOIN">
+      inner join ${prefix}ACT_RE_PROCDEF D on RES.PROC_DEF_ID_ = D.ID_
+    </if>
+    <if test="E_JOIN">
+      inner join ${prefix}ACT_RU_EXECUTION E on RES.PROC_INST_ID_ = E.ID_
+    </if>
+    <if test="CD_JOIN">
       inner join ${prefix}ACT_RE_CASE_DEF CD on RES.CASE_DEF_ID_ = CD.ID_
     </if>
-    <if test="caseInstanceBusinessKey != null || caseInstanceBusinessKeyLike != null ||
-              (orQuery != null &amp;&amp; (orQuery.caseInstanceBusinessKey != null || orQuery.caseInstanceBusinessKeyLike != null))">
-        inner join ${prefix}ACT_RU_CASE_EXECUTION CE on RES.CASE_INST_ID_ = CE.ID_
+    <if test="CE_JOIN">
+      inner join ${prefix}ACT_RU_CASE_EXECUTION CE on RES.CASE_INST_ID_ = CE.ID_
     </if>
-    <if test="activityInstanceIdIn != null &amp;&amp; activityInstanceIdIn.length > 0 ||
-              (orQuery != null &amp;&amp; (orQuery.activityInstanceIdIn != null &amp;&amp; orQuery.activityInstanceIdIn.length > 0))">
-        left join ${prefix}ACT_RU_EXECUTION E1 on RES.EXECUTION_ID_ = E1.ID_
+    <if test="E1_JOIN">
+      left join ${prefix}ACT_RU_EXECUTION E1 on RES.EXECUTION_ID_ = E1.ID_
     </if>
 
     <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
@@ -553,7 +594,7 @@
         </if>
       </if>
 
-      <if test="orQuery != null">
+      <foreach collection="orQueries" item="orQuery">
         and
         <trim prefix="(" suffix=")" prefixOverrides="or">
           <if test="orQuery.taskId != null">
@@ -824,7 +865,7 @@
             </if>
           </if>
         </trim>
-      </if>
+      </foreach>
       
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.contextualAuthorizationCheck" /> 
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />

@@ -114,7 +114,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   protected String caseExecutionId;
 
   // or query /////////////////////////////
-  protected TaskQueryImpl orQuery = null;
+  protected List<TaskQueryImpl> orQueries = new ArrayList<TaskQueryImpl>();
   protected TaskQueryImpl andQuery = this;
   protected boolean isOrQueryActive = false;
 
@@ -127,10 +127,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQueryImpl taskId(String taskId) {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     ensureNotNull("Task id", taskId);
     this.taskId = taskId;
     return this;
@@ -138,20 +135,14 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQueryImpl taskName(String name) {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     this.name = name;
     return this;
   }
 
   @Override
   public TaskQueryImpl taskNameLike(String nameLike) {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     ensureNotNull("Task nameLike", nameLike);
     this.nameLike = nameLike;
     return this;
@@ -159,10 +150,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQueryImpl taskDescription(String description) {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     ensureNotNull("Description", description);
     this.description = description;
     return this;
@@ -170,10 +158,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQuery taskDescriptionLike(String descriptionLike) {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     ensureNotNull("Task descriptionLike", descriptionLike);
     this.descriptionLike = descriptionLike;
     return this;
@@ -181,10 +166,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQuery taskPriority(Integer priority) {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     ensureNotNull("Priority", priority);
     this.priority = priority;
     return this;
@@ -192,10 +174,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQuery taskMinPriority(Integer minPriority) {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     ensureNotNull("Min Priority", minPriority);
     this.minPriority = minPriority;
     return this;
@@ -203,10 +182,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQuery taskMaxPriority(Integer maxPriority) {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     ensureNotNull("Max Priority", maxPriority);
     this.maxPriority = maxPriority;
     return this;
@@ -214,10 +190,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQueryImpl taskAssignee(String assignee) {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     ensureNotNull("Assignee", assignee);
     this.assignee = assignee;
     expressions.remove("taskAssignee");
@@ -226,6 +199,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQuery taskAssigneeExpression(String assigneeExpression) {
+    ensureOrQueryActivation();
     ensureNotNull("Assignee expression", assigneeExpression);
     expressions.put("taskAssignee", assigneeExpression);
     return this;
@@ -233,10 +207,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQuery taskAssigneeLike(String assignee) {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     ensureNotNull("Assignee", assignee);
     this.assigneeLike = assignee;
     expressions.remove("taskAssigneeLike");
@@ -245,6 +216,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQuery taskAssigneeLikeExpression(String assigneeLikeExpression) {
+    ensureOrQueryActivation();
     ensureNotNull("Assignee like expression", assigneeLikeExpression);
     expressions.put("taskAssigneeLike", assigneeLikeExpression);
     return this;
@@ -252,10 +224,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQueryImpl taskOwner(String owner) {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     ensureNotNull("Owner", owner);
     this.owner = owner;
     expressions.remove("taskOwner");
@@ -264,6 +233,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQuery taskOwnerExpression(String ownerExpression) {
+    ensureOrQueryActivation();
     ensureNotNull("Owner expression", ownerExpression);
     expressions.put("taskOwner", ownerExpression);
     return this;
@@ -278,30 +248,21 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQuery taskUnassigned() {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     this.unassigned = true;
     return this;
   }
 
   @Override
   public TaskQuery taskAssigned() {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     this.assigned = true;
     return this;
   }
 
   @Override
   public TaskQuery taskDelegationState(DelegationState delegationState) {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     if (delegationState == null) {
       this.noDelegationState = true;
     } else {
@@ -312,10 +273,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQueryImpl taskCandidateUser(String candidateUser) {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     ensureNotNull("Candidate user", candidateUser);
     if (!isOrQueryActive) {
       if (candidateGroup != null || expressions.containsKey("taskCandidateGroup")) {
@@ -325,7 +283,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
         throw new ProcessEngineException("Invalid query usage: cannot set both candidateUser and candidateGroupIn");
       }
     }
-    
+
     this.candidateUser = candidateUser;
     expressions.remove("taskCandidateUser");
     return this;
@@ -333,6 +291,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQuery taskCandidateUserExpression(String candidateUserExpression) {
+    ensureOrQueryActivation();
     ensureNotNull("Candidate user expression", candidateUserExpression);
 
     if (candidateGroup != null || expressions.containsKey("taskCandidateGroup")) {
@@ -348,10 +307,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQueryImpl taskInvolvedUser(String involvedUser) {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     ensureNotNull("Involved user", involvedUser);
     this.involvedUser = involvedUser;
     expressions.remove("taskInvolvedUser");
@@ -360,6 +316,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQuery taskInvolvedUserExpression(String involvedUserExpression) {
+    ensureOrQueryActivation();
     ensureNotNull("Involved user expression", involvedUserExpression);
     expressions.put("taskInvolvedUser", involvedUserExpression);
     return this;
@@ -367,7 +324,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQuery withCandidateGroups() {
-    if (orQuery == this) {
+    if (isOrQueryActive) {
       throw new ProcessEngineException("Invalid query usage: cannot set withCandidateGroups() within 'or' query");
     }
 
@@ -377,7 +334,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQuery withoutCandidateGroups() {
-    if (orQuery == this) {
+    if (isOrQueryActive) {
       throw new ProcessEngineException("Invalid query usage: cannot set withoutCandidateGroups() within 'or' query");
     }
 
@@ -387,7 +344,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQuery withCandidateUsers() {
-    if (orQuery == this) {
+    if (isOrQueryActive) {
       throw new ProcessEngineException("Invalid query usage: cannot set withCandidateUsers() within 'or' query");
     }
 
@@ -397,7 +354,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQuery withoutCandidateUsers() {
-    if (orQuery == this) {
+    if (isOrQueryActive) {
       throw new ProcessEngineException("Invalid query usage: cannot set withoutCandidateUsers() within 'or' query");
     }
 
@@ -407,11 +364,9 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQueryImpl taskCandidateGroup(String candidateGroup) {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     ensureNotNull("Candidate group", candidateGroup);
+
     if (!isOrQueryActive) {
       if (candidateUser != null || expressions.containsKey("taskCandidateUser")) {
         throw new ProcessEngineException("Invalid query usage: cannot set both candidateGroup and candidateUser");
@@ -420,7 +375,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
         throw new ProcessEngineException("Invalid query usage: cannot set both candidateGroup and candidateGroupIn");
       }
     }
-    
+
     this.candidateGroup = candidateGroup;
     expressions.remove("taskCandidateGroup");
     return this;
@@ -428,13 +383,16 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQuery taskCandidateGroupExpression(String candidateGroupExpression) {
+    ensureOrQueryActivation();
     ensureNotNull("Candidate group expression", candidateGroupExpression);
 
-    if (candidateUser != null || expressions.containsKey("taskCandidateUser")) {
-      throw new ProcessEngineException("Invalid query usage: cannot set both candidateGroup and candidateUser");
-    }
-    if (candidateGroups != null || expressions.containsKey("taskCandidateGroupIn")) {
-      throw new ProcessEngineException("Invalid query usage: cannot set both candidateGroup and candidateGroupIn");
+    if (!isOrQueryActive) {
+      if (candidateUser != null || expressions.containsKey("taskCandidateUser")) {
+        throw new ProcessEngineException("Invalid query usage: cannot set both candidateGroup and candidateUser");
+      }
+      if (candidateGroups != null || expressions.containsKey("taskCandidateGroupIn")) {
+        throw new ProcessEngineException("Invalid query usage: cannot set both candidateGroup and candidateGroupIn");
+      }
     }
 
     expressions.put("taskCandidateGroup", candidateGroupExpression);
@@ -443,10 +401,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQuery taskCandidateGroupIn(List<String> candidateGroups) {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     ensureNotEmpty("Candidate group list", candidateGroups);
 
     if (!isOrQueryActive) {
@@ -457,7 +412,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
         throw new ProcessEngineException("Invalid query usage: cannot set both candidateGroupIn and candidateGroup");
       }
     }
-    
+
     this.candidateGroups = candidateGroups;
     expressions.remove("taskCandidateGroupIn");
     return this;
@@ -467,11 +422,13 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   public TaskQuery taskCandidateGroupInExpression(String candidateGroupsExpression) {
     ensureNotEmpty("Candidate group list expression", candidateGroupsExpression);
 
-    if (candidateUser != null || expressions.containsKey("taskCandidateUser")) {
-      throw new ProcessEngineException("Invalid query usage: cannot set both candidateGroupIn and candidateUser");
-    }
-    if (candidateGroup != null || expressions.containsKey("taskCandidateGroup")) {
-      throw new ProcessEngineException("Invalid query usage: cannot set both candidateGroupIn and candidateGroup");
+    if (!isOrQueryActive) {
+      if (candidateUser != null || expressions.containsKey("taskCandidateUser")) {
+        throw new ProcessEngineException("Invalid query usage: cannot set both candidateGroupIn and candidateUser");
+      }
+      if (candidateGroup != null || expressions.containsKey("taskCandidateGroup")) {
+        throw new ProcessEngineException("Invalid query usage: cannot set both candidateGroupIn and candidateGroup");
+      }
     }
 
     expressions.put("taskCandidateGroupIn", candidateGroupsExpression);
@@ -480,10 +437,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQuery includeAssignedTasks() {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     if (candidateUser == null && candidateGroup == null && candidateGroups == null && !isWithCandidateGroups() && !isWithoutCandidateGroups() && !isWithCandidateUsers() && !isWithoutCandidateUsers()
         && !expressions.containsKey("taskCandidateUser") && !expressions.containsKey("taskCandidateGroup")
         && !expressions.containsKey("taskCandidateGroupIn")) {
@@ -501,60 +455,42 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQueryImpl processInstanceId(String processInstanceId) {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     this.processInstanceId = processInstanceId;
     return this;
   }
 
   @Override
   public TaskQueryImpl processInstanceBusinessKey(String processInstanceBusinessKey) {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     this.processInstanceBusinessKey = processInstanceBusinessKey;
     return this;
   }
 
   @Override
   public TaskQuery processInstanceBusinessKeyIn(String... processInstanceBusinessKeys) {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     this.processInstanceBusinessKeys = processInstanceBusinessKeys;
     return this;
   }
 
   @Override
   public TaskQuery processInstanceBusinessKeyLike(String processInstanceBusinessKey) {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
-  	this.processInstanceBusinessKeyLike = processInstanceBusinessKey;
+    ensureOrQueryActivation();
+    this.processInstanceBusinessKeyLike = processInstanceBusinessKey;
   	return this;
   }
 
   @Override
   public TaskQueryImpl executionId(String executionId) {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     this.executionId = executionId;
     return this;
   }
 
   @Override
   public TaskQuery activityInstanceIdIn(String... activityInstanceIds) {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     this.activityInstanceIdIn = activityInstanceIds;
     return this;
   }
@@ -562,10 +498,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   @Override
   public TaskQuery tenantIdIn(String... tenantIds) {
     ensureNotNull("tenantIds", (Object[]) tenantIds);
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     this.tenantIds = tenantIds;
     this.isTenantIdSet = true;
     return this;
@@ -573,10 +506,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQuery withoutTenantId() {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     this.tenantIds = null;
     this.isTenantIdSet = true;
     return this;
@@ -584,10 +514,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQueryImpl taskCreatedOn(Date createTime) {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     this.createTime = createTime;
     expressions.remove("taskCreatedOn");
     return this;
@@ -595,16 +522,14 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQuery taskCreatedOnExpression(String createTimeExpression) {
+    ensureOrQueryActivation();
     expressions.put("taskCreatedOn", createTimeExpression);
     return this;
   }
 
   @Override
   public TaskQuery taskCreatedBefore(Date before) {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     this.createTimeBefore = before;
     expressions.remove("taskCreatedBefore");
     return this;
@@ -612,16 +537,14 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQuery taskCreatedBeforeExpression(String beforeExpression) {
+    ensureOrQueryActivation();
     expressions.put("taskCreatedBefore", beforeExpression);
     return this;
   }
 
   @Override
   public TaskQuery taskCreatedAfter(Date after) {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     this.createTimeAfter = after;
     expressions.remove("taskCreatedAfter");
     return this;
@@ -629,56 +552,42 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQuery taskCreatedAfterExpression(String afterExpression) {
+    ensureOrQueryActivation();
     expressions.put("taskCreatedAfter", afterExpression);
     return this;
   }
 
   @Override
   public TaskQuery taskDefinitionKey(String key) {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     this.key = key;
     return this;
   }
 
   @Override
   public TaskQuery taskDefinitionKeyLike(String keyLike) {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     this.keyLike = keyLike;
     return this;
   }
 
   @Override
   public TaskQuery taskDefinitionKeyIn(String... taskDefinitionKeys) {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
-  	this.taskDefinitionKeys = taskDefinitionKeys;
+    ensureOrQueryActivation();
+    this.taskDefinitionKeys = taskDefinitionKeys;
   	return this;
   }
 
   @Override
   public TaskQuery taskParentTaskId(String taskParentTaskId) {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     this.parentTaskId = taskParentTaskId;
     return this;
   }
 
   @Override
   public TaskQuery caseInstanceId(String caseInstanceId) {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     ensureNotNull("caseInstanceId", caseInstanceId);
     this.caseInstanceId = caseInstanceId;
     return this;
@@ -686,10 +595,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQuery caseInstanceBusinessKey(String caseInstanceBusinessKey) {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     ensureNotNull("caseInstanceBusinessKey", caseInstanceBusinessKey);
     this.caseInstanceBusinessKey = caseInstanceBusinessKey;
     return this;
@@ -697,10 +603,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQuery caseInstanceBusinessKeyLike(String caseInstanceBusinessKeyLike) {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     ensureNotNull("caseInstanceBusinessKeyLike", caseInstanceBusinessKeyLike);
     this.caseInstanceBusinessKeyLike = caseInstanceBusinessKeyLike;
     return this;
@@ -708,10 +611,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQuery caseExecutionId(String caseExecutionId) {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     ensureNotNull("caseExecutionId", caseExecutionId);
     this.caseExecutionId = caseExecutionId;
     return this;
@@ -719,10 +619,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQuery caseDefinitionId(String caseDefinitionId) {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     ensureNotNull("caseDefinitionId", caseDefinitionId);
     this.caseDefinitionId = caseDefinitionId;
     return this;
@@ -730,10 +627,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQuery caseDefinitionKey(String caseDefinitionKey) {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     ensureNotNull("caseDefinitionKey", caseDefinitionKey);
     this.caseDefinitionKey = caseDefinitionKey;
     return this;
@@ -741,10 +635,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQuery caseDefinitionName(String caseDefinitionName) {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     ensureNotNull("caseDefinitionName", caseDefinitionName);
     this.caseDefinitionName = caseDefinitionName;
     return this;
@@ -752,10 +643,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQuery caseDefinitionNameLike(String caseDefinitionNameLike) {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     ensureNotNull("caseDefinitionNameLike", caseDefinitionNameLike);
     this.caseDefinitionNameLike = caseDefinitionNameLike;
     return this;
@@ -889,60 +777,42 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQuery processDefinitionKey(String processDefinitionKey) {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     this.processDefinitionKey = processDefinitionKey;
     return this;
   }
 
   @Override
   public TaskQuery processDefinitionKeyIn(String... processDefinitionKeys) {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     this.processDefinitionKeys = processDefinitionKeys;
     return this;
   }
 
   @Override
   public TaskQuery processDefinitionId(String processDefinitionId) {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     this.processDefinitionId = processDefinitionId;
     return this;
   }
 
   @Override
   public TaskQuery processDefinitionName(String processDefinitionName) {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     this.processDefinitionName = processDefinitionName;
     return this;
   }
 
   @Override
   public TaskQuery processDefinitionNameLike(String processDefinitionName) {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
-  	this.processDefinitionNameLike = processDefinitionName;
+    ensureOrQueryActivation();
+    this.processDefinitionNameLike = processDefinitionName;
   	return this;
   }
 
   @Override
   public TaskQuery dueDate(Date dueDate) {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     this.dueDate = dueDate;
     expressions.remove("dueDate");
     return this;
@@ -950,16 +820,14 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQuery dueDateExpression(String dueDateExpression) {
+    ensureOrQueryActivation();
     expressions.put("dueDate", dueDateExpression);
     return this;
   }
 
   @Override
   public TaskQuery dueBefore(Date dueBefore) {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     this.dueBefore = dueBefore;
     expressions.remove("dueBefore");
     return this;
@@ -967,16 +835,14 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQuery dueBeforeExpression(String dueDate) {
+    ensureOrQueryActivation();
     expressions.put("dueBefore", dueDate);
     return this;
   }
 
   @Override
   public TaskQuery dueAfter(Date dueAfter) {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     this.dueAfter = dueAfter;
     expressions.remove("dueAfter");
     return this;
@@ -984,16 +850,14 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQuery dueAfterExpression(String dueDateExpression) {
+    ensureOrQueryActivation();
     expressions.put("dueAfter", dueDateExpression);
     return this;
   }
 
   @Override
   public TaskQuery followUpDate(Date followUpDate) {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     this.followUpDate = followUpDate;
     expressions.remove("followUpDate");
     return this;
@@ -1001,16 +865,14 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQuery followUpDateExpression(String followUpDateExpression) {
+    ensureOrQueryActivation();
     expressions.put("followUpDate", followUpDateExpression);
     return this;
   }
 
   @Override
   public TaskQuery followUpBefore(Date followUpBefore) {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     this.followUpBefore = followUpBefore;
     this.followUpNullAccepted = false;
     expressions.remove("followUpBefore");
@@ -1026,10 +888,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQuery followUpBeforeOrNotExistent(Date followUpDate) {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     this.followUpBefore = followUpDate;
     this.followUpNullAccepted = true;
     expressions.remove("followUpBeforeOrNotExistent");
@@ -1038,6 +897,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQuery followUpBeforeOrNotExistentExpression(String followUpDateExpression) {
+    ensureOrQueryActivation();
     expressions.put("followUpBeforeOrNotExistent", followUpDateExpression);
     this.followUpNullAccepted = true;
     return this;
@@ -1049,10 +909,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQuery followUpAfter(Date followUpAfter) {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     this.followUpAfter = followUpAfter;
     expressions.remove("followUpAfter");
     return this;
@@ -1060,44 +917,36 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQuery followUpAfterExpression(String followUpAfterExpression) {
+    ensureOrQueryActivation();
     expressions.put("followUpAfter", followUpAfterExpression);
     return this;
   }
 
   @Override
   public TaskQuery excludeSubtasks() {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     this.excludeSubtasks = true;
     return this;
   }
 
   @Override
   public TaskQuery active() {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     this.suspensionState = SuspensionState.ACTIVE;
     return this;
   }
 
   @Override
   public TaskQuery suspended() {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     this.suspensionState = SuspensionState.SUSPENDED;
     return this;
   }
 
   @Override
   public TaskQuery initializeFormKeys() {
-    if (orQuery == this) {
-      isOrQueryActive = true;
+    if (isOrQueryActive) {
+      throw new ProcessEngineException("Invalid query usage: cannot set initializeFormKeys() within 'or' query");
     }
 
     this.initializeFormKeys = true;
@@ -1122,7 +971,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   }
 
   public List<String> getCandidateGroups() {
-    if (orQuery == this) {
+    if (isOrQueryActive) {
       if (candidateGroup != null && candidateGroups != null) {
         ArrayList result = new ArrayList();
         result.addAll(candidateGroups);
@@ -1209,24 +1058,29 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     return groupIds;
   }
 
+  protected void ensureOrQueryActivation() {
+    if (!orQueries.isEmpty() && orQueries.get(orQueries.size()-1) == this) {
+      isOrQueryActive = true;
+    }
+  }
+
   protected void ensureVariablesInitialized() {
     VariableSerializers types = Context.getProcessEngineConfiguration().getVariableSerializers();
     for(QueryVariableValue var : variables) {
       var.initialize(types);
     }
 
-    if (orQuery != null && orQuery.isOrQueryActive) {
-      for (QueryVariableValue var : orQuery.variables) {
-        var.initialize(types);
+    if (!orQueries.isEmpty()) {
+      for (TaskQueryImpl orQuery: orQueries) {
+        for (QueryVariableValue var : orQuery.variables) {
+          var.initialize(types);
+        }
       }
     }
   }
 
   public void addVariable(String name, Object value, QueryOperator operator, boolean isTaskVariable, boolean isProcessInstanceVariable) {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     ensureNotNull("name", name);
 
     if(value == null || isBoolean(value)) {
@@ -1464,7 +1318,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
       .getTaskManager()
       .findTasksByQueryCriteria(this);
 
-    if(initializeFormKeys || (orQuery != null && orQuery.initializeFormKeys)) {
+    if (initializeFormKeys) {
       for (Task task : taskList) {
         // initialize the form keys of the tasks
         ((TaskEntity) task).initializeFormKey();
@@ -1758,17 +1612,17 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     return isTenantIdSet;
   }
 
-  public TaskQueryImpl getOrQuery() {
-    return orQuery;
+  public List<TaskQueryImpl> getOrQueries() {
+    return orQueries;
   }
 
-  public boolean getIsOrQueryActive() {
+  public boolean isOrQueryActive() {
     return isOrQueryActive;
   }
 
-  public void setOrQuery(TaskQueryImpl orQuery) {
-    this.orQuery = orQuery;
-    this.orQuery.isOrQueryActive = true;
+  public void addOrQuery(TaskQueryImpl orQuery) {
+    orQuery.isOrQueryActive = true;
+    this.orQueries.add(orQuery);
   }
 
   public void setOrQueryActive() {
@@ -2213,381 +2067,11 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
     mergeOrdering(extendedQuery, extendingQuery);
 
-    // or query //////////////////
-    TaskQueryImpl extendedOrQuery = new TaskQueryImpl();
-    TaskQueryImpl extendingOrQuery = null;
-
-    if (extendingQuery.orQuery != null && extendingQuery.orQuery.isOrQueryActive) {
-      extendedOrQuery.isOrQueryActive = true;
-      extendingOrQuery = extendingQuery.orQuery;
-      extendedOrQuery.validators = new HashSet<Validator<AbstractQuery<?, ?>>>();
+    if (!orQueries.isEmpty()) {
+      extendedQuery.orQueries.addAll(orQueries);
     }
-
-    if (orQuery != null && orQuery.isOrQueryActive) {
-      extendedOrQuery.isOrQueryActive = true;
-      extendedOrQuery.validators = new HashSet<Validator<AbstractQuery<?, ?>>>(orQuery.validators);
-    }
-
-    if (extendingOrQuery != null && extendingOrQuery.getName() != null) {
-      extendedOrQuery.taskName(extendingOrQuery.getName());
-    } else if (orQuery != null && orQuery.getName() != null) {
-      extendedOrQuery.taskName(orQuery.getName());
-    }
-
-    if (extendingOrQuery != null && extendingOrQuery.getNameLike() != null) {
-      extendedOrQuery.taskNameLike(extendingOrQuery.getNameLike());
-    } else if (orQuery != null && orQuery.getNameLike() != null) {
-      extendedOrQuery.taskNameLike(orQuery.getNameLike());
-    }
-
-    if (extendingOrQuery != null && extendingOrQuery.getNameNotEqual() != null) {
-      extendedOrQuery.taskNameNotEqual(extendingOrQuery.getNameNotEqual());
-    } else if (orQuery != null && orQuery.getNameNotEqual() != null) {
-      extendedOrQuery.taskNameNotEqual(orQuery.getNameNotEqual());
-    }
-
-    if (extendingOrQuery != null && extendingOrQuery.getNameNotLike() != null) {
-      extendedOrQuery.taskNameNotLike(extendingOrQuery.getNameNotLike());
-    } else if (orQuery != null && orQuery.getNameNotLike() != null) {
-      extendedOrQuery.taskNameNotLike(orQuery.getNameNotLike());
-    }
-
-    if (extendingOrQuery != null && extendingOrQuery.getAssignee() != null) {
-      extendedOrQuery.taskAssignee(extendingOrQuery.getAssignee());
-    } else if (orQuery != null && orQuery.getAssignee() != null) {
-      extendedOrQuery.taskAssignee(orQuery.getAssignee());
-    }
-
-    if (extendingOrQuery != null && extendingOrQuery.getAssigneeLike() != null) {
-      extendedOrQuery.taskAssigneeLike(extendingOrQuery.getAssigneeLike());
-    } else if (orQuery != null && orQuery.getAssigneeLike() != null) {
-      extendedOrQuery.taskAssigneeLike(orQuery.getAssigneeLike());
-    }
-
-    if (extendingOrQuery != null && extendingOrQuery.getInvolvedUser() != null) {
-      extendedOrQuery.taskInvolvedUser(extendingOrQuery.getInvolvedUser());
-    } else if (orQuery != null && orQuery.getInvolvedUser() != null) {
-      extendedOrQuery.taskInvolvedUser(orQuery.getInvolvedUser());
-    }
-
-    if (extendingOrQuery != null && extendingOrQuery.getOwner() != null) {
-      extendedOrQuery.taskOwner(extendingOrQuery.getOwner());
-    } else if (orQuery != null && orQuery.getOwner() != null) {
-      extendedOrQuery.taskOwner(orQuery.getOwner());
-    }
-
-    if ((extendingOrQuery != null && extendingOrQuery.isAssigned()) || (orQuery != null && orQuery.isAssigned())) {
-      extendedOrQuery.taskAssigned();
-    }
-
-    if ((extendingOrQuery != null && extendingOrQuery.isUnassigned()) || (orQuery != null && orQuery.isUnassigned())) {
-      extendedOrQuery.taskUnassigned();
-    }
-
-    if (extendingOrQuery != null && extendingOrQuery.getDelegationState() != null) {
-      extendedOrQuery.taskDelegationState(extendingOrQuery.getDelegationState());
-    } else if (orQuery != null && orQuery.getDelegationState() != null) {
-      extendedOrQuery.taskDelegationState(orQuery.getDelegationState());
-    }
-
-    if (extendingOrQuery != null && extendingOrQuery.getCandidateUser() != null) {
-      extendedOrQuery.taskCandidateUser(extendingOrQuery.getCandidateUser());
-    } else if (orQuery != null && orQuery.getCandidateUser() != null) {
-      extendedOrQuery.taskCandidateUser(orQuery.getCandidateUser());
-    }
-
-    if (extendingOrQuery != null && extendingOrQuery.getCandidateGroup() != null) {
-      extendedOrQuery.taskCandidateGroup(extendingOrQuery.getCandidateGroup());
-    } else if (orQuery != null && orQuery.getCandidateGroup() != null) {
-      extendedOrQuery.taskCandidateGroup(orQuery.getCandidateGroup());
-    }
-
-    if (extendingOrQuery != null && extendingOrQuery.getCandidateGroupsInternal() != null) {
-      extendedOrQuery.taskCandidateGroupIn(extendingOrQuery.getCandidateGroupsInternal());
-    } else if (orQuery != null && orQuery.getCandidateGroupsInternal() != null) {
-      extendedOrQuery.taskCandidateGroupIn(orQuery.getCandidateGroupsInternal());
-    }
-
-    if (extendingOrQuery != null && extendingOrQuery.getProcessInstanceId() != null) {
-      extendedOrQuery.processInstanceId(extendingOrQuery.getProcessInstanceId());
-    } else if (orQuery != null && orQuery.getProcessInstanceId() != null) {
-      extendedOrQuery.processInstanceId(orQuery.getProcessInstanceId());
-    }
-
-    if (extendingOrQuery != null && extendingOrQuery.getExecutionId() != null) {
-      extendedOrQuery.executionId(extendingOrQuery.getExecutionId());
-    } else if (orQuery != null && orQuery.getExecutionId() != null) {
-      extendedOrQuery.executionId(orQuery.getExecutionId());
-    }
-
-    if (extendingOrQuery != null && extendingOrQuery.getActivityInstanceIdIn() != null) {
-      extendedOrQuery.activityInstanceIdIn(extendingOrQuery.getActivityInstanceIdIn());
-    } else if (orQuery != null && orQuery.getActivityInstanceIdIn() != null) {
-      extendedOrQuery.activityInstanceIdIn(orQuery.getActivityInstanceIdIn());
-    }
-
-    if (extendingOrQuery != null && extendingOrQuery.getTaskId() != null) {
-      extendedOrQuery.taskId(extendingOrQuery.getTaskId());
-    } else if (orQuery != null && orQuery.getTaskId() != null) {
-      extendedOrQuery.taskId(orQuery.getTaskId());
-    }
-
-    if (extendingOrQuery != null && extendingOrQuery.getDescription() != null) {
-      extendedOrQuery.taskDescription(extendingOrQuery.getDescription());
-    } else if (orQuery != null && orQuery.getDescription() != null) {
-      extendedOrQuery.taskDescription(orQuery.getDescription());
-    }
-
-    if (extendingOrQuery != null && extendingOrQuery.getDescriptionLike() != null) {
-      extendedOrQuery.taskDescriptionLike(extendingOrQuery.getDescriptionLike());
-    } else if (orQuery != null && orQuery.getDescriptionLike() != null) {
-      extendedOrQuery.taskDescriptionLike(orQuery.getDescriptionLike());
-    }
-
-    if (extendingOrQuery != null && extendingOrQuery.getPriority() != null) {
-      extendedOrQuery.taskPriority(extendingOrQuery.getPriority());
-    } else if (orQuery != null && orQuery.getPriority() != null) {
-      extendedOrQuery.taskPriority(orQuery.getPriority());
-    }
-
-    if (extendingOrQuery != null && extendingOrQuery.getMinPriority() != null) {
-      extendedOrQuery.taskMinPriority(extendingOrQuery.getMinPriority());
-    } else if (orQuery != null && orQuery.getMinPriority() != null) {
-      extendedOrQuery.taskMinPriority(orQuery.getMinPriority());
-    }
-
-    if (extendingOrQuery != null && extendingOrQuery.getMaxPriority() != null) {
-      extendedOrQuery.taskMaxPriority(extendingOrQuery.getMaxPriority());
-    } else if (orQuery != null && orQuery.getMaxPriority() != null) {
-      extendedOrQuery.taskMaxPriority(orQuery.getMaxPriority());
-    }
-
-    if (extendingOrQuery != null && extendingOrQuery.getCreateTime() != null) {
-      extendedOrQuery.taskCreatedOn(extendingOrQuery.getCreateTime());
-    } else if (orQuery != null && orQuery.getCreateTime() != null) {
-      extendedOrQuery.taskCreatedOn(orQuery.getCreateTime());
-    }
-
-    if (extendingOrQuery != null && extendingOrQuery.getCreateTimeBefore() != null) {
-      extendedOrQuery.taskCreatedBefore(extendingOrQuery.getCreateTimeBefore());
-    } else if (orQuery != null && orQuery.getCreateTimeBefore() != null) {
-      extendedOrQuery.taskCreatedBefore(orQuery.getCreateTimeBefore());
-    }
-
-    if (extendingOrQuery != null && extendingOrQuery.getCreateTimeAfter() != null) {
-      extendedOrQuery.taskCreatedAfter(extendingOrQuery.getCreateTimeAfter());
-    } else if (orQuery != null && orQuery.getCreateTimeAfter() != null) {
-      extendedOrQuery.taskCreatedAfter(orQuery.getCreateTimeAfter());
-    }
-
-    if (extendingOrQuery != null && extendingOrQuery.getKey() != null) {
-      extendedOrQuery.taskDefinitionKey(extendingOrQuery.getKey());
-    } else if (orQuery != null && orQuery.getKey() != null) {
-      extendedOrQuery.taskDefinitionKey(orQuery.getKey());
-    }
-
-    if (extendingOrQuery != null && extendingOrQuery.getKeyLike() != null) {
-      extendedOrQuery.taskDefinitionKeyLike(extendingOrQuery.getKeyLike());
-    } else if (orQuery != null && orQuery.getKeyLike() != null) {
-      extendedOrQuery.taskDefinitionKeyLike(orQuery.getKeyLike());
-    }
-
-    if (extendingOrQuery != null && extendingOrQuery.getKeys() != null) {
-      extendedOrQuery.taskDefinitionKeyIn(extendingOrQuery.getKeys());
-    } else if (orQuery != null && orQuery.getKeys() != null) {
-      extendedOrQuery.taskDefinitionKeyIn(orQuery.getKeys());
-    }
-
-    if (extendingOrQuery != null && extendingOrQuery.getParentTaskId() != null) {
-      extendedOrQuery.taskParentTaskId(extendingOrQuery.getParentTaskId());
-    } else if (orQuery != null && orQuery.getParentTaskId() != null) {
-      extendedOrQuery.taskParentTaskId(orQuery.getParentTaskId());
-    }
-
-    if (extendingOrQuery != null && extendingOrQuery.getProcessDefinitionKey() != null) {
-      extendedOrQuery.processDefinitionKey(extendingOrQuery.getProcessDefinitionKey());
-    } else if (orQuery != null && orQuery.getProcessDefinitionKey() != null) {
-      extendedOrQuery.processDefinitionKey(orQuery.getProcessDefinitionKey());
-    }
-
-    if (extendingOrQuery != null && extendingOrQuery.getProcessDefinitionKeys() != null) {
-      extendedOrQuery.processDefinitionKeyIn(extendingOrQuery.getProcessDefinitionKeys());
-    } else if (orQuery != null && orQuery.getProcessDefinitionKeys() != null) {
-      extendedOrQuery.processDefinitionKeyIn(orQuery.getProcessDefinitionKeys());
-    }
-
-    if (extendingOrQuery != null && extendingOrQuery.getProcessDefinitionId() != null) {
-      extendedOrQuery.processDefinitionId(extendingOrQuery.getProcessDefinitionId());
-    } else if (orQuery != null && orQuery.getProcessDefinitionId() != null) {
-      extendedOrQuery.processDefinitionId(orQuery.getProcessDefinitionId());
-    }
-
-    if (extendingOrQuery != null && extendingOrQuery.getProcessDefinitionName() != null) {
-      extendedOrQuery.processDefinitionName(extendingOrQuery.getProcessDefinitionName());
-    } else if (orQuery != null && orQuery.getProcessDefinitionName() != null) {
-      extendedOrQuery.processDefinitionName(orQuery.getProcessDefinitionName());
-    }
-
-    if (extendingOrQuery != null && extendingOrQuery.getProcessDefinitionNameLike() != null) {
-      extendedOrQuery.processDefinitionNameLike(extendingOrQuery.getProcessDefinitionNameLike());
-    } else if (orQuery != null && orQuery.getProcessDefinitionNameLike() != null) {
-      extendedOrQuery.processDefinitionNameLike(orQuery.getProcessDefinitionNameLike());
-    }
-
-    if (extendingOrQuery != null && extendingOrQuery.getProcessInstanceBusinessKey() != null) {
-      extendedOrQuery.processInstanceBusinessKey(extendingOrQuery.getProcessInstanceBusinessKey());
-    } else if (orQuery != null && orQuery.getProcessInstanceBusinessKey() != null) {
-      extendedOrQuery.processInstanceBusinessKey(orQuery.getProcessInstanceBusinessKey());
-    }
-
-    if (extendingOrQuery != null && extendingOrQuery.getProcessInstanceBusinessKeyLike() != null) {
-      extendedOrQuery.processInstanceBusinessKeyLike(extendingOrQuery.getProcessInstanceBusinessKeyLike());
-    } else if (orQuery != null && orQuery.getProcessInstanceBusinessKeyLike() != null) {
-      extendedOrQuery.processInstanceBusinessKeyLike(orQuery.getProcessInstanceBusinessKeyLike());
-    }
-
-    if (extendingOrQuery != null && extendingOrQuery.getDueDate() != null) {
-      extendedOrQuery.dueDate(extendingOrQuery.getDueDate());
-    } else if (orQuery != null && orQuery.getDueDate() != null) {
-      extendedOrQuery.dueDate(orQuery.getDueDate());
-    }
-
-    if (extendingOrQuery != null && extendingOrQuery.getDueBefore() != null) {
-      extendedOrQuery.dueBefore(extendingOrQuery.getDueBefore());
-    } else if (orQuery != null && orQuery.getDueBefore() != null) {
-      extendedOrQuery.dueBefore(orQuery.getDueBefore());
-    }
-
-    if (extendingOrQuery != null && extendingOrQuery.getDueAfter() != null) {
-      extendedOrQuery.dueAfter(extendingOrQuery.getDueAfter());
-    } else if (orQuery != null && orQuery.getDueAfter() != null) {
-      extendedOrQuery.dueAfter(orQuery.getDueAfter());
-    }
-
-    if (extendingOrQuery != null && extendingOrQuery.getFollowUpDate() != null) {
-      extendedOrQuery.followUpDate(extendingOrQuery.getFollowUpDate());
-    } else if (orQuery != null && orQuery.getFollowUpDate() != null) {
-      extendedOrQuery.followUpDate(orQuery.getFollowUpDate());
-    }
-
-    if (extendingOrQuery != null && extendingOrQuery.getFollowUpBefore() != null) {
-      extendedOrQuery.followUpBefore(extendingOrQuery.getFollowUpBefore());
-    } else if (orQuery != null && orQuery.getFollowUpBefore() != null) {
-      extendedOrQuery.followUpBefore(orQuery.getFollowUpBefore());
-    }
-
-    if (extendingOrQuery != null && extendingOrQuery.getFollowUpAfter() != null) {
-      extendedOrQuery.followUpAfter(extendingOrQuery.getFollowUpAfter());
-    } else if (orQuery != null && orQuery.getFollowUpAfter() != null) {
-      extendedOrQuery.followUpAfter(orQuery.getFollowUpAfter());
-    }
-
-    if ((extendingOrQuery != null && extendingOrQuery.isFollowUpNullAccepted()) || (orQuery != null && orQuery.isFollowUpNullAccepted())) {
-      extendedOrQuery.setFollowUpNullAccepted(true);
-    }
-
-    if ((extendingOrQuery != null && extendingOrQuery.isExcludeSubtasks()) || (orQuery != null && orQuery.isExcludeSubtasks())) {
-      extendedOrQuery.excludeSubtasks();
-    }
-
-    if (extendingOrQuery != null && extendingOrQuery.getSuspensionState() != null) {
-      if (extendingOrQuery.getSuspensionState().equals(SuspensionState.ACTIVE)) {
-        extendedOrQuery.active();
-      } else if (extendingOrQuery.getSuspensionState().equals(SuspensionState.SUSPENDED)) {
-        extendedOrQuery.suspended();
-      }
-    } else if (orQuery != null && orQuery.getSuspensionState() != null) {
-      if (orQuery.getSuspensionState().equals(SuspensionState.ACTIVE)) {
-        extendedOrQuery.active();
-      } else if (orQuery.getSuspensionState().equals(SuspensionState.SUSPENDED)) {
-        extendedOrQuery.suspended();
-      }
-    }
-
-    if (extendingOrQuery != null && extendingOrQuery.getCaseInstanceId() != null) {
-      extendedOrQuery.caseInstanceId(extendingOrQuery.getCaseInstanceId());
-    } else if (orQuery != null && orQuery.getCaseInstanceId() != null) {
-      extendedOrQuery.caseInstanceId(orQuery.getCaseInstanceId());
-    }
-
-    if (extendingOrQuery != null && extendingOrQuery.getCaseInstanceBusinessKey() != null) {
-      extendedOrQuery.caseInstanceBusinessKey(extendingOrQuery.getCaseInstanceBusinessKey());
-    } else if (orQuery != null && orQuery.getCaseInstanceBusinessKey() != null) {
-      extendedOrQuery.caseInstanceBusinessKey(orQuery.getCaseInstanceBusinessKey());
-    }
-
-    if (extendingOrQuery != null && extendingOrQuery.getCaseInstanceBusinessKeyLike() != null) {
-      extendedOrQuery.caseInstanceBusinessKeyLike(extendingOrQuery.getCaseInstanceBusinessKeyLike());
-    } else if (orQuery != null && orQuery.getCaseInstanceBusinessKeyLike() != null) {
-      extendedOrQuery.caseInstanceBusinessKeyLike(orQuery.getCaseInstanceBusinessKeyLike());
-    }
-
-    if (extendingOrQuery != null && extendingOrQuery.getCaseExecutionId() != null) {
-      extendedOrQuery.caseExecutionId(extendingOrQuery.getCaseExecutionId());
-    } else if (orQuery != null && orQuery.getCaseExecutionId() != null) {
-      extendedOrQuery.caseExecutionId(orQuery.getCaseExecutionId());
-    }
-
-    if (extendingOrQuery != null && extendingOrQuery.getCaseDefinitionId() != null) {
-      extendedOrQuery.caseDefinitionId(extendingOrQuery.getCaseDefinitionId());
-    } else if (orQuery != null && orQuery.getCaseDefinitionId() != null) {
-      extendedOrQuery.caseDefinitionId(orQuery.getCaseDefinitionId());
-    }
-
-    if (extendingOrQuery != null && extendingOrQuery.getCaseDefinitionKey() != null) {
-      extendedOrQuery.caseDefinitionKey(extendingOrQuery.getCaseDefinitionKey());
-    } else if (orQuery != null && orQuery.getCaseDefinitionKey() != null) {
-      extendedOrQuery.caseDefinitionKey(orQuery.getCaseDefinitionKey());
-    }
-
-    if (extendingOrQuery != null && extendingOrQuery.getCaseDefinitionName() != null) {
-      extendedOrQuery.caseDefinitionName(extendingOrQuery.getCaseDefinitionName());
-    } else if (orQuery != null && orQuery.getCaseDefinitionName() != null) {
-      extendedOrQuery.caseDefinitionName(orQuery.getCaseDefinitionName());
-    }
-
-    if (extendingOrQuery != null && extendingOrQuery.getCaseDefinitionNameLike() != null) {
-      extendedOrQuery.caseDefinitionNameLike(extendingOrQuery.getCaseDefinitionNameLike());
-    } else if (orQuery != null && orQuery.getCaseDefinitionNameLike() != null) {
-      extendedOrQuery.caseDefinitionNameLike(orQuery.getCaseDefinitionNameLike());
-    }
-
-    if ((extendingOrQuery != null && extendingOrQuery.isInitializeFormKeys()) || (orQuery != null && orQuery.isInitializeFormKeys())) {
-      extendedOrQuery.initializeFormKeys();
-    }
-
-    if ((extendingOrQuery != null && extendingOrQuery.isTaskNameCaseInsensitive()) || (orQuery != null && orQuery.isTaskNameCaseInsensitive())) {
-      extendedOrQuery.taskNameCaseInsensitive();
-    }
-
-    if (extendingOrQuery != null && extendingOrQuery.isTenantIdSet()) {
-      if (extendingOrQuery.getTenantIds() != null) {
-        extendedOrQuery.tenantIdIn(extendingOrQuery.getTenantIds());
-      } else {
-        extendedOrQuery.withoutTenantId();
-      }
-    } else if (orQuery != null && orQuery.isTenantIdSet()) {
-      if (orQuery.getTenantIds() != null) {
-        extendedOrQuery.tenantIdIn(orQuery.getTenantIds());
-      } else {
-        extendedOrQuery.withoutTenantId();
-      }
-    }
-
-    if ((extendingOrQuery != null && extendingOrQuery.getVariables() != null) && (orQuery != null && orQuery.getVariables() != null)) {
-      mergeVariables(extendedOrQuery, extendingOrQuery);
-    } else if ((extendingOrQuery != null && extendingOrQuery.getVariables() != null) && (orQuery == null || (orQuery != null && orQuery.getVariables() == null))) {
-      extendedOrQuery.variables = extendingOrQuery.getVariables();
-    } else if (((extendingOrQuery != null && extendingOrQuery.getVariables() == null) || extendingOrQuery == null) && (orQuery != null && orQuery.getVariables() != null)) {
-      extendedOrQuery.variables = orQuery.getVariables();
-    }
-
-    if ((extendingOrQuery != null && extendingOrQuery.isIncludeAssignedTasks()) || (orQuery != null && orQuery.isIncludeAssignedTasks())) {
-      extendedOrQuery.includeAssignedTasks();
-    }
-
-    if ((orQuery != null && orQuery.isOrQueryActive) || (extendingOrQuery != null && extendingOrQuery.isOrQueryActive)) {
-      extendedQuery.orQuery = extendedOrQuery;
+    if (!extendingQuery.orQueries.isEmpty()) {
+      extendedQuery.orQueries.addAll(extendingQuery.orQueries);
     }
 
     return extendedQuery;
@@ -2608,13 +2092,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
       extendingVariablesComparable.add(new TaskQueryVariableValueComparable(extendingVariable));
     }
 
-    List<TaskQueryVariableValue> originalVariables = this.getVariables();
-
-    if (extendedQuery.isOrQueryActive) {
-      originalVariables = orQuery.getVariables();
-    }
-
-    for (TaskQueryVariableValue originalVariable : originalVariables) {
+    for (TaskQueryVariableValue originalVariable : this.getVariables()) {
       if (!extendingVariablesComparable.contains(new TaskQueryVariableValueComparable(originalVariable))) {
         extendedQuery.addVariable(originalVariable);
       }
@@ -2662,20 +2140,14 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQuery taskNameNotEqual(String name) {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     this.nameNotEqual = name;
     return this;
   }
 
   @Override
   public TaskQuery taskNameNotLike(String nameNotLike) {
-    if (orQuery == this) {
-      isOrQueryActive = true;
-    }
-
+    ensureOrQueryActivation();
     ensureNotNull("Task nameNotLike", nameNotLike);
     this.nameNotLike = nameNotLike;
     return this;
@@ -2687,15 +2159,16 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
       throw new ProcessEngineException("Invalid query usage: cannot set startOr() within 'or' query");
     }
 
-    orQuery = new TaskQueryImpl();
-    orQuery.orQuery = orQuery;
+    TaskQueryImpl orQuery = new TaskQueryImpl();
+    orQuery.orQueries = orQueries;
     orQuery.andQuery = this;
+    orQueries.add(orQuery);
     return orQuery;
   }
 
   @Override
   public TaskQuery endOr() {
-    if (this != orQuery) {
+    if (!orQueries.isEmpty() && this != orQueries.get(orQueries.size()-1)) {
       throw new ProcessEngineException("Invalid query usage: cannot set endOr() before startOr()");
     }
 

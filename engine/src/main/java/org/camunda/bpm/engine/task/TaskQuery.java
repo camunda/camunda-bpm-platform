@@ -767,6 +767,9 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
    * If called, the form keys of the fetched tasks are initialized and
    * {@link Task#getFormKey()} will return a value (in case the task has a form key).
    *
+   * @throws ProcessEngineException
+   *   When method has been executed within "or query". Method must be executed on the base query.
+   *
    * @return the query itself
    */
   TaskQuery initializeFormKeys();
@@ -924,18 +927,18 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
   TaskQuery orderByTenantId();
 
   /**
-   * <p>Starts the "or query" instance to apply filters on.</p>
+   * <p>Starts an "or query" instance to apply filters on.</p>
    *
-   * @return the "or query" instance
+   * @return the created "or query" instance.
    *
-   * @throws ProcessEngineException When method has already been invoked.
+   * @throws ProcessEngineException When method has been invoked within an "or query" instance.
    */
   TaskQuery startOr();
 
   /**
-   * <p>Closes the "or" statement.</p>
+   * <p>Closes an "or query" instance.</p>
    *
-   * @return the "and query" instance
+   * @return the base query instance.
    *
    * @throws ProcessEngineException
    * <ul>

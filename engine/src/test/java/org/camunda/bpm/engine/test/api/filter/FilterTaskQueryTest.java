@@ -1201,15 +1201,21 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     // given
     Task task1 = taskService.newTask();
     task1.setName("taskForOr1");
+    task1.setDescription("aTaskDescription1");
     taskService.saveTask(task1);
 
     Task task2 = taskService.newTask();
     task2.setName("taskForOr2");
+    task2.setDescription("aTaskDescription2");
     taskService.saveTask(task2);
 
     Task task3 = taskService.newTask();
     task3.setName("taskForOr3");
     taskService.saveTask(task3);
+
+    Task task4 = taskService.newTask();
+    task4.setDescription("aTaskDescription4");
+    taskService.saveTask(task4);
 
     // when
     TaskQuery extendedQuery = taskService.createTaskQuery()
@@ -1221,11 +1227,16 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
 
     TaskQuery extendingQuery = taskService.createTaskQuery()
       .startOr()
-        .taskName("taskForOr1")
-        .taskNameLike("taskForOr2")
+        .taskDescriptionLike("aTaskDescription%")
+      .endOr()
+      .startOr()
+        .taskNameLike("taskForOr%")
       .endOr();
 
     // then
+    assertEquals(3, extendedQuery.list().size());
+    assertEquals(3, filterService.list(extendedFilter.getId()).size());
+    assertEquals(2, extendingQuery.list().size());
     assertEquals(2, filterService.list(extendedFilter.getId(), extendingQuery).size());
   }
 
@@ -1233,21 +1244,29 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     // given
     Task task1 = taskService.newTask();
     task1.setName("taskForOr1");
+    task1.setDescription("aTaskDescription1");
     taskService.saveTask(task1);
 
     Task task2 = taskService.newTask();
     task2.setName("taskForOr2");
+    task2.setDescription("aTaskDescription2");
     taskService.saveTask(task2);
 
     Task task3 = taskService.newTask();
     task3.setName("taskForOr3");
     taskService.saveTask(task3);
 
+    Task task4 = taskService.newTask();
+    task4.setDescription("aTaskDescription4");
+    taskService.saveTask(task4);
+
     // when
     TaskQuery extendedQuery = taskService.createTaskQuery()
       .startOr()
-        .taskName("taskForOr1")
-        .taskNameLike("taskForOr2")
+        .taskDescriptionLike("aTaskDescription%")
+      .endOr()
+      .startOr()
+        .taskNameLike("taskForOr%")
       .endOr();
 
     Filter extendedFilter = filterService.newTaskFilter("extendedOrFilter");
@@ -1258,6 +1277,9 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
       .taskNameLike("taskForOr%");
 
     // then
+    assertEquals(2, extendedQuery.list().size());
+    assertEquals(2, filterService.list(extendedFilter.getId()).size());
+    assertEquals(3, extendingQuery.list().size());
     assertEquals(2, filterService.list(extendedFilter.getId(), extendingQuery).size());
   }
 
@@ -1265,28 +1287,40 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     // given
     Task task1 = taskService.newTask();
     task1.setName("taskForOr1");
+    task1.setDescription("aTaskDescription1");
+    task1.setPriority(3);
     taskService.saveTask(task1);
+    taskService.addCandidateUser(task1.getId(), "aTaskCandidateUser");
 
     Task task2 = taskService.newTask();
     task2.setName("taskForOr2");
+    task2.setDescription("aTaskDescription2");
+    task2.setPriority(3);
     taskService.saveTask(task2);
+    taskService.addCandidateUser(task2.getId(), "aTaskCandidateUser");
 
     Task task3 = taskService.newTask();
-    task3.setDescription("aTaskDescription");
+    task3.setName("taskForOr3");
+    task3.setDescription("aTaskDescription3");
+    task3.setPriority(3);
     taskService.saveTask(task3);
+    taskService.addCandidateUser(task3.getId(), "aTaskCandidateUser");
 
     Task task4 = taskService.newTask();
-    task4.setDescription("anotherTaskDescription");
+    task4.setName("taskForOr4");
+    task4.setDescription("aTaskDescription4");
+    task4.setPriority(3);
     taskService.saveTask(task4);
+    taskService.addCandidateUser(task4.getId(), "aTaskCandidateUser");
 
     // when
     TaskQuery extendedQuery = taskService.createTaskQuery()
       .startOr()
-        .taskName("taskForOr1")
-        .taskNameLike("taskForOr2")
+        .taskDescriptionLike("aTaskDescription%")
+      .endOr()
+      .startOr()
+        .taskNameLike("taskForOr%")
       .endOr();
-
-    assertEquals(2, extendedQuery.count());
 
     Filter extendedFilter = filterService.newTaskFilter("extendedOrFilter");
     extendedFilter.setQuery(extendedQuery);
@@ -1294,13 +1328,16 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
 
     TaskQuery extendingQuery = taskService.createTaskQuery()
       .startOr()
-        .taskDescription("aTaskDescription")
-        .taskDescriptionLike("anotherTaskDescription")
+        .taskPriority(3)
+      .endOr()
+      .startOr()
+        .taskCandidateUser("aTaskCandidateUser")
       .endOr();
 
-    assertEquals(2, extendingQuery.count());
-
     // then
+    assertEquals(4, extendedQuery.count());
+    assertEquals(4, filterService.list(extendedFilter.getId()).size());
+    assertEquals(4, extendingQuery.count());
     assertEquals(4, filterService.list(extendedFilter.getId(), extendingQuery).size());
   }
 

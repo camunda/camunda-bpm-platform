@@ -77,7 +77,11 @@ public class TaskQueryOrTest {
   @Test
   public void shouldThrowExceptionByMissingStartOr() {
     try {
-      taskService.createTaskQuery().endOr();
+      taskService.createTaskQuery()
+        .startOr()
+          .taskName("aTaskName")
+        .endOr()
+        .endOr();
       fail("expected exception");
     } catch (ProcessEngineException e) { }
   }
@@ -85,7 +89,16 @@ public class TaskQueryOrTest {
   @Test
   public void shouldThrowExceptionByNesting() {
     try {
-      taskService.createTaskQuery().startOr().startOr();
+      taskService.createTaskQuery()
+        .startOr()
+          .taskName("aTaskName")
+          .startOr()
+            .taskName("anotherTaskName")
+          .endOr()
+        .endOr()
+        .startOr()
+          .taskName("aTaskName")
+        .endOr();
       fail("expected exception");
     } catch (ProcessEngineException e) { }
   }
@@ -93,7 +106,12 @@ public class TaskQueryOrTest {
   @Test
   public void shouldThrowExceptionByEmptyOrQuery() {
     try {
-      taskService.createTaskQuery().startOr().endOr();
+      taskService.createTaskQuery()
+        .startOr()
+          .taskName("aTaskName")
+        .endOr()
+        .startOr()
+        .endOr();
       fail("expected exception");
     } catch (ProcessEngineException e) { }
   }
@@ -102,6 +120,9 @@ public class TaskQueryOrTest {
   public void shouldThrowExceptionByWithCandidateGroupsApplied() {
     try {
       taskService.createTaskQuery()
+        .startOr()
+          .taskName("aTaskName")
+        .endOr()
         .startOr()
           .withCandidateGroups()
         .endOr();
@@ -114,6 +135,9 @@ public class TaskQueryOrTest {
     try {
       taskService.createTaskQuery()
         .startOr()
+          .taskName("aTaskName")
+        .endOr()
+        .startOr()
           .withoutCandidateGroups()
         .endOr();
       fail("expected exception");
@@ -124,6 +148,9 @@ public class TaskQueryOrTest {
   public void shouldThrowExceptionByWithCandidateUsersApplied() {
     try {
       taskService.createTaskQuery()
+        .startOr()
+          .taskName("aTaskName")
+        .endOr()
         .startOr()
           .withCandidateUsers()
         .endOr();
@@ -136,6 +163,9 @@ public class TaskQueryOrTest {
     try {
       taskService.createTaskQuery()
         .startOr()
+          .taskName("aTaskName")
+        .endOr()
+        .startOr()
           .withoutCandidateUsers()
         .endOr();
       fail("expected exception");
@@ -147,8 +177,22 @@ public class TaskQueryOrTest {
     try {
       taskService.createTaskQuery()
         .startOr()
+          .taskName("aTaskName")
+        .endOr()
+        .startOr()
           .taskName("Task")
           .orderByCaseExecutionId()
+        .endOr();
+      fail("expected exception");
+    } catch (ProcessEngineException e) { }
+  }
+
+  @Test
+  public void shouldThrowExceptionByInitializeFormKeysInOrQuery() {
+    try {
+      taskService.createTaskQuery()
+        .startOr()
+          .initializeFormKeys()
         .endOr();
       fail("expected exception");
     } catch (ProcessEngineException e) { }
@@ -349,10 +393,10 @@ public class TaskQueryOrTest {
       .endEvent()
       .done();
 
-     repositoryService
-       .createDeployment()
-       .addModelInstance("foo.bpmn", anotherProcessDefinition)
-       .deploy();
+    repositoryService
+      .createDeployment()
+      .addModelInstance("foo.bpmn", anotherProcessDefinition)
+      .deploy();
 
     ProcessInstance processInstance2 = runtimeService
       .startProcessInstanceByKey("anotherProcessDefinition");
@@ -362,8 +406,8 @@ public class TaskQueryOrTest {
       .startOr()
         .processDefinitionId(processInstance1.getProcessDefinitionId())
         .processInstanceId(processInstance2.getId())
-        .initializeFormKeys()
       .endOr()
+      .initializeFormKeys()
       .list();
 
     // then
@@ -579,6 +623,8 @@ public class TaskQueryOrTest {
     TaskQuery extendingQuery = taskService.createTaskQuery()
       .startOr()
         .taskName("aTaskName")
+      .endOr()
+      .startOr()
         .taskNameLike("anotherTaskName")
       .endOr();
 
@@ -586,9 +632,9 @@ public class TaskQueryOrTest {
     TaskQueryImpl result =  (TaskQueryImpl)((TaskQueryImpl)extendedQuery).extend(extendingQuery);
 
     // then
-    assertEquals("aTaskName", result.getOrQuery().getName());
-    assertEquals("anotherTaskName", result.getOrQuery().getNameLike());
     assertEquals("sales", result.getCandidateGroup());
+    assertEquals("aTaskName", result.getOrQueries().get(0).getName());
+    assertEquals("anotherTaskName", result.getOrQueries().get(1).getNameLike());
   }
 
   @Test
@@ -597,19 +643,21 @@ public class TaskQueryOrTest {
     TaskQuery extendedQuery = taskService.createTaskQuery()
       .startOr()
         .taskName("aTaskName")
+      .endOr()
+      .startOr()
         .taskNameLike("anotherTaskName")
       .endOr();
 
     TaskQuery extendingQuery = taskService.createTaskQuery()
-      .taskCandidateGroup("sales");
+      .taskCandidateGroup("aCandidateGroup");
 
     // when
     TaskQueryImpl result =  (TaskQueryImpl)((TaskQueryImpl)extendedQuery).extend(extendingQuery);
 
     // then
-    assertEquals("aTaskName", result.getOrQuery().getName());
-    assertEquals("anotherTaskName", result.getOrQuery().getNameLike());
-    assertEquals("sales", result.getCandidateGroup());
+    assertEquals("aTaskName", result.getOrQueries().get(0).getName());
+    assertEquals("anotherTaskName", result.getOrQueries().get(1).getNameLike());
+    assertEquals("aCandidateGroup", result.getCandidateGroup());
   }
 
   @Test
@@ -618,12 +666,16 @@ public class TaskQueryOrTest {
     TaskQuery extendedQuery = taskService.createTaskQuery()
       .startOr()
         .taskName("aTaskName")
+      .endOr()
+      .startOr()
         .taskNameLike("anotherTaskName")
       .endOr();
 
     TaskQuery extendingQuery = taskService.createTaskQuery()
       .startOr()
         .taskCandidateGroup("aCandidateGroup")
+      .endOr()
+      .startOr()
         .taskCandidateUser("aCandidateUser")
       .endOr();
 
@@ -631,74 +683,10 @@ public class TaskQueryOrTest {
     TaskQueryImpl result =  (TaskQueryImpl)((TaskQueryImpl)extendedQuery).extend(extendingQuery);
 
     // then
-    assertEquals("aTaskName", result.getOrQuery().getName());
-    assertEquals("anotherTaskName", result.getOrQuery().getNameLike());
-    assertEquals("aCandidateGroup", result.getOrQuery().getCandidateGroup());
-    assertEquals("aCandidateUser", result.getOrQuery().getCandidateUser());
-  }
-
-  @Test
-  public void shouldReturnTasksWithVariablesByExtendingQuery_OrInExtendingQuery() {
-    // given
-    TaskQuery extendedQuery = taskService.createTaskQuery()
-      .taskVariableValueEquals("aLongValue", 789L)
-      .taskVariableValueGreaterThan("anEvenLongerValue", 999L);
-
-    TaskQuery extendingQuery = taskService.createTaskQuery()
-      .startOr()
-        .taskVariableValueEquals("anotherLongValue", 789L)
-        .taskVariableValueGreaterThan("anotherEvenLongerValue", 999L)
-      .endOr();
-
-    // when
-    TaskQueryImpl result =  (TaskQueryImpl)((TaskQueryImpl)extendedQuery).extend(extendingQuery);
-
-    // then
-    assertEquals(2, result.getVariables().size());
-    assertEquals(2, result.getOrQuery().getVariables().size());
-  }
-
-  @Test
-  public void shouldReturnTasksWithVariablesByExtendingQuery_OrInExtendedQuery() {
-    // given
-    TaskQuery extendedQuery = taskService.createTaskQuery()
-      .startOr()
-        .taskVariableValueEquals("aLongValue", 789L)
-        .taskVariableValueGreaterThan("anEvenLongerValue", 999L)
-      .endOr();
-
-    TaskQuery extendingQuery = taskService.createTaskQuery()
-      .taskVariableValueEquals("anotherLongValue", 789L)
-      .taskVariableValueGreaterThan("anotherEvenLongerValue", 999L);
-
-    // when
-    TaskQueryImpl result = (TaskQueryImpl)((TaskQueryImpl)extendedQuery).extend(extendingQuery);
-
-    // then
-    assertEquals(2, result.getVariables().size());
-    assertEquals(2, result.getOrQuery().getVariables().size());
-  }
-
-  @Test
-  public void shouldReturnTasksWithVariablesByExtendingQuery_OrInBothExtendedAndExtendingQuery() {
-    // given
-    TaskQuery extendedQuery = taskService.createTaskQuery()
-      .startOr()
-        .taskVariableValueEquals("aLongValue", 789L)
-        .taskVariableValueGreaterThan("anEvenLongerValue", 999L)
-      .endOr();
-
-    TaskQuery extendingQuery = taskService.createTaskQuery()
-      .startOr()
-        .taskVariableValueEquals("anotherLongValue", 789L)
-        .taskVariableValueGreaterThan("anotherEvenLongerValue", 999L)
-      .endOr();
-
-    // when
-    TaskQueryImpl result =  (TaskQueryImpl)((TaskQueryImpl)extendedQuery).extend(extendingQuery);
-
-    // then
-    assertEquals(4, result.getOrQuery().getVariables().size());
+    assertEquals("aTaskName", result.getOrQueries().get(0).getName());
+    assertEquals("anotherTaskName", result.getOrQueries().get(1).getNameLike());
+    assertEquals("aCandidateGroup", result.getOrQueries().get(2).getCandidateGroup());
+    assertEquals("aCandidateUser", result.getOrQueries().get(3).getCandidateUser());
   }
 
 }

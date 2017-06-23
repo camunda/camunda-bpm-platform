@@ -111,7 +111,7 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
   public static final String TENANT_IDS = "tenantIds";
   public static final String WITHOUT_TENANT_ID = "withoutTenantId";
   public static final String ORDERING_PROPERTIES = "orderingProperties";
-  public static final String OR_QUERY = "orQuery";
+  public static final String OR_QUERIES = "orQueries";
 
   /**
    * Exists for backwards compatibility with 7.2; deprecated since 7.3
@@ -123,6 +123,10 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
 
   @Override
   public JSONObject toJsonObject(TaskQuery taskQuery) {
+    return toJsonObject(taskQuery, false);
+  }
+
+  public JSONObject toJsonObject(TaskQuery taskQuery, boolean isOrQueryActive) {
     JSONObject json = new JSONObject();
     TaskQueryImpl query = (TaskQueryImpl) taskQuery;
 
@@ -189,8 +193,16 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     addField(json, CASE_EXECUTION_ID, query.getCaseExecutionId());
     addTenantIdFields(json, query);
 
-    if (query.getOrQuery() != null && query.getOrQuery().getIsOrQueryActive() && query.getOrQuery() != query) {
-      addField(json, OR_QUERY, toJsonObject(query.getOrQuery()));
+    if (!query.getOrQueries().isEmpty() && !isOrQueryActive) {
+      JSONArray orQueries = new JSONArray();
+
+      for (TaskQueryImpl orQuery : query.getOrQueries()) {
+        if (orQuery != null && orQuery.isOrQueryActive()) {
+          orQueries.put(toJsonObject(orQuery, true));
+        }
+      }
+
+      addField(json, OR_QUERIES, orQueries);
     }
 
     if (query.getOrderingProperties() != null && !query.getOrderingProperties().isEmpty()) {
@@ -257,17 +269,12 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
 
   @Override
   public TaskQuery toObject(JSONObject json) {
-    return toObject(json, false);
-  }
-
-  public TaskQuery toObject(JSONObject json, boolean isOrQuery) {
     TaskQueryImpl query = new TaskQueryImpl();
 
-    if (isOrQuery) {
-      query.setOrQueryActive();
-    }
-    if (json.has(OR_QUERY)) {
-      query.setOrQuery((TaskQueryImpl) toObject(json.getJSONObject(OR_QUERY), true));
+    if (json.has(OR_QUERIES)) {
+      for (int i = 0; i < json.getJSONArray(OR_QUERIES).length(); i++) {
+        query.addOrQuery((TaskQueryImpl) toObject(json.getJSONArray(OR_QUERIES).getJSONObject(i)));
+      }
     }
     if (json.has(TASK_ID)) {
       query.taskId(json.getString(TASK_ID));
