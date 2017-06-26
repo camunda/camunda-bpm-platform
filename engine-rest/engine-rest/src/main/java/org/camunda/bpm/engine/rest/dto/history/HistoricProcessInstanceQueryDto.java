@@ -73,6 +73,8 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
   private Boolean finished;
   private Boolean unfinished;
   private Boolean withIncidents;
+  private String incidentId;
+  private String incidentType;
   private String incidentStatus;
   private String incidentMessage;
   private String incidentMessageLike;
@@ -230,6 +232,24 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
     this.variables = variables;
   }
 
+  public String getIncidentId() {
+    return incidentId;
+  }
+
+  @CamundaQueryParam(value = "incidentId")
+  public void setIncidentId(String incidentId) {
+    this.incidentId = incidentId;
+  }
+
+  public String getIncidentType() {
+    return incidentType;
+  }
+
+  @CamundaQueryParam(value = "incidentType")
+  public void setIncidentType(String incidentType) {
+    this.incidentType = incidentType;
+  }
+
   @CamundaQueryParam(value = "tenantIdIn", converter = StringListConverter.class)
   public void setTenantIdIn(List<String> tenantIds) {
     this.tenantIds = tenantIds;
@@ -306,6 +326,12 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
     }
     if (incidentStatus != null) {
       query.incidentStatus(incidentStatus);
+    }
+    if (incidentId != null) {
+      query.incidentId(incidentId);
+    }
+    if (incidentType != null) {
+      query.incidentType(incidentType);
     }
     if(incidentMessage != null) {
       query.incidentMessage(incidentMessage);
