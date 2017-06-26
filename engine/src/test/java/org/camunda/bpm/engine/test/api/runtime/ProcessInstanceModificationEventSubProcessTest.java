@@ -16,9 +16,6 @@ import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecutionTree;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
 
 import java.util.List;
 
@@ -26,11 +23,9 @@ import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
-import org.camunda.bpm.engine.runtime.ProcessInstanceModificationBuilder;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.util.ExecutionTree;
-import org.junit.Test;
 
 /**
  * @author Roman Smirnov
@@ -814,33 +809,23 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
 
   @Deployment(resources = CANCEL_AND_RESTART)
   public void testProcessInstanceModificationInEventSubProcessCancellationAndRestart() {
-    String processDefinition = "ProcessWithEventSubProcess";
-    String businessKey = "businessKey";
-    String userTaskMainProcess = "UserTaskMainProcess";
-    String userTaskEventSubProcess = "UserTaskEventSubProcess";
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("ProcessWithEventSubProcess");
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(processDefinition,
-      businessKey);
-
-    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey(userTaskMainProcess).singleResult();
-    assertNotNull(task);
-    taskService.complete(task.getId());
-
-    task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey(userTaskEventSubProcess).singleResult();
+    // assume
+    Task task = taskService.createTaskQuery()
+        .processInstanceId(processInstance.getId())
+        .taskDefinitionKey("UserTaskEventSubProcess")
+        .singleResult();
     assertNotNull(task);
 
-    List<String> activeActivityIds = runtimeService.getActiveActivityIds(processInstance.getId());
-
-    assert (activeActivityIds.contains(userTaskEventSubProcess));
-
-    ProcessInstanceModificationBuilder processInstanceModification = runtimeService.createProcessInstanceModification(
-      processInstance.getId());
-    processInstanceModification.cancelAllForActivity(userTaskEventSubProcess);
-    processInstanceModification.startAfterActivity(userTaskEventSubProcess);
-    processInstanceModification.execute();
+    // when
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+      .cancelAllForActivity("UserTaskEventSubProcess")
+      .startAfterActivity("UserTaskEventSubProcess")
+      .execute();
 
     assertNull(runtimeService.createProcessInstanceQuery().singleResult());
-
   }
 
   protected String getInstanceIdForActivity(ActivityInstance activityInstance, String activityId) {
