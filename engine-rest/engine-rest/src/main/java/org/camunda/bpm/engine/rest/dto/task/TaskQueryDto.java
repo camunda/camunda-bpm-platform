@@ -191,12 +191,19 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   private List<VariableQueryParameterDto> processVariables;
   private List<VariableQueryParameterDto> caseInstanceVariables;
 
+  private List<TaskQueryDto> orQueries = new ArrayList<TaskQueryDto>();
+
   public TaskQueryDto() {
 
   }
 
   public TaskQueryDto(ObjectMapper objectMapper, MultivaluedMap<String, String> queryParameters) {
     super(objectMapper, queryParameters);
+  }
+
+  @CamundaQueryParam("orQueries")
+  public void setOrQueries(List<TaskQueryDto> orQueries) {
+    this.orQueries = orQueries;
   }
 
   @CamundaQueryParam("processInstanceBusinessKey")
@@ -936,8 +943,20 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     return caseInstanceVariables;
   }
 
+  public List<TaskQueryDto> getOrQueries() {
+    return orQueries;
+  }
+
   @Override
   protected void applyFilters(TaskQuery query) {
+    if (orQueries != null) {
+      for (TaskQueryDto orQueryDto: orQueries) {
+        TaskQueryImpl orQuery = new TaskQueryImpl();
+        orQuery.setOrQueryActive();
+        orQueryDto.applyFilters(orQuery);
+        ((TaskQueryImpl) query).addOrQuery(orQuery);
+      }
+    }
     if (processInstanceBusinessKey != null) {
       query.processInstanceBusinessKey(processInstanceBusinessKey);
     }
@@ -1340,9 +1359,19 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   }
 
   public static TaskQueryDto fromQuery(Query<?, ?> query) {
+    return fromQuery(query, false);
+  }
+
+  public static TaskQueryDto fromQuery(Query<?, ?> query, boolean isOrQueryActive) {
     TaskQueryImpl taskQuery = (TaskQueryImpl) query;
 
     TaskQueryDto dto = new TaskQueryDto();
+
+    if (!isOrQueryActive) {
+      for (TaskQuery orQuery: taskQuery.getOrQueries()) {
+          dto.orQueries.add(fromQuery(orQuery, true));
+      }
+    }
 
     dto.activityInstanceIdIn = taskQuery.getActivityInstanceIdIn();
     dto.caseDefinitionId = taskQuery.getCaseDefinitionId();

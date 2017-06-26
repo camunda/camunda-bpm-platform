@@ -45,6 +45,7 @@ import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_FILTER_ID;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.mockFilter;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.mockVariableInstance;
 import static org.camunda.bpm.engine.rest.helper.TaskQueryMatcher.hasName;
+import static org.camunda.bpm.engine.rest.helper.TaskQueryOrMatcher.evalOrQuery;
 import static org.camunda.bpm.engine.variable.Variables.stringValue;
 import static org.fest.assertions.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.hasItems;
@@ -129,6 +130,8 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
 
   public static final TaskQuery extendingQuery = new TaskQueryImpl().taskName(MockProvider.EXAMPLE_TASK_NAME);
   public static final TaskQueryDto extendingQueryDto = TaskQueryDto.fromQuery(extendingQuery);
+  public static final TaskQuery extendingOrQuery = new TaskQueryImpl().startOr().taskDescription(MockProvider.EXAMPLE_TASK_DESCRIPTION).endOr().startOr().taskName(MockProvider.EXAMPLE_TASK_NAME).endOr();
+  public static final TaskQueryDto extendingOrQueryDto = TaskQueryDto.fromQuery(extendingOrQuery);
   public static final String invalidExtendingQuery = "abc";
 
   public static final String PROCESS_INSTANCE_A_ID = "processInstanceA";
@@ -920,6 +923,22 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
 
     verify(filterServiceMock).singleResult(eq(EXAMPLE_FILTER_ID),
         argThat(hasName(MockProvider.EXAMPLE_TASK_NAME)));
+  }
+
+  @Test
+  public void testExecuteSingleResultWithExtendingOrQuery() {
+    given()
+      .header(ACCEPT_JSON_HEADER)
+      .pathParam("id", EXAMPLE_FILTER_ID)
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(extendingOrQueryDto)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(EXECUTE_SINGLE_RESULT_FILTER_URL);
+
+    verify(filterServiceMock).singleResult(eq(EXAMPLE_FILTER_ID),
+        argThat(evalOrQuery(MockProvider.EXAMPLE_TASK_DESCRIPTION, MockProvider.EXAMPLE_TASK_NAME)));
   }
 
   @Test
