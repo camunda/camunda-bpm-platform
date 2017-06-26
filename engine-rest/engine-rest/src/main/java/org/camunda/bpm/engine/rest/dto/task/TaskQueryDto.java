@@ -768,7 +768,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   }
 
   public String getNameNotEqual() {
-    return name;
+    return nameNotEqual;
   }
 
   public String getNameLike() {
