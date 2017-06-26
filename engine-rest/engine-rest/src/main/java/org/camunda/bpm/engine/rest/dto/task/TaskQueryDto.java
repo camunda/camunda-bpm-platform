@@ -191,7 +191,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   private List<VariableQueryParameterDto> processVariables;
   private List<VariableQueryParameterDto> caseInstanceVariables;
 
-  private List<TaskQueryDto> orQueries = new ArrayList<TaskQueryDto>();
+  private List<TaskQueryDto> orQueries;
 
   public TaskQueryDto() {
 
@@ -1368,6 +1368,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     TaskQueryDto dto = new TaskQueryDto();
 
     if (!isOrQueryActive) {
+      dto.orQueries = new ArrayList<TaskQueryDto>();
       for (TaskQuery orQuery: taskQuery.getOrQueries()) {
           dto.orQueries.add(fromQuery(orQuery, true));
       }
