@@ -119,17 +119,15 @@ public class ModifyProcessInstanceCmd implements Command<Void> {
     }
   }
 
-
   protected void deletePropagate(ExecutionEntity processInstance, String deleteReason, boolean skipCustomListeners, boolean skipIoMappings) {
-
-
-    ExecutionEntity topmostCancellableExecution = processInstance;
-    ExecutionEntity parentScopeExecution = (ExecutionEntity) topmostCancellableExecution.getParentScopeExecution(true);
+    ExecutionEntity topmostDeletableExecution = processInstance;
+    ExecutionEntity parentScopeExecution = (ExecutionEntity) topmostDeletableExecution.getParentScopeExecution(true);
 
     while (parentScopeExecution != null && (parentScopeExecution.getNonEventScopeExecutions().size() <= 1)) {
-        topmostCancellableExecution = parentScopeExecution;
-        parentScopeExecution = (ExecutionEntity) topmostCancellableExecution.getParentScopeExecution(true);
+        topmostDeletableExecution = parentScopeExecution;
+        parentScopeExecution = (ExecutionEntity) topmostDeletableExecution.getParentScopeExecution(true);
     }
-    topmostCancellableExecution.deleteCascade(deleteReason, skipCustomListeners, skipIoMappings, false);
+
+    topmostDeletableExecution.deleteCascade(deleteReason, skipCustomListeners, skipIoMappings, false);
   }
 }

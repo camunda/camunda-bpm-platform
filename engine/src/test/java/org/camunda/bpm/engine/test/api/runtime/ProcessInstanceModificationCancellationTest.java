@@ -1589,20 +1589,13 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
     assertEquals(0, instanceList.size());
   }
 
-  /**
-   * Test case for checking cancellation of process instances in call activity subprocesses
-   *
-   * Test should propagate upward and destroy all process instances
-   *
-   */
   @Deployment(resources = {
     SIMPLE_SUBPROCESS,
     CALL_ACTIVITY_PROCESS
   })
   public void testCancellationAndRestartInCallActivitySubProcess() {
     // given
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callSimpleSubProcess");
-    String processInstanceId = processInstance.getId();
+    runtimeService.startProcessInstanceByKey("callSimpleSubProcess");
 
     // one task in the subprocess should be active after starting the process instance
     TaskQuery taskQuery = taskService.createTaskQuery();
@@ -1625,16 +1618,11 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
       .startBeforeActivity("task")
       .execute();
 
-
     // then
-
-
     // How many process Instances
     instanceList = runtimeService.createProcessInstanceQuery().list();
     assertEquals(2, instanceList.size());
   }
-
-
 
   /**
    * Test case for checking cancellation of process instances in call activity subprocesses
@@ -1661,17 +1649,15 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
     assertNotNull(activeActivityIds);
     assertEquals(2, activeActivityIds.size());
 
-
     ActivityInstance tree = runtimeService.getActivityInstance(taskList.get(0).getProcessInstanceId());
+
     // when
     runtimeService
       .createProcessInstanceModification(taskList.get(0).getProcessInstanceId())
       .cancelActivityInstance(getInstanceIdForActivity(tree, "task"))
       .execute();
 
-
     // then
-    //assertProcessEnded(processInstanceId);
 
     // How many process Instances
     instanceList = runtimeService.createProcessInstanceQuery().list();
@@ -1697,7 +1683,7 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
   })
   public void testCancellationMultilevelProcessInstanceInCallActivity() {
     // given
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nestedCallActivity");
+    runtimeService.startProcessInstanceByKey("nestedCallActivity");
 
     // one task in the subprocess should be active after starting the process instance
     TaskQuery taskQuery = taskService.createTaskQuery();
@@ -1723,15 +1709,11 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
       .cancelActivityInstance(getInstanceIdForActivity(tree, "task"))
       .execute();
 
-
     // then
-
     // How many process Instances
     instanceList = runtimeService.createProcessInstanceQuery().list();
     assertNotNull(instanceList);
     assertEquals(0, instanceList.size());
-
   }
-
 
 }
