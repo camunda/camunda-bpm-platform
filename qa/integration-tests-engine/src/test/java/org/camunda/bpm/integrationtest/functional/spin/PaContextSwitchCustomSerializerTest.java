@@ -22,6 +22,7 @@ import org.camunda.bpm.integrationtest.functional.spin.dataformat.XmlSerializabl
 import org.camunda.bpm.integrationtest.functional.spin.dataformat.XmlSerializableJsonSerializer;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.camunda.bpm.integrationtest.util.DeploymentHelper;
+import org.camunda.bpm.integrationtest.util.TestContainer;
 import org.camunda.spin.DataFormats;
 import org.camunda.spin.spi.DataFormatConfigurator;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -47,12 +48,11 @@ public class PaContextSwitchCustomSerializerTest extends AbstractFoxPlatformInte
         .addClass(XmlSerializable.class)
         .addClass(XmlSerializableJsonDeserializer.class)
         .addClass(XmlSerializableJsonSerializer.class)
-        .addAsLibraries(DeploymentHelper.getSpinJacksonJsonDataFormatForServer("tomcat"))
         .addAsResource("org/camunda/bpm/integrationtest/functional/spin/paContextSwitchCustomSerializer.bpmn20.xml")
         .addClass(CustomDataFormatConfigurator.class)
         .addAsServiceProvider(DataFormatConfigurator.class, CustomDataFormatConfigurator.class);
 
-//    TestContainer.addSpinJacksonJsonDataFormat(webArchive);
+    TestContainer.addSpinJacksonJsonDataFormat(webArchive);
 
     return webArchive;
   }
