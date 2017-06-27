@@ -99,11 +99,6 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
   HistoricProcessInstanceQuery incidentType(String incidentType);
 
   /**
-   * Only selects process instances with the given incident id.
-   */
-  HistoricProcessInstanceQuery incidentId(String incidentId);
-
-  /**
    * Only select historic process instances with the given incident message.
    *
    * @param incidentMessage Incidents Message for which the historic process instances should be selected

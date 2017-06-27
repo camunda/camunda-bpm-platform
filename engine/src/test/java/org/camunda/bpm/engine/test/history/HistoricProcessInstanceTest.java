@@ -270,6 +270,9 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
 
     assertEquals(0, historyService.createHistoricProcessInstanceQuery().incidentMessage("Unknown message").count());
     assertEquals(0, historyService.createHistoricProcessInstanceQuery().incidentMessage("Unknown message").list().size());
+
+    assertEquals(1, historyService.createHistoricProcessInstanceQuery().incidentType("failedJob").count());
+    assertEquals(1, historyService.createHistoricProcessInstanceQuery().incidentType("failedJob").list().size());
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/IncidentTest.testShouldDeleteIncidentAfterJobWasSuccessfully.bpmn"})

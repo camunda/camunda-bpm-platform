@@ -195,7 +195,7 @@
         </if>
 
 
-        <if test="withIncidents || incidentStatus != null || incidentMessage != null || incidentMessageLike != null">
+        <if test="withIncidents || incidentStatus != null || incidentMessage != null || incidentMessageLike != null || incidentType != null">
             inner join ${prefix}ACT_HI_INCIDENT INC on SELF.PROC_INST_ID_ = INC.PROC_INST_ID_
         </if>
         <where>
@@ -274,6 +274,9 @@
                 and SELF.END_TIME_ is not NULL
             </if>
 
+            <if test="incidentType != null">
+                and INC.INCIDENT_TYPE_ = #{incidentType}
+            </if>
             <if test="incidentMessage != null">
                 and INC.INCIDENT_MSG_ = #{incidentMessage}
             </if>
