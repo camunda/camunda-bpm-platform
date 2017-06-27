@@ -767,6 +767,17 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  public void testParseProcessDefinitionStringTtl() {
+    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
+    assertNotNull(processDefinitions);
+    assertEquals(1, processDefinitions.size());
+
+    Integer timeToLive = processDefinitions.get(0).getHistoryTimeToLive();
+    assertNotNull(timeToLive);
+    assertEquals(5, timeToLive.intValue());
+  }
+
+  @Deployment
   public void testParseProcessDefinitionEmptyTtl() {
     List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
     assertNotNull(processDefinitions);

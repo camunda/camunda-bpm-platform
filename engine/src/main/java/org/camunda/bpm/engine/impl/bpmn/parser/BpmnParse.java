@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.bpmn.parser;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.camunda.bpm.engine.ActivityTypes;
 import org.camunda.bpm.engine.BpmnParseException;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -563,8 +565,31 @@ public class BpmnParse extends Parse {
   }
 
   protected void parseHistoryTimeToLive(Element processElement, ProcessDefinitionEntity processDefinition) {
-    final Integer historyTimeToLive = parseIntegerAttribute(processElement, "historyTimeToLive",
-        processElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "historyTimeToLive"), false);
+    Integer historyTimeToLive = null;
+
+
+    String historyTTL = processElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS,"historyTimeToLive" );
+    if (historyTTL != null && !historyTTL.isEmpty()) {
+      String ISOformat = "P(\\d+)D";
+      String integerFormat = "(\\d+)";
+      Pattern regISO = Pattern.compile(ISOformat);
+      Pattern regInteger = Pattern.compile(integerFormat);
+
+      Matcher matISO = regISO.matcher(historyTTL);
+      Matcher matInteger = regInteger.matcher(historyTTL);
+      if (matISO.find()) {
+        String days = matISO.group(1);
+        historyTimeToLive = parseIntegerAttribute(processElement, "historyTimeToLive",
+          days, false);
+      } else if (matInteger.find()) {
+        historyTimeToLive = parseIntegerAttribute(processElement, "historyTimeToLive",
+          processElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "historyTimeToLive"), false);
+
+      } else {
+        addError("Cannot parse historyTimeToLive: Invalid format", processElement);
+      }
+    }
+
     if (historyTimeToLive == null || historyTimeToLive >= 0) {
       processDefinition.setHistoryTimeToLive(historyTimeToLive);
     } else {
