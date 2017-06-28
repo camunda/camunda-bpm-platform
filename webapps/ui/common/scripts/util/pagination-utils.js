@@ -35,17 +35,6 @@ function initializePaginationInController($scope, search, updateCallback) {
     updateCallback(newValue, oldValue);
   });
 
-  $scope.$watch('pages.total', function(total) {
-    if (total > 0 && +$scope.pages.current > Math.ceil(total/ +$scope.pages.size)) {
-      var oldValue = $scope.pages.current;
-      var params = search();
-      params.page = 1;
-
-      search.updateSilently(params, true);
-      updateCallback(1, oldValue);
-    }
-  });
-
   $scope.$on('$locationChangeSuccess', function() {
     var currentPage = getCurrentPageFromSearch(search);
 

@@ -93,7 +93,16 @@
     </tbody>
   </table>
 
-  <div cam-pagination="onPaginationChange(pages)" total="pages.total">
-  </div>
+  <pagination ng-if="pages.total > pages.size"
+              class="pagination-sm"
+
+              page="pages.current"
+              ng-model="pages.current"
+
+              total-items="pages.total"
+              items-per-page="pages.size"
+
+              max-size="7"
+              boundary-links="true"></pagination>
 </div>
 <!-- / CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/decisionList/app/views/decisionDefinition/decision-instance-table.html -->
