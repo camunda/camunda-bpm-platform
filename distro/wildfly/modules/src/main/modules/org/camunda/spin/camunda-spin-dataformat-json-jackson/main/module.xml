@@ -12,7 +12,6 @@
     <module name="org.camunda.commons.camunda-commons-typed-values" />
 
     <module name="com.fasterxml.jackson.core.jackson-databind" slot="2.6.3" />
-    <module name="com.fasterxml.jackson.datatype.jackson-datatype-jsr310" slot="2.6.3" />
     <module name="com.jayway.jsonpath.json-path" />
   </dependencies>
 
