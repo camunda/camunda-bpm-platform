@@ -23,6 +23,7 @@
       <result property="finishedProcessInstanceCount" column="FINISHED_" jdbcType="BIGINT" />
       <result property="processDefinitionId" column="ID_" jdbcType="VARCHAR" />
       <result property="processDefinitionKey" column="KEY_" jdbcType="VARCHAR" />
+      <result property="processDefinitionName" column="NAME_" jdbcType="VARCHAR" />
       <result property="processDefinitionVersion" column="VERSION_" jdbcType="VARCHAR" />
       <result property="historyTimeToLive" column="HISTORY_TTL_" jdbcType="BIGINT" />
     </resultMap>
@@ -528,7 +529,19 @@
             ,RES.VERSION_
             ,RES.HISTORY_TTL_
             ,(CASE WHEN F.FINISHED_ IS NOT NULL THEN F.FINISHED_ ELSE 0 END ) AS FINISHED_
-        FROM ${prefix}ACT_RE_PROCDEF RES
+        FROM
+          (
+            SELECT DISTINCT RES.*
+            FROM ${prefix}ACT_RE_PROCDEF RES
+            <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+              <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" />
+              AUTH ON (AUTH.RESOURCE_ID_ in (RES.KEY_, '*'))
+            </if>
+            <where>
+              <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
+              <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
+            </where>
+          ) RES
         LEFT JOIN ${prefix}ACT_HI_PROCINST PI
         ON PI.PROC_DEF_ID_ = RES.ID_
         LEFT JOIN (
@@ -538,14 +551,6 @@
             WHERE PI.END_TIME_ IS NOT NULL
             GROUP BY PI.PROC_DEF_ID_
             ) F ON F.PROC_DEF_ID_ = PI.PROC_DEF_ID_
-        <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
-          <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckConjunctiveJoinWithoutOnClause" />
-          AUTH ON (AUTH.RESOURCE_ID_ in (RES.KEY_, '*'))
-        </if>
-        <where>
-          <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
-          <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
-        </where>
         GROUP BY RES.ID_,
           RES.KEY_,
           RES.NAME_,

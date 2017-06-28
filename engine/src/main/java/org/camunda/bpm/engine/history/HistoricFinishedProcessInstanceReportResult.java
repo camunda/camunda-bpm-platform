@@ -13,6 +13,10 @@
 
 package org.camunda.bpm.engine.history;
 
+/**
+ * This interface defines the result of Historic finished process instance report.
+ *
+ */
 public interface HistoricFinishedProcessInstanceReportResult {
 
   String getProcessDefinitionId();
@@ -23,9 +27,9 @@ public interface HistoricFinishedProcessInstanceReportResult {
 
   int getProcessDefinitionVersion();
 
-  String getHistoryTimeToLive();
+  Integer getHistoryTimeToLive();
 
-  Long getFinishedProcessInstanceCount();
+  long getFinishedProcessInstanceCount();
 
-  Long getCleanableProcessInstanceCount();
+  long getCleanableProcessInstanceCount();
 }

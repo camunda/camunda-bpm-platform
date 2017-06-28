@@ -98,7 +98,7 @@ public class HistoricProcessDefinitionRestServiceImpl implements HistoricProcess
   public List<HistoricFinishedProcessInstanceReportDto> getHistoricFinishedProcessInstanceReport() {
     HistoryService historyService = processEngine.getHistoryService();
 
-    List<HistoricFinishedProcessInstanceReportResult> reportResult = historyService.createHistoricFinishedProcessInstanceReport().count();
+    List<HistoricFinishedProcessInstanceReportResult> reportResult = historyService.createHistoricFinishedProcessInstanceReport().list();
     return HistoricFinishedProcessInstanceReportDto.convert(reportResult);
   }
 

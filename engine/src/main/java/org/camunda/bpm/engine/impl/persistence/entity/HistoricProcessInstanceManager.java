@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 
 
-import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.history.HistoricFinishedProcessInstanceReportResult;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
@@ -110,6 +109,7 @@ public class HistoricProcessInstanceManager extends AbstractHistoricManager {
     getTenantManager().configureQuery(query);
   }
 
+  @SuppressWarnings("unchecked")
   public List<String> findHistoricProcessInstanceIdsForCleanup(Integer batchSize) {
     ListQueryParameterObject parameterObject = new ListQueryParameterObject();
     parameterObject.setParameter(ClockUtil.getCurrentTime());
@@ -124,14 +124,16 @@ public class HistoricProcessInstanceManager extends AbstractHistoricManager {
     return (Long) getDbEntityManager().selectOne("selectHistoricProcessInstanceIdsForCleanupCount", parameterObject);
   }
 
-  public List<HistoricFinishedProcessInstanceReportResult> findFinishedProcessInstancesReport() {
+  @SuppressWarnings("unchecked")
+  public List<HistoricFinishedProcessInstanceReportResult> findFinishedProcessInstancesReportResults() {
     ListQueryParameterObject parameterObject = new ListQueryParameterObject();
     parameterObject.setParameter(ClockUtil.getCurrentTime());
-    getAuthorizationManager().configureQuery(parameterObject, Resources.PROCESS_DEFINITION, "RES.KEY_", Permissions.READ, Permissions.READ_HISTORY);
+    getAuthorizationManager().configureQueryHistoricFinishedInstanceReport(parameterObject, Resources.PROCESS_DEFINITION);
     getTenantManager().configureQuery(parameterObject);
     return (List<HistoricFinishedProcessInstanceReportResult>) getDbEntityManager().selectList("selectFinishedProcessInstancesReportEntities", parameterObject);
   }
 
+  @SuppressWarnings("unchecked")
   public List<String> findHistoricProcessInstanceIds(HistoricProcessInstanceQueryImpl historicProcessInstanceQuery) {
     configureQuery(historicProcessInstanceQuery);
     return (List<String>) getDbEntityManager().selectList("selectHistoricProcessInstanceIdsByQueryCriteria", historicProcessInstanceQuery);

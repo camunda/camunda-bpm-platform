@@ -42,7 +42,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
-public class MultiTenancyHistoryCleanupReportCmdTenantCheckTest {
+public class MultiTenancyFinishedProcessInstanceReportCmdTenantCheckTest {
 
   protected static final String TENANT_ONE = "tenant1";
   protected static final String TENANT_TWO = "tenant2";
@@ -90,7 +90,7 @@ public class MultiTenancyHistoryCleanupReportCmdTenantCheckTest {
     identityService.setAuthentication("user", null, null);
 
     // when
-    List<HistoricFinishedProcessInstanceReportResult> reportResults = historyService.createHistoricFinishedProcessInstanceReport().count();
+    List<HistoricFinishedProcessInstanceReportResult> reportResults = historyService.createHistoricFinishedProcessInstanceReport().list();
 
     // then
     assertEquals(0, reportResults.size());
@@ -106,7 +106,7 @@ public class MultiTenancyHistoryCleanupReportCmdTenantCheckTest {
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
     // when
-    List<HistoricFinishedProcessInstanceReportResult> reportResults = historyService.createHistoricFinishedProcessInstanceReport().count();
+    List<HistoricFinishedProcessInstanceReportResult> reportResults = historyService.createHistoricFinishedProcessInstanceReport().list();
 
     // then
     assertEquals(1, reportResults.size());
@@ -123,7 +123,7 @@ public class MultiTenancyHistoryCleanupReportCmdTenantCheckTest {
     processEngineConfiguration.setTenantCheckEnabled(false);
 
     // when
-    List<HistoricFinishedProcessInstanceReportResult> reportResults = historyService.createHistoricFinishedProcessInstanceReport().count();
+    List<HistoricFinishedProcessInstanceReportResult> reportResults = historyService.createHistoricFinishedProcessInstanceReport().list();
 
     // then
     assertEquals(1, reportResults.size());

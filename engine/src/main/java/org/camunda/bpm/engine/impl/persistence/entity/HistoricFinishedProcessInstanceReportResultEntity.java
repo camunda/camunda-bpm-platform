@@ -22,9 +22,9 @@ public class HistoricFinishedProcessInstanceReportResultEntity implements Histor
   protected String processDefinitionKey;
   protected String processDefinitionName;
   protected int processDefinitionVersion;
-  protected String historyTimeToLive;
-  protected Long finishedProcessInstanceCount;
-  protected Long cleanableProcessInstanceCount;
+  protected Integer historyTimeToLive;
+  protected long finishedProcessInstanceCount;
+  protected long cleanableProcessInstanceCount;
 
   public String getProcessDefinitionId() {
     return processDefinitionId;
@@ -58,15 +58,15 @@ public class HistoricFinishedProcessInstanceReportResultEntity implements Histor
     this.processDefinitionVersion = processDefinitionVersion;
   }
 
-  public String getHistoryTimeToLive() {
+  public Integer getHistoryTimeToLive() {
     return historyTimeToLive;
   }
 
-  public void setHistoryTimeToLive(String historyTimeToLive) {
+  public void setHistoryTimeToLive(Integer historyTimeToLive) {
     this.historyTimeToLive = historyTimeToLive;
   }
 
-  public Long getFinishedProcessInstanceCount() {
+  public long getFinishedProcessInstanceCount() {
     return finishedProcessInstanceCount;
   }
 
@@ -74,7 +74,7 @@ public class HistoricFinishedProcessInstanceReportResultEntity implements Histor
     this.finishedProcessInstanceCount = finishedProcessInstanceCount;
   }
 
-  public Long getCleanableProcessInstanceCount() {
+  public long getCleanableProcessInstanceCount() {
     return cleanableProcessInstanceCount;
   }
 

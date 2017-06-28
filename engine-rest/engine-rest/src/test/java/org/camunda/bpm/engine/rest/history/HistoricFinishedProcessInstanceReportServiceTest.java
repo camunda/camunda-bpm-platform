@@ -58,7 +58,7 @@ public class HistoricFinishedProcessInstanceReportServiceTest extends AbstractRe
     when(reportResult.getProcessDefinitionKey()).thenReturn("aKey");
     when(reportResult.getProcessDefinitionName()).thenReturn("aName");
     when(reportResult.getProcessDefinitionVersion()).thenReturn(42);
-    when(reportResult.getHistoryTimeToLive()).thenReturn("5");
+    when(reportResult.getHistoryTimeToLive()).thenReturn(5);
     when(reportResult.getFinishedProcessInstanceCount()).thenReturn(10l);
     when(reportResult.getCleanableProcessInstanceCount()).thenReturn(5l);
 
@@ -79,7 +79,7 @@ public class HistoricFinishedProcessInstanceReportServiceTest extends AbstractRe
 
     historicFinishedProcessInstanceReport = mock(HistoricFinishedProcessInstanceReport.class);
     when(processEngine.getHistoryService().createHistoricFinishedProcessInstanceReport()).thenReturn(historicFinishedProcessInstanceReport);
-    when(historicFinishedProcessInstanceReport.count()).thenReturn(mocks);
+    when(historicFinishedProcessInstanceReport.list()).thenReturn(mocks);
   }
 
   @Test
@@ -91,13 +91,13 @@ public class HistoricFinishedProcessInstanceReportServiceTest extends AbstractRe
     .when().get(HISTORIC_REPORT_URL);
 
     InOrder inOrder = Mockito.inOrder(historicFinishedProcessInstanceReport);
-    inOrder.verify(historicFinishedProcessInstanceReport).count();
+    inOrder.verify(historicFinishedProcessInstanceReport).list();
   }
 
   @Test
   public void testMissingAuthorization() {
     String message = "not authorized";
-    when(historicFinishedProcessInstanceReport.count()).thenThrow(new AuthorizationException(message));
+    when(historicFinishedProcessInstanceReport.list()).thenThrow(new AuthorizationException(message));
 
 
     given()

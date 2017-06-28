@@ -130,7 +130,7 @@ public class HistoricFinishedProcessInstanceReportTest {
         repositoryService.createProcessDefinitionQuery().processDefinitionKey(SECOND_PROCESS_DEFINITION_KEY).singleResult().getId(), false);
 
         // when
-        List<HistoricFinishedProcessInstanceReportResult> reportResults = historyService.createHistoricFinishedProcessInstanceReport().count();
+        List<HistoricFinishedProcessInstanceReportResult> reportResults = historyService.createHistoricFinishedProcessInstanceReport().list();
 
         // then
         assertEquals(3, reportResults.size());
@@ -147,8 +147,8 @@ public class HistoricFinishedProcessInstanceReportTest {
   }
 
   private void checkResultNumbers(HistoricFinishedProcessInstanceReportResult result, int expectedCleanable, int expectedFinished) {
-    assertEquals(expectedCleanable, result.getCleanableProcessInstanceCount().longValue());
-    assertEquals(expectedFinished, result.getFinishedProcessInstanceCount().longValue());
+    assertEquals(expectedCleanable, result.getCleanableProcessInstanceCount());
+    assertEquals(expectedFinished, result.getFinishedProcessInstanceCount());
   }
 
   @Test
@@ -157,7 +157,7 @@ public class HistoricFinishedProcessInstanceReportTest {
     prepareProcessInstances(PROCESS_DEFINITION_KEY, -6, 5, 10);
 
     // when
-    List<HistoricFinishedProcessInstanceReportResult> reportResults = historyService.createHistoricFinishedProcessInstanceReport().count();
+    List<HistoricFinishedProcessInstanceReportResult> reportResults = historyService.createHistoricFinishedProcessInstanceReport().list();
 
     // then
     assertEquals(1, reportResults.size());
@@ -181,7 +181,7 @@ public class HistoricFinishedProcessInstanceReportTest {
     prepareProcessInstances(PROCESS_DEFINITION_KEY, 0, 5, 5);
 
     // when
-    List<HistoricFinishedProcessInstanceReportResult> reportResults = historyService.createHistoricFinishedProcessInstanceReport().count();
+    List<HistoricFinishedProcessInstanceReportResult> reportResults = historyService.createHistoricFinishedProcessInstanceReport().list();
 
     // then
     assertEquals(1, reportResults.size());
@@ -205,7 +205,7 @@ public class HistoricFinishedProcessInstanceReportTest {
     prepareProcessInstances(PROCESS_DEFINITION_KEY, 0, 0, 5);
 
     // when
-    List<HistoricFinishedProcessInstanceReportResult> reportResults = historyService.createHistoricFinishedProcessInstanceReport().count();
+    List<HistoricFinishedProcessInstanceReportResult> reportResults = historyService.createHistoricFinishedProcessInstanceReport().list();
 
     // then
     assertEquals(1, reportResults.size());
@@ -229,7 +229,7 @@ public class HistoricFinishedProcessInstanceReportTest {
     prepareProcessInstances(PROCESS_DEFINITION_KEY, 0, null, 5);
 
     // when
-    List<HistoricFinishedProcessInstanceReportResult> reportResults = historyService.createHistoricFinishedProcessInstanceReport().count();
+    List<HistoricFinishedProcessInstanceReportResult> reportResults = historyService.createHistoricFinishedProcessInstanceReport().list();
 
     // then
     assertEquals(1, reportResults.size());

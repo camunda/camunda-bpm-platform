@@ -146,6 +146,15 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
     saveAuthorization(authorization);
   }
 
+  protected void createGrantAuthorizationGroup(Resource resource, String resourceId, String groupId, Permission... permissions) {
+    Authorization authorization = createGrantAuthorization(resource, resourceId);
+    authorization.setGroupId(groupId);
+    for (Permission permission : permissions) {
+      authorization.addPermission(permission);
+    }
+    saveAuthorization(authorization);
+  }
+
   protected void createRevokeAuthorization(Resource resource, String resourceId, String userId, Permission... permissions) {
     Authorization authorization = createRevokeAuthorization(resource, resourceId);
     authorization.setUserId(userId);

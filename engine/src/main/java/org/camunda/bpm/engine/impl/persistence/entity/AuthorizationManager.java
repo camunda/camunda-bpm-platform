@@ -359,19 +359,14 @@ public class AuthorizationManager extends AbstractManager {
     }
   }
 
-  public void configureQuery(ListQueryParameterObject query, Resource resource, String queryParam, Permission... permission) {
+  public void configureQueryHistoricFinishedInstanceReport(ListQueryParameterObject query, Resource resource) {
     configureQuery(query);
 
     CompositePermissionCheck compositePermissionCheck = new CompositePermissionCheck(false);
     query.getAuthCheck().setPermissionChecks(compositePermissionCheck);
 
-    for (int i = 0; i < permission.length; i++) {
-      PermissionCheck check = new PermissionCheck();
-      check.setResource(resource);
-      check.setResourceIdQueryParam(queryParam);
-      check.setPermission(permission[i]);
-      compositePermissionCheck.addAtomicCheck(check);
-    }
+    addPermissionCheck(query, resource, "RES.KEY_", Permissions.READ);
+    addPermissionCheck(query, resource, "RES.KEY_", Permissions.READ_HISTORY);
   }
 
   public void enableQueryAuthCheck(AuthorizationCheck authCheck) {

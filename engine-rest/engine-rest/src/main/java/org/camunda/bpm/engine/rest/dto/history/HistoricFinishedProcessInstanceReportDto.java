@@ -29,9 +29,9 @@ public class HistoricFinishedProcessInstanceReportDto implements Serializable {
   protected String processDefinitionKey;
   protected String processDefinitionName;
   protected int processDefinitionVersion;
-  protected String historyTimeToLive;
-  protected Long finishedProcessInstancesCount;
-  protected Long cleanableProcessInstancesCount;
+  protected Integer historyTimeToLive;
+  protected long finishedProcessInstancesCount;
+  protected long cleanableProcessInstancesCount;
 
   public HistoricFinishedProcessInstanceReportDto() {
   }
@@ -52,7 +52,7 @@ public class HistoricFinishedProcessInstanceReportDto implements Serializable {
     this.processDefinitionVersion = processDefinitionVersion;
   }
 
-  public void setHistoryTimeToLive(String historyTimeToLive) {
+  public void setHistoryTimeToLive(Integer historyTimeToLive) {
     this.historyTimeToLive = historyTimeToLive;
   }
 
@@ -80,7 +80,7 @@ public class HistoricFinishedProcessInstanceReportDto implements Serializable {
     return processDefinitionVersion;
   }
 
-  public String getHistoryTimeToLive() {
+  public Integer getHistoryTimeToLive() {
     return historyTimeToLive;
   }
 
