@@ -56,6 +56,7 @@ public abstract class AbstractModelParser {
     dbf.setIgnoringComments(false);
     dbf.setIgnoringElementContentWhitespace(false);
     dbf.setNamespaceAware(true);
+    dbf.setExpandEntityReferences(false);
   }
 
   public ModelInstance parseModelFromStream(InputStream inputStream) {
