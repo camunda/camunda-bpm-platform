@@ -23,8 +23,6 @@
     "beforeEach": true,
     "afterEach": true,
     "before": true,
-    "after": true,
-    "by": true,
-    "browser": true
+    "after": true
   }
 }
