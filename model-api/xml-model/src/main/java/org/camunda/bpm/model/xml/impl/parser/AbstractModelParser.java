@@ -17,7 +17,11 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
 import org.camunda.bpm.model.xml.ModelInstance;
 import org.camunda.bpm.model.xml.ModelValidationException;
 import org.camunda.bpm.model.xml.impl.util.DomUtil;
@@ -25,11 +29,6 @@ import org.camunda.bpm.model.xml.impl.util.ReflectUtil;
 import org.camunda.bpm.model.xml.instance.DomDocument;
 import org.camunda.bpm.model.xml.instance.DomElement;
 import org.xml.sax.SAXException;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
-import javax.xml.validation.Validator;
 
 /**
  * @author Daniel Meyer
@@ -56,6 +55,35 @@ public abstract class AbstractModelParser {
     dbf.setIgnoringComments(false);
     dbf.setIgnoringElementContentWhitespace(false);
     dbf.setNamespaceAware(true);
+    protectAgainstXxeAttacks(dbf);
+  }
+
+  /**
+   * Configures the DocumentBuilderFactory in a way, that it is protected against XML External Entity Attacks.
+   * If the implementing parser does not support one or multiple features, the failed feature is ignored.
+   * The parser might not protected, if the feature assignment fails.
+   *
+   * @see <a href="https://www.owasp.org/index.php/XML_External_Entity_(XXE)_Prevention_Cheat_Sheet">OWASP Information of XXE attacks</a>
+   *
+   * @param dbf The factory to configure.
+   */
+  private void protectAgainstXxeAttacks(final DocumentBuilderFactory dbf) {
+    try {
+      dbf.setFeature("http://xml.org/sax/features/external-general-entities", false);
+    } catch (ParserConfigurationException ignored) {
+    }
+
+    try {
+      dbf.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+    } catch (ParserConfigurationException ignored) {
+    }
+
+    try {
+      dbf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+    } catch (ParserConfigurationException ignored) {
+    }
+
+    dbf.setXIncludeAware(false);
     dbf.setExpandEntityReferences(false);
   }
 
