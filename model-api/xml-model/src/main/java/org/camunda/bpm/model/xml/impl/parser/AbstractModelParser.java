@@ -60,7 +60,8 @@ public abstract class AbstractModelParser {
 
   /**
    * Configures the DocumentBuilderFactory in a way, that it is protected against XML External Entity Attacks.
-   * If the implementing parser does not support one or multiple features, the parser is not protected.
+   * If the implementing parser does not support one or multiple features, the failed feature is ignored.
+   * The parser might not protected, if the feature assignment fails.
    *
    * @see <a href="https://www.owasp.org/index.php/XML_External_Entity_(XXE)_Prevention_Cheat_Sheet">OWASP Information of XXE attacks</a>
    *
