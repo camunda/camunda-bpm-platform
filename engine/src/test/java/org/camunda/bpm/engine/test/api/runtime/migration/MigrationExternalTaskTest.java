@@ -24,11 +24,13 @@ import java.util.List;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.migration.MigratingProcessInstanceValidationException;
+import org.camunda.bpm.engine.migration.MigrationInstruction;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.migration.MigrationPlanValidationException;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ExternalTaskModels;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
@@ -398,6 +400,26 @@ public class MigrationExternalTaskTest {
     } catch (Exception ex) {
       Assert.assertTrue(ex instanceof MigratingProcessInstanceValidationException);
     }
+  }
+
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/ExternalTaskWithoutIdTest.bpmn"})
+  public void testProcessDeffinitionWithoutIdField() {
+     // given
+
+//    ProcessDefinition sourceProcessDefinition =
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy("org/camunda/bpm/engine/test/api/externaltask/ExternalTaskWithoutIdTest.bpmn").getDeployedProcessDefinitions().get(0);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy("org/camunda/bpm/engine/test/api/externaltask/ExternalTaskWithoutIdTest.bpmn").getDeployedProcessDefinitions().get(0);
+
+    //external task is not mapped to new external task
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapEqualActivities()
+      .build();
+
+    List<MigrationInstruction> instructions = migrationPlan.getInstructions();
+    // test that the messageEventDefinition without an id isn't included
+    assertEquals(2, instructions.size());
   }
 
   protected LockedExternalTask fetchAndLockSingleTask(String topic) {
