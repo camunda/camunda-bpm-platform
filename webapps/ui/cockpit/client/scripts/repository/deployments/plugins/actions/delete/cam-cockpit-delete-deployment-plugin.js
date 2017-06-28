@@ -8,9 +8,11 @@ var modalTemplate = fs.readFileSync(__dirname + '/modals/cam-cockpit-delete-depl
 var Controller = [
   '$scope',
   '$modal',
+  '$rootScope',
   function(
     $scope,
-    $modal
+    $modal,
+    $rootScope
   ) {
 
     var deploymentData = $scope.deploymentData;
@@ -26,9 +28,8 @@ var Controller = [
           'deployment': function() { return deployment; }
         }
       }).result.then(function() {
-        deploymentData.changed('deployments');
+        $rootScope.$broadcast('cam-common:cam-searchable:query-force-change');
       });
-
     };
 
   }];

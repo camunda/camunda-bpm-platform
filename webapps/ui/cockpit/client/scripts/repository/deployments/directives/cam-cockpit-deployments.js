@@ -3,43 +3,38 @@
 var fs = require('fs');
 
 var template = fs.readFileSync(__dirname + '/cam-cockpit-deployments.html', 'utf8');
+var searchConfigJSON = fs.readFileSync(__dirname + '/cam-cockpit-deployments-search-plugin-config.json', 'utf8');
 
 module.exports = [function() {
-
   return {
-
     restrict: 'A',
     scope: {
       deploymentsData: '=',
-      totalItems: '='
+      totalItems: '=',
+      deployments: '='
     },
-
     template: template,
-
     controller: [
       '$scope',
       '$location',
+      '$rootScope',
       'search',
       'Notifications',
+      'camAPI',
       function(
         $scope,
         $location,
+        $rootScope,
         search,
-        Notifications
+        Notifications,
+        camAPI
       ) {
-
+        var Deployment = camAPI.resource('deployment');
         var deploymentsListData = $scope.deploymentsListData = $scope.deploymentsData.newChild($scope);
-
-
-        // utilities /////////////////////////////////////////////////////////////////
-
-        var updateSilently = function(params) {
-          search.updateSilently(params);
-        };
-
+        $scope.searchConfig = JSON.parse(searchConfigJSON);
+        $scope.loadingState = 'INITIAL';
 
         // control ///////////////////////////////////////////////////////////////////
-
         var control = $scope.control = {};
         control.addMessage = function(status, msg, unsafe) {
           Notifications.addMessage({
@@ -50,46 +45,40 @@ module.exports = [function() {
           });
         };
 
+        $scope.onSearchChange = function(query, pages) {
+          $scope.loadingState = 'LOADING';
+          var pagination = {
+            firstResult: (pages.current - 1) * pages.size,
+            maxResults: pages.size
+          };
 
-        // pagination ////////////////////////////////////////////////////////////////
+          return Deployment.list(
+              Object.assign(query, pagination, $scope.deploymentsSorting)
+            )
+            .then(function(res) {
+              $scope.deployments = res.items;
 
-        $scope.pageNum = 1;
-        $scope.pageSize = null;
-        $scope.totalItems = 0;
+              $scope.loadingState = 'LOADED';
 
-        var pageChange = $scope.pageChange = function(page) {
-          // update query
-          updateSilently({
-            deploymentsPage: page,
-            editMode: null
-          });
-          deploymentsListData.changed('deploymentsPagination');
+              return res.count;
+            })
+            .catch(function() {
+              $scope.loadingState = 'ERROR';
+            });
         };
-
-        $scope.resetPage = function() {
-          pageChange(null);
-        };
-
 
         // observe data ///////////////////////////////////////////////////////////////
-
-        $scope.state = deploymentsListData.observe('deployments', function(deployments) {
-          $scope.deployments = deployments;
-        });
-
-        $scope.state = deploymentsListData.observe([ 'deploymentsQuery', 'deploymentsCount', function(query, count) {
-          $scope.pageSize = query.maxResults;
-          $scope.pageNum = (query.firstResult / $scope.pageSize) + 1;
-          $scope.totalItems = count;
-        }]);
-
         deploymentsListData.observe('currentDeployment', function(currentDeployment) {
           $scope.currentDeployment = currentDeployment;
         });
 
+        deploymentsListData.observe('deploymentsSorting', function(deploymentsSorting) {
+          $scope.deploymentsSorting = deploymentsSorting;
+
+          $rootScope.$broadcast('cam-common:cam-searchable:query-force-change');
+        });
 
         // selection ////////////////////////////////////////////////////////////////
-
         $scope.focus = function(deployment) {
           if (!isFocused(deployment)) {
             search.updateSilently({

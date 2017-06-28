@@ -9,16 +9,18 @@ module.exports = function() {
     restrict: 'A',
     transclude: true,
     template: template,
-    controller: 'CamSearchAbleAreaController as Searchable',
+    controller: 'CamPaginationSearchIntegrationController as Searchable',
     scope: {
       config: '=',
-      total: '=',
       loadingState: '=',
       loadingError: '=',
       arrayTypes: '=?',
       variableTypes: '=?',
+      buildCustomQuery: '&',
       onSearchChange: '&',
-      textEmpty: '@'
+      textEmpty: '@',
+      storageGroup: '=',
+      blocked: '='
     }
   };
 };

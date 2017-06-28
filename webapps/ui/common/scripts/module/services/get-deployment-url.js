@@ -8,7 +8,7 @@ module.exports = [
 
       var searches = {
         deployment: deployment.id,
-        deploymentsQuery: JSON.stringify([{
+        searchQuery: JSON.stringify([{
           type     : 'id',
           operator : 'eq',
           value    : deployment.id
@@ -31,7 +31,7 @@ module.exports = [
       return routeUtil.redirectTo(path, searches, [
         'deployment',
         'resourceName',
-        'deploymentsQuery',
+        'searchQuery',
         'deploymentsSortOrder',
         'deploymentsSortBy'
       ]);

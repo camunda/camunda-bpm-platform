@@ -11,7 +11,6 @@ var angular = require('camunda-commons-ui/vendor/angular'),
     camCockpitDeploymentsSortingChoices = require('./directives/cam-cockpit-deployments-sorting-choices'),
 
     /* plugins */
-    camCockpitDeploymentsSearchPlugin = require('./plugins/search/cam-cockpit-deployments-search-plugin'),
     camCockpitDeleteDeploymentPlugin = require('./plugins/actions/delete/cam-cockpit-delete-deployment-plugin'),
 
     /* modals */
@@ -30,7 +29,6 @@ deploymentsModule.directive('camDeployment', camCockpitDeployment);
 deploymentsModule.directive('camDeploymentsSortingChoices', camCockpitDeploymentsSortingChoices);
 
   /* plugins */
-deploymentsModule.config(camCockpitDeploymentsSearchPlugin);
 deploymentsModule.config(camCockpitDeleteDeploymentPlugin);
 
   /* modals */

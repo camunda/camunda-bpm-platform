@@ -31,7 +31,7 @@ var Configuration = function PluginConfiguration(ViewsProvider) {
             if (result === 'SUCCESS') {
               // refresh filter and all views
               $scope.processData.set('filter', angular.extend({}, $scope.filter));
-              $rootScope.$broadcast('addVariableNotification');
+              $rootScope.$broadcast('cam-common:cam-searchable:query-force-change');
             }
           });
         };

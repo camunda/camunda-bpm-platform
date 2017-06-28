@@ -2,7 +2,6 @@
 
 var fs = require('fs');
 var angular = require('angular');
-var createSearchQueryForSearchWidget = require('./../../../../../../common/scripts/util/search-widget-utils').createSearchQueryForSearchWidget;
 
 var template = fs.readFileSync(__dirname + '/decision-instance-table.html', 'utf8');
 var decisionSearchConfig = JSON.parse(fs.readFileSync(__dirname + '/decision-instance-search-config.json', 'utf8'));
@@ -14,11 +13,9 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
     label: 'Decision Instances',
     template: template,
     controller: [
-      '$scope', '$location', 'search', 'routeUtil', 'camAPI', 'Views', '$rootScope',
-      function($scope,   $location,   search,   routeUtil,   camAPI,   Views,   $rootScope) {
-
+      '$scope', '$location', 'search', 'routeUtil', 'camAPI', 'Views',
+      function($scope,   $location,   search,   routeUtil,   camAPI,   Views) {
         var processInstancePlugins = Views.getProviders({ component: 'cockpit.processInstance.view' });
-
         var hasHistoryPlugin = processInstancePlugins.filter(function(plugin) {
           return plugin.id === 'history';
         }).length > 0;
@@ -50,48 +47,23 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
         };
 
         $scope.getActivitySearch = function(decisionInstance) {
-
           return JSON.stringify([{
             type: 'caseActivityIdIn',
             operator: 'eq',
             value: decisionInstance.activityId
           }]);
-
         };
 
-        $scope.decisionSearchConfig = angular.copy(decisionSearchConfig);
-
-        $scope.$on('$routeChanged', function() {
-          pages.current = search().page || 1;
-        });
-
-        $scope.$watch('decisionSearchConfig.searches', function(newValue, oldValue) {
-          if (newValue !== oldValue) {
-            updateView();
-          }
-        }, true);
+        $scope.searchConfig = angular.copy(decisionSearchConfig);
 
         var historyService = camAPI.resource('history');
 
-        var DEFAULT_PAGES = { size: 50, total: 0, current: search().page || 1 };
+        $scope.onSearchChange = updateView;
 
-        var pages = $scope.pages = angular.copy(DEFAULT_PAGES);
-
-        $scope.$watch('pages.current', function(newValue, oldValue) {
-          if (newValue == oldValue) {
-            return;
-          }
-
-          search('page', !newValue || newValue == 1 ? null : newValue);
-          updateView();
-        });
-
-        function updateView() {
+        function updateView(searchQuery, pages) {
           var page = pages.current,
               count = pages.size,
-              firstResult = (page - 1) * count,
-              searchQuery = createSearchQueryForSearchWidget($scope.decisionSearchConfig.searches,
-                ['activityIdIn', 'activityInstanceIdIn']);
+              firstResult = (page - 1) * count;
 
           $scope.decisionInstances = null;
           $scope.loadingState = 'LOADING';
@@ -107,16 +79,6 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
             searchQuery
           );
 
-          historyService.decisionInstance(decisionInstanceQuery, function(err, data) {
-            $scope.decisionInstances = data;
-            $scope.loadingState = data.length ? 'LOADED' : 'EMPTY';
-
-            var phase = $rootScope.$$phase;
-            if(phase !== '$apply' && phase !== '$digest') {
-              $scope.$apply();
-            }
-          });
-
           var countQuery = angular.extend(
             {
               decisionDefinitionId: $scope.decisionDefinition.id
@@ -124,15 +86,20 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
             searchQuery
           );
 
-          historyService.decisionInstanceCount(countQuery, function(err, data) {
-            pages.total = data.count;
+          return historyService
+            .decisionInstanceCount(countQuery)
+            .then(function(data) {
+              var total = data.count;
 
-            var phase = $rootScope.$$phase;
-            if(phase !== '$apply' && phase !== '$digest') {
-              $scope.$apply();
-            }
+              return historyService
+                .decisionInstance(decisionInstanceQuery)
+                .then(function(data) {
+                  $scope.decisionInstances = data;
+                  $scope.loadingState = data.length ? 'LOADED' : 'EMPTY';
 
-          });
+                  return total;
+                });
+            });
         }
       }],
     priority: 10
