@@ -330,7 +330,7 @@ public class TaskListenerTest {
   }
 
   @Test
-  public void testTestCompleteListenerWithFollowingCallActivity() {
+  public void testCompleteTaskOnCreateListenerWithFollowingCallActivity() {
     final BpmnModelInstance subProcess = Bpmn.createExecutableProcess("subProc")
         .startEvent()
         .userTask("calledTask")
