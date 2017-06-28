@@ -263,15 +263,15 @@
     (
     <!-- to avoid to have a list of incidents with only one item which type is null and count is zero an extra subselect is needed -->
     <!-- this subselect selects all incidents to the assigned process definition id -->
-    select
-    INCIDENT.PROC_INST_ID_, INCIDENT.INCIDENT_TYPE_, count(INCIDENT.ID_) INCIDENT_COUNT_
-    from
-    ${prefix}ACT_RU_INCIDENT INCIDENT
-    group by
-    INCIDENT.PROC_INST_ID_, INCIDENT.INCIDENT_TYPE_
+      select
+        INCIDENT.PROC_INST_ID_, INCIDENT.INCIDENT_TYPE_, count(INCIDENT.ID_) INCIDENT_COUNT_
+      from
+        ${prefix}ACT_RU_INCIDENT INCIDENT
+      group by
+        INCIDENT.PROC_INST_ID_, INCIDENT.INCIDENT_TYPE_
     ) INCIDENT
     on
-    RES.PROC_INST_ID_ = INCIDENT.PROC_INST_ID_
+      RES.PROC_INST_ID_ = INCIDENT.PROC_INST_ID_
 
     <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" />

@@ -166,15 +166,15 @@ public class ProcessInstanceResourceTest extends AbstractCockpitPluginTest {
 
     resource = new ProcessInstanceResource(getProcessEngine().getName(), processInstance.getId());
 
-    ActivityInstance processInstanceActivityInstance = runtimeService.getActivityInstance(processInstance.getId());
+    runtimeService.getActivityInstance(processInstance.getId());
 
-    String callActivityId = repositoryService
+    String processDefinition1 = repositoryService
       .createProcessDefinitionQuery()
       .processDefinitionKey("CallActivity")
       .singleResult()
       .getId();
 
-    String failingProcessId = repositoryService
+    String processDefinition2 = repositoryService
       .createProcessDefinitionQuery()
       .processDefinitionKey("FailingProcess")
       .singleResult()
@@ -182,12 +182,8 @@ public class ProcessInstanceResourceTest extends AbstractCockpitPluginTest {
 
     executeAvailableJobs();
 
-
-
-    String[] activityInstanceIds1 = {callActivityId};
-
     CalledProcessInstanceQueryDto queryParameter1 = new CalledProcessInstanceQueryDto();
-    queryParameter1.setProcessDefinitionId(callActivityId);
+    queryParameter1.setProcessDefinitionId(processDefinition1);
 
     List<CalledProcessInstanceDto> callActivityInstances = resource.queryCalledProcessInstances(queryParameter1);
     assertThat(callActivityInstances).isNotEmpty();
@@ -200,10 +196,8 @@ public class ProcessInstanceResourceTest extends AbstractCockpitPluginTest {
     assertThat(incidents1.get(0).getIncidentCount()).isEqualTo(1);
     assertThat(incidents1.get(0).getIncidentType()).isEqualTo("failedJob");
 
-    String[] activityInstanceIds2 = {failingProcessId};
-
     CalledProcessInstanceQueryDto queryParameter2 = new CalledProcessInstanceQueryDto();
-    queryParameter2.setProcessDefinitionId(failingProcessId);
+    queryParameter2.setProcessDefinitionId(processDefinition2);
 
     List<CalledProcessInstanceDto> failingProcessInstance = resource.queryCalledProcessInstances(queryParameter2);
     assertThat(failingProcessInstance).isNotEmpty();
@@ -215,7 +209,6 @@ public class ProcessInstanceResourceTest extends AbstractCockpitPluginTest {
 
     assertThat(incidents2.get(0).getIncidentCount()).isEqualTo(1);
     assertThat(incidents2.get(0).getIncidentType()).isEqualTo("failedJob");
-
   }
 
 }
