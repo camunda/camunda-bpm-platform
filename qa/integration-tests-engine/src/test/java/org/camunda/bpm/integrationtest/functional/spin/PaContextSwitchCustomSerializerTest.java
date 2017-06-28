@@ -125,16 +125,7 @@ public class PaContextSwitchCustomSerializerTest extends AbstractFoxPlatformInte
       }
     }
 
-//    for (TransitionInstance childInstance : activityInstance.getChildTransitionInstances()) {
-//      ActivityInstance instance = getChildInstanceForTrActivity(childInstance, activityId);
-//      if (instance != null) {
-//        return instance;
-//      }
-//    }
-
     return null;
   }
 
 }
-
-
