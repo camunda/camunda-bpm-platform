@@ -4,7 +4,6 @@ var angular = require('angular');
 var fs = require('fs');
 
 var searchWidgetUtils = require('../../../../../../common/scripts/util/search-widget-utils');
-var paginationUtils = require('../../../../../../common/scripts/util/pagination-utils');
 var variableInstancesTabSearchConfig = JSON.parse(fs.readFileSync(__dirname + '/variable-instances-tab-search-config.json', 'utf8'));
 
 var instancesTemplate = fs.readFileSync(__dirname + '/variable-instances-tab.html', 'utf8');
@@ -15,9 +14,9 @@ var uploadTemplate = require('../../../../../client/scripts/components/variables
 module.exports = function(ngModule) {
   ngModule.controller('VariableInstancesController', [
     '$scope', '$sce', '$http', 'search', 'Uri', 'LocalExecutionVariableResource',
-    'Notifications', '$modal', '$q', 'camAPI', 'createIsSearchQueryChangedFunction',
+    'Notifications', '$modal', '$q', 'camAPI',
     function($scope, $sce, $http, search, Uri, LocalExecutionVariableResource,
-      Notifications, $modal, $q, camAPI, createIsSearchQueryChangedFunction) {
+      Notifications, $modal, $q, camAPI) {
 
         // input: processInstance, processData
 
@@ -29,43 +28,24 @@ module.exports = function(ngModule) {
       var executionService = camAPI.resource('execution'),
           taskService = camAPI.resource('task');
 
-      var isSearchQueryChanged = createIsSearchQueryChangedFunction();
-
-      var pages = paginationUtils.initializePaginationInController($scope, search, function(newValue, oldValue) {
-        if (!angular.equals(newValue, oldValue) && !isSearchQueryChanged()) {
-          updateView($scope.instanceIdToInstanceMap, $scope.searchConfig.searches);
-        }
-      });
-
-      variableInstanceData.provide('pages', pages);
-
       $scope.searchConfig = angular.copy(variableInstancesTabSearchConfig);
-      variableInstanceData.provide('searches', angular.copy($scope.searchConfig.searches));
-
-      $scope.$watch('searchConfig.searches', function(newValue, oldValue) {
-        if (!angular.equals(newValue, oldValue)) {
-          variableInstanceData.set('searches', angular.copy($scope.searchConfig.searches));
-        }
-      });
 
       variableInstanceData.observe('instanceIdToInstanceMap', function(instanceIdToInstanceMap) {
         $scope.instanceIdToInstanceMap = instanceIdToInstanceMap;
       });
 
-      $scope.getSearchQueryForSearchType = searchWidgetUtils.getSearchQueryForSearchType.bind(null, 'activityInstanceIdIn');
+      $scope.onSearchChange = function(query, pages) {
+        $scope.query = query;
+        $scope.pages = pages;
 
-      $scope.$on('addVariableNotification', function() {
-        updateView($scope.instanceIdToInstanceMap, $scope.searchConfig.searches);
-      });
-
-      variableInstanceData.observe(
-        ['instanceIdToInstanceMap', 'searches'],
-        function(instanceIdToInstanceMap, searches) {
-          if (searches) {
-            updateView(instanceIdToInstanceMap, searches);
-          }
+        if ($scope.instanceIdToInstanceMap) {
+          return updateView($scope.instanceIdToInstanceMap, query, pages);
         }
-      );
+
+        return $q.when($scope.total);
+      };
+
+      $scope.getSearchQueryForSearchType = searchWidgetUtils.getSearchQueryForSearchType.bind(null, 'activityInstanceIdIn');
 
       $scope.uploadVariable = function(info) {
         var promise = $q.defer();
@@ -212,12 +192,11 @@ module.exports = function(ngModule) {
         return promise.promise;
       };
 
-
       function getBasePath(variable) {
         return 'engine://engine/:engine/execution/' + variable.executionId + '/localVariables/' + variable.name;
       }
 
-      function updateView(instanceIdToInstanceMap, searches) {
+      function updateView(instanceIdToInstanceMap, variableQuery, pages) {
         var page = pages.current,
             count = pages.size,
             firstResult = (page - 1) * count;
@@ -232,64 +211,68 @@ module.exports = function(ngModule) {
           deserializeValues: false
         };
 
-        var variableQuery = searchWidgetUtils.createSearchQueryForSearchWidget(searches, ['activityInstanceIdIn'], ['variableValues']);
-
         var params = angular.extend({}, defaultParams, variableQuery);
 
         $scope.variables = null;
         $scope.loadingState = 'LOADING';
 
-          // get the 'count' of variables
-        $http.post(Uri.appUri('engine://engine/:engine/variable-instance/count'), params).success(function(data) {
-          pages.total = data.count;
-        });
-
         variableInstanceIdexceptionMessageMap = {};
         variableCopies = {};
 
-        $http.post(Uri.appUri('engine://engine/:engine/variable-instance/'), params, { params: pagingParams }).success(function(data) {
+        // get the 'count' of variables
+        return $http
+          .post(Uri.appUri('engine://engine/:engine/variable-instance/count'), params)
+          .then(function(response) {
+            $scope.total = response.data.count;
 
-          $scope.variables = data.map(function(item) {
-            var instance = instanceIdToInstanceMap[item.activityInstanceId];
-            item.instance = instance;
-            variableCopies[item.id] = angular.copy(item);
+            return $http
+              .post(Uri.appUri('engine://engine/:engine/variable-instance/'), params, { params: pagingParams })
+              .then(function(response) {
+                var data = response.data;
 
-              // prevents the list to throw an error when the activity instance is missing
-            var activityInstanceLink = '';
-            if(instance) {
-              activityInstanceLink = '<a ng-href="#/process-instance/' +
-                  processInstance.id + '/runtime' +
-                  '?detailsTab=variables-tab&'+ $scope.getSearchQueryForSearchType(instance.id) +
-                  '" title="' +
-                  instance.id +
-                  '">' +
-                  instance.name  +
-                  '</a>';
-            }
+                $scope.variables = data.map(function(item) {
+                  var instance = instanceIdToInstanceMap[item.activityInstanceId];
+                  item.instance = instance;
+                  variableCopies[item.id] = angular.copy(item);
 
-            return {
-              variable: {
-                id:           item.id,
-                name:         item.name,
-                type:         item.type,
-                value:        item.value,
-                valueInfo:    item.valueInfo,
-                executionId:  item.executionId
-              },
-              original: item,
-              additions: {
-                scope: {
-                  html: activityInstanceLink,
-                  scopeVariables: {
-                    processData: $scope.processData
+                    // prevents the list to throw an error when the activity instance is missing
+                  var activityInstanceLink = '';
+                  if(instance) {
+                    activityInstanceLink = '<a ng-href="#/process-instance/' +
+                        processInstance.id + '/runtime' +
+                        '?detailsTab=variables-tab&'+ $scope.getSearchQueryForSearchType(instance.id) +
+                        '" title="' +
+                        instance.id +
+                        '">' +
+                        instance.name  +
+                        '</a>';
                   }
-                }
-              }
-            };
-          });
 
-          $scope.loadingState = data.length ? 'LOADED' : 'EMPTY';
-        });
+                  return {
+                    variable: {
+                      id:           item.id,
+                      name:         item.name,
+                      type:         item.type,
+                      value:        item.value,
+                      valueInfo:    item.valueInfo,
+                      executionId:  item.executionId
+                    },
+                    original: item,
+                    additions: {
+                      scope: {
+                        html: activityInstanceLink,
+                        scopeVariables: {
+                          processData: $scope.processData
+                        }
+                      }
+                    }
+                  };
+                });
+                $scope.loadingState = data.length ? 'LOADED' : 'EMPTY';
+
+                return $scope.total;
+              });
+          });
       }
 
     }]);

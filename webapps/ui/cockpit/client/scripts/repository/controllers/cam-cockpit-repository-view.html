@@ -22,15 +22,13 @@
               vars="deploymentsVars" />
 
         <div cam-deployments
-             total-items="totalDeployments"
-             ng-style="{top: deploymentsListTop}"
-             deployments-data="deploymentsData"></div>
+            deployments-data="deploymentsData"
+            deployments="control.deployments"
+            ng-style="{top: deploymentsListTop}"></div>
       </div>
 
     </section>
     <!-- / deployment-list column -->
-
-
 
     <!-- # resource-list column -->
     <section class="column column-center resources">

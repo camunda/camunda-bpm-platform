@@ -1,40 +1,23 @@
 <!-- # CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/variable-instances-tab.html -->
-<div cam-widget-search
-     cam-widget-search-total="pages.total"
-     cam-widget-search-valid-searches="searchConfig.searches"
-     cam-widget-search-translations="searchConfig.tooltips"
-     cam-widget-search-types="searchConfig.types"
-     cam-widget-search-operators="searchConfig.operators"
-     cam-widget-search-mode="filter"
-     cam-widget-search-storage-group="'VI'">
-</div>
+<div cam-searchable-area
+     config="searchConfig"
+     array-types="['activityInstanceIdIn']"
+     variable-types="['variableValues']"
+     on-search-change="onSearchChange(query, pages)"
+     loading-state="loadingState"
+     text-empty="No process variables"
+     blocked="!instanceIdToInstanceMap"
+     storage-group="'VI'">
 
-<div cam-widget-loader
-     loading-state="{{ loadingState }}"
-     text-empty="No process variables">
-  <!-- <div cam-widget-debug debugged="variables"></div> -->
-
-  <div cam-widget-variables-table
-       on-save="saveVariable"
-       on-edit="editVariable"
-       on-upload="uploadVariable"
-       on-delete="deleteVariable"
-       on-download="downloadVariable"
-       cam-variables="variables"
-       cam-editable="['type', 'value']"
-       cam-headers="{ name: 'Name', value: 'Value', type: 'Type', scope: 'Scope' }"></div>
-
-
-  <pagination ng-if="pages.total > pages.size"
-              class="pagination-sm"
-
-              page="pages.current"
-              ng-model="pages.current"
-
-              total-items="pages.total"
-              items-per-page="pages.size"
-
-              max-size="7"
-              boundary-links="true"></pagination>
+      <div cam-widget-variables-table
+           on-save="saveVariable"
+           on-edit="editVariable"
+           on-upload="uploadVariable"
+           on-delete="deleteVariable"
+           on-download="downloadVariable"
+           cam-variables="variables"
+           cam-editable="['type', 'value']"
+           cam-headers="{ name: 'Name', value: 'Value', type: 'Type', scope: 'Scope' }">
+      </div>
 </div>
 <!-- / CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/variable-instances-tab.html -->

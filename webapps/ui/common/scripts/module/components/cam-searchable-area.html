@@ -1,7 +1,11 @@
-<div cam-search="Searchable.config"
-     total="Searchable.total"
-     on-query-change="Searchable.onQueryChange(query)"
-     array-types="Searchable.arrayTypes">
+<div cam-widget-search
+     cam-widget-search-total="Searchable.pages.total"
+     cam-widget-search-valid-searches="Searchable.config.searches"
+     cam-widget-search-translations="Searchable.config.tooltips"
+     cam-widget-search-types="Searchable.config.types"
+     cam-widget-search-operators="Searchable.config.operators"
+     cam-widget-search-storage-group="Searchable.storageGroup"
+     cam-widget-search-mode="filter">
 </div>
 
 <div cam-widget-loader
@@ -11,7 +15,12 @@
 
   <div ng-transclude></div>
 
-  <div cam-pagination="Searchable.onPaginationChange(pages)"
-       total="Searchable.total">
-  </div>
+  <pagination ng-if="Searchable.pages.total > Searchable.pages.size"
+              class="pagination-sm"
+              page="Searchable.pages.current"
+              ng-model="Searchable.pages.current"
+              total-items="Searchable.pages.total"
+              items-per-page="Searchable.pages.size"
+              boundary-links="true">
+  </pagination>
 </div>
