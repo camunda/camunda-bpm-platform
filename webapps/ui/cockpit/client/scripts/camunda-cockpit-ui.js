@@ -58,7 +58,7 @@ module.exports = function(pluginDependencies) {
       UriProvider.replace('app://', getUri('href'));
       UriProvider.replace('adminbase://', getUri('app-root') + '/app/admin/');
       UriProvider.replace('cockpit://', getUri('cockpit-api'));
-      UriProvider.replace('admin://', getUri('cockpit-api') + '../admin/');
+      UriProvider.replace('admin://', getUri('admin-api') || (getUri('cockpit-api') + '../admin/'));
       UriProvider.replace('plugin://', getUri('cockpit-api') + 'plugin/');
       UriProvider.replace('engine://', getUri('engine-api'));
 
