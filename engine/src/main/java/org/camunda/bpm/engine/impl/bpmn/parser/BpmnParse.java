@@ -2883,8 +2883,10 @@ public class BpmnParse extends Parse {
         if (isServiceTaskLike(messageEventDefinitionElement)) {
 
           // CAM-436 same behaviour as service task
+          ActivityImpl act = parseServiceTaskLike(ActivityTypes.END_EVENT_MESSAGE, messageEventDefinitionElement, scope);
           activity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.END_EVENT_MESSAGE);
-          activity.setActivityBehavior(parseServiceTaskLike(ActivityTypes.END_EVENT_MESSAGE, messageEventDefinitionElement, scope).getActivityBehavior());
+          activity.setActivityBehavior(act.getActivityBehavior());
+          scope.getActivities().remove(act);
         } else {
           // default to non behavior if no service task
           // properties have been specified

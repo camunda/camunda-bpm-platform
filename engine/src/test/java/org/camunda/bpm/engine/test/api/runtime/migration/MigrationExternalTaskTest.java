@@ -404,12 +404,33 @@ public class MigrationExternalTaskTest {
 
   @Test
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/ExternalTaskWithoutIdTest.bpmn"})
-  public void testProcessDeffinitionWithoutIdField() {
+  public void testProcessDefinitionWithoutIdField() {
      // given
 
 //    ProcessDefinition sourceProcessDefinition =
     ProcessDefinition sourceProcessDefinition = testHelper.deploy("org/camunda/bpm/engine/test/api/externaltask/ExternalTaskWithoutIdTest.bpmn").getDeployedProcessDefinitions().get(0);
     ProcessDefinition targetProcessDefinition = testHelper.deploy("org/camunda/bpm/engine/test/api/externaltask/ExternalTaskWithoutIdTest.bpmn").getDeployedProcessDefinitions().get(0);
+
+    //external task is not mapped to new external task
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapEqualActivities()
+      .build();
+
+    List<MigrationInstruction> instructions = migrationPlan.getInstructions();
+    // test that the messageEventDefinition without an id isn't included
+    assertEquals(2, instructions.size());
+  }
+
+
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/ExternalTaskWithoutIdTest.bpmn"})
+  public void testProcessDefinitionWithIdField() {
+     // given
+
+//    ProcessDefinition sourceProcessDefinition =
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy("org/camunda/bpm/engine/test/api/externaltask/ExternalTaskWithIdTest.bpmn").getDeployedProcessDefinitions().get(0);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy("org/camunda/bpm/engine/test/api/externaltask/ExternalTaskWithIdTest.bpmn").getDeployedProcessDefinitions().get(0);
 
     //external task is not mapped to new external task
     MigrationPlan migrationPlan = rule.getRuntimeService()
