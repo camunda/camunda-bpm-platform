@@ -179,7 +179,7 @@ public enum HistoryEventTypes implements HistoryEventType {
   EXTERNAL_TASK_DELETE("external-task", "delete");
 
   private HistoryEventTypes(String entityType, String eventName) {
-    this.entityType = eventName;
+    this.entityType = entityType;
     this.eventName = eventName;
   }
 
