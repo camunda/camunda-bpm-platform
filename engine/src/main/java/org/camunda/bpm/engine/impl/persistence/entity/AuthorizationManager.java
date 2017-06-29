@@ -362,11 +362,13 @@ public class AuthorizationManager extends AbstractManager {
   public void configureQueryHistoricFinishedInstanceReport(ListQueryParameterObject query, Resource resource) {
     configureQuery(query);
 
-    CompositePermissionCheck compositePermissionCheck = new CompositePermissionCheck(false);
-    query.getAuthCheck().setPermissionChecks(compositePermissionCheck);
+    CompositePermissionCheck compositePermissionCheck = new PermissionCheckBuilder()
+      .conjunctive()
+        .atomicCheck(resource, "RES.KEY_", READ)
+        .atomicCheck(resource, "RES.KEY_", READ_HISTORY)
+      .build();
 
-    addPermissionCheck(query, resource, "RES.KEY_", Permissions.READ);
-    addPermissionCheck(query, resource, "RES.KEY_", Permissions.READ_HISTORY);
+    query.getAuthCheck().setPermissionChecks(compositePermissionCheck);
   }
 
   public void enableQueryAuthCheck(AuthorizationCheck authCheck) {
