@@ -31,6 +31,7 @@ import org.camunda.bpm.engine.history.HistoricDecisionInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricDetailQuery;
 import org.camunda.bpm.engine.history.HistoricExternalTaskLogQuery;
+import org.camunda.bpm.engine.history.HistoricFinishedCaseInstanceReport;
 import org.camunda.bpm.engine.history.HistoricFinishedDecisionInstanceReport;
 import org.camunda.bpm.engine.history.HistoricFinishedProcessInstanceReport;
 import org.camunda.bpm.engine.history.HistoricExternalTaskLog;
@@ -385,6 +386,13 @@ public interface HistoryService {
    * @since 7.8
    */
   HistoricFinishedDecisionInstanceReport createHistoricFinishedDecisionInstanceReport();
+
+  /**
+   * Creates a new programmatic query to create a historic finished case instance report.
+   *
+   * @since 7.8
+   */
+  HistoricFinishedCaseInstanceReport createHistoricFinishedCaseInstanceReport();
 
   /**
    * Creates a query to search for {@link org.camunda.bpm.engine.batch.history.HistoricBatch} instances.

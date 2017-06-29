@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.rest.history;
 import java.util.List;
 
 import org.camunda.bpm.engine.rest.dto.history.HistoricCaseActivityStatisticsDto;
+import org.camunda.bpm.engine.rest.dto.history.HistoricFinishedCaseInstanceReportDto;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -26,14 +27,19 @@ import javax.ws.rs.core.MediaType;
  * @author Roman Smirnov
  *
  */
-@Path(HistoricCaseActivityStatisticsRestService.PATH)
+@Path(HistoricCaseDefinitionRestService.PATH)
 @Produces(MediaType.APPLICATION_JSON)
-public interface HistoricCaseActivityStatisticsRestService {
+public interface HistoricCaseDefinitionRestService {
 
-  public static final String PATH = "/case-definition/{id}/statistics";
+  public static final String PATH = "/case-definition";
 
   @GET
+  @Path("/{id}/statistics")
   @Produces(MediaType.APPLICATION_JSON)
   public List<HistoricCaseActivityStatisticsDto> getHistoricCaseActivityStatistics(@PathParam("id") String caseDefinitionId);
 
+  @GET
+  @Path("/finished-case-instance-report")
+  @Produces(MediaType.APPLICATION_JSON)
+  public List<HistoricFinishedCaseInstanceReportDto> getHistoricFinishedCaseInstanceReport();
 }

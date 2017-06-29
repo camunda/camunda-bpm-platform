@@ -18,6 +18,16 @@
 
 <mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.HistoricCaseInstanceEntity">
 
+  <resultMap id="finishedReportResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.HistoricFinishedCaseInstanceReportResultEntity">
+    <result property="cleanableCaseInstanceCount" column="CLEANABLE_" jdbcType="BIGINT" />
+    <result property="finishedCaseInstanceCount" column="FINISHED_" jdbcType="BIGINT" />
+    <result property="caseDefinitionId" column="ID_" jdbcType="VARCHAR" />
+    <result property="caseDefinitionKey" column="KEY_" jdbcType="VARCHAR" />
+    <result property="caseDefinitionName" column="NAME_" jdbcType="VARCHAR" />
+    <result property="caseDefinitionVersion" column="VERSION_" jdbcType="VARCHAR" />
+    <result property="historyTimeToLive" column="HISTORY_TTL_" jdbcType="BIGINT" />
+  </resultMap>
+
   <!-- HISTORIC CASE INSTANCE INSERT -->
 
   <insert id="insertHistoricCaseInstanceEvent" parameterType="org.camunda.bpm.engine.impl.history.event.HistoricCaseInstanceEventEntity">
@@ -342,4 +352,83 @@
     ORDER BY DATEDIFF(#{parameter}, ci.CLOSE_TIME_) DESC
     ${limitAfter}
   </select>
+
+  <!-- Select History Cleanup Report Entities -->
+  <select id="selectFinishedCaseInstancesReportEntities" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="finishedReportResultMap">
+      SELECT SUM(<include refid="selectCaseForCleanableCaseInstances" />)
+      <include refid="selectFinishedCaseInstancesReportEntitiesSql" />
+  </select>
+
+  <sql id="selectFinishedCaseInstancesReportEntitiesSql">
+   AS CLEANABLE_
+          ,RES.ID_
+          ,RES.KEY_
+          ,RES.NAME_
+          ,RES.VERSION_
+          ,RES.HISTORY_TTL_
+          ,(CASE WHEN F.FINISHED_ IS NOT NULL THEN F.FINISHED_ ELSE 0 END ) AS FINISHED_
+      FROM ${prefix}ACT_RE_CASE_DEF RES
+      LEFT JOIN ${prefix}ACT_HI_CASEINST CI
+      ON CI.CASE_DEF_ID_ = RES.ID_
+      LEFT JOIN (
+          SELECT COUNT(CI.ID_) AS FINISHED_
+              ,CI.CASE_DEF_ID_
+          FROM ${prefix}ACT_HI_CASEINST CI
+          WHERE CI.CLOSE_TIME_ IS NOT NULL
+          GROUP BY CI.CASE_DEF_ID_
+          ) F ON F.CASE_DEF_ID_ = CI.CASE_DEF_ID_
+      <where>
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
+      </where>
+      GROUP BY RES.ID_,
+        RES.KEY_,
+        RES.NAME_,
+        RES.VERSION_,
+        RES.HISTORY_TTL_,
+        F.FINISHED_
+  </sql>
+
+  <select id="selectFinishedCaseInstancesReportEntities_mssql" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="finishedReportResultMap">
+    SELECT SUM(<include refid="selectCaseForCleanableCaseInstances_mssql" />) <include refid="selectFinishedCaseInstancesReportEntitiesSql" />
+  </select>
+
+  <select id="selectFinishedCaseInstancesReportEntities_db2" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="finishedReportResultMap">
+    SELECT SUM(<include refid="selectCaseForCleanableCaseInstances_db2" />) <include refid="selectFinishedCaseInstancesReportEntitiesSql" />
+  </select>
+
+  <select id="selectFinishedCaseInstancesReportEntities_oracle" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="finishedReportResultMap">
+    SELECT SUM(<include refid="selectCaseForCleanableCaseInstances_oracle" />) <include refid="selectFinishedCaseInstancesReportEntitiesSql" />
+  </select>
+
+  <select id="selectFinishedCaseInstancesReportEntities_postgres" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="finishedReportResultMap">
+    SELECT SUM(<include refid="selectCaseForCleanableCaseInstances_postgres" />) <include refid="selectFinishedCaseInstancesReportEntitiesSql" />
+  </select>
+
+  <select id="selectFinishedCaseInstancesReportEntities_mysql" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="finishedReportResultMap">
+    SELECT SUM(<include refid="selectCaseForCleanableCaseInstances_mysql" />) <include refid="selectFinishedCaseInstancesReportEntitiesSql" />
+  </select>
+
+  <sql id="selectCaseForCleanableCaseInstances">
+    SELECT CASE WHEN CI.CLOSE_TIME_ is not null and DATEDIFF(DAY, CI.CLOSE_TIME_, #{parameter}) &gt;= RES.HISTORY_TTL_ THEN 1 ELSE 0 END ${dbSpecificDummyTable}
+  </sql>
+
+  <sql id="selectCaseForCleanableCaseInstances_mssql">
+    CASE WHEN CI.CLOSE_TIME_ is not null and DATEDIFF(DAY, CI.CLOSE_TIME_, #{parameter}) &gt;= RES.HISTORY_TTL_ THEN 1 ELSE 0 END
+  </sql>
+
+  <sql id="selectCaseForCleanableCaseInstances_db2">
+    CASE WHEN CI.CLOSE_TIME_ is not null and CI.CLOSE_TIME_ + RES.HISTORY_TTL_ DAYS &lt;= #{parameter} THEN 1 ELSE 0 END
+  </sql>
+
+  <sql id="selectCaseForCleanableCaseInstances_oracle">
+    CASE WHEN CI.CLOSE_TIME_ is not null and CI.CLOSE_TIME_ + RES.HISTORY_TTL_ &lt;= #{parameter} THEN 1 ELSE 0 END
+  </sql>
+
+  <sql id="selectCaseForCleanableCaseInstances_postgres">
+    CASE WHEN CI.CLOSE_TIME_ is not null and EXTRACT (day from #{parameter} - CI.CLOSE_TIME_) &gt;= RES.HISTORY_TTL_ THEN 1 ELSE 0 END ${dbSpecificDummyTable}
+  </sql>
+
+  <sql id="selectCaseForCleanableCaseInstances_mysql">
+    CASE WHEN CI.CLOSE_TIME_ is not null and DATEDIFF(#{parameter}, CI.CLOSE_TIME_) &gt;= RES.HISTORY_TTL_ THEN 1 ELSE 0 END ${dbSpecificDummyTable}
+  </sql>
 </mapper>

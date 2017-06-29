@@ -141,6 +141,7 @@ public class DbSqlSessionFactory implements SessionFactory {
       addDatabaseSpecificStatement(mysqlLikeDatabase, "selectHistoricCaseInstanceIdsForCleanup", "selectHistoricCaseInstanceIdsForCleanup_mysql");
       addDatabaseSpecificStatement(mysqlLikeDatabase, "selectFinishedProcessInstancesReportEntities", "selectFinishedProcessInstancesReportEntities_mysql");
       addDatabaseSpecificStatement(mysqlLikeDatabase, "selectFinishedDecisionInstancesReportEntities", "selectFinishedDecisionInstancesReportEntities_mysql");
+      addDatabaseSpecificStatement(mysqlLikeDatabase, "selectFinishedCaseInstancesReportEntities", "selectFinishedCaseInstancesReportEntities_mysql");
 
       constants = new HashMap<String, String>();
       constants.put("constant.event", "'event'");
@@ -202,6 +203,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     addDatabaseSpecificStatement(POSTGRES, "selectHistoricCaseInstanceIdsForCleanup", "selectHistoricCaseInstanceIdsForCleanup_postgres");
     addDatabaseSpecificStatement(POSTGRES, "selectFinishedProcessInstancesReportEntities", "selectFinishedProcessInstancesReportEntities_postgres");
     addDatabaseSpecificStatement(POSTGRES, "selectFinishedDecisionInstancesReportEntities", "selectFinishedDecisionInstancesReportEntities_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "selectFinishedCaseInstancesReportEntities", "selectFinishedCaseInstancesReportEntities_postgres");
 
     constants = new HashMap<String, String>();
     constants.put("constant.event", "'event'");
@@ -244,6 +246,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     addDatabaseSpecificStatement(ORACLE, "selectHistoricCaseInstanceIdsForCleanup", "selectHistoricCaseInstanceIdsForCleanup_oracle");
     addDatabaseSpecificStatement(ORACLE, "selectFinishedProcessInstancesReportEntities", "selectFinishedProcessInstancesReportEntities_oracle");
     addDatabaseSpecificStatement(ORACLE, "selectFinishedDecisionInstancesReportEntities", "selectFinishedDecisionInstancesReportEntities_oracle");
+    addDatabaseSpecificStatement(ORACLE, "selectFinishedCaseInstancesReportEntities", "selectFinishedCaseInstancesReportEntities_oracle");
 
     constants = new HashMap<String, String>();
     constants.put("constant.event", "cast('event' as nvarchar2(255))");
@@ -293,6 +296,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     addDatabaseSpecificStatement(DB2, "selectHistoricCaseInstanceIdsForCleanup", "selectHistoricCaseInstanceIdsForCleanup_db2");
     addDatabaseSpecificStatement(DB2, "selectFinishedProcessInstancesReportEntities", "selectFinishedProcessInstancesReportEntities_db2");
     addDatabaseSpecificStatement(DB2, "selectFinishedDecisionInstancesReportEntities", "selectFinishedDecisionInstancesReportEntities_db2");
+    addDatabaseSpecificStatement(DB2, "selectFinishedCaseInstancesReportEntities", "selectFinishedCaseInstancesReportEntities_db2");
 
     constants = new HashMap<String, String>();
     constants.put("constant.event", "'event'");
@@ -344,6 +348,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     addDatabaseSpecificStatement(MSSQL, "selectHistoricCaseInstanceIdsForCleanup", "selectHistoricCaseInstanceIdsForCleanup_mssql");
     addDatabaseSpecificStatement(MSSQL, "selectFinishedProcessInstancesReportEntities", "selectFinishedProcessInstancesReportEntities_mssql");
     addDatabaseSpecificStatement(MSSQL, "selectFinishedDecisionInstancesReportEntities", "selectFinishedDecisionInstancesReportEntities_mssql");
+    addDatabaseSpecificStatement(MSSQL, "selectFinishedCaseInstancesReportEntities", "selectFinishedCaseInstancesReportEntities_mssql");
 
     constants = new HashMap<String, String>();
     constants.put("constant.event", "'event'");

@@ -48,8 +48,8 @@ public interface HistoryRestService {
   @Path(HistoricDecisionDefinitionRestService.PATH)
   HistoricDecisionDefinitionRestService getDecisionDefinitionService();
 
-  @Path(HistoricCaseActivityStatisticsRestService.PATH)
-  HistoricCaseActivityStatisticsRestService getCaseActivityStatisticsService();
+  @Path(HistoricCaseDefinitionRestService.PATH)
+  HistoricCaseDefinitionRestService getCaseDefinitionService();
 
   @Path(HistoricDecisionStatisticsRestService.PATH)
   HistoricDecisionStatisticsRestService getDecisionStatisticsService();
