@@ -142,6 +142,8 @@ public class BpmnParse extends Parse {
   public static final String CONDITION_EXPRESSION = "conditionExpression";
   public static final String CONDITION = "condition";
 
+  protected static final Pattern REGEX_ISO = Pattern.compile("^P(\\d+)D$");
+
   public static final List<String> VARIABLE_EVENTS = Arrays.asList(
       VariableListener.CREATE,
       VariableListener.DELETE,
@@ -567,27 +569,14 @@ public class BpmnParse extends Parse {
   protected void parseHistoryTimeToLive(Element processElement, ProcessDefinitionEntity processDefinition) {
     Integer historyTimeToLive = null;
 
-
     String historyTTL = processElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS,"historyTimeToLive" );
     if (historyTTL != null && !historyTTL.isEmpty()) {
-      String ISOformat = "P(\\d+)D";
-      String integerFormat = "(\\d+)";
-      Pattern regISO = Pattern.compile(ISOformat);
-      Pattern regInteger = Pattern.compile(integerFormat);
-
-      Matcher matISO = regISO.matcher(historyTTL);
-      Matcher matInteger = regInteger.matcher(historyTTL);
+      Matcher matISO = REGEX_ISO.matcher(historyTTL);
       if (matISO.find()) {
-        String days = matISO.group(1);
-        historyTimeToLive = parseIntegerAttribute(processElement, "historyTimeToLive",
-          days, false);
-      } else if (matInteger.find()) {
-        historyTimeToLive = parseIntegerAttribute(processElement, "historyTimeToLive",
-          processElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "historyTimeToLive"), false);
-
-      } else {
-        addError("Cannot parse historyTimeToLive: Invalid format", processElement);
+        historyTTL = matISO.group(1);
       }
+      historyTimeToLive = parseIntegerAttribute(processElement, "historyTimeToLive",
+          historyTTL, false);
     }
 
     if (historyTimeToLive == null || historyTimeToLive >= 0) {
