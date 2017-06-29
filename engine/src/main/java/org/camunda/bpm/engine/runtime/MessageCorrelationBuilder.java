@@ -142,7 +142,7 @@ public interface MessageCorrelationBuilder {
   /**
    * Executes the message correlation.
    *
-   * @deprecated use {@link #correlateWithResult() ()} instead.
+   * @deprecated use {@link #correlateWithResult()} instead.
    */
   @Deprecated
   void correlate();
@@ -201,7 +201,7 @@ public interface MessageCorrelationBuilder {
   /**
    * Executes the message correlation for multiple messages.
    *
-   * @deprecated use {@link #correlateAllWithResult() ()} instead.
+   * @deprecated use {@link #correlateAllWithResult()} instead.
    */
   @Deprecated
   void correlateAll();
