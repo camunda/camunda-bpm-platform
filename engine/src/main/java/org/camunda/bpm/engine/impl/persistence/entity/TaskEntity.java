@@ -1002,6 +1002,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
       String oldAssignee = assigneePropertyChange.getOrgValueString();
       String newAssignee = assigneePropertyChange.getNewValueString();
       fireAssigneeAuthorizationProvider(oldAssignee, newAssignee);
+      fireEvent(TaskListener.EVENTNAME_ASSIGNMENT);
     }
 
     PropertyChange ownerPropertyChange = propertyChanges.get(OWNER);

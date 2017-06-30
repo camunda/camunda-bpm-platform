@@ -1012,4 +1012,29 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
     assertThat(pi.isEnded(), is(true));
   }
 
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricActivityInstanceTest.testHistoricActivityInstanceProperties.bpmn20.xml"})
+  public void testAssigneeSavedWhenTaskSaved() {
+      // Start process instance
+    runtimeService.startProcessInstanceByKey("taskAssigneeProcess");
+
+    // Get task list
+    HistoricActivityInstance historicActivityInstance = historyService.createHistoricActivityInstanceQuery().activityId("theTask").singleResult();
+
+    Task task = taskService.createTaskQuery().singleResult();
+    assertEquals(task.getId(), historicActivityInstance.getTaskId());
+    assertEquals("kermit", historicActivityInstance.getAssignee());
+
+
+    // change assignee of the task
+    task = taskService.createTaskQuery().singleResult();
+    task.setAssignee("gonzo");
+    taskService.saveTask(task);
+    System.out.println();
+
+    historicActivityInstance = historyService.createHistoricActivityInstanceQuery().activityId("theTask").singleResult();
+    System.out.println(historicActivityInstance.getAssignee());
+    assertEquals("gonzo", historicActivityInstance.getAssignee());
+
+
+  }
 }
