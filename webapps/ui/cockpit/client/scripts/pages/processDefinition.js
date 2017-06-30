@@ -16,6 +16,7 @@ var Controller = [
   function($location, $scope,   $rootScope,   $q,   search,   ProcessDefinitionResource,   ProcessInstanceResource,   Views,   Data,   Transform,   Variables,   dataDepend,   processDefinition,   page
   ) {
     var processData = $scope.processData = dataDepend.create($scope);
+    var pageData = $scope.pageData = dataDepend.create($scope);
 
     // utilities ///////////////////////
 
@@ -293,7 +294,7 @@ var Controller = [
 
     $scope.processDefinition = processDefinition;
 
-    $scope.processDefinitionVars = { read: [ 'processDefinition', 'selection', 'processData', 'filter' ] };
+    $scope.processDefinitionVars = { read: [ 'processDefinition', 'selection', 'processData', 'filter', 'pageData' ] };
     $scope.processDefinitionTabs = Views.getProviders({ component: 'cockpit.processDefinition.runtime.tab' });
     $scope.processDefinitionActions = Views.getProviders({ component: 'cockpit.processDefinition.runtime.action' });
 
@@ -321,7 +322,8 @@ var Controller = [
 
     var initData = {
       processDefinition : processDefinition,
-      processData       : processData
+      processData       : processData,
+      pageData          : pageData
     };
 
     for(var i = 0; i < processPlugins.length; i++) {
