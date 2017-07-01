@@ -28,7 +28,7 @@ class CamundaFeelEngine extends org.camunda.bpm.dmn.feel.impl.FeelEngine {
     val ctx = unpack(context)
     val variables = Map(Context.inputVariableKey -> inputVariable) ++ ctx
 
-    engine.evalSimpleUnaryTests(expression, variables) match {
+    engine.evalUnaryTests(expression, variables) match {
       case EvalValue(value) => value.asInstanceOf[Boolean]
       case EvalFailure(error) => throw new FeelException(error)
       case ParseFailure(error) => throw new FeelException(error)
