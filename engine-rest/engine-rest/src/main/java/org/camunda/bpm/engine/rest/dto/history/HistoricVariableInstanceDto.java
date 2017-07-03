@@ -93,10 +93,6 @@ public class HistoricVariableInstanceDto extends VariableValueDto {
     return state;
   }
 
-  public void setState(String state) {
-    this.state = state;
-  }
-
   public static HistoricVariableInstanceDto fromHistoricVariableInstance(HistoricVariableInstance historicVariableInstance) {
 
     HistoricVariableInstanceDto dto = new HistoricVariableInstanceDto();
