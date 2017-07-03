@@ -955,14 +955,10 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
 
     assertEquals("newValue", var.getValue());
 
-    final List<HistoricDetail> historicDetails = processEngine.getHistoryService().createHistoricDetailQuery().list();
-    assertEquals(2, historicDetails.size());
-    for (HistoricDetail historicDetail: historicDetails) {
-      if (((HistoryEvent)historicDetail).getSequenceCounter() == 2) {
-        final CustomVar typedValue = (CustomVar)((HistoricVariableUpdate) historicDetail).getTypedValue().getValue();
-        assertEquals("newValue", typedValue.getValue());
-      }
-    }
+    final List<HistoricDetail> historicDetails = processEngine.getHistoryService().createHistoricDetailQuery().orderPartiallyByOccurrence().desc().list();
+    HistoricDetail historicDetail = historicDetails.get(0);
+    final CustomVar typedValue = (CustomVar) ((HistoricVariableUpdate) historicDetail).getTypedValue().getValue();
+    assertEquals("newValue", typedValue.getValue());
   }
 
   public static class CustomVar implements Serializable {
