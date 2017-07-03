@@ -14,22 +14,43 @@
 package org.camunda.bpm.engine.history;
 
 /**
- * This interface defines the result of Historic finished decision instance report.
+ * This interface defines the result of Cleanable historic decision instance report.
  *
  */
-public interface HistoricFinishedDecisionInstanceReportResult {
+public interface CleanableHistoricDecisionInstanceReportResult {
 
+  /**
+   * Returns the decision definition id for the selected definition.
+   */
   String getDecisionDefinitionId();
 
+  /**
+   * Returns the decision definition key for the selected definition.
+   */
   String getDecisionDefinitionKey();
 
+  /**
+   * Returns the decision definition name for the selected definition.
+   */
   String getDecisionDefinitionName();
 
+  /**
+   * Returns the decision definition version for the selected definition.
+   */
   int getDecisionDefinitionVersion();
 
+  /**
+   * Returns the history time to live for the selected definition.
+   */
   Integer getHistoryTimeToLive();
 
+  /**
+   * Returns the amount of finished historic decision instances.
+   */
   long getFinishedDecisionInstanceCount();
 
+  /**
+   * Returns the amount of cleanable historic decision instances.
+   */
   long getCleanableDecisionInstanceCount();
 }

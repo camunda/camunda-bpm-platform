@@ -23,8 +23,10 @@ import org.apache.commons.lang.time.DateUtils;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
-import org.camunda.bpm.engine.history.HistoricFinishedDecisionInstanceReportResult;
+import org.camunda.bpm.engine.history.CleanableHistoricDecisionInstanceReportResult;
+import org.camunda.bpm.engine.history.CleanableHistoricDecisionInstanceReport;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -39,7 +41,7 @@ import org.junit.Test;
 import org.junit.rules.RuleChain;
 
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
-public class HistoricFinishedDecisionInstanceReportTest {
+public class CleanableHistoricDecisionInstanceReportTest {
   public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
@@ -88,7 +90,7 @@ public class HistoricFinishedDecisionInstanceReportTest {
   }
 
   @Test
-  public void testComplex() {
+  public void testReportComplex() {
     // given
     testRule.deploy("org/camunda/bpm/engine/test/repository/two.dmn", "org/camunda/bpm/engine/test/api/dmn/Another_Example.dmn",
         "org/camunda/bpm/engine/test/api/dmn/Example.dmn");
@@ -98,11 +100,14 @@ public class HistoricFinishedDecisionInstanceReportTest {
     prepareDecisionInstances(THIRD_DECISION_DEFINITION_KEY, -6, 5, 10);
 
     // when
-    List<HistoricFinishedDecisionInstanceReportResult> reportResults = historyService.createHistoricFinishedDecisionInstanceReport().list();
+    List<CleanableHistoricDecisionInstanceReportResult> reportResults = historyService.createCleanableHistoricDecisionInstanceReport().list();
+    String secondDecisionDefinitionId = repositoryService.createDecisionDefinitionQuery().decisionDefinitionKey(SECOND_DECISION_DEFINITION_KEY).singleResult().getId();
+    CleanableHistoricDecisionInstanceReportResult secondReportResult = historyService.createCleanableHistoricDecisionInstanceReport().decisionDefinitionIdIn(secondDecisionDefinitionId).singleResult();
+    CleanableHistoricDecisionInstanceReportResult thirdReportResult = historyService.createCleanableHistoricDecisionInstanceReport().decisionDefinitionKeyIn(THIRD_DECISION_DEFINITION_KEY).singleResult();
 
     // then
     assertEquals(4, reportResults.size());
-    for (HistoricFinishedDecisionInstanceReportResult result : reportResults) {
+    for (CleanableHistoricDecisionInstanceReportResult result : reportResults) {
       if (result.getDecisionDefinitionKey().equals(DECISION_DEFINITION_KEY)) {
         checkResultNumbers(result, 10, 20);
       } else if (result.getDecisionDefinitionKey().equals(SECOND_DECISION_DEFINITION_KEY)) {
@@ -113,35 +118,40 @@ public class HistoricFinishedDecisionInstanceReportTest {
         checkResultNumbers(result, 0, 0);
       }
     }
+    checkResultNumbers(secondReportResult, 0, 10);
+    checkResultNumbers(thirdReportResult, 10, 10);
 
   }
 
-  private void checkResultNumbers(HistoricFinishedDecisionInstanceReportResult result, int expectedCleanable, int expectedFinished) {
+  private void checkResultNumbers(CleanableHistoricDecisionInstanceReportResult result, int expectedCleanable, int expectedFinished) {
     assertEquals(expectedCleanable, result.getCleanableDecisionInstanceCount());
     assertEquals(expectedFinished, result.getFinishedDecisionInstanceCount());
   }
 
   @Test
-  public void testAllCleanable() {
+  public void testReportWithAllCleanableInstances() {
     // given
     prepareDecisionInstances(DECISION_DEFINITION_KEY, -6, 5, 10);
 
     // when
-    List<HistoricFinishedDecisionInstanceReportResult> reportResults = historyService.createHistoricFinishedDecisionInstanceReport().list();
+    List<CleanableHistoricDecisionInstanceReportResult> reportResults = historyService.createCleanableHistoricDecisionInstanceReport().list();
+    long count = historyService.createCleanableHistoricDecisionInstanceReport().count();
 
     // then
     assertEquals(1, reportResults.size());
+    assertEquals(1, count);
+
     checkResultNumbers(reportResults.get(0), 10, 10);
   }
 
   @Test
-  public void testPartCleanable() {
+  public void testReportWithPartiallyCleanableInstances() {
     // given
     prepareDecisionInstances(DECISION_DEFINITION_KEY, -6, 5, 5);
     prepareDecisionInstances(DECISION_DEFINITION_KEY, 0, 5, 5);
 
     // when
-    List<HistoricFinishedDecisionInstanceReportResult> reportResults = historyService.createHistoricFinishedDecisionInstanceReport().list();
+    List<CleanableHistoricDecisionInstanceReportResult> reportResults = historyService.createCleanableHistoricDecisionInstanceReport().list();
 
     // then
     assertEquals(1, reportResults.size());
@@ -149,13 +159,13 @@ public class HistoricFinishedDecisionInstanceReportTest {
   }
 
   @Test
-  public void testZeroTTL() {
+  public void testReportWithZeroHistoryTTL() {
     // given
     prepareDecisionInstances(DECISION_DEFINITION_KEY, -6, 0, 5);
     prepareDecisionInstances(DECISION_DEFINITION_KEY, 0, 0, 5);
 
     // when
-    List<HistoricFinishedDecisionInstanceReportResult> reportResults = historyService.createHistoricFinishedDecisionInstanceReport().list();
+    List<CleanableHistoricDecisionInstanceReportResult> reportResults = historyService.createCleanableHistoricDecisionInstanceReport().list();
 
     // then
     assertEquals(1, reportResults.size());
@@ -163,16 +173,45 @@ public class HistoricFinishedDecisionInstanceReportTest {
   }
 
   @Test
-  public void testNullTTL() {
+  public void testReportWithNullHistoryTTL() {
     // given
     prepareDecisionInstances(DECISION_DEFINITION_KEY, -6, null, 5);
     prepareDecisionInstances(DECISION_DEFINITION_KEY, 0, null, 5);
 
     // when
-    List<HistoricFinishedDecisionInstanceReportResult> reportResults = historyService.createHistoricFinishedDecisionInstanceReport().list();
+    List<CleanableHistoricDecisionInstanceReportResult> reportResults = historyService.createCleanableHistoricDecisionInstanceReport().list();
 
     // then
     assertEquals(1, reportResults.size());
     checkResultNumbers(reportResults.get(0), 0, 10);
+  }
+
+  @Test
+  public void testReportByInvalidDecisionDefinitionId() {
+    CleanableHistoricDecisionInstanceReport report = historyService.createCleanableHistoricDecisionInstanceReport();
+
+    try {
+      report.decisionDefinitionIdIn((String) null);
+    } catch (NotValidException e) {
+    }
+
+    try {
+      report.decisionDefinitionIdIn("abc", (String) null, "def");
+    } catch (NotValidException e) {
+    }
+  }
+
+  public void testReportByInvalidDecisionDefinitionKey() {
+    CleanableHistoricDecisionInstanceReport report = historyService.createCleanableHistoricDecisionInstanceReport();
+
+    try {
+      report.decisionDefinitionKeyIn((String) null);
+    } catch (NotValidException e) {
+    }
+
+    try {
+      report.decisionDefinitionKeyIn("abc", (String) null, "def");
+    } catch (NotValidException e) {
+    }
   }
 }

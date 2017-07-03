@@ -18,7 +18,7 @@
 
 <mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceEntity">
 
-    <resultMap id="finishedReportResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.HistoricFinishedProcessInstanceReportResultEntity">
+    <resultMap id="finishedReportResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.CleanableHistoricProcessInstanceReportResultEntity">
       <result property="cleanableProcessInstanceCount" column="CLEANABLE_" jdbcType="BIGINT" />
       <result property="finishedProcessInstanceCount" column="FINISHED_" jdbcType="BIGINT" />
       <result property="processDefinitionId" column="ID_" jdbcType="VARCHAR" />
@@ -516,90 +516,80 @@
   </select>
 
   <!-- Select History Cleanup Report Entities -->
-  <select id="selectFinishedProcessInstancesReportEntities" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="finishedReportResultMap">
-        SELECT SUM(<include refid="selectCaseForCleanableProcessInstances" />)
-        <include refid="selectFinishedProcessInstancesReportEntitiesSql" />
-    </select>
+  <select id="selectFinishedProcessInstancesReportEntitiesCount" parameterType="org.camunda.bpm.engine.impl.CleanableHistoricProcessInstanceReportImpl" resultType="long">
+    SELECT COUNT(DISTINCT RES.ID_)
+    <include refid="selectFinishedProcessInstancesReportEntitiesSql" />
+  </select>
 
-    <sql id="selectFinishedProcessInstancesReportEntitiesSql">
-     AS CLEANABLE_
-            ,RES.ID_
-            ,RES.KEY_
-            ,RES.NAME_
-            ,RES.VERSION_
-            ,RES.HISTORY_TTL_
-            ,(CASE WHEN F.FINISHED_ IS NOT NULL THEN F.FINISHED_ ELSE 0 END ) AS FINISHED_
-        FROM
-          (
-            SELECT DISTINCT RES.*
-            FROM ${prefix}ACT_RE_PROCDEF RES
-            <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
-              <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" />
-              AUTH ON (AUTH.RESOURCE_ID_ in (RES.KEY_, '*'))
+  <select id="selectFinishedProcessInstancesReportEntities" parameterType="org.camunda.bpm.engine.impl.CleanableHistoricProcessInstanceReportImpl" resultMap="finishedReportResultMap">
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
+    ${limitBefore}
+    SELECT ${distinct} RES.*
+    ${limitBetween}
+    <include refid="selectFinishedProcessInstancesReportEntitiesSql"/>
+    ${orderBy}
+    ${limitAfter}
+  </select>
+
+  <sql id="selectFinishedProcessInstancesReportEntitiesSql">
+    <bind name="days" value="'RES.HISTORY_TTL_'"/>
+    <bind name="date" value="'PI.END_TIME_'"/>
+
+    FROM (
+
+      SELECT RES.ID_,
+        RES.KEY_,
+        RES.NAME_,
+        RES.VERSION_,
+        RES.HISTORY_TTL_,
+        F.FINISHED_,
+        SUM(CASE WHEN PI.END_TIME_ is not null and ${dayComparator} THEN 1 ELSE 0 END) AS CLEANABLE_
+      FROM
+        (
+          SELECT DISTINCT RES.*
+          FROM ${prefix}ACT_RE_PROCDEF RES
+          <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+            <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" />
+            AUTH ON (AUTH.RESOURCE_ID_ in (RES.KEY_, '*'))
+          </if>
+          <where>
+
+            <if test="processDefinitionIdIn != null &amp;&amp; processDefinitionIdIn.length > 0">
+              RES.ID_ IN
+              <foreach item="processInstanceId" index="index" collection="processDefinitionIdIn" open="(" separator="," close=")">
+                  #{processInstanceId}
+              </foreach>
             </if>
-            <where>
-              <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
-              <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
-            </where>
-          ) RES
+
+            <if test="processDefinitionKeyIn != null &amp;&amp; processDefinitionKeyIn.length > 0">
+              and RES.KEY_ IN
+              <foreach item="processInstanceKey" index="index" collection="processDefinitionKeyIn" open="(" separator="," close=")">
+                  #{processInstanceKey}
+              </foreach>
+            </if>
+
+            <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
+            <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
+
+          </where>
+        ) RES
         LEFT JOIN ${prefix}ACT_HI_PROCINST PI
         ON PI.PROC_DEF_ID_ = RES.ID_
         LEFT JOIN (
-            SELECT COUNT(PI.ID_) AS FINISHED_
-                ,PI.PROC_DEF_ID_
-            FROM ${prefix}ACT_HI_PROCINST PI
-            WHERE PI.END_TIME_ IS NOT NULL
-            GROUP BY PI.PROC_DEF_ID_
-            ) F ON F.PROC_DEF_ID_ = PI.PROC_DEF_ID_
+          SELECT COUNT(PI.ID_) AS FINISHED_, PI.PROC_DEF_ID_
+          FROM ${prefix}ACT_HI_PROCINST PI
+          WHERE PI.END_TIME_ IS NOT NULL
+          GROUP BY PI.PROC_DEF_ID_
+          ) F ON F.PROC_DEF_ID_ = PI.PROC_DEF_ID_
         GROUP BY RES.ID_,
           RES.KEY_,
           RES.NAME_,
           RES.VERSION_,
           RES.HISTORY_TTL_,
           F.FINISHED_
-    </sql>
 
-    <select id="selectFinishedProcessInstancesReportEntities_mssql" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="finishedReportResultMap">
-        SELECT SUM(<include refid="selectCaseForCleanableProcessInstances_mssql" />) <include refid="selectFinishedProcessInstancesReportEntitiesSql" />
-    </select>
+    ) RES
 
-    <select id="selectFinishedProcessInstancesReportEntities_db2" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="finishedReportResultMap">
-        SELECT SUM(<include refid="selectCaseForCleanableProcessInstances_db2" />) <include refid="selectFinishedProcessInstancesReportEntitiesSql" />
-    </select>
+  </sql>
 
-    <select id="selectFinishedProcessInstancesReportEntities_oracle" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="finishedReportResultMap">
-        SELECT SUM(<include refid="selectCaseForCleanableProcessInstances_oracle" />) <include refid="selectFinishedProcessInstancesReportEntitiesSql" />
-    </select>
-
-    <select id="selectFinishedProcessInstancesReportEntities_postgres" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="finishedReportResultMap">
-        SELECT SUM(<include refid="selectCaseForCleanableProcessInstances_postgres" />) <include refid="selectFinishedProcessInstancesReportEntitiesSql" />
-    </select>
-
-    <select id="selectFinishedProcessInstancesReportEntities_mysql" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="finishedReportResultMap">
-        SELECT SUM(<include refid="selectCaseForCleanableProcessInstances_mysql" />) <include refid="selectFinishedProcessInstancesReportEntitiesSql" />
-    </select>
-
-    <sql id="selectCaseForCleanableProcessInstances">
-      SELECT CASE WHEN PI.END_TIME_ is not null and DATEDIFF(DAY, PI.END_TIME_, #{parameter}) &gt;= RES.HISTORY_TTL_ THEN 1 ELSE 0 END ${dbSpecificDummyTable}
-    </sql>
-
-    <sql id="selectCaseForCleanableProcessInstances_mssql">
-      CASE WHEN PI.END_TIME_ is not null and DATEDIFF(DAY, PI.END_TIME_, #{parameter}) &gt;= RES.HISTORY_TTL_ THEN 1 ELSE 0 END
-    </sql>
-
-    <sql id="selectCaseForCleanableProcessInstances_db2">
-      CASE WHEN PI.END_TIME_ is not null and PI.END_TIME_ + RES.HISTORY_TTL_ DAYS &lt;= #{parameter} THEN 1 ELSE 0 END
-    </sql>
-
-    <sql id="selectCaseForCleanableProcessInstances_oracle">
-      CASE WHEN PI.END_TIME_ is not null and pi.END_TIME_ + RES.HISTORY_TTL_ &lt;= #{parameter} THEN 1 ELSE 0 END
-    </sql>
-
-    <sql id="selectCaseForCleanableProcessInstances_postgres">
-      CASE WHEN PI.END_TIME_ is not null and EXTRACT (day from #{parameter} - pi.END_TIME_) &gt;= RES.HISTORY_TTL_ THEN 1 ELSE 0 END ${dbSpecificDummyTable}
-    </sql>
-
-    <sql id="selectCaseForCleanableProcessInstances_mysql">
-      CASE WHEN PI.END_TIME_ is not null and DATEDIFF(#{parameter}, PI.END_TIME_) &gt;= RES.HISTORY_TTL_ THEN 1 ELSE 0 END ${dbSpecificDummyTable}
-    </sql>
 </mapper>

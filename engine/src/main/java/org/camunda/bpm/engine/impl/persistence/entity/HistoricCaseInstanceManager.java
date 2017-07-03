@@ -18,7 +18,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.history.HistoricCaseInstance;
-import org.camunda.bpm.engine.history.HistoricFinishedCaseInstanceReportResult;
+import org.camunda.bpm.engine.history.CleanableHistoricCaseInstanceReportResult;
+import org.camunda.bpm.engine.impl.CleanableHistoricCaseInstanceReportImpl;
 import org.camunda.bpm.engine.impl.HistoricCaseInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
@@ -126,11 +127,16 @@ public class HistoricCaseInstanceManager extends AbstractHistoricManager {
   }
 
   @SuppressWarnings("unchecked")
-  public List<HistoricFinishedCaseInstanceReportResult> findHistoricFinishedCaseInstanceReportResults() {
-    ListQueryParameterObject parameterObject = new ListQueryParameterObject();
-    parameterObject.setParameter(ClockUtil.getCurrentTime());
-    getTenantManager().configureQuery(parameterObject);
-    return (List<HistoricFinishedCaseInstanceReportResult>) getDbEntityManager().selectList("selectFinishedCaseInstancesReportEntities", parameterObject);
+  public List<CleanableHistoricCaseInstanceReportResult> findCleanableHistoricCaseInstancesReportByCriteria(CleanableHistoricCaseInstanceReportImpl query, Page page) {
+    query.setCurrentTimestamp(ClockUtil.getCurrentTime());
+    getTenantManager().configureQuery(query);
+    return getDbEntityManager().selectList("selectFinishedCaseInstancesReportEntities", query, page);
+  }
+
+  public long findCleanableHistoricCaseInstancesReportCountByCriteria(CleanableHistoricCaseInstanceReportImpl query) {
+    query.setCurrentTimestamp(ClockUtil.getCurrentTime());
+    getTenantManager().configureQuery(query);
+    return (Long) getDbEntityManager().selectOne("selectFinishedCaseInstancesReportEntitiesCount", query);
   }
 
 }

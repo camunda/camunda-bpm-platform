@@ -14,23 +14,30 @@ package org.camunda.bpm.engine.rest.impl.history;
 
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.history.HistoricFinishedProcessInstanceReportResult;
+import org.camunda.bpm.engine.history.CleanableHistoricProcessInstanceReport;
+import org.camunda.bpm.engine.history.CleanableHistoricProcessInstanceReportResult;
 import org.camunda.bpm.engine.history.HistoricActivityStatistics;
 import org.camunda.bpm.engine.history.HistoricActivityStatisticsQuery;
 import org.camunda.bpm.engine.rest.dto.history.HistoricActivityStatisticsDto;
-import org.camunda.bpm.engine.rest.dto.history.HistoricFinishedProcessInstanceReportDto;
+import org.camunda.bpm.engine.rest.dto.history.CleanableHistoricProcessInstanceReportResultDto;
+import org.camunda.bpm.engine.rest.dto.history.CleanableHistoricProcessInstanceReportDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.history.HistoricProcessDefinitionRestService;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.Status;
 import java.util.ArrayList;
 import java.util.List;
 
 public class HistoricProcessDefinitionRestServiceImpl implements HistoricProcessDefinitionRestService {
 
+  protected ObjectMapper objectMapper;
   protected ProcessEngine processEngine;
 
-  public HistoricProcessDefinitionRestServiceImpl(ProcessEngine processEngine) {
+  public HistoricProcessDefinitionRestServiceImpl(ObjectMapper objectMapper, ProcessEngine processEngine) {
+    this.objectMapper = objectMapper;
     this.processEngine = processEngine;
   }
 
@@ -95,11 +102,28 @@ public class HistoricProcessDefinitionRestServiceImpl implements HistoricProcess
   }
 
   @Override
-  public List<HistoricFinishedProcessInstanceReportDto> getHistoricFinishedProcessInstanceReport() {
-    HistoryService historyService = processEngine.getHistoryService();
+  public List<CleanableHistoricProcessInstanceReportResultDto> getCleanableHistoricProcessInstanceReport(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
+    CleanableHistoricProcessInstanceReportDto queryDto = new CleanableHistoricProcessInstanceReportDto(objectMapper, uriInfo.getQueryParameters());
+    CleanableHistoricProcessInstanceReport query = queryDto.toQuery(processEngine);
 
-    List<HistoricFinishedProcessInstanceReportResult> reportResult = historyService.createHistoricFinishedProcessInstanceReport().list();
-    return HistoricFinishedProcessInstanceReportDto.convert(reportResult);
+    List<CleanableHistoricProcessInstanceReportResult> reportResult;
+    if (firstResult != null || maxResults != null) {
+    reportResult = executePaginatedQuery(query, firstResult, maxResults);
+    } else {
+    reportResult = query.list();
+    }
+
+    return CleanableHistoricProcessInstanceReportResultDto.convert(reportResult);
+  }
+
+  private List<CleanableHistoricProcessInstanceReportResult> executePaginatedQuery(CleanableHistoricProcessInstanceReport query, Integer firstResult, Integer maxResults) {
+    if (firstResult == null) {
+      firstResult = 0;
+    }
+    if (maxResults == null) {
+      maxResults = Integer.MAX_VALUE;
+    }
+    return query.listPage(firstResult, maxResults);
   }
 
 }

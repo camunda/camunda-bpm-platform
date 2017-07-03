@@ -11,17 +11,11 @@
  * limitations under the License.
  */
 
-package org.camunda.bpm.engine.rest.dto.history;
+package org.camunda.bpm.engine.impl.persistence.entity;
 
-import java.io.Serializable;
-import java.util.LinkedList;
-import java.util.List;
+import org.camunda.bpm.engine.history.CleanableHistoricDecisionInstanceReportResult;
 
-import org.camunda.bpm.engine.history.HistoricFinishedDecisionInstanceReportResult;
-
-public class HistoricFinishedDecisionInstanceReportDto implements Serializable {
-
-  private static final long serialVersionUID = 1L;
+public class CleanableHistoricDecisionInstanceReportResultEntity implements CleanableHistoricDecisionInstanceReportResult {
 
   protected String decisionDefinitionId;
   protected String decisionDefinitionKey;
@@ -75,7 +69,7 @@ public class HistoricFinishedDecisionInstanceReportDto implements Serializable {
     return finishedDecisionInstanceCount;
   }
 
-  public void setFinishedDecisionInstanceCount(Long finishedDecisionInstanceCount) {
+  public void setFinishedDecisionInstanceCount(long finishedDecisionInstanceCount) {
     this.finishedDecisionInstanceCount = finishedDecisionInstanceCount;
   }
 
@@ -83,23 +77,20 @@ public class HistoricFinishedDecisionInstanceReportDto implements Serializable {
     return cleanableDecisionInstanceCount;
   }
 
-  public void setCleanableDecisionInstanceCount(Long cleanableDecisionInstanceCount) {
+  public void setCleanableDecisionInstanceCount(long cleanableDecisionInstanceCount) {
     this.cleanableDecisionInstanceCount = cleanableDecisionInstanceCount;
   }
 
-  public static List<HistoricFinishedDecisionInstanceReportDto> convert(List<HistoricFinishedDecisionInstanceReportResult> reportResult) {
-    List<HistoricFinishedDecisionInstanceReportDto> dtos = new LinkedList<HistoricFinishedDecisionInstanceReportDto>();
-    for (HistoricFinishedDecisionInstanceReportResult current : reportResult) {
-      HistoricFinishedDecisionInstanceReportDto dto = new HistoricFinishedDecisionInstanceReportDto();
-      dto.setDecisionDefinitionId(current.getDecisionDefinitionId());
-      dto.setDecisionDefinitionKey(current.getDecisionDefinitionKey());
-      dto.setDecisionDefinitionName(current.getDecisionDefinitionName());
-      dto.setDecisionDefinitionVersion(current.getDecisionDefinitionVersion());
-      dto.setHistoryTimeToLive(current.getHistoryTimeToLive());
-      dto.setFinishedDecisionInstanceCount(current.getFinishedDecisionInstanceCount());
-      dto.setCleanableDecisionInstanceCount(current.getCleanableDecisionInstanceCount());
-      dtos.add(dto);
-    }
-    return dtos;
+  public String toString() {
+    return this.getClass().getSimpleName()
+        + "[decisionDefinitionId = " + decisionDefinitionId
+        + ", decisionDefinitionKey = " + decisionDefinitionKey
+        + ", decisionDefinitionName = " + decisionDefinitionName
+        + ", decisionDefinitionVersion = " + decisionDefinitionVersion
+        + ", historyTimeToLive = " + historyTimeToLive
+        + ", finishedDecisionInstanceCount = " + finishedDecisionInstanceCount
+        + ", cleanableDecisionInstanceCount = " + cleanableDecisionInstanceCount
+        + "]";
   }
+
 }

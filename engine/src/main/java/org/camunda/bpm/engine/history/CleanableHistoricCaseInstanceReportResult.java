@@ -14,22 +14,43 @@
 package org.camunda.bpm.engine.history;
 
 /**
- * This interface defines the result of Historic finished process case report.
+ * This interface defines the result of Historic finished case instance report.
  *
  */
-public interface HistoricFinishedCaseInstanceReportResult {
+public interface CleanableHistoricCaseInstanceReportResult {
 
+  /**
+   * Returns the case definition id for the selected definition.
+   */
   String getCaseDefinitionId();
 
+  /**
+   * Returns the case definition key for the selected definition.
+   */
   String getCaseDefinitionKey();
 
+  /**
+   * Returns the case definition name for the selected definition.
+   */
   String getCaseDefinitionName();
 
+  /**
+   * Returns the case definition version for the selected definition.
+   */
   int getCaseDefinitionVersion();
 
+  /**
+   * Returns the history time to live for the selected definition.
+   */
   Integer getHistoryTimeToLive();
 
+  /**
+   * Returns the amount of finished historic case instances.
+   */
   long getFinishedCaseInstanceCount();
 
+  /**
+   * Returns the amount of cleanable historic case instances.
+   */
   long getCleanableCaseInstanceCount();
 }

@@ -31,9 +31,9 @@ import org.camunda.bpm.engine.history.HistoricDecisionInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricDetailQuery;
 import org.camunda.bpm.engine.history.HistoricExternalTaskLogQuery;
-import org.camunda.bpm.engine.history.HistoricFinishedCaseInstanceReport;
-import org.camunda.bpm.engine.history.HistoricFinishedDecisionInstanceReport;
-import org.camunda.bpm.engine.history.HistoricFinishedProcessInstanceReport;
+import org.camunda.bpm.engine.history.CleanableHistoricCaseInstanceReport;
+import org.camunda.bpm.engine.history.CleanableHistoricDecisionInstanceReport;
+import org.camunda.bpm.engine.history.CleanableHistoricProcessInstanceReport;
 import org.camunda.bpm.engine.history.HistoricExternalTaskLog;
 import org.camunda.bpm.engine.history.HistoricIdentityLinkLog;
 import org.camunda.bpm.engine.history.HistoricIdentityLinkLogQuery;
@@ -374,25 +374,25 @@ public interface HistoryService {
   HistoricTaskInstanceReport createHistoricTaskInstanceReport();
 
   /**
-   * Creates a new programmatic query to create a historic finished process instance report.
+   * Creates a new programmatic query to create a cleanable historic process instance report.
    *
    * @since 7.8
    */
-  HistoricFinishedProcessInstanceReport createHistoricFinishedProcessInstanceReport();
+  CleanableHistoricProcessInstanceReport createCleanableHistoricProcessInstanceReport();
 
   /**
-   * Creates a new programmatic query to create a historic finished decision instance report.
+   * Creates a new programmatic query to create a cleanable historic decision instance report.
    *
    * @since 7.8
    */
-  HistoricFinishedDecisionInstanceReport createHistoricFinishedDecisionInstanceReport();
+  CleanableHistoricDecisionInstanceReport createCleanableHistoricDecisionInstanceReport();
 
   /**
-   * Creates a new programmatic query to create a historic finished case instance report.
+   * Creates a new programmatic query to create a cleanable historic case instance report.
    *
    * @since 7.8
    */
-  HistoricFinishedCaseInstanceReport createHistoricFinishedCaseInstanceReport();
+  CleanableHistoricCaseInstanceReport createCleanableHistoricCaseInstanceReport();
 
   /**
    * Creates a query to search for {@link org.camunda.bpm.engine.batch.history.HistoricBatch} instances.

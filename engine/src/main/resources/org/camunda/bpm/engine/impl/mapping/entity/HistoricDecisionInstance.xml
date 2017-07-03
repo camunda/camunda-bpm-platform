@@ -4,7 +4,7 @@
 
 <mapper namespace="org.camunda.bpm.engine.impl.history.event.HistoricDecisionInstanceEntity">
 
-  <resultMap id="finishedReportResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.HistoricFinishedDecisionInstanceReportResultEntity">
+  <resultMap id="finishedReportResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.CleanableHistoricDecisionInstanceReportResultEntity">
     <result property="cleanableDecisionInstanceCount" column="CLEANABLE_" jdbcType="BIGINT" />
     <result property="finishedDecisionInstanceCount" column="FINISHED_" jdbcType="BIGINT" />
     <result property="decisionDefinitionId" column="ID_" jdbcType="VARCHAR" />
@@ -334,91 +334,80 @@
   </select>
 
   <!-- Select History Cleanup Report Entities -->
-  <select id="selectFinishedDecisionInstancesReportEntities" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="finishedReportResultMap">
-    SELECT SUM(<include refid="selectCaseForCleanableDecisionInstances" />)
+  <select id="selectFinishedDecisionInstancesReportEntitiesCount" parameterType="org.camunda.bpm.engine.impl.CleanableHistoricDecisionInstanceReportImpl" resultType="long">
+    SELECT COUNT(DISTINCT RES.ID_)
     <include refid="selectFinishedDecisionInstancesReportEntitiesSql" />
   </select>
 
+  <select id="selectFinishedDecisionInstancesReportEntities" parameterType="org.camunda.bpm.engine.impl.CleanableHistoricProcessInstanceReportImpl" resultMap="finishedReportResultMap">
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
+    ${limitBefore}
+    SELECT ${distinct} RES.*
+    ${limitBetween}
+    <include refid="selectFinishedDecisionInstancesReportEntitiesSql" />
+    ${orderBy}
+    ${limitAfter}
+  </select>
+
   <sql id="selectFinishedDecisionInstancesReportEntitiesSql">
-    AS CLEANABLE_
-        ,RES.ID_
-        ,RES.KEY_
-        ,RES.NAME_
-        ,RES.VERSION_
-        ,RES.HISTORY_TTL_
-        ,(CASE WHEN F.FINISHED_ IS NOT NULL THEN F.FINISHED_ ELSE 0 END ) AS FINISHED_
-    FROM
-      (
-        SELECT DISTINCT RES.*
-        FROM ${prefix}ACT_RE_DECISION_DEF RES
-        <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
-          <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" />
-          AUTH ON (AUTH.RESOURCE_ID_ in (RES.KEY_, '*'))
-        </if>
-        <where>
-          <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
-          <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
-        </where>
-      ) RES
-    LEFT JOIN ${prefix}ACT_HI_DECINST DI
-    ON DI.DEC_DEF_ID_ = RES.ID_
-    LEFT JOIN (
-        SELECT COUNT(DI.ID_) AS FINISHED_
-            ,DI.DEC_DEF_ID_
-        FROM ${prefix}ACT_HI_DECINST DI
-        WHERE DI.EVAL_TIME_ IS NOT NULL
-        GROUP BY DI.DEC_DEF_ID_
-        ) F ON F.DEC_DEF_ID_ = DI.DEC_DEF_ID_
-    GROUP BY RES.ID_,
-      RES.KEY_,
-      RES.NAME_,
-      RES.VERSION_,
-      RES.HISTORY_TTL_,
-      F.FINISHED_
-  </sql>
+    <bind name="days" value="'RES.HISTORY_TTL_'"/>
+    <bind name="date" value="'DI.EVAL_TIME_'"/>
 
-  <sql id="selectCaseForCleanableDecisionInstances">
-    SELECT CASE WHEN DI.EVAL_TIME_ is not null and DATEDIFF(DAY, DI.EVAL_TIME_, #{parameter}) &gt;= RES.HISTORY_TTL_ THEN 1 ELSE 0 END ${dbSpecificDummyTable}
-  </sql>
+    FROM (
+      SELECT RES.ID_,
+        RES.KEY_,
+        RES.NAME_,
+        RES.VERSION_,
+        RES.HISTORY_TTL_,
+        F.FINISHED_,
+        SUM(CASE WHEN DI.EVAL_TIME_ is not null and ${dayComparator} THEN 1 ELSE 0 END) AS CLEANABLE_
+      FROM
+        (
+          SELECT DISTINCT RES.*
+          FROM ${prefix}ACT_RE_DECISION_DEF RES
+          <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+            <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" />
+            AUTH ON (AUTH.RESOURCE_ID_ in (RES.KEY_, '*'))
+          </if>
+          <where>
 
-  <select id="selectFinishedDecisionInstancesReportEntities_mssql" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="finishedReportResultMap">
-    SELECT SUM(<include refid="selectCaseForCleanableDecisionInstances_mssql" />) <include refid="selectFinishedDecisionInstancesReportEntitiesSql" />
-  </select>
+            <if test="decisionDefinitionIdIn != null &amp;&amp; decisionDefinitionIdIn.length > 0">
+              RES.ID_ IN
+              <foreach item="decisionInstanceId" index="index" collection="decisionDefinitionIdIn" open="(" separator="," close=")">
+                  #{decisionInstanceId}
+              </foreach>
+            </if>
 
-  <select id="selectFinishedDecisionInstancesReportEntities_db2" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="finishedReportResultMap">
-    SELECT SUM(<include refid="selectCaseForCleanableDecisionInstances_db2" />) <include refid="selectFinishedDecisionInstancesReportEntitiesSql" />
-  </select>
+            <if test="decisionDefinitionKeyIn != null &amp;&amp; decisionDefinitionKeyIn.length > 0">
+              and RES.KEY_ IN
+              <foreach item="decisionInstanceKey" index="index" collection="decisionDefinitionKeyIn" open="(" separator="," close=")">
+                  #{decisionInstanceKey}
+              </foreach>
+            </if>
 
-  <select id="selectFinishedDecisionInstancesReportEntities_oracle" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="finishedReportResultMap">
-    SELECT SUM(<include refid="selectCaseForCleanableDecisionInstances_oracle" />) <include refid="selectFinishedDecisionInstancesReportEntitiesSql" />
-  </select>
+            <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
+            <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
 
-  <select id="selectFinishedDecisionInstancesReportEntities_postgres" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="finishedReportResultMap">
-    SELECT SUM(<include refid="selectCaseForCleanableDecisionInstances_postgres" />) <include refid="selectFinishedDecisionInstancesReportEntitiesSql" />
-  </select>
+          </where>
+        ) RES
+        LEFT JOIN ${prefix}ACT_HI_DECINST DI
+        ON DI.DEC_DEF_ID_ = RES.ID_
+        LEFT JOIN (
+          SELECT COUNT(DI.ID_) AS FINISHED_
+              ,DI.DEC_DEF_ID_
+          FROM ${prefix}ACT_HI_DECINST DI
+          WHERE DI.EVAL_TIME_ IS NOT NULL
+          GROUP BY DI.DEC_DEF_ID_
+          ) F ON F.DEC_DEF_ID_ = DI.DEC_DEF_ID_
+        GROUP BY RES.ID_,
+          RES.KEY_,
+          RES.NAME_,
+          RES.VERSION_,
+          RES.HISTORY_TTL_,
+          F.FINISHED_
 
-  <select id="selectFinishedDecisionInstancesReportEntities_mysql" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="finishedReportResultMap">
-    SELECT SUM(<include refid="selectCaseForCleanableDecisionInstances_mysql" />) <include refid="selectFinishedDecisionInstancesReportEntitiesSql" />
-  </select>
+    ) RES
 
-  <sql id="selectCaseForCleanableDecisionInstances_mssql">
-    CASE WHEN DI.EVAL_TIME_ is not null and DATEDIFF(DAY, DI.EVAL_TIME_, #{parameter}) &gt;= RES.HISTORY_TTL_ THEN 1 ELSE 0 END
-  </sql>
-
-  <sql id="selectCaseForCleanableDecisionInstances_db2">
-    CASE WHEN DI.EVAL_TIME_ is not null and DI.EVAL_TIME_ + RES.HISTORY_TTL_ DAYS &lt;= #{parameter} THEN 1 ELSE 0 END
-  </sql>
-
-  <sql id="selectCaseForCleanableDecisionInstances_oracle">
-    CASE WHEN DI.EVAL_TIME_ is not null and DI.EVAL_TIME_ + RES.HISTORY_TTL_ &lt;= #{parameter} THEN 1 ELSE 0 END
-  </sql>
-
-  <sql id="selectCaseForCleanableDecisionInstances_postgres">
-    CASE WHEN DI.EVAL_TIME_ is not null and EXTRACT (day from #{parameter} - DI.EVAL_TIME_) &gt;= RES.HISTORY_TTL_ THEN 1 ELSE 0 END ${dbSpecificDummyTable}
-  </sql>
-
-  <sql id="selectCaseForCleanableDecisionInstances_mysql">
-    CASE WHEN DI.EVAL_TIME_ is not null and DATEDIFF(#{parameter}, DI.EVAL_TIME_) &gt;= RES.HISTORY_TTL_ THEN 1 ELSE 0 END ${dbSpecificDummyTable}
   </sql>
 
 </mapper>

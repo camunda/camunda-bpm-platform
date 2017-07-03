@@ -26,7 +26,7 @@ import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.history.HistoricFinishedProcessInstanceReportResult;
+import org.camunda.bpm.engine.history.CleanableHistoricProcessInstanceReportResult;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -42,7 +42,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
-public class MultiTenancyFinishedProcessInstanceReportCmdTenantCheckTest {
+public class MultiTenancyCleanableHistoricProcessInstanceReportCmdTenantCheckTest {
 
   protected static final String TENANT_ONE = "tenant1";
   protected static final String TENANT_TWO = "tenant2";
@@ -90,7 +90,7 @@ public class MultiTenancyFinishedProcessInstanceReportCmdTenantCheckTest {
     identityService.setAuthentication("user", null, null);
 
     // when
-    List<HistoricFinishedProcessInstanceReportResult> reportResults = historyService.createHistoricFinishedProcessInstanceReport().list();
+    List<CleanableHistoricProcessInstanceReportResult> reportResults = historyService.createCleanableHistoricProcessInstanceReport().list();
 
     // then
     assertEquals(0, reportResults.size());
@@ -106,7 +106,7 @@ public class MultiTenancyFinishedProcessInstanceReportCmdTenantCheckTest {
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
     // when
-    List<HistoricFinishedProcessInstanceReportResult> reportResults = historyService.createHistoricFinishedProcessInstanceReport().list();
+    List<CleanableHistoricProcessInstanceReportResult> reportResults = historyService.createCleanableHistoricProcessInstanceReport().list();
 
     // then
     assertEquals(1, reportResults.size());
@@ -123,7 +123,7 @@ public class MultiTenancyFinishedProcessInstanceReportCmdTenantCheckTest {
     processEngineConfiguration.setTenantCheckEnabled(false);
 
     // when
-    List<HistoricFinishedProcessInstanceReportResult> reportResults = historyService.createHistoricFinishedProcessInstanceReport().list();
+    List<CleanableHistoricProcessInstanceReportResult> reportResults = historyService.createCleanableHistoricProcessInstanceReport().list();
 
     // then
     assertEquals(1, reportResults.size());

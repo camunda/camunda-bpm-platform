@@ -13,10 +13,13 @@
 package org.camunda.bpm.engine.rest.history;
 
 import org.camunda.bpm.engine.rest.dto.history.HistoricActivityStatisticsDto;
-import org.camunda.bpm.engine.rest.dto.history.HistoricFinishedProcessInstanceReportDto;
+import org.camunda.bpm.engine.rest.dto.history.CleanableHistoricProcessInstanceReportResultDto;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriInfo;
+
 import java.util.List;
 
 /**
@@ -39,7 +42,9 @@ public interface HistoricProcessDefinitionRestService {
       @QueryParam("sortBy") String sortBy, @QueryParam("sortOrder") String sortOrder);
 
   @GET
-  @Path("/finished-process-instance-report")
+  @Path("/cleanable-process-instance-report")
   @Produces(MediaType.APPLICATION_JSON)
-  public List<HistoricFinishedProcessInstanceReportDto> getHistoricFinishedProcessInstanceReport();
+  public List<CleanableHistoricProcessInstanceReportResultDto> getCleanableHistoricProcessInstanceReport(@Context UriInfo uriInfo,
+                                                                                                         @QueryParam("firstResult") Integer firstResult,
+                                                                                                         @QueryParam("maxResults") Integer maxResults);
 }

@@ -14,7 +14,6 @@
 package org.camunda.bpm.engine.test.history;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -26,7 +25,9 @@ import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
-import org.camunda.bpm.engine.history.HistoricFinishedProcessInstanceReportResult;
+import org.camunda.bpm.engine.exception.NotValidException;
+import org.camunda.bpm.engine.history.CleanableHistoricProcessInstanceReport;
+import org.camunda.bpm.engine.history.CleanableHistoricProcessInstanceReportResult;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -45,7 +46,7 @@ import org.junit.Test;
 import org.junit.rules.RuleChain;
 
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
-public class HistoricFinishedProcessInstanceReportTest {
+public class CleanableHistoricProcessInstanceReportTest {
   public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
@@ -115,7 +116,7 @@ public class HistoricFinishedProcessInstanceReportTest {
   }
 
   @Test
-  public void testComplex() {
+  public void testReportComplex() {
     testRule.deploy(createProcessWithUserTask(SECOND_PROCESS_DEFINITION_KEY));
     testRule.deploy(createProcessWithUserTask(THIRD_PROCESS_DEFINITION_KEY));
     testRule.deploy(createProcessWithUserTask(FOURTH_PROCESS_DEFINITION_KEY));
@@ -129,120 +130,116 @@ public class HistoricFinishedProcessInstanceReportTest {
     repositoryService.deleteProcessDefinition(
         repositoryService.createProcessDefinitionQuery().processDefinitionKey(SECOND_PROCESS_DEFINITION_KEY).singleResult().getId(), false);
 
-        // when
-        List<HistoricFinishedProcessInstanceReportResult> reportResults = historyService.createHistoricFinishedProcessInstanceReport().list();
+    // when
+    List<CleanableHistoricProcessInstanceReportResult> reportResults = historyService.createCleanableHistoricProcessInstanceReport().list();
+    CleanableHistoricProcessInstanceReportResult secondReportResult = historyService.createCleanableHistoricProcessInstanceReport().processDefinitionIdIn(repositoryService.createProcessDefinitionQuery().processDefinitionKey(THIRD_PROCESS_DEFINITION_KEY).singleResult().getId()).singleResult();
+    CleanableHistoricProcessInstanceReportResult thirdReportResult = historyService.createCleanableHistoricProcessInstanceReport().processDefinitionKeyIn(FOURTH_PROCESS_DEFINITION_KEY).singleResult();
 
-        // then
-        assertEquals(3, reportResults.size());
-        for (HistoricFinishedProcessInstanceReportResult result : reportResults) {
-          if (result.getProcessDefinitionKey().equals(PROCESS_DEFINITION_KEY)) {
-            checkResultNumbers(result, 10, 20);
-          } else if (result.getProcessDefinitionKey().equals(THIRD_PROCESS_DEFINITION_KEY)) {
-            checkResultNumbers(result, 0, 10);
-          } else if (result.getProcessDefinitionKey().equals(FOURTH_PROCESS_DEFINITION_KEY)) {
-            checkResultNumbers(result, 10, 10);
-          }
-        }
-
+    // then
+    assertEquals(3, reportResults.size());
+    for (CleanableHistoricProcessInstanceReportResult result : reportResults) {
+      if (result.getProcessDefinitionKey().equals(PROCESS_DEFINITION_KEY)) {
+        checkResultNumbers(result, 10, 20);
+      } else if (result.getProcessDefinitionKey().equals(THIRD_PROCESS_DEFINITION_KEY)) {
+        checkResultNumbers(result, 0, 10);
+      } else if (result.getProcessDefinitionKey().equals(FOURTH_PROCESS_DEFINITION_KEY)) {
+        checkResultNumbers(result, 10, 10);
+      }
+    }
+    checkResultNumbers(secondReportResult, 0, 10);
+    checkResultNumbers(thirdReportResult, 10, 10);
   }
 
-  private void checkResultNumbers(HistoricFinishedProcessInstanceReportResult result, int expectedCleanable, int expectedFinished) {
+  private void checkResultNumbers(CleanableHistoricProcessInstanceReportResult result, int expectedCleanable, int expectedFinished) {
     assertEquals(expectedCleanable, result.getCleanableProcessInstanceCount());
     assertEquals(expectedFinished, result.getFinishedProcessInstanceCount());
   }
 
   @Test
-  public void testAllCleanable() {
+  public void testReportWithAllCleanableInstances() {
     // given
     prepareProcessInstances(PROCESS_DEFINITION_KEY, -6, 5, 10);
 
     // when
-    List<HistoricFinishedProcessInstanceReportResult> reportResults = historyService.createHistoricFinishedProcessInstanceReport().list();
+    List<CleanableHistoricProcessInstanceReportResult> reportResults = historyService.createCleanableHistoricProcessInstanceReport().list();
+    long count = historyService.createCleanableHistoricProcessInstanceReport().count();
 
     // then
     assertEquals(1, reportResults.size());
-    boolean entityFound = false;
+    assertEquals(1, count);
 
-    for (HistoricFinishedProcessInstanceReportResult result : reportResults) {
-      if (result.getProcessDefinitionKey().equals(PROCESS_DEFINITION_KEY)) {
-        checkResultNumbers(result, 10, 10);
-        entityFound = true;
-        break;
-      }
-    }
-
-    assertTrue(entityFound);
+    checkResultNumbers(reportResults.get(0), 10, 10);
   }
 
   @Test
-  public void testPartCleanable() {
+  public void testReportWithPartiallyCleanableInstances() {
     // given
     prepareProcessInstances(PROCESS_DEFINITION_KEY, -6, 5, 5);
     prepareProcessInstances(PROCESS_DEFINITION_KEY, 0, 5, 5);
 
     // when
-    List<HistoricFinishedProcessInstanceReportResult> reportResults = historyService.createHistoricFinishedProcessInstanceReport().list();
+    List<CleanableHistoricProcessInstanceReportResult> reportResults = historyService.createCleanableHistoricProcessInstanceReport().list();
 
     // then
     assertEquals(1, reportResults.size());
-    boolean entityFound = false;
 
-    for (HistoricFinishedProcessInstanceReportResult result : reportResults) {
-      if (result.getProcessDefinitionKey().equals(PROCESS_DEFINITION_KEY)) {
-        checkResultNumbers(result, 5, 10);
-        entityFound = true;
-        break;
-      }
-    }
-
-    assertTrue(entityFound);
+    checkResultNumbers(reportResults.get(0), 5, 10);
   }
 
   @Test
-  public void testZeroTTL() {
+  public void testReportWithZeroHistoryTTL() {
     // given
     prepareProcessInstances(PROCESS_DEFINITION_KEY, -6, 0, 5);
     prepareProcessInstances(PROCESS_DEFINITION_KEY, 0, 0, 5);
 
     // when
-    List<HistoricFinishedProcessInstanceReportResult> reportResults = historyService.createHistoricFinishedProcessInstanceReport().list();
+    CleanableHistoricProcessInstanceReportResult result = historyService.createCleanableHistoricProcessInstanceReport().singleResult();
 
     // then
-    assertEquals(1, reportResults.size());
-    boolean entityFound = false;
-
-    for (HistoricFinishedProcessInstanceReportResult result : reportResults) {
-      if (result.getProcessDefinitionKey().equals(PROCESS_DEFINITION_KEY)) {
-        checkResultNumbers(result, 10, 10);
-        entityFound = true;
-        break;
-      }
-    }
-
-    assertTrue(entityFound);
+    checkResultNumbers(result, 10, 10);
   }
 
   @Test
-  public void testNullTTL() {
+  public void testReportWithNullHistoryTTL() {
     // given
     prepareProcessInstances(PROCESS_DEFINITION_KEY, -6, null, 5);
     prepareProcessInstances(PROCESS_DEFINITION_KEY, 0, null, 5);
 
     // when
-    List<HistoricFinishedProcessInstanceReportResult> reportResults = historyService.createHistoricFinishedProcessInstanceReport().list();
+    List<CleanableHistoricProcessInstanceReportResult> reportResults = historyService.createCleanableHistoricProcessInstanceReport().list();
 
     // then
     assertEquals(1, reportResults.size());
-    boolean entityFound = false;
 
-    for (HistoricFinishedProcessInstanceReportResult result : reportResults) {
-      if (result.getProcessDefinitionKey().equals(PROCESS_DEFINITION_KEY)) {
-        checkResultNumbers(result, 0, 10);
-        entityFound = true;
-        break;
-      }
+    checkResultNumbers(reportResults.get(0), 0, 10);
+  }
+
+  @Test
+  public void testReportByInvalidProcessDefinitionId() {
+    CleanableHistoricProcessInstanceReport report = historyService.createCleanableHistoricProcessInstanceReport();
+
+    try {
+      report.processDefinitionIdIn((String) null);
+    } catch (NotValidException e) {
     }
 
-    assertTrue(entityFound);
+    try {
+      report.processDefinitionIdIn("abc", (String) null, "def");
+    } catch (NotValidException e) {
+    }
+  }
+
+  public void testReportByInvalidProcessDefinitionKey() {
+    CleanableHistoricProcessInstanceReport report = historyService.createCleanableHistoricProcessInstanceReport();
+
+    try {
+      report.processDefinitionKeyIn((String) null);
+    } catch (NotValidException e) {
+    }
+
+    try {
+      report.processDefinitionKeyIn("abc", (String) null, "def");
+    } catch (NotValidException e) {
+    }
   }
 }

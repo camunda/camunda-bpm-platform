@@ -15,13 +15,16 @@ package org.camunda.bpm.engine.rest.history;
 import java.util.List;
 
 import org.camunda.bpm.engine.rest.dto.history.HistoricCaseActivityStatisticsDto;
-import org.camunda.bpm.engine.rest.dto.history.HistoricFinishedCaseInstanceReportDto;
+import org.camunda.bpm.engine.rest.dto.history.CleanableHistoricCaseInstanceReportResultDto;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriInfo;
 
 /**
  * @author Roman Smirnov
@@ -39,7 +42,9 @@ public interface HistoricCaseDefinitionRestService {
   public List<HistoricCaseActivityStatisticsDto> getHistoricCaseActivityStatistics(@PathParam("id") String caseDefinitionId);
 
   @GET
-  @Path("/finished-case-instance-report")
+  @Path("/cleanable-case-instance-report")
   @Produces(MediaType.APPLICATION_JSON)
-  public List<HistoricFinishedCaseInstanceReportDto> getHistoricFinishedCaseInstanceReport();
+  public List<CleanableHistoricCaseInstanceReportResultDto> getCleanableHistoricCaseInstanceReport(@Context UriInfo uriInfo,
+                                                                                             @QueryParam("firstResult") Integer firstResult,
+                                                                                             @QueryParam("maxResults") Integer maxResults);
 }

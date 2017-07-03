@@ -14,22 +14,43 @@
 package org.camunda.bpm.engine.history;
 
 /**
- * This interface defines the result of Historic finished process instance report.
+ * This interface defines the result of Cleanable historic process instance report.
  *
  */
-public interface HistoricFinishedProcessInstanceReportResult {
+public interface CleanableHistoricProcessInstanceReportResult {
 
+  /**
+   * Returns the process definition id for the selected definition.
+   */
   String getProcessDefinitionId();
 
+  /**
+   * Returns the process definition key for the selected definition.
+   */
   String getProcessDefinitionKey();
 
+  /**
+   * Returns the process definition name for the selected definition.
+   */
   String getProcessDefinitionName();
 
+  /**
+   * Returns the process definition version for the selected definition.
+   */
   int getProcessDefinitionVersion();
 
+  /**
+   * Returns the history time to live for the selected definition.
+   */
   Integer getHistoryTimeToLive();
 
+  /**
+   * Returns the amount of finished historic process instances.
+   */
   long getFinishedProcessInstanceCount();
 
+  /**
+   * Returns the amount of cleanable historic process instances.
+   */
   long getCleanableProcessInstanceCount();
 }

@@ -19,7 +19,7 @@ import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInstanceQuery;
-import org.camunda.bpm.engine.history.HistoricFinishedDecisionInstanceReportResult;
+import org.camunda.bpm.engine.history.CleanableHistoricDecisionInstanceReportResult;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
@@ -199,7 +199,7 @@ public class HistoricDecisionInstanceAuthorizationTest extends AuthorizationTest
     prepareDecisionInstances(DECISION_DEFINITION_KEY, -6, 5, 10);
 
     // when
-    List<HistoricFinishedDecisionInstanceReportResult> reportResults = historyService.createHistoricFinishedDecisionInstanceReport().list();
+    List<CleanableHistoricDecisionInstanceReportResult> reportResults = historyService.createCleanableHistoricDecisionInstanceReport().list();
 
     // then
     assertEquals(0, reportResults.size());
@@ -213,7 +213,7 @@ public class HistoricDecisionInstanceAuthorizationTest extends AuthorizationTest
     createGrantAuthorizationGroup(DECISION_DEFINITION, DECISION_DEFINITION_KEY, groupId, Permissions.READ, Permissions.READ_HISTORY);
 
     // when
-    List<HistoricFinishedDecisionInstanceReportResult> reportResults = historyService.createHistoricFinishedDecisionInstanceReport().list();
+    List<CleanableHistoricDecisionInstanceReportResult> reportResults = historyService.createCleanableHistoricDecisionInstanceReport().list();
 
     // then
     assertEquals(1, reportResults.size());
@@ -228,7 +228,7 @@ public class HistoricDecisionInstanceAuthorizationTest extends AuthorizationTest
     createGrantAuthorization(DECISION_DEFINITION, DECISION_DEFINITION_KEY, userId, Permissions.READ);
 
     // when
-    List<HistoricFinishedDecisionInstanceReportResult> reportResults = historyService.createHistoricFinishedDecisionInstanceReport().list();
+    List<CleanableHistoricDecisionInstanceReportResult> reportResults = historyService.createCleanableHistoricDecisionInstanceReport().list();
 
     // then
     assertEquals(0, reportResults.size());
@@ -241,7 +241,7 @@ public class HistoricDecisionInstanceAuthorizationTest extends AuthorizationTest
     createGrantAuthorization(DECISION_DEFINITION, DECISION_DEFINITION_KEY, userId, Permissions.READ_HISTORY);
 
     // when
-    List<HistoricFinishedDecisionInstanceReportResult> reportResults = historyService.createHistoricFinishedDecisionInstanceReport().list();
+    List<CleanableHistoricDecisionInstanceReportResult> reportResults = historyService.createCleanableHistoricDecisionInstanceReport().list();
 
     // then
     assertEquals(0, reportResults.size());

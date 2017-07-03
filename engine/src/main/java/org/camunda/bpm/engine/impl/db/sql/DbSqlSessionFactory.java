@@ -70,6 +70,8 @@ public class DbSqlSessionFactory implements SessionFactory {
 
   public static final Map<String, Map<String, String>> dbSpecificConstants = new HashMap<String, Map<String, String>>();
 
+  public static final Map<String, String> databaseSpecificDaysComparator = new HashMap<String, String>();
+
   static {
 
     String defaultOrderBy = "order by ${internalOrderBy}";
@@ -95,6 +97,8 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificTrueConstant.put(H2, "1");
     databaseSpecificFalseConstant.put(H2, "0");
     databaseSpecificIfNull.put(H2, "IFNULL");
+
+    databaseSpecificDaysComparator.put(H2, "DATEDIFF(DAY, ${date}, #{currentTimestamp}) >= ${days}");
 
     HashMap<String, String> constants = new HashMap<String, String>();
     constants.put("constant.event", "'event'");
@@ -130,6 +134,8 @@ public class DbSqlSessionFactory implements SessionFactory {
       databaseSpecificFalseConstant.put(mysqlLikeDatabase, "0");
       databaseSpecificIfNull.put(mysqlLikeDatabase, "IFNULL");
 
+      databaseSpecificDaysComparator.put(mysqlLikeDatabase, "DATEDIFF(#{currentTimestamp}, ${date}) >= ${days}");
+
       addDatabaseSpecificStatement(mysqlLikeDatabase, "toggleForeignKey", "toggleForeignKey_mysql");
       addDatabaseSpecificStatement(mysqlLikeDatabase, "selectProcessDefinitionsByQueryCriteria", "selectProcessDefinitionsByQueryCriteria_mysql");
       addDatabaseSpecificStatement(mysqlLikeDatabase, "selectProcessDefinitionCountByQueryCriteria", "selectProcessDefinitionCountByQueryCriteria_mysql");
@@ -139,9 +145,6 @@ public class DbSqlSessionFactory implements SessionFactory {
       addDatabaseSpecificStatement(mysqlLikeDatabase, "selectHistoricProcessInstanceIdsForCleanupCount", "selectHistoricProcessInstanceIdsForCleanupCount_mysql");
       addDatabaseSpecificStatement(mysqlLikeDatabase, "selectHistoricDecisionInstanceIdsForCleanup", "selectHistoricDecisionInstanceIdsForCleanup_mysql");
       addDatabaseSpecificStatement(mysqlLikeDatabase, "selectHistoricCaseInstanceIdsForCleanup", "selectHistoricCaseInstanceIdsForCleanup_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "selectFinishedProcessInstancesReportEntities", "selectFinishedProcessInstancesReportEntities_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "selectFinishedDecisionInstancesReportEntities", "selectFinishedDecisionInstancesReportEntities_mysql");
-      addDatabaseSpecificStatement(mysqlLikeDatabase, "selectFinishedCaseInstancesReportEntities", "selectFinishedCaseInstancesReportEntities_mysql");
 
       constants = new HashMap<String, String>();
       constants.put("constant.event", "'event'");
@@ -174,6 +177,9 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificTrueConstant.put(POSTGRES, "true");
     databaseSpecificFalseConstant.put(POSTGRES, "false");
     databaseSpecificIfNull.put(POSTGRES, "COALESCE");
+
+    databaseSpecificDaysComparator.put(POSTGRES, "EXTRACT (DAY FROM #{currentTimestamp} - ${date}) >= ${days}");
+
     addDatabaseSpecificStatement(POSTGRES, "insertByteArray", "insertByteArray_postgres");
     addDatabaseSpecificStatement(POSTGRES, "updateByteArray", "updateByteArray_postgres");
     addDatabaseSpecificStatement(POSTGRES, "selectByteArray", "selectByteArray_postgres");
@@ -201,9 +207,6 @@ public class DbSqlSessionFactory implements SessionFactory {
     addDatabaseSpecificStatement(POSTGRES, "selectHistoricProcessInstanceIdsForCleanupCount", "selectHistoricProcessInstanceIdsForCleanupCount_postgres");
     addDatabaseSpecificStatement(POSTGRES, "selectHistoricDecisionInstanceIdsForCleanup", "selectHistoricDecisionInstanceIdsForCleanup_postgres");
     addDatabaseSpecificStatement(POSTGRES, "selectHistoricCaseInstanceIdsForCleanup", "selectHistoricCaseInstanceIdsForCleanup_postgres");
-    addDatabaseSpecificStatement(POSTGRES, "selectFinishedProcessInstancesReportEntities", "selectFinishedProcessInstancesReportEntities_postgres");
-    addDatabaseSpecificStatement(POSTGRES, "selectFinishedDecisionInstancesReportEntities", "selectFinishedDecisionInstancesReportEntities_postgres");
-    addDatabaseSpecificStatement(POSTGRES, "selectFinishedCaseInstancesReportEntities", "selectFinishedCaseInstancesReportEntities_postgres");
 
     constants = new HashMap<String, String>();
     constants.put("constant.event", "'event'");
@@ -236,6 +239,8 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificFalseConstant.put(ORACLE, "0");
     databaseSpecificIfNull.put(ORACLE, "NVL");
 
+    databaseSpecificDaysComparator.put(ORACLE, "${date} + ${days} <= #{currentTimestamp}");
+
     addDatabaseSpecificStatement(ORACLE, "selectHistoricProcessInstanceDurationReport", "selectHistoricProcessInstanceDurationReport_oracle");
     addDatabaseSpecificStatement(ORACLE, "selectHistoricTaskInstanceDurationReport", "selectHistoricTaskInstanceDurationReport_oracle");
     addDatabaseSpecificStatement(ORACLE, "selectHistoricTaskInstanceCountByTaskNameReport", "selectHistoricTaskInstanceCountByTaskNameReport_oracle");
@@ -244,9 +249,6 @@ public class DbSqlSessionFactory implements SessionFactory {
     addDatabaseSpecificStatement(ORACLE, "selectHistoricProcessInstanceIdsForCleanupCount", "selectHistoricProcessInstanceIdsForCleanupCount_oracle");
     addDatabaseSpecificStatement(ORACLE, "selectHistoricDecisionInstanceIdsForCleanup", "selectHistoricDecisionInstanceIdsForCleanup_oracle");
     addDatabaseSpecificStatement(ORACLE, "selectHistoricCaseInstanceIdsForCleanup", "selectHistoricCaseInstanceIdsForCleanup_oracle");
-    addDatabaseSpecificStatement(ORACLE, "selectFinishedProcessInstancesReportEntities", "selectFinishedProcessInstancesReportEntities_oracle");
-    addDatabaseSpecificStatement(ORACLE, "selectFinishedDecisionInstancesReportEntities", "selectFinishedDecisionInstancesReportEntities_oracle");
-    addDatabaseSpecificStatement(ORACLE, "selectFinishedCaseInstancesReportEntities", "selectFinishedCaseInstancesReportEntities_oracle");
 
     constants = new HashMap<String, String>();
     constants.put("constant.event", "cast('event' as nvarchar2(255))");
@@ -279,6 +281,8 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificFalseConstant.put(DB2, "0");
     databaseSpecificIfNull.put(DB2, "NVL");
 
+    databaseSpecificDaysComparator.put(DB2, "${date} + ${days} DAYS <= #{currentTimestamp}");
+
     addDatabaseSpecificStatement(DB2, "selectMeterLogAggregatedByTimeInterval", "selectMeterLogAggregatedByTimeInterval_db2_or_mssql");
     addDatabaseSpecificStatement(DB2, "selectExecutionByNativeQuery", "selectExecutionByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement(DB2, "selectHistoricActivityInstanceByNativeQuery", "selectHistoricActivityInstanceByNativeQuery_mssql_or_db2");
@@ -294,9 +298,6 @@ public class DbSqlSessionFactory implements SessionFactory {
     addDatabaseSpecificStatement(DB2, "selectHistoricProcessInstanceIdsForCleanupCount", "selectHistoricProcessInstanceIdsForCleanupCount_db2");
     addDatabaseSpecificStatement(DB2, "selectHistoricDecisionInstanceIdsForCleanup", "selectHistoricDecisionInstanceIdsForCleanup_db2");
     addDatabaseSpecificStatement(DB2, "selectHistoricCaseInstanceIdsForCleanup", "selectHistoricCaseInstanceIdsForCleanup_db2");
-    addDatabaseSpecificStatement(DB2, "selectFinishedProcessInstancesReportEntities", "selectFinishedProcessInstancesReportEntities_db2");
-    addDatabaseSpecificStatement(DB2, "selectFinishedDecisionInstancesReportEntities", "selectFinishedDecisionInstancesReportEntities_db2");
-    addDatabaseSpecificStatement(DB2, "selectFinishedCaseInstancesReportEntities", "selectFinishedCaseInstancesReportEntities_db2");
 
     constants = new HashMap<String, String>();
     constants.put("constant.event", "'event'");
@@ -328,6 +329,9 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificTrueConstant.put(MSSQL, "1");
     databaseSpecificFalseConstant.put(MSSQL, "0");
     databaseSpecificIfNull.put(MSSQL, "ISNULL");
+
+    databaseSpecificDaysComparator.put(MSSQL, "DATEDIFF(DAY, ${date}, #{currentTimestamp}) >= ${days}");
+
     addDatabaseSpecificStatement(MSSQL, "selectMeterLogAggregatedByTimeInterval", "selectMeterLogAggregatedByTimeInterval_db2_or_mssql");
     addDatabaseSpecificStatement(MSSQL, "selectExecutionByNativeQuery", "selectExecutionByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement(MSSQL, "selectHistoricActivityInstanceByNativeQuery", "selectHistoricActivityInstanceByNativeQuery_mssql_or_db2");
@@ -346,9 +350,6 @@ public class DbSqlSessionFactory implements SessionFactory {
     addDatabaseSpecificStatement(MSSQL, "selectHistoricProcessInstanceIdsForCleanupCount", "selectHistoricProcessInstanceIdsForCleanupCount_mssql");
     addDatabaseSpecificStatement(MSSQL, "selectHistoricDecisionInstanceIdsForCleanup", "selectHistoricDecisionInstanceIdsForCleanup_mssql");
     addDatabaseSpecificStatement(MSSQL, "selectHistoricCaseInstanceIdsForCleanup", "selectHistoricCaseInstanceIdsForCleanup_mssql");
-    addDatabaseSpecificStatement(MSSQL, "selectFinishedProcessInstancesReportEntities", "selectFinishedProcessInstancesReportEntities_mssql");
-    addDatabaseSpecificStatement(MSSQL, "selectFinishedDecisionInstancesReportEntities", "selectFinishedDecisionInstancesReportEntities_mssql");
-    addDatabaseSpecificStatement(MSSQL, "selectFinishedCaseInstancesReportEntities", "selectFinishedCaseInstancesReportEntities_mssql");
 
     constants = new HashMap<String, String>();
     constants.put("constant.event", "'event'");

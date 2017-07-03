@@ -13,9 +13,21 @@
 
 package org.camunda.bpm.engine.rest.history;
 
+import static com.jayway.restassured.RestAssured.given;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.ws.rs.core.Response.Status;
+
 import org.camunda.bpm.engine.AuthorizationException;
-import org.camunda.bpm.engine.history.HistoricFinishedDecisionInstanceReport;
-import org.camunda.bpm.engine.history.HistoricFinishedDecisionInstanceReportResult;
+import org.camunda.bpm.engine.history.CleanableHistoricDecisionInstanceReport;
+import org.camunda.bpm.engine.history.CleanableHistoricDecisionInstanceReportResult;
 import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
 import org.junit.Before;
@@ -26,25 +38,15 @@ import org.mockito.Mockito;
 
 import com.jayway.restassured.http.ContentType;
 
-import static com.jayway.restassured.RestAssured.given;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.ws.rs.core.Response.Status;
-
-public class HistoricFinishedDecisionInstanceReportServiceTest extends AbstractRestServiceTest {
+public class CleanableHistoricDecisionInstanceReportServiceTest extends AbstractRestServiceTest {
 
   @ClassRule
   public static TestContainerRule rule = new TestContainerRule();
 
   protected static final String HISTORY_URL = TEST_RESOURCE_ROOT_PATH + "/history";
-  protected static final String HISTORIC_REPORT_URL = HISTORY_URL + "/decision-definition/finished-decision-instance-report";
+  protected static final String HISTORIC_REPORT_URL = HISTORY_URL + "/decision-definition/cleanable-decision-instance-report";
 
-  private HistoricFinishedDecisionInstanceReport historicFinishedDecisionInstanceReport;
+  private CleanableHistoricDecisionInstanceReport historicDecisionInstanceReport;
 
   @Before
   public void setUpRuntimeData() {
@@ -52,7 +54,12 @@ public class HistoricFinishedDecisionInstanceReportServiceTest extends AbstractR
   }
 
   private void setupHistoryReportMock() {
-    HistoricFinishedDecisionInstanceReportResult reportResult = mock(HistoricFinishedDecisionInstanceReportResult.class);
+    CleanableHistoricDecisionInstanceReport report = mock(CleanableHistoricDecisionInstanceReport.class);
+
+    when(report.decisionDefinitionIdIn(anyString())).thenReturn(report);
+    when(report.decisionDefinitionKeyIn(anyString())).thenReturn(report);
+
+    CleanableHistoricDecisionInstanceReportResult reportResult = mock(CleanableHistoricDecisionInstanceReportResult.class);
 
     when(reportResult.getDecisionDefinitionId()).thenReturn("anId");
     when(reportResult.getDecisionDefinitionKey()).thenReturn("aKey");
@@ -62,7 +69,7 @@ public class HistoricFinishedDecisionInstanceReportServiceTest extends AbstractR
     when(reportResult.getFinishedDecisionInstanceCount()).thenReturn(1000l);
     when(reportResult.getCleanableDecisionInstanceCount()).thenReturn(567l);
 
-    HistoricFinishedDecisionInstanceReportResult anotherReportResult = mock(HistoricFinishedDecisionInstanceReportResult.class);
+    CleanableHistoricDecisionInstanceReportResult anotherReportResult = mock(CleanableHistoricDecisionInstanceReportResult.class);
 
     when(anotherReportResult.getDecisionDefinitionId()).thenReturn("dpId");
     when(anotherReportResult.getDecisionDefinitionKey()).thenReturn("dpKey");
@@ -72,13 +79,14 @@ public class HistoricFinishedDecisionInstanceReportServiceTest extends AbstractR
     when(anotherReportResult.getFinishedDecisionInstanceCount()).thenReturn(10l);
     when(reportResult.getCleanableDecisionInstanceCount()).thenReturn(0l);
 
-    List<HistoricFinishedDecisionInstanceReportResult> mocks = new ArrayList<HistoricFinishedDecisionInstanceReportResult>();
+    List<CleanableHistoricDecisionInstanceReportResult> mocks = new ArrayList<CleanableHistoricDecisionInstanceReportResult>();
     mocks.add(reportResult);
     mocks.add(anotherReportResult);
 
-    historicFinishedDecisionInstanceReport = mock(HistoricFinishedDecisionInstanceReport.class);
-    when(processEngine.getHistoryService().createHistoricFinishedDecisionInstanceReport()).thenReturn(historicFinishedDecisionInstanceReport);
-    when(historicFinishedDecisionInstanceReport.list()).thenReturn(mocks);
+    when(report.list()).thenReturn(mocks);
+
+    historicDecisionInstanceReport = report;
+    when(processEngine.getHistoryService().createCleanableHistoricDecisionInstanceReport()).thenReturn(historicDecisionInstanceReport);
   }
 
   @Test
@@ -89,14 +97,14 @@ public class HistoricFinishedDecisionInstanceReportServiceTest extends AbstractR
       .contentType(ContentType.JSON)
     .when().get(HISTORIC_REPORT_URL);
 
-    InOrder inOrder = Mockito.inOrder(historicFinishedDecisionInstanceReport);
-    inOrder.verify(historicFinishedDecisionInstanceReport).list();
+    InOrder inOrder = Mockito.inOrder(historicDecisionInstanceReport);
+    inOrder.verify(historicDecisionInstanceReport).list();
   }
 
   @Test
   public void testMissingAuthorization() {
     String message = "not authorized";
-    when(historicFinishedDecisionInstanceReport.list()).thenThrow(new AuthorizationException(message));
+    when(historicDecisionInstanceReport.list()).thenThrow(new AuthorizationException(message));
 
     given()
     .then().expect()
@@ -105,5 +113,26 @@ public class HistoricFinishedDecisionInstanceReportServiceTest extends AbstractR
       .body("type", equalTo(AuthorizationException.class.getSimpleName()))
       .body("message", equalTo(message))
     .when().get(HISTORIC_REPORT_URL);
+  }
+
+  @Test
+  public void testListParameters() {
+    String aDecDefId = "anDecDefId";
+    String anotherDecDefId = "anotherDecDefId";
+
+    String aDecDefKey = "anDecDefKey";
+    String anotherDecDefKey = "anotherDecDefKey";
+
+   given()
+     .queryParam("decisionDefinitionIdIn", aDecDefId + "," + anotherDecDefId)
+     .queryParam("decisionDefinitionKeyIn", aDecDefKey + "," + anotherDecDefKey)
+   .then().expect()
+     .statusCode(Status.OK.getStatusCode())
+     .contentType(ContentType.JSON)
+   .when().get(HISTORIC_REPORT_URL);
+
+   verify(historicDecisionInstanceReport).decisionDefinitionIdIn(aDecDefId, anotherDecDefId);
+   verify(historicDecisionInstanceReport).decisionDefinitionKeyIn(aDecDefKey, anotherDecDefKey);
+   verify(historicDecisionInstanceReport).list();
   }
 }

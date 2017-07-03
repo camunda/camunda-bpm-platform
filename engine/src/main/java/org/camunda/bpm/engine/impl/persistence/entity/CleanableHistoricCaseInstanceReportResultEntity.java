@@ -13,9 +13,9 @@
 
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-import org.camunda.bpm.engine.history.HistoricFinishedCaseInstanceReportResult;
+import org.camunda.bpm.engine.history.CleanableHistoricCaseInstanceReportResult;
 
-public class HistoricFinishedCaseInstanceReportResultEntity implements HistoricFinishedCaseInstanceReportResult {
+public class CleanableHistoricCaseInstanceReportResultEntity implements CleanableHistoricCaseInstanceReportResult {
 
   protected String caseDefinitionId;
   protected String caseDefinitionKey;

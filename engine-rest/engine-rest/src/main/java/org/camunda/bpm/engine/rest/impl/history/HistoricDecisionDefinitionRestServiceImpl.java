@@ -15,26 +15,49 @@ package org.camunda.bpm.engine.rest.impl.history;
 
 import java.util.List;
 
-import org.camunda.bpm.engine.HistoryService;
+import javax.ws.rs.core.UriInfo;
+
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.history.HistoricFinishedDecisionInstanceReportResult;
-import org.camunda.bpm.engine.rest.dto.history.HistoricFinishedDecisionInstanceReportDto;
+import org.camunda.bpm.engine.history.CleanableHistoricDecisionInstanceReport;
+import org.camunda.bpm.engine.history.CleanableHistoricDecisionInstanceReportResult;
+import org.camunda.bpm.engine.rest.dto.history.CleanableHistoricDecisionInstanceReportDto;
+import org.camunda.bpm.engine.rest.dto.history.CleanableHistoricDecisionInstanceReportResultDto;
 import org.camunda.bpm.engine.rest.history.HistoricDecisionDefinitionRestService;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class HistoricDecisionDefinitionRestServiceImpl implements HistoricDecisionDefinitionRestService {
 
+  protected ObjectMapper objectMapper;
   protected ProcessEngine processEngine;
 
-  public HistoricDecisionDefinitionRestServiceImpl(ProcessEngine processEngine) {
+  public HistoricDecisionDefinitionRestServiceImpl(ObjectMapper objectMapper, ProcessEngine processEngine) {
+    this.objectMapper = objectMapper;
     this.processEngine = processEngine;
   }
 
   @Override
-  public List<HistoricFinishedDecisionInstanceReportDto> getHistoricFinishedDecisionInstanceReport() {
-    HistoryService historyService = processEngine.getHistoryService();
+  public List<CleanableHistoricDecisionInstanceReportResultDto> getCleanableHistoricDecisionInstanceReport(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
+    CleanableHistoricDecisionInstanceReportDto queryDto = new CleanableHistoricDecisionInstanceReportDto(objectMapper, uriInfo.getQueryParameters());
+    CleanableHistoricDecisionInstanceReport query = queryDto.toQuery(processEngine);
 
-    List<HistoricFinishedDecisionInstanceReportResult> reportResult = historyService.createHistoricFinishedDecisionInstanceReport().list();
-    return HistoricFinishedDecisionInstanceReportDto.convert(reportResult);
+    List<CleanableHistoricDecisionInstanceReportResult> reportResult;
+    if (firstResult != null || maxResults != null) {
+      reportResult = executePaginatedQuery(query, firstResult, maxResults);
+      } else {
+      reportResult = query.list();
+      }
+
+    return CleanableHistoricDecisionInstanceReportResultDto.convert(reportResult);
   }
 
+  private List<CleanableHistoricDecisionInstanceReportResult> executePaginatedQuery(CleanableHistoricDecisionInstanceReport query, Integer firstResult, Integer maxResults) {
+    if (firstResult == null) {
+      firstResult = 0;
+    }
+    if (maxResults == null) {
+      maxResults = Integer.MAX_VALUE;
+    }
+    return query.listPage(firstResult, maxResults);
+  }
 }

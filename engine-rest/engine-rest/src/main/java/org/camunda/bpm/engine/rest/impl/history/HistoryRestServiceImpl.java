@@ -68,11 +68,11 @@ public class HistoryRestServiceImpl extends AbstractRestProcessEngineAware imple
   }
 
   public HistoricProcessDefinitionRestService getProcessDefinitionService() {
-    return new HistoricProcessDefinitionRestServiceImpl(getProcessEngine());
+    return new HistoricProcessDefinitionRestServiceImpl(getObjectMapper(), getProcessEngine());
   }
 
   public HistoricDecisionDefinitionRestService getDecisionDefinitionService() {
-    return new HistoricDecisionDefinitionRestServiceImpl(getProcessEngine());
+    return new HistoricDecisionDefinitionRestServiceImpl(getObjectMapper(), getProcessEngine());
   }
 
   public HistoricDecisionStatisticsRestService getDecisionStatisticsService() {
@@ -80,7 +80,7 @@ public class HistoryRestServiceImpl extends AbstractRestProcessEngineAware imple
   }
 
   public HistoricCaseDefinitionRestService getCaseDefinitionService() {
-    return new HistoricCaseDefinitionRestServiceImpl(getProcessEngine());
+    return new HistoricCaseDefinitionRestServiceImpl(getObjectMapper(), getProcessEngine());
   }
 
   public UserOperationLogRestService getUserOperationLogRestService() {

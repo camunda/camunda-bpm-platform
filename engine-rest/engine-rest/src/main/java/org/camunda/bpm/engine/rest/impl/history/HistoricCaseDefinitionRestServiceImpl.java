@@ -15,13 +15,19 @@ package org.camunda.bpm.engine.rest.impl.history;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.ws.rs.core.UriInfo;
+
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.HistoricCaseActivityStatistics;
-import org.camunda.bpm.engine.history.HistoricFinishedCaseInstanceReportResult;
+import org.camunda.bpm.engine.history.CleanableHistoricCaseInstanceReport;
+import org.camunda.bpm.engine.history.CleanableHistoricCaseInstanceReportResult;
 import org.camunda.bpm.engine.rest.dto.history.HistoricCaseActivityStatisticsDto;
-import org.camunda.bpm.engine.rest.dto.history.HistoricFinishedCaseInstanceReportDto;
+import org.camunda.bpm.engine.rest.dto.history.CleanableHistoricCaseInstanceReportDto;
+import org.camunda.bpm.engine.rest.dto.history.CleanableHistoricCaseInstanceReportResultDto;
 import org.camunda.bpm.engine.rest.history.HistoricCaseDefinitionRestService;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Roman Smirnov
@@ -29,9 +35,11 @@ import org.camunda.bpm.engine.rest.history.HistoricCaseDefinitionRestService;
  */
 public class HistoricCaseDefinitionRestServiceImpl implements HistoricCaseDefinitionRestService {
 
+  protected ObjectMapper objectMapper;
   protected ProcessEngine processEngine;
 
-  public HistoricCaseDefinitionRestServiceImpl(ProcessEngine processEngine) {
+  public HistoricCaseDefinitionRestServiceImpl(ObjectMapper objectMapper, ProcessEngine processEngine) {
+    this.objectMapper = objectMapper;
     this.processEngine = processEngine;
   }
 
@@ -49,10 +57,27 @@ public class HistoricCaseDefinitionRestServiceImpl implements HistoricCaseDefini
   }
 
   @Override
-  public List<HistoricFinishedCaseInstanceReportDto> getHistoricFinishedCaseInstanceReport() {
-    HistoryService historyService = processEngine.getHistoryService();
+  public List<CleanableHistoricCaseInstanceReportResultDto> getCleanableHistoricCaseInstanceReport(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
+    CleanableHistoricCaseInstanceReportDto queryDto = new CleanableHistoricCaseInstanceReportDto(objectMapper, uriInfo.getQueryParameters());
+    CleanableHistoricCaseInstanceReport query = queryDto.toQuery(processEngine);
 
-    List<HistoricFinishedCaseInstanceReportResult> reportResult = historyService.createHistoricFinishedCaseInstanceReport().list();
-    return HistoricFinishedCaseInstanceReportDto.convert(reportResult);
+    List<CleanableHistoricCaseInstanceReportResult> reportResult;
+    if (firstResult != null || maxResults != null) {
+    reportResult = executePaginatedQuery(query, firstResult, maxResults);
+    } else {
+    reportResult = query.list();
+    }
+
+    return CleanableHistoricCaseInstanceReportResultDto.convert(reportResult);
+  }
+
+  private List<CleanableHistoricCaseInstanceReportResult> executePaginatedQuery(CleanableHistoricCaseInstanceReport query, Integer firstResult, Integer maxResults) {
+    if (firstResult == null) {
+      firstResult = 0;
+    }
+    if (maxResults == null) {
+      maxResults = Integer.MAX_VALUE;
+    }
+    return query.listPage(firstResult, maxResults);
   }
 }

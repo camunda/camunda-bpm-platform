@@ -26,9 +26,9 @@ import org.camunda.bpm.engine.history.HistoricDecisionInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricDecisionInstanceStatisticsQuery;
 import org.camunda.bpm.engine.history.HistoricDetailQuery;
 import org.camunda.bpm.engine.history.HistoricExternalTaskLogQuery;
-import org.camunda.bpm.engine.history.HistoricFinishedCaseInstanceReport;
-import org.camunda.bpm.engine.history.HistoricFinishedDecisionInstanceReport;
-import org.camunda.bpm.engine.history.HistoricFinishedProcessInstanceReport;
+import org.camunda.bpm.engine.history.CleanableHistoricCaseInstanceReport;
+import org.camunda.bpm.engine.history.CleanableHistoricDecisionInstanceReport;
+import org.camunda.bpm.engine.history.CleanableHistoricProcessInstanceReport;
 import org.camunda.bpm.engine.history.HistoricIncidentQuery;
 import org.camunda.bpm.engine.history.HistoricJobLogQuery;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
@@ -232,16 +232,16 @@ public class HistoryServiceImpl extends ServiceImpl implements HistoryService {
     return new HistoricTaskInstanceReportImpl(commandExecutor);
   }
 
-  public HistoricFinishedProcessInstanceReport createHistoricFinishedProcessInstanceReport() {
-    return new HistoricFinishedProcessInstanceReportImpl(commandExecutor);
+  public CleanableHistoricProcessInstanceReport createCleanableHistoricProcessInstanceReport() {
+    return new CleanableHistoricProcessInstanceReportImpl(commandExecutor);
   }
 
-  public HistoricFinishedDecisionInstanceReport createHistoricFinishedDecisionInstanceReport() {
-    return new HistoricFinishedDecisionInstanceReportImpl(commandExecutor);
+  public CleanableHistoricDecisionInstanceReport createCleanableHistoricDecisionInstanceReport() {
+    return new CleanableHistoricDecisionInstanceReportImpl(commandExecutor);
   }
 
-  public HistoricFinishedCaseInstanceReport createHistoricFinishedCaseInstanceReport() {
-    return new HistoricFinishedCaseInstanceReportImpl(commandExecutor);
+  public CleanableHistoricCaseInstanceReport createCleanableHistoricCaseInstanceReport() {
+    return new CleanableHistoricCaseInstanceReportImpl(commandExecutor);
   }
 
   public HistoricBatchQuery createHistoricBatchQuery() {

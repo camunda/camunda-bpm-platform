@@ -14,12 +14,12 @@
 package org.camunda.bpm.engine.rest.dto.history;
 
 import java.io.Serializable;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
-import org.camunda.bpm.engine.history.HistoricFinishedCaseInstanceReportResult;
+import org.camunda.bpm.engine.history.CleanableHistoricCaseInstanceReportResult;
 
-public class HistoricFinishedCaseInstanceReportDto implements Serializable {
+public class CleanableHistoricCaseInstanceReportResultDto implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -87,10 +87,10 @@ public class HistoricFinishedCaseInstanceReportDto implements Serializable {
     this.cleanableCaseInstanceCount = cleanableCaseInstanceCount;
   }
 
-  public static List<HistoricFinishedCaseInstanceReportDto> convert(List<HistoricFinishedCaseInstanceReportResult> reportResult) {
-    List<HistoricFinishedCaseInstanceReportDto> dtos = new LinkedList<HistoricFinishedCaseInstanceReportDto>();
-    for (HistoricFinishedCaseInstanceReportResult current : reportResult) {
-      HistoricFinishedCaseInstanceReportDto dto = new HistoricFinishedCaseInstanceReportDto();
+  public static List<CleanableHistoricCaseInstanceReportResultDto> convert(List<CleanableHistoricCaseInstanceReportResult> reportResult) {
+    List<CleanableHistoricCaseInstanceReportResultDto> dtos = new ArrayList<CleanableHistoricCaseInstanceReportResultDto>();
+    for (CleanableHistoricCaseInstanceReportResult current : reportResult) {
+      CleanableHistoricCaseInstanceReportResultDto dto = new CleanableHistoricCaseInstanceReportResultDto();
       dto.setCaseDefinitionId(current.getCaseDefinitionId());
       dto.setCaseDefinitionKey(current.getCaseDefinitionKey());
       dto.setCaseDefinitionName(current.getCaseDefinitionName());

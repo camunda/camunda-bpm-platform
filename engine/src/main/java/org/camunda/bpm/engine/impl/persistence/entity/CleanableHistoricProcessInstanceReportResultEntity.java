@@ -14,9 +14,9 @@
 
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-import org.camunda.bpm.engine.history.HistoricFinishedProcessInstanceReportResult;
+import org.camunda.bpm.engine.history.CleanableHistoricProcessInstanceReportResult;
 
-public class HistoricFinishedProcessInstanceReportResultEntity implements HistoricFinishedProcessInstanceReportResult {
+public class CleanableHistoricProcessInstanceReportResultEntity implements CleanableHistoricProcessInstanceReportResult {
 
   protected String processDefinitionId;
   protected String processDefinitionKey;

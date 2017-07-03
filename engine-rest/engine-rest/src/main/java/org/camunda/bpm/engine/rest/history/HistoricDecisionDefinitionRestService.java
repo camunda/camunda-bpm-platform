@@ -18,9 +18,12 @@ import java.util.List;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriInfo;
 
-import org.camunda.bpm.engine.rest.dto.history.HistoricFinishedDecisionInstanceReportDto;
+import org.camunda.bpm.engine.rest.dto.history.CleanableHistoricDecisionInstanceReportResultDto;
 
 @Path(HistoricDecisionDefinitionRestService.PATH)
 @Produces(MediaType.APPLICATION_JSON)
@@ -29,8 +32,10 @@ public interface HistoricDecisionDefinitionRestService {
   public static final String PATH = "/decision-definition";
 
   @GET
-  @Path("/finished-decision-instance-report")
+  @Path("/cleanable-decision-instance-report")
   @Produces(MediaType.APPLICATION_JSON)
-  public List<HistoricFinishedDecisionInstanceReportDto> getHistoricFinishedDecisionInstanceReport();
+  public List<CleanableHistoricDecisionInstanceReportResultDto> getCleanableHistoricDecisionInstanceReport(@Context UriInfo uriInfo,
+                                                                                                           @QueryParam("firstResult") Integer firstResult,
+                                                                                                           @QueryParam("maxResults") Integer maxResults);
 
 }

@@ -25,7 +25,7 @@ import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RepositoryService;
-import org.camunda.bpm.engine.history.HistoricFinishedCaseInstanceReportResult;
+import org.camunda.bpm.engine.history.CleanableHistoricCaseInstanceReportResult;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.runtime.CaseInstance;
@@ -40,7 +40,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
-public class MultiTenancyFinishedCaseInstanceReportCmdTenantCheckTest {
+public class MultiTenancyCleanableHistoricCaseInstanceReportCmdTenantCheckTest {
 
   protected static final String TENANT_ONE = "tenant1";
 
@@ -102,7 +102,7 @@ public class MultiTenancyFinishedCaseInstanceReportCmdTenantCheckTest {
     identityService.setAuthentication("user", null, null);
 
     // when
-    List<HistoricFinishedCaseInstanceReportResult> reportResults = historyService.createHistoricFinishedCaseInstanceReport().list();
+    List<CleanableHistoricCaseInstanceReportResult> reportResults = historyService.createCleanableHistoricCaseInstanceReport().list();
 
     // then
     assertEquals(0, reportResults.size());
@@ -115,7 +115,7 @@ public class MultiTenancyFinishedCaseInstanceReportCmdTenantCheckTest {
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
     // when
-    List<HistoricFinishedCaseInstanceReportResult> reportResults = historyService.createHistoricFinishedCaseInstanceReport().list();
+    List<CleanableHistoricCaseInstanceReportResult> reportResults = historyService.createCleanableHistoricCaseInstanceReport().list();
 
     // then
     assertEquals(1, reportResults.size());
@@ -129,7 +129,7 @@ public class MultiTenancyFinishedCaseInstanceReportCmdTenantCheckTest {
     processEngineConfiguration.setTenantCheckEnabled(false);
 
     // when
-    List<HistoricFinishedCaseInstanceReportResult> reportResults = historyService.createHistoricFinishedCaseInstanceReport().list();
+    List<CleanableHistoricCaseInstanceReportResult> reportResults = historyService.createCleanableHistoricCaseInstanceReport().list();
 
     // then
     assertEquals(1, reportResults.size());
