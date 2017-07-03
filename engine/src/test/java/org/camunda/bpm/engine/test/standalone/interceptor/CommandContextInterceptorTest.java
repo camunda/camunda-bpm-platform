@@ -12,11 +12,18 @@
  */
 package org.camunda.bpm.engine.test.standalone.interceptor;
 
+import java.util.List;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.db.entitymanager.cache.DbEntityCache;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.repository.DeploymentWithDefinitions;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.test.Deployment;
 
 
 /**
@@ -86,6 +93,19 @@ public class CommandContextInterceptorTest extends PluggableProcessEngineTestCas
     });
   }
 
+  @Deployment
+  public void testCommandContextNestedFailingCommandsNotExceptions() {
+    // start bmpn
+
+    try {
+      runtimeService.startProcessInstanceByKey("Process_1");
+    } catch (Throwable t) {
+      // The expected throwable is caught
+      // Check data base consistency
+      assertEquals(0,runtimeService.createExecutionQuery().executionId("foo").count());
+    }
+  }
+
   protected class ExceptionThrowingCmd implements Command<Void> {
 
     protected boolean executed;
@@ -112,4 +132,5 @@ public class CommandContextInterceptorTest extends PluggableProcessEngineTestCas
       this.id = id;
     }
   }
+
 }

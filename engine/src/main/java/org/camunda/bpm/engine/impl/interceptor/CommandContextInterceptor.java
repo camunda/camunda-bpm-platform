@@ -103,8 +103,8 @@ public class CommandContextInterceptor extends CommandInterceptor {
       // delegate to next interceptor in chain
       return next.execute(command);
 
-    } catch (Exception e) {
-      commandInvocationContext.trySetThrowable(e);
+    } catch (Throwable t) {
+      commandInvocationContext.trySetThrowable(t);
 
     } finally {
       try {
