@@ -64,6 +64,7 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
     }
 
     task.fireAuthorizationProvider();
+    task.fireEvents();
     task.createHistoricTaskDetails(operation);
 
     return null;

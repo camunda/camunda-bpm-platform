@@ -354,6 +354,31 @@ public class TaskListenerTest {
     Assert.assertEquals(task.getTaskDefinitionKey(), "calledTask");
   }
 
+  @Test
+  public void testAssignmentTaskListenerWhenSavingTask() {
+    AssignmentTaskListener.reset();
+
+    final BpmnModelInstance process = Bpmn.createExecutableProcess("process")
+        .startEvent()
+        .userTask("task")
+          .camundaTaskListenerClass("assignment", AssignmentTaskListener.class)
+        .endEvent()
+        .done();
+
+    testRule.deploy(process);
+    engineRule.getRuntimeService().startProcessInstanceByKey("process");
+
+    // given
+    Task task = engineRule.getTaskService().createTaskQuery().singleResult();
+
+    // when
+    task.setAssignee("gonzo");
+    engineRule.getTaskService().saveTask(task);
+
+    // then
+    assertEquals(1, AssignmentTaskListener.eventCounter);
+  }
+
   public static class VariablesCollectingListener implements TaskListener {
 
     protected static VariableMap collectedVariables;
@@ -378,5 +403,19 @@ public class TaskListenerTest {
       public void notify(DelegateTask delegateTask) {
           delegateTask.getProcessEngineServices().getTaskService().complete(delegateTask.getId());
       }
+  }
+
+  public static class AssignmentTaskListener implements TaskListener {
+
+    public static int eventCounter = 0;
+
+    public void notify(DelegateTask delegateTask) {
+      eventCounter++;
+    }
+
+    public static void reset() {
+      eventCounter = 0;
+    }
+
   }
 }
