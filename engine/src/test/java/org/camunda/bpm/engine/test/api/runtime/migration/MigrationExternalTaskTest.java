@@ -407,7 +407,6 @@ public class MigrationExternalTaskTest {
   public void testProcessDefinitionWithoutIdField() {
      // given
 
-//    ProcessDefinition sourceProcessDefinition =
     ProcessDefinition sourceProcessDefinition = testHelper.deploy("org/camunda/bpm/engine/test/api/externaltask/ExternalTaskWithoutIdTest.bpmn").getDeployedProcessDefinitions().get(0);
     ProcessDefinition targetProcessDefinition = testHelper.deploy("org/camunda/bpm/engine/test/api/externaltask/ExternalTaskWithoutIdTest.bpmn").getDeployedProcessDefinitions().get(0);
 
@@ -428,7 +427,6 @@ public class MigrationExternalTaskTest {
   public void testProcessDefinitionWithIdField() {
      // given
 
-//    ProcessDefinition sourceProcessDefinition =
     ProcessDefinition sourceProcessDefinition = testHelper.deploy("org/camunda/bpm/engine/test/api/externaltask/ExternalTaskWithIdTest.bpmn").getDeployedProcessDefinitions().get(0);
     ProcessDefinition targetProcessDefinition = testHelper.deploy("org/camunda/bpm/engine/test/api/externaltask/ExternalTaskWithIdTest.bpmn").getDeployedProcessDefinitions().get(0);
 
@@ -439,7 +437,6 @@ public class MigrationExternalTaskTest {
       .build();
 
     List<MigrationInstruction> instructions = migrationPlan.getInstructions();
-    // test that the messageEventDefinition without an id isn't included
     assertEquals(2, instructions.size());
   }
 
