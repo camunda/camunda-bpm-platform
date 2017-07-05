@@ -1930,7 +1930,12 @@ public interface RuntimeService {
    * @param executionId execution id, cannot be null
    * @param activityId activity id
    * @param configuration
+   *
    * @return a new incident
+   *
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          and no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   Incident createIncident(String incidentType, String executionId, String activityId, String configuration);
 
@@ -1942,7 +1947,12 @@ public interface RuntimeService {
    * @param activityId activity id
    * @param configuration
    * @param message
+   *
    * @return a new incident
+   *
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          and no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   Incident createIncident(String incidentType, String executionId, String activityId, String configuration, String message);
 
@@ -1950,6 +1960,10 @@ public interface RuntimeService {
    * Resolve and remove an incident
    *
    * @param incidentId the id of an incident to resolve
+   *
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          and no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void resolveIncident(String incidentId);
 }

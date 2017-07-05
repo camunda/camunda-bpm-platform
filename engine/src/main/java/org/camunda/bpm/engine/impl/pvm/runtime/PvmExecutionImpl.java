@@ -18,6 +18,7 @@ import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.core.variable.event.VariableEvent;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
@@ -37,6 +38,7 @@ import org.camunda.bpm.engine.impl.util.EnsureUtil;
 import org.camunda.bpm.engine.runtime.Incident;
 
 import java.util.*;
+import java.util.concurrent.Callable;
 
 import static org.camunda.bpm.engine.impl.bpmn.helper.CompensationUtil.SIGNAL_COMPENSATION_DONE;
 import static org.camunda.bpm.engine.impl.pvm.runtime.ActivityInstanceState.ENDING;
@@ -2098,6 +2100,13 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     }
   }
 
+  /**
+   * Returns a new incident.
+   *
+   * @param incidentType the type of new incident
+   * @param configuration configuration of the incident
+   * @return new incident
+   */
   @Override
   public Incident createIncident(String incidentType, String configuration) {
     return createIncident(incidentType, configuration, null);
@@ -2117,9 +2126,22 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     return newIncident;
   }
 
+  /**
+   * Resolves an incident with given id.
+   *
+   * @param incidentId
+   */
   @Override
-  public void resolveIncident(String incidentId) {
-    IncidentEntity incident = (IncidentEntity) new IncidentQueryImpl().incidentId(incidentId).singleResult();
+  public void resolveIncident(final String incidentId) {
+    IncidentEntity incident = Context.getCommandContext().runWithoutAuthorization(new Callable<IncidentEntity>() {
+
+      @Override
+      public IncidentEntity call() throws Exception {
+        return (IncidentEntity) new IncidentQueryImpl().incidentId(incidentId).singleResult();
+      }
+
+    });
+
     incident.resolve();
   }
 }

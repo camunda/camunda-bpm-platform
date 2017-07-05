@@ -1,7 +1,10 @@
 package org.camunda.bpm.engine.impl.cmd;
 
+import java.util.concurrent.Callable;
+
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.impl.ExecutionQueryImpl;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -33,9 +36,21 @@ public class CreateIncidentCmd implements Command<Incident> {
   public Incident execute(CommandContext commandContext) {
     EnsureUtil.ensureNotNull(BadUserRequestException.class, "Execution id cannot be null", "executionId", executionId);
     EnsureUtil.ensureNotNull(BadUserRequestException.class, "incidentType", incidentType);
-    ExecutionEntity execution = (ExecutionEntity) new ExecutionQueryImpl().executionId(executionId).activityId(activityId).singleResult();
+    ExecutionEntity execution = commandContext.runWithoutAuthorization(new Callable<ExecutionEntity>() {
+
+      @Override
+      public ExecutionEntity call() throws Exception {
+         return (ExecutionEntity) new ExecutionQueryImpl().executionId(executionId).activityId(activityId).singleResult();
+      }
+    });
+
     EnsureUtil.ensureNotNull(BadUserRequestException.class,
         "Cannot find an execution with executionId '" + executionId + "' and activityId '" + activityId + "'", "execution", execution);
+
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkUpdateProcessInstance(execution);
+    }
+
     return execution.createIncident(incidentType, configuration, message);
   }
 }

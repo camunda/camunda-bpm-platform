@@ -2,6 +2,8 @@ package org.camunda.bpm.engine.test.api.runtime;
 
 import static org.junit.Assert.*;
 
+import java.util.List;
+
 import org.apache.tools.ant.filters.TokenFilter.ContainsString;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.HistoryService;
@@ -9,6 +11,7 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.history.HistoricIncident;
 import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
 import org.camunda.bpm.engine.runtime.Incident;
+import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
@@ -113,6 +116,32 @@ public class CreateAndResolveIncidentTest {
       fail("Exception expected");
     } catch (BadUserRequestException e) {
       assertThat(e.getMessage(), containsString("Cannot find an incident with id 'foo'"));
+    }
+  }
+
+  @Test
+  public void resolveIncidentThatBelongsToJobDefnition() {
+    // given
+    testRule.deploy("org/camunda/bpm/engine/test/api/mgmt/IncidentTest.testShouldCreateOneIncident.bpmn");
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("failingProcess");
+
+    // when
+    List<Job> jobs = engineRule.getManagementService().createJobQuery().withRetriesLeft().list();
+
+    for (Job job : jobs) {
+      engineRule.getManagementService().setJobRetries(job.getId(), 1);
+      try {
+        engineRule.getManagementService().executeJob(job.getId());
+      } catch (Exception e) {}
+    }
+
+    // then
+    Incident incident = runtimeService.createIncidentQuery().processInstanceId(processInstance.getId()).singleResult();
+    try {
+      runtimeService.resolveIncident(incident.getId());
+      fail("Exception expected");
+    } catch (BadUserRequestException e) {
+      assertThat(e.getMessage(), containsString("Cannot resolve an incident that belongs to a job definition"));
     }
   }
 }
