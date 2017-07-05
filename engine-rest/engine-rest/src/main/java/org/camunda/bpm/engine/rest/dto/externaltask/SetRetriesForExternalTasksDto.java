@@ -1,11 +1,15 @@
 package org.camunda.bpm.engine.rest.dto.externaltask;
 
 import java.util.List;
+import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceQueryDto;
+import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 
 public class SetRetriesForExternalTasksDto {
 
   protected List<String> externalTaskIds;
   protected ExternalTaskQueryDto externalTaskQuery;
+  protected ProcessInstanceQueryDto processInstanceQuery;
+  protected HistoricProcessInstanceQueryDto historicProcessInstanceQuery;
   protected int retries;
   
   public List<String> getExternalTaskIds() {
@@ -23,7 +27,21 @@ public class SetRetriesForExternalTasksDto {
   public void setExternalTaskQuery(ExternalTaskQueryDto externalTaskQuery) {
     this.externalTaskQuery = externalTaskQuery;
   }
-  
+
+  public ProcessInstanceQueryDto getProcessInstanceQuery() {
+    return processInstanceQuery;
+  }
+  public void setProcessInstanceQuery(ProcessInstanceQueryDto processInstanceQueryDto) {
+    this.processInstanceQuery = processInstanceQueryDto;
+  }
+
+  public HistoricProcessInstanceQueryDto getHistoricProcessInstanceQuery() {
+    return historicProcessInstanceQuery;
+  }
+
+  public void setHistoricProcessInstanceQuery(HistoricProcessInstanceQueryDto historicProcessInstanceQueryDto) {
+    this.historicProcessInstanceQuery = historicProcessInstanceQueryDto;
+  }
   public int getRetries() {
     return retries;
   }

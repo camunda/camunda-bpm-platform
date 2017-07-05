@@ -28,6 +28,7 @@ import java.util.List;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
+import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -227,6 +228,32 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
     // then
     assertNotNull(task);
     assertEquals(processInstances.get(0).getId(), task.getProcessInstanceId());
+  }
+
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  public void testQueryByProcessInstanceIdIn() {
+    // given
+    List<ProcessInstance> processInstances = startInstancesByKey("oneExternalTaskProcess", 3);
+
+    List<String> processInstanceIds = new ArrayList<String>();
+    for (ProcessInstance processInstance : processInstances) {
+      processInstanceIds.add(processInstance.getId());
+    }
+    // when
+    List<ExternalTask> tasks = externalTaskService
+      .createExternalTaskQuery()
+      .processInstanceIdIn(processInstances.get(0).getId(),
+        processInstances.get(1).getId(),
+        processInstances.get(2).getId())
+      .list();
+
+    // then
+    assertNotNull(tasks);
+    for (ExternalTask task : tasks) {
+      assertTrue(processInstanceIds.contains(task.getProcessInstanceId()));
+    }
+
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")

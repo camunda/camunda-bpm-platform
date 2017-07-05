@@ -17,8 +17,11 @@ import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
+import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
@@ -309,6 +312,40 @@ public class SetExternalTasksRetriesTest {
     for (ExternalTask t : tasks) {
       Assert.assertEquals(8, (int) t.getRetries());
     }
+  }
+
+  @Test
+  public void shouldSetExternalTaskRetriesWithProcessInstanceQueryAsync() {
+
+    ProcessInstanceQuery processInstanceQuery = engineRule.getProcessEngine().getRuntimeService().createProcessInstanceQuery();
+
+    // when
+    Batch batch = externalTaskService.setRetriesAsync(processInstanceQuery.active(), 5);
+
+    // then
+    executeSeedAndBatchJobs(batch);
+
+    ExternalTask task = externalTaskService.createExternalTaskQuery().processInstanceId(processInstanceIds.get(0)).singleResult();
+
+
+    Assert.assertEquals(5, (int) task.getRetries());
+  }
+
+  @Test
+  public void shouldSetExternalTaskRetriesWithHistoricProcessInstanceQueryAsync() {
+
+    HistoricProcessInstanceQuery historicProcessInstanceQuery = engineRule.getProcessEngine().getHistoryService().createHistoricProcessInstanceQuery();
+
+    // when
+    Batch batch = externalTaskService.setRetriesAsync(historicProcessInstanceQuery.processDefinitionKey(PROCESS_DEFINITION_KEY), 5);
+
+    // then
+    executeSeedAndBatchJobs(batch);
+
+    ExternalTask task = externalTaskService.createExternalTaskQuery().processInstanceId(processInstanceIds.get(0)).singleResult();
+
+
+    Assert.assertEquals(5, (int) task.getRetries());
   }
 
   public void executeSeedAndBatchJobs(Batch batch) {

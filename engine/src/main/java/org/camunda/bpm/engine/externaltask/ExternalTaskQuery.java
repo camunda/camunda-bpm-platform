@@ -70,6 +70,11 @@ public interface ExternalTaskQuery extends Query<ExternalTaskQuery, ExternalTask
   ExternalTaskQuery processInstanceId(String processInstanceId);
 
   /**
+   * Only select external tasks created in the context of the given process instances
+   */
+  ExternalTaskQuery processInstanceIdIn(String... processInstanceIdIn);
+
+  /**
    * Only select external tasks that belong to an instance of the given process definition
    */
   ExternalTaskQuery processDefinitionId(String processDefinitionId);

@@ -19,8 +19,11 @@ import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryBuilder;
+import org.camunda.bpm.engine.history.HistoricProcessInstance;
+import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.cmd.*;
 import org.camunda.bpm.engine.impl.externaltask.ExternalTaskQueryTopicBuilderImpl;
+import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 
 /**
  * @author Thorben Lindhauer
@@ -89,6 +92,18 @@ public class ExternalTaskServiceImpl extends ServiceImpl implements ExternalTask
     commandExecutor.execute(new SetExternalTasksRetriesCmd(externalTaskIds, retries));
   }
 
+  public void setRetries(List<String> externalTaskIds, ExternalTaskQuery externalTaskQuery, ProcessInstanceQuery processInstanceQuery, HistoricProcessInstanceQuery historicProcessInstanceQuery, int retries) {
+    commandExecutor.execute(new SetExternalTasksRetriesCmd(externalTaskIds, externalTaskQuery, processInstanceQuery, historicProcessInstanceQuery, retries));
+  }
+
+  public void setRetries(ProcessInstanceQuery processInstanceQuery, int retries) {
+    commandExecutor.execute(new SetExternalTasksRetriesCmd(processInstanceQuery, retries));
+  }
+
+  public void setRetries(HistoricProcessInstanceQuery historicProcessInstanceQuery, int retries) {
+    commandExecutor.execute(new SetExternalTasksRetriesCmd(historicProcessInstanceQuery, retries));
+  }
+
   public Batch setRetriesAsync(List<String> externalTaskIds, int retries) {
     return setRetriesAsync(externalTaskIds, null, retries);
   }
@@ -99,5 +114,17 @@ public class ExternalTaskServiceImpl extends ServiceImpl implements ExternalTask
 
   public Batch setRetriesAsync(List<String> externalTaskIds, ExternalTaskQuery externalTaskQuery, int retries) {
     return commandExecutor.execute(new SetExternalTasksRetriesBatchCmd(externalTaskIds, externalTaskQuery, retries));
+  }
+
+  public Batch setRetriesAsync(List<String> externalTaskIds, ExternalTaskQuery externalTaskQuery, ProcessInstanceQuery processInstanceQuery, HistoricProcessInstanceQuery historicProcessInstanceQuery, int retries) {
+    return commandExecutor.execute(new SetExternalTasksRetriesBatchCmd(externalTaskIds, externalTaskQuery, processInstanceQuery, historicProcessInstanceQuery, retries));
+  }
+
+  public Batch setRetriesAsync(ProcessInstanceQuery processInstanceQuery, int retries) {
+    return commandExecutor.execute(new SetExternalTasksRetriesBatchCmd(processInstanceQuery, retries));
+  }
+
+  public Batch setRetriesAsync(HistoricProcessInstanceQuery historicProcessInstanceQuery, int retries) {
+    return commandExecutor.execute(new SetExternalTasksRetriesBatchCmd(historicProcessInstanceQuery, retries));
   }
 }

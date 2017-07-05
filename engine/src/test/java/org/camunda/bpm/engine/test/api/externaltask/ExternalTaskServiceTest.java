@@ -1782,6 +1782,44 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  public void testSetRetriesByProcessInstance() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+    List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(5, WORKER_ID)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+
+    // when
+    externalTaskService.setRetries(runtimeService.createProcessInstanceQuery().active(), 5);
+
+    // then
+    ExternalTask task = externalTaskService.createExternalTaskQuery().singleResult();
+
+    assertEquals(5, (int) task.getRetries());
+  }
+
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  public void testSetRetriesByHistoricProcessInstance() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+    List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(5, WORKER_ID)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+
+    // when
+    externalTaskService.setRetries(historyService.createHistoricProcessInstanceQuery().processDefinitionKey("oneExternalTaskProcess"), 5);
+
+    // then
+    ExternalTask task = externalTaskService.createExternalTaskQuery().singleResult();
+
+    assertEquals(5, (int) task.getRetries());
+  }
+
+
+
   protected Date nowPlus(long millis) {
     return new Date(ClockUtil.getCurrentTime().getTime() + millis);
   }

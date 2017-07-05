@@ -81,4 +81,9 @@ public interface ExternalTaskRestService {
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   BatchDto setRetriesAsync(SetRetriesForExternalTasksDto retriesDto);
+
+  @PUT
+  @Path("/retries-sync")
+  @Consumes(MediaType.APPLICATION_JSON)
+  void setRetries(SetRetriesForExternalTasksDto retriesDto);
 }

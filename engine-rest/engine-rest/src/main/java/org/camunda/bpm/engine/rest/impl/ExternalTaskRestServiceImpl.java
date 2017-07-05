@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryBuilder;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryTopicBuilder;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
+import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.rest.ExternalTaskRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
@@ -35,6 +36,8 @@ import org.camunda.bpm.engine.rest.dto.externaltask.ExternalTaskDto;
 import org.camunda.bpm.engine.rest.dto.externaltask.ExternalTaskQueryDto;
 import org.camunda.bpm.engine.rest.dto.externaltask.FetchExternalTasksDto;
 import org.camunda.bpm.engine.rest.dto.externaltask.FetchExternalTasksDto.FetchExternalTaskTopicDto;
+import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceQueryDto;
+import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.dto.externaltask.LockedExternalTaskDto;
@@ -43,6 +46,7 @@ import org.camunda.bpm.engine.rest.sub.externaltask.ExternalTaskResource;
 import org.camunda.bpm.engine.rest.sub.externaltask.impl.ExternalTaskResourceImpl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 
 /**
  * @author Thorben Lindhauer
@@ -148,15 +152,28 @@ public class ExternalTaskRestServiceImpl extends AbstractRestProcessEngineAware 
 
     ExternalTaskService externalTaskService = getProcessEngine().getExternalTaskService();
     ExternalTaskQueryDto externalTaskQueryDto = retriesDto.getExternalTaskQuery();
+    ProcessInstanceQueryDto processInstanceQueryDto = retriesDto.getProcessInstanceQuery();
+    HistoricProcessInstanceQueryDto historicProcessInstanceQueryDto = retriesDto.getHistoricProcessInstanceQuery();
     ExternalTaskQuery externalTaskQuery = null;
+    ProcessInstanceQuery processInstanceQuery = null;
+    HistoricProcessInstanceQuery historicProcessInstanceQuery = null;
 
     if (externalTaskQueryDto != null) {
       externalTaskQuery = externalTaskQueryDto.toQuery(getProcessEngine());
     }
+
+    if (processInstanceQueryDto != null) {
+      processInstanceQuery = processInstanceQueryDto.toQuery(getProcessEngine());
+    }
+
+    if (historicProcessInstanceQueryDto != null) {
+      historicProcessInstanceQuery = historicProcessInstanceQueryDto.toQuery(getProcessEngine());
+    }
+
     Batch batch = null;
 
     try {
-      batch = externalTaskService.setRetriesAsync(retriesDto.getExternalTaskIds(), externalTaskQuery, retriesDto.getRetries());
+      batch = externalTaskService.setRetriesAsync(retriesDto.getExternalTaskIds(), externalTaskQuery, processInstanceQuery, historicProcessInstanceQuery,retriesDto.getRetries());
     } catch (NotFoundException e) {
       throw new InvalidRequestException(Status.NOT_FOUND, e.getMessage());
     } catch (BadUserRequestException e) {
@@ -164,5 +181,38 @@ public class ExternalTaskRestServiceImpl extends AbstractRestProcessEngineAware 
     }
 
     return BatchDto.fromBatch(batch);
+  }
+
+  @Override
+  public void setRetries(SetRetriesForExternalTasksDto retriesDto){
+
+    ExternalTaskService externalTaskService = getProcessEngine().getExternalTaskService();
+    ExternalTaskQueryDto externalTaskQueryDto = retriesDto.getExternalTaskQuery();
+    ProcessInstanceQueryDto processInstanceQueryDto = retriesDto.getProcessInstanceQuery();
+    HistoricProcessInstanceQueryDto historicProcessInstanceQueryDto = retriesDto.getHistoricProcessInstanceQuery();
+    ExternalTaskQuery externalTaskQuery = null;
+    ProcessInstanceQuery processInstanceQuery = null;
+    HistoricProcessInstanceQuery historicProcessInstanceQuery = null;
+
+    if (externalTaskQueryDto != null) {
+      externalTaskQuery = externalTaskQueryDto.toQuery(getProcessEngine());
+    }
+
+    if (processInstanceQueryDto != null) {
+      processInstanceQuery = processInstanceQueryDto.toQuery(getProcessEngine());
+    }
+
+    if (historicProcessInstanceQueryDto != null) {
+      historicProcessInstanceQuery = historicProcessInstanceQueryDto.toQuery(getProcessEngine());
+    }
+
+    try {
+      externalTaskService.setRetries(retriesDto.getExternalTaskIds(), externalTaskQuery, processInstanceQuery, historicProcessInstanceQuery, retriesDto.getRetries());
+    } catch (NotFoundException e) {
+      throw new InvalidRequestException(Status.NOT_FOUND, e.getMessage());
+    } catch (BadUserRequestException e) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());
+    }
+
   }
 }

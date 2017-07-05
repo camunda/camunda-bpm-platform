@@ -42,6 +42,7 @@ public class ExternalTaskQueryImpl extends AbstractQuery<ExternalTaskQuery, Exte
   protected Boolean notLocked;
   protected String executionId;
   protected String processInstanceId;
+  protected String[] processInstanceIdIn;
   protected String processDefinitionId;
   protected String activityId;
   protected String[] activityIdIn;
@@ -107,6 +108,12 @@ public class ExternalTaskQueryImpl extends AbstractQuery<ExternalTaskQuery, Exte
   public ExternalTaskQuery processInstanceId(String processInstanceId) {
     ensureNotNull("processInstanceId", processInstanceId);
     this.processInstanceId = processInstanceId;
+    return this;
+  }
+
+  public ExternalTaskQuery processInstanceIdIn(String... processInstanceIdIn) {
+    ensureNotNull("processInstanceIdIn", processInstanceIdIn);
+    this.processInstanceIdIn = processInstanceIdIn;
     return this;
   }
 
