@@ -91,7 +91,6 @@ public class PvmAtomicOperationDeleteCascadeFireActivityEnd extends PvmAtomicOpe
             if(propagatingExecution.getActivity() == null && activity != null && activity.getFlowScope() != null) {
               propagatingExecution.setActivity(getFlowScopeActivity(activity));
             }
-            propagatingExecution.performOperation(DELETE_CASCADE);
           }
         }
       }

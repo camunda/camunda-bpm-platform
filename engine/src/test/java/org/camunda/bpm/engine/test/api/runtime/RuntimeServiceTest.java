@@ -411,6 +411,31 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
     assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
   }
 
+  /**
+   * CAM-8005 - StackOverflowError must not happen.
+   */
+  public void testDeleteProcessInstancesManyParallelSubprocesses() {
+    final BpmnModelInstance multiInstanceWithSubprocess =
+      Bpmn.createExecutableProcess("multiInstanceWithSubprocess")
+        .startEvent()
+          .subProcess()
+          .embeddedSubProcess()
+          .startEvent()
+            .userTask("userTask")
+          .endEvent()
+          .subProcessDone()
+          .multiInstance().cardinality("300").multiInstanceDone()
+        .endEvent()
+      .done();
+
+    deployment(multiInstanceWithSubprocess);
+
+    final ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("multiInstanceWithSubprocess");
+
+    runtimeService.deleteProcessInstance(processInstance.getId(), "some reason");
+    assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
+  }
+
   public void testDeleteProcessInstanceUnexistingId() {
     try {
       runtimeService.deleteProcessInstance("enexistingInstanceId", null);
