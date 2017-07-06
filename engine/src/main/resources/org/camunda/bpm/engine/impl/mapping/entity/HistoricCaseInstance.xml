@@ -303,53 +303,19 @@
   </sql>
 
   <select id="selectHistoricCaseInstanceIdsForCleanup" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
+    <bind name="days" value="'cd.HISTORY_TTL_'"/>
+    <bind name="date" value="'ci.CLOSE_TIME_'"/>
+    <bind name="currentTimestamp" value="parameter"/>
     ${limitBefore}
-    SELECT ci.ID_
-    <include refid="selectHistoricCaseInstanceIdsForCleanupSql"/>
-    AND DATEDIFF(day, ci.CLOSE_TIME_ , #{parameter}) &gt;= cd.HISTORY_TTL_
-    ORDER BY DATEDIFF(day, ci.CLOSE_TIME_ , #{parameter}) DESC
-    ${limitAfter}
-  </select>
-
-  <select id="selectHistoricCaseInstanceIdsForCleanup_mssql" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
-    SELECT TOP (#{maxResults}) ci.ID_
-    <include refid="selectHistoricCaseInstanceIdsForCleanupSql"/>
-    AND DATEDIFF(day, ci.CLOSE_TIME_, #{parameter}) &gt;= cd.HISTORY_TTL_
-    ORDER BY DATEDIFF(day, ci.CLOSE_TIME_, #{parameter}) DESC
-  </select>
-
-  <select id="selectHistoricCaseInstanceIdsForCleanup_db2" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
-    SELECT ID_
-    FROM (SELECT ci.ID_, ROW_NUMBER() OVER(ORDER BY #{parameter} - ci.CLOSE_TIME_ DESC) as rownumber
-    <include refid="selectHistoricCaseInstanceIdsForCleanupSql"/>
-    AND ci.CLOSE_TIME_ + cd.HISTORY_TTL_ DAYS &lt;= #{parameter}) as SUB
-    where rownumber between 1 and #{maxResults}
-  </select>
-
-  <select id="selectHistoricCaseInstanceIdsForCleanup_oracle" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
-    ${limitBefore}
-    SELECT ci.ID_
-    <include refid="selectHistoricCaseInstanceIdsForCleanupSql"/>
-    AND ci.CLOSE_TIME_ + cd.HISTORY_TTL_ &lt;= #{parameter}
-    ORDER BY #{parameter} - ci.CLOSE_TIME_ DESC
-    ${limitAfter}
-  </select>
-
-  <select id="selectHistoricCaseInstanceIdsForCleanup_postgres" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
-    ${limitBefore}
-    SELECT ci.ID_
-    <include refid="selectHistoricCaseInstanceIdsForCleanupSql"/>
-    AND extract (day from #{parameter} - ci.CLOSE_TIME_) &gt;= cd.HISTORY_TTL_
-    ORDER BY #{parameter} - ci.CLOSE_TIME_ DESC
-    ${limitAfter}
-  </select>
-
-  <select id="selectHistoricCaseInstanceIdsForCleanup_mysql" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
-    ${limitBefore}
-    SELECT ci.ID_
-    <include refid="selectHistoricCaseInstanceIdsForCleanupSql"/>
-    AND DATEDIFF(#{parameter}, ci.CLOSE_TIME_) &gt;= cd.HISTORY_TTL_
-    ORDER BY DATEDIFF(#{parameter}, ci.CLOSE_TIME_) DESC
+    SELECT DISTINCT RES.*
+    ${limitBetween}
+    FROM (
+      SELECT ci.ID_, ci.CLOSE_TIME_
+      <include refid="selectHistoricCaseInstanceIdsForCleanupSql"/>
+      AND ${dayComparator}
+    ) RES
+    ${orderBy}
     ${limitAfter}
   </select>
 

@@ -19,8 +19,11 @@ import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionOutputInstance;
 import org.camunda.bpm.engine.history.CleanableHistoricDecisionInstanceReportResult;
 import org.camunda.bpm.engine.impl.CleanableHistoricDecisionInstanceReportImpl;
+import org.camunda.bpm.engine.impl.Direction;
 import org.camunda.bpm.engine.impl.HistoricDecisionInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
+import org.camunda.bpm.engine.impl.QueryOrderingProperty;
+import org.camunda.bpm.engine.impl.QueryPropertyImpl;
 import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
@@ -176,6 +179,7 @@ public class HistoricDecisionInstanceManager extends AbstractHistoricManager {
   public List<String> findHistoricDecisionInstanceIdsForCleanup(Integer batchSize) {
     ListQueryParameterObject parameterObject = new ListQueryParameterObject();
     parameterObject.setParameter(ClockUtil.getCurrentTime());
+    parameterObject.getOrderingProperties().add(new QueryOrderingProperty(new QueryPropertyImpl("EVAL_TIME_"), Direction.ASCENDING));
     parameterObject.setFirstResult(0);
     parameterObject.setMaxResults(batchSize);
     return (List<String>) getDbEntityManager().selectList("selectHistoricDecisionInstanceIdsForCleanup", parameterObject);

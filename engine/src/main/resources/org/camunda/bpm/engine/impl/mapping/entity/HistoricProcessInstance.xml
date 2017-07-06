@@ -409,94 +409,29 @@
     </sql>
 
     <select id="selectHistoricProcessInstanceIdsForCleanup" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
+        <bind name="days" value="'pd.HISTORY_TTL_'"/>
+        <bind name="date" value="'pi.END_TIME_'"/>
+        <bind name="currentTimestamp" value="parameter"/>
         ${limitBefore}
-        SELECT pi.PROC_INST_ID_
-        <include refid="selectHistoricProcessInstanceIdsForCleanupSql"/>
-        AND DATEDIFF(day, pi.END_TIME_, #{parameter}) &gt;= pd.HISTORY_TTL_
-        ORDER BY DATEDIFF(day, pi.END_TIME_, #{parameter}) DESC
+        SELECT DISTINCT RES.*
+        ${limitBetween}
+        FROM (
+          SELECT pi.PROC_INST_ID_, pi.END_TIME_
+          <include refid="selectHistoricProcessInstanceIdsForCleanupSql"/>
+          AND ${dayComparator}
+        ) RES
+        ${orderBy}
         ${limitAfter}
     </select>
 
     <select id="selectHistoricProcessInstanceIdsForCleanupCount" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="long">
+        <bind name="days" value="'pd.HISTORY_TTL_'"/>
+        <bind name="date" value="'pi.END_TIME_'"/>
+        <bind name="currentTimestamp" value="parameter"/>
         SELECT count(pi.PROC_INST_ID_)
         <include refid="selectHistoricProcessInstanceIdsForCleanupSql"/>
-        AND DATEDIFF(day, pi.END_TIME_, #{parameter}) &gt;= pd.HISTORY_TTL_
-    </select>
-
-    <select id="selectHistoricProcessInstanceIdsForCleanup_mssql" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
-        SELECT TOP (#{maxResults}) pi.PROC_INST_ID_
-        <include refid="selectHistoricProcessInstanceIdsForCleanupSql"/>
-        AND DATEDIFF(day, pi.END_TIME_, #{parameter}) &gt;= pd.HISTORY_TTL_
-        ORDER BY DATEDIFF(day, pi.END_TIME_, #{parameter}) DESC
-    </select>
-
-    <select id="selectHistoricProcessInstanceIdsForCleanupCount_mssql" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="long">
-        SELECT count(pi.PROC_INST_ID_)
-        <include refid="selectHistoricProcessInstanceIdsForCleanupSql"/>
-        AND DATEDIFF(day, pi.END_TIME_, #{parameter}) &gt;= pd.HISTORY_TTL_
-    </select>
-
-    <select id="selectHistoricProcessInstanceIdsForCleanup_db2" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
-        SELECT PROC_INST_ID_
-        FROM (SELECT pi.PROC_INST_ID_, ROW_NUMBER() OVER(ORDER BY #{parameter} - pi.END_TIME_ DESC) as rownumber
-        <include refid="selectHistoricProcessInstanceIdsForCleanupSql"/>
-        AND pi.END_TIME_ + pd.HISTORY_TTL_ DAYS &lt;= #{parameter}) as SUB
-        where rownumber between 1 and #{maxResults}
-    </select>
-
-    <select id="selectHistoricProcessInstanceIdsForCleanupCount_db2" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="long">
-        SELECT count(pi.PROC_INST_ID_)
-        FROM ${prefix}ACT_HI_PROCINST pi, ${prefix}ACT_RE_PROCDEF pd
-        where
-        pi.PROC_DEF_ID_ = pd.ID_
-        AND not pi.END_TIME_ is NULL
-        AND not pd.HISTORY_TTL_ is NULL
-        AND pi.END_TIME_ + pd.HISTORY_TTL_ DAYS &lt;= #{parameter}
-    </select>
-
-    <select id="selectHistoricProcessInstanceIdsForCleanup_oracle" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
-        ${limitBefore}
-        SELECT pi.PROC_INST_ID_
-        <include refid="selectHistoricProcessInstanceIdsForCleanupSql"/>
-        AND pi.END_TIME_ + pd.HISTORY_TTL_ &lt;= #{parameter}
-        ORDER BY #{parameter} - pi.END_TIME_ DESC
-        ${limitAfter}
-    </select>
-
-    <select id="selectHistoricProcessInstanceIdsForCleanupCount_oracle" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="long">
-        SELECT count(pi.PROC_INST_ID_)
-        <include refid="selectHistoricProcessInstanceIdsForCleanupSql"/>
-        AND pi.END_TIME_ + pd.HISTORY_TTL_ &lt;= #{parameter}
-    </select>
-
-    <select id="selectHistoricProcessInstanceIdsForCleanup_postgres" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
-        ${limitBefore}
-        SELECT pi.PROC_INST_ID_
-        <include refid="selectHistoricProcessInstanceIdsForCleanupSql"/>
-        AND extract (day from #{parameter} - pi.END_TIME_) &gt;= pd.HISTORY_TTL_
-        ORDER BY #{parameter} - pi.END_TIME_ DESC
-        ${limitAfter}
-    </select>
-
-    <select id="selectHistoricProcessInstanceIdsForCleanupCount_postgres" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="long">
-        SELECT count(pi.PROC_INST_ID_)
-        <include refid="selectHistoricProcessInstanceIdsForCleanupSql"/>
-        AND extract (day from #{parameter} - pi.END_TIME_) &gt;= pd.HISTORY_TTL_
-    </select>
-
-    <select id="selectHistoricProcessInstanceIdsForCleanup_mysql" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
-        ${limitBefore}
-        SELECT pi.PROC_INST_ID_
-        <include refid="selectHistoricProcessInstanceIdsForCleanupSql"/>
-        AND DATEDIFF(#{parameter}, pi.END_TIME_) &gt;= pd.HISTORY_TTL_
-        ORDER BY DATEDIFF(#{parameter}, pi.END_TIME_) DESC
-        ${limitAfter}
-    </select>
-
-    <select id="selectHistoricProcessInstanceIdsForCleanupCount_mysql" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="long">
-        SELECT count(pi.PROC_INST_ID_)
-        <include refid="selectHistoricProcessInstanceIdsForCleanupSql"/>
-        AND DATEDIFF(#{parameter}, pi.END_TIME_) &gt;= pd.HISTORY_TTL_
+        AND ${dayComparator}
     </select>
 
     <!-- DB2 or MSSQL -->
