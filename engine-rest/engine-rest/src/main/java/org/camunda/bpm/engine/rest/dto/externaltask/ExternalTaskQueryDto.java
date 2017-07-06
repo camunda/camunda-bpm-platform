@@ -139,6 +139,10 @@ public class ExternalTaskQueryDto extends AbstractQueryDto<ExternalTaskQuery> {
     this.processInstanceIdIn = processInstanceIdIn;
   }
 
+  public String getProcessDefinitionId() {
+    return processDefinitionId;
+  }
+
   @CamundaQueryParam("processDefinitionId")
   public void setProcessDefinitionId(String processDefinitionId) {
     this.processDefinitionId = processDefinitionId;

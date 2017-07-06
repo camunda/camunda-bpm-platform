@@ -26,13 +26,13 @@ import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
 /**
  * Represents a base class for the external task commands.
- * Contains functionality to get the external task by id and check 
+ * Contains functionality to get the external task by id and check
  * the authorization for the execution of a command on the requested external task.
- * 
+ *
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
 public abstract class ExternalTaskCmd implements Command<Void> {
-  
+
   /**
    * The corresponding external task id.
    */
@@ -45,10 +45,10 @@ public abstract class ExternalTaskCmd implements Command<Void> {
   @Override
   public Void execute(CommandContext commandContext) {
     EnsureUtil.ensureNotNull("externalTaskId", externalTaskId);
-    validateInput();    
+    validateInput();
 
     ExternalTaskEntity externalTask = commandContext.getExternalTaskManager().findExternalTaskById(externalTaskId);
-    EnsureUtil.ensureNotNull(NotFoundException.class,
+    ensureNotNull(NotFoundException.class,
         "Cannot find external task with id " + externalTaskId, "externalTask", externalTask);
 
     for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
@@ -62,7 +62,7 @@ public abstract class ExternalTaskCmd implements Command<Void> {
 
   /**
    * Executes the specific external task commands, which belongs to the current sub class.
-   * 
+   *
    * @param externalTask the external task which is used for the command execution
    */
   protected abstract void execute(ExternalTaskEntity externalTask);
@@ -70,6 +70,6 @@ public abstract class ExternalTaskCmd implements Command<Void> {
   /**
    * Validates the current input of the command.
    */
-  protected abstract void validateInput();  
+  protected abstract void validateInput();
 
 }

@@ -21,15 +21,18 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
+import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryBuilder;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.history.HistoricIncident;
+import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.util.AssertUtil;
@@ -39,6 +42,7 @@ import org.joda.time.DateTime;
 import org.junit.Assert;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -1782,43 +1786,188 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
-
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
-  public void testSetRetriesByProcessInstance() {
+  public void testUpdateRetriesByExternalTaskIds() {
     // given
-    runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
-    List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(5, WORKER_ID)
-        .topic(TOPIC_NAME, LOCK_TIME)
-        .execute();
+    startProcessInstance("oneExternalTaskProcess", 5);
+    List<ExternalTask> tasks = externalTaskService.createExternalTaskQuery().list();
+    List<String> externalTaskIds = Arrays.asList(
+        tasks.get(0).getId(),
+        tasks.get(1).getId(),
+        tasks.get(2).getId(),
+        tasks.get(3).getId(),
+        tasks.get(4).getId());
 
     // when
-    externalTaskService.setRetries(runtimeService.createProcessInstanceQuery().active(), 5);
+    externalTaskService.updateRetries().externalTaskIds(externalTaskIds).set(5);
 
     // then
-    ExternalTask task = externalTaskService.createExternalTaskQuery().singleResult();
+    tasks = externalTaskService.createExternalTaskQuery().list();
+    assertEquals(5, tasks.size());
 
-    assertEquals(5, (int) task.getRetries());
+    for (ExternalTask task : tasks) {
+      assertEquals(5, (int) task.getRetries());
+    }
   }
-
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
-  public void testSetRetriesByHistoricProcessInstance() {
+  public void testUpdateRetriesByExternalTaskIdArray() {
     // given
-    runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
-    List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(5, WORKER_ID)
-        .topic(TOPIC_NAME, LOCK_TIME)
-        .execute();
+    startProcessInstance("oneExternalTaskProcess", 5);
+    List<ExternalTask> tasks = externalTaskService.createExternalTaskQuery().list();
+    List<String> externalTaskIds = Arrays.asList(
+        tasks.get(0).getId(),
+        tasks.get(1).getId(),
+        tasks.get(2).getId(),
+        tasks.get(3).getId(),
+        tasks.get(4).getId());
 
     // when
-    externalTaskService.setRetries(historyService.createHistoricProcessInstanceQuery().processDefinitionKey("oneExternalTaskProcess"), 5);
+    externalTaskService.updateRetries().externalTaskIds(externalTaskIds.toArray(new String[externalTaskIds.size()])).set(5);
 
     // then
-    ExternalTask task = externalTaskService.createExternalTaskQuery().singleResult();
+    tasks = externalTaskService.createExternalTaskQuery().list();
+    assertEquals(5, tasks.size());
 
-    assertEquals(5, (int) task.getRetries());
+    for (ExternalTask task : tasks) {
+      assertEquals(5, (int) task.getRetries());
+    }
   }
 
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  public void testUpdateRetriesByProcessInstanceIds() {
+    // given
+    List<String> processInstances = startProcessInstance("oneExternalTaskProcess", 5);
 
+    // when
+    externalTaskService.updateRetries().processInstanceIds(processInstances).set(5);
+
+    // then
+    List<ExternalTask> tasks = externalTaskService.createExternalTaskQuery().list();
+    assertEquals(5, tasks.size());
+
+    for (ExternalTask task : tasks) {
+      assertEquals(5, (int) task.getRetries());
+    }
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  public void testUpdateRetriesByProcessInstanceIdArray() {
+    // given
+    List<String> processInstances = startProcessInstance("oneExternalTaskProcess", 5);
+
+    // when
+    externalTaskService.updateRetries().processInstanceIds(processInstances.toArray(new String[processInstances.size()])).set(5);
+
+    // then
+    List<ExternalTask> tasks = externalTaskService.createExternalTaskQuery().list();
+    assertEquals(5, tasks.size());
+
+    for (ExternalTask task : tasks) {
+      assertEquals(5, (int) task.getRetries());
+    }
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  public void testUpdateRetriesByExternalTaskQuery() {
+    // given
+    startProcessInstance("oneExternalTaskProcess", 5);
+
+    ExternalTaskQuery query = externalTaskService.createExternalTaskQuery();
+
+    // when
+    externalTaskService.updateRetries().externalTaskQuery(query).set(5);
+
+    // then
+    List<ExternalTask> tasks = query.list();
+    assertEquals(5, tasks.size());
+
+    for (ExternalTask task : tasks) {
+      assertEquals(5, (int) task.getRetries());
+    }
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  public void testUpdateRetriesByProcessInstanceQuery() {
+    // given
+    startProcessInstance("oneExternalTaskProcess", 5);
+
+    ProcessInstanceQuery processInstanceQuery = runtimeService
+        .createProcessInstanceQuery()
+        .processDefinitionKey("oneExternalTaskProcess");
+
+    // when
+    externalTaskService.updateRetries().processInstanceQuery(processInstanceQuery).set(5);
+
+    // then
+    List<ExternalTask> tasks = externalTaskService.createExternalTaskQuery().list();
+    assertEquals(5, tasks.size());
+
+    for (ExternalTask task : tasks) {
+      assertEquals(5, (int) task.getRetries());
+    }
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  public void testUpdateRetriesByHistoricProcessInstanceQuery() {
+    // given
+    startProcessInstance("oneExternalTaskProcess", 5);
+
+    HistoricProcessInstanceQuery query = historyService
+        .createHistoricProcessInstanceQuery()
+        .processDefinitionKey("oneExternalTaskProcess");
+
+    // when
+    externalTaskService.updateRetries().historicProcessInstanceQuery(query).set(5);
+
+    // then
+    List<ExternalTask> tasks = externalTaskService.createExternalTaskQuery().list();
+    assertEquals(5, tasks.size());
+
+    for (ExternalTask task : tasks) {
+      assertEquals(5, (int) task.getRetries());
+    }
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  public void testUpdateRetriesByAllParameters() {
+    // given
+    List<String> ids = startProcessInstance("oneExternalTaskProcess", 5);
+
+    ExternalTask externalTask = externalTaskService
+        .createExternalTaskQuery()
+        .processInstanceId(ids.get(0))
+        .singleResult();
+
+    ExternalTaskQuery externalTaskQuery = externalTaskService
+        .createExternalTaskQuery()
+        .processInstanceId(ids.get(1));
+
+    ProcessInstanceQuery processInstanceQuery = runtimeService
+        .createProcessInstanceQuery()
+        .processInstanceId(ids.get(2));
+
+    HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService
+        .createHistoricProcessInstanceQuery()
+        .processInstanceId(ids.get(3));
+
+    // when
+    externalTaskService.updateRetries()
+      .externalTaskIds(externalTask.getId())
+      .externalTaskQuery(externalTaskQuery)
+      .processInstanceQuery(processInstanceQuery)
+      .historicProcessInstanceQuery(historicProcessInstanceQuery)
+      .processInstanceIds(ids.get(4))
+      .set(5);
+
+    // then
+    List<ExternalTask> tasks = externalTaskService.createExternalTaskQuery().list();
+    assertEquals(5, tasks.size());
+
+    for (ExternalTask task : tasks) {
+      assertEquals(Integer.valueOf(5), task.getRetries());
+    }
+  }
 
   protected Date nowPlus(long millis) {
     return new Date(ClockUtil.getCurrentTime().getTime() + millis);
@@ -1827,4 +1976,13 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
   protected Date nowMinus(long millis) {
     return new Date(ClockUtil.getCurrentTime().getTime() - millis);
   }
+
+  protected List<String> startProcessInstance(String key, int instances) {
+    List<String> ids = new ArrayList<String>();
+    for (int i = 0; i < instances; i++) {
+      ids.add(runtimeService.startProcessInstanceByKey(key, String.valueOf(i)).getId());
+    }
+    return ids;
+  }
+
 }

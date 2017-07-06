@@ -111,6 +111,10 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
     this.processInstanceIds = processInstanceIds;
   }
 
+  public String getProcessDefinitionId() {
+    return processDefinitionId;
+  }
+
   @CamundaQueryParam("processDefinitionId")
   public void setProcessDefinitionId(String processDefinitionId) {
     this.processDefinitionId = processDefinitionId;

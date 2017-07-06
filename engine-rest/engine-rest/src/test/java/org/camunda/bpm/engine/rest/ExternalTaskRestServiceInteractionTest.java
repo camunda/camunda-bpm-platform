@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.rest;
 
 import static com.jayway.restassured.RestAssured.given;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.createMockBatch;
+import static org.fest.assertions.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Matchers.any;
@@ -47,11 +48,16 @@ import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryTopicBuilder;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
-import org.camunda.bpm.engine.history.HistoricProcessInstance;
+import org.camunda.bpm.engine.externaltask.UpdateExternalTaskRetriesBuilder;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
-import org.camunda.bpm.engine.impl.ExternalTaskServiceImpl;
+import org.camunda.bpm.engine.impl.ExternalTaskQueryImpl;
+import org.camunda.bpm.engine.impl.HistoricProcessInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.HistoryServiceImpl;
+import org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
+import org.camunda.bpm.engine.rest.dto.externaltask.ExternalTaskQueryDto;
+import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceQueryDto;
+import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.helper.EqualsVariableMap;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
@@ -65,6 +71,7 @@ import org.camunda.bpm.engine.variable.type.ValueType;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 
 /**
@@ -85,7 +92,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
   protected static final String HANDLE_EXTERNAL_TASK_BPMN_ERROR_URL = SINGLE_EXTERNAL_TASK_URL + "/bpmnError";
   protected static final String UNLOCK_EXTERNAL_TASK_URL = SINGLE_EXTERNAL_TASK_URL + "/unlock";
   protected static final String RETRIES_EXTERNAL_TASK_URL = SINGLE_EXTERNAL_TASK_URL + "/retries";
-  protected static final String RETRIES_EXTERNAL_TASK_SYNC_URL = EXTERNAL_TASK_URL + "/retries-sync";
+  protected static final String RETRIES_EXTERNAL_TASK_SYNC_URL = EXTERNAL_TASK_URL + "/retries";
   protected static final String RETRIES_EXTERNAL_TASKS_ASYNC_URL = EXTERNAL_TASK_URL + "/retries-async";
   protected static final String PRIORITY_EXTERNAL_TASK_URL = SINGLE_EXTERNAL_TASK_URL + "/priority";
 
@@ -98,20 +105,19 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
 
   protected ExternalTask externalTaskMock;
   protected ExternalTaskQuery externalTaskQueryMock;
-  protected ProcessInstanceQuery processInstanceQueryMock;
-  protected HistoricProcessInstanceQuery historicProcessInstanceQueryMock;
+
+  protected UpdateExternalTaskRetriesBuilder updateRetriesBuilder;
 
   @Before
   public void setUpRuntimeData() {
     externalTaskService = mock(ExternalTaskService.class);
     when(processEngine.getExternalTaskService()).thenReturn(externalTaskService);
-    when(externalTaskService.createExternalTaskQuery()).thenReturn(externalTaskQueryMock);
 
     runtimeServiceMock = mock(RuntimeServiceImpl.class);
-    when(runtimeServiceMock.createProcessInstanceQuery()).thenReturn(processInstanceQueryMock);
-    historyServiceMock = mock(HistoryServiceImpl.class);
-    when(historyServiceMock.createHistoricProcessInstanceQuery()).thenReturn(historicProcessInstanceQueryMock);
+    when(processEngine.getRuntimeService()).thenReturn(runtimeServiceMock);
 
+    historyServiceMock = mock(HistoryServiceImpl.class);
+    when(processEngine.getHistoryService()).thenReturn(historyServiceMock);
 
     // locked external task
     lockedExternalTaskMock = MockProvider.createMockLockedExternalTask();
@@ -127,21 +133,21 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     when(fetchTopicBuilder.enableCustomObjectDeserialization()).thenReturn(fetchTopicBuilder);
     when(fetchTopicBuilder.topic(any(String.class), anyLong())).thenReturn(fetchTopicBuilder);
 
-    Batch batchMock = createMockBatch();
-    when(externalTaskService.setRetriesAsync(anyListOf(String.class), any(ExternalTaskQuery.class), any(ProcessInstanceQuery.class), any(HistoricProcessInstanceQuery.class), anyInt())).thenReturn(batchMock);
+    Batch batch = createMockBatch();
+    updateRetriesBuilder = mock(UpdateExternalTaskRetriesBuilder.class);
+    when(externalTaskService.updateRetries()).thenReturn(updateRetriesBuilder);
+
+    when(updateRetriesBuilder.externalTaskIds(anyListOf(String.class))).thenReturn(updateRetriesBuilder);
+    when(updateRetriesBuilder.processInstanceIds(anyListOf(String.class))).thenReturn(updateRetriesBuilder);
+    when(updateRetriesBuilder.externalTaskQuery(any(ExternalTaskQuery.class))).thenReturn(updateRetriesBuilder);
+    when(updateRetriesBuilder.processInstanceQuery(any(ProcessInstanceQuery.class))).thenReturn(updateRetriesBuilder);
+    when(updateRetriesBuilder.historicProcessInstanceQuery(any(HistoricProcessInstanceQuery.class))).thenReturn(updateRetriesBuilder);
+    when(updateRetriesBuilder.setAsync(anyInt())).thenReturn(batch);
 
     // querying
     externalTaskQueryMock = mock(ExternalTaskQuery.class);
     when(externalTaskQueryMock.externalTaskId(any(String.class))).thenReturn(externalTaskQueryMock);
     when(externalTaskService.createExternalTaskQuery()).thenReturn(externalTaskQueryMock);
-
-    processInstanceQueryMock = mock(ProcessInstanceQuery.class);
-    when(processInstanceQueryMock.active()).thenReturn(processInstanceQueryMock);
-
-
-    historicProcessInstanceQueryMock = mock(HistoricProcessInstanceQuery.class);
-    when(historicProcessInstanceQueryMock.processDefinitionKey(any(String.class))).thenReturn(historicProcessInstanceQueryMock);
-
 
     // external task
     externalTaskMock = MockProvider.createMockExternalTask();
@@ -884,13 +890,105 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     .when()
      .post(RETRIES_EXTERNAL_TASKS_ASYNC_URL);
 
-    verify(externalTaskService).setRetriesAsync(externalTaskIds, null, null, null, 5);
+    verify(externalTaskService).updateRetries();
     verifyNoMoreInteractions(externalTaskService);
+
+    verify(updateRetriesBuilder).externalTaskIds(externalTaskIds);
+    verify(updateRetriesBuilder).processInstanceIds((List<String>) null);
+    verify(updateRetriesBuilder).externalTaskQuery(null);
+    verify(updateRetriesBuilder).processInstanceQuery(null);
+    verify(updateRetriesBuilder).historicProcessInstanceQuery(null);
+    verify(updateRetriesBuilder).setAsync(5);
+    verifyNoMoreInteractions(updateRetriesBuilder);
+  }
+
+  @Test
+  public void testSetRetriesForExternalTasksSync() {
+    List<String> externalTaskIds = Arrays.asList("externalTaskId1", "externalTaskId2");
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("retries", "5");
+    parameters.put("externalTaskIds", externalTaskIds);
+
+    given()
+     .contentType(POST_JSON_CONTENT_TYPE)
+     .body(parameters)
+    .then()
+     .expect()
+     .statusCode(Status.OK.getStatusCode())
+    .when()
+     .post(RETRIES_EXTERNAL_TASKS_ASYNC_URL);
+
+    verify(externalTaskService).updateRetries();
+    verifyNoMoreInteractions(externalTaskService);
+
+    verify(updateRetriesBuilder).externalTaskIds(externalTaskIds);
+    verify(updateRetriesBuilder).processInstanceIds((List<String>) null);
+    verify(updateRetriesBuilder).externalTaskQuery(null);
+    verify(updateRetriesBuilder).processInstanceQuery(null);
+    verify(updateRetriesBuilder).historicProcessInstanceQuery(null);
+    verify(updateRetriesBuilder).setAsync(5);
+    verifyNoMoreInteractions(updateRetriesBuilder);
+  }
+
+  @Test
+  public void testSetRetriesForExternalTasksAsyncByProcessInstanceIds() {
+    List<String> processInstanceIds = Arrays.asList("123", "456");
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("retries", "5");
+    parameters.put("processInstanceIds", processInstanceIds);
+
+    given()
+     .contentType(POST_JSON_CONTENT_TYPE)
+     .body(parameters)
+    .then()
+     .expect()
+     .statusCode(Status.OK.getStatusCode())
+    .when()
+     .post(RETRIES_EXTERNAL_TASKS_ASYNC_URL);
+
+    verify(externalTaskService).updateRetries();
+    verifyNoMoreInteractions(externalTaskService);
+
+    verify(updateRetriesBuilder).externalTaskIds((List<String>) null);
+    verify(updateRetriesBuilder).processInstanceIds(processInstanceIds);
+    verify(updateRetriesBuilder).externalTaskQuery(null);
+    verify(updateRetriesBuilder).processInstanceQuery(null);
+    verify(updateRetriesBuilder).historicProcessInstanceQuery(null);
+    verify(updateRetriesBuilder).setAsync(5);
+    verifyNoMoreInteractions(updateRetriesBuilder);
+  }
+
+  @Test
+  public void testSetRetriesForExternalTasksSyncByProcessInstanceIds() {
+    List<String> processInstanceIds = Arrays.asList("123", "456");
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("retries", "5");
+    parameters.put("processInstanceIds", processInstanceIds);
+
+    given()
+     .contentType(POST_JSON_CONTENT_TYPE)
+     .body(parameters)
+    .then()
+     .expect()
+     .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+     .put(RETRIES_EXTERNAL_TASK_SYNC_URL);
+
+    verify(externalTaskService).updateRetries();
+    verifyNoMoreInteractions(externalTaskService);
+
+    verify(updateRetriesBuilder).externalTaskIds((List<String>) null);
+    verify(updateRetriesBuilder).processInstanceIds(processInstanceIds);
+    verify(updateRetriesBuilder).externalTaskQuery(null);
+    verify(updateRetriesBuilder).processInstanceQuery(null);
+    verify(updateRetriesBuilder).historicProcessInstanceQuery(null);
+    verify(updateRetriesBuilder).set(5);
+    verifyNoMoreInteractions(updateRetriesBuilder);
   }
 
   @Test
   public void testSetRetriesForExternalTasksWithNullExternalTaskIdsAsync() {
-    doThrow(BadUserRequestException.class).when(externalTaskService).setRetriesAsync(anyListOf(String.class), any(ExternalTaskQuery.class), any(ProcessInstanceQuery.class), any(HistoricProcessInstanceQuery.class), anyInt());
+    doThrow(BadUserRequestException.class).when(updateRetriesBuilder).setAsync(anyInt());
 
     List<String> externalTaskIds = null;
     Map<String, Object> parameters = new HashMap<String, Object>();
@@ -906,13 +1004,21 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     .when()
      .post(RETRIES_EXTERNAL_TASKS_ASYNC_URL);
 
-    verify(externalTaskService).setRetriesAsync(externalTaskIds, null, null, null, 5);
+    verify(externalTaskService).updateRetries();
     verifyNoMoreInteractions(externalTaskService);
+
+    verify(updateRetriesBuilder).externalTaskIds(externalTaskIds);
+    verify(updateRetriesBuilder).processInstanceIds((List<String>) null);
+    verify(updateRetriesBuilder).externalTaskQuery(null);
+    verify(updateRetriesBuilder).processInstanceQuery(null);
+    verify(updateRetriesBuilder).historicProcessInstanceQuery(null);
+    verify(updateRetriesBuilder).setAsync(5);
+    verifyNoMoreInteractions(updateRetriesBuilder);
   }
 
   @Test
   public void testSetNegativeRetriesForExternalTasksAsync() {
-    doThrow(BadUserRequestException.class).when(externalTaskService).setRetriesAsync(anyListOf(String.class), any(ExternalTaskQuery.class), any(ProcessInstanceQuery.class), any(HistoricProcessInstanceQuery.class), anyInt());
+    doThrow(BadUserRequestException.class).when(updateRetriesBuilder).setAsync(anyInt());
 
     List<String> externalTaskIds = null;
     Map<String, Object> parameters = new HashMap<String, Object>();
@@ -928,13 +1034,25 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     .when()
      .post(RETRIES_EXTERNAL_TASKS_ASYNC_URL);
 
-    verify(externalTaskService).setRetriesAsync(externalTaskIds, null, null, null, -5);
+    verify(externalTaskService).updateRetries();
     verifyNoMoreInteractions(externalTaskService);
+
+    verify(updateRetriesBuilder).externalTaskIds(externalTaskIds);
+    verify(updateRetriesBuilder).processInstanceIds((List<String>) null);
+    verify(updateRetriesBuilder).externalTaskQuery(null);
+    verify(updateRetriesBuilder).processInstanceQuery(null);
+    verify(updateRetriesBuilder).historicProcessInstanceQuery(null);
+    verify(updateRetriesBuilder).setAsync(-5);
+    verifyNoMoreInteractions(updateRetriesBuilder);
   }
 
   @Test
   public void testSetRetriesForExternalTasksAsyncWithProcessInstanceQuery() {
-    ProcessInstanceQuery processInstanceQuery = runtimeServiceMock.createProcessInstanceQuery();
+    when(runtimeServiceMock.createProcessInstanceQuery()).thenReturn(new ProcessInstanceQueryImpl());
+
+    ProcessInstanceQueryDto processInstanceQuery = new ProcessInstanceQueryDto();
+    processInstanceQuery.setProcessDefinitionId(EXAMPLE_PROCESS_DEFINITION_ID);
+
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("retries", "5");
     parameters.put("processInstanceQuery", processInstanceQuery);
@@ -948,34 +1066,69 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
       .when()
       .post(RETRIES_EXTERNAL_TASKS_ASYNC_URL);
 
-    verify(externalTaskService).setRetriesAsync(null, null, processInstanceQuery, null, 5);
+    ArgumentCaptor<ProcessInstanceQuery> queryCapture = ArgumentCaptor.forClass(ProcessInstanceQuery.class);
+
+    verify(externalTaskService).updateRetries();
     verifyNoMoreInteractions(externalTaskService);
+
+    verify(updateRetriesBuilder).externalTaskIds((List<String>) null);
+    verify(updateRetriesBuilder).processInstanceIds((List<String>) null);
+    verify(updateRetriesBuilder).externalTaskQuery(null);
+    verify(updateRetriesBuilder).processInstanceQuery(queryCapture.capture());
+    verify(updateRetriesBuilder).historicProcessInstanceQuery(null);
+    verify(updateRetriesBuilder).setAsync(5);
+    verifyNoMoreInteractions(updateRetriesBuilder);
+
+    ProcessInstanceQueryImpl actualQuery = (ProcessInstanceQueryImpl) queryCapture.getValue();
+    assertThat(actualQuery).isNotNull();
+    assertThat(actualQuery.getProcessDefinitionId()).isEqualTo(EXAMPLE_PROCESS_DEFINITION_ID);
   }
 
   @Test
   public void testSetRetriesForExternalTasksAsyncWithHistoricProcessInstanceQuery() {
-    HistoricProcessInstanceQuery historicProcessInstanceQuery = historyServiceMock.createHistoricProcessInstanceQuery();
+    when(historyServiceMock.createHistoricProcessInstanceQuery()).thenReturn(new HistoricProcessInstanceQueryImpl());
+
+    HistoricProcessInstanceQueryDto query = new HistoricProcessInstanceQueryDto();
+    query.setProcessDefinitionId(EXAMPLE_PROCESS_DEFINITION_ID);
+
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("retries", "5");
-    parameters.put("historicProcessInstanceQuery", historicProcessInstanceQuery);
+    parameters.put("historicProcessInstanceQuery", query);
 
     given()
       .contentType(POST_JSON_CONTENT_TYPE)
       .body(parameters)
-      .then()
+    .then()
       .expect()
       .statusCode(Status.OK.getStatusCode())
-      .when()
+    .when()
       .post(RETRIES_EXTERNAL_TASKS_ASYNC_URL);
 
-    verify(externalTaskService).setRetriesAsync(null, null, null, historicProcessInstanceQuery, 5);
-    verifyNoMoreInteractions(externalTaskService);
-  }
+    ArgumentCaptor<HistoricProcessInstanceQuery> queryCapture = ArgumentCaptor.forClass(HistoricProcessInstanceQuery.class);
 
+    verify(externalTaskService).updateRetries();
+    verifyNoMoreInteractions(externalTaskService);
+
+    verify(updateRetriesBuilder).externalTaskIds((List<String>) null);
+    verify(updateRetriesBuilder).processInstanceIds((List<String>) null);
+    verify(updateRetriesBuilder).externalTaskQuery(null);
+    verify(updateRetriesBuilder).processInstanceQuery(null);
+    verify(updateRetriesBuilder).historicProcessInstanceQuery(queryCapture.capture());
+    verify(updateRetriesBuilder).setAsync(5);
+    verifyNoMoreInteractions(updateRetriesBuilder);
+
+    HistoricProcessInstanceQueryImpl actualQuery = (HistoricProcessInstanceQueryImpl) queryCapture.getValue();
+    assertThat(actualQuery).isNotNull();
+    assertThat(actualQuery.getProcessDefinitionId()).isEqualTo(EXAMPLE_PROCESS_DEFINITION_ID);
+  }
 
   @Test
   public void testSetRetriesWithProcessInstanceQuery() {
-    ProcessInstanceQuery processInstanceQuery = runtimeServiceMock.createProcessInstanceQuery();
+    when(runtimeServiceMock.createProcessInstanceQuery()).thenReturn(new ProcessInstanceQueryImpl());
+
+    ProcessInstanceQueryDto processInstanceQuery = new ProcessInstanceQueryDto();
+    processInstanceQuery.setProcessDefinitionId(EXAMPLE_PROCESS_DEFINITION_ID);
+
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("retries", "5");
     parameters.put("processInstanceQuery", processInstanceQuery);
@@ -989,18 +1142,34 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     .when()
       .put(RETRIES_EXTERNAL_TASK_SYNC_URL);
 
-    verify(externalTaskService).setRetries(null, null, processInstanceQuery, null, 5);
-    verifyNoMoreInteractions(externalTaskService);
-  }
+    ArgumentCaptor<ProcessInstanceQuery> queryCapture = ArgumentCaptor.forClass(ProcessInstanceQuery.class);
 
+    verify(externalTaskService).updateRetries();
+    verifyNoMoreInteractions(externalTaskService);
+
+    verify(updateRetriesBuilder).externalTaskIds((List<String>) null);
+    verify(updateRetriesBuilder).processInstanceIds((List<String>) null);
+    verify(updateRetriesBuilder).externalTaskQuery(null);
+    verify(updateRetriesBuilder).processInstanceQuery(queryCapture.capture());
+    verify(updateRetriesBuilder).historicProcessInstanceQuery(null);
+    verify(updateRetriesBuilder).set(5);
+    verifyNoMoreInteractions(updateRetriesBuilder);
+
+    ProcessInstanceQueryImpl actualQuery = (ProcessInstanceQueryImpl) queryCapture.getValue();
+    assertThat(actualQuery).isNotNull();
+    assertThat(actualQuery.getProcessDefinitionId()).isEqualTo(EXAMPLE_PROCESS_DEFINITION_ID);
+  }
 
   @Test
   public void testSetRetriesWithHistoricProcessInstanceQuery() {
-    HistoricProcessInstanceQuery historicProcessInstanceQuery = historyServiceMock.createHistoricProcessInstanceQuery();
+    when(historyServiceMock.createHistoricProcessInstanceQuery()).thenReturn(new HistoricProcessInstanceQueryImpl());
+
+    HistoricProcessInstanceQueryDto query = new HistoricProcessInstanceQueryDto();
+    query.setProcessDefinitionId(EXAMPLE_PROCESS_DEFINITION_ID);
+
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("retries", "5");
-    parameters.put("historicProcessInstanceQuery", historicProcessInstanceQuery);
-
+    parameters.put("historicProcessInstanceQuery", query);
 
     given()
       .contentType(POST_JSON_CONTENT_TYPE)
@@ -1011,10 +1180,100 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     .when()
       .put(RETRIES_EXTERNAL_TASK_SYNC_URL);
 
-    verify(externalTaskService).setRetries(null, null, null, historicProcessInstanceQuery, 5);
+    ArgumentCaptor<HistoricProcessInstanceQuery> queryCapture = ArgumentCaptor.forClass(HistoricProcessInstanceQuery.class);
+
+    verify(externalTaskService).updateRetries();
     verifyNoMoreInteractions(externalTaskService);
+
+    verify(updateRetriesBuilder).externalTaskIds((List<String>) null);
+    verify(updateRetriesBuilder).processInstanceIds((List<String>) null);
+    verify(updateRetriesBuilder).externalTaskQuery(null);
+    verify(updateRetriesBuilder).processInstanceQuery(null);
+    verify(updateRetriesBuilder).historicProcessInstanceQuery(queryCapture.capture());
+    verify(updateRetriesBuilder).set(5);
+    verifyNoMoreInteractions(updateRetriesBuilder);
+
+    HistoricProcessInstanceQueryImpl actualQuery = (HistoricProcessInstanceQueryImpl) queryCapture.getValue();
+    assertThat(actualQuery).isNotNull();
+    assertThat(actualQuery.getProcessDefinitionId()).isEqualTo(EXAMPLE_PROCESS_DEFINITION_ID);
   }
 
+  @Test
+  public void testSetRetriesSyncWithExternalTaskQuery() {
+    when(externalTaskService.createExternalTaskQuery()).thenReturn(new ExternalTaskQueryImpl());
 
+    ExternalTaskQueryDto query = new ExternalTaskQueryDto();
+    query.setProcessDefinitionId(EXAMPLE_PROCESS_DEFINITION_ID);
+
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("retries", "5");
+    parameters.put("externalTaskQuery", query);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(parameters)
+    .then()
+      .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .put(RETRIES_EXTERNAL_TASK_SYNC_URL);
+
+    ArgumentCaptor<ExternalTaskQuery> queryCapture = ArgumentCaptor.forClass(ExternalTaskQuery.class);
+
+    verify(externalTaskService).updateRetries();
+    verify(externalTaskService).createExternalTaskQuery();
+    verifyNoMoreInteractions(externalTaskService);
+
+    verify(updateRetriesBuilder).externalTaskIds((List<String>) null);
+    verify(updateRetriesBuilder).processInstanceIds((List<String>) null);
+    verify(updateRetriesBuilder).externalTaskQuery(queryCapture.capture());
+    verify(updateRetriesBuilder).processInstanceQuery(null);
+    verify(updateRetriesBuilder).historicProcessInstanceQuery(null);
+    verify(updateRetriesBuilder).set(5);
+    verifyNoMoreInteractions(updateRetriesBuilder);
+
+    ExternalTaskQueryImpl actualQuery = (ExternalTaskQueryImpl) queryCapture.getValue();
+    assertThat(actualQuery).isNotNull();
+    assertThat(actualQuery.getProcessDefinitionId()).isEqualTo(EXAMPLE_PROCESS_DEFINITION_ID);
+  }
+
+  @Test
+  public void testSetRetriesAsyncWithExternalTaskQuery() {
+    when(externalTaskService.createExternalTaskQuery()).thenReturn(new ExternalTaskQueryImpl());
+
+    ExternalTaskQueryDto query = new ExternalTaskQueryDto();
+    query.setProcessDefinitionId(EXAMPLE_PROCESS_DEFINITION_ID);
+
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("retries", "5");
+    parameters.put("externalTaskQuery", query);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(parameters)
+    .then()
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(RETRIES_EXTERNAL_TASKS_ASYNC_URL);
+
+    ArgumentCaptor<ExternalTaskQuery> queryCapture = ArgumentCaptor.forClass(ExternalTaskQuery.class);
+
+    verify(externalTaskService).updateRetries();
+    verify(externalTaskService).createExternalTaskQuery();
+    verifyNoMoreInteractions(externalTaskService);
+
+    verify(updateRetriesBuilder).externalTaskIds((List<String>) null);
+    verify(updateRetriesBuilder).processInstanceIds((List<String>) null);
+    verify(updateRetriesBuilder).externalTaskQuery(queryCapture.capture());
+    verify(updateRetriesBuilder).processInstanceQuery(null);
+    verify(updateRetriesBuilder).historicProcessInstanceQuery(null);
+    verify(updateRetriesBuilder).setAsync(5);
+    verifyNoMoreInteractions(updateRetriesBuilder);
+
+    ExternalTaskQueryImpl actualQuery = (ExternalTaskQueryImpl) queryCapture.getValue();
+    assertThat(actualQuery).isNotNull();
+    assertThat(actualQuery.getProcessDefinitionId()).isEqualTo(EXAMPLE_PROCESS_DEFINITION_ID);
+  }
 
 }
