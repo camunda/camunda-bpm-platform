@@ -551,7 +551,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
   public void deleteCascade(String deleteReason, boolean skipCustomListeners, boolean skipIoMappings, boolean externallyTerminated) {
     this.deleteReason = deleteReason;
-    this.deleteRoot = true;
+    setDeleteRoot(true);
     this.isEnded = true;
     this.skipCustomListeners = skipCustomListeners;
     this.skipIoMapping = skipIoMappings;
@@ -561,7 +561,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
   public void deleteCascade2(String deleteReason) {
     this.deleteReason = deleteReason;
-    this.deleteRoot = true;
+    setDeleteRoot(true);
     performOperation(new FoxAtomicOperationDeleteCascadeFireActivityEnd());
   }
 
@@ -687,6 +687,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     // activity instance id handling
     this.activityInstanceId = execution.getActivityInstanceId();
     this.isActive = execution.isActive;
+    this.deleteRoot = execution.deleteRoot;
 
     this.replacedBy = null;
     execution.replacedBy = this;
@@ -1643,6 +1644,13 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
   public boolean isDeleteRoot() {
     return deleteRoot;
+  }
+
+  public void setDeleteRoot(boolean deleteRoot) {
+    if (getReplacedBy() != null) {
+      getReplacedBy().setDeleteRoot(deleteRoot);
+    }
+    this.deleteRoot = deleteRoot;
   }
 
   @Override
