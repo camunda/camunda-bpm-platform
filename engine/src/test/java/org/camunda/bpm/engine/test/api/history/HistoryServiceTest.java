@@ -519,10 +519,10 @@ public class HistoryServiceTest extends PluggableProcessEngineTestCase {
 
   public void testDeleteProcessInstanceUnexistingId() {
     try {
-      historyService.deleteHistoricProcessInstance("enexistingInstanceId");
+      historyService.deleteHistoricProcessInstance("unexistingInstanceId");
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("No historic process instances found", ae.getMessage());
+      assertTextPresent("No historic process instance found with id", ae.getMessage());
     }
   }
 
@@ -531,7 +531,7 @@ public class HistoryServiceTest extends PluggableProcessEngineTestCase {
       historyService.deleteHistoricProcessInstance(null);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("No historic process instances found", ae.getMessage());
+      assertTextPresent("processInstanceId is null", ae.getMessage());
     }
   }
 

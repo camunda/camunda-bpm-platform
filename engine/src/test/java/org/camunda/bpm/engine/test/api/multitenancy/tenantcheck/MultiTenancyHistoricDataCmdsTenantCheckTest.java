@@ -99,7 +99,7 @@ public class MultiTenancyHistoricDataCmdsTenantCheckTest {
     identityService.setAuthentication("user", null, null);
 
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("No historic process instances found");
+    thrown.expectMessage("No historic process instance found");
 
     historyService.deleteHistoricProcessInstance(processInstanceId);
   }

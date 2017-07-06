@@ -28,12 +28,6 @@ import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
  */
 public class HistoricActivityInstanceManager extends AbstractHistoricManager {
 
-  public void deleteHistoricActivityInstancesByProcessInstanceId(String historicProcessInstanceId) {
-    if (isHistoryEnabled()) {
-      getDbEntityManager().delete(HistoricActivityInstanceEntity.class, "deleteHistoricActivityInstancesByProcessInstanceId", historicProcessInstanceId);
-    }
-  }
-
   public void deleteHistoricActivityInstancesByProcessInstanceIds(List<String> historicProcessInstanceIds) {
     getDbEntityManager().deletePreserveOrder(HistoricActivityInstanceEntity.class, "deleteHistoricActivityInstancesByProcessInstanceIds", historicProcessInstanceIds);
   }

@@ -43,10 +43,6 @@ public class HistoricTaskInstanceManager extends AbstractHistoricManager {
     deleteHistoricTaskInstances("processInstanceId", processInstanceId);
   }
 
-  public void deleteHistoricTaskInstancesByProcessInstanceIds(List<String> processInstanceIds) {
-    deleteHistoricTaskInstancesByProcessInstanceIds(processInstanceIds, true);
-  }
-
   /**
    * Deletes all data related with tasks, which belongs to specified process instance ids.
    * @param processInstanceIds

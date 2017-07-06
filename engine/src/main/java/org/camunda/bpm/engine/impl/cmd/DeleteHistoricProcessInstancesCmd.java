@@ -26,10 +26,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureEquals;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNumberOfElements;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotContainsNull;
+
 
 /**
  * @author Askar Akhmerov
@@ -45,8 +46,9 @@ public class DeleteHistoricProcessInstancesCmd implements Command<Void>, Seriali
   @Override
   public Void execute(CommandContext commandContext) {
     ensureNotEmpty(BadUserRequestException.class,"processInstanceIds", processInstanceIds);
-    // Check if process instance is still running
+    ensureNotContainsNull(BadUserRequestException.class, "processInstanceId is null", "processInstanceIds", processInstanceIds);
 
+    // Check if process instance is still running
     List<HistoricProcessInstance> instances = commandContext.runWithoutAuthorization(new Callable<List<HistoricProcessInstance>>() {
       @Override
       public List<HistoricProcessInstance> call() throws Exception {
@@ -54,8 +56,13 @@ public class DeleteHistoricProcessInstancesCmd implements Command<Void>, Seriali
       }
     });
 
-    ensureNotEmpty(BadUserRequestException.class,"No historic process instances found", "historicProcessInstanceIds", instances);
+    if (processInstanceIds.size() == 1) {
+      ensureNotEmpty(BadUserRequestException.class,"No historic process instance found with id: " + processInstanceIds.get(0), "historicProcessInstanceIds", instances);
+    } else {
+      ensureNotEmpty(BadUserRequestException.class,"No historic process instances found", "historicProcessInstanceIds", instances);
+    }
 
+    // check if all historicProcessInstances were found
     List<String> existingIds = new ArrayList<String>();
 
     for (HistoricProcessInstance historicProcessInstance : instances) {

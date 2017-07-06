@@ -56,8 +56,8 @@ public class HistoricProcessInstanceManager extends AbstractHistoricManager {
       List<String> historicProcessInstanceIds = getDbEntityManager()
         .selectList("selectHistoricProcessInstanceIdsByProcessDefinitionId", processDefinitionId);
 
-      for (String historicProcessInstanceId: historicProcessInstanceIds) {
-        deleteHistoricProcessInstanceByIds(Arrays.asList(historicProcessInstanceId));
+      if (!historicProcessInstanceIds.isEmpty()) {
+        deleteHistoricProcessInstanceByIds(historicProcessInstanceIds);
       }
     }
   }

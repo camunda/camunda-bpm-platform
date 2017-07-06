@@ -86,6 +86,11 @@ public class BulkHistoryDeleteProcessInstancesAuthorizationTest {
             .withAuthorizations(
                 grant(Resources.PROCESS_DEFINITION, "processDefinition", "demo", Permissions.DELETE_HISTORY)
             )
+            .succeeds(),
+        scenario()
+            .withAuthorizations(
+                grant(Resources.PROCESS_DEFINITION, "*", "demo", Permissions.DELETE_HISTORY)
+            )
             .succeeds()
     );
   }
