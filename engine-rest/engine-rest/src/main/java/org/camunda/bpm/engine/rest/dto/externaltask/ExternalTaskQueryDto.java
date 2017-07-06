@@ -134,7 +134,7 @@ public class ExternalTaskQueryDto extends AbstractQueryDto<ExternalTaskQuery> {
     this.processInstanceId = processInstanceId;
   }
 
-  @CamundaQueryParam("processInstanceIdIn")
+  @CamundaQueryParam(value="processInstanceIdIn", converter = StringListConverter.class)
   public void setProcessInstanceIdIn(List<String> processInstanceIdIn) {
     this.processInstanceIdIn = processInstanceIdIn;
   }
@@ -225,7 +225,7 @@ public class ExternalTaskQueryDto extends AbstractQueryDto<ExternalTaskQuery> {
     if (processInstanceId != null) {
       query.processInstanceId(processInstanceId);
     }
-    if (processInstanceIdIn != null) {
+    if (processInstanceIdIn != null && !processInstanceIdIn.isEmpty()) {
       query.processInstanceIdIn(processInstanceIdIn.toArray(new String[processInstanceIdIn.size()]));
     }
     if (processDefinitionId != null) {

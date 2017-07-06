@@ -260,6 +260,13 @@
       <if test="processInstanceId != null">
         and RES.PROC_INST_ID_ = #{processInstanceId}
       </if>
+      <if test="processInstanceIdIn != null &amp;&amp; processInstanceIdIn.length > 0">
+        and RES.PROC_INST_ID_ in
+        <foreach item="processInstanceId" index="index" collection="processInstanceIdIn"
+                 open="(" separator="," close=")">
+          #{processInstanceId}
+        </foreach>
+      </if>
       <if test="processDefinitionId != null">
         and RES.PROC_DEF_ID_ = #{processDefinitionId}
       </if>
