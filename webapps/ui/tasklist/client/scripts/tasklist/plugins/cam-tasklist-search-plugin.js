@@ -73,6 +73,7 @@ var Controller = [
   ) {
 
     $scope.searches = [];
+    $scope.matchType = '';
     $scope.translations = {};
 
     angular.forEach(searchConfig.tooltips, function(value, key) {
@@ -96,26 +97,37 @@ var Controller = [
     });
 
     var searchData = $scope.tasklistData.newChild($scope);
-    $scope.$watch('searches', function() {
-      var query = {};
+    $scope.$watch('[searches, matchType]', function() {
+      var baseQuery = {};
+      var tempQuery;
 
-      query.processVariables = [];
-      query.taskVariables = [];
-      query.caseInstanceVariables = [];
+      if ($scope.matchType === 'any') {
+        baseQuery.orQueries = [{}];
+        tempQuery = baseQuery.orQueries[0];
+      } else {
+        baseQuery.processVariables = [];
+        baseQuery.taskVariables = [];
+        baseQuery.caseInstanceVariables = [];
+        tempQuery = baseQuery;
+      }
 
       angular.forEach($scope.searches, function(search) {
-        if(typeof query[search.type.value.key] === 'object') {
-          query[search.type.value.key].push({
+        if(typeof tempQuery[search.type.value.key] === 'object') {
+          tempQuery[search.type.value.key].push({
             name: typeof search.name.value === 'object' ? search.name.value.key : search.name.value,
             operator: search.operator.value.key,
             value: getQueryValueBySearch(search)
           });
         } else {
-          query[sanitizeProperty(search, search.type.value.key, search.operator.value.key, search.value.value)] = getQueryValueBySearch(search);
+          tempQuery[sanitizeProperty(search, search.type.value.key, search.operator.value.key, search.value.value)] = getQueryValueBySearch(search);
         }
       });
 
-      searchData.set('searchQuery', query);
+      if (tempQuery === null) {
+        delete baseQuery.orQueries;
+      }
+
+      searchData.set('searchQuery', baseQuery);
     }, true);
 
     searchData.observe('currentFilter', function(filter) {
