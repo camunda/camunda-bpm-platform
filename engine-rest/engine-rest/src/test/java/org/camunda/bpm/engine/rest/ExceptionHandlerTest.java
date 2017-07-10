@@ -27,6 +27,7 @@ public class ExceptionHandlerTest extends AbstractRestServiceTest {
   private static final String REST_EXCEPTION_URL = EXCEPTION_RESOURCE_URL + "/restException";
   private static final String AUTH_EXCEPTION_URL = EXCEPTION_RESOURCE_URL + "/authorizationException";
   private static final String AUTH_EXCEPTION_MULTIPLE_URL = EXCEPTION_RESOURCE_URL + "/authorizationExceptionMultiple";
+  private static final String STACK_OVERFLOW_ERROR_URL = EXCEPTION_RESOURCE_URL + "/stackOverflowError";
 
 
   @Test
@@ -96,4 +97,15 @@ public class ExceptionHandlerTest extends AbstractRestServiceTest {
       .body("missingAuthorizations.permissionName", hasItems("somePermission1", "somePermission2"))
     .when().get(AUTH_EXCEPTION_MULTIPLE_URL);
   }
+
+  @Test
+  public void testThrowableHandler() {
+    given().header(ACCEPT_WILDCARD_HEADER)
+      .expect().contentType(ContentType.JSON)
+      .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+        .body("type", equalTo(StackOverflowError.class.getSimpleName()))
+        .body("message", equalTo("Stack overflow"))
+      .when().get(STACK_OVERFLOW_ERROR_URL);
+  }
+
 }

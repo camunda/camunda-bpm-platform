@@ -25,22 +25,25 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Translates any {@link Exception} to a HTTP 500 error and a JSON response. 
+ * Translates any {@link Throwable} to a HTTP 500 error and a JSON response.
  * Response content format: <code>{"type" : "ExceptionType", "message" : "some exception message"}
  * @author nico.rehwaldt
  */
 @Provider
-public class ExceptionHandler implements ExceptionMapper<Exception> {
+public class ExceptionHandler implements ExceptionMapper<Throwable> {
 
   private static final Logger LOGGER = Logger.getLogger(ExceptionHandler.class.getSimpleName());
 
   @Override
-  public Response toResponse(Exception exception) {
-    ExceptionDto dto = ExceptionDto.fromException(exception);
+  public Response toResponse(Throwable throwable) {
 
-    LOGGER.log(Level.WARNING, getStackTrace(exception));
-    
-    return Response.serverError().entity(dto).type(MediaType.APPLICATION_JSON_TYPE).build();
+    LOGGER.log(Level.WARNING, getStackTrace(throwable));
+
+    ExceptionDto exceptionDto = ExceptionHandlerHelper.getInstance().fromException(throwable);
+
+    Response.Status responseStatus = ExceptionHandlerHelper.getInstance().getStatus(throwable);
+
+    return Response.status(responseStatus).entity(exceptionDto).type(MediaType.APPLICATION_JSON_TYPE).build();
   }
   
   protected String getStackTrace(Throwable aThrowable) {

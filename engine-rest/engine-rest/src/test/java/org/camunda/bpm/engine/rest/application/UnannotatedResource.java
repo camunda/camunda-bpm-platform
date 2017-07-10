@@ -44,6 +44,12 @@ public class UnannotatedResource {
   }
 
   @GET
+  @Path("/stackOverflowError")
+  public String throwStackOverflowError() throws Throwable {
+    throw new StackOverflowError("Stack overflow");
+  }
+
+  @GET
   @Path("/authorizationExceptionMultiple")
   public String throwAuthorizationExceptionMultiple() throws Exception {
     List<MissingAuthorization> missingAuthorizations = new ArrayList<MissingAuthorization>();

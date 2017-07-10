@@ -25,15 +25,17 @@ public class RestExceptionHandler implements ExceptionMapper<RestException> {
 
   @Override
   public Response toResponse(RestException exception) {
-    ExceptionDto dto = ExceptionDto.fromException(exception);
+
+    Response.Status responseStatus = ExceptionHandlerHelper.getInstance().getStatus(exception);
+    ExceptionDto exceptionDto = ExceptionHandlerHelper.getInstance().fromException(exception);
 
     LOGGER.log(Level.WARNING, getStackTrace(exception));
-    
-    if (exception.getStatus() != null) {
-      return Response.status(exception.getStatus()).entity(dto).type(MediaType.APPLICATION_JSON_TYPE).build();
-    } else {
-      return Response.serverError().entity(dto).type(MediaType.APPLICATION_JSON_TYPE).build();
-    }
+
+    return Response
+      .status(responseStatus)
+      .entity(exceptionDto)
+      .type(MediaType.APPLICATION_JSON_TYPE)
+      .build();
   }
   
   protected String getStackTrace(Throwable aThrowable) {

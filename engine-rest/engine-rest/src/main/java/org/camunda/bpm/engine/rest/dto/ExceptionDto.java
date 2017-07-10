@@ -44,6 +44,16 @@ public class ExceptionDto {
     return dto;
   }
 
+  public static ExceptionDto fromException(Throwable e) {
+
+    ExceptionDto dto = new ExceptionDto();
+
+    dto.type = e.getClass().getSimpleName();
+    dto.message = e.getMessage();
+
+    return dto;
+  }
+
   public void setType(String type) {
     this.type = type;
   }

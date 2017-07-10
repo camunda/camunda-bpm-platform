@@ -13,14 +13,8 @@
 package org.camunda.bpm.engine.rest.exception;
 
 import org.camunda.bpm.engine.AuthorizationException;
-import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.migration.MigratingProcessInstanceValidationException;
-import org.camunda.bpm.engine.migration.MigrationPlanValidationException;
-import org.camunda.bpm.engine.rest.dto.AuthorizationExceptionDto;
 import org.camunda.bpm.engine.rest.dto.ExceptionDto;
-import org.camunda.bpm.engine.rest.dto.migration.MigratingProcessInstanceValidationExceptionDto;
-import org.camunda.bpm.engine.rest.dto.migration.MigrationPlanValidationExceptionDto;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -55,53 +49,15 @@ public class ProcessEngineExceptionHandler implements ExceptionMapper<ProcessEng
 
     LOGGER.log(Level.WARNING, getStackTrace(exception));
 
-    // provide custom handling of authorization exception
-    if (exception instanceof AuthorizationException) {
+    Status responseStatus = ExceptionHandlerHelper.getInstance().getStatus(exception);
 
-      AuthorizationExceptionDto exceptionDto = AuthorizationExceptionDto.fromException((AuthorizationException)exception);
+    ExceptionDto exceptionDto = ExceptionHandlerHelper.getInstance().fromException(exception);
 
-      return Response
-        .status(Status.FORBIDDEN)
-        .entity(exceptionDto)
-        .type(MediaType.APPLICATION_JSON_TYPE)
-        .build();
-
-    }
-    else if (exception instanceof MigrationPlanValidationException) {
-      MigrationPlanValidationExceptionDto dto = MigrationPlanValidationExceptionDto.from((MigrationPlanValidationException) exception);
-      return Response
-        .status(Status.BAD_REQUEST)
-        .entity(dto)
-        .type(MediaType.APPLICATION_JSON_TYPE)
-        .build();
-    }
-    else if (exception instanceof MigratingProcessInstanceValidationException) {
-      MigratingProcessInstanceValidationExceptionDto dto = MigratingProcessInstanceValidationExceptionDto
-        .from((MigratingProcessInstanceValidationException) exception);
-      return Response
-        .status(Status.BAD_REQUEST)
-        .entity(dto)
-        .type(MediaType.APPLICATION_JSON_TYPE)
-        .build();
-    }
-    else if (exception instanceof BadUserRequestException) {
-      ExceptionDto dto = ExceptionDto.fromException(exception);
-      return Response
-          .status(Status.BAD_REQUEST)
-          .entity(dto)
-          .type(MediaType.APPLICATION_JSON_TYPE)
-          .build();
-    }
-    else {
-
-      ExceptionDto exceptionDto = ExceptionDto.fromException(exception);
-
-      return Response
-        .serverError()
-        .entity(exceptionDto)
-        .type(MediaType.APPLICATION_JSON_TYPE)
-        .build();
-    }
+    return Response
+      .status(responseStatus)
+      .entity(exceptionDto)
+      .type(MediaType.APPLICATION_JSON_TYPE)
+      .build();
 
   }
 
