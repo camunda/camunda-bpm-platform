@@ -1199,74 +1199,46 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
 
   public void testExtendTaskQuery_ORInExtendingQuery() {
     // given
-    Task task1 = taskService.newTask();
-    task1.setName("taskForOr1");
-    task1.setDescription("aTaskDescription1");
-    taskService.saveTask(task1);
-
-    Task task2 = taskService.newTask();
-    task2.setName("taskForOr2");
-    task2.setDescription("aTaskDescription2");
-    taskService.saveTask(task2);
-
-    Task task3 = taskService.newTask();
-    task3.setName("taskForOr3");
-    taskService.saveTask(task3);
-
-    Task task4 = taskService.newTask();
-    task4.setDescription("aTaskDescription4");
-    taskService.saveTask(task4);
+    createTasksForOrQueries();
 
     // when
     TaskQuery extendedQuery = taskService.createTaskQuery()
-      .taskNameLike("taskForOr%");
+      .taskName("taskForOr");
 
     Filter extendedFilter = filterService.newTaskFilter("extendedOrFilter");
     extendedFilter.setQuery(extendedQuery);
     filterService.saveFilter(extendedFilter);
 
     TaskQuery extendingQuery = taskService.createTaskQuery()
-      .startOr()
-        .taskDescriptionLike("aTaskDescription%")
+      .or()
+        .taskDescription("aTaskDescription")
+        .taskOwner("aTaskOwner")
       .endOr()
-      .startOr()
-        .taskNameLike("taskForOr%")
+      .or()
+        .taskPriority(3)
+        .taskAssignee("aTaskAssignee")
       .endOr();
 
     // then
-    assertEquals(3, extendedQuery.list().size());
-    assertEquals(3, filterService.list(extendedFilter.getId()).size());
-    assertEquals(2, extendingQuery.list().size());
-    assertEquals(2, filterService.list(extendedFilter.getId(), extendingQuery).size());
+    assertEquals(4, extendedQuery.list().size());
+    assertEquals(4, filterService.list(extendedFilter.getId()).size());
+    assertEquals(6, extendingQuery.list().size());
+    assertEquals(3, filterService.list(extendedFilter.getId(), extendingQuery).size());
   }
 
   public void testExtendTaskQuery_ORInExtendedQuery() {
     // given
-    Task task1 = taskService.newTask();
-    task1.setName("taskForOr1");
-    task1.setDescription("aTaskDescription1");
-    taskService.saveTask(task1);
-
-    Task task2 = taskService.newTask();
-    task2.setName("taskForOr2");
-    task2.setDescription("aTaskDescription2");
-    taskService.saveTask(task2);
-
-    Task task3 = taskService.newTask();
-    task3.setName("taskForOr3");
-    taskService.saveTask(task3);
-
-    Task task4 = taskService.newTask();
-    task4.setDescription("aTaskDescription4");
-    taskService.saveTask(task4);
+    createTasksForOrQueries();
 
     // when
     TaskQuery extendedQuery = taskService.createTaskQuery()
-      .startOr()
-        .taskDescriptionLike("aTaskDescription%")
+      .or()
+        .taskDescription("aTaskDescription")
+        .taskOwner("aTaskOwner")
       .endOr()
-      .startOr()
-        .taskNameLike("taskForOr%")
+      .or()
+        .taskPriority(3)
+        .taskAssignee("aTaskAssignee")
       .endOr();
 
     Filter extendedFilter = filterService.newTaskFilter("extendedOrFilter");
@@ -1274,52 +1246,24 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     filterService.saveFilter(extendedFilter);
 
     TaskQuery extendingQuery = taskService.createTaskQuery()
-      .taskNameLike("taskForOr%");
+      .taskName("taskForOr");
 
     // then
-    assertEquals(2, extendedQuery.list().size());
-    assertEquals(2, filterService.list(extendedFilter.getId()).size());
-    assertEquals(3, extendingQuery.list().size());
-    assertEquals(2, filterService.list(extendedFilter.getId(), extendingQuery).size());
+    assertEquals(6, extendedQuery.list().size());
+    assertEquals(6, filterService.list(extendedFilter.getId()).size());
+    assertEquals(4, extendingQuery.list().size());
+    assertEquals(3, filterService.list(extendedFilter.getId(), extendingQuery).size());
   }
 
   public void testExtendTaskQuery_ORInBothExtendedAndExtendingQuery() {
     // given
-    Task task1 = taskService.newTask();
-    task1.setName("taskForOr1");
-    task1.setDescription("aTaskDescription1");
-    task1.setPriority(3);
-    taskService.saveTask(task1);
-    taskService.addCandidateUser(task1.getId(), "aTaskCandidateUser");
-
-    Task task2 = taskService.newTask();
-    task2.setName("taskForOr2");
-    task2.setDescription("aTaskDescription2");
-    task2.setPriority(3);
-    taskService.saveTask(task2);
-    taskService.addCandidateUser(task2.getId(), "aTaskCandidateUser");
-
-    Task task3 = taskService.newTask();
-    task3.setName("taskForOr3");
-    task3.setDescription("aTaskDescription3");
-    task3.setPriority(3);
-    taskService.saveTask(task3);
-    taskService.addCandidateUser(task3.getId(), "aTaskCandidateUser");
-
-    Task task4 = taskService.newTask();
-    task4.setName("taskForOr4");
-    task4.setDescription("aTaskDescription4");
-    task4.setPriority(3);
-    taskService.saveTask(task4);
-    taskService.addCandidateUser(task4.getId(), "aTaskCandidateUser");
+    createTasksForOrQueries();
 
     // when
     TaskQuery extendedQuery = taskService.createTaskQuery()
-      .startOr()
-        .taskDescriptionLike("aTaskDescription%")
-      .endOr()
-      .startOr()
-        .taskNameLike("taskForOr%")
+      .or()
+        .taskName("taskForOr")
+        .taskDescription("aTaskDescription")
       .endOr();
 
     Filter extendedFilter = filterService.newTaskFilter("extendedOrFilter");
@@ -1327,18 +1271,20 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     filterService.saveFilter(extendedFilter);
 
     TaskQuery extendingQuery = taskService.createTaskQuery()
-      .startOr()
-        .taskPriority(3)
+      .or()
+        .tenantIdIn("aTenantId")
+        .taskOwner("aTaskOwner")
       .endOr()
-      .startOr()
-        .taskCandidateUser("aTaskCandidateUser")
+      .or()
+        .taskPriority(3)
+        .taskAssignee("aTaskAssignee")
       .endOr();
 
     // then
-    assertEquals(4, extendedQuery.count());
-    assertEquals(4, filterService.list(extendedFilter.getId()).size());
-    assertEquals(4, extendingQuery.count());
-    assertEquals(4, filterService.list(extendedFilter.getId(), extendingQuery).size());
+    assertEquals(6, extendedQuery.list().size());
+    assertEquals(6, filterService.list(extendedFilter.getId()).size());
+    assertEquals(4, extendingQuery.list().size());
+    assertEquals(3, filterService.list(extendedFilter.getId(), extendingQuery).size());
   }
 
   protected void saveQuery(Query query) {
@@ -1368,6 +1314,50 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     task.setOwner(testUser.getId());
     task.setDelegationState(DelegationState.RESOLVED);
     taskService.saveTask(task);
+  }
+
+  protected void createTasksForOrQueries() {
+    Task task1 = taskService.newTask();
+    task1.setName("taskForOr");
+    task1.setDescription("aTaskDescription");
+    task1.setPriority(3);
+    taskService.saveTask(task1);
+
+    Task task2 = taskService.newTask();
+    task2.setName("taskForOr");
+    task2.setDescription("aTaskDescription");
+    task2.setAssignee("aTaskAssignee");
+    task2.setTenantId("aTenantId");
+    taskService.saveTask(task2);
+
+    Task task3 = taskService.newTask();
+    task3.setName("taskForOr");
+    task3.setOwner("aTaskOwner");
+    taskService.saveTask(task3);
+
+    Task task4 = taskService.newTask();
+    task4.setName("taskForOr");
+    task4.setOwner("aTaskOwner");
+    task4.setPriority(3);
+    taskService.saveTask(task4);
+
+    Task task5 = taskService.newTask();
+    task5.setDescription("aTaskDescription");
+    task5.setAssignee("aTaskAssignee");
+    taskService.saveTask(task5);
+
+    Task task6 = taskService.newTask();
+    task6.setDescription("aTaskDescription");
+    task6.setAssignee("aTaskAssignee");
+    task6.setTenantId("aTenantId");
+    taskService.saveTask(task6);
+
+    Task task7 = taskService.newTask();
+    task7.setTenantId("aTenantId");
+    task7.setOwner("aTaskOwner");
+    task7.setPriority(3);
+    task7.setAssignee("aTaskAssignee");
+    taskService.saveTask(task7);
   }
 
 }

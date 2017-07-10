@@ -927,24 +927,29 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
   TaskQuery orderByTenantId();
 
   /**
-   * <p>Starts an "or query" instance to apply filters on.</p>
+   * <p>After calling or(), a chain of several filter criteria could follow. Each filter criterion that follows or()
+   * will be linked together with an OR expression until the OR query is terminated. To terminate the OR query right
+   * after the last filter criterion was applied, {@link #endOr()} must be invoked.</p>
    *
-   * @return the created "or query" instance.
+   * @return an object of the type {@link TaskQuery} on which an arbitrary amount of filter criteria could be applied.
+   * The several filter criteria will be linked together by an OR expression.
    *
-   * @throws ProcessEngineException When method has been invoked within an "or query" instance.
-   */
-  TaskQuery startOr();
+   * @throws ProcessEngineException when or() has been invoked directly after or() or after or() and trailing filter
+   * criteria. To prevent throwing this exception, {@link #endOr()} must be invoked after a chain of filter criteria to
+   * mark the end of the OR query.
+   * */
+  TaskQuery or();
 
   /**
-   * <p>Closes an "or query" instance.</p>
+   * <p>endOr() terminates an OR query on which an arbitrary amount of filter criteria were applied. To terminate the
+   * OR query which has been started by invoking {@link #or()}, endOr() must be invoked. Filter criteria which are
+   * applied after calling endOr() are linked together by an AND expression.</p>
    *
-   * @return the base query instance.
+   * @return an object of the type {@link TaskQuery} on which an arbitrary amount of filter criteria could be applied.
+   * The filter criteria will be linked together by an AND expression.
    *
-   * @throws ProcessEngineException
-   * <ul>
-   *   <li>When method has been invoked before {@link #startOr()}</li>
-   *   <li>When no filter has been applied on "or query"</li>
-   * </ul>
-   */
+   * @throws ProcessEngineException when endOr() has been invoked before {@link #or()} was invoked. To prevent throwing
+   * this exception, {@link #or()} must be invoked first.
+   * */
   TaskQuery endOr();
 }

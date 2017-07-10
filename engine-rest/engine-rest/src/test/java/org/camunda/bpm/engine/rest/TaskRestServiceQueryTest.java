@@ -31,10 +31,12 @@ import org.camunda.bpm.application.ProcessApplicationInfo;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.identity.UserQuery;
+import org.camunda.bpm.engine.impl.TaskQueryImpl;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
+import org.camunda.bpm.engine.rest.dto.task.TaskQueryDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.hal.Hal;
 import org.camunda.bpm.engine.rest.helper.EqualsList;
@@ -51,6 +53,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.mockito.ArgumentMatcher;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 
@@ -72,7 +75,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
   }
 
   private TaskQuery setUpMockTaskQuery(List<Task> mockedTasks) {
-    TaskQuery sampleTaskQuery = mock(TaskQuery.class);
+    TaskQuery sampleTaskQuery = mock(TaskQueryImpl.class);
     when(sampleTaskQuery.list()).thenReturn(mockedTasks);
     when(sampleTaskQuery.count()).thenReturn((long) mockedTasks.size());
     when(sampleTaskQuery.taskCandidateGroup(anyString())).thenReturn(sampleTaskQuery);
@@ -1546,6 +1549,34 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     .when().get(TASK_QUERY_URL);
 
     verify(mockQuery, never()).withoutCandidateGroups();
+  }
+
+  @Test
+  public void testOrQuery() {
+    TaskQueryDto queryDto = TaskQueryDto.fromQuery(new TaskQueryImpl()
+      .or()
+        .taskName(MockProvider.EXAMPLE_TASK_NAME)
+        .taskDescription(MockProvider.EXAMPLE_TASK_DESCRIPTION)
+      .endOr());
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .header(ACCEPT_JSON_HEADER)
+      .body(queryDto)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(TASK_QUERY_URL);
+
+    verify(((TaskQueryImpl) mockQuery)).addOrQuery(argThat(new ArgumentMatcher<TaskQueryImpl>() {
+      @Override
+      public boolean matches(Object argument) {
+        TaskQueryImpl argumentQuery = (TaskQueryImpl) argument;
+
+        return MockProvider.EXAMPLE_TASK_DESCRIPTION.equals(argumentQuery.getDescription()) &&
+          MockProvider.EXAMPLE_TASK_NAME.equals(argumentQuery.getName());
+      }
+    }));
   }
 
 }

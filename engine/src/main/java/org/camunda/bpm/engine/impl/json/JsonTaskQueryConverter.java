@@ -193,10 +193,10 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     addField(json, CASE_EXECUTION_ID, query.getCaseExecutionId());
     addTenantIdFields(json, query);
 
-    if (!query.getOrQueries().isEmpty() && !isOrQueryActive) {
+    if (query.getQueries().size() > 1 && !isOrQueryActive) {
       JSONArray orQueries = new JSONArray();
 
-      for (TaskQueryImpl orQuery : query.getOrQueries()) {
+      for (TaskQueryImpl orQuery: query.getQueries()) {
         if (orQuery != null && orQuery.isOrQueryActive()) {
           orQueries.put(toJsonObject(orQuery, true));
         }

@@ -32,12 +32,12 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 /**
  * @author Tassilo Weidner
@@ -45,7 +45,10 @@ import static org.junit.Assert.fail;
 public class TaskQueryOrTest {
 
   @Rule
-  public ProcessEngineRule rule = new ProcessEngineRule();
+  public ProcessEngineRule processEngineRule = new ProcessEngineRule();
+
+  @Rule
+  public ExpectedException thrown = ExpectedException.none();
 
   protected RuntimeService runtimeService;
   protected TaskService taskService;
@@ -55,11 +58,11 @@ public class TaskQueryOrTest {
 
   @Before
   public void init() {
-    runtimeService = rule.getRuntimeService();
-    taskService = rule.getTaskService();
-    caseService = rule.getCaseService();
-    repositoryService = rule.getRepositoryService();
-    filterService = rule.getFilterService();
+    runtimeService = processEngineRule.getRuntimeService();
+    taskService = processEngineRule.getTaskService();
+    caseService = processEngineRule.getCaseService();
+    repositoryService = processEngineRule.getRepositoryService();
+    filterService = processEngineRule.getFilterService();
   }
 
   @After
@@ -76,126 +79,93 @@ public class TaskQueryOrTest {
 
   @Test
   public void shouldThrowExceptionByMissingStartOr() {
-    try {
-      taskService.createTaskQuery()
-        .startOr()
-          .taskName("aTaskName")
-        .endOr()
-        .endOr();
-      fail("expected exception");
-    } catch (ProcessEngineException e) { }
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("Invalid query usage: cannot set endOr() before or()");
+
+    taskService.createTaskQuery()
+      .or()
+      .endOr()
+      .endOr();
   }
 
   @Test
   public void shouldThrowExceptionByNesting() {
-    try {
-      taskService.createTaskQuery()
-        .startOr()
-          .taskName("aTaskName")
-          .startOr()
-            .taskName("anotherTaskName")
-          .endOr()
-        .endOr()
-        .startOr()
-          .taskName("aTaskName")
-        .endOr();
-      fail("expected exception");
-    } catch (ProcessEngineException e) { }
-  }
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("Invalid query usage: cannot set or() within 'or' query");
 
-  @Test
-  public void shouldThrowExceptionByEmptyOrQuery() {
-    try {
-      taskService.createTaskQuery()
-        .startOr()
-          .taskName("aTaskName")
+    taskService.createTaskQuery()
+      .or()
+        .or()
         .endOr()
-        .startOr()
-        .endOr();
-      fail("expected exception");
-    } catch (ProcessEngineException e) { }
+      .endOr()
+      .or()
+      .endOr();
   }
 
   @Test
   public void shouldThrowExceptionByWithCandidateGroupsApplied() {
-    try {
-      taskService.createTaskQuery()
-        .startOr()
-          .taskName("aTaskName")
-        .endOr()
-        .startOr()
-          .withCandidateGroups()
-        .endOr();
-      fail("expected exception");
-    } catch (ProcessEngineException e) { }
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("Invalid query usage: cannot set withCandidateGroups() within 'or' query");
+
+    taskService.createTaskQuery()
+      .or()
+        .withCandidateGroups()
+      .endOr();
   }
 
   @Test
   public void shouldThrowExceptionByWithoutCandidateGroupsApplied() {
-    try {
-      taskService.createTaskQuery()
-        .startOr()
-          .taskName("aTaskName")
-        .endOr()
-        .startOr()
-          .withoutCandidateGroups()
-        .endOr();
-      fail("expected exception");
-    } catch (ProcessEngineException e) { }
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("Invalid query usage: cannot set withoutCandidateGroups() within 'or' query");
+
+    taskService.createTaskQuery()
+      .or()
+        .withoutCandidateGroups()
+      .endOr();
   }
 
   @Test
   public void shouldThrowExceptionByWithCandidateUsersApplied() {
-    try {
-      taskService.createTaskQuery()
-        .startOr()
-          .taskName("aTaskName")
-        .endOr()
-        .startOr()
-          .withCandidateUsers()
-        .endOr();
-      fail("expected exception");
-    } catch (ProcessEngineException e) { }
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("Invalid query usage: cannot set withCandidateUsers() within 'or' query");
+
+    taskService.createTaskQuery()
+      .or()
+        .withCandidateUsers()
+      .endOr();
   }
 
   @Test
   public void shouldThrowExceptionByWithoutCandidateUsersApplied() {
-    try {
-      taskService.createTaskQuery()
-        .startOr()
-          .taskName("aTaskName")
-        .endOr()
-        .startOr()
-          .withoutCandidateUsers()
-        .endOr();
-      fail("expected exception");
-    } catch (ProcessEngineException e) { }
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("Invalid query usage: cannot set withoutCandidateUsers() within 'or' query");
+
+    taskService.createTaskQuery()
+      .or()
+        .withoutCandidateUsers()
+      .endOr();
   }
 
   @Test
   public void shouldThrowExceptionByOrderingApplied() {
-    try {
-      taskService.createTaskQuery()
-        .startOr()
-          .taskName("aTaskName")
-        .endOr()
-        .startOr()
-          .taskName("Task")
-          .orderByCaseExecutionId()
-        .endOr();
-      fail("expected exception");
-    } catch (ProcessEngineException e) { }
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("Invalid query usage: cannot set orderByCaseExecutionId() within 'or' query");
+
+    taskService.createTaskQuery()
+      .or()
+        .orderByCaseExecutionId()
+      .endOr();
   }
 
   @Test
   public void shouldThrowExceptionByInitializeFormKeysInOrQuery() {
-    try {
-      taskService.createTaskQuery()
-        .startOr()
-          .initializeFormKeys()
-        .endOr();
-      fail("expected exception");
-    } catch (ProcessEngineException e) { }
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("Invalid query usage: cannot set initializeFormKeys() within 'or' query");
+
+    taskService.createTaskQuery()
+      .or()
+        .initializeFormKeys()
+      .endOr();
   }
 
   @Test
@@ -207,18 +177,34 @@ public class TaskQueryOrTest {
 
     Task task2 = taskService.newTask();
     taskService.saveTask(task2);
-    taskService.addCandidateGroup(task1.getId(), "aCandidateGroup");
+    taskService.addCandidateGroup(task2.getId(), "aCandidateGroup");
 
     // when
     List<Task> tasks = taskService.createTaskQuery()
       .taskCandidateUser("aCandidateUser")
-      .startOr()
+      .or()
         .taskCandidateGroup("aCandidateGroup")
       .endOr()
       .list();
 
     // then
     assertEquals(0, tasks.size());
+  }
+
+  @Test
+  public void shouldReturnTasksWithEmptyOrQuery() {
+    // given
+    taskService.saveTask(taskService.newTask());
+    taskService.saveTask(taskService.newTask());
+
+    // when
+    List<Task> tasks = taskService.createTaskQuery()
+      .or()
+      .endOr()
+      .list();
+
+    // then
+    assertEquals(2, tasks.size());
   }
 
   @Test
@@ -234,7 +220,7 @@ public class TaskQueryOrTest {
 
     // when
     List<Task> tasks = taskService.createTaskQuery()
-      .startOr()
+      .or()
         .taskCandidateUser("John Doe")
         .taskCandidateGroup("Controlling")
       .endOr()
@@ -258,7 +244,7 @@ public class TaskQueryOrTest {
 
     // when
     List<Task> tasks = taskService.createTaskQuery()
-      .startOr()
+      .or()
         .taskCandidateUser("John Doe")
         .taskCandidateGroup("Controlling")
         .includeAssignedTasks()
@@ -286,7 +272,7 @@ public class TaskQueryOrTest {
 
     // when
     List<Task> tasks = taskService.createTaskQuery()
-      .startOr()
+      .or()
         .taskCandidateUser("John Doe")
         .taskCandidateGroupIn(Arrays.asList("Controlling", "Sales"))
       .endOr()
@@ -313,7 +299,7 @@ public class TaskQueryOrTest {
 
     // when
     List<Task> tasks = taskService.createTaskQuery()
-      .startOr()
+      .or()
         .taskCandidateGroup("Accounting")
         .taskCandidateGroupIn(Arrays.asList("Controlling", "Sales"))
       .endOr()
@@ -336,7 +322,7 @@ public class TaskQueryOrTest {
 
     // when
     List<Task> tasks = taskService.createTaskQuery()
-      .startOr()
+      .or()
         .taskName("aTaskName")
         .taskDescription("aTaskDescription")
       .endOr()
@@ -344,6 +330,189 @@ public class TaskQueryOrTest {
 
     // then
     assertEquals(2, tasks.size());
+  }
+
+  @Test
+  public void shouldReturnTasksWithMultipleOrCriteria() {
+    // given
+    Task task1 = taskService.newTask();
+    task1.setName("aTaskName");
+    taskService.saveTask(task1);
+
+    Task task2 = taskService.newTask();
+    task2.setDescription("aTaskDescription");
+    taskService.saveTask(task2);
+
+    Task task3 = taskService.newTask();
+    taskService.saveTask(task3);
+
+    Task task4 = taskService.newTask();
+    task4.setPriority(5);
+    taskService.saveTask(task4);
+
+    Task task5 = taskService.newTask();
+    task5.setOwner("aTaskOwner");
+    taskService.saveTask(task5);
+
+    // when
+    List<Task> tasks = taskService.createTaskQuery()
+      .or()
+        .taskName("aTaskName")
+        .taskDescription("aTaskDescription")
+        .taskId(task3.getId())
+        .taskPriority(5)
+        .taskOwner("aTaskOwner")
+      .endOr()
+      .list();
+
+    // then
+    assertEquals(5, tasks.size());
+  }
+
+  @Test
+  public void shouldReturnTasksFilteredByMultipleOrAndCriteria() {
+    // given
+    Task task1 = taskService.newTask();
+    task1.setPriority(4);
+    taskService.saveTask(task1);
+
+    Task task2 = taskService.newTask();
+    task2.setName("aTaskName");
+    task2.setOwner("aTaskOwner");
+    task2.setAssignee("aTaskAssignee");
+    task2.setPriority(4);
+    taskService.saveTask(task2);
+
+    Task task3 = taskService.newTask();
+    task3.setName("aTaskName");
+    task3.setOwner("aTaskOwner");
+    task3.setAssignee("aTaskAssignee");
+    task3.setPriority(4);
+    task3.setDescription("aTaskDescription");
+    taskService.saveTask(task3);
+
+    Task task4 = taskService.newTask();
+    task4.setOwner("aTaskOwner");
+    task4.setAssignee("aTaskAssignee");
+    task4.setPriority(4);
+    task4.setDescription("aTaskDescription");
+    taskService.saveTask(task4);
+
+    Task task5 = taskService.newTask();
+    task5.setDescription("aTaskDescription");
+    task5.setOwner("aTaskOwner");
+    taskService.saveTask(task5);
+
+    // when
+    List<Task> tasks = taskService.createTaskQuery()
+      .or()
+        .taskName("aTaskName")
+        .taskDescription("aTaskDescription")
+        .taskId(task3.getId())
+      .endOr()
+      .taskOwner("aTaskOwner")
+      .taskPriority(4)
+      .taskAssignee("aTaskAssignee")
+      .list();
+
+    // then
+    assertEquals(3, tasks.size());
+  }
+
+  @Test
+  public void shouldReturnTasksFilteredByMultipleOrQueries() {
+    // given
+    Task task1 = taskService.newTask();
+    task1.setName("aTaskName");
+    taskService.saveTask(task1);
+
+    Task task2 = taskService.newTask();
+    task2.setName("aTaskName");
+    task2.setDescription("aTaskDescription");
+    taskService.saveTask(task2);
+
+    Task task3 = taskService.newTask();
+    task3.setName("aTaskName");
+    task3.setDescription("aTaskDescription");
+    task3.setOwner("aTaskOwner");
+    taskService.saveTask(task3);
+
+    Task task4 = taskService.newTask();
+    task4.setName("aTaskName");
+    task4.setDescription("aTaskDescription");
+    task4.setOwner("aTaskOwner");
+    task4.setAssignee("aTaskAssignee");
+    taskService.saveTask(task4);
+
+    Task task5 = taskService.newTask();
+    task5.setName("aTaskName");
+    task5.setDescription("aTaskDescription");
+    task5.setOwner("aTaskOwner");
+    task5.setAssignee("aTaskAssignee");
+    task5.setPriority(4);
+    taskService.saveTask(task5);
+
+    Task task6 = taskService.newTask();
+    task6.setName("aTaskName");
+    task6.setDescription("aTaskDescription");
+    task6.setOwner("aTaskOwner");
+    task6.setAssignee("aTaskAssignee");
+    task6.setPriority(4);
+    taskService.saveTask(task6);
+
+    // when
+    List<Task> tasks = taskService.createTaskQuery()
+      .or()
+        .taskName("aTaskName")
+        .taskDescription("aTaskDescription")
+      .endOr()
+      .or()
+        .taskName("aTaskName")
+        .taskDescription("aTaskDescription")
+        .taskAssignee("aTaskAssignee")
+      .endOr()
+      .or()
+        .taskName("aTaskName")
+        .taskDescription("aTaskDescription")
+        .taskOwner("aTaskOwner")
+        .taskAssignee("aTaskAssignee")
+      .endOr()
+      .or()
+        .taskAssignee("aTaskAssignee")
+        .taskPriority(4)
+      .endOr()
+      .list();
+
+    // then
+    assertEquals(3, tasks.size());
+  }
+
+  @Test
+  public void shouldReturnTasksWhereSameCriterionWasAppliedThreeTimesInOneQuery() {
+    // given
+    Task task1 = taskService.newTask();
+    taskService.saveTask(task1);
+    taskService.addCandidateGroup(task1.getId(), "Accounting");
+
+    Task task2 = taskService.newTask();
+    taskService.saveTask(task2);
+    taskService.addCandidateGroup(task2.getId(), "Controlling");
+
+    Task task3 = taskService.newTask();
+    taskService.saveTask(task3);
+    taskService.addCandidateGroup(task3.getId(), "Sales");
+
+    // when
+    List<Task> tasks = taskService.createTaskQuery()
+      .or()
+        .taskCandidateGroup("Accounting")
+        .taskCandidateGroup("Controlling")
+        .taskCandidateGroup("Sales")
+      .endOr()
+      .list();
+
+    // then
+    assertEquals(1, tasks.size());
   }
 
   @Test
@@ -359,7 +528,7 @@ public class TaskQueryOrTest {
 
     // when
     TaskQuery query = taskService.createTaskQuery()
-      .startOr()
+      .or()
         .taskVariableValueEquals("aLongValue", 789L)
         .taskVariableValueGreaterThan("anEvenLongerValue", 999L)
       .endOr();
@@ -403,7 +572,7 @@ public class TaskQueryOrTest {
 
     // when
     List<Task> tasks = taskService.createTaskQuery()
-      .startOr()
+      .or()
         .processDefinitionId(processInstance1.getProcessDefinitionId())
         .processInstanceId(processInstance2.getId())
       .endOr()
@@ -448,7 +617,7 @@ public class TaskQueryOrTest {
 
     // when
     List<Task> tasks = taskService.createTaskQuery()
-      .startOr()
+      .or()
         .processDefinitionName("process1")
         .processDefinitionKey("anotherProcessDefinition")
       .endOr()
@@ -491,7 +660,7 @@ public class TaskQueryOrTest {
 
     // when
     List<Task> tasks = taskService.createTaskQuery()
-      .startOr()
+      .or()
         .processInstanceBusinessKey("aBusinessKey")
         .processInstanceBusinessKeyLike("anotherBusinessKey")
       .endOr()
@@ -529,7 +698,7 @@ public class TaskQueryOrTest {
 
     // when
     List<Task> tasks = taskService.createTaskQuery()
-      .startOr()
+      .or()
         .caseDefinitionKey("oneTaskCase")
         .caseDefinitionName("One")
       .endOr()
@@ -569,7 +738,7 @@ public class TaskQueryOrTest {
 
     // when
     List<Task> tasks = taskService.createTaskQuery()
-      .startOr()
+      .or()
         .caseInstanceBusinessKey(caseInstance1.getBusinessKey())
         .caseInstanceBusinessKeyLike(caseInstance2.getBusinessKey())
       .endOr()
@@ -604,7 +773,7 @@ public class TaskQueryOrTest {
 
     // when
     List<Task> tasks = taskService.createTaskQuery()
-      .startOr()
+      .or()
         .activityInstanceIdIn(activityInstanceId)
         .taskId(task2.getId())
       .endOr()
@@ -621,10 +790,10 @@ public class TaskQueryOrTest {
       .taskCandidateGroup("sales");
 
     TaskQuery extendingQuery = taskService.createTaskQuery()
-      .startOr()
+      .or()
         .taskName("aTaskName")
       .endOr()
-      .startOr()
+      .or()
         .taskNameLike("anotherTaskName")
       .endOr();
 
@@ -633,18 +802,18 @@ public class TaskQueryOrTest {
 
     // then
     assertEquals("sales", result.getCandidateGroup());
-    assertEquals("aTaskName", result.getOrQueries().get(0).getName());
-    assertEquals("anotherTaskName", result.getOrQueries().get(1).getNameLike());
+    assertEquals("aTaskName", result.getQueries().get(1).getName());
+    assertEquals("anotherTaskName", result.getQueries().get(2).getNameLike());
   }
 
   @Test
   public void shouldReturnTasksByExtendingQuery_OrInExtendedQuery() {
     // given
     TaskQuery extendedQuery = taskService.createTaskQuery()
-      .startOr()
+      .or()
         .taskName("aTaskName")
       .endOr()
-      .startOr()
+      .or()
         .taskNameLike("anotherTaskName")
       .endOr();
 
@@ -655,8 +824,8 @@ public class TaskQueryOrTest {
     TaskQueryImpl result =  (TaskQueryImpl)((TaskQueryImpl)extendedQuery).extend(extendingQuery);
 
     // then
-    assertEquals("aTaskName", result.getOrQueries().get(0).getName());
-    assertEquals("anotherTaskName", result.getOrQueries().get(1).getNameLike());
+    assertEquals("aTaskName", result.getQueries().get(1).getName());
+    assertEquals("anotherTaskName", result.getQueries().get(2).getNameLike());
     assertEquals("aCandidateGroup", result.getCandidateGroup());
   }
 
@@ -664,18 +833,18 @@ public class TaskQueryOrTest {
   public void shouldReturnTasksByExtendingQuery_OrInBothExtendedAndExtendingQuery() {
     // given
     TaskQuery extendedQuery = taskService.createTaskQuery()
-      .startOr()
+      .or()
         .taskName("aTaskName")
       .endOr()
-      .startOr()
+      .or()
         .taskNameLike("anotherTaskName")
       .endOr();
 
     TaskQuery extendingQuery = taskService.createTaskQuery()
-      .startOr()
+      .or()
         .taskCandidateGroup("aCandidateGroup")
       .endOr()
-      .startOr()
+      .or()
         .taskCandidateUser("aCandidateUser")
       .endOr();
 
@@ -683,10 +852,10 @@ public class TaskQueryOrTest {
     TaskQueryImpl result =  (TaskQueryImpl)((TaskQueryImpl)extendedQuery).extend(extendingQuery);
 
     // then
-    assertEquals("aTaskName", result.getOrQueries().get(0).getName());
-    assertEquals("anotherTaskName", result.getOrQueries().get(1).getNameLike());
-    assertEquals("aCandidateGroup", result.getOrQueries().get(2).getCandidateGroup());
-    assertEquals("aCandidateUser", result.getOrQueries().get(3).getCandidateUser());
+    assertEquals("aTaskName", result.getQueries().get(1).getName());
+    assertEquals("anotherTaskName", result.getQueries().get(2).getNameLike());
+    assertEquals("aCandidateGroup", result.getQueries().get(3).getCandidateGroup());
+    assertEquals("aCandidateUser", result.getQueries().get(4).getCandidateUser());
   }
 
 }

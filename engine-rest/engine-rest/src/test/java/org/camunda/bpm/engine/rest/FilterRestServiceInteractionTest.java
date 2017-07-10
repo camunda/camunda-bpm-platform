@@ -130,7 +130,7 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
 
   public static final TaskQuery extendingQuery = new TaskQueryImpl().taskName(MockProvider.EXAMPLE_TASK_NAME);
   public static final TaskQueryDto extendingQueryDto = TaskQueryDto.fromQuery(extendingQuery);
-  public static final TaskQuery extendingOrQuery = new TaskQueryImpl().startOr().taskDescription(MockProvider.EXAMPLE_TASK_DESCRIPTION).endOr().startOr().taskName(MockProvider.EXAMPLE_TASK_NAME).endOr();
+  public static final TaskQuery extendingOrQuery = new TaskQueryImpl().or().taskDescription(MockProvider.EXAMPLE_TASK_DESCRIPTION).endOr().or().taskName(MockProvider.EXAMPLE_TASK_NAME).endOr();
   public static final TaskQueryDto extendingOrQueryDto = TaskQueryDto.fromQuery(extendingOrQuery);
   public static final String invalidExtendingQuery = "abc";
 

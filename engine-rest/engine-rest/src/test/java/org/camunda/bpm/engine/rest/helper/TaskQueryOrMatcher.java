@@ -28,8 +28,8 @@ public class TaskQueryOrMatcher extends ArgumentMatcher<TaskQueryImpl> {
 
     TaskQueryImpl argumentQuery = (TaskQueryImpl) argument;
 
-    return taskDescription.equals(argumentQuery.getOrQueries().get(0).getDescription()) &&
-        taskName.equals(argumentQuery.getOrQueries().get(1).getName());
+    return taskDescription.equals(argumentQuery.getQueries().get(1).getDescription()) &&
+        taskName.equals(argumentQuery.getQueries().get(2).getName());
   }
 
   public static TaskQueryOrMatcher evalOrQuery(String taskDescription, String taskName) {

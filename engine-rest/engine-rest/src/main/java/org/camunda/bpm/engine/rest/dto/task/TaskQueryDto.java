@@ -1369,8 +1369,10 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
 
     if (!isOrQueryActive) {
       dto.orQueries = new ArrayList<TaskQueryDto>();
-      for (TaskQuery orQuery: taskQuery.getOrQueries()) {
+      for (TaskQueryImpl orQuery: taskQuery.getQueries()) {
+        if (orQuery.isOrQueryActive()) {
           dto.orQueries.add(fromQuery(orQuery, true));
+        }
       }
     }
 
