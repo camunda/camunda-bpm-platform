@@ -65,7 +65,7 @@ public class DecisionImpl extends DrgElementImpl implements Decision {
   protected static ChildElement<Expression> expressionChild;
 
   // camunda extensions
-  protected static Attribute<Integer> camundaHistoryTimeToLiveAttribute;
+  protected static Attribute<String> camundaHistoryTimeToLiveAttribute;
   protected static Attribute<String> camundaVersionTag;
 
   public DecisionImpl(ModelTypeInstanceContext instanceContext) {
@@ -143,12 +143,27 @@ public class DecisionImpl extends DrgElementImpl implements Decision {
   // camunda extensions
   @Override
   public Integer getCamundaHistoryTimeToLive() {
+    String ttl = getCamundaHistoryTimeToLiveString();
+
+    if (ttl != null) {
+      return Integer.valueOf(ttl);
+    }
+    return null;
+  }
+
+  @Override
+  public void setCamundaHistoryTimeToLive(Integer historyTimeToLive) {
+    setCamundaHistoryTimeToLiveString(String.valueOf(historyTimeToLive));
+  }
+
+  @Override
+  public String getCamundaHistoryTimeToLiveString() {
     return camundaHistoryTimeToLiveAttribute.getValue(this);
   }
 
   @Override
-  public void setCamundaHistoryTimeToLive(Integer inputVariable) {
-    camundaHistoryTimeToLiveAttribute.setValue(this, inputVariable);
+  public void setCamundaHistoryTimeToLiveString(String historyTimeToLive) {
+    camundaHistoryTimeToLiveAttribute.setValue(this, historyTimeToLive);
   }
 
   @Override
@@ -217,9 +232,9 @@ public class DecisionImpl extends DrgElementImpl implements Decision {
 
     // camunda extensions
 
-    camundaHistoryTimeToLiveAttribute = typeBuilder.integerAttribute(CAMUNDA_ATTRIBUTE_HISTORY_TIME_TO_LIVE)
-      .namespace(CAMUNDA_NS)
-      .build();
+    camundaHistoryTimeToLiveAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_HISTORY_TIME_TO_LIVE)
+        .namespace(CAMUNDA_NS)
+        .build();
 
     camundaVersionTag = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_VERSION_TAG)
       .namespace(CAMUNDA_NS)
