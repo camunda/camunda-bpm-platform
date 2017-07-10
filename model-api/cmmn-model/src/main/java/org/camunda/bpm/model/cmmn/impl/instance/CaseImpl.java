@@ -40,7 +40,7 @@ import org.camunda.bpm.model.xml.type.child.SequenceBuilder;
 public class CaseImpl extends CmmnElementImpl implements Case {
 
   protected static Attribute<String> nameAttribute;
-  protected static Attribute<Integer> camundaHistoryTimeToLive;
+  protected static Attribute<String> camundaHistoryTimeToLive;
 
   protected static ChildElement<CaseFileModel> caseFileModelChild;
   protected static ChildElement<CasePlanModel> casePlanModelChild;
@@ -103,11 +103,15 @@ public class CaseImpl extends CmmnElementImpl implements Case {
   }
 
   public Integer getCamundaHistoryTimeToLive() {
-    return camundaHistoryTimeToLive.getValue(this);
+    String ttl = getCamundaHistoryTimeToLiveString();
+    if (ttl != null) {
+      return Integer.parseInt(ttl);
+    }
+    return null;
   }
 
   public void setCamundaHistoryTimeToLive(Integer historyTimeToLive) {
-    camundaHistoryTimeToLive.setValue(this, historyTimeToLive);
+    setCamundaHistoryTimeToLiveString(String.valueOf(historyTimeToLive));
   }
 
   public static void registerType(ModelBuilder modelBuilder) {
@@ -123,7 +127,7 @@ public class CaseImpl extends CmmnElementImpl implements Case {
     nameAttribute = typeBuilder.stringAttribute(CMMN_ATTRIBUTE_NAME)
         .build();
 
-    camundaHistoryTimeToLive = typeBuilder.integerAttribute(CAMUNDA_ATTRIBUTE_HISTORY_TIME_TO_LIVE)
+    camundaHistoryTimeToLive = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_HISTORY_TIME_TO_LIVE)
         .namespace(CAMUNDA_NS)
         .build();
 
@@ -148,6 +152,16 @@ public class CaseImpl extends CmmnElementImpl implements Case {
         .build();
 
     typeBuilder.build();
+  }
+
+  @Override
+  public String getCamundaHistoryTimeToLiveString() {
+    return camundaHistoryTimeToLive.getValue(this);
+  }
+
+  @Override
+  public void setCamundaHistoryTimeToLiveString(String historyTimeToLive) {
+    camundaHistoryTimeToLive.setValue(this, historyTimeToLive);
   }
 
 }

@@ -43,8 +43,13 @@ public interface Case extends CmmnElement {
 
   void setCaseFileModel(CaseFileModel caseFileModel);
 
+  @Deprecated
   Integer getCamundaHistoryTimeToLive();
 
+  @Deprecated
   void setCamundaHistoryTimeToLive(Integer historyTimeToLive);
 
+  String getCamundaHistoryTimeToLiveString();
+
+  void setCamundaHistoryTimeToLiveString(String historyTimeToLive);
 }
