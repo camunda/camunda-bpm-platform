@@ -12,10 +12,11 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.handler;
 
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureGreaterThanOrEqual;
-
 import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
@@ -36,6 +37,7 @@ import org.camunda.bpm.model.cmmn.instance.Definitions;
 public class CaseHandler extends CmmnElementHandler<Case, CmmnCaseDefinition> {
 
   protected static final CmmnTransformerLogger LOG = ProcessEngineLogger.CMMN_TRANSFORMER_LOGGER;
+  protected static final Pattern REGEX_ISO = Pattern.compile("^P(\\d+)D$");
 
   public CmmnCaseDefinition handleElement(Case element, CmmnHandlerContext context) {
     CaseDefinitionEntity definition = createActivity(element, context);
@@ -54,12 +56,7 @@ public class CaseHandler extends CmmnElementHandler<Case, CmmnCaseDefinition> {
     definition.setName(element.getName());
     definition.setDeploymentId(deployment.getId());
     definition.setTaskDefinitions(new HashMap<String, TaskDefinition>());
-    Integer camundaHistoryTimeToLive = element.getCamundaHistoryTimeToLive();
-    if (camundaHistoryTimeToLive != null) {
-      ensureGreaterThanOrEqual(NotValidException.class, "", "historyTimeToLive", camundaHistoryTimeToLive, 0);
-    }
-    definition.setHistoryTimeToLive(camundaHistoryTimeToLive);
-
+    parseHistoryTimeToLive(element, definition);
     CmmnModelInstance model = context.getModel();
 
     Definitions definitions = model.getDefinitions();
@@ -73,6 +70,30 @@ public class CaseHandler extends CmmnElementHandler<Case, CmmnCaseDefinition> {
     definition.setCmmnElement(element);
 
     return definition;
+  }
+
+  protected void parseHistoryTimeToLive(Case element, CaseDefinitionEntity caseDefinition) {
+    Integer historyTimeToLive = null;
+
+    String historyTTL = element.getCamundaHistoryTimeToLiveString();
+    if (historyTTL != null && !historyTTL.isEmpty()) {
+      Matcher matISO = REGEX_ISO.matcher(historyTTL);
+      if (matISO.find()) {
+        historyTTL = matISO.group(1);
+      }
+
+      try {
+        historyTimeToLive = Integer.parseInt(historyTTL);
+      } catch (NumberFormatException e) {
+        throw new ProcessEngineException("Cannot parse historyTimeToLive: " + e.getMessage() + "| Resource: " + element);
+      }
+    }
+
+    if (historyTimeToLive == null || historyTimeToLive >= 0) {
+      caseDefinition.setHistoryTimeToLive(historyTimeToLive);
+    } else {
+      throw new NotValidException("Cannot parse historyTimeToLive: negative value is not allowed. Resource: " + element);
+    }
   }
 
 }

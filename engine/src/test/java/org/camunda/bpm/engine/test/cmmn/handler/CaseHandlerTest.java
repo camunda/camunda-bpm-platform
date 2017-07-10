@@ -142,7 +142,7 @@ public class CaseHandlerTest extends CmmnElementHandlerTest {
       handler.handleElement(caseDefinition, context);
       fail("Exception is expected, that negative value is not allowed.");
     } catch (NotValidException ex) {
-      assertTrue(ex.getMessage().contains("greater than"));
+      assertTrue(ex.getMessage().contains("negative value is not allowed"));
     }
   }
 

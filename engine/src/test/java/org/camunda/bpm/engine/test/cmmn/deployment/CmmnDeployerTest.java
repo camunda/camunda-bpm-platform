@@ -15,13 +15,12 @@ package org.camunda.bpm.engine.test.cmmn.deployment;
 import java.io.InputStream;
 import java.util.List;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.repository.*;
 import org.camunda.bpm.engine.test.Deployment;
-import org.camunda.bpm.model.bpmn.Bpmn;
-import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.cmmn.Cmmn;
 import org.camunda.bpm.model.cmmn.CmmnModelInstance;
 import org.camunda.bpm.model.cmmn.instance.Case;
@@ -208,4 +207,28 @@ public class CmmnDeployerTest extends PluggableProcessEngineTestCase {
     assertNull(repositoryService.createCaseDefinitionQuery().caseDefinitionResourceName("foo.cmmn").singleResult());
   }
 
+  @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/deployment/CmmnDeploymentTest.testDeployCaseDefinitionWithIntegerHistoryTimeToLive.cmmn")
+  public void testDeployCaseDefinitionWithIntegerHistoryTimeToLive() {
+    CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().singleResult();
+    Integer historyTimeToLive = caseDefinition.getHistoryTimeToLive();
+    assertNotNull(historyTimeToLive);
+    assertEquals((int) historyTimeToLive, 5);
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/deployment/CmmnDeploymentTest.testDeployCaseDefinitionWithStringHistoryTimeToLive.cmmn")
+  public void testDeployCaseDefinitionWithStringHistoryTimeToLive() {
+    CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().singleResult();
+    Integer historyTimeToLive = caseDefinition.getHistoryTimeToLive();
+    assertNotNull(historyTimeToLive);
+    assertEquals((int) historyTimeToLive, 5);
+  }
+
+  public void testDeployCaseDefinitionWithMalformedHistoryTimeToLive() {
+    try {
+      deployment("org/camunda/bpm/engine/test/cmmn/deployment/CmmnDeploymentTest.testDeployCaseDefinitionWithMalformedHistoryTimeToLive.cmmn");
+      fail("Exception expected");
+    } catch (ProcessEngineException e) {
+      assertTrue(e.getCause().getMessage().contains("Cannot parse historyTimeToLive"));
+    }
+  }
 }

@@ -361,7 +361,7 @@ public class DecisionDefinitionDeployerTest {
       testRule.deploy(repositoryService.createDeployment().addModelInstance("foo.dmn", dmnModelInstance));
       fail("Exception for negative time to live value is expected.");
     } catch (ProcessEngineException ex) {
-      assertTrue(ex.getCause().getMessage().contains("greater than or equal to 0"));
+      assertTrue(ex.getCause().getMessage().contains("negative value is not allowed"));
     }
   }
 
@@ -495,4 +495,52 @@ public class DecisionDefinitionDeployerTest {
     List<DecisionDefinition> persistedDecisionDefinitions = repositoryService.createDecisionDefinitionQuery().decisionDefinitionResourceName(DRD_SCORE_RESOURCE).list();
     assertEquals(deployedDecisionDefinitions.size(), persistedDecisionDefinitions.size());
   }
+
+  @Test
+  public void testDeployDecisionDefinitionWithIntegerHistoryTimeToLive() {
+    // when
+    DeploymentWithDefinitions deployment = testRule.deploy("org/camunda/bpm/engine/test/dmn/deployment/DecisionDefinitionDeployerTest.testDecisionDefinitionWithIntegerHistoryTimeToLive.dmn11.xml");
+
+    // then
+    List<DecisionDefinition> deployedDecisionDefinitions = deployment.getDeployedDecisionDefinitions();
+    assertEquals(deployedDecisionDefinitions.size(), 1);
+    Integer historyTimeToLive = deployedDecisionDefinitions.get(0).getHistoryTimeToLive();
+    assertNotNull(historyTimeToLive);
+    assertEquals((int) historyTimeToLive, 5);
+  }
+
+  @Test
+  public void testDeployDecisionDefinitionWithStringHistoryTimeToLive() {
+    // when
+    DeploymentWithDefinitions deployment = testRule.deploy("org/camunda/bpm/engine/test/dmn/deployment/DecisionDefinitionDeployerTest.testDecisionDefinitionWithStringHistoryTimeToLive.dmn11.xml");
+
+    // then
+    List<DecisionDefinition> deployedDecisionDefinitions = deployment.getDeployedDecisionDefinitions();
+    assertEquals(deployedDecisionDefinitions.size(), 1);
+    Integer historyTimeToLive = deployedDecisionDefinitions.get(0).getHistoryTimeToLive();
+    assertNotNull(historyTimeToLive);
+    assertEquals((int) historyTimeToLive, 5);
+  }
+
+  @Test
+  public void testDeployDecisionDefinitionWithMalformedStringHistoryTimeToLive() {
+    try {
+      testRule.deploy("org/camunda/bpm/engine/test/dmn/deployment/DecisionDefinitionDeployerTest.testDecisionDefinitionWithMalformedHistoryTimeToLive.dmn11.xml");
+      fail("Exception expected");
+    } catch (ProcessEngineException e) {
+      assertTrue(e.getCause().getMessage().contains("Cannot parse historyTimeToLive"));
+    }
+  }
+
+  @Test
+  public void testDeployDecisionDefinitionWithEmptyHistoryTimeToLive() {
+      DeploymentWithDefinitions deployment = testRule.deploy("org/camunda/bpm/engine/test/dmn/deployment/DecisionDefinitionDeployerTest.testDecisionDefinitionWithEmptyHistoryTimeToLive.dmn11.xml");
+
+      // then
+      List<DecisionDefinition> deployedDecisionDefinitions = deployment.getDeployedDecisionDefinitions();
+      assertEquals(deployedDecisionDefinitions.size(), 1);
+      Integer historyTimeToLive = deployedDecisionDefinitions.get(0).getHistoryTimeToLive();
+      assertNull(historyTimeToLive);
+  }
+
 }
