@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.history.HistoricCaseActivityStatistics;
 import org.camunda.bpm.engine.history.CleanableHistoricCaseInstanceReport;
 import org.camunda.bpm.engine.history.CleanableHistoricCaseInstanceReportResult;
 import org.camunda.bpm.engine.rest.dto.history.HistoricCaseActivityStatisticsDto;
+import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.history.CleanableHistoricCaseInstanceReportDto;
 import org.camunda.bpm.engine.rest.dto.history.CleanableHistoricCaseInstanceReportResultDto;
 import org.camunda.bpm.engine.rest.history.HistoricCaseDefinitionRestService;
@@ -79,5 +80,18 @@ public class HistoricCaseDefinitionRestServiceImpl implements HistoricCaseDefini
       maxResults = Integer.MAX_VALUE;
     }
     return query.listPage(firstResult, maxResults);
+  }
+
+  @Override
+  public CountResultDto getCleanableHistoricCaseInstanceReportCount(UriInfo uriInfo) {
+    CleanableHistoricCaseInstanceReportDto queryDto = new CleanableHistoricCaseInstanceReportDto(objectMapper, uriInfo.getQueryParameters());
+    queryDto.setObjectMapper(objectMapper);
+    CleanableHistoricCaseInstanceReport query = queryDto.toQuery(processEngine);
+
+    long count = query.count();
+    CountResultDto result = new CountResultDto();
+    result.setCount(count);
+
+    return result;
   }
 }

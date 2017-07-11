@@ -20,6 +20,7 @@ import javax.ws.rs.core.UriInfo;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.CleanableHistoricDecisionInstanceReport;
 import org.camunda.bpm.engine.history.CleanableHistoricDecisionInstanceReportResult;
+import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.history.CleanableHistoricDecisionInstanceReportDto;
 import org.camunda.bpm.engine.rest.dto.history.CleanableHistoricDecisionInstanceReportResultDto;
 import org.camunda.bpm.engine.rest.history.HistoricDecisionDefinitionRestService;
@@ -59,5 +60,18 @@ public class HistoricDecisionDefinitionRestServiceImpl implements HistoricDecisi
       maxResults = Integer.MAX_VALUE;
     }
     return query.listPage(firstResult, maxResults);
+  }
+
+  @Override
+  public CountResultDto getCleanableHistoricDecisionInstanceReportCount(UriInfo uriInfo) {
+    CleanableHistoricDecisionInstanceReportDto queryDto = new CleanableHistoricDecisionInstanceReportDto(objectMapper, uriInfo.getQueryParameters());
+    queryDto.setObjectMapper(objectMapper);
+    CleanableHistoricDecisionInstanceReport query = queryDto.toQuery(processEngine);
+
+    long count = query.count();
+    CountResultDto result = new CountResultDto();
+    result.setCount(count);
+
+    return result;
   }
 }

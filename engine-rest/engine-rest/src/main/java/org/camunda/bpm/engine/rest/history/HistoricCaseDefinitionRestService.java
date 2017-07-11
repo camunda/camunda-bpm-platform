@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.rest.history;
 import java.util.List;
 
 import org.camunda.bpm.engine.rest.dto.history.HistoricCaseActivityStatisticsDto;
+import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.history.CleanableHistoricCaseInstanceReportResultDto;
 
 import javax.ws.rs.GET;
@@ -47,4 +48,10 @@ public interface HistoricCaseDefinitionRestService {
   public List<CleanableHistoricCaseInstanceReportResultDto> getCleanableHistoricCaseInstanceReport(@Context UriInfo uriInfo,
                                                                                              @QueryParam("firstResult") Integer firstResult,
                                                                                              @QueryParam("maxResults") Integer maxResults);
+
+  @GET
+  @Path("/cleanable-case-instance-report/count")
+  @Produces(MediaType.APPLICATION_JSON)
+  public CountResultDto getCleanableHistoricCaseInstanceReportCount(@Context UriInfo uriInfo);
+
 }

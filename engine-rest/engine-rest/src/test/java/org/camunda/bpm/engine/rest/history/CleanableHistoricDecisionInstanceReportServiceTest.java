@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.engine.rest.history;
 
+import static com.jayway.restassured.RestAssured.expect;
 import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.mockito.Matchers.anyString;
@@ -43,8 +44,9 @@ public class CleanableHistoricDecisionInstanceReportServiceTest extends Abstract
   @ClassRule
   public static TestContainerRule rule = new TestContainerRule();
 
-  protected static final String HISTORY_URL = TEST_RESOURCE_ROOT_PATH + "/history";
-  protected static final String HISTORIC_REPORT_URL = HISTORY_URL + "/decision-definition/cleanable-decision-instance-report";
+  protected static final String HISTORY_URL = TEST_RESOURCE_ROOT_PATH + "/history/decision-definition";
+  protected static final String HISTORIC_REPORT_URL = HISTORY_URL + "/cleanable-decision-instance-report";
+  protected static final String HISTORIC_REPORT_COUNT_URL = HISTORIC_REPORT_URL + "/count";
 
   private CleanableHistoricDecisionInstanceReport historicDecisionInstanceReport;
 
@@ -84,6 +86,7 @@ public class CleanableHistoricDecisionInstanceReportServiceTest extends Abstract
     mocks.add(anotherReportResult);
 
     when(report.list()).thenReturn(mocks);
+    when(report.count()).thenReturn((long) mocks.size());
 
     historicDecisionInstanceReport = report;
     when(processEngine.getHistoryService().createCleanableHistoricDecisionInstanceReport()).thenReturn(historicDecisionInstanceReport);
@@ -134,5 +137,16 @@ public class CleanableHistoricDecisionInstanceReportServiceTest extends Abstract
    verify(historicDecisionInstanceReport).decisionDefinitionIdIn(aDecDefId, anotherDecDefId);
    verify(historicDecisionInstanceReport).decisionDefinitionKeyIn(aDecDefKey, anotherDecDefKey);
    verify(historicDecisionInstanceReport).list();
+  }
+
+  @Test
+  public void testQueryCount() {
+    expect()
+      .statusCode(Status.OK.getStatusCode())
+      .body("count", equalTo(2))
+    .when()
+      .get(HISTORIC_REPORT_COUNT_URL);
+
+    verify(historicDecisionInstanceReport).count();
   }
 }

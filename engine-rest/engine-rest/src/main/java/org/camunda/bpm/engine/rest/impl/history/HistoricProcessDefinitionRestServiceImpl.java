@@ -20,6 +20,7 @@ import org.camunda.bpm.engine.history.HistoricActivityStatistics;
 import org.camunda.bpm.engine.history.HistoricActivityStatisticsQuery;
 import org.camunda.bpm.engine.rest.dto.history.HistoricActivityStatisticsDto;
 import org.camunda.bpm.engine.rest.dto.history.CleanableHistoricProcessInstanceReportResultDto;
+import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.history.CleanableHistoricProcessInstanceReportDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.history.HistoricProcessDefinitionRestService;
@@ -124,6 +125,19 @@ public class HistoricProcessDefinitionRestServiceImpl implements HistoricProcess
       maxResults = Integer.MAX_VALUE;
     }
     return query.listPage(firstResult, maxResults);
+  }
+
+  @Override
+  public CountResultDto getCleanableHistoricProcessInstanceReportCount(UriInfo uriInfo) {
+    CleanableHistoricProcessInstanceReportDto queryDto = new CleanableHistoricProcessInstanceReportDto(objectMapper, uriInfo.getQueryParameters());
+    queryDto.setObjectMapper(objectMapper);
+    CleanableHistoricProcessInstanceReport query = queryDto.toQuery(processEngine);
+
+    long count = query.count();
+    CountResultDto result = new CountResultDto();
+    result.setCount(count);
+
+    return result;
   }
 
 }

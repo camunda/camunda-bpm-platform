@@ -23,6 +23,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
+import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.history.CleanableHistoricDecisionInstanceReportResultDto;
 
 @Path(HistoricDecisionDefinitionRestService.PATH)
@@ -37,5 +38,10 @@ public interface HistoricDecisionDefinitionRestService {
   public List<CleanableHistoricDecisionInstanceReportResultDto> getCleanableHistoricDecisionInstanceReport(@Context UriInfo uriInfo,
                                                                                                            @QueryParam("firstResult") Integer firstResult,
                                                                                                            @QueryParam("maxResults") Integer maxResults);
+
+  @GET
+  @Path("/cleanable-decision-instance-report/count")
+  @Produces(MediaType.APPLICATION_JSON)
+  public CountResultDto getCleanableHistoricDecisionInstanceReportCount(@Context UriInfo uriInfo);
 
 }

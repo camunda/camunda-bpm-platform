@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.rest.history;
 
 import org.camunda.bpm.engine.rest.dto.history.HistoricActivityStatisticsDto;
+import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.history.CleanableHistoricProcessInstanceReportResultDto;
 
 import javax.ws.rs.*;
@@ -47,4 +48,10 @@ public interface HistoricProcessDefinitionRestService {
   public List<CleanableHistoricProcessInstanceReportResultDto> getCleanableHistoricProcessInstanceReport(@Context UriInfo uriInfo,
                                                                                                          @QueryParam("firstResult") Integer firstResult,
                                                                                                          @QueryParam("maxResults") Integer maxResults);
+
+  @GET
+  @Path("/cleanable-process-instance-report/count")
+  @Produces(MediaType.APPLICATION_JSON)
+  public CountResultDto getCleanableHistoricProcessInstanceReportCount(@Context UriInfo uriInfo);
+
 }

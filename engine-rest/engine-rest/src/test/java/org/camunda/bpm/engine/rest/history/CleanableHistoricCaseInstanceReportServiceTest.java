@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.engine.rest.history;
 
+import static com.jayway.restassured.RestAssured.expect;
 import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.mockito.Matchers.anyString;
@@ -43,8 +44,9 @@ public class CleanableHistoricCaseInstanceReportServiceTest extends AbstractRest
   @ClassRule
   public static TestContainerRule rule = new TestContainerRule();
 
-  protected static final String HISTORY_URL = TEST_RESOURCE_ROOT_PATH + "/history";
-  protected static final String HISTORIC_REPORT_URL = HISTORY_URL + "/case-definition/cleanable-case-instance-report";
+  protected static final String HISTORY_URL = TEST_RESOURCE_ROOT_PATH + "/history/case-definition";
+  protected static final String HISTORIC_REPORT_URL = HISTORY_URL + "/cleanable-case-instance-report";
+  protected static final String HISTORIC_REPORT_COUNT_URL = HISTORIC_REPORT_URL + "/count";
 
   private CleanableHistoricCaseInstanceReport historicCaseInstanceReport;
 
@@ -84,6 +86,7 @@ public class CleanableHistoricCaseInstanceReportServiceTest extends AbstractRest
     mocks.add(anotherReportResult);
 
     when(report.list()).thenReturn(mocks);
+    when(report.count()).thenReturn((long) mocks.size());
 
     historicCaseInstanceReport = report;
     when(processEngine.getHistoryService().createCleanableHistoricCaseInstanceReport()).thenReturn(historicCaseInstanceReport);
@@ -137,5 +140,16 @@ public class CleanableHistoricCaseInstanceReportServiceTest extends AbstractRest
     verify(historicCaseInstanceReport).caseDefinitionIdIn(aCaseDefId, anotherCaseDefId);
     verify(historicCaseInstanceReport).caseDefinitionKeyIn(aCaseDefKey, anotherCaseDefKey);
     verify(historicCaseInstanceReport).list();
+  }
+
+  @Test
+  public void testQueryCount() {
+    expect()
+      .statusCode(Status.OK.getStatusCode())
+      .body("count", equalTo(2))
+    .when()
+      .get(HISTORIC_REPORT_COUNT_URL);
+
+    verify(historicCaseInstanceReport).count();
   }
 }
