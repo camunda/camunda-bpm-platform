@@ -12,36 +12,20 @@
  */
 package org.camunda.bpm.engine.test.standalone.interceptor;
 
-import javax.script.ScriptEngine;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
-import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.camunda.bpm.engine.impl.scripting.engine.ScriptingEngines;
 
-public class ThrowableThrowingDelegate implements JavaDelegate {
+public class ThrowErrorJavaDelegate implements JavaDelegate {
 
-  protected boolean executed;
+  public static boolean executed;
 
-  public ThrowableThrowingDelegate() {
+  public ThrowErrorJavaDelegate() {
     executed = false;
   }
 
   public void execute(DelegateExecution delegateExecution) throws Exception {
-    ExecutionEntity executionEntity = new ExecutionEntity();
-    executionEntity.setId("foo");
-    Context.getCommandContext().getDbEntityManager().insert(executionEntity);
     executed = true;
-    throw new Error();
-
+    throw new StackOverflowError();
   }
 
-
-  protected static void rethrowUnchecked(Throwable ex) {
-    rethrow(ex);
-  }
-
-  protected static void rethrow(Throwable t) {
-    throw (RuntimeException) t;
-  }
 }

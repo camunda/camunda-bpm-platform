@@ -12,19 +12,15 @@
  */
 package org.camunda.bpm.engine.test.standalone.interceptor;
 
-import java.util.List;
-import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.db.entitymanager.cache.DbEntityCache;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
-import org.camunda.bpm.engine.repository.DeploymentWithDefinitions;
-import org.camunda.bpm.engine.repository.ProcessDefinition;
-import org.camunda.bpm.engine.test.Deployment;
-
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
 /**
  * @author Tom Baeyens
@@ -93,17 +89,37 @@ public class CommandContextInterceptorTest extends PluggableProcessEngineTestCas
     });
   }
 
-  @Deployment
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   public void testCommandContextNestedFailingCommandsNotExceptions() {
-    // start bmpn
+    final BpmnModelInstance modelInstance =
+      Bpmn.createExecutableProcess("processThrowingThrowable")
+        .startEvent()
+          .serviceTask()
+          .camundaClass(ThrowErrorJavaDelegate.class)
+        .endEvent().done();
 
+    deployment(modelInstance);
+
+    boolean errorThrown = false;
     try {
-      runtimeService.startProcessInstanceByKey("Process_1");
-    } catch (Throwable t) {
-      // The expected throwable is caught
-      // Check data base consistency
-      assertEquals(0,runtimeService.createExecutionQuery().executionId("foo").count());
+      processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Object>() {
+        public Object execute(CommandContext commandContext) {
+
+          runtimeService.startProcessInstanceByKey("processThrowingThrowable");
+          return null;
+        }
+      });
+      fail("Exception expected");
+    } catch (StackOverflowError t) {
+      //OK
+      errorThrown = true;
     }
+
+    assertTrue(ThrowErrorJavaDelegate.executed);
+    assertTrue(errorThrown);
+
+    // Check data base consistency
+    assertEquals(0, historyService.createHistoricProcessInstanceQuery().count());
   }
 
   protected class ExceptionThrowingCmd implements Command<Void> {
