@@ -44,13 +44,10 @@ public class ExceptionHandlerHelper {
     if (exception instanceof ProcessEngineException) {
       responseStatus = getStatus((ProcessEngineException)exception);
     }
-    else if (exception instanceof MigrationPlanValidationException
-      || exception instanceof MigratingProcessInstanceValidationException
-      || exception instanceof BadUserRequestException) {
-      responseStatus = Response.Status.BAD_REQUEST;
-    } else if (exception instanceof RestException) {
+    else if (exception instanceof RestException) {
       responseStatus = getStatus((RestException) exception);
-    } else if (exception instanceof WebApplicationException) {
+    }
+    else if (exception instanceof WebApplicationException) {
       //we need to check this, as otherwise the logic for processing WebApplicationException will be overridden
       final int statusCode = ((WebApplicationException) exception).getResponse().getStatus();
       responseStatus = Response.Status.fromStatusCode(statusCode);
