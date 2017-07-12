@@ -29,25 +29,24 @@ function CamPaginationSearchIntegrationController($scope, $rootScope, searchWidg
   this.arrayTypes = angular.isArray(this.arrayTypes) ? this.arrayTypes : [];
   this.variableTypes = angular.isArray(this.variableTypes) ? this.variableTypes : [];
   this.pages = {
-    size: 2,
+    size: 50,
     total: 0,
     current: this.getCurrentPageFromSearch()
   };
 
-  console.log('initial pages', this.pages);
-  console.log('config', this.config);
-
   // RESULTS CHANGE TRIGGERS
-  $scope.$watch('Searchable.pages.current', this.onPageChange.bind(this));
+  var pagesWatchExpr = (function() {
+    return this.pages.current;
+  }).bind(this);
+
+  $scope.$watch(pagesWatchExpr, this.onPageChange.bind(this));
   $scope.$on('$locationChangeSuccess', this.onLocationChange.bind(this));
   $scope.$watch(
     'config.searches',
     this.updateQuery.bind(this),
     true
   );
-
   $scope.$watch('blocked', this.onBlockedChange.bind(this));
-
   $rootScope.$on('cam-common:cam-searchable:query-force-change', this.onForcedRefresh.bind(this));
 }
 
@@ -58,7 +57,6 @@ CamPaginationSearchIntegrationController.prototype.onForcedRefresh = function() 
 
 CamPaginationSearchIntegrationController.prototype.onBlockedChange = function(newValue, oldValue) {
   if (!newValue && oldValue && this.query) {
-    console.log('change blocked', newValue, oldValue);
     this.executeQueries();
   }
 };
@@ -70,8 +68,6 @@ CamPaginationSearchIntegrationController.prototype.getSearchQueryString = functi
 CamPaginationSearchIntegrationController.prototype.hasSearchQueryStringChanged = function() {
   var searchQuery = this.getSearchQueryString();
 
-  console.log('hasSearchQueryStringChanged', searchQuery, 'last', this.lastSearchQueryString, searchQuery !== this.lastSearchQueryString && (this.lastSearchQueryString || searchQuery !== '[]'));
-
   return searchQuery !== this.lastSearchQueryString && (this.lastSearchQueryString || searchQuery !== '[]');
 };
 
@@ -79,8 +75,6 @@ CamPaginationSearchIntegrationController.prototype.onPageChange = function(newVa
   // Used for checking if current page change is due to $locationChangeSuccess event
   // If so this change was already passed to updateCallback, so it can be ignored
   var searchCurrentPage = this.getCurrentPageFromSearch();
-
-  console.log('on page change', newValue, oldValue);
 
   if (newValue == oldValue || newValue === searchCurrentPage) {
     return;
@@ -95,8 +89,6 @@ CamPaginationSearchIntegrationController.prototype.onPageChange = function(newVa
 
 CamPaginationSearchIntegrationController.prototype.onLocationChange = function() {
   var currentPage = this.getCurrentPageFromSearch();
-
-  console.log('on location change', currentPage);
 
   if (+this.pages.current !== +currentPage) {
     this.pages.current = currentPage;
@@ -114,11 +106,7 @@ CamPaginationSearchIntegrationController.prototype.getCurrentPageFromSearch = fu
 };
 
 CamPaginationSearchIntegrationController.prototype.updateQuery = function(newValue, oldValue) {
-  console.log('change query', newValue, oldValue);
-
   if (this.areSearchesDifferent(newValue, oldValue)) {
-    console.log('search query is different');
-
     this.query = this.buildCustomQuery && this.buildCustomQuery(newValue) || this.createQuery(newValue);
 
     if (!this.locationChange) {
@@ -132,7 +120,6 @@ CamPaginationSearchIntegrationController.prototype.updateQuery = function(newVal
 };
 
 CamPaginationSearchIntegrationController.prototype.resetPage = function() {
-  console.log('set page to 1');
   var params = this.search();
 
   this.pages.current = 1;
@@ -144,8 +131,6 @@ CamPaginationSearchIntegrationController.prototype.resetPage = function() {
 
 CamPaginationSearchIntegrationController.prototype.executeQueries = function() {
   if (this.query && !this.blocked) {
-    console.log('execute queries', this.query, this.pages);
-
     this.locationChange = false;
     this
       .onSearchChange({
@@ -154,8 +139,6 @@ CamPaginationSearchIntegrationController.prototype.executeQueries = function() {
       })
       .then((function(total) {
         this.pages.total = total;
-
-        console.log('total', total);
       }).bind(this));
   }
 };
