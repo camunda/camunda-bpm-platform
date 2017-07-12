@@ -62,7 +62,7 @@ describe('cam-common getDeploymentUrl', function() {
       '#/repository',
       {
         deployment: deployment.id,
-        deploymentsQuery: JSON.stringify([{
+        searchQuery: JSON.stringify([{
           type     : 'id',
           operator : 'eq',
           value    : deployment.id
