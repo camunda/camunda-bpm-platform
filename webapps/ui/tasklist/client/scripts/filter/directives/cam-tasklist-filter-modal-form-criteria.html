@@ -132,4 +132,17 @@
            translate="FILTER_CRITERIA_INCLUDE_ASSIGNED_TASKS_HINT"></div>
     </div>
   </div>
+
+  <div ng-if="query.length > 0"
+       class="row match-type">
+    <div class="col-xs-10 col-xs-offset-2">
+      <button ng-click="switchMatchType()"
+              class="btn btn-default btn-xs"
+              ng-disabled="query.length < 2"
+              type="button">
+        {{ (filter.matchType === 'all' ? 'MATCH_TYPE_ALL' : 'MATCH_TYPE_ANY') | translate }}
+      </button>
+      <span ng-disabled="query.length < 2">{{ 'MATCH_TYPE' | translate }}</span>
+    </div>
+  </div>
 </div>
