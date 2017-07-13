@@ -50,6 +50,13 @@ module.exports = [function() {
     template: template,
 
     link: function($scope, $element, attrs, parentCtrl) {
+      $scope.switchMatchType = function() {
+        if ($scope.filter.matchType === 'any') {
+          $scope.filter.matchType = 'all';
+        } else {
+          $scope.filter.matchType = 'any';
+        }
+      };
 
       var emptyCriterion = {
         key: '',

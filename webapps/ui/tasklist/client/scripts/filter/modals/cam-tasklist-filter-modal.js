@@ -99,6 +99,9 @@ module.exports = [
     // initialize filter name
     $scope.filter.name =                   $scope.filter.name;
 
+    // initialize filter match type
+    $scope.filter.matchType =              $scope.filter.matchType;
+
     // initialize filter properties
     $scope.filter.properties =             $scope.filter.properties || {};
 
@@ -115,6 +118,14 @@ module.exports = [
 
     // initialize filter query
     var _query = $scope.filter.query =     $scope.filter.query || {};
+
+    if (_query.orQueries && _query.orQueries.length > 0) {
+      _query = _query.orQueries[0];
+      $scope.filter.matchType = 'any';
+    } else {
+      delete _query.orQueries;
+      $scope.filter.matchType = 'all';
+    }
 
      // transform filter query object into an array
     var query = [];
@@ -266,6 +277,10 @@ module.exports = [
 
       if ($scope.filter.includeAssignedTasks) {
         _queryObj.includeAssignedTasks = true;
+      }
+
+      if ($scope.filter.matchType === 'any') {
+        _queryObj = {orQueries: [_queryObj]};
       }
 
       var toSave = {
