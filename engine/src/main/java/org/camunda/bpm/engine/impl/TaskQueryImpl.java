@@ -986,6 +986,14 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     return groupIds;
   }
 
+  protected void ensureOrExpressionsEvaluated() {
+    // skips first query as it has already been evaluated
+    for (int i = 1; i < queries.size(); i++) {
+      queries.get(i).validate();
+      queries.get(i).evaluateExpressions();
+    }
+  }
+
   protected void ensureVariablesInitialized() {
     VariableSerializers types = Context.getProcessEngineConfiguration().getVariableSerializers();
     for(QueryVariableValue var : variables) {
@@ -1233,6 +1241,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public List<Task> executeList(CommandContext commandContext, Page page) {
+    ensureOrExpressionsEvaluated();
     ensureVariablesInitialized();
     checkQueryOk();
     List<Task> taskList = commandContext
@@ -1251,6 +1260,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public long executeCount(CommandContext commandContext) {
+    ensureOrExpressionsEvaluated();
     ensureVariablesInitialized();
     checkQueryOk();
     return commandContext

@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.TaskQueryImpl;
+import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.query.Query;
@@ -463,6 +464,48 @@ public class TaskQueryExpressionTest extends ResourceProcessEngineTestCase {
     taskQuery.count();
 
     assertEquals(1, taskQuery.getCandidateGroups().size());
+  }
+
+  public void testQueryOr() {
+    // given
+    Date date = DateTimeUtil.now().plusDays(2).toDate();
+
+    Task task1 = taskService.newTask();
+    task1.setFollowUpDate(date);
+    task1.setOwner("Luke Optim");
+    task1.setName("taskForOr");
+    taskService.saveTask(task1);
+
+    Task task2 = taskService.newTask();
+    task2.setDueDate(date);
+    task2.setName("taskForOr");
+    taskService.saveTask(task2);
+
+    Task task3 = taskService.newTask();
+    task3.setAssignee("John Munda");
+    task3.setDueDate(date);
+    task3.setName("taskForOr");
+    taskService.saveTask(task3);
+
+    Task task4 = taskService.newTask();
+    task4.setName("taskForOr");
+    taskService.saveTask(task4);
+
+    // when
+    List<Task> tasks = taskService.createTaskQuery()
+      .taskName("taskForOr")
+      .or()
+        .followUpAfterExpression("${ now() }")
+        .taskAssigneeLikeExpression("${ 'John%' }")
+      .endOr()
+      .or()
+        .taskOwnerExpression("${ 'Luke Optim' }")
+        .dueAfterExpression("${ now() }")
+      .endOr()
+      .list();
+
+    // then
+    assertEquals(2, tasks.size());
   }
 
   @After
