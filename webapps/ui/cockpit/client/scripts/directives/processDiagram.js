@@ -26,7 +26,9 @@ var DirectiveController = ['$scope', '$compile', 'Views', function( $scope,   $c
   $scope.control = {};
 
   $scope.$on('resize', function() {
-    $scope.control.refreshZoom();
+    if ($scope.control.refreshZoom) {
+      $scope.control.refreshZoom();
+    }
   });
 
   /**
@@ -39,7 +41,14 @@ var DirectiveController = ['$scope', '$compile', 'Views', function( $scope,   $c
     }
   });
 
+  $scope.diagramLoaded = false;
+  $scope.diagramEnabled = false;
+  $scope.$watch('collapsed', function(collapsed) {
+    $scope.diagramEnabled = $scope.diagramLoaded || !collapsed;
+  });
+
   $scope.onLoad = function() {
+    $scope.diagramLoaded = true;
     $scope.viewer = $scope.control.getViewer();
     decorateDiagram($scope.processDiagram.bpmnElements);
 
@@ -149,7 +158,7 @@ var DirectiveController = ['$scope', '$compile', 'Views', function( $scope,   $c
   });
 
   function updateSelection(newSelection) {
-    if ($scope.control.isLoaded()) {
+    if ($scope.control.isLoaded && $scope.control.isLoaded()) {
       if (selection) {
         angular.forEach(selection, function(elementId) {
           if(elementId.indexOf('#multiInstanceBody') !== -1 &&
@@ -214,11 +223,11 @@ var Directive = function() {
       pageData: '=',
       overlayProviderComponent: '@',
       actionProviderComponent: '@',
-      selectAll: '&'
+      selectAll: '&',
+      collapsed: '='
     },
     controller: DirectiveController,
     template: template,
-
     link: function($scope) {
       $scope.selectAll = $scope.$eval($scope.selectAll);
     }

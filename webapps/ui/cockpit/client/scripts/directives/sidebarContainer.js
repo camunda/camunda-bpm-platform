@@ -74,6 +74,8 @@ module.exports = ['localConf', '$rootScope', function(localConf, $rootScope) {
          * Toggle show / hide handles
          */
       function setCollapsed(collapsed, maximized) {
+        updateCollapsedClass(collapsed);
+
         if (collapsed) {
           hideHandle.hide();
           maximizeHandle.hide();
@@ -166,9 +168,10 @@ module.exports = ['localConf', '$rootScope', function(localConf, $rootScope) {
             .draggable({ axis: changeAxis, containment: 'parent'})
             .on('drag', function() {
               var pos = getPos();
+              var collapsed = isCollapsed();
 
               // update collapsed state on drag
-              setCollapsed(isCollapsed(), isCurrentlyMaximized());
+              setCollapsed(collapsed, isCurrentlyMaximized());
 
               collapsableElement.css(changeAttr, pos);
               compensateElement.css(direction, pos);
@@ -178,9 +181,13 @@ module.exports = ['localConf', '$rootScope', function(localConf, $rootScope) {
             .on('dragstop', function() {
               updateResizeHandlePosition();
 
+              var collapsed = isCollapsed();
+
+              updateCollapsedClass(collapsed);
+
               $rootScope.$broadcast('resize', {
                 direction: direction,
-                collapsed: isCollapsed()
+                collapsed: collapsed
               });
             });
 
@@ -193,10 +200,14 @@ module.exports = ['localConf', '$rootScope', function(localConf, $rootScope) {
           collapsableElement
             .animate(
               createSize(targetSize),
-              $rootScope.$broadcast.bind($rootScope, 'resize', {
-                direction: direction,
-                collapsed: true
-              })
+              function() {
+                $rootScope.$broadcast('resize', {
+                  direction: direction,
+                  collapsed: true
+                });
+
+                updateCollapsedClass(targetSize === 0);
+              }
             );
           compensateElement.animate(createOffset(targetSize));
         });
@@ -208,10 +219,14 @@ module.exports = ['localConf', '$rootScope', function(localConf, $rootScope) {
           collapsableElement
             .animate(
               createSize(minWidth || originalCollapsableSize),
-              $rootScope.$broadcast.bind($rootScope, 'resize', {
-                direction: direction,
-                collapsed: false
-              })
+              function() {
+                $rootScope.$broadcast('resize', {
+                  direction: direction,
+                  collapsed: false
+                });
+
+                updateCollapsedClass(false);
+              }
             );
           compensateElement.animate(createOffset(minWidth || originalCollapsableSize));
         });
@@ -244,7 +259,7 @@ module.exports = ['localConf', '$rootScope', function(localConf, $rootScope) {
         });
 
         function maximize(callback) {
-          callback = callback || angular.noop;
+          callback = typeof callback === 'function' ? callback : angular.noop;
           var maxSize = element[changeAttr]();
 
           setCollapsed(false, true);
@@ -253,13 +268,16 @@ module.exports = ['localConf', '$rootScope', function(localConf, $rootScope) {
           collapsableElement
             .animate(
               createSize(maxSize),
-              callback
+              function() {
+                callback();
+                updateCollapsedClass(false);
+              }
             );
           compensateElement.animate(createOffset(maxSize));
         }
 
         function minimize(callback) {
-          callback = callback || angular.noop;
+          callback = typeof callback === 'function' ? callback : angular.noop;
           var minSize = 0;
 
           setCollapsed(true, false);
@@ -268,19 +286,26 @@ module.exports = ['localConf', '$rootScope', function(localConf, $rootScope) {
           collapsableElement
             .animate(
               createSize(minSize),
-              callback
+              function() {
+                callback();
+                updateCollapsedClass(true);
+              }
             );
           compensateElement.animate(createOffset(minSize));
         }
 
         function restore(callback) {
+          callback = typeof callback === 'function' ? callback : angular.noop;
           setCollapsed(false, false);
 
           resizeHandle.animate(createOffset(minWidth || originalCollapsableSize));
           collapsableElement
             .animate(
               createSize(minWidth || originalCollapsableSize),
-              callback
+              function() {
+                callback();
+                updateCollapsedClass(false);
+              }
             );
           compensateElement.animate(createOffset(minWidth || originalCollapsableSize));
         }
@@ -345,6 +370,14 @@ module.exports = ['localConf', '$rootScope', function(localConf, $rootScope) {
           }
 
           return pos;
+        }
+      }
+
+      function updateCollapsedClass(collapsed) {
+        if (collapsed) {
+          collapsableElement.addClass('collapsed');
+        } else {
+          collapsableElement.removeClass('collapsed');
         }
       }
 
