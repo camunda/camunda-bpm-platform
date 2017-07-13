@@ -45,7 +45,6 @@ import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_FILTER_ID;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.mockFilter;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.mockVariableInstance;
 import static org.camunda.bpm.engine.rest.helper.TaskQueryMatcher.hasName;
-import static org.camunda.bpm.engine.rest.helper.TaskQueryOrMatcher.evalOrQuery;
 import static org.camunda.bpm.engine.variable.Variables.stringValue;
 import static org.fest.assertions.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.hasItems;
@@ -53,6 +52,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyListOf;
@@ -112,6 +112,7 @@ import org.junit.ClassRule;
 import org.junit.Test;
 
 import com.jayway.restassured.response.Response;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Sebastian Menski
@@ -937,8 +938,10 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
     .when()
       .post(EXECUTE_SINGLE_RESULT_FILTER_URL);
 
-    verify(filterServiceMock).singleResult(eq(EXAMPLE_FILTER_ID),
-        argThat(evalOrQuery(MockProvider.EXAMPLE_TASK_DESCRIPTION, MockProvider.EXAMPLE_TASK_NAME)));
+    ArgumentCaptor<TaskQueryImpl> argument = ArgumentCaptor.forClass(TaskQueryImpl.class);
+    verify(filterServiceMock).singleResult(eq(EXAMPLE_FILTER_ID), argument.capture());
+    assertEquals(MockProvider.EXAMPLE_TASK_DESCRIPTION, argument.getValue().getQueries().get(1).getDescription());
+    assertEquals(MockProvider.EXAMPLE_TASK_NAME, argument.getValue().getQueries().get(2).getName());
   }
 
   @Test

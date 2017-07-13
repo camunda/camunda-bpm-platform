@@ -2,6 +2,7 @@ package org.camunda.bpm.engine.rest;
 
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.path.json.JsonPath.from;
+import static junit.framework.TestCase.assertEquals;
 import static org.camunda.bpm.engine.rest.util.DateTimeUtils.withTimezone;
 import static org.camunda.bpm.engine.rest.util.QueryParamUtils.arrayAsCommaSeperatedList;
 import static org.hamcrest.Matchers.equalTo;
@@ -53,7 +54,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.mockito.ArgumentMatcher;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 
@@ -1568,15 +1569,10 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     .when()
       .post(TASK_QUERY_URL);
 
-    verify(((TaskQueryImpl) mockQuery)).addOrQuery(argThat(new ArgumentMatcher<TaskQueryImpl>() {
-      @Override
-      public boolean matches(Object argument) {
-        TaskQueryImpl argumentQuery = (TaskQueryImpl) argument;
-
-        return MockProvider.EXAMPLE_TASK_DESCRIPTION.equals(argumentQuery.getDescription()) &&
-          MockProvider.EXAMPLE_TASK_NAME.equals(argumentQuery.getName());
-      }
-    }));
+    ArgumentCaptor<TaskQueryImpl> argument = ArgumentCaptor.forClass(TaskQueryImpl.class);
+    verify(((TaskQueryImpl) mockQuery)).addOrQuery(argument.capture());
+    assertEquals(MockProvider.EXAMPLE_TASK_NAME, argument.getValue().getName());
+    assertEquals(MockProvider.EXAMPLE_TASK_DESCRIPTION, argument.getValue().getDescription());
   }
 
 }
