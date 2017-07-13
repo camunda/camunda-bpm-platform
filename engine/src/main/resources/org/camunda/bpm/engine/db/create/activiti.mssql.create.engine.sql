@@ -384,6 +384,11 @@ alter table ACT_RU_VARIABLE
     references ACT_RU_EXECUTION(ID_);
 
 alter table ACT_RU_VARIABLE
+    add constraint ACT_FK_VAR_TASK
+    foreign key (TASK_ID_)
+    references ACT_RU_TASK(ID_);
+
+alter table ACT_RU_VARIABLE
     add constraint ACT_FK_VAR_BYTEARRAY
     foreign key (BYTEARRAY_ID_)
     references ACT_GE_BYTEARRAY (ID_);

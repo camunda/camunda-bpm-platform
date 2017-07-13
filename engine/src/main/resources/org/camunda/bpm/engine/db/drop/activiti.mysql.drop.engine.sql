@@ -58,6 +58,9 @@ alter table ACT_RU_VARIABLE
 	drop FOREIGN KEY ACT_FK_VAR_PROCINST;
 
 alter table ACT_RU_VARIABLE
+	drop foreign key ACT_FK_VAR_TASK;
+
+alter table ACT_RU_VARIABLE
     drop FOREIGN KEY ACT_FK_VAR_BYTEARRAY;
 
 alter table ACT_RU_JOB
