@@ -174,7 +174,7 @@
   <select id="selectHistoricVariableInstanceByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricVariableInstanceQueryImpl" resultMap="historicVariableInstanceResultMap">
   	<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select RES.*
+    select distinct RES.*
     ${limitBetween}
     <include refid="selectHistoricVariableInstanceByQueryCriteriaSql"/>
     ${orderBy}
@@ -182,34 +182,17 @@
   </select>
 
   <select id="selectHistoricVariableInstanceCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricVariableInstanceQueryImpl" resultType="long">
-    select count(*)
+    select count(distinct RES.ID_)
     <include refid="selectHistoricVariableInstanceByQueryCriteriaSql"/>
-  </select>
-
-  <select id="selectHistoricVariableInstanceByQueryCriteria_postgres" parameterType="org.camunda.bpm.engine.impl.HistoricVariableInstanceQueryImpl" resultMap="historicVariableInstanceResultMap_postgres">
-    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
-    ${limitBefore}
-    select RES.*
-    ${limitBetween}
-    <include refid="selectHistoricVariableInstanceByQueryCriteriaSql"/>
-    ${orderBy}
-    ${limitAfter}
   </select>
 
   <sql id="selectHistoricVariableInstanceByQueryCriteriaSql">
     <bind name="escapeChar" value="'\\'"/>
     from ${prefix}ACT_HI_VARINST RES
 
-    <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
-      LEFT JOIN (
-        SELECT
-            SELF.PROC_DEF_KEY_ AS KEY_
-        FROM
-            (SELECT DISTINCT DKEYS.PROC_DEF_KEY_ from ${prefix}ACT_HI_VARINST DKEYS) SELF
-        WHERE
-            <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.querySingleAuthorizationCheck" />
-      ) AUTH
-      ON AUTH.KEY_ = RES.PROC_DEF_KEY_
+    <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause"/>
+        AUTH ON (AUTH.RESOURCE_ID_ in (RES.PROC_DEF_KEY_, '*'))
     </if>
 
     <if test="caseActivityIds != null &amp;&amp; caseActivityIds.length > 0">
@@ -319,7 +302,11 @@
       </if>
 
       <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
-        and ((RES.EXECUTION_ID_ is not null and AUTH.KEY_ is not null) or RES.EXECUTION_ID_ is null)
+        and (
+        (RES.EXECUTION_ID_ is not null
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck"/>
+        ) or RES.EXECUTION_ID_ is null
+        )
       </if>
 
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />

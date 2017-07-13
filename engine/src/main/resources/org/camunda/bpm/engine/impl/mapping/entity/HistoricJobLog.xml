@@ -178,7 +178,7 @@
   <select id="selectHistoricJobLogByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricJobLogQueryImpl" resultMap="historicJobLogMap">
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select RES.*
+    select distinct RES.*
     ${limitBetween}
     <include refid="selectHistoricJobLogByQueryCriteriaSql"/>
     ${orderBy}
@@ -186,23 +186,16 @@
   </select>
 
   <select id="selectHistoricJobLogCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricJobLogQueryImpl" resultType="long">
-    select count(RES.ID_)
+    select count(distinct RES.ID_)
     <include refid="selectHistoricJobLogByQueryCriteriaSql"/>
   </select>
 
   <sql id="selectHistoricJobLogByQueryCriteriaSql">
     from ${prefix}ACT_HI_JOB_LOG RES
 
-    <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
-      LEFT JOIN (
-        SELECT
-            SELF.PROCESS_DEF_KEY_ AS KEY_
-        FROM
-            (SELECT DISTINCT DKEYS.PROCESS_DEF_KEY_ from ${prefix}ACT_HI_JOB_LOG DKEYS) SELF
-        WHERE
-            <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.querySingleAuthorizationCheck" />
-      ) AUTH
-      ON AUTH.KEY_ = RES.PROCESS_DEF_KEY_
+    <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause"/>
+      AUTH ON (AUTH.RESOURCE_ID_ in (RES.PROCESS_DEF_KEY_, '*'))
     </if>
 
     <where>
@@ -269,7 +262,11 @@
 
       <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
         <!-- incident exists in context of a process definition -->
-        and ((RES.PROCESS_DEF_KEY_ is not null and AUTH.KEY_ is not null) or RES.PROCESS_DEF_KEY_ is null)
+        and (
+          (RES.PROCESS_DEF_KEY_ is not null
+          <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck"/>
+          ) or RES.PROCESS_DEF_KEY_ is null
+        )
       </if>
 
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
