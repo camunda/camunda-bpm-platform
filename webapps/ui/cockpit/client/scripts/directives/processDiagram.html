@@ -1,11 +1,19 @@
-<div diagram-statistics-loader>
+<div ng-if="diagramEnabled" style="position: relative; height: 100%">
+  <div diagram-statistics-loader>
+  </div>
+  <div cam-widget-bpmn-viewer
+    diagram-data='diagramData'
+    control='control'
+    on-load='onLoad()'
+    on-click='onClick(element, $event)'
+    on-mouse-enter='onMouseEnter(element, $event)'
+    on-mouse-leave='onMouseLeave(element, $event)'
+    style='height: 100%'>
+  </div>
 </div>
-<div cam-widget-bpmn-viewer
-  diagram-data='diagramData'
-  control='control'
-  on-load='onLoad()'
-  on-click='onClick(element, $event)'
-  on-mouse-enter='onMouseEnter(element, $event)'
-  on-mouse-leave='onMouseLeave(element, $event)'
-  style='height: 100%'>
+<div ng-if="!diagramEnabled" class="placeholder-container">
+  <div class="placeholder-content">
+    <span class="glyphicon glyphicon-refresh animate-spin"></span>
+    <span class="loading-text">Loading diagram</span>
+  </div>
 </div>

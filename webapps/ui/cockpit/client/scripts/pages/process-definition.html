@@ -145,12 +145,14 @@
 
       <!-- content top pane -->
       <div class="ctn-row ctn-content-top"
+           is-sidebar-collapsed="onDiagramCollapseChange(collapsed)"
            ctn-collapsable="top">
         <div process-diagram="processDiagram"
              on-element-click="handleBpmnElementSelection(id, $event)"
              selection="filter"
              process-data="processData"
              page-data="pageData"
+             collapsed="diagramCollapsed"
              overlay-provider-component="cockpit.processDefinition.diagram.overlay"
              viewer="diagramViewer"></div>
 

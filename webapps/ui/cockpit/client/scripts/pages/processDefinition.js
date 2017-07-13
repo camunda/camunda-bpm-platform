@@ -18,8 +18,18 @@ var Controller = [
     var processData = $scope.processData = dataDepend.create($scope);
     var pageData = $scope.pageData = dataDepend.create($scope);
 
-    // utilities ///////////////////////
+    $scope.diagramCollapsed = true;
+    $scope.onDiagramCollapseChange = function(collapsed) {
+      if (!$scope.$$phase) {
+        $scope.$apply(function() {
+          $scope.diagramCollapsed = collapsed;
+        });
+      } else {
+        $scope.diagramCollapsed = collapsed;
+      }
+    };
 
+    // utilities ///////////////////////
     $scope.hovered = null;
     $scope.hoverTitle = function(id) {
       $scope.hovered = id || null;
