@@ -20,11 +20,8 @@ import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryBuilder;
 import org.camunda.bpm.engine.externaltask.UpdateExternalTaskRetriesSelectBuilder;
-import org.camunda.bpm.engine.history.HistoricProcessInstance;
-import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.cmd.*;
 import org.camunda.bpm.engine.impl.externaltask.ExternalTaskQueryTopicBuilderImpl;
-import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 
 /**
  * @author Thorben Lindhauer
@@ -104,6 +101,11 @@ public class ExternalTaskServiceImpl extends ServiceImpl implements ExternalTask
 
   public UpdateExternalTaskRetriesSelectBuilder updateRetries() {
     return new UpdateExternalTaskRetriesBuilderImpl(commandExecutor);
+  }
+
+  @Override
+  public void extendLock(String externalTaskId, String workerId, long lockDuration) {
+    commandExecutor.execute(new ExtendLockOnExternalTaskCmd(externalTaskId, workerId, lockDuration));
   }
 
 }

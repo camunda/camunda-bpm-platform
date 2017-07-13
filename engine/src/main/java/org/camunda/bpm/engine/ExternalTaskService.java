@@ -131,6 +131,23 @@ public interface ExternalTaskService {
 
 
   /**
+   * <p>Extends a lock of an external task on behalf of a worker.
+   * The given task must be assigned to the worker.</p>
+   *
+   * @param externalTaskId the id of the external task
+   * @param workerId the id of the worker that extends the lock of the task
+   *
+   * @throws NotFoundException if no external task with the given id exists
+   * @throws BadUserRequestException if the task is assigned to a different worker
+   * @throws AuthorizationException thrown if the current user does not possess any of the following permissions:
+   *   <ul>
+   *     <li>{@link Permissions#UPDATE} on {@link Resources#PROCESS_INSTANCE}</li>
+   *     <li>{@link Permissions#UPDATE_INSTANCE} on {@link Resources#PROCESS_DEFINITION}</li>
+   *   </ul>
+   */
+  public void extendLock(String externalTaskId, String workerId, long newLockDuration);
+
+  /**
    * <p>Signals that an external task could not be successfully executed.
    * The task must be assigned to the given worker. The number of retries left can be specified. In addition, a timeout can be
    * provided, such that the task cannot be fetched before <code>now + retryTimeout</code> again.</p>

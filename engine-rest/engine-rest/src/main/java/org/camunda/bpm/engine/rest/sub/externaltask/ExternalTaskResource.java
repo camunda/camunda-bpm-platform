@@ -21,6 +21,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.camunda.bpm.engine.rest.dto.externaltask.CompleteExternalTaskDto;
+import org.camunda.bpm.engine.rest.dto.externaltask.ExtendLockOnExternalTaskDto;
 import org.camunda.bpm.engine.rest.dto.externaltask.ExternalTaskBpmnError;
 import org.camunda.bpm.engine.rest.dto.externaltask.ExternalTaskDto;
 import org.camunda.bpm.engine.rest.dto.externaltask.ExternalTaskFailureDto;
@@ -71,4 +72,9 @@ public interface ExternalTaskResource {
   @POST
   @Path("/unlock")
   void unlock();
+
+  @POST
+  @Path("/extendLock")
+  @Consumes(MediaType.APPLICATION_JSON)
+  void extendLock(ExtendLockOnExternalTaskDto extendLockDto);
 }

@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.rest.dto.externaltask.CompleteExternalTaskDto;
+import org.camunda.bpm.engine.rest.dto.externaltask.ExtendLockOnExternalTaskDto;
 import org.camunda.bpm.engine.rest.dto.externaltask.ExternalTaskDto;
 import org.camunda.bpm.engine.rest.dto.externaltask.ExternalTaskFailureDto;
 import org.camunda.bpm.engine.rest.dto.runtime.RetriesDto;
@@ -154,4 +155,16 @@ public class ExternalTaskResourceImpl implements ExternalTaskResource {
     }
   }
 
+  @Override
+  public void extendLock(ExtendLockOnExternalTaskDto extendLockDto) {
+    ExternalTaskService externalTaskService = engine.getExternalTaskService();
+
+    try {
+      externalTaskService.extendLock(externalTaskId, extendLockDto.getWorkerId(), extendLockDto.getNewDuration());
+    } catch (NotFoundException e) {
+      throw new RestException(Status.NOT_FOUND, e, "External task with id " + externalTaskId + " does not exist");
+    } catch (BadUserRequestException e) {
+      throw new RestException(Status.BAD_REQUEST, e, e.getMessage());
+    }
+  }
 }

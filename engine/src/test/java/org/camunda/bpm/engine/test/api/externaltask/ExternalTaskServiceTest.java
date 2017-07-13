@@ -43,10 +43,13 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.joda.time.DateTime;
 import org.junit.Assert;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.zip.DataFormatException;
 
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
@@ -1970,6 +1973,52 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
 
     for (ExternalTask task : tasks) {
       assertEquals(Integer.valueOf(5), task.getRetries());
+    }
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  public void testExtendLockTime() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+
+    List<LockedExternalTask> lockedTasks = externalTaskService.fetchAndLock(1, WORKER_ID)
+      .topic(TOPIC_NAME, LOCK_TIME)
+      .execute();
+
+    long oldLockTime = lockedTasks.get(0).getLockExpirationTime().getTime();
+
+    // when
+    externalTaskService.extendLock(lockedTasks.get(0).getId(), WORKER_ID, LOCK_TIME);
+
+    // then
+    ExternalTask taskWithExtendedLock = externalTaskService.createExternalTaskQuery().locked().singleResult();
+    assertNotNull(taskWithExtendedLock);
+    AssertUtil.assertEqualsSecondPrecision(new Date(oldLockTime+ LOCK_TIME), taskWithExtendedLock.getLockExpirationTime());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  public void testExtendLockTimeFailed() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+
+    List<LockedExternalTask> lockedTasks = externalTaskService.fetchAndLock(1, WORKER_ID)
+      .topic(TOPIC_NAME, 1L)
+      .execute();
+
+    assertNotNull(lockedTasks);
+    assertEquals(1, lockedTasks.size());
+
+    // when
+
+    try {
+      Thread.sleep(1);
+    } catch (InterruptedException e) {}
+
+    try {
+      externalTaskService.extendLock(lockedTasks.get(0).getId(), WORKER_ID, 100);
+      fail("Exception expected");
+    } catch (BadUserRequestException e) {
+      assertTrue(e.getMessage().contains("Cannot extend a lock that expired"));
     }
   }
 

@@ -20,6 +20,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyListOf;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Matchers.argThat;
@@ -74,6 +75,8 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 
+import com.jayway.restassured.http.ContentType;
+
 /**
  * @author Thorben Lindhauer
  *
@@ -95,6 +98,8 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
   protected static final String RETRIES_EXTERNAL_TASK_SYNC_URL = EXTERNAL_TASK_URL + "/retries";
   protected static final String RETRIES_EXTERNAL_TASKS_ASYNC_URL = EXTERNAL_TASK_URL + "/retries-async";
   protected static final String PRIORITY_EXTERNAL_TASK_URL = SINGLE_EXTERNAL_TASK_URL + "/priority";
+  protected static final String EXTEND_LOCK_ON_EXTERNAL_TASK = SINGLE_EXTERNAL_TASK_URL + "/extendLock";
+
 
   protected ExternalTaskService externalTaskService;
   protected RuntimeServiceImpl runtimeServiceMock;
@@ -1274,6 +1279,47 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     ExternalTaskQueryImpl actualQuery = (ExternalTaskQueryImpl) queryCapture.getValue();
     assertThat(actualQuery).isNotNull();
     assertThat(actualQuery.getProcessDefinitionId()).isEqualTo(EXAMPLE_PROCESS_DEFINITION_ID);
+  }
+
+  @Test
+  public void testExtendLockOnExternalTask() {
+    
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("workerId", "workerId");
+    parameters.put("newDuration", "1000");
+
+    given()
+      .pathParam("id", MockProvider.EXTERNAL_TASK_ID)
+      .contentType(ContentType.JSON)
+      .body(parameters)
+    .then()
+      .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .post(EXTEND_LOCK_ON_EXTERNAL_TASK);
+
+    verify(externalTaskService).extendLock(MockProvider.EXTERNAL_TASK_ID, "workerId", 1000);
+    verifyNoMoreInteractions(externalTaskService);
+  }
+
+  @Test
+  public void testExtendLockOnExternalTaskFailed() {
+
+    doThrow(BadUserRequestException.class).when(externalTaskService).extendLock(anyString(), anyString(), anyLong());
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("workerId", "workerId");
+    parameters.put("newDuration", "1000");
+
+    given()
+      .pathParam("id", MockProvider.EXTERNAL_TASK_ID)
+      .contentType(ContentType.JSON)
+      .body(parameters)
+    .then()
+      .expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+    .when()
+      .post(EXTEND_LOCK_ON_EXTERNAL_TASK);
+
   }
 
 }
