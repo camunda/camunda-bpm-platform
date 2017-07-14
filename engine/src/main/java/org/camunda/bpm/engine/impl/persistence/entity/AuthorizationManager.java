@@ -629,7 +629,7 @@ public class AuthorizationManager extends AbstractManager {
   // historic incident query ////////////////////////////////
 
   public void configureHistoricIncidentQuery(HistoricIncidentQueryImpl query) {
-    configureQuery(query, PROCESS_DEFINITION, "SELF.PROC_DEF_KEY_", READ_HISTORY);
+    configureQuery(query, PROCESS_DEFINITION, "RES.PROC_DEF_KEY_", READ_HISTORY);
   }
 
   //historic identity link query ////////////////////////////////
