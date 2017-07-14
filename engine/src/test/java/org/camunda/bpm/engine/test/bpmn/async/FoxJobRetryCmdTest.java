@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
@@ -19,6 +20,7 @@ import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.MessageEventDefinition;
@@ -293,6 +295,133 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
     assertEquals("Job shouldn't be acquirable", 0, acquirableJobs.size());
 
     ClockUtil.reset();
+  }
+
+  public void testFailedJobRetryTimeCycleWithExpression() {
+    BpmnModelInstance bpmnModelInstance = Bpmn.createExecutableProcess("process")
+        .startEvent()
+        .serviceTask()
+          .camundaClass("foo")
+          .camundaAsyncBefore()
+          .camundaFailedJobRetryTimeCycle("${var}")
+        .endEvent()
+        .done();
+
+    deployment(bpmnModelInstance);
+
+    runtimeService.startProcessInstanceByKey("process", Variables.createVariables().putValue("var", "R10/PT5M"));
+
+    Job job = managementService.createJobQuery().singleResult();
+
+   // when job fails
+    try {
+      managementService.executeJob(job.getId());
+    } catch (Exception e) {
+      // ignore
+    }
+
+    // then
+    job = managementService.createJobQuery().singleResult();
+    Assert.assertEquals(9, job.getRetries());
+  }
+
+  public void testFailedJobRetryTimeCycleWithUndefinedVar() {
+    BpmnModelInstance bpmnModelInstance = Bpmn.createExecutableProcess("process")
+        .startEvent()
+        .serviceTask()
+          .camundaClass("foo")
+          .camundaAsyncBefore()
+          .camundaFailedJobRetryTimeCycle("${var}")
+        .endEvent()
+        .done();
+
+    deployment(bpmnModelInstance);
+
+    runtimeService.startProcessInstanceByKey("process");
+
+    Job job = managementService.createJobQuery().singleResult();
+
+   // when job fails
+    try {
+      managementService.executeJob(job.getId());
+    } catch (Exception e) {
+      // ignore
+    }
+
+    // then
+    job = managementService.createJobQuery().singleResult();
+    Assert.assertEquals(2, job.getRetries()); // default behaviour
+  }
+
+  public void testFailedJobRetryTimeCycleWithChangingExpression() {
+    BpmnModelInstance bpmnModelInstance = Bpmn.createExecutableProcess("process")
+        .startEvent()
+        .serviceTask()
+          .camundaClass("foo")
+          .camundaAsyncBefore()
+          .camundaFailedJobRetryTimeCycle("${var}")
+        .endEvent()
+        .done();
+
+    deployment(bpmnModelInstance);
+
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("process", Variables.createVariables().putValue("var", "R10/PT5M"));
+    long oldCurrentTime = ClockUtil.getCurrentTime().getTime();
+
+    Job job = managementService.createJobQuery().singleResult();
+
+   // when
+    try {
+      managementService.executeJob(job.getId());
+    } catch (Exception e) {
+      // ignore
+    }
+
+    job = managementService.createJobQuery().singleResult();
+    Assert.assertEquals(9, job.getRetries());
+    long lockExpirationTime = ((JobEntity) managementService.createJobQuery().singleResult()).getLockExpirationTime().getTime();
+    long minutes = TimeUnit.MILLISECONDS.toMinutes(lockExpirationTime - oldCurrentTime);
+    assertEquals(5, minutes);
+
+    runtimeService.setVariable(pi.getProcessInstanceId(), "var", "R10/PT10M");
+    oldCurrentTime = ClockUtil.getCurrentTime().getTime();
+
+    try {
+      managementService.executeJob(job.getId());
+    } catch (Exception e) {
+      // ignore
+    }
+
+    //then
+    lockExpirationTime = ((JobEntity) managementService.createJobQuery().singleResult()).getLockExpirationTime().getTime();
+    minutes = TimeUnit.MILLISECONDS.toMinutes(lockExpirationTime - oldCurrentTime);
+    assertEquals(10, minutes);
+  }
+
+  public void testRetryOnTimerStartEventWithExpression() {
+    BpmnModelInstance bpmnModelInstance = Bpmn.createExecutableProcess("process")
+        .startEvent()
+          .camundaFailedJobRetryTimeCycle("${var}")
+          .timerWithDuration("PT5M")
+        .serviceTask()
+          .camundaClass("bar")
+        .endEvent()
+        .done();
+
+    deployment(bpmnModelInstance);
+
+    Job job = managementService.createJobQuery().singleResult();
+
+   // when job fails
+    try {
+      managementService.executeJob(job.getId());
+    } catch (Exception e) {
+      // ignore
+    }
+
+    // then
+    job = managementService.createJobQuery().singleResult();
+    Assert.assertEquals(2, job.getRetries()); // default behaviour
   }
 
   protected void assertJobRetriesForActivity(ProcessInstance pi, String activityId) {

@@ -16,6 +16,7 @@ import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.parser.FoxFailedJobParseListener;
 import org.camunda.bpm.engine.impl.calendar.DurationHelper;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.el.Expression;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.*;
 import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
@@ -73,7 +74,7 @@ public class FoxJobRetryCmd extends JobRetryCmd {
   }
 
   protected void executeCustomStrategy(CommandContext commandContext, JobEntity job, ActivityImpl activity) throws Exception {
-    String failedJobRetryTimeCycle = getFailedJobRetryTimeCycle(activity);
+    String failedJobRetryTimeCycle = getFailedJobRetryTimeCycle(job, activity);
 
     if(failedJobRetryTimeCycle == null) {
       executeStandardStrategy(commandContext);
@@ -120,8 +121,20 @@ public class FoxJobRetryCmd extends JobRetryCmd {
                   .findExecutionById(executionId);
   }
 
-  protected String getFailedJobRetryTimeCycle(ActivityImpl activity) {
-    return activity.getProperties().get(FoxFailedJobParseListener.FOX_FAILED_JOB_CONFIGURATION);
+  protected String getFailedJobRetryTimeCycle(JobEntity job, ActivityImpl activity) {
+
+    Expression expression = activity.getProperties().get(FoxFailedJobParseListener.FOX_FAILED_JOB_CONFIGURATION);
+    Object value = expression.getValue(fetchExecutionEntity(job.getExecutionId()));
+
+    if (value instanceof String) {
+      return (String) value;
+    }
+    else
+    {
+      // default behavior
+      return null;
+    }
+
   }
 
   protected DurationHelper getDurationHelper(String failedJobRetryTimeCycle) throws Exception {

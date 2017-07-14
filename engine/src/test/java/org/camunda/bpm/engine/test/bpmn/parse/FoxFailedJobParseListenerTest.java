@@ -1,6 +1,7 @@
 package org.camunda.bpm.engine.test.bpmn.parse;
 
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
+import org.camunda.bpm.engine.impl.el.Expression;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessInstanceWithVariablesImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
@@ -137,8 +138,8 @@ public class FoxFailedJobParseListenerTest extends PluggableProcessEngineTestCas
 
     assertTrue(activity.getProperties().contains(FOX_FAILED_JOB_CONFIGURATION));
 
-    Object value = activity.getProperties().get(FOX_FAILED_JOB_CONFIGURATION);
-    assertEquals("R5/PT5M", value);
+    Expression value = (Expression) activity.getProperties().get(FOX_FAILED_JOB_CONFIGURATION);
+    assertEquals("R5/PT5M", value.getExpressionText());
   }
 
   protected void checkNotContainingFoxFailedJobConfig(ActivityImpl activity) {
