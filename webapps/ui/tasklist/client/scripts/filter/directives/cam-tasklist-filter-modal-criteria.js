@@ -43,11 +43,15 @@
         },
         {
           name: 'processInstanceBusinessKey',
-          label: 'Business Key'
+          label: 'Business Key',
+          expressionSupport: true,
+          help: userExpLangHelp
         },
         {
           name: 'processInstanceBusinessKeyLike',
-          label: 'Business Key Like'
+          label: 'Business Key Like',
+          expressionSupport: true,
+          help: userExpLangHelp
         }
       ]
     },

@@ -55,7 +55,7 @@ var sanitizeProperty = function(search, type, operator, value) {
     out += operator;
   }
   if(expressionsRegex.test(value) &&
-       ['assignee', 'owner', 'candidateGroup', 'candidateUser', 'involvedUser'].indexOf(type) !== -1) {
+       ['assignee', 'owner', 'candidateGroup', 'candidateUser', 'involvedUser', 'processInstanceBusinessKey'].indexOf(type) !== -1) {
     out += 'Expression';
   }
   if(type === 'priority' && operator !== 'eq') {
