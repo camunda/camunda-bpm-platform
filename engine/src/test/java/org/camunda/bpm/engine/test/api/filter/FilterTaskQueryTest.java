@@ -44,8 +44,10 @@ import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.mock.Mocks;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
+import org.camunda.bpm.model.bpmn.Bpmn;
 
 /**
  * @author Sebastian Menski
@@ -93,6 +95,14 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Override
   public void tearDown() {
+    processEngineConfiguration.setEnableExpressionsInAdhocQueries(false);
+
+    Mocks.reset();
+
+    for (org.camunda.bpm.engine.repository.Deployment deployment:
+      repositoryService.createDeploymentQuery().list()) {
+      repositoryService.deleteDeployment(deployment.getId(), true);
+    }
     for (Filter filter : filterService.createTaskFilterQuery().list()) {
       filterService.deleteFilter(filter.getId());
     }
@@ -165,8 +175,10 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     query.processDefinitionName(testString);
     query.processDefinitionNameLike(testString);
     query.processInstanceBusinessKey(testString);
+    query.processInstanceBusinessKeyExpression(testString);
     query.processInstanceBusinessKeyIn(testKeys);
     query.processInstanceBusinessKeyLike(testString);
+    query.processInstanceBusinessKeyLikeExpression(testString);
 
     // variables
     query.taskVariableValueEquals(variableNames[0], variableValues[0]);
@@ -268,10 +280,12 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(testString, query.getProcessDefinitionName());
     assertEquals(testString, query.getProcessDefinitionNameLike());
     assertEquals(testString, query.getProcessInstanceBusinessKey());
+    assertEquals(testString, query.getExpressions().get("processInstanceBusinessKey"));
     for (int i = 0; i < query.getProcessInstanceBusinessKeys().length; i++) {
       assertEquals(testKeys[i], query.getProcessInstanceBusinessKeys()[i]);
     }
     assertEquals(testString, query.getProcessInstanceBusinessKeyLike());
+    assertEquals(testString, query.getExpressions().get("processInstanceBusinessKeyLike"));
 
     // variables
     List<TaskQueryVariableValue> variables = query.getVariables();
@@ -344,6 +358,111 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
             + "Actual filtering properties: " + actualRelationConditions);
       }
     }
+  }
+
+  public void testTaskQueryByBusinessKeyExpression() {
+    // given
+    String aBusinessKey = "business key";
+    Mocks.register("aBusinessKey", aBusinessKey);
+
+    createDeploymentWithBusinessKey(aBusinessKey);
+
+    // when
+    TaskQueryImpl extendedQuery = (TaskQueryImpl)taskService.createTaskQuery()
+      .processInstanceBusinessKeyExpression("${ " + Mocks.getMocks().keySet().toArray()[0] + " }");
+
+    Filter filter = filterService.newTaskFilter("aFilterName");
+    filter.setQuery(extendedQuery);
+    filterService.saveFilter(filter);
+
+    TaskQueryImpl filterQuery = filterService.getFilter(filter.getId()).getQuery();
+
+    // then
+    assertEquals(extendedQuery.getExpressions().get("processInstanceBusinessKey"),
+      filterQuery.getExpressions().get("processInstanceBusinessKey"));
+    assertEquals(1, filterService.list(filter.getId()).size());
+  }
+
+  public void testTaskQueryByBusinessKeyExpressionInAdhocQuery() {
+    // given
+    processEngineConfiguration.setEnableExpressionsInAdhocQueries(true);
+
+    String aBusinessKey = "business key";
+    Mocks.register("aBusinessKey", aBusinessKey);
+
+    createDeploymentWithBusinessKey(aBusinessKey);
+
+    // when
+    Filter filter = filterService.newTaskFilter("aFilterName");
+    filter.setQuery(taskService.createTaskQuery());
+    filterService.saveFilter(filter);
+
+    TaskQueryImpl extendingQuery = (TaskQueryImpl)taskService.createTaskQuery()
+      .processInstanceBusinessKeyExpression("${ " + Mocks.getMocks().keySet().toArray()[0] + " }");
+
+    // then
+    assertEquals(extendingQuery.getExpressions().get("processInstanceBusinessKey"),
+      "${ " + Mocks.getMocks().keySet().toArray()[0] + " }");
+    assertEquals(1, filterService.list(filter.getId(), extendingQuery).size());
+  }
+
+  public void testTaskQueryByBusinessKeyLikeExpression() {
+    // given
+    String aBusinessKey = "business key";
+    Mocks.register("aBusinessKeyLike", "%" + aBusinessKey.substring(5));
+
+    createDeploymentWithBusinessKey(aBusinessKey);
+
+    // when
+    TaskQueryImpl extendedQuery = (TaskQueryImpl)taskService.createTaskQuery()
+      .processInstanceBusinessKeyLikeExpression("${ " + Mocks.getMocks().keySet().toArray()[0] + " }");
+
+    Filter filter = filterService.newTaskFilter("aFilterName");
+    filter.setQuery(extendedQuery);
+    filterService.saveFilter(filter);
+
+    TaskQueryImpl filterQuery = filterService.getFilter(filter.getId()).getQuery();
+
+    // then
+    assertEquals(extendedQuery.getExpressions().get("processInstanceBusinessKeyLike"),
+      filterQuery.getExpressions().get("processInstanceBusinessKeyLike"));
+    assertEquals(1, filterService.list(filter.getId()).size());
+  }
+
+  public void testTaskQueryByBusinessKeyLikeExpressionInAdhocQuery() {
+    // given
+    processEngineConfiguration.setEnableExpressionsInAdhocQueries(true);
+
+    String aBusinessKey = "business key";
+    Mocks.register("aBusinessKeyLike", "%" + aBusinessKey.substring(5));
+
+    createDeploymentWithBusinessKey(aBusinessKey);
+
+    // when
+    Filter filter = filterService.newTaskFilter("aFilterName");
+    filter.setQuery(taskService.createTaskQuery());
+    filterService.saveFilter(filter);
+
+    TaskQueryImpl extendingQuery = (TaskQueryImpl)taskService.createTaskQuery()
+      .processInstanceBusinessKeyLikeExpression("${ " + Mocks.getMocks().keySet().toArray()[0] + " }");
+
+    // then
+    assertEquals(extendingQuery.getExpressions().get("processInstanceBusinessKeyLike"),
+      "${ " + Mocks.getMocks().keySet().toArray()[0] + " }");
+    assertEquals(1, filterService.list(filter.getId(), extendingQuery).size());
+  }
+
+  protected void createDeploymentWithBusinessKey(String aBusinessKey) {
+    repositoryService.createDeployment()
+      .addModelInstance("foo.bpmn",
+        Bpmn.createExecutableProcess("aProcessDefinition")
+          .startEvent()
+            .userTask()
+          .endEvent()
+          .done())
+      .deploy();
+
+    runtimeService.startProcessInstanceByKey("aProcessDefinition", aBusinessKey);
   }
 
   public void testTaskQueryByFollowUpBeforeOrNotExistent() {

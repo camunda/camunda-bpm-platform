@@ -437,6 +437,14 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   @Override
   public TaskQueryImpl processInstanceBusinessKey(String processInstanceBusinessKey) {
     this.processInstanceBusinessKey = processInstanceBusinessKey;
+    expressions.remove("processInstanceBusinessKey");
+    return this;
+  }
+
+  @Override
+  public TaskQuery processInstanceBusinessKeyExpression(String processInstanceBusinessKeyExpression) {
+    ensureNotNull("processInstanceBusinessKey expression", processInstanceBusinessKeyExpression);
+    expressions.put("processInstanceBusinessKey", processInstanceBusinessKeyExpression);
     return this;
   }
 
@@ -449,7 +457,15 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   @Override
   public TaskQuery processInstanceBusinessKeyLike(String processInstanceBusinessKey) {
     this.processInstanceBusinessKeyLike = processInstanceBusinessKey;
+    expressions.remove("processInstanceBusinessKeyLike");
   	return this;
+  }
+
+  @Override
+  public TaskQuery processInstanceBusinessKeyLikeExpression(String processInstanceBusinessKeyLikeExpression) {
+    ensureNotNull("processInstanceBusinessKeyLike expression", processInstanceBusinessKeyLikeExpression);
+    expressions.put("processInstanceBusinessKeyLike", processInstanceBusinessKeyLikeExpression);
+    return this;
   }
 
   @Override

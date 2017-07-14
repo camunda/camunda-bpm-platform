@@ -28,6 +28,8 @@ import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
+import org.camunda.bpm.engine.test.mock.Mocks;
+import org.camunda.bpm.model.bpmn.Bpmn;
 import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
@@ -292,6 +294,49 @@ public class TaskQueryExpressionTest extends ResourceProcessEngineTestCase {
     assertCount(taskQuery().followUpAfterExpression("${dateTime().minusYears(1)}"), 3);
   }
 
+  public void testQueryByProcessInstanceBusinessKeyExpression() {
+    // given
+    String aBusinessKey = "business key";
+    Mocks.register("aBusinessKey", aBusinessKey);
+
+    createBusinessKeyDeployment(aBusinessKey);
+
+    // when
+    TaskQuery taskQuery = taskQuery()
+      .processInstanceBusinessKeyExpression("${ " + Mocks.getMocks().keySet().toArray()[0] + " }");
+
+    // then
+    assertCount(taskQuery, 1);
+  }
+
+  public void testQueryByProcessInstanceBusinessKeyLikeExpression() {
+    // given
+    String aBusinessKey = "business key";
+    Mocks.register("aBusinessKeyLike", "%" + aBusinessKey.substring(5));
+
+    createBusinessKeyDeployment(aBusinessKey);
+
+    // when
+    TaskQuery taskQuery = taskQuery()
+      .processInstanceBusinessKeyLikeExpression("${ " + Mocks.getMocks().keySet().toArray()[0] + " }");
+
+    // then
+    assertCount(taskQuery, 1);
+  }
+
+  protected void createBusinessKeyDeployment(String aBusinessKey) {
+    repositoryService.createDeployment()
+      .addModelInstance("foo.bpmn",
+        Bpmn.createExecutableProcess("aProcessDefinition")
+          .startEvent()
+            .userTask()
+          .endEvent()
+          .done())
+      .deploy();
+
+    runtimeService.startProcessInstanceByKey("aProcessDefinition", aBusinessKey);
+  }
+
   public void testExpressionOverrideQuery() {
     String queryString = "query";
     String expressionString = "expression";
@@ -510,6 +555,12 @@ public class TaskQueryExpressionTest extends ResourceProcessEngineTestCase {
 
   @After
   public void tearDown() {
+    Mocks.reset();
+
+    for (org.camunda.bpm.engine.repository.Deployment deployment:
+      repositoryService.createDeploymentQuery().list()) {
+      repositoryService.deleteDeployment(deployment.getId(), true);
+    }
     for (Group group : identityService.createGroupQuery().list()) {
       identityService.deleteGroup(group.getId());
     }

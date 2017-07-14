@@ -1443,6 +1443,8 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     params.put("followUpBeforeExpression", generator.getValue("followUpBeforeExpression"));
     params.put("followUpDateExpression", generator.getValue("followUpDateExpression"));
     params.put("followUpAfterExpression", generator.getValue("followUpAfterExpression"));
+    params.put("processInstanceBusinessKeyExpression", generator.getValue("processInstanceBusinessKeyExpression"));
+    params.put("processInstanceBusinessKeyLikeExpression", generator.getValue("processInstanceBusinessKeyLikeExpression"));
 
     // get
     given()
@@ -1489,6 +1491,8 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     verify(mockQuery).followUpBeforeExpression(generator.getValue("followUpBeforeExpression"));
     verify(mockQuery).followUpDateExpression(generator.getValue("followUpDateExpression"));
     verify(mockQuery).followUpAfterExpression(generator.getValue("followUpAfterExpression"));
+    verify(mockQuery).processInstanceBusinessKeyExpression(generator.getValue("processInstanceBusinessKeyExpression"));
+    verify(mockQuery).processInstanceBusinessKeyLikeExpression(generator.getValue("processInstanceBusinessKeyLikeExpression"));
 
   }
 
