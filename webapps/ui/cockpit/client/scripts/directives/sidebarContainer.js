@@ -314,15 +314,18 @@ module.exports = ['localConf', '$rootScope', function(localConf, $rootScope) {
 
         scope.$on('$destroy', function() {
           $(window).off('resize', updateResizeHandlePosition);
+          removeRestoreListner();
+          removeMaximizeListener();
+          removeResizeListener();
         });
 
-        $rootScope.$on('restore', function(event, data) {
+        var removeRestoreListner = $rootScope.$on('restore', function(event, data) {
           if (element !== data.source) {
             restore();
           }
         });
 
-        $rootScope.$on('maximize', function(event, data) {
+        var removeMaximizeListener = $rootScope.$on('maximize', function(event, data) {
           if (element !== data.source) {
             if (data.direction === direction) {
               minimize();
@@ -332,7 +335,7 @@ module.exports = ['localConf', '$rootScope', function(localConf, $rootScope) {
           }
         });
 
-        $rootScope.$on('resize', function(event, data) {
+        var removeResizeListener = $rootScope.$on('resize', function(event, data) {
           if (data.direction === maximizeDirection) {
             setCollapsed(isCollapsed(), data.collapsed && isCurrentlyMaximized());
           }
