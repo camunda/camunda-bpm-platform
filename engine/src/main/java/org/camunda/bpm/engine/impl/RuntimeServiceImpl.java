@@ -14,12 +14,15 @@ package org.camunda.bpm.engine.impl;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.form.FormData;
@@ -42,6 +45,7 @@ import org.camunda.bpm.engine.impl.cmd.batch.DeleteProcessInstanceBatchCmd;
 import org.camunda.bpm.engine.impl.migration.MigrationPlanBuilderImpl;
 import org.camunda.bpm.engine.impl.migration.MigrationPlanExecutionBuilderImpl;
 import org.camunda.bpm.engine.impl.runtime.UpdateProcessInstanceSuspensionStateBuilderImpl;
+import org.camunda.bpm.engine.impl.util.ExceptionUtil;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.migration.MigrationPlanBuilder;
 import org.camunda.bpm.engine.migration.MigrationPlanExecutionBuilder;
@@ -321,7 +325,7 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
     ensureNotNull("variableName", variableName);
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put(variableName, value);
-    commandExecutor.execute(new SetExecutionVariablesCmd(executionId, variables, false));
+    setVariables(executionId, variables);
   }
 
   @Override
@@ -329,17 +333,28 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
     ensureNotNull("variableName", variableName);
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put(variableName, value);
-    commandExecutor.execute(new SetExecutionVariablesCmd(executionId, variables, true));
+    setVariablesLocal(executionId, variables);
   }
 
   @Override
   public void setVariables(String executionId, Map<String, ? extends Object> variables) {
-    commandExecutor.execute(new SetExecutionVariablesCmd(executionId, variables, false));
+    setVariables(executionId, variables, false);
   }
 
   @Override
   public void setVariablesLocal(String executionId, Map<String, ? extends Object> variables) {
-    commandExecutor.execute(new SetExecutionVariablesCmd(executionId, variables, true));
+    setVariables(executionId, variables, true);
+  }
+
+  protected void setVariables(String executionId, Map<String, ? extends Object> variables, boolean local) {
+    try {
+      commandExecutor.execute(new SetExecutionVariablesCmd(executionId, variables, local));
+    } catch (ProcessEngineException ex) {
+      if (ExceptionUtil.checkValueTooLongException(ex)) {
+        throw new BadUserRequestException("Variable value is too long", ex);
+      }
+      throw ex;
+    }
   }
 
   @Override
@@ -368,12 +383,25 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
   }
 
   public void updateVariables(String executionId, Map<String, ? extends Object> modifications, Collection<String> deletions) {
-    commandExecutor.execute(new PatchExecutionVariablesCmd(executionId, modifications, deletions, false));
+    updateVariables(executionId, modifications, deletions, false);
   }
 
   public void updateVariablesLocal(String executionId, Map<String, ? extends Object> modifications, Collection<String> deletions) {
-    commandExecutor.execute(new PatchExecutionVariablesCmd(executionId, modifications, deletions, true));
+    updateVariables(executionId, modifications, deletions, true);
   }
+
+  protected void updateVariables(String executionId, Map<String, ? extends Object> modifications, Collection<String> deletions, boolean local) {
+    try {
+      commandExecutor.execute(new PatchExecutionVariablesCmd(executionId, modifications, deletions, local));
+    } catch (ProcessEngineException ex) {
+      if (ExceptionUtil.checkValueTooLongException(ex)) {
+        throw new BadUserRequestException("Variable value is too long", ex);
+      }
+      throw ex;
+    }
+  }
+
+
 
   @Override
   public void signal(String executionId) {

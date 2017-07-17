@@ -14,7 +14,9 @@ package org.camunda.bpm.engine.impl.util;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.sql.SQLException;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 
@@ -64,6 +66,22 @@ public class ExceptionUtil {
     }
 
     return result;
+  }
+
+  public static boolean checkValueTooLongException(ProcessEngineException exception) {
+    Throwable ex = exception;
+    while (ex.getCause() != null) {
+      ex = ex.getCause();
+      if (ex instanceof SQLException && (ex.getMessage().contains("too long")
+        || ex.getMessage().contains("too large")
+        || ex.getMessage().contains("ORA-01461")
+        || ex.getMessage().contains("ORA-01401")
+        || ex.getMessage().contains("data would be truncated")
+        || ex.getMessage().contains("SQLCODE=-302, SQLSTATE=22001"))) {
+        return true;
+      }
+    }
+    return false;
   }
 
 }

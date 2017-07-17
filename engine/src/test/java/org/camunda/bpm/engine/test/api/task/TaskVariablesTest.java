@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
@@ -41,6 +42,25 @@ public class TaskVariablesTest extends PluggableProcessEngineTestCase {
     assertEquals("trumpet", taskService.getVariable(taskId, "instrument"));
 
     taskService.deleteTask(taskId, true);
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/task/TaskVariablesTest.testTaskExecutionVariables.bpmn20.xml"})
+  public void testTaskExecutionVariableLongValue() {
+    String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess").getId();
+
+    StringBuffer longString = new StringBuffer();
+    for (int i = 0; i < 500; i++) {
+      longString.append("tensimbols");
+    }
+    try {
+      runtimeService.setVariable(processInstanceId, "var", longString.toString());
+    } catch (Exception ex) {
+      if (!(ex instanceof BadUserRequestException)) {
+        fail("BadUserRequestException is expected, but another exception was received:  " + ex);
+      }
+      assertEquals("Variable value is too long", ex.getMessage());
+    }
+
   }
 
   @Deployment

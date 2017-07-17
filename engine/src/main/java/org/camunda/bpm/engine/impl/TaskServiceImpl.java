@@ -21,6 +21,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.cmd.AddCommentCmd;
 import org.camunda.bpm.engine.impl.cmd.AddGroupIdentityLinkCmd;
@@ -59,6 +61,7 @@ import org.camunda.bpm.engine.impl.cmd.SaveTaskCmd;
 import org.camunda.bpm.engine.impl.cmd.SetTaskOwnerCmd;
 import org.camunda.bpm.engine.impl.cmd.SetTaskPriorityCmd;
 import org.camunda.bpm.engine.impl.cmd.SetTaskVariablesCmd;
+import org.camunda.bpm.engine.impl.util.ExceptionUtil;
 import org.camunda.bpm.engine.task.Attachment;
 import org.camunda.bpm.engine.task.Comment;
 import org.camunda.bpm.engine.task.Event;
@@ -267,30 +270,52 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
     ensureNotNull("variableName", variableName);
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put(variableName, value);
-    commandExecutor.execute(new SetTaskVariablesCmd(executionId, variables, false));
+    setVariables(executionId, variables, false);
   }
 
   public void setVariableLocal(String executionId, String variableName, Object value) {
     ensureNotNull("variableName", variableName);
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put(variableName, value);
-    commandExecutor.execute(new SetTaskVariablesCmd(executionId, variables, true));
+    setVariables(executionId, variables, true);
   }
 
   public void setVariables(String executionId, Map<String, ? extends Object> variables) {
-    commandExecutor.execute(new SetTaskVariablesCmd(executionId, variables, false));
+    setVariables(executionId, variables, false);
   }
 
   public void setVariablesLocal(String executionId, Map<String, ? extends Object> variables) {
-    commandExecutor.execute(new SetTaskVariablesCmd(executionId, variables, true));
+    setVariables(executionId, variables, true);
+  }
+
+  protected void setVariables(String executionId, Map<String, ? extends Object> variables, boolean local) {
+    try {
+      commandExecutor.execute(new SetTaskVariablesCmd(executionId, variables, local));
+    } catch (ProcessEngineException ex) {
+      if (ExceptionUtil.checkValueTooLongException(ex)) {
+        throw new BadUserRequestException("Variable value is too long", ex);
+      }
+      throw ex;
+    }
   }
 
   public void updateVariablesLocal(String taskId, Map<String, ? extends Object> modifications, Collection<String> deletions) {
-    commandExecutor.execute(new PatchTaskVariablesCmd(taskId, modifications, deletions, true));
+    updateVariables(taskId, modifications, deletions, true);
   }
 
   public void updateVariables(String taskId, Map<String, ? extends Object> modifications, Collection<String> deletions) {
-    commandExecutor.execute(new PatchTaskVariablesCmd(taskId, modifications, deletions, false));
+    updateVariables(taskId, modifications, deletions, false);
+  }
+
+  protected void updateVariables(String taskId, Map<String, ? extends Object> modifications, Collection<String> deletions, boolean local) {
+    try {
+      commandExecutor.execute(new PatchTaskVariablesCmd(taskId, modifications, deletions, local));
+    } catch (ProcessEngineException ex) {
+      if (ExceptionUtil.checkValueTooLongException(ex)) {
+        throw new BadUserRequestException("Variable value is too long", ex);
+      }
+      throw ex;
+    }
   }
 
   public void removeVariable(String taskId, String variableName) {
