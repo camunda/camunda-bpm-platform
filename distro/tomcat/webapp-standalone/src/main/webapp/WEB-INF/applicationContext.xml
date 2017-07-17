@@ -43,7 +43,7 @@
         <bean id="connectPlugin" class="org.camunda.connect.plugin.impl.ConnectProcessEnginePlugin" />
       </list>
     </property>
-    <property name="historyCleanupBatchWindowStartTime">00:01</property>
+    <property name="historyCleanupBatchWindowStartTime" value="00:01" />
   </bean>
 
   <!-- ldap identity provider (deactivated, uncomment plugin in processEngineConfiguration to activate) -->
