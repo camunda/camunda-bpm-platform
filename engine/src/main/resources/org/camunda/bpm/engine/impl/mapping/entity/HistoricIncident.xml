@@ -115,7 +115,7 @@
   <select id="selectHistoricIncidentByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricIncidentQueryImpl" resultMap="historicIncidentResultMap">
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select distinct RES.*
+    select ${distinct} RES.*
     ${limitBetween}
     <include refid="selectHistoricIncidentByQueryCriteriaSql"/>
     ${orderBy}
@@ -187,9 +187,9 @@
       <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
         <!-- incident exists in context of a process definition -->
         and (
-          (RES.PROC_DEF_KEY_ is not null
+          (RES.PROC_DEF_ID_ is not null
           <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck"/>
-          ) or RES.PROC_DEF_KEY_ is null
+          ) or RES.PROC_DEF_ID_ is null
         )
       </if>
 

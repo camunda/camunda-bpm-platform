@@ -639,7 +639,7 @@ public class AuthorizationManager extends AbstractManager {
   }
 
   public void configureHistoricDecisionInstanceQuery(HistoricDecisionInstanceQueryImpl query) {
-    configureQuery(query, DECISION_DEFINITION, "SELF.DEC_DEF_KEY_", READ_HISTORY);
+    configureQuery(query, DECISION_DEFINITION, "RES.DEC_DEF_KEY_", READ_HISTORY);
   }
 
   // historic external task log query /////////////////////////////////
