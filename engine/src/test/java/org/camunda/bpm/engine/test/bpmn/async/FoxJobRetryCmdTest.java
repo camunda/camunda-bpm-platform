@@ -6,7 +6,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
@@ -353,7 +352,7 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
     Assert.assertEquals(2, job.getRetries()); // default behaviour
   }
 
-  public void testFailedJobRetryTimeCycleWithChangingExpression() {
+  public void testFailedJobRetryTimeCycleWithChangingExpression() throws ParseException {
     BpmnModelInstance bpmnModelInstance = Bpmn.createExecutableProcess("process")
         .startEvent()
         .serviceTask()
@@ -363,9 +362,16 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
         .endEvent()
         .done();
 
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    Date startDate = simpleDateFormat.parse("2017-01-01T09:55:00");
+    ClockUtil.setCurrentTime(startDate);
+
     deployment(bpmnModelInstance);
 
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("process", Variables.createVariables().putValue("var", "R10/PT5M"));
+
+    startDate = simpleDateFormat.parse("2017-01-01T10:00:00");
+    ClockUtil.setCurrentTime(startDate);
 
     Job job = managementService.createJobQuery().singleResult();
 
@@ -379,8 +385,10 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
     job = managementService.createJobQuery().singleResult();
     Assert.assertEquals(9, job.getRetries());
 
+    startDate = simpleDateFormat.parse("2017-01-01T10:05:00");
+    ClockUtil.setCurrentTime(startDate);
+
     runtimeService.setVariable(pi.getProcessInstanceId(), "var", "R10/PT10M");
-    long oldCurrentTime = ClockUtil.getCurrentTime().getTime();
 
     try {
       managementService.executeJob(job.getId());
@@ -389,9 +397,9 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
     }
 
     //then
-    long lockExpirationTime = ((JobEntity) managementService.createJobQuery().singleResult()).getLockExpirationTime().getTime();
-    long minutes = TimeUnit.MILLISECONDS.toMinutes(lockExpirationTime - oldCurrentTime);
-    assertTrue(minutes > 8 && minutes < 12);
+    Date expectedDate = simpleDateFormat.parse("2017-01-01T10:15:00");
+    Date lockExpirationTime = ((JobEntity) managementService.createJobQuery().singleResult()).getLockExpirationTime();
+    assertEquals(expectedDate, lockExpirationTime);
   }
 
   public void testRetryOnTimerStartEventWithExpression() {
