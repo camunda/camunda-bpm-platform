@@ -16,9 +16,12 @@
       </div>
     </header>
 
-    <div cam-widget-loader
-         loading-state="{{ loadingState }}"
-         text-empty="There are no tenants in the system.">
+    <div cam-searchable-area
+         config="searchConfig"
+         on-search-change="onSearchChange(query, pages)"
+         loading-state="loadingState"
+         text-empty="No tenants were found."
+         storage-group="'ANT'">
       <table class="cam-table">
         <thead>
           <tr>
@@ -45,30 +48,6 @@
         </tbody>
       </table>
     </div>
-
-    <div ng-show="loadingState === 'EMPTY' && pages.total && (!tenantList || !tenantList.length)"
-         class="well">
-      <span class="glyphicon glyphicon-info-sign"></span>
-      The current search parameters could not retrieve any tenants. Try to <a ng-click="pageChange(1)">reset page number.</a>
-    </div>
-
-    <pagination ng-if="pages.total > pages.size"
-                class="pagination-sm"
-
-                ng-model="pages.current"
-                ng-change="pageChange(pages.current)"
-
-                total-items="pages.total"
-                items-per-page="pages.size"
-                max-size="7"
-
-                boundary-links="true"
-
-                next-text="&rsaquo;"
-                last-text="&raquo;"
-                previous-text="&lsaquo;"
-                first-text="&laquo;"></pagination>
-
   </div>
 </section>
 <!-- / CE - camunda-admin-ui/client/scripts/pages/tenant.html -->

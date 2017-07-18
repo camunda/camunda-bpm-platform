@@ -3,28 +3,16 @@
 var fs = require('fs');
 
 var template = fs.readFileSync(__dirname + '/users.html', 'utf8');
+var searchConfig = JSON.parse(fs.readFileSync(__dirname + '/users-search-plugin-config.json', 'utf8'));
 
 var angular = require('camunda-commons-ui/vendor/angular');
 
 var Controller = ['$scope', '$location', 'search', 'UserResource', 'page', function($scope, $location, search, UserResource, pageService) {
 
-  $scope.availableOperations={};
-  $scope.loadingState = 'LOADING';
+  $scope.searchConfig = angular.copy(searchConfig);
+  $scope.onSearchChange = updateView;
 
-  var pages = $scope.pages = { size: 25, total: 0 };
-
-  $scope.$watch(function() {
-    return parseInt(($location.search() || {}).page || '1');
-  }, function(newValue) {
-    pages.current = newValue;
-    updateView();
-  });
-
-  $scope.pageChange = function(page) {
-    search.updateSilently({ page: !page || page == 1 ? null : page });
-  };
-
-  function updateView() {
+  function updateView(query, pages) {
     var page = pages.current,
         count = pages.size,
         firstResult = (page - 1) * count;
@@ -34,18 +22,24 @@ var Controller = ['$scope', '$location', 'search', 'UserResource', 'page', funct
       maxResults: count
     };
 
+    var params = angular.extend({}, query, pagingParams);
+
+    $scope.userList = null;
     $scope.loadingState = 'LOADING';
-    UserResource.query(pagingParams).$promise.then(function(response) {
-      $scope.userList = response;
-      $scope.loadingState = response.length ? 'LOADED' : 'EMPTY';
-    });
 
-    UserResource.count().$promise.then(function(response) {
-      pages.total = response.count;
-    });
+    return UserResource.count(query).$promise.then(function(data) {
+      var total = data.count;
 
+      return UserResource.query(params).$promise.then(function(data) {
+        $scope.userList = data;
+        $scope.loadingState = data.length ? 'LOADED' : 'EMPTY';
+
+        return total;
+      });
+    });
   }
 
+  $scope.availableOperations = {};
   UserResource.OPTIONS().$promise.then(function(response) {
     angular.forEach(response.links, function(link) {
       $scope.availableOperations[link.rel] = true;

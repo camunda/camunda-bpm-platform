@@ -1,6 +1,7 @@
 'use strict';
 
-var pagesModule = require('./pages/main'),
+var $ = window.jQuery = window.$ = require('jquery'),
+    pagesModule = require('./pages/main'),
     directivesModule = require('./directives/main'),
     filtersModule = require('./filters/main'),
     servicesModule = require('./services/main'),
@@ -12,8 +13,6 @@ var pagesModule = require('./pages/main'),
 
 
 var APP_NAME = 'cam.admin';
-var $ = window.jQuery = window.$ = require('jquery');
-
 
 module.exports = function(pluginDependencies) {
 
