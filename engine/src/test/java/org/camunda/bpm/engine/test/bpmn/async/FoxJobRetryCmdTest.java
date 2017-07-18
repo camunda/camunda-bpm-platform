@@ -366,7 +366,6 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
     deployment(bpmnModelInstance);
 
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("process", Variables.createVariables().putValue("var", "R10/PT5M"));
-    long oldCurrentTime = ClockUtil.getCurrentTime().getTime();
 
     Job job = managementService.createJobQuery().singleResult();
 
@@ -379,12 +378,9 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
 
     job = managementService.createJobQuery().singleResult();
     Assert.assertEquals(9, job.getRetries());
-    long lockExpirationTime = ((JobEntity) managementService.createJobQuery().singleResult()).getLockExpirationTime().getTime();
-    long minutes = TimeUnit.MILLISECONDS.toMinutes(lockExpirationTime - oldCurrentTime);
-    assertEquals(5, minutes);
 
     runtimeService.setVariable(pi.getProcessInstanceId(), "var", "R10/PT10M");
-    oldCurrentTime = ClockUtil.getCurrentTime().getTime();
+    long oldCurrentTime = ClockUtil.getCurrentTime().getTime();
 
     try {
       managementService.executeJob(job.getId());
@@ -393,9 +389,9 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
     }
 
     //then
-    lockExpirationTime = ((JobEntity) managementService.createJobQuery().singleResult()).getLockExpirationTime().getTime();
-    minutes = TimeUnit.MILLISECONDS.toMinutes(lockExpirationTime - oldCurrentTime);
-    assertEquals(10, minutes);
+    long lockExpirationTime = ((JobEntity) managementService.createJobQuery().singleResult()).getLockExpirationTime().getTime();
+    long minutes = TimeUnit.MILLISECONDS.toMinutes(lockExpirationTime - oldCurrentTime);
+    assertTrue(minutes > 8 && minutes < 12);
   }
 
   public void testRetryOnTimerStartEventWithExpression() {
