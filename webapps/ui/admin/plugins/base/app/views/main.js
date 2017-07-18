@@ -4,7 +4,7 @@
 'use strict';
 
 var angular = require('angular'),
-
+    camCommon = require('cam-common'),
     // dashboard
     dashboardUsers = require('./dashboard/users'),
     dashboardGroups = require('./dashboard/groups'),
@@ -12,7 +12,9 @@ var angular = require('angular'),
     dashboardAuthorizations = require('./dashboard/authorizations'),
     dashboardSystem = require('./dashboard/system');
 
-var ngModule = angular.module('cockpit.plugin.base.views', []);
+var ngModule = angular.module('cockpit.plugin.base.views', [
+  camCommon.name
+]);
 
 ngModule.config(dashboardUsers);
 ngModule.config(dashboardGroups);

@@ -1,0 +1,66 @@
+{
+  "types": [
+    {
+      "id": {
+        "key": "id",
+        "value": "ID"
+      },
+      "default": true,
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    },
+    {
+      "id": {
+        "key": "name",
+        "value": "Name"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        },
+        {
+          "key": "Like",
+          "value": "like"
+        }
+      ]
+    },
+    {
+      "id": {
+        "key": "userMember",
+        "value": "User ID"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    },
+    {
+      "id": {
+        "key": "groupMember",
+        "value": "Group ID"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    }
+  ],
+  "tooltips": {
+    "inputPlaceholder": "Add criteria",
+    "invalid": "This search query is not valid",
+    "deleteSearch": "Remove search",
+    "type": "Type",
+    "name": "Property",
+    "operator": "Operator",
+    "value": "Value"
+  }
+}

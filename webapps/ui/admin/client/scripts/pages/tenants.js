@@ -3,30 +3,16 @@
 var fs = require('fs');
 
 var template = fs.readFileSync(__dirname + '/tenants.html', 'utf8');
+var searchConfig = JSON.parse(fs.readFileSync(__dirname + '/tenants-search-plugin-config.json', 'utf8'));
 
 var angular = require('camunda-commons-ui/vendor/angular');
 
-var Controller = ['$scope', '$location', 'search', 'camAPI', 'page', function($scope, $location, search, camAPI, pageService) {
+var Controller = ['$scope', '$location', 'search', 'TenantResource', 'camAPI', 'page', function($scope, $location, search, TenantResource, camAPI, pageService) {
 
-  var TenantResource = camAPI.resource('tenant');
-    
-  $scope.availableOperations={};
-  $scope.loadingState = 'LOADING';
+  $scope.searchConfig = angular.copy(searchConfig);
+  $scope.onSearchChange = updateView;
 
-  var pages = $scope.pages = { size: 25, total: 0 };
-
-  $scope.$watch(function() {
-    return parseInt(($location.search() || {}).page || '1');
-  }, function(newValue) {
-    pages.current = newValue;
-    updateView();
-  });
-
-  $scope.pageChange = function(page) {
-    search.updateSilently({ page: !page || page == 1 ? null : page });
-  };
-
-  function updateView() {
+  function updateView(query, pages) {
     var page = pages.current,
         count = pages.size,
         firstResult = (page - 1) * count;
@@ -36,19 +22,25 @@ var Controller = ['$scope', '$location', 'search', 'camAPI', 'page', function($s
       maxResults: count
     };
 
+    var params = angular.extend({}, query, pagingParams);
+
+    $scope.tenantList = null;
     $scope.loadingState = 'LOADING';
-    TenantResource.list(pagingParams, function(err, res) {
-      $scope.tenantList = res;
-      $scope.loadingState = res.length ? 'LOADED' : 'EMPTY';
-    });
 
-    TenantResource.count(function(err, res) {
-      pages.total = res.count;
-    });
+    return TenantResource.count(query).$promise.then(function(data) {
+      var total = data.count;
 
+      return TenantResource.query(params).$promise.then(function(data) {
+        $scope.tenantList = data;
+        $scope.loadingState = data.length ? 'LOADED' : 'EMPTY';
+
+        return total;
+      });
+    });
   }
 
-  TenantResource.options(function(err, res) {
+  $scope.availableOperations = {};
+  camAPI.resource('tenant').options(function(err, res) {
     angular.forEach(res.links, function(link) {
       $scope.availableOperations[link.rel] = true;
     });
