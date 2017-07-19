@@ -27,7 +27,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.BpmnError;
-import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -267,7 +266,7 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   public void testInputMapElValues() {
     runtimeService.startProcessInstanceByKey("testProcess");
 
@@ -313,9 +312,11 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   public void testInputNested() {
-    runtimeService.startProcessInstanceByKey("testProcess");
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("exprKey", "b");
+    runtimeService.startProcessInstanceByKey("testProcess", variables);
     Execution execution = runtimeService.createExecutionQuery().activityId("wait").singleResult();
 
     VariableInstance var1 = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
@@ -323,6 +324,7 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     List<Object> nestedList = (List<Object>) value.get("a");
     assertEquals("stringInListNestedInMap", nestedList.get(0));
     assertEquals("b", nestedList.get(1));
+    assertEquals("stringValueWithExprKey", value.get("b"));
 
     VariableInstance var2 = runtimeService.createVariableInstanceQuery().variableName("var2").singleResult();
     assertNotNull(var2);
@@ -333,7 +335,9 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
   @Deployment
   @SuppressWarnings("unchecked")
   public void testInputNestedListValues() {
-    runtimeService.startProcessInstanceByKey("testProcess");
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("exprKey", "vegie");
+    runtimeService.startProcessInstanceByKey("testProcess", variables);
 
     VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
     assertNotNull(variable);
@@ -352,6 +356,47 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     TreeMap<String, Object> nestedMap = (TreeMap<String, Object>) value.get(4);
     assertEquals("bar", nestedMap.get("foo"));
     assertEquals("world", nestedMap.get("hello"));
+    assertEquals("potato", nestedMap.get("vegie"));
+  }
+
+  @Deployment
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  public void testInputMapElKey() {
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("varExpr1", "a");
+    variables.put("varExpr2", "b");
+    runtimeService.startProcessInstanceByKey("testProcess", variables);
+
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    assertNotNull(variable);
+    TreeMap<String, Object> value = (TreeMap) variable.getValue();
+    assertEquals("potato", value.get("a"));
+    assertEquals("tomato", value.get("b"));
+  }
+
+  @Deployment
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  public void testInputMapElMixedKey() {
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("varExpr1", "a");
+    variables.put("varExpr2", "b");
+    runtimeService.startProcessInstanceByKey("testProcess", variables);
+
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    assertNotNull(variable);
+    TreeMap<String, Object> value = (TreeMap) variable.getValue();
+    assertEquals("potato", value.get("a"));
+    assertEquals("tomato", value.get("b"));
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/iomapping/InputOutputTest.testInputMapElKey.bpmn")
+  public void testInputMapElUndefinedKey() {
+    try {
+      runtimeService.startProcessInstanceByKey("testProcess");
+      fail("Exception expected");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("Unknown property used in expression: ${varExpr1}", e.getMessage());
+    }
   }
 
   // output parameter ///////////////////////////////////////////////////////
@@ -559,7 +604,7 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   public void testOutputMapElValues() {
     runtimeService.startProcessInstanceByKey("testProcess");
 
@@ -603,9 +648,11 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   public void testOutputNested() {
-    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("exprKey", "b");
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess", variables);
 
     VariableInstance var1 = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
     TreeMap<String, Object> value = (TreeMap) var1.getValue();
@@ -613,6 +660,7 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     assertEquals("stringInListNestedInMap", nestedList.get(0));
     assertEquals("b", nestedList.get(1));
     assertEquals(pi.getId(), var1.getExecutionId());
+    assertEquals("stringValueWithExprKey", value.get("b"));
 
     VariableInstance var2 = runtimeService.createVariableInstanceQuery().variableName("var2").singleResult();
     assertNotNull(var2);
@@ -623,7 +671,9 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
   @Deployment
   @SuppressWarnings("unchecked")
   public void testOutputListNestedValues() {
-    runtimeService.startProcessInstanceByKey("testProcess");
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("exprKey", "vegie");
+    runtimeService.startProcessInstanceByKey("testProcess", variables);
 
     VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
     assertNotNull(variable);
@@ -642,6 +692,49 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     TreeMap<String, Object> nestedMap = (TreeMap<String, Object>) value.get(4);
     assertEquals("bar", nestedMap.get("foo"));
     assertEquals("world", nestedMap.get("hello"));
+    assertEquals("potato", nestedMap.get("vegie"));
+  }
+
+  @Deployment
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  public void testOutputMapElKey() {
+
+
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("varExpr1", "a");
+    variables.put("varExpr2", "b");
+    runtimeService.startProcessInstanceByKey("testProcess", variables);
+
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    assertNotNull(variable);
+    TreeMap<String, Object> value = (TreeMap) variable.getValue();
+    assertEquals("potato", value.get("a"));
+    assertEquals("tomato", value.get("b"));
+  }
+
+  @Deployment
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  public void testOutputMapElMixedKey() {
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("varExpr1", "a");
+    variables.put("varExpr2", "b");
+    runtimeService.startProcessInstanceByKey("testProcess", variables);
+
+    VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
+    assertNotNull(variable);
+    TreeMap<String, Object> value = (TreeMap) variable.getValue();
+    assertEquals("potato", value.get("a"));
+    assertEquals("tomato", value.get("b"));
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/iomapping/InputOutputTest.testOutputMapElKey.bpmn")
+  public void testOutputMapElUndefinedKey() {
+    try {
+      runtimeService.startProcessInstanceByKey("testProcess");
+      fail("Exception expected");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("Unknown property used in expression: ${varExpr1}", e.getMessage());
+    }
   }
 
   // ensure Io supported on event subprocess /////////////////////////////////

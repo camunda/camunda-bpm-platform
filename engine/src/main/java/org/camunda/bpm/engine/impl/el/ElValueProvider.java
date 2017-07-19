@@ -23,7 +23,7 @@ import org.camunda.commons.utils.EnsureUtil;
  * @author Daniel Meyer
  *
  */
-public class ElValueProvider implements ParameterValueProvider {
+public class ElValueProvider implements ParameterValueProvider, Comparable<ElValueProvider> {
 
   protected Expression expression;
 
@@ -42,6 +42,11 @@ public class ElValueProvider implements ParameterValueProvider {
 
   public void setExpression(Expression expression) {
     this.expression = expression;
+  }
+
+  @Override
+  public int compareTo(ElValueProvider o) {
+    return expression.getExpressionText().compareTo(o.getExpression().getExpressionText());
   }
 
 }

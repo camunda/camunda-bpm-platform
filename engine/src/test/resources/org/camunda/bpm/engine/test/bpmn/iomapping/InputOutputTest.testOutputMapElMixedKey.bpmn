@@ -14,16 +14,10 @@
         <camunda:inputOutput>
           <camunda:outputParameter name="var1">
             <camunda:map>
-              <camunda:entry key="a">
-                <camunda:list>
-                  <camunda:value>stringInListNestedInMap</camunda:value>
-                  <camunda:value>${ 'b' }</camunda:value>
-                </camunda:list>
-              </camunda:entry>
-              <camunda:entry key="${exprKey}">stringValueWithExprKey</camunda:entry>
+              <camunda:entry key="${varExpr1}">potato</camunda:entry>
+              <camunda:entry key="b">tomato</camunda:entry>
             </camunda:map>
           </camunda:outputParameter>
-          <camunda:outputParameter name="var2">stringConstantValue</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn2:extensionElements>
       <bpmn2:incoming>SequenceFlow_1</bpmn2:incoming>

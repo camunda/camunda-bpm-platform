@@ -24,25 +24,25 @@ import org.camunda.bpm.engine.delegate.VariableScope;
  */
 public class MapValueProvider implements ParameterValueProvider {
 
-  protected TreeMap<String, ParameterValueProvider> providerMap;
+  protected TreeMap<ParameterValueProvider, ParameterValueProvider> providerMap;
 
-  public MapValueProvider(TreeMap<String, ParameterValueProvider> providerMap) {
+  public MapValueProvider(TreeMap<ParameterValueProvider, ParameterValueProvider> providerMap) {
     this.providerMap = providerMap;
   }
 
   public Object getValue(VariableScope variableScope) {
-    Map<String, Object> valueMap = new TreeMap<String, Object>();
-    for (Entry<String, ParameterValueProvider> entry : providerMap.entrySet()) {
-      valueMap.put(entry.getKey(), entry.getValue().getValue(variableScope));
+    Map<Object, Object> valueMap = new TreeMap<Object, Object>();
+    for (Entry<ParameterValueProvider, ParameterValueProvider> entry : providerMap.entrySet()) {
+      valueMap.put(entry.getKey().getValue(variableScope), entry.getValue().getValue(variableScope));
     }
     return valueMap;
   }
 
-  public TreeMap<String, ParameterValueProvider> getProviderMap() {
+  public TreeMap<ParameterValueProvider, ParameterValueProvider> getProviderMap() {
     return providerMap;
   }
 
-  public void setProviderMap(TreeMap<String, ParameterValueProvider> providerMap) {
+  public void setProviderMap(TreeMap<ParameterValueProvider, ParameterValueProvider> providerMap) {
     this.providerMap = providerMap;
   }
 

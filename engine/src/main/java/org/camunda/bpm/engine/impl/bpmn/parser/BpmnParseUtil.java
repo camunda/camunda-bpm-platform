@@ -23,7 +23,6 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.variable.mapping.InputParameter;
 import org.camunda.bpm.engine.impl.core.variable.mapping.IoMapping;
 import org.camunda.bpm.engine.impl.core.variable.mapping.OutputParameter;
-import org.camunda.bpm.engine.impl.core.variable.mapping.value.ConstantValueProvider;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ListValueProvider;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.MapValueProvider;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.NullValueProvider;
@@ -33,7 +32,6 @@ import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.scripting.ExecutableScript;
 import org.camunda.bpm.engine.impl.scripting.ScriptValueProvider;
 import org.camunda.bpm.engine.impl.util.ScriptUtil;
-import org.camunda.bpm.engine.impl.util.StringUtil;
 import org.camunda.bpm.engine.impl.util.xml.Element;
 
 /**
@@ -177,7 +175,7 @@ public final class BpmnParseUtil {
 
     // MAP
     if("map".equals(parameterElement.getTagName())) {
-      TreeMap<String, ParameterValueProvider> providerMap = new TreeMap<String, ParameterValueProvider>();
+      TreeMap<ParameterValueProvider, ParameterValueProvider> providerMap = new TreeMap<ParameterValueProvider, ParameterValueProvider>();
       for (Element entryElement : parameterElement.elements("entry")) {
         // entry must provide key
         String keyAttribute = entryElement.attribute("key");
@@ -185,7 +183,7 @@ public final class BpmnParseUtil {
           throw new BpmnParseException("Missing attribute 'key' for 'entry' element", entryElement);
         }
         // parse nested provider
-        providerMap.put(keyAttribute, parseNestedParamValueProvider(entryElement));
+        providerMap.put(new ElValueProvider(getExpressionManager().createExpression(keyAttribute)), parseNestedParamValueProvider(entryElement));
       }
       return new MapValueProvider(providerMap);
     }

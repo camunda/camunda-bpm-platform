@@ -27,6 +27,7 @@
                 <camunda:map>
                   <camunda:entry key="foo">bar</camunda:entry>
                   <camunda:entry key="hello">world</camunda:entry>
+                  <camunda:entry key="${exprKey}">potato</camunda:entry>
                 </camunda:map>
               </camunda:list>
             </camunda:inputParameter>
