@@ -61,7 +61,7 @@ public class ProcessImpl extends CallableElementImpl implements Process {
   protected static Attribute<String> camundaCandidateStarterUsersAttribute;
   protected static Attribute<String> camundaJobPriorityAttribute;
   protected static Attribute<String> camundaTaskPriorityAttribute;
-  protected static Attribute<Integer> camundaHistoryTimeToLiveAttribute;
+  protected static Attribute<String> camundaHistoryTimeToLiveAttribute;
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(Process.class, BPMN_ELEMENT_PROCESS)
@@ -134,7 +134,7 @@ public class ProcessImpl extends CallableElementImpl implements Process {
       .namespace(CAMUNDA_NS)
       .build();
 
-    camundaHistoryTimeToLiveAttribute = typeBuilder.integerAttribute(CAMUNDA_ATTRIBUTE_HISTORY_TIME_TO_LIVE)
+    camundaHistoryTimeToLiveAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_HISTORY_TIME_TO_LIVE)
       .namespace(CAMUNDA_NS)
       .build();
 
@@ -276,11 +276,25 @@ public class ProcessImpl extends CallableElementImpl implements Process {
 
   @Override
   public Integer getCamundaHistoryTimeToLive() {
-    return camundaHistoryTimeToLiveAttribute.getValue(this);
+    String ttl = getCamundaHistoryTimeToLiveString();
+    if (ttl != null) {
+      return Integer.parseInt(ttl);
+    }
+    return null;
   }
 
   @Override
   public void setCamundaHistoryTimeToLive(Integer historyTimeToLive) {
+    setCamundaHistoryTimeToLiveString(String.valueOf(historyTimeToLive));
+  }
+
+  @Override
+  public String getCamundaHistoryTimeToLiveString() {
+    return camundaHistoryTimeToLiveAttribute.getValue(this);
+  }
+
+  @Override
+  public void setCamundaHistoryTimeToLiveString(String historyTimeToLive) {
     camundaHistoryTimeToLiveAttribute.setValue(this, historyTimeToLive);
   }
 }
