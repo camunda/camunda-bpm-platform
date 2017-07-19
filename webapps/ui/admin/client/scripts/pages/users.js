@@ -8,29 +8,54 @@ var searchConfig = JSON.parse(fs.readFileSync(__dirname + '/users-search-plugin-
 var angular = require('camunda-commons-ui/vendor/angular');
 
 var Controller = ['$scope', '$location', 'search', 'UserResource', 'page', function($scope, $location, search, UserResource, pageService) {
-
   $scope.searchConfig = angular.copy(searchConfig);
   $scope.onSearchChange = updateView;
 
+  $scope.query = $scope.pages = $scope.sortBy = $scope.sortOrder = null;
+
+  $scope.orderClass = function(forColumn) {
+    forColumn = forColumn || $scope.sortBy;
+    return 'glyphicon-' + ({
+      none: 'minus',
+      desc: 'chevron-down',
+      asc:  'chevron-up'
+    }[forColumn === $scope.sortBy ? $scope.sortOrder : 'none']);
+  };
+
+  $scope.changeOrder = function(column) {
+    $scope.sortBy = column;
+    $scope.sortOrder = $scope.sortOrder === 'desc' ? 'asc' : 'desc';
+
+    updateView();
+  };
+
   function updateView(query, pages) {
-    var page = pages.current,
-        count = pages.size,
+    if (query && pages) {
+      $scope.query = query;
+      $scope.pages = pages;
+    }
+
+    $scope.sortBy = $scope.sortBy || 'userId';
+    $scope.sortOrder = $scope.sortOrder || 'asc';
+
+    var page = $scope.pages.current,
+        count = $scope.pages.size,
         firstResult = (page - 1) * count;
 
-    var pagingParams = {
+    var queryParams = {
       firstResult: firstResult,
-      maxResults: count
+      maxResults: count,
+      sortBy: $scope.sortBy,
+      sortOrder: $scope.sortOrder
     };
-
-    var params = angular.extend({}, query, pagingParams);
 
     $scope.userList = null;
     $scope.loadingState = 'LOADING';
 
-    return UserResource.count(query).$promise.then(function(data) {
+    return UserResource.count(Object.assign({}, $scope.query)).$promise.then(function(data) {
       var total = data.count;
 
-      return UserResource.query(params).$promise.then(function(data) {
+      return UserResource.query(Object.assign({}, $scope.query, queryParams)).$promise.then(function(data) {
         $scope.userList = data;
         $scope.loadingState = data.length ? 'LOADED' : 'EMPTY';
 

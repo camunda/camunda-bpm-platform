@@ -11,25 +11,51 @@ var Controller = ['$scope', 'page', '$location', 'search', 'GroupResource', func
   $scope.searchConfig = angular.copy(searchConfig);
   $scope.onSearchChange = updateView;
 
+  $scope.query = $scope.pages = $scope.sortBy = $scope.sortOrder = null;
+
+  $scope.orderClass = function(forColumn) {
+    forColumn = forColumn || $scope.sortBy;
+    return 'glyphicon-' + ({
+        none: 'minus',
+        desc: 'chevron-down',
+        asc:  'chevron-up'
+      }[forColumn === $scope.sortBy ? $scope.sortOrder : 'none']);
+  };
+
+  $scope.changeOrder = function(column) {
+    $scope.sortBy = column;
+    $scope.sortOrder = $scope.sortOrder === 'desc' ? 'asc' : 'desc';
+
+    updateView();
+  };
+
   function updateView(query, pages) {
-    var page = pages.current,
-        count = pages.size,
+    if (query && pages) {
+      $scope.query = query;
+      $scope.pages = pages;
+    }
+
+    $scope.sortBy = $scope.sortBy || 'id';
+    $scope.sortOrder = $scope.sortOrder || 'asc';
+
+    var page = $scope.pages.current,
+        count = $scope.pages.size,
         firstResult = (page - 1) * count;
 
-    var pagingParams = {
+    var queryParams = {
       firstResult: firstResult,
-      maxResults: count
+      maxResults: count,
+      sortBy: $scope.sortBy,
+      sortOrder: $scope.sortOrder
     };
-
-    var params = angular.extend({}, query, pagingParams);
 
     $scope.groupList = null;
     $scope.loadingState = 'LOADING';
 
-    return GroupResource.count(query).$promise.then(function(data) {
+    return GroupResource.count(Object.assign({}, $scope.query)).$promise.then(function(data) {
       var total = data.count;
 
-      return GroupResource.query(params).$promise.then(function(data) {
+      return GroupResource.query(Object.assign({}, $scope.query, queryParams)).$promise.then(function(data) {
         $scope.groupList = data;
         $scope.loadingState = data.length ? 'LOADED' : 'EMPTY';
 

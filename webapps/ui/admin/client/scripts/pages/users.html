@@ -25,20 +25,54 @@
       <table class="cam-table">
         <thead>
           <tr>
-            <th class="name">Name</th>
-            <th class="username">Username</th>
+            <th class="username">
+              <span class="column-label">ID</span>
+              <a ng-click="changeOrder('userId')">
+              <span class="glyphicon"
+                    ng-class="orderClass('userId')"></span>
+              </a>
+            </th>
+            <th class="firstname">
+              <span class="column-label">Firstname</span>
+              <a ng-click="changeOrder('firstName')">
+              <span class="glyphicon"
+                    ng-class="orderClass('firstName')"></span>
+              </a>
+            </th>
+            <th class="lastname">
+              <span class="column-label">Lastname</span>
+              <a ng-click="changeOrder('lastName')">
+              <span class="glyphicon"
+                    ng-class="orderClass('lastName')"></span>
+              </a>
+            </th>
+            <th class="email">
+              <span class="column-label">Email</span>
+              <a ng-click="changeOrder('email')">
+              <span class="glyphicon"
+                    ng-class="orderClass('email')"></span>
+              </a>
+            </th>
             <th class="action">Action</th>
           </tr>
         </thead>
 
         <tbody>
           <tr ng-repeat="user in userList">
-            <td class="name">
-              <a ng-href="#/users/{{user.id | escape}}">{{user.firstName}} {{user.lastName}}</a>
+            <td class="username">
+              <a href="#/users/{{user.id | escape}}">{{user.id}}</a>
             </td>
 
-            <td class="username">
-              {{user.id}}
+            <td class="firstname">
+              {{user.firstName}}
+            </td>
+
+            <td class="lastname">
+              {{user.lastName}}
+            </td>
+
+            <td class="email">
+              {{user.email}}
             </td>
 
             <td class="action">
