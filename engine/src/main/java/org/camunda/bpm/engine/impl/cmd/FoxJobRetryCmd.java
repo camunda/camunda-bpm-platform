@@ -124,7 +124,15 @@ public class FoxJobRetryCmd extends JobRetryCmd {
   protected String getFailedJobRetryTimeCycle(JobEntity job, ActivityImpl activity) {
 
     Expression expression = activity.getProperties().get(FoxFailedJobParseListener.FOX_FAILED_JOB_CONFIGURATION);
-    Object value = expression.getValue(fetchExecutionEntity(job.getExecutionId()));
+
+    String executionId = job.getExecutionId();
+    ExecutionEntity execution = null;
+
+    if (executionId != null) {
+      execution = fetchExecutionEntity(executionId);
+    }
+
+    Object value = expression.getValue(execution);
 
     if (value instanceof String) {
       return (String) value;
