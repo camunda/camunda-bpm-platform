@@ -25,8 +25,20 @@
       <table class="cam-table">
         <thead>
           <tr>
-            <th class="id">Tenant ID</th>
-            <th class="name">Tenant Name</th>
+            <th class="id">
+              <span class="column-label">ID</span>
+              <a ng-click="changeOrder('id')">
+              <span class="glyphicon"
+                    ng-class="orderClass('id')"></span>
+              </a>
+            </th>
+            <th class="name">
+              <span class="column-label">Name</span>
+              <a ng-click="changeOrder('name')">
+              <span class="glyphicon"
+                    ng-class="orderClass('name')"></span>
+              </a>
+            </th>
             <th class="action">Action</th>
           </tr>
         </thead>

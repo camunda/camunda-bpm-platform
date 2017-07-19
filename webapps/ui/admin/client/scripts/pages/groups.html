@@ -25,9 +25,27 @@
       <table class="cam-table">
         <thead>
           <tr>
-            <th class="group-id">Group ID</th>
-            <th class="group-name">Group Name</th>
-            <th class="group-type">Group Type</th>
+            <th class="group-id">
+              <span class="column-label">ID</span>
+              <a ng-click="changeOrder('id')">
+              <span class="glyphicon"
+                    ng-class="orderClass('id')"></span>
+              </a>
+            </th>
+            <th class="group-name">
+              <span class="column-label">Name</span>
+              <a ng-click="changeOrder('name')">
+              <span class="glyphicon"
+                    ng-class="orderClass('name')"></span>
+              </a>
+            </th>
+            <th class="group-type">
+              <span class="column-label">Type</span>
+              <a ng-click="changeOrder('type')">
+              <span class="glyphicon"
+                    ng-class="orderClass('type')"></span>
+              </a>
+            </th>
             <th class="action">Action</th>
           </tr>
         </thead>
