@@ -16,10 +16,10 @@ var Controller = ['$scope', 'page', '$location', 'search', 'GroupResource', func
   $scope.orderClass = function(forColumn) {
     forColumn = forColumn || $scope.sortBy;
     return 'glyphicon-' + ({
-        none: 'minus',
-        desc: 'chevron-down',
-        asc:  'chevron-up'
-      }[forColumn === $scope.sortBy ? $scope.sortOrder : 'none']);
+      none: 'minus',
+      desc: 'chevron-down',
+      asc:  'chevron-up'
+    }[forColumn === $scope.sortBy ? $scope.sortOrder : 'none']);
   };
 
   $scope.changeOrder = function(column) {
