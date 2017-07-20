@@ -3,6 +3,7 @@ drop index ACT_IDX_TASK_CREATE;
 drop index ACT_IDX_TASK_ASSIGNEE;
 drop index ACT_IDX_IDENT_LNK_USER;
 drop index ACT_IDX_IDENT_LNK_GROUP;
+drop index ACT_IDX_VARIABLE_TASK_ID;
 drop index ACT_IDX_INC_CONFIGURATION;
 drop index ACT_IDX_JOB_PROCINST;
 drop index ACT_UNIQ_AUTH_USER;
@@ -45,9 +46,6 @@ alter table ACT_RU_VARIABLE
 
 alter table ACT_RU_VARIABLE
 	drop foreign key ACT_FK_VAR_PROCINST;
-
-alter table ACT_RU_VARIABLE
-	drop foreign key ACT_FK_VAR_TASK;
 
 alter table ACT_RU_VARIABLE
     drop foreign key ACT_FK_VAR_BYTEARRAY;
@@ -112,7 +110,6 @@ drop index ACT_IDX_JOB_EXCEPTION_STACK;
 drop index ACT_IDX_VARIABLE_BA;
 drop index ACT_IDX_VARIABLE_EXEC;
 drop index ACT_IDX_VARIABLE_PROCINST;
-drop index ACT_IDX_VARIABLE_TASK_ID;
 drop index ACT_IDX_TASK_EXEC;
 drop index ACT_IDX_TASK_PROCINST;
 drop index ACT_IDX_TASK_PROC_DEF_ID;

@@ -18,20 +18,13 @@ import org.camunda.bpm.engine.impl.cmd.SetTaskVariablesCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.variable.Variables;
+import org.junit.Ignore;
 
 /**
  * @author Svetlana Dorokhova
  *
  */
 public class CompetingCompleteTaskSetVariableTest extends ConcurrencyTestCase {
-
-  @Override
-  protected void tearDown() throws Exception {
-
-
-
-    super.tearDown();
-  }
 
   protected static class ControllableCompleteTaskCommand extends ConcurrencyTestCase.ControllableCommand<Void> {
 
@@ -80,6 +73,7 @@ public class CompetingCompleteTaskSetVariableTest extends ConcurrencyTestCase {
   }
 
   @Deployment
+  @Ignore("CAM-7477")
   public void testCompleteTaskSetLocalVariable() {
     runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
