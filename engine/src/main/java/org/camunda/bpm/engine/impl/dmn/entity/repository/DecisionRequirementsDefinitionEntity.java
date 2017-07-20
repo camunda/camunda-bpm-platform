@@ -235,6 +235,10 @@ public class DecisionRequirementsDefinitionEntity extends DmnDecisionRequirement
     }
   }
 
+  public void setHistoryTimeToLive(Integer historyTimeToLive) {
+    throw new UnsupportedOperationException();
+  }
+
   @Override
   public String toString() {
     return "DecisionRequirementsDefinitionEntity [id=" + id + ", revision=" + revision + ", name=" + name + ", category=" + category + ", key=" + key

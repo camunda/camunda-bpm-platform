@@ -42,4 +42,6 @@ public interface ResourceDefinitionEntity<T extends ResourceDefinition> extends 
 
   void updateModifiableFieldsFromEntity(T updatingDefinition);
 
+  void setHistoryTimeToLive(Integer historyTimeToLive);
+
 }

@@ -12,8 +12,6 @@
  */
 package org.camunda.bpm.engine.impl.bpmn.parser;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.camunda.bpm.engine.ActivityTypes;
 import org.camunda.bpm.engine.BpmnParseException;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -58,6 +56,7 @@ import org.camunda.bpm.engine.impl.task.listener.DelegateExpressionTaskListener;
 import org.camunda.bpm.engine.impl.task.listener.ExpressionTaskListener;
 import org.camunda.bpm.engine.impl.task.listener.ScriptTaskListener;
 import org.camunda.bpm.engine.impl.util.DecisionEvaluationUtil;
+import org.camunda.bpm.engine.impl.util.ParseUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.camunda.bpm.engine.impl.util.ScriptUtil;
 import org.camunda.bpm.engine.impl.util.StringUtil;
@@ -141,8 +140,6 @@ public class BpmnParse extends Parse {
   public static final String LINK_EVENT_DEFINITION = "linkEventDefinition";
   public static final String CONDITION_EXPRESSION = "conditionExpression";
   public static final String CONDITION = "condition";
-
-  protected static final Pattern REGEX_ISO = Pattern.compile("^P(\\d+)D$");
 
   public static final List<String> VARIABLE_EVENTS = Arrays.asList(
       VariableListener.CREATE,
@@ -542,7 +539,9 @@ public class BpmnParse extends Parse {
     processDefinition.setVersionTag(
       processElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "versionTag")
     );
-    parseHistoryTimeToLive(processElement, processDefinition);
+
+    ParseUtil.parseHistoryTimeToLive(processElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "historyTimeToLive"),
+        processDefinition);
 
     LOG.parsingElement("process", processDefinition.getKey());
 
@@ -564,26 +563,6 @@ public class BpmnParse extends Parse {
       activity.setDelegateAsyncBeforeUpdate(null);
     }
     return processDefinition;
-  }
-
-  protected void parseHistoryTimeToLive(Element processElement, ProcessDefinitionEntity processDefinition) {
-    Integer historyTimeToLive = null;
-
-    String historyTTL = processElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS,"historyTimeToLive" );
-    if (historyTTL != null && !historyTTL.isEmpty()) {
-      Matcher matISO = REGEX_ISO.matcher(historyTTL);
-      if (matISO.find()) {
-        historyTTL = matISO.group(1);
-      }
-      historyTimeToLive = parseIntegerAttribute(processElement, "historyTimeToLive",
-          historyTTL, false);
-    }
-
-    if (historyTimeToLive == null || historyTimeToLive >= 0) {
-      processDefinition.setHistoryTimeToLive(historyTimeToLive);
-    } else {
-      addError("Cannot parse historyTimeToLive: negative value is not allowed", processElement);
-    }
   }
 
   protected void parseLaneSets(Element parentElement, ProcessDefinitionEntity processDefinition) {
@@ -4338,21 +4317,6 @@ public class BpmnParse extends Parse {
       }
     }
     return -1.0;
-  }
-
-  public Integer parseIntegerAttribute(Element element, String attributeName, String integerText, boolean required) {
-    if (required && (integerText == null || integerText.isEmpty())) {
-      addError(attributeName + " is required", element);
-    } else {
-      if (integerText != null && !integerText.isEmpty()) {
-        try {
-          return Integer.parseInt(integerText);
-        } catch (NumberFormatException e) {
-          addError("Cannot parse " + attributeName + ": " + e.getMessage(), element);
-        }
-      }
-    }
-    return null;
   }
 
   protected boolean isExclusive(Element element) {
