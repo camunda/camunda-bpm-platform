@@ -30,6 +30,13 @@ public class ServiceTaskSpringDelegationTest extends SpringProcessEngineTestCase
     assertEquals("Activiti BPMN 2.0 process engine", runtimeService.getVariable(procInst.getId(), "myVar"));
     assertEquals("fieldInjectionWorking", runtimeService.getVariable(procInst.getId(), "fieldInjection"));
   }
+
+  @Deployment
+  public void testDelegateClass() {
+    ProcessInstance procInst = runtimeService.startProcessInstanceByKey("delegateClassToSpringBean");
+    assertEquals("Activiti BPMN 2.0 process engine", runtimeService.getVariable(procInst.getId(), "myVar"));
+    assertEquals("fieldInjectionWorking", runtimeService.getVariable(procInst.getId(), "fieldInjection"));
+  }
   
   @Deployment
   public void testMethodExpressionOnSpringBean() {

@@ -32,6 +32,9 @@ import org.camunda.bpm.engine.impl.interceptor.LogInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.ProcessApplicationContextInterceptor;
 import org.camunda.bpm.engine.impl.variable.serializer.jpa.EntityManagerSession;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.ContextResource;
 import org.springframework.core.io.Resource;
@@ -46,13 +49,13 @@ import org.springframework.transaction.support.TransactionTemplate;
  * @author Joram Barrez
  * @author Daniel Meyer
  */
-public class SpringProcessEngineConfiguration extends ProcessEngineConfigurationImpl {
+public class SpringProcessEngineConfiguration extends ProcessEngineConfigurationImpl implements ApplicationContextAware {
 
   protected PlatformTransactionManager transactionManager;
   protected String deploymentName = "SpringAutoDeployment";
   protected Resource[] deploymentResources = new Resource[0];
   protected String deploymentTenantId;
-
+  protected ApplicationContext applicationContext;
 
   public SpringProcessEngineConfiguration() {
     transactionsExternallyManaged = true;
@@ -160,6 +163,11 @@ public class SpringProcessEngineConfiguration extends ProcessEngineConfiguration
     }
   }
 
+  @Override
+  protected void initArtifactFactory() {
+    artifactFactory = new SpringArtifactFactory(applicationContext);
+  }
+
   public PlatformTransactionManager getTransactionManager() {
     return transactionManager;
   }
@@ -190,5 +198,10 @@ public class SpringProcessEngineConfiguration extends ProcessEngineConfiguration
 
   public void setDeploymentTenantId(String deploymentTenantId) {
     this.deploymentTenantId = deploymentTenantId;
+  }
+
+  @Override
+  public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+    this.applicationContext = applicationContext;
   }
 }
