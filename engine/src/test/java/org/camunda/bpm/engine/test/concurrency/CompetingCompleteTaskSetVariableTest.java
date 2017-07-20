@@ -73,8 +73,7 @@ public class CompetingCompleteTaskSetVariableTest extends ConcurrencyTestCase {
   }
 
   @Deployment
-  @Ignore("CAM-7477")
-  public void testCompleteTaskSetLocalVariable() {
+  public void ignoreTestCompleteTaskSetLocalVariable() {
     runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
     final String taskId = taskService.createTaskQuery().singleResult().getId();
