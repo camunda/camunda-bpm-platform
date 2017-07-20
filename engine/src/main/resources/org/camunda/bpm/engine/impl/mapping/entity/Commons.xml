@@ -143,4 +143,23 @@
       </foreach>
     </if>
   </sql>
+
+  <!-- Input: "listOfIds": a list of IDs;
+              "fieldName": the field name that should be used before IN clause -->
+  <!-- Output: a conjunction of IN clauses -->
+  <!-- Example Output: PROC_INST_ID_ IN ( "1", "2" ..... "1000") or IN ("1000", "1001") -->
+  <sql id="applyInForPaginatedCollection">
+	( ${fieldName} IN
+	<foreach item="id" index="index" collection="listOfIds" open = "(" separator="" close=")">
+	  #{id}
+	  <choose>
+	  <when test="index != 0 &amp;&amp; index%999 == 0 &amp;&amp; index &lt; listOfIds.size">
+		) or ${fieldName} IN (
+	  </when>
+	  <when test="index == listOfIds.size -1"></when>
+	  <otherwise> ,</otherwise>
+	  </choose>
+	</foreach>
+	)
+  </sql>
 </mapper>

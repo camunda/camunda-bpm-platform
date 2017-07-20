@@ -151,11 +151,9 @@
         and (RES.DEPLOYMENT_ID_ is null
         <if test="parameter.deploymentIds != null">
           or
-          RES.DEPLOYMENT_ID_ in
-	        <foreach item="deploymentId" index="index" collection="parameter.deploymentIds"
-	        open="(" separator="," close=")">
-	          #{deploymentId}
-	        </foreach>
+          <bind name="listOfIds" value="parameter.deploymentIds"/>
+          <bind name="fieldName" value="'RES.DEPLOYMENT_ID_'"/>
+          <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
         </if>
         )
       </if>

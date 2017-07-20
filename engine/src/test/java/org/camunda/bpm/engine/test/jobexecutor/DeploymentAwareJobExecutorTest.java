@@ -26,7 +26,10 @@ import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.junit.Assert;
+import org.junit.Assume;
+import org.junit.Test;
 
 public class DeploymentAwareJobExecutorTest extends PluggableProcessEngineTestCase {
 
@@ -245,6 +248,56 @@ public class DeploymentAwareJobExecutorTest extends PluggableProcessEngineTestCa
     acquirableJobs = findAcquirableJobs();
 
     assertEquals(0, acquirableJobs.size());
+  }
+
+  public void testFindAcquirableJobsWhen0InstancesDeployed() {
+    // given
+    Assume.assumeTrue(processEngineConfiguration.getDatabaseType().equals("oracle"));
+
+    // then
+    findAcquirableJobs();
+  }
+
+  public void testFindAcquirableJobsWhen1InstanceDeployed() {
+    // given
+    Assume.assumeTrue(processEngineConfiguration.getDatabaseType().equals("oracle"));
+    // when
+    deployment(ProcessModels.ONE_TASK_PROCESS);
+    // then
+    findAcquirableJobs();
+  }
+
+  public void testFindAcquirableJobsWhen1000InstancesDeployed() {
+    // given
+    Assume.assumeTrue(processEngineConfiguration.getDatabaseType().equals("oracle"));
+    // when
+    for (int i=0; i<1000; i++) {
+      deployment(ProcessModels.ONE_TASK_PROCESS);
+    }
+    // then
+    findAcquirableJobs();
+  }
+
+  public void testFindAcquirableJobsWhen1001InstancesDeployed() {
+    // given
+    Assume.assumeTrue(processEngineConfiguration.getDatabaseType().equals("oracle"));
+    // when
+    for (int i=0; i<1001; i++) {
+      deployment(ProcessModels.ONE_TASK_PROCESS);
+    }
+    // then
+    findAcquirableJobs();
+  }
+
+  public void testFindAcquirableJobsWhen2000InstancesDeployed() {
+    // given
+    Assume.assumeTrue(processEngineConfiguration.getDatabaseType().equals("oracle"));
+    // when
+    for (int i=0; i<2000; i++) {
+      deployment(ProcessModels.ONE_TASK_PROCESS);
+    }
+    // then
+    findAcquirableJobs();
   }
 
   protected List<JobEntity> findAcquirableJobs() {
