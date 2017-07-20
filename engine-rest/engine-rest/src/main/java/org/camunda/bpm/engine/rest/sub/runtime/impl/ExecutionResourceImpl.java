@@ -94,8 +94,8 @@ public class ExecutionResourceImpl implements ExecutionResource {
     Incident newIncident = null;
 
     try {
-      newIncident = engine.getRuntimeService().createIncident(createIncidentDto.getIncidentType(), executionId, createIncidentDto.getActivityId(),
-          createIncidentDto.getConfiguration(), createIncidentDto.getMessage());
+      newIncident = engine.getRuntimeService()
+          .createIncident(createIncidentDto.getIncidentType(), executionId, createIncidentDto.getConfiguration(), createIncidentDto.getMessage());
     } catch (BadUserRequestException e) {
       throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());
     }
