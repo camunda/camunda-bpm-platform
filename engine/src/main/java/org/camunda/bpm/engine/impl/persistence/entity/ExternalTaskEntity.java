@@ -473,7 +473,6 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
 
   public void extendLock(long newLockExpirationTime) {
     ensureActive();
-    EnsureUtil.ensureGreaterThanOrEqual(BadUserRequestException.class, "Cannot extend a lock that expired", "lockExpirationTime", lockExpirationTime.getTime(), System.currentTimeMillis());
     long newTime = lockExpirationTime.getTime() + newLockExpirationTime;
     this.lockExpirationTime = new Date(newTime);
   }

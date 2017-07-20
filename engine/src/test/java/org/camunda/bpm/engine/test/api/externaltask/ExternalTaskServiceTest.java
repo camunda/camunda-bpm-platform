@@ -1997,7 +1997,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
-  public void testExtendLockTimeFailed() {
+  public void testExtendLockTimeThatExpired() {
     // given
     runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
 
@@ -2008,17 +2008,149 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
     assertNotNull(lockedTasks);
     assertEquals(1, lockedTasks.size());
 
+    ClockUtil.setCurrentTime(new DateTime(ClockUtil.getCurrentTime()).plus(2).toDate());
     // when
-
-    try {
-      Thread.sleep(1);
-    } catch (InterruptedException e) {}
-
     try {
       externalTaskService.extendLock(lockedTasks.get(0).getId(), WORKER_ID, 100);
       fail("Exception expected");
     } catch (BadUserRequestException e) {
+      // then
       assertTrue(e.getMessage().contains("Cannot extend a lock that expired"));
+    }
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  public void testExtendLockTimeWithoutLock() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+
+    ExternalTask externalTask = externalTaskService.createExternalTaskQuery().singleResult();
+    // when
+    try {
+      externalTaskService.extendLock(externalTask.getId(), WORKER_ID, 100);
+      fail("Exception expected");
+    } catch (BadUserRequestException e) {
+      assertTrue(e.getMessage().contains("The lock of the External Task " + externalTask.getId() + " cannot be extended by worker '" + WORKER_ID));
+    }
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  public void testExtendLockTimeWithNullLockTime() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+
+    List<LockedExternalTask> lockedTasks = externalTaskService.fetchAndLock(1, WORKER_ID)
+        .topic(TOPIC_NAME, 1L)
+        .execute();
+
+    assertNotNull(lockedTasks);
+    assertEquals(1, lockedTasks.size());
+
+    // when
+    try {
+      externalTaskService.extendLock(lockedTasks.get(0).getId(), WORKER_ID, 0);
+      fail("Exception expected");
+    } catch (BadUserRequestException e) {
+      // then
+      assertTrue(e.getMessage().contains("lockTime is not greater than 0"));
+    }
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  public void testExtendLockTimeWithNegativeLockTime() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+
+    List<LockedExternalTask> lockedTasks = externalTaskService.fetchAndLock(1, WORKER_ID)
+        .topic(TOPIC_NAME, 1L)
+        .execute();
+
+    assertNotNull(lockedTasks);
+    assertEquals(1, lockedTasks.size());
+
+    // when
+    try {
+      externalTaskService.extendLock(lockedTasks.get(0).getId(), WORKER_ID, -1);
+      fail("Exception expected");
+    } catch (BadUserRequestException e) {
+      // then
+      assertTrue(e.getMessage().contains("lockTime is not greater than 0"));
+    }
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  public void testExtendLockTimeWithNullWorkerId() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+
+    List<LockedExternalTask> lockedTasks = externalTaskService.fetchAndLock(1, WORKER_ID)
+        .topic(TOPIC_NAME, 1L)
+        .execute();
+
+    assertNotNull(lockedTasks);
+    assertEquals(1, lockedTasks.size());
+
+    // when
+    try {
+      externalTaskService.extendLock(lockedTasks.get(0).getId(), null, 100);
+      fail("Exception expected");
+    } catch (NullValueException e) {
+      // then
+      assertTrue(e.getMessage().contains("workerId is null"));
+    }
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  public void testExtendLockTimeWithDifferentWorkerId() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+
+    List<LockedExternalTask> lockedTasks = externalTaskService.fetchAndLock(1, WORKER_ID)
+        .topic(TOPIC_NAME, 1L)
+        .execute();
+
+    assertNotNull(lockedTasks);
+    assertEquals(1, lockedTasks.size());
+
+    LockedExternalTask task = lockedTasks.get(0);
+    // when
+    try {
+      externalTaskService.extendLock(task.getId(),"anAnotherWorkerId", 100);
+      fail("Exception expected");
+    } catch (BadUserRequestException e) {
+      assertTrue(e.getMessage().contains("The lock of the External Task " + task.getId() + " cannot be extended by worker 'anAnotherWorkerId'"));
+    }
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  public void testExtendLockTimeWithNullExternalTask() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+
+    List<LockedExternalTask> lockedTasks = externalTaskService.fetchAndLock(1, WORKER_ID)
+        .topic(TOPIC_NAME, 1L)
+        .execute();
+
+    assertNotNull(lockedTasks);
+    assertEquals(1, lockedTasks.size());
+
+    // when
+    try {
+      externalTaskService.extendLock(null, WORKER_ID, 100);
+      fail("Exception expected");
+    } catch (BadUserRequestException e) {
+      assertTrue(e.getMessage().contains("Cannot find external task with id null"));
+    }
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  public void testExtendLockTimeForUnexistingExternalTask() {
+    // when
+    try {
+      externalTaskService.extendLock("unexisting", WORKER_ID, 100);
+      fail("Exception expected");
+    } catch (BadUserRequestException e) {
+      assertTrue(e.getMessage().contains("Cannot find external task with id unexisting"));
     }
   }
 
