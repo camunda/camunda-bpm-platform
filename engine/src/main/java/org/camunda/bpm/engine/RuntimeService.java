@@ -1924,7 +1924,7 @@ public interface RuntimeService {
   RestartProcessInstanceBuilder restartProcessInstances(String processDefinitionId);
 
   /**
-   * Create an incident
+   * Creates an incident
    *
    * @param incidentType the type of incident, cannot be null
    * @param executionId execution id, cannot be null
@@ -1937,10 +1937,10 @@ public interface RuntimeService {
    *          if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
    *          and no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
-  Incident createIncident(String incidentType, String executionId, String activityId, String configuration);
+  Incident createIncident(String incidentType, String executionId, String configuration);
 
   /**
-   * Create an incident
+   * Creates an incident
    *
    * @param incidentType the type of incident, cannot be null
    * @param executionId execution id, cannot be null
@@ -1954,10 +1954,10 @@ public interface RuntimeService {
    *          if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
    *          and no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
-  Incident createIncident(String incidentType, String executionId, String activityId, String configuration, String message);
+  Incident createIncident(String incidentType, String executionId, String configuration, String message);
 
   /**
-   * Resolve and remove an incident
+   * Resolves and remove an incident
    *
    * @param incidentId the id of an incident to resolve
    *

@@ -65,8 +65,11 @@
     <result property="revision" column="REV_" jdbcType="INTEGER" />
   </resultMap>
   
-  <!-- INCIDENT SELECT -->  
+  <!-- INCIDENT SELECT -->
 
+  <select id="selectIncident" parameterType="string" resultMap="incidentResultMap">
+    select * from ${prefix}ACT_RU_INCIDENT where ID_ = #{id}
+  </select>
   <select id="selectIncidentsByExecutionId" parameterType="string" resultMap="incidentResultMap">
     select *
     from ${prefix}ACT_RU_INCIDENT I

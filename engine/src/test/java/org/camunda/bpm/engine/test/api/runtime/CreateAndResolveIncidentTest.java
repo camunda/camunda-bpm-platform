@@ -4,12 +4,9 @@ import static org.junit.Assert.*;
 
 import java.util.List;
 
-import org.apache.tools.ant.filters.TokenFilter.ContainsString;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.history.HistoricIncident;
-import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -51,14 +48,14 @@ public class CreateAndResolveIncidentTest {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process");
 
     // when
-    Incident incident = runtimeService.createIncident("foo", processInstance.getId(), "userTask1", "bar");
+    Incident incident = runtimeService.createIncident("foo", processInstance.getId(), "aa", "bar");
 
     // then
     Incident incident2 = runtimeService.createIncidentQuery().executionId(processInstance.getId()).singleResult();
     assertEquals(incident2.getId(), incident.getId());
-    assertEquals("userTask1", incident2.getActivityId());
     assertEquals("foo", incident2.getIncidentType());
-    assertEquals("bar", incident2.getConfiguration());
+    assertEquals("aa", incident2.getConfiguration());
+    assertEquals("bar", incident2.getIncidentMessage());
     assertEquals(processInstance.getId(), incident2.getExecutionId());
   }
 
@@ -87,10 +84,10 @@ public class CreateAndResolveIncidentTest {
   public void createIncidentWithNonExistingExecution() {
 
     try {
-      runtimeService.createIncident("foo", "aaa", "userTask1", "bar");
+      runtimeService.createIncident("foo", "aaa", "bbb", "bar");
       fail("exception expected");
     } catch (BadUserRequestException e) {
-      assertThat(e.getMessage(), containsString("Cannot find an execution with executionId 'aaa' and activityId 'userTask1'"));
+      assertThat(e.getMessage(), containsString("Cannot find an execution with executionId 'aaa'"));
     }
   }
 
@@ -141,7 +138,7 @@ public class CreateAndResolveIncidentTest {
       runtimeService.resolveIncident(incident.getId());
       fail("Exception expected");
     } catch (BadUserRequestException e) {
-      assertThat(e.getMessage(), containsString("Cannot resolve an incident that belongs to a job definition"));
+      assertThat(e.getMessage(), containsString("Cannot resolve an incident of type failedJob"));
     }
   }
 }

@@ -41,6 +41,10 @@ public class IncidentManager extends AbstractManager {
     return (Long) getDbEntityManager().selectOne("selectIncidentCountByQueryCriteria", incidentQuery);
   }
 
+  public Incident findIncidentById(String id) {
+    return (Incident) getDbEntityManager().selectById(IncidentEntity.class, id);
+  }
+
   public List<Incident> findIncidentByConfiguration(String configuration) {
     return findIncidentByConfigurationAndIncidentType(configuration, null);
   }

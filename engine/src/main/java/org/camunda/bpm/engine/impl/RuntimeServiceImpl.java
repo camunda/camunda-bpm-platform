@@ -14,7 +14,6 @@ package org.camunda.bpm.engine.impl;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -666,12 +665,12 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
     return new RestartProcessInstanceBuilderImpl(commandExecutor, processDefinitionId);
   }
 
-  public Incident createIncident(String incidentType, String executionId, String activityId, String configuration) {
-    return createIncident(incidentType, executionId, activityId, configuration, null);
+  public Incident createIncident(String incidentType, String executionId, String configuration) {
+    return createIncident(incidentType, executionId, configuration, null);
   }
 
-  public Incident createIncident(String incidentType, String executionId, String activityId, String configuration, String message) {
-    return commandExecutor.execute(new CreateIncidentCmd(incidentType, executionId, activityId, configuration, message));
+  public Incident createIncident(String incidentType, String executionId, String configuration, String message) {
+    return commandExecutor.execute(new CreateIncidentCmd(incidentType, executionId, configuration, message));
   }
 
   public void resolveIncident(String incidentId) {

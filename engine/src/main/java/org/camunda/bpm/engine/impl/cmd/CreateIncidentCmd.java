@@ -1,9 +1,6 @@
 package org.camunda.bpm.engine.impl.cmd;
 
-import java.util.concurrent.Callable;
-
 import org.camunda.bpm.engine.BadUserRequestException;
-import org.camunda.bpm.engine.impl.ExecutionQueryImpl;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -20,14 +17,12 @@ public class CreateIncidentCmd implements Command<Incident> {
 
   protected String incidentType;
   protected String executionId;
-  protected String activityId;
   protected String configuration;
   protected String message;
 
-  public CreateIncidentCmd(String incidentType, String executionId, String activityId, String configuration, String message) {
+  public CreateIncidentCmd(String incidentType, String executionId, String configuration, String message) {
     this.incidentType = incidentType;
     this.executionId = executionId;
-    this.activityId = activityId;
     this.configuration = configuration;
     this.message = message;
   }
@@ -36,16 +31,12 @@ public class CreateIncidentCmd implements Command<Incident> {
   public Incident execute(CommandContext commandContext) {
     EnsureUtil.ensureNotNull(BadUserRequestException.class, "Execution id cannot be null", "executionId", executionId);
     EnsureUtil.ensureNotNull(BadUserRequestException.class, "incidentType", incidentType);
-    ExecutionEntity execution = commandContext.runWithoutAuthorization(new Callable<ExecutionEntity>() {
 
-      @Override
-      public ExecutionEntity call() throws Exception {
-         return (ExecutionEntity) new ExecutionQueryImpl().executionId(executionId).activityId(activityId).singleResult();
-      }
-    });
-
+    ExecutionEntity execution = commandContext.getExecutionManager().findExecutionById(executionId);
     EnsureUtil.ensureNotNull(BadUserRequestException.class,
-        "Cannot find an execution with executionId '" + executionId + "' and activityId '" + activityId + "'", "execution", execution);
+        "Cannot find an execution with executionId '" + executionId + "'", "execution", execution);
+    EnsureUtil.ensureNotNull(BadUserRequestException.class, "Execution must be related to an activity", "activity",
+        execution.getActivity());
 
     for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
       checker.checkUpdateProcessInstance(execution);

@@ -1,10 +1,6 @@
 package org.camunda.bpm.engine.impl.cmd;
 
-import java.util.concurrent.Callable;
-
 import org.camunda.bpm.engine.BadUserRequestException;
-import org.camunda.bpm.engine.impl.ExecutionQueryImpl;
-import org.camunda.bpm.engine.impl.IncidentQueryImpl;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -27,26 +23,20 @@ public class ResolveIncidentCmd implements Command<Void> {
 
   @Override
   public Void execute(CommandContext commandContext) {
-    final Incident incident = commandContext.runWithoutAuthorization(new Callable<Incident>() {
+    final Incident incident = commandContext.getIncidentManager().findIncidentById(incidentId);
 
-      @Override
-      public Incident call() throws Exception {
-        return new IncidentQueryImpl().incidentId(incidentId).singleResult();
-      }
-    });
+    EnsureUtil.ensureNotNull(BadUserRequestException.class, "Cannot find an incident with id '" + incidentId + "'",
+        "incident", incident);
 
-    EnsureUtil.ensureNotNull(BadUserRequestException.class, "Cannot find an incident with id '" + incidentId + "'", "incident", incident);
-    EnsureUtil.ensureNull(BadUserRequestException.class, "Cannot resolve an incident that belongs to a job definition", "jobDefinitionId", incident.getJobDefinitionId());
+    if (incident.getIncidentType().equals("failedJob") || incident.getIncidentType().equals("failedExternalTask")) {
+      throw new BadUserRequestException("Cannot resolve an incident of type " + incident.getIncidentType());
+    }
 
-    ExecutionEntity execution = commandContext.runWithoutAuthorization(new Callable<ExecutionEntity>() {
+    EnsureUtil.ensureNotNull(BadUserRequestException.class, "", "executionId", incident.getExecutionId());
+    ExecutionEntity execution = commandContext.getExecutionManager().findExecutionById(incident.getExecutionId());
 
-      @Override
-      public ExecutionEntity call() throws Exception {
-         return (ExecutionEntity) new ExecutionQueryImpl().executionId(incident.getExecutionId()).singleResult();
-      }
-    });
-
-    EnsureUtil.ensureNotNull(BadUserRequestException.class, "Cannot find an execution for an incident with id '" + incidentId + "'", "execution", execution);
+    EnsureUtil.ensureNotNull(BadUserRequestException.class,
+        "Cannot find an execution for an incident with id '" + incidentId + "'", "execution", execution);
 
     for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
       checker.checkUpdateProcessInstance(execution);
