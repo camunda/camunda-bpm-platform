@@ -1542,7 +1542,7 @@ public class ExecutionRestServiceInteractionTest extends AbstractRestServiceTest
 
   @Test
   public void testCreateIncident() {
-    when(runtimeServiceMock.createIncident(anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn(mock(Incident.class));
+    when(runtimeServiceMock.createIncident(anyString(), anyString(), anyString(), anyString())).thenReturn(mock(Incident.class));
     Map<String, Object> json = new HashMap<String, Object>();
     json.put("activityId", "activityId");
     json.put("incidentType", "incidentType");
@@ -1552,12 +1552,12 @@ public class ExecutionRestServiceInteractionTest extends AbstractRestServiceTest
     given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).contentType(ContentType.JSON).body(json).then().expect().statusCode(Status.OK.getStatusCode())
         .when().post(CREATE_INCIDENT_URL);
 
-    verify(runtimeServiceMock).createIncident("incidentType", MockProvider.EXAMPLE_EXECUTION_ID, "activityId", "configuration", "message");
+    verify(runtimeServiceMock).createIncident("incidentType", MockProvider.EXAMPLE_EXECUTION_ID, "configuration", "message");
   }
 
   @Test
   public void testCreateIncidentWithNullIncidentType() {
-    doThrow(new BadUserRequestException()).when(runtimeServiceMock).createIncident(anyString(), anyString(), anyString(), anyString(), anyString());
+    doThrow(new BadUserRequestException()).when(runtimeServiceMock).createIncident(anyString(), anyString(), anyString(), anyString());
     Map<String, Object> json = new HashMap<String, Object>();
     json.put("activiyId", "activityId");
     json.put("configuration", "configuration");
