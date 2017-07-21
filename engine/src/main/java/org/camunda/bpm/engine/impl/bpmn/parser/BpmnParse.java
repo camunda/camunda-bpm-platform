@@ -2943,6 +2943,7 @@ public class BpmnParse extends Parse {
 
       // create the boundary event activity
       ActivityImpl boundaryEventActivity = createActivityOnScope(boundaryEventElement, flowScope);
+      parseAsynchronousContinuation(boundaryEventElement, boundaryEventActivity);
 
       ActivityImpl attachedActivity = flowScope.findActivityAtLevelOfSubprocess(attachedToRef);
       if (attachedActivity == null) {

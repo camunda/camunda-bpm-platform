@@ -526,6 +526,18 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
     assertEquals(BoundaryConditionalEventActivityBehavior.class, conditionalBoundaryEvent.getActivityBehavior().getClass());
   }
 
+  @Deployment
+  public void testParseAsyncBoundaryEvent() {
+    ActivityImpl conditionalBoundaryEvent1 = findActivityInDeployedProcessDefinition("conditionalBoundaryEvent1");
+    ActivityImpl conditionalBoundaryEvent2 = findActivityInDeployedProcessDefinition("conditionalBoundaryEvent2");
+
+    assertTrue(conditionalBoundaryEvent1.isAsyncAfter());
+    assertTrue(conditionalBoundaryEvent1.isAsyncBefore());
+
+    assertFalse(conditionalBoundaryEvent2.isAsyncAfter());
+    assertFalse(conditionalBoundaryEvent2.isAsyncBefore());
+  }
+
   public void testParseInvalidIntermediateConditionalEvent() {
     parseInvalidConditionalEvent("testParseInvalidIntermediateConditionalEvent");
   }
