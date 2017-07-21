@@ -13,12 +13,8 @@
 
 package org.camunda.bpm.model.bpmn.instance;
 
-import org.junit.Test;
-
 import java.util.Arrays;
 import java.util.Collection;
-
-import static org.assertj.core.api.Assertions.fail;
 
 /**
  * @author Sebastian Menski
@@ -40,57 +36,4 @@ public class BoundaryEventTest extends BpmnModelElementInstanceTest {
     );
   }
 
-  @Test
-  public void shouldFailSettingCamundaAsyncBefore() {
-    BoundaryEvent boundaryEvent = modelInstance.newInstance(BoundaryEvent.class);
-    try {
-      boundaryEvent.isCamundaAsyncBefore();
-      fail("Expected: UnsupportedOperationException");
-    } catch(UnsupportedOperationException ex) {
-      // True
-    }
-
-    try {
-      boundaryEvent.setCamundaAsyncBefore(false);
-      fail("Expected: UnsupportedOperationException");
-    } catch(UnsupportedOperationException ex) {
-      // True
-    }
-  }
-
-  @Test
-  public void shouldFailSettingCamundaAsyncAfter() {
-    BoundaryEvent boundaryEvent = modelInstance.newInstance(BoundaryEvent.class);
-    try {
-      boundaryEvent.isCamundaAsyncAfter();
-      fail("Expected: UnsupportedOperationException");
-    } catch(UnsupportedOperationException ex) {
-      // True
-    }
-
-    try {
-      boundaryEvent.setCamundaAsyncAfter(false);
-      fail("Expected: UnsupportedOperationException");
-    } catch(UnsupportedOperationException ex) {
-      // True
-    }
-  }
-
-  @Test
-  public void shouldFailSettingCamundaExclusive() {
-    BoundaryEvent boundaryEvent = modelInstance.newInstance(BoundaryEvent.class);
-    try {
-      boundaryEvent.isCamundaExclusive();
-      fail("Expected: UnsupportedOperationException");
-    } catch(UnsupportedOperationException ex) {
-      // True
-    }
-
-    try {
-      boundaryEvent.setCamundaExclusive(false);
-      fail("Expected: UnsupportedOperationException");
-    } catch(UnsupportedOperationException ex) {
-      // True
-    }
-  }
 }
