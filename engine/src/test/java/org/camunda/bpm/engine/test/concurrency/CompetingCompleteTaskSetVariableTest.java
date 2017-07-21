@@ -24,6 +24,7 @@ import org.junit.Ignore;
  * @author Svetlana Dorokhova
  *
  */
+@Ignore
 public class CompetingCompleteTaskSetVariableTest extends ConcurrencyTestCase {
 
   protected static class ControllableCompleteTaskCommand extends ConcurrencyTestCase.ControllableCommand<Void> {
