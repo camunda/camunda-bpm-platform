@@ -48,6 +48,7 @@ import org.camunda.bpm.engine.test.mock.Mocks;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
 /**
  * @author Sebastian Menski
@@ -99,10 +100,6 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
 
     Mocks.reset();
 
-    for (org.camunda.bpm.engine.repository.Deployment deployment:
-      repositoryService.createDeploymentQuery().list()) {
-      repositoryService.deleteDeployment(deployment.getId(), true);
-    }
     for (Filter filter : filterService.createTaskFilterQuery().list()) {
       filterService.deleteFilter(filter.getId());
     }
@@ -113,7 +110,9 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
       identityService.deleteUser(user.getId());
     }
     for (Task task : taskService.createTaskQuery().list()) {
-      taskService.deleteTask(task.getId(), true);
+      if (task.getProcessInstanceId() == null) {
+        taskService.deleteTask(task.getId(), true);
+      }
     }
   }
 
@@ -453,14 +452,13 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
   }
 
   protected void createDeploymentWithBusinessKey(String aBusinessKey) {
-    repositoryService.createDeployment()
-      .addModelInstance("foo.bpmn",
-        Bpmn.createExecutableProcess("aProcessDefinition")
-          .startEvent()
-            .userTask()
-          .endEvent()
-          .done())
-      .deploy();
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("aProcessDefinition")
+      .startEvent()
+        .userTask()
+      .endEvent()
+      .done();
+
+    deployment(modelInstance);
 
     runtimeService.startProcessInstanceByKey("aProcessDefinition", aBusinessKey);
   }

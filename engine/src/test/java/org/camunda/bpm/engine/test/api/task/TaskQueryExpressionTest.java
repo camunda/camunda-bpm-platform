@@ -30,6 +30,8 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.mock.Mocks;
 import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.bpm.model.bpmn.builder.EndEventBuilder;
 import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
@@ -325,14 +327,13 @@ public class TaskQueryExpressionTest extends ResourceProcessEngineTestCase {
   }
 
   protected void createBusinessKeyDeployment(String aBusinessKey) {
-    repositoryService.createDeployment()
-      .addModelInstance("foo.bpmn",
-        Bpmn.createExecutableProcess("aProcessDefinition")
-          .startEvent()
-            .userTask()
-          .endEvent()
-          .done())
-      .deploy();
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("aProcessDefinition")
+      .startEvent()
+        .userTask()
+      .endEvent()
+      .done();
+
+    deployment(modelInstance);
 
     runtimeService.startProcessInstanceByKey("aProcessDefinition", aBusinessKey);
   }
@@ -557,10 +558,6 @@ public class TaskQueryExpressionTest extends ResourceProcessEngineTestCase {
   public void tearDown() {
     Mocks.reset();
 
-    for (org.camunda.bpm.engine.repository.Deployment deployment:
-      repositoryService.createDeploymentQuery().list()) {
-      repositoryService.deleteDeployment(deployment.getId(), true);
-    }
     for (Group group : identityService.createGroupQuery().list()) {
       identityService.deleteGroup(group.getId());
     }
