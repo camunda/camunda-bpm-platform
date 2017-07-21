@@ -74,17 +74,6 @@ module.exports = [
       repositoryData.set('deployments', deployments);
     });
 
-    // responsible for refreshing the deployments list top position.
-    // nope. css can't do that (unless we drop support for IE9 and use flexbox)
-    function updateDeploymentsListTop() {
-      var filterContainer = angular.element('[ng-controller="camDeploymentsCtrl"] .content view');
-      $scope.deploymentsListTop = (
-                                    (filterContainer[0].offsetTop * 1) +
-                                    Math.max(49, (filterContainer.height() || 0))
-                                  ) + 'px';
-    }
-    $timeout(updateDeploymentsListTop, 200);
-
     repositoryData.provide('currentDeployment', ['deployments', function(deployments) {
       deployments = deployments || [];
 
@@ -110,8 +99,7 @@ module.exports = [
           updateSilently({
             deployment: focused.id,
             resource: null,
-            viewbox: null,
-            editMode: null
+            viewbox: null
           });
           $location.replace();
         }
@@ -121,8 +109,7 @@ module.exports = [
         updateSilently({
           deployment: null,
           resource: null,
-          viewbox: null,
-          editMode: null
+          viewbox: null
         });
         $location.replace();
       }

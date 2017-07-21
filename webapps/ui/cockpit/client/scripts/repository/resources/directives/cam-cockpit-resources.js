@@ -88,16 +88,14 @@ module.exports = [function() {
           if ($scope.currentResourceId === resourceId) {
             updateSilently({
               resource: resourceId,
-              resourceName: null,
-              editMode: null
+              resourceName: null
             });
           }
           else {
             updateSilently({
               resource: resourceId,
               resourceName: null,
-              viewbox: null,
-              editMode: null
+              viewbox: null
             });
           }
 
