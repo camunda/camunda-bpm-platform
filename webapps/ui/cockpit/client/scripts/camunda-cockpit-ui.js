@@ -1,6 +1,7 @@
 'use strict';
 
 var $ = window.jQuery = window.$ = require('jquery');
+require('camunda-commons-ui/vendor/bootstrap');
 
 var commons = require('camunda-commons-ui/lib');
 var sdk = require('camunda-commons-ui/vendor/camunda-bpm-sdk-angular');

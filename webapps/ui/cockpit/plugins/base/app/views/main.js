@@ -5,6 +5,7 @@
 
 var angular = require('angular'),
     camCommon = require('cam-common'),
+    diagramInstancePlugins = require('./processInstance/diagramPlugins'),
     // dashboard
     dashboardDeployments = require('./dashboard/deployments'),
     dashboardReports = require('./dashboard/reports'),
@@ -37,12 +38,12 @@ var angular = require('angular'),
     addVariableAction = require('./processInstance/addVariableAction'),
     updateSuspensionStateActionPI = require('./processInstance/updateSuspensionStateAction'),
     updateSuspensionStateDialogPI = require('./processInstance/updateSuspensionStateDialog'),
-    activityInstanceStatisticsOverlayPI = require('./processInstance/activityInstanceStatisticsOverlay'),
     incidentJobRetryAction = require('./processInstance/incidentJobRetryAction'),
     incidentExternalTaskRetryAction = require('./processInstance/incident-externalTask-retry-action');
 
 var ngModule = angular.module('cockpit.plugin.base.views', [
-  camCommon.name
+  camCommon.name,
+  diagramInstancePlugins.name
 ]);
 
 ngModule.config(dashboardDeployments);
@@ -73,7 +74,6 @@ ngModule.controller('CancelProcessInstanceController', cancelProcessInstanceDial
 ngModule.config(addVariableAction);
 ngModule.config(updateSuspensionStateActionPI);
 ngModule.controller('UpdateProcessInstanceSuspensionStateController', updateSuspensionStateDialogPI);
-ngModule.config(activityInstanceStatisticsOverlayPI);
 ngModule.config(incidentJobRetryAction);
 ngModule.config(incidentExternalTaskRetryAction);
 
