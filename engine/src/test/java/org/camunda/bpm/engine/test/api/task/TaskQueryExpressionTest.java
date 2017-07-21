@@ -565,7 +565,9 @@ public class TaskQueryExpressionTest extends ResourceProcessEngineTestCase {
       identityService.deleteUser(user.getId());
     }
     for (Task task : taskService.createTaskQuery().list()) {
-      taskService.deleteTask(task.getId(), true);
+      if (task.getProcessInstanceId() == null) {
+        taskService.deleteTask(task.getId(), true);
+      }
     }
 
     identityService.clearAuthentication();
