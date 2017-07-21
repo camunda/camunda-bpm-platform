@@ -84,6 +84,12 @@ module.exports = function(grunt) {
     buildTarget: pkg.gruntConfig.welcomeBuildTarget
   });
 
+  require('./grunt/config/localescompile')(config, localesConf, {
+    appName: 'cockpit',
+    sourceDir: pkg.gruntConfig.cockpitSourceDir,
+    buildTarget: pkg.gruntConfig.cockpitBuildTarget
+  });
+
   var watchConf = {
     commons_styles: {
       options: {
