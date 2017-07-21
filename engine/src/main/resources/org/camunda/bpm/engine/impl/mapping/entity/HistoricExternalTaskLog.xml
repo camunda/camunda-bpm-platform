@@ -155,84 +155,82 @@
   </select>
 
   <sql id="selectHistoricExternalTaskLogByQueryCriteriaSql">
-    from (
+    FROM ${prefix}ACT_HI_EXT_TASK_LOG RES
 
-      SELECT SELF.* FROM ${prefix}ACT_HI_EXT_TASK_LOG SELF
-      <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
-        <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause"/>
-        AUTH ON (AUTH.RESOURCE_ID_ in (SELF.PROC_DEF_KEY_, '*'))
+    <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause"/>
+      AUTH ON (AUTH.RESOURCE_ID_ in (RES.PROC_DEF_KEY_, '*'))
+    </if>
+
+    <where>
+      <if test="id != null">
+        RES.ID_ = #{id}
+      </if>
+      <if test="externalTaskId != null">
+        and RES.EXT_TASK_ID_ = #{externalTaskId}
+      </if>
+      <if test="errorMessage != null">
+        and RES.ERROR_MSG_ = #{errorMessage}
+      </if>
+      <if test="topicName != null">
+        and RES.TOPIC_NAME_ = #{topicName}
+      </if>
+      <if test="workerId != null">
+        and RES.WORKER_ID_ = #{workerId}
+      </if>
+      <if test="activityIds != null &amp;&amp; activityIds.length > 0">
+        and RES.ACT_ID_ in
+        <foreach item="item" index="index" collection="activityIds"
+                 open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
+      <if test="activityInstanceIds != null &amp;&amp; activityInstanceIds.length > 0">
+        and RES.ACT_INST_ID_ in
+        <foreach item="item" index="index" collection="activityInstanceIds"
+                 open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
+      <if test="executionIds != null &amp;&amp; executionIds.length > 0">
+        and RES.EXECUTION_ID_ in
+        <foreach item="item" index="index" collection="executionIds"
+                 open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
+      <if test="processInstanceId != null">
+        and RES.PROC_INST_ID_ = #{processInstanceId}
+      </if>
+      <if test="processDefinitionId != null">
+        and RES.PROC_DEF_ID_ = #{processDefinitionId}
+      </if>
+      <if test="processDefinitionKey != null">
+        and RES.PROC_DEF_KEY_ = #{processDefinitionKey}
+      </if>
+      <if test="priorityHigherThanOrEqual != null">
+        and RES.PRIORITY_ &gt;= #{priorityHigherThanOrEqual}
+      </if>
+      <if test="priorityLowerThanOrEqual != null">
+        and RES.PRIORITY_ &lt;= #{priorityLowerThanOrEqual}
+      </if>
+      <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
+        and RES.TENANT_ID_ in
+        <foreach item="tenantId" index="index" collection="tenantIds"
+                 open="(" separator="," close=")">
+          #{tenantId}
+        </foreach>
+      </if>
+      <if test="state != null">
+        and RES.STATE_ = #{state.stateCode}
       </if>
 
-      <where>
-        <if test="id != null">
-          SELF.ID_ = #{id}
-        </if>
-        <if test="externalTaskId != null">
-          and SELF.EXT_TASK_ID_ = #{externalTaskId}
-        </if>
-        <if test="errorMessage != null">
-          and SELF.ERROR_MSG_ = #{errorMessage}
-        </if>
-        <if test="topicName != null">
-          and SELF.TOPIC_NAME_ = #{topicName}
-        </if>
-        <if test="workerId != null">
-          and SELF.WORKER_ID_ = #{workerId}
-        </if>
-        <if test="activityIds != null &amp;&amp; activityIds.length > 0">
-          and SELF.ACT_ID_ in
-          <foreach item="item" index="index" collection="activityIds"
-                   open="(" separator="," close=")">
-            #{item}
-          </foreach>
-        </if>
-        <if test="activityInstanceIds != null &amp;&amp; activityInstanceIds.length > 0">
-          and SELF.ACT_INST_ID_ in
-          <foreach item="item" index="index" collection="activityInstanceIds"
-                   open="(" separator="," close=")">
-            #{item}
-          </foreach>
-        </if>
-        <if test="executionIds != null &amp;&amp; executionIds.length > 0">
-          and SELF.EXECUTION_ID_ in
-          <foreach item="item" index="index" collection="executionIds"
-                   open="(" separator="," close=")">
-            #{item}
-          </foreach>
-        </if>
-        <if test="processInstanceId != null">
-          and SELF.PROC_INST_ID_ = #{processInstanceId}
-        </if>
-        <if test="processDefinitionId != null">
-          and SELF.PROC_DEF_ID_ = #{processDefinitionId}
-        </if>
-        <if test="processDefinitionKey != null">
-          and SELF.PROC_DEF_KEY_ = #{processDefinitionKey}
-        </if>
-        <if test="priorityHigherThanOrEqual != null">
-          and SELF.PRIORITY_ &gt;= #{priorityHigherThanOrEqual}
-        </if>
-        <if test="priorityLowerThanOrEqual != null">
-          and SELF.PRIORITY_ &lt;= #{priorityLowerThanOrEqual}
-        </if>
-        <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
-          and SELF.TENANT_ID_ in
-          <foreach item="tenantId" index="index" collection="tenantIds"
-                   open="(" separator="," close=")">
-            #{tenantId}
-          </foreach>
-        </if>
-        <if test="state != null">
-          and SELF.STATE_ = #{state.stateCode}
-        </if>
+      <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck"/>
+      </if>
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck"/>
 
-        <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
-          <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck"/>
-        </if>
-        <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithSelfPrefix"/>
-
-      </where>
-    ) RES
+    </where>
   </sql>
 
 

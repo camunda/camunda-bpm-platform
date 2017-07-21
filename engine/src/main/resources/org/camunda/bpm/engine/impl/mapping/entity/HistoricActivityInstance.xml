@@ -164,61 +164,60 @@
   </select>
 
   <sql id="selectHistoricActivityInstancesByQueryCriteriaSql">
-    from (
+    FROM ${prefix}ACT_HI_ACTINST RES
 
-    SELECT SELF.* FROM ${prefix}ACT_HI_ACTINST SELF
     <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause"/>
-      AUTH ON (AUTH.RESOURCE_ID_ in (SELF.PROC_DEF_KEY_, '*'))
+      AUTH ON (AUTH.RESOURCE_ID_ in (RES.PROC_DEF_KEY_, '*'))
     </if>
 
     <where>
       <if test="processInstanceId != null">
-        SELF.PROC_INST_ID_ = #{processInstanceId}
+        RES.PROC_INST_ID_ = #{processInstanceId}
       </if>
       <if test="activityInstanceId != null">
-        and SELF.ID_ = #{activityInstanceId}
+        and RES.ID_ = #{activityInstanceId}
       </if>
       <if test="executionId != null">
-        and SELF.EXECUTION_ID_ = #{executionId}
+        and RES.EXECUTION_ID_ = #{executionId}
       </if>
       <if test="processDefinitionId != null">
-        and SELF.PROC_DEF_ID_ = #{processDefinitionId}
+        and RES.PROC_DEF_ID_ = #{processDefinitionId}
       </if>
       <if test="activityId != null">
-        and SELF.ACT_ID_ = #{activityId}
+        and RES.ACT_ID_ = #{activityId}
       </if>
       <if test="activityName != null">
-        and SELF.ACT_NAME_ = #{activityName}
+        and RES.ACT_NAME_ = #{activityName}
       </if>
       <if test="activityType != null">
-        and SELF.ACT_TYPE_ = #{activityType}
+        and RES.ACT_TYPE_ = #{activityType}
       </if>
       <if test="assignee != null">
-        and SELF.ASSIGNEE_ = #{assignee}
+        and RES.ASSIGNEE_ = #{assignee}
       </if>
       <if test="unfinished">
-        and SELF.END_TIME_ is null
+        and RES.END_TIME_ is null
       </if>
-      <if test="finished">and SELF.END_TIME_ is not null
+      <if test="finished">and RES.END_TIME_ is not null
       </if>
       <if test="startedBefore != null">
-        and SELF.START_TIME_ &lt;= #{startedBefore}
+        and RES.START_TIME_ &lt;= #{startedBefore}
       </if>
       <if test="startedAfter != null">
-        and SELF.START_TIME_ &gt;= #{startedAfter}
+        and RES.START_TIME_ &gt;= #{startedAfter}
       </if>
       <if test="finishedBefore != null">
-        and SELF.END_TIME_ &lt;= #{finishedBefore}
+        and RES.END_TIME_ &lt;= #{finishedBefore}
       </if>
       <if test="finishedAfter != null">
-        and SELF.END_TIME_ &gt;= #{finishedAfter}
+        and RES.END_TIME_ &gt;= #{finishedAfter}
       </if>
       <if test="activityInstanceState != null">
-        and SELF.ACT_INST_STATE_ = #{activityInstanceState.stateCode}
+        and RES.ACT_INST_STATE_ = #{activityInstanceState.stateCode}
       </if>
       <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
-        and SELF.TENANT_ID_ in
+        and RES.TENANT_ID_ in
         <foreach item="tenantId" index="index" collection="tenantIds"
                  open="(" separator="," close=")">
           #{tenantId}
@@ -228,10 +227,9 @@
       <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
         <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck"/>
       </if>
-      <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithSelfPrefix"/>
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck"/>
 
     </where>
-    ) RES
   </sql>
 
   <select id="selectHistoricActivityInstanceByNativeQuery" parameterType="java.util.Map" resultMap="historicActivityInstanceResultMap">
