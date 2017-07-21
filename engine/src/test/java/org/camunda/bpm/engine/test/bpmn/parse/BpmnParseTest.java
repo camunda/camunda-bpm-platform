@@ -795,7 +795,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
       repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
       fail("Exception expected: Process definition historyTimeToLive value can not be parsed.");
     } catch (ProcessEngineException e) {
-      assertTextPresent("Cannot parse historyTimeToLive", e.getCause().getMessage());
+      assertTextPresent("Cannot parse historyTimeToLive", e.getMessage());
     }
   }
 
@@ -825,7 +825,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
       repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
       fail("Exception expected: Process definition historyTimeToLive value can not be parsed.");
     } catch (ProcessEngineException e) {
-      assertTextPresent("Cannot parse historyTimeToLive", e.getCause().getMessage());
+      assertTextPresent("Cannot parse historyTimeToLive", e.getMessage());
     }
   }
 
@@ -835,7 +835,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
       repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
       fail("Exception expected: Process definition historyTimeToLive value can not be parsed.");
     } catch (ProcessEngineException e) {
-      assertTextPresent("Cannot parse historyTimeToLive", e.getCause().getMessage());
+      assertTextPresent("Cannot parse historyTimeToLive", e.getMessage());
     }
   }
 

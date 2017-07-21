@@ -51,7 +51,7 @@ public class CaseHandler extends CmmnElementHandler<Case, CmmnCaseDefinition> {
     definition.setName(element.getName());
     definition.setDeploymentId(deployment.getId());
     definition.setTaskDefinitions(new HashMap<String, TaskDefinition>());
-    ParseUtil.parseHistoryTimeToLive(element.getCamundaHistoryTimeToLiveString(), definition);
+    definition.setHistoryTimeToLive(ParseUtil.parseHistoryTimeToLive(element.getCamundaHistoryTimeToLiveString()));
     CmmnModelInstance model = context.getModel();
 
     Definitions definitions = model.getDefinitions();

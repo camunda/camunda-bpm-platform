@@ -536,12 +536,15 @@ public class BpmnParse extends Parse {
     processDefinition.setDeploymentId(deployment.getId());
     processDefinition.setProperty(PROPERTYNAME_JOB_PRIORITY, parsePriority(processElement, PROPERTYNAME_JOB_PRIORITY));
     processDefinition.setProperty(PROPERTYNAME_TASK_PRIORITY, parsePriority(processElement, PROPERTYNAME_TASK_PRIORITY));
-    processDefinition.setVersionTag(
-      processElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "versionTag")
-    );
+    processDefinition.setVersionTag(processElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "versionTag"));
 
-    ParseUtil.parseHistoryTimeToLive(processElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "historyTimeToLive"),
-        processDefinition);
+    try {
+      String historyTimeToLive = processElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "historyTimeToLive");
+      processDefinition.setHistoryTimeToLive(ParseUtil.parseHistoryTimeToLive(historyTimeToLive));
+    }
+    catch (Exception e) {
+      addError(new BpmnParseException(e.getMessage(), processElement, e));
+    }
 
     LOG.parsingElement("process", processDefinition.getKey());
 

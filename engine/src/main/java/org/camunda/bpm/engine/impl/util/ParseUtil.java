@@ -5,7 +5,6 @@ import java.util.regex.Pattern;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotValidException;
-import org.camunda.bpm.engine.impl.repository.ResourceDefinitionEntity;
 
 public class ParseUtil {
 
@@ -16,36 +15,36 @@ public class ParseUtil {
    * @param historyTimeToLive
    * @param entity
    */
-  public static void parseHistoryTimeToLive(String historyTimeToLive, ResourceDefinitionEntity<?> entity) {
-    Integer historyTTL = null;
+  public static Integer parseHistoryTimeToLive(String historyTimeToLive) {
+    Integer timeToLive = null;
 
     if (historyTimeToLive != null && !historyTimeToLive.isEmpty()) {
       Matcher matISO = REGEX_TTL_ISO.matcher(historyTimeToLive);
       if (matISO.find()) {
         historyTimeToLive = matISO.group(1);
       }
-      historyTTL = parseIntegerAttribute("historyTimeToLive", historyTimeToLive, false);
+      timeToLive = parseIntegerAttribute("historyTimeToLive", historyTimeToLive);
     }
 
-    if (historyTTL == null || historyTTL >= 0) {
-      entity.setHistoryTimeToLive(historyTTL);
-    } else {
+    if (timeToLive != null && timeToLive < 0) {
       throw new NotValidException("Cannot parse historyTimeToLive: negative value is not allowed");
     }
+
+    return timeToLive;
   }
 
-  public static Integer parseIntegerAttribute(String attributeName, String integerText, boolean required) {
-    if (required && (integerText == null || integerText.isEmpty())) {
-      throw new ProcessEngineException(attributeName + " is required");
-    } else {
-      if (integerText != null && !integerText.isEmpty()) {
-        try {
-          return Integer.parseInt(integerText);
-        } catch (NumberFormatException e) {
-          throw new ProcessEngineException("Cannot parse " + attributeName + ": " + e.getMessage());
-        }
+  protected static Integer parseIntegerAttribute(String attributeName, String text) {
+    Integer result = null;
+
+    if (text != null && !text.isEmpty()) {
+      try {
+        result = Integer.parseInt(text);
+      }
+      catch (NumberFormatException e) {
+        throw new ProcessEngineException("Cannot parse " + attributeName + ": " + e.getMessage());
       }
     }
-    return null;
+
+    return result;
   }
 }
