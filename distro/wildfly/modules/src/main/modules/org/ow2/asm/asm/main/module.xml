@@ -1,0 +1,5 @@
+<module xmlns="urn:jboss:module:1.0" name="org.ow2.awm.awm">
+  <resources>
+    <resource-root path="asm-5.0.4.jar" />
+  </resources>
+</module>
