@@ -20,6 +20,7 @@ module.exports = function() {
       onSearchChange: '&',
       textEmpty: '@',
       storageGroup: '=',
+      searchId: '@?',
       blocked: '='
     }
   };
