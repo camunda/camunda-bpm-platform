@@ -93,6 +93,9 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
   protected String taskId;
   protected String taskParentTaskId;
   protected String processInstanceId;
+  protected String processInstanceBusinessKey;
+  protected String[] processInstanceBusinessKeyIn;
+  protected String processInstanceBusinessKeyLike;
   protected String executionId;
   protected String[] activityInstanceIdIn;
   protected String processDefinitionId;
@@ -163,6 +166,21 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
   @CamundaQueryParam("processInstanceId")
   public void setProcessInstanceId(String processInstanceId) {
     this.processInstanceId = processInstanceId;
+  }
+
+  @CamundaQueryParam("processInstanceBusinessKey")
+  public void setProcessInstanceBusinessKey(String businessKey) {
+    this.processInstanceBusinessKey = businessKey;
+  }
+
+  @CamundaQueryParam(value = "processInstanceBusinessKeyIn", converter = StringArrayConverter.class)
+  public void setProcessInstanceBusinessKeyIn(String[] processInstanceBusinessKeyIn) {
+    this.processInstanceBusinessKeyIn = processInstanceBusinessKeyIn;
+  }
+
+  @CamundaQueryParam("processInstanceBusinessKeyLike")
+  public void setProcessInstanceBusinessKeyLike(String businessKeyLike) {
+    this.processInstanceBusinessKeyLike = businessKeyLike;
   }
 
   @CamundaQueryParam("executionId")
@@ -425,6 +443,15 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
     }
     if (processInstanceId != null) {
       query.processInstanceId(processInstanceId);
+    }
+    if (processInstanceBusinessKey != null) {
+      query.processInstanceBusinessKey(processInstanceBusinessKey);
+    }
+    if (processInstanceBusinessKeyIn != null && processInstanceBusinessKeyIn.length > 0) {
+      query.processInstanceBusinessKeyIn(processInstanceBusinessKeyIn);
+    }
+    if (processInstanceBusinessKeyLike != null) {
+      query.processInstanceBusinessKeyLike(processInstanceBusinessKeyLike);
     }
     if (executionId != null) {
       query.executionId(executionId);

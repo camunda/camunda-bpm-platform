@@ -605,6 +605,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_HISTORIC_TASK_INST_PROC_DEF_ID = "aProcDefId";
   public static final String EXAMPLE_HISTORIC_TASK_INST_PROC_DEF_KEY = "aProcDefKey";
   public static final String EXAMPLE_HISTORIC_TASK_INST_PROC_INST_ID = "aProcInstId";
+  public static final String EXAMPLE_HISTORIC_TASK_INST_PROC_INST_BUSINESS_KEY = "aBusinessKey";
   public static final String EXAMPLE_HISTORIC_TASK_INST_EXEC_ID = "anExecId";
   public static final String EXAMPLE_HISTORIC_TASK_INST_ACT_INST_ID = "anActInstId";
   public static final String EXAMPLE_HISTORIC_TASK_INST_NAME = "aName";
@@ -3008,7 +3009,7 @@ public abstract class MockProvider {
 
     return decisionResults;
   }
-  
+
   // historic external task log
   public static List<HistoricExternalTaskLog> createMockHistoricExternalTaskLogs() {
     List<HistoricExternalTaskLog> mocks = new ArrayList<HistoricExternalTaskLog>();

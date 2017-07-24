@@ -3,6 +3,7 @@ package org.camunda.bpm.engine.rest.history;
 import static com.jayway.restassured.RestAssured.expect;
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.path.json.JsonPath.from;
+import static org.camunda.bpm.engine.rest.util.QueryParamUtils.arrayAsCommaSeperatedList;
 import static org.fest.assertions.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
@@ -625,6 +626,92 @@ public class HistoricTaskInstanceRestServiceQueryTest extends AbstractRestServic
       .when().post(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
 
     verify(mockedQuery).processInstanceId(processInstanceId);
+  }
+
+  @Test
+  public void testQueryByProcessInstanceBusinessKey() {
+    String processInstanceBusinessKey = MockProvider.EXAMPLE_HISTORIC_TASK_INST_PROC_INST_BUSINESS_KEY;
+
+    given()
+      .queryParam("processInstanceBusinessKey", processInstanceBusinessKey)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).processInstanceBusinessKey(processInstanceBusinessKey);
+  }
+
+  @Test
+  public void testQueryByProcessInstanceBusinessKeyAsPost() {
+    String processInstanceBusinessKey = MockProvider.EXAMPLE_HISTORIC_TASK_INST_PROC_INST_BUSINESS_KEY;
+
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("processInstanceBusinessKey", processInstanceBusinessKey);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(params)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().post(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).processInstanceBusinessKey(processInstanceBusinessKey);
+  }
+
+  @Test
+  public void testQueryByProcessInstanceBusinessKeyLike() {
+    String processInstanceBusinessKeyLike = MockProvider.EXAMPLE_HISTORIC_TASK_INST_PROC_INST_BUSINESS_KEY;
+
+    given()
+      .queryParam("processInstanceBusinessKeyLike", processInstanceBusinessKeyLike)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).processInstanceBusinessKeyLike(processInstanceBusinessKeyLike);
+  }
+
+  @Test
+  public void testQueryByProcessInstanceBusinessKeyLikeAsPost() {
+    String processInstanceBusinessKeyLike = MockProvider.EXAMPLE_HISTORIC_TASK_INST_PROC_INST_BUSINESS_KEY;
+
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("processInstanceBusinessKeyLike", processInstanceBusinessKeyLike);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(params)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().post(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).processInstanceBusinessKeyLike(processInstanceBusinessKeyLike);
+  }
+
+  @Test
+  public void testQueryByProcessInstanceBusinessKeyIn() {
+    given()
+        .queryParam("processInstanceBusinessKeyIn", arrayAsCommaSeperatedList("aBusinessKey", "anotherBusinessKey"))
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).processInstanceBusinessKeyIn("aBusinessKey", "anotherBusinessKey");
+  }
+
+  @Test
+  public void testQueryByProcessInstanceBusinessKeyInAsPost() {
+    String businessKey1 = "aBusinessKey";
+    String businessKey2 = "anotherBusinessKey";
+    List<String> processInstanceBusinessKeyIn = new ArrayList<String>();
+    processInstanceBusinessKeyIn.add(businessKey1);
+    processInstanceBusinessKeyIn.add(businessKey2);
+
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("processInstanceBusinessKeyIn", processInstanceBusinessKeyIn);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(params)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().post(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).processInstanceBusinessKeyIn(businessKey1, businessKey2);
   }
 
   @Test

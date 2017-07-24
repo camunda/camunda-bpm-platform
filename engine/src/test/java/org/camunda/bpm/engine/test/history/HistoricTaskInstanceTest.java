@@ -17,6 +17,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
@@ -121,7 +122,7 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
   @Deployment
   public void testHistoricTaskInstanceQuery() throws Exception {
     // First instance is finished
-    ProcessInstance finishedInstance = runtimeService.startProcessInstanceByKey("HistoricTaskQueryTest");
+    ProcessInstance finishedInstance = runtimeService.startProcessInstanceByKey("HistoricTaskQueryTest", "aBusinessKey");
 
     // Set priority to non-default value
     Task task = taskService.createTaskQuery().processInstanceId(finishedInstance.getId()).singleResult();
@@ -163,6 +164,10 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
     // Process instance id
     assertEquals(1, historyService.createHistoricTaskInstanceQuery().processInstanceId(finishedInstance.getId()).count());
     assertEquals(0, historyService.createHistoricTaskInstanceQuery().processInstanceId("unexistingid").count());
+
+    // Process instance business key
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().processInstanceBusinessKey(finishedInstance.getBusinessKey()).count());
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery().processInstanceBusinessKey("unexistingBusinessKey").count());
 
     // Process definition id
     assertEquals(1, historyService.createHistoricTaskInstanceQuery().processDefinitionId(finishedInstance.getProcessDefinitionId()).count());
@@ -996,5 +1001,42 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
       fail("A ProcessEngineExcpetion was expected.");
     } catch (NotValidException e) {}
 
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
+  public void testQueryByProcessInstanceBusinessKeyIn() {
+    // given
+    ProcessInstance piBusinessKey1 = runtimeService.startProcessInstanceByKey("oneTaskProcess", "BUSINESS-KEY-1");
+    ProcessInstance piBusinessKey2 = runtimeService.startProcessInstanceByKey("oneTaskProcess", "BUSINESS-KEY-2");
+
+    // Complete the task
+    List<Task> list = taskService.createTaskQuery().processDefinitionKey("oneTaskProcess").list();
+    assertEquals(2, list.size());
+    for (Task task : list) {
+      taskService.complete(task.getId());
+    }
+
+    // then
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().processInstanceBusinessKeyIn(piBusinessKey1.getBusinessKey()).count());
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery().processInstanceBusinessKeyIn("unexistingBusinessKey").count());
+    HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().processInstanceBusinessKeyIn(piBusinessKey2.getBusinessKey()).singleResult();
+    assertNotNull(historicTaskInstance);
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
+  public void testQueryByProcessInstanceBusinessKeyLike() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", "BUSINESS-KEY-1");
+
+    // Complete the task
+    Task task = taskService.createTaskQuery().processDefinitionKey("oneTaskProcess").singleResult();
+    assertNotNull(task);
+    taskService.complete(task.getId());
+
+    // then
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().processInstanceBusinessKeyLike("BUSINESS-KEY-1").list().size());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().processInstanceBusinessKeyLike("BUSINESS-KEY%").count());
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery().processInstanceBusinessKeyLike("BUSINESS-KEY").count());
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery().processInstanceBusinessKeyLike("BUZINESS-KEY%").count());
   }
 }

@@ -39,6 +39,9 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
   protected String processDefinitionKey;
   protected String processDefinitionName;
   protected String processInstanceId;
+  protected String processInstanceBusinessKey;
+  protected String[] processInstanceBusinessKeys;
+  protected String processInstanceBusinessKeyLike;
   protected String executionId;
   protected String[] activityInstanceIds;
   protected String taskId;
@@ -115,6 +118,25 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
 
   public HistoricTaskInstanceQueryImpl processInstanceId(String processInstanceId) {
     this.processInstanceId = processInstanceId;
+    return this;
+  }
+
+  public HistoricTaskInstanceQuery processInstanceBusinessKey(String processInstanceBusinessKey) {
+    this.processInstanceBusinessKey = processInstanceBusinessKey;
+    expressions.remove("processInstanceBusinessKey");
+    return this;
+  }
+
+  @Override
+  public HistoricTaskInstanceQuery processInstanceBusinessKeyIn(String... processInstanceBusinessKeys) {
+    this.processInstanceBusinessKeys = processInstanceBusinessKeys;
+    return this;
+  }
+
+  @Override
+  public HistoricTaskInstanceQuery processInstanceBusinessKeyLike(String processInstanceBusinessKey) {
+    this.processInstanceBusinessKeyLike = processInstanceBusinessKey;
+    expressions.remove("processInstanceBusinessKeyLike");
     return this;
   }
 
@@ -390,7 +412,8 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
       || CompareUtil.areNotInAscendingOrder(startedAfter, startedBefore)
       || CompareUtil.areNotInAscendingOrder(finishedAfter, finishedBefore)
       || CompareUtil.areNotInAscendingOrder(dueAfter, dueDate, dueBefore)
-      || CompareUtil.areNotInAscendingOrder(followUpAfter, followUpDate, followUpBefore);
+      || CompareUtil.areNotInAscendingOrder(followUpAfter, followUpDate, followUpBefore)
+      || CompareUtil.elementIsNotContainedInArray(processInstanceBusinessKey, processInstanceBusinessKeys);
   }
 
   // ordering /////////////////////////////////////////////////////////////////
@@ -503,6 +526,18 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
 
   public String getProcessInstanceId() {
     return processInstanceId;
+  }
+
+  public String getProcessInstanceBusinessKey() {
+    return processInstanceBusinessKey;
+  }
+
+  public String[] getProcessInstanceBusinessKeys() {
+    return processInstanceBusinessKeys;
+  }
+
+  public String getProcessInstanceBusinessKeyLike() {
+    return processInstanceBusinessKeyLike;
   }
 
   public String getExecutionId() {

@@ -205,7 +205,8 @@
       AUTH ON (AUTH.RESOURCE_ID_ in (RES.PROC_DEF_KEY_, '*'))
     </if>
 
-    <if test="processFinished || processUnfinished">
+    <if test="processFinished || processUnfinished || processInstanceBusinessKey != null|| processInstanceBusinessKeyLike != null ||
+              (processInstanceBusinessKeys != null &amp;&amp; processInstanceBusinessKeys.length > 0)">
       inner join ${prefix}ACT_HI_PROCINST HPI ON RES.PROC_INST_ID_ = HPI.ID_
     </if>
     <if test="processDefinitionKey != null || processDefinitionName != null">
@@ -264,6 +265,19 @@
       </if>
       <if test="processInstanceId != null">
         and RES.PROC_INST_ID_ = #{processInstanceId}
+      </if>
+      <if test="processInstanceBusinessKey != null">
+        and HPI.BUSINESS_KEY_ = #{processInstanceBusinessKey}
+      </if>
+      <if test="processInstanceBusinessKeys != null &amp;&amp; processInstanceBusinessKeys.length > 0">
+        and HPI.BUSINESS_KEY_ in
+        <foreach item="item" index="index" collection="processInstanceBusinessKeys"
+                 open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
+      <if test="processInstanceBusinessKeyLike != null">
+        HPI.BUSINESS_KEY_ like #{processInstanceBusinessKeyLike} ESCAPE #{escapeChar}
       </if>
       <if test="taskDefinitionKeys != null &amp;&amp; taskDefinitionKeys.length > 0">
         and RES.TASK_DEF_KEY_ in

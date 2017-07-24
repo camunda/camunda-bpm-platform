@@ -32,6 +32,18 @@ public interface HistoricTaskInstanceQuery  extends Query<HistoricTaskInstanceQu
   /** Only select historic task instances for the given process instance. */
   HistoricTaskInstanceQuery processInstanceId(String processInstanceId);
 
+  /** Only select historic tasks for the given process instance business key */
+  HistoricTaskInstanceQuery processInstanceBusinessKey(String processInstanceBusinessKey);
+
+  /**
+   * Only select historic tasks for any of the given the given process instance business keys.
+   */
+  HistoricTaskInstanceQuery processInstanceBusinessKeyIn(String... processInstanceBusinessKeys);
+
+  /** Only select historic tasks matching the given process instance business key.
+   *  The syntax is that of SQL: for example usage: nameLike(%camunda%)*/
+  HistoricTaskInstanceQuery processInstanceBusinessKeyLike(String processInstanceBusinessKey);
+
   /** Only select historic task instances for the given execution. */
   HistoricTaskInstanceQuery executionId(String executionId);
 
