@@ -2008,7 +2008,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
     assertNotNull(lockedTasks);
     assertEquals(1, lockedTasks.size());
 
-    ClockUtil.setCurrentTime(new DateTime(ClockUtil.getCurrentTime()).plus(2).toDate());
+    ClockUtil.setCurrentTime(nowPlus(2));
     // when
     try {
       externalTaskService.extendLock(lockedTasks.get(0).getId(), WORKER_ID, 100);
