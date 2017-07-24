@@ -1453,4 +1453,10 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
   public void addIdentityLinkChanges(String type, String oldProperty, String newProperty) {
     identityLinkChanges.add(new PropertyChange(type, oldProperty, newProperty));
   }
+
+  @Override
+  public void setVariablesLocal(Map<String, ?> variables) {
+    super.setVariablesLocal(variables);
+    Context.getCommandContext().getDbEntityManager().forceUpdate(this);
+  }
 }
