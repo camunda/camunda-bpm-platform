@@ -132,7 +132,14 @@ public class FoxJobRetryCmd extends JobRetryCmd {
       execution = fetchExecutionEntity(executionId);
     }
 
-    Object value = expression.getValue(execution);
+    Object value = null;
+
+    try {
+       value = expression.getValue(execution);
+    }
+    catch (Exception e) {
+      LOG.exceptionWhileParsingExpression(jobId, e.getCause().getMessage());
+    }
 
     if (value instanceof String) {
       return (String) value;

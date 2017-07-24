@@ -38,7 +38,7 @@ public class JobExecutorLogger extends ProcessEngineLogger {
 
   public void debugFallbackToDefaultRetryStrategy() {
     logDebug(
-        "003", "Falling back to default retry stratefy");
+        "003", "Falling back to default retry strategy");
   }
 
   public void debugDecrementingRetriesForJob(String id) {
@@ -167,6 +167,11 @@ public class JobExecutorLogger extends ProcessEngineLogger {
   public ProcessEngineException jobNotFoundException(String jobId) {
     return new ProcessEngineException(exceptionMessage(
         "026", "No job found with id '{}'", jobId));
+  }
+
+  public void exceptionWhileParsingExpression(String jobId, String exceptionMessage) {
+    logWarn(
+        "027", "Falling back to default retry strategy. Exception while executing job {}: {}", jobId, exceptionMessage);
   }
 
 }
