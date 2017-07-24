@@ -1308,7 +1308,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     doThrow(BadUserRequestException.class).when(externalTaskService).extendLock(anyString(), anyString(), anyLong());
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("workerId", "workerId");
-    parameters.put("newDuration", "1000");
+    parameters.put("newDuration", -1);
 
     given()
       .pathParam("id", MockProvider.EXTERNAL_TASK_ID)
@@ -1320,6 +1320,25 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     .when()
       .post(EXTEND_LOCK_ON_EXTERNAL_TASK);
 
+  }
+
+  @Test
+  public void testExtendLockOnUnexistingExternalTask() {
+    doThrow(NotFoundException.class).when(externalTaskService).extendLock(anyString(), anyString(), anyLong());
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("workerId", "workerId");
+    json.put("newDuration", 1000);
+
+    given()
+      .pathParam("id", MockProvider.EXTERNAL_TASK_ID)
+      .contentType(ContentType.JSON)
+      .body(json)
+    .then()
+      .expect()
+      .statusCode(Status.NOT_FOUND.getStatusCode())
+    .when()
+      .post(EXTEND_LOCK_ON_EXTERNAL_TASK);
   }
 
 }
