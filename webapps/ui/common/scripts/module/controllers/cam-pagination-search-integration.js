@@ -47,7 +47,11 @@ function CamPaginationSearchIntegrationController($scope, $rootScope, searchWidg
     true
   );
   $scope.$watch('blocked', this.onBlockedChange.bind(this));
-  $rootScope.$on('cam-common:cam-searchable:query-force-change', this.onForcedRefresh.bind(this));
+  var removeForcedRefresh = $rootScope.$on('cam-common:cam-searchable:query-force-change', this.onForcedRefresh.bind(this));
+
+  $scope.$on('$destroy', function() {
+    removeForcedRefresh();
+  });
 }
 
 CamPaginationSearchIntegrationController.prototype.onForcedRefresh = function() {
