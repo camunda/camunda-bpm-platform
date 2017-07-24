@@ -650,12 +650,19 @@ public class AsyncAfterTest extends PluggableProcessEngineTestCase {
     // given process instance
     runtimeService.startProcessInstanceByKey("Process");
 
+    // assume
+    Task task = taskService.createTaskQuery().singleResult();
+    assertNotNull(task);
+
     // when we trigger the event
     runtimeService.correlateMessage("foo");
 
     // then
     Job job = managementService.createJobQuery().singleResult();
     assertNotNull(job);
+
+    task = taskService.createTaskQuery().singleResult();
+    assertNull(task);
   }
 
   @Deployment
@@ -663,25 +670,34 @@ public class AsyncAfterTest extends PluggableProcessEngineTestCase {
     // given process instance
     runtimeService.startProcessInstanceByKey("Process");
 
+    // assume
+    Task task = taskService.createTaskQuery().singleResult();
+    assertNotNull(task);
+
     // when we trigger the event
     runtimeService.correlateMessage("foo");
 
     // then
     Job job = managementService.createJobQuery().singleResult();
     assertNotNull(job);
+
+    task = taskService.createTaskQuery().singleResult();
+    assertNull(task);
   }
 
   public void testAsyncAfterErrorEvent() {
     // given
     BpmnModelInstance instance = Bpmn.createExecutableProcess("process")
       .startEvent()
-      .serviceTask("servTask").camundaClass(ThrowBpmnErrorDelegate.class)
+      .serviceTask("servTask")
+        .camundaClass(ThrowBpmnErrorDelegate.class)
       .boundaryEvent()
         .camundaAsyncAfter(true)
         .camundaFailedJobRetryTimeCycle("R10/PT10S")
         .errorEventDefinition()
         .errorEventDefinitionDone()
-      .serviceTask().camundaClass("foo")
+      .serviceTask()
+        .camundaClass("foo")
       .endEvent()
       .moveToActivity("servTask")
       .endEvent().done();

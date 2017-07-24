@@ -55,9 +55,7 @@ public class FoxFailedJobParseListener extends AbstractBpmnParseListener {
   @Override
   public void parseBoundaryEvent(Element boundaryEventElement, ScopeImpl scopeElement, ActivityImpl nestedActivity) {
     String type = nestedActivity.getProperties().get(BpmnProperties.TYPE);
-    if (type != null && type.equals(BOUNDARY_TIMER)) {
-      this.setFailedJobRetryTimeCycleValue(boundaryEventElement, nestedActivity);
-    } else if(isAsync(nestedActivity)) {
+    if ((type != null && type.equals(BOUNDARY_TIMER)) || isAsync(nestedActivity)) {
       setFailedJobRetryTimeCycleValue(boundaryEventElement, nestedActivity);
     }
   }
