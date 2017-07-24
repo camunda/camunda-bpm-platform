@@ -123,7 +123,6 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
 
   public HistoricTaskInstanceQuery processInstanceBusinessKey(String processInstanceBusinessKey) {
     this.processInstanceBusinessKey = processInstanceBusinessKey;
-    expressions.remove("processInstanceBusinessKey");
     return this;
   }
 
@@ -136,7 +135,6 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
   @Override
   public HistoricTaskInstanceQuery processInstanceBusinessKeyLike(String processInstanceBusinessKey) {
     this.processInstanceBusinessKeyLike = processInstanceBusinessKey;
-    expressions.remove("processInstanceBusinessKeyLike");
     return this;
   }
 
