@@ -117,7 +117,17 @@ public class CreateAndResolveIncidentTest {
   }
 
   @Test
-  public void resolveIncidentThatBelongsToJobDefnition() {
+  public void resolveNullIncident() {
+    try {
+      runtimeService.resolveIncident(null);
+      fail("Exception expected");
+    } catch (BadUserRequestException e) {
+      assertThat(e.getMessage(), containsString("Cannot find an incident with id 'null'"));
+    }
+  }
+
+  @Test
+  public void resolveIncidentOfTypeFailedJob() {
     // given
     testRule.deploy("org/camunda/bpm/engine/test/api/mgmt/IncidentTest.testShouldCreateOneIncident.bpmn");
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("failingProcess");

@@ -2141,15 +2141,10 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
    */
   @Override
   public void resolveIncident(final String incidentId) {
-    IncidentEntity incident = Context.getCommandContext().runWithoutAuthorization(new Callable<IncidentEntity>() {
-
-      @Override
-      public IncidentEntity call() throws Exception {
-        return (IncidentEntity) new IncidentQueryImpl().incidentId(incidentId).singleResult();
-      }
-
-    });
-
+    IncidentEntity incident = (IncidentEntity) Context
+        .getCommandContext()
+        .getIncidentManager()
+        .findIncidentById(incidentId);
     incident.resolve();
   }
 }
