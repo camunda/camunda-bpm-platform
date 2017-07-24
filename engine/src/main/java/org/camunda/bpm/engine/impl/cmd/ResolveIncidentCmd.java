@@ -18,6 +18,7 @@ public class ResolveIncidentCmd implements Command<Void> {
   protected String incidentId;
 
   public ResolveIncidentCmd(String incidentId) {
+    EnsureUtil.ensureNotNull(BadUserRequestException.class, "", "incidentId", incidentId);
     this.incidentId = incidentId;
   }
 

@@ -122,7 +122,7 @@ public class CreateAndResolveIncidentTest {
       runtimeService.resolveIncident(null);
       fail("Exception expected");
     } catch (BadUserRequestException e) {
-      assertThat(e.getMessage(), containsString("Cannot find an incident with id 'null'"));
+      assertThat(e.getMessage(), containsString("incidentId is null"));
     }
   }
 
