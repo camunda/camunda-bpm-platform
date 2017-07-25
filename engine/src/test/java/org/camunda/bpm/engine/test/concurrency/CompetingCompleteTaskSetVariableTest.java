@@ -24,7 +24,6 @@ import org.junit.Ignore;
  * @author Svetlana Dorokhova
  *
  */
-@Ignore
 public class CompetingCompleteTaskSetVariableTest extends ConcurrencyTestCase {
 
   protected static class ControllableCompleteTaskCommand extends ConcurrencyTestCase.ControllableCommand<Void> {
@@ -74,7 +73,7 @@ public class CompetingCompleteTaskSetVariableTest extends ConcurrencyTestCase {
   }
 
   @Deployment
-  public void ignoreTestCompleteTaskSetLocalVariable() {
+  public void testCompleteTaskSetLocalVariable() {
     runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
     final String taskId = taskService.createTaskQuery().singleResult().getId();
