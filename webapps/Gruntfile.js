@@ -208,7 +208,7 @@ grunt.registerTask('build', function(mode, app) {
       'less'
     );
 
-    if(typeof app === 'undefined' || app === 'tasklist') {
+    if(typeof app === 'undefined' || app === 'tasklist' || app === 'cockpit') {
       tasksToRun.push('localescompile');
     }
 

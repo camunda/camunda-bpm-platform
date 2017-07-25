@@ -67,14 +67,16 @@ var sanitizeProperty = function(search, type, operator, value) {
 var Controller = [
   '$scope',
   '$translate',
+  '$location',
   function(
     $scope,
-    $translate
+    $translate,
+    $location
   ) {
 
     $scope.searches = [];
-    $scope.matchType = '';
     $scope.translations = {};
+    $scope.matchAny = $location.search()['searchOrQuery'] || false;
 
     angular.forEach(searchConfig.tooltips, function(value, key) {
       $scope.translations[key] = $translate.instant(value);
@@ -97,13 +99,16 @@ var Controller = [
     });
 
     var searchData = $scope.tasklistData.newChild($scope);
-    $scope.$watch('[searches, matchType]', function() {
+    $scope.$watch('[searches, matchAny]', function() {
       var baseQuery = {};
       var tempQuery;
 
-      if ($scope.matchType === 'any') {
+      if ($scope.matchAny === true) {
         baseQuery.orQueries = [{}];
         tempQuery = baseQuery.orQueries[0];
+        tempQuery.processVariables = [];
+        tempQuery.taskVariables = [];
+        tempQuery.caseInstanceVariables = [];
       } else {
         baseQuery.processVariables = [];
         baseQuery.taskVariables = [];
@@ -123,7 +128,7 @@ var Controller = [
         }
       });
 
-      if (tempQuery === null) {
+      if ($scope.matchAny === false) {
         delete baseQuery.orQueries;
       }
 
