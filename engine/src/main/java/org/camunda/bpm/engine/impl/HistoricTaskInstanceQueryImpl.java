@@ -128,6 +128,7 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
 
   @Override
   public HistoricTaskInstanceQuery processInstanceBusinessKeyIn(String... processInstanceBusinessKeys) {
+    ensureNotNull("processInstanceBusinessKeys", (Object[]) processInstanceBusinessKeys);
     this.processInstanceBusinessKeys = processInstanceBusinessKeys;
     return this;
   }

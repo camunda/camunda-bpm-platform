@@ -205,7 +205,7 @@
       AUTH ON (AUTH.RESOURCE_ID_ in (RES.PROC_DEF_KEY_, '*'))
     </if>
 
-    <if test="processFinished || processUnfinished || processInstanceBusinessKey != null|| processInstanceBusinessKeyLike != null ||
+    <if test="processFinished || processUnfinished || processInstanceBusinessKey != null || processInstanceBusinessKeyLike != null ||
               (processInstanceBusinessKeys != null &amp;&amp; processInstanceBusinessKeys.length > 0)">
       inner join ${prefix}ACT_HI_PROCINST HPI ON RES.PROC_INST_ID_ = HPI.ID_
     </if>

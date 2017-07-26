@@ -1029,6 +1029,29 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
     assertEquals(1, query.processInstanceBusinessKeyIn(businessKey2, unexistingBusinessKey).count());
   }
 
+  public void testQueryByInvalidProcessInstanceBusinessKeyIn() {
+    HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
+
+    query.processInstanceBusinessKeyIn("invalid");
+    assertEquals(0, query.count());
+
+    try {
+      query.processInstanceBusinessKeyIn(null);
+      fail("A ProcessEngineExcpetion was expected.");
+    } catch (ProcessEngineException e) {}
+
+    try {
+      query.processInstanceBusinessKeyIn((String)null);
+      fail("A ProcessEngineExcpetion was expected.");
+    } catch (ProcessEngineException e) {}
+
+    try {
+      String[] values = { "a", null, "b" };
+      query.processInstanceBusinessKeyIn(values);
+      fail("A ProcessEngineExcpetion was expected.");
+    } catch (ProcessEngineException e) {}
+  }
+
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testQueryByProcessInstanceBusinessKeyLike() {
     // given
