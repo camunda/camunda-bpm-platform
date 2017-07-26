@@ -139,10 +139,6 @@ public class ProcessDefinitionQueryTest extends AbstractDefinitionQueryTest {
    * Verify that search by name like returns results with case-insensitive
    */
   public void testQueryByNameLikeCaseInsensitive() {
-    ProcessDefinitionQuery queryCaseSensitive = repositoryService.createProcessDefinitionQuery()
-      .processDefinitionName("OnE");
-    verifyQueryResults(queryCaseSensitive, 0);
-
     ProcessDefinitionQuery queryCaseInsensitive = repositoryService.createProcessDefinitionQuery()
       .processDefinitionNameLike("%OnE%");
     verifyQueryResults(queryCaseInsensitive, 2);
