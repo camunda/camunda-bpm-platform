@@ -456,6 +456,27 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  public void FAILING_testOutputScriptValueAsVariableAvailableAfterAsyncAfterParallelGateway() {
+    // given a local variable that we expose via output mapping
+    // and then we have a parallel gateway with async after
+    runtimeService.startProcessInstanceByKey("weird_variable_problem");
+
+    // when we execute all async jobs
+    List<Job> jobs = managementService.createJobQuery().list();
+    assertNotNull(jobs);
+    for (Job job : jobs) {
+      managementService.executeJob(job.getId());
+    }
+
+    // then the variable should be available in the branches after the parallel gateway
+    VariableInstance variableInstance = runtimeService
+      .createVariableInstanceQuery()
+      .variableName("someVariable")
+      .singleResult();
+    assertNotNull(variableInstance);
+  }
+
+  @Deployment
   public void testOutputScriptValueAsBean() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("onePlusOneBean", new OnePlusOneBean());
