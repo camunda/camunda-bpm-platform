@@ -11,6 +11,7 @@
             <camunda:map>
               <camunda:entry key="${varExpr1}">potato</camunda:entry>
               <camunda:entry key="b">tomato</camunda:entry>
+              <camunda:entry key="${varExpr2}">${varExprMapValue}</camunda:entry>
             </camunda:map>
           </camunda:inputParameter>
         </camunda:inputOutput>

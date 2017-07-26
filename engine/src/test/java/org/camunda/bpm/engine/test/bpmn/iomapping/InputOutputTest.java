@@ -380,6 +380,7 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("varExpr1", "a");
     variables.put("varExpr2", "b");
+    variables.put("varExprMapValue", "avocado");
     runtimeService.startProcessInstanceByKey("testProcess", variables);
 
     VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("var1").singleResult();
