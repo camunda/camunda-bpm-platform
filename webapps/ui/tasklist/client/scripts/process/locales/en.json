@@ -6,7 +6,7 @@
   "PROCESS_START_ERROR":
                         "The process could not be started.",
   "SEARCH_PROCESS_BY_NAME":
-                        "Search by process name, case sensitive.",
+                        "Search by process name.",
   "NO_PROCESS_DEFINITION_AVAILABLE":
                         "Note there are no process definitions available.",
   "START_PROCESS":
