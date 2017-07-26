@@ -212,7 +212,8 @@
         and RES.NAME_ = #{name}
       </if>
       <if test="nameLike != null">
-        and RES.NAME_ like #{nameLike} ESCAPE #{escapeChar}
+        <!-- based on CAM-8014 compare name like case-insensitive -->
+        and UPPER(RES.NAME_) like UPPER(#{nameLike}) ESCAPE #{escapeChar}
       </if>
       <if test="key != null">
         and RES.KEY_ = #{key}
