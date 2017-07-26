@@ -52,10 +52,10 @@ var Controller = ['$scope', '$location', 'search', 'TenantResource', 'camAPI', '
     $scope.tenantList = null;
     $scope.loadingState = 'LOADING';
 
-    return TenantResource.count(Object.assign({}, $scope.query)).$promise.then(function(data) {
+    return TenantResource.count(angular.extend({}, $scope.query)).$promise.then(function(data) {
       var total = data.count;
 
-      return TenantResource.query(Object.assign({}, $scope.query, queryParams)).$promise.then(function(data) {
+      return TenantResource.query(angular.extend({}, $scope.query, queryParams)).$promise.then(function(data) {
         $scope.tenantList = data;
         $scope.loadingState = data.length ? 'LOADED' : 'EMPTY';
 

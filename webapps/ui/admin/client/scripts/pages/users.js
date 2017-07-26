@@ -52,10 +52,10 @@ var Controller = ['$scope', '$location', 'search', 'UserResource', 'page', funct
     $scope.userList = null;
     $scope.loadingState = 'LOADING';
 
-    return UserResource.count(Object.assign({}, $scope.query)).$promise.then(function(data) {
+    return UserResource.count(angular.extend({}, $scope.query)).$promise.then(function(data) {
       var total = data.count;
 
-      return UserResource.query(Object.assign({}, $scope.query, queryParams)).$promise.then(function(data) {
+      return UserResource.query(angular.extend({}, $scope.query, queryParams)).$promise.then(function(data) {
         $scope.userList = data;
         $scope.loadingState = data.length ? 'LOADED' : 'EMPTY';
 

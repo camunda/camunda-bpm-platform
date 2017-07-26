@@ -52,10 +52,10 @@ var Controller = ['$scope', 'page', '$location', 'search', 'GroupResource', func
     $scope.groupList = null;
     $scope.loadingState = 'LOADING';
 
-    return GroupResource.count(Object.assign({}, $scope.query)).$promise.then(function(data) {
+    return GroupResource.count(angular.extend({}, $scope.query)).$promise.then(function(data) {
       var total = data.count;
 
-      return GroupResource.query(Object.assign({}, $scope.query, queryParams)).$promise.then(function(data) {
+      return GroupResource.query(angular.extend({}, $scope.query, queryParams)).$promise.then(function(data) {
         $scope.groupList = data;
         $scope.loadingState = data.length ? 'LOADED' : 'EMPTY';
 
