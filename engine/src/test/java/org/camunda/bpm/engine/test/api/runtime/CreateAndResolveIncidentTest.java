@@ -7,6 +7,7 @@ import java.util.List;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -111,7 +112,7 @@ public class CreateAndResolveIncidentTest {
     try {
       runtimeService.resolveIncident("foo");
       fail("Exception expected");
-    } catch (BadUserRequestException e) {
+    } catch (NotFoundException e) {
       assertThat(e.getMessage(), containsString("Cannot find an incident with id 'foo'"));
     }
   }

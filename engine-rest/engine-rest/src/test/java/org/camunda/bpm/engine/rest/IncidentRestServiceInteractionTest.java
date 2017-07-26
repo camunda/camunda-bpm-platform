@@ -3,6 +3,7 @@ package org.camunda.bpm.engine.rest;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.impl.IncidentQueryImpl;
 import org.camunda.bpm.engine.impl.ManagementServiceImpl;
 import org.camunda.bpm.engine.impl.RepositoryServiceImpl;
@@ -102,12 +103,12 @@ public class IncidentRestServiceInteractionTest extends AbstractRestServiceTest 
 
   @Test
   public void testResolveUnexistingIncident() {
-    doThrow(new BadUserRequestException()).when(mockRuntimeService).resolveIncident(anyString());
+    doThrow(new NotFoundException()).when(mockRuntimeService).resolveIncident(anyString());
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_INCIDENT_ID)
     .then().expect()
-      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .statusCode(Status.NOT_FOUND.getStatusCode())
     .when()
       .delete(SINGLE_INCIDENT_URL);
 

@@ -4,6 +4,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.rest.dto.runtime.IncidentDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.sub.runtime.IncidentResource;
@@ -34,6 +35,8 @@ public class IncidentResourceImpl implements IncidentResource {
   public void resolveIncident() {
     try {
       engine.getRuntimeService().resolveIncident(incidentId);
+    } catch (NotFoundException e) {
+      throw new InvalidRequestException(Status.NOT_FOUND, e.getMessage());
     } catch (BadUserRequestException e) {
       throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());
     }

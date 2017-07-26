@@ -1,6 +1,7 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -26,7 +27,7 @@ public class ResolveIncidentCmd implements Command<Void> {
   public Void execute(CommandContext commandContext) {
     final Incident incident = commandContext.getIncidentManager().findIncidentById(incidentId);
 
-    EnsureUtil.ensureNotNull(BadUserRequestException.class, "Cannot find an incident with id '" + incidentId + "'",
+    EnsureUtil.ensureNotNull(NotFoundException.class, "Cannot find an incident with id '" + incidentId + "'",
         "incident", incident);
 
     if (incident.getIncidentType().equals("failedJob") || incident.getIncidentType().equals("failedExternalTask")) {
