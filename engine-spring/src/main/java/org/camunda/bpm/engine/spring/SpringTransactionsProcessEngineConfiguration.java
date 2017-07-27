@@ -52,7 +52,6 @@ public class SpringTransactionsProcessEngineConfiguration extends ProcessEngineC
   protected String deploymentName = "SpringAutoDeployment";
   protected Resource[] deploymentResources = new Resource[0];
   protected String deploymentTenantId;
-  protected ApplicationContext applicationContext;
 
   public SpringTransactionsProcessEngineConfiguration() {
     transactionsExternallyManaged = true;
