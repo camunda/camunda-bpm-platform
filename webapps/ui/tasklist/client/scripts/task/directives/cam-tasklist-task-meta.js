@@ -10,10 +10,14 @@ module.exports = [
   '$modal',
   '$timeout',
   'camAPI',
+  'fixDate',
+  'unfixDate',
   function(
     $modal,
     $timeout,
-    camAPI
+    camAPI,
+    fixDate,
+    unfixDate
   ) {
     var Task = camAPI.resource('task');
 
@@ -36,6 +40,9 @@ module.exports = [
        */
         taskMetaData.observe('task', function(task) {
           $scope.task = angular.copy(task);
+
+          $scope.task.followUp = unfixDate($scope.task.followUp);
+          $scope.task.due = unfixDate($scope.task.due);
         });
 
         taskMetaData.observe('assignee', function(assignee) {
@@ -100,6 +107,9 @@ module.exports = [
 
           delete toSend._embedded;
           delete toSend._links;
+
+          toSend.due = fixDate(toSend.due);
+          toSend.followUp = fixDate(toSend.followUp);
 
           Task.update(toSend, function(err) {
             reload();

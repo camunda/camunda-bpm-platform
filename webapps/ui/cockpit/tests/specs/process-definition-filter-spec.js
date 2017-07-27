@@ -101,7 +101,7 @@ describe('Cockpit Process Definition Filter Spec', function() {
 
     it('should filter date', function() {
       // when
-      definitionPage.search.createSearch('Variable', '=', '2011-11-11T11:11:11.000+0200', 'myDate');
+      definitionPage.search.createSearch('Variable', '=', '2011-11-11T11:11:11', 'myDate');
 
       // then
       expect(definitionPage.processInstancesTab.table().count()).to.eventually.eql(1);

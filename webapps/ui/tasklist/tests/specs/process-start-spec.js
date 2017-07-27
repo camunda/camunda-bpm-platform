@@ -143,7 +143,7 @@ describe.skip('Tasklist Start Spec', function () {
       expect(startDialogPage.genericStartForm.variableList().count()).to.eventually.eql(0);
 
       // when
-      startDialogPage.genericStartForm.addVariable('var_1', 'Date', '2012-12-12T12:12:12.000+0200');
+      startDialogPage.genericStartForm.addVariable('var_1', 'Date', '2012-12-12T12:12:12');
       startDialogPage.genericStartForm.addVariable('var_2', 'Short', '123456');
 
       // then
@@ -251,7 +251,7 @@ describe.skip('Tasklist Start Spec', function () {
     it('should enter variables and business key', function() {
 
       // when
-      startDialogPage.genericStartForm.addVariable('var_1', 'Date', '2012-12-12T12:12:12.000+0200');
+      startDialogPage.genericStartForm.addVariable('var_1', 'Date', '2012-12-12T12:12:12');
       startDialogPage.genericStartForm.addVariable('var_2', 'Short', '123');
       startDialogPage.genericStartForm.addVariable('var_3', 'String', 'blaw blaw');
       startDialogPage.genericStartForm.addVariable('var_4', 'Integer', '123456789');

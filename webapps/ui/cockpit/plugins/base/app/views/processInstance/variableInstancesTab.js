@@ -14,9 +14,9 @@ var uploadTemplate = require('../../../../../client/scripts/components/variables
 module.exports = function(ngModule) {
   ngModule.controller('VariableInstancesController', [
     '$scope', '$sce', '$http', 'search', 'Uri', 'LocalExecutionVariableResource',
-    'Notifications', '$modal', '$q', 'camAPI',
+    'Notifications', '$modal', '$q', 'camAPI', 'fixDate', 'unfixDate',
     function($scope, $sce, $http, search, Uri, LocalExecutionVariableResource,
-      Notifications, $modal, $q, camAPI) {
+      Notifications, $modal, $q, camAPI, fixDate, unfixDate) {
 
         // input: processInstance, processData
 
@@ -153,6 +153,10 @@ module.exports = function(ngModule) {
         var newValue = variable.value;
         var newType = variable.type;
 
+        if(newType === 'Date') {
+          newValue = fixDate(newValue);
+        }
+
         var newVariable = { value: newValue, type: newType };
         modifiedVariable[variable.name] = newVariable;
 
@@ -172,6 +176,11 @@ module.exports = function(ngModule) {
               message: 'The variable \'' + variable.name + '\' has been changed successfully.',
               duration: 5000
             });
+
+            if(newVariable.type === 'Date') {
+              newVariable.value = unfixDate(newVariable.value);
+            }
+
             angular.extend(variable, newVariable);
             promise.resolve(info.variable);
           }
@@ -235,7 +244,11 @@ module.exports = function(ngModule) {
                   item.instance = instance;
                   variableCopies[item.id] = angular.copy(item);
 
-                    // prevents the list to throw an error when the activity instance is missing
+                  if(item.type === 'Date') {
+                    item.value = unfixDate(item.value);
+                  }
+
+                  // prevents the list to throw an error when the activity instance is missing
                   var activityInstanceLink = '';
                   if(instance) {
                     activityInstanceLink = '<a ng-href="#/process-instance/' +

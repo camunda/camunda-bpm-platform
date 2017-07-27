@@ -6,7 +6,7 @@ module.exports = function() {
     require: 'ngModel',
     link: function(scope, element, attrs, model) {
 
-      var pattern = /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(|\.[0-9]{0,4})([+-][0-9]{4}|Z)$/;
+      var pattern = /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(|\.[0-9]{0,4})$/;
 
       var dateParser = function(value) {
 

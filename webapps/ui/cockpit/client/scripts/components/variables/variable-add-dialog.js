@@ -13,6 +13,7 @@ var Controller = [
   'Uri',
   'instance',
   'isProcessInstance',
+  'fixDate',
   function(
     $http,
     $modalInstance,
@@ -20,11 +21,12 @@ var Controller = [
     Notifications,
     Uri,
     instance,
-    isProcessInstance
+    isProcessInstance,
+    fixDate
   ) {
 
 
-    $scope.isProcessInstance = isProcessInstance;  
+    $scope.isProcessInstance = isProcessInstance;
 
     $scope.variableTypes = [
       'String',
@@ -76,6 +78,10 @@ var Controller = [
           name = data.name;
 
       delete data.name;
+
+      if(data.type === 'Date') {
+        data.value = fixDate(data.value);
+      }
 
       $http
       .put(Uri.appUri('engine://engine/:engine/'+(isProcessInstance ? 'process' : 'case')+'-instance/'+instance.id+'/variables/'+name), data)

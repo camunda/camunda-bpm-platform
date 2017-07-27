@@ -128,7 +128,7 @@
                         "Loading the filters finished with failures. Try to refresh the page to try again.",
 
   "INVALID_DATE":
-                        "Invalid date: the date should have the pattern 'yyyy-MM-ddTHH:mm:ss.SSSZ'",
+                        "Invalid date: the date should have the pattern 'yyyy-MM-ddTHH:mm:ss'",
 
   "REQUIRE_UNIQUE_KEY":
                         "Key must be unique"
