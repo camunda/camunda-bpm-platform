@@ -984,8 +984,8 @@ public class TaskQueryOrTest {
       oneHourLater = new Date(date.getTime() + 60 * 60 * 1000);
 
     Task taskDueBefore = taskService.newTask();
-    taskDueBefore.setFollowUpDate(new Date(oneHourAgo.getTime() - 1));
-    taskDueBefore.setDueDate(new Date(oneHourAgo.getTime() - 1));
+    taskDueBefore.setFollowUpDate(new Date(oneHourAgo.getTime() - 1000));
+    taskDueBefore.setDueDate(new Date(oneHourAgo.getTime() - 1000));
     taskService.saveTask(taskDueBefore);
 
     Task taskDueDate = taskService.newTask();
@@ -994,8 +994,8 @@ public class TaskQueryOrTest {
     taskService.saveTask(taskDueDate);
 
     Task taskDueAfter = taskService.newTask();
-    taskDueAfter.setFollowUpDate(new Date(oneHourLater.getTime() + 1));
-    taskDueAfter.setDueDate(new Date(oneHourLater.getTime() + 1));
+    taskDueAfter.setFollowUpDate(new Date(oneHourLater.getTime() + 1000));
+    taskDueAfter.setDueDate(new Date(oneHourLater.getTime() + 1000));
     taskService.saveTask(taskDueAfter);
 
     assertEquals(3, taskService.createTaskQuery().count());
