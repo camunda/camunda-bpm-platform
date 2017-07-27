@@ -34,7 +34,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -856,6 +860,151 @@ public class TaskQueryOrTest {
     assertEquals("anotherTaskName", result.getQueries().get(2).getNameLike());
     assertEquals("aCandidateGroup", result.getQueries().get(3).getCandidateGroup());
     assertEquals("aCandidateUser", result.getQueries().get(4).getCandidateUser());
+  }
+
+  @Test
+  public void shouldTestDueDateCombinations() throws ParseException {
+    HashMap<String, Date> dates = createFollowUpAndDueDateTasks();
+
+    assertEquals(2, taskService.createTaskQuery()
+      .or()
+        .dueDate(dates.get("date"))
+        .dueBefore(dates.get("oneHourAgo"))
+      .endOr()
+      .count());
+
+    assertEquals(2, taskService.createTaskQuery()
+      .or()
+        .dueDate(dates.get("date"))
+        .dueAfter(dates.get("oneHourLater"))
+      .endOr()
+      .count());
+
+    assertEquals(2, taskService.createTaskQuery()
+      .or()
+        .dueBefore(dates.get("oneHourAgo"))
+        .dueAfter(dates.get("oneHourLater"))
+      .endOr()
+      .count());
+
+    assertEquals(3, taskService.createTaskQuery()
+      .or()
+        .dueBefore(dates.get("oneHourLater"))
+        .dueAfter(dates.get("oneHourAgo"))
+      .endOr()
+      .count());
+
+    assertEquals(3, taskService.createTaskQuery()
+      .or()
+        .dueDate(dates.get("date"))
+        .dueBefore(dates.get("oneHourAgo"))
+        .dueAfter(dates.get("oneHourLater"))
+      .endOr()
+      .count());
+  }
+
+  @Test
+  public void shouldTestFollowUpDateCombinations() throws ParseException {
+    HashMap<String, Date> dates = createFollowUpAndDueDateTasks();
+
+    assertEquals(2, taskService.createTaskQuery()
+      .or()
+        .followUpDate(dates.get("date"))
+        .followUpBefore(dates.get("oneHourAgo"))
+      .endOr()
+      .count());
+
+    assertEquals(2, taskService.createTaskQuery()
+      .or()
+        .followUpDate(dates.get("date"))
+        .followUpAfter(dates.get("oneHourLater"))
+      .endOr()
+      .count());
+
+    assertEquals(2, taskService.createTaskQuery()
+      .or()
+        .followUpBefore(dates.get("oneHourAgo"))
+        .followUpAfter(dates.get("oneHourLater"))
+      .endOr()
+      .count());
+
+    assertEquals(3, taskService.createTaskQuery()
+      .or()
+        .followUpBefore(dates.get("oneHourLater"))
+        .followUpAfter(dates.get("oneHourAgo"))
+      .endOr()
+      .count());
+
+    assertEquals(3, taskService.createTaskQuery()
+      .or()
+        .followUpDate(dates.get("date"))
+        .followUpBefore(dates.get("oneHourAgo"))
+        .followUpAfter(dates.get("oneHourLater"))
+      .endOr()
+      .count());
+
+    // followUp before or null
+    taskService.saveTask(taskService.newTask());
+
+    assertEquals(4, taskService.createTaskQuery().count());
+
+    assertEquals(3, taskService.createTaskQuery()
+      .or()
+        .followUpDate(dates.get("date"))
+        .followUpBeforeOrNotExistent(dates.get("oneHourAgo"))
+      .endOr()
+      .count());
+
+    assertEquals(3, taskService.createTaskQuery()
+      .or()
+        .followUpBeforeOrNotExistent(dates.get("oneHourAgo"))
+        .followUpAfter(dates.get("oneHourLater"))
+      .endOr()
+      .count());
+
+    assertEquals(4, taskService.createTaskQuery()
+      .or()
+        .followUpBeforeOrNotExistent(dates.get("oneHourLater"))
+        .followUpAfter(dates.get("oneHourAgo"))
+      .endOr()
+      .count());
+
+    assertEquals(4, taskService.createTaskQuery()
+      .or()
+        .followUpDate(dates.get("date"))
+        .followUpBeforeOrNotExistent(dates.get("oneHourAgo"))
+        .followUpAfter(dates.get("oneHourLater"))
+      .endOr()
+      .count());
+  }
+
+  public HashMap<String, Date> createFollowUpAndDueDateTasks() throws ParseException {
+    final Date date = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss").parse("27/07/2017 01:12:13"),
+      oneHourAgo = new Date(date.getTime() - 60 * 60 * 1000),
+      oneHourLater = new Date(date.getTime() + 60 * 60 * 1000);
+
+    Task taskDueBefore = taskService.newTask();
+    taskDueBefore.setFollowUpDate(new Date(oneHourAgo.getTime() - 1));
+    taskDueBefore.setDueDate(new Date(oneHourAgo.getTime() - 1));
+    taskService.saveTask(taskDueBefore);
+
+    Task taskDueDate = taskService.newTask();
+    taskDueDate.setFollowUpDate(date);
+    taskDueDate.setDueDate(date);
+    taskService.saveTask(taskDueDate);
+
+    Task taskDueAfter = taskService.newTask();
+    taskDueAfter.setFollowUpDate(new Date(oneHourLater.getTime() + 1));
+    taskDueAfter.setDueDate(new Date(oneHourLater.getTime() + 1));
+    taskService.saveTask(taskDueAfter);
+
+    assertEquals(3, taskService.createTaskQuery().count());
+
+    return new HashMap<String, Date>() {{
+      put("date", date);
+      put("oneHourAgo", oneHourAgo);
+      put("oneHourLater", oneHourLater);
+    }};
   }
 
 }

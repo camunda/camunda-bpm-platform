@@ -430,32 +430,42 @@
             <if test="query.caseDefinitionNameLike != null">
               ${queryType} CD.NAME_ like #{query.caseDefinitionNameLike} ESCAPE #{escapeChar}
             </if>
-            <if test="query.dueDate != null">
-              ${queryType} RES.DUE_DATE_ = #{query.dueDate}
-            </if>
-            <if test="query.dueBefore != null">
-              ${queryType} RES.DUE_DATE_ &lt; #{query.dueBefore}
-            </if>
-            <if test="query.dueAfter != null">
-              ${queryType} RES.DUE_DATE_ &gt; #{query.dueAfter}
-            </if>
             <if test="query.dueDate != null || query.dueBefore != null || query.dueAfter != null">
-              ${queryType} RES.DUE_DATE_ is not null
+              ${queryType}
+              <trim prefix="(" suffix=")" prefixOverrides="and|or">
+                <if test="query.dueDate != null">
+                  ${queryType} RES.DUE_DATE_ = #{query.dueDate}
+                </if>
+                <if test="query.dueBefore != null">
+                  ${queryType} RES.DUE_DATE_ &lt; #{query.dueBefore}
+                </if>
+                <if test="query.dueAfter != null">
+                  ${queryType} RES.DUE_DATE_ &gt; #{query.dueAfter}
+                </if>
+
+                and RES.DUE_DATE_ is not null
+              </trim>
             </if>
-            <if test="query.followUpDate != null">
-              ${queryType} RES.FOLLOW_UP_DATE_ = #{query.followUpDate}
-            </if>
-            <if test="query.followUpBefore != null &amp;&amp; !query.followUpNullAccepted">
-              ${queryType} RES.FOLLOW_UP_DATE_ &lt; #{query.followUpBefore}
-            </if>
-            <if test="query.followUpBefore != null &amp;&amp; query.followUpNullAccepted">
-              ${queryType} (RES.FOLLOW_UP_DATE_ IS NULL OR RES.FOLLOW_UP_DATE_ &lt; #{query.followUpBefore})
-            </if>
-            <if test="query.followUpAfter != null">
-              ${queryType} RES.FOLLOW_UP_DATE_ &gt; #{query.followUpAfter}
-            </if>
-            <if test="(query.followUpDate != null || query.followUpBefore != null || query.followUpAfter != null) &amp;&amp; !query.followUpNullAccepted">
-              ${queryType} RES.FOLLOW_UP_DATE_ is not null
+            <if test="query.followUpDate != null || query.followUpBefore != null || query.followUpAfter != null">
+              ${queryType}
+              <trim prefix="(" suffix=")" prefixOverrides="and|or">
+                <if test="query.followUpDate != null">
+                  ${queryType} RES.FOLLOW_UP_DATE_ = #{query.followUpDate}
+                </if>
+                <if test="query.followUpBefore != null &amp;&amp; !query.followUpNullAccepted">
+                  ${queryType} RES.FOLLOW_UP_DATE_ &lt; #{query.followUpBefore}
+                </if>
+                <if test="query.followUpBefore != null &amp;&amp; query.followUpNullAccepted">
+                  ${queryType} (RES.FOLLOW_UP_DATE_ IS NULL OR RES.FOLLOW_UP_DATE_ &lt; #{query.followUpBefore})
+                </if>
+                <if test="query.followUpAfter != null">
+                  ${queryType} RES.FOLLOW_UP_DATE_ &gt; #{query.followUpAfter}
+                </if>
+
+                <if test="!query.followUpNullAccepted">
+                  and RES.FOLLOW_UP_DATE_ is not null
+                </if>
+              </trim>
             </if>
             <if test="query.excludeSubtasks">
               ${queryType} RES.PARENT_TASK_ID_ IS NULL
