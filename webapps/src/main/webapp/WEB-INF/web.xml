@@ -61,6 +61,16 @@
     <dispatcher>REQUEST</dispatcher>
   </filter-mapping>
 
+  <!-- Empty body filter -->
+  <filter>
+    <filter-name>EmptyBodyFilter</filter-name>
+    <filter-class>org.camunda.bpm.engine.rest.filter.EmptyBodyFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>EmptyBodyFilter</filter-name>
+    <url-pattern>/api/*</url-pattern>
+  </filter-mapping>
+
   <!-- REST cache control filter -->
   <filter>
     <filter-name>CacheControlFilter</filter-name>
@@ -142,7 +152,7 @@
     <servlet-name>Engine Api</servlet-name>
     <url-pattern>/api/engine/*</url-pattern>
   </servlet-mapping>
-  
+
   <!-- welcome rest api -->
   <servlet>
     <servlet-name>Welcome Api</servlet-name>
