@@ -30,7 +30,7 @@ public class DeploymentAwareJobExecutorForOracleTest {
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
+  public RuleChain ruleChain = RuleChain.outerRule(deploymentAwareBootstrapRule).around(engineRule).around(testRule);
   
   @Test
   public void testFindAcquirableJobsWhen0InstancesDeployed() {
@@ -78,9 +78,9 @@ public class DeploymentAwareJobExecutorForOracleTest {
   @Test
   public void testFindAcquirableJobsWhen2000InstancesDeployed() {
     // given
-    Assume.assumeTrue(engineRule.getProcessEngineConfiguration().getDatabaseType().equals("oracle"));
+    //Assume.assumeTrue(engineRule.getProcessEngineConfiguration().getDatabaseType().equals("oracle"));
     // when
-    for (int i=0; i<2000; i++) {
+    for (int i=0; i<2001; i++) {
       testRule.deploy(ProcessModels.ONE_TASK_PROCESS);
     }
     // then
