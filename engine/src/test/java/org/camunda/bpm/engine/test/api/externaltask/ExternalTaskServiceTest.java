@@ -43,13 +43,10 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.joda.time.DateTime;
 import org.junit.Assert;
 
-import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.zip.DataFormatException;
 
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
@@ -1978,22 +1975,28 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
   public void testExtendLockTime() {
-    // given
-    runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+    final Date oldCurrentTime = ClockUtil.getCurrentTime();
+    try {
+      // given
+      runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+      ClockUtil.setCurrentTime(nowMinus(1000));
+      List<LockedExternalTask> lockedTasks = externalTaskService.fetchAndLock(1, WORKER_ID).topic(TOPIC_NAME, LOCK_TIME).execute();
 
-    List<LockedExternalTask> lockedTasks = externalTaskService.fetchAndLock(1, WORKER_ID)
-      .topic(TOPIC_NAME, LOCK_TIME)
-      .execute();
+      // when
+      Date extendLockTime = new Date();
+      ClockUtil.setCurrentTime(extendLockTime);
 
-    long oldLockTime = lockedTasks.get(0).getLockExpirationTime().getTime();
+      externalTaskService.extendLock(lockedTasks.get(0).getId(), WORKER_ID, LOCK_TIME);
 
-    // when
-    externalTaskService.extendLock(lockedTasks.get(0).getId(), WORKER_ID, LOCK_TIME);
+      // then
+      ExternalTask taskWithExtendedLock = externalTaskService.createExternalTaskQuery().locked().singleResult();
+      assertNotNull(taskWithExtendedLock);
+      AssertUtil.assertEqualsSecondPrecision(new Date(extendLockTime.getTime() + LOCK_TIME), taskWithExtendedLock.getLockExpirationTime());
 
-    // then
-    ExternalTask taskWithExtendedLock = externalTaskService.createExternalTaskQuery().locked().singleResult();
-    assertNotNull(taskWithExtendedLock);
-    AssertUtil.assertEqualsSecondPrecision(new Date(oldLockTime+ LOCK_TIME), taskWithExtendedLock.getLockExpirationTime());
+    } finally {
+      ClockUtil.setCurrentTime(oldCurrentTime);
+    }
+
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
