@@ -78,9 +78,9 @@ public class DeploymentAwareJobExecutorForOracleTest {
   @Test
   public void testFindAcquirableJobsWhen2000InstancesDeployed() {
     // given
-    //Assume.assumeTrue(engineRule.getProcessEngineConfiguration().getDatabaseType().equals("oracle"));
+    Assume.assumeTrue(engineRule.getProcessEngineConfiguration().getDatabaseType().equals("oracle"));
     // when
-    for (int i=0; i<2001; i++) {
+    for (int i=0; i<2000; i++) {
       testRule.deploy(ProcessModels.ONE_TASK_PROCESS);
     }
     // then
