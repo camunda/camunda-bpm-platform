@@ -48,7 +48,8 @@ module.exports = function(config, browserifyConfig) {
                'angular-data-depend': 'angular-data-depend',
                'moment': 'moment',
                'events': 'events',
-               'cam-common': 'cam-common'
+               'cam-common': 'cam-common',
+               'lodash': 'lodash'
               }
             }
         ]

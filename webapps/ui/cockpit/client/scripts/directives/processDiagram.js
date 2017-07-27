@@ -211,7 +211,7 @@ var DirectiveController = [
     });
 
     function scrollToBpmnElement(bpmnElementId) {
-      if ($scope.control.isLoaded() && bpmnElementId) {
+      if ($scope.control.isLoaded && $scope.control.isLoaded() && bpmnElementId) {
         scrollTo(bpmnElementId);
       }
     }

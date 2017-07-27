@@ -4,6 +4,8 @@ var $ = window.jQuery = window.$ = require('jquery');
 
 var commons = require('camunda-commons-ui/lib');
 var sdk = require('camunda-commons-ui/vendor/camunda-bpm-sdk-angular');
+var camCommon = require('../../../common/scripts/module');
+var lodash = require('camunda-commons-ui/vendor/lodash');
 
 var APP_NAME = 'cam.welcome';
 
@@ -85,7 +87,8 @@ module.exports.exposePackages = function(container) {
   container.jquery = $;
   container['camunda-commons-ui'] = commons;
   container['camunda-bpm-sdk-js'] = sdk;
-  container['cam-common'] = require('../../../common/scripts/module');
+  container['cam-common'] = camCommon;
+  container['lodash'] = lodash;
 };
 
 

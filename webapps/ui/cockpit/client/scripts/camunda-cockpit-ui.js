@@ -9,6 +9,7 @@ var dataDepend = require('angular-data-depend');
 var camCommon = require('../../../common/scripts/module');
 var moment = require('camunda-commons-ui/vendor/moment');
 var events = require('events');
+var lodash = require('camunda-commons-ui/vendor/lodash');
 
 require('../../../common/scripts/module');
 
@@ -123,9 +124,6 @@ module.exports = function(pluginDependencies) {
   if (top !== window) {
     window.parent.postMessage({ type: 'loadamd' }, '*');
   }
-
-
-
 };
 
 module.exports.exposePackages = function(container) {
@@ -137,6 +135,7 @@ module.exports.exposePackages = function(container) {
   container['moment'] = moment;
   container['events'] = events;
   container['cam-common'] = camCommon;
+  container['lodash'] = lodash;
 };
 
 
