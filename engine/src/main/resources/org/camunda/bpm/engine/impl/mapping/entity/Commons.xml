@@ -153,7 +153,7 @@
 	<foreach item="id" index="index" collection="listOfIds" open = "(" separator="" close=")">
 	  #{id}
 	  <choose>
-	  <when test="index != 0 &amp;&amp; index%999 == 0 &amp;&amp; index &lt; listOfIds.size">
+	  <when test="index != 0 &amp;&amp; (index+1)%1000 == 0 &amp;&amp; (index+1) &lt; listOfIds.size">
 		) or ${fieldName} IN (
 	  </when>
 	  <when test="index == listOfIds.size -1"></when>
