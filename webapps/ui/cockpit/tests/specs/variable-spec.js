@@ -174,7 +174,7 @@ describe('Cockpit Variable Spec', function() {
       var variable = instancePage.variablesTab.variableByName('myDate');
 
       expect(variable.type().getText()).to.eventually.eql('Date');
-      expect(variable.value().getText()).to.eventually.eql('2011-11-11T11:11:11.000+0200');
+      expect(variable.value().getText()).to.eventually.eql('2011-11-11T11:11:11');
 
       // when
       variable.enterEditMode();
@@ -301,7 +301,7 @@ describe('Cockpit Variable Spec', function() {
 
         // then
         expect(instancePage.addVariable.addButton().isEnabled()).to.eventually.be.false;
-        expect(instancePage.addVariable.variableValueInfoLabel().getText()).to.eventually.eql('Supported pattern \'yyyy-MM-ddTHH:mm:ss.SSSZ\'.');
+        expect(instancePage.addVariable.variableValueInfoLabel().getText()).to.eventually.eql('Supported pattern \'yyyy-MM-ddTHH:mm:ss\'.');
       });
 
 

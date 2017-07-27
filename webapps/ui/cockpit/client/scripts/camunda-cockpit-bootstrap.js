@@ -37,7 +37,7 @@ window.__define('camunda-cockpit-bootstrap', [
       }
     });
 
-    var dependencies = ['angular', 'ngDefine'].concat(pluginDependencies.map(function(plugin) {
+    var dependencies = ['angular', 'ngDefine', 'moment'].concat(pluginDependencies.map(function(plugin) {
       return plugin.requirePackageName;
     }));
 

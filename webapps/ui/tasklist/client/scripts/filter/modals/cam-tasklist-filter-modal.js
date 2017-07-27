@@ -40,6 +40,10 @@ function unfixLike(key, value) {
   return value;
 }
 
+var dateProperties = ['createdBefore', 'createdAfter', 'dueBefore', 'dueAfter', 'followUpBefore', 'followUpAfter'];
+var completeDateExp = /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(|\.[0-9]{0,4})([+-][0-9]{4}|Z)$/;
+var simpleDateExp = /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(|\.[0-9]{0,4})$/;
+
 var varExp = /Variables$/;
 function isQueryVariable(key) {
   return varExp.test(key);
@@ -71,6 +75,8 @@ module.exports = [
   'camAPI',
   'filter',
   'filtersData',
+  'fixDate',
+  'unfixDate',
   function(
     $scope,
     $translate,
@@ -78,7 +84,9 @@ module.exports = [
     Notifications,
     camAPI,
     filter,
-    filtersData
+    filtersData,
+    fixDate,
+    unfixDate
   ) {
 
     var Filter = camAPI.resource('filter');
@@ -135,9 +143,14 @@ module.exports = [
       var value = _query[key];
 
       if (!isQueryVariable(key)) {
+        value = unfixLike(key, value);
+        if(dateProperties.indexOf(key) !== -1 && completeDateExp.test(value)) {
+          value = unfixDate(value);
+        }
+
         query.push({
           key: key,
-          value: unfixLike(key, value)
+          value: value
         });
       }
       else {
@@ -244,6 +257,9 @@ module.exports = [
 
           // if key == '...Like' -> value = '%' + value + '%'
           value = fixLike(key, value);
+          if(dateProperties.indexOf(key) !== -1 && simpleDateExp.test(value)) {
+            value = fixDate(value);
+          }
 
           if (isExpression(value)) {
 

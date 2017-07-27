@@ -5,8 +5,10 @@ var template = fs.readFileSync(__dirname + '/cam-tasklist-search-plugin.html', '
 var searchConfigJSON = fs.readFileSync(__dirname + '/cam-tasklist-search-plugin-config.json', 'utf8');
 
 var angular = require('camunda-commons-ui/vendor/angular');
+var moment = require('camunda-commons-ui/vendor/moment');
 
 var expressionsRegex = /^[\s]*(\#|\$)\{/;
+var simpleDateExp = /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(|\.[0-9]{0,4})$/;
 
 var searchConfig = JSON.parse(searchConfigJSON);
 
@@ -33,11 +35,13 @@ var parseValue = function(value, enforceString) {
   return value;
 };
 
-var sanitizeValue = function(value, operator) {
+var sanitizeValue = function(value, operator, search) {
   if(operator === 'Like' || operator === 'like') {
     return '%'+value+'%';
   } else if(operator == 'in') {
     return value.split(',');
+  } else if(search.allowDates && simpleDateExp.test(value)) {
+    return moment(value).format('YYYY-MM-DDTHH:mm:ss.SSSZZ');
   }
   return value;
 };
@@ -46,7 +50,7 @@ var getQueryValueBySearch = function(search) {
   if (search.basic) {
     return true;
   }
-  return sanitizeValue(parseValue(search.value.value, search.enforceString), search.operator.value.key);
+  return sanitizeValue(parseValue(search.value.value, search.enforceString), search.operator.value.key, search);
 };
 
 var sanitizeProperty = function(search, type, operator, value) {

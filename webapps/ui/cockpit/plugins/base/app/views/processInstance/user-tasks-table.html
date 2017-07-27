@@ -36,13 +36,13 @@
         </td>
 
         <td class="created">
-          {{ userTask.created }}
+          {{ userTask.created | camDate }}
         </td>
         <td class="due">
-          {{ userTask.due }}
+          {{ userTask.due | camDate }}
         </td>
         <td class="follow-up">
-          {{ userTask.followUp }}
+          {{ userTask.followUp | camDate }}
         </td>
         <td class="priority">
           {{ userTask.priority }}

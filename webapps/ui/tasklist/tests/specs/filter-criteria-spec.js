@@ -296,7 +296,7 @@ describe('Tasklist Filter Criteria Spec', function() {
       it('should add follow up before criterion', function() {
 
         // when
-        editModalPage.addCriterion('Dates', 'Follow Up Before', '2014-08-25T11:00:02.000+0200');
+        editModalPage.addCriterion('Dates', 'Follow Up Before', '2014-08-25T11:00:02');
         editModalPage.saveFilter();
 
         // then
@@ -308,7 +308,7 @@ describe('Tasklist Filter Criteria Spec', function() {
       it('should edit follow up criterion', function() {
 
         // when
-        editModalPage.editCriterion(0, 'Dates', 'Follow Up After', '2014-08-25T11:00:02.000+0200');
+        editModalPage.editCriterion(0, 'Dates', 'Follow Up After', '2014-08-25T11:00:02');
         editModalPage.saveFilter();
 
         // then

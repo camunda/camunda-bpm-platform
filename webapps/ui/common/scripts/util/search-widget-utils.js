@@ -1,6 +1,7 @@
 'use strict';
 
 var angular = require('camunda-commons-ui/vendor/angular');
+var moment = require('camunda-commons-ui/vendor/moment');
 var includes = require('./includes');
 
 module.exports = {
@@ -248,12 +249,15 @@ function getSearchValue(search) {
     return true;
   }
 
-  return sanitizeValue(search.value.value, search.operator.value.key);
+  return sanitizeValue(search.value.value, search.operator.value.key, search);
 }
 
-function sanitizeValue(value, operator) {
+var simpleDateExp = /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(|\.[0-9]{0,4})$/;
+function sanitizeValue(value, operator, search) {
   if (includes(['like', 'Like'], operator)) {
     return '%'+value+'%';
+  } else if(search.allowDates && simpleDateExp.test(value)) {
+    return moment(value).format('YYYY-MM-DDTHH:mm:ss.SSSZZ');
   }
   return value;
 }
