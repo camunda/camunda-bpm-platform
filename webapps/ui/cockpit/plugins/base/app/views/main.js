@@ -6,6 +6,7 @@
 var angular = require('angular'),
     camCommon = require('cam-common'),
     diagramInstancePlugins = require('./processInstance/diagramPlugins'),
+    diagramDefinitionPlugins = require('./processDefinition/diagramPlugins'),
     // dashboard
     dashboardDeployments = require('./dashboard/deployments'),
     dashboardReports = require('./dashboard/reports'),
@@ -22,7 +23,6 @@ var angular = require('angular'),
     calledProcessDefinitionTable = require('./processDefinition/calledProcessDefinitionTable'),
     updateSuspensionStateAction = require('./processDefinition/updateSuspensionStateAction'),
     updateSuspensionStateDialog = require('./processDefinition/updateSuspensionStateDialog'),
-    activityInstanceStatisticsOverlay = require('./processDefinition/activityInstanceStatisticsOverlay'),
 
     // process instance
     variableInstancesTab = require('./processInstance/variableInstancesTab'),
@@ -43,7 +43,8 @@ var angular = require('angular'),
 
 var ngModule = angular.module('cockpit.plugin.base.views', [
   camCommon.name,
-  diagramInstancePlugins.name
+  diagramInstancePlugins.name,
+  diagramDefinitionPlugins.name
 ]);
 
 ngModule.config(dashboardDeployments);
@@ -59,7 +60,6 @@ ngModule.config(processInstanceTable);
 ngModule.config(calledProcessDefinitionTable);
 ngModule.config(updateSuspensionStateAction);
 ngModule.controller('UpdateProcessDefinitionSuspensionStateController', updateSuspensionStateDialog);
-ngModule.config(activityInstanceStatisticsOverlay);
 
 variableInstancesTab(ngModule);
 ngModule.config(incidentsTab);

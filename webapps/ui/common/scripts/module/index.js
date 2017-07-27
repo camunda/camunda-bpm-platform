@@ -14,6 +14,7 @@ var readFiles = require('./services/read-files');
 var upload = require('./services/upload');
 var getDeploymentUrl = require('./services/get-deployment-url');
 var isFileUploadSupported = require('./services/is-file-upload-supported');
+var get = require('./services/get');
 
 // Components
 var camToolbar = require('./components/cam-toolbar');
@@ -58,6 +59,7 @@ ngModule.factory('readFiles', readFiles);
 ngModule.factory('upload', upload);
 ngModule.factory('getDeploymentUrl', getDeploymentUrl);
 ngModule.factory('isFileUploadSupported', isFileUploadSupported);
+ngModule.factory('get', get);
 
 // Components
 ngModule.directive('camToolbar', camToolbar);
