@@ -52,6 +52,7 @@ module.exports = ['ViewsProvider',  function(ViewsProvider) {
           } else {
             nodes.instancesNode.show();
             nodes.instancesNode.tooltip({
+              container: 'body',
               title: 'Running Activity Instances',
               placement: 'top',
               animation: false
@@ -61,6 +62,7 @@ module.exports = ['ViewsProvider',  function(ViewsProvider) {
           if (data.incidents) {
             nodes.incidentsNode.show();
             nodes.incidentsNode.tooltip({
+              container: 'body',
               title: 'Open Incidents',
               placement: 'top',
               animation: false

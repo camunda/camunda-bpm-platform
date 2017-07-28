@@ -57,6 +57,7 @@ module.exports = ['ViewsProvider',  function(ViewsProvider) {
                   if (suspended) {
                     node.show();
                     node.tooltip({
+                      container: 'body',
                       title: 'Suspended Job Definition',
                       placement: 'top'
                     });
