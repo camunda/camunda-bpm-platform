@@ -16,6 +16,7 @@ package org.camunda.bpm.engine.impl.cmd;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 import org.camunda.bpm.engine.history.HistoricCaseInstance;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
@@ -52,7 +53,7 @@ public class DeleteHistoricCaseInstanceCmd implements Command<Object>, Serializa
 
     commandContext
       .getHistoricCaseInstanceManager()
-      .deleteHistoricCaseInstanceById(caseInstanceId);
+      .deleteHistoricCaseInstancesByIds(Arrays.asList(caseInstanceId));
 
     return null;
   }

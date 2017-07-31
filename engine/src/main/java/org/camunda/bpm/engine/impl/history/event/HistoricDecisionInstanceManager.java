@@ -50,7 +50,7 @@ public class HistoricDecisionInstanceManager extends AbstractHistoricManager {
     if (isHistoryEnabled()) {
       List<HistoricDecisionInstanceEntity> decisionInstances = findHistoricDecisionInstancesByDecisionDefinitionId(decisionDefinitionId);
 
-      Set<String> decisionInstanceIds = new HashSet<String>();
+      List<String> decisionInstanceIds = new ArrayList<String>();
       for(HistoricDecisionInstanceEntity decisionInstance : decisionInstances) {
         decisionInstanceIds.add(decisionInstance.getId());
         // delete decision instance
@@ -58,9 +58,7 @@ public class HistoricDecisionInstanceManager extends AbstractHistoricManager {
       }
 
       if(!decisionInstanceIds.isEmpty()) {
-        deleteHistoricDecisionInputInstancesByDecisionInstanceIds(decisionInstanceIds);
-
-        deleteHistoricDecisionOutputInstancesByDecisionInstanceIds(decisionInstanceIds);
+        deleteHistoricDecisionInstanceByIds(decisionInstanceIds);
       }
     }
   }
@@ -70,44 +68,12 @@ public class HistoricDecisionInstanceManager extends AbstractHistoricManager {
     return getDbEntityManager().selectList("selectHistoricDecisionInstancesByDecisionDefinitionId", configureParameterizedQuery(decisionDefinitionId));
   }
 
-  protected void deleteHistoricDecisionInputInstancesByDecisionInstanceIds(Set<String> decisionInstanceIds) {
-    List<HistoricDecisionInputInstanceEntity> decisionInputInstances = findHistoricDecisionInputInstancesByDecisionInstanceIds(decisionInstanceIds);
-    for (HistoricDecisionInputInstanceEntity decisionInputInstance : decisionInputInstances) {
-      // delete input instance and byte array value if exists
-      decisionInputInstance.delete();
-    }
-  }
-
-  protected void deleteHistoricDecisionOutputInstancesByDecisionInstanceIds(Set<String> decisionInstanceIds) {
-    List<HistoricDecisionOutputInstanceEntity> decisionOutputInstances = findHistoricDecisionOutputInstancesByDecisionInstanceIds(decisionInstanceIds);
-    for (HistoricDecisionOutputInstanceEntity decisionOutputInstance : decisionOutputInstances) {
-      // delete output instance and byte array value if exists
-      decisionOutputInstance.delete();
-    }
-  }
-
-  public void deleteHistoricHistoricInstanceByInstanceId(String historicDecisionInstanceId) {
-    HistoricDecisionInstanceEntity decisionInstance = findHistoricDecisionInstance(historicDecisionInstanceId);
-    boolean foundHistoricDecisionInstance = decisionInstance != null;
-    if (foundHistoricDecisionInstance) {
-      decisionInstance.delete();
-      deleteHistoricDecisionInputAndOutputInstances(historicDecisionInstanceId);
-    }
-  }
-
   public void deleteHistoricDecisionInstanceByIds(List<String> decisionInstanceIds) {
     getDbEntityManager().deletePreserveOrder(ByteArrayEntity.class, "deleteHistoricDecisionInputInstanceByteArraysByDecisionInstanceIds", decisionInstanceIds);
     getDbEntityManager().deletePreserveOrder(ByteArrayEntity.class, "deleteHistoricDecisionOutputInstanceByteArraysByDecisionInstanceIds", decisionInstanceIds);
     getDbEntityManager().deletePreserveOrder(HistoricDecisionInputInstanceEntity.class, "deleteHistoricDecisionInputInstanceByDecisionInstanceIds", decisionInstanceIds);
     getDbEntityManager().deletePreserveOrder(HistoricDecisionOutputInstanceEntity.class, "deleteHistoricDecisionOutputInstanceByDecisionInstanceIds", decisionInstanceIds);
     getDbEntityManager().deletePreserveOrder(HistoricDecisionInstanceEntity.class, "deleteHistoricDecisionInstanceByIds", decisionInstanceIds);
-  }
-
-  protected void deleteHistoricDecisionInputAndOutputInstances(String historicDecisionInstanceId) {
-    Set<String> decisionInstanceIds = new HashSet<String>();
-    decisionInstanceIds.add(historicDecisionInstanceId);
-    deleteHistoricDecisionInputInstancesByDecisionInstanceIds(decisionInstanceIds);
-    deleteHistoricDecisionOutputInstancesByDecisionInstanceIds(decisionInstanceIds);
   }
 
   public void insertHistoricDecisionInstances(HistoricDecisionEvaluationEvent event) {

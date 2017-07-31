@@ -162,25 +162,6 @@
     select * from ${prefix}ACT_HI_TASKINST where ID_ = #{historicTaskInstanceId}
   </select>
 
-  <select id="selectHistoricTaskInstanceIdsByParameters" resultType="string" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
-    select ID_
-    from ${prefix}ACT_HI_TASKINST
-    <where>
-      <if test="parameter.processInstanceId != null">
-        PROC_INST_ID_ = #{parameter.processInstanceId, jdbcType=VARCHAR}
-      </if>
-      <if test="parameter.processDefinitionId != null">
-        and PROC_DEF_ID_ = #{parameter.processDefinitionId, jdbcType=VARCHAR}
-      </if>
-      <if test="parameter.caseInstanceId != null">
-        and CASE_INST_ID_ = #{parameter.caseInstanceId, jdbcType=VARCHAR}
-      </if>
-      <if test="parameter.caseDefinitionId != null">
-        and CASE_DEF_ID_ = #{parameter.caseDefinitionId, jdbcType=VARCHAR}
-      </if>
-    </where>
-  </select>
-
   <select id="selectHistoricTaskInstancesByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricTaskInstanceQueryImpl" resultMap="historicTaskInstanceResultMap">
   	<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}

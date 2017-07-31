@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.engine.impl.dmn.cmd;
 
+import java.util.Arrays;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -49,7 +50,7 @@ public class DeleteHistoricDecisionInstanceByInstanceIdCmd implements Command<Ob
 
     commandContext
         .getHistoricDecisionInstanceManager()
-        .deleteHistoricHistoricInstanceByInstanceId(historicDecisionInstanceId);
+        .deleteHistoricDecisionInstanceByIds(Arrays.asList(historicDecisionInstanceId));
 
     return null;
   }

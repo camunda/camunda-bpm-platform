@@ -16,7 +16,6 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -38,10 +37,6 @@ import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
  * @author  Tom Baeyens
  */
 public class HistoricTaskInstanceManager extends AbstractHistoricManager {
-
-  public void deleteHistoricTaskInstancesByProcessInstanceId(String processInstanceId) {
-    deleteHistoricTaskInstances("processInstanceId", processInstanceId);
-  }
 
   /**
    * Deletes all data related with tasks, which belongs to specified process instance ids.
@@ -72,16 +67,12 @@ public class HistoricTaskInstanceManager extends AbstractHistoricManager {
     getDbEntityManager().deletePreserveOrder(HistoricTaskInstanceEntity.class, "deleteHistoricTaskInstanceByProcessInstanceIds", processInstanceIds);
   }
 
-  public void deleteHistoricTaskInstancesByCaseInstanceId(String caseInstanceId) {
-    deleteHistoricTaskInstances("caseInstanceId", caseInstanceId);
-  }
-
   public void deleteHistoricTaskInstancesByCaseInstanceIds(List<String> caseInstanceIds) {
 
     CommandContext commandContext = Context.getCommandContext();
 
     getHistoricDetailManager()
-        .deleteHistoricDetailsByCaseTaskInstanceIds(caseInstanceIds);
+        .deleteHistoricDetailsByTaskCaseInstanceIds(caseInstanceIds);
 
     commandContext
         .getCommentManager()
@@ -94,27 +85,6 @@ public class HistoricTaskInstanceManager extends AbstractHistoricManager {
         .deleteHistoricIdentityLinksLogByTaskCaseInstanceIds(caseInstanceIds);
 
     getDbEntityManager().deletePreserveOrder(HistoricTaskInstanceEntity.class, "deleteHistoricTaskInstanceByCaseInstanceIds", caseInstanceIds);
-  }
-
-  public void deleteHistoricTaskInstancesByCaseDefinitionId(String caseDefinitionId) {
-    deleteHistoricTaskInstances("caseDefinitionId", caseDefinitionId);
-  }
-
-  @SuppressWarnings("unchecked")
-  protected void deleteHistoricTaskInstances(String key, String value) {
-    if (isHistoryEnabled()) {
-
-      Map<String, String> params = new HashMap<String, String>();
-      params.put(key, value);
-
-      List<String> taskInstanceIds = getDbEntityManager()
-          .selectList("selectHistoricTaskInstanceIdsByParameters", params);
-
-      for (String taskInstanceId : taskInstanceIds) {
-        deleteHistoricTaskInstanceById(taskInstanceId);
-      }
-
-    }
   }
 
   public long findHistoricTaskInstanceCountByQueryCriteria(final HistoricTaskInstanceQueryImpl historicTaskInstanceQuery) {

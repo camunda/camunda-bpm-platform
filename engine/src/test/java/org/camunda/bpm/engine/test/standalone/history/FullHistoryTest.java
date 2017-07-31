@@ -21,6 +21,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -904,7 +905,7 @@ public class FullHistoryTest {
         ProcessInstance processInstance = new SubmitStartFormCmd(processDefinitionId, null, formProperties).execute(commandContext);
 
         // two historic details should be in cache: one form property and one variable update
-        commandContext.getHistoricDetailManager().deleteHistoricDetailsByProcessInstanceId(processInstance.getId());
+        commandContext.getHistoricDetailManager().deleteHistoricDetailsByProcessInstanceIds(Arrays.asList(processInstance.getId()));
         return null;
       }
     });

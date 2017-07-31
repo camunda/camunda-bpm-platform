@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.entity.runtime;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.camunda.bpm.engine.BadUserRequestException;
@@ -77,7 +78,7 @@ public class CaseExecutionManager extends AbstractManager {
       Context
         .getCommandContext()
         .getHistoricCaseInstanceManager()
-        .deleteHistoricCaseInstanceById(caseInstanceId);
+        .deleteHistoricCaseInstancesByIds(Arrays.asList(caseInstanceId));
     }
   }
 

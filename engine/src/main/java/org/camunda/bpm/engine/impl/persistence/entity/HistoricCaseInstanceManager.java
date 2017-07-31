@@ -56,23 +56,9 @@ public class HistoricCaseInstanceManager extends AbstractHistoricManager {
       List<String> historicCaseInstanceIds = getDbEntityManager()
         .selectList("selectHistoricCaseInstanceIdsByCaseDefinitionId", caseDefinitionId);
 
-      for (String historicCaseInstanceId: historicCaseInstanceIds) {
-        deleteHistoricCaseInstanceById(historicCaseInstanceId);
+      if (historicCaseInstanceIds != null && !historicCaseInstanceIds.isEmpty()) {
+        deleteHistoricCaseInstancesByIds(historicCaseInstanceIds);
       }
-    }
-  }
-
-  public void deleteHistoricCaseInstanceById(String historicCaseInstanceId) {
-    if (isHistoryEnabled()) {
-      getHistoricDetailManager().deleteHistoricDetailsByCaseInstanceId(historicCaseInstanceId);
-
-      getHistoricVariableInstanceManager().deleteHistoricVariableInstanceByCaseInstanceId(historicCaseInstanceId);
-
-      getHistoricCaseActivityInstanceManager().deleteHistoricCaseActivityInstancesByCaseInstanceId(historicCaseInstanceId);
-
-      getHistoricTaskInstanceManager().deleteHistoricTaskInstancesByCaseInstanceId(historicCaseInstanceId);
-
-      getDbEntityManager().delete(HistoricCaseInstanceEntity.class, "deleteHistoricCaseInstance", historicCaseInstanceId);
     }
   }
 

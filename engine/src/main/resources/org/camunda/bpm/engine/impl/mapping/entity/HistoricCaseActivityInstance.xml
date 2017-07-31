@@ -88,10 +88,6 @@
 
   <!-- HISTORIC CASE ACTIVITY INSTANCE DELETE -->
 
-  <delete id="deleteHistoricCaseActivityInstancesByCaseInstanceId">
-    delete from ${prefix}ACT_HI_CASEACTINST where CASE_INST_ID_ = #{caseInstanceId}
-  </delete>
-
   <delete id="deleteHistoricCaseActivityInstancesByCaseInstanceIds">
     delete from ${prefix}ACT_HI_CASEACTINST where CASE_INST_ID_ IN
     <foreach item="caseInstanceId" index="index" collection="list" open="(" separator="," close=")">

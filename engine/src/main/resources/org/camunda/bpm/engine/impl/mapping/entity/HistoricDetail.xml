@@ -181,16 +181,6 @@
 
   <!-- HISTORIC VARIABLE UPDATE SELECT -->
 
-  <select id="selectHistoricDetailsByProcessInstanceId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="historicDetailResultMap">
-    select * from ${prefix}ACT_HI_DETAIL
-    where PROC_INST_ID_ = #{parameter, jdbcType=VARCHAR}
-  </select>
-
-  <select id="selectHistoricDetailsByCaseInstanceId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="historicDetailResultMap">
-    select * from ${prefix}ACT_HI_DETAIL
-    where CASE_INST_ID_ = #{parameter, jdbcType=VARCHAR}
-  </select>
-
   <select id="selectHistoricDetailsByTaskId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="historicDetailResultMap">
     select * from ${prefix}ACT_HI_DETAIL
     where TASK_ID_ = #{parameter, jdbcType=VARCHAR}
