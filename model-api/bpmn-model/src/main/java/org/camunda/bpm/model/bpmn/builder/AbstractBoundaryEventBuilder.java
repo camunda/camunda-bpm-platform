@@ -140,7 +140,7 @@ public abstract class AbstractBoundaryEventBuilder<B extends AbstractBoundaryEve
       double targetHeight = shapeBounds.getHeight();
 
       x = sourceX + sourceWidth + SPACE;
-      y = sourceY + sourceHeight / 2 - targetHeight / 2 + SPACE;
+      y = sourceY + sourceHeight - targetHeight / 2 + SPACE;
     }
 
     shapeBounds.setX(x);
@@ -171,7 +171,7 @@ public abstract class AbstractBoundaryEventBuilder<B extends AbstractBoundaryEve
 
       Waypoint w2 = createInstance(Waypoint.class);
       w2.setX(sourceX + sourceWidth / 2);
-      w2.setY(sourceY + sourceHeight / 2 + SPACE);
+      w2.setY(sourceY + sourceHeight + SPACE);
 
       Waypoint w3 = createInstance(Waypoint.class);
       w3.setX(targetX);

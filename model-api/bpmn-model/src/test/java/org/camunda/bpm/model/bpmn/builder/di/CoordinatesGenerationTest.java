@@ -522,7 +522,7 @@ public class CoordinatesGenerationTest {
         .done();
 
     Bounds endEventBounds = findBpmnShape(END_EVENT_ID).getBounds();
-    assertShapeCoordinates(endEventBounds, 304, 190);
+    assertShapeCoordinates(endEventBounds, 304, 208);
 
     Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge(SEQUENCE_FLOW_ID).getWaypoints();
     Iterator<Waypoint> iterator = sequenceFlowWaypoints.iterator();
@@ -534,7 +534,7 @@ public class CoordinatesGenerationTest {
       waypoint = iterator.next();
     }
 
-    assertWaypointCoordinates(waypoint, 304, 208);
+    assertWaypointCoordinates(waypoint, 304, 226);
   }
 
   @Test
@@ -658,7 +658,7 @@ public class CoordinatesGenerationTest {
         .done();
 
     Bounds endEventBounds = findBpmnShape(END_EVENT_ID).getBounds();
-    assertShapeCoordinates(endEventBounds, 429, 250);
+    assertShapeCoordinates(endEventBounds, 429, 268);
 
     Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge(SEQUENCE_FLOW_ID).getWaypoints();
     Iterator<Waypoint> iterator = sequenceFlowWaypoints.iterator();
@@ -670,7 +670,7 @@ public class CoordinatesGenerationTest {
       waypoint = iterator.next();
     }
 
-    assertWaypointCoordinates(waypoint, 429, 268);
+    assertWaypointCoordinates(waypoint, 429, 286);
   }
 
   @Test
@@ -1310,6 +1310,33 @@ public class CoordinatesGenerationTest {
     Bounds subProcessBounds = findBpmnShape(SUB_PROCESS_ID).getBounds();
     assertThat(subProcessBounds.getY()).isEqualTo(-32);
     assertThat(subProcessBounds.getHeight()).isEqualTo(376);
+  }
+
+  @Test
+  public void shouldPlaceCompensation() {
+    ProcessBuilder builder = Bpmn.createExecutableProcess();
+
+    instance = builder
+        .startEvent()
+        .userTask("task")
+        .boundaryEvent("boundary")
+          .compensateEventDefinition().compensateEventDefinitionDone()
+          .compensationStart()
+          .userTask("compensate").name("compensate")
+          .compensationDone()
+        .userTask("task2")
+          .boundaryEvent("boundary2")
+            .compensateEventDefinition().compensateEventDefinitionDone()
+            .compensationStart()
+            .userTask("compensate2").name("compensate2")
+            .compensationDone()
+        .endEvent("theend")
+        .done();
+
+    Bounds compensationBounds = findBpmnShape("compensate").getBounds();
+    assertShapeCoordinates(compensationBounds, 304, 186);
+    Bounds compensation2Bounds = findBpmnShape("compensate2").getBounds();
+    assertShapeCoordinates(compensation2Bounds, 454, 186);
   }
 
   protected BpmnShape findBpmnShape(String id) {
