@@ -40,6 +40,12 @@
       <groupId>com.jayway.jsonpath</groupId>
       <artifactId>json-path</artifactId>
       <version>2.4.0</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>asm</artifactId>
+          <groupId>org.ow2.asm</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
