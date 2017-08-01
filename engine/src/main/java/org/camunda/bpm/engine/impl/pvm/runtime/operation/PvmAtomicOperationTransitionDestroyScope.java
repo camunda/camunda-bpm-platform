@@ -60,13 +60,13 @@ public class PvmAtomicOperationTransitionDestroyScope implements PvmAtomicOperat
           LegacyBehavior.destroyConcurrentScope(execution);
         }
         else {
+          execution.destroy();
+          execution.remove();
           propagatingExecution = execution.getParent();
           propagatingExecution.setActivity(execution.getActivity());
           propagatingExecution.setTransition(execution.getTransition());
           propagatingExecution.setActive(true);
           LOG.debugDestroyScope(execution, propagatingExecution);
-          execution.destroy();
-          execution.remove();
         }
       }
 

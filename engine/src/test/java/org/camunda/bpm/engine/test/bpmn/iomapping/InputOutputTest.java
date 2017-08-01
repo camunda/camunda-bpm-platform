@@ -455,23 +455,30 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     assertEquals(pi.getId(), variable.getExecutionId());
   }
 
-  @Deployment
-  public void FAILING_testOutputScriptValueAsVariableAvailableAfterAsyncAfterParallelGateway() {
-    // given a local variable that we expose via output mapping
-    // and then we have a parallel gateway with async after
-    runtimeService.startProcessInstanceByKey("weird_variable_problem");
+  // related to CAM-8072
+  public void testOutputParameterAvailableAfterParallelGateway() {
+    // given
+    BpmnModelInstance processDefinition = Bpmn.createExecutableProcess("process")
+      .startEvent()
+      .serviceTask()
+        .camundaOutputParameter("variable", "A")
+        .camundaExpression("${'this value does not matter'}")
+      .parallelGateway("fork")
+      .endEvent()
+      .moveToNode("fork")
+        .serviceTask().camundaExpression("${variable}")
+        .receiveTask()
+      .endEvent()
+    .done();
 
-    // when we execute all async jobs
-    List<Job> jobs = managementService.createJobQuery().list();
-    assertNotNull(jobs);
-    for (Job job : jobs) {
-      managementService.executeJob(job.getId());
-    }
+    // when
+    deployment(processDefinition);
+    runtimeService.startProcessInstanceByKey("process");
 
-    // then the variable should be available in the branches after the parallel gateway
+    // then
     VariableInstance variableInstance = runtimeService
       .createVariableInstanceQuery()
-      .variableName("someVariable")
+      .variableName("variable")
       .singleResult();
     assertNotNull(variableInstance);
   }
