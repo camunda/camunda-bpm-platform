@@ -2,8 +2,4 @@
   <resources>
     <resource-root path="accessors-smart-1.2.jar" />
   </resources>
-
-  <dependencies>
-    <module name="org.ow2.asm.asm" />
-  </dependencies>
 </module>
