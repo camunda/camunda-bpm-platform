@@ -1,6 +1,7 @@
 'use strict';
 
 var fs = require('fs');
+var lodash = require('camunda-commons-ui/vendor/lodash');
 
 var template = fs.readFileSync(__dirname + '/cam-cockpit-deployments.html', 'utf8');
 var searchConfigJSON = fs.readFileSync(__dirname + '/cam-cockpit-deployments-search-plugin-config.json', 'utf8');
@@ -53,7 +54,7 @@ module.exports = [function() {
           };
 
           return Deployment.list(
-              Object.assign(query, pagination, $scope.deploymentsSorting)
+              lodash.assign(query, pagination, $scope.deploymentsSorting)
             )
             .then(function(res) {
               $scope.deployments = res.items;
