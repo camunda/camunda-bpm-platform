@@ -96,8 +96,18 @@
     from
         ${prefix}ACT_GE_BYTEARRAY
     <where>
-        ID_ in (<include refid="selectExceptionByteArrayIds"/>)
+      ID_ in (select J.JOB_EXCEPTION_STACK_ID_ from ${prefix}ACT_HI_JOB_LOG J
+      <where><include refid="whereExceptionByteArrayIds"/></where>)
     </where>
+  </delete>
+
+  <delete id="deleteExceptionByteArraysByIds_mysql">
+    delete B
+    from
+      ${prefix}ACT_GE_BYTEARRAY B
+    inner join ${prefix}ACT_HI_JOB_LOG J
+      on B.ID_ = J.JOB_EXCEPTION_STACK_ID_
+    <include refid="whereExceptionByteArrayIds"/>
   </delete>
 
   <!-- RESULT MAP -->
@@ -125,51 +135,45 @@
     <result property="sequenceCounter" column="SEQUENCE_COUNTER_" jdbcType="BIGINT" />
   </resultMap>
 
-  <!-- SELECT -->
-
-  <sql id="selectExceptionByteArrayIds">
-    select
-        JOB_EXCEPTION_STACK_ID_
-    from
-        ${prefix}ACT_HI_JOB_LOG
-    <where>
-        JOB_EXCEPTION_STACK_ID_ is not null
-        <if test="id != null">
-        and ID_ = #{id, jdbcType=VARCHAR}
-        </if>
-        <if test="jobId != null">
-        and JOB_ID_ = #{jobId, jdbcType=VARCHAR}
-        </if>
-        <if test="jobDefinitionId != null">
-        and JOB_DEF_ID_ = #{jobDefinitionId, jdbcType=VARCHAR}
-        </if>
-        <if test="executionId != null">
-        and EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR}
-        </if>
-        <if test="processInstanceId != null">
-        and PROCESS_INSTANCE_ID_ = #{processInstanceId, jdbcType=VARCHAR}
-        </if>
-        <if test="processInstanceIdIn != null &amp;&amp; processInstanceIdIn.length > 0">
-            and PROCESS_INSTANCE_ID_ in
-            <foreach item="item" index="index" collection="processInstanceIdIn"
-                     open="(" separator="," close=")">
-                #{item}
-            </foreach>
-        </if>
-        <if test="processDefinitionId != null">
-        and PROCESS_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR}
-        </if>
-        <if test="processDefinitionKey != null">
-        and PROCESS_DEF_KEY_ = #{processDefinitionKey, jdbcType=VARCHAR}
-        </if>
-        <if test="deploymentId != null">
-        and DEPLOYMENT_ID_ = #{deploymentId, jdbcType=VARCHAR}
-        </if>
-        <if test="jobDefinitionType != null">
-        and JOB_DEF_TYPE_ = #{jobDefinitionType, jdbcType=VARCHAR}
-        </if>
-    </where>
+  <sql id="whereExceptionByteArrayIds">
+    and J.JOB_EXCEPTION_STACK_ID_ is not null
+    <if test="id != null">
+      and J.ID_ = #{id, jdbcType=VARCHAR}
+    </if>
+    <if test="jobId != null">
+      and J.JOB_ID_ = #{jobId, jdbcType=VARCHAR}
+    </if>
+    <if test="jobDefinitionId != null">
+      and J.JOB_DEF_ID_ = #{jobDefinitionId, jdbcType=VARCHAR}
+    </if>
+    <if test="executionId != null">
+      and J.EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR}
+    </if>
+    <if test="processInstanceId != null">
+      and J.PROCESS_INSTANCE_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+    </if>
+    <if test="processInstanceIdIn != null &amp;&amp; processInstanceIdIn.length > 0">
+      and J.PROCESS_INSTANCE_ID_ in
+      <foreach item="item" index="index" collection="processInstanceIdIn"
+               open="(" separator="," close=")">
+        #{item}
+      </foreach>
+    </if>
+    <if test="processDefinitionId != null">
+      and J.PROCESS_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR}
+    </if>
+    <if test="processDefinitionKey != null">
+      and J.PROCESS_DEF_KEY_ = #{processDefinitionKey, jdbcType=VARCHAR}
+    </if>
+    <if test="deploymentId != null">
+      and J.DEPLOYMENT_ID_ = #{deploymentId, jdbcType=VARCHAR}
+    </if>
+    <if test="jobDefinitionType != null">
+      and J.JOB_DEF_TYPE_ = #{jobDefinitionType, jdbcType=VARCHAR}
+    </if>
   </sql>
+
+  <!-- SELECT -->
 
   <select id="selectHistoricJobLog" resultMap="historicJobLogMap">
     select * from ${prefix}ACT_HI_JOB_LOG where ID_ = #{id}
