@@ -5,6 +5,7 @@
   <table class="called-process-instance cam-table">
     <thead>
       <tr>
+        <th class="status">State</th>
         <th class="called-process-instance">Called Process Instance</th>
         <th class="process-definition">Process Definition</th>
         <th class="activity">Activity</th>
@@ -13,6 +14,12 @@
 
     <tbody>
       <tr ng-repeat="calledProcessInstance in calledProcessInstances">
+        <td class="state">
+          <div ng-if="calledProcessInstance.incidents.length > -1" state-circle incidents="calledProcessInstance.incidents"></div>
+          <div ng-if="calledProcessInstance.incidents == undefined">
+            <span class="glyphicon glyphicon-refresh animate-spin"></span>
+          </div>
+        </td>
         <td class="called-process-instance"
             cam-widget-clipboard="calledProcessInstance.id">
           <a href="#/process-instance/{{ calledProcessInstance.id }}/runtime">
