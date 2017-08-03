@@ -56,7 +56,7 @@
         </thead>
 
         <tbody>
-          <tr ng-if="!taskGroupState.$loaded">
+          <tr ng-if="!taskGroupState.$loaded && !taskGroupState.$error">
             <td colspan="2"><span class="glyphicon glyphicon-refresh animate-spin"></span></td>
           </tr>
           <tr ng-if="taskGroupState.$loaded" ng-repeat="taskGroup in taskGroups">
