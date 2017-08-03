@@ -60,6 +60,17 @@
         and BYTEARRAY_ID_ is not NULL)
   </delete>
 
+  <delete id="deleteHistoricDecisionInputInstanceByteArraysByDecisionInstanceIds_mysql">
+    delete B from ${prefix}ACT_GE_BYTEARRAY B
+    inner join ${prefix}ACT_HI_DEC_IN D
+      on B.ID_ = D.BYTEARRAY_ID_
+      and D.DEC_INST_ID_ in
+        <foreach item="decisionInstanceId" index="index" collection="list" open="(" separator="," close=")">
+          #{decisionInstanceId}
+        </foreach>
+      and D.BYTEARRAY_ID_ is not NULL
+  </delete>
+
   <!-- result map -->
 
   <resultMap id="historicDecisionInputInstanceResultMap" type="org.camunda.bpm.engine.impl.history.event.HistoricDecisionInputInstanceEntity">

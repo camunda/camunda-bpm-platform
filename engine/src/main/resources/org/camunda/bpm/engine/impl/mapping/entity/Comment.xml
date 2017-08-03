@@ -87,6 +87,30 @@
     </if>
   </delete>
 
+  <delete id="deleteCommentsByIds_mysql" parameterType="java.util.Map">
+    delete CO from ${prefix}ACT_HI_COMMENT CO
+    left join ${prefix}ACT_HI_TASKINST T
+      on CO.TASK_ID_ = T.ID_
+      <if test="taskProcessInstanceIds != null &amp;&amp; taskProcessInstanceIds.size() > 0">
+        where T.PROC_INST_ID_ in
+          <foreach item="processInstanceId" index="index" collection="taskProcessInstanceIds" open="(" separator="," close=")">
+            #{processInstanceId}
+          </foreach>
+      </if>
+      <if test="taskCaseInstanceIds != null &amp;&amp; taskCaseInstanceIds.size() > 0">
+        where T.CASE_INST_ID_ in
+        <foreach item="caseInstanceId" index="index" collection="taskCaseInstanceIds" open="(" separator="," close=")">
+          #{caseInstanceId}
+        </foreach>
+      </if>
+      <if test="processInstanceIds != null &amp;&amp; processInstanceIds.size() > 0">
+        where CO.PROC_INST_ID_ in
+        <foreach item="processInstanceId" index="index" collection="processInstanceIds" open="(" separator="," close=")">
+          #{processInstanceId}
+        </foreach>
+      </if>
+  </delete>
+
   <!-- COMMENT RESULTMAP -->
 
   <resultMap id="commentResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.CommentEntity">

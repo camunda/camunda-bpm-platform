@@ -127,16 +127,33 @@
 
   <delete id="deleteHistoricDetailsByIds" parameterType="java.util.Map">
     delete from ${prefix}ACT_HI_DETAIL
-    <include refid="selectHistoricDetailsByIdsSql"/>
+    <where>
+      <include refid="selectHistoricDetailsProcessAndCaseInstanceByIdsSql"/>
+      <include refid="selectHistoricDetailsTaskProcessAndCaseInstanceByIdsSql"/>
+    </where>
   </delete>
 
   <delete id="deleteHistoricDetailByteArraysByIds" parameterType="java.util.Map">
     delete from ${prefix}ACT_GE_BYTEARRAY
     where ID_ in
-    (select DISTINCT BYTEARRAY_ID_
-    from ${prefix}ACT_HI_DETAIL RES
-    <include refid="selectHistoricDetailsByIdsSql"/>
-    and BYTEARRAY_ID_ is not NULL)
+      (select DISTINCT BYTEARRAY_ID_
+      from ${prefix}ACT_HI_DETAIL
+      <where>
+        <include refid="selectHistoricDetailsProcessAndCaseInstanceByIdsSql"/>
+        <include refid="selectHistoricDetailsTaskProcessAndCaseInstanceByIdsSql"/>
+        and BYTEARRAY_ID_ is not NULL
+      </where>)
+  </delete>
+
+  <delete id="deleteHistoricDetailByteArraysByIds_mysql" parameterType="java.util.Map">
+    delete B from ${prefix}ACT_GE_BYTEARRAY B
+    inner join ${prefix}ACT_HI_DETAIL D
+      on B.ID_ = D.BYTEARRAY_ID_
+      <include refid="selectHistoricDetailsTaskProcessAndCaseInstanceByIdsSql_mysql"/>
+      <where>
+        <include refid="selectHistoricDetailsProcessAndCaseInstanceByIdsSql"/>
+        and D.BYTEARRAY_ID_ is not NULL
+      </where>
   </delete>
 
   <!-- HISTORIC DETAILS RESULTMAP -->
@@ -278,22 +295,24 @@
     </where>
   </sql>
 
-  <sql id="selectHistoricDetailsByIdsSql">
-    WHERE
+  <sql id="selectHistoricDetailsProcessAndCaseInstanceByIdsSql">
     <if test="processInstanceIds != null &amp;&amp; processInstanceIds.size() > 0">
-      PROC_INST_ID_ IN
+      and PROC_INST_ID_ IN
       <foreach item="processInstanceId" index="index" collection="processInstanceIds" open="(" separator="," close=")">
         #{processInstanceId}
       </foreach>
     </if>
     <if test="caseInstanceIds != null &amp;&amp; caseInstanceIds.size() > 0">
-      CASE_INST_ID_ IN
+      and CASE_INST_ID_ IN
       <foreach item="caseInstanceId" index="index" collection="caseInstanceIds" open="(" separator="," close=")">
         #{caseInstanceId}
       </foreach>
     </if>
+  </sql>
+
+  <sql id="selectHistoricDetailsTaskProcessAndCaseInstanceByIdsSql">
     <if test="taskProcessInstanceIds != null &amp;&amp; taskProcessInstanceIds.size() > 0">
-      TASK_ID_ IN
+      and TASK_ID_ IN
       (select distinct ID_ from ${prefix}ACT_HI_TASKINST
       where PROC_INST_ID_ in
       <foreach item="processInstanceId" index="index" collection="taskProcessInstanceIds" open="(" separator="," close=")">
@@ -302,13 +321,32 @@
       )
     </if>
     <if test="taskCaseInstanceIds != null &amp;&amp; taskCaseInstanceIds.size() > 0">
-      TASK_ID_ IN
+      and TASK_ID_ IN
       (select distinct ID_ from ${prefix}ACT_HI_TASKINST
       where CASE_INST_ID_ in
       <foreach item="caseInstanceId" index="index" collection="taskCaseInstanceIds" open="(" separator="," close=")">
         #{caseInstanceId}
       </foreach>
       )
+    </if>
+  </sql>
+
+  <sql id="selectHistoricDetailsTaskProcessAndCaseInstanceByIdsSql_mysql">
+    <if test="taskProcessInstanceIds != null &amp;&amp; taskProcessInstanceIds.size() > 0">
+      inner join ${prefix}ACT_HI_TASKINST T
+        on TASK_ID_ = T.ID_
+        and T.PROC_INST_ID_ in
+          <foreach item="processInstanceId" index="index" collection="taskProcessInstanceIds" open="(" separator="," close=")">
+            #{processInstanceId}
+          </foreach>
+    </if>
+    <if test="taskCaseInstanceIds != null &amp;&amp; taskCaseInstanceIds.size() > 0">
+      inner join ${prefix}ACT_HI_TASKINST T
+        on TASK_ID_ = T.ID_
+        and T.CASE_INST_ID_ in
+          <foreach item="caseInstanceId" index="index" collection="taskCaseInstanceIds" open="(" separator="," close=")">
+            #{caseInstanceId}
+          </foreach>
     </if>
   </sql>
 

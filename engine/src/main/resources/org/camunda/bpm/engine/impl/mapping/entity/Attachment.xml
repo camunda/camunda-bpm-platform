@@ -57,7 +57,10 @@
 
   <delete id="deleteAttachmentByIds" parameterType="java.util.Map">
     delete from ${prefix}ACT_HI_ATTACHMENT
-    <include refid="selectAttachmentsByIdsSql"/>
+    <where>
+      <include refid="selectAttachmentsProcessInstanceByIdsSql"/>
+      <include refid="selectAttachmentsTaskProcessAndCaseInstanceByIdsSql"/>
+    </where>
   </delete>
 
   <delete id="deleteAttachmentByteArraysByIds" parameterType="java.util.Map">
@@ -65,8 +68,22 @@
     where ID_ in
       (select distinct CONTENT_ID_
       from ${prefix}ACT_HI_ATTACHMENT
-        <include refid="selectAttachmentsByIdsSql"/>
-        and CONTENT_ID_ is not NULL)
+      <where>
+        <include refid="selectAttachmentsProcessInstanceByIdsSql"/>
+        <include refid="selectAttachmentsTaskProcessAndCaseInstanceByIdsSql"/>
+        and CONTENT_ID_ is not NULL
+      </where>)
+  </delete>
+
+  <delete id="deleteAttachmentByteArraysByIds_mysql" parameterType="java.util.Map">
+    delete B from ${prefix}ACT_GE_BYTEARRAY B
+    inner join ${prefix}ACT_HI_ATTACHMENT A
+      on B.ID_ = A.CONTENT_ID_
+      <include refid="selectAttachmentsTaskProcessAndCaseInstanceByIdsSql_mysql"/>
+      <where>
+        <include refid="selectAttachmentsProcessInstanceByIdsSql"/>
+        and A.CONTENT_ID_ is not NULL
+      </where>
   </delete>
 
   <delete id="deleteByteArraysByIds">
@@ -113,16 +130,18 @@
     and ID_ = #{id,jdbcType=VARCHAR}
   </select>
 
-  <sql id="selectAttachmentsByIdsSql">
-    WHERE
+  <sql id="selectAttachmentsProcessInstanceByIdsSql">
     <if test="processInstanceIds != null &amp;&amp; processInstanceIds.size() > 0">
-      PROC_INST_ID_ IN
+      and PROC_INST_ID_ IN
       <foreach item="processInstanceId" index="index" collection="processInstanceIds" open="(" separator="," close=")">
         #{processInstanceId}
       </foreach>
     </if>
+  </sql>
+
+  <sql id="selectAttachmentsTaskProcessAndCaseInstanceByIdsSql">
     <if test="taskProcessInstanceIds != null &amp;&amp; taskProcessInstanceIds.size() > 0">
-      TASK_ID_ IN
+      and TASK_ID_ IN
       (select distinct ID_ from ${prefix}ACT_HI_TASKINST
       where PROC_INST_ID_ in
         <foreach item="processInstanceId" index="index" collection="taskProcessInstanceIds" open="(" separator="," close=")">
@@ -131,13 +150,32 @@
       )
     </if>
     <if test="caseInstanceIds != null &amp;&amp; caseInstanceIds.size() > 0">
-      TASK_ID_ IN
+      and TASK_ID_ IN
       (select distinct ID_ from ${prefix}ACT_HI_TASKINST
       where CASE_INST_ID_ in
         <foreach item="caseInstanceId" index="index" collection="caseInstanceIds" open="(" separator="," close=")">
           #{caseInstanceId}
         </foreach>
       )
+    </if>
+  </sql>
+
+  <sql id="selectAttachmentsTaskProcessAndCaseInstanceByIdsSql_mysql">
+    <if test="taskProcessInstanceIds != null &amp;&amp; taskProcessInstanceIds.size() > 0">
+      inner join ${prefix}ACT_HI_TASKINST T
+        on TASK_ID_ = T.ID_
+        and T.PROC_INST_ID_ in
+          <foreach item="processInstanceId" index="index" collection="taskProcessInstanceIds" open="(" separator="," close=")">
+            #{processInstanceId}
+          </foreach>
+    </if>
+    <if test="caseInstanceIds != null &amp;&amp; caseInstanceIds.size() > 0">
+      inner join ${prefix}ACT_HI_TASKINST T
+        on TASK_ID_ = T.ID_
+        and T.CASE_INST_ID_ in
+          <foreach item="caseInstanceId" index="index" collection="caseInstanceIds" open="(" separator="," close=")">
+            #{caseInstanceId}
+          </foreach>
     </if>
   </sql>
 
