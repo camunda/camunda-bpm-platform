@@ -67,7 +67,7 @@
       ${prefix}ACT_GE_BYTEARRAY
     <where>
       ID_ in (select E.ERROR_DETAILS_ID_ from ${prefix}ACT_HI_EXT_TASK_LOG E
-      <where><include refid="whereErrorDetailsByteArrayIds"/></where>)
+      <where><include refid="selectErrorDetailsByteArrayIds"/></where>)
     </where>
   </delete>
 
@@ -77,7 +77,7 @@
       ${prefix}ACT_GE_BYTEARRAY B
     inner join ${prefix}ACT_HI_EXT_TASK_LOG E
       on B.ID_ = E.ERROR_DETAILS_ID_
-    <include refid="whereErrorDetailsByteArrayIds"/>
+    <include refid="selectErrorDetailsByteArrayIds"/>
   </delete>
 
   <!-- RESULT MAP -->
@@ -102,7 +102,7 @@
     <result property="state" column="STATE_" jdbcType="VARCHAR" />
   </resultMap>
 
-  <sql id="whereErrorDetailsByteArrayIds">
+  <sql id="selectErrorDetailsByteArrayIds">
     and E.ERROR_DETAILS_ID_ is not null
     <if test="id != null">
       and E.ID_ = #{id, jdbcType=VARCHAR}
