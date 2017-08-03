@@ -1919,4 +1919,9 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
   public ProcessEngineServices getProcessEngineServices() {
     return Context.getProcessEngineConfiguration().getProcessEngine();
   }
+
+  @Override
+  public IncidentEntity findLastIncident() {
+    return incidents.get(incidents.size()-1);
+  }
 }

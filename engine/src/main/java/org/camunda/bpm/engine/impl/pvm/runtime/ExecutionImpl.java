@@ -30,6 +30,7 @@ import org.camunda.bpm.engine.impl.core.variable.scope.SimpleVariableInstance.Si
 import org.camunda.bpm.engine.impl.core.variable.scope.VariableInstanceFactory;
 import org.camunda.bpm.engine.impl.core.variable.scope.VariableInstanceLifecycleListener;
 import org.camunda.bpm.engine.impl.core.variable.scope.VariableStore;
+import org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
@@ -340,6 +341,11 @@ public class ExecutionImpl extends PvmExecutionImpl implements
 
   protected void removeVariablesLocalInternal(){
     // do nothing
+  }
+
+  @Override
+  public IncidentEntity findLastIncident() {
+    throw new UnsupportedOperationException();
   }
 
 }

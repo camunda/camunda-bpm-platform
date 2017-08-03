@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.core.variable.event.VariableEvent;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.impl.incident.IncidentContext;
+import org.camunda.bpm.engine.impl.incident.IncidentHandler;
 import org.camunda.bpm.engine.impl.persistence.entity.DelayedVariableEvent;
 import org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity;
 import org.camunda.bpm.engine.impl.pvm.*;
@@ -2109,7 +2110,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   }
 
   /**
-   * Returns a new incident.
+   * Returns the newest incident in this execution
    *
    * @param incidentType the type of new incident
    * @param configuration configuration of the incident
@@ -2129,10 +2130,20 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     incidentContext.setActivityId(this.getActivityId());
     incidentContext.setConfiguration(configuration);
 
-    IncidentEntity newIncident = IncidentEntity.createAndInsertIncident(incidentType, incidentContext, message);
-    newIncident.createRecursiveIncidents();
+    IncidentEntity newIncident = null;
+    IncidentHandler incidentHandler = findCustomIncidentHandler(incidentType);
+
+    if (incidentHandler == null) {
+      newIncident = IncidentEntity.createAndInsertIncident(incidentType, incidentContext, message);
+      newIncident.createRecursiveIncidents();
+    } else {
+      incidentHandler.handleIncident(incidentContext, message);
+      newIncident = findLastIncident();
+    }
     return newIncident;
   }
+
+  public abstract IncidentEntity findLastIncident();
 
   /**
    * Resolves an incident with given id.
@@ -2145,6 +2156,25 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
         .getCommandContext()
         .getIncidentManager()
         .findIncidentById(incidentId);
-    incident.resolve();
+
+    IncidentHandler incidentHandler = findCustomIncidentHandler(incident.getIncidentType());
+
+    if (incidentHandler == null) {
+      incident.resolve();
+    } else {
+      IncidentContext incidentContext = new IncidentContext();
+      incidentContext.setTenantId(incident.getTenantId());
+      incidentContext.setActivityId(incident.getActivityId());
+      incidentContext.setConfiguration(incident.getConfiguration());
+      incidentContext.setJobDefinitionId(incident.getJobDefinitionId());
+      incidentContext.setProcessDefinitionId(incident.getProcessDefinitionId());
+      incidentContext.setExecutionId(incident.getExecutionId());
+      incidentHandler.resolveIncident(incidentContext);
+    }
+  }
+
+  public IncidentHandler findCustomIncidentHandler(String incidentType) {
+    Map<String, IncidentHandler> incidentHandlers = Context.getProcessEngineConfiguration().getIncidentHandlers();
+    return incidentHandlers.get(incidentType);
   }
 }

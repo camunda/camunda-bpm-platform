@@ -2,17 +2,25 @@ package org.camunda.bpm.engine.test.api.runtime;
 
 import static org.junit.Assert.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.HistoryService;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.incident.IncidentContext;
+import org.camunda.bpm.engine.impl.incident.IncidentHandler;
+import org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
+import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.Before;
@@ -24,14 +32,20 @@ import static org.hamcrest.CoreMatchers.containsString;
 
 public class CreateAndResolveIncidentTest {
 
-  protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
+  protected ProcessEngineBootstrapRule processEngineBootstrapRule = new ProcessEngineBootstrapRule() {
+    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+      configuration.setCustomIncidentHandlers(Arrays.asList((IncidentHandler) new CustomIncidentHandler()));
+      return configuration;
+    }
+  };
+  protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule(processEngineBootstrapRule);
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
   public ExpectedException thrown = ExpectedException.none();
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
+  public RuleChain ruleChain = RuleChain.outerRule(processEngineBootstrapRule).around(engineRule).around(testRule);
 
   protected RuntimeService runtimeService;
   protected HistoryService historyService;
@@ -151,5 +165,68 @@ public class CreateAndResolveIncidentTest {
     } catch (BadUserRequestException e) {
       assertThat(e.getMessage(), containsString("Cannot resolve an incident of type failedJob"));
     }
+  }
+
+  @Test
+  public void createIncidentWithIncidentHandler() {
+    // given
+    testRule.deploy(ProcessModels.TWO_TASKS_PROCESS);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process");
+
+    // when
+    Incident incident = runtimeService.createIncident("custom", processInstance.getId(), "configuration");
+
+    // then
+    assertNotNull(incident);
+
+    Incident incident2 = runtimeService.createIncidentQuery().singleResult();
+    assertNotNull(incident2);
+    assertEquals(incident, incident2);
+    assertEquals("custom", incident.getIncidentType());
+    assertEquals("configuration", incident.getConfiguration());
+  }
+
+  @Test
+  public void resolveIncidentWithIncidentHandler() {
+    // given
+    testRule.deploy(ProcessModels.TWO_TASKS_PROCESS);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process");
+    runtimeService.createIncident("custom", processInstance.getId(), "configuration");
+    Incident incident = runtimeService.createIncidentQuery().singleResult();
+
+    // when
+    runtimeService.resolveIncident(incident.getId());
+
+    // then
+    incident = runtimeService.createIncidentQuery().singleResult();
+    assertNull(incident);
+  }
+
+  public static class CustomIncidentHandler implements IncidentHandler {
+
+    String incidentType = "custom";
+
+    @Override
+    public String getIncidentHandlerType() {
+      return incidentType;
+    }
+
+    @Override
+    public void handleIncident(IncidentContext context, String message) {
+      IncidentEntity.createAndInsertIncident(incidentType, context, message);
+    }
+
+    @Override
+    public void resolveIncident(IncidentContext context) {
+      deleteIncident(context);
+    }
+
+    @Override
+    public void deleteIncident(IncidentContext context) {
+      List<Incident> incidents = Context.getCommandContext().getIncidentManager()
+          .findIncidentByConfigurationAndIncidentType(context.getConfiguration(), incidentType);
+      ((IncidentEntity) incidents.get(0)).delete();
+    }
+
   }
 }
