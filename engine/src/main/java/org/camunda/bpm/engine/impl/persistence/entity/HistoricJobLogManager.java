@@ -108,6 +108,13 @@ public class HistoricJobLogManager extends AbstractHistoricManager {
     }
   }
 
+  public void deleteHistoricJobLogByBatchIds(List<String> historicBatchIds) {
+    if (isHistoryEnabled()) {
+      deleteExceptionByteArrayByParameterMap("historicBatchIdIn", historicBatchIds);
+      getDbEntityManager().delete(HistoricJobLogEventEntity.class, "deleteHistoricJobLogByBatchIds", historicBatchIds);
+    }
+  }
+
   // byte array delete ////////////////////////////////////////////////////////
 
   protected void deleteExceptionByteArrayByParameterMap(String key, Object value) {

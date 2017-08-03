@@ -69,6 +69,7 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
+import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.impl.AuthorizationServiceImpl;
 import org.camunda.bpm.engine.impl.DecisionServiceImpl;
 import org.camunda.bpm.engine.impl.DefaultArtifactFactory;
@@ -692,6 +693,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   private Date historyCleanupBatchWindowStartTimeAsDate;
   private Date historyCleanupBatchWindowEndTimeAsDate;
 
+  private Integer batchOperationHistoryTimeToLive;
+  private Map<String, Integer> batchOperationHistoryTimeToLiveMap;
+
   /**
    * Size of batch in which history cleanup data will be deleted. {@link HistoryCleanupBatch#MAX_BATCH_SIZE} must be respected.
    */
@@ -786,6 +790,23 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     if (historyCleanupBatchThreshold < 0) {
       throw LOG.invalidPropertyValue("historyCleanupBatchThreshold", String.valueOf(historyCleanupBatchThreshold),
           "History cleanup batch threshold cannot be negative.");
+    }
+
+    initBatchOperationsHistoryTimeToLive();
+  }
+
+  private void initBatchOperationsHistoryTimeToLive() {
+    if (batchOperationHistoryTimeToLiveMap == null) {
+      batchOperationHistoryTimeToLiveMap = new HashMap<String, Integer>();
+    }
+
+    if (batchHandlers != null && batchOperationHistoryTimeToLive != null) {
+
+      for (String key : batchHandlers.keySet()) {
+        if (!batchOperationHistoryTimeToLiveMap.containsKey(key)) {
+          batchOperationHistoryTimeToLiveMap.put(key, batchOperationHistoryTimeToLive);
+        }
+      }
     }
   }
 
@@ -3731,6 +3752,22 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setHistoryCleanupMetricsEnabled(boolean historyCleanupMetricsEnabled) {
     this.historyCleanupMetricsEnabled = historyCleanupMetricsEnabled;
+  }
+
+  public Integer getBatchOperationHistoryTimeToLive() {
+    return batchOperationHistoryTimeToLive;
+  }
+
+  public void setBatchOperationHistoryTimeToLive(Integer batchOperationHistoryTimeToLive) {
+    this.batchOperationHistoryTimeToLive = batchOperationHistoryTimeToLive;
+  }
+
+  public Map<String, Integer> getBatchOperationHistoryTimeToLiveMap() {
+    return batchOperationHistoryTimeToLiveMap;
+  }
+
+  public void setBatchOperationHistoryTimeToLiveMap(Map<String, Integer> batchOperationHistoryTimeToLiveMap) {
+    this.batchOperationHistoryTimeToLiveMap = batchOperationHistoryTimeToLiveMap;
   }
 
   public int getFailedJobListenerMaxRetries() {

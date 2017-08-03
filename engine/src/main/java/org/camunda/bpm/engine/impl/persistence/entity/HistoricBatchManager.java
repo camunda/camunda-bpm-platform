@@ -12,21 +12,29 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
+import org.camunda.bpm.engine.impl.Direction;
 import org.camunda.bpm.engine.impl.Page;
+import org.camunda.bpm.engine.impl.QueryOrderingProperty;
+import org.camunda.bpm.engine.impl.QueryPropertyImpl;
 import org.camunda.bpm.engine.impl.batch.BatchEntity;
 import org.camunda.bpm.engine.impl.batch.history.HistoricBatchEntity;
 import org.camunda.bpm.engine.impl.batch.history.HistoricBatchQueryImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventProcessor;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 
 public class HistoricBatchManager extends AbstractManager {
 
@@ -45,8 +53,33 @@ public class HistoricBatchManager extends AbstractManager {
     return getDbEntityManager().selectById(HistoricBatchEntity.class, batchId);
   }
 
+  @SuppressWarnings("unchecked")
+  public List<String> findHistoricBatchIdsForCleanup(Integer batchSize, Map<String, Integer> batchOperationHistoryTimeToLiveMap) {
+    Map<String, Object> map = new HashMap<String, Object>();
+    map.put("currentTimestamp", ClockUtil.getCurrentTime());
+    map.put("map", batchOperationHistoryTimeToLiveMap);
+
+    ListQueryParameterObject parameterObject = new ListQueryParameterObject();
+    parameterObject.setParameter(map);
+    parameterObject.getOrderingProperties().add(new QueryOrderingProperty(new QueryPropertyImpl("END_TIME_"), Direction.ASCENDING));
+    parameterObject.setFirstResult(0);
+    parameterObject.setMaxResults(batchSize);
+
+    return (List<String>) getDbEntityManager().selectList("selectHistoricBatchIdsForCleanup", parameterObject);
+  }
+
   public void deleteHistoricBatchById(String id) {
     getDbEntityManager().delete(HistoricBatchEntity.class, "deleteHistoricBatchById", id);
+  }
+
+  public void deleteHistoricBatchByIds(List<String> historicBatchIds) {
+    CommandContext commandContext = Context.getCommandContext();
+
+    commandContext.getHistoricIncidentManager().deleteHistoricIncidentsByBatchId(historicBatchIds);
+    commandContext.getHistoricJobLogManager().deleteHistoricJobLogByBatchIds(historicBatchIds);
+
+    getDbEntityManager().deletePreserveOrder(HistoricJobLogEventEntity.class, "deleteHistoricBatchByIds", historicBatchIds);
+
   }
 
   public void createHistoricBatch(final BatchEntity batch) {

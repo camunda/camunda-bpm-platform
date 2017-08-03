@@ -63,6 +63,13 @@
     delete from ${prefix}ACT_HI_BATCH where ID_ = #{parameter}
   </delete>
 
+  <delete id="deleteHistoricBatchByIds" parameterType="string">
+    delete from ${prefix}ACT_HI_BATCH where ID_ IN
+    <foreach item="batchId" index="index" collection="list" open="(" separator="," close=")">
+      #{batchId}
+    </foreach>
+  </delete>
+
   <!-- UPDATE -->
   <update id="updateHistoricBatch" parameterType="org.camunda.bpm.engine.impl.batch.history.HistoricBatchEntity">
     update ${prefix}ACT_HI_BATCH
@@ -127,5 +134,28 @@
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
     </where>
   </sql>
+
+  <!-- Select ids for async history cleanup -->
+
+  <select id="selectHistoricBatchIdsForCleanup" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
+    <bind name="date" value="'b.END_TIME_'"/>
+    <bind name="currentTimestamp" value="parameter.currentTimestamp"/>
+    ${limitBefore}
+    SELECT DISTINCT RES.*
+    ${limitBetween}
+    FROM (
+      SELECT b.ID_, b.END_TIME_
+      FROM ${prefix}ACT_HI_BATCH b
+      WHERE
+      <foreach index="key" item="value" collection="parameter.map" open="(" separator="OR" close=")">
+        <bind name="days" value="'#{value}'"/>
+        b.TYPE_ = #{key} and ${dayComparator}
+      </foreach>
+      AND b.END_TIME_ is not null
+    ) RES
+    ${orderBy}
+    ${limitAfter}
+  </select>
 
 </mapper>

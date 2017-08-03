@@ -89,6 +89,15 @@
     delete from ${prefix}ACT_HI_JOB_LOG where JOB_DEF_ID_ = #{jobDefinitionId}
   </delete>
 
+  <delete id="deleteHistoricJobLogByBatchIds">
+    delete from ${prefix}ACT_HI_JOB_LOG
+    where JOB_DEF_CONFIGURATION_
+    in
+    <foreach item="batchId" index="index" collection="list" open="(" separator="," close=")">
+       #{batchId}
+    </foreach>
+  </delete>
+
   <!-- BYTE ARRAY DELETE -->
 
   <delete id="deleteExceptionByteArraysByIds">
@@ -170,6 +179,12 @@
     </if>
     <if test="jobDefinitionType != null">
       and J.JOB_DEF_TYPE_ = #{jobDefinitionType, jdbcType=VARCHAR}
+    </if>
+    <if test="historicBatchIdIn != null &amp;&amp; historicBatchIdIn.size > 0">
+      and J.JOB_DEF_CONFIGURATION_ in
+      <foreach item="item" index="index" collection="historicBatchIdIn" open="(" separator="," close=")">
+          #{item}
+      </foreach>
     </if>
   </sql>
 

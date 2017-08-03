@@ -21,6 +21,7 @@ public class HistoryCleanupBatch {
   private List<String> historicProcessInstanceIds = Collections.emptyList();
   private List<String> historicDecisionInstanceIds = Collections.emptyList();
   private List<String> historicCaseInstanceIds = Collections.emptyList();
+  private List<String> historicBatchIds = Collections.emptyList();
 
   public List<String> getHistoricProcessInstanceIds() {
     return historicProcessInstanceIds;
@@ -46,11 +47,19 @@ public class HistoryCleanupBatch {
     this.historicCaseInstanceIds = historicCaseInstanceIds;
   }
 
+  public List<String> getHistoricBatchIds() {
+    return historicBatchIds;
+  }
+
+  public void setHistoricBatchIds(List<String> historicBatchIds) {
+    this.historicBatchIds = historicBatchIds;
+  }
+
   /**
    * Size of the batch.
    */
   public int size() {
-    return historicProcessInstanceIds.size() + historicDecisionInstanceIds.size() + historicCaseInstanceIds.size();
+    return historicProcessInstanceIds.size() + historicDecisionInstanceIds.size() + historicCaseInstanceIds.size() + historicBatchIds.size();
   }
 
   public void performCleanup() {
@@ -63,9 +72,13 @@ public class HistoryCleanupBatch {
       commandContext.getHistoricDecisionInstanceManager().deleteHistoricDecisionInstanceByIds(historicDecisionInstanceIds);
       recordValue(Metrics.HISTORY_CLEANUP_REMOVED_DECISION_INSTANCES, historicDecisionInstanceIds.size());
     }
-    if (historicCaseInstanceIds.size() > 0){
+    if (historicCaseInstanceIds.size() > 0) {
       commandContext.getHistoricCaseInstanceManager().deleteHistoricCaseInstancesByIds(historicCaseInstanceIds);
       recordValue(Metrics.HISTORY_CLEANUP_REMOVED_CASE_INSTANCES, historicCaseInstanceIds.size());
+    }
+    if (historicBatchIds.size() > 0) {
+      commandContext.getHistoricBatchManager().deleteHistoricBatchByIds(historicBatchIds);
+      recordValue(Metrics.HISTORY_CLEANUP_REMOVED_BATCH_INSTANCES, historicBatchIds.size());
     }
   }
 

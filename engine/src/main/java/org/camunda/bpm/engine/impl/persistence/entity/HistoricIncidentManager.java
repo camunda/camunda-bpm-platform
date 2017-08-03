@@ -52,6 +52,12 @@ public class HistoricIncidentManager extends AbstractHistoricManager {
     }
   }
 
+  public void deleteHistoricIncidentsByBatchId(List<String> historicBatchIds) {
+    if (isHistoryLevelFullEnabled()) {
+      getDbEntityManager().delete(HistoricIncidentEntity.class, "deleteHistoricIncidentsByBatchIds", historicBatchIds);
+    }
+  }
+
   protected void configureQuery(HistoricIncidentQueryImpl query) {
     getAuthorizationManager().configureHistoricIncidentQuery(query);
     getTenantManager().configureQuery(query);
