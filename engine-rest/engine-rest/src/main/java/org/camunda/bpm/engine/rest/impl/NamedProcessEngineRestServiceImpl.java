@@ -49,6 +49,7 @@ import org.camunda.bpm.engine.rest.MigrationRestService;
 import org.camunda.bpm.engine.rest.ModificationRestService;
 import org.camunda.bpm.engine.rest.ProcessDefinitionRestService;
 import org.camunda.bpm.engine.rest.ProcessInstanceRestService;
+import org.camunda.bpm.engine.rest.SignalRestService;
 import org.camunda.bpm.engine.rest.TaskRestService;
 import org.camunda.bpm.engine.rest.TenantRestService;
 import org.camunda.bpm.engine.rest.UserRestService;
@@ -223,6 +224,12 @@ public class NamedProcessEngineRestServiceImpl extends AbstractProcessEngineRest
   @Path("/{name}" + TenantRestService.PATH)
   public TenantRestService getTenantRestService(@PathParam("name") String engineName) {
     return super.getTenantRestService(engineName);
+  }
+
+  @Override
+  @Path("/{name}" + SignalRestService.PATH)
+  public SignalRestService getSignalRestService(@PathParam("name") String engineName) {
+    return super.getSignalRestService(engineName);
   }
 
   @GET

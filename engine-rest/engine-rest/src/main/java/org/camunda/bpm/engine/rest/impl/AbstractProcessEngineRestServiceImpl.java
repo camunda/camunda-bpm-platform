@@ -40,6 +40,7 @@ import org.camunda.bpm.engine.rest.MigrationRestService;
 import org.camunda.bpm.engine.rest.ModificationRestService;
 import org.camunda.bpm.engine.rest.ProcessDefinitionRestService;
 import org.camunda.bpm.engine.rest.ProcessInstanceRestService;
+import org.camunda.bpm.engine.rest.SignalRestService;
 import org.camunda.bpm.engine.rest.TaskRestService;
 import org.camunda.bpm.engine.rest.TenantRestService;
 import org.camunda.bpm.engine.rest.UserRestService;
@@ -251,6 +252,13 @@ public abstract class AbstractProcessEngineRestServiceImpl {
   public TenantRestService getTenantRestService(String engineName) {
     String rootResourcePath = getRelativeEngineUri(engineName).toASCIIString();
     TenantRestServiceImpl subResource = new TenantRestServiceImpl(engineName, getObjectMapper());
+    subResource.setRelativeRootResourceUri(rootResourcePath);
+    return subResource;
+  }
+
+  public SignalRestService getSignalRestService(String engineName) {
+    String rootResourcePath = getRelativeEngineUri(engineName).toASCIIString();
+    SignalRestServiceImpl subResource = new SignalRestServiceImpl(engineName, getObjectMapper());
     subResource.setRelativeRootResourceUri(rootResourcePath);
     return subResource;
   }
