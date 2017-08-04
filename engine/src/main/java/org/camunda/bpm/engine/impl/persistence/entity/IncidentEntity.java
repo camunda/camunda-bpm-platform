@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
@@ -30,9 +31,9 @@ import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventProcessor;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventType;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
-import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.incident.IncidentContext;
+import org.camunda.bpm.engine.impl.incident.IncidentLogger;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.Incident;
 
@@ -40,6 +41,8 @@ import org.camunda.bpm.engine.runtime.Incident;
  * @author roman.smirnov
  */
 public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbReferences {
+
+  protected static final IncidentLogger LOG = ProcessEngineLogger.INCIDENT_LOGGER;
 
   protected int revision;
 
@@ -120,8 +123,13 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
         .getExecutionManager()
         .findExecutionById(context.getExecutionId());
 
-      // link incident with execution
-      newIncident.setExecution(execution);
+      if (execution != null) {
+        // link incident with execution
+        newIncident.setExecution(execution);
+      }
+      else {
+        LOG.executionNotFound(context.getExecutionId());
+      }
     }
 
     // insert new incident (and create a new historic incident)
@@ -376,7 +384,10 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
       execution.addIncident(this);
     }
     else {
-      getExecution().removeIncident(this);
+      ExecutionEntity oldExecution = getExecution();
+      if (oldExecution != null) {
+        oldExecution.removeIncident(this);
+      }
       executionId = null;
       processInstanceId = null;
     }
@@ -384,10 +395,17 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
 
   public ExecutionEntity getExecution() {
     if(executionId != null) {
-      return Context.getCommandContext()
+      ExecutionEntity execution = Context.getCommandContext()
         .getExecutionManager()
         .findExecutionById(executionId);
-    } else {
+
+      if (execution == null) {
+        LOG.executionNotFound(executionId);
+      }
+
+      return execution;
+    }
+    else {
       return null;
     }
   }
