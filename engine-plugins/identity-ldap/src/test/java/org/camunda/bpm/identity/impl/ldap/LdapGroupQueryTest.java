@@ -52,7 +52,7 @@ public class LdapGroupQueryTest extends LdapIdentityProviderTest {
     assertNull(group);
   }
 
-  public void FAILING_testFilterByGroupIdIn() {
+  public void testFilterByGroupIdIn() {
     List<Group> groups = identityService.createGroupQuery()
       .groupIdIn("external", "management")
       .list();

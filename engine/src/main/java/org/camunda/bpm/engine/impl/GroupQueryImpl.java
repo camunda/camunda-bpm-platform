@@ -124,5 +124,7 @@ public abstract class GroupQueryImpl extends AbstractQuery<GroupQuery, Group> im
   public String getTenantId() {
     return tenantId;
   }
-
+  public String[] getIds() {
+    return ids;
+  }
 }

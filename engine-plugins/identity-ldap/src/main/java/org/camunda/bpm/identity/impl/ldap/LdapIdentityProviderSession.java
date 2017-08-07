@@ -442,6 +442,13 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
     if(query.getId() != null) {
       addFilter(ldapConfiguration.getGroupIdAttribute(), query.getId(), search);
     }
+    if(query.getIds() != null && query.getIds().length > 0) {
+      search.write("(|");
+      for (String id : query.getIds()) {
+        addFilter(ldapConfiguration.getGroupIdAttribute(), id, search);
+      }
+      search.write(")");
+    }
     if(query.getName() != null) {
       addFilter(ldapConfiguration.getGroupNameAttribute(), query.getName(), search);
     }
