@@ -36,7 +36,11 @@ var parseValue = function(value, enforceString) {
 };
 
 var sanitizeValue = function(value, operator, search) {
-  if(operator === 'Like' || operator === 'like') {
+  // Regex for '\_' and '\%' epxressions
+  var specialWildCardCharExp = /(\\%)|(\\_)/g;
+  // Regex for '_' and '%' special characters
+  var wildCardExp = /(\%)|(\_)/;
+  if(operator.toLowerCase() === 'like' && !wildCardExp.test(value.replace(specialWildCardCharExp, ''))) {
     return '%'+value+'%';
   } else if(operator == 'in') {
     return value.split(',');
