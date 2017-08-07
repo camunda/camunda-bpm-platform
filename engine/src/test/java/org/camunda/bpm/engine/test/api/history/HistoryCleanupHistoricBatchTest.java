@@ -217,7 +217,7 @@ public class HistoryCleanupHistoricBatchTest {
     map.put("instance-migration", 2);
     map.put("instance-deletion", 5);
     processEngineConfiguration.setBatchOperationHistoryTimeToLive(null);
-    processEngineConfiguration.setBatchOperationHistoryTimeToLiveMap(map);
+    processEngineConfiguration.setBatchOperationsForHistoryCleanup(map);
     processEngineConfiguration.initHistoryCleanup();
 
     assertNull(processEngineConfiguration.getBatchOperationHistoryTimeToLive());
@@ -265,7 +265,7 @@ public class HistoryCleanupHistoricBatchTest {
     Map<String, Integer> map = new HashMap<String, Integer>();
     map.put("instance-modification", 20);
     processEngineConfiguration.setBatchOperationHistoryTimeToLive(5);
-    processEngineConfiguration.setBatchOperationHistoryTimeToLiveMap(map);
+    processEngineConfiguration.setBatchOperationsForHistoryCleanup(map);
     processEngineConfiguration.initHistoryCleanup();
 
     Date startDate = ClockUtil.getCurrentTime();

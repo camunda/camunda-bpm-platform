@@ -101,6 +101,10 @@ public abstract class HistoryCleanupHelper {
     return commandContext.getProcessEngineConfiguration().getHistoryCleanupBatchSize();
   }
 
+  private static Map<String, Integer> getBatchOperationsForHistoryCleanup(CommandContext commandContext) {
+    return commandContext.getProcessEngineConfiguration().getBatchOperationsForHistoryCleanup();
+  }
+
   /**
    * Creates next batch object for history cleanup. First searches for historic process instances ready for cleanup. If there is still some place left in batch (configured batch
    * size was not reached), searches for historic decision instances and also adds them to the batch. Then if there is still some place left in batch, searches for historic case
@@ -140,20 +144,16 @@ public abstract class HistoryCleanupHelper {
     }
 
     //if batch is not full, add batch ids
-    Map<String, Integer> batchOperationHistoryTimeToLiveMap = getBatchOperationHistoryTimeToLiveMap(commandContext);
-    if (historyCleanupBatch.size() < batchSize && batchOperationHistoryTimeToLiveMap != null && !batchOperationHistoryTimeToLiveMap.isEmpty()) {
+    Map<String, Integer> batchOperationsForHistoryCleanup = getBatchOperationsForHistoryCleanup(commandContext);
+    if (historyCleanupBatch.size() < batchSize && batchOperationsForHistoryCleanup != null && !batchOperationsForHistoryCleanup.isEmpty()) {
       List<String> historicBatchIds = commandContext
           .getHistoricBatchManager()
-          .findHistoricBatchIdsForCleanup(batchSize - historyCleanupBatch.size(), batchOperationHistoryTimeToLiveMap);
+          .findHistoricBatchIdsForCleanup(batchSize - historyCleanupBatch.size(), batchOperationsForHistoryCleanup);
       if (historicBatchIds.size() > 0) {
         historyCleanupBatch.setHistoricBatchIds(historicBatchIds);
       }
     }
 
     return historyCleanupBatch;
-  }
-
-  private static Map<String, Integer> getBatchOperationHistoryTimeToLiveMap(CommandContext commandContext) {
-    return commandContext.getProcessEngineConfiguration().getBatchOperationHistoryTimeToLiveMap();
   }
 }

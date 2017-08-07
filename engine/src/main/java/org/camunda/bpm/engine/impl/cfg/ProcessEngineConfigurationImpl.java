@@ -694,7 +694,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   private Date historyCleanupBatchWindowEndTimeAsDate;
 
   private Integer batchOperationHistoryTimeToLive;
-  private Map<String, Integer> batchOperationHistoryTimeToLiveMap;
+  private Map<String, Integer> batchOperationsForHistoryCleanup;
 
   /**
    * Size of batch in which history cleanup data will be deleted. {@link HistoryCleanupBatch#MAX_BATCH_SIZE} must be respected.
@@ -796,15 +796,22 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   }
 
   private void initBatchOperationsHistoryTimeToLive() {
-    if (batchOperationHistoryTimeToLiveMap == null) {
-      batchOperationHistoryTimeToLiveMap = new HashMap<String, Integer>();
+    if (batchOperationsForHistoryCleanup == null) {
+      batchOperationsForHistoryCleanup = new HashMap<String, Integer>();
+    } else {
+      for (String operation : batchOperationsForHistoryCleanup.keySet()) {
+        if (!batchHandlers.keySet().contains(operation)) {
+          LOG.invalidBatchOperation(operation, batchOperationsForHistoryCleanup.get(operation));
+          batchOperationsForHistoryCleanup.remove(operation);
+        }
+      }
     }
 
     if (batchHandlers != null && batchOperationHistoryTimeToLive != null) {
 
       for (String key : batchHandlers.keySet()) {
-        if (!batchOperationHistoryTimeToLiveMap.containsKey(key)) {
-          batchOperationHistoryTimeToLiveMap.put(key, batchOperationHistoryTimeToLive);
+        if (!batchOperationsForHistoryCleanup.containsKey(key)) {
+          batchOperationsForHistoryCleanup.put(key, batchOperationHistoryTimeToLive);
         }
       }
     }
@@ -3762,12 +3769,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     this.batchOperationHistoryTimeToLive = batchOperationHistoryTimeToLive;
   }
 
-  public Map<String, Integer> getBatchOperationHistoryTimeToLiveMap() {
-    return batchOperationHistoryTimeToLiveMap;
+  public Map<String, Integer> getBatchOperationsForHistoryCleanup() {
+    return batchOperationsForHistoryCleanup;
   }
 
-  public void setBatchOperationHistoryTimeToLiveMap(Map<String, Integer> batchOperationHistoryTimeToLiveMap) {
-    this.batchOperationHistoryTimeToLiveMap = batchOperationHistoryTimeToLiveMap;
+  public void setBatchOperationsForHistoryCleanup(Map<String, Integer> batchOperationsForHistoryCleanup) {
+    this.batchOperationsForHistoryCleanup = batchOperationsForHistoryCleanup;
   }
 
   public int getFailedJobListenerMaxRetries() {

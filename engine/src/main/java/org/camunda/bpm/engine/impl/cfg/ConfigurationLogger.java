@@ -76,4 +76,9 @@ public class ConfigurationLogger extends ProcessEngineLogger {
       "Invalid value '{}' for configuration property '{}': {}.", propertyValue, propertyName, reason));
   }
 
+  public void invalidBatchOperation(String operation, Integer historyTimeToLive) {
+    logWarn(
+      "010", "Invalid batch operation name '{}' with history time to live set to'{}'" , operation, historyTimeToLive);
+  }
+
 }
