@@ -254,7 +254,11 @@ function getSearchValue(search) {
 
 var simpleDateExp = /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(|\.[0-9]{0,4})$/;
 function sanitizeValue(value, operator, search) {
-  if (includes(['like', 'Like'], operator)) {
+  // Regex for '\_' and '\%' epxressions
+  var specialWildCardCharExp = /(\\%)|(\\_)/g;
+  // Regex for '_' and '%' special characters
+  var wildCardExp = /(\%)|(\_)/;
+  if(operator.toLowerCase() === 'like' && !wildCardExp.test(value.replace(specialWildCardCharExp, ''))) {
     return '%'+value+'%';
   } else if(search.allowDates && simpleDateExp.test(value)) {
     return moment(value).format('YYYY-MM-DDTHH:mm:ss.SSSZZ');
