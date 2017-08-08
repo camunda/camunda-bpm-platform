@@ -13,15 +13,11 @@
 package org.camunda.bpm.engine.rest.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.camunda.bpm.engine.AuthorizationException;
-import org.camunda.bpm.engine.BadUserRequestException;
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.rest.SignalRestService;
 import org.camunda.bpm.engine.rest.dto.SignalDto;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.runtime.SignalEventReceivedBuilder;
 
 import javax.ws.rs.core.Response.Status;
@@ -43,42 +39,36 @@ public class SignalRestServiceImpl extends AbstractRestProcessEngineAware implem
       throw new InvalidRequestException(Status.BAD_REQUEST, "No signal name given");
     }
 
+    SignalEventReceivedBuilder signalEvent = createSignalEventReceivedBuilder(dto);
+    signalEvent.send();
+  }
+
+  protected SignalEventReceivedBuilder createSignalEventReceivedBuilder(SignalDto dto) {
     RuntimeService runtimeService = processEngine.getRuntimeService();
-    SignalEventReceivedBuilder signal = runtimeService.createSignalEvent(name);
+    String name = dto.getName();
+    SignalEventReceivedBuilder signalEvent = runtimeService.createSignalEvent(name);
 
     String executionId = dto.getExecutionId();
     if (executionId != null) {
-      signal.executionId(executionId);
+      signalEvent.executionId(executionId);
     }
 
     Map<String, VariableValueDto> variablesDto = dto.getVariables();
     if (variablesDto != null) {
-      try {
-        Map<String, Object> variables = VariableValueDto.toMap(variablesDto, processEngine, objectMapper);
-        signal.setVariables(variables);
-      } catch (RestException e) {
-        throw new InvalidRequestException(e.getStatus(), e, e.getMessage());
-      }
+      Map<String, Object> variables = VariableValueDto.toMap(variablesDto, processEngine, objectMapper);
+      signalEvent.setVariables(variables);
     }
 
     String tenantId = dto.getTenantId();
     if (tenantId != null) {
-      signal.tenantId(tenantId);
+      signalEvent.tenantId(tenantId);
     }
 
-    boolean isTenantIdSet = dto.isWithoutTenantId();
-    if (isTenantIdSet) {
-      signal.withoutTenantId();
+    boolean isWithoutTenantId = dto.isWithoutTenantId();
+    if (isWithoutTenantId) {
+      signalEvent.withoutTenantId();
     }
 
-    try {
-      signal.send();
-    } catch (BadUserRequestException e) {
-      throw new InvalidRequestException(Status.BAD_REQUEST, e, e.getMessage());
-    } catch (AuthorizationException e) {
-      throw new InvalidRequestException(Status.FORBIDDEN, e, e.getMessage());
-    } catch (ProcessEngineException e) {
-      throw new InvalidRequestException(Status.INTERNAL_SERVER_ERROR, e, e.getMessage());
-    }
+    return signalEvent;
   }
 }

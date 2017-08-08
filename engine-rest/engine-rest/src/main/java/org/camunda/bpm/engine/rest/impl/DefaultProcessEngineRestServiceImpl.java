@@ -187,7 +187,7 @@ public class DefaultProcessEngineRestServiceImpl extends AbstractProcessEngineRe
   }
 
   @Path(SignalRestService.PATH)
-  public SignalRestService SignalRestService() {
+  public SignalRestService getSignalRestService() {
     return super.getSignalRestService(null);
   }
 

@@ -77,7 +77,7 @@ public class SignalRestServiceTest extends AbstractRestServiceTest {
       .expect()
         .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
-      .put(SIGNAL_URL);
+      .post(SIGNAL_URL);
 
     verify(runtimeServiceMock).createSignalEvent(requestBody.get("name"));
     verify(signalBuilderMock).send();
@@ -101,7 +101,7 @@ public class SignalRestServiceTest extends AbstractRestServiceTest {
       .expect()
         .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
-      .put(SIGNAL_URL);
+      .post(SIGNAL_URL);
 
     verify(runtimeServiceMock).createSignalEvent((String) requestBody.get("name"));
 
@@ -126,7 +126,7 @@ public class SignalRestServiceTest extends AbstractRestServiceTest {
       .expect()
         .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
-      .put(SIGNAL_URL);
+      .post(SIGNAL_URL);
 
     verify(runtimeServiceMock).createSignalEvent((String) requestBody.get("name"));
     verify(signalBuilderMock).tenantId((String) requestBody.get("tenantId"));
@@ -152,7 +152,7 @@ public class SignalRestServiceTest extends AbstractRestServiceTest {
       .expect()
         .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
-      .put(SIGNAL_URL);
+      .post(SIGNAL_URL);
 
     verify(runtimeServiceMock).createSignalEvent((String) requestBody.get("name"));
 
@@ -178,7 +178,7 @@ public class SignalRestServiceTest extends AbstractRestServiceTest {
       .expect()
         .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
-      .put(SIGNAL_URL);
+      .post(SIGNAL_URL);
 
     verify(runtimeServiceMock).createSignalEvent((String) requestBody.get("name"));
     verify(signalBuilderMock).withoutTenantId();
@@ -204,7 +204,7 @@ public class SignalRestServiceTest extends AbstractRestServiceTest {
       .expect()
         .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
-      .put(SIGNAL_URL);
+      .post(SIGNAL_URL);
 
     verify(runtimeServiceMock).createSignalEvent((String) requestBody.get("name"));
     Map<String, Object> expectedVariables = new HashMap<String, Object>();
@@ -229,7 +229,7 @@ public class SignalRestServiceTest extends AbstractRestServiceTest {
       .expect()
         .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
-      .put(SIGNAL_URL);
+      .post(SIGNAL_URL);
 
     verify(runtimeServiceMock).createSignalEvent(requestBody.get("name"));
     verify(signalBuilderMock).executionId(requestBody.get("executionId"));
@@ -255,7 +255,7 @@ public class SignalRestServiceTest extends AbstractRestServiceTest {
       .expect()
         .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
-      .put(SIGNAL_URL);
+      .post(SIGNAL_URL);
 
     verify(runtimeServiceMock).createSignalEvent((String) requestBody.get("name"));
     Map<String, Object> expectedVariables = new HashMap<String, Object>();
@@ -281,7 +281,7 @@ public class SignalRestServiceTest extends AbstractRestServiceTest {
       .expect()
         .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
-      .put(SIGNAL_URL);
+      .post(SIGNAL_URL);
 
     verify(runtimeServiceMock).createSignalEvent((String) requestBody.get("name"));
     verify(signalBuilderMock).tenantId((String) requestBody.get("tenantId"));
@@ -309,7 +309,7 @@ public class SignalRestServiceTest extends AbstractRestServiceTest {
       .expect()
         .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
-      .put(SIGNAL_URL);
+      .post(SIGNAL_URL);
 
     verify(runtimeServiceMock).createSignalEvent((String) requestBody.get("name"));
     verify(signalBuilderMock).executionId((String) requestBody.get("executionId"));
@@ -336,7 +336,7 @@ public class SignalRestServiceTest extends AbstractRestServiceTest {
       .expect()
         .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
-      .put(SIGNAL_URL);
+      .post(SIGNAL_URL);
 
     verify(runtimeServiceMock).createSignalEvent((String) requestBody.get("name"));
     verify(signalBuilderMock).executionId((String) requestBody.get("executionId"));
@@ -364,7 +364,7 @@ public class SignalRestServiceTest extends AbstractRestServiceTest {
       .expect()
         .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
-      .put(SIGNAL_URL);
+      .post(SIGNAL_URL);
 
     verify(runtimeServiceMock).createSignalEvent((String) requestBody.get("name"));
     verify(signalBuilderMock).executionId((String) requestBody.get("executionId"));
@@ -390,7 +390,7 @@ public class SignalRestServiceTest extends AbstractRestServiceTest {
         .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
         .body("message", equalTo("No signal name given"))
     .when()
-      .put(SIGNAL_URL);
+      .post(SIGNAL_URL);
   }
 
   @Test
@@ -407,10 +407,10 @@ public class SignalRestServiceTest extends AbstractRestServiceTest {
     .then()
       .expect()
         .statusCode(Status.BAD_REQUEST.getStatusCode())
-        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("type", equalTo(BadUserRequestException.class.getSimpleName()))
         .body("message", equalTo(message))
     .when()
-      .put(SIGNAL_URL);
+      .post(SIGNAL_URL);
   }
 
   @Test
@@ -427,10 +427,10 @@ public class SignalRestServiceTest extends AbstractRestServiceTest {
     .then()
       .expect()
         .statusCode(Status.FORBIDDEN.getStatusCode())
-        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("type", equalTo(AuthorizationException.class.getSimpleName()))
         .body("message", equalTo(message))
     .when()
-      .put(SIGNAL_URL);
+      .post(SIGNAL_URL);
   }
 
   @Test
@@ -447,10 +447,10 @@ public class SignalRestServiceTest extends AbstractRestServiceTest {
     .then()
       .expect()
         .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
-        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("type", equalTo(ProcessEngineException.class.getSimpleName()))
         .body("message", equalTo(message))
     .when()
-      .put(SIGNAL_URL);
+      .post(SIGNAL_URL);
   }
 
 }
