@@ -18,11 +18,47 @@
   <modules>
     <module>bom</module>
     <module>extension</module>
-    <module>examples</module>
-    <module>maven</module>
-    <module>gradle</module>
     <module>docs</module>
   </modules>
+
+  <profiles>
+    <profile>
+      <id>gradle</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>gradle</module>
+      </modules>
+    </profile>
+    <profile>
+      <id>maven</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>maven</module>
+      </modules>
+    </profile>
+    <profile>
+      <id>examples</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>examples</module>
+      </modules>
+    </profile>
+    <profile>
+      <id>docs</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>docs</module>
+      </modules>
+    </profile>
+  </profiles>
 
   <properties>
     <spring-boot.version>1.5.6.RELEASE</spring-boot.version>
