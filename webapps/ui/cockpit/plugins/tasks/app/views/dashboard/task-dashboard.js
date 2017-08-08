@@ -46,19 +46,20 @@ module.exports = ['ViewsProvider', function(ViewsProvider) {
         var provideResourceData = function(resourceName, resource, method, params) {
           var deferred = $q.defer();
 
-          var getErrorMessage = function(err) {
+          var getErrorStatus = function() {
             if(method === 'countByCandidateGroup') {
-              return 'Unable to fetch tasks per group: ' + err.toString();
+              return 'Unable to fetch assignments by group';
             }
 
-            return err.toString();
-          };
+            return 'Could not fetch the resource for \'' + resourceName + '\'';
+
+          }
 
           var resourceCallback = function(err, res) {
             if (err) {
               Notifications.addError({
-                status: 'Could not fetch the resource for \'' + resourceName + '\'',
-                message: getErrorMessage(err)
+                status: getErrorStatus(),
+                message: err.toString()
               });
               deferred.reject(err);
             } else {
