@@ -1,6 +1,6 @@
 <section>
   <div class="inner">
-    <header>
+    <header ng-if="decisionCount">
       <h1 class="section-title">{{decisionCount}} decision {{ (decisionCount > 1 ? 'definitions' : 'definition') }}  deployed</h1>
     </header>
 
@@ -38,4 +38,3 @@
     </h3>
   </div>
 </section>
-

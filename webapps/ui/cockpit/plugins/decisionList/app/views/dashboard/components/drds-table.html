@@ -1,6 +1,6 @@
 <section ng-if="isDrdAvailable">
   <div class="inner">
-    <header>
+    <header ng-if="drdsCount">
       <h1 class="section-title">{{drdsCount}} decision requirements
         {{ (drdsCount > 1 ? 'definitions' : 'definition') }} deployed</h1>
     </header>

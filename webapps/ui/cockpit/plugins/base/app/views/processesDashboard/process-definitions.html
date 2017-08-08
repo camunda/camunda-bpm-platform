@@ -1,13 +1,13 @@
 <!-- # CE - ui/cockpit/plugins/base/app/views/processesDashboard/process-definitions.html -->
 <section>
   <div class="inner">
-    <header>
+    <header ng-if=processDefinitionsCount>
       <div class="row">
-        <h1 class="col-xs-6 section-title">{{ processDefinitionData.length }} process {{ (processDefinitionData.length > 1 ? 'definitions' : 'definition') }} deployed</h1>
+        <h1 class="col-xs-6 section-title">{{ processDefinitionsCount }} process {{ (processDefinitionsCount > 1 ? 'definitions' : 'definition') }} deployed</h1>
 
 
         <div class="col-xs-6 text-right">
-          <ul class="nav nav-tabs" ng-if="processDefinitionData && processDefinitionData.length">
+          <ul class="nav nav-tabs">
             <li ng-class="{active: activeTab === 'list'}">
               <a ng-click="selectTab('list')">List</a>
             </li>
@@ -24,7 +24,7 @@
     <div cam-widget-loader
          loading-state="{{loadingState}}"
          class="deployed-processes">
-      <table ng-if="activeTab === 'list'"
+      <table ng-if="processDefinitionsCount && activeTab === 'list'"
              class="process-definitions-list cam-table">
         <thead>
           <tr>
@@ -82,7 +82,7 @@
         </tbody>
       </table>
 
-      <div ng-if="activeTab === 'previews'"
+      <div ng-if="processDefinitionsCount && activeTab === 'previews'"
            class="tile-grid">
         <div ng-repeat="pd in processDefinitionData | orderBy:orderByPredicate:orderByReverse"
              class="tile col-xs-12 col-sm-6 col-md-4 col-lg-3">
@@ -116,7 +116,7 @@
         </div>
       </div>
 
-      <h3 ng-if="!processDefinitionData || !processDefinitionData.length">
+      <h3 ng-if="!processDefinitionsCount">
         No process definitions deployed
       </h3>
 
