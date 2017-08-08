@@ -58,6 +58,11 @@ public class LdapGroupQueryTest extends LdapIdentityProviderTest {
       .list();
 
     assertEquals(2, groups.size());
+    for (Group group : groups) {
+      if (!group.getId().equals("external") && !group.getId().equals("management")) {
+        fail();
+      }
+    }
   }
 
   public void testFilterByGroupName() {
