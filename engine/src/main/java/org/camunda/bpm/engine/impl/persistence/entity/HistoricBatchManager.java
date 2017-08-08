@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
+import org.camunda.bpm.engine.history.CleanableHistoricBatchReportResult;
+import org.camunda.bpm.engine.impl.CleanableHistoricBatchReportImpl;
 import org.camunda.bpm.engine.impl.Direction;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.QueryOrderingProperty;
@@ -54,10 +56,10 @@ public class HistoricBatchManager extends AbstractManager {
   }
 
   @SuppressWarnings("unchecked")
-  public List<String> findHistoricBatchIdsForCleanup(Integer batchSize, Map<String, Integer> batchOperationHistoryTimeToLiveMap) {
+  public List<String> findHistoricBatchIdsForCleanup(Integer batchSize, Map<String, Integer> batchOperationsForHistoryCleanup) {
     Map<String, Object> map = new HashMap<String, Object>();
     map.put("currentTimestamp", ClockUtil.getCurrentTime());
-    map.put("map", batchOperationHistoryTimeToLiveMap);
+    map.put("map", batchOperationsForHistoryCleanup);
 
     ListQueryParameterObject parameterObject = new ListQueryParameterObject();
     parameterObject.setParameter(map);
@@ -115,6 +117,22 @@ public class HistoricBatchManager extends AbstractManager {
   protected void configureQuery(HistoricBatchQueryImpl query) {
     getAuthorizationManager().configureHistoricBatchQuery(query);
     getTenantManager().configureQuery(query);
+  }
+
+  @SuppressWarnings("unchecked")
+  public List<CleanableHistoricBatchReportResult> findCleanableHistoricBatchReportByCriteria(CleanableHistoricBatchReportImpl query, Page page, Map<String, Integer> batchOperationsForHistoryCleanup) {
+    query.setCurrentTimestamp(ClockUtil.getCurrentTime());
+    query.setParameter(batchOperationsForHistoryCleanup);
+    query.getOrderingProperties().add(new QueryOrderingProperty(new QueryPropertyImpl("TYPE_"), Direction.ASCENDING));
+
+    return getDbEntityManager().selectList("selectFinishedBatchReportEntities", query, page);
+  }
+
+  public long findCleanableHistoricBatchReportCountByCriteria(CleanableHistoricBatchReportImpl query, Map<String, Integer> batchOperationsForHistoryCleanup) {
+    query.setCurrentTimestamp(ClockUtil.getCurrentTime());
+    query.setParameter(batchOperationsForHistoryCleanup);
+
+    return (Long) getDbEntityManager().selectOne("selectFinishedBatchReportEntitiesCount", query);
   }
 
 }

@@ -239,6 +239,9 @@ public class TenantCommandChecker implements CommandChecker {
     }
   }
 
+  public void checkReadHistoricBatch() {
+  }
+
   @Override
   public void checkCreateDeployment() {
   }

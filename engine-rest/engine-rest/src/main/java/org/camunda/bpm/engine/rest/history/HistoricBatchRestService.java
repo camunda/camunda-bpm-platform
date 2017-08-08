@@ -25,6 +25,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
+import org.camunda.bpm.engine.rest.dto.history.batch.CleanableHistoricBatchReportResultDto;
 import org.camunda.bpm.engine.rest.dto.history.batch.HistoricBatchDto;
 import org.camunda.bpm.engine.rest.sub.history.HistoricBatchResource;
 
@@ -47,4 +48,15 @@ public interface HistoricBatchRestService {
   @Produces(MediaType.APPLICATION_JSON)
   CountResultDto getHistoricBatchesCount(@Context UriInfo uriInfo);
 
+  @GET
+  @Path("/cleanable-batch-report")
+  @Produces(MediaType.APPLICATION_JSON)
+  List<CleanableHistoricBatchReportResultDto> getCleanableHistoricBatchReport(@Context UriInfo uriInfo,
+                                                 @QueryParam("firstResult") Integer firstResult,
+                                                 @QueryParam("maxResults") Integer maxResults);
+
+  @GET
+  @Path("/cleanable-batch-report/count")
+  @Produces(MediaType.APPLICATION_JSON)
+  public CountResultDto getCleanableHistoricBatchReportCount(@Context UriInfo uriInfo);
 }

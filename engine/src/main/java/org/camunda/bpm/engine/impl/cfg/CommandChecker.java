@@ -166,6 +166,11 @@ public interface CommandChecker {
   void checkActivateBatch(BatchEntity batch);
 
   /**
+   * Check if it is allowed to read historic batches
+   */
+  void checkReadHistoricBatch();
+
+  /**
    * Checks if it is allowed to create a deployment.
    */
   void checkCreateDeployment();

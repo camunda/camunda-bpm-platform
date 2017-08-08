@@ -12,14 +12,26 @@
  */
 package org.camunda.bpm.engine.test.api.authorization.batch;
 
-import java.util.Arrays;
-import java.util.List;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang.time.DateUtils;
+import org.camunda.bpm.engine.AuthorizationException;
+import org.camunda.bpm.engine.HistoryService;
+import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
+import org.camunda.bpm.engine.history.CleanableHistoricBatchReportResult;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -34,6 +46,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 /**
@@ -49,6 +62,9 @@ public class HistoricBatchQueryAuthorizationTest {
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(authRule).around(testHelper);
+
+  @Rule
+  public final ExpectedException thrown = ExpectedException.none();
 
   protected MigrationPlan migrationPlan;
   protected Batch batch1;
@@ -84,12 +100,23 @@ public class HistoricBatchQueryAuthorizationTest {
   @After
   public void tearDown() {
     authRule.deleteUsersAndGroups();
+    removeAllRunningAndHistoricBatches();
+    engineRule.getProcessEngineConfiguration().setBatchOperationHistoryTimeToLive(null);
+    engineRule.getProcessEngineConfiguration().setBatchOperationsForHistoryCleanup(null);
   }
 
-  @After
-  public void deleteBatches() {
-    engineRule.getManagementService().deleteBatch(batch1.getId(), true);
-    engineRule.getManagementService().deleteBatch(batch2.getId(), true);
+  private void removeAllRunningAndHistoricBatches() {
+    HistoryService historyService = engineRule.getHistoryService();
+    ManagementService managementService = engineRule.getManagementService();
+
+    for (Batch batch : managementService.createBatchQuery().list()) {
+      managementService.deleteBatch(batch.getId(), true);
+    }
+
+    // remove history of completed batches
+    for (HistoricBatch historicBatch : historyService.createHistoricBatchQuery().list()) {
+      historyService.deleteHistoricBatch(historicBatch.getId());
+    }
   }
 
   @Test
@@ -159,5 +186,79 @@ public class HistoricBatchQueryAuthorizationTest {
 
     // then
     Assert.assertEquals(2, batches.size());
+  }
+
+  @Test
+  public void testHistoryCleanupReportQueryWithPermissions() {
+    // given
+    authRule.createGrantAuthorization(Resources.BATCH, "*", "user", Permissions.READ_HISTORY);
+    int migrationOperationsTTL = 0;
+    prepareBatch(migrationOperationsTTL);
+
+    authRule.enableAuthorization("user");
+    CleanableHistoricBatchReportResult result = engineRule.getHistoryService().createCleanableHistoricBatchReport().singleResult();
+    authRule.disableAuthorization();
+
+    assertNotNull(result);
+    checkResultNumbers(result, 1, 1, migrationOperationsTTL);
+  }
+
+  @Test
+  public void testHistoryCleanupReportQueryWithoutPermission() {
+    // given
+    int migrationOperationsTTL = 0;
+    prepareBatch(migrationOperationsTTL);
+    // then
+    thrown.expect(AuthorizationException.class);
+
+    authRule.enableAuthorization("user");
+    try {
+      // when
+      engineRule.getHistoryService().createCleanableHistoricBatchReport().list();
+    } finally {
+      authRule.disableAuthorization();
+    }
+  }
+
+  private void prepareBatch(int migrationOperationsTTL) {
+    engineRule.getProcessEngineConfiguration().setAuthorizationEnabled(false);
+    Map<String, Integer> map = new HashMap<String, Integer>();
+    map.put("instance-migration", migrationOperationsTTL);
+    engineRule.getProcessEngineConfiguration().setBatchOperationsForHistoryCleanup(map);
+    engineRule.getProcessEngineConfiguration().initHistoryCleanup();
+
+    Date startDate = ClockUtil.getCurrentTime();
+    ClockUtil.setCurrentTime(DateUtils.addDays(startDate, -11));
+    String batchId = createBatch();
+    ClockUtil.setCurrentTime(DateUtils.addDays(startDate, -7));
+
+    engineRule.getManagementService().deleteBatch(batchId, false);
+
+    engineRule.getProcessEngineConfiguration().setAuthorizationEnabled(true);
+  }
+
+  private void checkResultNumbers(CleanableHistoricBatchReportResult result, int expectedCleanable, int expectedFinished, Integer expectedTTL) {
+    assertEquals(expectedCleanable, result.getCleanableBatchCount());
+    assertEquals(expectedFinished, result.getFinishedBatchCount());
+    assertEquals(expectedTTL, result.getHistoryTimeToLive());
+  }
+
+
+  private String createBatch() {
+    ProcessDefinition sourceDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetDefinition = testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+
+    MigrationPlan plan = engineRule.getRuntimeService().createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
+      .mapEqualActivities()
+      .build();
+
+    ProcessInstance pi = engineRule.getRuntimeService().startProcessInstanceById(sourceDefinition.getId());
+
+     Batch batch = engineRule.getRuntimeService()
+      .newMigration(plan)
+      .processInstanceIds(Arrays.asList(pi.getId()))
+      .executeAsync();
+
+     return batch.getId();
   }
 }

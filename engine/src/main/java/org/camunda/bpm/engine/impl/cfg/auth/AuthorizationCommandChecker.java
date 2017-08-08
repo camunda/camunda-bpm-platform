@@ -404,6 +404,10 @@ public class AuthorizationCommandChecker implements CommandChecker {
     getAuthorizationManager().checkAuthorization(UPDATE, BATCH, batch.getId());
   }
 
+  public void checkReadHistoricBatch() {
+    getAuthorizationManager().checkAuthorization(READ_HISTORY, BATCH);
+  }
+
   /* DEPLOYMENT */
 
   // create permission ////////////////////////////////////////////////

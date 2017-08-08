@@ -53,6 +53,13 @@
     <result property="endTime" column="END_TIME_" jdbcType="TIMESTAMP" />
   </resultMap>
 
+  <resultMap id="finishedReportResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.CleanableHistoricBatchesReportResultEntity">
+    <result property="cleanableBatchCount" column="CLEANABLE_" jdbcType="BIGINT" />
+    <result property="finishedBatchCount" column="FINISHED_" jdbcType="BIGINT" />
+    <result property="batchType" column="TYPE_" jdbcType="VARCHAR" />
+    <result property="historyTimeToLive" column="HISTORY_TTL_" jdbcType="BIGINT" />
+  </resultMap>
+
   <!-- DELETE -->
 
   <delete id="deleteHistoricBatch" parameterType="org.camunda.bpm.engine.impl.batch.history.HistoricBatchEntity">
@@ -157,5 +164,110 @@
     ${orderBy}
     ${limitAfter}
   </select>
+
+  <!-- Select History Cleanup Report Entities -->
+  <select id="selectFinishedBatchReportEntitiesCount" parameterType="org.camunda.bpm.engine.impl.CleanableHistoricBatchReportImpl" resultType="long">
+    SELECT COUNT(DISTINCT RES.TYPE_)
+    <include refid="selectFinishedBatchReportEntitiesSql" />
+  </select>
+
+  <select id="selectFinishedBatchReportEntities" parameterType="org.camunda.bpm.engine.impl.CleanableHistoricBatchReportImpl" resultMap="finishedReportResultMap">
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
+    ${limitBefore}
+    SELECT ${distinct} RES.*
+    ${limitBetween}
+    <include refid="selectFinishedBatchReportEntitiesSql"/>
+    ${orderBy}
+    ${limitAfter}
+  </select>
+
+  <sql id="selectFinishedBatchReportEntitiesSql">
+    <bind name="date" value="'RES.END_TIME_'" />
+    <bind name="days" value="'HISTORY_TTL_'"/>
+    FROM (
+      SELECT RES.TYPE_,
+             HISTORY_TTL_,
+             SUM(CASE WHEN HISTORY_TTL_ is not null and (${dayComparator}) THEN 1 ELSE 0 end) AS CLEANABLE_,
+             F.FINISHED_
+      FROM (
+        SELECT DISTINCT RES.*
+          <!-- add the dummy historyTTL column here because when historyTTL is null the left join will be not working  -->
+          <if test="parameter.isEmpty()">
+          ,null as HISTORY_TTL_
+          </if>
+        FROM ${prefix}ACT_HI_BATCH RES
+      ) RES
+      <if test="!parameter.isEmpty()">
+        LEFT JOIN (
+          <foreach index="key" item="value" collection="parameter" separator="UNION">
+            select '${key}' as TYPE_, ${value} as HISTORY_TTL_
+            ${dbSpecificDummyTable}
+          </foreach>
+        ) C ON C.TYPE_ = RES.TYPE_
+      </if>
+      LEFT JOIN (
+        SELECT COUNT(TYPE_) AS FINISHED_,
+        TYPE_
+        FROM ${prefix}ACT_HI_BATCH RES
+        WHERE END_TIME_ is not null
+        GROUP BY TYPE_
+      ) F ON F.TYPE_ = RES.TYPE_
+      GROUP BY RES.TYPE_,
+      HISTORY_TTL_,
+      F.FINISHED_
+    ) RES
+  </sql>
+
+  <select id="selectFinishedBatchReportEntitiesCount_postgres_or_db2" parameterType="org.camunda.bpm.engine.impl.CleanableHistoricBatchReportImpl" resultType="long">
+    SELECT COUNT(DISTINCT RES.TYPE_)
+    <include refid="selectFinishedBatchReportEntitiesSql_postgres_or_db2" />
+  </select>
+
+  <select id="selectFinishedBatchReportEntities_postgres_or_db2" parameterType="org.camunda.bpm.engine.impl.CleanableHistoricBatchReportImpl" resultMap="finishedReportResultMap">
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
+    ${limitBefore}
+    SELECT ${distinct} RES.*
+    ${limitBetween}
+    <include refid="selectFinishedBatchReportEntitiesSql_postgres_or_db2"/>
+    ${orderBy}
+    ${limitAfter}
+  </select>
+
+  <sql id="selectFinishedBatchReportEntitiesSql_postgres_or_db2">
+    <bind name="date" value="'RES.END_TIME_'" />
+    <bind name="days" value="'HISTORY_TTL_'"/>
+    FROM (
+      SELECT RES.TYPE_,
+             HISTORY_TTL_,
+             SUM(CASE WHEN HISTORY_TTL_ is not null and ${dayComparator} THEN 1 ELSE 0 END) AS CLEANABLE_,
+             F.FINISHED_
+      FROM (
+        SELECT DISTINCT RES.*
+          <!-- add the dummy historyTTL column here because when historyTTL is null the left join will be not working  -->
+          <if test="parameter.isEmpty()">
+          ,cast(null as integer) as HISTORY_TTL_
+          </if>
+        FROM ${prefix}ACT_HI_BATCH RES
+      ) RES
+      <if test="!parameter.isEmpty()">
+        LEFT JOIN (
+          <foreach index="key" item="value" collection="parameter" separator="UNION">
+            select cast('${key}' as varchar(64)) as TYPE_, ${value} as HISTORY_TTL_
+            ${dbSpecificDummyTable}
+          </foreach>
+        ) C ON C.TYPE_ = RES.TYPE_
+      </if>
+      LEFT JOIN (
+        SELECT COUNT(TYPE_) AS FINISHED_,
+        TYPE_
+        FROM ${prefix}ACT_HI_BATCH RES
+        WHERE END_TIME_ is not null
+        GROUP BY TYPE_
+      ) F ON F.TYPE_ = RES.TYPE_
+      GROUP BY RES.TYPE_,
+      HISTORY_TTL_,
+      F.FINISHED_
+    ) RES
+  </sql>
 
 </mapper>

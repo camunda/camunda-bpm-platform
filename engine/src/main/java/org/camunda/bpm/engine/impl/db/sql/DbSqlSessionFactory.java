@@ -213,6 +213,8 @@ public class DbSqlSessionFactory implements SessionFactory {
     addDatabaseSpecificStatement(POSTGRES, "selectEventsByTaskId", "selectEventsByTaskId_postgres");
     addDatabaseSpecificStatement(POSTGRES, "selectFilterByQueryCriteria", "selectFilterByQueryCriteria_postgres");
     addDatabaseSpecificStatement(POSTGRES, "selectFilter", "selectFilter_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "selectFinishedBatchReportEntitiesCount", "selectFinishedBatchReportEntitiesCount_postgres_or_db2");
+    addDatabaseSpecificStatement(POSTGRES, "selectFinishedBatchReportEntities", "selectFinishedBatchReportEntities_postgres_or_db2");
 
     constants = new HashMap<String, String>();
     constants.put("constant.event", "'event'");
@@ -296,6 +298,8 @@ public class DbSqlSessionFactory implements SessionFactory {
     addDatabaseSpecificStatement(DB2, "selectUserByNativeQuery", "selectUserByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement(DB2, "selectHistoricDecisionInstancesByNativeQuery", "selectHistoricDecisionInstancesByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement(DB2, "selectFilterByQueryCriteria", "selectFilterByQueryCriteria_oracleDb2");
+    addDatabaseSpecificStatement(DB2, "selectFinishedBatchReportEntitiesCount", "selectFinishedBatchReportEntitiesCount_postgres_or_db2");
+    addDatabaseSpecificStatement(DB2, "selectFinishedBatchReportEntities", "selectFinishedBatchReportEntities_postgres_or_db2");
 
     constants = new HashMap<String, String>();
     constants.put("constant.event", "'event'");

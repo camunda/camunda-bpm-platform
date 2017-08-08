@@ -37,7 +37,7 @@ public class CleanableHistoricProcessInstanceReportImpl extends AbstractQuery<Cl
     super(commandExecutor);
   }
 
-  public CleanableHistoricProcessInstanceReport processDefinitionIdIn(final String... processDefinitionIds) {
+  public CleanableHistoricProcessInstanceReport processDefinitionIdIn(String... processDefinitionIds) {
     ensureNotNull(NotValidException.class, "", "processDefinitionIdIn", (Object[]) processDefinitionIds);
     this.processDefinitionIdIn = processDefinitionIds;
     return this;
