@@ -53,7 +53,7 @@ module.exports = ['ViewsProvider', function(ViewsProvider) {
 
             return 'Could not fetch the resource for \'' + resourceName + '\'';
 
-          }
+          };
 
           var resourceCallback = function(err, res) {
             if (err) {
