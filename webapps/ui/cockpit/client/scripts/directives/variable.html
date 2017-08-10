@@ -50,7 +50,7 @@
          autofocus="autofocus"
          required />
 
-  <textarea ng-if="isString(variable)"
+  <textarea ng-if="isString(variable) || isJSON(variable) || isXML(variable)"
             rows="5"
             ng-model="variable.value"
             class="form-control variable-type-string"
