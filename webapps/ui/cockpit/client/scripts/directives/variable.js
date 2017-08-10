@@ -69,6 +69,14 @@ var Directive = function() {
         return inPlaceEdit;
       };
 
+      scope.isJSON = function(variable) {
+        return variable.type.toLowerCase() === 'json';
+      };
+
+      scope.isXML = function(variable) {
+        return variable.type.toLowerCase() === 'xml';
+      };
+
       scope.$watch('variable.type', function(newValue, oldValue) {
         if (oldValue === newValue) {
           return;
