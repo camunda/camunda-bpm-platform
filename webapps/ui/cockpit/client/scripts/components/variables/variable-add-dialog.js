@@ -14,7 +14,6 @@ var Controller = [
   'instance',
   'isProcessInstance',
   'fixDate',
-  'typeUtils',
   function(
     $http,
     $modalInstance,
@@ -23,8 +22,7 @@ var Controller = [
     Uri,
     instance,
     isProcessInstance,
-    fixDate,
-    typeUtils
+    fixDate
   ) {
 
     $scope.isProcessInstance = isProcessInstance;
@@ -61,35 +59,17 @@ var Controller = [
       $modalInstance.close($scope.status);
     };
 
-    $scope.getFormScope = function() {
-      return angular.element('[name="addVariableForm"]').scope();
-    };
 
-    $scope.customValidator = function(type, value) {
-      if(['Json', 'Xml'].indexOf(type) > -1) {
-        var valid = typeUtils.isType(value, type);
-        $scope.getFormScope().addVariableForm.$setValidity('customValidation', valid);
-      }
-    };
 
     var isValid = $scope.isValid = function() {
       // that's a pity... I do not get why,
       // but getting the form scope is.. kind of random
       // m2c: it has to do with the `click event`
       // Hate the game, not the player
-      var formScope = $scope.getFormScope();
+      var formScope = angular.element('[name="addVariableForm"]').scope();
       return (formScope && formScope.addVariableForm) ? formScope.addVariableForm.$valid : false;
     };
 
-    $scope.$watch('newVariable.value', function(newValue) {
-      var type = $scope.newVariable.type;
-      return $scope.customValidator(type, newValue);
-    });
-
-    $scope.$watch('newVariable.type', function(newType) {
-      var value = $scope.newVariable.value;
-      return $scope.customValidator(newType, value);
-    });
 
     $scope.save = function() {
       if (!isValid()) {
