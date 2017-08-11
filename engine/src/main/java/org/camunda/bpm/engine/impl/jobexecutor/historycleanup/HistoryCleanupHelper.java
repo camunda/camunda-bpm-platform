@@ -4,12 +4,14 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.util.ParseUtil;
 
 /**
  * @author Svetlana Dorokhova.
@@ -101,8 +103,14 @@ public abstract class HistoryCleanupHelper {
     return commandContext.getProcessEngineConfiguration().getHistoryCleanupBatchSize();
   }
 
-  private static Map<String, Integer> getBatchOperationsForHistoryCleanup(CommandContext commandContext) {
-    return commandContext.getProcessEngineConfiguration().getBatchOperationsForHistoryCleanup();
+  public static Map<String, Integer> getBatchOperationsForHistoryCleanup(CommandContext commandContext) {
+    Map<String, String> batchOperationsForHistoryCleanup = commandContext.getProcessEngineConfiguration().getBatchOperationsForHistoryCleanup();
+    Map<String, Integer> result = new HashMap<String, Integer>();
+    for (String operation : batchOperationsForHistoryCleanup.keySet()) {
+      Integer historyTimeToLive = ParseUtil.parseHistoryTimeToLive(batchOperationsForHistoryCleanup.get(operation));
+      result.put(operation, historyTimeToLive);
+    }
+    return result;
   }
 
   /**

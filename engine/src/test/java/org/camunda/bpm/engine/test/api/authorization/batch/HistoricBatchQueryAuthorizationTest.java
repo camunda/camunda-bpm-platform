@@ -192,7 +192,7 @@ public class HistoricBatchQueryAuthorizationTest {
   public void testHistoryCleanupReportQueryWithPermissions() {
     // given
     authRule.createGrantAuthorization(Resources.BATCH, "*", "user", Permissions.READ_HISTORY);
-    int migrationOperationsTTL = 0;
+    String migrationOperationsTTL = "P0D";
     prepareBatch(migrationOperationsTTL);
 
     authRule.enableAuthorization("user");
@@ -200,13 +200,13 @@ public class HistoricBatchQueryAuthorizationTest {
     authRule.disableAuthorization();
 
     assertNotNull(result);
-    checkResultNumbers(result, 1, 1, migrationOperationsTTL);
+    checkResultNumbers(result, 1, 1, 0);
   }
 
   @Test
   public void testHistoryCleanupReportQueryWithoutPermission() {
     // given
-    int migrationOperationsTTL = 0;
+    String migrationOperationsTTL = "P0D";
     prepareBatch(migrationOperationsTTL);
     // then
     thrown.expect(AuthorizationException.class);
@@ -220,9 +220,9 @@ public class HistoricBatchQueryAuthorizationTest {
     }
   }
 
-  private void prepareBatch(int migrationOperationsTTL) {
+  private void prepareBatch(String migrationOperationsTTL) {
     engineRule.getProcessEngineConfiguration().setAuthorizationEnabled(false);
-    Map<String, Integer> map = new HashMap<String, Integer>();
+    Map<String, String> map = new HashMap<String, String>();
     map.put("instance-migration", migrationOperationsTTL);
     engineRule.getProcessEngineConfiguration().setBatchOperationsForHistoryCleanup(map);
     engineRule.getProcessEngineConfiguration().initHistoryCleanup();

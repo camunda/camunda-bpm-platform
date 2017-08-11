@@ -87,11 +87,11 @@ public class CleanableHistoricBatchReportTest {
 
   @Test
   public void testMixedConfiguration() {
-    Map<String, Integer> map = new HashMap<String, Integer>();
+    Map<String, String> map = new HashMap<String, String>();
     int modOperationsTTL = 20;
-    map.put("instance-modification", modOperationsTTL);
+    map.put("instance-modification", "P20D");
     int defaultTTL = 5;
-    processEngineConfiguration.setBatchOperationHistoryTimeToLive(defaultTTL);
+    processEngineConfiguration.setBatchOperationHistoryTimeToLive("P5D");
     processEngineConfiguration.setBatchOperationsForHistoryCleanup(map);
     processEngineConfiguration.initHistoryCleanup();
 
@@ -107,7 +107,7 @@ public class CleanableHistoricBatchReportTest {
     List<String> batchIds1 = new ArrayList<String>();
     batchIds1.addAll(createMigrationBatchList(migrationCountBatch));
 
-    int cancelationCountBatch = modOperationsTTL;
+    int cancelationCountBatch = 20;
     List<String> batchIds2 = new ArrayList<String>();
     batchIds2.addAll(createCancelationBatchList(cancelationCountBatch));
 
@@ -162,11 +162,11 @@ public class CleanableHistoricBatchReportTest {
 
   @Test
   public void testNoDefaultConfiguration() {
-    Map<String, Integer> map = new HashMap<String, Integer>();
+    Map<String, String> map = new HashMap<String, String>();
     int modOperationsTTL = 5;
-    map.put("instance-modification", modOperationsTTL);
+    map.put("instance-modification", "P5D");
     int delOperationsTTL = 7;
-    map.put("instance-deletion", delOperationsTTL);
+    map.put("instance-deletion", "P7D");
     processEngineConfiguration.setBatchOperationsForHistoryCleanup(map);
     processEngineConfiguration.initHistoryCleanup();
     assertNull(processEngineConfiguration.getBatchOperationHistoryTimeToLive());
@@ -277,9 +277,9 @@ public class CleanableHistoricBatchReportTest {
 
   @Test
   public void testZeroTTL() {
-    Map<String, Integer> map = new HashMap<String, Integer>();
+    Map<String, String> map = new HashMap<String, String>();
     int modOperationsTTL = 0;
-    map.put("instance-modification", modOperationsTTL);
+    map.put("instance-modification", "P0D");
     processEngineConfiguration.setBatchOperationsForHistoryCleanup(map);
     processEngineConfiguration.initHistoryCleanup();
 

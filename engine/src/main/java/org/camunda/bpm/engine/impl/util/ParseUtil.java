@@ -13,7 +13,6 @@ public class ParseUtil {
   /**
    * Parse History Time To Live in ISO-8601 format to integer and set into the given entity
    * @param historyTimeToLive
-   * @param entity
    */
   public static Integer parseHistoryTimeToLive(String historyTimeToLive) {
     Integer timeToLive = null;

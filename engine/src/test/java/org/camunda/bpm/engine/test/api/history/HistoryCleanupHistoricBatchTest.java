@@ -27,6 +27,7 @@ import org.apache.commons.lang.time.DateUtils;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
@@ -68,6 +69,8 @@ public class HistoryCleanupHistoricBatchTest {
   protected MigrationTestRule migrationRule = new MigrationTestRule(engineRule);
   protected BatchMigrationHelper migrationHelper = new BatchMigrationHelper(engineRule, migrationRule);
   protected BatchModificationHelper modificationHelper = new BatchModificationHelper(engineRule);
+
+  private static final String DEFAULT_TTL_DAYS = "P5D";
 
   @Rule
   public ExpectedException thrown = ExpectedException.none();
@@ -115,9 +118,15 @@ public class HistoryCleanupHistoricBatchTest {
     });
   }
 
+  @After
+  public void resetConfiguration() {
+    processEngineConfiguration.setBatchOperationHistoryTimeToLive(null);
+    processEngineConfiguration.setBatchOperationsForHistoryCleanup(null);
+  }
+
   @Test
   public void testCleanupHistoricBatch() {
-    initBatchOperationHistoryTimeToLive(5);
+    initBatchOperationHistoryTimeToLive(DEFAULT_TTL_DAYS);
     int daysInThePast = -11;
 
     // given
@@ -136,7 +145,7 @@ public class HistoryCleanupHistoricBatchTest {
 
   @Test
   public void testCleanupHistoricJobLog() {
-    initBatchOperationHistoryTimeToLive(5);
+    initBatchOperationHistoryTimeToLive(DEFAULT_TTL_DAYS);
     int daysInThePast = -11;
 
     // given
@@ -156,7 +165,7 @@ public class HistoryCleanupHistoricBatchTest {
 
   @Test
   public void testCleanupHistoricIncident() {
-    initBatchOperationHistoryTimeToLive(5);
+    initBatchOperationHistoryTimeToLive(DEFAULT_TTL_DAYS);
     ClockUtil.setCurrentTime(DateUtils.addDays(new Date(), -11));
 
     BatchEntity batch = (BatchEntity) createFailingMigrationBatch();
@@ -194,7 +203,7 @@ public class HistoryCleanupHistoricBatchTest {
 
   @Test
   public void testHistoryCleanupBatchMetrics() {
-    initBatchOperationHistoryTimeToLive(5);
+    initBatchOperationHistoryTimeToLive(DEFAULT_TTL_DAYS);
     // given
     int daysInThePast = -11;
     int batchesCount = 5;
@@ -213,9 +222,9 @@ public class HistoryCleanupHistoricBatchTest {
 
   @Test
   public void testBatchOperationTypeConfigurationOnly() {
-    Map<String, Integer> map = new HashMap<String, Integer>();
-    map.put("instance-migration", 2);
-    map.put("instance-deletion", 5);
+    Map<String, String> map = new HashMap<String, String>();
+    map.put("instance-migration", "P2D");
+    map.put("instance-deletion", DEFAULT_TTL_DAYS);
     processEngineConfiguration.setBatchOperationHistoryTimeToLive(null);
     processEngineConfiguration.setBatchOperationsForHistoryCleanup(map);
     processEngineConfiguration.initHistoryCleanup();
@@ -262,9 +271,9 @@ public class HistoryCleanupHistoricBatchTest {
 
   @Test
   public void testMixedConfiguration() {
-    Map<String, Integer> map = new HashMap<String, Integer>();
-    map.put("instance-modification", 20);
-    processEngineConfiguration.setBatchOperationHistoryTimeToLive(5);
+    Map<String, String> map = new HashMap<String, String>();
+    map.put("instance-modification", "P20D");
+    processEngineConfiguration.setBatchOperationHistoryTimeToLive(DEFAULT_TTL_DAYS);
     processEngineConfiguration.setBatchOperationsForHistoryCleanup(map);
     processEngineConfiguration.initHistoryCleanup();
 
@@ -311,7 +320,45 @@ public class HistoryCleanupHistoricBatchTest {
     }
   }
 
-  private void initBatchOperationHistoryTimeToLive(Integer days) {
+  @Test
+  public void testWrongGlobalConfiguration() {
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("Invalid value");
+    processEngineConfiguration.setBatchOperationHistoryTimeToLive("PD");
+    processEngineConfiguration.initHistoryCleanup();
+  }
+
+  @Test
+  public void testWrongSpecificConfiguration() {
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("Invalid value");
+    Map<String, String> map = new HashMap<String, String>();
+    map.put("instance-modification", "PD");
+    processEngineConfiguration.setBatchOperationHistoryTimeToLive("P5D");
+    processEngineConfiguration.setBatchOperationsForHistoryCleanup(map);
+    processEngineConfiguration.initHistoryCleanup();
+  }
+
+  @Test
+  public void testWrongGlobalConfigurationNegativeTTL() {
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("Invalid value");
+    processEngineConfiguration.setBatchOperationHistoryTimeToLive("P-1D");
+    processEngineConfiguration.initHistoryCleanup();
+  }
+
+  @Test
+  public void testWrongSpecificConfigurationNegativeTTL() {
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("Invalid value");
+    Map<String, String> map = new HashMap<String, String>();
+    map.put("instance-modification", "P-5D");
+    processEngineConfiguration.setBatchOperationHistoryTimeToLive("P5D");
+    processEngineConfiguration.setBatchOperationsForHistoryCleanup(map);
+    processEngineConfiguration.initHistoryCleanup();
+  }
+
+  private void initBatchOperationHistoryTimeToLive(String days) {
     processEngineConfiguration.setBatchOperationHistoryTimeToLive(days);
     processEngineConfiguration.initHistoryCleanup();
   }

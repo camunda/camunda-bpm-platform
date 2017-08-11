@@ -15,13 +15,13 @@ package org.camunda.bpm.engine.impl;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import org.camunda.bpm.engine.history.CleanableHistoricBatchReport;
 import org.camunda.bpm.engine.history.CleanableHistoricBatchReportResult;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupHelper;
 
 public class CleanableHistoricBatchReportImpl extends AbstractQuery<CleanableHistoricBatchReport, CleanableHistoricBatchReportResult> implements CleanableHistoricBatchReport {
 
@@ -36,19 +36,17 @@ public class CleanableHistoricBatchReportImpl extends AbstractQuery<CleanableHis
   @Override
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
-    Map<String, Integer> batchOperationsForHistoryCleanup = commandContext.getProcessEngineConfiguration().getBatchOperationsForHistoryCleanup();
     checkPermissions(commandContext);
 
-    return commandContext.getHistoricBatchManager().findCleanableHistoricBatchReportCountByCriteria(this, batchOperationsForHistoryCleanup);
+    return commandContext.getHistoricBatchManager().findCleanableHistoricBatchReportCountByCriteria(this, HistoryCleanupHelper.getBatchOperationsForHistoryCleanup(commandContext));
   }
 
   @Override
   public List<CleanableHistoricBatchReportResult> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
-    Map<String, Integer> batchOperationsForHistoryCleanup = commandContext.getProcessEngineConfiguration().getBatchOperationsForHistoryCleanup();
     checkPermissions(commandContext);
 
-    return commandContext.getHistoricBatchManager().findCleanableHistoricBatchReportByCriteria(this, page, batchOperationsForHistoryCleanup);
+    return commandContext.getHistoricBatchManager().findCleanableHistoricBatchReportByCriteria(this, page, HistoryCleanupHelper.getBatchOperationsForHistoryCleanup(commandContext));
   }
 
   public Date getCurrentTimestamp() {

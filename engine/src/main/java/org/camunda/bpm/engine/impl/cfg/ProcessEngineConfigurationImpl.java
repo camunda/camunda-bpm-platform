@@ -69,7 +69,6 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
-import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.impl.AuthorizationServiceImpl;
 import org.camunda.bpm.engine.impl.DecisionServiceImpl;
 import org.camunda.bpm.engine.impl.DefaultArtifactFactory;
@@ -302,6 +301,7 @@ import org.camunda.bpm.engine.impl.scripting.engine.VariableScopeResolverFactory
 import org.camunda.bpm.engine.impl.scripting.env.ScriptEnvResolver;
 import org.camunda.bpm.engine.impl.scripting.env.ScriptingEnvironment;
 import org.camunda.bpm.engine.impl.util.IoUtil;
+import org.camunda.bpm.engine.impl.util.ParseUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.camunda.bpm.engine.impl.variable.ValueTypeResolverImpl;
 import org.camunda.bpm.engine.impl.variable.serializer.BooleanValueSerializer;
@@ -693,8 +693,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   private Date historyCleanupBatchWindowStartTimeAsDate;
   private Date historyCleanupBatchWindowEndTimeAsDate;
 
-  private Integer batchOperationHistoryTimeToLive;
-  private Map<String, Integer> batchOperationsForHistoryCleanup;
+  private String batchOperationHistoryTimeToLive;
+  private Map<String, String> batchOperationsForHistoryCleanup;
 
   /**
    * Size of batch in which history cleanup data will be deleted. {@link HistoryCleanupBatch#MAX_BATCH_SIZE} must be respected.
@@ -796,13 +796,26 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   }
 
   private void initBatchOperationsHistoryTimeToLive() {
+    try {
+      ParseUtil.parseHistoryTimeToLive(batchOperationHistoryTimeToLive);
+    } catch (Exception e) {
+      throw LOG.invalidPropertyValue("batchOperationHistoryTimeToLive", batchOperationHistoryTimeToLive, e);
+    }
+
     if (batchOperationsForHistoryCleanup == null) {
-      batchOperationsForHistoryCleanup = new HashMap<String, Integer>();
+      batchOperationsForHistoryCleanup = new HashMap<String, String>();
     } else {
       for (String operation : batchOperationsForHistoryCleanup.keySet()) {
+        String propertyValue = batchOperationsForHistoryCleanup.get(operation);
         if (!batchHandlers.keySet().contains(operation)) {
-          LOG.invalidBatchOperation(operation, batchOperationsForHistoryCleanup.get(operation));
+          LOG.invalidBatchOperation(operation, propertyValue);
           batchOperationsForHistoryCleanup.remove(operation);
+        }
+
+        try {
+          ParseUtil.parseHistoryTimeToLive(propertyValue);
+        } catch (Exception e) {
+          throw LOG.invalidPropertyValue("history time to live for " + operation + " batch operations", propertyValue, e);
         }
       }
     }
@@ -3761,19 +3774,19 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     this.historyCleanupMetricsEnabled = historyCleanupMetricsEnabled;
   }
 
-  public Integer getBatchOperationHistoryTimeToLive() {
+  public String getBatchOperationHistoryTimeToLive() {
     return batchOperationHistoryTimeToLive;
   }
 
-  public void setBatchOperationHistoryTimeToLive(Integer batchOperationHistoryTimeToLive) {
+  public void setBatchOperationHistoryTimeToLive(String batchOperationHistoryTimeToLive) {
     this.batchOperationHistoryTimeToLive = batchOperationHistoryTimeToLive;
   }
 
-  public Map<String, Integer> getBatchOperationsForHistoryCleanup() {
+  public Map<String, String> getBatchOperationsForHistoryCleanup() {
     return batchOperationsForHistoryCleanup;
   }
 
-  public void setBatchOperationsForHistoryCleanup(Map<String, Integer> batchOperationsForHistoryCleanup) {
+  public void setBatchOperationsForHistoryCleanup(Map<String, String> batchOperationsForHistoryCleanup) {
     this.batchOperationsForHistoryCleanup = batchOperationsForHistoryCleanup;
   }
 
