@@ -58,16 +58,11 @@ public class CdiResolver extends ELResolver {
 
   @Override
   public Object getValue(ELContext context, Object base, Object property) {
-    try {
-      return getWrappedResolver().getValue(wrapContext(context), base, property);
-    } catch (IllegalStateException e) {
-      // dependent scoped / EJBs
-      Object result = ProgrammaticBeanLookup.lookup(property.toString(), getBeanManager());
-      if(result != null) {
-        context.setPropertyResolved(true);
-      }
-      return result;
+    Object result = ProgrammaticBeanLookup.lookup(property.toString(), getBeanManager());
+    if(result != null) {
+      context.setPropertyResolved(true);
     }
+    return result;
   }
 
   @Override
