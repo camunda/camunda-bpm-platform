@@ -5,11 +5,12 @@
 
 'use strict';
 
+var angular = require('angular');
 var fs = require('fs');
 
 var template = fs.readFileSync(__dirname + '/variable.html', 'utf8');
 
-var Directive = function() {
+module.exports = ['typeUtils', function(typeUtils) {
   return {
     restrict: 'EAC',
     scope: {
@@ -22,6 +23,25 @@ var Directive = function() {
       var inPlaceEdit = (element.attr('inline-edit') !== undefined),
           oldVariableValue,
           oldVariableValueBoolean = true;
+
+
+      var getFormScope = function() {
+        return angular.element('[name="addVariableForm"]').scope();
+      };
+
+      var customJsonXmlValidator = function(type, value) {
+        var valid = typeUtils.isType(value, type);
+        getFormScope().addVariableForm.$setValidity('customValidation', valid);
+      };
+
+      scope.changeVariableValue = function() {
+        var type = scope.variable.type;
+        var newValue = scope.variable.value;
+        if(['Json', 'Xml'].indexOf(type) > -1) {
+          return customJsonXmlValidator(type, newValue);
+        }
+      };
+
 
       scope.autofocus = !!(element.attr('autofocus') !== undefined);
 
@@ -82,6 +102,10 @@ var Directive = function() {
           return;
         }
 
+        if(['Json', 'Xml'].indexOf(newValue) > -1) {
+          return customJsonXmlValidator(newValue, scope.variable.value);
+        }
+
         if (newValue.toLowerCase() === 'boolean') {
           oldVariableValue = scope.variable.value;
 
@@ -107,6 +131,4 @@ var Directive = function() {
 
     }
   };
-};
-
-module.exports = Directive;
+}];

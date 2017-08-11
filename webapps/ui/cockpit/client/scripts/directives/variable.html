@@ -53,6 +53,7 @@
   <textarea ng-if="isString(variable) || isJSON(variable) || isXML(variable)"
             rows="5"
             ng-model="variable.value"
+            ng-change="changeVariableValue()"
             class="form-control variable-type-string"
             ng-class="{'in-place-edit': isInPlaceEdit() }"
             autofocus="autofocus"
