@@ -9,60 +9,22 @@
     <relativePath />
   </parent>
 
-  <groupId>org.camunda.bpm.extension.springboot.project</groupId>
+  <groupId>org.camunda.bpm.springboot.project</groupId>
   <artifactId>camunda-bpm-spring-boot-starter-root</artifactId>
   <version>2.3.0-SNAPSHOT</version>
 
   <packaging>pom</packaging>
 
   <modules>
-    <module>bom</module>
-    <module>extension</module>
-    <module>docs</module>
+    <module>starter</module>
+    <module>starter-rest</module>
+    <module>starter-webapp-core</module>
+    <module>starter-test</module>
   </modules>
-
-  <profiles>
-    <profile>
-      <id>gradle</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <modules>
-        <module>gradle</module>
-      </modules>
-    </profile>
-    <profile>
-      <id>maven</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <modules>
-        <module>maven</module>
-      </modules>
-    </profile>
-    <profile>
-      <id>examples</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <modules>
-        <module>examples</module>
-      </modules>
-    </profile>
-    <profile>
-      <id>docs</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <modules>
-        <module>docs</module>
-      </modules>
-    </profile>
-  </profiles>
 
   <properties>
     <spring-boot.version>1.5.6.RELEASE</spring-boot.version>
-    <camunda.version>7.7.0</camunda.version>
+    <camunda.version>7.8.0-SNAPSHOT</camunda.version>
 
     <version.java>1.8</version.java>
     <java.version>${version.java}</java.version>
@@ -70,6 +32,29 @@
     <!-- disable javadoc linter for JDK8 to not fail on incomplete javadoc -->
     <additionalparam>-Xdoclint:none</additionalparam>
   </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <!-- Import dependency management from camunda -->
+        <groupId>org.camunda.bpm</groupId>
+        <artifactId>camunda-bom</artifactId>
+        <version>${camunda.version}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+
+      <dependency>
+        <!-- Import dependency management from Spring Boot -->
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-dependencies</artifactId>
+        <version>${spring-boot.version}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+
+    </dependencies>
+  </dependencyManagement>
 
   <build>
     <pluginManagement>
