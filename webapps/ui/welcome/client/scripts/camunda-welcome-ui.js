@@ -52,7 +52,7 @@ module.exports = function(pluginDependencies) {
       UriProvider.replace('app://', getUri('href'));
       UriProvider.replace('adminbase://', getUri('app-root') + '/app/admin/');
       UriProvider.replace('welcome://', getUri('welcome-api'));
-      UriProvider.replace('admin://', getUri('welcome-api') + '../admin/');
+      UriProvider.replace('admin://', getUri('admin-api') + '../admin/');
       UriProvider.replace('plugin://', getUri('welcome-api') + 'plugin/');
       UriProvider.replace('engine://', getUri('engine-api'));
 
