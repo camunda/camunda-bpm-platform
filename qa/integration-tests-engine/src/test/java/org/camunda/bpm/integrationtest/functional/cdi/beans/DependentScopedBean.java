@@ -15,8 +15,11 @@
  */
 package org.camunda.bpm.integrationtest.functional.cdi.beans;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.enterprise.context.Dependent;
 import javax.inject.Named;
+import java.util.ArrayList;
 
 /**
  * @author Tassilo Weidner
@@ -25,18 +28,24 @@ import javax.inject.Named;
 @Dependent
 public class DependentScopedBean {
 
-  protected boolean invoked;
+  public static ArrayList<String> lifecycle = new ArrayList<String>();
 
   public void invoke() {
-    this.invoked = true;
+    lifecycle.add("bean-invoked");
   }
 
-  public boolean isInvoked() {
-    return invoked;
+  public static void reset() {
+    lifecycle.clear();
   }
 
-  public void setInvoked(boolean invoked) {
-    this.invoked = invoked;
+  @PreDestroy
+  public void preDestroy() {
+    lifecycle.add("pre-destroy-invoked");
+  }
+
+  @PostConstruct
+  public void postContruct() {
+    lifecycle.add("post-construct-invoked");
   }
 
 }

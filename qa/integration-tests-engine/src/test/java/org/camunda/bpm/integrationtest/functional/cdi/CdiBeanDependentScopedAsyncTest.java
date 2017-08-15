@@ -1,8 +1,11 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
+/**
+ * Copyright (C) 2017 camunda services GmbH
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *    http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,7 +15,6 @@
  */
 package org.camunda.bpm.integrationtest.functional.cdi;
 
-import org.camunda.bpm.engine.cdi.impl.util.ProgrammaticBeanLookup;
 import org.camunda.bpm.integrationtest.functional.cdi.beans.DependentScopedBean;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.camunda.bpm.integrationtest.util.DeploymentHelper;
@@ -24,20 +26,22 @@ import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import java.util.Arrays;
 
 /**
  * @author Tassilo Weidner
  */
 @RunWith(Arquillian.class)
-public class CdiBeanDependentScopedTest extends AbstractFoxPlatformIntegrationTest {
+public class CdiBeanDependentScopedAsyncTest extends AbstractFoxPlatformIntegrationTest {
 
   @Deployment
   public static WebArchive processArchive() {
     return initWebArchiveDeployment()
       .addClass(DependentScopedBean.class)
-      .addAsResource("org/camunda/bpm/integrationtest/functional/cdi/CdiBeanDependentScoped.testResolveBean.bpmn20.xml")
       .addAsResource("org/camunda/bpm/integrationtest/functional/cdi/CdiBeanDependentScoped.testResolveBeanFromJobExecutor.bpmn20.xml");
   }
 
@@ -46,6 +50,7 @@ public class CdiBeanDependentScopedTest extends AbstractFoxPlatformIntegrationTe
     WebArchive deployment = ShrinkWrap.create(WebArchive.class, "client.war")
             .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
             .addClass(AbstractFoxPlatformIntegrationTest.class)
+            .addClass(DependentScopedBean.class)
             .addAsLibraries(DeploymentHelper.getEngineCdi());
 
     TestContainer.addContainerSpecificResourcesForNonPa(deployment);
@@ -53,21 +58,11 @@ public class CdiBeanDependentScopedTest extends AbstractFoxPlatformIntegrationTe
     return deployment;
   }
 
-  @Test
+  @Before
   @OperateOnDeployment("clientDeployment")
-  public void testResolveBean() {
-    Assert.assertNull(ProgrammaticBeanLookup.lookup("dependentScopedBean"));
+  public void setup() {
+    DependentScopedBean.reset();
 
-    Assert.assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey("testProcess").count());
-
-    runtimeService.startProcessInstanceByKey("testProcess");
-
-    Assert.assertEquals(0,runtimeService.createProcessInstanceQuery().processDefinitionKey("testProcess").count());
-  }
-
-  @Test
-  @OperateOnDeployment("clientDeployment")
-  public void testResolveBeanFromJobExecutor() {
     Assert.assertEquals(0,runtimeService.createProcessInstanceQuery().processDefinitionKey("testResolveBeanFromJobExecutor").count());
 
     runtimeService.startProcessInstanceByKey("testResolveBeanFromJobExecutor");
@@ -77,7 +72,11 @@ public class CdiBeanDependentScopedTest extends AbstractFoxPlatformIntegrationTe
     waitForJobExecutorToProcessAllJobs();
 
     Assert.assertEquals(0,runtimeService.createProcessInstanceQuery().processDefinitionKey("testResolveBeanFromJobExecutor").count());
+  }
 
+  @Test
+  public void testResolveBeanFromJobExecutor() {
+    Assert.assertEquals(Arrays.asList("post-construct-invoked", "bean-invoked", "pre-destroy-invoked"), DependentScopedBean.lifecycle);
   }
 
 }
