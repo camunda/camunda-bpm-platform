@@ -122,6 +122,16 @@ public class HistoricVariableInstanceManager extends AbstractHistoricManager {
     }
   }
 
+  @SuppressWarnings("unchecked")
+  public List<HistoricVariableInstance> findHistoricVariableInstancesByNativeQuery(Map<String, Object> parameterMap, int firstResult, int
+          maxResults) {
+    return getDbEntityManager().selectListWithRawParameter("selectHistoricVariableInstanceByNativeQuery", parameterMap, firstResult, maxResults);
+  }
+
+  public long findHistoricVariableInstanceCountByNativeQuery(Map<String, Object> parameterMap) {
+    return (Long) getDbEntityManager().selectOne("selectHistoricVariableInstanceCountByNativeQuery", parameterMap);
+  }
+
   protected void configureQuery(HistoricVariableInstanceQueryImpl query) {
     getAuthorizationManager().configureHistoricVariableInstanceQuery(query);
     getTenantManager().configureQuery(query);

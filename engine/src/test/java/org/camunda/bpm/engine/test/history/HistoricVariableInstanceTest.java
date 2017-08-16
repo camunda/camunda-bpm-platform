@@ -721,6 +721,44 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
 
   }
 
+  public void testDisableCustomObjectDeserializationNativeQuery() {
+    // given
+    Task newTask = taskService.newTask();
+    taskService.saveTask(newTask);
+
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("customSerializable", new CustomSerializable());
+    variables.put("failingSerializable", new FailingSerializable());
+    taskService.setVariables(newTask.getId(), variables);
+
+    // when
+    List<HistoricVariableInstance> variableInstances = historyService.createNativeHistoricVariableInstanceQuery()
+      .sql("SELECT * from " + managementService.getTableName(HistoricVariableInstance.class))
+      .disableCustomObjectDeserialization()
+      .list();
+
+    // then
+    assertEquals(2, variableInstances.size());
+
+    for (HistoricVariableInstance variableInstance : variableInstances) {
+      assertNull(variableInstance.getErrorMessage());
+
+      ObjectValue typedValue = (ObjectValue) variableInstance.getTypedValue();
+      assertNotNull(typedValue);
+      assertFalse(typedValue.isDeserialized());
+      // cannot access the deserialized value
+      try {
+        typedValue.getValue();
+      }
+      catch(IllegalStateException e) {
+        assertTextPresent("Object is not deserialized", e.getMessage());
+      }
+      assertNotNull(typedValue.getValueSerialized());
+    }
+
+    taskService.deleteTask(newTask.getId(), true);
+  }
+
   public void testErrorMessage() {
 
     Task newTask = taskService.newTask();
