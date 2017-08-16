@@ -23,7 +23,7 @@ import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.util.xml.Element;
 import org.camunda.bpm.engine.impl.util.xml.Namespace;
 
-public class FoxFailedJobParseListener extends AbstractBpmnParseListener {
+public class DefaultFailedJobParseListener extends AbstractBpmnParseListener {
 
   protected static final String TYPE = "type";
   protected static final String START_TIMER_EVENT = "startTimerEvent";

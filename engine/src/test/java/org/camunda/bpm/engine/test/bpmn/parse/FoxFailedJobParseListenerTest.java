@@ -9,7 +9,7 @@ import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 
-import static org.camunda.bpm.engine.impl.bpmn.parser.FoxFailedJobParseListener.FOX_FAILED_JOB_CONFIGURATION;
+import static org.camunda.bpm.engine.impl.bpmn.parser.DefaultFailedJobParseListener.FOX_FAILED_JOB_CONFIGURATION;
 
 public class FoxFailedJobParseListenerTest extends PluggableProcessEngineTestCase {
 

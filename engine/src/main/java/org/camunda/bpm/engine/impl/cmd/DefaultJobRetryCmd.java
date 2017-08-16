@@ -13,7 +13,7 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
-import org.camunda.bpm.engine.impl.bpmn.parser.FoxFailedJobParseListener;
+import org.camunda.bpm.engine.impl.bpmn.parser.DefaultFailedJobParseListener;
 import org.camunda.bpm.engine.impl.calendar.DurationHelper;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.el.Expression;
@@ -31,7 +31,7 @@ import java.util.List;
 /**
  * @author Roman Smirnov
  */
-public class FoxJobRetryCmd extends JobRetryCmd {
+public class DefaultJobRetryCmd extends JobRetryCmd {
 
   public static final List<String> SUPPORTED_TYPES = Arrays.asList(
       TimerExecuteNestedActivityJobHandler.TYPE,
@@ -42,7 +42,7 @@ public class FoxJobRetryCmd extends JobRetryCmd {
   );
   private final static JobExecutorLogger LOG = ProcessEngineLogger.JOB_EXECUTOR_LOGGER;
 
-  public FoxJobRetryCmd(String jobId, Throwable exception) {
+  public DefaultJobRetryCmd(String jobId, Throwable exception) {
     super(jobId, exception);
   }
 
@@ -50,14 +50,15 @@ public class FoxJobRetryCmd extends JobRetryCmd {
     JobEntity job = getJob();
 
     ActivityImpl activity = getCurrentActivity(commandContext, job);
+    String globalFailedJobRetryTimeCycle = commandContext.getProcessEngineConfiguration().getFailedJobRetryTimeCycle();
 
-    if (activity == null) {
+    if (activity == null && globalFailedJobRetryTimeCycle == null) {
       LOG.debugFallbackToDefaultRetryStrategy();
       executeStandardStrategy(commandContext);
 
     } else {
       try {
-        executeCustomStrategy(commandContext, job, activity);
+        executeCustomStrategy(commandContext, job, activity, globalFailedJobRetryTimeCycle);
 
       } catch (Exception e) {
         LOG.debugFallbackToDefaultRetryStrategy();
@@ -73,10 +74,17 @@ public class FoxJobRetryCmd extends JobRetryCmd {
     decrementCmd.execute(commandContext);
   }
 
-  protected void executeCustomStrategy(CommandContext commandContext, JobEntity job, ActivityImpl activity) throws Exception {
-    String failedJobRetryTimeCycle = getFailedJobRetryTimeCycle(job, activity);
+  protected void executeCustomStrategy(CommandContext commandContext, JobEntity job, ActivityImpl activity, String globalFailedJobRetryTimeCycle) throws Exception {
+    String failedJobRetryTimeCycle = null;
+    if (activity != null) {
+      failedJobRetryTimeCycle = getFailedJobRetryTimeCycle(job, activity);
+    }
 
-    if(failedJobRetryTimeCycle == null) {
+    if (failedJobRetryTimeCycle == null && globalFailedJobRetryTimeCycle != null) {
+      failedJobRetryTimeCycle = globalFailedJobRetryTimeCycle;
+    }
+
+    if (failedJobRetryTimeCycle == null) {
       executeStandardStrategy(commandContext);
 
     } else {
@@ -123,7 +131,7 @@ public class FoxJobRetryCmd extends JobRetryCmd {
 
   protected String getFailedJobRetryTimeCycle(JobEntity job, ActivityImpl activity) {
 
-    Expression expression = activity.getProperties().get(FoxFailedJobParseListener.FOX_FAILED_JOB_CONFIGURATION);
+    Expression expression = activity.getProperties().get(DefaultFailedJobParseListener.FOX_FAILED_JOB_CONFIGURATION);
 
     String executionId = job.getExecutionId();
     ExecutionEntity execution = null;
@@ -133,6 +141,10 @@ public class FoxJobRetryCmd extends JobRetryCmd {
     }
 
     Object value = null;
+
+    if (expression == null) {
+      return null;
+    }
 
     try {
        value = expression.getValue(execution);

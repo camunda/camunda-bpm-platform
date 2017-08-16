@@ -12,8 +12,6 @@
  */
 package org.camunda.bpm.container.impl.deployment;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.application.AbstractProcessApplication;
@@ -28,12 +26,9 @@ import org.camunda.bpm.container.impl.spi.DeploymentOperationStep;
 import org.camunda.bpm.container.impl.spi.PlatformServiceContainer;
 import org.camunda.bpm.container.impl.spi.ServiceTypes;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
-import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
-import org.camunda.bpm.engine.impl.bpmn.parser.FoxFailedJobParseListener;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin;
 import org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration;
-import org.camunda.bpm.engine.impl.jobexecutor.FoxFailedJobCommandFactory;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.persistence.StrongUuidGenerator;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
@@ -89,8 +84,6 @@ public class StartProcessEngineStep extends DeploymentOperationStep {
     ProcessEngineConfigurationImpl configurationImpl = configuration;
     configurationImpl.setIdGenerator(new StrongUuidGenerator());
 
-    configureCustomRetryStrategy(configurationImpl);
-
     // set configuration values
     String name = processEngineXml.getName();
     configuration.setProcessEngineName(name);
@@ -128,18 +121,6 @@ public class StartProcessEngineStep extends DeploymentOperationStep {
 
   protected JmxManagedProcessEngineController createProcessEngineControllerInstance(ProcessEngineConfigurationImpl configuration) {
     return new JmxManagedProcessEngineController(configuration);
-  }
-
-  protected void configureCustomRetryStrategy(ProcessEngineConfigurationImpl configurationImpl) {
-    // add support for custom Retry strategy
-    // TODO: decide whether this should be moved  to configuration or to plugin
-    List<BpmnParseListener> customPostBPMNParseListeners = configurationImpl.getCustomPostBPMNParseListeners();
-    if(customPostBPMNParseListeners==null) {
-      customPostBPMNParseListeners = new ArrayList<BpmnParseListener>();
-      configurationImpl.setCustomPostBPMNParseListeners(customPostBPMNParseListeners);
-    }
-    customPostBPMNParseListeners.add(new FoxFailedJobParseListener());
-    configurationImpl.setFailedJobCommandFactory(new FoxFailedJobCommandFactory());
   }
 
   /**

@@ -29,9 +29,6 @@
     <property name="jobExecutorActivate" value="false" />
     <property name="deploymentResources" value="classpath*:bpmn/*.bpmn" />
     <property name="authorizationEnabled" value="true" />
-    <property name="failedJobCommandFactory">
-      <bean class="org.camunda.bpm.engine.impl.jobexecutor.FoxFailedJobCommandFactory" />
-    </property>
     <property name="idGenerator">
       <bean class="org.camunda.bpm.engine.impl.persistence.StrongUuidGenerator" />
     </property>

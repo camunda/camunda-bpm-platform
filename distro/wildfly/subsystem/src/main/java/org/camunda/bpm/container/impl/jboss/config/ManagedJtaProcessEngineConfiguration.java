@@ -16,9 +16,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
-import org.camunda.bpm.engine.impl.bpmn.parser.FoxFailedJobParseListener;
+import org.camunda.bpm.engine.impl.bpmn.parser.DefaultFailedJobParseListener;
 import org.camunda.bpm.engine.impl.cfg.JtaProcessEngineConfiguration;
-import org.camunda.bpm.engine.impl.jobexecutor.FoxFailedJobCommandFactory;
+import org.camunda.bpm.engine.impl.jobexecutor.DefaultFailedJobCommandFactory;
 import org.camunda.bpm.engine.impl.persistence.StrongUuidGenerator;
 
 /**
@@ -47,9 +47,9 @@ public class ManagedJtaProcessEngineConfiguration extends JtaProcessEngineConfig
       customPostBPMNParseListeners = new ArrayList<BpmnParseListener>();
       setCustomPostBPMNParseListeners(customPostBPMNParseListeners);
     }
-    customPostBPMNParseListeners.add(new FoxFailedJobParseListener());
+    customPostBPMNParseListeners.add(new DefaultFailedJobParseListener());
 
-    setFailedJobCommandFactory(new FoxFailedJobCommandFactory());
+    setFailedJobCommandFactory(new DefaultFailedJobCommandFactory());
   }
 
   protected void initIdGenerator() {

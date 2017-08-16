@@ -21,14 +21,11 @@ import org.apache.commons.lang.time.DateUtils;
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.cmd.AcquireJobsCmd;
-import org.camunda.bpm.engine.impl.cmd.FoxJobRetryCmd;
+import org.camunda.bpm.engine.impl.cmd.DefaultJobRetryCmd;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.jobexecutor.FailedJobCommandFactory;
-import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
+import org.camunda.bpm.engine.impl.jobexecutor.DefaultFailedJobCommandFactory;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.Job;
@@ -134,11 +131,10 @@ public class FailedJobListenerWithRetriesTest {
     return jobs.get(0);
   }
 
-  private class OLEFailedJobCommandFactory implements FailedJobCommandFactory {
+  private class OLEFailedJobCommandFactory extends DefaultFailedJobCommandFactory {
 
     private Map<String, OLEFoxJobRetryCmd> oleFoxJobRetryCmds = new HashMap<String, OLEFoxJobRetryCmd>();
 
-    @Override
     public Command<Object> getCommand(String jobId, Throwable exception) {
       return getOleFoxJobRetryCmds(jobId, exception);
     }
@@ -151,7 +147,7 @@ public class FailedJobListenerWithRetriesTest {
     }
   }
 
-  private class OLEFoxJobRetryCmd extends FoxJobRetryCmd {
+  private class OLEFoxJobRetryCmd extends DefaultJobRetryCmd {
 
     private int countRuns = 0;
 

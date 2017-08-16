@@ -99,6 +99,7 @@ import org.camunda.bpm.engine.impl.bpmn.behavior.ExternalTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.deployer.BpmnDeployer;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParser;
+import org.camunda.bpm.engine.impl.bpmn.parser.DefaultFailedJobParseListener;
 import org.camunda.bpm.engine.impl.calendar.BusinessCalendarManager;
 import org.camunda.bpm.engine.impl.calendar.CycleBusinessCalendar;
 import org.camunda.bpm.engine.impl.calendar.DueDateBusinessCalendar;
@@ -187,10 +188,10 @@ import org.camunda.bpm.engine.impl.interceptor.CommandInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.DelegateInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.SessionFactory;
 import org.camunda.bpm.engine.impl.jobexecutor.AsyncContinuationJobHandler;
-import org.camunda.bpm.engine.impl.jobexecutor.DefaultFailedJobCommandFactory;
 import org.camunda.bpm.engine.impl.jobexecutor.DefaultJobExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.DefaultJobPriorityProvider;
 import org.camunda.bpm.engine.impl.jobexecutor.FailedJobCommandFactory;
+import org.camunda.bpm.engine.impl.jobexecutor.DefaultFailedJobCommandFactory;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
@@ -709,6 +710,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   private int failedJobListenerMaxRetries = DEFAULT_FAILED_JOB_LISTENER_MAX_RETRIES;
 
+  private String failedJobRetryTimeCycle;
+
   // buildProcessEngine ///////////////////////////////////////////////////////
 
   @Override
@@ -743,6 +746,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initCommandExecutors();
     initServices();
     initIdGenerator();
+    initFailedJobCommandFactory();
     initDeployers();
     initJobProvider();
     initExternalTaskPriorityProvider();
@@ -758,7 +762,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initJpa();
     initDelegateInterceptor();
     initEventHandlers();
-    initFailedJobCommandFactory();
     initProcessApplicationManager();
     initCorrelationHandler();
     initIncidentHandlers();
@@ -872,6 +875,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     if (failedJobCommandFactory == null) {
       failedJobCommandFactory = new DefaultFailedJobCommandFactory();
     }
+    if (postParseListeners == null) {
+      postParseListeners = new ArrayList<BpmnParseListener>();
+    }
+    postParseListeners.add(new DefaultFailedJobParseListener());
   }
 
   // incident handlers /////////////////////////////////////////////////////////////
@@ -3796,5 +3803,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setFailedJobListenerMaxRetries(int failedJobListenerMaxRetries) {
     this.failedJobListenerMaxRetries = failedJobListenerMaxRetries;
+  }
+
+  public String getFailedJobRetryTimeCycle() {
+    return failedJobRetryTimeCycle;
+  }
+
+  public void setFailedJobRetryTimeCycle(String failedJobRetryTimeCycle) {
+    this.failedJobRetryTimeCycle = failedJobRetryTimeCycle;
   }
 }

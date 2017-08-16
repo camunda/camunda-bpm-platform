@@ -28,14 +28,6 @@
 
     <property name="history" value="full"/>
 
-    <property name="customPostBPMNParseListeners">
-      <list>
-        <bean class="org.camunda.bpm.engine.impl.bpmn.parser.FoxFailedJobParseListener"/>
-      </list>
-    </property>
-
-    <property name="failedJobCommandFactory" ref="foxFailedJobCommandFactory"/>
-
   </bean>
 
   <bean id="processEngineRule" class="org.camunda.bpm.engine.test.ProcessEngineRule">
@@ -57,8 +49,6 @@
 
   <context:annotation-config/>
 
-
-  <bean id="foxFailedJobCommandFactory" class="org.camunda.bpm.engine.impl.jobexecutor.FoxFailedJobCommandFactory"/>
 
   <bean id="userBean" class="org.camunda.bpm.engine.spring.test.transaction.modification.UserBean"></bean>
   <bean id="deleteVariableListener" class="org.camunda.bpm.engine.spring.test.transaction.modification.DeleteVariableListener"></bean>

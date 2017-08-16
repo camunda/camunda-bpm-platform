@@ -27,20 +27,10 @@
     <!-- turn off metrics reporter -->
     <property name="dbMetricsReporterActivate" value="false" />
 
-    <property name="customPostBPMNParseListeners">
-      <list>
-        <bean class="org.camunda.bpm.engine.impl.bpmn.parser.FoxFailedJobParseListener" />
-      </list>
-    </property>
-
-    <property name="failedJobCommandFactory" ref="foxFailedJobCommandFactory" />
-
     <property name="authorizationCheckRevokes" value="${authorizationCheckRevokes}"/>
 
     <!--<property name="idGenerator" ref="uuidGenerator" />-->
 
   </bean>
-
-  <bean id="foxFailedJobCommandFactory" class="org.camunda.bpm.engine.impl.jobexecutor.FoxFailedJobCommandFactory" />
 
 </beans>

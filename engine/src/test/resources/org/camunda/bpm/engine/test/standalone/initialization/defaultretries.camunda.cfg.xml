@@ -21,19 +21,9 @@
     <property name="mailServerPort" value="${mail.server.port}" />
     <property name="history" value="${history.level}" />
 
-    <property name="customPostBPMNParseListeners">
-      <list>
-        <bean class="org.camunda.bpm.engine.impl.bpmn.parser.FoxFailedJobParseListener" />
-      </list>
-    </property>
-
-    <property name="failedJobCommandFactory" ref="foxFailedJobCommandFactory" />
-    
     <!-- turn off metrics reporter -->
     <property name="dbMetricsReporterActivate" value="false" />
 
   </bean>
-
-  <bean id="foxFailedJobCommandFactory" class="org.camunda.bpm.engine.impl.jobexecutor.FoxFailedJobCommandFactory" />
 
 </beans>

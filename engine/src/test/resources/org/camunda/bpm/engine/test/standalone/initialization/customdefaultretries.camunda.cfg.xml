@@ -24,19 +24,10 @@
     <!-- default job retries -->
     <property name="defaultNumberOfRetries" value="5" />
 
-    <property name="customPostBPMNParseListeners">
-      <list>
-        <bean class="org.camunda.bpm.engine.impl.bpmn.parser.FoxFailedJobParseListener" />
-      </list>
-    </property>
-
-    <property name="failedJobCommandFactory" ref="foxFailedJobCommandFactory" />
-    
     <!-- turn off metrics reporter -->
     <property name="dbMetricsReporterActivate" value="false" />
 
   </bean>
 
-  <bean id="foxFailedJobCommandFactory" class="org.camunda.bpm.engine.impl.jobexecutor.FoxFailedJobCommandFactory" />
 
 </beans>
