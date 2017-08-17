@@ -129,6 +129,11 @@
         <version>${project.version}</version>
         <classifier>classes</classifier>
       </dependency>
+      <dependency>
+        <groupId>org.camunda.bpm.webapp</groupId>
+        <artifactId>camunda-webapp-webjar</artifactId>
+        <version>${project.version}</version>
+      </dependency>
 
       <!-- dmn engine -->
       <dependency>
