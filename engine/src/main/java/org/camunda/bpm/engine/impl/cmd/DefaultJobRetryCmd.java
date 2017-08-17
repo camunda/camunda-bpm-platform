@@ -70,8 +70,15 @@ public class DefaultJobRetryCmd extends JobRetryCmd {
   }
 
   protected void executeStandardStrategy(CommandContext commandContext) {
-    DecrementJobRetriesCmd decrementCmd = new DecrementJobRetriesCmd(jobId, exception);
-    decrementCmd.execute(commandContext);
+    JobEntity job = getJob();
+    if (job != null) {
+      job.unlock();
+      logException(job);
+      decrementRetries(job);
+      notifyAcquisition(commandContext);
+    } else {
+      LOG.debugFailedJobNotFound(jobId);
+    }
   }
 
   protected void executeCustomStrategy(CommandContext commandContext, JobEntity job, ActivityImpl activity, String globalFailedJobRetryTimeCycle) throws Exception {
