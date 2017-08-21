@@ -23,14 +23,6 @@
     
     <property name="history" value="full" />
     
-   	<property name="customPostBPMNParseListeners">
-      <list>
-        <bean class="org.camunda.bpm.engine.impl.bpmn.parser.FoxFailedJobParseListener" />
-      </list>
-    </property>
-
-    <property name="failedJobCommandFactory" ref="foxFailedJobCommandFactory" />
-
     <!--<property name="idGenerator" ref="uuidGenerator" />-->
 
     <property name="authorizationCheckRevokes" value="${authorizationCheckRevokes}"/>
