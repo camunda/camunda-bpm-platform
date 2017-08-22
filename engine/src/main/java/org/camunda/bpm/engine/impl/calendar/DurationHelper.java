@@ -24,7 +24,6 @@ import java.util.List;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.EngineUtilLogger;
@@ -97,7 +96,7 @@ public class DurationHelper {
     return times;
   }
 
-  private Date getDateAfterRepeat(Date date) {
+  public Date getDateAfterRepeat(Date date) {
     if (start != null) {
       Date cur = start;
       for (int i=0;i<times && !cur.after(date);i++) {
@@ -113,6 +112,12 @@ public class DurationHelper {
       cur = add(cur, period.negate());
     }
     return next.before(date) ? null : next;
+  }
+
+  public DurationHelper withPeriod(String period) {
+    DurationHelper durationHelper = this;
+    durationHelper.period = datatypeFactory.newDuration(period);
+    return durationHelper;
   }
 
   private Date add(Date date, Duration duration) {
