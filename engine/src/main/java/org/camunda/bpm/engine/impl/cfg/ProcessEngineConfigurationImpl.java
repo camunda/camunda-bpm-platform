@@ -812,7 +812,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         String propertyValue = batchOperationsForHistoryCleanup.get(operation);
         if (!batchHandlers.keySet().contains(operation)) {
           LOG.invalidBatchOperation(operation, propertyValue);
-          batchOperationsForHistoryCleanup.remove(operation);
         }
 
         try {
