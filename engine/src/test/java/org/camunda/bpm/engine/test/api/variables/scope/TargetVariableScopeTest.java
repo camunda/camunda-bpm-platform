@@ -2,6 +2,8 @@ package org.camunda.bpm.engine.test.api.variables.scope;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.ScriptEvaluationException;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessInstanceWithVariablesImpl;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -12,6 +14,8 @@ import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.bpm.model.bpmn.instance.SequenceFlow;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaExecutionListener;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -19,14 +23,14 @@ import org.junit.rules.ExpectedException;
 import java.util.Arrays;
 
 import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
-import static org.camunda.bpm.model.bpmn.Bpmn.createExecutableProcess;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsInstanceOf.instanceOf;
+import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 
 /**
  * @author Askar Akhmerov
+ * @author Tassilo Weidner
  */
 public class TargetVariableScopeTest {
   @Rule
@@ -139,5 +143,160 @@ public class TargetVariableScopeTest {
     engineRule.getRuntimeService().startProcessInstanceById(processDefinition.getId(),variables);
   }
 
+  public static class JavaDelegate implements org.camunda.bpm.engine.delegate.JavaDelegate {
+
+    @Override
+    public void execute(DelegateExecution execution) {
+      execution.setVariable("varName", "varValue", "activityId");
+      assertThat(execution.getVariableLocal("varName"), is(notNullValue()));
+    }
+
+  }
+
+  public static class ExecutionListener implements org.camunda.bpm.engine.delegate.ExecutionListener {
+
+    @Override
+    public void notify(DelegateExecution execution) {
+      execution.setVariable("varName", "varValue", "activityId");
+      assertThat(execution.getVariableLocal("varName"), is(notNullValue()));
+    }
+
+  }
+
+  public static class TaskListener implements org.camunda.bpm.engine.delegate.TaskListener {
+
+    @Override
+    public void notify(DelegateTask delegateTask) {
+      DelegateExecution execution = delegateTask.getExecution();
+      execution.setVariable("varName", "varValue", "activityId");
+      assertThat(execution.getVariableLocal("varName"), is(notNullValue()));
+    }
+  }
+
+  @Test
+  public void testSetLocalScopeWithJavaDelegate() {
+    testHelper.deploy(Bpmn.createExecutableProcess("process")
+      .startEvent()
+      .serviceTask()
+        .id("activityId")
+        .camundaClass(JavaDelegate.class)
+      .endEvent()
+      .done());
+
+    engineRule.getRuntimeService().startProcessInstanceByKey("process");
+  }
+
+  @Test
+  public void testSetLocalScopeWithExecutionListenerStart() {
+    testHelper.deploy(Bpmn.createExecutableProcess("process")
+      .startEvent().id("activityId")
+        .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_START, ExecutionListener.class)
+      .endEvent()
+      .done());
+
+    engineRule.getRuntimeService().startProcessInstanceByKey("process");
+  }
+
+  @Test
+  public void testSetLocalScopeWithExecutionListenerEnd() {
+    testHelper.deploy(Bpmn.createExecutableProcess("process")
+      .startEvent()
+      .endEvent().id("activityId")
+        .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_END, ExecutionListener.class)
+      .done());
+
+    engineRule.getRuntimeService().startProcessInstanceByKey("process");
+  }
+
+  @Test
+  public void testSetLocalScopeWithExecutionListenerTake() {
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("process")
+      .startEvent().id("activityId")
+      .sequenceFlowId("sequenceFlow")
+      .endEvent()
+      .done();
+
+    CamundaExecutionListener listener = modelInstance.newInstance(CamundaExecutionListener.class);
+    listener.setCamundaEvent(ExecutionListener.EVENTNAME_TAKE);
+    listener.setCamundaClass(ExecutionListener.class.getName());
+    modelInstance.<SequenceFlow>getModelElementById("sequenceFlow").builder().addExtensionElement(listener);
+
+    testHelper.deploy(modelInstance);
+    engineRule.getRuntimeService().startProcessInstanceByKey("process");
+  }
+
+  @Test
+  public void testSetLocalScopeWithTaskListener() {
+    testHelper.deploy(Bpmn.createExecutableProcess("process")
+      .startEvent()
+      .userTask().id("activityId")
+        .camundaTaskListenerClass(TaskListener.EVENTNAME_CREATE, TaskListener.class)
+      .endEvent()
+      .done());
+
+    engineRule.getRuntimeService().startProcessInstanceByKey("process");
+  }
+
+  @Test
+  public void testSetLocalScopeInSubprocessWithJavaDelegate() {
+    testHelper.deploy(Bpmn.createExecutableProcess("process")
+      .startEvent()
+      .subProcess().embeddedSubProcess()
+        .startEvent()
+          .serviceTask().id("activityId")
+            .camundaClass(JavaDelegate.class)
+        .endEvent()
+      .subProcessDone()
+      .endEvent()
+      .done());
+
+    engineRule.getRuntimeService().startProcessInstanceByKey("process");
+  }
+
+  @Test
+  public void testSetLocalScopeInSubprocessWithStartExecutionListener() {
+    testHelper.deploy(Bpmn.createExecutableProcess("process")
+      .startEvent()
+      .subProcess().embeddedSubProcess()
+        .startEvent().id("activityId")
+          .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_START, ExecutionListener.class)
+        .endEvent()
+      .subProcessDone()
+      .endEvent()
+      .done());
+
+    engineRule.getRuntimeService().startProcessInstanceByKey("process");
+  }
+
+  @Test
+  public void testSetLocalScopeInSubprocessWithEndExecutionListener() {
+    testHelper.deploy(Bpmn.createExecutableProcess("process")
+      .startEvent()
+      .subProcess().embeddedSubProcess()
+        .startEvent()
+        .endEvent().id("activityId")
+          .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_END, ExecutionListener.class)
+      .subProcessDone()
+      .endEvent()
+      .done());
+
+    engineRule.getRuntimeService().startProcessInstanceByKey("process");
+  }
+
+  @Test
+  public void testSetLocalScopeInSubprocessWithTaskListener() {
+    testHelper.deploy(Bpmn.createExecutableProcess("process")
+      .startEvent()
+      .subProcess().embeddedSubProcess()
+        .startEvent()
+        .userTask().id("activityId")
+        .camundaTaskListenerClass(TaskListener.EVENTNAME_CREATE, TaskListener.class)
+        .endEvent()
+      .subProcessDone()
+      .endEvent()
+      .done());
+
+    engineRule.getRuntimeService().startProcessInstanceByKey("process");
+  }
 
 }
