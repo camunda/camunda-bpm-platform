@@ -95,6 +95,13 @@ public class AttributeTest extends TestModelTest {
   }
 
   @Test
+  public void testSetAttributeValueWithoutUpdateReference() {
+    String identifier = "new-" + tweety.getId();
+    idAttribute.setValue(tweety, identifier, false);
+    assertThat(idAttribute).hasValue(tweety, identifier);
+  }
+
+  @Test
   public void testSetDefaultValue() {
     String defaultName = "default-name";
     assertThat(tweety.getName()).isNull();

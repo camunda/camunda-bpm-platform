@@ -108,11 +108,18 @@ public abstract class AttributeImpl<T> implements Attribute<T> {
    *  the value of the attribute.
    */
   public void setValue(ModelElementInstance modelElement, T value) {
+    setValue(modelElement, value, true);
+  }
+
+  @Override
+  public void setValue(ModelElementInstance modelElement, T value, boolean withReferenceUpdate) {
     String xmlValue = convertModelValueToXmlValue(value);
     if(namespaceUri == null) {
-      modelElement.setAttributeValue(attributeName, xmlValue, isIdAttribute);
+      modelElement.setAttributeValue(attributeName, xmlValue,
+              isIdAttribute, withReferenceUpdate);
     } else {
-      modelElement.setAttributeValueNs(namespaceUri, attributeName, xmlValue, isIdAttribute);
+      modelElement.setAttributeValueNs(namespaceUri, attributeName,
+              xmlValue, isIdAttribute, withReferenceUpdate);
     }
   }
 

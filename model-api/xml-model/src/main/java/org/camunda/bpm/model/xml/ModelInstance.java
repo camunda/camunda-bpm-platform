@@ -61,6 +61,16 @@ public interface ModelInstance {
   <T extends ModelElementInstance> T newInstance(Class<T> type);
 
   /**
+   * Creates a new instance of type class with user-defined id.
+   *
+   * @param type  the class of the type to create
+   * @param id    identifier of new element instance
+   * @param <T>   instance type
+   * @return the new created instance
+   */
+  <T extends ModelElementInstance> T newInstance(Class<T> type, String id);
+
+  /**
    * Creates a new instance of type.
    *
    * @param type  the type to create
@@ -68,6 +78,16 @@ public interface ModelInstance {
    * @return the new created instance
    */
   <T extends ModelElementInstance> T newInstance(ModelElementType type);
+
+  /**
+   * Creates a new instance of type with user-defined id.
+   *
+   * @param type  the type to create
+   * @param id    identifier of new element instance
+   * @param <T>   instance type
+   * @return  the new created instance
+   */
+  <T extends ModelElementInstance> T newInstance(ModelElementType type, String id);
 
   /**
    * Returns the underlying model.

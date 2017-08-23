@@ -93,10 +93,15 @@ public class ModelElementInstanceImpl implements ModelElementInstance {
   }
 
   public void setAttributeValue(String attributeName, String xmlValue) {
-    setAttributeValue(attributeName, xmlValue, false);
+    setAttributeValue(attributeName, xmlValue, false, true);
   }
 
   public void setAttributeValue(String attributeName, String xmlValue, boolean isIdAttribute) {
+    setAttributeValue(attributeName, xmlValue, isIdAttribute, true);
+  }
+
+  public void setAttributeValue(String attributeName, String xmlValue,
+                                boolean isIdAttribute, boolean withReferenceUpdate) {
     String oldValue = getAttributeValue(attributeName);
     if (isIdAttribute) {
       domElement.setIdAttribute(attributeName, xmlValue);
@@ -105,16 +110,21 @@ public class ModelElementInstanceImpl implements ModelElementInstance {
       domElement.setAttribute(attributeName, xmlValue);
     }
     Attribute<?> attribute = elementType.getAttribute(attributeName);
-    if (attribute != null) {
+    if (attribute != null && withReferenceUpdate) {
       ((AttributeImpl<?>) attribute).updateIncomingReferences(this, xmlValue, oldValue);
     }
   }
 
   public void setAttributeValueNs(String namespaceUri, String attributeName, String xmlValue) {
-    setAttributeValueNs(namespaceUri, attributeName, xmlValue, false);
+    setAttributeValueNs(namespaceUri, attributeName, xmlValue, false, true);
   }
 
   public void setAttributeValueNs(String namespaceUri, String attributeName, String xmlValue, boolean isIdAttribute) {
+    setAttributeValueNs(namespaceUri, attributeName, xmlValue, isIdAttribute, true);
+  }
+
+  public void setAttributeValueNs(String namespaceUri, String attributeName, String xmlValue,
+                                  boolean isIdAttribute, boolean withReferenceUpdate) {
     String namespaceForSetting = namespaceUri;
     if (hasValueToBeSetForAlternativeNs(namespaceUri, attributeName)) {
       namespaceForSetting = modelInstance.getModel().getAlternativeNamespace(namespaceUri);
@@ -127,7 +137,7 @@ public class ModelElementInstanceImpl implements ModelElementInstance {
       domElement.setAttribute(namespaceForSetting, attributeName, xmlValue);
     }
     Attribute<?> attribute = elementType.getAttribute(attributeName);
-    if (attribute != null) {
+    if (attribute != null && withReferenceUpdate) {
       ((AttributeImpl<?>) attribute).updateIncomingReferences(this, xmlValue, oldValue);
     }
   }

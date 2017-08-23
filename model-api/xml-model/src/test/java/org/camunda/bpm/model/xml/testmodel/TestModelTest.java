@@ -55,8 +55,7 @@ public abstract class TestModelTest {
   }
 
   public static Bird createBird(ModelInstance modelInstance, String id, Gender gender) {
-    Bird bird = modelInstance.newInstance(Bird.class);
-    bird.setId(id);
+    Bird bird = modelInstance.newInstance(Bird.class, id);
     bird.setGender(gender);
     Animals animals = (Animals) modelInstance.getDocumentElement();
     animals.getAnimals().add(bird);
@@ -64,8 +63,7 @@ public abstract class TestModelTest {
   }
 
   protected static RelationshipDefinition createRelationshipDefinition(ModelInstance modelInstance, Animal animalInRelationshipWith, Class<? extends RelationshipDefinition> relationshipDefinitionClass) {
-    RelationshipDefinition relationshipDefinition = modelInstance.newInstance(relationshipDefinitionClass);
-    relationshipDefinition.setId("relationship-" + animalInRelationshipWith.getId());
+    RelationshipDefinition relationshipDefinition = modelInstance.newInstance(relationshipDefinitionClass, "relationship-" + animalInRelationshipWith.getId());
     relationshipDefinition.setAnimal(animalInRelationshipWith);
     return relationshipDefinition;
   }
@@ -77,8 +75,7 @@ public abstract class TestModelTest {
   }
 
   public static Egg createEgg(ModelInstance modelInstance, String id) {
-    Egg egg = modelInstance.newInstance(Egg.class);
-    egg.setId(id);
+    Egg egg = modelInstance.newInstance(Egg.class, id);
     return egg;
   }
 

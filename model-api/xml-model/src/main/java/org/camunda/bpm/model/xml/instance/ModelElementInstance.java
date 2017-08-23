@@ -81,6 +81,17 @@ public interface ModelElementInstance {
   void setAttributeValue(String attributeName, String xmlValue, boolean isIdAttribute);
 
   /**
+   * Sets attribute value by name.
+   *
+   * @param attributeName  the name of the attribute
+   * @param xmlValue  the value to set
+   * @param isIdAttribute  true if the attribute is an ID attribute, false otherwise
+   * @param withReferenceUpdate  true to update incoming references in other elements, false otherwise
+   */
+  void setAttributeValue(String attributeName, String xmlValue,
+                         boolean isIdAttribute, boolean withReferenceUpdate);
+
+  /**
    * Removes attribute by name.
    *
    * @param attributeName  the name of the attribute
@@ -114,6 +125,18 @@ public interface ModelElementInstance {
    * @param isIdAttribute  true if the attribute is an ID attribute, false otherwise
    */
   void setAttributeValueNs(String namespaceUri, String attributeName, String xmlValue, boolean isIdAttribute);
+
+  /**
+   * Sets the attribute value by name and namespace.
+   *
+   * @param namespaceUri  the namespace URI of the attribute
+   * @param attributeName  the name of the attribute
+   * @param xmlValue  the XML value to set
+   * @param isIdAttribute  true if the attribute is an ID attribute, false otherwise
+   * @param withReferenceUpdate  true to update incoming references in other elements, false otherwise
+   */
+  void setAttributeValueNs(String namespaceUri, String attributeName, String xmlValue,
+                           boolean isIdAttribute, boolean withReferenceUpdate);
 
   /**
    * Removes the attribute by name and namespace.

@@ -35,9 +35,17 @@ public interface Attribute<T> {
   /**
    * sets the value of the attribute.
    *
-   *  the value of the attribute.
+   * @param value the value of the attribute.
    */
   void setValue(ModelElementInstance modelElement, T value);
+
+  /**
+   * sets the value of the attribute.
+   *
+   * @param value the value of the attribute.
+   * @param withReferenceUpdate true to update id references in other elements, false otherwise
+   */
+  void setValue(ModelElementInstance modelElement, T value, boolean withReferenceUpdate);
 
   T getDefaultValue();
 

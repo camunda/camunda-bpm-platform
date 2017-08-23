@@ -69,18 +69,30 @@ public class ModelInstanceImpl implements ModelInstance {
   }
 
   public <T extends ModelElementInstance> T newInstance(Class<T> type) {
+    return newInstance(type, null);
+  }
+
+  public <T extends ModelElementInstance> T newInstance(Class<T> type, String id) {
     ModelElementType modelElementType = model.getType(type);
     if(modelElementType != null) {
-      return newInstance(modelElementType);
+      return newInstance(modelElementType, id);
     } else {
       throw new ModelException("Cannot create instance of ModelType "+type+": no such type registered.");
     }
   }
 
-  @SuppressWarnings("unchecked")
   public <T extends ModelElementInstance> T newInstance(ModelElementType type) {
+    return newInstance(type, null);
+  }
+
+  @SuppressWarnings("unchecked")
+  public <T extends ModelElementInstance> T newInstance(ModelElementType type, String id) {
     ModelElementInstance modelElementInstance = type.newInstance(this);
-    ModelUtil.setGeneratedUniqueIdentifier(type, modelElementInstance);
+    if (id != null && !id.isEmpty()) {
+      ModelUtil.setNewIdentifier(type, modelElementInstance, id, false);
+    } else {
+      ModelUtil.setGeneratedUniqueIdentifier(type, modelElementInstance, false);
+    }
     return (T) modelElementInstance;
   }
 
