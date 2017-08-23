@@ -47,6 +47,10 @@ module.exports = ['ViewsProvider',  function(ViewsProvider) {
             $filter('abbreviateNumber')(data.instances)
           );
 
+          nodes.incidentsNode.text(
+            $filter('abbreviateNumber')(data.incidents)
+          );
+
           if (data.instances <= 0) {
             nodes.instancesNode.hide();
           } else {
