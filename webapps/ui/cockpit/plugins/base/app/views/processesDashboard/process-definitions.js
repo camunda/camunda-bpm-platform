@@ -15,7 +15,7 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
       'camAPI',
       function($scope, Views, camAPI) {
 
-        $scope.getPDIncidentsCount = function(incidents) {
+        var getPDIncidentsCount = function(incidents) {
           if(!incidents) {
             return 0;
           }
@@ -60,6 +60,7 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
               var foundObject = foundIds[0];
               if(foundObject) {
                 foundObject.incidents = statistic.incidents;
+                foundObject.incidentCount = getPDIncidentsCount(foundObject.incidents);
                 foundObject.instances = statistic.instances;
               }
             });
