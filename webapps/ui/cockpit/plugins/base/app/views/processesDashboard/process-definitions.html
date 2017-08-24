@@ -19,7 +19,7 @@
       </div>
     </header>
 
-    <header class="header-empty" ng-if="!processDefinitionsCount">
+    <header class="header-empty" ng-if="!processDefinitionsCount && loadingState !== 'LOADING'">
         <h1 class="section-title">No process definitions deployed</h1>
     </header>
 
