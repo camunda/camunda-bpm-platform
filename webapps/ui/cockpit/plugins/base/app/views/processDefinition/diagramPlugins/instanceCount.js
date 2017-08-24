@@ -27,13 +27,29 @@ module.exports = ['ViewsProvider',  function(ViewsProvider) {
           return data.instances || data.incidents;
         }
 
+        var getIncidentCount = function(incidents) {
+          if(!incidents) {
+            return 0;
+          }
+
+          return incidents.reduce(function(sum, incident) {
+            return sum + incident.incidentCount;
+          }, 0);
+        };
+
+
         function getInstancesCountsForElement(element, activityInstanceStatistics) {
           var stats = getStatsWithId(activityInstanceStatistics, element.id);
           var statsMi = getStatsWithId(activityInstanceStatistics, element.id + '#multiInstanceBody');
 
+          var statsIncidents = get(stats, ['incidents'], []);
+          var statsMiIncidents = get(statsMi, ['incidents'], []);
+          var incidents = statsIncidents.concat(statsMiIncidents);
+          var incidentsCount = getIncidentCount(incidents);
+
           return {
             instances: get(stats, ['instances'], 0) + get(statsMi, ['instances'], 0),
-            incidents: get(stats, ['incidents', 'length'], 0) + get(statsMi, ['incidents', 'length'], 0)
+            incidents: incidentsCount
           };
         }
 
