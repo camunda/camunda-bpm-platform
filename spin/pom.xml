@@ -23,7 +23,7 @@
 
   <properties>
     <jackson.version>2.6.3</jackson.version>
-    <spin.version.old>1.3.0</spin.version.old>
+    <spin.version.old>1.3.1</spin.version.old>
   </properties>
 
   <dependencyManagement>
