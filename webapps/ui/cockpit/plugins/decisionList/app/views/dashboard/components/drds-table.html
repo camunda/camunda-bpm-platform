@@ -5,6 +5,10 @@
         {{ (drdsCount > 1 ? 'definitions' : 'definition') }} deployed</h1>
     </header>
 
+    <header class="header-empty" ng-if="!drdsCount">
+      <h1 class="section-title">No decision requirements definitions deployed</h1>
+    </header>
+
     <table class="drd-definitions-list cam-table" ng-if="drdsCount">
       <thead>
         <tr>
@@ -26,9 +30,5 @@
         </tr>
       </tbody>
     </table>
-
-    <h3 ng-if="!drdsCount">
-      No decision requirements definitions deployed
-    </h3>
   </div>
 </section>

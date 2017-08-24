@@ -1,7 +1,7 @@
 <!-- # CE - ui/cockpit/plugins/base/app/views/processesDashboard/process-definitions.html -->
 <section>
   <div class="inner">
-    <header ng-if=processDefinitionsCount>
+    <header ng-if="processDefinitionsCount">
       <div class="row">
         <h1 class="col-xs-6 section-title">{{ processDefinitionsCount }} process {{ (processDefinitionsCount > 1 ? 'definitions' : 'definition') }} deployed</h1>
 
@@ -17,6 +17,10 @@
           </ul>
         </div>
       </div>
+    </header>
+
+    <header class="header-empty" ng-if="!processDefinitionsCount">
+        <h1 class="section-title">No process definitions deployed</h1>
     </header>
 
 
@@ -121,9 +125,6 @@
         </div>
       </div>
 
-      <h3 ng-if="!processDefinitionsCount">
-        No process definitions deployed
-      </h3>
 
     </div>
 
