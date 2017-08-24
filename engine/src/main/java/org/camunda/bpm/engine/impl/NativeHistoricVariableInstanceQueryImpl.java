@@ -30,6 +30,8 @@ public class NativeHistoricVariableInstanceQueryImpl extends AbstractNativeQuery
 
   private static final long serialVersionUID = 1L;
 
+  protected boolean isCustomObjectDeserializationEnabled = true;
+
   public NativeHistoricVariableInstanceQueryImpl(CommandContext commandContext) {
     super(commandContext);
   }
@@ -41,6 +43,12 @@ public class NativeHistoricVariableInstanceQueryImpl extends AbstractNativeQuery
 
   //results ////////////////////////////////////////////////////////////////
 
+  @Override
+  public NativeHistoricVariableInstanceQuery disableCustomObjectDeserialization() {
+        this.isCustomObjectDeserializationEnabled = false;
+        return this;
+  }
+
   public List<HistoricVariableInstance> executeList(CommandContext commandContext, Map<String, Object> parameterMap, int firstResult, int maxResults) {
     List<HistoricVariableInstance> historicVariableInstances = commandContext
             .getHistoricVariableInstanceManager()
@@ -51,7 +59,7 @@ public class NativeHistoricVariableInstanceQueryImpl extends AbstractNativeQuery
 
         HistoricVariableInstanceEntity variableInstanceEntity = (HistoricVariableInstanceEntity) historicVariableInstance;
           try {
-            variableInstanceEntity.getTypedValue(true);
+            variableInstanceEntity.getTypedValue(isCustomObjectDeserializationEnabled);
           } catch(Exception t) {
             // do not fail if one of the variables fails to load
             LOG.exceptionWhileGettingValueForVariable(t);
