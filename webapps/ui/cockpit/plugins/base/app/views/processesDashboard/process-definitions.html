@@ -29,6 +29,7 @@
         <thead>
           <tr>
             <th class="state">State</th>
+            <th class="incidents">Incidents</th>
             <th class="instances">Running Instances</th>
             <th class="name">Name</th>
             <th class="tenant-id">Tenant ID</th>
@@ -46,6 +47,10 @@
               <div ng-if="pd.incidents == undefined">
                 <span class="glyphicon glyphicon-refresh animate-spin"></span>
               </div>
+            </td>
+
+            <td class="state">
+              {{ getPDIncidentsCount(pd.incidents)}}
             </td>
 
             <td ng-if="pd.instances >= 0" class="instances">

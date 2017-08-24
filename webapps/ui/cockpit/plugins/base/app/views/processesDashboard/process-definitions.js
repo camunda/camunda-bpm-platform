@@ -14,6 +14,17 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
       'Views',
       'camAPI',
       function($scope, Views, camAPI) {
+
+        $scope.getPDIncidentsCount = function(incidents) {
+          if(!incidents) {
+            return 0;
+          }
+
+          return incidents.reduce(function(sum, incident) {
+            return sum + incident.incidentCount;
+          }, 0);
+        };
+
         var processInstancePlugins = Views.getProviders({ component: 'cockpit.processInstance.view' });
         $scope.hasHistoryPlugin = processInstancePlugins.filter(function(plugin) {
           return plugin.id === 'history';
