@@ -63,6 +63,7 @@ import org.camunda.bpm.model.bpmn.instance.camunda.CamundaFailedJobRetryTimeCycl
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaFormData;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaFormField;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaIn;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaIncrementalIntervals;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaInputOutput;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaInputParameter;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaOut;
@@ -88,6 +89,7 @@ public class ProcessBuilderTest {
   public static final String TIMER_CYCLE = "R3/PT10H";
 
   public static final String FAILED_JOB_RETRY_TIME_CYCLE = "R5/PT1M";
+  public static final String INCREMENTAL_INTERVALS = "R5/PT1M";
 
   @Rule
   public ExpectedException thrown = ExpectedException.none();
@@ -474,6 +476,7 @@ public class ProcessBuilderTest {
         .camundaJobPriority("${somePriority}")
         .camundaTaskPriority(TEST_SERVICE_TASK_PRIORITY)
         .camundaFailedJobRetryTimeCycle(FAILED_JOB_RETRY_TIME_CYCLE)
+        .camundaIncrementalIntervals(INCREMENTAL_INTERVALS)
       .endEvent()
       .done();
 
@@ -484,6 +487,7 @@ public class ProcessBuilderTest {
     assertThat(serviceTask.getCamundaTaskPriority()).isEqualTo(TEST_SERVICE_TASK_PRIORITY);
 
     assertCamundaFailedJobRetryTimeCycle(serviceTask);
+    assertCamundaIncrementalIntervals(serviceTask);
   }
 
   @Test
@@ -499,6 +503,7 @@ public class ProcessBuilderTest {
         .camundaType(TEST_STRING_API)
         .camundaTaskPriority(TEST_SERVICE_TASK_PRIORITY)
         .camundaFailedJobRetryTimeCycle(FAILED_JOB_RETRY_TIME_CYCLE)
+        .camundaIncrementalIntervals(INCREMENTAL_INTERVALS)
       .done();
 
     ServiceTask serviceTask = modelInstance.getModelElementById(TASK_ID);
@@ -511,14 +516,15 @@ public class ProcessBuilderTest {
     assertThat(serviceTask.getCamundaTaskPriority()).isEqualTo(TEST_SERVICE_TASK_PRIORITY);
 
     assertCamundaFailedJobRetryTimeCycle(serviceTask);
+    assertCamundaIncrementalIntervals(serviceTask);
   }
-  
+
   @Test
   public void testServiceTaskCamundaClass() {
     modelInstance = Bpmn.createProcess()
       .startEvent()
       .serviceTask(TASK_ID)
-        .camundaClass(getClass().getName())       
+        .camundaClass(getClass().getName())
       .done();
 
     ServiceTask serviceTask = modelInstance.getModelElementById(TASK_ID);
@@ -539,6 +545,7 @@ public class ProcessBuilderTest {
         .camundaType(TEST_STRING_API)
         .camundaTaskPriority(TEST_SERVICE_TASK_PRIORITY)
         .camundaFailedJobRetryTimeCycle(FAILED_JOB_RETRY_TIME_CYCLE)
+        .camundaIncrementalIntervals(INCREMENTAL_INTERVALS)
       .endEvent()
       .done();
 
@@ -552,6 +559,7 @@ public class ProcessBuilderTest {
     assertThat(sendTask.getCamundaTaskPriority()).isEqualTo(TEST_SERVICE_TASK_PRIORITY);
 
     assertCamundaFailedJobRetryTimeCycle(sendTask);
+    assertCamundaIncrementalIntervals(sendTask);
   }
 
   @Test
@@ -581,6 +589,7 @@ public class ProcessBuilderTest {
         .camundaFormKey(TEST_STRING_API)
         .camundaPriority(TEST_PRIORITY_API)
         .camundaFailedJobRetryTimeCycle(FAILED_JOB_RETRY_TIME_CYCLE)
+        .camundaIncrementalIntervals(INCREMENTAL_INTERVALS)
       .endEvent()
       .done();
 
@@ -597,6 +606,7 @@ public class ProcessBuilderTest {
     assertThat(userTask.getCamundaPriority()).isEqualTo(TEST_PRIORITY_API);
 
     assertCamundaFailedJobRetryTimeCycle(userTask);
+    assertCamundaIncrementalIntervals(userTask);
   }
 
   @Test
@@ -617,6 +627,7 @@ public class ProcessBuilderTest {
         .camundaMapDecisionResult("singleEntry")
         .camundaTaskPriority(TEST_SERVICE_TASK_PRIORITY)
         .camundaFailedJobRetryTimeCycle(FAILED_JOB_RETRY_TIME_CYCLE)
+        .camundaIncrementalIntervals(INCREMENTAL_INTERVALS)
       .endEvent()
       .done();
 
@@ -635,6 +646,7 @@ public class ProcessBuilderTest {
     assertThat(businessRuleTask.getCamundaTaskPriority()).isEqualTo(TEST_SERVICE_TASK_PRIORITY);
 
     assertCamundaFailedJobRetryTimeCycle(businessRuleTask);
+    assertCamundaIncrementalIntervals(businessRuleTask);
   }
 
   @Test
@@ -658,6 +670,7 @@ public class ProcessBuilderTest {
         .camundaResultVariable(TEST_STRING_API)
         .camundaResource(TEST_STRING_API)
         .camundaFailedJobRetryTimeCycle(FAILED_JOB_RETRY_TIME_CYCLE)
+        .camundaIncrementalIntervals(INCREMENTAL_INTERVALS)
       .endEvent()
       .done();
 
@@ -666,6 +679,7 @@ public class ProcessBuilderTest {
     assertThat(scriptTask.getCamundaResource()).isEqualTo(TEST_STRING_API);
 
     assertCamundaFailedJobRetryTimeCycle(scriptTask);
+    assertCamundaIncrementalIntervals(scriptTask);
   }
 
   @Test
@@ -678,6 +692,7 @@ public class ProcessBuilderTest {
         .camundaFormKey(TEST_STRING_API)
         .camundaInitiator(TEST_STRING_API)
         .camundaFailedJobRetryTimeCycle(FAILED_JOB_RETRY_TIME_CYCLE)
+        .camundaIncrementalIntervals(INCREMENTAL_INTERVALS)
       .done();
 
     StartEvent startEvent = modelInstance.getModelElementById(START_EVENT_ID);
@@ -688,6 +703,7 @@ public class ProcessBuilderTest {
     assertThat(startEvent.getCamundaInitiator()).isEqualTo(TEST_STRING_API);
 
     assertCamundaFailedJobRetryTimeCycle(startEvent);
+    assertCamundaIncrementalIntervals(startEvent);
   }
 
   @Test
@@ -740,6 +756,7 @@ public class ProcessBuilderTest {
         .camundaVariableMappingDelegateExpression(TEST_DELEGATE_EXPRESSION_API)
         .notCamundaExclusive()
         .camundaFailedJobRetryTimeCycle(FAILED_JOB_RETRY_TIME_CYCLE)
+        .camundaIncrementalIntervals(INCREMENTAL_INTERVALS)
       .endEvent()
       .done();
 
@@ -766,6 +783,7 @@ public class ProcessBuilderTest {
     assertThat(callActivity.getCamundaVariableMappingClass()).isEqualTo(TEST_CLASS_API);
     assertThat(callActivity.getCamundaVariableMappingDelegateExpression()).isEqualTo(TEST_DELEGATE_EXPRESSION_API);
     assertCamundaFailedJobRetryTimeCycle(callActivity);
+    assertCamundaIncrementalIntervals(callActivity);
   }
 
   @Test
@@ -2799,6 +2817,14 @@ public class ProcessBuilderTest {
     CamundaFailedJobRetryTimeCycle camundaFailedJobRetryTimeCycle = element.getExtensionElements().getElementsQuery().filterByType(CamundaFailedJobRetryTimeCycle.class).singleResult();
     assertThat(camundaFailedJobRetryTimeCycle).isNotNull();
     assertThat(camundaFailedJobRetryTimeCycle.getTextContent()).isEqualTo(FAILED_JOB_RETRY_TIME_CYCLE);
+  }
+
+  protected void assertCamundaIncrementalIntervals(BaseElement element) {
+    assertThat(element.getExtensionElements()).isNotNull();
+
+    CamundaIncrementalIntervals camundaIncrementalIntervals = element.getExtensionElements().getElementsQuery().filterByType(CamundaIncrementalIntervals.class).singleResult();
+    assertThat(camundaIncrementalIntervals).isNotNull();
+    assertThat(camundaIncrementalIntervals.getTextContent()).isEqualTo(INCREMENTAL_INTERVALS);
   }
 
   @Test

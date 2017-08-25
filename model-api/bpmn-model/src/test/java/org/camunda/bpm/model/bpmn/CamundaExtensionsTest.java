@@ -94,6 +94,7 @@ import org.camunda.bpm.model.bpmn.instance.camunda.CamundaFormData;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaFormField;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaFormProperty;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaIn;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaIncrementalIntervals;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaInputOutput;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaInputParameter;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaList;
@@ -588,6 +589,14 @@ public class CamundaExtensionsTest {
   @Test
   public void testFailedJobRetryTimeCycleExtension() {
     CamundaFailedJobRetryTimeCycle timeCycle = sendTask.getExtensionElements().getElementsQuery().filterByType(CamundaFailedJobRetryTimeCycle.class).singleResult();
+    assertThat(timeCycle.getTextContent()).isEqualTo(TEST_STRING_XML);
+    timeCycle.setTextContent(TEST_STRING_API);
+    assertThat(timeCycle.getTextContent()).isEqualTo(TEST_STRING_API);
+  }
+
+  @Test
+  public void testIncrementalIntervalsExtension() {
+    CamundaIncrementalIntervals timeCycle = sendTask.getExtensionElements().getElementsQuery().filterByType(CamundaIncrementalIntervals.class).singleResult();
     assertThat(timeCycle.getTextContent()).isEqualTo(TEST_STRING_XML);
     timeCycle.setTextContent(TEST_STRING_API);
     assertThat(timeCycle.getTextContent()).isEqualTo(TEST_STRING_API);

@@ -45,6 +45,7 @@ import org.camunda.bpm.model.bpmn.impl.instance.camunda.CamundaFormDataImpl;
 import org.camunda.bpm.model.bpmn.impl.instance.camunda.CamundaFormFieldImpl;
 import org.camunda.bpm.model.bpmn.impl.instance.camunda.CamundaFormPropertyImpl;
 import org.camunda.bpm.model.bpmn.impl.instance.camunda.CamundaInImpl;
+import org.camunda.bpm.model.bpmn.impl.instance.camunda.CamundaIncrementalIntervalsImpl;
 import org.camunda.bpm.model.bpmn.impl.instance.camunda.CamundaInputOutputImpl;
 import org.camunda.bpm.model.bpmn.impl.instance.camunda.CamundaInputParameterImpl;
 import org.camunda.bpm.model.bpmn.impl.instance.camunda.CamundaListImpl;
@@ -485,6 +486,7 @@ public class Bpmn {
     CamundaExecutionListenerImpl.registerType(bpmnModelBuilder);
     CamundaExpressionImpl.registerType(bpmnModelBuilder);
     CamundaFailedJobRetryTimeCycleImpl.registerType(bpmnModelBuilder);
+    CamundaIncrementalIntervalsImpl.registerType(bpmnModelBuilder);
     CamundaFieldImpl.registerType(bpmnModelBuilder);
     CamundaFormDataImpl.registerType(bpmnModelBuilder);
     CamundaFormFieldImpl.registerType(bpmnModelBuilder);

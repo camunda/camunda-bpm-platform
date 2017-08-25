@@ -20,6 +20,7 @@ import org.camunda.bpm.model.bpmn.instance.*;
 import org.camunda.bpm.model.bpmn.instance.bpmndi.BpmnShape;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaExecutionListener;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaFailedJobRetryTimeCycle;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaIncrementalIntervals;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 
 /**
@@ -412,11 +413,19 @@ public abstract class AbstractFlowNodeBuilder<B extends AbstractFlowNodeBuilder<
     return myself;
   }
 
+  public B camundaIncrementalIntervals(String incrementalIntervals) {
+    CamundaIncrementalIntervals intervals = createInstance(CamundaIncrementalIntervals.class);
+    intervals.setTextContent(incrementalIntervals);
+
+    addExtensionElement(intervals);
+    return myself;
+  }
+
   @SuppressWarnings("rawtypes")
   public B camundaExecutionListenerClass(String eventName, Class listenerClass) {
     return camundaExecutionListenerClass(eventName, listenerClass.getName());
   }
-  
+
   public B camundaExecutionListenerClass(String eventName, String fullQualifiedClassName) {
     CamundaExecutionListener executionListener = createInstance(CamundaExecutionListener.class);
     executionListener.setCamundaEvent(eventName);

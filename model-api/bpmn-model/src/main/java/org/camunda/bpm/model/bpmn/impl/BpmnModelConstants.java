@@ -266,6 +266,7 @@ public final class BpmnModelConstants {
   public static final String CAMUNDA_ELEMENT_EXECUTION_LISTENER = "executionListener";
   public static final String CAMUNDA_ELEMENT_EXPRESSION = "expression";
   public static final String CAMUNDA_ELEMENT_FAILED_JOB_RETRY_TIME_CYCLE = "failedJobRetryTimeCycle";
+  public static final String CAMUNDA_ELEMENT_INCREMENTAL_INTERVALS = "incrementalIntervals";
   public static final String CAMUNDA_ELEMENT_FIELD = "field";
   public static final String CAMUNDA_ELEMENT_FORM_DATA = "formData";
   public static final String CAMUNDA_ELEMENT_FORM_FIELD = "formField";
