@@ -142,7 +142,7 @@ public class DefaultJobRetryCmd extends JobRetryCmd {
 
   protected String getFailedJobRetryTimeCycle(JobEntity job, ActivityImpl activity) {
 
-    Expression expression = activity.getProperties().get(DefaultFailedJobParseListener.FOX_FAILED_JOB_CONFIGURATION);
+    Expression expression = activity.getProperties().get(DefaultFailedJobParseListener.FAILED_JOB_CONFIGURATION);
 
     String executionId = job.getExecutionId();
     ExecutionEntity execution = null;

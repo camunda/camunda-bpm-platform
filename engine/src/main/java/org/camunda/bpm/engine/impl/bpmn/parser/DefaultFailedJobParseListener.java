@@ -48,13 +48,13 @@ public class DefaultFailedJobParseListener extends AbstractBpmnParseListener {
   @Deprecated
   public static final Namespace FOX_ENGINE_NS = new Namespace("http://www.camunda.com/fox");
 
-  public static final PropertyKey<Expression> FOX_FAILED_JOB_CONFIGURATION = new PropertyKey<Expression>("FOX_FAILED_JOB_CONFIGURATION");
-  public static final PropertyListKey<String> FAILED_JOB_INTERVALS= new PropertyListKey<String>("FAILED_JOB_INTERVALS");
+  public static final PropertyKey<Expression> FAILED_JOB_CONFIGURATION = new PropertyKey<Expression>("FAILED_JOB_CONFIGURATION");
+  public static final PropertyListKey<String> FAILED_JOB_INTERVALS = new PropertyListKey<String>("FAILED_JOB_INTERVALS");
 
   @Override
   public void parseStartEvent(Element startEventElement, ScopeImpl scope, ActivityImpl startEventActivity) {
     String type = startEventActivity.getProperties().get(BpmnProperties.TYPE);
-    if (type != null && type.equals(START_TIMER_EVENT)){
+    if (type != null && type.equals(START_TIMER_EVENT)) {
       this.setFailedJobRetryTimeCycleValue(startEventElement, startEventActivity);
     }
   }
@@ -170,7 +170,7 @@ public class DefaultFailedJobParseListener extends AbstractBpmnParseListener {
         String failedJobRetryTimeCycleValue = failedJobRetryTimeCycleElement.getText();
         ExpressionManager expressionManager = Context.getProcessEngineConfiguration().getExpressionManager();
         Expression expression = expressionManager.createExpression(failedJobRetryTimeCycleValue);
-        activity.getProperties().set(FOX_FAILED_JOB_CONFIGURATION, expression);
+        activity.getProperties().set(FAILED_JOB_CONFIGURATION, expression);
       }
 
       setFailedJobIncrementalIntervals(activity, extensionElements);
@@ -179,7 +179,7 @@ public class DefaultFailedJobParseListener extends AbstractBpmnParseListener {
 
   private void setFailedJobIncrementalIntervals(ActivityImpl activity, Element extensionElements) {
     Element failedJobIncrementalIntervals = extensionElements.elementNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, FAILED_JOB_INCREMENTAL_INTERVALS);
-    if (failedJobIncrementalIntervals!= null) {
+    if (failedJobIncrementalIntervals != null) {
       String value = failedJobIncrementalIntervals.getText();
       List<String> intervals = new ArrayList<String>(Arrays.asList(value.trim().split("\\s*,\\s*")));
       activity.getProperties().set(FAILED_JOB_INTERVALS, intervals);

@@ -12,13 +12,7 @@
  */
 package org.camunda.bpm.container.impl.jboss.config;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
-import org.camunda.bpm.engine.impl.bpmn.parser.DefaultFailedJobParseListener;
 import org.camunda.bpm.engine.impl.cfg.JtaProcessEngineConfiguration;
-import org.camunda.bpm.engine.impl.jobexecutor.DefaultFailedJobCommandFactory;
 import org.camunda.bpm.engine.impl.persistence.StrongUuidGenerator;
 
 /**
@@ -32,24 +26,6 @@ public class ManagedJtaProcessEngineConfiguration extends JtaProcessEngineConfig
     // override job executor auto activate: set to true in shared engine scenario
     // if it is not specified (see #CAM-4817)
     setJobExecutorActivate(true);
-  }
-
-  @Override
-  protected void init() {
-    initCustomJobRetryStrategy();
-    super.init();
-  }
-
-  protected void initCustomJobRetryStrategy() {
-    // hook custom Failed Job Support
-    List<BpmnParseListener> customPostBPMNParseListeners = getCustomPostBPMNParseListeners();
-    if(customPostBPMNParseListeners==null) {
-      customPostBPMNParseListeners = new ArrayList<BpmnParseListener>();
-      setCustomPostBPMNParseListeners(customPostBPMNParseListeners);
-    }
-    customPostBPMNParseListeners.add(new DefaultFailedJobParseListener());
-
-    setFailedJobCommandFactory(new DefaultFailedJobCommandFactory());
   }
 
   protected void initIdGenerator() {

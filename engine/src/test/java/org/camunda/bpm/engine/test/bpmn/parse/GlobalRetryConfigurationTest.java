@@ -22,7 +22,6 @@ import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
@@ -30,7 +29,6 @@ import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -61,28 +59,32 @@ public class GlobalRetryConfigurationTest {
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(testRule);
 
-  private Deployment currentDeployment;
   private RuntimeService runtimeService;
   private ManagementService managementService;
 
   @Before
   public void setUp() {
-    BpmnModelInstance instance = prepareSignalEventProcessWithoutRetry();
-    currentDeployment = testRule.deploy(instance);
     runtimeService = engineRule.getRuntimeService();
     managementService = engineRule.getManagementService();
   }
 
-  @After
-  public void tearDown() {
-    engineRule.getRepositoryService().deleteDeployment(currentDeployment.getId(), true, true);
+  @Test
+  public void testFailedServiceTaskStandardStrategy() {
+    engineRule.getProcessEngineConfiguration().setFailedJobRetryTimeCycle(null);
+    BpmnModelInstance bpmnModelInstance = prepareFailingServiceTask();
+
+    testRule.deploy(bpmnModelInstance);
+
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey(PROCESS_ID);
+
+    assertJobRetries(pi, 2);
   }
 
   @Test
   public void testFailedIntermediateThrowingSignalEventAsync() {
     BpmnModelInstance bpmnModelInstance = prepareSignalEventProcessWithoutRetry();
 
-    currentDeployment = testRule.deploy(bpmnModelInstance);
+    testRule.deploy(bpmnModelInstance);
     ProcessInstance pi = runtimeService.startProcessInstanceByKey(PROCESS_ID);
     assertJobRetries(pi, 4);
   }
@@ -91,7 +93,7 @@ public class GlobalRetryConfigurationTest {
   public void testFailedServiceTask() {
     BpmnModelInstance bpmnModelInstance = prepareFailingServiceTask();
 
-    currentDeployment = testRule.deploy(bpmnModelInstance);
+    testRule.deploy(bpmnModelInstance);
 
     ProcessInstance pi = runtimeService.startProcessInstanceByKey(PROCESS_ID);
 
@@ -102,7 +104,7 @@ public class GlobalRetryConfigurationTest {
   public void testFailedServiceTaskMixConfiguration() {
     BpmnModelInstance bpmnModelInstance = prepareFailingServiceTaskWithRetryCycle();
 
-    currentDeployment = testRule.deploy(bpmnModelInstance);
+    testRule.deploy(bpmnModelInstance);
 
     ProcessInstance pi = runtimeService.startProcessInstanceByKey(PROCESS_ID);
 
@@ -113,7 +115,7 @@ public class GlobalRetryConfigurationTest {
   public void testFailedBusinessRuleTask() {
     BpmnModelInstance bpmnModelInstance = prepareFailingBusinessRuleTask();
 
-    currentDeployment = testRule.deploy(bpmnModelInstance);
+    testRule.deploy(bpmnModelInstance);
 
     ProcessInstance pi = runtimeService.startProcessInstanceByKey(PROCESS_ID);
 
@@ -123,7 +125,7 @@ public class GlobalRetryConfigurationTest {
   @Test
   public void testFailedCallActivity() {
 
-    currentDeployment = testRule.deploy(
+    testRule.deploy(
       Bpmn.createExecutableProcess(PROCESS_ID)
         .startEvent()
         .callActivity()
@@ -147,7 +149,7 @@ public class GlobalRetryConfigurationTest {
   public void testFailingScriptTask() {
     BpmnModelInstance bpmnModelInstance = prepareFailingScriptTask();
 
-    currentDeployment = testRule.deploy(bpmnModelInstance);
+    testRule.deploy(bpmnModelInstance);
 
     ProcessInstance pi = runtimeService.startProcessInstanceByKey(PROCESS_ID);
 
@@ -158,7 +160,7 @@ public class GlobalRetryConfigurationTest {
   public void testFailingSubProcess() {
     BpmnModelInstance bpmnModelInstance = prepareFailingSubProcess();
 
-    currentDeployment = testRule.deploy(bpmnModelInstance);
+    testRule.deploy(bpmnModelInstance);
 
     ProcessInstance pi = runtimeService.startProcessInstanceByKey(PROCESS_ID);
 
