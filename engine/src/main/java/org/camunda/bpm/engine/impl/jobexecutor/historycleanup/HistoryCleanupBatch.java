@@ -77,7 +77,7 @@ public class HistoryCleanupBatch {
       recordValue(Metrics.HISTORY_CLEANUP_REMOVED_CASE_INSTANCES, historicCaseInstanceIds.size());
     }
     if (historicBatchIds.size() > 0) {
-      commandContext.getHistoricBatchManager().deleteHistoricBatchByIds(historicBatchIds);
+      commandContext.getHistoricBatchManager().deleteHistoricBatchesByIds(historicBatchIds);
       recordValue(Metrics.HISTORY_CLEANUP_REMOVED_BATCH_INSTANCES, historicBatchIds.size());
     }
   }

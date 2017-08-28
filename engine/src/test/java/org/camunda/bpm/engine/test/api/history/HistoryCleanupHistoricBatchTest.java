@@ -243,8 +243,6 @@ public class HistoryCleanupHistoricBatchTest {
     int cancelationCountBatch = 20;
     batchIds.addAll(createCancelationBatchList(cancelationCountBatch));
 
-    List<String> byteArrayIds = findExceptionByteArrayIds();
-
     ClockUtil.setCurrentTime(DateUtils.addDays(startDate, -7));
 
     for (String batchId : batchIds) {
@@ -262,8 +260,6 @@ public class HistoryCleanupHistoricBatchTest {
 
     // then
     assertEquals(0,  historyService.createHistoricBatchQuery().count());
-    assertEquals(0, historyService.createHistoricIncidentQuery().count());
-    verifyByteArraysWereRemoved(byteArrayIds.toArray(new String[] {}));
     for (String batchId : batchIds) {
       assertEquals(0, historyService.createHistoricJobLogQuery().jobDefinitionConfiguration(batchId).count());
     }
@@ -291,8 +287,6 @@ public class HistoryCleanupHistoricBatchTest {
     int cancelationCountBatch = 20;
     batchIds.addAll(createCancelationBatchList(cancelationCountBatch));
 
-    List<String> byteArrayIds = findExceptionByteArrayIds();
-
     ClockUtil.setCurrentTime(DateUtils.addDays(startDate, -8));
 
     for (String batchId : batchIds) {
@@ -311,8 +305,6 @@ public class HistoryCleanupHistoricBatchTest {
     // then
     HistoricBatch modificationHistoricBatch = historyService.createHistoricBatchQuery().singleResult(); // the other batches should be cleaned
     assertEquals(modificationBatch.getId(), modificationHistoricBatch.getId());
-    assertEquals(0, historyService.createHistoricIncidentQuery().count());
-    verifyByteArraysWereRemoved(byteArrayIds.toArray(new String[] {}));
     assertEquals(2, historyService.createHistoricJobLogQuery().jobDefinitionConfiguration(modificationBatch.getId()).count());
     batchIds.remove(modificationBatch.getId());
     for (String batchId : batchIds) {

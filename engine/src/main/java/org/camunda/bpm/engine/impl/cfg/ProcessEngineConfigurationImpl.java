@@ -811,25 +811,25 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     if (batchOperationsForHistoryCleanup == null) {
       batchOperationsForHistoryCleanup = new HashMap<String, String>();
     } else {
-      for (String operation : batchOperationsForHistoryCleanup.keySet()) {
-        String propertyValue = batchOperationsForHistoryCleanup.get(operation);
-        if (!batchHandlers.keySet().contains(operation)) {
-          LOG.invalidBatchOperation(operation, propertyValue);
+      for (String batchOperation : batchOperationsForHistoryCleanup.keySet()) {
+        String timeToLive = batchOperationsForHistoryCleanup.get(batchOperation);
+        if (!batchHandlers.keySet().contains(batchOperation)) {
+          LOG.invalidBatchOperation(batchOperation, timeToLive);
         }
 
         try {
-          ParseUtil.parseHistoryTimeToLive(propertyValue);
+          ParseUtil.parseHistoryTimeToLive(timeToLive);
         } catch (Exception e) {
-          throw LOG.invalidPropertyValue("history time to live for " + operation + " batch operations", propertyValue, e);
+          throw LOG.invalidPropertyValue("history time to live for " + batchOperation + " batch operations", timeToLive, e);
         }
       }
     }
 
     if (batchHandlers != null && batchOperationHistoryTimeToLive != null) {
 
-      for (String key : batchHandlers.keySet()) {
-        if (!batchOperationsForHistoryCleanup.containsKey(key)) {
-          batchOperationsForHistoryCleanup.put(key, batchOperationHistoryTimeToLive);
+      for (String batchOperation : batchHandlers.keySet()) {
+        if (!batchOperationsForHistoryCleanup.containsKey(batchOperation)) {
+          batchOperationsForHistoryCleanup.put(batchOperation, batchOperationHistoryTimeToLive);
         }
       }
     }

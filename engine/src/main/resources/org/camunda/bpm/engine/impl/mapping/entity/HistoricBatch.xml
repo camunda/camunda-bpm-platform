@@ -146,21 +146,18 @@
 
   <select id="selectHistoricBatchIdsForCleanup" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
-    <bind name="date" value="'b.END_TIME_'"/>
+    <bind name="date" value="'RES.END_TIME_'"/>
     <bind name="currentTimestamp" value="parameter.currentTimestamp"/>
     ${limitBefore}
-    SELECT DISTINCT RES.*
+    SELECT RES.ID_, RES.END_TIME_
     ${limitBetween}
-    FROM (
-      SELECT b.ID_, b.END_TIME_
-      FROM ${prefix}ACT_HI_BATCH b
-      WHERE
-      <foreach index="key" item="value" collection="parameter.map" open="(" separator="OR" close=")">
-        <bind name="days" value="'#{value}'"/>
-        b.TYPE_ = #{key} and ${dayComparator}
-      </foreach>
-      AND b.END_TIME_ is not null
-    ) RES
+    FROM ${prefix}ACT_HI_BATCH RES
+    WHERE
+    <foreach index="key" item="value" collection="parameter.map" open="(" separator="OR" close=")">
+      <bind name="days" value="'#{value}'"/>
+      RES.TYPE_ = #{key} and ${dayComparator}
+    </foreach>
+    AND RES.END_TIME_ is not null
     ${orderBy}
     ${limitAfter}
   </select>

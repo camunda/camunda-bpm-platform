@@ -105,12 +105,12 @@ public abstract class HistoryCleanupHelper {
 
   public static Map<String, Integer> getBatchOperationsForHistoryCleanup(CommandContext commandContext) {
     Map<String, String> batchOperationsForHistoryCleanup = commandContext.getProcessEngineConfiguration().getBatchOperationsForHistoryCleanup();
-    Map<String, Integer> result = new HashMap<String, Integer>();
+    Map<String, Integer> batchOperations = new HashMap<String, Integer>();
     for (String operation : batchOperationsForHistoryCleanup.keySet()) {
       Integer historyTimeToLive = ParseUtil.parseHistoryTimeToLive(batchOperationsForHistoryCleanup.get(operation));
-      result.put(operation, historyTimeToLive);
+      batchOperations.put(operation, historyTimeToLive);
     }
-    return result;
+    return batchOperations;
   }
 
   /**

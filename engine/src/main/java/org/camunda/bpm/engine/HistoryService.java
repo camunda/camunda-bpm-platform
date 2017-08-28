@@ -171,8 +171,10 @@ public interface HistoryService {
   void deleteHistoricProcessInstancesBulk(List<String> processInstanceIds);
 
   /**
-   * Schedules history cleanup job at batch window start time. The job will delete historic data for finished processes
-   * taking into account {@link ProcessDefinition#getHistoryTimeToLive()} value.
+   * Schedules history cleanup job at batch window start time. The job will delete historic data for
+   * finished process, decision and case instances, and batch operations taking into account {@link ProcessDefinition#getHistoryTimeToLive()},
+   * {@link DecisionDefinition#getHistoryTimeToLive()}, {@link CaseDefinition#getHistoryTimeToLive()}, {@link ProcessEngineConfigurationImpl#getBatchOperationHistoryTimeToLive()}
+   * and {@link ProcessEngineConfigurationImpl#getBatchOperationsForHistoryCleanup()} values.
    *
    * @throws AuthorizationException
    *          If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#PROCESS_DEFINITION}
@@ -181,8 +183,10 @@ public interface HistoryService {
   Job cleanUpHistoryAsync();
 
   /**
-   * Schedules history cleanup job. The job will delete historic data for finished processes
-   * taking into account {@link ProcessDefinition#getHistoryTimeToLive()} value.
+   * Schedules history cleanup job at batch window start time. The job will delete historic data for
+   * finished process, decision and case instances, and batch operations taking into account {@link ProcessDefinition#getHistoryTimeToLive()},
+   * {@link DecisionDefinition#getHistoryTimeToLive()}, {@link CaseDefinition#getHistoryTimeToLive()}, {@link ProcessEngineConfigurationImpl#getBatchOperationHistoryTimeToLive()}
+   * and {@link ProcessEngineConfigurationImpl#getBatchOperationsForHistoryCleanup()} values.
    *
    * @param immediatelyDue must be true if cleanup must be scheduled at once, otherwise is will be scheduled according to configured batch window
    * @throws AuthorizationException
