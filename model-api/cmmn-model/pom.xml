@@ -11,7 +11,7 @@
 
   <groupId>org.camunda.bpm.model</groupId>
   <artifactId>camunda-cmmn-model</artifactId>
-  <version>7.8.0-SNAPSHOT</version>
+  <version>7.8.0-alpha3</version>
   <name>camunda BPM - CMMN Model API</name>
   <packaging>jar</packaging>
 
@@ -167,7 +167,7 @@
     <url>https://github.com/camunda/camunda-cmmn-model</url>
     <connection>scm:git:git@github.com:camunda/camunda-cmmn-model.git</connection>
     <developerConnection>scm:git:git@github.com:camunda/camunda-cmmn-model.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>7.8.0-alpha3</tag>
   </scm>
 
   <issueManagement>
