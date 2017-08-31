@@ -1,5 +1,7 @@
 package org.camunda.bpm.engine.impl.util;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -45,5 +47,9 @@ public class ParseUtil {
     }
 
     return result;
+  }
+
+  public static ArrayList<String> parseRetryIntervals(String failedJobRetryIntervals) {
+    return new ArrayList<String>(Arrays.asList(failedJobRetryIntervals.trim().split("\\s*,\\s*")));
   }
 }

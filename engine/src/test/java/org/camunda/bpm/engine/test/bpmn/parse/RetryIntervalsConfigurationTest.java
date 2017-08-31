@@ -24,25 +24,29 @@ import org.apache.commons.lang.time.DateUtils;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.batch.Batch;
+import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
-import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.test.api.AbstractAsyncOperationsTest;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
-public class IncremenatalRetryIntervalConfigurationTest {
+public class RetryIntervalsConfigurationTest extends AbstractAsyncOperationsTest {
 
   private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
   private static final String PROCESS_ID = "process";
@@ -50,8 +54,7 @@ public class IncremenatalRetryIntervalConfigurationTest {
 
   public ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
     public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
-      configuration.setFailedJobRetryTimeCycle("R6/PT5M");
-      configuration.setIncrementalIntervals("PT20M, PT3M");
+      configuration.setFailedJobRetryTimeCycle("PT5M,PT20M, PT3M");
       return configuration;
     }
   };
@@ -65,7 +68,6 @@ public class IncremenatalRetryIntervalConfigurationTest {
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(testRule);
 
-  private Deployment currentDeployment;
   private RuntimeService runtimeService;
   private ManagementService managementService;
 
@@ -76,19 +78,23 @@ public class IncremenatalRetryIntervalConfigurationTest {
   }
 
   @After
-  public void tearDown() {
-    if (currentDeployment != null) {
-
-      engineRule.getRepositoryService().deleteDeployment(currentDeployment.getId(), true, true);
+  public void cleanBatch() {
+    Batch batch = managementService.createBatchQuery().singleResult();
+    if (batch != null) {
+      managementService.deleteBatch(batch.getId(), true);
     }
-    ClockUtil.setCurrentTime(new Date());
+
+    HistoricBatch historicBatch = engineRule.getHistoryService().createHistoricBatchQuery().singleResult();
+    if (historicBatch != null) {
+      engineRule.getHistoryService().deleteHistoricBatch(historicBatch.getId());
+    }
   }
 
   @Test
   public void testFailedServiceTask() throws ParseException {
-    // given global retry conf. ("R6/PT5M") & ("PT20M, PT3M")
-    BpmnModelInstance bpmnModelInstance = prepareFailingServiceTask();
-    currentDeployment = testRule.deploy(bpmnModelInstance);
+    // given global retry conf. ("PT5M,PT20M, PT3M")
+    BpmnModelInstance bpmnModelInstance = prepareProcessFailingServiceTask();
+    testRule.deploy(bpmnModelInstance);
 
     ClockUtil.setCurrentTime(SIMPLE_DATE_FORMAT.parse("2017-01-01T09:55:00"));
 
@@ -100,32 +106,30 @@ public class IncremenatalRetryIntervalConfigurationTest {
     String processInstanceId = pi.getProcessInstanceId();
 
     int jobRetries = executeJob(processInstanceId);
-    assertEquals(5, jobRetries);
+    assertEquals(2, jobRetries);
     currentTime = DateUtils.addMinutes(currentTime, 5);
     assertLockExpirationTime(currentTime);
     ClockUtil.setCurrentTime(currentTime);
 
     jobRetries = executeJob(processInstanceId);
-    assertEquals(4, jobRetries);
+    assertEquals(1, jobRetries);
     currentTime = DateUtils.addMinutes(currentTime, 20);
     assertLockExpirationTime(currentTime);
     ClockUtil.setCurrentTime(currentTime);
 
-    for (int i = 0; i < 4; i++) {
-      jobRetries = executeJob(processInstanceId);
-      assertEquals(3 - i, jobRetries);
-      currentTime = DateUtils.addMinutes(currentTime, 3);
-      assertLockExpirationTime(currentTime);
-      ClockUtil.setCurrentTime(currentTime);
-    }
+    jobRetries = executeJob(processInstanceId);
+    assertEquals(0, jobRetries);
+    currentTime = DateUtils.addMinutes(currentTime, 3);
+    assertLockExpirationTime(currentTime);
+    ClockUtil.setCurrentTime(currentTime);
   }
 
   @Test
   public void testFailedServiceTaskMixConfiguration() throws ParseException {
-    // given local retry conf. "R3/PT1M"
-    BpmnModelInstance bpmnModelInstance = prepareFailingServiceTaskWithRetryCycle();
+    // given
+    BpmnModelInstance bpmnModelInstance = prepareProcessFailingServiceTaskWithRetryCycle("R3/PT1M");
 
-    currentDeployment = testRule.deploy(bpmnModelInstance);
+    testRule.deploy(bpmnModelInstance);
 
     ClockUtil.setCurrentTime(SIMPLE_DATE_FORMAT.parse("2017-01-01T09:55:00"));
 
@@ -150,9 +154,9 @@ public class IncremenatalRetryIntervalConfigurationTest {
 
   @Test
   public void testFailedServiceTaskIncrementalIntervals() throws ParseException {
-    // given local retry conf. ("R5/PT3M") & ("PT10M,PT8M")
-    BpmnModelInstance bpmnModelInstance = prepareFailingServiceTaskWithRetryCycleAndInterval();
-    currentDeployment = testRule.deploy(bpmnModelInstance);
+    // given
+    BpmnModelInstance bpmnModelInstance = prepareProcessFailingServiceTaskWithRetryCycle("PT3M, PT10M,PT8M");
+    testRule.deploy(bpmnModelInstance);
 
     ClockUtil.setCurrentTime(SIMPLE_DATE_FORMAT.parse("2017-01-01T09:55:00"));
 
@@ -165,24 +169,44 @@ public class IncremenatalRetryIntervalConfigurationTest {
     String processInstanceId = pi.getProcessInstanceId();
 
     int jobRetries = executeJob(processInstanceId);
-    assertEquals(4, jobRetries);
+    assertEquals(2, jobRetries);
     currentTime = DateUtils.addMinutes(currentTime, 3);
     assertLockExpirationTime(currentTime);
     ClockUtil.setCurrentTime(currentTime);
 
     jobRetries = executeJob(processInstanceId);
-    assertEquals(3, jobRetries);
+    assertEquals(1, jobRetries);
     currentTime = DateUtils.addMinutes(currentTime, 10);
     assertLockExpirationTime(currentTime);
     ClockUtil.setCurrentTime(currentTime);
 
-    for (int i = 0; i < 3; i++) {
-      jobRetries = executeJob(processInstanceId);
-      assertEquals(2 - i, jobRetries);
-      currentTime = DateUtils.addMinutes(currentTime, 8);
-      assertLockExpirationTime(currentTime);
-      ClockUtil.setCurrentTime(currentTime);
+    jobRetries = executeJob(processInstanceId);
+    assertEquals(0, jobRetries);
+    currentTime = DateUtils.addMinutes(currentTime, 8);
+    assertLockExpirationTime(currentTime);
+    ClockUtil.setCurrentTime(currentTime);
+  }
+
+  @Test
+  public void testFailedServiceTaskWithVarList() {
+    // given
+    BpmnModelInstance bpmnModelInstance = prepareProcessFailingServiceTaskWithRetryCycle("${var}");
+    testRule.deploy(bpmnModelInstance);
+
+    runtimeService.startProcessInstanceByKey("process", Variables.createVariables().putValue("var", "PT1M,PT2M,PT3M,PT4M,PT5M,PT6M,PT7M,PT8M"));
+
+    Job job = managementService.createJobQuery().singleResult();
+
+    // when job fails
+    try {
+      managementService.executeJob(job.getId());
+    } catch (Exception e) {
+      // ignore
     }
+
+    // then
+    job = managementService.createJobQuery().singleResult();
+    Assert.assertEquals(7, job.getRetries());
   }
 
   private int executeJob(String processInstanceId) {
@@ -208,7 +232,7 @@ public class IncremenatalRetryIntervalConfigurationTest {
     return managementService.createJobQuery().processInstanceId(processInstanceId).singleResult();
   }
 
-  private BpmnModelInstance prepareFailingServiceTask() {
+  private BpmnModelInstance prepareProcessFailingServiceTask() {
     BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(PROCESS_ID)
         .startEvent()
         .serviceTask()
@@ -219,26 +243,13 @@ public class IncremenatalRetryIntervalConfigurationTest {
     return modelInstance;
   }
 
-  private BpmnModelInstance prepareFailingServiceTaskWithRetryCycle() {
+  private BpmnModelInstance prepareProcessFailingServiceTaskWithRetryCycle(String retryTimeCycle) {
     BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(PROCESS_ID)
         .startEvent()
         .serviceTask()
           .camundaClass(FAILING_CLASS)
           .camundaAsyncBefore()
-          .camundaFailedJobRetryTimeCycle("R3/PT1M")
-        .endEvent()
-        .done();
-    return modelInstance;
-  }
-
-  private BpmnModelInstance prepareFailingServiceTaskWithRetryCycleAndInterval() {
-    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(PROCESS_ID)
-        .startEvent()
-        .serviceTask()
-          .camundaClass(FAILING_CLASS)
-          .camundaAsyncBefore()
-          .camundaFailedJobRetryTimeCycle("R5/PT3M")
-          .camundaIncrementalIntervals("PT10M,PT8M")
+          .camundaFailedJobRetryTimeCycle(retryTimeCycle)
         .endEvent()
         .done();
     return modelInstance;

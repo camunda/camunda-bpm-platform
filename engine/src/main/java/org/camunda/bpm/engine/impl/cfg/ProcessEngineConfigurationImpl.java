@@ -25,7 +25,6 @@ import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -712,8 +711,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   private int failedJobListenerMaxRetries = DEFAULT_FAILED_JOB_LISTENER_MAX_RETRIES;
 
   private String failedJobRetryTimeCycle;
-  private String incrementalIntervals;
-  private List<String> parsedIncrementalIntervals;
+  private List<String> parsedRetryIntervals;
 
   // buildProcessEngine ///////////////////////////////////////////////////////
 
@@ -882,8 +880,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
     postParseListeners.add(new DefaultFailedJobParseListener());
 
-    if (incrementalIntervals != null) {
-      parsedIncrementalIntervals = new ArrayList<String>(Arrays.asList(incrementalIntervals.trim().split("\\s*,\\s*")));
+    if (failedJobRetryTimeCycle != null) {
+      ArrayList<String> parsedIntervalsList = ParseUtil.parseRetryIntervals(failedJobRetryTimeCycle);
+      if (parsedIntervalsList.size() > 1) {
+        parsedRetryIntervals = parsedIntervalsList;
+      }
     }
   }
 
@@ -3819,19 +3820,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     this.failedJobRetryTimeCycle = failedJobRetryTimeCycle;
   }
 
-  public String getIncrementalIntervals() {
-    return incrementalIntervals;
+  public List<String> getParsedRetryIntervals() {
+    return parsedRetryIntervals;
   }
 
-  public void setIncrementalIntervals(String incrementalIntervals) {
-    this.incrementalIntervals = incrementalIntervals;
-  }
-
-  public List<String> getParsedIncrementalIntervals() {
-    return parsedIncrementalIntervals;
-  }
-
-  public void setParsedIncrementalIntervals(List<String> parsedIncrementalIntervals) {
-    this.parsedIncrementalIntervals = parsedIncrementalIntervals;
+  public void setParsedRetryIntervals(List<String> parsedRetryIntervals) {
+    this.parsedRetryIntervals = parsedRetryIntervals;
   }
 }

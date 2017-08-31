@@ -96,7 +96,7 @@ public class DurationHelper {
     return times;
   }
 
-  public Date getDateAfterRepeat(Date date) {
+  private Date getDateAfterRepeat(Date date) {
     if (start != null) {
       Date cur = start;
       for (int i=0;i<times && !cur.after(date);i++) {
@@ -112,12 +112,6 @@ public class DurationHelper {
       cur = add(cur, period.negate());
     }
     return next.before(date) ? null : next;
-  }
-
-  public DurationHelper withPeriod(String period) {
-    DurationHelper durationHelper = this;
-    durationHelper.period = datatypeFactory.newDuration(period);
-    return durationHelper;
   }
 
   private Date add(Date date, Duration duration) {

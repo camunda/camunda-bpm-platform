@@ -138,7 +138,7 @@ public class FoxFailedJobParseListenerTest extends PluggableProcessEngineTestCas
 
     assertTrue(activity.getProperties().contains(FAILED_JOB_CONFIGURATION));
 
-    Expression value = (Expression) activity.getProperties().get(FAILED_JOB_CONFIGURATION);
+    Expression value = (Expression) activity.getProperties().get(FAILED_JOB_CONFIGURATION).getRetryCycle();
     assertEquals("R5/PT5M", value.getExpressionText());
   }
 

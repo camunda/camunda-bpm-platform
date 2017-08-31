@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.parser.DefaultFailedJobParseListener;
+import org.camunda.bpm.engine.impl.bpmn.parser.FailedJobParseRetryConf;
 import org.camunda.bpm.engine.impl.calendar.DurationHelper;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.el.Expression;
@@ -24,7 +25,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
-import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.impl.util.ParseUtil;
 
 import java.util.Arrays;
 import java.util.List;
@@ -84,28 +85,29 @@ public class DefaultJobRetryCmd extends JobRetryCmd {
 
   protected void executeCustomStrategy(CommandContext commandContext, JobEntity job, ActivityImpl activity, String globalFailedJobRetryTimeCycle) throws Exception {
     String failedJobRetryTimeCycle = null;
-    List<String> incrementalIntervals = null;
+    List<String> retryIntervals = null;
     if (activity != null) {
-      failedJobRetryTimeCycle = getFailedJobRetryTimeCycle(job, activity);
-      incrementalIntervals = getIncrementalIntervals(activity);
+      FailedJobParseRetryConf failedJobParseRetryConf = activity.getProperties().get(DefaultFailedJobParseListener.FAILED_JOB_CONFIGURATION);
+      if(failedJobParseRetryConf.hasIntervals()){
+        retryIntervals = failedJobParseRetryConf.getRetryIntervals();
+      } else {
+        failedJobRetryTimeCycle = getFailedJobRetryTimeCycle(job,  failedJobParseRetryConf.getRetryCycle());
+        if (failedJobRetryTimeCycle.contains(",")) {
+          retryIntervals = ParseUtil.parseRetryIntervals(failedJobRetryTimeCycle);
+        }
+      }
     }
 
-    if (failedJobRetryTimeCycle == null && globalFailedJobRetryTimeCycle != null) {
-      failedJobRetryTimeCycle = globalFailedJobRetryTimeCycle;
-      incrementalIntervals = commandContext.getProcessEngineConfiguration().getParsedIncrementalIntervals();
-    }
-
-    if (failedJobRetryTimeCycle == null) {
+    if (failedJobRetryTimeCycle == null && retryIntervals == null) {
       executeStandardStrategy(commandContext);
 
     } else {
-      DurationHelper durationHelper = getDurationHelper(failedJobRetryTimeCycle);
+      DurationHelper durationHelper = getDurationHelper(job, failedJobRetryTimeCycle, retryIntervals);
+      job.setLockExpirationTime(durationHelper.getDateAfter());
 
-      setLockExpirationTime(job, incrementalIntervals, durationHelper);
-
-      if (isFirstJobExecution(job)) {
+      if (isFirstJobExecution(job) && retryIntervals == null) {
         // then change default retries to the ones configured
-        initializeRetries(job, durationHelper);
+        initializeRetries(job, durationHelper.getTimes());
 
       } else {
         LOG.debugDecrementingRetriesForJob(job.getId());
@@ -140,9 +142,7 @@ public class DefaultJobRetryCmd extends JobRetryCmd {
                   .findExecutionById(executionId);
   }
 
-  protected String getFailedJobRetryTimeCycle(JobEntity job, ActivityImpl activity) {
-
-    Expression expression = activity.getProperties().get(DefaultFailedJobParseListener.FAILED_JOB_CONFIGURATION);
+  protected String getFailedJobRetryTimeCycle(JobEntity job, Expression expression) {
 
     String executionId = job.getExecutionId();
     ExecutionEntity execution = null;
@@ -175,27 +175,25 @@ public class DefaultJobRetryCmd extends JobRetryCmd {
 
   }
 
-  protected List<String> getIncrementalIntervals(ActivityImpl activity) {
-    return activity.getProperties().get(DefaultFailedJobParseListener.FAILED_JOB_INTERVALS);
+  protected DurationHelper getDurationHelper(JobEntity job, String failedJobRetryTimeCycle, List<String> retryIntervals) throws Exception {
+    DurationHelper durationHelper = null;
+    if (retryIntervals == null || retryIntervals.isEmpty()) {
+      durationHelper = getDurationHelper(failedJobRetryTimeCycle);
+    } else {
+      if (isFirstJobExecution(job)) {
+        initializeRetries(job, retryIntervals.size());
+      }
+      if (retryIntervals.size() >= job.getRetries()) {
+        durationHelper = getDurationHelper(retryIntervals.get(retryIntervals.size() - job.getRetries()));
+      } else {
+        durationHelper = getDurationHelper(retryIntervals.get(retryIntervals.size() - 1));
+      }
+    }
+    return durationHelper;
   }
 
   protected DurationHelper getDurationHelper(String failedJobRetryTimeCycle) throws Exception {
     return new DurationHelper(failedJobRetryTimeCycle);
-  }
-
-  protected void setLockExpirationTime(JobEntity job, List<String> incrementalIntervals, DurationHelper durationHelper) {
-    if (incrementalIntervals == null || incrementalIntervals.isEmpty() || isFirstJobExecution(job)) {
-      job.setLockExpirationTime(durationHelper.getDateAfter());
-    } else {
-      int i = durationHelper.getTimes() - job.getRetries();
-      String period = null;
-      if ((i - 1) < incrementalIntervals.size()) {
-        period = incrementalIntervals.get(i - 1);
-      } else {
-        period = incrementalIntervals.get(incrementalIntervals.size() - 1);
-      }
-      job.setLockExpirationTime(durationHelper.withPeriod(period).getDateAfterRepeat(ClockUtil.getCurrentTime()));
-    }
   }
 
   protected boolean isFirstJobExecution(JobEntity job) {
@@ -207,9 +205,9 @@ public class DefaultJobRetryCmd extends JobRetryCmd {
     return job.getExceptionByteArrayId() == null && job.getExceptionMessage() == null;
   }
 
-  protected void initializeRetries(JobEntity job, DurationHelper durationHelper) {
-    LOG.debugInitiallyAppyingRetryCycleForJob(job.getId(),  durationHelper.getTimes());
-    job.setRetries(durationHelper.getTimes());
+  protected void initializeRetries(JobEntity job, int retries) {
+    LOG.debugInitiallyAppyingRetryCycleForJob(job.getId(), retries);
+    job.setRetries(retries);
   }
 
 }
