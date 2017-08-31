@@ -26,6 +26,7 @@ function CamPaginationSearchIntegrationController($scope, $rootScope, searchWidg
     'blocked'
   ]);
 
+
   this.arrayTypes = angular.isArray(this.arrayTypes) ? this.arrayTypes : [];
   this.variableTypes = angular.isArray(this.variableTypes) ? this.variableTypes : [];
   this.pages = {

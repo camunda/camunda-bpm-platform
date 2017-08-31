@@ -12,8 +12,8 @@ var camCommons = require('camunda-commons-ui/lib');
 var ngModule = angular.module('cam.cockpit.pages.processDefinition', ['dataDepend', camCommons.name]);
 
 var Controller = [
-  '$location', '$scope', '$rootScope', '$q', 'search', 'ProcessDefinitionResource', 'ProcessInstanceResource', 'Views', 'Data', 'Transform', 'Variables', 'dataDepend', 'processDefinition', 'page',
-  function($location, $scope,   $rootScope,   $q,   search,   ProcessDefinitionResource,   ProcessInstanceResource,   Views,   Data,   Transform,   Variables,   dataDepend,   processDefinition,   page
+  '$location', '$scope', '$rootScope', '$q', '$filter', 'search', 'ProcessDefinitionResource', 'ProcessInstanceResource', 'JobDefinitionResource', 'Views', 'Data', 'Transform', 'Variables', 'dataDepend', 'processDefinition', 'page',
+  function($location, $scope,   $rootScope,   $q,   $filter,   search,   ProcessDefinitionResource,   ProcessInstanceResource,   JobDefinitionResource,   Views,   Data,   Transform,   Variables,   dataDepend,   processDefinition,   page
   ) {
     var processData = $scope.processData = dataDepend.create($scope);
     var pageData = $scope.pageData = dataDepend.create($scope);
@@ -96,7 +96,6 @@ var Controller = [
     function parseFilterFromUri() {
       var params = search(),
           filter;
-
       filter = {
         activityIds: searchWidgetUtils.getActivityIdsFromUrlParams('activityIdIn', params),
         parentProcessDefinitionId: params.parentProcessDefinitionId
@@ -204,6 +203,53 @@ var Controller = [
 
       return diagram;
     }]);
+
+    // activityInstances
+    processData.provide('activityInstances', ['processDefinition', function(processDefinition) {
+      return JobDefinitionResource.query({ processDefinitionId: processDefinition.id }).$promise;
+    }]);
+
+
+    // activityInstanceTree, activityIdToInstancesMap, instanceIdToInstanceMap
+    processData.provide([ 'activityIdToInstancesMap'], [
+      'activityInstances', 'processDefinition', 'bpmnElements',
+      function(activityInstances,   processDefinition,   bpmnElements) {
+        var activityIdToInstancesMap = {}, model = bpmnElements[processDefinition.key];
+
+        function getActivityName(bpmnElement) {
+          var name = bpmnElement.name;
+          if (!name) {
+            var shortenFilter = $filter('shorten');
+            name = bpmnElement.$type.substr(5) + ' (' + shortenFilter(bpmnElement.id, 8) + ')';
+          }
+
+          return name;
+        }
+
+        function decorateActivityInstanceTree(instance) {
+
+          if (instance && instance.length > 0) {
+            for (var t = 0, jd; (jd = instance[t]); t++) {
+              var targetActivityId = jd.activityId,
+                  targetBpmnElement = bpmnElements[targetActivityId],
+                  information = jd;
+
+              if(targetBpmnElement) {
+                jd.name = getActivityName(targetBpmnElement);
+              } else {
+                jd.name = targetActivityId;
+              }
+              activityIdToInstancesMap[targetActivityId] = [information];
+            }
+          }
+        }
+
+        activityInstances.name = getActivityName(model);
+
+        decorateActivityInstanceTree(activityInstances);
+
+        return [ activityIdToInstancesMap ];
+      }]);
 
     // end data definition /////////////////////////
 

@@ -1,0 +1,250 @@
+<!-- # CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/incidents-tab.html -->
+<div cam-searchable-area
+     ng-if="searchable"
+     config="searchConfig"
+     on-search-change="onSearchChange(query, pages)"
+     variable-types="['variables']"
+     loading-state="loadingState"
+     text-empty="No incidents matched by current query."
+     storage-group="'CI'">
+
+  <table class="incidents-tab cam-table">
+    <thead>
+      <tr>
+        <th class="message">Message</th>
+        <th class="timestamp">Timestamp</th>
+        <th class="activity">Activity</th>
+        <th class="cause instance-id uuid">Cause Process Instance ID</th>
+        <th class="cause-root instance-id uuid">Root Cause Process Instance ID</th>
+        <th class="type">Type</th>
+        <th class="action">Action</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr ng-repeat="incident in incidents">
+        <td class="message"
+            ng-if="incident.incidentType === 'failedJob'">
+          <!--
+            it would be great to be able to copy the stacktrace from here
+            using the clipboard widget but it comes from an API endpoint...
+          -->
+          <a ng-if="incident.rootCauseIncidentMessage"
+             href="{{ getJobStacktraceUrl(incident) }}"
+             target="_blank"
+             tooltip="Open stacktrace in new window"
+             tooltip-placement="top"
+             class="auto-cutoff">
+            {{ incident.rootCauseIncidentMessage }}
+          </a>
+          <a ng-if="!incident.rootCauseIncidentMessage"
+             href="{{ getJobStacktraceUrl(incident) }}"
+             target="_blank"
+             tooltip="Open stacktrace in new window"
+             tooltip-placement="top">
+            <i>Message is null.</i>
+          </a>
+        </td>
+        <td class="message"
+            tooltip="Open stacktrace in new window"
+            tooltip-placement="top"
+            ng-if="incident.incidentType === 'failedExternalTask'">
+          <span external-task-error-message-link="incident.rootCauseIncidentConfiguration">
+            <span ng-show="incident.rootCauseIncidentMessage">
+              {{ incident.rootCauseIncidentMessage }}
+            </span>
+            <span ng-show="!incident.rootCauseIncidentMessage">
+              <i>Message is null.</i>
+            </span>
+          </span>
+        </td>
+        <td class="message"
+            ng-if="['failedExternalTask', 'failedJob'].indexOf(incident.incidentType) === -1 && incident.rootCauseIncidentMessage">
+          <div class="auto-cutoff"
+               cam-widget-clipboard="incident.rootCauseIncidentMessage">
+            {{ incident.rootCauseIncidentMessage }}
+          </div>
+        </td>
+        <td class="message"
+            ng-if="['failedExternalTask', 'failedJob'].indexOf(incident.incidentType) === -1 && !incident.rootCauseIncidentMessage">
+          <i>Message is null.</i>
+        </td>
+
+        <td class="timestamp">
+          {{ incident.incidentTimestamp | camDate }}
+        </td>
+
+        <td class="activity">
+          <span ng-show="incident.linkable && processDefinition"
+                cam-select-activity="incident.activityId"
+                cam-widget-clipboard="incident.activityId">
+            <a ng-href="#/process-definition/{{ processDefinition.id }}/runtime?activityIds={{ incident.activityId }}&amp;tab=incidents-tab">
+              {{ incident.activityName }}
+            </a>
+          </span>
+          <span ng-show="incident.linkable && processInstance"
+                cam-widget-clipboard="incident.activityId">
+            <a ng-href="#/process-instance/{{ processInstance.id }}/runtime?activityIds={{ incident.activityId }}&amp;tab=incidents-tab">
+              {{ incident.activityName }}
+            </a>
+          </span>
+          <span ng-hide="incident.linkable">
+            {{ incident.activityName }}
+          </span>
+        </td>
+
+        <td class="cause instance-id">
+          <span ng-show="incident.causeIncidentProcessInstanceId !== incident.processInstanceId"
+                cam-widget-clipboard="incident.causeIncidentProcessInstanceId">
+            <a ng-href="#/process-instance/{{incident.causeIncidentProcessInstanceId}}/runtime?activityIds={{ incident.causeIncidentActivityId }}&amp;tab=incidents-tab">
+              {{ incident.causeIncidentProcessInstanceId }}
+            </a>
+          </span>
+        </td>
+
+        <td class="cause-root instance-id">
+          <span ng-show="incident.rootCauseIncidentProcessInstanceId !== incident.processInstanceId"
+                cam-widget-clipboard="incident.rootCauseIncidentProcessInstanceId">
+            <a ng-href="#/process-instance/{{incident.rootCauseIncidentProcessInstanceId}}/runtime?activityIds={{ incident.rootCauseIncidentActivityId }}&amp;tab=incidents-tab">
+              {{ incident.rootCauseIncidentProcessInstanceId }}
+            </a>
+          </span>
+        </td>
+
+        <td class="type">
+          {{ getIncidentType(incident) }}
+        </td>
+
+        <td class="action">
+          <span ng-repeat="actionProvider in incidentActions">
+            <view provider="actionProvider"
+              vars="incidentVars" />
+          </span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+</div>
+<div ng-if="!searchable">
+  <table class="incidents-tab cam-table">
+  <thead>
+    <tr>
+      <th class="message">Message</th>
+      <th class="timestamp">Timestamp</th>
+      <th class="activity">Activity</th>
+      <th class="cause instance-id uuid">Cause Process Instance ID</th>
+      <th class="cause-root instance-id uuid">Root Cause Process Instance ID</th>
+      <th class="type">Type</th>
+      <th class="action">Action</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr ng-repeat="incident in incidents">
+      <td class="message"
+          ng-if="incident.incidentType === 'failedJob'">
+        <!--
+          it would be great to be able to copy the stacktrace from here
+          using the clipboard widget but it comes from an API endpoint...
+        -->
+        <a ng-if="incident.rootCauseIncidentMessage"
+           href="{{ getJobStacktraceUrl(incident) }}"
+           target="_blank"
+           tooltip="Open stacktrace in new window"
+           tooltip-placement="top"
+           class="auto-cutoff">
+          {{ incident.rootCauseIncidentMessage }}
+        </a>
+        <a ng-if="!incident.rootCauseIncidentMessage"
+           href="{{ getJobStacktraceUrl(incident) }}"
+           target="_blank"
+           tooltip="Open stacktrace in new window"
+           tooltip-placement="top">
+          <i>Message is null.</i>
+        </a>
+      </td>
+      <td class="message"
+          tooltip="Open stacktrace in new window"
+          tooltip-placement="top"
+          ng-if="incident.incidentType === 'failedExternalTask'">
+        <span external-task-error-message-link="incident.rootCauseIncidentConfiguration">
+          <span ng-show="incident.rootCauseIncidentMessage">
+            {{ incident.rootCauseIncidentMessage }}
+          </span>
+          <span ng-show="!incident.rootCauseIncidentMessage">
+            <i>Message is null.</i>
+          </span>
+        </span>
+      </td>
+      <td class="message"
+          ng-if="['failedExternalTask', 'failedJob'].indexOf(incident.incidentType) === -1 && incident.rootCauseIncidentMessage">
+        <div class="auto-cutoff"
+             cam-widget-clipboard="incident.rootCauseIncidentMessage">
+          {{ incident.rootCauseIncidentMessage }}
+        </div>
+      </td>
+      <td class="message"
+          ng-if="['failedExternalTask', 'failedJob'].indexOf(incident.incidentType) === -1 && !incident.rootCauseIncidentMessage">
+        <i>Message is null.</i>
+      </td>
+
+      <td class="timestamp">
+        {{ incident.incidentTimestamp | camDate }}
+      </td>
+
+      <td class="activity">
+        <span ng-show="incident.linkable && processDefinition"
+              cam-select-activity="incident.activityId"
+              cam-widget-clipboard="incident.activityId">
+          <a ng-href="#/process-definition/{{ processDefinition.id }}/runtime?activityIds={{ incident.activityId }}&amp;tab=incidents-tab">
+            {{ incident.activityName }}
+          </a>
+        </span>
+        <span ng-show="incident.linkable && processInstance"
+              cam-widget-clipboard="incident.activityId">
+          <a ng-href="#/process-instance/{{ processInstance.id }}/runtime?activityIds={{ incident.activityId }}&amp;tab=incidents-tab">
+            {{ incident.activityName }}
+          </a>
+        </span>
+        <span ng-hide="incident.linkable">
+          {{ incident.activityName }}
+        </span>
+      </td>
+
+      <td class="cause instance-id">
+        <span ng-show="incident.causeIncidentProcessInstanceId !== incident.processInstanceId"
+              cam-widget-clipboard="incident.causeIncidentProcessInstanceId">
+          <a ng-href="#/process-instance/{{incident.causeIncidentProcessInstanceId}}/runtime?activityIds={{ incident.causeIncidentActivityId }}&amp;tab=incidents-tab">
+            {{ incident.causeIncidentProcessInstanceId }}
+          </a>
+        </span>
+      </td>
+
+      <td class="cause-root instance-id">
+        <span ng-show="incident.rootCauseIncidentProcessInstanceId !== incident.processInstanceId"
+              cam-widget-clipboard="incident.rootCauseIncidentProcessInstanceId">
+          <a ng-href="#/process-instance/{{incident.rootCauseIncidentProcessInstanceId}}/runtime?activityIds={{ incident.rootCauseIncidentActivityId }}&amp;tab=incidents-tab">
+            {{ incident.rootCauseIncidentProcessInstanceId }}
+          </a>
+        </span>
+      </td>
+
+      <td class="type">
+        {{ getIncidentType(incident) }}
+      </td>
+
+      <td class="action">
+        <span ng-repeat="actionProvider in incidentActions">
+          <view provider="actionProvider"
+            vars="incidentVars" />
+        </span>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div cam-pagination="onPaginationChange(pages)" total="pages.total"> </div>
+
+<!-- / CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/incidents-tab.html -->
