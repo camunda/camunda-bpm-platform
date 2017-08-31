@@ -105,7 +105,6 @@ var Controller = [
         function decorateActivityInstanceTree(instance) {
           var children = instance.childActivityInstances;
 
-
           if (children && children.length > 0) {
 
             for (var i = 0, child; (child = children[i]); i++) {
@@ -130,6 +129,7 @@ var Controller = [
           }
 
           var transitions = instance.childTransitionInstances;
+          console.log('transitions: ', transitions);
           if (transitions && transitions.length > 0) {
 
             for (var t = 0, transition; (transition = transitions[t]); t++) {
