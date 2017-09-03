@@ -37,4 +37,35 @@ class CamundaFeelEngineIntegrationTest extends FlatSpec with Matchers {
     camundaFeelEngine.evaluateSimpleExpression[Int]("a * 4", context) should be(8)
   }
   
+  it should "return number as Java Double" in {
+    
+    val camundaFeelEngine = camundaFeelEngineFactory.createInstance()
+    val context = new SimpleTestContext(Map())
+    
+    camundaFeelEngine.evaluateSimpleExpression[Any]("2.4", context) should be (new java.lang.Double(2.4))    
+  }
+  
+  it should "return list as Java List" in {
+  	
+  	val camundaFeelEngine = camundaFeelEngineFactory.createInstance()
+    val context = new SimpleTestContext(Map())
+  	
+    val list = new java.util.ArrayList[String]
+    list.add("a")
+    list.add("b")
+    
+    camundaFeelEngine.evaluateSimpleExpression[Any](""" ["a","b"] """, context) should be (list)    
+  }
+  
+  it should "return context as Java Map" in {
+  	
+  	val camundaFeelEngine = camundaFeelEngineFactory.createInstance()
+    val context = new SimpleTestContext(Map())
+  	
+    val map = new java.util.HashMap[String, String]
+    map.put("a", "b")
+    
+    camundaFeelEngine.evaluateSimpleExpression[Any](""" {a:"b"} """, context) should be (map)    
+  }
+  
 }
