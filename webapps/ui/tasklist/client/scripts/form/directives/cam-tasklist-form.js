@@ -226,10 +226,16 @@ module.exports = [function() {
                  $scope.$loaded;
         };
 
-        $scope.disableCompleteButton = function() {
+        var disableCompleteButton = $scope.disableCompleteButton = function() {
           return $scope.taskRemoved || $scope.completeInProgress || $scope.$invalid ||
             ($scope.options && $scope.options.disableCompleteButton);
         };
+
+        var attemptComplete = function attemptComplete() {
+          var canComplete = !disableCompleteButton();
+          return canComplete && complete();
+        };
+
 
         // save ///////////////////////////////////////////////////
 
@@ -287,6 +293,7 @@ module.exports = [function() {
           $scope.saveHandler = fn ||  noop;
         };
 
+        this.attemptComplete = attemptComplete;
 
       }]
   };
