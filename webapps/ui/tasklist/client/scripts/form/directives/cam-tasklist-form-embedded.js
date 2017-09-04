@@ -107,6 +107,12 @@ module.exports = [
           }
         });
 
+        $scope.formKeyPressed = function formKeyPressed(e) {
+          if (e.ctrlKey && e.keyCode == 13) {
+            return formController.attemptComplete();
+          }
+        };
+
         var complete = function(callback) {
           camForm.submit(callback);
         };
