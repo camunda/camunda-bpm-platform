@@ -32,9 +32,19 @@ module.exports = [function() {
         Views,
         $timeout
       ) {
+
         function updateSilently(params) {
           search.updateSilently(params);
         }
+
+        /**
+         * checks if tasks include any task with taskid
+         */
+        var hasTaskId = function hasTaskId(tasks, taskid) {
+          return tasks.filter(function(o) {
+            return o.id === taskid;
+          }).length > 0;
+        };
 
         $scope.expanded = {};
         $scope.toggle = function(delta, $event) {
@@ -97,6 +107,10 @@ module.exports = [function() {
         $scope.state = tasksData.observe('taskList', function(taskList) {
           $scope.totalItems = taskList.count;
           $scope.tasks = taskList._embedded.task;
+          var isTaskIncluded = hasTaskId($scope.tasks, $scope.currentTaskId);
+          if(!isTaskIncluded) {
+            tasksData.set('taskId', { 'taskId' : null });
+          }
           if(taskList._embedded.assignee) {
             parseAssignees(taskList._embedded.assignee);
           }
