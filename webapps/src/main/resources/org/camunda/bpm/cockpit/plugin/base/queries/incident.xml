@@ -80,6 +80,15 @@
           </if>
 
           <where>
+            <!-- processDefinitionIds -->
+            <if test="processDefinitionIdIn != null &amp;&amp; processDefinitionIdIn.length > 0">
+              and
+              <foreach item="item" index="index" collection="processDefinitionIdIn"
+                       open="(" separator="or" close=")">
+                RES.PROC_DEF_ID_ = #{item}
+              </foreach>
+            </if>
+
             <!-- processInstanceIds -->
             <if test="processInstanceIdIn != null &amp;&amp; processInstanceIdIn.length > 0">
               and
