@@ -67,10 +67,12 @@
   </delete>
 
   <delete id="deleteHistoricJobLogByProcessInstanceIds">
-    delete from ${prefix}ACT_HI_JOB_LOG where PROCESS_INSTANCE_ID_ IN
-    <foreach item="processInstanceId" index="index" collection="list" open="(" separator="," close=")">
-       #{processInstanceId}
-    </foreach>
+    delete
+    from ${prefix}ACT_HI_JOB_LOG
+    where
+      <bind name="listOfIds" value="list"/>
+      <bind name="fieldName" value="'PROCESS_INSTANCE_ID_'"/>
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
   </delete>
 
   <delete id="deleteHistoricJobLogByProcessDefinitionId">
@@ -91,22 +93,23 @@
 
   <delete id="deleteHistoricJobLogByBatchIds">
     delete from ${prefix}ACT_HI_JOB_LOG
-    where JOB_DEF_CONFIGURATION_
-    in
-    <foreach item="batchId" index="index" collection="list" open="(" separator="," close=")">
-       #{batchId}
-    </foreach>
+    where
+      <bind name="listOfIds" value="list"/>
+      <bind name="fieldName" value="'JOB_DEF_CONFIGURATION_'"/>
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
   </delete>
 
   <!-- BYTE ARRAY DELETE -->
 
   <delete id="deleteExceptionByteArraysByIds">
     delete
-    from
-        ${prefix}ACT_GE_BYTEARRAY
+    from ${prefix}ACT_GE_BYTEARRAY
     <where>
-      ID_ in (select J.JOB_EXCEPTION_STACK_ID_ from ${prefix}ACT_HI_JOB_LOG J
-      <where><include refid="selectExceptionByteArrayIds"/></where>)
+      ID_ in (
+        select J.JOB_EXCEPTION_STACK_ID_
+        from ${prefix}ACT_HI_JOB_LOG J
+        <where><include refid="selectExceptionByteArrayIds"/></where>
+      )
     </where>
   </delete>
 
@@ -162,11 +165,10 @@
       and J.PROCESS_INSTANCE_ID_ = #{processInstanceId, jdbcType=VARCHAR}
     </if>
     <if test="processInstanceIdIn != null &amp;&amp; processInstanceIdIn.length > 0">
-      and J.PROCESS_INSTANCE_ID_ in
-      <foreach item="item" index="index" collection="processInstanceIdIn"
-               open="(" separator="," close=")">
-        #{item}
-      </foreach>
+      and
+        <bind name="listOfIds" value="processInstanceIdIn"/>
+        <bind name="fieldName" value="'J.PROCESS_INSTANCE_ID_'"/>
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedArray"/>
     </if>
     <if test="processDefinitionId != null">
       and J.PROCESS_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR}
@@ -181,10 +183,10 @@
       and J.JOB_DEF_TYPE_ = #{jobDefinitionType, jdbcType=VARCHAR}
     </if>
     <if test="historicBatchIdIn != null &amp;&amp; historicBatchIdIn.size > 0">
-      and J.JOB_DEF_CONFIGURATION_ in
-      <foreach item="item" index="index" collection="historicBatchIdIn" open="(" separator="," close=")">
-          #{item}
-      </foreach>
+      and
+        <bind name="listOfIds" value="historicBatchIdIn"/>
+        <bind name="fieldName" value="'J.JOB_DEF_CONFIGURATION_'"/>
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
     </if>
   </sql>
 

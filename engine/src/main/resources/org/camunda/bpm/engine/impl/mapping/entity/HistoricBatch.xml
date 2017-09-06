@@ -71,10 +71,12 @@
   </delete>
 
   <delete id="deleteHistoricBatchByIds" parameterType="string">
-    delete from ${prefix}ACT_HI_BATCH where ID_ IN
-    <foreach item="batchId" index="index" collection="list" open="(" separator="," close=")">
-      #{batchId}
-    </foreach>
+    delete
+    from ${prefix}ACT_HI_BATCH
+    where
+      <bind name="listOfIds" value="list"/>
+      <bind name="fieldName" value="'ID_'"/>
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
   </delete>
 
   <!-- UPDATE -->

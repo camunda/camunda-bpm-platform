@@ -66,10 +66,12 @@
   </delete>
 
   <delete id="deleteHistoricDecisionInstanceByIds">
-    delete from ${prefix}ACT_HI_DECINST where ID_ IN
-    <foreach item="decisionInstanceId" index="index" collection="list" open="(" separator="," close=")">
-      #{decisionInstanceId}
-    </foreach>
+    delete
+    from ${prefix}ACT_HI_DECINST
+    where
+      <bind name="listOfIds" value="list"/>
+      <bind name="fieldName" value="'ID_'"/>
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
   </delete>
 
   <!-- result map -->

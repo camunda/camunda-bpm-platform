@@ -42,22 +42,22 @@
 
   <delete id="deleteHistoricDecisionInputInstanceByDecisionInstanceIds" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
     delete from ${prefix}ACT_HI_DEC_IN
-    where DEC_INST_ID_ in
-      <foreach item="decisionInstanceId" index="index" collection="list" open="(" separator="," close=")">
-        #{decisionInstanceId}
-      </foreach>
+    where
+      <bind name="listOfIds" value="list"/>
+      <bind name="fieldName" value="'DEC_INST_ID_'"/>
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
   </delete>
 
   <delete id="deleteHistoricDecisionInputInstanceByteArraysByDecisionInstanceIds">
-    delete from ${prefix}ACT_GE_BYTEARRAY
-    where ID_ in
-      (select distinct BYTEARRAY_ID_
+    delete from ${prefix}ACT_GE_BYTEARRAY where ID_ in (
+      select BYTEARRAY_ID_
       from ${prefix}ACT_HI_DEC_IN
-      where DEC_INST_ID_ in
-          <foreach item="decisionInstanceId" index="index" collection="list" open="(" separator="," close=")">
-            #{decisionInstanceId}
-          </foreach>
-        and BYTEARRAY_ID_ is not NULL)
+        where
+          <bind name="listOfIds" value="list"/>
+          <bind name="fieldName" value="'DEC_INST_ID_'"/>
+          <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
+          and BYTEARRAY_ID_ is not NULL
+    )
   </delete>
 
   <delete id="deleteHistoricDecisionInputInstanceByteArraysByDecisionInstanceIds_mysql">

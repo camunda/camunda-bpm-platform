@@ -89,10 +89,12 @@
   <!-- HISTORIC CASE ACTIVITY INSTANCE DELETE -->
 
   <delete id="deleteHistoricCaseActivityInstancesByCaseInstanceIds">
-    delete from ${prefix}ACT_HI_CASEACTINST where CASE_INST_ID_ IN
-    <foreach item="caseInstanceId" index="index" collection="list" open="(" separator="," close=")">
-      #{caseInstanceId}
-    </foreach>
+    delete
+    from ${prefix}ACT_HI_CASEACTINST
+    where
+      <bind name="listOfIds" value="list"/>
+      <bind name="fieldName" value="'CASE_INST_ID_'"/>
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
   </delete>
 
   <!-- HISTORIC CASE ACTIVITY INSTANCE RESULT MAP -->

@@ -105,10 +105,12 @@
   </delete>
 
   <delete id="deleteHistoricProcessInstances">
-    delete from ${prefix}ACT_HI_PROCINST where PROC_INST_ID_ IN
-    <foreach item="processInstanceId" index="index" collection="list" open="(" separator="," close=")">
-      #{processInstanceId}
-    </foreach>
+    delete
+    from ${prefix}ACT_HI_PROCINST
+    where
+      <bind name="listOfIds" value="list"/>
+      <bind name="fieldName" value="'PROC_INST_ID_'"/>
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
   </delete>
 
   <!-- HISTORIC PROCESS INSTANCE RESULT MAP -->
