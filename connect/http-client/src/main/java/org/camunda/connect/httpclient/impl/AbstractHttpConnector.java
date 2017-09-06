@@ -40,10 +40,12 @@ public abstract class AbstractHttpConnector<Q extends HttpBaseRequest<Q, R>, R e
   protected static HttpConnectorLogger LOG = HttpLogger.HTTP_LOGGER;
 
   protected CloseableHttpClient httpClient;
+  protected final Charset charset;
 
   public AbstractHttpConnector(String connectorId) {
     super(connectorId);
     httpClient = createClient();
+    charset = Charset.forName("utf-8");
   }
 
   protected CloseableHttpClient createClient() {
@@ -135,8 +137,10 @@ public abstract class AbstractHttpConnector<Q extends HttpBaseRequest<Q, R>, R e
   protected <T extends HttpRequestBase> void applyPayload(T httpRequest, Q request) {
     if (httpMethodSupportsPayload(httpRequest)) {
       if (request.getPayload() != null) {
-        ByteArrayInputStream payload = new ByteArrayInputStream(request.getPayload().getBytes(Charset.forName("utf-8")));
-        ((HttpEntityEnclosingRequestBase) httpRequest).setEntity(new InputStreamEntity(payload));
+        byte[] bytes = request.getPayload().getBytes(charset);
+        ByteArrayInputStream payload = new ByteArrayInputStream(bytes);
+        InputStreamEntity entity = new InputStreamEntity(payload, bytes.length);
+        ((HttpEntityEnclosingRequestBase) httpRequest).setEntity(entity);
       }
     }
     else if (request.getPayload() != null) {

@@ -161,6 +161,15 @@ public class HttpConnectorTest {
     assertThat(content).isEqualTo(EXAMPLE_PAYLOAD);
   }
 
+  @Test
+  public void shouldSetContentLength() {
+    connector.createRequest().url(EXAMPLE_URL).payload(EXAMPLE_PAYLOAD).post().execute();
+    HttpPost request = interceptor.getTarget();
+    long contentLength = request.getEntity().getContentLength();
+
+    assertThat(contentLength).isEqualTo(EXAMPLE_PAYLOAD.length());
+  }
+
   protected void verifyHttpRequest(Class<? extends HttpRequestBase> requestClass) {
     Object target = interceptor.getTarget();
     assertThat(target).isInstanceOf(requestClass);
