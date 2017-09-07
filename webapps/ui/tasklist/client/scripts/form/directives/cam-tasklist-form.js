@@ -20,7 +20,7 @@ function compact(arr) {
 
 var noop = function() {};
 
-module.exports = [function() {
+module.exports = ['Notifications', function(Notifications) {
 
   return {
 
@@ -146,6 +146,12 @@ module.exports = [function() {
                 // prevents multiple "/" in the URI
                 .replace(/\/([\/]+)/, '/');
               setAsynchronousFormKey(key);
+            } else {
+              Notifications.addError({
+                status: 'Could not fetch form',
+                message: 'The conext path is either empty or not defined'
+              });
+              $scope.$loaded = true;
             }
           }
 
