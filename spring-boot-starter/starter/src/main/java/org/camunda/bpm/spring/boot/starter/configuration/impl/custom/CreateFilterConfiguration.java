@@ -1,7 +1,8 @@
-package org.camunda.bpm.spring.boot.starter.configuration.impl;
+package org.camunda.bpm.spring.boot.starter.configuration.impl.custom;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.filter.Filter;
+import org.camunda.bpm.spring.boot.starter.configuration.impl.AbstractCamundaConfiguration;
 import org.camunda.bpm.spring.boot.starter.property.FilterProperty;
 
 import javax.annotation.PostConstruct;

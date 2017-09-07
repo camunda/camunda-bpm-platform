@@ -20,8 +20,8 @@ import org.camunda.bpm.spring.boot.starter.configuration.CamundaMetricsConfigura
 import org.camunda.bpm.spring.boot.starter.configuration.CamundaProcessEngineConfiguration;
 import org.camunda.bpm.spring.boot.starter.configuration.condition.NeedsHistoryAutoConfigurationCondition;
 import org.camunda.bpm.spring.boot.starter.configuration.id.IdGeneratorConfiguration;
-import org.camunda.bpm.spring.boot.starter.configuration.impl.CreateAdminUserConfiguration;
-import org.camunda.bpm.spring.boot.starter.configuration.impl.CreateFilterConfiguration;
+import org.camunda.bpm.spring.boot.starter.configuration.impl.custom.CreateAdminUserConfiguration;
+import org.camunda.bpm.spring.boot.starter.configuration.impl.custom.CreateFilterConfiguration;
 import org.camunda.bpm.spring.boot.starter.configuration.impl.DefaultAuthorizationConfiguration;
 import org.camunda.bpm.spring.boot.starter.configuration.impl.DefaultDatasourceConfiguration;
 import org.camunda.bpm.spring.boot.starter.configuration.impl.DefaultDeploymentConfiguration;
@@ -33,7 +33,7 @@ import org.camunda.bpm.spring.boot.starter.configuration.impl.DefaultJobConfigur
 import org.camunda.bpm.spring.boot.starter.configuration.impl.DefaultJpaConfiguration;
 import org.camunda.bpm.spring.boot.starter.configuration.impl.DefaultMetricsConfiguration;
 import org.camunda.bpm.spring.boot.starter.configuration.impl.DefaultProcessEngineConfiguration;
-import org.camunda.bpm.spring.boot.starter.configuration.impl.EnterLicenseKeyConfiguration;
+import org.camunda.bpm.spring.boot.starter.configuration.impl.custom.EnterLicenseKeyConfiguration;
 import org.camunda.bpm.spring.boot.starter.configuration.impl.GenericPropertiesConfiguration;
 import org.camunda.bpm.spring.boot.starter.jdbc.HistoryLevelDeterminator;
 import org.camunda.bpm.spring.boot.starter.property.CamundaBpmProperties;
@@ -103,6 +103,7 @@ public class CamundaBpmConfiguration {
     return new DefaultMetricsConfiguration();
   }
 
+  //TODO to be removed within CAM-8108
   @Bean(name = "historyLevelAutoConfiguration")
   @ConditionalOnMissingBean(CamundaHistoryLevelAutoHandlingConfiguration.class)
   @ConditionalOnProperty(prefix = "camunda.bpm", name = "history-level", havingValue = "auto", matchIfMissing = false)
@@ -111,6 +112,7 @@ public class CamundaBpmConfiguration {
     return new DefaultHistoryLevelAutoHandlingConfiguration();
   }
 
+  //TODO to be removed within CAM-8108
   @Bean(name = "historyLevelDeterminator")
   @ConditionalOnMissingBean(name = { "camundaBpmJdbcTemplate", "historyLevelDeterminator" })
   @ConditionalOnBean(name = "historyLevelAutoConfiguration")
@@ -118,6 +120,7 @@ public class CamundaBpmConfiguration {
     return createHistoryLevelDeterminator(camundaBpmProperties, jdbcTemplate);
   }
 
+  //TODO to be removed within CAM-8108
   @Bean(name = "historyLevelDeterminator")
   @ConditionalOnBean(name = { "camundaBpmJdbcTemplate", "historyLevelAutoConfiguration", "historyLevelDeterminator" })
   @ConditionalOnMissingBean(name = "historyLevelDeterminator")

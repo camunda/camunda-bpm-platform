@@ -1,8 +1,9 @@
-package org.camunda.bpm.spring.boot.starter.configuration.impl;
+package org.camunda.bpm.spring.boot.starter.configuration.impl.custom;
 
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.spring.boot.starter.CamundaBpmNestedRuntimeException;
+import org.camunda.bpm.spring.boot.starter.configuration.impl.AbstractCamundaConfiguration;
 import org.camunda.bpm.spring.boot.starter.util.CamundaBpmVersion;
 import org.springframework.beans.factory.annotation.Autowired;
 

@@ -1,5 +1,6 @@
 package org.camunda.bpm.spring.boot.starter.property;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngines;
 import org.camunda.bpm.spring.boot.starter.configuration.id.IdGeneratorConfiguration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -17,7 +18,6 @@ import static org.springframework.core.io.support.ResourcePatternResolver.CLASSP
 public class CamundaBpmProperties {
 
   public static final String PREFIX = "camunda.bpm";
-  private static final String CLASS_NAME = CamundaBpmProperties.class.getSimpleName();
 
   public static final String[] DEFAULT_BPMN_RESOURCE_SUFFIXES = new String[]{"bpmn20.xml", "bpmn" };
   public static final String[] DEFAULT_CMMN_RESOURCE_SUFFIXES = new String[]{"cmmn11.xml", "cmmn10.xml", "cmmn" };
@@ -46,12 +46,12 @@ public class CamundaBpmProperties {
    */
   private String processEngineName = ProcessEngines.NAME_DEFAULT;
 
-  private String idGenerator = IdGeneratorConfiguration.SIMPLE;
+  private String idGenerator = IdGeneratorConfiguration.STRONG;
 
   /**
    * the history level to use
    */
-  private String historyLevel;
+  private String historyLevel = ProcessEngineConfiguration.HISTORY_FULL;
 
   /**
    * the default history level to use when 'historyLevel' is 'auto'

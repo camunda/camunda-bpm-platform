@@ -1,4 +1,4 @@
-package org.camunda.bpm.spring.boot.starter.configuration.impl;
+package org.camunda.bpm.spring.boot.starter.configuration.impl.custom;
 
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.IdentityService;
@@ -9,6 +9,7 @@ import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
+import org.camunda.bpm.spring.boot.starter.configuration.impl.AbstractCamundaConfiguration;
 import org.camunda.bpm.spring.boot.starter.property.AdminUserProperty;
 import org.springframework.beans.BeanUtils;
 

@@ -19,7 +19,7 @@ public class IdGeneratorConfiguration {
 
   @Bean
   @ConditionalOnMissingBean(IdGenerator.class)
-  @ConditionalOnProperty(prefix = CamundaBpmProperties.PREFIX, name = PROPERTY_NAME, havingValue = STRONG)
+  @ConditionalOnProperty(prefix = CamundaBpmProperties.PREFIX, name = PROPERTY_NAME, havingValue = STRONG, matchIfMissing = true)
   public IdGenerator strongUuidGenerator() {
     return new StrongUuidGenerator();
   }

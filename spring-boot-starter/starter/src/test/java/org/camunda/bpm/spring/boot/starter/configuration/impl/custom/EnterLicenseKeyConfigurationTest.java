@@ -1,4 +1,4 @@
-package org.camunda.bpm.spring.boot.starter.configuration.impl;
+package org.camunda.bpm.spring.boot.starter.configuration.impl.custom;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
