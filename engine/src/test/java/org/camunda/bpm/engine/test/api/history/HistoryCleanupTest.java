@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.engine.test.api.history;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -37,6 +38,7 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.ExecuteJobHelper;
+import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupHelper;
 import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupJobHandlerConfiguration;
 import org.camunda.bpm.engine.impl.metrics.Meter;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentEntity;
@@ -62,11 +64,13 @@ import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -979,6 +983,24 @@ public class HistoryCleanupTest {
     processEngineConfiguration.setHistoryCleanupBatchSize(500);
     processEngineConfiguration.initHistoryCleanup();
     assertEquals(processEngineConfiguration.getHistoryCleanupBatchSize(), 500);
+  }
+
+  @Test
+  @Ignore("CAM-8205")
+  public void testHistoryCleanupHelper() throws ParseException {
+    processEngineConfiguration.setHistoryCleanupBatchWindowStartTime("22:00+0100");
+    processEngineConfiguration.setHistoryCleanupBatchWindowEndTime("01:00+0200");
+    processEngineConfiguration.initHistoryCleanup();
+
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+    Date date = sdf.parse("2017-09-06T22:15:00+0100");
+
+    assertTrue(HistoryCleanupHelper.isWithinBatchWindow(date, processEngineConfiguration.getHistoryCleanupBatchWindowStartTimeAsDate(),
+      processEngineConfiguration.getHistoryCleanupBatchWindowEndTimeAsDate()));
+
+    date = sdf.parse("2017-09-06T22:15:00+0200");   // = 21:15+0100 - which is outside batch window, but returns true now
+    assertFalse(HistoryCleanupHelper.isWithinBatchWindow(date, processEngineConfiguration.getHistoryCleanupBatchWindowStartTimeAsDate(),
+      processEngineConfiguration.getHistoryCleanupBatchWindowEndTimeAsDate()));
   }
 
   @Test

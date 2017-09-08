@@ -59,16 +59,22 @@ public abstract class HistoryCleanupHelper {
    */
   public static boolean isWithinBatchWindow(Date date, CommandContext commandContext) {
     if (isBatchWindowConfigured(commandContext)) {
-      Date todaysBatchWindowStartTime = updateTime(date, getBatchWindowStartTime(commandContext));
-      Date todaysBatchWindowEndTime = updateTime(date, getBatchWindowEndTime(commandContext));
-      if (todaysBatchWindowEndTime.after(todaysBatchWindowStartTime)) {
-        //interval is within one day
-        return (date.after(todaysBatchWindowStartTime) || date.equals(todaysBatchWindowStartTime)) && date.before(todaysBatchWindowEndTime);
-      } else {
-        return date.after(todaysBatchWindowStartTime) || date.equals(todaysBatchWindowStartTime) || date.before(todaysBatchWindowEndTime);
-      }
+      final Date batchWindowStartTime = getBatchWindowStartTime(commandContext);
+      final Date batchWindowEndTime = getBatchWindowEndTime(commandContext);
+      return isWithinBatchWindow(date, batchWindowStartTime, batchWindowEndTime);
     } else {
       return false;
+    }
+  }
+
+  public static boolean isWithinBatchWindow(Date date, Date batchWindowStartTime, Date batchWindowEndTime) {
+    Date todaysBatchWindowStartTime = updateTime(date, batchWindowStartTime);
+    Date todaysBatchWindowEndTime = updateTime(date, batchWindowEndTime);
+    if (todaysBatchWindowEndTime.after(todaysBatchWindowStartTime)) {
+      //interval is within one day
+      return (date.after(todaysBatchWindowStartTime) || date.equals(todaysBatchWindowStartTime)) && date.before(todaysBatchWindowEndTime);
+    } else {
+      return date.after(todaysBatchWindowStartTime) || date.equals(todaysBatchWindowStartTime) || date.before(todaysBatchWindowEndTime);
     }
   }
 
