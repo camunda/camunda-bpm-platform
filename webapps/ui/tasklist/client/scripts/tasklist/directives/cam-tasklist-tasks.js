@@ -32,10 +32,11 @@ module.exports = [function() {
         Views,
         $timeout
       ) {
+
         function updateSilently(params) {
           search.updateSilently(params);
         }
-
+        
         $scope.expanded = {};
         $scope.toggle = function(delta, $event) {
           $scope.expanded[delta] = !$scope.expanded[delta];
@@ -132,6 +133,7 @@ module.exports = [function() {
             $scope.pageSize = $scope.query.maxResults;
             // Sachbearbeiter starts counting at '1'
             $scope.pageNum = ($scope.query.firstResult / $scope.pageSize) + 1;
+            tasksData.set('taskId', { 'taskId' : null });
           }
         });
 

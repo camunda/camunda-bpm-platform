@@ -20,7 +20,7 @@ function compact(arr) {
 
 var noop = function() {};
 
-module.exports = [function() {
+module.exports = ['Notifications', function(Notifications) {
 
   return {
 
@@ -146,6 +146,12 @@ module.exports = [function() {
                 // prevents multiple "/" in the URI
                 .replace(/\/([\/]+)/, '/');
               setAsynchronousFormKey(key);
+            } else {
+              Notifications.addError({
+                status: 'Could not fetch form',
+                message: 'The conext path is either empty or not defined'
+              });
+              $scope.$loaded = true;
             }
           }
 
@@ -226,10 +232,16 @@ module.exports = [function() {
                  $scope.$loaded;
         };
 
-        $scope.disableCompleteButton = function() {
+        var disableCompleteButton = $scope.disableCompleteButton = function() {
           return $scope.taskRemoved || $scope.completeInProgress || $scope.$invalid ||
             ($scope.options && $scope.options.disableCompleteButton);
         };
+
+        var attemptComplete = function attemptComplete() {
+          var canComplete = !disableCompleteButton();
+          return canComplete && complete();
+        };
+
 
         // save ///////////////////////////////////////////////////
 
@@ -287,6 +299,7 @@ module.exports = [function() {
           $scope.saveHandler = fn ||  noop;
         };
 
+        this.attemptComplete = attemptComplete;
 
       }]
   };

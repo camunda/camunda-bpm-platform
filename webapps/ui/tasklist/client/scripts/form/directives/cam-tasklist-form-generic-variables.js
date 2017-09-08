@@ -5,7 +5,7 @@ var template = fs.readFileSync(__dirname + '/cam-tasklist-form-generic-variables
 
 var angular = require('camunda-commons-ui/vendor/angular');
 
-module.exports = ['camAPI', 'Notifications', '$translate', function(camAPI, Notifications, $translate) {
+module.exports = ['camAPI', 'Notifications', '$translate', 'unfixDate', function(camAPI, Notifications, $translate, unfixDate) {
 
   return {
 
@@ -82,9 +82,14 @@ module.exports = ['camAPI', 'Notifications', '$translate', function(camAPI, Noti
           var variableAdded = false;
           angular.forEach(result, function(value, name) {
             if(variableTypes[value.type]) {
+              var parsedValue = value.value;
+
+              if(value.type === 'Date') {
+                parsedValue = unfixDate(parsedValue);
+              }
               $scope.variables.push({
                 name : name,
-                value: value.value,
+                value: parsedValue,
                 type:  value.type,
                 fixedName : true
               });
