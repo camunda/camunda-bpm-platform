@@ -20,7 +20,6 @@ import org.camunda.bpm.model.bpmn.instance.*;
 import org.camunda.bpm.model.bpmn.instance.bpmndi.BpmnShape;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaExecutionListener;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaFailedJobRetryTimeCycle;
-import org.camunda.bpm.model.bpmn.instance.camunda.CamundaIncrementalIntervals;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 
 /**
@@ -410,14 +409,6 @@ public abstract class AbstractFlowNodeBuilder<B extends AbstractFlowNodeBuilder<
 
     addExtensionElement(failedJobRetryTimeCycle);
 
-    return myself;
-  }
-
-  public B camundaIncrementalIntervals(String incrementalIntervals) {
-    CamundaIncrementalIntervals intervals = createInstance(CamundaIncrementalIntervals.class);
-    intervals.setTextContent(incrementalIntervals);
-
-    addExtensionElement(intervals);
     return myself;
   }
 

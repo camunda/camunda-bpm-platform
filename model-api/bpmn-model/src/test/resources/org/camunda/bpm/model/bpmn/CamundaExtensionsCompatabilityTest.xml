@@ -149,7 +149,6 @@
     <sendTask id="sendTask">
       <extensionElements>
         <camunda:failedJobRetryTimeCycle>test</camunda:failedJobRetryTimeCycle>
-        <camunda:incrementalIntervals>test</camunda:incrementalIntervals>
         <camunda:field name="test" stringValue="test" expression="${test}">
           <camunda:expression>${test}</camunda:expression>
           <camunda:string>test</camunda:string>
