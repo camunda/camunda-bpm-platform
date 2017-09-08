@@ -13,8 +13,11 @@
 package org.camunda.bpm.engine.test.history.useroperationlog;
 
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+
+import java.util.List;
 
 /**
  * @author Roman Smirnov
@@ -150,7 +153,6 @@ public class UserOperationLogDeletionTest extends AbstractUserOperationLogTest {
     assertEquals(1, query.count());
   }
 
-
   @Deployment(resources = PROCESS_PATH)
   public void testDeleteProcessDefinitionKeepUserOperationLog() {
     // given
@@ -173,6 +175,36 @@ public class UserOperationLogDeletionTest extends AbstractUserOperationLogTest {
 
     // then new log is created and old stays
     assertEquals(1, query.count());
+  }
+
+  public void testDeleteProcessDefinitionsKeepUserOperationLog() {
+    // given
+    for (int i = 0; i < 3; i++) {
+      deploymentId = repositoryService.createDeployment()
+        .addClasspathResource(PROCESS_PATH)
+        .deploy().getId();
+      deploymentIds.add(deploymentId);
+    }
+
+    List<ProcessDefinition> processDefinitions = repositoryService
+      .createProcessDefinitionQuery()
+      .list();
+
+    for (ProcessDefinition processDefinition: processDefinitions) {
+      runtimeService.startProcessInstanceById(processDefinition.getId()).getId();
+    }
+
+    assertEquals(3, historyService.createUserOperationLogQuery().count());
+
+    // when
+    repositoryService.deleteProcessDefinitions()
+      .byKey(PROCESS_KEY)
+      .withoutTenantId()
+      .cascade()
+      .delete();
+
+    // then
+    assertEquals(6, historyService.createUserOperationLogQuery().count());
   }
 
   @Deployment(resources = PROCESS_PATH)

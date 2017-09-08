@@ -29,6 +29,7 @@ import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinitionQuery;
 import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
 import org.camunda.bpm.engine.repository.DecisionRequirementsDefinitionQuery;
+import org.camunda.bpm.engine.repository.DeleteProcessDefinitionsSelectBuilder;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.repository.DeploymentQuery;
 import org.camunda.bpm.engine.repository.DiagramLayout;
@@ -186,6 +187,13 @@ public interface RepositoryService {
    *          If the user has no {@link Permissions#DELETE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void deleteProcessDefinition(String processDefinitionId, boolean cascade, boolean skipCustomListeners);
+
+  /**
+   * Fluent builder to delete process definitions.
+   *
+   * @return the builder to delete process definitions
+   */
+  DeleteProcessDefinitionsSelectBuilder deleteProcessDefinitions();
 
   /**
    * Retrieves a list of deployment resource names for the given deployment,

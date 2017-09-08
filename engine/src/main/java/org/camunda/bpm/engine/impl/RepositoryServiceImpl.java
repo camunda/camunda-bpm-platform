@@ -61,6 +61,7 @@ import org.camunda.bpm.engine.impl.dmn.cmd.GetDeploymentDmnModelInstanceCmd;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionQueryImpl;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionQueryImpl;
 import org.camunda.bpm.engine.impl.pvm.ReadOnlyProcessDefinition;
+import org.camunda.bpm.engine.impl.repository.DeleteProcessDefinitionsBuilderImpl;
 import org.camunda.bpm.engine.impl.repository.DeploymentBuilderImpl;
 import org.camunda.bpm.engine.impl.repository.ProcessApplicationDeploymentBuilderImpl;
 import org.camunda.bpm.engine.impl.repository.UpdateProcessDefinitionSuspensionStateBuilderImpl;
@@ -133,6 +134,11 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
   @Override
   public void deleteProcessDefinition(String processDefinitionId, boolean cascade, boolean skipCustomListeners) {
     commandExecutor.execute(new DeleteProcessDefinitionCmd(processDefinitionId, cascade, skipCustomListeners));
+  }
+
+  @Override
+  public DeleteProcessDefinitionsSelectBuilder deleteProcessDefinitions() {
+    return new DeleteProcessDefinitionsBuilderImpl(commandExecutor);
   }
 
   public ProcessDefinitionQuery createProcessDefinitionQuery() {

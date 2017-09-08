@@ -15,27 +15,14 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import java.io.Serializable;
-import org.camunda.bpm.engine.exception.NotFoundException;
-import org.camunda.bpm.engine.history.UserOperationLogEntry;
-import org.camunda.bpm.engine.impl.cfg.CommandChecker;
-import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
-import org.camunda.bpm.engine.impl.persistence.entity.UserOperationLogManager;
-import org.camunda.bpm.engine.repository.ProcessDefinition;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
- * Command to delete a process definition form a deployment.
+ * Command to delete a process definition from a deployment.
  *
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
-public class DeleteProcessDefinitionCmd implements Command<Void>, Serializable {
-
-  private final String processDefinitionId;
-  private final Boolean cascade;
-  private final Boolean skipCustomListeners;
+public class DeleteProcessDefinitionCmd extends AbstractDeleteProcessDefinitionCmd {
 
   public DeleteProcessDefinitionCmd(String processDefinitionId, Boolean cascade, Boolean skipCustomListeners) {
     this.processDefinitionId = processDefinitionId;
@@ -45,23 +32,8 @@ public class DeleteProcessDefinitionCmd implements Command<Void>, Serializable {
 
   @Override
   public Void execute(CommandContext commandContext) {
-    ensureNotNull("processDefinitionId", processDefinitionId);
+    deleteProcessDefinitionCmd(commandContext, processDefinitionId, cascade, skipCustomListeners);
 
-    ProcessDefinition processDefinition = commandContext.getProcessDefinitionManager()
-                                                .findLatestProcessDefinitionById(processDefinitionId);
-    ensureNotNull(NotFoundException.class, "No process definition found with id '" + processDefinitionId + "'", "processDefinition", processDefinition);
-
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
-      checker.checkDeleteProcessDefinitionById(processDefinitionId);
-    }
-
-    UserOperationLogManager logManager = commandContext.getOperationLogManager();
-    logManager.logProcessDefinitionOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE,
-                                             processDefinitionId,
-                                             processDefinition.getKey(),
-                                             new PropertyChange("cascade", null, cascade));
-
-    commandContext.getProcessDefinitionManager().deleteProcessDefinition(processDefinition, processDefinitionId, cascade, cascade, skipCustomListeners);
     return null;
   }
 }
