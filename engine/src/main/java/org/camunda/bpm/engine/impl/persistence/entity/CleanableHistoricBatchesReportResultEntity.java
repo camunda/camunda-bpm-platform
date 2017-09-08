@@ -19,9 +19,10 @@ public class CleanableHistoricBatchesReportResultEntity implements CleanableHist
 
   protected String batchType;
   protected Integer historyTimeToLive;
-  protected long finishedBatchCount;
-  protected long cleanableBatchCount;
+  protected long finishedBatchesCount;
+  protected long cleanableBatchesCount;
 
+  @Override
   public String getBatchType() {
     return batchType;
   }
@@ -30,6 +31,7 @@ public class CleanableHistoricBatchesReportResultEntity implements CleanableHist
     this.batchType = batchType;
   }
 
+  @Override
   public Integer getHistoryTimeToLive() {
     return historyTimeToLive;
   }
@@ -38,28 +40,31 @@ public class CleanableHistoricBatchesReportResultEntity implements CleanableHist
     this.historyTimeToLive = historyTimeToLive;
   }
 
-  public long getFinishedBatchCount() {
-    return finishedBatchCount;
+  @Override
+  public long getFinishedBatchesCount() {
+    return finishedBatchesCount;
   }
 
-  public void setFinishedBatchCount(long finishedBatchCount) {
-    this.finishedBatchCount = finishedBatchCount;
+  public void setFinishedBatchesCount(long finishedBatchCount) {
+    this.finishedBatchesCount = finishedBatchCount;
   }
 
-  public long getCleanableBatchCount() {
-    return cleanableBatchCount;
+  @Override
+  public long getCleanableBatchesCount() {
+    return cleanableBatchesCount;
   }
 
-  public void setCleanableBatchCount(long cleanableBatchCount) {
-    this.cleanableBatchCount = cleanableBatchCount;
+  public void setCleanableBatchesCount(long cleanableBatchCount) {
+    this.cleanableBatchesCount = cleanableBatchCount;
   }
 
+  @Override
   public String toString() {
     return this.getClass().getSimpleName()
         + "[batchType = " + batchType
         + ", historyTimeToLive = " + historyTimeToLive
-        + ", finishedBatchCount = " + finishedBatchCount
-        + ", cleanableBatchCount = " + cleanableBatchCount
+        + ", finishedBatchesCount = " + finishedBatchesCount
+        + ", cleanableBatchesCount = " + cleanableBatchesCount
         + "]";
   }
 }

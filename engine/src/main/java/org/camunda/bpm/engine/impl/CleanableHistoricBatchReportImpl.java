@@ -38,7 +38,7 @@ public class CleanableHistoricBatchReportImpl extends AbstractQuery<CleanableHis
     checkQueryOk();
     checkPermissions(commandContext);
 
-    return commandContext.getHistoricBatchManager().findCleanableHistoricBatchReportCountByCriteria(this, HistoryCleanupHelper.getBatchOperationsForHistoryCleanup(commandContext));
+    return commandContext.getHistoricBatchManager().findCleanableHistoricBatchesReportCountByCriteria(this, HistoryCleanupHelper.getBatchOperationsForHistoryCleanup(commandContext));
   }
 
   @Override
@@ -46,7 +46,7 @@ public class CleanableHistoricBatchReportImpl extends AbstractQuery<CleanableHis
     checkQueryOk();
     checkPermissions(commandContext);
 
-    return commandContext.getHistoricBatchManager().findCleanableHistoricBatchReportByCriteria(this, page, HistoryCleanupHelper.getBatchOperationsForHistoryCleanup(commandContext));
+    return commandContext.getHistoricBatchManager().findCleanableHistoricBatchesReportByCriteria(this, page, HistoryCleanupHelper.getBatchOperationsForHistoryCleanup(commandContext));
   }
 
   public Date getCurrentTimestamp() {

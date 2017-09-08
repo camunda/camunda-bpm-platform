@@ -238,8 +238,8 @@ public class HistoricBatchQueryAuthorizationTest {
   }
 
   private void checkResultNumbers(CleanableHistoricBatchReportResult result, int expectedCleanable, int expectedFinished, Integer expectedTTL) {
-    assertEquals(expectedCleanable, result.getCleanableBatchCount());
-    assertEquals(expectedFinished, result.getFinishedBatchCount());
+    assertEquals(expectedCleanable, result.getCleanableBatchesCount());
+    assertEquals(expectedFinished, result.getFinishedBatchesCount());
     assertEquals(expectedTTL, result.getHistoryTimeToLive());
   }
 

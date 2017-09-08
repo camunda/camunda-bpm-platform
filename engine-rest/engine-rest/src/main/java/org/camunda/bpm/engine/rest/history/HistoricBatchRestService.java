@@ -51,12 +51,12 @@ public interface HistoricBatchRestService {
   @GET
   @Path("/cleanable-batch-report")
   @Produces(MediaType.APPLICATION_JSON)
-  List<CleanableHistoricBatchReportResultDto> getCleanableHistoricBatchReport(@Context UriInfo uriInfo,
+  List<CleanableHistoricBatchReportResultDto> getCleanableHistoricBatchesReport(@Context UriInfo uriInfo,
                                                  @QueryParam("firstResult") Integer firstResult,
                                                  @QueryParam("maxResults") Integer maxResults);
 
   @GET
   @Path("/cleanable-batch-report/count")
   @Produces(MediaType.APPLICATION_JSON)
-  public CountResultDto getCleanableHistoricBatchReportCount(@Context UriInfo uriInfo);
+  public CountResultDto getCleanableHistoricBatchesReportCount(@Context UriInfo uriInfo);
 }

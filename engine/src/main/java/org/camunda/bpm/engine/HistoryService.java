@@ -406,7 +406,7 @@ public interface HistoryService {
   CleanableHistoricCaseInstanceReport createCleanableHistoricCaseInstanceReport();
 
   /**
-   * Creates a new programmatic query to create a cleanable historic case instance report.
+   * Creates a new programmatic query to create a cleanable historic batch report.
    *
    * @since 7.8
    */

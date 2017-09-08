@@ -120,19 +120,25 @@ public class HistoricBatchManager extends AbstractManager {
   }
 
   @SuppressWarnings("unchecked")
-  public List<CleanableHistoricBatchReportResult> findCleanableHistoricBatchReportByCriteria(CleanableHistoricBatchReportImpl query, Page page, Map<String, Integer> batchOperationsForHistoryCleanup) {
+  public List<CleanableHistoricBatchReportResult> findCleanableHistoricBatchesReportByCriteria(CleanableHistoricBatchReportImpl query, Page page, Map<String, Integer> batchOperationsForHistoryCleanup) {
     query.setCurrentTimestamp(ClockUtil.getCurrentTime());
     query.setParameter(batchOperationsForHistoryCleanup);
     query.getOrderingProperties().add(new QueryOrderingProperty(new QueryPropertyImpl("TYPE_"), Direction.ASCENDING));
-
-    return getDbEntityManager().selectList("selectFinishedBatchReportEntities", query, page);
+    if (batchOperationsForHistoryCleanup.isEmpty()) {
+      return getDbEntityManager().selectList("selectOnlyFinishedBatchesReportEntities", query, page);
+    } else {
+      return getDbEntityManager().selectList("selectFinishedBatchesReportEntities", query, page);
+    }
   }
 
-  public long findCleanableHistoricBatchReportCountByCriteria(CleanableHistoricBatchReportImpl query, Map<String, Integer> batchOperationsForHistoryCleanup) {
+  public long findCleanableHistoricBatchesReportCountByCriteria(CleanableHistoricBatchReportImpl query, Map<String, Integer> batchOperationsForHistoryCleanup) {
     query.setCurrentTimestamp(ClockUtil.getCurrentTime());
     query.setParameter(batchOperationsForHistoryCleanup);
-
-    return (Long) getDbEntityManager().selectOne("selectFinishedBatchReportEntitiesCount", query);
+    if (batchOperationsForHistoryCleanup.isEmpty()) {
+      return (Long) getDbEntityManager().selectOne("selectOnlyFinishedBatchesReportEntitiesCount", query);
+    } else {
+      return (Long) getDbEntityManager().selectOne("selectFinishedBatchesReportEntitiesCount", query);
+    }
   }
 
 }

@@ -25,9 +25,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class CleanableHistoricBatchReportDto extends AbstractQueryDto<CleanableHistoricBatchReport> {
 
-  public CleanableHistoricBatchReportDto() {
-  }
-
   public CleanableHistoricBatchReportDto(ObjectMapper objectMapper, MultivaluedMap<String, String> queryParameters) {
     super(objectMapper, queryParameters);
   }

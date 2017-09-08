@@ -166,7 +166,7 @@ public interface CommandChecker {
   void checkActivateBatch(BatchEntity batch);
 
   /**
-   * Check if it is allowed to read historic batches
+   * Check if it is allowed to read historic batch
    */
   void checkReadHistoricBatch();
 

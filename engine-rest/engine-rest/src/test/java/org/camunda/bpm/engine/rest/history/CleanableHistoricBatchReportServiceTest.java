@@ -61,15 +61,15 @@ public class CleanableHistoricBatchReportServiceTest extends AbstractRestService
 
     when(reportResult.getBatchType()).thenReturn("batchId1");
     when(reportResult.getHistoryTimeToLive()).thenReturn(5);
-    when(reportResult.getFinishedBatchCount()).thenReturn(10l);
-    when(reportResult.getCleanableBatchCount()).thenReturn(5l);
+    when(reportResult.getFinishedBatchesCount()).thenReturn(10l);
+    when(reportResult.getCleanableBatchesCount()).thenReturn(5l);
 
     CleanableHistoricBatchReportResult anotherReportResult = mock(CleanableHistoricBatchReportResult.class);
 
     when(anotherReportResult.getBatchType()).thenReturn("batchId2");
     when(anotherReportResult.getHistoryTimeToLive()).thenReturn(null);
-    when(anotherReportResult.getFinishedBatchCount()).thenReturn(13l);
-    when(anotherReportResult.getCleanableBatchCount()).thenReturn(0l);
+    when(anotherReportResult.getFinishedBatchesCount()).thenReturn(13l);
+    when(anotherReportResult.getCleanableBatchesCount()).thenReturn(0l);
 
     List<CleanableHistoricBatchReportResult> mocks = new ArrayList<CleanableHistoricBatchReportResult>();
     mocks.add(reportResult);

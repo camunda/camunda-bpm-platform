@@ -270,9 +270,8 @@ public class CleanableHistoricBatchReportTest {
     List<HistoricBatch> historicList = historyService.createHistoricBatchQuery().list();
     assertEquals(20, historicList.size());
 
-    List<CleanableHistoricBatchReportResult> list = historyService.createCleanableHistoricBatchReport().list();
-    assertEquals(1, list.size());
-    checkResultNumbers(list.get(0), 0, 18, null);
+    assertEquals(1, historyService.createCleanableHistoricBatchReport().count());
+    checkResultNumbers(historyService.createCleanableHistoricBatchReport().singleResult(), 0, 18, null);
   }
 
   @Test
@@ -298,8 +297,8 @@ public class CleanableHistoricBatchReportTest {
   }
 
   private void checkResultNumbers(CleanableHistoricBatchReportResult result, int expectedCleanable, int expectedFinished, Integer expectedTTL) {
-    assertEquals(expectedCleanable, result.getCleanableBatchCount());
-    assertEquals(expectedFinished, result.getFinishedBatchCount());
+    assertEquals(expectedCleanable, result.getCleanableBatchesCount());
+    assertEquals(expectedFinished, result.getFinishedBatchesCount());
     assertEquals(expectedTTL, result.getHistoryTimeToLive());
   }
 

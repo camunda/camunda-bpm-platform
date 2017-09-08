@@ -107,6 +107,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     constants.put("constant.datepart.quarter", "QUARTER");
     constants.put("constant.datepart.month", "MONTH");
     constants.put("constant.null.startTime", "null START_TIME_");
+    constants.put("constant.varchar.cast", "'${key}'");
     dbSpecificConstants.put(H2, constants);
 
     // mysql specific
@@ -164,6 +165,7 @@ public class DbSqlSessionFactory implements SessionFactory {
       constants.put("constant.datepart.quarter", "QUARTER");
       constants.put("constant.datepart.month", "MONTH");
       constants.put("constant.null.startTime", "null START_TIME_");
+      constants.put("constant.varchar.cast", "'${key}'");
       dbSpecificConstants.put(mysqlLikeDatabase, constants);
     }
 
@@ -213,8 +215,6 @@ public class DbSqlSessionFactory implements SessionFactory {
     addDatabaseSpecificStatement(POSTGRES, "selectEventsByTaskId", "selectEventsByTaskId_postgres");
     addDatabaseSpecificStatement(POSTGRES, "selectFilterByQueryCriteria", "selectFilterByQueryCriteria_postgres");
     addDatabaseSpecificStatement(POSTGRES, "selectFilter", "selectFilter_postgres");
-    addDatabaseSpecificStatement(POSTGRES, "selectFinishedBatchReportEntitiesCount", "selectFinishedBatchReportEntitiesCount_postgres_or_db2");
-    addDatabaseSpecificStatement(POSTGRES, "selectFinishedBatchReportEntities", "selectFinishedBatchReportEntities_postgres_or_db2");
 
     constants = new HashMap<String, String>();
     constants.put("constant.event", "'event'");
@@ -223,6 +223,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     constants.put("constant.datepart.quarter", "QUARTER");
     constants.put("constant.datepart.month", "MONTH");
     constants.put("constant.null.startTime", "null START_TIME_");
+    constants.put("constant.varchar.cast", "cast('${key}' as varchar(64))");
     dbSpecificConstants.put(POSTGRES, constants);
 
     // oracle
@@ -261,6 +262,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     constants.put("constant.datepart.quarter", "'Q'");
     constants.put("constant.datepart.month", "'MM'");
     constants.put("constant.null.startTime", "null START_TIME_");
+    constants.put("constant.varchar.cast", "'${key}'");
     dbSpecificConstants.put(ORACLE, constants);
 
     // db2
@@ -299,8 +301,6 @@ public class DbSqlSessionFactory implements SessionFactory {
     addDatabaseSpecificStatement(DB2, "selectUserByNativeQuery", "selectUserByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement(DB2, "selectHistoricDecisionInstancesByNativeQuery", "selectHistoricDecisionInstancesByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement(DB2, "selectFilterByQueryCriteria", "selectFilterByQueryCriteria_oracleDb2");
-    addDatabaseSpecificStatement(DB2, "selectFinishedBatchReportEntitiesCount", "selectFinishedBatchReportEntitiesCount_postgres_or_db2");
-    addDatabaseSpecificStatement(DB2, "selectFinishedBatchReportEntities", "selectFinishedBatchReportEntities_postgres_or_db2");
 
     constants = new HashMap<String, String>();
     constants.put("constant.event", "'event'");
@@ -309,6 +309,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     constants.put("constant.datepart.quarter", "QUARTER");
     constants.put("constant.datepart.month", "MONTH");
     constants.put("constant.null.startTime", "CAST(NULL as timestamp) as START_TIME_");
+    constants.put("constant.varchar.cast", "cast('${key}' as varchar(64))");
     dbSpecificConstants.put(DB2, constants);
 
     // mssql
@@ -357,6 +358,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     constants.put("constant.datepart.quarter", "QUARTER");
     constants.put("constant.datepart.month", "MONTH");
     constants.put("constant.null.startTime", "null START_TIME_");
+    constants.put("constant.varchar.cast", "'${key}'");
     dbSpecificConstants.put(MSSQL, constants);
   }
 

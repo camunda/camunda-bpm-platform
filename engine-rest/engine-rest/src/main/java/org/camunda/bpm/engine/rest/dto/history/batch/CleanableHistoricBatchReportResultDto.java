@@ -24,11 +24,8 @@ public class CleanableHistoricBatchReportResultDto {
 
   protected String batchType;
   protected Integer historyTimeToLive;
-  protected long finishedBatchCount;
-  protected long cleanableBatchCount;
-
-  public CleanableHistoricBatchReportResultDto() {
-  }
+  protected long finishedBatchesCount;
+  protected long cleanableBatchesCount;
 
   public String getBatchType() {
     return batchType;
@@ -46,20 +43,20 @@ public class CleanableHistoricBatchReportResultDto {
     this.historyTimeToLive = historyTimeToLive;
   }
 
-  public long getFinishedBatchCount() {
-    return finishedBatchCount;
+  public long getFinishedBatchesCount() {
+    return finishedBatchesCount;
   }
 
-  public void setFinishedBatchCount(long finishedBatchCount) {
-    this.finishedBatchCount = finishedBatchCount;
+  public void setFinishedBatchesCount(long finishedBatchCount) {
+    this.finishedBatchesCount = finishedBatchCount;
   }
 
-  public long getCleanableBatchCount() {
-    return cleanableBatchCount;
+  public long getCleanableBatchesCount() {
+    return cleanableBatchesCount;
   }
 
-  public void setCleanableBatchCount(long cleanableBatchCount) {
-    this.cleanableBatchCount = cleanableBatchCount;
+  public void setCleanableBatchesCount(long cleanableBatchCount) {
+    this.cleanableBatchesCount = cleanableBatchCount;
   }
 
   protected CleanableHistoricBatchReport createNewReportQuery(ProcessEngine engine) {
@@ -71,8 +68,8 @@ public class CleanableHistoricBatchReportResultDto {
       CleanableHistoricBatchReportResultDto dto = new CleanableHistoricBatchReportResultDto();
       dto.setBatchType(current.getBatchType());
       dto.setHistoryTimeToLive(current.getHistoryTimeToLive());
-      dto.setFinishedBatchCount(current.getFinishedBatchCount());
-      dto.setCleanableBatchCount(current.getCleanableBatchCount());
+      dto.setFinishedBatchesCount(current.getFinishedBatchesCount());
+      dto.setCleanableBatchesCount(current.getCleanableBatchesCount());
       dtos.add(dto);
     }
     return dtos;

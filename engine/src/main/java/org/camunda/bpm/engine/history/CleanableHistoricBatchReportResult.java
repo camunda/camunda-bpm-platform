@@ -25,17 +25,17 @@ public interface CleanableHistoricBatchReportResult {
   String getBatchType();
 
   /**
-   * Returns the history time to live for the selected batch.
+   * Returns the history time to live for the selected batch type.
    */
   Integer getHistoryTimeToLive();
 
   /**
-   * Returns the amount of finished historic batch.
+   * Returns the amount of finished historic batches.
    */
-  long getFinishedBatchCount();
+  long getFinishedBatchesCount();
 
   /**
-   * Returns the amount of cleanable historic batch.
+   * Returns the amount of cleanable historic batches.
    */
-  long getCleanableBatchCount();
+  long getCleanableBatchesCount();
 }
