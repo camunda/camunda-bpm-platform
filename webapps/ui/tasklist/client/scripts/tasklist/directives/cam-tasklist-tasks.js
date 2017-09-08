@@ -128,14 +128,24 @@ module.exports = [function() {
          */
         tasksData.observe('taskListQuery', function(taskListQuery) {
           if (taskListQuery) {
+
+            var oldQuery = $scope.query;
+
             // parse pagination properties from query
             $scope.query = angular.copy(taskListQuery);
             $scope.pageSize = $scope.query.maxResults;
             // Sachbearbeiter starts counting at '1'
             $scope.pageNum = ($scope.query.firstResult / $scope.pageSize) + 1;
-            tasksData.set('taskId', { 'taskId' : null });
+
+            if (oldQuery.id) {
+              tasksData.set('taskId', { 'taskId' : null });
+              var searchParams = $location.search() || {};
+              searchParams.task = null;
+              updateSilently(searchParams);
+            }
           }
         });
+
 
         tasksData.observe('taskId', function(taskId) {
           $scope.currentTaskId = taskId.taskId;
