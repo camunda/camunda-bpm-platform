@@ -20,9 +20,15 @@ module.exports = [function() {
     controller: [
       '$scope',
       'search',
+      '$http',
+      'Uri',
+      'Notifications',
       function(
         $scope,
-        search
+        search,
+        $http,
+        Uri,
+        Notifications
       ) {
 
         var filtersData = $scope.filtersData = $scope.filtersData.newChild($scope);
@@ -79,6 +85,36 @@ module.exports = [function() {
          */
         $scope.isFocused = function(filter) {
           return filter.id === $scope.currentFilter.id;
+        };
+
+        /**
+         * Add initial 'All' filter
+         */
+         
+        $scope.addAllFilter = function() {
+          var payload = {
+            name: 'All Tasks',
+            resourceType: 'Task',
+            query: {},
+            properties: {
+              description: 'Unfiltered Tasks',
+              priority: 1,
+              color: '#555555',
+              refresh: false,
+              howUndefinedVariable: false
+            }
+          };
+
+          $http.post(Uri.appUri('engine://engine/:engine/filter/create'), payload)
+            .then(function() {
+              $scope.filtersData.changed('filters');
+            })
+            .catch(function(err) {
+              Notifications.addError({
+                status: 'Could not add filter',
+                message: err.message
+              });
+            });
         };
 
       }]

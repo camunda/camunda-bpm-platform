@@ -21,6 +21,7 @@ import org.camunda.bpm.cockpit.impl.plugin.base.dto.query.IncidentQueryDto;
 import org.camunda.bpm.cockpit.impl.plugin.resources.IncidentRestService;
 import org.camunda.bpm.cockpit.plugin.test.AbstractCockpitPluginTest;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -34,6 +35,7 @@ import org.junit.Test;
 public class IncidentRestServiceTest extends AbstractCockpitPluginTest {
 
   private ProcessEngine processEngine;
+  private RepositoryService repositoryService;
   private RuntimeService runtimeService;
   private IncidentRestService resource;
 
@@ -42,6 +44,7 @@ public class IncidentRestServiceTest extends AbstractCockpitPluginTest {
     super.before();
 
     processEngine = getProcessEngine();
+    repositoryService = processEngine.getRepositoryService();
     runtimeService = processEngine.getRuntimeService();
 
     resource = new IncidentRestService(processEngine.getName());
@@ -289,4 +292,59 @@ public class IncidentRestServiceTest extends AbstractCockpitPluginTest {
     assertThat(result).hasSize(4);
   }
 
+  @Test
+  @Deployment(resources = {
+      "processes/failing-process.bpmn",
+      "processes/call-activity.bpmn",
+      "processes/nested-call-activity.bpmn"
+  })
+  public void testQueryByProcessDefinitionId() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("NestedCallActivity");
+
+    executeAvailableJobs();
+
+    String[] processDefinitionIds = { processInstance.getProcessDefinitionId() };
+
+    IncidentQueryDto queryParameter = new IncidentQueryDto();
+    queryParameter.setProcessDefinitionIdIn(processDefinitionIds);
+
+    List<IncidentDto> result = resource.queryIncidents(queryParameter, null, null);
+    assertThat(result).isNotEmpty();
+    assertThat(result).hasSize(1);
+
+    IncidentDto incident = result.get(0);
+
+    assertThat(incident.getId()).isNotNull();
+    assertThat(incident.getIncidentType()).isEqualTo(Incident.FAILED_JOB_HANDLER_TYPE);
+    assertThat(incident.getIncidentMessage()).isNull();
+    assertThat(incident.getIncidentTimestamp()).isNotNull();
+    assertThat(incident.getActivityId()).isEqualTo("CallActivity_1");
+    assertThat(incident.getProcessInstanceId()).isEqualTo(processInstance.getId());
+    assertThat(incident.getProcessDefinitionId()).isEqualTo(processInstance.getProcessDefinitionId());
+    assertThat(incident.getExecutionId()).isNotNull();
+    assertThat(incident.getConfiguration()).isNull();
+  }
+
+  @Test
+  @Deployment(resources = {
+      "processes/failing-process.bpmn",
+      "processes/call-activity.bpmn",
+      "processes/nested-call-activity.bpmn"
+  })
+  public void testQueryByProcessDefinitionIds() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("NestedCallActivity");
+
+    executeAvailableJobs();
+
+    String processDefinition2 = repositoryService.createProcessDefinitionQuery().processDefinitionKey("CallActivity").singleResult().getId();
+
+    String[] processDefinitionIds = { processInstance.getProcessDefinitionId(), processDefinition2 };
+
+    IncidentQueryDto queryParameter = new IncidentQueryDto();
+    queryParameter.setProcessDefinitionIdIn(processDefinitionIds);
+
+    List<IncidentDto> result = resource.queryIncidents(queryParameter, null, null);
+    assertThat(result).isNotEmpty();
+    assertThat(result).hasSize(2);
+  }
 }
