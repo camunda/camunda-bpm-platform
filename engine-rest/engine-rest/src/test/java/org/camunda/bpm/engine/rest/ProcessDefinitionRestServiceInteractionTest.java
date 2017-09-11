@@ -12,6 +12,8 @@ import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
+import org.camunda.bpm.engine.repository.DeleteProcessDefinitionsBuilder;
+import org.camunda.bpm.engine.repository.DeleteProcessDefinitionsSelectBuilder;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.rest.dto.HistoryTimeToLiveDto;
@@ -136,6 +138,9 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
     when(processEngine.getRepositoryService()).thenReturn(repositoryServiceMock);
     when(repositoryServiceMock.getProcessDefinition(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))).thenReturn(mockDefinition);
     when(repositoryServiceMock.getProcessModel(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))).thenReturn(createMockProcessDefinionBpmn20Xml());
+
+    DeleteProcessDefinitionsSelectBuilder deleteProcessDefinitionsSelectBuilder = mock(DeleteProcessDefinitionsSelectBuilder.class, RETURNS_DEEP_STUBS);
+    when(repositoryServiceMock.deleteProcessDefinitions()).thenReturn(deleteProcessDefinitionsSelectBuilder);
 
     setUpMockDefinitionQuery(mockDefinition);
 
@@ -1552,6 +1557,185 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
       .body("message", is(message))
     .when()
       .delete(SINGLE_PROCESS_DEFINITION_URL);
+  }
+
+  @Test
+  public void testDeleteDefinitionsByKey() {
+    given()
+      .pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
+    .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .delete(SINGLE_PROCESS_DEFINITION_BY_KEY_URL);
+
+    DeleteProcessDefinitionsBuilder builder = repositoryServiceMock.deleteProcessDefinitions()
+      .byKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+
+    verify(builder).delete();
+  }
+
+  @Test
+  public void testDeleteDefinitionsByKeyCascade() {
+    given()
+      .pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
+      .queryParam("cascade", true)
+    .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .delete(SINGLE_PROCESS_DEFINITION_BY_KEY_URL);
+
+    DeleteProcessDefinitionsBuilder builder = repositoryServiceMock.deleteProcessDefinitions()
+      .byKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
+      .cascade();
+
+    verify(builder).delete();
+  }
+
+  @Test
+  public void testDeleteDefinitionsByKeySkipCustomListeners() {
+    given()
+      .pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
+      .queryParam("skipCustomListeners", true)
+    .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .delete(SINGLE_PROCESS_DEFINITION_BY_KEY_URL);
+
+    DeleteProcessDefinitionsBuilder builder = repositoryServiceMock.deleteProcessDefinitions()
+      .byKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
+      .skipCustomListeners();
+
+    verify(builder).delete();
+  }
+
+  @Test
+  public void testDeleteDefinitionsByKeySkipCustomListenersAndCascade() {
+    given()
+      .pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
+      .queryParam("cascade", true)
+      .queryParam("skipCustomListeners", true)
+    .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .delete(SINGLE_PROCESS_DEFINITION_BY_KEY_URL);
+
+    DeleteProcessDefinitionsBuilder builder = repositoryServiceMock.deleteProcessDefinitions()
+      .byKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
+      .skipCustomListeners()
+      .cascade();
+
+    verify(builder).delete();
+  }
+
+  @Test
+  public void testDeleteNotExistingKey() {
+    DeleteProcessDefinitionsBuilder builder = repositoryServiceMock.deleteProcessDefinitions()
+      .byKey("NOT_EXISTING_KEY");
+
+    doThrow(new NotFoundException("No process definition found with key 'NOT_EXISTING_KEY'")).when(builder).delete();
+
+    given()
+      .pathParam("key", "NOT_EXISTING_KEY")
+    .expect()
+      .statusCode(Status.NOT_FOUND.getStatusCode())
+      .body(containsString("No process definition found with key 'NOT_EXISTING_KEY'"))
+    .when()
+      .delete(SINGLE_PROCESS_DEFINITION_BY_KEY_URL);
+  }
+
+  @Test
+  public void testDeleteDefinitionsByKeyWithTenantId() {
+    given()
+      .pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
+      .pathParam("tenant-id", MockProvider.EXAMPLE_TENANT_ID)
+    .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .delete(SINGLE_PROCESS_DEFINITION_BY_KEY_AND_TENANT_ID_URL);
+
+    DeleteProcessDefinitionsBuilder builder = repositoryServiceMock.deleteProcessDefinitions()
+      .byKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
+      .withTenantId(MockProvider.EXAMPLE_TENANT_ID);
+
+    verify(builder).delete();
+  }
+
+
+  @Test
+  public void testDeleteDefinitionsByKeyCascadeWithTenantId() {
+    given()
+      .pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
+      .pathParam("tenant-id", MockProvider.EXAMPLE_TENANT_ID)
+      .queryParam("cascade", true)
+    .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .delete(SINGLE_PROCESS_DEFINITION_BY_KEY_AND_TENANT_ID_URL);
+
+    DeleteProcessDefinitionsBuilder builder = repositoryServiceMock.deleteProcessDefinitions()
+      .byKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
+      .withTenantId(MockProvider.EXAMPLE_TENANT_ID)
+      .cascade();
+
+    verify(builder).delete();
+  }
+
+  @Test
+  public void testDeleteDefinitionsByKeySkipCustomListenersWithTenantId() {
+    given()
+      .pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
+      .pathParam("tenant-id", MockProvider.EXAMPLE_TENANT_ID)
+      .queryParam("skipCustomListeners", true)
+    .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .delete(SINGLE_PROCESS_DEFINITION_BY_KEY_AND_TENANT_ID_URL);
+
+    DeleteProcessDefinitionsBuilder builder = repositoryServiceMock.deleteProcessDefinitions()
+      .byKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
+      .withTenantId(MockProvider.EXAMPLE_TENANT_ID)
+      .skipCustomListeners();
+
+    verify(builder).delete();
+  }
+
+  @Test
+  public void testDeleteDefinitionsByKeySkipCustomListenersAndCascadeWithTenantId() {
+    given()
+      .pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
+      .queryParam("skipCustomListeners", true)
+      .queryParam("cascade", true)
+      .pathParam("tenant-id", MockProvider.EXAMPLE_TENANT_ID)
+    .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .delete(SINGLE_PROCESS_DEFINITION_BY_KEY_AND_TENANT_ID_URL);
+
+    DeleteProcessDefinitionsBuilder builder = repositoryServiceMock.deleteProcessDefinitions()
+      .byKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
+      .withTenantId(MockProvider.EXAMPLE_TENANT_ID)
+      .skipCustomListeners()
+      .cascade();
+
+    verify(builder).delete();
+  }
+
+  @Test
+  public void testDeleteNoPermissions() {
+    DeleteProcessDefinitionsBuilder builder = repositoryServiceMock.deleteProcessDefinitions()
+      .byKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
+      .withTenantId(MockProvider.EXAMPLE_TENANT_ID);
+
+    doThrow(new AuthorizationException("No permission to delete process definitions")).when(builder).delete();
+
+    given()
+      .pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
+      .pathParam("tenant-id", MockProvider.EXAMPLE_TENANT_ID)
+    .expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .body(containsString("No permission to delete process definitions"))
+    .when()
+      .delete(SINGLE_PROCESS_DEFINITION_BY_KEY_AND_TENANT_ID_URL);
   }
 
   @Test

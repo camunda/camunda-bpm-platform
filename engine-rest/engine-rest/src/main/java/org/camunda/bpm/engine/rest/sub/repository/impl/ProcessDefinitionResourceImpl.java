@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.form.StartFormData;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.management.ActivityStatistics;
 import org.camunda.bpm.engine.management.ActivityStatisticsQuery;
+import org.camunda.bpm.engine.repository.DeleteProcessDefinitionsBuilder;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.rest.ProcessInstanceRestService;
 import org.camunda.bpm.engine.rest.dto.StatisticsResultDto;
@@ -418,4 +419,42 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
     restartProcessInstanceDto.applyTo(builder, engine, objectMapper);
     return builder;
   }
+
+  @Override
+  public void deleteProcessDefinitionsByKey(String processDefinitionKey, boolean cascade, boolean skipCustomListeners) {
+    RepositoryService repositoryService = engine.getRepositoryService();
+
+    DeleteProcessDefinitionsBuilder builder = repositoryService.deleteProcessDefinitions()
+      .byKey(processDefinitionKey);
+
+    deleteProcessDefinitions(builder, cascade, skipCustomListeners);
+  }
+
+  @Override
+  public void deleteProcessDefinitionsByKeyAndTenantId(String processDefinitionKey, boolean cascade, boolean skipCustomListeners, String tenantId) {
+    RepositoryService repositoryService = engine.getRepositoryService();
+
+    DeleteProcessDefinitionsBuilder builder = repositoryService.deleteProcessDefinitions()
+      .byKey(processDefinitionKey)
+      .withTenantId(tenantId);
+
+    deleteProcessDefinitions(builder, cascade, skipCustomListeners);
+  }
+
+  private void deleteProcessDefinitions(DeleteProcessDefinitionsBuilder builder, boolean cascade, boolean skipCustomListeners) {
+    if (skipCustomListeners) {
+      builder = builder.skipCustomListeners();
+    }
+
+    if (cascade) {
+      builder = builder.cascade();
+    }
+
+    try {
+      builder.delete();
+    } catch (NotFoundException e) { // rewrite status code from bad request (400) to not found (404)
+      throw new InvalidRequestException(Status.NOT_FOUND, e.getMessage());
+    }
+  }
+
 }

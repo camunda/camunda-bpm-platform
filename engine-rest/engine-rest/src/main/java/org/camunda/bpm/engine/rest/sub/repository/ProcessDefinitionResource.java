@@ -105,4 +105,18 @@ public interface ProcessDefinitionResource {
   @Produces(MediaType.APPLICATION_JSON)
   Map<String, VariableValueDto> getFormVariables(@QueryParam("variableNames") String variableNames,
       @QueryParam(VariableResource.DESERIALIZE_VALUES_QUERY_PARAM) @DefaultValue("true") boolean deserializeValues);
+
+  @DELETE
+  @Path("/key/{key}")
+  void deleteProcessDefinitionsByKey(@PathParam("key") String processDefinitionKey,
+                                     @QueryParam("cascade") boolean cascade,
+                                     @QueryParam("skipCustomListeners") boolean skipCustomListeners);
+
+  @DELETE
+  @Path("/key/{key}/tenant-id/{tenantId}")
+  void deleteProcessDefinitionsByKeyAndTenantId(@PathParam("key") String processDefinitionKey,
+                                                @QueryParam("cascade") boolean cascade,
+                                                @QueryParam("skipCustomListeners") boolean skipCustomListeners,
+                                                @PathParam("tenantId") String tenantId);
+
 }
