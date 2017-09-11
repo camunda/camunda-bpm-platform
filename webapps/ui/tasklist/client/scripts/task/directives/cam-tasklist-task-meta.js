@@ -41,8 +41,10 @@ module.exports = [
         taskMetaData.observe('task', function(task) {
           $scope.task = angular.copy(task);
 
-          $scope.task.followUp = unfixDate($scope.task.followUp);
-          $scope.task.due = unfixDate($scope.task.due);
+          if ($scope.task) {
+            $scope.task.followUp = unfixDate($scope.task.followUp);
+            $scope.task.due = unfixDate($scope.task.due);
+          }
         });
 
         taskMetaData.observe('assignee', function(assignee) {
