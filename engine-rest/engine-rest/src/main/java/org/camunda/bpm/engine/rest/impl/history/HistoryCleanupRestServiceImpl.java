@@ -10,6 +10,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupHelp
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.rest.dto.history.HistoryCleanupConfigurationDto;
 import org.camunda.bpm.engine.rest.dto.runtime.JobDto;
+import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.history.HistoryCleanupRestService;
 import org.camunda.bpm.engine.runtime.Job;
@@ -45,6 +46,9 @@ public class HistoryCleanupRestServiceImpl implements HistoryCleanupRestService 
         .getHistoryCleanupBatchWindowStartTimeAsDate();
     Date endTime = ((ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration())
         .getHistoryCleanupBatchWindowEndTimeAsDate();
+    if (startTime == null || endTime == null) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, "History cleanup batch window is not configured.");
+    }
     Date now = new Date();
     ClockUtil.setCurrentTime(now);
     Date startDate = HistoryCleanupHelper.getCurrentOrNextBatchWindowStartTime(now, startTime, endTime);
