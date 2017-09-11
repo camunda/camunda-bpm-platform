@@ -20,8 +20,11 @@ import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatistics;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatisticsQuery;
+import org.camunda.bpm.engine.repository.DeleteProcessDefinitionsBuilder;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.rest.ProcessDefinitionRestService;
@@ -178,6 +181,43 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
     } catch (IllegalArgumentException e) {
       String message = String.format("Could not update the suspension state of Process Definitions due to: %s", e.getMessage()) ;
       throw new InvalidRequestException(Status.BAD_REQUEST, e, message);
+    }
+  }
+
+  @Override
+  public void deleteProcessDefinitionsByKey(String processDefinitionKey, boolean cascade, boolean skipCustomListeners) {
+    RepositoryService repositoryService = processEngine.getRepositoryService();
+
+    DeleteProcessDefinitionsBuilder builder = repositoryService.deleteProcessDefinitions()
+      .byKey(processDefinitionKey);
+
+    deleteProcessDefinitions(builder, cascade, skipCustomListeners);
+  }
+
+  @Override
+  public void deleteProcessDefinitionsByKeyAndTenantId(String processDefinitionKey, boolean cascade, boolean skipCustomListeners, String tenantId) {
+    RepositoryService repositoryService = processEngine.getRepositoryService();
+
+    DeleteProcessDefinitionsBuilder builder = repositoryService.deleteProcessDefinitions()
+      .byKey(processDefinitionKey)
+      .withTenantId(tenantId);
+
+    deleteProcessDefinitions(builder, cascade, skipCustomListeners);
+  }
+
+  private void deleteProcessDefinitions(DeleteProcessDefinitionsBuilder builder, boolean cascade, boolean skipCustomListeners) {
+    if (skipCustomListeners) {
+      builder = builder.skipCustomListeners();
+    }
+
+    if (cascade) {
+      builder = builder.cascade();
+    }
+
+    try {
+      builder.delete();
+    } catch (NotFoundException e) { // rewrite status code from bad request (400) to not found (404)
+      throw new InvalidRequestException(Status.NOT_FOUND, e.getMessage());
     }
   }
 

@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.rest;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -81,4 +82,17 @@ public interface ProcessDefinitionRestService {
   @Path("/suspended")
   @Consumes(MediaType.APPLICATION_JSON)
   void updateSuspensionState(ProcessDefinitionSuspensionStateDto dto);
+
+  @DELETE
+  @Path("/key/{key}/delete")
+  void deleteProcessDefinitionsByKey(@PathParam("key") String processDefinitionKey,
+                                     @QueryParam("cascade") boolean cascade,
+                                     @QueryParam("skipCustomListeners") boolean skipCustomListeners);
+
+  @DELETE
+  @Path("/key/{key}/tenant-id/{tenantId}/delete")
+  void deleteProcessDefinitionsByKeyAndTenantId(@PathParam("key") String processDefinitionKey,
+                                                @QueryParam("cascade") boolean cascade,
+                                                @QueryParam("skipCustomListeners") boolean skipCustomListeners,
+                                                @PathParam("tenantId") String tenantId);
 }

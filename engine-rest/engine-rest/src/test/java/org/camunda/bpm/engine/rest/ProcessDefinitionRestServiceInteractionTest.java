@@ -90,6 +90,8 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
   protected static final String SINGLE_PROCESS_DEFINITION_BY_KEY_SUSPENDED_URL = SINGLE_PROCESS_DEFINITION_BY_KEY_URL + "/suspended";
   protected static final String SINGLE_PROCESS_DEFINITION_HISTORY_TIMETOLIVE_URL = SINGLE_PROCESS_DEFINITION_URL + "/history-time-to-live";
   protected static final String PROCESS_DEFINITION_SUSPENDED_URL = PROCESS_DEFINITION_URL + "/suspended";
+  protected static final String SINGLE_PROCESS_DEFINITION_BY_KEY_DELETE_URL = SINGLE_PROCESS_DEFINITION_BY_KEY_URL + "/delete";
+  protected static final String SINGLE_PROCESS_DEFINITION_BY_KEY_AND_TENANT_ID_DELETE_URL = SINGLE_PROCESS_DEFINITION_BY_KEY_AND_TENANT_ID_URL + "/delete";
 
   private RuntimeService runtimeServiceMock;
   private RepositoryService repositoryServiceMock;
@@ -1566,7 +1568,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
-      .delete(SINGLE_PROCESS_DEFINITION_BY_KEY_URL);
+      .delete(SINGLE_PROCESS_DEFINITION_BY_KEY_DELETE_URL);
 
     DeleteProcessDefinitionsBuilder builder = repositoryServiceMock.deleteProcessDefinitions()
       .byKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
@@ -1582,7 +1584,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
-      .delete(SINGLE_PROCESS_DEFINITION_BY_KEY_URL);
+      .delete(SINGLE_PROCESS_DEFINITION_BY_KEY_DELETE_URL);
 
     DeleteProcessDefinitionsBuilder builder = repositoryServiceMock.deleteProcessDefinitions()
       .byKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
@@ -1599,7 +1601,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
-      .delete(SINGLE_PROCESS_DEFINITION_BY_KEY_URL);
+      .delete(SINGLE_PROCESS_DEFINITION_BY_KEY_DELETE_URL);
 
     DeleteProcessDefinitionsBuilder builder = repositoryServiceMock.deleteProcessDefinitions()
       .byKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
@@ -1617,7 +1619,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
-      .delete(SINGLE_PROCESS_DEFINITION_BY_KEY_URL);
+      .delete(SINGLE_PROCESS_DEFINITION_BY_KEY_DELETE_URL);
 
     DeleteProcessDefinitionsBuilder builder = repositoryServiceMock.deleteProcessDefinitions()
       .byKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
@@ -1628,7 +1630,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
   }
 
   @Test
-  public void testDeleteNotExistingKey() {
+  public void testDeleteDefinitionsByKeyNotExistingKey() {
     DeleteProcessDefinitionsBuilder builder = repositoryServiceMock.deleteProcessDefinitions()
       .byKey("NOT_EXISTING_KEY");
 
@@ -1640,7 +1642,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
       .statusCode(Status.NOT_FOUND.getStatusCode())
       .body(containsString("No process definition found with key 'NOT_EXISTING_KEY'"))
     .when()
-      .delete(SINGLE_PROCESS_DEFINITION_BY_KEY_URL);
+      .delete(SINGLE_PROCESS_DEFINITION_BY_KEY_DELETE_URL);
   }
 
   @Test
@@ -1651,7 +1653,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
-      .delete(SINGLE_PROCESS_DEFINITION_BY_KEY_AND_TENANT_ID_URL);
+      .delete(SINGLE_PROCESS_DEFINITION_BY_KEY_AND_TENANT_ID_DELETE_URL);
 
     DeleteProcessDefinitionsBuilder builder = repositoryServiceMock.deleteProcessDefinitions()
       .byKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
@@ -1670,7 +1672,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
-      .delete(SINGLE_PROCESS_DEFINITION_BY_KEY_AND_TENANT_ID_URL);
+      .delete(SINGLE_PROCESS_DEFINITION_BY_KEY_AND_TENANT_ID_DELETE_URL);
 
     DeleteProcessDefinitionsBuilder builder = repositoryServiceMock.deleteProcessDefinitions()
       .byKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
@@ -1689,7 +1691,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
-      .delete(SINGLE_PROCESS_DEFINITION_BY_KEY_AND_TENANT_ID_URL);
+      .delete(SINGLE_PROCESS_DEFINITION_BY_KEY_AND_TENANT_ID_DELETE_URL);
 
     DeleteProcessDefinitionsBuilder builder = repositoryServiceMock.deleteProcessDefinitions()
       .byKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
@@ -1709,7 +1711,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
-      .delete(SINGLE_PROCESS_DEFINITION_BY_KEY_AND_TENANT_ID_URL);
+      .delete(SINGLE_PROCESS_DEFINITION_BY_KEY_AND_TENANT_ID_DELETE_URL);
 
     DeleteProcessDefinitionsBuilder builder = repositoryServiceMock.deleteProcessDefinitions()
       .byKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
@@ -1721,7 +1723,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
   }
 
   @Test
-  public void testDeleteNoPermissions() {
+  public void testDeleteDefinitionsByKeyNoPermissions() {
     DeleteProcessDefinitionsBuilder builder = repositoryServiceMock.deleteProcessDefinitions()
       .byKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
       .withTenantId(MockProvider.EXAMPLE_TENANT_ID);
@@ -1735,7 +1737,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
       .statusCode(Status.FORBIDDEN.getStatusCode())
       .body(containsString("No permission to delete process definitions"))
     .when()
-      .delete(SINGLE_PROCESS_DEFINITION_BY_KEY_AND_TENANT_ID_URL);
+      .delete(SINGLE_PROCESS_DEFINITION_BY_KEY_AND_TENANT_ID_DELETE_URL);
   }
 
   @Test
