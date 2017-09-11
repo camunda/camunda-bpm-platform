@@ -12,10 +12,6 @@
  */
 package org.camunda.bpm.engine.rest.impl.history;
 
-import javax.ws.rs.core.Response.Status;
-
-import org.camunda.bpm.engine.rest.dto.runtime.JobDto;
-import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.history.HistoricActivityInstanceRestService;
 import org.camunda.bpm.engine.rest.history.HistoricProcessDefinitionRestService;
 import org.camunda.bpm.engine.rest.history.HistoricBatchRestService;
@@ -33,11 +29,11 @@ import org.camunda.bpm.engine.rest.history.HistoricJobLogRestService;
 import org.camunda.bpm.engine.rest.history.HistoricProcessInstanceRestService;
 import org.camunda.bpm.engine.rest.history.HistoricTaskInstanceRestService;
 import org.camunda.bpm.engine.rest.history.HistoricVariableInstanceRestService;
+import org.camunda.bpm.engine.rest.history.HistoryCleanupRestService;
 import org.camunda.bpm.engine.rest.history.HistoryRestService;
 import org.camunda.bpm.engine.rest.history.UserOperationLogRestService;
 
 import org.camunda.bpm.engine.rest.impl.AbstractRestProcessEngineAware;
-import org.camunda.bpm.engine.runtime.Job;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -120,18 +116,8 @@ public class HistoryRestServiceImpl extends AbstractRestProcessEngineAware imple
     return new HistoricExternalTaskLogRestServiceImpl(getObjectMapper(), getProcessEngine());
   }
 
-  @Override
-  public JobDto cleanupAsync(boolean immediatelyDue) {
-    Job job = processEngine.getHistoryService().cleanUpHistoryAsync(immediatelyDue);
-    return JobDto.fromJob(job);
-  }
-
-  @Override
-  public JobDto findCleanupJob() {
-    Job job = processEngine.getHistoryService().findHistoryCleanupJob();
-    if (job == null) {
-      throw new RestException(Status.NOT_FOUND, "History cleanup job does not exist");
-    }
-    return JobDto.fromJob(job);
-  }
+	@Override
+	public HistoryCleanupRestService getHistoryCleanupRestService() {
+		return new HistoryCleanupRestServiceImpl(getObjectMapper(), getProcessEngine());
+	}
 }

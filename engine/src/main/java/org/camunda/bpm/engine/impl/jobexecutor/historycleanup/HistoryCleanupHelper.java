@@ -40,6 +40,32 @@ public abstract class HistoryCleanupHelper {
     }
   }
 
+  public static Date getCurrentOrNextBatchWindowStartTime(Date date, Date startTime, Date endTime) {
+    Date startDate = updateTime(date, startTime);
+    if (isWithinBatchWindow(date, startTime, endTime)) {
+      return startDate;
+    }
+    if (startDate.after(date)) {
+      return startDate;
+    } else {
+      //tomorrow
+      return addDays(startDate, 1);
+    }
+  }
+
+  /**
+   * Returns next batch window end time
+   * @param date current date
+   * @param endTime
+   */
+  public static Date getNextBatchWindowEndTime(Date date, Date endTime) {
+    Date todayEndTime = updateTime(date, endTime);
+    if (todayEndTime.after(date)) {
+      return todayEndTime;
+    }
+    return addDays(todayEndTime, 1);
+  }
+
   public static Date getBatchWindowStartTime(CommandContext commandContext) {
     return commandContext.getProcessEngineConfiguration().getHistoryCleanupBatchWindowStartTimeAsDate();
   }
@@ -78,7 +104,7 @@ public abstract class HistoryCleanupHelper {
     }
   }
 
-  private static Date updateTime(Date now, Date newTime) {
+  public static Date updateTime(Date now, Date newTime) {
     Calendar c = Calendar.getInstance();
     c.setTime(now);
     Calendar newTimeCalendar = Calendar.getInstance();
@@ -90,7 +116,7 @@ public abstract class HistoryCleanupHelper {
     return c.getTime();
   }
 
-  private static Date addDays(Date date, int amount) {
+  public static Date addDays(Date date, int amount) {
     Calendar c = Calendar.getInstance();
     c.setTime(date);
     c.add(Calendar.DATE, amount);

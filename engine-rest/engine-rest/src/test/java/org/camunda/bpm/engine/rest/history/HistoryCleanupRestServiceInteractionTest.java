@@ -14,6 +14,8 @@ package org.camunda.bpm.engine.rest.history;
 
 import javax.ws.rs.core.Response.Status;
 import org.camunda.bpm.engine.HistoryService;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupHelper;
 import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
@@ -27,14 +29,20 @@ import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.hamcrest.CoreMatchers.containsString;
 
-public class HistoryRestServiceInteractionTest extends AbstractRestServiceTest {
+import java.text.ParseException;
+import java.util.Calendar;
+import java.util.Date;
+
+public class HistoryCleanupRestServiceInteractionTest extends AbstractRestServiceTest {
 
   @ClassRule
   public static TestContainerRule rule = new TestContainerRule();
-  
-  protected static final String HISTORY_CLEANUP_ASYNC_URL = TEST_RESOURCE_ROOT_PATH + "/history/cleanup";
-  protected static final String FIND_HISTORY_CLEANUP_JOB_URL = TEST_RESOURCE_ROOT_PATH + "/history/cleanup-job";
+
+  protected static final String HISTORY_CLEANUP_URL = TEST_RESOURCE_ROOT_PATH + "/history/cleanup";
+  protected static final String FIND_HISTORY_CLEANUP_JOB_URL = HISTORY_CLEANUP_URL + "/job";
+  protected static final String CONFIGURATION_URL = HISTORY_CLEANUP_URL + "/configuration";
 
   private HistoryService historyServiceMock;
 
@@ -79,7 +87,7 @@ public class HistoryRestServiceInteractionTest extends AbstractRestServiceTest {
     given().contentType(ContentType.JSON)
         .then()
         .expect().statusCode(Status.OK.getStatusCode())
-        .when().post(HISTORY_CLEANUP_ASYNC_URL);
+        .when().post(HISTORY_CLEANUP_URL);
 
     verify(historyServiceMock).cleanUpHistoryAsync(true);
   }
@@ -89,7 +97,7 @@ public class HistoryRestServiceInteractionTest extends AbstractRestServiceTest {
     given().contentType(ContentType.JSON)
         .queryParam("immediatelyDue", true)
         .then().expect().statusCode(Status.OK.getStatusCode())
-        .when().post(HISTORY_CLEANUP_ASYNC_URL);
+        .when().post(HISTORY_CLEANUP_URL);
 
     verify(historyServiceMock).cleanUpHistoryAsync(true);
   }
@@ -98,10 +106,59 @@ public class HistoryRestServiceInteractionTest extends AbstractRestServiceTest {
   public void testHistoryCleanup() {
     given().contentType(ContentType.JSON).queryParam("immediatelyDue", false)
         .then().expect().statusCode(Status.OK.getStatusCode())
-        .when().post(HISTORY_CLEANUP_ASYNC_URL);
+        .when().post(HISTORY_CLEANUP_URL);
 
     verify(historyServiceMock).cleanUpHistoryAsync(false);
   }
 
+  @Test
+  public void testHistoryConfiguration() throws ParseException {
+    ProcessEngineConfigurationImpl processEngineConfigurationImplMock = mock(ProcessEngineConfigurationImpl.class);
+    Date startDate = HistoryCleanupHelper.parseTimeConfiguration("23:59");
+    Date endDate = HistoryCleanupHelper.parseTimeConfiguration("00:00");
+    when(processEngine.getProcessEngineConfiguration()).thenReturn(processEngineConfigurationImplMock);
+    when(processEngineConfigurationImplMock.getHistoryCleanupBatchWindowStartTimeAsDate()).thenReturn(startDate);
+    when(processEngineConfigurationImplMock.getHistoryCleanupBatchWindowEndTimeAsDate()).thenReturn(endDate);
+
+    Date now = new Date();
+    Calendar today = Calendar.getInstance();
+    today.setTime(now);
+    Calendar tomorrow = Calendar.getInstance();
+    tomorrow.setTime(HistoryCleanupHelper.addDays(now, 1));
+
+    int yearToday = today.get(Calendar.YEAR);
+    String monthToday = (today.get(Calendar.MONTH) + 1) + "";
+    if (monthToday.equals("12")) {
+      monthToday = "0";
+    }
+    if (monthToday.length()==1) {
+      monthToday = "0" + monthToday;
+    }
+    int dayToday = today.get(Calendar.DAY_OF_MONTH);
+
+    int yearTomorrow = tomorrow.get(Calendar.YEAR);
+    String monthTomorrow = (tomorrow.get(Calendar.MONTH) + 1) + "";
+    if (monthTomorrow.equals("12")) {
+      monthTomorrow = "0";
+    }
+    if (monthTomorrow.length()==1) {
+      monthTomorrow = "0" + monthTomorrow;
+    }
+    int dayTomorrow = tomorrow.get(Calendar.DAY_OF_MONTH);
+
+    given()
+      .contentType(ContentType.JSON)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .body("historyCleanupBatchWindowStartTime", containsString(yearToday + "-" + monthToday + "-" + dayToday))
+      .body("historyCleanupBatchWindowStartTime", containsString("23:59"))
+      .body("historyCleanupBatchWindowEndTime", containsString(yearTomorrow + "-" + monthTomorrow + "-" + dayTomorrow))
+      .body("historyCleanupBatchWindowEndTime", containsString("00:00"))
+    .when()
+      .get(CONFIGURATION_URL);
+
+    verify(processEngineConfigurationImplMock).getHistoryCleanupBatchWindowStartTimeAsDate();
+    verify(processEngineConfigurationImplMock).getHistoryCleanupBatchWindowEndTimeAsDate();
+  }
 
 }
