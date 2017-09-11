@@ -39,16 +39,18 @@ public class HistoryCleanupRestServiceImpl implements HistoryCleanupRestService 
     return JobDto.fromJob(job);
   }
 
-	public HistoryCleanupConfigurationDto getHistoryCleanupConfiguration() {
-	  HistoryCleanupConfigurationDto configurationDto = new HistoryCleanupConfigurationDto();
-	  Date startTime = ((ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration()).getHistoryCleanupBatchWindowStartTimeAsDate();
-	  Date endTime = ((ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration()).getHistoryCleanupBatchWindowEndTimeAsDate();
-	  Date now = new Date();
-	  ClockUtil.setCurrentTime(now);
-	  Date startDate = HistoryCleanupHelper.getCurrentOrNextBatchWindowStartTime(now, startTime, endTime);
-	  Date endDate = HistoryCleanupHelper.getNextBatchWindowEndTime(now, endTime);
-	  configurationDto.setHistoryCleanupBatchWindowStartTime(startDate);
-	  configurationDto.setHistoryCleanupBatchWindowEndTime(endDate);
-		return configurationDto;
-	}
+  public HistoryCleanupConfigurationDto getHistoryCleanupConfiguration() {
+    HistoryCleanupConfigurationDto configurationDto = new HistoryCleanupConfigurationDto();
+    Date startTime = ((ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration())
+        .getHistoryCleanupBatchWindowStartTimeAsDate();
+    Date endTime = ((ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration())
+        .getHistoryCleanupBatchWindowEndTimeAsDate();
+    Date now = new Date();
+    ClockUtil.setCurrentTime(now);
+    Date startDate = HistoryCleanupHelper.getCurrentOrNextBatchWindowStartTime(now, startTime, endTime);
+    Date endDate = HistoryCleanupHelper.getNextBatchWindowEndTime(now, endTime);
+    configurationDto.setHistoryCleanupBatchWindowStartTime(startDate);
+    configurationDto.setHistoryCleanupBatchWindowEndTime(endDate);
+    return configurationDto;
+  }
 }

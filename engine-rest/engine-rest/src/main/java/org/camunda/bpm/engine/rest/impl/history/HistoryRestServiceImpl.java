@@ -116,8 +116,8 @@ public class HistoryRestServiceImpl extends AbstractRestProcessEngineAware imple
     return new HistoricExternalTaskLogRestServiceImpl(getObjectMapper(), getProcessEngine());
   }
 
-	@Override
-	public HistoryCleanupRestService getHistoryCleanupRestService() {
-		return new HistoryCleanupRestServiceImpl(getObjectMapper(), getProcessEngine());
-	}
+  @Override
+  public HistoryCleanupRestService getHistoryCleanupRestService() {
+    return new HistoryCleanupRestServiceImpl(getObjectMapper(), getProcessEngine());
+  }
 }
