@@ -214,39 +214,29 @@ var Controller = [
     processData.provide([ 'activityIdToInstancesMap'], [
       'activityInstances', 'processDefinition', 'bpmnElements',
       function(activityInstances,   processDefinition,   bpmnElements) {
-        var activityIdToInstancesMap = {}, model = bpmnElements[processDefinition.key];
+        var model = bpmnElements[processDefinition.key];
 
         function getActivityName(bpmnElement) {
-          var name = bpmnElement.name;
-          if (!name) {
-            var shortenFilter = $filter('shorten');
-            name = bpmnElement.$type.substr(5) + ' (' + shortenFilter(bpmnElement.id, 8) + ')';
-          }
-
-          return name;
+          var shortenFilter = $filter('shorten');
+          return bpmnElement.name || bpmnElement.$type.substr(5) + ' (' + shortenFilter(bpmnElement.id, 8) + ')';
         }
 
-        function decorateActivityInstanceTree(instance) {
+        function decorateActivityInstanceTree(instances) {
+          return instances && instances.map(function(instance) {
+            var result = {};
+            var targetActivityId = instance.activityId,
+                targetBpmnElement = bpmnElements[targetActivityId];
 
-          if (instance && instance.length > 0) {
-            for (var t = 0, jd; (jd = instance[t]); t++) {
-              var targetActivityId = jd.activityId,
-                  targetBpmnElement = bpmnElements[targetActivityId],
-                  information = jd;
+            instance.name = targetBpmnElement ? getActivityName(targetBpmnElement) : targetActivityId;
+            result[targetActivityId] = [instance];
 
-              if(targetBpmnElement) {
-                jd.name = getActivityName(targetBpmnElement);
-              } else {
-                jd.name = targetActivityId;
-              }
-              activityIdToInstancesMap[targetActivityId] = [information];
-            }
-          }
+            return result;
+          }) || {};
         }
 
         activityInstances.name = getActivityName(model);
 
-        decorateActivityInstanceTree(activityInstances);
+        var activityIdToInstancesMap = decorateActivityInstanceTree(activityInstances);
 
         return [ activityIdToInstancesMap ];
       }]);
