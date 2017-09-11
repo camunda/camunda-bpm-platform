@@ -101,10 +101,10 @@
 
   <select id="selectHistoricDecisionInputInstancesByDecisionInstanceIds" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="historicDecisionInputInstanceResultMap">
     select * from ${prefix}ACT_HI_DEC_IN 
-    where DEC_INST_ID_ in
-    <foreach collection="parameter" index="index" item="decisionInstanceId" open="(" separator="," close=")">
-      #{decisionInstanceId}
-    </foreach>
+    where
+      <bind name="listOfIds" value="parameter"/>
+      <bind name="fieldName" value="'DEC_INST_ID_'"/>
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
     order by CLAUSE_ID_
   </select>
 

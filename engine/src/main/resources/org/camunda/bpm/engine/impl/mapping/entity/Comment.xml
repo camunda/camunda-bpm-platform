@@ -93,22 +93,22 @@
     left join ${prefix}ACT_HI_TASKINST T
       on CO.TASK_ID_ = T.ID_
       <if test="taskProcessInstanceIds != null &amp;&amp; taskProcessInstanceIds.size() > 0">
-        where T.PROC_INST_ID_ in
-          <foreach item="processInstanceId" index="index" collection="taskProcessInstanceIds" open="(" separator="," close=")">
-            #{processInstanceId}
-          </foreach>
+        where
+          <bind name="listOfIds" value="taskProcessInstanceIds"/>
+          <bind name="fieldName" value="'T.PROC_INST_ID_'"/>
+          <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
       </if>
       <if test="taskCaseInstanceIds != null &amp;&amp; taskCaseInstanceIds.size() > 0">
-        where T.CASE_INST_ID_ in
-        <foreach item="caseInstanceId" index="index" collection="taskCaseInstanceIds" open="(" separator="," close=")">
-          #{caseInstanceId}
-        </foreach>
+        where
+          <bind name="listOfIds" value="taskCaseInstanceIds"/>
+          <bind name="fieldName" value="'T.CASE_INST_ID_'"/>
+          <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
       </if>
       <if test="processInstanceIds != null &amp;&amp; processInstanceIds.size() > 0">
-        where CO.PROC_INST_ID_ in
-        <foreach item="processInstanceId" index="index" collection="processInstanceIds" open="(" separator="," close=")">
-          #{processInstanceId}
-        </foreach>
+        where
+          <bind name="listOfIds" value="processInstanceIds"/>
+          <bind name="fieldName" value="'CO.PROC_INST_ID_'"/>
+          <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
       </if>
   </delete>
 
