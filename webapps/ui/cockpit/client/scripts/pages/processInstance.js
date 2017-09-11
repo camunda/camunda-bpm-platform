@@ -129,7 +129,6 @@ var Controller = [
           }
 
           var transitions = instance.childTransitionInstances;
-          console.log('transitions: ', transitions);
           if (transitions && transitions.length > 0) {
 
             for (var t = 0, transition; (transition = transitions[t]); t++) {
