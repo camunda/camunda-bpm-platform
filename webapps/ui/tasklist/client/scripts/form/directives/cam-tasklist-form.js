@@ -20,7 +20,7 @@ function compact(arr) {
 
 var noop = function() {};
 
-module.exports = ['Notifications', function(Notifications) {
+module.exports = function() {
 
   return {
 
@@ -107,6 +107,8 @@ module.exports = ['Notifications', function(Notifications) {
           failure: false
         };
 
+        var API = this;
+
         function setAsynchronousFormKeyFailure(err) {
           $scope.asynchronousFormKey.failure = true;
           $scope.asynchronousFormKey.error = err;
@@ -147,9 +149,8 @@ module.exports = ['Notifications', function(Notifications) {
                 .replace(/\/([\/]+)/, '/');
               setAsynchronousFormKey(key);
             } else {
-              Notifications.addError({
-                status: 'Could not fetch form',
-                message: 'The conext path is either empty or not defined'
+              API.notifyFormInitializationFailed({
+                message: 'EMPTY_CONTEXT_PATH'
               });
               $scope.$loaded = true;
             }
@@ -303,4 +304,4 @@ module.exports = ['Notifications', function(Notifications) {
 
       }]
   };
-}];
+};
