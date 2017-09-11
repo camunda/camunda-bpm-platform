@@ -161,4 +161,19 @@ public class HistoryCleanupRestServiceInteractionTest extends AbstractRestServic
     verify(processEngineConfigurationImplMock).getHistoryCleanupBatchWindowEndTimeAsDate();
   }
 
+  @Test
+  public void testHistoryConfigurationWhenBatchNotDefined() {
+    ProcessEngineConfigurationImpl processEngineConfigurationImplMock = mock(ProcessEngineConfigurationImpl.class);
+    when(processEngine.getProcessEngineConfiguration()).thenReturn(processEngineConfigurationImplMock);
+    when(processEngineConfigurationImplMock.getHistoryCleanupBatchWindowStartTimeAsDate()).thenReturn(null);
+    when(processEngineConfigurationImplMock.getHistoryCleanupBatchWindowEndTimeAsDate()).thenReturn(null);
+
+    given()
+      .contentType(ContentType.JSON)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+    .when()
+      .get(CONFIGURATION_URL);
+  }
+
 }
