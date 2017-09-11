@@ -45,13 +45,13 @@ public class JacksonJsonPathQuery implements SpinJsonPathQuery {
   public SpinJsonNode element() {
     try {
       Object result = query.read(spinJsonNode.toString(), dataFormat.getJsonPathConfiguration());
+      JsonNode node;
       if (result != null) {
-        JsonNode node = dataFormat.createJsonNode(result);
-        return dataFormat.createWrapperInstance(node);
+        node = dataFormat.createJsonNode(result);
+      } else {
+        node = dataFormat.createNullJsonNode();
       }
-      else {
-        throw LOG.unableToFindJsonPath(query.getPath(), spinJsonNode.toString());
-      }
+      return dataFormat.createWrapperInstance(node);
     } catch(PathNotFoundException pex) {
       throw LOG.unableToEvaluateJsonPathExpressionOnNode(spinJsonNode, pex);
     } catch (ClassCastException cex) {

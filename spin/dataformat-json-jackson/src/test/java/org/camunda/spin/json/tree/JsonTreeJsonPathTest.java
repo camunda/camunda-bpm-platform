@@ -17,7 +17,6 @@ import static org.assertj.core.api.Assertions.fail;
 import static org.camunda.spin.Spin.JSON;
 import static org.camunda.spin.json.JsonTestConstants.EXAMPLE_JSON;
 
-import com.jayway.jsonpath.InvalidPathException;
 import org.camunda.spin.SpinList;
 import org.camunda.spin.json.SpinJsonDataFormatException;
 import org.camunda.spin.json.SpinJsonNode;
@@ -73,6 +72,12 @@ public class JsonTreeJsonPathTest {
     Number order = jsonNode.jsonPath("$.id").numberValue();
 
     assertThat(order.longValue()).isEqualTo(1234567890987654321L);
+  }
+  
+  @Test
+  public void shouldGetNullNode() {
+	  SpinJsonNode node = jsonNode.jsonPath("$.nullValue").element();
+	  assertThat(node.isNull()).isTrue();
   }
 
   @Test
