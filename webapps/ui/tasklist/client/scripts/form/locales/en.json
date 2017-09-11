@@ -3,6 +3,8 @@
       "Form failure:",
   "INIT_EXTERNAL_FORM_FAILED":
       "Cannot initialize external form url: either task ID or process definition key must be provided. Try to refresh the page to try again.",
+  "EMPTY_CONTEXT_PATH":
+      "The conext path is either empty or not defined",
   "TASK_EXTERNAL_FORM_NOTE":
       "This task contains an external form to complete it. In order to open the external form click on the \"Open external form\" link below.",
   "PROCESS_EXTERNAL_FORM_NOTE":
