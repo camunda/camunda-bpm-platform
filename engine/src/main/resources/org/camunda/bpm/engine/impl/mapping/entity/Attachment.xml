@@ -63,6 +63,14 @@
     </where>
   </delete>
 
+  <delete id="deleteAttachmentByIds_mysql" parameterType="java.util.Map">
+    delete A from ${prefix}ACT_HI_ATTACHMENT A
+    <include refid="selectAttachmentsTaskProcessAndCaseInstanceByIdsSql_mysql"/>
+    <where>
+      <include refid="selectAttachmentsProcessInstanceByIdsSql"/>
+    </where>
+  </delete>
+
   <delete id="deleteAttachmentByteArraysByIds" parameterType="java.util.Map">
     delete from ${prefix}ACT_GE_BYTEARRAY
     where ID_ in

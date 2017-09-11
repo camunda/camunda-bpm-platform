@@ -133,6 +133,14 @@
     </where>
   </delete>
 
+  <delete id="deleteHistoricDetailsByIds_mysql" parameterType="java.util.Map">
+    delete D from ${prefix}ACT_HI_DETAIL D
+    <include refid="selectHistoricDetailsTaskProcessAndCaseInstanceByIdsSql_mysql"/>
+    <where>
+      <include refid="selectHistoricDetailsProcessAndCaseInstanceByIdsSql"/>
+    </where>
+  </delete>
+
   <delete id="deleteHistoricDetailByteArraysByIds" parameterType="java.util.Map">
     delete from ${prefix}ACT_GE_BYTEARRAY
     where ID_ in
