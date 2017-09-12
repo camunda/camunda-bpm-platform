@@ -152,7 +152,6 @@ module.exports = function() {
               API.notifyFormInitializationFailed({
                 message: 'EMPTY_CONTEXT_PATH'
               });
-              $scope.$loaded = true;
             }
           }
 
