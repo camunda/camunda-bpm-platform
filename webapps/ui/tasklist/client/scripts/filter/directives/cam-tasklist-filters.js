@@ -23,12 +23,14 @@ module.exports = [function() {
       '$http',
       'Uri',
       'Notifications',
+      '$translate',
       function(
         $scope,
         search,
         $http,
         Uri,
-        Notifications
+        Notifications,
+        $translate
       ) {
 
         var filtersData = $scope.filtersData = $scope.filtersData.newChild($scope);
@@ -90,29 +92,31 @@ module.exports = [function() {
         /**
          * Add initial 'All' filter
          */
-         
-        $scope.addAllFilter = function() {
-          var payload = {
-            name: 'All Tasks',
-            resourceType: 'Task',
-            query: {},
-            properties: {
-              description: 'Unfiltered Tasks',
-              priority: 1,
-              color: '#555555',
-              refresh: false,
-              howUndefinedVariable: false
-            }
-          };
 
-          $http.post(Uri.appUri('engine://engine/:engine/filter/create'), payload)
-            .then(function() {
-              $scope.filtersData.changed('filters');
-            })
+        $scope.addAllFilter = function() {
+          return $translate('ALL_TASKS').then(function(translated) {
+            var payload = {
+              name: translated,
+              resourceType: 'Task',
+              query: {},
+              properties: {
+                description: 'Unfiltered Tasks',
+                priority: 1,
+                color: '#555555',
+                refresh: false,
+                howUndefinedVariable: false
+              }
+            };
+            return $http.post(Uri.appUri('engine://engine/:engine/filter/create'), payload);
+          }).then(function() {
+            $scope.filtersData.changed('filters');
+          })
             .catch(function(err) {
-              Notifications.addError({
-                status: 'Could not add filter',
-                message: err.message
+              return $translate('FILTER_SAVE_ERROR').then(function(translated) {
+                Notifications.addError({
+                  status: translated,
+                  message: err.message || ''
+                });
               });
             });
         };

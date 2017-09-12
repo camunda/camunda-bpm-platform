@@ -7,6 +7,10 @@
                         "Filter details",
   "FILTER_DELETE":
                         "Delete filter",
+  "ADD_FILTER_HINT":
+                        "Add a simple filter",
+  "ALL_TASKS":
+                        "All Tasks",
 
   "FILTER_DELETION_WARNING":
                         "Deleting the filter can not be undone, are your sure to want to proceed?",
