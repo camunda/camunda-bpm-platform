@@ -354,6 +354,7 @@
           FROM ${prefix}ACT_HI_ACTINST
           <where>
             PROC_INST_ID_ = SELF.ID_
+            AND END_TIME_ IS NOT NULL
             AND ID_ IN
             <foreach item="activityId" index="index" collection="executedActivityIds" open="(" separator="," close=")">
 			  #{activityId}
