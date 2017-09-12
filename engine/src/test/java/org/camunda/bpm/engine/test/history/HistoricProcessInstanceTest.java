@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.exception.NullValueException;
+import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
@@ -38,6 +39,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Test;
@@ -1310,4 +1312,27 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
     assertNull(historicProcessInstance);
   }
 
+  @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  public void testHistoricProcInstQueryWithExecutedActivityIds() {
+    // given
+    deployment(ProcessModels.TWO_TASKS_PROCESS);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process");
+
+    Task task = taskService.createTaskQuery().active().singleResult();
+    taskService.complete(task.getId());
+
+    HistoricActivityInstance historicActivityInstance = historyService.createHistoricActivityInstanceQuery()
+        .processInstanceId(processInstance.getId()).activityId("userTask1").singleResult();
+    assertNotNull(historicActivityInstance);
+
+    // when
+    List<HistoricProcessInstance> result = historyService.createHistoricProcessInstanceQuery()
+        .executedActivityIdIn(Arrays.asList(historicActivityInstance.getId())).list();
+
+    // then
+    assertNotNull(result);
+    assertEquals(1, result.size());
+    assertEquals(result.get(0).getId(), processInstance.getId());
+  }
 }

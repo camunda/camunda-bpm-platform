@@ -47,6 +47,7 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
   protected static final String QUERY_PARAM_EXECUTED_JOB_AFTER = "executedJobAfter";
   protected static final String QUERY_PARAM_EXECUTED_ACTIVITY_BEFORE = "executedActivityBefore";
   protected static final String QUERY_PARAM_EXECUTED_ACTIVITY_AFTER = "executedActivityAfter";
+  protected static final String QUERY_PARAM_EXECUTED_ACTIVITY_IDS = "executedActivityIdIn";
 
   @ClassRule
   public static TestContainerRule rule = new TestContainerRule();
@@ -1438,6 +1439,35 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
       .post(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
 
     verifyStringExecutedJobParameterQueryInvocations();
+  }
+
+  @Test
+  public void testExecutedActivityIdIn() {
+
+    given()
+      .queryParameter(QUERY_PARAM_EXECUTED_ACTIVITY_IDS, "1,2")
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).executedActivityIdIn(Arrays.asList("1", "2"));
+  }
+
+  @Test
+  public void testExecutedActivityIdInAsPost() {
+    Map<String, List<String>> parameters = new HashMap<String, List<String>>();
+    parameters.put(QUERY_PARAM_EXECUTED_ACTIVITY_IDS, Arrays.asList("1", "2"));
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(parameters)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).executedActivityIdIn(Arrays.asList("1", "2"));
   }
 
   private void verifyExecutedJobParameterQueryInvocations() {

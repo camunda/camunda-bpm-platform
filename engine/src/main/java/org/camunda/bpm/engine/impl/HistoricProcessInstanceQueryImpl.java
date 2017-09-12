@@ -13,13 +13,16 @@
 
 package org.camunda.bpm.engine.impl;
 
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
-import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.util.CompareUtil;
@@ -66,6 +69,7 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   protected String processDefinitionKey;
   protected Set<String> processInstanceIds;
   protected String[] tenantIds;
+  protected Collection<String> executedActivityIds;
 
   protected String caseInstanceId;
 
@@ -478,6 +482,14 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   @Override
   public HistoricProcessInstanceQuery executedJobBefore(Date date) {
     this.executedJobBefore = date;
+    return this;
+  }
+
+  @Override
+  public HistoricProcessInstanceQuery executedActivityIdIn(Collection<String> ids) {
+    ensureNotNull(BadUserRequestException.class, "activity ids", ids);
+    ensureNotContainsNull(BadUserRequestException.class, "activity ids", ids);
+    this.executedActivityIds = ids;
     return this;
   }
 }

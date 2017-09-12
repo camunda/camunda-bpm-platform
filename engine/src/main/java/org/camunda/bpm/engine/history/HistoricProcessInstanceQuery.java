@@ -14,6 +14,7 @@
 package org.camunda.bpm.engine.history;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -288,6 +289,9 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
 
   /** Only select historic process instances that executed an activity before the given date. */
   HistoricProcessInstanceQuery executedActivityBefore(Date date);
+
+  /** Only select historic process instances that executed activities with given ids. */
+  HistoricProcessInstanceQuery executedActivityIdIn(Collection<String> ids);
 
   /** Only select historic process instances that executed an job after the given date. */
   HistoricProcessInstanceQuery executedJobAfter(Date date);
