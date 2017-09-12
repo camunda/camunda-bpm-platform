@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang.time.DateUtils;
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotValidException;
@@ -42,6 +43,7 @@ import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.Assert;
 import org.junit.Test;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicProcessInstanceByProcessDefinitionId;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicProcessInstanceByProcessDefinitionKey;
@@ -49,6 +51,7 @@ import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicP
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicProcessInstanceByProcessDefinitionVersion;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicProcessInstanceByProcessInstanceId;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.verifySorting;
+import static org.hamcrest.CoreMatchers.containsString;
 
 /**
  * @author Tom Baeyens
@@ -1334,5 +1337,27 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
     assertNotNull(result);
     assertEquals(1, result.size());
     assertEquals(result.get(0).getId(), processInstance.getId());
+  }
+
+  @Test
+  public void testHistoricProcInstQueryWithExecutedActivityIdsNull() {
+    try {
+      historyService.createHistoricProcessInstanceQuery()
+      .executedActivityIdIn(null).list();
+      fail("exception expected");
+    } catch (BadUserRequestException e) {
+      Assert.assertThat(e.getMessage(), containsString("activity ids is null"));
+    }
+  }
+
+  @Test
+  public void testHistoricProcInstQueryWithExecutedActivityIdsContainNull() {
+    try {
+      historyService.createHistoricProcessInstanceQuery()
+      .executedActivityIdIn(Arrays.asList(null, "1")).list();
+      fail("exception expected");
+    } catch (BadUserRequestException e) {
+      Assert.assertThat(e.getMessage(), containsString("activity ids contains null"));
+    }
   }
 }
