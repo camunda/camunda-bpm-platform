@@ -293,6 +293,9 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
   /** Only select historic process instances that executed activities with given ids. */
   HistoricProcessInstanceQuery executedActivityIdIn(Collection<String> ids);
 
+  /** Only select historic process instances that have active activities with given ids. */
+  HistoricProcessInstanceQuery activeActivityIdIn(Collection<String> ids);
+
   /** Only select historic process instances that executed an job after the given date. */
   HistoricProcessInstanceQuery executedJobAfter(Date date);
 

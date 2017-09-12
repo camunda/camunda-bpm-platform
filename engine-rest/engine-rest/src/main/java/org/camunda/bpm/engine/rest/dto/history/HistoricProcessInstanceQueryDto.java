@@ -93,6 +93,7 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
   private String caseInstanceId;
   private List<String> tenantIds;
   private List<String> executedActivityIdIn;
+  private List<String> activeActivityIdIn;
 
   private List<VariableQueryParameterDto> variables;
 
@@ -265,6 +266,11 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
     this.executedActivityBefore = executedActivityBefore;
   }
 
+  @CamundaQueryParam(value = "activeActivityIdIn", converter = StringListConverter.class)
+  public void setActiveActivityIdIn(List<String> activeActivityIdIn) {
+    this.activeActivityIdIn = activeActivityIdIn;
+  }
+
   @CamundaQueryParam(value = "executedJobAfter", converter = DateConverter.class)
   public void setExecutedJobAfter(Date executedJobAfter) {
     this.executedJobAfter = executedJobAfter;
@@ -406,6 +412,10 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
 
     if (executedActivityIdIn != null) {
       query.executedActivityIdIn(executedActivityIdIn);
+    }
+
+    if (activeActivityIdIn != null) {
+      query.activeActivityIdIn(activeActivityIdIn);
     }
 
     if (executedJobAfter != null) {

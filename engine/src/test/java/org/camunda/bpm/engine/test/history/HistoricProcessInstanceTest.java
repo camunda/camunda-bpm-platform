@@ -1360,4 +1360,47 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
       Assert.assertThat(e.getMessage(), containsString("activity ids contains null"));
     }
   }
+
+  @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  public void testHistoricProcInstQueryWithActiveActivityIds() {
+    // given
+    deployment(ProcessModels.TWO_TASKS_PROCESS);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process");
+
+    HistoricActivityInstance historicActivityInstance = historyService.createHistoricActivityInstanceQuery()
+        .activityId("userTask1").singleResult();
+    assertNotNull(historicActivityInstance);
+
+    // when
+    List<HistoricProcessInstance> result = historyService.createHistoricProcessInstanceQuery()
+        .activeActivityIdIn(Arrays.asList(historicActivityInstance.getId())).list();
+
+    // then
+    assertNotNull(result);
+    assertEquals(1, result.size());
+    assertEquals(result.get(0).getId(), processInstance.getId());
+  }
+
+  @Test
+  public void testHistoricProcInstQueryWithActiveActivityIdsNull() {
+    try {
+      historyService.createHistoricProcessInstanceQuery()
+      .activeActivityIdIn(null).list();
+      fail("exception expected");
+    } catch (BadUserRequestException e) {
+      Assert.assertThat(e.getMessage(), containsString("activity ids is null"));
+    }
+  }
+
+  @Test
+  public void testHistoricProcInstQueryWithActiveActivityIdsContainNull() {
+    try {
+      historyService.createHistoricProcessInstanceQuery()
+      .activeActivityIdIn(Arrays.asList(null, "1")).list();
+      fail("exception expected");
+    } catch (BadUserRequestException e) {
+      Assert.assertThat(e.getMessage(), containsString("activity ids contains null"));
+    }
+  }
 }

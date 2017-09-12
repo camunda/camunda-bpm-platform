@@ -13,7 +13,6 @@
 
 package org.camunda.bpm.engine.impl;
 
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
@@ -70,6 +69,7 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   protected Set<String> processInstanceIds;
   protected String[] tenantIds;
   protected Collection<String> executedActivityIds;
+  protected Collection<String> activeActivityIds;
 
   protected String caseInstanceId;
 
@@ -492,4 +492,13 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     this.executedActivityIds = ids;
     return this;
   }
+
+  @Override
+  public HistoricProcessInstanceQuery activeActivityIdIn(Collection<String> ids) {
+    ensureNotNull(BadUserRequestException.class, "activity ids", ids);
+    ensureNotContainsNull(BadUserRequestException.class, "activity ids", ids);
+    this.activeActivityIds = ids;
+    return this;
+  }
+
 }
