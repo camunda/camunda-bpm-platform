@@ -23,7 +23,7 @@
   </modules>
 
   <properties>
-    <spring-boot.version>1.5.6.RELEASE</spring-boot.version>
+    <spring-boot.version>1.5.7.RELEASE</spring-boot.version>
     <camunda.version>7.8.0-SNAPSHOT</camunda.version>
 
     <version.java>1.8</version.java>
