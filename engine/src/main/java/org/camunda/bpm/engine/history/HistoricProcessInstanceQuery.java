@@ -14,7 +14,6 @@
 package org.camunda.bpm.engine.history;
 
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -88,7 +87,7 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
 
   /** Only select historic process instances with incident status either 'open' or 'resolved'.
    * To get all process instances with incidents, use {@link HistoricProcessInstanceQuery#withIncidents()}.
-   *  
+   *
    * @param status indicates the incident status, which is either 'open' or 'resolved'
    * @return {@link HistoricProcessInstanceQuery}
    */
@@ -291,10 +290,10 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
   HistoricProcessInstanceQuery executedActivityBefore(Date date);
 
   /** Only select historic process instances that executed activities with given ids. */
-  HistoricProcessInstanceQuery executedActivityIdIn(Collection<String> ids);
+  HistoricProcessInstanceQuery executedActivityIdIn(String... ids);
 
   /** Only select historic process instances that have active activities with given ids. */
-  HistoricProcessInstanceQuery activeActivityIdIn(Collection<String> ids);
+  HistoricProcessInstanceQuery activeActivityIdIn(String... ids);
 
   /** Only select historic process instances that executed an job after the given date. */
   HistoricProcessInstanceQuery executedJobAfter(Date date);

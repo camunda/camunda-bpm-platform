@@ -13,8 +13,8 @@
 
 package org.camunda.bpm.engine.impl;
 
+import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -68,8 +68,8 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   protected String processDefinitionKey;
   protected Set<String> processInstanceIds;
   protected String[] tenantIds;
-  protected Collection<String> executedActivityIds;
-  protected Collection<String> activeActivityIds;
+  protected String[] executedActivityIds;
+  protected String[] activeActivityIds;
 
   protected String caseInstanceId;
 
@@ -486,17 +486,17 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   }
 
   @Override
-  public HistoricProcessInstanceQuery executedActivityIdIn(Collection<String> ids) {
-    ensureNotNull(BadUserRequestException.class, "activity ids", ids);
-    ensureNotContainsNull(BadUserRequestException.class, "activity ids", ids);
+  public HistoricProcessInstanceQuery executedActivityIdIn(String... ids) {
+    ensureNotNull(BadUserRequestException.class, "activity ids", Arrays.asList(ids));
+    ensureNotContainsNull(BadUserRequestException.class, "activity ids", Arrays.asList(ids));
     this.executedActivityIds = ids;
     return this;
   }
 
   @Override
-  public HistoricProcessInstanceQuery activeActivityIdIn(Collection<String> ids) {
-    ensureNotNull(BadUserRequestException.class, "activity ids", ids);
-    ensureNotContainsNull(BadUserRequestException.class, "activity ids", ids);
+  public HistoricProcessInstanceQuery activeActivityIdIn(String... ids) {
+    ensureNotNull(BadUserRequestException.class, "activity ids", Arrays.asList(ids));
+    ensureNotContainsNull(BadUserRequestException.class, "activity ids", Arrays.asList(ids));
     this.activeActivityIds = ids;
     return this;
   }

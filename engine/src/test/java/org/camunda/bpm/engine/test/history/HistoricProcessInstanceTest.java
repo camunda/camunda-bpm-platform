@@ -1325,13 +1325,19 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
     Task task = taskService.createTaskQuery().active().singleResult();
     taskService.complete(task.getId());
 
-    HistoricActivityInstance historicActivityInstance = historyService.createHistoricActivityInstanceQuery()
-        .processInstanceId(processInstance.getId()).activityId("userTask1").singleResult();
+    // assume
+    HistoricActivityInstance historicActivityInstance = historyService
+        .createHistoricActivityInstanceQuery()
+        .processInstanceId(processInstance.getId())
+        .activityId("userTask1")
+        .singleResult();
     assertNotNull(historicActivityInstance);
 
     // when
-    List<HistoricProcessInstance> result = historyService.createHistoricProcessInstanceQuery()
-        .executedActivityIdIn(Arrays.asList(historicActivityInstance.getId())).list();
+    List<HistoricProcessInstance> result = historyService
+        .createHistoricProcessInstanceQuery()
+        .executedActivityIdIn(historicActivityInstance.getActivityId())
+        .list();
 
     // then
     assertNotNull(result);
@@ -1354,7 +1360,7 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
   public void testHistoricProcInstQueryWithExecutedActivityIdsContainNull() {
     try {
       historyService.createHistoricProcessInstanceQuery()
-      .executedActivityIdIn(Arrays.asList(null, "1")).list();
+      .executedActivityIdIn(null, "1").list();
       fail("exception expected");
     } catch (BadUserRequestException e) {
       Assert.assertThat(e.getMessage(), containsString("activity ids contains null"));
@@ -1368,13 +1374,18 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
     deployment(ProcessModels.TWO_TASKS_PROCESS);
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process");
 
-    HistoricActivityInstance historicActivityInstance = historyService.createHistoricActivityInstanceQuery()
-        .activityId("userTask1").singleResult();
+    // assume
+    HistoricActivityInstance historicActivityInstance = historyService
+        .createHistoricActivityInstanceQuery()
+        .activityId("userTask1")
+        .singleResult();
     assertNotNull(historicActivityInstance);
 
     // when
-    List<HistoricProcessInstance> result = historyService.createHistoricProcessInstanceQuery()
-        .activeActivityIdIn(Arrays.asList(historicActivityInstance.getId())).list();
+    List<HistoricProcessInstance> result = historyService
+        .createHistoricProcessInstanceQuery()
+        .activeActivityIdIn(historicActivityInstance.getActivityId())
+        .list();
 
     // then
     assertNotNull(result);
@@ -1397,7 +1408,7 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
   public void testHistoricProcInstQueryWithActiveActivityIdsContainNull() {
     try {
       historyService.createHistoricProcessInstanceQuery()
-      .activeActivityIdIn(Arrays.asList(null, "1")).list();
+      .activeActivityIdIn(null, "1").list();
       fail("exception expected");
     } catch (BadUserRequestException e) {
       Assert.assertThat(e.getMessage(), containsString("activity ids contains null"));

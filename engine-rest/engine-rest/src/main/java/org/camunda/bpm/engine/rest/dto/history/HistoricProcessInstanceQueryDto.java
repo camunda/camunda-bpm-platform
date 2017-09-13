@@ -410,12 +410,12 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
       query.executedActivityBefore(executedActivityBefore);
     }
 
-    if (executedActivityIdIn != null) {
-      query.executedActivityIdIn(executedActivityIdIn);
+    if (executedActivityIdIn != null && !executedActivityIdIn.isEmpty()) {
+      query.executedActivityIdIn(executedActivityIdIn.toArray(new String[executedActivityIdIn.size()]));
     }
 
-    if (activeActivityIdIn != null) {
-      query.activeActivityIdIn(activeActivityIdIn);
+    if (activeActivityIdIn != null && !activeActivityIdIn.isEmpty()) {
+      query.activeActivityIdIn(activeActivityIdIn.toArray(new String[activeActivityIdIn.size()]));
     }
 
     if (executedJobAfter != null) {

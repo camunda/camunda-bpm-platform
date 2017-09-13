@@ -202,6 +202,11 @@
         inner join ${prefix}ACT_HI_INCIDENT INC on SELF.PROC_INST_ID_ = INC.PROC_INST_ID_
     </if>
 
+    <if test="(executedActivityIds != null and executedActivityIds.length > 0) || (activeActivityIds != null and activeActivityIds.length > 0)">
+      LEFT JOIN ${prefix}ACT_HI_ACTINST HAI
+      ON HAI.PROC_INST_ID_ = SELF.ID_
+    </if>
+
     <where>
       <if test="processInstanceId != null">
         SELF.PROC_INST_ID_ = #{processInstanceId}
@@ -348,34 +353,20 @@
           )
       </if>
 
-	  <if test="executedActivityIds != null">
-        AND EXISTS (
-          SELECT *
-          FROM ${prefix}ACT_HI_ACTINST
-          <where>
-            PROC_INST_ID_ = SELF.ID_
-            AND END_TIME_ IS NOT NULL
-            AND ID_ IN
-            <foreach item="activityId" index="index" collection="executedActivityIds" open="(" separator="," close=")">
-			  #{activityId}
-			</foreach>
-          </where>
-          )
+      <if test="executedActivityIds != null and executedActivityIds.length > 0">
+        HAI.END_TIME_ IS NOT NULL
+        AND HAI.ACT_ID_ IN
+        <foreach item="activityId" index="index" collection="executedActivityIds" open="(" separator="," close=")">
+          #{activityId}
+        </foreach>
       </if>
 
-	   <if test="activeActivityIds != null">
-        AND EXISTS (
-          SELECT *
-          FROM ${prefix}ACT_HI_ACTINST
-          <where>
-            PROC_INST_ID_ = SELF.ID_
-            AND END_TIME_ IS NULL
-            AND ID_ IN
-            <foreach item="activityId" index="index" collection="activeActivityIds" open="(" separator="," close=")">
-			  #{activityId}
-			</foreach>
-          </where>
-          )
+      <if test="activeActivityIds != null and activeActivityIds.length > 0">
+        HAI.END_TIME_ IS NULL
+        AND HAI.ACT_ID_ IN
+        <foreach item="activityId" index="index" collection="activeActivityIds" open="(" separator="," close=")">
+          #{activityId}
+        </foreach>
       </if>
 
       <if test="executedJobAfter != null || executedJobBefore != null">

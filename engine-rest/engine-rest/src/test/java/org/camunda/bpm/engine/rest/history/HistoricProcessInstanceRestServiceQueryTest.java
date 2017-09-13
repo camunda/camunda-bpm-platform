@@ -1454,7 +1454,7 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
     .when()
       .get(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
 
-    verify(mockedQuery).executedActivityIdIn(Arrays.asList("1", "2"));
+    verify(mockedQuery).executedActivityIdIn("1", "2");
   }
 
   @Test
@@ -1470,7 +1470,7 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
     .when()
       .post(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
 
-    verify(mockedQuery).executedActivityIdIn(Arrays.asList("1", "2"));
+    verify(mockedQuery).executedActivityIdIn("1", "2");
   }
 
   @Test
@@ -1483,7 +1483,7 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
     .when()
       .get(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
 
-    verify(mockedQuery).activeActivityIdIn(Arrays.asList("1", "2"));
+    verify(mockedQuery).activeActivityIdIn("1", "2");
   }
 
   @Test
@@ -1499,7 +1499,7 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
     .when()
       .post(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
 
-    verify(mockedQuery).activeActivityIdIn(Arrays.asList("1", "2"));
+    verify(mockedQuery).activeActivityIdIn("1", "2");
   }
 
   private void verifyExecutedJobParameterQueryInvocations() {
