@@ -17,7 +17,7 @@ window.__define('camunda-cockpit-bootstrap', [
 
   requirejs(['globalize'], function(globalize) {
 
-    globalize(requirejs, ['angular', 'camunda-commons-ui', 'camunda-bpm-sdk-js', 'jquery', 'angular-data-depend', 'moment', 'events'], requirePackages);
+    globalize(requirejs, ['angular', 'camunda-commons-ui', 'camunda-bpm-sdk-js', 'jquery', 'angular-data-depend', 'moment', 'moment-precise-range-plugin', 'events'], requirePackages);
 
     var pluginPackages = window.PLUGIN_PACKAGES || [];
     var pluginDependencies = window.PLUGIN_DEPENDENCIES || [];
@@ -37,7 +37,7 @@ window.__define('camunda-cockpit-bootstrap', [
       }
     });
 
-    var dependencies = ['angular', 'ngDefine', 'moment'].concat(pluginDependencies.map(function(plugin) {
+    var dependencies = ['angular', 'ngDefine', 'moment', 'moment-precise-range-plugin'].concat(pluginDependencies.map(function(plugin) {
       return plugin.requirePackageName;
     }));
 
