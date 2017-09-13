@@ -37,6 +37,7 @@
     "jquery": "2.1.1",
     "jquery-ui": "1.10.5",
     "lodash.debounce": "4.0.8",
+    "moment-precise-range-plugin": "^1.2.4",
     "mousetrap": "1.5.3",
     "requirejs": "2.1.22",
     "requirejs-angular-define": "git://github.com/camunda/requirejs-angular-define#aaa450a66e4d1a0588819804e1098c541bed585d"
