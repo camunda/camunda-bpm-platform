@@ -12,7 +12,12 @@
 
         function updateStateCircle() {
           var incidents = scope.$eval(attrs.incidents);
+          var running = scope.$eval(attrs.running);
           var incidentsForTypes = scope.$eval(attrs.incidentsForTypes) ||  [];
+
+          if(running) {
+            return setStateToBlue();
+          }
 
           if (!!incidents && incidents.length > 0) {
 
@@ -44,11 +49,27 @@
         }
 
         function setStateToGreen() {
-          element.removeClass('circle-red').addClass('circle-green');
+          element
+            .removeClass('circle-red')
+            .removeClass('circle-blue')
+            .removeClass('animate-spin')
+            .addClass('circle-green');
         }
 
         function setStateToRed() {
-          element.removeClass('circle-green').addClass('circle-red');
+          element
+            .removeClass('circle-green')
+            .removeClass('circle-blue')
+            .removeClass('animate-spin')
+            .addClass('circle-red');
+        }
+
+        function setStateToBlue() {
+          element
+            .removeClass('circle-green')
+            .removeClass('circle-red')
+            .addClass('circle-blue')
+            .addClass('animate-spin');
         }
       }
     };
