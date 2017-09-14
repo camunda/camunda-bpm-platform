@@ -340,7 +340,7 @@ var Controller = [
 
     $scope.processDefinition = processDefinition;
 
-    $scope.processDefinitionVars = { read: [ 'processDefinition', 'selection', 'processData', 'filter', 'pageData' ] };
+    $scope.processDefinitionVars = { read: [ 'processDefinition', 'selection', 'processData', 'filter', 'pageData', 'instanceStatistics' ] };
     $scope.processDefinitionTabs = Views.getProviders({ component: 'cockpit.processDefinition.runtime.tab' });
     $scope.processDefinitionActions = Views.getProviders({ component: 'cockpit.processDefinition.runtime.action' });
 
