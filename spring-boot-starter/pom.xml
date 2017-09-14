@@ -142,13 +142,13 @@
   <distributionManagement>
     <repository>
       <id>camunda-nexus</id>
-      <name>camunda bpm community extensions</name>
-      <url>https://app.camunda.com/nexus/content/repositories/camunda-bpm-community-extensions</url>
+      <name>camunda bpm</name>
+      <url>https://app.camunda.com/nexus/content/repositories/camunda-bpm</url>
     </repository>
     <snapshotRepository>
       <id>camunda-nexus</id>
-      <name>camunda bpm community extensions snapshots</name>
-      <url>https://app.camunda.com/nexus/content/repositories/camunda-bpm-community-extensions-snapshots</url>
+      <name>camunda bpm snapshots</name>
+      <url>https://app.camunda.com/nexus/content/repositories/camunda-bpm-snapshots</url>
       <uniqueVersion>true</uniqueVersion>
     </snapshotRepository>
   </distributionManagement>
