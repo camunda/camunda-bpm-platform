@@ -12,7 +12,8 @@ module.exports = [function() {
     restrict: 'A',
     scope: {
       filtersData: '=',
-      openModal: '&'
+      openModal: '&',
+      userCanCreateFilter: '='
     },
 
     template: template,
@@ -20,14 +21,14 @@ module.exports = [function() {
     controller: [
       '$scope',
       'search',
-      '$http',
+      'camAPI',
       'Uri',
       'Notifications',
       '$translate',
       function(
         $scope,
         search,
-        $http,
+        camAPI,
         Uri,
         Notifications,
         $translate
@@ -36,6 +37,8 @@ module.exports = [function() {
         var filtersData = $scope.filtersData = $scope.filtersData.newChild($scope);
 
         $scope.openModal = $scope.openModal() || noop;
+
+        var filterResource = camAPI.resource('filter');
 
         // observe ////////////////////////////////////////////////////////////////////////////////
 
@@ -107,7 +110,7 @@ module.exports = [function() {
                 howUndefinedVariable: false
               }
             };
-            return $http.post(Uri.appUri('engine://engine/:engine/filter/create'), payload);
+            return filterResource.create(payload);
           }).then(function() {
             $scope.filtersData.changed('filters');
           })

@@ -18,7 +18,9 @@
     <span class="glyphicon glyphicon-info-sign"></span>
     {{ 'NO_AVAILABLE_FILTER' | translate }}
     <div class="add-initial-filter">
-      <a class="filter-hint" ng-click="addAllFilter()">
+      <a ng-if="userCanCreateFilter"
+         class="filter-hint"
+         ng-click="addAllFilter()">
         <span class="glyphicon glyphicon-plus"></span>
         {{ 'ADD_FILTER_HINT' | translate }}
       </a>
