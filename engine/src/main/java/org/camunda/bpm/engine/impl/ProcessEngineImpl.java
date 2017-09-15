@@ -129,6 +129,7 @@ public class ProcessEngineImpl implements ProcessEngine {
 
   protected void executeSchemaOperations() {
     commandExecutorSchemaOperations.execute(processEngineConfiguration.getSchemaOperationsCommand());
+    commandExecutorSchemaOperations.execute(processEngineConfiguration.getHistoryLevelCommand());
   }
 
   @Override
@@ -156,8 +157,8 @@ public class ProcessEngineImpl implements ProcessEngine {
   public String getName() {
     return name;
   }
-  
-  @Override  
+
+  @Override
   public ProcessEngineConfigurationImpl getProcessEngineConfiguration() {
     return processEngineConfiguration;
   }

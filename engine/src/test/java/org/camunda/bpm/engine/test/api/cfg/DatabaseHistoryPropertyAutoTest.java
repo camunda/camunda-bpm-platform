@@ -10,8 +10,8 @@ import java.util.UUID;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.HistoryLevelSetupCommand;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
-import org.camunda.bpm.engine.impl.SchemaOperationsProcessEngineBuild;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
@@ -79,7 +79,7 @@ public class DatabaseHistoryPropertyAutoTest {
     final Integer level = config.getCommandExecutorSchemaOperations().execute(new Command<Integer>() {
       @Override
       public Integer execute(CommandContext commandContext) {
-        return SchemaOperationsProcessEngineBuild.databaseHistoryLevel(commandContext.getSession(DbEntityManager.class));
+        return HistoryLevelSetupCommand.databaseHistoryLevel(commandContext.getSession(DbEntityManager.class));
       }
     });
 

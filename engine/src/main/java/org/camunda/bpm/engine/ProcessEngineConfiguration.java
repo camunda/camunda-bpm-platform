@@ -19,6 +19,7 @@ import javax.sql.DataSource;
 
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.camunda.bpm.engine.impl.HistoryLevelSetupCommand;
 import org.camunda.bpm.engine.impl.SchemaOperationsProcessEngineBuild;
 import org.camunda.bpm.engine.impl.cfg.BeansConfigurationHelper;
 import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
@@ -211,6 +212,7 @@ public abstract class ProcessEngineConfiguration {
   protected int jdbcPingConnectionNotUsedFor;
   protected DataSource dataSource;
   protected SchemaOperationsCommand schemaOperationsCommand = new SchemaOperationsProcessEngineBuild();
+  protected HistoryLevelSetupCommand historyLevelCommand = new HistoryLevelSetupCommand();
   protected boolean transactionsExternallyManaged = false;
   /** the number of seconds the jdbc driver will wait for a response from the database */
   protected Integer jdbcStatementTimeout;
@@ -438,6 +440,14 @@ public abstract class ProcessEngineConfiguration {
 
   public void setSchemaOperationsCommand(SchemaOperationsCommand schemaOperationsCommand) {
     this.schemaOperationsCommand = schemaOperationsCommand;
+  }
+
+  public HistoryLevelSetupCommand getHistoryLevelCommand() {
+    return historyLevelCommand;
+  }
+
+  public void setHistoryLevelCommand(HistoryLevelSetupCommand historyLevelCommand) {
+    this.historyLevelCommand = historyLevelCommand;
   }
 
   public String getJdbcDriver() {

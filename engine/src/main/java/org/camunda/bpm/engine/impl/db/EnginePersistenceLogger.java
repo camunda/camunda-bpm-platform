@@ -644,4 +644,9 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
         thatDeploymentId);
   }
 
+  public void noStartupLockPropertyFound() {
+    logError(
+        "081", "No startup lock property found in databse");
+  }
+
 }

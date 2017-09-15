@@ -33,8 +33,14 @@ public class PropertyManager extends AbstractManager {
   }
 
   public void acquireExclusiveLockForHistoryCleanupJob() {
-    // We lock a special deployment lock property
+    // We lock a special history cleanup lock property
     getDbEntityManager().lock("lockHistoryCleanupJobLockProperty");
+
+  }
+
+  public void acquireExclusiveLockForStartup() {
+    // We lock a special startup lock property
+    getDbEntityManager().lock("lockStartupLockProperty");
 
   }
 

@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.impl.HistoryLevelSetupCommand;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.SchemaOperationsProcessEngineBuild;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -46,7 +47,11 @@ public class DatabaseHistoryPropertyTest {
     processEngineImpl.getProcessEngineConfiguration()
     .getCommandExecutorSchemaOperations()
     .execute(new SchemaOperationsProcessEngineBuild());
-    
+
+    processEngineImpl.getProcessEngineConfiguration()
+    .getCommandExecutorSchemaOperations()
+    .execute(new HistoryLevelSetupCommand());
+
     assertHistoryLevel();
   }
   
@@ -60,7 +65,11 @@ public class DatabaseHistoryPropertyTest {
     processEngineImpl.getProcessEngineConfiguration()
     .getCommandExecutorSchemaOperations()
     .execute(new SchemaOperationsProcessEngineBuild());
-    
+
+    processEngineImpl.getProcessEngineConfiguration()
+    .getCommandExecutorSchemaOperations()
+    .execute(new HistoryLevelSetupCommand());
+
     assertHistoryLevel();
   }
   

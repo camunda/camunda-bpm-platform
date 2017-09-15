@@ -18,10 +18,10 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
+import org.camunda.bpm.engine.impl.HistoryLevelSetupCommand;
 import org.camunda.bpm.engine.impl.ManagementServiceImpl;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
-import org.camunda.bpm.engine.impl.SchemaOperationsProcessEngineBuild;
 import org.camunda.bpm.engine.impl.application.ProcessApplicationManager;
 import org.camunda.bpm.engine.impl.bpmn.deployer.BpmnDeployer;
 import org.camunda.bpm.engine.impl.cfg.IdGenerator;
@@ -474,7 +474,7 @@ public abstract class TestHelper {
              dbEntityManager.merge(historyLevelProperty);
            }
          } else {
-           SchemaOperationsProcessEngineBuild.dbCreateHistoryLevel(dbEntityManager);
+           HistoryLevelSetupCommand.dbCreateHistoryLevel(dbEntityManager);
          }
          return null;
        }

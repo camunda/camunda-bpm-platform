@@ -1,9 +1,9 @@
 package org.camunda.bpm.integrationtest.functional.database;
 
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.impl.HistoryLevelSetupCommand;
 import org.camunda.bpm.engine.impl.ManagementServiceImpl;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
-import org.camunda.bpm.engine.impl.SchemaOperationsProcessEngineBuild;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.db.PersistenceSession;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -89,7 +89,7 @@ public class PurgeDatabaseTest extends AbstractFoxPlatformIntegrationTest {
               PersistenceSession persistenceSession = commandContext.getSession(PersistenceSession.class);
               persistenceSession.dbSchemaDrop();
               persistenceSession.dbSchemaCreate();
-              SchemaOperationsProcessEngineBuild.dbCreateHistoryLevel(commandContext.getDbEntityManager());
+              HistoryLevelSetupCommand.dbCreateHistoryLevel(commandContext.getDbEntityManager());
               return null;
             }
           });
