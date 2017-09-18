@@ -1,4 +1,4 @@
-package org.camunda.bpm.extension.spring.boot.rest;
+package org.camunda.bpm.spring.boot.starter.rest;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;

@@ -1,4 +1,4 @@
-package org.camunda.bpm.extension.spring.boot.rest.test;
+package org.camunda.bpm.spring.boot.starter.rest.test;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
