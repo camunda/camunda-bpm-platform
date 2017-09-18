@@ -13,7 +13,8 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
       '$scope',
       'Views',
       'camAPI',
-      function($scope, Views, camAPI) {
+      '$rootScope',
+      function($scope, Views, camAPI, $rootScope) {
 
         var getPDIncidentsCount = function(incidents) {
           if(!incidents) {
@@ -65,6 +66,13 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
               }
             });
           });
+        });
+
+        $scope.processesActions = Views.getProviders({ component: 'cockpit.processes.action'});
+        $scope.definitionVars = { read: [ 'pd', 'processDefinitionData',  'processDefinitionsCount'] };
+
+        $rootScope.$on('processes.action.delete', function() {
+          $scope.processDefinitionsCount = $scope.processDefinitionData.length;
         });
 
         $scope.activeTab = 'list';
