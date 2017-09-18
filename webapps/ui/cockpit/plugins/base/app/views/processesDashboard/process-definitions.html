@@ -87,6 +87,13 @@
                 <span class="glyphicon glyphicon-signal"></span>
               </a>
             </td>
+
+            <td ng-if="processesActions.length > 0">
+              <view ng-repeat="processesAction in processesActions"
+                    data-plugin-id="{{ processAction.id }}"
+                    vars="definitionVars"
+                    provider="processesAction"></view>
+            </td>
           </tr>
         </tbody>
       </table>
