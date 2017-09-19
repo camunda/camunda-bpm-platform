@@ -4,23 +4,23 @@ import java.util.Date;
 
 public class HistoryCleanupConfigurationDto {
 
-	protected Date historyCleanupBatchWindowStartTime;
-	protected Date historyCleanupBatchWindowEndTime;
+	protected Date batchWindowStartTime;
+	protected Date batchWindowEndTime;
 
-	public Date getHistoryCleanupBatchWindowStartTime() {
-		return historyCleanupBatchWindowStartTime;
+	public Date getBatchWindowStartTime() {
+		return batchWindowStartTime;
 	}
 
-	public void setHistoryCleanupBatchWindowStartTime(Date historyCleanupBatchWindowStartTime) {
-		this.historyCleanupBatchWindowStartTime = historyCleanupBatchWindowStartTime;
+	public void setBatchWindowStartTime(Date batchWindowStartTime) {
+		this.batchWindowStartTime = batchWindowStartTime;
 	}
 
-	public Date getHistoryCleanupBatchWindowEndTime() {
-		return historyCleanupBatchWindowEndTime;
+	public Date getBatchWindowEndTime() {
+		return batchWindowEndTime;
 	}
 
-	public void setHistoryCleanupBatchWindowEndTime(Date historyCleanupBatchWindowEndTime) {
-		this.historyCleanupBatchWindowEndTime = historyCleanupBatchWindowEndTime;
+	public void setBatchWindowEndTime(Date batchWindowEndTime) {
+		this.batchWindowEndTime = batchWindowEndTime;
 	}
 
 }

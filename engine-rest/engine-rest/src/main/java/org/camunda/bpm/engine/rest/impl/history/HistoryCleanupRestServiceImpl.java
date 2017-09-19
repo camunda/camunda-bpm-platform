@@ -47,14 +47,13 @@ public class HistoryCleanupRestServiceImpl implements HistoryCleanupRestService 
     Date endTime = ((ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration())
         .getHistoryCleanupBatchWindowEndTimeAsDate();
     if (startTime == null || endTime == null) {
-      throw new InvalidRequestException(Status.BAD_REQUEST, "History cleanup batch window is not configured.");
+      return configurationDto;
     }
-    Date now = new Date();
-    ClockUtil.setCurrentTime(now);
+    Date now = ClockUtil.getCurrentTime();
     Date startDate = HistoryCleanupHelper.getCurrentOrNextBatchWindowStartTime(now, startTime, endTime);
     Date endDate = HistoryCleanupHelper.getNextBatchWindowEndTime(now, endTime);
-    configurationDto.setHistoryCleanupBatchWindowStartTime(startDate);
-    configurationDto.setHistoryCleanupBatchWindowEndTime(endDate);
+    configurationDto.setBatchWindowStartTime(startDate);
+    configurationDto.setBatchWindowEndTime(endDate);
     return configurationDto;
   }
 }

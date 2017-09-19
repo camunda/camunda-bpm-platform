@@ -18,6 +18,7 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupHelper;
 import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
+import org.camunda.bpm.engine.rest.mapper.JacksonConfigurator;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
 import org.camunda.bpm.engine.runtime.Job;
 import org.junit.Before;
@@ -30,8 +31,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.equalTo;
 
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -126,34 +129,20 @@ public class HistoryCleanupRestServiceInteractionTest extends AbstractRestServic
     Calendar tomorrow = Calendar.getInstance();
     tomorrow.setTime(HistoryCleanupHelper.addDays(now, 1));
 
-    int yearToday = today.get(Calendar.YEAR);
-    String monthToday = (today.get(Calendar.MONTH) + 1) + "";
-    if (monthToday.equals("12")) {
-      monthToday = "0";
-    }
-    if (monthToday.length()==1) {
-      monthToday = "0" + monthToday;
-    }
-    int dayToday = today.get(Calendar.DAY_OF_MONTH);
+    Date timeToday = HistoryCleanupHelper.parseTimeConfiguration("23:59");
+    Date timeTomorrow = HistoryCleanupHelper.parseTimeConfiguration("00:00");
 
-    int yearTomorrow = tomorrow.get(Calendar.YEAR);
-    String monthTomorrow = (tomorrow.get(Calendar.MONTH) + 1) + "";
-    if (monthTomorrow.equals("12")) {
-      monthTomorrow = "0";
-    }
-    if (monthTomorrow.length()==1) {
-      monthTomorrow = "0" + monthTomorrow;
-    }
-    int dayTomorrow = tomorrow.get(Calendar.DAY_OF_MONTH);
+    Date dateToday = HistoryCleanupHelper.updateTime(today.getTime(), timeToday);
+    Date dateTomorrow = HistoryCleanupHelper.updateTime(tomorrow.getTime(), timeTomorrow);
+
+    SimpleDateFormat sdf = new SimpleDateFormat(JacksonConfigurator.dateFormatString);
 
     given()
       .contentType(ContentType.JSON)
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
-      .body("historyCleanupBatchWindowStartTime", containsString(yearToday + "-" + monthToday + "-" + dayToday))
-      .body("historyCleanupBatchWindowStartTime", containsString("23:59"))
-      .body("historyCleanupBatchWindowEndTime", containsString(yearTomorrow + "-" + monthTomorrow + "-" + dayTomorrow))
-      .body("historyCleanupBatchWindowEndTime", containsString("00:00"))
+      .body("batchWindowStartTime", containsString(sdf.format(dateToday)))
+      .body("batchWindowEndTime", containsString(sdf.format(dateTomorrow)))
     .when()
       .get(CONFIGURATION_URL);
 
@@ -171,9 +160,14 @@ public class HistoryCleanupRestServiceInteractionTest extends AbstractRestServic
     given()
       .contentType(ContentType.JSON)
     .then().expect()
-      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .statusCode(Status.OK.getStatusCode())
+      .body("batchWindowStartTime", equalTo(null))
+      .body("batchWindowEndTime", equalTo(null))
     .when()
       .get(CONFIGURATION_URL);
+
+    verify(processEngineConfigurationImplMock).getHistoryCleanupBatchWindowStartTimeAsDate();
+    verify(processEngineConfigurationImplMock).getHistoryCleanupBatchWindowEndTimeAsDate();
   }
 
 }
