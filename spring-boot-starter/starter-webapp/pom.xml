@@ -89,6 +89,7 @@
       </build>
     </profile>
     <profile>
+      <!-- profile to test community webapps -->
       <id>test-ce</id>
       <activation>
         <activeByDefault>false</activeByDefault>
@@ -99,6 +100,17 @@
           <artifactId>camunda-webapp-webjar</artifactId>
           <version>${camunda.version}</version>
           <classifier>test-ce</classifier>
+          <!-- Classifier does not have affect when pulling transitive dependency.
+
+           E.g. we have in repository:
+            org.camunda.bpm.webapp:camunda-webapp-webjar:7.8.0-SNAPSHOT:jar   - contains EE web resources, coming from camunda-bpm-platform-ee/webapps/camunda-webapp/webjar
+            org.camunda.bpm.webapp:camunda-webapp-webjar:7.8.0-SNAPSHOT:pom  - contains EE webjar POM, corresponds to the latter JAR, contains dependency on camunda-webapp-ee-plugins
+            org.camunda.bpm.webapp:camunda-webapp-webjar:7.8.0-SNAPSHOT-test-ce:jar - contains CE web resources, coming from camunda-bpm-platform/distro/webjar
+            org.camunda.bpm.webapp:camunda-webapp-webjar:7.8.0-SNAPSHOT-test-ee:jar - contains EE web resources - same JAR as in the 1st line
+
+            In this case, if we want to use CE webapps (test-ce classifier), we have to exclude camunda-webapp-ee-plugins manually, as the dependency will come from POM mentioned above,
+            not respecting the declared classifier
+           -->
           <exclusions>
             <exclusion>
               <groupId>org.camunda.bpm.webapp</groupId>
@@ -122,6 +134,7 @@
       </build>
     </profile>
     <profile>
+      <!-- profile to test enterprise webapps -->
       <id>test-ee</id>
       <activation>
         <activeByDefault>false</activeByDefault>
