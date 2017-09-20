@@ -20,8 +20,6 @@ import org.camunda.bpm.engine.variable.type.SerializableValueType;
 import org.camunda.bpm.engine.variable.value.SerializableValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
-import javax.xml.bind.DatatypeConverter;
-
 /**
  * @author Roman Smirnov
  *
@@ -106,8 +104,7 @@ public abstract class AbstractSerializableValueSerializer<T extends Serializable
   protected String getSerializedStringValue(byte[] serializedByteValue) {
     if(serializedByteValue != null) {
       if(!isSerializationTextBased()) {
-        return DatatypeConverter.printBase64Binary(serializedByteValue);
-        //serializedByteValue = Base64.encodeBase64(serializedByteValue);
+        serializedByteValue = Base64.encodeBase64(serializedByteValue);
       }
       return StringUtil.fromBytes(serializedByteValue);
     }
@@ -120,8 +117,7 @@ public abstract class AbstractSerializableValueSerializer<T extends Serializable
     if(serializedStringValue != null) {
       byte[] serializedByteValue = StringUtil.toByteArray(serializedStringValue);
       if (!isSerializationTextBased()) {
-        serializedByteValue = DatatypeConverter.parseBase64Binary(serializedStringValue);
-        // serializedByteValue = Base64.decodeBase64(serializedByteValue);
+        serializedByteValue = Base64.decodeBase64(serializedByteValue);
       }
       return serializedByteValue;
     }
