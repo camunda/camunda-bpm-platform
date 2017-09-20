@@ -8,7 +8,6 @@ var sdk = require('camunda-commons-ui/vendor/camunda-bpm-sdk-angular');
 var dataDepend = require('angular-data-depend');
 var camCommon = require('../../../common/scripts/module');
 var moment = require('camunda-commons-ui/vendor/moment');
-var momentPreciseRangePlugin = require('moment-precise-range-plugin');
 var events = require('events');
 var lodash = require('camunda-commons-ui/vendor/lodash');
 
@@ -134,7 +133,6 @@ module.exports.exposePackages = function(container) {
   container['camunda-bpm-sdk-js'] = sdk;
   container['angular-data-depend'] = dataDepend;
   container['moment'] = moment;
-  container['moment-precise-range-plugin'] = momentPreciseRangePlugin;
   container['events'] = events;
   container['cam-common'] = camCommon;
   container['lodash'] = lodash;
