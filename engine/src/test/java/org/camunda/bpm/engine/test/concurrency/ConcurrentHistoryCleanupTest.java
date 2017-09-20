@@ -21,7 +21,7 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.runtime.Job;
-import org.camunda.bpm.engine.test.util.ConcurrentTestHelper;
+import org.camunda.bpm.engine.test.util.DatabaseHelper;
 
 /**
  * <p>Tests the call to history cleanup simultaneously.</p>
@@ -54,8 +54,8 @@ public class ConcurrentHistoryCleanupTest extends ConcurrencyTestCase {
 
   @Override
   protected void runTest() throws Throwable {
-    final Integer transactionIsolationLevel = ConcurrentTestHelper.getTransactionIsolationLevel(processEngineConfiguration);
-    String databaseType = ConcurrentTestHelper.getDatabaseType(processEngineConfiguration);
+    final Integer transactionIsolationLevel = DatabaseHelper.getTransactionIsolationLevel(processEngineConfiguration);
+    String databaseType = DatabaseHelper.getDatabaseType(processEngineConfiguration);
 
     if (DbSqlSessionFactory.H2.equals(databaseType) || DbSqlSessionFactory.MARIADB.equals(databaseType) || (transactionIsolationLevel != null && !transactionIsolationLevel.equals(Connection.TRANSACTION_READ_COMMITTED))) {
       // skip test method - if database is H2

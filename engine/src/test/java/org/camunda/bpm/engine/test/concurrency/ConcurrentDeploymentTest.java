@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.repository.DeploymentQuery;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.test.util.DatabaseHelper;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
@@ -53,7 +54,7 @@ public class ConcurrentDeploymentTest extends ConcurrencyTestCase {
    */
   @Override
   protected void runTest() throws Throwable {
-    String databaseType = processEngineConfiguration.getDbSqlSessionFactory().getDatabaseType();
+    String databaseType = DatabaseHelper.getDatabaseType(processEngineConfiguration);
 
     if("h2".equals(databaseType)) {
       // skip test method - if database is H2

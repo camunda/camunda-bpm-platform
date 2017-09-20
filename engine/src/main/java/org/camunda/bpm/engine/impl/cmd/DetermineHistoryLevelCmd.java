@@ -2,7 +2,6 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.HistoryLevelSetupCommand;
-import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -22,7 +21,7 @@ public class DetermineHistoryLevelCmd implements Command<HistoryLevel> {
 
   @Override
   public HistoryLevel execute(final CommandContext commandContext) {
-    final Integer databaseHistoryLevel = HistoryLevelSetupCommand.databaseHistoryLevel(commandContext.getSession(DbEntityManager.class));
+    final Integer databaseHistoryLevel = HistoryLevelSetupCommand.databaseHistoryLevel(commandContext);
 
     HistoryLevel result = null;
 

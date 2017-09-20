@@ -89,7 +89,7 @@ public class PurgeDatabaseTest extends AbstractFoxPlatformIntegrationTest {
               PersistenceSession persistenceSession = commandContext.getSession(PersistenceSession.class);
               persistenceSession.dbSchemaDrop();
               persistenceSession.dbSchemaCreate();
-              HistoryLevelSetupCommand.dbCreateHistoryLevel(commandContext.getDbEntityManager());
+              HistoryLevelSetupCommand.dbCreateHistoryLevel(commandContext);
               return null;
             }
           });

@@ -19,7 +19,7 @@ import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.test.TestHelper;
-import org.camunda.bpm.engine.test.util.ConcurrentTestHelper;
+import org.camunda.bpm.engine.test.util.DatabaseHelper;
 
 /**
  * <p>Tests cluster scenario with two nodes trying to write the history level property in parallel.</p>
@@ -38,8 +38,8 @@ public class ConcurrentHistoryLevelTest extends ConcurrencyTestCase {
 
   @Override
   protected void runTest() throws Throwable {
-    final Integer transactionIsolationLevel = ConcurrentTestHelper.getTransactionIsolationLevel(processEngineConfiguration);
-    String databaseType = ConcurrentTestHelper.getDatabaseType(processEngineConfiguration);
+    final Integer transactionIsolationLevel = DatabaseHelper.getTransactionIsolationLevel(processEngineConfiguration);
+    String databaseType = DatabaseHelper.getDatabaseType(processEngineConfiguration);
 
     if (DbSqlSessionFactory.H2.equals(databaseType) || DbSqlSessionFactory.MARIADB.equals(databaseType)
         || (transactionIsolationLevel != null && !transactionIsolationLevel.equals(Connection.TRANSACTION_READ_COMMITTED))) {

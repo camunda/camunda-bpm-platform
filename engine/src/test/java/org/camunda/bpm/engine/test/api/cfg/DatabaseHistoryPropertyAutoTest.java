@@ -14,7 +14,6 @@ import org.camunda.bpm.engine.impl.HistoryLevelSetupCommand;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
-import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -79,7 +78,7 @@ public class DatabaseHistoryPropertyAutoTest {
     final Integer level = config.getCommandExecutorSchemaOperations().execute(new Command<Integer>() {
       @Override
       public Integer execute(CommandContext commandContext) {
-        return HistoryLevelSetupCommand.databaseHistoryLevel(commandContext.getSession(DbEntityManager.class));
+        return HistoryLevelSetupCommand.databaseHistoryLevel(commandContext);
       }
     });
 

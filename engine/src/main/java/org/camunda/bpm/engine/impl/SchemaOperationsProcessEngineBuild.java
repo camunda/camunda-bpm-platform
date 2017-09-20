@@ -18,8 +18,6 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.PersistenceSession;
-import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
-import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
 
@@ -54,10 +52,8 @@ public final class SchemaOperationsProcessEngineBuild implements SchemaOperation
       persistenceSession.dbSchemaUpdate();
     }
 
-
-    DbEntityManager entityManager = commandContext.getSession(DbEntityManager.class);
-    checkDeploymentLockExists(entityManager);
-    checkHistoryCleanupLockExists(entityManager);
+    checkDeploymentLockExists(commandContext);
+    checkHistoryCleanupLockExists(commandContext);
 
     //create history cleanup job
     if (Context.getProcessEngineConfiguration().getManagementService().getTableMetaData("ACT_RU_JOB") != null) {
@@ -67,23 +63,15 @@ public final class SchemaOperationsProcessEngineBuild implements SchemaOperation
     return null;
   }
 
-  public static void dbCreateHistoryLevel(DbEntityManager entityManager) {
-    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
-    HistoryLevel configuredHistoryLevel = processEngineConfiguration.getHistoryLevel();
-    PropertyEntity property = new PropertyEntity("historyLevel", Integer.toString(configuredHistoryLevel.getId()));
-    entityManager.insert(property);
-    LOG.creatingHistoryLevelPropertyInDatabase(configuredHistoryLevel);
-  }
-
-  public void checkDeploymentLockExists(DbEntityManager entityManager) {
-    PropertyEntity deploymentLockProperty = entityManager.selectById(PropertyEntity.class, "deployment.lock");
+  public void checkDeploymentLockExists(CommandContext commandContext) {
+    PropertyEntity deploymentLockProperty = commandContext.getPropertyManager().findPropertyById("deployment.lock");
     if (deploymentLockProperty == null) {
       LOG.noDeploymentLockPropertyFound();
     }
   }
 
-  public void checkHistoryCleanupLockExists(DbEntityManager entityManager) {
-    PropertyEntity historyCleanupLockProperty = entityManager.selectById(PropertyEntity.class, "history.cleanup.job.lock");
+  public void checkHistoryCleanupLockExists(CommandContext commandContext) {
+    PropertyEntity historyCleanupLockProperty = commandContext.getPropertyManager().findPropertyById("history.cleanup.job.lock");
     if (historyCleanupLockProperty == null) {
       LOG.noHistoryCleanupLockPropertyFound();
     }

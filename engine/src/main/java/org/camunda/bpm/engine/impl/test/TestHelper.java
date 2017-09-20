@@ -474,7 +474,7 @@ public abstract class TestHelper {
              dbEntityManager.merge(historyLevelProperty);
            }
          } else {
-           HistoryLevelSetupCommand.dbCreateHistoryLevel(dbEntityManager);
+           HistoryLevelSetupCommand.dbCreateHistoryLevel(commandContext);
          }
          return null;
        }
