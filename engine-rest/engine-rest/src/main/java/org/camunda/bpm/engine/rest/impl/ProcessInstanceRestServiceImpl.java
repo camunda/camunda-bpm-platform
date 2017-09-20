@@ -42,7 +42,6 @@ import org.camunda.bpm.engine.rest.sub.runtime.impl.ProcessInstanceResourceImpl;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.camunda.bpm.engine.runtime.UpdateProcessInstancesSuspensionStateBuilder;
 
 public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAware implements
     ProcessInstanceRestService {
@@ -154,7 +153,8 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
         dto.getProcessInstanceIds(),
         processInstanceQuery,
         dto.getDeleteReason(),
-        dto.isSkipCustomListeners());
+        dto.isSkipCustomListeners(),
+        dto.isSkipSubprocesses());
 
       return BatchDto.fromBatch(batch);
     }
@@ -187,7 +187,8 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
         processInstanceIds,
         null,
         deleteProcessInstancesDto.getDeleteReason(),
-        deleteProcessInstancesDto.isSkipCustomListeners());
+        deleteProcessInstancesDto.isSkipCustomListeners(),
+        deleteProcessInstancesDto.isSkipSubprocesses());
 
       return BatchDto.fromBatch(batch);
     } catch (BadUserRequestException e) {

@@ -13,7 +13,6 @@
 
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -149,6 +148,14 @@ public class HistoricProcessInstanceManager extends AbstractHistoricManager {
     getAuthorizationManager().configureQueryHistoricFinishedInstanceReport(query, Resources.PROCESS_DEFINITION);
     getTenantManager().configureQuery(query);
     return (Long) getDbEntityManager().selectOne("selectFinishedProcessInstancesReportEntitiesCount", query);
+  }
+
+  public void updateHistoricSubprocessInstance(String processInstanceId) {
+    if (isHistoryEnabled()) {
+      ListQueryParameterObject parameterObject = new ListQueryParameterObject();
+      parameterObject.setParameter(processInstanceId);
+      getDbEntityManager().update(HistoricProcessInstanceEntity.class, "updateHistoricSubprocessInstance", parameterObject);
+    }
   }
 
 }

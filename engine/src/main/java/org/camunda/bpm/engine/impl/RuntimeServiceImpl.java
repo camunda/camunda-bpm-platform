@@ -184,8 +184,14 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
     return deleteProcessInstancesAsync(null, processInstanceQuery, deleteReason, false);
   }
 
+  @Override
   public Batch deleteProcessInstancesAsync(List<String> processInstanceIds, ProcessInstanceQuery processInstanceQuery, String deleteReason, boolean skipCustomListeners) {
-    return commandExecutor.execute(new DeleteProcessInstanceBatchCmd(processInstanceIds, processInstanceQuery, deleteReason, skipCustomListeners));
+    return deleteProcessInstancesAsync(processInstanceIds, processInstanceQuery, deleteReason, skipCustomListeners, false);
+  }
+
+  @Override
+  public Batch deleteProcessInstancesAsync(List<String> processInstanceIds, ProcessInstanceQuery processInstanceQuery, String deleteReason, boolean skipCustomListeners, boolean skipSubprocesses) {
+    return commandExecutor.execute(new DeleteProcessInstanceBatchCmd(processInstanceIds, processInstanceQuery, deleteReason, skipCustomListeners, skipSubprocesses));
   }
 
   @Override
@@ -200,12 +206,22 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
 
   @Override
   public void deleteProcessInstance(String processInstanceId, String deleteReason, boolean skipCustomListeners, boolean externallyTerminated, boolean skipIoMappings) {
-    commandExecutor.execute(new DeleteProcessInstanceCmd(processInstanceId, deleteReason, skipCustomListeners, externallyTerminated, skipIoMappings));
+    deleteProcessInstance(processInstanceId, deleteReason, skipCustomListeners, externallyTerminated, skipIoMappings, false);
+  }
+
+  @Override
+  public void deleteProcessInstance(String processInstanceId, String deleteReason, boolean skipCustomListeners, boolean externallyTerminated, boolean skipIoMappings, boolean skipSubprocesses) {
+    commandExecutor.execute(new DeleteProcessInstanceCmd(processInstanceId, deleteReason, skipCustomListeners, externallyTerminated, skipIoMappings, skipSubprocesses));
   }
 
   @Override
   public void deleteProcessInstances(List<String> processInstanceIds, String deleteReason, boolean skipCustomListeners, boolean externallyTerminated){
-    commandExecutor.execute(new DeleteProcessInstancesCmd(processInstanceIds, deleteReason, skipCustomListeners, externallyTerminated));
+    deleteProcessInstances(processInstanceIds, deleteReason, skipCustomListeners, externallyTerminated, false);
+  }
+
+  @Override
+  public void deleteProcessInstances(List<String> processInstanceIds, String deleteReason, boolean skipCustomListeners, boolean externallyTerminated, boolean skipSubprocesses){
+    commandExecutor.execute(new DeleteProcessInstancesCmd(processInstanceIds, deleteReason, skipCustomListeners, externallyTerminated, skipSubprocesses));
   }
 
   @Override

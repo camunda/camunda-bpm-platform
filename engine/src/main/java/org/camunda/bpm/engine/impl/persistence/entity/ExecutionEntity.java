@@ -53,7 +53,6 @@ import org.camunda.bpm.engine.impl.history.event.HistoryEventProcessor;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.interceptor.AtomicOperationInvocation;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.MessageJobDeclaration;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.util.FormPropertyStartContext;
@@ -917,6 +916,13 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
       this.superExecution.setSubProcessInstance(this);
     } else {
       this.superExecutionId = null;
+      updateHistoricProcessInstanceSuperProcess();
+    }
+  }
+
+  private void updateHistoricProcessInstanceSuperProcess() {
+    if (processInstanceId != null) {
+      Context.getCommandContext().getHistoricProcessInstanceManager().updateHistoricSubprocessInstance(processInstanceId);
     }
   }
 
@@ -1137,8 +1143,6 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
   }
 
   protected void moveTasksTo(ExecutionEntity other) {
-    CommandContext commandContext = Context.getCommandContext();
-
     // update the related tasks
     for (TaskEntity task : getTasksInternal()) {
       task.setExecution(other);

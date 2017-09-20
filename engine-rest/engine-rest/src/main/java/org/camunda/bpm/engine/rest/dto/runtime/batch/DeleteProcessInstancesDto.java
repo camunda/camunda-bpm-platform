@@ -14,6 +14,7 @@ public class DeleteProcessInstancesDto {
   protected String deleteReason;
   protected boolean skipCustomListeners;
   protected HistoricProcessInstanceQueryDto historicProcessInstanceQuery;
+  protected boolean skipSubprocesses;
 
   public List<String> getProcessInstanceIds() {
     return processInstanceIds;
@@ -53,6 +54,14 @@ public class DeleteProcessInstancesDto {
 
   public HistoricProcessInstanceQueryDto getHistoricProcessInstanceQuery() {
     return historicProcessInstanceQuery;
+  }
+
+  public boolean isSkipSubprocesses() {
+    return skipSubprocesses;
+  }
+
+  public void setSkipSubprocesses(boolean skipSubprocesses) {
+    this.skipSubprocesses = skipSubprocesses;
   }
 
 }

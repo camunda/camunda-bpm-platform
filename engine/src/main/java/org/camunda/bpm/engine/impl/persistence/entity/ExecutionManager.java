@@ -57,7 +57,7 @@ public class ExecutionManager extends AbstractManager {
       .selectList("selectProcessInstanceIdsByProcessDefinitionId", processDefinitionId);
 
     for (String processInstanceId: processInstanceIds) {
-      deleteProcessInstance(processInstanceId, deleteReason, cascade, skipCustomListeners, false, skipIoMappings);
+      deleteProcessInstance(processInstanceId, deleteReason, cascade, skipCustomListeners, false, skipIoMappings, false);
     }
 
     if (cascade) {
@@ -70,11 +70,11 @@ public class ExecutionManager extends AbstractManager {
   }
 
   public void deleteProcessInstance(String processInstanceId, String deleteReason, boolean cascade, boolean skipCustomListeners) {
-    deleteProcessInstance(processInstanceId,deleteReason,cascade,skipCustomListeners,false,false);
+    deleteProcessInstance(processInstanceId, deleteReason, cascade, skipCustomListeners, false, false, false);
   }
 
   public void deleteProcessInstance(String processInstanceId, String deleteReason, boolean cascade, boolean skipCustomListeners, boolean externallyTerminated,
-      boolean skipIoMappings) {
+      boolean skipIoMappings, boolean skipSubprocesses) {
     ExecutionEntity execution = findExecutionById(processInstanceId);
 
     if(execution == null) {
@@ -84,7 +84,7 @@ public class ExecutionManager extends AbstractManager {
     getTaskManager().deleteTasksByProcessInstanceId(processInstanceId, deleteReason, cascade, skipCustomListeners);
 
     // delete the execution BEFORE we delete the history, otherwise we will produce orphan HistoricVariableInstance instances
-    execution.deleteCascade(deleteReason, skipCustomListeners, skipIoMappings, externallyTerminated);
+    execution.deleteCascade(deleteReason, skipCustomListeners, skipIoMappings, externallyTerminated, skipSubprocesses);
 
     if (cascade) {
       getHistoricProcessInstanceManager().deleteHistoricProcessInstanceByIds(Arrays.asList(processInstanceId));

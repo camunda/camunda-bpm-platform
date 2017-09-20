@@ -254,7 +254,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
   @Test
   public void testDeleteAsync() {
     List<String> ids = Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
-    when(runtimeServiceMock.deleteProcessInstancesAsync(anyListOf(String.class), any(ProcessInstanceQuery.class), anyString(), anyBoolean())).thenReturn(new BatchEntity());
+    when(runtimeServiceMock.deleteProcessInstancesAsync(anyListOf(String.class), any(ProcessInstanceQuery.class), anyString(), anyBoolean(), anyBoolean())).thenReturn(new BatchEntity());
     Map<String, Object> messageBodyJson = new HashMap<String, Object>();
     messageBodyJson.put("processInstanceIds", ids);
     messageBodyJson.put("deleteReason", TEST_DELETE_REASON);
@@ -264,7 +264,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
         .statusCode(Status.OK.getStatusCode())
         .when().post(DELETE_PROCESS_INSTANCES_ASYNC_URL);
 
-    verify(runtimeServiceMock, times(1)).deleteProcessInstancesAsync(ids, null, TEST_DELETE_REASON, false);
+    verify(runtimeServiceMock, times(1)).deleteProcessInstancesAsync(ids, null, TEST_DELETE_REASON, false, false);
   }
 
   @Test
@@ -273,7 +273,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
     messageBodyJson.put("deleteReason", TEST_DELETE_REASON);
     ProcessInstanceQueryDto query = new ProcessInstanceQueryDto();
     messageBodyJson.put("processInstanceQuery", query);
-    when(runtimeServiceMock.deleteProcessInstancesAsync(anyListOf(String.class), any(ProcessInstanceQuery.class), anyString(), anyBoolean())).thenReturn(new BatchEntity());
+    when(runtimeServiceMock.deleteProcessInstancesAsync(anyListOf(String.class), any(ProcessInstanceQuery.class), anyString(), anyBoolean(), anyBoolean())).thenReturn(new BatchEntity());
 
     given()
         .contentType(ContentType.JSON).body(messageBodyJson)
@@ -282,13 +282,13 @@ public class ProcessInstanceRestServiceInteractionTest extends
         .when().post(DELETE_PROCESS_INSTANCES_ASYNC_URL);
 
     verify(runtimeServiceMock, times(1)).deleteProcessInstancesAsync(
-        anyListOf(String.class), Mockito.any(ProcessInstanceQuery.class), Mockito.eq(TEST_DELETE_REASON), Mockito.eq(false));
+        anyListOf(String.class), Mockito.any(ProcessInstanceQuery.class), Mockito.eq(TEST_DELETE_REASON), Mockito.eq(false), Mockito.eq(false));
   }
 
   @Test
   public void testDeleteAsyncWithBadRequestQuery() {
     doThrow(new BadUserRequestException("process instance ids are empty"))
-      .when(runtimeServiceMock).deleteProcessInstancesAsync(eq((List<String>) null), eq((ProcessInstanceQuery) null), anyString(), anyBoolean());
+      .when(runtimeServiceMock).deleteProcessInstancesAsync(eq((List<String>) null), eq((ProcessInstanceQuery) null), anyString(), anyBoolean(), anyBoolean());
 
     Map<String, Object> messageBodyJson = new HashMap<String, Object>();
     messageBodyJson.put("deleteReason", TEST_DELETE_REASON);
@@ -302,7 +302,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
   @Test
   public void testDeleteAsyncWithSkipCustomListeners() {
-    when(runtimeServiceMock.deleteProcessInstancesAsync(anyListOf(String.class), any(ProcessInstanceQuery.class), anyString(), anyBoolean())).thenReturn(new BatchEntity());
+    when(runtimeServiceMock.deleteProcessInstancesAsync(anyListOf(String.class), any(ProcessInstanceQuery.class), anyString(), anyBoolean(), anyBoolean())).thenReturn(new BatchEntity());
     Map<String, Object> messageBodyJson = new HashMap<String, Object>();
     messageBodyJson.put("deleteReason", TEST_DELETE_REASON);
     messageBodyJson.put("processInstanceIds", Arrays.asList("processInstanceId1", "processInstanceId2"));
@@ -314,7 +314,29 @@ public class ProcessInstanceRestServiceInteractionTest extends
         .statusCode(Status.OK.getStatusCode())
         .when().post(DELETE_PROCESS_INSTANCES_ASYNC_URL);
 
-    verify(runtimeServiceMock).deleteProcessInstancesAsync(anyListOf(String.class), Mockito.any(ProcessInstanceQuery.class), Mockito.eq(TEST_DELETE_REASON), Mockito.eq(true));
+    verify(runtimeServiceMock).deleteProcessInstancesAsync(anyListOf(String.class), Mockito.any(ProcessInstanceQuery.class), Mockito.eq(TEST_DELETE_REASON), Mockito.eq(true), Mockito.eq(false));
+  }
+
+  @Test
+  public void testDeleteAsyncWithSkipSubprocesses() {
+    when(runtimeServiceMock.deleteProcessInstancesAsync(anyListOf(String.class), any(ProcessInstanceQuery.class), anyString(), anyBoolean(), anyBoolean())).thenReturn(new BatchEntity());
+    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    messageBodyJson.put("deleteReason", TEST_DELETE_REASON);
+    messageBodyJson.put("processInstanceIds", Arrays.asList("processInstanceId1", "processInstanceId2"));
+    messageBodyJson.put("skipSubprocesses", true);
+
+    given()
+        .contentType(ContentType.JSON).body(messageBodyJson)
+        .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+        .when().post(DELETE_PROCESS_INSTANCES_ASYNC_URL);
+
+    verify(runtimeServiceMock).deleteProcessInstancesAsync(
+        anyListOf(String.class),
+        Mockito.any(ProcessInstanceQuery.class),
+        Mockito.eq(TEST_DELETE_REASON),
+        Mockito.eq(false),
+        Mockito.eq(true));
   }
 
   @Test
@@ -323,6 +345,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
       anyListOf(String.class),
       any(ProcessInstanceQuery.class),
       anyString(),
+      anyBoolean(),
       anyBoolean()))
     .thenReturn(new BatchEntity());
 
@@ -345,6 +368,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
         Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID),
         null,
         null,
+        false,
         false);
   }
 
@@ -354,6 +378,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
       anyListOf(String.class),
       any(ProcessInstanceQuery.class),
       anyString(),
+      anyBoolean(),
       anyBoolean()))
     .thenReturn(new BatchEntity());
 
@@ -371,6 +396,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
       Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID),
       null,
       null,
+      false,
       false);
   }
 
@@ -380,6 +406,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
       anyListOf(String.class),
       any(ProcessInstanceQuery.class),
       anyString(),
+      anyBoolean(),
       anyBoolean()))
     .thenReturn(new BatchEntity());
 
@@ -403,6 +430,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
       Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, MockProvider.ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID),
       null,
       null,
+      false,
       false);
   }
 
@@ -413,6 +441,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
         anyListOf(String.class),
         eq((ProcessInstanceQuery) null),
         anyString(),
+        anyBoolean(),
         anyBoolean());
 
     given()
@@ -426,6 +455,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
         new ArrayList<String>(),
         null,
         null,
+        false,
         false);
   }
 
@@ -435,6 +465,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
       anyListOf(String.class),
       any(ProcessInstanceQuery.class),
       anyString(),
+      anyBoolean(),
       anyBoolean()))
     .thenReturn(new BatchEntity());
 
@@ -452,6 +483,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
         new ArrayList<String>(),
         null,
         MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_DELETE_REASON,
+        false,
         false);
   }
 
@@ -461,6 +493,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
       anyListOf(String.class),
       any(ProcessInstanceQuery.class),
       anyString(),
+      anyBoolean(),
       anyBoolean()))
     .thenReturn(new BatchEntity());
 
@@ -478,6 +511,35 @@ public class ProcessInstanceRestServiceInteractionTest extends
       new ArrayList<String>(),
       null,
       null,
+      true,
+      false);
+  }
+
+  @Test
+  public void testDeleteAsyncHistoricQueryBasedWithSkipSubprocesses() {
+    when(runtimeServiceMock.deleteProcessInstancesAsync(
+      anyListOf(String.class),
+      any(ProcessInstanceQuery.class),
+      anyString(),
+      anyBoolean(),
+      anyBoolean()))
+    .thenReturn(new BatchEntity());
+
+    DeleteProcessInstancesDto body = new DeleteProcessInstancesDto();
+    body.setSkipSubprocesses(true);
+
+    given()
+      .contentType(ContentType.JSON).body(body)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when().post(DELETE_PROCESS_INSTANCES_ASYNC_HIST_QUERY_URL);
+
+    verify(runtimeServiceMock,
+      times(1)).deleteProcessInstancesAsync(
+      new ArrayList<String>(),
+      null,
+      null,
+      false,
       true);
   }
 

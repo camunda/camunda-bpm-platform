@@ -12,35 +12,19 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
+import java.util.Collections;
 import java.util.concurrent.Callable;
+
 import org.camunda.bpm.engine.BadUserRequestException;
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
-import org.camunda.bpm.engine.impl.ActivityExecutionTreeMapping;
 import org.camunda.bpm.engine.impl.ProcessInstanceModificationBuilderImpl;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
-import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
-
-import java.util.Collections;
-import org.camunda.bpm.engine.impl.pvm.delegate.ModificationObserverBehavior;
-import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
-import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
-import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
-import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
-import org.camunda.bpm.engine.impl.util.EnsureUtil;
-import org.camunda.bpm.engine.runtime.ActivityInstance;
-import org.camunda.bpm.engine.runtime.Execution;
-
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * Created by aakhmerov on 16.09.16.
@@ -53,6 +37,7 @@ public abstract class AbstractDeleteProcessInstanceCmd {
   protected boolean externallyTerminated;
   protected String deleteReason;
   protected boolean skipCustomListeners;
+  protected boolean skipSubprocesses;
 
   protected void checkDeleteProcessInstance(ExecutionEntity execution, CommandContext commandContext) {
     for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
@@ -66,7 +51,8 @@ public abstract class AbstractDeleteProcessInstanceCmd {
       String deleteReason,
       final boolean skipCustomListeners,
       boolean externallyTerminated,
-      final boolean skipIoMappings) {
+      final boolean skipIoMappings,
+      boolean skipSubprocesses) {
     ensureNotNull(BadUserRequestException.class, "processInstanceId is null", "processInstanceId", processInstanceId);
 
     // fetch process instance
@@ -80,7 +66,7 @@ public abstract class AbstractDeleteProcessInstanceCmd {
     // delete process instance
     commandContext
         .getExecutionManager()
-        .deleteProcessInstance(processInstanceId, deleteReason, false, skipCustomListeners, externallyTerminated, skipIoMappings);
+        .deleteProcessInstance(processInstanceId, deleteReason, false, skipCustomListeners, externallyTerminated, skipIoMappings, skipSubprocesses);
 
     final ExecutionEntity superExecution = execution.getSuperExecution();
     if (superExecution != null) {

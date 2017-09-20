@@ -41,8 +41,13 @@ public class PvmAtomicOperationDeleteCascade implements PvmAtomicOperation {
         nextLeaf.setSkipIoMappings(deleteRoot.isSkipIoMappings());
       }
 
-      if (nextLeaf.getSubProcessInstance() != null) {
-        nextLeaf.getSubProcessInstance().deleteCascade(execution.getDeleteReason(), nextLeaf.isSkipCustomListeners(), nextLeaf.isSkipIoMappings());
+      PvmExecutionImpl subProcessInstance = nextLeaf.getSubProcessInstance();
+      if (subProcessInstance != null) {
+        if (deleteRoot.isSkipSubprocesses()) {
+          subProcessInstance.setSuperExecution(null);
+        } else {
+          subProcessInstance.deleteCascade(execution.getDeleteReason(), nextLeaf.isSkipCustomListeners(), nextLeaf.isSkipIoMappings());
+        }
       }
 
       nextLeaf.performOperation(DELETE_CASCADE_FIRE_ACTIVITY_END);

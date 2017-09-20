@@ -52,6 +52,7 @@ import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricDetail;
+import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -2447,4 +2448,138 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  public void testDeleteProcessInstanceWithSubprocessInstances() {
+    // given a process instance with subprocesses
+    BpmnModelInstance calling = prepareComplexProcess("A", "B", "A");
+
+    BpmnModelInstance calledA = prepareSimpleProcess("A");
+    BpmnModelInstance calledB = prepareSimpleProcess("B");
+
+    deployment(calling, calledA, calledB);
+
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("calling");
+    List<ProcessInstance> subInstances = runtimeService.createProcessInstanceQuery().superProcessInstanceId(instance.getId()).list();
+
+    // when the process instance is deleted and we do not skip sub processes
+    String id = instance.getId();
+    runtimeService.deleteProcessInstance(id, "test_purposes", false, true, false, false);
+
+    // then
+    ProcessInstance superInstance = runtimeService.createProcessInstanceQuery().processInstanceId(id).singleResult();
+    assertNull(superInstance);
+    assertProcessEnded(id);
+
+    ProcessInstance piA = runtimeService.createProcessInstanceQuery().processDefinitionKey("A").singleResult();
+    assertNull(piA);
+    ProcessInstance piB = runtimeService.createProcessInstanceQuery().processDefinitionKey("B").singleResult();
+    assertNull(piB);
+    for (ProcessInstance processInstance : subInstances) {
+      assertProcessEnded(processInstance.getId());
+    }
+  }
+
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  public void testDeleteProcessInstanceWithoutSubprocessInstances() {
+    // given a process instance with subprocesses
+    BpmnModelInstance calling = prepareComplexProcess("A", "B", "C");
+
+    BpmnModelInstance calledA = prepareSimpleProcess("A");
+    BpmnModelInstance calledB = prepareSimpleProcess("B");
+    BpmnModelInstance calledC = prepareSimpleProcess("C");
+
+    deployment(calling, calledA, calledB, calledC);
+
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("calling");
+    List<ProcessInstance> subInstances = runtimeService.createProcessInstanceQuery().superProcessInstanceId(instance.getId()).list();
+
+    // when the process instance is deleted and we do skip sub processes
+    String id = instance.getId();
+    runtimeService.deleteProcessInstance(id, "test_purposes", false, true, false, true);
+
+    // then
+    ProcessInstance superInstance = runtimeService.createProcessInstanceQuery().processInstanceId(id).singleResult();
+    assertNull(superInstance);
+    assertProcessEnded(id);
+
+    for (ProcessInstance processInstance : subInstances) {
+      assertNotNull(processInstance);
+      assertProcessNotEnded(processInstance.getId());
+    }
+
+    List<HistoricProcessInstance> historicSubprocessList = historyService.createHistoricProcessInstanceQuery().list();
+    for (HistoricProcessInstance historicProcessInstance : historicSubprocessList) {
+      assertNull(historicProcessInstance.getSuperProcessInstanceId());
+    }
+  }
+
+  public void testDeleteProcessInstancesWithoutSubprocessInstances() {
+    // given a process instance with subprocess
+    String callingProcessKey = "calling";
+    String calledProcessKey = "called";
+    BpmnModelInstance calling = prepareCallingProcess(callingProcessKey, calledProcessKey);
+    BpmnModelInstance called = prepareSimpleProcess(calledProcessKey);
+    deployment(calling, called);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(callingProcessKey);
+    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey(callingProcessKey);
+
+    List<ProcessInstance> subprocessList = runtimeService.createProcessInstanceQuery().superProcessInstanceId(processInstance.getId()).list();
+    subprocessList.addAll(runtimeService.createProcessInstanceQuery().superProcessInstanceId(processInstance2.getId()).list());
+
+    // when
+    runtimeService.deleteProcessInstances(Arrays.asList(processInstance.getId(), processInstance2.getId()), null, false, false, true);
+
+    // then
+    for (ProcessInstance instance : subprocessList) {
+      assertProcessNotEnded(instance.getId());
+    }
+  }
+
+  private BpmnModelInstance prepareComplexProcess(String calledProcessA,String calledProcessB,String calledProcessC) {
+    BpmnModelInstance calling =
+        Bpmn.createExecutableProcess("calling")
+          .startEvent()
+          .parallelGateway("fork1")
+            .subProcess()
+            .embeddedSubProcess()
+              .startEvent()
+              .parallelGateway("fork2")
+                .callActivity("callingA")
+                  .calledElement(calledProcessA)
+              .endEvent("endA")
+
+              .moveToNode("fork2")
+              .callActivity("callingB")
+                .calledElement(calledProcessB)
+              .endEvent()
+            .subProcessDone()
+
+          .moveToNode("fork1")
+            .callActivity("callingC")
+              .calledElement(calledProcessC)
+            .endEvent()
+
+        .done();
+    return calling;
+  }
+
+  private BpmnModelInstance prepareSimpleProcess(String name) {
+    BpmnModelInstance calledA = Bpmn.createExecutableProcess(name)
+        .startEvent()
+        .userTask("Task" + name)
+        .endEvent()
+        .done();
+    return calledA;
+  }
+
+  private BpmnModelInstance prepareCallingProcess(String callingProcess, String calledProcess) {
+    BpmnModelInstance calling =
+        Bpmn.createExecutableProcess(callingProcess)
+          .startEvent()
+          .callActivity()
+            .calledElement(calledProcess)
+          .endEvent()
+          .done();
+    return calling;
+  }
 }

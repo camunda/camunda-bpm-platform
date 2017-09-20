@@ -57,7 +57,7 @@ public class DeleteProcessInstancesJobHandler extends AbstractBatchJobHandler<De
 
   @Override
   protected DeleteProcessInstanceBatchConfiguration createJobConfiguration(DeleteProcessInstanceBatchConfiguration configuration, List<String> processIdsForJob) {
-    return new DeleteProcessInstanceBatchConfiguration(processIdsForJob, configuration.getDeleteReason(), configuration.isSkipCustomListeners());
+    return new DeleteProcessInstanceBatchConfiguration(processIdsForJob, configuration.getDeleteReason(), configuration.isSkipCustomListeners(), configuration.isSkipSubprocesses());
   }
 
   @Override
@@ -74,7 +74,7 @@ public class DeleteProcessInstancesJobHandler extends AbstractBatchJobHandler<De
     try {
       commandContext.getProcessEngineConfiguration()
           .getRuntimeService()
-          .deleteProcessInstances(batchConfiguration.getIds(), batchConfiguration.deleteReason, batchConfiguration.isSkipCustomListeners(), true);
+          .deleteProcessInstances(batchConfiguration.getIds(), batchConfiguration.deleteReason, batchConfiguration.isSkipCustomListeners(), true, batchConfiguration.isSkipSubprocesses());
     } finally {
       commandContext.enableUserOperationLog();
       commandContext.setRestrictUserOperationLogToAuthenticatedUsers(initialLegacyRestrictions);

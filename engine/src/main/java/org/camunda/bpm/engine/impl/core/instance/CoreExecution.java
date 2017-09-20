@@ -49,6 +49,7 @@ public abstract class CoreExecution extends AbstractVariableScope implements Bas
   protected int listenerIndex = 0;
   protected boolean skipCustomListeners;
   protected boolean skipIoMapping;
+  protected boolean skipSubprocesses;
 
   // atomic operations ////////////////////////////////////////////////////////
 
@@ -135,6 +136,14 @@ public abstract class CoreExecution extends AbstractVariableScope implements Bas
 
   public void setSkipIoMappings(boolean skipIoMappings) {
     this.skipIoMapping = skipIoMappings;
+  }
+
+  public boolean isSkipSubprocesses() {
+    return skipSubprocesses;
+  }
+
+  public void setSkipSubprocesseses(boolean skipSubprocesses) {
+    this.skipSubprocesses = skipSubprocesses;
   }
 
 }

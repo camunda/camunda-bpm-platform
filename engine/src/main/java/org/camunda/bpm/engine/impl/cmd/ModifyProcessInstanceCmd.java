@@ -128,6 +128,6 @@ public class ModifyProcessInstanceCmd implements Command<Void> {
         parentScopeExecution = (ExecutionEntity) topmostDeletableExecution.getParentScopeExecution(true);
     }
 
-    topmostDeletableExecution.deleteCascade(deleteReason, skipCustomListeners, skipIoMappings, false);
+    topmostDeletableExecution.deleteCascade(deleteReason, skipCustomListeners, skipIoMappings, false, false);
   }
 }

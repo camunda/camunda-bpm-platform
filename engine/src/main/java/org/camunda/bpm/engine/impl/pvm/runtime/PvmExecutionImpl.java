@@ -13,7 +13,6 @@
 package org.camunda.bpm.engine.impl.pvm.runtime;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.IncidentQueryImpl;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
@@ -39,7 +38,6 @@ import org.camunda.bpm.engine.impl.util.EnsureUtil;
 import org.camunda.bpm.engine.runtime.Incident;
 
 import java.util.*;
-import java.util.concurrent.Callable;
 
 import static org.camunda.bpm.engine.impl.bpmn.helper.CompensationUtil.SIGNAL_COMPENSATION_DONE;
 import static org.camunda.bpm.engine.impl.pvm.runtime.ActivityInstanceState.ENDING;
@@ -547,16 +545,17 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   }
 
   public void deleteCascade(String deleteReason, boolean skipCustomListeners, boolean skipIoMappings) {
-    deleteCascade(deleteReason, skipCustomListeners, skipIoMappings, false);
+    deleteCascade(deleteReason, skipCustomListeners, skipIoMappings, false, false);
   }
 
-  public void deleteCascade(String deleteReason, boolean skipCustomListeners, boolean skipIoMappings, boolean externallyTerminated) {
+  public void deleteCascade(String deleteReason, boolean skipCustomListeners, boolean skipIoMappings, boolean externallyTerminated, boolean skipSubprocesses) {
     this.deleteReason = deleteReason;
     setDeleteRoot(true);
     this.isEnded = true;
     this.skipCustomListeners = skipCustomListeners;
     this.skipIoMapping = skipIoMappings;
     this.externallyTerminated = externallyTerminated;
+    this.skipSubprocesses = skipSubprocesses;
     performOperation(PvmAtomicOperation.DELETE_CASCADE);
   }
 
