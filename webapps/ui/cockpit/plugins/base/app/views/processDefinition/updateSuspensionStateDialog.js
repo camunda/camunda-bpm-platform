@@ -12,7 +12,7 @@ module.exports = [
         UPDATE_FAILED = 'FAIL';
 
     var dateFilter = $filter('date'),
-        dateFormat = 'yyyy-MM-dd\'T\'HH:mm:ss.000Z';
+        dateFormat = 'yyyy-MM-dd\'T\'HH:mm:ss';
 
 
     $scope.processDefinition = processDefinition;
