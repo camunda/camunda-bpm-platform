@@ -41,6 +41,7 @@ import static org.mockito.Mockito.when;
 public class PerfTestBase64 {
 
     @Test
+    @Ignore
     public void launchBenchmark() throws Exception {
         Options opt = new OptionsBuilder()
                 .include(this.getClass().getName() + ".*")
