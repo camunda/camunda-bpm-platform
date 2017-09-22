@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.variable.serializer;
 
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.util.StringUtil;
 
 import javax.xml.bind.DatatypeConverter;
@@ -24,28 +25,28 @@ import javax.xml.bind.DatatypeConverter;
  */
 public class JavaObjectSerializerIntern extends JavaObjectSerializer {
 
-  protected String getSerializedStringValue(byte[] serializedByteValue) {
-    if(serializedByteValue != null) {
-      if(!isSerializationTextBased()) {
-        return DatatypeConverter.printBase64Binary(serializedByteValue);
-      }
-      return StringUtil.fromBytes(serializedByteValue);
+    protected String getSerializedStringValue(byte[] serializedByteValue) {
+        if (serializedByteValue != null) {
+            if (!isSerializationTextBased()) {
+                return DatatypeConverter.printBase64Binary(serializedByteValue);
+            }
+            return StringUtil.fromBytes(serializedByteValue);
+        } else {
+            return null;
+        }
     }
-    else {
-      return null;
-    }
-  }
 
-  protected byte[] getSerializedBytesValue(String serializedStringValue) {
-    if(serializedStringValue != null) {
-      byte[] serializedByteValue = StringUtil.toByteArray(serializedStringValue);
-      if (!isSerializationTextBased()) {
-        serializedByteValue = DatatypeConverter.parseBase64Binary(serializedStringValue);
-      }
-      return serializedByteValue;
+    protected byte[] getSerializedBytesValue(String serializedStringValue) {
+        if (serializedStringValue != null) {
+            byte[] serializedByteValue = null;
+            if (!isSerializationTextBased()) {
+                serializedByteValue = DatatypeConverter.parseBase64Binary(serializedStringValue);
+            } else {
+                serializedByteValue = StringUtil.toByteArray(serializedStringValue);
+            }
+            return serializedByteValue;
+        } else {
+            return null;
+        }
     }
-    else {
-      return null;
-    }
-  }
 }
