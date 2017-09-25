@@ -916,13 +916,6 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
       this.superExecution.setSubProcessInstance(this);
     } else {
       this.superExecutionId = null;
-      updateHistoricProcessInstanceSuperProcess();
-    }
-  }
-
-  private void updateHistoricProcessInstanceSuperProcess() {
-    if (processInstanceId != null) {
-      Context.getCommandContext().getHistoricProcessInstanceManager().updateHistoricSubprocessInstance(processInstanceId);
     }
   }
 

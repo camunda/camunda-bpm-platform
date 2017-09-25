@@ -80,6 +80,7 @@
     PROC_DEF_KEY_ = #{processDefinitionKey, jdbcType=VARCHAR},
     END_ACT_ID_ = #{endActivityId, jdbcType=VARCHAR},
     DELETE_REASON_ = #{deleteReason, jdbcType=VARCHAR},
+    SUPER_PROCESS_INSTANCE_ID_ = #{superProcessInstanceId, jdbcType=VARCHAR},
     STATE_ = #{state, jdbcType=VARCHAR}
 
     <if test="endTime!=null">
@@ -88,12 +89,6 @@
     </if>
 
     where ID_ = #{id, jdbcType=VARCHAR}
-  </update>
-
-  <update id="updateHistoricSubprocessInstance">
-    update ${prefix}ACT_HI_PROCINST set
-    SUPER_PROCESS_INSTANCE_ID_ = null
-    WHERE ID_ = ${parameter}
   </update>
 
   <!-- HISTORIC PROCESS INSTANCE SELECT -->

@@ -334,7 +334,6 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
     executeBatchJobs(batch);
 
     // then
-    assertThat(IncrementCounterListener.counter, is(0));
     ProcessInstance superInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processIds.get(0)).singleResult();
     assertNull(superInstance);
 

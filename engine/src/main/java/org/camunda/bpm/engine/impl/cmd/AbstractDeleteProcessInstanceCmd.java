@@ -15,16 +15,26 @@ package org.camunda.bpm.engine.impl.cmd;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.ProcessInstanceModificationBuilderImpl;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
+import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.impl.history.event.HistoryEventProcessor;
+import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
+import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 
 /**
  * Created by aakhmerov on 16.09.16.
@@ -68,6 +78,12 @@ public abstract class AbstractDeleteProcessInstanceCmd {
         .getExecutionManager()
         .deleteProcessInstance(processInstanceId, deleteReason, false, skipCustomListeners, externallyTerminated, skipIoMappings, skipSubprocesses);
 
+    if (skipSubprocesses) {
+      List<ProcessInstance> superProcesslist = commandContext.getProcessEngineConfiguration().getRuntimeService().createProcessInstanceQuery()
+          .superProcessInstanceId(processInstanceId).list();
+      triggerHistoryEvent(superProcesslist);
+    }
+
     final ExecutionEntity superExecution = execution.getSuperExecution();
     if (superExecution != null) {
       commandContext.runWithoutAuthorization(new Callable<Void>() {
@@ -86,5 +102,25 @@ public abstract class AbstractDeleteProcessInstanceCmd {
         .logProcessInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE, processInstanceId,
             null, null, Collections.singletonList(PropertyChange.EMPTY_CHANGE));
   }
+
+  public void triggerHistoryEvent(List<ProcessInstance> subProcesslist) {
+    ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
+    HistoryLevel historyLevel = configuration.getHistoryLevel();
+
+    for (final ProcessInstance processInstance : subProcesslist) {
+      // TODO: This smells bad, as the rest of the history is done via the
+      // ParseListener
+      if (historyLevel.isHistoryEventProduced(HistoryEventTypes.PROCESS_INSTANCE_UPDATE, processInstance)) {
+
+        HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
+          @Override
+          public HistoryEvent createHistoryEvent(HistoryEventProducer producer) {
+            return producer.createProcessInstanceUpdateEvt((DelegateExecution) processInstance);
+          }
+        });
+    }
+    }
+  }
+
 
 }

@@ -172,6 +172,37 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
     assertNotNull(historicProcessInstance.getEndTime());
   }
 
+  public void testDeleteProcessInstanceWithoutSubprocessInstances() {
+    // given a process instance with subprocesses
+    BpmnModelInstance calling =
+        Bpmn.createExecutableProcess("calling")
+          .startEvent()
+          .callActivity()
+            .calledElement("called")
+          .endEvent("endA")
+          .done();
+
+    BpmnModelInstance called = Bpmn.createExecutableProcess("called")
+        .startEvent()
+        .userTask("Task1")
+        .endEvent()
+        .done();
+
+    deployment(calling, called);
+
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("calling");
+
+    // when the process instance is deleted and we do skip sub processes
+    String id = instance.getId();
+    runtimeService.deleteProcessInstance(id, "test_purposes", false, true, false, true);
+
+    // then
+    List<HistoricProcessInstance> historicSubprocessList = historyService.createHistoricProcessInstanceQuery().list();
+    for (HistoricProcessInstance historicProcessInstance : historicSubprocessList) {
+      assertNull(historicProcessInstance.getSuperProcessInstanceId());
+    }
+  }
+
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
   public void testHistoricProcessInstanceStartDate() {
     runtimeService.startProcessInstanceByKey("oneTaskProcess");
