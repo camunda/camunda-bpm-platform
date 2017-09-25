@@ -3,8 +3,20 @@
 var angular = require('angular');
 
 module.exports = [
-  '$scope', '$q', 'Notifications', 'JobDefinitionResource', '$modalInstance', 'jobDefinitions',
-  function($scope,   $q,   Notifications,   JobDefinitionResource,   $modalInstance,   jobDefinitions) {
+  '$scope', '$q', 'Notifications', 'JobDefinitionResource', '$modalInstance', 'jobDefinitions', '$timeout',
+  function($scope,   $q,   Notifications,   JobDefinitionResource,   $modalInstance,   jobDefinitions, $timeout) {
+
+    $scope.hasNoJobDefinitions = jobDefinitions.length === 0;
+    if ($scope.hasNoJobDefinitions) {
+      $modalInstance.opened.then(
+        $timeout(function() {
+          Notifications.addError({
+            status: 'Error',
+            message: 'This process definition has no job definitions associated with. The job priority cannot be overridden.',
+            exclusive: true
+          });
+        }, 0));
+    }
 
     $scope.status;
     var FINISHED = 'FINISHED',

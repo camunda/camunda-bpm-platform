@@ -6,7 +6,7 @@
 <div class="job-definition-override-job-priority modal-body">
   <div notifications-panel></div>
 
-  <div ng-hide="status === 'FINISHED'">
+  <div ng-hide="status === 'FINISHED' || hasNoJobDefinitions">
 
     <p>Change for each job definition associated to this process definition the overriding job priority.</p>
 
@@ -154,7 +154,7 @@
   <button class="btn btn-link"
           ng-click="close(status)"
           ng-disabled="status === 'PERFORMING'"
-          ng-hide="status === 'FINISHED'">
+          ng-hide="status === 'FINISHED' || hasNoJobDefinitions">
     Close
   </button>
 
@@ -169,14 +169,14 @@
   <button type="submit"
           class="btn btn-primary"
           ng-click="submit()"
-          ng-hide="!setJobPriority || status === 'FINISHED'"
+          ng-hide="!setJobPriority || status === 'FINISHED' || hasNoJobDefinitions"
           ng-disabled="!isValid() || status === 'PERFORMING'">
     Override
   </button>
 
   <button class="btn btn-primary"
           ng-click="close(status)"
-          ng-show="status === 'FINISHED'">
+          ng-show="status === 'FINISHED' || hasNoJobDefinitions">
     OK
   </button>
 </div>
