@@ -18,6 +18,7 @@ import static org.junit.Assert.assertNotNull;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 
 import org.apache.commons.lang.time.DateUtils;
@@ -55,6 +56,7 @@ public class RetryIntervalsConfigurationTest extends AbstractAsyncOperationsTest
   public ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
     public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
       configuration.setFailedJobRetryTimeCycle("PT5M,PT20M, PT3M");
+      configuration.setEnableExceptionsAfterUnhandledBpmnError(true);
       return configuration;
     }
   };
@@ -91,7 +93,7 @@ public class RetryIntervalsConfigurationTest extends AbstractAsyncOperationsTest
   }
 
   @Test
-  public void testFailedServiceTask() throws ParseException {
+  public void testRetryGlobalConfiguration() throws ParseException {
     // given global retry conf. ("PT5M,PT20M, PT3M")
     BpmnModelInstance bpmnModelInstance = prepareProcessFailingServiceTask();
     testRule.deploy(bpmnModelInstance);
@@ -125,7 +127,7 @@ public class RetryIntervalsConfigurationTest extends AbstractAsyncOperationsTest
   }
 
   @Test
-  public void testFailedServiceTaskMixConfiguration() throws ParseException {
+  public void testRetryMixConfiguration() throws ParseException {
     // given
     BpmnModelInstance bpmnModelInstance = prepareProcessFailingServiceTaskWithRetryCycle("R3/PT1M");
 
@@ -153,7 +155,7 @@ public class RetryIntervalsConfigurationTest extends AbstractAsyncOperationsTest
   }
 
   @Test
-  public void testFailedServiceTaskIncrementalIntervals() throws ParseException {
+  public void testRetryIntervals() throws ParseException {
     // given
     BpmnModelInstance bpmnModelInstance = prepareProcessFailingServiceTaskWithRetryCycle("PT3M, PT10M,PT8M");
     testRule.deploy(bpmnModelInstance);
@@ -188,7 +190,7 @@ public class RetryIntervalsConfigurationTest extends AbstractAsyncOperationsTest
   }
 
   @Test
-  public void testFailedServiceTaskWithVarList() {
+  public void testRetryWithVarList() {
     // given
     BpmnModelInstance bpmnModelInstance = prepareProcessFailingServiceTaskWithRetryCycle("${var}");
     testRule.deploy(bpmnModelInstance);
@@ -207,6 +209,111 @@ public class RetryIntervalsConfigurationTest extends AbstractAsyncOperationsTest
     // then
     job = managementService.createJobQuery().singleResult();
     Assert.assertEquals(7, job.getRetries());
+  }
+
+  @Test
+  public void testIntervalsAfterUpdateRetries() throws ParseException {
+    // given
+    BpmnModelInstance bpmnModelInstance = prepareProcessFailingServiceTaskWithRetryCycle("PT3M, PT10M,PT8M");
+    testRule.deploy(bpmnModelInstance);
+
+    ClockUtil.setCurrentTime(SIMPLE_DATE_FORMAT.parse("2017-01-01T09:55:00"));
+
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey(PROCESS_ID);
+    assertNotNull(pi);
+
+    Date currentTime = SIMPLE_DATE_FORMAT.parse("2017-01-01T10:00:00");
+    ClockUtil.setCurrentTime(currentTime);
+
+    String processInstanceId = pi.getProcessInstanceId();
+
+    int jobRetries = executeJob(processInstanceId);
+    assertEquals(2, jobRetries);
+    currentTime = DateUtils.addMinutes(currentTime, 3);
+    assertLockExpirationTime(currentTime);
+    ClockUtil.setCurrentTime(currentTime);
+
+    Job job = managementService.createJobQuery().processInstanceId(processInstanceId).singleResult();
+    managementService.setJobRetries(Arrays.asList(job.getId()), 5);
+
+    jobRetries = executeJob(processInstanceId);
+    assertEquals(4, jobRetries);
+    currentTime = DateUtils.addMinutes(currentTime, 8);
+    assertLockExpirationTime(currentTime);
+    ClockUtil.setCurrentTime(currentTime);
+
+    jobRetries = executeJob(processInstanceId);
+    assertEquals(3, jobRetries);
+    currentTime = DateUtils.addMinutes(currentTime, 8);
+    assertLockExpirationTime(currentTime);
+    ClockUtil.setCurrentTime(currentTime);
+
+    jobRetries = executeJob(processInstanceId);
+    assertEquals(2, jobRetries);
+    currentTime = DateUtils.addMinutes(currentTime, 3);
+    assertLockExpirationTime(currentTime);
+    ClockUtil.setCurrentTime(currentTime);
+
+    jobRetries = executeJob(processInstanceId);
+    assertEquals(1, jobRetries);
+    currentTime = DateUtils.addMinutes(currentTime, 10);
+    assertLockExpirationTime(currentTime);
+    ClockUtil.setCurrentTime(currentTime);
+
+    jobRetries = executeJob(processInstanceId);
+    assertEquals(0, jobRetries);
+    currentTime = DateUtils.addMinutes(currentTime, 8);
+    assertLockExpirationTime(currentTime);
+    ClockUtil.setCurrentTime(currentTime);
+
+  }
+
+  @Test
+  public void testMixConfigurationWithinOneProcess() throws ParseException {
+    // given
+    BpmnModelInstance bpmnModelInstance = Bpmn.createExecutableProcess(PROCESS_ID)
+        .startEvent()
+        .serviceTask("Task1")
+          .camundaClass(ServiceTaskDelegate.class.getName())
+          .camundaAsyncBefore()
+        .serviceTask("Task2")
+          .camundaClass(FAILING_CLASS)
+          .camundaAsyncBefore()
+          .camundaFailedJobRetryTimeCycle("PT3M, PT10M,PT8M")
+        .endEvent()
+        .done();
+    testRule.deploy(bpmnModelInstance);
+
+    ClockUtil.setCurrentTime(SIMPLE_DATE_FORMAT.parse("2017-01-01T09:55:00"));
+
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey(PROCESS_ID);
+    assertNotNull(pi);
+
+    Date currentTime = SIMPLE_DATE_FORMAT.parse("2017-01-01T10:00:00");
+    ClockUtil.setCurrentTime(currentTime);
+
+    String processInstanceId = pi.getProcessInstanceId();
+
+    // try to execute the first service task without success
+    int jobRetries = executeJob(processInstanceId);
+    assertEquals(2, jobRetries);
+    currentTime = DateUtils.addMinutes(currentTime, 5);
+    assertLockExpirationTime(currentTime);
+    ClockUtil.setCurrentTime(currentTime);
+
+    ServiceTaskDelegate.firstAttempt = false;
+
+    // finish the first service task
+    jobRetries = executeJob(processInstanceId);
+    assertEquals(3, jobRetries);
+
+    // try to execute the second service task without success
+    jobRetries = executeJob(processInstanceId);
+    assertEquals(2, jobRetries);
+    currentTime = DateUtils.addMinutes(currentTime, 3);
+    assertLockExpirationTime(currentTime);
+    ClockUtil.setCurrentTime(currentTime);
+
   }
 
   private int executeJob(String processInstanceId) {

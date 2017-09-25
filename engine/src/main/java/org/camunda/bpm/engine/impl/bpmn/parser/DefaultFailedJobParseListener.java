@@ -19,7 +19,6 @@ import org.camunda.bpm.engine.impl.bpmn.behavior.MultiInstanceActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.model.PropertyKey;
-import org.camunda.bpm.engine.impl.core.model.PropertyListKey;
 import org.camunda.bpm.engine.impl.el.Expression;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
@@ -48,7 +47,6 @@ public class DefaultFailedJobParseListener extends AbstractBpmnParseListener {
   public static final Namespace FOX_ENGINE_NS = new Namespace("http://www.camunda.com/fox");
 
   public static final PropertyKey<FailedJobParseRetryConf> FAILED_JOB_CONFIGURATION = new PropertyKey<FailedJobParseRetryConf>("FAILED_JOB_CONFIGURATION");
-  public static final PropertyListKey<String> FAILED_JOB_INTERVALS = new PropertyListKey<String>("FAILED_JOB_INTERVALS");
 
   @Override
   public void parseStartEvent(Element startEventElement, ScopeImpl scope, ActivityImpl startEventActivity) {

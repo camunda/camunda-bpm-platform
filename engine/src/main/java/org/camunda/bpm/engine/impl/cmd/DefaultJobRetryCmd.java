@@ -60,7 +60,7 @@ public class DefaultJobRetryCmd extends JobRetryCmd {
 
     } else {
       try {
-        executeCustomStrategy(commandContext, job, activity, globalFailedJobRetryTimeCycle);
+        executeCustomStrategy(commandContext, job, activity);
 
       } catch (Exception e) {
         LOG.debugFallbackToDefaultRetryStrategy();
@@ -83,7 +83,7 @@ public class DefaultJobRetryCmd extends JobRetryCmd {
     }
   }
 
-  protected void executeCustomStrategy(CommandContext commandContext, JobEntity job, ActivityImpl activity, String globalFailedJobRetryTimeCycle) throws Exception {
+  protected void executeCustomStrategy(CommandContext commandContext, JobEntity job, ActivityImpl activity) throws Exception {
     String failedJobRetryTimeCycle = null;
     List<String> retryIntervals = null;
     if (activity != null) {
