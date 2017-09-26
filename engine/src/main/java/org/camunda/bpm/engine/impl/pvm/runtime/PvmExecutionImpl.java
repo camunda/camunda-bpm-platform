@@ -1574,11 +1574,12 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   /**
    * {@inheritDoc}
    */
-  public void setVariable(String variableName, Object value, String activityId) {
-    if (getActivityId().equals(activityId)) {
+  public void setVariable(String variableName, Object value, String targetActivityId) {
+    String activityId = getActivityId();
+    if (activityId != null && activityId.equals(targetActivityId)) {
       setVariableLocal(variableName, value);
     } else {
-      PvmExecutionImpl executionForFlowScope = findExecutionForFlowScope(activityId);
+      PvmExecutionImpl executionForFlowScope = findExecutionForFlowScope(targetActivityId);
       if (executionForFlowScope != null) {
         executionForFlowScope.setVariableLocal(variableName, value);
       }
