@@ -29,7 +29,7 @@ public interface DeleteProcessDefinitionsSelectBuilder {
    * @param processDefinitionId at least one process definition id
    * @return the builder
    */
-  DeleteProcessDefinitionsBuilder byIds(String... processDefinitionId);
+  DeleteProcessDefinitionsTenantBuilder byIds(String... processDefinitionId);
 
   /**
    * Selects process definitions with a given key.

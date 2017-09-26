@@ -24,6 +24,8 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
  */
 public class DeleteProcessDefinitionCmd extends AbstractDeleteProcessDefinitionCmd {
 
+  protected String processDefinitionId;
+
   public DeleteProcessDefinitionCmd(String processDefinitionId, Boolean cascade, Boolean skipCustomListeners) {
     this.processDefinitionId = processDefinitionId;
     this.cascade = cascade;

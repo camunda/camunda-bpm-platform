@@ -35,7 +35,6 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
  */
 public abstract class AbstractDeleteProcessDefinitionCmd implements Command<Void>, Serializable {
 
-  protected String processDefinitionId;
   protected boolean cascade;
   protected boolean skipCustomListeners;
 

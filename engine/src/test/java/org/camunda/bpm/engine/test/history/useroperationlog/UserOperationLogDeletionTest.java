@@ -12,11 +12,14 @@
  */
 package org.camunda.bpm.engine.test.history.useroperationlog;
 
+import org.camunda.bpm.engine.EntityTypes;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -177,7 +180,7 @@ public class UserOperationLogDeletionTest extends AbstractUserOperationLogTest {
     assertEquals(1, query.count());
   }
 
-  public void testDeleteProcessDefinitionsKeepUserOperationLog() {
+  public void testDeleteProcessDefinitionsByKey() {
     // given
     for (int i = 0; i < 3; i++) {
       deploymentId = repositoryService.createDeployment()
@@ -186,15 +189,24 @@ public class UserOperationLogDeletionTest extends AbstractUserOperationLogTest {
       deploymentIds.add(deploymentId);
     }
 
-    List<ProcessDefinition> processDefinitions = repositoryService
-      .createProcessDefinitionQuery()
-      .list();
+    // when
+    repositoryService.deleteProcessDefinitions()
+      .byKey(PROCESS_KEY)
+      .withoutTenantId()
+      .delete();
 
-    for (ProcessDefinition processDefinition: processDefinitions) {
-      runtimeService.startProcessInstanceById(processDefinition.getId()).getId();
+    // then
+    assertUserOperationLogs();
+  }
+
+  public void testDeleteProcessDefinitionsByKeyCascading() {
+    // given
+    for (int i = 0; i < 3; i++) {
+      deploymentId = repositoryService.createDeployment()
+        .addClasspathResource(PROCESS_PATH)
+        .deploy().getId();
+      deploymentIds.add(deploymentId);
     }
-
-    assertEquals(3, historyService.createUserOperationLogQuery().count());
 
     // when
     repositoryService.deleteProcessDefinitions()
@@ -204,7 +216,46 @@ public class UserOperationLogDeletionTest extends AbstractUserOperationLogTest {
       .delete();
 
     // then
-    assertEquals(6, historyService.createUserOperationLogQuery().count());
+    assertUserOperationLogs();
+  }
+
+  public void testDeleteProcessDefinitionsByIds() {
+    // given
+    for (int i = 0; i < 3; i++) {
+      deploymentId = repositoryService.createDeployment()
+        .addClasspathResource(PROCESS_PATH)
+        .deploy().getId();
+      deploymentIds.add(deploymentId);
+    }
+
+    // when
+    repositoryService.deleteProcessDefinitions()
+      .byIds(findProcessDefinitionIdsByKey(PROCESS_KEY))
+      .withoutTenantId()
+      .delete();
+
+    // then
+    assertUserOperationLogs();
+  }
+
+  public void testDeleteProcessDefinitionsByIdsCascading() {
+    // given
+    for (int i = 0; i < 3; i++) {
+      deploymentId = repositoryService.createDeployment()
+        .addClasspathResource(PROCESS_PATH)
+        .deploy().getId();
+      deploymentIds.add(deploymentId);
+    }
+
+    // when
+    repositoryService.deleteProcessDefinitions()
+      .byIds(findProcessDefinitionIdsByKey(PROCESS_KEY))
+      .withoutTenantId()
+      .cascade()
+      .delete();
+
+    // then
+    assertUserOperationLogs();
   }
 
   @Deployment(resources = PROCESS_PATH)
@@ -232,6 +283,54 @@ public class UserOperationLogDeletionTest extends AbstractUserOperationLogTest {
 
     // then
     assertEquals(1, query.count());
+  }
+
+  public void assertUserOperationLogs() {
+    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
+
+    UserOperationLogQuery userOperationLogQuery = historyService
+      .createUserOperationLogQuery()
+      .operationType(UserOperationLogEntry.OPERATION_TYPE_DELETE);
+
+    List<UserOperationLogEntry> userOperationLogs = userOperationLogQuery.list();
+
+    assertEquals(3, userOperationLogs.size());
+
+    for (ProcessDefinition processDefinition: processDefinitions) {
+      UserOperationLogEntry userOperationLogEntry = userOperationLogQuery
+        .deploymentId(processDefinition.getDeploymentId()).singleResult();
+
+      assertEquals(EntityTypes.PROCESS_DEFINITION, userOperationLogEntry.getEntityType());
+      assertEquals(processDefinition.getId(), userOperationLogEntry.getProcessDefinitionId());
+      assertEquals(processDefinition.getKey(), userOperationLogEntry.getProcessDefinitionKey());
+      assertEquals(processDefinition.getDeploymentId(), userOperationLogEntry.getDeploymentId());
+
+      assertEquals(UserOperationLogEntry.OPERATION_TYPE_DELETE, userOperationLogEntry.getOperationType());
+
+      assertEquals("cascade", userOperationLogEntry.getProperty());
+      assertFalse(Boolean.valueOf(userOperationLogEntry.getOrgValue()));
+      assertTrue(Boolean.valueOf(userOperationLogEntry.getNewValue()));
+
+      assertEquals(USER_ID, userOperationLogEntry.getUserId());
+
+      assertNull(userOperationLogEntry.getJobDefinitionId());
+      assertNull(userOperationLogEntry.getProcessInstanceId());
+      assertNull(userOperationLogEntry.getCaseInstanceId());
+      assertNull(userOperationLogEntry.getCaseDefinitionId());
+    }
+
+    assertEquals(6, historyService.createUserOperationLogQuery().count());
+  }
+
+  private String[] findProcessDefinitionIdsByKey(String processDefinitionKey) {
+    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery()
+      .processDefinitionKey(processDefinitionKey).list();
+    List<String> processDefinitionIds = new ArrayList<String>();
+    for (ProcessDefinition processDefinition: processDefinitions) {
+      processDefinitionIds.add(processDefinition.getId());
+    }
+
+    return processDefinitionIds.toArray(new String[0]);
   }
 
 }
