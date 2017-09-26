@@ -18,6 +18,7 @@
   <modules>
     <module>starter</module>
     <module>starter-rest</module>
+    <module>starter-webapp-core</module>
     <module>starter-webapp</module>
     <module>starter-test</module>
   </modules>
@@ -55,6 +56,18 @@
 
     </dependencies>
   </dependencyManagement>
+
+  <profiles>
+    <profile>
+      <id>distro-ee</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <modules>
+        <module>starter-webapp-ee</module>
+      </modules>
+    </profile>
+  </profiles>
 
   <build>
     <pluginManagement>

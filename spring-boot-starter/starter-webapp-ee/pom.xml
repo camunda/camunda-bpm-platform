@@ -8,7 +8,7 @@
   </parent>
 
   <groupId>org.camunda.bpm.springboot</groupId>
-  <artifactId>camunda-bpm-spring-boot-starter-webapp</artifactId>
+  <artifactId>camunda-bpm-spring-boot-starter-webapp-ee</artifactId>
 
   <dependencies>
     <dependency>
@@ -16,10 +16,9 @@
       <artifactId>camunda-bpm-spring-boot-starter-webapp-core</artifactId>
       <version>${project.version}</version>
     </dependency>
-
     <dependency>
       <groupId>org.camunda.bpm.webapp</groupId>
-      <artifactId>camunda-webapp-webjar</artifactId>
+      <artifactId>camunda-webapp-webjar-ee</artifactId>
     </dependency>
     <dependency>
       <groupId>com.h2database</groupId>

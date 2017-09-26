@@ -33,7 +33,7 @@ public class ApplicationProperty {
 
   /**
    * Indicates whether old versions of the deployment should be resumed. If
-   * this property is not set, the default value is used: true.
+   * this property is not set, the default value is used: false.
    */
   private boolean isResumePreviousVersions = false;
 
