@@ -197,9 +197,40 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
     runtimeService.deleteProcessInstance(id, "test_purposes", false, true, false, true);
 
     // then
-    List<HistoricProcessInstance> historicSubprocessList = historyService.createHistoricProcessInstanceQuery().list();
+    List<HistoricProcessInstance> historicSubprocessList = historyService.createHistoricProcessInstanceQuery().processDefinitionKey("called").list();
     for (HistoricProcessInstance historicProcessInstance : historicSubprocessList) {
       assertNull(historicProcessInstance.getSuperProcessInstanceId());
+    }
+  }
+
+  public void testDeleteProcessInstanceWithSubprocessInstances() {
+    // given a process instance with subprocesses
+    BpmnModelInstance calling =
+        Bpmn.createExecutableProcess("calling")
+          .startEvent()
+          .callActivity()
+            .calledElement("called")
+          .endEvent("endA")
+          .done();
+
+    BpmnModelInstance called = Bpmn.createExecutableProcess("called")
+        .startEvent()
+        .userTask("Task1")
+        .endEvent()
+        .done();
+
+    deployment(calling, called);
+
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("calling");
+
+    // when the process instance is deleted and we do not skip sub processes
+    String id = instance.getId();
+    runtimeService.deleteProcessInstance(id, "test_purposes", false, true, false, false);
+
+    // then
+    List<HistoricProcessInstance> historicSubprocessList = historyService.createHistoricProcessInstanceQuery().processDefinitionKey("called").list();
+    for (HistoricProcessInstance historicProcessInstance : historicSubprocessList) {
+      assertNotNull(historicProcessInstance.getSuperProcessInstanceId());
     }
   }
 

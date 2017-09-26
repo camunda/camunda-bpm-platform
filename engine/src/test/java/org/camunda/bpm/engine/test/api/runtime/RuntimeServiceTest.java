@@ -52,7 +52,6 @@ import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricDetail;
-import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -2466,16 +2465,10 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
     runtimeService.deleteProcessInstance(id, "test_purposes", false, true, false, false);
 
     // then
-    ProcessInstance superInstance = runtimeService.createProcessInstanceQuery().processInstanceId(id).singleResult();
-    assertNull(superInstance);
     assertProcessEnded(id);
 
-    ProcessInstance piA = runtimeService.createProcessInstanceQuery().processDefinitionKey("A").singleResult();
-    assertNull(piA);
-    ProcessInstance piB = runtimeService.createProcessInstanceQuery().processDefinitionKey("B").singleResult();
-    assertNull(piB);
-    for (ProcessInstance processInstance : subInstances) {
-      assertProcessEnded(processInstance.getId());
+    for (ProcessInstance subInstance : subInstances) {
+      assertProcessEnded(subInstance.getId());
     }
   }
 
@@ -2490,26 +2483,18 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
 
     deployment(calling, calledA, calledB, calledC);
 
-    ProcessInstance instance = runtimeService.startProcessInstanceByKey("calling");
-    List<ProcessInstance> subInstances = runtimeService.createProcessInstanceQuery().superProcessInstanceId(instance.getId()).list();
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("calling");
+    List<ProcessInstance> subInstances = runtimeService.createProcessInstanceQuery().superProcessInstanceId(processInstance.getId()).list();
 
     // when the process instance is deleted and we do skip sub processes
-    String id = instance.getId();
+    String id = processInstance.getId();
     runtimeService.deleteProcessInstance(id, "test_purposes", false, true, false, true);
 
     // then
-    ProcessInstance superInstance = runtimeService.createProcessInstanceQuery().processInstanceId(id).singleResult();
-    assertNull(superInstance);
     assertProcessEnded(id);
 
-    for (ProcessInstance processInstance : subInstances) {
-      assertNotNull(processInstance);
-      assertProcessNotEnded(processInstance.getId());
-    }
-
-    List<HistoricProcessInstance> historicSubprocessList = historyService.createHistoricProcessInstanceQuery().list();
-    for (HistoricProcessInstance historicProcessInstance : historicSubprocessList) {
-      assertNull(historicProcessInstance.getSuperProcessInstanceId());
+    for (ProcessInstance subInstance : subInstances) {
+      assertProcessNotEnded(subInstance.getId());
     }
   }
 
@@ -2530,8 +2515,36 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
     runtimeService.deleteProcessInstances(Arrays.asList(processInstance.getId(), processInstance2.getId()), null, false, false, true);
 
     // then
+    assertProcessEnded(processInstance.getId());
+    assertProcessEnded(processInstance2.getId());
+
     for (ProcessInstance instance : subprocessList) {
       assertProcessNotEnded(instance.getId());
+    }
+  }
+
+  public void testDeleteProcessInstancesWithSubprocessInstances() {
+    // given a process instance with subprocess
+    String callingProcessKey = "calling";
+    String calledProcessKey = "called";
+    BpmnModelInstance calling = prepareCallingProcess(callingProcessKey, calledProcessKey);
+    BpmnModelInstance called = prepareSimpleProcess(calledProcessKey);
+    deployment(calling, called);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(callingProcessKey);
+    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey(callingProcessKey);
+
+    List<ProcessInstance> subprocessList = runtimeService.createProcessInstanceQuery().superProcessInstanceId(processInstance.getId()).list();
+    subprocessList.addAll(runtimeService.createProcessInstanceQuery().superProcessInstanceId(processInstance2.getId()).list());
+
+    // when
+    runtimeService.deleteProcessInstances(Arrays.asList(processInstance.getId(), processInstance2.getId()), null, false, false, false);
+
+    // then
+    assertProcessEnded(processInstance.getId());
+    assertProcessEnded(processInstance2.getId());
+
+    for (ProcessInstance subprocess : subprocessList) {
+      assertProcessEnded(subprocess.getId());
     }
   }
 

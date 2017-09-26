@@ -826,12 +826,12 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
       .when().delete(SINGLE_PROCESS_INSTANCE_URL);
 
-    verify(runtimeServiceMock).deleteProcessInstance(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, null, false, true, false);
+    verify(runtimeServiceMock).deleteProcessInstance(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, null, false, true, false, false);
   }
 
   @Test
   public void testDeleteNonExistingProcessInstance() {
-    doThrow(new ProcessEngineException("expected exception")).when(runtimeServiceMock).deleteProcessInstance(anyString(), anyString(),anyBoolean(),anyBoolean(),anyBoolean());
+    doThrow(new ProcessEngineException("expected exception")).when(runtimeServiceMock).deleteProcessInstance(anyString(), anyString(), anyBoolean(), anyBoolean(), anyBoolean() ,anyBoolean());
 
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)
       .then().expect().statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
@@ -843,7 +843,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
   @Test
   public void testDeleteProcessInstanceThrowsAuthorizationException() {
     String message = "expected exception";
-    doThrow(new AuthorizationException(message)).when(runtimeServiceMock).deleteProcessInstance(anyString(), anyString(),anyBoolean(),anyBoolean(),anyBoolean());
+    doThrow(new AuthorizationException(message)).when(runtimeServiceMock).deleteProcessInstance(anyString(), anyString(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean());
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)
@@ -862,7 +862,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
       .when().delete(SINGLE_PROCESS_INSTANCE_URL);
 
-    verify(runtimeServiceMock).deleteProcessInstance(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, null, false, true, false);
+    verify(runtimeServiceMock).deleteProcessInstance(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, null, false, true, false, false);
   }
 
   @Test
@@ -870,7 +870,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).queryParams("skipCustomListeners", true).then().expect()
         .statusCode(Status.NO_CONTENT.getStatusCode()).when().delete(SINGLE_PROCESS_INSTANCE_URL);
 
-    verify(runtimeServiceMock).deleteProcessInstance(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, null, true, true, false);
+    verify(runtimeServiceMock).deleteProcessInstance(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, null, true, true, false, false);
   }
 
   @Test
@@ -878,7 +878,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).queryParams("skipCustomListeners", false).then().expect()
         .statusCode(Status.NO_CONTENT.getStatusCode()).when().delete(SINGLE_PROCESS_INSTANCE_URL);
 
-    verify(runtimeServiceMock).deleteProcessInstance(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, null, false, true, false);
+    verify(runtimeServiceMock).deleteProcessInstance(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, null, false, true, false, false);
   }
 
   @Test
@@ -886,7 +886,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).queryParams("skipIoMappings", true).then().expect()
         .statusCode(Status.NO_CONTENT.getStatusCode()).when().delete(SINGLE_PROCESS_INSTANCE_URL);
 
-    verify(runtimeServiceMock).deleteProcessInstance(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, null, false, true, true);
+    verify(runtimeServiceMock).deleteProcessInstance(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, null, false, true, true, false);
   }
 
   @Test
@@ -894,7 +894,23 @@ public class ProcessInstanceRestServiceInteractionTest extends
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).queryParams("skipIoMappings", false).then().expect()
         .statusCode(Status.NO_CONTENT.getStatusCode()).when().delete(SINGLE_PROCESS_INSTANCE_URL);
 
-    verify(runtimeServiceMock).deleteProcessInstance(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, null, false, true, false);
+    verify(runtimeServiceMock).deleteProcessInstance(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, null, false, true, false, false);
+  }
+
+  @Test
+  public void testDeleteProcessInstanceSkipSubprocesses() {
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).queryParams("skipSubprocesses", true).then().expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode()).when().delete(SINGLE_PROCESS_INSTANCE_URL);
+
+    verify(runtimeServiceMock).deleteProcessInstance(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, null, false, true, false, true);
+  }
+
+  @Test
+  public void testDeleteProcessInstanceWithoutSkipSubprocesses() {
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).queryParams("skipSubprocesses", false).then().expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode()).when().delete(SINGLE_PROCESS_INSTANCE_URL);
+
+    verify(runtimeServiceMock).deleteProcessInstance(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, null, false, true, false, false);
   }
 
   @Test

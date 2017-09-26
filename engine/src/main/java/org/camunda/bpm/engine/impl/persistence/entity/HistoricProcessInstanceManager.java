@@ -150,12 +150,4 @@ public class HistoricProcessInstanceManager extends AbstractHistoricManager {
     return (Long) getDbEntityManager().selectOne("selectFinishedProcessInstancesReportEntitiesCount", query);
   }
 
-  public void updateHistoricSubprocessInstance(String processInstanceId) {
-    if (isHistoryEnabled()) {
-      ListQueryParameterObject parameterObject = new ListQueryParameterObject();
-      parameterObject.setParameter(processInstanceId);
-      getDbEntityManager().update(HistoricProcessInstanceEntity.class, "updateHistoricSubprocessInstance", parameterObject);
-    }
-  }
-
 }

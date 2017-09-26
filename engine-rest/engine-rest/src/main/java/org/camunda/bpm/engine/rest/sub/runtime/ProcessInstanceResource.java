@@ -37,7 +37,8 @@ public interface ProcessInstanceResource {
 
   @DELETE
   void deleteProcessInstance(@QueryParam("skipCustomListeners") @DefaultValue("false") boolean skipCustomListeners,
-      @QueryParam("skipIoMappings") @DefaultValue("false") boolean skipIoMappings);
+      @QueryParam("skipIoMappings") @DefaultValue("false") boolean skipIoMappings,
+      @QueryParam("skipSubprocesses") @DefaultValue("false") boolean skipSubprocesses);
 
   @Path("/variables")
   VariableResource getVariablesResource();

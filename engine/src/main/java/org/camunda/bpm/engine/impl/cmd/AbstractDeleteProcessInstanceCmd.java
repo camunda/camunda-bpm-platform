@@ -118,9 +118,8 @@ public abstract class AbstractDeleteProcessInstanceCmd {
             return producer.createProcessInstanceUpdateEvt((DelegateExecution) processInstance);
           }
         });
-    }
+      }
     }
   }
-
 
 }
