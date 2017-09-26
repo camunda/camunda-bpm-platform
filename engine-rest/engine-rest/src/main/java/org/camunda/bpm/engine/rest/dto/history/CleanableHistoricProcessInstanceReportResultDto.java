@@ -27,8 +27,8 @@ public class CleanableHistoricProcessInstanceReportResultDto {
   protected String processDefinitionName;
   protected int processDefinitionVersion;
   protected Integer historyTimeToLive;
-  protected long finishedProcessInstancesCount;
-  protected long cleanableProcessInstancesCount;
+  protected long finishedProcessInstanceCount;
+  protected long cleanableProcessInstanceCount;
 
   public CleanableHistoricProcessInstanceReportResultDto() {
   }
@@ -53,12 +53,12 @@ public class CleanableHistoricProcessInstanceReportResultDto {
     this.historyTimeToLive = historyTimeToLive;
   }
 
-  public void setFinishedProcessInstancesCount(Long finishedProcessInstancesCount) {
-    this.finishedProcessInstancesCount = finishedProcessInstancesCount;
+  public void setFinishedProcessInstanceCount(Long finishedProcessInstanceCount) {
+    this.finishedProcessInstanceCount = finishedProcessInstanceCount;
   }
 
-  public void setCleanableProcessInstancesCount(Long cleanableProcessInstancesCount) {
-    this.cleanableProcessInstancesCount = cleanableProcessInstancesCount;
+  public void setCleanableProcessInstanceCount(Long cleanableProcessInstanceCount) {
+    this.cleanableProcessInstanceCount = cleanableProcessInstanceCount;
   }
 
   public String getProcessDefinitionId() {
@@ -81,12 +81,12 @@ public class CleanableHistoricProcessInstanceReportResultDto {
     return historyTimeToLive;
   }
 
-  public Long getFinishedProcessInstancesCount() {
-    return finishedProcessInstancesCount;
+  public Long getFinishedProcessInstanceCount() {
+    return finishedProcessInstanceCount;
   }
 
   public Long getCleanableProcessInstancesCount() {
-    return cleanableProcessInstancesCount;
+    return cleanableProcessInstanceCount;
   }
 
   protected CleanableHistoricProcessInstanceReport createNewReportQuery(ProcessEngine engine) {
@@ -102,8 +102,8 @@ public class CleanableHistoricProcessInstanceReportResultDto {
       dto.setProcessDefinitionName(current.getProcessDefinitionName());
       dto.setProcessDefinitionVersion(current.getProcessDefinitionVersion());
       dto.setHistoryTimeToLive(current.getHistoryTimeToLive());
-      dto.setFinishedProcessInstancesCount(current.getFinishedProcessInstanceCount());
-      dto.setCleanableProcessInstancesCount(current.getCleanableProcessInstanceCount());
+      dto.setFinishedProcessInstanceCount(current.getFinishedProcessInstanceCount());
+      dto.setCleanableProcessInstanceCount(current.getCleanableProcessInstanceCount());
       dtos.add(dto);
     }
     return dtos;
