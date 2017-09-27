@@ -41,14 +41,8 @@ module.exports = ['camAPI', '$window' , 'Notifications', function(camAPI, $windo
       };
 
       function updateValue(timeToLive) {
-        var id = (
-          $scope.definition.id ||
-          $scope.definition.processDefinitionId ||
-          $scope.definition.caseDefinitionId ||
-          $scope.definition.decisionDefinitionId
-        );
         return resource.updateHistoryTimeToLive(
-          id,
+          $scope.definition.id,
           {
             historyTimeToLive: timeToLive
           }
