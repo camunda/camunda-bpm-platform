@@ -62,5 +62,5 @@ public class Metrics {
   public final static String HISTORY_CLEANUP_REMOVED_PROCESS_INSTANCES = "history-cleanup-removed-process-instances";
   public final static String HISTORY_CLEANUP_REMOVED_CASE_INSTANCES = "history-cleanup-removed-case-instances";
   public final static String HISTORY_CLEANUP_REMOVED_DECISION_INSTANCES = "history-cleanup-removed-decision-instances";
-  public final static String HISTORY_CLEANUP_REMOVED_BATCH_INSTANCES = "history-cleanup-removed-batch-instances";
+  public final static String HISTORY_CLEANUP_REMOVED_BATCH_OPERATIONS = "history-cleanup-removed-batch-operations";
 }

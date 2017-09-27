@@ -215,7 +215,7 @@ public class HistoryCleanupHistoricBatchTest {
     managementService.executeJob(jobId);
 
     // then
-    final long removedBatches = managementService.createMetricsQuery().name(Metrics.HISTORY_CLEANUP_REMOVED_BATCH_INSTANCES).sum();
+    final long removedBatches = managementService.createMetricsQuery().name(Metrics.HISTORY_CLEANUP_REMOVED_BATCH_OPERATIONS).sum();
 
     assertEquals(batchesCount, removedBatches);
   }
