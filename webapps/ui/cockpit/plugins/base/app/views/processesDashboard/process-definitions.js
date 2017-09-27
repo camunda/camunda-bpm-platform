@@ -69,9 +69,18 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
         });
 
         $scope.processesActions = Views.getProviders({ component: 'cockpit.processes.action'});
-        $scope.definitionVars = { read: [ 'pd', 'processDefinitionData',  'processDefinitionsCount'] };
+        $scope.definitionVars = { read: [ 'pd', 'processDefinitionsCount'] };
 
-        $rootScope.$on('processes.action.delete', function() {
+        $rootScope.$on('processes.action.delete', function(event, procDefId) {
+          var procDefIndex;
+          for (var i = 0; i<$scope.processDefinitionData.length; i++) {
+            if ($scope.processDefinitionData[i].id === procDefId) {
+              procDefIndex = i;
+            }
+          }
+
+          $scope.processDefinitionData.splice(procDefIndex, 1);
+
           $scope.processDefinitionsCount = $scope.processDefinitionData.length;
         });
 
