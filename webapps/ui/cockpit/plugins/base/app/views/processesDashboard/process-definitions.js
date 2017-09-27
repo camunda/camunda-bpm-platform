@@ -69,9 +69,9 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
         });
 
         $scope.processesActions = Views.getProviders({ component: 'cockpit.processes.action'});
-        $scope.definitionVars = { read: [ 'pd', 'processDefinitionsCount'] };
+        $scope.definitionVars = { read: [ 'pd' ] };
 
-        $rootScope.$on('processes.action.delete', function(event, procDefId) {
+        var removeActionDeleteListener = $rootScope.$on('processes.action.delete', function(event, procDefId) {
           var procDefIndex;
           for (var i = 0; i<$scope.processDefinitionData.length; i++) {
             if ($scope.processDefinitionData[i].id === procDefId) {
@@ -82,6 +82,10 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
           $scope.processDefinitionData.splice(procDefIndex, 1);
 
           $scope.processDefinitionsCount = $scope.processDefinitionData.length;
+        });
+
+        $rootScope.$on('$destroy', function() {
+          removeActionDeleteListener();
         });
 
         $scope.activeTab = 'list';
