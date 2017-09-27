@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.rest.history;
 
 import static com.jayway.restassured.RestAssured.expect;
 import static com.jayway.restassured.RestAssured.given;
+import static com.jayway.restassured.path.json.JsonPath.from;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -31,6 +32,7 @@ import org.camunda.bpm.engine.history.CleanableHistoricProcessInstanceReport;
 import org.camunda.bpm.engine.history.CleanableHistoricProcessInstanceReportResult;
 import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -38,8 +40,16 @@ import org.mockito.InOrder;
 import org.mockito.Mockito;
 
 import com.jayway.restassured.http.ContentType;
+import com.jayway.restassured.response.Response;
 
 public class CleanableHistoricProcessInstanceReportServiceTest extends AbstractRestServiceTest {
+
+  private static final String EXAMPLE_PD_NAME = "aName";
+  private static final String EXAMPLE_PD_KEY = "aKey";
+  private static final int EXAMPLE_PD_VERSION = 42;
+  private static final int EXAMPLE_TTL = 5;
+  private static final long EXAMPLE_FINISHED_PI_COUNT = 10l;
+  private static final long EXAMPLE_CLEANABLE_PI_COUNT = 5l;
 
   @ClassRule
   public static TestContainerRule rule = new TestContainerRule();
@@ -64,12 +74,12 @@ public class CleanableHistoricProcessInstanceReportServiceTest extends AbstractR
     CleanableHistoricProcessInstanceReportResult reportResult = mock(CleanableHistoricProcessInstanceReportResult.class);
 
     when(reportResult.getProcessDefinitionId()).thenReturn(EXAMPLE_PROCESS_DEFINITION_ID);
-    when(reportResult.getProcessDefinitionKey()).thenReturn("aKey");
-    when(reportResult.getProcessDefinitionName()).thenReturn("aName");
-    when(reportResult.getProcessDefinitionVersion()).thenReturn(42);
-    when(reportResult.getHistoryTimeToLive()).thenReturn(5);
-    when(reportResult.getFinishedProcessInstanceCount()).thenReturn(10l);
-    when(reportResult.getCleanableProcessInstanceCount()).thenReturn(5l);
+    when(reportResult.getProcessDefinitionKey()).thenReturn(EXAMPLE_PD_KEY);
+    when(reportResult.getProcessDefinitionName()).thenReturn(EXAMPLE_PD_NAME);
+    when(reportResult.getProcessDefinitionVersion()).thenReturn(EXAMPLE_PD_VERSION);
+    when(reportResult.getHistoryTimeToLive()).thenReturn(EXAMPLE_TTL);
+    when(reportResult.getFinishedProcessInstanceCount()).thenReturn(EXAMPLE_FINISHED_PI_COUNT);
+    when(reportResult.getCleanableProcessInstanceCount()).thenReturn(EXAMPLE_CLEANABLE_PI_COUNT);
 
     CleanableHistoricProcessInstanceReportResult anotherReportResult = mock(CleanableHistoricProcessInstanceReportResult.class);
 
@@ -102,6 +112,40 @@ public class CleanableHistoricProcessInstanceReportServiceTest extends AbstractR
 
     InOrder inOrder = Mockito.inOrder(historicProcessInstanceReport);
     inOrder.verify(historicProcessInstanceReport).list();
+  }
+
+  @Test
+  public void testReportRetrieval() {
+    Response response = given()
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .contentType(ContentType.JSON)
+    .when().get(HISTORIC_REPORT_URL);
+
+    // assert query invocation
+    InOrder inOrder = Mockito.inOrder(historicProcessInstanceReport);
+    inOrder.verify(historicProcessInstanceReport).list();
+
+    String content = response.asString();
+    List<String> reportResults = from(content).getList("");
+    Assert.assertEquals("There should be two report results returned.", 2, reportResults.size());
+    Assert.assertNotNull(reportResults.get(0));
+
+    String returnedDefinitionId = from(content).getString("[0].processDefinitionId");
+    String returnedDefinitionKey = from(content).getString("[0].processDefinitionKey");
+    String returnedDefinitionName = from(content).getString("[0].processDefinitionName");
+    int returnedDefinitionVersion = from(content).getInt("[0].processDefinitionVersion");
+    int returnedTTL = from(content).getInt("[0].historyTimeToLive");
+    long returnedFinishedCount= from(content).getLong("[0].finishedProcessInstanceCount");
+    long returnedCleanableCount = from(content).getLong("[0].cleanableProcessInstanceCount");
+
+    Assert.assertEquals(EXAMPLE_PROCESS_DEFINITION_ID, returnedDefinitionId);
+    Assert.assertEquals(EXAMPLE_PD_KEY, returnedDefinitionKey);
+    Assert.assertEquals(EXAMPLE_PD_NAME, returnedDefinitionName);
+    Assert.assertEquals(EXAMPLE_PD_VERSION, returnedDefinitionVersion);
+    Assert.assertEquals(EXAMPLE_TTL, returnedTTL);
+    Assert.assertEquals(EXAMPLE_FINISHED_PI_COUNT, returnedFinishedCount);
+    Assert.assertEquals(EXAMPLE_CLEANABLE_PI_COUNT, returnedCleanableCount);
   }
 
   @Test

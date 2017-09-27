@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.rest.history;
 
 import static com.jayway.restassured.RestAssured.expect;
 import static com.jayway.restassured.RestAssured.given;
+import static com.jayway.restassured.path.json.JsonPath.from;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -31,6 +32,7 @@ import org.camunda.bpm.engine.history.CleanableHistoricCaseInstanceReport;
 import org.camunda.bpm.engine.history.CleanableHistoricCaseInstanceReportResult;
 import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -38,8 +40,17 @@ import org.mockito.InOrder;
 import org.mockito.Mockito;
 
 import com.jayway.restassured.http.ContentType;
+import com.jayway.restassured.response.Response;
 
 public class CleanableHistoricCaseInstanceReportServiceTest extends AbstractRestServiceTest {
+
+  private static final String EXAMPLE_CD_ID = "anId";
+  private static final String EXAMPLE_CD_KEY = "aKey";
+  private static final String EXAMPLE_CD_NAME = "aName";
+  private static final int EXAMPLE_CD_VERSION = 42;
+  private static final int EXAMPLE_TTL = 5;
+  private static final long EXAMPLE_FINISHED_CI_COUNT = 10l;
+  private static final long EXAMPLE_CLEANABLE_CI_COUNT = 5l;
 
   @ClassRule
   public static TestContainerRule rule = new TestContainerRule();
@@ -63,13 +74,13 @@ public class CleanableHistoricCaseInstanceReportServiceTest extends AbstractRest
 
     CleanableHistoricCaseInstanceReportResult reportResult = mock(CleanableHistoricCaseInstanceReportResult.class);
 
-    when(reportResult.getCaseDefinitionId()).thenReturn("anId");
-    when(reportResult.getCaseDefinitionKey()).thenReturn("aKey");
-    when(reportResult.getCaseDefinitionName()).thenReturn("aName");
-    when(reportResult.getCaseDefinitionVersion()).thenReturn(42);
-    when(reportResult.getHistoryTimeToLive()).thenReturn(5);
-    when(reportResult.getFinishedCaseInstanceCount()).thenReturn(10l);
-    when(reportResult.getCleanableCaseInstanceCount()).thenReturn(5l);
+    when(reportResult.getCaseDefinitionId()).thenReturn(EXAMPLE_CD_ID);
+    when(reportResult.getCaseDefinitionKey()).thenReturn(EXAMPLE_CD_KEY);
+    when(reportResult.getCaseDefinitionName()).thenReturn(EXAMPLE_CD_NAME);
+    when(reportResult.getCaseDefinitionVersion()).thenReturn(EXAMPLE_CD_VERSION);
+    when(reportResult.getHistoryTimeToLive()).thenReturn(EXAMPLE_TTL);
+    when(reportResult.getFinishedCaseInstanceCount()).thenReturn(EXAMPLE_FINISHED_CI_COUNT);
+    when(reportResult.getCleanableCaseInstanceCount()).thenReturn(EXAMPLE_CLEANABLE_CI_COUNT);
 
     CleanableHistoricCaseInstanceReportResult anotherReportResult = mock(CleanableHistoricCaseInstanceReportResult.class);
 
@@ -102,6 +113,40 @@ public class CleanableHistoricCaseInstanceReportServiceTest extends AbstractRest
 
     InOrder inOrder = Mockito.inOrder(historicCaseInstanceReport);
     inOrder.verify(historicCaseInstanceReport).list();
+  }
+
+  @Test
+  public void testReportRetrieval() {
+    Response response = given()
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .contentType(ContentType.JSON)
+    .when().get(HISTORIC_REPORT_URL);
+
+    // assert query invocation
+    InOrder inOrder = Mockito.inOrder(historicCaseInstanceReport);
+    inOrder.verify(historicCaseInstanceReport).list();
+
+    String content = response.asString();
+    List<String> reportResults = from(content).getList("");
+    Assert.assertEquals("There should be two report results returned.", 2, reportResults.size());
+    Assert.assertNotNull(reportResults.get(0));
+
+    String returnedDefinitionId = from(content).getString("[0].caseDefinitionId");
+    String returnedDefinitionKey = from(content).getString("[0].caseDefinitionKey");
+    String returnedDefinitionName = from(content).getString("[0].caseDefinitionName");
+    int returnedDefinitionVersion = from(content).getInt("[0].caseDefinitionVersion");
+    int returnedTTL = from(content).getInt("[0].historyTimeToLive");
+    long returnedFinishedCount= from(content).getLong("[0].finishedCaseInstanceCount");
+    long returnedCleanableCount = from(content).getLong("[0].cleanableCaseInstanceCount");
+
+    Assert.assertEquals(EXAMPLE_CD_ID, returnedDefinitionId);
+    Assert.assertEquals(EXAMPLE_CD_KEY, returnedDefinitionKey);
+    Assert.assertEquals(EXAMPLE_CD_NAME, returnedDefinitionName);
+    Assert.assertEquals(EXAMPLE_CD_VERSION, returnedDefinitionVersion);
+    Assert.assertEquals(EXAMPLE_TTL, returnedTTL);
+    Assert.assertEquals(EXAMPLE_FINISHED_CI_COUNT, returnedFinishedCount);
+    Assert.assertEquals(EXAMPLE_CLEANABLE_CI_COUNT, returnedCleanableCount);
   }
 
   @Test

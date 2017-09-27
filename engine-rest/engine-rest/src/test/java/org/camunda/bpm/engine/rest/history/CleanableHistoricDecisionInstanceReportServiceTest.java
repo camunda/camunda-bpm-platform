@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.rest.history;
 
 import static com.jayway.restassured.RestAssured.expect;
 import static com.jayway.restassured.RestAssured.given;
+import static com.jayway.restassured.path.json.JsonPath.from;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -31,6 +32,7 @@ import org.camunda.bpm.engine.history.CleanableHistoricDecisionInstanceReport;
 import org.camunda.bpm.engine.history.CleanableHistoricDecisionInstanceReportResult;
 import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -38,8 +40,17 @@ import org.mockito.InOrder;
 import org.mockito.Mockito;
 
 import com.jayway.restassured.http.ContentType;
+import com.jayway.restassured.response.Response;
 
 public class CleanableHistoricDecisionInstanceReportServiceTest extends AbstractRestServiceTest {
+
+  private static final String EXAMPLE_DD_ID = "anId";
+  private static final String EXAMPLE_DD_KEY = "aKey";
+  private static final String EXAMPLE_DD_NAME = "aName";
+  private static final int EXAMPLE_DD_VERSION = 42;
+  private static final int EXAMPLE_TTL = 5;
+  private static final long EXAMPLE_FINISHED_DI_COUNT = 1000l;
+  private static final long EXAMPLE_CLEANABLE_DI_COUNT = 567l;
 
   @ClassRule
   public static TestContainerRule rule = new TestContainerRule();
@@ -63,13 +74,13 @@ public class CleanableHistoricDecisionInstanceReportServiceTest extends Abstract
 
     CleanableHistoricDecisionInstanceReportResult reportResult = mock(CleanableHistoricDecisionInstanceReportResult.class);
 
-    when(reportResult.getDecisionDefinitionId()).thenReturn("anId");
-    when(reportResult.getDecisionDefinitionKey()).thenReturn("aKey");
-    when(reportResult.getDecisionDefinitionName()).thenReturn("aName");
-    when(reportResult.getDecisionDefinitionVersion()).thenReturn(42);
-    when(reportResult.getHistoryTimeToLive()).thenReturn(5);
-    when(reportResult.getFinishedDecisionInstanceCount()).thenReturn(1000l);
-    when(reportResult.getCleanableDecisionInstanceCount()).thenReturn(567l);
+    when(reportResult.getDecisionDefinitionId()).thenReturn(EXAMPLE_DD_ID);
+    when(reportResult.getDecisionDefinitionKey()).thenReturn(EXAMPLE_DD_KEY);
+    when(reportResult.getDecisionDefinitionName()).thenReturn(EXAMPLE_DD_NAME);
+    when(reportResult.getDecisionDefinitionVersion()).thenReturn(EXAMPLE_DD_VERSION);
+    when(reportResult.getHistoryTimeToLive()).thenReturn(EXAMPLE_TTL);
+    when(reportResult.getFinishedDecisionInstanceCount()).thenReturn(EXAMPLE_FINISHED_DI_COUNT);
+    when(reportResult.getCleanableDecisionInstanceCount()).thenReturn(EXAMPLE_CLEANABLE_DI_COUNT);
 
     CleanableHistoricDecisionInstanceReportResult anotherReportResult = mock(CleanableHistoricDecisionInstanceReportResult.class);
 
@@ -79,7 +90,7 @@ public class CleanableHistoricDecisionInstanceReportServiceTest extends Abstract
     when(anotherReportResult.getDecisionDefinitionVersion()).thenReturn(33);
     when(anotherReportResult.getHistoryTimeToLive()).thenReturn(5);
     when(anotherReportResult.getFinishedDecisionInstanceCount()).thenReturn(10l);
-    when(reportResult.getCleanableDecisionInstanceCount()).thenReturn(0l);
+    when(anotherReportResult.getCleanableDecisionInstanceCount()).thenReturn(0l);
 
     List<CleanableHistoricDecisionInstanceReportResult> mocks = new ArrayList<CleanableHistoricDecisionInstanceReportResult>();
     mocks.add(reportResult);
@@ -102,6 +113,40 @@ public class CleanableHistoricDecisionInstanceReportServiceTest extends Abstract
 
     InOrder inOrder = Mockito.inOrder(historicDecisionInstanceReport);
     inOrder.verify(historicDecisionInstanceReport).list();
+  }
+
+  @Test
+  public void testReportRetrieval() {
+    Response response = given()
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .contentType(ContentType.JSON)
+    .when().get(HISTORIC_REPORT_URL);
+
+    // assert query invocation
+    InOrder inOrder = Mockito.inOrder(historicDecisionInstanceReport);
+    inOrder.verify(historicDecisionInstanceReport).list();
+
+    String content = response.asString();
+    List<String> reportResults = from(content).getList("");
+    Assert.assertEquals("There should be two report results returned.", 2, reportResults.size());
+    Assert.assertNotNull(reportResults.get(0));
+
+    String returnedDefinitionId = from(content).getString("[0].decisionDefinitionId");
+    String returnedDefinitionKey = from(content).getString("[0].decisionDefinitionKey");
+    String returnedDefinitionName = from(content).getString("[0].decisionDefinitionName");
+    int returnedDefinitionVersion = from(content).getInt("[0].decisionDefinitionVersion");
+    int returnedTTL = from(content).getInt("[0].historyTimeToLive");
+    long returnedFinishedCount= from(content).getLong("[0].finishedDecisionInstanceCount");
+    long returnedCleanableCount = from(content).getLong("[0].cleanableDecisionInstanceCount");
+
+    Assert.assertEquals(EXAMPLE_DD_ID, returnedDefinitionId);
+    Assert.assertEquals(EXAMPLE_DD_KEY, returnedDefinitionKey);
+    Assert.assertEquals(EXAMPLE_DD_NAME, returnedDefinitionName);
+    Assert.assertEquals(EXAMPLE_DD_VERSION, returnedDefinitionVersion);
+    Assert.assertEquals(EXAMPLE_TTL, returnedTTL);
+    Assert.assertEquals(EXAMPLE_FINISHED_DI_COUNT, returnedFinishedCount);
+    Assert.assertEquals(EXAMPLE_CLEANABLE_DI_COUNT, returnedCleanableCount);
   }
 
   @Test

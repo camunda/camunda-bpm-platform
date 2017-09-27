@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.rest.history;
 
 import static com.jayway.restassured.RestAssured.expect;
 import static com.jayway.restassured.RestAssured.given;
+import static com.jayway.restassured.path.json.JsonPath.from;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -30,6 +31,7 @@ import org.camunda.bpm.engine.history.CleanableHistoricBatchReport;
 import org.camunda.bpm.engine.history.CleanableHistoricBatchReportResult;
 import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -37,8 +39,14 @@ import org.mockito.InOrder;
 import org.mockito.Mockito;
 
 import com.jayway.restassured.http.ContentType;
+import com.jayway.restassured.response.Response;
 
 public class CleanableHistoricBatchReportServiceTest extends AbstractRestServiceTest {
+
+  private static final String EXAMPLE_TYPE = "batchId1";
+  private static final int EXAMPLE_TTL = 5;
+  private static final long EXAMPLE_FINISHED_COUNT = 10l;
+  private static final long EXAMPLE_CLEANABLE_COUNT = 5l;
 
   @ClassRule
   public static TestContainerRule rule = new TestContainerRule();
@@ -59,10 +67,10 @@ public class CleanableHistoricBatchReportServiceTest extends AbstractRestService
 
     CleanableHistoricBatchReportResult reportResult = mock(CleanableHistoricBatchReportResult.class);
 
-    when(reportResult.getBatchType()).thenReturn("batchId1");
-    when(reportResult.getHistoryTimeToLive()).thenReturn(5);
-    when(reportResult.getFinishedBatchesCount()).thenReturn(10l);
-    when(reportResult.getCleanableBatchesCount()).thenReturn(5l);
+    when(reportResult.getBatchType()).thenReturn(EXAMPLE_TYPE);
+    when(reportResult.getHistoryTimeToLive()).thenReturn(EXAMPLE_TTL);
+    when(reportResult.getFinishedBatchesCount()).thenReturn(EXAMPLE_FINISHED_COUNT);
+    when(reportResult.getCleanableBatchesCount()).thenReturn(EXAMPLE_CLEANABLE_COUNT);
 
     CleanableHistoricBatchReportResult anotherReportResult = mock(CleanableHistoricBatchReportResult.class);
 
@@ -92,6 +100,34 @@ public class CleanableHistoricBatchReportServiceTest extends AbstractRestService
 
     InOrder inOrder = Mockito.inOrder(historicBatchReport);
     inOrder.verify(historicBatchReport).list();
+  }
+
+  @Test
+  public void testReportRetrieval() {
+    Response response = given()
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .contentType(ContentType.JSON)
+    .when().get(HISTORIC_REPORT_URL);
+
+    // assert query invocation
+    InOrder inOrder = Mockito.inOrder(historicBatchReport);
+    inOrder.verify(historicBatchReport).list();
+
+    String content = response.asString();
+    List<String> reportResults = from(content).getList("");
+    Assert.assertEquals("There should be two report results returned.", 2, reportResults.size());
+    Assert.assertNotNull(reportResults.get(0));
+
+    String returnedBatchType = from(content).getString("[0].batchType");
+    int returnedTTL = from(content).getInt("[0].historyTimeToLive");
+    long returnedFinishedCount= from(content).getLong("[0].finishedBatchesCount");
+    long returnedCleanableCount = from(content).getLong("[0].cleanableBatchesCount");
+
+    Assert.assertEquals(EXAMPLE_TYPE, returnedBatchType);
+    Assert.assertEquals(EXAMPLE_TTL, returnedTTL);
+    Assert.assertEquals(EXAMPLE_FINISHED_COUNT, returnedFinishedCount);
+    Assert.assertEquals(EXAMPLE_CLEANABLE_COUNT, returnedCleanableCount);
   }
 
   @Test

@@ -85,7 +85,7 @@ public class CleanableHistoricProcessInstanceReportResultDto {
     return finishedProcessInstanceCount;
   }
 
-  public Long getCleanableProcessInstancesCount() {
+  public Long getCleanableProcessInstanceCount() {
     return cleanableProcessInstanceCount;
   }
 
