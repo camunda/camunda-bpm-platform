@@ -13,8 +13,7 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
       '$scope',
       'Views',
       'camAPI',
-      '$rootScope',
-      function($scope, Views, camAPI, $rootScope) {
+      function($scope, Views, camAPI) {
 
         var getPDIncidentsCount = function(incidents) {
           if(!incidents) {
@@ -71,20 +70,21 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
         $scope.processesActions = Views.getProviders({ component: 'cockpit.processes.action'});
         $scope.definitionVars = { read: [ 'pd' ] };
 
-        var removeActionDeleteListener = $rootScope.$on('processes.action.delete', function(event, procDefId) {
-          var procDefIndex;
-          for (var i = 0; i<$scope.processDefinitionData.length; i++) {
-            if ($scope.processDefinitionData[i].id === procDefId) {
-              procDefIndex = i;
+        var removeActionDeleteListener = $scope.$on('processes.action.delete', function(event, definitionId) {
+
+          var definitions = $scope.processDefinitionData;
+
+          for (var i = 0; i < definitions.length; i++) {
+            if (definitions[i].id === definitionId) {
+              definitions.splice(i, 1);
+              break;
             }
           }
 
-          $scope.processDefinitionData.splice(procDefIndex, 1);
-
-          $scope.processDefinitionsCount = $scope.processDefinitionData.length;
+          $scope.processDefinitionsCount = definitions.length;
         });
 
-        $rootScope.$on('$destroy', function() {
+        $scope.$on('$destroy', function() {
           removeActionDeleteListener();
         });
 
