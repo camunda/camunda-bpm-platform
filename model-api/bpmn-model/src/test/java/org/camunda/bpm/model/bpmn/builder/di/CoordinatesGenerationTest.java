@@ -522,7 +522,7 @@ public class CoordinatesGenerationTest {
         .done();
 
     Bounds endEventBounds = findBpmnShape(END_EVENT_ID).getBounds();
-    assertShapeCoordinates(endEventBounds, 304, 208);
+    assertShapeCoordinates(endEventBounds, 266.5, 208);
 
     Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge(SEQUENCE_FLOW_ID).getWaypoints();
     Iterator<Waypoint> iterator = sequenceFlowWaypoints.iterator();
@@ -534,7 +534,7 @@ public class CoordinatesGenerationTest {
       waypoint = iterator.next();
     }
 
-    assertWaypointCoordinates(waypoint, 304, 226);
+    assertWaypointCoordinates(waypoint, 266.5, 226);
   }
 
   @Test
@@ -658,7 +658,7 @@ public class CoordinatesGenerationTest {
         .done();
 
     Bounds endEventBounds = findBpmnShape(END_EVENT_ID).getBounds();
-    assertShapeCoordinates(endEventBounds, 429, 268);
+    assertShapeCoordinates(endEventBounds, 391.5, 268);
 
     Collection<Waypoint> sequenceFlowWaypoints = findBpmnEdge(SEQUENCE_FLOW_ID).getWaypoints();
     Iterator<Waypoint> iterator = sequenceFlowWaypoints.iterator();
@@ -670,7 +670,7 @@ public class CoordinatesGenerationTest {
       waypoint = iterator.next();
     }
 
-    assertWaypointCoordinates(waypoint, 429, 286);
+    assertWaypointCoordinates(waypoint, 391.5, 286);
   }
 
   @Test
@@ -1334,9 +1334,9 @@ public class CoordinatesGenerationTest {
         .done();
 
     Bounds compensationBounds = findBpmnShape("compensate").getBounds();
-    assertShapeCoordinates(compensationBounds, 304, 186);
+    assertShapeCoordinates(compensationBounds, 266.5, 186);
     Bounds compensation2Bounds = findBpmnShape("compensate2").getBounds();
-    assertShapeCoordinates(compensation2Bounds, 454, 186);
+    assertShapeCoordinates(compensation2Bounds, 416.5, 186);
   }
 
   protected BpmnShape findBpmnShape(String id) {

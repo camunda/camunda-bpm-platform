@@ -139,7 +139,7 @@ public abstract class AbstractBoundaryEventBuilder<B extends AbstractBoundaryEve
       double sourceHeight = sourceBounds.getHeight();
       double targetHeight = shapeBounds.getHeight();
 
-      x = sourceX + sourceWidth + SPACE;
+      x = sourceX + sourceWidth + SPACE / 4;
       y = sourceY + sourceHeight - targetHeight / 2 + SPACE;
     }
 
