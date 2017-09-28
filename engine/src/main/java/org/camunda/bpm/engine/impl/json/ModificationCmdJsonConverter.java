@@ -16,6 +16,7 @@ public class ModificationCmdJsonConverter extends JsonObjectConverter<AbstractPr
   public static final String START_AFTER = "startAfterActivity";
   public static final String START_TRANSITION = "startTransition";
   public static final String CANCEL_ALL = "cancelAllForActivity";
+  public static final String CANCEL_CURRENT = "cancelCurrentActiveActivityInstances";
 
   @Override
   public JSONObject toJsonObject(AbstractProcessInstanceModificationCommand command) {
@@ -32,6 +33,7 @@ public class ModificationCmdJsonConverter extends JsonObjectConverter<AbstractPr
     }
     else if (command instanceof ActivityCancellationCmd) {
       JsonUtil.addField(json, CANCEL_ALL, ((ActivityCancellationCmd) command).getActivityId());
+      JsonUtil.addField(json, CANCEL_CURRENT, ((ActivityCancellationCmd) command).isCancelCurrentActiveActivityInstances());
     }
 
     return json;
@@ -53,6 +55,8 @@ public class ModificationCmdJsonConverter extends JsonObjectConverter<AbstractPr
     }
     else if (json.has(CANCEL_ALL)) {
       cmd = new ActivityCancellationCmd(json.getString(CANCEL_ALL));
+      boolean cancelCurrentActiveActivityInstances = json.getBoolean(CANCEL_CURRENT);
+      ((ActivityCancellationCmd) cmd).cancelCurrentActiveActivityInstances(cancelCurrentActiveActivityInstances);
     }
 
     return cmd;

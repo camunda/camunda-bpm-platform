@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
@@ -25,6 +26,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
+import org.camunda.bpm.engine.runtime.ActivityInstance;
 
 /**
  * @author Thorben Lindhauer
@@ -62,6 +64,7 @@ public class ModifyProcessInstanceCmd implements Command<Void> {
 
     List<AbstractProcessInstanceModificationCommand> instructions = builder.getModificationOperations();
 
+    checkCancellation(commandContext);
     for (int i = 0; i < instructions.size(); i++) {
 
       AbstractProcessInstanceModificationCommand instruction = instructions.get(i);
@@ -95,6 +98,21 @@ public class ModifyProcessInstanceCmd implements Command<Void> {
     }
 
     return null;
+  }
+
+  private void checkCancellation(final CommandContext commandContext) {
+    for (final AbstractProcessInstanceModificationCommand instruction : builder.getModificationOperations()) {
+      if (instruction instanceof ActivityCancellationCmd
+          && ((ActivityCancellationCmd) instruction).cancelCurrentActiveActivityInstances) {
+        ActivityInstance activityInstanceTree = commandContext.runWithoutAuthorization(new Callable<ActivityInstance>() {
+          @Override
+          public ActivityInstance call() throws Exception {
+            return new GetActivityInstanceCmd(((ActivityCancellationCmd) instruction).processInstanceId).execute(commandContext);
+          }
+        });
+        ((ActivityCancellationCmd) instruction).setActivityInstanceTreeToCancel(activityInstanceTree);
+      }
+    }
   }
 
   protected void ensureProcessInstanceExist(String processInstanceId, ExecutionEntity processInstance) {

@@ -33,6 +33,8 @@ import org.camunda.bpm.engine.runtime.TransitionInstance;
 public class ActivityCancellationCmd extends AbstractProcessInstanceModificationCommand {
 
   protected String activityId;
+  protected boolean cancelCurrentActiveActivityInstances;
+  protected ActivityInstance activityInstanceTree;
 
   public ActivityCancellationCmd(String activityId) {
     this(null, activityId);
@@ -45,12 +47,14 @@ public class ActivityCancellationCmd extends AbstractProcessInstanceModification
 
   @Override
   public Void execute(final CommandContext commandContext) {
-    ActivityInstance activityInstanceTree = commandContext.runWithoutAuthorization(new Callable<ActivityInstance>() {
-      @Override
-      public ActivityInstance call() throws Exception {
-        return new GetActivityInstanceCmd(processInstanceId).execute(commandContext);
-      }
-    });
+    if (!cancelCurrentActiveActivityInstances) {
+      activityInstanceTree = commandContext.runWithoutAuthorization(new Callable<ActivityInstance>() {
+        @Override
+        public ActivityInstance call() throws Exception {
+          return new GetActivityInstanceCmd(processInstanceId).execute(commandContext);
+        }
+      });
+    }
 
     ExecutionEntity processInstance = commandContext.getExecutionManager().findExecutionById(processInstanceId);
     ProcessDefinitionImpl processDefinition = processInstance.getProcessDefinition();
@@ -132,8 +136,20 @@ public class ActivityCancellationCmd extends AbstractProcessInstanceModification
     return activityId;
   }
 
+  public void setActivityInstanceTreeToCancel(ActivityInstance activityInstanceTreeToCancel) {
+    this.activityInstanceTree = activityInstanceTreeToCancel;
+  }
+
   @Override
   protected String describe() {
     return "Cancel all instances of activity '" + activityId + "'";
+  }
+
+  public void cancelCurrentActiveActivityInstances(boolean flag) {
+    this.cancelCurrentActiveActivityInstances = flag;
+  }
+
+  public boolean isCancelCurrentActiveActivityInstances() {
+    return cancelCurrentActiveActivityInstances;
   }
 }

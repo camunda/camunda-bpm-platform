@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.impl.batch.BatchSeedJobHandler;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.repository.DeploymentWithDefinitions;
@@ -957,6 +958,64 @@ public class ModificationExecutionAsyncTest {
 
     // then
     assertEquals(0, runtimeService.createVariableInstanceQuery().count());
+  }
+
+  @Test
+  public void testCancelWithoutFlag() {
+    // given
+    this.instance = Bpmn.createExecutableProcess("process1")
+        .startEvent("start")
+        .serviceTask("ser").camundaExpression("${true}")
+        .userTask("user")
+        .endEvent("end")
+        .done();
+
+    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
+
+    List<String> processInstanceIds = helper.startInstances("process1", 1);
+
+    // when
+    Batch batch = runtimeService.createModification(processDefinition.getId())
+      .startBeforeActivity("ser")
+      .cancelAllForActivity("user")
+      .processInstanceIds(processInstanceIds)
+      .executeAsync();
+
+    helper.executeSeedJob(batch);
+    helper.executeJobs(batch);
+
+    // then
+    assertEquals(0, runtimeService.createExecutionQuery().list().size());
+  }
+
+  @Test
+  public void testCancelWithFlag() {
+    // given
+    this.instance = Bpmn.createExecutableProcess("process1")
+        .startEvent("start")
+        .serviceTask("ser").camundaExpression("${true}")
+        .userTask("user")
+        .endEvent("end")
+        .done();
+
+    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
+
+    List<String> processInstanceIds = helper.startInstances("process1", 1);
+
+    // when
+    Batch batch = runtimeService.createModification(processDefinition.getId())
+      .startBeforeActivity("ser")
+      .cancelAllForActivity("user", true)
+      .processInstanceIds(processInstanceIds)
+      .executeAsync();
+
+    helper.executeSeedJob(batch);
+    helper.executeJobs(batch);
+
+    // then
+    ExecutionEntity execution = (ExecutionEntity) runtimeService.createExecutionQuery().singleResult();
+    assertNotNull(execution);
+    assertEquals("user", execution.getActivityId());
   }
 
   protected void assertBatchCreated(Batch batch, int processInstanceCount) {

@@ -50,6 +50,7 @@ public abstract class ProcessInstanceModificationInstructionDto {
   protected String activityInstanceId;
   protected String transitionInstanceId;
   protected String ancestorActivityInstanceId;
+  protected boolean cancelCurrentActiveActivityInstances;
 
   public Map<String, TriggerVariableValueDto> getVariables() {
     return variables;
@@ -92,6 +93,12 @@ public abstract class ProcessInstanceModificationInstructionDto {
   }
   public void setAncestorActivityInstanceId(String ancestorActivityInstanceId) {
     this.ancestorActivityInstanceId = ancestorActivityInstanceId;
+  }
+  public boolean isCancelCurrentActiveActivityInstances() {
+    return cancelCurrentActiveActivityInstances;
+  }
+  public void setCancelCurrentActiveActivityInstances(boolean cancelCurrentActiveActivityInstances) {
+    this.cancelCurrentActiveActivityInstances = cancelCurrentActiveActivityInstances;
   }
 
   public abstract void applyTo(ProcessInstanceModificationBuilder builder, ProcessEngine engine, ObjectMapper mapper);

@@ -81,7 +81,11 @@ public class CancellationInstructionDto extends ProcessInstanceModificationInstr
       if (activityId == null) {
         throw new InvalidRequestException(Status.BAD_REQUEST, buildErrorMessage("'activityId' must be set"));
       }
-      ((ModificationBuilder) builder).cancelAllForActivity(activityId);
+      if (cancelCurrentActiveActivityInstances) {
+        ((ModificationBuilder) builder).cancelAllForActivity(activityId, true);
+      } else {
+        ((ModificationBuilder) builder).cancelAllForActivity(activityId);
+      }
     }
   }
 

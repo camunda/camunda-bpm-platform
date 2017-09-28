@@ -631,4 +631,51 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
       .post(EXECUTE_MODIFICATION_ASYNC_URL);
   }
 
+  @Test
+  public void executeCancellationWithActiveFlagSync() {
+    Map<String, Object> json = new HashMap<String, Object>();
+    List<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
+
+    json.put("skipIoMappings", true);
+    json.put("processInstanceIds", Arrays.asList("200", "100"));
+    instructions.add(ModificationInstructionBuilder.cancellation().activityId("activityId").cancelCurrentActiveActivityInstances().getJson());
+    json.put("instructions", instructions);
+    json.put("processDefinitionId", "processDefinitionId");
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(json)
+    .then()
+      .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .post(EXECUTE_MODIFICATION_SYNC_URL);
+
+    verify(modificationBuilderMock).cancelAllForActivity("activityId", true);
+    verify(modificationBuilderMock).execute();
+  }
+
+  @Test
+  public void executeCancellationWithActiveFlagAsync() {
+    Map<String, Object> json = new HashMap<String, Object>();
+    List<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
+
+    json.put("skipIoMappings", true);
+    json.put("processInstanceIds", Arrays.asList("200", "100"));
+    instructions.add(ModificationInstructionBuilder.cancellation().activityId("activityId").cancelCurrentActiveActivityInstances().getJson());
+    json.put("instructions", instructions);
+    json.put("processDefinitionId", "processDefinitionId");
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(json)
+    .then()
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(EXECUTE_MODIFICATION_ASYNC_URL);
+
+    verify(modificationBuilderMock).cancelAllForActivity("activityId", true);
+    verify(modificationBuilderMock).executeAsync();
+  }
 }

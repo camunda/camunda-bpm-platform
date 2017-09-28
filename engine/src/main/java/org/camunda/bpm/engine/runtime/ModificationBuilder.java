@@ -6,7 +6,6 @@ import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
-import org.camunda.bpm.engine.migration.MigratingProcessInstanceValidationException;
 
 public interface ModificationBuilder extends InstantiationBuilder<ModificationBuilder>{
 
@@ -24,6 +23,22 @@ public interface ModificationBuilder extends InstantiationBuilder<ModificationBu
    * @param activityId the activity for which all instances should be cancelled
    */
   ModificationBuilder cancelAllForActivity(String activityId);
+
+  /**
+   * <p><i>Submits the instruction:</i></p>
+   *
+   * <p>Cancel all instances of the given activity in an arbitrary order, which are:
+   * <ul>
+   *   <li>activity instances of that activity
+   *   <li>transition instances entering or leaving that activity
+   * </ul></p>
+   *
+   * <p>The cancellation order of the instances is arbitrary</p>
+   *
+   * @param activityId the activity for which all instances should be cancelled
+   * @param cancelCurrentActiveActivityInstances
+   */
+  ModificationBuilder cancelAllForActivity(String activityId, boolean cancelCurrentActiveActivityInstances);
 
   /**
    * @param processInstanceIds the process instance ids to modify.
