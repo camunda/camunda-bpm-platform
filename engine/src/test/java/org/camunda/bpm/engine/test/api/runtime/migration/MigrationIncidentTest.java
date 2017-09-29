@@ -15,6 +15,9 @@
  */
 package org.camunda.bpm.engine.test.api.runtime.migration;
 
+import static org.junit.Assert.assertEquals;
+
+import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
@@ -274,5 +277,34 @@ public class MigrationIncidentTest {
     Assert.assertEquals(newProcess.getId(), incidentAfterMigration.getProcessDefinitionId());
     Assert.assertEquals("taskV2", incidentAfterMigration.getActivityId());
 
+  }
+
+  @Test
+  public void testCustomIncidentMigration() {
+    // given
+    RuntimeService runtimeService = engineRule.getRuntimeService();
+    BpmnModelInstance instance1 = Bpmn.createExecutableProcess("process1").startEvent().userTask("u1").endEvent().done();
+    BpmnModelInstance instance2 = Bpmn.createExecutableProcess("process2").startEvent().userTask("u2").endEvent().done();
+
+    testHelper.deploy(instance1, instance2);
+
+    ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("process1");
+    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("process2");
+
+    MigrationPlan migrationPlan = runtimeService
+        .createMigrationPlan(processInstance1.getProcessDefinitionId(), processInstance2.getProcessDefinitionId())
+        .mapActivities("u1", "u2")
+        .build();
+
+    runtimeService.createIncident("custom", processInstance1.getId(), "");
+
+    // when
+    runtimeService.newMigration(migrationPlan).processInstanceIds(processInstance1.getId()).execute();
+
+    // then
+    Incident incident = runtimeService.createIncidentQuery().singleResult();
+    assertEquals(processInstance2.getProcessDefinitionId(), incident.getProcessDefinitionId());
+    assertEquals("custom", incident.getIncidentType());
+    assertEquals(processInstance1.getId(), incident.getExecutionId());
   }
 }
