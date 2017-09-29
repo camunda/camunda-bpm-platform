@@ -29,27 +29,18 @@ public class IncidentInstanceHandler implements MigratingInstanceParseHandler<In
   public void handle(MigratingInstanceParseContext parseContext, IncidentEntity incident) {
     if (incident.getConfiguration() == null
             && (isFailedJobIncident(incident) || isExternalTaskIncident(incident))) {
-      handleCallActivityIncident(parseContext, incident);
+      handleIncident(parseContext, incident);
     } else if (isFailedJobIncident(incident)) {
       handleFailedJobIncident(parseContext, incident);
     } else if (isExternalTaskIncident(incident)) {
       handleExternalTaskIncident(parseContext, incident);
     }
     else {
-      handleCustomIncident(parseContext, incident);
+      handleIncident(parseContext, incident);
     }
   }
 
-  protected void handleCustomIncident(MigratingInstanceParseContext parseContext, IncidentEntity incident) {
-    MigratingActivityInstance owningInstance = parseContext.getMigratingActivityInstanceById(incident.getExecution().getActivityInstanceId());
-    if (owningInstance != null) {
-      parseContext.consume(incident);
-      MigratingIncident migratingIncident = new MigratingIncident(incident, owningInstance.getTargetScope());
-      owningInstance.addMigratingDependentInstance(migratingIncident);
-    }
-  }
-
-  protected void handleCallActivityIncident(MigratingInstanceParseContext parseContext, IncidentEntity incident) {
+  protected void handleIncident(MigratingInstanceParseContext parseContext, IncidentEntity incident) {
     MigratingActivityInstance owningInstance = parseContext.getMigratingActivityInstanceById(incident.getExecution().getActivityInstanceId());
     if (owningInstance != null) {
       parseContext.consume(incident);
