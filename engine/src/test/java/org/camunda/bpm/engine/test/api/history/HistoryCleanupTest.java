@@ -986,7 +986,6 @@ public class HistoryCleanupTest {
   }
 
   @Test
-  @Ignore("CAM-8205")
   public void testHistoryCleanupHelper() throws ParseException {
     processEngineConfiguration.setHistoryCleanupBatchWindowStartTime("22:00+0100");
     processEngineConfiguration.setHistoryCleanupBatchWindowEndTime("01:00+0200");

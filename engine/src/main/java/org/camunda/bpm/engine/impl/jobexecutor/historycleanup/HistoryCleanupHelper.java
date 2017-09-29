@@ -109,6 +109,8 @@ public abstract class HistoryCleanupHelper {
     c.setTime(now);
     Calendar newTimeCalendar = Calendar.getInstance();
     newTimeCalendar.setTime(newTime);
+    c.set(Calendar.ZONE_OFFSET, newTimeCalendar.get(Calendar.ZONE_OFFSET));
+    c.set(Calendar.DST_OFFSET, newTimeCalendar.get(Calendar.DST_OFFSET));
     c.set(Calendar.HOUR_OF_DAY, newTimeCalendar.get(Calendar.HOUR_OF_DAY));
     c.set(Calendar.MINUTE, newTimeCalendar.get(Calendar.MINUTE));
     c.set(Calendar.SECOND, newTimeCalendar.get(Calendar.SECOND));
