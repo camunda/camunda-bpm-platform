@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.incident;
 
+import org.camunda.bpm.engine.runtime.Incident;
+
 /**
  * The {@link IncidentHandler} interface may be implemented by components
  * that handle and resolve incidents of a specific type that occur during the
@@ -37,7 +39,7 @@ public interface IncidentHandler {
   /**
    * Handle an incident that arose in the context of an execution.
    */
-  public void handleIncident(IncidentContext context, String message);
+  public Incident handleIncident(IncidentContext context, String message);
 
   /**
    * Called in situations in which an incidenthandler may wich to resolve existing incidents

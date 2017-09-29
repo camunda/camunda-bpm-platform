@@ -343,9 +343,4 @@ public class ExecutionImpl extends PvmExecutionImpl implements
     // do nothing
   }
 
-  @Override
-  public IncidentEntity findLastIncident() {
-    throw new UnsupportedOperationException();
-  }
-
 }

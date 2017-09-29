@@ -27,6 +27,17 @@ public class IncidentContext {
   protected String tenantId;
   protected String jobDefinitionId;
 
+  public IncidentContext() {}
+
+  public IncidentContext(Incident incident) {
+    this.processDefinitionId = incident.getProcessDefinitionId();
+    this.activityId = incident.getActivityId();
+    this.executionId = incident.getExecutionId();
+    this.configuration = incident.getConfiguration();
+    this.tenantId = incident.getTenantId();
+    this.jobDefinitionId = incident.getJobDefinitionId();
+  }
+
   public String getProcessDefinitionId() {
     return processDefinitionId;
   }

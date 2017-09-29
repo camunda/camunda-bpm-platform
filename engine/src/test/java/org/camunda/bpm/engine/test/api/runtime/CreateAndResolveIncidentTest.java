@@ -212,8 +212,8 @@ public class CreateAndResolveIncidentTest {
     }
 
     @Override
-    public void handleIncident(IncidentContext context, String message) {
-      IncidentEntity.createAndInsertIncident(incidentType, context, message);
+    public Incident handleIncident(IncidentContext context, String message) {
+      return IncidentEntity.createAndInsertIncident(incidentType, context, message);
     }
 
     @Override

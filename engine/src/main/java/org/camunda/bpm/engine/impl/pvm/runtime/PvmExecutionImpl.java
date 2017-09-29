@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.core.variable.event.VariableEvent;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
+import org.camunda.bpm.engine.impl.incident.DefaultIncidentHandler;
 import org.camunda.bpm.engine.impl.incident.IncidentContext;
 import org.camunda.bpm.engine.impl.incident.IncidentHandler;
 import org.camunda.bpm.engine.impl.persistence.entity.DelayedVariableEvent;
@@ -2134,20 +2135,14 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     incidentContext.setActivityId(this.getActivityId());
     incidentContext.setConfiguration(configuration);
 
-    IncidentEntity newIncident = null;
-    IncidentHandler incidentHandler = findCustomIncidentHandler(incidentType);
+    IncidentHandler incidentHandler = findIncidentHandler(incidentType);
 
     if (incidentHandler == null) {
-      newIncident = IncidentEntity.createAndInsertIncident(incidentType, incidentContext, message);
-      newIncident.createRecursiveIncidents();
-    } else {
-      incidentHandler.handleIncident(incidentContext, message);
-      newIncident = findLastIncident();
+      incidentHandler = new DefaultIncidentHandler(incidentType);
     }
-    return newIncident;
+    return incidentHandler.handleIncident(incidentContext, message);
   }
 
-  public abstract IncidentEntity findLastIncident();
 
   /**
    * Resolves an incident with given id.
@@ -2161,23 +2156,16 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
         .getIncidentManager()
         .findIncidentById(incidentId);
 
-    IncidentHandler incidentHandler = findCustomIncidentHandler(incident.getIncidentType());
+    IncidentHandler incidentHandler = findIncidentHandler(incident.getIncidentType());
 
     if (incidentHandler == null) {
-      incident.resolve();
-    } else {
-      IncidentContext incidentContext = new IncidentContext();
-      incidentContext.setTenantId(incident.getTenantId());
-      incidentContext.setActivityId(incident.getActivityId());
-      incidentContext.setConfiguration(incident.getConfiguration());
-      incidentContext.setJobDefinitionId(incident.getJobDefinitionId());
-      incidentContext.setProcessDefinitionId(incident.getProcessDefinitionId());
-      incidentContext.setExecutionId(incident.getExecutionId());
-      incidentHandler.resolveIncident(incidentContext);
+      incidentHandler = new DefaultIncidentHandler(incident.getIncidentType());
     }
+    IncidentContext incidentContext = new IncidentContext(incident);
+    incidentHandler.resolveIncident(incidentContext);
   }
 
-  public IncidentHandler findCustomIncidentHandler(String incidentType) {
+  public IncidentHandler findIncidentHandler(String incidentType) {
     Map<String, IncidentHandler> incidentHandlers = Context.getProcessEngineConfiguration().getIncidentHandlers();
     return incidentHandlers.get(incidentType);
   }

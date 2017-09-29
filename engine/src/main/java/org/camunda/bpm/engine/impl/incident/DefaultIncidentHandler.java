@@ -50,8 +50,8 @@ public class DefaultIncidentHandler implements IncidentHandler {
     return type;
   }
 
-  public void handleIncident(IncidentContext context, String message) {
-    createIncident(context, message);
+  public Incident handleIncident(IncidentContext context, String message) {
+    return createIncident(context, message);
   }
 
   public Incident createIncident(IncidentContext context, String message) {
