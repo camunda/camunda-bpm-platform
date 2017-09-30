@@ -12,6 +12,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.event.ContextClosedEvent;
+import org.springframework.context.event.EventListener;
 
 public class LazyInitRegistration implements ApplicationContextAware {
 
@@ -63,6 +65,11 @@ public class LazyInitRegistration implements ApplicationContextAware {
     for (LazyDelegateFilter<? extends Filter> lazyDelegateFilter : getRegistrations()) {
       lazyInit(lazyDelegateFilter);
     }
+  }
+  
+  @EventListener
+  protected void onContextClosed(ContextClosedEvent ev) {
+    APPLICATION_CONTEXT = null;
   }
 
   static Set<LazyDelegateFilter<? extends Filter>> getRegistrations() {
