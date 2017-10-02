@@ -6,6 +6,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.impl.ModificationBuilderImpl;
@@ -14,14 +15,15 @@ import org.camunda.bpm.engine.impl.ProcessInstanceModificationBuilderImpl;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.camunda.bpm.engine.runtime.ActivityInstance;
 
 public class ProcessInstanceModificationCmd extends AbstractModificationCmd<Void> {
 
   private final static CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
   protected boolean writeUserOperationLog;
 
-  public ProcessInstanceModificationCmd(ModificationBuilderImpl modificationBuilderImpl, boolean writeUserOperationLog) {
-    super(modificationBuilderImpl);
+  public ProcessInstanceModificationCmd(ModificationBuilderImpl modificationBuilder, boolean writeUserOperationLog) {
+    super(modificationBuilder);
     this.writeUserOperationLog = writeUserOperationLog;
    }
 
@@ -50,20 +52,11 @@ public class ProcessInstanceModificationCmd extends AbstractModificationCmd<Void
       ensureProcessInstanceExist(processInstanceId, processInstance);
       ensureSameProcessDefinition(processInstance, processDefinition.getId());
 
-      ProcessInstanceModificationBuilderImpl builder = new ProcessInstanceModificationBuilderImpl(commandContext, processInstanceId);
-      setProcessInstanceId(instructions, processInstanceId);
-      builder.setModificationOperations(instructions);
-
+      ProcessInstanceModificationBuilderImpl builder = createProcessInstanceModificationBuilder(processInstanceId, commandContext);
       builder.execute(false, skipCustomListeners, skipIoMappings);
     }
 
     return null;
-  }
-
-  protected void setProcessInstanceId(List<AbstractProcessInstanceModificationCommand> instructions, String processInstanceId) {
-    for (AbstractProcessInstanceModificationCommand operationCmd : instructions) {
-      operationCmd.setProcessInstanceId(processInstanceId);
-    }
   }
 
   protected void ensureSameProcessDefinition(ExecutionEntity processInstance, String processDefinitionId) {
@@ -76,6 +69,40 @@ public class ProcessInstanceModificationCmd extends AbstractModificationCmd<Void
     if (processInstance == null) {
       throw LOG.processInstanceDoesNotExist(processInstanceId);
     }
+  }
+
+  protected ProcessInstanceModificationBuilderImpl createProcessInstanceModificationBuilder(final String processInstanceId, final CommandContext commandContext) {
+    ProcessInstanceModificationBuilderImpl processInstanceModificationBuilder = new ProcessInstanceModificationBuilderImpl(commandContext, processInstanceId);
+    List<AbstractProcessInstanceModificationCommand> operations = processInstanceModificationBuilder.getModificationOperations();
+
+    ActivityInstance activityInstanceTree = null;
+
+    for (AbstractProcessInstanceModificationCommand instruction : builder.getInstructions()) {
+
+      instruction.setProcessInstanceId(processInstanceId);
+
+      if (!(instruction instanceof ActivityCancellationCmd) || !((ActivityCancellationCmd)instruction).isCancelCurrentActiveActivityInstances()) {
+        operations.add(instruction);
+      }
+      else {
+
+        if (activityInstanceTree == null) {
+          activityInstanceTree = commandContext.runWithoutAuthorization(new Callable<ActivityInstance>() {
+            @Override
+            public ActivityInstance call() throws Exception {
+              return new GetActivityInstanceCmd(processInstanceId).execute(commandContext);
+            }
+          });
+        }
+
+        ActivityCancellationCmd cancellationInstruction = (ActivityCancellationCmd) instruction;
+        List<AbstractInstanceCancellationCmd> cmds = cancellationInstruction.createActivityInstanceCancellations(activityInstanceTree, commandContext);
+        operations.addAll(cmds);
+      }
+
+    }
+
+    return processInstanceModificationBuilder;
   }
 
 }

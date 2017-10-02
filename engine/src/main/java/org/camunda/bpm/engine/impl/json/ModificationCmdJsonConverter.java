@@ -56,7 +56,7 @@ public class ModificationCmdJsonConverter extends JsonObjectConverter<AbstractPr
     else if (json.has(CANCEL_ALL)) {
       cmd = new ActivityCancellationCmd(json.getString(CANCEL_ALL));
       boolean cancelCurrentActiveActivityInstances = json.getBoolean(CANCEL_CURRENT);
-      ((ActivityCancellationCmd) cmd).cancelCurrentActiveActivityInstances(cancelCurrentActiveActivityInstances);
+      ((ActivityCancellationCmd) cmd).setCancelCurrentActiveActivityInstances(cancelCurrentActiveActivityInstances);
     }
 
     return cmd;

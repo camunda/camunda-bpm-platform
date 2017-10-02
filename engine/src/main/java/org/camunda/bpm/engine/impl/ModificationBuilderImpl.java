@@ -69,7 +69,7 @@ public class ModificationBuilderImpl implements ModificationBuilder {
   public ModificationBuilder cancelAllForActivity(String activityId, boolean cancelCurrentActiveActivityInstances) {
     ensureNotNull(NotValidException.class, "activityId", activityId);
     ActivityCancellationCmd activityCancellationCmd = new ActivityCancellationCmd(activityId);
-    activityCancellationCmd.cancelCurrentActiveActivityInstances(cancelCurrentActiveActivityInstances);
+    activityCancellationCmd.setCancelCurrentActiveActivityInstances(cancelCurrentActiveActivityInstances);
     instructions.add(activityCancellationCmd);
     return this;
   }

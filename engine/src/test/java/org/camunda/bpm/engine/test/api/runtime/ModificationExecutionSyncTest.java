@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.repository.DeploymentWithDefinitions;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
+import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
@@ -342,4 +343,34 @@ public class ModificationExecutionSyncTest {
     assertNotNull(execution);
     assertEquals("user", execution.getActivityId());
   }
+
+  @Test
+  public void testCancelWithFlagForManyInstances() {
+    // given
+    this.instance = Bpmn.createExecutableProcess("process1")
+        .startEvent("start")
+        .serviceTask("ser").camundaExpression("${true}")
+        .userTask("user")
+        .endEvent("end")
+        .done();
+
+    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
+
+    List<String> processInstanceIds = helper.startInstances("process1", 10);
+
+    // when
+    runtimeService.createModification(processDefinition.getId())
+      .startBeforeActivity("ser")
+      .cancelAllForActivity("user", true)
+      .processInstanceIds(processInstanceIds)
+      .execute();
+
+    // then
+    for (String processInstanceId : processInstanceIds) {
+      Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstanceId).singleResult();
+      assertNotNull(execution);
+      assertEquals("user", ((ExecutionEntity) execution).getActivityId());
+    }
+  }
+
 }
