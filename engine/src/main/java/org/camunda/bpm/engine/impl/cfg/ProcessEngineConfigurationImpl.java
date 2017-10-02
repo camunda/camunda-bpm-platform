@@ -833,7 +833,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       }
     }
 
-    Map<String, Integer> parsedBatchOperationsForHistoryCleanup = new HashMap<String, Integer>();
+    parsedBatchOperationsForHistoryCleanup = new HashMap<String, Integer>();
     if (batchOperationsForHistoryCleanup != null) {
       for (String operation : batchOperationsForHistoryCleanup.keySet()) {
         Integer historyTimeToLive = ParseUtil.parseHistoryTimeToLive(batchOperationsForHistoryCleanup.get(operation));
