@@ -1,6 +1,7 @@
 package org.camunda.bpm.engine.impl.jobexecutor.historycleanup;
 
 import java.text.ParseException;
+import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -11,6 +12,7 @@ import java.util.Map;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.ParseUtil;
 
 /**
@@ -18,9 +20,11 @@ import org.camunda.bpm.engine.impl.util.ParseUtil;
  */
 public abstract class HistoryCleanupHelper {
 
-  private static final SimpleDateFormat TIME_FORMAT_WITHOUT_SECONDS = new SimpleDateFormat("HH:mm");
+  private static final SimpleDateFormat TIME_FORMAT_WITHOUT_SECONDS = new SimpleDateFormat("yyyy-MM-ddHH:mm");
 
-  public static final SimpleDateFormat TIME_FORMAT_WITHOUT_SECONDS_WITH_TIMEZONE = new SimpleDateFormat("HH:mmZ");
+  public static final SimpleDateFormat TIME_FORMAT_WITHOUT_SECONDS_WITH_TIMEZONE = new SimpleDateFormat("yyyy-MM-ddHH:mmZ");
+
+  public static final SimpleDateFormat DATE_FORMAT_WITHOUT_TIME = new SimpleDateFormat("yyyy-MM-dd");
 
   public static Date getNextRunWithinBatchWindow(Date date, CommandContext commandContext) {
     return getNextRunWithinBatchWindow(date, getBatchWindowStartTime(commandContext));
@@ -126,10 +130,11 @@ public abstract class HistoryCleanupHelper {
   }
 
   public static Date parseTimeConfiguration(String time) throws ParseException {
+    String today = DATE_FORMAT_WITHOUT_TIME.format(ClockUtil.getCurrentTime());
     try {
-      return TIME_FORMAT_WITHOUT_SECONDS_WITH_TIMEZONE.parse(time);
+      return TIME_FORMAT_WITHOUT_SECONDS_WITH_TIMEZONE.parse(today+time);
     } catch (ParseException ex) {
-      return TIME_FORMAT_WITHOUT_SECONDS.parse(time);
+      return TIME_FORMAT_WITHOUT_SECONDS.parse(today+time);
     }
   }
 
