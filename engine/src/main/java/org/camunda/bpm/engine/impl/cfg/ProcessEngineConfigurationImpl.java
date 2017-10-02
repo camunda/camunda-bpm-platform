@@ -694,8 +694,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   private Date historyCleanupBatchWindowStartTimeAsDate;
   private Date historyCleanupBatchWindowEndTimeAsDate;
 
-  private String batchOperationHistoryTimeToLive;
-  private Map<String, String> batchOperationsForHistoryCleanup;
+  protected String batchOperationHistoryTimeToLive;
+  protected Map<String, String> batchOperationsForHistoryCleanup;
+  protected Map<String, Integer> parsedBatchOperationsForHistoryCleanup;
 
   /**
    * Size of batch in which history cleanup data will be deleted. {@link HistoryCleanupBatch#MAX_BATCH_SIZE} must be respected.
@@ -710,8 +711,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   private int failedJobListenerMaxRetries = DEFAULT_FAILED_JOB_LISTENER_MAX_RETRIES;
 
-  private String failedJobRetryTimeCycle;
-  private List<String> parsedRetryIntervals;
+  protected String failedJobRetryTimeCycle;
+  protected List<String> parsedRetryIntervals;
 
   // buildProcessEngine ///////////////////////////////////////////////////////
 
@@ -799,7 +800,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initBatchOperationsHistoryTimeToLive();
   }
 
-  private void initBatchOperationsHistoryTimeToLive() {
+  protected void initBatchOperationsHistoryTimeToLive() {
     try {
       ParseUtil.parseHistoryTimeToLive(batchOperationHistoryTimeToLive);
     } catch (Exception e) {
@@ -829,6 +830,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         if (!batchOperationsForHistoryCleanup.containsKey(batchOperation)) {
           batchOperationsForHistoryCleanup.put(batchOperation, batchOperationHistoryTimeToLive);
         }
+      }
+    }
+
+    Map<String, Integer> parsedBatchOperationsForHistoryCleanup = new HashMap<String, Integer>();
+    if (batchOperationsForHistoryCleanup != null) {
+      for (String operation : batchOperationsForHistoryCleanup.keySet()) {
+        Integer historyTimeToLive = ParseUtil.parseHistoryTimeToLive(batchOperationsForHistoryCleanup.get(operation));
+        parsedBatchOperationsForHistoryCleanup.put(operation, historyTimeToLive);
       }
     }
   }
@@ -3802,6 +3811,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setBatchOperationsForHistoryCleanup(Map<String, String> batchOperationsForHistoryCleanup) {
     this.batchOperationsForHistoryCleanup = batchOperationsForHistoryCleanup;
+  }
+
+  public Map<String, Integer> getParsedBatchOperationsForHistoryCleanup() {
+    return parsedBatchOperationsForHistoryCleanup;
+  }
+
+  public void setParsedBatchOperationsForHistoryCleanup(Map<String, Integer> parsedBatchOperationsForHistoryCleanup) {
+    this.parsedBatchOperationsForHistoryCleanup = parsedBatchOperationsForHistoryCleanup;
   }
 
   public int getFailedJobListenerMaxRetries() {

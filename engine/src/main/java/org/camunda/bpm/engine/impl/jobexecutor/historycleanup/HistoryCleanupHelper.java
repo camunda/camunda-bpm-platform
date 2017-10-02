@@ -1,11 +1,9 @@
 package org.camunda.bpm.engine.impl.jobexecutor.historycleanup;
 
 import java.text.ParseException;
-import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -13,7 +11,6 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
-import org.camunda.bpm.engine.impl.util.ParseUtil;
 
 /**
  * @author Svetlana Dorokhova.
@@ -142,16 +139,6 @@ public abstract class HistoryCleanupHelper {
     return commandContext.getProcessEngineConfiguration().getHistoryCleanupBatchSize();
   }
 
-  public static Map<String, Integer> getBatchOperationsForHistoryCleanup(CommandContext commandContext) {
-    Map<String, String> batchOperationsForHistoryCleanup = commandContext.getProcessEngineConfiguration().getBatchOperationsForHistoryCleanup();
-    Map<String, Integer> batchOperations = new HashMap<String, Integer>();
-    for (String operation : batchOperationsForHistoryCleanup.keySet()) {
-      Integer historyTimeToLive = ParseUtil.parseHistoryTimeToLive(batchOperationsForHistoryCleanup.get(operation));
-      batchOperations.put(operation, historyTimeToLive);
-    }
-    return batchOperations;
-  }
-
   /**
    * Creates next batch object for history cleanup. First searches for historic process instances ready for cleanup. If there is still some place left in batch (configured batch
    * size was not reached), searches for historic decision instances and also adds them to the batch. Then if there is still some place left in batch, searches for historic case
@@ -191,7 +178,7 @@ public abstract class HistoryCleanupHelper {
     }
 
     //if batch is not full, add batch ids
-    Map<String, Integer> batchOperationsForHistoryCleanup = getBatchOperationsForHistoryCleanup(commandContext);
+    Map<String, Integer> batchOperationsForHistoryCleanup = processEngineConfiguration.getParsedBatchOperationsForHistoryCleanup();
     if (historyCleanupBatch.size() < batchSize && batchOperationsForHistoryCleanup != null && !batchOperationsForHistoryCleanup.isEmpty()) {
       List<String> historicBatchIds = commandContext
           .getHistoricBatchManager()

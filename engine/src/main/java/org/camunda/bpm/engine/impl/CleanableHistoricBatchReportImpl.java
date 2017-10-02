@@ -15,13 +15,13 @@ package org.camunda.bpm.engine.impl;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.camunda.bpm.engine.history.CleanableHistoricBatchReport;
 import org.camunda.bpm.engine.history.CleanableHistoricBatchReportResult;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
-import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupHelper;
 
 public class CleanableHistoricBatchReportImpl extends AbstractQuery<CleanableHistoricBatchReport, CleanableHistoricBatchReportResult> implements CleanableHistoricBatchReport {
 
@@ -38,7 +38,8 @@ public class CleanableHistoricBatchReportImpl extends AbstractQuery<CleanableHis
     checkQueryOk();
     checkPermissions(commandContext);
 
-    return commandContext.getHistoricBatchManager().findCleanableHistoricBatchesReportCountByCriteria(this, HistoryCleanupHelper.getBatchOperationsForHistoryCleanup(commandContext));
+    Map<String, Integer> batchOperationsForHistoryCleanup = commandContext.getProcessEngineConfiguration().getParsedBatchOperationsForHistoryCleanup();
+    return commandContext.getHistoricBatchManager().findCleanableHistoricBatchesReportCountByCriteria(this, batchOperationsForHistoryCleanup);
   }
 
   @Override
@@ -46,7 +47,8 @@ public class CleanableHistoricBatchReportImpl extends AbstractQuery<CleanableHis
     checkQueryOk();
     checkPermissions(commandContext);
 
-    return commandContext.getHistoricBatchManager().findCleanableHistoricBatchesReportByCriteria(this, page, HistoryCleanupHelper.getBatchOperationsForHistoryCleanup(commandContext));
+    Map<String, Integer> batchOperationsForHistoryCleanup = commandContext.getProcessEngineConfiguration().getParsedBatchOperationsForHistoryCleanup();
+    return commandContext.getHistoricBatchManager().findCleanableHistoricBatchesReportByCriteria(this, page, batchOperationsForHistoryCleanup);
   }
 
   public Date getCurrentTimestamp() {
