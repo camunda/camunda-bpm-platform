@@ -13,10 +13,7 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import java.io.Serializable;
 import java.util.Date;
-import org.camunda.bpm.engine.authorization.Permissions;
-import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -33,7 +30,7 @@ import org.camunda.bpm.engine.runtime.Job;
 /**
  * @author Svetlana Dorokhova
  */
-public class HistoryCleanupCmd implements Command<Job>, Serializable {
+public class HistoryCleanupCmd implements Command<Job> {
 
   private final static CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
 
@@ -47,7 +44,7 @@ public class HistoryCleanupCmd implements Command<Job>, Serializable {
 
   @Override
   public Job execute(CommandContext commandContext) {
-    commandContext.getAuthorizationManager().checkAuthorization(Permissions.DELETE_HISTORY, Resources.PROCESS_DEFINITION);
+    commandContext.getAuthorizationManager().checkCamundaAdmin();
 
     //validate
     if (!willBeScheduled(commandContext)) {
