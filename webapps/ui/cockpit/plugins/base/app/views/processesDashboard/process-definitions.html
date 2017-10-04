@@ -41,6 +41,8 @@
                 class="history-link">History view</th>
             <th ng-if="hasReportPlugin"
                 class="report-link">Report</th>
+            <th ng-if="hasActionPlugin"
+                class="action">Action</th>
           </tr>
         </thead>
 
@@ -88,7 +90,7 @@
               </a>
             </td>
 
-            <td ng-if="processesActions.length > 0">
+            <td ng-if="hasActionPlugin">
               <view ng-repeat="processesAction in processesActions"
                     data-plugin-id="{{ processAction.id }}"
                     vars="definitionVars"
