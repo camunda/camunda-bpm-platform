@@ -204,4 +204,9 @@ public class EngineUtilLogger extends ProcessEngineLogger {
         "Cannot parse duration '{}'.", expressions));
   }
 
+  public void logParsingRetryIntervals(String intervals, Exception e) {
+    logWarn(
+        "029",
+        "Exception while parsing retry intervals '{}'", intervals, e.getMessage(), e);
+  }
 }

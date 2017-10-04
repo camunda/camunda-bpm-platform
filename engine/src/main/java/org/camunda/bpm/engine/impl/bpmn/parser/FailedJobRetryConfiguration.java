@@ -17,33 +17,30 @@ import java.util.List;
 
 import org.camunda.bpm.engine.impl.el.Expression;
 
-public class FailedJobParseRetryConf {
+public class FailedJobRetryConfiguration {
 
-  private boolean hasIntervals;
-  private Expression retryCycle;
-  private List<String> retryIntervals;
+  protected int retries;
+  protected List<String> retryIntervals;
+  protected Expression expression;
 
-  public FailedJobParseRetryConf(Expression retryCycle) {
-    this.retryCycle = retryCycle;
+  public FailedJobRetryConfiguration(Expression expression) {
+    this.expression = expression;
   }
 
-  public FailedJobParseRetryConf(List<String> retryIntervals) {
+  public FailedJobRetryConfiguration(int retries, List<String> retryIntervals) {
+    this.retries = retries;
     this.retryIntervals = retryIntervals;
-    if (retryIntervals != null && !retryIntervals.isEmpty()) {
-      hasIntervals = true;
-    }
   }
 
-  public boolean hasIntervals() {
-    return hasIntervals;
-  }
-
-  public Expression getRetryCycle() {
-    return retryCycle;
+  public int getRetries() {
+    return retries;
   }
 
   public List<String> getRetryIntervals() {
     return retryIntervals;
   }
 
+  public Expression getExpression() {
+    return expression;
+  }
 }

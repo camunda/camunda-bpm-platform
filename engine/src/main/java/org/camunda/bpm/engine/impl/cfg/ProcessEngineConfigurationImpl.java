@@ -712,7 +712,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   private int failedJobListenerMaxRetries = DEFAULT_FAILED_JOB_LISTENER_MAX_RETRIES;
 
   protected String failedJobRetryTimeCycle;
-  protected List<String> parsedRetryIntervals;
 
   // buildProcessEngine ///////////////////////////////////////////////////////
 
@@ -889,12 +888,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
     postParseListeners.add(new DefaultFailedJobParseListener());
 
-    if (failedJobRetryTimeCycle != null) {
-      ArrayList<String> parsedIntervalsList = ParseUtil.parseRetryIntervals(failedJobRetryTimeCycle);
-      if (parsedIntervalsList.size() > 1) {
-        parsedRetryIntervals = parsedIntervalsList;
-      }
-    }
   }
 
   // incident handlers /////////////////////////////////////////////////////////////
@@ -3837,11 +3830,4 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     this.failedJobRetryTimeCycle = failedJobRetryTimeCycle;
   }
 
-  public List<String> getParsedRetryIntervals() {
-    return parsedRetryIntervals;
-  }
-
-  public void setParsedRetryIntervals(List<String> parsedRetryIntervals) {
-    this.parsedRetryIntervals = parsedRetryIntervals;
-  }
 }

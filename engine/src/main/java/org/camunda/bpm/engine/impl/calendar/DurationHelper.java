@@ -96,6 +96,10 @@ public class DurationHelper {
     return times;
   }
 
+  public boolean isRepeat() {
+    return isRepeat;
+  }
+
   private Date getDateAfterRepeat(Date date) {
     if (start != null) {
       Date cur = start;

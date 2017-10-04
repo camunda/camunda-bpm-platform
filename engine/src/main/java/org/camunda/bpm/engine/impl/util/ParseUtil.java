@@ -1,14 +1,21 @@
 package org.camunda.bpm.engine.impl.util;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotValidException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.bpmn.parser.FailedJobRetryConfiguration;
+import org.camunda.bpm.engine.impl.calendar.DurationHelper;
+import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.el.Expression;
+import org.camunda.bpm.engine.impl.el.ExpressionManager;
 
 public class ParseUtil {
+
+  private static final EngineUtilLogger LOG = ProcessEngineLogger.UTIL_LOGGER;
 
   protected static final Pattern REGEX_TTL_ISO = Pattern.compile("^P(\\d+)D$");
 
@@ -49,7 +56,34 @@ public class ParseUtil {
     return result;
   }
 
-  public static ArrayList<String> parseRetryIntervals(String failedJobRetryIntervals) {
-    return new ArrayList<String>(Arrays.asList(failedJobRetryIntervals.trim().split("\\s*,\\s*")));
+  public static FailedJobRetryConfiguration parseRetryIntervals(String retryIntervals) {
+
+    if (retryIntervals != null && !retryIntervals.isEmpty()) {
+
+      if (StringUtil.isExpression(retryIntervals)) {
+        ExpressionManager expressionManager = Context.getProcessEngineConfiguration().getExpressionManager();
+        Expression expression = expressionManager.createExpression(retryIntervals);
+        return new FailedJobRetryConfiguration(expression);
+      }
+
+      String[] intervals = StringUtil.split(retryIntervals, ",");
+      int retries = intervals.length + 1;
+
+      if (intervals.length == 1) {
+        try {
+          DurationHelper durationHelper = new DurationHelper(intervals[0]);
+
+          if (durationHelper.isRepeat()) {
+            retries = durationHelper.getTimes();
+          }
+        } catch (Exception e) {
+          LOG.logParsingRetryIntervals(intervals[0], e);
+          return null;
+        }
+      }
+      return new FailedJobRetryConfiguration(retries, Arrays.asList(intervals));
+    } else {
+      return null;
+    }
   }
 }
