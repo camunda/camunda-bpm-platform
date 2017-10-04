@@ -61,7 +61,9 @@
     <profile>
       <id>distro-ee</id>
       <activation>
-        <activeByDefault>false</activeByDefault>
+        <property>
+          <name>env.RELEASE_VERSION</name>
+        </property>
       </activation>
       <modules>
         <module>starter-webapp-ee</module>
@@ -150,8 +152,7 @@
     <tag>HEAD</tag>
   </scm>
 
-  <!-- repositories used for distribution of releases and snapshots, DO NOT
-    CHANGE -->
+  <!-- repositories used for distribution of releases and snapshots, DO NOT CHANGE -->
   <distributionManagement>
     <repository>
       <id>camunda-nexus</id>
