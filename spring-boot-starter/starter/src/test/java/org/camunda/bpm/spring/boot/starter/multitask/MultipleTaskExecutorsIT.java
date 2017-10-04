@@ -1,4 +1,4 @@
-package org.camunda.bpm.spring.boot.starter;
+package org.camunda.bpm.spring.boot.starter.multitask;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -22,7 +22,7 @@ import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
  *      "https://github.com/camunda/camunda-bpm-spring-boot-starter/issues/209">#209</a>
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(classes = { MultipleTaskExecutorsIT.MultipleTaskExecutorsConfig.class })
 public class MultipleTaskExecutorsIT {
 
   @Autowired

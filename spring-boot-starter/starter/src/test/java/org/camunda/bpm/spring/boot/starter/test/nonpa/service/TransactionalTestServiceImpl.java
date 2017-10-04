@@ -1,12 +1,13 @@
-package org.camunda.bpm.spring.boot.starter.test.service;
+package org.camunda.bpm.spring.boot.starter.test.nonpa.service;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
-import org.camunda.bpm.spring.boot.starter.test.jpa.domain.TestEntity;
-import org.camunda.bpm.spring.boot.starter.test.jpa.repository.TestEntityRepository;
+import org.camunda.bpm.spring.boot.starter.test.nonpa.jpa.domain.TestEntity;
+import org.camunda.bpm.spring.boot.starter.test.nonpa.jpa.repository.TestEntityRepository;
+import org.camunda.bpm.spring.boot.starter.test.nonpa.service.TransactionalTestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

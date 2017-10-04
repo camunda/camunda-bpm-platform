@@ -10,9 +10,9 @@ import java.util.Map;
 import javax.transaction.Transactional;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.spring.boot.starter.test.TestApplication;
-import org.camunda.bpm.spring.boot.starter.test.jpa.domain.TestEntity;
-import org.camunda.bpm.spring.boot.starter.test.jpa.repository.TestEntityRepository;
+import org.camunda.bpm.spring.boot.starter.test.nonpa.TestApplication;
+import org.camunda.bpm.spring.boot.starter.test.nonpa.jpa.domain.TestEntity;
+import org.camunda.bpm.spring.boot.starter.test.nonpa.jpa.repository.TestEntityRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

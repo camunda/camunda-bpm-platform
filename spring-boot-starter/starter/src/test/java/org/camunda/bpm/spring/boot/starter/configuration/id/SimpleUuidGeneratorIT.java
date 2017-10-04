@@ -4,7 +4,7 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.cfg.IdGenerator;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.db.DbIdGenerator;
-import org.camunda.bpm.spring.boot.starter.test.TestApplication;
+import org.camunda.bpm.spring.boot.starter.test.nonpa.TestApplication;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

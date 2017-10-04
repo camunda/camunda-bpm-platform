@@ -7,10 +7,10 @@ import static org.junit.Assert.fail;
 import javax.transaction.Transactional;
 
 import org.camunda.bpm.engine.runtime.ProcessInstance;
-import org.camunda.bpm.spring.boot.starter.test.TestApplication;
-import org.camunda.bpm.spring.boot.starter.test.jpa.domain.TestEntity;
-import org.camunda.bpm.spring.boot.starter.test.jpa.repository.TestEntityRepository;
-import org.camunda.bpm.spring.boot.starter.test.service.TransactionalTestService;
+import org.camunda.bpm.spring.boot.starter.test.nonpa.TestApplication;
+import org.camunda.bpm.spring.boot.starter.test.nonpa.jpa.domain.TestEntity;
+import org.camunda.bpm.spring.boot.starter.test.nonpa.jpa.repository.TestEntityRepository;
+import org.camunda.bpm.spring.boot.starter.test.nonpa.service.TransactionalTestService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

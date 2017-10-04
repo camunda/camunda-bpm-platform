@@ -10,6 +10,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Optional;
@@ -22,6 +23,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
   classes = GetAnnotatedBeanTest.WithName.class,
   webEnvironment = NONE
 )
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class GetAnnotatedBeanTest {
 
   @SpringBootApplication

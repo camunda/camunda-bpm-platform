@@ -1,4 +1,4 @@
-package org.camunda.bpm.spring.boot.starter.test;
+package org.camunda.bpm.spring.boot.starter.test.nonpa;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.transaction.annotation.EnableTransactionManagement;

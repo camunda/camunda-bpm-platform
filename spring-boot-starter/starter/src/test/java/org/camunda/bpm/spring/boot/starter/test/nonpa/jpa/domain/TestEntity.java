@@ -1,4 +1,4 @@
-package org.camunda.bpm.spring.boot.starter.test.jpa.domain;
+package org.camunda.bpm.spring.boot.starter.test.nonpa.jpa.domain;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

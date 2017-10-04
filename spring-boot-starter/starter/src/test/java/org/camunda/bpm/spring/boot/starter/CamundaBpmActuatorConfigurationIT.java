@@ -2,7 +2,7 @@ package org.camunda.bpm.spring.boot.starter;
 
 import static org.junit.Assert.assertTrue;
 
-import org.camunda.bpm.spring.boot.starter.test.TestApplication;
+import org.camunda.bpm.spring.boot.starter.test.nonpa.TestApplication;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

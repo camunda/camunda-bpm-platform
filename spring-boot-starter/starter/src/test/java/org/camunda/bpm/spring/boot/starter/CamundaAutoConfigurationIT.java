@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.spring.boot.starter.AdditionalCammundaBpmConfigurations.AfterStandardConfiguration;
 import org.camunda.bpm.spring.boot.starter.AdditionalCammundaBpmConfigurations.BeforeStandardConfiguration;
-import org.camunda.bpm.spring.boot.starter.test.TestApplication;
+import org.camunda.bpm.spring.boot.starter.test.nonpa.TestApplication;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;

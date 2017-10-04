@@ -9,7 +9,7 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.camunda.bpm.engine.ProcessEngineServices;
-import org.camunda.bpm.spring.boot.starter.test.TestApplication;
+import org.camunda.bpm.spring.boot.starter.test.nonpa.TestApplication;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,4 +1,4 @@
-package org.camunda.bpm.spring.boot.starter.test.service;
+package org.camunda.bpm.spring.boot.starter.test.nonpa.service;
 
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;

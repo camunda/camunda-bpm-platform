@@ -2,7 +2,7 @@ package org.camunda.bpm.spring.boot.starter;
 
 import static org.junit.Assert.assertNull;
 
-import org.camunda.bpm.spring.boot.starter.test.TestApplication;
+import org.camunda.bpm.spring.boot.starter.test.nonpa.TestApplication;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;

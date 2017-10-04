@@ -4,7 +4,7 @@ package org.camunda.bpm.spring.boot.starter.configuration.id;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.cfg.IdGenerator;
 import org.camunda.bpm.spring.boot.starter.property.CamundaBpmProperties;
-import org.camunda.bpm.spring.boot.starter.test.TestApplication;
+import org.camunda.bpm.spring.boot.starter.test.nonpa.TestApplication;
 import org.camunda.bpm.spring.boot.starter.util.CamundaSpringBootUtil;
 import org.junit.Test;
 import org.junit.runner.RunWith;
