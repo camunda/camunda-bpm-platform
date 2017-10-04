@@ -68,6 +68,7 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
         });
 
         $scope.processesActions = Views.getProviders({ component: 'cockpit.processes.action'});
+        $scope.hasActionPlugin = $scope.processesActions.length > 0;
         $scope.definitionVars = { read: [ 'pd' ] };
 
         var removeActionDeleteListener = $scope.$on('processes.action.delete', function(event, definitionId) {
