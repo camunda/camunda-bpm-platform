@@ -10,6 +10,10 @@
   <groupId>org.camunda.bpm.springboot</groupId>
   <artifactId>camunda-bpm-spring-boot-starter-webapp-ee</artifactId>
 
+  <properties>
+    <camunda-webapp.version>${camunda.version}</camunda-webapp.version>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -19,6 +23,7 @@
     <dependency>
       <groupId>org.camunda.bpm.webapp</groupId>
       <artifactId>camunda-webapp-webjar-ee</artifactId>
+      <version>${camunda-webapp.version}</version>
     </dependency>
     <dependency>
       <groupId>com.h2database</groupId>
@@ -26,5 +31,19 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+
+  <profiles>
+    <profile>
+      <id>sonatype-oss-release</id>
+      <activation>
+        <property>
+          <name>env.RELEASE_VERSION</name>
+        </property>
+      </activation>
+      <properties>
+        <camunda-webapp.version>${camunda.version}-ee</camunda-webapp.version>
+      </properties>
+    </profile>
+  </profiles>
 
 </project>
