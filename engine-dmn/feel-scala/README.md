@@ -73,14 +73,16 @@ You can build the project with [SBT](http://www.scala-sbt.org) or [Maven](http:/
 
 ### Using SBT
 
+In the root directory:
+
 Run the tests with
 ```
-sbt test
+sbt factory/test
 ```
 
 Build the jar including all dependencies with
 ```
-sbt assemply
+sbt factory/assemply
 ```
 
 ### Using Maven
