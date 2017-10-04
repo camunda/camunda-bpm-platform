@@ -25,7 +25,7 @@
 
   <properties>
     <spring-boot.version>1.5.7.RELEASE</spring-boot.version>
-    <camunda.version>7.8.0-SNAPSHOT</camunda.version>
+    <camunda.version>7.8.0-alpha4</camunda.version>
 
     <version.java>1.8</version.java>
     <java.version>${version.java}</java.version>
