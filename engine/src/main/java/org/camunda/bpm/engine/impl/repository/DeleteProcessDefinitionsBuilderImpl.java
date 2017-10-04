@@ -47,6 +47,7 @@ public class DeleteProcessDefinitionsBuilderImpl implements DeleteProcessDefinit
 
   private boolean cascade;
   private String tenantId;
+  private boolean isTenantIdSet;
   private boolean skipCustomListeners;
 
   public DeleteProcessDefinitionsBuilderImpl(CommandExecutor commandExecutor) {
@@ -70,13 +71,14 @@ public class DeleteProcessDefinitionsBuilderImpl implements DeleteProcessDefinit
 
   @Override
   public DeleteProcessDefinitionsBuilderImpl withoutTenantId() {
+    isTenantIdSet = true;
     return this;
   }
 
   @Override
   public DeleteProcessDefinitionsBuilderImpl withTenantId(String tenantId) {
     ensureNotNull("tenantId", tenantId);
-
+    isTenantIdSet = true;
     this.tenantId = tenantId;
     return this;
   }
@@ -99,9 +101,9 @@ public class DeleteProcessDefinitionsBuilderImpl implements DeleteProcessDefinit
 
     Command<Void> command;
     if (processDefinitionKey != null) {
-      command = new DeleteProcessDefinitionsByKeyCmd(processDefinitionKey, cascade, skipCustomListeners, tenantId);
+      command = new DeleteProcessDefinitionsByKeyCmd(processDefinitionKey, cascade, skipCustomListeners, tenantId, isTenantIdSet);
     } else if (processDefinitionIds != null && !processDefinitionIds.isEmpty()) {
-      command = new DeleteProcessDefinitionsByIdsCmd(processDefinitionIds, cascade, skipCustomListeners, tenantId);
+      command = new DeleteProcessDefinitionsByIdsCmd(processDefinitionIds, cascade, skipCustomListeners);
     } else {
       return;
     }

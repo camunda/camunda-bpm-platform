@@ -33,12 +33,14 @@ public class DeleteProcessDefinitionsByKeyCmd extends AbstractDeleteProcessDefin
 
   private final String processDefinitionKey;
   private final String tenantId;
+  private final boolean isTenantIdSet;
 
-  public DeleteProcessDefinitionsByKeyCmd(String processDefinitionKey, boolean cascade, boolean skipCustomListeners, String tenantId) {
+  public DeleteProcessDefinitionsByKeyCmd(String processDefinitionKey, boolean cascade, boolean skipCustomListeners, String tenantId, boolean isTenantIdSet) {
     this.processDefinitionKey = processDefinitionKey;
     this.cascade = cascade;
     this.skipCustomListeners = skipCustomListeners;
     this.tenantId = tenantId;
+    this.isTenantIdSet = isTenantIdSet;
   }
 
   @Override
@@ -46,7 +48,7 @@ public class DeleteProcessDefinitionsByKeyCmd extends AbstractDeleteProcessDefin
     ensureNotNull("processDefinitionKey", processDefinitionKey);
 
     List<ProcessDefinition> processDefinitions = commandContext.getProcessDefinitionManager()
-      .findDefinitionsByKeyAndTenantId(processDefinitionKey, tenantId);
+      .findDefinitionsByKeyAndTenantId(processDefinitionKey, tenantId, isTenantIdSet);
     ensureNotEmpty(NotFoundException.class, "No process definition found with key '" + processDefinitionKey + "'",
       "processDefinitions", processDefinitions);
 

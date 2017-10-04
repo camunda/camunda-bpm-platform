@@ -32,13 +32,11 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 public class DeleteProcessDefinitionsByIdsCmd extends AbstractDeleteProcessDefinitionCmd {
 
   private final List<String> processDefinitionIds;
-  private final String tenantId;
 
-  public DeleteProcessDefinitionsByIdsCmd(List<String> processDefinitionIds, boolean cascade, boolean skipCustomListeners, String tenantId) {
+  public DeleteProcessDefinitionsByIdsCmd(List<String> processDefinitionIds, boolean cascade, boolean skipCustomListeners) {
     this.processDefinitionIds = processDefinitionIds;
     this.cascade = cascade;
     this.skipCustomListeners = skipCustomListeners;
-    this.tenantId = tenantId;
   }
 
   @Override
@@ -46,7 +44,7 @@ public class DeleteProcessDefinitionsByIdsCmd extends AbstractDeleteProcessDefin
     ensureNotNull("processDefinitionIds", processDefinitionIds);
 
     List<ProcessDefinition> processDefinitions = commandContext.getProcessDefinitionManager()
-      .findDefinitionsByIdsAndTenantId(processDefinitionIds, tenantId);
+      .findDefinitionsByIds(processDefinitionIds);
     ensureNotEmpty(NotFoundException.class, "No process definition found",
       "processDefinitions", processDefinitions);
 

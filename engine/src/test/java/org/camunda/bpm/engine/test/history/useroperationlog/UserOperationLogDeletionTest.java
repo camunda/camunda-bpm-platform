@@ -231,7 +231,6 @@ public class UserOperationLogDeletionTest extends AbstractUserOperationLogTest {
     // when
     repositoryService.deleteProcessDefinitions()
       .byIds(findProcessDefinitionIdsByKey(PROCESS_KEY))
-      .withoutTenantId()
       .delete();
 
     // then
@@ -250,7 +249,6 @@ public class UserOperationLogDeletionTest extends AbstractUserOperationLogTest {
     // when
     repositoryService.deleteProcessDefinitions()
       .byIds(findProcessDefinitionIdsByKey(PROCESS_KEY))
-      .withoutTenantId()
       .cascade()
       .delete();
 

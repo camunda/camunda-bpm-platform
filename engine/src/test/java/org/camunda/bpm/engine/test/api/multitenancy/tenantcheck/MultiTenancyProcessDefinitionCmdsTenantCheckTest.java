@@ -361,6 +361,24 @@ public class MultiTenancyProcessDefinitionCmdsTenantCheckTest {
   }
 
   @Test
+  public void testDeleteProcessDefinitionsByKeyForAllTenants() {
+    // given
+    for (int i = 0; i < 3; i++) {
+      deployProcessDefinitionWithTenant();
+      deployProcessDefinitionWithoutTenant();
+    }
+
+    // when
+    repositoryService.deleteProcessDefinitions()
+      .byKey("process")
+      .delete();
+
+    // then
+    assertThat(repositoryService.createProcessDefinitionQuery().count(), is(1L));
+    assertThat(repositoryService.createProcessDefinitionQuery().tenantIdIn(TENANT_ONE).count(), is(1L));
+  }
+
+  @Test
   public void testDeleteProcessDefinitionsByKeyWithAuthenticatedTenant() {
     // given
     for (int i = 0; i < 3; i++) {
@@ -466,12 +484,11 @@ public class MultiTenancyProcessDefinitionCmdsTenantCheckTest {
 
     // then
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("No process definition found");
+    thrown.expectMessage("Cannot delete the process definition");
 
     // when
     repositoryService.deleteProcessDefinitions()
       .byIds(processDefinitionIds)
-      .withoutTenantId()
       .delete();
   }
 
@@ -489,7 +506,6 @@ public class MultiTenancyProcessDefinitionCmdsTenantCheckTest {
     // when
     repositoryService.deleteProcessDefinitions()
       .byIds(processDefinitionIds)
-      .withTenantId(TENANT_ONE)
       .delete();
 
     // then
@@ -514,7 +530,6 @@ public class MultiTenancyProcessDefinitionCmdsTenantCheckTest {
     // when
     repositoryService.deleteProcessDefinitions()
       .byIds(processDefinitionIds)
-      .withTenantId(TENANT_ONE)
       .cascade()
       .delete();
 
@@ -540,7 +555,6 @@ public class MultiTenancyProcessDefinitionCmdsTenantCheckTest {
     // when
     repositoryService.deleteProcessDefinitions()
       .byIds(processDefinitionIds)
-      .withTenantId(TENANT_ONE)
       .delete();
 
     // then
@@ -565,7 +579,6 @@ public class MultiTenancyProcessDefinitionCmdsTenantCheckTest {
     // when
     repositoryService.deleteProcessDefinitions()
       .byIds(processDefinitionIds)
-      .withTenantId(TENANT_ONE)
       .cascade()
       .delete();
 
@@ -626,6 +639,14 @@ public class MultiTenancyProcessDefinitionCmdsTenantCheckTest {
   private void deployProcessDefinitionWithTenant() {
     testRule.deployForTenant(TENANT_ONE,
       Bpmn.createExecutableProcess("process")
+        .startEvent()
+        .userTask()
+        .endEvent()
+        .done());
+  }
+
+  private void deployProcessDefinitionWithoutTenant() {
+    testRule.deploy(Bpmn.createExecutableProcess("process")
         .startEvent()
         .userTask()
         .endEvent()

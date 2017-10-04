@@ -140,11 +140,13 @@
         <bind name="fieldName" value="'ID_'"/>
         <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
       </if>
-      <if test="parameter.tenantId != null">
-        and TENANT_ID_ = #{parameter.tenantId}
-      </if>
-      <if test="parameter.tenantId == null">
-        and TENANT_ID_ is null
+      <if test="parameter.isTenantIdSet">
+        <if test="parameter.tenantId != null">
+          and TENANT_ID_ = #{parameter.tenantId}
+        </if>
+        <if test="parameter.tenantId == null">
+          and TENANT_ID_ is null
+        </if>
       </if>
   </select>
 
