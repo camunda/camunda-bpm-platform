@@ -1,6 +1,3 @@
-[.right]
-image::./docs/camunda-spring-boot-logo.png[alt="Logo", width="150", float="right"]
-
 # camunda-bpm-spring-boot-starter
 
 [cols="a,a,a,a"]
@@ -15,71 +12,29 @@ image::https://maven-badges.herokuapp.com/maven-central/org.camunda.bpm.extensio
 image::https://www.openhub.net/p/camunda-bpm-spring-boot-starter/widgets/project_thin_badge.gif[link="https://www.openhub.net/p/camunda-bpm-spring-boot-starter"]
 ,====
 
+This project provides Spring Boot starters that allow you to integrate Camunda BPM Platform in your Spring Boot applications.
 
-## Get started
-
-The extension is published on maven central, so if you are using maven, just add the dependency:
-
-```xml
-<dependency>
-  <groupId>org.camunda.bpm.extension.springboot</groupId>
-  <artifactId>camunda-bpm-spring-boot-starter([-rest|-webapp])</artifactId>
-  <version>2.2.0</version>
-</dependency>
-```
-
-or use the BOM:
-
-```xml
-<dependencyManagement>
-  <dependencies>
-    <dependency>
-      <groupId>org.camunda.bpm.extension.springboot</groupId>
-      <artifactId>camunda-bpm-spring-boot-starter-bom</artifactId>
-      <version>2.2.0</version>
-      <type>pom</type>
-      <scope>import</scope>
-    </dependency>
-  </dependencies>
-</dependencyManagement>
-...
-<dependency>
-  <groupId>org.camunda.bpm.extension.springboot</groupId>
-  <artifactId>camunda-bpm-spring-boot-starter([-rest|-webapp])</artifactId>
-</dependency>
-```
-
-and then create a simple process application like this one:
-
-```java
-@SpringBootApplication
-@EnableProcessApplication
-public class WebappExampleProcessApplication  {
-
-  public static void main(String... args) {
-    SpringApplication.run(WebappExampleProcessApplication.class, args);
-  }
-
-}
-```
-
-Check out the https://camunda.github.io/camunda-bpm-spring-boot-starter[Documentation] and the https://github.com/camunda/camunda-bpm-spring-boot-starter/tree/2.2.0/examples[Examples]
-
+Please check out the https://docs.camunda.org/manual/develop/user-guide/spring-boot-integration/[Documentation],
+the https://docs.camunda.org/get-started/spring-boot/[Getting Started Guide] and
+the https://github.com/camunda/camunda-bpm-examples/tree/master/spring-boot-starter[Examples].
 
 ## Resources
 
-* https://github.com/camunda/camunda-bpm-spring-boot-starter/issues[Issue Tracker] - if you have an idea for a new feature or want to file a bug ... this is the place to go.
-* link:./CONTRIBUTE.md[Contributing] - check this if you want to contribute
-* https://forum.camunda.org/c/community-extensions/spring-boot-starter[Discussion Forum] - this extension has it's own sub-category at the camunda forum ... use it!
+* https://app.camunda.com/jira[Issue Tracker] - if you have an idea for a new feature or want to file a bug ... this is the place to go.
+* https://github.com/camunda/camunda-bpm-platform/blob/master/CONTRIBUTING.md[Contributing] - check this if you want to contribute
+* https://forum.camunda.org/c/community-extensions/spring-boot-starter[Discussion Forum] - this project has it's own sub-category at the camunda forum ... use it!
 
-## Releases
+## Resources for versions older than 2.3.0
+
+* https://github.com/camunda/camunda-bpm-spring-boot-starter/issues[Issue Tracker] - please DON'T create new isuues here.
+* https://camunda.github.io/camunda-bpm-spring-boot-starter/[Documentation]
 
 ### 2.x
 
-* https://github.com/camunda/camunda-bpm-spring-boot-starter/blob/prepare_adoption/docs/src/main/asciidoc/changelog/220.adoc[Release Notes 2.2.0]
-* https://github.com/camunda/camunda-bpm-spring-boot-starter/blob/2.2.0/docs/src/main/asciidoc/changelog/212.adoc[Release Notes 2.1.2]
-* https://github.com/camunda/camunda-bpm-spring-boot-starter/blob/2.2.0/docs/src/main/asciidoc/changelog/210.adoc[Release Notes 2.1.0]
-* https://github.com/camunda/camunda-bpm-spring-boot-starter/blob/2.2.0/docs/src/main/asciidoc/changelog/200.adoc[Release Notes 2.0.0]
+* https://camunda.github.io/camunda-bpm-spring-boot-starter/docs/2.2.0/index.html#_2_2_0[Release Notes 2.2.0]
+* https://camunda.github.io/camunda-bpm-spring-boot-starter/docs/2.2.0/index.html#_2_1_2[Release Notes 2.1.2]
+* https://camunda.github.io/camunda-bpm-spring-boot-starter/docs/2.2.0/index.html#_2_1_0[Release Notes 2.1.0]
+* https://camunda.github.io/camunda-bpm-spring-boot-starter/docs/2.2.0/index.html#_2_0_0[Release Notes 2.0.0]
 
 ### 1.3.0
 
@@ -96,11 +51,15 @@ If you have implemented an `CamundaConfiguration` you have to switch to `Process
 * https://github.com/camunda/camunda-bpm-spring-boot-starter/milestone/5?closed=1[Release Notes 1.2.1]
 * https://blog.camunda.org/post/2016/06/camunda-spring-boot-1.2.0-released/[Blog Article for release 1.2.0]
 
-## Maintainer
+## Credits
+
+Camunda Spring Boot Starter project used to be the community extension, created and supported by
 
 *  _https://github.com/osteinhauer[Oliver Steinhauer]_
 *  _https://github.com/jangalinski[Jan Galinski]_
 *  _https://github.com/hawky-4s-[Christian Lipphardt]_
+
+Starting from version 2.3.0 it was adopted as part of Camunda BPM.
 
 ## License
 
