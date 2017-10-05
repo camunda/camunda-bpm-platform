@@ -36,7 +36,7 @@ module.exports = [
 
       data.suspended = !processDefinition.suspended;
       data.includeProcessInstances = $scope.data.includeInstances;
-      data.executionDate = !$scope.data.executeImmediately ? dateFilter(Date.now(), timezoneDateFormat) : null;
+      data.executionDate = !$scope.data.executeImmediately ? dateFilter($scope.data.executionDate, timezoneDateFormat) : null;
 
       $http
       .put(Uri.appUri('engine://engine/:engine/process-definition/' + processDefinition.id + '/suspended/'), data)
