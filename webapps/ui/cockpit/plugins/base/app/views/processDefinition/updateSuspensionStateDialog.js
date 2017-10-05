@@ -59,20 +59,18 @@ module.exports = [
 
       }).error(function(response) {
         $scope.status = UPDATE_FAILED;
-
-        if ($scope.data.executeImmediately) {
-          Notifications.addError({
-            status: 'Finished',
-            message: 'Could not update the suspension state of the process definition: ' + response.message,
-            exclusive: true
-          });
+        var errorMessage;
+        if($scope.data.executeImmediately) {
+          errorMessage = 'Could not update the suspension state of the process definition: ' + response.message;
         } else {
-          Notifications.addError({
-            status: 'Finished',
-            message: 'The update of the suspension state of the process definition could not be scheduled: ' + response.message,
-            exclusive: true
-          });
+          'The update of the suspension state of the process definition could not be scheduled: ' + response.message;
         }
+        Notifications.addError({
+          status: 'Finished',
+          message: errorMessage,
+          exclusive: true
+        });
+
       });
     };
 
