@@ -100,8 +100,12 @@
                    required />
 
             <p class="invalid"
-               ng-show="this.updateSuspensionStateForm.executionDateValue.$error.date">
+               ng-show="this.updateSuspensionStateForm.executionDateValue.$error.datePattern">
               Supported pattern 'yyyy-MM-ddTHH:mm:ss'.
+            </p>
+            <p class="invalid"
+               ng-show="this.updateSuspensionStateForm.executionDateValue.$error.dateValue">
+              Invalid Date Value.
             </p>
           </div>
         </div><!-- /.form-group -->

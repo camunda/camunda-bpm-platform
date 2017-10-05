@@ -134,6 +134,9 @@
   "INVALID_DATE":
                         "Invalid date: the date should have the pattern 'yyyy-MM-ddTHH:mm:ss'",
 
+  "INVALID_DATE_VALUE":
+                        "Invalid date: the date value is invalid",
+
   "REQUIRE_UNIQUE_KEY":
                         "Key must be unique"
 }

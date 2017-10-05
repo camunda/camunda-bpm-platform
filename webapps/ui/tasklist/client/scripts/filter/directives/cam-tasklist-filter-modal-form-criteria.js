@@ -137,7 +137,8 @@ module.exports = [function() {
       $scope.valueChanged = function(queryParam, control) {
         control.$setValidity('number', true);
         control.$setValidity('date', true);
-
+        control.$setValidity('dateValue', true);
+        
         if (booleanCriterion[queryParam.key]) {
           queryParam.value = true;
         }

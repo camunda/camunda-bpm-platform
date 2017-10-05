@@ -10,9 +10,10 @@ module.exports = function() {
 
       var dateParser = function(value) {
 
-        var isValid = pattern.test(value);
-        model.$setValidity('date', isValid);
-
+        var isValidPattern = pattern.test(value);
+        var isValidValue = isValidPattern ? !isNaN(new Date(value).getTime()) : true;
+        model.$setValidity('datePattern', isValidPattern);
+        model.$setValidity('dateValue', isValidValue);
         return value;
       };
 
@@ -26,9 +27,11 @@ module.exports = function() {
           return;
         }
 
-          // test the pattern
-        var isValid = pattern.test(value);
-        model.$setValidity('date', isValid);
+        var isValidValue = !isNaN(new Date(value).getTime());
+        var isValidPattern = pattern.test(value);
+        var isValid = isValidValue && isValidPattern;
+        model.$setValidity('datePattern', isValidPattern);
+        model.$setValidity('dateValue', isValidValue);
 
         if (!isValid) {
             // if the value is invalid, then

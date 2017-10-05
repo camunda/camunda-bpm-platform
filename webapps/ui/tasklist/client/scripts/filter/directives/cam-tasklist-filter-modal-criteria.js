@@ -19,8 +19,16 @@
           return { valid : true };
         }
       }
-
       if (regex.test(value)) {
+        if(error === 'date') {
+          var isValidDateValue = !isNaN(new Date(value).getTime());
+          if(!isValidDateValue) {
+            return {
+              valid: false,
+              error: 'dateValue'
+            };
+          }
+        }
         return { valid : true };
 
       }
