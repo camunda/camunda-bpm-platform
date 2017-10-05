@@ -12,8 +12,8 @@ module.exports = [
         UPDATE_FAILED = 'FAIL';
 
     var dateFilter = $filter('date'),
-        dateFormat = 'yyyy-MM-dd\'T\'HH:mm:ss';
-
+        dateFormat = 'yyyy-MM-dd\'T\'HH:mm:ss',
+        timezoneDateFormat = 'yyyy-MM-dd\'T\'HH:mm:ss\'Z';
 
     $scope.processDefinition = processDefinition;
 
@@ -36,7 +36,7 @@ module.exports = [
 
       data.suspended = !processDefinition.suspended;
       data.includeProcessInstances = $scope.data.includeInstances;
-      data.executionDate = !$scope.data.executeImmediately ? $scope.data.executionDate : null;
+      data.executionDate = !$scope.data.executeImmediately ? dateFilter(Date.now(), timezoneDateFormat) : null;
 
       $http
       .put(Uri.appUri('engine://engine/:engine/process-definition/' + processDefinition.id + '/suspended/'), data)
