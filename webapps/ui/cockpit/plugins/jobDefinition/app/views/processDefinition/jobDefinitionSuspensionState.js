@@ -12,7 +12,8 @@ module.exports = [
         UPDATE_FAILED = 'FAIL';
 
     var dateFilter = $filter('date'),
-        dateFormat = 'yyyy-MM-dd\'T\'HH:mm:ss';
+        dateFormat = 'yyyy-MM-dd\'T\'HH:mm:ss',
+        timezoneDateFormat = 'yyyy-MM-dd\'T\'HH:mm:ss\'Z';
 
 
     $scope.jobDefinition = jobDefinition;
@@ -36,7 +37,7 @@ module.exports = [
 
       data.suspended = !jobDefinition.suspended;
       data.includeJobs = $scope.data.includeJobs;
-      data.executionDate = !$scope.data.executeImmediately ? $scope.data.executionDate : null;
+      data.executionDate = !$scope.data.executeImmediately ? dateFilter(Date.now(), timezoneDateFormat) : null;
 
       $http.put(Uri.appUri('engine://engine/:engine/job-definition/' + jobDefinition.id + '/suspended/'), data).success(function() {
         $scope.status = UPDATE_SUCCESS;
