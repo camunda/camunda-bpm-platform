@@ -37,7 +37,7 @@ module.exports = [
 
       data.suspended = !jobDefinition.suspended;
       data.includeJobs = $scope.data.includeJobs;
-      data.executionDate = !$scope.data.executeImmediately ? dateFilter(Date.now(), timezoneDateFormat) : null;
+      data.executionDate = !$scope.data.executeImmediately ? dateFilter($scope.data.executionDate, timezoneDateFormat) : null;
 
       $http.put(Uri.appUri('engine://engine/:engine/job-definition/' + jobDefinition.id + '/suspended/'), data).success(function() {
         $scope.status = UPDATE_SUCCESS;
