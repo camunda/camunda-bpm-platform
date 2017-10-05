@@ -48,8 +48,13 @@
           <div variable="newVariable"></div>
 
           <p class="invalid"
-             ng-show="this.addVariableForm.editDateValue.$error.date">
+             ng-show="this.addVariableForm.editDateValue.$error.datePattern">
             Supported pattern 'yyyy-MM-ddTHH:mm:ss'.
+          </p>
+
+          <p class="invalid"
+             ng-show="this.addVariableForm.editDateValue.$error.dateValue">
+            Invalid Date Value.
           </p>
 
           <p class="invalid"

@@ -99,6 +99,10 @@
                       class="help-block">
                   {{ 'INVALID_DATE' | translate }}
                 </span>
+                <span ng-show="this.criteriaFieldForm.queryParamValue.$error.dateValue"
+                      class="help-block">
+                  {{ 'INVALID_DATE_VALUE' | translate }}
+                </span>
               </div>
             </div>
 
