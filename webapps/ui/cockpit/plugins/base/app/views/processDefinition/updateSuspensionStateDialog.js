@@ -67,7 +67,7 @@ module.exports = [
             exclusive: true
           });
         } else {
-          Notifications.addMessage({
+          Notifications.addError({
             status: 'Finished',
             message: 'The update of the suspension state of the process definition could not be scheduled: ' + response.message,
             exclusive: true
