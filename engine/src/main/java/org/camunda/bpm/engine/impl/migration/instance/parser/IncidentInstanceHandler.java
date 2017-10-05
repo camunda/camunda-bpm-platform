@@ -27,12 +27,10 @@ public class IncidentInstanceHandler implements MigratingInstanceParseHandler<In
 
   @Override
   public void handle(MigratingInstanceParseContext parseContext, IncidentEntity incident) {
-    if (incident.getConfiguration() == null
-            && (isFailedJobIncident(incident) || isExternalTaskIncident(incident))) {
-      handleIncident(parseContext, incident);
-    } else if (isFailedJobIncident(incident)) {
+    if (incident.getConfiguration() != null && isFailedJobIncident(incident)) {
       handleFailedJobIncident(parseContext, incident);
-    } else if (isExternalTaskIncident(incident)) {
+    }
+    else if (incident.getConfiguration() != null && isExternalTaskIncident(incident)) {
       handleExternalTaskIncident(parseContext, incident);
     }
     else {

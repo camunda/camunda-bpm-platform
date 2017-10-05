@@ -87,7 +87,7 @@ public class MigrationIncidentTest {
     .endEvent("end")
     .done();
 
-  
+
   public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   public ProcessEngineTestRule testHelper = new ProcessEngineTestRule(engineRule);
 
@@ -296,7 +296,36 @@ public class MigrationIncidentTest {
         .mapActivities("u1", "u2")
         .build();
 
-    runtimeService.createIncident("custom", processInstance1.getId(), "");
+    runtimeService.createIncident("custom", processInstance1.getId(), "foo");
+
+    // when
+    runtimeService.newMigration(migrationPlan).processInstanceIds(processInstance1.getId()).execute();
+
+    // then
+    Incident incident = runtimeService.createIncidentQuery().singleResult();
+    assertEquals(processInstance2.getProcessDefinitionId(), incident.getProcessDefinitionId());
+    assertEquals("custom", incident.getIncidentType());
+    assertEquals(processInstance1.getId(), incident.getExecutionId());
+  }
+
+  @Test
+  public void testCustomIncidentMigrationWithoutConfiguration() {
+    // given
+    RuntimeService runtimeService = engineRule.getRuntimeService();
+    BpmnModelInstance instance1 = Bpmn.createExecutableProcess("process1").startEvent().userTask("u1").endEvent().done();
+    BpmnModelInstance instance2 = Bpmn.createExecutableProcess("process2").startEvent().userTask("u2").endEvent().done();
+
+    testHelper.deploy(instance1, instance2);
+
+    ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("process1");
+    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("process2");
+
+    MigrationPlan migrationPlan = runtimeService
+        .createMigrationPlan(processInstance1.getProcessDefinitionId(), processInstance2.getProcessDefinitionId())
+        .mapActivities("u1", "u2")
+        .build();
+
+    runtimeService.createIncident("custom", processInstance1.getId(), null);
 
     // when
     runtimeService.newMigration(migrationPlan).processInstanceIds(processInstance1.getId()).execute();
