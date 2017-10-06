@@ -987,7 +987,6 @@ public class HistoryCleanupTest {
   @Test
   public void testHistoryCleanupHelper() throws ParseException {
     processEngineConfiguration.setHistoryCleanupBatchWindowStartTime("22:00+0100");
-    processEngineConfiguration.setHistoryCleanupBatchWindowEndTime("01:00+0200");
     processEngineConfiguration.initHistoryCleanup();
 
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
@@ -996,7 +995,7 @@ public class HistoryCleanupTest {
     assertTrue(HistoryCleanupHelper.isWithinBatchWindow(date, processEngineConfiguration.getHistoryCleanupBatchWindowStartTimeAsDate(),
       processEngineConfiguration.getHistoryCleanupBatchWindowEndTimeAsDate()));
 
-    date = sdf.parse("2017-09-06T22:15:00+0200");   // = 21:15+0100 - which is outside batch window, but returns true now
+    date = sdf.parse("2017-09-06T22:15:00+0200");
     assertFalse(HistoryCleanupHelper.isWithinBatchWindow(date, processEngineConfiguration.getHistoryCleanupBatchWindowStartTimeAsDate(),
       processEngineConfiguration.getHistoryCleanupBatchWindowEndTimeAsDate()));
   }
