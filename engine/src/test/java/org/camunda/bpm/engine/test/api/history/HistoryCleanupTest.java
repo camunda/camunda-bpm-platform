@@ -64,7 +64,6 @@ import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -1052,6 +1051,44 @@ public class HistoryCleanupTest {
     thrown.expectMessage("historyCleanupBatchThreshold");
 
     processEngineConfiguration.initHistoryCleanup();
+  }
+
+  @Test
+  public void testScheduleJobForCurrentBatchWindow() throws ParseException {
+    processEngineConfiguration.setHistoryCleanupBatchWindowStartTime("22:00");
+    processEngineConfiguration.setHistoryCleanupBatchWindowEndTime("23:00");
+
+    processEngineConfiguration.initHistoryCleanup();
+
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    Date date = sdf.parse("2017-09-06T22:15:00");
+    ClockUtil.setCurrentTime(date);
+
+    Job job = historyService.cleanUpHistoryAsync();
+
+    Date start = sdf.parse("2017-09-06T22:00:00");
+    Date end = sdf.parse("2017-09-06T23:00:00");
+    assertFalse(start.after(job.getDuedate())); // job due date is not before start date
+    assertTrue(end.after(job.getDuedate()));
+  }
+
+  @Test
+  public void testScheduleJobForCurrentBatchWindow2() throws ParseException {
+    processEngineConfiguration.setHistoryCleanupBatchWindowStartTime("23:00");
+    processEngineConfiguration.setHistoryCleanupBatchWindowEndTime("01:00");
+
+    processEngineConfiguration.initHistoryCleanup();
+
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    Date date = sdf.parse("2017-09-06T00:15:00");
+    ClockUtil.setCurrentTime(date);
+
+    Job job = historyService.cleanUpHistoryAsync();
+
+    Date start = sdf.parse("2017-09-05T23:00:00");
+    Date end = sdf.parse("2017-09-06T01:00:00");
+    assertFalse(start.after(job.getDuedate())); // job due date is not before start date
+    assertTrue(end.after(job.getDuedate()));
   }
 
   private Date getNextRunWithinBatchWindow(Date currentTime) {

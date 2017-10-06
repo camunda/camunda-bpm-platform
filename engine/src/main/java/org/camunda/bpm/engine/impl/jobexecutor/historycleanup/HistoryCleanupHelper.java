@@ -23,6 +23,13 @@ public abstract class HistoryCleanupHelper {
 
   public static final SimpleDateFormat DATE_FORMAT_WITHOUT_TIME = new SimpleDateFormat("yyyy-MM-dd");
 
+  public static Date getCurrentOrNextRunWithinBatchWindow(Date date, CommandContext commandContext) {
+    if (!isBatchWindowConfigured(commandContext)) {
+      throw new ProcessEngineException("Batch window must be configured");
+    }
+    return getCurrentOrNextBatchWindowStartTime(date, getBatchWindowStartTime(commandContext), getBatchWindowEndTime(commandContext));
+  }
+
   public static Date getNextRunWithinBatchWindow(Date date, CommandContext commandContext) {
     return getNextRunWithinBatchWindow(date, getBatchWindowStartTime(commandContext));
   }
@@ -42,15 +49,14 @@ public abstract class HistoryCleanupHelper {
   }
 
   public static Date getCurrentOrNextBatchWindowStartTime(Date date, Date startTime, Date endTime) {
-    Date startDate = updateTime(date, startTime);
     if (isWithinBatchWindow(date, startTime, endTime)) {
-      return startDate;
-    }
-    if (startDate.after(date)) {
-      return startDate;
+      Date todayStartTime = updateTime(date, startTime);
+      if (todayStartTime.after(date)) {
+        todayStartTime = addDays(todayStartTime, -1);
+      }
+      return todayStartTime;
     } else {
-      //tomorrow
-      return addDays(startDate, 1);
+      return getNextRunWithinBatchWindow(date, startTime);
     }
   }
 
