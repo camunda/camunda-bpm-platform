@@ -21,7 +21,7 @@ the https://github.com/camunda/camunda-bpm-examples/tree/master/spring-boot-star
 ## Resources
 
 * https://app.camunda.com/jira[Issue Tracker] - if you have an idea for a new feature or want to file a bug ... this is the place to go.
-* https://github.com/camunda/camunda-bpm-platform/blob/master/CONTRIBUTING.md[Contributing] - check this if you want to contribute
+* https://github.com/camunda/camunda-bpm-spring-boot-starter/blob/master/.github/CONTRIBUTING.md[Contributing] - check this if you want to contribute
 * https://forum.camunda.org/c/community-extensions/spring-boot-starter[Discussion Forum] - this project has it's own sub-category at the camunda forum ... use it!
 
 ## Resources for versions older than 2.3.0
