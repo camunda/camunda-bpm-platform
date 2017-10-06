@@ -16,6 +16,7 @@ import javax.ws.rs.core.Response.Status;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupHelper;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.mapper.JacksonConfigurator;
@@ -123,19 +124,49 @@ public class HistoryCleanupRestServiceInteractionTest extends AbstractRestServic
     when(processEngineConfigurationImplMock.getHistoryCleanupBatchWindowStartTimeAsDate()).thenReturn(startDate);
     when(processEngineConfigurationImplMock.getHistoryCleanupBatchWindowEndTimeAsDate()).thenReturn(endDate);
 
-    Date now = new Date();
+    SimpleDateFormat sdf = new SimpleDateFormat(JacksonConfigurator.dateFormatString);
+    Date now = sdf.parse("2017-09-01T22:00:00.000+0200");
+
+    ClockUtil.setCurrentTime(now);
     Calendar today = Calendar.getInstance();
     today.setTime(now);
     Calendar tomorrow = Calendar.getInstance();
     tomorrow.setTime(HistoryCleanupHelper.addDays(now, 1));
 
-    Date timeToday = HistoryCleanupHelper.parseTimeConfiguration("23:59");
-    Date timeTomorrow = HistoryCleanupHelper.parseTimeConfiguration("00:00");
+    Date dateToday = HistoryCleanupHelper.updateTime(today.getTime(), startDate);
+    Date dateTomorrow = HistoryCleanupHelper.updateTime(tomorrow.getTime(), endDate);
 
-    Date dateToday = HistoryCleanupHelper.updateTime(today.getTime(), timeToday);
-    Date dateTomorrow = HistoryCleanupHelper.updateTime(tomorrow.getTime(), timeTomorrow);
+    given()
+      .contentType(ContentType.JSON)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .body("batchWindowStartTime", containsString(sdf.format(dateToday)))
+      .body("batchWindowEndTime", containsString(sdf.format(dateTomorrow)))
+    .when()
+      .get(CONFIGURATION_URL);
+
+    verify(processEngineConfigurationImplMock).getHistoryCleanupBatchWindowStartTimeAsDate();
+    verify(processEngineConfigurationImplMock).getHistoryCleanupBatchWindowEndTimeAsDate();
+  }
+
+  @Test
+  public void testHistoryConfiguration2() throws ParseException {
+    ProcessEngineConfigurationImpl processEngineConfigurationImplMock = mock(ProcessEngineConfigurationImpl.class);
+    Date startDate = HistoryCleanupHelper.parseTimeConfiguration("22:00");
+    Date endDate = HistoryCleanupHelper.parseTimeConfiguration("23:00");
+    when(processEngine.getProcessEngineConfiguration()).thenReturn(processEngineConfigurationImplMock);
+    when(processEngineConfigurationImplMock.getHistoryCleanupBatchWindowStartTimeAsDate()).thenReturn(startDate);
+    when(processEngineConfigurationImplMock.getHistoryCleanupBatchWindowEndTimeAsDate()).thenReturn(endDate);
 
     SimpleDateFormat sdf = new SimpleDateFormat(JacksonConfigurator.dateFormatString);
+    Date now = sdf.parse("2017-09-01T22:00:00.000+0200");
+    ClockUtil.setCurrentTime(now);
+
+    Calendar today = Calendar.getInstance();
+    today.setTime(now);
+
+    Date dateToday = HistoryCleanupHelper.updateTime(today.getTime(), startDate);
+    Date dateTomorrow = HistoryCleanupHelper.updateTime(today.getTime(), endDate);
 
     given()
       .contentType(ContentType.JSON)
