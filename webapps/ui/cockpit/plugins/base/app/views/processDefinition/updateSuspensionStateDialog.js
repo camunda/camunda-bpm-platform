@@ -3,8 +3,8 @@
 var angular = require('angular');
 
 module.exports = [
-  '$scope', '$http', '$filter', 'Uri', 'Notifications', '$modalInstance', 'processDefinition',
-  function($scope,   $http,   $filter,   Uri,   Notifications,   $modalInstance,   processDefinition) {
+  '$scope', '$http', '$filter', 'Uri', 'Notifications', '$modalInstance', 'processDefinition','fixDate',
+  function($scope,   $http,   $filter,   Uri,   Notifications,   $modalInstance,   processDefinition, fixDate) {
 
     var BEFORE_UPDATE = 'BEFORE_UPDATE',
         PERFORM_UPDATE = 'PERFORM_UDPATE',
@@ -12,8 +12,7 @@ module.exports = [
         UPDATE_FAILED = 'FAIL';
 
     var dateFilter = $filter('date'),
-        dateFormat = 'yyyy-MM-dd\'T\'HH:mm:ss',
-        timezoneDateFormat = 'yyyy-MM-dd\'T\'HH:mm:ss\'Z';
+        dateFormat = 'yyyy-MM-dd\'T\'HH:mm:ss';
 
     $scope.processDefinition = processDefinition;
 
@@ -36,7 +35,7 @@ module.exports = [
 
       data.suspended = !processDefinition.suspended;
       data.includeProcessInstances = $scope.data.includeInstances;
-      data.executionDate = !$scope.data.executeImmediately ? dateFilter($scope.data.executionDate, timezoneDateFormat) : null;
+      data.executionDate = !$scope.data.executeImmediately ? fixDate($scope.data.executionDate) : null;
 
       $http
       .put(Uri.appUri('engine://engine/:engine/process-definition/' + processDefinition.id + '/suspended/'), data)
