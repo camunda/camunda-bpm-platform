@@ -1476,4 +1476,40 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
       Assert.assertThat(e.getMessage(), containsString("activity ids contains null"));
     }
   }
+
+  @Test
+  public void testHistoricProcInstQueryWithActiveActivityIdsAndProcessDefinitionKey() {
+    // given
+    deployment(ProcessModels.ONE_TASK_PROCESS);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process");
+
+    // when
+    HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
+      .processDefinitionKey("Process")
+      .activeActivityIdIn("userTask")
+      .singleResult();
+
+    // then
+    assertNotNull(historicProcessInstance);
+    assertEquals(processInstance.getId(), historicProcessInstance.getId());
+  }
+
+  @Test
+  public void testHistoricProcInstQueryWithExecutedActivityIdsAndProcessDefinitionKey() {
+    // given
+    deployment(ProcessModels.ONE_TASK_PROCESS);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process");
+
+    Task task = taskService.createTaskQuery().singleResult();
+    taskService.complete(task.getId());
+
+    HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
+      .processDefinitionKey("Process")
+      .executedActivityIdIn("userTask")
+      .singleResult();
+
+    // then
+    assertNotNull(historicProcessInstance);
+    assertEquals(processInstance.getId(), historicProcessInstance.getId());
+  }
 }
