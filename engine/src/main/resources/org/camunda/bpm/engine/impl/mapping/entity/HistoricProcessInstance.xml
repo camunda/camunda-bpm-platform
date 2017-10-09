@@ -355,7 +355,7 @@
       </if>
 
       <if test="executedActivityIds != null and executedActivityIds.length > 0">
-        HAI.END_TIME_ IS NOT NULL
+        AND HAI.END_TIME_ IS NOT NULL
         AND HAI.ACT_ID_ IN
         <foreach item="activityId" index="index" collection="executedActivityIds" open="(" separator="," close=")">
           #{activityId}
@@ -363,7 +363,7 @@
       </if>
 
       <if test="activeActivityIds != null and activeActivityIds.length > 0">
-        HAI.END_TIME_ IS NULL
+        AND HAI.END_TIME_ IS NULL
         AND HAI.ACT_ID_ IN
         <foreach item="activityId" index="index" collection="activeActivityIds" open="(" separator="," close=")">
           #{activityId}
