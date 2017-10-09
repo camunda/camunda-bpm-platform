@@ -1478,7 +1478,7 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
   }
 
   @Test
-  public void testHistoricProcInstQueryWithActiveActivityIdsAndProcessDefinitionKey() {
+  public void testQueryByActiveActivityIdInAndProcessDefinitionKey() {
     // given
     deployment(ProcessModels.ONE_TASK_PROCESS);
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process");
@@ -1495,7 +1495,7 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
   }
 
   @Test
-  public void testHistoricProcInstQueryWithExecutedActivityIdsAndProcessDefinitionKey() {
+  public void testQueryByExecutedActivityIdInAndProcessDefinitionKey() {
     // given
     deployment(ProcessModels.ONE_TASK_PROCESS);
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process");
