@@ -50,4 +50,11 @@ public class MessageReceiveModels {
     .userTask("userTask")
     .endEvent()
     .done();
+
+  public static final BpmnModelInstance MESSAGE_START_PROCESS = ProcessModels.newModel()
+    .startEvent("startEvent")
+      .message(MESSAGE_NAME)
+    .userTask("userTask")
+    .endEvent()
+    .done();
 }
