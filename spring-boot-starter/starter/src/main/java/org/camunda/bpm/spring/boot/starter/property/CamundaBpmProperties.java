@@ -56,7 +56,7 @@ public class CamundaBpmProperties {
   /**
    * the default history level to use when 'historyLevel' is 'auto'
    */
-  private String historyLevelDefault;
+  private String historyLevelDefault = ProcessEngineConfiguration.HISTORY_FULL;
 
   /**
    * enables auto deployment of processes

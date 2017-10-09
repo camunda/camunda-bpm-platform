@@ -10,11 +10,6 @@ public class JobExecutionProperty {
   private boolean enabled;
 
   /**
-   * activate job execution
-   */
-  private boolean active = true;
-
-  /**
    * if job execution is deployment aware
    */
   private boolean deploymentAware;
@@ -28,14 +23,6 @@ public class JobExecutionProperty {
 
   public void setEnabled(boolean enabled) {
     this.enabled = enabled;
-  }
-
-  public boolean isActive() {
-    return active;
-  }
-
-  public void setActive(boolean active) {
-    this.active = active;
   }
 
   public boolean isDeploymentAware() {
@@ -66,7 +53,6 @@ public class JobExecutionProperty {
   public String toString() {
     return joinOn(this.getClass())
       .add("enabled=" + enabled)
-      .add("active=" + active)
       .add("deploymentAware=" + deploymentAware)
       .add("corePoolSize=" + corePoolSize)
       .add("maxPoolSize=" + maxPoolSize)

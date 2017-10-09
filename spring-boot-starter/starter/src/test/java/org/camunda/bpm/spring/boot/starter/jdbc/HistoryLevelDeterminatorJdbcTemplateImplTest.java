@@ -8,10 +8,10 @@ import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.HistoryLevelAudit;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventType;
-import org.camunda.bpm.engine.spring.SpringProcessEngineConfiguration;
 import org.camunda.bpm.spring.boot.starter.property.CamundaBpmProperties;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,7 +41,7 @@ public class HistoryLevelDeterminatorJdbcTemplateImplTest {
     determinator.setJdbcTemplate(jdbcTemplate);
     determinator.setCamundaBpmProperties(camundaBpmProperties);
     determinator.afterPropertiesSet();
-    assertEquals(new SpringProcessEngineConfiguration().getHistory(), determinator.defaultHistoryLevel);
+    assertEquals(ProcessEngineConfiguration.HISTORY_FULL, determinator.defaultHistoryLevel);
   }
 
   @Test
