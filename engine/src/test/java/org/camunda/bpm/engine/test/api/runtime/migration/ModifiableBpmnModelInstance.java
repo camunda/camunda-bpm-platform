@@ -81,8 +81,18 @@ public class ModifiableBpmnModelInstance implements BpmnModelInstance {
     return modelInstance.newInstance(type);
   }
 
+  @Override
+  public <T extends ModelElementInstance> T newInstance(Class<T> aClass, String s) {
+    return modelInstance.newInstance(aClass, s);
+  }
+
   public <T extends ModelElementInstance> T newInstance(ModelElementType type) {
     return modelInstance.newInstance(type);
+  }
+
+  @Override
+  public <T extends ModelElementInstance> T newInstance(ModelElementType modelElementType, String s) {
+    return modelInstance.newInstance(modelElementType, s);
   }
 
   public Model getModel() {
