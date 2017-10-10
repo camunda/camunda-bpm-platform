@@ -26,6 +26,8 @@ the https://github.com/camunda/camunda-bpm-examples/tree/master/spring-boot-star
 
 ## Resources for versions older than 2.3.0
 
+Before version 2.2.0 the project existed as a community extension, therefore the resources were located in different paths. You can find all the links below.
+
 * https://github.com/camunda/camunda-bpm-spring-boot-starter/issues[Issue Tracker] - please DON'T create new isuues here.
 * https://camunda.github.io/camunda-bpm-spring-boot-starter/[Documentation]
 
