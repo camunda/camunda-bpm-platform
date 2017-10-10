@@ -70,7 +70,11 @@ public class MeterLogManager extends AbstractManager {
       //we have to add all unlogged metrics to last interval
       if (queryName != null) {
         MetricIntervalEntity intervalEntity = (MetricIntervalEntity) intervalResult.get(0);
-        intervalEntity.setValue(intervalEntity.getValue() + metrics.get(queryName).get());
+        long entityValue = intervalEntity.getValue();
+        if (metrics.get(queryName) != null) {
+          entityValue += metrics.get(queryName).get();
+        }
+        intervalEntity.setValue(entityValue);
       } else {
         Set<String> metricNames = metrics.keySet();
         Date lastIntervalTimestamp = intervalResult.get(0).getTimestamp();

@@ -47,7 +47,9 @@ import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.ExceptionUtil;
 import org.camunda.bpm.engine.impl.util.json.JSONObject;
+import org.camunda.bpm.engine.management.MetricIntervalValue;
 import org.camunda.bpm.engine.management.Metrics;
+import org.camunda.bpm.engine.management.MetricsQuery;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -215,14 +217,56 @@ public class HistoryCleanupTest {
 
     //then
     final long removedProcessInstances = managementService.createMetricsQuery().name(Metrics.HISTORY_CLEANUP_REMOVED_PROCESS_INSTANCES).sum();
-    final long removedDecisionInstances = managementService.createMetricsQuery().name(Metrics.HISTORY_CLEANUP_REMOVED_CASE_INSTANCES).sum();
-    final long removedCaseInstances = managementService.createMetricsQuery().name(Metrics.HISTORY_CLEANUP_REMOVED_DECISION_INSTANCES).sum();
+    final long removedDecisionInstances = managementService.createMetricsQuery().name(Metrics.HISTORY_CLEANUP_REMOVED_DECISION_INSTANCES).sum();
+    final long removedCaseInstances = managementService.createMetricsQuery().name(Metrics.HISTORY_CLEANUP_REMOVED_CASE_INSTANCES).sum();
 
     assertTrue(removedProcessInstances > 0);
     assertTrue(removedDecisionInstances > 0);
     assertTrue(removedCaseInstances > 0);
 
     assertEquals(15, removedProcessInstances + removedCaseInstances + removedDecisionInstances);
+  }
+
+
+  @Test
+  public void testHistoryCleanupMetricsExtend() {
+    // given
+    processEngineConfiguration.setHistoryCleanupMetricsEnabled(true);
+    prepareData(15);
+
+    ClockUtil.setCurrentTime(new Date());
+    // when
+    String jobId = historyService.cleanUpHistoryAsync(true).getId();
+
+    managementService.executeJob(jobId);
+
+    // then
+    MetricsQuery processMetricsQuery = managementService.createMetricsQuery().name(Metrics.HISTORY_CLEANUP_REMOVED_PROCESS_INSTANCES);
+    long removedProcessInstances = processMetricsQuery.startDate(DateUtils.addDays(new Date(), DAYS_IN_THE_PAST)).endDate(new Date()).sum();
+    assertEquals(5, removedProcessInstances);
+    MetricsQuery decisionMetricsQuery = managementService.createMetricsQuery().name(Metrics.HISTORY_CLEANUP_REMOVED_DECISION_INSTANCES);
+    long removedDecisionInstances = decisionMetricsQuery.startDate(DateUtils.addDays(new Date(), DAYS_IN_THE_PAST)).endDate(new Date()).sum();
+    assertEquals(5, removedDecisionInstances);
+    MetricsQuery caseMetricsQuery = managementService.createMetricsQuery().name(Metrics.HISTORY_CLEANUP_REMOVED_CASE_INSTANCES);
+    long removedCaseInstances = caseMetricsQuery.startDate(DateUtils.addDays(new Date(), DAYS_IN_THE_PAST)).endDate(new Date()).sum();
+    assertEquals(5, removedCaseInstances);
+
+    long noneProcessInstances = processMetricsQuery.startDate(new Date()).limit(1).sum();
+    assertEquals(0, noneProcessInstances);
+    long noneDecisionInstances = decisionMetricsQuery.startDate(new Date()).limit(1).sum();
+    assertEquals(0, noneDecisionInstances);
+    long noneCaseInstances = caseMetricsQuery.startDate(new Date()).limit(1).sum();
+    assertEquals(0, noneCaseInstances);
+
+    List<MetricIntervalValue> piList = processMetricsQuery.startDate(DateUtils.addDays(new Date(), DAYS_IN_THE_PAST)).interval(900);
+    assertEquals(1, piList.size());
+    assertEquals(5, piList.get(0).getValue());
+    List<MetricIntervalValue> diList = decisionMetricsQuery.startDate(DateUtils.addDays(new Date(), DAYS_IN_THE_PAST)).interval(900);
+    assertEquals(1, diList.size());
+    assertEquals(5, diList.get(0).getValue());
+    List<MetricIntervalValue> ciList = caseMetricsQuery.startDate(DateUtils.addDays(new Date(), DAYS_IN_THE_PAST)).interval(900);
+    assertEquals(1, ciList.size());
+    assertEquals(5, ciList.get(0).getValue());
   }
 
   @Test
