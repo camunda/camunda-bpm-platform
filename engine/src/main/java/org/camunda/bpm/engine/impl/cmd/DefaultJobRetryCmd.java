@@ -104,11 +104,9 @@ public class DefaultJobRetryCmd extends JobRetryCmd {
       }
 
       List<String> intervals = retryConfiguration.getRetryIntervals();
-      int size = intervals.size();
-
-      int idx = Math.max(0, Math.min(size - 1, size - (job.getRetries() - 1)));
-
-      DurationHelper durationHelper = getDurationHelper(intervals.get(idx));
+      int intervalsCount = intervals.size();
+      int indexOfInterval = Math.max(0, Math.min(intervalsCount - 1, intervalsCount - (job.getRetries() - 1)));
+      DurationHelper durationHelper = getDurationHelper(intervals.get(indexOfInterval));
       job.setLockExpirationTime(durationHelper.getDateAfter());
 
       logException(job);
@@ -142,11 +140,6 @@ public class DefaultJobRetryCmd extends JobRetryCmd {
 
   protected FailedJobRetryConfiguration getFailedJobRetryConfiguration(JobEntity job, ActivityImpl activity) {
     FailedJobRetryConfiguration retryConfiguration = activity.getProperties().get(DefaultFailedJobParseListener.FAILED_JOB_CONFIGURATION);
-
-    if (retryConfiguration != null && retryConfiguration.getExpression() != null) {
-      String retryIntervals = getFailedJobRetryTimeCycle(job, retryConfiguration.getExpression());
-      retryConfiguration = ParseUtil.parseRetryIntervals(retryIntervals);
-    }
 
     while (retryConfiguration != null && retryConfiguration.getExpression() != null) {
       String retryIntervals = getFailedJobRetryTimeCycle(job, retryConfiguration.getExpression());

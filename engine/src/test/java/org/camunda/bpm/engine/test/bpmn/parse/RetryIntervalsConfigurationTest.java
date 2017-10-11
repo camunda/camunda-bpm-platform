@@ -132,7 +132,7 @@ public class RetryIntervalsConfigurationTest extends AbstractAsyncOperationsTest
   }
 
   @Test
-  public void testRetryGlobalConfigurationWithExecutionListenter() throws ParseException {
+  public void testRetryGlobalConfigurationWithExecutionListener() throws ParseException {
     // given
     engineRule.getProcessEngineConfiguration().setFailedJobRetryTimeCycle("PT5M");
 
