@@ -18,9 +18,12 @@ import org.camunda.bpm.engine.impl.Direction;
 import org.camunda.bpm.engine.impl.QueryEntityRelationCondition;
 import org.camunda.bpm.engine.impl.QueryOrderingProperty;
 import org.camunda.bpm.engine.impl.QueryPropertyImpl;
+import org.camunda.bpm.engine.impl.VariableInstanceQueryProperty;
+import org.camunda.bpm.engine.impl.VariableOrderProperty;
 import org.camunda.bpm.engine.impl.util.JsonUtil;
 import org.camunda.bpm.engine.impl.util.json.JSONArray;
 import org.camunda.bpm.engine.impl.util.json.JSONObject;
+import org.camunda.bpm.engine.impl.variable.ValueTypeResolverImpl;
 import org.camunda.bpm.engine.query.QueryProperty;
 
 
@@ -70,11 +73,20 @@ public class JsonQueryOrderingPropertyConverter extends JsonObjectConverter<Quer
   }
 
   public QueryOrderingProperty toObject(JSONObject jsonObject) {
-    QueryOrderingProperty property = new QueryOrderingProperty();
-
+    String relation = null;
     if (jsonObject.has(RELATION)) {
-      property.setRelation(jsonObject.getString(RELATION));
+      relation = jsonObject.getString(RELATION);
     }
+
+    QueryOrderingProperty property = null;
+    if (QueryOrderingProperty.RELATION_VARIABLE.equals(relation)) {
+      property = new VariableOrderProperty();
+    }
+    else {
+      property = new QueryOrderingProperty();
+    }
+
+    property.setRelation(relation);
 
     if (jsonObject.has(QUERY_PROPERTY)) {
       String propertyName = jsonObject.getString(QUERY_PROPERTY);
@@ -100,5 +112,4 @@ public class JsonQueryOrderingPropertyConverter extends JsonObjectConverter<Quer
 
     return property;
   }
-
 }

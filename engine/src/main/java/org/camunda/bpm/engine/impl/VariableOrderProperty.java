@@ -35,6 +35,9 @@ public class VariableOrderProperty extends QueryOrderingProperty {
     relationConditions.add(new QueryEntityRelationCondition(VariableInstanceQueryProperty.VARIABLE_TYPE, valueType.getName()));
   }
 
+  public VariableOrderProperty() {
+  }
+
   public static VariableOrderProperty forProcessInstanceVariable(String variableName, ValueType valueType) {
     VariableOrderProperty orderingProperty = new VariableOrderProperty(variableName, valueType);
     orderingProperty.relationConditions.add(
