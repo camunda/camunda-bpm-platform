@@ -24,6 +24,7 @@ public class CleanableHistoricCaseInstanceReportResultEntity implements Cleanabl
   protected Integer historyTimeToLive;
   protected long finishedCaseInstanceCount;
   protected long cleanableCaseInstanceCount;
+  protected String tenantId;
 
   public String getCaseDefinitionId() {
     return caseDefinitionId;
@@ -81,6 +82,14 @@ public class CleanableHistoricCaseInstanceReportResultEntity implements Cleanabl
     this.cleanableCaseInstanceCount = cleanableCaseInstanceCount;
   }
 
+  public String getTenantId() {
+    return tenantId;
+  }
+
+  public void setTenantId(String tenantId) {
+    this.tenantId = tenantId;
+  }
+
   public String toString() {
     return this.getClass().getSimpleName()
         + "[caseDefinitionId = " + caseDefinitionId
@@ -90,6 +99,7 @@ public class CleanableHistoricCaseInstanceReportResultEntity implements Cleanabl
         + ", historyTimeToLive = " + historyTimeToLive
         + ", finishedCaseInstanceCount = " + finishedCaseInstanceCount
         + ", cleanableCaseInstanceCount = " + cleanableCaseInstanceCount
+        + ", tenantId = " + tenantId
         + "]";
   }
 }

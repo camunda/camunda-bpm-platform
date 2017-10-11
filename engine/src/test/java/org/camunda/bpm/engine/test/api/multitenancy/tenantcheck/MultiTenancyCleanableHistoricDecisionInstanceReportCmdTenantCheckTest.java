@@ -44,6 +44,9 @@ import org.junit.rules.RuleChain;
 public class MultiTenancyCleanableHistoricDecisionInstanceReportCmdTenantCheckTest {
 
   protected static final String TENANT_ONE = "tenant1";
+  protected static final String TENANT_TWO = "tenant2";
+
+  private static final String DECISION_DEFINITION_KEY = "decision";
 
   protected static final String DMN_MODEL = "org/camunda/bpm/engine/test/api/multitenancy/simpleDecisionTable.dmn";
 
@@ -69,15 +72,13 @@ public class MultiTenancyCleanableHistoricDecisionInstanceReportCmdTenantCheckTe
     identityService = engineRule.getIdentityService();
     historyService = engineRule.getHistoryService();
     processEngineConfiguration = engineRule.getProcessEngineConfiguration();
-
-    testRule.deployForTenant(TENANT_ONE, DMN_MODEL);
-    prepareDecisionInstances("decision", -6, 5, 10);
   }
 
   @Test
   public void testReportNoAuthenticatedTenants() {
     // given
-    // Decision Definition and 10 decision instances
+    testRule.deployForTenant(TENANT_ONE, DMN_MODEL);
+    prepareDecisionInstances(DECISION_DEFINITION_KEY, -6, 5, 10, null);
     identityService.setAuthentication("user", null, null);
 
     // when
@@ -90,7 +91,8 @@ public class MultiTenancyCleanableHistoricDecisionInstanceReportCmdTenantCheckTe
   @Test
   public void testReportWithAuthenticatedTenants() {
     // given
-    // Decision Definition and 10 decision instances
+    testRule.deployForTenant(TENANT_ONE, DMN_MODEL);
+    prepareDecisionInstances(DECISION_DEFINITION_KEY, -6, 5, 10, null);
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
     // when
@@ -98,12 +100,16 @@ public class MultiTenancyCleanableHistoricDecisionInstanceReportCmdTenantCheckTe
 
     // then
     assertEquals(1, reportResults.size());
+    assertEquals(TENANT_ONE, reportResults.get(0).getTenantId());
   }
 
   @Test
   public void testReportDisabledTenantCheck() {
     // given
-    // Decision Definition and 10 decision instances
+    testRule.deployForTenant(TENANT_ONE, DMN_MODEL);
+    prepareDecisionInstances(DECISION_DEFINITION_KEY, -6, 5, 10,TENANT_ONE);
+    testRule.deployForTenant(TENANT_TWO, DMN_MODEL);
+    prepareDecisionInstances(DECISION_DEFINITION_KEY, -6, 5, 10, TENANT_TWO);
     identityService.setAuthentication("user", null, null);
     processEngineConfiguration.setTenantCheckEnabled(false);
 
@@ -111,11 +117,18 @@ public class MultiTenancyCleanableHistoricDecisionInstanceReportCmdTenantCheckTe
     List<CleanableHistoricDecisionInstanceReportResult> reportResults = historyService.createCleanableHistoricDecisionInstanceReport().list();
 
     // then
-    assertEquals(1, reportResults.size());
+    assertEquals(2, reportResults.size());
+    assertEquals(TENANT_ONE, reportResults.get(0).getTenantId());
+    assertEquals(TENANT_TWO, reportResults.get(1).getTenantId());
   }
 
-  protected void prepareDecisionInstances(String key, int daysInThePast, Integer historyTimeToLive, int instanceCount) {
-    List<DecisionDefinition> decisionDefinitions = repositoryService.createDecisionDefinitionQuery().decisionDefinitionKey(key).list();
+  protected void prepareDecisionInstances(String key, int daysInThePast, Integer historyTimeToLive, int instanceCount, String tenantId) {
+    List<DecisionDefinition> decisionDefinitions = null;
+    if (tenantId != null) {
+      decisionDefinitions = repositoryService.createDecisionDefinitionQuery().decisionDefinitionKey(key).tenantIdIn(tenantId).list();
+    } else {
+      decisionDefinitions = repositoryService.createDecisionDefinitionQuery().decisionDefinitionKey(key).list();
+    }
     assertEquals(1, decisionDefinitions.size());
     repositoryService.updateDecisionDefinitionHistoryTimeToLive(decisionDefinitions.get(0).getId(), historyTimeToLive);
 
@@ -124,7 +137,11 @@ public class MultiTenancyCleanableHistoricDecisionInstanceReportCmdTenantCheckTe
 
     Map<String, Object> variables = Variables.createVariables().putValue("status", "silver").putValue("sum", 723);
     for (int i = 0; i < instanceCount; i++) {
-      engineRule.getDecisionService().evaluateDecisionByKey(key).variables(variables).evaluate();
+      if (tenantId != null) {
+        engineRule.getDecisionService().evaluateDecisionByKey(key).decisionDefinitionTenantId(tenantId).variables(variables).evaluate();
+      } else {
+        engineRule.getDecisionService().evaluateDecisionByKey(key).variables(variables).evaluate();
+      }
     }
 
     ClockUtil.setCurrentTime(oldCurrentTime);

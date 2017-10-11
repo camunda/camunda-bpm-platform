@@ -29,6 +29,7 @@ public class CleanableHistoricProcessInstanceReportResultDto {
   protected Integer historyTimeToLive;
   protected long finishedProcessInstanceCount;
   protected long cleanableProcessInstanceCount;
+  protected String tenantId;
 
   public CleanableHistoricProcessInstanceReportResultDto() {
   }
@@ -53,12 +54,16 @@ public class CleanableHistoricProcessInstanceReportResultDto {
     this.historyTimeToLive = historyTimeToLive;
   }
 
-  public void setFinishedProcessInstanceCount(Long finishedProcessInstanceCount) {
+  public void setFinishedProcessInstanceCount(long finishedProcessInstanceCount) {
     this.finishedProcessInstanceCount = finishedProcessInstanceCount;
   }
 
-  public void setCleanableProcessInstanceCount(Long cleanableProcessInstanceCount) {
+  public void setCleanableProcessInstanceCount(long cleanableProcessInstanceCount) {
     this.cleanableProcessInstanceCount = cleanableProcessInstanceCount;
+  }
+
+  public void setTenantId(String tenantId) {
+    this.tenantId = tenantId;
   }
 
   public String getProcessDefinitionId() {
@@ -89,6 +94,10 @@ public class CleanableHistoricProcessInstanceReportResultDto {
     return cleanableProcessInstanceCount;
   }
 
+  public String getTenantId() {
+    return tenantId;
+  }
+
   protected CleanableHistoricProcessInstanceReport createNewReportQuery(ProcessEngine engine) {
     return engine.getHistoryService().createCleanableHistoricProcessInstanceReport();
   }
@@ -104,6 +113,7 @@ public class CleanableHistoricProcessInstanceReportResultDto {
       dto.setHistoryTimeToLive(current.getHistoryTimeToLive());
       dto.setFinishedProcessInstanceCount(current.getFinishedProcessInstanceCount());
       dto.setCleanableProcessInstanceCount(current.getCleanableProcessInstanceCount());
+      dto.setTenantId(current.getTenantId());
       dtos.add(dto);
     }
     return dtos;

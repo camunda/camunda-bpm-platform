@@ -30,6 +30,7 @@ public class CleanableHistoricCaseInstanceReportResultDto implements Serializabl
   protected Integer historyTimeToLive;
   protected long finishedCaseInstanceCount;
   protected long cleanableCaseInstanceCount;
+  protected String tenantId;
 
   public String getCaseDefinitionId() {
     return caseDefinitionId;
@@ -75,7 +76,7 @@ public class CleanableHistoricCaseInstanceReportResultDto implements Serializabl
     return finishedCaseInstanceCount;
   }
 
-  public void setFinishedCaseInstanceCount(Long finishedCaseInstanceCount) {
+  public void setFinishedCaseInstanceCount(long finishedCaseInstanceCount) {
     this.finishedCaseInstanceCount = finishedCaseInstanceCount;
   }
 
@@ -83,8 +84,16 @@ public class CleanableHistoricCaseInstanceReportResultDto implements Serializabl
     return cleanableCaseInstanceCount;
   }
 
-  public void setCleanableCaseInstanceCount(Long cleanableCaseInstanceCount) {
+  public void setCleanableCaseInstanceCount(long cleanableCaseInstanceCount) {
     this.cleanableCaseInstanceCount = cleanableCaseInstanceCount;
+  }
+
+  public String getTenantId() {
+    return tenantId;
+  }
+
+  public void setTenantId(String tenantId) {
+    this.tenantId = tenantId;
   }
 
   public static List<CleanableHistoricCaseInstanceReportResultDto> convert(List<CleanableHistoricCaseInstanceReportResult> reportResult) {
@@ -98,6 +107,7 @@ public class CleanableHistoricCaseInstanceReportResultDto implements Serializabl
       dto.setHistoryTimeToLive(current.getHistoryTimeToLive());
       dto.setFinishedCaseInstanceCount(current.getFinishedCaseInstanceCount());
       dto.setCleanableCaseInstanceCount(current.getCleanableCaseInstanceCount());
+      dto.setTenantId(current.getTenantId());
       dtos.add(dto);
     }
     return dtos;

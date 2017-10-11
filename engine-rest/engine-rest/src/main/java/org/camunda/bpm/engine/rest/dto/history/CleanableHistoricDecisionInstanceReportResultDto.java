@@ -30,6 +30,7 @@ public class CleanableHistoricDecisionInstanceReportResultDto implements Seriali
   protected Integer historyTimeToLive;
   protected long finishedDecisionInstanceCount;
   protected long cleanableDecisionInstanceCount;
+  protected String tenantId;
 
   public String getDecisionDefinitionId() {
     return decisionDefinitionId;
@@ -75,7 +76,7 @@ public class CleanableHistoricDecisionInstanceReportResultDto implements Seriali
     return finishedDecisionInstanceCount;
   }
 
-  public void setFinishedDecisionInstanceCount(Long finishedDecisionInstanceCount) {
+  public void setFinishedDecisionInstanceCount(long finishedDecisionInstanceCount) {
     this.finishedDecisionInstanceCount = finishedDecisionInstanceCount;
   }
 
@@ -83,8 +84,16 @@ public class CleanableHistoricDecisionInstanceReportResultDto implements Seriali
     return cleanableDecisionInstanceCount;
   }
 
-  public void setCleanableDecisionInstanceCount(Long cleanableDecisionInstanceCount) {
+  public void setCleanableDecisionInstanceCount(long cleanableDecisionInstanceCount) {
     this.cleanableDecisionInstanceCount = cleanableDecisionInstanceCount;
+  }
+
+  public String getTenantId() {
+    return tenantId;
+  }
+
+  public void setTenantId(String tenantId) {
+    this.tenantId = tenantId;
   }
 
   public static List<CleanableHistoricDecisionInstanceReportResultDto> convert(List<CleanableHistoricDecisionInstanceReportResult> reportResult) {
@@ -98,6 +107,7 @@ public class CleanableHistoricDecisionInstanceReportResultDto implements Seriali
       dto.setHistoryTimeToLive(current.getHistoryTimeToLive());
       dto.setFinishedDecisionInstanceCount(current.getFinishedDecisionInstanceCount());
       dto.setCleanableDecisionInstanceCount(current.getCleanableDecisionInstanceCount());
+      dto.setTenantId(current.getTenantId());
       dtos.add(dto);
     }
     return dtos;

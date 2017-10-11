@@ -24,6 +24,7 @@ public class CleanableHistoricDecisionInstanceReportResultEntity implements Clea
   protected Integer historyTimeToLive;
   protected long finishedDecisionInstanceCount;
   protected long cleanableDecisionInstanceCount;
+  protected String tenantId;
 
   public String getDecisionDefinitionId() {
     return decisionDefinitionId;
@@ -81,6 +82,14 @@ public class CleanableHistoricDecisionInstanceReportResultEntity implements Clea
     this.cleanableDecisionInstanceCount = cleanableDecisionInstanceCount;
   }
 
+  public String getTenantId() {
+    return tenantId;
+  }
+
+  public void setTenantId(String tenantId) {
+    this.tenantId = tenantId;
+  }
+
   public String toString() {
     return this.getClass().getSimpleName()
         + "[decisionDefinitionId = " + decisionDefinitionId
@@ -90,6 +99,7 @@ public class CleanableHistoricDecisionInstanceReportResultEntity implements Clea
         + ", historyTimeToLive = " + historyTimeToLive
         + ", finishedDecisionInstanceCount = " + finishedDecisionInstanceCount
         + ", cleanableDecisionInstanceCount = " + cleanableDecisionInstanceCount
+        + ", tenantId = " + tenantId
         + "]";
   }
 

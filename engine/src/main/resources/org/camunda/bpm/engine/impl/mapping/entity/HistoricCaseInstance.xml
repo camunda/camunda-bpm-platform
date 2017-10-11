@@ -26,6 +26,7 @@
     <result property="caseDefinitionName" column="NAME_" jdbcType="VARCHAR" />
     <result property="caseDefinitionVersion" column="VERSION_" jdbcType="VARCHAR" />
     <result property="historyTimeToLive" column="HISTORY_TTL_" jdbcType="BIGINT" />
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR"/>
   </resultMap>
 
   <!-- HISTORIC CASE INSTANCE INSERT -->
@@ -343,6 +344,7 @@
         RES.NAME_,
         RES.VERSION_,
         RES.HISTORY_TTL_,
+        RES.TENANT_ID_,
         F.FINISHED_,
         SUM(CASE WHEN CI.CLOSE_TIME_ is not null and ${dayComparator} THEN 1 ELSE 0 END) AS CLEANABLE_
       FROM ${prefix}ACT_RE_CASE_DEF RES
@@ -379,6 +381,7 @@
         RES.NAME_,
         RES.VERSION_,
         RES.HISTORY_TTL_,
+        RES.TENANT_ID_,
         F.FINISHED_
 
     ) RES

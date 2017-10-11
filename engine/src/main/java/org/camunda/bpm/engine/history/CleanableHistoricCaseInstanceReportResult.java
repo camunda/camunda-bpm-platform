@@ -53,4 +53,10 @@ public interface CleanableHistoricCaseInstanceReportResult {
    * Returns the amount of cleanable historic case instances.
    */
   long getCleanableCaseInstanceCount();
+
+  /**
+   *
+   * Returns the tenant id of the current case instances.
+   */
+  String getTenantId();
 }

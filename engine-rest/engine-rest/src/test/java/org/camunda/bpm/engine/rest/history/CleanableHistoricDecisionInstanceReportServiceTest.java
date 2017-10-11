@@ -51,6 +51,7 @@ public class CleanableHistoricDecisionInstanceReportServiceTest extends Abstract
   private static final int EXAMPLE_TTL = 5;
   private static final long EXAMPLE_FINISHED_DI_COUNT = 1000l;
   private static final long EXAMPLE_CLEANABLE_DI_COUNT = 567l;
+  private static final String EXAMPLE_TENANT_ID = "aTenantId";
 
   @ClassRule
   public static TestContainerRule rule = new TestContainerRule();
@@ -81,6 +82,7 @@ public class CleanableHistoricDecisionInstanceReportServiceTest extends Abstract
     when(reportResult.getHistoryTimeToLive()).thenReturn(EXAMPLE_TTL);
     when(reportResult.getFinishedDecisionInstanceCount()).thenReturn(EXAMPLE_FINISHED_DI_COUNT);
     when(reportResult.getCleanableDecisionInstanceCount()).thenReturn(EXAMPLE_CLEANABLE_DI_COUNT);
+    when(reportResult.getTenantId()).thenReturn(EXAMPLE_TENANT_ID);
 
     CleanableHistoricDecisionInstanceReportResult anotherReportResult = mock(CleanableHistoricDecisionInstanceReportResult.class);
 
@@ -91,6 +93,8 @@ public class CleanableHistoricDecisionInstanceReportServiceTest extends Abstract
     when(anotherReportResult.getHistoryTimeToLive()).thenReturn(5);
     when(anotherReportResult.getFinishedDecisionInstanceCount()).thenReturn(10l);
     when(anotherReportResult.getCleanableDecisionInstanceCount()).thenReturn(0l);
+    when(anotherReportResult.getTenantId()).thenReturn("piTenantId");
+
 
     List<CleanableHistoricDecisionInstanceReportResult> mocks = new ArrayList<CleanableHistoricDecisionInstanceReportResult>();
     mocks.add(reportResult);
@@ -139,6 +143,7 @@ public class CleanableHistoricDecisionInstanceReportServiceTest extends Abstract
     int returnedTTL = from(content).getInt("[0].historyTimeToLive");
     long returnedFinishedCount= from(content).getLong("[0].finishedDecisionInstanceCount");
     long returnedCleanableCount = from(content).getLong("[0].cleanableDecisionInstanceCount");
+    String returnedTenantId = from(content).getString("[0].tenantId");
 
     Assert.assertEquals(EXAMPLE_DD_ID, returnedDefinitionId);
     Assert.assertEquals(EXAMPLE_DD_KEY, returnedDefinitionKey);
@@ -147,6 +152,7 @@ public class CleanableHistoricDecisionInstanceReportServiceTest extends Abstract
     Assert.assertEquals(EXAMPLE_TTL, returnedTTL);
     Assert.assertEquals(EXAMPLE_FINISHED_DI_COUNT, returnedFinishedCount);
     Assert.assertEquals(EXAMPLE_CLEANABLE_DI_COUNT, returnedCleanableCount);
+    Assert.assertEquals(EXAMPLE_TENANT_ID, returnedTenantId);
   }
 
   @Test

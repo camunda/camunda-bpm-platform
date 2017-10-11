@@ -53,4 +53,10 @@ public interface CleanableHistoricProcessInstanceReportResult {
    * Returns the amount of cleanable historic process instances.
    */
   long getCleanableProcessInstanceCount();
+
+  /**
+   *
+   * Returns the tenant id of the current process instances.
+   */
+  String getTenantId();
 }

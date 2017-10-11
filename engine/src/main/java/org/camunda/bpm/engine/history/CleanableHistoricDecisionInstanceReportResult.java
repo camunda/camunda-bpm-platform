@@ -53,4 +53,10 @@ public interface CleanableHistoricDecisionInstanceReportResult {
    * Returns the amount of cleanable historic decision instances.
    */
   long getCleanableDecisionInstanceCount();
+
+  /**
+   *
+   * Returns the tenant id of the current decision instances.
+   */
+  String getTenantId();
 }

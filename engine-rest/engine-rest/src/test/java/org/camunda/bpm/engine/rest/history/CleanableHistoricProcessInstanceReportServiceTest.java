@@ -50,6 +50,7 @@ public class CleanableHistoricProcessInstanceReportServiceTest extends AbstractR
   private static final int EXAMPLE_TTL = 5;
   private static final long EXAMPLE_FINISHED_PI_COUNT = 10l;
   private static final long EXAMPLE_CLEANABLE_PI_COUNT = 5l;
+  private static final String EXAMPLE_TENANT_ID = "aTenantId";
 
   @ClassRule
   public static TestContainerRule rule = new TestContainerRule();
@@ -80,6 +81,7 @@ public class CleanableHistoricProcessInstanceReportServiceTest extends AbstractR
     when(reportResult.getHistoryTimeToLive()).thenReturn(EXAMPLE_TTL);
     when(reportResult.getFinishedProcessInstanceCount()).thenReturn(EXAMPLE_FINISHED_PI_COUNT);
     when(reportResult.getCleanableProcessInstanceCount()).thenReturn(EXAMPLE_CLEANABLE_PI_COUNT);
+    when(reportResult.getTenantId()).thenReturn(EXAMPLE_TENANT_ID);
 
     CleanableHistoricProcessInstanceReportResult anotherReportResult = mock(CleanableHistoricProcessInstanceReportResult.class);
 
@@ -90,6 +92,7 @@ public class CleanableHistoricProcessInstanceReportServiceTest extends AbstractR
     when(anotherReportResult.getHistoryTimeToLive()).thenReturn(null);
     when(anotherReportResult.getFinishedProcessInstanceCount()).thenReturn(13l);
     when(anotherReportResult.getCleanableProcessInstanceCount()).thenReturn(0l);
+    when(anotherReportResult.getTenantId()).thenReturn("piTenantId");
 
     List<CleanableHistoricProcessInstanceReportResult> mocks = new ArrayList<CleanableHistoricProcessInstanceReportResult>();
     mocks.add(reportResult);
@@ -138,6 +141,7 @@ public class CleanableHistoricProcessInstanceReportServiceTest extends AbstractR
     int returnedTTL = from(content).getInt("[0].historyTimeToLive");
     long returnedFinishedCount= from(content).getLong("[0].finishedProcessInstanceCount");
     long returnedCleanableCount = from(content).getLong("[0].cleanableProcessInstanceCount");
+    String returnedTenantId = from(content).getString("[0].tenantId");
 
     Assert.assertEquals(EXAMPLE_PROCESS_DEFINITION_ID, returnedDefinitionId);
     Assert.assertEquals(EXAMPLE_PD_KEY, returnedDefinitionKey);
@@ -146,6 +150,7 @@ public class CleanableHistoricProcessInstanceReportServiceTest extends AbstractR
     Assert.assertEquals(EXAMPLE_TTL, returnedTTL);
     Assert.assertEquals(EXAMPLE_FINISHED_PI_COUNT, returnedFinishedCount);
     Assert.assertEquals(EXAMPLE_CLEANABLE_PI_COUNT, returnedCleanableCount);
+    Assert.assertEquals(EXAMPLE_TENANT_ID, returnedTenantId);
   }
 
   @Test

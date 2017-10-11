@@ -25,6 +25,7 @@ public class CleanableHistoricProcessInstanceReportResultEntity implements Clean
   protected Integer historyTimeToLive;
   protected long finishedProcessInstanceCount;
   protected long cleanableProcessInstanceCount;
+  protected String tenantId;
 
   public String getProcessDefinitionId() {
     return processDefinitionId;
@@ -82,6 +83,14 @@ public class CleanableHistoricProcessInstanceReportResultEntity implements Clean
     this.cleanableProcessInstanceCount = cleanableProcessInstanceCount;
   }
 
+  public String getTenantId() {
+    return tenantId;
+  }
+
+  public void setTenantId(String tenantId) {
+    this.tenantId = tenantId;
+  }
+
   public String toString() {
     return this.getClass().getSimpleName()
         + "[processDefinitionId = " + processDefinitionId
@@ -91,6 +100,7 @@ public class CleanableHistoricProcessInstanceReportResultEntity implements Clean
         + ", historyTimeToLive = " + historyTimeToLive
         + ", finishedProcessInstanceCount = " + finishedProcessInstanceCount
         + ", cleanableProcessInstanceCount = " + cleanableProcessInstanceCount
+        + ", tenantId = " + tenantId
         + "]";
   }
 }

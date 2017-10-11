@@ -110,14 +110,17 @@ public class MultiTenancyCleanableHistoricProcessInstanceReportCmdTenantCheckTes
 
     // then
     assertEquals(1, reportResults.size());
+    assertEquals(TENANT_ONE, reportResults.get(0).getTenantId());
   }
 
   @Test
   public void testReportDisabledTenantCheck() {
     // given
     testRule.deployForTenant(TENANT_ONE, BPMN_PROCESS);
+    testRule.deployForTenant(TENANT_TWO, BPMN_PROCESS);
 
-    prepareProcessInstances(PROCESS_DEFINITION_KEY, -6, 5, 10, null);
+    prepareProcessInstances(PROCESS_DEFINITION_KEY, -6, 5, 10, TENANT_ONE);
+    prepareProcessInstances(PROCESS_DEFINITION_KEY, -6, 5, 10, TENANT_TWO);
 
     identityService.setAuthentication("user", null, null);
     processEngineConfiguration.setTenantCheckEnabled(false);
@@ -126,11 +129,18 @@ public class MultiTenancyCleanableHistoricProcessInstanceReportCmdTenantCheckTes
     List<CleanableHistoricProcessInstanceReportResult> reportResults = historyService.createCleanableHistoricProcessInstanceReport().list();
 
     // then
-    assertEquals(1, reportResults.size());
+    assertEquals(2, reportResults.size());
+    assertEquals(TENANT_ONE, reportResults.get(0).getTenantId());
+    assertEquals(TENANT_TWO, reportResults.get(1).getTenantId());
   }
 
   protected void prepareProcessInstances(String key, int daysInThePast, Integer historyTimeToLive, int instanceCount, String tenantId) {
-    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().processDefinitionKey(key).list();
+    List<ProcessDefinition> processDefinitions = null;
+    if (tenantId == null) {
+      processDefinitions = repositoryService.createProcessDefinitionQuery().processDefinitionKey(key).list();
+    } else {
+      processDefinitions = repositoryService.createProcessDefinitionQuery().processDefinitionKey(key).tenantIdIn(tenantId).list();
+    }
     assertEquals(1, processDefinitions.size());
     repositoryService.updateProcessDefinitionHistoryTimeToLive(processDefinitions.get(0).getId(), historyTimeToLive);
 

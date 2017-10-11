@@ -51,6 +51,7 @@ public class CleanableHistoricCaseInstanceReportServiceTest extends AbstractRest
   private static final int EXAMPLE_TTL = 5;
   private static final long EXAMPLE_FINISHED_CI_COUNT = 10l;
   private static final long EXAMPLE_CLEANABLE_CI_COUNT = 5l;
+  private static final String EXAMPLE_TENANT_ID = "aTenantId";
 
   @ClassRule
   public static TestContainerRule rule = new TestContainerRule();
@@ -81,6 +82,7 @@ public class CleanableHistoricCaseInstanceReportServiceTest extends AbstractRest
     when(reportResult.getHistoryTimeToLive()).thenReturn(EXAMPLE_TTL);
     when(reportResult.getFinishedCaseInstanceCount()).thenReturn(EXAMPLE_FINISHED_CI_COUNT);
     when(reportResult.getCleanableCaseInstanceCount()).thenReturn(EXAMPLE_CLEANABLE_CI_COUNT);
+    when(reportResult.getTenantId()).thenReturn(EXAMPLE_TENANT_ID);
 
     CleanableHistoricCaseInstanceReportResult anotherReportResult = mock(CleanableHistoricCaseInstanceReportResult.class);
 
@@ -91,6 +93,8 @@ public class CleanableHistoricCaseInstanceReportServiceTest extends AbstractRest
     when(anotherReportResult.getHistoryTimeToLive()).thenReturn(null);
     when(anotherReportResult.getFinishedCaseInstanceCount()).thenReturn(13l);
     when(anotherReportResult.getCleanableCaseInstanceCount()).thenReturn(0l);
+    when(anotherReportResult.getTenantId()).thenReturn("piTenantId");
+
 
     List<CleanableHistoricCaseInstanceReportResult> mocks = new ArrayList<CleanableHistoricCaseInstanceReportResult>();
     mocks.add(reportResult);
@@ -139,6 +143,7 @@ public class CleanableHistoricCaseInstanceReportServiceTest extends AbstractRest
     int returnedTTL = from(content).getInt("[0].historyTimeToLive");
     long returnedFinishedCount= from(content).getLong("[0].finishedCaseInstanceCount");
     long returnedCleanableCount = from(content).getLong("[0].cleanableCaseInstanceCount");
+    String returnedTenantId = from(content).getString("[0].tenantId");
 
     Assert.assertEquals(EXAMPLE_CD_ID, returnedDefinitionId);
     Assert.assertEquals(EXAMPLE_CD_KEY, returnedDefinitionKey);
@@ -147,6 +152,7 @@ public class CleanableHistoricCaseInstanceReportServiceTest extends AbstractRest
     Assert.assertEquals(EXAMPLE_TTL, returnedTTL);
     Assert.assertEquals(EXAMPLE_FINISHED_CI_COUNT, returnedFinishedCount);
     Assert.assertEquals(EXAMPLE_CLEANABLE_CI_COUNT, returnedCleanableCount);
+    Assert.assertEquals(EXAMPLE_TENANT_ID, returnedTenantId);
   }
 
   @Test
