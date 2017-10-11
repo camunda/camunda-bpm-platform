@@ -527,6 +527,19 @@
               </foreach>
             </if>
 
+            <if test="isTenantIdSet">
+              <if test="tenantIdIn != null &amp;&amp; tenantIdIn.length > 0">
+                and RES.TENANT_ID_ in
+                <foreach item="tenantId" index="index" collection="tenantIdIn"
+                         open="(" separator="," close=")">
+                  #{tenantId}
+                </foreach>
+              </if>
+              <if test="tenantIdIn == null">
+                and RES.TENANT_ID_ is null
+              </if>
+            </if>
+
             <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
             <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
 

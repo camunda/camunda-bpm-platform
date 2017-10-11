@@ -23,7 +23,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
 
@@ -52,6 +54,11 @@ public class CleanableHistoricDecisionInstanceReportServiceTest extends Abstract
   private static final long EXAMPLE_FINISHED_DI_COUNT = 1000l;
   private static final long EXAMPLE_CLEANABLE_DI_COUNT = 567l;
   private static final String EXAMPLE_TENANT_ID = "aTenantId";
+
+  protected static final String ANOTHER_EXAMPLE_DD_ID = "anotherDefId";
+  protected static final String ANOTHER_EXAMPLE_DD_KEY = "anotherDefKey";
+  protected static final String ANOTHER_EXAMPLE_TENANT_ID = "anotherTenantId";
+
 
   @ClassRule
   public static TestContainerRule rule = new TestContainerRule();
@@ -86,14 +93,14 @@ public class CleanableHistoricDecisionInstanceReportServiceTest extends Abstract
 
     CleanableHistoricDecisionInstanceReportResult anotherReportResult = mock(CleanableHistoricDecisionInstanceReportResult.class);
 
-    when(anotherReportResult.getDecisionDefinitionId()).thenReturn("dpId");
-    when(anotherReportResult.getDecisionDefinitionKey()).thenReturn("dpKey");
+    when(anotherReportResult.getDecisionDefinitionId()).thenReturn(ANOTHER_EXAMPLE_DD_ID);
+    when(anotherReportResult.getDecisionDefinitionKey()).thenReturn(ANOTHER_EXAMPLE_DD_KEY);
     when(anotherReportResult.getDecisionDefinitionName()).thenReturn("dpName");
     when(anotherReportResult.getDecisionDefinitionVersion()).thenReturn(33);
     when(anotherReportResult.getHistoryTimeToLive()).thenReturn(5);
     when(anotherReportResult.getFinishedDecisionInstanceCount()).thenReturn(10l);
     when(anotherReportResult.getCleanableDecisionInstanceCount()).thenReturn(0l);
-    when(anotherReportResult.getTenantId()).thenReturn("piTenantId");
+    when(anotherReportResult.getTenantId()).thenReturn(ANOTHER_EXAMPLE_TENANT_ID);
 
 
     List<CleanableHistoricDecisionInstanceReportResult> mocks = new ArrayList<CleanableHistoricDecisionInstanceReportResult>();
@@ -170,6 +177,81 @@ public class CleanableHistoricDecisionInstanceReportServiceTest extends Abstract
   }
 
   @Test
+  public void testQueryByDefinitionId() {
+    given()
+      .queryParam("decisionDefinitionIdIn",  EXAMPLE_DD_ID + "," + ANOTHER_EXAMPLE_DD_ID)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .contentType(ContentType.JSON)
+      .when()
+        .get(HISTORIC_REPORT_URL);
+
+    verify(historicDecisionInstanceReport).decisionDefinitionIdIn(EXAMPLE_DD_ID, ANOTHER_EXAMPLE_DD_ID);
+    verify(historicDecisionInstanceReport).list();
+  }
+  @Test
+  public void testQueryByDefinitionKey() {
+    given()
+      .queryParam("decisionDefinitionKeyIn", EXAMPLE_DD_KEY + "," + ANOTHER_EXAMPLE_DD_KEY)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .contentType(ContentType.JSON)
+      .when()
+        .get(HISTORIC_REPORT_URL);
+
+    verify(historicDecisionInstanceReport).decisionDefinitionKeyIn(EXAMPLE_DD_KEY, ANOTHER_EXAMPLE_DD_KEY);
+    verify(historicDecisionInstanceReport).list();
+  }
+
+  @Test
+  public void testQueryByTenantId() {
+    given()
+      .queryParam("tenantIdIn", EXAMPLE_TENANT_ID + "," + ANOTHER_EXAMPLE_TENANT_ID)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .contentType(ContentType.JSON)
+      .when()
+        .get(HISTORIC_REPORT_URL);
+
+    verify(historicDecisionInstanceReport).tenantIdIn(EXAMPLE_TENANT_ID, ANOTHER_EXAMPLE_TENANT_ID);
+    verify(historicDecisionInstanceReport).list();
+  }
+
+  @Test
+  public void testQueryWithoutTenantId() {
+    given()
+      .queryParam("withoutTenantId", true)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .contentType(ContentType.JSON)
+      .when()
+        .get(HISTORIC_REPORT_URL);
+
+    verify(historicDecisionInstanceReport).withoutTenantId();
+    verify(historicDecisionInstanceReport).list();
+  }
+
+  @Test
+  public void testFullQuery() {
+    given()
+      .params(getCompleteQueryParameters())
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .contentType(ContentType.JSON)
+      .when()
+        .get(HISTORIC_REPORT_URL);
+
+    verifyQueryParameterInvocations();
+    verify(historicDecisionInstanceReport).list();
+  }
+
+
+  @Test
   public void testListParameters() {
     String aDecDefId = "anDecDefId";
     String anotherDecDefId = "anotherDecDefId";
@@ -177,9 +259,13 @@ public class CleanableHistoricDecisionInstanceReportServiceTest extends Abstract
     String aDecDefKey = "anDecDefKey";
     String anotherDecDefKey = "anotherDecDefKey";
 
+    String aTenantId = "anTenantId";
+    String anotherTenantId = "anotherTenantId";
+
    given()
      .queryParam("decisionDefinitionIdIn", aDecDefId + "," + anotherDecDefId)
      .queryParam("decisionDefinitionKeyIn", aDecDefKey + "," + anotherDecDefKey)
+     .queryParam("tenantIdIn", aTenantId + "," + anotherTenantId)
    .then().expect()
      .statusCode(Status.OK.getStatusCode())
      .contentType(ContentType.JSON)
@@ -199,5 +285,37 @@ public class CleanableHistoricDecisionInstanceReportServiceTest extends Abstract
       .get(HISTORIC_REPORT_COUNT_URL);
 
     verify(historicDecisionInstanceReport).count();
+  }
+
+  @Test
+  public void testFullQueryCount() {
+    given()
+      .params(getCompleteQueryParameters())
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .body("count", equalTo(2))
+    .when()
+      .get(HISTORIC_REPORT_COUNT_URL);
+
+    verifyQueryParameterInvocations();
+    verify(historicDecisionInstanceReport).count();
+  }
+
+  protected Map<String, Object> getCompleteQueryParameters() {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+
+    parameters.put("decisionDefinitionIdIn", EXAMPLE_DD_ID + "," + ANOTHER_EXAMPLE_DD_ID);
+    parameters.put("decisionDefinitionKeyIn", EXAMPLE_DD_KEY + "," + ANOTHER_EXAMPLE_DD_KEY);
+    parameters.put("tenantIdIn", EXAMPLE_TENANT_ID + "," + ANOTHER_EXAMPLE_TENANT_ID);
+    parameters.put("withoutTenantId", true);
+
+    return parameters;
+  }
+
+  protected void verifyQueryParameterInvocations() {
+    verify(historicDecisionInstanceReport).decisionDefinitionIdIn(EXAMPLE_DD_ID, ANOTHER_EXAMPLE_DD_ID);
+    verify(historicDecisionInstanceReport).decisionDefinitionKeyIn(EXAMPLE_DD_KEY, ANOTHER_EXAMPLE_DD_KEY);
+    verify(historicDecisionInstanceReport).tenantIdIn(EXAMPLE_TENANT_ID, ANOTHER_EXAMPLE_TENANT_ID);
+    verify(historicDecisionInstanceReport).withoutTenantId();
   }
 }

@@ -30,6 +30,8 @@ public class CleanableHistoricCaseInstanceReportImpl extends AbstractQuery<Clean
 
   protected String[] caseDefinitionIdIn;
   protected String[] caseDefinitionKeyIn;
+  protected String[] tenantIdIn;
+  protected boolean isTenantIdSet = false;
 
   protected Date currentTimestamp;
 
@@ -48,6 +50,21 @@ public class CleanableHistoricCaseInstanceReportImpl extends AbstractQuery<Clean
   public CleanableHistoricCaseInstanceReport caseDefinitionKeyIn(String... caseDefinitionKeys) {
     ensureNotNull(NotValidException.class, "", "caseDefinitionKeyIn", (Object[]) caseDefinitionKeys);
     this.caseDefinitionKeyIn = caseDefinitionKeys;
+    return this;
+  }
+
+  @Override
+  public CleanableHistoricCaseInstanceReport tenantIdIn(String... tenantIds) {
+    ensureNotNull(NotValidException.class, "", "tenantIdIn", (Object[]) tenantIds);
+    this.tenantIdIn = tenantIds;
+    isTenantIdSet = true;
+    return this;
+  }
+
+  @Override
+  public CleanableHistoricCaseInstanceReport withoutTenantId() {
+    this.tenantIdIn = null;
+    isTenantIdSet = true;
     return this;
   }
 
@@ -91,4 +108,15 @@ public class CleanableHistoricCaseInstanceReportImpl extends AbstractQuery<Clean
     this.currentTimestamp = currentTimestamp;
   }
 
+  public String[] getTenantIdIn() {
+    return tenantIdIn;
+  }
+
+  public void setTenantIdIn(String[] tenantIdIn) {
+    this.tenantIdIn = tenantIdIn;
+  }
+
+  public boolean isTenantIdSet() {
+    return isTenantIdSet;
+  }
 }

@@ -85,7 +85,7 @@ public class MultiTenancyCleanableHistoricProcessInstanceReportCmdTenantCheckTes
     // given
     testRule.deployForTenant(TENANT_ONE, BPMN_PROCESS);
 
-    prepareProcessInstances(PROCESS_DEFINITION_KEY, -6, 5, 10, null);
+    prepareProcessInstances(PROCESS_DEFINITION_KEY, -6, 5, 10, TENANT_ONE);
 
     identityService.setAuthentication("user", null, null);
 
@@ -101,7 +101,7 @@ public class MultiTenancyCleanableHistoricProcessInstanceReportCmdTenantCheckTes
     // given
     testRule.deployForTenant(TENANT_ONE, BPMN_PROCESS);
 
-    prepareProcessInstances(PROCESS_DEFINITION_KEY, -6, 5, 10, null);
+    prepareProcessInstances(PROCESS_DEFINITION_KEY, -6, 5, 10, TENANT_ONE);
 
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
@@ -134,10 +134,109 @@ public class MultiTenancyCleanableHistoricProcessInstanceReportCmdTenantCheckTes
     assertEquals(TENANT_TWO, reportResults.get(1).getTenantId());
   }
 
+  @Test
+  public void testReportTenantIdInNoAuthenticatedTenants() {
+    // given
+    testRule.deployForTenant(TENANT_ONE, BPMN_PROCESS);
+    testRule.deployForTenant(TENANT_TWO, BPMN_PROCESS);
+
+    prepareProcessInstances(PROCESS_DEFINITION_KEY, -6, 5, 10, TENANT_ONE);
+    prepareProcessInstances(PROCESS_DEFINITION_KEY, -6, 5, 10, TENANT_TWO);
+
+    identityService.setAuthentication("user", null, null);
+
+    // when
+    List<CleanableHistoricProcessInstanceReportResult> reportResultsOne = historyService.createCleanableHistoricProcessInstanceReport().tenantIdIn(TENANT_ONE).list();
+    List<CleanableHistoricProcessInstanceReportResult> reportResultsTwo = historyService.createCleanableHistoricProcessInstanceReport().tenantIdIn(TENANT_TWO).list();
+
+    // then
+    assertEquals(0, reportResultsOne.size());
+    assertEquals(0, reportResultsTwo.size());
+  }
+
+  @Test
+  public void testReportTenantIdInWithAuthenticatedTenants() {
+    // given
+    testRule.deployForTenant(TENANT_ONE, BPMN_PROCESS);
+    testRule.deployForTenant(TENANT_TWO, BPMN_PROCESS);
+
+    prepareProcessInstances(PROCESS_DEFINITION_KEY, -6, 5, 10, TENANT_ONE);
+    prepareProcessInstances(PROCESS_DEFINITION_KEY, -6, 5, 10, TENANT_TWO);
+
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+
+    // when
+    List<CleanableHistoricProcessInstanceReportResult> reportResultsOne = historyService.createCleanableHistoricProcessInstanceReport().tenantIdIn(TENANT_ONE).list();
+    List<CleanableHistoricProcessInstanceReportResult> reportResultsTwo = historyService.createCleanableHistoricProcessInstanceReport().tenantIdIn(TENANT_TWO).list();
+
+    // then
+    assertEquals(1, reportResultsOne.size());
+    assertEquals(TENANT_ONE, reportResultsOne.get(0).getTenantId());
+    assertEquals(0, reportResultsTwo.size());
+  }
+
+  @Test
+  public void testReportTenantIdInDisabledTenantCheck() {
+    // given
+    testRule.deployForTenant(TENANT_ONE, BPMN_PROCESS);
+    testRule.deployForTenant(TENANT_TWO, BPMN_PROCESS);
+
+    prepareProcessInstances(PROCESS_DEFINITION_KEY, -6, 5, 10, TENANT_ONE);
+    prepareProcessInstances(PROCESS_DEFINITION_KEY, -6, 5, 10, TENANT_TWO);
+
+    identityService.setAuthentication("user", null, null);
+    processEngineConfiguration.setTenantCheckEnabled(false);
+
+    // when
+    List<CleanableHistoricProcessInstanceReportResult> reportResultsOne = historyService.createCleanableHistoricProcessInstanceReport().tenantIdIn(TENANT_ONE).list();
+    List<CleanableHistoricProcessInstanceReportResult> reportResultsTwo = historyService.createCleanableHistoricProcessInstanceReport().tenantIdIn(TENANT_TWO).list();
+
+    // then
+    assertEquals(1, reportResultsOne.size());
+    assertEquals(TENANT_ONE, reportResultsOne.get(0).getTenantId());
+    assertEquals(1, reportResultsTwo.size());
+    assertEquals(TENANT_TWO, reportResultsTwo.get(0).getTenantId());
+  }
+
+  @Test
+  public void testReportWithoutTenantId() {
+    // given
+    testRule.deploy(BPMN_PROCESS);
+
+    prepareProcessInstances(PROCESS_DEFINITION_KEY, -6, 5, 10, null);
+
+    // when
+    List<CleanableHistoricProcessInstanceReportResult> reportResults = historyService.createCleanableHistoricProcessInstanceReport().withoutTenantId().list();
+
+    // then
+    assertEquals(1, reportResults.size());
+    assertEquals(null, reportResults.get(0).getTenantId());
+  }
+
+  @Test
+  public void testReportTenantIdInWithoutTenantId() {
+    // given
+    testRule.deploy(BPMN_PROCESS);
+    testRule.deployForTenant(TENANT_ONE, BPMN_PROCESS);
+
+    prepareProcessInstances(PROCESS_DEFINITION_KEY, -6, 5, 10, TENANT_ONE);
+    prepareProcessInstances(PROCESS_DEFINITION_KEY, -6, 5, 10, null);
+
+    // when
+    List<CleanableHistoricProcessInstanceReportResult> reportResults = historyService.createCleanableHistoricProcessInstanceReport().withoutTenantId().list();
+    List<CleanableHistoricProcessInstanceReportResult> reportResultsOne = historyService.createCleanableHistoricProcessInstanceReport().tenantIdIn(TENANT_ONE).list();
+
+    // then
+    assertEquals(1, reportResults.size());
+    assertEquals(null, reportResults.get(0).getTenantId());
+    assertEquals(1, reportResultsOne.size());
+    assertEquals(TENANT_ONE, reportResultsOne.get(0).getTenantId());
+  }
+
   protected void prepareProcessInstances(String key, int daysInThePast, Integer historyTimeToLive, int instanceCount, String tenantId) {
     List<ProcessDefinition> processDefinitions = null;
     if (tenantId == null) {
-      processDefinitions = repositoryService.createProcessDefinitionQuery().processDefinitionKey(key).list();
+      processDefinitions = repositoryService.createProcessDefinitionQuery().processDefinitionKey(key).withoutTenantId().list();
     } else {
       processDefinitions = repositoryService.createProcessDefinitionQuery().processDefinitionKey(key).tenantIdIn(tenantId).list();
     }
@@ -152,7 +251,7 @@ public class MultiTenancyCleanableHistoricProcessInstanceReportCmdTenantCheckTes
       for (int i = 0; i < instanceCount; i++) {
         String processInstanceId = null;
         if (tenantId == null) {
-          processInstanceId = runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY).getId();
+          processInstanceId = runtimeService.createProcessInstanceByKey(PROCESS_DEFINITION_KEY).processDefinitionWithoutTenantId().execute().getId();
         } else {
           processInstanceId = runtimeService.createProcessInstanceByKey(PROCESS_DEFINITION_KEY).processDefinitionTenantId(tenantId).execute().getId();
         }

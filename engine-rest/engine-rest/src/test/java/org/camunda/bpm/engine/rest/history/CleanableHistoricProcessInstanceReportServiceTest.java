@@ -23,7 +23,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
 
@@ -51,6 +53,10 @@ public class CleanableHistoricProcessInstanceReportServiceTest extends AbstractR
   private static final long EXAMPLE_FINISHED_PI_COUNT = 10l;
   private static final long EXAMPLE_CLEANABLE_PI_COUNT = 5l;
   private static final String EXAMPLE_TENANT_ID = "aTenantId";
+
+  protected static final String ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID = "anotherDefId";
+  protected static final String ANOTHER_EXAMPLE_PD_KEY = "anotherDefKey";
+  protected static final String ANOTHER_EXAMPLE_TENANT_ID = "anotherTenantId";
 
   @ClassRule
   public static TestContainerRule rule = new TestContainerRule();
@@ -85,14 +91,14 @@ public class CleanableHistoricProcessInstanceReportServiceTest extends AbstractR
 
     CleanableHistoricProcessInstanceReportResult anotherReportResult = mock(CleanableHistoricProcessInstanceReportResult.class);
 
-    when(anotherReportResult.getProcessDefinitionId()).thenReturn("pdId");
-    when(anotherReportResult.getProcessDefinitionKey()).thenReturn("pdKey");
+    when(anotherReportResult.getProcessDefinitionId()).thenReturn(ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID);
+    when(anotherReportResult.getProcessDefinitionKey()).thenReturn(ANOTHER_EXAMPLE_PD_KEY);
     when(anotherReportResult.getProcessDefinitionName()).thenReturn("pdName");
     when(anotherReportResult.getProcessDefinitionVersion()).thenReturn(33);
     when(anotherReportResult.getHistoryTimeToLive()).thenReturn(null);
     when(anotherReportResult.getFinishedProcessInstanceCount()).thenReturn(13l);
     when(anotherReportResult.getCleanableProcessInstanceCount()).thenReturn(0l);
-    when(anotherReportResult.getTenantId()).thenReturn("piTenantId");
+    when(anotherReportResult.getTenantId()).thenReturn(ANOTHER_EXAMPLE_TENANT_ID);
 
     List<CleanableHistoricProcessInstanceReportResult> mocks = new ArrayList<CleanableHistoricProcessInstanceReportResult>();
     mocks.add(reportResult);
@@ -169,16 +175,9 @@ public class CleanableHistoricProcessInstanceReportServiceTest extends AbstractR
   }
 
   @Test
-  public void testListParameters() {
-    String aProcDefId = "anProcDefId";
-    String anotherProcDefId = "anotherProcDefId";
-
-    String aProcDefKey = "anProcDefKey";
-    String anotherProcDefKey = "anotherProcDefKey";
-
+  public void testQueryByDefinitionId() {
     given()
-      .queryParam("processDefinitionIdIn", aProcDefId + "," + anotherProcDefId)
-      .queryParam("processDefinitionKeyIn", aProcDefKey + "," + anotherProcDefKey)
+      .queryParam("processDefinitionIdIn",  EXAMPLE_PROCESS_DEFINITION_ID + "," + ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
     .then()
       .expect()
         .statusCode(Status.OK.getStatusCode())
@@ -186,8 +185,67 @@ public class CleanableHistoricProcessInstanceReportServiceTest extends AbstractR
       .when()
         .get(HISTORIC_REPORT_URL);
 
-    verify(historicProcessInstanceReport).processDefinitionIdIn(aProcDefId, anotherProcDefId);
-    verify(historicProcessInstanceReport).processDefinitionKeyIn(aProcDefKey, anotherProcDefKey);
+    verify(historicProcessInstanceReport).processDefinitionIdIn(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID);
+    verify(historicProcessInstanceReport).list();
+  }
+
+  @Test
+  public void testQueryByDefinitionKey() {
+    given()
+      .queryParam("processDefinitionKeyIn", EXAMPLE_PD_KEY + "," + ANOTHER_EXAMPLE_PD_KEY)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .contentType(ContentType.JSON)
+      .when()
+        .get(HISTORIC_REPORT_URL);
+
+    verify(historicProcessInstanceReport).processDefinitionKeyIn(EXAMPLE_PD_KEY, ANOTHER_EXAMPLE_PD_KEY);
+    verify(historicProcessInstanceReport).list();
+  }
+
+  @Test
+  public void testQueryByTenantId() {
+    given()
+      .queryParam("tenantIdIn", EXAMPLE_TENANT_ID + "," + ANOTHER_EXAMPLE_TENANT_ID)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .contentType(ContentType.JSON)
+      .when()
+        .get(HISTORIC_REPORT_URL);
+
+    verify(historicProcessInstanceReport).tenantIdIn(EXAMPLE_TENANT_ID, ANOTHER_EXAMPLE_TENANT_ID);
+    verify(historicProcessInstanceReport).list();
+  }
+
+  @Test
+  public void testQueryWithoutTenantId() {
+    given()
+      .queryParam("withoutTenantId", true)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .contentType(ContentType.JSON)
+      .when()
+        .get(HISTORIC_REPORT_URL);
+
+    verify(historicProcessInstanceReport).withoutTenantId();
+    verify(historicProcessInstanceReport).list();
+  }
+
+  @Test
+  public void testFullQuery() {
+    given()
+      .params(getCompleteQueryParameters())
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .contentType(ContentType.JSON)
+      .when()
+        .get(HISTORIC_REPORT_URL);
+
+    verifyQueryParameterInvocations();
     verify(historicProcessInstanceReport).list();
   }
 
@@ -202,4 +260,35 @@ public class CleanableHistoricProcessInstanceReportServiceTest extends AbstractR
     verify(historicProcessInstanceReport).count();
   }
 
+  @Test
+  public void testFullQueryCount() {
+    given()
+      .params(getCompleteQueryParameters())
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .body("count", equalTo(2))
+    .when()
+      .get(HISTORIC_REPORT_COUNT_URL);
+
+    verifyQueryParameterInvocations();
+    verify(historicProcessInstanceReport).count();
+  }
+
+  protected Map<String, Object> getCompleteQueryParameters() {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+
+    parameters.put("processDefinitionIdIn", EXAMPLE_PROCESS_DEFINITION_ID + "," + ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID);
+    parameters.put("processDefinitionKeyIn", EXAMPLE_PD_KEY + "," + ANOTHER_EXAMPLE_PD_KEY);
+    parameters.put("tenantIdIn", EXAMPLE_TENANT_ID + "," + ANOTHER_EXAMPLE_TENANT_ID);
+    parameters.put("withoutTenantId", true);
+
+    return parameters;
+  }
+
+  protected void verifyQueryParameterInvocations() {
+    verify(historicProcessInstanceReport).processDefinitionIdIn(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID);
+    verify(historicProcessInstanceReport).processDefinitionKeyIn(EXAMPLE_PD_KEY, ANOTHER_EXAMPLE_PD_KEY);
+    verify(historicProcessInstanceReport).tenantIdIn(EXAMPLE_TENANT_ID, ANOTHER_EXAMPLE_TENANT_ID);
+    verify(historicProcessInstanceReport).withoutTenantId();
+  }
 }

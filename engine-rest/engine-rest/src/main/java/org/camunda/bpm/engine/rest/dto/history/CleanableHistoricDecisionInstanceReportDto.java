@@ -21,14 +21,17 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.CleanableHistoricDecisionInstanceReport;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
+import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
 import org.camunda.bpm.engine.rest.dto.converter.StringArrayConverter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class CleanableHistoricDecisionInstanceReportDto extends AbstractQueryDto<CleanableHistoricDecisionInstanceReport>{
 
-  private String[] decisionDefinitionIdIn;
-  private String[] decisionDefinitionKeyIn;
+  protected String[] decisionDefinitionIdIn;
+  protected String[] decisionDefinitionKeyIn;
+  protected String[] tenantIdIn;
+  protected Boolean withoutTenantId;
 
   public CleanableHistoricDecisionInstanceReportDto() {
   }
@@ -45,6 +48,16 @@ public class CleanableHistoricDecisionInstanceReportDto extends AbstractQueryDto
   @CamundaQueryParam(value = "decisionDefinitionKeyIn", converter = StringArrayConverter.class)
   public void setDecisionDefinitionKeyIn(String[] decisionDefinitionKeyIn) {
     this.decisionDefinitionKeyIn = decisionDefinitionKeyIn;
+  }
+
+  @CamundaQueryParam(value = "tenantIdIn", converter = StringArrayConverter.class)
+  public void setTenantIdIn(String[] tenantIdIn) {
+    this.tenantIdIn = tenantIdIn;
+  }
+
+  @CamundaQueryParam(value = "withoutTenantId", converter = BooleanConverter.class)
+  public void setWithoutTenantId(Boolean withoutTenantId) {
+    this.withoutTenantId = withoutTenantId;
   }
 
   @Override
@@ -65,7 +78,12 @@ public class CleanableHistoricDecisionInstanceReportDto extends AbstractQueryDto
     if (decisionDefinitionKeyIn != null && decisionDefinitionKeyIn.length > 0) {
       query.decisionDefinitionKeyIn(decisionDefinitionKeyIn);
     }
-
+    if (Boolean.TRUE.equals(withoutTenantId)) {
+      query.withoutTenantId();
+    }
+    if (tenantIdIn != null && tenantIdIn.length > 0) {
+      query.tenantIdIn(tenantIdIn);
+    }
   }
 
   @Override

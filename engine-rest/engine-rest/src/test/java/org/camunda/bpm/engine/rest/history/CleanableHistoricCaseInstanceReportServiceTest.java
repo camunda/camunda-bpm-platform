@@ -23,7 +23,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
 
@@ -52,6 +54,10 @@ public class CleanableHistoricCaseInstanceReportServiceTest extends AbstractRest
   private static final long EXAMPLE_FINISHED_CI_COUNT = 10l;
   private static final long EXAMPLE_CLEANABLE_CI_COUNT = 5l;
   private static final String EXAMPLE_TENANT_ID = "aTenantId";
+
+  protected static final String ANOTHER_EXAMPLE_CD_ID = "anotherCaseDefId";
+  protected static final String ANOTHER_EXAMPLE_CD_KEY = "anotherCaseDefKey";
+  protected static final String ANOTHER_EXAMPLE_TENANT_ID = "anotherTenantId";
 
   @ClassRule
   public static TestContainerRule rule = new TestContainerRule();
@@ -86,14 +92,14 @@ public class CleanableHistoricCaseInstanceReportServiceTest extends AbstractRest
 
     CleanableHistoricCaseInstanceReportResult anotherReportResult = mock(CleanableHistoricCaseInstanceReportResult.class);
 
-    when(anotherReportResult.getCaseDefinitionId()).thenReturn("pdId");
-    when(anotherReportResult.getCaseDefinitionKey()).thenReturn("pdKey");
-    when(anotherReportResult.getCaseDefinitionName()).thenReturn("pdName");
+    when(anotherReportResult.getCaseDefinitionId()).thenReturn(ANOTHER_EXAMPLE_CD_ID);
+    when(anotherReportResult.getCaseDefinitionKey()).thenReturn(ANOTHER_EXAMPLE_CD_KEY);
+    when(anotherReportResult.getCaseDefinitionName()).thenReturn("cdName");
     when(anotherReportResult.getCaseDefinitionVersion()).thenReturn(33);
     when(anotherReportResult.getHistoryTimeToLive()).thenReturn(null);
     when(anotherReportResult.getFinishedCaseInstanceCount()).thenReturn(13l);
     when(anotherReportResult.getCleanableCaseInstanceCount()).thenReturn(0l);
-    when(anotherReportResult.getTenantId()).thenReturn("piTenantId");
+    when(anotherReportResult.getTenantId()).thenReturn(ANOTHER_EXAMPLE_TENANT_ID);
 
 
     List<CleanableHistoricCaseInstanceReportResult> mocks = new ArrayList<CleanableHistoricCaseInstanceReportResult>();
@@ -171,16 +177,9 @@ public class CleanableHistoricCaseInstanceReportServiceTest extends AbstractRest
   }
 
   @Test
-  public void testListParameters() {
-    String aCaseDefId = "anCaseDefId";
-    String anotherCaseDefId = "anotherCaseDefId";
-
-    String aCaseDefKey = "anCaseDefKey";
-    String anotherCaseDefKey = "anotherCaseDefKey";
-
+  public void testQueryByDefinitionId() {
     given()
-      .queryParam("caseDefinitionIdIn", aCaseDefId + "," + anotherCaseDefId)
-      .queryParam("caseDefinitionKeyIn", aCaseDefKey + "," + anotherCaseDefKey)
+      .queryParam("caseDefinitionIdIn",  EXAMPLE_CD_ID + "," + ANOTHER_EXAMPLE_CD_ID)
     .then()
       .expect()
         .statusCode(Status.OK.getStatusCode())
@@ -188,8 +187,66 @@ public class CleanableHistoricCaseInstanceReportServiceTest extends AbstractRest
       .when()
         .get(HISTORIC_REPORT_URL);
 
-    verify(historicCaseInstanceReport).caseDefinitionIdIn(aCaseDefId, anotherCaseDefId);
-    verify(historicCaseInstanceReport).caseDefinitionKeyIn(aCaseDefKey, anotherCaseDefKey);
+    verify(historicCaseInstanceReport).caseDefinitionIdIn(EXAMPLE_CD_ID, ANOTHER_EXAMPLE_CD_ID);
+    verify(historicCaseInstanceReport).list();
+  }
+  @Test
+  public void testQueryByDefinitionKey() {
+    given()
+      .queryParam("caseDefinitionKeyIn", EXAMPLE_CD_KEY + "," + ANOTHER_EXAMPLE_CD_KEY)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .contentType(ContentType.JSON)
+      .when()
+        .get(HISTORIC_REPORT_URL);
+
+    verify(historicCaseInstanceReport).caseDefinitionKeyIn(EXAMPLE_CD_KEY, ANOTHER_EXAMPLE_CD_KEY);
+    verify(historicCaseInstanceReport).list();
+  }
+
+  @Test
+  public void testQueryByTenantId() {
+    given()
+      .queryParam("tenantIdIn", EXAMPLE_TENANT_ID + "," + ANOTHER_EXAMPLE_TENANT_ID)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .contentType(ContentType.JSON)
+      .when()
+        .get(HISTORIC_REPORT_URL);
+
+    verify(historicCaseInstanceReport).tenantIdIn(EXAMPLE_TENANT_ID, ANOTHER_EXAMPLE_TENANT_ID);
+    verify(historicCaseInstanceReport).list();
+  }
+
+  @Test
+  public void testQueryWithoutTenantId() {
+    given()
+      .queryParam("withoutTenantId", true)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .contentType(ContentType.JSON)
+      .when()
+        .get(HISTORIC_REPORT_URL);
+
+    verify(historicCaseInstanceReport).withoutTenantId();
+    verify(historicCaseInstanceReport).list();
+  }
+
+  @Test
+  public void testFullQuery() {
+    given()
+      .params(getCompleteQueryParameters())
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .contentType(ContentType.JSON)
+      .when()
+        .get(HISTORIC_REPORT_URL);
+
+    verifyQueryParameterInvocations();
     verify(historicCaseInstanceReport).list();
   }
 
@@ -202,5 +259,37 @@ public class CleanableHistoricCaseInstanceReportServiceTest extends AbstractRest
       .get(HISTORIC_REPORT_COUNT_URL);
 
     verify(historicCaseInstanceReport).count();
+  }
+
+  @Test
+  public void testFullQueryCount() {
+    given()
+      .params(getCompleteQueryParameters())
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .body("count", equalTo(2))
+    .when()
+      .get(HISTORIC_REPORT_COUNT_URL);
+
+    verifyQueryParameterInvocations();
+    verify(historicCaseInstanceReport).count();
+  }
+
+  protected Map<String, Object> getCompleteQueryParameters() {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+
+    parameters.put("caseDefinitionIdIn", EXAMPLE_CD_ID + "," + ANOTHER_EXAMPLE_CD_ID);
+    parameters.put("caseDefinitionKeyIn", EXAMPLE_CD_KEY + "," + ANOTHER_EXAMPLE_CD_KEY);
+    parameters.put("tenantIdIn", EXAMPLE_TENANT_ID + "," + ANOTHER_EXAMPLE_TENANT_ID);
+    parameters.put("withoutTenantId", true);
+
+    return parameters;
+  }
+
+  protected void verifyQueryParameterInvocations() {
+    verify(historicCaseInstanceReport).caseDefinitionIdIn(EXAMPLE_CD_ID, ANOTHER_EXAMPLE_CD_ID);
+    verify(historicCaseInstanceReport).caseDefinitionKeyIn(EXAMPLE_CD_KEY, ANOTHER_EXAMPLE_CD_KEY);
+    verify(historicCaseInstanceReport).tenantIdIn(EXAMPLE_TENANT_ID, ANOTHER_EXAMPLE_TENANT_ID);
+    verify(historicCaseInstanceReport).withoutTenantId();
   }
 }

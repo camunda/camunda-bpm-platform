@@ -78,7 +78,7 @@ public class MultiTenancyCleanableHistoricDecisionInstanceReportCmdTenantCheckTe
   public void testReportNoAuthenticatedTenants() {
     // given
     testRule.deployForTenant(TENANT_ONE, DMN_MODEL);
-    prepareDecisionInstances(DECISION_DEFINITION_KEY, -6, 5, 10, null);
+    prepareDecisionInstances(DECISION_DEFINITION_KEY, -6, 5, 10, TENANT_ONE);
     identityService.setAuthentication("user", null, null);
 
     // when
@@ -92,7 +92,7 @@ public class MultiTenancyCleanableHistoricDecisionInstanceReportCmdTenantCheckTe
   public void testReportWithAuthenticatedTenants() {
     // given
     testRule.deployForTenant(TENANT_ONE, DMN_MODEL);
-    prepareDecisionInstances(DECISION_DEFINITION_KEY, -6, 5, 10, null);
+    prepareDecisionInstances(DECISION_DEFINITION_KEY, -6, 5, 10, TENANT_ONE);
     identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
     // when
@@ -122,12 +122,111 @@ public class MultiTenancyCleanableHistoricDecisionInstanceReportCmdTenantCheckTe
     assertEquals(TENANT_TWO, reportResults.get(1).getTenantId());
   }
 
+  @Test
+  public void testReportTenantIdInNoAuthenticatedTenants() {
+    // given
+    testRule.deployForTenant(TENANT_ONE, DMN_MODEL);
+    testRule.deployForTenant(TENANT_TWO, DMN_MODEL);
+
+    prepareDecisionInstances(DECISION_DEFINITION_KEY, -6, 5, 10, TENANT_ONE);
+    prepareDecisionInstances(DECISION_DEFINITION_KEY, -6, 5, 10, TENANT_TWO);
+
+    identityService.setAuthentication("user", null, null);
+
+    // when
+    List<CleanableHistoricDecisionInstanceReportResult> reportResultsOne = historyService.createCleanableHistoricDecisionInstanceReport().tenantIdIn(TENANT_ONE).list();
+    List<CleanableHistoricDecisionInstanceReportResult> reportResultsTwo = historyService.createCleanableHistoricDecisionInstanceReport().tenantIdIn(TENANT_TWO).list();
+
+    // then
+    assertEquals(0, reportResultsOne.size());
+    assertEquals(0, reportResultsTwo.size());
+  }
+
+  @Test
+  public void testReportTenantIdInWithAuthenticatedTenants() {
+    // given
+    testRule.deployForTenant(TENANT_ONE, DMN_MODEL);
+    testRule.deployForTenant(TENANT_TWO, DMN_MODEL);
+
+    prepareDecisionInstances(DECISION_DEFINITION_KEY, -6, 5, 10, TENANT_ONE);
+    prepareDecisionInstances(DECISION_DEFINITION_KEY, -6, 5, 10, TENANT_TWO);
+
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+
+    // when
+    List<CleanableHistoricDecisionInstanceReportResult> reportResultsOne = historyService.createCleanableHistoricDecisionInstanceReport().tenantIdIn(TENANT_ONE).list();
+    List<CleanableHistoricDecisionInstanceReportResult> reportResultsTwo = historyService.createCleanableHistoricDecisionInstanceReport().tenantIdIn(TENANT_TWO).list();
+
+    // then
+    assertEquals(1, reportResultsOne.size());
+    assertEquals(TENANT_ONE, reportResultsOne.get(0).getTenantId());
+    assertEquals(0, reportResultsTwo.size());
+  }
+
+  @Test
+  public void testReportTenantIdInDisabledTenantCheck() {
+    // given
+    testRule.deployForTenant(TENANT_ONE, DMN_MODEL);
+    testRule.deployForTenant(TENANT_TWO, DMN_MODEL);
+
+    prepareDecisionInstances(DECISION_DEFINITION_KEY, -6, 5, 10, TENANT_ONE);
+    prepareDecisionInstances(DECISION_DEFINITION_KEY, -6, 5, 10, TENANT_TWO);
+
+    identityService.setAuthentication("user", null, null);
+    processEngineConfiguration.setTenantCheckEnabled(false);
+
+    // when
+    List<CleanableHistoricDecisionInstanceReportResult> reportResultsOne = historyService.createCleanableHistoricDecisionInstanceReport().tenantIdIn(TENANT_ONE).list();
+    List<CleanableHistoricDecisionInstanceReportResult> reportResultsTwo = historyService.createCleanableHistoricDecisionInstanceReport().tenantIdIn(TENANT_TWO).list();
+
+    // then
+    assertEquals(1, reportResultsOne.size());
+    assertEquals(TENANT_ONE, reportResultsOne.get(0).getTenantId());
+    assertEquals(1, reportResultsTwo.size());
+    assertEquals(TENANT_TWO, reportResultsTwo.get(0).getTenantId());
+  }
+
+  @Test
+  public void testReportWithoutTenantId() {
+    // given
+    testRule.deploy(DMN_MODEL);
+
+    prepareDecisionInstances(DECISION_DEFINITION_KEY, -6, 5, 10, null);
+
+    // when
+    List<CleanableHistoricDecisionInstanceReportResult> reportResults = historyService.createCleanableHistoricDecisionInstanceReport().withoutTenantId().list();
+
+    // then
+    assertEquals(1, reportResults.size());
+    assertEquals(null, reportResults.get(0).getTenantId());
+  }
+
+  @Test
+  public void testReportTenantIdInWithoutTenantId() {
+    // given
+    testRule.deploy(DMN_MODEL);
+    testRule.deployForTenant(TENANT_ONE, DMN_MODEL);
+
+    prepareDecisionInstances(DECISION_DEFINITION_KEY, -6, 5, 10, null);
+    prepareDecisionInstances(DECISION_DEFINITION_KEY, -6, 5, 10, TENANT_ONE);
+
+    // when
+    List<CleanableHistoricDecisionInstanceReportResult> reportResults = historyService.createCleanableHistoricDecisionInstanceReport().withoutTenantId().list();
+    List<CleanableHistoricDecisionInstanceReportResult> reportResultsOne = historyService.createCleanableHistoricDecisionInstanceReport().tenantIdIn(TENANT_ONE).list();
+
+    // then
+    assertEquals(1, reportResults.size());
+    assertEquals(null, reportResults.get(0).getTenantId());
+    assertEquals(1, reportResultsOne.size());
+    assertEquals(TENANT_ONE, reportResultsOne.get(0).getTenantId());
+  }
+
   protected void prepareDecisionInstances(String key, int daysInThePast, Integer historyTimeToLive, int instanceCount, String tenantId) {
     List<DecisionDefinition> decisionDefinitions = null;
     if (tenantId != null) {
       decisionDefinitions = repositoryService.createDecisionDefinitionQuery().decisionDefinitionKey(key).tenantIdIn(tenantId).list();
     } else {
-      decisionDefinitions = repositoryService.createDecisionDefinitionQuery().decisionDefinitionKey(key).list();
+      decisionDefinitions = repositoryService.createDecisionDefinitionQuery().decisionDefinitionKey(key).withoutTenantId().list();
     }
     assertEquals(1, decisionDefinitions.size());
     repositoryService.updateDecisionDefinitionHistoryTimeToLive(decisionDefinitions.get(0).getId(), historyTimeToLive);
@@ -140,10 +239,11 @@ public class MultiTenancyCleanableHistoricDecisionInstanceReportCmdTenantCheckTe
       if (tenantId != null) {
         engineRule.getDecisionService().evaluateDecisionByKey(key).decisionDefinitionTenantId(tenantId).variables(variables).evaluate();
       } else {
-        engineRule.getDecisionService().evaluateDecisionByKey(key).variables(variables).evaluate();
+        engineRule.getDecisionService().evaluateDecisionByKey(key).decisionDefinitionWithoutTenantId().variables(variables).evaluate();
       }
     }
 
     ClockUtil.setCurrentTime(oldCurrentTime);
   }
+
 }
