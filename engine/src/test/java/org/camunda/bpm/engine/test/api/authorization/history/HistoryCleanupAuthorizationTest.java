@@ -113,7 +113,7 @@ public class HistoryCleanupAuthorizationTest extends AuthorizationTest {
     repositoryService.updateCaseDefinitionHistoryTimeToLive(caseDefinitions.get(0).getId(), caseTimeToLive);
 
     Date oldCurrentTime = ClockUtil.getCurrentTime();
-    ClockUtil.setCurrentTime(DateUtils.addDays(new Date(), -6));
+    ClockUtil.setCurrentTime(DateUtils.addDays(oldCurrentTime, -6));
 
     // create 3 process instances
     List<String> processInstanceIds = new ArrayList<String>();
