@@ -10,17 +10,25 @@ module.exports = ['camAPI', '$window' , 'Notifications', function(camAPI, $windo
     template: template,
     scope: {
       definition: '=timeToLive',
+      customOnChange: '=onChange',
       resource: '@'
     },
     link: function($scope) {
       var lastValue = getAndCorrectTimeToLiveValue();
       var resource = camAPI.resource($scope.resource);
 
+      function customOnChange() {
+        if(typeof $scope.customOnChange === 'function' ) {
+          $scope.customOnChange();
+        }
+      }
+
       $scope.onChange = function() {
         $window.setTimeout(function() {
           var timeToLive = getAndCorrectTimeToLiveValue();
 
-          updateValue(timeToLive);
+          updateValue(timeToLive)
+            .then(customOnChange);
         });
       };
 
@@ -29,6 +37,7 @@ module.exports = ['camAPI', '$window' , 'Notifications', function(camAPI, $windo
           .then(function() {
             lastValue = null;
             $scope.definition.historyTimeToLive = null;
+            customOnChange();
           });
       };
 
