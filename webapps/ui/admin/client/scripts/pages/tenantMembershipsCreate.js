@@ -197,9 +197,7 @@ module.exports = [
       };
 
       angular.forEach(selectedTenantIds, function(tenantId) {
-        createMembershipObj.id = tenantId
-                                    .replace(/\//g, '%2F')
-                                    .replace(/\\/g, '%5C');
+        createMembershipObj.id = tenantId;
 
         if( typeof createMembershipObj.userId === 'string' ) {
           TenantResource.createUserMember(createMembershipObj, cb);
