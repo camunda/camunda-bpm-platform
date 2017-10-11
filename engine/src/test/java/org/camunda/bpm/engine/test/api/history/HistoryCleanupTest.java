@@ -230,41 +230,45 @@ public class HistoryCleanupTest {
 
   @Test
   public void testHistoryCleanupMetricsExtend() {
+    Date currentDate = new Date();
     // given
     processEngineConfiguration.setHistoryCleanupMetricsEnabled(true);
     prepareData(15);
 
-    ClockUtil.setCurrentTime(new Date());
+    ClockUtil.setCurrentTime(currentDate);
     // when
     String jobId = historyService.cleanUpHistoryAsync(true).getId();
 
     managementService.executeJob(jobId);
 
+    // assume
+    assertResult(0);
+
     // then
     MetricsQuery processMetricsQuery = managementService.createMetricsQuery().name(Metrics.HISTORY_CLEANUP_REMOVED_PROCESS_INSTANCES);
-    long removedProcessInstances = processMetricsQuery.startDate(DateUtils.addDays(new Date(), DAYS_IN_THE_PAST)).endDate(new Date()).sum();
+    long removedProcessInstances = processMetricsQuery.startDate(DateUtils.addDays(currentDate, DAYS_IN_THE_PAST)).endDate(DateUtils.addHours(currentDate, 1)).sum();
     assertEquals(5, removedProcessInstances);
     MetricsQuery decisionMetricsQuery = managementService.createMetricsQuery().name(Metrics.HISTORY_CLEANUP_REMOVED_DECISION_INSTANCES);
-    long removedDecisionInstances = decisionMetricsQuery.startDate(DateUtils.addDays(new Date(), DAYS_IN_THE_PAST)).endDate(new Date()).sum();
+    long removedDecisionInstances = decisionMetricsQuery.startDate(DateUtils.addDays(currentDate, DAYS_IN_THE_PAST)).endDate(DateUtils.addHours(currentDate, 1)).sum();
     assertEquals(5, removedDecisionInstances);
     MetricsQuery caseMetricsQuery = managementService.createMetricsQuery().name(Metrics.HISTORY_CLEANUP_REMOVED_CASE_INSTANCES);
-    long removedCaseInstances = caseMetricsQuery.startDate(DateUtils.addDays(new Date(), DAYS_IN_THE_PAST)).endDate(new Date()).sum();
+    long removedCaseInstances = caseMetricsQuery.startDate(DateUtils.addDays(currentDate, DAYS_IN_THE_PAST)).endDate(DateUtils.addHours(currentDate, 1)).sum();
     assertEquals(5, removedCaseInstances);
 
-    long noneProcessInstances = processMetricsQuery.startDate(new Date()).limit(1).sum();
+    long noneProcessInstances = processMetricsQuery.startDate(DateUtils.addHours(currentDate, 1)).limit(1).sum();
     assertEquals(0, noneProcessInstances);
-    long noneDecisionInstances = decisionMetricsQuery.startDate(new Date()).limit(1).sum();
+    long noneDecisionInstances = decisionMetricsQuery.startDate(DateUtils.addHours(currentDate, 1)).limit(1).sum();
     assertEquals(0, noneDecisionInstances);
-    long noneCaseInstances = caseMetricsQuery.startDate(new Date()).limit(1).sum();
+    long noneCaseInstances = caseMetricsQuery.startDate(DateUtils.addHours(currentDate, 1)).limit(1).sum();
     assertEquals(0, noneCaseInstances);
 
-    List<MetricIntervalValue> piList = processMetricsQuery.startDate(DateUtils.addDays(new Date(), DAYS_IN_THE_PAST)).interval(900);
+    List<MetricIntervalValue> piList = processMetricsQuery.startDate(currentDate).interval(900);
     assertEquals(1, piList.size());
     assertEquals(5, piList.get(0).getValue());
-    List<MetricIntervalValue> diList = decisionMetricsQuery.startDate(DateUtils.addDays(new Date(), DAYS_IN_THE_PAST)).interval(900);
+    List<MetricIntervalValue> diList = decisionMetricsQuery.startDate(DateUtils.addDays(currentDate, DAYS_IN_THE_PAST)).interval(900);
     assertEquals(1, diList.size());
     assertEquals(5, diList.get(0).getValue());
-    List<MetricIntervalValue> ciList = caseMetricsQuery.startDate(DateUtils.addDays(new Date(), DAYS_IN_THE_PAST)).interval(900);
+    List<MetricIntervalValue> ciList = caseMetricsQuery.startDate(DateUtils.addDays(currentDate, DAYS_IN_THE_PAST)).interval(900);
     assertEquals(1, ciList.size());
     assertEquals(5, ciList.get(0).getValue());
   }
