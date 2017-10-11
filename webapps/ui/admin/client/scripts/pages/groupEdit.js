@@ -17,6 +17,7 @@ var Controller = [
   'Notifications',
   '$location',
   '$modal',
+  'unescape',
   function(
     $scope,
     pageService,
@@ -25,7 +26,8 @@ var Controller = [
     camAPI,
     Notifications,
     $location,
-    $modal
+    $modal,
+    unescape
   ) {
 
     var AuthorizationResource = camAPI.resource('authorization'),
@@ -42,12 +44,6 @@ var Controller = [
       });
     };
 
-    var encodeId = function(id) {
-      return id
-        .replace(/\//g, '%2F')
-        .replace(/\\/g, '%5C');
-    };
-
     $scope.$root.showBreadcrumbs = true;
 
     pageService.titleSet('Group');
@@ -55,7 +51,8 @@ var Controller = [
 
     $scope.group = null;
     $scope.groupName = null;
-    $scope.encodedGroupId = encodeId($routeParams.groupId);
+
+    $scope.decodedGroupId = unescape(encodeURIComponent($routeParams.groupId));
 
     $scope.availableOperations = {};
     $scope.groupUserList = null;
@@ -77,7 +74,7 @@ var Controller = [
 
     var loadGroup = $scope.loadGroup = function() {
       $scope.groupLoadingState = 'LOADING';
-      GroupResource.get({ id : $scope.encodedGroupId }, function(err, res) {
+      GroupResource.get({ id : $scope.decodedGroupId }, function(err, res) {
         $scope.groupLoadingState = 'LOADED';
         $scope.group = res;
         $scope.groupName = (res.name ? res.name : res.id);
@@ -131,7 +128,7 @@ var Controller = [
 
     var updateGroupUserView = function() {
       var pagingParams = preparePaging(groupUserPages);
-      var searchParams = { memberOfGroup : $scope.encodedGroupId };
+      var searchParams = { memberOfGroup : $scope.decodedGroupId };
 
       $scope.userLoadingState = 'LOADING';
       UserResource.list(angular.extend({}, searchParams, pagingParams), function(err, res) {
@@ -150,7 +147,7 @@ var Controller = [
 
     var updateGroupTenantView = function() {
       var pagingParams = preparePaging(groupTenantPages);
-      var searchParams = { groupMember : $scope.encodedGroupId };
+      var searchParams = { groupMember : $scope.decodedGroupId };
 
       $scope.tenantLoadingState = 'LOADING';
       TenantResource.list(angular.extend({}, searchParams, pagingParams), function(err, res) {
@@ -185,16 +182,14 @@ var Controller = [
       });
     };
 
-    GroupResource.options({ id: $scope.encodedGroupId }, function(err, res) {
+    GroupResource.options({ id: $scope.decodedGroupId }, function(err, res) {
       angular.forEach(res.links, function(link) {
         $scope.availableOperations[link.rel] = true;
       });
     });
 
     $scope.removeTenant = function(tenantId) {
-      var encodedTenantId = encodeId(tenantId);
-
-      TenantResource.deleteGroupMember({ groupId: $scope.encodedGroupId, id: encodedTenantId }, function() {
+      TenantResource.deleteGroupMember({ groupId: $scope.decodedGroupId, id: tenantId }, function() {
         Notifications.addMessage({
           type:'success',
           status:'Success',
@@ -205,7 +200,7 @@ var Controller = [
     };
 
     $scope.updateGroup = function() {
-      GroupResource.update(angular.extend({}, { groupId: $scope.encodedGroupId }, $scope.group), function(err) {
+      GroupResource.update(angular.extend({}, { groupId: $scope.decodedGroupId }, $scope.group), function(err) {
         if( err === null ) {
           Notifications.addMessage({
             type : 'success',
@@ -232,7 +227,7 @@ var Controller = [
           $dialogScope.question = 'Really delete group ' + $scope.group.id + '?';
         }]
       }).result.then(function() {
-        GroupResource.delete({ id: $scope.encodedGroupId }, function(err) {
+        GroupResource.delete({ id: $scope.decodedGroupId }, function(err) {
           if( err === null ) {
             Notifications.addMessage({
               type : 'success',
@@ -275,7 +270,7 @@ var Controller = [
             return $scope.group;
           },
           memberId : function() {
-            return $scope.encodedGroupId;
+            return $scope.decodedGroupId;
           }
         },
 

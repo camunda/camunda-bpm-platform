@@ -13,21 +13,13 @@ module.exports = [ '$routeProvider', function($routeProvider) {
   $routeProvider.when('/users/:userId', {
     template: template,
     controller: [
-      '$scope', 'page', '$routeParams', 'camAPI', 'Notifications', '$location', '$modal', 'authentication',
-      function($scope,   page,   $routeParams,   camAPI,   Notifications,   $location,   $modal,   authentication) {
+      '$scope', 'page', '$routeParams', 'camAPI', 'Notifications', '$location', '$modal', 'authentication', 'unescape',
+      function($scope,   page,   $routeParams,   camAPI,   Notifications,   $location,   $modal,   authentication, unescape) {
 
         var AuthorizationResource = camAPI.resource('authorization'),
             GroupResource         = camAPI.resource('group'),
             TenantResource        = camAPI.resource('tenant'),
             UserResource          = camAPI.resource('user');
-
-        var encodeId = function(id) {
-          return id
-            .replace(/\//g, '%2F')
-            .replace(/\\/g, '%5C');
-        };
-
-        $scope.encodedUserId = encodeId($routeParams.userId);
 
         var refreshBreadcrumbs = function() {
           page.breadcrumbsClear();
@@ -37,10 +29,8 @@ module.exports = [ '$routeProvider', function($routeProvider) {
           });
         };
 
-        $scope.encodedUserId = encodeId($routeParams.userId);
-        $scope.decodedUserId = $routeParams.userId
-                                                .replace(/%2F/g, '/')
-                                                .replace(/%5C/g, '\\');
+        $scope.decodedUserId = unescape(encodeURIComponent($routeParams.userId));
+
         $scope.authenticatedUser = authentication;
 
         // used to display information about the user
@@ -75,7 +65,7 @@ module.exports = [ '$routeProvider', function($routeProvider) {
 
         // load options ////////////////////////////////////
 
-        UserResource.options({ id : $scope.encodedUserId }, function(err, res) {
+        UserResource.options({ id : $scope.decodedUserId }, function(err, res) {
           angular.forEach(res.links, function(link) {
             $scope.availableOperations[link.rel] = true;
           });
@@ -84,7 +74,7 @@ module.exports = [ '$routeProvider', function($routeProvider) {
         // update profile form /////////////////////////////
 
         var loadProfile = $scope.loadProfile = function() {
-          UserResource.profile({ id : $scope.encodedUserId }, function(err, res) {
+          UserResource.profile({ id : $scope.decodedUserId }, function(err, res) {
             $scope.user = res;
 
             $scope.profile = angular.copy(res);
@@ -102,7 +92,7 @@ module.exports = [ '$routeProvider', function($routeProvider) {
         };
 
         $scope.updateProfile = function() {
-          var resourceData = angular.extend({}, { id : $scope.encodedUserId }, $scope.profile);
+          var resourceData = angular.extend({}, { id : $scope.decodedUserId }, $scope.profile);
           UserResource.updateProfile(resourceData, function(err) {
             if( err === null ) {
               Notifications.addMessage({
@@ -123,21 +113,21 @@ module.exports = [ '$routeProvider', function($routeProvider) {
         };
         // update password form ////////////////////////////
 
-        var resetCredentials = function() {
+        var resetCredentials = function(form) {
           $scope.credentials.authenticatedUserPassword = '';
           $scope.credentials.password = '';
           $scope.credentials.password2 = '';
 
-          $scope.updateCredentialsForm.$setPristine();
+          form.$setPristine();
         };
 
-        $scope.updateCredentials = function() {
+        $scope.updateCredentials = function(form) {
           var credentialsData = {
             authenticatedUserPassword: $scope.credentials.authenticatedUserPassword,
             password: $scope.credentials.password
           };
 
-          var resourceData = angular.extend({}, { id : $scope.encodedUserId }, credentialsData);
+          var resourceData = angular.extend({}, { id : $scope.decodedUserId }, credentialsData);
 
           UserResource.updateCredentials(resourceData, function(err) {
             if( err === null ) {
@@ -148,7 +138,7 @@ module.exports = [ '$routeProvider', function($routeProvider) {
                 duration: 5000,
                 exclusive: true
               });
-              resetCredentials();
+              resetCredentials(form);
 
             } else {
               if( err.status === 400 ) {
@@ -185,7 +175,7 @@ module.exports = [ '$routeProvider', function($routeProvider) {
               $dialogScope.question = 'Really delete user ' + $scope.user.id + '?';
             }]
           }).result.then(function() {
-            UserResource.delete({ id: $scope.encodedUserId }, function() {
+            UserResource.delete({ id: $scope.decodedUserId }, function() {
               Notifications.addMessage({
                 type: 'success',
                 status: 'Success',
@@ -219,9 +209,7 @@ module.exports = [ '$routeProvider', function($routeProvider) {
         };
 
         $scope.removeGroup = function(groupId) {
-          var encodedGroupId = encodeId(groupId);
-
-          GroupResource.deleteMember({ userId: $scope.encodedUserId, id: encodedGroupId}, function() {
+          GroupResource.deleteMember({ userId: $scope.decodedUserId, id: groupId}, function() {
             Notifications.addMessage({
               type:'success',
               status:'Success',
@@ -276,9 +264,7 @@ module.exports = [ '$routeProvider', function($routeProvider) {
         };
 
         $scope.removeTenant = function(tenantId) {
-          var encodedTenantId = encodeId(tenantId);
-
-          TenantResource.deleteUserMember({userId: $scope.encodedUserId, id: encodedTenantId}, function() {
+          TenantResource.deleteUserMember({userId: $scope.decodedUserId, id: tenantId}, function() {
             Notifications.addMessage({
               type:'success',
               status:'Success',
@@ -337,7 +323,7 @@ module.exports = [ '$routeProvider', function($routeProvider) {
                 return $scope.user;
               },
               memberId : function() {
-                return $scope.encodedUserId;
+                return $scope.decodedUserId;
               }
             },
 

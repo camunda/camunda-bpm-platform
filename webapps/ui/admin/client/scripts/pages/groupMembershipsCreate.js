@@ -67,11 +67,7 @@ module.exports = [
       var completeCount = 0;
       var deferred = $q.defer();
       angular.forEach(selectedGroupIds, function(groupId) {
-        var encodedGroupId = groupId
-                                .replace(/\//g, '%2F')
-                                .replace(/\\/g, '%5C');
-
-        GroupResource.createMember({ id: encodedGroupId, userId: $scope.userId }, function(err) {
+        GroupResource.createMember({ id: groupId, userId: $scope.userId }, function(err) {
           completeCount++;
           if( err === null ) {
             if(completeCount == selectedGroupIds.length) {
