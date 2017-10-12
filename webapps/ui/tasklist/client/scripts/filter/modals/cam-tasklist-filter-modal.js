@@ -253,7 +253,7 @@ module.exports = [
         var key = elem.key;
         var value = elem.value;
 
-        if (!isQueryVariable(key)) {
+        if (!isQueryVariable(key) && key !== 'sorting') {
 
           // if key == '...Like' -> value = '%' + value + '%'
           value = fixLike(key, value);
