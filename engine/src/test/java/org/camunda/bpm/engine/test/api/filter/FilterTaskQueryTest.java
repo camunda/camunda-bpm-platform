@@ -33,6 +33,7 @@ import org.camunda.bpm.engine.impl.QueryOrderingProperty;
 import org.camunda.bpm.engine.impl.TaskQueryImpl;
 import org.camunda.bpm.engine.impl.TaskQueryProperty;
 import org.camunda.bpm.engine.impl.TaskQueryVariableValue;
+import org.camunda.bpm.engine.impl.VariableOrderProperty;
 import org.camunda.bpm.engine.impl.json.JsonTaskQueryConverter;
 import org.camunda.bpm.engine.impl.persistence.entity.FilterEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
@@ -1402,6 +1403,33 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(6, filterService.list(extendedFilter.getId()).size());
     assertEquals(4, extendingQuery.list().size());
     assertEquals(3, filterService.list(extendedFilter.getId(), extendingQuery).size());
+  }
+
+  public void testOrderByVariables() {
+    // given
+    TaskQueryImpl query = (TaskQueryImpl) taskService.createTaskQuery()
+        .orderByProcessVariable("foo", ValueType.STRING).asc()
+        .orderByExecutionVariable("foo", ValueType.STRING).asc()
+        .orderByCaseInstanceVariable("foo", ValueType.STRING).asc()
+        .orderByCaseExecutionVariable("foo", ValueType.STRING).asc()
+        .orderByTaskVariable("foo", ValueType.STRING).asc();
+
+    Filter filter = filterService.newTaskFilter("extendedOrFilter");
+    filter.setQuery(query);
+    filterService.saveFilter(filter);
+
+    // when
+    filter = filterService.getFilter(filter.getId());
+
+    // then
+    List<QueryOrderingProperty> expectedOrderingProperties =
+        new ArrayList<QueryOrderingProperty>(query.getOrderingProperties());
+
+    verifyOrderingProperties(expectedOrderingProperties, ((TaskQueryImpl) filter.getQuery()).getOrderingProperties());
+
+    for (QueryOrderingProperty prop : ((TaskQueryImpl) filter.getQuery()).getOrderingProperties()) {
+      assertTrue(prop instanceof VariableOrderProperty);
+    }
   }
 
   protected void saveQuery(Query query) {
