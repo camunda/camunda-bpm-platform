@@ -78,6 +78,10 @@ module.exports = [function() {
         return item.key !== 'includeAssignedTasks';
       });
 
+      $scope.isQueryParameter = function(queryParam) {
+        return queryParam.key !== 'sorting';
+      };
+
       $scope.canIncludeAssignedTasks = function() {
         for (var q = 0; q < $scope.query.length; q++) {
           if (includeAssignedTasksSupport[$scope.query[q].key]) {
