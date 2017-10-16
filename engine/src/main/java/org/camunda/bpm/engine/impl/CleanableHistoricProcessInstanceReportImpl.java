@@ -32,6 +32,7 @@ public class CleanableHistoricProcessInstanceReportImpl extends AbstractQuery<Cl
   protected String[] processDefinitionKeyIn;
   protected String[] tenantIdIn;
   protected boolean isTenantIdSet = false;
+  protected boolean isFinishedNonzero = false;
 
   protected Date currentTimestamp;
 
@@ -63,6 +64,12 @@ public class CleanableHistoricProcessInstanceReportImpl extends AbstractQuery<Cl
   public CleanableHistoricProcessInstanceReport withoutTenantId() {
     this.tenantIdIn = null;
     isTenantIdSet = true;
+    return this;
+  }
+
+  @Override
+  public CleanableHistoricProcessInstanceReport withoutFinishedZero() {
+    this.isFinishedNonzero = true;
     return this;
   }
 

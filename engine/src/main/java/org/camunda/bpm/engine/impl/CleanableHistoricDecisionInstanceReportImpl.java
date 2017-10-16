@@ -32,6 +32,7 @@ public class CleanableHistoricDecisionInstanceReportImpl extends AbstractQuery<C
   protected String[] decisionDefinitionKeyIn;
   protected String[] tenantIdIn;
   protected boolean isTenantIdSet = false;
+  protected boolean isFinishedNonzero = false;
 
   protected Date currentTimestamp;
 
@@ -65,6 +66,12 @@ public class CleanableHistoricDecisionInstanceReportImpl extends AbstractQuery<C
   public CleanableHistoricDecisionInstanceReport withoutTenantId() {
     this.tenantIdIn = null;
     isTenantIdSet = true;
+    return this;
+  }
+
+  @Override
+  public CleanableHistoricDecisionInstanceReport withoutFinishedZero() {
+    this.isFinishedNonzero = true;
     return this;
   }
 

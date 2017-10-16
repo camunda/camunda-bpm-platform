@@ -32,6 +32,7 @@ public class CleanableHistoricCaseInstanceReportImpl extends AbstractQuery<Clean
   protected String[] caseDefinitionKeyIn;
   protected String[] tenantIdIn;
   protected boolean isTenantIdSet = false;
+  protected boolean isFinishedNonzero = false;
 
   protected Date currentTimestamp;
 
@@ -65,6 +66,12 @@ public class CleanableHistoricCaseInstanceReportImpl extends AbstractQuery<Clean
   public CleanableHistoricCaseInstanceReport withoutTenantId() {
     this.tenantIdIn = null;
     isTenantIdSet = true;
+    return this;
+  }
+
+  @Override
+  public CleanableHistoricCaseInstanceReport withoutFinishedZero() {
+    this.isFinishedNonzero = true;
     return this;
   }
 

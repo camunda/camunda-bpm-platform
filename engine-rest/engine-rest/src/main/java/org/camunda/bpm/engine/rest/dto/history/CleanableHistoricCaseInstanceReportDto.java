@@ -32,6 +32,7 @@ public class CleanableHistoricCaseInstanceReportDto extends AbstractQueryDto<Cle
   protected String[] caseDefinitionKeyIn;
   protected String[] tenantIdIn;
   protected Boolean withoutTenantId;
+  protected Boolean withoutFinishedZero;
 
   public CleanableHistoricCaseInstanceReportDto() {
   }
@@ -60,6 +61,11 @@ public class CleanableHistoricCaseInstanceReportDto extends AbstractQueryDto<Cle
     this.withoutTenantId = withoutTenantId;
   }
 
+  @CamundaQueryParam(value = "withoutFinishedZero", converter = BooleanConverter.class)
+  public void setWithoutFinishedZero(Boolean withoutFinishedZero) {
+    this.withoutFinishedZero = withoutFinishedZero;
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return false;
@@ -84,6 +90,10 @@ public class CleanableHistoricCaseInstanceReportDto extends AbstractQueryDto<Cle
     if (tenantIdIn != null && tenantIdIn.length > 0) {
       query.tenantIdIn(tenantIdIn);
     }
+    if (Boolean.TRUE.equals(withoutFinishedZero)) {
+      query.withoutFinishedZero();
+    }
+
   }
 
   @Override

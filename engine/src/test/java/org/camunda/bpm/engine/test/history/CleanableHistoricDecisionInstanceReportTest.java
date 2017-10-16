@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.engine.test.history;
 
+import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Date;
@@ -24,9 +25,9 @@ import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.exception.NotValidException;
-import org.camunda.bpm.engine.history.HistoricDecisionInstance;
-import org.camunda.bpm.engine.history.CleanableHistoricDecisionInstanceReportResult;
 import org.camunda.bpm.engine.history.CleanableHistoricDecisionInstanceReport;
+import org.camunda.bpm.engine.history.CleanableHistoricDecisionInstanceReportResult;
+import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -192,26 +193,54 @@ public class CleanableHistoricDecisionInstanceReportTest {
 
     try {
       report.decisionDefinitionIdIn((String) null);
+      fail("Expected NotValidException");
     } catch (NotValidException e) {
+      // expected
     }
 
     try {
       report.decisionDefinitionIdIn("abc", (String) null, "def");
+      fail("Expected NotValidException");
     } catch (NotValidException e) {
+      // expected
     }
   }
 
+  @Test
   public void testReportByInvalidDecisionDefinitionKey() {
     CleanableHistoricDecisionInstanceReport report = historyService.createCleanableHistoricDecisionInstanceReport();
 
     try {
       report.decisionDefinitionKeyIn((String) null);
+      fail("Expected NotValidException");
     } catch (NotValidException e) {
+      // expected
     }
 
     try {
       report.decisionDefinitionKeyIn("abc", (String) null, "def");
+      fail("Expected NotValidException");
     } catch (NotValidException e) {
+      // expected
     }
   }
+
+  @Test
+  public void testReportWithoutFinishedZero() {
+    // given
+    List<DecisionDefinition> decisionDefinitions = repositoryService.createDecisionDefinitionQuery().decisionDefinitionKey(DECISION_DEFINITION_KEY).list();
+    assertEquals(1, decisionDefinitions.size());
+
+    // assume
+    List<CleanableHistoricDecisionInstanceReportResult> resultWithZeros = historyService.createCleanableHistoricDecisionInstanceReport().list();
+    assertEquals(1, resultWithZeros.size());
+    assertEquals(0, resultWithZeros.get(0).getFinishedDecisionInstanceCount());
+
+    // when
+    long resultCountWithoutZeros = historyService.createCleanableHistoricDecisionInstanceReport().withoutFinishedZero().count();
+
+    // then
+    assertEquals(0, resultCountWithoutZeros);
+  }
+
 }

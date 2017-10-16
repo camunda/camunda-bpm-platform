@@ -49,4 +49,9 @@ public interface CleanableHistoricCaseInstanceReport extends Query<CleanableHist
    */
   CleanableHistoricCaseInstanceReport withoutTenantId();
 
+  /**
+   * Only selects historic case instances which have more than zero finished instances.
+   */
+  CleanableHistoricCaseInstanceReport withoutFinishedZero();
+
 }

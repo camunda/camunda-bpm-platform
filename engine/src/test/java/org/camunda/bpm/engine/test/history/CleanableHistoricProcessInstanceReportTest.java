@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.engine.test.history;
 
+import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
@@ -77,8 +78,13 @@ public class CleanableHistoricProcessInstanceReportTest {
 
   @After
   public void cleanUp() {
-    List<Task> list = taskService.createTaskQuery().list();
-    for (Task task : list) {
+    List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().list();
+    for (ProcessInstance processInstance : processInstances) {
+      runtimeService.deleteProcessInstance(processInstance.getId(), null, true, true);
+    }
+
+    List<Task> tasks = taskService.createTaskQuery().list();
+    for (Task task : tasks) {
       taskService.deleteTask(task.getId(), true);
     }
 
@@ -220,26 +226,53 @@ public class CleanableHistoricProcessInstanceReportTest {
 
     try {
       report.processDefinitionIdIn((String) null);
+      fail("Expected NotValidException");
     } catch (NotValidException e) {
+      // expected
     }
 
     try {
       report.processDefinitionIdIn("abc", (String) null, "def");
+      fail("Expected NotValidException");
     } catch (NotValidException e) {
+      // expected
     }
   }
 
+  @Test
   public void testReportByInvalidProcessDefinitionKey() {
     CleanableHistoricProcessInstanceReport report = historyService.createCleanableHistoricProcessInstanceReport();
 
     try {
       report.processDefinitionKeyIn((String) null);
+      fail("Expected NotValidException");
     } catch (NotValidException e) {
+      // expected
     }
 
     try {
       report.processDefinitionKeyIn("abc", (String) null, "def");
+      fail("Expected NotValidException");
     } catch (NotValidException e) {
+      // expected
     }
+  }
+
+  @Test
+  public void testReportWithoutFinishedZero() {
+    // given
+    List<ProcessDefinition> pdList = repositoryService.createProcessDefinitionQuery().processDefinitionKey(PROCESS_DEFINITION_KEY).list();
+    assertEquals(1, pdList.size());
+    runtimeService.startProcessInstanceById(pdList.get(0).getId());
+
+    List<CleanableHistoricProcessInstanceReportResult> resultWithZeros = historyService.createCleanableHistoricProcessInstanceReport().list();
+    assertEquals(1, resultWithZeros.size());
+    assertEquals(0, resultWithZeros.get(0).getFinishedProcessInstanceCount());
+
+    // when
+    long resultCountWithoutZeros = historyService.createCleanableHistoricProcessInstanceReport().withoutFinishedZero().count();
+
+    // then
+    assertEquals(0, resultCountWithoutZeros);
   }
 }

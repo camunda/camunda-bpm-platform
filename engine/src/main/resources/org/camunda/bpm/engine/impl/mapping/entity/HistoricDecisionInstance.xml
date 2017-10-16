@@ -383,6 +383,11 @@
           WHERE DI.EVAL_TIME_ IS NOT NULL
           GROUP BY DI.DEC_DEF_ID_
           ) F ON F.DEC_DEF_ID_ = DI.DEC_DEF_ID_
+
+        <if test="isFinishedNonzero">
+          WHERE FINISHED_ > 0
+        </if>
+
         GROUP BY RES.ID_,
           RES.KEY_,
           RES.NAME_,

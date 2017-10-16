@@ -49,4 +49,9 @@ public interface CleanableHistoricDecisionInstanceReport extends Query<Cleanable
    */
   CleanableHistoricDecisionInstanceReport withoutTenantId();
 
+  /**
+   * Only selects historic decision instances which have more than zero finished instances.
+   */
+  CleanableHistoricDecisionInstanceReport withoutFinishedZero();
+
 }

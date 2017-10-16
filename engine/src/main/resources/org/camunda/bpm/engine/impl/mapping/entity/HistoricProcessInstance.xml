@@ -553,6 +553,11 @@
           WHERE PI.END_TIME_ IS NOT NULL
           GROUP BY PI.PROC_DEF_ID_
           ) F ON F.PROC_DEF_ID_ = PI.PROC_DEF_ID_
+
+        <if test="isFinishedNonzero">
+          WHERE FINISHED_ > 0
+        </if>
+
         GROUP BY RES.ID_,
           RES.KEY_,
           RES.NAME_,

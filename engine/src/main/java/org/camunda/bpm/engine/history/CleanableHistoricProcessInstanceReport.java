@@ -49,4 +49,9 @@ public interface CleanableHistoricProcessInstanceReport extends Query<CleanableH
    */
   CleanableHistoricProcessInstanceReport withoutTenantId();
 
+  /**
+   * Only selects historic process instances which have more than zero finished instances.
+   */
+  CleanableHistoricProcessInstanceReport withoutFinishedZero();
+
 }

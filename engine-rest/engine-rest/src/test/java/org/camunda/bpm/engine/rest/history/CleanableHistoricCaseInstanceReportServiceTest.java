@@ -236,6 +236,21 @@ public class CleanableHistoricCaseInstanceReportServiceTest extends AbstractRest
   }
 
   @Test
+  public void testQueryWithoutFinishedZero() {
+    given()
+      .queryParam("withoutFinishedZero", true)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .contentType(ContentType.JSON)
+      .when()
+        .get(HISTORIC_REPORT_URL);
+
+    verify(historicCaseInstanceReport).withoutFinishedZero();
+    verify(historicCaseInstanceReport).list();
+  }
+
+  @Test
   public void testFullQuery() {
     given()
       .params(getCompleteQueryParameters())
@@ -282,6 +297,7 @@ public class CleanableHistoricCaseInstanceReportServiceTest extends AbstractRest
     parameters.put("caseDefinitionKeyIn", EXAMPLE_CD_KEY + "," + ANOTHER_EXAMPLE_CD_KEY);
     parameters.put("tenantIdIn", EXAMPLE_TENANT_ID + "," + ANOTHER_EXAMPLE_TENANT_ID);
     parameters.put("withoutTenantId", true);
+    parameters.put("withoutFinishedZero", true);
 
     return parameters;
   }
@@ -291,5 +307,6 @@ public class CleanableHistoricCaseInstanceReportServiceTest extends AbstractRest
     verify(historicCaseInstanceReport).caseDefinitionKeyIn(EXAMPLE_CD_KEY, ANOTHER_EXAMPLE_CD_KEY);
     verify(historicCaseInstanceReport).tenantIdIn(EXAMPLE_TENANT_ID, ANOTHER_EXAMPLE_TENANT_ID);
     verify(historicCaseInstanceReport).withoutTenantId();
+    verify(historicCaseInstanceReport).withoutFinishedZero();
   }
 }

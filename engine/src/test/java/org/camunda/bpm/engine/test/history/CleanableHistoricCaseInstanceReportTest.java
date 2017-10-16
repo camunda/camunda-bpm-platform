@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.engine.test.history;
 
+import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Date;
@@ -26,9 +27,9 @@ import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.exception.NotValidException;
-import org.camunda.bpm.engine.history.HistoricCaseInstance;
-import org.camunda.bpm.engine.history.CleanableHistoricCaseInstanceReportResult;
 import org.camunda.bpm.engine.history.CleanableHistoricCaseInstanceReport;
+import org.camunda.bpm.engine.history.CleanableHistoricCaseInstanceReportResult;
+import org.camunda.bpm.engine.history.HistoricCaseInstance;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.runtime.CaseInstance;
@@ -215,12 +216,16 @@ public class CleanableHistoricCaseInstanceReportTest {
 
     try {
       report.caseDefinitionIdIn((String) null);
+      fail("Expected NotValidException");
     } catch (NotValidException e) {
+      // expected
     }
 
     try {
       report.caseDefinitionIdIn("abc", (String) null, "def");
+      fail("Expected NotValidException");
     } catch (NotValidException e) {
+      // expected
     }
   }
 
@@ -229,12 +234,33 @@ public class CleanableHistoricCaseInstanceReportTest {
 
     try {
       report.caseDefinitionKeyIn((String) null);
+      fail("Expected NotValidException");
     } catch (NotValidException e) {
+      // expected
     }
 
     try {
       report.caseDefinitionKeyIn("abc", (String) null, "def");
+      fail("Expected NotValidException");
     } catch (NotValidException e) {
+      // expected
     }
+  }
+
+  @Test
+  public void testReportWithoutFinishedZero() {
+    // given
+    List<CaseDefinition> caseDefinitions = repositoryService.createCaseDefinitionQuery().caseDefinitionKey(CASE_DEFINITION_KEY).list();
+    assertEquals(1, caseDefinitions.size());
+
+    List<CleanableHistoricCaseInstanceReportResult> resultWithZeros = historyService.createCleanableHistoricCaseInstanceReport().list();
+    assertEquals(1, resultWithZeros.size());
+    assertEquals(0, resultWithZeros.get(0).getFinishedCaseInstanceCount());
+
+    // when
+    long resultCountWithoutZeros = historyService.createCleanableHistoricCaseInstanceReport().withoutFinishedZero().count();
+
+    // then
+    assertEquals(0, resultCountWithoutZeros);
   }
 }
