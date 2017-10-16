@@ -12,7 +12,7 @@ image::https://maven-badges.herokuapp.com/maven-central/org.camunda.bpm.extensio
 image::https://www.openhub.net/p/camunda-bpm-spring-boot-starter/widgets/project_thin_badge.gif[link="https://www.openhub.net/p/camunda-bpm-spring-boot-starter"]
 ,====
 
-This project provides Spring Boot starters that allow you to integrate Camunda BPM Platform in your Spring Boot applications.
+This project provides Spring Boot starters that allow you to integrate the Camunda BPM Platform into your Spring Boot applications.
 
 Please check out the https://docs.camunda.org/manual/develop/user-guide/spring-boot-integration/[Documentation],
 the https://docs.camunda.org/get-started/spring-boot/[Getting Started Guide] and
@@ -22,13 +22,17 @@ the https://github.com/camunda/camunda-bpm-examples/tree/master/spring-boot-star
 
 * https://app.camunda.com/jira/browse/CAM/component/13850[Issue Tracker] - if you have an idea for a new feature or want to file a bug ... this is the place to go.
 * https://github.com/camunda/camunda-bpm-spring-boot-starter/blob/master/.github/CONTRIBUTING.md[Contributing] - check this if you want to contribute
+<<<<<<< Updated upstream
 * https://forum.camunda.org/c/spring-boot-starter[Discussion Forum] - this project has it's own sub-category at the camunda forum ... use it!
+=======
+* https://forum.camunda.org/c/community-extensions/spring-boot-starter[Discussion Forum] - this project has its own sub-category at the Camunda forum ... use it!
+>>>>>>> Stashed changes
 
 ## Resources for versions older than 2.3.0
 
-Before version 2.2.0 the project existed as a community extension, therefore the resources were located in different paths. You can find all the links below.
+Before version 2.2.0, the project existed as a community extension. Therefore the resources were located in different paths. You can find all the links below.
 
-* https://github.com/camunda/camunda-bpm-spring-boot-starter/issues[Issue Tracker] - please DON'T create new isuues here.
+* https://github.com/camunda/camunda-bpm-spring-boot-starter/issues[Issue Tracker] - please DON'T create new issues here.
 * https://camunda.github.io/camunda-bpm-spring-boot-starter/[Documentation]
 
 ### 2.x
@@ -45,8 +49,8 @@ Before version 2.2.0 the project existed as a community extension, therefore the
 #### Migration hints from < 1.3.0 to >= 1.3.0
 
 [IMPORTANT]
-We have decided to refactor the configuration mechanism. Especially we removed the  `org.camunda.bpm.spring.boot.starter.configuration.CamundaConfiguration` interface. For now each configuration is a `org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin`. With this it is possible to hook into `preInit`, `postInit` and `postProcessEngineBuild` which supports more complex situations.
-If you have implemented an `CamundaConfiguration` you have to switch to `ProcessEnginePlugin` (and its `preInit` method). You can also extend your configuration from `org.camunda.bpm.spring.boot.starter.configuration.impl.AbstractCamundaConfiguration` to avoid a cast to `SpringProcessEngineConfiguration`.
+We have decided to refactor the configuration mechanism. Especially, we removed the  `org.camunda.bpm.spring.boot.starter.configuration.CamundaConfiguration` interface. For now, each configuration is a `org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin`. With this it is possible to hook into `preInit`, `postInit` and `postProcessEngineBuild`, which supports more complex situations.
+If you have implemented a `CamundaConfiguration`, you have to switch to `ProcessEnginePlugin` (and its `preInit` method). You can also extend your configuration from `org.camunda.bpm.spring.boot.starter.configuration.impl.AbstractCamundaConfiguration` to avoid a cast to `SpringProcessEngineConfiguration`.
 
 ### 1.2.1
 
@@ -55,13 +59,13 @@ If you have implemented an `CamundaConfiguration` you have to switch to `Process
 
 ## Credits
 
-Camunda Spring Boot Starter project used to be the community extension, created and supported by
+The Camunda Spring Boot Starter project used to be the community extension, created and supported by
 
 *  _https://github.com/osteinhauer[Oliver Steinhauer]_
 *  _https://github.com/jangalinski[Jan Galinski]_
 *  _https://github.com/hawky-4s-[Christian Lipphardt]_
 
-Starting from version 2.3.0 it was adopted as part of Camunda BPM.
+Starting from version 2.3.0 it was adopted as part of the Camunda BPM Platform.
 
 ## License
 
