@@ -810,7 +810,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
     assertNotNull(inputStream);
   }
 
-  public void testGetDeployedTaskFormWithourAuthorization() {
+  public void testGetDeployedTaskFormWithoutAuthorization() {
     // given
     startProcessInstanceByKey(FORM_PROCESS_KEY);
     String taskId = selectSingleTask().getId();
