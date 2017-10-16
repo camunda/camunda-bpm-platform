@@ -7,27 +7,53 @@ var CamSDK = require('camunda-commons-ui/vendor/camunda-bpm-sdk');
 
 var Controller = [
   '$scope',
+  '$filter',
   'Uri',
   'camAPI',
-  function($scope, Uri, camAPI) {
+  'fixDate',
+  function($scope, $filter, Uri, camAPI, fixDate) {
 
     var MetricsResource = camAPI.resource('metrics');
 
 
+    // date variables
     var now = new Date();
-    $scope.startDate = now.getFullYear() + '-01-01T00:00:00.000+0000';
-    $scope.endDate = now.getFullYear() + '-12-31T23:59:59.999+0000';
+    var dateFilter = $filter('date');
+    var dateFormat = 'yyyy-MM-dd\'T\'HH:mm:ss';
+
+    // initial scope data
+    $scope.startDate = dateFilter(now.getFullYear() + '-01-01T00:00:00.000', dateFormat);
+    $scope.endDate =   dateFilter(now.getFullYear() + '-12-31T23:59:59.999', dateFormat);
     $scope.loadingState = 'INITIAL';
 
-    $scope.load = function() {
+    
+    // sets loading state to error and updates error message
+    function setLoadingError(error) {
+      $scope.loadingState = 'ERROR';
+      $scope.loadingError = error;
+    }
+
+    // called every time date input changes
+    $scope.handleDateChange = function handleDateChange() {
+      var form = $scope.form;
+      if(form.$valid) {
+        return load();
+      } else if(form.startDate.$error.datePattern || form.endDate.$error.datePattern) {
+        setLoadingError('Supported pattern \'yyyy-MM-ddTHH:mm:ss\'.');
+      } else if(form.startDate.$error.dateValue || form.endDate.$error.dateValue) {
+        setLoadingError('Invalid Date Value.');
+      }
+    };
+
+    var load = $scope.load = function() {
       $scope.loadingState = 'LOADING';
       // promises??? NOPE!
       CamSDK.utils.series({
         flowNodes: function(cb) {
           MetricsResource.sum({
             name: 'activity-instance-start',
-            startDate: $scope.startDate,
-            endDate: $scope.endDate
+            startDate: fixDate($scope.startDate),
+            endDate: fixDate($scope.endDate)
           }, function(err, res) {
             cb(err, !err ? res.result : null);
           });
@@ -35,8 +61,8 @@ var Controller = [
         decisionElements: function(cb) {
           MetricsResource.sum({
             name: 'executed-decision-elements',
-            startDate: $scope.startDate,
-            endDate: $scope.endDate
+            startDate: fixDate($scope.startDate),
+            endDate: fixDate($scope.endDate)
           }, function(err, res) {
             cb(err, !err ? res.result : null);
           });
@@ -44,6 +70,7 @@ var Controller = [
       }, function(err, res) {
         $scope.loadingState = 'LOADED';
         if (err) {
+          setLoadingError('Could not set start and end dates.');
           $scope.loadingState = 'ERROR';
           return;
         }
@@ -52,7 +79,7 @@ var Controller = [
 
     };
 
-    $scope.load();
+    load();
 
   }];
 
