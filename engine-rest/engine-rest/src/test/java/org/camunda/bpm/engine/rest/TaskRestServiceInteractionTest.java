@@ -75,6 +75,7 @@ import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.exception.DeploymentResourceNotFoundException;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.form.TaskFormData;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
@@ -140,6 +141,7 @@ public class TaskRestServiceInteractionTest extends
   protected static final String TASK_IDENTITY_LINKS_URL = SINGLE_TASK_URL + "/identity-links";
 
   protected static final String TASK_FORM_URL = SINGLE_TASK_URL + "/form";
+  protected static final String DEPLOYED_TASK_FORM_URL = SINGLE_TASK_URL + "/deployed-form";
   protected static final String RENDERED_FORM_URL = SINGLE_TASK_URL + "/rendered-form";
   protected static final String SUBMIT_FORM_URL = SINGLE_TASK_URL + "/submit-form";
 
@@ -3102,6 +3104,66 @@ public class TaskRestServiceInteractionTest extends
       .body("message", equalTo(message))
     .when()
       .put(SINGLE_TASK_URL);
+  }
+
+  @Test
+  public void testGetDeployedTaskForm() {
+    InputStream deployedFormMock = new ByteArrayInputStream("Test".getBytes());
+    when(formServiceMock.getDeployedTaskForm(anyString())).thenReturn(deployedFormMock);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .body(equalTo("Test"))
+    .when()
+      .get(DEPLOYED_TASK_FORM_URL);
+
+    verify(formServiceMock).getDeployedTaskForm(MockProvider.EXAMPLE_TASK_ID);
+  }
+
+  @Test
+  public void testGetDeployedTaskFormWithoutAuthorization() {
+    String message = "unauthorized";
+    when(formServiceMock.getDeployedTaskForm(anyString()))
+        .thenThrow(new AuthorizationException(message));
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .body("message", equalTo(message))
+    .when()
+      .get(DEPLOYED_TASK_FORM_URL);
+  }
+
+  @Test
+  public void testGetDeployedTaskFormWithDeploymentResourceNotFoundException() {
+    String message = "no resource found in deployment";
+    when(formServiceMock.getDeployedTaskForm(anyString()))
+        .thenThrow(new DeploymentResourceNotFoundException(message));
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+    .then().expect()
+      .statusCode(Status.NOT_FOUND.getStatusCode())
+      .body("message", equalTo(message))
+    .when()
+      .get(DEPLOYED_TASK_FORM_URL);
+  }
+
+  @Test
+  public void testGetDeployedTaskFormWithUnexistingForm() {
+    when(formServiceMock.getDeployedTaskForm(anyString()))
+        .thenReturn(null);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .body(equalTo(""))
+    .when()
+      .get(DEPLOYED_TASK_FORM_URL);
   }
 
   @SuppressWarnings({ "rawtypes", "unchecked" })

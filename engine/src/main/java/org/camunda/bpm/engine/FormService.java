@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.engine;
 
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.Map;
 
@@ -246,5 +247,9 @@ public interface FormService {
    *          If the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   String getTaskFormKey(String processDefinitionId, String taskDefinitionKey);
+
+  InputStream getDeployedStartForm(String processDefinitionId);
+
+  InputStream getDeployedTaskForm(String taskId);
 
 }

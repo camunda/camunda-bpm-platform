@@ -60,6 +60,10 @@ public interface TaskResource {
   @Produces(MediaType.APPLICATION_XHTML_XML)
   Response getRenderedForm();
 
+  @GET
+  @Path("/deployed-form")
+  Response getDeployedForm();
+
   @POST
   @Path("/claim")
   @Consumes(MediaType.APPLICATION_JSON)

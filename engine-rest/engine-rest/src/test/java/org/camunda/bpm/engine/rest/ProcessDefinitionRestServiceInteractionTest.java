@@ -6,6 +6,7 @@ import org.camunda.bpm.ProcessApplicationService;
 import org.camunda.bpm.application.ProcessApplicationInfo;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
 import org.camunda.bpm.engine.*;
+import org.camunda.bpm.engine.exception.DeploymentResourceNotFoundException;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.form.StartFormData;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
@@ -79,6 +80,8 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   protected static final String START_FORM_URL = SINGLE_PROCESS_DEFINITION_URL + "/startForm";
   protected static final String START_FORM_BY_KEY_URL = SINGLE_PROCESS_DEFINITION_BY_KEY_URL + "/startForm";
+  protected static final String DEPLOYED_START_FORM_URL = SINGLE_PROCESS_DEFINITION_URL + "/deployed-start-form";
+  protected static final String DEPLOYED_START_FORM_BY_KEY_URL = SINGLE_PROCESS_DEFINITION_BY_KEY_URL + "/deployed-start-form";
   protected static final String RENDERED_FORM_URL = SINGLE_PROCESS_DEFINITION_URL + "/rendered-form";
   protected static final String RENDERED_FORM_BY_KEY_URL = SINGLE_PROCESS_DEFINITION_BY_KEY_URL + "/rendered-form";
   protected static final String SUBMIT_FORM_URL = SINGLE_PROCESS_DEFINITION_URL + "/submit-form";
@@ -3791,6 +3794,84 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
       .body("message", equalTo(message))
     .when()
       .get(START_FORM_VARIABLES_BY_KEY_URL);
+  }
+
+  @Test
+  public void testGetDeployedStartForm_ByKey() {
+    InputStream deployedStartFormMock = new ByteArrayInputStream("Test".getBytes());
+    when(formServiceMock.getDeployedStartForm(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))
+        .thenReturn(deployedStartFormMock);
+
+    given()
+    .pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
+    .then().expect()
+    .statusCode(Status.OK.getStatusCode())
+    .body(equalTo("Test"))
+    .when()
+    .get(DEPLOYED_START_FORM_BY_KEY_URL);
+
+    verify(formServiceMock).getDeployedStartForm(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
+  }
+
+  @Test
+  public void testGetDeployedStartForm() {
+    InputStream deployedStartFormMock = new ByteArrayInputStream("Test".getBytes());
+    when(formServiceMock.getDeployedStartForm(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))
+        .thenReturn(deployedStartFormMock);
+
+    given()
+    .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+    .then().expect()
+    .statusCode(Status.OK.getStatusCode())
+    .body(equalTo("Test"))
+    .when()
+    .get(DEPLOYED_START_FORM_URL);
+
+    verify(formServiceMock).getDeployedStartForm(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
+  }
+
+  @Test
+  public void testGetDeployedStartFormWithoutAuthorization() {
+    String message = "unauthorized";
+    when(formServiceMock.getDeployedStartForm(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))
+        .thenThrow(new AuthorizationException(message));
+
+    given()
+    .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+    .then().expect()
+    .statusCode(Status.FORBIDDEN.getStatusCode())
+    .body("message", equalTo(message))
+    .when()
+    .get(DEPLOYED_START_FORM_URL);
+  }
+
+  @Test
+  public void testGetDeployedStartFormWithDeploymentResourceNotFoundException() {
+    String message = "resource not found";
+    when(formServiceMock.getDeployedStartForm(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))
+        .thenThrow(new DeploymentResourceNotFoundException(message));
+
+    given()
+    .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+    .then().expect()
+    .statusCode(Status.NOT_FOUND.getStatusCode())
+    .body("message", equalTo(message))
+    .when()
+    .get(DEPLOYED_START_FORM_URL);
+  }
+
+  @Test
+  public void testGetDeployedStartFormWithUnexistingForm() {
+    when(formServiceMock.getDeployedStartForm(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))
+        .thenReturn(null);
+
+    given()
+    .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+    .then().expect()
+    .statusCode(Status.OK.getStatusCode())
+    .body(equalTo(""))
+    .when()
+    .get(DEPLOYED_START_FORM_URL);
   }
 
 }

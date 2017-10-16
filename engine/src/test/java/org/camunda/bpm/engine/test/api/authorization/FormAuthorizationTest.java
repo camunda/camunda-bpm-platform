@@ -23,6 +23,8 @@ import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Resources.TASK;
 
+import java.io.InputStream;
+
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.form.StartFormData;
@@ -37,7 +39,7 @@ import org.camunda.bpm.engine.variable.VariableMap;
  */
 public class FormAuthorizationTest extends AuthorizationTest {
 
-  protected static final String FORM_KEY_PROCESS_KEY = "formKeyProcess";
+  protected static final String FORM_PROCESS_KEY = "FormsProcess";
   protected static final String RENDERED_FORM_PROCESS_KEY = "renderedFormProcess";
   protected static final String CASE_KEY = "oneTaskCase";
 
@@ -45,7 +47,9 @@ public class FormAuthorizationTest extends AuthorizationTest {
 
   public void setUp() throws Exception {
     deploymentId = createDeployment(null,
-        "org/camunda/bpm/engine/test/api/authorization/formKeyProcess.bpmn20.xml",
+        "org/camunda/bpm/engine/test/api/form/FormsProcess.bpmn20.xml",
+        "org/camunda/bpm/engine/test/api/form/start.form",
+        "org/camunda/bpm/engine/test/api/form/task.form",
         "org/camunda/bpm/engine/test/api/authorization/renderedFormProcess.bpmn20.xml",
         "org/camunda/bpm/engine/test/api/authorization/oneTaskCase.cmmn").getId();
     super.setUp();
@@ -60,7 +64,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
 
   public void testGetStartFormDataWithoutAuthorizations() {
     // given
-    String processDefinitionId = selectProcessDefinitionByKey(FORM_KEY_PROCESS_KEY).getId();
+    String processDefinitionId = selectProcessDefinitionByKey(FORM_PROCESS_KEY).getId();
 
     try {
       // when
@@ -71,22 +75,22 @@ public class FormAuthorizationTest extends AuthorizationTest {
       String message = e.getMessage();
       assertTextPresent(userId, message);
       assertTextPresent(READ.getName(), message);
-      assertTextPresent(FORM_KEY_PROCESS_KEY, message);
+      assertTextPresent(FORM_PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
   }
 
   public void testGetStartFormData() {
     // given
-    String processDefinitionId = selectProcessDefinitionByKey(FORM_KEY_PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_DEFINITION, FORM_KEY_PROCESS_KEY, userId, READ);
+    String processDefinitionId = selectProcessDefinitionByKey(FORM_PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, FORM_PROCESS_KEY, userId, READ);
 
     // when
     StartFormData startFormData = formService.getStartFormData(processDefinitionId);
 
     // then
     assertNotNull(startFormData);
-    assertEquals("aStartFormKey", startFormData.getFormKey());
+    assertEquals("org/camunda/bpm/engine/test/api/form/start.form", startFormData.getFormKey());
   }
 
   // get rendered start form /////////////////////////////////////
@@ -158,7 +162,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
 
   public void testSubmitStartFormWithoutAuthorization() {
     // given
-    String processDefinitionId = selectProcessDefinitionByKey(FORM_KEY_PROCESS_KEY).getId();
+    String processDefinitionId = selectProcessDefinitionByKey(FORM_PROCESS_KEY).getId();
 
     try {
       // when
@@ -175,7 +179,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
 
   public void testSubmitStartFormWithCreatePermissionOnProcessInstance() {
     // given
-    String processDefinitionId = selectProcessDefinitionByKey(FORM_KEY_PROCESS_KEY).getId();
+    String processDefinitionId = selectProcessDefinitionByKey(FORM_PROCESS_KEY).getId();
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, CREATE);
 
     try {
@@ -187,15 +191,15 @@ public class FormAuthorizationTest extends AuthorizationTest {
       String message = e.getMessage();
       assertTextPresent(userId, message);
       assertTextPresent(CREATE_INSTANCE.getName(), message);
-      assertTextPresent(FORM_KEY_PROCESS_KEY, message);
+      assertTextPresent(FORM_PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
   }
 
   public void testSubmitStartFormWithCreateInstancePermissionOnProcessDefinition() {
     // given
-    String processDefinitionId = selectProcessDefinitionByKey(FORM_KEY_PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_DEFINITION, FORM_KEY_PROCESS_KEY, userId, CREATE_INSTANCE);
+    String processDefinitionId = selectProcessDefinitionByKey(FORM_PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, FORM_PROCESS_KEY, userId, CREATE_INSTANCE);
 
     try {
       // when
@@ -212,8 +216,8 @@ public class FormAuthorizationTest extends AuthorizationTest {
 
   public void testSubmitStartForm() {
     // given
-    String processDefinitionId = selectProcessDefinitionByKey(FORM_KEY_PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_DEFINITION, FORM_KEY_PROCESS_KEY, userId, CREATE_INSTANCE);
+    String processDefinitionId = selectProcessDefinitionByKey(FORM_PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, FORM_PROCESS_KEY, userId, CREATE_INSTANCE);
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, CREATE);
 
     // when
@@ -266,7 +270,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
 
   public void testProcessTaskGetTaskFormDataWithoutAuthorization() {
     // given
-    startProcessInstanceByKey(FORM_KEY_PROCESS_KEY);
+    startProcessInstanceByKey(FORM_PROCESS_KEY);
     String taskId = selectSingleTask().getId();
 
     try {
@@ -281,14 +285,14 @@ public class FormAuthorizationTest extends AuthorizationTest {
       assertTextPresent(taskId, message);
       assertTextPresent(TASK.resourceName(), message);
       assertTextPresent(READ_TASK.getName(), message);
-      assertTextPresent(FORM_KEY_PROCESS_KEY, message);
+      assertTextPresent(FORM_PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
   }
 
   public void testProcessTaskGetTaskFormDataWithReadPermissionOnTask() {
     // given
-    startProcessInstanceByKey(FORM_KEY_PROCESS_KEY);
+    startProcessInstanceByKey(FORM_PROCESS_KEY);
     String taskId = selectSingleTask().getId();
     createGrantAuthorization(TASK, taskId, userId, READ);
 
@@ -301,9 +305,9 @@ public class FormAuthorizationTest extends AuthorizationTest {
 
   public void testProcessTaskGetTaskFormDataWithReadTaskPermissionOnProcessDefinition() {
     // given
-    startProcessInstanceByKey(FORM_KEY_PROCESS_KEY);
+    startProcessInstanceByKey(FORM_PROCESS_KEY);
     String taskId = selectSingleTask().getId();
-    createGrantAuthorization(PROCESS_DEFINITION, FORM_KEY_PROCESS_KEY, userId, READ_TASK);
+    createGrantAuthorization(PROCESS_DEFINITION, FORM_PROCESS_KEY, userId, READ_TASK);
 
     // when
     TaskFormData taskFormData = formService.getTaskFormData(taskId);
@@ -314,10 +318,10 @@ public class FormAuthorizationTest extends AuthorizationTest {
 
   public void testProcessTaskGetTaskFormData() {
     // given
-    startProcessInstanceByKey(FORM_KEY_PROCESS_KEY);
+    startProcessInstanceByKey(FORM_PROCESS_KEY);
     String taskId = selectSingleTask().getId();
     createGrantAuthorization(TASK, taskId, userId, READ);
-    createGrantAuthorization(PROCESS_DEFINITION, FORM_KEY_PROCESS_KEY, userId, READ_TASK);
+    createGrantAuthorization(PROCESS_DEFINITION, FORM_PROCESS_KEY, userId, READ_TASK);
 
     // when
     TaskFormData taskFormData = formService.getTaskFormData(taskId);
@@ -619,7 +623,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
 
   public void testProcessTaskSubmitTaskFormWithoutAuthorization() {
     // given
-    startProcessInstanceByKey(FORM_KEY_PROCESS_KEY);
+    startProcessInstanceByKey(FORM_PROCESS_KEY);
     String taskId = selectSingleTask().getId();
 
     try {
@@ -634,17 +638,17 @@ public class FormAuthorizationTest extends AuthorizationTest {
       assertTextPresent(taskId, message);
       assertTextPresent(TASK.resourceName(), message);
       assertTextPresent(UPDATE_TASK.getName(), message);
-      assertTextPresent(FORM_KEY_PROCESS_KEY, message);
+      assertTextPresent(FORM_PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
   }
 
   public void testProcessTaskSubmitTaskFormWithUpdatePermissionOnTask() {
     // given
-    startProcessInstanceByKey(FORM_KEY_PROCESS_KEY);
+    startProcessInstanceByKey(FORM_PROCESS_KEY);
     String taskId = selectSingleTask().getId();
     createGrantAuthorization(TASK, taskId, userId, UPDATE);
-    createGrantAuthorization(PROCESS_DEFINITION, FORM_KEY_PROCESS_KEY, userId, UPDATE_TASK);
+    createGrantAuthorization(PROCESS_DEFINITION, FORM_PROCESS_KEY, userId, UPDATE_TASK);
 
     // when
     formService.submitTaskForm(taskId, null);
@@ -656,10 +660,10 @@ public class FormAuthorizationTest extends AuthorizationTest {
 
   public void testProcessTaskSubmitTaskFormWithUpdateTaskPermissionOnProcessDefinition() {
     // given
-    startProcessInstanceByKey(FORM_KEY_PROCESS_KEY);
+    startProcessInstanceByKey(FORM_PROCESS_KEY);
     String taskId = selectSingleTask().getId();
     createGrantAuthorization(TASK, taskId, userId, UPDATE);
-    createGrantAuthorization(PROCESS_DEFINITION, FORM_KEY_PROCESS_KEY, userId, UPDATE_TASK);
+    createGrantAuthorization(PROCESS_DEFINITION, FORM_PROCESS_KEY, userId, UPDATE_TASK);
 
     // when
     formService.submitTaskForm(taskId, null);
@@ -671,10 +675,10 @@ public class FormAuthorizationTest extends AuthorizationTest {
 
   public void testProcessTaskSubmitTaskForm() {
     // given
-    startProcessInstanceByKey(FORM_KEY_PROCESS_KEY);
+    startProcessInstanceByKey(FORM_PROCESS_KEY);
     String taskId = selectSingleTask().getId();
     createGrantAuthorization(TASK, taskId, userId, UPDATE);
-    createGrantAuthorization(PROCESS_DEFINITION, FORM_KEY_PROCESS_KEY, userId, UPDATE_TASK);
+    createGrantAuthorization(PROCESS_DEFINITION, FORM_PROCESS_KEY, userId, UPDATE_TASK);
 
     // when
     formService.submitTaskForm(taskId, null);
@@ -703,7 +707,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
 
   public void testGetStartFormKeyWithoutAuthorizations() {
     // given
-    String processDefinitionId = selectProcessDefinitionByKey(FORM_KEY_PROCESS_KEY).getId();
+    String processDefinitionId = selectProcessDefinitionByKey(FORM_PROCESS_KEY).getId();
 
     try {
       // when
@@ -714,28 +718,28 @@ public class FormAuthorizationTest extends AuthorizationTest {
       String message = e.getMessage();
       assertTextPresent(userId, message);
       assertTextPresent(READ.getName(), message);
-      assertTextPresent(FORM_KEY_PROCESS_KEY, message);
+      assertTextPresent(FORM_PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
   }
 
   public void testGetStartFormKey() {
     // given
-    String processDefinitionId = selectProcessDefinitionByKey(FORM_KEY_PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_DEFINITION, FORM_KEY_PROCESS_KEY, userId, READ);
+    String processDefinitionId = selectProcessDefinitionByKey(FORM_PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, FORM_PROCESS_KEY, userId, READ);
 
     // when
     String formKey = formService.getStartFormKey(processDefinitionId);
 
     // then
-    assertEquals("aStartFormKey", formKey);
+    assertEquals("org/camunda/bpm/engine/test/api/form/start.form", formKey);
   }
 
   // get task form key ////////////////////////////////////////
 
   public void testGetTaskFormKeyWithoutAuthorizations() {
     // given
-    String processDefinitionId = selectProcessDefinitionByKey(FORM_KEY_PROCESS_KEY).getId();
+    String processDefinitionId = selectProcessDefinitionByKey(FORM_PROCESS_KEY).getId();
 
     try {
       // when
@@ -746,21 +750,83 @@ public class FormAuthorizationTest extends AuthorizationTest {
       String message = e.getMessage();
       assertTextPresent(userId, message);
       assertTextPresent(READ.getName(), message);
-      assertTextPresent(FORM_KEY_PROCESS_KEY, message);
+      assertTextPresent(FORM_PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
   }
 
   public void testGetTaskFormKey() {
     // given
-    String processDefinitionId = selectProcessDefinitionByKey(FORM_KEY_PROCESS_KEY).getId();
-    createGrantAuthorization(PROCESS_DEFINITION, FORM_KEY_PROCESS_KEY, userId, READ);
+    String processDefinitionId = selectProcessDefinitionByKey(FORM_PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, FORM_PROCESS_KEY, userId, READ);
 
     // when
     String formKey = formService.getTaskFormKey(processDefinitionId, "task");
 
     // then
-    assertEquals("aTaskFormKey", formKey);
+    assertEquals("org/camunda/bpm/engine/test/api/form/task.form", formKey);
+  }
+
+  // get deployed start form////////////////////////////////////////
+
+  public void testGetDeployedStartForm() {
+    // given
+    String processDefinitionId = selectProcessDefinitionByKey(FORM_PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, FORM_PROCESS_KEY, userId, READ);
+
+    // when
+    InputStream inputStream = formService.getDeployedStartForm(processDefinitionId);
+    assertNotNull(inputStream);
+  }
+
+  public void testGetDeployedStartFormWithoutAuthorization() {
+    // given
+    String processDefinitionId = selectProcessDefinitionByKey(FORM_PROCESS_KEY).getId();
+
+    try {
+      // when
+      formService.getDeployedStartForm(processDefinitionId);
+      fail("Exception expected: It should not possible to get a deployed start form");
+    } catch (AuthorizationException e) {
+      // then
+      String message = e.getMessage();
+      assertTextPresent(userId, message);
+      assertTextPresent(READ.getName(), message);
+      assertTextPresent(FORM_PROCESS_KEY, message);
+      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+    }
+  }
+
+  // get deployed task form////////////////////////////////////////
+
+  public void testGetDeployedTaskForm() {
+    // given
+    startProcessInstanceByKey(FORM_PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+    createGrantAuthorization(TASK, taskId, userId, READ);
+
+    // when
+    InputStream inputStream = formService.getDeployedTaskForm(taskId);
+    assertNotNull(inputStream);
+  }
+
+  public void testGetDeployedTaskFormWithourAuthorization() {
+    // given
+    startProcessInstanceByKey(FORM_PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+
+    try {
+      // when
+      formService.getDeployedTaskForm(taskId);
+      fail("Exception expected: It should not possible to get a deployed task form");
+    } catch (AuthorizationException e) {
+      // then
+      String message = e.getMessage();
+      assertTextPresent(userId, message);
+      assertTextPresent(READ.getName(), message);
+      assertTextPresent(FORM_PROCESS_KEY, message);
+      assertTextPresent(TASK.resourceName(), message);
+    }
   }
 
 }

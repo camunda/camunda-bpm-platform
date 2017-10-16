@@ -86,6 +86,10 @@ public interface ProcessDefinitionResource {
   FormDto getStartForm();
 
   @GET
+  @Path("/deployed-start-form")
+  Response getDeployedStartForm();
+
+  @GET
   @Path("/rendered-form")
   @Produces(MediaType.APPLICATION_XHTML_XML)
   Response getRenderedForm();
