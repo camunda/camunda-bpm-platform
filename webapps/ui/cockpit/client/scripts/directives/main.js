@@ -4,7 +4,7 @@ var angular = require('camunda-commons-ui/vendor/angular'),
 
     breadcrumbs = require('./../../../../common/scripts/directives/breadcrumbs'),
     numeric = require('./numeric'),
-    date = require('./date'),
+    date = require('./../../../../common/scripts/directives/date'),
     processDiagram = require('./processDiagram'),
     decisionTable = require('./decisionTable'),
     processDiagramPreview = require('./processDiagramPreview'),
