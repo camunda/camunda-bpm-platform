@@ -248,8 +248,26 @@ public interface FormService {
    */
   String getTaskFormKey(String processDefinitionId, String taskDefinitionKey);
 
+  /**
+   * Retrieves a deployed start form for a process definition with a given id.
+   *
+   *
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_DEFINITION}.
+   * @throws DeploymentResourceNotFoundException
+   *          If the start form cannot be found in a deployment.
+   */
   InputStream getDeployedStartForm(String processDefinitionId);
 
+  /**
+   * Retrieves a deployed task form for a task with a given id.
+   *
+   *
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#READ} permission on {@link Resources#TASK}.
+   * @throws DeploymentResourceNotFoundException
+   *          If the task form cannot be found in a deployment.
+   */
   InputStream getDeployedTaskForm(String taskId);
 
 }
