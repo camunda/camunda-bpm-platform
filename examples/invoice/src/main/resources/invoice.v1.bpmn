@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" id="sid-0b0aaa25-3baf-4875-9d7a-0907d599a9ef" targetNamespace="http://www.omg.org/spec/BPMN/20100524/MODEL" exporter="Camunda Modeler" exporterVersion="1.2.2" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
+<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" id="sid-0b0aaa25-3baf-4875-9d7a-0907d599a9ef" targetNamespace="http://www.omg.org/spec/BPMN/20100524/MODEL" exporter="Camunda Modeler" exporterVersion="1.10.0" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
   <dataStore id="FinancialAccountingSystem" name="Financial Accounting System" isUnlimited="false">
     <dataState id="DataState_1" />
   </dataStore>
@@ -7,7 +7,7 @@
   <collaboration id="collaboration_3">
     <participant id="Process_Engine_1" name="Invoice Receipt" processRef="invoice" />
   </collaboration>
-  <process id="invoice" name="Invoice Receipt" isExecutable="true">
+  <process id="invoice" name="Invoice Receipt" isExecutable="true" camunda:versionTag="V1.0">
     <laneSet id="laneSet_5">
       <lane id="Approver" name="Approver">
         <flowNodeRef>approveInvoice</flowNodeRef>
@@ -23,8 +23,8 @@
       </lane>
       <lane id="Accountant" name="Accountant">
         <flowNodeRef>prepareBankTransfer</flowNodeRef>
-        <flowNodeRef>ServiceTask_1</flowNodeRef>
         <flowNodeRef>invoiceProcessed</flowNodeRef>
+        <flowNodeRef>ServiceTask_1</flowNodeRef>
       </lane>
     </laneSet>
     <userTask id="approveInvoice" name="Approve Invoice" camunda:formKey="embedded:app:forms/approve-invoice.html" camunda:candidateGroups="${approverGroups}" camunda:dueDate="${dateTime().plusWeeks(1).toDate()}">
@@ -114,16 +114,16 @@
   <bpmndi:BPMNDiagram id="BPMNDiagram_73">
     <bpmndi:BPMNPlane id="BPMNPlane_73" bpmnElement="collaboration_3">
       <bpmndi:BPMNShape id="Process_Engine_1_gui" bpmnElement="Process_Engine_1" isHorizontal="true">
-        <omgdc:Bounds x="0" y="0" width="1108" height="486" />
+        <omgdc:Bounds x="-10" y="-10" width="1118" height="496" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Freigebender_105_gui" bpmnElement="Approver" isHorizontal="true">
-        <omgdc:Bounds x="30" y="182" width="1078" height="161" />
+        <omgdc:Bounds x="20" y="182" width="1088" height="161" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Team-Assistenz_110_gui" bpmnElement="teamAssistant" isHorizontal="true">
-        <omgdc:Bounds x="30" y="0" width="1078" height="183" />
+        <omgdc:Bounds x="20" y="-10" width="1088" height="193" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Buchhaltung_119_gui" bpmnElement="Accountant" isHorizontal="true">
-        <omgdc:Bounds x="30" y="342" width="1078" height="144" />
+        <omgdc:Bounds x="20" y="342" width="1088" height="144" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Rechnung_freigeben_125_gui" bpmnElement="approveInvoice" isHorizontal="true">
         <omgdc:Bounds x="353" y="224" width="100" height="80" />
