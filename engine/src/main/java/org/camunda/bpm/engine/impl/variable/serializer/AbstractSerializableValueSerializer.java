@@ -12,8 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.variable.serializer;
 
+import javax.xml.bind.DatatypeConverter;
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
 import org.camunda.bpm.engine.impl.util.StringUtil;
 import org.camunda.bpm.engine.variable.impl.value.UntypedValueImpl;
 import org.camunda.bpm.engine.variable.type.SerializableValueType;
@@ -104,7 +104,7 @@ public abstract class AbstractSerializableValueSerializer<T extends Serializable
   protected String getSerializedStringValue(byte[] serializedByteValue) {
     if(serializedByteValue != null) {
       if(!isSerializationTextBased()) {
-        serializedByteValue = Base64.encodeBase64(serializedByteValue);
+        return DatatypeConverter.printBase64Binary(serializedByteValue);
       }
       return StringUtil.fromBytes(serializedByteValue);
     }
@@ -115,9 +115,11 @@ public abstract class AbstractSerializableValueSerializer<T extends Serializable
 
   protected byte[] getSerializedBytesValue(String serializedStringValue) {
     if(serializedStringValue != null) {
-      byte[] serializedByteValue = StringUtil.toByteArray(serializedStringValue);
+      byte[] serializedByteValue = null;
       if (!isSerializationTextBased()) {
-        serializedByteValue = Base64.decodeBase64(serializedByteValue);
+        serializedByteValue = DatatypeConverter.parseBase64Binary(serializedStringValue);
+      } else {
+        serializedByteValue = StringUtil.toByteArray(serializedStringValue);
       }
       return serializedByteValue;
     }
