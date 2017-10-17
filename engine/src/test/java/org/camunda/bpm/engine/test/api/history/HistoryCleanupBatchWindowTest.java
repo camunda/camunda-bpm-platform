@@ -39,13 +39,17 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 /**
- * 
+ *
  * @author Anna Pazola
  *
  */
 @RunWith(Parameterized.class)
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
 public class HistoryCleanupBatchWindowTest {
+
+  protected String defaultStartTime;
+  protected String defaultEndTime;
+  protected int defaultBatchSize;
 
   protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
     public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
@@ -101,21 +105,22 @@ public class HistoryCleanupBatchWindowTest {
         // after the batch window on the next day
         { "22:00", "23:00", sdf.parse("2017-09-07T22:00:00"), sdf.parse("2017-09-07T23:00:00"), sdf.parse("2017-09-07T00:15:00")} });
   }
+
   @Before
   public void init() {
     historyService = engineRule.getHistoryService();
     processEngineConfiguration = engineRule.getProcessEngineConfiguration();
     managementService = engineRule.getManagementService();
     testRule.deploy("org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml", "org/camunda/bpm/engine/test/api/dmn/Example.dmn", "org/camunda/bpm/engine/test/api/cmmn/oneTaskCaseWithHistoryTimeToLive.cmmn");
+
+    defaultStartTime = processEngineConfiguration.getHistoryCleanupBatchWindowStartTime();
+    defaultEndTime = processEngineConfiguration.getHistoryCleanupBatchWindowEndTime();
+    defaultBatchSize = processEngineConfiguration.getHistoryCleanupBatchSize();
   }
 
   @After
   public void clearDatabase() {
     //reset configuration changes
-    String defaultStartTime = processEngineConfiguration.getHistoryCleanupBatchWindowStartTime();
-    String defaultEndTime = processEngineConfiguration.getHistoryCleanupBatchWindowEndTime();
-    int defaultBatchSize = processEngineConfiguration.getHistoryCleanupBatchSize();
-
     processEngineConfiguration.setHistoryCleanupBatchWindowStartTime(defaultStartTime);
     processEngineConfiguration.setHistoryCleanupBatchWindowEndTime(defaultEndTime);
     processEngineConfiguration.setHistoryCleanupBatchSize(defaultBatchSize);

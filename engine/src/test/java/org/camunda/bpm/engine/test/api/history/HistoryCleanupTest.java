@@ -92,6 +92,10 @@ public class HistoryCleanupTest {
   protected static final String DECISION = "decision";
   protected static final String ONE_TASK_CASE = "case";
 
+  protected String defaultStartTime;
+  protected String defaultEndTime;
+  protected int defaultBatchSize;
+
   protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
     public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
       configuration.setHistoryCleanupBatchSize(20);
@@ -126,15 +130,14 @@ public class HistoryCleanupTest {
     repositoryService = engineRule.getRepositoryService();
     processEngineConfiguration = engineRule.getProcessEngineConfiguration();
     testRule.deploy("org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml", "org/camunda/bpm/engine/test/api/dmn/Example.dmn", "org/camunda/bpm/engine/test/api/cmmn/oneTaskCaseWithHistoryTimeToLive.cmmn");
+    defaultStartTime = processEngineConfiguration.getHistoryCleanupBatchWindowStartTime();
+    defaultEndTime = processEngineConfiguration.getHistoryCleanupBatchWindowEndTime();
+    defaultBatchSize = processEngineConfiguration.getHistoryCleanupBatchSize();
   }
 
   @After
   public void clearDatabase() {
     //reset configuration changes
-    String defaultStartTime = processEngineConfiguration.getHistoryCleanupBatchWindowStartTime();
-    String defaultEndTime = processEngineConfiguration.getHistoryCleanupBatchWindowEndTime();
-    int defaultBatchSize = processEngineConfiguration.getHistoryCleanupBatchSize();
-
     processEngineConfiguration.setHistoryCleanupBatchWindowStartTime(defaultStartTime);
     processEngineConfiguration.setHistoryCleanupBatchWindowEndTime(defaultEndTime);
     processEngineConfiguration.setHistoryCleanupBatchSize(defaultBatchSize);
