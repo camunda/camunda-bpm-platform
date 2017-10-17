@@ -259,7 +259,7 @@ public class CleanableHistoricProcessInstanceReportTest {
   }
 
   @Test
-  public void testReportWithoutFinishedZero() {
+  public void testReportCompact() {
     // given
     List<ProcessDefinition> pdList = repositoryService.createProcessDefinitionQuery().processDefinitionKey(PROCESS_DEFINITION_KEY).list();
     assertEquals(1, pdList.size());
@@ -270,7 +270,7 @@ public class CleanableHistoricProcessInstanceReportTest {
     assertEquals(0, resultWithZeros.get(0).getFinishedProcessInstanceCount());
 
     // when
-    long resultCountWithoutZeros = historyService.createCleanableHistoricProcessInstanceReport().withoutFinishedZero().count();
+    long resultCountWithoutZeros = historyService.createCleanableHistoricProcessInstanceReport().compact().count();
 
     // then
     assertEquals(0, resultCountWithoutZeros);

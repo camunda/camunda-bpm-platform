@@ -386,7 +386,7 @@
           </if>
         </if>
 
-        <if test="isFinishedNonzero">
+        <if test="isCompact">
           F.FINISHED_ > 0
         </if>
 

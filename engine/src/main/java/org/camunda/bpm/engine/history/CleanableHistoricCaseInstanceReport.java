@@ -51,7 +51,7 @@ public interface CleanableHistoricCaseInstanceReport extends Query<CleanableHist
   /**
    * Only selects historic case instances which have more than zero finished instances.
    */
-  CleanableHistoricCaseInstanceReport withoutFinishedZero();
+  CleanableHistoricCaseInstanceReport compact();
 
   /**
    * Order by finished case instances amount (needs to be followed by {@link #asc()} or {@link #desc()}).

@@ -51,7 +51,7 @@ public interface CleanableHistoricDecisionInstanceReport extends Query<Cleanable
   /**
    * Only selects historic decision instances which have more than zero finished instances.
    */
-  CleanableHistoricDecisionInstanceReport withoutFinishedZero();
+  CleanableHistoricDecisionInstanceReport compact();
 
   /**
    * Order by finished decision instances amount (needs to be followed by {@link #asc()} or {@link #desc()}).

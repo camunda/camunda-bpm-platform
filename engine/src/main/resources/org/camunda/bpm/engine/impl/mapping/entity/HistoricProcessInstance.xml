@@ -554,7 +554,7 @@
           GROUP BY PI.PROC_DEF_ID_
           ) F ON F.PROC_DEF_ID_ = PI.PROC_DEF_ID_
 
-        <if test="isFinishedNonzero">
+        <if test="isCompact">
           WHERE FINISHED_ > 0
         </if>
 

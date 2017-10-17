@@ -51,7 +51,7 @@ public interface CleanableHistoricProcessInstanceReport extends Query<CleanableH
   /**
    * Only selects historic process instances which have more than zero finished instances.
    */
-  CleanableHistoricProcessInstanceReport withoutFinishedZero();
+  CleanableHistoricProcessInstanceReport compact();
 
   /**
    * Order by finished process instances amount (needs to be followed by {@link #asc()} or {@link #desc()}).

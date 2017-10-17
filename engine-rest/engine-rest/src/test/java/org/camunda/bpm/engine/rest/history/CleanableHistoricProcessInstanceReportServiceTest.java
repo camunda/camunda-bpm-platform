@@ -237,9 +237,9 @@ public class CleanableHistoricProcessInstanceReportServiceTest extends AbstractR
   }
 
   @Test
-  public void testQueryWithoutFinishedZero() {
+  public void testQueryCompact() {
     given()
-      .queryParam("withoutFinishedZero", true)
+      .queryParam("compact", true)
     .then()
       .expect()
         .statusCode(Status.OK.getStatusCode())
@@ -247,7 +247,7 @@ public class CleanableHistoricProcessInstanceReportServiceTest extends AbstractR
       .when()
         .get(HISTORIC_REPORT_URL);
 
-    verify(historicProcessInstanceReport).withoutFinishedZero();
+    verify(historicProcessInstanceReport).compact();
     verify(historicProcessInstanceReport).list();
   }
 
@@ -357,7 +357,7 @@ public class CleanableHistoricProcessInstanceReportServiceTest extends AbstractR
     parameters.put("processDefinitionKeyIn", EXAMPLE_PD_KEY + "," + ANOTHER_EXAMPLE_PD_KEY);
     parameters.put("tenantIdIn", EXAMPLE_TENANT_ID + "," + ANOTHER_EXAMPLE_TENANT_ID);
     parameters.put("withoutTenantId", true);
-    parameters.put("withoutFinishedZero", true);
+    parameters.put("compact", true);
 
     return parameters;
   }
@@ -367,6 +367,6 @@ public class CleanableHistoricProcessInstanceReportServiceTest extends AbstractR
     verify(historicProcessInstanceReport).processDefinitionKeyIn(EXAMPLE_PD_KEY, ANOTHER_EXAMPLE_PD_KEY);
     verify(historicProcessInstanceReport).tenantIdIn(EXAMPLE_TENANT_ID, ANOTHER_EXAMPLE_TENANT_ID);
     verify(historicProcessInstanceReport).withoutTenantId();
-    verify(historicProcessInstanceReport).withoutFinishedZero();
+    verify(historicProcessInstanceReport).compact();
   }
 }

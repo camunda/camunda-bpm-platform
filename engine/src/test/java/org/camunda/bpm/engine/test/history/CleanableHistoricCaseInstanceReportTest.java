@@ -248,7 +248,7 @@ public class CleanableHistoricCaseInstanceReportTest {
   }
 
   @Test
-  public void testReportWithoutFinishedZero() {
+  public void testReportCompact() {
     // given
     List<CaseDefinition> caseDefinitions = repositoryService.createCaseDefinitionQuery().caseDefinitionKey(CASE_DEFINITION_KEY).list();
     assertEquals(1, caseDefinitions.size());
@@ -258,7 +258,7 @@ public class CleanableHistoricCaseInstanceReportTest {
     assertEquals(0, resultWithZeros.get(0).getFinishedCaseInstanceCount());
 
     // when
-    long resultCountWithoutZeros = historyService.createCleanableHistoricCaseInstanceReport().withoutFinishedZero().count();
+    long resultCountWithoutZeros = historyService.createCleanableHistoricCaseInstanceReport().compact().count();
 
     // then
     assertEquals(0, resultCountWithoutZeros);

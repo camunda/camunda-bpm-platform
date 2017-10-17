@@ -226,7 +226,7 @@ public class CleanableHistoricDecisionInstanceReportTest {
   }
 
   @Test
-  public void testReportWithoutFinishedZero() {
+  public void testReportCompact() {
     // given
     List<DecisionDefinition> decisionDefinitions = repositoryService.createDecisionDefinitionQuery().decisionDefinitionKey(DECISION_DEFINITION_KEY).list();
     assertEquals(1, decisionDefinitions.size());
@@ -237,7 +237,7 @@ public class CleanableHistoricDecisionInstanceReportTest {
     assertEquals(0, resultWithZeros.get(0).getFinishedDecisionInstanceCount());
 
     // when
-    long resultCountWithoutZeros = historyService.createCleanableHistoricDecisionInstanceReport().withoutFinishedZero().count();
+    long resultCountWithoutZeros = historyService.createCleanableHistoricDecisionInstanceReport().compact().count();
 
     // then
     assertEquals(0, resultCountWithoutZeros);

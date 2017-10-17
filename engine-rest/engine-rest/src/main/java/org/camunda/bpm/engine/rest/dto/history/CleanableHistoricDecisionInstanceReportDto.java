@@ -34,7 +34,7 @@ public class CleanableHistoricDecisionInstanceReportDto extends AbstractQueryDto
   protected String[] decisionDefinitionKeyIn;
   protected String[] tenantIdIn;
   protected Boolean withoutTenantId;
-  protected Boolean withoutFinishedZero;
+  protected Boolean compact;
 
   protected static final String SORT_BY_FINISHED_VALUE = "finished";
 
@@ -72,9 +72,9 @@ public class CleanableHistoricDecisionInstanceReportDto extends AbstractQueryDto
     this.withoutTenantId = withoutTenantId;
   }
 
-  @CamundaQueryParam(value = "withoutFinishedZero", converter = BooleanConverter.class)
-  public void setWithoutFinishedZero(Boolean withoutFinishedZero) {
-    this.withoutFinishedZero = withoutFinishedZero;
+  @CamundaQueryParam(value = "compact", converter = BooleanConverter.class)
+  public void setCompact(Boolean compact) {
+    this.compact = compact;
   }
 
   @Override
@@ -101,8 +101,8 @@ public class CleanableHistoricDecisionInstanceReportDto extends AbstractQueryDto
     if (tenantIdIn != null && tenantIdIn.length > 0) {
       query.tenantIdIn(tenantIdIn);
     }
-    if (Boolean.TRUE.equals(withoutFinishedZero)) {
-      query.withoutFinishedZero();
+    if (Boolean.TRUE.equals(compact)) {
+      query.compact();
     }
   }
 

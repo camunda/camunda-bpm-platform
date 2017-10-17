@@ -32,7 +32,7 @@ public class CleanableHistoricDecisionInstanceReportImpl extends AbstractQuery<C
   protected String[] decisionDefinitionKeyIn;
   protected String[] tenantIdIn;
   protected boolean isTenantIdSet = false;
-  protected boolean isFinishedNonzero = false;
+  protected boolean isCompact = false;
 
   protected Date currentTimestamp;
 
@@ -70,8 +70,8 @@ public class CleanableHistoricDecisionInstanceReportImpl extends AbstractQuery<C
   }
 
   @Override
-  public CleanableHistoricDecisionInstanceReport withoutFinishedZero() {
-    this.isFinishedNonzero = true;
+  public CleanableHistoricDecisionInstanceReport compact() {
+    this.isCompact = true;
     return this;
   }
 
@@ -132,4 +132,9 @@ public class CleanableHistoricDecisionInstanceReportImpl extends AbstractQuery<C
   public boolean isTenantIdSet() {
     return isTenantIdSet;
   }
+
+  public boolean isCompact() {
+    return isCompact;
+  }
+
 }

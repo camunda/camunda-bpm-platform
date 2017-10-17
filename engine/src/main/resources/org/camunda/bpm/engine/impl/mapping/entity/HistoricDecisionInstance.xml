@@ -384,7 +384,7 @@
           GROUP BY DI.DEC_DEF_ID_
           ) F ON F.DEC_DEF_ID_ = DI.DEC_DEF_ID_
 
-        <if test="isFinishedNonzero">
+        <if test="isCompact">
           WHERE FINISHED_ > 0
         </if>
 

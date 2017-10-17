@@ -238,11 +238,17 @@ public class CleanableHistoricDecisionInstanceReportServiceTest extends Abstract
   }
 
   @Test
-  public void testQueryWithoutFinishedZero() {
-    given().queryParam("withoutFinishedZero", true).then().expect().statusCode(Status.OK.getStatusCode()).contentType(ContentType.JSON).when()
+  public void testQueryCompact() {
+    given()
+      .queryParam("compact", true)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .contentType(ContentType.JSON)
+      .when()
         .get(HISTORIC_REPORT_URL);
 
-    verify(historicDecisionInstanceReport).withoutFinishedZero();
+    verify(historicDecisionInstanceReport).compact();
     verify(historicDecisionInstanceReport).list();
   }
 
@@ -352,7 +358,7 @@ public class CleanableHistoricDecisionInstanceReportServiceTest extends Abstract
     parameters.put("decisionDefinitionKeyIn", EXAMPLE_DD_KEY + "," + ANOTHER_EXAMPLE_DD_KEY);
     parameters.put("tenantIdIn", EXAMPLE_TENANT_ID + "," + ANOTHER_EXAMPLE_TENANT_ID);
     parameters.put("withoutTenantId", true);
-    parameters.put("withoutFinishedZero", true);
+    parameters.put("compact", true);
 
     return parameters;
   }
@@ -362,6 +368,6 @@ public class CleanableHistoricDecisionInstanceReportServiceTest extends Abstract
     verify(historicDecisionInstanceReport).decisionDefinitionKeyIn(EXAMPLE_DD_KEY, ANOTHER_EXAMPLE_DD_KEY);
     verify(historicDecisionInstanceReport).tenantIdIn(EXAMPLE_TENANT_ID, ANOTHER_EXAMPLE_TENANT_ID);
     verify(historicDecisionInstanceReport).withoutTenantId();
-    verify(historicDecisionInstanceReport).withoutFinishedZero();
+    verify(historicDecisionInstanceReport).compact();
   }
 }
