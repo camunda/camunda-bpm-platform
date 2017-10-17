@@ -74,6 +74,12 @@ public class CleanableHistoricProcessInstanceReportImpl extends AbstractQuery<Cl
   }
 
   @Override
+  public CleanableHistoricProcessInstanceReport orderByFinishedProcessInstance() {
+    orderBy(CleanableHistoricInstanceReportProperty.FINISHED_AMOUNT);
+    return this;
+  }
+
+  @Override
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
     return commandContext

@@ -29,7 +29,6 @@ public interface CleanableHistoricDecisionInstanceReport extends Query<Cleanable
    */
   CleanableHistoricDecisionInstanceReport decisionDefinitionIdIn(String... decisionDefinitionIds);
 
-
   /**
    * Only takes historic decision instances into account for the given decision definition keys.
    *
@@ -53,5 +52,10 @@ public interface CleanableHistoricDecisionInstanceReport extends Query<Cleanable
    * Only selects historic decision instances which have more than zero finished instances.
    */
   CleanableHistoricDecisionInstanceReport withoutFinishedZero();
+
+  /**
+   * Order by finished decision instances amount (needs to be followed by {@link #asc()} or {@link #desc()}).
+   */
+  CleanableHistoricDecisionInstanceReport orderByFinishedDecisionInstance();
 
 }

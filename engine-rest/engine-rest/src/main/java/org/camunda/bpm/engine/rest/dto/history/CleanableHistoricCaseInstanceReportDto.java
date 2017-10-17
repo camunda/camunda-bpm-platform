@@ -13,6 +13,8 @@
 
 package org.camunda.bpm.engine.rest.dto.history;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.MultivaluedMap;
@@ -33,6 +35,15 @@ public class CleanableHistoricCaseInstanceReportDto extends AbstractQueryDto<Cle
   protected String[] tenantIdIn;
   protected Boolean withoutTenantId;
   protected Boolean withoutFinishedZero;
+
+  protected static final String SORT_BY_FINISHED_VALUE = "finished";
+
+  public static final List<String> VALID_SORT_BY_VALUES;
+
+  static {
+    VALID_SORT_BY_VALUES = new ArrayList<String>();
+    VALID_SORT_BY_VALUES.add(SORT_BY_FINISHED_VALUE);
+  }
 
   public CleanableHistoricCaseInstanceReportDto() {
   }
@@ -68,7 +79,7 @@ public class CleanableHistoricCaseInstanceReportDto extends AbstractQueryDto<Cle
 
   @Override
   protected boolean isValidSortByValue(String value) {
-    return false;
+    return VALID_SORT_BY_VALUES.contains(value);
   }
 
   @Override
@@ -98,5 +109,8 @@ public class CleanableHistoricCaseInstanceReportDto extends AbstractQueryDto<Cle
 
   @Override
   protected void applySortBy(CleanableHistoricCaseInstanceReport query, String sortBy, Map<String, Object> parameters, ProcessEngine engine) {
+    if (sortBy.equals(SORT_BY_FINISHED_VALUE)) {
+      query.orderByFinishedCaseInstance();
+    }
   }
 }

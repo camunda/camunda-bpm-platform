@@ -29,7 +29,6 @@ public interface CleanableHistoricCaseInstanceReport extends Query<CleanableHist
    */
   CleanableHistoricCaseInstanceReport caseDefinitionIdIn(String... caseDefinitionIds);
 
-
   /**
    * Only takes historic case instances into account for the given case definition keys.
    *
@@ -53,5 +52,10 @@ public interface CleanableHistoricCaseInstanceReport extends Query<CleanableHist
    * Only selects historic case instances which have more than zero finished instances.
    */
   CleanableHistoricCaseInstanceReport withoutFinishedZero();
+
+  /**
+   * Order by finished case instances amount (needs to be followed by {@link #asc()} or {@link #desc()}).
+   */
+  CleanableHistoricCaseInstanceReport orderByFinishedCaseInstance();
 
 }

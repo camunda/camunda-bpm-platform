@@ -275,4 +275,50 @@ public class CleanableHistoricProcessInstanceReportTest {
     // then
     assertEquals(0, resultCountWithoutZeros);
   }
+
+  @Test
+  public void testReportOrderByFinishedProcessInstanceAsc() {
+    testRule.deploy(createProcessWithUserTask(SECOND_PROCESS_DEFINITION_KEY));
+    testRule.deploy(createProcessWithUserTask(THIRD_PROCESS_DEFINITION_KEY));
+    // given
+    prepareProcessInstances(SECOND_PROCESS_DEFINITION_KEY, -6, 5, 6);
+    prepareProcessInstances(PROCESS_DEFINITION_KEY, -6, 5, 4);
+    prepareProcessInstances(THIRD_PROCESS_DEFINITION_KEY, -6, 5, 8);
+
+    // when
+    List<CleanableHistoricProcessInstanceReportResult> reportResult = historyService
+        .createCleanableHistoricProcessInstanceReport()
+        .orderByFinishedProcessInstance()
+        .asc()
+        .list();
+
+    // then
+    assertEquals(3, reportResult.size());
+    assertEquals(PROCESS_DEFINITION_KEY, reportResult.get(0).getProcessDefinitionKey());
+    assertEquals(SECOND_PROCESS_DEFINITION_KEY, reportResult.get(1).getProcessDefinitionKey());
+    assertEquals(THIRD_PROCESS_DEFINITION_KEY, reportResult.get(2).getProcessDefinitionKey());
+  }
+
+  @Test
+  public void testReportOrderByFinishedProcessInstanceDesc() {
+    testRule.deploy(createProcessWithUserTask(SECOND_PROCESS_DEFINITION_KEY));
+    testRule.deploy(createProcessWithUserTask(THIRD_PROCESS_DEFINITION_KEY));
+    // given
+    prepareProcessInstances(SECOND_PROCESS_DEFINITION_KEY, -6, 5, 6);
+    prepareProcessInstances(PROCESS_DEFINITION_KEY, -6, 5, 4);
+    prepareProcessInstances(THIRD_PROCESS_DEFINITION_KEY, -6, 5, 8);
+
+    // when
+    List<CleanableHistoricProcessInstanceReportResult> reportResult = historyService
+        .createCleanableHistoricProcessInstanceReport()
+        .orderByFinishedProcessInstance()
+        .desc()
+        .list();
+
+    // then
+    assertEquals(3, reportResult.size());
+    assertEquals(THIRD_PROCESS_DEFINITION_KEY, reportResult.get(0).getProcessDefinitionKey());
+    assertEquals(SECOND_PROCESS_DEFINITION_KEY, reportResult.get(1).getProcessDefinitionKey());
+    assertEquals(PROCESS_DEFINITION_KEY, reportResult.get(2).getProcessDefinitionKey());
+  }
 }

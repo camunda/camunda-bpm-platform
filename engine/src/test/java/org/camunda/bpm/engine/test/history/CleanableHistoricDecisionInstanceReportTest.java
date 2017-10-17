@@ -243,4 +243,47 @@ public class CleanableHistoricDecisionInstanceReportTest {
     assertEquals(0, resultCountWithoutZeros);
   }
 
+  @Test
+  public void testReportOrderByFinishedProcessInstanceAsc() {
+    // give
+    testRule.deploy("org/camunda/bpm/engine/test/repository/two.dmn", "org/camunda/bpm/engine/test/api/dmn/Another_Example.dmn");
+    prepareDecisionInstances(SECOND_DECISION_DEFINITION_KEY, -6, 5, 6);
+    prepareDecisionInstances(THIRD_DECISION_DEFINITION_KEY, -6, 5, 8);
+    prepareDecisionInstances(DECISION_DEFINITION_KEY, -6, 5, 4);
+
+    // when
+    List<CleanableHistoricDecisionInstanceReportResult> reportResult = historyService
+        .createCleanableHistoricDecisionInstanceReport()
+        .orderByFinishedDecisionInstance()
+        .asc()
+        .list();
+
+    // then
+    assertEquals(3, reportResult.size());
+    assertEquals(DECISION_DEFINITION_KEY, reportResult.get(0).getDecisionDefinitionKey());
+    assertEquals(SECOND_DECISION_DEFINITION_KEY, reportResult.get(1).getDecisionDefinitionKey());
+    assertEquals(THIRD_DECISION_DEFINITION_KEY, reportResult.get(2).getDecisionDefinitionKey());
+  }
+
+  @Test
+  public void testReportOrderByFinishedProcessInstanceDesc() {
+    // give
+    testRule.deploy("org/camunda/bpm/engine/test/repository/two.dmn", "org/camunda/bpm/engine/test/api/dmn/Another_Example.dmn");
+    prepareDecisionInstances(SECOND_DECISION_DEFINITION_KEY, -6, 5, 6);
+    prepareDecisionInstances(THIRD_DECISION_DEFINITION_KEY, -6, 5, 8);
+    prepareDecisionInstances(DECISION_DEFINITION_KEY, -6, 5, 4);
+
+    // when
+    List<CleanableHistoricDecisionInstanceReportResult> reportResult = historyService
+        .createCleanableHistoricDecisionInstanceReport()
+        .orderByFinishedDecisionInstance()
+        .desc()
+        .list();
+
+    // then
+    assertEquals(3, reportResult.size());
+    assertEquals(THIRD_DECISION_DEFINITION_KEY, reportResult.get(0).getDecisionDefinitionKey());
+    assertEquals(SECOND_DECISION_DEFINITION_KEY, reportResult.get(1).getDecisionDefinitionKey());
+    assertEquals(DECISION_DEFINITION_KEY, reportResult.get(2).getDecisionDefinitionKey());
+  }
 }

@@ -17,6 +17,7 @@ import static com.jayway.restassured.RestAssured.expect;
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.path.json.JsonPath.from;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.Matchers.containsString;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -33,6 +34,7 @@ import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.history.CleanableHistoricProcessInstanceReport;
 import org.camunda.bpm.engine.history.CleanableHistoricProcessInstanceReportResult;
 import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
+import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
 import org.junit.Assert;
 import org.junit.Before;
@@ -287,6 +289,65 @@ public class CleanableHistoricProcessInstanceReportServiceTest extends AbstractR
 
     verifyQueryParameterInvocations();
     verify(historicProcessInstanceReport).count();
+  }
+
+  @Test
+  public void testOrderByFinishedProcessInstanceAsc() {
+    given()
+      .queryParam("sortBy", "finished")
+      .queryParam("sortOrder", "asc")
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(HISTORIC_REPORT_URL);
+
+    verify(historicProcessInstanceReport).orderByFinishedProcessInstance();
+    verify(historicProcessInstanceReport).asc();
+  }
+
+  @Test
+  public void testOrderByFinishedProcessInstanceDesc() {
+    given()
+      .queryParam("sortBy", "finished")
+      .queryParam("sortOrder", "desc")
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(HISTORIC_REPORT_URL);
+
+    verify(historicProcessInstanceReport).orderByFinishedProcessInstance();
+    verify(historicProcessInstanceReport).desc();
+  }
+
+  @Test
+  public void testSortOrderParameterOnly() {
+    given()
+    .queryParam("sortOrder", "asc")
+  .then()
+    .expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", containsString("Only a single sorting parameter specified. sortBy and sortOrder required"))
+    .when()
+      .get(HISTORIC_REPORT_URL);
+  }
+
+  @Test
+  public void testInvalidSortingOptions() {
+    executeAndVerifySorting("anInvalidSortByOption", "asc", Status.BAD_REQUEST);
+    executeAndVerifySorting("finished", "anInvalidSortOrderOption", Status.BAD_REQUEST);
+  }
+
+  protected void executeAndVerifySorting(String sortBy, String sortOrder, Status expectedStatus) {
+    given()
+      .queryParam("sortBy", sortBy)
+      .queryParam("sortOrder", sortOrder)
+    .then()
+      .expect()
+        .statusCode(expectedStatus.getStatusCode())
+      .when()
+        .get(HISTORIC_REPORT_URL);
   }
 
   protected Map<String, Object> getCompleteQueryParameters() {

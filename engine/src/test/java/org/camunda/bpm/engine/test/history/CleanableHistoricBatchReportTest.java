@@ -86,7 +86,7 @@ public class CleanableHistoricBatchReportTest {
   }
 
   @Test
-  public void testMixedConfiguration() {
+  public void testReportMixedConfiguration() {
     Map<String, String> map = new HashMap<String, String>();
     int modOperationsTTL = 20;
     map.put("instance-modification", "P20D");
@@ -161,7 +161,7 @@ public class CleanableHistoricBatchReportTest {
   }
 
   @Test
-  public void testNoDefaultConfiguration() {
+  public void testReportNoDefaultConfiguration() {
     Map<String, String> map = new HashMap<String, String>();
     int modOperationsTTL = 5;
     map.put("instance-modification", "P5D");
@@ -199,7 +199,7 @@ public class CleanableHistoricBatchReportTest {
     for (int i = 0; i < 4; i++) {
       managementService.deleteBatch(batchIds1.get(i), false);
     }
-    ClockUtil.setCurrentTime(DateUtils.addDays(startDate, -delOperationsTTL));
+    ClockUtil.setCurrentTime(DateUtils.addDays(startDate, -7));
     for (int i = 6; i < batchIds1.size(); i++) {
       managementService.deleteBatch(batchIds1.get(i), false);
     }
@@ -237,9 +237,8 @@ public class CleanableHistoricBatchReportTest {
     }
   }
 
-
   @Test
-  public void testNoTTLConfiguration() {
+  public void testReportNoTTLConfiguration() {
     processEngineConfiguration.initHistoryCleanup();
     assertNull(processEngineConfiguration.getBatchOperationHistoryTimeToLive());
 
@@ -275,7 +274,7 @@ public class CleanableHistoricBatchReportTest {
   }
 
   @Test
-  public void testZeroTTL() {
+  public void testReportZeroTTL() {
     Map<String, String> map = new HashMap<String, String>();
     int modOperationsTTL = 0;
     map.put("instance-modification", "P0D");
@@ -294,6 +293,61 @@ public class CleanableHistoricBatchReportTest {
     CleanableHistoricBatchReportResult result = historyService.createCleanableHistoricBatchReport().singleResult();
     assertNotNull(result);
     checkResultNumbers(result, 1, 1, modOperationsTTL);
+  }
+
+  @Test
+  public void testReportOrderByFinishedProcessInstance() {
+    processEngineConfiguration.setBatchOperationHistoryTimeToLive("P5D");
+    processEngineConfiguration.initHistoryCleanup();
+    assertNotNull(processEngineConfiguration.getBatchOperationHistoryTimeToLive());
+
+    Date startDate = ClockUtil.getCurrentTime();
+    int daysInThePast = -11;
+    ClockUtil.setCurrentTime(DateUtils.addDays(startDate, daysInThePast));
+
+    List<String> batchIds = new ArrayList<String>();
+
+    Batch modificationBatch = createModificationBatch();
+    batchIds.add(modificationBatch.getId());
+
+    int migrationCountBatch = 10;
+    batchIds.addAll(createMigrationBatchList(migrationCountBatch));
+
+    int cancelationCountBatch = 20;
+    batchIds.addAll(createCancelationBatchList(cancelationCountBatch));
+
+    ClockUtil.setCurrentTime(DateUtils.addDays(startDate, -8));
+
+    for (String batchId : batchIds) {
+      managementService.deleteBatch(batchId, false);
+    }
+
+    ClockUtil.setCurrentTime(new Date());
+
+    // assume
+    List<HistoricBatch> historicList = historyService.createHistoricBatchQuery().list();
+    assertEquals(31, historicList.size());
+
+    // then
+    List<CleanableHistoricBatchReportResult> reportResultAsc = historyService
+        .createCleanableHistoricBatchReport()
+        .orderByFinishedBatchOperation()
+        .asc()
+        .list();
+    assertEquals(3, reportResultAsc.size());
+    assertEquals("instance-modification", reportResultAsc.get(0).getBatchType());
+    assertEquals("instance-migration", reportResultAsc.get(1).getBatchType());
+    assertEquals("instance-deletion", reportResultAsc.get(2).getBatchType());
+
+    List<CleanableHistoricBatchReportResult> reportResultDesc = historyService
+        .createCleanableHistoricBatchReport()
+        .orderByFinishedBatchOperation()
+        .desc()
+        .list();
+    assertEquals(3, reportResultDesc.size());
+    assertEquals("instance-deletion", reportResultDesc.get(0).getBatchType());
+    assertEquals("instance-migration", reportResultDesc.get(1).getBatchType());
+    assertEquals("instance-modification", reportResultDesc.get(2).getBatchType());
   }
 
   private void checkResultNumbers(CleanableHistoricBatchReportResult result, int expectedCleanable, int expectedFinished, Integer expectedTTL) {

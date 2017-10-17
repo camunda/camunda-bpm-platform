@@ -176,6 +176,7 @@
     SELECT ${distinct} RES.*
     ${limitBetween}
     <include refid="selectFinishedBatchesReportEntitiesSql"/>
+    ${orderBy}
     ${limitAfter}
   </select>
 
@@ -212,6 +213,7 @@
     SELECT FINISHED_, TYPE_
     ${limitBetween}
     <include refid="selectOnlyFinishedBatchesReportEntitiesSql" />
+    ${orderBy}
     ${limitAfter}
   </select>
 

@@ -13,6 +13,8 @@
 
 package org.camunda.bpm.engine.rest.dto.history.batch;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.MultivaluedMap;
@@ -25,13 +27,22 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class CleanableHistoricBatchReportDto extends AbstractQueryDto<CleanableHistoricBatchReport> {
 
+  protected static final String SORT_BY_FINISHED_VALUE = "finished";
+
+  public static final List<String> VALID_SORT_BY_VALUES;
+
+  static {
+    VALID_SORT_BY_VALUES = new ArrayList<String>();
+    VALID_SORT_BY_VALUES.add(SORT_BY_FINISHED_VALUE);
+  }
+
   public CleanableHistoricBatchReportDto(ObjectMapper objectMapper, MultivaluedMap<String, String> queryParameters) {
     super(objectMapper, queryParameters);
   }
 
   @Override
   protected boolean isValidSortByValue(String value) {
-    return false;
+    return VALID_SORT_BY_VALUES.contains(value);
   }
 
   @Override
@@ -45,6 +56,9 @@ public class CleanableHistoricBatchReportDto extends AbstractQueryDto<CleanableH
 
   @Override
   protected void applySortBy(CleanableHistoricBatchReport query, String sortBy, Map<String, Object> parameters, ProcessEngine engine) {
+    if (sortBy.equals(SORT_BY_FINISHED_VALUE)) {
+      query.orderByFinishedBatchOperation();
+    }
   }
 
 }

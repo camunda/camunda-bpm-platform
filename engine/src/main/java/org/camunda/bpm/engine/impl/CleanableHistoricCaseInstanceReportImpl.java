@@ -76,6 +76,12 @@ public class CleanableHistoricCaseInstanceReportImpl extends AbstractQuery<Clean
   }
 
   @Override
+  public CleanableHistoricCaseInstanceReport orderByFinishedCaseInstance() {
+    orderBy(CleanableHistoricInstanceReportProperty.FINISHED_AMOUNT);
+    return this;
+  }
+
+  @Override
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
     return commandContext

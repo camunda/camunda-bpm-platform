@@ -11,19 +11,11 @@
  * limitations under the License.
  */
 
-package org.camunda.bpm.engine.history;
+package org.camunda.bpm.engine.impl;
 
-import org.camunda.bpm.engine.query.Query;
+import org.camunda.bpm.engine.query.QueryProperty;
 
-/**
- * Defines a report query for cleanable batches.
- *
- */
-public interface CleanableHistoricBatchReport extends Query<CleanableHistoricBatchReport, CleanableHistoricBatchReportResult> {
+public interface CleanableHistoricInstanceReportProperty {
 
-  /**
-   * Order by finished batch operations amount (needs to be followed by {@link #asc()} or {@link #desc()}).
-   */
-  CleanableHistoricBatchReport orderByFinishedBatchOperation();
-
+  public static final QueryProperty FINISHED_AMOUNT = new QueryPropertyImpl("FINISHED_");
 }

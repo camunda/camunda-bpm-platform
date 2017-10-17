@@ -263,4 +263,49 @@ public class CleanableHistoricCaseInstanceReportTest {
     // then
     assertEquals(0, resultCountWithoutZeros);
   }
+
+  @Test
+  public void testReportOrderByFinishedProcessInstanceAsc() {
+    // given
+    testRule.deploy("org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn", "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn");
+    prepareCaseInstances(THIRD_CASE_DEFINITION_KEY, -6, 5, 8);
+    prepareCaseInstances(CASE_DEFINITION_KEY, -6, 5, 4);
+    prepareCaseInstances(SECOND_CASE_DEFINITION_KEY, -6, 5, 6);
+
+    // when
+    List<CleanableHistoricCaseInstanceReportResult> reportResult = historyService
+        .createCleanableHistoricCaseInstanceReport()
+        .orderByFinishedCaseInstance()
+        .asc()
+        .list();
+
+    // then
+    assertEquals(3, reportResult.size());
+    assertEquals(CASE_DEFINITION_KEY, reportResult.get(0).getCaseDefinitionKey());
+    assertEquals(SECOND_CASE_DEFINITION_KEY, reportResult.get(1).getCaseDefinitionKey());
+    assertEquals(THIRD_CASE_DEFINITION_KEY, reportResult.get(2).getCaseDefinitionKey());
+  }
+
+  @Test
+  public void testReportOrderByFinishedProcessInstanceDesc() {
+    // given
+    testRule.deploy("org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn", "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn");
+    prepareCaseInstances(THIRD_CASE_DEFINITION_KEY, -6, 5, 8);
+    prepareCaseInstances(CASE_DEFINITION_KEY, -6, 5, 4);
+    prepareCaseInstances(SECOND_CASE_DEFINITION_KEY, -6, 5, 6);
+
+    // when
+    List<CleanableHistoricCaseInstanceReportResult> reportResult = historyService
+        .createCleanableHistoricCaseInstanceReport()
+        .orderByFinishedCaseInstance()
+        .desc()
+        .list();
+
+    // then
+    assertEquals(3, reportResult.size());
+    assertEquals(THIRD_CASE_DEFINITION_KEY, reportResult.get(0).getCaseDefinitionKey());
+    assertEquals(SECOND_CASE_DEFINITION_KEY, reportResult.get(1).getCaseDefinitionKey());
+    assertEquals(CASE_DEFINITION_KEY, reportResult.get(2).getCaseDefinitionKey());
+  }
+
 }

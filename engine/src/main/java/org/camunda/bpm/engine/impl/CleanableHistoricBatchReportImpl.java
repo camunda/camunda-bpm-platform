@@ -34,6 +34,12 @@ public class CleanableHistoricBatchReportImpl extends AbstractQuery<CleanableHis
   }
 
   @Override
+  public CleanableHistoricBatchReport orderByFinishedBatchOperation() {
+    orderBy(CleanableHistoricInstanceReportProperty.FINISHED_AMOUNT);
+    return this;
+  }
+
+  @Override
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
     checkPermissions(commandContext);
