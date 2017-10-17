@@ -254,8 +254,10 @@ public interface FormService {
    *
    * @throws AuthorizationException
    *          If the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_DEFINITION}.
-   * @throws DeploymentResourceNotFoundException
-   *          If the start form cannot be found in a deployment.
+   * @throws NotFoundException
+   *          If the start form cannot be found.
+   * @throws BadUserRequestException
+   *          If the start form key has wrong format ("embedded:deployment:<path>" or "deployment:<path>" required).
    */
   InputStream getDeployedStartForm(String processDefinitionId);
 
@@ -265,8 +267,10 @@ public interface FormService {
    *
    * @throws AuthorizationException
    *          If the user has no {@link Permissions#READ} permission on {@link Resources#TASK}.
-   * @throws DeploymentResourceNotFoundException
-   *          If the task form cannot be found in a deployment.
+   * @throws NotFoundException
+   *          If the task form cannot be found.
+   * @throws BadUserRequestException
+   *          If the task form key has wrong format ("embedded:deployment:<path>" or "deployment:<path>" required).
    */
   InputStream getDeployedTaskForm(String taskId);
 
