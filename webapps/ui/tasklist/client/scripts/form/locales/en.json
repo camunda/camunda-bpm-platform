@@ -1,6 +1,8 @@
 {
   "FORM_FAILURE":
       "Form failure:",
+  "API_FAILED_BUSINESS_KEY":
+      "Business key couldn't be retrieved.",
   "INIT_EXTERNAL_FORM_FAILED":
       "Cannot initialize external form url: either task ID or process definition key must be provided. Try to refresh the page to try again.",
   "EMPTY_CONTEXT_PATH":

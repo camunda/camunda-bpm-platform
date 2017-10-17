@@ -27,8 +27,7 @@ module.exports = [
       template: template,
 
       link: function($scope, $element, attrs, formController) {
-        $scope.showBusinessKeyField = !!formController.getParams().processDefinitionId;
-
+      
         var formElement = $($element[0]).find('form');
         var camForm = null;
         var form = {

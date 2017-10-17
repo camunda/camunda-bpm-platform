@@ -61,10 +61,12 @@ var Controller = [
       $scope.options = angular.copy(DEFAULT_OPTIONS);
 
       if (task && task.id) {
-        $scope.params = { 
+        $scope.params = {
           taskId : task.id,
+          caseDefinitionId: task.caseDefinitionId,
+          caseInstanceId: task.caseInstanceId,
           processDefinitionId: task.processDefinitionId,
-          caseDefinitionId: task.caseDefinitionId
+          processInstanceId: task.processInstanceId
         };
       }
       else {
