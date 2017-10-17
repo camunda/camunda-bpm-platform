@@ -20,7 +20,6 @@ import java.util.Map;
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.form.StartFormData;
 import org.camunda.bpm.engine.form.TaskFormData;
-import org.camunda.bpm.engine.impl.cmd.AbstractGetDeployedFormCmd;
 import org.camunda.bpm.engine.impl.cmd.GetDeployedStartFormCmd;
 import org.camunda.bpm.engine.impl.cmd.GetFormKeyCmd;
 import org.camunda.bpm.engine.impl.cmd.GetRenderedStartFormCmd;

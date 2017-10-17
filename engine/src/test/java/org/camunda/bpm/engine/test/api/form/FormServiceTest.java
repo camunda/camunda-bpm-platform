@@ -34,7 +34,7 @@ import java.util.Map.Entry;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.DeploymentResourceNotFoundException;
-import org.camunda.bpm.engine.exception.NullValueException;
+import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.form.FormField;
 import org.camunda.bpm.engine.form.FormProperty;
 import org.camunda.bpm.engine.form.StartFormData;
@@ -56,7 +56,6 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.commons.utils.IoUtil;
-import org.junit.Assert;
 
 /**
  * @author Joram Barrez
@@ -1044,7 +1043,7 @@ public class FormServiceTest extends PluggableProcessEngineTestCase {
     assertTrue(result.get(0).getName().equals("secondParam"));
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/form/FormsProcess.bpmn20.xml",
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/form/DeployedFormsProcess.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/form/start.form",
       "org/camunda/bpm/engine/test/api/form/task.form" })
   public void testGetDeployedStartForm() {
@@ -1070,7 +1069,7 @@ public class FormServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/form/FormsProcess.bpmn20.xml",
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/form/DeployedFormsProcess.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/form/start.form",
       "org/camunda/bpm/engine/test/api/form/task.form" })
   public void testGetDeployedTaskForm() {
@@ -1097,7 +1096,7 @@ public class FormServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/form/FormsProcess.bpmn20.xml",
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/form/DeployedFormsProcess.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/form/task.form" })
   public void testGetDeployedStartForm_DeploymentNotFound() {
     // given
@@ -1107,13 +1106,14 @@ public class FormServiceTest extends PluggableProcessEngineTestCase {
       // when
       formService.getDeployedStartForm(procDefId);
       fail("Exception expected");
-    } catch (DeploymentResourceNotFoundException e) {
+    } catch (NotFoundException e) {
       // then
-      assertTextPresent("no resource found", e.getMessage());
+      assertTextPresent("The resource 'org/camunda/bpm/engine/test/api/form/start.form' cannot be found.", e.getMessage());
+      assertEquals(DeploymentResourceNotFoundException.class.getSimpleName(), e.getCause().getClass().getSimpleName());
     }
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/form/FormsProcess.bpmn20.xml",
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/form/DeployedFormsProcess.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/form/start.form" })
   public void testGetDeployedTaskForm_DeploymentNotFound() {
     // given
@@ -1124,34 +1124,68 @@ public class FormServiceTest extends PluggableProcessEngineTestCase {
       // when
       formService.getDeployedTaskForm(taskId);
       fail("Exception expected");
-    } catch (DeploymentResourceNotFoundException e) {
+    } catch (NotFoundException e) {
       // then
-      assertTextPresent("no resource found", e.getMessage());
+      assertTextPresent("The resource 'org/camunda/bpm/engine/test/api/form/task.form' cannot be found.", e.getMessage());
+      assertEquals(DeploymentResourceNotFoundException.class.getSimpleName(), e.getCause().getClass().getSimpleName());
     }
   }
 
-  public void testGetDeployedStartForm_NotFound() {
+  public void testGetDeployedStartForm_FormKeyNotSet() {
     // given
     deployment(ProcessModels.ONE_TASK_PROCESS);
     String processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
 
     // when
-    InputStream deployedStartForm = formService.getDeployedStartForm(processDefinitionId);
-
-    // then
-    assertNull(deployedStartForm);
+    try {
+      formService.getDeployedStartForm(processDefinitionId);
+      fail("Exception expected");
+    } catch (NotFoundException e) {
+      // then
+      assertTextPresent("The form key is not set.", e.getMessage());
+    }
   }
 
-  public void testGetDeployedTaskForm_NotFound() {
+  public void testGetDeployedTaskForm_FormKeyNotSet() {
     // given
     deployment(ProcessModels.ONE_TASK_PROCESS);
     runtimeService.startProcessInstanceByKey("Process");
     String taskId = taskService.createTaskQuery().singleResult().getId();
 
     // when
-    InputStream deployedTaskForm = formService.getDeployedTaskForm(taskId);
+    try {
+      formService.getDeployedTaskForm(taskId);
+      fail("Exception expected");
+    } catch (NotFoundException e) {
+      // then
+      assertTextPresent("The form key is not set.", e.getMessage());
+    }
+  }
 
-    // then
-    assertNull(deployedTaskForm);
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/form/FormServiceTest.testGetDeployedStartFormWithWrongKeyFormat.bpmn20.xml" })
+  public void testGetDeployedStartFormWithWrongKeyFormat() {
+    String processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
+
+    try {
+      formService.getDeployedStartForm(processDefinitionId);
+      fail("Exception expected");
+    } catch (BadUserRequestException e) {
+      assertTextPresent("The form key 'formKey' has wrong format.", e.getMessage());
+    }
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/form/FormServiceTest.testGetDeployedTaskFormWithWrongKeyFormat.bpmn20.xml" })
+  public void testGetDeployedTaskFormWithWrongKeyFormat() {
+    runtimeService.startProcessInstanceByKey("FormsProcess");
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+
+    try {
+      formService.getDeployedTaskForm(taskId);
+      fail("Exception expected");
+    } catch (BadUserRequestException e) {
+      assertTextPresent("The form key 'formKey' has wrong format.", e.getMessage());
+    }
   }
 }

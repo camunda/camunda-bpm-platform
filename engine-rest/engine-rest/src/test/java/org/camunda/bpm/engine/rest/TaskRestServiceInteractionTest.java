@@ -69,13 +69,14 @@ import org.camunda.bpm.ProcessApplicationService;
 import org.camunda.bpm.application.ProcessApplicationInfo;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
 import org.camunda.bpm.engine.AuthorizationException;
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.TaskService;
-import org.camunda.bpm.engine.exception.DeploymentResourceNotFoundException;
+import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.form.TaskFormData;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
@@ -3138,30 +3139,31 @@ public class TaskRestServiceInteractionTest extends
   }
 
   @Test
-  public void testGetDeployedTaskFormWithDeploymentResourceNotFoundException() {
-    String message = "no resource found in deployment";
+  public void testGetDeployedTaskFormWithWrongFormKey() {
+    String message = "wrong key format";
     when(formServiceMock.getDeployedTaskForm(anyString()))
-        .thenThrow(new DeploymentResourceNotFoundException(message));
+        .thenThrow(new BadUserRequestException(message));
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("message", equalTo(message))
+    .when()
+    .get(DEPLOYED_TASK_FORM_URL);
+  }
+
+  @Test
+  public void testGetDeployedTaskFormWithUnexistingForm() {
+    String message = "not found";
+    when(formServiceMock.getDeployedTaskForm(anyString()))
+        .thenThrow(new NotFoundException(message));
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_TASK_ID)
     .then().expect()
       .statusCode(Status.NOT_FOUND.getStatusCode())
-      .body("message", equalTo(message))
-    .when()
-      .get(DEPLOYED_TASK_FORM_URL);
-  }
-
-  @Test
-  public void testGetDeployedTaskFormWithUnexistingForm() {
-    when(formServiceMock.getDeployedTaskForm(anyString()))
-        .thenReturn(null);
-
-    given()
-      .pathParam("id", MockProvider.EXAMPLE_TASK_ID)
-    .then().expect()
-      .statusCode(Status.OK.getStatusCode())
-      .body(equalTo(""))
+      .body("message",equalTo(message))
     .when()
       .get(DEPLOYED_TASK_FORM_URL);
   }

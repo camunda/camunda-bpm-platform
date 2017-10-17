@@ -14,8 +14,6 @@ package org.camunda.bpm.engine.rest.sub.task.impl;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +31,7 @@ import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.TaskService;
-import org.camunda.bpm.engine.exception.DeploymentResourceNotFoundException;
+import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.form.FormData;
@@ -367,14 +365,14 @@ public class TaskResourceImpl implements TaskResource {
     InputStream deployedTaskForm = null;
     try {
       deployedTaskForm = engine.getFormService().getDeployedTaskForm(taskId);
-    } catch (BadUserRequestException e) {
-      throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());
-    } catch (NullValueException e) {
+    } catch (NotFoundException e) {
       throw new InvalidRequestException(Status.NOT_FOUND, e.getMessage());
+    } catch (NullValueException e) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());
     } catch (AuthorizationException e) {
       throw new InvalidRequestException(Status.FORBIDDEN, e.getMessage());
-    } catch (DeploymentResourceNotFoundException e) {
-      throw new InvalidRequestException(Status.NOT_FOUND, e.getMessage());
+    } catch (BadUserRequestException e) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());
     }
     return Response.ok(deployedTaskForm, MediaType.APPLICATION_XHTML_XML).build();
   }

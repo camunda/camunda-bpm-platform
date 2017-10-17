@@ -23,7 +23,6 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
-import org.camunda.bpm.engine.exception.DeploymentResourceNotFoundException;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.form.StartFormData;
@@ -425,14 +424,14 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
     InputStream deployedStartForm = null;
     try {
       deployedStartForm = engine.getFormService().getDeployedStartForm(processDefinitionId);
-    } catch (BadUserRequestException e) {
-      throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());
-    } catch (NullValueException e) {
+    } catch (NotFoundException e) {
       throw new InvalidRequestException(Status.NOT_FOUND, e.getMessage());
+    } catch (NullValueException e) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());
     } catch (AuthorizationException e) {
       throw new InvalidRequestException(Status.FORBIDDEN, e.getMessage());
-    } catch (DeploymentResourceNotFoundException e) {
-      throw new InvalidRequestException(Status.NOT_FOUND, e.getMessage());
+    } catch (BadUserRequestException e) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());
     }
     return Response.ok(deployedStartForm, MediaType.APPLICATION_XHTML_XML).build();
   }

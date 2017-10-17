@@ -47,7 +47,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
 
   public void setUp() throws Exception {
     deploymentId = createDeployment(null,
-        "org/camunda/bpm/engine/test/api/form/FormsProcess.bpmn20.xml",
+        "org/camunda/bpm/engine/test/api/form/DeployedFormsProcess.bpmn20.xml",
         "org/camunda/bpm/engine/test/api/form/start.form",
         "org/camunda/bpm/engine/test/api/form/task.form",
         "org/camunda/bpm/engine/test/api/authorization/renderedFormProcess.bpmn20.xml",
@@ -90,7 +90,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
 
     // then
     assertNotNull(startFormData);
-    assertEquals("org/camunda/bpm/engine/test/api/form/start.form", startFormData.getFormKey());
+    assertEquals("deployment:org/camunda/bpm/engine/test/api/form/start.form", startFormData.getFormKey());
   }
 
   // get rendered start form /////////////////////////////////////
@@ -732,7 +732,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
     String formKey = formService.getStartFormKey(processDefinitionId);
 
     // then
-    assertEquals("org/camunda/bpm/engine/test/api/form/start.form", formKey);
+    assertEquals("deployment:org/camunda/bpm/engine/test/api/form/start.form", formKey);
   }
 
   // get task form key ////////////////////////////////////////
@@ -764,7 +764,7 @@ public class FormAuthorizationTest extends AuthorizationTest {
     String formKey = formService.getTaskFormKey(processDefinitionId, "task");
 
     // then
-    assertEquals("org/camunda/bpm/engine/test/api/form/task.form", formKey);
+    assertEquals("deployment:org/camunda/bpm/engine/test/api/form/task.form", formKey);
   }
 
   // get deployed start form////////////////////////////////////////

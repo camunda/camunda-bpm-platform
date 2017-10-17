@@ -6,7 +6,6 @@ import org.camunda.bpm.ProcessApplicationService;
 import org.camunda.bpm.application.ProcessApplicationInfo;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
 import org.camunda.bpm.engine.*;
-import org.camunda.bpm.engine.exception.DeploymentResourceNotFoundException;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.form.StartFormData;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
@@ -3846,15 +3845,15 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
   }
 
   @Test
-  public void testGetDeployedStartFormWithDeploymentResourceNotFoundException() {
-    String message = "resource not found";
+  public void testGetDeployedStartFormWithWrongFormKeyFormat() {
+    String message = "wrong key format";
     when(formServiceMock.getDeployedStartForm(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))
-        .thenThrow(new DeploymentResourceNotFoundException(message));
+        .thenThrow(new BadUserRequestException(message));
 
     given()
     .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
     .then().expect()
-    .statusCode(Status.NOT_FOUND.getStatusCode())
+    .statusCode(Status.BAD_REQUEST.getStatusCode())
     .body("message", equalTo(message))
     .when()
     .get(DEPLOYED_START_FORM_URL);
@@ -3862,14 +3861,15 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testGetDeployedStartFormWithUnexistingForm() {
+    String message = "not found";
     when(formServiceMock.getDeployedStartForm(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))
-        .thenReturn(null);
+        .thenThrow(new NotFoundException(message));
 
     given()
     .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
     .then().expect()
-    .statusCode(Status.OK.getStatusCode())
-    .body(equalTo(""))
+    .statusCode(Status.NOT_FOUND.getStatusCode())
+    .body("message", equalTo(message))
     .when()
     .get(DEPLOYED_START_FORM_URL);
   }
