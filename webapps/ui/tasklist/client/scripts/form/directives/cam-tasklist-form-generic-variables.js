@@ -17,7 +17,11 @@ module.exports = ['camAPI', 'Notifications', '$translate', 'unfixDate', function
 
     link: function($scope, $element, attrs, formController) {
 
+    // setup ///////////////////////////////////////////////////////////
+
       var Task = camAPI.resource('task');
+      var ProcessInstance = camAPI.resource('process-instance');
+      var CaseInstance = camAPI.resource('case-instance');
 
       $scope.$watch('tasklistForm', function() {
         $scope.variablesLoaded = false;
@@ -38,6 +42,32 @@ module.exports = ['camAPI', 'Notifications', '$translate', 'unfixDate', function
         'String':   'text',
         'Date':     'text'
       };
+
+      (function getBusinessKey() {
+        var params = formController.getParams();
+
+        var resource;
+
+        if (params.processInstanceId) {
+          resource = ProcessInstance;
+        }
+        else if (params.caseInstanceId) {
+          resource = CaseInstance;
+        }
+
+        if (resource) {
+          resource.get(params.processInstanceId || params.caseInstanceId, function(err, res) {
+
+            $scope.readonly = true;
+
+            if(!err && res.businessKey) {
+              $scope.businessKey = res.businessKey;
+            } else if (err) {
+              $scope.tasklistForm.$error = {message: 'API_FAILED_BUSINESS_KEY'};
+            }
+          });
+        }
+      })();
 
       $scope.addVariable = function() {
         var newVariable = angular.copy(emptyVariable);

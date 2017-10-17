@@ -31,8 +31,7 @@ module.exports = [
 
     // init data depend for task list data
     var tasklistData = $scope.tasklistData = dataDepend.create($scope);
-
-    // get current task id from location
+      // get current task id from location
     var taskId = getPropertyFromLocation('task');
     var detailsTab = getPropertyFromLocation('detailsTab');
 
