@@ -1,7 +1,8 @@
 <form name="generic-form"
       class="form-horizontal">
 
-  <div class="form-group">
+  <div class="form-group"
+       ng-if="showBusinessKey">
     <label for="business-key-field"
            translate="BUSINESS_KEY"
            class="control-label col-xs-2">Business key</label>
