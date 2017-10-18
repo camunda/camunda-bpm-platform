@@ -387,7 +387,7 @@
         </if>
 
         <if test="isCompact">
-          F.FINISHED_ > 0
+          and F.FINISHED_ > 0
         </if>
 
         <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
