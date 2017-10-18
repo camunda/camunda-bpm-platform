@@ -3,8 +3,8 @@
 var angular = require('angular');
 
 module.exports = [
-  '$scope', '$q', 'Notifications', 'JobDefinitionResource', '$modalInstance', 'jobDefinitions', '$timeout',
-  function($scope,   $q,   Notifications,   JobDefinitionResource,   $modalInstance,   jobDefinitions, $timeout) {
+  '$scope', '$q', 'Notifications', 'JobDefinitionResource', '$modalInstance', 'jobDefinitions', '$timeout', '$translate',
+  function($scope,   $q,   Notifications,   JobDefinitionResource,   $modalInstance,   jobDefinitions, $timeout, $translate) {
 
     $scope.hasNoJobDefinitions = jobDefinitions.length === 0;
     if ($scope.hasNoJobDefinitions) {
@@ -80,15 +80,15 @@ module.exports = [
 
           if ($scope.setJobPriority) {
             Notifications.addMessage({
-              status: 'Finished',
-              message: 'Overriding the priority completed successfully.',
+              status: $translate.instant('BULK_OVERRIDE_STATUS_FINISHED'),
+              message: $translate.instant('BULK_OVERRIDE_MESSAGE'),
               exclusive: true
             });
           }
           else {
             Notifications.addMessage({
-              status: 'Finished',
-              message: 'Clearing the priority completed successfully.',
+              status: $translate.instant('BULK_OVERRIDE_STATUS_FINISHED'),
+              message: $translate.instant('BULK_OVERRIDE_CLEARING_MESSAGE'),
               exclusive: true
             });
           }
@@ -96,15 +96,15 @@ module.exports = [
         else {
           if ($scope.setJobPriority) {
             Notifications.addError({
-              status: 'Finished',
-              message: 'Overriding the priority was not successfully.',
+              status: $translate.instant('BULK_OVERRIDE_STATUS_FINISHED'),
+              message: $translate.instant('BULK_OVERRIDE_ERROR_1'),
               exclusive: true
             });
           }
           else {
             Notifications.addError({
-              status: 'Finished',
-              message: 'Clearing the priority was not successfully.',
+              status: $translate.instant('BULK_OVERRIDE_STATUS_FINISHED'),
+              message: $translate.instant('BULK_OVERRIDE_ERROR_2'),
               exclusive: true
             });
           }

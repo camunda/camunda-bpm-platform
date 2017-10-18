@@ -12,14 +12,14 @@
   <div class="section-content">
     <header class="row">
       <div class="col-xs-8">
-        <h3>{{title}} Authorizations</h3>
+        <h3>{{title}} {{'AUTHORIZATION_AUTHORIZATIONS' | translate}}</h3>
       </div>
       <div class="col-xs-4 text-right"
            ng-controller="AuthorizationCreateController">
         <a ng-click="addNewAuthorization()"
            class="btn btn-default"
            ng-hide="loadingState === 'LOADING'">
-          Create new authorization
+          {{ 'AUTHORIZATION_CREATE_NEW_AUTHORIZATION' | translate }}
           <span class="glyphicon glyphicon-plus-sign"></span>
         </a>
       </div>
@@ -31,11 +31,11 @@
       <table class="cam-table">
         <thead>
           <tr>
-            <th class="authorization-type">Type</th>
-            <th class="user group">User / Group</th>
-            <th class="permissions">Permissions</th>
-            <th class="resource-id">Resource ID</th>
-            <th class="action">Action</th>
+            <th class="authorization-type">{{ 'AUTHORIZATION_TYPE' | translate }}</th>
+            <th class="user group">{{ 'AUTHORIZATION_USER_GROUP' | translate }}</th>
+            <th class="permissions">{{ 'AUTHORIZATION_PERMISSIONS' | translate }}</th>
+            <th class="resource-id">{{ 'AUTHORIZATION_RESOURCE_ID' | translate }}</th>
+            <th class="action">{{ 'AUTHORIZATION_ACTION' | translate }}</th>
           </tr>
         </thead>
 
@@ -51,22 +51,22 @@
               <select ng-model="authorization.type"
                       class="select-auth-type form-control"
                       ng-change="ensureValidUser(authorization)">
-                <option value="0">GLOBAL</option>
-                <option value="1">ALLOW</option>
-                <option value="2">DENY</option>
+                <option value="0">{{ 'AUTHORIZATION_GLOBAL' | translate }}</option>
+                <option value="1">{{ 'AUTHORIZATION_ALLOW' | translate }}</option>
+                <option value="2">{{ 'AUTHORIZATION_DENY' | translate }}</option>
               </select>
             </td>
 
             <td class="user group"
                 ng-if="!authorization.inUpdate">
               <span ng-show="!!authorization.userId"
-                    tooltip="User">
+                    tooltip="{{ 'AUTHORIZATION_USER' | translate }}">
                 <span class="glyphicon glyphicon-user"></span>
                 {{authorization.userId}}
               </span>
 
               <span ng-show="!!authorization.groupId"
-                    tooltip="Group">
+                    tooltip="{{ 'AUTHORIZATION_GROUP' | translate }}">
                 <span class="glyphicon glyphicon-th"></span>
                 {{authorization.groupId}}
               </span>
@@ -77,14 +77,14 @@
                 <a class="input-group-addon"
                    ng-disabled="isIdentityIdDisabledFor(authorization)"
                    ng-click="setIdentityTypeFor(getIdentityTypeFor(authorization) == 'Group' ? 'User' : 'Group', authorization)"
-                   tooltip="{{getIdentityTypeFor(authorization)}}">
+                   tooltip="{{ getIdentityTypeFor(authorization) == 'Group' ? 'AUTHORIZATION_GROUP' : 'AUTHORIZATION_USER' | translate }}">
                   <span class="glyphicon"
                         ng-class="{'glyphicon-th': getIdentityTypeFor(authorization) == 'Group', 'glyphicon-user': getIdentityTypeFor(authorization) == 'User'}"></span>
                 </a>
 
                 <input type="text"
                        class="input-auth-name form-control"
-                       placeholder="User / Group ID"
+                       placeholder="{{ 'AUTHORIZATION_USER_GROUP_ID' | translate }}"
                        ng-disabled="isIdentityIdDisabledFor(authorization)"
                        ng-class="{'ng-invalid': !authorization.identityId}"
                        ng-model="authorization.identityId"/>
@@ -145,16 +145,16 @@
                         />
 
               <span ng-show="selectedResourceType==0"
-                    class="text-muted">(cockpit or tasklist or *)</span>
+                    class="text-muted">{{ 'AUTHORIZATION_COCKPIT_OR_TASKLIST' | translate }}</span>
             </td>
 
             <td class="action"
                 ng-if="!authorization.inUpdate">
               <a ng-click="updateAuthorization(authorization)">
-                Edit
+                {{ 'AUTHORIZATION_EDIT' | translate }}
               </a>
               <a ng-click="deleteAuthorization(authorization)">
-                Delete
+                {{ 'AUTHORIZATION_DELETE' | translate }}
               </a>
             </td>
             <td class="action"

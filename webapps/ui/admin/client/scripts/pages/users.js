@@ -7,8 +7,24 @@ var searchConfig = JSON.parse(fs.readFileSync(__dirname + '/users-search-plugin-
 
 var angular = require('camunda-commons-ui/vendor/angular');
 
-var Controller = ['$scope', '$location', 'search', 'UserResource', 'page', function($scope, $location, search, UserResource, pageService) {
+var Controller = ['$scope', '$location', 'search', 'UserResource', 'page', '$translate', function($scope, $location, search, UserResource, pageService, $translate) {
   $scope.searchConfig = angular.copy(searchConfig);
+
+  angular.forEach(searchConfig.tooltips, function(translation, tooltip) {
+    $scope.searchConfig.tooltips[tooltip] = $translate.instant(translation);
+  });
+
+  $scope.searchConfig.types.map(function(type) {
+    type.id.value = $translate.instant(type.id.value);
+    if (type.operators) {
+      type.operators = type.operators.map(function(op) {
+        op.value = $translate.instant(op.value);
+        return op;
+      });
+    }
+    return type;
+  });
+
   $scope.onSearchChange = updateView;
 
   $scope.query = $scope.pages = $scope.sortBy = $scope.sortOrder = null;
@@ -73,12 +89,12 @@ var Controller = ['$scope', '$location', 'search', 'UserResource', 'page', funct
 
   $scope.$root.showBreadcrumbs = true;
 
-  pageService.titleSet('Users');
+  pageService.titleSet($translate.instant('USERS_USERS'));
 
   pageService.breadcrumbsClear();
 
   pageService.breadcrumbsAdd({
-    label: 'Users',
+    label: $translate.instant('USERS_USERS'),
     href: '#/users/'
   });
 }];

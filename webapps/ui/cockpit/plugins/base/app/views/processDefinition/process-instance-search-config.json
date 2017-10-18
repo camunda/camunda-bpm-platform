@@ -3,7 +3,7 @@
     {
       "id": {
         "key": "businessKey",
-        "value": "Business Key"
+        "value": "PROCESS_INSTANCE_ID_BUSINESS_KEY"
       },
       "default": true,
       "operators": [
@@ -16,7 +16,7 @@
     {
       "id": {
         "key": "activityIdIn",
-        "value": "Activity ID"
+        "value": "PROCESS_INSTANCE_ID_ACTIVITY_ID"
       },
       "operators": [
         {
@@ -28,16 +28,16 @@
     {
       "id": {
         "key": "startedDate",
-        "value": "Start Date"
+        "value": "PROCESS_INSTANCE_ID_START_DATE"
       },
       "operators": [
         {
           "key": "Before",
-          "value": "before"
+          "value": "PROCESS_INSTANCE_OPERATOR_BEFORE"
         },
         {
           "key": "After",
-          "value": "after"
+          "value": "PROCESS_INSTANCE_OPERATOR_AFTER"
         }
       ],
       "allowDates": true,
@@ -46,7 +46,7 @@
     {
       "id": {
         "key": "variables",
-        "value": "Variable"
+        "value": "PROCESS_INSTANCE_ID_VARIABLE"
       },
       "extended": true,
       "operators": [
@@ -76,7 +76,7 @@
         },
         {
           "key": "like",
-          "value": "like"
+          "value": "PROCESS_INSTANCE_OPERATOR_LIKE"
         }
       ]
     }
@@ -109,7 +109,7 @@
       },
       {
         "key": "like",
-        "value": "like"
+        "value": "PROCESS_INSTANCE_OPERATOR_LIKE"
       }
     ],
     "string":     [
@@ -139,7 +139,7 @@
       },
       {
         "key": "like",
-        "value": "like"
+        "value": "PROCESS_INSTANCE_OPERATOR_LIKE"
       }
     ],
     "number":     [
@@ -188,20 +188,20 @@
       }],
     "date":     [{
       "key": "lteq",
-      "value": "before"
+      "value": "PROCESS_INSTANCE_OPERATOR_BEFORE"
     },
       {
         "key": "gteq",
-        "value": "after"
+        "value": "PROCESS_INSTANCE_OPERATOR_AFTER"
       }]
   },
   "tooltips": {
-    "inputPlaceholder": "Add criteria",
-    "invalid": "This search query is not valid",
-    "deleteSearch": "Remove search",
-    "type": "Type",
-    "name": "Property",
-    "operator": "Operator",
-    "value": "Value"
+    "inputPlaceholder": "PROCESS_INSTANCE_ADD_CRITERIA",
+    "invalid": "PROCESS_INSTANCE_INVALID",
+    "deleteSearch": "PROCESS_INSTANCE_DELETE_SEARCH",
+    "type": "PROCESS_INSTANCE_TYPE",
+    "name": "PROCESS_INSTANCE_NAME",
+    "operator": "PROCESS_INSTANCE_OPERATOR",
+    "value": "PROCESS_INSTANCE_VALUE"
   }
 }

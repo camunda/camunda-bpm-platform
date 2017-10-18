@@ -3,13 +3,13 @@
   <section class="col-xs-12 col-md-6">
     <div class="inner">
       <header>
-        <h1 class="section-title">Assignments by type</h1>
+        <h1 class="section-title">{{ 'PLUGIN_TASK_ASSIGNMENT_BY_TYPE' | translate }}</h1>
       </header>
       <table class="cam-table values-left" id="open-task-statistics">
         <thead>
           <tr>
-            <th>Tasks</th>
-            <th>Type</th>
+            <th>{{ 'PLUGIN_TASK_TASKS' | translate }}</th>
+            <th>{{ 'PLUGIN_TASK_TYPES' | translate }}</th>
           </tr>
         </thead>
 
@@ -22,7 +22,7 @@
                 <a class="search-link" ng-click="createSearch('allOpenTasks', 'statistics')">{{ openTasksCount }}</a>
               </span>
             </th>
-            <th>Total</th>
+            <th>{{ 'PLUGIN_TASK_TOTAL' | translate }}</th>
           </tr>
         </tfoot>
 
@@ -45,13 +45,13 @@
   <section class="col-xs-12 col-md-6">
     <div class="inner">
       <header>
-        <h1 class="section-title">Assignments by group</h1>
+        <h1 class="section-title">{{ 'PLUGIN_TASK_ASSIGNMENT_BY_GROUP' | translate }}</h1>
       </header>
       <table class="cam-table values-left" id="task-group-counts">
         <thead>
           <tr>
-            <th>Tasks</th>
-            <th>Group</th>
+            <th>{{ 'PLUGIN_TASK_TASKS' | translate }}</th>
+            <th>{{ 'PLUGIN_TASK_GROUP' | translate }}</th>
           </tr>
         </thead>
 
@@ -70,7 +70,7 @@
       </table>
       <p id="multiple-groups-info" ng-if="taskGroupState.$loaded">
         <span class="glyphicon glyphicon-info-sign"></span>
-        A task may have multiple groups.
+        {{ 'PLUGIN_TASK_LEGEND_FOOTER' | translate }}
       </p>
     </div>
   </section>

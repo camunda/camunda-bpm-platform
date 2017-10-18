@@ -1,6 +1,6 @@
 <!-- # CE - camunda-bpm-webapp/ui/cockpit/scripts/components/variables/variable-inspect-modal.html -->
 <div class="modal-header">
-  <h3>Inspect "{{ variable.name }}" variable</h3>
+  <h3>{{ 'VARIABLE_INSPECT_MODAL_TITLE' | translate: '{ name: variable.name }' }}</h3>
 </div>
 
 
@@ -11,13 +11,13 @@
   <div ng-show="status === 'beforeChange' || status === 'confirmChange'">
 
     <div class="form-group">
-      <label>Object Type Name:</label>
+      <label>{{ 'VARIABLE_INSPECT_OBJECT_TYPE_NAME' | translate }}</label>
       <code class="form-control-static"
             cam-widget-clipboard="variable.valueInfo.objectTypeName">{{ variable.valueInfo.objectTypeName }}</code>
     </div>
 
     <div class="form-group">
-      <label>Serialization Data Format:</label>
+      <label>{{ 'VARIABLE_INSPECT_SERIALIZATION_DATA' | translate }}</label>
       <code class="form-control-static"
             cam-widget-clipboard="variable.valueInfo.serializationDataFormat">{{ variable.valueInfo.serializationDataFormat }}</code>
     </div>
@@ -26,10 +26,10 @@
 
       <ul class="nav nav-tabs">
         <li ng-class="{ active: selectedTab === 'serialized' }">
-          <a href ng-click="selectTab('serialized')">Serialized</a>
+          <a href ng-click="selectTab('serialized')">{{ 'VARIABLE_INSPECT_SERIALIZED' | translate }}</a>
         </li>
         <li ng-class="{ active: selectedTab === 'deserialized' }">
-          <a href ng-click="selectTab('deserialized')">Deserialized</a>
+          <a href ng-click="selectTab('deserialized')">{{ 'VARIABLE_INSPECT_DESERIALIZED' | translate }}</a>
         </li>
       </ul>
 
@@ -45,7 +45,7 @@
       <div ng-if="selectedTab === 'deserialized'">
         <div class="alert alert-danger"
              ng-show="deserializationError">
-          <strong>Deserialization Error</strong>:
+          <strong>{{ 'VARIABLE_INSPECT_DESERIALIZED_ERROR' | translate }}</strong>
           {{deserializationError}}
         </div>
 
@@ -67,8 +67,8 @@
   <div class="alert alert-warning"
        ng-show="status === 'confirmChange'">
     <span class="glyphicon glyphicon-alert"></span>
-    <strong>Warning:</strong>
-    Are you sure you want to change the value of this Object? Changing the variable in an incompatible way may lead to severe runtime problems.
+    <strong>{{ 'VARIABLE_INSPECT_WARNING' | translate }}</strong>
+    {{ 'VARIABLE_INSPECT_WARNING_MESSAGE' | translate }}
   </div>
 
 </div>
@@ -78,27 +78,27 @@
   <button class="btn btn-default"
           ng-click="$dismiss()"
           ng-hide="status === 'changeSuccess'">
-    Close
+    {{ 'VARIABLE_INSPECT_CLOSE' | translate }}
   </button>
 
   <![if gt IE 9]>
     <button class="btn btn-primary"
             ng-click="$close()"
             ng-show="!readlonly && status === 'changeSuccess'">
-      OK
+      {{ 'VARIABLE_INSPECT_OK' | translate }}
     </button>
 
     <button class="btn btn-primary"
             ng-click="change()"
             ng-disabled="status !== 'beforeChange' || !hasChanged()"
             ng-hide="readonly || status !== 'beforeChange'">
-      Change
+      {{ 'VARIABLE_INSPECT_CHANGE' | translate }}
     </button>
 
     <button class="btn btn-warning"
             ng-click="change()"
             ng-hide="readonly || status !== 'confirmChange'">
-      Confirm Change
+      {{ 'VARIABLE_INSPECT_CONFIRM_CHANGE' | translate }}
     </button>
   <![endif]>
 </div>

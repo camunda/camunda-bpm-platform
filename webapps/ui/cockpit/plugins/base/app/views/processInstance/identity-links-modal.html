@@ -1,6 +1,6 @@
 <!-- # CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/identity-links-modal.html -->
 <div class="modal-header">
-  <h3 class="modal-title">{{ title }}</h3>
+  <h3 class="modal-title">{{ title | translate }}</h3>
 </div>
 
 <div class="identity-links modal-body">
@@ -15,7 +15,7 @@
         <thead>
           <tr>
             <th class="id">{{ decorator.table.id }}</th>
-            <th class="action text-right">Action</th>
+            <th class="action text-right">{{ 'PLUGIN_IDENTITY_LINKS_ACTION' | translate }}</th>
           </tr>
         </thead>
 
@@ -55,7 +55,7 @@
 <div class="modal-footer">
   <button ng-click="$dismiss()"
           class="btn btn-default">
-    Close
+    {{ 'PLUGIN_IDENTITY_LINKS_CLOSE' | translate }}
   </button>
 </div>
 <!-- / CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/identity-links-modal.html -->

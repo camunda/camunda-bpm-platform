@@ -7,8 +7,24 @@ var searchConfig = JSON.parse(fs.readFileSync(__dirname + '/groups-search-plugin
 
 var angular = require('camunda-commons-ui/vendor/angular');
 
-var Controller = ['$scope', 'page', '$location', 'search', 'GroupResource', function($scope, pageService, $location, search, GroupResource) {
+var Controller = ['$scope', 'page', '$location', 'search', 'GroupResource', '$translate', function($scope, pageService, $location, search, GroupResource, $translate) {
   $scope.searchConfig = angular.copy(searchConfig);
+
+  angular.forEach(searchConfig.tooltips, function(translation, tooltip) {
+    $scope.searchConfig.tooltips[tooltip] = $translate.instant(translation);
+  });
+
+  $scope.searchConfig.types.map(function(type) {
+    type.id.value = $translate.instant(type.id.value);
+    if (type.operators) {
+      type.operators = type.operators.map(function(op) {
+        op.value = $translate.instant(op.value);
+        return op;
+      });
+    }
+    return type;
+  });
+
   $scope.onSearchChange = updateView;
 
   $scope.query = $scope.pages = $scope.sortBy = $scope.sortOrder = null;
@@ -73,12 +89,12 @@ var Controller = ['$scope', 'page', '$location', 'search', 'GroupResource', func
 
   $scope.$root.showBreadcrumbs = true;
 
-  pageService.titleSet('Groups');
+  pageService.titleSet($translate.instant('GROUPS_GROUP'));
 
   pageService.breadcrumbsClear();
 
   pageService.breadcrumbsAdd({
-    label: 'Groups',
+    label: $translate.instant('GROUPS_GROUP'),
     href: '#/groups'
   });
 }];

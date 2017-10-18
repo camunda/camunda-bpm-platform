@@ -5,7 +5,7 @@
      variable-types="['variableValues']"
      on-search-change="onSearchChange(query, pages)"
      loading-state="loadingState"
-     text-empty="No process variables"
+     text-empty="{{ 'PLUGIN_VARIABLE_NO_PROCESS_VARIABLES' | translate }}"
      blocked="!instanceIdToInstanceMap"
      storage-group="'VI'">
 
@@ -17,7 +17,7 @@
            on-download="downloadVariable"
            cam-variables="variables"
            cam-editable="['type', 'value']"
-           cam-headers="{ name: 'Name', value: 'Value', type: 'Type', scope: 'Scope' }">
+           cam-headers="getHeaderVariable">
       </div>
 </div>
 <!-- / CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/variable-instances-tab.html -->

@@ -5,16 +5,16 @@
      variable-types="['variables']"
      on-search-change="onSearchChange(query, pages)"
      loading-state="loadingState"
-     text-empty="No process instances matched by current filter"
+     text-empty="{{'PLUGIN_PROCESS_INSTANCE_NO_PROCESS' | translate}}"
      storage-group="'PDI'">
 
   <table class="process-instances cam-table">
     <thead>
       <tr>
-        <th class="state">State</th>
-        <th class="instance-id">ID</th>
-        <th class="start-time">Start Time</th>
-        <th class="business-key">Business Key</th>
+        <th class="state">{{'PLUGIN_PROCESS_INSTANCE_STATE' | translate}}</th>
+        <th class="instance-id">{{'PLUGIN_PROCESS_INSTANCE_ID' | translate}}</th>
+        <th class="start-time">{{'PLUGIN_PROCESS_INSTANCE_START_TIME' | translate}}</th>
+        <th class="business-key">{{'PLUGIN_PROCESS_INSTANCE_BUSINESS_KEY' | translate}}</th>
       </tr>
     </thead>
     <tbody>
@@ -25,7 +25,7 @@
              ng-href="{{ getProcessInstanceUrl(processInstance, { tab: 'incidents-tab' }) }}"></a>
           <span class="badge badge-warning badge-suspended"
                 ng-show="processInstance.suspended"
-                tooltip="Currently suspended"
+                tooltip="{{'PLUGIN_PROCESS_INSTANCE_SUSPENDED' | translate}}"
                 tooltip-placement="left">
             <span class="glyphicon glyphicon-pause white"></span>
           </span>

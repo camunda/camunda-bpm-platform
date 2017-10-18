@@ -11,13 +11,15 @@ var Controller = [
   'Uri',
   'basePath',
   'variable',
+  '$translate',
   function(
     $modalInstance,
     $scope,
     Notifications,
     Uri,
     basePath,
-    variable
+    variable,
+    $translate
   ) {
 
     var BEFORE_UPLOAD = 'beforeUpload',
@@ -56,15 +58,15 @@ var Controller = [
           if(xhr.status === 204) {
             $scope.status = UPLOAD_SUCCESS;
             Notifications.addMessage({
-              status: 'File',
-              message: 'The file has been uploaded successfully.'
+              status: $translate.instant('VARIABLE_UPLOAD_FILE'),
+              message: $translate.instant('VARIABLE_UPLOAD_MESSAGE_ADD')
             });
           }
           else {
             $scope.status = UPLOAD_FAILED;
             Notifications.addError({
-              status: 'File',
-              message: 'The file could not be uploaded successfully.',
+              status: $translate.instant('VARIABLE_UPLOAD_FILE'),
+              message: $translate.instant('VARIABLE_UPLOAD_MESSAGE_ERR'),
               exclusive: true
             });
           }
@@ -75,8 +77,8 @@ var Controller = [
         $scope.$apply(function() {
           $scope.status = UPLOAD_FAILED;
           Notifications.addError({
-            status: 'File',
-            message: 'The file could not be uploaded successfully.',
+            status: $translate.instant('VARIABLE_UPLOAD_FILE'),
+            message: $translate.instant('VARIABLE_UPLOAD_MESSAGE_ERR'),
             exclusive: true
           });
         });

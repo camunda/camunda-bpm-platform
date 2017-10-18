@@ -59,7 +59,7 @@ module.exports = function(ngModule) {
   var Configuration = function PluginConfiguration(ViewsProvider) {
     ViewsProvider.registerDefaultView('cockpit.processInstance.runtime.tab', {
       id: 'called-process-instances-tab',
-      label: 'Called Process Instances',
+      label: 'PLUGIN_CALLED_PROCESS_INSTANCE_LABEL',
       template: template,
       controller: 'CalledProcessInstanceController',
       priority: 10

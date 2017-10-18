@@ -14,8 +14,8 @@ var camCommons = require('camunda-commons-ui/lib');
 var ngModule = angular.module('cam.cockpit.pages.decisionInstance', ['dataDepend', camCommons.name]);
 
 var Controller = [
-  '$scope', '$rootScope', '$q', 'dataDepend', 'page', 'camAPI', 'decisionInstance', 'Views', 'search',
-  function($scope,   $rootScope,   $q,   dataDepend,   page,   camAPI,   decisionInstance,   Views,   search
+  '$scope', '$rootScope', '$q', 'dataDepend', 'page', 'camAPI', 'decisionInstance', 'Views', 'search', '$translate',
+  function($scope,   $rootScope,   $q,   dataDepend,   page,   camAPI,   decisionInstance,   Views,   search, $translate
   ) {
 
     $scope.control = {};
@@ -99,7 +99,7 @@ var Controller = [
 
     page.breadcrumbsAdd([
       {
-        label: 'Decisions',
+        label: $translate.instant('DECISION_INSTANCE_DECISIONS'),
         href: '#/decisions/'
       },
       {
@@ -116,7 +116,7 @@ var Controller = [
 
     page.titleSet([
       decisionInstance.id,
-      'Instance View'
+      $translate.instant('DECISION_INSTANCE_INSTANCE_VIEW')
     ].join(' | '));
 
     decisionData.observe(['tableXml'], function(tableXml) {

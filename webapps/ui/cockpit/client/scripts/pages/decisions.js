@@ -8,10 +8,12 @@ var Controller = [
   '$scope',
   'Views',
   'page',
+  '$translate',
   function(
   $scope,
   Views,
-  page
+  page,
+  $translate
 ) {
     var $rootScope = $scope.$root;
 
@@ -20,10 +22,10 @@ var Controller = [
     page.breadcrumbsClear();
 
     page.breadcrumbsAdd({
-      label: 'Decisions'
+      label: $translate.instant('DECISION_INSTANCE_DECISIONS')
     });
 
-    page.titleSet('Decisions');
+    page.titleSet($translate.instant('DECISION_INSTANCE_DECISIONS'));
 
   // INITIALIZE PLUGINS
     $scope.plugins = Views.getProviders({ component: 'cockpit.decisions.dashboard' });

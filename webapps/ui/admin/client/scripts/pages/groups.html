@@ -4,13 +4,13 @@
   <div class="section-content">
     <header class="row">
       <div class="col-xs-8">
-        <h3>List of groups</h3>
+        <h3>{{ 'GROUPS_LIST_GROUPS' | translate }}</h3>
       </div>
       <div class="col-xs-4 text-right"
            ng-show="availableOperations.create">
         <a href="#/group-create"
            class="btn btn-default">
-          Create new group
+          {{ 'GROUPS_CREATE_GROUP' | translate }}
           <span class="glyphicon glyphicon-plus-sign"></span>
         </a>
       </div>
@@ -20,33 +20,34 @@
          config="searchConfig"
          on-search-change="onSearchChange(query, pages)"
          loading-state="loadingState"
-         text-empty="No groups were found."
+         text-empty="{{ 'GROUPS_NO_GROUPS' | translate }}"
+         toolips="translations"
          storage-group="'ANG'">
       <table class="cam-table">
         <thead>
           <tr>
             <th class="group-id">
-              <span class="column-label">ID</span>
+              <span class="column-label">{{ 'GROUPS_GROUP_ID' | translate }}</span>
               <a ng-click="changeOrder('id')">
               <span class="glyphicon"
                     ng-class="orderClass('id')"></span>
               </a>
             </th>
             <th class="group-name">
-              <span class="column-label">Name</span>
+              <span class="column-label">{{ 'GROUPS_GROUP_NAME' | translate }}</span>
               <a ng-click="changeOrder('name')">
               <span class="glyphicon"
                     ng-class="orderClass('name')"></span>
               </a>
             </th>
             <th class="group-type">
-              <span class="column-label">Type</span>
+              <span class="column-label">{{ 'GROUPS_GROUP_TYPE' | translate }}</span>
               <a ng-click="changeOrder('type')">
               <span class="glyphicon"
                     ng-class="orderClass('type')"></span>
               </a>
             </th>
-            <th class="action">Action</th>
+            <th class="action">{{ 'GROUPS_ACTION' | translate }}</th>
           </tr>
         </thead>
 
@@ -65,7 +66,7 @@
             </td>
 
             <td class="action">
-              <a href="#/groups/{{group.id | escape}}">Edit</a>
+              <a href="#/groups/{{group.id | escape}}">{{ 'GROUPS_ACTION_EDIT' | translate }}</a>
             </td>
           </tr>
         </tbody>

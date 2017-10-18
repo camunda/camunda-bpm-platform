@@ -2,7 +2,7 @@
 module.exports = [ 'ViewsProvider', function(ViewsProvider) {
   ViewsProvider.registerDefaultView('cockpit.navigation', {
     id: 'decisions',
-    label: 'Decisions',
+    label: 'COCKPIT_DECISIONS',
     pagePath: '#/decisions',
     checkActive: function(path) {
       return path.indexOf('#/decision') > -1;

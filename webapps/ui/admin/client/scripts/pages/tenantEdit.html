@@ -3,13 +3,13 @@
   <aside>
     <ul>
       <li ng-class="activeClass('tab=tenant')">
-        <a href="#/tenants/{{ tenant.id | escape }}?tab=tenant">Information</a>
+        <a href="#/tenants/{{ tenant.id | escape }}?tab=tenant">{{ 'TENANTS_INFORMATION' | translate }}</a>
       </li>
       <li ng-class="activeClass('tab=groups')">
-        <a href="#/tenants/{{ tenant.id | escape }}?tab=groups">Groups</a>
+        <a href="#/tenants/{{ tenant.id | escape }}?tab=groups">{{ 'TENANTS_GROUPS' | translate }}</a>
       </li>
       <li ng-class="activeClass('tab=users')">
-        <a href="#/tenants/{{ tenant.id | escape }}?tab=users">Users</a>
+        <a href="#/tenants/{{ tenant.id | escape }}?tab=users">{{ 'TENANTS_USERS' | translate }}</a>
       </li>
     </ul>
   </aside>
@@ -24,7 +24,7 @@
 
       <div class="form-group">
         <label class="control-label col-sm-4 col-md-2"
-               for="inputName">Tenant Name*</label>
+               for="inputName">{{ 'TENANTS_TENANT_NAME' | translate }}</label>
 
         <div class="col-sm-8 col-md-10">
           <input id="inputName"
@@ -38,7 +38,7 @@
 
           <p class="text-danger"
              ng-show="editTenantForm.tenantName.$error.required">
-            Name is required.
+            {{ 'TENANTS_NAME_REQUIRED' | translate }}
           </p>
         </div>
       </div>
@@ -49,39 +49,39 @@
           <button type="submit"
                   class="btn btn-primary"
                   ng-disabled="!canSubmit(editTenantForm, 'tenant')"
-                  ng-click="updateTenant()">Update Tenant</button>
+                  ng-click="updateTenant()">{{ 'TENANTS_UPDATE_TENANT' | translate }}</button>
         </div>
       </div>
     </form>
 
     <form class="form-horizontal"
           ng-show="show('tenant') && availableOperations.delete">
-      <div class="h4">Delete Tenant</div>
+      <div class="h4">{{ 'TENANTS_DELETE_TENANT' | translate }}</div>
 
       <div class="alert alert-danger">
-        <strong>Warning:</strong> deleting a tenant cannot be undone.
+        <strong>{{ 'TENANTS_WARNING' | translate }}</strong> {{ 'TENANTS_DELETING_TENANT_UNDONE' | translate }}
       </div>
 
       <div class="text-right">
         <button type="submit"
                 class="btn btn-danger"
                 ng-click="deleteTenant()">
-          Delete Tenant
+          {{ 'TENANTS_DELETE_TENANT' | translate }}
         </button>
       </div>
     </form>
 
     <div ng-show="show('users')">
-      <div class="h4">Tenant Users</div>
+      <div class="h4">{{ 'TENANTS_TENANT_USERS' | translate }}</div>
 
       <div cam-widget-loader
            loading-state="{{ userLoadingState }}"
-           text-empty="Tenant {{ tenant.name }} does not currently have any users.">
+           text-empty="{{ 'TENANTS_NO_USERS' | translate:'{tenant: tenant.name }' }}">
         <table class="cam-table">
           <thead>
             <tr>
-              <th>Name</th>
-              <th>Username</th>
+              <th>{{ 'TENANTS_NAME' | translate }}</th>
+              <th>{{ 'TENANTS_USERNAME' | translate }}</th>
             </tr>
           </thead>
           <tbody>
@@ -113,15 +113,15 @@
     </div>
 
     <div ng-show="show('groups')">
-      <div class="h4">Tenant Groups</div>
+      <div class="h4">{{ 'TENANTS_TENANT_GROUPS' | translate }}</div>
 
       <div cam-widget-loader
            loading-state="{{ groupLoadingState }}"
-           text-empty="Tenant {{ tenant.name }} does not currently have any groups.">
+           text-empty="{{ 'TENANTS_NO_GROUPS' | translate:'{ tenant: tenant.name }' }}">
         <table class="cam-table">
           <thead>
           <tr>
-            <th>Name</th>
+            <th>{{ 'TENANTS_NAME' | translate }}</th>
           </tr>
           </thead>
           <tbody>

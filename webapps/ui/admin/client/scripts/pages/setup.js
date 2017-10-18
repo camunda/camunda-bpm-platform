@@ -4,7 +4,7 @@ var fs = require('fs');
 
 var template = fs.readFileSync(__dirname + '/setup.html', 'utf8');
 
-var Controller = ['$scope', 'InitialUserResource', 'Notifications', '$location', 'Uri', function($scope, InitialUserResource, Notifications, $location, Uri) {
+var Controller = ['$scope', 'InitialUserResource', 'Notifications', '$location', 'Uri', '$translate', function($scope, InitialUserResource, Notifications, $location, Uri, $translate) {
 
   if (!/.*\/app\/admin\/([\w-]+)\/setup\/.*/.test($location.absUrl())) {
     $location.path('/');
@@ -40,7 +40,7 @@ var Controller = ['$scope', 'InitialUserResource', 'Notifications', '$location',
           $scope.created = true;
         },
         function() {
-          Notifications.addError({ status: 'Error', message: 'Could not create initial user.' });
+          Notifications.addError({ status: $translate.instant('NOTIFICATIONS_STATUS_ERROR'), message: $translate.instant('SETUP_COULD_NOT_CREATE_USER')});
         }
       );
   };

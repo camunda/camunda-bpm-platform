@@ -11,7 +11,7 @@ module.exports = [
 ) {
     ViewsProvider.registerDefaultView('admin.dashboard.section', {
       id: 'group',
-      label: 'Groups',
+      label: 'GROUPS_GROUPS',
       template: template,
       pagePath: '#/groups',
       controller: [

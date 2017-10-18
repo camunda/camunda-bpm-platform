@@ -2,12 +2,12 @@
 <table class="job-definition cam-table">
   <thead>
     <tr>
-      <th class="state">State</th>
-      <th class="activity">Activity</th>
-      <th class="type">Type</th>
-      <th class="configuration">Configuration</th>
-      <th class="overriding-job-priority">Overriding Job Priority</th>
-      <th class="action">Action</th>
+      <th class="state">{{ 'PLUGIN_JOBDEFINITION_STATE' | translate }}</th>
+      <th class="activity">{{ 'PLUGIN_JOBDEFINITION_ACTIVITY' | translate }}</th>
+      <th class="type">{{ 'PLUGIN_JOBDEFINITION_TYPE' | translate }}</th>
+      <th class="configuration">{{ 'PLUGIN_JOBDEFINITION_CONFIGURATION' | translate }}</th>
+      <th class="overriding-job-priority">{{ 'PLUGIN_JOBDEFINITION_JOB_PRIORITY' | translate }}</th>
+      <th class="action">{{ 'PLUGIN_JOBDEFINITION_ACTION' | translate }}</th>
     </tr>
   </thead>
 
@@ -15,10 +15,10 @@
     <tr ng-repeat="jobDefinition in jobDefinitions">
       <td class="state">
         <span ng-show="jobDefinition.suspended">
-          Suspended
+          {{ 'PLUGIN_JOBDEFINITION_SUSPENDED' | translate }}
         </span>
         <span ng-hide="jobDefinition.suspended">
-          Active
+          {{ 'PLUGIN_JOBDEFINITION_ACTIVE' | translate }}
         </span>
       </td>
       <td class="activity"
@@ -47,13 +47,13 @@
     <tr ng-if="!jobDefinitions">
       <td colspan="6">
         <span class="glyphicon glyphicon-loading"></span>
-        loading job definitions...
+        {{ 'PLUGIN_JOBDEFINITION_LOADING_JOB' | translate }}
       </td>
     </tr>
 
     <tr ng-if="jobDefinitions && !jobDefinitions.length">
       <td colspan="6">
-        No job definitions matched by current filter.
+        {{ 'PLUGIN_JOBDEFINITION_NO_JOB_DEFINITION' | translate }}
       </td>
     </tr>
 

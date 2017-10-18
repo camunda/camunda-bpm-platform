@@ -1,6 +1,6 @@
 <!-- # CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/job-retry-bulk-dialog.html -->
 <div class="modal-header">
-  <h3>Increment Number of Retries</h3>
+  <h3>{{ 'PLUGIN_JOB_RETRY_BULK_INCREMENT_RETRIES' | translate }}</h3>
 </div>
 
 <div class="job-retry-bulk modal-body">
@@ -9,10 +9,10 @@
   <form name="selectFailedJobsForm"
         ng-hide="status === 'finished' || status === 'performing'">
     <fieldset>
-      <p>Select one of the following failed jobs to increment their number of retries:</p>
+      <p>{{ 'PLUGIN_JOB_RETRY_BULK_SELECT_FAILED_JOB' | translate }}</p>
       <div cam-widget-loader
            loading-state="{{ loadingState }}"
-           text-empty="There are no failed jobs available to increment their retries.">
+           text-empty="{{ 'PLUGIN_JOB_RETRY_BULK_THERE_ARE_NO_FAILED_JOBS' | translate }}">
         <table class="cam-table">
           <thead>
             <tr>
@@ -22,9 +22,9 @@
                        ng-model="allJobsSelected"
                        ng-change="selectAllJobs(allJobsSelected)">
               </th>
-              <th class="job-id uuid">ID</th>
-              <th class="scope">Scope</th>
-              <th class="exception">Exception</th>
+              <th class="job-id uuid">{{ 'PLUGIN_JOB_RETRY_BULK_ID' | translate }}</th>
+              <th class="scope">{{ 'PLUGIN_JOB_RETRY_BULK_SCOPE' | translate }}</th>
+              <th class="exception">{{ 'PLUGIN_JOB_RETRY_BULK_EXCEPTION' | translate }}</th>
             </tr>
           </thead>
 
@@ -66,9 +66,9 @@
     <table class="cam-table">
       <thead>
         <tr>
-          <th class="job-id uuid">ID</th>
-          <th class="scope">Scope</th>
-          <th class="status">Status</th>
+          <th class="job-id uuid">{{ 'PLUGIN_JOB_RETRY_BULK_ID' | translate }}</th>
+          <th class="scope">{{ 'PLUGIN_JOB_RETRY_BULK_SCOPE' | translate }}</th>
+          <th class="status">{{ 'PLUGIN_JOB_RETRY_BULK_STATUS' | translate }}</th>
         </tr>
       </thead>
 
@@ -83,10 +83,10 @@
               <span class="glyphicon glyphicon-loading"></span>
             </span>
             <span ng-show="job.status && job.status === 'successful'">
-              <span class="glyphicon glyphicon-ok"></span>&nbsp;Successful
+              <span class="glyphicon glyphicon-ok"></span>&nbsp;{{ 'PLUGIN_JOB_RETRY_BULK_SUCCESSFUL' | translate }}
             </span>
             <span ng-show="job.status && job.status === 'failed'">
-              <span class="glyphicon glyphicon-remove"></span>&nbsp;Failed
+              <span class="glyphicon glyphicon-remove"></span>&nbsp;{{ 'PLUGIN_JOB_RETRY_BULK_FAILED' | translate }}
             </span>
           </td>
         </tr>
@@ -113,21 +113,21 @@
   <button class="btn btn-default"
           ng-click="close()"
           ng-hide="status === 'finished' || status === 'performing'">
-    Close
+    {{ 'PLUGIN_JOB_RETRY_BULK_CLOSE' | translate }}
   </button>
 
   <button class="btn btn-primary"
           ng-click="retryFailedJobs(selectedFailedJobIds)"
           ng-disabled="!failedJobs || !failedJobs.length || !selectedFailedJobIds.length"
           ng-hide="status === 'finished' || status === 'performing'">
-    Retry <span ng-if="selectedFailedJobIds.length > 1">{{ selectedFailedJobIds.length }} jobs</span>
+    {{ 'PLUGIN_JOB_RETRY_BULK_RETRY' | translate }} <span ng-if="selectedFailedJobIds.length > 1">{{ 'PLUGIN_JOB_RETRY_BULK_JOBS' | translate:'{count: selectedFailedJobIds.length}' }}</span>
   </button>
 
   <button class="btn btn-primary"
           ng-click="close()"
           ng-disabled="status === 'performing'"
           ng-show="status === 'performing' || status === 'finished'">
-    OK
+    {{ 'PLUGIN_JOB_RETRY_BULK_OK' | translate }}
   </button>
 </div>
 <!-- / CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/job-retry-bulk-dialog.html -->

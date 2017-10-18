@@ -1,6 +1,6 @@
 <!-- # CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/update-suspension-state-dialog.html -->
 <div class="modal-header">
-  <h3>{{ (processInstance.suspended ? 'Activate' : 'Suspend') }} Process Instance</h3>
+  <h3>{{ (processInstance.suspended ? 'PLUGIN_UPDATE_DIALOG_ACTIVATE' : 'PLUGIN_UPDATE_DIALOG_SUSPEND' | translate) }}</h3>
 </div>
 
 <div class="process-instance update-suspension-state modal-body">
@@ -11,69 +11,69 @@
     <div ng-show="processInstance.suspended">
       <!-- activation -->
       <p>
-        Activating a process instance means that the execution is running, so the <i>token state</i> will change.
+        {{ 'PLUGIN_UPDATE_DIALOG_LEGEND_1' | translate}} <i>{{ 'PLUGIN_UPDATE_DIALOG_LEGEND_2' | translate }}</i> {{ 'PLUGIN_UPDATE_DIALOG_LEGEND_3' | translate }}
       </p>
 
       <p>
-        Tasks belonging to this process instance will also be activated.
+        {{ 'PLUGIN_UPDATE_DIALOG_LEGEND_4' | translate}}
       </p>
 
       <p>
-        If a process instance is in the state active, the engine will also execute jobs associated with this process instance.
+        {{ 'PLUGIN_UPDATE_DIALOG_LEGEND_5' | translate}}
       </p>
 
       <p>
-        If this process instance have a process instance hierarchy, activating this process instance from the hierarchy will not activate other process instances from that hierarchy.
+        {{ 'PLUGIN_UPDATE_DIALOG_LEGEND_6' | translate}}
       </p>
 
-      <p>Do you really want to activate this process instance?</p>
+      <p>{{ 'PLUGIN_UPDATE_DIALOG_LEGEND_7' | translate}}</p>
     </div>
 
     <div ng-hide="processInstance.suspended">
       <!-- suspension -->
       <p>
-        Suspending a process instance means that the execution is stopped, so the <i>token state</i> will not change. However, actions that do not change token state, like setting or removing variables, etc. will still succeed.
+        {{ 'PLUGIN_UPDATE_DIALOG_LEGEND_8' | translate }} <i>{{ 'PLUGIN_UPDATE_DIALOG_LEGEND_9' | translate }}</i> {{ 'PLUGIN_UPDATE_DIALOG_LEGEND_10' | translate }}
       </p>
 
       <p>
-        Tasks belonging to this process instance will also be suspended. This means that any actions influencing the tasks' lifecycles will fail, such as
+        {{ 'PLUGIN_UPDATE_DIALOG_LEGEND_11' | translate }}
         <ul>
-          <li>claiming</li>
-          <li>completing</li>
-          <li>delegation</li>
-          <li>changes in task assignees, owners, etc.</li>
+          <li>{{ 'PLUGIN_UPDATE_DIALOG_CLAIMING' | translate }}</li>
+          <li>{{ 'PLUGIN_UPDATE_DIALOG_COMPLETING' | translate }}</li>
+          <li>{{ 'PLUGIN_UPDATE_DIALOG_DELEGATION' | translate }}</li>
+          <li>{{ 'PLUGIN_UPDATE_DIALOG_CHANGES_IN' | translate }}</li>
         </ul>
-        Actions that only change task properties will still succeed, such as changing variables.
+        {{ 'PLUGIN_UPDATE_DIALOG_LEGEND_12' | translate }}
       </p>
 
       <p>
-        If a process instance is in the state suspended, the engine will also not execute jobs associated with this process instance.
+        {{ 'PLUGIN_UPDATE_DIALOG_LEGEND_13' | translate }}
       </p>
 
       <p>
-        If this process instance have a process instance hierarchy, suspending this process instance from the hierarchy will not suspend other process instances from that hierarchy.
+        {{ 'PLUGIN_UPDATE_DIALOG_LEGEND_14' | translate }}
       </p>
 
-      <p>Do you really want to suspend this process instance?</p>
+      <p>{{ 'PLUGIN_UPDATE_DIALOG_LEGEND_15' | translate }}</p>
     </div>
 
   </div>
 
   <div ng-show="status === 'SUCCESS'">
     <p ng-show="processInstance.suspended">
-      The suspension state of the process instance has been updated to "active" successfully.
+      {{ 'PLUGIN_UPDATE_DIALOG_LEGEND_16' | translate }}
     </p>
     <p ng-hide="processInstance.suspended">
-      The suspension state of the process instance has been updated to "suspended" successfully.
+      {{ 'PLUGIN_UPDATE_DIALOG_LEGEND_17' | translate }}
     </p>
   </div>
 
   <div ng-show="status === 'FAIL'">
     <p ng-show="processInstance.suspended">
-      The suspension state of the process instance could not be updated to "active" successfully.
+      {{ 'PLUGIN_UPDATE_DIALOG_LEGEND_18' | translate }}
     </p>
     <p ng-hide="processInstance.suspended">
-      The suspension state of the process instance could not be updated to "suspended" successfully.
+      {{ 'PLUGIN_UPDATE_DIALOG_LEGEND_19' | translate }}
     </p>
   </div>
 
@@ -82,18 +82,18 @@
   <button class="btn btn-default"
           ng-click="close(status)"
           ng-disabled="status === 'PERFORM_UDPATE'"
-          ng-hide="status === 'SUCCESS' || status === 'FAIL'">Close</button>
+          ng-hide="status === 'SUCCESS' || status === 'FAIL'">{{ 'PLUGIN_UPDATE_DIALOG_BTN_CLOSE' | translate }}</button>
 
   <button type="submit"
           class="btn btn-primary"
           ng-click="updateSuspensionState()"
           ng-hide="status === 'SUCCESS' || status === 'FAIL'"
           ng-disabled="status === 'PERFORM_UDPATE'">
-    {{ (processInstance.suspended ? 'Activate' : 'Suspend') }}
+    {{ (processInstance.suspended ? 'PLUGIN_UPDATE_DIALOG_BTN_ACTIVATE' : 'PLUGIN_UPDATE_DIALOG_BTN_SUSPEND' | translate) }}
   </button>
 
   <button class="btn btn-primary"
           ng-click="close(status)"
-          ng-show="status === 'SUCCESS' || status === 'FAIL'">OK</button>
+          ng-show="status === 'SUCCESS' || status === 'FAIL'">{{ 'PLUGIN_UPDATE_DIALOG_BTN_OK' | translate }}</button>
 </div>
 <!-- / CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/update-suspension-state-dialog.html -->

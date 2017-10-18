@@ -6,7 +6,7 @@ module.exports = [
   ) {
     ViewsProvider.registerDefaultView('cockpit.navigation', {
       id: 'tasks',
-      label: 'Human Tasks',
+      label: 'COCKPIT_HUMAN_TASKS',
       template: '<!-- nothing to show, but needed -->',
       pagePath: '#/tasks',
       checkActive: function(path) {

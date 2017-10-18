@@ -1,8 +1,8 @@
   'use strict';
 
   module.exports = [
-    '$scope', '$location', 'Notifications', 'camAPI', '$modalInstance', 'incident',
-    function($scope,   $location,   Notifications,   camAPI,   $modalInstance,   incident) {
+    '$scope', '$location', 'Notifications', 'camAPI', '$modalInstance', 'incident', '$translate',
+    function($scope,   $location,   Notifications,   camAPI,   $modalInstance,   incident, $translate) {
 
       var FINISHED = 'finished',
           PERFORM = 'performing',
@@ -24,15 +24,15 @@
           $scope.status = FINISHED;
 
           Notifications.addMessage({
-            status: 'Finished',
-            message: 'Incrementing the number of retries finished successfully.',
+            status: $translate.instant('PLUGIN_EXTERNAL_TASK_STATUS_FINISHED'),
+            message: $translate.instant('PLUGIN_EXTERNAL_TASK_MESSAGE_1'),
             exclusive: true
           });
         }, function(error) {
           $scope.status = FAILED;
           Notifications.addError({
-            status: 'Finished',
-            message: 'Incrementing the number of retries was not successful: ' + error.data.message,
+            status: $translate.instant('PLUGIN_EXTERNAL_TASK_STATUS_FINISHED'),
+            message: $translate.instant('PLUGIN_EXTERNAL_TASK_MESSAGE_2', {message: error.data.message}),
             exclusive: true
           });
         });

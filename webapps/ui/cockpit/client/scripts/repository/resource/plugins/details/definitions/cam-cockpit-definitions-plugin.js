@@ -162,7 +162,7 @@ var Configuration = function PluginConfiguration(ViewsProvider) {
 
   ViewsProvider.registerDefaultView('cockpit.repository.resource.detail', {
     id: 'resource-details',
-    label: 'Definitions',
+    label: 'DEFINITIONS_DEFINITIONS',
     template: template,
     controller: Controller,
     priority: 1000

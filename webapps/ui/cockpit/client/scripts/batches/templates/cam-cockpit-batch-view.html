@@ -1,18 +1,18 @@
 <div class="batch-wrapper">
   <div class="row">
     <div class="col-md-6">
-      <h3>In Progress Batches</h3>
+      <h3>{{ 'BATCHES_PROGRESS_IN' | translate }}</h3>
       <div cam-widget-loader
            loading-state="{{ ctrl.getLoadingState('runtime') }}"
-           text-empty="No running batches">
+           text-empty="{{ 'BATCHES_PROGRESS_NO_RUNNING' | translate }}">
 
         <table class="cam-table">
           <thead>
             <tr>
-              <th class="id">ID</th>
-              <th class="type">Type</th>
-              <th class="failed">Failed Jobs</th>
-              <th>Progress</th>
+              <th class="id">{{ 'BATCHES_PROGRESS_ID' | translate }}</th>
+              <th class="type">{{ 'BATCHES_PROGRESS_TYPE' | translate }}</th>
+              <th class="failed">{{ 'BATCHES_PROGRESS_FAIL_JOBS' | translate }}</th>
+              <th>{{ 'BATCHES_PROGRESS_PROGRESS' | translate }}</th>
             </tr>
           </thead>
           <tbody>
@@ -47,19 +47,19 @@
                     boundary-links="true"></pagination>
       </div>
 
-      <h3>Ended Batches</h3>
+      <h3>{{ 'BATCHES_PROGRESS_END' | translate }}</h3>
 
       <div cam-widget-loader
            loading-state="{{ ctrl.getLoadingState('history') }}"
-           text-empty="No finished batches">
+           text-empty="{{ 'BATCHES_PROGRESS_NO_FINISHED' | translate }}">
 
         <table class="cam-table">
           <thead>
             <tr>
-              <th class="id">ID</th>
-              <th class="type">Type</th>
-              <th class="start-time">Started</th>
-              <th class="end-time">Ended</th>
+              <th class="id">{{ 'BATCHES_PROGRESS_ID' | translate }}</th>
+              <th class="type">{{ 'BATCHES_PROGRESS_TYPE' | translate }}</th>
+              <th class="start-time">{{ 'BATCHES_PROGRESS_START_TIME' | translate }}</th>
+              <th class="end-time">{{ 'BATCHES_PROGRESS_END_TIME' | translate }}</th>
             </tr>
           </thead>
           <tbody>
@@ -95,8 +95,8 @@
           <div class="row"
                ng-init="selection = ctrl.getSelection()">
             <h3 class="col-xs-8">
-              <span ng-if="ctrl.getSelectionType() == 'history'">Completed</span>
-              <span ng-if="ctrl.getSelectionType() == 'runtime'">In Progress</span> Batch Details
+              <span ng-if="ctrl.getSelectionType() == 'history'">{{ 'BATCHES_PROGRESS_COMPLETED' | translate }}</span>
+              <span ng-if="ctrl.getSelectionType() == 'runtime'">{{ 'BATCHES_PROGRESS_IN_PROGRESS' | translate }}</span> {{ 'BATCHES_PROGRESS_BATCH_DETAILS' | translate }}
             </h3>
 
             <div class="col-xs-4 text-right">
@@ -104,28 +104,28 @@
                 <a ng-if="ctrl.getSelectionType() == 'runtime' && !ctrl.getSuspendedState()"
                    ng-click="ctrl.toggleSuspension()"
                    class="btn btn-default"
-                   tooltip="Suspend Batch">
+                   tooltip="{{ 'BATCHES_PROGRESS_TOOLTIP_SUSPEND_BATCH' | translate }}">
                   <span class="glyphicon glyphicon-pause"></span>
                 </a>
 
                 <a ng-if="ctrl.getSelectionType() == 'runtime' && ctrl.getSuspendedState()"
                    ng-click="ctrl.toggleSuspension()"
                    class="btn btn-default"
-                   tooltip="Activate Batch">
+                   tooltip="{{ 'BATCHES_PROGRESS_TOOLTIP_ACTIVATE_BATCH' | translate }}">
                   <span class="glyphicon glyphicon-play"></span>
                 </a>
 
                 <a ng-if="ctrl.getSelectionType() == 'runtime' && ctrl.getJobs().length > 0"
                    class="btn btn-default action-button"
                    ng-click="ctrl.retryAll()"
-                   tooltip="Increment Number of Retries for all Failed Jobs">
+                   tooltip="{{ 'BATCHES_PROGRESS_TOOLTIP_INCREMENT_NUMBER' | translate }}">
                   <span class="glyphicon glyphicon-repeat"></span>
                 </a>
 
                 <a ng-if="ctrl.getSelectionType() == 'runtime'"
                    class="btn btn-danger action-button"
                    ng-click="ctrl.openDeleteModal()"
-                   tooltip="Delete this batch">
+                   tooltip="{{ 'BATCHES_PROGRESS_BATCH_DETAILS' | translate }}">
                   <span class="glyphicon glyphicon-trash"></span>
                 </a>
               </div>
@@ -134,8 +134,8 @@
 
           <table class="cam-table batch-details">
             <thead>
-              <th>Property</th>
-              <th>Value</th>
+              <th>{{ 'BATCHES_PROGRESS_PROPERTY' | translate }}</th>
+              <th>{{ 'BATCHES_PROGRESS_VALUE' | translate }}</th>
             </thead>
             <tbody>
               <tr ng-repeat="key in ctrl.sortingKeys"
@@ -144,23 +144,23 @@
                 <td>{{key}}</td>
                 <td>{{selection[key]}}
                   <span ng-if="key === 'remainingJobs' && selection.failedJobs"
-                        class="failedJobs">(Failed {{ selection.failedJobs }})</span>
+                        class="failedJobs">({{ 'BATCHES_PROGRESS_FAILED' | translate:'{jobs: selection.failedJobs}' }}</span>
                   </td>
               </tr>
             </tbody>
           </table>
           <div ng-if="ctrl.getSelectionType() == 'runtime'">
-            <h3>Failed Jobs</h3>
+            <h3>{{ 'BATCHES_PROGRESS_FAIL_JOBS' | translate }}</h3>
             <div cam-widget-loader
                  loading-state="{{ ctrl.getLoadingState('jobs') }}"
-                 text-empty="No failed jobs"
-                 text-error="{{ctrl.getJobs()}}">
+                 text-empty="{{ 'BATCHES_PROGRESS_NO_FAILED_JOBS' | translate }}"
+                 text-error="{{ ctrl.getJobs() }}">
             <table class="cam-table">
               <thead>
                 <tr>
-                  <th class="id">ID</th>
-                  <th class="type">Exception</th>
-                  <th class="action">Actions</th>
+                  <th class="id">{{ 'BATCHES_PROGRESS_ID' | translate }}</th>
+                  <th class="type">{{ 'BATCHES_PROGRESS_EXCEPTION' | translate }}</th>
+                  <th class="action">{{ 'BATCHES_PROGRESS_ACTIONS' | translate }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -170,18 +170,18 @@
                     {{job.exceptionMessage.substr(0, 120)}}…
                     <a ng-href="{{ctrl.getStacktraceUrl(job)}}"
                        target="_blank"
-                       tooltip="Open stacktrace in new window">Full stack trace</a>
+                       tooltip="{{ 'BATCHES_PROGRESS_TOOLTIP_OPEN_STACK' | translate }}">{{ 'BATCHES_PROGRESS_FULL_STACK_TRACE' | translate }}</a>
                   </td>
                   <td>
                     <div class="btn-group btn-group-sm">
                       <a class="btn btn-default action-button"
                          ng-click="ctrl.retryJob(job)"
-                         tooltip="Increment Number of Retries for this Job">
+                         tooltip="{{ 'BATCHES_PROGRESS_TOOLTIP_INCREMENT_RETRIES' | translate }}">
                         <span class="glyphicon glyphicon-repeat"></span>
                       </a>
                       <a class="btn btn-default action-button"
                          ng-click="ctrl.deleteJob(job)"
-                         tooltip="Delete this Job">
+                         tooltip="{{ 'BATCHES_PROGRESS_TOOLTIP_DELETE_BATCH' | translate }}">
                         <span class="glyphicon glyphicon-trash"></span>
                       </a>
                     </div>

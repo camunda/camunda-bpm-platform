@@ -1,20 +1,20 @@
 <section>
   <div class="inner">
     <header ng-if="decisionCount">
-      <h1 class="section-title">{{decisionCount}} decision {{ (decisionCount > 1 ? 'definitions' : 'definition') }}  deployed</h1>
+      <h1 class="section-title">{{ (decisionCount > 1 ? 'PLUGIN_DECISION_TABLE_TITLE_DEFINITIONS' : 'PLUGIN_DECISION_TABLE_TITLE_DEFINITION' | translate:'{count: decisionCount}') }}</h1>
     </header>
 
     <header class='header-empty' ng-if="!decisionCount">
-      <h1 class="section-title">No decision tables deployed</h1>
+      <h1 class="section-title">{{ 'PLUGIN_DECISION_TABLE_NO_DECISION_TABLES_DEPLOYED' | translate }}</h1>
     </header>
 
     <table class="decision-definitions-list cam-table"
            ng-if="decisionCount">
       <thead>
       <tr>
-        <th class="name">Name</th>
-        <th class="tenant-id">Tenant ID</th>
-        <th class="tenant-id" ng-if="isDrdAvailable">Decision Requirements Definition</th>
+        <th class="name">{{ 'PLUGIN_DECISION_TABLE_NAME' | translate }}</th>
+        <th class="tenant-id">{{ 'PLUGIN_DECISION_TABLE_TENANT_ID' | translate }}</th>
+        <th class="tenant-id" ng-if="isDrdAvailable">{{ 'PLUGIN_DECISION_TABLE_DECISION_REQUIREMENTS' | translate }}</th>
       </tr>
       </thead>
 

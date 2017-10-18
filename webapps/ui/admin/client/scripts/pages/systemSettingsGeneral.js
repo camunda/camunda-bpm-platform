@@ -18,7 +18,7 @@ module.exports = ['ViewsProvider', function PluginConfiguration(ViewsProvider) {
 
   ViewsProvider.registerDefaultView('admin.system', {
     id: 'system-settings-general',
-    label: 'General',
+    label: 'SYSTEM_GENERAL',
     template: template,
     controller: Controller,
     priority: 1000

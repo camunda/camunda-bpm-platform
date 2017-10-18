@@ -1,6 +1,6 @@
 <!-- # CE - camunda-bpm-webapp/ui/admin/client/scripts/pages/create-group-membership.html -->
 <div class="modal-header">
-  <h3>Select Groups</h3>
+  <h3>{{ 'GROUP_MEMBERSHIP_GROUP_SELECT_GROUPS' | translate }}</h3>
 </div>
 
 <div class="create-group-membership modal-body">
@@ -11,9 +11,9 @@
     <thead>
       <tr>
         <th class="select"></th>
-        <th class="group-id">Group ID</th>
-        <th class="group-name">Group Name</th>
-        <th class="group-type">Group Type</th>
+        <th class="group-id">{{ 'GROUP_MEMBERSHIP_GROUP_GROUP_ID' | translate }}</th>
+        <th class="group-name">{{ 'GROUP_MEMBERSHIP_GROUP_GROUP_NAME' | translate }}</th>
+        <th class="group-type">{{ 'GROUP_MEMBERSHIP_GROUP_GROUP_TYPE' | translate }}</th>
       </tr>
     </thead>
 
@@ -40,12 +40,11 @@
   </table>
 
   <p ng-show="availableGroups.length == 0">
-    There are no additional groups available to which the user can be added.
-    You can create a new group <a href="#/group-create" ng-click="close">here</a>.
+  	{{ 'GROUP_MEMBERSHIP_GROUP_MESSAGE_AVAILABLE_GROUPS' | translate }} <a href="#/group-create" ng-click="close">{{ 'GROUP_MEMBERSHIP_GROUP_MESSAGE_HERE' | translate }}</a>.
   </p>
 
   <p ng-show="status === 'SUCCESS'">
-    User was successfully added to selected groups.
+    {{ 'GROUP_MEMBERSHIP_GROUP_MESSAGE_SUCCESS' | translate }}
   </p>
 
 </div>
@@ -55,20 +54,20 @@
           ng-click="close()"
           ng-disabled="status === 'performCreate'"
           ng-hide="status === 'SUCCESS' || status === 'FAILED' || status === 'loadingFailed'">
-    Close
+    {{ 'GROUP_MEMBERSHIP_GROUP_CLOSE' | translate }}
   </button>
 
   <button class="btn btn-primary"
           ng-click="close(status)"
           ng-show="status === 'SUCCESS' || status === 'FAILED' || status === 'loadingFailed'">
-    OK
+    {{ 'GROUP_MEMBERSHIP_GROUP_OK' | translate }}
   </button>
 
   <button class="btn btn-primary"
           ng-click="createGroupMemberships()"
           ng-disabled="status !== 'beforeCreate'"
           ng-hide="status === 'SUCCESS' || status === 'FAILED' || status === 'loadingFailed' || availableGroups.length == 0">
-    Add Groups
+    {{ 'GROUP_MEMBERSHIP_GROUP_ADD_GROUPS' | translate }}
   </button>
 </div>
 <!-- / CE - camunda-bpm-webapp/ui/admin/client/scripts/pages/create-group-membership.html -->

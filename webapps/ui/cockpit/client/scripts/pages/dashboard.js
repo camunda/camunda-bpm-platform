@@ -40,6 +40,7 @@ var Controller = [
   'page',
   'Data',
   'dataDepend',
+  '$translate',
   function(
   $scope,
   camAPI,
@@ -48,7 +49,8 @@ var Controller = [
   hasPlugin,
   page,
   Data,
-  dataDepend
+  dataDepend,
+  $translate
 ) {
     $scope.hasMetricsPlugin = hasPlugin('cockpit.dashboard.metrics', 'executed-activity-instances');
     $scope.hasProcessSearch = hasPlugin('cockpit.processes.dashboard', 'search-process-instances');
@@ -67,7 +69,7 @@ var Controller = [
   // reset breadcrumbs
     page.breadcrumbsClear();
     $scope.$root.showBreadcrumbs = false;
-    page.titleSet('Dashboard');
+    page.titleSet($translate.instant('DASHBOARD_DASHBOARD'));
 
   // ----------------------------------------------------------------------------------------
 
@@ -98,7 +100,7 @@ var Controller = [
 
       var belowTreshold = {
         value: 0,
-        label: 'Others',
+        label: $translate.instant('DASHBOARD_OTHERS'),
         names: [],
         url: url
       };
@@ -229,7 +231,7 @@ var Controller = [
                   assigned: true
                 }, function(err, value) {
                   done(err, {
-                    label: 'Assigned to a user',
+                    label: $translate.instant('DASHBOARD_ASSIGNED_TO_USER'),
                     url: '/tasks?searchQuery=%5B%7B%22type%22:%22unfinished%22,%22operator%22:%22eq%22,%22value%22:%22%22,%22name%22:%22%22%7D,%7B%22type%22:%22assigned%22,%22operator%22:%22eq%22,%22value%22:%22%22,%22name%22:%22%22%7D%5D',
                     value: value
                   });
@@ -242,7 +244,7 @@ var Controller = [
                   withCandidateGroups: true
                 }, function(err, value) {
                   done(err, {
-                    label: 'Assigned to 1 or more groups',
+                    label: $translate.instant('DASHBOARD_ASSIGNED_TO_GROUPS'),
                     url: '/tasks?searchQuery=%5B%7B%22type%22:%22unfinished%22,%22operator%22:%22eq%22,%22value%22:%22%22,%22name%22:%22%22%7D,%7B%22type%22:%22withCandidateGroups%22,%22operator%22:%22eq%22,%22value%22:%22%22,%22name%22:%22%22%7D,%7B%22type%22:%22unassigned%22,%22operator%22:%22eq%22,%22value%22:%22%22,%22name%22:%22%22%7D%5D',
                     value: value
                   });
@@ -255,7 +257,7 @@ var Controller = [
                   withoutCandidateGroups: true
                 }, function(err, value) {
                   done(err, {
-                    label: 'Unassigned',
+                    label: $translate.instant('DASHBOARD_UNASSIGNED'),
                     url: '/tasks?searchQuery=%5B%7B%22type%22:%22unfinished%22,%22operator%22:%22eq%22,%22value%22:%22%22,%22name%22:%22%22%7D,%7B%22type%22:%22withoutCandidateGroups%22,%22operator%22:%22eq%22,%22value%22:%22%22,%22name%22:%22%22%7D,%7B%22type%22:%22unassigned%22,%22operator%22:%22eq%22,%22value%22:%22%22,%22name%22:%22%22%7D%5D',
                     value: value
                   });

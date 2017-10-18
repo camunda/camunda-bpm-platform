@@ -12,8 +12,8 @@ var camCommons = require('camunda-commons-ui/lib');
 var ngModule = angular.module('cam.cockpit.pages.processDefinition', ['dataDepend', camCommons.name]);
 
 var Controller = [
-  '$location', '$scope', '$rootScope', '$q', '$filter', 'search', 'ProcessDefinitionResource', 'ProcessInstanceResource', 'JobDefinitionResource', 'Views', 'Data', 'Transform', 'Variables', 'dataDepend', 'processDefinition', 'page',
-  function($location, $scope,   $rootScope,   $q,   $filter,   search,   ProcessDefinitionResource,   ProcessInstanceResource,   JobDefinitionResource,   Views,   Data,   Transform,   Variables,   dataDepend,   processDefinition,   page
+  '$location', '$scope', '$rootScope', '$q', '$filter', 'search', 'ProcessDefinitionResource', 'ProcessInstanceResource', 'JobDefinitionResource', 'Views', 'Data', 'Transform', 'Variables', 'dataDepend', 'processDefinition', 'page', '$translate',
+  function($location, $scope,   $rootScope,   $q,   $filter,   search,   ProcessDefinitionResource,   ProcessInstanceResource,   JobDefinitionResource,   Views,   Data,   Transform,   Variables,   dataDepend,   processDefinition,   page, $translate
   ) {
     var processData = $scope.processData = dataDepend.create($scope);
     var pageData = $scope.pageData = dataDepend.create($scope);
@@ -75,7 +75,7 @@ var Controller = [
         changed = true;
       }
 
-      if (filter != currentFilter) {
+      if (filter !== currentFilter) {
         serializeFilterToUri(filter);
       }
 
@@ -255,7 +255,7 @@ var Controller = [
       page.breadcrumbsClear();
 
       page.breadcrumbsAdd({
-        label: 'Processes',
+        label: $translate.instant('PROCESS_DEFINITION_PROCESSES'),
         href: '#/processes/'
       });
 
@@ -490,7 +490,7 @@ var ViewConfig = [ 'ViewsProvider', function(ViewsProvider) {
   ViewsProvider.registerDefaultView('cockpit.processDefinition.view', {
     id: 'runtime',
     priority: 20,
-    label: 'Runtime',
+    label: 'BREAD_CRUMBS_RUNTIME',
     keepSearchParams: [
       'parentProcessDefinitionId',
       'businessKey',

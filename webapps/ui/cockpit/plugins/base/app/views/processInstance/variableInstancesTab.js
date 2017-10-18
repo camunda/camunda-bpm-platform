@@ -14,9 +14,9 @@ var uploadTemplate = require('../../../../../client/scripts/components/variables
 module.exports = function(ngModule) {
   ngModule.controller('VariableInstancesController', [
     '$scope', '$sce', '$http', 'search', 'Uri', 'LocalExecutionVariableResource',
-    'Notifications', '$modal', '$q', 'camAPI', 'fixDate', 'unfixDate',
+    'Notifications', '$modal', '$q', 'camAPI', 'fixDate', 'unfixDate', '$translate',
     function($scope, $sce, $http, search, Uri, LocalExecutionVariableResource,
-      Notifications, $modal, $q, camAPI, fixDate, unfixDate) {
+      Notifications, $modal, $q, camAPI, fixDate, unfixDate, $translate) {
 
         // input: processInstance, processData
 
@@ -29,6 +29,21 @@ module.exports = function(ngModule) {
           taskService = camAPI.resource('task');
 
       $scope.searchConfig = angular.copy(variableInstancesTabSearchConfig);
+
+      angular.forEach(variableInstancesTabSearchConfig.tooltips, function(translation, tooltip) {
+        $scope.searchConfig.tooltips[tooltip] = $translate.instant(translation);
+      });
+
+      $scope.searchConfig.types.map(function(type) {
+        type.id.value = $translate.instant(type.id.value);
+        if (type.operators) {
+          type.operators = type.operators.map(function(op) {
+            op.value = $translate.instant(op.value);
+            return op;
+          });
+        }
+        return type;
+      });
 
       variableInstanceData.observe('instanceIdToInstanceMap', function(instanceIdToInstanceMap) {
         $scope.instanceIdToInstanceMap = instanceIdToInstanceMap;
@@ -82,16 +97,16 @@ module.exports = function(ngModule) {
         var callback = function(error) {
           if(error) {
             Notifications.addError({
-              status: 'Variable',
-              message: 'The variable \'' + info.variable.name + '\' could not be deleted successfully.',
+              status: $translate.instant('PLUGIN_VARIABLE_INSTANCES_STATUS_VARIABLE'),
+              message: $translate.instant('PLUGIN_VARIABLE_INSTANCES_MESSAGES_ERROR_0', { name: info.variable.name }),
               exclusive: true,
               duration: 5000
             });
             promise.reject();
           } else {
             Notifications.addMessage({
-              status: 'Variable',
-              message: 'The variable \'' + info.variable.name + '\' has been deleted successfully.',
+              status: $translate.instant('PLUGIN_VARIABLE_INSTANCES_STATUS_VARIABLE'),
+              message: $translate.instant('PLUGIN_VARIABLE_INSTANCES_MESSAGES_ADD_0', { name: info.variable.name }),
               duration: 5000
             });
             promise.resolve(info.variable);
@@ -163,8 +178,8 @@ module.exports = function(ngModule) {
         var callback = function(error) {
           if(error) {
             Notifications.addError({
-              status: 'Variable',
-              message: 'The variable \'' + variable.name + '\' could not be changed successfully.',
+              status: $translate.instant('PLUGIN_VARIABLE_INSTANCES_STATUS_VARIABLE'),
+              message: $translate.instant('PLUGIN_VARIABLE_INSTANCES_MESSAGES_ERROR_1', { name: variable.name }),
               exclusive: true,
               duration: 5000
             });
@@ -172,8 +187,8 @@ module.exports = function(ngModule) {
             promise.reject();
           } else {
             Notifications.addMessage({
-              status: 'Variable',
-              message: 'The variable \'' + variable.name + '\' has been changed successfully.',
+              status: $translate.instant('PLUGIN_VARIABLE_INSTANCES_STATUS_VARIABLE'),
+              message: $translate.instant('PLUGIN_VARIABLE_INSTANCES_MESSAGES_ADD_1', { name: variable.name}),
               duration: 5000
             });
 
@@ -199,6 +214,14 @@ module.exports = function(ngModule) {
         }
 
         return promise.promise;
+      };
+
+      // Variables table header
+      $scope.getHeaderVariable = {
+        'name' : $translate.instant('PLUGIN_VARIABLE_NAME'),
+        'value': $translate.instant('PLUGIN_VARIABLE_VALUE'),
+        'type' : $translate.instant('PLUGIN_VARIABLE_TYPE'),
+        'scope' : $translate.instant('PLUGIN_VARIABLE_SCOPE')
       };
 
       function getBasePath(variable) {
@@ -294,7 +317,7 @@ module.exports = function(ngModule) {
 
     ViewsProvider.registerDefaultView('cockpit.processInstance.runtime.tab', {
       id: 'variables-tab',
-      label: 'Variables',
+      label: 'PLUGIN_VARIABLE_INSTANCES_LABEL',
       template: instancesTemplate,
       controller: 'VariableInstancesController',
       priority: 20

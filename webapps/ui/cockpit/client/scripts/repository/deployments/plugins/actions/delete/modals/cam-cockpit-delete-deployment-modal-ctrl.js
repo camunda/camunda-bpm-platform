@@ -7,13 +7,15 @@ module.exports = [
   'Notifications',
   'deploymentData',
   'deployment',
+  '$translate',
   function(
     $scope,
     $q,
     camAPI,
     Notifications,
     deploymentData,
-    deployment
+    deployment,
+    $translate
   ) {
 
     var Deployment = camAPI.resource('deployment');
@@ -105,25 +107,23 @@ module.exports = [
     };
 
     $scope.getInfoSnippet = function() {
-      var info = [ 'There are' ];
+      var info = [ $translate.instant('REPOSITORY_DEPLOYMENTS_INFO_THERE_ARE') ];
 
       if ($scope.processInstanceCount && $scope.processInstanceCount.count > 0) {
         info.push($scope.processInstanceCount.count);
-        info.push('running process');
-        ($scope.processInstanceCount && $scope.processInstanceCount.count > 1) ? info.push('instances') : info.push('instance');
+        ($scope.processInstanceCount && $scope.processInstanceCount.count > 1) ? info.push($translate.instant('REPOSITORY_DEPLOYMENTS_INFO_RUNNING_PLURAL')) : info.push($translate.instant('REPOSITORY_DEPLOYMENTS_INFO_RUNNING_SINGULAR'));
       }
 
       if ($scope.processInstanceCount && $scope.processInstanceCount.count > 0 && $scope.caseInstanceCount > 0) {
-        info.push('and');
+        info.push($translate.instant('REPOSITORY_DEPLOYMENTS_INFO_AND'));
       }
 
       if ($scope.caseInstanceCount > 0) {
         info.push($scope.caseInstanceCount);
-        info.push('open case');
-        $scope.caseInstanceCount > 1 ? info.push('instances') : info.push('instance');
+        $scope.caseInstanceCount > 1 ? info.push($translate.instant('REPOSITORY_DEPLOYMENTS_INFO_OPEN_PLURAL')) : info.push($translate.instant('REPOSITORY_DEPLOYMENTS_INFO_OPEN_SINGULAR'));
       }
 
-      info.push('which belong to this deployment.');
+      info.push($translate.instant('REPOSITORY_DEPLOYMENTS_INFO_WHICH_BELONG'));
       info = info.join(' ');
 
       return info;
@@ -138,8 +138,8 @@ module.exports = [
 
         if (err) {
           return Notifications.addError({
-            status: 'Finished',
-            message: 'Could not delete deployment: ' + err.message,
+            status: $translate.instant('REPOSITORY_DEPLOYMENTS_INFO_MSN_STATUS'),
+            message: $translate.instant('REPOSITORY_DEPLOYMENTS_INFO_MSN_MSN', { message: err.message }),
             exclusive: true
           });
         }

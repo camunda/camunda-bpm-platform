@@ -3,7 +3,7 @@
   type="{{type}}"
   change="onChange()"
   value="property">
-  <span ng-show="property == null" class="null-value">null</span>
+  <span ng-show="property == null" class="null-value">{{ 'TIME_TO_LIVE_NULL' | translate }}</span>
   <span ng-show="property != null">
     {{format({property: property}) || property}}
     <button type="button" class="btn btn-link btn-xs" ng-click="remove($event)">

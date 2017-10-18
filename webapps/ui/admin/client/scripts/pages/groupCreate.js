@@ -4,21 +4,21 @@ var fs = require('fs');
 
 var template = fs.readFileSync(__dirname + '/groupCreate.html', 'utf8');
 
-var Controller = ['$scope', 'page', 'GroupResource', 'Notifications', '$location', function($scope, pageService, GroupResource, Notifications, $location) {
+var Controller = ['$scope', 'page', 'GroupResource', 'Notifications', '$location', '$translate', function($scope, pageService, GroupResource, Notifications, $location, $translate) {
 
   $scope.$root.showBreadcrumbs = true;
 
-  pageService.titleSet('Create New Group');
+  pageService.titleSet($translate.instant('GROUP_CREATE_NEW_GROUP'));
 
   pageService.breadcrumbsClear();
 
   pageService.breadcrumbsAdd([
     {
-      label: 'Groups',
+      label: $translate.instant('GROUP_CREATE_LABEL_GROUP'),
       href: '#/groups'
     },
     {
-      label: 'Create New Group',
+      label: $translate.instant('GROUP_CREATE_LABEL_NEW_GROUP'),
       href: '#/group-create'
     }
   ]);
@@ -34,11 +34,11 @@ var Controller = ['$scope', 'page', 'GroupResource', 'Notifications', '$location
     var group = $scope.group;
     GroupResource.createGroup(group).$promise.then(
         function() {
-          Notifications.addMessage({type:'success', status:'Success', message:'Successfully created new group '+group.id});
+          Notifications.addMessage({type:'success', status:$translate.instant('NOTIFICATIONS_STATUS_SUCCESS'), message: $translate.instant('GROUP_CREATE_MESSAGE_SUCCESS', { group: group.id })});
           $location.path('/groups');
         },
         function() {
-          Notifications.addError({ status: 'Failed', message: 'Could not create group ' + group.id + '. Check if it already exists.' });
+          Notifications.addError({ status: $translate.instant('NOTIFICATIONS_STATUS_FAILED'), message: $translate.instant('GROUP_CREATE_MESSAGE_ERROR', { group: group.id }) });
         }
       );
   };

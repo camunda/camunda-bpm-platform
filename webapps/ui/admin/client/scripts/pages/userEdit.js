@@ -13,8 +13,8 @@ module.exports = [ '$routeProvider', function($routeProvider) {
   $routeProvider.when('/users/:userId', {
     template: template,
     controller: [
-      '$scope', 'page', '$routeParams', 'camAPI', 'Notifications', '$location', '$modal', 'authentication', 'unescape',
-      function($scope,   page,   $routeParams,   camAPI,   Notifications,   $location,   $modal,   authentication, unescape) {
+      '$scope', 'page', '$routeParams', 'camAPI', 'Notifications', '$location', '$modal', 'authentication', 'unescape', '$translate',
+      function($scope,   page,   $routeParams,   camAPI,   Notifications,   $location,   $modal,   authentication, unescape, $translate) {
 
         var AuthorizationResource = camAPI.resource('authorization'),
             GroupResource         = camAPI.resource('group'),
@@ -24,7 +24,7 @@ module.exports = [ '$routeProvider', function($routeProvider) {
         var refreshBreadcrumbs = function() {
           page.breadcrumbsClear();
           page.breadcrumbsAdd({
-            label: 'Users',
+            label: $translate.instant('USERS_USERS'),
             href: '#/users/'
           });
         };
@@ -80,7 +80,7 @@ module.exports = [ '$routeProvider', function($routeProvider) {
             $scope.profile = angular.copy(res);
             $scope.profileCopy = angular.copy(res);
 
-            page.titleSet('Edit `' + $scope.user + '` user');
+            page.titleSet($translate.instant('USERS_EDIT_USER', { user: $scope.user }));
 
             refreshBreadcrumbs();
 
@@ -97,16 +97,16 @@ module.exports = [ '$routeProvider', function($routeProvider) {
             if( err === null ) {
               Notifications.addMessage({
                 type : 'success',
-                status : 'Success',
-                message : 'User profile successfully updated.'
+                status : $translate.instant('NOTIFICATIONS_STATUS_SUCCESS'),
+                message : $translate.instant('USERS_EDIT_SUCCESS_MSN')
               });
               loadProfile();
 
             } else {
 
               Notifications.addError({
-                status : 'Failed',
-                message : 'Failed to update user profile'
+                status : $translate.instant('NOTIFICATIONS_STATUS_FAILED'),
+                message : $translate.instant('USERS_EDIT_FAILED')
               });
             }
           });
@@ -133,8 +133,8 @@ module.exports = [ '$routeProvider', function($routeProvider) {
             if( err === null ) {
               Notifications.addMessage({
                 type: 'success',
-                status: 'Password',
-                message: 'Changed the password.',
+                status: $translate.instant('NOTIFICATIONS_STATUS_PASSWORD'),
+                message: $translate.instant('USERS_PASSWORD_CHANGED'),
                 duration: 5000,
                 exclusive: true
               });
@@ -144,22 +144,22 @@ module.exports = [ '$routeProvider', function($routeProvider) {
               if( err.status === 400 ) {
                 if( $scope.decodedUserId === $scope.authenticatedUser ) {
                   Notifications.addError({
-                    status : 'Password',
-                    message : 'Old password is not valid.',
+                    status : $translate.instant('NOTIFICATIONS_STATUS_PASSWORD'),
+                    message : $translate.instant('USERS_OLD_PASSWORD_NOT_VALID'),
                     exclusive : true
                   });
 
                 } else {
                   Notifications.addError({
-                    status : 'Password',
-                    message : 'Your password is not valid.',
+                    status : $translate.instant('NOTIFICATIONS_STATUS_PASSWORD'),
+                    message : $translate.instant('USERS_PASSWORD_NOT_VALID'),
                     exclusive : true
                   });
                 }
               } else {
                 Notifications.addError({
-                  status : 'Password',
-                  message : 'Could not change the password.'
+                  status : $translate.instant('NOTIFICATIONS_STATUS_PASSWORD'),
+                  message : $translate.instant('USERS_PASSWORD_COULD_NOT_CHANGE')
                 });
               }
             }
@@ -172,14 +172,14 @@ module.exports = [ '$routeProvider', function($routeProvider) {
           $modal.open({
             template: confirmationTemplate,
             controller: ['$scope', function($dialogScope) {
-              $dialogScope.question = 'Really delete user ' + $scope.user.id + '?';
+              $dialogScope.question = $translate.instant('USERS_USER_DELETE_CONFIRM', { user: $scope.user.id});
             }]
           }).result.then(function() {
             UserResource.delete({ id: $scope.decodedUserId }, function() {
               Notifications.addMessage({
                 type: 'success',
-                status: 'Success',
-                message: 'User '+$scope.user.id+' successfully deleted.'
+                status: $translate.instant('NOTIFICATIONS_STATUS_SUCCESS'),
+                message: $translate.instant('USERS_USER_DELETE_SUCCESS', { user: $scope.user.id })
               });
               $location.path('/users');
             }
@@ -212,8 +212,8 @@ module.exports = [ '$routeProvider', function($routeProvider) {
           GroupResource.deleteMember({ userId: $scope.decodedUserId, id: groupId}, function() {
             Notifications.addMessage({
               type:'success',
-              status:'Success',
-              message:'User '+$scope.user.id+' removed from group.'
+              status:$translate.instant('NOTIFICATIONS_STATUS_SUCCESS'),
+              message: $translate.instant('USERS_USER_DELETE_FROM_GROUP', { user: $scope.user.id })
             });
             loadGroups();
           }
@@ -267,8 +267,8 @@ module.exports = [ '$routeProvider', function($routeProvider) {
           TenantResource.deleteUserMember({userId: $scope.decodedUserId, id: tenantId}, function() {
             Notifications.addMessage({
               type:'success',
-              status:'Success',
-              message:'User '+$scope.user.id+' removed from tenant.'
+              status: $translate.instant('NOTIFICATIONS_STATUS_SUCCESS'),
+              message: $translate.instant('USERS_USER_DELETE_FROM_TENANT', { user: $scope.user.id })
             });
             loadTenants();
           }
@@ -359,7 +359,7 @@ module.exports = [ '$routeProvider', function($routeProvider) {
 
         $scope.$root.showBreadcrumbs = true;
 
-        page.titleSet('Edit user');
+        page.titleSet($translate.instant('USERS_EDIT_USER'));
         refreshBreadcrumbs();
 
         loadProfile();

@@ -3,7 +3,7 @@
 module.exports = [ 'ViewsProvider', function(ViewsProvider) {
   ViewsProvider.registerDefaultView('cockpit.navigation', {
     id: 'reports',
-    label: 'Reports',
+    label: 'COCKPIT_REPORTS',
     pagePath: '#/reports',
     template: '<!-- nothing to show, but needed -->',
     controller: function() {},

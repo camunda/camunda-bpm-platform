@@ -1,6 +1,6 @@
 <!-- # CE - camunda-bpm-webapp/ui/cockpit/scripts/components/variables/variable-upload-modal.html -->
 <div class="modal-header">
-  <h3>Upload binary variable</h3>
+  <h3>{{ 'VARIABLE_UPLOAD_MODAL_TITLE' | translate }}</h3>
 </div>
 
 <!--[if lt IE 10]>
@@ -17,7 +17,7 @@ This feature is unsupported in your Browser.
 
   <div ng-show="status === 'beforeUpload'">
 
-    <p>Select a file containing the binary content for  the variable:</p>
+    <p>{{ 'VARIABLE_UPLOAD_SELECT_FILE' | translate }}:</p>
 
     <p>
       <input name="data"
@@ -31,7 +31,7 @@ This feature is unsupported in your Browser.
   </div>
 
   <div ng-show="status === 'performUpload'">
-    Upload progress: {{progress}}%
+    {{ 'VARIABLE_UPLOAD_PROGRESS' | translate:'{progress: progress}' }}
   </div>
 
 </div>
@@ -40,20 +40,20 @@ This feature is unsupported in your Browser.
   <button class="btn btn-default"
           ng-click="$dismiss()"
           ng-hide="status === 'uploadSuccess' || status === 'uploadFailed'">
-    Close
+    {{ 'VARIABLE_UPLOAD_CLOSE' | translate }}
   </button>
 
   <button class="btn btn-primary"
           ng-click="$close()"
           ng-show="status === 'uploadSuccess' || status === 'uploadFailed'">
-    OK
+    {{ 'VARIABLE_UPLOAD_OK' | translate }}
   </button>
 
   <button class="btn btn-primary"
           ng-click="upload()"
           ng-disabled="status !== 'beforeUpload'"
           ng-hide="status === 'uploadSuccess' || status === 'uploadFailed'">
-    Upload
+    {{ 'VARIABLE_UPLOAD_UPLOAD' | translate }}
   </button>
 </div>
 

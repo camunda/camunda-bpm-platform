@@ -22,6 +22,7 @@ module.exports = function(pluginDependencies) {
   var ngDependencies = [
     'ng',
     'ngResource',
+    'pascalprecht.translate',
     commons.name,
     require('./repository/main').name,
     require('./batches/main').name,

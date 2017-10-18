@@ -12,9 +12,9 @@ var ngModule = angular.module('cam.cockpit.pages.decisionDefinition', ['dataDepe
 
 var Controller = [
   '$scope', '$rootScope', '$q', 'dataDepend', 'page', 'camAPI',
-  'decisionDefinition', 'Views', 'search', 'isModuleAvailable',
+  'decisionDefinition', 'Views', 'search', 'isModuleAvailable', '$translate',
   function($scope,   $rootScope,   $q,   dataDepend,   page,   camAPI,
-           decisionDefinition,   Views,   search, isModuleAvailable) {
+           decisionDefinition,   Views,   search, isModuleAvailable, $translate) {
 
     $scope.control = {};
 
@@ -96,7 +96,7 @@ var Controller = [
 
       page.breadcrumbsAdd([
         {
-          label: 'Decisions',
+          label: $translate.instant('DECISION_DEFINITION_DECISIONS'),
           href: '#/decisions'
         },
         {
@@ -108,7 +108,7 @@ var Controller = [
 
       page.titleSet([
         definition.name || definition.key || definition.id,
-        'Definition View'
+        $translate.instant('DECISION_DEFINITION_DEFINITION_VIEW')
       ].join(' | '));
     });
 

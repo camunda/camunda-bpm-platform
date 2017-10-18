@@ -17,6 +17,7 @@ var Controller = [
   '$location',
   '$modal',
   'unescape',
+  '$translate',
   function(
     $scope,
     pageService,
@@ -26,7 +27,8 @@ var Controller = [
     Notifications,
     $location,
     $modal,
-    unescape
+    unescape,
+    $translate
   ) {
 
     var TenantResource        = camAPI.resource('tenant'),
@@ -37,7 +39,7 @@ var Controller = [
 
 
 
-    pageService.titleSet('Tenant');
+    pageService.titleSet($translate.instant('TENANTS_TENANT'));
 
 
 
@@ -45,7 +47,7 @@ var Controller = [
       pageService.breadcrumbsClear();
 
       pageService.breadcrumbsAdd([{
-        label: 'Tenants',
+        label: $translate.instant('TENANTS_TENANTS'),
         href: '#/tenants'
       }]);
     }
@@ -82,7 +84,7 @@ var Controller = [
         $scope.tenantName = (res.name ? res.name : res.id);
         $scope.tenantCopy = angular.copy(res);
 
-        pageService.titleSet($scope.tenantName + ' Tenant');
+        pageService.titleSet($translate.instant('TENANTS_TENANT_TITLE', { tenant: $scope.tenantName }));
 
         refreshBreadcrumbs();
 
@@ -189,14 +191,14 @@ var Controller = [
         if( err === null ) {
           Notifications.addMessage({
             type : 'success',
-            status : 'Success',
-            message : 'Tenant successfully updated.'
+            status : $translate.instant('NOTIFICATIONS_STATUS_SUCCESS'),
+            message : $translate.instant('TENANTS_TENANT_UPDATE_SUCCESS')
           });
           loadTenant();
         } else {
           Notifications.addError({
-            status : 'Failed',
-            message : 'Failed to update tenant.'
+            status : $translate.instant('NOTIFICATIONS_STATUS_FAILED'),
+            message : $translate.instant('TENANTS_TENANT_UPDATE_FAILED')
           });
         }
       });
@@ -208,22 +210,22 @@ var Controller = [
       $modal.open({
         template: confirmationTemplate,
         controller: ['$scope', function($dialogScope) {
-          $dialogScope.question = 'Really delete tenant ' + $scope.tenant.id + '?';
+          $dialogScope.question = $translate.instant('TENANTS_TENANT_DELETE_CONFIRM', { tenant: $scope.tenant.id });
         }]
       }).result.then(function() {
         TenantResource.delete({ id: $scope.decodedTenantId }, function(err) {
           if(err === null) {
             Notifications.addMessage({
               type: 'success',
-              status: 'Success',
-              message: 'Tenant ' + $scope.tenant.id + ' successfully deleted.'
+              status: $translate.instant('NOTIFICATIONS_STATUS_SUCCESS'),
+              message: $translate.instant('TENANTS_TENANT_DELETE_SUCCESS', { tenant: $scope.tenant.id })
             });
             $location.path('/tenants');
           } else {
             Notifications.addMessage({
               type: 'success',
-              status: 'Success',
-              message: 'Failed to delete tenant ' + $scope.tenant.id + '.'
+              status: $translate.instant('NOTIFICATIONS_STATUS_SUCCESS'),
+              message: $translate.instant('TENANTS_TENANT_DELETE_FAILED', { tenant: $scope.tenant.id })
             });
           }
         });

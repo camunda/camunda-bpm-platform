@@ -11,7 +11,7 @@ module.exports = [
 ) {
     ViewsProvider.registerDefaultView('admin.dashboard.section', {
       id: 'tenants',
-      label: 'Tenants',
+      label: 'TENANTS_TENANTS',
       template: template,
       pagePath: '#/tenants',
       controller: [

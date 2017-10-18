@@ -3,7 +3,7 @@
     {
       "id": {
         "key": "id",
-        "value": "ID"
+        "value": "PLUGIN_SEARCH_TENANTS_ID"
       },
       "default": true,
       "operators": [
@@ -16,7 +16,7 @@
     {
       "id": {
         "key": "name",
-        "value": "Name"
+        "value": "PLUGIN_SEARCH_TENANTS_NAME"
       },
       "operators": [
         {
@@ -25,14 +25,14 @@
         },
         {
           "key": "Like",
-          "value": "like"
+          "value": "PLUGIN_SEARCH_TENANTS_LIKE"
         }
       ]
     },
     {
       "id": {
         "key": "userMember",
-        "value": "User ID"
+        "value": "PLUGIN_SEARCH_TENANTS_USER_ID"
       },
       "operators": [
         {
@@ -44,7 +44,7 @@
     {
       "id": {
         "key": "groupMember",
-        "value": "Group ID"
+        "value": "PLUGIN_SEARCH_TENANTS_GROUP_ID"
       },
       "operators": [
         {
@@ -55,12 +55,12 @@
     }
   ],
   "tooltips": {
-    "inputPlaceholder": "Add criteria",
-    "invalid": "This search query is not valid",
-    "deleteSearch": "Remove search",
-    "type": "Type",
-    "name": "Property",
-    "operator": "Operator",
-    "value": "Value"
+    "inputPlaceholder": "SEARCH_PLACEHOLDER",
+    "invalid": "INVALID_SEARCH",
+    "deleteSearch": "DELETE_SEARCH",
+    "type": "TYPE",
+    "name": "PROPERTY",
+    "operator": "OPERATOR",
+    "value": "VALUE"
   }
 }

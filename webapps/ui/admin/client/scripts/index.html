@@ -63,28 +63,28 @@
           ng-controller="NavigationController">
 
         <li ng-class="activeClass('#/user')">
-          <a href="#/users">Users</a>
+          <a href="#/users">{{ 'USERS_USERS' | translate }}</a>
         </li>
 
         <li ng-class="activeClass('#/group')">
-          <a href="#/groups">Groups</a>
+          <a href="#/groups">{{ 'GROUPS_GROUPS' | translate }}</a>
         </li>
 
         <li ng-class="activeClass('#/tenant')">
-          <a href="#/tenants">Tenants</a>
+          <a href="#/tenants">{{ 'TENANTS_TENANTS' | translate }}</a>
         </li>
 
         <li ng-class="activeClass('#/authorization')"
             show-if-authorized
             auth-permission="ALL"
             auth-resource-name="authorization">
-          <a href="#/authorization?resource=0">Authorizations</a>
+          <a href="#/authorization?resource=0">{{ 'AUTHORIZATION_AUTHORIZATIONS' | translate }}</a>
         </li>
         <li ng-class="activeClass('#/system')"
             show-if-authorized
             auth-permission="ALL"
             auth-resource-name="authorization">
-          <a href="#/system?section=system-settings-general">System</a>
+          <a href="#/system?section=system-settings-general">{{ 'SYSTEM_SYSTEM' | translate }}</a>
         </li>
       </ul>
     </div>

@@ -2,14 +2,14 @@
 <section class="col-xs-12">
   <div class="inner">
     <header>
-      <h1 class="section-title">Available reports</h1>
+      <h1 class="section-title">{{ 'REPORTS_TYPE_AVAILABLE_REPORTS' | translate }}</h1>
     </header>
 
     <div class="reports-type-selection">
       <div ng-if="!plugins || !(plugins.length > 0)"
            class="well no-reports-available">
         <span class="glyphicon glyphicon-info-sign"></span>
-        No reports available.
+        {{ 'REPORTS_TYPE_NO_AVAILABLE_REPORTS' | translate }}
       </div>
 
       <ul ng-if="plugins">

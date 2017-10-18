@@ -8,7 +8,7 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
 
   ViewsProvider.registerDefaultView('cockpit.decisionInstance.tab', {
     id: 'decision-input-table',
-    label: 'Inputs',
+    label: 'PLUGIN_INPUT_TABLE_LABEL',
     template: template,
     controller: [
       '$scope',

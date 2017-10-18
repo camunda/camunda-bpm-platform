@@ -11,7 +11,7 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
 
   ViewsProvider.registerDefaultView('cockpit.processDefinition.runtime.tab', {
     id: 'call-process-definitions-table',
-    label: 'Called Process Definitions',
+    label: 'PLUGIN_CALLED_PROCESS_DEFINITIONS_LABEL',
     template: template,
     controller: [
       '$scope', '$location', '$q', 'PluginProcessDefinitionResource',

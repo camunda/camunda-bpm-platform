@@ -3,7 +3,7 @@
   <div class="section-content">
     <header class="row">
       <div class="col-xs-8">
-        <h3>Create new group</h3>
+        <h3>{{ 'GROUP_CREATE_NEW_GROUP' | translate }}</h3>
       </div>
     </header>
 
@@ -12,7 +12,7 @@
       <div class="col-xs-12">
         <div class="form-group">
           <label class="control-label col-sm-4 col-md-2"
-                 for="inputGroupId">Group ID*</label>
+                 for="inputGroupId">{{ 'GROUP_CREATE_GROUP_ID' | translate }}</label>
 
           <div class="col-sm-8 col-md-10">
             <input id="inputGroupId"
@@ -22,13 +22,13 @@
                    ng-model="group.id"
                    novalidate required />
             <span class="help-inline"
-                ng-show="createGroupForm.groupId.$error.required">Group ID is required.</span>
+                ng-show="createGroupForm.groupId.$error.required">{{ 'GROUP_CREATE_ID_REQUIRED' | translate }}</span>
           </div>
         </div>
 
         <div class="form-group">
           <label class="control-label col-sm-4 col-md-2"
-                 for="inputName">Group Name*</label>
+                 for="inputName">{{ 'GROUP_CREATE_GROUP_NAME' | translate }}</label>
 
           <div class="col-sm-8 col-md-10">
             <input id="inputName"
@@ -38,13 +38,13 @@
                    ng-model="group.name"
                    novalidate required />
             <span class="help-inline"
-                  ng-show="createGroupForm.groupName.$error.required">Name is required.</span>
+                  ng-show="createGroupForm.groupName.$error.required">{{ 'GROUP_CREATE_NAME_REQUIRED' | translate }}</span>
           </div>
         </div>
 
         <div class="form-group">
           <label class="control-label col-sm-4 col-md-2"
-                 for="inputType">Group Type</label>
+                 for="inputType">{{ 'GROUP_GROUP_TYPE' | translate }}</label>
           <div class="col-sm-8 col-md-10">
             <input id="inputType"
                    name="groupType"
@@ -58,14 +58,14 @@
           <div class="col-sm-8 col-sm-offset-4 col-md-10 col-md-offset-2 text-right">
             <a class="btn btn-link"
                href="#/groups">
-              Cancel
+              {{ 'GROUP_CREATE_CANCEL' | translate }}
             </a>
 
             <button type="submit"
                     class="btn btn-primary"
                     ng-disabled="!createGroupForm.$valid"
                     ng-click="createGroup()">
-              Create new Group
+              {{ 'GROUP_CREATE_NEW_GROUP' | translate }}
             </button>
           </div>
         </div>

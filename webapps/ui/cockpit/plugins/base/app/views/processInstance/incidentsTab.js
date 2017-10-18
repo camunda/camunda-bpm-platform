@@ -7,7 +7,7 @@ var incidentsTemplate = fs.readFileSync(__dirname + '/incidents-tab.html', 'utf8
 var Configuration = function PluginConfiguration(ViewsProvider) {
   ViewsProvider.registerDefaultView('cockpit.processInstance.runtime.tab', {
     id: 'incidents-tab',
-    label: 'Incidents',
+    label: 'PLUGIN_INCIDENTS_LABEL',
     template: incidentsTemplate,
     priority: 15
   });

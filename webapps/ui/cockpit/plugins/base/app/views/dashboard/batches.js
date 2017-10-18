@@ -3,7 +3,7 @@
 module.exports = [ 'ViewsProvider', function(ViewsProvider) {
   ViewsProvider.registerDefaultView('cockpit.navigation', {
     id: 'batch',
-    label: 'Batches',
+    label: 'COCKPIT_BATCHES',
     pagePath: '#/batch',
     template: '<!-- nothing to show, but needed -->',
     controller: function() {},

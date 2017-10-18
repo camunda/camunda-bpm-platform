@@ -11,7 +11,7 @@ module.exports = [
 ) {
     ViewsProvider.registerDefaultView('admin.dashboard.section', {
       id: 'system',
-      label: 'System',
+      label: 'SYSTEM_SYSTEM',
       template: template,
       pagePath: '#/system?section=system-settings-general',
       controller: [

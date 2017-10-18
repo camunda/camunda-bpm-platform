@@ -10,14 +10,28 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
 
   ViewsProvider.registerDefaultView('cockpit.processDefinition.runtime.tab', {
     id: 'process-instances-table',
-    label: 'Process Instances',
+    label: 'PLUGIN_PROCESS_INSTANCES_LABEL',
     template: template,
     controller: [
-      '$scope', '$location', 'search', 'routeUtil', 'PluginProcessInstanceResource',
-      function($scope,   $location,   search,   routeUtil,   PluginProcessInstanceResource) {
-        var processDefinition = $scope.processDefinition;
-
+      '$scope', '$location', 'search', 'routeUtil', 'PluginProcessInstanceResource', '$translate',
+      function($scope,   $location,   search,   routeUtil,   PluginProcessInstanceResource, $translate) {
         $scope.searchConfig = angular.copy(searchConfig);
+        angular.forEach(searchConfig.tooltips, function(translation, tooltip) {
+          $scope.searchConfig.tooltips[tooltip] = $translate.instant(translation);
+        });
+
+        $scope.searchConfig.types.map(function(type) {
+          type.id.value = $translate.instant(type.id.value);
+          if (type.operators) {
+            type.operators = type.operators.map(function(op) {
+              op.value = $translate.instant(op.value);
+              return op;
+            });
+          }
+          return type;
+        });
+
+        var processDefinition = $scope.processDefinition;
         $scope.onSearchChange = updateView;
 
         function updateView(query, pages) {
