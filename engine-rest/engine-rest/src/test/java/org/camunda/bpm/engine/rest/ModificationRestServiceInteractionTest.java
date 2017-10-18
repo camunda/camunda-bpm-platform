@@ -638,7 +638,7 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
 
     json.put("skipIoMappings", true);
     json.put("processInstanceIds", Arrays.asList("200", "100"));
-    instructions.add(ModificationInstructionBuilder.cancellation().activityId("activityId").cancelCurrentActiveActivityInstances().getJson());
+    instructions.add(ModificationInstructionBuilder.cancellation().activityId("activityId").cancelCurrentActiveActivityInstances(true).getJson());
     json.put("instructions", instructions);
     json.put("processDefinitionId", "processDefinitionId");
 
@@ -662,7 +662,7 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
 
     json.put("skipIoMappings", true);
     json.put("processInstanceIds", Arrays.asList("200", "100"));
-    instructions.add(ModificationInstructionBuilder.cancellation().activityId("activityId").cancelCurrentActiveActivityInstances().getJson());
+    instructions.add(ModificationInstructionBuilder.cancellation().activityId("activityId").cancelCurrentActiveActivityInstances(true).getJson());
     json.put("instructions", instructions);
     json.put("processDefinitionId", "processDefinitionId");
 
@@ -676,6 +676,54 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
       .post(EXECUTE_MODIFICATION_ASYNC_URL);
 
     verify(modificationBuilderMock).cancelAllForActivity("activityId", true);
+    verify(modificationBuilderMock).executeAsync();
+  }
+
+  @Test
+  public void executeCancellationWithoutActiveFlagSync() {
+    Map<String, Object> json = new HashMap<String, Object>();
+    List<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
+
+    json.put("skipIoMappings", true);
+    json.put("processInstanceIds", Arrays.asList("200", "100"));
+    instructions.add(ModificationInstructionBuilder.cancellation().activityId("activityId").cancelCurrentActiveActivityInstances(false).getJson());
+    json.put("instructions", instructions);
+    json.put("processDefinitionId", "processDefinitionId");
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(json)
+    .then()
+      .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .post(EXECUTE_MODIFICATION_SYNC_URL);
+
+    verify(modificationBuilderMock).cancelAllForActivity("activityId");
+    verify(modificationBuilderMock).execute();
+  }
+
+  @Test
+  public void executeCancellationWithoutActiveFlagAsync() {
+    Map<String, Object> json = new HashMap<String, Object>();
+    List<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
+
+    json.put("skipIoMappings", true);
+    json.put("processInstanceIds", Arrays.asList("200", "100"));
+    instructions.add(ModificationInstructionBuilder.cancellation().activityId("activityId").cancelCurrentActiveActivityInstances(false).getJson());
+    json.put("instructions", instructions);
+    json.put("processDefinitionId", "processDefinitionId");
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(json)
+    .then()
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(EXECUTE_MODIFICATION_ASYNC_URL);
+
+    verify(modificationBuilderMock).cancelAllForActivity("activityId");
     verify(modificationBuilderMock).executeAsync();
   }
 }

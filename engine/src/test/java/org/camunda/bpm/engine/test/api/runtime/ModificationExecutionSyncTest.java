@@ -318,6 +318,31 @@ public class ModificationExecutionSyncTest {
   }
 
   @Test
+  public void testCancelWithoutFlag2() {
+    // given
+    this.instance = Bpmn.createExecutableProcess("process1")
+        .startEvent("start")
+        .serviceTask("ser").camundaExpression("${true}")
+        .userTask("user")
+        .endEvent("end")
+        .done();
+
+    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
+
+    List<String> processInstanceIds = helper.startInstances("process1", 1);
+
+    // when
+    runtimeService.createModification(processDefinition.getId())
+      .startBeforeActivity("ser")
+      .cancelAllForActivity("user", false)
+      .processInstanceIds(processInstanceIds)
+      .execute();
+
+    // then
+    assertEquals(0, runtimeService.createExecutionQuery().list().size());
+  }
+
+  @Test
   public void testCancelWithFlag() {
     // given
     this.instance = Bpmn.createExecutableProcess("process1")
