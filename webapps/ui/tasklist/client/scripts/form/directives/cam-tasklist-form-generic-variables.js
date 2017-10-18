@@ -58,7 +58,6 @@ module.exports = ['camAPI', 'Notifications', '$translate', 'unfixDate', function
 
         resource.get(id)
           .then(function(res) {
-            res.businessKey = 'something';
             if(res.businessKey) {
               $scope.showBusinessKey = true;
               $scope.businessKey = res.businessKey;
