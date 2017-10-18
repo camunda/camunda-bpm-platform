@@ -7,7 +7,7 @@ var template = fs.readFileSync(__dirname + '/process-instance-runtime-external-t
 module.exports = ['ViewsProvider', function(ViewsProvider) {
   ViewsProvider.registerDefaultView('cockpit.processInstance.runtime.tab', {
     id: 'external-tasks-process-instance-runtime',
-    label: 'External Tasks',
+    label: 'PLUGIN_EXTERNAL_TASKS_LABEL',
     template: template,
     controller: 'ProcessInstanceRuntimeTabController as RuntimeTab'
   });

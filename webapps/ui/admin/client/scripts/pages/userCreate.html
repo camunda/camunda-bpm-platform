@@ -5,11 +5,11 @@
     <form class="form-horizontal"
           name="createUserForm">
       <div class="col-xs-12">
-        <div class="h3">User Account</div>
+        <div class="h3">{{ 'USERS_USER_ACCOUNT' | translate }}</div>
 
         <div class="form-group">
           <label class="control-label col-sm-4 col-md-2"
-                 for="inputUserId">User ID*</label>
+                 for="inputUserId">{{ 'USERS_USER_ID' | translate }}</label>
 
           <div class="col-sm-8 col-md-10">
             <input id="inputUserId"
@@ -22,14 +22,14 @@
 
             <span class="help-inline"
                   ng-show="createUserForm.userId.$error.required">
-              User ID is required.
+              {{ 'USERS_USER_ID_REQUIRED' | translate }}
             </span>
           </div>
         </div>
 
         <div class="form-group">
           <label class="control-label col-sm-4 col-md-2"
-                 for="inputPassword">Password*:</label>
+                 for="inputPassword">{{ 'USERS_PASSWORD' | translate }}</label>
 
           <div class="col-sm-8 col-md-10">
             <input id="inputPassword"
@@ -41,19 +41,19 @@
 
             <span class="help-inline"
                   ng-show="createUserForm.inputPassword.$error.password">
-              Password must have at least 8 characters.
+              {{ 'USERS_PASSWORD_INVALID' | translate }}
             </span>
 
             <span class="help-inline"
                   ng-show="createUserForm.inputPassword.$error.required">
-              Password is required.
+              {{ 'USERS_PASSWORD_REQUIRED' | translate }}
             </span>
           </div>
         </div>
 
         <div class="form-group">
           <label class="control-label col-sm-4 col-md-2"
-                 for="inputPasswordRepeat">Password (repeat)*:</label>
+                 for="inputPasswordRepeat">{{ 'USERS_PASSWORD_REPEAT' | translate }}</label>
 
           <div class="col-sm-8 col-md-10">
             <input id="inputPasswordRepeat"
@@ -65,16 +65,16 @@
 
             <span class="help-inline"
                   ng-show="createUserForm.inputPasswordRepeat.$error.passwordRepeat">
-              Passwords must match.
+              {{ 'USERS_PASSWORDS_NOT_EQUAL' | translate }}
             </span>
           </div>
         </div>
 
-        <div class="h3">User Profile</div>
+        <div class="h3">{{ 'USERS_USER_PROFILE' | translate }}</div>
 
         <div class="form-group">
           <label class="control-label col-sm-4 col-md-2"
-                 for="inputFirstname">Firstname*</label>
+                 for="inputFirstname">{{ 'USERS_FIRSTNAME' | translate }}</label>
 
           <div class="col-sm-8 col-md-10">
             <input id="inputFirstname"
@@ -87,14 +87,14 @@
 
             <span class="help-inline"
                   ng-show="createUserForm.firstname.$error.required">
-              Firstname is required.
+              {{ 'USERS_FIRSTNAME_REQUIRED' | translate }}
             </span>
           </div>
         </div>
 
         <div class="form-group">
           <label class="control-label col-sm-4 col-md-2"
-                 for="inputLastname">Lastname*</label>
+                 for="inputLastname">{{ 'USERS_LASTNAME' | translate }}</label>
 
           <div class="col-sm-8 col-md-10">
             <input id="inputLastname"
@@ -106,14 +106,14 @@
 
             <span class="help-inline"
                   ng-show="createUserForm.firstname.$error.required">
-              Lastname is required.
+              {{ 'USERS_LASTNAME_REQUIRED' | translate }}
             </span>
           </div>
         </div>
 
         <div class="form-group">
           <label class="control-label col-sm-4 col-md-2"
-              for="inputEmail">Email</label>
+              for="inputEmail">{{ 'USERS_EMAIL' | translate }}</label>
 
           <div class="col-sm-8 col-md-10">
             <input id="inputEmail"
@@ -125,7 +125,7 @@
 
             <span class="help-inline"
                   ng-show="createUserForm.email.$error.email">
-              Not a valid email address.
+              {{ 'USERS_EMAIL_INVALID' | translate }}
             </span>
           </div>
         </div>
@@ -133,12 +133,12 @@
         <div class="form-group">
           <div class="col-sm-8 col-sm-offset-4 col-md-10 col-md-offset-2 text-right">
             <a class="btn btn-link"
-               href="#/users">Cancel</a>
+               href="#/users">{{ 'USERS_CANCEL' | translate }}</a>
 
             <button type="submit"
                     class="btn btn-primary"
                     ng-disabled="!createUserForm.$valid"
-                    ng-click="createUser()">Create new User</button>
+                    ng-click="createUser()">{{ 'USERS_CREATE_NEW_USER' | translate }}</button>
           </div>
         </div>
 

@@ -3,7 +3,7 @@
     {
       "id": {
         "key": "variableName",
-        "value": "Variable Name"
+        "value": "PLUGIN_VIEW_VARIABLE_TYPE_VARIABLE_NAME"
       },
       "default": true,
       "operators": [
@@ -13,14 +13,14 @@
         },
         {
           "key": "Like",
-          "value": "like"
+          "value": "PLUGIN_VIEW_VARIABLE_OPERATOR_LIKE"
         }
       ]
     },
     {
       "id": {
         "key": "activityInstanceIdIn",
-        "value": "Activity Instance ID"
+        "value": "PLUGIN_VIEW_VARIABLE_ACTIVITY_INSTANCE_ID"
       },
       "operators": [
         {
@@ -32,7 +32,7 @@
     {
       "id": {
         "key": "variableValues",
-        "value": "Variable Value"
+        "value": "PLUGIN_VIEW_VARIABLE_VARIABLE_VALUE"
       },
       "extended": true,
       "operators": [
@@ -62,7 +62,7 @@
         },
         {
           "key": "like",
-          "value": "like"
+          "value": "PLUGIN_VIEW_VARIABLE_OPERATOR_LIKE"
         }
       ]
     }
@@ -95,7 +95,7 @@
       },
       {
         "key": "like",
-        "value": "like"
+        "value": "PLUGIN_VIEW_VARIABLE_OPERATOR_LIKE"
       }
     ],
     "string":     [
@@ -125,7 +125,7 @@
       },
       {
         "key": "like",
-        "value": "like"
+        "value": "PLUGIN_VIEW_VARIABLE_OPERATOR_LIKE"
       }
     ],
     "number":     [
@@ -174,20 +174,20 @@
       }],
     "date":     [{
       "key": "lteq",
-      "value": "before"
+      "value": "PLUGIN_VIEW_VARIABLE_OPERATOR_BEFORE"
     },
       {
         "key": "gteq",
-        "value": "after"
+        "value": "PLUGIN_VIEW_VARIABLE_OPERATOR_AFTER"
       }]
   },
   "tooltips": {
-    "inputPlaceholder": "Add criteria",
-    "invalid": "This search query is not valid",
-    "deleteSearch": "Remove search",
-    "type": "Type",
-    "name": "Property",
-    "operator": "Operator",
-    "value": "Value"
+    "inputPlaceholder": "PLUGIN_VIEW_VARIABLE_ADD_CRITERIA",
+    "invalid": "PLUGIN_VIEW_VARIABLE_INVALID",
+    "deleteSearch": "PLUGIN_VIEW_VARIABLE_DELETE_SEARCH",
+    "type": "PLUGIN_VIEW_VARIABLE_TYPE",
+    "name": "PLUGIN_VIEW_VARIABLE_NAME",
+    "operator": "PLUGIN_VIEW_VARIABLE_OPERATOR",
+    "value": "PLUGIN_VIEW_VARIABLE_VALUE"
   }
 }

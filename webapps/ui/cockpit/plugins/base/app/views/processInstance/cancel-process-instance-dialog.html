@@ -1,6 +1,6 @@
 <!-- # CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/cancel-process-instance-dialog.html -->
 <div class="modal-header">
-  <h3>Cancel Process Instance</h3>
+  <h3>{{ 'PLUGIN_CANCEL_PROCESS_CANCEL_PROCESS_INSTANCE' | translate }}</h3>
 </div>
 
 <div class="cancel-process-instance modal-body">
@@ -8,23 +8,23 @@
 
   <div ng-hide="status === 'cancellationSuccess' || status === 'cancellationFailed' || status === 'beforeCancellation' || status === 'loadingFailed'">
     <span class="glyphicon glyphicon-loading"></span>
-    loading process instance information...
+    {{ 'PLUGIN_CANCEL_PROCESS_LOADING_INFORMATION' | translate }}
   </div>
 
   <p ng-show="status === 'loadingFailed'">
-    It was not possible to get further process instance informations to be able to cancel this process instance. Refresh the current page by pressing F5 and try once again to cancel this process instance.
+    {{ 'PLUGIN_CANCEL_PROCESS_LOADING_FAILED' | translate }}
   </p>
 
   <div ng-show="status === 'beforeCancellation'">
     <div ng-show="subProcessInstances.length > 0">
       <p>
-        If you cancel this process instance the following sub process instances will also be canceled:
+        {{ 'PLUGIN_CANCEL_PROCESS_BEFORE_CANCELLATION' | translate }}
       </p>
 
       <table class="table cam-table">
         <thead>
           <tr>
-            <th class="instance-id uuid">ID</th>
+            <th class="instance-id uuid">{{ 'PLUGIN_CANCEL_PROCESS_ID' | translate }}</th>
           </tr>
         </thead>
 
@@ -40,7 +40,7 @@
 
           <tr>
             <td ng-hide="subProcessInstances.length === subProcessInstancesCount">
-              and {{ subProcessInstancesCount - subProcessInstances.length }} other process instances.
+              {{ 'PLUGIN_CANCEL_PROCESS_OTHER_PROCESS_INSTANCES' | translate:'{count: subProcessInstancesCount - subProcessInstances.length}' }}
             </td>
           </tr>
         </tbody>
@@ -55,9 +55,9 @@
 
         <label class="control-label col-xs-5"
                for="skipCustomListeners">
-          Skip Custom Listeners
+          {{ 'PLUGIN_CANCEL_PROCESS_SKIP_CUSTOM_LISTENERS' | translate }}
           <span class="glyphicon glyphicon-question-sign"
-                tooltip="If the value is enabled, only built-in listeners will be notified with the end event."
+                tooltip="{{ 'PLUGIN_CANCEL_PROCESS_TOOLTIP_VALUE_ENABLED' | translate }}"
                 tooltip-placement="right">
           </span>
         </label>
@@ -76,9 +76,9 @@
 
         <label class="control-label col-xs-5"
                for="skipIoMappings">
-          Skip IO Mappings
+          {{ 'PLUGIN_CANCEL_PROCESS_SKIP_IO_MAPPINGS' | translate }}
           <span class="glyphicon glyphicon-question-sign"
-                tooltip="If the value is enabled IO mappings will be skipped during process cancelation."
+                tooltip="{{ 'PLUGIN_CANCEL_PROCESS_TOOLTIP_VALUE_ENABLED_IO' | translate }}"
                 tooltip-placement="right">
           </span>
         </label>
@@ -94,17 +94,17 @@
       </div>
     </form>
 
-    <p>Do you really want to cancel this process instance?</p>
+    <p>{{ 'PLUGIN_CANCEL_PROCESS_CANCEL_CONFIRM' | translate }}</p>
   </div>
 
   <div ng-show="status === 'cancellationSuccess'">
-    <p>The process instance was canceled successfully.</p>
-    <p>After closing this dialog you will be redirected to the corresponding process definition overview.</p>
+    <p>{{ 'PLUGIN_CANCEL_PROCESS_CANCEL_SUCCESS_1' | translate }}</p>
+    <p>{{ 'PLUGIN_CANCEL_PROCESS_CANCEL_SUCCESS_2' | translate }}</p>
   </div>
 
   <div ng-show="status === 'cancellationFailed'">
-    <p>The process instance could not be canceled successfully.</p>
-    <p>Maybe the process instance has already been cancelled or finished. Try to press F5 to refresh the page.</p>
+    <p>{{ 'PLUGIN_CANCEL_PROCESS_CANCEL_FAILED_1' | translate }}</p>
+    <p>{{ 'PLUGIN_CANCEL_PROCESS_CANCEL_FAILED_2' | translate }}</p>
   </div>
 </div>
 
@@ -113,20 +113,20 @@
           ng-click="close(status)"
           ng-disabled="status === 'performCancellation'"
           ng-hide="status === 'cancellationSuccess' || status === 'cancellationFailed' || status === 'loadingFailed'">
-    Close
+    {{ 'PLUGIN_CANCEL_PROCESS_CLOSE' | translate }}
   </button>
 
   <button class="btn btn-primary"
           ng-click="close(status)"
           ng-show="status === 'cancellationSuccess' || status === 'cancellationFailed' || status === 'loadingFailed'">
-    OK
+    {{ 'PLUGIN_CANCEL_PROCESS_OK' | translate }}
   </button>
 
   <button class="btn btn-primary"
           ng-click="cancelProcessInstance()"
           ng-disabled="status !== 'beforeCancellation'"
           ng-hide="status === 'cancellationSuccess' || status === 'cancellationFailed' || status === 'loadingFailed'">
-    Cancel Process Instance
+    {{ 'PLUGIN_CANCEL_PROCESS_CANCEL_PROCESS_INSTANCE' | translate }}
   </button>
 </div>
 <!-- / CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/cancel-process-instance-dialog.html -->

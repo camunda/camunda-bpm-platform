@@ -7,8 +7,24 @@ var searchConfig = JSON.parse(fs.readFileSync(__dirname + '/tenants-search-plugi
 
 var angular = require('camunda-commons-ui/vendor/angular');
 
-var Controller = ['$scope', '$location', 'search', 'TenantResource', 'camAPI', 'page', function($scope, $location, search, TenantResource, camAPI, pageService) {
+var Controller = ['$scope', '$location', 'search', 'TenantResource', 'camAPI', 'page', '$translate', function($scope, $location, search, TenantResource, camAPI, pageService, $translate) {
   $scope.searchConfig = angular.copy(searchConfig);
+
+  angular.forEach(searchConfig.tooltips, function(translation, tooltip) {
+    $scope.searchConfig.tooltips[tooltip] = $translate.instant(translation);
+  });
+
+  $scope.searchConfig.types.map(function(type) {
+    type.id.value = $translate.instant(type.id.value);
+    if (type.operators) {
+      type.operators = type.operators.map(function(op) {
+        op.value = $translate.instant(op.value);
+        return op;
+      });
+    }
+    return type;
+  });
+
   $scope.onSearchChange = updateView;
 
   $scope.query = $scope.pages = $scope.sortBy = $scope.sortOrder = null;
@@ -73,12 +89,12 @@ var Controller = ['$scope', '$location', 'search', 'TenantResource', 'camAPI', '
 
   $scope.$root.showBreadcrumbs = true;
 
-  pageService.titleSet('Tenants');
+  pageService.titleSet($translate.instant('TENANTS_TENANTS'));
 
   pageService.breadcrumbsClear();
 
   pageService.breadcrumbsAdd({
-    label: 'Tenants',
+    label: $translate.instant('TENANTS_TENANTS'),
     href: '#/tenants/'
   });
 }];

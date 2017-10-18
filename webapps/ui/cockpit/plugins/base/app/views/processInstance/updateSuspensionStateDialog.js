@@ -1,8 +1,8 @@
   'use strict';
 
   module.exports = [
-    '$scope', '$http', '$filter', 'Uri', 'Notifications', '$modalInstance', 'processInstance',
-    function($scope,   $http,   $filter,   Uri,   Notifications,   $modalInstance,   processInstance) {
+    '$scope', '$http', '$filter', 'Uri', 'Notifications', '$modalInstance', 'processInstance', '$translate',
+    function($scope,   $http,   $filter,   Uri,   Notifications,   $modalInstance,   processInstance, $translate) {
 
       var BEFORE_UPDATE = 'BEFORE_UPDATE',
           PERFORM_UPDATE = 'PERFORM_UDPATE',
@@ -28,8 +28,8 @@
           $scope.status = UPDATE_SUCCESS;
 
           Notifications.addMessage({
-            status: 'Finished',
-            message: 'Updated the suspension state of the process instance.',
+            status: $translate.instant('PLUGIN_UPDATE_DIALOG_STATUS_FINISHED'),
+            message: $translate.instant('PLUGIN_UPDATE_DIALOG_MESSAGES_1'),
             exclusive: true
           });
 
@@ -37,8 +37,8 @@
           $scope.status = UPDATE_FAILED;
 
           Notifications.addError({
-            status: 'Finished',
-            message: 'Could not update the suspension state of the process instance: ' + data.message,
+            status: $translate.instant('PLUGIN_UPDATE_DIALOG_STATUS_FINISHED'),
+            message: $translate.instant('PLUGIN_UPDATE_DIALOG_ERROR_1', { message: data.message }),
             exclusive: true
           });
         });

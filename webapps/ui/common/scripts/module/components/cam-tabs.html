@@ -2,7 +2,7 @@
     ng-if="Tabs.providers.length > 1">
   <li ng-repeat="tabProvider in Tabs.providers"
       ng-class="{ active: Tabs.isSelected(tabProvider) }">
-    <a href ng-click="Tabs.selectTab(tabProvider)">{{ tabProvider.label }}</a>
+    <a href ng-click="Tabs.selectTab(tabProvider)">{{ tabProvider.label | translate }}</a>
   </li>
 </ul>
 

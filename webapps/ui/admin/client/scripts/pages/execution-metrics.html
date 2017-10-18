@@ -1,18 +1,17 @@
 <form name="form">
-  <div class="h3">Execution Metrics</div>
+  <div class="h3">{{ 'EXECUTION_METRICS' | translate }}</div>
 
   <div class="alert alert-info">
     <p>
-      Displays an approximate number of <strong>Flow Nodes Instances (FNI)</strong> and
-      <strong>Executed Decision Elements (EDE)</strong> processed by the engine in
-      the selected time range.
+      {{ 'EXECUTION_METRICS_INFO_1' | translate }} <strong>{{ 'EXECUTION_METRICS_FNI' | translate }}</strong> {{ 'EXECUTION_METRICS_AND' | translate }}
+      <strong>{{ 'EXECUTION_METRICS_EDE' | translate }}</strong> {{ 'EXECUTION_METRICS_INFO_2' | translate }}
     </p>
   </div>
 
   <div class="row">
     <div class="form-group col-xs-12 col-sm-6">
       <label for="startDate">
-        Start Date
+        {{ 'EXECUTION_METRICS_START_DATE' | translate }}
       </label>
       <input type="text"
              name="startDate"
@@ -20,13 +19,13 @@
              ng-required="true"
              ng-change="handleDateChange()"
              class="form-control"
-             id="startDate" 
+             id="startDate"
              date />
     </div>
 
     <div class="form-group col-xs-12 col-sm-6">
       <label for="endDate">
-        End Date
+        {{ 'EXECUTION_METRICS_END_DATE' | translate }}
       </label>
       <input type="text"
              name="endDate"
@@ -45,14 +44,14 @@
        loading-state="{{ loadingState }}"
        text-error="{{ loadingError }}">
     <div class="panel panel-default">
-      <div class="panel-heading">Results</div>
+      <div class="panel-heading">{{ 'EXECUTION_METRICS_RESULTS' | translate }}</div>
       <div class="panel-body">
         <ul>
           <li>
-            <strong>{{ metrics.flowNodes }}</strong> Flow Node Instances (FNI).
+            <strong>{{ metrics.flowNodes }}</strong> {{ 'EXECUTION_METRICS_FNI' | translate }}
           </li>
           <li>
-            <strong>{{ metrics.decisionElements }}</strong> Executed Decision Elements (EDE).
+            <strong>{{ metrics.decisionElements }}</strong> {{ 'EXECUTION_METRICS_EDE' | translate }}
           </li>
         </ul>
       </div>
@@ -65,7 +64,7 @@
             ng-disabled="!form.$valid || loadingState === 'LOADING'"
             class="btn btn-default"
             ng-click="load()">
-      Refresh
+      {{ 'EXECUTION_METRICS_REFRESH' | translate }}
     </button>
   </div>
 

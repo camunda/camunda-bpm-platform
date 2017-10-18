@@ -12,6 +12,7 @@ module.exports = [
   'dataDepend',
   'page',
   'camAPI',
+  '$translate',
   function(
     $scope,
     $q,
@@ -21,7 +22,8 @@ module.exports = [
     search,
     dataDepend,
     page,
-    camAPI
+    camAPI,
+    $translate
   ) {
     var Deployment = camAPI.resource('deployment');
     $scope.$root.showBreadcrumbs = false;
@@ -33,10 +35,10 @@ module.exports = [
     page.breadcrumbsClear();
 
     page.breadcrumbsAdd({
-      label: 'Deployments'
+      label: $translate.instant('REPOSITORY_CONTROLLER_CAM_BREAD_CRUMB')
     });
 
-    page.titleSet('Deployments');
+    page.titleSet($translate.instant('REPOSITORY_CONTROLLER_CAM_TITLE_SET'));
 
     // utilities /////////////////////////////////////////////////////////////////
     var updateSilently = function(params) {

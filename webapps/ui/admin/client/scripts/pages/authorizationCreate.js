@@ -2,7 +2,7 @@
 
 var angular = require('camunda-commons-ui/vendor/angular');
 
-module.exports = ['$scope', '$q', '$location', 'Uri', 'Notifications', 'camAPI', function AuthorizationCreateController($scope, $q, $location, Uri, Notifications, camAPI) {
+module.exports = ['$scope', '$q', '$location', 'Uri', 'Notifications', 'camAPI', '$translate', function($scope, $q, $location, Uri, Notifications, camAPI, $translate) {
 
   var AuthorizationResource = camAPI.resource('authorization');
 
@@ -83,7 +83,7 @@ module.exports = ['$scope', '$q', '$location', 'Uri', 'Notifications', 'camAPI',
     AuthorizationResource.save(query, function(err, result) {
       if(err) {
         Notifications.addError({
-          status: 'Could not ' + (query.id ? 'update' : 'create') + ' authorization',
+          status: query.id ? $translate.instant('AUTHORIZATION_UPDATE') : $translate.instant('AUTHORIZATION_CREATE'),
           message: err.toString()
         });
         $scope.cancelUpdateAuthorization(authorization);

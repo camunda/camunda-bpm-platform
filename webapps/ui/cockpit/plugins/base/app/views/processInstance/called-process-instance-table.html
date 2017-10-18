@@ -1,14 +1,14 @@
 <!-- # CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/called-process-instance-table.html -->
 <div cam-widget-loader
      loading-state="{{ loadingState }}"
-     text-empty="No called process instances">
+     text-empty="{{ 'PLUGIN_CALLED_PROCESS_NO_PROCESS_INSTANCES' | translate }}">
   <table class="called-process-instance cam-table">
     <thead>
       <tr>
         <th class="status">State</th>
-        <th class="called-process-instance">Called Process Instance</th>
-        <th class="process-definition">Process Definition</th>
-        <th class="activity">Activity</th>
+        <th class="called-process-instance">{{ 'PLUGIN_CALLED_PROCESS_PROCESS_INSTANCE' | translate }}</th>
+        <th class="process-definition">{{ 'PLUGIN_CALLED_PROCESS_PROCESS_DEFINITION' | translate }}</th>
+        <th class="activity">{{ 'PLUGIN_CALLED_PROCESS_ACTIVITY' | translate }}</th>
       </tr>
     </thead>
 

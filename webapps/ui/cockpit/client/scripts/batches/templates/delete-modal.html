@@ -1,13 +1,13 @@
 <div class="modal-header">
-  <h3 class="modal-title">Delete Batch</h3>
+  <h3 class="modal-title">{{ 'BATCHES_DELETE_TITLE' | translate }}</h3>
 </div>
 <div class="modal-body">
-  Do you really want to delete this batch and all related jobs and job definitions?<br />
+  {{ 'BATCHES_DELETE_LEGEND' | translate }}<br />
   <br />
-  <input type="radio" ng-model="ctrl.cascade" ng-value="false" /> Keep the historic batch and historic job logs<br />
-  <input type="radio" ng-model="ctrl.cascade" ng-value="true" /> Delete the historic batch and historic job logs, too
+  <input type="radio" ng-model="ctrl.cascade" ng-value="false" /> {{ 'BATCHES_DELETE_INPUT_KEEP' | translate }}<br />
+  <input type="radio" ng-model="ctrl.cascade" ng-value="true" /> {{ 'BATCHES_DELETE_INPUT_DELETE' | translate }}
 </div>
 <div class="modal-footer">
-    <button class="btn btn-default" ng-click="ctrl.cancel()">Cancel</button>
-    <button class="btn btn-primary" ng-click="ctrl.confirm()">Delete Batch</button>
+    <button class="btn btn-default" ng-click="ctrl.cancel()">{{ 'BATCHES_DELETE_BTN_CANCEL'  | translate }}</button>
+    <button class="btn btn-primary" ng-click="ctrl.confirm()">{{ 'BATCHES_DELETE_BTN_CONFIRM' | translate }}</button>
 </div>

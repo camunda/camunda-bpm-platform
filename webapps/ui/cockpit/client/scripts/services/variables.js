@@ -1,6 +1,6 @@
   'use strict';
 
-  var VariablesFactory = [ function() {
+  var VariablesFactory = [ '$translate', function($translate) {
 
     // variable specific stuff //////////////
 
@@ -65,7 +65,7 @@
         return value === 'true';
       }
 
-      throw new Error('Cannot infer type of value ' + value);
+      throw new Error( $translate.instant('VARIABLE_ERROR_INFER_TYPE', {value: value}));
     }
 
     function typedString(value) {
@@ -87,7 +87,7 @@
       }
 
 
-      throw new Error('Cannot infer type of value ' + value);
+      throw new Error($translate.instant('VARIABLE_ERROR_INFER_TYPE', {value: value}));
     }
 
     /**
@@ -106,7 +106,7 @@
             value;
 
         if (!match) {
-          throw new Error('Invalid variable syntax: ' + str);
+          throw new Error($translate.instant('VARIABLE_ERROR_VARIABLE_SYNTAX', {message: str}));
         }
 
         value = typed(match[3]);

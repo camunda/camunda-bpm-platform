@@ -3,8 +3,8 @@
 var angular = require('angular');
 
 module.exports = [
-  '$scope', '$http', '$filter', 'Uri', 'Notifications', '$modalInstance', 'processDefinition','fixDate',
-  function($scope,   $http,   $filter,   Uri,   Notifications,   $modalInstance,   processDefinition, fixDate) {
+  '$scope', '$http', '$filter', 'Uri', 'Notifications', '$modalInstance', 'processDefinition','fixDate', '$translate',
+  function($scope,   $http,   $filter,   Uri,   Notifications,   $modalInstance,   processDefinition, fixDate, $translate) {
 
     var BEFORE_UPDATE = 'BEFORE_UPDATE',
         PERFORM_UPDATE = 'PERFORM_UDPATE',
@@ -44,14 +44,14 @@ module.exports = [
 
         if ($scope.data.executeImmediately) {
           Notifications.addMessage({
-            status: 'Finished',
-            message: 'Updated the suspension state of the process definition.',
+            status: $translate.instant('PLUGIN_UPDATE_SUSPENSION_STATE_STATUS_FINISHED'),
+            message: $translate.instant('PLUGIN_UPDATE_SUSPENSION_STATE_MESSAGE_1'),
             exclusive: true
           });
         } else {
           Notifications.addMessage({
-            status: 'Finished',
-            message: 'The update of the suspension state of the process definition has been scheduled.',
+            status: $translate.instant('PLUGIN_UPDATE_SUSPENSION_STATE_STATUS_FINISHED'),
+            message: $translate.instant('PLUGIN_UPDATE_SUSPENSION_STATE_MESSAGE_2'),
             exclusive: true
           });
         }
@@ -60,12 +60,12 @@ module.exports = [
         $scope.status = UPDATE_FAILED;
         var errorMessage;
         if($scope.data.executeImmediately) {
-          errorMessage = 'Could not update the suspension state of the process definition: ' + response.message;
+          errorMessage = $translate.instant('PLUGIN_UPDATE_SUSPENSION_STATE_MESSAGE_3', { message: response.message });
         } else {
-          'The update of the suspension state of the process definition could not be scheduled: ' + response.message;
+          errorMessage = $translate.instant('PLUGIN_UPDATE_SUSPENSION_STATE_MESSAGE_4', { message: response.message });
         }
         Notifications.addError({
-          status: 'Finished',
+          status: $translate.instant('PLUGIN_UPDATE_SUSPENSION_STATE_STATUS_FINISHED'),
           message: errorMessage,
           exclusive: true
         });

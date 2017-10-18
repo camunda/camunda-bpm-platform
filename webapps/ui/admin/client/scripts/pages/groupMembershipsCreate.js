@@ -3,8 +3,8 @@
 var angular = require('camunda-commons-ui/vendor/angular');
 
 module.exports = [
-  '$scope', '$q', '$location', 'Uri', 'Notifications', 'camAPI', '$modalInstance', 'member', 'memberId', 'idList',
-  function($scope,   $q,   $location,   Uri,   Notifications,   camAPI,   $modalInstance,   member,   memberId,   idList) {
+  '$scope', '$q', '$location', 'Uri', 'Notifications', 'camAPI', '$modalInstance', 'member', 'memberId', 'idList', '$translate',
+  function($scope,   $q,   $location,   Uri,   Notifications,   camAPI,   $modalInstance,   member,   memberId,   idList, $translate) {
 
     var GroupResource = camAPI.resource('group');
 
@@ -49,7 +49,7 @@ module.exports = [
       $scope.status = LOADING_FAILED;
       Notifications.addError({
         'status': 'Failed',
-        'message': 'Loading of groups failed: ' + error.message,
+        'message': $translate.instant('GROUP_MEMBERSHIP_CREATE_LOAD_FAILED', {message: error.message}),
         'exclusive': ['type']
       });
     });
@@ -88,7 +88,7 @@ module.exports = [
         $scope.status = CREATE_FAILED;
         Notifications.addError({
           'status': 'Failed',
-          'message': 'Creating group memberships failed: ' + error.message,
+          'message': $translate.instant('GROUP_MEMBERSHIP_CREATE_CREATE_FAILED', {message: error.message }),
           'exclusive': ['type']
         });
       });

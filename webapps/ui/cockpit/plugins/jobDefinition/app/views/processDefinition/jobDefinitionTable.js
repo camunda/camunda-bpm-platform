@@ -54,7 +54,7 @@ var Configuration = function PluginConfiguration(ViewsProvider) {
 
   ViewsProvider.registerDefaultView('cockpit.processDefinition.runtime.tab', {
     id: 'job-definition-table',
-    label: 'Job Definitions',
+    label: 'PLUGIN_JOB_DEFINITION_LABEL',
     template: template,
     controller: Controller,
     priority: 2

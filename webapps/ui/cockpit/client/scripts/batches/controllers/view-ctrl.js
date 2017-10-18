@@ -14,12 +14,14 @@ module.exports = [
   'camAPI',
   '$location',
   '$modal',
+  '$translate',
   function(
   $scope,
   page,
   camAPI,
   $location,
-  $modal
+  $modal,
+  $translate
 ) {
 
     $scope.$on('$destroy', function() {
@@ -46,7 +48,7 @@ module.exports = [
       });
     });
 
-    require('../components/breadcrumbs')(page, $scope.$root);
+    require('../components/breadcrumbs')(page, $scope.$root, $translate);
 
     $scope.ctrl = new Ctrl(camAPI);
     $scope.ctrl.loadPeriodically(5000);

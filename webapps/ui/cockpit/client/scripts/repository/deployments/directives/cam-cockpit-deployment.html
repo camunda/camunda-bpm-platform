@@ -7,19 +7,19 @@
 <h4 class="name">{{ deployment.name || deployment.id }}</h4>
 
 <dl>
-  <dt>Time:</dt>
+  <dt>{{ 'REPOSITORY_DEPLOYMENTS_TIME' | translate }}</dt>
   <dd class="time">{{ deployment.deploymentTime | camDate:'normal' }}</dd>
 
-  <dt>Source:</dt>
+  <dt>{{ 'REPOSITORY_DEPLOYMENTS_SOURCE' | translate }}</dt>
   <dd class="source"
       ng-if="deployment.source">{{ deployment.source }}</dd>
   <dd class="source undefined"
-      ng-if="!deployment.source"><span class="null-value">null</span>
+      ng-if="!deployment.source"><span class="null-value">{{ 'REPOSITORY_DEPLOYMENTS_NULL' | translate }}</span>
 
-  <dt>Tenant ID:</dt>
+  <dt>{{ 'REPOSITORY_DEPLOYMENTS_TENANT_ID' | translate }}</dt>
   <dd class="tenant-id"
       ng-if="deployment.tenantId">{{ deployment.tenantId }}</dd>
   <dd class="tenant-id"
-      ng-if="!deployment.tenantId"><span class="null-value">null</span></dd>
+      ng-if="!deployment.tenantId"><span class="null-value">{{ 'REPOSITORY_DEPLOYMENTS_NULL' | translate }}</span></dd>
 
 </dl>

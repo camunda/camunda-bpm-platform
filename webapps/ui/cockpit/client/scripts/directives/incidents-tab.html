@@ -2,14 +2,14 @@
 <table class="incidents-tab cam-table">
   <thead>
     <tr>
-      <th class="state" ng-if="incidentsContext === 'history'">State</th>
-      <th class="message">Message</th>
-      <th class="timestamp">Timestamp</th>
-      <th class="activity">Activity</th>
-      <th class="cause instance-id uuid">Cause Process Instance ID</th>
-      <th class="cause-root instance-id uuid">Root Cause Process Instance ID</th>
-      <th class="type">Type</th>
-      <th class="action">Action</th>
+      <th class="state" ng-if="incidentsContext === 'history'">{{ 'PLUGIN_INCIDENTS_TAB_STATE' | translate }}</th>
+      <th class="message">{{ 'PLUGIN_INCIDENTS_TAB_MESSAGE' | translate }}</th>
+      <th class="timestamp">{{ 'PLUGIN_INCIDENTS_TAB_TIMESTAMP' | translate }}</th>
+      <th class="activity">{{ 'PLUGIN_INCIDENTS_TAB_ACTIVITY' | translate }}</th>
+      <th class="cause instance-id uuid">{{ 'PLUGIN_INCIDENTS_TAB_CAUSE_INSTANCE_ID' | translate }}</th>
+      <th class="cause-root instance-id uuid">{{ 'PLUGIN_INCIDENTS_TAB_CAUSE_ROOT_INSTANCE_ID' | translate }}</th>
+      <th class="type">{{ 'PLUGIN_INCIDENTS_TAB_TYPE' | translate }}</th>
+      <th class="action">{{ 'PLUGIN_INCIDENTS_TAB_ACTION' | translate }}</th>
     </tr>
   </thead>
 
@@ -28,7 +28,7 @@
         <a ng-if="incident.rootCauseIncidentMessage"
            href="{{ getJobStacktraceUrl(incident) }}"
            target="_blank"
-           tooltip="Open stacktrace in new window"
+           tooltip="{{'PLUGIN_INCIDENTS_TAB_TOOLTIP_STACKTRACE'|translate}}"
            tooltip-placement="top"
            class="auto-cutoff">
           {{ incident.rootCauseIncidentMessage }}
@@ -36,13 +36,13 @@
         <a ng-if="!incident.rootCauseIncidentMessage"
            href="{{ getJobStacktraceUrl(incident) }}"
            target="_blank"
-           tooltip="Open stacktrace in new window"
+           tooltip="{{'PLUGIN_INCIDENTS_TAB_TOOLTIP_STACKTRACE'|translate}}"
            tooltip-placement="top">
           <i>Message is null.</i>
         </a>
       </td>
       <td class="message"
-          tooltip="Open stacktrace in new window"
+          tooltip="{{'PLUGIN_INCIDENTS_TAB_TOOLTIP_STACKTRACE'|translate}}"
           tooltip-placement="top"
           ng-if="incident.incidentType === 'failedExternalTask'">
         <span external-task-error-message-link="incident.rootCauseIncidentConfiguration">

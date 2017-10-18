@@ -1,6 +1,6 @@
 <!-- # CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processDefinition/update-suspension-state-dialog.html -->
 <div class="modal-header">
-  <h3>{{ (processDefinition.suspended ? 'Activate' : 'Suspend') }} Process Definition</h3>
+  <h3>{{ processDefinition.suspended ? 'PLUGIN_SUSPENSION_ACTIVATE_PROCESS' : 'PLUGIN_SUSPENSION_SUSPEND_PROCESS' | translate }}</h3>
 </div>
 
 <div class="process-definition update-suspension-state modal-body">
@@ -10,12 +10,12 @@
 
     <p ng-show="processDefinition.suspended">
       <!-- activation -->
-      This process definition will be activated, so that it will be possible to start new process instances based on this process definition.
+      {{'PLUGIN_SUSPENSION_MESSAGE_1' | translate}}
     </p>
 
     <p ng-hide="processDefinition.suspended">
       <!-- suspension -->
-      This process definition will be suspended, so that it will not be possible to start new process instances based on this process definition.
+      {{'PLUGIN_SUSPENSION_MESSAGE_2' | translate}}
     </p>
 
     <form class="form-horizontal"
@@ -26,16 +26,16 @@
       <fieldset>
         <div class="form-group">
           <label class="control-label col-xs-4"
-                 for="includeInstancesValue">Include Instances
+                 for="includeInstancesValue">{{'PLUGIN_SUSPENSION_INCLUDE_INSTANCES' | translate}}
             <!-- activation -->
-            <span tooltip="Including the process instances means that all existing process instances of this process definition will be activated too, if the value is set to true."
+            <span tooltip="{{'PLUGIN_SUSPENSION_INCLUDING_MESSAGE_1' | translate}}"
                   tooltip-placement="right"
                   ng-show="processDefinition.suspended">
               <span class="glyphicon glyphicon-question-sign"></span>
             </span>
 
             <!-- suspension -->
-            <span tooltip="Including the process instances means that all existing process instances of this process definition will be suspended too, if the value is set to true."
+            <span tooltip="{{'PLUGIN_SUSPENSION_INCLUDING_MESSAGE_2' | translate}}"
                   tooltip-placement="right"
                   ng-hide="processDefinition.suspended">
               <span class="glyphicon glyphicon-question-sign"></span>
@@ -53,13 +53,13 @@
         </div>
 
         <div class="form-group">
-          <label class="control-label col-xs-4" for="executeImmediately">Execute
-            <span tooltip="Decide whether the activation of this process definition should be executed immediately or delayed. If the activation should happen delayed then an execution date must be provided on which the activation will be scheduled."
+          <label class="control-label col-xs-4" for="executeImmediately">{{'PLUGIN_SUSPENSION_EXECUTE' | translate}}
+            <span tooltip="{{'PLUGIN_SUSPENSION_DECIDE_ACTIVATION' | translate}}"
                   tooltip-placement="right"
                   ng-show="processDefinition.suspended">
               <span class="glyphicon glyphicon-question-sign"></span>
             </span>
-            <span tooltip="Decide whether the suspension of this process definition should be executed immediately or delayed. If the suspension should happen delayed then an execution date must be provided on which the suspension will be scheduled."
+            <span tooltip="{{'PLUGIN_SUSPENSION_DECIDE_SUSPENSION' | translate}}"
                   tooltip-placement="right"
                   ng-hide="processDefinition.suspended">
               <span class="glyphicon glyphicon-question-sign"></span>
@@ -72,7 +72,7 @@
                      ng-value="true"
                      type="radio"
                      name="execute">
-              Immediately
+              {{'PLUGIN_SUSPENSION_IMMEDIATELY' | translate}}
             </label>
 
             <label class="radio">
@@ -80,7 +80,7 @@
                      ng-value="false"
                      type="radio"
                      name="execute">
-              Delayed
+              {{'PLUGIN_SUSPENSION_DELAYED' | translate}}
             </label>
           </div>
         </div>
@@ -88,7 +88,7 @@
              ng-show="!data.executeImmediately">
           <label class="control-label col-xs-4"
                  for="executionDateValue">
-            Schedule at
+            {{'PLUGIN_SUSPENSION_SCHEDULE_AT' | translate}}
           </label>
 
           <div class="col-xs-8">
@@ -101,7 +101,7 @@
 
             <p class="invalid"
                ng-show="this.updateSuspensionStateForm.executionDateValue.$error.datePattern">
-              Supported pattern 'yyyy-MM-ddTHH:mm:ss'.
+              {{'PLUGIN_SUSPENSION_VALID_PATTERN' | translate}}
             </p>
             <p class="invalid"
                ng-show="this.updateSuspensionStateForm.executionDateValue.$error.dateValue">
@@ -114,38 +114,38 @@
     </form>
 
     <p>
-      Do you really want to {{ (processDefinition.suspended ? 'activate' : 'suspend') }} this process definition?
+      {{ processDefinition.suspended ? 'PLUGIN_SUSPENSION_WANT_TO_ACTIVATE' : 'PLUGIN_SUSPENSION_WANT_TO_SUSPEND' | translate }}
     </p>
 
   </div>
 
   <div ng-show="status === 'SUCCESS'">
     <p ng-show="processDefinition.suspended && data.executeImmediately">
-      The suspension state of the process definition has been updated to "active" successfully.
+      {{'PLUGIN_SUSPENSION_STATE_ACTIVE' | translate}}
     </p>
     <p ng-show="processDefinition.suspended && !data.executeImmediately">
-      The activation of the process definition has been scheduled to {{ data.executionDate | camDate  }} successfully.
+      {{'PLUGIN_SUSPENSION_ACTIVATION_SCHEDULED_TO' | translate:'{date: data.executionDate | camDate}'}}
     </p>
     <p ng-show="!processDefinition.suspended && data.executeImmediately">
-      The suspension state of the process definition has been updated to "suspended" successfully.
+      {{'PLUGIN_SUSPENSION_STATE_SUSPENDED' | translate}}
     </p>
     <p ng-show="!processDefinition.suspended && !data.executeImmediately">
-      The suspension of the process definition has been scheduled to {{ data.executionDate | camDate  }} successfully.
+      {{'PLUGIN_SUSPENSION_SUSPENSION_SCHEDULED_TO' | translate:'{date: data.executionDate | camDate}'}}
     </p>
   </div>
 
   <div ng-show="status === 'FAIL'">
     <p ng-show="processDefinition.suspended && data.executeImmediately">
-      The suspension state of the process definition could not be updated to "active" successfully.
+      {{'PLUGIN_SUSPENSION_STATE_NOT_ACTIVATED' | translate}}.
     </p>
     <p ng-show="processDefinition.suspended && !data.executeImmediately">
-      The activation of the process definition could not be scheduled to {{ data.executionDate | camDate  }} successfully.
+      {{'PLUGIN_SUSPENSION_ACTIVATION_NOT_SCHEDULED_TO' | translate:'{date: data.executionDate | camDate}'}}
     </p>
     <p ng-show="!processDefinition.suspended && data.executeImmediately">
-      The suspension state of the process definition could not be updated to "suspended" successfully.
+      {{'PLUGIN_SUSPENSION_STATE_NOT_SUSPENDED' | translate}}
     </p>
     <p ng-show="!processDefinition.suspended && !data.executeImmediately">
-      The suspension of the process definition could not be scheduled to {{ data.executionDate | camDate  }} successfully.
+      {{'PLUGIN_SUSPENSION_SUSPENSION_NOT_SCHEDULED_TO' | translate:'{date: data.executionDate | camDate}'}}
     </p>
   </div>
 
@@ -156,7 +156,7 @@
           ng-click="close(status)"
           ng-disabled="status === 'PERFORM_UDPATE'"
           ng-hide="status === 'SUCCESS' || status === 'FAIL'">
-    Close
+    {{'PLUGIN_SUSPENSION_CLOSE' | translate}}
   </button>
 
   <button type="submit"
@@ -164,13 +164,13 @@
           ng-click="updateSuspensionState()"
           ng-hide="status === 'SUCCESS' || status === 'FAIL'"
           ng-disabled="!isValid() || status === 'PERFORM_UDPATE'">
-    {{ (processDefinition.suspended ? 'Activate' : 'Suspend') }}
+    {{ processDefinition.suspended ? 'PLUGIN_SUSPENSION_ACTIVATE' : 'PLUGIN_SUSPENSION_SUSPEND' | translate }}
   </button>
 
   <button class="btn btn-primary"
           ng-click="close(status)"
           ng-show="status === 'SUCCESS' || status === 'FAIL'">
-    OK
+    {{'PLUGIN_SUSPENSION_OK' | translate}}
   </button>
 </div>
 <!-- / CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processDefinition/update-suspension-state-dialog.html -->

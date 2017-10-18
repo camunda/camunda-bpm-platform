@@ -4,13 +4,13 @@
   <div class="section-content">
     <header class="row">
       <div class="col-xs-8">
-        <h3>List of users</h3>
+        <h3>{{ 'USERS_LIST_OF_USERS' | translate }}</h3>
       </div>
       <div class="col-xs-4 text-right">
         <a class="btn btn-default"
            ng-show="availableOperations.create"
            href="#/user-create">
-          Add user
+          {{ 'USERS_ADD_USER' | translate }}
           <span class="glyphicon glyphicon-plus-sign"></span>
         </a>
       </div>
@@ -20,40 +20,40 @@
          config="searchConfig"
          on-search-change="onSearchChange(query, pages)"
          loading-state="loadingState"
-         text-empty="No users were found."
+         text-empty="{{ 'USERS_NOT_FOUND' | translate }}"
          storage-group="'ANU'">
       <table class="cam-table">
         <thead>
           <tr>
             <th class="username">
-              <span class="column-label">ID</span>
+              <span class="column-label">{{ 'USERS_ID' | translate }}</span>
               <a ng-click="changeOrder('userId')">
               <span class="glyphicon"
                     ng-class="orderClass('userId')"></span>
               </a>
             </th>
             <th class="firstname">
-              <span class="column-label">Firstname</span>
+              <span class="column-label">{{ 'USERS_FIRSTNAME' | translate }}</span>
               <a ng-click="changeOrder('firstName')">
               <span class="glyphicon"
                     ng-class="orderClass('firstName')"></span>
               </a>
             </th>
             <th class="lastname">
-              <span class="column-label">Lastname</span>
+              <span class="column-label">{{ 'USERS_LASTNAME' | translate }}</span>
               <a ng-click="changeOrder('lastName')">
               <span class="glyphicon"
                     ng-class="orderClass('lastName')"></span>
               </a>
             </th>
             <th class="email">
-              <span class="column-label">Email</span>
+              <span class="column-label">{{ 'USERS_EMAIL' | translate }}</span>
               <a ng-click="changeOrder('email')">
               <span class="glyphicon"
                     ng-class="orderClass('email')"></span>
               </a>
             </th>
-            <th class="action">Action</th>
+            <th class="action">{{ 'USERS_ACTION' | translate }}</th>
           </tr>
         </thead>
 
@@ -76,7 +76,7 @@
             </td>
 
             <td class="action">
-              <a ng-href="#/users/{{user.id | escape}}">Edit</a>
+              <a ng-href="#/users/{{user.id | escape}}">{{ 'USERS_EDIT' | translate }}</a>
             </td>
           </tr>
         </tbody>

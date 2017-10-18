@@ -9,37 +9,37 @@ module.exports = [ '$routeProvider', function($routeProvider) {
   $routeProvider.when('/authorization', {
     template: template,
     controller: [
-      '$scope', 'page',      '$routeParams', '$modal', 'AuthorizationResource', 'Notifications', '$location',
-      function($scope,   pageService, $routeParams,   $modal,   AuthorizationResource,   Notifications,   $location) {
+      '$scope', 'page',      '$routeParams', '$modal', 'AuthorizationResource', 'Notifications', '$location', '$translate',
+      function($scope,   pageService, $routeParams,   $modal,   AuthorizationResource,   Notifications,   $location, $translate) {
 
         $scope.$root.showBreadcrumbs = true;
 
-        pageService.titleSet('Authorizations');
+        pageService.titleSet($translate.instant('AUTHORIZATION_AUTHORIZATIONS'));
 
         pageService.breadcrumbsClear();
 
         $scope.allPermissionsValue = 2147483647;
 
         $scope.resourceMap = {
-          0: 'Application',
-          1: 'User',
-          2: 'Group',
-          3: 'Group Membership',
-          4: 'Authorization',
-          5: 'Filter',
-          6: 'Process Definition',
-          7: 'Task',
-          8: 'Process Instance',
-          9: 'Deployment',
-          10: 'Decision Definition',
-          11: 'Tenant',
-          12: 'Tenant Membership',
-          13: 'Batch'
+          0: $translate.instant('AUTHORIZATION_APPLICATION'),
+          1: $translate.instant('AUTHORIZATION_USER'),
+          2: $translate.instant('AUTHORIZATION_GROUP'),
+          3: $translate.instant('AUTHORIZATION_GROUP_MEMBERSHIP'),
+          4: $translate.instant('AUTHORIZATION_AUTHORIZATION'),
+          5: $translate.instant('AUTHORIZATION_FILTER'),
+          6: $translate.instant('AUTHORIZATION_PROCESS_DEFINITION'),
+          7: $translate.instant('AUTHORIZATION_TASK'),
+          8: $translate.instant('AUTHORIZATION_PROCESS_INSTANCE'),
+          9: $translate.instant('AUTHORIZATION_DEPLOYMENT'),
+          10: $translate.instant('AUTHORIZATION_DECISION_DEFINITION'),
+          11: $translate.instant('AUTHORIZATION_TENANT'),
+          12: $translate.instant('AUTHORIZATION_TENANT_MEMBERSHIP'),
+          13: $translate.instant('AUTHORIZATION_BATCH')
         };
 
         pageService.breadcrumbsAdd([
           {
-            label: 'Authorizations',
+            label: $translate.instant('AUTHORIZATION_AUTHORIZATIONS'),
             href: '#/authorization'
           }
         ]);
@@ -62,9 +62,9 @@ module.exports = [ '$routeProvider', function($routeProvider) {
         };
 
         $scope.typeMap = {
-          0: 'GLOBAL',
-          1: 'ALLOW',
-          2: 'DENY'
+          0: $translate.instant('AUTHORIZATION_GLOBAL'),
+          1: $translate.instant('AUTHORIZATION_ALLOW'),
+          2: $translate.instant('AUTHORIZATION_DENY')
         };
 
         $scope.getIdentityId = function(auth) {

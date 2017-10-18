@@ -1,6 +1,6 @@
 <!-- # CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/jobDefinition/app/views/processDefinition/job-definition-suspension-state-dialog.html -->
 <div class="modal-header">
-  <h3>{{ (jobDefinition.suspended ? 'Activate' : 'Suspend') }} Job Definition</h3>
+  <h3>{{ (jobDefinition.suspended ? 'PLUGIN_JOBDEFINITION_ACTIVE_JOB_DEFINITION' : 'PLUGIN_JOBDEFINITION_SUSPEND_JOB_DEFINITION' | translate) }}</h3>
 </div>
 
 <div class="job-definition-suspension-state modal-body">
@@ -10,12 +10,12 @@
 
     <p ng-show="jobDefinition.suspended">
       <!-- activation -->
-      This job definition will be activated, so that new jobs based on this job definition are initially active.
+      {{ 'PLUGIN_JOBDEFINITION_LEGEND_ACTIVE' | translate }}
     </p>
 
     <p ng-hide="jobDefinition.suspended">
       <!-- suspension -->
-      This job definition will be suspended, so that new jobs based on this job definition are initially suspended.
+      {{ 'PLUGIN_JOBDEFINITION_LEGEND_SUSPEND' | translate }}
     </p>
 
     <form class="form-horizontal"
@@ -28,17 +28,17 @@
         <div class="form-group">
           <label class="col-xs-4 control-label"
                  for="includeJobsValue">
-            Include Existing Jobs
+            {{ 'PLUGIN_JOBDEFINITION_INCLUDE_EXISTING_JOB' | translate }}
             <!-- activation -->
             <span class="glyphicon glyphicon-question-sign"
-                  tooltip="Including jobs means that all existing jobs of this job definition will be activated too, if the value is set to true."
+                  tooltip="{{ 'PLUGIN_JOBDEFINITION_INCLUDE_EXISTING_JOB_TOOLTIP_1' | translate }}"
                   tooltip-placement="right"
                   ng-show="jobDefinition.suspended">
             </span>
 
             <!-- suspension -->
             <span class="glyphicon glyphicon-question-sign"
-                  tooltip="Including jobs means that all existing jobs of this job definition will be suspended too, if the value is set to true."
+                  tooltip="{{ 'PLUGIN_JOBDEFINITION_INCLUDE_EXISTING_JOB_TOOLTIP_2' | translate }}"
                   tooltip-placement="right"
                   ng-hide="jobDefinition.suspended">
             </span>
@@ -58,15 +58,15 @@
         <div class="form-group">
           <label class="col-xs-4 control-label"
                  for="executeImmediately">
-            Execute
+            {{ 'PLUGIN_JOBDEFINITION_EXECUTE' | translate }}
             <span class="glyphicon glyphicon-question-sign"
-                  tooltip="Decide whether the activation of this job definition should be executed immediately or delayed. If the activation should happen delayed then an execution date must be provided on which the activation will be scheduled."
+                  tooltip="{{ 'PLUGIN_JOBDEFINITION_EXECUTE_TOOLTIP_1' | translate }}"
                   tooltip-placement="right"
                   ng-show="jobDefinition.suspended">
             </span>
 
             <span class="glyphicon glyphicon-question-sign"
-                  tooltip="Decide whether the suspension of this job definition should be executed immediately or delayed. If the suspension should happen delayed then an execution date must be provided on which the suspension will be scheduled."
+                  tooltip="{{ 'PLUGIN_JOBDEFINITION_EXECUTE_TOOLTIP_2' | translate }}"
                   tooltip-placement="right"
                   ng-hide="jobDefinition.suspended">
             </span>
@@ -79,7 +79,7 @@
                        ng-value="true"
                        type="radio"
                        name="execute" />
-                Immediately
+                {{ 'PLUGIN_JOBDEFINITION_IMMEDIATELY' | translate }}
               </label>
             </div>
 
@@ -89,7 +89,7 @@
                        ng-value="false"
                        type="radio"
                        name="execute" />
-                Delayed
+                {{ 'PLUGIN_JOBDEFINITION_DELAYED' | translate }}
               </label>
             </div>
           </div>
@@ -99,7 +99,7 @@
              ng-show="!data.executeImmediately">
           <label class="col-xs-4 control-label"
                  for="executionDateValue">
-            Schedule at
+            {{ 'PLUGIN_JOBDEFINITION_SCHEDULE_AT' | translate }}
           </label>
 
           <div class="col-xs-8">
@@ -112,12 +112,12 @@
 
             <p class="invalid"
                ng-show="this.updateSuspensionStateForm.executionDateValue.$error.datePattern">
-              Supported pattern 'yyyy-MM-ddTHH:mm:ss'.
+              {{ 'PLUGIN_JOBDEFINITION_SUPPORTED_PATTERN' | translate }}
             </p>
 
             <p class="invalid"
                ng-show="this.updateSuspensionStateForm.executionDateValue.$error.dateValue">
-              Invalid Date Value.
+              {{ 'PLUGIN_JOBDEFINITION_INVALID_DATE_VALUE' | translate }}
             </p>
 
           </div>
@@ -127,38 +127,38 @@
     </form>
 
     <p>
-      Do you really want to {{ (jobDefinition.suspended ? 'activate' : 'suspend') }} this job definition?
+      {{ (jobDefinition.suspended ? 'PLUGIN_JOBDEFINITION_DO_ACTIVATE' : 'PLUGIN_JOBDEFINITION_DO_SUSPEND' | translate ) }}
     </p>
 
   </div>
 
   <div ng-show="status === 'SUCCESS'">
     <p ng-show="jobDefinition.suspended && data.executeImmediately">
-      The suspension state of the Job Definition has been updated to "active" successfully.
+      {{ 'PLUGIN_JOBDEFINITION_LEGEND_1' | translate }}
     </p>
     <p ng-show="jobDefinition.suspended && !data.executeImmediately">
-      The activation of the Job Definition has been scheduled to {{ data.executionDate }} successfully.
+      {{ 'PLUGIN_JOBDEFINITION_LEGEND_2' | translate:' { data: data.executionDate }' }}
     </p>
     <p ng-show="!jobDefinition.suspended && data.executeImmediately">
-      The suspension state of the Job Definition has been updated to "suspended" successfully.
+      {{ 'PLUGIN_JOBDEFINITION_LEGEND_3' | translate }}
     </p>
     <p ng-show="!jobDefinition.suspended && !data.executeImmediately">
-      The suspension of the Job Definition has been scheduled to {{ data.executionDate }} successfully.
+      {{ 'PLUGIN_JOBDEFINITION_LEGEND_4' | translate:' { data: data.executionDate }' }}
     </p>
   </div>
 
   <div ng-show="status === 'FAIL'">
     <p ng-show="jobDefinition.suspended && data.executeImmediately">
-      The suspension state of the Job Definition could not be updated to "active" successfully.
+      {{ 'PLUGIN_JOBDEFINITION_LEGEND_5' | translate }}
     </p>
     <p ng-show="jobDefinition.suspended && !data.executeImmediately">
-      The activation of the Job Definition could not be scheduled to {{ data.executionDate }} successfully.
+      {{ 'PLUGIN_JOBDEFINITION_LEGEND_6' | translate:' { data: data.executionDate }' }}
     </p>
     <p ng-show="!jobDefinition.suspended && data.executeImmediately">
-      The suspension state of the Job Definition could not be updated to "suspended" successfully.
+      {{ 'PLUGIN_JOBDEFINITION_LEGEND_7' | translate }}
     </p>
     <p ng-show="!jobDefinition.suspended && !data.executeImmediately">
-      The suspension of the Job Definition could not be scheduled to {{ data.executionDate }} successfully.
+      {{ 'PLUGIN_JOBDEFINITION_LEGEND_8' | translate:' { data: data.executionDate }' }}
     </p>
   </div>
 </div>
@@ -168,7 +168,7 @@
           ng-click="close(status)"
           ng-disabled="status === 'PERFORM_UDPATE'"
           ng-hide="status === 'SUCCESS' || status === 'FAIL'">
-    Close
+    {{ 'PLUGIN_JOBDEFINITION_CLOSE' | translate }}
   </button>
 
   <button type="submit"
@@ -176,13 +176,13 @@
           ng-click="updateSuspensionState()"
           ng-hide="status === 'SUCCESS' || status === 'FAIL'"
           ng-disabled="!isValid() || status === 'PERFORM_UDPATE'">
-    {{ (jobDefinition.suspended ? 'Activate' : 'Suspend') }}
+    {{ (jobDefinition.suspended ? 'PLUGIN_JOBDEFINITION_ACTIVATE' : 'PLUGIN_JOBDEFINITION_SUSPEND' | translate) }}
   </button>
 
   <button class="btn btn-primary"
           ng-click="close(status)"
           ng-show="status === 'SUCCESS' || status === 'FAIL'">
-    OK
+    {{ 'PLUGIN_JOBDEFINITION_OK' | translate }}
   </button>
 </div>
 <!-- / CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/jobDefinition/app/views/processDefinition/job-definition-suspension-state-dialog.html -->

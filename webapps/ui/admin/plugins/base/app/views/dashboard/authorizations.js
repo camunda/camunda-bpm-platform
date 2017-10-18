@@ -11,7 +11,7 @@ module.exports = [
 ) {
     ViewsProvider.registerDefaultView('admin.dashboard.section', {
       id: 'authorization',
-      label: 'Authorizations',
+      label: 'AUTHORIZATION_AUTHORIZATIONS',
       template: template,
       pagePath: '#/authorization',
       controller: [function() {}],

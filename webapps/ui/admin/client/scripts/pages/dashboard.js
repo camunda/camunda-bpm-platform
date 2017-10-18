@@ -12,11 +12,13 @@ var Controller = [
   'Views',
   'page',
   '$injector',
+  '$translate',
   function(
   $scope,
   Views,
   page,
-  $injector
+  $injector,
+  $translate
 ) {
     var $rootScope = $scope.$root;
 
@@ -46,7 +48,7 @@ var Controller = [
 
     page.breadcrumbsClear();
 
-    page.titleSet('Dashboard');
+    page.titleSet($translate.instant('DASHBOARD_DASHBOARD'));
   }];
 
 module.exports = [ '$routeProvider', function($routeProvider) {

@@ -5,18 +5,18 @@ var fs = require('fs');
 var template = fs.readFileSync(__dirname + '/tasks.html', 'utf8');
 
 var Controller = [
-  '$scope', 'Views', 'page',
-  function($scope, Views, page) {
+  '$scope', 'Views', 'page', '$translate',
+  function($scope, Views, page, $translate) {
     var $rootScope = $scope.$root;
 
     $rootScope.showBreadcrumbs = true;
 
     page.breadcrumbsClear();
     page.breadcrumbsAdd({
-      label : 'Human Tasks'
+      label : $translate.instant('TASKS_HUMAN_TASKS')
     });
 
-    page.titleSet('Human Tasks');
+    page.titleSet($translate.instant('TASKS_HUMAN_TASKS'));
 
     // INITIALIZE PLUGINS
     $scope.plugins = Views.getProviders({ component : 'cockpit.tasks.dashboard' });

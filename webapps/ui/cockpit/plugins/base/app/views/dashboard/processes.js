@@ -3,7 +3,7 @@
 module.exports = [ 'ViewsProvider', function(ViewsProvider) {
   ViewsProvider.registerDefaultView('cockpit.navigation', {
     id: 'proceses',
-    label: 'Processes',
+    label: 'COCKPIT_PROCESSES',
     pagePath: '#/processes',
     checkActive: function(path) {
     // matches "#/process/", "#/processes" or "#/migration"

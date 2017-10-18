@@ -6,8 +6,8 @@ module.exports = ['ViewsProvider',  function(ViewsProvider) {
   ViewsProvider.registerDefaultView('cockpit.processDefinition.diagram.plugin', {
     id: 'activity-instance-statistics-overlay',
     overlay: [
-      '$scope', 'control', 'processData', 'processDiagram', 'Loaders', 'get', '$filter', '$rootScope',
-      function($scope, control, processData, processDiagram, Loaders, get, $filter, $rootScope) {
+      '$scope', 'control', 'processData', 'processDiagram', 'Loaders', 'get', '$filter', '$rootScope', '$translate',
+      function($scope, control, processData, processDiagram, Loaders, get, $filter, $rootScope, $translate) {
         var callbacks = {
           observe: observe,
           getData: getInstancesCountsForElement,
@@ -73,7 +73,7 @@ module.exports = ['ViewsProvider',  function(ViewsProvider) {
             nodes.instancesNode.show();
             nodes.instancesNode.tooltip({
               container: 'body',
-              title: 'Running Activity Instances',
+              title: $translate.instant('PLUGIN_ACTIVITY_INSTANCE_RUNNING_ACTIVITY_INSTANCES'),
               placement: 'top',
               animation: false
             });
@@ -83,7 +83,7 @@ module.exports = ['ViewsProvider',  function(ViewsProvider) {
             nodes.incidentsNode.show();
             nodes.incidentsNode.tooltip({
               container: 'body',
-              title: 'Open Incidents',
+              title: $translate.instant('PLUGIN_ACTIVITY_INSTANCE_OPEN_INCIDENTS'),
               placement: 'top',
               animation: false
             });

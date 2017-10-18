@@ -6,7 +6,7 @@
        ng-switch on="created">
     <header class="row">
       <div class="col-xs-8">
-        <h3>Setup</h3>
+        <h3>{{ 'SETUP_SETUP' | translate }}</h3>
       </div>
       <div class="col-xs-4 text-right">
       </div>
@@ -17,11 +17,11 @@
       <div class="col-md-12">
 
         <div class="alert alert-success">
-          <strong>User created</strong>
-          You have created an initial user.
+          <strong>{{ 'SETUP_USER_CREATED' | translate }}</strong>
+          {{ 'SETUP_USER_INITIAL' | translate }}
         </div>
 
-        Head over to the <a href="./#/login">signin page</a> to login using the newly created credentials.
+        {{ 'SETUP_USER_REDIRECT_1' | translate }} <a href="./#/login">{{ 'SETUP_USER_REDIRECT_2' | translate }}</a> {{ 'SETUP_USER_REDIRECT_3' | translate }}
       </div>
     </div>
 
@@ -34,11 +34,11 @@
 
         <form class="form-horizontal"
               name="createUserForm">
-          <div class="h4">User Account</div>
+          <div class="h4">{{ 'SETUP_USER_ACCOUNT' | translate }}</div>
 
           <div class="form-group">
             <label class="control-label col-sm-4"
-                   for="inputUserId">User ID*</label>
+                   for="inputUserId">{{ 'SETUP_USER_ID' | translate }}</label>
 
             <div class="col-sm-8">
               <input id="inputUserId"
@@ -50,14 +50,14 @@
 
               <span class="help-inline"
                     ng-show="createUserForm.userId.$error.required">
-                User ID is required.
+                {{ 'SETUP_USER_ID_REQUIRED' | translate }}
               </span>
             </div>
           </div>
 
           <div class="form-group">
             <label class="control-label col-sm-4"
-                   for="inputPassword">Password*:</label>
+                   for="inputPassword">{{ 'SETUP_USER_PASSWORD' | translate }}</label>
 
             <div class="col-sm-8">
               <input id="inputPassword"
@@ -69,18 +69,18 @@
 
               <span class="help-inline"
                     ng-show="createUserForm.inputPassword.$error.password">
-                Password must have at least 8 characters.
+                {{ 'SETUP_USER_PASSWORD_LENGTH' | translate }}
               </span>
               <span class="help-inline"
                     ng-show="createUserForm.inputPassword.$error.required">
-                Password is required.
+                {{ 'SETUP_USER_PASSWORD_REQUIRED' | translate }}
               </span>
             </div>
           </div>
 
           <div class="form-group">
             <label class="control-label col-sm-4"
-                   for="inputPasswordRepeat">Password (repeat)*:</label>
+                   for="inputPasswordRepeat">{{ 'SETUP_USER_PASSWORD_REPEAT' | translate }}</label>
 
             <div class="col-sm-8">
               <input id="inputPasswordRepeat"
@@ -92,16 +92,16 @@
 
               <span class="help-inline"
                     ng-show="createUserForm.inputPasswordRepeat.$error.passwordRepeat">
-                Passwords must match.
+                {{ 'SETUP_USER_PASSWORD_MUST_MATCH' | translate }}
               </span>
             </div>
           </div>
 
-          <div class="h4">User Profile</div>
+          <div class="h4">{{ 'SETUP_USER_PROFILE' | translate }}</div>
 
           <div class="form-group">
             <label class="control-label col-sm-4"
-                for="inputFirstname">Firstname*</label>
+                for="inputFirstname">{{ 'SETUP_USER_FIRSTNAME' | translate }}</label>
 
             <div class="col-sm-8">
               <input id="inputFirstname"
@@ -112,16 +112,16 @@
                      novalidate
                      required></input>
 
-              <span class="help-inline"="text-danger"
+              <span class="help-inline text-danger"
                     ng-show="createUserForm.firstname.$error.required">
-                Firstname is required.
+                {{ 'SETUP_USER_FIRSTNAME_REQUIRED' | translate }}
               </span>
             </div>
           </div>
 
           <div class="form-group">
             <label class="control-label col-sm-4"
-                for="inputLastname">Lastname*</label>
+                for="inputLastname">{{ 'SETUP_USER_LASTNAME' | translate }}</label>
 
             <div class="col-sm-8">
               <input id="inputLastname"
@@ -133,14 +133,14 @@
 
               <span class="help-inline"
                     ng-show="createUserForm.firstname.$error.required">
-                Lastname is required.
+                {{ 'SETUP_USER_LASTNAME_REQUIRED' | translate }}
               </span>
             </div>
           </div>
 
           <div class="form-group">
             <label class="control-label col-sm-4"
-                for="inputEmail">Email</label>
+                for="inputEmail">{{ 'SETUP_USER_EMAIL' | translate }}</label>
 
             <div class="col-sm-8">
               <input id="inputEmail"
@@ -152,7 +152,7 @@
 
               <span class="help-inline"
                     ng-show="createUserForm.email.$error.email">
-                Not a valid email address.
+                {{ 'SETUP_USER_EMAIL_NOT_VALID' | translate }}
               </span>
             </div>
           </div>
@@ -162,7 +162,7 @@
               <button type="submit"
                       class="btn btn-primary"
                       ng-disabled="!createUserForm.$valid"
-                      ng-click="createUser()">Create new User</button>
+                      ng-click="createUser()">{{ 'SETUP_USER_NEW_USER' | translate }}</button>
             </div>
           </div>
 
@@ -171,14 +171,14 @@
 
       <div class="col-md-4">
         <div class="well">
-          <div class="h4">Why is this page shown?</div>
-          <p>You are trying to access the process engine &quot;<strong>{{ engineName }}</strong>&quot;.
-          This process engine is configured to use the built-in identity service (database) but has no administrative users configured.
-          This page allows you to create a user for accessing the process engine.</p>
+          <div class="h4">{{ 'SETUP_USER_MESSAGE_1' | translate }}</div>
+          <p>{{ 'SETUP_USER_MESSAGE_2' | translate }}<strong>{{ engineName }}</strong>
+          {{ 'SETUP_USER_MESSAGE_3' | translate }}
+          {{ 'SETUP_USER_MESSAGE_4' | translate }}</p>
           <p>
             <a href="https://docs.camunda.org/manual/installation/"
                class="btn btn-success">
-              » Setup LDAP instead
+              {{ 'SETUP_USER_MESSAGE_5' | translate }}
             </a>
           </p>
         </div>

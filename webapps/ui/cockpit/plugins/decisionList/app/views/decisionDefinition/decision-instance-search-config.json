@@ -3,7 +3,7 @@
     {
       "id": {
         "key": "decisionInstanceId",
-        "value": "ID"
+        "value": "PLUGIN_DECISION_DEFINITION_VALUE_TYPE_ID"
       },
       "operators": [
         {
@@ -16,7 +16,7 @@
     {
       "id": {
         "key": "processDefinitionId",
-        "value": "Process Definition ID"
+        "value": "PLUGIN_DECISION_DEFINITION_VALUE_PROCESS_DEFINITION_ID"
       },
       "operators": [
         {
@@ -28,7 +28,7 @@
     {
       "id": {
         "key": "processDefinitionKey",
-        "value": "Process Definition Key"
+        "value": "PLUGIN_DECISION_DEFINITION_VALUE_PROCESS_DEFINITION_KEY"
       },
       "operators": [
         {
@@ -40,7 +40,7 @@
     {
       "id": {
         "key": "processInstanceId",
-        "value": "Process Instance ID"
+        "value": "PLUGIN_DECISION_DEFINITION_VALUE_PROCESS_INSTANCE_ID"
       },
       "operators": [
         {
@@ -52,7 +52,7 @@
     {
       "id": {
         "key": "caseDefinitionId",
-        "value": "Case Definition ID"
+        "value": "PLUGIN_DECISION_DEFINITION_VALUE_CASE_DEFINITION_ID"
       },
       "operators": [
         {
@@ -64,7 +64,7 @@
     {
       "id": {
         "key": "caseDefinitionKey",
-        "value": "Case Definition Key"
+        "value": "PLUGIN_DECISION_DEFINITION_VALUE_CASE_DEFINITION_KEY"
       },
       "operators": [
         {
@@ -76,7 +76,7 @@
     {
       "id": {
         "key": "caseInstanceId",
-        "value": "Case Instance ID"
+        "value": "PLUGIN_DECISION_DEFINITION_VALUE_CASE_INSTANCE_ID"
       },
       "operators": [
         {
@@ -88,7 +88,7 @@
     {
       "id": {
         "key": "activityIdIn",
-        "value": "Activity ID"
+        "value": "PLUGIN_DECISION_DEFINITION_VALUE_ACTIVITY_ID"
       },
       "operators": [
         {
@@ -100,7 +100,7 @@
     {
       "id": {
         "key": "activityInstanceIdIn",
-        "value": "Activity Instance ID"
+        "value": "PLUGIN_DECISION_DEFINITION_VALUE_ACTIVITY_INSTANCE_ID"
       },
       "operators": [
         {
@@ -112,16 +112,16 @@
     {
       "id": {
         "key": "evaluatedDate",
-        "value": "Evaluated Date"
+        "value": "PLUGIN_DECISION_DEFINITION_VALUE_EVALUATED_DATE"
       },
       "operators": [
         {
           "key": "Before",
-          "value": "before"
+          "value": "PLUGIN_DECISION_DEFINITION_VALUE_OPERATOR_BEFORE"
         },
         {
           "key": "After",
-          "value": "after"
+          "value": "PLUGIN_DECISION_DEFINITION_VALUE_OPERATOR_AFTER"
         }
       ],
       "allowDates": true,
@@ -130,7 +130,7 @@
     {
       "id": {
         "key": "userId",
-        "value": "User ID"
+        "value": "PLUGIN_DECISION_DEFINITION_VALUE_USER_ID"
       },
       "operators": [
         {
@@ -168,7 +168,7 @@
       },
       {
         "key": "like",
-        "value": "like"
+        "value": "PLUGIN_DECISION_DEFINITION_OPERATOR_LIKE"
       }
     ],
     "string":     [
@@ -198,7 +198,7 @@
       },
       {
         "key": "like",
-        "value": "like"
+        "value": "PLUGIN_DECISION_DEFINITION_OPERATOR_LIKE"
       }
     ],
     "number":     [
@@ -247,20 +247,20 @@
       }],
     "date":     [{
       "key": "lteq",
-      "value": "before"
+      "value": "PLUGIN_DECISION_DEFINITION_VALUE_OPERATOR_BEFORE"
     },
       {
         "key": "gteq",
-        "value": "after"
+        "value": "PLUGIN_DECISION_DEFINITION_VALUE_OPERATOR_AFTER"
       }]
   },
   "tooltips": {
-    "inputPlaceholder": "Add criteria",
-    "invalid": "This search query is not valid",
-    "deleteSearch": "Remove search",
-    "type": "Type",
-    "name": "Property",
-    "operator": "Operator",
-    "value": "Value"
+    "inputPlaceholder": "PLUGIN_DECISION_DEFINITION_ADD_CRITERIA",
+    "invalid": "PLUGIN_DECISION_DEFINITION_INVALID",
+    "deleteSearch": "PLUGIN_DECISION_DEFINITION_DELETE_SEARCH",
+    "type": "PLUGIN_DECISION_DEFINITION_TYPE",
+    "name": "PLUGIN_DECISION_DEFINITION_NAME",
+    "operator": "PLUGIN_DECISION_DEFINITION_OPERATOR",
+    "value": "PLUGIN_DECISION_DEFINITION_VALUE"
   }
 }

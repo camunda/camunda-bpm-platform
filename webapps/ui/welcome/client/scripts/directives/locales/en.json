@@ -18,5 +18,6 @@
   "CHANGES_SAVED": "Changes saved",
   "ERROR_WHILE_SAVING": "Error while saving",
   "PASSWORD_CHANGED": "Password changed",
-  "ERROR_WHILE_CHANGING_PASSWORD": "Error while changing password"
+  "ERROR_WHILE_CHANGING_PASSWORD": "Error while changing password",
+  "USERNAME_FOR_AUTHENTICATION" : "Username for authentication: {{username}}"
 }

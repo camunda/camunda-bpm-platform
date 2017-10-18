@@ -24,13 +24,15 @@ module.exports = [ function() {
       'Views',
       'Notifications',
       'search',
+      '$translate',
       function(
         $scope,
         $q,
         $location,
         Views,
         Notifications,
-        search
+        search,
+        $translate
       ) {
 
         // utilities ///////////////////////////////////////////////////////////////////
@@ -54,11 +56,11 @@ module.exports = [ function() {
           if (msg) {
 
             if(msg.indexOf('does not exist') === -1) {
-              return 'The deployment resource does not exist anymore';
+              return $translate.instant('REPOSITORY_DEPLOYMENT_RESOURCE_DIRECTIVES_RETURN_1');
             }
 
           }
-          return 'Could not load deployment resource';
+          return $translate.instant('REPOSITORY_DEPLOYMENT_RESOURCE_DIRECTIVES_RETURN_2');
         };
 
         var clearResource = function() {
@@ -118,7 +120,7 @@ module.exports = [ function() {
 
           if (selectedResourceId) {
             var provider = Views.getProvider({ component: PLUGIN_DETAILS_COMPONENT, id: selectedResourceId });
-            if (provider && tabs.indexOf(provider) != -1) {
+            if (provider && tabs.indexOf(provider) !== -1) {
               $scope.selectedResourceDetailTab = provider;
               return;
             }

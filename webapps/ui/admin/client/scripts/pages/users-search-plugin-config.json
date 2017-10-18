@@ -3,7 +3,7 @@
     {
       "id": {
         "key": "id",
-        "value": "ID"
+        "value": "PLUGIN_SEARCH_USER_ID"
       },
       "default": true,
       "operators": [
@@ -16,7 +16,7 @@
     {
       "id": {
         "key": "firstName",
-        "value": "Firstname"
+        "value": "PLUGIN_SEARCH_USER_FIRSTNAME"
       },
       "operators": [
         {
@@ -25,14 +25,14 @@
         },
         {
           "key": "Like",
-          "value": "like"
+          "value": "PLUGIN_SEARCH_USER_LIKE"
         }
       ]
     },
     {
       "id": {
         "key": "lastName",
-        "value": "Lastname"
+        "value": "PLUGIN_SEARCH_USER_LASTNAME"
       },
       "operators": [
         {
@@ -41,14 +41,14 @@
         },
         {
           "key": "Like",
-          "value": "like"
+          "value": "PLUGIN_SEARCH_USER_LIKE"
         }
       ]
     },
     {
       "id": {
         "key": "email",
-        "value": "Email"
+        "value": "PLUGIN_SEARCH_USER_EMAIL"
       },
       "operators": [
         {
@@ -57,14 +57,14 @@
         },
         {
           "key": "Like",
-          "value": "like"
+          "value": "PLUGIN_SEARCH_USER_LIKE"
         }
       ]
     },
     {
       "id": {
         "key": "memberOfGroup",
-        "value": "Group ID"
+        "value": "PLUGIN_SEARCH_USER_GROUP_ID"
       },
       "operators": [
         {
@@ -76,7 +76,7 @@
     {
       "id": {
         "key": "memberOfTenant",
-        "value": "Tenant ID"
+        "value": "PLUGIN_SEARCH_USER_TENANT_ID"
       },
       "operators": [
         {
@@ -87,12 +87,12 @@
     }
   ],
   "tooltips": {
-    "inputPlaceholder": "Add criteria",
-    "invalid": "This search query is not valid",
-    "deleteSearch": "Remove search",
-    "type": "Type",
-    "name": "Property",
-    "operator": "Operator",
-    "value": "Value"
+    "inputPlaceholder": "SEARCH_PLACEHOLDER",
+    "invalid": "INVALID_SEARCH",
+    "deleteSearch": "DELETE_SEARCH",
+    "type": "TYPE",
+    "name": "PROPERTY",
+    "operator": "OPERATOR",
+    "value": "VALUE"
   }
 }

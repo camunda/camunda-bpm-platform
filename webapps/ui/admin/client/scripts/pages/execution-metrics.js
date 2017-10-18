@@ -87,7 +87,7 @@ module.exports = ['ViewsProvider', function PluginConfiguration(ViewsProvider) {
 
   ViewsProvider.registerDefaultView('admin.system', {
     id: 'system-settings-metrics',
-    label: 'Execution Metrics',
+    label: 'EXECUTION_METRICS',
     template: template,
     controller: Controller,
     priority: 900

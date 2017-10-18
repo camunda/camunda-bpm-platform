@@ -13,7 +13,7 @@ module.exports = function() {
     scope: {
       config: '=',
       loadingState: '=',
-      loadingError: '=',
+      loadingError: '@',
       arrayTypes: '=?',
       variableTypes: '=?',
       buildCustomQuery: '&',

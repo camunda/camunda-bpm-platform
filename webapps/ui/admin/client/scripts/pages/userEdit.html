@@ -3,20 +3,20 @@
   <aside>
     <ul>
       <li ng-class="activeClass('profile')">
-        <a href="#/users/{{user.id | escape}}?tab=profile">Profile</a>
+        <a href="#/users/{{user.id | escape}}?tab=profile">{{ 'USERS_PROFILE' | translate }}</a>
       </li>
 
       <li ng-class="activeClass('account')"
           ng-show="availableOperations.update">
-        <a href="#/users/{{user.id | escape}}?tab=account">Account</a>
+        <a href="#/users/{{user.id | escape}}?tab=account">{{ 'USERS_ACCOUNT' | translate }}</a>
       </li>
 
       <li ng-class="activeClass('groups')">
-        <a href="#/users/{{user.id | escape}}?tab=groups">Groups</a>
+        <a href="#/users/{{user.id | escape}}?tab=groups">{{ 'USERS_GROUPS' | translate }}</a>
       </li>
 
       <li ng-class="activeClass('tenants')">
-        <a href="#/users/{{user.id | escape}}?tab=tenants">Tenants</a>
+        <a href="#/users/{{user.id | escape}}?tab=tenants">{{ 'USERS_TENANTS' | translate }}</a>
       </li>
     </ul>
   </aside>
@@ -24,20 +24,20 @@
   <div class="section-content">
     <header class="row">
       <div class="col-xs-8">
-        <h3>Edit user {{user.firstName}} {{user.lastName}}</h3>
+        <h3>{{ 'USERS_EDIT_USER' | translate }} {{user.firstName}} {{user.lastName}}</h3>
       </div>
       <div class="col-xs-4 text-right">
         <a class="btn btn-default"
            ng-if="show('groups')"
            ng-click="openCreateGroupMembershipDialog()">
-          Add to a group
+          {{ 'USERS_ADD_TO_A_GROUP' | translate }}
           <span class="glyphicon glyphicon-plus-sign"></span>
         </a>
 
         <a class="btn btn-default"
            ng-if="show('tenants')"
            ng-click="openCreateTenantMembershipDialog()">
-          Add to a tenant
+          {{ 'USERS_ADD_TO_A_TENANT' | translate }}
           <span class="glyphicon glyphicon-plus-sign"></span>
         </a>
       </div>
@@ -46,17 +46,17 @@
     <div ng-if="show('profile')">
       <p ng-if="!profile">
         <span class="glyphicon glyphicon-loading"></span>
-        loading profile...
+        {{ 'USERS_LOADING_PROFILE' | translate }}
       </p>
 
       <form class="form-horizontal"
             name="editProfileForm"
             ng-if="profile">
-        <div class="h4">Profile</div>
+        <div class="h4">{{ 'USERS_PROFILE' | translate }}</div>
 
         <div class="form-group">
           <label class="control-label col-sm-4 col-md-2"
-                 for="inputFirstname">Firstname*</label>
+                 for="inputFirstname">{{ 'USERS_FIRSTNAME' | translate }}</label>
 
           <div class="col-sm-8 col-md-10">
             <input id="inputFirstname"
@@ -70,14 +70,14 @@
 
             <p class="help-block"
                ng-show="editProfileForm.firstname.$error.required">
-              Firstname is required.
+              {{ 'USERS_FIRSTNAME_REQUIRED' | translate }}
             </p>
           </div>
         </div>
 
         <div class="form-group">
           <label class="control-label col-sm-4 col-md-2"
-                 for="inputLastname">Lastname*</label>
+                 for="inputLastname">{{ 'USERS_LASTNAME' | translate }}</label>
 
           <div class="col-sm-8 col-md-10">
             <input id="inputLastname"
@@ -90,14 +90,14 @@
 
             <p class="help-block"
                ng-show="editProfileForm.firstname.$error.required">
-              Lastname is required.
+              {{ 'USERS_LASTNAME_REQUIRED' | translate }}
             </p>
           </div>
         </div>
 
         <div class="form-group">
           <label class="control-label col-sm-4 col-md-2"
-                 for="inputEmail">Email</label>
+                 for="inputEmail">{{ 'USERS_EMAIL' | translate }}</label>
 
           <div class="col-sm-8 col-md-10">
             <input id="inputEmail"
@@ -110,7 +110,7 @@
 
             <p class="help-block"
                ng-show="editProfileForm.email.$error.email">
-              Not a valid email address.
+              {{ 'USERS_EMAIL_INVALID' | translate }}
             </p>
           </div>
         </div>
@@ -122,7 +122,7 @@
                     class="btn btn-primary"
                     ng-disabled="!canSubmit(editProfileForm, 'profile')"
                     ng-click="updateProfile()">
-              Update Profile
+              {{ 'USERS_UPDATE_PROFILE' | translate }}
             </button>
           </div>
         </div>
@@ -134,21 +134,21 @@
             ng-if="availableOperations.update"
             name="updateCredentialsForm">
 
-        <div class="h4">Change Password</div>
+        <div class="h4">{{ 'USERS_CHANGE_PASSWORD' | translate }}</div>
 
-        <p>Type a new password to change the existing account password.</p>
+        <p>{{ 'USERS_TYPE_NEW_PASSWORD' | translate }}</p>
 
         <div class="form-group">
           <label class="control-label col-sm-4 col-md-2"
                  for="inputAuthenticationUserPassword"
                  ng-if="userId === authenticatedUser">
-            Old Password*:
+            {{ 'USERS_OLD_PASSWORD' | translate }}
           </label>
 
           <label class="control-label col-sm-4 col-md-2"
                  for="inputAuthenticationUserPassword"
                  ng-if="userId !== authenticatedUser">
-            My Password*:
+            {{ 'USERS_MY_PASSWORD' | translate }}
           </label>
 
           <div class="col-sm-8 col-md-10">
@@ -163,7 +163,7 @@
 
         <div class="form-group">
           <label class="control-label col-sm-4 col-md-2"
-                 for="inputPassword">New Password*:</label>
+                 for="inputPassword">{{ 'USERS_NEW_PASSWORD' | translate }}</label>
 
           <div class="col-sm-8 col-md-10">
             <input id="inputPassword"
@@ -175,14 +175,14 @@
 
             <p class="text-danger"
                ng-show="updateCredentialsForm.inputPassword.$error.password">
-              Password must have at least 8 characters.
+              {{ 'USERS_PASSWORD_INVALID' | translate }}
             </p>
           </div>
         </div>
 
         <div class="form-group">
           <label class="control-label col-sm-4 col-md-2"
-              for="inputPasswordRepeat">New Password (repeat)*:</label>
+              for="inputPasswordRepeat">{{ 'USERS_NEW_PASSWORD_REPEAT' | translate }}</label>
 
           <div class="col-sm-8 col-md-10">
             <input id="inputPasswordRepeat"
@@ -194,7 +194,7 @@
 
             <p class="text-danger"
                ng-show="updateCredentialsForm.inputPasswordRepeat.$error.passwordRepeat">
-              Passwords must match.
+              {{ 'USERS_PASSWORDS_NOT_EQUAL' | translate }}
             </p>
           </div>
         </div>
@@ -204,7 +204,7 @@
             <button type="submit"
                     class="btn btn-primary"
                     ng-disabled="!canSubmit(updateCredentialsForm)"
-                    ng-click="updateCredentials(updateCredentialsForm)">Change Password</button>
+                    ng-click="updateCredentials(updateCredentialsForm)">{{ 'USERS_CHANGE_PASSWORD' | translate }}</button>
           </div>
         </div>
       </form>
@@ -213,17 +213,17 @@
       <form class="form-horizontal"
             ng-if="availableOperations.delete">
 
-        <div class="h4">Delete User</div>
+        <div class="h4">{{ 'USERS_DELETE_USER' | translate }}</div>
 
         <div class="alert alert-danger">
-          <strong>Warning:</strong> deleting a user account cannot be undone.
+          <strong>{{ 'USERS_WARNING' | translate }}</strong> {{ 'USERS_DELETING_UNDONE' | translate }}
         </div>
 
         <div class="text-right">
           <button type="submit"
                   class="btn btn-danger"
                   ng-click="deleteUser()">
-            Delete User
+            {{ 'USERS_DELETE_USER' | translate }}
           </button>
         </div>
       </form>
@@ -234,22 +234,22 @@
             name="updateGroupMemberships">
 
         <div class="h4">
-          {{user.firstName}} {{user.lastName}}&#39;s Groups
+          {{ 'USERS_FIRSTNAME_LASTNAME_GROUPS' | translate:'{firstname: user.firstName, lastname: user.lastName}' }}
         </div>
 
         <div cam-widget-loader
              loading-state="{{ groupLoadingState }}"
-             text-empty="User {{user.firstName}} {{user.lastName}} is currently not member of any groups.">
+             text-empty="{{ 'USERS_NOT_MEMBER_GROUP' | translate:'{firstname: user.firstName, lastname:user.lastName}' }}">
           <table class="cam-table"
                  ng-hide="groupList.length == 0">
             <thead>
               <tr>
-                <th class="group-id">Group ID</th>
-                <th class="group-name">Group Name</th>
-                <th class="group-type">Group Type</th>
+                <th class="group-id">{{ 'USERS_GROUP_ID' | translate }}</th>
+                <th class="group-name">{{ 'USERS_GROUP_NAME' | translate }}</th>
+                <th class="group-type">{{ 'USERS_GROUP_TYPE' | translate }}</th>
                 <th class="action"
                     ng-show="availableOperations.removeGroup">
-                  Action
+                  {{ 'USERS_ACTION' | translate }}
                 </th>
               </tr>
             </thead>
@@ -270,7 +270,7 @@
 
                 <td class="action"
                     ng-show="availableOperations.removeGroup">
-                  <a ng-click="removeGroup(group.id)">Remove</a>
+                  <a ng-click="removeGroup(group.id)">{{ 'USERS_REMOVE' | translate }}</a>
                 </td>
               </tr>
             </tbody>
@@ -285,21 +285,21 @@
             name="updateTenantMemberships">
 
         <div class="h4">
-          {{user.firstName}} {{user.lastName}}&#39;s Tenants
+          {{ 'USERS_FIRSTNAME_LASTNAME_TENANTS' | translate:'{firstname: user.firstName, lastname: user.lastName}' }}
         </div>
 
         <div cam-widget-loader
              loading-state="{{ tenantLoadingState }}"
-             text-empty="User {{user.firstName}} {{user.lastName}} is currently not member of any tenants.">
+             text-empty="{{ 'USERS_NOT_MEMBER_TENTANT' | translate:'{firstname: user.firstName, lastname: user.lastName}' }}">
           <table class="cam-table"
                  ng-hide="tenantList.length == 0">
             <thead>
             <tr>
-              <th class="tenant-id">Tenant ID</th>
-              <th class="tenant-name">Tenant Name</th>
+              <th class="tenant-id">{{ 'USERS_TENANT_ID' | translate }}</th>
+              <th class="tenant-name">{{ 'USERS_TENANT_NAME' | translate }}</th>
               <th class="action"
                   ng-show="availableOperations.removeTenant">
-                Action
+                {{ 'USERS_ACTION' | translate }}
               </th>
             </tr>
             </thead>
@@ -316,7 +316,7 @@
 
               <td class="action"
                   ng-show="availableOperations.removeTenant">
-                <a ng-click="removeTenant(tenant.id)">Remove</a>
+                <a ng-click="removeTenant(tenant.id)">{{ 'USERS_REMOVE' | translate }}</a>
               </td>
             </tr>
             </tbody>

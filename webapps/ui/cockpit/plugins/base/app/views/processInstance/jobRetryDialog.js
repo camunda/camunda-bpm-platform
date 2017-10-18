@@ -1,8 +1,8 @@
   'use strict';
 
   module.exports = [
-    '$scope', '$location', 'Notifications', 'JobResource', '$modalInstance', 'incident',
-    function($scope,   $location,   Notifications,   JobResource,   $modalInstance,   incident) {
+    '$scope', '$location', 'Notifications', 'JobResource', '$modalInstance', 'incident', '$translate',
+    function($scope,   $location,   Notifications,   JobResource,   $modalInstance,   incident, $translate) {
 
       var FINISHED = 'finished',
           PERFORM = 'performing',
@@ -23,15 +23,15 @@
           $scope.status = FINISHED;
 
           Notifications.addMessage({
-            status: 'Finished',
-            message: 'Incrementing the number of retries finished successfully.',
+            status: $translate.instant('PLUGIN_JOB_RETRY_STATUS_FINISHED'),
+            message: $translate.instant('PLUGIN_JOB_RETRY_MESSAGE_1'),
             exclusive: true
           });
         }, function(error) {
           $scope.status = FAILED;
           Notifications.addError({
-            status: 'Finished',
-            message: 'Incrementing the number of retries was not successful: ' + error.data.message,
+            status: $translate.instant('PLUGIN_JOB_RETRY_STATUS_FINISHED'),
+            message: $translate.instant('PLUGIN_JOB_RETRY_ERROR_1', { message: error.data.message }),
             exclusive: true
           });
         });

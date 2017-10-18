@@ -7,8 +7,8 @@
         <header>
           <h1 class="section-title">
             <a ng-if="plugin.pagePath"
-               ng-href="{{ plugin.pagePath }}">{{ plugin.label }}</a>
-            <span ng-if="!plugin.pagePath">{{ plugin.label }}</span>
+               ng-href="{{ plugin.pagePath }}">{{ plugin.label | translate}}</a>
+            <span ng-if="!plugin.pagePath">{{ plugin.label | translate}}</span>
           </h1>
         </header>
         <div class="stats">

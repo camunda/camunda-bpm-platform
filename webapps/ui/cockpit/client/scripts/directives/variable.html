@@ -61,7 +61,7 @@
 
   <div ng-if="isObject(variable)">
       <label class="control-label"
-             for="objectTypeName">Object type name*</label>
+             for="objectTypeName">{{ 'VARIABLE_OBJECT_TYPE_NAME' | translate }}</label>
         <input id="objectTypeName"
                name="objectTypeName"
                class="form-control"
@@ -70,7 +70,7 @@
                autofocus
                required />
       <label class="control-label"
-             for="serializationDataFormat">Serialization data format*</label>
+             for="serializationDataFormat">{{ 'VARIABLE_SERIALIZATION_DATA_FORMAT' | translate }}</label>
         <input id="serializationDataFormat"
                name="serializationDataFormat"
                class="form-control"
@@ -78,7 +78,7 @@
                ng-model="variable.valueInfo.serializationDataFormat"
                required />
       <label class="control-label"
-             for="serializedValue">Serialized value</label>
+             for="serializedValue">{{ 'VARIABLE_SERIALIZED_VALUE' | translate }}</label>
         <textarea rows="5"
                   ng-model="variable.value"
                   class="form-control"

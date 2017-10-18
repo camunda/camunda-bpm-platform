@@ -10,23 +10,25 @@ var Controller = [
   '$location',
   '$routeParams',
   'Views',
+  '$translate',
   function(
     $scope,
     page,
     $location,
     $routeParams,
-    Views
+    Views,
+    $translate
   ) {
 
     $scope.$root.showBreadcrumbs = true;
 
-    page.titleSet('System Settings');
+    page.titleSet($translate.instant('SYSTEM_SYSTEM_SETTINGS'));
 
     page.breadcrumbsClear();
 
     page.breadcrumbsAdd([
       {
-        label: 'System Settings',
+        label: $translate.instant('SYSTEM_SYSTEM_SETTINGS'),
         href: '#/system'
       }
     ]);

@@ -34,7 +34,7 @@
     <!-- running -->
     <span ng-if="!node.endTime"
           class="tree-node-addon activity-instance-running"
-          tooltip="Running Activity Instance"
+          tooltip="{{ 'ACTIVITY_INSTANCE_TOOLTIP_RUNNING' | translate }}"
           tooltip-placement="right">
       <span class="glyphicon glyphicon-adjust"></span>
     </span>
@@ -42,7 +42,7 @@
     <!-- completed -->
     <span ng-if="node.endTime && !node.canceled"
           class="tree-node-addon activity-instance-completed"
-          tooltip="Completed Activity Instance"
+          tooltip="{{ 'ACTIVITY_INSTANCE_TOOLTIP_COMPLETED' | translate }}"
           tooltip-placement="right">
       <span class="glyphicon glyphicon-ok-circle"></span>
     </span>
@@ -50,7 +50,7 @@
     <!-- canceled -->
     <span ng-if="node.endTime && node.canceled"
           class="tree-node-addon activity-instance-canceled"
-          tooltip="Canceled Activity Instance"
+          tooltip="{{ 'ACTIVITY_INSTANCE_TOOLTIP_CANCELED' | translate }}"
           tooltip-placement="right">
       <span class="glyphicon glyphicon-ban-circle"></span>
     </span>

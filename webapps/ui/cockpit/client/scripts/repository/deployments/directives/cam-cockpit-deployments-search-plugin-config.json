@@ -3,7 +3,7 @@
     {
       "id": {
         "key": "id",
-        "value": "ID"
+        "value": "REPOSITORY_SEARCH_TYPE_ID"
       },
       "operators": [
         {
@@ -15,7 +15,7 @@
     {
       "id": {
         "key": "name",
-        "value": "Name"
+        "value": "REPOSITORY_SEARCH_TYPE_NAME"
       },
       "operators": [
         {
@@ -24,7 +24,7 @@
         },
         {
           "key": "Like",
-          "value": "like"
+          "value": "REPOSITORY_SEARCH_TYPE_OPERATOR_LIKE"
         }
       ],
       "default": true
@@ -32,16 +32,16 @@
     {
       "id": {
         "key": "deploymentTime",
-        "value": "Time"
+        "value": "REPOSITORY_SEARCH_TYPE_TIME"
       },
       "operators": [
         {
           "key": "Before",
-          "value": "before"
+          "value": "REPOSITORY_SEARCH_TYPE_BEFORE"
         },
         {
           "key": "After",
-          "value": "after"
+          "value": "REPOSITORY_SEARCH_TYPE_AFTER"
         }
       ],
       "allowDates": true,
@@ -50,7 +50,7 @@
     {
       "id": {
         "key": "source",
-        "value": "Source"
+        "value": "REPOSITORY_SEARCH_TYPE_SOURCE"
       },
       "operators": [
         {
@@ -62,14 +62,14 @@
     {
       "id": {
         "key": "withoutSource",
-        "value": "Source Undefined"
+        "value": "REPOSITORY_SEARCH_TYPE_SOURCE_UNDEFINED"
       },
       "basic": true
     },
     {
       "id": {
         "key": "tenantIdIn",
-        "value": "Tenant ID"
+        "value": "REPOSITORY_SEARCH_TYPE_TENANT_ID"
       },
       "operators": [
         {
@@ -81,7 +81,7 @@
     {
       "id": {
         "key": "withoutTenantId",
-        "value": "without Tenant ID"
+        "value": "REPOSITORY_SEARCH_TYPE_WITHOUT_TENANT_ID"
       },
       "basic": true
     }
@@ -100,27 +100,27 @@
       },
       {
         "key": "like",
-        "value": "like"
+        "value": "REPOSITORY_SEARCH_TYPE_OPERATOR_LIKE"
       }
     ],
     "date":       [
       {
         "key": "lteq",
-        "value": "before"
+        "value": "REPOSITORY_SEARCH_TYPE_BEFORE"
       },
       {
         "key": "gteq",
-        "value": "after"
+        "value": "REPOSITORY_SEARCH_TYPE_AFTER"
       }
     ]
   },
   "tooltips": {
-    "inputPlaceholder": "Add criteria",
-    "invalid": "This filtering query is not valid",
-    "deleteSearch": "Remove filters",
-    "type": "Type",
-    "name": "Property",
-    "operator": "Operator",
-    "value": "Value"
+    "inputPlaceholder": "REPOSITORY_SEARCH_ADD_CRITERIA",
+    "invalid": "REPOSITORY_SEARCH_INVALID",
+    "deleteSearch": "REPOSITORY_SEARCH_DELETE_SEARCH",
+    "type": "REPOSITORY_SEARCH_TYPE",
+    "name": "REPOSITORY_SEARCH_NAME",
+    "operator": "REPOSITORY_SEARCH_OPERATOR",
+    "value": "REPOSITORY_SEARCH_VALUE"
   }
 }

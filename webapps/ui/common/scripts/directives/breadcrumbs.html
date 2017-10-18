@@ -2,7 +2,7 @@
 <ul class="cam-breadcrumb">
   <li ng-class="{ active: !breadcrumbs || !breadcrumbs.length }">
     <a href="#/"
-       class="text">Dashboard</a>
+       class="text">{{ 'DASHBOARD_DASHBOARD' | translate }}</a>
   </li>
 
   <li ng-repeat="(index, crumb) in breadcrumbs"
@@ -34,14 +34,14 @@
     <span ng-if="(crumb.type === 'processDefinition' && crumb.processDefinition.suspended) || (crumb.type === 'processInstance' && crumb.processInstance.suspended)"
           ng-show="!crumb.hidden"
           class="badge badge-warning badge-suspended"
-          tooltip="Currently suspended"
+          tooltip="{{ 'BREAD_CRUMBS_CURRENTLY_SUSPENDED' | translate }}"
           tooltip-placement="bottom">
       <span class="glyphicon glyphicon-pause white"></span>
     </span>
 
     <span ng-if="!!crumb.choices && crumb.choices.length === 1" ng-show="!crumb.hidden">
       <span class="divider">:</span>
-      {{ getActiveChoice(crumb.choices) }}
+      {{ getActiveChoice(crumb.choices) | translate }}
     </span>
 
     <span ng-if="!!crumb.choices && crumb.choices.length === 2"

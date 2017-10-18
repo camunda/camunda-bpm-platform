@@ -22,10 +22,10 @@
 
       <ul class="nav nav-tabs">
         <li ng-class="{active: sidebarTab === 'info'}">
-          <a ng-click="sidebarTab = 'info'">Information</a>
+          <a ng-click="sidebarTab = 'info'">{{ 'PROCESS_INSTANCE_INFORMATION' | translate }}</a>
         </li>
         <li ng-class="{active: sidebarTab === 'filters'}">
-          <a ng-click="sidebarTab = 'filters'">Filter</a>
+          <a ng-click="sidebarTab = 'filters'">{{ 'PROCESS_INSTANCE_FILTER' | translate }}</a>
         </li>
       </ul>
 
@@ -34,7 +34,7 @@
         <dl class="process-information">
           <dt cam-widget-clipboard="processInstance.id"
               ng-class="{hovered: hovered === 'instance-id'}">
-            <span tooltip="Process instance ID as it appears in the database">Instance ID:</span>
+            <span tooltip="{{ 'PROCESS_INSTANCE_TOOLTIP_INSTANCE_ID_DATABASE' | translate }}">{{ 'PROCESS_INSTANCE_INSTANCE_ID' | translate }}</span>
           </dt>
           <dd class="instance-id"
               ng-mouseenter="hoverTitle('instance-id')"
@@ -45,7 +45,7 @@
           <dt cam-widget-clipboard="processInstance.businessKey"
               ng-class="{hovered: hovered === 'business-key'}"
               ng-if="processInstance.businessKey">
-            <span tooltip="Business key of the process instance">Business Key:</span>
+            <span tooltip="{{ 'PROCESS_INSTANCE_TOOLTIP_BUSINESS_KEY' | translate }}">{{ 'PROCESS_INSTANCE_BUSINESS_KEY' | translate }}</span>
           </dt>
           <dd ng-if="processInstance.businessKey"
               class="business-key"
@@ -54,24 +54,24 @@
             {{ processInstance.businessKey }}
           </dd>
           <dt ng-if="!processInstance.businessKey">
-            <span tooltip="Business key of the process instance">Business Key:</span>
+            <span tooltip="{{ 'PROCESS_INSTANCE_TOOLTIP_BUSINESS_KEY' | translate }}">{{ 'PROCESS_INSTANCE_BUSINESS_KEY' | translate }}</span>
           </dt>
           <dd ng-if="!processInstance.businessKey"
-              class="business-key"><span class="null-value">null</span></dd>
+              class="business-key"><span class="null-value">{{ 'PROCESS_INSTANCE_NULL' | translate }}</span></dd>
 
-          <dt>Definition Version:</dt>
+          <dt>{{ 'PROCESS_INSTANCE_DEFINITION_VERSION' | translate }}</dt>
           <dd class="definition-version">
             {{ processDefinition.version }}
             <a ng-href="{{ getMigrationUrl() }}"
                class="instance-upgrade-link"
                ng-if="hasMigrationPlugin && !isLatestVersion()">
               <span class="glyphicon glyphicon-arrow-up"
-                    tooltip="Migrate this instance to latest version"></span>
+                    tooltip="{{ 'PROCESS_INSTANCE_TOOLTIP_MIGRATE_INSTANCE' | translate }}"></span>
             </a>
           </dd>
 
           <dt cam-widget-clipboard="processDefinition.id"
-              ng-class="{hovered: hovered === 'definition-id'}">Definition ID:</dt>
+              ng-class="{hovered: hovered === 'definition-id'}">{{ 'PROCESS_INSTANCE_DEFINITION_ID' | translate }}</dt>
           <dd class="definition-id"
               ng-mouseenter="hoverTitle('definition-id')"
               ng-mouseleave="hoverTitle()">
@@ -79,38 +79,38 @@
           </dd>
 
           <dt cam-widget-clipboard="processDefinition.key"
-              ng-class="{hovered: hovered === 'definition-key'}">Definition Key:</dt>
+              ng-class="{hovered: hovered === 'definition-key'}">{{ 'PROCESS_INSTANCE_DEFINITION_KEY' | translate }}</dt>
           <dd class="definition-key"
               ng-mouseenter="hoverTitle('definition-key')"
               ng-mouseleave="hoverTitle()">{{ processDefinition.key }}</dd>
 
-          <dt>Definition Name:</dt>
+          <dt>{{ 'PROCESS_INSTANCE_DEFINITION_NAME' | translate }}</dt>
           <dd class="definition-name">{{ processDefinition.name }}</dd>
 
           <dt ng-if="processInstance.tenantId"
               ng-class="{hovered: hovered === 'tenant-id'}"
-              cam-widget-clipboard="processInstance.tenantId">Tenant ID:</dt>
+              cam-widget-clipboard="processInstance.tenantId">{{ 'PROCESS_INSTANCE_TENANT_ID' | translate }}</dt>
           <dd class="tenant-id"
               ng-if="processInstance.tenantId"
               ng-mouseenter="hoverTitle('tenant-id')"
               ng-mouseleave="hoverTitle()">{{ processInstance.tenantId }}</dd>
-          <dt ng-if="!processInstance.tenantId">Tenant ID:</dt>
+          <dt ng-if="!processInstance.tenantId">{{ 'PROCESS_INSTANCE_TENANT_ID' | translate }}</dt>
           <dd class="tenant-id"
-              ng-if="!processInstance.tenantId"><span class="null-value">null</span></dd>
+              ng-if="!processInstance.tenantId"><span class="null-value">{{ 'PROCESS_INSTANCE_NULL' | translate }}</span></dd>
 
           <dt cam-widget-clipboard="processDefinition.deploymentId"
-              ng-class="{hovered: hovered === 'deployment-id'}">Deployment ID:</dt>
+              ng-class="{hovered: hovered === 'deployment-id'}">{{ 'PROCESS_INSTANCE_DEPLOYMENT_ID' | translate }}</dt>
           <dd class="deployment-id"
               ng-mouseenter="hoverTitle('deployment-id')"
               ng-mouseleave="hoverTitle()">
             <a ng-href="{{ getDeploymentUrl() }}">{{ processDefinition.deploymentId }}</a>
           </dd>
 
-          <dt ng-if="hasMigrationPlugin">Related:</dt>
+          <dt ng-if="hasMigrationPlugin">{{ 'PROCESS_INSTANCE_RELATED' | translate }}</dt>
           <dd ng-if="hasMigrationPlugin">
             <ul>
               <li>
-                <a ng-href="#/migration?searchQuery=%5B%5D&sourceKey={{ processDefinition.key }}">Migration</a>
+                <a ng-href="#/migration?searchQuery=%5B%5D&sourceKey={{ processDefinition.key }}">{{ 'PROCESS_INSTANCE_MIGRATION' | translate }}</a>
               </li>
             </ul>
           </dd>
@@ -121,9 +121,9 @@
       <div class="tab-content filters"
            ng-if="sidebarTab === 'filters'">
         <h5>
-          Filter
+          {{ 'PROCESS_INSTANCE_FILTER' | translate }}
           <span class="glyphicon glyphicon-info-sign"
-                tooltip="The activity instance tree with all currently selected activity instances. You may change the selection via (CTRL +) click."></span>
+                tooltip="{{ 'PROCESS_INSTANCE_TOOLTIP_ACTIVITY_INSTANCE_TREE' | translate }}"></span>
         </h5>
 
         <div cam-quick-filter
@@ -141,12 +141,8 @@
           </button>
 
           <ng-pluralize count="filterData.activityInstanceCount"
-                        when="{ 'null' : 'Nothing',
-                                '0': 'Nothing',
-                                'one': '1 activity instance',
-                                'other': '{{ filterData.activityInstanceCount }} activity instances'}">
+                        when="getDataWhen(filterData.activityInstanceCount)">
           </ng-pluralize>
-          selected
         </div>
 
 
@@ -179,21 +175,21 @@
              overlay-provider-component="cockpit.processInstance.diagram.overlay"></div>
 
         <a class="hide-collapsable vertical-collapse"
-           title="Show tabs"></a>
+           title="{{ 'PROCESS_INSTANCE_SHOW_TABS' | translate }}"></a>
 
         <a class="maximize-collapsable vertical-collapse"
            maximize-parent-direction="left"
-           title="Maximize diagram"></a>
+           title="{{ 'PROCESS_INSTANCE_MAXIMIZE_DIAGRAM' | translate }}"></a>
 
         <a class="restore-collapsable vertical-collapse"
            maximize-parent-direction="left"
-           title="Restore diagram to default size"></a>
+           title="{{ 'PROCESS_INSTANCE_RESTORE_DEFAULT_SIZE' | translate }}"></a>
       </div>
 
       <!-- content bottom pane -->
       <div class="ctn-row ctn-content-bottom ctn-tabbed">
         <a class="show-collapsable vertical-collapse"
-           title="Hide tabs"></a>
+           title="{{ 'PROCESS_INSTANCE_HIDE_TABS' | translate }}"></a>
         <div cam-tabs="{component: 'cockpit.processInstance.runtime.tab'}"
              providers="tabs"
              vars="processInstanceVars"

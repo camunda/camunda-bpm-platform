@@ -1,9 +1,9 @@
   'use strict';
   module.exports = [
     '$scope', '$location', 'Notifications', 'ProcessInstanceResource',
-    '$modalInstance', 'processInstance', 'processData', 'Views',
+    '$modalInstance', 'processInstance', 'processData', 'Views', '$translate',
     function($scope,   $location,   Notifications,   ProcessInstanceResource,
-      $modalInstance,   processInstance,   processData,   Views) {
+      $modalInstance,   processInstance,   processData,   Views, $translate) {
 
       var BEFORE_CANCEL = 'beforeCancellation',
           PERFORM_CANCEL = 'performCancellation',
@@ -52,12 +52,12 @@
         $scope.processInstance.$delete($scope.options, function() {
         // success
           $scope.status = CANCEL_SUCCESS;
-          Notifications.addMessage({'status': 'Canceled', 'message': 'The cancellation of the process instance was successful.'});
+          Notifications.addMessage({'status': $translate.instant('PLUGIN_CANCEL_PROCESS_STATUS_CANCELED'), 'message': $translate.instant('PLUGIN_CANCEL_PROCESS_MESSAGE_1')});
 
         }, function(err) {
         // failure
           $scope.status = CANCEL_FAILED;
-          Notifications.addError({'status': 'Failed', 'message': 'The cancellation of the process instance failed. ' + err.data.message, 'exclusive': ['type']});
+          Notifications.addError({'status': $translate.instant('PLUGIN_CANCEL_PROCESS_STATUS_FAILED'), 'message': $translate.instant('PLUGIN_CANCEL_PROCESS_MESSAGE_2', { message: err.data.message }), 'exclusive': ['type']});
         });
       };
 

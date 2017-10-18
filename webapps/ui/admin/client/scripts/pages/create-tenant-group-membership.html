@@ -1,6 +1,6 @@
 <!-- # CE - camunda-bpm-webapp/ui/admin/client/scripts/pages/create-group-membership.html -->
 <div class="modal-header">
-  <h3>Select Tenants</h3>
+  <h3>{{ 'GROUP_MEMBERSHIP_TENANT_SELECT_TENANTS' | translate }}</h3>
 </div>
 
 <div class="create-tenant-membership modal-body">
@@ -15,8 +15,8 @@
                  ng-checked="allTenantsChecked()"
                  ng-click="checkAllTenants()"  />
         </th>
-        <th class="group-id">Tenant ID</th>
-        <th class="group-name">Tenant Name</th>
+        <th class="group-id">{{ 'GROUP_MEMBERSHIP_TENANT_TENANT_ID' | translate }}</th>
+        <th class="group-name">{{ 'GROUP_MEMBERSHIP_TENANT_TENANT_NAME' | translate }}</th>
       </tr>
     </thead>
 
@@ -56,12 +56,11 @@
               first-text="&laquo;"></pagination>
 
   <p ng-show="availableTenants.length == 0">
-    There are no additional tenants available to which the user can be added.
-    You can create a new tenant <a href="#/tenant-create" ng-click="close">here</a>.
+    {{ 'GROUP_MEMBERSHIP_TENANT_MESSAGE_AVAILABLE_TENANTS' | translate }} <a href="#/tenant-create" ng-click="close">{{ 'GROUP_MEMBERSHIP_TENANT_MESSAGE_HERE' | translate }}</a>.
   </p>
 
   <p ng-show="status === 'SUCCESS'">
-    User was successfully added to selected tenants.
+    {{ 'GROUP_MEMBERSHIP_TENANT_MESSAGE_SUCCESS' | translate }}
   </p>
 
 </div>
@@ -71,20 +70,20 @@
           ng-click="close()"
           ng-disabled="status === 'performCreate'"
           ng-hide="status === 'SUCCESS' || status === 'FAILED' || status === 'loadingFailed'">
-    Close
+    {{ 'GROUP_MEMBERSHIP_TENANT_CLOSE' | translate }}
   </button>
 
   <button class="btn btn-primary"
           ng-click="close(status)"
           ng-show="status === 'SUCCESS' || status === 'FAILED' || status === 'loadingFailed'">
-    OK
+    {{ 'GROUP_MEMBERSHIP_TENANT_OK' | translate }}
   </button>
 
   <button class="btn btn-primary"
           ng-click="createGroupMemberships()"
           ng-disabled="status !== 'beforeCreate' || checkedItemsCount === 0"
           ng-hide="status === 'SUCCESS' || status === 'FAILED' || status === 'loadingFailed' || availableTenants.length == 0">
-    Add {{ checkedItemsCount }} Tenants
+    {{ 'GROUP_MEMBERSHIP_TENANT_ADD' | translate:'{ itemsCount: checkedItemsCount }' }}
   </button>
 </div>
 <!-- / CE - camunda-bpm-webapp/ui/admin/client/scripts/pages/create-group-membership.html -->

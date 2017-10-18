@@ -3,8 +3,8 @@
 var angular = require('angular');
 
 module.exports = [
-  '$scope', '$q', 'Notifications', 'JobDefinitionResource', '$modalInstance', 'jobDefinition',
-  function($scope,   $q,   Notifications,   JobDefinitionResource,   $modalInstance,   jobDefinition) {
+  '$scope', '$q', 'Notifications', 'JobDefinitionResource', '$modalInstance', 'jobDefinition', '$translate',
+  function($scope,   $q,   Notifications,   JobDefinitionResource,   $modalInstance,   jobDefinition, $translate) {
 
     var SUCCESS = 'SUCCESS',
         FAILED = 'FAIL';
@@ -38,20 +38,20 @@ module.exports = [
         function() {
           $scope.status = SUCCESS;
           if (setJobPriority) {
-            Notifications.addMessage({ 'status': 'Finished', 'message': 'Overriding the priority completed successfully.', 'exclusive': true });
+            Notifications.addMessage({ 'status': $translate.instant('PLUGIN_JOBDEFINITION_ACTION_STATUS_FINISHED'), 'message': $translate.instant('PLUGIN_JOBDEFINITION_ACTION_DIALOG_MSN_1'), 'exclusive': true });
           }
           else {
-            Notifications.addMessage({ 'status': 'Finished', 'message': 'Clearing the priority completed successfully.', 'exclusive': true });
+            Notifications.addMessage({ 'status': $translate.instant('PLUGIN_JOBDEFINITION_ACTION_STATUS_FINISHED'), 'message': $translate.instant('PLUGIN_JOBDEFINITION_ACTION_DIALOG_MSN_2'), 'exclusive': true });
           }
         },
 
         function(error) {
           $scope.status = FAILED;
           if (setJobPriority) {
-            Notifications.addError({ 'status': 'Finished', 'message': 'Overriding the priority was not successful: ' + error.data.message, 'exclusive': true });
+            Notifications.addError({ 'status': $translate.instant('PLUGIN_JOBDEFINITION_ACTION_STATUS_FINISHED'), 'message': $translate.instant('PLUGIN_JOBDEFINITION_ACTION_DIALOG_ERR_1', { message: error.data.message }), 'exclusive': true });
           }
           else {
-            Notifications.addError({ 'status': 'Finished', 'message': 'Clearing the priority was not successful: ' + error.data.message, 'exclusive': true });
+            Notifications.addError({ 'status': $translate.instant('PLUGIN_JOBDEFINITION_ACTION_STATUS_FINISHED'), 'message': $translate.instant('PLUGIN_JOBDEFINITION_ACTION_DIALOG_ERR_2', { message: error.data.message }), 'exclusive': true });
           }
         }
       );

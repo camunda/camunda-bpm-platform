@@ -14,6 +14,7 @@ var Controller = [
   'instance',
   'isProcessInstance',
   'fixDate',
+  '$translate',
   function(
     $http,
     $modalInstance,
@@ -22,7 +23,8 @@ var Controller = [
     Uri,
     instance,
     isProcessInstance,
-    fixDate
+    fixDate,
+    $translate
   ) {
 
     $scope.isProcessInstance = isProcessInstance;
@@ -93,16 +95,16 @@ var Controller = [
         $scope.status = SUCCESS;
 
         Notifications.addMessage({
-          status: 'Finished',
-          message: 'Added the variable',
+          status: $translate.instant('VARIABLE_ADD_MESSAGE_STATUS_FINISHED'),
+          message: $translate.instant('VARIABLE_ADD_MESSAGE_MESSAGE_ADD'),
           exclusive: true
         });
       }).error(function(data) {
         $scope.status = FAIL;
 
         Notifications.addError({
-          status: 'Finished',
-          message: 'Could not add the new variable: ' + data.message,
+          status: $translate.instant('VARIABLE_ADD_MESSAGE_STATUS_FINISHED'),
+          message: $translate.instant('VARIABLE_ADD_MESSAGE_MESSAGE_ERROR', {message: data.message}),
           exclusive: true
         });
       });

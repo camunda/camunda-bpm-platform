@@ -3,8 +3,8 @@
 var angular = require('angular');
 
 module.exports = [
-  '$scope', '$q', 'Notifications', 'JobResource', '$modalInstance', 'processData', 'processInstance',
-  function($scope,   $q,   Notifications,   JobResource,   $modalInstance,   processData,   processInstance) {
+  '$scope', '$q', 'Notifications', 'JobResource', '$modalInstance', 'processData', 'processInstance', '$translate',
+  function($scope,   $q,   Notifications,   JobResource,   $modalInstance,   processData,   processInstance, $translate) {
 
     var jobRetriesData = processData.newChild($scope);
 
@@ -149,14 +149,14 @@ module.exports = [
       doRetry(selectedFailedJobIds).then(function() {
         if (!finishedWithFailures) {
           Notifications.addMessage({
-            status: 'Finished',
-            message: 'Incrementing the number of retries finished.',
+            status: $translate.instant('PLUGIN_JOB_RETRY_STATUS_FINISHED'),
+            message: $translate.instant('PLUGIN_JOB_RETRY_MESSAGE_2'),
             exclusive: true
           });
         } else {
           Notifications.addError({
-            status: 'Finished',
-            message: 'Incrementing the number of retries finished with failures.',
+            status: $translate.instant('PLUGIN_JOB_RETRY_STATUS_FINISHED'),
+            message: $translate.instant('PLUGIN_JOB_RETRY_ERROR_2'),
             exclusive: true
           });
         }

@@ -14,6 +14,7 @@ var Controller = [
   'Data',
   'dataDepend',
   'page',
+  '$translate',
   function(
     $scope,
     $location,
@@ -21,7 +22,8 @@ var Controller = [
     Views,
     Data,
     dataDepend,
-    page
+    page,
+    $translate
   ) {
     var $rootScope = $scope.$root;
 
@@ -62,10 +64,10 @@ var Controller = [
     page.breadcrumbsClear();
 
     page.breadcrumbsAdd({
-      label: 'Processes'
+      label: $translate.instant('PROCESS_PROCESSES')
     });
 
-    page.titleSet('Processes');
+    page.titleSet($translate.instant('PROCESS_PROCESSES'));
   }];
 
 var RouteConfig = [ '$routeProvider', function($routeProvider) {

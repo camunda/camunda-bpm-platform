@@ -9,7 +9,7 @@ var angular = require('angular');
 module.exports = ['ViewsProvider', function(ViewsProvider) {
   ViewsProvider.registerDefaultView('cockpit.processDefinition.runtime.action', {
     id: 'update-suspension-state-action',
-    label: 'Update Suspension State',
+    label: 'PLUGIN_UPDATE_SUSPENSION_STATE',
     template: actionTemplate,
     controller: [
       '$scope', '$rootScope', '$modal',

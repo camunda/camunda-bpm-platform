@@ -1,6 +1,6 @@
 <!-- # CE - camunda-bpm-webapp/ui/cockpit/client/scripts/components/variables/variable-add-dialog.html -->
 <div class="modal-header">
-  <h3>Add Variable to {{ isProcessInstance ? 'Process' : 'Case' }} Instance</h3>
+  <h3>{{ isProcessInstance ? 'VARIABLE_ADD_MODAL_TITLE_PROCESS' : 'VARIABLE_ADD_MODAL_TITLE_CASE' | translate }}</h3>
 </div>
 
 <div class="modal-body add-variable-dialog">
@@ -16,7 +16,7 @@
 
       <div class="form-group variable-name">
         <label class="control-label col-xs-4"
-               for="variableName">Variable Name*</label>
+               for="variableName">{{ 'VARIABLE_ADD_VARIABLE_NAME' | translate }}</label>
         <div class="col-xs-8">
           <input id="variableNameId"
                  name="variableName"
@@ -30,7 +30,7 @@
 
       <div class="form-group variable-type">
         <label class="control-label col-xs-4"
-               for="variableType">Variable Type*</label>
+               for="variableType">{{ 'VARIABLE_ADD_VARIABLE_TYPE' | translate }}</label>
         <div class="col-xs-8">
           <select id="variableTypeId"
                   name="variableType"
@@ -43,13 +43,13 @@
 
       <div class="form-group variable-value">
         <label class="control-label col-xs-4"
-               for="variableValue">Variable Value*</label>
+               for="variableValue">{{ 'VARIABLE_ADD_VARIABLE_VALUE' | translate }}</label>
         <div class="col-xs-8">
           <div variable="newVariable"></div>
 
           <p class="invalid"
              ng-show="this.addVariableForm.editDateValue.$error.datePattern">
-            Supported pattern 'yyyy-MM-ddTHH:mm:ss'.
+            {{ 'VARIABLE_ADD_VARIABLE_SUPPORTED' | translate }}
           </p>
 
           <p class="invalid"
@@ -59,7 +59,7 @@
 
           <p class="invalid"
              ng-show="this.addVariableForm.editIntegerValue.$error.numeric || this.addVariableForm.editFloatValue.$error.numeric">
-            Only a {{ newVariable.type }} value is allowed.
+            {{ 'VARIABLE_ADD_VARIABLE_ONLY' | translate:'{ type : newVariable.type }' }}
           </p>
         </div>
       </div>
@@ -68,11 +68,11 @@
   </form>
 
   <div ng-show="status === 'SUCCESS'">
-    The variable "{{ newVariable.name }}" has been added to the {{ isProcessInstance ? 'process' : 'case' }} instance successfully.
+    {{ isProcessInstance ? 'VARIABLE_ADD_STATUS_SUCCESS_PROCESS' : 'VARIABLE_ADD_STATUS_SUCCESS_CASE' | translate:'{ name: newVariable.name }' }}
   </div>
 
   <div ng-show="status === 'FAIL'">
-    The variable "{{ newVariable.name }}" could not be added to the {{ isProcessInstance ? 'process' : 'case' }} instance.
+    {{ isProcessInstance ? 'VARIABLE_ADD_STATUS_FAIL_PROCESS' : 'VARIABLE_ADD_STATUS_FAIL_CASE' | translate:'{ name: newVariable.name }' }}
   </div>
 
 </div>
@@ -81,16 +81,16 @@
   <button class="btn btn-link"
           ng-click="close()"
           ng-disabled="status === 'PERFORM_SAVE'"
-          ng-hide="status === 'SUCCESS' || status === 'FAIL'">Close</button>
+          ng-hide="status === 'SUCCESS' || status === 'FAIL'">{{ 'VARIABLE_ADD_CLOSE' | translate }}</button>
 
   <button type="submit"
           class="btn btn-primary"
           ng-click="save()"
           ng-hide="status === 'SUCCESS' || status === 'FAIL'"
-          ng-disabled="!isValid()">Add</button>
+          ng-disabled="!isValid()">{{ 'VARIABLE_ADD_ADD' | translate }}</button>
 
   <button class="btn btn-primary"
           ng-click="close()"
-          ng-show="status === 'SUCCESS' || status === 'FAIL'">OK</button>
+          ng-show="status === 'SUCCESS' || status === 'FAIL'">{{ 'VARIABLE_ADD_OK' | translate }}</button>
 </div>
 <!-- / CE - camunda-bpm-webapp/ui/cockpit/client/scripts/components/variables/variable-add-dialog.html -->

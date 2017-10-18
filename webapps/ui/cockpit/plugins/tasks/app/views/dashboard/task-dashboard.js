@@ -7,11 +7,11 @@ var template = fs.readFileSync(__dirname + '/task-dashboard.html', 'utf8');
 module.exports = ['ViewsProvider', function(ViewsProvider) {
   ViewsProvider.registerDefaultView('cockpit.tasks.dashboard', {
     id : 'task-dashboard',
-    label : 'Task Dashboard',
+    label : 'PLUGIN_TASK_DASHBOARD_TITLE',
     template : template,
     controller : [
-      '$scope', '$q', 'Views', 'camAPI', 'dataDepend', 'search', 'Notifications',
-      function($scope, $q, Views, camAPI, dataDepend, search, Notifications) {
+      '$scope', '$q', 'Views', 'camAPI', 'dataDepend', 'search', 'Notifications', '$translate',
+      function($scope, $q, Views, camAPI, dataDepend, search, Notifications, $translate) {
 
         var tasksPluginData = dataDepend.create($scope);
 
@@ -22,21 +22,21 @@ module.exports = ['ViewsProvider', function(ViewsProvider) {
           {
             // assigned to users
             'state' : undefined,
-            'label' : 'assigned to a user',
+            'label' : $translate.instant('PLUGIN_TASK_ASSIGNED_TO_USER'),
             'count' : 0,
             'search': 'openAssignedTasks'
           },
           {
             // assigned to groups
             'state' : undefined,
-            'label' : 'assigned to 1 or more groups',
+            'label' : $translate.instant('PLUGIN_TASK_ASSIGNED_TO_ONE'),
             'count' : 0,
             'search': 'openGroupTasks'
           },
           {
             // assigned neither to groups nor to users
             'state' : undefined,
-            'label' : 'unassigned',
+            'label' : $translate.instant('PLUGIN_TASK_ASSIGNED_UNASSIGNED'),
             'count' : 0,
             'search': 'openUnassignedTasks'
           }
@@ -48,17 +48,17 @@ module.exports = ['ViewsProvider', function(ViewsProvider) {
 
           var getErrorStatus = function() {
             if(method === 'countByCandidateGroup') {
-              return 'Unable to fetch assignments by group';
+              return $translate.instant('PLUGIN_TASK_ERROR_COUNT');
             }
 
-            return 'Could not fetch the resource for \'' + resourceName + '\'';
+            return $translate.instant('PLUGIN_TASK_ERROR_FETCH', {res: resourceName});
 
           };
 
           var resourceCallback = function(err, res) {
             if (err) {
               Notifications.addError({
-                status: getErrorStatus(),
+                status: $translate.instant('PLUGIN_TASK_ASSIGNED_ERR_COULD_NOT', {err: getErrorStatus}),
                 message: err.toString()
               });
               deferred.reject(err);
@@ -193,7 +193,7 @@ module.exports = ['ViewsProvider', function(ViewsProvider) {
             searchLinks = resetSearch();
           };
 
-          // prevents the initializer from overwriting the exisiting search
+          // prevents the initializer from overwriting the existing search
           if(!search().hasOwnProperty('searchQuery')) {
             search.updateSilently({ searchQuery: JSON.stringify(searchLinks) }, true);
           }
