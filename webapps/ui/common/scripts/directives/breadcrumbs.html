@@ -50,9 +50,9 @@
           ng-init="choices = sortedChoices(crumb.choices)">
       <span class="divider">:</span>
 
-      <span class="current">{{ choices[0].label }}</span>
+      <span class="current">{{ choices[0].label | translate}}</span>
       <span class="divider">|</span>
-      <a href ng-click="selectChoice($event, choices[1])">{{ choices[1].label }}</a>
+      <a href ng-click="selectChoice($event, choices[1])">{{ choices[1].label | translate}}</a>
     </span>
 
     <span ng-if="!!crumb.choices && crumb.choices.length > 2"
