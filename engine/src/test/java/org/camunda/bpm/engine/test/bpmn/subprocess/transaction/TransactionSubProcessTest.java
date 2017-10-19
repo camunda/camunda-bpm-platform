@@ -30,6 +30,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.util.ActivityInstanceAssert;
+import org.camunda.bpm.engine.variable.Variables;
 
 
 /**
@@ -580,6 +581,27 @@ public class TransactionSubProcessTest extends PluggableProcessEngineTestCase {
 
     // and the process has ended
     assertProcessEnded(instance.getId());
+  }
+
+  @Deployment
+  public void FAILURE_testMultipleCompensationOfCancellationOfMultipleTx() {
+    // when
+    List<String> devices = new ArrayList<String>();
+	  devices.add("device1");
+    devices.add("device2");
+    devices.add("fail");
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey( //
+	      "order", //
+	      Variables.putValue("devices", devices));
+
+    // then the compensation should be triggered three times
+    int expected = 3;
+    int actual = historyService
+      .createHistoricActivityInstanceQuery()
+      .activityId("ServiceTask_CompensateConfiguration")
+      .list()
+      .size();
+    assertEquals(expected, actual);
   }
 
   public void testMultipleCancelBoundaryFails() {
