@@ -290,7 +290,7 @@
   "PLUGIN_PROCESS_DEF_TENANT_ID":"Tenant ID",
   "PLUGIN_PROCESS_DEF_HISTORY_VIEW":"History view",
   "PLUGIN_PROCESS_DEF_REPORT":"Report",
-  "PLUGIN_PROCESS_DEF_Action":"Action",
+  "PLUGIN_PROCESS_DEF_ACTION":"Action",
   "PLUGIN_PROCESS_DEF_PREV_RUNNING_INSTANCE":"1 running instance",
   "PLUGIN_PROCESS_DEF_PREV_RUNNING_INSTANCES":"{{instances}} running instances",
   "PLUGIN_PROCESS_DEF_NO_PROCESS_DEF":"No process definitions deployed",
