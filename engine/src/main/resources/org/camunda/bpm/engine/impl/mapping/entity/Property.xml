@@ -54,31 +54,31 @@
   </select>
   
   <select id="selectProperties" resultMap="propertyResultMap">
-    select * from ${prefix}ACT_GE_PROPERTY 
+    select * from ${prefix}ACT_GE_PROPERTY
   </select>
 
-  <update id="lockDeploymentLockProperty">
-    SELECT * FROM ${prefix}ACT_GE_PROPERTY WHERE NAME_ = 'deployment.lock' ${constant_for_update}
-  </update>
+  <select id="lockDeploymentLockProperty" resultType="string">
+    SELECT VALUE_ FROM ${prefix}ACT_GE_PROPERTY WHERE NAME_ = 'deployment.lock' ${constant_for_update}
+  </select>
 
-  <update id="lockDeploymentLockProperty_mssql">
-    SELECT * FROM ${prefix}ACT_GE_PROPERTY WITH (XLOCK, ROWLOCK) WHERE NAME_ = 'deployment.lock'
-  </update>
+  <select id="lockDeploymentLockProperty_mssql" resultType="string">
+    SELECT VALUE_ FROM ${prefix}ACT_GE_PROPERTY WITH (XLOCK, ROWLOCK) WHERE NAME_ = 'deployment.lock'
+  </select>
 
-  <update id="lockHistoryCleanupJobLockProperty">
-    SELECT * FROM ${prefix}ACT_GE_PROPERTY WHERE NAME_ = 'history.cleanup.job.lock' ${constant_for_update}
-  </update>
+  <select id="lockHistoryCleanupJobLockProperty" resultType="string">
+    SELECT VALUE_ FROM ${prefix}ACT_GE_PROPERTY WHERE NAME_ = 'history.cleanup.job.lock' ${constant_for_update}
+  </select>
 
-  <update id="lockHistoryCleanupJobLockProperty_mssql">
-    SELECT * FROM ${prefix}ACT_GE_PROPERTY WITH (XLOCK, ROWLOCK) WHERE NAME_ = 'history.cleanup.job.lock'
-  </update>
+  <select id="lockHistoryCleanupJobLockProperty_mssql" resultType="string">
+    SELECT VALUE_ FROM ${prefix}ACT_GE_PROPERTY WITH (XLOCK, ROWLOCK) WHERE NAME_ = 'history.cleanup.job.lock'
+  </select>
 
-  <update id="lockStartupLockProperty">
-    SELECT * FROM ${prefix}ACT_GE_PROPERTY WHERE NAME_ = 'startup.lock' ${constant_for_update}
-  </update>
+  <select id="lockStartupLockProperty" resultType="string">
+    SELECT VALUE_ FROM ${prefix}ACT_GE_PROPERTY WHERE NAME_ = 'startup.lock' ${constant_for_update}
+  </select>
 
-  <update id="lockStartupLockProperty_mssql">
-    SELECT * FROM ${prefix}ACT_GE_PROPERTY WITH (XLOCK, ROWLOCK) WHERE NAME_ = 'startup.lock'
-  </update>
+  <select id="lockStartupLockProperty_mssql" resultType="string">
+    SELECT VALUE_ FROM ${prefix}ACT_GE_PROPERTY WITH (XLOCK, ROWLOCK) WHERE NAME_ = 'startup.lock'
+  </select>
 
 </mapper>

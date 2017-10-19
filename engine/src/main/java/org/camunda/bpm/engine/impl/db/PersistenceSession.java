@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.impl.db;
 
 import java.util.List;
 
+import org.apache.ibatis.executor.BatchResult;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
 import org.camunda.bpm.engine.impl.interceptor.Session;
 
@@ -39,6 +40,8 @@ public interface PersistenceSession extends Session {
   int executeUpdate(String updateStatement, Object parameter);
 
   int executeNonEmptyUpdateStmt(String updateStmt, Object parameter);
+
+  List<BatchResult> flushOperations();
 
   void commit();
 
