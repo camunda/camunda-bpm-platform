@@ -26,10 +26,8 @@ import static org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
-import org.apache.ibatis.executor.BatchResult;
 import org.camunda.bpm.engine.impl.DeploymentQueryImpl;
 import org.camunda.bpm.engine.impl.ExecutionQueryImpl;
 import org.camunda.bpm.engine.impl.GroupQueryImpl;
@@ -53,7 +51,6 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.DbEntityLifecycleAware;
 import org.camunda.bpm.engine.impl.db.EntityLoadListener;
-import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.db.PersistenceSession;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
@@ -299,55 +296,18 @@ public class DbEntityManager implements Session, EntityLoadListener {
     if (isIgnoreForeignKeysForNextFlush) {
       persistenceSession.executeNonEmptyUpdateStmt(TOGGLE_FOREIGN_KEY_STMT, false);
     }
-
+    // execute the flush
     try {
-      // execute the flush
       for (DbOperation dbOperation : operationsToFlush) {
         try {
           persistenceSession.executeDbOperation(dbOperation);
         } catch (Exception e) {
           throw LOG.flushDbOperationException(operationsToFlush, dbOperation, e);
         }
-      }
-
-      List<BatchResult> flushResult;
-      try {
-        flushResult = persistenceSession.flushOperations();
-      } catch (Exception e) {
-        throw LOG.flushDbOperationsException(operationsToFlush, e);
-      }
-
-      int flushResultSize = 0;
-
-      if (flushResult != null && flushResult.size() > 0) {
-        LOG.printBatchResults(flushResult);
-        //process the batch results to handle Optimistic Lock Exceptions
-        Iterator<DbOperation> operationIt = operationsToFlush.iterator();
-        for (BatchResult batchResult : flushResult) {
-          for (int statementResult : batchResult.getUpdateCounts()) {
-            flushResultSize ++;
-            DbOperation thisOperation = operationIt.next();
-            if (thisOperation instanceof DbEntityOperation && ((DbEntityOperation) thisOperation).getEntity() instanceof HasDbRevision) {
-              final DbEntity dbEntity = ((DbEntityOperation) thisOperation).getEntity();
-              if (statementResult != 1) {
-                ((DbEntityOperation) thisOperation).setFailed(true);
-                handleOptimisticLockingException(thisOperation);
-              } else {
-                //update revision number in cache
-                if (thisOperation.getOperationType().equals(DbOperationType.UPDATE)) {
-                  HasDbRevision versionedObject = (HasDbRevision) dbEntity;
-                  versionedObject.setRevision(versionedObject.getRevisionNext());
-                }
-              }
-            }
-          }
-        }
-        //this must not happen, but worth checking
-        if (operationsToFlush.size() != flushResultSize) {
-          LOG.wrongBatchResultsSizeException(operationsToFlush);
+        if (dbOperation.isFailed()) {
+          handleOptimisticLockingException(dbOperation);
         }
       }
-
     } finally {
       if (isIgnoreForeignKeysForNextFlush) {
         persistenceSession.executeNonEmptyUpdateStmt(TOGGLE_FOREIGN_KEY_STMT, true);
