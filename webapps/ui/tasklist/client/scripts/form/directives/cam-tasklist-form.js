@@ -145,13 +145,13 @@ module.exports = function() {
           }
 
           else if (key.indexOf(DEPLOYMENT_KEY) === 0) {
-              if ($scope.params.taskId) {
-                key = Uri.appUri('engine://engine/:engine/task/' + $scope.params.taskId + '/deployed-form');
-              } else {
-                key = Uri.appUri('engine://engine/:engine/process-definition/' + $scope.params.processDefinitionId + '/deployed-start-form');
-              }
+            if ($scope.params.taskId) {
+              key = Uri.appUri('engine://engine/:engine/task/' + $scope.params.taskId + '/deployed-form');
+            } else {
+              key = Uri.appUri('engine://engine/:engine/process-definition/' + $scope.params.processDefinitionId + '/deployed-start-form');
+            }
 
-              setAsynchronousFormKey(key);
+            setAsynchronousFormKey(key);
           }
 
           else if(key.indexOf(ENGINE_KEY) === 0) {
