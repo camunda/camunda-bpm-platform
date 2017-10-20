@@ -66,20 +66,14 @@ module.exports = function() {
     controller: [
       '$scope',
       'Uri',
-      'camAPI',
       function(
         $scope,
-        Uri,
-        camAPI
+        Uri
       ) {
         $scope.taskRemoved = false;
         $scope.$on('taskremoved', function() {
           $scope.taskRemoved = true;
         });
-
-        var processDefinitionResource = camAPI.resource('process-definition');
-        var caseDefinitionResource = camAPI.resource('case-definition');
-        var deploymentResource = camAPI.resource('deployment');
 
         // setup //////////////////////////////////////////////////////////////////
 
@@ -108,11 +102,6 @@ module.exports = function() {
         };
 
         var API = this;
-
-        function setAsynchronousFormKeyFailure(err) {
-          $scope.asynchronousFormKey.failure = true;
-          $scope.asynchronousFormKey.error = err;
-        }
 
         function setAsynchronousFormKey(formKey) {
           $scope.asynchronousFormKey.key = formKey;
@@ -156,47 +145,13 @@ module.exports = function() {
           }
 
           else if (key.indexOf(DEPLOYMENT_KEY) === 0) {
-            var resourceName = key.substring(DEPLOYMENT_KEY.length);
+              if ($scope.params.taskId) {
+                key = Uri.appUri('engine://engine/:engine/task/' + $scope.params.taskId + '/deployed-form');
+              } else {
+                key = Uri.appUri('engine://engine/:engine/process-definition/' + $scope.params.processDefinitionId + '/deployed-start-form');
+              }
 
-            var loadResourceInDeployment = function(deploymentId)  {
-              deploymentResource.getResources(deploymentId, function(err, resourcesData) {
-                if (err) {
-                  setAsynchronousFormKeyFailure(err);
-                } else {
-                  var resourceFound = false;
-                  // Find the resource with the given name from the list of all resources of a deployment
-                  for (var index = 0; index < resourcesData.length; ++index) {
-                    if (resourcesData[index].name === resourceName) {
-                      key = Uri.appUri('engine://engine/:engine/deployment/' + deploymentId + '/resources/' + resourcesData[index].id + '/data');
-                      setAsynchronousFormKey(key);
-                      resourceFound = true;
-                      break;
-                    }
-                  }
-                  if (!resourceFound) {
-                    setAsynchronousFormKeyFailure(new Error('Resource ' + resourceName + ' not found in deployment'));
-                  }
-                }
-              });
-            };
-
-            if ($scope.params.processDefinitionId) {
-              processDefinitionResource.get($scope.params.processDefinitionId, function(err, deploymentData) {
-                if (err) {
-                  setAsynchronousFormKeyFailure(err);
-                } else {
-                  loadResourceInDeployment(deploymentData.deploymentId);
-                }
-              });
-            } else if ($scope.params.caseDefinitionId) {
-              caseDefinitionResource.get($scope.params.caseDefinitionId, function(err, deploymentData) {
-                if (err) {
-                  setAsynchronousFormKeyFailure(err);
-                } else {
-                  loadResourceInDeployment(deploymentData.deploymentId);
-                }
-              });
-            }
+              setAsynchronousFormKey(key);
           }
 
           else if(key.indexOf(ENGINE_KEY) === 0) {
