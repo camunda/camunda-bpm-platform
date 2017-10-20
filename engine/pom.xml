@@ -215,6 +215,7 @@
     <history.level>full</history.level>
     <mail.server.port>5025</mail.server.port>
     <authorizationCheckRevokes>auto</authorizationCheckRevokes>
+    <jdbcBatchProcessing>true</jdbcBatchProcessing>
 
     <camunda.artifact>
       org.camunda.bpm
@@ -440,6 +441,13 @@
     </profile>
 
     <profile>
+      <id>cfgJdbcBatchProcessingOff</id>
+      <properties>
+        <jdbcBatchProcessing>false</jdbcBatchProcessing>
+      </properties>
+    </profile>
+
+    <profile>
       <id>oracle-10</id>
       <build>
         <plugins>
@@ -476,6 +484,38 @@
                 <exclude>**/CompetingMessageCorrelationTest.java</exclude>
                 <exclude>**/ConcurrentDeploymentTest.java</exclude>
                 <exclude>**/*TestCase.java</exclude>
+              </excludes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>mariadb</id>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <excludes combine.children="append">
+                <exclude>**/JdbcStatementTimeoutTest.java</exclude>
+              </excludes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>db2</id>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <excludes combine.children="append">
+                <exclude>**/JdbcStatementTimeoutTest.java</exclude>
               </excludes>
             </configuration>
           </plugin>

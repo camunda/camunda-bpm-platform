@@ -20,11 +20,13 @@ import org.camunda.bpm.engine.history.HistoricJobLog;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManagerFactory;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.test.util.DatabaseHelper;
 
 /**
  *  @author Philipp Ossler
@@ -38,6 +40,19 @@ public class JdbcStatementTimeoutTest extends ConcurrencyTestCase {
 
   private ThreadControl thread1;
   private ThreadControl thread2;
+
+  @Override
+  protected void runTest() throws Throwable {
+    String databaseType = DatabaseHelper.getDatabaseType(processEngineConfiguration);
+
+    if ((DbSqlSessionFactory.DB2.equals(databaseType) || DbSqlSessionFactory.MARIADB.equals(databaseType))
+      && processEngine.getProcessEngineConfiguration().isJdbcBatchProcessing()) {
+      // skip test method - if database is H2
+    } else {
+      // invoke the test method
+      super.runTest();
+    }
+  }
 
   @Override
   protected void initializeProcessEngine() {
@@ -79,10 +94,10 @@ public class JdbcStatementTimeoutTest extends ConcurrencyTestCase {
 
   @Override
   protected void tearDown() throws Exception {
-
-    thread1.waitUntilDone();
-
-    deleteJobEntities();
+    if (thread1 != null) {
+      thread1.waitUntilDone();
+      deleteJobEntities();
+    }
   }
 
   private void createJobEntity() {

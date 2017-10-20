@@ -15,6 +15,8 @@ package org.camunda.bpm.engine.impl.util;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -69,19 +71,35 @@ public class ExceptionUtil {
   }
 
   public static boolean checkValueTooLongException(ProcessEngineException exception) {
-    Throwable ex = exception;
-    while (ex.getCause() != null) {
-      ex = ex.getCause();
-      if (ex instanceof SQLException && (ex.getMessage().contains("too long")
+    List<SQLException> sqlExceptionList = findRelatedSqlExceptions(exception);
+    for (SQLException ex: sqlExceptionList) {
+      if (ex.getMessage().contains("too long")
         || ex.getMessage().contains("too large")
         || ex.getMessage().contains("ORA-01461")
         || ex.getMessage().contains("ORA-01401")
         || ex.getMessage().contains("data would be truncated")
-        || ex.getMessage().contains("SQLCODE=-302, SQLSTATE=22001"))) {
+        || ex.getMessage().contains("SQLCODE=-302, SQLSTATE=22001")) {
         return true;
       }
     }
     return false;
+  }
+
+  public static List<SQLException> findRelatedSqlExceptions(Throwable exception) {
+    List<SQLException> sqlExceptionList = new ArrayList<SQLException>();
+    Throwable cause = exception;
+    do {
+      if (cause instanceof SQLException) {
+        SQLException sqlEx = (SQLException) cause;
+        sqlExceptionList.add(sqlEx);
+        while (sqlEx.getNextException() != null) {
+          sqlExceptionList.add(sqlEx.getNextException());
+          sqlEx = sqlEx.getNextException();
+        }
+      }
+      cause = cause.getCause();
+    } while (cause != null);
+    return sqlExceptionList;
   }
 
 }

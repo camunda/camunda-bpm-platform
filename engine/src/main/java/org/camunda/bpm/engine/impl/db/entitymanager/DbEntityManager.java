@@ -26,8 +26,10 @@ import static org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
+import org.apache.ibatis.executor.BatchResult;
 import org.camunda.bpm.engine.impl.DeploymentQueryImpl;
 import org.camunda.bpm.engine.impl.ExecutionQueryImpl;
 import org.camunda.bpm.engine.impl.GroupQueryImpl;
@@ -51,6 +53,7 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.DbEntityLifecycleAware;
 import org.camunda.bpm.engine.impl.db.EntityLoadListener;
+import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.db.PersistenceSession;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
@@ -66,6 +69,7 @@ import org.camunda.bpm.engine.impl.identity.db.DbGroupQueryImpl;
 import org.camunda.bpm.engine.impl.identity.db.DbUserQueryImpl;
 import org.camunda.bpm.engine.impl.interceptor.Session;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutorContext;
+import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
 /**
@@ -78,6 +82,7 @@ public class DbEntityManager implements Session, EntityLoadListener {
 
   protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
   protected static final String TOGGLE_FOREIGN_KEY_STMT = "toggleForeignKey";
+  public static final int BATCH_SIZE = 50;
 
   protected List<OptimisticLockingListener> optimisticLockingListeners;
 
@@ -286,8 +291,13 @@ public class DbEntityManager implements Session, EntityLoadListener {
   }
 
   protected void flushDbOperationManager() {
+
     // obtain totally ordered operation list from operation manager
     List<DbOperation> operationsToFlush = dbOperationManager.calculateFlush();
+    if (operationsToFlush == null || operationsToFlush.size() == 0) {
+      return;
+    }
+
     LOG.databaseFlushSummary(operationsToFlush);
 
     // If we want to delete all table data as bulk operation, on tables which have self references,
@@ -295,23 +305,77 @@ public class DbEntityManager implements Session, EntityLoadListener {
     // On other databases we have to do nothing, the mapped statement will be empty.
     if (isIgnoreForeignKeysForNextFlush) {
       persistenceSession.executeNonEmptyUpdateStmt(TOGGLE_FOREIGN_KEY_STMT, false);
+      persistenceSession.flushOperations();
     }
-    // execute the flush
+
     try {
-      for (DbOperation dbOperation : operationsToFlush) {
-        try {
-          persistenceSession.executeDbOperation(dbOperation);
-        } catch (Exception e) {
-          throw LOG.flushDbOperationException(operationsToFlush, dbOperation, e);
-        }
-        if (dbOperation.isFailed()) {
-          handleOptimisticLockingException(dbOperation);
-        }
+      final List<List<DbOperation>> batches = CollectionUtil.partition(operationsToFlush, BATCH_SIZE);
+      for (List<DbOperation> batch : batches) {
+        flushDbOperations(batch);
       }
     } finally {
       if (isIgnoreForeignKeysForNextFlush) {
         persistenceSession.executeNonEmptyUpdateStmt(TOGGLE_FOREIGN_KEY_STMT, true);
+        persistenceSession.flushOperations();
         isIgnoreForeignKeysForNextFlush = false;
+      }
+    }
+  }
+
+  protected void flushDbOperations(List<DbOperation> operationsToFlush) {
+    // execute the flush
+    for (DbOperation dbOperation : operationsToFlush) {
+      try {
+        persistenceSession.executeDbOperation(dbOperation);
+      } catch (Exception e) {
+        throw LOG.flushDbOperationException(operationsToFlush, dbOperation, e);
+      }
+      if (dbOperation.isFailed()) {
+        handleOptimisticLockingException(dbOperation);
+      }
+    }
+
+    if (Context.getProcessEngineConfiguration().isJdbcBatchProcessing()) {
+      List<BatchResult> flushResult;
+      try {
+        flushResult = persistenceSession.flushOperations();
+      } catch (Exception e) {
+        throw LOG.flushDbOperationsException(operationsToFlush, e);
+      }
+      checkFlushResults(operationsToFlush, flushResult);
+    }
+  }
+
+  protected void checkFlushResults(List<DbOperation> operationsToFlush, List<BatchResult> flushResult) {
+    int flushResultSize = 0;
+
+    if (flushResult != null && flushResult.size() > 0) {
+      LOG.printBatchResults(flushResult);
+      //process the batch results to handle Optimistic Lock Exceptions
+      Iterator<DbOperation> operationIt = operationsToFlush.iterator();
+      for (BatchResult batchResult : flushResult) {
+        for (int statementResult : batchResult.getUpdateCounts()) {
+          flushResultSize++;
+          DbOperation thisOperation = operationIt.next();
+          if (thisOperation instanceof DbEntityOperation && ((DbEntityOperation) thisOperation).getEntity() instanceof HasDbRevision
+            && !thisOperation.getOperationType().equals(DbOperationType.INSERT)) {
+            final DbEntity dbEntity = ((DbEntityOperation) thisOperation).getEntity();
+            if (statementResult != 1) {
+              ((DbEntityOperation) thisOperation).setFailed(true);
+              handleOptimisticLockingException(thisOperation);
+            } else {
+              //update revision number in cache
+              if (thisOperation.getOperationType().equals(DbOperationType.UPDATE)) {
+                HasDbRevision versionedObject = (HasDbRevision) dbEntity;
+                versionedObject.setRevision(versionedObject.getRevisionNext());
+              }
+            }
+          }
+        }
+      }
+      //this must not happen, but worth checking
+      if (operationsToFlush.size() != flushResultSize) {
+        LOG.wrongBatchResultsSizeException(operationsToFlush);
       }
     }
   }

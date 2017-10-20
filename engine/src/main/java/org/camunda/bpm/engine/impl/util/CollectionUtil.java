@@ -87,4 +87,16 @@ public class CollectionUtil {
     }
     set.addAll(values);
   }
+
+  /**
+   * Chops a list into non-view sublists of length partitionSize.
+   */
+  public static <T> List<List<T>> partition(List<T> list, final int partitionSize) {
+    List<List<T>> parts = new ArrayList<List<T>>();
+    final int listSize = list.size();
+    for (int i = 0; i < listSize; i += partitionSize) {
+      parts.add(new ArrayList<T>(list.subList(i, Math.min(listSize, i + partitionSize))));
+    }
+    return parts;
+  }
 }

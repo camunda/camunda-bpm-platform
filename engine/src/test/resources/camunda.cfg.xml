@@ -33,6 +33,8 @@
 
     <property name="authorizationCheckRevokes" value="${authorizationCheckRevokes}"/>
 
+    <property name="jdbcBatchProcessing" value="${jdbcBatchProcessing}"/>
+
     <!--<property name="idGenerator" ref="uuidGenerator" />-->
 
   </bean>

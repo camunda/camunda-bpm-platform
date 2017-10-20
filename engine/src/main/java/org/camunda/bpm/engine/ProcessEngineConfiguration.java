@@ -216,6 +216,7 @@ public abstract class ProcessEngineConfiguration {
   protected boolean transactionsExternallyManaged = false;
   /** the number of seconds the jdbc driver will wait for a response from the database */
   protected Integer jdbcStatementTimeout;
+  protected boolean jdbcBatchProcessing = true;
 
   protected String jpaPersistenceUnitName;
   protected Object jpaEntityManagerFactory;
@@ -566,6 +567,15 @@ public abstract class ProcessEngineConfiguration {
   /** Sets the number of seconds the jdbc driver will wait for a response from the database. */
   public ProcessEngineConfiguration setJdbcStatementTimeout(Integer jdbcStatementTimeout) {
     this.jdbcStatementTimeout = jdbcStatementTimeout;
+    return this;
+  }
+
+  public boolean isJdbcBatchProcessing() {
+    return jdbcBatchProcessing;
+  }
+
+  public ProcessEngineConfiguration setJdbcBatchProcessing(boolean jdbcBatchProcessing) {
+    this.jdbcBatchProcessing = jdbcBatchProcessing;
     return this;
   }
 

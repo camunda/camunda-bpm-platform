@@ -12,10 +12,14 @@
  */
 package org.camunda.bpm.engine.impl.db;
 
+import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.executor.BatchExecutorException;
+import org.apache.ibatis.executor.BatchResult;
 import org.camunda.bpm.application.ProcessApplicationUnavailableException;
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.BadUserRequestException;
@@ -33,6 +37,7 @@ import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.util.ClassNameUtil;
+import org.camunda.bpm.engine.impl.util.ExceptionUtil;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 
@@ -647,6 +652,53 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
   public void noStartupLockPropertyFound() {
     logError(
         "081", "No startup lock property found in databse");
+  }
+
+  public void printBatchResults(List<BatchResult> results) {
+    if (results.size() > 0) {
+      StringBuilder sb = new StringBuilder();
+      sb.append("Batch summary:\n");
+      for (int i = 0; i < results.size(); i++) {
+        BatchResult result = results.get(i);
+        sb.append("Result ").append(i).append(":\t");
+        sb.append(result.getSql().replaceAll("\n", "").replaceAll("\\s+", " ")).append("\t");
+        sb.append("Update counts: ").append(Arrays.toString(result.getUpdateCounts())).append("\n");
+      }
+      logDebug("082", sb.toString());
+    }
+  }
+
+  public ProcessEngineException flushDbOperationsException(List<DbOperation> operationsToFlush,
+    Throwable cause) {
+    String message = cause.getMessage();
+
+    //collect real SQL exception messages in case of batch processing
+    Throwable exCause = cause;
+    do {
+      if (exCause instanceof BatchExecutorException) {
+        final List<SQLException> relatedSqlExceptions = ExceptionUtil.findRelatedSqlExceptions(exCause);
+        StringBuffer sb = new StringBuffer();
+        for (SQLException sqlException : relatedSqlExceptions) {
+          sb.append(sqlException).append("\n");
+        }
+        message = message + "\n" + sb.toString();
+      }
+      exCause = exCause.getCause();
+    } while (exCause != null);
+
+    return new ProcessEngineException(exceptionMessage(
+      "083",
+      "Exception while executing Batch Database Operations with message '{}'. Flush summary: \n {}", message,
+      buildStringFromList(operationsToFlush)
+    ), cause);
+  }
+
+  public ProcessEngineException wrongBatchResultsSizeException(List<DbOperation> operationsToFlush) {
+    return new ProcessEngineException(exceptionMessage(
+      "084",
+      "Exception while executing Batch Database Operations: the size of Batch Result does not correspond to the number of flushed operations. Flush summary: \n {}",
+      buildStringFromList(operationsToFlush)
+    ));
   }
 
 }

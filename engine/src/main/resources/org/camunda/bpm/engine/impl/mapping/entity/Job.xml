@@ -201,7 +201,7 @@
       </if>)
   </select>
 
-    <select id="selectJobsByHandlerType" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
+    <select id="selectJobsByHandlerType" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap" flushCache="true">
         select * from ${prefix}ACT_RU_JOB
         where HANDLER_TYPE_ = #{parameter}
     </select>

@@ -50,7 +50,7 @@ public class TaskVariablesTest extends PluggableProcessEngineTestCase {
 
     StringBuffer longString = new StringBuffer();
     for (int i = 0; i < 500; i++) {
-      longString.append("tensimbols");
+      longString.append("tensymbols");
     }
     try {
       runtimeService.setVariable(processInstanceId, "var", longString.toString());

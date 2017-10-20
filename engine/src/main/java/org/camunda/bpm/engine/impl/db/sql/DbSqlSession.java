@@ -31,7 +31,9 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.ibatis.executor.BatchResult;
 import org.apache.ibatis.mapping.MappedStatement;
+import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
@@ -69,16 +71,29 @@ public class DbSqlSession extends AbstractPersistenceSession {
     this.dbSqlSessionFactory = dbSqlSessionFactory;
     this.sqlSession = dbSqlSessionFactory
       .getSqlSessionFactory()
-      .openSession();
+      .openSession(getExecutorType());
   }
 
   public DbSqlSession(DbSqlSessionFactory dbSqlSessionFactory, Connection connection, String catalog, String schema) {
     this.dbSqlSessionFactory = dbSqlSessionFactory;
     this.sqlSession = dbSqlSessionFactory
       .getSqlSessionFactory()
-      .openSession(connection);
+      .openSession(getExecutorType(), connection);
     this.connectionMetadataDefaultCatalog = catalog;
     this.connectionMetadataDefaultSchema = schema;
+  }
+
+  protected ExecutorType getExecutorType() {
+    if (Context.getProcessEngineConfiguration().isJdbcBatchProcessing()) {
+      return ExecutorType.BATCH;
+    } else {
+      return ExecutorType.SIMPLE;
+    }
+  }
+
+  @Override
+  public List<BatchResult> flushOperations() {
+    return sqlSession.flushStatements();
   }
 
   // select ////////////////////////////////////////////
@@ -118,7 +133,7 @@ public class DbSqlSession extends AbstractPersistenceSession {
     // Id using the DbIdGenerator while performing a deployment.
     if (!DbSqlSessionFactory.H2.equals(dbSqlSessionFactory.getDatabaseType())) {
       String mappedStatement = dbSqlSessionFactory.mapStatement(statement);
-      sqlSession.update(mappedStatement, parameter);
+      sqlSession.selectList( mappedStatement, parameter);
     }
   }
 
@@ -214,18 +229,23 @@ public class DbSqlSession extends AbstractPersistenceSession {
 
     LOG.executeDatabaseOperation("UPDATE", dbEntity);
 
-    // execute update
-    int numOfRowsUpdated = executeUpdate(updateStatement, dbEntity);
+    if (Context.getProcessEngineConfiguration().isJdbcBatchProcessing()) {
+      // execute update
+      executeUpdate(updateStatement, dbEntity);
+    } else {
+      // execute update
+      int numOfRowsUpdated = executeUpdate(updateStatement, dbEntity);
 
-    if (dbEntity instanceof HasDbRevision) {
-      if(numOfRowsUpdated != 1) {
-        // failed with optimistic locking
-        operation.setFailed(true);
-        return;
-      } else {
-        // increment revision of our copy
-        HasDbRevision versionedObject = (HasDbRevision) dbEntity;
-        versionedObject.setRevision(versionedObject.getRevisionNext());
+      if (dbEntity instanceof HasDbRevision) {
+        if (numOfRowsUpdated != 1) {
+          // failed with optimistic locking
+          operation.setFailed(true);
+          return;
+        } else {
+          // increment revision of our copy
+          HasDbRevision versionedObject = (HasDbRevision) dbEntity;
+          versionedObject.setRevision(versionedObject.getRevisionNext());
+        }
       }
     }
 
