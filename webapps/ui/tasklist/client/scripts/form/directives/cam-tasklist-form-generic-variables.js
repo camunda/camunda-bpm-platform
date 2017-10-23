@@ -20,7 +20,7 @@ module.exports = ['camAPI', 'Notifications', '$translate', 'unfixDate', function
       /**
        * initial setup
        */
-      
+
       var Task = camAPI.resource('task');
       var ProcessInstance = camAPI.resource('process-instance');
       var CaseInstance = camAPI.resource('case-instance');
@@ -55,16 +55,12 @@ module.exports = ['camAPI', 'Notifications', '$translate', 'unfixDate', function
       } else if(id) {
         $scope.readonly = true;
         var resource = params.processInstanceId ? ProcessInstance : CaseInstance;
-
         resource.get(id)
           .then(function(res) {
             if(res.businessKey) {
               $scope.showBusinessKey = true;
               $scope.businessKey = res.businessKey;
             }
-          })
-          .catch(function() {
-            $scope.tasklistForm.$error = {message: 'API_FAILED_BUSINESS_KEY'};
           });
       } else {
         $scope.showBusinessKey = true;
