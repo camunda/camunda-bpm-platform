@@ -52,7 +52,7 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
   protected String[] activityInstanceIds;
   protected String[] tenantIds;
   protected String[] processInstanceIds;
-
+  protected String processDefinitionId;
   protected boolean includeDeleted = false;
 
   protected boolean isByteArrayFetchingEnabled = true;
@@ -281,6 +281,17 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
   @Override
   public HistoricVariableInstanceQuery includeDeleted() {
     includeDeleted = true;
+    return this;
+  }
+
+  public String getProcessDefinitionId() {
+    return processDefinitionId;
+  }
+
+  @Override
+  public HistoricVariableInstanceQuery processDefinitionId(String processDefinitionId) {
+    ensureNotNull("processDefinitionId", processDefinitionId);
+    this.processDefinitionId = processDefinitionId;
     return this;
   }
 }

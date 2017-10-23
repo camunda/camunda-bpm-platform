@@ -42,6 +42,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.anyString;
 
 public class HistoricVariableInstanceRestServiceQueryTest extends AbstractRestServiceTest {
 
@@ -789,6 +790,37 @@ public class HistoricVariableInstanceRestServiceQueryTest extends AbstractRestSe
         .get(HISTORIC_VARIABLE_INSTANCE_RESOURCE_URL);
 
     verify(mockedQuery).includeDeleted();
+  }
+
+  @Test
+  public void testHistoricVariableQueryByProcessDefinitionIdAsPost() {
+    when(mockedQuery.processDefinitionId(anyString())).thenReturn(mockedQuery);
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("processDefinitionId", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(json)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(HISTORIC_VARIABLE_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).processDefinitionId(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
+  }
+
+  @Test
+  public void testHistoricVariableQueryByProcessDefinitionId() {
+    when(mockedQuery.processDefinitionId(anyString())).thenReturn(mockedQuery);
+
+    given()
+      .queryParameter("processDefinitionId", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(HISTORIC_VARIABLE_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).processDefinitionId(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
   }
 
   private List<HistoricVariableInstance> createMockHistoricVariableInstancesTwoTenants() {

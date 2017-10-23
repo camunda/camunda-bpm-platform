@@ -45,6 +45,7 @@ public class HistoricVariableInstanceQueryDto extends AbstractQueryDto<HistoricV
   }
 
   protected String processInstanceId;
+  protected String processDefinitionId;
   protected String caseInstanceId;
   protected String variableName;
   protected String variableNameLike;
@@ -69,6 +70,11 @@ public class HistoricVariableInstanceQueryDto extends AbstractQueryDto<HistoricV
   @CamundaQueryParam("processInstanceId")
   public void setProcessInstanceId(String processInstanceId) {
     this.processInstanceId = processInstanceId;
+  }
+
+  @CamundaQueryParam("processDefinitionId")
+  public void setProcessDefinitionId(String processDefinitionId) {
+    this.processDefinitionId = processDefinitionId;
   }
 
   @CamundaQueryParam("caseInstanceId")
@@ -154,6 +160,9 @@ public class HistoricVariableInstanceQueryDto extends AbstractQueryDto<HistoricV
   protected void applyFilters(HistoricVariableInstanceQuery query) {
     if (processInstanceId != null) {
       query.processInstanceId(processInstanceId);
+    }
+    if (processDefinitionId != null) {
+      query.processDefinitionId(processDefinitionId);
     }
     if (caseInstanceId != null) {
       query.caseInstanceId(caseInstanceId);
