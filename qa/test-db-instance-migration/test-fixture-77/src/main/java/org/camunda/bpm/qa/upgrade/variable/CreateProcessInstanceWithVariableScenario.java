@@ -1,0 +1,29 @@
+package org.camunda.bpm.qa.upgrade.variable;
+
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.runtime.Execution;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.qa.upgrade.DescribesScenario;
+import org.camunda.bpm.qa.upgrade.ScenarioSetup;
+
+public class CreateProcessInstanceWithVariableScenario {
+
+  @Deployment
+  public static String deployProcess() {
+    return "org/camunda/bpm/qa/upgrade/variable/simpleProcess.bpmn20.xml";
+  }
+
+  @DescribesScenario("initProcessInstance")
+  public static ScenarioSetup initProcessInstance() {
+    return new ScenarioSetup() {
+      public void execute(ProcessEngine engine, String scenarioName) {
+        // given
+        ProcessInstance processInstance = engine.getRuntimeService().startProcessInstanceByKey("Process", "process");
+        // when
+        Execution execution = engine.getRuntimeService().createExecutionQuery().processInstanceId(processInstance.getId()).singleResult();
+        engine.getRuntimeService().setVariable(execution.getId(), "foo", "bar");
+      }
+    };
+  }
+}

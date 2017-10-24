@@ -246,7 +246,7 @@
         and RES.NAME_ like #{variableNameLike} ESCAPE #{escapeChar}
       </if>
       <if test="includeDeleted == false">
-        and RES.STATE_ != 'DELETED'
+        and (RES.STATE_ != 'DELETED' or RES.STATE_ is null)
       </if>
 
       <!-- processInstanceIds -->
