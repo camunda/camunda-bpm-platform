@@ -116,10 +116,10 @@ public class HistoryCleanupRestServiceInteractionTest extends AbstractRestServic
   }
 
   @Test
-  public void testHistoryConfiguration() throws ParseException {
+  public void testHistoryConfigurationOutsideBatchWindow() throws ParseException {
     ProcessEngineConfigurationImpl processEngineConfigurationImplMock = mock(ProcessEngineConfigurationImpl.class);
-    Date startDate = HistoryCleanupHelper.parseTimeConfiguration("23:59");
-    Date endDate = HistoryCleanupHelper.parseTimeConfiguration("00:00");
+    Date startDate = HistoryCleanupHelper.parseTimeConfiguration("23:59+0200");
+    Date endDate = HistoryCleanupHelper.parseTimeConfiguration("00:00+0200");
     when(processEngine.getProcessEngineConfiguration()).thenReturn(processEngineConfigurationImplMock);
     when(processEngineConfigurationImplMock.getHistoryCleanupBatchWindowStartTimeAsDate()).thenReturn(startDate);
     when(processEngineConfigurationImplMock.getHistoryCleanupBatchWindowEndTimeAsDate()).thenReturn(endDate);
@@ -150,10 +150,10 @@ public class HistoryCleanupRestServiceInteractionTest extends AbstractRestServic
   }
 
   @Test
-  public void testHistoryConfiguration2() throws ParseException {
+  public void testHistoryConfigurationWithinBatchWindow() throws ParseException {
     ProcessEngineConfigurationImpl processEngineConfigurationImplMock = mock(ProcessEngineConfigurationImpl.class);
-    Date startDate = HistoryCleanupHelper.parseTimeConfiguration("22:00");
-    Date endDate = HistoryCleanupHelper.parseTimeConfiguration("23:00");
+    Date startDate = HistoryCleanupHelper.parseTimeConfiguration("22:00+0200");
+    Date endDate = HistoryCleanupHelper.parseTimeConfiguration("23:00+0200");
     when(processEngine.getProcessEngineConfiguration()).thenReturn(processEngineConfigurationImplMock);
     when(processEngineConfigurationImplMock.getHistoryCleanupBatchWindowStartTimeAsDate()).thenReturn(startDate);
     when(processEngineConfigurationImplMock.getHistoryCleanupBatchWindowEndTimeAsDate()).thenReturn(endDate);
