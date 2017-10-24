@@ -111,8 +111,8 @@ module.exports = function(pluginDependencies) {
       getUserProfile($scope.authentication);
     }]);
 
-  if (typeof window.adminConf !== 'undefined' && window.adminConf.polyfills) {
-    var polyfills = window.adminConf.polyfills;
+  if (typeof window.camAdminConf !== 'undefined' && window.camAdminConf.polyfills) {
+    var polyfills = window.camAdminConf.polyfills;
 
     if (polyfills.indexOf('placeholder') > -1) {
       var load = window.requirejs;

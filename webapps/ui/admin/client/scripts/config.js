@@ -12,5 +12,9 @@ window.camAdminConf = {
   //     // with a file called `scripts.js` in it and defining the `custom-ui` AMD module
   //     'custom-ui': 'custom-ui/scripts'
   //   }
+  // },
+  // 'locales': {
+  //   'availableLocales': ['en', 'de'],
+  //   'fallbackLocale': 'en'
   // }
 };
