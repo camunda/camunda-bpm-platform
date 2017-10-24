@@ -77,7 +77,7 @@ module.exports = function(pluginDependencies) {
       }]);
     }];
 
-  appNgModule.provider('configuration', require('./../../../common/scripts/services/cam-configuration')(window.cockpitConf, 'Cockpit'));
+  appNgModule.provider('configuration', require('./../../../common/scripts/services/cam-configuration')(window.camCockpitConf, 'Cockpit'));
   appNgModule.config(ModuleConfig);
 
   require('./../../../common/scripts/services/locales')(appNgModule, getUri('app-root'), 'cockpit');
@@ -102,8 +102,8 @@ module.exports = function(pluginDependencies) {
     }]);
 
 
-  if (typeof window.cockpitConf !== 'undefined' && window.cockpitConf.polyfills) {
-    var polyfills = window.cockpitConf.polyfills;
+  if (typeof window.camCockpitConf !== 'undefined' && window.camCockpitConf.polyfills) {
+    var polyfills = window.camCockpitConf.polyfills;
 
     if (polyfills.indexOf('placeholder') > -1) {
       var load = window.requirejs;
