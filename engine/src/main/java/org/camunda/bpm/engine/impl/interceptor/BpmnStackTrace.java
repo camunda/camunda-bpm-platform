@@ -15,7 +15,9 @@ package org.camunda.bpm.engine.impl.interceptor;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 
@@ -55,9 +57,9 @@ public class BpmnStackTrace {
     // log the failed operation verbosely
     writeInvocation(perfromedInvocations.get(perfromedInvocations.size() - 1), writer);
 
-    // log human consumable trace of activity ids only
-    List<String> activities = collectActivityTrace();
-    logActivityTrace(writer, activities);
+    // log human consumable trace of activity ids and names
+    List<Map<String, String>> activityTrace = collectActivityTrace();
+    logActivityTrace(writer, activityTrace);
   }
 
   protected void logVerbose(StringWriter writer) {
@@ -68,31 +70,50 @@ public class BpmnStackTrace {
     }
   }
 
-  protected void logActivityTrace(StringWriter writer, List<String> activities) {
+  protected void logActivityTrace(StringWriter writer, List<Map<String, String>> activities) {
     for (int i = 0; i < activities.size(); i++) {
       if(i != 0) {
         writer.write("\t  ^\n");
         writer.write("\t  |\n");
       }
       writer.write("\t");
-      writer.write(activities.get(i));
+
+      Map<String, String> activity = activities.get(i);
+      String activityId = activity.get("activityId");
+      writer.write(activityId);
+
+      String activityName = activity.get("activityName");
+      if (activityName != null) {
+        writer.write(", name=");
+        writer.write(activityName);
+      }
+
       writer.write("\n");
     }
   }
 
-  protected List<String> collectActivityTrace() {
-    List<String> activities = new ArrayList<String>();
+  protected List<Map<String, String>> collectActivityTrace() {
+    List<Map<String, String>> activityTrace = new ArrayList<Map<String, String>>();
     for (AtomicOperationInvocation atomicOperationInvocation : perfromedInvocations) {
       String activityId = atomicOperationInvocation.getActivityId();
       if(activityId == null) {
         continue;
       }
-      if(activities.isEmpty() ||
-          !activityId.equals(activities.get(0))) {
-        activities.add(0, activityId);
+
+      Map<String, String> activity = new HashMap<String, String>();
+      activity.put("activityId", activityId);
+
+      String activityName = atomicOperationInvocation.getActivityName();
+      if (activityName != null) {
+        activity.put("activityName", activityName);
+      }
+
+      if(activityTrace.isEmpty() ||
+          !activity.get("activityId").equals(activityTrace.get(0).get("activityId"))) {
+        activityTrace.add(0, activity);
       }
     }
-    return activities;
+    return activityTrace;
   }
 
   public void add(AtomicOperationInvocation atomicOperationInvocation) {

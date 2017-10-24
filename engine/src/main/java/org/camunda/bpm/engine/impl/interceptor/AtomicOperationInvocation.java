@@ -38,6 +38,7 @@ public class AtomicOperationInvocation {
   // for logging
   protected String applicationContextName = null;
   protected String activityId = null;
+  protected String activityName = null;
 
   public AtomicOperationInvocation(AtomicOperation operation, ExecutionEntity execution, boolean performAsync) {
     init(operation, execution, performAsync);
@@ -80,6 +81,7 @@ public class AtomicOperationInvocation {
       applicationContextName = currentPa.getName();
     }
     activityId = execution.getActivityId();
+    activityName = execution.getCurrentActivityName();
     stackTrace.add(this);
 
     try {
@@ -116,6 +118,10 @@ public class AtomicOperationInvocation {
 
   public String getActivityId() {
     return activityId;
+  }
+
+  public String getActivityName() {
+    return activityName;
   }
 
 }
