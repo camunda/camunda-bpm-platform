@@ -148,6 +148,7 @@
            is-sidebar-collapsed="onDiagramCollapseChange(collapsed)"
            ctn-collapsable="top">
         <div process-diagram="processDiagram"
+             key="{{processDefinition.id}}"
              on-element-click="handleBpmnElementSelection(id, $event)"
              selection="filter"
              process-data="processData"
