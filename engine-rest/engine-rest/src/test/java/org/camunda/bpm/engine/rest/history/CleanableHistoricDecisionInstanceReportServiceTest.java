@@ -21,6 +21,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -126,6 +127,7 @@ public class CleanableHistoricDecisionInstanceReportServiceTest extends Abstract
 
     InOrder inOrder = Mockito.inOrder(historicDecisionInstanceReport);
     inOrder.verify(historicDecisionInstanceReport).list();
+    verifyNoMoreInteractions(historicDecisionInstanceReport);
   }
 
   @Test
@@ -191,7 +193,9 @@ public class CleanableHistoricDecisionInstanceReportServiceTest extends Abstract
 
     verify(historicDecisionInstanceReport).decisionDefinitionIdIn(EXAMPLE_DD_ID, ANOTHER_EXAMPLE_DD_ID);
     verify(historicDecisionInstanceReport).list();
+    verifyNoMoreInteractions(historicDecisionInstanceReport);
   }
+
   @Test
   public void testQueryByDefinitionKey() {
     given()
@@ -205,6 +209,7 @@ public class CleanableHistoricDecisionInstanceReportServiceTest extends Abstract
 
     verify(historicDecisionInstanceReport).decisionDefinitionKeyIn(EXAMPLE_DD_KEY, ANOTHER_EXAMPLE_DD_KEY);
     verify(historicDecisionInstanceReport).list();
+    verifyNoMoreInteractions(historicDecisionInstanceReport);
   }
 
   @Test
@@ -220,6 +225,7 @@ public class CleanableHistoricDecisionInstanceReportServiceTest extends Abstract
 
     verify(historicDecisionInstanceReport).tenantIdIn(EXAMPLE_TENANT_ID, ANOTHER_EXAMPLE_TENANT_ID);
     verify(historicDecisionInstanceReport).list();
+    verifyNoMoreInteractions(historicDecisionInstanceReport);
   }
 
   @Test
@@ -235,6 +241,7 @@ public class CleanableHistoricDecisionInstanceReportServiceTest extends Abstract
 
     verify(historicDecisionInstanceReport).withoutTenantId();
     verify(historicDecisionInstanceReport).list();
+    verifyNoMoreInteractions(historicDecisionInstanceReport);
   }
 
   @Test
@@ -250,6 +257,7 @@ public class CleanableHistoricDecisionInstanceReportServiceTest extends Abstract
 
     verify(historicDecisionInstanceReport).compact();
     verify(historicDecisionInstanceReport).list();
+    verifyNoMoreInteractions(historicDecisionInstanceReport);
   }
 
   @Test
@@ -276,6 +284,7 @@ public class CleanableHistoricDecisionInstanceReportServiceTest extends Abstract
       .get(HISTORIC_REPORT_COUNT_URL);
 
     verify(historicDecisionInstanceReport).count();
+    verifyNoMoreInteractions(historicDecisionInstanceReport);
   }
 
   @Test
@@ -302,8 +311,10 @@ public class CleanableHistoricDecisionInstanceReportServiceTest extends Abstract
     .when()
         .get(HISTORIC_REPORT_URL);
 
-    verify(historicDecisionInstanceReport).orderByFinishedDecisionInstance();
+    verify(historicDecisionInstanceReport).orderByFinished();
     verify(historicDecisionInstanceReport).asc();
+    verify(historicDecisionInstanceReport).list();
+    verifyNoMoreInteractions(historicDecisionInstanceReport);
   }
 
   @Test
@@ -316,8 +327,10 @@ public class CleanableHistoricDecisionInstanceReportServiceTest extends Abstract
     .when()
         .get(HISTORIC_REPORT_URL);
 
-    verify(historicDecisionInstanceReport).orderByFinishedDecisionInstance();
+    verify(historicDecisionInstanceReport).orderByFinished();
     verify(historicDecisionInstanceReport).desc();
+    verify(historicDecisionInstanceReport).list();
+    verifyNoMoreInteractions(historicDecisionInstanceReport);
   }
 
   @Test

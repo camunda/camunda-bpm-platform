@@ -56,6 +56,6 @@ public interface CleanableHistoricDecisionInstanceReport extends Query<Cleanable
   /**
    * Order by finished decision instances amount (needs to be followed by {@link #asc()} or {@link #desc()}).
    */
-  CleanableHistoricDecisionInstanceReport orderByFinishedDecisionInstance();
+  CleanableHistoricDecisionInstanceReport orderByFinished();
 
 }

@@ -21,6 +21,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -125,6 +126,7 @@ public class CleanableHistoricCaseInstanceReportServiceTest extends AbstractRest
 
     InOrder inOrder = Mockito.inOrder(historicCaseInstanceReport);
     inOrder.verify(historicCaseInstanceReport).list();
+    verifyNoMoreInteractions(historicCaseInstanceReport);
   }
 
   @Test
@@ -168,7 +170,6 @@ public class CleanableHistoricCaseInstanceReportServiceTest extends AbstractRest
     String message = "not authorized";
     when(historicCaseInstanceReport.list()).thenThrow(new AuthorizationException(message));
 
-
     given()
     .then().expect()
       .statusCode(Status.FORBIDDEN.getStatusCode())
@@ -191,7 +192,9 @@ public class CleanableHistoricCaseInstanceReportServiceTest extends AbstractRest
 
     verify(historicCaseInstanceReport).caseDefinitionIdIn(EXAMPLE_CD_ID, ANOTHER_EXAMPLE_CD_ID);
     verify(historicCaseInstanceReport).list();
+    verifyNoMoreInteractions(historicCaseInstanceReport);
   }
+
   @Test
   public void testQueryByDefinitionKey() {
     given()
@@ -205,6 +208,7 @@ public class CleanableHistoricCaseInstanceReportServiceTest extends AbstractRest
 
     verify(historicCaseInstanceReport).caseDefinitionKeyIn(EXAMPLE_CD_KEY, ANOTHER_EXAMPLE_CD_KEY);
     verify(historicCaseInstanceReport).list();
+    verifyNoMoreInteractions(historicCaseInstanceReport);
   }
 
   @Test
@@ -220,6 +224,7 @@ public class CleanableHistoricCaseInstanceReportServiceTest extends AbstractRest
 
     verify(historicCaseInstanceReport).tenantIdIn(EXAMPLE_TENANT_ID, ANOTHER_EXAMPLE_TENANT_ID);
     verify(historicCaseInstanceReport).list();
+    verifyNoMoreInteractions(historicCaseInstanceReport);
   }
 
   @Test
@@ -235,6 +240,7 @@ public class CleanableHistoricCaseInstanceReportServiceTest extends AbstractRest
 
     verify(historicCaseInstanceReport).withoutTenantId();
     verify(historicCaseInstanceReport).list();
+    verifyNoMoreInteractions(historicCaseInstanceReport);
   }
 
   @Test
@@ -250,6 +256,7 @@ public class CleanableHistoricCaseInstanceReportServiceTest extends AbstractRest
 
     verify(historicCaseInstanceReport).compact();
     verify(historicCaseInstanceReport).list();
+    verifyNoMoreInteractions(historicCaseInstanceReport);
   }
 
   @Test
@@ -276,6 +283,7 @@ public class CleanableHistoricCaseInstanceReportServiceTest extends AbstractRest
       .get(HISTORIC_REPORT_COUNT_URL);
 
     verify(historicCaseInstanceReport).count();
+    verifyNoMoreInteractions(historicCaseInstanceReport);
   }
 
   @Test
@@ -302,8 +310,10 @@ public class CleanableHistoricCaseInstanceReportServiceTest extends AbstractRest
     .when()
       .get(HISTORIC_REPORT_URL);
 
-    verify(historicCaseInstanceReport).orderByFinishedCaseInstance();
+    verify(historicCaseInstanceReport).orderByFinished();
     verify(historicCaseInstanceReport).asc();
+    verify(historicCaseInstanceReport).list();
+    verifyNoMoreInteractions(historicCaseInstanceReport);
   }
 
   @Test
@@ -316,8 +326,10 @@ public class CleanableHistoricCaseInstanceReportServiceTest extends AbstractRest
     .when()
       .get(HISTORIC_REPORT_URL);
 
-    verify(historicCaseInstanceReport).orderByFinishedCaseInstance();
+    verify(historicCaseInstanceReport).orderByFinished();
     verify(historicCaseInstanceReport).desc();
+    verify(historicCaseInstanceReport).list();
+    verifyNoMoreInteractions(historicCaseInstanceReport);
   }
 
   @Test

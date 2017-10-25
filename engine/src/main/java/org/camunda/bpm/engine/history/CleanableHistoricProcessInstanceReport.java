@@ -56,6 +56,6 @@ public interface CleanableHistoricProcessInstanceReport extends Query<CleanableH
   /**
    * Order by finished process instances amount (needs to be followed by {@link #asc()} or {@link #desc()}).
    */
-  CleanableHistoricProcessInstanceReport orderByFinishedProcessInstance();
+  CleanableHistoricProcessInstanceReport orderByFinished();
 
 }

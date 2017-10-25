@@ -56,6 +56,6 @@ public interface CleanableHistoricCaseInstanceReport extends Query<CleanableHist
   /**
    * Order by finished case instances amount (needs to be followed by {@link #asc()} or {@link #desc()}).
    */
-  CleanableHistoricCaseInstanceReport orderByFinishedCaseInstance();
+  CleanableHistoricCaseInstanceReport orderByFinished();
 
 }

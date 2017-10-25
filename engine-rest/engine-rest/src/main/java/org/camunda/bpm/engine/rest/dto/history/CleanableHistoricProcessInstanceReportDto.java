@@ -110,7 +110,7 @@ public class CleanableHistoricProcessInstanceReportDto extends AbstractQueryDto<
   @Override
   protected void applySortBy(CleanableHistoricProcessInstanceReport query, String sortBy, Map<String, Object> parameters, ProcessEngine engine) {
     if (sortBy.equals(SORT_BY_FINISHED_VALUE)) {
-      query.orderByFinishedProcessInstance();
+      query.orderByFinished();
     }
   }
 }

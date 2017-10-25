@@ -244,7 +244,7 @@ public class CleanableHistoricDecisionInstanceReportTest {
   }
 
   @Test
-  public void testReportOrderByFinishedProcessInstanceAsc() {
+  public void testReportOrderByFinishedAsc() {
     // give
     testRule.deploy("org/camunda/bpm/engine/test/repository/two.dmn", "org/camunda/bpm/engine/test/api/dmn/Another_Example.dmn");
     prepareDecisionInstances(SECOND_DECISION_DEFINITION_KEY, -6, 5, 6);
@@ -254,7 +254,7 @@ public class CleanableHistoricDecisionInstanceReportTest {
     // when
     List<CleanableHistoricDecisionInstanceReportResult> reportResult = historyService
         .createCleanableHistoricDecisionInstanceReport()
-        .orderByFinishedDecisionInstance()
+        .orderByFinished()
         .asc()
         .list();
 
@@ -266,7 +266,7 @@ public class CleanableHistoricDecisionInstanceReportTest {
   }
 
   @Test
-  public void testReportOrderByFinishedProcessInstanceDesc() {
+  public void testReportOrderByFinishedDesc() {
     // give
     testRule.deploy("org/camunda/bpm/engine/test/repository/two.dmn", "org/camunda/bpm/engine/test/api/dmn/Another_Example.dmn");
     prepareDecisionInstances(SECOND_DECISION_DEFINITION_KEY, -6, 5, 6);
@@ -276,7 +276,7 @@ public class CleanableHistoricDecisionInstanceReportTest {
     // when
     List<CleanableHistoricDecisionInstanceReportResult> reportResult = historyService
         .createCleanableHistoricDecisionInstanceReport()
-        .orderByFinishedDecisionInstance()
+        .orderByFinished()
         .desc()
         .list();
 

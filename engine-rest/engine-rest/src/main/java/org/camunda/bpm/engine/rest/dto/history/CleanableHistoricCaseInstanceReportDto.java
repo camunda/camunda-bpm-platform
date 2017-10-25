@@ -110,7 +110,7 @@ public class CleanableHistoricCaseInstanceReportDto extends AbstractQueryDto<Cle
   @Override
   protected void applySortBy(CleanableHistoricCaseInstanceReport query, String sortBy, Map<String, Object> parameters, ProcessEngine engine) {
     if (sortBy.equals(SORT_BY_FINISHED_VALUE)) {
-      query.orderByFinishedCaseInstance();
+      query.orderByFinished();
     }
   }
 }

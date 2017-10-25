@@ -277,7 +277,7 @@ public class CleanableHistoricProcessInstanceReportTest {
   }
 
   @Test
-  public void testReportOrderByFinishedProcessInstanceAsc() {
+  public void testReportOrderByFinishedAsc() {
     testRule.deploy(createProcessWithUserTask(SECOND_PROCESS_DEFINITION_KEY));
     testRule.deploy(createProcessWithUserTask(THIRD_PROCESS_DEFINITION_KEY));
     // given
@@ -288,7 +288,7 @@ public class CleanableHistoricProcessInstanceReportTest {
     // when
     List<CleanableHistoricProcessInstanceReportResult> reportResult = historyService
         .createCleanableHistoricProcessInstanceReport()
-        .orderByFinishedProcessInstance()
+        .orderByFinished()
         .asc()
         .list();
 
@@ -300,7 +300,7 @@ public class CleanableHistoricProcessInstanceReportTest {
   }
 
   @Test
-  public void testReportOrderByFinishedProcessInstanceDesc() {
+  public void testReportOrderByFinishedDesc() {
     testRule.deploy(createProcessWithUserTask(SECOND_PROCESS_DEFINITION_KEY));
     testRule.deploy(createProcessWithUserTask(THIRD_PROCESS_DEFINITION_KEY));
     // given
@@ -311,7 +311,7 @@ public class CleanableHistoricProcessInstanceReportTest {
     // when
     List<CleanableHistoricProcessInstanceReportResult> reportResult = historyService
         .createCleanableHistoricProcessInstanceReport()
-        .orderByFinishedProcessInstance()
+        .orderByFinished()
         .desc()
         .list();
 

@@ -266,7 +266,7 @@ public class CleanableHistoricCaseInstanceReportTest {
   }
 
   @Test
-  public void testReportOrderByFinishedProcessInstanceAsc() {
+  public void testReportOrderByFinishedAsc() {
     // given
     testRule.deploy("org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn", "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn");
     prepareCaseInstances(THIRD_CASE_DEFINITION_KEY, -6, 5, 8);
@@ -276,7 +276,7 @@ public class CleanableHistoricCaseInstanceReportTest {
     // when
     List<CleanableHistoricCaseInstanceReportResult> reportResult = historyService
         .createCleanableHistoricCaseInstanceReport()
-        .orderByFinishedCaseInstance()
+        .orderByFinished()
         .asc()
         .list();
 
@@ -288,7 +288,7 @@ public class CleanableHistoricCaseInstanceReportTest {
   }
 
   @Test
-  public void testReportOrderByFinishedProcessInstanceDesc() {
+  public void testReportOrderByFinishedDesc() {
     // given
     testRule.deploy("org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn", "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn");
     prepareCaseInstances(THIRD_CASE_DEFINITION_KEY, -6, 5, 8);
@@ -298,7 +298,7 @@ public class CleanableHistoricCaseInstanceReportTest {
     // when
     List<CleanableHistoricCaseInstanceReportResult> reportResult = historyService
         .createCleanableHistoricCaseInstanceReport()
-        .orderByFinishedCaseInstance()
+        .orderByFinished()
         .desc()
         .list();
 

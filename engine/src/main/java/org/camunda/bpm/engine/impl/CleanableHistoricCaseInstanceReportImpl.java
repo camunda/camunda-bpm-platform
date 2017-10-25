@@ -76,7 +76,7 @@ public class CleanableHistoricCaseInstanceReportImpl extends AbstractQuery<Clean
   }
 
   @Override
-  public CleanableHistoricCaseInstanceReport orderByFinishedCaseInstance() {
+  public CleanableHistoricCaseInstanceReport orderByFinished() {
     orderBy(CleanableHistoricInstanceReportProperty.FINISHED_AMOUNT);
     return this;
   }

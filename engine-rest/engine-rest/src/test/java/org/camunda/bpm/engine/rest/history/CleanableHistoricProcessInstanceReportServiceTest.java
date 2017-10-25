@@ -21,6 +21,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -123,6 +124,7 @@ public class CleanableHistoricProcessInstanceReportServiceTest extends AbstractR
 
     InOrder inOrder = Mockito.inOrder(historicProcessInstanceReport);
     inOrder.verify(historicProcessInstanceReport).list();
+    verifyNoMoreInteractions(historicProcessInstanceReport);
   }
 
   @Test
@@ -166,7 +168,6 @@ public class CleanableHistoricProcessInstanceReportServiceTest extends AbstractR
     String message = "not authorized";
     when(historicProcessInstanceReport.list()).thenThrow(new AuthorizationException(message));
 
-
     given()
     .then().expect()
       .statusCode(Status.FORBIDDEN.getStatusCode())
@@ -189,6 +190,7 @@ public class CleanableHistoricProcessInstanceReportServiceTest extends AbstractR
 
     verify(historicProcessInstanceReport).processDefinitionIdIn(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID);
     verify(historicProcessInstanceReport).list();
+    verifyNoMoreInteractions(historicProcessInstanceReport);
   }
 
   @Test
@@ -204,6 +206,7 @@ public class CleanableHistoricProcessInstanceReportServiceTest extends AbstractR
 
     verify(historicProcessInstanceReport).processDefinitionKeyIn(EXAMPLE_PD_KEY, ANOTHER_EXAMPLE_PD_KEY);
     verify(historicProcessInstanceReport).list();
+    verifyNoMoreInteractions(historicProcessInstanceReport);
   }
 
   @Test
@@ -219,6 +222,7 @@ public class CleanableHistoricProcessInstanceReportServiceTest extends AbstractR
 
     verify(historicProcessInstanceReport).tenantIdIn(EXAMPLE_TENANT_ID, ANOTHER_EXAMPLE_TENANT_ID);
     verify(historicProcessInstanceReport).list();
+    verifyNoMoreInteractions(historicProcessInstanceReport);
   }
 
   @Test
@@ -234,6 +238,7 @@ public class CleanableHistoricProcessInstanceReportServiceTest extends AbstractR
 
     verify(historicProcessInstanceReport).withoutTenantId();
     verify(historicProcessInstanceReport).list();
+    verifyNoMoreInteractions(historicProcessInstanceReport);
   }
 
   @Test
@@ -249,6 +254,7 @@ public class CleanableHistoricProcessInstanceReportServiceTest extends AbstractR
 
     verify(historicProcessInstanceReport).compact();
     verify(historicProcessInstanceReport).list();
+    verifyNoMoreInteractions(historicProcessInstanceReport);
   }
 
   @Test
@@ -275,6 +281,7 @@ public class CleanableHistoricProcessInstanceReportServiceTest extends AbstractR
       .get(HISTORIC_REPORT_COUNT_URL);
 
     verify(historicProcessInstanceReport).count();
+    verifyNoMoreInteractions(historicProcessInstanceReport);
   }
 
   @Test
@@ -301,8 +308,10 @@ public class CleanableHistoricProcessInstanceReportServiceTest extends AbstractR
     .when()
       .get(HISTORIC_REPORT_URL);
 
-    verify(historicProcessInstanceReport).orderByFinishedProcessInstance();
+    verify(historicProcessInstanceReport).orderByFinished();
     verify(historicProcessInstanceReport).asc();
+    verify(historicProcessInstanceReport).list();
+    verifyNoMoreInteractions(historicProcessInstanceReport);
   }
 
   @Test
@@ -315,8 +324,10 @@ public class CleanableHistoricProcessInstanceReportServiceTest extends AbstractR
     .when()
       .get(HISTORIC_REPORT_URL);
 
-    verify(historicProcessInstanceReport).orderByFinishedProcessInstance();
+    verify(historicProcessInstanceReport).orderByFinished();
     verify(historicProcessInstanceReport).desc();
+    verify(historicProcessInstanceReport).list();
+    verifyNoMoreInteractions(historicProcessInstanceReport);
   }
 
   @Test

@@ -76,7 +76,7 @@ public class CleanableHistoricDecisionInstanceReportImpl extends AbstractQuery<C
   }
 
   @Override
-  public CleanableHistoricDecisionInstanceReport orderByFinishedDecisionInstance() {
+  public CleanableHistoricDecisionInstanceReport orderByFinished() {
     orderBy(CleanableHistoricInstanceReportProperty.FINISHED_AMOUNT);
     return this;
   }
