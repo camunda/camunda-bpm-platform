@@ -225,14 +225,14 @@ public class CleanableHistoricProcessInstanceReportTest {
     CleanableHistoricProcessInstanceReport report = historyService.createCleanableHistoricProcessInstanceReport();
 
     try {
-      report.processDefinitionIdIn((String) null);
+      report.processDefinitionIdIn(null);
       fail("Expected NotValidException");
     } catch (NotValidException e) {
       // expected
     }
 
     try {
-      report.processDefinitionIdIn("abc", (String) null, "def");
+      report.processDefinitionIdIn("abc", null, "def");
       fail("Expected NotValidException");
     } catch (NotValidException e) {
       // expected
@@ -244,14 +244,14 @@ public class CleanableHistoricProcessInstanceReportTest {
     CleanableHistoricProcessInstanceReport report = historyService.createCleanableHistoricProcessInstanceReport();
 
     try {
-      report.processDefinitionKeyIn((String) null);
+      report.processDefinitionKeyIn(null);
       fail("Expected NotValidException");
     } catch (NotValidException e) {
       // expected
     }
 
     try {
-      report.processDefinitionKeyIn("abc", (String) null, "def");
+      report.processDefinitionKeyIn("abc", null, "def");
       fail("Expected NotValidException");
     } catch (NotValidException e) {
       // expected

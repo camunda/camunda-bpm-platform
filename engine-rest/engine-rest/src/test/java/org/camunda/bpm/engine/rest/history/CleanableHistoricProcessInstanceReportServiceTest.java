@@ -323,14 +323,14 @@ public class CleanableHistoricProcessInstanceReportServiceTest extends AbstractR
   public void testSortOrderParameterOnly() {
     given()
     .queryParam("sortOrder", "asc")
-  .then()
-    .expect()
-      .statusCode(Status.BAD_REQUEST.getStatusCode())
-      .contentType(ContentType.JSON)
-      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-      .body("message", containsString("Only a single sorting parameter specified. sortBy and sortOrder required"))
-    .when()
-      .get(HISTORIC_REPORT_URL);
+    .then()
+      .expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode())
+        .contentType(ContentType.JSON)
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", containsString("Only a single sorting parameter specified. sortBy and sortOrder required"))
+      .when()
+        .get(HISTORIC_REPORT_URL);
   }
 
   @Test

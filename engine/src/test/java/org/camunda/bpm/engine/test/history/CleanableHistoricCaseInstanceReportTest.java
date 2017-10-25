@@ -215,32 +215,33 @@ public class CleanableHistoricCaseInstanceReportTest {
     CleanableHistoricCaseInstanceReport report = historyService.createCleanableHistoricCaseInstanceReport();
 
     try {
-      report.caseDefinitionIdIn((String) null);
+      report.caseDefinitionIdIn(null);
       fail("Expected NotValidException");
     } catch (NotValidException e) {
       // expected
     }
 
     try {
-      report.caseDefinitionIdIn("abc", (String) null, "def");
+      report.caseDefinitionIdIn("abc", null, "def");
       fail("Expected NotValidException");
     } catch (NotValidException e) {
       // expected
     }
   }
 
+  @Test
   public void testReportByInvalidCaseDefinitionKey() {
     CleanableHistoricCaseInstanceReport report = historyService.createCleanableHistoricCaseInstanceReport();
 
     try {
-      report.caseDefinitionKeyIn((String) null);
+      report.caseDefinitionKeyIn(null);
       fail("Expected NotValidException");
     } catch (NotValidException e) {
       // expected
     }
 
     try {
-      report.caseDefinitionKeyIn("abc", (String) null, "def");
+      report.caseDefinitionKeyIn("abc", null, "def");
       fail("Expected NotValidException");
     } catch (NotValidException e) {
       // expected

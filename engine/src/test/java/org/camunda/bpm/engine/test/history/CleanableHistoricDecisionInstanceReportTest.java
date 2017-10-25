@@ -192,14 +192,14 @@ public class CleanableHistoricDecisionInstanceReportTest {
     CleanableHistoricDecisionInstanceReport report = historyService.createCleanableHistoricDecisionInstanceReport();
 
     try {
-      report.decisionDefinitionIdIn((String) null);
+      report.decisionDefinitionIdIn(null);
       fail("Expected NotValidException");
     } catch (NotValidException e) {
       // expected
     }
 
     try {
-      report.decisionDefinitionIdIn("abc", (String) null, "def");
+      report.decisionDefinitionIdIn("abc", null, "def");
       fail("Expected NotValidException");
     } catch (NotValidException e) {
       // expected
@@ -211,14 +211,14 @@ public class CleanableHistoricDecisionInstanceReportTest {
     CleanableHistoricDecisionInstanceReport report = historyService.createCleanableHistoricDecisionInstanceReport();
 
     try {
-      report.decisionDefinitionKeyIn((String) null);
+      report.decisionDefinitionKeyIn(null);
       fail("Expected NotValidException");
     } catch (NotValidException e) {
       // expected
     }
 
     try {
-      report.decisionDefinitionKeyIn("abc", (String) null, "def");
+      report.decisionDefinitionKeyIn("abc", null, "def");
       fail("Expected NotValidException");
     } catch (NotValidException e) {
       // expected
