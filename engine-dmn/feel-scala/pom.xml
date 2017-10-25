@@ -24,6 +24,11 @@
     </dependency>
 
     <dependency>
+      <groupId>com.github.nscala-time</groupId>
+      <artifactId>nscala-time_2.11</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.camunda.bpm.dmn</groupId>
       <artifactId>camunda-engine-dmn</artifactId>
       <scope>test</scope>
