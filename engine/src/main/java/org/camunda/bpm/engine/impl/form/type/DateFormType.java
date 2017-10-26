@@ -64,7 +64,7 @@ public class DateFormType extends AbstractFormFieldType {
         return Variables.dateValue(null);
       }
       try {
-        return Variables.dateValue((Date) dateFormat.parseObject(strValue);
+        return Variables.dateValue((Date) dateFormat.parseObject(strValue));
       } catch (ParseException e) {
         throw new ProcessEngineException("Could not parse value '"+value+"' as date using date format '"+datePattern+"'.");
       }
