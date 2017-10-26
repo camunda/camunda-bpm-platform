@@ -223,7 +223,7 @@ create table ACT_RU_AUTHORIZATION (
   GROUP_ID_ varchar(255),
   USER_ID_ varchar(255),
   RESOURCE_TYPE_ integer not null,
-  RESOURCE_ID_ varchar(64),
+  RESOURCE_ID_ varchar(255),
   PERMS_ integer,
   primary key (ID_),
   UNI_USER_ID_ varchar (255) not null generated always as (case when "USER_ID_" is null then "ID_" else "USER_ID_" end),

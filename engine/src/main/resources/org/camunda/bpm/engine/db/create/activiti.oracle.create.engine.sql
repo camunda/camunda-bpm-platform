@@ -223,7 +223,7 @@ create table ACT_RU_AUTHORIZATION (
   GROUP_ID_ NVARCHAR2(255),
   USER_ID_ NVARCHAR2(255),
   RESOURCE_TYPE_ integer not null,
-  RESOURCE_ID_ NVARCHAR2(64),
+  RESOURCE_ID_ NVARCHAR2(255),
   PERMS_ integer,
   primary key (ID_)
 );
