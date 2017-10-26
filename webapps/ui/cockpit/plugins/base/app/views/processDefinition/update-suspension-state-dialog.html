@@ -124,13 +124,13 @@
       {{'PLUGIN_SUSPENSION_STATE_ACTIVE' | translate}}
     </p>
     <p ng-show="processDefinition.suspended && !data.executeImmediately">
-      {{'PLUGIN_SUSPENSION_ACTIVATION_SCHEDULED_TO' | translate:'{date: data.executionDate | camDate}'}}
+      {{'PLUGIN_SUSPENSION_ACTIVATION_SCHEDULED_TO' | translate:'{date: (data.executionDate | camDate) }'}}
     </p>
     <p ng-show="!processDefinition.suspended && data.executeImmediately">
       {{'PLUGIN_SUSPENSION_STATE_SUSPENDED' | translate}}
     </p>
     <p ng-show="!processDefinition.suspended && !data.executeImmediately">
-      {{'PLUGIN_SUSPENSION_SUSPENSION_SCHEDULED_TO' | translate:'{date: data.executionDate | camDate}'}}
+      {{'PLUGIN_SUSPENSION_SUSPENSION_SCHEDULED_TO' | translate:'{date: (data.executionDate | camDate) }'}}
     </p>
   </div>
 
@@ -139,13 +139,13 @@
       {{'PLUGIN_SUSPENSION_STATE_NOT_ACTIVATED' | translate}}.
     </p>
     <p ng-show="processDefinition.suspended && !data.executeImmediately">
-      {{'PLUGIN_SUSPENSION_ACTIVATION_NOT_SCHEDULED_TO' | translate:'{date: data.executionDate | camDate}'}}
+      {{'PLUGIN_SUSPENSION_ACTIVATION_NOT_SCHEDULED_TO' | translate:'{date: (data.executionDate | camDate) }'}}
     </p>
     <p ng-show="!processDefinition.suspended && data.executeImmediately">
       {{'PLUGIN_SUSPENSION_STATE_NOT_SUSPENDED' | translate}}
     </p>
     <p ng-show="!processDefinition.suspended && !data.executeImmediately">
-      {{'PLUGIN_SUSPENSION_SUSPENSION_NOT_SCHEDULED_TO' | translate:'{date: data.executionDate | camDate}'}}
+      {{'PLUGIN_SUSPENSION_SUSPENSION_NOT_SCHEDULED_TO' | translate:'{date: (data.executionDate | camDate) }'}}
     </p>
   </div>
 
