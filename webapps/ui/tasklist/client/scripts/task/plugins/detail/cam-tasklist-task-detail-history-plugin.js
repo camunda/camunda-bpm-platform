@@ -63,21 +63,27 @@ var Controller = [
     historyData.provide('history', ['task', function(task) {
       var deferred = $q.defer();
 
+
       if (!task) {
         return deferred.resolve(null);
       }
 
       History.userOperation({taskId : task.id}, function(err, res) {
+
         if(err) {
           deferred.reject(err);
-        }
-        else {
+        } else {
           deferred.resolve(res);
         }
+
       });
 
       return deferred.promise;
     }]);
+
+    $scope.opState = historyData.observe('history', function(res) {
+      $scope.userOperations = res.length;
+    });
 
     historyData.provide('comments', ['task', function(task) {
       var deferred = $q.defer();
@@ -87,6 +93,7 @@ var Controller = [
       }
 
       Task.comments(task.id, function(err, res) {
+
         if(err) {
           deferred.reject(err);
         }
@@ -101,6 +108,7 @@ var Controller = [
     historyData.provide('orderedHistoryAndCommentsByDay', ['history', 'comments', function(history, comments) {
       history = history || {};
       comments = comments || {};
+
 
       var days = [],
           i = 0,
