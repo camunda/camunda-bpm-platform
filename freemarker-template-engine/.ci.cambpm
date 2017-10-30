@@ -1,0 +1,1 @@
+buildMavenAndDeployToMavenCentral([jdk:7])
