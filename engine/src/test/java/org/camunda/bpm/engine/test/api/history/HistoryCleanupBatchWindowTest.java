@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang.time.DateUtils;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
@@ -71,6 +72,9 @@ public class HistoryCleanupBatchWindowTest {
   private ProcessEngineConfigurationImpl processEngineConfiguration;
 
   private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+  private static SimpleDateFormat dayFormat = new SimpleDateFormat("yyyy-MM-dd");
+  private static String currentDay = dayFormat.format(new Date());
+  private static String nextDay = dayFormat.format(DateUtils.addDays(new Date(), 1));
 
   @Parameterized.Parameter(0)
   public String startTime;
@@ -91,19 +95,19 @@ public class HistoryCleanupBatchWindowTest {
   public static Collection<Object[]> scenarios() throws ParseException {
     return Arrays.asList(new Object[][] {
         // inside the batch window on the same day
-        { "22:00", "23:00", sdf.parse("2017-09-06T22:00:00"), sdf.parse("2017-09-06T23:00:00"), sdf.parse("2017-09-06T22:15:00")},
+        { "22:00", "23:00", sdf.parse(currentDay + "T22:00:00"), sdf.parse(currentDay+"T23:00:00"), sdf.parse(currentDay + "T22:15:00")} ,
         // inside the batch window on the next day
-        { "23:00", "01:00", sdf.parse("2017-09-06T23:00:00"), sdf.parse("2017-09-07T01:00:00"), sdf.parse("2017-09-07T00:15:00")},
+        { "23:00", "01:00", sdf.parse(currentDay + "T23:00:00"), sdf.parse(nextDay + "T01:00:00"), sdf.parse(nextDay + "T00:15:00")},
         // batch window 24h
-        { "00:00", "00:00", sdf.parse("2017-09-06T00:00:00"), sdf.parse("2017-09-07T00:00:00"), sdf.parse("2017-09-06T15:00:00")},
+        { "00:00", "00:00", sdf.parse(currentDay + "T00:00:00"), sdf.parse(nextDay + "T00:00:00"), sdf.parse(currentDay + "T15:00:00")},
         // batch window 24h
-        { "00:00", "00:00", sdf.parse("2017-09-06T00:00:00"), sdf.parse("2017-09-07T00:00:00"), sdf.parse("2017-09-06T00:00:00")},
+        { "00:00", "00:00", sdf.parse(currentDay + "T00:00:00"), sdf.parse(nextDay + "T00:00:00"), sdf.parse(currentDay + "T00:00:00")},
         // before the batch window on the same day
-        { "22:00", "23:00", sdf.parse("2017-09-06T22:00:00"), sdf.parse("2017-09-06T23:00:00"), sdf.parse("2017-09-06T21:15:00")},
+        { "22:00", "23:00", sdf.parse(currentDay + "T22:00:00"), sdf.parse(currentDay + "T23:00:00"), sdf.parse(currentDay + "T21:15:00")},
         // after the batch window on the same day
-        { "22:00", "23:00", sdf.parse("2017-09-07T22:00:00"), sdf.parse("2017-09-07T23:00:00"), sdf.parse("2017-09-06T23:15:00")},
+        { "22:00", "23:00", sdf.parse(nextDay + "T22:00:00"), sdf.parse(nextDay + "T23:00:00"), sdf.parse(currentDay + "T23:15:00")},
         // after the batch window on the next day
-        { "22:00", "23:00", sdf.parse("2017-09-07T22:00:00"), sdf.parse("2017-09-07T23:00:00"), sdf.parse("2017-09-07T00:15:00")} });
+        { "22:00", "23:00", sdf.parse(nextDay + "T22:00:00"), sdf.parse(nextDay + "T23:00:00"), sdf.parse(nextDay + "T00:15:00")} });
   }
 
   @Before
