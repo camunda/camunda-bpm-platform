@@ -55,7 +55,8 @@ module.exports = [
 
       JobResource.count({
         processInstanceId: processInstance.id,
-        withException: true
+        withException: true,
+        noRetriesLeft: true
       }).$promise.then(function(data) {
         jobPages.total = data.count;
 
