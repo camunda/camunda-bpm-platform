@@ -716,9 +716,8 @@ public class HistoryCleanupTest {
 
   private Date getNextRunWithDelay(Date date, int countEmptyRuns) {
     //ignore milliseconds because MySQL does not support them, and it's not important for test
-    Date result = DateUtils.setMilliseconds(DateUtils.addSeconds(date, Math.min((int)(Math.pow(2., countEmptyRuns) * HistoryCleanupJobHandlerConfiguration.START_DELAY),
+    return DateUtils.setMilliseconds(DateUtils.addSeconds(date, Math.min((int)(Math.pow(2., countEmptyRuns) * HistoryCleanupJobHandlerConfiguration.START_DELAY),
         HistoryCleanupJobHandlerConfiguration.MAX_DELAY)), 0);
-    return result;
   }
 
   private JobEntity getJobEntity(String jobId) {
@@ -1105,37 +1104,13 @@ public class HistoryCleanupTest {
 
   private Date getNextRunWithinBatchWindow(Date currentTime) {
     Date batchWindowStartTime = processEngineConfiguration.getHistoryCleanupBatchWindowStartTimeAsDate();
-    return getNextRunWithinBatchWindow(currentTime, batchWindowStartTime);
-  }
-
-  public Date getNextRunWithinBatchWindow(Date date, Date batchWindowStartTime) {
-    Date todayPossibleRun = updateTime(date, batchWindowStartTime);
-    if (todayPossibleRun.after(date)) {
-      return todayPossibleRun;
-    } else {
-      //tomorrow
-      return DateUtils.addDays(todayPossibleRun, 1);
-    }
-  }
-
-  private Date updateTime(Date now, Date newTime) {
-    Date result = now;
-
-    Calendar newTimeCalendar = Calendar.getInstance();
-    newTimeCalendar.setTime(newTime);
-
-    result = DateUtils.setHours(result, newTimeCalendar.get(Calendar.HOUR_OF_DAY));
-    result = DateUtils.setMinutes(result, newTimeCalendar.get(Calendar.MINUTE));
-    result = DateUtils.setSeconds(result, newTimeCalendar.get(Calendar.SECOND));
-    result = DateUtils.setMilliseconds(result, newTimeCalendar.get(Calendar.MILLISECOND));
-    return result;
+    return HistoryCleanupHelper.getNextRunWithinBatchWindow(currentTime, batchWindowStartTime);
   }
 
   private HistoryCleanupJobHandlerConfiguration getConfiguration(JobEntity jobEntity) {
     String jobHandlerConfigurationRaw = jobEntity.getJobHandlerConfigurationRaw();
     return HistoryCleanupJobHandlerConfiguration.fromJson(new JSONObject(jobHandlerConfigurationRaw));
   }
-
 
   private void prepareData(int instanceCount) {
     int createdInstances = instanceCount / 3;
