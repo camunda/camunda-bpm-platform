@@ -1,20 +1,20 @@
 <div class="history-pane">
 
-  <div ng-show="!opState.$loaded"
+  <div ng-show="!state.$loaded"
        class="loader">
     <span class="animate-spin glyphicon glyphicon-refresh"></span>
     {{ 'LOADING' | translate }}
   </div>
 
-  <div ng-hide="!opState.$loaded">
-    <div ng-if="userOperations == 0">
+  <div ng-hide="!state.$loaded">
+    <div ng-if="!days.length">
       <div class="well">
         <span class="glyphicon glyphicon-info-sign"></span>
         {{ 'NO_HISTORY' | translate }}
       </div>
     </div>
 
-    <div ng-if="userOperations > 0"
+    <div ng-if="days.length"
          class="day row"
          ng-repeat="day in days | orderBy:'-date'">
       <div class="col-xs-2">
