@@ -37,12 +37,15 @@ import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_USERS_API;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_USERS_LIST_API;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TRANSACTION_ID;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN20_NS;
+import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import javax.naming.directory.ModificationItem;
 
 import org.camunda.bpm.model.bpmn.*;
 
@@ -2894,6 +2897,23 @@ public class ProcessBuilderTest {
       assertThat(e).hasMessageContaining("Unable to find a parent subProcess.");
 
     }
+  }
+
+  @Test
+  public void testSetIdAsDefaultNameForFlowElements() {
+    BpmnModelInstance instance = Bpmn.createExecutableProcess("process")
+        .startEvent("start")
+        .userTask("user")
+        .endEvent("end")
+          .name("name")
+        .done();
+
+    String startName = ((FlowElement) instance.getModelElementById("start")).getName();
+    assertEquals("start", startName);
+    String userName = ((FlowElement) instance.getModelElementById("user")).getName();
+    assertEquals("user", userName);
+    String endName = ((FlowElement) instance.getModelElementById("end")).getName();
+    assertEquals("name", endName);
   }
 
 }

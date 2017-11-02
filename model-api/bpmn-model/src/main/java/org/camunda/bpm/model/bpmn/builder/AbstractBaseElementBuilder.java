@@ -46,6 +46,9 @@ public abstract class AbstractBaseElementBuilder<B extends AbstractBaseElementBu
     T instance = createInstance(typeClass);
     if (identifier != null) {
       instance.setId(identifier);
+      if (instance instanceof FlowElement) {
+        ((FlowElement) instance).setName(identifier);
+      }
     }
     return instance;
   }
