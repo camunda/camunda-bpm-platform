@@ -206,6 +206,7 @@ public class HistoricTaskReportTest {
       .name("name_" + ANOTHER_PROCESS_DEFINITION_KEY)
       .startEvent()
         .userTask("task1_" + ANOTHER_PROCESS_DEFINITION_KEY)
+        .name(null)
         .endEvent()
       .done();
 
