@@ -215,6 +215,23 @@ public class FormDataTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  public void testSubmitFormDataWithEmptyDate() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("FormDataTest.testSubmitFormDataWithEmptyDate");
+    Task task = taskService.createTaskQuery().singleResult();
+    Map<String, Object> formValues = new HashMap<String, Object>();
+    formValues.put("stringField", "12345");
+    formValues.put("dateField", "");
+
+    // when
+    formService.submitTaskForm(task.getId(), formValues);
+
+    // then
+    formValues.put("dateField", null);
+    assertEquals(formValues, runtimeService.getVariables(processInstance.getId()));
+  }
+
+  @Deployment
   public void testMissingFormVariables()
   {
     // given process definition with defined form varaibles
