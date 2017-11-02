@@ -38,10 +38,10 @@ public class HistoricProcessInstanceEventEntity extends HistoricScopeInstanceEve
   /** the reason why this process instance was cancelled (deleted) */
   protected String deleteReason;
 
-  /** id of the activity which started the process instance */
+  /** id of the activity which ended the process instance */
   protected String endActivityId;
 
-  /** id of the activity which ended the process instance */
+  /** id of the activity which started the process instance */
   protected String startActivityId;
 
   /** id of the tenant which belongs to the process instance  */
