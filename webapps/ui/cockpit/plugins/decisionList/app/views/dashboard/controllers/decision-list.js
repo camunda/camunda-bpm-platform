@@ -1,10 +1,11 @@
 'use strict';
 
 module.exports = [
-  '$scope', 'decisionList', 'isModuleAvailable',
-  function($scope, decisionList, isModuleAvailable) {
+  '$scope', 'decisionList', 'Views',
+  function($scope, decisionList, Views) {
     $scope.loadingState = 'LOADING';
-    $scope.isDrdAvailable = isModuleAvailable('cockpit.plugin.drd');
+    $scope.drdDashboard = Views.getProvider({ component: 'cockpit.plugin.drd.dashboard' });
+    $scope.isDrdDashboardAvailable = !!$scope.drdDashboard;
 
     decisionList
       .getDecisionsLists()
@@ -23,5 +24,7 @@ module.exports = [
 
         throw err;
       });
+
+    $scope.drdDashboardVars = { read: [ 'drdsCount', 'drds' ] };
   }
 ];
