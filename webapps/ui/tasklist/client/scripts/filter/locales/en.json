@@ -138,5 +138,11 @@
                         "Invalid date: the date value is invalid",
 
   "REQUIRE_UNIQUE_KEY":
-                        "Key must be unique"
+                        "Key must be unique",
+  "MATCH_TYPE":
+                        "of the criteria are met.",
+  "MATCH_TYPE_ANY":
+                        "any",
+  "MATCH_TYPE_ALL":
+                        "all"
 }
