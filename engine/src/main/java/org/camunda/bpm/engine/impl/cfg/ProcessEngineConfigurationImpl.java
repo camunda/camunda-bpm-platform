@@ -43,6 +43,7 @@ import org.apache.ibatis.builder.xml.XMLConfigBuilder;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.apache.ibatis.mapping.Environment;
 import org.apache.ibatis.session.Configuration;
+import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.defaults.DefaultSqlSessionFactory;
 import org.apache.ibatis.transaction.TransactionFactory;
@@ -121,6 +122,7 @@ import org.camunda.bpm.engine.impl.cmmn.transformer.CmmnTransformFactory;
 import org.camunda.bpm.engine.impl.cmmn.transformer.CmmnTransformListener;
 import org.camunda.bpm.engine.impl.cmmn.transformer.CmmnTransformer;
 import org.camunda.bpm.engine.impl.cmmn.transformer.DefaultCmmnTransformFactory;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbIdGenerator;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManagerFactory;
 import org.camunda.bpm.engine.impl.db.entitymanager.cache.DbEntityCacheKeyMapping;
@@ -1242,6 +1244,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
           configuration = parser.parse();
 
           configuration.setDefaultStatementTimeout(jdbcStatementTimeout);
+
+          if (isJdbcBatchProcessing()) {
+            configuration.setDefaultExecutorType(ExecutorType.BATCH);
+          }
 
           sqlSessionFactory = new DefaultSqlSessionFactory(configuration);
 

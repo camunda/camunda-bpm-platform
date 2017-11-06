@@ -71,24 +71,16 @@ public class DbSqlSession extends AbstractPersistenceSession {
     this.dbSqlSessionFactory = dbSqlSessionFactory;
     this.sqlSession = dbSqlSessionFactory
       .getSqlSessionFactory()
-      .openSession(getExecutorType());
+      .openSession();
   }
 
   public DbSqlSession(DbSqlSessionFactory dbSqlSessionFactory, Connection connection, String catalog, String schema) {
     this.dbSqlSessionFactory = dbSqlSessionFactory;
     this.sqlSession = dbSqlSessionFactory
       .getSqlSessionFactory()
-      .openSession(getExecutorType(), connection);
+      .openSession(connection);
     this.connectionMetadataDefaultCatalog = catalog;
     this.connectionMetadataDefaultSchema = schema;
-  }
-
-  protected ExecutorType getExecutorType() {
-    if (Context.getProcessEngineConfiguration().isJdbcBatchProcessing()) {
-      return ExecutorType.BATCH;
-    } else {
-      return ExecutorType.SIMPLE;
-    }
   }
 
   @Override
@@ -133,7 +125,11 @@ public class DbSqlSession extends AbstractPersistenceSession {
     // Id using the DbIdGenerator while performing a deployment.
     if (!DbSqlSessionFactory.H2.equals(dbSqlSessionFactory.getDatabaseType())) {
       String mappedStatement = dbSqlSessionFactory.mapStatement(statement);
-      sqlSession.selectList( mappedStatement, parameter);
+      if (!Context.getProcessEngineConfiguration().isJdbcBatchProcessing()) {
+        sqlSession.update(mappedStatement, parameter);
+      } else {
+        sqlSession.selectList(mappedStatement, parameter);
+      }
     }
   }
 

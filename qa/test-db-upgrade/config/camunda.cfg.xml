@@ -29,6 +29,8 @@
     <property name="mailServerPort" value="${mail.server.port}" />
     <property name="history" value="full" />
 
+    <property name="jdbcBatchProcessing" value="false"/>
+
   </bean>
 
 </beans>
