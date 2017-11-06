@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.spring;
 
 import org.camunda.bpm.engine.ArtifactFactory;
 import org.camunda.bpm.engine.impl.DefaultArtifactFactory;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 
 /**
@@ -32,9 +33,11 @@ public class SpringArtifactFactory implements ArtifactFactory {
 
   @Override
   public <T> T getArtifact(Class<T> clazz) {
-    T instance = applicationContext.getBean(clazz);
+    T instance;
 
-    if (instance == null) {
+    try {
+      instance = applicationContext.getBean(clazz);
+    } catch (NoSuchBeanDefinitionException ex) {
       // fall back to using newInstance()
       instance = defaultArtifactFactory.getArtifact(clazz);
     }
