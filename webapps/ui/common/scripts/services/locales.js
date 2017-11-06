@@ -3,8 +3,8 @@ var moment = require('camunda-commons-ui/vendor/moment'),
     angular = require('camunda-commons-ui/vendor/angular');
 
 module.exports = function(ngModule, appRoot, appName) {
-  ngModule.factory('localeLoader', ['$q', '$http', 'Notifications',
-      function($q, $http, Notifications) {
+  ngModule.factory('localeLoader', ['$q', '$http', 'Notifications', 'configuration',
+      function($q, $http, Notifications, configuration) {
         return function(options) {
 
           if (!options || (!angular.isString(options.prefix) || !angular.isString(options.suffix))) {
@@ -12,31 +12,43 @@ module.exports = function(ngModule, appRoot, appName) {
           }
 
           var deferred = $q.defer();
+          var cacheKey = 'locales_data_'+options.key;
+          var cachedLocalesData = configuration.get(cacheKey);
 
-          $http(angular.extend({
-            url: [
-              options.prefix,
-              options.key,
-              options.suffix
-            ].join(''),
-            method: 'GET',
-            params: ''
-          }, options.$http)).success(function(data) {
+          if(cachedLocalesData) {
+            cachedLocalesData = JSON.parse((cachedLocalesData));
             if(typeof options.callback === 'function') {
-              options.callback(null, data, options.key);
+              options.callback(null, cachedLocalesData, options.key);
             }
-            deferred.resolve(data.labels);
-          }).error(function(data) {
-            if(typeof options.callback === 'function') {
-              options.callback(data, null, options.key);
-            }
-            // error notification
-            Notifications.addError({
-              status: 'Error in localization configuration',
-              message: '"' + options.key + '" is declared as available locale, but no such locale file exists.'
+            deferred.resolve(cachedLocalesData.labels);
+          }
+          else {
+            $http(angular.extend({
+              url: [
+                options.prefix,
+                options.key,
+                options.suffix
+              ].join(''),
+              method: 'GET',
+              params: ''
+            }, options.$http)).success(function(data) {
+              configuration.set(cacheKey, JSON.stringify(data));
+              if(typeof options.callback === 'function') {
+                options.callback(null, data, options.key);
+              }
+              deferred.resolve(data.labels);
+            }).error(function(data) {
+              if(typeof options.callback === 'function') {
+                options.callback(data, null, options.key);
+              }
+              // error notification
+              Notifications.addError({
+                status: 'Error in localization configuration',
+                message: '"' + options.key + '" is declared as available locale, but no such locale file exists.'
+              });
+              deferred.reject(options.key);
             });
-            deferred.reject(options.key);
-          });
+          }
 
           return deferred.promise;
         };

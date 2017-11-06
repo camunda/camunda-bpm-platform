@@ -17,6 +17,19 @@ var defaultConfig = {
 
 module.exports = function(config, app) {
   return [function() {
+    var storage = window.localStorage;
+    var values = JSON.parse(storage.getItem('camunda-web') || '{}');
+
+
+    this.get = function(key, defaultValue) {
+      return typeof values[key] !== 'undefined' ? values[key] : defaultValue;
+    };
+
+    this.set = function(key, value) {
+      values[key] = value;
+      storage.setItem('camunda-web', JSON.stringify(values));
+    };
+
     this.getDateFormat = function(formatName) {
       var dateFormatObj = config.dateFormat || defaultConfig.dateFormat;
       return dateFormatObj[formatName] || defaultConfig.dateFormat[formatName];
