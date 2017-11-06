@@ -12,7 +12,7 @@ module.exports = function(ngModule, appRoot, appName) {
           }
 
           var deferred = $q.defer();
-          var cacheKey = 'locales_data_'+options.key;
+          var cacheKey = options.prefix+'_locales_data_'+options.key;
           var cachedLocalesData = configuration.get(cacheKey);
 
           if(cachedLocalesData) {
