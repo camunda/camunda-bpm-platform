@@ -34,6 +34,8 @@
     <skip.frontend.build>false</skip.frontend.build>
 
     <authorizationCheckRevokes>auto</authorizationCheckRevokes>
+
+    <jdbcBatchProcessing>true</jdbcBatchProcessing>
   </properties>
 
   <dependencyManagement>
@@ -973,6 +975,13 @@
       <id>cfghistorynone</id>
       <properties>
         <history.level>none</history.level>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>cfgJdbcBatchProcessingOff</id>
+      <properties>
+        <jdbcBatchProcessing>false</jdbcBatchProcessing>
       </properties>
     </profile>
 
