@@ -31,23 +31,25 @@ module.exports = function(ngModule, appRoot, appName) {
               ].join(''),
               method: 'GET',
               params: ''
-            }, options.$http)).success(function(data) {
-              configuration.set(cacheKey, JSON.stringify(data));
-              if(typeof options.callback === 'function') {
-                options.callback(null, data, options.key);
-              }
-              deferred.resolve(data.labels);
-            }).error(function(data) {
-              if(typeof options.callback === 'function') {
-                options.callback(data, null, options.key);
-              }
-              // error notification
-              Notifications.addError({
-                status: 'Error in localization configuration',
-                message: '"' + options.key + '" is declared as available locale, but no such locale file exists.'
+            }, options.$http))
+              .success(function(data) {
+                configuration.set(cacheKey, JSON.stringify(data));
+                if(typeof options.callback === 'function') {
+                  options.callback(null, data, options.key);
+                }
+                deferred.resolve(data.labels);
+              })
+              .error(function(data) {
+                if(typeof options.callback === 'function') {
+                  options.callback(data, null, options.key);
+                }
+                // error notification
+                Notifications.addError({
+                  status: 'Error in localization configuration',
+                  message: '"' + options.key + '" is declared as available locale, but no such locale file exists.'
+                });
+                deferred.reject(options.key);
               });
-              deferred.reject(options.key);
-            });
           }
 
           return deferred.promise;
