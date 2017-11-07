@@ -14,17 +14,14 @@
 package org.camunda.bpm.engine.test.api.history;
 
 import java.text.ParseException;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupHelper;
-import org.camunda.bpm.engine.impl.metrics.Meter;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.Job;
@@ -96,8 +93,10 @@ public class HistoryCleanupOnEngineStartTest {
     assertNotNull(historyCleanupJob);
     Date historyCleanupBatchWindowStartTime = ((ProcessEngineConfigurationImpl) engineRule.getProcessEngine().getProcessEngineConfiguration())
         .getHistoryCleanupBatchWindowStartTimeAsDate();
-    assertEquals(HistoryCleanupHelper.getNextRunWithinBatchWindow(ClockUtil.getCurrentTime(),
-        historyCleanupBatchWindowStartTime), historyCleanupJob.getDuedate());
+    Date historyCleanupBatchWindowEndTime = ((ProcessEngineConfigurationImpl) engineRule.getProcessEngine().getProcessEngineConfiguration())
+        .getHistoryCleanupBatchWindowEndTimeAsDate();
+    assertEquals(HistoryCleanupHelper.getCurrentOrNextBatchWindowStartTime(ClockUtil.getCurrentTime(),
+        historyCleanupBatchWindowStartTime, HistoryCleanupHelper.addDays(historyCleanupBatchWindowEndTime, 1)), historyCleanupJob.getDuedate());
   }
 
 }
