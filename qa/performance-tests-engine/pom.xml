@@ -15,6 +15,7 @@
     <!-- without a special test profile we don't want to exclude anything, this expressions should never match -->
     <test.excludes>$.</test.excludes>
     <historyLevel>full</historyLevel>
+    <jdbcBatchProcessing>true</jdbcBatchProcessing>
   </properties>
 
   <dependencies>
@@ -511,6 +512,13 @@
       <id>history-level-full</id>
       <properties>
         <historyLevel>full</historyLevel>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>cfgJdbcBatchProcessingOff</id>
+      <properties>
+        <jdbcBatchProcessing>false</jdbcBatchProcessing>
       </properties>
     </profile>
 

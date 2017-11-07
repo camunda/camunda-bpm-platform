@@ -58,6 +58,8 @@ public class PerfTestProcessEngine {
 
     processEngineConfiguration.setHistory(properties.getProperty("historyLevel"));
 
+    processEngineConfiguration.setJdbcBatchProcessing(Boolean.valueOf(properties.getProperty("jdbcBatchProcessing")));
+
     // load plugins
     String processEnginePlugins = properties.getProperty("processEnginePlugins", "");
     for (String pluginName : processEnginePlugins.split(",")) {
