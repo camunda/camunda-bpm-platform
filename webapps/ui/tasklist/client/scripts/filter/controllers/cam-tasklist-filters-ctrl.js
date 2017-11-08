@@ -77,7 +77,8 @@ module.exports = [
       if(filter) {
         doAfterFilterUpdate.push(function() {
           $timeout(function() {
-            $('.task-filters .content div.item.active .actions a')[0].focus();
+            var element = $('.task-filters .content div.item.active .actions a')[0];
+            element && element.focus();
           });
         });
       } else {
