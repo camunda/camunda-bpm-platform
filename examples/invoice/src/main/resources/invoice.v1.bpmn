@@ -56,7 +56,9 @@
     <sequenceFlow id="invoiceApproved" name="yes" isImmediate="true" sourceRef="invoice_approved" targetRef="ServiceTask_06mdb3v">
       <conditionExpression xsi:type="tFormalExpression" id="conditionExpression_63">${approved}</conditionExpression>
     </sequenceFlow>
-    <sequenceFlow id="reviewSuccessful" name="yes" isImmediate="true" sourceRef="reviewSuccessful_gw" targetRef="approveInvoice" />
+    <sequenceFlow id="reviewSuccessful" name="yes" isImmediate="true" sourceRef="reviewSuccessful_gw" targetRef="approveInvoice">
+      <conditionExpression xsi:type="tFormalExpression">${clarified}</conditionExpression>
+    </sequenceFlow>
     <sequenceFlow id="sequenceFlow_178" isImmediate="true" sourceRef="assignApprover" targetRef="approveInvoice" />
     <sequenceFlow id="SequenceFlow_1" name="" sourceRef="StartEvent_1" targetRef="assignApprover" />
     <businessRuleTask id="assignApprover" name="Assign Approver Group" camunda:resultVariable="approverGroups" camunda:decisionRef="invoice-assign-approver" camunda:mapDecisionResult="collectEntries">
