@@ -12,18 +12,22 @@
  */
 package org.camunda.bpm.engine.spring.test.transaction.modification;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.apache.ibatis.logging.LogFactory;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -56,7 +60,6 @@ public class ProcessInstanceModificationInTransactionTest {
     LogFactory.useSlf4jLogging();
   }
 
-  @Ignore
   @Test
   public void shouldBeAbleToPerformModification() {
 
@@ -75,7 +78,12 @@ public class ProcessInstanceModificationInTransactionTest {
     // when
     userBean.completeUserTaskAndModifyInstanceInOneTransaction(procInst);
 
-    // then it works
+    // then
+    VariableInstance variable = rule.getRuntimeService().createVariableInstanceQuery().processInstanceIdIn(procInst.getId()).variableName("createDate").singleResult();
+    assertNotNull(variable);
+    HistoricVariableInstance historicVariable = rule.getHistoryService().createHistoricVariableInstanceQuery().singleResult();
+    assertEquals(variable.getName(), historicVariable.getName());
+    assertEquals(HistoricVariableInstance.STATE_CREATED, historicVariable.getState());
   }
 
   private void deployModelInstance(BpmnModelInstance modelInstance) {
