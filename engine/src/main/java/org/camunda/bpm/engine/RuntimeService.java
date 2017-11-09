@@ -1996,7 +1996,6 @@ public interface RuntimeService {
    *
    * @param incidentType the type of incident, cannot be null
    * @param executionId execution id, cannot be null
-   * @param activityId activity id
    * @param configuration
    *
    * @return a new incident
@@ -2012,7 +2011,6 @@ public interface RuntimeService {
    *
    * @param incidentType the type of incident, cannot be null
    * @param executionId execution id, cannot be null
-   * @param activityId activity id
    * @param configuration
    * @param message
    *
