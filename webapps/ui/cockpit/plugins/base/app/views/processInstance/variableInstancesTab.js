@@ -49,6 +49,13 @@ module.exports = function(ngModule) {
         $scope.instanceIdToInstanceMap = instanceIdToInstanceMap;
       });
 
+      variableInstanceData.observe('filter', function() {
+        if ($scope.instanceIdToInstanceMap && $scope.pages ) {
+          return updateView($scope.instanceIdToInstanceMap, $scope.query, $scope.pages);
+        }
+        return $q.when($scope.total);
+      });
+
       $scope.onSearchChange = function(query, pages) {
         $scope.query = query;
         $scope.pages = pages;
