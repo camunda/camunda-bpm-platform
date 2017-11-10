@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.webapp.impl.security;
 
+import javax.servlet.ServletException;
+import java.io.IOException;
 import java.util.List;
 
 import org.camunda.bpm.cockpit.Cockpit;
@@ -27,7 +29,7 @@ import org.camunda.bpm.webapp.impl.security.auth.UserAuthentication;
  */
 public class SecurityActions {
 
-  public static <T> T runWithAuthentications(SecurityAction<T> action, Authentications authentications) {
+  public static <T> T runWithAuthentications(SecurityAction<T> action, Authentications authentications) throws IOException, ServletException {
 
     List<Authentication> currentAuthentications = authentications.getAuthentications();
     try {
@@ -70,7 +72,7 @@ public class SecurityActions {
     }
   }
 
-  public static <T> T runWithoutAuthentication(SecurityAction<T> action, ProcessEngine processEngine) {
+  public static <T> T runWithoutAuthentication(SecurityAction<T> action, ProcessEngine processEngine) throws IOException, ServletException {
 
     final IdentityService identityService = processEngine.getIdentityService();
     org.camunda.bpm.engine.impl.identity.Authentication currentAuth = identityService.getCurrentAuthentication();
@@ -87,7 +89,7 @@ public class SecurityActions {
   }
 
   public static interface SecurityAction<T> {
-    public T execute();
+    public T execute() throws IOException, ServletException;
   }
 
 }

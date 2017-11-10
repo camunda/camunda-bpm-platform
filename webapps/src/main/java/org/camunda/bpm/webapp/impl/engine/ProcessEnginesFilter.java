@@ -126,7 +126,7 @@ public class ProcessEnginesFilter extends AbstractTemplateFilter {
     chain.doFilter(request, response);
   }
 
-  protected void serveIndexPage(String appName, String engineName, String pageUri, String contextPath, HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException {
+  protected void serveIndexPage(String appName, String engineName, String pageUri, String contextPath, HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
 
     // access to /
     if (appName == null) {
@@ -203,7 +203,7 @@ public class ProcessEnginesFilter extends AbstractTemplateFilter {
     }
   }
 
-  protected boolean needsInitialUser(String engineName) {
+  protected boolean needsInitialUser(String engineName) throws IOException, ServletException {
     final ProcessEngine processEngine = Cockpit.getProcessEngine(engineName);
     if (processEngine == null) {
       return false;

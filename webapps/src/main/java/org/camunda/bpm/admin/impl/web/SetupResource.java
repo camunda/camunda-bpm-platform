@@ -16,9 +16,11 @@ import static org.camunda.bpm.engine.authorization.Authorization.ANY;
 import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GRANT;
 import static org.camunda.bpm.engine.authorization.Permissions.ALL;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.ServiceLoader;
 
+import javax.servlet.ServletException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -67,7 +69,7 @@ public class SetupResource {
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
-  public void createInitialUser(final @PathParam("engine") String processEngineName, final UserDto user) {
+  public void createInitialUser(final @PathParam("engine") String processEngineName, final UserDto user) throws IOException, ServletException {
 
     final ProcessEngine processEngine = lookupProcessEngine(processEngineName);
     if(processEngine == null) {
