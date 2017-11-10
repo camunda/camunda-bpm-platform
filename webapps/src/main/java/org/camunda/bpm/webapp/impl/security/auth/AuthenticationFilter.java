@@ -54,12 +54,8 @@ public class AuthenticationFilter implements Filter {
     try {
 
       SecurityActions.runWithAuthentications(new SecurityAction<Void>() {
-        public Void execute() {
-          try {
-            chain.doFilter(request, response);
-          } catch(Exception e) {
-            throw new RuntimeException(e);
-          }
+        public Void execute() throws IOException, ServletException {
+          chain.doFilter(request, response);
           return null;
         }
       }, authentications);
