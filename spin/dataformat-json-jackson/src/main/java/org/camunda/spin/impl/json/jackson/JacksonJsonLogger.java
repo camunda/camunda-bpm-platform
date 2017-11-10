@@ -107,10 +107,6 @@ public class JacksonJsonLogger extends SpinLogger {
       exceptionMessage("015", "Unable to cast JsonPath expression to '{}'", castClass.getName()), cause);
   }
 
-  public PathNotFoundException unableToFindJsonPath(String path, String json) {
-    return new PathNotFoundException(exceptionMessage("016", "Unable to find json path '{}' on json node '{}'", path, json));
-  }
-
   public SpinJsonPathException invalidJsonPath(Class<?> castClass, Exception cause) {
     return new SpinJsonPathException(
             exceptionMessage("017", "Invalid json path to '{}'", castClass.getName()), cause);
