@@ -349,9 +349,6 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
       if (candidateUser != null || expressions.containsKey("taskCandidateUser")) {
         throw new ProcessEngineException("Invalid query usage: cannot set both candidateGroup and candidateUser");
       }
-      if (candidateGroups != null || expressions.containsKey("taskCandidateGroupIn")) {
-        throw new ProcessEngineException("Invalid query usage: cannot set both candidateGroup and candidateGroupIn");
-      }
     }
 
     this.candidateGroup = candidateGroup;
@@ -367,9 +364,6 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
       if (candidateUser != null || expressions.containsKey("taskCandidateUser")) {
         throw new ProcessEngineException("Invalid query usage: cannot set both candidateGroup and candidateUser");
       }
-      if (candidateGroups != null || expressions.containsKey("taskCandidateGroupIn")) {
-        throw new ProcessEngineException("Invalid query usage: cannot set both candidateGroup and candidateGroupIn");
-      }
     }
 
     expressions.put("taskCandidateGroup", candidateGroupExpression);
@@ -383,9 +377,6 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     if (!isOrQueryActive) {
       if (candidateUser != null || expressions.containsKey("taskCandidateUser")) {
         throw new ProcessEngineException("Invalid query usage: cannot set both candidateGroupIn and candidateUser");
-      }
-      if (candidateGroup != null || expressions.containsKey("taskCandidateGroup")) {
-        throw new ProcessEngineException("Invalid query usage: cannot set both candidateGroupIn and candidateGroup");
       }
     }
 
@@ -401,9 +392,6 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     if (!isOrQueryActive) {
       if (candidateUser != null || expressions.containsKey("taskCandidateUser")) {
         throw new ProcessEngineException("Invalid query usage: cannot set both candidateGroupIn and candidateUser");
-      }
-      if (candidateGroup != null || expressions.containsKey("taskCandidateGroup")) {
-        throw new ProcessEngineException("Invalid query usage: cannot set both candidateGroupIn and candidateGroup");
       }
     }
 
@@ -932,10 +920,13 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
       return null;
     }
 
-    if (candidateGroup!=null) {
-      ArrayList result = new ArrayList();
-      result.add(candidateGroup);
-      return result;
+    if (candidateGroup!=null && candidateGroups != null) {
+        //get intersection of candidateGroups and candidateGroup
+        ArrayList result = new ArrayList(candidateGroups);
+        result.retainAll(Arrays.asList(candidateGroup));
+        return result;
+    } else if (candidateGroup!=null) {
+      return Arrays.asList(candidateGroup);
     } else if (candidateUser != null) {
       return getGroupsForCandidateUser(candidateUser);
     } else if(candidateGroups != null) {

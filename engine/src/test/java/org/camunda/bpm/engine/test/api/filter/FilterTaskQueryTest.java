@@ -17,6 +17,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -801,6 +802,42 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
     extendedQuery = extendedFilter.getQuery();
     assertEquals("${'test'}", extendedQuery.getExpressions().get("taskCandidateGroup"));
     assertTrue(extendedQuery.isIncludeAssignedTasks());
+  }
+
+  public void testExtendTaskQueryWithCandidateGroupInAndCandidateGroup() {
+    // create an query with candidate group in and save it as a filter
+    TaskQueryImpl candidateGroupInQuery = (TaskQueryImpl)taskService.createTaskQuery().taskCandidateGroupIn(Arrays.asList("testGroup", "testGroup2"));
+    assertEquals(2, candidateGroupInQuery.getCandidateGroups().size());
+    assertEquals("testGroup", candidateGroupInQuery.getCandidateGroups().get(0));
+    assertEquals("testGroup2", candidateGroupInQuery.getCandidateGroups().get(1));
+    Filter candidateGroupInFilter = filterService.newTaskFilter("Groups filter");
+    candidateGroupInFilter.setQuery(candidateGroupInQuery);
+
+    // create a query with candidate group
+    // and save it as filter
+    TaskQuery candidateGroupQuery = taskService.createTaskQuery().taskCandidateGroup("testGroup2");
+
+    // extend candidate group in filter by query with candidate group
+    Filter extendedFilter = candidateGroupInFilter.extend(candidateGroupQuery);
+    TaskQueryImpl extendedQuery = extendedFilter.getQuery();
+    assertEquals(1, extendedQuery.getCandidateGroups().size());
+    assertEquals("testGroup2", extendedQuery.getCandidateGroups().get(0));
+  }
+
+  public void testTaskQueryWithCandidateGroupInExpressionAndCandidateGroup() {
+    // create an query with candidate group in expression and candidate group at once
+    TaskQueryImpl candidateGroupInQuery = (TaskQueryImpl)taskService.createTaskQuery().taskCandidateGroupInExpression("${'test'}").taskCandidateGroup("testGroup");
+    assertEquals("${'test'}", candidateGroupInQuery.getExpressions().get("taskCandidateGroupIn"));
+    assertEquals("testGroup", candidateGroupInQuery.getCandidateGroup());
+  }
+
+  public void testTaskQueryWithCandidateGroupInAndCandidateGroupExpression() {
+    // create an query with candidate group in and candidate group expression
+    TaskQueryImpl candidateGroupInQuery = (TaskQueryImpl)taskService.createTaskQuery().taskCandidateGroupIn(Arrays.asList("testGroup", "testGroup2")).taskCandidateGroupExpression("${'test'}");
+    assertEquals("${'test'}", candidateGroupInQuery.getExpressions().get("taskCandidateGroup"));
+    assertEquals(2, candidateGroupInQuery.getCandidateGroups().size());
+    assertEquals("testGroup", candidateGroupInQuery.getCandidateGroups().get(0));
+    assertEquals("testGroup2", candidateGroupInQuery.getCandidateGroups().get(1));
   }
 
   public void testExtendTaskQueryWithCandidateGroupInExpressionAndIncludeAssignedTasks() {

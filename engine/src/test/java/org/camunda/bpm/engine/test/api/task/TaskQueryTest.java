@@ -539,6 +539,52 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(5, query.list().size());
   }
 
+  public void testQueryByCandidateGroupInAndCandidateGroup() {
+    List<String> groups = Arrays.asList("management", "accountancy");
+    String candidateGroup = "management";
+    TaskQuery query = taskService.createTaskQuery().taskCandidateGroupIn(groups).taskCandidateGroup(candidateGroup);
+    assertEquals(2, query.count());
+    assertEquals(2, query.list().size());
+    try {
+      query.singleResult();
+      fail("expected exception");
+    } catch (ProcessEngineException e) {
+      // OK
+    }
+
+    // test including assigned tasks
+    query = taskService.createTaskQuery().taskCandidateGroupIn(groups).taskCandidateGroup(candidateGroup).includeAssignedTasks();
+    assertEquals(3, query.count());
+    assertEquals(3, query.list().size());
+
+    // Unexisting groups or groups that don't have candidate tasks shouldn't influence other results
+    groups = Arrays.asList("management", "accountancy", "sales", "unexising");
+    query = taskService.createTaskQuery().taskCandidateGroupIn(groups).taskCandidateGroup(candidateGroup);
+    assertEquals(2, query.count());
+    assertEquals(2, query.list().size());
+    try {
+      query.singleResult();
+      fail("expected exception");
+    } catch (ProcessEngineException e) {
+      // OK
+    }
+
+    // test including assigned tasks
+    query = taskService.createTaskQuery().taskCandidateGroupIn(groups).taskCandidateGroup(candidateGroup).includeAssignedTasks();
+    assertEquals(3, query.count());
+    assertEquals(3, query.list().size());
+
+    // sales group is candidate for no tasks
+    query = taskService.createTaskQuery().taskCandidateGroupIn(groups).taskCandidateGroup("sales");
+    assertEquals(0, query.count());
+    assertEquals(0, query.list().size());
+
+    // test including assigned tasks
+    query = taskService.createTaskQuery().taskCandidateGroupIn(groups).taskCandidateGroup("sales").includeAssignedTasks();
+    assertEquals(0, query.count());
+    assertEquals(0, query.list().size());
+  }
+
   public void testQueryByNullCandidateGroupIn() {
     try {
       taskService.createTaskQuery().taskCandidateGroupIn(null).list();
