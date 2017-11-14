@@ -17,6 +17,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -920,16 +921,16 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
       return null;
     }
 
-    if (candidateGroup!=null && candidateGroups != null) {
-        //get intersection of candidateGroups and candidateGroup
-        ArrayList result = new ArrayList(candidateGroups);
-        result.retainAll(Arrays.asList(candidateGroup));
-        return result;
-    } else if (candidateGroup!=null) {
+    if (candidateGroup != null && candidateGroups != null) {
+      //get intersection of candidateGroups and candidateGroup
+      ArrayList result = new ArrayList(candidateGroups);
+      result.retainAll(Arrays.asList(candidateGroup));
+      return result;
+    } else if (candidateGroup != null) {
       return Arrays.asList(candidateGroup);
     } else if (candidateUser != null) {
       return getGroupsForCandidateUser(candidateUser);
-    } else if(candidateGroups != null) {
+    } else if (candidateGroups != null) {
       return candidateGroups;
     }
     return null;
@@ -1251,6 +1252,12 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     ensureOrExpressionsEvaluated();
     ensureVariablesInitialized();
     checkQueryOk();
+
+    //check if candidateGroup and candidateGroups intersect
+    if (getCandidateGroup() != null && getCandidateGroupsInternal() != null && getCandidateGroups().isEmpty()) {
+      return Collections.emptyList();
+    }
+
     List<Task> taskList = commandContext
       .getTaskManager()
       .findTasksByQueryCriteria(this);
@@ -1270,6 +1277,10 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     ensureOrExpressionsEvaluated();
     ensureVariablesInitialized();
     checkQueryOk();
+    //check if candidateGroup and candidateGroups intersect
+    if (getCandidateGroup() != null && getCandidateGroupsInternal() != null && getCandidateGroups().isEmpty()) {
+      return 0;
+    }
     return commandContext
       .getTaskManager()
       .findTaskCountByQueryCriteria(this);

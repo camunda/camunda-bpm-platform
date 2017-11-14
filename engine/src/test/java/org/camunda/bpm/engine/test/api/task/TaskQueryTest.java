@@ -585,6 +585,14 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(0, query.list().size());
   }
 
+  public void testQueryByCandidateGroupInAndCandidateGroupNotIntersected() {
+    List<String> groups = Arrays.asList("accountancy");
+    String candidateGroup = "management";
+    TaskQuery query = taskService.createTaskQuery().taskCandidateGroupIn(groups).taskCandidateGroup(candidateGroup);
+    assertEquals(0, query.count());
+    assertEquals(0, query.list().size());
+  }
+
   public void testQueryByNullCandidateGroupIn() {
     try {
       taskService.createTaskQuery().taskCandidateGroupIn(null).list();
