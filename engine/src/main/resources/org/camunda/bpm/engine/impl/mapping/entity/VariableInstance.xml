@@ -369,13 +369,21 @@
 
             <!-- activityInstanceIds -->
             <if test="activityInstanceIds != null &amp;&amp; activityInstanceIds.length > 0">
-              and <include refid="actInstIdColumn"/> in
-              <foreach item="item" index="index" collection="activityInstanceIds"
-                       open="(" separator="," close=")">
-                #{item}
-              </foreach>
-            </if>
-            
+              <bind name="sizeOfIds" value="activityInstanceIds.length"/>
+              and ( <include refid="actInstIdColumn"/> IN
+			  <foreach item="id" index="index" collection="activityInstanceIds" open = "(" separator="" close=")">
+				#{id}
+				<choose>
+				  <when test="index != 0 &amp;&amp; (index+1)%1000 == 0 &amp;&amp; (index+1) &lt; sizeOfIds">
+					) or <include refid="actInstIdColumn"/> IN (
+				  </when>
+				  <when test="index == sizeOfIds -1"></when>
+				  <otherwise> ,</otherwise>
+				</choose>
+			  </foreach>
+			    )
+			</if>
+
             <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
               and RES.TENANT_ID_ in
               <foreach item="tenantId" index="index" collection="tenantIds"
