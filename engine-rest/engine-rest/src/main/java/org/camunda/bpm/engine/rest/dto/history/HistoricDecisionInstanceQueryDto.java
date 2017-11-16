@@ -56,6 +56,7 @@ public class HistoricDecisionInstanceQueryDto extends AbstractQueryDto<HistoricD
   protected String[] decisionDefinitionKeyIn;
 
   protected String decisionDefinitionName;
+  protected String decisionDefinitionNameLike;
   protected String processDefinitionId;
   protected String processDefinitionKey;
   protected String processInstanceId;
@@ -117,6 +118,11 @@ public class HistoricDecisionInstanceQueryDto extends AbstractQueryDto<HistoricD
   @CamundaQueryParam("decisionDefinitionName")
   public void setDecisionDefinitionName(String decisionDefinitionName) {
     this.decisionDefinitionName = decisionDefinitionName;
+  }
+
+  @CamundaQueryParam("decisionDefinitionNameLike")
+  public void setDecisionDefinitionNameLike(String decisionDefinitionNameLike) {
+    this.decisionDefinitionNameLike = decisionDefinitionNameLike;
   }
 
   @CamundaQueryParam("processDefinitionId")
@@ -251,6 +257,9 @@ public class HistoricDecisionInstanceQueryDto extends AbstractQueryDto<HistoricD
     }
     if (decisionDefinitionName != null) {
       query.decisionDefinitionName(decisionDefinitionName);
+    }
+    if (decisionDefinitionNameLike != null) {
+      query.decisionDefinitionNameLike(decisionDefinitionNameLike);
     }
     if (processDefinitionId != null) {
       query.processDefinitionId(processDefinitionId);

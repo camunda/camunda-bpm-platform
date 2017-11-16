@@ -230,7 +230,7 @@ public class HistoricDecisionInstanceRestServiceQueryTest extends AbstractRestSe
     assertEquals(1, instances.size());
     Assert.assertNotNull(instances.get(0));
 
-  String returnedHistoricDecisionInstanceId = from(content).getString("[0].id");
+    String returnedHistoricDecisionInstanceId = from(content).getString("[0].id");
     String returnedDecisionDefinitionId = from(content).getString("[0].decisionDefinitionId");
     String returnedDecisionDefinitionKey = from(content).getString("[0].decisionDefinitionKey");
     String returnedDecisionDefinitionName = from(content).getString("[0].decisionDefinitionName");
@@ -516,6 +516,7 @@ public class HistoricDecisionInstanceRestServiceQueryTest extends AbstractRestSe
     parameters.put("decisionDefinitionKey", MockProvider.EXAMPLE_DECISION_DEFINITION_KEY);
     parameters.put("decisionDefinitionKeyIn", MockProvider.EXAMPLE_DECISION_DEFINITION_KEY_IN);
     parameters.put("decisionDefinitionName", MockProvider.EXAMPLE_DECISION_DEFINITION_NAME);
+    parameters.put("decisionDefinitionNameLike", MockProvider.EXAMPLE_DECISION_DEFINITION_NAME_LIKE);
     parameters.put("processDefinitionId", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
     parameters.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
     parameters.put("processInstanceId", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
@@ -545,6 +546,7 @@ public class HistoricDecisionInstanceRestServiceQueryTest extends AbstractRestSe
     verify(mockedQuery).decisionDefinitionKey(stringQueryParameters.get("decisionDefinitionKey"));
     verify(mockedQuery).decisionDefinitionKeyIn(stringArrayConverter.convertQueryParameterToType(stringQueryParameters.get("decisionDefinitionKeyIn")));
     verify(mockedQuery).decisionDefinitionName(stringQueryParameters.get("decisionDefinitionName"));
+    verify(mockedQuery).decisionDefinitionNameLike(stringQueryParameters.get("decisionDefinitionNameLike"));
     verify(mockedQuery).processDefinitionId(stringQueryParameters.get("processDefinitionId"));
     verify(mockedQuery).processDefinitionKey(stringQueryParameters.get("processDefinitionKey"));
     verify(mockedQuery).processInstanceId(stringQueryParameters.get("processInstanceId"));

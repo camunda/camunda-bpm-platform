@@ -16,11 +16,13 @@ package org.camunda.bpm.engine.test.history.dmn;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInstanceQuery;
 import org.camunda.bpm.engine.history.NativeHistoricDecisionInstanceQuery;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.repository.DecisionDefinitionQuery;
 import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -29,6 +31,7 @@ import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.joda.time.DateTime;
+import org.junit.Test;
 
 import java.util.Date;
 import java.util.List;
@@ -36,6 +39,7 @@ import java.util.List;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 /**
  * @author Philipp Ossler
@@ -46,8 +50,10 @@ public class HistoricDecisionInstanceQueryTest extends PluggableProcessEngineTes
 
   protected static final String DECISION_CASE = "org/camunda/bpm/engine/test/history/HistoricDecisionInstanceTest.caseWithDecisionTask.cmmn";
   protected static final String DECISION_PROCESS = "org/camunda/bpm/engine/test/history/HistoricDecisionInstanceTest.processWithBusinessRuleTask.bpmn20.xml";
+  protected static final String DECISION_PROCESS_WITH_UNDERSCORE = "org/camunda/bpm/engine/test/history/HistoricDecisionInstanceTest.processWithBusinessRuleTask_.bpmn20.xml";
 
   protected static final String DECISION_SINGLE_OUTPUT_DMN = "org/camunda/bpm/engine/test/history/HistoricDecisionInstanceTest.decisionSingleOutput.dmn11.xml";
+  protected static final String DECISION_SINGLE_OUTPUT_DMN_WITH_UNDERSCORE = "org/camunda/bpm/engine/test/history/HistoricDecisionInstanceTest.decisionSingleOutput_.dmn11.xml";
   protected static final String DECISION_NO_INPUT_DMN = "org/camunda/bpm/engine/test/history/HistoricDecisionInstanceTest.noInput.dmn11.xml";
 
   protected static final String DRG_DMN = "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml";
@@ -259,6 +265,36 @@ public class HistoricDecisionInstanceQueryTest extends PluggableProcessEngineTes
 
     assertThat(query.decisionDefinitionName("sample decision").count(), is(1L));
     assertThat(query.decisionDefinitionName("other name").count(), is(0L));
+  }
+
+  @Deployment(resources = { DECISION_PROCESS, DECISION_PROCESS_WITH_UNDERSCORE, DECISION_SINGLE_OUTPUT_DMN, DECISION_SINGLE_OUTPUT_DMN_WITH_UNDERSCORE })
+  public void testQueryByDecisionDefinitionNameLike() {
+
+    startProcessInstanceAndEvaluateDecision();
+    startProcessInstanceAndEvaluateDecisionWithUnderscore();
+
+    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
+
+    assertThat(query.decisionDefinitionNameLike("%ample dec%").count(), is(1L));
+    assertThat(query.decisionDefinitionNameLike("%ample\\_%").count(), is(1L));
+
+  }
+
+  @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
+  public void testQueryByInvalidDecisionDefinitionNameLike() {
+
+    startProcessInstanceAndEvaluateDecision();
+
+    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
+
+    assertThat(query.decisionDefinitionNameLike("%invalid%").count(), is(0L));
+
+    try {
+      query.decisionDefinitionNameLike(null);
+      fail();
+    } catch (NotValidException e) {
+      // Expected exception
+    }
   }
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
@@ -552,6 +588,10 @@ public class HistoricDecisionInstanceQueryTest extends PluggableProcessEngineTes
 
   protected ProcessInstance startProcessInstanceAndEvaluateDecision() {
     return runtimeService.startProcessInstanceByKey("testProcess", getVariables());
+  }
+
+  protected ProcessInstance startProcessInstanceAndEvaluateDecisionWithUnderscore() {
+    return runtimeService.startProcessInstanceByKey("testProcess_", getVariables());
   }
 
   protected CaseInstance createCaseInstanceAndEvaluateDecision() {

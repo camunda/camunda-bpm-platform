@@ -45,6 +45,11 @@ public interface HistoricDecisionInstanceQuery extends Query<HistoricDecisionIns
   /** Only select historic decision instances with the given name of the decision definition. */
   HistoricDecisionInstanceQuery decisionDefinitionName(String decisionDefinitionName);
 
+  /**
+   * Only select historic decision instances with the given name of the decision definition using LIKE construct.
+   */
+  HistoricDecisionInstanceQuery decisionDefinitionNameLike(String decisionDefinitionNameLike);
+
   /** Only select historic decision instances that are evaluated inside a process
    * with the given process definition key. */
   HistoricDecisionInstanceQuery processDefinitionKey(String processDefinitionKey);
