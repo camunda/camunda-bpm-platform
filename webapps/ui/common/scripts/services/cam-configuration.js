@@ -1,5 +1,7 @@
 'use strict';
 
+var angular = require('angular');
+
 var defaultConfig = {
   'dateFormat': {
     'monthName': 'MMMM',
@@ -12,6 +14,10 @@ var defaultConfig = {
   'locales': {
     'availableLocales': ['en'],
     'fallbackLocale': 'en'
+  },
+  'skipCustomListeners': {
+    'default': true,
+    'hidden': false
   }
 };
 
@@ -61,6 +67,10 @@ module.exports = function(config, app) {
 
     this.getAppName = function() {
       return config.app && config.app.name ? config.app.name : app;
+    };
+
+    this.getSkipCustomListeners = function() {
+      return angular.extend({}, defaultConfig.skipCustomListeners, config.skipCustomListeners);
     };
 
     this.$get = function() {
