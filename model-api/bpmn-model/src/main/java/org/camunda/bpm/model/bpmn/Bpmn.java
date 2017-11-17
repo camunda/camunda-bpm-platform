@@ -328,6 +328,7 @@ public class Bpmn {
     DataObjectImpl.registerType(bpmnModelBuilder);
     DataObjectReferenceImpl.registerType(bpmnModelBuilder);
     DataStoreImpl.registerType(bpmnModelBuilder);
+    DataStoreReferenceImpl.registerType(bpmnModelBuilder);
     DefinitionsImpl.registerType(bpmnModelBuilder);
     DocumentationImpl.registerType(bpmnModelBuilder);
     EndEventImpl.registerType(bpmnModelBuilder);

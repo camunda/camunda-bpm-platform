@@ -16,6 +16,7 @@ package org.camunda.bpm.model.bpmn;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.camunda.bpm.model.bpmn.instance.DataStore;
+import org.camunda.bpm.model.bpmn.instance.DataStoreReference;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -40,4 +41,12 @@ public class DataStoreTest {
     assertThat(dataStore.isUnlimited()).isFalse();
   }
 
+  @Test
+  public void testGetDataStoreReference() {
+    DataStoreReference dataStoreReference = modelInstance.getModelElementById("myDataStoreReference");
+    DataStore dataStore = modelInstance.getModelElementById("myDataStore");
+    assertThat(dataStoreReference).isNotNull();
+    assertThat(dataStoreReference.getName()).isEqualTo("My Data Store Reference");
+    assertThat(dataStoreReference.getDataStore()).isEqualTo(dataStore);
+  }
 }

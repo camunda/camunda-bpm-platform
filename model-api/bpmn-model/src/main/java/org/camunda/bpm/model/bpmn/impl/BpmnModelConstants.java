@@ -93,6 +93,7 @@ public final class BpmnModelConstants {
   public static final String BPMN_ELEMENT_DATA_OBJECT = "dataObject";
   public static final String BPMN_ELEMENT_DATA_OBJECT_REFERENCE = "dataObjectReference";
   public static final String BPMN_ELEMENT_DATA_STORE = "dataStore";
+  public static final String BPMN_ELEMENT_DATA_STORE_REFERENCE = "dataStoreReference";
   public static final String BPMN_ELEMENT_DATA_INPUT = "dataInput";
   public static final String BPMN_ELEMENT_FORMAL_EXPRESSION = "formalExpression";
   public static final String BPMN_ELEMENT_DATA_ASSOCIATION = "dataAssociation";
@@ -365,6 +366,7 @@ public final class BpmnModelConstants {
   public static final String BPMN_ATTRIBUTE_ESCALATION_REF = "escalationRef";
   public static final String BPMN_ATTRIBUTE_EVENT_GATEWAY_TYPE = "eventGatewayType";
   public static final String BPMN_ATTRIBUTE_DATA_OBJECT_REF = "dataObjectRef";
+  public static final String BPMN_ATTRIBUTE_DATA_STORE_REF = "dataStoreRef";
   public static final String BPMN_ATTRIBUTE_METHOD = "method";
   public static final String BPMN_ATTRIBUTE_CAPACITY = "capacity";
   public static final String BPMN_ATTRIBUTE_IS_UNLIMITED = "isUnlimited";
