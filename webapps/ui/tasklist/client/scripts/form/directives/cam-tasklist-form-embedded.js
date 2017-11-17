@@ -34,14 +34,24 @@ module.exports = [
           '$invalid': true
         };
 
-        $scope.$watch('asynchronousFormKey', function(formInfo) {
+        function clearVariableManager() {
+          var variables = camForm.variableManager.variables;
+          for (var v in variables) {
+            camForm.variableManager.destroyVariable(v);
+          }
+        }
+
+        function handleAsynchronousFormKey(formInfo) {
+          // asynchronousFormKey = formInfo;
           if (formInfo && formInfo.loaded) {
             showForm(container, formInfo, formController.getParams());
           }
           if (formInfo && formInfo.failure) {
             formController.notifyFormInitializationFailed(formInfo.error);
           }
-        }, true);
+        }
+
+        $scope.$watch('asynchronousFormKey', handleAsynchronousFormKey, true);
 
         $scope.$watch(function() {
           return form && form.$valid;
@@ -113,8 +123,18 @@ module.exports = [
           }
         };
 
+        var localCallback = function(callback) {
+          return function(err, result) {
+            if(err) {
+              clearVariableManager();
+              handleAsynchronousFormKey($scope.asynchronousFormKey);
+            }
+
+            return callback(err, result);
+          };
+        };
         var complete = function(callback) {
-          camForm.submit(callback);
+          camForm.submit(localCallback(callback));
         };
 
         var save = function(evt) {
