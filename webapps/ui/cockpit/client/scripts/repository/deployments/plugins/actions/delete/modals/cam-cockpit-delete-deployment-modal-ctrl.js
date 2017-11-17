@@ -8,6 +8,7 @@ module.exports = [
   'deploymentData',
   'deployment',
   '$translate',
+  'configuration',
   function(
     $scope,
     $q,
@@ -15,7 +16,8 @@ module.exports = [
     Notifications,
     deploymentData,
     deployment,
-    $translate
+    $translate,
+    configuration
   ) {
 
     var Deployment = camAPI.resource('deployment');
@@ -24,11 +26,15 @@ module.exports = [
 
     var deleteDeploymentData = deploymentData.newChild($scope);
 
+    var SKIP_CUSTOM_LISTENERS = configuration.getSkipCustomListeners();
+
     var options = $scope.options = {
       cascade: false,
-      skipCustomListeners: true,
+      skipCustomListeners: SKIP_CUSTOM_LISTENERS.default,
       skipIoMappings: true
     };
+
+    $scope.hideSkipCustomListeners = SKIP_CUSTOM_LISTENERS.hidden;
 
     $scope.deployment = deployment;
     $scope.status;
