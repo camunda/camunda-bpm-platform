@@ -2,6 +2,7 @@ package org.camunda.bpm.spring.boot.starter.multitask;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.camunda.bpm.spring.boot.starter.AbstractCamundaAutoConfigurationIT;
 import org.camunda.bpm.spring.boot.starter.configuration.impl.DefaultJobConfiguration.JobConfiguration;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,7 +24,7 @@ import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = { MultipleTaskExecutorsIT.MultipleTaskExecutorsConfig.class })
-public class MultipleTaskExecutorsIT {
+public class MultipleTaskExecutorsIT extends AbstractCamundaAutoConfigurationIT {
 
   @Autowired
   private TaskExecutor[] taskExecutors;
