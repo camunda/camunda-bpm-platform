@@ -13,7 +13,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = { TestApplication.class }, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class CamundaBpmActuatorConfigurationIT {
+public class CamundaBpmActuatorConfigurationIT extends AbstractCamundaAutoConfigurationIT{
 
   @Autowired
   private TestRestTemplate testRestTemplate;
