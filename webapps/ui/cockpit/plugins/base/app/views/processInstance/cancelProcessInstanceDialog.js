@@ -52,7 +52,7 @@
         $scope.processInstance.$delete($scope.options, function() {
         // success
           $scope.status = CANCEL_SUCCESS;
-          Notifications.addMessage({'status': $translate.instant('PLUGIN_CANCEL_PROCESS_STATUS_CANCELED'), 'message': $translate.instant('PLUGIN_CANCEL_PROCESS_MESSAGE_1')});
+          Notifications.addMessage({'status': $translate.instant('PLUGIN_CANCEL_PROCESS_STATUS_DELETED'), 'message': $translate.instant('PLUGIN_CANCEL_PROCESS_MESSAGE_1')});
 
         }, function(err) {
         // failure
