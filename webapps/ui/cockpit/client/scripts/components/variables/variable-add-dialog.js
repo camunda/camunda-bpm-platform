@@ -4,7 +4,6 @@ var angular = require('angular');
 var fs = require('fs');
 
 var template = fs.readFileSync(__dirname + '/variable-add-dialog.html', 'utf8');
-var escapeUrl = require('camunda-bpm-sdk-js').utils.escapeUrl;
 
 var Controller = [
   '$http',
@@ -16,6 +15,7 @@ var Controller = [
   'isProcessInstance',
   'fixDate',
   '$translate',
+  'camAPI',
   function(
     $http,
     $modalInstance,
@@ -25,7 +25,8 @@ var Controller = [
     instance,
     isProcessInstance,
     fixDate,
-    $translate
+    $translate,
+    camAPI
   ) {
 
     $scope.isProcessInstance = isProcessInstance;
@@ -54,6 +55,9 @@ var Controller = [
         SUCCESS = 'SUCCESS',
         FAIL = 'FAIL';
 
+    var processInstance = camAPI.resource('process-instance');
+    var caseInstance = camAPI.resource('case-instance');
+
     $scope.$on('$routeChangeStart', function() {
       $modalInstance.close($scope.status);
     });
@@ -81,34 +85,33 @@ var Controller = [
 
       $scope.status = PERFORM_SAVE;
 
-      var data = angular.extend({}, newVariable),
-          name = escapeUrl(data.name);
-
-      delete data.name;
+      var data = angular.extend({}, newVariable);
 
       if(data.type === 'Date') {
         data.value = fixDate(data.value);
       }
 
-      $http
-      .put(Uri.appUri('engine://engine/:engine/'+(isProcessInstance ? 'process' : 'case')+'-instance/'+instance.id+'/variables/'+name), data)
-      .success(function() {
-        $scope.status = SUCCESS;
+      var instanceAPI = (isProcessInstance ? processInstance : caseInstance);
+      instanceAPI
+        .setVariable(instance.id, data)
+        .then(function() {
+          $scope.status = SUCCESS;
 
-        Notifications.addMessage({
-          status: $translate.instant('VARIABLE_ADD_MESSAGE_STATUS_FINISHED'),
-          message: $translate.instant('VARIABLE_ADD_MESSAGE_MESSAGE_ADD'),
-          exclusive: true
-        });
-      }).error(function(data) {
-        $scope.status = FAIL;
+          Notifications.addMessage({
+            status: $translate.instant('VARIABLE_ADD_MESSAGE_STATUS_FINISHED'),
+            message: $translate.instant('VARIABLE_ADD_MESSAGE_MESSAGE_ADD'),
+            exclusive: true
+          });
+        })
+        .catch(function(data) {
+          $scope.status = FAIL;
 
-        Notifications.addError({
-          status: $translate.instant('VARIABLE_ADD_MESSAGE_STATUS_FINISHED'),
-          message: $translate.instant('VARIABLE_ADD_MESSAGE_MESSAGE_ERROR', {message: data.message}),
-          exclusive: true
+          Notifications.addError({
+            status: $translate.instant('VARIABLE_ADD_MESSAGE_STATUS_FINISHED'),
+            message: $translate.instant('VARIABLE_ADD_MESSAGE_MESSAGE_ERROR', {message: data.message}),
+            exclusive: true
+          });
         });
-      });
     };
   }];
 
