@@ -25,7 +25,7 @@ module.exports = function(ngModule) {
   var Configuration = function PluginConfiguration(ViewsProvider) {
     ViewsProvider.registerDefaultView('cockpit.processInstance.runtime.action', {
       id: 'cancel-process-instance-action',
-      label: 'PLUGIN_CANCEL_PROCESS_CANCEL_ACTION',
+      label: 'PLUGIN_CANCEL_PROCESS_DELETE_ACTION',
       template: actionTemplate,
       controller: 'CancelProcessInstanceActionController',
       priority: 20

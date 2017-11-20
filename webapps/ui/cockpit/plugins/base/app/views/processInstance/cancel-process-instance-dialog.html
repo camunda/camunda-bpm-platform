@@ -1,6 +1,6 @@
 <!-- # CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/cancel-process-instance-dialog.html -->
 <div class="modal-header">
-  <h3>{{ 'PLUGIN_CANCEL_PROCESS_CANCEL_PROCESS_INSTANCE' | translate }}</h3>
+  <h3>{{ 'PLUGIN_CANCEL_PROCESS_DELETE_PROCESS_INSTANCE' | translate }}</h3>
 </div>
 
 <div class="cancel-process-instance modal-body">
@@ -18,7 +18,7 @@
   <div ng-show="status === 'beforeCancellation'">
     <div ng-show="subProcessInstances.length > 0">
       <p>
-        {{ 'PLUGIN_CANCEL_PROCESS_BEFORE_CANCELLATION' | translate }}
+        {{ 'PLUGIN_CANCEL_PROCESS_BEFORE_DELETION' | translate }}
       </p>
 
       <table class="table cam-table">
@@ -94,17 +94,17 @@
       </div>
     </form>
 
-    <p>{{ 'PLUGIN_CANCEL_PROCESS_CANCEL_CONFIRM' | translate }}</p>
+    <p>{{ 'PLUGIN_CANCEL_PROCESS_DELETE_CONFIRM' | translate }}</p>
   </div>
 
   <div ng-show="status === 'cancellationSuccess'">
-    <p>{{ 'PLUGIN_CANCEL_PROCESS_CANCEL_SUCCESS_1' | translate }}</p>
-    <p>{{ 'PLUGIN_CANCEL_PROCESS_CANCEL_SUCCESS_2' | translate }}</p>
+    <p>{{ 'PLUGIN_CANCEL_PROCESS_DELETE_SUCCESS_1' | translate }}</p>
+    <p>{{ 'PLUGIN_CANCEL_PROCESS_DELETE_SUCCESS_2' | translate }}</p>
   </div>
 
   <div ng-show="status === 'cancellationFailed'">
-    <p>{{ 'PLUGIN_CANCEL_PROCESS_CANCEL_FAILED_1' | translate }}</p>
-    <p>{{ 'PLUGIN_CANCEL_PROCESS_CANCEL_FAILED_2' | translate }}</p>
+    <p>{{ 'PLUGIN_CANCEL_PROCESS_DELETE_FAILED_1' | translate }}</p>
+    <p>{{ 'PLUGIN_CANCEL_PROCESS_DELETE_FAILED_2' | translate }}</p>
   </div>
 </div>
 
@@ -126,7 +126,7 @@
           ng-click="cancelProcessInstance()"
           ng-disabled="status !== 'beforeCancellation'"
           ng-hide="status === 'cancellationSuccess' || status === 'cancellationFailed' || status === 'loadingFailed'">
-    {{ 'PLUGIN_CANCEL_PROCESS_CANCEL_PROCESS_INSTANCE' | translate }}
+    {{ 'PLUGIN_CANCEL_PROCESS_DELETE_PROCESS_INSTANCE' | translate }}
   </button>
 </div>
 <!-- / CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/cancel-process-instance-dialog.html -->
