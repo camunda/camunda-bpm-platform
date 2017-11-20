@@ -4,6 +4,7 @@ var angular = require('angular');
 var fs = require('fs');
 
 var template = fs.readFileSync(__dirname + '/variable-add-dialog.html', 'utf8');
+var escapeUrl = require('camunda-bpm-sdk-js').utils.escapeUrl;
 
 var Controller = [
   '$http',
@@ -81,7 +82,7 @@ var Controller = [
       $scope.status = PERFORM_SAVE;
 
       var data = angular.extend({}, newVariable),
-          name = data.name;
+          name = escapeUrl(data.name);
 
       delete data.name;
 
