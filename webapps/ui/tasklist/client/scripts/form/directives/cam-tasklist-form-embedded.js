@@ -29,6 +29,7 @@ module.exports = [
       link : function($scope, $element, attrs, formController) {
         var container = $($element[0]).find('.form-container');
         var camForm = null;
+        var initialVariables = null;
         var form = $scope.form = {
           '$valid': false,
           '$invalid': true
@@ -39,6 +40,8 @@ module.exports = [
           for (var v in variables) {
             camForm.variableManager.destroyVariable(v);
           }
+          // reset initial form variables
+          camForm.variableManager.variables = initialVariables;
         }
 
         function handleAsynchronousFormKey(formInfo) {
@@ -85,7 +88,6 @@ module.exports = [
           });
 
           camForm = new CamForm(params);
-
         }
 
         var done = function(err, _camForm) {
@@ -93,6 +95,7 @@ module.exports = [
             return formController.notifyFormInitializationFailed(err);
           }
           camForm = _camForm;
+          initialVariables = angular.copy(camForm.variableManager.variables);
 
           var formName = _camForm.formElement.attr('name');
           var camFormScope = _camForm.formElement.scope();
@@ -127,7 +130,6 @@ module.exports = [
           return function(err, result) {
             if(err) {
               clearVariableManager();
-              handleAsynchronousFormKey($scope.asynchronousFormKey);
             }
 
             return callback(err, result);
