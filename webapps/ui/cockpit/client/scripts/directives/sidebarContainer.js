@@ -23,7 +23,7 @@ module.exports = ['localConf', '$rootScope', function(localConf, $rootScope) {
       if (attrs.ctnMinWidth) {
         var minWidthEls = $('.ctn-' + containerId + ' ' + attrs.ctnMinWidth, container);
         minWidthEls.each(function(e, el) {
-          minWidth += el.width;
+          minWidth += $(el).width();
         });
 
         // just to avoid half pixels glitches
