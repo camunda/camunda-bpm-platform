@@ -19,6 +19,7 @@ import java.util.Map;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.ScriptCompilationException;
 import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
@@ -117,6 +118,20 @@ public class ExternalScriptTaskTest extends PluggableProcessEngineTestCase {
     "org/camunda/bpm/engine/test/bpmn/scripttask/greeting.py"
   })
   public void testScriptInDeployment() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    String greeting = (String) runtimeService.getVariable(processInstance.getId(), "greeting");
+    assertNotNull(greeting);
+    assertEquals("Greetings camunda BPM speaking", greeting);
+  }
+
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/bpmn/scripttask/ExternalScriptTaskTest.testScriptInDeployment.bpmn20.xml",
+    "org/camunda/bpm/engine/test/bpmn/scripttask/greeting.py"
+  })
+  public void testScriptInDeploymentAfterCacheWasCleaned() {
+    processEngineConfiguration.getDeploymentCache().discardProcessDefinitionCache();
+
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
     String greeting = (String) runtimeService.getVariable(processInstance.getId(), "greeting");

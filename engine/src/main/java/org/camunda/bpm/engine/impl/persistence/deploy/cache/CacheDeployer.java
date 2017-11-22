@@ -64,6 +64,7 @@ public class CacheDeployer {
         return null;
       }
     });
+    deployment.setResources(null);
   }
 
   protected void initDeployment(final DeploymentEntity deployment, String... resourceNames) {
