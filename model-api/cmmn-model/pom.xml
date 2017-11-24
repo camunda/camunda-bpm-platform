@@ -16,7 +16,7 @@
   <packaging>jar</packaging>
 
   <properties>
-    <camunda.version.old>7.7.0</camunda.version.old>
+    <camunda.version.old>7.8.0</camunda.version.old>
   </properties>
 
   <dependencyManagement>
