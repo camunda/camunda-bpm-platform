@@ -24,6 +24,8 @@
     <!-- turn off metrics reporter -->
     <property name="dbMetricsReporterActivate" value="false" />
 
+    <property name="jdbcBatchProcessing" value="false"/>
+
   </bean>
 
 </beans>
