@@ -90,8 +90,14 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
         });
 
         $scope.activeTab = 'list';
+        $scope.tabActive = true;
+
         $scope.selectTab = function(tab) {
           $scope.activeTab = tab;
+        };
+
+        $scope.toggleSection = function toggleSection() {
+          $scope.tabActive = !$scope.tabActive;
         };
       }],
 
