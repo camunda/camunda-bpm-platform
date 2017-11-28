@@ -38,14 +38,15 @@ public class OutputParameter extends IoParameter {
   }
 
   protected void execute(AbstractVariableScope innerScope, AbstractVariableScope outerScope) {
-
-    // get value from inner scope
-    Object value = valueProvider.getValue(innerScope);
-
-    LOG.debugMappingValuefromInnerScopeToOuterScope(value, innerScope, name, outerScope);
-
-    // set variable in outer scope
-    outerScope.setVariable(name, value);
+    try {
+      // get value from inner scope
+      Object value = valueProvider.getValue(innerScope);
+      LOG.debugMappingValuefromInnerScopeToOuterScope(value, innerScope, name, outerScope);
+      // set variable in outer scope
+      outerScope.setVariable(name, value);
+    }catch (Exception e){
+      outerScope.setVariable(name, null);
+    }
   }
 
 }
