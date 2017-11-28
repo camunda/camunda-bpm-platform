@@ -36,7 +36,14 @@ module.exports = [function() {
         function updateSilently(params) {
           search.updateSilently(params);
         }
-        
+
+        function clearSelectedTask() {
+          tasksData.set('taskId', { 'taskId' : null });
+          var searchParams = $location.search() || {};
+          searchParams.task = null;
+          updateSilently(searchParams);
+        }
+
         $scope.expanded = {};
         $scope.toggle = function(delta, $event) {
           $scope.expanded[delta] = !$scope.expanded[delta];
@@ -138,11 +145,10 @@ module.exports = [function() {
             $scope.pageNum = ($scope.query.firstResult / $scope.pageSize) + 1;
 
             if (oldQuery.id) {
-              tasksData.set('taskId', { 'taskId' : null });
-              var searchParams = $location.search() || {};
-              searchParams.task = null;
-              updateSilently(searchParams);
+              clearSelectedTask();
             }
+          } else {
+            clearSelectedTask();
           }
         });
 
