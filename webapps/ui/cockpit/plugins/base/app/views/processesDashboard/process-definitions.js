@@ -13,7 +13,8 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
       '$scope',
       'Views',
       'camAPI',
-      function($scope, Views, camAPI) {
+      'localConf',
+      function($scope, Views, camAPI, localConf) {
 
         var getPDIncidentsCount = function(incidents) {
           if(!incidents) {
@@ -90,7 +91,7 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
         });
 
         $scope.activeTab = 'list';
-        $scope.tabActive = true;
+        $scope.tabActive = localConf.get('processesDashboardActive', true);
 
         $scope.selectTab = function(tab) {
           $scope.activeTab = tab;
@@ -98,6 +99,7 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
 
         $scope.toggleSection = function toggleSection() {
           $scope.tabActive = !$scope.tabActive;
+          localConf.set('processesDashboardActive', $scope.tabActive);
         };
       }],
 
