@@ -181,6 +181,12 @@
       <if test="entityType != null">
         and RES.ENTITY_TYPE_ = #{entityType}
       </if>
+      <if test="entityTypes != null &amp;&amp; entityTypes.length > 0">
+        and RES.ENTITY_TYPE_ in
+        <foreach item="entityType" collection="entityTypes" open="(" separator="," close=")">
+          #{entityType}
+        </foreach>
+      </if>
       <if test="property != null">
         and RES.PROPERTY_ = #{property}
       </if>

@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.history;
 
 import java.util.Date;
 
+import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.query.Query;
 
@@ -30,11 +31,22 @@ public interface UserOperationLogQuery extends Query<UserOperationLogQuery, User
    * result set to all operations which were performed on the same Entity (ie. all Task Operations,
    * All IdentityLink Operations ...)
    *
-   * @see UserOperationLogEntry#ENTITY_TYPE_TASK
-   * @see UserOperationLogEntry#ENTITY_TYPE_IDENTITY_LINK
-   * @see UserOperationLogEntry#ENTITY_TYPE_ATTACHMENT
+   * @see EntityTypes#TASK
+   * @see EntityTypes#IDENTITY_LINK
+   * @see EntityTypes#ATTACHMENT
    */
   UserOperationLogQuery entityType(String entityType);
+
+  /**
+   * Query for operations on entities of a given type only. This allows you to restrict the
+   * result set to all operations which were performed on the same Entity (ie. all Task Operations,
+   * All IdentityLink Operations ...)
+   *
+   * @see EntityTypes#TASK
+   * @see EntityTypes#IDENTITY_LINK
+   * @see EntityTypes#ATTACHMENT
+   */
+  UserOperationLogQuery entityTypeIn(String... entityTypes);
 
   /**
    * Query for operations of a given type only. Types of operations depend on the entity on which the operation

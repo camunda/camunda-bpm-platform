@@ -32,6 +32,7 @@ import java.util.List;
 
 import javax.ws.rs.core.Response.Status;
 
+import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
@@ -128,7 +129,8 @@ public class UserOperationLogRestServiceQueryTest extends AbstractRestServiceTes
         .queryParam("userId", "icke")
         .queryParam("operationId", "5")
         .queryParam("operationType", OPERATION_TYPE_CLAIM)
-        .queryParam("entityType", ENTITY_TYPE_TASK)
+        .queryParam("entityType", EntityTypes.TASK)
+        .queryParam("entityTypeIn", EntityTypes.TASK + "," + EntityTypes.VARIABLE)
         .queryParam("property", "owner")
         .then().expect().statusCode(Status.OK.getStatusCode())
         .when().get(USER_OPERATION_LOG_RESOURCE_URL);
@@ -148,7 +150,8 @@ public class UserOperationLogRestServiceQueryTest extends AbstractRestServiceTes
     verify(queryMock).userId("icke");
     verify(queryMock).operationId("5");
     verify(queryMock).operationType(OPERATION_TYPE_CLAIM);
-    verify(queryMock).entityType(ENTITY_TYPE_TASK);
+    verify(queryMock).entityType(EntityTypes.TASK);
+    verify(queryMock).entityTypeIn(EntityTypes.TASK, EntityTypes.VARIABLE);
     verify(queryMock).property("owner");
     verify(queryMock).list();
 

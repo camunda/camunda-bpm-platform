@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.rest.dto.history;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.MultivaluedMap;
@@ -22,6 +23,7 @@ import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
+import org.camunda.bpm.engine.rest.dto.converter.StringArrayConverter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -51,6 +53,8 @@ public class UserOperationLogQueryDto extends AbstractQueryDto<UserOperationLogQ
   protected String property;
   protected Date afterTimestamp;
   protected Date beforeTimestamp;
+
+  protected String[] entityTypes;
 
   public UserOperationLogQueryDto(ObjectMapper objectMapper, MultivaluedMap<String, String> queryParameters) {
     super(objectMapper, queryParameters);
@@ -115,6 +119,9 @@ public class UserOperationLogQueryDto extends AbstractQueryDto<UserOperationLogQ
     }
     if (entityType != null) {
       query.entityType(entityType);
+    }
+    if (entityTypes != null) {
+      query.entityTypeIn(entityTypes);
     }
     if (property != null) {
       query.property(property);
@@ -212,6 +219,11 @@ public class UserOperationLogQueryDto extends AbstractQueryDto<UserOperationLogQ
   @CamundaQueryParam("entityType")
   public void setEntityType(String entityType) {
     this.entityType = entityType;
+  }
+
+  @CamundaQueryParam(value = "entityTypeIn", converter = StringArrayConverter.class)
+  public void setEntityTypeIn(String[] entityTypes) {
+    this.entityTypes = entityTypes;
   }
 
   @CamundaQueryParam("property")

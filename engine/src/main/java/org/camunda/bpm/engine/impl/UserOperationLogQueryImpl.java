@@ -49,6 +49,8 @@ public class UserOperationLogQueryImpl extends AbstractQuery<UserOperationLogQue
   protected Date timestampAfter;
   protected Date timestampBefore;
 
+  protected String[] entityTypes;
+
   public UserOperationLogQueryImpl() {
   }
 
@@ -156,6 +158,12 @@ public class UserOperationLogQueryImpl extends AbstractQuery<UserOperationLogQue
   public UserOperationLogQuery entityType(String entityType) {
     ensureNotNull("entityType", entityType);
     this.entityType = entityType;
+    return this;
+  }
+
+  public UserOperationLogQuery entityTypeIn(String... entityTypes) {
+    ensureNotNull("entity types", (Object[]) entityTypes);
+    this.entityTypes = entityTypes;
     return this;
   }
 

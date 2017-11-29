@@ -873,6 +873,46 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     verifyVariableOperationAsserts(3, UserOperationLogEntry.OPERATION_TYPE_REMOVE_VARIABLE);
   }
 
+  @Deployment(resources = {ONE_TASK_PROCESS})
+  public void testQueryByEntityTypes() {
+    // given
+    process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    processTaskId = taskService.createTaskQuery().singleResult().getId();
+
+    // when
+    taskService.setAssignee(processTaskId, "foo");
+    taskService.setVariable(processTaskId, "foo", "bar");
+
+    // then
+    UserOperationLogQuery query = historyService
+        .createUserOperationLogQuery()
+        .entityTypeIn(EntityTypes.TASK, EntityTypes.VARIABLE);
+
+    verifyQueryResults(query, 2);
+  }
+
+  public void testQueryByInvalidEntityTypes() {
+    UserOperationLogQuery query = historyService
+        .createUserOperationLogQuery()
+        .entityTypeIn("foo");
+
+    verifyQueryResults(query, 0);
+
+    try {
+      query.entityTypeIn(null);
+      fail();
+    } catch (ProcessEngineException e) {
+      // expected
+    }
+
+    try {
+      query.entityTypeIn(EntityTypes.TASK, null, EntityTypes.VARIABLE);
+      fail();
+    } catch (ProcessEngineException e) {
+      // expected
+    }
+  }
+
   // --------------- CMMN --------------------
 
   @Deployment(resources={ONE_TASK_CASE})
