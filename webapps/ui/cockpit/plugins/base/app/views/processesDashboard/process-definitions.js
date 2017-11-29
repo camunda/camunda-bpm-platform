@@ -38,35 +38,51 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
         var processDefinitionService = camAPI.resource('process-definition');
         $scope.loadingState = 'LOADING';
 
-        processDefinitionService.list({
-          latest: true
-        }, function(err, data) {
-          $scope.processDefinitionData = data.items;
-          $scope.processDefinitionsCount = data.items.length;
-          if (err) {
-            $scope.loadingState = 'ERROR';
-          }
+        // only get count of process definitions
+        var countProcessDefinitions =  function() {
+          processDefinitionService.count({
+            latest: true
+          }, function(err, count) {
+            if (err) {
+              $scope.loadingState = 'ERROR';
+            }
+            $scope.processDefinitionsCount = count;
+          });
+        };
 
-          $scope.loadingState = 'LOADED';
+        // get full list of process definitions and related resources
+        var listProcessDefinitions =  function() {
+          processDefinitionService.list({
+            latest: true
+          }, function(err, data) {
+            $scope.processDefinitionData = data.items;
+            $scope.processDefinitionsCount = data.items.length;
+            if (err) {
+              $scope.loadingState = 'ERROR';
+            }
 
-          processData.observe('processDefinitionStatistics', function(processDefinitionStatistics) {
-            $scope.statistics = processDefinitionStatistics;
+            $scope.loadingState = 'LOADED';
 
-            $scope.statistics.forEach(function(statistic) {
-              var processDefId = statistic.definition.id;
-              var foundIds = $scope.processDefinitionData.filter(function(pd) {
-                return pd.id === processDefId;
+            processData.observe('processDefinitionStatistics', function(processDefinitionStatistics) {
+              $scope.statistics = processDefinitionStatistics;
+
+              $scope.statistics.forEach(function(statistic) {
+                var processDefId = statistic.definition.id;
+                var foundIds = $scope.processDefinitionData.filter(function(pd) {
+                  return pd.id === processDefId;
+                });
+
+                var foundObject = foundIds[0];
+                if(foundObject) {
+                  foundObject.incidents = statistic.incidents;
+                  foundObject.incidentCount = getPDIncidentsCount(foundObject.incidents);
+                  foundObject.instances = statistic.instances;
+                }
               });
-
-              var foundObject = foundIds[0];
-              if(foundObject) {
-                foundObject.incidents = statistic.incidents;
-                foundObject.incidentCount = getPDIncidentsCount(foundObject.incidents);
-                foundObject.instances = statistic.instances;
-              }
             });
           });
-        });
+        };
+
 
         $scope.processesActions = Views.getProviders({ component: 'cockpit.processes.action'});
         $scope.hasActionPlugin = $scope.processesActions.length > 0;
@@ -91,15 +107,19 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
         });
 
         $scope.activeTab = 'list';
-        $scope.tabActive = localConf.get('processesDashboardActive', true);
 
         $scope.selectTab = function(tab) {
           $scope.activeTab = tab;
         };
 
+        $scope.activeSection = localConf.get('processesDashboardActive', true);
+        // if tab is not active, it's enough to only get the count of process definitions
+        $scope.activeSection ? listProcessDefinitions() : countProcessDefinitions();
+
         $scope.toggleSection = function toggleSection() {
-          $scope.tabActive = !$scope.tabActive;
-          localConf.set('processesDashboardActive', $scope.tabActive);
+          // if tab is not active, it's enough to only get the count of process definitions
+          ($scope.activeSection = !$scope.activeSection) ? listProcessDefinitions() : countProcessDefinitions();
+          localConf.set('processesDashboardActive', $scope.activeSection);
         };
       }],
 
