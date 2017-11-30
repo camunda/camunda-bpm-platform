@@ -9,6 +9,6 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
     },
     template: '<!-- nothing to show, but needed -->',
     controller: function() {},
-    priority: 30
+    priority: 90
   });
 }];
