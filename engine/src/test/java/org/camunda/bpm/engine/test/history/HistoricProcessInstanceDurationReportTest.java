@@ -275,6 +275,7 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     DurationReportResultAssertion assertion = createReportScenario()
       .periodUnit(QUARTER)
       .startAndCompleteProcessInstance("process", 2016, 0, 15, 10, 0) // 15.01.2016 10:00
+      .startAndCompleteProcessInstance("process", 2016, 0, 15, 10, 0) // 15.01.2016 10:00
       .done();
 
     // start a second process instance
