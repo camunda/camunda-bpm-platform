@@ -15,6 +15,8 @@ package org.camunda.bpm.engine.impl;
 import static org.camunda.bpm.engine.impl.util.CompareUtil.areNotInAscendingOrder;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -29,6 +31,7 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.query.PeriodUnit;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
 
 /**
  * @author Roman Smirnov
@@ -120,8 +123,32 @@ public class HistoricProcessInstanceReportImpl implements HistoricProcessInstanc
   protected void doAuthCheck(CommandContext commandContext) {
     // since a report does only make sense in context of historic
     // data, the authorization check will be performed here
-    for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
-      checker.checkReadHistoryAnyProcessDefinition();
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      if (processDefinitionIdIn == null && processDefinitionKeyIn == null) {
+        checker.checkReadHistoryAnyProcessDefinition();
+      } else {
+        List<String> processDefinitionKeys = new ArrayList<String>();
+        if (processDefinitionKeyIn != null) {
+          processDefinitionKeys.addAll(Arrays.asList(processDefinitionKeyIn));
+        }
+
+        if (processDefinitionIdIn != null) {
+          for (String processDefinitionId : processDefinitionIdIn) {
+            ProcessDefinition processDefinition = commandContext.getProcessDefinitionManager()
+              .findLatestProcessDefinitionById(processDefinitionId);
+
+            if (processDefinition != null && processDefinition.getKey() != null) {
+              processDefinitionKeys.add(processDefinition.getKey());
+            }
+          }
+        }
+
+        if (!processDefinitionKeys.isEmpty()) {
+          for (String processDefinitionKey : processDefinitionKeys) {
+            checker.checkReadHistoryProcessDefinition(processDefinitionKey);
+          }
+        }
+      }
     }
   }
 

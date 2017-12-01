@@ -361,6 +361,202 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
     assertEquals(1, result.size());
   }
 
+  public void testReportWithoutQueryCriteriaAndAnyReadHistoryPermission() {
+    // given
+    ProcessInstance processInstance1 = startProcessInstanceByKey(PROCESS_KEY);
+    ProcessInstance processInstance2 = startProcessInstanceByKey(MESSAGE_START_PROCESS_KEY);
+    disableAuthorization();
+    runtimeService.deleteProcessInstance(processInstance1.getProcessInstanceId(), "");
+    runtimeService.deleteProcessInstance(processInstance2.getProcessInstanceId(), "");
+    enableAuthorization();
+
+    createGrantAuthorization(PROCESS_DEFINITION, "*", userId, READ_HISTORY);
+
+    // when
+    List<DurationReportResult> result = historyService
+        .createHistoricProcessInstanceReport()
+        .duration(PeriodUnit.MONTH);
+
+    // then
+    assertEquals(1, result.size());
+  }
+
+  public void testReportWithoutQueryCriteriaAndNoReadHistoryPermission() {
+    // given
+    ProcessInstance processInstance1 = startProcessInstanceByKey(PROCESS_KEY);
+    ProcessInstance processInstance2 = startProcessInstanceByKey(MESSAGE_START_PROCESS_KEY);
+    disableAuthorization();
+    runtimeService.deleteProcessInstance(processInstance1.getProcessInstanceId(), "");
+    runtimeService.deleteProcessInstance(processInstance2.getProcessInstanceId(), "");
+    enableAuthorization();
+
+    // when
+    try {
+      historyService
+        .createHistoricProcessInstanceReport()
+        .duration(PeriodUnit.MONTH);
+
+      // then
+      fail("Exception expected: It should not be possible to create a historic process instance report");
+    } catch (AuthorizationException e) {
+
+    }
+  }
+
+  public void testReportWithQueryCriterionProcessDefinitionKeyInAndReadHistoryPermission() {
+    // given
+    ProcessInstance processInstance1 = startProcessInstanceByKey(PROCESS_KEY);
+    ProcessInstance processInstance2 = startProcessInstanceByKey(MESSAGE_START_PROCESS_KEY);
+    disableAuthorization();
+    runtimeService.deleteProcessInstance(processInstance1.getProcessInstanceId(), "");
+    runtimeService.deleteProcessInstance(processInstance2.getProcessInstanceId(), "");
+    enableAuthorization();
+
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_HISTORY);
+    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_START_PROCESS_KEY, userId, READ_HISTORY);
+
+    // when
+    List<DurationReportResult> result = historyService
+      .createHistoricProcessInstanceReport()
+      .processDefinitionKeyIn(PROCESS_KEY, MESSAGE_START_PROCESS_KEY)
+      .duration(PeriodUnit.MONTH);
+
+    // then
+    assertEquals(1, result.size());
+  }
+
+  public void testReportWithQueryCriterionProcessDefinitionKeyInAndMissingReadHistoryPermission() {
+    // given
+    ProcessInstance processInstance1 = startProcessInstanceByKey(PROCESS_KEY);
+    ProcessInstance processInstance2 = startProcessInstanceByKey(MESSAGE_START_PROCESS_KEY);
+    disableAuthorization();
+    runtimeService.deleteProcessInstance(processInstance1.getProcessInstanceId(), "");
+    runtimeService.deleteProcessInstance(processInstance2.getProcessInstanceId(), "");
+    enableAuthorization();
+
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_HISTORY);
+
+    // when
+    try {
+      historyService
+        .createHistoricProcessInstanceReport()
+        .processDefinitionKeyIn(PROCESS_KEY, MESSAGE_START_PROCESS_KEY)
+        .duration(PeriodUnit.MONTH);
+
+      // then
+      fail("Exception expected: It should not be possible to create a historic process instance report");
+    } catch (AuthorizationException e) {
+
+    }
+  }
+
+  public void testReportWithQueryCriterionProcessDefinitionIdInAndReadHistoryPermission() {
+    // given
+    ProcessInstance processInstance1 = startProcessInstanceByKey(PROCESS_KEY);
+    ProcessInstance processInstance2 = startProcessInstanceByKey(MESSAGE_START_PROCESS_KEY);
+    disableAuthorization();
+    runtimeService.deleteProcessInstance(processInstance1.getProcessInstanceId(), "");
+    runtimeService.deleteProcessInstance(processInstance2.getProcessInstanceId(), "");
+    enableAuthorization();
+
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_HISTORY);
+    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_START_PROCESS_KEY, userId, READ_HISTORY);
+
+    // when
+    List<DurationReportResult> result = historyService
+      .createHistoricProcessInstanceReport()
+      .processDefinitionIdIn(processInstance1.getProcessDefinitionId(), processInstance2.getProcessDefinitionId())
+      .duration(PeriodUnit.MONTH);
+
+    // then
+    assertEquals(1, result.size());
+  }
+
+  public void testReportWithQueryCriterionProcessDefinitionIdInAndMissingReadHistoryPermission() {
+    // given
+    ProcessInstance processInstance1 = startProcessInstanceByKey(PROCESS_KEY);
+    ProcessInstance processInstance2 = startProcessInstanceByKey(MESSAGE_START_PROCESS_KEY);
+    disableAuthorization();
+    runtimeService.deleteProcessInstance(processInstance1.getProcessInstanceId(), "");
+    runtimeService.deleteProcessInstance(processInstance2.getProcessInstanceId(), "");
+    enableAuthorization();
+
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_HISTORY);
+
+    // when
+    try {
+      historyService
+        .createHistoricProcessInstanceReport()
+        .processDefinitionIdIn(processInstance1.getProcessDefinitionId(), processInstance2.getProcessDefinitionId())
+        .duration(PeriodUnit.MONTH);
+
+      // then
+      fail("Exception expected: It should not be possible to create a historic process instance report");
+    } catch (AuthorizationException e) {
+
+    }
+  }
+
+  public void testReportWithMixedQueryCriteriaAndReadHistoryPermission() {
+    // given
+    ProcessInstance processInstance1 = startProcessInstanceByKey(PROCESS_KEY);
+    ProcessInstance processInstance2 = startProcessInstanceByKey(MESSAGE_START_PROCESS_KEY);
+    disableAuthorization();
+    runtimeService.deleteProcessInstance(processInstance1.getProcessInstanceId(), "");
+    runtimeService.deleteProcessInstance(processInstance2.getProcessInstanceId(), "");
+    enableAuthorization();
+
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_HISTORY);
+    createGrantAuthorization(PROCESS_DEFINITION, MESSAGE_START_PROCESS_KEY, userId, READ_HISTORY);
+
+    // when
+    List<DurationReportResult> result = historyService
+      .createHistoricProcessInstanceReport()
+      .processDefinitionKeyIn(PROCESS_KEY)
+      .processDefinitionIdIn(processInstance2.getProcessDefinitionId())
+      .duration(PeriodUnit.MONTH);
+
+    // then
+    assertEquals(0, result.size());
+  }
+
+  public void testReportWithMixedQueryCriteriaAndMissingReadHistoryPermission() {
+    // given
+    ProcessInstance processInstance1 = startProcessInstanceByKey(PROCESS_KEY);
+    ProcessInstance processInstance2 = startProcessInstanceByKey(MESSAGE_START_PROCESS_KEY);
+    disableAuthorization();
+    runtimeService.deleteProcessInstance(processInstance1.getProcessInstanceId(), "");
+    runtimeService.deleteProcessInstance(processInstance2.getProcessInstanceId(), "");
+    enableAuthorization();
+
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_HISTORY);
+
+    // when
+    try {
+    historyService
+      .createHistoricProcessInstanceReport()
+      .processDefinitionKeyIn(PROCESS_KEY)
+      .processDefinitionIdIn(processInstance2.getProcessDefinitionId())
+      .duration(PeriodUnit.MONTH);
+
+      // then
+      fail("Exception expected: It should not be possible to create a historic process instance report");
+    } catch (AuthorizationException e) {
+
+    }
+  }
+
+  public void testReportWithQueryCriterionProcessInstanceIdInWrongProcessDefinitionId() {
+    // when
+    List<DurationReportResult> result = historyService
+      .createHistoricProcessInstanceReport()
+      .processDefinitionIdIn("aWrongProcessDefinitionId")
+      .duration(PeriodUnit.MONTH);
+
+    // then
+    assertEquals(0, result.size());
+  }
+
   public void testHistoryCleanupReportWithPermissions() {
     // given
     prepareProcessInstances(PROCESS_KEY, -6, 5, 10);

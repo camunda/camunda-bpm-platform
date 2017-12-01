@@ -389,6 +389,14 @@ public class TenantCommandChecker implements CommandChecker {
   }
 
   @Override
+  public void checkReadHistoryProcessDefinition(String processDefinitionId) {
+    // No tenant check here because it is called in the SQL query:
+    // Report.selectHistoricProcessInstanceDurationReport
+    // It is necessary to make the check there because the query may be return only the
+    // historic process instances which belong to the authenticated tenant.
+  }
+
+  @Override
   public void checkReadHistoryAnyTaskInstance() {
     // No tenant check here because it is called in the SQL query:
     // Report.selectHistoricProcessInstanceDurationReport
