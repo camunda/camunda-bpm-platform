@@ -15,11 +15,25 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
     controller: [
       '$scope', '$location', 'search', 'routeUtil', 'PluginProcessInstanceResource', '$translate',
       function($scope,   $location,   search,   routeUtil,   PluginProcessInstanceResource, $translate) {
+
+        var processDefinition = $scope.processDefinition;
+        $scope.onSearchChange = updateView;
+        $scope.onSortChange   = updateView;
+
+        $scope.headColumns = [
+          { class: 'state',        request: 'state',       sortable: false, content: 'PLUGIN_PROCESS_INSTANCE_STATE'},
+          { class: 'instance-id',  request: 'instanceId',  sortable: false, content: 'PLUGIN_PROCESS_INSTANCE_ID'},
+          { class: 'start-time',   request: 'startTime',   sortable: true,  content: 'PLUGIN_PROCESS_INSTANCE_START_TIME'},
+          { class: 'business-key', request: 'businessKey', sortable: false, content: 'PLUGIN_PROCESS_INSTANCE_BUSINESS_KEY'}
+        ];
+        // Default Sorting
+        $scope.sortObj = { sortBy: 'startTime', sortOrder: 'desc' };
+
+
         $scope.searchConfig = angular.copy(searchConfig);
         angular.forEach(searchConfig.tooltips, function(translation, tooltip) {
           $scope.searchConfig.tooltips[tooltip] = $translate.instant(translation);
         });
-
         $scope.searchConfig.types.map(function(type) {
           type.id.value = $translate.instant(type.id.value);
           if (type.operators) {
@@ -31,12 +45,16 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
           return type;
         });
 
-        var processDefinition = $scope.processDefinition;
-        $scope.onSearchChange = updateView;
+        function updateView(query, pages, sortObj) {
 
-        function updateView(query, pages) {
-          var page = pages.current,
-              count = pages.size,
+          //Make pages available in process Instance table TODO: better solution required
+          $scope.pagesObj = pages   || $scope.pagesObj ;
+          $scope.queryObj = query   || $scope.queryObj;
+          sortObj         = sortObj || $scope.sortObj;
+
+          var page        =  $scope.pagesObj.current,
+              queryParams =  $scope.queryObj,
+              count       =  $scope.pagesObj.size,
               firstResult = (page - 1) * count;
 
           var defaultParams = {
@@ -44,14 +62,14 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
           };
 
           var pagingParams = {
-            firstResult: firstResult,
-            maxResults: count,
-            sortBy: 'startTime',
-            sortOrder: 'desc'
+            firstResult    : firstResult,
+            maxResults     : count,
+            sortBy         : sortObj.sortBy,
+            sortOrder      : sortObj.sortOrder
           };
 
           var params = angular.extend({}, query, pagingParams, defaultParams);
-          var countParams = angular.extend({}, query, defaultParams);
+          var countParams = angular.extend({}, queryParams, defaultParams);
 
           $scope.processInstances = null;
           $scope.loadingState = 'LOADING';
@@ -62,7 +80,6 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
             return PluginProcessInstanceResource.query(pagingParams, params).$promise.then(function(data) {
               $scope.processInstances = data;
               $scope.loadingState = data.length ? 'LOADED' : 'EMPTY';
-
               return total;
             });
           });

@@ -10,7 +10,21 @@ var Directive = [
   '$http', '$q', '$modal', 'search', 'Uri', 'Views',
   function($http,  $q,   $modal,   search,   Uri, Views) {
 
+
+   /* scope.headColumns = [
+      { class: 'state', request: 'state', sortable: false, content: 'PLUGIN_INCIDENTS_TAB_STATE'},
+      { class: 'message',   request: 'instanceId',  sortable: false,  content: 'PLUGIN_INCIDENTS_TAB_MESSAGE'},
+      { class: 'timestamp', request: 'startTime',   sortable: false,  content: 'PLUGIN_INCIDENTS_TAB_TIMESTAMP'},
+      { class: 'activity',  request: 'startTime',   sortable: false,  content: 'PLUGIN_INCIDENTS_TAB_ACTIVITY'},
+      { class: 'cause instance-id uuid',        request: 'startTime', sortable: false,  content: 'PLUGIN_INCIDENTS_TAB_CAUSE_INSTANCE_ID'},
+      { class: 'cause-root instance-id uuid',   request: 'startTime', sortable: false,  content: 'PLUGIN_INCIDENTS_TAB_CAUSE_ROOT_INSTANCE_ID'},
+      { class: 'type',      request: 'startTime',   sortable: false,  content: 'PLUGIN_INCIDENTS_TAB_TYPE'},
+      { class: 'action',    request: 'startTime',   sortable: false,  content: 'PLUGIN_INCIDENTS_TAB_ACTION'}
+    ];*/
+
+
     var Link =  function linkFunction(scope) {
+
 
       var incidentData = scope.processData.newChild(scope);
 

@@ -9,14 +9,13 @@
      storage-group="'PDI'">
 
   <table class="process-instances cam-table">
-    <thead>
-      <tr>
-        <th class="state">{{'PLUGIN_PROCESS_INSTANCE_STATE' | translate}}</th>
-        <th class="instance-id">{{'PLUGIN_PROCESS_INSTANCE_ID' | translate}}</th>
-        <th class="start-time">{{'PLUGIN_PROCESS_INSTANCE_START_TIME' | translate}}</th>
-        <th class="business-key">{{'PLUGIN_PROCESS_INSTANCE_BUSINESS_KEY' | translate}}</th>
-      </tr>
+
+    <thead sortable-table-head
+           head-columns="headColumns"
+           on-sort-change="onSortChange(query, pages, sortObj)"
+           default-sort="sortObj">
     </thead>
+
     <tbody>
       <tr ng-repeat="processInstance in processInstances">
         <td class="state">
