@@ -45,17 +45,7 @@ class CamundaFeelEngineIntegrationTest extends FlatSpec with Matchers {
 
     camundaFeelEngine.evaluateSimpleExpression[Any]("2.4", context) should be (new java.lang.Double(2.4))
   }
-
-  it should "return data-time as Java Date" in {
-
-    val camundaFeelEngine = camundaFeelEngineFactory.createInstance()
-    val context = new SimpleTestContext(Map())
-
-    val date = java.util.Date.from(LocalDateTime.parse("2017-03-10T11:45:30").atZone(ZoneId.systemDefault).toInstant)
-
-    camundaFeelEngine.evaluateSimpleExpression[Any](""" date and time("2017-03-10T11:45:30") """, context) should be (date)
-  }
-
+  
   it should "return list as Java List" in {
 
   	val camundaFeelEngine = camundaFeelEngineFactory.createInstance()
