@@ -1,3 +1,4 @@
+/* eslint-disable indent */
 'use strict';
 
 var angular = require('angular');
@@ -26,7 +27,8 @@ module.exports = function(ngModule) {
           variableCopies;
 
       var executionService = camAPI.resource('execution'),
-          taskService = camAPI.resource('task');
+          taskService      = camAPI.resource('task'),
+          variableService  = camAPI.resource('variable');
 
       $scope.searchConfig = angular.copy(variableInstancesTabSearchConfig);
 
@@ -56,16 +58,19 @@ module.exports = function(ngModule) {
         return $q.when($scope.total);
       });
 
-      $scope.onSearchChange = function(query, pages) {
-        $scope.query = query;
-        $scope.pages = pages;
+      $scope.onSearchChange = function(query, pages, sortObj) {
+        $scope.query = query ||  $scope.query;
+        $scope.pages = pages ||  $scope.pages;
 
         if ($scope.instanceIdToInstanceMap) {
-          return updateView($scope.instanceIdToInstanceMap, query, pages);
+          return updateView($scope.instanceIdToInstanceMap, query, pages, sortObj);
         }
 
         return $q.when($scope.total);
       };
+
+      $scope.onSortChange = $scope.onSearchChange;
+
 
       $scope.getSearchQueryForSearchType = searchWidgetUtils.getSearchQueryForSearchType.bind(null, 'activityInstanceIdIn');
 
@@ -235,14 +240,18 @@ module.exports = function(ngModule) {
         return 'engine://engine/:engine/execution/' + variable.executionId + '/localVariables/' + variable.name;
       }
 
-      function updateView(instanceIdToInstanceMap, variableQuery, pages) {
+      function updateView(instanceIdToInstanceMap, variableQuery, pages, sortObj) {
         var page = pages.current,
             count = pages.size,
             firstResult = (page - 1) * count;
 
+
+
         var defaultParams = {
           processInstanceIdIn: [ processInstance.id ]
         };
+
+        if(sortObj) {defaultParams.sorting = [sortObj];}
 
         var pagingParams = {
           firstResult: firstResult,
@@ -259,15 +268,15 @@ module.exports = function(ngModule) {
         variableCopies = {};
 
         // get the 'count' of variables
-        return $http
-          .post(Uri.appUri('engine://engine/:engine/variable-instance/count'), params)
+        return variableService
+          .count(params)
           .then(function(response) {
-            $scope.total = response.data.count;
+            $scope.total = response;
 
-            return $http
-              .post(Uri.appUri('engine://engine/:engine/variable-instance/'), params, { params: pagingParams })
+            return variableService
+              .instances(params, { params: pagingParams })
               .then(function(response) {
-                var data = response.data;
+                var data = response;
 
                 $scope.variables = data.map(function(item) {
                   var instance = instanceIdToInstanceMap[item.activityInstanceId];
@@ -282,13 +291,13 @@ module.exports = function(ngModule) {
                   var activityInstanceLink = '';
                   if(instance) {
                     activityInstanceLink = '<a ng-href="#/process-instance/' +
-                        processInstance.id + '/runtime' +
-                        '?detailsTab=variables-tab&'+ $scope.getSearchQueryForSearchType(instance.id) +
-                        '" title="' +
-                        instance.id +
-                        '">' +
-                        instance.name  +
-                        '</a>';
+                      processInstance.id + '/runtime' +
+                      '?detailsTab=variables-tab&'+ $scope.getSearchQueryForSearchType(instance.id) +
+                      '" title="' +
+                      instance.id +
+                      '">' +
+                      instance.name  +
+                      '</a>';
                   }
 
                   return {
@@ -314,7 +323,7 @@ module.exports = function(ngModule) {
                 $scope.loadingState = data.length ? 'LOADED' : 'EMPTY';
 
                 return $scope.total;
-              });
+            });
           });
       }
 

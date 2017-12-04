@@ -3,7 +3,7 @@
      config="searchConfig"
      array-types="['activityInstanceIdIn']"
      variable-types="['variableValues']"
-     on-search-change="onSearchChange(query, pages)"
+     on-search-change="onSearchChange(query, pages,sortObj)"
      loading-state="loadingState"
      text-empty="{{ 'PLUGIN_VARIABLE_NO_PROCESS_VARIABLES' | translate }}"
      blocked="!instanceIdToInstanceMap"
@@ -15,6 +15,7 @@
            on-upload="uploadVariable"
            on-delete="deleteVariable"
            on-download="downloadVariable"
+           on-Sort-Change="onSortChange(query, pages,sortObj)"
            cam-variables="variables"
            cam-editable="['type', 'value']"
            cam-headers="getHeaderVariable">
