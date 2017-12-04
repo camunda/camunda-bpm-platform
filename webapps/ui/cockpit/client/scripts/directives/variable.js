@@ -14,7 +14,8 @@ module.exports = ['typeUtils', function(typeUtils) {
   return {
     restrict: 'EAC',
     scope: {
-      variable: '='
+      variable: '=',
+      form: '@'
     },
     replace: true,
     template: template,
@@ -25,13 +26,13 @@ module.exports = ['typeUtils', function(typeUtils) {
           oldVariableValueBoolean = true;
 
 
-      var getFormScope = function() {
-        return angular.element('[name="addVariableForm"]').scope();
+      var getForm = function() {
+        return angular.element('[name="'+scope.form+'"]').scope()[scope.form];
       };
 
       var customJsonXmlValidator = function(type, value) {
         var valid = typeUtils.isType(value, type);
-        getFormScope().addVariableForm.$setValidity('customValidation', valid);
+        getForm().$setValidity('customValidation', valid);
       };
 
       scope.changeVariableValue = function() {
