@@ -51,6 +51,7 @@
          required />
 
   <textarea ng-if="isString(variable) || isJSON(variable) || isXML(variable)"
+            id="value"
             rows="5"
             ng-model="variable.value"
             ng-change="changeVariableValue()"
