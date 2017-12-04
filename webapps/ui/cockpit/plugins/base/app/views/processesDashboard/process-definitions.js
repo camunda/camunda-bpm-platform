@@ -56,7 +56,7 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
             latest: true
           }, function(err, data) {
             $scope.processDefinitionData = data.items;
-            $scope.processDefinitionsCount = data.items.length;
+            $scope.processDefinitionsCount = data.count;
             if (err) {
               $scope.loadingState = 'ERROR';
             }
