@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
@@ -44,6 +45,8 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
 public class HistoricProcessInstanceDurationReportTest extends PluggableProcessEngineTestCase {
 
+  private Random random = new Random();
+
   public void testDurationReportByMonth() {
     // given
     deployment(createProcessWithUserTask("process"));
@@ -51,6 +54,8 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
     DurationReportResultAssertion assertion = createReportScenario()
       .periodUnit(MONTH)
       // period: 01 (January)
+      .startAndCompleteProcessInstance("process", 2016, 0, 1, 10, 0) // 01.01.2016 10:00
+      .startAndCompleteProcessInstance("process", 2016, 0, 1, 10, 0) // 01.01.2016 10:00
       .startAndCompleteProcessInstance("process", 2016, 0, 1, 10, 0) // 01.01.2016 10:00
       .done();
 
@@ -71,6 +76,7 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
         .periodUnit(MONTH)
         // period: 01 (January)
         .startAndCompleteProcessInstance("process", 2016, 0, 1, 10, 0) // 01.01.2016 10:00
+        .startAndCompleteProcessInstance("process", 2016, 0, 15, 10, 0) // 15.01.2016 10:00
         .startAndCompleteProcessInstance("process", 2016, 0, 15, 10, 0) // 15.01.2016 10:00
         .done();
 
@@ -276,10 +282,13 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
       .periodUnit(QUARTER)
       .startAndCompleteProcessInstance("process", 2016, 0, 15, 10, 0) // 15.01.2016 10:00
       .startAndCompleteProcessInstance("process", 2016, 0, 15, 10, 0) // 15.01.2016 10:00
+      .startAndCompleteProcessInstance("process", 2016, 0, 15, 10, 0) // 15.01.2016 10:00
       .done();
 
     // start a second process instance
     createReportScenario()
+        .startAndCompleteProcessInstance("process", 2016, 3, 1, 10, 0) // 01.04.2016 10:00
+        .startAndCompleteProcessInstance("process", 2016, 3, 1, 10, 0) // 01.04.2016 10:00
         .startAndCompleteProcessInstance("process", 2016, 3, 1, 10, 0) // 01.04.2016 10:00
         .done();
 
@@ -730,6 +739,7 @@ public class HistoricProcessInstanceDurationReportTest extends PluggableProcessE
       assertion.addDurationReportResult(period+1, pi.getId());
 
       addToCalendar(Calendar.MONTH, 5);
+      addToCalendar(Calendar.SECOND, random.nextInt(60));
       Task task = taskService.createTaskQuery()
           .processInstanceId(pi.getId())
           .singleResult();
