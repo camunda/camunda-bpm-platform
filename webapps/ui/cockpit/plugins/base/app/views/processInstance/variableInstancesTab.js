@@ -30,6 +30,15 @@ module.exports = function(ngModule) {
           taskService      = camAPI.resource('task'),
           variableService  = camAPI.resource('variable');
 
+      // correct header to pass
+      $scope.headColumns = [
+        { class: 'name',  request: 'variableName', sortable: true, content: $translate.instant('PLUGIN_VARIABLE_NAME')},
+        { class: 'type',  request: 'variableType', sortable: true, content: $translate.instant('PLUGIN_VARIABLE_TYPE')},
+        { class: 'value', request: '',             sortable: false, content: $translate.instant('PLUGIN_VARIABLE_VALUE')}
+      ];
+
+      $scope.sortObj = { sortBy: 'variableName', sortOrder: 'desc' };
+
       $scope.searchConfig = angular.copy(variableInstancesTabSearchConfig);
 
       angular.forEach(variableInstancesTabSearchConfig.tooltips, function(translation, tooltip) {
@@ -228,38 +237,34 @@ module.exports = function(ngModule) {
         return promise.promise;
       };
 
-      // Variables table header
-      $scope.getHeaderVariable = {
-        'name' : $translate.instant('PLUGIN_VARIABLE_NAME'),
-        'value': $translate.instant('PLUGIN_VARIABLE_VALUE'),
-        'type' : $translate.instant('PLUGIN_VARIABLE_TYPE'),
-        'scope' : $translate.instant('PLUGIN_VARIABLE_SCOPE')
-      };
-
       function getBasePath(variable) {
         return 'engine://engine/:engine/execution/' + variable.executionId + '/localVariables/' + variable.name;
       }
 
       function updateView(instanceIdToInstanceMap, variableQuery, pages, sortObj) {
-        var page = pages.current,
-            count = pages.size,
+
+        $scope.pagesObj = pages   || $scope.pagesObj ;
+        sortObj         = sortObj || $scope.sortObj;
+
+        var page        =  $scope.pagesObj.current,
+            count       =  $scope.pagesObj.size,
             firstResult = (page - 1) * count;
-
-
 
         var defaultParams = {
           processInstanceIdIn: [ processInstance.id ]
         };
 
+        // Add default sorting param
         if(sortObj) {defaultParams.sorting = [sortObj];}
 
         var pagingParams = {
-          firstResult: firstResult,
-          maxResults: count,
+          firstResult    : firstResult,
+          maxResults     : count,
           deserializeValues: false
         };
 
-        var params = angular.extend({}, defaultParams, variableQuery);
+        var countParams = angular.extend({}, defaultParams, variableQuery);
+        var params = angular.extend({}, pagingParams, defaultParams);
 
         $scope.variables = null;
         $scope.loadingState = 'LOADING';
@@ -271,10 +276,10 @@ module.exports = function(ngModule) {
 
         // get the 'count' of variables
         return variableService
-          .count(params)
+          .count(countParams)
           .then(function(response) {
-            $scope.total = response;
-
+            $scope.total = response.count;
+            // get variables objects
             return variableService
               .instances(params)
               .then(function(response) {
@@ -323,7 +328,6 @@ module.exports = function(ngModule) {
                   };
                 });
                 $scope.loadingState = data.length ? 'LOADED' : 'EMPTY';
-
                 return $scope.total;
             });
           });
