@@ -110,4 +110,13 @@ public class VariablesBuilder {
     return serializedVariable;
   }
 
+  public VariablesBuilder variableTransient(String name, String value, String type) {
+    Map<String, Object> valueMap = getVariableValueMap(value, type);
+    Map<String, Object> valueInfo = new HashMap<String, Object>();
+    valueInfo.put("transient", true);
+    valueMap.put("valueInfo", valueInfo);
+    variables.put(name, valueMap);
+    return this;
+  }
+
 }

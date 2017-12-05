@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.camunda.bpm.engine.delegate.VariableScope;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableInstance;
 import org.camunda.bpm.engine.impl.core.variable.event.VariableEvent;
@@ -292,6 +293,9 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
 
   protected void setVariable(String variableName, TypedValue value, AbstractVariableScope sourceActivityVariableScope) {
     if (hasVariableLocal(variableName)) {
+      if (value.isTransient()) {
+        throw ProcessEngineLogger.CORE_LOGGER.transientVariableException(variableName);
+      }
       setVariableLocal(variableName, value, sourceActivityVariableScope);
       return;
     }
@@ -304,7 +308,11 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
       }
       return;
     }
-    setVariableLocal(variableName, value, sourceActivityVariableScope);
+    if (value.isTransient()) {
+      setVariableLocalTransient(variableName, value, sourceActivityVariableScope);
+    } else {
+      setVariableLocal(variableName, value, sourceActivityVariableScope);
+    }
   }
 
   public void setVariableLocal(String variableName, TypedValue value, AbstractVariableScope sourceActivityExecution) {
@@ -381,8 +389,14 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
    */
   public void setVariableLocalTransient(String variableName, Object value) {
     TypedValue typedValue = Variables.untypedValue(value);
+    CoreVariableInstance coreVariableInstance = getVariableInstanceFactory().build(variableName, typedValue, true);
+    getVariableStore().addVariable(coreVariableInstance);
+  }
 
-    getVariableStore().addVariable(getVariableInstanceFactory().build(variableName, typedValue, true));
+  public void setVariableLocalTransient(String variableName, Object value, AbstractVariableScope sourceActivityVariableScope) {
+    VariableStore<CoreVariableInstance> variableStore = getVariableStore();
+    setVariableLocalTransient(variableName, value);
+    invokeVariableLifecycleListenersCreate(variableStore.getVariable(variableName), sourceActivityVariableScope);
   }
 
   public void removeVariable(String variableName) {

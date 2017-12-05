@@ -119,8 +119,10 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
   }
 
   public static VariableInstanceEntity createAndInsert(String name, TypedValue value) {
-    VariableInstanceEntity variableInstance = create(name, value, false);
-    insert(variableInstance);
+    VariableInstanceEntity variableInstance = create(name, value, value.isTransient());
+    if (!variableInstance.isTransient) {
+      insert(variableInstance);
+    }
 
     return variableInstance;
   }
@@ -554,7 +556,9 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
 
     }
     else {
-      getVariableScope().setVariableLocal(name, updatedValue);
+      if (!isTransient) {
+        getVariableScope().setVariableLocal(name, updatedValue);
+      }
     }
   }
 

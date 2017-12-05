@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.mapper.MultipartFormData.FormPart;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.impl.type.AbstractValueTypeImpl;
 import org.camunda.bpm.engine.variable.type.FileValueType;
 import org.camunda.bpm.engine.variable.type.PrimitiveValueType;
 import org.camunda.bpm.engine.variable.type.SerializableValueType;
@@ -79,6 +80,9 @@ public class VariableValueDto {
     ValueTypeResolver valueTypeResolver = processEngine.getProcessEngineConfiguration().getValueTypeResolver();
 
     if (type == null) {
+      if (valueInfo != null && valueInfo.get(ValueType.VALUE_INFO_TRANSIENT) == (Boolean) true) {
+        return Variables.transientUntypedValue(value);
+      }
       return Variables.untypedValue(value);
     }
 
@@ -237,6 +241,12 @@ public class VariableValueDto {
       String encoding = mimeType.getParameter("encoding");
       if (encoding != null) {
         dto.valueInfo.put(FileValueType.VALUE_INFO_FILE_ENCODING, encoding);
+      }
+
+      String transientString = mimeType.getParameter("transient");
+      boolean isTransient = Boolean.parseBoolean(transientString);
+      if (isTransient) {
+        dto.valueInfo.put(AbstractValueTypeImpl.VALUE_INFO_TRANSIENT, isTransient);
       }
     }
 

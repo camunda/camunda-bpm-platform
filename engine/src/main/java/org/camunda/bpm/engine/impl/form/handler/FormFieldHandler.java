@@ -124,6 +124,7 @@ public class FormFieldHandler {
     if (submittedValue != null) {
       if (type != null) {
         modelValue = type.convertToModelValue(submittedValue);
+        modelValue.setTransient(submittedValue.isTransient());
       }
       else {
         modelValue = submittedValue;

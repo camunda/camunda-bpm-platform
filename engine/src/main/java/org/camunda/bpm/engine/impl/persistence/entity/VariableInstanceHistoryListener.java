@@ -32,7 +32,7 @@ public class VariableInstanceHistoryListener implements VariableInstanceLifecycl
 
   @Override
   public void onCreate(final VariableInstanceEntity variableInstance, final AbstractVariableScope sourceScope) {
-    if (getHistoryLevel().isHistoryEventProduced(HistoryEventTypes.VARIABLE_INSTANCE_CREATE, variableInstance)) {
+    if (getHistoryLevel().isHistoryEventProduced(HistoryEventTypes.VARIABLE_INSTANCE_CREATE, variableInstance) && !variableInstance.isTransient()) {
       HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
         @Override
         public HistoryEvent createHistoryEvent(HistoryEventProducer producer) {

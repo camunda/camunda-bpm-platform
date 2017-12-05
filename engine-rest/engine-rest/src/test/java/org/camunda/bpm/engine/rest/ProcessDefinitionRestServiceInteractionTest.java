@@ -32,7 +32,12 @@ import org.camunda.bpm.engine.runtime.ProcessInstanceWithVariables;
 import org.camunda.bpm.engine.runtime.ProcessInstantiationBuilder;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.impl.VariableMapImpl;
+import org.camunda.bpm.engine.variable.impl.type.PrimitiveValueTypeImpl.StringTypeImpl;
+import org.camunda.bpm.engine.variable.impl.value.NullValueImpl;
+import org.camunda.bpm.engine.variable.impl.value.PrimitiveTypeValueImpl;
 import org.camunda.bpm.engine.variable.type.ValueType;
+import org.camunda.bpm.engine.variable.value.StringValue;
 import org.fest.assertions.Assertions;
 import org.junit.Assert;
 import org.junit.Before;
@@ -40,6 +45,8 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Matchers;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 import javax.ws.rs.core.Response.Status;
 import java.io.*;
@@ -50,6 +57,7 @@ import static com.jayway.restassured.RestAssured.given;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.createMockSerializedVariables;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
@@ -983,6 +991,36 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
     verify(runtimeServiceMock).createProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID));
     verify(mockInstantiationBuilder).businessKey("myBusinessKey");
     verify(mockInstantiationBuilder).setVariables(argThat(new EqualsMap(expectedParameters)));
+    verify(mockInstantiationBuilder).executeWithVariablesInReturn(anyBoolean(), anyBoolean());
+  }
+
+  @Test
+  public void testProcessInstantiationWithTransientVariables() throws IOException {
+    Map<String, Object> json = new HashMap<String, Object>();
+
+    json.put("variables", VariablesBuilder.create().variableTransient("foo", "bar", "string").getVariables());
+
+    final VariableMap varMap = new VariableMapImpl();
+
+    when(mockInstantiationBuilder.setVariables(anyMapOf(String.class, Object.class))).thenAnswer(new Answer<ProcessInstantiationBuilder>() {
+      @Override
+      public ProcessInstantiationBuilder answer(InvocationOnMock invocation) throws Throwable {
+        varMap.putAll((VariableMap) invocation.getArguments()[0]);
+        return mockInstantiationBuilder;
+      }
+    });
+
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+      .contentType(POST_JSON_CONTENT_TYPE).body(json)
+      .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+        .body("id", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
+      .when().post(START_PROCESS_INSTANCE_URL);
+
+    VariableMap expectedVariables = Variables.createVariables().putValueTyped("foo", Variables.stringValueTransient("bar"));
+    verify(runtimeServiceMock).createProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID));
+    verify(mockInstantiationBuilder).setVariables(expectedVariables);
+    assertEquals(expectedVariables.getValueTyped("foo").isTransient(), varMap.getValueTyped("foo").isTransient());
     verify(mockInstantiationBuilder).executeWithVariablesInReturn(anyBoolean(), anyBoolean());
   }
 

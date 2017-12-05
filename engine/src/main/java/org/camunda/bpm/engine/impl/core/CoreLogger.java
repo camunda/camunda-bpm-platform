@@ -55,9 +55,17 @@ public class CoreLogger extends ProcessEngineLogger {
 
   public ProcessEngineException missingVariableInstanceException(CoreVariableInstance variableInstance) {
     return new ProcessEngineException(exceptionMessage(
-        "004",
+        "005",
         "Cannot update variable instance with name {}. Variable does not exist",
         variableInstance.getName()
+      ));
+  }
+
+  public ProcessEngineException transientVariableException(String variableName) {
+    return new ProcessEngineException(exceptionMessage(
+        "006",
+        "Cannot set transient variable with name {}. Persisted variable already exists",
+        variableName
       ));
   }
 
