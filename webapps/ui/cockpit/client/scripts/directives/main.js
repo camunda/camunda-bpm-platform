@@ -24,7 +24,8 @@ var angular = require('camunda-commons-ui/vendor/angular'),
     timeToLive = require('./time-to-live.js'),
     camCommon = require('../../../../common/scripts/module'),
     isSidebarCollapsed = require('./isSidebarCollapsed'),
-    incidentsTab = require('./incidentsTab');
+    incidentsTab = require('./incidentsTab'),
+    sortableTableHead = require('./sortableTableHead');
 
 var directivesModule = angular.module('cam.cockpit.directives', [
   camCommon.name
@@ -51,6 +52,7 @@ directivesModule.directive('camQuickFilter', quickFilter);
 directivesModule.directive('diagramStatisticsLoader', diagramStatisticsLoader);
 directivesModule.directive('timeToLive', timeToLive);
 directivesModule.directive('isSidebarCollapsed', isSidebarCollapsed);
+directivesModule.directive('sortableTableHead', sortableTableHead);
 directivesModule.directive('incidentsTab', incidentsTab);
 
 module.exports = directivesModule;

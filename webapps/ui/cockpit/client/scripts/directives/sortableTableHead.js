@@ -16,12 +16,11 @@ var Directive = function() {
     template: template,
     controller: ['$scope',
       function($scope) {
-
-
         // Set default sorting
         $scope.sortObj = $scope.defaultSort;
 
         // Order Icons
+
         $scope.orderClass = function(forColumn) {
           forColumn = forColumn || $scope.sortObj.sortBy;
           var icons = {
@@ -41,8 +40,6 @@ var Directive = function() {
           $scope.onSortChange({
             sortObj: $scope.sortObj
           });
-
-
         };
       }],
     link: function() {}
