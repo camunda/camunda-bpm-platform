@@ -46,8 +46,6 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
         });
 
         function updateView(query, pages, sortObj) {
-
-          //Make pages available in process Instance table TODO: better solution required
           $scope.pagesObj = pages   || $scope.pagesObj ;
           $scope.queryObj = query   || $scope.queryObj;
           sortObj         = sortObj || $scope.sortObj;
