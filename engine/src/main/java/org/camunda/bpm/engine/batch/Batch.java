@@ -37,6 +37,7 @@ public interface Batch {
   String TYPE_PROCESS_INSTANCE_DELETION = "instance-deletion";
   String TYPE_PROCESS_INSTANCE_UPDATE_SUSPENSION_STATE = "instance-update-suspension-state";
   String TYPE_HISTORIC_PROCESS_INSTANCE_DELETION = "historic-instance-deletion";
+  String TYPE_HISTORIC_DECISION_INSTANCE_DELETION = "historic-decision-instance-deletion";
   String TYPE_SET_JOB_RETRIES = "set-job-retries";
   String TYPE_SET_EXTERNAL_TASK_RETRIES = "set-external-task-retries";
 

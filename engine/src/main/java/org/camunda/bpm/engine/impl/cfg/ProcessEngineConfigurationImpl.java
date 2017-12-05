@@ -134,6 +134,7 @@ import org.camunda.bpm.engine.impl.digest.PasswordEncryptor;
 import org.camunda.bpm.engine.impl.digest.PasswordManager;
 import org.camunda.bpm.engine.impl.digest.SaltGenerator;
 import org.camunda.bpm.engine.impl.digest.Sha512HashDigest;
+import org.camunda.bpm.engine.impl.dmn.batch.DeleteHistoricDecisionInstancesJobHandler;
 import org.camunda.bpm.engine.impl.dmn.configuration.DmnEngineConfigurationBuilder;
 import org.camunda.bpm.engine.impl.dmn.deployer.DecisionDefinitionDeployer;
 import org.camunda.bpm.engine.impl.dmn.deployer.DecisionRequirementsDefinitionDeployer;
@@ -940,6 +941,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
       UpdateProcessInstancesSuspendStateJobHandler suspendProcessInstancesJobHandler = new UpdateProcessInstancesSuspendStateJobHandler();
       batchHandlers.put(suspendProcessInstancesJobHandler.getType(), suspendProcessInstancesJobHandler);
+
+      DeleteHistoricDecisionInstancesJobHandler deleteHistoricDecisionInstancesJobHandler = new DeleteHistoricDecisionInstancesJobHandler();
+      batchHandlers.put(deleteHistoricDecisionInstancesJobHandler.getType(), deleteHistoricDecisionInstancesJobHandler);
     }
 
     if (customBatchJobHandlers != null) {

@@ -58,6 +58,7 @@ import org.camunda.bpm.engine.impl.cmd.GetHistoricExternalTaskLogErrorDetailsCmd
 import org.camunda.bpm.engine.impl.cmd.GetHistoricJobLogExceptionStacktraceCmd;
 import org.camunda.bpm.engine.impl.cmd.batch.DeleteHistoricProcessInstancesBatchCmd;
 import org.camunda.bpm.engine.impl.dmn.cmd.DeleteHistoricDecisionInstanceByInstanceIdCmd;
+import org.camunda.bpm.engine.impl.dmn.cmd.DeleteHistoricDecisionInstancesBatchCmd;
 import org.camunda.bpm.engine.impl.dmn.cmd.DeleteHistoricDecisionInstanceByDefinitionIdCmd;
 import org.camunda.bpm.engine.impl.dmn.cmd.DeleteHistoricDecisionInstancesBulkCmd;
 import org.camunda.bpm.engine.runtime.Job;
@@ -192,6 +193,18 @@ public class HistoryServiceImpl extends ServiceImpl implements HistoryService {
 
   public void deleteHistoricDecisionInstanceByInstanceId(String historicDecisionInstanceId){
     commandExecutor.execute(new DeleteHistoricDecisionInstanceByInstanceIdCmd(historicDecisionInstanceId));
+  }
+
+  public Batch deleteHistoricDecisionInstancesAsync(List<String> decisionInstanceIds) {
+    return deleteHistoricDecisionInstancesAsync(decisionInstanceIds, null);
+  }
+
+  public Batch deleteHistoricDecisionInstancesAsync(HistoricDecisionInstanceQuery query) {
+    return deleteHistoricDecisionInstancesAsync(null, query);
+  }
+
+  public Batch deleteHistoricDecisionInstancesAsync(List<String> decisionInstanceIds, HistoricDecisionInstanceQuery query) {
+    return commandExecutor.execute(new DeleteHistoricDecisionInstancesBatchCmd(decisionInstanceIds, query));
   }
 
   public NativeHistoricProcessInstanceQuery createNativeHistoricProcessInstanceQuery() {

@@ -314,6 +314,42 @@ public interface HistoryService {
   void deleteHistoricDecisionInstanceByInstanceId(String historicDecisionInstanceId);
 
   /**
+   * Deletes historic decision instances asynchronously based on a list of decision instances. Query result and
+   * list of ids will be merged.
+   *
+   * @throws BadUserRequestException
+   *          when no decision instances are found with the given ids or ids are null.
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#DECISION_DEFINITION}
+   *          or no {@link Permissions#CREATE} permission on {@link Resources#BATCH}.
+   */
+  Batch deleteHistoricDecisionInstancesAsync(List<String> decisionInstanceIds);
+
+  /**
+   * Deletes historic decision instances asynchronously based on query of decision instances. Query result and
+   * list of ids will be merged.
+   *
+   * @throws BadUserRequestException
+   *          when no decision instances are found with the given ids or ids are null.
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#DECISION_DEFINITION}
+   *          or no {@link Permissions#CREATE} permission on {@link Resources#BATCH}.
+   */
+  Batch deleteHistoricDecisionInstancesAsync(HistoricDecisionInstanceQuery query);
+
+  /**
+   * Deletes historic decision instances asynchronously based on query and a list of decision instances. Query result and
+   * list of ids will be merged.
+   *
+   * @throws BadUserRequestException
+   *          when no decision instances are found with the given ids or ids are null.
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#DECISION_DEFINITION}
+   *          or no {@link Permissions#CREATE} permission on {@link Resources#BATCH}.
+   */
+  Batch deleteHistoricDecisionInstancesAsync(List<String> decisionInstanceIds, HistoricDecisionInstanceQuery query);
+
+  /**
    * creates a native query to search for {@link HistoricProcessInstance}s via SQL
    */
   NativeHistoricProcessInstanceQuery createNativeHistoricProcessInstanceQuery();
