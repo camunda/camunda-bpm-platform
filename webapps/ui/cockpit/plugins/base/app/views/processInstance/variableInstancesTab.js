@@ -267,6 +267,8 @@ module.exports = function(ngModule) {
         variableInstanceIdexceptionMessageMap = {};
         variableCopies = {};
 
+        params = angular.extend({}, params, pagingParams);
+
         // get the 'count' of variables
         return variableService
           .count(params)
@@ -274,7 +276,7 @@ module.exports = function(ngModule) {
             $scope.total = response;
 
             return variableService
-              .instances(params, { params: pagingParams })
+              .instances(params)
               .then(function(response) {
                 var data = response;
 
