@@ -300,7 +300,7 @@ public class HistoricDecisionInstanceRestServiceInteractionTest extends Abstract
     )).thenReturn(batchEntity);
 
     Map<String, Object> messageBodyJson = new HashMap<String, Object>();
-    messageBodyJson.put("decisionInstanceIds", ids);
+    messageBodyJson.put("historicDecisionInstanceIds", ids);
 
     Response response = given()
         .contentType(ContentType.JSON).body(messageBodyJson)
@@ -353,7 +353,7 @@ public class HistoricDecisionInstanceRestServiceInteractionTest extends Abstract
     messageBodyJson.put("historicDecisionInstanceQuery", query);
 
     List<String> ids = Arrays.asList(MockProvider.EXAMPLE_DECISION_INSTANCE_ID);
-    messageBodyJson.put("decisionInstanceIds", ids);
+    messageBodyJson.put("historicDecisionInstanceIds", ids);
 
     Response response = given()
         .contentType(ContentType.JSON).body(messageBodyJson)

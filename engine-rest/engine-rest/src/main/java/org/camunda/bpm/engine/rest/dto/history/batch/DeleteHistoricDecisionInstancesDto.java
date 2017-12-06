@@ -18,15 +18,15 @@ import org.camunda.bpm.engine.rest.dto.history.HistoricDecisionInstanceQueryDto;
 
 public class DeleteHistoricDecisionInstancesDto {
 
-  protected List<String> decisionInstanceIds;
+  protected List<String> historicDecisionInstanceIds;
   protected HistoricDecisionInstanceQueryDto historicDecisionInstanceQuery;
 
-  public List<String> getDecisionInstanceIds() {
-    return decisionInstanceIds;
+  public List<String> getHistoricDecisionInstanceIds() {
+    return historicDecisionInstanceIds;
   }
 
-  public void setDecisionInstanceIds(List<String> decisionInstanceIds) {
-    this.decisionInstanceIds = decisionInstanceIds;
+  public void setHistoricDecisionInstanceIds(List<String> historicDecisionInstanceIds) {
+    this.historicDecisionInstanceIds = historicDecisionInstanceIds;
   }
 
   public HistoricDecisionInstanceQueryDto getHistoricDecisionInstanceQuery() {
