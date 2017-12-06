@@ -71,7 +71,10 @@
                  ng-class="{hovered: hovered === 'var-value'}">
             {{ 'CAM_WIDGET_STRING_DIALOG_LABEL_VALUE' | translate }}
           </label>
-          <div variable="variable" form="jsonXmlForm"></div>
+          <div variable="variable"
+               readonly="readonly"
+               form="jsonXmlForm">
+          </div>
         </form>
 
     </div>
