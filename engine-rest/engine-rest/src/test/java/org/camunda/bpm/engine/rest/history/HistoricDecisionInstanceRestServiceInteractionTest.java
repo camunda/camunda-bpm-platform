@@ -19,29 +19,44 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.core.Response.Status;
-
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.HistoryService;
+import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInstanceQuery;
 import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
+import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
+import org.camunda.bpm.engine.rest.dto.history.HistoricDecisionInstanceQueryDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
+import org.camunda.bpm.engine.rest.util.JsonPathUtil;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.mockito.InOrder;
+
+import javax.ws.rs.core.Response.Status;
 
 import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.response.Response;
@@ -53,6 +68,7 @@ public class HistoricDecisionInstanceRestServiceInteractionTest extends Abstract
 
   protected static final String HISTORIC_DECISION_INSTANCE_URL = TEST_RESOURCE_ROOT_PATH + "/history/decision-instance";
   protected static final String HISTORIC_SINGLE_DECISION_INSTANCE_URL = HISTORIC_DECISION_INSTANCE_URL + "/{id}";
+  protected static final String HISTORIC_DECISION_INSTANCES_DELETE_ASYNC_URL = HISTORIC_DECISION_INSTANCE_URL + "/delete";
 
   protected HistoryService historyServiceMock;
   protected HistoricDecisionInstance historicInstanceMock;
@@ -270,6 +286,110 @@ public class HistoricDecisionInstanceRestServiceInteractionTest extends Abstract
       .body("message", equalTo("Historic decision instance with id '" + MockProvider.NON_EXISTING_ID + "' does not exist"))
     .when()
       .get(HISTORIC_SINGLE_DECISION_INSTANCE_URL);
+  }
+
+  @Test
+  public void testDeleteAsync() {
+    List<String> ids = Arrays.asList(MockProvider.EXAMPLE_DECISION_INSTANCE_ID);
+
+    Batch batchEntity = MockProvider.createMockBatch();
+
+    when(historyServiceMock.deleteHistoricDecisionInstancesAsync(
+        anyListOf(String.class),
+        any(HistoricDecisionInstanceQuery.class)
+    )).thenReturn(batchEntity);
+
+    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    messageBodyJson.put("decisionInstanceIds", ids);
+
+    Response response = given()
+        .contentType(ContentType.JSON).body(messageBodyJson)
+        .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+        .when().post(HISTORIC_DECISION_INSTANCES_DELETE_ASYNC_URL);
+
+    verifyBatchJson(response.asString());
+
+    verify(historyServiceMock, times(1)).deleteHistoricDecisionInstancesAsync(eq(ids), eq((HistoricDecisionInstanceQuery) null));
+  }
+
+  @Test
+  public void testDeleteAsyncWithQuery() {
+    Batch batchEntity = MockProvider.createMockBatch();
+
+    when(historyServiceMock.deleteHistoricDecisionInstancesAsync(
+        anyListOf(String.class),
+        any(HistoricDecisionInstanceQuery.class)
+    )).thenReturn(batchEntity);
+
+    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    HistoricDecisionInstanceQueryDto query = new HistoricDecisionInstanceQueryDto();
+    query.setDecisionDefinitionKey("decision");
+    messageBodyJson.put("historicDecisionInstanceQuery", query);
+
+    Response response = given()
+        .contentType(ContentType.JSON).body(messageBodyJson)
+        .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+        .when().post(HISTORIC_DECISION_INSTANCES_DELETE_ASYNC_URL);
+
+    verifyBatchJson(response.asString());
+
+    verify(historyServiceMock, times(1)).deleteHistoricDecisionInstancesAsync(eq((List<String>) null), any(HistoricDecisionInstanceQuery.class));
+  }
+
+  @Test
+  public void testDeleteAsyncWithIdsAndQuery() {
+    Batch batchEntity = MockProvider.createMockBatch();
+
+    when(historyServiceMock.deleteHistoricDecisionInstancesAsync(
+        anyListOf(String.class),
+        any(HistoricDecisionInstanceQuery.class)
+    )).thenReturn(batchEntity);
+
+    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    HistoricDecisionInstanceQueryDto query = new HistoricDecisionInstanceQueryDto();
+    query.setDecisionDefinitionKey("decision");
+    messageBodyJson.put("historicDecisionInstanceQuery", query);
+
+    List<String> ids = Arrays.asList(MockProvider.EXAMPLE_DECISION_INSTANCE_ID);
+    messageBodyJson.put("decisionInstanceIds", ids);
+
+    Response response = given()
+        .contentType(ContentType.JSON).body(messageBodyJson)
+        .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+        .when().post(HISTORIC_DECISION_INSTANCES_DELETE_ASYNC_URL);
+
+    verifyBatchJson(response.asString());
+
+    verify(historyServiceMock, times(1)).deleteHistoricDecisionInstancesAsync(eq(ids), any(HistoricDecisionInstanceQuery.class));
+  }
+
+  @Test
+  public void testDeleteAsyncWithBadRequestQuery() {
+    doThrow(new BadUserRequestException("process instance ids are empty"))
+        .when(historyServiceMock).deleteHistoricDecisionInstancesAsync(eq((List<String>) null), eq((HistoricDecisionInstanceQuery) null));
+
+    given()
+        .contentType(ContentType.JSON).body(EMPTY_JSON_OBJECT)
+        .then().expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode())
+        .when().post(HISTORIC_DECISION_INSTANCES_DELETE_ASYNC_URL);
+  }
+
+  protected void verifyBatchJson(String batchJson) {
+    BatchDto batch = JsonPathUtil.from(batchJson).getObject("", BatchDto.class);
+    assertNotNull("The returned batch should not be null.", batch);
+    assertEquals(MockProvider.EXAMPLE_BATCH_ID, batch.getId());
+    assertEquals(MockProvider.EXAMPLE_BATCH_TYPE, batch.getType());
+    assertEquals(MockProvider.EXAMPLE_BATCH_TOTAL_JOBS, batch.getTotalJobs());
+    assertEquals(MockProvider.EXAMPLE_BATCH_JOBS_PER_SEED, batch.getBatchJobsPerSeed());
+    assertEquals(MockProvider.EXAMPLE_INVOCATIONS_PER_BATCH_JOB, batch.getInvocationsPerBatchJob());
+    assertEquals(MockProvider.EXAMPLE_SEED_JOB_DEFINITION_ID, batch.getSeedJobDefinitionId());
+    assertEquals(MockProvider.EXAMPLE_MONITOR_JOB_DEFINITION_ID, batch.getMonitorJobDefinitionId());
+    assertEquals(MockProvider.EXAMPLE_BATCH_JOB_DEFINITION_ID, batch.getBatchJobDefinitionId());
+    assertEquals(MockProvider.EXAMPLE_TENANT_ID, batch.getTenantId());
   }
 
 }

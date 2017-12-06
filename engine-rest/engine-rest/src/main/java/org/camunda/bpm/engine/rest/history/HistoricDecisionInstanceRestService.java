@@ -13,7 +13,10 @@
 package org.camunda.bpm.engine.rest.history;
 
 import java.util.List;
+
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -24,7 +27,9 @@ import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.history.HistoricDecisionInstanceQuery;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
+import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricDecisionInstanceDto;
+import org.camunda.bpm.engine.rest.dto.history.batch.DeleteHistoricDecisionInstancesDto;
 import org.camunda.bpm.engine.rest.sub.history.HistoricDecisionInstanceResource;
 
 @Path(HistoricDecisionInstanceRestService.PATH)
@@ -50,5 +55,11 @@ public interface HistoricDecisionInstanceRestService {
   @Path("/count")
   @Produces(MediaType.APPLICATION_JSON)
   CountResultDto getHistoricDecisionInstancesCount(@Context UriInfo uriInfo);
+
+  @POST
+  @Path("/delete")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  BatchDto deleteAsync(DeleteHistoricDecisionInstancesDto dto);
 
 }

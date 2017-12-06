@@ -15,16 +15,24 @@ package org.camunda.bpm.engine.rest.impl.history;
 import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Response.Status;
 
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInstanceQuery;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
+import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricDecisionInstanceDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricDecisionInstanceQueryDto;
+import org.camunda.bpm.engine.rest.dto.history.batch.DeleteHistoricDecisionInstancesDto;
+import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.history.HistoricDecisionInstanceRestService;
 import org.camunda.bpm.engine.rest.sub.history.HistoricDecisionInstanceResource;
 import org.camunda.bpm.engine.rest.sub.history.impl.HistoricDecisionInstanceResourceImpl;
+import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -86,6 +94,21 @@ public class HistoricDecisionInstanceRestServiceImpl implements HistoricDecision
     long count = query.count();
 
     return new CountResultDto(count);
+  }
+
+  public BatchDto deleteAsync(DeleteHistoricDecisionInstancesDto dto) {
+    HistoricDecisionInstanceQuery decisionInstanceQuery = null;
+    if (dto.getHistoricDecisionInstanceQuery() != null) {
+      decisionInstanceQuery = dto.getHistoricDecisionInstanceQuery().toQuery(processEngine);
+    }
+
+    try {
+      Batch batch = processEngine.getHistoryService().deleteHistoricDecisionInstancesAsync(dto.getDecisionInstanceIds(), decisionInstanceQuery);
+      return BatchDto.fromBatch(batch);
+    }
+    catch (BadUserRequestException e) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());
+    }
   }
 
 }
