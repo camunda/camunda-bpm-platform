@@ -15,7 +15,8 @@ module.exports = ['typeUtils', function(typeUtils) {
     restrict: 'EAC',
     scope: {
       variable: '=',
-      form: '@'
+      form: '@',
+      readonly: '='
     },
     replace: true,
     template: template,

@@ -44,7 +44,7 @@ var Controller = [
     $scope.selectedTab = 'serialized';
     $scope.status = BEFORE_CHANGE;
 
-    $scope.variable = variable;
+    $scope.variable = angular.copy(variable);
     $scope.isJsonOrXml = variable.type && ( variable.type.toLowerCase() === 'json' || variable.type.toLowerCase() === 'xml' );
     $scope.readonly = readonly;
 
@@ -64,7 +64,7 @@ var Controller = [
     $scope.selectTab = function(tab) {
       $scope.selectedTab = tab;
       // reset changed state
-      $scope.currentValue = angular.copy(variable.value);
+      $scope.currentValue = angular.copy($scope.variable.value);
       $scope.currentDeserializedValue = angular.copy(initialDeserializedValue);
       $scope.status = BEFORE_CHANGE;
     };
@@ -84,7 +84,7 @@ var Controller = [
 
     var hasChanged = $scope.hasChanged = function(type) {
       if($scope.isJsonOrXml || isSerializedTab(type)) {
-        return variable.value !== $scope.currentValue;
+        return $scope.variable.value !== $scope.currentValue;
       } else {
         return initialDeserializedValue != $scope.currentDeserializedValue;
       }
@@ -96,7 +96,7 @@ var Controller = [
       var updateDeserialized = !isSerializedTab($scope.selectedTab);
       var newValue = updateDeserialized ? $scope.currentDeserializedValue : $scope.currentValue;
       if($scope.isJsonOrXml) {
-        newValue = variable.value;
+        newValue = $scope.variable.value;
       }
 
       if(variable.valueInfo.serializationDataFormat === 'application/json' || updateDeserialized) {
@@ -115,7 +115,7 @@ var Controller = [
         }
       }
 
-      !updateDeserialized ? updateValue(variable, newValue) : updateDeserializedValue(variable, newValue);
+      !updateDeserialized ? updateValue($scope.variable, newValue) : updateDeserializedValue($scope.variable, newValue);
 
     };
 
@@ -136,6 +136,10 @@ var Controller = [
         value: newValue,
         valueInfo: variable.valueInfo
       };
+
+      if(!$scope.isJsonOrXml) {
+        variableUpdate.valueInfo = variable.valueInfo;
+      }
 
       $http({
         method: 'PUT',
