@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInstanceQuery;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.HistoricDecisionInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.batch.BatchConfiguration;
 import org.camunda.bpm.engine.impl.batch.BatchEntity;
@@ -32,6 +33,7 @@ import org.camunda.bpm.engine.impl.batch.BatchJobHandler;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmd.batch.AbstractIDBasedBatchCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 
 public class DeleteHistoricDecisionInstancesBatchCmd extends AbstractIDBasedBatchCmd<Batch> {
 
@@ -72,6 +74,7 @@ public class DeleteHistoricDecisionInstancesBatchCmd extends AbstractIDBasedBatc
     ensureNotEmpty(BadUserRequestException.class, "historicDecisionInstanceIds", decisionInstanceIds);
 
     checkAuthorizations(commandContext);
+    writeUserOperationLog(commandContext, decisionInstanceIds.size());
 
     BatchEntity batch = createBatch(commandContext, decisionInstanceIds);
 
@@ -84,6 +87,16 @@ public class DeleteHistoricDecisionInstancesBatchCmd extends AbstractIDBasedBatc
     batch.createSeedJob();
 
     return batch;
+  }
+
+  protected void writeUserOperationLog(CommandContext commandContext, int numInstances) {
+    List<PropertyChange> propertyChanges = new ArrayList<PropertyChange>();
+    propertyChanges.add(new PropertyChange("nrOfInstances", null, numInstances));
+    propertyChanges.add(new PropertyChange("async", null, true));
+    propertyChanges.add(new PropertyChange("type", null, "history"));
+
+    commandContext.getOperationLogManager()
+      .logDecisionInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE, propertyChanges);
   }
 
   protected BatchConfiguration getAbstractIdsBatchConfiguration(List<String> processInstanceIds) {

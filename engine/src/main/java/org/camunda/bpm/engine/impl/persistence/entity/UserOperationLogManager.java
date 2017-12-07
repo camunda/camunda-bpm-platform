@@ -19,7 +19,6 @@ import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.UserOperationLogQueryImpl;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventProcessor;
@@ -29,7 +28,6 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.oplog.UserOperationLogContext;
 import org.camunda.bpm.engine.impl.oplog.UserOperationLogContextEntryBuilder;
 import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
 
 /**
  * Manager for {@link UserOperationLogEntryEventEntity} that also provides a generic and some specific log methods.
@@ -330,6 +328,19 @@ public class UserOperationLogManager extends AbstractHistoricManager {
         UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.BATCH)
           .batchId(batchId)
           .propertyChanges(propertyChange);
+
+      context.addEntry(entryBuilder.create());
+
+      fireUserOperationLog(context);
+    }
+  }
+
+  public void logDecisionInstanceOperation(String operation, List<PropertyChange> propertyChanges) {
+    if(isUserOperationLogEnabled()) {
+      UserOperationLogContext context = new UserOperationLogContext();
+      UserOperationLogContextEntryBuilder entryBuilder =
+        UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.DECISION_INSTANCE)
+          .propertyChanges(propertyChanges);
 
       context.addEntry(entryBuilder.create());
 
