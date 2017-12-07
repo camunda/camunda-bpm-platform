@@ -12,15 +12,12 @@
  */
 package org.camunda.bpm.engine.test.api.history;
 
-import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,15 +33,9 @@ import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInstanceQuery;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
-import org.camunda.bpm.engine.migration.MigrationPlan;
-import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
-import org.camunda.bpm.engine.test.api.runtime.migration.MigrationTestRule;
-import org.camunda.bpm.engine.test.api.runtime.migration.batch.BatchMigrationHelper;
-import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.VariableMap;
@@ -124,12 +115,12 @@ public class BatchHistoricDecisionInstanceDeletionUserOperationTest {
   public void testCreationByIds() {
     // when
     identityService.setAuthenticatedUserId(USER_ID);
-    historyService.deleteHistoricDecisionInstancesAsync(decisionInstanceIds);
+    historyService.deleteHistoricDecisionInstancesAsync(decisionInstanceIds, "a-delete-reason");
     identityService.clearAuthentication();
 
     // then
     List<UserOperationLogEntry> opLogEntries = engineRule.getHistoryService().createUserOperationLogQuery().list();
-    Assert.assertEquals(3, opLogEntries.size());
+    Assert.assertEquals(4, opLogEntries.size());
 
     Map<String, UserOperationLogEntry> entries = asMap(opLogEntries);
 
@@ -163,8 +154,19 @@ public class BatchHistoricDecisionInstanceDeletionUserOperationTest {
     assertNull(typeEntry.getOrgValue());
     assertEquals("10", numInstancesEntry.getNewValue());
 
+    UserOperationLogEntry deleteReasonEntry = entries.get("deleteReason");
+    assertNotNull(deleteReasonEntry);
+    assertEquals(EntityTypes.DECISION_INSTANCE, typeEntry.getEntityType());
+    assertEquals(UserOperationLogEntry.OPERATION_TYPE_DELETE, typeEntry.getOperationType());
+    assertNull(typeEntry.getProcessDefinitionId());
+    assertNull(typeEntry.getProcessDefinitionKey());
+    assertNull(typeEntry.getProcessInstanceId());
+    assertNull(typeEntry.getOrgValue());
+    assertEquals("a-delete-reason", deleteReasonEntry.getNewValue());
+
     assertEquals(typeEntry.getOperationId(), asyncEntry.getOperationId());
-    assertEquals(asyncEntry.getOperationId(), numInstancesEntry.getOperationId());
+    assertEquals(asyncEntry.getOperationId(), deleteReasonEntry.getOperationId());
+    assertEquals(numInstancesEntry.getOperationId(), deleteReasonEntry.getOperationId());
   }
 
   @Test
@@ -174,12 +176,12 @@ public class BatchHistoricDecisionInstanceDeletionUserOperationTest {
 
     // when
     identityService.setAuthenticatedUserId(USER_ID);
-    historyService.deleteHistoricDecisionInstancesAsync(query);
+    historyService.deleteHistoricDecisionInstancesAsync(query, "a-delete-reason");
     identityService.clearAuthentication();
 
     // then
     List<UserOperationLogEntry> opLogEntries = engineRule.getHistoryService().createUserOperationLogQuery().list();
-    Assert.assertEquals(3, opLogEntries.size());
+    Assert.assertEquals(4, opLogEntries.size());
 
     Map<String, UserOperationLogEntry> entries = asMap(opLogEntries);
 
@@ -213,8 +215,19 @@ public class BatchHistoricDecisionInstanceDeletionUserOperationTest {
     assertNull(typeEntry.getOrgValue());
     assertEquals("10", numInstancesEntry.getNewValue());
 
+    UserOperationLogEntry deleteReasonEntry = entries.get("deleteReason");
+    assertNotNull(deleteReasonEntry);
+    assertEquals(EntityTypes.DECISION_INSTANCE, typeEntry.getEntityType());
+    assertEquals(UserOperationLogEntry.OPERATION_TYPE_DELETE, typeEntry.getOperationType());
+    assertNull(typeEntry.getProcessDefinitionId());
+    assertNull(typeEntry.getProcessDefinitionKey());
+    assertNull(typeEntry.getProcessInstanceId());
+    assertNull(typeEntry.getOrgValue());
+    assertEquals("a-delete-reason", deleteReasonEntry.getNewValue());
+
     assertEquals(typeEntry.getOperationId(), asyncEntry.getOperationId());
     assertEquals(asyncEntry.getOperationId(), numInstancesEntry.getOperationId());
+    assertEquals(numInstancesEntry.getOperationId(), deleteReasonEntry.getOperationId());
   }
 
   @Test
@@ -224,12 +237,12 @@ public class BatchHistoricDecisionInstanceDeletionUserOperationTest {
 
     // when
     identityService.setAuthenticatedUserId(USER_ID);
-    historyService.deleteHistoricDecisionInstancesAsync(decisionInstanceIds, query);
+    historyService.deleteHistoricDecisionInstancesAsync(decisionInstanceIds, query, "a-delete-reason");
     identityService.clearAuthentication();
 
     // then
     List<UserOperationLogEntry> opLogEntries = engineRule.getHistoryService().createUserOperationLogQuery().list();
-    Assert.assertEquals(3, opLogEntries.size());
+    Assert.assertEquals(4, opLogEntries.size());
 
     Map<String, UserOperationLogEntry> entries = asMap(opLogEntries);
 
@@ -263,14 +276,25 @@ public class BatchHistoricDecisionInstanceDeletionUserOperationTest {
     assertNull(typeEntry.getOrgValue());
     assertEquals("10", numInstancesEntry.getNewValue());
 
+    UserOperationLogEntry deleteReasonEntry = entries.get("deleteReason");
+    assertNotNull(deleteReasonEntry);
+    assertEquals(EntityTypes.DECISION_INSTANCE, typeEntry.getEntityType());
+    assertEquals(UserOperationLogEntry.OPERATION_TYPE_DELETE, typeEntry.getOperationType());
+    assertNull(typeEntry.getProcessDefinitionId());
+    assertNull(typeEntry.getProcessDefinitionKey());
+    assertNull(typeEntry.getProcessInstanceId());
+    assertNull(typeEntry.getOrgValue());
+    assertEquals("a-delete-reason", deleteReasonEntry.getNewValue());
+
     assertEquals(typeEntry.getOperationId(), asyncEntry.getOperationId());
     assertEquals(asyncEntry.getOperationId(), numInstancesEntry.getOperationId());
+    assertEquals(numInstancesEntry.getOperationId(), deleteReasonEntry.getOperationId());
   }
 
   @Test
   public void testNoCreationOnSyncBatchJobExecution() {
     // given
-    Batch batch = historyService.deleteHistoricDecisionInstancesAsync(decisionInstanceIds);
+    Batch batch = historyService.deleteHistoricDecisionInstancesAsync(decisionInstanceIds, null);
 
     // when
     engineRule.getIdentityService().setAuthenticatedUserId(USER_ID);
@@ -285,7 +309,7 @@ public class BatchHistoricDecisionInstanceDeletionUserOperationTest {
   public void testNoCreationOnSyncBatchJobExecutionByIds() {
     // given
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery().decisionDefinitionKey(DECISION);
-    Batch batch = historyService.deleteHistoricDecisionInstancesAsync(query);
+    Batch batch = historyService.deleteHistoricDecisionInstancesAsync(query, null);
 
     // when
     engineRule.getIdentityService().setAuthenticatedUserId(USER_ID);
@@ -300,7 +324,7 @@ public class BatchHistoricDecisionInstanceDeletionUserOperationTest {
   public void testNoCreationOnSyncBatchJobExecutionByIdsAndQuery() {
     // given
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery().decisionDefinitionKey(DECISION);
-    Batch batch = historyService.deleteHistoricDecisionInstancesAsync(decisionInstanceIds, query);
+    Batch batch = historyService.deleteHistoricDecisionInstancesAsync(decisionInstanceIds, query, null);
 
     // when
     engineRule.getIdentityService().setAuthenticatedUserId(USER_ID);
@@ -315,7 +339,7 @@ public class BatchHistoricDecisionInstanceDeletionUserOperationTest {
   public void testNoCreationOnJobExecutorBatchJobExecutionByIds() {
     // given
     // given
-    historyService.deleteHistoricDecisionInstancesAsync(decisionInstanceIds);
+    historyService.deleteHistoricDecisionInstancesAsync(decisionInstanceIds, null);
 
     // when
     testRule.waitForJobExecutorToProcessAllJobs(5000L);
@@ -329,7 +353,7 @@ public class BatchHistoricDecisionInstanceDeletionUserOperationTest {
     // given
     // given
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery().decisionDefinitionKey(DECISION);
-    historyService.deleteHistoricDecisionInstancesAsync(query);
+    historyService.deleteHistoricDecisionInstancesAsync(query, null);
 
     // when
     testRule.waitForJobExecutorToProcessAllJobs(5000L);
@@ -343,7 +367,7 @@ public class BatchHistoricDecisionInstanceDeletionUserOperationTest {
     // given
     // given
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery().decisionDefinitionKey(DECISION);
-    historyService.deleteHistoricDecisionInstancesAsync(decisionInstanceIds, query);
+    historyService.deleteHistoricDecisionInstancesAsync(decisionInstanceIds, query, null);
 
     // when
     testRule.waitForJobExecutorToProcessAllJobs(5000L);

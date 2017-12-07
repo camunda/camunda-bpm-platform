@@ -39,10 +39,12 @@ public class DeleteHistoricDecisionInstancesBatchCmd extends AbstractIDBasedBatc
 
   protected List<String> historicProcessInstanceIds;
   protected HistoricDecisionInstanceQuery historicDecisionInstanceQuery;
+  protected String deleteReason;
 
-  public DeleteHistoricDecisionInstancesBatchCmd(List<String> historicDecisionInstanceIds, HistoricDecisionInstanceQuery historicDecisionInstanceQuery) {
+  public DeleteHistoricDecisionInstancesBatchCmd(List<String> historicDecisionInstanceIds, HistoricDecisionInstanceQuery historicDecisionInstanceQuery, String deleteReason) {
     this.historicProcessInstanceIds = historicDecisionInstanceIds;
     this.historicDecisionInstanceQuery = historicDecisionInstanceQuery;
+    this.deleteReason = deleteReason;
   }
 
   protected List<String> collectHistoricDecisionInstanceIds() {
@@ -94,6 +96,7 @@ public class DeleteHistoricDecisionInstancesBatchCmd extends AbstractIDBasedBatc
     propertyChanges.add(new PropertyChange("nrOfInstances", null, numInstances));
     propertyChanges.add(new PropertyChange("async", null, true));
     propertyChanges.add(new PropertyChange("type", null, "history"));
+    propertyChanges.add(new PropertyChange("deleteReason", null, deleteReason));
 
     commandContext.getOperationLogManager()
       .logDecisionInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE, propertyChanges);

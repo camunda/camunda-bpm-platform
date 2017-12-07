@@ -144,7 +144,7 @@ public class BatchHistoricDecisionInstanceDeletionAuthorizationTest {
 
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery().decisionDefinitionKey(DECISION);
 
-    Batch batch = historyService.deleteHistoricDecisionInstancesAsync(decisionInstanceIds, query);
+    Batch batch = historyService.deleteHistoricDecisionInstancesAsync(decisionInstanceIds, query, null);
 
     if (batch != null) {
       Job job = managementService.createJobQuery().jobDefinitionId(batch.getSeedJobDefinitionId()).singleResult();

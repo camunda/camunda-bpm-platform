@@ -314,8 +314,7 @@ public interface HistoryService {
   void deleteHistoricDecisionInstanceByInstanceId(String historicDecisionInstanceId);
 
   /**
-   * Deletes historic decision instances asynchronously based on a list of decision instances. Query result and
-   * list of ids will be merged.
+   * Deletes historic decision instances asynchronously based on a list of decision instances.
    *
    * @throws BadUserRequestException
    *          when no decision instances are found with the given ids or ids are null.
@@ -323,11 +322,10 @@ public interface HistoryService {
    *          If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#DECISION_DEFINITION}
    *          or no {@link Permissions#CREATE} permission on {@link Resources#BATCH}.
    */
-  Batch deleteHistoricDecisionInstancesAsync(List<String> decisionInstanceIds);
+  Batch deleteHistoricDecisionInstancesAsync(List<String> decisionInstanceIds, String deleteReason);
 
   /**
-   * Deletes historic decision instances asynchronously based on query of decision instances. Query result and
-   * list of ids will be merged.
+   * Deletes historic decision instances asynchronously based on query of decision instances.
    *
    * @throws BadUserRequestException
    *          when no decision instances are found with the given ids or ids are null.
@@ -335,10 +333,10 @@ public interface HistoryService {
    *          If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#DECISION_DEFINITION}
    *          or no {@link Permissions#CREATE} permission on {@link Resources#BATCH}.
    */
-  Batch deleteHistoricDecisionInstancesAsync(HistoricDecisionInstanceQuery query);
+  Batch deleteHistoricDecisionInstancesAsync(HistoricDecisionInstanceQuery query, String deleteReason);
 
   /**
-   * Deletes historic decision instances asynchronously based on query and a list of decision instances. Query result and
+   * Deletes historic decision instances asynchronously based on query and a list of decision instances, whereby query result and
    * list of ids will be merged.
    *
    * @throws BadUserRequestException
@@ -347,7 +345,7 @@ public interface HistoryService {
    *          If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#DECISION_DEFINITION}
    *          or no {@link Permissions#CREATE} permission on {@link Resources#BATCH}.
    */
-  Batch deleteHistoricDecisionInstancesAsync(List<String> decisionInstanceIds, HistoricDecisionInstanceQuery query);
+  Batch deleteHistoricDecisionInstancesAsync(List<String> decisionInstanceIds, HistoricDecisionInstanceQuery query, String deleteReason);
 
   /**
    * creates a native query to search for {@link HistoricProcessInstance}s via SQL

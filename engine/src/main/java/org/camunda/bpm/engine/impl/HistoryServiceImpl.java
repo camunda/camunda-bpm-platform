@@ -195,16 +195,16 @@ public class HistoryServiceImpl extends ServiceImpl implements HistoryService {
     commandExecutor.execute(new DeleteHistoricDecisionInstanceByInstanceIdCmd(historicDecisionInstanceId));
   }
 
-  public Batch deleteHistoricDecisionInstancesAsync(List<String> decisionInstanceIds) {
-    return deleteHistoricDecisionInstancesAsync(decisionInstanceIds, null);
+  public Batch deleteHistoricDecisionInstancesAsync(List<String> decisionInstanceIds, String deleteReason) {
+    return deleteHistoricDecisionInstancesAsync(decisionInstanceIds, null, deleteReason);
   }
 
-  public Batch deleteHistoricDecisionInstancesAsync(HistoricDecisionInstanceQuery query) {
-    return deleteHistoricDecisionInstancesAsync(null, query);
+  public Batch deleteHistoricDecisionInstancesAsync(HistoricDecisionInstanceQuery query, String deleteReason) {
+    return deleteHistoricDecisionInstancesAsync(null, query, deleteReason);
   }
 
-  public Batch deleteHistoricDecisionInstancesAsync(List<String> decisionInstanceIds, HistoricDecisionInstanceQuery query) {
-    return commandExecutor.execute(new DeleteHistoricDecisionInstancesBatchCmd(decisionInstanceIds, query));
+  public Batch deleteHistoricDecisionInstancesAsync(List<String> decisionInstanceIds, HistoricDecisionInstanceQuery query, String deleteReason) {
+    return commandExecutor.execute(new DeleteHistoricDecisionInstancesBatchCmd(decisionInstanceIds, query, deleteReason));
   }
 
   public NativeHistoricProcessInstanceQuery createNativeHistoricProcessInstanceQuery() {

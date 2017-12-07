@@ -296,11 +296,13 @@ public class HistoricDecisionInstanceRestServiceInteractionTest extends Abstract
 
     when(historyServiceMock.deleteHistoricDecisionInstancesAsync(
         anyListOf(String.class),
-        any(HistoricDecisionInstanceQuery.class)
+        any(HistoricDecisionInstanceQuery.class),
+        anyString()
     )).thenReturn(batchEntity);
 
     Map<String, Object> messageBodyJson = new HashMap<String, Object>();
     messageBodyJson.put("historicDecisionInstanceIds", ids);
+    messageBodyJson.put("deleteReason", "a-delete-reason");
 
     Response response = given()
         .contentType(ContentType.JSON).body(messageBodyJson)
@@ -310,7 +312,7 @@ public class HistoricDecisionInstanceRestServiceInteractionTest extends Abstract
 
     verifyBatchJson(response.asString());
 
-    verify(historyServiceMock, times(1)).deleteHistoricDecisionInstancesAsync(eq(ids), eq((HistoricDecisionInstanceQuery) null));
+    verify(historyServiceMock, times(1)).deleteHistoricDecisionInstancesAsync(eq(ids), eq((HistoricDecisionInstanceQuery) null), eq("a-delete-reason"));
   }
 
   @Test
@@ -319,13 +321,15 @@ public class HistoricDecisionInstanceRestServiceInteractionTest extends Abstract
 
     when(historyServiceMock.deleteHistoricDecisionInstancesAsync(
         anyListOf(String.class),
-        any(HistoricDecisionInstanceQuery.class)
+        any(HistoricDecisionInstanceQuery.class),
+        anyString()
     )).thenReturn(batchEntity);
 
     Map<String, Object> messageBodyJson = new HashMap<String, Object>();
     HistoricDecisionInstanceQueryDto query = new HistoricDecisionInstanceQueryDto();
     query.setDecisionDefinitionKey("decision");
     messageBodyJson.put("historicDecisionInstanceQuery", query);
+    messageBodyJson.put("deleteReason", "a-delete-reason");
 
     Response response = given()
         .contentType(ContentType.JSON).body(messageBodyJson)
@@ -335,7 +339,7 @@ public class HistoricDecisionInstanceRestServiceInteractionTest extends Abstract
 
     verifyBatchJson(response.asString());
 
-    verify(historyServiceMock, times(1)).deleteHistoricDecisionInstancesAsync(eq((List<String>) null), any(HistoricDecisionInstanceQuery.class));
+    verify(historyServiceMock, times(1)).deleteHistoricDecisionInstancesAsync(eq((List<String>) null), any(HistoricDecisionInstanceQuery.class), eq("a-delete-reason"));
   }
 
   @Test
@@ -344,7 +348,8 @@ public class HistoricDecisionInstanceRestServiceInteractionTest extends Abstract
 
     when(historyServiceMock.deleteHistoricDecisionInstancesAsync(
         anyListOf(String.class),
-        any(HistoricDecisionInstanceQuery.class)
+        any(HistoricDecisionInstanceQuery.class),
+        anyString()
     )).thenReturn(batchEntity);
 
     Map<String, Object> messageBodyJson = new HashMap<String, Object>();
@@ -354,6 +359,7 @@ public class HistoricDecisionInstanceRestServiceInteractionTest extends Abstract
 
     List<String> ids = Arrays.asList(MockProvider.EXAMPLE_DECISION_INSTANCE_ID);
     messageBodyJson.put("historicDecisionInstanceIds", ids);
+    messageBodyJson.put("deleteReason", "a-delete-reason");
 
     Response response = given()
         .contentType(ContentType.JSON).body(messageBodyJson)
@@ -363,13 +369,13 @@ public class HistoricDecisionInstanceRestServiceInteractionTest extends Abstract
 
     verifyBatchJson(response.asString());
 
-    verify(historyServiceMock, times(1)).deleteHistoricDecisionInstancesAsync(eq(ids), any(HistoricDecisionInstanceQuery.class));
+    verify(historyServiceMock, times(1)).deleteHistoricDecisionInstancesAsync(eq(ids), any(HistoricDecisionInstanceQuery.class), eq("a-delete-reason"));
   }
 
   @Test
   public void testDeleteAsyncWithBadRequestQuery() {
     doThrow(new BadUserRequestException("process instance ids are empty"))
-        .when(historyServiceMock).deleteHistoricDecisionInstancesAsync(eq((List<String>) null), eq((HistoricDecisionInstanceQuery) null));
+        .when(historyServiceMock).deleteHistoricDecisionInstancesAsync(eq((List<String>) null), eq((HistoricDecisionInstanceQuery) null), anyString());
 
     given()
         .contentType(ContentType.JSON).body(EMPTY_JSON_OBJECT)

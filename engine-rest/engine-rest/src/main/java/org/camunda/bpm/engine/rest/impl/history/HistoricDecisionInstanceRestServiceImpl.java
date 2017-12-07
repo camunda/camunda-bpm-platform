@@ -103,7 +103,9 @@ public class HistoricDecisionInstanceRestServiceImpl implements HistoricDecision
     }
 
     try {
-      Batch batch = processEngine.getHistoryService().deleteHistoricDecisionInstancesAsync(dto.getHistoricDecisionInstanceIds(), decisionInstanceQuery);
+      List<String> historicDecisionInstanceIds = dto.getHistoricDecisionInstanceIds();
+      String deleteReason = dto.getDeleteReason();
+      Batch batch = processEngine.getHistoryService().deleteHistoricDecisionInstancesAsync(historicDecisionInstanceIds, decisionInstanceQuery, deleteReason);
       return BatchDto.fromBatch(batch);
     }
     catch (BadUserRequestException e) {

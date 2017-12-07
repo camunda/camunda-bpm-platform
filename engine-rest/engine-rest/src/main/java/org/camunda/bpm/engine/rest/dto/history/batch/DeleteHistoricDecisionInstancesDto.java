@@ -20,6 +20,7 @@ public class DeleteHistoricDecisionInstancesDto {
 
   protected List<String> historicDecisionInstanceIds;
   protected HistoricDecisionInstanceQueryDto historicDecisionInstanceQuery;
+  protected String deleteReason;
 
   public List<String> getHistoricDecisionInstanceIds() {
     return historicDecisionInstanceIds;
@@ -35,6 +36,14 @@ public class DeleteHistoricDecisionInstancesDto {
 
   public void setHistoricDecisionInstanceQuery(HistoricDecisionInstanceQueryDto historicDecisionInstanceQuery) {
     this.historicDecisionInstanceQuery = historicDecisionInstanceQuery;
+  }
+
+  public String getDeleteReason() {
+    return deleteReason;
+  }
+
+  public void setDeleteReason(String deleteReason) {
+    this.deleteReason = deleteReason;
   }
 
 }
