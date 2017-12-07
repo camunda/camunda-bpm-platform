@@ -69,6 +69,10 @@ public class ObjectTypeImpl extends AbstractValueTypeImpl implements Serializabl
       valueInfo.put(VALUE_INFO_OBJECT_TYPE_NAME, objectTypeName);
     }
 
+    if (objectValue.isTransient()) {
+      valueInfo.put(VALUE_INFO_TRANSIENT, objectValue.isTransient());
+    }
+
     return valueInfo;
   }
 
@@ -94,6 +98,10 @@ public class ObjectTypeImpl extends AbstractValueTypeImpl implements Serializabl
       builder.serializationDataFormat(serializationDataFormat);
     }
 
+    Object isTransient = valueInfo.get(VALUE_INFO_TRANSIENT);
+    if (isTransient instanceof Boolean && ((Boolean) isTransient == true)) {
+      builder.setTransient(true);
+    }
   }
 
 }

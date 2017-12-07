@@ -72,4 +72,5 @@ public interface FileValueBuilder extends TypedValueBuilder<FileValue> {
    * @return
    */
   FileValueBuilder encoding(String encoding);
+
 }

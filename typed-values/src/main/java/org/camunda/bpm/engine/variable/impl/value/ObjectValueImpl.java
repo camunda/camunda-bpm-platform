@@ -49,6 +49,11 @@ public class ObjectValueImpl extends AbstractTypedValue<Object> implements Objec
     this(value, null, null, null, true);
   }
 
+  public ObjectValueImpl(Object value, boolean isTransient) {
+    this(value, null, null, null, true);
+    this.isTransient = isTransient;
+  }
+
   public String getSerializationDataFormat() {
     return serializationDataFormat;
   }
@@ -114,6 +119,10 @@ public class ObjectValueImpl extends AbstractTypedValue<Object> implements Objec
     return (SerializableValueType) super.getType();
   }
 
+  public void setTransient(boolean isTransient) {
+    this.isTransient = isTransient;
+  }
+
   @Override
   public String toString() {
     return "ObjectValue ["
@@ -122,6 +131,7 @@ public class ObjectValueImpl extends AbstractTypedValue<Object> implements Objec
         + ", serializationDataFormat=" + serializationDataFormat
         + ", objectTypeName=" + objectTypeName
         + ", serializedValue="+ (serializedValue != null ? (serializedValue.length() + " chars") : null)
+        + ", isTransient=" + isTransient
         + "]";
   }
 }

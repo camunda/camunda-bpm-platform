@@ -38,4 +38,16 @@ public interface TypedValue extends Serializable {
    */
   ValueType getType();
 
+  /**
+   * Indicator for transience of the value
+   * @return isTransient
+   */
+  boolean isTransient();
+
+  /**
+   * Set the indicator for transience of the value
+   * @param isTransient
+   */
+  void setTransient(boolean isTransient);
+
 }

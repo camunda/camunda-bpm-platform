@@ -33,6 +33,7 @@ public class FileValueImpl implements FileValue {
   protected byte[] value;
   protected FileValueType type;
   protected String encoding;
+  protected boolean isTransient;
 
   public FileValueImpl(byte[] value, FileValueType type, String filename, String mimeType, String encoding) {
     this.value = value;
@@ -109,8 +110,15 @@ public class FileValueImpl implements FileValue {
 
   @Override
   public String toString() {
-    return "FileValueImpl [mimeType=" + mimeType + ", filename=" + filename + ", type=" + type + "]";
+    return "FileValueImpl [mimeType=" + mimeType + ", filename=" + filename + ", type=" + type + ", isTransient=" + isTransient + "]";
   }
 
+  @Override
+  public boolean isTransient() {
+    return isTransient;
+  }
 
+  public void setTransient(boolean isTransient) {
+    this.isTransient = isTransient;
+  }
 }
