@@ -50,6 +50,7 @@ public class PrimitiveTypeValueImpl<T> extends AbstractTypedValue<T> implements 
     int result = 1;
     result = prime * result + ((type == null) ? 0 : type.hashCode());
     result = prime * result + ((value == null) ? 0 : value.hashCode());
+    result = prime * result + (isTransient ? 1 : 0);
     return result;
   }
 
@@ -72,6 +73,9 @@ public class PrimitiveTypeValueImpl<T> extends AbstractTypedValue<T> implements 
         return false;
     } else if (!value.equals(other.value))
       return false;
+    if (isTransient != other.isTransient()) {
+      return false;
+    }
     return true;
   }
 

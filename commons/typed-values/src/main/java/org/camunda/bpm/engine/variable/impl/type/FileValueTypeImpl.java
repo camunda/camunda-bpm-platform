@@ -74,7 +74,10 @@ public class FileValueTypeImpl extends AbstractValueTypeImpl implements FileValu
 
       builder.encoding(encoding.toString());
     }
-    return builder.create();
+    
+    FileValue fileValue = builder.create();
+    setTransient(fileValue, valueInfo);
+    return fileValue;
   }
 
   @Override
@@ -90,6 +93,9 @@ public class FileValueTypeImpl extends AbstractValueTypeImpl implements FileValu
     }
     if (fileValue.getEncoding() != null) {
       result.put(VALUE_INFO_FILE_ENCODING, fileValue.getEncoding());
+    }
+    if (fileValue.isTransient()) {
+      result.put(VALUE_INFO_TRANSIENT, fileValue.isTransient());
     }
     return result;
   }

@@ -18,15 +18,20 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
 
+import java.io.File;
+import java.net.URISyntaxException;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.camunda.bpm.engine.variable.context.VariableContext;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.Variables.SerializationDataFormats;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.junit.Test;
 
 /**
@@ -162,4 +167,25 @@ public class VariableApiTest {
     assertTrue(varContext.containsVariable("someValue"));
   }
 
+  @Test
+  public void testTransientVariables() throws URISyntaxException {
+    VariableMap variableMap = createVariables().putValueTyped("foo", doubleValueTransient(10.0))
+                     .putValueTyped("bar", integerValueTransient(10))
+                     .putValueTyped("aa", booleanValueTransient(true))
+                     .putValueTyped("bb", stringValueTransient("bb"))
+                     .putValueTyped("test", byteArrayValueTransient("test".getBytes()))
+                     .putValueTyped("blob", fileValueTransient(new File(this.getClass().getClassLoader().getResource("org/camunda/bpm/engine/test/variables/simpleFile.txt").toURI())))
+                     .putValueTyped("val", dateValueTransient(new Date()))
+                     .putValueTyped("var", objectValueTransient(new Integer(10)).create())
+                     .putValueTyped("short", shortValueTransient((short)12))
+                     .putValueTyped("long", longValueTransient((long)10))
+                     .putValueTyped("file", fileValue("org/camunda/bpm/engine/test/variables/simpleFile.txt").setTransient(true).create())
+                     .putValueTyped("hi", transientUntypedValue("stringUntyped"))
+                     .putValueTyped("null", transientUntypedValue(null));
+
+    for (Entry<String, Object> e : variableMap.entrySet()) {
+      TypedValue value = (TypedValue) variableMap.getValueTyped(e.getKey());
+      assertTrue(value.isTransient());
+    }
+  }
 }

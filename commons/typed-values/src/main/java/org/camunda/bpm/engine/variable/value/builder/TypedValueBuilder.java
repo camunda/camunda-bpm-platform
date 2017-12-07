@@ -22,4 +22,6 @@ public interface TypedValueBuilder<T extends TypedValue> {
 
   T create();
 
+  TypedValueBuilder<T> setTransient(boolean isTransient);
+
 }

@@ -28,8 +28,15 @@ public class UntypedValueImpl implements TypedValue {
 
   protected Object value;
 
+  protected boolean isTransient;
+
   public UntypedValueImpl(Object object) {
     value = object;
+  }
+
+  public UntypedValueImpl(Object object, boolean isTransient) {
+    value = object;
+    this.isTransient = isTransient;
   }
 
   public Object getValue() {
@@ -43,7 +50,7 @@ public class UntypedValueImpl implements TypedValue {
 
   @Override
   public String toString() {
-    return "Untyped value '"+value+"'";
+    return "Untyped value '"+value+"', isTransient = " + isTransient;
   }
 
   @Override
@@ -51,6 +58,7 @@ public class UntypedValueImpl implements TypedValue {
     final int prime = 31;
     int result = 1;
     result = prime * result + ((value == null) ? 0 : value.hashCode());
+    result = prime * result + (isTransient ? 1 : 0);
     return result;
   }
 
@@ -68,7 +76,20 @@ public class UntypedValueImpl implements TypedValue {
         return false;
     } else if (!value.equals(other.value))
       return false;
+    if (isTransient != other.isTransient()) {
+      return false;
+    }
     return true;
+  }
+
+  @Override
+  public boolean isTransient() {
+    return isTransient;
+  }
+
+  @Override
+  public void setTransient(boolean isTransient) {
+    this.isTransient = isTransient;
   }
 
 }

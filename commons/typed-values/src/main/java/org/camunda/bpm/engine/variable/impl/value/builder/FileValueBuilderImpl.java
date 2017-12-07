@@ -85,4 +85,10 @@ public class FileValueBuilderImpl implements FileValueBuilder {
     return this;
   }
 
+  @Override
+  public FileValueBuilder setTransient(boolean isTransient) {
+    fileValue.setTransient(isTransient);
+    return this;
+  }
+
 }

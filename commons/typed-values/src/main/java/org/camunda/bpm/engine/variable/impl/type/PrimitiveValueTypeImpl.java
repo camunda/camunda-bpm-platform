@@ -12,8 +12,8 @@
  */
 package org.camunda.bpm.engine.variable.impl.type;
 
-import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.lang.model.type.NullType;
@@ -67,7 +67,10 @@ public abstract class PrimitiveValueTypeImpl extends AbstractValueTypeImpl imple
   }
 
   public Map<String, Object> getValueInfo(TypedValue typedValue) {
-    return Collections.emptyMap();
+    Map<String, Object> result = new HashMap<String, Object>();
+    if (typedValue.isTransient())
+      result.put(VALUE_INFO_TRANSIENT, typedValue.isTransient());
+    return result;
   }
 
   // concrete types ///////////////////////////////////////////////////
@@ -81,7 +84,9 @@ public abstract class PrimitiveValueTypeImpl extends AbstractValueTypeImpl imple
     }
 
     public BooleanValue createValue(Object value, Map<String, Object> valueInfo) {
-      return Variables.booleanValue((Boolean) value);
+      BooleanValue booleanValue = Variables.booleanValue((Boolean) value);
+      setTransient(booleanValue, valueInfo);
+      return booleanValue;
     }
 
   }
@@ -95,7 +100,9 @@ public abstract class PrimitiveValueTypeImpl extends AbstractValueTypeImpl imple
     }
 
     public BytesValue createValue(Object value, Map<String, Object> valueInfo) {
-      return Variables.byteArrayValue((byte[]) value);
+      BytesValue bytesValue = Variables.byteArrayValue((byte[]) value);
+      setTransient(bytesValue, valueInfo);
+      return bytesValue;
     }
 
   }
@@ -109,7 +116,9 @@ public abstract class PrimitiveValueTypeImpl extends AbstractValueTypeImpl imple
     }
 
     public DateValue createValue(Object value, Map<String, Object> valueInfo) {
-      return Variables.dateValue((Date) value);
+      DateValue dateValue = Variables.dateValue((Date) value);
+      setTransient(dateValue, valueInfo);
+      return dateValue;
     }
 
   }
@@ -123,7 +132,9 @@ public abstract class PrimitiveValueTypeImpl extends AbstractValueTypeImpl imple
     }
 
     public DoubleValue createValue(Object value, Map<String, Object> valueInfo) {
-      return Variables.doubleValue((Double) value);
+      DoubleValue doubleValue = Variables.doubleValue((Double) value);
+      setTransient(doubleValue, valueInfo);
+      return doubleValue;
     }
 
     @Override
@@ -145,13 +156,15 @@ public abstract class PrimitiveValueTypeImpl extends AbstractValueTypeImpl imple
       if (typedValue.getType() != ValueType.NUMBER) {
         throw unsupportedConversion(typedValue.getType());
       }
-
+      DoubleValue doubleValue = null;
       NumberValue numberValue = (NumberValue) typedValue;
       if (numberValue.getValue() != null) {
-        return Variables.doubleValue(numberValue.getValue().doubleValue());
+        doubleValue = Variables.doubleValue(numberValue.getValue().doubleValue());
       } else {
-        return Variables.doubleValue(null);
+        doubleValue = Variables.doubleValue(null);
       }
+      doubleValue.setTransient(numberValue.isTransient());
+      return doubleValue;
     }
   }
 
@@ -164,7 +177,9 @@ public abstract class PrimitiveValueTypeImpl extends AbstractValueTypeImpl imple
     }
 
     public IntegerValue createValue(Object value, Map<String, Object> valueInfo) {
-      return Variables.integerValue((Integer) value);
+      IntegerValue integerValue = Variables.integerValue((Integer) value);
+      setTransient(integerValue, valueInfo);
+      return integerValue;
     }
 
     @Override
@@ -198,12 +213,15 @@ public abstract class PrimitiveValueTypeImpl extends AbstractValueTypeImpl imple
         throw unsupportedConversion(typedValue.getType());
       }
 
+      IntegerValue integerValue = null;
       NumberValue numberValue = (NumberValue) typedValue;
       if (numberValue.getValue() != null) {
-        return Variables.integerValue(numberValue.getValue().intValue());
+        integerValue = Variables.integerValue(numberValue.getValue().intValue());
       } else {
-        return Variables.integerValue(null);
+        integerValue = Variables.integerValue(null);
       }
+      integerValue.setTransient(numberValue.isTransient());
+      return integerValue;
     }
   }
 
@@ -216,7 +234,9 @@ public abstract class PrimitiveValueTypeImpl extends AbstractValueTypeImpl imple
     }
 
     public LongValue createValue(Object value, Map<String, Object> valueInfo) {
-      return Variables.longValue((Long) value);
+      LongValue longValue = Variables.longValue((Long) value);
+      setTransient(longValue, valueInfo);
+      return longValue;
     }
 
     @Override
@@ -250,13 +270,16 @@ public abstract class PrimitiveValueTypeImpl extends AbstractValueTypeImpl imple
         throw unsupportedConversion(typedValue.getType());
       }
 
+      LongValue longvalue = null;
       NumberValue numberValue = (NumberValue) typedValue;
 
       if (numberValue.getValue() != null) {
-        return Variables.longValue(numberValue.getValue().longValue());
+        longvalue = Variables.longValue(numberValue.getValue().longValue());
       } else {
-        return Variables.longValue(null);
+        longvalue =  Variables.longValue(null);
       }
+      longvalue.setTransient(numberValue.isTransient());
+      return longvalue;
     }
   }
 
@@ -269,7 +292,9 @@ public abstract class PrimitiveValueTypeImpl extends AbstractValueTypeImpl imple
     }
 
     public TypedValue createValue(Object value, Map<String, Object> valueInfo) {
-      return Variables.untypedNullValue();
+      TypedValue nullValue = Variables.untypedNullValue();
+      setTransient(nullValue, valueInfo);
+      return nullValue;
     }
 
   }
@@ -283,7 +308,9 @@ public abstract class PrimitiveValueTypeImpl extends AbstractValueTypeImpl imple
     }
 
     public ShortValue createValue(Object value, Map<String, Object> valueInfo) {
-      return Variables.shortValue((Short) value);
+      ShortValue shortValue = Variables.shortValue((Short) value);
+      setTransient(shortValue, valueInfo);
+      return shortValue;
     }
 
     @Override
@@ -297,12 +324,15 @@ public abstract class PrimitiveValueTypeImpl extends AbstractValueTypeImpl imple
         throw unsupportedConversion(typedValue.getType());
       }
 
+      ShortValue shortValue = null;
       NumberValue numberValue = (NumberValue) typedValue;
       if (numberValue.getValue() != null) {
-        return Variables.shortValue(numberValue.getValue().shortValue());
+        shortValue = Variables.shortValue(numberValue.getValue().shortValue());
       } else {
-        return Variables.shortValue(null);
+        shortValue =  Variables.shortValue(null);
       }
+      shortValue.setTransient(numberValue.isTransient());
+      return shortValue;
     }
 
     @Override
@@ -335,7 +365,9 @@ public abstract class PrimitiveValueTypeImpl extends AbstractValueTypeImpl imple
     }
 
     public StringValue createValue(Object value, Map<String, Object> valueInfo) {
-      return Variables.stringValue((String) value);
+      StringValue stringValue = Variables.stringValue((String) value);
+      setTransient(stringValue, valueInfo);
+      return stringValue;
     }
   }
 
@@ -348,7 +380,9 @@ public abstract class PrimitiveValueTypeImpl extends AbstractValueTypeImpl imple
     }
 
     public NumberValue createValue(Object value, Map<String, Object> valueInfo) {
-      return Variables.numberValue((Number) value);
+      NumberValue numberValue = Variables.numberValue((Number) value);
+      setTransient(numberValue, valueInfo);
+      return numberValue;
     }
 
     @Override

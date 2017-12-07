@@ -16,6 +16,7 @@ import org.camunda.bpm.engine.variable.impl.value.ObjectValueImpl;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.bpm.engine.variable.value.SerializationDataFormat;
 import org.camunda.bpm.engine.variable.value.builder.ObjectValueBuilder;
+import org.camunda.bpm.engine.variable.value.builder.TypedValueBuilder;
 
 /**
  * @author Daniel Meyer
@@ -44,6 +45,12 @@ public class ObjectVariableBuilderImpl implements ObjectValueBuilder {
 
   public ObjectValueBuilder serializationDataFormat(SerializationDataFormat dataFormat) {
     return serializationDataFormat(dataFormat.getName());
+  }
+
+  @Override
+  public TypedValueBuilder<ObjectValue> setTransient(boolean isTransient) {
+    variableValue.setTransient(isTransient);
+    return this;
   }
 
 }

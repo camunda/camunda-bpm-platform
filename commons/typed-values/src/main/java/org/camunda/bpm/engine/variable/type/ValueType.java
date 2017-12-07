@@ -62,7 +62,7 @@ public interface ValueType extends Serializable {
 
   public static final FileValueType FILE = new FileValueTypeImpl();
 
-
+  public static final String VALUE_INFO_TRANSIENT = "transient";
   /**
    * Returns the name of the variable type
    */
