@@ -110,9 +110,4 @@ public class DeleteHistoricDecisionInstancesBatchCmd extends AbstractIDBasedBatc
     return (BatchJobHandler<BatchConfiguration>) processEngineConfiguration.getBatchHandlers().get(Batch.TYPE_HISTORIC_DECISION_INSTANCE_DELETION);
   }
 
-  protected void checkAuthorizations(CommandContext commandContext) {
-    super.checkAuthorizations(commandContext);
-    commandContext.getAuthorizationManager().checkAuthorization(Permissions.DELETE_HISTORY, Resources.DECISION_DEFINITION);
-  }
-
 }

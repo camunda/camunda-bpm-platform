@@ -284,12 +284,8 @@ public interface ExternalTaskService {
    * @param externalTaskQuery a query which selects the external tasks to set the retries for.
    * @throws NotFoundException if no external task with one of the given id exists
    * @throws BadUserRequestException if the ids are null or the number of retries is negative
-   * @throws AuthorizationException thrown if the current user has no {@link Permissions#CREATE} permission on {@link Resources#BATCH}
-   *    or does not possess any of the following permissions:
-   *   <ul>
-   *     <li>{@link Permissions#UPDATE} on {@link Resources#PROCESS_INSTANCE}</li>
-   *     <li>{@link Permissions#UPDATE_INSTANCE} on {@link Resources#PROCESS_DEFINITION}</li>
-   *   </ul>
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#CREATE} permission on {@link Resources#BATCH}.
    */
   public Batch setRetriesAsync(List<String> externalTaskIds, ExternalTaskQuery externalTaskQuery, int retries);
 

@@ -837,9 +837,7 @@ public interface ManagementService {
    *
    * @throws BadUserRequestException if jobIds is null
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION},
-   *          or no {@link Permissions#CREATE} permission on {@link Resources#BATCH}.
+   *          If the user has no {@link Permissions#CREATE} permission on {@link Resources#BATCH}.
    */
   Batch setJobRetriesAsync(List<String> jobIds, int retries);
 
@@ -855,9 +853,7 @@ public interface ManagementService {
    *
    * @throws BadUserRequestException if jobQuery is null
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION},
-   *          or no {@link Permissions#CREATE} permission on {@link Resources#BATCH}.
+   *          If the user has no {@link Permissions#CREATE} permission on {@link Resources#BATCH}.
    */
   Batch setJobRetriesAsync(JobQuery jobQuery, int retries);
 
@@ -877,9 +873,7 @@ public interface ManagementService {
    *
    * @throws BadUserRequestException if neither jobIds, nor jobQuery is provided or result in empty list
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION},
-   *          or no {@link Permissions#CREATE} permission on {@link Resources#BATCH}.
+   *          If the user has no {@link Permissions#CREATE} permission on {@link Resources#BATCH}.
    */
   Batch setJobRetriesAsync(List<String> jobIds, JobQuery jobQuery, int retries);
 
@@ -898,9 +892,7 @@ public interface ManagementService {
    * @param retries number of retries.
    *
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION},
-   *          or no {@link Permissions#CREATE} permission on {@link Resources#BATCH}.
+   *          If the user has no {@link Permissions#CREATE} permission on {@link Resources#BATCH}.
    */
   Batch setJobRetriesAsync (List<String> processInstanceIds, ProcessInstanceQuery query, int retries);
 

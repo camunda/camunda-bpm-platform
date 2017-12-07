@@ -209,8 +209,7 @@ public interface HistoryService {
    * @throws BadUserRequestException
    *          when no process instances is found with the given ids or ids are null.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#PROCESS_DEFINITION}
-   *          or no {@link Permissions#CREATE} permission on {@link Resources#BATCH}.
+   *          If the user has no {@link Permissions#CREATE} permission on {@link Resources#BATCH}.
    */
   Batch deleteHistoricProcessInstancesAsync(List<String> processInstanceIds, String deleteReason);
 
@@ -221,8 +220,7 @@ public interface HistoryService {
    * @throws BadUserRequestException
    *          when no process instances is found with the given ids or ids are null.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#PROCESS_DEFINITION}
-   *          or no {@link Permissions#CREATE} permission on {@link Resources#BATCH}.
+   *          If the user has no {@link Permissions#CREATE} permission on {@link Resources#BATCH}.
    */
   Batch deleteHistoricProcessInstancesAsync(HistoricProcessInstanceQuery query, String deleteReason);
 
@@ -234,8 +232,7 @@ public interface HistoryService {
    * @throws BadUserRequestException
    *          when no process instances is found with the given ids or ids are null.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#PROCESS_DEFINITION}
-   *          or no {@link Permissions#CREATE} permission on {@link Resources#BATCH}.
+   *          If the user has no {@link Permissions#CREATE} permission on {@link Resources#BATCH}.
    */
   Batch deleteHistoricProcessInstancesAsync(List<String> processInstanceIds, HistoricProcessInstanceQuery query, String deleteReason);
 
@@ -319,8 +316,7 @@ public interface HistoryService {
    * @throws BadUserRequestException
    *          when no decision instances are found with the given ids or ids are null.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#DECISION_DEFINITION}
-   *          or no {@link Permissions#CREATE} permission on {@link Resources#BATCH}.
+   *          If the user has no {@link Permissions#CREATE} permission on {@link Resources#BATCH}.
    */
   Batch deleteHistoricDecisionInstancesAsync(List<String> decisionInstanceIds, String deleteReason);
 
@@ -330,8 +326,7 @@ public interface HistoryService {
    * @throws BadUserRequestException
    *          when no decision instances are found with the given ids or ids are null.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#DECISION_DEFINITION}
-   *          or no {@link Permissions#CREATE} permission on {@link Resources#BATCH}.
+   *          If the user has no {@link Permissions#CREATE} permission on {@link Resources#BATCH}.
    */
   Batch deleteHistoricDecisionInstancesAsync(HistoricDecisionInstanceQuery query, String deleteReason);
 
@@ -342,8 +337,7 @@ public interface HistoryService {
    * @throws BadUserRequestException
    *          when no decision instances are found with the given ids or ids are null.
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#DECISION_DEFINITION}
-   *          or no {@link Permissions#CREATE} permission on {@link Resources#BATCH}.
+   *          If the user has no {@link Permissions#CREATE} permission on {@link Resources#BATCH}.
    */
   Batch deleteHistoricDecisionInstancesAsync(List<String> decisionInstanceIds, HistoricDecisionInstanceQuery query, String deleteReason);
 
