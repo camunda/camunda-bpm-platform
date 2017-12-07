@@ -171,6 +171,14 @@ public class Variables {
   }
 
   /**
+   * Returns a builder to create a new transient {@link ObjectValue} that encapsulates
+   * the given {@code value}.
+   */
+  public static ObjectValueBuilder objectValueTransient(Object value) {
+    return (ObjectValueBuilder) objectValue(value).setTransient(true);
+  }
+
+  /**
    * Returns a builder to create a new {@link ObjectValue} from a serialized
    * object representation.
    */
@@ -193,10 +201,28 @@ public class Variables {
   }
 
   /**
+   * Creates a new transient {@link IntegerValue} that encapsulates the given <code>integer</code>
+   */
+  public static IntegerValue integerValueTransient(Integer integer) {
+    IntegerValue value = integerValue(integer);
+    value.setTransient(true);
+    return value;
+  }
+
+  /**
    * Creates a new {@link StringValue} that encapsulates the given <code>stringValue</code>
    */
   public static StringValue stringValue(String stringValue) {
     return new StringValueImpl(stringValue);
+  }
+
+  /**
+   * Creates a new transient {@link StringValue} that encapsulates the given <code>stringValue</code>
+   */
+  public static StringValue stringValueTransient(String stringValue) {
+    StringValue value = stringValue(stringValue);
+    value.setTransient(true);
+    return value;
   }
 
   /**
@@ -207,10 +233,28 @@ public class Variables {
   }
 
   /**
+   * Creates a new transient {@link BooleanValue} that encapsulates the given <code>booleanValue</code>
+   */
+  public static BooleanValue booleanValueTransient(Boolean booleanValue) {
+    BooleanValue value = booleanValue(booleanValue);
+    value.setTransient(true);
+    return value;
+  }
+
+  /**
    * Creates a new {@link BytesValue} that encapsulates the given <code>bytes</code>
    */
   public static BytesValue byteArrayValue(byte[] bytes) {
     return new BytesValueImpl(bytes);
+  }
+
+  /**
+   * Creates a new transient {@link BytesValue} that encapsulates the given <code>bytes</code>
+   */
+  public static BytesValue byteArrayValueTransient(byte[] bytes) {
+    BytesValue value = byteArrayValue(bytes);
+    value.setTransient(true);
+    return value;
   }
 
   /**
@@ -221,10 +265,28 @@ public class Variables {
   }
 
   /**
+   * Creates a new transient {@link DateValue} that encapsulates the given <code>date</code>
+   */
+  public static DateValue dateValueTransient(Date date) {
+    DateValue value = dateValue(date);
+    value.setTransient(true);
+    return value;
+  }
+
+  /**
    * Creates a new {@link LongValue} that encapsulates the given <code>longValue</code>
    */
   public static LongValue longValue(Long longValue) {
     return new LongValueImpl(longValue);
+  }
+
+  /**
+   * Creates a new transient {@link LongValue} that encapsulates the given <code>longValue</code>
+   */
+  public static LongValue longValueTransient(Long longValue) {
+    LongValue value = longValue(longValue);
+    value.setTransient(true);
+    return value;
   }
 
   /**
@@ -235,10 +297,28 @@ public class Variables {
   }
 
   /**
+   * Creates a new transient {@link ShortValue} that encapsulates the given <code>shortValue</code>
+   */
+  public static ShortValue shortValueTransient(Short shortValue) {
+    ShortValue value = shortValue(shortValue);
+    value.setTransient(true);
+    return value;
+  }
+
+  /**
    * Creates a new {@link DoubleValue} that encapsulates the given <code>doubleValue</code>
    */
   public static DoubleValue doubleValue(Double doubleValue) {
     return new DoubleValueImpl(doubleValue);
+  }
+
+  /**
+   * Creates a new transient {@link DoubleValue} that encapsulates the given <code>doubleValue</code>
+   */
+  public static DoubleValue doubleValueTransient(Double doubleValue) {
+    DoubleValue value = doubleValue(doubleValue);
+    value.setTransient(true);
+    return value;
   }
 
   /**
@@ -255,6 +335,13 @@ public class Variables {
    */
   public static TypedValue untypedNullValue() {
     return NullValueImpl.INSTANCE;
+  }
+
+  /**
+   * Creates a transient {@link TypedValue} with value {@code null} and type {@link ValueType#NULL}
+   */
+  public static TypedValue untypedTransientNullValue() {
+    return NullValueImpl.INSTANCE_TRANSIENT;
   }
 
   /**
@@ -277,12 +364,37 @@ public class Variables {
   }
 
   /**
+   * Creates an transient untyped value, i.e. {@link TypedValue#getType()} returns <code>null</code>
+   * for the returned instance.
+   */
+  public static TypedValue transientUntypedValue(Object value) {
+    if(value == null) {
+      return untypedTransientNullValue();
+    } else if (value instanceof TypedValueBuilder<?>) {
+      return ((TypedValueBuilder<?>) value).setTransient(true).create();
+    } else if (value instanceof TypedValue) {
+      TypedValue transientValue = (TypedValue) value;
+      if (value instanceof NullValueImpl) {
+        transientValue = untypedTransientNullValue();
+      } else {
+        transientValue.setTransient(true);
+      }
+      return transientValue;
+    }
+    else {
+      // unknown value
+      return new UntypedValueImpl(value, true);
+    }
+  }
+
+  /**
    * Returns a builder to create a new {@link FileValue} with the given
    * {@code filename}.
    */
   public static FileValueBuilder fileValue(String filename) {
     return new FileValueBuilderImpl(filename);
   }
+
 
   /**
    * Shortcut for calling {@code Variables.fileValue(name).file(file).mimeType(type).create()}.
@@ -291,6 +403,15 @@ public class Variables {
   public static FileValue fileValue(File file){
     String contentType = MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(file);
     return new FileValueBuilderImpl(file.getName()).file(file).mimeType(contentType).create();
+  }
+
+  /**
+   * Shortcut for calling {@code Variables.fileValue(name).file(file).mimeType(type).setTransient(true).create()}.
+   * The name is set to the file name and the mime type is detected via {@link MimetypesFileTypeMap}.
+   */
+  public static FileValue fileValueTransient(File file){
+    String contentType = MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(file);
+    return new FileValueBuilderImpl(file.getName()).file(file).mimeType(contentType).setTransient(true).create();
   }
 
   /**
