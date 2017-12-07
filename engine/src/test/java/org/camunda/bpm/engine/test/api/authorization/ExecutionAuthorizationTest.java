@@ -21,6 +21,7 @@ import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
 import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 
 /**
  * @author Roman Smirnov
@@ -235,6 +236,18 @@ public class ExecutionAuthorizationTest extends AuthorizationTest {
 
     // then
     verifyQueryResults(query, 11);
+  }
+
+  public void testQueryShouldReturnAllExecutions() {
+    // given
+    ProcessInstance processInstance = startProcessInstanceByKey(MESSAGE_BOUNDARY_PROCESS_KEY);
+    createGrantAuthorization(PROCESS_INSTANCE, processInstance.getId(), userId, READ);
+
+    // when
+    ExecutionQuery query = runtimeService.createExecutionQuery();
+
+    // then
+    verifyQueryResults(query, 2);
   }
 
   protected void verifyQueryResults(ExecutionQuery query, int countExpected) {
