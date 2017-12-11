@@ -20,7 +20,6 @@ module.exports = function(ngModule) {
       Notifications, $modal, $q, camAPI, fixDate, unfixDate, $translate) {
 
         // input: processInstance, processData
-
       var variableInstanceData = $scope.processData.newChild($scope),
           processInstance = $scope.processInstance,
           variableInstanceIdexceptionMessageMap,
@@ -30,14 +29,15 @@ module.exports = function(ngModule) {
           taskService      = camAPI.resource('task'),
           variableService  = camAPI.resource('variable');
 
-      // correct header to pass
+      // Table header
       $scope.headColumns = [
         { class: 'name',  request: 'variableName', sortable: true, content: $translate.instant('PLUGIN_VARIABLE_NAME')},
         { class: 'type',  request: 'variableType', sortable: true, content: $translate.instant('PLUGIN_VARIABLE_TYPE')},
         { class: 'value', request: '',             sortable: false, content: $translate.instant('PLUGIN_VARIABLE_VALUE')}
       ];
 
-      $scope.sortObj = { sortBy: 'variableName', sortOrder: 'desc' };
+      // Default sorting
+      $scope.sortObj = { sortBy: 'variableName', sortOrder: 'asc' };
 
       $scope.searchConfig = angular.copy(variableInstancesTabSearchConfig);
 
@@ -72,7 +72,7 @@ module.exports = function(ngModule) {
         $scope.pages = pages ||  $scope.pages;
 
         if ($scope.instanceIdToInstanceMap) {
-          return updateView($scope.instanceIdToInstanceMap, query, pages, sortObj);
+          return updateView($scope.instanceIdToInstanceMap,  $scope.query,   $scope.pages , sortObj);
         }
 
         return $q.when($scope.total);
