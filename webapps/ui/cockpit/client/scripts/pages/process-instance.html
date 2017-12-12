@@ -105,6 +105,21 @@
             <a ng-href="{{ getDeploymentUrl() }}">{{ processDefinition.deploymentId }}</a>
           </dd>
 
+          <dt ng-if="superProcessInstance"
+              cam-widget-clipboard="superProcessInstance.id"
+              ng-class="{hovered: hovered === 'super-process-instance-id'}">{{ 'PROCESS_INSTANCE_SUPER_PROCESS_INSTANCE_ID' | translate }}</dt>
+          <dd class="super-process-instance-id"
+              ng-if="superProcessInstance.id"
+              ng-mouseenter="hoverTitle('super-process-instance-id')"
+              ng-mouseleave="hoverTitle()">
+            <a ng-href="#/process-instance/{{superProcessInstance.id}}">{{ superProcessInstance.id }}</a>
+          </dd>
+          <dt ng-if="!superProcessInstance">{{ 'PROCESS_INSTANCE_SUPER_PROCESS_INSTANCE_ID' | translate }}</dt>
+          <dd class="super-process-instance-id"
+              ng-if="!superProcessInstance">
+            <span class="null-value">null</span>
+          </dd>
+
           <dt ng-if="hasMigrationPlugin">{{ 'PROCESS_INSTANCE_RELATED' | translate }}</dt>
           <dd ng-if="hasMigrationPlugin">
             <ul>
