@@ -151,7 +151,7 @@
             <div ng-repeat="plugin in metricsPlugins"
                  data-plugin-id="{{ plugin.id }}"
                  class="stats-section col-md-6 col-lg-4 entry">
-              <h4>{{ plugin.label }}</h4>
+              <h4>{{ plugin.label | translate }}</h4>
               <view vars="metricsVars"
                     provider="plugin"
                     period="metricsPeriod"
