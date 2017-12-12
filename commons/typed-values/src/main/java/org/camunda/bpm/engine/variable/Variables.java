@@ -395,6 +395,13 @@ public class Variables {
     return new FileValueBuilderImpl(filename);
   }
 
+  /**
+   * Returns a builder to create a new transient {@link FileValue} with the given
+   * {@code filename}.
+   */
+  public static FileValueBuilder fileValueTransient(String filename) {
+    return new FileValueBuilderImpl(filename).setTransient(true);
+  }
 
   /**
    * Shortcut for calling {@code Variables.fileValue(name).file(file).mimeType(type).create()}.
