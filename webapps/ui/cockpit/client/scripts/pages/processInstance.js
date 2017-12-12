@@ -292,8 +292,8 @@ var Controller = [
       return routeUtil.redirectTo(path, searches, [ 'deployment', 'resourceName', 'deploymentsQuery' ]);
     };
 
-    processData.provide('superProcessInstanceCount', ['processInstance', function(processInstance) {
-      return ProcessInstanceResource.count({ subProcessInstance : processInstance.id }).$promise;
+    processData.provide('superProcessInstance', ['processInstance', function(processInstance) {
+      return ProcessInstanceResource.query({ subProcessInstance : processInstance.id }).$promise;
     }]);
 
     function fetchSuperProcessInstance(processInstance, done) {
@@ -313,8 +313,8 @@ var Controller = [
     $rootScope.showBreadcrumbs = true;
 
     processData.observe([
-      'processDefinition', 'processInstance', 'superProcessInstanceCount'],
-    function(processDefinition,   processInstance,   superProcessInstanceCount) {
+      'processDefinition', 'processInstance', 'superProcessInstance'],
+    function(processDefinition,   processInstance,   superProcessInstance) {
       var crumbs = [
         {
           label: $translate.instant('PROCESS_INSTANCE_PROCESSES'),
@@ -322,7 +322,9 @@ var Controller = [
         }
       ];
 
-      if (superProcessInstanceCount.count) {
+      if (superProcessInstance.length) {
+        $scope.superProcessInstance = superProcessInstance[0];
+
         crumbs.push(function(index) {
           breadcrumbTrails(processInstance, fetchSuperProcessInstance, [], index, 'runtime');
         });

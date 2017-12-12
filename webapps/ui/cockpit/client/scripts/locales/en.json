@@ -113,6 +113,7 @@
   "PROCESS_INSTANCE_MESSAGE_4" : "process definition view.",
   "PROCESS_INSTANCE_STATUS_FAILED_RUNNING_PROCESS" : "Failed to display running process instance",
   "PROCESS_INSTANCE_MESSAGE_5" : "No running process instance with ID {{id}}",
+  "PROCESS_INSTANCE_SUPER_PROCESS_INSTANCE_ID" : "Super Process Instance ID:",
 
   "TASKS_HUMAN_TASKS" : "Human Tasks",
 
