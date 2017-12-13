@@ -261,7 +261,7 @@ module.exports = function(ngModule) {
 
         // Add default sorting param
         if(sortObj) {
-          defaultParams.sorting = [sortObj]
+          defaultParams.sorting = [sortObj];
           saveLocal(sortObj);
         }
 
