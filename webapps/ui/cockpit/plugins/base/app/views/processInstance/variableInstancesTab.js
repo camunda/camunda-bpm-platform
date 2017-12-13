@@ -342,12 +342,12 @@ module.exports = function(ngModule) {
       }
 
       function saveLocal(sortObj) {
-        localConf.set('varInstTab', sortObj);
+        localConf.set('sortHistVarInstTab', sortObj);
 
       }
 
       function loadLocal(defaultValue) {
-        return localConf.get('varInstTab', defaultValue);
+        return localConf.get('sortHistVarInstTab', defaultValue);
       }
 
 
