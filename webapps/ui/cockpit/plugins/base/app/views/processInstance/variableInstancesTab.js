@@ -15,9 +15,9 @@ var uploadTemplate = require('../../../../../client/scripts/components/variables
 module.exports = function(ngModule) {
   ngModule.controller('VariableInstancesController', [
     '$scope', '$sce', '$http', 'search', 'Uri', 'LocalExecutionVariableResource',
-    'Notifications', '$modal', '$q', 'camAPI', 'fixDate', 'unfixDate', '$translate',
+    'Notifications', '$modal', '$q', 'camAPI', 'fixDate', 'unfixDate', '$translate', 'localConf',
     function($scope, $sce, $http, search, Uri, LocalExecutionVariableResource,
-      Notifications, $modal, $q, camAPI, fixDate, unfixDate, $translate) {
+      Notifications, $modal, $q, camAPI, fixDate, unfixDate, $translate,localConf) {
 
         // input: processInstance, processData
       var variableInstanceData = $scope.processData.newChild($scope),
@@ -37,7 +37,12 @@ module.exports = function(ngModule) {
       ];
 
       // Default sorting
-      $scope.sortObj = { sortBy: 'variableName', sortOrder: 'asc' };
+      var defaultValue= { sortBy: 'variableName', sortOrder: 'asc' };
+      $scope.sortObj   = loadLocal(defaultValue);
+
+
+
+
 
       $scope.searchConfig = angular.copy(variableInstancesTabSearchConfig);
 
@@ -255,7 +260,10 @@ module.exports = function(ngModule) {
         };
 
         // Add default sorting param
-        if(sortObj) {defaultParams.sorting = [sortObj];}
+        if(sortObj) {
+          defaultParams.sorting = [sortObj]
+          saveLocal(sortObj);
+        }
 
         var pagingParams = {
           firstResult    : firstResult,
@@ -332,6 +340,16 @@ module.exports = function(ngModule) {
             });
           });
       }
+
+      function saveLocal(sortObj) {
+        localConf.set('varInstTab', sortObj);
+
+      }
+
+      function loadLocal(defaultValue) {
+        return localConf.get('varInstTab', defaultValue);
+      }
+
 
     }]);
 
