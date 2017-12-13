@@ -278,7 +278,7 @@ module.exports = function(ngModule) {
         return variableService
           .count(countParams)
           .then(function(response) {
-            $scope.total = response.count;
+            $scope.total = response;
             // get variables objects
             return variableService
               .instances(params)
