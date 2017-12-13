@@ -13,8 +13,8 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
     label: 'PLUGIN_PROCESS_INSTANCES_LABEL',
     template: template,
     controller: [
-      '$scope', '$location', 'search', 'routeUtil', 'PluginProcessInstanceResource', '$translate',
-      function($scope,   $location,   search,   routeUtil,   PluginProcessInstanceResource, $translate) {
+      '$scope', '$location', 'search', 'routeUtil', 'PluginProcessInstanceResource', '$translate', 'localConf',
+      function($scope,   $location,   search,   routeUtil,   PluginProcessInstanceResource, $translate, localConf) {
 
         var processDefinition = $scope.processDefinition;
         $scope.onSearchChange = updateView;
@@ -26,8 +26,10 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
           { class: 'start-time',   request: 'startTime',   sortable: true,  content: 'PLUGIN_PROCESS_INSTANCE_START_TIME'},
           { class: 'business-key', request: 'businessKey', sortable: false, content: 'PLUGIN_PROCESS_INSTANCE_BUSINESS_KEY'}
         ];
-        // Default Sorting
-        $scope.sortObj = { sortBy: 'startTime', sortOrder: 'desc' };
+
+        // Default sorting
+        var defaultValue=  {sortBy: 'startTime', sortOrder: 'desc'};
+        $scope.sortObj   = loadLocal(defaultValue);
 
 
         $scope.searchConfig = angular.copy(searchConfig);
@@ -49,6 +51,8 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
           $scope.pagesObj = pages   || $scope.pagesObj ;
           $scope.queryObj = query   || $scope.queryObj;
           sortObj         = sortObj || $scope.sortObj;
+
+          saveLocal(sortObj);
 
           var page        =  $scope.pagesObj.current,
               queryParams =  $scope.queryObj,
@@ -81,6 +85,15 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
               return total;
             });
           });
+        }
+
+        function saveLocal(sortObj) {
+          localConf.set('sortProcInst', sortObj);
+
+        }
+
+        function loadLocal(defaultValue) {
+          return localConf.get('sortProcInst', defaultValue);
         }
 
         $scope.getProcessInstanceUrl = function(processInstance, params) {
