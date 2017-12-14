@@ -9,9 +9,9 @@ var Directive = function() {
     replace: false,
     restrict: 'AE',
     scope: {
-      headColumns: '=',
+      headColumns: '=?',
       onSortChange: '&',
-      defaultSort: '='
+      defaultSort: '=?'
     },
     template: template,
     controller: ['$scope',

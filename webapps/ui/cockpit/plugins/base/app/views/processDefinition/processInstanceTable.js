@@ -21,10 +21,10 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
         $scope.onSortChange   = updateView;
 
         $scope.headColumns = [
-          { class: 'state',        request: 'state',       sortable: false, content: 'PLUGIN_PROCESS_INSTANCE_STATE'},
-          { class: 'instance-id',  request: 'instanceId',  sortable: false, content: 'PLUGIN_PROCESS_INSTANCE_ID'},
-          { class: 'start-time',   request: 'startTime',   sortable: true,  content: 'PLUGIN_PROCESS_INSTANCE_START_TIME'},
-          { class: 'business-key', request: 'businessKey', sortable: false, content: 'PLUGIN_PROCESS_INSTANCE_BUSINESS_KEY'}
+          { class: 'state',        request: 'state',       sortable: false, content: $translate.instant('PLUGIN_PROCESS_INSTANCE_STATE')},
+          { class: 'instance-id',  request: 'instanceId',  sortable: false, content: $translate.instant('PLUGIN_PROCESS_INSTANCE_ID')},
+          { class: 'start-time',   request: 'startTime',   sortable: true,  content: $translate.instant('PLUGIN_PROCESS_INSTANCE_START_TIME')},
+          { class: 'business-key', request: 'businessKey', sortable: false, content: $translate.instant('PLUGIN_PROCESS_INSTANCE_BUSINESS_KEY')}
         ];
 
         // Default sorting
@@ -70,8 +70,9 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
             sortOrder      : sortObj.sortOrder
           };
 
-          var params = angular.extend({}, query, pagingParams, defaultParams);
           var countParams = angular.extend({}, queryParams, defaultParams);
+          var params = angular.extend({}, queryParams, pagingParams, defaultParams);
+
 
           $scope.processInstances = null;
           $scope.loadingState = 'LOADING';
