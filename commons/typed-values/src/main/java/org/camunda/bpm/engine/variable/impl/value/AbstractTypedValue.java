@@ -51,7 +51,6 @@ public class AbstractTypedValue<T> implements TypedValue {
     return isTransient;
   }
 
-  @Override
   public void setTransient(boolean isTransient) {
     this.isTransient = isTransient;
   }

@@ -22,6 +22,8 @@ import javax.activation.MimetypesFileTypeMap;
 import org.camunda.bpm.engine.variable.context.VariableContext;
 import org.camunda.bpm.engine.variable.impl.VariableMapImpl;
 import org.camunda.bpm.engine.variable.impl.context.EmptyVariableContext;
+import org.camunda.bpm.engine.variable.impl.value.AbstractTypedValue;
+import org.camunda.bpm.engine.variable.impl.value.FileValueImpl;
 import org.camunda.bpm.engine.variable.impl.value.NullValueImpl;
 import org.camunda.bpm.engine.variable.impl.value.UntypedValueImpl;
 import org.camunda.bpm.engine.variable.impl.value.PrimitiveTypeValueImpl.BooleanValueImpl;
@@ -171,11 +173,11 @@ public class Variables {
   }
 
   /**
-   * Returns a builder to create a new transient {@link ObjectValue} that encapsulates
+   * Returns a builder to create a new {@link ObjectValue} that encapsulates
    * the given {@code value}.
    */
-  public static ObjectValueBuilder objectValueTransient(Object value) {
-    return (ObjectValueBuilder) objectValue(value).setTransient(true);
+  public static ObjectValueBuilder objectValue(Object value, boolean isTransient) {
+    return (ObjectValueBuilder) objectValue(value).setTransient(isTransient);
   }
 
   /**
@@ -197,128 +199,112 @@ public class Variables {
    * Creates a new {@link IntegerValue} that encapsulates the given <code>integer</code>
    */
   public static IntegerValue integerValue(Integer integer) {
-    return new IntegerValueImpl(integer);
+    return integerValue(integer, false);
   }
 
   /**
-   * Creates a new transient {@link IntegerValue} that encapsulates the given <code>integer</code>
+   * Creates a new {@link IntegerValue} that encapsulates the given <code>integer</code>
    */
-  public static IntegerValue integerValueTransient(Integer integer) {
-    IntegerValue value = integerValue(integer);
-    value.setTransient(true);
-    return value;
+  public static IntegerValue integerValue(Integer integer, boolean isTransient) {
+    return new IntegerValueImpl(integer, isTransient);
   }
 
   /**
    * Creates a new {@link StringValue} that encapsulates the given <code>stringValue</code>
    */
   public static StringValue stringValue(String stringValue) {
-    return new StringValueImpl(stringValue);
+    return stringValue(stringValue, false);
   }
 
   /**
-   * Creates a new transient {@link StringValue} that encapsulates the given <code>stringValue</code>
+   * Creates a new {@link StringValue} that encapsulates the given <code>stringValue</code>
    */
-  public static StringValue stringValueTransient(String stringValue) {
-    StringValue value = stringValue(stringValue);
-    value.setTransient(true);
-    return value;
+  public static StringValue stringValue(String stringValue, boolean isTransient) {
+    return new StringValueImpl(stringValue, isTransient);
   }
 
   /**
    * Creates a new {@link BooleanValue} that encapsulates the given <code>booleanValue</code>
    */
   public static BooleanValue booleanValue(Boolean booleanValue) {
-    return new BooleanValueImpl(booleanValue);
+    return booleanValue(booleanValue, false);
   }
 
   /**
-   * Creates a new transient {@link BooleanValue} that encapsulates the given <code>booleanValue</code>
+   * Creates a new {@link BooleanValue} that encapsulates the given <code>booleanValue</code>
    */
-  public static BooleanValue booleanValueTransient(Boolean booleanValue) {
-    BooleanValue value = booleanValue(booleanValue);
-    value.setTransient(true);
-    return value;
+  public static BooleanValue booleanValue(Boolean booleanValue, boolean isTransient) {
+    return new BooleanValueImpl(booleanValue, isTransient);
   }
 
   /**
    * Creates a new {@link BytesValue} that encapsulates the given <code>bytes</code>
    */
   public static BytesValue byteArrayValue(byte[] bytes) {
-    return new BytesValueImpl(bytes);
+    return byteArrayValue(bytes, false);
   }
 
   /**
-   * Creates a new transient {@link BytesValue} that encapsulates the given <code>bytes</code>
+   * Creates a new {@link BytesValue} that encapsulates the given <code>bytes</code>
    */
-  public static BytesValue byteArrayValueTransient(byte[] bytes) {
-    BytesValue value = byteArrayValue(bytes);
-    value.setTransient(true);
-    return value;
+  public static BytesValue byteArrayValue(byte[] bytes, boolean isTransient) {
+    return new BytesValueImpl(bytes, isTransient);
   }
 
   /**
    * Creates a new {@link DateValue} that encapsulates the given <code>date</code>
    */
   public static DateValue dateValue(Date date) {
-    return new DateValueImpl(date);
+    return dateValue(date, false);
   }
 
   /**
-   * Creates a new transient {@link DateValue} that encapsulates the given <code>date</code>
+   * Creates a new {@link DateValue} that encapsulates the given <code>date</code>
    */
-  public static DateValue dateValueTransient(Date date) {
-    DateValue value = dateValue(date);
-    value.setTransient(true);
-    return value;
+  public static DateValue dateValue(Date date, boolean isTransient) {
+    return new DateValueImpl(date, isTransient);
   }
 
   /**
    * Creates a new {@link LongValue} that encapsulates the given <code>longValue</code>
    */
   public static LongValue longValue(Long longValue) {
-    return new LongValueImpl(longValue);
+    return longValue(longValue, false);
   }
 
   /**
-   * Creates a new transient {@link LongValue} that encapsulates the given <code>longValue</code>
+   * Creates a new {@link LongValue} that encapsulates the given <code>longValue</code>
    */
-  public static LongValue longValueTransient(Long longValue) {
-    LongValue value = longValue(longValue);
-    value.setTransient(true);
-    return value;
+  public static LongValue longValue(Long longValue, boolean isTransient) {
+    return new LongValueImpl(longValue, isTransient);
   }
 
   /**
    * Creates a new {@link ShortValue} that encapsulates the given <code>shortValue</code>
    */
   public static ShortValue shortValue(Short shortValue) {
-    return new ShortValueImpl(shortValue);
+    return shortValue(shortValue, false);
   }
 
   /**
-   * Creates a new transient {@link ShortValue} that encapsulates the given <code>shortValue</code>
+   * Creates a new {@link ShortValue} that encapsulates the given <code>shortValue</code>
    */
-  public static ShortValue shortValueTransient(Short shortValue) {
-    ShortValue value = shortValue(shortValue);
-    value.setTransient(true);
-    return value;
+  public static ShortValue shortValue(Short shortValue, boolean isTransient) {
+    return new ShortValueImpl(shortValue, isTransient);
   }
 
   /**
    * Creates a new {@link DoubleValue} that encapsulates the given <code>doubleValue</code>
    */
   public static DoubleValue doubleValue(Double doubleValue) {
-    return new DoubleValueImpl(doubleValue);
+    return doubleValue(doubleValue, false);
   }
 
   /**
-   * Creates a new transient {@link DoubleValue} that encapsulates the given <code>doubleValue</code>
+   * Creates a new {@link DoubleValue} that encapsulates the given <code>doubleValue</code>
    */
-  public static DoubleValue doubleValueTransient(Double doubleValue) {
-    DoubleValue value = doubleValue(doubleValue);
-    value.setTransient(true);
-    return value;
+  public static DoubleValue doubleValue(Double doubleValue, boolean isTransient) {
+    return new DoubleValueImpl(doubleValue, isTransient);
   }
 
   /**
@@ -327,21 +313,35 @@ public class Variables {
    * {@link #longValue(Long)} and {@link #doubleValue(Double)} instead.
    */
   public static NumberValue numberValue(Number numberValue) {
-    return new NumberValueImpl(numberValue);
+    return numberValue(numberValue, false);
+  }
+
+  /**
+   * Creates an abstract Number value. Note that this value cannot be used to set variables.
+   * Use the specific methods {@link Variables#integerValue(Integer)}, {@link #shortValue(Short)},
+   * {@link #longValue(Long)} and {@link #doubleValue(Double)} instead.
+   */
+  public static NumberValue numberValue(Number numberValue, boolean isTransient) {
+    return new NumberValueImpl(numberValue, isTransient);
   }
 
   /**
    * Creates a {@link TypedValue} with value {@code null} and type {@link ValueType#NULL}
    */
   public static TypedValue untypedNullValue() {
-    return NullValueImpl.INSTANCE;
+    return untypedNullValue(false);
   }
 
   /**
-   * Creates a transient {@link TypedValue} with value {@code null} and type {@link ValueType#NULL}
+   * Creates a {@link TypedValue} with value {@code null} and type {@link ValueType#NULL}
    */
-  public static TypedValue untypedTransientNullValue() {
-    return NullValueImpl.INSTANCE_TRANSIENT;
+  public static TypedValue untypedNullValue(boolean isTransient) {
+    if (isTransient) {
+      return NullValueImpl.INSTANCE_TRANSIENT;
+    }
+    else {
+      return NullValueImpl.INSTANCE;
+    }
   }
 
   /**
@@ -349,41 +349,35 @@ public class Variables {
    * for the returned instance.
    */
   public static TypedValue untypedValue(Object value) {
-    if(value == null) {
-      return untypedNullValue();
-    } else if (value instanceof TypedValueBuilder<?>) {
-      return ((TypedValueBuilder<?>) value).create();
+    if (value instanceof TypedValue) {
+      return untypedValue(value, ((TypedValue) value).isTransient());
     }
-    else if (value instanceof TypedValue) {
-      return (TypedValue) value;
-    }
-    else {
-      // unknown value
-      return new UntypedValueImpl(value);
-    }
+    else return untypedValue(value, false);
   }
 
   /**
-   * Creates an transient untyped value, i.e. {@link TypedValue#getType()} returns <code>null</code>
+   * Creates an untyped value, i.e. {@link TypedValue#getType()} returns <code>null</code>
    * for the returned instance.
    */
-  public static TypedValue transientUntypedValue(Object value) {
+  public static TypedValue untypedValue(Object value, boolean isTransient) {
     if(value == null) {
-      return untypedTransientNullValue();
+      return untypedNullValue(isTransient);
     } else if (value instanceof TypedValueBuilder<?>) {
-      return ((TypedValueBuilder<?>) value).setTransient(true).create();
+      return ((TypedValueBuilder<?>) value).setTransient(isTransient).create();
     } else if (value instanceof TypedValue) {
       TypedValue transientValue = (TypedValue) value;
       if (value instanceof NullValueImpl) {
-        transientValue = untypedTransientNullValue();
-      } else {
-        transientValue.setTransient(true);
+        transientValue = untypedNullValue(isTransient);
+      } else if (value instanceof FileValue) {
+        ((FileValueImpl) transientValue).setTransient(isTransient);
+      } else if (value instanceof AbstractTypedValue<?>) {
+        ((AbstractTypedValue<?>) transientValue).setTransient(isTransient);
       }
       return transientValue;
     }
     else {
       // unknown value
-      return new UntypedValueImpl(value, true);
+      return new UntypedValueImpl(value, isTransient);
     }
   }
 
@@ -392,15 +386,15 @@ public class Variables {
    * {@code filename}.
    */
   public static FileValueBuilder fileValue(String filename) {
-    return new FileValueBuilderImpl(filename);
+    return fileValue(filename, false);
   }
 
   /**
-   * Returns a builder to create a new transient {@link FileValue} with the given
+   * Returns a builder to create a new {@link FileValue} with the given
    * {@code filename}.
    */
-  public static FileValueBuilder fileValueTransient(String filename) {
-    return new FileValueBuilderImpl(filename).setTransient(true);
+  public static FileValueBuilder fileValue(String filename, boolean isTransient) {
+    return new FileValueBuilderImpl(filename).setTransient(isTransient);
   }
 
   /**
@@ -413,12 +407,12 @@ public class Variables {
   }
 
   /**
-   * Shortcut for calling {@code Variables.fileValue(name).file(file).mimeType(type).setTransient(true).create()}.
+   * Shortcut for calling {@code Variables.fileValue(name).file(file).mimeType(type).setTransient(isTransient).create()}.
    * The name is set to the file name and the mime type is detected via {@link MimetypesFileTypeMap}.
    */
-  public static FileValue fileValueTransient(File file){
+  public static FileValue fileValue(File file, boolean isTransient){
     String contentType = MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(file);
-    return new FileValueBuilderImpl(file.getName()).file(file).mimeType(contentType).setTransient(true).create();
+    return new FileValueBuilderImpl(file.getName()).file(file).mimeType(contentType).setTransient(isTransient).create();
   }
 
   /**

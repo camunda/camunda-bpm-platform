@@ -52,9 +52,4 @@ public class NullValueImpl implements TypedValue {
     return isTransient;
   }
 
-  @Override
-  public void setTransient(boolean isTransient) {
-    // do nothing
-  }
-
 }

@@ -99,8 +99,8 @@ public class ObjectTypeImpl extends AbstractValueTypeImpl implements Serializabl
     }
 
     Object isTransient = valueInfo.get(VALUE_INFO_TRANSIENT);
-    if (isTransient instanceof Boolean && ((Boolean) isTransient == true)) {
-      builder.setTransient(true);
+    if (isTransient instanceof Boolean) {
+      builder.setTransient((Boolean)isTransient);
     }
   }
 
