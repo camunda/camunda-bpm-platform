@@ -169,19 +169,19 @@ public class VariableApiTest {
 
   @Test
   public void testTransientVariables() throws URISyntaxException {
-    VariableMap variableMap = createVariables().putValueTyped("foo", doubleValueTransient(10.0))
-                     .putValueTyped("bar", integerValueTransient(10))
-                     .putValueTyped("aa", booleanValueTransient(true))
-                     .putValueTyped("bb", stringValueTransient("bb"))
-                     .putValueTyped("test", byteArrayValueTransient("test".getBytes()))
-                     .putValueTyped("blob", fileValueTransient(new File(this.getClass().getClassLoader().getResource("org/camunda/bpm/engine/test/variables/simpleFile.txt").toURI())))
-                     .putValueTyped("val", dateValueTransient(new Date()))
-                     .putValueTyped("var", objectValueTransient(new Integer(10)).create())
-                     .putValueTyped("short", shortValueTransient((short)12))
-                     .putValueTyped("long", longValueTransient((long)10))
+    VariableMap variableMap = createVariables().putValueTyped("foo", doubleValue(10.0, true))
+                     .putValueTyped("bar", integerValue(10, true))
+                     .putValueTyped("aa", booleanValue(true, true))
+                     .putValueTyped("bb", stringValue("bb", true))
+                     .putValueTyped("test", byteArrayValue("test".getBytes(), true))
+                     .putValueTyped("blob", fileValue(new File(this.getClass().getClassLoader().getResource("org/camunda/bpm/engine/test/variables/simpleFile.txt").toURI()), true))
+                     .putValueTyped("val", dateValue(new Date(), true))
+                     .putValueTyped("var", objectValue(new Integer(10), true).create())
+                     .putValueTyped("short", shortValue((short)12, true))
+                     .putValueTyped("long", longValue((long)10, true))
                      .putValueTyped("file", fileValue("org/camunda/bpm/engine/test/variables/simpleFile.txt").setTransient(true).create())
-                     .putValueTyped("hi", transientUntypedValue("stringUntyped"))
-                     .putValueTyped("null", transientUntypedValue(null));
+                     .putValueTyped("hi", untypedValue("stringUntyped", true))
+                     .putValueTyped("null", untypedValue(null, true));
 
     for (Entry<String, Object> e : variableMap.entrySet()) {
       TypedValue value = (TypedValue) variableMap.getValueTyped(e.getKey());

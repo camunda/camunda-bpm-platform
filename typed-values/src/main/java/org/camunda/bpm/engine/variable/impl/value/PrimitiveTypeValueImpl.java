@@ -89,6 +89,11 @@ public class PrimitiveTypeValueImpl<T> extends AbstractTypedValue<T> implements 
     public BooleanValueImpl(Boolean value) {
       super(value, ValueType.BOOLEAN);
     }
+
+    public BooleanValueImpl(Boolean value, boolean isTransient) {
+        this(value);
+        this.isTransient = isTransient;
+    }
   }
 
   public static class BytesValueImpl extends PrimitiveTypeValueImpl<byte[]> implements BytesValue {
@@ -97,6 +102,11 @@ public class PrimitiveTypeValueImpl<T> extends AbstractTypedValue<T> implements 
 
     public BytesValueImpl(byte[] value) {
       super(value, ValueType.BYTES);
+    }
+
+    public BytesValueImpl(byte[] value, boolean isTransient) {
+      this(value);
+      this.isTransient = isTransient;
     }
   }
 
@@ -107,6 +117,11 @@ public class PrimitiveTypeValueImpl<T> extends AbstractTypedValue<T> implements 
     public DateValueImpl(Date value) {
       super(value, ValueType.DATE);
     }
+
+    public DateValueImpl(Date value, boolean isTransient) {
+      this(value);
+      this.isTransient = isTransient;
+    }
   }
 
   public static class DoubleValueImpl extends PrimitiveTypeValueImpl<Double> implements DoubleValue {
@@ -115,6 +130,11 @@ public class PrimitiveTypeValueImpl<T> extends AbstractTypedValue<T> implements 
 
     public DoubleValueImpl(Double value) {
       super(value, ValueType.DOUBLE);
+    }
+
+    public DoubleValueImpl(Double value, boolean isTransient) {
+      this(value);
+      this.isTransient = isTransient;
     }
   }
 
@@ -125,6 +145,11 @@ public class PrimitiveTypeValueImpl<T> extends AbstractTypedValue<T> implements 
     public IntegerValueImpl(Integer value) {
       super(value, ValueType.INTEGER);
     }
+
+    public IntegerValueImpl(Integer value, boolean isTransient) {
+      this(value);
+      this.isTransient = isTransient;
+    }
   }
 
   public static class LongValueImpl extends PrimitiveTypeValueImpl<Long> implements LongValue {
@@ -133,6 +158,11 @@ public class PrimitiveTypeValueImpl<T> extends AbstractTypedValue<T> implements 
 
     public LongValueImpl(Long value) {
       super(value, ValueType.LONG);
+    }
+
+    public LongValueImpl(Long value, boolean isTransient) {
+      this(value);
+      this.isTransient = isTransient;
     }
   }
 
@@ -143,6 +173,11 @@ public class PrimitiveTypeValueImpl<T> extends AbstractTypedValue<T> implements 
     public ShortValueImpl(Short value) {
       super(value, ValueType.SHORT);
     }
+
+    public ShortValueImpl(Short value, boolean isTransient) {
+      this(value);
+      this.isTransient = isTransient;
+    }
   }
 
   public static class StringValueImpl extends PrimitiveTypeValueImpl<String> implements StringValue {
@@ -152,6 +187,11 @@ public class PrimitiveTypeValueImpl<T> extends AbstractTypedValue<T> implements 
     public StringValueImpl(String value) {
       super(value, ValueType.STRING);
     }
+
+    public StringValueImpl(String value, boolean isTransient) {
+      this(value);
+      this.isTransient = isTransient;
+    }
   }
 
   public static class NumberValueImpl extends PrimitiveTypeValueImpl<Number> implements NumberValue {
@@ -160,6 +200,11 @@ public class PrimitiveTypeValueImpl<T> extends AbstractTypedValue<T> implements 
 
     public NumberValueImpl(Number value) {
       super(value, ValueType.NUMBER);
+    }
+
+    public NumberValueImpl(Number value, boolean isTransient) {
+      this(value);
+      this.isTransient = isTransient;
     }
   }
 
