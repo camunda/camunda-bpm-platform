@@ -27,7 +27,7 @@
     (
       #{id, jdbcType=VARCHAR},
       #{caseInstanceId, jdbcType=VARCHAR},
-      #{businessKey, jdbcType=VARCHAR},
+      #{businessKeyWithoutCascade, jdbcType=VARCHAR},
       #{caseDefinitionId, jdbcType=VARCHAR},
       #{activityId, jdbcType=VARCHAR},
       #{parentId, jdbcType=VARCHAR},

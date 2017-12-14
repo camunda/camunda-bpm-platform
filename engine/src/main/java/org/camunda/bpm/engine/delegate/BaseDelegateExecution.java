@@ -27,8 +27,7 @@ public interface BaseDelegateExecution extends VariableScope {
   /** The {@link ExecutionListener#EVENTNAME_START event name} in case this execution is passed in for an {@link ExecutionListener}  */
   String getEventName();
 
-  /** The business key for this execution. Only returns a value if the delegate execution
-   * is a a root execution (such as a process instance).
+  /** The business key for the root execution (e.g. process instance).
    */
   String getBusinessKey();
 

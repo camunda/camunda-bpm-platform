@@ -1529,4 +1529,16 @@ public class ExecutionQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(4, runtimeService.createExecutionQuery().processVariableValueNotEquals("var", Variables.numberValue(123)).count());
   }
 
+  public void testNullBusinessKeyForChildExecutions() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CONCURRENT_PROCESS_KEY, "76545");
+    List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
+    for (Execution e : executions) {
+      if (((ExecutionEntity) e).isProcessInstanceExecution()) {
+        assertEquals("76545", ((ExecutionEntity) e).getBusinessKeyWithoutCascade());
+      } else {
+        assertNull(((ExecutionEntity) e).getBusinessKeyWithoutCascade());
+      }
+    }
+  }
+
 }

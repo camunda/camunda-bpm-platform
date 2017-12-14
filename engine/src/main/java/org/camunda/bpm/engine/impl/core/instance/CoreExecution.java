@@ -39,6 +39,7 @@ public abstract class CoreExecution extends AbstractVariableScope implements Bas
    * the business key for this execution
    */
   protected String businessKey;
+  protected String businessKeyWithoutCascade;
 
   protected String tenantId;
 
@@ -106,12 +107,13 @@ public abstract class CoreExecution extends AbstractVariableScope implements Bas
     this.id = id;
   }
 
-  public String getBusinessKey() {
-    return businessKey;
+  public String getBusinessKeyWithoutCascade() {
+    return businessKeyWithoutCascade;
   }
 
   public void setBusinessKey(String businessKey) {
     this.businessKey = businessKey;
+    this.businessKeyWithoutCascade = businessKey;
   }
 
   public String getTenantId() {

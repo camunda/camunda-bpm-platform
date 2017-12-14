@@ -27,5 +27,6 @@ public class BusinessKeyCheckJavaDelegate implements JavaDelegate {
 
   public void execute(DelegateExecution execution) throws Exception {
     execution.setVariable("businessKeySetOnExecution", execution.getProcessBusinessKey());
+    execution.setVariable("businessKeyAsProcessBusinessKey", execution.getBusinessKey());
   }
 }

@@ -740,6 +740,14 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
     return getCaseInstance().getBusinessKey();
   }
 
+  @Override
+  public String getBusinessKey() {
+    if (this.isCaseInstanceExecution()) {
+      return businessKey;
+    }
+    else return getCaseBusinessKey();
+  }
+
   // case definition ///////////////////////////////////////////////////////
 
   public CmmnCaseDefinition getCaseDefinition() {

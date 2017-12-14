@@ -12,8 +12,11 @@
  */
 package org.camunda.bpm.engine.test.cmmn.listener;
 
+import java.util.List;
+
 import org.camunda.bpm.engine.delegate.CaseExecutionListener;
 import org.camunda.bpm.engine.impl.test.CmmnProcessEngineTestCase;
+import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 import org.camunda.bpm.engine.test.Deployment;
 
@@ -2496,6 +2499,25 @@ public class CaseExecutionListenerTest extends CmmnProcessEngineTestCase {
       assertTextPresent("Exception while instantiating class 'org.camunda.bpm.engine.test.cmmn.listener.NotExistingCaseExecutionListener'", message);
     }
 
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/listener/CaseExecutionListenerTest.testBusinessKeyAsCaseBusinessKey.cmmn"})
+  public void testBusinessKeyAsCaseBusinessKey() {
+    // given
+
+    // when
+    caseService.withCaseDefinitionByKey("case")
+      .businessKey("myBusinessKey")
+      .create()
+      .getId();
+
+    // then
+    VariableInstance v1 = runtimeService.createVariableInstanceQuery().variableName("businessKey").singleResult();
+    VariableInstance v2 = runtimeService.createVariableInstanceQuery().variableName("caseBusinessKey").singleResult();
+    assertNotNull(v1);
+    assertNotNull(v2);
+    assertEquals("myBusinessKey", v1.getValue());
+    assertEquals(v1.getValue(), v2.getValue());
   }
 
 }

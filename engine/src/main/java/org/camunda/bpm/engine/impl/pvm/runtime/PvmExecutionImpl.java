@@ -1116,6 +1116,13 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     return getProcessInstance().getBusinessKey();
   }
 
+  @Override
+  public String getBusinessKey() {
+    if (this.isProcessInstanceExecution()) {
+      return businessKey;
+    } else return getProcessBusinessKey();
+  }
+
   // process definition ///////////////////////////////////////////////////////
 
   public void setProcessDefinition(ProcessDefinitionImpl processDefinition) {

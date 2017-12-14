@@ -33,7 +33,7 @@
     (
       #{id ,jdbcType=VARCHAR},
       #{processInstanceId, jdbcType=VARCHAR},
-      #{businessKey, jdbcType=VARCHAR},
+      #{businessKeyWithoutCascade, jdbcType=VARCHAR},
       #{processDefinitionId ,jdbcType=VARCHAR},
       #{activityId ,jdbcType=VARCHAR},
       #{activityInstanceId ,jdbcType=VARCHAR},

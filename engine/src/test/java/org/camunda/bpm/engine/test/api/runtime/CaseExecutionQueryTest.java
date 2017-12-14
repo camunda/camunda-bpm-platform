@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotValidException;
+import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseExecutionQuery;
@@ -2534,6 +2535,18 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     CaseExecution execution = query.singleResult();
     assertNotNull(execution);
     assertTrue(execution.isRequired());
+  }
+
+  public void testNullBusinessKeyForChildExecutions() {
+    caseService.createCaseInstanceByKey(CASE_DEFINITION_KEY, "7890");
+    List<CaseExecution> executions = caseService.createCaseExecutionQuery().caseInstanceBusinessKey("7890").list();
+    for (CaseExecution e : executions) {
+      if (((CaseExecutionEntity) e).isCaseInstanceExecution()) {
+        assertEquals("7890", ((CaseExecutionEntity) e).getBusinessKeyWithoutCascade());
+      } else {
+        assertNull(((CaseExecutionEntity) e).getBusinessKeyWithoutCascade());
+      }
+    }
   }
 
 }

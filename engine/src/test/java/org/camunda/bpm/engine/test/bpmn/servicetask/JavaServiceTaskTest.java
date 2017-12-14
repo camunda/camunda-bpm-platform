@@ -121,6 +121,10 @@ public class JavaServiceTaskTest extends PluggableProcessEngineTestCase {
     String key = (String) runtimeService.getVariable(processInstance.getId(), "businessKeySetOnExecution");
     assertNotNull(key);
     assertEquals("1234567890", key);
+
+    // check if BaseDelegateExecution#getBusinessKey() behaves like DelegateExecution#getProcessBusinessKey()
+    String key2 = (String) runtimeService.getVariable(processInstance.getId(), "businessKeyAsProcessBusinessKey");
+    assertEquals(key2, key);
   }
 
 }
