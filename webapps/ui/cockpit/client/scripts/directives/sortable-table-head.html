@@ -1,5 +1,5 @@
 <th ng-repeat="column in headColumns" ng-class="column">
-  <span class="{{column.class}}">{{ column.content | translate}}</span>
+  <span class="{{column.class}}">{{ column.content}}</span>
   <a ng-if="column.sortable === true"
      ng-click="changeOrder(column.request)">
     <span class="glyphicon" ng-class="orderClass(column.request)"></span>
