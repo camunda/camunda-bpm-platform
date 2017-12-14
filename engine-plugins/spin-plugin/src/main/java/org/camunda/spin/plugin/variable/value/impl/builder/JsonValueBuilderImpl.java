@@ -12,7 +12,9 @@
  */
 package org.camunda.spin.plugin.variable.value.impl.builder;
 
+import org.camunda.bpm.engine.variable.impl.value.AbstractTypedValue;
 import org.camunda.bpm.engine.variable.value.SerializationDataFormat;
+import org.camunda.bpm.engine.variable.value.builder.TypedValueBuilder;
 import org.camunda.spin.json.SpinJsonNode;
 import org.camunda.spin.plugin.variable.value.JsonValue;
 import org.camunda.spin.plugin.variable.value.builder.JsonValueBuilder;
@@ -42,6 +44,12 @@ public class JsonValueBuilderImpl extends SpinValueBuilderImpl<JsonValue> implem
 
   public JsonValueBuilder serializationDataFormat(String dataFormatName) {
     return (JsonValueBuilderImpl) super.serializationDataFormat(dataFormatName);
+  }
+
+  @Override
+  public TypedValueBuilder<JsonValue> setTransient(boolean isTransient) {
+    ((AbstractTypedValue<?>) variableValue).setTransient(isTransient);
+    return this;
   }
 
 }

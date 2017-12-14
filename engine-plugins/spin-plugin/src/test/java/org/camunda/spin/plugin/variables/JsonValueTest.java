@@ -16,8 +16,11 @@ import static org.camunda.spin.DataFormats.json;
 import static org.camunda.spin.plugin.variable.SpinValues.jsonValue;
 import static org.camunda.spin.plugin.variable.type.SpinValueType.JSON;
 
+import java.util.List;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.variable.VariableMap;
@@ -174,6 +177,20 @@ public class JsonValueTest extends PluggableProcessEngineTestCase {
     // then
     Task task = taskService.createTaskQuery().singleResult();
     assertEquals("task1", task.getTaskDefinitionKey());
+  }
+
+  @Deployment(resources = ONE_TASK_PROCESS)
+  public void testTransientJsonValue() throws JSONException {
+    // given
+    JsonValue jsonValue = jsonValue(jsonString).setTransient(true).create();
+    VariableMap variables = Variables.createVariables().putValueTyped(variableName, jsonValue);
+
+    // when
+    runtimeService.startProcessInstanceByKey(ONE_TASK_PROCESS_KEY, variables).getId();
+
+    // then
+    List<VariableInstance> variableInstances = runtimeService.createVariableInstanceQuery().list();
+    assertEquals(0, variableInstances.size());
   }
 
 }

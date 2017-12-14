@@ -38,10 +38,10 @@ public class LongFormType extends SimpleFormFieldType {
     else {
       Object value = propertyValue.getValue();
       if(value == null) {
-        return Variables.longValue(null);
+        return Variables.longValue(null, propertyValue.isTransient());
       }
       else if((value instanceof Number) || (value instanceof String)) {
-        return Variables.longValue(new Long(value.toString()));
+        return Variables.longValue(new Long(value.toString()), propertyValue.isTransient());
       }
       else {
         throw new ProcessEngineException("Value '"+value+"' is not of type Long.");

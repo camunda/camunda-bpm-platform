@@ -53,18 +53,18 @@ public class DateFormType extends AbstractFormFieldType {
   public TypedValue convertToModelValue(TypedValue propertyValue) {
     Object value = propertyValue.getValue();
     if(value == null) {
-      return Variables.dateValue(null);
+      return Variables.dateValue(null, propertyValue.isTransient());
     }
     else if(value instanceof Date) {
-      return Variables.dateValue((Date) value);
+      return Variables.dateValue((Date) value, propertyValue.isTransient());
     }
     else if(value instanceof String) {
       String strValue = ((String) value).trim();
       if (strValue.isEmpty()) {
-        return Variables.dateValue(null);
+        return Variables.dateValue(null, propertyValue.isTransient());
       }
       try {
-        return Variables.dateValue((Date) dateFormat.parseObject(strValue));
+        return Variables.dateValue((Date) dateFormat.parseObject(strValue), propertyValue.isTransient());
       } catch (ParseException e) {
         throw new ProcessEngineException("Could not parse value '"+value+"' as date using date format '"+datePattern+"'.");
       }
@@ -76,9 +76,9 @@ public class DateFormType extends AbstractFormFieldType {
 
   public TypedValue convertToFormValue(TypedValue modelValue) {
     if(modelValue.getValue() == null) {
-      return Variables.stringValue(null);
+      return Variables.stringValue(null, modelValue.isTransient());
     } else if(modelValue.getType() == ValueType.DATE) {
-      return Variables.stringValue(dateFormat.format(modelValue.getValue()));
+      return Variables.stringValue(dateFormat.format(modelValue.getValue()), modelValue.isTransient());
     }
     else {
       throw new ProcessEngineException("Expected value to be of type '"+ValueType.DATE+"' but got '"+modelValue.getType()+"'.");

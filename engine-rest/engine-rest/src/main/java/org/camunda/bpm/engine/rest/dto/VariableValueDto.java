@@ -80,8 +80,8 @@ public class VariableValueDto {
     ValueTypeResolver valueTypeResolver = processEngine.getProcessEngineConfiguration().getValueTypeResolver();
 
     if (type == null) {
-      if (valueInfo != null && valueInfo.get(ValueType.VALUE_INFO_TRANSIENT) == (Boolean) true) {
-        return Variables.transientUntypedValue(value);
+      if (valueInfo != null && valueInfo.get(ValueType.VALUE_INFO_TRANSIENT) instanceof Boolean) {
+        return Variables.untypedValue(value, (Boolean) valueInfo.get(ValueType.VALUE_INFO_TRANSIENT));
       }
       return Variables.untypedValue(value);
     }

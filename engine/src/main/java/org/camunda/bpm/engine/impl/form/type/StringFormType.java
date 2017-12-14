@@ -37,10 +37,10 @@ public class StringFormType extends SimpleFormFieldType {
     else {
       Object value = propertyValue.getValue();
       if(value == null) {
-        return Variables.stringValue(null);
+        return Variables.stringValue(null, propertyValue.isTransient());
       }
       else {
-        return Variables.stringValue(value.toString());
+        return Variables.stringValue(value.toString(), propertyValue.isTransient());
       }
     }
   }

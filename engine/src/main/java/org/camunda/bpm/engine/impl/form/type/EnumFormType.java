@@ -49,7 +49,7 @@ public class EnumFormType extends SimpleFormFieldType {
     Object value = propertyValue.getValue();
     if(value == null || String.class.isInstance(value)) {
       validateValue(value);
-      return Variables.stringValue((String) value);
+      return Variables.stringValue((String) value, propertyValue.isTransient());
     }
     else {
       throw new ProcessEngineException("Value '"+value+"' is not of type String.");

@@ -33,11 +33,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstantiationBuilder;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.impl.VariableMapImpl;
-import org.camunda.bpm.engine.variable.impl.type.PrimitiveValueTypeImpl.StringTypeImpl;
-import org.camunda.bpm.engine.variable.impl.value.NullValueImpl;
-import org.camunda.bpm.engine.variable.impl.value.PrimitiveTypeValueImpl;
 import org.camunda.bpm.engine.variable.type.ValueType;
-import org.camunda.bpm.engine.variable.value.StringValue;
 import org.fest.assertions.Assertions;
 import org.junit.Assert;
 import org.junit.Before;
@@ -1017,7 +1013,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
         .body("id", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
       .when().post(START_PROCESS_INSTANCE_URL);
 
-    VariableMap expectedVariables = Variables.createVariables().putValueTyped("foo", Variables.stringValueTransient("bar"));
+    VariableMap expectedVariables = Variables.createVariables().putValueTyped("foo", Variables.stringValue("bar", true));
     verify(runtimeServiceMock).createProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID));
     verify(mockInstantiationBuilder).setVariables(expectedVariables);
     assertEquals(expectedVariables.getValueTyped("foo").isTransient(), varMap.getValueTyped("foo").isTransient());

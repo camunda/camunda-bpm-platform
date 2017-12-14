@@ -36,10 +36,10 @@ public class BooleanFormType extends SimpleFormFieldType {
     else {
       Object value = propertyValue.getValue();
       if(value == null) {
-        return Variables.booleanValue(null);
+        return Variables.booleanValue(null, propertyValue.isTransient());
       }
       else if((value instanceof Boolean) || (value instanceof String)) {
-        return Variables.booleanValue(new Boolean(value.toString()));
+        return Variables.booleanValue(new Boolean(value.toString()), propertyValue.isTransient());
       }
       else {
         throw new ProcessEngineException("Value '"+value+"' is not of type Boolean.");

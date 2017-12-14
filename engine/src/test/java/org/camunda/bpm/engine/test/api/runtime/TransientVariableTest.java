@@ -18,26 +18,10 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
-import org.camunda.bpm.engine.delegate.VariableScope;
-import org.camunda.bpm.engine.form.TaskFormData;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
-import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
-import org.camunda.bpm.engine.impl.el.ExpressionManager;
-import org.camunda.bpm.engine.impl.form.handler.DefaultTaskFormHandler;
-import org.camunda.bpm.engine.impl.form.handler.FormFieldHandler;
-import org.camunda.bpm.engine.impl.form.handler.FormFieldValidationConstraintHandler;
-import org.camunda.bpm.engine.impl.form.handler.TaskFormHandler;
-import org.camunda.bpm.engine.impl.form.type.AbstractFormFieldType;
-import org.camunda.bpm.engine.impl.form.type.FormTypes;
-import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
-import org.camunda.bpm.engine.impl.util.xml.Element;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
-import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
@@ -46,19 +30,13 @@ import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
-import org.camunda.bpm.engine.test.api.runtime.migration.models.SignalCatchModels;
-import org.camunda.bpm.engine.test.bpmn.event.conditional.AbstractConditionalEventTestCase;
-import org.camunda.bpm.engine.test.bpmn.event.conditional.SetVariableDelegate;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
-import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.camunda.bpm.model.bpmn.impl.instance.ScriptImpl;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -91,19 +69,19 @@ public class TransientVariableTest {
     // when
     runtimeService.startProcessInstanceByKey("Process",
         Variables.createVariables()
-            .putValueTyped("a", Variables.stringValueTransient("bar"))
-            .putValueTyped("b", Variables.booleanValueTransient(true))
-            .putValueTyped("c", Variables.byteArrayValueTransient("test".getBytes()))
-            .putValueTyped("d", Variables.dateValueTransient(new Date()))
-            .putValueTyped("e", Variables.doubleValueTransient(20.))
-            .putValueTyped("f", Variables.integerValueTransient(10))
-            .putValueTyped("g", Variables.longValueTransient((long) 10))
-            .putValueTyped("h", Variables.shortValueTransient((short) 10))
-            .putValueTyped("i", Variables.objectValueTransient(new Integer(100)).create())
-            .putValueTyped("j", Variables.transientUntypedValue(null))
-            .putValueTyped("k", Variables.transientUntypedValue(Variables.booleanValue(true)))
-            .putValueTyped("l", Variables.fileValueTransient(new File(this.getClass().getClassLoader()
-                .getResource("org/camunda/bpm/engine/test/standalone/variables/simpleFile.txt").toURI()))));
+            .putValueTyped("a", Variables.stringValue("bar", true))
+            .putValueTyped("b", Variables.booleanValue(true, true))
+            .putValueTyped("c", Variables.byteArrayValue("test".getBytes(), true))
+            .putValueTyped("d", Variables.dateValue(new Date(), true))
+            .putValueTyped("e", Variables.doubleValue(20., true))
+            .putValueTyped("f", Variables.integerValue(10, true))
+            .putValueTyped("g", Variables.longValue((long) 10, true))
+            .putValueTyped("h", Variables.shortValue((short) 10, true))
+            .putValueTyped("i", Variables.objectValue(new Integer(100), true).create())
+            .putValueTyped("j", Variables.untypedValue(null, true))
+            .putValueTyped("k", Variables.untypedValue(Variables.booleanValue(true), true))
+            .putValueTyped("l", Variables.fileValue(new File(this.getClass().getClassLoader()
+                .getResource("org/camunda/bpm/engine/test/standalone/variables/simpleFile.txt").toURI()), true)));
 
     // then
     List<HistoricVariableInstance> historicVariableInstances = historyService.createHistoricVariableInstanceQuery().list();
@@ -119,19 +97,19 @@ public class TransientVariableTest {
 
     // when
     runtimeService.startProcessInstanceByKey("Process",
-        Variables.createVariables().putValue("a", Variables.stringValueTransient("bar"))
-        .putValue("b", Variables.booleanValueTransient(true))
-        .putValue("c", Variables.byteArrayValueTransient("test".getBytes()))
-        .putValue("d", Variables.dateValueTransient(new Date()))
-        .putValue("e", Variables.doubleValueTransient(20.))
-        .putValue("f", Variables.integerValueTransient(10))
-        .putValue("g", Variables.longValueTransient((long) 10))
-        .putValue("h", Variables.shortValueTransient((short) 10))
-        .putValue("i", Variables.objectValueTransient(new Integer(100)).create())
-        .putValue("j", Variables.transientUntypedValue(null))
-        .putValue("k", Variables.transientUntypedValue(Variables.booleanValue(true)))
-        .putValue("l", Variables.fileValueTransient(new File(this.getClass().getClassLoader()
-            .getResource("org/camunda/bpm/engine/test/standalone/variables/simpleFile.txt").toURI()))));
+        Variables.createVariables().putValue("a", Variables.stringValue("bar", true))
+        .putValue("b", Variables.booleanValue(true, true))
+        .putValue("c", Variables.byteArrayValue("test".getBytes(), true))
+        .putValue("d", Variables.dateValue(new Date(), true))
+        .putValue("e", Variables.doubleValue(20., true))
+        .putValue("f", Variables.integerValue(10, true))
+        .putValue("g", Variables.longValue((long) 10, true))
+        .putValue("h", Variables.shortValue((short) 10, true))
+        .putValue("i", Variables.objectValue(new Integer(100), true).create())
+        .putValue("j", Variables.untypedValue(null, true))
+        .putValue("k", Variables.untypedValue(Variables.booleanValue(true), true))
+        .putValue("l", Variables.fileValue(new File(this.getClass().getClassLoader()
+            .getResource("org/camunda/bpm/engine/test/standalone/variables/simpleFile.txt").toURI()), true)));
 
     // then
     List<HistoricVariableInstance> historicVariableInstances = historyService.createHistoricVariableInstanceQuery().list();
@@ -147,7 +125,7 @@ public class TransientVariableTest {
 
     // when
     runtimeService.createProcessInstanceByKey("Process")
-      .setVariables(Variables.createVariables().putValue("foo", Variables.stringValueTransient("dlsd")))
+      .setVariables(Variables.createVariables().putValue("foo", Variables.stringValue("dlsd", true)))
       .execute();
 
     // then
@@ -164,7 +142,7 @@ public class TransientVariableTest {
 
     // when
     VariableMap variables = Variables.createVariables();
-    variables.put("b", Variables.transientUntypedValue(true));
+    variables.put("b", Variables.untypedValue(true, true));
     runtimeService.startProcessInstanceByKey("Process",
        variables
         );
@@ -194,8 +172,6 @@ public class TransientVariableTest {
 
     // when
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(CONDITIONAL_PROCESS_KEY);
-//    Execution execution = runtimeService.createExecutionQuery().activityId(CONDITION_ID).singleResult();
-//    runtimeService.setVariable(execution.getId(), VARIABLE_NAME, Variables.integerValue(1));
 
     // then
     assertEquals(true, processInstance.isEnded());
@@ -259,7 +235,7 @@ public class TransientVariableTest {
     // when
     runtimeService.startProcessInstanceByKey(ProcessModels.PROCESS_KEY);
     Execution execution = runtimeService.createExecutionQuery().singleResult();
-    runtimeService.setVariable(execution.getId(), "foo", Variables.stringValueTransient("bar"));
+    runtimeService.setVariable(execution.getId(), "foo", Variables.stringValue("bar", true));
 
     // then
     List<VariableInstance> variables = runtimeService.createVariableInstanceQuery().list();
@@ -275,7 +251,7 @@ public class TransientVariableTest {
 
     // when
     engineRule.getCaseService().withCaseDefinitionByKey("oneTaskCase")
-        .setVariable("foo", Variables.stringValueTransient("bar")).create();
+        .setVariable("foo", Variables.stringValue("bar", true)).create();
 
     // then
     List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery().list();
@@ -291,7 +267,7 @@ public class TransientVariableTest {
     Execution execution = runtimeService.createExecutionQuery().singleResult();
 
     try {
-      runtimeService.setVariable(execution.getId(), "foo", Variables.stringValueTransient("xyz"));
+      runtimeService.setVariable(execution.getId(), "foo", Variables.stringValue("xyz", true));
     } catch (ProcessEngineException e) {
       assertThat(e.getMessage(), containsString("Cannot set transient variable with name foo"));
     }
@@ -300,11 +276,11 @@ public class TransientVariableTest {
   @Test
   public void testSameNamesDifferentScopes() {
     testRule.deploy(ProcessModels.SUBPROCESS_PROCESS);
-    runtimeService.startProcessInstanceByKey("Process", Variables.createVariables().putValue("foo", "bar"));
+    runtimeService.startProcessInstanceByKey("Process", Variables.createVariables().putValue("foo", Variables.stringValue("bar")));
     Execution execution = runtimeService.createExecutionQuery().activityId(USER_TASK_ID).singleResult();
 
     try {
-      runtimeService.setVariable(execution.getId(), "foo", Variables.stringValueTransient("xyz"));
+      runtimeService.setVariable(execution.getId(), "foo", Variables.stringValue("xyz", true));
     } catch (ProcessEngineException e) {
       assertThat(e.getMessage(), containsString("Cannot set transient variable with name foo"));
     }
@@ -319,7 +295,7 @@ public class TransientVariableTest {
 
     // when
     Map<String, Object> formValues = new HashMap<String, Object>();
-    formValues.put("stringField", Variables.stringValueTransient("foobar"));
+    formValues.put("stringField", Variables.stringValue("foobar", true));
     formValues.put("longField", 9L);
     engineRule.getFormService().submitTaskForm(task.getId(), formValues);
 
@@ -337,7 +313,7 @@ public class TransientVariableTest {
 
     // when
     Map<String, Object> formValues = new HashMap<String, Object>();
-    formValues.put("stringField", Variables.stringValueTransient("foobar"));
+    formValues.put("stringField", Variables.stringValue("foobar", true));
     formValues.put("longField", 9L);
     engineRule.getFormService().submitStartForm(processDefinition.getId(), formValues);
 
@@ -366,7 +342,7 @@ public class TransientVariableTest {
 
     // when
     runtimeService.signalEventReceived("signal",
-        Variables.createVariables().putValue("foo", Variables.stringValueTransient("bar")));
+        Variables.createVariables().putValue("foo", Variables.stringValue("bar", true)));
 
     // then
     List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery().list();
@@ -377,7 +353,7 @@ public class TransientVariableTest {
   public static class SetVariableTransientDelegate implements JavaDelegate {
     @Override
     public void execute(DelegateExecution execution) throws Exception {
-      execution.setVariable(VARIABLE_NAME, Variables.integerValueTransient(1));
+      execution.setVariable(VARIABLE_NAME, Variables.integerValue(1, true));
     }
   }
 }
