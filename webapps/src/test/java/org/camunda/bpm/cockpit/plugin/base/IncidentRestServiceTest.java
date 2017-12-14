@@ -347,4 +347,41 @@ public class IncidentRestServiceTest extends AbstractCockpitPluginTest {
     assertThat(result).isNotEmpty();
     assertThat(result).hasSize(2);
   }
+
+  @Test
+  @Deployment(resources = {
+      "processes/failing-process.bpmn",
+      "processes/call-activity.bpmn",
+      "processes/nested-call-activity.bpmn"
+  })
+  public void testQuerySorting() {
+    runtimeService.startProcessInstanceByKey("NestedCallActivity");
+
+    executeAvailableJobs();
+
+    // asc
+    verifySorting("incidentTimestamp", "asc", 3);
+    verifySorting("incidentType", "asc", 3);
+    verifySorting("activityId", "asc", 3);
+    verifySorting("causeIncidentProcessInstanceId", "asc", 3);
+    verifySorting("rootCauseIncidentProcessInstanceId", "asc", 3);
+
+    // desc
+    verifySorting("incidentTimestamp", "desc", 3);
+    verifySorting("incidentType", "desc", 3);
+    verifySorting("activityId", "desc", 3);
+    verifySorting("causeIncidentProcessInstanceId", "desc", 3);
+    verifySorting("rootCauseIncidentProcessInstanceId", "desc", 3);
+  }
+
+  protected void verifySorting(String sortBy, String sortOrder, int expectedResult) {
+    IncidentQueryDto queryParameter = new IncidentQueryDto();
+    queryParameter.setSortBy(sortBy);
+    queryParameter.setSortOrder(sortOrder);
+
+    List<IncidentDto> result = resource.queryIncidents(queryParameter, null, null);
+    assertThat(result).isNotEmpty();
+    assertThat(result).hasSize(expectedResult);
+  }
+
 }
