@@ -261,6 +261,10 @@ public class BpmnDeployer extends AbstractDefinitionDeployer<ProcessDefinitionEn
           .findEventSubscriptionsByConfiguration(EventType.SIGNAL.name(), latestProcessDefinition.getId());
       subscriptionsToDelete.addAll(signalEventSubscriptions);
 
+      List<EventSubscriptionEntity> conditionalEventSubscriptions = eventSubscriptionManager
+          .findEventSubscriptionsByConfiguration(EventType.CONDITONAL.name(), latestProcessDefinition.getId());
+      subscriptionsToDelete.addAll(conditionalEventSubscriptions);
+
       for (EventSubscriptionEntity eventSubscriptionEntity : subscriptionsToDelete) {
         eventSubscriptionEntity.delete();
       }
@@ -282,6 +286,8 @@ public class BpmnDeployer extends AbstractDefinitionDeployer<ProcessDefinitionEn
         addMessageStartEventSubscription(eventDefinition, processDefinition);
       } else if (eventType.equals(EventType.SIGNAL.name())) {
         addSignalStartEventSubscription(eventDefinition, processDefinition);
+      } else if (eventType.equals(EventType.CONDITONAL.name())) {
+        addConditionalStartEventSubscription(eventDefinition, processDefinition);
       }
     }
   }
@@ -380,13 +386,18 @@ public class BpmnDeployer extends AbstractDefinitionDeployer<ProcessDefinitionEn
     newSubscription.insert();
   }
 
+  protected void addConditionalStartEventSubscription(EventSubscriptionDeclaration conditionalEventDefinition, ProcessDefinitionEntity processDefinition) {
+    EventSubscriptionEntity newSubscription = conditionalEventDefinition.createSubscriptionForStartEvent(processDefinition);
+
+    newSubscription.insert();
+  }
+
   enum ExprType {
 	  USER, GROUP;
 
   }
 
   protected void addAuthorizationsFromIterator(Set<Expression> exprSet, ProcessDefinitionEntity processDefinition, ExprType exprType) {
-    DbEntityManager dbEntityManager = getDbEntityManager();
     if (exprSet != null) {
       for (Expression expr : exprSet) {
         IdentityLinkEntity identityLink = new IdentityLinkEntity();

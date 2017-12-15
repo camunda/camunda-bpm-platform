@@ -897,6 +897,7 @@ public class BpmnParse extends Parse {
     Element timerEventDefinition = startEventElement.element(TIMER_EVENT_DEFINITION);
     Element messageEventDefinition = startEventElement.element(MESSAGE_EVENT_DEFINITION);
     Element signalEventDefinition = startEventElement.element(SIGNAL_EVENT_DEFINITION);
+    Element conditionEventDefinition = startEventElement.element(CONDITIONAL_EVENT_DEFINITION);
     if (timerEventDefinition != null) {
       parseTimerStartEventDefinition(timerEventDefinition, startEventActivity, processDefinition);
     } else if (messageEventDefinition != null) {
@@ -909,11 +910,19 @@ public class BpmnParse extends Parse {
 
       ensureNoExpressionInMessageStartEvent(messageEventDefinition, messageStartEventSubscriptionDeclaration);
       addEventSubscriptionDeclaration(messageStartEventSubscriptionDeclaration, processDefinition, startEventElement);
-    } else if (signalEventDefinition != null){
+    } else if (signalEventDefinition != null) {
       startEventActivity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.START_EVENT_SIGNAL);
       startEventActivity.setEventScope(scope);
 
       parseSignalCatchEventDefinition(signalEventDefinition, startEventActivity, true);
+    } else if (conditionEventDefinition != null) {
+      startEventActivity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.START_EVENT_CONDITIONAL);
+
+      EventSubscriptionDeclaration conditionStartEventSubscriptionDeclaration = parseConditionalEventDefinition(conditionEventDefinition);
+      conditionStartEventSubscriptionDeclaration.setStartEvent(true);
+      conditionStartEventSubscriptionDeclaration.setActivityId(startEventActivity.getId());
+
+      addEventSubscriptionDeclaration(conditionStartEventSubscriptionDeclaration, processDefinition, startEventElement);
     }
   }
 
@@ -1130,6 +1139,11 @@ public class BpmnParse extends Parse {
       addError("Invalid 'messageRef': no message with id '" + messageRef + "' found.", messageEventDefinition);
     }
     return new EventSubscriptionDeclaration(messageDefinition.getExpression(), EventType.MESSAGE);
+  }
+
+  protected EventSubscriptionDeclaration parseConditionalEventDefinition(Element eventDefinition) {
+
+    return new EventSubscriptionDeclaration(null, EventType.CONDITONAL);
   }
 
   @SuppressWarnings("unchecked")

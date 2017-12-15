@@ -267,8 +267,14 @@ public class ProcessDefinitionManager extends AbstractManager implements Abstrac
     eventSubscriptionsToRemove.addAll(messageEventSubscriptions);
 
     // remove signal event subscriptions:
-    List<EventSubscriptionEntity> signalEventSubscriptions = getEventSubscriptionManager().findEventSubscriptionsByConfiguration(EventType.SIGNAL.name(), processDefinitionId);
+    List<EventSubscriptionEntity> signalEventSubscriptions = getEventSubscriptionManager()
+        .findEventSubscriptionsByConfiguration(EventType.SIGNAL.name(), processDefinitionId);
     eventSubscriptionsToRemove.addAll(signalEventSubscriptions);
+
+    // remove conditional event subscriptions:
+    List<EventSubscriptionEntity> conditionalEventSubscriptions = getEventSubscriptionManager()
+        .findEventSubscriptionsByConfiguration(EventType.CONDITONAL.name(), processDefinitionId);
+    eventSubscriptionsToRemove.addAll(conditionalEventSubscriptions);
 
     for (EventSubscriptionEntity eventSubscriptionEntity : eventSubscriptionsToRemove) {
       eventSubscriptionEntity.delete();
