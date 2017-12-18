@@ -88,7 +88,7 @@ import org.camunda.bpm.model.dmn.impl.instance.OutputEntryImpl;
 import org.camunda.bpm.model.dmn.impl.instance.OutputImpl;
 import org.camunda.bpm.model.dmn.impl.instance.OutputValuesImpl;
 import org.camunda.bpm.model.dmn.impl.instance.OwnerReferenceImpl;
-import org.camunda.bpm.model.dmn.impl.instance.ParameterReferenceImpl;
+import org.camunda.bpm.model.dmn.impl.instance.ParameterImpl;
 import org.camunda.bpm.model.dmn.impl.instance.PerformanceIndicatorImpl;
 import org.camunda.bpm.model.dmn.impl.instance.QuestionImpl;
 import org.camunda.bpm.model.dmn.impl.instance.RelationImpl;
@@ -340,7 +340,7 @@ public class Dmn {
     OutputEntryImpl.registerType(modelBuilder);
     OutputValuesImpl.registerType(modelBuilder);
     OwnerReferenceImpl.registerType(modelBuilder);
-    ParameterReferenceImpl.registerType(modelBuilder);
+    ParameterImpl.registerType(modelBuilder);
     PerformanceIndicatorImpl.registerType(modelBuilder);
     QuestionImpl.registerType(modelBuilder);
     RelationImpl.registerType(modelBuilder);

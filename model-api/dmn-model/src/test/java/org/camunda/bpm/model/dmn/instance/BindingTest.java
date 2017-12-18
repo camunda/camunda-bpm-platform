@@ -24,7 +24,7 @@ public class BindingTest extends DmnModelElementInstanceTest {
 
   public Collection<ChildElementAssumption> getChildElementAssumptions() {
     return Arrays.asList(
-      new ChildElementAssumption(ParameterReference.class, 1, 1),
+      new ChildElementAssumption(Parameter.class, 1, 1),
       new ChildElementAssumption(Expression.class, 0, 1)
     );
   }

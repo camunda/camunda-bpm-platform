@@ -117,6 +117,8 @@
               <logResults>true</logResults>
               <excludes>
                 <exclude>org/camunda/bpm/model/dmn/impl/**</exclude>
+                <exclude>org/camunda/bpm/model/dmn/instance/Binding</exclude>
+                <exclude>org/camunda/bpm/model/dmn/instance/ParameterReference</exclude>
               </excludes>
             </configuration>
             <executions>

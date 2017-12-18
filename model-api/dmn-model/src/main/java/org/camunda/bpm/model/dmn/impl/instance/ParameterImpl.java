@@ -16,26 +16,27 @@ package org.camunda.bpm.model.dmn.impl.instance;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_NS;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ELEMENT_PARAMETER;
 
-import org.camunda.bpm.model.dmn.instance.DmnElementReference;
-import org.camunda.bpm.model.dmn.instance.ParameterReference;
+import org.camunda.bpm.model.dmn.instance.InformationItem;
+import org.camunda.bpm.model.dmn.instance.Parameter;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder.ModelTypeInstanceProvider;
 
-public class ParameterReferenceImpl extends DmnElementReferenceImpl implements ParameterReference {
+public class ParameterImpl extends InformationItemImpl implements Parameter {
 
-  public ParameterReferenceImpl(ModelTypeInstanceContext instanceContext) {
+  public ParameterImpl(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
   }
 
   public static void registerType(ModelBuilder modelBuilder) {
-    ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(ParameterReference.class, DMN_ELEMENT_PARAMETER)
+    ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(Parameter.class, DMN_ELEMENT_PARAMETER)
       .namespaceUri(DMN11_NS)
-      .extendsType(DmnElementReference.class)
-      .instanceProvider(new ModelTypeInstanceProvider<ParameterReference>() {
-        public ParameterReference newInstance(ModelTypeInstanceContext instanceContext) {
-          return new ParameterReferenceImpl(instanceContext);
+      .extendsType(InformationItem.class)
+      .instanceProvider(new ModelTypeInstanceProvider<Parameter>() {
+        @Override
+        public Parameter newInstance(ModelTypeInstanceContext instanceContext) {
+          return new ParameterImpl(instanceContext);
         }
       });
 

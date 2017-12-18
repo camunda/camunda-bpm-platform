@@ -13,5 +13,5 @@
 
 package org.camunda.bpm.model.dmn.instance;
 
-public interface ParameterReference extends DmnElementReference {
+public interface Parameter extends InformationItem {
 }
