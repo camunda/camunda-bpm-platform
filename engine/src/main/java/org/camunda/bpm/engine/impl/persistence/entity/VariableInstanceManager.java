@@ -13,7 +13,10 @@
 
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.VariableInstanceQueryImpl;
@@ -26,14 +29,28 @@ import org.camunda.bpm.engine.runtime.VariableInstance;
  */
 public class VariableInstanceManager extends AbstractManager {
 
-  @SuppressWarnings("unchecked")
   public List<VariableInstanceEntity> findVariableInstancesByTaskId(String taskId) {
-    return getDbEntityManager().selectList("selectVariablesByTaskId", taskId);
+    return findVariableInstancesByTaskIdAndVariableNames(taskId, null);
   }
 
   @SuppressWarnings("unchecked")
+  public List<VariableInstanceEntity> findVariableInstancesByTaskIdAndVariableNames(String taskId, Collection<String> variableNames) {
+    Map<String, Object> parameter = new HashMap<String, Object>();
+    parameter.put("taskId", taskId);
+    parameter.put("variableNames", variableNames);
+    return getDbEntityManager().selectList("selectVariablesByTaskId", parameter);
+  }
+
   public List<VariableInstanceEntity> findVariableInstancesByExecutionId(String executionId) {
-    return getDbEntityManager().selectList("selectVariablesByExecutionId", executionId);
+    return findVariableInstancesByExecutionIdAndVariableNames(executionId, null);
+  }
+
+  @SuppressWarnings("unchecked")
+  public List<VariableInstanceEntity> findVariableInstancesByExecutionIdAndVariableNames(String executionId, Collection<String> variableNames) {
+    Map<String, Object> parameter = new HashMap<String, Object>();
+    parameter.put("executionId", executionId);
+    parameter.put("variableNames", variableNames);
+    return getDbEntityManager().selectList("selectVariablesByExecutionId", parameter);
   }
 
   @SuppressWarnings("unchecked")
@@ -41,9 +58,16 @@ public class VariableInstanceManager extends AbstractManager {
     return getDbEntityManager().selectList("selectVariablesByProcessInstanceId", processInstanceId);
   }
 
-  @SuppressWarnings("unchecked")
   public List<VariableInstanceEntity> findVariableInstancesByCaseExecutionId(String caseExecutionId) {
-    return getDbEntityManager().selectList("selectVariablesByCaseExecutionId", caseExecutionId);
+    return findVariableInstancesByCaseExecutionIdAndVariableNames(caseExecutionId, null);
+  }
+
+  @SuppressWarnings("unchecked")
+  public List<VariableInstanceEntity> findVariableInstancesByCaseExecutionIdAndVariableNames(String caseExecutionId, Collection<String> variableNames) {
+    Map<String, Object> parameter = new HashMap<String, Object>();
+    parameter.put("caseExecutionId", caseExecutionId);
+    parameter.put("variableNames", variableNames);
+    return getDbEntityManager().selectList("selectVariablesByCaseExecutionId", parameter);
   }
 
   public void deleteVariableInstanceByTask(TaskEntity task) {

@@ -1229,6 +1229,10 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     return Context.getCommandContext().getVariableInstanceManager().findVariableInstancesByExecutionId(id);
   }
 
+  public Collection<VariableInstanceEntity> provideVariables(Collection<String> variableNames) {
+    return Context.getCommandContext().getVariableInstanceManager().findVariableInstancesByExecutionIdAndVariableNames(id, variableNames);
+  }
+
   protected boolean isAutoFireHistoryEvents() {
     // as long as the process instance is starting (i.e. before activity instance
     // of the selected initial (start event) is created), the variable scope should
@@ -1497,7 +1501,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     List<EventSubscriptionEntity> result = new ArrayList<EventSubscriptionEntity>(eventSubscriptions.size());
     for (EventSubscriptionEntity eventSubscriptionEntity : eventSubscriptions) {
       if (eventSubscriptionEntity.isSubscriptionForEventType(EventType.COMPENSATE)) {
-        result.add((EventSubscriptionEntity) eventSubscriptionEntity);
+        result.add(eventSubscriptionEntity);
       }
     }
     return result;
@@ -1509,7 +1513,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     for (EventSubscriptionEntity eventSubscriptionEntity : eventSubscriptions) {
       if (eventSubscriptionEntity.isSubscriptionForEventType(EventType.COMPENSATE)
               && activityId.equals(eventSubscriptionEntity.getActivityId())) {
-          result.add((EventSubscriptionEntity) eventSubscriptionEntity);
+          result.add(eventSubscriptionEntity);
         }
     }
     return result;

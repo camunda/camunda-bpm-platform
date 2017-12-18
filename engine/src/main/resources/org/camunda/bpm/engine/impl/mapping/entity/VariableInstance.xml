@@ -124,8 +124,8 @@
         RES.ID_ = #{id, jdbcType=VARCHAR}
   </select>
 
-	<select id="selectVariablesByExecutionId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="variableInstanceResultMap">
-		SELECT
+  <select id="selectVariablesByExecutionId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="variableInstanceResultMap">
+    SELECT
         RES.*,
         (<include refid="actInstIdColumn"/>) ACT_INST_ID_
     FROM
@@ -141,12 +141,19 @@
     ON
         EXECUTION.PARENT_ID_ = PARENT_EXECUTION.ID_
 
-		WHERE
-        EXECUTION_ID_ = #{parameter, jdbcType=VARCHAR}
-		AND
+    WHERE
+        EXECUTION_ID_ = #{parameter.executionId, jdbcType=VARCHAR}
+    AND
         TASK_ID_ is null
+    <if test="parameter.variableNames != null">
+    AND
+        NAME_ IN
+        <foreach item="item" index="index" collection="parameter.variableNames" open="(" separator="," close=")">
+          #{item, jdbcType=VARCHAR}
+        </foreach>
+    </if>
   </select>
-  
+
   <select id="selectVariablesByProcessInstanceId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="variableInstanceResultMap">
     SELECT
         RES.*,
@@ -186,9 +193,16 @@
         EXECUTION.PARENT_ID_ = PARENT_EXECUTION.ID_
 
     WHERE
-        CASE_EXECUTION_ID_ = #{parameter, jdbcType=VARCHAR}
+        CASE_EXECUTION_ID_ = #{parameter.caseExecutionId, jdbcType=VARCHAR}
     AND
         TASK_ID_ is null
+    <if test="parameter.variableNames != null">
+    AND
+        NAME_ IN
+        <foreach item="item" index="index" collection="parameter.variableNames" open="(" separator="," close=")">
+          #{item, jdbcType=VARCHAR}
+        </foreach>
+    </if>
   </select>
 
   <select id="selectVariablesByTaskId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="variableInstanceResultMap">
@@ -209,7 +223,14 @@
         EXECUTION.PARENT_ID_ = PARENT_EXECUTION.ID_
 
     WHERE
-        TASK_ID_ = #{parameter, jdbcType=VARCHAR}
+        TASK_ID_ = #{parameter.taskId, jdbcType=VARCHAR}
+    <if test="parameter.variableNames != null">
+    AND
+        NAME_ IN
+        <foreach item="item" index="index" collection="parameter.variableNames" open="(" separator="," close=")">
+          #{item, jdbcType=VARCHAR}
+        </foreach>
+    </if>
   </select>
 
   <select id="selectVariableInstanceByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.VariableInstanceQueryImpl" resultMap="variableInstanceResultMap">

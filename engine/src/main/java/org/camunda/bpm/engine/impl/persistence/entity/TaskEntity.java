@@ -507,6 +507,13 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
         .findVariableInstancesByTaskId(id);
   }
 
+  public Collection<VariableInstanceEntity> provideVariables(Collection<String> variableNames) {
+    return Context
+        .getCommandContext()
+        .getVariableInstanceManager()
+        .findVariableInstancesByTaskIdAndVariableNames(id, variableNames);
+  }
+
   @Override
   public AbstractVariableScope getParentVariableScope() {
     if (getExecution()!=null) {

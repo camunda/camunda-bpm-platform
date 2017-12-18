@@ -91,7 +91,7 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
   public void collectVariables(VariableMapImpl resultVariables, Collection<String> variableNames, boolean isLocal, boolean deserializeValues) {
     boolean collectAll = (variableNames == null);
 
-    List<CoreVariableInstance> localVariables = getVariableInstancesLocal();
+    List<CoreVariableInstance> localVariables = getVariableInstancesLocal(variableNames);
     for (CoreVariableInstance var : localVariables) {
       if(!resultVariables.containsKey(var.getName())
          && (collectAll || variableNames.contains(var.getName()))) {
@@ -179,6 +179,10 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
 
   public List<CoreVariableInstance> getVariableInstancesLocal() {
     return getVariableStore().getVariables();
+  }
+
+  public List<CoreVariableInstance> getVariableInstancesLocal(Collection<String> variableNames) {
+    return getVariableStore().getVariables(variableNames);
   }
 
   public boolean hasVariables() {

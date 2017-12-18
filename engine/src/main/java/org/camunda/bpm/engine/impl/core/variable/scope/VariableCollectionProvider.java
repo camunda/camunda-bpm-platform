@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl.core.variable.scope;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableInstance;
 import org.camunda.bpm.engine.impl.core.variable.scope.VariableStore.VariablesProvider;
@@ -39,6 +40,23 @@ public class VariableCollectionProvider<T extends CoreVariableInstance> implemen
     else {
       return variables;
     }
+  }
+
+  @Override
+  public Collection<T> provideVariables(Collection<String> variablesNames) {
+    if (variablesNames == null) {
+      return provideVariables();
+    }
+
+    List<T> result = new ArrayList<T>();
+    if (variables != null) {
+      for (T variable : variables) {
+        if (variablesNames.contains(variable.getName())) {
+          result.add(variable);
+        }
+      }
+    }
+    return result;
   }
 
   public static <T extends CoreVariableInstance> VariableCollectionProvider<T> emptyVariables() {

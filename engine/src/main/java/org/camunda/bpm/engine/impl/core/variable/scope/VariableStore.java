@@ -68,6 +68,32 @@ public class VariableStore<T extends CoreVariableInstance> {
     return variables;
   }
 
+  protected Map<String, T> getVariablesMap(Collection<String> variableNames) {
+    if (variableNames == null) {
+      return getVariablesMap();
+    }
+
+    Map<String, T> result = new HashMap<String, T>();
+
+    if (isInitialized()) {
+      for (String variableName : variableNames) {
+        if (variables.containsKey(variableName)) {
+          result.put(variableName, variables.get(variableName));
+        }
+      }
+    }
+    else {
+      // in this case we don't initialize the variables map,
+      // otherwise it would most likely contain only a subset
+      // of existing variables
+      for (T variable : variablesProvider.provideVariables(variableNames)) {
+        result.put(variable.getName(), variable);
+      }
+    }
+
+    return result;
+  }
+
   public T getRemovedVariable(String name) {
     return removedVariables.get(name);
   }
@@ -81,6 +107,9 @@ public class VariableStore<T extends CoreVariableInstance> {
     return new ArrayList<T>(getVariablesMap().values());
   }
 
+  public List<T> getVariables(Collection<String> variableNames) {
+    return new ArrayList<T>(getVariablesMap(variableNames).values());
+  }
 
   public void addVariable(T value) {
 
@@ -187,6 +216,8 @@ public class VariableStore<T extends CoreVariableInstance> {
   public static interface VariablesProvider<T extends CoreVariableInstance> {
 
     Collection<T> provideVariables();
+
+    Collection<T> provideVariables(Collection<String> variableNames);
 
   }
 

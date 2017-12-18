@@ -728,6 +728,13 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
       .findVariableInstancesByCaseExecutionId(id);
   }
 
+  public Collection<VariableInstanceEntity> provideVariables(Collection<String> variableNames) {
+    return Context
+      .getCommandContext()
+      .getVariableInstanceManager()
+      .findVariableInstancesByCaseExecutionIdAndVariableNames(id, variableNames);
+  }
+
   // toString /////////////////////////////////////////////////////////////
 
   public String toString() {
