@@ -126,30 +126,30 @@
   "CLAIM_OK":
         "The task has been claimed.",
   "CLAIM_ERROR":
-        "An error happend while claiming the task.",
+        "An error happened while claiming the task.",
 
   "UNCLAIM_OK":
         "The task has been unclaimed.",
   "UNCLAIM_ERROR":
-        "An error happend while unclaiming the task.",
+        "An error happened while unclaiming the task.",
 
   "RESOLVE_OK":
         "The task has been resolved.",
   "RESOLVE_ERROR":
-        "An error happend while resolving the task.",
+        "An error happened while resolving the task.",
 
   "DELEGATE_ERROR":
-        "An error happend while delegating the task.",
+        "An error happened while delegating the task.",
   "DELEGATE_OK":
         "The task has been delegated.",
 
   "ASSIGNED_ERROR":
-        "An error happend while assigning the task.",
+        "An error happened while assigning the task.",
   "ASSIGNED_OK":
         "The task has been assigned.",
 
   "COMPLETE_ERROR":
-        "An error happend while submitting the task form",
+        "An error happened while submitting the task form",
   "COMPLETE_OK":
         "The task is completed.",
 
