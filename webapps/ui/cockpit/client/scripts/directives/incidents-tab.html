@@ -1,16 +1,15 @@
 <!-- # CE - camunda-cockpit-ui/client/scripts/directives/incidents-tab.html -->
+<div cam-widget-loader
+     loading-state="{{ loadingState }}"
+     text-empty="{{ 'PLUGIN_INCIDENTS_TAB_NO_INCIDENTS' | translate }}">
+
+
 <table class="incidents-tab cam-table">
-  <thead>
-    <tr>
-      <th class="state" ng-if="incidentsContext === 'history'">{{ 'PLUGIN_INCIDENTS_TAB_STATE' | translate }}</th>
-      <th class="message">{{ 'PLUGIN_INCIDENTS_TAB_MESSAGE' | translate }}</th>
-      <th class="timestamp">{{ 'PLUGIN_INCIDENTS_TAB_TIMESTAMP' | translate }}</th>
-      <th class="activity">{{ 'PLUGIN_INCIDENTS_TAB_ACTIVITY' | translate }}</th>
-      <th class="cause instance-id uuid">{{ 'PLUGIN_INCIDENTS_TAB_CAUSE_INSTANCE_ID' | translate }}</th>
-      <th class="cause-root instance-id uuid">{{ 'PLUGIN_INCIDENTS_TAB_CAUSE_ROOT_INSTANCE_ID' | translate }}</th>
-      <th class="type">{{ 'PLUGIN_INCIDENTS_TAB_TYPE' | translate }}</th>
-      <th class="action">{{ 'PLUGIN_INCIDENTS_TAB_ACTION' | translate }}</th>
-    </tr>
+
+  <thead sortable-table-head
+         head-columns="headColumns"
+         on-sort-change="onSortChange(query, pages, sortObj)"
+         default-sort="sortObj">
   </thead>
 
   <tbody>
@@ -129,7 +128,6 @@
     </tr>
   </tbody>
 </table>
-
 <div cam-pagination="onPaginationChange(pages)" total="pages.total"> </div>
-
+</div>
 <!-- / CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/incidents-tab.html -->

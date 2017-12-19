@@ -11,10 +11,11 @@ module.exports = function(ngModule) {
     '$scope', 'PluginProcessInstanceResource',
     function($scope,   PluginProcessInstanceResource) {
 
-        // input: processInstance, processData
+      // input: processInstance, processData
 
       var calledProcessInstanceData = $scope.processData.newChild($scope);
-        // var processInstance = $scope.processInstance;
+
+      // var processInstance = $scope.processInstance;
 
       var filter = null;
 
@@ -31,7 +32,7 @@ module.exports = function(ngModule) {
         delete filter.activityIds;
         delete filter.scrollToBpmnElement;
 
-          // fix missmatch -> activityInstanceIds -> activityInstanceIdIn
+        // fix missmatch -> activityInstanceIds -> activityInstanceIdIn
         filter.activityInstanceIdIn = filter.activityInstanceIds;
         delete filter.activityInstanceIds;
 
