@@ -142,7 +142,14 @@ var Directive = [
       scope.getJobStacktraceUrl = function(incident) {
         return Uri.appUri('engine://engine/:engine/job/' + incident.rootCauseIncidentConfiguration + '/stacktrace');
       };
-
+      
+      scope.incidentHasActions = function(incident) {
+        return scope.incidentsContext !== 'history' ||
+          scope.incidentsContext === 'history' &&
+          incident.incidentType === 'failedJob' &&
+          !incident.deleted &&
+          !incident.resolved;
+      };
       scope.incidentVars = { read: ['incident', 'processData', 'filter']};
       scope.incidentActions = Views.getProviders({ component: 'cockpit.incident.action' });
     };
