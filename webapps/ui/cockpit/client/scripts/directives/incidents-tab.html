@@ -66,8 +66,16 @@
         <i>Message is null.</i>
       </td>
 
-      <td class="timestamp">
+      <td ng-if="incident.incidentTimestamp !== undefined" class="timestamp">
         {{ incident.incidentTimestamp | camDate }}
+      </td>
+
+      <td ng-if="incident.endTime !== undefined"class="end-time">
+        {{ incident.endTime | camDate }}
+      </td>
+
+      <td ng-if="incident.createTime !== undefined"class="create-time">
+        {{ incident.createTime | camDate }}
       </td>
 
       <td class="activity">
