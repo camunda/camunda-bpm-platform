@@ -112,8 +112,8 @@
       </td>
 
       <td class="action">
-        <span ng-repeat="actionProvider in incidentActions"
-              ng-show="incident.incidentType === 'failedJob' && incident.configuration && !incident.deleted && !incident.resolved">
+        <span ng-if="incidentHasActions(incident)"
+              ng-repeat="actionProvider in incidentActions">
           <view provider="actionProvider"
             vars="incidentVars" />
         </span>
