@@ -350,6 +350,95 @@ public class TransientVariableTest {
     assertEquals("abc", variables.get(0).getName());
   }
 
+  @Test
+  public void testStartMessageCorrelationWithTransientVariable() {
+    // given
+    BpmnModelInstance instance = Bpmn.createExecutableProcess("process")
+      .startEvent()
+        .message("message")
+      .scriptTask("scriptTask")
+        .scriptFormat("javascript")
+        .camundaResultVariable("abc")
+        .scriptText("execution.setVariable('abc', foo);")
+      .endEvent()
+      .done();
+
+    testRule.deploy(instance);
+
+    // when
+    runtimeService.createMessageCorrelation("message")
+      .setVariable("foo", Variables.stringValue("bar", true))
+      .correlate();
+
+    // then
+    List<VariableInstance> variableInstances = runtimeService.createVariableInstanceQuery().list();
+    assertEquals(0, variableInstances.size());
+    List<HistoricVariableInstance> historicInstances = historyService.createHistoricVariableInstanceQuery().list();
+    assertEquals(1, historicInstances.size());
+    assertEquals("abc", historicInstances.get(0).getName());
+    assertEquals("bar", historicInstances.get(0).getValue());
+  }
+
+  @Test
+  public void testMessageCorrelationWithTransientVariableAsCorrelationKey() {
+    // given
+    BpmnModelInstance instance = Bpmn.createExecutableProcess("process")
+      .startEvent()
+      .intermediateCatchEvent()
+        .message("message")
+      .endEvent()
+      .done();
+ 
+    testRule.deploy(instance);
+    runtimeService.startProcessInstanceByKey("process",
+        Variables.createVariables().putValueTyped("foo", Variables.stringValue("bar", false)));
+
+    // when
+    VariableMap variables = Variables.createVariables().putValueTyped("foo", Variables.stringValue("bar", false));
+    runtimeService.correlateMessage("message", variables);
+
+    // then
+    VariableInstance variableInstance = runtimeService.createVariableInstanceQuery().singleResult();
+    assertNull(variableInstance);
+    HistoricVariableInstance historicVariableInstance = historyService.createHistoricVariableInstanceQuery().singleResult();
+    assertNotNull(historicVariableInstance);
+    assertEquals("foo", historicVariableInstance.getName());
+    assertEquals("bar", historicVariableInstance.getValue());
+  }
+
+  @Test
+  public void testParallelExecutions() {
+    // given
+    testRule.deploy(ProcessModels.PARALLEL_GATEWAY_PROCESS);
+
+    // when
+    runtimeService.startProcessInstanceByKey("Process",
+        Variables.createVariables().putValueTyped("foo", Variables.stringValue("bar", true)));
+
+    // then
+    List<VariableInstance> variables = runtimeService.createVariableInstanceQuery().list();
+    assertEquals(0, variables.size());
+
+    List<HistoricVariableInstance> historicVariables = historyService.createHistoricVariableInstanceQuery().list();
+    assertEquals(0, historicVariables.size());
+  }
+
+  @Test
+  public void testOrGateway() {
+    // given
+    testRule.deploy("org/camunda/bpm/engine/test/bpmn/gateway/ExclusiveGatewayTest.testDivergingExclusiveGateway.bpmn20.xml");
+
+    // when
+    runtimeService.startProcessInstanceByKey("exclusiveGwDiverging",
+        Variables.createVariables().putValueTyped("input", Variables.integerValue(1, true)));
+
+    // then
+    List<VariableInstance> variables = runtimeService.createVariableInstanceQuery().list();
+    assertEquals(0, variables.size());
+    Task task = taskService.createTaskQuery().singleResult();
+    assertEquals("theTask1", task.getTaskDefinitionKey());
+  }
+
   public static class SetVariableTransientDelegate implements JavaDelegate {
     @Override
     public void execute(DelegateExecution execution) throws Exception {
