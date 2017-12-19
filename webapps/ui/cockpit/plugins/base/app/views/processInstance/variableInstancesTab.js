@@ -40,10 +40,6 @@ module.exports = function(ngModule) {
       var defaultValue= { sortBy: 'variableName', sortOrder: 'asc' };
       $scope.sortObj   = loadLocal(defaultValue);
 
-
-
-
-
       $scope.searchConfig = angular.copy(variableInstancesTabSearchConfig);
 
       angular.forEach(variableInstancesTabSearchConfig.tooltips, function(translation, tooltip) {
