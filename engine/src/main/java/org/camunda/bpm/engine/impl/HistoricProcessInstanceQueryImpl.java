@@ -47,6 +47,7 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   protected boolean finished = false;
   protected boolean unfinished = false;
   protected boolean withIncidents = false;
+  protected boolean withRootIncidents = false;
   protected String incidentType;
   protected String incidentStatus;
   protected String incidentMessage;
@@ -134,6 +135,11 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   public HistoricProcessInstanceQuery withIncidents() {
     this.withIncidents = true;
 
+    return this;
+  }
+
+  public HistoricProcessInstanceQuery withRootIncidents() {
+    this.withRootIncidents = true;
     return this;
   }
 
@@ -388,6 +394,10 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
 
   public String getIncidentMessageLike() {
     return this.incidentMessageLike;
+  }
+
+  public boolean isWithRootIncidents() {
+    return withRootIncidents;
   }
 
   // below is deprecated and to be removed in 5.12

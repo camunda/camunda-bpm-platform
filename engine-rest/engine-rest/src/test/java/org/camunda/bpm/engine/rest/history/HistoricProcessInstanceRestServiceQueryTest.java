@@ -1502,6 +1502,36 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
     verify(mockedQuery).activeActivityIdIn("1", "2");
   }
 
+  @Test
+  public void testQueryWithRootIncidents() {
+    given()
+      .queryParam("withRootIncidents", true)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
+
+    InOrder inOrder = inOrder(mockedQuery);
+    inOrder.verify(mockedQuery).withRootIncidents();
+    inOrder.verify(mockedQuery).list();
+  }
+
+  @Test
+  public void testQueryWithRootIncidentsAsPost() {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("withRootIncidents", true);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(parameters)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).withRootIncidents();
+  }
+
   private void verifyExecutedJobParameterQueryInvocations() {
     Map<String, Date> startDateParameters = getCompleteExecutedJobDateQueryParameters();
 

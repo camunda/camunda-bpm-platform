@@ -40,6 +40,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.camunda.bpm.engine.test.api.runtime.migration.models.CallActivityModels;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
@@ -340,6 +341,9 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
 
     assertEquals(1, historyService.createHistoricProcessInstanceQuery().incidentType("failedJob").count());
     assertEquals(1, historyService.createHistoricProcessInstanceQuery().incidentType("failedJob").list().size());
+
+    assertEquals(1, historyService.createHistoricProcessInstanceQuery().withRootIncidents().count());
+    assertEquals(1, historyService.createHistoricProcessInstanceQuery().withRootIncidents().list().size());
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/IncidentTest.testShouldDeleteIncidentAfterJobWasSuccessfully.bpmn"})
@@ -1511,5 +1515,25 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
     // then
     assertNotNull(historicProcessInstance);
     assertEquals(processInstance.getId(), historicProcessInstance.getId());
+  }
+
+  @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  public void testQueryWithRootIncidents() {
+    // given
+    deployment("org/camunda/bpm/engine/test/history/HistoricProcessInstanceTest.testQueryWithRootIncidents.bpmn20.xml");
+    deployment(CallActivityModels.oneBpmnCallActivityProcess("Process_1"));
+
+    runtimeService.startProcessInstanceByKey("Process");
+    ProcessInstance calledProcessInstance = runtimeService.createProcessInstanceQuery().processDefinitionKey("Process_1").singleResult();
+    executeAvailableJobs();
+
+    // when
+    List<HistoricProcessInstance> historicProcInstances = historyService.createHistoricProcessInstanceQuery().withRootIncidents().list();
+
+    // then
+    assertNotNull(calledProcessInstance);
+    assertEquals(1, historicProcInstances.size());
+    assertEquals(calledProcessInstance.getId(), historicProcInstances.get(0).getId());
   }
 }

@@ -73,6 +73,7 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
   private Boolean finished;
   private Boolean unfinished;
   private Boolean withIncidents;
+  private Boolean withRootIncidents;
   private String incidentType;
   private String incidentStatus;
   private String incidentMessage;
@@ -165,6 +166,11 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
   @CamundaQueryParam(value = "withIncidents", converter = BooleanConverter.class)
   public void setWithIncidents(Boolean withIncidents) {
     this.withIncidents = withIncidents;
+  }
+
+  @CamundaQueryParam(value = "withRootIncidents", converter = BooleanConverter.class)
+  public void setWithRootIncidents(Boolean withRootIncidents) {
+    this.withRootIncidents = withRootIncidents;
   }
 
   @CamundaQueryParam(value = "incidentStatus")
@@ -329,6 +335,9 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
     }
     if (withIncidents != null && withIncidents) {
       query.withIncidents();
+    }
+    if (withRootIncidents != null && withRootIncidents) {
+      query.withRootIncidents();
     }
     if (incidentStatus != null) {
       query.incidentStatus(incidentStatus);
