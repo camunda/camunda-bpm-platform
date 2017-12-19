@@ -125,7 +125,7 @@
                 <a ng-if="ctrl.getSelectionType() == 'runtime'"
                    class="btn btn-danger action-button"
                    ng-click="ctrl.openDeleteModal()"
-                   tooltip="{{ 'BATCHES_PROGRESS_BATCH_DETAILS' | translate }}">
+                   tooltip="{{ 'BATCHES_PROGRESS_TOOLTIP_DELETE_BATCH' | translate }}">
                   <span class="glyphicon glyphicon-trash"></span>
                 </a>
               </div>
@@ -144,7 +144,7 @@
                 <td>{{key}}</td>
                 <td>{{selection[key]}}
                   <span ng-if="key === 'remainingJobs' && selection.failedJobs"
-                        class="failedJobs">({{ 'BATCHES_PROGRESS_FAILED' | translate:'{jobs: selection.failedJobs}' }}</span>
+                        class="failedJobs">({{ 'BATCHES_PROGRESS_FAILED' | translate:'{jobs: selection.failedJobs}' }})</span>
                   </td>
               </tr>
             </tbody>
@@ -181,7 +181,7 @@
                       </a>
                       <a class="btn btn-default action-button"
                          ng-click="ctrl.deleteJob(job)"
-                         tooltip="{{ 'BATCHES_PROGRESS_TOOLTIP_DELETE_BATCH' | translate }}">
+                         tooltip="{{ 'BATCHES_PROGRESS_TOOLTIP_DELETE_JOB' | translate }}">
                         <span class="glyphicon glyphicon-trash"></span>
                       </a>
                     </div>
