@@ -16,31 +16,25 @@ var Directive = function() {
     template: template,
     controller: ['$scope',
       function($scope) {
-        // Set default sorting
-        $scope.sortObj = $scope.defaultSort;
 
         // Order Icons
-
         $scope.orderClass = function(forColumn) {
-          forColumn = forColumn || $scope.sortObj.sortBy;
+          forColumn = forColumn || $scope.defaultSort.sortBy;
           var icons = {
             none: 'minus',
             desc: 'chevron-down',
             asc: 'chevron-up'
           };
-          return 'glyphicon-' + (icons[forColumn === $scope.sortObj.sortBy ? $scope.sortObj.sortOrder : 'none']);
+          return 'glyphicon-' + (icons[forColumn === $scope.defaultSort.sortBy ? $scope.defaultSort.sortOrder : 'none']);
         };
 
         // On-click function to order Columns
         $scope.changeOrder = function(column) {
-          $scope.sortObj.sortBy    = column;
-          $scope.sortObj.sortOrder = ($scope.sortObj.sortOrder === 'desc') ? 'asc' : 'desc';
-
-          // pass sorting to updateView function in parent scope.
-          $scope.onSortChange({
-            sortObj: $scope.sortObj
-          });
+          $scope.defaultSort.sortBy    = column;
+          $scope.defaultSort.sortOrder = ($scope.defaultSort.sortOrder === 'desc') ? 'asc' : 'desc';
+          $scope.onSortChange({ sortObj: $scope.defaultSort });
         };
+
       }],
     link: function() {}
   };
