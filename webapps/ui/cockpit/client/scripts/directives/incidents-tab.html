@@ -69,13 +69,15 @@
         {{ incident.incidentTimestamp | camDate }}
       </td>
 
-      <td ng-if="incident.endTime !== undefined"class="end-time">
-        {{ incident.endTime | camDate }}
-      </td>
 
       <td ng-if="incident.createTime !== undefined"class="create-time">
         {{ incident.createTime | camDate }}
       </td>
+
+      <td ng-if="incident.endTime !== undefined"class="end-time">
+        {{ incident.endTime | camDate }}
+      </td>
+
 
       <td class="activity">
         <span ng-show="incident.linkable && processDefinition"
