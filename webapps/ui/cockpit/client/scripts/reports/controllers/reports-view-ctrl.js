@@ -61,7 +61,7 @@ var Controller = [
           }
         ]);
 
-        page.titleSet($translate.instant('REPORTS_VIEW_TITLE_SET', { name: reportTypePlugin[0].label }));
+        page.titleSet($translate.instant('REPORTS_VIEW_TITLE_SET', { name: $translate.instant(reportTypePlugin[0].label) }));
       }
     }
     else {
