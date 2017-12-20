@@ -9,7 +9,7 @@
          ng-if="!selectedReportId">
     </div>
 
-    <h3 ng-if="selectedReportId">{{ pluginLabel }}</h3>
+    <h3 ng-if="selectedReportId">{{ pluginLabel | translate }}</h3>
 
     <div class="reports-plugin-wrapper"
          cam-reports-plugin

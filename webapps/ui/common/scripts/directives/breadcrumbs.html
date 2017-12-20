@@ -29,7 +29,7 @@
 
     <span ng-if="!crumb.href && !crumb.callback"
           ng-show="!crumb.hidden"
-          class="text">{{ crumb.label }}</span>
+          class="text">{{ crumb.label | translate }}</span>
 
     <span ng-if="(crumb.type === 'processDefinition' && crumb.processDefinition.suspended) || (crumb.type === 'processInstance' && crumb.processInstance.suspended)"
           ng-show="!crumb.hidden"
