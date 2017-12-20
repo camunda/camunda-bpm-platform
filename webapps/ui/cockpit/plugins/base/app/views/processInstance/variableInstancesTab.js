@@ -1,4 +1,3 @@
-/* eslint-disable indent */
 'use strict';
 
 var angular = require('angular');
@@ -333,7 +332,7 @@ module.exports = function(ngModule) {
                 });
                 $scope.loadingState = data.length ? 'LOADED' : 'EMPTY';
                 return $scope.total;
-            });
+              });
           });
       }
 
