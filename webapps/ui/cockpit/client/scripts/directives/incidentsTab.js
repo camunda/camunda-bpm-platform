@@ -15,8 +15,8 @@ var Directive = [
 
       var availableColumns = [
         { class: 'state',      request: 'incidentState',     sortable: true, content: $translate.instant('PLUGIN_INCIDENTS_TAB_STATE')},
-        { class: 'end-time',   request: 'endTime',           sortable: true, content: $translate.instant('PLUGIN_INCIDENTS_TAB_END_TIME')},
         { class: 'create-time',request: 'createTime',        sortable: true, content: $translate.instant('PLUGIN_INCIDENTS_TAB_CREATE_TIME')},
+        { class: 'end-time',   request: 'endTime',           sortable: true, content: $translate.instant('PLUGIN_INCIDENTS_TAB_END_TIME')},
         { class: 'timestamp',  request: 'incidentTimestamp', sortable: true, content: $translate.instant('PLUGIN_INCIDENTS_TAB_TIMESTAMP')},
         { class: 'message',    request: '',                  sortable: false, content: $translate.instant('PLUGIN_INCIDENTS_TAB_MESSAGE')},
         { class: 'activity',   request: 'activityId',        sortable: true, content: $translate.instant('PLUGIN_INCIDENTS_TAB_ACTIVITY')},
@@ -37,8 +37,8 @@ var Directive = [
           var histColClasses = [
             'state',
             'message',
-            'end-time',
             'create-time',
+            'end-time',
             'activity',
             'cause instance-id uuid',
             'cause-root instance-id uuid',
