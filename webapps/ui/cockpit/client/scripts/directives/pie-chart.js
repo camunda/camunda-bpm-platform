@@ -43,7 +43,7 @@ proto.resize = function(width, height) {
 
 proto.setData = function(data) {
   this.data = data;
-  if (!this.data.length || !this.data[0].value) {
+  if (!this.data.length || !this.data[0].value && this.data[0].value !== 0) {
     this.data = this.missingData;
   }
 
