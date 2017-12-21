@@ -6,7 +6,7 @@ var Controller = [ '$scope', 'processData', 'ProcessDefinitionResource',
       function($scope, processData, ProcessDefinitionResource) {
 
         processData.provide('processDefinitions', function() {
-          return ProcessDefinitionResource.queryStatistics({ rootIncidents: true }).$promise;
+          return ProcessDefinitionResource.queryStatistics({ incidents: true }).$promise;
         });
 
         processData.provide('processDefinitionStatistics', ['processDefinitions', function(processDefinitions) {

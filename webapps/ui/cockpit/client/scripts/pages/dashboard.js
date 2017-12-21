@@ -92,7 +92,7 @@ var Controller = [
 
     if ($scope.hasProcessSearch) {
       $scope.linkBase.processInstances = '/processes?searchQuery=%5B%7B%22type%22:%22PIunfinished%22,%22operator%22:%22eq%22,%22value%22:%22%22,%22name%22:%22%22%7D,%7B%22type%22:%22PIprocessDefinitionKey%22,%22operator%22:%22eq%22,%22value%22:%22{{key}}%22,%22name%22:%22%22%7D%5D';
-      $scope.linkBase.processIncidents = '/processes?searchQuery=%5B%7B%22type%22:%22PIwithIncidents%22,%22operator%22:%22eq%22,%22value%22:%22%22,%22name%22:%22%22%7D,%7B%22type%22:%22PIincidentStatus%22,%22operator%22:%22eq%22,%22value%22:%22open%22,%22name%22:%22%22%7D,%7B%22type%22:%22PIprocessDefinitionKey%22,%22operator%22:%22eq%22,%22value%22:%22{{key}}%22,%22name%22:%22%22%7D%5D';
+      $scope.linkBase.processIncidents = '/processes?searchQuery=%5B%7B%22type%22:%22PIwithRootIncidents%22,%22operator%22:%22eq%22,%22value%22:%22%22,%22name%22:%22%22%7D,%7B%22type%22:%22PIincidentStatus%22,%22operator%22:%22eq%22,%22value%22:%22open%22,%22name%22:%22%22%7D,%7B%22type%22:%22PIprocessDefinitionKey%22,%22operator%22:%22eq%22,%22value%22:%22{{key}}%22,%22name%22:%22%22%7D%5D';
     }
 
     function prepareValues(values, total, url) {
@@ -210,10 +210,11 @@ var Controller = [
 
             $scope.processDefinitionData = data.items;
 
-            processData.observe('processDefinitionStatistics', function(processDefinitionStatistics) {
-              aggregateInstances(processDefinitionStatistics);
-              aggregateIncidents(processDefinitionStatistics);
-            });
+            camAPI.resource('process-definition').statistics({ rootIncidents: true })
+              .then(function(processDefinitionStatistics) {
+                aggregateInstances(processDefinitionStatistics);
+                aggregateIncidents(processDefinitionStatistics);
+              });
 
             next();
           });

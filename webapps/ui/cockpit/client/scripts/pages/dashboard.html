@@ -46,7 +46,7 @@
                    values="values.procIncid"
                    placeholder="{{ 'DASHBOARD_OPEN_INCIDENTS' | translate }}"></div>
               <a class="value"
-                 href="#/processes?searchQuery=%5B%7B%22type%22:%22PIwithIncidents%22,%22operator%22:%22eq%22,%22value%22:%22%22,%22name%22:%22%22%7D,%7B%22type%22:%22PIincidentStatus%22,%22operator%22:%22eq%22,%22value%22:%22open%22,%22name%22:%22%22%7D%5D"
+                 href="#/processes?searchQuery=%5B%7B%22type%22:%22PIwithRootIncidents%22,%22operator%22:%22eq%22,%22value%22:%22%22,%22name%22:%22%22%7D,%7B%22type%22:%22PIincidentStatus%22,%22operator%22:%22eq%22,%22value%22:%22open%22,%22name%22:%22%22%7D%5D"
                  ng-if="hasProcessSearch">
                 {{ (!data.actual.openIncidents ? 0 : '') }}
                 {{ data.actual.openIncidents | abbreviateNumber }}
