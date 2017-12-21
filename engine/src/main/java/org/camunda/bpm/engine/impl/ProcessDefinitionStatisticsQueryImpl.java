@@ -81,6 +81,12 @@ public class ProcessDefinitionStatisticsQueryImpl extends AbstractQuery<ProcessD
     if (includeIncidents && includeIncidentsForType != null) {
       throw new ProcessEngineException("Invalid query: It is not possible to use includeIncident() and includeIncidentForType() to execute one query.");
     }
+    if (includeRootIncidents && includeIncidentsForType != null) {
+      throw new ProcessEngineException("Invalid query: It is not possible to use includeRootIncident() and includeIncidentForType() to execute one query.");
+    }
+    if (includeIncidents && includeRootIncidents) {
+      throw new ProcessEngineException("Invalid query: It is not possible to use includeIncident() and includeRootIncidents() to execute one query.");
+    }
   }
 
   @Override

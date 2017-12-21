@@ -305,7 +305,7 @@
       </if>
 
 	  <if test="withRootIncidents">
-		and INC.ID_ = INC.ROOT_CAUSE_INCIDENT_ID_
+        and INC.ID_ = INC.ROOT_CAUSE_INCIDENT_ID_
 	  </if>
       <if test="startedBy != null">
         and SELF.START_USER_ID_ = #{startedBy}

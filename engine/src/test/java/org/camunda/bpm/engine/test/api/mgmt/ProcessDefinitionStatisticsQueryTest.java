@@ -16,7 +16,8 @@ package org.camunda.bpm.engine.test.api.mgmt;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import static org.hamcrest.CoreMatchers.containsString;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.management.IncidentStatistics;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatistics;
@@ -643,37 +644,19 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
 
   @Test
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testCallActivityWithIncidentsWithoutFailedJobs.bpmn20.xml")
-  public void testIncludeRootIncidents() {
+  public void testIncludeRootIncidentsFails() {
     runtimeService.startProcessInstanceByKey("callExampleSubProcess");
 
     executeAvailableJobs();
 
-    List<ProcessDefinitionStatistics> statistics =
+    try {
         managementService
         .createProcessDefinitionStatisticsQuery()
         .includeIncidents()
         .includeRootIncidents()
         .list();
-
-    // two process definitions
-    assertEquals(2, statistics.size());
-
-    for (ProcessDefinitionStatistics definitionResult : statistics) {
-
-      if (definitionResult.getKey().equals("callExampleSubProcess")) {
-        // there is no root incidents
-        assertTrue(definitionResult.getIncidentStatistics().isEmpty());
-
-      } else if (definitionResult.getKey().equals("ExampleProcess")) {
-        // there is one root incident
-        assertFalse(definitionResult.getIncidentStatistics().isEmpty());
-        assertEquals(1, definitionResult.getIncidentStatistics().size());
-        assertEquals(1, definitionResult.getIncidentStatistics().get(0).getIncidentCount());
-
-      } else {
-        // fail if the process definition key does not match
-        fail();
-      }
+    } catch (ProcessEngineException e) {
+      Assert.assertThat(e.getMessage(), containsString("It is not possible to use includeIncident() and includeRootIncidents() to execute one query"));
     }
   }
 
