@@ -28,6 +28,11 @@ public interface ProcessDefinitionStatisticsQuery extends Query<ProcessDefinitio
   ProcessDefinitionStatisticsQuery includeIncidents();
 
   /**
+   * Include an aggregation of root incidents only
+   */
+  ProcessDefinitionStatisticsQuery includeRootIncidents();
+
+  /**
    * Include an aggregation of incidents of the assigned incidentType in the result.
    */
   ProcessDefinitionStatisticsQuery includeIncidentsForType(String incidentType);

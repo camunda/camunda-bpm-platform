@@ -167,6 +167,9 @@
                   <if test="includeIncidentsForType != null">
                       I.INCIDENT_TYPE_ = #{includeIncidentsForType}
                   </if>
+                  <if test="includeRootIncidents">
+					and I.ID_ = I.ROOT_CAUSE_INCIDENT_ID_
+                  </if>
                   <bind name="columnPrefix" value="'I.'"/>
                   <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithPrefix" />
                 </where>

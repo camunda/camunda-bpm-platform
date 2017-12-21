@@ -27,6 +27,7 @@ public class ProcessDefinitionStatisticsQueryImpl extends AbstractQuery<ProcessD
   protected static final long serialVersionUID = 1L;
   protected boolean includeFailedJobs = false;
   protected boolean includeIncidents = false;
+  protected boolean includeRootIncidents = false;
   protected String includeIncidentsForType;
 
   public ProcessDefinitionStatisticsQueryImpl(CommandExecutor commandExecutor) {
@@ -72,7 +73,7 @@ public class ProcessDefinitionStatisticsQueryImpl extends AbstractQuery<ProcessD
   }
 
   public boolean isIncidentsToInclude() {
-    return includeIncidents || includeIncidentsForType != null;
+    return includeIncidents || includeRootIncidents || includeIncidentsForType != null;
   }
 
   protected void checkQueryOk() {
@@ -80,6 +81,12 @@ public class ProcessDefinitionStatisticsQueryImpl extends AbstractQuery<ProcessD
     if (includeIncidents && includeIncidentsForType != null) {
       throw new ProcessEngineException("Invalid query: It is not possible to use includeIncident() and includeIncidentForType() to execute one query.");
     }
+  }
+
+  @Override
+  public ProcessDefinitionStatisticsQuery includeRootIncidents() {
+    this.includeRootIncidents = true;
+    return this;
   }
 
 }

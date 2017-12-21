@@ -140,9 +140,17 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
 
 
   @Override
-  public List<StatisticsResultDto> getStatistics(Boolean includeFailedJobs, Boolean includeIncidents, String includeIncidentsForType) {
+  public List<StatisticsResultDto> getStatistics(Boolean includeFailedJobs, Boolean includeRootIncidents, Boolean includeIncidents, String includeIncidentsForType) {
     if (includeIncidents != null && includeIncidentsForType != null) {
       throw new InvalidRequestException(Status.BAD_REQUEST, "Only one of the query parameter includeIncidents or includeIncidentsForType can be set.");
+    }
+
+    if (includeIncidents != null && includeRootIncidents != null) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, "Only one of the query parameter includeIncidents or includeRootIncidents can be set.");
+    }
+
+    if (includeRootIncidents != null && includeIncidentsForType != null) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, "Only one of the query parameter includeRootIncidents or includeIncidentsForType can be set.");
     }
 
     ManagementService mgmtService = getProcessEngine().getManagementService();
@@ -156,6 +164,8 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
       query.includeIncidents();
     } else if (includeIncidentsForType != null) {
       query.includeIncidentsForType(includeIncidentsForType);
+    } else if (includeRootIncidents != null && includeRootIncidents) {
+      query.includeRootIncidents();
     }
 
     List<ProcessDefinitionStatistics> queryResults = query.list();

@@ -606,6 +606,77 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
     assertEquals(Incident.FAILED_JOB_HANDLER_TYPE, incidentStatistic.getIncidentType());
   }
 
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testCallActivityWithIncidentsWithoutFailedJobs.bpmn20.xml")
+  public void testIncludeRootIncidentsOnly() {
+    runtimeService.startProcessInstanceByKey("callExampleSubProcess");
+
+    executeAvailableJobs();
+
+    List<ProcessDefinitionStatistics> statistics =
+        managementService
+        .createProcessDefinitionStatisticsQuery()
+        .includeRootIncidents()
+        .list();
+
+    // two process definitions
+    assertEquals(2, statistics.size());
+
+    for (ProcessDefinitionStatistics definitionResult : statistics) {
+
+      if (definitionResult.getKey().equals("callExampleSubProcess")) {
+        // there is no root incidents
+        assertTrue(definitionResult.getIncidentStatistics().isEmpty());
+
+      } else if (definitionResult.getKey().equals("ExampleProcess")) {
+        // there is one root incident
+        assertFalse(definitionResult.getIncidentStatistics().isEmpty());
+        assertEquals(1, definitionResult.getIncidentStatistics().size());
+        assertEquals(1, definitionResult.getIncidentStatistics().get(0).getIncidentCount());
+
+      } else {
+        // fail if the process definition key does not match
+        fail();
+      }
+    }
+  }
+
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testCallActivityWithIncidentsWithoutFailedJobs.bpmn20.xml")
+  public void testIncludeRootIncidents() {
+    runtimeService.startProcessInstanceByKey("callExampleSubProcess");
+
+    executeAvailableJobs();
+
+    List<ProcessDefinitionStatistics> statistics =
+        managementService
+        .createProcessDefinitionStatisticsQuery()
+        .includeIncidents()
+        .includeRootIncidents()
+        .list();
+
+    // two process definitions
+    assertEquals(2, statistics.size());
+
+    for (ProcessDefinitionStatistics definitionResult : statistics) {
+
+      if (definitionResult.getKey().equals("callExampleSubProcess")) {
+        // there is no root incidents
+        assertTrue(definitionResult.getIncidentStatistics().isEmpty());
+
+      } else if (definitionResult.getKey().equals("ExampleProcess")) {
+        // there is one root incident
+        assertFalse(definitionResult.getIncidentStatistics().isEmpty());
+        assertEquals(1, definitionResult.getIncidentStatistics().size());
+        assertEquals(1, definitionResult.getIncidentStatistics().get(0).getIncidentCount());
+
+      } else {
+        // fail if the process definition key does not match
+        fail();
+      }
+    }
+  }
+
   public void testProcessDefinitionStatisticsProperties() {
     String resourceName = "org/camunda/bpm/engine/test/api/mgmt/ProcessDefinitionStatisticsQueryTest.testProcessDefinitionStatisticsProperties.bpmn20.xml";
     String deploymentId = deploymentForTenant("tenant1", resourceName);

@@ -376,4 +376,15 @@ public class StatisticsRestTest extends AbstractRestServiceTest {
       .get(ACTIVITY_STATISTICS_BY_KEY_URL);
   }
 
+  @Test
+  public void testProcessDefinitionStatisticsWithRootIncidents() {
+    given().queryParam("rootIncidents", "true")
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when().get(PROCESS_DEFINITION_STATISTICS_URL);
+
+    InOrder inOrder = Mockito.inOrder(processDefinitionStatisticsQueryMock);;
+    inOrder.verify(processDefinitionStatisticsQueryMock).includeRootIncidents();
+    inOrder.verify(processDefinitionStatisticsQueryMock).list();
+  }
 }
