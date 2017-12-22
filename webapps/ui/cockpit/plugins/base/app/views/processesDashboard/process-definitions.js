@@ -34,6 +34,7 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
         var processData = $scope.processData.newChild($scope);
 
         $scope.hasReportPlugin = Views.getProviders({ component: 'cockpit.report' }).length > 0;
+        $scope.hasSearchPlugin = Views.getProviders( { component: 'cockpit.processes.dashboard', id: 'search-process-instances' }).length > 0;
 
         var processDefinitionService = camAPI.resource('process-definition');
         $scope.loadingState = 'LOADING';

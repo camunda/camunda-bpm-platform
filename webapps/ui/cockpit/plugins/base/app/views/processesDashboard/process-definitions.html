@@ -57,8 +57,12 @@
         <tbody>
           <tr ng-repeat="pd in processDefinitionData | orderBy:['name || key','tenantId']:false">
             <td class="state">
-              <div ng-if="pd.incidents.length > -1" state-circle incidents="pd.incidents"></div>
-              <div ng-if="pd.incidents == undefined">
+              <div ng-if="!!pd.incidents" state-circle incidents="pd.incidents">
+                <a ng-if="pd.incidents.length && hasSearchPlugin"
+                   ng-href="#/processes?searchQuery=%5B%7B%22type%22:%22PIincidentStatus%22,%22operator%22:%22eq%22,%22value%22:%22open%22,%22name%22:%22%22%7D,%7B%22type%22:%22PIprocessDefinitionKey%22,%22operator%22:%22eq%22,%22value%22:%22{{pd.key}}%22,%22name%22:%22%22%7D%5D#search-section"
+                   class="incidents-link"></a>
+              </div>
+              <div ng-if="!pd.incidents">
                 <span class="glyphicon glyphicon-refresh animate-spin"></span>
               </div>
             </td>
