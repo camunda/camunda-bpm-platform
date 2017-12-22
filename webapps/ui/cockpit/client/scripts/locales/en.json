@@ -164,6 +164,15 @@
   "BATCHES_DELETE_BTN_CANCEL" : "Cancel",
   "BATCHES_DELETE_BTN_CONFIRM" : "Delete Batch",
 
+  "BATCHES_DELETE_BATCH_STATUS" : "Finished",
+  "BATCHES_DELETE_BATCH_FAILED" : "Could not delete batch: {{message}}",
+
+  "BATCHES_DELETE_JOB_STATUS" : "Finished",
+  "BATCHES_DELETE_JOB_FAILED" : "Could not delete job: {{message}}",
+
+  "BATCHES_RETRY_JOB_STATUS" : "Finished",
+  "BATCHES_RETRY_JOB_FAILED" : "Could not retry job: {{message}}",
+
   "VARIABLE_ADD_MODAL_TITLE_PROCESS" : "Add Variable to Process Instance",
   "VARIABLE_ADD_MODAL_TITLE_CASE" : "Add Variable to Case Instance",
   "VARIABLE_ADD_VARIABLE_NAME" : "Variable Name*",

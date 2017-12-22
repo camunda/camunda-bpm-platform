@@ -45,8 +45,6 @@ var Batch = function(camAPI) {
   });
 
   events.on('delete:confirm', function(params) {
-    self.deleteModal.instance && self.deleteModal.instance.close();
-    self.deleteModal.instance = null;
     self._remove(params);
   });
 };
@@ -60,6 +58,10 @@ Batch.prototype._remove = function(params) {
   params.id = obj.data.id;
   var self = this;
   return this._sdk.resource('batch').delete(params, function(err) {
+
+    self.deleteModal.instance && self.deleteModal.instance.close();
+    self.deleteModal.instance = null;
+
     if(err) {
       events.emit('batch:delete:failed', err);
     } else {

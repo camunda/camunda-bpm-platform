@@ -15,13 +15,15 @@ module.exports = [
   '$location',
   '$modal',
   '$translate',
+  'Notifications',
   function(
   $scope,
   page,
   camAPI,
   $location,
   $modal,
-  $translate
+  $translate,
+  Notifications
 ) {
 
     $scope.$on('$destroy', function() {
@@ -45,6 +47,30 @@ module.exports = [
       deleteModal.instance = $modal.open({
         template: deleteModalTemplate,
         controller: deleteModalCtrl
+      });
+    });
+
+    events.on('batch:delete:failed', function(err) {
+      Notifications.addError({
+        status: $translate.instant('BATCHES_DELETE_BATCH_STATUS'),
+        message: $translate.instant('BATCHES_DELETE_BATCH_FAILED', {message: err.message}),
+        exclusive: true
+      });
+    });
+
+    events.on('job:delete:failed', function(err) {
+      Notifications.addError({
+        status: $translate.instant('BATCHES_DELETE_JOB_STATUS'),
+        message: $translate.instant('BATCHES_DELETE_JOB_FAILED', {message: err.message}),
+        exclusive: true
+      });
+    });
+
+    events.on('job:retry:failed', function(err) {
+      Notifications.addError({
+        status: $translate.instant('BATCHES_RETRY_JOB_STATUS'),
+        message: $translate.instant('BATCHES_RETRY_JOB_FAILED', {message: err.message}),
+        exclusive: true
       });
     });
 
