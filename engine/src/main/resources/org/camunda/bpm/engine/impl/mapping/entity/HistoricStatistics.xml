@@ -45,89 +45,38 @@
 
   <sql id="selectHistoricActivityStatisticsByQueryCriteriaSql">
     from (
-      select ACTIVITY.ACT_ID_ as ID_
-      , INSTANCE_COUNT_
-      <if test="includeFinished">
-      , FINISHED_COUNT_
-      </if>
-      <if test="includeCanceled">
-      , CANCELED_COUNT_
-      </if>
-      <if test="includeCompleteScope">
-      , COMPLETE_SCOPE_COUNT_
-      </if>
-
-      from
-
-        (
-          select distinct ACT_ID_
-          from ${prefix}ACT_HI_ACTINST
-          where PROC_DEF_ID_ = #{processDefinitionId}
-          and (END_TIME_ is null
+          select ACT_ID_ as ID_,
+          sum(CASE WHEN END_TIME_ is NULL THEN 1 ELSE 0 END) as INSTANCE_COUNT_
           <if test="includeFinished">
-          or END_TIME_ is not null
+          , sum(CASE WHEN END_TIME_ is not NULL THEN 1 ELSE 0 END)  as FINISHED_COUNT_
           </if>
           <if test="includeCanceled">
-          or ACT_INST_STATE_ = 2
+          , sum(CASE WHEN ACT_INST_STATE_ = 2 THEN 1 ELSE 0 END)  as CANCELED_COUNT_
           </if>
           <if test="includeCompleteScope">
-          or ACT_INST_STATE_ = 1
+          , sum(CASE WHEN ACT_INST_STATE_ = 1 THEN 1 ELSE 0 END)  as COMPLETE_SCOPE_COUNT_
           </if>
-          )
 
-        ) ACTIVITY
-
-        left outer join
-
-        (
-          select ACT_ID_, count(ACT_ID_) as INSTANCE_COUNT_
           from ${prefix}ACT_HI_ACTINST
           where PROC_DEF_ID_ = #{processDefinitionId}
-          and END_TIME_ is null
-          group by ACT_ID_
-        ) INSTANCE
-        on INSTANCE.ACT_ID_ = ACTIVITY.ACT_ID_
+            and (END_TIME_ is null
+            <if test="includeFinished">
+            or END_TIME_ is not null
+            </if>
+            <if test="includeCanceled">
+            or ACT_INST_STATE_ = 2
+            </if>
+            <if test="includeCompleteScope">
+            or ACT_INST_STATE_ = 1
+            </if>
+            )
+            and (END_TIME_ is null
+              or END_TIME_ >= #{startDate}
+            )
+            and START_TIME_ &lt; #{endDate}
+          GROUP BY ACT_ID_
 
-        <if test="includeFinished">
-        left outer join
-
-        (
-          select ACT_ID_, count(ACT_ID_) as FINISHED_COUNT_
-          from ${prefix}ACT_HI_ACTINST
-          where PROC_DEF_ID_ = #{processDefinitionId}
-          and END_TIME_ is not null
-          group by ACT_ID_
-        ) FINISHED
-        on FINISHED.ACT_ID_ = ACTIVITY.ACT_ID_
-        </if>
-
-        <if test="includeCanceled">
-        left outer join
-
-        (
-          select ACT_ID_, count(ACT_ID_) as CANCELED_COUNT_
-          from ${prefix}ACT_HI_ACTINST
-          where PROC_DEF_ID_ = #{processDefinitionId}
-          and ACT_INST_STATE_ = 2
-          group by ACT_ID_
-        ) CANCELED
-        on CANCELED.ACT_ID_ = ACTIVITY.ACT_ID_
-        </if>
-
-        <if test="includeCompleteScope">
-        left outer join
-
-        (
-          select ACT_ID_, count(ACT_ID_) as COMPLETE_SCOPE_COUNT_
-          from ${prefix}ACT_HI_ACTINST
-          where PROC_DEF_ID_ = #{processDefinitionId}
-          and ACT_INST_STATE_ = 1
-          group by ACT_ID_
-        ) COMPLETE
-        on COMPLETE.ACT_ID_ = ACTIVITY.ACT_ID_
-        </if>
-
-      ) RES
+        ) RES
   </sql>
 
   <!-- HistoricCaseActivity statistics -->

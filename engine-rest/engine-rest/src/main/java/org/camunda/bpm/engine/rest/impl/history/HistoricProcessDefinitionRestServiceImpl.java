@@ -18,32 +18,35 @@ import org.camunda.bpm.engine.history.CleanableHistoricProcessInstanceReport;
 import org.camunda.bpm.engine.history.CleanableHistoricProcessInstanceReportResult;
 import org.camunda.bpm.engine.history.HistoricActivityStatistics;
 import org.camunda.bpm.engine.history.HistoricActivityStatisticsQuery;
+import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
 import org.camunda.bpm.engine.rest.dto.history.HistoricActivityStatisticsDto;
 import org.camunda.bpm.engine.rest.dto.history.CleanableHistoricProcessInstanceReportResultDto;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.history.CleanableHistoricProcessInstanceReportDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.history.HistoricProcessDefinitionRestService;
+import org.camunda.bpm.engine.rest.impl.AbstractRestProcessEngineAware;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.Status;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
-public class HistoricProcessDefinitionRestServiceImpl implements HistoricProcessDefinitionRestService {
+public class HistoricProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineAware implements HistoricProcessDefinitionRestService {
 
-  protected ObjectMapper objectMapper;
-  protected ProcessEngine processEngine;
+  public static final String QUERY_PARAM_START_DATE = "startDate";
+  public static final String QUERY_PARAM_END_DATE = "endDate";
 
   public HistoricProcessDefinitionRestServiceImpl(ObjectMapper objectMapper, ProcessEngine processEngine) {
-    this.objectMapper = objectMapper;
-    this.processEngine = processEngine;
+    super(processEngine.getName(), objectMapper);
   }
 
   @Override
-  public List<HistoricActivityStatisticsDto> getHistoricActivityStatistics(String processDefinitionId, Boolean includeCanceled, Boolean includeFinished,
+  public List<HistoricActivityStatisticsDto> getHistoricActivityStatistics(UriInfo uriInfo, String processDefinitionId, Boolean includeCanceled, Boolean includeFinished,
       Boolean includeCompleteScope, String sortBy, String sortOrder) {
     HistoryService historyService = processEngine.getHistoryService();
 
@@ -59,6 +62,21 @@ public class HistoricProcessDefinitionRestServiceImpl implements HistoricProcess
 
     if (includeCompleteScope != null && includeCompleteScope) {
       query.includeCompleteScope();
+    }
+
+    final MultivaluedMap<String, String> queryParameters = uriInfo.getQueryParameters();
+
+    DateConverter dateConverter = new DateConverter();
+    dateConverter.setObjectMapper(objectMapper);
+
+    if(queryParameters.getFirst(QUERY_PARAM_START_DATE) != null) {
+      Date startDate = dateConverter.convertQueryParameterToType(queryParameters.getFirst(QUERY_PARAM_START_DATE));
+      query.startDate(startDate);
+    }
+
+    if(queryParameters.getFirst(QUERY_PARAM_END_DATE) != null) {
+      Date endDate = dateConverter.convertQueryParameterToType(queryParameters.getFirst(QUERY_PARAM_END_DATE));
+      query.endDate(endDate);
     }
 
     setSortOptions(query, sortOrder, sortBy);

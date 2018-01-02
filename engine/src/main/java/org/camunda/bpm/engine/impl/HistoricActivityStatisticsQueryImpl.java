@@ -12,11 +12,14 @@
  */
 package org.camunda.bpm.engine.impl;
 
+import java.util.Date;
 import java.util.List;
+import org.apache.tools.ant.util.DateUtils;
 import org.camunda.bpm.engine.history.HistoricActivityStatistics;
 import org.camunda.bpm.engine.history.HistoricActivityStatisticsQuery;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
@@ -35,6 +38,9 @@ public class HistoricActivityStatisticsQueryImpl extends AbstractQuery<HistoricA
   protected boolean includeCanceled;
   protected boolean includeCompleteScope;
 
+  protected Date startDate = new Date(0);
+  protected Date endDate = new Date(ClockUtil.getCurrentTime().getTime() + 1);    //current time + 1 ms, as taken into account exclusively
+
   public HistoricActivityStatisticsQueryImpl(String processDefinitionId, CommandExecutor commandExecutor) {
     super(commandExecutor);
     this.processDefinitionId = processDefinitionId;
@@ -52,6 +58,18 @@ public class HistoricActivityStatisticsQueryImpl extends AbstractQuery<HistoricA
 
   public HistoricActivityStatisticsQuery includeCompleteScope() {
     includeCompleteScope = true;
+    return this;
+  }
+
+  @Override
+  public HistoricActivityStatisticsQuery startDate(Date startDate) {
+    this.startDate = startDate;
+    return this;
+  }
+
+  @Override
+  public HistoricActivityStatisticsQuery endDate(Date endDate) {
+    this.endDate = endDate;
     return this;
   }
 
@@ -98,4 +116,11 @@ public class HistoricActivityStatisticsQueryImpl extends AbstractQuery<HistoricA
     return includeCompleteScope;
   }
 
+  public Date getStartDate() {
+    return startDate;
+  }
+
+  public Date getEndDate() {
+    return endDate;
+  }
 }

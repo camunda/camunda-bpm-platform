@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.history;
 
+import java.util.Date;
 import org.camunda.bpm.engine.query.Query;
 
 /**
@@ -36,6 +37,16 @@ public interface HistoricActivityStatisticsQuery extends Query<HistoricActivityS
    * which consumed a token and did not produced a new one), in the result.
    */
   HistoricActivityStatisticsQuery includeCompleteScope();
+
+  /**
+   * Sets start date of the period of interest.
+   */
+  HistoricActivityStatisticsQuery startDate(Date startDate);
+
+  /**
+   * Sets end date of the period of interest.
+   */
+  HistoricActivityStatisticsQuery endDate(Date endDate);
 
   /**
    * Order by activity id (needs to be followed by {@link #asc()} or {@link #desc()}).

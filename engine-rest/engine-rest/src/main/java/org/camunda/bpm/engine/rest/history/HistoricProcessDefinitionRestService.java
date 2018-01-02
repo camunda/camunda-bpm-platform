@@ -21,6 +21,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -37,7 +38,7 @@ public interface HistoricProcessDefinitionRestService {
   @GET
   @Path("/{id}/statistics")
   @Produces(MediaType.APPLICATION_JSON)
-  public List<HistoricActivityStatisticsDto> getHistoricActivityStatistics(@PathParam("id") String processDefinitionId,
+  public List<HistoricActivityStatisticsDto> getHistoricActivityStatistics(@Context UriInfo uriInfo, @PathParam("id") String processDefinitionId,
                                                                            @QueryParam("canceled") Boolean includeCanceled,
       @QueryParam("finished") Boolean includeFinished, @QueryParam("completeScope") Boolean includeCompleteScope,
       @QueryParam("sortBy") String sortBy, @QueryParam("sortOrder") String sortOrder);
