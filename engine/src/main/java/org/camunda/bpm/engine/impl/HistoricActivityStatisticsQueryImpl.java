@@ -39,7 +39,7 @@ public class HistoricActivityStatisticsQueryImpl extends AbstractQuery<HistoricA
   protected boolean includeCompleteScope;
 
   protected Date startDate = new Date(0);
-  protected Date endDate = new Date(ClockUtil.getCurrentTime().getTime() + 1);    //current time + 1 ms, as taken into account exclusively
+  protected Date endDate = new Date(ClockUtil.getCurrentTime().getTime() + 1000);    //current time + 1 sec, as taken into account exclusively
 
   public HistoricActivityStatisticsQueryImpl(String processDefinitionId, CommandExecutor commandExecutor) {
     super(commandExecutor);
