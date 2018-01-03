@@ -14,7 +14,34 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
       'Views',
       'camAPI',
       'localConf',
-      function($scope, Views, camAPI, localConf) {
+      '$translate',
+      function($scope, Views, camAPI, localConf, $translate) {
+
+        $scope.headColumns = [
+          { class: 'state',    request: '', sortable: false, content: $translate.instant('PLUGIN_PROCESS_DEF_STATE')},
+          { class: 'incidents',request: 'incidentCount', sortable: true,  content: $translate.instant('PLUGIN_PROCESS_DEF_INCIDENTS')},
+          { class: 'instances',request: 'instances'    , sortable: true, content: $translate.instant('PLUGIN_PROCESS_DEF_RUNNING_INSTANCES')},
+          { class: 'name',     request: 'key'          , sortable: true, content: $translate.instant('PLUGIN_PROCESS_DEF_NAME')},
+          { class: 'tenantID', request: 'tenantId'     , sortable: true, content: $translate.instant('PLUGIN_PROCESS_DEF_TENANT_ID')},
+          { class: 'history',  request: '', sortable: false, content: $translate.instant('PLUGIN_PROCESS_DEF_HISTORY_VIEW')},
+          { class: 'report',   request: '', sortable: false, content: $translate.instant('PLUGIN_PROCESS_DEF_REPORT')},
+          { class: 'action',   request: '', sortable: false, content: $translate.instant('PLUGIN_PROCESS_DEF_ACTION')}
+        ];
+
+        // Default sorting
+        var defaultValue = { sortBy: 'key', sortOrder: 'asc', sortReverse: false};
+        $scope.sortObj   = loadLocal(defaultValue);
+
+        // Update Table
+        $scope.onSortChange = function(sortObj) {
+          sortObj = sortObj || $scope.sortObj;
+          // transforms sortOrder in anqular required boolean;
+          sortObj.sortReverse = sortObj.sortOrder !== 'asc';
+          saveLocal(sortObj);
+          $scope.sortObj = sortObj;
+        };
+
+
 
         var getPDIncidentsCount = function(incidents) {
           if(!incidents) {
@@ -27,12 +54,12 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
         };
 
         var processInstancePlugins = Views.getProviders({ component: 'cockpit.processInstance.view' });
-        $scope.hasHistoryPlugin = processInstancePlugins.filter(function(plugin) {
-          return plugin.id === 'history';
-        }).length > 0;
 
         var processData = $scope.processData.newChild($scope);
 
+        $scope.hasHistoryPlugin = processInstancePlugins.filter(function(plugin) {
+          return plugin.id === 'history';
+        }).length > 0;
         $scope.hasReportPlugin = Views.getProviders({ component: 'cockpit.report' }).length > 0;
         $scope.hasSearchPlugin = Views.getProviders( { component: 'cockpit.processes.dashboard', id: 'search-process-instances' }).length > 0;
 
@@ -56,6 +83,8 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
           processDefinitionService.list({
             latest: true
           }, function(err, data) {
+            console.log(data);
+
             $scope.processDefinitionData = data.items;
             $scope.processDefinitionsCount = data.count;
             if (err) {
@@ -122,6 +151,51 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
           ($scope.activeSection = !$scope.activeSection) ? listProcessDefinitions() : countProcessDefinitions();
           localConf.set('processesDashboardActive', $scope.activeSection);
         };
+
+        function saveLocal(sortObj) {
+          localConf.set('sortProcessDefTab', sortObj);
+
+        }
+        function loadLocal(defaultValue) {
+          return localConf.get('sortProcessDefTab', defaultValue);
+        }
+
+    /*    function sortTable(data,sortBy,sortOrder) {
+          // sort by value
+          data.sort(function (a, b) {
+            return a.value - b.value;
+          });
+          return data;
+        }
+
+        function sortByValue() {
+          return function(a, b) {
+            return a.value - b.value;
+          };
+        }
+
+        function sortByName() {
+          return function(a, b) {
+            var nameA = a.name.toUpperCase(); // ignore upper and lowercase
+            var nameB = b.name.toUpperCase(); // ignore upper and lowercase
+            if (nameA < nameB) {
+              return -1;
+            }
+            if (nameA > nameB) {
+              return 1;
+            }
+
+            // names must be equal
+            return 0;
+          };
+        }
+*/
+
+
+
+
+
+
       }],
 
     priority: 0
