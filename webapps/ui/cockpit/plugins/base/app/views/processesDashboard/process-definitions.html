@@ -36,26 +36,17 @@
          loading-state="{{loadingState}}"
          class="deployed-processes"
          ng-if="activeSection">
+
+
       <table ng-if="processDefinitionsCount && activeTab === 'list'"
              class="process-definitions-list cam-table">
-        <thead>
-          <tr>
-            <th class="state">{{'PLUGIN_PROCESS_DEF_STATE' | translate}}</th>
-            <th class="incidents">{{'PLUGIN_PROCESS_DEF_INCIDENTS' | translate}}</th>
-            <th class="instances">{{'PLUGIN_PROCESS_DEF_RUNNING_INSTANCES' | translate}}</th>
-            <th class="name">{{'PLUGIN_PROCESS_DEF_NAME' | translate}}</th>
-            <th class="tenant-id">{{'PLUGIN_PROCESS_DEF_TENANT_ID' | translate}}</th>
-            <th ng-if="hasHistoryPlugin"
-                class="history-link">{{'PLUGIN_PROCESS_DEF_HISTORY_VIEW' | translate}}</th>
-            <th ng-if="hasReportPlugin"
-                class="report-link">{{'PLUGIN_PROCESS_DEF_REPORT' | translate}}</th>
-            <th ng-if="hasActionPlugin"
-                class="action">{{'PLUGIN_PROCESS_DEF_ACTION' | translate}}</th>
-          </tr>
+        <thead sortable-table-head
+               head-columns="headColumns"
+               on-sort-change="onSortChange(query, pages, sortObj)"
+               default-sort="sortObj">
         </thead>
-
         <tbody>
-          <tr ng-repeat="pd in processDefinitionData | orderBy:['name || key','tenantId']:false">
+          <tr ng-repeat="pd in processDefinitionData | orderBy:sortObj.sortBy:sortObj.sortReverse">
             <td class="state">
               <div ng-if="!!pd.incidents" state-circle incidents="pd.incidents">
                 <a ng-if="pd.incidents.length && hasSearchPlugin"
