@@ -78,6 +78,10 @@ public class ConditionalEventDefinition extends EventSubscriptionDeclaration imp
     this.variableEvents = variableEvents;
   }
 
+  public Condition getCondition() {
+    return condition;
+  }
+
   public boolean shouldEvaluateForVariableEvent(VariableEvent event) {
     return
     ((variableName == null || event.getVariableInstance().getName().equals(variableName))

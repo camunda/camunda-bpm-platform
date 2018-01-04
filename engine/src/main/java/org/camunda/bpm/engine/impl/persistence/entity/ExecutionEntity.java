@@ -765,7 +765,13 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
   @Override
   public void setProcessDefinition(ProcessDefinitionImpl processDefinition) {
     this.processDefinition = processDefinition;
-    this.processDefinitionId = processDefinition.getId();
+    if (processDefinition != null) {
+      this.processDefinitionId = processDefinition.getId();
+    }
+    else {
+      this.processDefinitionId = null;
+    }
+
   }
 
   // process instance /////////////////////////////////////////////////////////

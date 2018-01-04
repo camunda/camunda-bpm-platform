@@ -266,6 +266,27 @@
       </if>
   </select>
 
+  <select id="selectConditionalStartEventSubscription" resultMap="eventSubscriptionResultMap" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
+    select *
+    from ${prefix}ACT_RU_EVENT_SUBSCR RES
+    where (EVENT_TYPE_ = 'conditional')
+        and EXECUTION_ID_ is null
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
+  </select>
+
+  <select id="selectConditionalStartEventSubscriptionByTenantId" resultMap="eventSubscriptionResultMap" parameterType="string">
+    select *
+    from ${prefix}ACT_RU_EVENT_SUBSCR
+    where (EVENT_TYPE_ = 'conditional')
+      and EXECUTION_ID_ is null
+      <if test="parameter.tenantId != null">
+        and TENANT_ID_ = #{parameter.tenantId}
+      </if>
+      <if test="parameter.tenantId == null">
+        and TENANT_ID_ is null
+      </if>
+  </select>
+
   <!-- INSERT -->
 
   <insert id="insertEventSubscription" parameterType="org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity">

@@ -25,6 +25,8 @@ import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 
 import static org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse.PROPERTYNAME_HAS_CONDITIONAL_EVENTS;
 
+import org.camunda.bpm.engine.impl.bpmn.parser.ConditionalEventDefinition;
+
 /**
  * Properties of bpmn elements.
  *
@@ -60,5 +62,7 @@ public class BpmnProperties {
   public static final PropertyKey<Boolean> TRIGGERED_BY_EVENT = new PropertyKey<Boolean>("triggeredByEvent");
 
   public static final PropertyKey<Boolean> HAS_CONDITIONAL_EVENTS = new PropertyKey<Boolean>(PROPERTYNAME_HAS_CONDITIONAL_EVENTS);
+
+  public static final PropertyKey<ConditionalEventDefinition> CONDITIONAL_EVENT_DEFINITION = new PropertyKey<ConditionalEventDefinition>("conditionalEventDefinition");
 
 }

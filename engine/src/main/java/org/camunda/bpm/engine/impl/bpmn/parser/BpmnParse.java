@@ -918,11 +918,22 @@ public class BpmnParse extends Parse {
     } else if (conditionEventDefinition != null) {
       startEventActivity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.START_EVENT_CONDITIONAL);
 
-      EventSubscriptionDeclaration conditionStartEventSubscriptionDeclaration = parseConditionalEventDefinition(conditionEventDefinition);
-      conditionStartEventSubscriptionDeclaration.setStartEvent(true);
-      conditionStartEventSubscriptionDeclaration.setActivityId(startEventActivity.getId());
+      ensureCondition(conditionEventDefinition);
 
-      addEventSubscriptionDeclaration(conditionStartEventSubscriptionDeclaration, processDefinition, startEventElement);
+      ConditionalEventDefinition conditionalEventDefinition = parseConditionalEventDefinition(conditionEventDefinition, startEventActivity);
+      conditionalEventDefinition.setStartEvent(true);
+      conditionalEventDefinition.setActivityId(startEventActivity.getId());
+      conditionalEventDefinition.setVariableName(conditionEventDefinition.element("condition").getText());
+      startEventActivity.getProperties().set(BpmnProperties.CONDITIONAL_EVENT_DEFINITION, conditionalEventDefinition);
+
+      addEventSubscriptionDeclaration(conditionalEventDefinition, processDefinition, startEventElement);
+    }
+  }
+
+  protected void ensureCondition(Element conditionEventDefinition) {
+    String condition = conditionEventDefinition.element("condition").getText();
+    if (condition == null) {
+      addError("element 'condition' is required", conditionEventDefinition);
     }
   }
 
@@ -1141,12 +1152,6 @@ public class BpmnParse extends Parse {
     return new EventSubscriptionDeclaration(messageDefinition.getExpression(), EventType.MESSAGE);
   }
 
-  protected EventSubscriptionDeclaration parseConditionalEventDefinition(Element eventDefinition) {
-
-    return new EventSubscriptionDeclaration(null, EventType.CONDITONAL);
-  }
-
-  @SuppressWarnings("unchecked")
   protected void addEventSubscriptionDeclaration(EventSubscriptionDeclaration subscription, ScopeImpl scope, Element element) {
     if (subscription.getEventType().equals(EventType.MESSAGE.name()) && (!subscription.hasEventName())) {
       addError("Cannot have a message event subscription with an empty or missing name", element);
@@ -1155,15 +1160,21 @@ public class BpmnParse extends Parse {
     Map<String, EventSubscriptionDeclaration> eventDefinitions = scope.getProperties().get(BpmnProperties.EVENT_SUBSCRIPTION_DECLARATIONS);
 
     // if this is a message event, validate that it is the only one with the provided name for this scope
-    if(hasMultipleMessageEventDefinitionsWithSameName(subscription, eventDefinitions.values())){
+    if (hasMultipleMessageEventDefinitionsWithSameName(subscription, eventDefinitions.values())){
       addError("Cannot have more than one message event subscription with name '" + subscription.getUnresolvedEventName() + "' for scope '" + scope.getId() + "'",
           element);
     }
 
     // if this is a signal event, validate that it is the only one with the provided name for this scope
-    if(hasMultipleSignalEventDefinitionsWithSameName(subscription, eventDefinitions.values())){
+    if (hasMultipleSignalEventDefinitionsWithSameName(subscription, eventDefinitions.values())){
       addError("Cannot have more than one signal event subscription with name '" + subscription.getUnresolvedEventName() + "' for scope '" + scope.getId() + "'",
           element);
+    }
+
+    // if this is a conditional event, validate that it is the only one with the provided expression
+
+    if (subscription.isStartEvent() && hasMultipleConditionalEventDefinitionsWithSameExpr(subscription, eventDefinitions.values())) {
+      throw LOG.conditionalEventSubscriptionWithSameConditionExists(scope.getProcessDefinition().getDeploymentId(), ((ConditionalEventDefinition) subscription).getVariableName());
     }
 
     scope.getProperties().putMapEntry(BpmnProperties.EVENT_SUBSCRIPTION_DECLARATIONS, subscription.getActivityId(), subscription);
@@ -1183,6 +1194,18 @@ public class BpmnParse extends Parse {
         if (eventDefinition.getEventType().equals(eventType) && eventDefinition.getUnresolvedEventName().equals(subscription.getUnresolvedEventName())
             && eventDefinition.isStartEvent() == subscription.isStartEvent()) {
          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  protected boolean hasMultipleConditionalEventDefinitionsWithSameExpr(EventSubscriptionDeclaration subscription, Collection<EventSubscriptionDeclaration> eventDefinitions) {
+    if (subscription.getEventType().equals(EventType.CONDITONAL.name())) {
+      for (EventSubscriptionDeclaration eventDefinition : eventDefinitions) {
+        if (eventDefinition.getEventType().equals(EventType.CONDITONAL.name()) && ((ConditionalEventDefinition) eventDefinition).getVariableName().equals(((ConditionalEventDefinition) subscription).getVariableName())
+            && eventDefinition.isStartEvent() == subscription.isStartEvent()) {
+          return true;
         }
       }
     }
