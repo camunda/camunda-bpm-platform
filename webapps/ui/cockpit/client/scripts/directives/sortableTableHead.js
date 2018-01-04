@@ -11,7 +11,7 @@ var Directive = function() {
     scope: {
       headColumns: '=?',
       onSortChange: '&',
-      defaultSort: '=?',
+      defaultSort: '=?'
     },
     template: template,
     controller: ['$scope',
@@ -36,7 +36,6 @@ var Directive = function() {
         };
 
         $scope.evaluateCondition = function(condition) {
-          console.log(condition);
           return (typeof condition === 'undefined')?
             true:
             condition;
