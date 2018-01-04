@@ -53,7 +53,8 @@ public class CompiledExecutableScript extends ExecutableScript {
       if (e.getCause() instanceof BpmnError) {
         throw (BpmnError) e.getCause();
       }
-      throw new ScriptEvaluationException("Unable to evaluate script: " + e.getMessage(), e);
+      String activityIdMessage = getActivityIdExceptionMessage(variableScope);
+      throw new ScriptEvaluationException("Unable to evaluate script" + activityIdMessage +": " + e.getMessage(), e);
     }
   }
 

@@ -69,7 +69,8 @@ public class TargetVariableScopeTest {
     VariableMap variables = Variables.createVariables().putValue("orderIds", Arrays.asList(new int[]{1, 2, 3}));
     //fails due to inappropriate variable scope target
     thrown.expect(ScriptEvaluationException.class);
-    thrown.expectMessage(startsWith("Unable to evaluate script: org.camunda.bpm.engine.ProcessEngineException: ENGINE-20011 Scope with specified activity Id NOT_EXISTING and execution"));
+    ProcessDefinition processDefinition = engineRule.getRepositoryService().createProcessDefinitionQuery().processDefinitionKey("Process_MultiInstanceCallAcitivity").singleResult();
+    thrown.expectMessage(startsWith("Unable to evaluate script while executing activity 'CallActivity_1' in the process definition with id '" + processDefinition.getId() + "': org.camunda.bpm.engine.ProcessEngineException: ENGINE-20011 Scope with specified activity Id NOT_EXISTING and execution"));
     engineRule.getRuntimeService().startProcessInstanceByKey("Process_MultiInstanceCallAcitivity",variables);
   }
 

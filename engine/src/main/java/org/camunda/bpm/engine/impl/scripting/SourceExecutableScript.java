@@ -57,7 +57,15 @@ public class SourceExecutableScript extends CompiledExecutableScript {
       return super.evaluate(engine, variableScope, bindings);
     }
     else {
-      return evaluateScript(engine, bindings);
+      try {
+        return evaluateScript(engine, bindings);
+      } catch (ScriptException e) {
+        if (e.getCause() instanceof BpmnError) {
+          throw (BpmnError) e.getCause();
+        }
+        String activityIdMessage = getActivityIdExceptionMessage(variableScope);
+        throw new ScriptEvaluationException("Unable to evaluate script" + activityIdMessage + ":" + e.getMessage(), e);
+      }
     }
   }
 
@@ -108,16 +116,9 @@ public class SourceExecutableScript extends CompiledExecutableScript {
 
   }
 
-  protected Object evaluateScript(ScriptEngine engine, Bindings bindings) {
-    try {
-      LOG.debugEvaluatingNonCompiledScript(scriptSource);
-      return engine.eval(scriptSource, bindings);
-    } catch (ScriptException e) {
-      if (e.getCause() instanceof BpmnError) {
-        throw (BpmnError) e.getCause();
-      }
-      throw new ScriptEvaluationException("Unable to evaluate script: " + e.getMessage(), e);
-    }
+  protected Object evaluateScript(ScriptEngine engine, Bindings bindings) throws ScriptException {
+    LOG.debugEvaluatingNonCompiledScript(scriptSource);
+    return engine.eval(scriptSource, bindings);
   }
 
   public String getScriptSource() {

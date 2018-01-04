@@ -16,7 +16,10 @@ import javax.script.Bindings;
 import javax.script.ScriptEngine;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.delegate.DelegateCaseExecution;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.VariableScope;
+import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 
 /**
  * <p>Represents an executable script.</p>
@@ -54,6 +57,35 @@ public abstract class ExecutableScript {
    */
   public Object execute(ScriptEngine scriptEngine, VariableScope variableScope, Bindings bindings) {
     return evaluate(scriptEngine, variableScope, bindings);
+  }
+
+  protected String getActivityIdExceptionMessage(VariableScope variableScope) {
+    String activityId = null;
+    String definitionIdMessage = "";
+
+    if (variableScope instanceof DelegateExecution) {
+      activityId = ((DelegateExecution) variableScope).getCurrentActivityId();
+      definitionIdMessage = " in the process definition with id '" + ((DelegateExecution) variableScope).getProcessDefinitionId() + "'";
+    } else if (variableScope instanceof TaskEntity) {
+      TaskEntity task = (TaskEntity) variableScope;
+      if (task.getExecution() != null) {
+        activityId = task.getExecution().getActivityId();
+        definitionIdMessage = " in the process definition with id '" + task.getProcessDefinitionId() + "'";
+      }
+      if (task.getCaseExecution() != null) {
+        activityId = task.getCaseExecution().getActivityId();
+        definitionIdMessage = " in the case definition with id '" + task.getCaseDefinitionId() + "'";
+      }
+    } else if (variableScope instanceof DelegateCaseExecution) {
+      activityId = ((DelegateCaseExecution) variableScope).getActivityId();
+      definitionIdMessage = " in the case definition with id '" + ((DelegateCaseExecution) variableScope).getCaseDefinitionId() + "'";
+    }
+
+    if (activityId == null) {
+      return "";
+    } else {
+      return " while executing activity '" + activityId + "'" + definitionIdMessage;
+    }
   }
 
   protected abstract Object evaluate(ScriptEngine scriptEngine, VariableScope variableScope, Bindings bindings);

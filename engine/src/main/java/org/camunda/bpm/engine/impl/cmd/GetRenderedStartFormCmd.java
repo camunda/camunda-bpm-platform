@@ -16,7 +16,9 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
 
+import org.camunda.bpm.engine.ScriptEvaluationException;
 import org.camunda.bpm.engine.form.StartFormData;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -37,6 +39,7 @@ public class GetRenderedStartFormCmd implements Command<Object>, Serializable {
   private static final long serialVersionUID = 1L;
   protected String processDefinitionId;
   protected String formEngineName;
+  private static CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
 
   public GetRenderedStartFormCmd(String processDefinitionId, String formEngineName) {
     this.processDefinitionId = processDefinitionId;
@@ -67,6 +70,12 @@ public class GetRenderedStartFormCmd implements Command<Object>, Serializable {
 
     StartFormData startForm = startFormHandler.createStartFormData(processDefinition);
 
-    return formEngine.renderStartForm(startForm);
+    Object renderedStartForm = null;
+    try {
+      renderedStartForm = formEngine.renderStartForm(startForm);
+    } catch (ScriptEvaluationException e) {
+      LOG.exceptionWhenStartFormScriptEvaluation(processDefinitionId, e);
+    }
+    return renderedStartForm;
   }
 }

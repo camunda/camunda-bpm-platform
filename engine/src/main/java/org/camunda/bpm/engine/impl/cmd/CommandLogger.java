@@ -270,4 +270,11 @@ public class CommandLogger extends ProcessEngineLogger {
       historicProcessInstance.getProcessDefinitionId()
     ));
   }
+
+  public ProcessEngineException exceptionWhenStartFormScriptEvaluation(String processDefinitionId, Throwable cause) {
+    return new ProcessEngineException(exceptionMessage(
+        "041",
+        "Unable to evaluate script when rendering start form of the process definition '{}'.",
+        processDefinitionId));
+  }
 }
