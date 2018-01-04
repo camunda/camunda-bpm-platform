@@ -36,11 +36,11 @@ module.exports = function() {
         };
 
         function saveLocal(sortObj) {
-          localConf.set('sortProcessDefTab', sortObj);
+          localConf.set('sortDecDefTab', sortObj);
 
         }
         function loadLocal(defaultValue) {
-          return localConf.get('sortProcessDefTab', defaultValue);
+          return localConf.get('sortDecDefTab', defaultValue);
         }
 
 
