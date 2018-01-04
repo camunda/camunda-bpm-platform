@@ -19,8 +19,6 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
 
         var processDefinitionService = camAPI.resource('process-definition');
 
-
-
         $scope.processesActions = Views.getProviders({ component: 'cockpit.processes.action'});
         $scope.hasActionPlugin = $scope.processesActions.length > 0;
 
@@ -84,8 +82,6 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
           processDefinitionService.list({
             latest: true
           }, function(err, data) {
-            console.log(data);
-
             $scope.processDefinitionData = data.items;
             $scope.processDefinitionsCount = data.count;
             if (err) {
@@ -157,42 +153,6 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
         function loadLocal(defaultValue) {
           return localConf.get('sortProcessDefTab', defaultValue);
         }
-
-    /*    function sortTable(data,sortBy,sortOrder) {
-          // sort by value
-          data.sort(function (a, b) {
-            return a.value - b.value;
-          });
-          return data;
-        }
-
-        function sortByValue() {
-          return function(a, b) {
-            return a.value - b.value;
-          };
-        }
-
-        function sortByName() {
-          return function(a, b) {
-            var nameA = a.name.toUpperCase(); // ignore upper and lowercase
-            var nameB = b.name.toUpperCase(); // ignore upper and lowercase
-            if (nameA < nameB) {
-              return -1;
-            }
-            if (nameA > nameB) {
-              return 1;
-            }
-
-            // names must be equal
-            return 0;
-          };
-        }
-*/
-
-
-
-
-
 
       }],
 
