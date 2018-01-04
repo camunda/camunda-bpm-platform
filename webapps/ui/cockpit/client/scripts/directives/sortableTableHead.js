@@ -11,7 +11,7 @@ var Directive = function() {
     scope: {
       headColumns: '=?',
       onSortChange: '&',
-      defaultSort: '=?'
+      defaultSort: '=?',
     },
     template: template,
     controller: ['$scope',
@@ -34,6 +34,15 @@ var Directive = function() {
           $scope.defaultSort.sortOrder = ($scope.defaultSort.sortOrder === 'desc') ? 'asc' : 'desc';
           $scope.onSortChange({ sortObj: $scope.defaultSort });
         };
+
+        $scope.evaluateCondition = function(condition) {
+          console.log(condition);
+          return (typeof condition === 'undefined')?
+            true:
+            condition;
+        };
+
+
 
       }],
     link: function() {}

@@ -17,15 +17,29 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
       '$translate',
       function($scope, Views, camAPI, localConf, $translate) {
 
+        var processDefinitionService = camAPI.resource('process-definition');
+
+
+
+        $scope.processesActions = Views.getProviders({ component: 'cockpit.processes.action'});
+        $scope.hasActionPlugin = $scope.processesActions.length > 0;
+
+        var processInstancePlugins = Views.getProviders({ component: 'cockpit.processInstance.view' });
+        $scope.hasHistoryPlugin = processInstancePlugins.filter(function(plugin) {
+          return plugin.id === 'history';
+        }).length > 0;
+        $scope.hasReportPlugin = Views.getProviders({ component: 'cockpit.report' }).length > 0;
+        $scope.hasSearchPlugin = Views.getProviders( { component: 'cockpit.processes.dashboard', id: 'search-process-instances' }).length > 0;
+
         $scope.headColumns = [
           { class: 'state',    request: '', sortable: false, content: $translate.instant('PLUGIN_PROCESS_DEF_STATE')},
           { class: 'incidents',request: 'incidentCount', sortable: true,  content: $translate.instant('PLUGIN_PROCESS_DEF_INCIDENTS')},
           { class: 'instances',request: 'instances'    , sortable: true, content: $translate.instant('PLUGIN_PROCESS_DEF_RUNNING_INSTANCES')},
           { class: 'name',     request: 'key'          , sortable: true, content: $translate.instant('PLUGIN_PROCESS_DEF_NAME')},
           { class: 'tenantID', request: 'tenantId'     , sortable: true, content: $translate.instant('PLUGIN_PROCESS_DEF_TENANT_ID')},
-          { class: 'history',  request: '', sortable: false, content: $translate.instant('PLUGIN_PROCESS_DEF_HISTORY_VIEW')},
-          { class: 'report',   request: '', sortable: false, content: $translate.instant('PLUGIN_PROCESS_DEF_REPORT')},
-          { class: 'action',   request: '', sortable: false, content: $translate.instant('PLUGIN_PROCESS_DEF_ACTION')}
+          { class: 'history',  request: '', sortable: false, content: $translate.instant('PLUGIN_PROCESS_DEF_HISTORY_VIEW'), condition: $scope.hasReportPlugin},
+          { class: 'report',   request: '', sortable: false, content: $translate.instant('PLUGIN_PROCESS_DEF_REPORT'), condition: $scope.hasReportPlugin},
+          { class: 'action',   request: '', sortable: false, content: $translate.instant('PLUGIN_PROCESS_DEF_ACTION'), condition: $scope.hasActionPlugin}
         ];
 
         // Default sorting
@@ -35,36 +49,23 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
         // Update Table
         $scope.onSortChange = function(sortObj) {
           sortObj = sortObj || $scope.sortObj;
-          // transforms sortOrder in anqular required boolean;
+          // transforms sortOrder to boolean required by anqular-sorting;
           sortObj.sortReverse = sortObj.sortOrder !== 'asc';
           saveLocal(sortObj);
           $scope.sortObj = sortObj;
         };
 
-
+        var processData = $scope.processData.newChild($scope);
 
         var getPDIncidentsCount = function(incidents) {
-          if(!incidents) {
-            return 0;
-          }
-
+          if(!incidents) { return 0;}
           return incidents.reduce(function(sum, incident) {
             return sum + incident.incidentCount;
           }, 0);
         };
 
-        var processInstancePlugins = Views.getProviders({ component: 'cockpit.processInstance.view' });
-
-        var processData = $scope.processData.newChild($scope);
-
-        $scope.hasHistoryPlugin = processInstancePlugins.filter(function(plugin) {
-          return plugin.id === 'history';
-        }).length > 0;
-        $scope.hasReportPlugin = Views.getProviders({ component: 'cockpit.report' }).length > 0;
-        $scope.hasSearchPlugin = Views.getProviders( { component: 'cockpit.processes.dashboard', id: 'search-process-instances' }).length > 0;
-
-        var processDefinitionService = camAPI.resource('process-definition');
         $scope.loadingState = 'LOADING';
+
 
         // only get count of process definitions
         var countProcessDefinitions =  function() {
@@ -113,9 +114,6 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
           });
         };
 
-
-        $scope.processesActions = Views.getProviders({ component: 'cockpit.processes.action'});
-        $scope.hasActionPlugin = $scope.processesActions.length > 0;
         $scope.definitionVars = { read: [ 'pd' ] };
 
         var removeActionDeleteListener = $scope.$on('processes.action.delete', function(event, definitionId) {
