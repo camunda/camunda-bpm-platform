@@ -10,16 +10,14 @@
 
     <table class="decision-definitions-list cam-table"
            ng-if="decisionCount">
-      <thead>
-      <tr>
-        <th class="name">{{ 'PLUGIN_DECISION_TABLE_NAME' | translate }}</th>
-        <th class="tenant-id">{{ 'PLUGIN_DECISION_TABLE_TENANT_ID' | translate }}</th>
-        <th class="tenant-id" ng-if="isDrdAvailable">{{ 'PLUGIN_DECISION_TABLE_DECISION_REQUIREMENTS' | translate }}</th>
-      </tr>
-      </thead>
 
+      <thead sortable-table-head
+             head-columns="headColumns"
+             on-sort-change="onSortChange(sortObj)"
+             default-sort="sortObj">
+      </thead>
       <tbody>
-      <tr ng-repeat="decision in decisions | orderBy:['name || key','tenantId']:false">
+      <tr ng-repeat="decision in decisions | orderBy:sortObj.sortBy:sortObj.sortReverse">
         <td class="name">
           <a href="#/decision-definition/{{ decision.id }}">
             {{ decision.name || decision.key }}
