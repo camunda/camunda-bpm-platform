@@ -12,7 +12,6 @@
       <div class="row">
         <h1 class="col-xs-6 section-title">{{ processDefinitionsCount }} {{ (processDefinitionsCount > 1 ? 'PLUGIN_PROCESS_DEF_PROCESS_DEFINITIONS_DEPLOYED' : 'PLUGIN_PROCESS_DEF_PROCESS_DEFINITION_DEPLOYED' | translate) }}</h1>
 
-
         <div class="col-xs-6 text-right" ng-if="activeSection">
           <ul class="nav nav-tabs">
             <li ng-class="{active: activeTab === 'list'}">
@@ -42,7 +41,7 @@
              class="process-definitions-list cam-table">
         <thead sortable-table-head
                head-columns="headColumns"
-               on-sort-change="onSortChange(query, pages, sortObj)"
+               on-sort-change="onSortChange(sortObj)"
                default-sort="sortObj">
         </thead>
         <tbody>
