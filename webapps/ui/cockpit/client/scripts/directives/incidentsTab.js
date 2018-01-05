@@ -77,7 +77,8 @@ var Directive = [
       scope.incidents = null;
 
       scope.onPaginationChange = function onPaginationChange(pages) {
-        scope.pages = pages;
+        scope.pages.current = pages.current;
+        updateView();
       };
 
       scope.getIncidentState = function(incident) {
