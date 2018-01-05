@@ -29,8 +29,6 @@ var Directive = [
       setHeader();
 
       function setHeader() {
-        var defaultSort = {sortBy: 'incidentType', sortOrder: 'asc'};
-
         var commonClasses = [
           'activity',
           'cause instance-id uuid',
@@ -46,7 +44,7 @@ var Directive = [
             'create-time',
             'end-time'
           ];
-          scope.headColumns = setColumns(availableColumns,histColClasses.concat(commonClasses));
+          scope.headColumns = setColumns(availableColumns, histColClasses.concat(commonClasses));
           scope.localConfKey = 'sortHistInci';
 
         } else {
@@ -58,19 +56,20 @@ var Directive = [
           scope.localConfKey = 'sortInci';
         }
 
+        var defaultSort = {sortBy: 'incidentType', sortOrder: 'asc'};
         scope.sortObj = loadLocal(defaultSort);
       }
 
-      function setColumns(availableColObjs, selectedColClasses) {
-        var Cols = [];
+      function setColumns(availableColumns, selectedColClasses) {
+        var columns = [];
 
         selectedColClasses.forEach(function(selectedColumnClass) {
-          var classObj = availableColObjs.filter(function(columnObj) {
-            return columnObj.class === selectedColumnClass;
+          var matchedColumn = availableColumns.filter(function(column) {
+            return column.class === selectedColumnClass;
           })[0];
-          Cols.push(classObj);
+          columns.push(matchedColumn);
         });
-        return Cols;
+        return columns;
       }
 
       var incidentData = scope.processData.newChild(scope);
@@ -117,7 +116,7 @@ var Directive = [
           return $q.when(null);
         }
 
-        if(pages) {
+        if (pages) {
           scope.pages = pages;
         }
 
@@ -146,7 +145,7 @@ var Directive = [
 
         // Add default sorting param
         if (sortObj) {
-          defaultParams.sortBy    = scope.sortObj.sortBy;
+          defaultParams.sortBy = scope.sortObj.sortBy;
           defaultParams.sortOrder = scope.sortObj.sortOrder;
           saveLocal(sortObj);
         }
@@ -156,7 +155,7 @@ var Directive = [
           maxResults: count
         };
 
-        var params = angular.extend({}, filter, defaultParams,queryParams);
+        var params = angular.extend({}, filter, defaultParams, queryParams);
 
         params.activityIdIn = params.activityIds;
         delete params.activityIds;
