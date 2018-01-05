@@ -13,8 +13,22 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
     label: 'DECISION_DEFINITION_LABEL',
     template: template,
     controller: [
-      '$scope', '$location', 'search', 'routeUtil', 'camAPI', 'Views', '$translate',
-      function($scope,   $location,   search,   routeUtil,   camAPI,   Views, $translate) {
+      '$scope', '$location', 'search', 'routeUtil', 'camAPI', 'Views', '$translate', 'localConf',
+      function($scope,   $location,   search,   routeUtil,   camAPI,   Views, $translate, localConf) {
+
+        $scope.headColumns = [
+          { class: 'instance-id',    request: ''          , sortable: false, content: $translate.instant('PLUGIN_DECISION_ID')},
+          { class: 'start-time',     request: 'evaluationTime'     , sortable: true, content: $translate.instant('PLUGIN_DECISION_EVALUATION_TIME')},
+          { class: 'definition-key', request: '', sortable: false, content: $translate.instant('PLUGIN_DECISION_CALLING_PROCESS_CASE')},
+          { class: 'instance-id',    request: '', sortable: false, content: $translate.instant('PLUGIN_DECISION_CALLING_INSTANCE_ID')},
+          { class: 'activity-id',    request: '', sortable: false, content: $translate.instant('PLUGIN_DECISION_ACTIVITY_ID')}
+        ];
+
+        // Default sorting
+        var defaultValue = { sortBy: 'evaluationTime', sortOrder: 'desc'};
+        $scope.sortObj   = loadLocal(defaultValue);
+
+
         var processInstancePlugins = Views.getProviders({ component: 'cockpit.processInstance.view' });
         var hasHistoryPlugin = processInstancePlugins.filter(function(plugin) {
           return plugin.id === 'history';
@@ -73,22 +87,32 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
         var historyService = camAPI.resource('history');
 
         $scope.onSearchChange = updateView;
+        $scope.onSortChange = updateView;
 
-        function updateView(searchQuery, pages) {
-          var page = pages.current,
-              count = pages.size,
+
+        function updateView(searchQuery, pages, sortObj) {
+          $scope.pagesObj = pages   || $scope.pagesObj;
+          $scope.sortObj  = sortObj || $scope.sortObj;
+
+          // Add default sorting param
+          if(sortObj) {
+            saveLocal(sortObj);
+          }
+
+          var page = $scope.pagesObj.current,
+              count = $scope.pagesObj.size,
               firstResult = (page - 1) * count;
 
           $scope.decisionInstances = null;
           $scope.loadingState = 'LOADING';
-
+          
           var decisionInstanceQuery = angular.extend(
             {
               decisionDefinitionId: $scope.decisionDefinition.id,
               firstResult: firstResult,
               maxResults: count,
-              sortBy: 'evaluationTime',
-              sortOrder: 'desc'
+              sortBy: $scope.sortObj.sortBy,
+              sortOrder: $scope.sortObj.sortOrder
             },
             searchQuery
           );
@@ -115,6 +139,17 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
                 });
             });
         }
+
+        function saveLocal(sortObj) {
+          localConf.set('sortDecInstTab', sortObj);
+
+        }
+        function loadLocal(defaultValue) {
+          return localConf.get('sortDecInstTab', defaultValue);
+        }
+
+
+
       }],
     priority: 10
   });
