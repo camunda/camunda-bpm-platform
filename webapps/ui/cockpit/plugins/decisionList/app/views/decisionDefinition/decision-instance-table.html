@@ -5,7 +5,7 @@
      variable-types="['variableValues']"
      on-search-change="onSearchChange(query, pages)"
      loading-state="loadingState"
-     text-empty="No decision instances matched by current filter"
+     text-empty="{{ 'PLUGIN_DECISION_TABLE_NOT_FOUND' | translate }}"
      storage-group="'DI'">
 
   <table class="decision-instances cam-table cam-fixed-layout">
