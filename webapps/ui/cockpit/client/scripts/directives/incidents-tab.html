@@ -65,20 +65,15 @@
         <i>Message is null.</i>
       </td>
 
-      <td ng-if="incident.incidentTimestamp !== undefined" class="timestamp">
+      <td  ng-if="incidentsContext !== 'history'" class="timestamp">
         {{ incident.incidentTimestamp | camDate }}
       </td>
-
-
-      <td ng-if="incident.createTime !== undefined"class="create-time">
+      <td ng-if="incidentsContext === 'history'" class="create-time">
         {{ incident.createTime | camDate }}
       </td>
-
-      <td ng-if="incident.endTime !== undefined"class="end-time">
+      <td ng-if="incidentsContext === 'history'" class="end-time">
         {{ incident.endTime | camDate }}
       </td>
-
-
       <td class="activity">
         <span ng-show="incident.linkable && processDefinition"
               cam-select-activity="incident.activityId"
