@@ -20,8 +20,8 @@ var Directive = [
         { class: 'timestamp',  request: 'incidentTimestamp', sortable: true, content: $translate.instant('PLUGIN_INCIDENTS_TAB_TIMESTAMP')},
         { class: 'message',    request: '',                  sortable: false, content: $translate.instant('PLUGIN_INCIDENTS_TAB_MESSAGE')},
         { class: 'activity',   request: 'activityId',        sortable: true, content: $translate.instant('PLUGIN_INCIDENTS_TAB_ACTIVITY')},
-        { class: 'cause instance-id uuid',      request: 'causeIncidentProcessInstanceId',     sortable: true, content: $translate.instant('PLUGIN_INCIDENTS_TAB_CAUSE_INSTANCE_ID')},
-        { class: 'cause-root instance-id uuid', request: 'rootCauseIncidentProcessInstanceId', sortable: true, content: $translate.instant('PLUGIN_INCIDENTS_TAB_CAUSE_ROOT_INSTANCE_ID')},
+        { class: 'cause instance-id uuid',      request: 'causeIncidentProcessInstanceId',     sortable: false, content: $translate.instant('PLUGIN_INCIDENTS_TAB_CAUSE_INSTANCE_ID')},
+        { class: 'cause-root instance-id uuid', request: 'rootCauseIncidentProcessInstanceId', sortable: false, content: $translate.instant('PLUGIN_INCIDENTS_TAB_CAUSE_ROOT_INSTANCE_ID')},
         { class: 'type',       request: 'incidentType',      sortable: true, content: $translate.instant('PLUGIN_INCIDENTS_TAB_TYPE')},
         { class: 'action',     request: '',                  sortable: false, content: $translate.instant('PLUGIN_INCIDENTS_TAB_ACTION')}
       ];
