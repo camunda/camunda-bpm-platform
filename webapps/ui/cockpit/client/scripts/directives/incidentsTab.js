@@ -156,7 +156,7 @@ var Directive = [
 
         var params = angular.extend({}, filter, defaultParams, queryParams);
 
-        params.activityId = params.activityIds;
+        params.activityIdIn = params.activityIds;
         delete params.activityIds;
 
         var baseUrl = scope.incidentsContext === 'history' ? baseHistoricUrl : baseRuntimeUrl;
