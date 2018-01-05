@@ -1,7 +1,6 @@
 'use strict';
 
 var angular = require('angular');
-var $ = require('jquery');
 
 var fs = require('fs');
 
@@ -26,45 +25,52 @@ var Directive = [
         { class: 'action',     request: '',                  sortable: false, content: $translate.instant('PLUGIN_INCIDENTS_TAB_ACTION')}
       ];
 
-
       scope.onSortChange = updateView;
       setHeader();
 
       function setHeader() {
-        var defaultSort;
+        var defaultSort = {sortBy: 'incidentType', sortOrder: 'asc'};
+
+        var commonClasses = [
+          'activity',
+          'cause instance-id uuid',
+          'cause-root instance-id uuid',
+          'type',
+          'action'
+        ];
 
         if (scope.incidentsContext === 'history') {
           var histColClasses = [
             'state',
             'message',
             'create-time',
-            'end-time',
-            'activity',
-            'cause instance-id uuid',
-            'cause-root instance-id uuid',
-            'type',
-            'action'
+            'end-time'
           ];
-
-          scope.headColumns = setHistoryColumns(availableColumns,histColClasses);
-          defaultSort = {sortBy: 'incidentType', sortOrder: 'asc'};
+          scope.headColumns = setColumns(availableColumns,histColClasses.concat(commonClasses));
           scope.localConfKey = 'sortHistInci';
+
         } else {
           var runtimeColClasses = [
             'message',
-            'timestamp',
-            'activity',
-            'cause instance-id uuid',
-            'cause-root instance-id uuid',
-            'type',
-            'action'
+            'timestamp'
           ];
-          scope.headColumns = setRuntimeColumns(availableColumns, runtimeColClasses);
-          defaultSort = {sortBy: 'incidentType', sortOrder: 'asc'};
+          scope.headColumns = setColumns(availableColumns, runtimeColClasses.concat(commonClasses));
           scope.localConfKey = 'sortInci';
         }
 
         scope.sortObj = loadLocal(defaultSort);
+      }
+
+      function setColumns(availableColObjs, selectedColClasses) {
+        var Cols = [];
+
+        selectedColClasses.forEach(function(selectedColumnClass) {
+          var classObj = availableColObjs.filter(function(columnObj) {
+            return columnObj.class === selectedColumnClass;
+          })[0];
+          Cols.push(classObj);
+        });
+        return Cols;
       }
 
       var incidentData = scope.processData.newChild(scope);
@@ -104,18 +110,14 @@ var Directive = [
         });
 
       function updateView(query, pages, sortObj) {
-        scope.pagesObj = query || scope.pagesObj;
         scope.sortObj = sortObj || scope.sortObj;
-
-
-        saveLocal(scope.sortObj);
 
         if (!scope.filter || !scope.bpmnElements || !scope.activityIdToInstancesMap) {
           // return empty promise
           return $q.when(null);
         }
 
-        if (pages) {
+        if(pages) {
           scope.pages = pages;
         }
 
@@ -129,10 +131,10 @@ var Directive = [
         delete filter.activityInstanceIds;
         delete filter.scrollToBpmnElement;
 
-        var page = scope.pages.current,
-            queryParams = scope.queryObj,
-            count = scope.pages.size,
-            firstResult = (page - 1) * count;
+        var page =  scope.pages.current,
+            count =  scope.pages.size,
+            firstResult = (page - 1) * count,
+            queryParams = query || {};
 
         var defaultParams;
 
@@ -154,7 +156,7 @@ var Directive = [
           maxResults: count
         };
 
-        var params = angular.extend({}, filter, defaultParams, queryParams);
+        var params = angular.extend({}, filter, defaultParams,queryParams);
 
         params.activityIdIn = params.activityIds;
         delete params.activityIds;
@@ -205,29 +207,6 @@ var Directive = [
       scope.incidentVars = { read: ['incident', 'processData', 'filter']};
       scope.incidentActions = Views.getProviders({ component: 'cockpit.incident.action' });
 
-      function setRuntimeColumns(availableColObjs, runtimeColClasses) {
-        var runtimeCols = [];
-
-        runtimeColClasses.forEach(function(el) {
-          var classObj = $.grep(availableColObjs, function(obj) {
-            return obj.class === el;
-          })[0];
-          runtimeCols.push(classObj);
-        });
-        return runtimeCols;
-      }
-
-      function setHistoryColumns( availableColObjs, histColClasses) {
-        var historyCols = [];
-
-        histColClasses.forEach(function(el) {
-          var classObj = $.grep(availableColObjs, function(obj) {
-            return obj.class === el;
-          })[0];
-          historyCols.push(classObj);
-        });
-        return historyCols;
-      }
 
       function saveLocal(sortObj) {
         localConf.set(scope.localConfKey, sortObj);
