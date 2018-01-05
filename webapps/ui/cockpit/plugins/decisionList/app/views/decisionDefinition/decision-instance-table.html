@@ -9,15 +9,13 @@
      storage-group="'DI'">
 
   <table class="decision-instances cam-table cam-fixed-layout">
-    <thead>
-      <tr>
-        <th class="instance-id">{{ 'PLUGIN_DECISION_ID' | translate }}</th>
-        <th class="start-time">{{ 'PLUGIN_DECISION_EVALUATION_TIME' | translate }}</th>
-        <th class="definition-key">{{ 'PLUGIN_DECISION_CALLING_PROCESS_CASE' | translate }}</th>
-        <th class="instance-id">{{ 'PLUGIN_DECISION_CALLING_INSTANCE_ID' | translate }}</th>
-        <th class="activity-id">{{ 'PLUGIN_DECISION_ACTIVITY_ID' | translate }}</th>
-      </tr>
+
+    <thead sortable-table-head
+           head-columns="headColumns"
+           on-sort-change="onSortChange(searchQuery, pages, sortObj)"
+           default-sort="sortObj">
     </thead>
+
     <tbody>
       <tr ng-repeat="decisionInstance in decisionInstances">
         <td class="instance-id"
