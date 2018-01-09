@@ -23,7 +23,7 @@ var Controller = [
     ];
 
     // Default sorting
-    $scope.sortObj   = loadLocal({ sortBy: 'state', sortOrder: 'asc', sortReverse: false});
+    $scope.sortObj   = loadLocal({ sortBy: 'suspended', sortOrder: 'asc', sortReverse: false});
 
 
     $scope.onSortChange = function(sortObj) {
