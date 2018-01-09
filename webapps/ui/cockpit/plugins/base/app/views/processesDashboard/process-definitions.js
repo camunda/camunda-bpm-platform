@@ -130,6 +130,11 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
           removeActionDeleteListener();
         });
 
+        $scope.incidentsLink = '#/processes?searchQuery=%5B%7B%22type%22:%22PIincidentStatus%22,%22operator%22:' +
+          '%22eq%22,%22value%22:%22open%22,%22name%22:%22%22%7D,%7B%22type%22:%22PIprocessDefinitionKey%22,' +
+          '%22operator%22:%22eq%22,%22value%22:%22PD_KEY%22,%22name%22:%22%22%7D%5D#search-section';
+
+
         $scope.activeTab = 'list';
 
         $scope.selectTab = function(tab) {

@@ -48,8 +48,8 @@
           <tr ng-repeat="pd in processDefinitionData | orderBy:sortObj.sortBy:sortObj.sortReverse">
             <td class="state">
               <div ng-if="!!pd.incidents" state-circle incidents="pd.incidents">
-                <a ng-if="pd.incidents.length && hasSearchPlugin"
-                   ng-href="#/processes?searchQuery=%5B%7B%22type%22:%22PIincidentStatus%22,%22operator%22:%22eq%22,%22value%22:%22open%22,%22name%22:%22%22%7D,%7B%22type%22:%22PIprocessDefinitionKey%22,%22operator%22:%22eq%22,%22value%22:%22{{pd.key}}%22,%22name%22:%22%22%7D%5D#search-section"
+                <a ng-if="pd.incidentCount && hasSearchPlugin"
+                   ng-href="{{ incidentsLink.replace('PD_KEY', pd.key) }}"
                    class="incidents-link"></a>
               </div>
               <div ng-if="!pd.incidents">
@@ -57,8 +57,12 @@
               </div>
             </td>
 
-            <td class="state">
-              {{ pd.incidentCount }}
+            <td class="incidents">
+              <a ng-if="pd.incidentCount && hasSearchPlugin"
+                 ng-href="{{ incidentsLink.replace('PD_KEY', pd.key) }}">
+                {{ pd.incidentCount }}
+              </a>
+              <span ng-if="!pd.incidentCount || !hasSearchPlugin">{{ pd.incidentCount }}</span>
             </td>
 
             <td ng-if="pd.instances >= 0" class="instances">
