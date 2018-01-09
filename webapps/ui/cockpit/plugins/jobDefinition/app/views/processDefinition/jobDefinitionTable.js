@@ -9,7 +9,40 @@ var template = fs.readFileSync(__dirname + '/job-definition-table.html', 'utf8')
 var Controller = [
   '$scope',
   'Views',
-  function($scope, Views) {
+  '$translate',
+  'localConf',
+  function($scope, Views, $translate, localConf) {
+
+    $scope.headColumns = [
+      { class: 'state',         request: 'suspended'     , sortable: true, content: $translate.instant('PLUGIN_JOBDEFINITION_STATE')},
+      { class: 'activity',      request: 'activityName'     , sortable: true, content: $translate.instant('PLUGIN_JOBDEFINITION_ACTIVITY')},
+      { class: 'type',          request: 'jobType'         , sortable: true, content: $translate.instant('PLUGIN_JOBDEFINITION_TYPE')},
+      { class: 'configuration', request: 'jobConfiguration', sortable: true, content: $translate.instant('PLUGIN_JOBDEFINITION_CONFIGURATION')},
+      { class: 'overriding-job-priority', request: 'overridingJobPriority', sortable: true, content: $translate.instant('PLUGIN_JOBDEFINITION_JOB_PRIORITY')},
+      { class: 'action',        request: 'action', sortable: false, content: $translate.instant('PLUGIN_JOBDEFINITION_ACTION')}
+    ];
+
+    // Default sorting
+    $scope.sortObj   = loadLocal({ sortBy: 'state', sortOrder: 'asc', sortReverse: false});
+
+
+    $scope.onSortChange = function(sortObj) {
+      sortObj = sortObj || $scope.sortObj;
+      // sortReverse required by anqular-sorting;
+      sortObj.sortReverse = sortObj.sortOrder !== 'asc';
+      saveLocal(sortObj);
+      $scope.sortObj = sortObj;
+
+    };
+
+    function saveLocal(sortObj) {
+      localConf.set('sortJobDefTab', sortObj);
+
+    }
+    function loadLocal(defaultValue) {
+      return localConf.get('sortJobDefTab', defaultValue);
+    }
+
 
     var processData = $scope.processData.newChild($scope);
 
