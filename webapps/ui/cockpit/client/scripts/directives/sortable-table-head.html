@@ -1,5 +1,5 @@
 <!-- # CE - camunda-cockpit-ui/client/scripts/directives/sortable-table-head.html -->
-<th ng-repeat="column in headColumns" ng-class="column">
+<th ng-repeat="column in headColumns" ng-class="column.class">
   <span ng-if="evaluateCondition(column.condition)" class="{{column.class}}">{{ column.content}}</span>
   <a ng-if="column.sortable === true"
      ng-click="changeOrder(column.request)">
