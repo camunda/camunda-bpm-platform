@@ -17,9 +17,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
 import org.camunda.bpm.engine.impl.bpmn.parser.ConditionalEventDefinition;
 import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
+import org.camunda.bpm.engine.impl.cmd.CommandLogger;
 import org.camunda.bpm.engine.impl.event.EventType;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
@@ -30,6 +32,8 @@ import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 
 public class DefaultConditionHandler implements ConditionHandler {
+
+  private final static CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
 
   @Override
   public List<ConditionHandlerResult> correlateStartCondition(CommandContext commandContext, ConditionSet conditionSet) {
@@ -53,29 +57,15 @@ public class DefaultConditionHandler implements ConditionHandler {
 
         ActivityImpl activity = subscription.getActivity();
 
-        bruh(conditionSet, results, processDefinition, activity);
+        ConditionHandlerResult conditionResult = evaluateCondition(conditionSet, results, processDefinition, activity);
+        if (conditionResult != null) {
+          results.add(conditionResult);
+        }
 
       }
     }
 
     return results;
-  }
-
-  private void bruh(ConditionSet conditionSet, List<ConditionHandlerResult> results, ProcessDefinitionEntity processDefinition, ActivityImpl activity) {
-    ExecutionEntity temporaryExecution = new ExecutionEntity();
-    temporaryExecution.initializeVariableStore(conditionSet.getVariables());
-    temporaryExecution.setProcessDefinition(processDefinition);
-
-    ConditionalEventDefinition conditionalEventDefinition = activity.getProperties().get(BpmnProperties.CONDITIONAL_EVENT_DEFINITION);
-    try {
-      if (conditionalEventDefinition.evaluate(temporaryExecution)) {
-        results.add(new ConditionHandlerResult(processDefinition, activity));
-      }
-    } catch (ProcessEngineException e) {
-      if (!e.getMessage().contains("Unknown property used in expression:")) {
-        throw e;
-      }
-    }
   }
 
   protected List<EventSubscriptionEntity> findConditionalStartEventSubscriptions(CommandContext commandContext, ConditionSet conditionSet) {
@@ -103,7 +93,10 @@ public class DefaultConditionHandler implements ConditionHandler {
     if (processDefinition != null && !processDefinition.isSuspended()) {
       List<ActivityImpl> activities = findActivities(processDefinition);
       for (ActivityImpl activity : activities) {
-        bruh(conditionSet, results, processDefinition, activity);
+        ConditionHandlerResult conditionResult = evaluateCondition(conditionSet, results, processDefinition, activity);
+        if (conditionResult != null) {
+          results.add(conditionResult);
+        }
       }
     }
     return results;
@@ -121,6 +114,26 @@ public class DefaultConditionHandler implements ConditionHandler {
 
   protected boolean isConditionStartEventWithName(EventSubscriptionDeclaration declaration) {
     return EventType.CONDITONAL.name().equals(declaration.getEventType()) && declaration.isStartEvent();
+  }
+
+  protected ConditionHandlerResult evaluateCondition(ConditionSet conditionSet, List<ConditionHandlerResult> results, ProcessDefinitionEntity processDefinition, ActivityImpl activity) {
+    ExecutionEntity temporaryExecution = new ExecutionEntity();
+    temporaryExecution.initializeVariableStore(conditionSet.getVariables());
+    temporaryExecution.setProcessDefinition(processDefinition);
+
+    ConditionalEventDefinition conditionalEventDefinition = activity.getProperties().get(BpmnProperties.CONDITIONAL_EVENT_DEFINITION);
+    try {
+      if (conditionalEventDefinition.evaluate(temporaryExecution)) {
+        return new ConditionHandlerResult(processDefinition, activity);
+      }
+    } catch (ProcessEngineException e) {
+      if (!e.getMessage().contains("Unknown property used in expression:")) {
+        throw e;
+      } else {
+        LOG.debugConditionCorrelation(e.getMessage());
+      }
+    }
+    return null;
   }
 
 }

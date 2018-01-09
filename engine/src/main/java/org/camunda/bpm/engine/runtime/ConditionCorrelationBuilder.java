@@ -76,7 +76,7 @@ public interface ConditionCorrelationBuilder {
 
   /**
    * Specify that the condition can only be correlated on process
-   * definitions which belongs to the given tenant.
+   * definitions which belongs to no tenant.
    *
    * @return the builder
    */
