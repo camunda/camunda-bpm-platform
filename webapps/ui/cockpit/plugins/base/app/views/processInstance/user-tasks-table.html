@@ -3,19 +3,10 @@
      loading-state="{{ loadingState }}"
      text-empty="{{ 'PLUGIN_USER_TASKS_NO_USER_TASKS' | translate }}">
   <table class="process-instance user-tasks cam-table">
-    <thead>
-      <tr>
-        <th class="activity uuid">{{ 'PLUGIN_USER_TASKS_ACTIVITY' | translate }}</th>
-        <th class="assignee">{{ 'PLUGIN_USER_TASKS_ASSIGNEE' | translate }}</th>
-        <th class="owner">{{ 'PLUGIN_USER_TASKS_OWNER' | translate }}</th>
-        <th class="created">{{ 'PLUGIN_USER_TASKS_CREATED_DATE' | translate }}</th>
-        <th class="due">{{ 'PLUGIN_USER_TASKS_DUE_DATE' | translate }}</th>
-        <th class="follow-up">{{ 'PLUGIN_USER_TASKS_FOLLOW_UP_DATE' | translate }}</th>
-        <th class="priority">{{ 'PLUGIN_USER_TASKS_PRIORITY' | translate }}</th>
-        <th class="delegation-state">{{ 'PLUGIN_USER_TASKS_DELEGATION_STATE' | translate }}</th>
-        <th class="task-id uuid">{{ 'PLUGIN_USER_TASKS_TASK_ID' | translate }}</th>
-        <th class="action">{{ 'PLUGIN_USER_TASKS_ACTION' | translate }}</th>
-      </tr>
+    <thead sortable-table-head
+           head-columns="headColumns"
+           on-sort-change="onSortChange(sortObj)"
+           default-sort="sorting">
     </thead>
 
     <tbody>
