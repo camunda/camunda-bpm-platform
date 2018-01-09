@@ -83,31 +83,31 @@ module.exports = ['ViewsProvider', function(ViewsProvider) {
         };
 
         tasksPluginData.provide('openTaskCount', function() {
-          return provideResourceData('Open tasks', HistoryResource, 'taskCount', defaultParameter());
+          return provideResourceData($translate.instant('PLUGIN_TASK_ERROR_OPEN_TASKS'), HistoryResource, 'taskCount', defaultParameter());
         });
 
         tasksPluginData.provide('assignedToUserCount', function() {
           var params = defaultParameter();
           params.assigned = true;
-          return provideResourceData('Tasks assigned to users', HistoryResource, 'taskCount', params);
+          return provideResourceData($translate.instant('PLUGIN_TASK_ERROR_ASSIGNED_TO_USERS'), HistoryResource, 'taskCount', params);
         });
 
         tasksPluginData.provide('assignedToGroupCount', function() {
           var params = defaultParameter();
           params.unassigned = true;
           params.withCandidateGroups = true;
-          return provideResourceData('Tasks assigned to groups', HistoryResource, 'taskCount', params);
+          return provideResourceData($translate.instant('PLUGIN_TASK_ERROR_ASSIGNED_TO_GROUPS'), HistoryResource, 'taskCount', params);
         });
 
         tasksPluginData.provide('notAssignedCount', function() {
           var params = defaultParameter();
           params.unassigned = true;
           params.withoutCandidateGroups = true;
-          return provideResourceData('Unassigned tasks', HistoryResource, 'taskCount', params);
+          return provideResourceData($translate.instant('PLUGIN_TASK_ERROR_UNASSIGNED'), HistoryResource, 'taskCount', params);
         });
 
         tasksPluginData.provide('countByCandidateGroup', function() {
-          return provideResourceData('Tasks per group', TaskReportResource, 'countByCandidateGroup');
+          return provideResourceData($translate.instant('PLUGIN_TASK_ERROR_PER_GROUP'), TaskReportResource, 'countByCandidateGroup');
         });
 
         // -- observe task data --------------
@@ -133,7 +133,7 @@ module.exports = ['ViewsProvider', function(ViewsProvider) {
         });
 
         $scope.formatGroupName = function(name) {
-          return ( name == null ) ? 'without group' : name;
+          return ( name == null ) ? $translate.instant('PLUGIN_TASK_ASSIGNED_WITHOUT_GROUP') : name;
         };
 
         var taskDashboardPlugins = Views.getProviders({component: 'cockpit.tasks.dashboard'});
