@@ -122,7 +122,6 @@ import org.camunda.bpm.engine.impl.cmmn.transformer.CmmnTransformFactory;
 import org.camunda.bpm.engine.impl.cmmn.transformer.CmmnTransformListener;
 import org.camunda.bpm.engine.impl.cmmn.transformer.CmmnTransformer;
 import org.camunda.bpm.engine.impl.cmmn.transformer.DefaultCmmnTransformFactory;
-import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbIdGenerator;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManagerFactory;
 import org.camunda.bpm.engine.impl.db.entitymanager.cache.DbEntityCacheKeyMapping;
@@ -294,7 +293,9 @@ import org.camunda.bpm.engine.impl.persistence.entity.TaskReportManager;
 import org.camunda.bpm.engine.impl.persistence.entity.TenantManager;
 import org.camunda.bpm.engine.impl.persistence.entity.UserOperationLogManager;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceManager;
+import org.camunda.bpm.engine.impl.runtime.ConditionHandler;
 import org.camunda.bpm.engine.impl.runtime.CorrelationHandler;
+import org.camunda.bpm.engine.impl.runtime.DefaultConditionHandler;
 import org.camunda.bpm.engine.impl.runtime.DefaultCorrelationHandler;
 import org.camunda.bpm.engine.impl.scripting.ScriptFactory;
 import org.camunda.bpm.engine.impl.scripting.engine.BeansResolverFactory;
@@ -573,6 +574,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected CorrelationHandler correlationHandler;
 
+  protected ConditionHandler conditionHandler;
+
   /**
    * session factory to be used for obtaining identity provider sessions
    */
@@ -768,6 +771,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initEventHandlers();
     initProcessApplicationManager();
     initCorrelationHandler();
+    initConditionHandler();
     initIncidentHandlers();
     initPasswordDigest();
     initDeploymentRegistration();
@@ -2105,6 +2109,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   }
 
+  // condition handler //////////////////////////////////////////////////////
+  protected void initConditionHandler() {
+    if (conditionHandler == null) {
+      conditionHandler = new DefaultConditionHandler();
+    }
+  }
+
   // history handlers /////////////////////////////////////////////////////
 
   protected void initHistoryEventProducer() {
@@ -3071,6 +3082,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setCorrelationHandler(CorrelationHandler correlationHandler) {
     this.correlationHandler = correlationHandler;
+  }
+
+  public ConditionHandler getConditionHandler() {
+    return conditionHandler;
+  }
+
+  public void setConditionHandler(ConditionHandler conditionHandler) {
+    this.conditionHandler = conditionHandler;
   }
 
   public ProcessEngineConfigurationImpl setHistoryEventHandler(HistoryEventHandler historyEventHandler) {

@@ -923,7 +923,6 @@ public class BpmnParse extends Parse {
       ConditionalEventDefinition conditionalEventDefinition = parseConditionalEventDefinition(conditionEventDefinition, startEventActivity);
       conditionalEventDefinition.setStartEvent(true);
       conditionalEventDefinition.setActivityId(startEventActivity.getId());
-      conditionalEventDefinition.setVariableName(conditionEventDefinition.element("condition").getText());
       startEventActivity.getProperties().set(BpmnProperties.CONDITIONAL_EVENT_DEFINITION, conditionalEventDefinition);
 
       addEventSubscriptionDeclaration(conditionalEventDefinition, processDefinition, startEventElement);
@@ -1171,12 +1170,6 @@ public class BpmnParse extends Parse {
           element);
     }
 
-    // if this is a conditional event, validate that it is the only one with the provided expression
-
-    if (subscription.isStartEvent() && hasMultipleConditionalEventDefinitionsWithSameExpr(subscription, eventDefinitions.values())) {
-      throw LOG.conditionalEventSubscriptionWithSameConditionExists(scope.getProcessDefinition().getDeploymentId(), ((ConditionalEventDefinition) subscription).getVariableName());
-    }
-
     scope.getProperties().putMapEntry(BpmnProperties.EVENT_SUBSCRIPTION_DECLARATIONS, subscription.getActivityId(), subscription);
   }
 
@@ -1194,18 +1187,6 @@ public class BpmnParse extends Parse {
         if (eventDefinition.getEventType().equals(eventType) && eventDefinition.getUnresolvedEventName().equals(subscription.getUnresolvedEventName())
             && eventDefinition.isStartEvent() == subscription.isStartEvent()) {
          return true;
-        }
-      }
-    }
-    return false;
-  }
-
-  protected boolean hasMultipleConditionalEventDefinitionsWithSameExpr(EventSubscriptionDeclaration subscription, Collection<EventSubscriptionDeclaration> eventDefinitions) {
-    if (subscription.getEventType().equals(EventType.CONDITONAL.name())) {
-      for (EventSubscriptionDeclaration eventDefinition : eventDefinitions) {
-        if (eventDefinition.getEventType().equals(EventType.CONDITONAL.name()) && ((ConditionalEventDefinition) eventDefinition).getVariableName().equals(((ConditionalEventDefinition) subscription).getVariableName())
-            && eventDefinition.isStartEvent() == subscription.isStartEvent()) {
-          return true;
         }
       }
     }

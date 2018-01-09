@@ -13,46 +13,68 @@
 
 package org.camunda.bpm.engine.test.bpmn.event.conditional;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.event.EventType;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
-import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.rules.RuleChain;
 
-public class ConditionalStartEventTest extends PluggableProcessEngineTestCase {
+public class ConditionalStartEventTest {
 
-//  private List<EventSubscription> eventSubscriptions;
-//  private List<String> deploymentIds = new ArrayList<String>();
+  protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
 
+  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
-//  @After
-//  public void cleanUp() {
-//    for (String deploymentId : deploymentIds) {
-//      repositoryService.deleteDeployment(deploymentId, true);
-//    }
-//
-//    eventSubscriptions = runtimeService.createEventSubscriptionQuery().list();
-//    assertEquals(0, eventSubscriptions.size());
-//  }
+  @Rule
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
+
+  @Rule
+  public ExpectedException thrown= ExpectedException.none();
+
+  protected RepositoryService repositoryService;
+  protected RuntimeService runtimeService;
+
+  @Before
+  public void setUp() throws Exception {
+    repositoryService = engineRule.getRepositoryService();
+    runtimeService = engineRule.getRuntimeService();
+  }
 
   @Test
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/conditional/ConditionalStartEventTest.testSingleConditionalStartEvent.bpmn20.xml")
   public void testDeploymentCreatesSubscriptions() {
+    // given a deployed process
+
+    // when
     List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().list();
 
+    // then
     assertEquals(1, eventSubscriptions.size());
     assertEquals(EventType.CONDITONAL.name(), eventSubscriptions.get(0).getEventType());
   }
@@ -60,19 +82,21 @@ public class ConditionalStartEventTest extends PluggableProcessEngineTestCase {
   @Test
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/conditional/ConditionalStartEventTest.testSingleConditionalStartEvent.bpmn20.xml")
   public void testUpdateProcessVersionCancelsSubscriptions() {
-
+    // given a deployed process
     List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().list();
     List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
 
     assertEquals(1, eventSubscriptions.size());
     assertEquals(1, processDefinitions.size());
 
+    // when
     String deploymentId = repositoryService
         .createDeployment()
         .addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/conditional/ConditionalStartEventTest.testSingleConditionalStartEvent.bpmn20.xml")
         .deploy()
         .getId();
 
+    // then
     List<EventSubscription> newEventSubscriptions = runtimeService.createEventSubscriptionQuery().list();
     List<ProcessDefinition> newProcessDefinitions = repositoryService.createProcessDefinitionQuery().list();
 
@@ -97,16 +121,18 @@ public class ConditionalStartEventTest extends PluggableProcessEngineTestCase {
   }
 
   @Test
+  @Ignore("CAM-8664")
   public void testTwoEqualConditionalStartEvent() {
-    try {
-      repositoryService
-          .createDeployment()
-          .addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/conditional/ConditionalStartEventTest.testTwoEqualConditionalStartEvent.bpmn20.xml")
-          .deploy().getId();
-      fail("exception expected");
-    } catch (ProcessEngineException e) {
-      assertTrue(e.getMessage().contains("Error while parsing process"));
-    }
+    // given a deployed process
+
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("Error while parsing process");
+
+    // when
+    repositoryService
+    .createDeployment()
+        .addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/conditional/ConditionalStartEventTest.testTwoEqualConditionalStartEvent.bpmn20.xml")
+        .deploy();
 
     List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().list();
     assertEquals(0, eventSubscriptions.size());
@@ -115,11 +141,15 @@ public class ConditionalStartEventTest extends PluggableProcessEngineTestCase {
   @Test
   @Deployment
   public void testTrueConditionalStartEvent() {
+    // given a deployed process
+
+    // when
     List<ProcessInstance> conditionInstances = runtimeService
         .createConditionCorrelation()
         .setVariable("foo", "bar")
         .correlateStartConditions();
 
+    // when
     assertEquals(1, conditionInstances.size());
 
     List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().processDefinitionKey("trueConditionProcess").list();
@@ -131,11 +161,15 @@ public class ConditionalStartEventTest extends PluggableProcessEngineTestCase {
   @Test
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/conditional/ConditionalStartEventTest.testSingleConditionalStartEvent.bpmn20.xml")
   public void testVariableCondition() {
+    // given a deployed process
+
+    // when
     List<ProcessInstance> instances = runtimeService
         .createConditionCorrelation()
         .setVariable("foo", 1)
         .correlateStartConditions();
 
+    // then
     assertEquals(1, instances.size());
 
     VariableInstance vars = runtimeService.createVariableInstanceQuery().singleResult();
@@ -146,14 +180,17 @@ public class ConditionalStartEventTest extends PluggableProcessEngineTestCase {
   @Test
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/conditional/ConditionalStartEventTest.testSingleConditionalStartEvent.bpmn20.xml")
   public void testTransientVariableCondition() {
+    // given a deployed process
     VariableMap variableMap = Variables.createVariables()
         .putValueTyped("foo", Variables.integerValue(1, true));
 
+    // when
     List<ProcessInstance> instances = runtimeService
         .createConditionCorrelation()
         .setVariables(variableMap)
         .correlateStartConditions();
 
+    // then
     assertEquals(1, instances.size());
 
     VariableInstance vars = runtimeService.createVariableInstanceQuery().singleResult();
@@ -163,12 +200,16 @@ public class ConditionalStartEventTest extends PluggableProcessEngineTestCase {
   @Test
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/conditional/ConditionalStartEventTest.testSingleConditionalStartEvent.bpmn20.xml")
   public void testWithoutResult() {
-    try {
-      runtimeService.createConditionCorrelation().setVariable("foo", 0).correlateStartConditions();
-      fail("ProcessEngineException should be thrown");
-    } catch (ProcessEngineException e) {
-      Assert.assertTrue(e.getMessage().contains("No process instances were started during correlation of the conditional start events."));
-    }
+    // given a deployed process
+
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("No process instances were started during correlation of the conditional start events.");
+
+    // when
+    runtimeService
+      .createConditionCorrelation()
+      .setVariable("foo", 0)
+      .correlateStartConditions();
 
     assertNull(runtimeService.createVariableInstanceQuery().singleResult());
     assertNull(runtimeService.createProcessInstanceQuery().processDefinitionKey("conditionalEventProcess").singleResult());
@@ -177,17 +218,21 @@ public class ConditionalStartEventTest extends PluggableProcessEngineTestCase {
   @Test
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/conditional/ConditionalStartEventTest.testTrueConditionalStartEvent.bpmn20.xml")
   public void testWithoutVariables() throws Exception {
-    try {
-      runtimeService.createConditionCorrelation().correlateStartConditions();
-      fail("BadUserRequestException should be thrown");
-    } catch (BadUserRequestException e) {
-      Assert.assertTrue(e.getMessage().contains("Variables are mandatory"));
-    }
+    // given a deployed process
+
+    thrown.expect(BadUserRequestException.class);
+    thrown.expectMessage("Variables are mandatory");
+
+    // when
+    runtimeService
+        .createConditionCorrelation()
+        .correlateStartConditions();
   }
 
   @Test
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/conditional/ConditionalStartEventTest.testMultipleCondition.bpmn20.xml")
   public void testMultipleConditions() {
+    // given a deployed process with three conditional start events
     List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().list();
 
     assertEquals(3, eventSubscriptions.size());
@@ -199,11 +244,13 @@ public class ConditionalStartEventTest extends PluggableProcessEngineTestCase {
     variableMap.put("foo", 1);
     variableMap.put("bar", true);
 
+    // when
     List<ProcessInstance> resultInstances = runtimeService
         .createConditionCorrelation()
         .setVariables(variableMap)
         .correlateStartConditions();
 
+    // then
     assertEquals(2, resultInstances.size());
 
     List<ProcessInstance> instances = runtimeService.createProcessInstanceQuery().processDefinitionKey("multipleConditions").list();
@@ -215,6 +262,7 @@ public class ConditionalStartEventTest extends PluggableProcessEngineTestCase {
                             "org/camunda/bpm/engine/test/bpmn/event/conditional/ConditionalStartEventTest.testMultipleCondition.bpmn20.xml",
                             "org/camunda/bpm/engine/test/bpmn/event/conditional/ConditionalStartEventTest.testTrueConditionalStartEvent.bpmn20.xml" })
   public void testMultipleSubscriptions() {
+    // given three deployed processes
     List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().list();
 
     assertEquals(5, eventSubscriptions.size());
@@ -223,11 +271,13 @@ public class ConditionalStartEventTest extends PluggableProcessEngineTestCase {
     variableMap.put("foo", 1);
     variableMap.put("bar", true);
 
+    // when
     List<ProcessInstance> instances = runtimeService
         .createConditionCorrelation()
         .setVariables(variableMap)
         .correlateStartConditions();
 
+    // then
     assertEquals(4, instances.size());
   }
 
@@ -236,6 +286,7 @@ public class ConditionalStartEventTest extends PluggableProcessEngineTestCase {
                             "org/camunda/bpm/engine/test/bpmn/event/conditional/ConditionalStartEventTest.testMultipleCondition.bpmn20.xml",
                             "org/camunda/bpm/engine/test/bpmn/event/conditional/ConditionalStartEventTest.testTrueConditionalStartEvent.bpmn20.xml" })
   public void testMultipleSubscriptionsWithLessVariables() {
+    // given three deployed processes
     List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().list();
 
     assertEquals(5, eventSubscriptions.size());
@@ -243,11 +294,13 @@ public class ConditionalStartEventTest extends PluggableProcessEngineTestCase {
     Map<String, Object> variableMap = new HashMap<String, Object>();
     variableMap.put("foo", 1);
 
+    // when
     List<ProcessInstance> instances = runtimeService
         .createConditionCorrelation()
         .setVariables(variableMap)
         .correlateStartConditions();
 
+    // then
     assertEquals(3, instances.size());
   }
 
@@ -255,48 +308,62 @@ public class ConditionalStartEventTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/event/conditional/ConditionalStartEventTest.testSingleConditionalStartEvent.bpmn20.xml",
                             "org/camunda/bpm/engine/test/bpmn/event/conditional/ConditionalStartEventTest.testMultipleCondition.bpmn20.xml"})
   public void testWithBusinessKey() {
+    // given two deployed processes
     List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().list();
 
     assertEquals(4, eventSubscriptions.size());
 
+    // when
     List<ProcessInstance> instances = runtimeService
         .createConditionCorrelation()
         .setVariable("foo", 1)
-        .processInstanceBusinessKey("conditionalEventProcess")
+        .processInstanceBusinessKey("humuhumunukunukuapua")
         .correlateStartConditions();
 
-    assertEquals(1, instances.size());
-  }
-
-  @Test
-  @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/event/conditional/ConditionalStartEventTest.testSingleConditionalStartEvent.bpmn20.xml",
-                            "org/camunda/bpm/engine/test/bpmn/event/conditional/ConditionalStartEventTest.testMultipleCondition.bpmn20.xml"})
-  public void testWithNonExistingBusinessKey() {
-    List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().list();
-
-    assertEquals(4, eventSubscriptions.size());
-
-    try {
-      runtimeService
-        .createConditionCorrelation()
-        .setVariable("foo", 1)
-        .processInstanceBusinessKey("nonExisting")
-        .correlateStartConditions();
-      fail("Expected exception");
-    } catch (ProcessEngineException e) {
-      assertTrue(e.getMessage().contains("No process instances were started during correlation of the conditional start events."));
-    }
+    // then
+    assertEquals(2, instances.size());
+    assertEquals(2, runtimeService.createProcessInstanceQuery().processInstanceBusinessKey("humuhumunukunukuapua").count());
   }
 
   @Test
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/event/conditional/ConditionalStartEventTest.testSingleConditionalStartEvent.bpmn20.xml",
                             "org/camunda/bpm/engine/test/bpmn/event/conditional/ConditionalStartEventTest.testTrueConditionalStartEvent.bpmn20.xml" })
   public void testWithProcessDefinitionId() {
+    // given two deployed processes
     List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().list();
 
     assertEquals(2, eventSubscriptions.size());
 
     String processDefinitionId = repositoryService.createProcessDefinitionQuery().processDefinitionKey("trueConditionProcess").singleResult().getId();
+
+    // when
+    List<ProcessInstance> instances = runtimeService
+        .createConditionCorrelation()
+        .setVariable("foo", 1)
+        .processDefinitionId(processDefinitionId)
+        .correlateStartConditions();
+
+    // then
+    assertEquals(1, instances.size());
+  }
+
+  @Test
+  @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/event/conditional/ConditionalStartEventTest.testSingleConditionalStartEvent.bpmn20.xml",
+  "org/camunda/bpm/engine/test/bpmn/event/conditional/ConditionalStartEventTest.testMultipleCondition.bpmn20.xml"})
+  public void testWithProcessDefinitionFirstVersion() {
+    // given two deployed processes
+    String processDefinitionId = repositoryService.createProcessDefinitionQuery().processDefinitionKey("conditionalEventProcess").singleResult().getId();
+
+    // assume
+    List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().list();
+    assertEquals(4, eventSubscriptions.size());
+
+    // when
+    String deploymentId = repositoryService
+        .createDeployment()
+        .addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/conditional/ConditionalStartEventTest.testSingleConditionalStartEvent.bpmn20.xml")
+        .deploy()
+        .getId();
 
     List<ProcessInstance> instances = runtimeService
         .createConditionCorrelation()
@@ -304,26 +371,30 @@ public class ConditionalStartEventTest extends PluggableProcessEngineTestCase {
         .processDefinitionId(processDefinitionId)
         .correlateStartConditions();
 
+    // then
     assertEquals(1, instances.size());
+    assertEquals(processDefinitionId, instances.get(0).getProcessDefinitionId());
+
+    repositoryService.deleteDeployment(deploymentId, true);
   }
 
   @Test
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/event/conditional/ConditionalStartEventTest.testSingleConditionalStartEvent.bpmn20.xml",
                             "org/camunda/bpm/engine/test/bpmn/event/conditional/ConditionalStartEventTest.testTrueConditionalStartEvent.bpmn20.xml" })
   public void testWithNonExistingProcessDefinitionId() {
+    // given two deployed processes
     List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().list();
 
     assertEquals(2, eventSubscriptions.size());
 
-    try {
-      runtimeService
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("no deployed process definition found with id 'nonExistingId': processDefinition is null");
+
+    // when
+    runtimeService
         .createConditionCorrelation()
         .setVariable("foo", 1)
         .processDefinitionId("nonExistingId")
         .correlateStartConditions();
-      fail("Expected exception");
-    } catch (ProcessEngineException e) {
-      assertTrue(e.getMessage().contains("No process instances were started during correlation of the conditional start events."));
-    }
   }
 }

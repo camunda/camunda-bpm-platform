@@ -13,16 +13,20 @@
 
 package org.camunda.bpm.engine.test.api.multitenancy.tenantcheck;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.event.EventType;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.EventSubscription;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
@@ -60,66 +64,73 @@ public class MultiTenancyStartProcessInstanceByConditionCmdTenantCheckTest {
 
   @Test
   public void testNoAuthenticatedTenants() throws Exception {
+    // given
     testRule.deployForTenant(TENANT_ONE, PROCESS);
     testRule.deployForTenant(TENANT_TWO, PROCESS);
     testRule.deploy(PROCESS);
+
+    ensureEventSubscriptions(3);
 
     engineRule.getIdentityService().setAuthentication("user", null, null);
 
     Map<String, Object> variableMap = new HashMap<String, Object>();
     variableMap.put("foo", "bar");
 
-    engineRule.getRuntimeService()
+    // when
+    List<ProcessInstance> instances = engineRule.getRuntimeService()
       .createConditionCorrelation()
       .setVariables(variableMap)
       .correlateStartConditions();
 
+    // then
+    assertNotNull(instances);
+    assertEquals(1, instances.size());
+
     engineRule.getIdentityService().clearAuthentication();
 
     ProcessInstanceQuery processInstanceQuery = engineRule.getRuntimeService().createProcessInstanceQuery();
-    assertThat(processInstanceQuery.count(), is(1L));
-    assertThat(processInstanceQuery.withoutTenantId().count(), is(1L));
-
-    List<EventSubscription> eventSubscriptions = engineRule.getRuntimeService().createEventSubscriptionQuery().list();
-    assertEquals(3, eventSubscriptions.size());
-    for (EventSubscription eventSubscription : eventSubscriptions) {
-      assertEquals(EventType.CONDITONAL.name(), eventSubscription.getEventType());
-    }
+    assertEquals(1, processInstanceQuery.count());
+    assertEquals(1, processInstanceQuery.withoutTenantId().count());
   }
 
   @Test
   public void testWithAuthenticatedTenant() throws Exception {
+    // given
     testRule.deployForTenant(TENANT_ONE, PROCESS);
     testRule.deployForTenant(TENANT_TWO, PROCESS);
+
+    ensureEventSubscriptions(2);
 
     engineRule.getIdentityService().setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
     Map<String, Object> variableMap = new HashMap<String, Object>();
     variableMap.put("foo", "bar");
 
-    engineRule.getRuntimeService()
+    // when
+    List<ProcessInstance> processInstances = engineRule.getRuntimeService()
       .createConditionCorrelation()
       .setVariables(variableMap)
       .tenantId(TENANT_ONE)
       .correlateStartConditions();
 
+    // then
+    assertNotNull(processInstances);
+    assertEquals(1, processInstances.size());
+
     engineRule.getIdentityService().clearAuthentication();
 
     ProcessInstanceQuery processInstanceQuery = engineRule.getRuntimeService().createProcessInstanceQuery();
-    assertThat(processInstanceQuery.tenantIdIn(TENANT_ONE).count(), is(1L));
-    assertThat(processInstanceQuery.tenantIdIn(TENANT_TWO).count(), is(0L));
-
-    List<EventSubscription> eventSubscriptions = engineRule.getRuntimeService().createEventSubscriptionQuery().list();
-    assertEquals(2, eventSubscriptions.size());
-    for (EventSubscription eventSubscription : eventSubscriptions) {
-      assertEquals(EventType.CONDITONAL.name(), eventSubscription.getEventType());
-    }
+    assertEquals(1, processInstanceQuery.tenantIdIn(TENANT_ONE).count());
+    assertEquals(0, processInstanceQuery.tenantIdIn(TENANT_TWO).count());
   }
 
   @Test
   public void testDisabledTenantCheck() throws Exception {
+    // given
     testRule.deployForTenant(TENANT_ONE, PROCESS);
     testRule.deployForTenant(TENANT_TWO, PROCESS);
+
+    ensureEventSubscriptions(2);
 
     engineRule.getProcessEngineConfiguration().setTenantCheckEnabled(false);
     engineRule.getIdentityService().setAuthentication("user", null, null);
@@ -128,22 +139,82 @@ public class MultiTenancyStartProcessInstanceByConditionCmdTenantCheckTest {
     variableMap.put("foo", "bar");
 
     try {
+      // when
       engineRule.getRuntimeService()
         .createConditionCorrelation()
         .setVariables(variableMap)
         .correlateStartConditions();
       fail("Exception expected");
     } catch (Exception e) {
+      // then
       Assert.assertTrue(e.getMessage().contains("No subscriptions were found during correlation of the conditional start events."));
     } finally {
       engineRule.getIdentityService().clearAuthentication();
     }
 
     ProcessInstanceQuery processInstanceQuery = engineRule.getRuntimeService().createProcessInstanceQuery();
-    assertThat(processInstanceQuery.count(), is(0L));
+    assertEquals(0, processInstanceQuery.count());
+  }
 
+  @Test
+  public void testFailToCorrelateConditionByProcessDefinitionIdNoAuthenticatedTenants() {
+    // given
+    testRule.deployForTenant(TENANT_ONE, PROCESS);
+
+    ensureEventSubscriptions(1);
+
+    ProcessDefinition processDefinition = engineRule.getRepositoryService().createProcessDefinitionQuery().processDefinitionKey("conditionStart").singleResult();
+
+    // expected
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("Cannot create an instance of the process definition");
+
+    engineRule.getIdentityService().setAuthentication("user", null, null);
+
+    // when
+    engineRule.getRuntimeService()
+      .createConditionCorrelation()
+      .setVariable("foo", "bar")
+      .processDefinitionId(processDefinition.getId())
+      .correlateStartConditions();
+  }
+
+  @Test
+  public void testCorrelateConditionByProcessDefinitionIdWithAuthenticatedTenants() {
+    // given
+    testRule.deployForTenant(TENANT_ONE, PROCESS);
+
+    ensureEventSubscriptions(1);
+
+    ProcessDefinition processDefinition = engineRule.getRepositoryService().createProcessDefinitionQuery().processDefinitionKey("conditionStart").singleResult();
+
+    engineRule.getIdentityService().setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+
+    // when
+    List<ProcessInstance> instances = engineRule.getRuntimeService()
+      .createConditionCorrelation()
+      .setVariable("foo", "bar")
+      .tenantId(TENANT_ONE)
+      .processDefinitionId(processDefinition.getId())
+      .correlateStartConditions();
+
+    // then
+    assertNotNull(instances);
+    assertEquals(1, instances.size());
+    assertEquals(TENANT_ONE, instances.get(0).getTenantId());
+
+    engineRule.getIdentityService().clearAuthentication();
+
+    ProcessInstanceQuery processInstanceQuery = engineRule.getRuntimeService().createProcessInstanceQuery();
+    assertEquals(1, processInstanceQuery.tenantIdIn(TENANT_ONE).count());
+
+    EventSubscription eventSubscription = engineRule.getRuntimeService().createEventSubscriptionQuery().singleResult();
+    assertEquals(EventType.CONDITONAL.name(), eventSubscription.getEventType());
+  }
+
+  protected void ensureEventSubscriptions(int count) {
     List<EventSubscription> eventSubscriptions = engineRule.getRuntimeService().createEventSubscriptionQuery().list();
-    assertEquals(2, eventSubscriptions.size());
+    assertEquals(count, eventSubscriptions.size());
     for (EventSubscription eventSubscription : eventSubscriptions) {
       assertEquals(EventType.CONDITONAL.name(), eventSubscription.getEventType());
     }

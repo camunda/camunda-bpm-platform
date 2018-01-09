@@ -35,7 +35,7 @@ public class ConditionCorrelationBuilderImpl implements ConditionCorrelationBuil
   protected String processInstanceId;
   protected String processDefinitionId;
 
-  protected VariableMap processInstanceVariables;
+  protected VariableMap variables;
 
   protected String tenantId = null;
   protected boolean isTenantIdSet = false;
@@ -77,12 +77,12 @@ public class ConditionCorrelationBuilderImpl implements ConditionCorrelationBuil
     this.processDefinitionId = processDefinitionId;
   }
 
-  public VariableMap getProcessInstanceVariables() {
-    return processInstanceVariables;
+  public VariableMap getVariables() {
+    return variables;
   }
 
-  public void setProcessInstanceVariables(VariableMap processInstanceVariables) {
-    this.processInstanceVariables = processInstanceVariables;
+  public void setVariables(VariableMap variables) {
+    this.variables = variables;
   }
 
   public String getTenantId() {
@@ -126,16 +126,16 @@ public class ConditionCorrelationBuilderImpl implements ConditionCorrelationBuil
   @Override
   public ConditionCorrelationBuilder setVariable(String variableName, Object variableValue) {
     ensureNotNull("variableName", variableName);
-    ensureProcessInstanceVariablesInitialized();
-    processInstanceVariables.put(variableName, variableValue);
+    ensureVariablesInitialized();
+    this.variables.put(variableName, variableValue);
     return this;
   }
 
   @Override
   public ConditionCorrelationBuilder setVariables(Map<String, Object> variables) {
     ensureNotNull("variables", variables);
-    ensureProcessInstanceVariablesInitialized();
-    processInstanceVariables.putAll(variables);
+    ensureVariablesInitialized();
+    this.variables.putAll(variables);
     return this;
   }
 
@@ -162,9 +162,9 @@ public class ConditionCorrelationBuilderImpl implements ConditionCorrelationBuil
     return execute(new CorrelateStartConditionCmd(this));
   }
 
-  protected void ensureProcessInstanceVariablesInitialized() {
-    if (processInstanceVariables == null) {
-      processInstanceVariables = new VariableMapImpl();
+  protected void ensureVariablesInitialized() {
+    if (variables == null) {
+      variables = new VariableMapImpl();
     }
   }
 }
