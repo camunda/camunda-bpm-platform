@@ -59,8 +59,8 @@ module.exports = function(ngModule) {
   }
 
   ngModule.controller('UserTaskController', [
-    '$scope', 'search', 'camAPI', 'TaskResource', 'Notifications', '$modal', '$translate',
-    function($scope,   search,   camAPI,   TaskResource,   Notifications,   $modal, $translate) {
+    '$scope', 'search', 'camAPI', 'TaskResource', 'Notifications', '$modal', '$translate', 'localConf',
+    function($scope,   search,   camAPI,   TaskResource,   Notifications,   $modal, $translate, localConf) {
 
       // input: processInstance, processData
 
@@ -74,10 +74,26 @@ module.exports = function(ngModule) {
       var pages = $scope.pages = angular.copy(DEFAULT_PAGES);
 
       var filter = null;
+      var executionIdToInstanceMap = null;
 
       var Task = camAPI.resource('task');
 
+      var sorting = $scope.sorting = loadLocal({ sortBy: 'created', sortOrder: 'desc' });
+
       $scope.getSearchQueryForSearchType = searchWidgetUtils.getSearchQueryForSearchType.bind(null, 'activityInstanceIdIn');
+
+      $scope.headColumns = [
+        { class: 'activity uuid', request: 'nameCaseInsensitive', sortable: true, content: $translate.instant('PLUGIN_USER_TASKS_ACTIVITY') },
+        { class: 'assignee', request: 'assignee', sortable: true, content: $translate.instant('PLUGIN_USER_TASKS_ASSIGNEE') },
+        { class: 'owner', request: '', sortable: false, content: $translate.instant('PLUGIN_USER_TASKS_OWNER') },
+        { class: 'created', request: 'created', sortable: true, content: $translate.instant('PLUGIN_USER_TASKS_CREATED_DATE') },
+        { class: 'due', request: 'dueDate', sortable: true, content: $translate.instant('PLUGIN_USER_TASKS_DUE_DATE') },
+        { class: 'follow-up', request: 'followUpDate', sortable: true, content: $translate.instant('PLUGIN_USER_TASKS_FOLLOW_UP_DATE') },
+        { class: 'priority', request: 'priority', sortable: true, content: $translate.instant('PLUGIN_USER_TASKS_PRIORITY') },
+        { class: 'delegation-state', request: '', sortable: false, content: $translate.instant('PLUGIN_USER_TASKS_DELEGATION_STATE') },
+        { class: 'task-id uuid', request: 'id', sortable: true, content: $translate.instant('PLUGIN_USER_TASKS_TASK_ID') },
+        { class: 'action', request: '', sortable: false, content: $translate.instant('PLUGIN_USER_TASKS_ACTION') }
+      ];
 
       $scope.$watch('pages.current', function(newValue, oldValue) {
         if (newValue == oldValue) {
@@ -87,13 +103,22 @@ module.exports = function(ngModule) {
         search('page', !newValue || newValue == 1 ? null : newValue);
       });
 
-      userTaskData.observe([ 'filter', 'executionIdToInstanceMap' ], function(newFilter, executionIdToInstanceMap) {
+      userTaskData.observe([ 'filter', 'executionIdToInstanceMap' ], function(newFilter, newExecutionIdToInstanceMap) {
         pages.current = newFilter.page || 1;
+        executionIdToInstanceMap = newExecutionIdToInstanceMap;
 
-        updateView(newFilter, executionIdToInstanceMap);
+        updateView(newFilter, newExecutionIdToInstanceMap, sorting);
       });
 
-      function updateView(newFilter, executionIdToInstanceMap) {
+      function loadLocal(defaultValue) {
+        return localConf.get('sortPIUserTaskTab', defaultValue);
+      }
+
+      function saveLocal(sorting) {
+        localConf.set('sortPIUserTaskTab', sorting);
+      }
+
+      function updateView(newFilter, executionIdToInstanceMap, sorting) {
         filter = angular.copy(newFilter);
 
         delete filter.page;
@@ -106,7 +131,11 @@ module.exports = function(ngModule) {
 
         var defaultParams = {
           processInstanceId: processInstance.id,
-          processDefinitionId: processInstance.definitionId
+          processDefinitionId: processInstance.definitionId,
+          sorting: [{
+            sortBy: sorting.sortBy,
+            sortOrder: sorting.sortOrder
+          }]
         };
 
         var pagingParams = {
@@ -141,6 +170,12 @@ module.exports = function(ngModule) {
         });
 
       }
+
+      $scope.onSortChange = function(_sorting) {
+        sorting = _sorting;
+        saveLocal(sorting);
+        updateView(filter, executionIdToInstanceMap, sorting);
+      };
 
       $scope.getHref = function(userTask) {
         if(userTask.instance) {
