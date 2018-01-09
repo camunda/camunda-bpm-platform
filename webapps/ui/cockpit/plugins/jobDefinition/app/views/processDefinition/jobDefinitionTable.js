@@ -51,7 +51,6 @@ var Controller = [
     });
 
     function updateView(filter, jobDefinitions) {
-
       $scope.jobDefinitions = null;
 
       var activityIds = filter.activityIds;
@@ -64,7 +63,6 @@ var Controller = [
       var jobDefinitionSelection = [];
 
       angular.forEach(jobDefinitions, function(jobDefinition) {
-
         var activityId = jobDefinition.activityId;
 
         if (activityIds.indexOf(activityId) != -1) {
