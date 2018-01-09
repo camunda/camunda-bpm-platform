@@ -5,11 +5,19 @@ var angular = require('angular');
 var Controller = [ '$scope', 'processData', 'ProcessDefinitionResource',
       function($scope, processData, ProcessDefinitionResource) {
 
+        processData.provide('processDefinitionsWithRootIncidents', function() {
+          return ProcessDefinitionResource.queryStatistics({ rootIncidents: true }).$promise;
+        });
+
         processData.provide('processDefinitions', function() {
           return ProcessDefinitionResource.queryStatistics({ incidents: true }).$promise;
         });
 
         processData.provide('processDefinitionStatistics', ['processDefinitions', function(processDefinitions) {
+          return aggregateStatistics(processDefinitions);
+        }]);
+
+        processData.provide('processDefinitionWithRootIncidentsStatistics', ['processDefinitionsWithRootIncidents', function(processDefinitions) {
           return aggregateStatistics(processDefinitions);
         }]);
 
