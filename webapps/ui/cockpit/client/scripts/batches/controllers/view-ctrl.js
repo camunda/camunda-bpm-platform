@@ -16,6 +16,7 @@ module.exports = [
   '$modal',
   '$translate',
   'Notifications',
+  'localConf',
   function(
   $scope,
   page,
@@ -23,8 +24,16 @@ module.exports = [
   $location,
   $modal,
   $translate,
-  Notifications
+  Notifications,
+  localConf
 ) {
+
+    $scope.inProgressHeadColumns = [
+      { class: 'id', request: 'batchId', sortable: true, content: $translate.instant('BATCHES_PROGRESS_ID') },
+      { class: 'type', request: '', sortable: false, content: $translate.instant('BATCHES_PROGRESS_TYPE') },
+      { class: 'failed', request: '', sortable: false, content: $translate.instant('BATCHES_PROGRESS_FAIL_JOBS') },
+      { class: '', request: '', sortable: false, content: $translate.instant('BATCHES_PROGRESS_PROGRESS') }
+    ];
 
     $scope.$on('$destroy', function() {
       events.removeAllListeners();
@@ -76,6 +85,6 @@ module.exports = [
 
     require('../components/breadcrumbs')(page, $scope.$root, $translate);
 
-    $scope.ctrl = new Ctrl(camAPI);
+    $scope.ctrl = new Ctrl(camAPI, localConf);
     $scope.ctrl.loadPeriodically(5000);
   }];

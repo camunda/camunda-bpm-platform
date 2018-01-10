@@ -4,15 +4,23 @@ var events = require('./events');
 
 var PAGE_SIZE = 10;
 
-var Batch = function(camAPI) {
+var Batch = function(camAPI, localConf) {
   this._sdk = camAPI;
+  this._localConf = localConf;
+
+  this.sortingProperties = {
+    runtime: 'batch-runtime-sort'
+  };
+
+  var runtimeSorting = this._loadLocal('runtime', { sortBy: 'batchId', sortOrder: 'asc' });
 
   this._batches = {
     runtime: {
       state: 'INITIAL',
       currentPage: 1,
       count: 0,
-      data: null
+      data: null,
+      sorting: runtimeSorting
     },
     history: {
       state: 'INITIAL',
@@ -49,8 +57,22 @@ var Batch = function(camAPI) {
   });
 };
 
+Batch.prototype._loadLocal = function(type, defaultValue) {
+  return this._localConf.get(this.sortingProperties[type], defaultValue);
+};
+
+Batch.prototype._saveLocal = function(type, value) {
+  this._localConf.set(this.sortingProperties[type], value);
+};
+
 Batch.prototype.openDeleteModal = function() {
   events.emit('deleteModal:open', this.deleteModal);
+};
+
+Batch.prototype.onSortChange = function(type, sorting) {
+  this._batches[type].sorting = sorting;
+  this._saveLocal(type, sorting);
+  this._load(type);
 };
 
 Batch.prototype._remove = function(params) {
@@ -308,6 +330,12 @@ Batch.prototype._load = function(type) {
     firstResult: (obj.currentPage - 1) * PAGE_SIZE,
     maxResults: PAGE_SIZE
   };
+
+  if (obj.sorting) {
+    params.sortBy = obj.sorting.sortBy;
+    params.sortOrder = obj.sorting.sortOrder;
+  }
+
   var countCb = function(err, data) {
     obj.state = data.count ? 'LOADED' : 'EMPTY';
     obj.count = data.count;
