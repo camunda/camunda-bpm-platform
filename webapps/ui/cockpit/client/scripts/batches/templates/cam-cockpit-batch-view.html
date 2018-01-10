@@ -7,13 +7,10 @@
            text-empty="{{ 'BATCHES_PROGRESS_NO_RUNNING' | translate }}">
 
         <table class="cam-table">
-          <thead>
-            <tr>
-              <th class="id">{{ 'BATCHES_PROGRESS_ID' | translate }}</th>
-              <th class="type">{{ 'BATCHES_PROGRESS_TYPE' | translate }}</th>
-              <th class="failed">{{ 'BATCHES_PROGRESS_FAIL_JOBS' | translate }}</th>
-              <th>{{ 'BATCHES_PROGRESS_PROGRESS' | translate }}</th>
-            </tr>
+          <thead sortable-table-head
+                 head-columns="inProgressHeadColumns"
+                 on-sort-change="ctrl.onSortChange('runtime', sortObj)"
+                 default-sort="ctrl._batches.runtime.sorting">
           </thead>
           <tbody>
             <tr ng-repeat="batch in ctrl.getBatches('runtime')" ng-class="{selected: ctrl.isSelected(batch)}">
