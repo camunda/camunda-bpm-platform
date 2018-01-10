@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.repository.Deployment;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.model.bpmn.Bpmn;
@@ -667,5 +668,15 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
     // and not automatically stored as a process variable.
     assertNull(runtimeService.getVariable(pi.getId(), "scriptVar"));
     assertEquals("test123", runtimeService.getVariable(pi.getId(), "myVar"));
+  }
+
+  @org.camunda.bpm.engine.test.Deployment
+  public void testScriptEvaluationException() {
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("Process_1").singleResult();
+    try {
+      runtimeService.startProcessInstanceByKey("Process_1");
+    } catch (ScriptEvaluationException e) {
+      assertTextPresent("Unable to evaluate script while executing activity 'Failing' in the process definition with id '" + processDefinition.getId() + "'", e.getMessage());
+    }
   }
 }
