@@ -28,11 +28,18 @@ module.exports = [
   localConf
 ) {
 
-    $scope.inProgressHeadColumns = [
+    $scope.runtimeHeadColumns = [
       { class: 'id', request: 'batchId', sortable: true, content: $translate.instant('BATCHES_PROGRESS_ID') },
       { class: 'type', request: '', sortable: false, content: $translate.instant('BATCHES_PROGRESS_TYPE') },
       { class: 'failed', request: '', sortable: false, content: $translate.instant('BATCHES_PROGRESS_FAIL_JOBS') },
       { class: '', request: '', sortable: false, content: $translate.instant('BATCHES_PROGRESS_PROGRESS') }
+    ];
+
+    $scope.historyHeadColumns = [
+      { class: 'id', request: 'batchId', sortable: true, content: $translate.instant('BATCHES_PROGRESS_ID') },
+      { class: 'type', request: '', sortable: false, content: $translate.instant('BATCHES_PROGRESS_TYPE') },
+      { class: 'start-time', request: 'startTime', sortable: true, content: $translate.instant('BATCHES_PROGRESS_START_TIME') },
+      { class: 'end-time', request: 'endTime', sortable: true, content: $translate.instant('BATCHES_PROGRESS_END_TIME') }
     ];
 
     $scope.$on('$destroy', function() {
