@@ -42,6 +42,12 @@ module.exports = [
       { class: 'end-time', request: 'endTime', sortable: true, content: $translate.instant('BATCHES_PROGRESS_END_TIME') }
     ];
 
+    $scope.jobHeadColumns = [
+      { class: 'id', request: 'jobId', sortable: true, content: $translate.instant('BATCHES_PROGRESS_ID') },
+      { class: 'type', request: '', sortable: false, content: $translate.instant('BATCHES_PROGRESS_EXCEPTION') },
+      { class: 'action', request: '', sortable: false, content: $translate.instant('BATCHES_PROGRESS_ACTIONS') }
+    ];
+
     $scope.$on('$destroy', function() {
       events.removeAllListeners();
       $scope.ctrl.stopLoadingPeriodically();
