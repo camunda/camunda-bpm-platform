@@ -8,7 +8,7 @@
 
         <table class="cam-table">
           <thead sortable-table-head
-                 head-columns="inProgressHeadColumns"
+                 head-columns="runtimeHeadColumns"
                  on-sort-change="ctrl.onSortChange('runtime', sortObj)"
                  default-sort="ctrl._batches.runtime.sorting">
           </thead>
@@ -51,13 +51,10 @@
            text-empty="{{ 'BATCHES_PROGRESS_NO_FINISHED' | translate }}">
 
         <table class="cam-table">
-          <thead>
-            <tr>
-              <th class="id">{{ 'BATCHES_PROGRESS_ID' | translate }}</th>
-              <th class="type">{{ 'BATCHES_PROGRESS_TYPE' | translate }}</th>
-              <th class="start-time">{{ 'BATCHES_PROGRESS_START_TIME' | translate }}</th>
-              <th class="end-time">{{ 'BATCHES_PROGRESS_END_TIME' | translate }}</th>
-            </tr>
+          <thead sortable-table-head
+                 head-columns="historyHeadColumns"
+                 on-sort-change="ctrl.onSortChange('history', sortObj)"
+                 default-sort="ctrl._batches.history.sorting">
           </thead>
           <tbody>
             <tr ng-repeat="batch in ctrl.getBatches('history')" ng-class="{selected: ctrl.isSelected(batch)}">

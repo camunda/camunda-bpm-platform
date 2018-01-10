@@ -9,10 +9,12 @@ var Batch = function(camAPI, localConf) {
   this._localConf = localConf;
 
   this.sortingProperties = {
-    runtime: 'batch-runtime-sort'
+    runtime: 'batch-runtime-sort',
+    history: 'batch-history-sort'
   };
 
   var runtimeSorting = this._loadLocal('runtime', { sortBy: 'batchId', sortOrder: 'asc' });
+  var historySorting = this._loadLocal('history', { sortBy: 'startTime', sortOrder: 'desc' });
 
   this._batches = {
     runtime: {
@@ -26,7 +28,8 @@ var Batch = function(camAPI, localConf) {
       state: 'INITIAL',
       currentPage: 1,
       count: 0,
-      data: null
+      data: null,
+      sorting: historySorting
     },
     selection: {
       state: 'INITIAL',
@@ -331,11 +334,6 @@ Batch.prototype._load = function(type) {
     maxResults: PAGE_SIZE
   };
 
-  if (obj.sorting) {
-    params.sortBy = obj.sorting.sortBy;
-    params.sortOrder = obj.sorting.sortOrder;
-  }
-
   var countCb = function(err, data) {
     obj.state = data.count ? 'LOADED' : 'EMPTY';
     obj.count = data.count;
@@ -355,13 +353,16 @@ Batch.prototype._load = function(type) {
     }
   }.bind(this);
 
+  if (obj.sorting) {
+    params.sortBy = obj.sorting.sortBy;
+    params.sortOrder = obj.sorting.sortOrder;
+  }
+
   switch(type) {
   case 'runtime':
     return this._sdk.resource('batch').statistics(params, cb);
   case 'history':
     params.completed = true;
-    params.sortBy = 'startTime';
-    params.sortOrder = 'desc';
     return this._sdk.resource('history').batch(params, cb);
   }
 };
