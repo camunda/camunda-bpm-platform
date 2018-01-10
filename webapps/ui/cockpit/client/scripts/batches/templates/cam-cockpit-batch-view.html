@@ -9,7 +9,7 @@
         <table class="cam-table">
           <thead sortable-table-head
                  head-columns="runtimeHeadColumns"
-                 on-sort-change="ctrl.onSortChange('runtime', sortObj)"
+                 on-sort-change="ctrl.onBatchSortChange('runtime', sortObj)"
                  default-sort="ctrl._batches.runtime.sorting">
           </thead>
           <tbody>
@@ -53,7 +53,7 @@
         <table class="cam-table">
           <thead sortable-table-head
                  head-columns="historyHeadColumns"
-                 on-sort-change="ctrl.onSortChange('history', sortObj)"
+                 on-sort-change="ctrl.onBatchSortChange('history', sortObj)"
                  default-sort="ctrl._batches.history.sorting">
           </thead>
           <tbody>
@@ -150,12 +150,10 @@
                  text-empty="{{ 'BATCHES_PROGRESS_NO_FAILED_JOBS' | translate }}"
                  text-error="{{ ctrl.getJobs() }}">
             <table class="cam-table">
-              <thead>
-                <tr>
-                  <th class="id">{{ 'BATCHES_PROGRESS_ID' | translate }}</th>
-                  <th class="type">{{ 'BATCHES_PROGRESS_EXCEPTION' | translate }}</th>
-                  <th class="action">{{ 'BATCHES_PROGRESS_ACTIONS' | translate }}</th>
-                </tr>
+              <thead sortable-table-head
+                     head-columns="jobHeadColumns"
+                     on-sort-change="ctrl.onJobSortChange(sortObj)"
+                     default-sort="ctrl._jobs.sorting">
               </thead>
               <tbody>
                 <tr ng-repeat="job in ctrl.getJobs()">

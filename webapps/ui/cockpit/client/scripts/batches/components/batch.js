@@ -10,7 +10,8 @@ var Batch = function(camAPI, localConf) {
 
   this.sortingProperties = {
     runtime: 'batch-runtime-sort',
-    history: 'batch-history-sort'
+    history: 'batch-history-sort',
+    job: 'batch-job-sort'
   };
 
   var runtimeSorting = this._loadLocal('runtime', { sortBy: 'batchId', sortOrder: 'asc' });
@@ -38,11 +39,14 @@ var Batch = function(camAPI, localConf) {
     }
   };
 
+  var jobSorting = this._loadLocal('job', { sortBy: 'jobId', sortOrder: 'asc' });
+
   this._jobs = {
     state: 'INITIAL',
     currentPage: 1,
     count: 0,
-    data: []
+    data: [],
+    sorting: jobSorting
   };
 
   this.deleteModal = {
@@ -72,10 +76,16 @@ Batch.prototype.openDeleteModal = function() {
   events.emit('deleteModal:open', this.deleteModal);
 };
 
-Batch.prototype.onSortChange = function(type, sorting) {
+Batch.prototype.onBatchSortChange = function(type, sorting) {
   this._batches[type].sorting = sorting;
   this._saveLocal(type, sorting);
   this._load(type);
+};
+
+Batch.prototype.onJobSortChange = function(sorting) {
+  this._jobs.sorting = sorting;
+  this._saveLocal('job', sorting);
+  this._loadFailedJobs(this.getSelection());
 };
 
 Batch.prototype._remove = function(params) {
@@ -304,7 +314,8 @@ Batch.prototype._loadFailedJobs = function(data) {
     withException: true,
     noRetriesLeft: true,
     firstResult: (obj.currentPage - 1) * PAGE_SIZE,
-    maxResults: PAGE_SIZE
+    maxResults: PAGE_SIZE,
+    sorting: [ this._jobs.sorting ]
   };
 
   this._sdk.resource('job').list(params, (function(err, data) {
@@ -313,6 +324,9 @@ Batch.prototype._loadFailedJobs = function(data) {
       obj.state = 'ERROR';
     } else {
       obj.data = data;
+
+      delete params.sorting;
+
       this._sdk.resource('job').count(params, function(err, data) {
         obj.state = data ? 'LOADED' : 'EMPTY';
         obj.count = data;
