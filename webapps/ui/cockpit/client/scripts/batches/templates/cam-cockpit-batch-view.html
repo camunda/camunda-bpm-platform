@@ -60,8 +60,8 @@
             <tr ng-repeat="batch in ctrl.getBatches('history')" ng-class="{selected: ctrl.isSelected(batch)}">
               <td class="uuid"><a ng-href="#/batch?details={{batch.id}}&type=history">{{batch.id}}</a></td>
               <td>{{batch.type}}</td>
-              <td>{{batch.startTime}}</td>
-              <td>{{batch.endTime}}</td>
+              <td>{{batch.startTime | camDate}}</td>
+              <td>{{batch.endTime | camDate}}</td>
             </tr>
           </tbody>
         </table>
@@ -136,10 +136,11 @@
                   ng-if="selection[key] && key !== 'failedJobs'"
                   ng-class="key">
                 <td>{{key}}</td>
-                <td>{{selection[key]}}
+                <td ng-if="key !== 'startTime' && key !== 'endTime'">{{selection[key]}}
                   <span ng-if="key === 'remainingJobs' && selection.failedJobs"
                         class="failedJobs">({{ 'BATCHES_PROGRESS_FAILED' | translate:'{jobs: selection.failedJobs}' }})</span>
-                  </td>
+                </td>
+                <td ng-if="key === 'startTime' || key == 'endTime'">{{selection[key] | camDate}}</td>
               </tr>
             </tbody>
           </table>
