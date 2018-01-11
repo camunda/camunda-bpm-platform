@@ -15,16 +15,10 @@ module.exports = [
       getActiveExternalTasksForProcess: getActiveExternalTasksForProcess
     };
 
-    function getActiveExternalTasksForProcess(processId, pages, otherParams) {
-      return getExternalTasks(
-        angular.extend(
-          {
-            processInstanceId: processId
-          },
-          otherParams
-        ),
-        pages
-      );
+    function getActiveExternalTasksForProcess(processId, pages, sorting, otherParams) {
+      var countParams = angular.extend({}, { processInstanceId : processId });
+      var sortParams = angular.extend({}, {sorting: [ sorting ]});
+      return getExternalTasks(angular.extend(countParams, otherParams),pages,sortParams);
     }
   }
 ];

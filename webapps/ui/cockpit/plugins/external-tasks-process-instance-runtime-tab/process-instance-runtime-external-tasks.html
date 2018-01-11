@@ -2,16 +2,11 @@
 <div external-tasks-tab="RuntimeTab.onLoad(pages, activityIds)"
      process-data="RuntimeTab.processData">
   <table class="history-job-log cam-table">
-    <thead>
-      <tr>
-        <th class="state">{{ 'PLUGIN_EXT_EXTERNAL_TASK_ID' | translate }}</th>
-        <th class="activity">{{ 'PLUGIN_EXT_ACTIVITY' | translate }}</th>
-        <th class="retries">{{ 'PLUGIN_EXT_RETRIES' | translate }}</th>
-        <th class="worker-id">{{ 'PLUGIN_EXT_WORKER_ID' | translate }}</th>
-        <th class="expiration">{{ 'PLUGIN_EXT_LOCK_EXPIRATION_TIME' | translate }}</th>
-        <th class="topic">{{ 'PLUGIN_EXT_TOPIC' | translate }}</th>
-        <th class="priority">{{ 'PLUGIN_EXT_PRIORITY' | translate }}</th>
-      </tr>
+
+    <thead sortable-table-head
+           head-columns="RuntimeTab.headColumns"
+           on-sort-change="RuntimeTab.onSortChange(RuntimeTab.sorting)"
+           default-sort="RuntimeTab.sorting">
     </thead>
     <tbody>
       <tr ng-repeat="task in RuntimeTab.tasks track by task.id">
