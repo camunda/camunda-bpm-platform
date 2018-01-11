@@ -2183,11 +2183,14 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
     VariableInstance variableInstance = runtimeService.createVariableInstanceQuery()
         .processInstanceIdIn(processInstance.getId()).singleResult();
     assertNull(variableInstance);
-    HistoricVariableInstance historicVariableInstance = historyService.createHistoricVariableInstanceQuery()
-        .activityInstanceIdIn(lockedTasks.get(0).getActivityInstanceId()).singleResult();
-    assertNotNull(historicVariableInstance);
-    assertEquals("abc", historicVariableInstance.getName());
-    assertEquals("bar", historicVariableInstance.getValue());
+    if (processEngineConfiguration.getHistoryLevel() == HistoryLevel.HISTORY_LEVEL_AUDIT
+        || processEngineConfiguration.getHistoryLevel() == HistoryLevel.HISTORY_LEVEL_FULL) {
+      HistoricVariableInstance historicVariableInstance = historyService.createHistoricVariableInstanceQuery()
+          .activityInstanceIdIn(lockedTasks.get(0).getActivityInstanceId()).singleResult();
+      assertNotNull(historicVariableInstance);
+      assertEquals("abc", historicVariableInstance.getName());
+      assertEquals("bar", historicVariableInstance.getValue());
+    }
   }
 
   public void testCompleteWithNonLocalVariables() {
