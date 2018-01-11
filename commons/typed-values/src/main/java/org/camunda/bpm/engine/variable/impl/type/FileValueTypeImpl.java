@@ -75,12 +75,7 @@ public class FileValueTypeImpl extends AbstractValueTypeImpl implements FileValu
       builder.encoding(encoding.toString());
     }
 
-    if (valueInfo.containsKey(VALUE_INFO_TRANSIENT)) {
-      Object isTransient = valueInfo.get(VALUE_INFO_TRANSIENT);
-      if (isTransient instanceof Boolean) {
-        builder.setTransient((Boolean)isTransient);
-      }
-    }
+    builder.setTransient(isTransient(valueInfo));
     return builder.create();
   }
 

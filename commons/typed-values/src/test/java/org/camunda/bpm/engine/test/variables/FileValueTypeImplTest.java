@@ -176,17 +176,32 @@ public class FileValueTypeImplTest {
   }
 
   @Test
-  public void valueInfoContainsFileTypeNameAndCharsetEncoding() {
+  public void cannotCreateFileWithInvalidTransientFlag() {
+    InputStream file = this.getClass().getClassLoader().getResourceAsStream("org/camunda/bpm/engine/test/variables/simpleFile.txt");
+    Map<String, Object> info = new HashMap<String, Object>();
+    info.put("filename", "bar");
+    info.put("transient", "foo");
+    try {
+      type.createValue(file, info);
+    } catch (IllegalArgumentException e) {
+      assertThat(e.getMessage(), containsString("The property 'transient' should have a value of type 'boolean'."));
+    }
+    
+  }
+
+  @Test
+  public void valueInfoContainsFileTypeNameTransientFlagAndCharsetEncoding() {
     InputStream file = this.getClass().getClassLoader().getResourceAsStream("org/camunda/bpm/engine/test/variables/simpleFile.txt");
     String fileName = "simpleFile.txt";
     String fileType = "text/plain";
     Charset encoding = Charset.forName("UTF-8");
-    FileValue fileValue = Variables.fileValue(fileName).file(file).mimeType(fileType).encoding(encoding).create();
+    FileValue fileValue = Variables.fileValue(fileName).file(file).mimeType(fileType).encoding(encoding).setTransient(true).create();
     Map<String, Object> info = type.getValueInfo(fileValue);
 
     assertThat(info, hasEntry(FileValueTypeImpl.VALUE_INFO_FILE_NAME, (Object) fileName));
     assertThat(info, hasEntry(FileValueTypeImpl.VALUE_INFO_FILE_MIME_TYPE, (Object) fileType));
     assertThat(info, hasEntry(FileValueTypeImpl.VALUE_INFO_FILE_ENCODING, (Object) encoding.name()));
+    assertThat(info, hasEntry(FileValueTypeImpl.VALUE_INFO_TRANSIENT, (Object) true));
   }
 
   @Test

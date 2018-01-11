@@ -77,16 +77,6 @@ public abstract class PrimitiveValueTypeImpl extends AbstractValueTypeImpl imple
     return result;
   }
 
-  protected Boolean isTransient(Map<String, Object> valueInfo) {
-    if (valueInfo != null && valueInfo.containsKey(VALUE_INFO_TRANSIENT)) {
-      Object isTransient = valueInfo.get(VALUE_INFO_TRANSIENT);
-      if (isTransient instanceof Boolean) {
-        return (Boolean) isTransient;
-      }
-    }
-    return false;
-  }
-
   // concrete types ///////////////////////////////////////////////////
 
   public static class BooleanTypeImpl extends PrimitiveValueTypeImpl {
