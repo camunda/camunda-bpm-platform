@@ -58,9 +58,8 @@ public class DefaultConditionHandler implements ConditionHandler {
 
         ActivityImpl activity = subscription.getActivity();
 
-        ConditionHandlerResult conditionResult = evaluateCondition(conditionSet, activity);
-        if (conditionResult != null) {
-          results.add(conditionResult);
+        if (evaluateCondition(conditionSet, activity)) {
+          results.add(new ConditionHandlerResult(processDefinition, activity));
         }
 
       }
@@ -94,9 +93,8 @@ public class DefaultConditionHandler implements ConditionHandler {
     if (processDefinition != null && !processDefinition.isSuspended()) {
       List<ActivityImpl> activities = findActivities(processDefinition);
       for (ActivityImpl activity : activities) {
-        ConditionHandlerResult conditionResult = evaluateCondition(conditionSet, activity);
-        if (conditionResult != null) {
-          results.add(conditionResult);
+        if (evaluateCondition(conditionSet, activity)) {
+          results.add(new ConditionHandlerResult(processDefinition, activity));
         }
       }
     }
@@ -117,7 +115,7 @@ public class DefaultConditionHandler implements ConditionHandler {
     return EventType.CONDITONAL.name().equals(declaration.getEventType()) && declaration.isStartEvent();
   }
 
-  protected ConditionHandlerResult evaluateCondition(ConditionSet conditionSet, ActivityImpl activity) {
+  protected boolean evaluateCondition(ConditionSet conditionSet, ActivityImpl activity) {
     ExecutionEntity temporaryExecution = new ExecutionEntity();
     temporaryExecution.initializeVariableStore(conditionSet.getVariables());
     temporaryExecution.setProcessDefinition(activity.getProcessDefinition());
@@ -125,7 +123,8 @@ public class DefaultConditionHandler implements ConditionHandler {
     ConditionalEventDefinition conditionalEventDefinition = activity.getProperties().get(BpmnProperties.CONDITIONAL_EVENT_DEFINITION);
     try {
       if (conditionalEventDefinition.evaluate(temporaryExecution)) {
-        return new ConditionHandlerResult((ProcessDefinitionEntity) activity.getProcessDefinition(), activity);
+        return (conditionalEventDefinition.getVariableName() == null || conditionSet.getVariables().containsKey(conditionalEventDefinition.getVariableName()))
+                && conditionalEventDefinition.evaluate(temporaryExecution);
       }
     } catch (ProcessEngineException e) {
       if (e.getCause() instanceof PropertyNotFoundException) {
@@ -134,7 +133,7 @@ public class DefaultConditionHandler implements ConditionHandler {
         throw e;
       }
     }
-    return null;
+    return false;
   }
 
 }

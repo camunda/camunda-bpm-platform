@@ -126,7 +126,7 @@ public class ConditionalStartEventTest {
   }
 
   @Test
-  @Ignore("CAM-8664")
+  @Ignore("CAM-8635")
   public void testTwoEqualConditionalStartEvent() {
     // given a deployed process
 
@@ -393,5 +393,47 @@ public class ConditionalStartEventTest {
         .setVariable("foo", 1)
         .processDefinitionId("nonExistingId")
         .correlateStartConditions();
+  }
+
+  @Test
+  @Deployment
+  public void testVariableName() {
+    // given deployed process with two conditional start events:
+    // ${true} variableName="foo"
+    // ${true}
+
+    // assume
+    List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().list();
+    assertEquals(2, eventSubscriptions.size());
+
+    // when
+    List<ProcessInstance> instances = runtimeService
+        .createConditionCorrelation()
+        .setVariable("foo", 42)
+        .correlateStartConditions();
+
+    // then
+    assertEquals(2, instances.size());
+  }
+
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/conditional/ConditionalStartEventTest.testVariableName.bpmn20.xml")
+  public void testVariableNameNotFullfilled() {
+    // given deployed process with two conditional start events:
+    // ${true} variableName="foo"
+    // ${true}
+
+    // assume
+    List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().list();
+    assertEquals(2, eventSubscriptions.size());
+
+    // when
+    List<ProcessInstance> instances = runtimeService
+        .createConditionCorrelation()
+        .setVariable("bar", 42)
+        .correlateStartConditions();
+
+    // then
+    assertEquals(1, instances.size());
   }
 }
