@@ -295,7 +295,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     .when()
       .post(COMPLETE_EXTERNAL_TASK_URL);
 
-    verify(externalTaskService).complete("anExternalTaskId", "aWorkerId", null);
+    verify(externalTaskService).complete("anExternalTaskId", "aWorkerId", null, null);
     verifyNoMoreInteractions(externalTaskService);
   }
 
@@ -333,6 +333,47 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
                 .type(ValueType.OBJECT)
                 .serializedValue("val3")
                 .serializationFormat("aFormat")
+                .objectTypeName("aRootType"))),
+        eq((Map<String, Object>) null));
+
+    verifyNoMoreInteractions(externalTaskService);
+  }
+
+  @Test
+  public void testCompleteWithLocalVariables() {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("workerId", "aWorkerId");
+
+    Map<String, Object> variables = VariablesBuilder
+        .create()
+        .variable("var1", "val1")
+        .variable("var2", "val2", "String")
+        .variable("var3", ValueType.OBJECT.getName(), "val3", "aFormat", "aRootType")
+        .getVariables();
+    parameters.put("localVariables", variables);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(parameters)
+      .pathParam("id", "anExternalTaskId")
+    .then()
+      .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .post(COMPLETE_EXTERNAL_TASK_URL);
+
+    verify(externalTaskService).complete(
+        eq("anExternalTaskId"),
+        eq("aWorkerId"),
+        eq((Map<String, Object>) null),
+        argThat(EqualsVariableMap.matches()
+          .matcher("var1", EqualsUntypedValue.matcher().value("val1"))
+          .matcher("var2", EqualsPrimitiveValue.stringValue("val2"))
+          .matcher("var3",
+              EqualsObjectValue.objectValueMatcher()
+                .type(ValueType.OBJECT)
+                .serializedValue("val3")
+                .serializationFormat("aFormat")
                 .objectTypeName("aRootType"))));
 
     verifyNoMoreInteractions(externalTaskService);
@@ -342,7 +383,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
   public void testCompleteNonExistingTask() {
     doThrow(new NotFoundException())
       .when(externalTaskService)
-      .complete(any(String.class), any(String.class), anyMapOf(String.class, Object.class));
+      .complete(any(String.class), any(String.class), anyMapOf(String.class, Object.class), anyMapOf(String.class, Object.class));
 
     Map<String, String> parameters = new HashMap<String, String>();
     parameters.put("workerId", "aWorkerId");
@@ -364,7 +405,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
   public void testCompleteThrowsAuthorizationException() {
     doThrow(new AuthorizationException("aMessage"))
       .when(externalTaskService)
-      .complete(any(String.class), any(String.class), anyMapOf(String.class, Object.class));
+      .complete(any(String.class), any(String.class), anyMapOf(String.class, Object.class), anyMapOf(String.class, Object.class));
 
     Map<String, String> parameters = new HashMap<String, String>();
     parameters.put("workerId", "aWorkerId");
@@ -386,7 +427,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
   public void testCompleteThrowsBadUserRequestException() {
     doThrow(new BadUserRequestException("aMessage"))
       .when(externalTaskService)
-      .complete(any(String.class), any(String.class), anyMapOf(String.class, Object.class));
+      .complete(any(String.class), any(String.class), anyMapOf(String.class, Object.class), anyMapOf(String.class, Object.class));
 
     Map<String, String> parameters = new HashMap<String, String>();
     parameters.put("workerId", "aWorkerId");

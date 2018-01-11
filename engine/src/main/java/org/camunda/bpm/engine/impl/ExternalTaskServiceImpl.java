@@ -41,11 +41,15 @@ public class ExternalTaskServiceImpl extends ServiceImpl implements ExternalTask
   }
 
   public void complete(String externalTaskId, String workerId) {
-    commandExecutor.execute(new CompleteExternalTaskCmd(externalTaskId, workerId, null));
+    complete(externalTaskId, workerId, null, null);
   }
 
   public void complete(String externalTaskId, String workerId, Map<String, Object> variables) {
-    commandExecutor.execute(new CompleteExternalTaskCmd(externalTaskId, workerId, variables));
+    complete(externalTaskId, workerId, variables, null);
+  }
+
+  public void complete(String externalTaskId, String workerId, Map<String, Object> variables, Map<String, Object> localVariables) {
+    commandExecutor.execute(new CompleteExternalTaskCmd(externalTaskId, workerId, variables, localVariables));
   }
 
   public void handleFailure(String externalTaskId, String workerId, String errorMessage, int retries, long retryDuration) {

@@ -24,6 +24,7 @@ public class CompleteExternalTaskDto {
 
   protected String workerId;
   protected Map<String, VariableValueDto> variables;
+  protected Map<String, VariableValueDto> localVariables;
 
   public String getWorkerId() {
     return workerId;
@@ -40,4 +41,13 @@ public class CompleteExternalTaskDto {
   public void setVariables(Map<String, VariableValueDto> variables) {
     this.variables = variables;
   }
+
+  public Map<String, VariableValueDto> getLocalVariables() {
+    return localVariables;
+  }
+
+  public void setLocalVariables(Map<String, VariableValueDto> localVariables) {
+    this.localVariables = localVariables;
+  }
+
 }

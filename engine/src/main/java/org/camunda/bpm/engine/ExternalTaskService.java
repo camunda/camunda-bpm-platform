@@ -24,11 +24,6 @@ import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryBuilder;
 import org.camunda.bpm.engine.externaltask.UpdateExternalTaskRetriesBuilder;
 import org.camunda.bpm.engine.externaltask.UpdateExternalTaskRetriesSelectBuilder;
-import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
-import org.camunda.bpm.engine.runtime.JobQuery;
-import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
-import org.camunda.bpm.engine.runtime.UpdateProcessInstanceSuspensionStateBuilder;
-import org.camunda.bpm.engine.runtime.UpdateProcessInstanceSuspensionStateSelectBuilder;
 
 /**
  * Service that provides access to {@link ExternalTask} instances. External tasks
@@ -129,6 +124,26 @@ public interface ExternalTaskService {
    */
   public void complete(String externalTaskId, String workerId, Map<String, Object> variables);
 
+  /**
+   * <p>Completes an external task on behalf of a worker and submits variables
+   * to the process instance before continuing execution. The given task must be
+   * assigned to the worker.</p>
+   *
+   * @param externalTaskId the id of the external to complete
+   * @param workerId the id of the worker that completes the task
+   * @param variables a map of variables to set on the execution
+   *   the external task is assigned to
+   * @param localVariables a map of variables to set on the execution locally
+   *
+   * @throws NotFoundException if no external task with the given id exists
+   * @throws BadUserRequestException if the task is assigned to a different worker
+   * @throws AuthorizationException thrown if the current user does not possess any of the following permissions:
+   *   <ul>
+   *     <li>{@link Permissions#UPDATE} on {@link Resources#PROCESS_INSTANCE}</li>
+   *     <li>{@link Permissions#UPDATE_INSTANCE} on {@link Resources#PROCESS_DEFINITION}</li>
+   *   </ul>
+   */
+  public void complete(String externalTaskId, String workerId, Map<String, Object> variables, Map<String, Object> localVariables);
 
   /**
    * <p>Extends a lock of an external task on behalf of a worker.

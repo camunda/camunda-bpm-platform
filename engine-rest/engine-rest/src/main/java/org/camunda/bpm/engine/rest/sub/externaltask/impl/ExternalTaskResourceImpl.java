@@ -102,9 +102,10 @@ public class ExternalTaskResourceImpl implements ExternalTaskResource {
     ExternalTaskService externalTaskService = engine.getExternalTaskService();
 
     VariableMap variables = VariableValueDto.toMap(dto.getVariables(), engine, objectMapper);
+    VariableMap localVariables = VariableValueDto.toMap(dto.getLocalVariables(), engine, objectMapper);
 
     try {
-      externalTaskService.complete(externalTaskId, dto.getWorkerId(), variables);
+      externalTaskService.complete(externalTaskId, dto.getWorkerId(), variables, localVariables);
     } catch (NotFoundException e) {
       throw new RestException(Status.NOT_FOUND, e, "External task with id " + externalTaskId + " does not exist");
     } catch (BadUserRequestException e) {

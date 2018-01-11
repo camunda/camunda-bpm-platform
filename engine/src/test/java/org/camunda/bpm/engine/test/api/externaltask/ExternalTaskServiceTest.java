@@ -19,6 +19,8 @@ import org.apache.ibatis.jdbc.RuntimeSqlException;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
@@ -27,6 +29,7 @@ import org.camunda.bpm.engine.externaltask.ExternalTaskQueryBuilder;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.history.HistoricIncident;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
+import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
@@ -34,12 +37,15 @@ import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
+import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.util.AssertUtil;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.joda.time.DateTime;
 import org.junit.Assert;
 
@@ -2157,6 +2163,57 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  public void testCompleteWithLocalVariables() {
+    // given
+    BpmnModelInstance instance = Bpmn.createExecutableProcess("Process").startEvent().serviceTask("externalTask")
+        .camundaType("external").camundaTopic("foo").camundaTaskPriority("100")
+        .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_END, ReadLocalVariableListenerImpl.class)
+        .userTask("user").endEvent().done();
+
+    deployment(instance);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process");
+
+    List<LockedExternalTask> lockedTasks = externalTaskService.fetchAndLock(1, WORKER_ID).topic("foo", 1L).execute();
+
+    // when
+    externalTaskService.complete(lockedTasks.get(0).getId(), WORKER_ID, null,
+        Variables.createVariables().putValue("abc", "bar"));
+
+    // then
+    VariableInstance variableInstance = runtimeService.createVariableInstanceQuery()
+        .processInstanceIdIn(processInstance.getId()).singleResult();
+    assertNull(variableInstance);
+    HistoricVariableInstance historicVariableInstance = historyService.createHistoricVariableInstanceQuery()
+        .activityInstanceIdIn(lockedTasks.get(0).getActivityInstanceId()).singleResult();
+    assertNotNull(historicVariableInstance);
+    assertEquals("abc", historicVariableInstance.getName());
+    assertEquals("bar", historicVariableInstance.getValue());
+  }
+
+  public void testCompleteWithNonLocalVariables() {
+    // given
+    BpmnModelInstance instance = Bpmn.createExecutableProcess("Process").startEvent().serviceTask("externalTask")
+        .camundaType("external").camundaTopic("foo").camundaTaskPriority("100")
+        .camundaExecutionListenerClass(ExecutionListener.EVENTNAME_END, ReadLocalVariableListenerImpl.class)
+        .userTask("user").endEvent().done();
+
+    deployment(instance);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process");
+
+    List<LockedExternalTask> lockedTasks = externalTaskService.fetchAndLock(1, WORKER_ID).topic("foo", 1L).execute();
+
+    // when
+    externalTaskService.complete(lockedTasks.get(0).getId(), WORKER_ID,
+        Variables.createVariables().putValue("abc", "bar"), null);
+
+    // then
+    VariableInstance variableInstance = runtimeService.createVariableInstanceQuery()
+        .processInstanceIdIn(processInstance.getId()).singleResult();
+    assertNotNull(variableInstance);
+    assertEquals("bar", variableInstance.getValue());
+    assertEquals("abc", variableInstance.getName());
+  }
+
   protected Date nowPlus(long millis) {
     return new Date(ClockUtil.getCurrentTime().getTime() + millis);
   }
@@ -2171,6 +2228,15 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
       ids.add(runtimeService.startProcessInstanceByKey(key, String.valueOf(i)).getId());
     }
     return ids;
+  }
+
+  public static class ReadLocalVariableListenerImpl implements ExecutionListener {
+
+    @Override
+    public void notify(DelegateExecution execution) throws Exception {
+      String value = (String) execution.getVariable("abc");
+      assertEquals("bar", value);
+    }
   }
 
 }
