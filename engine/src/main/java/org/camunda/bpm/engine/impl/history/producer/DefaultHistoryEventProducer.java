@@ -769,7 +769,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     // initialize
     initHistoricIncidentEvent(evt, incident, eventType);
 
-    if (!HistoryEventTypes.INCIDENT_CREATE.equals(eventType)) {
+    if (HistoryEventTypes.INCIDENT_RESOLVE.equals(eventType) || HistoryEventTypes.INCIDENT_DELETE.equals(eventType)) {
       evt.setEndTime(ClockUtil.getCurrentTime());
     }
 
