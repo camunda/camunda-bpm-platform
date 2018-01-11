@@ -6,7 +6,8 @@ module.exports = [
   '$q',
   function($q) {
     return function(getCount, getList) {
-      return function(query, pages) {
+
+      return function(query, pages, sorting) {
         return getCount(query)
           .then(function(data) {
             var first = (pages.current - 1) * pages.size;
@@ -17,7 +18,7 @@ module.exports = [
               {
                 firstResult: first,
                 maxResults: pages.size
-              }
+              }, sorting
             );
 
             if (count > first) {
