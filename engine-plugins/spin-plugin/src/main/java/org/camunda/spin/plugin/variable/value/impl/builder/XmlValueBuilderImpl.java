@@ -12,9 +12,7 @@
  */
 package org.camunda.spin.plugin.variable.value.impl.builder;
 
-import org.camunda.bpm.engine.variable.impl.value.AbstractTypedValue;
 import org.camunda.bpm.engine.variable.value.SerializationDataFormat;
-import org.camunda.bpm.engine.variable.value.builder.TypedValueBuilder;
 import org.camunda.spin.plugin.variable.value.XmlValue;
 import org.camunda.spin.plugin.variable.value.builder.XmlValueBuilder;
 import org.camunda.spin.plugin.variable.value.impl.XmlValueImpl;
@@ -44,12 +42,6 @@ public class XmlValueBuilderImpl extends SpinValueBuilderImpl<XmlValue> implemen
 
   public XmlValueBuilder serializationDataFormat(String dataFormatName) {
     return (XmlValueBuilder) super.serializationDataFormat(dataFormatName);
-  }
-
-  @Override
-  public TypedValueBuilder<XmlValue> setTransient(boolean isTransient) {
-    ((AbstractTypedValue<?>) variableValue).setTransient(isTransient);
-    return this;
   }
 
 }

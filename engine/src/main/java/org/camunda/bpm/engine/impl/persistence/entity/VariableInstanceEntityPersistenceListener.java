@@ -25,9 +25,7 @@ public class VariableInstanceEntityPersistenceListener implements VariableInstan
 
   @Override
   public void onCreate(VariableInstanceEntity variable, AbstractVariableScope sourceScope) {
-    if (!variable.isTransient()) {
-      VariableInstanceEntity.insert(variable);
-    }
+    VariableInstanceEntity.insert(variable);
   }
 
   @Override

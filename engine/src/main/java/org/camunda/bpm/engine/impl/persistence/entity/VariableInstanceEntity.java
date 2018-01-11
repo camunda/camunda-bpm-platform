@@ -120,18 +120,17 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
 
   public static VariableInstanceEntity createAndInsert(String name, TypedValue value) {
     VariableInstanceEntity variableInstance = create(name, value, value.isTransient());
-    if (!variableInstance.isTransient) {
-      insert(variableInstance);
-    }
-
+    insert(variableInstance);
     return variableInstance;
   }
 
   public static void insert(VariableInstanceEntity variableInstance) {
-    Context
-    .getCommandContext()
-    .getDbEntityManager()
-    .insert(variableInstance);
+    if (!variableInstance.isTransient()) {
+      Context
+      .getCommandContext()
+      .getDbEntityManager()
+      .insert(variableInstance);
+    }
   }
 
   public static VariableInstanceEntity create(String name, TypedValue value, boolean isTransient) {
