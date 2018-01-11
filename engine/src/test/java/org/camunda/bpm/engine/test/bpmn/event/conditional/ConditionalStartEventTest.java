@@ -47,6 +47,10 @@ import org.junit.rules.RuleChain;
 
 public class ConditionalStartEventTest {
 
+  private static final String MULTIPLE_CONDITIONS = "multipleConditions";
+  private static final String TRUE_CONDITION_PROCESS = "trueConditionProcess";
+  private static final String CONDITIONAL_EVENT_PROCESS = "conditionalEventProcess";
+
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
 
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
@@ -70,13 +74,19 @@ public class ConditionalStartEventTest {
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/conditional/ConditionalStartEventTest.testSingleConditionalStartEvent.bpmn20.xml")
   public void testDeploymentCreatesSubscriptions() {
     // given a deployed process
+    String processDefinitionId = repositoryService.createProcessDefinitionQuery().processDefinitionKey(CONDITIONAL_EVENT_PROCESS).singleResult().getId();
 
     // when
     List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().list();
 
     // then
     assertEquals(1, eventSubscriptions.size());
-    assertEquals(EventType.CONDITONAL.name(), eventSubscriptions.get(0).getEventType());
+    EventSubscriptionEntity conditionalEventSubscription = (EventSubscriptionEntity) eventSubscriptions.get(0);
+    assertEquals(EventType.CONDITONAL.name(), conditionalEventSubscription.getEventType());
+    assertEquals(processDefinitionId, conditionalEventSubscription.getConfiguration());
+    assertNull(conditionalEventSubscription.getEventName());
+    assertNull(conditionalEventSubscription.getExecutionId());
+    assertNull(conditionalEventSubscription.getProcessInstanceId());
   }
 
   @Test
@@ -90,11 +100,7 @@ public class ConditionalStartEventTest {
     assertEquals(1, processDefinitions.size());
 
     // when
-    String deploymentId = repositoryService
-        .createDeployment()
-        .addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/conditional/ConditionalStartEventTest.testSingleConditionalStartEvent.bpmn20.xml")
-        .deploy()
-        .getId();
+    testRule.deploy("org/camunda/bpm/engine/test/bpmn/event/conditional/ConditionalStartEventTest.testSingleConditionalStartEvent.bpmn20.xml");
 
     // then
     List<EventSubscription> newEventSubscriptions = runtimeService.createEventSubscriptionQuery().list();
@@ -117,7 +123,6 @@ public class ConditionalStartEventTest {
     }
     assertFalse(eventSubscriptions.equals(newEventSubscriptions));
 
-    repositoryService.deleteDeployment(deploymentId, true);
   }
 
   @Test
@@ -129,10 +134,7 @@ public class ConditionalStartEventTest {
     thrown.expectMessage("Error while parsing process");
 
     // when
-    repositoryService
-    .createDeployment()
-        .addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/conditional/ConditionalStartEventTest.testTwoEqualConditionalStartEvent.bpmn20.xml")
-        .deploy();
+    testRule.deploy("org/camunda/bpm/engine/test/bpmn/event/conditional/ConditionalStartEventTest.testTwoEqualConditionalStartEvent.bpmn20.xml");
 
     List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().list();
     assertEquals(0, eventSubscriptions.size());
@@ -152,7 +154,7 @@ public class ConditionalStartEventTest {
     // when
     assertEquals(1, conditionInstances.size());
 
-    List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().processDefinitionKey("trueConditionProcess").list();
+    List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().processDefinitionKey(TRUE_CONDITION_PROCESS).list();
     assertEquals(1, processInstances.size());
 
     assertEquals(processInstances.get(0).getId(), conditionInstances.get(0).getId());
@@ -212,7 +214,7 @@ public class ConditionalStartEventTest {
       .correlateStartConditions();
 
     assertNull(runtimeService.createVariableInstanceQuery().singleResult());
-    assertNull(runtimeService.createProcessInstanceQuery().processDefinitionKey("conditionalEventProcess").singleResult());
+    assertNull(runtimeService.createProcessInstanceQuery().processDefinitionKey(CONDITIONAL_EVENT_PROCESS).singleResult());
   }
 
   @Test
@@ -253,7 +255,7 @@ public class ConditionalStartEventTest {
     // then
     assertEquals(2, resultInstances.size());
 
-    List<ProcessInstance> instances = runtimeService.createProcessInstanceQuery().processDefinitionKey("multipleConditions").list();
+    List<ProcessInstance> instances = runtimeService.createProcessInstanceQuery().processDefinitionKey(MULTIPLE_CONDITIONS).list();
     assertEquals(2, instances.size());
   }
 
@@ -285,7 +287,7 @@ public class ConditionalStartEventTest {
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/event/conditional/ConditionalStartEventTest.testSingleConditionalStartEvent.bpmn20.xml",
                             "org/camunda/bpm/engine/test/bpmn/event/conditional/ConditionalStartEventTest.testMultipleCondition.bpmn20.xml",
                             "org/camunda/bpm/engine/test/bpmn/event/conditional/ConditionalStartEventTest.testTrueConditionalStartEvent.bpmn20.xml" })
-  public void testMultipleSubscriptionsWithLessVariables() {
+  public void testMultipleSubscriptionsWithoutProvidingAllVariables() {
     // given three deployed processes
     List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().list();
 
@@ -294,7 +296,7 @@ public class ConditionalStartEventTest {
     Map<String, Object> variableMap = new HashMap<String, Object>();
     variableMap.put("foo", 1);
 
-    // when
+    // when, it should not throw PropertyNotFoundException
     List<ProcessInstance> instances = runtimeService
         .createConditionCorrelation()
         .setVariables(variableMap)
@@ -334,7 +336,7 @@ public class ConditionalStartEventTest {
 
     assertEquals(2, eventSubscriptions.size());
 
-    String processDefinitionId = repositoryService.createProcessDefinitionQuery().processDefinitionKey("trueConditionProcess").singleResult().getId();
+    String processDefinitionId = repositoryService.createProcessDefinitionQuery().processDefinitionKey(TRUE_CONDITION_PROCESS).singleResult().getId();
 
     // when
     List<ProcessInstance> instances = runtimeService
@@ -345,25 +347,22 @@ public class ConditionalStartEventTest {
 
     // then
     assertEquals(1, instances.size());
+    assertEquals(processDefinitionId, instances.get(0).getProcessDefinitionId());
   }
 
   @Test
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/event/conditional/ConditionalStartEventTest.testSingleConditionalStartEvent.bpmn20.xml",
-  "org/camunda/bpm/engine/test/bpmn/event/conditional/ConditionalStartEventTest.testMultipleCondition.bpmn20.xml"})
+                            "org/camunda/bpm/engine/test/bpmn/event/conditional/ConditionalStartEventTest.testMultipleCondition.bpmn20.xml"})
   public void testWithProcessDefinitionFirstVersion() {
     // given two deployed processes
-    String processDefinitionId = repositoryService.createProcessDefinitionQuery().processDefinitionKey("conditionalEventProcess").singleResult().getId();
+    String processDefinitionId = repositoryService.createProcessDefinitionQuery().processDefinitionKey(CONDITIONAL_EVENT_PROCESS).singleResult().getId();
 
     // assume
     List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().list();
     assertEquals(4, eventSubscriptions.size());
 
-    // when
-    String deploymentId = repositoryService
-        .createDeployment()
-        .addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/conditional/ConditionalStartEventTest.testSingleConditionalStartEvent.bpmn20.xml")
-        .deploy()
-        .getId();
+    // when deploy another version
+    testRule.deploy("org/camunda/bpm/engine/test/bpmn/event/conditional/ConditionalStartEventTest.testSingleConditionalStartEvent.bpmn20.xml");
 
     List<ProcessInstance> instances = runtimeService
         .createConditionCorrelation()
@@ -374,8 +373,6 @@ public class ConditionalStartEventTest {
     // then
     assertEquals(1, instances.size());
     assertEquals(processDefinitionId, instances.get(0).getProcessDefinitionId());
-
-    repositoryService.deleteDeployment(deploymentId, true);
   }
 
   @Test

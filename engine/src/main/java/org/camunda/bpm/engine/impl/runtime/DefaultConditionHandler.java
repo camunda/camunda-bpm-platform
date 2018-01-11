@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
 import org.camunda.bpm.engine.impl.cmd.CommandLogger;
 import org.camunda.bpm.engine.impl.event.EventType;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.javax.el.PropertyNotFoundException;
 import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionManager;
@@ -57,7 +58,7 @@ public class DefaultConditionHandler implements ConditionHandler {
 
         ActivityImpl activity = subscription.getActivity();
 
-        ConditionHandlerResult conditionResult = evaluateCondition(conditionSet, results, processDefinition, activity);
+        ConditionHandlerResult conditionResult = evaluateCondition(conditionSet, activity);
         if (conditionResult != null) {
           results.add(conditionResult);
         }
@@ -93,7 +94,7 @@ public class DefaultConditionHandler implements ConditionHandler {
     if (processDefinition != null && !processDefinition.isSuspended()) {
       List<ActivityImpl> activities = findActivities(processDefinition);
       for (ActivityImpl activity : activities) {
-        ConditionHandlerResult conditionResult = evaluateCondition(conditionSet, results, processDefinition, activity);
+        ConditionHandlerResult conditionResult = evaluateCondition(conditionSet, activity);
         if (conditionResult != null) {
           results.add(conditionResult);
         }
@@ -116,21 +117,21 @@ public class DefaultConditionHandler implements ConditionHandler {
     return EventType.CONDITONAL.name().equals(declaration.getEventType()) && declaration.isStartEvent();
   }
 
-  protected ConditionHandlerResult evaluateCondition(ConditionSet conditionSet, List<ConditionHandlerResult> results, ProcessDefinitionEntity processDefinition, ActivityImpl activity) {
+  protected ConditionHandlerResult evaluateCondition(ConditionSet conditionSet, ActivityImpl activity) {
     ExecutionEntity temporaryExecution = new ExecutionEntity();
     temporaryExecution.initializeVariableStore(conditionSet.getVariables());
-    temporaryExecution.setProcessDefinition(processDefinition);
+    temporaryExecution.setProcessDefinition(activity.getProcessDefinition());
 
     ConditionalEventDefinition conditionalEventDefinition = activity.getProperties().get(BpmnProperties.CONDITIONAL_EVENT_DEFINITION);
     try {
       if (conditionalEventDefinition.evaluate(temporaryExecution)) {
-        return new ConditionHandlerResult(processDefinition, activity);
+        return new ConditionHandlerResult((ProcessDefinitionEntity) activity.getProcessDefinition(), activity);
       }
     } catch (ProcessEngineException e) {
-      if (!e.getMessage().contains("Unknown property used in expression:")) {
-        throw e;
-      } else {
+      if (e.getCause() instanceof PropertyNotFoundException) {
         LOG.debugConditionCorrelation(e.getMessage());
+      } else {
+        throw e;
       }
     }
     return null;

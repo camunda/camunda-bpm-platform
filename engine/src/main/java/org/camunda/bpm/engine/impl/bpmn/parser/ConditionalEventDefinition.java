@@ -93,14 +93,14 @@ public class ConditionalEventDefinition extends EventSubscriptionDeclaration imp
     if (condition != null) {
       return condition.evaluate(execution, execution);
     }
-    throw new IllegalStateException("Condtional event must have a condition!");
+    throw new IllegalStateException("Conditional event must have a condition!");
   }
 
   public boolean tryEvaluate(DelegateExecution execution) {
     if (condition != null) {
       return condition.tryEvaluate(execution, execution);
     }
-    throw new IllegalStateException("Condtional event must have a condition!");
+    throw new IllegalStateException("Conditional event must have a condition!");
   }
 
   public boolean tryEvaluate(VariableEvent variableEvent, DelegateExecution execution) {

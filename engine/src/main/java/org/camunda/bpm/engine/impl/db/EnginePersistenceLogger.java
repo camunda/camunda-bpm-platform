@@ -651,7 +651,7 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
 
   public void noStartupLockPropertyFound() {
     logError(
-        "081", "No startup lock property found in databse");
+        "081", "No startup lock property found in database");
   }
 
   public void printBatchResults(List<BatchResult> results) {
