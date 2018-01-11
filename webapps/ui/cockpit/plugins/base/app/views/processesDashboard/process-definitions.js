@@ -33,7 +33,7 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
           { class: 'state',    request: '', sortable: false, content: $translate.instant('PLUGIN_PROCESS_DEF_STATE')},
           { class: 'incidents',request: 'incidentCount', sortable: true,  content: $translate.instant('PLUGIN_PROCESS_DEF_INCIDENTS')},
           { class: 'instances',request: 'instances'    , sortable: true, content: $translate.instant('PLUGIN_PROCESS_DEF_RUNNING_INSTANCES')},
-          { class: 'name',     request: 'key'          , sortable: true, content: $translate.instant('PLUGIN_PROCESS_DEF_NAME')},
+          { class: 'name',     request: 'name'          , sortable: true, content: $translate.instant('PLUGIN_PROCESS_DEF_NAME')},
           { class: 'tenantID', request: 'tenantId'     , sortable: true, content: $translate.instant('PLUGIN_PROCESS_DEF_TENANT_ID')},
           { class: 'history',  request: '', sortable: false, content: $translate.instant('PLUGIN_PROCESS_DEF_HISTORY_VIEW'), condition: $scope.hasReportPlugin},
           { class: 'report',   request: '', sortable: false, content: $translate.instant('PLUGIN_PROCESS_DEF_REPORT'), condition: $scope.hasReportPlugin},
@@ -41,7 +41,7 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
         ];
 
         // Default sorting
-        var defaultValue = { sortBy: 'key', sortOrder: 'asc', sortReverse: false};
+        var defaultValue = { sortBy: 'name', sortOrder: 'asc', sortReverse: false};
         $scope.sortObj   = loadLocal(defaultValue);
 
         // Update Table
