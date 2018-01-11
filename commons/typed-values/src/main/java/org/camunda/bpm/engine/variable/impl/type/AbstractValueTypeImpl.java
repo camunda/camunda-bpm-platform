@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.variable.impl.type;
 
+import java.util.Map;
+
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
@@ -81,6 +83,18 @@ public abstract class AbstractValueTypeImpl implements ValueType {
     } else if (!name.equals(other.name))
       return false;
     return true;
+  }
+
+  protected Boolean isTransient(Map<String, Object> valueInfo) {
+    if (valueInfo != null && valueInfo.containsKey(VALUE_INFO_TRANSIENT)) {
+      Object isTransient = valueInfo.get(VALUE_INFO_TRANSIENT);
+      if (isTransient instanceof Boolean) {
+        return (Boolean) isTransient;
+      } else {
+        throw new IllegalArgumentException("The property 'transient' should have a value of type 'boolean'.");
+      }
+    }
+    return false;
   }
 
 }
