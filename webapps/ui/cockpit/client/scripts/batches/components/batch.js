@@ -65,11 +65,13 @@ var Batch = function(camAPI, localConf) {
 };
 
 Batch.prototype._loadLocal = function(type, defaultValue) {
-  return this._localConf.get(this.sortingProperties[type], defaultValue);
+  var localConf = this._localConf;
+  return localConf && localConf.get(this.sortingProperties[type], defaultValue);
 };
 
 Batch.prototype._saveLocal = function(type, value) {
-  this._localConf.set(this.sortingProperties[type], value);
+  var localConf = this._localConf;
+  localConf && localConf.set(this.sortingProperties[type], value);
 };
 
 Batch.prototype.openDeleteModal = function() {
