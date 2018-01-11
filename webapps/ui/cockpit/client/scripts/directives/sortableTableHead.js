@@ -41,6 +41,9 @@ var Directive = function() {
             condition;
         };
 
+        $scope.formatClassName = function(className) {
+          return className.replace(/\s/g, '-');
+        };
 
 
       }],
