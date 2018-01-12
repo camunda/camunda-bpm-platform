@@ -45,7 +45,6 @@ public class DeploymentManager extends AbstractManager {
 
     for (ResourceEntity resource : deployment.getResources().values()) {
       resource.setDeploymentId(deployment.getId());
-      resource.setTenantId(deployment.getTenantId());
       getResourceManager().insertResource(resource);
     }
 

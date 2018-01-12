@@ -27,7 +27,6 @@ import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
-import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentQuery;
 import org.camunda.bpm.engine.repository.Resource;
@@ -387,26 +386,6 @@ public class MultiTenancyDeploymentCmdsTenantCheckTest {
     assertThat(query.count(), is(2L));
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
     assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
-  }
-
-  @Test
-  public void shouldSetTenantIdForDeploymentResources() {
-    // when
-    repositoryService.createDeployment()
-      .addClasspathResource("org/camunda/bpm/engine/test/api/multitenancy/testProcess.bpmn")
-      .tenantId(TENANT_ONE)
-      .deploy();
-
-    Deployment deployment = repositoryService
-        .createDeploymentQuery()
-        .singleResult();
-
-    // then
-    assertThat(deployment, is(notNullValue()));
-    assertThat(deployment.getTenantId(), is(TENANT_ONE));
-
-    List<Resource> deploymentResources = repositoryService.getDeploymentResources(deployment.getId());
-    assertThat(((ResourceEntity)deploymentResources.get(0)).getTenantId(), is(TENANT_ONE));
   }
 
   @After
