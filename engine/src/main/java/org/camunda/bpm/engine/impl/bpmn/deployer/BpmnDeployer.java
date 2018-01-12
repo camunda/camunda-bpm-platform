@@ -408,6 +408,7 @@ public class BpmnDeployer extends AbstractDefinitionDeployer<ProcessDefinitionEn
           identityLink.setGroupId(expr.toString());
         }
         identityLink.setType(IdentityLinkType.CANDIDATE);
+        identityLink.setTenantId(processDefinition.getTenantId());
         identityLink.insert();
       }
     }
