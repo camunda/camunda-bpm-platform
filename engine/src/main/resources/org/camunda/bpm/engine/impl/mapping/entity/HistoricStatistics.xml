@@ -58,8 +58,8 @@
           </if>
 
           from ${prefix}ACT_HI_ACTINST ACT
-          INNER JOIN ${prefix}ACT_HI_PROCINST PROC
-          ON ACT.PROC_INST_ID_ = PROC.ID_
+          INNER JOIN ${prefix}ACT_HI_PROCINST PI
+          ON ACT.PROC_INST_ID_ = PI.ID_
 
           where ACT.PROC_DEF_ID_ = #{processDefinitionId}
             <if test="!includeFinished">
@@ -75,16 +75,16 @@
             </if>
 
             <if test="startedBefore != null">
-            and PROC.START_TIME_ &lt;= #{startedBefore}
+            and PI.START_TIME_ &lt;= #{startedBefore}
             </if>
             <if test="startedAfter != null">
-            and PROC.START_TIME_ &gt;= #{startedAfter}
+            and PI.START_TIME_ &gt;= #{startedAfter}
             </if>
             <if test="finishedBefore != null">
-            and PROC.END_TIME_ &lt;= #{finishedBefore}
+            and PI.END_TIME_ &lt;= #{finishedBefore}
             </if>
             <if test="finishedAfter != null">
-            and PROC.END_TIME_ &gt;= #{finishedAfter}
+            and PI.END_TIME_ &gt;= #{finishedAfter}
             </if>
           GROUP BY ACT_ID_
 
