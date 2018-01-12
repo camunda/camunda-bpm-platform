@@ -129,31 +129,65 @@ public class HistoricActivityStatisticsRestServiceQueryTest extends AbstractRest
   }
 
   @Test
-  public void testAdditionalStartDateOption() {
+  public void testAdditionalStartedAfterOption() {
+    final Date testDate = new Date(0);
     given()
       .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
-      .queryParam("startDate", DATE_FORMAT_WITH_TIMEZONE.format(new Date(0)))
+      .queryParam("startedAfter", DATE_FORMAT_WITH_TIMEZONE.format(testDate))
       .then().expect()
       .statusCode(Status.OK.getStatusCode())
       .when().get(HISTORIC_ACTIVITY_STATISTICS_URL);
 
     InOrder inOrder = Mockito.inOrder(historicActivityStatisticsQuery);
-    inOrder.verify(historicActivityStatisticsQuery).startDate(new Date(0));
+    inOrder.verify(historicActivityStatisticsQuery).startedAfter(testDate);
     inOrder.verify(historicActivityStatisticsQuery).list();
     inOrder.verifyNoMoreInteractions();
   }
 
   @Test
-  public void testAdditionalEndDateOption() {
+  public void testAdditionalStartedBeforeOption() {
+    final Date testDate = new Date(0);
     given()
       .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
-      .queryParam("endDate", DATE_FORMAT_WITH_TIMEZONE.format(new Date(15 * 60 * 1000)))
+      .queryParam("startedBefore", DATE_FORMAT_WITH_TIMEZONE.format(testDate))
       .then().expect()
       .statusCode(Status.OK.getStatusCode())
       .when().get(HISTORIC_ACTIVITY_STATISTICS_URL);
 
     InOrder inOrder = Mockito.inOrder(historicActivityStatisticsQuery);
-    inOrder.verify(historicActivityStatisticsQuery).endDate(new Date(15 * 60 * 1000));
+    inOrder.verify(historicActivityStatisticsQuery).startedBefore(testDate);
+    inOrder.verify(historicActivityStatisticsQuery).list();
+    inOrder.verifyNoMoreInteractions();
+  }
+
+  @Test
+  public void testAdditionalFinishedAfterOption() {
+    final Date testDate = new Date(0);
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+      .queryParam("finishedAfter", DATE_FORMAT_WITH_TIMEZONE.format(testDate))
+      .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .when().get(HISTORIC_ACTIVITY_STATISTICS_URL);
+
+    InOrder inOrder = Mockito.inOrder(historicActivityStatisticsQuery);
+    inOrder.verify(historicActivityStatisticsQuery).finishedAfter(testDate);
+    inOrder.verify(historicActivityStatisticsQuery).list();
+    inOrder.verifyNoMoreInteractions();
+  }
+
+  @Test
+  public void testAdditionalFinishedBeforeOption() {
+    final Date testDate = new Date(0);
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+      .queryParam("finishedBefore", DATE_FORMAT_WITH_TIMEZONE.format(testDate))
+      .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .when().get(HISTORIC_ACTIVITY_STATISTICS_URL);
+
+    InOrder inOrder = Mockito.inOrder(historicActivityStatisticsQuery);
+    inOrder.verify(historicActivityStatisticsQuery).finishedBefore(testDate);
     inOrder.verify(historicActivityStatisticsQuery).list();
     inOrder.verifyNoMoreInteractions();
   }

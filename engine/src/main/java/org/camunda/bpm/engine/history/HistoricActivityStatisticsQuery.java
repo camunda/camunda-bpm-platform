@@ -38,15 +38,17 @@ public interface HistoricActivityStatisticsQuery extends Query<HistoricActivityS
    */
   HistoricActivityStatisticsQuery includeCompleteScope();
 
-  /**
-   * Sets start date of the period of interest.
-   */
-  HistoricActivityStatisticsQuery startDate(Date startDate);
+  /** Only select historic activities of process instances that were started before the given date. */
+  HistoricActivityStatisticsQuery startedBefore(Date date);
 
-  /**
-   * Sets end date of the period of interest.
-   */
-  HistoricActivityStatisticsQuery endDate(Date endDate);
+  /** Only select historic activities of process instances that were started after the given date. */
+  HistoricActivityStatisticsQuery startedAfter(Date date);
+
+  /** Only select historic activities of process instances that were started before the given date. */
+  HistoricActivityStatisticsQuery finishedBefore(Date date);
+
+  /** Only select historic activities of process instances that were started after the given date. */
+  HistoricActivityStatisticsQuery finishedAfter(Date date);
 
   /**
    * Order by activity id (needs to be followed by {@link #asc()} or {@link #desc()}).

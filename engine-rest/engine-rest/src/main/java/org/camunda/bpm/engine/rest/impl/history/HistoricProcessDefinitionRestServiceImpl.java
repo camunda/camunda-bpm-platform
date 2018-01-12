@@ -38,8 +38,10 @@ import java.util.List;
 
 public class HistoricProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineAware implements HistoricProcessDefinitionRestService {
 
-  public static final String QUERY_PARAM_START_DATE = "startDate";
-  public static final String QUERY_PARAM_END_DATE = "endDate";
+  public static final String QUERY_PARAM_STARTED_AFTER = "startedAfter";
+  public static final String QUERY_PARAM_STARTED_BEFORE = "startedBefore";
+  public static final String QUERY_PARAM_FINISHED_AFTER = "finishedAfter";
+  public static final String QUERY_PARAM_FINISHED_BEFORE = "finishedBefore";
 
   public HistoricProcessDefinitionRestServiceImpl(ObjectMapper objectMapper, ProcessEngine processEngine) {
     super(processEngine.getName(), objectMapper);
@@ -69,14 +71,24 @@ public class HistoricProcessDefinitionRestServiceImpl extends AbstractRestProces
     DateConverter dateConverter = new DateConverter();
     dateConverter.setObjectMapper(objectMapper);
 
-    if(queryParameters.getFirst(QUERY_PARAM_START_DATE) != null) {
-      Date startDate = dateConverter.convertQueryParameterToType(queryParameters.getFirst(QUERY_PARAM_START_DATE));
-      query.startDate(startDate);
+    if(queryParameters.getFirst(QUERY_PARAM_STARTED_AFTER) != null) {
+      Date startedAfter = dateConverter.convertQueryParameterToType(queryParameters.getFirst(QUERY_PARAM_STARTED_AFTER));
+      query.startedAfter(startedAfter);
     }
 
-    if(queryParameters.getFirst(QUERY_PARAM_END_DATE) != null) {
-      Date endDate = dateConverter.convertQueryParameterToType(queryParameters.getFirst(QUERY_PARAM_END_DATE));
-      query.endDate(endDate);
+    if(queryParameters.getFirst(QUERY_PARAM_STARTED_BEFORE) != null) {
+      Date startedBefore = dateConverter.convertQueryParameterToType(queryParameters.getFirst(QUERY_PARAM_STARTED_BEFORE));
+      query.startedBefore(startedBefore);
+    }
+
+    if(queryParameters.getFirst(QUERY_PARAM_FINISHED_AFTER) != null) {
+      Date finishedAfter = dateConverter.convertQueryParameterToType(queryParameters.getFirst(QUERY_PARAM_FINISHED_AFTER));
+      query.finishedAfter(finishedAfter);
+    }
+
+    if(queryParameters.getFirst(QUERY_PARAM_FINISHED_BEFORE) != null) {
+      Date finishedBefore = dateConverter.convertQueryParameterToType(queryParameters.getFirst(QUERY_PARAM_FINISHED_BEFORE));
+      query.finishedBefore(finishedBefore);
     }
 
     setSortOptions(query, sortOrder, sortBy);

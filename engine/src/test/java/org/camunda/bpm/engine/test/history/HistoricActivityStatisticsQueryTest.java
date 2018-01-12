@@ -578,44 +578,43 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
     assertEquals(4, task.getFinished());
   }
 
-  /*@Ignore
   @Deployment(resources="org/camunda/bpm/engine/test/history/HistoricActivityStatisticsQueryTest.testSingleTask.bpmn20.xml")
   public void testQueryByCanceledAndFinishedByPeriods() throws ParseException {
     try {
 
-      ClockUtil.setCurrentTime(sdf.parse("01.01.2016 12:00:00"));
-
-      String processDefinitionId = getProcessDefinitionId();
-
+      //start two process instances
+      ClockUtil.setCurrentTime(sdf.parse("15.01.2016 12:00:00"));
       startProcesses(2);
 
       // cancel running process instances
+      ClockUtil.setCurrentTime(sdf.parse("15.02.2016 12:00:00"));
       List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().list();
       for (ProcessInstance processInstance : processInstances) {
         runtimeService.deleteProcessInstance(processInstance.getId(), "test");
       }
 
-      //move current time
+      //start two process instances
       ClockUtil.setCurrentTime(sdf.parse("01.02.2016 12:00:00"));
-
       startProcesses(2);
 
       // complete running tasks
+      ClockUtil.setCurrentTime(sdf.parse("25.02.2016 12:00:00"));
       List<Task> tasks = taskService.createTaskQuery().list();
       for (Task task : tasks) {
         taskService.complete(task.getId());
       }
 
-      //move current time
-      ClockUtil.setCurrentTime(sdf.parse("01.03.2016 12:00:00"));
-
+      //starte two more process instances
+      ClockUtil.setCurrentTime(sdf.parse("15.03.2016 12:00:00"));
       startProcesses(2);
 
-      ClockUtil.setCurrentTime(sdf.parse("01.04.2016 12:00:00"));
+      //NOW
+      ClockUtil.setCurrentTime(sdf.parse("25.03.2016 12:00:00"));
 
-      //check January
+      String processDefinitionId = getProcessDefinitionId();
+      //check January by started dates
       HistoricActivityStatisticsQuery query = historyService.createHistoricActivityStatisticsQuery(processDefinitionId).includeCanceled().includeFinished()
-        .startDate(sdf.parse("01.12.2015 12:00:00")).endDate(sdf.parse("31.01.2016 12:00:00")).orderByActivityId().asc();
+        .startedAfter(sdf.parse("01.01.2016 00:00:00")).startedBefore(sdf.parse("31.01.2016 23:59:59")).orderByActivityId().asc();
       List<HistoricActivityStatistics> statistics = query.list();
 
       assertEquals(2, query.count());
@@ -627,9 +626,17 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
       // task
       assertActivityStatistics(statistics.get(1), "task", 0, 2, 2);
 
-      //check February
+      //check January by finished dates
       query = historyService.createHistoricActivityStatisticsQuery(processDefinitionId).includeCanceled().includeFinished()
-        .startDate(sdf.parse("01.02.2016 10:00:00")).endDate(sdf.parse("28.02.2016 12:00:00")).orderByActivityId().asc();
+        .finishedAfter(sdf.parse("01.01.2016 00:00:00")).finishedBefore(sdf.parse("31.01.2016 23:59:59")).orderByActivityId().asc();
+      statistics = query.list();
+
+      assertEquals(0, query.count());
+      assertEquals(0, statistics.size());
+
+      //check February by started dates
+      query = historyService.createHistoricActivityStatisticsQuery(processDefinitionId).includeCanceled().includeFinished()
+        .startedAfter(sdf.parse("01.02.2016 00:00:00")).startedBefore(sdf.parse("28.02.2016 23:59:59")).orderByActivityId().asc();
       statistics = query.list();
 
       assertEquals(3, query.count());
@@ -644,9 +651,26 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
       // task
       assertActivityStatistics(statistics.get(2), "task", 0, 0, 2);
 
-      //check March
+      //check February by finished dates
       query = historyService.createHistoricActivityStatisticsQuery(processDefinitionId).includeCanceled().includeFinished()
-        .startDate(sdf.parse("01.03.2016 10:00:00")).orderByActivityId().asc();
+        .finishedAfter(sdf.parse("01.02.2016 00:00:00")).finishedBefore(sdf.parse("28.02.2016 23:59:59")).orderByActivityId().asc();
+      statistics = query.list();
+
+      assertEquals(3, query.count());
+      assertEquals(3, statistics.size());
+
+      // end
+      assertActivityStatistics(statistics.get(0), "end", 0, 0, 2);
+
+      // start
+      assertActivityStatistics(statistics.get(1), "start", 0, 0, 4);
+
+      // task
+      assertActivityStatistics(statistics.get(2), "task", 0, 2, 4);
+
+      //check March by started dates
+      query = historyService.createHistoricActivityStatisticsQuery(processDefinitionId).includeCanceled().includeFinished()
+        .startedAfter(sdf.parse("01.03.2016 00:00:00")).orderByActivityId().asc();
       statistics = query.list();
 
       assertEquals(2, query.count());
@@ -658,8 +682,17 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
       // task
       assertActivityStatistics(statistics.get(1), "task", 2, 0, 0);
 
-      //check whole period
-      query = historyService.createHistoricActivityStatisticsQuery(processDefinitionId).includeCanceled().includeFinished().orderByActivityId().asc();
+      //check March by finished dates
+      query = historyService.createHistoricActivityStatisticsQuery(processDefinitionId).includeCanceled().includeFinished()
+        .finishedAfter(sdf.parse("01.03.2016 00:00:00")).orderByActivityId().asc();
+      statistics = query.list();
+
+      assertEquals(0, query.count());
+      assertEquals(0, statistics.size());
+
+      //check whole period by started date
+      query = historyService.createHistoricActivityStatisticsQuery(processDefinitionId).includeCanceled().includeFinished()
+        .startedAfter(sdf.parse("01.01.2016 00:00:00")).orderByActivityId().asc();
       statistics = query.list();
 
       assertEquals(3, query.count());
@@ -678,7 +711,7 @@ public class HistoricActivityStatisticsQueryTest extends PluggableProcessEngineT
       ClockUtil.reset();
     }
 
-  }*/
+  }
 
   protected void assertActivityStatistics(HistoricActivityStatistics activity, String activityName, long instances, long canceled, long finished) {
     assertEquals(activityName, activity.getId());

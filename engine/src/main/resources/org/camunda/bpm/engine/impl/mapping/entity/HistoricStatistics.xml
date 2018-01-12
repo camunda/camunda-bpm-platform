@@ -45,35 +45,47 @@
 
   <sql id="selectHistoricActivityStatisticsByQueryCriteriaSql">
     from (
-          select ACT_ID_ as ID_,
-          sum(CASE WHEN END_TIME_ is NULL THEN 1 ELSE 0 END) as INSTANCE_COUNT_
+          select ACT.ACT_ID_ as ID_,
+          sum(CASE WHEN ACT.END_TIME_ is NULL THEN 1 ELSE 0 END) as INSTANCE_COUNT_
           <if test="includeFinished">
-          , sum(CASE WHEN END_TIME_ is not NULL THEN 1 ELSE 0 END)  as FINISHED_COUNT_
+          , sum(CASE WHEN ACT.END_TIME_ is not NULL THEN 1 ELSE 0 END)  as FINISHED_COUNT_
           </if>
           <if test="includeCanceled">
-          , sum(CASE WHEN ACT_INST_STATE_ = 2 THEN 1 ELSE 0 END)  as CANCELED_COUNT_
+          , sum(CASE WHEN ACT.ACT_INST_STATE_ = 2 THEN 1 ELSE 0 END)  as CANCELED_COUNT_
           </if>
           <if test="includeCompleteScope">
-          , sum(CASE WHEN ACT_INST_STATE_ = 1 THEN 1 ELSE 0 END)  as COMPLETE_SCOPE_COUNT_
+          , sum(CASE WHEN ACT.ACT_INST_STATE_ = 1 THEN 1 ELSE 0 END)  as COMPLETE_SCOPE_COUNT_
           </if>
 
-          from ${prefix}ACT_HI_ACTINST
-          where PROC_DEF_ID_ = #{processDefinitionId}
-            and (END_TIME_ is null
-            <if test="includeFinished">
-            or END_TIME_ is not null
-            </if>
+          from ${prefix}ACT_HI_ACTINST ACT
+          INNER JOIN ${prefix}ACT_HI_PROCINST PROC
+          ON act.PROC_INST_ID_ = proc.ID_
+
+          where ACT.PROC_DEF_ID_ = #{processDefinitionId}
+            <if test="!includeFinished">
+            and (
+              ACT.END_TIME_ is null
             <if test="includeCanceled">
-            or ACT_INST_STATE_ = 2
+            or ACT.ACT_INST_STATE_ = 2
             </if>
             <if test="includeCompleteScope">
-            or ACT_INST_STATE_ = 1
+            or ACT.ACT_INST_STATE_ = 1
             </if>
             )
-            and (END_TIME_ is null
-              or END_TIME_ >= #{startDate}
-            )
-            and START_TIME_ &lt; #{endDate}
+            </if>
+
+            <if test="startedBefore != null">
+            and PROC.START_TIME_ &lt;= #{startedBefore}
+            </if>
+            <if test="startedAfter != null">
+            and PROC.START_TIME_ &gt;= #{startedAfter}
+            </if>
+            <if test="finishedBefore != null">
+            and PROC.END_TIME_ &lt;= #{finishedBefore}
+            </if>
+            <if test="finishedAfter != null">
+            and PROC.END_TIME_ &gt;= #{finishedAfter}
+            </if>
           GROUP BY ACT_ID_
 
         ) RES

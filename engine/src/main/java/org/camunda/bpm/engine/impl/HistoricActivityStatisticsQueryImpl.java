@@ -38,8 +38,10 @@ public class HistoricActivityStatisticsQueryImpl extends AbstractQuery<HistoricA
   protected boolean includeCanceled;
   protected boolean includeCompleteScope;
 
-  protected Date startDate = new Date(0);
-  protected Date endDate = new Date(ClockUtil.getCurrentTime().getTime() + 1000);    //current time + 1 sec, as taken into account exclusively
+  protected Date startedBefore;
+  protected Date startedAfter;
+  protected Date finishedBefore;
+  protected Date finishedAfter;
 
   public HistoricActivityStatisticsQueryImpl(String processDefinitionId, CommandExecutor commandExecutor) {
     super(commandExecutor);
@@ -62,14 +64,26 @@ public class HistoricActivityStatisticsQueryImpl extends AbstractQuery<HistoricA
   }
 
   @Override
-  public HistoricActivityStatisticsQuery startDate(Date startDate) {
-    this.startDate = startDate;
+  public HistoricActivityStatisticsQuery startedAfter(Date date) {
+    startedAfter = date;
     return this;
   }
 
   @Override
-  public HistoricActivityStatisticsQuery endDate(Date endDate) {
-    this.endDate = endDate;
+  public HistoricActivityStatisticsQuery startedBefore(Date date) {
+    startedBefore = date;
+    return this;
+  }
+
+  @Override
+  public HistoricActivityStatisticsQuery finishedAfter(Date date) {
+    finishedAfter = date;
+    return this;
+  }
+
+  @Override
+  public HistoricActivityStatisticsQuery finishedBefore(Date date) {
+    finishedBefore = date;
     return this;
   }
 
@@ -116,11 +130,4 @@ public class HistoricActivityStatisticsQueryImpl extends AbstractQuery<HistoricA
     return includeCompleteScope;
   }
 
-  public Date getStartDate() {
-    return startDate;
-  }
-
-  public Date getEndDate() {
-    return endDate;
-  }
 }
