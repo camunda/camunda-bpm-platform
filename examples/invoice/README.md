@@ -7,7 +7,7 @@ This is the invoice demo application which is shipped with the full distribution
 If you want to hack this demo, type
 
 ```bash
-mvn jetty:run -Pdevelop
+mvn clean jetty:run -Pdevelop
 ```
 
 Open your browser at [http://localhost:8080/camunda](http://localhost:8080/camunda).
