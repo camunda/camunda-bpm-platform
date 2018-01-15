@@ -1,7 +1,7 @@
 var sinon = require('sinon');
 
 module.exports = {
-  _loadLocal: sinon.stub().returnsThis(),
-  _saveLocal: sinon.stub().returnsThis()
+  get: sinon.stub().returnsThis(),
+  set: sinon.stub(),
+  remove: sinon.stub()
 };
-
