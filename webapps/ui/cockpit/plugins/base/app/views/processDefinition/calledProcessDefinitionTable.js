@@ -14,11 +14,39 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
     label: 'PLUGIN_CALLED_PROCESS_DEFINITIONS_LABEL',
     template: template,
     controller: [
-      '$scope', '$location', '$q', 'PluginProcessDefinitionResource',
-      function($scope, $location, $q, PluginProcessDefinitionResource) {
+      '$scope', '$location', '$q', 'PluginProcessDefinitionResource', '$translate',  'localConf',
+      function($scope, $location, $q, PluginProcessDefinitionResource, $translate, localConf) {
 
         var filter;
         var processData = $scope.processData.newChild($scope);
+
+        $scope.headColumns = [
+          { class: 'process-definition', request: 'processDef', sortable: true, content: $translate.instant('PLUGIN_CALLED_PROCESS')},
+          { class: 'activity', request: 'activityName', sortable: true, content: $translate.instant('PLUGIN_ACTIVITY')}
+        ];
+
+        // Default sorting
+        $scope.sortObj   = loadLocal({ sortBy: 'processDef', sortOrder: 'asc', sortReverse: false});
+
+
+        $scope.onSortChange = function(sortObj) {
+          sortObj = sortObj || $scope.sortObj;
+          // sortReverse required by anqular-sorting;
+          sortObj.sortReverse = sortObj.sortOrder !== 'asc';
+          saveLocal(sortObj);
+          $scope.sortObj = sortObj;
+
+        };
+
+        function saveLocal(sortObj) {
+          localConf.set('sortCalledProcessDefTab', sortObj);
+
+        }
+        function loadLocal(defaultValue) {
+          return localConf.get('sortCalledProcessDefTab', defaultValue);
+        }
+
+
 
         $scope.getSearchQueryForSearchType = searchWidgetUtils.getSearchQueryForSearchType.bind(null, 'activityIdIn');
 
