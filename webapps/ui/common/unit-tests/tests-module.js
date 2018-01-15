@@ -10,11 +10,12 @@ ngModule.value('camAPI', createCamApiMock());
 ngModule.provider('Views', function() {
   return ViewsProvider;
 });
+
 ngModule.provider('$route', function() {
   return $routeProvider;
 });
 
-ngModule.provider('localConf', function() {
+ngModule.factory('localConf', function() {
   return localConfMock;
 });
 
