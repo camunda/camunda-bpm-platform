@@ -3,15 +3,13 @@
      loading-state="{{ loadingState }}"
      text-empty="{{'PLUGIN_CALLED_PROCESS_EMPTY' | translate}}">
   <table class="called-process-definition cam-table">
-    <thead>
-      <tr>
-        <th class="process-definition">{{'PLUGIN_CALLED_PROCESS' | translate}}</th>
-        <th class="activity">{{'PLUGIN_ACTIVITY' | translate}}</th>
-      </tr>
+    <thead sortable-table-head
+           head-columns="headColumns"
+           on-sort-change="onSortChange(sortObj)"
+           default-sort="sortObj">
     </thead>
-
     <tbody>
-      <tr ng-repeat="calledProcessDefinition in calledProcessDefinitions">
+      <tr ng-repeat="calledProcessDefinition in calledProcessDefinitions | orderBy:sortObj.sortBy:sortObj.sortReverse">
         <td class="process-definition"
             cam-widget-clipboard="calledProcessDefinition.id">
           <a ng-href="#/process-definition/{{ calledProcessDefinition.id }}/runtime?parentProcessDefinitionId={{ processDefinition.id }}">
