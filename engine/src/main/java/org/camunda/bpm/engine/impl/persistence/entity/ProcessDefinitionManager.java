@@ -18,6 +18,8 @@ import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl;
+import org.camunda.bpm.engine.impl.bpmn.deployer.BpmnDeployer;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.auth.ResourceAuthorizationProvider;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
@@ -26,6 +28,8 @@ import org.camunda.bpm.engine.impl.event.EventType;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.impl.persistence.AbstractResourceDefinitionManager;
+import org.camunda.bpm.engine.impl.persistence.deploy.Deployer;
+import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
 
@@ -276,6 +280,16 @@ public class ProcessDefinitionManager extends AbstractManager implements Abstrac
         .findEventSubscriptionsByConfiguration(EventType.CONDITONAL.name(), processDefinitionId);
     eventSubscriptionsToRemove.addAll(conditionalEventSubscriptions);
 
+    List<EventSubscriptionEntity> cachedEventSubscriptions = getCommandContext().getDbEntityManager().getCachedEntitiesByType(EventSubscriptionEntity.class);
+
+    if (cachedEventSubscriptions != null && !cachedEventSubscriptions.isEmpty()) {
+      for (EventSubscriptionEntity entity : cachedEventSubscriptions) {
+        if (processDefinitionId.equals(entity.getConfiguration()) && entity.getExecutionId() == null && !eventSubscriptionsToRemove.contains(entity)) {
+          eventSubscriptionsToRemove.add(entity);
+        }
+      }
+    }
+
     for (EventSubscriptionEntity eventSubscriptionEntity : eventSubscriptionsToRemove) {
       eventSubscriptionEntity.delete();
     }
@@ -343,11 +357,33 @@ public class ProcessDefinitionManager extends AbstractManager implements Abstrac
 
     deleteSubscriptionsForProcessDefinition(processDefinitionId);
 
+    addSubsctiptionsFromPreviousVersion((ProcessDefinitionEntity) processDefinition);
+
     // delete job definitions
     getJobDefinitionManager().deleteJobDefinitionsByProcessDefinitionId(processDefinition.getId());
 
+    ((ProcessDefinitionEntity) processDefinition).setDeleted(true);
   }
 
+  protected void addSubsctiptionsFromPreviousVersion(ProcessDefinitionEntity processDefinition) {
+    String previousProcessDefinitionId = processDefinition.getPreviousProcessDefinitionId();
+    if (previousProcessDefinitionId != null) {
+      ProcessDefinitionEntity previousDefinition = findLatestProcessDefinitionById(previousProcessDefinitionId);
+
+      if (previousDefinition != null && !previousDefinition.isDeleted()) {
+        ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
+        DeploymentCache deploymentCache = configuration.getDeploymentCache();
+        previousDefinition = deploymentCache.resolveProcessDefinition(previousDefinition);
+
+        List<Deployer> deployers = configuration.getDeployers();
+        for (Deployer deployer : deployers) {
+          if (deployer instanceof BpmnDeployer) {
+            ((BpmnDeployer) deployer).addEventSubscriptions(previousDefinition);
+          }
+        }
+      }
+    }
+  }
 
   // helper ///////////////////////////////////////////////////////////
 

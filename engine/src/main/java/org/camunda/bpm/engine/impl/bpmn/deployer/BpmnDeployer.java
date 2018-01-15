@@ -271,7 +271,7 @@ public class BpmnDeployer extends AbstractDefinitionDeployer<ProcessDefinitionEn
     }
   }
 
-  protected void addEventSubscriptions(ProcessDefinitionEntity processDefinition) {
+  public void addEventSubscriptions(ProcessDefinitionEntity processDefinition) {
     Map<String, EventSubscriptionDeclaration> eventDefinitions = processDefinition.getProperties().get(BpmnProperties.EVENT_SUBSCRIPTION_DECLARATIONS);
     for (EventSubscriptionDeclaration eventDefinition : eventDefinitions.values()) {
       addEventSubscription(processDefinition, eventDefinition);

@@ -69,6 +69,8 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
   protected Set<Expression> candidateStarterUserIdExpressions = new HashSet<Expression>();
   protected Set<Expression> candidateStarterGroupIdExpressions = new HashSet<Expression>();
 
+  protected boolean deleted = false;
+
   // firstVersion is true, when version == 1 or when
   // this definition does not have any previous definitions
   protected boolean firstVersion = false;
@@ -457,5 +459,13 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
 
   public void setHistoryTimeToLive(Integer historyTimeToLive) {
     this.historyTimeToLive = historyTimeToLive;
+  }
+
+  public void setDeleted(boolean deleted) {
+    this.deleted = deleted;
+  }
+
+  public boolean isDeleted() {
+    return deleted;
   }
 }
