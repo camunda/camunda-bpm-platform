@@ -21,12 +21,12 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
         var processData = $scope.processData.newChild($scope);
 
         $scope.headColumns = [
-          { class: 'process-definition', request: 'processDef', sortable: true, content: $translate.instant('PLUGIN_CALLED_PROCESS')},
-          { class: 'activity', request: 'activityName', sortable: true, content: $translate.instant('PLUGIN_ACTIVITY')}
+          { class: 'process-definition', request: 'key', sortable: true, content: $translate.instant('PLUGIN_CALLED_PROCESS')},
+          { class: 'activity', request: 'name', sortable: true, content: $translate.instant('PLUGIN_ACTIVITY')}
         ];
 
         // Default sorting
-        $scope.sortObj   = loadLocal({ sortBy: 'processDef', sortOrder: 'asc', sortReverse: false});
+        $scope.sortObj   = loadLocal({ sortBy: 'key', sortOrder: 'asc', sortReverse: false});
 
 
         $scope.onSortChange = function(sortObj) {
