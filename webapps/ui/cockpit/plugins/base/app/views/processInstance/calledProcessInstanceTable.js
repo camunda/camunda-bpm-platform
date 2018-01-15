@@ -8,14 +8,41 @@ var template = fs.readFileSync(__dirname + '/called-process-instance-table.html'
 
 module.exports = function(ngModule) {
   ngModule.controller('CalledProcessInstanceController', [
-    '$scope', 'PluginProcessInstanceResource',
-    function($scope,   PluginProcessInstanceResource) {
+    '$scope', 'PluginProcessInstanceResource', '$translate',  'localConf',
+    function($scope,   PluginProcessInstanceResource, $translate, localConf) {
 
       // input: processInstance, processData
 
       var calledProcessInstanceData = $scope.processData.newChild($scope);
 
       // var processInstance = $scope.processInstance;
+
+      $scope.headColumns = [
+        { class: 'state', request: 'incidents', sortable: true, content: 'State' },
+        { class: 'called-process-instance', request: 'id', sortable: true, content: $translate.instant('PLUGIN_CALLED_PROCESS_PROCESS_INSTANCE')},
+        { class: 'process-definition', request: 'processDefinitionId', sortable: true, content: $translate.instant('PLUGIN_CALLED_PROCESS_PROCESS_DEFINITION')},
+        { class: 'activity', request: 'instance', sortable: true, content: $translate.instant('PLUGIN_CALLED_PROCESS_ACTIVITY')}
+      ];
+
+      // Default sorting
+      $scope.sortObj   = loadLocal({ sortBy: 'processDefinitionId', sortOrder: 'asc', sortReverse: false});
+
+      $scope.onSortChange = function(sortObj) {
+        sortObj = sortObj || $scope.sortObj;
+        // sortReverse required by anqular-sorting;
+        sortObj.sortReverse = sortObj.sortOrder !== 'asc';
+        saveLocal(sortObj);
+        $scope.sortObj = sortObj;
+
+      };
+
+      function saveLocal(sortObj) {
+        localConf.set('sortCalledProcessInstTab', sortObj);
+
+      }
+      function loadLocal(defaultValue) {
+        return localConf.get('sortCalledProcessInstTab', defaultValue);
+      }
 
       var filter = null;
 

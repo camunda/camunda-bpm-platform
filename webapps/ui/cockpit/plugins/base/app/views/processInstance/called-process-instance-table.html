@@ -3,17 +3,16 @@
      loading-state="{{ loadingState }}"
      text-empty="{{ 'PLUGIN_CALLED_PROCESS_NO_PROCESS_INSTANCES' | translate }}">
   <table class="called-process-instance cam-table">
-    <thead>
-      <tr>
-        <th class="status">State</th>
-        <th class="called-process-instance">{{ 'PLUGIN_CALLED_PROCESS_PROCESS_INSTANCE' | translate }}</th>
-        <th class="process-definition">{{ 'PLUGIN_CALLED_PROCESS_PROCESS_DEFINITION' | translate }}</th>
-        <th class="activity">{{ 'PLUGIN_CALLED_PROCESS_ACTIVITY' | translate }}</th>
-      </tr>
+
+    <thead sortable-table-head
+           head-columns="headColumns"
+           on-sort-change="onSortChange(sortObj)"
+           default-sort="sortObj">
     </thead>
 
     <tbody>
-      <tr ng-repeat="calledProcessInstance in calledProcessInstances">
+      <tr ng-repeat="calledProcessInstance in calledProcessInstances | orderBy:sortObj.sortBy:sortObj.sortReverse">
+        {{sortObj.sortBy}} {{sortObj.sortReverse}}
         <td class="state">
           <div ng-if="calledProcessInstance.incidents.length > -1" state-circle incidents="calledProcessInstance.incidents"></div>
           <div ng-if="calledProcessInstance.incidents == undefined">
