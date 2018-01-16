@@ -119,10 +119,16 @@
            loading-state="{{ groupLoadingState }}"
            text-empty="{{ 'TENANTS_NO_GROUPS' | translate:'{ tenant: tenant.name }' }}">
         <table class="cam-table">
-          <thead>
-          <tr>
-            <th>{{ 'TENANTS_NAME' | translate }}</th>
-          </tr>
+          <thead cam-sortable-table-header
+                 default-sort-by="name"
+                 default-sort-order="asc"
+                 sorting-id="admin-sorting-tenants-groups"
+                 on-sort-change="onGroupsSortingChanged(sorting)"
+                 on-sort-initialized="onGroupsSortingInitialized(sorting)">
+            <tr>
+              <th cam-sortable-table-column
+                  sort-by-property="name">{{ 'TENANTS_NAME' | translate }}</th>
+            </tr>
           </thead>
           <tbody>
           <tr ng-repeat="group in tenantGroupList">
