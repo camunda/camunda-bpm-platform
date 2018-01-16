@@ -22,30 +22,27 @@
          loading-state="loadingState"
          text-empty="{{ 'GROUPS_NO_GROUPS' | translate }}"
          toolips="translations"
-         storage-group="'ANG'">
+         storage-group="'ANG'"
+         blocked="blocked">
       <table class="cam-table">
-        <thead>
+        <thead cam-sortable-table-header
+               default-sort-by="id"
+               default-sort-order="asc"
+               sorting-id="admin-sorting-groups"
+               on-sort-change="onSortChanged(sorting)"
+               on-sort-initialized="onSortInitialized(sorting)">
           <tr>
-            <th class="group-id">
-              <span class="column-label">{{ 'GROUPS_GROUP_ID' | translate }}</span>
-              <a ng-click="changeOrder('id')">
-              <span class="glyphicon"
-                    ng-class="orderClass('id')"></span>
-              </a>
+            <th class="group-id"
+                cam-sortable-table-column
+                sort-by-property="id">{{ 'GROUPS_GROUP_ID' | translate }}
             </th>
-            <th class="group-name">
-              <span class="column-label">{{ 'GROUPS_GROUP_NAME' | translate }}</span>
-              <a ng-click="changeOrder('name')">
-              <span class="glyphicon"
-                    ng-class="orderClass('name')"></span>
-              </a>
+            <th class="group-name"
+                cam-sortable-table-column
+                sort-by-property="name">{{ 'GROUPS_GROUP_NAME' | translate }}
             </th>
-            <th class="group-type">
-              <span class="column-label">{{ 'GROUPS_GROUP_TYPE' | translate }}</span>
-              <a ng-click="changeOrder('type')">
-              <span class="glyphicon"
-                    ng-class="orderClass('type')"></span>
-              </a>
+            <th class="group-type"
+                cam-sortable-table-column
+                sort-by-property="type">{{ 'GROUPS_GROUP_TYPE' | translate }}
             </th>
             <th class="action">{{ 'GROUPS_ACTION' | translate }}</th>
           </tr>
