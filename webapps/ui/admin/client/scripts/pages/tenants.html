@@ -21,23 +21,23 @@
          on-search-change="onSearchChange(query, pages)"
          loading-state="loadingState"
          text-empty="{{ 'TENANTS_NO_TENANTS' | translate }}"
-         storage-group="'ANT'">
+         storage-group="'ANT'"
+         blocked="blocked">
       <table class="cam-table">
-        <thead>
+        <thead cam-sortable-table-header
+               default-sort-by="id"
+               default-sort-order="asc"
+               sorting-id="admin-sorting-tenants"
+               on-sort-change="onSortChanged(sorting)"
+               on-sort-initialized="onSortInitialized(sorting)">
           <tr>
-            <th class="id">
-              <span class="column-label">{{ 'TENANTS_TENANT_ID' | translate }}</span>
-              <a ng-click="changeOrder('id')">
-              <span class="glyphicon"
-                    ng-class="orderClass('id')"></span>
-              </a>
+            <th class="id"
+                cam-sortable-table-column
+                sort-by-property="id">{{ 'TENANTS_TENANT_ID' | translate }}
             </th>
-            <th class="name">
-              <span class="column-label">{{ 'TENANTS_TENANT_NAME' | translate }}</span>
-              <a ng-click="changeOrder('name')">
-              <span class="glyphicon"
-                    ng-class="orderClass('name')"></span>
-              </a>
+            <th class="name"
+                cam-sortable-table-column
+                sort-by-property="name">{{ 'TENANTS_TENANT_NAME' | translate }}
             </th>
             <th class="action">{{ 'TENANTS_ACTION' | translate }}</th>
           </tr>
