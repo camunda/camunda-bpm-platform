@@ -169,15 +169,18 @@
                  on-sort-initialized="onUsersSortingInitialized(sorting)">
             <tr>
               <th cam-sortable-table-column
-                  sort-by-property="firstName">{{ 'GROUP_EDIT_NAME' | translate }}</th>
+                  sort-by-property="userId">{{ 'USERS_ID' | translate }}</th>
               <th cam-sortable-table-column
-                  sort-by-property="userId">{{ 'GROUP_EDIT_USERNAME' | translate }}</th>
+                  sort-by-property="firstName">{{ 'USERS_FIRSTNAME' | translate }}</th>
+              <th cam-sortable-table-column
+                  sort-by-property="lastName">{{ 'USERS_LASTNAME' | translate }}</th>
             </tr>
           </thead>
           <tbody>
             <tr ng-repeat="user in groupUserList">
-              <td><a ng-href="#/users/{{user.id | escape}}">{{user.firstName}} {{user.lastName}}</a></td>
-              <td>{{user.id}}</td>
+              <td><a ng-href="#/users/{{user.id | escape}}">{{ user.id }}</a></td>
+              <td>{{ user.firstName }}</td>
+              <td>{{ user.lastName }}</td>
             </tr>
           </tbody>
         </table>
