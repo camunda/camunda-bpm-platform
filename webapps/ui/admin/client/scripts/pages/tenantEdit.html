@@ -78,16 +78,26 @@
            loading-state="{{ userLoadingState }}"
            text-empty="{{ 'TENANTS_NO_USERS' | translate:'{tenant: tenant.name }' }}">
         <table class="cam-table">
-          <thead>
+          <thead cam-sortable-table-header
+                 default-sort-by="userId"
+                 default-sort-order="asc"
+                 sorting-id="admin-sorting-tenants-users"
+                 on-sort-change="onUsersSortingChanged(sorting)"
+                 on-sort-initialized="onUsersSortingInitialized(sorting)">
             <tr>
-              <th>{{ 'TENANTS_NAME' | translate }}</th>
-              <th>{{ 'TENANTS_USERNAME' | translate }}</th>
+              <th cam-sortable-table-column
+                  sort-by-property="userId">{{ 'USERS_ID' | translate }}</th>
+              <th cam-sortable-table-column
+                  sort-by-property="firstName">{{ 'USERS_FIRSTNAME' | translate }}</th>
+              <th cam-sortable-table-column
+                  sort-by-property="lastName">{{ 'USERS_LASTNAME' | translate }}</th>
             </tr>
           </thead>
           <tbody>
             <tr ng-repeat="user in tenantUserList">
-              <td><a ng-href="#/users/{{ user.id | escape }}">{{ user.firstName }} {{ user.lastName }}</a></td>
-              <td>{{ user.id }}</td>
+              <td><a ng-href="#/users/{{ user.id | escape }}">{{ user.id }}</a></td>
+              <td>{{ user.firstName }}</td>
+              <td>{{ user.lastName }}</td>
             </tr>
           </tbody>
         </table>

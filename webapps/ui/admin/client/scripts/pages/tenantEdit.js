@@ -65,6 +65,7 @@ var Controller = [
         tenantUserPages = $scope.tenantUserPages = { size: 25, total: 0 };
 
     var groupsSorting = null;
+    var usersSorting = null;
 
     // common form validation //////////////////////////
 
@@ -100,9 +101,18 @@ var Controller = [
       });
     };
 
+    $scope.onUsersSortingInitialized = function(_sorting) {
+      usersSorting = _sorting;
+    };
+
+    $scope.onUsersSortingChanged = function(_sorting) {
+      usersSorting = _sorting;
+      updateTenantUserView();
+    };
+
     // update users list
     $scope.$watch(function() {
-      return $location.search().tab === 'users' && parseInt(($location.search() || {}).page || '1');
+      return $location.search().tab === 'users' && usersSorting && parseInt(($location.search() || {}).page || '1');
     }, function(newValue) {
       if (newValue) {
         tenantUserPages.current = newValue;
@@ -171,7 +181,7 @@ var Controller = [
       var prep = prepareTenantMemberView(tenantUserPages);
 
       $scope.userLoadingState = 'LOADING';
-      UserResource.list(angular.extend({}, prep.searchParams, prep.pagingParams), function(err, res) {
+      UserResource.list(angular.extend({}, prep.searchParams, prep.pagingParams, usersSorting), function(err, res) {
         if( err === null ) {
           $scope.tenantUserList = res;
           $scope.userLoadingState = res.length ? 'LOADED' : 'EMPTY';
