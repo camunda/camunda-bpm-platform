@@ -13,7 +13,7 @@
 
 package org.camunda.bpm.engine.impl.runtime;
 
-import org.camunda.bpm.engine.impl.ConditionCorrelationBuilderImpl;
+import org.camunda.bpm.engine.impl.ConditionEvaluationBuilderImpl;
 import org.camunda.bpm.engine.variable.VariableMap;
 
 public class ConditionSet {
@@ -25,7 +25,7 @@ public class ConditionSet {
   protected final String tenantId;
   protected final boolean isTenantIdSet;
 
-  public ConditionSet(ConditionCorrelationBuilderImpl builder) {
+  public ConditionSet(ConditionEvaluationBuilderImpl builder) {
     this.businessKey = builder.getBusinessKey();
     this.processInstanceId = builder.getProcessInstanceId();
     this.processDefinitionId = builder.getProcessDefinitionId();

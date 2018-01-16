@@ -78,9 +78,9 @@ public class MultiTenancyStartProcessInstanceByConditionCmdTenantCheckTest {
 
     // when
     List<ProcessInstance> instances = engineRule.getRuntimeService()
-      .createConditionCorrelation()
+      .createConditionEvaluation()
       .setVariables(variableMap)
-      .correlateStartConditions();
+      .evaluateStartConditions();
 
     // then
     assertNotNull(instances);
@@ -108,10 +108,10 @@ public class MultiTenancyStartProcessInstanceByConditionCmdTenantCheckTest {
 
     // when
     List<ProcessInstance> processInstances = engineRule.getRuntimeService()
-      .createConditionCorrelation()
+      .createConditionEvaluation()
       .setVariables(variableMap)
       .tenantId(TENANT_ONE)
-      .correlateStartConditions();
+      .evaluateStartConditions();
 
     // then
     assertNotNull(processInstances);
@@ -141,13 +141,13 @@ public class MultiTenancyStartProcessInstanceByConditionCmdTenantCheckTest {
     try {
       // when
       engineRule.getRuntimeService()
-        .createConditionCorrelation()
+        .createConditionEvaluation()
         .setVariables(variableMap)
-        .correlateStartConditions();
+        .evaluateStartConditions();
       fail("Exception expected");
     } catch (Exception e) {
       // then
-      Assert.assertTrue(e.getMessage().contains("No subscriptions were found during correlation of the conditional start events."));
+      Assert.assertTrue(e.getMessage().contains("No subscriptions were found during evaluation of the conditional start events."));
     } finally {
       engineRule.getIdentityService().clearAuthentication();
     }
@@ -157,7 +157,7 @@ public class MultiTenancyStartProcessInstanceByConditionCmdTenantCheckTest {
   }
 
   @Test
-  public void testFailToCorrelateConditionByProcessDefinitionIdNoAuthenticatedTenants() {
+  public void testFailToEvaluateConditionByProcessDefinitionIdNoAuthenticatedTenants() {
     // given
     testRule.deployForTenant(TENANT_ONE, PROCESS);
 
@@ -173,14 +173,14 @@ public class MultiTenancyStartProcessInstanceByConditionCmdTenantCheckTest {
 
     // when
     engineRule.getRuntimeService()
-      .createConditionCorrelation()
+      .createConditionEvaluation()
       .setVariable("foo", "bar")
       .processDefinitionId(processDefinition.getId())
-      .correlateStartConditions();
+      .evaluateStartConditions();
   }
 
   @Test
-  public void testCorrelateConditionByProcessDefinitionIdWithAuthenticatedTenants() {
+  public void testEvaluateConditionByProcessDefinitionIdWithAuthenticatedTenants() {
     // given
     testRule.deployForTenant(TENANT_ONE, PROCESS);
 
@@ -192,11 +192,11 @@ public class MultiTenancyStartProcessInstanceByConditionCmdTenantCheckTest {
 
     // when
     List<ProcessInstance> instances = engineRule.getRuntimeService()
-      .createConditionCorrelation()
+      .createConditionEvaluation()
       .setVariable("foo", "bar")
       .tenantId(TENANT_ONE)
       .processDefinitionId(processDefinition.getId())
-      .correlateStartConditions();
+      .evaluateStartConditions();
 
     // then
     assertNotNull(instances);

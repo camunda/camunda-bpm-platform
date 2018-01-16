@@ -18,16 +18,16 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import java.util.List;
 import java.util.Map;
 
-import org.camunda.bpm.engine.impl.cmd.CorrelateStartConditionCmd;
+import org.camunda.bpm.engine.impl.cmd.EvaluateStartConditionCmd;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
-import org.camunda.bpm.engine.runtime.ConditionCorrelationBuilder;
+import org.camunda.bpm.engine.runtime.ConditionEvaluationBuilder;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.impl.VariableMapImpl;
 
-public class ConditionCorrelationBuilderImpl implements ConditionCorrelationBuilder {
+public class ConditionEvaluationBuilderImpl implements ConditionEvaluationBuilder {
   protected CommandExecutor commandExecutor;
   protected CommandContext commandContext;
 
@@ -40,7 +40,7 @@ public class ConditionCorrelationBuilderImpl implements ConditionCorrelationBuil
   protected String tenantId = null;
   protected boolean isTenantIdSet = false;
 
-  public ConditionCorrelationBuilderImpl(CommandExecutor commandExecutor) {
+  public ConditionEvaluationBuilderImpl(CommandExecutor commandExecutor) {
     ensureNotNull("commandExecutor", commandExecutor);
     this.commandExecutor = commandExecutor;
   }
@@ -110,21 +110,21 @@ public class ConditionCorrelationBuilderImpl implements ConditionCorrelationBuil
   }
 
   @Override
-  public ConditionCorrelationBuilder processInstanceBusinessKey(String businessKey) {
+  public ConditionEvaluationBuilder processInstanceBusinessKey(String businessKey) {
     ensureNotNull("businessKey", businessKey);
     this.businessKey = businessKey;
     return this;
   }
 
   @Override
-  public ConditionCorrelationBuilder processDefinitionId(String processDefinitionId) {
+  public ConditionEvaluationBuilder processDefinitionId(String processDefinitionId) {
     ensureNotNull("processDefinitionId", processDefinitionId);
     this.processDefinitionId = processDefinitionId;
     return this;
   }
 
   @Override
-  public ConditionCorrelationBuilder setVariable(String variableName, Object variableValue) {
+  public ConditionEvaluationBuilder setVariable(String variableName, Object variableValue) {
     ensureNotNull("variableName", variableName);
     ensureVariablesInitialized();
     this.variables.put(variableName, variableValue);
@@ -132,7 +132,7 @@ public class ConditionCorrelationBuilderImpl implements ConditionCorrelationBuil
   }
 
   @Override
-  public ConditionCorrelationBuilder setVariables(Map<String, Object> variables) {
+  public ConditionEvaluationBuilder setVariables(Map<String, Object> variables) {
     ensureNotNull("variables", variables);
     ensureVariablesInitialized();
     this.variables.putAll(variables);
@@ -140,9 +140,9 @@ public class ConditionCorrelationBuilderImpl implements ConditionCorrelationBuil
   }
 
   @Override
-  public ConditionCorrelationBuilder tenantId(String tenantId) {
+  public ConditionEvaluationBuilder tenantId(String tenantId) {
     ensureNotNull(
-        "The tenant-id cannot be null. Use 'withoutTenantId()' if you want to correlate conditional start event to a process definition which has no tenant-id.",
+        "The tenant-id cannot be null. Use 'withoutTenantId()' if you want to evaluate conditional start event with a process definition which has no tenant-id.",
         "tenantId", tenantId);
 
     isTenantIdSet = true;
@@ -151,15 +151,15 @@ public class ConditionCorrelationBuilderImpl implements ConditionCorrelationBuil
   }
 
   @Override
-  public ConditionCorrelationBuilder withoutTenantId() {
+  public ConditionEvaluationBuilder withoutTenantId() {
     isTenantIdSet = true;
     tenantId = null;
     return this;
   }
 
   @Override
-  public List<ProcessInstance> correlateStartConditions() {
-    return execute(new CorrelateStartConditionCmd(this));
+  public List<ProcessInstance> evaluateStartConditions() {
+    return execute(new EvaluateStartConditionCmd(this));
   }
 
   protected void ensureVariablesInitialized() {

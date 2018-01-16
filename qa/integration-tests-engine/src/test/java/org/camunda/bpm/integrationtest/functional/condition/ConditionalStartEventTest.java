@@ -41,16 +41,16 @@ public class ConditionalStartEventTest extends AbstractFoxPlatformIntegrationTes
   }
 
   @Test
-  public void test() {
+  public void testStartInstanceWithBeanCondition() {
     List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().list();
 
     assertEquals(1, eventSubscriptions.size());
     assertEquals(EventType.CONDITONAL.name(), eventSubscriptions.get(0).getEventType());
 
     List<ProcessInstance> instances = runtimeService
-        .createConditionCorrelation()
+        .createConditionEvaluation()
         .setVariable("foo", 1)
-        .correlateStartConditions();
+        .evaluateStartConditions();
 
     assertEquals(1, instances.size());
 

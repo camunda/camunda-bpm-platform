@@ -26,7 +26,7 @@ import org.camunda.bpm.engine.migration.MigrationPlanExecutionBuilder;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
-import org.camunda.bpm.engine.runtime.ConditionCorrelationBuilder;
+import org.camunda.bpm.engine.runtime.ConditionEvaluationBuilder;
 import org.camunda.bpm.engine.runtime.EventSubscriptionQuery;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
@@ -2025,10 +2025,10 @@ public interface RuntimeService {
   void resolveIncident(String incidentId);
 
   /**
-   * Define a complex condition correlation using a fluent builder.
+   * Define a complex condition evaluation using a fluent builder.
    *
-   * @return the fluent builder for defining the condition correlation.
+   * @return the fluent builder for defining the condition evaluation.
    */
-  ConditionCorrelationBuilder createConditionCorrelation();
+  ConditionEvaluationBuilder createConditionEvaluation();
 
 }

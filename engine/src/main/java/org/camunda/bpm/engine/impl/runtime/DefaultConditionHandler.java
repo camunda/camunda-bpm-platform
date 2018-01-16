@@ -37,18 +37,18 @@ public class DefaultConditionHandler implements ConditionHandler {
   private final static CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
 
   @Override
-  public List<ConditionHandlerResult> correlateStartCondition(CommandContext commandContext, ConditionSet conditionSet) {
+  public List<ConditionHandlerResult> evaluateStartCondition(CommandContext commandContext, ConditionSet conditionSet) {
     if (conditionSet.getProcessDefinitionId() == null) {
-      return correlateConditionStartByEventSubscription(commandContext, conditionSet);
+      return evaluateConditionStartByEventSubscription(commandContext, conditionSet);
     } else {
-      return correlateConditionStartByProcessDefinitionId(commandContext, conditionSet, conditionSet.getProcessDefinitionId());
+      return evaluateConditionStartByProcessDefinitionId(commandContext, conditionSet, conditionSet.getProcessDefinitionId());
     }
   }
 
-  protected List<ConditionHandlerResult> correlateConditionStartByEventSubscription(CommandContext commandContext, ConditionSet conditionSet) {
+  protected List<ConditionHandlerResult> evaluateConditionStartByEventSubscription(CommandContext commandContext, ConditionSet conditionSet) {
     List<EventSubscriptionEntity> subscriptions = findConditionalStartEventSubscriptions(commandContext, conditionSet);
     if (subscriptions == null || subscriptions.isEmpty()) {
-      throw new ProcessEngineException("No subscriptions were found during correlation of the conditional start events.");
+      throw new ProcessEngineException("No subscriptions were found during evaluation of the conditional start events.");
     }
     List<ConditionHandlerResult> results = new ArrayList<ConditionHandlerResult>();
     for (EventSubscriptionEntity subscription : subscriptions) {
@@ -83,7 +83,7 @@ public class DefaultConditionHandler implements ConditionHandler {
     }
   }
 
-  protected List<ConditionHandlerResult> correlateConditionStartByProcessDefinitionId(CommandContext commandContext, ConditionSet conditionSet,
+  protected List<ConditionHandlerResult> evaluateConditionStartByProcessDefinitionId(CommandContext commandContext, ConditionSet conditionSet,
       String processDefinitionId) {
     DeploymentCache deploymentCache = commandContext.getProcessEngineConfiguration().getDeploymentCache();
     ProcessDefinitionEntity processDefinition = deploymentCache.findDeployedProcessDefinitionById(processDefinitionId);
@@ -128,7 +128,7 @@ public class DefaultConditionHandler implements ConditionHandler {
       }
     } catch (ProcessEngineException e) {
       if (e.getCause() instanceof PropertyNotFoundException) {
-        LOG.debugConditionCorrelation(e.getMessage());
+        LOG.debugConditionEvaluation(e.getMessage());
       } else {
         throw e;
       }

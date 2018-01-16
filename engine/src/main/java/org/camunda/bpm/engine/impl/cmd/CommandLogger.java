@@ -278,7 +278,7 @@ public class CommandLogger extends ProcessEngineLogger {
         processDefinitionId));
   }
 
-  public void debugConditionCorrelation(String message) {
+  public void debugConditionEvaluation(String message) {
     logDebug("042", message);
   }
 }

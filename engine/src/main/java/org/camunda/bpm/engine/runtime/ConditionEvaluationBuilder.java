@@ -20,29 +20,29 @@ import java.util.Map;
  * <p>A fluent builder for defining conditional start event correlation</p>
  *  TODO
  */
-public interface ConditionCorrelationBuilder {
+public interface ConditionEvaluationBuilder {
 
   /**
    * <p>
    * Correlate the condition such that the process instance has a business key with
    * the given name. If the condition is correlated to a conditional start
    * event then the given business key is set on the created process instance.
-   * Is only supported for {@link #correlateStartConditions()}.</p>
+   * Is only supported for {@link #evaluateStartConditions()}.</p>
    *
    * @param businessKey
    *          the businessKey to correlate on.
    * @return the builder
    */
-  ConditionCorrelationBuilder processInstanceBusinessKey(String businessKey);
+  ConditionEvaluationBuilder processInstanceBusinessKey(String businessKey);
 
   /**
    * <p>Correlate the condition such that a process definition with the given id is selected.
-   * Is only supported for {@link #correlateStartConditions()}.</p>
+   * Is only supported for {@link #evaluateStartConditions()}.</p>
    *
    * @param processDefinitionId the id of the process definition to correlate on.
    * @return the builder
    */
-  ConditionCorrelationBuilder processDefinitionId(String processDefinitionId);
+  ConditionEvaluationBuilder processDefinitionId(String processDefinitionId);
 
   /**
    * <p>Pass a variable to the condition.</p>
@@ -53,7 +53,7 @@ public interface ConditionCorrelationBuilder {
    * @param variableValue the value of the variable to set
    * @return the builder
    */
-  ConditionCorrelationBuilder setVariable(String variableName, Object variableValue);
+  ConditionEvaluationBuilder setVariable(String variableName, Object variableValue);
 
   /**
    * <p>Pass a variables to the condition.</p>
@@ -62,7 +62,7 @@ public interface ConditionCorrelationBuilder {
    *          the map of variables
    * @return the builder
    */
-  ConditionCorrelationBuilder setVariables(Map<String, Object> variables);
+  ConditionEvaluationBuilder setVariables(Map<String, Object> variables);
 
   /**
    * Specify a tenant to correlate a condition to. The condition can only be
@@ -72,7 +72,7 @@ public interface ConditionCorrelationBuilder {
    *          the id of the tenant
    * @return the builder
    */
-  ConditionCorrelationBuilder tenantId(String tenantId);
+  ConditionEvaluationBuilder tenantId(String tenantId);
 
   /**
    * Specify that the condition can only be correlated on process
@@ -80,12 +80,12 @@ public interface ConditionCorrelationBuilder {
    *
    * @return the builder
    */
-  ConditionCorrelationBuilder withoutTenantId();
+  ConditionEvaluationBuilder withoutTenantId();
 
   /**
    *
    * @return the list of the newly created process instances
    */
-  List<ProcessInstance> correlateStartConditions();
+  List<ProcessInstance> evaluateStartConditions();
 
 }

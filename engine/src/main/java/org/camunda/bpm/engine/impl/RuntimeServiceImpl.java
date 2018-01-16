@@ -49,7 +49,7 @@ import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.migration.MigrationPlanBuilder;
 import org.camunda.bpm.engine.migration.MigrationPlanExecutionBuilder;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
-import org.camunda.bpm.engine.runtime.ConditionCorrelationBuilder;
+import org.camunda.bpm.engine.runtime.ConditionEvaluationBuilder;
 import org.camunda.bpm.engine.runtime.EventSubscriptionQuery;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
 import org.camunda.bpm.engine.runtime.Incident;
@@ -695,7 +695,7 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
   }
 
   @Override
-  public ConditionCorrelationBuilder createConditionCorrelation() {
-    return new ConditionCorrelationBuilderImpl(commandExecutor);
+  public ConditionEvaluationBuilder createConditionEvaluation() {
+    return new ConditionEvaluationBuilderImpl(commandExecutor);
   }
 }

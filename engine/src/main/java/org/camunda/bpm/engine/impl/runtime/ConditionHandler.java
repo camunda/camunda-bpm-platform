@@ -19,7 +19,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
 public interface ConditionHandler {
 
-  public List<ConditionHandlerResult> correlateStartCondition(CommandContext commandContext, ConditionSet conditionSet);
+  public List<ConditionHandlerResult> evaluateStartCondition(CommandContext commandContext, ConditionSet conditionSet);
 
 
 }

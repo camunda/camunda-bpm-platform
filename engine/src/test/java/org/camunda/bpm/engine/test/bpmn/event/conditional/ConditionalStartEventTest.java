@@ -169,9 +169,9 @@ public class ConditionalStartEventTest {
 
     // when
     List<ProcessInstance> conditionInstances = runtimeService
-        .createConditionCorrelation()
+        .createConditionEvaluation()
         .setVariable("foo", 1)
-        .correlateStartConditions();
+        .evaluateStartConditions();
 
     // then
     assertEquals(1, conditionInstances.size());
@@ -191,13 +191,13 @@ public class ConditionalStartEventTest {
     repositoryService.deleteDeployment(deployment.getId(), true);
 
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("No subscriptions were found during correlation of the conditional start events.");
+    thrown.expectMessage("No subscriptions were found during evaluation of the conditional start events.");
 
     // when
     runtimeService
-      .createConditionCorrelation()
+      .createConditionEvaluation()
       .setVariable("foo", 1)
-      .correlateStartConditions();
+      .evaluateStartConditions();
   }
 
   @Test
@@ -369,9 +369,9 @@ public class ConditionalStartEventTest {
 
     // when
     List<ProcessInstance> conditionInstances = runtimeService
-        .createConditionCorrelation()
+        .createConditionEvaluation()
         .setVariable("foo", "bar")
-        .correlateStartConditions();
+        .evaluateStartConditions();
 
     // then
     assertEquals(1, conditionInstances.size());
@@ -389,9 +389,9 @@ public class ConditionalStartEventTest {
 
     // when
     List<ProcessInstance> instances = runtimeService
-        .createConditionCorrelation()
+        .createConditionEvaluation()
         .setVariable("foo", 1)
-        .correlateStartConditions();
+        .evaluateStartConditions();
 
     // then
     assertEquals(1, instances.size());
@@ -410,9 +410,9 @@ public class ConditionalStartEventTest {
 
     // when
     List<ProcessInstance> instances = runtimeService
-        .createConditionCorrelation()
+        .createConditionEvaluation()
         .setVariables(variableMap)
-        .correlateStartConditions();
+        .evaluateStartConditions();
 
     // then
     assertEquals(1, instances.size());
@@ -427,13 +427,13 @@ public class ConditionalStartEventTest {
     // given a deployed process
 
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("No process instances were started during correlation of the conditional start events.");
+    thrown.expectMessage("No process instances were started during evaluation of the conditional start events.");
 
     // when
     runtimeService
-      .createConditionCorrelation()
+      .createConditionEvaluation()
       .setVariable("foo", 0)
-      .correlateStartConditions();
+      .evaluateStartConditions();
 
     assertNull(runtimeService.createVariableInstanceQuery().singleResult());
     assertNull(runtimeService.createProcessInstanceQuery().processDefinitionKey(CONDITIONAL_EVENT_PROCESS).singleResult());
@@ -449,8 +449,8 @@ public class ConditionalStartEventTest {
 
     // when
     runtimeService
-        .createConditionCorrelation()
-        .correlateStartConditions();
+        .createConditionEvaluation()
+        .evaluateStartConditions();
   }
 
   @Test
@@ -470,9 +470,9 @@ public class ConditionalStartEventTest {
 
     // when
     List<ProcessInstance> resultInstances = runtimeService
-        .createConditionCorrelation()
+        .createConditionEvaluation()
         .setVariables(variableMap)
-        .correlateStartConditions();
+        .evaluateStartConditions();
 
     // then
     assertEquals(2, resultInstances.size());
@@ -497,9 +497,9 @@ public class ConditionalStartEventTest {
 
     // when
     List<ProcessInstance> instances = runtimeService
-        .createConditionCorrelation()
+        .createConditionEvaluation()
         .setVariables(variableMap)
-        .correlateStartConditions();
+        .evaluateStartConditions();
 
     // then
     assertEquals(4, instances.size());
@@ -520,9 +520,9 @@ public class ConditionalStartEventTest {
 
     // when, it should not throw PropertyNotFoundException
     List<ProcessInstance> instances = runtimeService
-        .createConditionCorrelation()
+        .createConditionEvaluation()
         .setVariables(variableMap)
-        .correlateStartConditions();
+        .evaluateStartConditions();
 
     // then
     assertEquals(3, instances.size());
@@ -539,10 +539,10 @@ public class ConditionalStartEventTest {
 
     // when
     List<ProcessInstance> instances = runtimeService
-        .createConditionCorrelation()
+        .createConditionEvaluation()
         .setVariable("foo", 1)
         .processInstanceBusinessKey("humuhumunukunukuapua")
-        .correlateStartConditions();
+        .evaluateStartConditions();
 
     // then
     assertEquals(2, instances.size());
@@ -562,10 +562,10 @@ public class ConditionalStartEventTest {
 
     // when
     List<ProcessInstance> instances = runtimeService
-        .createConditionCorrelation()
+        .createConditionEvaluation()
         .setVariable("foo", 1)
         .processDefinitionId(processDefinitionId)
-        .correlateStartConditions();
+        .evaluateStartConditions();
 
     // then
     assertEquals(1, instances.size());
@@ -587,10 +587,10 @@ public class ConditionalStartEventTest {
     testRule.deploy("org/camunda/bpm/engine/test/bpmn/event/conditional/ConditionalStartEventTest.testSingleConditionalStartEvent.bpmn20.xml");
 
     List<ProcessInstance> instances = runtimeService
-        .createConditionCorrelation()
+        .createConditionEvaluation()
         .setVariable("foo", 1)
         .processDefinitionId(processDefinitionId)
-        .correlateStartConditions();
+        .evaluateStartConditions();
 
     // then
     assertEquals(1, instances.size());
@@ -611,10 +611,10 @@ public class ConditionalStartEventTest {
 
     // when
     runtimeService
-        .createConditionCorrelation()
+        .createConditionEvaluation()
         .setVariable("foo", 1)
         .processDefinitionId("nonExistingId")
-        .correlateStartConditions();
+        .evaluateStartConditions();
   }
 
   @Test
@@ -630,9 +630,9 @@ public class ConditionalStartEventTest {
 
     // when
     List<ProcessInstance> instances = runtimeService
-        .createConditionCorrelation()
+        .createConditionEvaluation()
         .setVariable("foo", 42)
-        .correlateStartConditions();
+        .evaluateStartConditions();
 
     // then
     assertEquals(2, instances.size());
@@ -651,9 +651,9 @@ public class ConditionalStartEventTest {
 
     // when
     List<ProcessInstance> instances = runtimeService
-        .createConditionCorrelation()
+        .createConditionEvaluation()
         .setVariable("bar", 42)
-        .correlateStartConditions();
+        .evaluateStartConditions();
 
     // then
     assertEquals(1, instances.size());

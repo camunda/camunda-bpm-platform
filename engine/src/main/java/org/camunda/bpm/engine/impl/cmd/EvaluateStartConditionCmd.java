@@ -21,7 +21,7 @@ import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.ConditionCorrelationBuilderImpl;
+import org.camunda.bpm.engine.impl.ConditionEvaluationBuilderImpl;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -33,11 +33,11 @@ import org.camunda.bpm.engine.impl.runtime.ConditionHandlerResult;
 import org.camunda.bpm.engine.impl.runtime.ConditionSet;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 
-public class CorrelateStartConditionCmd implements Command<List<ProcessInstance>> {
+public class EvaluateStartConditionCmd implements Command<List<ProcessInstance>> {
 
-  protected ConditionCorrelationBuilderImpl builder;
+  protected ConditionEvaluationBuilderImpl builder;
 
-  public CorrelateStartConditionCmd(ConditionCorrelationBuilderImpl builder) {
+  public EvaluateStartConditionCmd(ConditionEvaluationBuilderImpl builder) {
     this.builder = builder;
   }
 
@@ -50,12 +50,12 @@ public class CorrelateStartConditionCmd implements Command<List<ProcessInstance>
 
     List<ConditionHandlerResult> results = commandContext.runWithoutAuthorization(new Callable<List<ConditionHandlerResult>>() {
       public List<ConditionHandlerResult> call() throws Exception {
-        return conditionHandler.correlateStartCondition(commandContext, conditionSet);
+        return conditionHandler.evaluateStartCondition(commandContext, conditionSet);
       }
     });
 
     if (results.isEmpty()) {
-      throw new ProcessEngineException("No process instances were started during correlation of the conditional start events.");
+      throw new ProcessEngineException("No process instances were started during evaluation of the conditional start events.");
     }
 
     for (ConditionHandlerResult ConditionHandlerResult : results) {
