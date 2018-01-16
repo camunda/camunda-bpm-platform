@@ -33,7 +33,7 @@ function ProcessInstanceRuntimeTab($scope, exposeScopeProperties, externalTasks,
 ProcessInstanceRuntimeTab.prototype._loadLocal = function(defaultValue) {
   return this.localConf.get('sortExternalTaskRuntimeTab', defaultValue);
 };
-//'sortExternalTaskProcessDefinitionTab'
+
 ProcessInstanceRuntimeTab.prototype._saveLocal = function(sorting) {
   return this.localConf.set('sortExternalTaskRuntimeTab', sorting);
 };
