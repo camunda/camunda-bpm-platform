@@ -12,6 +12,8 @@ module.exports = [
       current: 1
     };
 
+    var sorting;
+
     var checkedItems = $scope.checkedItems = [];
     $scope.checkedItemsCount = 0;
 
@@ -55,6 +57,11 @@ module.exports = [
       loadAllTenants();
     });
 
+    $scope.onSortChanged = function(_sorting) {
+      sorting = _sorting;
+      loadAllTenants();
+    };
+
     $scope.pageChange = function(page) {
       search.updateSilently({ modalPage: !page || page == 1 ? null : page });
     };
@@ -82,7 +89,9 @@ module.exports = [
 
       var pagingParams = {
         firstResult: firstResult,
-        maxResults: count
+        maxResults: count,
+        sortBy: sorting.sortBy,
+        sortOrder: sorting.sortOrder
       };
 
       TenantResource.list(pagingParams, function(err, res) {
@@ -223,5 +232,5 @@ module.exports = [
       $modalInstance.close(status);
     };
 
-    loadAllTenants();
+
   }];

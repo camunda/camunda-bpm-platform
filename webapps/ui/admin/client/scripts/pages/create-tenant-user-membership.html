@@ -8,15 +8,24 @@
 
   <table class="cam-table"
          ng-hide="status !== 'beforeCreate' || availableTenants.length == 0">
-    <thead>
+    <thead cam-sortable-table-header
+           default-sort-by="id"
+           default-sort-order="asc"
+           sorting-id="admin-sorting-users-edit-tenants"
+           on-sort-change="onSortChanged(sorting)"
+           on-sort-initialized="onSortChanged(sorting)">
       <tr>
         <th class="select">
           <input type="checkbox"
                  ng-checked="allTenantsChecked()"
                  ng-click="checkAllTenants()"  />
         </th>
-        <th class="group-id">{{ 'USER_MEMBERSHIP_TENANT_TENANT_ID' | translate }}</th>
-        <th class="group-name">{{ 'USER_MEMBERSHIP_TENANT_TENANT_NAME' | translate }}</th>
+        <th class="tenant-id"
+            cam-sortable-table-column
+            sort-by-property="id">{{ 'USER_MEMBERSHIP_TENANT_TENANT_ID' | translate }}</th>
+        <th class="tenant-name"
+            cam-sortable-table-column
+            sort-by-property="name">{{ 'USER_MEMBERSHIP_TENANT_TENANT_NAME' | translate }}</th>
       </tr>
     </thead>
 
