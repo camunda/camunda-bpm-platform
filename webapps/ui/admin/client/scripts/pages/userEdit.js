@@ -253,8 +253,17 @@ module.exports = [ '$routeProvider', function($routeProvider) {
 
         // Tenant Form ///////////////////////////////////////////
 
+        var tenantsSorting = $scope.tenantsSorting = null;
+
+        $scope.onTenantsSortingChanged = function(_sorting) {
+          tenantsSorting = $scope.tenantsSorting = $scope.tenantsSorting || {};
+          tenantsSorting.sortBy = _sorting.sortBy;
+          tenantsSorting.sortOrder = _sorting.sortOrder;
+          tenantsSorting.sortReverse = _sorting.sortOrder !== 'asc';
+        };
+
         $scope.$watch(function() {
-          return $location.search().tab === 'tenants';
+          return $location.search().tab === 'tenants' && tenantsSorting;
         }, function(newValue) {
           return newValue && loadTenants();
         });

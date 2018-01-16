@@ -304,10 +304,19 @@
              text-empty="{{ 'USERS_NOT_MEMBER_TENTANT' | translate:'{firstname: user.firstName, lastname: user.lastName}' }}">
           <table class="cam-table"
                  ng-hide="tenantList.length == 0">
-            <thead>
+            <thead cam-sortable-table-header
+                   default-sort-by="id"
+                   default-sort-order="asc"
+                   sorting-id="admin-sorting-users-tenants"
+                   on-sort-change="onTenantsSortingChanged(sorting)"
+                   on-sort-initialized="onTenantsSortingChanged(sorting)">
             <tr>
-              <th class="tenant-id">{{ 'USERS_TENANT_ID' | translate }}</th>
-              <th class="tenant-name">{{ 'USERS_TENANT_NAME' | translate }}</th>
+              <th class="tenant-id"
+                    cam-sortable-table-column
+                    sort-by-property="id">{{ 'USERS_TENANT_ID' | translate }}</th>
+              <th class="tenant-name"
+                    cam-sortable-table-column
+                    sort-by-property="name">{{ 'USERS_TENANT_NAME' | translate }}</th>
               <th class="action"
                   ng-show="availableOperations.removeTenant">
                 {{ 'USERS_ACTION' | translate }}
@@ -316,7 +325,7 @@
             </thead>
 
             <tbody>
-            <tr ng-repeat="tenant in tenantList">
+            <tr ng-repeat="tenant in tenantList | orderBy:tenantsSorting.sortBy:tenantsSorting.sortReverse">
               <td class="tenant-id">
                 <a href="#/tenants/{{ tenant.id | escape }}?tab=tenant">{{ tenant.id }}</a>
               </td>
