@@ -161,10 +161,17 @@
            loading-state="{{ userLoadingState }}"
            text-empty="{{ 'GROUP_EDIT_MESSAGE_USERS' | translate:'{group: group.name}' }}">
         <table class="cam-table">
-          <thead>
+          <thead cam-sortable-table-header
+                 default-sort-by="userId"
+                 default-sort-order="asc"
+                 sorting-id="admin-sorting-groups-users"
+                 on-sort-change="onUsersSortingChanged(sorting)"
+                 on-sort-initialized="onUsersSortingInitialized(sorting)">
             <tr>
-              <th>{{ 'GROUP_EDIT_NAME' | translate }}</th>
-              <th>{{ 'GROUP_EDIT_USERNAME' | translate }}</th>
+              <th cam-sortable-table-column
+                  sort-by-property="firstName">{{ 'GROUP_EDIT_NAME' | translate }}</th>
+              <th cam-sortable-table-column
+                  sort-by-property="userId">{{ 'GROUP_EDIT_USERNAME' | translate }}</th>
             </tr>
           </thead>
           <tbody>
