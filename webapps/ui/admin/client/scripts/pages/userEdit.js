@@ -189,8 +189,17 @@ module.exports = [ '$routeProvider', function($routeProvider) {
 
         // group form /////////////////////////////
 
+        var groupsSorting = $scope.groupsSorting = null;
+
+        $scope.onGroupsSortingChanged = function(_sorting) {
+          groupsSorting = $scope.groupsSorting = $scope.groupsSorting || {};
+          groupsSorting.sortBy = _sorting.sortBy;
+          groupsSorting.sortOrder = _sorting.sortOrder;
+          groupsSorting.sortReverse = _sorting.sortOrder !== 'asc';
+        };
+
         $scope.$watch(function() {
-          return $location.search().tab === 'groups';
+          return $location.search().tab === 'groups' && groupsSorting;
         }, function(newValue) {
           return newValue && loadGroups();
         });
