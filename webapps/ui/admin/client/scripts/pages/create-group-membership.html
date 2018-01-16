@@ -8,17 +8,28 @@
 
   <table class="cam-table"
          ng-hide="status !== 'beforeCreate' || availableGroups.length == 0">
-    <thead>
+    <thead cam-sortable-table-header
+           default-sort-by="id"
+           default-sort-order="asc"
+           sorting-id="admin-sorting-users-edit-groups"
+           on-sort-change="onSortingChanged(sorting)"
+           on-sort-initialized="onSortingChanged(sorting)">
       <tr>
         <th class="select"></th>
-        <th class="group-id">{{ 'GROUP_MEMBERSHIP_GROUP_GROUP_ID' | translate }}</th>
-        <th class="group-name">{{ 'GROUP_MEMBERSHIP_GROUP_GROUP_NAME' | translate }}</th>
-        <th class="group-type">{{ 'GROUP_MEMBERSHIP_GROUP_GROUP_TYPE' | translate }}</th>
+        <th class="group-id"
+            cam-sortable-table-column
+            sort-by-property="id">{{ 'GROUP_MEMBERSHIP_GROUP_GROUP_ID' | translate }}</th>
+        <th class="group-name"
+            cam-sortable-table-column
+            sort-by-property="name">{{ 'GROUP_MEMBERSHIP_GROUP_GROUP_NAME' | translate }}</th>
+        <th class="group-type"
+            cam-sortable-table-column
+            sort-by-property="type">{{ 'GROUP_MEMBERSHIP_GROUP_GROUP_TYPE' | translate }}</th>
       </tr>
     </thead>
 
     <tbody>
-      <tr ng-repeat="group in availableGroups">
+      <tr ng-repeat="group in availableGroups | orderBy:sorting.sortBy:sorting.sortReverse">
         <td class="row-select">
           <input type="checkbox"
                  ng-model="group.checked" />

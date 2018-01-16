@@ -242,11 +242,22 @@
              text-empty="{{ 'USERS_NOT_MEMBER_GROUP' | translate:'{firstname: user.firstName, lastname:user.lastName}' }}">
           <table class="cam-table"
                  ng-hide="groupList.length == 0">
-            <thead>
+            <thead cam-sortable-table-header
+                   default-sort-by="id"
+                   default-sort-order="asc"
+                   sorting-id="admin-sorting-users-groups"
+                   on-sort-change="onGroupsSortingChanged(sorting)"
+                   on-sort-initialized="onGroupsSortingChanged(sorting)">
               <tr>
-                <th class="group-id">{{ 'USERS_GROUP_ID' | translate }}</th>
-                <th class="group-name">{{ 'USERS_GROUP_NAME' | translate }}</th>
-                <th class="group-type">{{ 'USERS_GROUP_TYPE' | translate }}</th>
+                <th class="group-id"
+                    cam-sortable-table-column
+                    sort-by-property="id">{{ 'USERS_GROUP_ID' | translate }}</th>
+                <th class="group-name"
+                    cam-sortable-table-column
+                    sort-by-property="name ">{{ 'USERS_GROUP_NAME' | translate }}</th>
+                <th class="group-type"
+                    cam-sortable-table-column
+                    sort-by-property="type">{{ 'USERS_GROUP_TYPE' | translate }}</th>
                 <th class="action"
                     ng-show="availableOperations.removeGroup">
                   {{ 'USERS_ACTION' | translate }}
@@ -255,7 +266,7 @@
             </thead>
 
             <tbody>
-              <tr ng-repeat="group in groupList">
+              <tr ng-repeat="group in groupList | orderBy:groupsSorting.sortBy:groupsSorting.sortReverse">
                 <td class="group-id">
                   <a href="#/groups/{{group.id | escape}}?tab=group">{{group.id}}</a>
                 </td>

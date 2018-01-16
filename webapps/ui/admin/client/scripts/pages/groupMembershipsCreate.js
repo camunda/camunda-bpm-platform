@@ -36,6 +36,16 @@ module.exports = [
       return deferred.promise;
     }
 
+    var sorting = $scope.sorting = null;
+
+    $scope.onSortingChanged = function(_sorting) {
+      sorting = $scope.sorting = $scope.sorting || {};
+      sorting.sortBy = _sorting.sortBy;
+      sorting.sortOrder = _sorting.sortOrder;
+      sorting.sortReverse = _sorting.sortOrder !== 'asc';
+    };
+
+
     $q.all([ loadAllGroups() ]).then(function(results) {
       var availableGroups = results[0];
       $scope.availableGroups = [];
