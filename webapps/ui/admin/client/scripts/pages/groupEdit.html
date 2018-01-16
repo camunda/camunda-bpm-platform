@@ -112,10 +112,19 @@
              text-empty="{{ 'GROUP_EDIT_MESSAGE_GROUP' | translate:'{ group: group.name }' }}">
           <table class="cam-table"
                  ng-hide="tenantList.length == 0">
-            <thead>
+            <thead cam-sortable-table-header
+                   default-sort-by="id"
+                   default-sort-order="asc"
+                   sorting-id="admin-sorting-groups-tenants"
+                   on-sort-change="onTenantsSortingChanged(sorting)"
+                   on-sort-initialized="onTenantsSortingChanged(sorting)">
             <tr>
-              <th class="tenant-id">{{ 'GROUP_EDIT_TENANT_ID' | translate }}</th>
-              <th class="tenant-name">{{ 'GROUP_EDIT_TENANT_NAME' | translate }}</th>
+              <th class="tenant-id"
+                  cam-sortable-table-column
+                  sort-by-property="id">{{ 'GROUP_EDIT_TENANT_ID' | translate }}</th>
+              <th class="tenant-name"
+                  cam-sortable-table-column
+                  sort-by-property="name">{{ 'GROUP_EDIT_TENANT_NAME' | translate }}</th>
               <th class="action"
                   ng-show="availableOperations.removeTenant">
                 {{ 'GROUP_EDIT_ACTION' | translate }}
@@ -124,7 +133,7 @@
             </thead>
 
             <tbody>
-            <tr ng-repeat="tenant in tenantList">
+            <tr ng-repeat="tenant in tenantList | orderBy:tenantsSorting.sortBy:tenantsSorting.sortReverse">
               <td class="tenant-id">
                 <a href="#/tenants/{{ tenant.id | escape }}?tab=tenant">{{ tenant.id }}</a>
               </td>

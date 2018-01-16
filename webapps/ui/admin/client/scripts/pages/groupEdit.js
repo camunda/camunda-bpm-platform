@@ -63,6 +63,8 @@ var Controller = [
     var groupUserPages = $scope.groupUserPages = { size: 25, total: 0 };
     var groupTenantPages = $scope.groupTenantPages = { size: 25, total: 0 };
 
+    var tenantsSorting = $scope.tenantsSorting = null;
+
     // common form validation //////////////////////////
 
     /** form must be valid & user must have made some changes */
@@ -95,6 +97,13 @@ var Controller = [
       });
     };
 
+    $scope.onTenantsSortingChanged = function(_sorting) {
+      tenantsSorting = $scope.tenantsSorting = $scope.tenantsSorting || {};
+      tenantsSorting.sortBy = _sorting.sortBy;
+      tenantsSorting.sortOrder = _sorting.sortOrder;
+      tenantsSorting.sortReverse = _sorting.sortOrder !== 'asc';
+    };
+
     $scope.$watch(function() {
       return $location.search().tab === 'users' && parseInt(($location.search() || {}).page || '1');
     }, function(newValue) {
@@ -105,7 +114,7 @@ var Controller = [
     });
 
     $scope.$watch(function() {
-      return $location.search().tab === 'tenants' && parseInt(($location.search() || {}).page || '1');
+      return $location.search().tab === 'tenants' && tenantsSorting && parseInt(($location.search() || {}).page || '1');
     }, function(newValue) {
       if( newValue ) {
         groupTenantPages.current = newValue;
