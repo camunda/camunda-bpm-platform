@@ -25,23 +25,19 @@ var Controller = ['$scope', '$location', 'search', 'TenantResource', 'camAPI', '
     return type;
   });
 
+  $scope.blocked = true;
   $scope.onSearchChange = updateView;
 
-  $scope.query = $scope.pages = $scope.sortBy = $scope.sortOrder = null;
+  $scope.query = $scope.pages = null;
+  var sorting;
 
-  $scope.orderClass = function(forColumn) {
-    forColumn = forColumn || $scope.sortBy;
-    return 'glyphicon-' + ({
-      none: 'minus',
-      desc: 'chevron-down',
-      asc:  'chevron-up'
-    }[forColumn === $scope.sortBy ? $scope.sortOrder : 'none']);
+  $scope.onSortInitialized = function(_sorting) {
+    sorting = _sorting;
+    $scope.blocked = false;
   };
 
-  $scope.changeOrder = function(column) {
-    $scope.sortBy = column;
-    $scope.sortOrder = $scope.sortOrder === 'desc' ? 'asc' : 'desc';
-
+  $scope.onSortChanged = function(_sorting) {
+    sorting = _sorting;
     updateView();
   };
 
@@ -51,9 +47,6 @@ var Controller = ['$scope', '$location', 'search', 'TenantResource', 'camAPI', '
       $scope.pages = pages;
     }
 
-    $scope.sortBy = $scope.sortBy || 'id';
-    $scope.sortOrder = $scope.sortOrder || 'asc';
-
     var page = $scope.pages.current,
         count = $scope.pages.size,
         firstResult = (page - 1) * count;
@@ -61,8 +54,8 @@ var Controller = ['$scope', '$location', 'search', 'TenantResource', 'camAPI', '
     var queryParams = {
       firstResult: firstResult,
       maxResults: count,
-      sortBy: $scope.sortBy,
-      sortOrder: $scope.sortOrder
+      sortBy: sorting.sortBy,
+      sortOrder: sorting.sortOrder
     };
 
     $scope.tenantList = null;
