@@ -64,6 +64,8 @@ var Controller = [
     var tenantGroupPages = $scope.tenantGroupPages = { size: 25, total: 0 },
         tenantUserPages = $scope.tenantUserPages = { size: 25, total: 0 };
 
+    var groupsSorting = null;
+
     // common form validation //////////////////////////
 
     /** form must be valid & user must have made some changes */
@@ -108,9 +110,18 @@ var Controller = [
       }
     });
 
+    $scope.onGroupsSortingInitialized = function(_sorting) {
+      groupsSorting = _sorting;
+    };
+
+    $scope.onGroupsSortingChanged = function(_sorting) {
+      groupsSorting = _sorting;
+      updateTenantGroupView();
+    };
+
     // update groups list
     $scope.$watch(function() {
-      return $location.search().tab === 'groups' && parseInt( ($location.search() || {}).page || '1' );
+      return $location.search().tab === 'groups' && groupsSorting && parseInt( ($location.search() || {}).page || '1' );
     }, function(newValue) {
       if(newValue) {
         tenantGroupPages.current = newValue;
@@ -142,7 +153,7 @@ var Controller = [
       var prep = prepareTenantMemberView(tenantGroupPages);
 
       $scope.groupLoadingState = 'LOADING';
-      GroupResource.list(angular.extend({}, prep.searchParams, prep.pagingParams), function(err, res) {
+      GroupResource.list(angular.extend({}, prep.searchParams, prep.pagingParams, groupsSorting), function(err, res) {
         if( err === null ) {
           $scope.tenantGroupList = res;
           $scope.groupLoadingState = res.length ? 'LOADED' : 'EMPTY';
