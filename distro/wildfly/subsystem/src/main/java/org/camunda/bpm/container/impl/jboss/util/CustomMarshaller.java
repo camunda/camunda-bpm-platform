@@ -64,13 +64,37 @@ public class CustomMarshaller {
   }
 
   /**
+   *  Marshaller for properties.
+   */
+  private static class PropertiesAttributeMarshaller extends AttributeMarshallers.PropertiesAttributeMarshaller {
+
+    @Override
+    public void marshallSingleElement(AttributeDefinition attribute, ModelNode property, boolean marshallDefault, XMLStreamWriter writer) throws XMLStreamException {
+      writer.writeStartElement(elementName);
+      writer.writeAttribute(org.jboss.as.controller.parsing.Attribute.NAME.getLocalName(), property.asProperty().getName());
+      writer.writeCharacters(property.asProperty().getValue().asString());
+      writer.writeEndElement();
+    }
+
+  }
+
+  /**
    * Marshall the plugin object.
    */
   private static class PluginObjectTypeMarshaller extends DefaultAttributeMarshaller {
 
     @Override
     public void marshallAsElement(AttributeDefinition attribute, ModelNode resourceModel, boolean marshallDefault, XMLStreamWriter writer) throws XMLStreamException {
-      assert attribute instanceof ObjectTypeAttributeDefinition;
+
+      if (attribute instanceof ObjectListAttributeDefinition) {
+        attribute = ((ObjectListAttributeDefinition) attribute).getValueType();
+      }
+
+      if (!(attribute instanceof ObjectTypeAttributeDefinition)) {
+        throw new XMLStreamException(
+          String.format("Attribute of class %s is expected, but %s received", "ObjectTypeAttributeDefinition", attribute.getClass().getSimpleName())
+        );
+      }
 
       AttributeDefinition[] valueTypes;
       valueTypes = CustomMarshaller.getValueTypes(attribute, ObjectTypeAttributeDefinition.class);
@@ -124,4 +148,5 @@ public class CustomMarshaller {
   public static final AttributeAsElementMarshaller ATTRIBUTE_AS_ELEMENT = new AttributeAsElementMarshaller();
   public static final PluginObjectTypeMarshaller OBJECT_AS_ELEMENT = new PluginObjectTypeMarshaller();
   public static final ObjectListMarshaller OBJECT_LIST = new ObjectListMarshaller();
+  public static final PropertiesAttributeMarshaller PROPERTIES_MARSHALLER = new PropertiesAttributeMarshaller();
 }

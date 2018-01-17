@@ -23,7 +23,10 @@ public class SubsystemAttributeDefinitons {
 
   // general
   public static final SimpleAttributeDefinition NAME = new SimpleAttributeDefinition(ModelConstants.NAME, new ModelNode("default"), ModelType.STRING, false, AttributeAccess.Flag.RESTART_ALL_SERVICES);
-  public static final SimpleMapAttributeDefinition PROPERTIES = new SimpleMapAttributeDefinition.Builder(ModelConstants.PROPERTIES, true).setRestartAllServices().build();
+  public static final SimpleMapAttributeDefinition PROPERTIES = new SimpleMapAttributeDefinition.Builder(ModelConstants.PROPERTIES, true)
+    .setAttributeMarshaller(CustomMarshaller.PROPERTIES_MARSHALLER)
+    .setRestartAllServices()
+    .build();
 
   // process engine
   public static final SimpleAttributeDefinition DEFAULT = new SimpleAttributeDefinition(ModelConstants.DEFAULT, new ModelNode(false), ModelType.BOOLEAN, true, AttributeAccess.Flag.RESTART_ALL_SERVICES);
