@@ -42,7 +42,6 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -348,10 +347,8 @@ public class ConditionalStartEventTest {
   }
 
   @Test
-  @Ignore("CAM-8635")
-  public void testTwoEqualConditionalStartEvent() {
-    // given a deployed process
-
+  public void testDeploymentOfTwoEqualConditionalStartEvent() {
+    // expect
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage("Error while parsing process");
 

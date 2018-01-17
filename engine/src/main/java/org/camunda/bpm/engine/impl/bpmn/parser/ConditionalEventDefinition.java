@@ -33,6 +33,7 @@ public class ConditionalEventDefinition extends EventSubscriptionDeclaration imp
 
   private static final long serialVersionUID = 1L;
 
+  protected String conditionAsString;
   protected final Condition condition;
   protected boolean interrupting;
   protected String variableName;
@@ -78,8 +79,12 @@ public class ConditionalEventDefinition extends EventSubscriptionDeclaration imp
     this.variableEvents = variableEvents;
   }
 
-  public Condition getCondition() {
-    return condition;
+  public String getConditionAsString() {
+    return conditionAsString;
+  }
+
+  public void setConditionAsString(String conditionAsString) {
+    this.conditionAsString = conditionAsString;
   }
 
   public boolean shouldEvaluateForVariableEvent(VariableEvent event) {

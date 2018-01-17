@@ -1169,6 +1169,11 @@ public class BpmnParse extends Parse {
       addError("Cannot have more than one signal event subscription with name '" + subscription.getUnresolvedEventName() + "' for scope '" + scope.getId() + "'",
           element);
     }
+    // if this is a conditional event, validate that it is the only one with the provided condition
+    if (subscription.isStartEvent() && hasMultipleConditionalEventDefinitionsWithSameCondition(subscription, eventDefinitions.values())) {
+      throw LOG.conditionalEventSubscriptionWithSameConditionExists(scope.getProcessDefinition().getDeploymentId(),
+          ((ConditionalEventDefinition) subscription).getConditionAsString());
+    }
 
     scope.getProperties().putMapEntry(BpmnProperties.EVENT_SUBSCRIPTION_DECLARATIONS, subscription.getActivityId(), subscription);
   }
@@ -1179,6 +1184,18 @@ public class BpmnParse extends Parse {
 
   protected boolean hasMultipleSignalEventDefinitionsWithSameName(EventSubscriptionDeclaration subscription, Collection<EventSubscriptionDeclaration> eventDefinitions) {
     return hasMultipleEventDefinitionsWithSameName(subscription, eventDefinitions, EventType.SIGNAL.name());
+  }
+
+  protected boolean hasMultipleConditionalEventDefinitionsWithSameCondition(EventSubscriptionDeclaration subscription, Collection<EventSubscriptionDeclaration> eventDefinitions) {
+    if (subscription.getEventType().equals(EventType.CONDITONAL.name())) {
+      for (EventSubscriptionDeclaration eventDefinition : eventDefinitions) {
+        if (eventDefinition.getEventType().equals(EventType.CONDITONAL.name()) && eventDefinition.isStartEvent() == subscription.isStartEvent()
+            && ((ConditionalEventDefinition) eventDefinition).getConditionAsString().equals(((ConditionalEventDefinition) subscription).getConditionAsString())) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   protected boolean hasMultipleEventDefinitionsWithSameName(EventSubscriptionDeclaration subscription, Collection<EventSubscriptionDeclaration> eventDefinitions, String eventType) {
@@ -3473,6 +3490,9 @@ public class BpmnParse extends Parse {
     if (conditionExprElement != null) {
       Condition condition = parseConditionExpression(conditionExprElement);
       conditionalEventDefinition = new ConditionalEventDefinition(condition, conditionalActivity);
+
+      String expression = conditionExprElement.getText().trim();
+      conditionalEventDefinition.setConditionAsString(expression);
 
       conditionalActivity.getProcessDefinition().getProperties().set(BpmnProperties.HAS_CONDITIONAL_EVENTS, true);
 

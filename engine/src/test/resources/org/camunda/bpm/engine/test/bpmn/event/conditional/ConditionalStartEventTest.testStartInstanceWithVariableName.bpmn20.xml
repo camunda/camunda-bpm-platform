@@ -19,7 +19,7 @@
     <bpmn:startEvent id="StartEvent_2" name="Start mediocre path">
       <bpmn:outgoing>SequenceFlow_1fy5j1p</bpmn:outgoing>
       <bpmn:conditionalEventDefinition camunda:variableName="foo">
-        <bpmn:condition xsi:type="bpmn:tFormalExpression">${true}</bpmn:condition>
+        <bpmn:condition xsi:type="bpmn:tFormalExpression">${foo == 42}</bpmn:condition>
       </bpmn:conditionalEventDefinition>
     </bpmn:startEvent>
     <bpmn:exclusiveGateway id="ExclusiveGateway_1pcoch7">
