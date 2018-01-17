@@ -1,11 +1,16 @@
 package org.camunda.bpm.container.impl.jboss.util;
 
-import org.jboss.as.controller.*;
-import org.jboss.dmr.ModelNode;
-
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import java.lang.reflect.Field;
+import java.util.List;
+import org.jboss.as.controller.AttributeDefinition;
+import org.jboss.as.controller.AttributeMarshaller;
+import org.jboss.as.controller.DefaultAttributeMarshaller;
+import org.jboss.as.controller.ObjectListAttributeDefinition;
+import org.jboss.as.controller.ObjectTypeAttributeDefinition;
+import org.jboss.dmr.ModelNode;
+import org.jboss.dmr.Property;
 
 public class CustomMarshaller {
 
@@ -37,7 +42,7 @@ public class CustomMarshaller {
    */
   public static AttributeDefinition getValueType(Object instance, Class clazz) {
     try {
-      Field valueTypesField = clazz.getClass().getDeclaredField("valueType");
+      Field valueTypesField = clazz.getDeclaredField("valueType");
       valueTypesField.setAccessible(true);
       Object value = valueTypesField.get(instance);
       if (value != null) {
@@ -66,14 +71,25 @@ public class CustomMarshaller {
   /**
    *  Marshaller for properties.
    */
-  private static class PropertiesAttributeMarshaller extends AttributeMarshallers.PropertiesAttributeMarshaller {
+  private static class PropertiesAttributeMarshaller extends DefaultAttributeMarshaller {
 
     @Override
-    public void marshallSingleElement(AttributeDefinition attribute, ModelNode property, boolean marshallDefault, XMLStreamWriter writer) throws XMLStreamException {
-      writer.writeStartElement(elementName);
-      writer.writeAttribute(org.jboss.as.controller.parsing.Attribute.NAME.getLocalName(), property.asProperty().getName());
-      writer.writeCharacters(property.asProperty().getValue().asString());
+    public void marshallAsElement(AttributeDefinition attribute, ModelNode resourceModel, boolean marshallDefault, XMLStreamWriter writer) throws XMLStreamException {
+      resourceModel = resourceModel.get(attribute.getXmlName());
+      writer.writeStartElement(attribute.getName());
+      final List<Property> properties = resourceModel.asPropertyList();
+      for (Property property: properties) {
+        writer.writeStartElement(org.jboss.as.controller.parsing.Element.PROPERTY.getLocalName());
+        writer.writeAttribute(org.jboss.as.controller.parsing.Attribute.NAME.getLocalName(), property.getName());
+        writer.writeCharacters(property.getValue().asString());
+        writer.writeEndElement();
+      }
       writer.writeEndElement();
+    }
+
+    @Override
+    public boolean isMarshallableAsElement() {
+      return true;
     }
 
   }
@@ -87,7 +103,7 @@ public class CustomMarshaller {
     public void marshallAsElement(AttributeDefinition attribute, ModelNode resourceModel, boolean marshallDefault, XMLStreamWriter writer) throws XMLStreamException {
 
       if (attribute instanceof ObjectListAttributeDefinition) {
-        attribute = ((ObjectListAttributeDefinition) attribute).getValueType();
+        attribute = getValueType(attribute, ObjectListAttributeDefinition.class);
       }
 
       if (!(attribute instanceof ObjectTypeAttributeDefinition)) {
