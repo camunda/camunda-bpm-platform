@@ -12,7 +12,6 @@
 
     <tbody>
       <tr ng-repeat="calledProcessInstance in calledProcessInstances | orderBy:sortObj.sortBy:sortObj.sortReverse">
-        {{sortObj.sortBy}} {{sortObj.sortReverse}}
         <td class="state">
           <div ng-if="calledProcessInstance.incidents.length > -1" state-circle incidents="calledProcessInstance.incidents"></div>
           <div ng-if="calledProcessInstance.incidents == undefined">
