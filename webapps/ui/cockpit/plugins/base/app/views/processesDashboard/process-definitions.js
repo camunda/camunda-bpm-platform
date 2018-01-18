@@ -33,7 +33,7 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
           { class: 'state',    request: '', sortable: false, content: $translate.instant('PLUGIN_PROCESS_DEF_STATE')},
           { class: 'incidents',request: 'incidentCount', sortable: true,  content: $translate.instant('PLUGIN_PROCESS_DEF_INCIDENTS')},
           { class: 'instances',request: 'instances'    , sortable: true, content: $translate.instant('PLUGIN_PROCESS_DEF_RUNNING_INSTANCES')},
-          { class: 'name',     request: 'name'          , sortable: true, content: $translate.instant('PLUGIN_PROCESS_DEF_NAME')},
+          { class: 'name',     request: 'processDefinitionLabel' , sortable: true, content: $translate.instant('PLUGIN_PROCESS_DEF_NAME')},
           { class: 'tenantID', request: 'tenantId'     , sortable: true, content: $translate.instant('PLUGIN_PROCESS_DEF_TENANT_ID')},
           { class: 'history',  request: '', sortable: false, content: $translate.instant('PLUGIN_PROCESS_DEF_HISTORY_VIEW'), condition: $scope.hasReportPlugin},
           { class: 'report',   request: '', sortable: false, content: $translate.instant('PLUGIN_PROCESS_DEF_REPORT'), condition: $scope.hasReportPlugin},
@@ -41,7 +41,10 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
         ];
 
         // Default sorting
-        var defaultValue = { sortBy: 'name', sortOrder: 'asc', sortReverse: false};
+        var defaultValue = { sortBy: 'processDefinitionLabel', sortOrder: 'asc', sortReverse: false};
+
+
+
         $scope.sortObj   = loadLocal(defaultValue);
 
         // Update Table
@@ -82,6 +85,12 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
           processDefinitionService.list({
             latest: true
           }, function(err, data) {
+
+            // Add label for sorting
+            data.items.forEach(function(item) {
+              item.processDefinitionLabel = item.name || item.key;
+            });
+
             $scope.processDefinitionData = data.items;
             $scope.processDefinitionsCount = data.count;
             if (err) {
