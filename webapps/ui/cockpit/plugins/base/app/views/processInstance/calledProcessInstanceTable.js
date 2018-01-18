@@ -20,7 +20,7 @@ module.exports = function(ngModule) {
       $scope.headColumns = [
         { class: 'state', request: 'incidents', sortable: true, content: 'State' },
         { class: 'called-process-instance', request: 'id', sortable: true, content: $translate.instant('PLUGIN_CALLED_PROCESS_PROCESS_INSTANCE')},
-        { class: 'process-definition', request: 'processDefinitionId', sortable: true, content: $translate.instant('PLUGIN_CALLED_PROCESS_PROCESS_DEFINITION')},
+        { class: 'process-definition', request: 'processDefinitionLabel', sortable: true, content: $translate.instant('PLUGIN_CALLED_PROCESS_PROCESS_DEFINITION')},
         { class: 'activity', request: 'instance', sortable: true, content: $translate.instant('PLUGIN_CALLED_PROCESS_ACTIVITY')}
       ];
 
@@ -76,6 +76,7 @@ module.exports = function(ngModule) {
             angular.forEach(response, function(calledInstance) {
               var instance = instanceIdToInstanceMap[calledInstance.callActivityInstanceId];
               calledInstance.instance = instance;
+              calledInstance.processDefinitionLabel = calledInstance.processDefinitionName || calledInstance.processDefinitionKey;
             });
 
             $scope.loadingState = response.length ? 'LOADED' : 'EMPTY';
