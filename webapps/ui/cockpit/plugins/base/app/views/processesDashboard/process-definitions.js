@@ -93,11 +93,8 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
 
             $scope.processDefinitionData = data.items;
             $scope.processDefinitionsCount = data.count;
-            if (err) {
-              $scope.loadingState = 'ERROR';
-            }
 
-            $scope.loadingState = 'LOADED';
+            $scope.loadingState = err? 'ERROR': 'LOADED';
 
             processData.observe('processDefinitionStatistics', function(processDefinitionStatistics) {
               $scope.statistics = processDefinitionStatistics;
