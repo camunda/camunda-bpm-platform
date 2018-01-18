@@ -155,7 +155,7 @@ module.exports = function(viewContext) {
           // unaryCallActivitiesMap: activityIdToInstancesMap filtered with only call activities that have exactly 1 activityInstance
           var unaryCallActivitiesMap = Object.keys(activityIdToInstancesMap)
             .reduce(function(map, id) {
-              if(activityIdToInstancesMap[id].length === 1) {
+              if(activityIdToInstancesMap[id] && activityIdToInstancesMap[id].length === 1) {
                 map[id] = activityIdToInstancesMap[id];
               }
               return map;
