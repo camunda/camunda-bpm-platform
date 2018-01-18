@@ -133,6 +133,30 @@
         </dependency>
       </dependencies>
     </profile>
+    <profile>
+      <id>wildfly11</id>
+      <dependencies>
+        <dependency>
+          <groupId>org.wildfly</groupId>
+          <artifactId>wildfly-web-common</artifactId>
+          <version>${version.wildfly11}</version>
+          <scope>provided</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.wildfly</groupId>
+          <artifactId>wildfly-ejb3</artifactId>
+          <version>${version.wildfly11}</version>
+          <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>org.wildfly.core</groupId>
+          <artifactId>wildfly-subsystem-test-framework</artifactId>
+          <version>${version.wildfly11.core}</version>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
   </profiles>
 
 </project>

@@ -34,6 +34,8 @@
     <version.wildfly>8.2.1.Final</version.wildfly>
     <version.wildfly10>10.1.0.Final</version.wildfly10>
     <version.wildfly10.core>2.2.0.Final</version.wildfly10.core>
+    <version.wildfly11>11.0.0.Final</version.wildfly11>
+    <version.wildfly11.core>3.0.8.Final</version.wildfly11.core>
 
     <version.glassfish>3.1.2</version.glassfish>
     <version.tomcat>8.0.47</version.tomcat>
@@ -45,8 +47,6 @@
     <version.jboss-javaee-spec>3.0.2.Final</version.jboss-javaee-spec>
 
     <version.java.wildfly>1.7</version.java.wildfly>
-    <version.java.wildfly10>1.8</version.java.wildfly10>
-
 
     <!-- OSGi bundles properties -->
     <camunda.artifact />

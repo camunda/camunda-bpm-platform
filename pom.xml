@@ -123,6 +123,7 @@
         <module>javaee/ejb-client</module>
         <module>distro/wildfly</module>
         <module>distro/wildfly10</module>
+        <module>distro/wildfly11</module>
       </modules>
     </profile>
 
