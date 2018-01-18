@@ -21,7 +21,7 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
         var processData = $scope.processData.newChild($scope);
 
         $scope.headColumns = [
-          { class: 'process-definition', request: 'key', sortable: true, content: $translate.instant('PLUGIN_CALLED_PROCESS')},
+          { class: 'process-definition', request: 'label', sortable: true, content: $translate.instant('PLUGIN_CALLED_PROCESS')},
           { class: 'activity', request: 'name', sortable: true, content: $translate.instant('PLUGIN_ACTIVITY')}
         ];
 
@@ -74,7 +74,11 @@ module.exports = [ 'ViewsProvider', function(ViewsProvider) {
 
         processData.observe([ 'calledProcessDefinitions', 'bpmnElements' ], function(calledProcessDefinitions, bpmnElements) {
 
-          $scope.calledProcessDefinitions = attachCalledFromActivities(calledProcessDefinitions, bpmnElements);
+          $scope.calledProcessDefinitions = attachCalledFromActivities(calledProcessDefinitions, bpmnElements).map(
+            function(calledProcessDefinition) {
+              return angular.extend({}, calledProcessDefinition, { label: calledProcessDefinition.name || calledProcessDefinition.key });
+            }
+          );
           $scope.loadingState = $scope.calledProcessDefinitions.length ? 'LOADED' : 'EMPTY';
         });
 
