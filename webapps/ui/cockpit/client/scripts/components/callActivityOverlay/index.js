@@ -1,3 +1,5 @@
+'use strict';
+
 var fs = require('fs');
 var angular = require('angular');
 
@@ -5,8 +7,8 @@ var template = fs.readFileSync(__dirname + '/template.html', 'utf8');
 
 module.exports = function(viewContext) {
   return [
-    '$scope', '$timeout', '$location', 'search', 'control', 'processData', 'processDiagram', 'PluginProcessInstanceResource',
-    function($scope, $timeout, $location, search, control, processData, processDiagram, PluginProcessInstanceResource) {
+    '$scope', '$timeout', '$location', '$translate', 'search', 'control', 'processData', 'processDiagram', 'PluginProcessInstanceResource',
+    function($scope, $timeout, $location, $translate, search, control, processData, processDiagram, PluginProcessInstanceResource) {
       /**
        * @returns {Array} BPMN Elements that are flow nodes
        */
@@ -20,7 +22,7 @@ module.exports = function(viewContext) {
 
       /**
        * shows calledProcessInstances tab filtered by activityId
-       * @param activityId
+       * @param activities
        */
       function showCalledPInstances(activities) {
         var params = angular.copy(search());
@@ -88,6 +90,7 @@ module.exports = function(viewContext) {
         };
 
         var clickListener = function() {
+          buttonOverlay.tooltip('hide');
           return activityInstances.length > 1 ?
             applyFunction(showCalledPInstances, activityInstances):
             applyFunction(redirectToCalledPInstance, activityInstances[0]);
@@ -108,7 +111,7 @@ module.exports = function(viewContext) {
 
         // clear listeners
         $scope.$on('$destroy', function() {
-          buttonOverlay.off('click', clickListener);
+          buttonOverlay.off('mouseover mouseout click');
           diagramNode.off('mouseover mouseout');
         });
       }
@@ -121,6 +124,13 @@ module.exports = function(viewContext) {
       function addOverlayForSingleElement(id, activityInstances) {
         if (!overlaysNodes[id]) {
           overlaysNodes[id] = angular.element(template).hide();
+
+          overlaysNodes[id].tooltip({
+            container: 'body',
+            title: $translate.instant('PLUGIN_ACTIVITY_INSTANCE_SHOW_CALLED_PROCESS_INSTANCES'),
+            placement: 'top',
+            animation: false
+          });
 
           overlays.add(id, {
             position: {
@@ -141,39 +151,52 @@ module.exports = function(viewContext) {
       var overlaysNodes = {};
       var overlays = control.getViewer().get('overlays');
       var TAB_NAME = 'called-process-instances-tab';
+      var flowNodes = getFlowNodes();
+      var callActivityToInstancesMap = {};
 
-      var addOverlays = function(activitiesMap) {
-        getFlowNodes().map(function(id) {
-          return !!activitiesMap[id] && activitiesMap[id].length > 0 && addOverlayForSingleElement(id, activitiesMap[id]);
+      /**
+       * adds the callActivity overlay to each callActivity to a processInstance
+       * @param callActivityToInstancesMap
+       */
+      var addOverlays = function(callActivityToInstancesMap) {
+        Object.keys(callActivityToInstancesMap).map(function(id) {
+          return callActivityToInstancesMap[id][0].calledProcessInstanceId &&
+            addOverlayForSingleElement(id, callActivityToInstancesMap[id]);
         });
       };
 
-      if(viewContext === 'history') {
-        processData.observe('activityIdToInstancesMap', addOverlays);
-      } else {
-        processData.observe(['activityIdToInstancesMap', 'processInstance'], function(activityIdToInstancesMap, processInstance) {
-          // unaryCallActivitiesMap: activityIdToInstancesMap filtered with only call activities that have exactly 1 activityInstance
-          var unaryCallActivitiesMap = Object.keys(activityIdToInstancesMap)
-            .reduce(function(map, id) {
-              if(activityIdToInstancesMap[id] && activityIdToInstancesMap[id].length === 1) {
-                map[id] = activityIdToInstancesMap[id];
-              }
-              return map;
-            }, {});
-
-          // if there are no unary call activities, then we don't need any extra information
-          if(Object.keys(unaryCallActivitiesMap).length === 0) {
-            return addOverlays(activityIdToInstancesMap);
+      /**
+       * returns activityIdToInstancesMap but with only non empty callActivities
+       * @param flowNodes (flowNodes of type CallActivity only)
+       * @param activityIdToInstancesMap
+       */
+      var getCallActivitiesMap = function(flowNodes, activityIdToInstancesMap) {
+        return flowNodes.reduce(function(map, id) {
+          if(activityIdToInstancesMap[id] && activityIdToInstancesMap[id].length > 0) {
+            map[id] = activityIdToInstancesMap[id];
           }
+          return map;
+        }, {});
+      };
 
-          // for each callActivity, add calledProcessInstanceId to the first activity instance
-          // this is done so that it can be used to redirect to the calledProcessInstance
+
+      if(viewContext === 'history') {
+        flowNodes.length && processData.observe('activityIdToInstancesMap', function(activityIdToInstancesMap) {
+          callActivityToInstancesMap = getCallActivitiesMap(flowNodes, activityIdToInstancesMap);
+          addOverlays(callActivityToInstancesMap);
+        });
+      } else {
+        flowNodes.length && processData.observe(['activityIdToInstancesMap', 'processInstance'], function(activityIdToInstancesMap, processInstance) {
+          callActivityToInstancesMap = getCallActivitiesMap(flowNodes, activityIdToInstancesMap);
+
+          // For each callActivity, add calledProcessInstanceId to the first activity instance
+          //  this is done so that it can be used to redirect to the calledProcessInstance.
           PluginProcessInstanceResource
             .processInstances({ id: processInstance.id }, function(calledPInstances) {
               calledPInstances.forEach(function(calledPInstance) {
-                unaryCallActivitiesMap[calledPInstance.callActivityId][0].calledProcessInstanceId = calledPInstance.id;
+                callActivityToInstancesMap[calledPInstance.callActivityId][0].calledProcessInstanceId = calledPInstance.id;
               });
-              return addOverlays(unaryCallActivitiesMap);
+              return addOverlays(callActivityToInstancesMap);
             });
         });
 

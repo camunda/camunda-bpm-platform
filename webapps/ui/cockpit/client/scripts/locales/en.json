@@ -493,6 +493,7 @@
 
   "PLUGIN_ACTIVITY_INSTANCE_RUNNING_ACTIVITY_INSTANCES" : "Running Activity Instances",
   "PLUGIN_ACTIVITY_INSTANCE_OPEN_INCIDENTS" : "Open Incidents",
+  "PLUGIN_ACTIVITY_INSTANCE_SHOW_CALLED_PROCESS_INSTANCES" : "Show Called Process Instances",
 
   "PLUGIN_ADD_VARIABLE_NEW_VARIABLE" : "Add a new variable to Process Instance",
 
