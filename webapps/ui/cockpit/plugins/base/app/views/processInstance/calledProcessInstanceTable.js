@@ -25,7 +25,7 @@ module.exports = function(ngModule) {
       ];
 
       // Default sorting
-      $scope.sortObj   = loadLocal({ sortBy: 'processDefinitionId', sortOrder: 'asc', sortReverse: false});
+      $scope.sortObj   = loadLocal({ sortBy: 'processDefinitionLabel', sortOrder: 'asc', sortReverse: false});
 
       $scope.onSortChange = function(sortObj) {
         sortObj = sortObj || $scope.sortObj;
