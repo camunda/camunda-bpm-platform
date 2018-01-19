@@ -32,6 +32,7 @@ import org.camunda.bpm.engine.rest.BatchRestService;
 import org.camunda.bpm.engine.rest.CaseDefinitionRestService;
 import org.camunda.bpm.engine.rest.CaseExecutionRestService;
 import org.camunda.bpm.engine.rest.CaseInstanceRestService;
+import org.camunda.bpm.engine.rest.ConditionRestService;
 import org.camunda.bpm.engine.rest.DecisionDefinitionRestService;
 import org.camunda.bpm.engine.rest.DecisionRequirementsDefinitionRestService;
 import org.camunda.bpm.engine.rest.DeploymentRestService;
@@ -213,7 +214,7 @@ public class NamedProcessEngineRestServiceImpl extends AbstractProcessEngineRest
   public ModificationRestService getModificationRestService(@PathParam("name") String engineName) {
     return super.getModificationRestService(engineName);
   }
-  
+
   @Override
   @Path("/{name}" + BatchRestService.PATH)
   public BatchRestService getBatchRestService(@PathParam("name") String engineName) {
@@ -230,6 +231,12 @@ public class NamedProcessEngineRestServiceImpl extends AbstractProcessEngineRest
   @Path("/{name}" + SignalRestService.PATH)
   public SignalRestService getSignalRestService(@PathParam("name") String engineName) {
     return super.getSignalRestService(engineName);
+  }
+
+  @Override
+  @Path("/{name}" + ConditionRestService.PATH)
+  public ConditionRestService getConditionRestService(@PathParam("name") String engineName) {
+    return super.getConditionRestService(engineName);
   }
 
   @GET
