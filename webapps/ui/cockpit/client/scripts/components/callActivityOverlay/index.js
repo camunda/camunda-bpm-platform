@@ -83,10 +83,8 @@ module.exports = function(viewContext) {
         };
 
         var redirectToCalledPInstance = function(activityInstance) {
-          var view = activityInstance.endTime ?
-            '/history' :
-            '/runtime';
-          $location.url('/process-instance/' + activityInstance.calledProcessInstanceId + view);
+          var url = '/process-instance/' + activityInstance.calledProcessInstanceId + '/' + viewContext;
+          $location.url(url);
         };
 
         var clickListener = function() {
