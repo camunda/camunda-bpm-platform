@@ -556,7 +556,7 @@
         <plugin>
           <groupId>org.codehaus.cargo</groupId>
           <artifactId>cargo-maven2-plugin</artifactId>
-          <version>1.4.5</version>
+          <version>1.6.6</version>
         </plugin>
         <plugin>
           <groupId>net.kennychua</groupId>

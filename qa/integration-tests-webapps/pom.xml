@@ -286,7 +286,6 @@
                   </properties>
                 </deployable>
               </deployables>
-              <wait>false</wait>
             </configuration>
           </plugin>
           <plugin>
@@ -352,7 +351,6 @@
           <plugin>
             <groupId>org.codehaus.cargo</groupId>
             <artifactId>cargo-maven2-plugin</artifactId>
-            <version>1.4.19</version>
             <executions>
               <execution>
                 <id>start-container</id>
@@ -409,7 +407,6 @@
                   <pingTimeout>${cargo.deploy.timeout}</pingTimeout>
                 </deployable>
               </deployables>
-              <wait>false</wait>
             </configuration>
           </plugin>
           <plugin>
@@ -520,7 +517,6 @@
                   </properties>
                 </deployable>
               </deployables>
-              <wait>false</wait>
             </configuration>
           </plugin>
         </plugins>
@@ -761,7 +757,6 @@
           <plugin>
             <groupId>org.codehaus.cargo</groupId>
             <artifactId>cargo-maven2-plugin</artifactId>
-            <version>1.4.19-SNAPSHOT</version>
             <configuration>
               <skip>true</skip>
             </configuration>
