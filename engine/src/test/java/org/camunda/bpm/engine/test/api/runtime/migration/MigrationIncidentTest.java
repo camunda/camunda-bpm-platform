@@ -348,47 +348,62 @@ public class MigrationIncidentTest {
   public void historicIncidentRemainsOpenAfterMigration() {
 
     // Given we create a new process instance
-    ProcessDefinition callingProcess = engineRule.getRepositoryService()
+    ProcessDefinition process1 = engineRule.getRepositoryService()
         .createProcessDefinitionQuery()
         .processDefinitionKey("calledProcess")
         .singleResult();
-    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceById(callingProcess.getId());
+    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceById(process1.getId());
 
-    LockedExternalTask task = engineRule.getExternalTaskService().fetchAndLock(1, "foo")
-      .topic("foo", 1000L)
-      .execute()
-      .get(0);
-    // creating an incident in the called and calling process
+    LockedExternalTask task = engineRule.getExternalTaskService()
+        .fetchAndLock(1, "foo")
+        .topic("foo", 1000L)
+        .execute()
+        .get(0);
+
     engineRule.getExternalTaskService().handleFailure(task.getId(), "foo", "error", 0, 1000L);
 
-    Incident incidentInCallingProcess = engineRule.getRuntimeService().createIncidentQuery().processDefinitionId(callingProcess.getId()).singleResult();
+    Incident incidentInProcess = engineRule.getRuntimeService()
+        .createIncidentQuery()
+        .processDefinitionId(process1.getId())
+        .singleResult();
 
     // when
-    ProcessDefinition callingProcessV2 = engineRule.getRepositoryService()
+    ProcessDefinition process2 = engineRule.getRepositoryService()
         .createProcessDefinitionQuery()
         .processDefinitionKey("calledProcessV2")
         .singleResult();
 
     MigrationPlan migrationPlan = engineRule.getRuntimeService()
-        .createMigrationPlan(callingProcess.getId(), callingProcessV2.getId())
+        .createMigrationPlan(process1.getId(), process2.getId())
         .mapEqualActivities()
-            .mapActivities("ServiceTask_1p58ywb", "ServiceTask_V2")
+        .mapActivities("ServiceTask_1p58ywb", "ServiceTask_V2")
         .build();
 
     engineRule.getRuntimeService()
-            .newMigration(migrationPlan)
-            .processInstanceIds(processInstance.getId())
-            .execute();
+        .newMigration(migrationPlan)
+        .processInstanceIds(processInstance.getId())
+        .execute();
 
     // then
-    HistoricIncident historicIncidentAfterMigration = engineRule.getHistoryService().createHistoricIncidentQuery().open().singleResult();
-    HistoricProcessInstance historicProcessInstanceAfterMigration = engineRule.getHistoryService().createHistoricProcessInstanceQuery().withIncidents().incidentStatus("open").singleResult();
+    HistoricIncident historicIncidentAfterMigration = engineRule.getHistoryService()
+        .createHistoricIncidentQuery()
+        .singleResult();
     assertNotNull(historicIncidentAfterMigration);
     assertNull(historicIncidentAfterMigration.getEndTime());
-    assertNotNull(historicProcessInstanceAfterMigration);
     assertTrue(historicIncidentAfterMigration.isOpen());
-    Incident incidentAfterMigration = engineRule.getRuntimeService().createIncidentQuery().incidentId(incidentInCallingProcess.getId()).singleResult();
-    assertEquals(callingProcessV2.getId(), incidentAfterMigration.getProcessDefinitionId());
+
+    HistoricProcessInstance historicProcessInstanceAfterMigration = engineRule.getHistoryService()
+        .createHistoricProcessInstanceQuery()
+        .withIncidents()
+        .incidentStatus("open")
+        .singleResult();
+    assertNotNull(historicProcessInstanceAfterMigration);
+
+    Incident incidentAfterMigration = engineRule.getRuntimeService()
+        .createIncidentQuery()
+        .incidentId(incidentInProcess.getId())
+        .singleResult();
+    assertEquals(process2.getId(), incidentAfterMigration.getProcessDefinitionId());
     assertEquals("ServiceTask_V2", incidentAfterMigration.getActivityId());
   }
 }
