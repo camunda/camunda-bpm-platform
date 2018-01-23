@@ -181,7 +181,8 @@ public class VariableApiTest {
                      .putValueTyped("long", longValue((long)10, true))
                      .putValueTyped("file", fileValue("org/camunda/bpm/engine/test/variables/simpleFile.txt").setTransient(true).create())
                      .putValueTyped("hi", untypedValue("stringUntyped", true))
-                     .putValueTyped("null", untypedValue(null, true));
+                     .putValueTyped("null", untypedValue(null, true))
+                     .putValueTyped("ser", serializedObjectValue("{\"name\" : \"foo\"}", true).create());
 
     for (Entry<String, Object> e : variableMap.entrySet()) {
       TypedValue value = (TypedValue) variableMap.getValueTyped(e.getKey());

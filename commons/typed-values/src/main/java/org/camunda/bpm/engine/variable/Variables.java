@@ -196,6 +196,13 @@ public class Variables {
   }
 
   /**
+   * Shortcut for {@code Variables.serializedObjectValue().serializedObjectValue(value).setTransient(isTransient)}
+   */
+  public static SerializedObjectValueBuilder serializedObjectValue(String value, boolean isTransient) {
+    return (SerializedObjectValueBuilder) serializedObjectValue().serializedValue(value).setTransient(isTransient);
+  }
+
+  /**
    * Creates a new {@link IntegerValue} that encapsulates the given <code>integer</code>
    */
   public static IntegerValue integerValue(Integer integer) {
