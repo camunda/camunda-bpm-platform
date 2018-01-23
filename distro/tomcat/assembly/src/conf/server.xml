@@ -47,7 +47,12 @@
               description="User database that can be updated and saved"
               factory="org.apache.catalina.users.MemoryUserDatabaseFactory"
               pathname="conf/tomcat-users.xml" />
-              
+
+    <!-- Additional properties can be set to avoid a common exception
+         regarding connection timeout in the connection pool:
+          testOnBorrow="true"
+          validationQuery="SELECT 1"
+    -->
     <Resource name="jdbc/ProcessEngine"
               auth="Container"
               type="javax.sql.DataSource" 
