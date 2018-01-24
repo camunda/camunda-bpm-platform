@@ -18,9 +18,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
@@ -33,6 +35,7 @@ import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.AsyncProcessModels;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.util.ExecutionTree;
+import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.Variables.SerializationDataFormats;
@@ -51,7 +54,13 @@ import org.junit.rules.RuleChain;
  */
 public class MigrationVariablesTest {
 
-  protected ProcessEngineRule rule = new ProvidedProcessEngineRule();
+  protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
+    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+      configuration.setJavaSerializationFormatEnabled(true);
+      return configuration;
+    }
+  };
+  protected ProcessEngineRule rule = new ProvidedProcessEngineRule(bootstrapRule);
   protected MigrationTestRule testHelper = new MigrationTestRule(rule);
 
   protected static final BpmnModelInstance ONE_BOUNDARY_TASK = ModifiableBpmnModelInstance.modify(ProcessModels.ONE_TASK_PROCESS)
@@ -79,7 +88,7 @@ public class MigrationVariablesTest {
       .done();
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(rule).around(testHelper);
+  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(rule).around(testHelper);
 
   protected RuntimeService runtimeService;
   protected TaskService taskService;

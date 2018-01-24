@@ -24,12 +24,15 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.exception.NullValueException;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.camunda.bpm.engine.impl.runtime.CorrelationHandlerResult;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.StringUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -40,17 +43,58 @@ import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.api.variables.FailingJavaSerializable;
+import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
+import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.Variables.SerializationDataFormats;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.bpm.model.bpmn.Bpmn;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.rules.RuleChain;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author Thorben Lindhauer
  */
-public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
+public class MessageCorrelationTest {
+
+  protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
+    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+      configuration.setJavaSerializationFormatEnabled(true);
+      return configuration;
+    }
+  };
+  protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
+  public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
+
+  @Rule
+  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(testRule);
+
+  @Rule
+  public ExpectedException thrown = ExpectedException.none();
+
+  private RuntimeService runtimeService;
+  private TaskService taskService;
+  private RepositoryService repositoryService;
+
+  @Before
+  public void init() {
+    runtimeService = engineRule.getRuntimeService();
+    taskService = engineRule.getTaskService();
+    repositoryService = engineRule.getRepositoryService();
+  }
 
   @Deployment
+  @Test
   public void testCatchingMessageEventCorrelation() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("aKey", "aValue");
@@ -109,6 +153,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCatchingMessageEventCorrelation.bpmn20.xml")
+  @Test
   public void testOneMatchinProcessInstanceUsingFluentCorrelateAll() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("aKey", "aValue");
@@ -144,6 +189,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCatchingMessageEventCorrelation.bpmn20.xml")
+  @Test
   public void testTwoMatchingProcessInstancesCorrelation() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("aKey", "aValue");
@@ -161,7 +207,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
       runtimeService.correlateMessage(messageName, correlationKeys);
       fail("Expected an Exception");
     } catch (MismatchingMessageCorrelationException e) {
-      assertTextPresent("2 executions match the correlation keys", e.getMessage());
+      testRule.assertTextPresent("2 executions match the correlation keys", e.getMessage());
     }
 
     // fluent builder fails as well
@@ -171,11 +217,12 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
         .correlate();
       fail("Expected an Exception");
     } catch (MismatchingMessageCorrelationException e) {
-      assertTextPresent("2 executions match the correlation keys", e.getMessage());
+      testRule.assertTextPresent("2 executions match the correlation keys", e.getMessage());
     }
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCatchingMessageEventCorrelation.bpmn20.xml")
+  @Test
   public void testTwoMatchingProcessInstancesUsingFluentCorrelateAll() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("aKey", "aValue");
@@ -212,6 +259,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCatchingMessageEventCorrelation.bpmn20.xml")
+  @Test
   public void testExecutionCorrelationByBusinessKey() {
     String businessKey = "aBusinessKey";
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process", businessKey);
@@ -238,6 +286,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCatchingMessageEventCorrelation.bpmn20.xml")
+  @Test
   public void testExecutionCorrelationByBusinessKeyUsingFluentCorrelateAll() {
     String businessKey = "aBusinessKey";
     runtimeService.startProcessInstanceByKey("process", businessKey);
@@ -255,6 +304,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCatchingMessageEventCorrelation.bpmn20.xml")
+  @Test
   public void testMessageCorrelateAllResultListWithResultTypeExecution() {
     //given
     ProcessInstance procInstance1 = runtimeService.startProcessInstanceByKey("process");
@@ -279,6 +329,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
 
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testMessageStartEventCorrelation.bpmn20.xml")
+  @Test
   public void testMessageCorrelateAllResultListWithResultTypeProcessDefinition() {
     //when correlated all with result
     List<MessageCorrelationResult> resultList = runtimeService.createMessageCorrelation("newInvoiceMessage")
@@ -293,6 +344,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
 
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCatchingMessageEventCorrelation.bpmn20.xml")
+  @Test
   public void testExecutionCorrelationByBusinessKeyWithVariables() {
     String businessKey = "aBusinessKey";
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process", businessKey);
@@ -326,6 +378,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCatchingMessageEventCorrelation.bpmn20.xml")
+  @Test
   public void testExecutionCorrelationByBusinessKeyWithVariablesUsingFluentCorrelateAll() {
     String businessKey = "aBusinessKey";
 
@@ -347,6 +400,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCatchingMessageEventCorrelation.bpmn20.xml")
+  @Test
   public void testExecutionCorrelationSetSerializedVariableValue() throws IOException, ClassNotFoundException {
 
     // given
@@ -357,13 +411,13 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
 
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     new ObjectOutputStream(baos).writeObject(javaSerializable);
-    String serializedObject = StringUtil.fromBytes(Base64.encodeBase64(baos.toByteArray()), processEngine);
+    String serializedObject = StringUtil.fromBytes(Base64.encodeBase64(baos.toByteArray()), engineRule.getProcessEngine());
 
     // then it is not possible to deserialize the object
     try {
       new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray())).readObject();
     } catch (RuntimeException e) {
-      assertTextPresent("Exception while deserializing object.", e.getMessage());
+      testRule.assertTextPresent("Exception while deserializing object.", e.getMessage());
     }
 
     // but it can be set as a variable:
@@ -387,6 +441,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCatchingMessageEventCorrelation.bpmn20.xml")
+  @Test
   public void testExecutionCorrelationSetSerializedVariableValues() throws IOException, ClassNotFoundException {
 
     // given
@@ -397,13 +452,13 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
 
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     new ObjectOutputStream(baos).writeObject(javaSerializable);
-    String serializedObject = StringUtil.fromBytes(Base64.encodeBase64(baos.toByteArray()), processEngine);
+    String serializedObject = StringUtil.fromBytes(Base64.encodeBase64(baos.toByteArray()), engineRule.getProcessEngine());
 
     // then it is not possible to deserialize the object
     try {
       new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray())).readObject();
     } catch (RuntimeException e) {
-      assertTextPresent("Exception while deserializing object.", e.getMessage());
+      testRule.assertTextPresent("Exception while deserializing object.", e.getMessage());
     }
 
     // but it can be set as a variable:
@@ -428,6 +483,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testMessageStartEventCorrelation() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("aKey", "aValue");
@@ -440,6 +496,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testMessageStartEventCorrelation.bpmn20.xml")
+  @Test
   public void testMessageStartEventCorrelationUsingFluentCorrelateStartMessage() {
 
     runtimeService.createMessageCorrelation("newInvoiceMessage")
@@ -452,6 +509,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testMessageStartEventCorrelation.bpmn20.xml")
+  @Test
   public void testMessageStartEventCorrelationUsingFluentCorrelateSingle() {
 
     runtimeService.createMessageCorrelation("newInvoiceMessage")
@@ -464,6 +522,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testMessageStartEventCorrelation.bpmn20.xml")
+  @Test
   public void testMessageStartEventCorrelationUsingFluentCorrelateAll() {
 
     runtimeService.createMessageCorrelation("newInvoiceMessage")
@@ -479,6 +538,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testMessageStartEventCorrelation.bpmn20.xml"})
+  @Test
   public void testMessageStartEventCorrelationWithBusinessKey() {
     final String businessKey = "aBusinessKey";
 
@@ -490,6 +550,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testMessageStartEventCorrelation.bpmn20.xml"})
+  @Test
   public void testMessageStartEventCorrelationWithBusinessKeyUsingFluentCorrelateStartMessage() {
     final String businessKey = "aBusinessKey";
 
@@ -503,6 +564,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testMessageStartEventCorrelation.bpmn20.xml"})
+  @Test
   public void testMessageStartEventCorrelationWithBusinessKeyUsingFluentCorrelateSingle() {
     final String businessKey = "aBusinessKey";
 
@@ -516,6 +578,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testMessageStartEventCorrelation.bpmn20.xml"})
+  @Test
   public void testMessageStartEventCorrelationWithBusinessKeyUsingFluentCorrelateAll() {
     final String businessKey = "aBusinessKey";
 
@@ -529,6 +592,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testMessageStartEventCorrelation.bpmn20.xml")
+  @Test
   public void testMessageStartEventCorrelationSetSerializedVariableValue() throws IOException, ClassNotFoundException {
 
     // when
@@ -536,13 +600,13 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
 
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     new ObjectOutputStream(baos).writeObject(javaSerializable);
-    String serializedObject = StringUtil.fromBytes(Base64.encodeBase64(baos.toByteArray()), processEngine);
+    String serializedObject = StringUtil.fromBytes(Base64.encodeBase64(baos.toByteArray()), engineRule.getProcessEngine());
 
     // then it is not possible to deserialize the object
     try {
       new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray())).readObject();
     } catch (RuntimeException e) {
-      assertTextPresent("Exception while deserializing object.", e.getMessage());
+      testRule.assertTextPresent("Exception while deserializing object.", e.getMessage());
     }
 
     // but it can be set as a variable:
@@ -569,6 +633,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testMessageStartEventCorrelation.bpmn20.xml")
+  @Test
   public void testMessageStartEventCorrelationSetSerializedVariableValues() throws IOException, ClassNotFoundException {
 
     // when
@@ -576,13 +641,13 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
 
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     new ObjectOutputStream(baos).writeObject(javaSerializable);
-    String serializedObject = StringUtil.fromBytes(Base64.encodeBase64(baos.toByteArray()), processEngine);
+    String serializedObject = StringUtil.fromBytes(Base64.encodeBase64(baos.toByteArray()), engineRule.getProcessEngine());
 
     // then it is not possible to deserialize the object
     try {
       new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray())).readObject();
     } catch (RuntimeException e) {
-      assertTextPresent("Exception while deserializing object.", e.getMessage());
+      testRule.assertTextPresent("Exception while deserializing object.", e.getMessage());
     }
 
     // but it can be set as a variable:
@@ -610,6 +675,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testMessageStartEventCorrelation.bpmn20.xml")
+  @Test
   public void testMessageStartEventCorrelationWithVariablesUsingFluentCorrelateStartMessage() {
 
     runtimeService.createMessageCorrelation("newInvoiceMessage")
@@ -625,6 +691,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testMessageStartEventCorrelation.bpmn20.xml")
+  @Test
   public void testMessageStartEventCorrelationWithVariablesUsingFluentCorrelateSingleMessage() {
 
     runtimeService.createMessageCorrelation("newInvoiceMessage")
@@ -640,6 +707,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testMessageStartEventCorrelation.bpmn20.xml")
+  @Test
   public void testMessageStartEventCorrelationWithVariablesUsingFluentCorrelateAll() {
 
     runtimeService.createMessageCorrelation("newInvoiceMessage")
@@ -658,6 +726,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
    * this test assures the right start event is selected
    */
   @Deployment
+  @Test
   public void testMultipleMessageStartEventsCorrelation() {
 
     runtimeService.correlateMessage("someMessage");
@@ -676,6 +745,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testMultipleMessageStartEventsCorrelation.bpmn20.xml"})
+  @Test
   public void testMultipleMessageStartEventsCorrelationUsingFluentCorrelateStartMessage() {
 
     runtimeService.createMessageCorrelation("someMessage").correlateStartMessage();
@@ -694,6 +764,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testMultipleMessageStartEventsCorrelation.bpmn20.xml"})
+  @Test
   public void testMultipleMessageStartEventsCorrelationUsingFluentCorrelateSingle() {
 
     runtimeService.createMessageCorrelation("someMessage").correlate();
@@ -715,6 +786,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
    * this test assures the right start event is selected
    */
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testMultipleMessageStartEventsCorrelation.bpmn20.xml"})
+  @Test
   public void testMultipleMessageStartEventsCorrelationUsingFluentCorrelateAll() {
 
     runtimeService.createMessageCorrelation("someMessage").correlateAll();
@@ -733,6 +805,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testMatchingStartEventAndExecution() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
@@ -758,6 +831,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
 
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testMatchingStartEventAndExecution.bpmn20.xml"})
+  @Test
   public void testMessageCorrelationResultWithResultTypeProcessDefinition() {
     //given
     String msgName = "newInvoiceMessage";
@@ -780,6 +854,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
 
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testMatchingStartEventAndExecution.bpmn20.xml"})
+  @Test
   public void testMessageCorrelationResultWithResultTypeExecution() {
     //given
     String msgName = "newInvoiceMessage";
@@ -805,6 +880,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
 
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testMatchingStartEventAndExecution.bpmn20.xml"})
+  @Test
   public void testMatchingStartEventAndExecutionUsingFluentCorrelateAll() {
     runtimeService.startProcessInstanceByKey("process");
     runtimeService.startProcessInstanceByKey("process");
@@ -819,6 +895,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
 
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testMatchingStartEventAndExecution.bpmn20.xml"})
+  @Test
   public void testMatchingStartEventAndExecutionCorrelateAllWithResult() {
     //given
     ProcessInstance procInstance1 = runtimeService.startProcessInstanceByKey("process");
@@ -852,12 +929,13 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
     assertEquals(1, procDefResultCount);
   }
 
+  @Test
   public void testMessageStartEventCorrelationWithNonMatchingDefinition() {
     try {
       runtimeService.correlateMessage("aMessageName");
       fail("Expect an Exception");
     } catch (MismatchingMessageCorrelationException e) {
-      assertTextPresent("Cannot correlate message", e.getMessage());
+      testRule.assertTextPresent("Cannot correlate message", e.getMessage());
     }
 
     // fluent builder //////////////////
@@ -866,7 +944,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
       runtimeService.createMessageCorrelation("aMessageName").correlate();
       fail("Expect an Exception");
     } catch (MismatchingMessageCorrelationException e) {
-      assertTextPresent("Cannot correlate message", e.getMessage());
+      testRule.assertTextPresent("Cannot correlate message", e.getMessage());
     }
 
     // fluent builder with multiple correlation //////////////////
@@ -875,6 +953,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCatchingMessageEventCorrelation.bpmn20.xml")
+  @Test
   public void testCorrelationByBusinessKeyAndVariables() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("aKey", "aValue");
@@ -933,6 +1012,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCatchingMessageEventCorrelation.bpmn20.xml")
+  @Test
   public void testCorrelationByBusinessKeyAndVariablesUsingFluentCorrelateAll() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("aKey", "aValue");
@@ -974,6 +1054,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCatchingMessageEventCorrelation.bpmn20.xml")
+  @Test
   public void testCorrelationByProcessInstanceId() {
 
     ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("process");
@@ -985,7 +1066,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
       runtimeService.createMessageCorrelation("aMessageName").correlate();
       fail("Expect an Exception");
     } catch (MismatchingMessageCorrelationException e) {
-      assertTextPresent("Cannot correlate message", e.getMessage());
+      testRule.assertTextPresent("Cannot correlate message", e.getMessage());
     }
 
     // use process instance id as well
@@ -1009,6 +1090,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCatchingMessageEventCorrelation.bpmn20.xml")
+  @Test
   public void testCorrelationByProcessInstanceIdUsingFluentCorrelateAll() {
     // correlate by name
     ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("process");
@@ -1049,6 +1131,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCatchingMessageEventCorrelation.bpmn20.xml")
+  @Test
   public void testCorrelationByBusinessKeyAndNullVariableUsingFluentCorrelateAll() {
     runtimeService.startProcessInstanceByKey("process", "aBusinessKey");
 
@@ -1063,12 +1146,13 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
     }
     catch (Exception e) {
       assertTrue(e instanceof ProcessEngineException);
-      assertTextPresent("null", e.getMessage());
+      testRule.assertTextPresent("null", e.getMessage());
     }
 
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCatchingMessageEventCorrelation.bpmn20.xml")
+  @Test
   public void testCorrelationByBusinessKeyAndNullVariableEqualsUsingFluentCorrelateAll() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("foo", "bar");
@@ -1085,12 +1169,13 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
     }
     catch (Exception e) {
       assertTrue(e instanceof ProcessEngineException);
-      assertTextPresent("null", e.getMessage());
+      testRule.assertTextPresent("null", e.getMessage());
     }
 
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCatchingMessageEventCorrelation.bpmn20.xml")
+  @Test
   public void testCorrelationByBusinessKeyAndNullVariablesUsingFluentCorrelateAll() {
     runtimeService.startProcessInstanceByKey("process", "aBusinessKey");
 
@@ -1112,6 +1197,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCatchingMessageEventCorrelation.bpmn20.xml")
+  @Test
   public void testCorrelationByVariablesOnly() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("variable", "value1");
@@ -1132,6 +1218,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCatchingMessageEventCorrelation.bpmn20.xml")
+  @Test
   public void testCorrelationByBusinessKey() {
     runtimeService.startProcessInstanceByKey("process", "businessKey1");
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("process", "businessKey2");
@@ -1148,6 +1235,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCatchingMessageEventCorrelation.bpmn20.xml")
+  @Test
   public void testCorrelationByProcessInstanceIdOnly() {
     runtimeService.startProcessInstanceByKey("process");
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("process");
@@ -1167,6 +1255,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCatchingMessageEventCorrelation.bpmn20.xml")
+  @Test
   public void testCorrelationWithoutMessageNameFluent() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("variable", "value1");
@@ -1190,6 +1279,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCatchingMessageEventCorrelation.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCorrelateAllWithoutMessage.bpmn20.xml"})
+  @Test
   public void testCorrelateAllWithoutMessage() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("variable", "value1");
@@ -1217,6 +1307,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testMessageStartEventCorrelation.bpmn20.xml")
+  @Test
   public void testCorrelationWithoutMessageDoesNotMatchStartEvent() {
     try {
       runtimeService.createMessageCorrelation(null)
@@ -1236,6 +1327,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCatchingMessageEventCorrelation.bpmn20.xml")
+  @Test
   public void testCorrelationWithoutCorrelationPropertiesFails() {
 
     runtimeService.startProcessInstanceByKey("process");
@@ -1257,6 +1349,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/twoBoundaryEventSubscriptions.bpmn20.xml")
+  @Test
   public void testCorrelationToExecutionWithMultipleSubscriptionsFails() {
 
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("process");
@@ -1277,6 +1370,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCatchingMessageEventCorrelation.bpmn20.xml")
+  @Test
   public void testSuspendedProcessInstance() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("aKey", "aValue");
@@ -1298,6 +1392,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCatchingMessageEventCorrelation.bpmn20.xml")
+  @Test
   public void testOneMatchingAndOneSuspendedProcessInstance() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("aKey", "aValue");
@@ -1340,6 +1435,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testMessageStartEventCorrelation.bpmn20.xml")
+  @Test
   public void testSuspendedProcessDefinition() {
     String processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
 
@@ -1356,15 +1452,16 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testCorrelateMessageStartEventWithProcessDefinitionId() {
-    deployment(Bpmn.createExecutableProcess("process")
+    testRule.deploy(Bpmn.createExecutableProcess("process")
         .startEvent()
           .message("a")
         .userTask()
         .endEvent()
         .done());
 
-    deployment(Bpmn.createExecutableProcess("process")
+    testRule.deploy(Bpmn.createExecutableProcess("process")
         .startEvent()
           .message("b")
         .userTask()
@@ -1390,15 +1487,16 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
         .processInstanceBusinessKey("second").processDefinitionId(secondProcessDefinition.getId()).count());
   }
 
+  @Test
   public void testFailCorrelateMessageStartEventWithWrongProcessDefinitionId() {
-    deployment(Bpmn.createExecutableProcess("process")
+    testRule.deploy(Bpmn.createExecutableProcess("process")
         .startEvent()
           .message("a")
         .userTask()
         .endEvent()
         .done());
 
-    deployment(Bpmn.createExecutableProcess("process")
+    testRule.deploy(Bpmn.createExecutableProcess("process")
         .startEvent()
           .message("b")
         .userTask()
@@ -1414,10 +1512,11 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
 
       fail("expected exception");
     } catch (MismatchingMessageCorrelationException e){
-      assertTextPresent("Cannot correlate message 'a'", e.getMessage());
+      testRule.assertTextPresent("Cannot correlate message 'a'", e.getMessage());
     }
   }
 
+  @Test
   public void testFailCorrelateMessageStartEventWithNonExistingProcessDefinitionId() {
     try {
       runtimeService.createMessageCorrelation("a")
@@ -1426,10 +1525,11 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
 
       fail("expected exception");
     } catch (ProcessEngineException e){
-      assertTextPresent("no deployed process definition found", e.getMessage());
+      testRule.assertTextPresent("no deployed process definition found", e.getMessage());
     }
   }
 
+  @Test
   public void testFailCorrelateMessageWithProcessDefinitionId() {
     try {
       runtimeService.createMessageCorrelation("a")
@@ -1438,10 +1538,11 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
 
       fail("expected exception");
     } catch (BadUserRequestException e){
-      assertTextPresent("Cannot specify a process definition id", e.getMessage());
+      testRule.assertTextPresent("Cannot specify a process definition id", e.getMessage());
     }
   }
 
+  @Test
   public void testFailCorrelateMessagesWithProcessDefinitionId() {
     try {
       runtimeService.createMessageCorrelation("a")
@@ -1450,10 +1551,11 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
 
       fail("expected exception");
     } catch (BadUserRequestException e){
-      assertTextPresent("Cannot specify a process definition id", e.getMessage());
+      testRule.assertTextPresent("Cannot specify a process definition id", e.getMessage());
     }
   }
 
+  @Test
   public void testFailCorrelateMessageStartEventWithCorrelationVariable() {
     try {
       runtimeService.createMessageCorrelation("a")
@@ -1462,10 +1564,11 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
 
       fail("expected exception");
     } catch (BadUserRequestException e){
-      assertTextPresent("Cannot specify correlation variables ", e.getMessage());
+      testRule.assertTextPresent("Cannot specify correlation variables ", e.getMessage());
     }
   }
 
+  @Test
   public void testFailCorrelateMessageStartEventWithCorrelationVariables() {
     try {
       runtimeService.createMessageCorrelation("a")
@@ -1477,7 +1580,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
 
       fail("expected exception");
     } catch (BadUserRequestException e){
-      assertTextPresent("Cannot specify correlation variables ", e.getMessage());
+      testRule.assertTextPresent("Cannot specify correlation variables ", e.getMessage());
     }
   }
 

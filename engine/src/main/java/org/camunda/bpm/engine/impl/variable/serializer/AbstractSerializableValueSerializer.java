@@ -130,43 +130,24 @@ public abstract class AbstractSerializableValueSerializer<T extends Serializable
 
   protected boolean canWriteValue(TypedValue typedValue) {
 
-    Object objectToSerialize = null;
-    String requestedDataformat = null;
-
-    if(typedValue instanceof UntypedValueImpl) {
-      objectToSerialize = typedValue.getValue();
-      requestedDataformat = null;
-    }
-    else if(typedValue instanceof SerializableValue) {
-      SerializableValue serializableValue = (SerializableValue) typedValue;
-      String requestedDataFormat = serializableValue.getSerializationDataFormat();
-
-      if(!serializableValue.isDeserialized()) {
-        // serialized object => dataformat must match
-        return serializationDataFormat.equals(requestedDataFormat);
-      }
-      else {
-        objectToSerialize = typedValue.getValue();
-        requestedDataformat = serializableValue.getSerializationDataFormat();
-      }
-    } else {
-      // not an object value
+    if (! (typedValue instanceof SerializableValue) && ! (typedValue instanceof UntypedValueImpl)) {
       return false;
     }
 
-    boolean canSerialize = objectToSerialize == null || canSerializeValue(objectToSerialize);
+    if (typedValue instanceof SerializableValue) {
+      SerializableValue serializableValue = (SerializableValue) typedValue;
+      String requestedDataFormat = serializableValue.getSerializationDataFormat();
+      if (!serializableValue.isDeserialized()) {
+        // serialized object => dataformat must match
+        return serializationDataFormat.equals(requestedDataFormat);
+      } else {
+        final boolean canSerialize = typedValue.getValue() == null || canSerializeValue(typedValue.getValue());
+        return canSerialize && (requestedDataFormat == null || serializationDataFormat.equals(requestedDataFormat));
+      }
+    } else {
+      return typedValue.getValue() == null || canSerializeValue(typedValue.getValue());
+    }
 
-    if(requestedDataformat != null) {
-      if(requestedDataformat.equals(serializationDataFormat)) {
-        return canSerialize;
-      }
-      else {
-        return false;
-      }
-    }
-    else {
-      return canSerialize;
-    }
   }
 
 

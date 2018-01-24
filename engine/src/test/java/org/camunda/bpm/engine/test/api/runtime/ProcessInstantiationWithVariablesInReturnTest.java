@@ -21,10 +21,12 @@ import java.util.Arrays;
 import java.util.List;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.runtime.ProcessInstanceWithVariables;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.VariableMap;
@@ -37,7 +39,6 @@ import static junit.framework.TestCase.assertTrue;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
-import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.util.StringUtil;
 import org.camunda.bpm.engine.test.api.variables.JavaSerializable;
 import static org.camunda.bpm.engine.test.util.TypedValueAssert.assertObjectValueSerializedJava;
@@ -60,12 +61,17 @@ public class ProcessInstantiationWithVariablesInReturnTest {
   protected static final String SET_VARIABLE_IN_DELEGATE_WITH_WAIT_STATE_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstantiationWithVariablesInReturn.setVariableInDelegateWithWaitState.bpmn20.xml";
   protected static final String SIMPLE_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstantiationWithVariablesInReturn.simpleProcess.bpmn20.xml";
 
-
-  public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
+  protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
+    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+      configuration.setJavaSerializationFormatEnabled(true);
+      return configuration;
+    }
+  };
+  public ProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
   public ProcessEngineTestRule testHelper = new ProcessEngineTestRule(engineRule);
 
   @Rule
-  public RuleChain chain = RuleChain.outerRule(engineRule).around(testHelper);
+  public RuleChain chain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(testHelper);
 
   private void checkVariables(VariableMap map, int expectedSize) {
     List<HistoricVariableInstance> variables = engineRule.getHistoryService()
@@ -91,7 +97,7 @@ public class ProcessInstantiationWithVariablesInReturnTest {
     }
   }
 
-  private void testVariablesWithoutDesrialization(String processDefinitionKey) throws Exception {
+  private void testVariablesWithoutDeserialization(String processDefinitionKey) throws Exception {
     //given serializable variable
     JavaSerializable javaSerializable = new JavaSerializable("foo");
 
@@ -128,13 +134,13 @@ public class ProcessInstantiationWithVariablesInReturnTest {
   @Test
   @Deployment(resources = SIMPLE_PROCESS)
   public void testReturnVariablesFromStartWithoutDeserialization() throws Exception {
-    testVariablesWithoutDesrialization("simpleProcess");
+    testVariablesWithoutDeserialization("simpleProcess");
   }
 
   @Test
   @Deployment(resources = SUBPROCESS_PROCESS)
   public void testReturnVariablesFromStartWithoutDeserializationWithWaitstate() throws Exception {
-    testVariablesWithoutDesrialization("subprocess");
+    testVariablesWithoutDeserialization("subprocess");
   }
 
   @Test

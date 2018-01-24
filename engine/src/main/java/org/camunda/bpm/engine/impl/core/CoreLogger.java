@@ -69,4 +69,12 @@ public class CoreLogger extends ProcessEngineLogger {
       ));
   }
 
+  public ProcessEngineException javaSerializationProhibitedException(String variableName) {
+    return new ProcessEngineException(exceptionMessage(
+        "007",
+        "Cannot set variable with name {}. Java serialization format is prohibited",
+        variableName
+      ));
+  }
+
 }

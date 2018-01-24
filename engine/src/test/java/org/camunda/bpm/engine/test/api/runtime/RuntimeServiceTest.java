@@ -24,7 +24,13 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
@@ -39,10 +45,13 @@ import java.util.Map;
 import java.util.Set;
 
 import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.HistoryService;
+import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.ProcessEngines;
+import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -77,22 +86,63 @@ import org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListe
 import org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener.RecordedEvent;
 import org.camunda.bpm.engine.test.bpmn.tasklistener.util.RecorderTaskListener;
 import org.camunda.bpm.engine.test.history.SerializableVariable;
+import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
+import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.test.util.TestExecutionListener;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.rules.RuleChain;
 
 /**
  * @author Frederik Heremans
  * @author Joram Barrez
  */
-public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
+public class RuntimeServiceTest {
 
   public static final String TESTING_INSTANCE_DELETION = "testing instance deletion";
   public static final String A_STREAM = "aStream";
 
+  protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
+    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+      configuration.setJavaSerializationFormatEnabled(true);
+      return configuration;
+    }
+  };
+  protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
+  public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
+
+  @Rule
+  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(testRule);
+
+  @Rule
+  public ExpectedException thrown = ExpectedException.none();
+
+  private RuntimeService runtimeService;
+  private TaskService taskService;
+  private ManagementService managementService;
+  private RepositoryService repositoryService;
+  private HistoryService historyService;
+  private ProcessEngineConfigurationImpl processEngineConfiguration;
+
+  @Before
+  public void init() {
+    runtimeService = engineRule.getRuntimeService();
+    taskService = engineRule.getTaskService();
+    managementService = engineRule.getManagementService();
+    repositoryService = engineRule.getRepositoryService();
+    historyService = engineRule.getHistoryService();
+    processEngineConfiguration = engineRule.getProcessEngineConfiguration();
+  }
+
+  @Test
   public void testStartProcessInstanceByKeyNullKey() {
     try {
       runtimeService.startProcessInstanceByKey(null);
@@ -102,15 +152,17 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testStartProcessInstanceByKeyUnexistingKey() {
     try {
       runtimeService.startProcessInstanceByKey("unexistingkey");
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("no processes deployed with key", ae.getMessage());
+      testRule.assertTextPresent("no processes deployed with key", ae.getMessage());
     }
   }
 
+  @Test
   public void testStartProcessInstanceByIdNullId() {
     try {
       runtimeService.startProcessInstanceById(null);
@@ -120,17 +172,19 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testStartProcessInstanceByIdUnexistingId() {
     try {
       runtimeService.startProcessInstanceById("unexistingId");
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("no deployed process definition found with id", ae.getMessage());
+      testRule.assertTextPresent("no deployed process definition found with id", ae.getMessage());
     }
   }
 
   @Deployment(resources={
     "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Test
   public void testStartProcessInstanceByIdNullVariables() {
     runtimeService.startProcessInstanceByKey("oneTaskProcess", (Map<String, Object>) null);
     assertEquals(1, runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
@@ -167,6 +221,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={
     "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Test
   public void testDeleteProcessInstance() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
     assertEquals(1, runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
@@ -189,6 +244,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={
       "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Test
   public void testDeleteProcessInstances() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
     ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -200,6 +256,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testDeleteProcessInstanceWithListeners() {
     RecorderExecutionListener.clear();
 
@@ -243,6 +300,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={
   "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Test
   public void testDeleteProcessInstanceSkipCustomListenersEnsureHistoryWritten() {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -261,6 +319,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testDeleteProcessInstanceSkipCustomListeners() {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
@@ -281,6 +340,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testDeleteProcessInstanceSkipCustomListenersScope() {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
@@ -301,6 +361,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testDeleteProcessInstanceSkipCustomTaskListeners() {
 
     // given a process instance
@@ -329,6 +390,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   @Deployment(resources={
       "org/camunda/bpm/engine/test/api/oneTaskProcessWithIoMappings.bpmn20.xml" })
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @Test
   public void testDeleteProcessInstanceSkipIoMappings() {
 
     // given a process instance
@@ -338,7 +400,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
     runtimeService.deleteProcessInstance(instance.getId(), null, false, true, true);
 
     // then
-    assertProcessEnded(instance.getId());
+    testRule.assertProcessEnded(instance.getId());
     assertEquals(1, historyService.createHistoricVariableInstanceQuery().processInstanceId(instance.getId()).list().size());
     assertEquals(1, historyService.createHistoricVariableInstanceQuery().variableName("inputMappingExecuted").count());
   }
@@ -346,6 +408,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/api/oneTaskProcessWithIoMappings.bpmn20.xml" })
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @Test
   public void testDeleteProcessInstanceWithoutSkipIoMappings() {
 
     // given a process instance
@@ -355,7 +418,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
     runtimeService.deleteProcessInstance(instance.getId(), null, false, true, false);
 
     // then
-    assertProcessEnded(instance.getId());
+    testRule.assertProcessEnded(instance.getId());
     assertEquals(2, historyService.createHistoricVariableInstanceQuery().processInstanceId(instance.getId()).list().size());
     assertEquals(1, historyService.createHistoricVariableInstanceQuery().variableName("inputMappingExecuted").count());
     assertEquals(1, historyService.createHistoricVariableInstanceQuery().variableName("outputMappingExecuted").count());
@@ -364,6 +427,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/RuntimeServiceTest.testCascadingDeleteSubprocessInstanceSkipIoMappings.Calling.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/runtime/RuntimeServiceTest.testCascadingDeleteSubprocessInstanceSkipIoMappings.Called.bpmn20.xml" })
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @Test
   public void testCascadingDeleteSubprocessInstanceSkipIoMappings() {
 
     // given a process instance
@@ -375,7 +439,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
     runtimeService.deleteProcessInstance(instance.getId(), "test_purposes", false, true, true);
 
     // then
-    assertProcessEnded(instance.getId());
+    testRule.assertProcessEnded(instance.getId());
     assertEquals(1, historyService.createHistoricVariableInstanceQuery().processInstanceId(instance2.getId()).list().size());
     assertEquals(1, historyService.createHistoricVariableInstanceQuery().variableName("inputMappingExecuted").count());
   }
@@ -383,6 +447,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/RuntimeServiceTest.testCascadingDeleteSubprocessInstanceSkipIoMappings.Calling.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/runtime/RuntimeServiceTest.testCascadingDeleteSubprocessInstanceSkipIoMappings.Called.bpmn20.xml" })
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @Test
   public void testCascadingDeleteSubprocessInstanceWithoutSkipIoMappings() {
 
     // given a process instance
@@ -394,7 +459,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
     runtimeService.deleteProcessInstance(instance.getId(), "test_purposes", false, true, false);
 
     // then
-    assertProcessEnded(instance.getId());
+    testRule.assertProcessEnded(instance.getId());
     assertEquals(2, historyService.createHistoricVariableInstanceQuery().processInstanceId(instance2.getId()).list().size());
     assertEquals(1, historyService.createHistoricVariableInstanceQuery().variableName("inputMappingExecuted").count());
     assertEquals(1, historyService.createHistoricVariableInstanceQuery().variableName("outputMappingExecuted").count());
@@ -402,6 +467,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={
     "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Test
   public void testDeleteProcessInstanceNullReason() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
     assertEquals(1, runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
@@ -414,6 +480,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   /**
    * CAM-8005 - StackOverflowError must not happen.
    */
+  @Test
   public void testDeleteProcessInstancesManyParallelSubprocesses() {
     final BpmnModelInstance multiInstanceWithSubprocess =
       Bpmn.createExecutableProcess("multiInstanceWithSubprocess")
@@ -428,7 +495,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
         .endEvent()
       .done();
 
-    deployment(multiInstanceWithSubprocess);
+    testRule.deploy(multiInstanceWithSubprocess);
 
     final ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("multiInstanceWithSubprocess");
 
@@ -436,28 +503,31 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
     assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
   }
 
+  @Test
   public void testDeleteProcessInstanceUnexistingId() {
     try {
       runtimeService.deleteProcessInstance("enexistingInstanceId", null);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("No process instance found for id", ae.getMessage());
+      testRule.assertTextPresent("No process instance found for id", ae.getMessage());
       assertTrue(ae instanceof BadUserRequestException);
     }
   }
 
 
+  @Test
   public void testDeleteProcessInstanceNullId() {
     try {
       runtimeService.deleteProcessInstance(null, "test null id delete");
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("processInstanceId is null", ae.getMessage());
+      testRule.assertTextPresent("processInstanceId is null", ae.getMessage());
       assertTrue(ae instanceof BadUserRequestException);
     }
   }
 
   @Deployment
+  @Test
   public void testDeleteProcessInstanceWithActiveCompensation() {
     // given
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("compensationProcess");
@@ -478,11 +548,12 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
     runtimeService.deleteProcessInstance(instance.getId(), "");
 
     // then
-    assertProcessEnded(instance.getId());
+    testRule.assertProcessEnded(instance.getId());
   }
 
 
   @Deployment
+  @Test
   public void testDeleteProcessInstanceWithVariableOnScopeAndConcurrentExecution() {
 
     // given
@@ -502,11 +573,12 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
     runtimeService.deleteProcessInstance(processInstance.getId(), null);
 
     // then
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources={
     "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Test
   public void testFindActiveActivityIds() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
@@ -515,21 +587,23 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
     assertEquals(1, activities.size());
   }
 
+  @Test
   public void testFindActiveActivityIdsUnexistingExecututionId() {
     try {
       runtimeService.getActiveActivityIds("unexistingExecutionId");
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("execution unexistingExecutionId doesn't exist", ae.getMessage());
+      testRule.assertTextPresent("execution unexistingExecutionId doesn't exist", ae.getMessage());
     }
   }
 
+  @Test
   public void testFindActiveActivityIdsNullExecututionId() {
     try {
       runtimeService.getActiveActivityIds(null);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("executionId is null", ae.getMessage());
+      testRule.assertTextPresent("executionId is null", ae.getMessage());
     }
   }
 
@@ -537,8 +611,9 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
    * Testcase to reproduce ACT-950 (https://jira.codehaus.org/browse/ACT-950)
    */
   @Deployment
+  @Test
   public void testFindActiveActivityIdProcessWithErrorEventAndSubProcess() {
-    ProcessInstance processInstance = processEngine.getRuntimeService().startProcessInstanceByKey("errorEventSubprocess");
+    ProcessInstance processInstance = engineRule.getProcessEngine().getRuntimeService().startProcessInstanceByKey("errorEventSubprocess");
 
     List<String> activeActivities = runtimeService.getActiveActivityIds(processInstance.getId());
     assertEquals(3, activeActivities.size());
@@ -610,30 +685,33 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
 
     taskService.complete(tasks.get(0).getId());
 
-    assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance.getId());
   }
 
+  @Test
   public void testSignalUnexistingExecututionId() {
     try {
       runtimeService.signal("unexistingExecutionId");
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("execution unexistingExecutionId doesn't exist", ae.getMessage());
+      testRule.assertTextPresent("execution unexistingExecutionId doesn't exist", ae.getMessage());
       assertTrue(ae instanceof BadUserRequestException);
     }
   }
 
+  @Test
   public void testSignalNullExecutionId() {
     try {
       runtimeService.signal(null);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("executionId is null", ae.getMessage());
+      testRule.assertTextPresent("executionId is null", ae.getMessage());
       assertTrue(ae instanceof BadUserRequestException);
     }
   }
 
   @Deployment
+  @Test
   public void testSignalWithProcessVariables() {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testSignalWithProcessVariables");
@@ -650,6 +728,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={
     "org/camunda/bpm/engine/test/api/runtime/RuntimeServiceTest.testSignalWithProcessVariables.bpmn20.xml"})
+  @Test
   public void testSignalWithSignalNameAndData() {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testSignalWithProcessVariables");
@@ -666,6 +745,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={
     "org/camunda/bpm/engine/test/api/runtime/RuntimeServiceTest.testSignalWithProcessVariables.bpmn20.xml"})
+  @Test
   public void testSignalWithoutSignalNameAndData() {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testSignalWithProcessVariables");
@@ -681,6 +761,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testSignalInactiveExecution() {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("testSignalInactiveExecution");
 
@@ -690,89 +771,98 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
       fail();
     } catch(ProcessEngineException e) {
       // happy path
-      assertTextPresent("cannot signal execution " + instance.getId() + ": it has no current activity", e.getMessage());
+      testRule.assertTextPresent("cannot signal execution " + instance.getId() + ": it has no current activity", e.getMessage());
     } catch (Exception e) {
       fail("Signalling an inactive execution that has no activity should result in a ProcessEngineException");
     }
 
   }
 
+  @Test
   public void testGetVariablesUnexistingExecutionId() {
     try {
       runtimeService.getVariables("unexistingExecutionId");
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("execution unexistingExecutionId doesn't exist", ae.getMessage());
+      testRule.assertTextPresent("execution unexistingExecutionId doesn't exist", ae.getMessage());
     }
   }
 
+  @Test
   public void testGetVariablesNullExecutionId() {
     try {
       runtimeService.getVariables(null);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("executionId is null", ae.getMessage());
+      testRule.assertTextPresent("executionId is null", ae.getMessage());
     }
   }
 
+  @Test
   public void testGetVariableUnexistingExecutionId() {
     try {
       runtimeService.getVariables("unexistingExecutionId");
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("execution unexistingExecutionId doesn't exist", ae.getMessage());
+      testRule.assertTextPresent("execution unexistingExecutionId doesn't exist", ae.getMessage());
     }
   }
 
+  @Test
   public void testGetVariableNullExecutionId() {
     try {
       runtimeService.getVariables(null);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("executionId is null", ae.getMessage());
+      testRule.assertTextPresent("executionId is null", ae.getMessage());
     }
   }
 
   @Deployment(resources={
     "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Test
   public void testGetVariableUnexistingVariableName() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
     Object variableValue = runtimeService.getVariable(processInstance.getId(), "unexistingVariable");
     assertNull(variableValue);
   }
 
+  @Test
   public void testSetVariableUnexistingExecutionId() {
     try {
       runtimeService.setVariable("unexistingExecutionId", "variableName", "value");
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("execution unexistingExecutionId doesn't exist", ae.getMessage());
+      testRule.assertTextPresent("execution unexistingExecutionId doesn't exist", ae.getMessage());
     }
   }
 
+  @Test
   public void testSetVariableNullExecutionId() {
     try {
       runtimeService.setVariable(null, "variableName", "variableValue");
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("executionId is null", ae.getMessage());
+      testRule.assertTextPresent("executionId is null", ae.getMessage());
     }
   }
 
   @Deployment(resources={
     "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Test
   public void testSetVariableNullVariableName() {
     try {
       ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
       runtimeService.setVariable(processInstance.getId(), null, "variableValue");
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("variableName is null", ae.getMessage());
+      testRule.assertTextPresent("variableName is null", ae.getMessage());
     }
   }
 
   @Deployment(resources={
   "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Test
   public void testSetVariables() {
     Map<String, Object> vars = new HashMap<String, Object>();
     vars.put("variable1", "value1");
@@ -787,6 +877,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={
   "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Test
   public void testGetVariablesTyped() {
     Map<String, Object> vars = new HashMap<String, Object>();
     vars.put("variable1", "value1");
@@ -799,6 +890,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={
   "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Test
   public void testGetVariablesTypedDeserialize() {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess",
@@ -817,19 +909,20 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
     try {
       runtimeService.getVariablesTyped(processInstance.getId());
     } catch(ProcessEngineException e) {
-      assertTextPresent("Cannot deserialize object", e.getMessage());
+      testRule.assertTextPresent("Cannot deserialize object", e.getMessage());
     }
 
     // this does not
     try {
       runtimeService.getVariablesTyped(processInstance.getId(), Arrays.asList("broken"), true);
     } catch(ProcessEngineException e) {
-      assertTextPresent("Cannot deserialize object", e.getMessage());
+      testRule.assertTextPresent("Cannot deserialize object", e.getMessage());
     }
   }
 
   @Deployment(resources={
   "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Test
   public void testGetVariablesLocalTyped() {
     Map<String, Object> vars = new HashMap<String, Object>();
     vars.put("variable1", "value1");
@@ -842,6 +935,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={
   "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Test
   public void testGetVariablesLocalTypedDeserialize() {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess",
@@ -860,35 +954,37 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
     try {
       runtimeService.getVariablesLocalTyped(processInstance.getId());
     } catch(ProcessEngineException e) {
-      assertTextPresent("Cannot deserialize object", e.getMessage());
+      testRule.assertTextPresent("Cannot deserialize object", e.getMessage());
     }
 
     // this does not
     try {
       runtimeService.getVariablesLocalTyped(processInstance.getId(), Arrays.asList("broken"), true);
     } catch(ProcessEngineException e) {
-      assertTextPresent("Cannot deserialize object", e.getMessage());
+      testRule.assertTextPresent("Cannot deserialize object", e.getMessage());
     }
 
   }
 
   @SuppressWarnings("unchecked")
+  @Test
   public void testSetVariablesUnexistingExecutionId() {
     try {
       runtimeService.setVariables("unexistingexecution", Collections.EMPTY_MAP);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("execution unexistingexecution doesn't exist", ae.getMessage());
+      testRule.assertTextPresent("execution unexistingexecution doesn't exist", ae.getMessage());
     }
   }
 
   @SuppressWarnings("unchecked")
+  @Test
   public void testSetVariablesNullExecutionId() {
     try {
       runtimeService.setVariables(null, Collections.EMPTY_MAP);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("executionId is null", ae.getMessage());
+      testRule.assertTextPresent("executionId is null", ae.getMessage());
     }
   }
 
@@ -918,6 +1014,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={
   "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Test
   public void testRemoveVariable() {
     Map<String, Object> vars = new HashMap<String, Object>();
     vars.put("variable1", "value1");
@@ -937,6 +1034,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={
   "org/camunda/bpm/engine/test/api/oneSubProcess.bpmn20.xml"})
+  @Test
   public void testRemoveVariableInParentScope() {
     Map<String, Object> vars = new HashMap<String, Object>();
     vars.put("variable1", "value1");
@@ -954,17 +1052,19 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   }
 
 
+  @Test
   public void testRemoveVariableNullExecutionId() {
     try {
       runtimeService.removeVariable(null, "variable");
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("executionId is null", ae.getMessage());
+      testRule.assertTextPresent("executionId is null", ae.getMessage());
     }
   }
 
   @Deployment(resources={
   "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Test
   public void testRemoveVariableLocal() {
     Map<String, Object> vars = new HashMap<String, Object>();
     vars.put("variable1", "value1");
@@ -982,6 +1082,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={
   "org/camunda/bpm/engine/test/api/oneSubProcess.bpmn20.xml"})
+  @Test
   public void testRemoveVariableLocalWithParentScope() {
     Map<String, Object> vars = new HashMap<String, Object>();
     vars.put("variable1", "value1");
@@ -1008,17 +1109,19 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   }
 
 
+  @Test
   public void testRemoveLocalVariableNullExecutionId() {
     try {
       runtimeService.removeVariableLocal(null, "variable");
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("executionId is null", ae.getMessage());
+      testRule.assertTextPresent("executionId is null", ae.getMessage());
     }
   }
 
   @Deployment(resources={
   "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Test
   public void testRemoveVariables() {
     Map<String, Object> vars = new HashMap<String, Object>();
     vars.put("variable1", "value1");
@@ -1043,6 +1146,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={
   "org/camunda/bpm/engine/test/api/oneSubProcess.bpmn20.xml"})
+  @Test
   public void testRemoveVariablesWithParentScope() {
     Map<String, Object> vars = new HashMap<String, Object>();
     vars.put("variable1", "value1");
@@ -1073,17 +1177,19 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @SuppressWarnings("unchecked")
+  @Test
   public void testRemoveVariablesNullExecutionId() {
     try {
       runtimeService.removeVariables(null, Collections.EMPTY_LIST);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("executionId is null", ae.getMessage());
+      testRule.assertTextPresent("executionId is null", ae.getMessage());
     }
   }
 
   @Deployment(resources={
   "org/camunda/bpm/engine/test/api/oneSubProcess.bpmn20.xml"})
+  @Test
   public void testRemoveVariablesLocalWithParentScope() {
     Map<String, Object> vars = new HashMap<String, Object>();
     vars.put("variable1", "value1");
@@ -1129,17 +1235,19 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @SuppressWarnings("unchecked")
+  @Test
   public void testRemoveVariablesLocalNullExecutionId() {
     try {
       runtimeService.removeVariablesLocal(null, Collections.EMPTY_LIST);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("executionId is null", ae.getMessage());
+      testRule.assertTextPresent("executionId is null", ae.getMessage());
     }
   }
 
   @Deployment(resources={
   "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Test
   public void testUpdateVariables() {
     Map<String, Object> modifications = new HashMap<String, Object>();
     modifications.put("variable1", "value1");
@@ -1159,6 +1267,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={
   "org/camunda/bpm/engine/test/api/oneSubProcess.bpmn20.xml"})
+  @Test
   public void testUpdateVariablesLocal() {
     Map<String, Object> globalVars = new HashMap<String, Object>();
     globalVars.put("variable4", "value4");
@@ -1192,6 +1301,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
           "org/camunda/bpm/engine/test/api/runtime/RuntimeServiceTest.catchAlertSignal.bpmn20.xml",
           "org/camunda/bpm/engine/test/api/runtime/RuntimeServiceTest.catchPanicSignal.bpmn20.xml"
   })
+  @Test
   public void testSignalEventReceived() {
 
     //////  test  signalEventReceived(String)
@@ -1232,6 +1342,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
           "org/camunda/bpm/engine/test/api/runtime/RuntimeServiceTest.catchAlertMessage.bpmn20.xml",
           "org/camunda/bpm/engine/test/api/runtime/RuntimeServiceTest.catchPanicMessage.bpmn20.xml"
   })
+  @Test
   public void testMessageEventReceived() {
 
     startMessageCatchProcesses();
@@ -1259,7 +1370,8 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
 
   }
 
- public void testSignalEventReceivedNonExistingExecution() {
+ @Test
+  public void testSignalEventReceivedNonExistingExecution() {
    try {
      runtimeService.signalEventReceived("alert", "nonexistingExecution");
      fail("exeception expected");
@@ -1269,7 +1381,8 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
    }
   }
 
- public void testMessageEventReceivedNonExistingExecution() {
+ @Test
+  public void testMessageEventReceivedNonExistingExecution() {
    try {
      runtimeService.messageEventReceived("alert", "nonexistingExecution");
      fail("exeception expected");
@@ -1282,7 +1395,8 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
  @Deployment(resources={
          "org/camunda/bpm/engine/test/api/runtime/RuntimeServiceTest.catchAlertSignal.bpmn20.xml"
  })
- public void testExecutionWaitingForDifferentSignal() {
+ @Test
+  public void testExecutionWaitingForDifferentSignal() {
    runtimeService.startProcessInstanceByKey("catchAlertSignal");
    Execution execution = runtimeService.createExecutionQuery()
      .signalEventSubscriptionName("alert")
@@ -1312,10 +1426,12 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
 
   // getActivityInstance Tests //////////////////////////////////
 
+  @Test
   public void testActivityInstanceForNonExistingProcessInstanceId() {
     assertNull(runtimeService.getActivityInstance("some-nonexisting-id"));
   }
 
+  @Test
   public void testActivityInstanceForNullProcessInstanceId() {
     try {
       runtimeService.getActivityInstance(null);
@@ -1327,6 +1443,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={
   "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Test
   public void testActivityInstancePopulated() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", "business-key");
 
@@ -1358,6 +1475,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testActivityInstanceTreeForAsyncBeforeTask() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
@@ -1372,6 +1490,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testActivityInstanceTreeForConcurrentAsyncBeforeTask() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("concurrentTasksProcess");
 
@@ -1388,6 +1507,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testActivityInstanceTreeForAsyncBeforeStartEvent() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
@@ -1402,6 +1522,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testActivityInstanceTreeForAsyncAfterTask() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
@@ -1420,6 +1541,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testActivityInstanceTreeForConcurrentAsyncAfterTask() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("concurrentTasksProcess");
 
@@ -1440,6 +1562,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testActivityInstanceTreeForAsyncAfterEndEvent() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("asyncEndEventProcess");
 
@@ -1454,6 +1577,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testActivityInstanceTreeForNestedAsyncBeforeTask() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
@@ -1471,6 +1595,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testActivityInstanceTreeForNestedAsyncBeforeStartEvent() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
@@ -1483,6 +1608,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testActivityInstanceTreeForNestedAsyncAfterTask() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
@@ -1504,6 +1630,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testActivityInstanceTreeForNestedAsyncAfterEndEvent() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("asyncEndEventProcess");
 
@@ -1524,6 +1651,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
    * Test for CAM-3572
    */
   @Deployment
+  @Test
   public void testActivityInstanceForConcurrentSubprocess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("concurrentSubProcess");
 
@@ -1539,6 +1667,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testGetActivityInstancesForActivity() {
     // given
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("miSubprocess");
@@ -1566,6 +1695,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/RuntimeServiceTest.testGetActivityInstancesForActivity.bpmn20.xml")
+  @Test
   public void testGetInvalidActivityInstancesForActivity() {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("miSubprocess");
 
@@ -1580,6 +1710,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/RuntimeServiceTest.testGetActivityInstancesForActivity.bpmn20.xml")
+  @Test
   public void testGetActivityInstancesForNonExistingActivity() {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("miSubprocess");
 
@@ -1591,6 +1722,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testGetTransitionInstancesForActivity() {
     // given
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("miSubprocess");
@@ -1619,6 +1751,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/RuntimeServiceTest.testGetTransitionInstancesForActivity.bpmn20.xml")
+  @Test
   public void testGetInvalidTransitionInstancesForActivity() {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("miSubprocess");
 
@@ -1633,6 +1766,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/RuntimeServiceTest.testGetTransitionInstancesForActivity.bpmn20.xml")
+  @Test
   public void testGetTransitionInstancesForNonExistingActivity() {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("miSubprocess");
 
@@ -1660,6 +1794,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
 
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  @Test
   public void testChangeVariableType() {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
@@ -1675,6 +1810,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  @Test
   public void testStartByKeyWithCaseInstanceId() {
     String caseInstanceId = "aCaseInstanceId";
 
@@ -1711,6 +1847,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  @Test
   public void testStartByIdWithCaseInstanceId() {
     String processDefinitionId = repositoryService
         .createProcessDefinitionQuery()
@@ -1752,6 +1889,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  @Test
   public void testSetAbstractNumberValueFails() {
     try {
       runtimeService.startProcessInstanceByKey("oneTaskProcess",
@@ -1759,7 +1897,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
       fail("exception expected");
     } catch (ProcessEngineException e) {
       // happy path
-      assertTextPresentIgnoreCase("cannot serialize value of abstract type number", e.getMessage());
+      testRule.assertTextPresentIgnoreCase("cannot serialize value of abstract type number", e.getMessage());
     }
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -1769,12 +1907,13 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
       fail("exception expected");
     } catch (ProcessEngineException e) {
       // happy path
-      assertTextPresentIgnoreCase("cannot serialize value of abstract type number", e.getMessage());
+      testRule.assertTextPresentIgnoreCase("cannot serialize value of abstract type number", e.getMessage());
     }
   }
 
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/messageStartEvent.bpmn20.xml")
+  @Test
   public void testStartProcessInstanceByMessageWithEarlierVersionOfProcessDefinition() {
 	  String deploymentId = repositoryService.createDeployment().addClasspathResource("org/camunda/bpm/engine/test/api/runtime/messageStartEvent_version2.bpmn20.xml").deploy().getId();
 	  ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionVersion(1).singleResult();
@@ -1789,6 +1928,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/messageStartEvent.bpmn20.xml")
+  @Test
   public void testStartProcessInstanceByMessageWithLastVersionOfProcessDefinition() {
 	  String deploymentId = repositoryService.createDeployment().addClasspathResource("org/camunda/bpm/engine/test/api/runtime/messageStartEvent_version2.bpmn20.xml").deploy().getId();
 	  ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().latestVersion().singleResult();
@@ -1803,6 +1943,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
    }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/messageStartEvent.bpmn20.xml")
+  @Test
   public void testStartProcessInstanceByMessageWithNonExistingMessageStartEvent() {
 	  String deploymentId = null;
 	  try {
@@ -1824,6 +1965,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Test
   public void testActivityInstanceActivityNameProperty() {
     // given
     String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess").getId();
@@ -1842,6 +1984,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testTransitionInstanceActivityNamePropertyBeforeTask() {
     // given
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
@@ -1864,6 +2007,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/RuntimeServiceTest.testTransitionInstanceActivityNamePropertyBeforeTask.bpmn20.xml")
+  @Test
   public void testTransitionInstanceActivityTypePropertyBeforeTask() {
     // given
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
@@ -1886,6 +2030,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testTransitionInstanceActivityNamePropertyAfterTask() {
     // given
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
@@ -1908,6 +2053,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/RuntimeServiceTest.testTransitionInstanceActivityNamePropertyAfterTask.bpmn20.xml")
+  @Test
   public void testTransitionInstanceActivityTypePropertyAfterTask() {
     // given
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
@@ -1930,6 +2076,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testTransitionInstanceActivityNamePropertyBeforeStartEvent() {
     // given
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
@@ -1946,6 +2093,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/RuntimeServiceTest.testTransitionInstanceActivityNamePropertyBeforeStartEvent.bpmn20.xml")
+  @Test
   public void testTransitionInstanceActivityTypePropertyBeforeStartEvent() {
     // given
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
@@ -1962,6 +2110,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testTransitionInstanceActivityNamePropertyAfterStartEvent() {
     // given
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
@@ -1978,6 +2127,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/RuntimeServiceTest.testTransitionInstanceActivityNamePropertyAfterStartEvent.bpmn20.xml")
+  @Test
   public void testTransitionInstanceActivityTypePropertyAfterStartEvent() {
     // given
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
@@ -1997,6 +2147,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   // cache is cleaned and the deployed process definition is
   // removed from the process cache. This led to problems because
   // the id wasnt fetched from the DB after a redeploy.
+  @Test
   public void testStartProcessInstanceByIdAfterReboot() {
 
     // In case this test is run in a test suite, previous engines might
@@ -2086,6 +2237,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testVariableScope() {
 
     // After starting the process, the task in the subprocess should be active
@@ -2131,6 +2283,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testBasicVariableOperations() {
 
     Date now = new Date();
@@ -2240,6 +2393,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/RuntimeServiceTest.testBasicVariableOperations.bpmn20.xml"})
+  @Test
   public void testOnlyChangeType() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("aVariable", 1234);
@@ -2260,6 +2414,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/RuntimeServiceTest.testBasicVariableOperations.bpmn20.xml"})
+  @Test
   public void testChangeTypeFromSerializableUsingApi() {
 
     Map<String, Object> variables = new HashMap<String, Object>();
@@ -2278,6 +2433,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testChangeSerializableInsideEngine() {
 
     runtimeService.startProcessInstanceByKey("testProcess");
@@ -2290,6 +2446,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/RuntimeServiceTest.testBasicVariableOperations.bpmn20.xml"})
+  @Test
   public void testChangeToSerializableUsingApi() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("aVariable", "test");
@@ -2307,6 +2464,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testGetVariableInstancesFromVariableScope() {
 
     VariableMap variables = createVariables()
@@ -2321,6 +2479,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/RuntimeServiceTest.testSetVariableInScope.bpmn20.xml")
+  @Test
   public void testSetVariableInScopeExplicitUpdate() {
     // when a process instance is started and the task after the subprocess reached
     runtimeService.startProcessInstanceByKey("testProcess",
@@ -2333,6 +2492,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/RuntimeServiceTest.testSetVariableInScope.bpmn20.xml")
+  @Test
   public void testSetVariableInScopeImplicitUpdate() {
     // when a process instance is started and the task after the subprocess reached
     runtimeService.startProcessInstanceByKey("testProcess",
@@ -2345,6 +2505,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testUpdateVariableInProcessWithoutWaitstate() {
     // when a process instance is started
     runtimeService.startProcessInstanceByKey("oneScriptTaskProcess",
@@ -2356,6 +2517,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testSetUpdateAndDeleteComplexVariable() {
     // when a process instance is started
     runtimeService.startProcessInstanceByKey("oneUserTaskProcess",
@@ -2367,6 +2529,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testRollback() {
     try {
       runtimeService.startProcessInstanceByKey("RollbackProcess");
@@ -2383,6 +2546,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/api/runtime/trivial.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/runtime/rollbackAfterSubProcess.bpmn20.xml"})
+  @Test
   public void testRollbackAfterSubProcess() {
     try {
       runtimeService.startProcessInstanceByKey("RollbackAfterSubProcess");
@@ -2397,6 +2561,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Test
   public void testGetActivityInstanceForCompletedInstanceInDelegate() {
     // given
     BpmnModelInstance deletingProcess = Bpmn.createExecutableProcess("process1")
@@ -2413,7 +2578,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
         .endEvent()
         .done();
 
-    deployment(deletingProcess, processToDelete);
+    testRule.deploy(deletingProcess, processToDelete);
 
     ProcessInstance instanceToDelete = runtimeService.startProcessInstanceByKey("process2");
     ProcessInstance deletingInstance = runtimeService.startProcessInstanceByKey("process1",
@@ -2448,6 +2613,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
   }
 
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @Test
   public void testDeleteProcessInstanceWithSubprocessInstances() {
     // given a process instance with subprocesses
     BpmnModelInstance calling = prepareComplexProcess("A", "B", "A");
@@ -2455,7 +2621,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
     BpmnModelInstance calledA = prepareSimpleProcess("A");
     BpmnModelInstance calledB = prepareSimpleProcess("B");
 
-    deployment(calling, calledA, calledB);
+    testRule.deploy(calling, calledA, calledB);
 
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("calling");
     List<ProcessInstance> subInstances = runtimeService.createProcessInstanceQuery().superProcessInstanceId(instance.getId()).list();
@@ -2465,14 +2631,15 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
     runtimeService.deleteProcessInstance(id, "test_purposes", false, true, false, false);
 
     // then
-    assertProcessEnded(id);
+    testRule.assertProcessEnded(id);
 
     for (ProcessInstance subInstance : subInstances) {
-      assertProcessEnded(subInstance.getId());
+      testRule.assertProcessEnded(subInstance.getId());
     }
   }
 
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @Test
   public void testDeleteProcessInstanceWithoutSubprocessInstances() {
     // given a process instance with subprocesses
     BpmnModelInstance calling = prepareComplexProcess("A", "B", "C");
@@ -2481,7 +2648,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
     BpmnModelInstance calledB = prepareSimpleProcess("B");
     BpmnModelInstance calledC = prepareSimpleProcess("C");
 
-    deployment(calling, calledA, calledB, calledC);
+    testRule.deploy(calling, calledA, calledB, calledC);
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("calling");
     List<ProcessInstance> subInstances = runtimeService.createProcessInstanceQuery().superProcessInstanceId(processInstance.getId()).list();
@@ -2491,20 +2658,21 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
     runtimeService.deleteProcessInstance(id, "test_purposes", false, true, false, true);
 
     // then
-    assertProcessEnded(id);
+    testRule.assertProcessEnded(id);
 
     for (ProcessInstance subInstance : subInstances) {
-      assertProcessNotEnded(subInstance.getId());
+      testRule.assertProcessNotEnded(subInstance.getId());
     }
   }
 
+  @Test
   public void testDeleteProcessInstancesWithoutSubprocessInstances() {
     // given a process instance with subprocess
     String callingProcessKey = "calling";
     String calledProcessKey = "called";
     BpmnModelInstance calling = prepareCallingProcess(callingProcessKey, calledProcessKey);
     BpmnModelInstance called = prepareSimpleProcess(calledProcessKey);
-    deployment(calling, called);
+    testRule.deploy(calling, called);
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(callingProcessKey);
     ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey(callingProcessKey);
 
@@ -2515,21 +2683,22 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
     runtimeService.deleteProcessInstances(Arrays.asList(processInstance.getId(), processInstance2.getId()), null, false, false, true);
 
     // then
-    assertProcessEnded(processInstance.getId());
-    assertProcessEnded(processInstance2.getId());
+    testRule.assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance2.getId());
 
     for (ProcessInstance instance : subprocessList) {
-      assertProcessNotEnded(instance.getId());
+      testRule.assertProcessNotEnded(instance.getId());
     }
   }
 
+  @Test
   public void testDeleteProcessInstancesWithSubprocessInstances() {
     // given a process instance with subprocess
     String callingProcessKey = "calling";
     String calledProcessKey = "called";
     BpmnModelInstance calling = prepareCallingProcess(callingProcessKey, calledProcessKey);
     BpmnModelInstance called = prepareSimpleProcess(calledProcessKey);
-    deployment(calling, called);
+    testRule.deploy(calling, called);
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(callingProcessKey);
     ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey(callingProcessKey);
 
@@ -2540,11 +2709,11 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
     runtimeService.deleteProcessInstances(Arrays.asList(processInstance.getId(), processInstance2.getId()), null, false, false, false);
 
     // then
-    assertProcessEnded(processInstance.getId());
-    assertProcessEnded(processInstance2.getId());
+    testRule.assertProcessEnded(processInstance.getId());
+    testRule.assertProcessEnded(processInstance2.getId());
 
     for (ProcessInstance subprocess : subprocessList) {
-      assertProcessEnded(subprocess.getId());
+      testRule.assertProcessEnded(subprocess.getId());
     }
   }
 

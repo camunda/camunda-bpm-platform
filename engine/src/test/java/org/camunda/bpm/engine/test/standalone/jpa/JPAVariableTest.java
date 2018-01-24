@@ -13,8 +13,8 @@
 
 package org.camunda.bpm.engine.test.standalone.jpa;
 
-
-
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -23,14 +23,6 @@ import java.math.BigInteger;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-
-import junit.extensions.TestSetup;
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -47,9 +39,11 @@ import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.Variables.SerializationDataFormats;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
-import org.camunda.bpm.engine.variable.value.SerializationDataFormat;
 import org.junit.Assert;
 import org.junit.Ignore;
+import junit.extensions.TestSetup;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 
 /**
@@ -98,6 +92,8 @@ public class JPAVariableTest extends AbstractProcessEngineTestCase {
     protected void setUp() throws Exception {
       ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
           .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/standalone/jpa/camunda.cfg.xml");
+
+      processEngineConfiguration.setJavaSerializationFormatEnabled(true);
 
       cachedProcessEngine = processEngineConfiguration.buildProcessEngine();
 

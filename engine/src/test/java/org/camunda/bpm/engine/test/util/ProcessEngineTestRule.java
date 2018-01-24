@@ -28,11 +28,16 @@ import java.util.TimerTask;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.cmmn.behavior.CaseControlRuleImpl;
+import org.camunda.bpm.engine.impl.el.FixedValue;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.HistoryLevelFull;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
+import org.camunda.bpm.engine.impl.test.AbstractProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
@@ -80,6 +85,19 @@ public class ProcessEngineTestRule extends TestWatcher {
     assertThat("Process instance with id " + processInstanceId + " is not finished",
         processInstance, is(nullValue()));
   }
+
+  public void assertProcessNotEnded(final String processInstanceId) {
+    ProcessInstance processInstance = processEngine
+      .getRuntimeService()
+      .createProcessInstanceQuery()
+      .processInstanceId(processInstanceId)
+      .singleResult();
+
+    if (processInstance==null) {
+      throw new AssertionFailedError("Expected process instance '"+processInstanceId+"' to be still active but it was not in the db");
+    }
+  }
+
 
   public void assertCaseEnded(String caseInstanceId) {
     CaseInstance caseInstance = processEngine
@@ -299,6 +317,30 @@ public class ProcessEngineTestRule extends TestWatcher {
   public boolean isHistoryLevelFull() {
     HistoryLevel historyLevel = processEngineRule.getProcessEngineConfiguration().getHistoryLevel();
     return HistoryLevel.HISTORY_LEVEL_FULL.equals(historyLevel);
+  }
+
+  /**
+   * Asserts if the provided text is part of some text.
+   */
+  public void assertTextPresent(String expected, String actual) {
+    if ( (actual==null)
+      || (actual.indexOf(expected)==-1)
+      ) {
+      throw new AssertionFailedError("expected presence of ["+expected+"], but was ["+actual+"]");
+    }
+  }
+
+  /**
+   * Asserts if the provided text is part of some text, ignoring any uppercase characters
+   */
+  public void assertTextPresentIgnoreCase(String expected, String actual) {
+    assertTextPresent(expected.toLowerCase(), actual.toLowerCase());
+  }
+
+  public Object defaultManualActivation() {
+    Expression expression = new FixedValue(true);
+    CaseControlRuleImpl caseControlRule = new CaseControlRuleImpl(expression);
+    return caseControlRule;
   }
 
   protected static class InterruptTask extends TimerTask {

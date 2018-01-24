@@ -490,6 +490,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected VariableSerializerFactory fallbackSerializerFactory;
 
   protected String defaultSerializationFormat = Variables.SerializationDataFormats.JAVA.getName();
+  protected boolean javaSerializationFormatEnabled = false;
   protected String defaultCharsetName = null;
   protected Charset defaultCharset = null;
 
@@ -3424,6 +3425,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   public ProcessEngineConfigurationImpl setDefaultSerializationFormat(String defaultSerializationFormat) {
     this.defaultSerializationFormat = defaultSerializationFormat;
     return this;
+  }
+
+  public boolean isJavaSerializationFormatEnabled() {
+    return javaSerializationFormatEnabled;
+  }
+
+  public void setJavaSerializationFormatEnabled(boolean javaSerializationFormatEnabled) {
+    this.javaSerializationFormatEnabled = javaSerializationFormatEnabled;
   }
 
   public ProcessEngineConfigurationImpl setDefaultCharsetName(String defaultCharsetName) {

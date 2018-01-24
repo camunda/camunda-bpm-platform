@@ -13,9 +13,20 @@
 
 package org.camunda.bpm.engine.test.bpmn.event.message;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.HashMap;
+import java.util.List;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.StringUtil;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -23,23 +34,58 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.api.variables.FailingJavaSerializable;
+import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
+import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.Variables.SerializationDataFormats;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
-
-import java.io.*;
-import java.util.HashMap;
-import java.util.List;
-
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.rules.RuleChain;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author Daniel Meyer
  * @author Nico Rehwaldt
  */
-public class MessageIntermediateEventTest extends PluggableProcessEngineTestCase {
+public class MessageIntermediateEventTest {
 
+  protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
+    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+      configuration.setJavaSerializationFormatEnabled(true);
+      return configuration;
+    }
+  };
+  protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
+  public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
+  @Rule
+  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(testRule);
+
+  @Rule
+  public ExpectedException thrown = ExpectedException.none();
+
+  private RuntimeService runtimeService;
+  private TaskService taskService;
+  private RepositoryService repositoryService;
+
+  @Before
+  public void init() {
+    runtimeService = engineRule.getRuntimeService();
+    taskService = engineRule.getTaskService();
+    repositoryService = engineRule.getRepositoryService();
+  }
+  
   @Deployment
+  @Test
   public void testSingleIntermediateMessageEvent() {
 
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("process");
@@ -66,6 +112,7 @@ public class MessageIntermediateEventTest extends PluggableProcessEngineTestCase
   }
 
   @Deployment
+  @Test
   public void testConcurrentIntermediateMessageEvent() {
 
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("process");
@@ -99,6 +146,7 @@ public class MessageIntermediateEventTest extends PluggableProcessEngineTestCase
     taskService.complete(task.getId());
   }
 
+  @Test
   public void testIntermediateMessageEventRedeployment() {
 
     // deploy version 1
@@ -136,6 +184,7 @@ public class MessageIntermediateEventTest extends PluggableProcessEngineTestCase
 
   }
 
+  @Test
   public void testEmptyMessageNameFails() {
     try {
       repositoryService
@@ -149,6 +198,7 @@ public class MessageIntermediateEventTest extends PluggableProcessEngineTestCase
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/message/MessageIntermediateEventTest.testSingleIntermediateMessageEvent.bpmn20.xml")
+  @Test
   public void testSetSerializedVariableValues() throws IOException, ClassNotFoundException {
 
     // given
@@ -161,13 +211,13 @@ public class MessageIntermediateEventTest extends PluggableProcessEngineTestCase
 
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     new ObjectOutputStream(baos).writeObject(javaSerializable);
-    String serializedObject = StringUtil.fromBytes(Base64.encodeBase64(baos.toByteArray()), processEngine);
+    String serializedObject = StringUtil.fromBytes(Base64.encodeBase64(baos.toByteArray()), engineRule.getProcessEngine());
 
     // then it is not possible to deserialize the object
     try {
       new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray())).readObject();
     } catch (RuntimeException e) {
-      assertTextPresent("Exception while deserializing object.", e.getMessage());
+      testRule.assertTextPresent("Exception while deserializing object.", e.getMessage());
     }
 
     // but it can be set as a variable when delivering a message:
@@ -192,6 +242,7 @@ public class MessageIntermediateEventTest extends PluggableProcessEngineTestCase
   }
 
   @Deployment
+  @Test
   public void testExpressionInSingleIntermediateMessageEvent() {
 
     // given

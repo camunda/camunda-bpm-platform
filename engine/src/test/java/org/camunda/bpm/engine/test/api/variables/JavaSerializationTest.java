@@ -21,29 +21,70 @@ import static org.camunda.bpm.engine.test.util.TypedValueAssert.assertObjectValu
 import static org.camunda.bpm.engine.test.util.TypedValueAssert.assertUntypedNullValue;
 import static org.camunda.bpm.engine.variable.Variables.objectValue;
 import static org.camunda.bpm.engine.variable.Variables.serializedObjectValue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.StringUtil;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
+import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.rules.RuleChain;
 
-public class JavaSerializationTest extends PluggableProcessEngineTestCase {
+public class JavaSerializationTest {
 
   protected static final String ONE_TASK_PROCESS = "org/camunda/bpm/engine/test/api/variables/oneTaskProcess.bpmn20.xml";
 
   protected static final String JAVA_DATA_FORMAT = Variables.SerializationDataFormats.JAVA.getName();
 
-  protected String originalSerializationFormat;
+  protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
+    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
+      configuration.setJavaSerializationFormatEnabled(true);
+      return configuration;
+    }
+  };
+  protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
+  public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
+  @Rule
+  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(testRule);
+
+  @Rule
+  public ExpectedException thrown = ExpectedException.none();
+
+  private RuntimeService runtimeService;
+  private TaskService taskService;
+
+  @Before
+  public void init() {
+    runtimeService = engineRule.getRuntimeService();
+    taskService = engineRule.getTaskService();
+  }
+
+  @Test
   @Deployment(resources = ONE_TASK_PROCESS)
   public void testSerializationAsJava() throws Exception {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -53,6 +94,7 @@ public class JavaSerializationTest extends PluggableProcessEngineTestCase {
 
     // validate untyped value
     JavaSerializable value = (JavaSerializable) runtimeService.getVariable(instance.getId(), "simpleBean");
+
     assertEquals(javaSerializable, value);
 
     // validate typed value
@@ -61,6 +103,7 @@ public class JavaSerializationTest extends PluggableProcessEngineTestCase {
     assertObjectValueSerializedJava(typedValue, javaSerializable);
   }
 
+  @Test
   @Deployment(resources = ONE_TASK_PROCESS)
   public void testSetJavaOjectSerialized() throws Exception {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -69,7 +112,7 @@ public class JavaSerializationTest extends PluggableProcessEngineTestCase {
 
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     new ObjectOutputStream(baos).writeObject(javaSerializable);
-    String serializedObject = StringUtil.fromBytes(Base64.encodeBase64(baos.toByteArray()), processEngine);
+    String serializedObject = StringUtil.fromBytes(Base64.encodeBase64(baos.toByteArray()), engineRule.getProcessEngine());
 
     runtimeService.setVariable(instance.getId(), "simpleBean",
         serializedObjectValue(serializedObject)
@@ -87,6 +130,7 @@ public class JavaSerializationTest extends PluggableProcessEngineTestCase {
     assertObjectValueSerializedJava(typedValue, javaSerializable);
   }
 
+  @Test
   @Deployment
   public void testJavaObjectDeserializedInFirstCommand() throws Exception {
 
@@ -97,7 +141,7 @@ public class JavaSerializationTest extends PluggableProcessEngineTestCase {
     JavaSerializable javaSerializable = new JavaSerializable("foo");
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     new ObjectOutputStream(baos).writeObject(javaSerializable);
-    String serializedObject = StringUtil.fromBytes(Base64.encodeBase64(baos.toByteArray()), processEngine);
+    String serializedObject = StringUtil.fromBytes(Base64.encodeBase64(baos.toByteArray()), engineRule.getProcessEngine());
 
     // if
     // I start a process instance in which a Java Delegate reads the value in its deserialized form
@@ -111,6 +155,7 @@ public class JavaSerializationTest extends PluggableProcessEngineTestCase {
     // it does not fail
   }
 
+  @Test
   @Deployment
   public void testJavaObjectNotDeserializedIfNotRequested() throws Exception {
 
@@ -122,16 +167,14 @@ public class JavaSerializationTest extends PluggableProcessEngineTestCase {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     new ObjectOutputStream(baos).writeObject(javaSerializable);
     byte[] serializedObjectBytes = baos.toByteArray();
-    String serializedObject = StringUtil.fromBytes(Base64.encodeBase64(serializedObjectBytes), processEngine);
+    String serializedObject = StringUtil.fromBytes(Base64.encodeBase64(serializedObjectBytes), engineRule.getProcessEngine());
+
+    thrown.expect(RuntimeException.class);
+    thrown.expectMessage("Exception while deserializing object");
 
     // which cannot be deserialized
-    try {
-      ObjectInputStream objectInputStream = new ObjectInputStream(new ByteArrayInputStream(serializedObjectBytes));
-      objectInputStream.readObject();
-      fail("Exception expected");
-    } catch(RuntimeException e) {
-      assertTextPresent("Exception while deserializing object", e.getMessage());
-    }
+    ObjectInputStream objectInputStream = new ObjectInputStream(new ByteArrayInputStream(serializedObjectBytes));
+    objectInputStream.readObject();
 
     // if
     // I start a process instance in which a Java Delegate reads the value in its serialized form
@@ -145,7 +188,7 @@ public class JavaSerializationTest extends PluggableProcessEngineTestCase {
     // it does not fail
   }
 
-
+  @Test
   @Deployment(resources = ONE_TASK_PROCESS)
   public void testSetJavaOjectNullDeserialized() throws Exception {
 
@@ -166,6 +209,7 @@ public class JavaSerializationTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Test
   @Deployment(resources = ONE_TASK_PROCESS)
   public void testSetJavaOjectNullSerialized() throws Exception {
 
@@ -188,6 +232,7 @@ public class JavaSerializationTest extends PluggableProcessEngineTestCase {
     assertObjectValueSerializedNull(serializedTypedValue);
   }
 
+  @Test
   @Deployment(resources = ONE_TASK_PROCESS)
   public void testSetJavaOjectNullSerializedObjectTypeName() throws Exception {
 
@@ -223,6 +268,7 @@ public class JavaSerializationTest extends PluggableProcessEngineTestCase {
     assertEquals(typeName, serializedTypedValue.getObjectTypeName());
   }
 
+  @Test
   @Deployment(resources = ONE_TASK_PROCESS)
   public void testSetUntypedNullForExistingVariable() throws Exception {
 
@@ -248,6 +294,7 @@ public class JavaSerializationTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Test
   @Deployment(resources = ONE_TASK_PROCESS)
   public void testSetTypedNullForExistingVariable() throws Exception {
 
@@ -270,6 +317,31 @@ public class JavaSerializationTest extends PluggableProcessEngineTestCase {
     // variable is still of type object
     ObjectValue typedValue = runtimeService.getVariableTyped(instance.getId(), "varName");
     assertObjectValueDeserializedNull(typedValue);
+  }
+
+  @Test
+  public void testStandaloneTaskTransientVariable() throws IOException {
+    Task task = taskService.newTask();
+    task.setName("gonzoTask");
+    taskService.saveTask(task);
+    String taskId = task.getId();
+    try{
+
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      new ObjectOutputStream(baos).writeObject(new String("trumpet"));
+      String serializedObject = StringUtil.fromBytes(Base64.encodeBase64(baos.toByteArray()), engineRule.getProcessEngine());
+
+      taskService.setVariable(taskId, "instrument",
+        Variables.serializedObjectValue(serializedObject)
+          .objectTypeName(String.class.getName())
+          .serializationDataFormat(Variables.SerializationDataFormats.JAVA)
+          .setTransient(true)
+          );
+      assertEquals("trumpet", taskService.getVariable(taskId, "instrument"));
+    } finally {
+      taskService.deleteTask(taskId, true);
+    }
+
   }
 
 }

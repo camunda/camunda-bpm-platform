@@ -29,9 +29,12 @@ import org.camunda.bpm.engine.impl.core.variable.event.VariableEventDispatcher;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.javax.el.ELContext;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.util.TypedValueField;
+import org.camunda.bpm.engine.impl.variable.serializer.TypedValueSerializer;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.impl.VariableMapImpl;
+import org.camunda.bpm.engine.variable.value.SerializableValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
@@ -328,6 +331,9 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
   }
 
   public void setVariableLocal(String variableName, TypedValue value, AbstractVariableScope sourceActivityExecution) {
+
+    checkJavaSerialization(variableName, value);
+
     VariableStore<CoreVariableInstance> variableStore = getVariableStore();
 
     if (variableStore.containsKey(variableName)) {
@@ -350,6 +356,35 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
       CoreVariableInstance variableValue = getVariableInstanceFactory().build(variableName, value, false);
       getVariableStore().addVariable(variableValue);
       invokeVariableLifecycleListenersCreate(variableValue, sourceActivityExecution);
+    }
+  }
+
+  /**
+   * Checks, if Java serialization will be used and if it is allowed to be used.
+   * @param variableName
+   * @param value
+   */
+  private void checkJavaSerialization(String variableName, TypedValue value) {
+    if (value instanceof SerializableValue) {
+      final SerializableValue serializableValue = (SerializableValue) value;
+      //if Java serialization is prohibited
+      if (!Context.getProcessEngineConfiguration().isJavaSerializationFormatEnabled() && !serializableValue.isDeserialized()) {
+        String javaSerializationDataFormat = Variables.SerializationDataFormats.JAVA.getName();
+        boolean javaSerializerWillBeUsed;
+        if (serializableValue.getSerializationDataFormat() == null) {
+          //check if Java serializer will be used
+          final TypedValueSerializer serializerForValue = TypedValueField.getSerializers()
+            .findSerializerForValue(serializableValue, Context.getProcessEngineConfiguration().getFallbackSerializerFactory());
+          javaSerializerWillBeUsed = serializerForValue.getSerializationDataformat().equals(javaSerializationDataFormat);
+        } else {
+          // or check, if Java serialization is defined explicitly
+          javaSerializerWillBeUsed = serializableValue.getSerializationDataFormat().equals(Variables.SerializationDataFormats.JAVA.getName());
+        }
+
+        if (javaSerializerWillBeUsed) {
+          throw ProcessEngineLogger.CORE_LOGGER.javaSerializationProhibitedException(variableName);
+        }
+      }
     }
   }
 
@@ -401,6 +436,9 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
    */
   public void setVariableLocalTransient(String variableName, Object value) {
     TypedValue typedValue = Variables.untypedValue(value);
+
+    checkJavaSerialization(variableName, typedValue);
+
     CoreVariableInstance coreVariableInstance = getVariableInstanceFactory().build(variableName, typedValue, true);
     getVariableStore().addVariable(coreVariableInstance);
   }
