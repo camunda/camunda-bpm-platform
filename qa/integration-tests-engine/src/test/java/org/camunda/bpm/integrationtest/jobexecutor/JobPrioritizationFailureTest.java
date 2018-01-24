@@ -18,6 +18,9 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.camunda.bpm.BpmPlatform;
+import org.camunda.bpm.ProcessEngineService;
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
 import org.camunda.bpm.engine.impl.jobexecutor.DefaultJobPriorityProvider;
 import org.camunda.bpm.engine.impl.util.IoUtil;
@@ -48,11 +51,15 @@ public class JobPrioritizationFailureTest extends AbstractFoxPlatformIntegration
 
   protected ProcessInstance processInstance;
 
+  private ProcessEngine engine1;
+
   public static final String VARIABLE_CLASS_NAME = "org.camunda.bpm.integrationtest.jobexecutor.beans.PriorityBean";
   public static final String PRIORITY_BEAN_INSTANCE_FILE = "priorityBean.instance";
 
   @Before
   public void setEngines() {
+    ProcessEngineService engineService = BpmPlatform.getProcessEngineService();
+    engine1 = engineService.getProcessEngine("engine1");
 
     // unregister process application so that context switch cannot be performed
     unregisterProcessApplication();
@@ -74,7 +81,7 @@ public class JobPrioritizationFailureTest extends AbstractFoxPlatformIntegration
 
   @Deployment(name = "dummy-client", order = 2)
   public static WebArchive createDummyClientDeployment() {
-    return initWebArchiveDeployment("pa2.war")
+    return initWebArchiveDeployment("pa2.war", "org/camunda/bpm/integrationtest/jobexecutor/processes-javaSerializationEnabled.xml")
        .addAsResource(new ByteArrayAsset(serializeJavaObjectValue(new PriorityBean())), PRIORITY_BEAN_INSTANCE_FILE);
   }
 
@@ -109,11 +116,11 @@ public class JobPrioritizationFailureTest extends AbstractFoxPlatformIntegration
           .create());
 
     // when
-    processInstance = runtimeService.startProcessInstanceByKey("priorityProcess", variables);
+    processInstance = engine1.getRuntimeService().startProcessInstanceByKey("priorityProcess", variables);
 
     // then the job was created successfully and has the default priority although
     // the bean could not be resolved due to a missing class
-    Job job = managementService.createJobQuery().singleResult();
+    Job job = engine1.getManagementService().createJobQuery().singleResult();
     Assert.assertEquals(DefaultJobPriorityProvider.DEFAULT_PRIORITY_ON_RESOLUTION_FAILURE, job.getPriority());
   }
 
@@ -129,11 +136,11 @@ public class JobPrioritizationFailureTest extends AbstractFoxPlatformIntegration
           .create());
 
     // when
-    processInstance = runtimeService.startProcessInstanceByKey("priorityProcess", variables);
+    processInstance = engine1.getRuntimeService().startProcessInstanceByKey("priorityProcess", variables);
 
     // then the job was created successfully and has the default priority although
     // the bean could not be resolved due to a missing class
-    Job job = managementService.createJobQuery().singleResult();
+    Job job = engine1.getManagementService().createJobQuery().singleResult();
     Assert.assertEquals(DefaultJobPriorityProvider.DEFAULT_PRIORITY_ON_RESOLUTION_FAILURE, job.getPriority());
   }
 
@@ -152,11 +159,11 @@ public class JobPrioritizationFailureTest extends AbstractFoxPlatformIntegration
           .create());
 
     // when
-    processInstance = runtimeService.startProcessInstanceByKey("priorityProcess", variables);
+    processInstance = engine1.getRuntimeService().startProcessInstanceByKey("priorityProcess", variables);
 
     // then the job was created successfully and has the default priority although
     // the bean could not be resolved due to a missing class
-    Job job = managementService.createJobQuery().singleResult();
+    Job job = engine1.getManagementService().createJobQuery().singleResult();
     Assert.assertEquals(DefaultJobPriorityProvider.DEFAULT_PRIORITY_ON_RESOLUTION_FAILURE, job.getPriority());
   }
 
