@@ -81,7 +81,7 @@ public class JobPrioritizationFailureTest extends AbstractFoxPlatformIntegration
 
   @Deployment(name = "dummy-client", order = 2)
   public static WebArchive createDummyClientDeployment() {
-    return initWebArchiveDeployment("pa2.war", "org/camunda/bpm/integrationtest/jobexecutor/processes-javaSerializationEnabled.xml")
+    return initWebArchiveDeployment("pa2.war", "org/camunda/bpm/integrationtest/processes-javaSerializationEnabled.xml")
        .addAsResource(new ByteArrayAsset(serializeJavaObjectValue(new PriorityBean())), PRIORITY_BEAN_INSTANCE_FILE);
   }
 
