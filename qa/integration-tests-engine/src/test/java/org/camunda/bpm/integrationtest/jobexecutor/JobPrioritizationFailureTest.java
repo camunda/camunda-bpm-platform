@@ -31,6 +31,7 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.Variables.SerializationDataFormats;
 import org.camunda.bpm.integrationtest.jobexecutor.beans.PriorityBean;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
+import org.camunda.bpm.integrationtest.util.TestContainer;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -81,8 +82,10 @@ public class JobPrioritizationFailureTest extends AbstractFoxPlatformIntegration
 
   @Deployment(name = "dummy-client", order = 2)
   public static WebArchive createDummyClientDeployment() {
-    return initWebArchiveDeployment("pa2.war", "org/camunda/bpm/integrationtest/processes-javaSerializationEnabled.xml")
-       .addAsResource(new ByteArrayAsset(serializeJavaObjectValue(new PriorityBean())), PRIORITY_BEAN_INSTANCE_FILE);
+    final WebArchive webArchive = initWebArchiveDeployment("pa2.war", "org/camunda/bpm/integrationtest/processes-javaSerializationEnabled.xml")
+      .addAsResource(new ByteArrayAsset(serializeJavaObjectValue(new PriorityBean())), PRIORITY_BEAN_INSTANCE_FILE);
+    TestContainer.addSpinJacksonJsonDataFormat(webArchive);
+    return webArchive;
   }
 
   @After
