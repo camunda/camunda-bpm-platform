@@ -18,6 +18,12 @@ var defaultConfig = {
   'skipCustomListeners': {
     'default': true,
     'hidden': false
+  },
+  'historicActivityInstanceMetrics': {
+    'adjustablePeriod': true,
+    'period': {
+      'unit': 'day'
+    }
   }
 };
 
@@ -71,6 +77,18 @@ module.exports = function(config, app) {
 
     this.getSkipCustomListeners = function() {
       return angular.extend({}, defaultConfig.skipCustomListeners, config.skipCustomListeners);
+    };
+
+    this.getActivityInstancePeriod = function() {
+      return config.historicActivityInstanceMetrics.period?
+        config.historicActivityInstanceMetrics.period:
+        defaultConfig.historicActivityInstanceMetrics.period;
+    };
+
+    this.getActivityInstanceAdjustable = function() {
+      return config.historicActivityInstanceMetrics.adjustablePeriod?
+        config.historicActivityInstanceMetrics.adjustablePeriod:
+        defaultConfig.historicActivityInstanceMetrics.adjustablePeriod;
     };
 
     this.$get = function() {

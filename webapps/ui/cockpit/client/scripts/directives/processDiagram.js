@@ -15,7 +15,7 @@ var DirectiveController = [
     $scope.overlayProviders = Views.getProviders({ component:  $scope.overlayProviderComponent });
 
     var overlay = '<div class="bpmn-overlay"><div view ng-repeat="overlayProvider in overlayProviders" provider="overlayProvider" vars="vars"></div></div>';
-    var actions = '<ul><li view ng-repeat="actionProvider in actionProviders" provider="actionProvider" vars="vars"></li></ul>';
+    var actions = '<div class="action"><div view ng-repeat="actionProvider in actionProviders" provider="actionProvider" vars="vars"></div></div>';
 
     var bpmnElements,
         selection;
