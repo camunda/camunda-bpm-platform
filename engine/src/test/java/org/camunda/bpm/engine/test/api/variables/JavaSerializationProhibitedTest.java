@@ -55,12 +55,7 @@ public class JavaSerializationProhibitedTest {
 
   protected static final String JAVA_DATA_FORMAT = Variables.SerializationDataFormats.JAVA.getName();
 
-  protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
-      configuration.setFallbackSerializerFactory(new JavaFallbackSerializerFactory());
-      return configuration;
-    }
-  };
+  protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule();
 
   protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
@@ -78,6 +73,9 @@ public class JavaSerializationProhibitedTest {
   public void init() {
     runtimeService = engineRule.getRuntimeService();
     taskService = engineRule.getTaskService();
+    ((ProcessEngineConfigurationImpl) engineRule.getProcessEngine().getProcessEngineConfiguration())
+        .getVariableSerializers()
+        .addSerializer(new JavaCustomSerializer());
   }
 
   //still works for normal objects (not serialized)
@@ -163,19 +161,6 @@ public class JavaSerializationProhibitedTest {
       taskService.deleteTask(taskId, true);
     }
 
-  }
-
-  private class JavaFallbackSerializerFactory implements VariableSerializerFactory {
-
-    @Override
-    public TypedValueSerializer<?> getSerializer(String serializerName) {
-      return new JavaCustomSerializer();
-    }
-
-    @Override
-    public TypedValueSerializer<?> getSerializer(TypedValue value) {
-      return new JavaCustomSerializer();
-    }
   }
 
   private class JavaCustomSerializer extends JavaObjectSerializer {
