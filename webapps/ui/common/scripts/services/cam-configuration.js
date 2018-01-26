@@ -80,13 +80,15 @@ module.exports = function(config, app) {
     };
 
     this.getActivityInstancePeriod = function() {
-      return config.historicActivityInstanceMetrics.period?
+      return config.historicActivityInstanceMetrics &&
+      config.historicActivityInstanceMetrics.period?
         config.historicActivityInstanceMetrics.period:
         defaultConfig.historicActivityInstanceMetrics.period;
     };
 
     this.getActivityInstanceAdjustable = function() {
-      return config.historicActivityInstanceMetrics.adjustablePeriod?
+      return  config.historicActivityInstanceMetrics &&
+      config.historicActivityInstanceMetrics.adjustablePeriod?
         config.historicActivityInstanceMetrics.adjustablePeriod:
         defaultConfig.historicActivityInstanceMetrics.adjustablePeriod;
     };
