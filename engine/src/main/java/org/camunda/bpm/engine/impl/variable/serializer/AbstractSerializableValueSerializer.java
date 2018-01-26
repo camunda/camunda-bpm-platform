@@ -130,7 +130,7 @@ public abstract class AbstractSerializableValueSerializer<T extends Serializable
 
   protected boolean canWriteValue(TypedValue typedValue) {
 
-    if (! (typedValue instanceof SerializableValue) && ! (typedValue instanceof UntypedValueImpl)) {
+    if (!(typedValue instanceof SerializableValue) && !(typedValue instanceof UntypedValueImpl)) {
       return false;
     }
 

@@ -22,6 +22,7 @@ import java.util.Set;
 
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableInstance;
 import org.camunda.bpm.engine.impl.core.variable.event.VariableEvent;
@@ -364,24 +365,27 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
    * @param variableName
    * @param value
    */
-  private void checkJavaSerialization(String variableName, TypedValue value) {
-    if (value instanceof SerializableValue) {
-      final SerializableValue serializableValue = (SerializableValue) value;
-      //if Java serialization is prohibited
-      if (!Context.getProcessEngineConfiguration().isJavaSerializationFormatEnabled() && !serializableValue.isDeserialized()) {
+  protected void checkJavaSerialization(String variableName, TypedValue value) {
+    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+    if (value instanceof SerializableValue && !processEngineConfiguration.isJavaSerializationFormatEnabled()) {
+
+      SerializableValue serializableValue = (SerializableValue) value;
+
+      // if Java serialization is prohibited
+      if (!serializableValue.isDeserialized()) {
+
         String javaSerializationDataFormat = Variables.SerializationDataFormats.JAVA.getName();
-        boolean javaSerializerWillBeUsed;
-        if (serializableValue.getSerializationDataFormat() == null) {
-          //check if Java serializer will be used
+        String requestedDataFormat = serializableValue.getSerializationDataFormat();
+
+        if (requestedDataFormat == null) {
+          // check if Java serializer will be used
           final TypedValueSerializer serializerForValue = TypedValueField.getSerializers()
-            .findSerializerForValue(serializableValue, Context.getProcessEngineConfiguration().getFallbackSerializerFactory());
-          javaSerializerWillBeUsed = serializerForValue.getSerializationDataformat().equals(javaSerializationDataFormat);
-        } else {
-          // or check, if Java serialization is defined explicitly
-          javaSerializerWillBeUsed = serializableValue.getSerializationDataFormat().equals(Variables.SerializationDataFormats.JAVA.getName());
+              .findSerializerForValue(serializableValue, processEngineConfiguration.getFallbackSerializerFactory());
+
+          requestedDataFormat = serializerForValue.getSerializationDataformat();
         }
 
-        if (javaSerializerWillBeUsed) {
+        if (javaSerializationDataFormat.equals(requestedDataFormat)) {
           throw ProcessEngineLogger.CORE_LOGGER.javaSerializationProhibitedException(variableName);
         }
       }
