@@ -75,17 +75,16 @@ public class JobPrioritizationFailureTest extends AbstractFoxPlatformIntegration
 
   @Deployment(order = 1)
   public static WebArchive createDeployment() {
-    final WebArchive webArchive = initWebArchiveDeployment().addClass(PriorityBean.class)
+    final WebArchive webArchive = initWebArchiveDeployment("pa1.war", "org/camunda/bpm/integrationtest/processes-javaSerializationEnabled-pa1.xml")
+      .addClass(PriorityBean.class)
       .addAsResource("org/camunda/bpm/integrationtest/jobexecutor/JobPrioritizationTest.priorityProcess.bpmn20.xml");
-    TestContainer.addSpinJacksonJsonDataFormat(webArchive);
     return webArchive;
   }
 
   @Deployment(name = "dummy-client", order = 2)
   public static WebArchive createDummyClientDeployment() {
-    final WebArchive webArchive = initWebArchiveDeployment("pa2.war", "org/camunda/bpm/integrationtest/processes-javaSerializationEnabled.xml")
+    final WebArchive webArchive = initWebArchiveDeployment("pa2.war", "org/camunda/bpm/integrationtest/processes-javaSerializationEnabled-pa2.xml")
       .addAsResource(new ByteArrayAsset(serializeJavaObjectValue(new PriorityBean())), PRIORITY_BEAN_INSTANCE_FILE);
-    TestContainer.addSpinJacksonJsonDataFormat(webArchive);
     return webArchive;
   }
 

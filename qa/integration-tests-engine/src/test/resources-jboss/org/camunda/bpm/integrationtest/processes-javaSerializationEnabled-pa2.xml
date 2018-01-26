@@ -4,20 +4,7 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.camunda.org/schema/1.0/ProcessApplication http://www.camunda.org/schema/1.0/ProcessApplication ">
 
-	<process-engine name="engine1">
-	  <job-acquisition>default</job-acquisition>
-	  <datasource>java:comp/env/ProcessEngineDataSource</datasource>
-	  <properties>
-	    <property name="history">full</property>
-      <property name="javaSerializationFormatEnabled">true</property>
-	  </properties>
-		<plugins>
-			<plugin>
-				<class>org.camunda.spin.plugin.impl.SpinProcessEnginePlugin</class>
-			</plugin>
-		</plugins>
-	</process-engine>
-  <process-archive name="pa">
+  <process-archive name="pa2">
 		<process-engine>engine1</process-engine>
     <properties>
       <property name="isDeleteUponUndeploy">true</property>
