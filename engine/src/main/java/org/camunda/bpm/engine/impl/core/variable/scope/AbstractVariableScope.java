@@ -381,8 +381,9 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
           // check if Java serializer will be used
           final TypedValueSerializer serializerForValue = TypedValueField.getSerializers()
               .findSerializerForValue(serializableValue, processEngineConfiguration.getFallbackSerializerFactory());
-
-          requestedDataFormat = serializerForValue.getSerializationDataformat();
+          if (serializerForValue != null) {
+            requestedDataFormat = serializerForValue.getSerializationDataformat();
+          }
         }
 
         if (javaSerializationDataFormat.equals(requestedDataFormat)) {

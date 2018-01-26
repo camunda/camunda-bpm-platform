@@ -105,7 +105,7 @@ public class JavaSerializationTest {
 
   @Test
   @Deployment(resources = ONE_TASK_PROCESS)
-  public void testSetJavaOjectSerialized() throws Exception {
+  public void testSetJavaObjectSerialized() throws Exception {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
     JavaSerializable javaSerializable = new JavaSerializable("foo");
@@ -190,7 +190,7 @@ public class JavaSerializationTest {
 
   @Test
   @Deployment(resources = ONE_TASK_PROCESS)
-  public void testSetJavaOjectNullDeserialized() throws Exception {
+  public void testSetJavaObjectNullDeserialized() throws Exception {
 
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
@@ -211,7 +211,7 @@ public class JavaSerializationTest {
 
   @Test
   @Deployment(resources = ONE_TASK_PROCESS)
-  public void testSetJavaOjectNullSerialized() throws Exception {
+  public void testSetJavaObjectNullSerialized() throws Exception {
 
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
@@ -234,7 +234,7 @@ public class JavaSerializationTest {
 
   @Test
   @Deployment(resources = ONE_TASK_PROCESS)
-  public void testSetJavaOjectNullSerializedObjectTypeName() throws Exception {
+  public void testSetJavaObjectNullSerializedObjectTypeName() throws Exception {
 
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
