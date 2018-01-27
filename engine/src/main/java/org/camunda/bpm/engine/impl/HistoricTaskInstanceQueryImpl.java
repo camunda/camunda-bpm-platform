@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
@@ -279,6 +280,41 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
     return this;
   }
 
+  @Override
+  public HistoricTaskInstanceQuery processVariableValueNotEquals(String variableName, Object variableValue) {
+    addVariable(variableName, variableValue, QueryOperator.NOT_EQUALS, false, true);
+    return this;
+  }
+
+  public HistoricTaskInstanceQuery processVariableValueLike(String variableName, Object variableValue) {
+    addVariable(variableName, variableValue, QueryOperator.LIKE, false, true);
+    return this;
+  }
+
+  @Override
+  public HistoricTaskInstanceQuery processVariableValueGreaterThan(String variableName, Object variableValue) {
+    addVariable(variableName, variableValue, QueryOperator.GREATER_THAN, false, true);
+    return this;
+  }
+
+  @Override
+  public HistoricTaskInstanceQuery processVariableValueGreaterThanOrEquals(String variableName, Object variableValue) {
+    addVariable(variableName, variableValue, QueryOperator.GREATER_THAN_OR_EQUAL, false, true);
+    return this;
+  }
+
+  @Override
+  public HistoricTaskInstanceQuery processVariableValueLessThan(String variableName, Object variableValue) {
+    addVariable(variableName, variableValue, QueryOperator.LESS_THAN, false, true);
+    return this;
+  }
+
+  @Override
+  public HistoricTaskInstanceQuery processVariableValueLessThanOrEquals(String variableName, Object variableValue) {
+    addVariable(variableName, variableValue, QueryOperator.LESS_THAN_OR_EQUAL, false, true);
+    return this;
+  }
+
   public HistoricTaskInstanceQuery taskDefinitionKey(String taskDefinitionKey) {
     return taskDefinitionKeyIn(taskDefinitionKey);
   }
@@ -339,6 +375,40 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
     for(QueryVariableValue var : variables) {
       var.initialize(types);
     }
+  }
+
+  public void addVariable(String name, Object value, QueryOperator operator, boolean isTaskVariable, boolean isProcessInstanceVariable) {
+    ensureNotNull("name", name);
+    System.out.println("add var");
+    if(value == null || isBoolean(value)) {
+      // Null-values and booleans can only be used in EQUALS and NOT_EQUALS
+      switch(operator) {
+        case GREATER_THAN:
+          throw new ProcessEngineException("Booleans and null cannot be used in 'greater than' condition");
+        case LESS_THAN:
+          throw new ProcessEngineException("Booleans and null cannot be used in 'less than' condition");
+        case GREATER_THAN_OR_EQUAL:
+          throw new ProcessEngineException("Booleans and null cannot be used in 'greater than or equal' condition");
+        case LESS_THAN_OR_EQUAL:
+          throw new ProcessEngineException("Booleans and null cannot be used in 'less than or equal' condition");
+        case LIKE:
+          throw new ProcessEngineException("Booleans and null cannot be used in 'like' condition");
+        default:
+          break;
+      }
+    }
+    addVariable(new TaskQueryVariableValue(name, value, operator, isTaskVariable, isProcessInstanceVariable));
+  }
+
+  protected void addVariable(TaskQueryVariableValue taskQueryVariableValue) {
+    variables.add(taskQueryVariableValue);
+  }
+
+  private boolean isBoolean(Object value) {
+    if (value == null) {
+      return false;
+    }
+    return Boolean.class.isAssignableFrom(value.getClass()) || boolean.class.isAssignableFrom(value.getClass());
   }
 
   public HistoricTaskInstanceQuery taskDueDate(Date dueDate) {

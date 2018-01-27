@@ -1859,6 +1859,84 @@ public class HistoricTaskInstanceRestServiceQueryTest extends AbstractRestServic
         .get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
 
     verify(mockedQuery).processVariableValueEquals(variableName, variableValue);
+
+    // greater then
+    queryValue = variableName + "_gt_" + variableValue;
+
+    given()
+      .queryParam("processVariables", queryValue)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).processVariableValueGreaterThan(variableName, variableValue);
+
+    // greater then equals
+    queryValue = variableName + "_gteq_" + variableValue;
+
+    given()
+      .queryParam("processVariables", queryValue)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).processVariableValueGreaterThanOrEquals(variableName, variableValue);
+
+    // lower then
+    queryValue = variableName + "_lt_" + variableValue;
+
+    given()
+      .queryParam("processVariables", queryValue)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).processVariableValueLessThan(variableName, variableValue);
+
+    // lower then equals
+    queryValue = variableName + "_lteq_" + variableValue;
+
+    given()
+      .queryParam("processVariables", queryValue)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).processVariableValueLessThanOrEquals(variableName, variableValue);
+
+    // like
+    queryValue = variableName + "_like_" + variableValue;
+
+    given()
+      .queryParam("processVariables", queryValue)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).processVariableValueLike(variableName, variableValue);
+
+    // not equals
+    queryValue = variableName + "_neq_" + variableValue;
+
+    given()
+      .queryParam("processVariables", queryValue)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).processVariableValueNotEquals(variableName, variableValue);
   }
 
   @Test

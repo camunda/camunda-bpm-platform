@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
@@ -73,6 +74,69 @@ public class HistoricTaskInstanceQueryTest extends PluggableProcessEngineTestCas
     assertEquals(4, historyService.createHistoricTaskInstanceQuery().processVariableValueEquals("var", Variables.numberValue((short) 123)).count());
 
     assertEquals(1, historyService.createHistoricTaskInstanceQuery().processVariableValueEquals("var", Variables.numberValue(null)).count());
+
+    assertEquals(8, historyService.createHistoricTaskInstanceQuery().processVariableValueNotEquals("var", 999L).count());
+    assertEquals(8, historyService.createHistoricTaskInstanceQuery().processVariableValueNotEquals("var",  (short) 999).count());
+    assertEquals(8, historyService.createHistoricTaskInstanceQuery().processVariableValueNotEquals("var", 999).count());
+    assertEquals(8, historyService.createHistoricTaskInstanceQuery().processVariableValueNotEquals("var", "999").count());
+    assertEquals(8, historyService.createHistoricTaskInstanceQuery().processVariableValueNotEquals("var", false).count());
+
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void testProcessVariableValueLike() throws Exception {
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+            Collections.<String, Object>singletonMap("requester", "vahid alizadeh"));
+
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().processVariableValueLike("requester", "vahid%").count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().processVariableValueLike("requester", "%alizadeh").count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().processVariableValueLike("requester", "%ali%").count());
+
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery().processVariableValueLike("requester", "requester%").count());
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery().processVariableValueLike("requester", "%ali").count());
+
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery().processVariableValueLike("requester", "vahid").count());
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery().processVariableValueLike("nonExistingVar", "string%").count());
+
+    // test with null value
+    try {
+      historyService.createHistoricTaskInstanceQuery().processVariableValueLike("requester", null).count();
+      fail("expected exception");
+    } catch (final ProcessEngineException e) {/*OK*/}
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void testProcessVariableValueGreaterThan() throws Exception {
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+            Collections.<String, Object>singletonMap("requestNumber", 123));
+
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().processVariableValueGreaterThan("requestNumber", 122).count());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void testProcessVariableValueGreaterThanOrEqual() throws Exception {
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+            Collections.<String, Object>singletonMap("requestNumber", 123));
+
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().processVariableValueGreaterThanOrEquals("requestNumber", 122).count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().processVariableValueGreaterThanOrEquals("requestNumber", 123).count());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void testProcessVariableValueLessThan() throws Exception {
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+            Collections.<String, Object>singletonMap("requestNumber", 123));
+
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().processVariableValueLessThan("requestNumber", 124).count());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void testProcessVariableValueLessThanOrEqual() throws Exception {
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+            Collections.<String, Object>singletonMap("requestNumber", 123));
+
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().processVariableValueLessThanOrEquals("requestNumber", 123).count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().processVariableValueLessThanOrEquals("requestNumber", 124).count());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")

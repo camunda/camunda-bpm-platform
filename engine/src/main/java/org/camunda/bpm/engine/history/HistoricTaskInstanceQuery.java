@@ -250,6 +250,45 @@ public interface HistoricTaskInstanceQuery  extends Query<HistoricTaskInstanceQu
   HistoricTaskInstanceQuery processVariableValueEquals(String variableName, Object variableValue);
 
   /**
+   * Only select historic task instances which have a variable with the given name, but
+   * with a different value than the passed value.
+   * Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers)
+   * are not supported.
+   */
+  HistoricTaskInstanceQuery processVariableValueNotEquals(String variableName, Object variableValue);
+
+  /**
+   * Only select historic task instances which are part of a process that have a variable
+   * with the given name and matching the given value.
+   * The syntax is that of SQL: for example usage: valueLike(%value%)
+   * */
+  HistoricTaskInstanceQuery processVariableValueLike(String variableName, Object variableValue);
+
+  /**
+   * Only select historic task instances which are part of a process that have a variable
+   * with the given name and a value greater than the given one.
+   */
+  HistoricTaskInstanceQuery processVariableValueGreaterThan(String variableName, Object variableValue);
+
+  /**
+   * Only select historic task instances which are part of a process that have a variable
+   * with the given name and a value greater than or equal to the given one.
+   */
+  HistoricTaskInstanceQuery processVariableValueGreaterThanOrEquals(String variableName, Object variableValue);
+
+  /**
+   * Only select historic task instances which are part of a process that have a variable
+   * with the given name and a value less than the given one.
+   */
+  HistoricTaskInstanceQuery processVariableValueLessThan(String variableName, Object variableValue);
+
+  /**
+   * Only select historic task instances which are part of a process that have a variable
+   * with the given name and a value less than or equal to the given one.
+   */
+  HistoricTaskInstanceQuery processVariableValueLessThanOrEquals(String variableName, Object variableValue);
+
+  /**
    * Only select select historic task instances with the given due date.
    */
   HistoricTaskInstanceQuery taskDueDate(Date dueDate);

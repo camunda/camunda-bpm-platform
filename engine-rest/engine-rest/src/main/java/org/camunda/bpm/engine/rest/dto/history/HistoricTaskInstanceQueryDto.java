@@ -618,8 +618,20 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
 
         if (op.equals(VariableQueryParameterDto.EQUALS_OPERATOR_NAME)) {
           query.processVariableValueEquals(variableName, variableValue);
+        } else if (op.equals(VariableQueryParameterDto.NOT_EQUALS_OPERATOR_NAME)) {
+          query.processVariableValueNotEquals(variableName, variableValue);
+        } else if (op.equals(VariableQueryParameterDto.GREATER_THAN_OPERATOR_NAME)) {
+          query.processVariableValueGreaterThan(variableName, variableValue);
+        } else if (op.equals(VariableQueryParameterDto.GREATER_THAN_OR_EQUALS_OPERATOR_NAME)) {
+          query.processVariableValueGreaterThanOrEquals(variableName, variableValue);
+        } else if (op.equals(VariableQueryParameterDto.LESS_THAN_OPERATOR_NAME)) {
+          query.processVariableValueLessThan(variableName, variableValue);
+        } else if (op.equals(VariableQueryParameterDto.LESS_THAN_OR_EQUALS_OPERATOR_NAME)) {
+          query.processVariableValueLessThanOrEquals(variableName, variableValue);
+        } else if (op.equals(VariableQueryParameterDto.LIKE_OPERATOR_NAME)) {
+          query.processVariableValueLike(variableName, String.valueOf(variableValue));
         } else {
-          throw new InvalidRequestException(Status.BAD_REQUEST, "Invalid variable comparator specified: " + op);
+          throw new InvalidRequestException(Status.BAD_REQUEST, "Invalid process variable comparator specified: " + op);
         }
       }
     }
