@@ -248,6 +248,36 @@ public interface HistoricTaskInstanceQuery  extends Query<HistoricTaskInstanceQu
    * >= AUDIT when this feature is used.
    */
   HistoricTaskInstanceQuery processVariableValueEquals(String variableName, Object variableValue);
+  
+  /**
+   * Only select tasks which are part of a process that have a variable
+   * with the given name and matching the given value.
+   * The syntax is that of SQL: for example usage: valueLike(%value%)*/
+  HistoricTaskInstanceQuery processVariableValueLike(String variableName, Object variableValue);
+  
+  /**
+   * Only select tasks which are part of a process that have a variable
+   * with the given name and a value greater than the given one.
+   */
+  HistoricTaskInstanceQuery processVariableValueGreaterThan(String variableName, Object variableValue);
+  
+  /**
+   * Only select tasks which are part of a process that have a variable
+   * with the given name and a value greater than or equal to the given one.
+   */
+  HistoricTaskInstanceQuery processVariableValueGreaterThanOrEqual(String variableName, Object variableValue);
+
+  /**
+   * Only select tasks which are part of a process that have a variable
+   * with the given name and a value less than the given one.
+   */
+  HistoricTaskInstanceQuery processVariableValueLessThan(String variableName, Object variableValue);
+  
+  /**
+   * Only select tasks which are part of a process that have a variable
+   * with the given name and a value less than or equal to the given one.
+   */
+  HistoricTaskInstanceQuery processVariableValueLessThanOrEqual(String variableName, Object variableValue);
 
   /**
    * Only select select historic task instances with the given due date.
