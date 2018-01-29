@@ -28,7 +28,8 @@ public interface EventSubscriptionQuery extends Query<EventSubscriptionQuery, Ev
   EventSubscriptionQuery eventName(String eventName);
 
   /** Only select subscriptions for events with the given type. "message" selects message event subscriptions,
-   * "signal" selects signal event subscriptions, "compensation" selects compensation event subscriptions.**/
+   * "signal" selects signal event subscriptions, "compensation" selects compensation event subscriptions,
+   * "conditional" selects conditional event subscriptions.**/
   EventSubscriptionQuery eventType(String eventType);
 
   /** Only select subscriptions that belong to an execution with the given id. **/
