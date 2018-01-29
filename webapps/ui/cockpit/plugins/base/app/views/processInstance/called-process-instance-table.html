@@ -28,7 +28,7 @@
         <td class="process-definition"
             cam-widget-clipboard="calledProcessInstance.processDefinitionId">
           <a href="#/process-definition/{{ calledProcessInstance.processDefinitionId }}/runtime?parentProcessDefinitionId={{ processInstance.definitionId }}">
-            {{ calledProcessInstance.processDefinitionName || calledProcessInstance.processDefinitionKey }}
+            {{ calledProcessInstance.processDefinitionLabel}}
           </a>
         </td>
 
