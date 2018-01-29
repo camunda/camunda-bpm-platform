@@ -13,16 +13,24 @@
 package org.camunda.bpm.integrationtest.jobexecutor;
 
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Map;
+import org.camunda.bpm.BpmPlatform;
+import org.camunda.bpm.ProcessEngineService;
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
 import org.camunda.bpm.engine.impl.jobexecutor.DefaultJobPriorityProvider;
+import org.camunda.bpm.engine.impl.util.IoUtil;
+import org.camunda.bpm.engine.impl.util.StringUtil;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.Variables.SerializationDataFormats;
 import org.camunda.bpm.integrationtest.jobexecutor.beans.PriorityBean;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
+import org.camunda.bpm.integrationtest.util.TestContainer;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -39,15 +47,19 @@ import org.junit.runner.RunWith;
  *
  */
 @RunWith(Arquillian.class)
-public class JobPrioritizationFailureTest extends AbstractFoxPlatformIntegrationTest {
+public class JobPrioritizationFailureJavaSerializationTest extends AbstractFoxPlatformIntegrationTest {
 
   protected ProcessInstance processInstance;
+
+  private ProcessEngine engine1;
 
   public static final String VARIABLE_CLASS_NAME = "org.camunda.bpm.integrationtest.jobexecutor.beans.PriorityBean";
   public static final String PRIORITY_BEAN_INSTANCE_FILE = "priorityBean.instance";
 
   @Before
   public void setEngines() {
+    ProcessEngineService engineService = BpmPlatform.getProcessEngineService();
+    engine1 = engineService.getProcessEngine("engine1");
 
     // unregister process application so that context switch cannot be performed
     unregisterProcessApplication();
@@ -55,28 +67,30 @@ public class JobPrioritizationFailureTest extends AbstractFoxPlatformIntegration
 
   protected void unregisterProcessApplication() {
     org.camunda.bpm.engine.repository.Deployment deployment =
-        processEngine.getRepositoryService().createDeploymentQuery().singleResult();
+      engine1.getRepositoryService().createDeploymentQuery().singleResult();
 
-    managementService.unregisterProcessApplication(deployment.getId(), false);
+    engine1.getManagementService().unregisterProcessApplication(deployment.getId(), false);
   }
 
   @Deployment(order = 1)
   public static WebArchive createDeployment() {
-    return initWebArchiveDeployment()
+    final WebArchive webArchive = initWebArchiveDeployment("pa1.war", "org/camunda/bpm/integrationtest/processes-javaSerializationEnabled-pa1.xml")
       .addClass(PriorityBean.class)
       .addAsResource("org/camunda/bpm/integrationtest/jobexecutor/JobPrioritizationTest.priorityProcess.bpmn20.xml");
+    return webArchive;
   }
 
   @Deployment(name = "dummy-client", order = 2)
   public static WebArchive createDummyClientDeployment() {
-    return initWebArchiveDeployment("pa2.war")
-       .addAsResource(new ByteArrayAsset(serializeJavaObjectValue(new PriorityBean())), PRIORITY_BEAN_INSTANCE_FILE);
+    final WebArchive webArchive = initWebArchiveDeployment("pa2.war", "org/camunda/bpm/integrationtest/processes-javaSerializationEnabled-pa2.xml")
+      .addAsResource(new ByteArrayAsset(serializeJavaObjectValue(new PriorityBean())), PRIORITY_BEAN_INSTANCE_FILE);
+    return webArchive;
   }
 
   @After
   public void tearDown() {
     if (processInstance != null) {
-      runtimeService.deleteProcessInstance(processInstance.getId(), "");
+      engine1.getRuntimeService().deleteProcessInstance(processInstance.getId(), "");
     }
   }
 
@@ -85,50 +99,33 @@ public class JobPrioritizationFailureTest extends AbstractFoxPlatformIntegration
   @OperateOnDeployment("dummy-client")
   public void testGracefulDegradationOnMissingBean() {
     // when
-    processInstance = runtimeService.startProcessInstanceByKey("priorityProcess");
+    processInstance = engine1.getRuntimeService().startProcessInstanceByKey("priorityProcess");
 
     // then the job was created successfully and has the default priority on bean evaluation failure
-    Job job = managementService.createJobQuery().singleResult();
+    Job job = engine1.getManagementService().createJobQuery().processInstanceId(processInstance.getProcessInstanceId()).singleResult();
     Assert.assertEquals(DefaultJobPriorityProvider.DEFAULT_PRIORITY_ON_RESOLUTION_FAILURE, job.getPriority());
   }
 
   @Test
   @OperateOnDeployment("dummy-client")
-  public void testGracefulDegradationOnMissingClassSpinJson() {
+  public void testGracefulDegradationOnMissingClassJava() {
     // given
+    byte[] serializedPriorityBean = readByteArrayFromClasspath(PRIORITY_BEAN_INSTANCE_FILE);
+    String encodedPriorityBean = StringUtil.fromBytes(Base64.encodeBase64(serializedPriorityBean), processEngine);
+
     Map<String, Object> variables = Variables.createVariables().putValue(
         "priorityBean",
-        Variables.serializedObjectValue("{}")
-          .serializationDataFormat(SerializationDataFormats.JSON)
+        Variables.serializedObjectValue(encodedPriorityBean)
+          .serializationDataFormat(SerializationDataFormats.JAVA)
           .objectTypeName(VARIABLE_CLASS_NAME)
           .create());
 
     // when
-    processInstance = runtimeService.startProcessInstanceByKey("priorityProcess", variables);
+    processInstance = engine1.getRuntimeService().startProcessInstanceByKey("priorityProcess", variables);
 
     // then the job was created successfully and has the default priority although
     // the bean could not be resolved due to a missing class
-    Job job = managementService.createJobQuery().singleResult();
-    Assert.assertEquals(DefaultJobPriorityProvider.DEFAULT_PRIORITY_ON_RESOLUTION_FAILURE, job.getPriority());
-  }
-
-  @Test
-  @OperateOnDeployment("dummy-client")
-  public void testGracefulDegradationOnMissingClassSpinXml() {
-    // given
-    Map<String, Object> variables = Variables.createVariables().putValue(
-        "priorityBean",
-        Variables.serializedObjectValue("<?xml version=\"1.0\" encoding=\"utf-8\"?><prioritybean></prioritybean>")
-          .serializationDataFormat(SerializationDataFormats.XML)
-          .objectTypeName(VARIABLE_CLASS_NAME)
-          .create());
-
-    // when
-    processInstance = runtimeService.startProcessInstanceByKey("priorityProcess", variables);
-
-    // then the job was created successfully and has the default priority although
-    // the bean could not be resolved due to a missing class
-    Job job = managementService.createJobQuery().singleResult();
+    Job job = engine1.getManagementService().createJobQuery().processInstanceId(processInstance.getProcessInstanceId()).singleResult();
     Assert.assertEquals(DefaultJobPriorityProvider.DEFAULT_PRIORITY_ON_RESOLUTION_FAILURE, job.getPriority());
   }
 
@@ -138,6 +135,17 @@ public class JobPrioritizationFailureTest extends AbstractFoxPlatformIntegration
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       new ObjectOutputStream(baos).writeObject(object);
       return baos.toByteArray();
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  protected static byte[] readByteArrayFromClasspath(String path) {
+    try {
+      InputStream inStream = JobPrioritizationFailureJavaSerializationTest.class.getClassLoader().getResourceAsStream(path);
+      byte[] serializedValue = IoUtil.readInputStream(inStream, "");
+      inStream.close();
+      return serializedValue;
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

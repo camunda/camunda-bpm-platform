@@ -11,11 +11,6 @@
 	    <property name="history">full</property>
       <property name="javaSerializationFormatEnabled">true</property>
 	  </properties>
-		<plugins>
-			<plugin>
-				<class>org.camunda.spin.plugin.impl.SpinProcessEnginePlugin</class>
-			</plugin>
-		</plugins>
 	</process-engine>
   <process-archive name="pa1">
 		<process-engine>engine1</process-engine>
