@@ -213,7 +213,7 @@
   </select>
 
   <sql id="selectHistoricVariableInstanceByQueryCriteriaSql">
-    <bind name="escapeChar" value="'\'\\\''"/>
+
     from ${prefix}ACT_HI_VARINST RES
 
     <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">

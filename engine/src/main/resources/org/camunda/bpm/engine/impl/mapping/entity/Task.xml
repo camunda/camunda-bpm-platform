@@ -206,7 +206,7 @@
   </sql>
 
   <sql id="selectTaskByQueryCriteriaSql">
-    <bind name="escapeChar" value="'\'\\\''"/>
+
     from ${prefix}ACT_RU_TASK RES
     <bind name="I_JOIN" value="false" />
     <bind name="D_JOIN" value="false" />

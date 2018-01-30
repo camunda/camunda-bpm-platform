@@ -141,7 +141,7 @@
   </select>
 
   <sql id="selectHistoricCaseInstancesByQueryCriteriaSql">
-    <bind name="escapeChar" value="'\'\\\''"/>
+
     from (
 
       SELECT RES.*, DEF.NAME_, DEF.KEY_

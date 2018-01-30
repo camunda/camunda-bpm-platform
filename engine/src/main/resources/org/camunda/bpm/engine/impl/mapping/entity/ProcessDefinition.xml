@@ -189,7 +189,6 @@
   </select>
 
   <sql id="selectProcessDefinitionsByQueryCriteriaSql">
-    <bind name="escapeChar" value="'\'\\\''"/>
     from ${prefix}ACT_RE_PROCDEF RES
     <if test="eventSubscriptionType != null">
     	inner join ${prefix}ACT_RU_EVENT_SUBSCR EVT on RES.ID_ = EVT.CONFIGURATION_

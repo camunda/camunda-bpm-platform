@@ -61,7 +61,7 @@
   </select>
   
   <sql id="selectTenantByQueryCriteriaSql">
-    <bind name="escapeChar" value="'\'\\\''"/>
+
     from ${prefix}ACT_ID_TENANT RES
     <if test="userId != null || groupId != null">
       inner join ${prefix}ACT_ID_TENANT_MEMBER TM on RES.ID_ = TM.TENANT_ID_

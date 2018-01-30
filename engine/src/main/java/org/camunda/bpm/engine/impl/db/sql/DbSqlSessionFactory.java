@@ -48,6 +48,8 @@ public class DbSqlSessionFactory implements SessionFactory {
   public static final Map<String, String> databaseSpecificLimitBetweenStatements = new HashMap<String, String>();
   public static final Map<String, String> databaseSpecificLimitBetweenFilterStatements = new HashMap<String, String>();
 
+  public static final Map<String, String> databaseSpecificEscapeChar = new HashMap<String, String>();
+
   public static final Map<String, String> databaseSpecificOrderByStatements = new HashMap<String, String>();
   public static final Map<String, String> databaseSpecificLimitBeforeNativeQueryStatements = new HashMap<String, String>();
 
@@ -76,6 +78,8 @@ public class DbSqlSessionFactory implements SessionFactory {
 
     String defaultOrderBy = "order by ${internalOrderBy}";
 
+    String defaultEscapeChar = "'\\'";
+
     // h2
     databaseSpecificLimitBeforeStatements.put(H2, "");
     databaseSpecificLimitAfterStatements.put(H2, "LIMIT #{maxResults} OFFSET #{firstResult}");
@@ -85,6 +89,8 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificOrderByStatements.put(H2, defaultOrderBy);
     databaseSpecificLimitBeforeNativeQueryStatements.put(H2, "");
     databaseSpecificDistinct.put(H2, "distinct");
+
+    databaseSpecificEscapeChar.put(H2, defaultEscapeChar);
 
     databaseSpecificBitAnd1.put(H2, "BITAND(");
     databaseSpecificBitAnd2.put(H2, ",");
@@ -122,6 +128,8 @@ public class DbSqlSessionFactory implements SessionFactory {
       databaseSpecificOrderByStatements.put(mysqlLikeDatabase, defaultOrderBy);
       databaseSpecificLimitBeforeNativeQueryStatements.put(mysqlLikeDatabase, "");
       databaseSpecificDistinct.put(mysqlLikeDatabase, "distinct");
+
+      databaseSpecificEscapeChar.put(mysqlLikeDatabase, "'\\\\'");
 
       databaseSpecificBitAnd1.put(mysqlLikeDatabase, "");
       databaseSpecificBitAnd2.put(mysqlLikeDatabase, " & ");
@@ -181,6 +189,8 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificLimitBeforeNativeQueryStatements.put(POSTGRES, "");
     databaseSpecificDistinct.put(POSTGRES, "distinct");
 
+    databaseSpecificEscapeChar.put(POSTGRES, defaultEscapeChar);
+
     databaseSpecificBitAnd1.put(POSTGRES, "");
     databaseSpecificBitAnd2.put(POSTGRES, " & ");
     databaseSpecificBitAnd3.put(POSTGRES, "");
@@ -238,6 +248,8 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificLimitBeforeNativeQueryStatements.put(ORACLE, "");
     databaseSpecificDistinct.put(ORACLE, "distinct");
 
+    databaseSpecificEscapeChar.put(ORACLE, defaultEscapeChar);
+
     databaseSpecificDummyTable.put(ORACLE, "FROM DUAL");
     databaseSpecificBitAnd1.put(ORACLE, "BITAND(");
     databaseSpecificBitAnd2.put(ORACLE, ",");
@@ -276,6 +288,8 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificOrderByStatements.put(DB2, defaultOrderBy);
     databaseSpecificLimitBeforeNativeQueryStatements.put(DB2, "SELECT SUB.* FROM ( select RES.* , row_number() over (ORDER BY ${internalOrderBy}) rnk FROM (");
     databaseSpecificDistinct.put(DB2, "");
+
+    databaseSpecificEscapeChar.put(DB2, defaultEscapeChar);
 
     databaseSpecificBitAnd1.put(DB2, "BITAND(");
     databaseSpecificBitAnd2.put(DB2, ", CAST(");
@@ -323,6 +337,8 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificOrderByStatements.put(MSSQL, "");
     databaseSpecificLimitBeforeNativeQueryStatements.put(MSSQL, "SELECT SUB.* FROM ( select RES.* , row_number() over (ORDER BY ${internalOrderBy}) rnk FROM (");
     databaseSpecificDistinct.put(MSSQL, "");
+
+    databaseSpecificEscapeChar.put(MSSQL, defaultEscapeChar);
 
     databaseSpecificBitAnd1.put(MSSQL, "");
     databaseSpecificBitAnd2.put(MSSQL, " &");

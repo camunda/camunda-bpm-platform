@@ -208,7 +208,7 @@
   </select>
 
   <sql id="selectDecisionDefinitionsByQueryCriteriaSql">
-    <bind name="escapeChar" value="'\'\\\''"/>
+
     from ${prefix}ACT_RE_DECISION_DEF RES
     <if test="latest">
       inner join

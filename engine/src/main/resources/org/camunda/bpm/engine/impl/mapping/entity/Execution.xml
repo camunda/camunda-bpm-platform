@@ -196,7 +196,7 @@
   </select>
 
   <sql id="selectProcessInstanceByQueryCriteriaSql">
-    <bind name="escapeChar" value="'\'\\\''"/>
+
     from ${prefix}ACT_RU_EXECUTION RES
     <if test="incidentType != null || incidentId != null || incidentMessage != null || incidentMessageLike != null">
       inner join ${prefix}ACT_RU_INCIDENT INC on RES.ID_ = INC.PROC_INST_ID_
@@ -325,7 +325,7 @@
   </sql>
 
   <sql id="selectExecutionsByQueryCriteriaSql">
-    <bind name="escapeChar" value="'\'\\\''"/>
+
     from ${prefix}ACT_RU_EXECUTION RES
     <if test="businessKey != null">
       inner join ${prefix}ACT_RU_EXECUTION INST on RES.PROC_INST_ID_ = INST.ID_

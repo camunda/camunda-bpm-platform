@@ -134,7 +134,7 @@
   </select>
 
   <sql id="selectFilterByQueryCriteriaSql">
-    <bind name="escapeChar" value="'\'\\\''"/>
+
     from ${prefix}ACT_RU_FILTER RES
     
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoin" /> 

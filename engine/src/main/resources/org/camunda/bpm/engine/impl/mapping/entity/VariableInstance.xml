@@ -277,7 +277,7 @@
   </sql>
 
   <sql id="selectVariableInstanceByQueryCriteriaSql">
-    <bind name="escapeChar" value="'\'\\\''"/>
+
     from (
           select
             RES.*,

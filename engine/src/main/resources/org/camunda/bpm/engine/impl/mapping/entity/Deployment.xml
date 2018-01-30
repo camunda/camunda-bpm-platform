@@ -70,7 +70,7 @@
   </select>
 
   <sql id="selectDeploymentsByQueryCriteriaSql">
-    <bind name="escapeChar" value="'\'\\\''"/>
+
     from ${prefix}ACT_RE_DEPLOYMENT RES
 
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoin" /> 

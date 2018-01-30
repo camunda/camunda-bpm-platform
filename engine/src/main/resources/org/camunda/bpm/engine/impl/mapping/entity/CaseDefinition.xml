@@ -187,7 +187,7 @@
   </select>
 
   <sql id="selectCaseDefinitionsByQueryCriteriaSql">
-    <bind name="escapeChar" value="'\'\\\''"/>
+
     from ${prefix}ACT_RE_CASE_DEF RES
     <if test="latest">
       inner join

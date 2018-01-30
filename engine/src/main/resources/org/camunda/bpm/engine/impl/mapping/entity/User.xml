@@ -73,7 +73,7 @@
   </select>
   
   <sql id="selectUserByQueryCriteriaSql">
-    <bind name="escapeChar" value="'\'\\\''"/>
+
     from ${prefix}ACT_ID_USER RES 
     <if test="groupId != null">
       inner join ${prefix}ACT_ID_MEMBERSHIP M on RES.ID_ = M.USER_ID_

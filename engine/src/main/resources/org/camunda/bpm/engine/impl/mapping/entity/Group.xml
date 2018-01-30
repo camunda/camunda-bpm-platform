@@ -81,7 +81,7 @@
   </select>
   
   <sql id="selectGroupByQueryCriteriaSql">
-    <bind name="escapeChar" value="'\'\\\''"/>
+
     from ${prefix}ACT_ID_GROUP RES
     <if test="userId != null">
       inner join ${prefix}ACT_ID_MEMBERSHIP M on RES.ID_ = M.GROUP_ID_

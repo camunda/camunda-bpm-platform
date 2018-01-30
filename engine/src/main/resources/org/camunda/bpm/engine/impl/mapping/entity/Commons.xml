@@ -22,7 +22,7 @@
   
   <!-- This snippet is used by all queries that allow filtering by variable values -->
   <sql id="variableValueConditions">
-    <bind name="escapeChar" value="'\'\\\''"/>
+
     <if test="queryVariableValue.operatorName.equals('NOT_EQUALS')">NOT</if><!-- NOT_EQUALS uses the same conditions as EQUALS -->
     (
     <foreach collection="queryVariableValue.valueConditions" item="valueCondition" separator="or">

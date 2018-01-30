@@ -184,7 +184,7 @@
   </select>
 
   <sql id="selectHistoricProcessInstancesByQueryCriteriaSql">
-    <bind name="escapeChar" value="'\'\\\''"/>
+
     from (
 
     SELECT SELF.*, DEF.NAME_, DEF.VERSION_
