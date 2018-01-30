@@ -182,7 +182,7 @@
   </select>
 
   <sql id="selectHistoricTaskInstancesByQueryCriteriaSql">
-    <bind name="escapeChar" value="'\\'"/>
+    <bind name="escapeChar" value="'\'\\\''"/>
     from ${prefix}ACT_HI_TASKINST RES
 
     <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
@@ -262,7 +262,7 @@
         </foreach>
       </if>
       <if test="processInstanceBusinessKeyLike != null">
-        HPI.BUSINESS_KEY_ like #{processInstanceBusinessKeyLike} ESCAPE #{escapeChar}
+        HPI.BUSINESS_KEY_ like #{processInstanceBusinessKeyLike} ESCAPE ${escapeChar}
       </if>
       <if test="taskDefinitionKeys != null &amp;&amp; taskDefinitionKeys.length > 0">
         and RES.TASK_DEF_KEY_ in
@@ -300,7 +300,7 @@
         and RES.NAME_ = #{taskName}
       </if>
       <if test="taskNameLike != null">
-        and RES.NAME_ like #{taskNameLike} ESCAPE #{escapeChar}
+        and RES.NAME_ like #{taskNameLike} ESCAPE ${escapeChar}
       </if>
       <if test="taskParentTaskId != null">
         and RES.PARENT_TASK_ID_ = #{taskParentTaskId}
@@ -309,19 +309,19 @@
         and RES.DESCRIPTION_ = #{taskDescription}
       </if>
       <if test="taskDescriptionLike != null">
-        and RES.DESCRIPTION_ like #{taskDescriptionLike} ESCAPE #{escapeChar}
+        and RES.DESCRIPTION_ like #{taskDescriptionLike} ESCAPE ${escapeChar}
       </if>
       <if test="taskDeleteReason != null">
         and RES.DELETE_REASON_ = #{taskDeleteReason}
       </if>
       <if test="taskDeleteReasonLike != null">
-        and RES.DELETE_REASON_ like #{taskDeleteReasonLike} ESCAPE #{escapeChar}
+        and RES.DELETE_REASON_ like #{taskDeleteReasonLike} ESCAPE ${escapeChar}
       </if>
       <if test="taskOwner != null">
         and RES.OWNER_ = #{taskOwner}
       </if>
       <if test="taskOwnerLike != null">
-        and RES.OWNER_ like #{taskOwnerLike} ESCAPE #{escapeChar}
+        and RES.OWNER_ like #{taskOwnerLike} ESCAPE ${escapeChar}
       </if>
       <if test="assigned">
         and RES.ASSIGNEE_ is not null
@@ -333,7 +333,7 @@
         and RES.ASSIGNEE_ = #{taskAssignee}
       </if>
       <if test="taskAssigneeLike != null">
-        and RES.ASSIGNEE_ like #{taskAssigneeLike} ESCAPE #{escapeChar}
+        and RES.ASSIGNEE_ like #{taskAssigneeLike} ESCAPE ${escapeChar}
       </if>
       <if test="taskPriority != null">
         and RES.PRIORITY_ = #{taskPriority}

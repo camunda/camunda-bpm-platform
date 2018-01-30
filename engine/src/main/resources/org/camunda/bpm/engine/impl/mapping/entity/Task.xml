@@ -206,7 +206,7 @@
   </sql>
 
   <sql id="selectTaskByQueryCriteriaSql">
-    <bind name="escapeChar" value="'\\'"/>
+    <bind name="escapeChar" value="'\'\\\''"/>
     from ${prefix}ACT_RU_TASK RES
     <bind name="I_JOIN" value="false" />
     <bind name="D_JOIN" value="false" />
@@ -302,16 +302,16 @@
             </if>
             <if test="query.nameLike != null">
               <!-- based on CAM-6165 compare name like case insensitive -->
-              ${queryType} UPPER(RES.NAME_) like UPPER(#{query.nameLike}) ESCAPE #{escapeChar}
+              ${queryType} UPPER(RES.NAME_) like UPPER(#{query.nameLike}) ESCAPE ${escapeChar}
             </if>
             <if test="query.nameNotLike != null">
-              ${queryType} UPPER(RES.NAME_) not like UPPER(#{query.nameNotLike}) ESCAPE #{escapeChar}
+              ${queryType} UPPER(RES.NAME_) not like UPPER(#{query.nameNotLike}) ESCAPE ${escapeChar}
             </if>
             <if test="query.description != null">
               ${queryType} RES.DESCRIPTION_ = #{query.description}
             </if>
             <if test="query.descriptionLike != null">
-              ${queryType} RES.DESCRIPTION_ like #{query.descriptionLike} ESCAPE #{escapeChar}
+              ${queryType} RES.DESCRIPTION_ like #{query.descriptionLike} ESCAPE ${escapeChar}
             </if>
             <if test="query.priority != null">
               ${queryType} RES.PRIORITY_ = #{query.priority}
@@ -326,7 +326,7 @@
               ${queryType} RES.ASSIGNEE_ = #{query.assignee}
             </if>
             <if test="query.assigneeLike != null">
-              ${queryType} RES.ASSIGNEE_ like #{query.assigneeLike} ESCAPE #{escapeChar}
+              ${queryType} RES.ASSIGNEE_ like #{query.assigneeLike} ESCAPE ${escapeChar}
             </if>
             <if test="query.owner != null">
               ${queryType} RES.OWNER_ = #{query.owner}
@@ -357,7 +357,7 @@
               </foreach>
             </if>
             <if test="query.processInstanceBusinessKeyLike != null">
-              ${queryType} E.BUSINESS_KEY_ like #{query.processInstanceBusinessKeyLike} ESCAPE #{escapeChar}
+              ${queryType} E.BUSINESS_KEY_ like #{query.processInstanceBusinessKeyLike} ESCAPE ${escapeChar}
             </if>
             <if test="query.executionId != null">
               ${queryType} RES.EXECUTION_ID_ = #{query.executionId}
@@ -369,7 +369,7 @@
               ${queryType} CE.BUSINESS_KEY_ = #{query.caseInstanceBusinessKey}
             </if>
             <if test="query.caseInstanceBusinessKeyLike != null">
-              ${queryType} CE.BUSINESS_KEY_ like #{query.caseInstanceBusinessKeyLike} ESCAPE #{escapeChar}
+              ${queryType} CE.BUSINESS_KEY_ like #{query.caseInstanceBusinessKeyLike} ESCAPE ${escapeChar}
             </if>
             <if test="query.caseExecutionId != null">
               ${queryType} RES.CASE_EXECUTION_ID_ = #{query.caseExecutionId}
@@ -387,7 +387,7 @@
               ${queryType} RES.TASK_DEF_KEY_ = #{query.key}
             </if>
             <if test="query.keyLike != null">
-              ${queryType} RES.TASK_DEF_KEY_ like #{query.keyLike} ESCAPE #{escapeChar}
+              ${queryType} RES.TASK_DEF_KEY_ like #{query.keyLike} ESCAPE ${escapeChar}
             </if>
             <if test="query.parentTaskId != null">
               ${queryType} RES.PARENT_TASK_ID_ = #{query.parentTaskId}
@@ -416,7 +416,7 @@
               ${queryType} D.NAME_ = #{query.processDefinitionName}
             </if>
             <if test="query.processDefinitionNameLike != null">
-              ${queryType} D.NAME_ like #{query.processDefinitionNameLike} ESCAPE #{escapeChar}
+              ${queryType} D.NAME_ like #{query.processDefinitionNameLike} ESCAPE ${escapeChar}
             </if>
             <if test="query.caseDefinitionId != null">
               ${queryType} RES.CASE_DEF_ID_ = #{query.caseDefinitionId}
@@ -428,7 +428,7 @@
               ${queryType} CD.NAME_ = #{query.caseDefinitionName}
             </if>
             <if test="query.caseDefinitionNameLike != null">
-              ${queryType} CD.NAME_ like #{query.caseDefinitionNameLike} ESCAPE #{escapeChar}
+              ${queryType} CD.NAME_ like #{query.caseDefinitionNameLike} ESCAPE ${escapeChar}
             </if>
             <if test="query.dueDate != null || query.dueBefore != null || query.dueAfter != null">
               ${queryType}
