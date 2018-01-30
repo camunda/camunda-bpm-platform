@@ -189,14 +189,14 @@ public class Variables {
   }
 
   /**
-   * Shortcut for {@code Variables.serializedObjectValue().serializedObjectValue(value)}
+   * Shortcut for {@code Variables.serializedObjectValue().serializedValue(value)}
    */
   public static SerializedObjectValueBuilder serializedObjectValue(String value) {
     return serializedObjectValue().serializedValue(value);
   }
 
   /**
-   * Shortcut for {@code Variables.serializedObjectValue().serializedObjectValue(value).setTransient(isTransient)}
+   * Shortcut for {@code Variables.serializedObjectValue().serializedValue(value).setTransient(isTransient)}
    */
   public static SerializedObjectValueBuilder serializedObjectValue(String value, boolean isTransient) {
     return (SerializedObjectValueBuilder) serializedObjectValue().serializedValue(value).setTransient(isTransient);
