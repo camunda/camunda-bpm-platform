@@ -77,6 +77,8 @@ public class JobPrioritizationFailureJavaSerializationTest extends AbstractFoxPl
     final WebArchive webArchive = initWebArchiveDeployment("pa1.war", "org/camunda/bpm/integrationtest/processes-javaSerializationEnabled-pa1.xml")
       .addClass(PriorityBean.class)
       .addAsResource("org/camunda/bpm/integrationtest/jobexecutor/JobPrioritizationTest.priorityProcess.bpmn20.xml");
+
+    TestContainer.addContainerSpecificProcessEngineConfigurationClass(webArchive);
     return webArchive;
   }
 
