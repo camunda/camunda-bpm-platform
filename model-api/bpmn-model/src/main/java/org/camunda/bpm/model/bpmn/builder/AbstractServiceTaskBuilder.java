@@ -115,6 +115,19 @@ public abstract class AbstractServiceTaskBuilder<B extends AbstractServiceTaskBu
     element.setCamundaType(camundaType);
     return myself;
   }
+
+  /**
+   * Sets the camunda topic attribute and the camunda type attribute to the
+   * value <code>external</code. Reduces two calls to {@link #camundaType(String)} and {@link #camundaTopic(String)}.
+   *
+   * @param camundaTopic the topic to set
+   * @return the build object
+   */
+  public B camundaExternalTask(String camundaTopic) {
+    this.camundaType("external");
+    this.camundaTopic(camundaTopic);
+    return myself;
+  }
   
   /**
    * Sets the camunda task priority attribute. This is only meaningful when

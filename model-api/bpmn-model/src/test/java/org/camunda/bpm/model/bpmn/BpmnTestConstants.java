@@ -28,6 +28,7 @@ public final class BpmnTestConstants {
   public static final String TASK_ID = "task";
   public static final String USER_TASK_ID = "userTask";
   public static final String SERVICE_TASK_ID = "serviceTask";
+  public static final String EXTERNAL_TASK_ID = "externalTask";
   public static final String SEND_TASK_ID = "sendTask";
   public static final String SCRIPT_TASK_ID = "scriptTask";
   public static final String SEQUENCE_FLOW_ID = "sequenceFlow";
@@ -75,6 +76,7 @@ public final class BpmnTestConstants {
   public static final String TEST_PROCESS_JOB_PRIORITY = "15";
   public static final String TEST_PROCESS_TASK_PRIORITY = "13";
   public static final String TEST_SERVICE_TASK_PRIORITY = "${test}";
+  public static final String TEST_EXTERNAL_TASK_TOPIC = "${externalTaskTopic}";
   public static final Integer TEST_HISTORY_TIME_TO_LIVE = 5;
 
   public static final String TEST_CONDITION = "${true}";

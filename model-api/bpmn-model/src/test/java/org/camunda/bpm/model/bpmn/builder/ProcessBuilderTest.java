@@ -15,27 +15,7 @@ package org.camunda.bpm.model.bpmn.builder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Fail.fail;
-import static org.camunda.bpm.model.bpmn.BpmnTestConstants.CALL_ACTIVITY_ID;
-import static org.camunda.bpm.model.bpmn.BpmnTestConstants.PROCESS_ID;
-import static org.camunda.bpm.model.bpmn.BpmnTestConstants.SERVICE_TASK_ID;
-import static org.camunda.bpm.model.bpmn.BpmnTestConstants.START_EVENT_ID;
-import static org.camunda.bpm.model.bpmn.BpmnTestConstants.SUB_PROCESS_ID;
-import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TASK_ID;
-import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_CLASS_API;
-import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_DELEGATE_EXPRESSION_API;
-import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_DUE_DATE_API;
-import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_EXPRESSION_API;
-import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_FOLLOW_UP_DATE_API;
-import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_GROUPS_API;
-import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_GROUPS_LIST_API;
-import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_HISTORY_TIME_TO_LIVE;
-import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_PRIORITY_API;
-import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_PROCESS_TASK_PRIORITY;
-import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_SERVICE_TASK_PRIORITY;
-import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_STRING_API;
-import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_USERS_API;
-import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_USERS_LIST_API;
-import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TRANSACTION_ID;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.*;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN20_NS;
 import static org.junit.Assert.assertEquals;
 
@@ -48,15 +28,6 @@ import java.util.List;
 import javax.naming.directory.ModificationItem;
 
 import org.camunda.bpm.model.bpmn.*;
-
-import static org.camunda.bpm.model.bpmn.BpmnTestConstants.BOUNDARY_ID;
-import static org.camunda.bpm.model.bpmn.BpmnTestConstants.CATCH_ID;
-import static org.camunda.bpm.model.bpmn.BpmnTestConstants.CONDITION_ID;
-import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_CONDITION;
-import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_CONDITIONAL_VARIABLE_EVENTS;
-import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_CONDITIONAL_VARIABLE_EVENTS_LIST;
-import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_CONDITIONAL_VARIABLE_NAME;
-import static org.camunda.bpm.model.bpmn.BpmnTestConstants.USER_TASK_ID;
 
 import org.camunda.bpm.model.bpmn.instance.*;
 import org.camunda.bpm.model.bpmn.instance.Error;
@@ -465,6 +436,20 @@ public class ProcessBuilderTest {
     assertThat(process.getCamundaJobPriority()).isEqualTo("${somePriority}");
     assertThat(process.getCamundaTaskPriority()).isEqualTo(TEST_PROCESS_TASK_PRIORITY);
     assertThat(process.getCamundaHistoryTimeToLive()).isEqualTo(TEST_HISTORY_TIME_TO_LIVE);
+  }
+
+  @Test
+  public void testTaskCamundaExternalTask() {
+    modelInstance = Bpmn.createProcess()
+        .startEvent()
+        .serviceTask(EXTERNAL_TASK_ID)
+          .camundaExternalTask(TEST_EXTERNAL_TASK_TOPIC)
+        .endEvent()
+        .done();
+
+    ServiceTask serviceTask = modelInstance.getModelElementById(EXTERNAL_TASK_ID);
+    assertThat(serviceTask.getCamundaType()).isEqualTo("external");
+    assertThat(serviceTask.getCamundaTopic()).isEqualTo(TEST_EXTERNAL_TASK_TOPIC);
   }
 
   @Test
