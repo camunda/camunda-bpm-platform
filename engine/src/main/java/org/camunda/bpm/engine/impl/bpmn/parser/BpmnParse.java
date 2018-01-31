@@ -117,6 +117,7 @@ public class BpmnParse extends Parse {
   public static final String PROPERTYNAME_CONSUMES_COMPENSATION = "consumesCompensation";
   public static final String PROPERTYNAME_JOB_PRIORITY = "jobPriority";
   public static final String PROPERTYNAME_TASK_PRIORITY = "taskPriority";
+  public static final String PROPERTYNAME_EXTERNAL_TASK_TOPIC = "topic";
   public static final String PROPERTYNAME_CLASS = "class";
   public static final String PROPERTYNAME_EXPRESSION = "expression";
   public static final String PROPERTYNAME_DELEGATE_EXPRESSION = "delegateExpression";
@@ -2266,6 +2267,23 @@ public class BpmnParse extends Parse {
     }
   }
 
+  protected ParameterValueProvider parseTopic(Element element, String topicAttribute) {
+    String topicAttributeValue = element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, topicAttribute);
+
+    if (topicAttributeValue == null) {
+      return null;
+
+    } else {
+      Object value = topicAttributeValue;
+      if (StringUtil.isExpression(topicAttributeValue)) {
+        return createParameterValueProvider(value, expressionManager);
+      } else {
+        // A topic can be a string, but not an expression
+        return new ConstantValueProvider(value);
+      }
+    }
+  }
+
   @SuppressWarnings("unchecked")
   protected void addMessageJobDeclarationToActivity(MessageJobDeclaration messageJobDeclaration, ActivityImpl activity) {
     List<MessageJobDeclaration> messageJobDeclarations = (List<MessageJobDeclaration>) activity.getProperty(PROPERTYNAME_MESSAGE_JOB_DECLARATION);
@@ -2328,13 +2346,13 @@ public class BpmnParse extends Parse {
   protected void parseExternalServiceTask(ActivityImpl activity, Element serviceTaskElement) {
     activity.setScope(true);
 
-    String topicName = serviceTaskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "topic");
-    if (topicName == null) {
+    ParameterValueProvider topicNameProvider = parseTopic(serviceTaskElement, PROPERTYNAME_EXTERNAL_TASK_TOPIC);
+    if (topicNameProvider == null) {
       addError("External tasks must specify a 'topic' attribute in the camunda namespace", serviceTaskElement);
     }
 
-    ParameterValueProvider provider = parsePriority(serviceTaskElement, PROPERTYNAME_TASK_PRIORITY);
-    activity.setActivityBehavior(new ExternalTaskActivityBehavior(topicName, provider));
+    ParameterValueProvider priorityProvider = parsePriority(serviceTaskElement, PROPERTYNAME_TASK_PRIORITY);
+    activity.setActivityBehavior(new ExternalTaskActivityBehavior(topicNameProvider, priorityProvider));
   }
 
   protected void validateFieldDeclarationsForEmail(Element serviceTaskElement, List<FieldDeclaration> fieldDeclarations) {

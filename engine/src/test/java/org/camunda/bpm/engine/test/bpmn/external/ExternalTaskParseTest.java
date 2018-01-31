@@ -13,8 +13,14 @@
 package org.camunda.bpm.engine.test.bpmn.external;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.test.Deployment;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Thorben Lindhauer
@@ -33,5 +39,24 @@ public class ExternalTaskParseTest extends PluggableProcessEngineTestCase {
     } catch (ProcessEngineException e) {
       assertTextPresent("External tasks must specify a 'topic' attribute in the camunda namespace", e.getMessage());
     }
+  }
+
+  @Deployment
+  public void testParseExternalTaskWithExpressionTopic() {
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("topicName", "testTopicExpression");
+
+    runtimeService.startProcessInstanceByKey("oneExternalTaskWithExpressionTopicProcess", variables);
+    ExternalTask task = externalTaskService.createExternalTaskQuery().singleResult();
+    assertEquals("testTopicExpression", task.getTopicName());
+  }
+
+  @Deployment
+  public void testParseExternalTaskWithStringTopic() {
+    Map<String, Object> variables = new HashMap<String, Object>();
+
+    runtimeService.startProcessInstanceByKey("oneExternalTaskWithStringTopicProcess", variables);
+    ExternalTask task = externalTaskService.createExternalTaskQuery().singleResult();
+    assertEquals("testTopicString", task.getTopicName());
   }
 }

@@ -33,11 +33,11 @@ import org.camunda.bpm.engine.impl.pvm.delegate.MigrationObserverBehavior;
  */
 public class ExternalTaskActivityBehavior extends AbstractBpmnActivityBehavior implements MigrationObserverBehavior {
 
-  protected String topicName;
+  protected ParameterValueProvider topicNameValueProvider;
   protected ParameterValueProvider priorityValueProvider;
 
-  public ExternalTaskActivityBehavior(String topicName, ParameterValueProvider paramValueProvider) {
-    this.topicName = topicName;
+  public ExternalTaskActivityBehavior(ParameterValueProvider topicName, ParameterValueProvider paramValueProvider) {
+    this.topicNameValueProvider = topicName;
     this.priorityValueProvider = paramValueProvider;
   }
 
@@ -45,8 +45,11 @@ public class ExternalTaskActivityBehavior extends AbstractBpmnActivityBehavior i
   public void execute(ActivityExecution execution) throws Exception {
     ExecutionEntity executionEntity = (ExecutionEntity) execution;
     PriorityProvider<ExternalTaskActivityBehavior> provider = Context.getProcessEngineConfiguration().getExternalTaskPriorityProvider();
+
     long priority = provider.determinePriority(executionEntity, this, null);
-    ExternalTaskEntity.createAndInsert(executionEntity, topicName, priority);
+    String topic = (String) topicNameValueProvider.getValue(executionEntity);
+
+    ExternalTaskEntity.createAndInsert(executionEntity, topic, priority);
 
   }
 
