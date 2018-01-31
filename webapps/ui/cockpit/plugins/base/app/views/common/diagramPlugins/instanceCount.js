@@ -8,45 +8,44 @@ var template = fs.readFileSync(__dirname + '/instanceCount.html', 'utf8');
 module.exports = function($scope, control, processData, processDiagram, Loaders, $rootScope, callbacks) {
   var viewer = control.getViewer();
   var overlays = viewer.get('overlays');
+  var elementRegistry = viewer.get('elementRegistry');
   var stopLoading = Loaders.startLoading();
   var overlaysNodes = {};
 
   callbacks.observe(function(sources) {
     stopLoading();
 
-    Object
-      .keys(processDiagram.bpmnElements)
-      .forEach(function(key) {
-        var element = processDiagram.bpmnElements[key];
-        var data = callbacks.getData.apply(null, [element].concat(sources));
-        var nodes;
+    elementRegistry.forEach(function(shape) {
+      var element = processDiagram.bpmnElements[shape.businessObject.id];
+      var data = callbacks.getData.apply(null, [element].concat(sources));
+      var nodes;
 
-        if (callbacks.isActive(data)) {
-          if (!overlaysNodes[element.id]) {
-            nodes = getOverlayNodes(element, data);
+      if (callbacks.isActive(data)) {
+        if (!overlaysNodes[element.id]) {
+          nodes = getOverlayNodes(element, data);
 
-            overlays.add(element.id, {
-              position: {
-                bottom: 0,
-                left: 0
-              },
-              show: {
-                minZoom: -Infinity,
-                maxZoom: +Infinity
-              },
-              html: nodes.html
-            });
+          overlays.add(element.id, {
+            position: {
+              bottom: 0,
+              left: 0
+            },
+            show: {
+              minZoom: -Infinity,
+              maxZoom: +Infinity
+            },
+            html: nodes.html
+          });
 
-            overlaysNodes[element.id] = nodes;
-          }
-
-          element.isSelectable = true;
+          overlaysNodes[element.id] = nodes;
         }
 
-        if (overlaysNodes[element.id]) {
-          callbacks.updateOverlayNodes(overlaysNodes[element.id], data);
-        }
-      });
+        element.isSelectable = true;
+      }
+
+      if (overlaysNodes[element.id]) {
+        callbacks.updateOverlayNodes(overlaysNodes[element.id], data);
+      }
+    });
 
     $rootScope.$broadcast('cockpit.plugin.base.views:diagram-plugins:instance-plugin-loaded');
   });
