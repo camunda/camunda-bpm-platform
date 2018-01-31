@@ -23,6 +23,19 @@ var DirectiveController = [
     $scope.$on('$destroy', function() {
       $scope.processDiagram = null;
       $scope.overlayProviders = null;
+
+      var control = $scope.control;
+      var viewer = control.getViewer();
+      var canvas = viewer.get('canvas');
+      var elementRegistry = viewer.get('elementRegistry');
+
+      elementRegistry.forEach(function(shape) {
+        var bo = shape.businessObject;
+        if (bo.$instanceOf('bpmn:FlowNode')) {
+          canvas.removeMarker(bo.id, 'selectable');
+          control.clearHighlight(bo.id);
+        }
+      });
     });
 
     $scope.control = {};
