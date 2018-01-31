@@ -918,21 +918,12 @@ public class BpmnParse extends Parse {
     } else if (conditionEventDefinition != null) {
       startEventActivity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.START_EVENT_CONDITIONAL);
 
-      ensureCondition(conditionEventDefinition);
-
       ConditionalEventDefinition conditionalEventDefinition = parseConditionalEventDefinition(conditionEventDefinition, startEventActivity);
       conditionalEventDefinition.setStartEvent(true);
       conditionalEventDefinition.setActivityId(startEventActivity.getId());
       startEventActivity.getProperties().set(BpmnProperties.CONDITIONAL_EVENT_DEFINITION, conditionalEventDefinition);
 
       addEventSubscriptionDeclaration(conditionalEventDefinition, processDefinition, startEventElement);
-    }
-  }
-
-  protected void ensureCondition(Element conditionEventDefinition) {
-    String condition = conditionEventDefinition.element("condition").getText();
-    if (condition == null) {
-      addError("element 'condition' is required", conditionEventDefinition);
     }
   }
 
