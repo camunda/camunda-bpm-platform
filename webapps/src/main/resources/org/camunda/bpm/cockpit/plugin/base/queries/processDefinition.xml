@@ -41,7 +41,6 @@
   </select>
 
   <sql id="selectCalledProcesses">
-    <bind name="escapeChar" value="'\'\\\''"/>
     from
       ${prefix}ACT_RE_PROCDEF RES
     inner join
