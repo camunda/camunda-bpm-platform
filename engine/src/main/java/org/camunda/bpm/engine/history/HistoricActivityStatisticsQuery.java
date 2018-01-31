@@ -44,10 +44,10 @@ public interface HistoricActivityStatisticsQuery extends Query<HistoricActivityS
   /** Only select historic activities of process instances that were started after the given date. */
   HistoricActivityStatisticsQuery startedAfter(Date date);
 
-  /** Only select historic activities of process instances that were started before the given date. */
+  /** Only select historic activities of process instances that were finished before the given date. */
   HistoricActivityStatisticsQuery finishedBefore(Date date);
 
-  /** Only select historic activities of process instances that were started after the given date. */
+  /** Only select historic activities of process instances that were finished after the given date. */
   HistoricActivityStatisticsQuery finishedAfter(Date date);
 
   /**
