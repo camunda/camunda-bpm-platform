@@ -13,11 +13,16 @@ module.exports = function(viewContext) {
        * @returns {Array} BPMN Elements that are flow nodes
        */
       function getFlowNodes() {
-        var bpmnElements = processDiagram.bpmnElements;
-        return Object.keys(processDiagram.bpmnElements)
-          .filter(function(key) {
-            return bpmnElements[key].$instanceOf('bpmn:CallActivity');
-          });
+        var nodes = [];
+
+        elementRegistry.forEach(function(shape) {
+          var bo = shape.businessObject;
+          if (bo.$instanceOf('bpmn:CallActivity')) {
+            nodes.push(bo.id);
+          }
+        });
+
+        return nodes;
       }
 
       /**
@@ -148,6 +153,7 @@ module.exports = function(viewContext) {
 
       var overlaysNodes = {};
       var overlays = control.getViewer().get('overlays');
+      var elementRegistry = control.getViewer().get('elementRegistry');
       var TAB_NAME = 'called-process-instances-tab';
       var flowNodes = getFlowNodes();
       var callActivityToInstancesMap = {};
@@ -192,7 +198,10 @@ module.exports = function(viewContext) {
           PluginProcessInstanceResource
             .processInstances({ id: processInstance.id }, function(calledPInstances) {
               calledPInstances.forEach(function(calledPInstance) {
-                callActivityToInstancesMap[calledPInstance.callActivityId][0].calledProcessInstanceId = calledPInstance.id;
+                var instances = callActivityToInstancesMap[calledPInstance.callActivityId];
+                if (instances && instances.length) {
+                  instances[0].calledProcessInstanceId = calledPInstance.id;
+                }
               });
               return addOverlays(callActivityToInstancesMap);
             });
