@@ -18,7 +18,8 @@ import java.util.Map;
 
 /**
  * <p>A fluent builder for defining conditional start event correlation</p>
- *  TODO
+ *
+ * @author Yana Vasileva
  */
 public interface ConditionEvaluationBuilder {
 

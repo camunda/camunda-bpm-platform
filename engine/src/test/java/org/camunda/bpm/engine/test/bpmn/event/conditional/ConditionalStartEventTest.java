@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
@@ -367,7 +366,6 @@ public class ConditionalStartEventTest {
     // when
     List<ProcessInstance> conditionInstances = runtimeService
         .createConditionEvaluation()
-        .setVariable("foo", "bar")
         .evaluateStartConditions();
 
     // then
@@ -423,31 +421,17 @@ public class ConditionalStartEventTest {
   public void testStartInstanceWithoutResult() {
     // given a deployed process
 
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("No process instances were started during evaluation of the conditional start events.");
-
     // when
-    runtimeService
+    List<ProcessInstance> processes = runtimeService
       .createConditionEvaluation()
       .setVariable("foo", 0)
       .evaluateStartConditions();
 
+    assertNotNull(processes);
+    assertEquals(0, processes.size());
+
     assertNull(runtimeService.createVariableInstanceQuery().singleResult());
     assertNull(runtimeService.createProcessInstanceQuery().processDefinitionKey(CONDITIONAL_EVENT_PROCESS).singleResult());
-  }
-
-  @Test
-  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/conditional/ConditionalStartEventTest.testStartInstanceWithTrueConditionalStartEvent.bpmn20.xml")
-  public void testStartInstanceWithoutVariables() throws Exception {
-    // given a deployed process
-
-    thrown.expect(BadUserRequestException.class);
-    thrown.expectMessage("Variables are mandatory");
-
-    // when
-    runtimeService
-        .createConditionEvaluation()
-        .evaluateStartConditions();
   }
 
   @Test
@@ -549,7 +533,7 @@ public class ConditionalStartEventTest {
   @Test
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/event/conditional/ConditionalStartEventTest.testSingleConditionalStartEvent.bpmn20.xml",
                             "org/camunda/bpm/engine/test/bpmn/event/conditional/ConditionalStartEventTest.testStartInstanceWithTrueConditionalStartEvent.bpmn20.xml" })
-  public void testStartInstanceWithProcessDefinitionId() {
+  public void testStartInstanceByProcessDefinitionId() {
     // given two deployed processes
     List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().list();
 
@@ -572,7 +556,7 @@ public class ConditionalStartEventTest {
   @Test
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/event/conditional/ConditionalStartEventTest.testSingleConditionalStartEvent.bpmn20.xml",
                             "org/camunda/bpm/engine/test/bpmn/event/conditional/ConditionalStartEventTest.testMultipleCondition.bpmn20.xml"})
-  public void testStartInstanceWithProcessDefinitionFirstVersion() {
+  public void testStartInstanceByProcessDefinitionFirstVersion() {
     // given two deployed processes
     String processDefinitionId = repositoryService.createProcessDefinitionQuery().processDefinitionKey(CONDITIONAL_EVENT_PROCESS).singleResult().getId();
 
@@ -597,7 +581,7 @@ public class ConditionalStartEventTest {
   @Test
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/event/conditional/ConditionalStartEventTest.testSingleConditionalStartEvent.bpmn20.xml",
                             "org/camunda/bpm/engine/test/bpmn/event/conditional/ConditionalStartEventTest.testStartInstanceWithTrueConditionalStartEvent.bpmn20.xml" })
-  public void testStartInstanceWithNonExistingProcessDefinitionId() {
+  public void testStartInstanceByNonExistingProcessDefinitionId() {
     // given two deployed processes
     List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().list();
 
@@ -611,6 +595,27 @@ public class ConditionalStartEventTest {
         .createConditionEvaluation()
         .setVariable("foo", 1)
         .processDefinitionId("nonExistingId")
+        .evaluateStartConditions();
+  }
+
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testStartInstanceByProcessDefinitionIdWithoutCondition() {
+    // given deployed process without conditional start event
+    String processDefinitionId = repositoryService.createProcessDefinitionQuery().processDefinitionKey("oneTaskProcess").singleResult().getId();
+
+    List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().list();
+
+    assertEquals(0, eventSubscriptions.size());
+
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("No conditional start events were found during evaluation of the conditions by process definition with id: " + processDefinitionId);
+
+
+    // when
+    runtimeService
+        .createConditionEvaluation()
+        .processDefinitionId(processDefinitionId)
         .evaluateStartConditions();
   }
 

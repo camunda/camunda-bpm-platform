@@ -13,14 +13,11 @@
 
 package org.camunda.bpm.engine.impl.cmd;
 
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import org.camunda.bpm.engine.BadUserRequestException;
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ConditionEvaluationBuilderImpl;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -33,6 +30,12 @@ import org.camunda.bpm.engine.impl.runtime.ConditionHandlerResult;
 import org.camunda.bpm.engine.impl.runtime.ConditionSet;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 
+/**
+ * Evaluates the conditions to start processes by conditional start events
+ *
+ * @author Yana Vasileva
+ *
+ */
 public class EvaluateStartConditionCmd implements Command<List<ProcessInstance>> {
 
   protected ConditionEvaluationBuilderImpl builder;
@@ -43,8 +46,6 @@ public class EvaluateStartConditionCmd implements Command<List<ProcessInstance>>
 
   @Override
   public List<ProcessInstance> execute(final CommandContext commandContext) {
-    ensureNotNull(BadUserRequestException.class, "Variables are mandatory to start process instance by condition", "variables", builder.getVariables());
-
     final ConditionHandler conditionHandler = commandContext.getProcessEngineConfiguration().getConditionHandler();
     final ConditionSet conditionSet = new ConditionSet(builder);
 
@@ -53,10 +54,6 @@ public class EvaluateStartConditionCmd implements Command<List<ProcessInstance>>
         return conditionHandler.evaluateStartCondition(commandContext, conditionSet);
       }
     });
-
-    if (results.isEmpty()) {
-      throw new ProcessEngineException("No process instances were started during evaluation of the conditional start events.");
-    }
 
     for (ConditionHandlerResult ConditionHandlerResult : results) {
       checkAuthorization(commandContext, ConditionHandlerResult);

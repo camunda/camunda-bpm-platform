@@ -17,14 +17,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
 import org.camunda.bpm.engine.impl.bpmn.parser.ConditionalEventDefinition;
 import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
-import org.camunda.bpm.engine.impl.cmd.CommandLogger;
 import org.camunda.bpm.engine.impl.event.EventType;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.javax.el.PropertyNotFoundException;
 import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionManager;
@@ -32,9 +29,11 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 
+/**
+ * @author Yana Vasileva
+ *
+ */
 public class DefaultConditionHandler implements ConditionHandler {
-
-  private final static CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
 
   @Override
   public List<ConditionHandlerResult> evaluateStartCondition(CommandContext commandContext, ConditionSet conditionSet) {
@@ -47,7 +46,7 @@ public class DefaultConditionHandler implements ConditionHandler {
 
   protected List<ConditionHandlerResult> evaluateConditionStartByEventSubscription(CommandContext commandContext, ConditionSet conditionSet) {
     List<EventSubscriptionEntity> subscriptions = findConditionalStartEventSubscriptions(commandContext, conditionSet);
-    if (subscriptions == null || subscriptions.isEmpty()) {
+    if (subscriptions.isEmpty()) {
       throw new ProcessEngineException("No subscriptions were found during evaluation of the conditional start events.");
     }
     List<ConditionHandlerResult> results = new ArrayList<ConditionHandlerResult>();
@@ -72,12 +71,7 @@ public class DefaultConditionHandler implements ConditionHandler {
     EventSubscriptionManager eventSubscriptionManager = commandContext.getEventSubscriptionManager();
 
     if (conditionSet.isTenantIdSet) {
-      List<EventSubscriptionEntity> subscriptions = eventSubscriptionManager.findConditionalStartEventSubscriptionByTenantId(conditionSet.getTenantId());
-      if (subscriptions == null || subscriptions.isEmpty()) {
-        return null;
-      } else {
-        return subscriptions;
-      }
+      return eventSubscriptionManager.findConditionalStartEventSubscriptionByTenantId(conditionSet.getTenantId());
     } else {
       return eventSubscriptionManager.findConditionalStartEventSubscription();
     }
@@ -91,7 +85,10 @@ public class DefaultConditionHandler implements ConditionHandler {
     List<ConditionHandlerResult> results = new ArrayList<ConditionHandlerResult>();
 
     if (processDefinition != null && !processDefinition.isSuspended()) {
-      List<ActivityImpl> activities = findActivities(processDefinition);
+      List<ActivityImpl> activities = findConditionalStartEventActivities(processDefinition);
+      if (activities.isEmpty()) {
+        throw new ProcessEngineException("No conditional start events were found during evaluation of the conditions by process definition with id: " + processDefinitionId);
+      }
       for (ActivityImpl activity : activities) {
         if (evaluateCondition(conditionSet, activity)) {
           results.add(new ConditionHandlerResult(processDefinition, activity));
@@ -101,39 +98,33 @@ public class DefaultConditionHandler implements ConditionHandler {
     return results;
   }
 
-  protected List<ActivityImpl> findActivities(ProcessDefinitionEntity processDefinition) {
+  protected List<ActivityImpl> findConditionalStartEventActivities(ProcessDefinitionEntity processDefinition) {
     List<ActivityImpl> activities = new ArrayList<ActivityImpl>();
     for (EventSubscriptionDeclaration declaration : ConditionalEventDefinition.getDeclarationsForScope(processDefinition).values()) {
-      if (isConditionStartEventWithName(declaration)) {
+      if (isConditionStartEvent(declaration)) {
         activities.add(((ConditionalEventDefinition) declaration).getConditionalActivity());
       }
     }
     return activities;
   }
 
-  protected boolean isConditionStartEventWithName(EventSubscriptionDeclaration declaration) {
+  protected boolean isConditionStartEvent(EventSubscriptionDeclaration declaration) {
     return EventType.CONDITONAL.name().equals(declaration.getEventType()) && declaration.isStartEvent();
   }
 
   protected boolean evaluateCondition(ConditionSet conditionSet, ActivityImpl activity) {
     ExecutionEntity temporaryExecution = new ExecutionEntity();
-    temporaryExecution.initializeVariableStore(conditionSet.getVariables());
+    if (conditionSet.getVariables() != null) {
+      temporaryExecution.initializeVariableStore(conditionSet.getVariables());
+    }
     temporaryExecution.setProcessDefinition(activity.getProcessDefinition());
 
     ConditionalEventDefinition conditionalEventDefinition = activity.getProperties().get(BpmnProperties.CONDITIONAL_EVENT_DEFINITION);
-    try {
-      if (conditionalEventDefinition.evaluate(temporaryExecution)) {
-        return (conditionalEventDefinition.getVariableName() == null || conditionSet.getVariables().containsKey(conditionalEventDefinition.getVariableName()))
-                && conditionalEventDefinition.evaluate(temporaryExecution);
-      }
-    } catch (ProcessEngineException e) {
-      if (e.getCause() instanceof PropertyNotFoundException) {
-        LOG.debugConditionEvaluation(e.getMessage());
-      } else {
-        throw e;
-      }
+    if (conditionalEventDefinition.getVariableName() == null || conditionSet.getVariables().containsKey(conditionalEventDefinition.getVariableName())) {
+      return conditionalEventDefinition.tryEvaluate(temporaryExecution);
+    } else {
+      return false;
     }
-    return false;
   }
 
 }

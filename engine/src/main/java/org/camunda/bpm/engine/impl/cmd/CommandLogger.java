@@ -277,8 +277,4 @@ public class CommandLogger extends ProcessEngineLogger {
         "Unable to evaluate script when rendering start form of the process definition '{}'.",
         processDefinitionId));
   }
-
-  public void debugConditionEvaluation(String message) {
-    logDebug("042", message);
-  }
 }

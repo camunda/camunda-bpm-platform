@@ -20,7 +20,6 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.impl.cmd.EvaluateStartConditionCmd;
 import org.camunda.bpm.engine.impl.interceptor.Command;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.runtime.ConditionEvaluationBuilder;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -29,10 +28,8 @@ import org.camunda.bpm.engine.variable.impl.VariableMapImpl;
 
 public class ConditionEvaluationBuilderImpl implements ConditionEvaluationBuilder {
   protected CommandExecutor commandExecutor;
-  protected CommandContext commandContext;
 
   protected String businessKey;
-  protected String processInstanceId;
   protected String processDefinitionId;
 
   protected VariableMap variables;
@@ -49,64 +46,28 @@ public class ConditionEvaluationBuilderImpl implements ConditionEvaluationBuilde
     return commandExecutor;
   }
 
-  public CommandContext getCommandContext() {
-    return commandContext;
-  }
-
   public String getBusinessKey() {
     return businessKey;
-  }
-
-  public void setBusinessKey(String businessKey) {
-    this.businessKey = businessKey;
-  }
-
-  public String getProcessInstanceId() {
-    return processInstanceId;
-  }
-
-  public void setProcessInstanceId(String processInstanceId) {
-    this.processInstanceId = processInstanceId;
   }
 
   public String getProcessDefinitionId() {
     return processDefinitionId;
   }
 
-  public void setProcessDefinitionId(String processDefinitionId) {
-    this.processDefinitionId = processDefinitionId;
-  }
-
   public VariableMap getVariables() {
     return variables;
-  }
-
-  public void setVariables(VariableMap variables) {
-    this.variables = variables;
   }
 
   public String getTenantId() {
     return tenantId;
   }
 
-  public void setTenantId(String tenantId) {
-    this.tenantId = tenantId;
-  }
-
   public boolean isTenantIdSet() {
     return isTenantIdSet;
   }
 
-  public void setTenantIdSet(boolean isTenantIdSet) {
-    this.isTenantIdSet = isTenantIdSet;
-  }
-
   protected <T> T execute(Command<T> command) {
-    if (commandExecutor != null) {
-      return commandExecutor.execute(command);
-    } else {
-      return command.execute(commandContext);
-    }
+    return commandExecutor.execute(command);
   }
 
   @Override

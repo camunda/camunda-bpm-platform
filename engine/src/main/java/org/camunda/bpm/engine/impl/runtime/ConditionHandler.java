@@ -17,8 +17,18 @@ import java.util.List;
 
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
+/**
+ * @author Yana.Vasileva
+ *
+ */
 public interface ConditionHandler {
 
+  /**
+   * Evaluates conditions of process definition with a conditional start event
+   *
+   * @param conditionSet
+   * @return all matched process definitions and respective activities containing evaluated to true conditions
+   */
   public List<ConditionHandlerResult> evaluateStartCondition(CommandContext commandContext, ConditionSet conditionSet);
 
 

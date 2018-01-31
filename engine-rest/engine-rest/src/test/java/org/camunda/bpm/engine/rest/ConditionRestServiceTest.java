@@ -34,7 +34,6 @@ import java.util.Map;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.AuthorizationException;
-import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.ConditionEvaluationBuilderImpl;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
@@ -49,7 +48,6 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.mockito.Matchers;
 
-import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.response.Response;
 
 public class ConditionRestServiceTest extends AbstractRestServiceTest {
@@ -108,23 +106,6 @@ public class ConditionRestServiceTest extends AbstractRestServiceTest {
     verify(conditionEvaluationBuilderMock).setVariables(expectedVariables);
     verify(conditionEvaluationBuilderMock).evaluateStartConditions();
     verifyNoMoreInteractions(conditionEvaluationBuilderMock);
-  }
-
-  @Test
-  public void testConditionEvaluationWithoutVariables() {
-    String message = "expected exception";
-    doThrow(new BadUserRequestException(message)).when(conditionEvaluationBuilderMock).evaluateStartConditions();
-
-    given()
-      .contentType(POST_JSON_CONTENT_TYPE)
-      .body(EMPTY_JSON_OBJECT)
-    .then().expect()
-      .statusCode(Status.BAD_REQUEST.getStatusCode())
-      .contentType(ContentType.JSON)
-      .body("type", equalTo(BadUserRequestException.class.getSimpleName()))
-      .body("message", equalTo(message))
-    .when()
-      .post(CONDITION_URL);
   }
 
   @Test

@@ -19,7 +19,6 @@ import org.camunda.bpm.engine.variable.VariableMap;
 public class ConditionSet {
 
   protected final String businessKey;
-  protected final String processInstanceId;
   protected final String processDefinitionId;
   protected final VariableMap variables;
   protected final String tenantId;
@@ -27,7 +26,6 @@ public class ConditionSet {
 
   public ConditionSet(ConditionEvaluationBuilderImpl builder) {
     this.businessKey = builder.getBusinessKey();
-    this.processInstanceId = builder.getProcessInstanceId();
     this.processDefinitionId = builder.getProcessDefinitionId();
     this.variables = builder.getVariables();
     this.tenantId = builder.getTenantId();
@@ -36,10 +34,6 @@ public class ConditionSet {
 
   public String getBusinessKey() {
     return businessKey;
-  }
-
-  public String getProcessInstanceId() {
-    return processInstanceId;
   }
 
   public String getProcessDefinitionId() {
@@ -60,7 +54,7 @@ public class ConditionSet {
 
   @Override
   public String toString() {
-    return "ConditionSet [businessKey=" + businessKey + ", processInstanceId=" + processInstanceId + ", processDefinitionId=" + processDefinitionId
+    return "ConditionSet [businessKey=" + businessKey + ", processDefinitionId=" + processDefinitionId
         + ", variables=" + variables + ", tenantId=" + tenantId + ", isTenantIdSet=" + isTenantIdSet + "]";
   }
 
