@@ -82,7 +82,6 @@
   </select>
 
   <sql id="selectProcessInstances">
-    <bind name="escapeChar" value="'\'\\\''"/>
     from
       ${prefix}ACT_RU_EXECUTION RES
 
