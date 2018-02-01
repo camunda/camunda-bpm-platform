@@ -54,6 +54,7 @@ public class FetchExternalTasksDto {
 
   public static class FetchExternalTaskTopicDto {
     protected String topicName;
+    protected String businessKey;
     protected long lockDuration;
     protected List<String> variables;
     protected boolean deserializeValues = false;
@@ -63,6 +64,12 @@ public class FetchExternalTasksDto {
     }
     public void setTopicName(String topicName) {
       this.topicName = topicName;
+    }
+    public String getBusinessKey() {
+      return businessKey;
+    }
+    public void setBusinessKey(String businessKey) {
+      this.businessKey = businessKey;
     }
     public long getLockDuration() {
       return lockDuration;

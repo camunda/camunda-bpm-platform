@@ -126,6 +126,10 @@ public class ExternalTaskRestServiceImpl extends AbstractRestProcessEngineAware 
         ExternalTaskQueryTopicBuilder topicFetchBuilder =
             fetchBuilder.topic(topicDto.getTopicName(), topicDto.getLockDuration());
 
+        if (topicDto.getBusinessKey() != null) {
+          topicFetchBuilder = topicFetchBuilder.businessKey(topicDto.getBusinessKey());
+        }
+
         if (topicDto.getVariables() != null) {
           topicFetchBuilder = topicFetchBuilder.variables(topicDto.getVariables());
         }
