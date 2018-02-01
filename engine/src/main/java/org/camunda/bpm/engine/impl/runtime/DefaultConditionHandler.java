@@ -16,10 +16,11 @@ package org.camunda.bpm.engine.impl.runtime;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
 import org.camunda.bpm.engine.impl.bpmn.parser.ConditionalEventDefinition;
 import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
+import org.camunda.bpm.engine.impl.cmd.CommandLogger;
 import org.camunda.bpm.engine.impl.event.EventType;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
@@ -35,6 +36,8 @@ import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
  */
 public class DefaultConditionHandler implements ConditionHandler {
 
+  private final static CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
+
   @Override
   public List<ConditionHandlerResult> evaluateStartCondition(CommandContext commandContext, ConditionSet conditionSet) {
     if (conditionSet.getProcessDefinitionId() == null) {
@@ -47,7 +50,7 @@ public class DefaultConditionHandler implements ConditionHandler {
   protected List<ConditionHandlerResult> evaluateConditionStartByEventSubscription(CommandContext commandContext, ConditionSet conditionSet) {
     List<EventSubscriptionEntity> subscriptions = findConditionalStartEventSubscriptions(commandContext, conditionSet);
     if (subscriptions.isEmpty()) {
-      throw new ProcessEngineException("No subscriptions were found during evaluation of the conditional start events.");
+      throw LOG.exceptionWhenEvaluatingConditionalStartEvent();
     }
     List<ConditionHandlerResult> results = new ArrayList<ConditionHandlerResult>();
     for (EventSubscriptionEntity subscription : subscriptions) {
@@ -87,7 +90,7 @@ public class DefaultConditionHandler implements ConditionHandler {
     if (processDefinition != null && !processDefinition.isSuspended()) {
       List<ActivityImpl> activities = findConditionalStartEventActivities(processDefinition);
       if (activities.isEmpty()) {
-        throw new ProcessEngineException("No conditional start events were found during evaluation of the conditions by process definition with id: " + processDefinitionId);
+        throw LOG.exceptionWhenEvaluatingConditionalStartEventByProcessDefinition(processDefinitionId);
       }
       for (ActivityImpl activity : activities) {
         if (evaluateCondition(conditionSet, activity)) {

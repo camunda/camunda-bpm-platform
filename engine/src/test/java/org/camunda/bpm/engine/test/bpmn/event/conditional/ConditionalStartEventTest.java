@@ -609,7 +609,7 @@ public class ConditionalStartEventTest {
     assertEquals(0, eventSubscriptions.size());
 
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("No conditional start events were found during evaluation of the conditions by process definition with id: " + processDefinitionId);
+    thrown.expectMessage("Process definition with id " + processDefinitionId + " does not declare conditional start event");
 
 
     // when
@@ -654,7 +654,6 @@ public class ConditionalStartEventTest {
     // when
     List<ProcessInstance> instances = runtimeService
         .createConditionEvaluation()
-        .setVariable("bar", 42)
         .evaluateStartConditions();
 
     // then

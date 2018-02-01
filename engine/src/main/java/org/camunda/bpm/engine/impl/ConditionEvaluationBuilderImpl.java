@@ -32,7 +32,7 @@ public class ConditionEvaluationBuilderImpl implements ConditionEvaluationBuilde
   protected String businessKey;
   protected String processDefinitionId;
 
-  protected VariableMap variables;
+  protected VariableMap variables = new VariableMapImpl();
 
   protected String tenantId = null;
   protected boolean isTenantIdSet = false;
@@ -87,7 +87,6 @@ public class ConditionEvaluationBuilderImpl implements ConditionEvaluationBuilde
   @Override
   public ConditionEvaluationBuilder setVariable(String variableName, Object variableValue) {
     ensureNotNull("variableName", variableName);
-    ensureVariablesInitialized();
     this.variables.put(variableName, variableValue);
     return this;
   }
@@ -95,8 +94,9 @@ public class ConditionEvaluationBuilderImpl implements ConditionEvaluationBuilde
   @Override
   public ConditionEvaluationBuilder setVariables(Map<String, Object> variables) {
     ensureNotNull("variables", variables);
-    ensureVariablesInitialized();
-    this.variables.putAll(variables);
+    if (variables != null) {
+      this.variables.putAll(variables);
+    }
     return this;
   }
 
@@ -123,9 +123,4 @@ public class ConditionEvaluationBuilderImpl implements ConditionEvaluationBuilde
     return execute(new EvaluateStartConditionCmd(this));
   }
 
-  protected void ensureVariablesInitialized() {
-    if (variables == null) {
-      variables = new VariableMapImpl();
-    }
-  }
 }
