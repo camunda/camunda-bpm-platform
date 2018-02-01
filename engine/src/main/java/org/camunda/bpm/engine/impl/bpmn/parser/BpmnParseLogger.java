@@ -58,10 +58,4 @@ public class BpmnParseLogger extends ProcessEngineLogger {
         "Cannot deploy process definition '{}': there already is a message event subscription for the message with name '{}'.", resourceName, eventName));
   }
 
-  public ProcessEngineException conditionalEventSubscriptionWithSameConditionExists(String resourceName, String expr) {
-    throw new ProcessEngineException(exceptionMessage(
-        "012",
-        "Cannot deploy process definition '{}': there already is a conditional event subscription with the same condition '{}'.", resourceName, expr));
-  }
-
 }

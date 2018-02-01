@@ -1163,8 +1163,7 @@ public class BpmnParse extends Parse {
     }
     // if this is a conditional event, validate that it is the only one with the provided condition
     if (subscription.isStartEvent() && hasMultipleConditionalEventDefinitionsWithSameCondition(subscription, eventDefinitions.values())) {
-      throw LOG.conditionalEventSubscriptionWithSameConditionExists(scope.getProcessDefinition().getDeploymentId(),
-          ((ConditionalEventDefinition) subscription).getConditionAsString());
+      addError("Cannot have more than one conditional event subscription with the same condition '" + ((ConditionalEventDefinition) subscription).getConditionAsString(), element);
     }
 
     scope.getProperties().putMapEntry(BpmnProperties.EVENT_SUBSCRIPTION_DECLARATIONS, subscription.getActivityId(), subscription);
