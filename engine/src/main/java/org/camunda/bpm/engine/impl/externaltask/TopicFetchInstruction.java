@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.impl.externaltask;
 
 import java.io.Serializable;
+import java.util.AbstractMap;
 import java.util.List;
 
 /**
@@ -24,12 +25,14 @@ public class TopicFetchInstruction implements Serializable {
   private static final long serialVersionUID = 1L;
 
   protected String topicName;
+  protected AbstractMap.SimpleEntry<String, String> topicBusinessKeyTuple;
   protected List<String> variablesToFetch;
   protected long lockDuration;
   protected boolean deserializeVariables = false;
 
   public TopicFetchInstruction(String topicName, long lockDuration) {
     this.topicName = topicName;
+    this.topicBusinessKeyTuple = new AbstractMap.SimpleEntry<String, String>(topicName, null);
     this.lockDuration = lockDuration;
   }
 
@@ -41,12 +44,20 @@ public class TopicFetchInstruction implements Serializable {
     this.variablesToFetch = variablesToFetch;
   }
 
+  public void setBusinessKey(String businessKey) {
+    this.topicBusinessKeyTuple.setValue(businessKey);
+  }
+
   public Long getLockDuration() {
     return lockDuration;
   }
 
   public String getTopicName() {
     return topicName;
+  }
+
+  public AbstractMap.SimpleEntry<String, String> getTopicBusinessKeyTuple() {
+    return topicBusinessKeyTuple;
   }
 
   public boolean isDeserializeVariables() {

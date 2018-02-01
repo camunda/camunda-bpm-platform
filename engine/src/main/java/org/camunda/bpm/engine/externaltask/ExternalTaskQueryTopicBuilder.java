@@ -39,6 +39,14 @@ public interface ExternalTaskQueryTopicBuilder extends ExternalTaskQueryBuilder 
   public ExternalTaskQueryTopicBuilder variables(List<String> variables);
 
   /**
+   * Define business key value to filter external tasks by (Process Instance) Business Key.
+   *
+   * @param businessKey the value of the Business Key to filter by
+   * @return this builder
+   */
+  public ExternalTaskQueryTopicBuilder businessKey(String businessKey);
+
+  /**
    * Enable deserialization of variable values that are custom objects. By default, the query
    * will not attempt to deserialize the value of these variables.
    *

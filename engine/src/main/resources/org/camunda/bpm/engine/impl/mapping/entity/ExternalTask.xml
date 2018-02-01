@@ -148,6 +148,10 @@
     ${limitBetween}
     from ${prefix}ACT_RU_EXT_TASK RES
 
+    <if test="parameter != null &amp;&amp; parameter.businessKey">
+      inner join ${prefix}ACT_RU_EXECUTION REX on RES.PROC_INST_ID_ = REX.PROC_INST_ID_
+    </if>
+
     <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" /> 
       AUTH ON (
@@ -174,11 +178,15 @@
       (RES.LOCK_EXP_TIME_ is null or RES.LOCK_EXP_TIME_ &lt;= #{parameter.now, jdbcType=TIMESTAMP})
       and (RES.SUSPENSION_STATE_ is null or RES.SUSPENSION_STATE_ = 1)
       and (RES.RETRIES_ is null or RES.RETRIES_ > 0)
-      <if test="parameter != null">
-        and RES.TOPIC_NAME_ in 
-        <foreach collection="parameter.topics" open="(" close=")" separator="," item="topicName">
-          #{topicName}
+      <if test="parameter != null &amp;&amp; parameter.topics.size() > 0">
+        and (
+        <foreach collection="parameter.topics" open="(" close=")" separator=") OR (" index="topicName" item="businessKey">
+            RES.TOPIC_NAME_ like #{topicName}
         </foreach>
+        <if test="parameter.businessKey">
+            and REX.BUSINESS_KEY_ = #{businessKey}
+        </if>
+          )
       </if>
     </where>
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />

@@ -12,11 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
@@ -45,6 +41,7 @@ public class FetchExternalTasksCmd implements Command<List<LockedExternalTask>> 
   protected int maxResults;
   protected boolean usePriority;
   protected Map<String, TopicFetchInstruction> fetchInstructions = new HashMap<String, TopicFetchInstruction>();
+  protected boolean businessKey;
 
   public FetchExternalTasksCmd(String workerId, int maxResults, Map<String, TopicFetchInstruction> instructions) {
     this(workerId, maxResults, instructions, false);
@@ -57,13 +54,21 @@ public class FetchExternalTasksCmd implements Command<List<LockedExternalTask>> 
     this.usePriority = usePriority;
   }
 
+  public FetchExternalTasksCmd(String workerId, int maxResults, Map<String, TopicFetchInstruction> instructions, boolean businessKey, boolean usePriority) {
+    this.workerId = workerId;
+    this.maxResults = maxResults;
+    this.fetchInstructions = instructions;
+    this.businessKey = businessKey;
+    this.usePriority = usePriority;
+  }
+
   @Override
   public List<LockedExternalTask> execute(CommandContext commandContext) {
     validateInput();
 
     List<ExternalTaskEntity> externalTasks = commandContext
       .getExternalTaskManager()
-      .selectExternalTasksForTopics(fetchInstructions.keySet(), maxResults, usePriority);
+      .selectExternalTasksForTopics(getTopicBusinessKeyTupleSet(fetchInstructions), businessKey, maxResults, usePriority);
 
     final List<LockedExternalTask> result = new ArrayList<LockedExternalTask>();
 
@@ -123,5 +128,15 @@ public class FetchExternalTasksCmd implements Command<List<LockedExternalTask>> 
       EnsureUtil.ensureNotNull("topicName", instruction.getTopicName());
       EnsureUtil.ensurePositive("lockTime", instruction.getLockDuration());
     }
+  }
+
+  protected Set<AbstractMap.SimpleEntry> getTopicBusinessKeyTupleSet(Map<String, TopicFetchInstruction> instructions) {
+    Set<AbstractMap.SimpleEntry> tupleSet = new HashSet<AbstractMap.SimpleEntry>();
+
+    for (Map.Entry<String, TopicFetchInstruction> instruction : instructions.entrySet()) {
+      tupleSet.add(instruction.getValue().getTopicBusinessKeyTuple());
+    }
+
+    return tupleSet;
   }
 }

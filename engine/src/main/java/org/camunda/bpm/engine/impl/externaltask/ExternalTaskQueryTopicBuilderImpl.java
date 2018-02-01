@@ -41,6 +41,8 @@ public class ExternalTaskQueryTopicBuilderImpl implements ExternalTaskQueryTopic
 
   protected Map<String, TopicFetchInstruction> instructions;
 
+  protected boolean filterByBusinessKey;
+
   protected TopicFetchInstruction currentInstruction;
 
   public ExternalTaskQueryTopicBuilderImpl(CommandExecutor commandExecutor, String workerId, int maxTasks, boolean usePriority) {
@@ -53,7 +55,7 @@ public class ExternalTaskQueryTopicBuilderImpl implements ExternalTaskQueryTopic
 
   public List<LockedExternalTask> execute() {
     submitCurrentInstruction();
-    return commandExecutor.execute(new FetchExternalTasksCmd(workerId, maxTasks, instructions, usePriority));
+    return commandExecutor.execute(new FetchExternalTasksCmd(workerId, maxTasks, instructions, filterByBusinessKey, usePriority));
   }
 
   public ExternalTaskQueryTopicBuilder topic(String topicName, long lockDuration) {
@@ -73,6 +75,12 @@ public class ExternalTaskQueryTopicBuilderImpl implements ExternalTaskQueryTopic
 
   public ExternalTaskQueryTopicBuilder variables(List<String> variables) {
     currentInstruction.setVariablesToFetch(variables);
+    return this;
+  }
+
+  public ExternalTaskQueryTopicBuilder businessKey(String businessKey) {
+    this.filterByBusinessKey = true;
+    currentInstruction.setBusinessKey(businessKey);
     return this;
   }
 

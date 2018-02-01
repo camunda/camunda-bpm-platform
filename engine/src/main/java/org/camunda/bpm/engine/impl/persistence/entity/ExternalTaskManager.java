@@ -12,11 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.impl.Direction;
@@ -58,13 +54,14 @@ public class ExternalTaskManager extends AbstractManager {
     return getDbEntityManager().selectList("selectExternalTasksByExecutionId", processInstanceId);
   }
 
-  public List<ExternalTaskEntity> selectExternalTasksForTopics(Collection<String> topics, int maxResults, boolean usePriority) {
+  public List<ExternalTaskEntity> selectExternalTasksForTopics(Collection<AbstractMap.SimpleEntry> topics, boolean businessKey, int maxResults, boolean usePriority) {
     if (topics.isEmpty()) {
       return new ArrayList<ExternalTaskEntity>();
     }
 
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("topics", topics);
+    parameters.put("businessKey", businessKey);
     parameters.put("now", ClockUtil.getCurrentTime());
     parameters.put("applyOrdering", usePriority);
     List<QueryOrderingProperty> orderingProperties = new ArrayList<QueryOrderingProperty>();

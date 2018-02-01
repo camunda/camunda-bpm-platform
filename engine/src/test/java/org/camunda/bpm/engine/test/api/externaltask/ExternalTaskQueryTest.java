@@ -214,6 +214,34 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/parallelExternalTaskProcess.bpmn20.xml")
+  public void testQueryByBusinessKey() {
+    // given
+    String businessKey1 = "testBusinessKey1";
+    String businessKey2 = "testBusinessKey2";
+
+    runtimeService.startProcessInstanceByKey("parallelExternalTaskProcess", businessKey1);
+    runtimeService.startProcessInstanceByKey("parallelExternalTaskProcess", businessKey2);
+
+    //when
+    List<LockedExternalTask> topicTasks = externalTaskService
+        .fetchAndLock(1, "externalWorkerId")
+        .topic("topic1", 60L * 1000L)
+        .businessKey(businessKey1)
+        .execute();
+
+    //then
+    assertEquals(1, topicTasks.size());
+
+    String taskPid = topicTasks.get(0).getProcessInstanceId();
+    ProcessInstance pi = runtimeService.createProcessInstanceQuery()
+        .processInstanceId(taskPid)
+        .singleResult();
+
+    // compare test business key with queried task PI business key
+    assertEquals(businessKey1, pi.getBusinessKey());
+  }
+
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
   public void testQueryByProcessInstanceId() {
     // given
