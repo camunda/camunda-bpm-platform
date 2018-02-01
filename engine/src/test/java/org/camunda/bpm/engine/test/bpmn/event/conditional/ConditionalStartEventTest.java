@@ -609,7 +609,7 @@ public class ConditionalStartEventTest {
     assertEquals(0, eventSubscriptions.size());
 
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Process definition with id " + processDefinitionId + " does not declare conditional start event");
+    thrown.expectMessage("Process definition with id '" + processDefinitionId + "' does not declare conditional start event");
 
 
     // when
@@ -622,34 +622,32 @@ public class ConditionalStartEventTest {
   @Test
   @Deployment
   public void testStartInstanceWithVariableName() {
-    // given deployed process with two conditional start events:
+    // given deployed process
     // ${true} variableName="foo"
-    // ${true}
 
     // assume
     List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().list();
-    assertEquals(2, eventSubscriptions.size());
+    assertEquals(1, eventSubscriptions.size());
 
     // when
     List<ProcessInstance> instances = runtimeService
         .createConditionEvaluation()
-        .setVariable("foo", 42)
+        .setVariable("foo", true)
         .evaluateStartConditions();
 
     // then
-    assertEquals(2, instances.size());
+    assertEquals(1, instances.size());
   }
 
   @Test
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/conditional/ConditionalStartEventTest.testStartInstanceWithVariableName.bpmn20.xml")
   public void testStartInstanceWithVariableNameNotFullfilled() {
-    // given deployed process with two conditional start events:
+    // given deployed process
     // ${true} variableName="foo"
-    // ${true}
 
     // assume
     List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().list();
-    assertEquals(2, eventSubscriptions.size());
+    assertEquals(1, eventSubscriptions.size());
 
     // when
     List<ProcessInstance> instances = runtimeService
@@ -657,7 +655,7 @@ public class ConditionalStartEventTest {
         .evaluateStartConditions();
 
     // then
-    assertEquals(1, instances.size());
+    assertEquals(0, instances.size());
   }
 
   protected String deployProcess(String resourcePath) {
