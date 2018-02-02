@@ -2110,6 +2110,76 @@ public class TaskServiceTest {
     assertEquals(humanTaskId, variableInstance.getCaseExecutionId());
   }
 
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testGetVariablesByEmptyList() {
+    // given
+    String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess").getId();
+    String taskId = taskService.createTaskQuery()
+      .processInstanceId(processInstanceId)
+      .singleResult()
+      .getId();
 
+    // when
+    Map<String, Object> variables = taskService.getVariables(taskId, new ArrayList<String>());
+
+    // then
+    assertNotNull(variables);
+    assertTrue(variables.isEmpty());
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testGetVariablesTypedByEmptyList() {
+    // given
+    String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess").getId();
+    String taskId = taskService.createTaskQuery()
+      .processInstanceId(processInstanceId)
+      .singleResult()
+      .getId();
+
+    // when
+    Map<String, Object> variables = taskService.getVariablesTyped(taskId, new ArrayList<String>(), false);
+
+    // then
+    assertNotNull(variables);
+    assertTrue(variables.isEmpty());
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testGetVariablesLocalByEmptyList() {
+    // given
+    String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess").getId();
+    String taskId = taskService.createTaskQuery()
+      .processInstanceId(processInstanceId)
+      .singleResult()
+      .getId();
+
+    // when
+    Map<String, Object> variables = taskService.getVariablesLocal(taskId, new ArrayList<String>());
+
+    // then
+    assertNotNull(variables);
+    assertTrue(variables.isEmpty());
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testGetVariablesLocalTypedByEmptyList() {
+    // given
+    String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess").getId();
+    String taskId = taskService.createTaskQuery()
+      .processInstanceId(processInstanceId)
+      .singleResult()
+      .getId();
+
+    // when
+    Map<String, Object> variables = taskService.getVariablesLocalTyped(taskId, new ArrayList<String>(), false);
+
+    // then
+    assertNotNull(variables);
+    assertTrue(variables.isEmpty());
+  }
 
 }

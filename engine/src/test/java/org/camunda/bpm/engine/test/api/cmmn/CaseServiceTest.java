@@ -2504,4 +2504,57 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
 
     assertEquals(1, caseInstances.size());
   }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testGetVariablesByEmptyList() {
+    // given
+    String caseInstanceId = caseService.createCaseInstanceByKey("oneTaskCase").getId();
+
+    // when
+    Map<String, Object> variables = caseService.getVariables(caseInstanceId, new ArrayList<String>());
+
+    // then
+    assertNotNull(variables);
+    assertTrue(variables.isEmpty());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testGetVariablesTypedByEmptyList() {
+    // given
+    String caseInstanceId = caseService.createCaseInstanceByKey("oneTaskCase").getId();
+
+    // when
+    Map<String, Object> variables = caseService.getVariablesTyped(caseInstanceId, new ArrayList<String>(), false);
+
+    // then
+    assertNotNull(variables);
+    assertTrue(variables.isEmpty());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testGetVariablesLocalByEmptyList() {
+    // given
+    String caseInstanceId = caseService.createCaseInstanceByKey("oneTaskCase").getId();
+
+    // when
+    Map<String, Object> variables = caseService.getVariablesLocal(caseInstanceId, new ArrayList<String>());
+
+    // then
+    assertNotNull(variables);
+    assertTrue(variables.isEmpty());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testGetVariablesLocalTypedByEmptyList() {
+    // given
+    String caseInstanceId = caseService.createCaseInstanceByKey("oneTaskCase").getId();
+
+    // when
+    Map<String, Object> variables = caseService.getVariablesLocalTyped(caseInstanceId, new ArrayList<String>(), false);
+
+    // then
+    assertNotNull(variables);
+    assertTrue(variables.isEmpty());
+  }
+
 }

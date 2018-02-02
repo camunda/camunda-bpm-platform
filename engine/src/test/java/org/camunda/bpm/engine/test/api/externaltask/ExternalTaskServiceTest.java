@@ -2217,6 +2217,25 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
     assertEquals("abc", variableInstance.getName());
   }
 
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  public void testFetchWithEmptyListOfVariables() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+
+    // when
+    List<LockedExternalTask> tasks = externalTaskService.fetchAndLock(5, WORKER_ID)
+      .topic("externalTaskTopic", LOCK_TIME)
+      .variables(new String[]{})
+      .execute();
+
+    // then
+    assertEquals(1, tasks.size());
+
+    LockedExternalTask task = tasks.get(0);
+    assertNotNull(task.getId());
+    assertEquals(0, task.getVariables().size());
+  }
+
   protected Date nowPlus(long millis) {
     return new Date(ClockUtil.getCurrentTime().getTime() + millis);
   }

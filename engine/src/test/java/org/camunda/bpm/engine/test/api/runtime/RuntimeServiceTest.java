@@ -2717,6 +2717,62 @@ public class RuntimeServiceTest {
     }
   }
 
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testGetVariablesByEmptyList() {
+    // given
+    String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess").getId();
+
+    // when
+    Map<String, Object> variables = runtimeService.getVariables(processInstanceId, new ArrayList<String>());
+
+    // then
+    assertNotNull(variables);
+    assertTrue(variables.isEmpty());
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testGetVariablesTypedByEmptyList() {
+    // given
+    String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess").getId();
+
+    // when
+    Map<String, Object> variables = runtimeService.getVariablesTyped(processInstanceId, new ArrayList<String>(), false);
+
+    // then
+    assertNotNull(variables);
+    assertTrue(variables.isEmpty());
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testGetVariablesLocalByEmptyList() {
+    // given
+    String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess").getId();
+
+    // when
+    Map<String, Object> variables = runtimeService.getVariablesLocal(processInstanceId, new ArrayList<String>());
+
+    // then
+    assertNotNull(variables);
+    assertTrue(variables.isEmpty());
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testGetVariablesLocalTypedByEmptyList() {
+    // given
+    String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess").getId();
+
+    // when
+    Map<String, Object> variables = runtimeService.getVariablesLocalTyped(processInstanceId, new ArrayList<String>(), false);
+
+    // then
+    assertNotNull(variables);
+    assertTrue(variables.isEmpty());
+  }
+
   private BpmnModelInstance prepareComplexProcess(String calledProcessA,String calledProcessB,String calledProcessC) {
     BpmnModelInstance calling =
         Bpmn.createExecutableProcess("calling")
