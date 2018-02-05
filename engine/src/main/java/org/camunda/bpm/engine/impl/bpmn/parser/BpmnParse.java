@@ -2270,6 +2270,7 @@ public class BpmnParse extends Parse {
     String topicAttributeValue = element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, topicAttribute);
 
     if (topicAttributeValue == null) {
+      addError("External tasks must specify a 'topic' attribute in the camunda namespace", element);
       return null;
 
     } else {
@@ -2346,10 +2347,6 @@ public class BpmnParse extends Parse {
     activity.setScope(true);
 
     ParameterValueProvider topicNameProvider = parseTopic(serviceTaskElement, PROPERTYNAME_EXTERNAL_TASK_TOPIC);
-    if (topicNameProvider == null) {
-      addError("External tasks must specify a 'topic' attribute in the camunda namespace", serviceTaskElement);
-    }
-
     ParameterValueProvider priorityProvider = parsePriority(serviceTaskElement, PROPERTYNAME_TASK_PRIORITY);
     activity.setActivityBehavior(new ExternalTaskActivityBehavior(topicNameProvider, priorityProvider));
   }
