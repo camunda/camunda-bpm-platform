@@ -357,7 +357,7 @@ public class ProcessDefinitionManager extends AbstractManager implements Abstrac
 
     deleteSubscriptionsForProcessDefinition(processDefinitionId);
 
-    addSubsctiptionsFromPreviousVersion((ProcessDefinitionEntity) processDefinition);
+    addSubscriptionsFromPreviousVersion((ProcessDefinitionEntity) processDefinition);
 
     // delete job definitions
     getJobDefinitionManager().deleteJobDefinitionsByProcessDefinitionId(processDefinition.getId());
@@ -365,11 +365,14 @@ public class ProcessDefinitionManager extends AbstractManager implements Abstrac
     ((ProcessDefinitionEntity) processDefinition).setDeleted(true);
   }
 
-  protected void addSubsctiptionsFromPreviousVersion(ProcessDefinitionEntity processDefinition) {
+  protected void addSubscriptionsFromPreviousVersion(ProcessDefinitionEntity processDefinition) {
+    //we don't want to take the process definition from deployment cache, as it can have inconsistent value in "deleted" flag
+    //instead we take it from DbEntityCache (or the database)
     String previousProcessDefinitionId = processDefinition.getPreviousProcessDefinitionId();
     if (previousProcessDefinitionId != null) {
       ProcessDefinitionEntity previousDefinition = findLatestProcessDefinitionById(previousProcessDefinitionId);
 
+      //if not deleted, than add event subscriptions
       if (previousDefinition != null && !previousDefinition.isDeleted()) {
         ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
         DeploymentCache deploymentCache = configuration.getDeploymentCache();

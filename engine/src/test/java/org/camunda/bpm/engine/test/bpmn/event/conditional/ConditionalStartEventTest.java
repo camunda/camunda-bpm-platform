@@ -41,6 +41,7 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -339,6 +340,46 @@ public class ConditionalStartEventTest {
     repositoryService.deleteProcessDefinitions()
         .byIds(definitionId2, definitionId3)
         .delete();
+
+    // then
+    assertEquals(1, runtimeService.createEventSubscriptionQuery().count());
+    assertEquals(definitionId1, ((EventSubscriptionEntity) runtimeService.createEventSubscriptionQuery().singleResult()).getConfiguration());
+  }
+
+  /**
+   * Tests the case, when no new subscription is needed, as it is not the latest version, that is being deleted.
+   */
+  @Test
+  @Ignore("CAM-8666")
+  public void testDeleteNotLatestVersion() {
+    String definitionId1 = deployProcess(SINGLE_CONDITIONAL_XML);
+    String definitionId2 = deployProcess(SINGLE_CONDITIONAL_XML);
+    String definitionId3 = deployProcess(SINGLE_CONDITIONAL_XML);
+
+    // when
+    repositoryService.deleteProcessDefinitions()
+      .byIds(definitionId2)
+      .delete();
+
+    // then
+    assertEquals(1, runtimeService.createEventSubscriptionQuery().count());
+    assertEquals(definitionId3, ((EventSubscriptionEntity) runtimeService.createEventSubscriptionQuery().singleResult()).getConfiguration());
+  }
+
+  /**
+   * Tests the case when the previous of the previous version will be needed.
+   */
+  @Test
+  public void testSubscribePreviousPreviousVersion() {
+
+    String definitionId1 = deployProcess(SINGLE_CONDITIONAL_XML);
+    String definitionId2 = deployProcess(SINGLE_CONDITIONAL_XML);
+    String definitionId3 = deployProcess(SINGLE_CONDITIONAL_XML); //we're deleting version 3, but as version 2 is already deleted, we must subscribe version 1
+
+    // when
+    repositoryService.deleteProcessDefinitions()
+      .byIds(definitionId2, definitionId3)
+      .delete();
 
     // then
     assertEquals(1, runtimeService.createEventSubscriptionQuery().count());
