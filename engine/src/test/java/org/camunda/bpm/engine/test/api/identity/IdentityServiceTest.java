@@ -18,15 +18,21 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang.time.DateUtils;
+import org.camunda.bpm.engine.AuthenticationException;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -35,6 +41,7 @@ import org.camunda.bpm.engine.identity.Picture;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.identity.Account;
 import org.camunda.bpm.engine.impl.identity.Authentication;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.After;
@@ -47,6 +54,8 @@ import org.junit.rules.ExpectedException;
  * @author Frederik Heremans
  */
 public class IdentityServiceTest {
+
+  private final static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
   @Rule
   public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
@@ -69,6 +78,7 @@ public class IdentityServiceTest {
     for (Group group : identityService.createGroupQuery().list()) {
       identityService.deleteGroup(group.getId());
     }
+    ClockUtil.setCurrentTime(new Date());
   }
 
   @Test
@@ -610,6 +620,81 @@ public class IdentityServiceTest {
 
     assertTrue(identityService.checkPassword("johndoe", "xxx"));
     assertFalse(identityService.checkPassword("johndoe", "invalid pwd"));
+
+    identityService.deleteUser("johndoe");
+  }
+
+  @Test
+  public void testUsuccessfulAttemptsResultInException() throws ParseException {
+    User user = identityService.newUser("johndoe");
+    user.setPassword("xxx");
+    identityService.saveUser(user);
+
+    thrown.expect(AuthenticationException.class);
+    thrown.expectMessage("The user with id 'johndoe' tries to login without success.");
+
+    Date now = sdf.parse("2000-01-24T13:00:00");
+    ClockUtil.setCurrentTime(now);
+    for (int i = 0; i <= 6; i++) {
+      assertFalse(identityService.checkPassword("johndoe", "invalid pwd"));
+      now = DateUtils.addMinutes(now, 1);
+      ClockUtil.setCurrentTime(now);
+    }
+  }
+
+  @Test
+  public void testSuccessfulLoginAfterFailureAndDelay() {
+    User user = identityService.newUser("johndoe");
+    user.setPassword("xxx");
+    identityService.saveUser(user);
+
+    Date now = null;
+    now = ClockUtil.getCurrentTime();
+    assertFalse(identityService.checkPassword("johndoe", "invalid pwd"));
+    ClockUtil.setCurrentTime(DateUtils.addSeconds(now, 30));
+    assertTrue(identityService.checkPassword("johndoe", "xxx"));
+
+    identityService.deleteUser("johndoe");
+  }
+
+  @Test
+  public void testSuccessfulLoginAfterFailureWithoutDelay() {
+    User user = identityService.newUser("johndoe");
+    user.setPassword("xxx");
+    identityService.saveUser(user);
+
+    Date now = ClockUtil.getCurrentTime();
+    assertFalse(identityService.checkPassword("johndoe", "invalid pwd"));
+    try{
+    assertFalse(identityService.checkPassword("johndoe", "xxx"));
+    fail("expected exception");
+    } catch (AuthenticationException e) {
+      assertEquals("The user with id 'johndoe' tries to login without success.", e.getMessage());
+    }
+    ClockUtil.setCurrentTime(DateUtils.addSeconds(now, 30));
+    assertTrue(identityService.checkPassword("johndoe", "xxx"));
+
+    identityService.deleteUser("johndoe");
+  }
+
+  @Test
+  public void testUnsuccessfulLoginAfterFailureWithoutDelay() {
+    User user = identityService.newUser("johndoe");
+    user.setPassword("xxx");
+    identityService.saveUser(user);
+
+    Date now = null;
+    now = ClockUtil.getCurrentTime();
+    assertFalse(identityService.checkPassword("johndoe", "invalid pwd"));
+
+    // try again before exprTime
+    ClockUtil.setCurrentTime(DateUtils.addSeconds(now, 1));
+    try {
+      assertFalse(identityService.checkPassword("johndoe", "invalid pwd"));
+      fail("expected exception");
+    } catch (AuthenticationException e) {
+      assertEquals("The user with id 'johndoe' tries to login without success.", e.getMessage());
+    }
 
     identityService.deleteUser("johndoe");
   }

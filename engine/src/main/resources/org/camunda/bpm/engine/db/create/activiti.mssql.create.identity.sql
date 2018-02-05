@@ -20,6 +20,8 @@ create table ACT_ID_USER (
     EMAIL_ nvarchar(255),
     PWD_ nvarchar(255),
     SALT_ nvarchar(255),
+    LOCK_EXP_TIME_ datetime2,
+    ATTEMPTS_ int,
     PICTURE_ID_ nvarchar(64),
     primary key (ID_)
 );

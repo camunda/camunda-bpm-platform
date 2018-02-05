@@ -720,6 +720,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected String failedJobRetryTimeCycle;
 
+  // login attempts ///////////////////////////////////////////////////////
+  protected int loginMaxAttempts = 5;
+  protected int loginDelayFactor = 2;
+  protected int loginDelayMaxTime = 60;
+  protected int loginDelayBase = 2;
+
   // buildProcessEngine ///////////////////////////////////////////////////////
 
   @Override
@@ -3868,6 +3874,38 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setFailedJobRetryTimeCycle(String failedJobRetryTimeCycle) {
     this.failedJobRetryTimeCycle = failedJobRetryTimeCycle;
+  }
+
+  public int getLoginMaxAttempts() {
+    return loginMaxAttempts;
+  }
+
+  public void setLoginMaxAttempts(int loginMaxAttempts) {
+    this.loginMaxAttempts = loginMaxAttempts;
+  }
+
+  public int getLoginDelayFactor() {
+    return loginDelayFactor;
+  }
+
+  public void setLoginDelayFactor(int loginDelayFactor) {
+    this.loginDelayFactor = loginDelayFactor;
+  }
+
+  public int getLoginDelayMaxTime() {
+    return loginDelayMaxTime;
+  }
+
+  public void setLoginDelayMaxTime(int loginDelayMaxTime) {
+    this.loginDelayMaxTime = loginDelayMaxTime;
+  }
+
+  public int getLoginDelayBase() {
+    return loginDelayBase;
+  }
+
+  public void setLoginDelayBase(int loginInitialDelay) {
+    this.loginDelayBase = loginInitialDelay;
   }
 
 }

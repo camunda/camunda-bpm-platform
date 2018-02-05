@@ -20,6 +20,8 @@ create table ACT_ID_USER (
     EMAIL_ NVARCHAR2(255),
     PWD_ NVARCHAR2(255),
     SALT_ NVARCHAR2(255),
+    LOCK_EXP_TIME_ TIMESTAMP(6),
+    ATTEMPTS_ INTEGER,
     PICTURE_ID_ NVARCHAR2(64),
     primary key (ID_)
 );

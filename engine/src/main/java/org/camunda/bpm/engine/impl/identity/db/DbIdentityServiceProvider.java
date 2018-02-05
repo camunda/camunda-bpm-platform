@@ -14,14 +14,17 @@ package org.camunda.bpm.engine.impl.identity.db;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.camunda.bpm.engine.AuthenticationException;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.Tenant;
 import org.camunda.bpm.engine.identity.User;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.identity.WritableIdentityProvider;
 import org.camunda.bpm.engine.impl.persistence.entity.GroupEntity;
@@ -29,6 +32,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.MembershipEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TenantEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TenantMembershipEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.UserEntity;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 
 /**
  * <p>{@link WritableIdentityProvider} implementation backed by a
@@ -73,6 +77,74 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
 
       deleteAuthorizations(Resources.USER, userId);
       getDbEntityManager().delete(user);
+    }
+  }
+
+  public boolean checkPassword(String userId, String password) {
+    UserEntity user = findUserById(userId);
+    if (user == null || password == null) {
+      return false;
+    }
+
+    if (isUserLocked(user)) {
+      throw new AuthenticationException(userId);
+    }
+
+    if (matchPassword(password, user)) {
+      unlockUser(user);
+      return true;
+    }
+    else {
+      lockUser(user);
+      return false;
+    }
+  }
+
+  protected boolean isUserLocked(UserEntity user) {
+    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+
+    int maxAttempts = processEngineConfiguration.getLoginMaxAttempts();
+    int attempts = user.getAttempts();
+
+    if (attempts >= maxAttempts) {
+      return true;
+    }
+
+    Date lockExpirationTime = user.getLockExpirationTime();
+    Date currentTime = ClockUtil.getCurrentTime();
+
+    return lockExpirationTime != null && lockExpirationTime.after(currentTime);
+  }
+
+  protected void lockUser(UserEntity user) {
+    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+
+    int max = processEngineConfiguration.getLoginDelayMaxTime();
+    int baseTime = processEngineConfiguration.getLoginDelayBase();
+    int factor = processEngineConfiguration.getLoginDelayFactor();
+    int attempts = user.getAttempts() + 1;
+
+    long delay = (long) (baseTime * Math.pow(factor, attempts - 1));
+    delay = Math.min(delay, max) * 1000;
+
+    long currentTime = ClockUtil.getCurrentTime().getTime();
+    Date lockExpirationTime = new Date(currentTime + delay);
+
+    getIdentityInfoManager().updateUserLock(user, attempts, lockExpirationTime);
+  }
+
+  public void unlockUser(String userId) {
+    getAuthorizationManager().checkCamundaAdmin();
+
+    UserEntity user = findUserById(userId);
+    if(user != null) {
+      unlockUser(user);
+    }
+  }
+
+  protected void unlockUser(UserEntity user) {
+    if (user.getAttempts() > 0 || user.getLockExpirationTime() != null) {
+      getIdentityInfoManager().updateUserLock(user, 0, null);
     }
   }
 

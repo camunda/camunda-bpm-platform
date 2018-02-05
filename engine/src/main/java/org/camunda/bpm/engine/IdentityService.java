@@ -105,6 +105,8 @@ public interface IdentityService {
    */
   void deleteUser(String userId);
 
+  void unlockUser(String userId);
+
   /**
    * Creates a new group. The group is transient and must be saved using
    * {@link #saveGroup(Group)}.

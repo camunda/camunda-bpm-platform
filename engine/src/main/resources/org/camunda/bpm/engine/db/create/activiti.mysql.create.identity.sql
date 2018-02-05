@@ -20,6 +20,8 @@ create table ACT_ID_USER (
     EMAIL_ varchar(255),
     PWD_ varchar(255),
     SALT_ varchar(255),
+    LOCK_EXP_TIME_ timestamp NULL,
+    ATTEMPTS_ integer,
     PICTURE_ID_ varchar(64),
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;

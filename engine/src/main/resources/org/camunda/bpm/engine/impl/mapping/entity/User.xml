@@ -33,6 +33,15 @@
       and REV_ = #{revision}
   </update>
   
+  <update id="updateUserLock" parameterType="org.camunda.bpm.engine.impl.persistence.entity.UserEntity">
+    update ${prefix}ACT_ID_USER set
+      REV_ = #{revisionNext ,jdbcType=INTEGER},
+      LOCK_EXP_TIME_ = #{lockExpirationTime ,jdbcType=TIMESTAMP},
+      ATTEMPTS_ = #{attempts ,jdbcType=INTEGER}
+    where ID_ = #{id}
+      and REV_ = #{revision}
+  </update>
+  
   <!-- USER DELETE -->
 
   <delete id="deleteUser" parameterType="org.camunda.bpm.engine.impl.persistence.entity.UserEntity">
@@ -49,6 +58,8 @@
     <result property="email" column="EMAIL_" jdbcType="VARCHAR" />
     <result property="dbPassword" column="PWD_" jdbcType="VARCHAR" />
     <result property="salt" column="SALT_" jdbcType="VARCHAR" />
+    <result property="lockExpirationTime" column="LOCK_EXP_TIME_" jdbcType="TIMESTAMP" />
+    <result property="attempts" column="ATTEMPTS_" jdbcType="INTEGER" />
   </resultMap>
   
   <!-- USER SELECT -->
