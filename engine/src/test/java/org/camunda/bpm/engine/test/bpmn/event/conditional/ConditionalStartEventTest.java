@@ -349,7 +349,7 @@ public class ConditionalStartEventTest {
   public void testDeploymentOfTwoEqualConditionalStartEvent() {
     // expect
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Could not parse BPMN process");
+    thrown.expectMessage("Cannot have more than one conditional event subscription with the same condition '${variable == 1}'");
 
     // when
     testRule.deploy("org/camunda/bpm/engine/test/bpmn/event/conditional/ConditionalStartEventTest.testTwoEqualConditionalStartEvent.bpmn20.xml");
