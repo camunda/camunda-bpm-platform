@@ -68,7 +68,6 @@ import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration
 import org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
@@ -81,6 +80,7 @@ import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.api.runtime.util.SimpleSerializableBean;
 import org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener;
 import org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener.RecordedEvent;
@@ -96,6 +96,7 @@ import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -575,6 +576,36 @@ public class RuntimeServiceTest {
     // then
     testRule.assertProcessEnded(processInstance.getId());
   }
+
+  @Test
+  @Ignore("CAM-8680")
+  public void testDeleteCalledSubprocess() {
+
+    // given
+    BpmnModelInstance callingInstance = ProcessModels.newModel("oneTaskProcess")
+      .startEvent()
+      .callActivity()
+      .calledElement("called")
+      .endEvent()
+      .done();
+
+    BpmnModelInstance calledInstance = ProcessModels.newModel("called")
+      .startEvent()
+      .userTask()
+      .endEvent()
+      .done();
+
+    testRule.deploy(callingInstance, calledInstance);
+    final String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess").getProcessInstanceId();
+
+    String subprocessId = historyService.createHistoricProcessInstanceQuery().processDefinitionKey("called").singleResult().getId();
+
+    runtimeService.deleteProcessInstance(subprocessId, TESTING_INSTANCE_DELETION);
+
+    assertEquals(TESTING_INSTANCE_DELETION, historyService.createHistoricProcessInstanceQuery().processInstanceId(subprocessId).singleResult().getDeleteReason());
+    assertEquals(TESTING_INSTANCE_DELETION, historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult().getDeleteReason());
+  }
+
 
   @Deployment(resources={
     "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
