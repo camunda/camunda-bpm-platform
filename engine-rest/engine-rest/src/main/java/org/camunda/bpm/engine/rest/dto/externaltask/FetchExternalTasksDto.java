@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.rest.dto.externaltask;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -57,6 +58,7 @@ public class FetchExternalTasksDto {
     protected String businessKey;
     protected long lockDuration;
     protected List<String> variables;
+    protected HashMap<String, Object> processVariables;
     protected boolean deserializeValues = false;
 
     public String getTopicName() {
@@ -82,6 +84,12 @@ public class FetchExternalTasksDto {
     }
     public void setVariables(List<String> variables) {
       this.variables = variables;
+    }
+    public HashMap<String, Object> getProcessVariables() {
+      return processVariables;
+    }
+    public void setProcessVariables(HashMap<String, Object> processVariables) {
+      this.processVariables = processVariables;
     }
     public boolean isDeserializeValues() {
       return deserializeValues;

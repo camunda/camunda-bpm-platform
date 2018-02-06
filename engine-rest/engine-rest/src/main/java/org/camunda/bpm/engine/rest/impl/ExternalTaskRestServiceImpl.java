@@ -40,7 +40,6 @@ import org.camunda.bpm.engine.rest.dto.externaltask.FetchExternalTasksDto.FetchE
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.dto.externaltask.LockedExternalTaskDto;
 import org.camunda.bpm.engine.rest.dto.externaltask.SetRetriesForExternalTasksDto;
 import org.camunda.bpm.engine.rest.sub.externaltask.ExternalTaskResource;
@@ -132,6 +131,10 @@ public class ExternalTaskRestServiceImpl extends AbstractRestProcessEngineAware 
 
         if (topicDto.getVariables() != null) {
           topicFetchBuilder = topicFetchBuilder.variables(topicDto.getVariables());
+        }
+
+        if (topicDto.getProcessVariables() != null) {
+          topicFetchBuilder = topicFetchBuilder.processInstanceVariableEquals(topicDto.getProcessVariables());
         }
 
         if (topicDto.isDeserializeValues()) {
