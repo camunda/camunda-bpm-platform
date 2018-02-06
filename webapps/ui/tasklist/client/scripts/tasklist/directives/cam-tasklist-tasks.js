@@ -137,7 +137,8 @@ module.exports = [function() {
           if (taskListQuery) {
 
             var oldQuery = $scope.query;
-
+            var searchParams = ($location.search() || {});
+            var forceDisplayTask = searchParams.forceDisplayTask;
             // parse pagination properties from query
             $scope.query = angular.copy(taskListQuery);
             $scope.pageSize = $scope.query.maxResults;
@@ -145,6 +146,10 @@ module.exports = [function() {
             $scope.pageNum = ($scope.query.firstResult / $scope.pageSize) + 1;
 
             // only clear the task if the filter changed
+            if(forceDisplayTask) {
+              delete searchParams.forceDisplayTask;
+              return search.updateSilently(searchParams)
+            }
             if (oldQuery.id && oldQuery.id !== taskListQuery.id) {
               clearSelectedTask();
             }
@@ -177,9 +182,9 @@ module.exports = [function() {
           tasksData.set('taskId', { 'taskId' : taskId });
           $scope.currentTaskId = taskId;
 
-          var searchParams = $location.search() || {};
+          var searchParams = angular.copy(search) || {};
           searchParams.task = taskId;
-          updateSilently(searchParams);
+          search.updateSilently(searchParams);
 
           var el = document.querySelector('[cam-tasks] .tasks-list .task [href*="#/?task=' + taskId + '"]');
           if(el) {
