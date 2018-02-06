@@ -148,7 +148,7 @@ module.exports = [function() {
             // only clear the task if the filter changed
             if(forceDisplayTask) {
               delete searchParams.forceDisplayTask;
-              return search.updateSilently(searchParams)
+              return search.updateSilently(searchParams);
             }
             if (oldQuery.id && oldQuery.id !== taskListQuery.id) {
               clearSelectedTask();
