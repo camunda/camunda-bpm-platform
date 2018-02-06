@@ -182,7 +182,7 @@
       and (RES.RETRIES_ is null or RES.RETRIES_ > 0)
       <if test="parameter != null &amp;&amp; parameter.topics.size() > 0">
         and
-        <foreach collection="parameter.topics" open="(" close=")" separator=") or (" item="topicFilters">
+        <foreach collection="parameter.topics" open="(" close=")" separator="or" item="topicFilters">
           RES.TOPIC_NAME_ like #{topicFilters.topicName}
           <if test="parameter.businessKeyFilter">
             and REX.BUSINESS_KEY_ = #{topicFilters.businessKey}
