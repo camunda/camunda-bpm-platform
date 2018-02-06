@@ -144,7 +144,8 @@ module.exports = [function() {
             // Sachbearbeiter starts counting at '1'
             $scope.pageNum = ($scope.query.firstResult / $scope.pageSize) + 1;
 
-            if (oldQuery.id) {
+            // only clear the task if the filter changed
+            if (oldQuery.id && oldQuery.id !== taskListQuery.id) {
               clearSelectedTask();
             }
           } else {
