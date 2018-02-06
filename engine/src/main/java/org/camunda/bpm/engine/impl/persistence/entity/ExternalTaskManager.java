@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.impl.ExternalTaskQueryProperty;
 import org.camunda.bpm.engine.impl.QueryOrderingProperty;
 import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
+import org.camunda.bpm.engine.impl.externaltask.TopicFetchInstruction;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 
@@ -54,14 +55,15 @@ public class ExternalTaskManager extends AbstractManager {
     return getDbEntityManager().selectList("selectExternalTasksByExecutionId", processInstanceId);
   }
 
-  public List<ExternalTaskEntity> selectExternalTasksForTopics(Collection<AbstractMap.SimpleEntry> topics, boolean businessKey, int maxResults, boolean usePriority) {
-    if (topics.isEmpty()) {
+  public List<ExternalTaskEntity> selectExternalTasksForTopics(Collection<TopicFetchInstruction> queryFilters, boolean filterByBusinessKey, boolean filterByVariable, int maxResults, boolean usePriority) {
+    if (queryFilters.isEmpty()) {
       return new ArrayList<ExternalTaskEntity>();
     }
 
     Map<String, Object> parameters = new HashMap<String, Object>();
-    parameters.put("topics", topics);
-    parameters.put("businessKey", businessKey);
+    parameters.put("topics", queryFilters);
+    parameters.put("businessKeyFilter", filterByBusinessKey);
+    parameters.put("variableValueFilter", filterByVariable);
     parameters.put("now", ClockUtil.getCurrentTime());
     parameters.put("applyOrdering", usePriority);
     List<QueryOrderingProperty> orderingProperties = new ArrayList<QueryOrderingProperty>();
@@ -136,3 +138,5 @@ public class ExternalTaskManager extends AbstractManager {
     return getTenantManager().configureQuery(parameter);
   }
 }
+
+

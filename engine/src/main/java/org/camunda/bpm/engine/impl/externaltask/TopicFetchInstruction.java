@@ -12,9 +12,15 @@
  */
 package org.camunda.bpm.engine.impl.externaltask;
 
+import org.camunda.bpm.engine.impl.QueryOperator;
+import org.camunda.bpm.engine.impl.QueryVariableValue;
+import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.variable.serializer.VariableSerializers;
+
 import java.io.Serializable;
-import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Thorben Lindhauer
@@ -25,15 +31,16 @@ public class TopicFetchInstruction implements Serializable {
   private static final long serialVersionUID = 1L;
 
   protected String topicName;
-  protected AbstractMap.SimpleEntry<String, String> topicBusinessKeyTuple;
+  protected String businessKey;
   protected List<String> variablesToFetch;
+  protected List<QueryVariableValue> filterVariables;
   protected long lockDuration;
   protected boolean deserializeVariables = false;
 
   public TopicFetchInstruction(String topicName, long lockDuration) {
     this.topicName = topicName;
-    this.topicBusinessKeyTuple = new AbstractMap.SimpleEntry<String, String>(topicName, null);
     this.lockDuration = lockDuration;
+    this.filterVariables = new ArrayList<QueryVariableValue>();
   }
 
   public List<String> getVariablesToFetch() {
@@ -45,7 +52,24 @@ public class TopicFetchInstruction implements Serializable {
   }
 
   public void setBusinessKey(String businessKey) {
-    this.topicBusinessKeyTuple.setValue(businessKey);
+    this.businessKey = businessKey;
+  }
+
+  public List<QueryVariableValue> getFilterVariables() {
+    return filterVariables;
+  }
+
+  public void setFilterVariables(Map<String, Object> filterVariables) {
+    QueryVariableValue variableValue;
+    for (Map.Entry<String, Object> filter : filterVariables.entrySet()) {
+      variableValue = new QueryVariableValue(filter.getKey(), filter.getValue(), null, false);
+      this.filterVariables.add(variableValue);
+    }
+  }
+
+  public void addFilterVariable(String name, Object value) {
+    QueryVariableValue variableValue = new QueryVariableValue(name, value, QueryOperator.EQUALS, true);
+    this.filterVariables.add(variableValue);
   }
 
   public Long getLockDuration() {
@@ -56,10 +80,6 @@ public class TopicFetchInstruction implements Serializable {
     return topicName;
   }
 
-  public AbstractMap.SimpleEntry<String, String> getTopicBusinessKeyTuple() {
-    return topicBusinessKeyTuple;
-  }
-
   public boolean isDeserializeVariables() {
     return deserializeVariables;
   }
@@ -68,4 +88,14 @@ public class TopicFetchInstruction implements Serializable {
     this.deserializeVariables = deserializeVariables;
   }
 
+  public void ensureVariablesInitialized() {
+    if (!filterVariables.isEmpty()) {
+      VariableSerializers variableSerializers = Context
+          .getProcessEngineConfiguration()
+          .getVariableSerializers();
+      for(QueryVariableValue queryVariableValue : filterVariables) {
+        queryVariableValue.initialize(variableSerializers);
+      }
+    }
+  }
 }

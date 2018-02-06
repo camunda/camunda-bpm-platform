@@ -43,6 +43,8 @@ public class ExternalTaskQueryTopicBuilderImpl implements ExternalTaskQueryTopic
 
   protected boolean filterByBusinessKey;
 
+  protected boolean filterByVariables;
+
   protected TopicFetchInstruction currentInstruction;
 
   public ExternalTaskQueryTopicBuilderImpl(CommandExecutor commandExecutor, String workerId, int maxTasks, boolean usePriority) {
@@ -50,12 +52,14 @@ public class ExternalTaskQueryTopicBuilderImpl implements ExternalTaskQueryTopic
     this.workerId = workerId;
     this.maxTasks = maxTasks;
     this.usePriority = usePriority;
+    this.filterByBusinessKey = false;
+    this.filterByVariables = false;
     this.instructions = new HashMap<String, TopicFetchInstruction>();
   }
 
   public List<LockedExternalTask> execute() {
     submitCurrentInstruction();
-    return commandExecutor.execute(new FetchExternalTasksCmd(workerId, maxTasks, instructions, filterByBusinessKey, usePriority));
+    return commandExecutor.execute(new FetchExternalTasksCmd(workerId, maxTasks, instructions, filterByBusinessKey, filterByVariables, usePriority));
   }
 
   public ExternalTaskQueryTopicBuilder topic(String topicName, long lockDuration) {
@@ -75,6 +79,18 @@ public class ExternalTaskQueryTopicBuilderImpl implements ExternalTaskQueryTopic
 
   public ExternalTaskQueryTopicBuilder variables(List<String> variables) {
     currentInstruction.setVariablesToFetch(variables);
+    return this;
+  }
+
+  public ExternalTaskQueryTopicBuilder processInstanceVariableEquals(Map<String, Object> variables) {
+    this.filterByVariables = true;
+    currentInstruction.setFilterVariables(variables);
+    return this;
+  }
+
+  public ExternalTaskQueryTopicBuilder processInstanceVariableEquals(String name, Object value) {
+    this.filterByVariables = true;
+    currentInstruction.addFilterVariable(name, value);
     return this;
   }
 

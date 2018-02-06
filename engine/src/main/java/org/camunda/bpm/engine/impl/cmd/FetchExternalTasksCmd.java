@@ -41,7 +41,8 @@ public class FetchExternalTasksCmd implements Command<List<LockedExternalTask>> 
   protected int maxResults;
   protected boolean usePriority;
   protected Map<String, TopicFetchInstruction> fetchInstructions = new HashMap<String, TopicFetchInstruction>();
-  protected boolean businessKey;
+  protected boolean filterByBusinessKey;
+  protected boolean filterByVariables;
 
   public FetchExternalTasksCmd(String workerId, int maxResults, Map<String, TopicFetchInstruction> instructions) {
     this(workerId, maxResults, instructions, false);
@@ -51,14 +52,17 @@ public class FetchExternalTasksCmd implements Command<List<LockedExternalTask>> 
     this.workerId = workerId;
     this.maxResults = maxResults;
     this.fetchInstructions = instructions;
+    this.filterByBusinessKey = false;
+    this.filterByVariables = false;
     this.usePriority = usePriority;
   }
 
-  public FetchExternalTasksCmd(String workerId, int maxResults, Map<String, TopicFetchInstruction> instructions, boolean businessKey, boolean usePriority) {
+  public FetchExternalTasksCmd(String workerId, int maxResults, Map<String, TopicFetchInstruction> instructions, boolean filterByBusinessKey, boolean filterByVariables, boolean usePriority) {
     this.workerId = workerId;
     this.maxResults = maxResults;
     this.fetchInstructions = instructions;
-    this.businessKey = businessKey;
+    this.filterByBusinessKey = filterByBusinessKey;
+    this.filterByVariables = filterByVariables;
     this.usePriority = usePriority;
   }
 
@@ -66,9 +70,13 @@ public class FetchExternalTasksCmd implements Command<List<LockedExternalTask>> 
   public List<LockedExternalTask> execute(CommandContext commandContext) {
     validateInput();
 
+    for (TopicFetchInstruction instruction : fetchInstructions.values()) {
+      instruction.ensureVariablesInitialized();
+    }
+
     List<ExternalTaskEntity> externalTasks = commandContext
       .getExternalTaskManager()
-      .selectExternalTasksForTopics(getTopicBusinessKeyTupleSet(fetchInstructions), businessKey, maxResults, usePriority);
+      .selectExternalTasksForTopics(fetchInstructions.values(), filterByBusinessKey, filterByVariables, maxResults, usePriority);
 
     final List<LockedExternalTask> result = new ArrayList<LockedExternalTask>();
 
@@ -128,15 +136,5 @@ public class FetchExternalTasksCmd implements Command<List<LockedExternalTask>> 
       EnsureUtil.ensureNotNull("topicName", instruction.getTopicName());
       EnsureUtil.ensurePositive("lockTime", instruction.getLockDuration());
     }
-  }
-
-  protected Set<AbstractMap.SimpleEntry> getTopicBusinessKeyTupleSet(Map<String, TopicFetchInstruction> instructions) {
-    Set<AbstractMap.SimpleEntry> tupleSet = new HashSet<AbstractMap.SimpleEntry>();
-
-    for (Map.Entry<String, TopicFetchInstruction> instruction : instructions.entrySet()) {
-      tupleSet.add(instruction.getValue().getTopicBusinessKeyTuple());
-    }
-
-    return tupleSet;
   }
 }

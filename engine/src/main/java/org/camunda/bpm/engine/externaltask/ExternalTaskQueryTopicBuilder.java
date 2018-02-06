@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.externaltask;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Thorben Lindhauer
@@ -37,6 +38,25 @@ public interface ExternalTaskQueryTopicBuilder extends ExternalTaskQueryBuilder 
    * @return this builder
    */
   public ExternalTaskQueryTopicBuilder variables(List<String> variables);
+
+  /**
+   * Define a HashMap of variables and their values to filter correlated tasks.
+   * Calling this method multiple times overrides the previously specified variables.
+   *
+   * @param variables a HashMap of the variable names (keys) and the values to filter by
+   * @return this builder
+   */
+  public ExternalTaskQueryTopicBuilder processInstanceVariableEquals(Map<String, Object> variables);
+
+  /**
+   * Define a single variable and its name to filter tasks in a topic. Multiple calls to
+   * this method add to the existing "variable filters".
+   *
+   * @param name the name of the variable you want to fetch and query by
+   * @param value the value of the variable which you want to filter
+   * @return this builder
+   */
+  public ExternalTaskQueryTopicBuilder processInstanceVariableEquals(String name, Object value);
 
   /**
    * Define business key value to filter external tasks by (Process Instance) Business Key.

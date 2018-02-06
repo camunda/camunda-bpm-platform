@@ -148,10 +148,12 @@
     ${limitBetween}
     from ${prefix}ACT_RU_EXT_TASK RES
 
-    <if test="parameter != null &amp;&amp; parameter.businessKey">
+    <if test="parameter != null &amp;&amp; parameter.businessKeyFilter">
       inner join ${prefix}ACT_RU_EXECUTION REX on RES.PROC_INST_ID_ = REX.PROC_INST_ID_
     </if>
-
+    <if test="parameter != null &amp;&amp; parameter.variableValueFilter">
+      inner join ${prefix}ACT_RU_VARIABLE VAR on RES.PROC_INST_ID_ = VAR.EXECUTION_ID_
+    </if>
     <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" /> 
       AUTH ON (
@@ -179,14 +181,51 @@
       and (RES.SUSPENSION_STATE_ is null or RES.SUSPENSION_STATE_ = 1)
       and (RES.RETRIES_ is null or RES.RETRIES_ > 0)
       <if test="parameter != null &amp;&amp; parameter.topics.size() > 0">
-        and (
-        <foreach collection="parameter.topics" open="(" close=")" separator=") OR (" index="topicName" item="businessKey">
-            RES.TOPIC_NAME_ like #{topicName}
+        and
+        <foreach collection="parameter.topics" open="(" close=")" separator=") or (" item="topicFilters">
+          RES.TOPIC_NAME_ like #{topicFilters.topicName}
+          <if test="parameter.businessKeyFilter">
+            and REX.BUSINESS_KEY_ = #{topicFilters.businessKey}
+          </if>
+          <if test="parameter.variableValueFilter &amp;&amp; topicFilters.filterVariables.size() > 0">
+            and
+            <foreach collection="topicFilters.filterVariables" open="(" close=")" separator=") or (" item="variable">
+              VAR.NAME_ like #{variable.name}
+              and
+              <bind name="varTypeField" value="'TYPE_'"/>
+              <bind name="varPrefix" value="'VAR.'"/>
+              <foreach collection="variable.getValueConditions()" item="variableValue" separator="or">
+                <trim prefix="(" prefixOverrides="and" suffix=")">
+                  <if test="!variableValue.type.equals('null')">
+                      <!-- When type of value is null, type doesn't matter! -->
+                      and ${varPrefix}${varTypeField} is not null and ${varPrefix}${varTypeField} like #{variableValue.type}
+                  </if>
+
+                  <if test="variableValue.textValue != null &amp;&amp; variableValue.longValue == null &amp;&amp; variableValue.doubleValue == null">
+                      and ${varPrefix}TEXT_ is not null and ${varPrefix}TEXT_ like #{variableValue.textValue}
+                  </if>
+                  <if test="variableValue.textValue2 != null">
+                      and ${varPrefix}TEXT2_ is not null and ${varPrefix}TEXT2_ like #{variableValue.textValue2}
+                  </if>
+
+                  <if test="variableValue.longValue != null">
+                      and ${varPrefix}LONG_ is not null and ${varPrefix}LONG_ = #{variableValue.longValue}
+                  </if>
+
+                  <if test="variableValue.doubleValue != null">
+                      and ${varPrefix}DOUBLE_ is not null and ${varPrefix}DOUBLE_ = #{variableValue.doubleValue}
+                  </if>
+
+                  <!-- Null variable type -->
+                  <if test="variableValue.textValue == null &amp;&amp; variableValue.textValue2 == null &amp;&amp; variableValue.longValue == null &amp;&amp; variableValue.doubleValue == null">
+                      and ${varPrefix}TEXT_ is null and ${varPrefix}TEXT2_ is null and ${varPrefix}LONG_ is null and ${varPrefix}DOUBLE_ is null and ${varPrefix}BYTEARRAY_ID_ is null
+                  </if>
+                </trim>
+              </foreach>
+            </foreach>
+          </if>
         </foreach>
-        <if test="parameter.businessKey">
-            and REX.BUSINESS_KEY_ = #{businessKey}
-        </if>
-          )
+
       </if>
     </where>
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
@@ -196,7 +235,7 @@
     </if>
     ${limitAfter}
   </select>
-  
+
   <select id="selectExternalTaskByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.ExternalTaskQueryImpl" resultMap="externalTaskResultMap">
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
@@ -341,4 +380,5 @@
     RES.TENANT_ID_,
     RES.PRIORITY_
   </sql>
+
 </mapper>

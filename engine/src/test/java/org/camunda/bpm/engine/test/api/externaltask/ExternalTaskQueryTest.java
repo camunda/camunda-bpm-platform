@@ -20,10 +20,7 @@ import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.externalT
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.inverted;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.verifySorting;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
@@ -240,6 +237,53 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
 
     // compare test business key with queried task PI business key
     assertEquals(businessKey1, pi.getBusinessKey());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.testVariableValueTopicQuery.bpmn20.xml")
+  public void testQueryByVariableValues() {
+    // given
+    String topicName1 = "testTopic1";
+    String topicName2 = "testTopic2";
+    String businessKey = "testBusinessKey";
+    String variableName = "testVariable";
+    String variableValue = "testValue";
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put(variableName, variableValue);
+
+    //when
+    runtimeService.startProcessInstanceByKey("parallelExternalTaskProcessTopicQueryVariableValues", variables);
+    List<LockedExternalTask> topicTasks = externalTaskService
+        .fetchAndLock(2, "externalWorkerId")
+        .topic(topicName1, 60L * 1000L)
+        .processInstanceVariableEquals(variableName, variableValue)
+        .execute();
+
+    runtimeService.startProcessInstanceByKey("parallelExternalTaskProcessTopicQueryVariableValues", businessKey, variables);
+    List<LockedExternalTask> topicTasksBK = externalTaskService
+        .fetchAndLock(2, "externalWorkerId")
+        .topic(topicName2, 60L * 1000L)
+        .businessKey(businessKey)
+        .processInstanceVariableEquals(variables)
+        .execute();
+
+    //then
+    assertEquals(1, topicTasks.size());
+
+    LockedExternalTask externalTask = topicTasks.get(0);
+    assertEquals(topicName1, externalTask.getTopicName());
+    assertEquals(variableValue, externalTask.getVariables().get(variableName));
+
+    assertEquals(1, topicTasksBK.size());
+
+    LockedExternalTask externalTaskBK = topicTasksBK.get(0);
+    assertEquals(topicName2, externalTaskBK.getTopicName());
+
+    ProcessInstance pi = runtimeService.createProcessInstanceQuery()
+        .processInstanceId(externalTaskBK.getProcessInstanceId())
+        .singleResult();
+
+    assertEquals(businessKey, pi.getBusinessKey());
+    assertEquals(variableValue, externalTask.getVariables().get(variableName));
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
