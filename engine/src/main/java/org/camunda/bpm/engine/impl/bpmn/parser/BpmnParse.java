@@ -4226,7 +4226,7 @@ public class BpmnParse extends Parse {
                                                           // lane, but it might
                                                           // still reference
                                                           // 'something'
-            addError("Invalid reference in 'bpmnElement' attribute, activity " + bpmnElement + "not found", bpmnShapeElement);
+            addError("Invalid reference in 'bpmnElement' attribute, activity " + bpmnElement + " not found", bpmnShapeElement);
           }
         }
       }
