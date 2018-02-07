@@ -148,14 +148,11 @@
     from ${prefix}ACT_RU_EXECUTION RES
     inner join ${prefix}ACT_RE_PROCDEF P
     on RES.PROC_DEF_ID_ = P.ID_
-    WHERE RES.PARENT_ID_ is null and RES.PROC_INST_ID_ in
-      <foreach item="id" 
-               collection="parameter" 
-               open="(" 
-               separator="," 
-               close=")">
-        #{id}
-      </foreach>
+    WHERE
+      RES.PARENT_ID_ is null and
+      <bind name="listOfIds" value="parameter" />
+      <bind name="fieldName" value="'RES.PROC_INST_ID_'" />
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection" />
   </select> 
 
 </mapper>

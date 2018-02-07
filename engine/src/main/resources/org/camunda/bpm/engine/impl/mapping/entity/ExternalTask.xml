@@ -189,7 +189,7 @@
           </if>
           <if test="parameter.variableValueFilter &amp;&amp; topicFilters.filterVariables.size() > 0">
             and
-            <foreach collection="topicFilters.filterVariables" open="(" close=")" separator=") or (" item="variable">
+            <foreach collection="topicFilters.filterVariables" open="(" close=")" separator="or" item="variable">
               VAR.NAME_ like #{variable.name}
               and
               <bind name="varTypeField" value="'TYPE_'"/>
