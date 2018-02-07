@@ -108,11 +108,7 @@ public class HistoricCaseInstanceManager extends AbstractHistoricManager {
 
   @SuppressWarnings("unchecked")
   public List<String> findHistoricCaseInstanceIdsForCleanup(int batchSize) {
-    ListQueryParameterObject parameterObject = new ListQueryParameterObject();
-    parameterObject.setParameter(ClockUtil.getCurrentTime());
-    parameterObject.getOrderingProperties().add(new QueryOrderingProperty(new QueryPropertyImpl("CLOSE_TIME_"), Direction.ASCENDING));
-    parameterObject.setFirstResult(0);
-    parameterObject.setMaxResults(batchSize);
+    ListQueryParameterObject parameterObject = new ListQueryParameterObject(ClockUtil.getCurrentTime(), 0, batchSize);
     return getDbEntityManager().selectList("selectHistoricCaseInstanceIdsForCleanup", parameterObject);
   }
 

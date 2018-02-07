@@ -284,27 +284,25 @@
 
   <!-- Select ids for async history cleanup -->
   <sql id="selectHistoricDecisionInstanceIdsForCleanupSql">
-        FROM ${prefix}ACT_HI_DECINST di, ${prefix}ACT_RE_DECISION_DEF dd
-        where
-        di.DEC_DEF_ID_ = dd.ID_
-        AND not dd.HISTORY_TTL_ is NULL
-    </sql>
-
-  <select id="selectHistoricDecisionInstanceIdsForCleanup" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
-    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     <bind name="days" value="'dd.HISTORY_TTL_'"/>
     <bind name="date" value="'di.EVAL_TIME_'"/>
     <bind name="currentTimestamp" value="parameter"/>
-    ${limitBefore}
-    SELECT DISTINCT RES.*
-    ${limitBetween}
-    FROM (
-      SELECT di.ID_, di.EVAL_TIME_
-      <include refid="selectHistoricDecisionInstanceIdsForCleanupSql"/>
-      AND ${dayComparator}
-    ) RES
-    ${orderBy}
-    ${limitAfter}
+    FROM ${prefix}ACT_HI_DECINST di, ${prefix}ACT_RE_DECISION_DEF dd
+    where
+        di.DEC_DEF_ID_ = dd.ID_
+        AND not dd.HISTORY_TTL_ is NULL
+        AND ${dayComparator}
+    ${limitAfterWithoutOffset}
+  </sql>
+
+  <select id="selectHistoricDecisionInstanceIdsForCleanup" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
+    SELECT ${limitBeforeWithoutOffset} di.ID_, di.EVAL_TIME_
+    <include refid="selectHistoricDecisionInstanceIdsForCleanupSql"/>
+  </select>
+
+  <select id="selectHistoricDecisionInstanceIdsForCleanup_oracle" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
+    SELECT /*+ FIRST_ROWS(${maxResults}) NO_PARALLEL(di) NO_PARALLEL(dd) */ di.ID_, di.EVAL_TIME_
+    <include refid="selectHistoricDecisionInstanceIdsForCleanupSql"/>
   </select>
 
   <!-- Select History Cleanup Report Entities -->

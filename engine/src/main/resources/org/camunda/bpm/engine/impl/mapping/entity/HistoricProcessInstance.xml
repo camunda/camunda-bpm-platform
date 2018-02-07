@@ -427,37 +427,26 @@
 
   <!-- Select ids for async history cleanup -->
   <sql id="selectHistoricProcessInstanceIdsForCleanupSql">
+    <bind name="days" value="'pd.HISTORY_TTL_'"/>
+    <bind name="date" value="'pi.END_TIME_'"/>
+    <bind name="currentTimestamp" value="parameter"/>
     FROM ${prefix}ACT_HI_PROCINST pi, ${prefix}ACT_RE_PROCDEF pd
     where
         pi.PROC_DEF_ID_ = pd.ID_
         AND not pi.END_TIME_ is NULL
         AND not pd.HISTORY_TTL_ is NULL
+        AND ${dayComparator}
+    ${limitAfterWithoutOffset}
   </sql>
 
   <select id="selectHistoricProcessInstanceIdsForCleanup" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
-    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
-    <bind name="days" value="'pd.HISTORY_TTL_'"/>
-    <bind name="date" value="'pi.END_TIME_'"/>
-    <bind name="currentTimestamp" value="parameter"/>
-    ${limitBefore}
-    SELECT DISTINCT RES.*
-    ${limitBetween}
-    FROM (
-      SELECT pi.PROC_INST_ID_, pi.END_TIME_
-      <include refid="selectHistoricProcessInstanceIdsForCleanupSql"/>
-      AND ${dayComparator}
-    ) RES
-    ${orderBy}
-    ${limitAfter}
+    SELECT ${limitBeforeWithoutOffset} pi.PROC_INST_ID_, pi.END_TIME_
+    <include refid="selectHistoricProcessInstanceIdsForCleanupSql"/>
   </select>
 
-  <select id="selectHistoricProcessInstanceIdsForCleanupCount" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="long">
-    <bind name="days" value="'pd.HISTORY_TTL_'"/>
-    <bind name="date" value="'pi.END_TIME_'"/>
-    <bind name="currentTimestamp" value="parameter"/>
-    SELECT count(pi.PROC_INST_ID_)
+  <select id="selectHistoricProcessInstanceIdsForCleanup_oracle" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
+    SELECT /*+ FIRST_ROWS(${maxResults}) NO_PARALLEL(pi) NO_PARALLEL(pd) */ pi.PROC_INST_ID_, pi.END_TIME_
     <include refid="selectHistoricProcessInstanceIdsForCleanupSql"/>
-    AND ${dayComparator}
   </select>
 
   <!-- DB2 or MSSQL -->

@@ -295,27 +295,25 @@
 
   <!-- Select ids for async history cleanup -->
   <sql id="selectHistoricCaseInstanceIdsForCleanupSql">
-    FROM ${prefix}ACT_HI_CASEINST ci, ${prefix}ACT_RE_CASE_DEF cd
-    where
-    ci.CASE_DEF_ID_ = cd.ID_
-    AND not cd.HISTORY_TTL_ is NULL
-  </sql>
-
-  <select id="selectHistoricCaseInstanceIdsForCleanup" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
-    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     <bind name="days" value="'cd.HISTORY_TTL_'"/>
     <bind name="date" value="'ci.CLOSE_TIME_'"/>
     <bind name="currentTimestamp" value="parameter"/>
-    ${limitBefore}
-    SELECT DISTINCT RES.*
-    ${limitBetween}
-    FROM (
-      SELECT ci.ID_, ci.CLOSE_TIME_
-      <include refid="selectHistoricCaseInstanceIdsForCleanupSql"/>
+    FROM ${prefix}ACT_HI_CASEINST ci, ${prefix}ACT_RE_CASE_DEF cd
+    where
+      ci.CASE_DEF_ID_ = cd.ID_
+      AND not cd.HISTORY_TTL_ is NULL
       AND ${dayComparator}
-    ) RES
-    ${orderBy}
-    ${limitAfter}
+    ${limitAfterWithoutOffset}
+  </sql>
+
+  <select id="selectHistoricCaseInstanceIdsForCleanup" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
+    SELECT ${limitBeforeWithoutOffset} ci.ID_, ci.CLOSE_TIME_
+    <include refid="selectHistoricCaseInstanceIdsForCleanupSql"/>
+  </select>
+
+  <select id="selectHistoricCaseInstanceIdsForCleanup_oracle" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
+    SELECT /*+ FIRST_ROWS(${maxResults}) NO_PARALLEL(di) NO_PARALLEL(dd) */ ci.ID_, ci.CLOSE_TIME_
+    <include refid="selectHistoricCaseInstanceIdsForCleanupSql"/>
   </select>
 
   <!-- Select History Cleanup Report Entities -->

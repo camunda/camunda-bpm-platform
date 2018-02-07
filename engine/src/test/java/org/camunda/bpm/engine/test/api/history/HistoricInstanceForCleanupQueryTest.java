@@ -53,6 +53,7 @@ import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -74,14 +75,12 @@ public class HistoricInstanceForCleanupQueryTest {
   @Rule public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule).around(migrationRule);
 
   private HistoryService historyService;
-  private RuntimeService runtimeService;
   private ManagementService managementService;
   private CaseService caseService;
   private ProcessEngineConfigurationImpl processEngineConfiguration;
 
   @Before
   public void init() {
-    runtimeService = engineRule.getRuntimeService();
     historyService = engineRule.getHistoryService();
     managementService = engineRule.getManagementService();
     caseService = engineRule.getCaseService();
@@ -101,105 +100,6 @@ public class HistoricInstanceForCleanupQueryTest {
       meter.getAndClear();
     }
     managementService.deleteMetrics(null);
-  }
-
-  @Test
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
-  public void testSortHistoricProcessInstancesForCleanup() {
-
-    final String processDefinitionKey = "oneTaskProcess";
-
-    startAndDeleteProcessInstance(processDefinitionKey, -11);
-    startAndDeleteProcessInstance(processDefinitionKey, -10);
-    startAndDeleteProcessInstance(processDefinitionKey, -12);
-
-    processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
-      public Void execute(CommandContext commandContext) {
-
-        HistoricProcessInstanceManager historicProcessInstanceManager = commandContext.getHistoricProcessInstanceManager();
-        List<String> historicProcessInstanceIds = historicProcessInstanceManager.findHistoricProcessInstanceIdsForCleanup(7);
-        assertEquals(3, historicProcessInstanceIds.size());
-        HistoricProcessInstanceEntity historicProcessInstance1 = historicProcessInstanceManager.findHistoricProcessInstance(historicProcessInstanceIds.get(0));
-        HistoricProcessInstanceEntity historicProcessInstance2 = historicProcessInstanceManager.findHistoricProcessInstance(historicProcessInstanceIds.get(1));
-        HistoricProcessInstanceEntity historicProcessInstance3 = historicProcessInstanceManager.findHistoricProcessInstance(historicProcessInstanceIds.get(2));
-
-        assertTrue(historicProcessInstance1.getEndTime().before(historicProcessInstance2.getEndTime()));
-        assertTrue(historicProcessInstance2.getEndTime().before(historicProcessInstance3.getEndTime()));
-
-        return null;
-      }
-    });
-  }
-
-  private void startAndDeleteProcessInstance(String processDefinitionKey, int daysToAdd) {
-    Date oldCurrentTime = ClockUtil.getCurrentTime();
-    ClockUtil.setCurrentTime(DateUtils.addDays(oldCurrentTime, daysToAdd));
-    ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey(processDefinitionKey);
-    runtimeService.deleteProcessInstances(Arrays.asList(processInstance1.getId()), null, true, true);
-    ClockUtil.setCurrentTime(oldCurrentTime);
-  }
-
-  @Test
-  @Deployment(resources = "org/camunda/bpm/engine/test/api/dmn/Example.dmn")
-  public void testSortHistoricDecisionInstancesForCleanup() {
-
-    final String decisionDefinitionKey1 = "decision";
-
-    evaluateDecisionDefinition(decisionDefinitionKey1, -11);
-    evaluateDecisionDefinition(decisionDefinitionKey1, -10);
-    evaluateDecisionDefinition(decisionDefinitionKey1, -12);
-
-    processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
-      public Void execute(CommandContext commandContext) {
-
-        HistoricDecisionInstanceManager historicDecisionInstanceManager = commandContext.getHistoricDecisionInstanceManager();
-        List<String> historicDecisionInstanceIds = historicDecisionInstanceManager.findHistoricDecisionInstanceIdsForCleanup(7);
-        assertEquals(3, historicDecisionInstanceIds.size());
-
-        HistoricDecisionInstanceEntity instance0 = historicDecisionInstanceManager.findHistoricDecisionInstance(historicDecisionInstanceIds.get(0));
-        HistoricDecisionInstanceEntity instance1 = historicDecisionInstanceManager.findHistoricDecisionInstance(historicDecisionInstanceIds.get(1));
-        HistoricDecisionInstanceEntity instance2 = historicDecisionInstanceManager.findHistoricDecisionInstance(historicDecisionInstanceIds.get(2));
-
-        assertTrue(instance0.getEvaluationTime().before(instance1.getEvaluationTime()));
-        assertTrue(instance1.getEvaluationTime().before(instance2.getEvaluationTime()));
-
-        return null;
-      }
-    });
-  }
-
-  private void evaluateDecisionDefinition(String decisionDefinitionKey, int daysToAdd) {
-    Date oldCurrentTime = ClockUtil.getCurrentTime();
-    ClockUtil.setCurrentTime(DateUtils.addDays(oldCurrentTime, daysToAdd));
-    engineRule.getDecisionService().evaluateDecisionByKey(decisionDefinitionKey).variables(getDMNVariables()).evaluate();
-    ClockUtil.setCurrentTime(oldCurrentTime);
-  }
-
-  @Test
-  @Deployment(resources = "org/camunda/bpm/engine/test/api/cmmn/oneTaskCaseWithHistoryTimeToLive.cmmn")
-  public void testSortHistoricCaseInstancesForCleanup() {
-
-    final String caseDefinitionKey1 = "case";
-
-    startAndCloseCaseInstance(caseDefinitionKey1, -11);
-    startAndCloseCaseInstance(caseDefinitionKey1, -10);
-    startAndCloseCaseInstance(caseDefinitionKey1, -12);
-
-    processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
-      public Void execute(CommandContext commandContext) {
-
-        HistoricCaseInstanceManager historicCaseInstanceManager = commandContext.getHistoricCaseInstanceManager();
-        List<String> historicCaseInstanceIds = historicCaseInstanceManager.findHistoricCaseInstanceIdsForCleanup(7);
-        assertEquals(3, historicCaseInstanceIds.size());
-        HistoricCaseInstanceEntity instance0 = historicCaseInstanceManager.findHistoricCaseInstance(historicCaseInstanceIds.get(0));
-        HistoricCaseInstanceEntity instance1 = historicCaseInstanceManager.findHistoricCaseInstance(historicCaseInstanceIds.get(1));
-        HistoricCaseInstanceEntity instance2 = historicCaseInstanceManager.findHistoricCaseInstance(historicCaseInstanceIds.get(2));
-        assertTrue(instance0.getCloseTime().before(instance1.getCloseTime()));
-        assertTrue(instance1.getCloseTime().before(instance2.getCloseTime()));
-
-        return null;
-      }
-    });
   }
 
   @SuppressWarnings("unchecked")
@@ -244,19 +144,6 @@ public class HistoricInstanceForCleanupQueryTest {
         return null;
       }
     });
-  }
-
-  private void startAndCloseCaseInstance(String caseDefinitionKey, int daysToAdd) {
-    Date oldCurrentTime = ClockUtil.getCurrentTime();
-    ClockUtil.setCurrentTime(DateUtils.addDays(oldCurrentTime, daysToAdd));
-    CaseInstance caseInstance1 = caseService.createCaseInstanceByKey(caseDefinitionKey);
-    caseService.terminateCaseExecution(caseInstance1.getId());
-    caseService.closeCaseInstance(caseInstance1.getId());
-    ClockUtil.setCurrentTime(oldCurrentTime);
-  }
-
-  protected VariableMap getDMNVariables() {
-    return Variables.createVariables().putValue("status", "silver").putValue("sum", 723);
   }
 
 }
