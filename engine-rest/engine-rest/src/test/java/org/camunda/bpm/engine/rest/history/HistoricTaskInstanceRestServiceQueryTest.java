@@ -1982,7 +1982,7 @@ public class HistoricTaskInstanceRestServiceQueryTest extends AbstractRestServic
         .statusCode(Status.BAD_REQUEST.getStatusCode())
         .contentType(ContentType.JSON)
         .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-        .body("message", containsString("Invalid variable comparator specified: " + invalidComparator))
+        .body("message", containsString("Invalid process variable comparator specified: " + invalidComparator))
       .when()
         .get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
 
@@ -2027,7 +2027,7 @@ public class HistoricTaskInstanceRestServiceQueryTest extends AbstractRestServic
         .statusCode(Status.BAD_REQUEST.getStatusCode())
         .contentType(ContentType.JSON)
         .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-        .body("message", containsString("Invalid variable comparator specified: " + invalidComparator))
+        .body("message", containsString("Invalid process variable comparator specified: " + invalidComparator))
       .when()
         .post(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
   }
