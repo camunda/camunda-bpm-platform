@@ -214,29 +214,44 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/parallelExternalTaskProcess.bpmn20.xml")
   public void testQueryByBusinessKey() {
     // given
+    String topicName1 = "topic1";
+    String topicName2 = "topic2";
+    String topicName3 = "topic3";
+
     String businessKey1 = "testBusinessKey1";
     String businessKey2 = "testBusinessKey2";
+
+    Long lockDuration = 60L * 1000L;
 
     runtimeService.startProcessInstanceByKey("parallelExternalTaskProcess", businessKey1);
     runtimeService.startProcessInstanceByKey("parallelExternalTaskProcess", businessKey2);
 
     //when
     List<LockedExternalTask> topicTasks = externalTaskService
-        .fetchAndLock(1, "externalWorkerId")
-        .topic("topic1", 60L * 1000L)
-        .businessKey(businessKey1)
+        .fetchAndLock(3, "externalWorkerId")
+        .topic(topicName1, lockDuration)
+          .businessKey(businessKey1)
+        .topic(topicName2, lockDuration)
+          .businessKey(businessKey2)
+        .topic(topicName3, lockDuration)
+          .businessKey("fakeBusinessKey")
         .execute();
 
     //then
-    assertEquals(1, topicTasks.size());
+    assertEquals(2, topicTasks.size());
 
-    String taskPid = topicTasks.get(0).getProcessInstanceId();
-    ProcessInstance pi = runtimeService.createProcessInstanceQuery()
-        .processInstanceId(taskPid)
-        .singleResult();
-
-    // compare test business key with queried task PI business key
-    assertEquals(businessKey1, pi.getBusinessKey());
+    for (LockedExternalTask externalTask : topicTasks) {
+      ProcessInstance pi = runtimeService.createProcessInstanceQuery()
+          .processInstanceId(externalTask.getProcessInstanceId())
+          .singleResult();
+      if (externalTask.getTopicName().equals(topicName1)) {
+        assertEquals(businessKey1, pi.getBusinessKey());
+      } else if (externalTask.getTopicName().equals(topicName2)){
+        assertEquals(businessKey2, pi.getBusinessKey());
+      } else {
+        fail("No other topic name values should be available!");
+      }
+    }
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.testVariableValueTopicQuery.bpmn20.xml")
