@@ -2274,13 +2274,7 @@ public class BpmnParse extends Parse {
       return null;
 
     } else {
-      Object value = topicAttributeValue;
-      if (StringUtil.isExpression(topicAttributeValue)) {
-        return createParameterValueProvider(value, expressionManager);
-      } else {
-        // A topic can be a string, but not an expression
-        return new ConstantValueProvider(value);
-      }
+      return createParameterValueProvider(topicAttributeValue, expressionManager);
     }
   }
 
