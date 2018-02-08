@@ -578,7 +578,6 @@ public class RuntimeServiceTest {
   }
 
   @Test
-  @Ignore("CAM-8680")
   public void testDeleteCalledSubprocess() {
 
     // given

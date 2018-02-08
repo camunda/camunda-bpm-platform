@@ -58,7 +58,7 @@ public abstract class AbstractDeleteProcessInstanceCmd {
   protected void deleteProcessInstance(
       final CommandContext commandContext,
       String processInstanceId,
-      String deleteReason,
+      final String deleteReason,
       final boolean skipCustomListeners,
       boolean externallyTerminated,
       final boolean skipIoMappings,
@@ -88,7 +88,7 @@ public abstract class AbstractDeleteProcessInstanceCmd {
     if (superExecution != null) {
       commandContext.runWithoutAuthorization(new Callable<Void>() {
         public Void call() {
-          ProcessInstanceModificationBuilderImpl builder = (ProcessInstanceModificationBuilderImpl) new ProcessInstanceModificationBuilderImpl(commandContext, superExecution.getProcessInstanceId())
+          ProcessInstanceModificationBuilderImpl builder = (ProcessInstanceModificationBuilderImpl) new ProcessInstanceModificationBuilderImpl(commandContext, superExecution.getProcessInstanceId(), deleteReason)
             .cancelActivityInstance(superExecution.getActivityInstanceId());
           builder.execute(false, skipCustomListeners, skipIoMappings);
           return null;

@@ -46,6 +46,7 @@ public class ProcessInstanceModificationBuilderImpl implements ProcessInstanceMo
   protected CommandContext commandContext;
 
   protected String processInstanceId;
+  protected String modificationReason;
 
   protected boolean skipCustomListeners = false;
   protected boolean skipIoMappings = false;
@@ -65,6 +66,12 @@ public class ProcessInstanceModificationBuilderImpl implements ProcessInstanceMo
     this.commandContext = commandContext;
   }
 
+  public ProcessInstanceModificationBuilderImpl(CommandContext commandContext, String processInstanceId, String modificationReason) {
+    this(processInstanceId);
+    this.commandContext = commandContext;
+    this.modificationReason = modificationReason;
+  }
+
   public ProcessInstanceModificationBuilderImpl(String processInstanceId) {
     ensureNotNull(NotValidException.class, "processInstanceId", processInstanceId);
     this.processInstanceId = processInstanceId;
@@ -76,7 +83,7 @@ public class ProcessInstanceModificationBuilderImpl implements ProcessInstanceMo
   @Override
   public ProcessInstanceModificationBuilder cancelActivityInstance(String activityInstanceId) {
     ensureNotNull(NotValidException.class, "activityInstanceId", activityInstanceId);
-    operations.add(new ActivityInstanceCancellationCmd(processInstanceId, activityInstanceId));
+    operations.add(new ActivityInstanceCancellationCmd(processInstanceId, activityInstanceId, this.modificationReason));
     return this;
   }
 
@@ -281,4 +288,11 @@ public class ProcessInstanceModificationBuilderImpl implements ProcessInstanceMo
     return processVariables;
   }
 
+  public String getModificationReason() {
+    return modificationReason;
+  }
+
+  public void setModificationReason(String modificationReason) {
+    this.modificationReason = modificationReason;
+  }
 }

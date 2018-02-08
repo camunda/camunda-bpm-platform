@@ -25,8 +25,16 @@ import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
  */
 public abstract class AbstractInstanceCancellationCmd extends AbstractProcessInstanceModificationCommand {
 
+  protected String cancellationReason;
+
   public AbstractInstanceCancellationCmd(String processInstanceId) {
     super(processInstanceId);
+    this.cancellationReason = "Cancellation due to process instance modifcation";
+  }
+
+  public AbstractInstanceCancellationCmd(String processInstanceId, String cancellationReason) {
+    super(processInstanceId);
+    this.cancellationReason = cancellationReason;
   }
 
   public Void execute(CommandContext commandContext) {
@@ -50,11 +58,11 @@ public abstract class AbstractInstanceCancellationCmd extends AbstractProcessIns
     }
 
     if (topmostCancellableExecution.isPreserveScope()) {
-      topmostCancellableExecution.interrupt("Cancelled due to process instance modification", skipCustomListeners, skipIoMappings);
+      topmostCancellableExecution.interrupt(cancellationReason, skipCustomListeners, skipIoMappings);
       topmostCancellableExecution.leaveActivityInstance();
       topmostCancellableExecution.setActivity(null);
     } else {
-      topmostCancellableExecution.deleteCascade("Cancelled due to process instance modification", skipCustomListeners, skipIoMappings);
+      topmostCancellableExecution.deleteCascade(cancellationReason, skipCustomListeners, skipIoMappings);
       handleChildRemovalInScope(topmostCancellableExecution);
 
     }
