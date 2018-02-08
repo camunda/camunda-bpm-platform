@@ -20,5 +20,10 @@
     <sequenceFlow id="flow5" sourceRef="externalTask2" targetRef="end2" />
     <endEvent id="end2" />
 
+    <sequenceFlow id="flow6" sourceRef="fork" targetRef="externalTask3" />
+    <serviceTask id="externalTask3" camunda:type="external" camunda:topic="testTopic3" />
+    <sequenceFlow id="flow7" sourceRef="externalTask3" targetRef="end3" />
+    <endEvent id="end3" />
+
   </process>
 </definitions>
