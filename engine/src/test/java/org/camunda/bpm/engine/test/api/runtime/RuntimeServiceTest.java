@@ -578,6 +578,7 @@ public class RuntimeServiceTest {
   }
 
   @Test
+  @RequiredHistoryLevel(ProcessEngineConfigurationImpl.HISTORY_AUDIT)
   public void testDeleteCalledSubprocess() {
 
     // given
@@ -604,7 +605,6 @@ public class RuntimeServiceTest {
     assertEquals(TESTING_INSTANCE_DELETION, historyService.createHistoricProcessInstanceQuery().processInstanceId(subprocessId).singleResult().getDeleteReason());
     assertEquals(TESTING_INSTANCE_DELETION, historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult().getDeleteReason());
   }
-
 
   @Deployment(resources={
     "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
