@@ -15,7 +15,6 @@ package org.camunda.bpm.engine.test.api.multitenancy.tenantcheck;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -33,7 +32,6 @@ import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -125,6 +123,36 @@ public class MultiTenancyStartProcessInstanceByConditionCmdTenantCheckTest {
   }
 
   @Test
+  public void testWithAuthenticatedTenant2() throws Exception {
+    // given
+    testRule.deployForTenant(TENANT_ONE, PROCESS);
+    testRule.deployForTenant(TENANT_TWO, PROCESS);
+
+    ensureEventSubscriptions(2);
+
+    engineRule.getIdentityService().setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+
+    Map<String, Object> variableMap = new HashMap<String, Object>();
+    variableMap.put("foo", "bar");
+
+    // when
+    List<ProcessInstance> processInstances = engineRule.getRuntimeService()
+      .createConditionEvaluation()
+      .setVariables(variableMap)
+      .evaluateStartConditions();
+
+    // then
+    assertNotNull(processInstances);
+    assertEquals(1, processInstances.size());
+
+    engineRule.getIdentityService().clearAuthentication();
+
+    ProcessInstanceQuery processInstanceQuery = engineRule.getRuntimeService().createProcessInstanceQuery();
+    assertEquals(1, processInstanceQuery.tenantIdIn(TENANT_ONE).count());
+    assertEquals(0, processInstanceQuery.tenantIdIn(TENANT_TWO).count());
+  }
+
+  @Test
   public void testDisabledTenantCheck() throws Exception {
     // given
     testRule.deployForTenant(TENANT_ONE, PROCESS);
@@ -135,25 +163,19 @@ public class MultiTenancyStartProcessInstanceByConditionCmdTenantCheckTest {
     engineRule.getProcessEngineConfiguration().setTenantCheckEnabled(false);
     engineRule.getIdentityService().setAuthentication("user", null, null);
 
+    System.out.println(engineRule.getProcessEngineConfiguration().isAuthorizationEnabled());
+
     Map<String, Object> variableMap = new HashMap<String, Object>();
     variableMap.put("foo", "bar");
 
-    try {
-      // when
-      engineRule.getRuntimeService()
-        .createConditionEvaluation()
-        .setVariables(variableMap)
-        .evaluateStartConditions();
-      fail("Exception expected");
-    } catch (Exception e) {
-      // then
-      Assert.assertTrue(e.getMessage().contains("No subscriptions were found during evaluation of the conditional start events."));
-    } finally {
-      engineRule.getIdentityService().clearAuthentication();
-    }
+    // when
+    List<ProcessInstance> evaluateStartConditions = engineRule.getRuntimeService()
+      .createConditionEvaluation()
+      .setVariables(variableMap)
+      .evaluateStartConditions();
+    assertEquals(2, evaluateStartConditions.size());
 
-    ProcessInstanceQuery processInstanceQuery = engineRule.getRuntimeService().createProcessInstanceQuery();
-    assertEquals(0, processInstanceQuery.count());
+    engineRule.getIdentityService().clearAuthentication();
   }
 
   @Test

@@ -290,6 +290,8 @@ public class EventSubscriptionManager extends AbstractManager {
   public List<EventSubscriptionEntity> findConditionalStartEventSubscriptionByTenantId(String tenantId) {
     Map<String, String> parameters = new HashMap<String, String>();
     parameters.put("tenantId", tenantId);
+
+    configureParameterizedQuery(parameters);
     return getDbEntityManager().selectList("selectConditionalStartEventSubscriptionByTenantId", parameters);
   }
 
@@ -299,7 +301,15 @@ public class EventSubscriptionManager extends AbstractManager {
    */
   @SuppressWarnings("unchecked")
   public List<EventSubscriptionEntity> findConditionalStartEventSubscription() {
-    return getDbEntityManager().selectList("selectConditionalStartEventSubscription");
+    ListQueryParameterObject parameter = new ListQueryParameterObject();
+
+    configurParameterObject(parameter);
+    return getDbEntityManager().selectList("selectConditionalStartEventSubscription", parameter);
+  }
+
+  protected void configurParameterObject(ListQueryParameterObject parameter) {
+    getAuthorizationManager().configureConditionalEventSubscriptionQuery(parameter);
+    getTenantManager().configureQuery(parameter);
   }
 
   protected void configureQuery(EventSubscriptionQueryImpl query) {

@@ -548,6 +548,11 @@ public class AuthorizationManager extends AbstractManager {
     addPermissionCheck(query, PROCESS_DEFINITION, "PROCDEF.KEY_", READ_INSTANCE);
   }
 
+  public void configureConditionalEventSubscriptionQuery(ListQueryParameterObject query) {
+    configureQuery(query);
+    addPermissionCheck(query, PROCESS_DEFINITION, "P.KEY_", READ);
+  }
+
   // incident query ///////////////////////////////////////
 
   public void configureIncidentQuery(IncidentQueryImpl query) {

@@ -16,7 +16,6 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.impl.ConditionEvaluationBuilderImpl;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
@@ -49,11 +48,7 @@ public class EvaluateStartConditionCmd implements Command<List<ProcessInstance>>
     final ConditionHandler conditionHandler = commandContext.getProcessEngineConfiguration().getConditionHandler();
     final ConditionSet conditionSet = new ConditionSet(builder);
 
-    List<ConditionHandlerResult> results = commandContext.runWithoutAuthorization(new Callable<List<ConditionHandlerResult>>() {
-      public List<ConditionHandlerResult> call() throws Exception {
-        return conditionHandler.evaluateStartCondition(commandContext, conditionSet);
-      }
-    });
+    List<ConditionHandlerResult> results = conditionHandler.evaluateStartCondition(commandContext, conditionSet);
 
     for (ConditionHandlerResult ConditionHandlerResult : results) {
       checkAuthorization(commandContext, ConditionHandlerResult);
