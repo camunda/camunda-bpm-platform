@@ -269,15 +269,17 @@
   <select id="selectConditionalStartEventSubscription" resultMap="eventSubscriptionResultMap" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
     select *
     from ${prefix}ACT_RU_EVENT_SUBSCR RES
-    <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+    <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
       inner join ${prefix}ACT_RE_PROCDEF P on RES.CONFIGURATION_ = P.ID_
-      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" />
-      AUTH ON (AUTH.RESOURCE_ID_ in (P.KEY_, '*'))
+      <if test="!authCheck.revokeAuthorizationCheckEnabled">
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" />
+        AUTH ON (AUTH.RESOURCE_ID_ in (P.KEY_, '*'))
+      </if>
     </if>
     <where>
       (EVENT_TYPE_ = 'conditional')
       and EXECUTION_ID_ is null
-      <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+      <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
         <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
       </if>
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
