@@ -151,9 +151,7 @@
     <if test="parameter != null &amp;&amp; parameter.businessKeyFilter">
       inner join ${prefix}ACT_RU_EXECUTION REX on RES.PROC_INST_ID_ = REX.PROC_INST_ID_
     </if>
-    <!--<if test="parameter != null &amp;&amp; parameter.variableValueFilter">-->
-      <!--inner join ${prefix}ACT_RU_VARIABLE VAR on RES.PROC_INST_ID_ = VAR.EXECUTION_ID_-->
-    <!--</if>-->
+
     <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" /> 
       AUTH ON (
