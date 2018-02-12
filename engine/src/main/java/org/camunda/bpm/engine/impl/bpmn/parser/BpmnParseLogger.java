@@ -43,7 +43,7 @@ public class BpmnParseLogger extends ProcessEngineLogger {
   // EXCEPTIONS
 
   public ProcessEngineException parsingProcessException(Exception cause) {
-    return new ProcessEngineException(exceptionMessage("009", "Error while parsing process"), cause);
+    return new ProcessEngineException(exceptionMessage("009", "Error while parsing process. {}.", cause.getMessage()), cause);
   }
 
   public void exceptionWhileGeneratingProcessDiagram(Throwable t) {

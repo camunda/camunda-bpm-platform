@@ -45,7 +45,7 @@ public class EngineUtilLogger extends ProcessEngineLogger {
   public ProcessEngineException parsingFailureException(String name, Throwable cause) {
     return new ProcessEngineException(exceptionMessage(
         "003",
-        "Could not parse '{}'.", name), cause);
+        "Could not parse '{}'. {}", name, cause.getMessage()), cause);
   }
 
   public void logParseWarnings(String formattedMessage) {

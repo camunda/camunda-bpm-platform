@@ -200,6 +200,26 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  public void testExpressionParsingErrors() {
+    try {
+      String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testExpressionParsingErrors");
+      repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
+      fail("Exception expected: Process definition could not be parsed, the expression contains an escalation start event.");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("Error parsing '${currentUser()': syntax error at position 15, encountered 'null', expected '}'", e.getMessage());
+    }
+  }
+
+  public void testXmlParsingErrors() {
+    try {
+      String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testXMLParsingErrors");
+      repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
+      fail("Exception expected: Process definition could not be parsed, the XML contains an escalation start event.");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("The end-tag for element type \"bpmndi:BPMNLabel\" must end with a '>' delimiter", e.getMessage());
+    }
+  }
+
   public void testInvalidSequenceFlowInAndOutEventSubProcess() {
     try {
       String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testInvalidSequenceFlowInAndOutEventSubProcess");
