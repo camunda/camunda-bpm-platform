@@ -186,7 +186,7 @@
     FROM (
       SELECT RES.TYPE_,
              C.HISTORY_TTL_,
-             SUM(CASE WHEN HISTORY_TTL_ is not null and (${dayComparator}) THEN 1 ELSE 0 END) AS CLEANABLE_,
+             SUM(CASE WHEN HISTORY_TTL_ is not null and (HISTORY_TTL_ = 0 OR ${dayComparator}) and END_TIME_ is not null THEN 1 ELSE 0 END) AS CLEANABLE_,
              F.FINISHED_
         FROM ${prefix}ACT_HI_BATCH RES
         LEFT JOIN (

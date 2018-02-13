@@ -344,7 +344,7 @@
         RES.HISTORY_TTL_,
         RES.TENANT_ID_,
         F.FINISHED_,
-        SUM(CASE WHEN CI.CLOSE_TIME_ is not null and ${dayComparator} THEN 1 ELSE 0 END) AS CLEANABLE_
+        SUM(CASE WHEN RES.HISTORY_TTL_ is not null and CI.CLOSE_TIME_ is not null and (RES.HISTORY_TTL_ = 0 OR ${dayComparator}) THEN 1 ELSE 0 END) AS CLEANABLE_
       FROM ${prefix}ACT_RE_CASE_DEF RES
       LEFT JOIN ${prefix}ACT_HI_CASEINST CI
       ON CI.CASE_DEF_ID_ = RES.ID_

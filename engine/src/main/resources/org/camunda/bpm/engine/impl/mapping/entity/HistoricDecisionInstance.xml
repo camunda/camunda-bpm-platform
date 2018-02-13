@@ -333,7 +333,7 @@
         RES.HISTORY_TTL_,
         RES.TENANT_ID_,
         F.FINISHED_,
-        SUM(CASE WHEN DI.EVAL_TIME_ is not null and ${dayComparator} THEN 1 ELSE 0 END) AS CLEANABLE_
+        SUM(CASE WHEN RES.HISTORY_TTL_ is not null and DI.EVAL_TIME_ is not null and (RES.HISTORY_TTL_=0 OR ${dayComparator}) THEN 1 ELSE 0 END) AS CLEANABLE_
       FROM
         (
           SELECT DISTINCT RES.*
