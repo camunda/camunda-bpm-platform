@@ -357,7 +357,10 @@ public class ProcessDefinitionManager extends AbstractManager implements Abstrac
 
     deleteSubscriptionsForProcessDefinition(processDefinitionId);
 
-    addSubscriptionsFromPreviousVersion((ProcessDefinitionEntity) processDefinition);
+    ProcessDefinitionEntity latestProcessDefinition = findLatestProcessDefinitionByKeyAndTenantId(processDefinition.getKey(), processDefinition.getTenantId());
+    if (processDefinition.getVersion() == latestProcessDefinition.getVersion()) {
+      addSubscriptionsFromPreviousVersion((ProcessDefinitionEntity) processDefinition);
+    }
 
     // delete job definitions
     getJobDefinitionManager().deleteJobDefinitionsByProcessDefinitionId(processDefinition.getId());
@@ -384,6 +387,8 @@ public class ProcessDefinitionManager extends AbstractManager implements Abstrac
             ((BpmnDeployer) deployer).addEventSubscriptions(previousDefinition);
           }
         }
+      } else if(previousDefinition != null && previousDefinition.isDeleted()){
+        addSubscriptionsFromPreviousVersion(previousDefinition);
       }
     }
   }
