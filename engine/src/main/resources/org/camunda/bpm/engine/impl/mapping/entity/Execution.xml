@@ -226,10 +226,10 @@
         and RES.PROC_INST_ID_ = #{processInstanceId}
       </if>
       <if test="processInstanceIds != null and !processInstanceIds.isEmpty()">
-        and RES.PROC_INST_ID_ in
-        <foreach item="item" index="index" collection="processInstanceIds" open="(" separator="," close=")">
-          #{item}
-        </foreach>
+        and
+        <bind name="listOfIds" value="processInstanceIds" />
+        <bind name="fieldName" value="'RES.PROC_INST_ID_'" />
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection" />
       </if>
       <if test="businessKey != null">
         and RES.BUSINESS_KEY_ = #{businessKey}

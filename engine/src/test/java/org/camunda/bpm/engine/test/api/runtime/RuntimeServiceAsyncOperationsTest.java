@@ -126,12 +126,13 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
   @Test
   public void testDeleteProcessInstancesAsyncWithLargeList() throws Exception {
     // given
-    List<String> processIds = startTestProcesses(1500);
+    engineRule.getProcessEngineConfiguration().setBatchJobsPerSeed(1100);
+    List<String> processIds = startTestProcesses(2200);
 
     // when
     Batch batch = runtimeService.deleteProcessInstancesAsync(processIds, null, TESTING_INSTANCE_DELETE);
 
-    createAndExecuteSeedJobs(batch.getSeedJobDefinitionId(), 15);
+    createAndExecuteSeedJobs(batch.getSeedJobDefinitionId(), 2);
     executeBatchJobs(batch);
 
     // then
