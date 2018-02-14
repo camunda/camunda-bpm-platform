@@ -77,9 +77,10 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
 
   @After
   public void cleanBatch() {
-    Batch batch = managementService.createBatchQuery().singleResult();
-    if (batch != null) {
-      managementService.deleteBatch(batch.getId(), true);
+    List<Batch> batches = managementService.createBatchQuery().list();
+    if (batches.size() > 0) {
+      for (Batch batch : batches)
+        managementService.deleteBatch(batch.getId(), true);
     }
 
     HistoricBatch historicBatch = historyService.createHistoricBatchQuery().singleResult();
@@ -126,8 +127,8 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
   @Test
   public void testDeleteProcessInstancesAsyncWithLargeList() throws Exception {
     // given
-    engineRule.getProcessEngineConfiguration().setBatchJobsPerSeed(1100);
-    List<String> processIds = startTestProcesses(2200);
+    engineRule.getProcessEngineConfiguration().setBatchJobsPerSeed(1010);
+    List<String> processIds = startTestProcesses(1100);
 
     // when
     Batch batch = runtimeService.deleteProcessInstancesAsync(processIds, null, TESTING_INSTANCE_DELETE);
@@ -139,6 +140,13 @@ public class RuntimeServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
     assertHistoricTaskDeletionPresent(processIds, TESTING_INSTANCE_DELETE, testRule);
     assertHistoricBatchExists(testRule);
     assertProcessInstancesAreDeleted();
+
+    // cleanup
+    if (!testRule.isHistoryLevelNone()) {
+      batch = historyService.deleteHistoricProcessInstancesAsync(processIds, null);
+      createAndExecuteSeedJobs(batch.getSeedJobDefinitionId(), 2);
+      executeBatchJobs(batch);
+    }
   }
 
   @Deployment(resources = {
