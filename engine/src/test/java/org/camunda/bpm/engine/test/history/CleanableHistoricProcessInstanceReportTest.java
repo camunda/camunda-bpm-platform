@@ -54,7 +54,6 @@ public class CleanableHistoricProcessInstanceReportTest {
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(testRule).around(engineRule);
 
-  protected ProcessEngineConfiguration processEngineConfiguration;
   protected HistoryService historyService;
   protected TaskService taskService;
   protected RepositoryService repositoryService;
@@ -68,7 +67,6 @@ public class CleanableHistoricProcessInstanceReportTest {
   @Before
   public void setUp() {
     historyService = engineRule.getHistoryService();
-    processEngineConfiguration = engineRule.getProcessEngineConfiguration();
     taskService = engineRule.getTaskService();
     repositoryService = engineRule.getRepositoryService();
     runtimeService = engineRule.getRuntimeService();

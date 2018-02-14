@@ -39,6 +39,7 @@ import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.authorization.util.AuthorizationTestBaseRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
+import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.After;
@@ -56,12 +57,13 @@ import org.junit.rules.RuleChain;
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
 public class HistoricBatchQueryAuthorizationTest {
 
-  public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
+  public ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule();
+  public ProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
   public AuthorizationTestBaseRule authRule = new AuthorizationTestBaseRule(engineRule);
   public ProcessEngineTestRule testHelper = new ProcessEngineTestRule(engineRule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(authRule).around(testHelper);
+  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(authRule).around(testHelper);
 
   @Rule
   public final ExpectedException thrown = ExpectedException.none();

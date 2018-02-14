@@ -41,6 +41,7 @@ import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.runtime.BatchModificationHelper;
 import org.camunda.bpm.engine.test.api.runtime.migration.MigrationTestRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.batch.BatchMigrationHelper;
+import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
@@ -54,14 +55,15 @@ import org.junit.rules.RuleChain;
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
 public class CleanableHistoricBatchReportTest {
 
-  public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
+  protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule();
+  public ProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
   protected MigrationTestRule migrationRule = new MigrationTestRule(engineRule);
   protected BatchMigrationHelper migrationHelper = new BatchMigrationHelper(engineRule, migrationRule);
   protected BatchModificationHelper modificationHelper = new BatchModificationHelper(engineRule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(testRule).around(engineRule).around(migrationRule);
+  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(testRule).around(engineRule).around(migrationRule);
 
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
   protected HistoryService historyService;
@@ -72,7 +74,7 @@ public class CleanableHistoricBatchReportTest {
   @Before
   public void setUp() {
     historyService = engineRule.getHistoryService();
-    processEngineConfiguration = engineRule.getProcessEngineConfiguration();
+    processEngineConfiguration = (ProcessEngineConfigurationImpl)bootstrapRule.getProcessEngine().getProcessEngineConfiguration();
     repositoryService = engineRule.getRepositoryService();
     runtimeService = engineRule.getRuntimeService();
     managementService = engineRule.getManagementService();
