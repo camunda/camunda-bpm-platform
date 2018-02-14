@@ -18,8 +18,6 @@ import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl;
-import org.camunda.bpm.engine.impl.bpmn.deployer.BpmnDeployer;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.auth.ResourceAuthorizationProvider;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
@@ -28,8 +26,6 @@ import org.camunda.bpm.engine.impl.event.EventType;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.impl.persistence.AbstractResourceDefinitionManager;
-import org.camunda.bpm.engine.impl.persistence.deploy.Deployer;
-import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
 
@@ -271,24 +267,12 @@ public class ProcessDefinitionManager extends AbstractManager implements Abstrac
     eventSubscriptionsToRemove.addAll(messageEventSubscriptions);
 
     // remove signal event subscriptions:
-    List<EventSubscriptionEntity> signalEventSubscriptions = getEventSubscriptionManager()
-        .findEventSubscriptionsByConfiguration(EventType.SIGNAL.name(), processDefinitionId);
+    List<EventSubscriptionEntity> signalEventSubscriptions = getEventSubscriptionManager().findEventSubscriptionsByConfiguration(EventType.SIGNAL.name(), processDefinitionId);
     eventSubscriptionsToRemove.addAll(signalEventSubscriptions);
 
     // remove conditional event subscriptions:
-    List<EventSubscriptionEntity> conditionalEventSubscriptions = getEventSubscriptionManager()
-        .findEventSubscriptionsByConfiguration(EventType.CONDITONAL.name(), processDefinitionId);
+    List<EventSubscriptionEntity> conditionalEventSubscriptions = getEventSubscriptionManager().findEventSubscriptionsByConfiguration(EventType.CONDITONAL.name(), processDefinitionId);
     eventSubscriptionsToRemove.addAll(conditionalEventSubscriptions);
-
-    List<EventSubscriptionEntity> cachedEventSubscriptions = getCommandContext().getDbEntityManager().getCachedEntitiesByType(EventSubscriptionEntity.class);
-
-    if (cachedEventSubscriptions != null && !cachedEventSubscriptions.isEmpty()) {
-      for (EventSubscriptionEntity entity : cachedEventSubscriptions) {
-        if (processDefinitionId.equals(entity.getConfiguration()) && entity.getExecutionId() == null && !eventSubscriptionsToRemove.contains(entity)) {
-          eventSubscriptionsToRemove.add(entity);
-        }
-      }
-    }
 
     for (EventSubscriptionEntity eventSubscriptionEntity : eventSubscriptionsToRemove) {
       eventSubscriptionEntity.delete();
@@ -357,41 +341,11 @@ public class ProcessDefinitionManager extends AbstractManager implements Abstrac
 
     deleteSubscriptionsForProcessDefinition(processDefinitionId);
 
-    ProcessDefinitionEntity latestProcessDefinition = findLatestProcessDefinitionByKeyAndTenantId(processDefinition.getKey(), processDefinition.getTenantId());
-    if (processDefinition.getVersion() == latestProcessDefinition.getVersion()) {
-      addSubscriptionsFromPreviousVersion((ProcessDefinitionEntity) processDefinition);
-    }
-
     // delete job definitions
     getJobDefinitionManager().deleteJobDefinitionsByProcessDefinitionId(processDefinition.getId());
 
-    ((ProcessDefinitionEntity) processDefinition).setDeleted(true);
   }
 
-  protected void addSubscriptionsFromPreviousVersion(ProcessDefinitionEntity processDefinition) {
-    //we don't want to take the process definition from deployment cache, as it can have inconsistent value in "deleted" flag
-    //instead we take it from DbEntityCache (or the database)
-    String previousProcessDefinitionId = processDefinition.getPreviousProcessDefinitionId();
-    if (previousProcessDefinitionId != null) {
-      ProcessDefinitionEntity previousDefinition = findLatestProcessDefinitionById(previousProcessDefinitionId);
-
-      //if not deleted, than add event subscriptions
-      if (previousDefinition != null && !previousDefinition.isDeleted()) {
-        ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
-        DeploymentCache deploymentCache = configuration.getDeploymentCache();
-        previousDefinition = deploymentCache.resolveProcessDefinition(previousDefinition);
-
-        List<Deployer> deployers = configuration.getDeployers();
-        for (Deployer deployer : deployers) {
-          if (deployer instanceof BpmnDeployer) {
-            ((BpmnDeployer) deployer).addEventSubscriptions(previousDefinition);
-          }
-        }
-      } else if(previousDefinition != null && previousDefinition.isDeleted()){
-        addSubscriptionsFromPreviousVersion(previousDefinition);
-      }
-    }
-  }
 
   // helper ///////////////////////////////////////////////////////////
 
