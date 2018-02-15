@@ -61,12 +61,13 @@ public class UserRestServiceInteractionTest extends AbstractRestServiceTest {
 
   @ClassRule
   public static TestContainerRule rule = new TestContainerRule();
-  
+
   protected static final String SERVICE_URL = TEST_RESOURCE_ROOT_PATH + "/user";
   protected static final String USER_URL = SERVICE_URL + "/{id}";
   protected static final String USER_CREATE_URL = SERVICE_URL + "/create";
   protected static final String USER_PROFILE_URL = USER_URL + "/profile";
   protected static final String USER_CREDENTIALS_URL = USER_URL + "/credentials";
+  protected static final String USER_UNLOCK = USER_URL + "/unlock";
 
   protected IdentityService identityServiceMock;
   protected AuthorizationService authorizationServiceMock;
@@ -750,6 +751,44 @@ public class UserRestServiceInteractionTest extends AbstractRestServiceTest {
       .when().delete(USER_URL);
 
     verify(identityServiceMock, never()).deleteUser(MockProvider.EXAMPLE_USER_ID);
+  }
+
+  @Test
+  public void testUnlockUser() {
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_USER_ID)
+    .then().expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .get(USER_UNLOCK);
+
+    verify(identityServiceMock).unlockUser(MockProvider.EXAMPLE_USER_ID);
+  }
+
+  @Test
+  public void testUnlockUserNonExistingUser() {
+    given()
+      .pathParam("id", "non-existing")
+    .then().expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .get(USER_UNLOCK);
+  }
+
+  @Test
+  public void testUnlockUserThrowsAuthorizationException() {
+    String message = "expected exception";
+    doThrow(new AuthorizationException(message)).when(identityServiceMock).unlockUser(MockProvider.EXAMPLE_USER_ID);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_USER_ID)
+    .then()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo(message))
+    .when()
+      .get(USER_UNLOCK);
   }
 
   protected void verifyNoAuthorizationCheckPerformed() {

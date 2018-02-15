@@ -86,6 +86,11 @@ public class UserResourceImpl extends AbstractIdentityResource implements UserRe
     identityService.deleteUser(resourceId);
   }
 
+  public void unlockUser() {
+    ensureNotReadOnly();
+    identityService.unlockUser(resourceId);
+  }
+
   public void updateCredentials(UserCredentialsDto account) {
     ensureNotReadOnly();
 
