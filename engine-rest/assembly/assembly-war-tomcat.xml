@@ -18,17 +18,19 @@
       <scope>provided</scope>
       <includes>
         <include>org.jboss.resteasy:resteasy-jaxrs:jar:*</include>
+        <include>org.camunda.bpm:engine-rest-jax-rs-two:jar:*</include>
       </includes>
     </dependencySet>
     <dependencySet>
       <outputDirectory>/</outputDirectory>
       <includes>
         <include>org.camunda.bpm:camunda-engine-rest:war:*</include>        
-      </includes>      
+      </includes>
       <unpack>true</unpack>   
       <unpackOptions>
         <excludes>
-          <exclude>**/web.xml</exclude>        
+          <exclude>**/web.xml</exclude> 
+          <exclude>**/camunda-engine-rest-core-*</exclude>        
         </excludes>
       </unpackOptions>   
     </dependencySet>    

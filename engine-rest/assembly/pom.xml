@@ -14,6 +14,13 @@
   <dependencies>
     <dependency>
       <groupId>org.camunda.bpm</groupId>
+      <artifactId>engine-rest-jax-rs-two</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine-rest-core</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -45,6 +52,7 @@
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-jaxrs</artifactId>
+      <version>3.0.19.Final</version>
       <scope>provided</scope>
     </dependency>
 
