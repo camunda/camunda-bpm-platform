@@ -312,7 +312,7 @@
   </select>
 
   <select id="selectHistoricCaseInstanceIdsForCleanup_oracle" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
-    SELECT /*+ FIRST_ROWS(${maxResults}) NO_PARALLEL(di) NO_PARALLEL(dd) */ ci.ID_, ci.CLOSE_TIME_
+    SELECT /*+ FIRST_ROWS(${maxResults}) NO_PARALLEL(ci) NO_PARALLEL(cd) */ ci.ID_, ci.CLOSE_TIME_
     <include refid="selectHistoricCaseInstanceIdsForCleanupSql"/>
   </select>
 
