@@ -5,7 +5,6 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmd.CompleteTaskCmd;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.slf4j.Logger;

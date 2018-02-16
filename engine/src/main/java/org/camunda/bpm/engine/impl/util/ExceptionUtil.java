@@ -18,6 +18,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.ibatis.executor.BatchExecutorException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
@@ -102,4 +103,34 @@ public class ExceptionUtil {
     return sqlExceptionList;
   }
 
+  public static boolean checkForeignKeyConstraintViolation(Throwable cause) {
+
+    while (cause != null) {
+      List<SQLException> relatedSqlExceptions = findRelatedSqlExceptions(cause);
+      for (SQLException exception : relatedSqlExceptions) {
+        if (exception.getMessage().contains("FOREIGN KEY constraint")
+          || exception.getMessage().contains("foreign key constraint")
+          || exception.getMessage().contains("integrity constraint")
+          || exception.getMessage().contains("constraint violation")
+          || exception.getMessage().contains("SQLCODE=-530, SQLSTATE=23503")) {
+          return true;
+        }
+      }
+      cause = cause.getCause();
+    }
+
+    return false;
+  }
+
+  public static BatchExecutorException findBatchExecutorException(Throwable exception) {
+    Throwable cause = exception;
+    do {
+      if (cause instanceof BatchExecutorException) {
+        return (BatchExecutorException) cause;
+      }
+      cause = cause.getCause();
+    } while (cause != null);
+
+    return null;
+  }
 }

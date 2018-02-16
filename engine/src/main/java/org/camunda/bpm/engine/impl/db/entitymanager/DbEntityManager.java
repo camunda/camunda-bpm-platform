@@ -30,6 +30,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.ibatis.executor.BatchExecutorException;
 import org.apache.ibatis.executor.BatchResult;
 import org.camunda.bpm.engine.impl.DeploymentQueryImpl;
 import org.camunda.bpm.engine.impl.ExecutionQueryImpl;
@@ -72,6 +73,7 @@ import org.camunda.bpm.engine.impl.interceptor.Session;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutorContext;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
+import org.camunda.bpm.engine.impl.util.ExceptionUtil;
 
 /**
  *
@@ -358,14 +360,20 @@ public class DbEntityManager implements Session, EntityLoadListener {
    * @return A boolean determining if an OptimisticLockingException should be thrown
    */
   private boolean isOptimisticLockingException(List<DbOperation> operationsToFlush, Throwable cause) {
-    if (cause.getMessage().contains("constraint violation")) {
-      for (DbOperation operation : operationsToFlush) {
 
-        if (operation instanceof DbEntityOperation
-          && (operation.getOperationType().equals(DbOperationType.INSERT)
-            || operation.getOperationType().equals(DbOperationType.UPDATE))) {
+    boolean isConstraintViolation = ExceptionUtil.checkForeignKeyConstraintViolation(cause);
+    BatchExecutorException batchExecutorException = ExceptionUtil.findBatchExecutorException(cause);
 
-          DbEntity entity = ((DbEntityOperation) operation).getEntity();
+    if (isConstraintViolation && batchExecutorException != null) {
+
+      int failedOperationIndex = batchExecutorException.getSuccessfulBatchResults().size();
+
+      if (failedOperationIndex < operationsToFlush.size()) {
+        DbOperation failedOperation = operationsToFlush.get(failedOperationIndex);
+
+        if (failedOperation instanceof DbEntityOperation && (failedOperation.getOperationType().equals(DbOperationType.INSERT) || failedOperation.getOperationType().equals(DbOperationType.UPDATE))) {
+
+          DbEntity entity = ((DbEntityOperation) failedOperation).getEntity();
           for (Field classField : entity.getClass().getDeclaredFields()) {
 
             if (DbEntity.class.isAssignableFrom(classField.getType())) {
@@ -381,8 +389,12 @@ public class DbEntityManager implements Session, EntityLoadListener {
                     return true;
                   }
                 }
-              } catch (IllegalAccessException e) {
-                throw LOG.noAccessToFieldValue(e);
+              } catch (Exception e) {
+                if (ExceptionUtil.findRelatedSqlExceptions(e).size() > 0) {
+                  return true;
+                } else {
+                  throw LOG.noAccessToFieldValue(e);
+                }
               }
             }
           }
