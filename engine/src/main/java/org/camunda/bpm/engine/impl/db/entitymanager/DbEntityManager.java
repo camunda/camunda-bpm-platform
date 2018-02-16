@@ -24,6 +24,7 @@ import static org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation
 import static org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperationType.UPDATE;
 import static org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperationType.UPDATE_BULK;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -340,10 +341,56 @@ public class DbEntityManager implements Session, EntityLoadListener {
       try {
         flushResult = persistenceSession.flushOperations();
       } catch (Exception e) {
-        throw LOG.flushDbOperationsException(operationsToFlush, e);
+        boolean doOptimisticLockingException = isOptimisticLockingException(operationsToFlush, e);
+        throw LOG.flushDbOperationsException(operationsToFlush, e, doOptimisticLockingException);
       }
       checkFlushResults(operationsToFlush, flushResult);
     }
+  }
+
+  /**
+   * Checks if the reason for a persistence exception was the foreign-key referencing of a (currently)
+   * non-existing entity. This might happen with concurrent transactions, leading to an
+   * OptimisticLockingException.
+   *
+   * @param operationsToFlush The list of DB operations in which the Exception occurred
+   * @param cause the Exception object
+   * @return A boolean determining if an OptimisticLockingException should be thrown
+   */
+  private boolean isOptimisticLockingException(List<DbOperation> operationsToFlush, Throwable cause) {
+    if (cause.getMessage().contains("constraint violation")) {
+      for (DbOperation operation : operationsToFlush) {
+
+        if (operation instanceof DbEntityOperation
+          && (operation.getOperationType().equals(DbOperationType.INSERT)
+            || operation.getOperationType().equals(DbOperationType.UPDATE))) {
+
+          DbEntity entity = ((DbEntityOperation) operation).getEntity();
+          for (Field classField : entity.getClass().getDeclaredFields()) {
+
+            if (DbEntity.class.isAssignableFrom(classField.getType())) {
+              try {
+                classField.setAccessible(true);
+                DbEntity fieldEntity = (DbEntity) classField.get(entity);
+
+                if (fieldEntity != null) {
+                  String entityId = fieldEntity.getId();
+                  fieldEntity = this.persistenceSession.selectById(fieldEntity.getClass(), entityId);
+
+                  if (fieldEntity == null) {
+                    return true;
+                  }
+                }
+              } catch (IllegalAccessException e) {
+                throw LOG.noAccessToFieldValue(e);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    return false;
   }
 
   protected void checkFlushResults(List<DbOperation> operationsToFlush, List<BatchResult> flushResult) {

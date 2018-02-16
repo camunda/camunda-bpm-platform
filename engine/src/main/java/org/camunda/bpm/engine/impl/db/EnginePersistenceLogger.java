@@ -669,7 +669,7 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
   }
 
   public ProcessEngineException flushDbOperationsException(List<DbOperation> operationsToFlush,
-    Throwable cause) {
+    Throwable cause, boolean isOptimisticLockingException) {
     String message = cause.getMessage();
 
     //collect real SQL exception messages in case of batch processing
@@ -686,11 +686,17 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
       exCause = exCause.getCause();
     } while (exCause != null);
 
-    return new ProcessEngineException(exceptionMessage(
+    String exceptionMessage = exceptionMessage(
       "083",
       "Exception while executing Batch Database Operations with message '{}'. Flush summary: \n {}", message,
       buildStringFromList(operationsToFlush)
-    ), cause);
+    );
+
+    if (isOptimisticLockingException) {
+      return new OptimisticLockingException(exceptionMessage);
+    }
+
+    return new ProcessEngineException(exceptionMessage, cause);
   }
 
   public ProcessEngineException wrongBatchResultsSizeException(List<DbOperation> operationsToFlush) {
@@ -698,6 +704,14 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
       "084",
       "Exception while executing Batch Database Operations: the size of Batch Result does not correspond to the number of flushed operations. Flush summary: \n {}",
       buildStringFromList(operationsToFlush)
+    ));
+  }
+
+  public ProcessEngineException noAccessToFieldValue(Throwable cause) {
+    return new ProcessEngineException(exceptionMessage(
+      "085",
+      "Exception while trying to access field value of class. Check SecurityManager configuration. Summary: \n {}",
+      cause.getMessage()
     ));
   }
 
