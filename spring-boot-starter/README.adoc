@@ -7,7 +7,7 @@ image::https://travis-ci.org/camunda/camunda-bpm-spring-boot-starter.svg?branch=
 // license
 image::https://img.shields.io/badge/License-Apache%202.0-blue.svg[link="./LICENSE"]
 // mvn central
-image::https://maven-badges.herokuapp.com/maven-central/org.camunda.bpm.extension.springboot/camunda-bpm-spring-boot-starter/badge.svg[link="https://maven-badges.herokuapp.com/maven-central/org.camunda.bpm.extension.springboot/camunda-bpm-spring-boot-starter"]
+image::https://maven-badges.herokuapp.com/maven-central/org.camunda.bpm.springboot/camunda-bpm-spring-boot-starter/badge.svg[link="https://maven-badges.herokuapp.com/maven-central/org.camunda.bpm.springboot/camunda-bpm-spring-boot-starter"]
 // openhub
 image::https://www.openhub.net/p/camunda-bpm-spring-boot-starter/widgets/project_thin_badge.gif[link="https://www.openhub.net/p/camunda-bpm-spring-boot-starter"]
 ,====
