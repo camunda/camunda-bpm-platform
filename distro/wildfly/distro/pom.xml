@@ -48,6 +48,7 @@
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine-rest</artifactId>
       <version>${project.version}</version>
+      <classifier>wildfly</classifier>
       <type>war</type>
     </dependency>
     
