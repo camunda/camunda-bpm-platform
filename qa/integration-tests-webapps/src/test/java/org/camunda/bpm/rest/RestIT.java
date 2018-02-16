@@ -10,6 +10,7 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.ws.rs.core.MediaType;
@@ -36,6 +37,8 @@ public class RestIT extends AbstractWebappIntegrationTest {
   private static final String HISTORIC_DETAIL_PATH = ENGINE_DEFAULT_PATH + "/history/detail";
 
   private static final String PROCESS_INSTANCE_PATH = ENGINE_DEFAULT_PATH + "/process-instance";
+
+  private static final String FETCH_AND_LOCK_PATH = ENGINE_DEFAULT_PATH + "/external-task/fetchAndLock";
 
 
   private final static Logger log = Logger.getLogger(RestIT.class.getName());
@@ -265,6 +268,22 @@ public class RestIT extends AbstractWebappIntegrationTest {
       .post(ClientResponse.class);
 
     assertEquals(400, response.getStatus());
+    response.close();
+  }
+
+  @Ignore("CAM-8744")
+  @Test
+  public void testJaxRsTwoArtifactIsUsed() throws JSONException {
+    Map<String, Object> fetchAndLock = new HashMap<String, Object>();
+    fetchAndLock.put("asyncResponseTimeout", "20");
+
+    ClientResponse response = client.resource(APP_BASE_PATH + FETCH_AND_LOCK_PATH).accept(MediaType.APPLICATION_JSON)
+      .entity(fetchAndLock, MediaType.APPLICATION_JSON_TYPE)
+      .post(ClientResponse.class);
+
+    assertEquals(400, response.getStatus());
+    String responseMessage = response.getEntity(JSONObject.class).get("message").toString();
+    assertTrue(responseMessage.contains("The asynchronous response timeout cannot be set to a value less than"));
     response.close();
   }
 
