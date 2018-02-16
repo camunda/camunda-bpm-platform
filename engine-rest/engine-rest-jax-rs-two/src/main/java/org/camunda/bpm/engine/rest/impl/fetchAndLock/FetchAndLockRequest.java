@@ -33,6 +33,11 @@ public class FetchAndLockRequest implements Comparable<FetchAndLockRequest> {
     return requestTime;
   }
 
+  public FetchAndLockRequest setRequestTime(Date requestTime) {
+    this.requestTime = requestTime;
+    return this;
+  }
+
   public FetchExternalTasksExtendedDto getDto() {
     return dto;
   }
@@ -72,7 +77,7 @@ public class FetchAndLockRequest implements Comparable<FetchAndLockRequest> {
   @Override
   public int compareTo(FetchAndLockRequest request) {
     return (request.requestTime.getTime() + request.dto.getAsyncResponseTimeout()) <
-      (requestTime.getTime() + dto.getAsyncResponseTimeout()) ? -1 : 0;
+      (requestTime.getTime() + dto.getAsyncResponseTimeout()) ? 0 : -1;
   }
 
 }

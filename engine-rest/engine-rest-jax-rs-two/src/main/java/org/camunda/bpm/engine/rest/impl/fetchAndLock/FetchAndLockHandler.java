@@ -40,48 +40,57 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class FetchAndLockHandler implements Runnable {
 
   private static final long MAX_BACK_OFF_TIME = Long.MAX_VALUE;
-  private static final long MIN_BACK_OFF_TIME = 10000; // 10 seconds
+  private static final long MIN_BACK_OFF_TIME = 3000; // 3 seconds
+  private static final long DEFAULT_BACK_OFF_TIME = 15000; // 15 seconds
   public static final long MIN_TIMEOUT = 60000; // 1 minute
   public static final long MAX_TIMEOUT = 1800000; // 30 minutes
   private static final String BASIC_AUTH_HEADER_PREFIX = "Basic ";
 
   private List<FetchAndLockRequest> pendingRequests = new CopyOnWriteArrayList<FetchAndLockRequest>();
   private Thread handlerThread = new Thread(this, this.getClass().getSimpleName());
+  private boolean isRunning = true;
 
-  FetchAndLockHandler() {
+  public FetchAndLockHandler() {
     handlerThread.start();
   }
 
   @Override
   public void run() {
-    while (true) {
+    while (isRunning) {
       long backOffTime;
       if (pendingRequests.isEmpty()) {
         backOffTime = MAX_BACK_OFF_TIME;
       } else {
-        FetchAndLockRequest pendingRequest = pendingRequests.get(0); // get pending request with minimum slack time
-        List<LockedExternalTaskDto> lockedTasks = tryFetchAndLock(pendingRequest);
+        for (FetchAndLockRequest pendingRequest : pendingRequests) {
+          List<LockedExternalTaskDto> lockedTasks = tryFetchAndLock(pendingRequest);
+          if (lockedTasks != null) { // if false not authorized; pending request has already been removed
+            FetchExternalTasksExtendedDto dto = pendingRequest.getDto();
+            long asyncResponseTimeout = dto.getAsyncResponseTimeout();
+            long currentTime = ClockUtil.getCurrentTime().getTime();
+            long requestTime = pendingRequest.getRequestTime().getTime();
+            if (!lockedTasks.isEmpty() || (requestTime + asyncResponseTimeout) <= currentTime) {
+              pendingRequests.remove(pendingRequest);
+              AsyncResponse asyncResponse = pendingRequest.getAsyncResponse();
+              asyncResponse.resume(lockedTasks);
+            }
+          }
+        }
 
-        if (lockedTasks == null) { // not authorized; pending request has already been removed
-          backOffTime = 0;
-        } else {
+        if (!pendingRequests.isEmpty()) {
+          FetchAndLockRequest pendingRequest = pendingRequests.get(0); // get pending request with minimum slack time
           FetchExternalTasksExtendedDto dto = pendingRequest.getDto();
           long asyncResponseTimeout = dto.getAsyncResponseTimeout();
           long currentTime = ClockUtil.getCurrentTime().getTime();
           long requestTime = pendingRequest.getRequestTime().getTime();
-          if (!lockedTasks.isEmpty() || (requestTime + asyncResponseTimeout) < currentTime) {
-            pendingRequests.remove(pendingRequest);
-            AsyncResponse asyncResponse = pendingRequest.getAsyncResponse();
-            asyncResponse.resume(lockedTasks);
-          }
-
           long slackTime = (requestTime + asyncResponseTimeout) - currentTime;
-          if (slackTime > MIN_BACK_OFF_TIME) {
+          if (slackTime > DEFAULT_BACK_OFF_TIME) {
             long dividedSlackTime = slackTime / 10;
-            backOffTime = dividedSlackTime > MIN_BACK_OFF_TIME ? dividedSlackTime : MIN_BACK_OFF_TIME;
+            backOffTime = dividedSlackTime > DEFAULT_BACK_OFF_TIME ? dividedSlackTime : DEFAULT_BACK_OFF_TIME;
           } else {
-            backOffTime = 0;
+            backOffTime = MIN_BACK_OFF_TIME;
           }
+        } else {
+          backOffTime = MAX_BACK_OFF_TIME;
         }
       }
 
@@ -162,7 +171,7 @@ public class FetchAndLockHandler implements Runnable {
     asyncResponse.resume(new InvalidRequestException(Status.BAD_REQUEST, exception, exception.getMessage()));
   }
 
-  void addPendingRequest(FetchExternalTasksExtendedDto dto,
+  public void addPendingRequest(FetchExternalTasksExtendedDto dto,
                          AsyncResponse asyncResponse, HttpHeaders headers, ProcessEngine processEngine) {
     if (dto == null) {
       invalidRequest(asyncResponse, "The body of the request cannot be empty");
@@ -272,6 +281,18 @@ public class FetchAndLockHandler implements Runnable {
 
   private boolean isAuthenticated(ProcessEngine engine, String userName, String password) {
     return engine.getIdentityService().checkPassword(userName, password);
+  }
+
+  public Thread getHandlerThread() {
+    return handlerThread;
+  }
+
+  public void stop() {
+    isRunning = false;
+  }
+
+  public List<FetchAndLockRequest> getPendingRequests() {
+    return pendingRequests;
   }
 
 }
