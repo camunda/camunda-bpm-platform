@@ -12,6 +12,10 @@
     <version>7.9.0-SNAPSHOT</version>
   </parent>
 
+  <properties>
+    <version.resteasy>3.0.19.Final</version.resteasy>
+  </properties>
+
   <dependencies>
     <!-- compile -->
     <dependency>
@@ -125,21 +129,21 @@
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-netty4</artifactId>
-      <version>3.0.19.Final</version>
+      <version>${version.resteasy}</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-jaxrs</artifactId>
-      <version>3.0.19.Final</version>
+      <version>${version.resteasy}</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-client</artifactId>
-      <version>3.0.19.Final</version>
+      <version>${version.resteasy}</version>
       <scope>test</scope>
     </dependency>
 
