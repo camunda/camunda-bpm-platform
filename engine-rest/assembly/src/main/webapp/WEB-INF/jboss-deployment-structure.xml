@@ -4,6 +4,8 @@
     <exclusions>
       <module name="org.jboss.resteasy.resteasy-jackson-provider" />
       <module name="org.jboss.resteasy.resteasy-jettison-provider" />
+      <module name="org.jboss.resteasy.resteasy-jaxrs" />
+      <module name="javaee.api" />
     </exclusions>
   </deployment>
 </jboss-deployment-structure>

@@ -42,6 +42,7 @@
   	</dependencySet>
 
     <dependencySet>
+        <outputFileNameMapping>${artifact.artifactId}-${artifact.version}.${artifact.extension}</outputFileNameMapping>
         <includes>
             <include>org.camunda.bpm:camunda-engine-rest:war:*</include>
         </includes>

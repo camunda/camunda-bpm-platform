@@ -23,9 +23,6 @@
       <useTransitiveDependencies>true</useTransitiveDependencies>     
       <useTransitiveFiltering>true</useTransitiveFiltering>
       <scope>provided</scope>
-      <includes>
-        <include>org.camunda.bpm:engine-rest-jax-rs-two:jar:*</include>
-      </includes>
     </dependencySet>
 
     <dependencySet>
