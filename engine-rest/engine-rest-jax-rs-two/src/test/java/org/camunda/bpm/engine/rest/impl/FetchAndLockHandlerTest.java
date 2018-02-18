@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.identity.Tenant;
 import org.camunda.bpm.engine.identity.TenantQuery;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.rest.dto.externaltask.LockedExternalTaskDto;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.impl.fetchAndLock.FetchAndLockHandler;
 import org.camunda.bpm.engine.rest.impl.fetchAndLock.FetchAndLockRequest;
@@ -40,6 +41,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
@@ -61,6 +64,8 @@ import static org.mockito.Mockito.when;
  * @author Tassilo Weidner
  */
 public class FetchAndLockHandlerTest {
+
+  private static final String AUTH_HEADER = FetchAndLockHandler.BASIC_AUTH_HEADER_PREFIX + "dXNlcklkOnMzY3JldA=="; // userId:s3cret
 
   private ProcessEngine processEngine;
 
@@ -97,7 +102,7 @@ public class FetchAndLockHandlerTest {
 
     httpHeaders = mock(HttpHeaders.class);
     when(httpHeaders.getHeaderString(anyString()))
-      .thenReturn("Basic dXNlcklkOnMzY3JldA==");
+      .thenReturn(AUTH_HEADER);
     when(identityServiceMock.checkPassword(MockProvider.EXAMPLE_USER_ID, MockProvider.EXAMPLE_USER_PASSWORD))
       .thenReturn(true);
 
@@ -113,21 +118,19 @@ public class FetchAndLockHandlerTest {
 
   @After
   public void tearDown() {
-    fetchAndLockHandler.getHandlerThread().stop();
+    fetchAndLockHandler.getHandlerThread().stop(); // provoke thread death
     ClockUtil.reset();
   }
 
   @Test
-  public void shouldResumeRequestAfterQueryAtLeastTenTimes() {
-    // given & when
+  public void shouldQueryAtLeast10TimesBeforeResumeRequest() throws InterruptedException {
+    // given
     AsyncResponse asyncResponse1 = mock(AsyncResponse.class);
     fetchAndLockHandler.addPendingRequest(createDto(FetchAndLockHandler.MIN_TIMEOUT),
       asyncResponse1, httpHeaders, processEngine);
 
-    List<FetchAndLockRequest> pendingRequests;
-    do {
-      pendingRequests = fetchAndLockHandler.getPendingRequests();
-    } while (!pendingRequests.isEmpty());
+    // when
+    Thread.sleep(FetchAndLockHandler.MIN_TIMEOUT + 500);
 
     // then
     verify(fetchTopicBuilder, atLeast(10)).execute();
@@ -135,8 +138,8 @@ public class FetchAndLockHandlerTest {
   }
 
   @Test
-  public void shouldResumeRequestsAfterQueryAtLeastTwentyTimes() {
-    // given & when
+  public void shouldQueryAtLeast40TimesBeforeResumeRequests() throws InterruptedException {
+    // given
     AsyncResponse asyncResponse1 = mock(AsyncResponse.class);
     fetchAndLockHandler.addPendingRequest(createDto(FetchAndLockHandler.MIN_TIMEOUT),
       asyncResponse1, httpHeaders, processEngine);
@@ -153,14 +156,39 @@ public class FetchAndLockHandlerTest {
     fetchAndLockHandler.addPendingRequest(createDto(FetchAndLockHandler.MIN_TIMEOUT),
       asyncResponse4, httpHeaders, processEngine);
 
-    List<FetchAndLockRequest> pendingRequests;
-    do {
-      pendingRequests = fetchAndLockHandler.getPendingRequests();
-    } while (!pendingRequests.isEmpty());
+    // when
+    Thread.sleep(FetchAndLockHandler.MIN_TIMEOUT + 500);
 
     // then
     verify(fetchTopicBuilder, atLeast(40)).execute();
     verify(fetchTopicBuilder, atMost(50)).execute();
+  }
+
+  @Test
+  public void shouldQueryAtLeast50TimesBeforeResumeRequests() throws InterruptedException {
+    // given
+    AsyncResponse asyncResponse1 = mock(AsyncResponse.class);
+    fetchAndLockHandler.addPendingRequest(createDto(FetchAndLockHandler.MIN_TIMEOUT * 2),
+      asyncResponse1, httpHeaders, processEngine);
+
+    AsyncResponse asyncResponse2 = mock(AsyncResponse.class);
+    fetchAndLockHandler.addPendingRequest(createDto(FetchAndLockHandler.MIN_TIMEOUT),
+      asyncResponse2, httpHeaders, processEngine);
+
+    AsyncResponse asyncResponse3 = mock(AsyncResponse.class);
+    fetchAndLockHandler.addPendingRequest(createDto(FetchAndLockHandler.MIN_TIMEOUT),
+      asyncResponse3, httpHeaders, processEngine);
+
+    AsyncResponse asyncResponse4 = mock(AsyncResponse.class);
+    fetchAndLockHandler.addPendingRequest(createDto(FetchAndLockHandler.MIN_TIMEOUT),
+      asyncResponse4, httpHeaders, processEngine);
+
+    // when
+    Thread.sleep(FetchAndLockHandler.MIN_TIMEOUT * 2 + 500);
+
+    // then
+    verify(fetchTopicBuilder, atLeast(50)).execute();
+    verify(fetchTopicBuilder, atMost(60)).execute();
   }
 
   @Test
@@ -170,113 +198,112 @@ public class FetchAndLockHandlerTest {
     FetchAndLockRequest incomingRequest1 = new FetchAndLockRequest()
       .setProcessEngine(processEngine)
       .setAsyncResponse(asyncResponse1)
-      .setDto(createDto(FetchAndLockHandler.MIN_TIMEOUT + 1000))
-      .setAuthHeader("Basic dXNlcklkOnMzY3JldA==");
-
-    Thread.sleep(500);
+      .setDto(createDto(FetchAndLockHandler.MIN_TIMEOUT + 3000))
+      .setAuthHeader(AUTH_HEADER);
 
     AsyncResponse asyncResponse2 = mock(AsyncResponse.class);
     FetchAndLockRequest incomingRequest2 = new FetchAndLockRequest()
       .setProcessEngine(processEngine)
       .setAsyncResponse(asyncResponse2)
       .setDto(createDto(FetchAndLockHandler.MIN_TIMEOUT + 2000))
-      .setAuthHeader("Basic dXNlcklkOnMzY3JldA==");
-
-    Thread.sleep(500);
+      .setAuthHeader(AUTH_HEADER);
 
     AsyncResponse asyncResponse3 = mock(AsyncResponse.class);
     FetchAndLockRequest incomingRequest3 = new FetchAndLockRequest()
       .setProcessEngine(processEngine)
       .setAsyncResponse(asyncResponse3)
-      .setDto(createDto(FetchAndLockHandler.MIN_TIMEOUT + 3000))
-      .setAuthHeader("Basic dXNlcklkOnMzY3JldA==");
+      .setDto(createDto(FetchAndLockHandler.MIN_TIMEOUT + 1000))
+      .setAuthHeader(AUTH_HEADER);
 
-    Thread.sleep(500);
-
-    FetchAndLockHandler fetchAndLockHandler = new FetchAndLockHandler();
     List<FetchAndLockRequest> pendingRequests = fetchAndLockHandler.getPendingRequests();
     pendingRequests.addAll(Arrays.asList(incomingRequest1, incomingRequest2, incomingRequest3));
-
-    Thread.sleep(500);
 
     // when
     AsyncResponse asyncResponse4 = mock(AsyncResponse.class);
     fetchAndLockHandler.addPendingRequest(createDto(FetchAndLockHandler.MIN_TIMEOUT + 10000),
       asyncResponse4, httpHeaders, processEngine);
 
-    FetchAndLockRequest maxSlackTimeRequest = pendingRequests.get(pendingRequests.size()-1);
-    ClockUtil.setCurrentTime(new Date(maxSlackTimeRequest.getRequestTime().getTime()
-      + maxSlackTimeRequest.getDto().getAsyncResponseTimeout()));
+    ClockUtil.setCurrentTime(new Date(ClockUtil.getCurrentTime().getTime() + FetchAndLockHandler.MIN_TIMEOUT + 10000));
 
-    do {
-      pendingRequests = fetchAndLockHandler.getPendingRequests();
-    } while (!pendingRequests.isEmpty());
+    fetchAndLockHandler.getHandlerThread().interrupt();
+    Thread.sleep(500);
 
     // then
     InOrder inOrder = inOrder(asyncResponse1, asyncResponse2, asyncResponse3, asyncResponse4);
-    inOrder.verify(asyncResponse1).resume(Collections.emptyList());
-    inOrder.verify(asyncResponse2).resume(Collections.emptyList());
     inOrder.verify(asyncResponse3).resume(Collections.emptyList());
+    inOrder.verify(asyncResponse2).resume(Collections.emptyList());
+    inOrder.verify(asyncResponse1).resume(Collections.emptyList());
     inOrder.verify(asyncResponse4).resume(Collections.emptyList());
   }
 
   @Test
-  public void shouldResumeAllRequestsByAvailableResultAndTimeout() {
-    // given & when
+  public void shouldResumeRequestWithAvailableResultFirst() throws InterruptedException {
+    // given
     when(fetchTopicBuilder.execute())
-      .thenReturn(Collections.<LockedExternalTask>emptyList())
-      .thenReturn(Collections.singletonList(lockedExternalTaskMock))
-      .thenReturn(Collections.<LockedExternalTask>emptyList())
-      .thenReturn(Collections.<LockedExternalTask>emptyList())
+      .thenReturn(Collections.singletonList(lockedExternalTaskMock)) // return non-empty list once
       .thenReturn(Collections.<LockedExternalTask>emptyList());
 
-    ClockUtil.setCurrentTime(new Date(ClockUtil.getCurrentTime().getTime()));
+    ClockUtil.setCurrentTime(ClockUtil.getCurrentTime());
 
     AsyncResponse asyncResponse1 = mock(AsyncResponse.class);
-    fetchAndLockHandler.addPendingRequest(createDto(FetchAndLockHandler.MIN_TIMEOUT + 1000),
-      asyncResponse1, httpHeaders, processEngine);
+    FetchAndLockRequest incomingRequest1 = new FetchAndLockRequest()
+      .setProcessEngine(processEngine)
+      .setAsyncResponse(asyncResponse1)
+      .setDto(createDto(FetchAndLockHandler.MIN_TIMEOUT))
+      .setAuthHeader(AUTH_HEADER);
 
     AsyncResponse asyncResponse2 = mock(AsyncResponse.class);
-    fetchAndLockHandler.addPendingRequest(createDto(FetchAndLockHandler.MIN_TIMEOUT + 5000),
-      asyncResponse2, httpHeaders, processEngine);
+    FetchAndLockRequest incomingRequest2 = new FetchAndLockRequest()
+      .setProcessEngine(processEngine)
+      .setAsyncResponse(asyncResponse2)
+      .setDto(createDto(FetchAndLockHandler.MIN_TIMEOUT))
+      .setAuthHeader(AUTH_HEADER);
 
     AsyncResponse asyncResponse3 = mock(AsyncResponse.class);
-    fetchAndLockHandler.addPendingRequest(createDto(FetchAndLockHandler.MIN_TIMEOUT + 2000),
-      asyncResponse3, httpHeaders, processEngine);
-
-    AsyncResponse asyncResponse4 = mock(AsyncResponse.class);
-    fetchAndLockHandler.addPendingRequest(createDto(FetchAndLockHandler.MIN_TIMEOUT + 3000),
-      asyncResponse4, httpHeaders, processEngine);
-
-    AsyncResponse asyncResponse5 = mock(AsyncResponse.class);
-    fetchAndLockHandler.addPendingRequest(createDto(FetchAndLockHandler.MIN_TIMEOUT),
-      asyncResponse5, httpHeaders, processEngine);
+    FetchAndLockRequest incomingRequest3 = new FetchAndLockRequest()
+      .setProcessEngine(processEngine)
+      .setAsyncResponse(asyncResponse3)
+      .setDto(createDto(FetchAndLockHandler.MIN_TIMEOUT))
+      .setAuthHeader(AUTH_HEADER);
 
     List<FetchAndLockRequest> pendingRequests = fetchAndLockHandler.getPendingRequests();
-    FetchAndLockRequest maxSlackTimeRequest = pendingRequests.get(pendingRequests.size()-1);
-    ClockUtil.setCurrentTime(new Date(maxSlackTimeRequest.getRequestTime().getTime()
-      + maxSlackTimeRequest.getDto().getAsyncResponseTimeout()));
+    List<FetchAndLockRequest> allRequests = new ArrayList<FetchAndLockRequest>(Arrays.asList(
+      incomingRequest1, incomingRequest2, incomingRequest3));
+    pendingRequests.addAll(allRequests);
 
-    do {
-      pendingRequests = fetchAndLockHandler.getPendingRequests();
-    } while (!pendingRequests.isEmpty());
+    assertThat(pendingRequests.size(), is(3));
+
+    // when
+    fetchAndLockHandler.getHandlerThread().interrupt();
+    Thread.sleep(500);
+
+    assertThat(pendingRequests.size(), is(2));
+
+    List<FetchAndLockRequest> requestsWithoutResult = new ArrayList<FetchAndLockRequest>(pendingRequests);
+    allRequests.removeAll(pendingRequests);
+    FetchAndLockRequest requestWithResult = allRequests.get(0);
+    verify(requestWithResult.getAsyncResponse()).resume(anyListOf(LockedExternalTaskDto.class));
+
+    ClockUtil.setCurrentTime(new Date(ClockUtil.getCurrentTime().getTime() + FetchAndLockHandler.MIN_TIMEOUT));
+
+    fetchAndLockHandler.getHandlerThread().interrupt();
+    Thread.sleep(500);
 
     // then
-    InOrder inOrder = inOrder(asyncResponse1, asyncResponse2, asyncResponse3, asyncResponse4);
-    inOrder.verify(asyncResponse2).resume(anyList());
-    inOrder.verify(asyncResponse1).resume(Collections.<LockedExternalTask>emptyList());
-    inOrder.verify(asyncResponse3).resume(Collections.<LockedExternalTask>emptyList());
-    inOrder.verify(asyncResponse4).resume(Collections.<LockedExternalTask>emptyList());
+    for (FetchAndLockRequest fetchAndLockRequest : requestsWithoutResult) {
+      verify(fetchAndLockRequest.getAsyncResponse()).resume(Collections.EMPTY_LIST);
+    }
   }
 
   @Test
   public void shouldResumeSecondRequestByAvailableResult() {
-    // given & when
+    // given
     when(fetchTopicBuilder.execute())
       .thenReturn(Collections.<LockedExternalTask>emptyList())
       .thenReturn(Collections.singletonList(lockedExternalTaskMock))
       .thenReturn(Collections.<LockedExternalTask>emptyList());
 
+    // when
     AsyncResponse asyncResponse1 = mock(AsyncResponse.class);
     fetchAndLockHandler.addPendingRequest(createDto(FetchAndLockHandler.MIN_TIMEOUT + 1000),
       asyncResponse1, httpHeaders, processEngine);
@@ -302,12 +329,12 @@ public class FetchAndLockHandlerTest {
   }
 
   @Test
-  public void shouldThrowNotAuthorizedException()  {
+  public void shouldThrowNotAuthorizedException() throws InterruptedException {
     // given
     HttpHeaders httpHeaders = mock(HttpHeaders.class);
     when(httpHeaders.getHeaderString(anyString()))
-      .thenReturn("Basic dXNlcklkOnMzY3JldA==")
-      .thenReturn("Basic wrong");
+      .thenReturn(AUTH_HEADER)
+      .thenReturn(AUTH_HEADER + "wroong");
 
     when(identityServiceMock.checkPassword(MockProvider.EXAMPLE_USER_ID, MockProvider.EXAMPLE_USER_PASSWORD))
       .thenReturn(true)
@@ -320,25 +347,22 @@ public class FetchAndLockHandlerTest {
     fetchAndLockHandler.addPendingRequest(createDto(FetchAndLockHandler.MIN_TIMEOUT + 1000),
       asyncResponse1, httpHeaders, processEngine);
 
-    List<FetchAndLockRequest> pendingRequests = fetchAndLockHandler.getPendingRequests();
-    FetchAndLockRequest maxSlackTimeRequest = pendingRequests.get(pendingRequests.size()-1);
-    ClockUtil.setCurrentTime(new Date(maxSlackTimeRequest.getRequestTime().getTime() +
-      maxSlackTimeRequest.getDto().getAsyncResponseTimeout()));
+    ClockUtil.setCurrentTime(new Date(ClockUtil.getCurrentTime().getTime() + FetchAndLockHandler.MIN_TIMEOUT + 1000));
 
-    do {
-      pendingRequests = fetchAndLockHandler.getPendingRequests();
-    } while (!pendingRequests.isEmpty());
+    fetchAndLockHandler.getHandlerThread().interrupt();
+    Thread.sleep(500);
 
     // then
     verify(asyncResponse1).resume(any(NotAuthorizedException.class));
   }
 
   @Test
-  public void shouldStopHandlerThread() {
-    // given & when
+  public void shouldShutdownHandlerThread() {
+    // given
     fetchAndLockHandler.shutdown();
     fetchAndLockHandler.getHandlerThread().interrupt();
 
+    // when
     AsyncResponse asyncResponse1 = mock(AsyncResponse.class);
     fetchAndLockHandler.addPendingRequest(createDto(FetchAndLockHandler.MIN_TIMEOUT + 1000),
       asyncResponse1, httpHeaders, processEngine);
@@ -367,7 +391,8 @@ public class FetchAndLockHandlerTest {
     }
     fetchExternalTasksDto.setMaxTasks(5);
     fetchExternalTasksDto.setWorkerId("aWorkerId");
-    FetchExternalTasksExtendedDto.FetchExternalTaskTopicDto topicDto = new FetchExternalTasksExtendedDto.FetchExternalTaskTopicDto();
+    FetchExternalTasksExtendedDto.FetchExternalTaskTopicDto topicDto =
+      new FetchExternalTasksExtendedDto.FetchExternalTaskTopicDto();
     fetchExternalTasksDto.setTopics(Collections.singletonList(topicDto));
     topicDto.setTopicName("aTopicName");
     topicDto.setLockDuration(12354L);
