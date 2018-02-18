@@ -17,9 +17,7 @@ import org.camunda.bpm.engine.rest.impl.fetchAndLock.FetchAndLockRestServiceImpl
 
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.ext.Providers;
 import java.net.URI;
 
 /**
@@ -29,9 +27,6 @@ import java.net.URI;
 public class JaxRsTwoNamedProcessEngineRestServiceImpl extends JaxRsTwoAbstractProcessEngineRestServiceImpl {
 
   static final String PATH = "/engine";
-
-  @Context
-  protected Providers providers;
 
   @Path("/{name}" + FetchAndLockRestService.PATH)
   public FetchAndLockRestService fetchAndLock(@PathParam("name") String engineName) {

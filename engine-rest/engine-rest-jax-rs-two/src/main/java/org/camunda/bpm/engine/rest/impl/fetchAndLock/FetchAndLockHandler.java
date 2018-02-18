@@ -44,7 +44,7 @@ public class FetchAndLockHandler implements Runnable {
   private static final long DEFAULT_BACK_OFF_TIME = 15000; // 15 seconds
   public static final long MIN_TIMEOUT = 60000; // 1 minute
   public static final long MAX_TIMEOUT = 1800000; // 30 minutes
-  private static final String BASIC_AUTH_HEADER_PREFIX = "Basic ";
+  public static final String BASIC_AUTH_HEADER_PREFIX = "Basic ";
 
   private List<FetchAndLockRequest> pendingRequests = new CopyOnWriteArrayList<FetchAndLockRequest>();
   private Thread handlerThread = new Thread(this, this.getClass().getSimpleName());
@@ -91,10 +91,14 @@ public class FetchAndLockHandler implements Runnable {
           long asyncResponseTimeout = dto.getAsyncResponseTimeout();
           long currentTime = ClockUtil.getCurrentTime().getTime();
           long requestTime = pendingRequest.getRequestTime().getTime();
-          long slackTime = (requestTime + asyncResponseTimeout) - currentTime;
-          if (slackTime > DEFAULT_BACK_OFF_TIME) {
-            long dividedSlackTime = slackTime / 10;
-            backOffTime = dividedSlackTime > DEFAULT_BACK_OFF_TIME ? dividedSlackTime : DEFAULT_BACK_OFF_TIME;
+          long slackTime = requestTime - currentTime + asyncResponseTimeout;
+          long dividedSlackTime = slackTime / 10;
+          if (dividedSlackTime > 0) {
+            if (dividedSlackTime > DEFAULT_BACK_OFF_TIME) {
+              backOffTime = dividedSlackTime;
+            } else {
+              backOffTime = DEFAULT_BACK_OFF_TIME;
+            }
           } else {
             backOffTime = MIN_BACK_OFF_TIME;
           }
@@ -109,7 +113,7 @@ public class FetchAndLockHandler implements Runnable {
     }
   }
 
-  private AuthenticationResult enforceAuthentication(FetchAndLockRequest request) {
+  private AuthenticationResult checkAuthentication(FetchAndLockRequest request) {
     AuthenticationResult authenticationResult =
       extractAuthenticatedUser(request.getProcessEngine(), request.getAuthHeader());
     if (!authenticationResult.isAuthenticated()) {
@@ -124,8 +128,14 @@ public class FetchAndLockHandler implements Runnable {
   }
 
   private List<LockedExternalTaskDto> tryFetchAndLock(FetchAndLockRequest request) {
-    AuthenticationResult authenticationResult = enforceAuthentication(request);
-    if (authenticationResult.isAuthenticated()) {
+    AuthenticationResult authenticationResult = null;
+    try {
+      authenticationResult = checkAuthentication(request);
+    } catch (ProcessEngineException e) {
+      handleProcessEngineException(request, e);
+    }
+
+    if (authenticationResult != null && authenticationResult.isAuthenticated()) {
       List<LockedExternalTaskDto> lockedTasks = Collections.emptyList();
 
       try {
@@ -133,7 +143,7 @@ public class FetchAndLockHandler implements Runnable {
         lockedTasks = delegateFetchAndLock(request);
         clearAuthentication(request.getProcessEngine());
       } catch (ProcessEngineException e) {
-        processEngineException(request, e);
+        handleProcessEngineException(request, e);
       }
 
       return lockedTasks;
@@ -174,7 +184,7 @@ public class FetchAndLockHandler implements Runnable {
     asyncResponse.resume(invalidRequestException);
   }
 
-  private void processEngineException(FetchAndLockRequest request, ProcessEngineException exception) {
+  private void handleProcessEngineException(FetchAndLockRequest request, ProcessEngineException exception) {
     pendingRequests.remove(request);
     AsyncResponse asyncResponse = request.getAsyncResponse();
     asyncResponse.resume(new InvalidRequestException(Status.BAD_REQUEST, exception, exception.getMessage()));
@@ -182,10 +192,6 @@ public class FetchAndLockHandler implements Runnable {
 
   public void addPendingRequest(FetchExternalTasksExtendedDto dto,
                          AsyncResponse asyncResponse, HttpHeaders headers, ProcessEngine processEngine) {
-    if (dto == null) {
-      invalidRequest(asyncResponse, "The body of the request cannot be empty");
-      return;
-    }
 
     Long asyncResponseTimeout = dto.getAsyncResponseTimeout();
     if (asyncResponseTimeout != null && asyncResponseTimeout < MIN_TIMEOUT) {

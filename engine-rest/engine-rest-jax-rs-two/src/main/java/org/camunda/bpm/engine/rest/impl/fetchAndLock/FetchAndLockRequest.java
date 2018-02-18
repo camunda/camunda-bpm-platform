@@ -76,8 +76,18 @@ public class FetchAndLockRequest implements Comparable<FetchAndLockRequest> {
 
   @Override
   public int compareTo(FetchAndLockRequest request) {
-    return (request.requestTime.getTime() + request.dto.getAsyncResponseTimeout()) <
-      (requestTime.getTime() + dto.getAsyncResponseTimeout()) ? 0 : -1;
+    long dueTimeThis = requestTime.getTime() + dto.getAsyncResponseTimeout();
+    long dueTimeThat = request.requestTime.getTime() + request.dto.getAsyncResponseTimeout();
+
+    if (dueTimeThis < dueTimeThat) {
+      return -1;
+    }
+
+    if (dueTimeThis > dueTimeThat) {
+      return 1;
+    }
+
+    return 0;
   }
 
 }
