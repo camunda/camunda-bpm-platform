@@ -52,6 +52,15 @@ public class FetchAndLockHandler implements Runnable {
 
   public FetchAndLockHandler() {
     handlerThread.start();
+
+    // shutdown thread gracefully
+    Runtime.getRuntime()
+      .addShutdownHook( new Thread() {
+        @Override
+        public void run(){
+          shutdown();
+        }
+    });
   }
 
   @Override
@@ -287,8 +296,14 @@ public class FetchAndLockHandler implements Runnable {
     return handlerThread;
   }
 
-  public void stop() {
+  public void shutdown() {
     isRunning = false;
+    handlerThread.interrupt();
+
+    for (FetchAndLockRequest pendingRequest: pendingRequests) {
+      invalidRequest(pendingRequest.getAsyncResponse(),
+        "Request rejected due to shutdown of application server.");
+    }
   }
 
   public List<FetchAndLockRequest> getPendingRequests() {

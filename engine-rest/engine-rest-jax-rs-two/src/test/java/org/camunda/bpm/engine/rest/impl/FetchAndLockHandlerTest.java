@@ -336,7 +336,7 @@ public class FetchAndLockHandlerTest {
   @Test
   public void shouldStopHandlerThread() {
     // given & when
-    fetchAndLockHandler.stop();
+    fetchAndLockHandler.shutdown();
     fetchAndLockHandler.getHandlerThread().interrupt();
 
     AsyncResponse asyncResponse1 = mock(AsyncResponse.class);
