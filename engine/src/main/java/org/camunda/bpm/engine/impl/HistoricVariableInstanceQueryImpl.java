@@ -17,7 +17,6 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.List;
 
-import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.impl.cmd.CommandLogger;
@@ -40,6 +39,8 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
 
   protected String variableId;
   protected String processInstanceId;
+  protected String processDefinitionId;
+  protected String processDefinitionKey;
   protected String caseInstanceId;
   protected String variableName;
   protected String variableNameLike;
@@ -52,7 +53,6 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
   protected String[] activityInstanceIds;
   protected String[] tenantIds;
   protected String[] processInstanceIds;
-  protected String processDefinitionId;
   protected boolean includeDeleted = false;
 
   protected boolean isByteArrayFetchingEnabled = true;
@@ -74,6 +74,17 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
   public HistoricVariableInstanceQueryImpl processInstanceId(String processInstanceId) {
     ensureNotNull("processInstanceId", processInstanceId);
     this.processInstanceId = processInstanceId;
+    return this;
+  }
+
+  public HistoricVariableInstanceQuery processDefinitionId(String processDefinitionId) {
+    ensureNotNull("processDefinitionId", processDefinitionId);
+    this.processDefinitionId = processDefinitionId;
+    return this;
+  }
+
+  public HistoricVariableInstanceQuery processDefinitionKey(String processDefinitionKey) {
+    this.processDefinitionKey = processDefinitionKey;
     return this;
   }
 
@@ -288,10 +299,7 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
     return processDefinitionId;
   }
 
-  @Override
-  public HistoricVariableInstanceQuery processDefinitionId(String processDefinitionId) {
-    ensureNotNull("processDefinitionId", processDefinitionId);
-    this.processDefinitionId = processDefinitionId;
-    return this;
+  public String getProcessDefinitionKey() {
+    return processDefinitionKey;
   }
 }

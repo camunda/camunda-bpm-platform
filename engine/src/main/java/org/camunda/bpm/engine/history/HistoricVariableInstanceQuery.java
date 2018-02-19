@@ -34,6 +34,9 @@ public interface HistoricVariableInstanceQuery extends Query<HistoricVariableIns
   /** Only select historic process variables for the given process definition */
   HistoricVariableInstanceQuery processDefinitionId(String processDefinitionId);
 
+  /** Only select historic process variables for the given process definition key */
+  HistoricVariableInstanceQuery processDefinitionKey(String processDefinitionKey);
+
   /** Only select historic case variables with the given case instance. */
   HistoricVariableInstanceQuery caseInstanceId(String caseInstanceId);
 

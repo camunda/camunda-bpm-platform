@@ -236,8 +236,11 @@
       <if test="caseInstanceId != null">
         RES.CASE_INST_ID_ = #{caseInstanceId}
       </if>
-       <if test="processDefinitionId != null">
+      <if test="processDefinitionId != null">
         and RES.PROC_DEF_ID_ = #{processDefinitionId}
+      </if>
+      <if test="processDefinitionKey !=null">
+        and RES.PROC_DEF_KEY_ = #{processDefinitionKey}
       </if>
       <if test="variableName != null">
         and RES.NAME_ = #{variableName}

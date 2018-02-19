@@ -823,6 +823,37 @@ public class HistoricVariableInstanceRestServiceQueryTest extends AbstractRestSe
     verify(mockedQuery).processDefinitionId(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
   }
 
+  @Test
+  public void testHistoricVariableQueryByProcessDefinitionKeyAsPost() {
+    when(mockedQuery.processDefinitionKey(anyString())).thenReturn(mockedQuery);
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(json)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(HISTORIC_VARIABLE_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).processDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+  }
+
+  @Test
+  public void testHistoricVariableQueryByProcessDefinitionKey() {
+    when(mockedQuery.processDefinitionKey(anyString())).thenReturn(mockedQuery);
+
+    given()
+      .queryParameter("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(HISTORIC_VARIABLE_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).processDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+  }
+
   private List<HistoricVariableInstance> createMockHistoricVariableInstancesTwoTenants() {
     return Arrays.asList(
         MockProvider.mockHistoricVariableInstance(MockProvider.EXAMPLE_TENANT_ID).build(),
