@@ -19,13 +19,6 @@
 
   <dependencySets>
     <dependencySet>
-      <outputDirectory>WEB-INF/lib</outputDirectory>
-      <useTransitiveDependencies>true</useTransitiveDependencies>     
-      <useTransitiveFiltering>true</useTransitiveFiltering>
-      <scope>provided</scope>
-    </dependencySet>
-
-    <dependencySet>
       <outputDirectory>/</outputDirectory>
       <includes>
         <include>org.camunda.bpm:camunda-engine-rest:war:*</include>        
