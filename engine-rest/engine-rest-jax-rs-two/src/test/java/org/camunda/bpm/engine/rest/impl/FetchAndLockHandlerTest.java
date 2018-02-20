@@ -29,6 +29,7 @@ import org.camunda.bpm.engine.rest.impl.fetchAndLock.FetchAndLockRequest;
 import org.camunda.bpm.engine.rest.impl.fetchAndLock.FetchExternalTasksExtendedDto;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.InOrder;
 
@@ -122,6 +123,7 @@ public class FetchAndLockHandlerTest {
     ClockUtil.reset();
   }
 
+  @Ignore("CAM-8440")
   @Test
   public void shouldQueryAtLeast10TimesBeforeResumeRequest() throws InterruptedException {
     // given
@@ -137,6 +139,7 @@ public class FetchAndLockHandlerTest {
     verify(fetchTopicBuilder, atMost(15)).execute();
   }
 
+  @Ignore("CAM-8440")
   @Test
   public void shouldQueryAtLeast40TimesBeforeResumeRequests() throws InterruptedException {
     // given
@@ -164,6 +167,7 @@ public class FetchAndLockHandlerTest {
     verify(fetchTopicBuilder, atMost(50)).execute();
   }
 
+  @Ignore("CAM-8440")
   @Test
   public void shouldQueryAtLeast50TimesBeforeResumeRequests() throws InterruptedException {
     // given
@@ -191,6 +195,7 @@ public class FetchAndLockHandlerTest {
     verify(fetchTopicBuilder, atMost(60)).execute();
   }
 
+  @Ignore("CAM-8440")
   @Test
   public void shouldResumeAllRequestsOrderedByTimeout() throws InterruptedException {
     // given
