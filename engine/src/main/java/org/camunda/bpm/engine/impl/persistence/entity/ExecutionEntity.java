@@ -209,7 +209,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
    * persisted reference to the super execution of this execution
    *
    * @See {@link #getSuperExecution()}
-   * @see #setSuperExecution(ExecutionEntity)
+   * @see <code>setSuperExecution(ExecutionEntity)</code>
    */
   protected String superExecutionId;
 
@@ -217,7 +217,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
    * persisted reference to the super case execution of this execution
    *
    * @See {@link #getSuperCaseExecution()}
-   * @see #setSuperCaseExecution(ExecutionEntity)
+   * @see <code>setSuperCaseExecution(ExecutionEntity)</code>
    */
   protected String superCaseExecutionId;
 
@@ -1841,16 +1841,21 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
 
   @Override
   public Set<String> getReferencedEntityIds() {
-    Set<String> referenceIds = new HashSet<String>();
+    return getReferencedEntitiesIdAndClass().keySet();
+  }
+
+  @Override
+  public Map<String, Class> getReferencedEntitiesIdAndClass() {
+    Map<String, Class> referenceIdAndClass = new HashMap<String, Class>();
 
     if (superExecutionId != null) {
-      referenceIds.add(superExecutionId);
+      referenceIdAndClass.put(this.superExecutionId, ExecutionEntity.class);
     }
     if (parentId != null) {
-      referenceIds.add(parentId);
+      referenceIdAndClass.put(this.parentId, ExecutionEntity.class);
     }
 
-    return referenceIds;
+    return referenceIdAndClass;
   }
 
   public int getSuspensionState() {

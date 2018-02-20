@@ -240,13 +240,33 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
 
   @Override
   public Set<String> getReferencedEntityIds() {
-    Set<String> referenceIds = new HashSet<String>();
+    return getReferencedEntitiesIdAndClass().keySet();
+  }
+
+  @Override
+  public Map<String, Class> getReferencedEntitiesIdAndClass() {
+    Map<String, Class> referenceIdAndClass = new HashMap<String, Class>();
 
     if (causeIncidentId != null) {
-      referenceIds.add(causeIncidentId);
+      referenceIdAndClass.put(causeIncidentId, IncidentEntity.class);
+    }
+    if (processDefinitionId != null) {
+      referenceIdAndClass.put(processDefinitionId, ProcessDefinitionEntity.class);
+    }
+    if (processInstanceId != null) {
+      referenceIdAndClass.put(processInstanceId, ExecutionEntity.class);
+    }
+    if (jobDefinitionId != null) {
+      referenceIdAndClass.put(jobDefinitionId, JobDefinitionEntity.class);
+    }
+    if (executionId != null) {
+      referenceIdAndClass.put(executionId, ExecutionEntity.class);
+    }
+    if (rootCauseIncidentId != null) {
+      referenceIdAndClass.put(rootCauseIncidentId, IncidentEntity.class);
     }
 
-    return referenceIds;
+    return referenceIdAndClass;
   }
 
   @Override

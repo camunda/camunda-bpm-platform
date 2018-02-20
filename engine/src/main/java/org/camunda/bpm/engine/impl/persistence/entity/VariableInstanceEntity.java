@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 
 import org.camunda.bpm.application.InvocationContext;
@@ -28,6 +29,7 @@ import org.camunda.bpm.engine.impl.core.variable.CoreVariableInstance;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.DbEntityLifecycleAware;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
+import org.camunda.bpm.engine.impl.db.HasDbReferences;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.persistence.entity.util.ByteArrayField;
 import org.camunda.bpm.engine.impl.persistence.entity.util.TypedValueField;
@@ -40,7 +42,8 @@ import org.camunda.bpm.engine.variable.value.TypedValue;
 /**
  * @author Tom Baeyens
  */
-public class VariableInstanceEntity implements VariableInstance, CoreVariableInstance, ValueFields, DbEntity, DbEntityLifecycleAware, TypedValueUpdateListener, HasDbRevision, Serializable {
+public class VariableInstanceEntity implements VariableInstance, CoreVariableInstance, ValueFields, DbEntity, DbEntityLifecycleAware, TypedValueUpdateListener, HasDbRevision,
+  HasDbReferences, Serializable {
 
   protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
@@ -649,4 +652,31 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
     this.tenantId = tenantId;
   }
 
+  @Override
+  public Set<String> getReferencedEntityIds() {
+    return getReferencedEntitiesIdAndClass().keySet();
+  }
+
+  @Override
+  public Map<String, Class> getReferencedEntitiesIdAndClass() {
+    Map<String, Class> referenceIdAndClass = new HashMap<String, Class>();
+
+    if (processInstanceId != null){
+      referenceIdAndClass.put(processInstanceId, ExecutionEntity.class);
+    }
+    if (executionId != null){
+      referenceIdAndClass.put(executionId, ExecutionEntity.class);
+    }
+    if (caseInstanceId != null){
+      referenceIdAndClass.put(caseInstanceId, CaseExecutionEntity.class);
+    }
+    if (caseExecutionId != null){
+      referenceIdAndClass.put(caseExecutionId, CaseExecutionEntity.class);
+    }
+    if (getByteArrayValueId() != null){
+      referenceIdAndClass.put(getByteArrayValueId(), ByteArrayEntity.class);
+    }
+
+    return referenceIdAndClass;
+  }
 }

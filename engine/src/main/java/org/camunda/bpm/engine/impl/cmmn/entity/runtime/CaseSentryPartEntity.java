@@ -14,18 +14,20 @@ package org.camunda.bpm.engine.impl.cmmn.entity.runtime;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnSentryPart;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
+import org.camunda.bpm.engine.impl.db.HasDbReferences;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class CaseSentryPartEntity extends CmmnSentryPart implements DbEntity, HasDbRevision {
+public class CaseSentryPartEntity extends CmmnSentryPart implements DbEntity, HasDbRevision, HasDbReferences {
 
   private static final long serialVersionUID = 1L;
 
@@ -182,5 +184,22 @@ public class CaseSentryPartEntity extends CmmnSentryPart implements DbEntity, Ha
         .findCaseExecutionById(caseExecutionId);
   }
 
+  @Override
+  public Set<String> getReferencedEntityIds() {
+    return getReferencedEntitiesIdAndClass().keySet();
+  }
 
+  @Override
+  public Map<String, Class> getReferencedEntitiesIdAndClass() {
+    Map<String, Class> referenceIdAndClass = new HashMap<String, Class>();
+
+    if (caseExecutionId != null) {
+      referenceIdAndClass.put(caseExecutionId, CaseExecutionEntity.class);
+    }
+    if (caseInstanceId != null) {
+      referenceIdAndClass.put(caseInstanceId, CaseExecutionEntity.class);
+    }
+
+    return referenceIdAndClass;
+  }
 }

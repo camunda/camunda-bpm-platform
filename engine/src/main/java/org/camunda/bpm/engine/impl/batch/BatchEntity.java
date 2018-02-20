@@ -15,10 +15,13 @@ package org.camunda.bpm.engine.impl.batch;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
+import org.camunda.bpm.engine.impl.db.HasDbReferences;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentManager;
@@ -31,7 +34,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 import org.camunda.bpm.engine.impl.persistence.entity.util.ByteArrayField;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 
-public class BatchEntity implements Batch, DbEntity, Nameable, HasDbRevision {
+public class BatchEntity implements Batch, DbEntity, HasDbReferences, Nameable, HasDbRevision {
 
   public static final BatchSeedJobDeclaration BATCH_SEED_JOB_DECLARATION = new BatchSeedJobDeclaration();
   public static final BatchMonitorJobDeclaration BATCH_MONITOR_JOB_DECLARATION = new BatchMonitorJobDeclaration();
@@ -381,5 +384,27 @@ public class BatchEntity implements Batch, DbEntity, Nameable, HasDbRevision {
       ", batchJobDefinitionId='" + batchJobDefinitionId + '\'' +
       ", configurationId='" + configuration.getByteArrayId() + '\'' +
       '}';
+  }
+
+  @Override
+  public Set<String> getReferencedEntityIds() {
+    return getReferencedEntitiesIdAndClass().keySet();
+  }
+
+  @Override
+  public Map<String, Class> getReferencedEntitiesIdAndClass() {
+    Map<String, Class> referenceIdAndClass = new HashMap<String, Class>();
+
+    if (seedJobDefinitionId != null) {
+      referenceIdAndClass.put(seedJobDefinitionId, JobDefinitionEntity.class);
+    }
+    if (batchJobDefinitionId != null) {
+      referenceIdAndClass.put(batchJobDefinitionId, JobDefinitionEntity.class);
+    }
+    if (monitorJobDefinitionId != null) {
+      referenceIdAndClass.put(monitorJobDefinitionId, JobDefinitionEntity.class);
+    }
+
+    return referenceIdAndClass;
   }
 }

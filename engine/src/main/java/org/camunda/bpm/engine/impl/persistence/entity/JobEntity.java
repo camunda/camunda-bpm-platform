@@ -21,12 +21,14 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
+import org.camunda.bpm.engine.impl.db.HasDbReferences;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.incident.IncidentContext;
 import org.camunda.bpm.engine.impl.incident.IncidentHandler;
@@ -49,7 +51,7 @@ import org.camunda.bpm.engine.runtime.Job;
  * @author Dave Syer
  * @author Frederik Heremans
  */
-public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRevision {
+public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRevision, HasDbReferences {
 
   private final static EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
@@ -656,6 +658,22 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
   }
 
   @Override
+  public Set<String> getReferencedEntityIds() {
+    return getReferencedEntitiesIdAndClass().keySet();
+  }
+
+  @Override
+  public Map<String, Class> getReferencedEntitiesIdAndClass() {
+    Map<String, Class> referenceIdAndClass = new HashMap<String, Class>();
+
+    if (exceptionByteArrayId != null) {
+      referenceIdAndClass.put(exceptionByteArrayId, ByteArrayEntity.class);
+    }
+
+    return referenceIdAndClass;
+  }
+
+  @Override
   public String toString() {
     return this.getClass().getSimpleName()
            + "[id=" + id
@@ -678,5 +696,4 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
            + ", tenantId=" + tenantId
            + "]";
   }
-
 }

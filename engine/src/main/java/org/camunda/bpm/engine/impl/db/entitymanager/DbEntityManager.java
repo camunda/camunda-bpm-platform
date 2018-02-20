@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.executor.BatchExecutorException;
 import org.apache.ibatis.executor.BatchResult;
@@ -55,6 +56,7 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.DbEntityLifecycleAware;
 import org.camunda.bpm.engine.impl.db.EntityLoadListener;
+import org.camunda.bpm.engine.impl.db.HasDbReferences;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.db.PersistenceSession;
@@ -351,9 +353,7 @@ public class DbEntityManager implements Session, EntityLoadListener {
   }
 
   /**
-   * Checks if the reason for a persistence exception was the foreign-key referencing of a (currently)
-   * non-existing entity. This might happen with concurrent transactions, leading to an
-   * OptimisticLockingException.
+   * An OptimisticLockingException check for batch processing
    *
    * @param operationsToFlush The list of DB operations in which the Exception occurred
    * @param cause the Exception object
@@ -367,36 +367,40 @@ public class DbEntityManager implements Session, EntityLoadListener {
     if (isConstraintViolation && batchExecutorException != null) {
 
       int failedOperationIndex = batchExecutorException.getSuccessfulBatchResults().size();
-
       if (failedOperationIndex < operationsToFlush.size()) {
         DbOperation failedOperation = operationsToFlush.get(failedOperationIndex);
+        return isOptimisticLockingException(failedOperation);
+      }
+    }
 
-        if (failedOperation instanceof DbEntityOperation && (failedOperation.getOperationType().equals(DbOperationType.INSERT) || failedOperation.getOperationType().equals(DbOperationType.UPDATE))) {
+    return false;
+  }
 
-          DbEntity entity = ((DbEntityOperation) failedOperation).getEntity();
-          for (Field classField : entity.getClass().getDeclaredFields()) {
+  /**
+   * Checks if the reason for a persistence exception was the foreign-key referencing of a (currently)
+   * non-existing entity. This might happen with concurrent transactions, leading to an
+   * OptimisticLockingException.
+   *
+   * @param failedOperation
+   * @return
+   */
+  private boolean isOptimisticLockingException(DbOperation failedOperation) {
 
-            if (DbEntity.class.isAssignableFrom(classField.getType())) {
-              try {
-                classField.setAccessible(true);
-                DbEntity fieldEntity = (DbEntity) classField.get(entity);
+    if (failedOperation instanceof DbEntityOperation
+      && ((DbEntityOperation) failedOperation).getEntity() instanceof HasDbReferences
+      && (failedOperation.getOperationType().equals(DbOperationType.INSERT)
+      || failedOperation.getOperationType().equals(DbOperationType.UPDATE))) {
 
-                if (fieldEntity != null) {
-                  String entityId = fieldEntity.getId();
-                  fieldEntity = this.persistenceSession.selectById(fieldEntity.getClass(), entityId);
-
-                  if (fieldEntity == null) {
-                    return true;
-                  }
-                }
-              } catch (Exception e) {
-                if (ExceptionUtil.findRelatedSqlExceptions(e).size() > 0) {
-                  return true;
-                } else {
-                  throw LOG.noAccessToFieldValue(e);
-                }
-              }
-            }
+      DbEntity entity = ((DbEntityOperation) failedOperation).getEntity();
+      for (Map.Entry<String, Class> reference : ((HasDbReferences)entity).getReferencedEntitiesIdAndClass().entrySet()) {
+        try {
+          DbEntity referencedEntity = this.persistenceSession.selectById(reference.getValue(), reference.getKey());
+          if (referencedEntity == null) {
+            return true;
+          }
+        } catch (Exception e) {
+          if (ExceptionUtil.findRelatedSqlExceptions(e).size() > 0) {
+            return true;
           }
         }
       }

@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.db;
 
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -26,4 +27,11 @@ public interface HasDbReferences {
    */
   Set<String> getReferencedEntityIds();
 
+  /**
+   * @return a map of the ids and the entities' classes that this
+   * entity references. It's used when trying to determine if there
+   * was an Optimistic Locking occurrence on an INSERT or UPDATE of
+   * an object of this type.
+   */
+  Map<String, Class> getReferencedEntitiesIdAndClass();
 }

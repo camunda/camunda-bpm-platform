@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.delegate.BpmnError;
@@ -24,6 +25,7 @@ import org.camunda.bpm.engine.impl.bpmn.behavior.ExternalTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
+import org.camunda.bpm.engine.impl.db.HasDbReferences;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.incident.IncidentContext;
 import org.camunda.bpm.engine.impl.incident.IncidentHandler;
@@ -42,7 +44,7 @@ import static org.camunda.bpm.engine.impl.util.StringUtil.toByteArray;
  * @author Askar Akhmerov
  *
  */
-public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision {
+public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision, HasDbReferences {
 
   protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
   private static final String EXCEPTION_NAME = "externalTask.exceptionByteArray";
@@ -478,5 +480,24 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
     ensureActive();
     long newTime = ClockUtil.getCurrentTime().getTime() + newLockExpirationTime;
     this.lockExpirationTime = new Date(newTime);
+  }
+
+  @Override
+  public Set<String> getReferencedEntityIds() {
+    return getReferencedEntitiesIdAndClass().keySet();
+  }
+
+  @Override
+  public Map<String, Class> getReferencedEntitiesIdAndClass() {
+    Map<String, Class> referenceIdAndClass = new HashMap<String, Class>();
+
+    if (executionId != null) {
+      referenceIdAndClass.put(executionId, ExecutionEntity.class);
+    }
+    if (errorDetailsByteArrayId != null) {
+      referenceIdAndClass.put(errorDetailsByteArrayId, ByteArrayEntity.class);
+    }
+
+    return referenceIdAndClass;
   }
 }

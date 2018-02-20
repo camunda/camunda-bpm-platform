@@ -13,12 +13,16 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
+import org.camunda.bpm.engine.impl.db.HasDbReferences;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventProcessor;
@@ -32,7 +36,7 @@ import org.camunda.bpm.engine.task.IdentityLink;
  * @author Joram Barrez
  * @author Deivarayan Azhagappan
  */
-public class IdentityLinkEntity implements Serializable, IdentityLink, DbEntity {
+public class IdentityLinkEntity implements Serializable, IdentityLink, DbEntity, HasDbReferences {
 
   private static final long serialVersionUID = 1L;
   protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
@@ -213,6 +217,26 @@ public class IdentityLinkEntity implements Serializable, IdentityLink, DbEntity 
 
     }
   }
+
+  @Override
+  public Set<String> getReferencedEntityIds() {
+    return getReferencedEntitiesIdAndClass().keySet();
+  }
+
+  @Override
+  public Map<String, Class> getReferencedEntitiesIdAndClass() {
+    Map<String, Class> referenceIdAndClass = new HashMap<String, Class>();
+
+    if (processDefId != null) {
+      referenceIdAndClass.put(processDefId, ProcessDefinitionEntity.class);
+    }
+    if (taskId != null) {
+      referenceIdAndClass.put(taskId, TaskEntity.class);
+    }
+
+    return referenceIdAndClass;
+  }
+
   @Override
   public String toString() {
     return this.getClass().getSimpleName()
