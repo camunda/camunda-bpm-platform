@@ -117,9 +117,22 @@ module.exports = function(ngModule) {
 
         var callback = function(error) {
           if(error) {
+
+            var errorMessage = { text: '', payload: {}};
+
+            if (error.response.body &&
+              error.response.body.type === 'AuthorizationException') {
+              errorMessage.text =  'PLUGIN_VARIABLE_INSTANCES_MESSAGES_ERROR_3';
+              errorMessage.payload = {message: error.message};
+            } else {
+              errorMessage.text = 'PLUGIN_VARIABLE_INSTANCES_MESSAGES_ERROR_0';
+              errorMessage.payload = {  name: info.variable.name };
+            }
+
+
             Notifications.addError({
               status: $translate.instant('PLUGIN_VARIABLE_INSTANCES_STATUS_VARIABLE'),
-              message: $translate.instant('PLUGIN_VARIABLE_INSTANCES_MESSAGES_ERROR_0', { name: info.variable.name }),
+              message: $translate.instant(errorMessage.text , errorMessage.payload),
               exclusive: true,
               duration: 5000
             });
@@ -198,9 +211,20 @@ module.exports = function(ngModule) {
 
         var callback = function(error) {
           if(error) {
+            var errorMessage = { text: '', payload: {}};
+
+            if (error.response.body  &&
+                error.response.body.type === 'AuthorizationException') {
+              errorMessage.text =  'PLUGIN_VARIABLE_INSTANCES_MESSAGES_ERROR_2';
+              errorMessage.payload = {message: error.message};
+            } else {
+              errorMessage.text = 'PLUGIN_VARIABLE_INSTANCES_MESSAGES_ERROR_1';
+              errorMessage.payload = { name: variable.name };
+            }
+
             Notifications.addError({
               status: $translate.instant('PLUGIN_VARIABLE_INSTANCES_STATUS_VARIABLE'),
-              message: $translate.instant('PLUGIN_VARIABLE_INSTANCES_MESSAGES_ERROR_1', { name: variable.name }),
+              message: $translate.instant(errorMessage.text , errorMessage.payload),
               exclusive: true,
               duration: 5000
             });

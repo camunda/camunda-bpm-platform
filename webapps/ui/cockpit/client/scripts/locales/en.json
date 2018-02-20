@@ -629,6 +629,8 @@
   "PLUGIN_VARIABLE_INSTANCES_MESSAGES_ERROR_1" : "The variable '{{name}}' could not be changed successfully.",
   "PLUGIN_VARIABLE_INSTANCES_MESSAGES_ADD_0" : "The variable '{{name}}' has been deleted successfully.",
   "PLUGIN_VARIABLE_INSTANCES_MESSAGES_ADD_1" : "The variable '{{name}}' has been changed successfully.",
+  "PLUGIN_VARIABLE_INSTANCES_MESSAGES_ERROR_2": "Saving Variables was not successful: {{message}}",
+  "PLUGIN_VARIABLE_INSTANCES_MESSAGES_ERROR_3": "The Variable has not been deleted: {{message}}",
 
   "PLUGIN_VARIABLE_NO_PROCESS_VARIABLES" : "No process variables",
   "PLUGIN_VARIABLE_NAME" : "Name",
