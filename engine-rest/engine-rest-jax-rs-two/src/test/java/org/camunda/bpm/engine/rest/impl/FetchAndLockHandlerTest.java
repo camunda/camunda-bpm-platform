@@ -241,6 +241,7 @@ public class FetchAndLockHandlerTest {
     inOrder.verify(asyncResponse4).resume(Collections.emptyList());
   }
 
+  @Ignore("CAM-8440")
   @Test
   public void shouldResumeRequestWithAvailableResultFirst() throws InterruptedException {
     // given
@@ -300,6 +301,7 @@ public class FetchAndLockHandlerTest {
     }
   }
 
+  @Ignore("CAM-8440")
   @Test
   public void shouldResumeSecondRequestByAvailableResult() {
     // given
