@@ -82,6 +82,7 @@ public class CleanableHistoricBatchReportTest {
 
   @After
   public void cleanUp() {
+    ClockUtil.reset();
     migrationHelper.removeAllRunningAndHistoricBatches();
     processEngineConfiguration.setBatchOperationHistoryTimeToLive(null);
     processEngineConfiguration.setBatchOperationsForHistoryCleanup(null);
@@ -97,7 +98,7 @@ public class CleanableHistoricBatchReportTest {
     processEngineConfiguration.setBatchOperationsForHistoryCleanup(map);
     processEngineConfiguration.initHistoryCleanup();
 
-    Date startDate = ClockUtil.getCurrentTime();
+    Date startDate = new Date();
     int daysInThePast = -11;
     ClockUtil.setCurrentTime(DateUtils.addDays(startDate, daysInThePast));
 
@@ -143,7 +144,7 @@ public class CleanableHistoricBatchReportTest {
       managementService.deleteBatch(batchIds2.get(i), false);
     }
 
-    ClockUtil.setCurrentTime(new Date());
+    ClockUtil.setCurrentTime(DateUtils.addSeconds(startDate, 1));
 
     // when
     List<HistoricBatch> historicList = historyService.createHistoricBatchQuery().list();
@@ -173,7 +174,7 @@ public class CleanableHistoricBatchReportTest {
     processEngineConfiguration.initHistoryCleanup();
     assertNull(processEngineConfiguration.getBatchOperationHistoryTimeToLive());
 
-    Date startDate = ClockUtil.getCurrentTime();
+    Date startDate = new Date();
     int daysInThePast = -11;
     ClockUtil.setCurrentTime(DateUtils.addDays(startDate, daysInThePast));
 
@@ -219,7 +220,7 @@ public class CleanableHistoricBatchReportTest {
       managementService.deleteBatch(batchIds2.get(i), false);
     }
 
-    ClockUtil.setCurrentTime(new Date());
+    ClockUtil.setCurrentTime(DateUtils.addSeconds(startDate, 1));
 
     // when
     List<HistoricBatch> historicList = historyService.createHistoricBatchQuery().list();
@@ -233,7 +234,6 @@ public class CleanableHistoricBatchReportTest {
       } else if (result.getBatchType().equals("instance-modification")) {
         checkResultNumbers(result, 1, 1, modOperationsTTL);
       } else if (result.getBatchType().equals("instance-deletion")) {
-        System.out.println(result);
         checkResultNumbers(result, delOperationsTTL, 18, delOperationsTTL);
       }
     }
@@ -244,7 +244,7 @@ public class CleanableHistoricBatchReportTest {
     processEngineConfiguration.initHistoryCleanup();
     assertNull(processEngineConfiguration.getBatchOperationHistoryTimeToLive());
 
-    Date startDate = ClockUtil.getCurrentTime();
+    Date startDate = new Date();
     int daysInThePast = -11;
     ClockUtil.setCurrentTime(DateUtils.addDays(startDate, daysInThePast));
 
@@ -265,7 +265,7 @@ public class CleanableHistoricBatchReportTest {
       managementService.deleteBatch(batchIds2.get(i), false);
     }
 
-    ClockUtil.setCurrentTime(new Date());
+    ClockUtil.setCurrentTime(DateUtils.addSeconds(startDate, 1));
 
     // when
     List<HistoricBatch> historicList = historyService.createHistoricBatchQuery().list();
@@ -303,7 +303,7 @@ public class CleanableHistoricBatchReportTest {
     processEngineConfiguration.initHistoryCleanup();
     assertNotNull(processEngineConfiguration.getBatchOperationHistoryTimeToLive());
 
-    Date startDate = ClockUtil.getCurrentTime();
+    Date startDate = new Date();
     int daysInThePast = -11;
     ClockUtil.setCurrentTime(DateUtils.addDays(startDate, daysInThePast));
 
@@ -324,7 +324,7 @@ public class CleanableHistoricBatchReportTest {
       managementService.deleteBatch(batchId, false);
     }
 
-    ClockUtil.setCurrentTime(new Date());
+    ClockUtil.setCurrentTime(DateUtils.addSeconds(startDate, 1));
 
     // assume
     List<HistoricBatch> historicList = historyService.createHistoricBatchQuery().list();
