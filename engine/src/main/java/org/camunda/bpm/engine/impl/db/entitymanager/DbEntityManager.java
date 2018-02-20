@@ -333,7 +333,8 @@ public class DbEntityManager implements Session, EntityLoadListener {
       try {
         persistenceSession.executeDbOperation(dbOperation);
       } catch (Exception e) {
-        throw LOG.flushDbOperationException(operationsToFlush, dbOperation, e);
+        boolean doOptimisticLockingException = isOptimisticLockingException(dbOperation);
+        throw LOG.flushDbOperationException(operationsToFlush, dbOperation, e, doOptimisticLockingException);
       }
       if (dbOperation.isFailed()) {
         handleOptimisticLockingException(dbOperation);
