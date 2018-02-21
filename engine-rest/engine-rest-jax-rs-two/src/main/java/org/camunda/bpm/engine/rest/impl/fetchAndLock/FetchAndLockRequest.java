@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.rest.impl.fetchAndLock;
 
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 
 import javax.ws.rs.container.AsyncResponse;
@@ -21,13 +22,13 @@ import java.util.Date;
 /**
  * @author Tassilo Weidner
  */
-public class FetchAndLockRequest implements Comparable<FetchAndLockRequest> {
+public class FetchAndLockRequest {
 
   private Date requestTime = ClockUtil.getCurrentTime();
   private FetchExternalTasksExtendedDto dto;
   private AsyncResponse asyncResponse;
   private ProcessEngine processEngine;
-  private String authHeader;
+  private Authentication authentication;
 
   public Date getRequestTime() {
     return requestTime;
@@ -65,29 +66,13 @@ public class FetchAndLockRequest implements Comparable<FetchAndLockRequest> {
     return this;
   }
 
-  public String getAuthHeader() {
-    return authHeader;
+  public Authentication getAuthentication() {
+    return authentication;
   }
 
-  public FetchAndLockRequest setAuthHeader(String authHeader) {
-    this.authHeader = authHeader;
+  public FetchAndLockRequest setAuthentication(Authentication authentication) {
+    this.authentication = authentication;
     return this;
-  }
-
-  @Override
-  public int compareTo(FetchAndLockRequest request) {
-    long dueTimeThis = requestTime.getTime() + dto.getAsyncResponseTimeout();
-    long dueTimeThat = request.requestTime.getTime() + request.dto.getAsyncResponseTimeout();
-
-    if (dueTimeThis < dueTimeThat) {
-      return -1;
-    }
-
-    if (dueTimeThis > dueTimeThat) {
-      return 1;
-    }
-
-    return 0;
   }
 
 }

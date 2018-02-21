@@ -16,23 +16,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.engine.rest.impl.AbstractRestProcessEngineAware;
 
 import javax.ws.rs.container.AsyncResponse;
-import javax.ws.rs.core.HttpHeaders;
 
 /**
  * @author Tassilo Weidner
  */
 public class FetchAndLockRestServiceImpl extends AbstractRestProcessEngineAware implements FetchAndLockRestService {
 
-  private FetchAndLockHandler fetchAndLockHandler;
-
-  public FetchAndLockRestServiceImpl(String processEngine, ObjectMapper objectMapper, FetchAndLockHandler fetchAndLockHandler) {
+  public FetchAndLockRestServiceImpl(String processEngine, ObjectMapper objectMapper) {
     super(processEngine, objectMapper);
-    this.fetchAndLockHandler = fetchAndLockHandler;
   }
 
   @Override
-  public void fetchAndLock(FetchExternalTasksExtendedDto dto, AsyncResponse asyncResponse, HttpHeaders headers) {
-    fetchAndLockHandler.addPendingRequest(dto, asyncResponse, headers, processEngine);
+  public void fetchAndLock(FetchExternalTasksExtendedDto dto, AsyncResponse asyncResponse) {
+    FetchAndLockHandler fetchAndLockHandler = FetchAndLockContextListener.newInstance();
+    fetchAndLockHandler.addPendingRequest(dto, asyncResponse, processEngine);
   }
 
 }

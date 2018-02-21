@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.rest.impl;
+package org.camunda.bpm.engine.rest.impl.fetchAndLock;
 
 import com.jayway.restassured.http.ContentType;
 import org.camunda.bpm.engine.ExternalTaskService;
@@ -22,19 +22,18 @@ import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.identity.Tenant;
 import org.camunda.bpm.engine.identity.TenantQuery;
-import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
+import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
-import org.camunda.bpm.engine.rest.impl.fetchAndLock.FetchAndLockHandler;
-import org.camunda.bpm.engine.rest.impl.fetchAndLock.FetchExternalTasksExtendedDto;
+import org.camunda.bpm.engine.rest.impl.NamedProcessEngineRestServiceImpl;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response.Status;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -43,18 +42,19 @@ import java.util.List;
 import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.isEmptyString;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNull.notNullValue;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
@@ -75,6 +75,9 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
 
   private IdentityService identityServiceMock;
 
+  private List<String> groupIds;
+  private List<String> tenantIds;
+
   @Before
   public void setUpRuntimeData() {
     externalTaskService = mock(ExternalTaskService.class);
@@ -91,22 +94,21 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
     when(processEngine.getIdentityService()).thenReturn(identityServiceMock);
 
     List<Group> groupMocks = MockProvider.createMockGroups();
-    setupGroupQueryMock(groupMocks);
+    groupIds = setupGroupQueryMock(groupMocks);
 
     List<Tenant> tenantMocks = Collections.singletonList(MockProvider.createMockTenant());
-    setupTenantQueryMock(tenantMocks);
+    tenantIds = setupTenantQueryMock(tenantMocks);
 
-    when(identityServiceMock.checkPassword(MockProvider.EXAMPLE_USER_ID, MockProvider.EXAMPLE_USER_PASSWORD)).thenReturn(true);
+    new FetchAndLockContextListener().contextInitialized(null);
   }
 
   @Test
   public void shouldFetchAndLock() {
-    List<LockedExternalTask> tasks = new ArrayList<LockedExternalTask>(Collections.singleton(lockedExternalTaskMock));
-    when(fetchTopicBuilder.execute()).thenReturn(tasks);
+    when(fetchTopicBuilder.execute())
+      .thenReturn(new ArrayList<LockedExternalTask>(Collections.singleton(lockedExternalTaskMock)));
     FetchExternalTasksExtendedDto fetchExternalTasksDto = createDto(null, true, true, false);
 
     given()
-      .auth().preemptive().basic(MockProvider.EXAMPLE_USER_ID, MockProvider.EXAMPLE_USER_PASSWORD)
       .contentType(ContentType.JSON)
       .body(fetchExternalTasksDto)
       .pathParam("name", "default")
@@ -145,12 +147,11 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
 
   @Test
   public void shouldFetchWithoutVariables() {
-    List<LockedExternalTask> tasks = new ArrayList<LockedExternalTask>(Collections.singleton(lockedExternalTaskMock));
-    when(fetchTopicBuilder.execute()).thenReturn(tasks);
+    when(fetchTopicBuilder.execute())
+      .thenReturn(new ArrayList<LockedExternalTask>(Collections.singleton(lockedExternalTaskMock)));
     FetchExternalTasksExtendedDto fetchExternalTasksDto = createDto(null);
 
     given()
-      .auth().preemptive().basic(MockProvider.EXAMPLE_USER_ID, MockProvider.EXAMPLE_USER_PASSWORD)
       .contentType(ContentType.JSON)
       .body(fetchExternalTasksDto)
     .then()
@@ -169,12 +170,11 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
 
   @Test
   public void shouldFetchWithCustomObjectDeserializationEnabled() {
-    List<LockedExternalTask> tasks = new ArrayList<LockedExternalTask>(Collections.singleton(lockedExternalTaskMock));
-    when(fetchTopicBuilder.execute()).thenReturn(tasks);
+    when(fetchTopicBuilder.execute())
+      .thenReturn(new ArrayList<LockedExternalTask>(Collections.singleton(lockedExternalTaskMock)));
     FetchExternalTasksExtendedDto fetchExternalTasksDto = createDto(null, false, true, true);
 
     given()
-      .auth().preemptive().basic(MockProvider.EXAMPLE_USER_ID, MockProvider.EXAMPLE_USER_PASSWORD)
       .contentType(ContentType.JSON)
       .body(fetchExternalTasksDto)
       .pathParam("name", "default")
@@ -194,28 +194,10 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
   }
 
   @Test
-  public void shouldThrowInvalidRequestExceptionOnLessThanMinTimeout() {
-    FetchExternalTasksExtendedDto fetchExternalTasksDto = createDto(100L);
-
-    given()
-      .auth().preemptive().basic(MockProvider.EXAMPLE_USER_ID, MockProvider.EXAMPLE_USER_PASSWORD)
-      .contentType(ContentType.JSON)
-      .body(fetchExternalTasksDto)
-    .then()
-      .expect()
-        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-        .body("message", containsString("The asynchronous response timeout cannot be set to a value less than "))
-        .statusCode(Status.BAD_REQUEST.getStatusCode())
-    .when()
-      .post(FETCH_EXTERNAL_TASK_URL);
-  }
-
-  @Test
   public void shouldThrowInvalidRequestExceptionOnMaxTimeoutExceeded() {
-    FetchExternalTasksExtendedDto fetchExternalTasksDto = createDto(FetchAndLockHandler.MAX_TIMEOUT + 1);
+    FetchExternalTasksExtendedDto fetchExternalTasksDto = createDto(FetchAndLockHandlerImpl.MAX_TIMEOUT + 1);
 
     given()
-      .auth().preemptive().basic(MockProvider.EXAMPLE_USER_ID, MockProvider.EXAMPLE_USER_PASSWORD)
       .contentType(ContentType.JSON)
       .body(fetchExternalTasksDto)
       .pathParam("name", "default")
@@ -229,36 +211,59 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
   }
 
   @Test
-  public void shouldThrowProcessEngineException() {
-    FetchExternalTasksExtendedDto fetchExternalTasksDto = createDto(null);
+  public void shouldThrowProcessEngineExceptionDuringTimeout() {
+    FetchExternalTasksExtendedDto fetchExternalTasksDto = createDto(500L);
 
-    doThrow(new ProcessEngineException("anExceptionMessage"))
-      .when(externalTaskService).fetchAndLock(fetchExternalTasksDto.getMaxTasks(), fetchExternalTasksDto.getWorkerId(),
-          fetchExternalTasksDto.isUsePriority());
+    when(fetchTopicBuilder.execute())
+      .thenReturn(Collections.<LockedExternalTask>emptyList())
+      .thenReturn(Collections.<LockedExternalTask>emptyList())
+      .thenThrow(new ProcessEngineException("anExceptionMessage"));
 
     given()
-      .auth().preemptive().basic(MockProvider.EXAMPLE_USER_ID, MockProvider.EXAMPLE_USER_PASSWORD)
       .contentType(ContentType.JSON)
       .body(fetchExternalTasksDto)
       .pathParam("name", "default")
     .then()
       .expect()
-        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("type", equalTo(ProcessEngineException.class.getSimpleName()))
         .body("message", equalTo("anExceptionMessage"))
-        .statusCode(Status.BAD_REQUEST.getStatusCode())
+        .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
     .when()
       .post(FETCH_EXTERNAL_TASK_URL_NAMED_ENGINE);
+
+    verify(fetchTopicBuilder, times(3)).execute();
+  }
+
+  @Test
+  public void shouldThrowProcessEngineExceptionNotDuringTimeout() {
+    FetchExternalTasksExtendedDto fetchExternalTasksDto = createDto(500L);
+
+    when(fetchTopicBuilder.execute())
+      .thenThrow(new ProcessEngineException("anExceptionMessage"));
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(fetchExternalTasksDto)
+      .pathParam("name", "default")
+    .then()
+      .expect()
+        .body("type", equalTo(ProcessEngineException.class.getSimpleName()))
+        .body("message", equalTo("anExceptionMessage"))
+        .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+    .when()
+      .post(FETCH_EXTERNAL_TASK_URL_NAMED_ENGINE);
+
+    verify(fetchTopicBuilder, times(1)).execute();
   }
 
   @Test
   public void shouldResponseImmediatelyDueToAvailableTasks() {
-    List<LockedExternalTask> tasks = new ArrayList<LockedExternalTask>(Collections.singleton(lockedExternalTaskMock));
-    when(fetchTopicBuilder.execute()).thenReturn(tasks);
+    when(fetchTopicBuilder.execute())
+      .thenReturn(new ArrayList<LockedExternalTask>(Collections.singleton(lockedExternalTaskMock)));
 
-    FetchExternalTasksExtendedDto fetchExternalTasksDto = createDto(FetchAndLockHandler.MIN_TIMEOUT);
+    FetchExternalTasksExtendedDto fetchExternalTasksDto = createDto(500L);
 
     given()
-      .auth().preemptive().basic(MockProvider.EXAMPLE_USER_ID, MockProvider.EXAMPLE_USER_PASSWORD)
       .contentType(ContentType.JSON)
       .body(fetchExternalTasksDto)
     .then()
@@ -268,98 +273,27 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
     .when()
       .post(FETCH_EXTERNAL_TASK_URL);
   }
-  
+
   @Test
-  public void shouldDeclineRequestDueToInvalidAuthorization() {
-    when(identityServiceMock.checkPassword(MockProvider.EXAMPLE_USER_ID, MockProvider.EXAMPLE_USER_PASSWORD)).thenReturn(false);
-    FetchExternalTasksExtendedDto fetchExternalTasksDto = createDto(FetchAndLockHandler.MIN_TIMEOUT);
+  public void shouldSetAuthenticationProperly() {
+    when(identityServiceMock.getCurrentAuthentication())
+      .thenReturn(new Authentication(MockProvider.EXAMPLE_USER_ID, groupIds, tenantIds));
+
+    FetchExternalTasksExtendedDto fetchExternalTasksDto = createDto(500L);
 
     given()
-      .auth().preemptive().basic(MockProvider.EXAMPLE_USER_ID, MockProvider.EXAMPLE_USER_PASSWORD)
       .contentType(ContentType.JSON)
       .body(fetchExternalTasksDto)
       .pathParam("name", "default")
-    .then()
-      .expect()
-        .header(HttpHeaders.WWW_AUTHENTICATE, "Basic realm=\"default\"")
-        .body(isEmptyString())
-        .statusCode(Status.UNAUTHORIZED.getStatusCode())
     .when()
       .post(FETCH_EXTERNAL_TASK_URL_NAMED_ENGINE);
-  }
 
-  @Test
-  public void shouldAcceptRequestDueToValidAuthorization() {
-    FetchExternalTasksExtendedDto fetchExternalTasksDto = createDto(FetchAndLockHandler.MIN_TIMEOUT);
+    ArgumentCaptor<Authentication> argumentCaptor = ArgumentCaptor.forClass(Authentication.class);
+    verify(identityServiceMock, times(3)).setAuthentication(argumentCaptor.capture());
 
-    given()
-      .auth().preemptive().basic(MockProvider.EXAMPLE_USER_ID, MockProvider.EXAMPLE_USER_PASSWORD)
-      .contentType(ContentType.JSON)
-      .body(fetchExternalTasksDto)
-      .pathParam("name", "default")
-    .then()
-      .expect()
-        .body("isEmpty()", is(true))
-        .statusCode(Status.OK.getStatusCode())
-    .when()
-      .post(FETCH_EXTERNAL_TASK_URL_NAMED_ENGINE);
-  }
-
-  @Test
-  public void shouldFailByAuthenticationCheck() {
-    when(identityServiceMock.checkPassword(MockProvider.EXAMPLE_USER_ID, MockProvider.EXAMPLE_USER_PASSWORD)).thenReturn(false);
-    FetchExternalTasksExtendedDto fetchExternalTasksDto = createDto(FetchAndLockHandler.MIN_TIMEOUT);
-
-    given()
-      .auth().preemptive().basic(MockProvider.EXAMPLE_USER_ID, MockProvider.EXAMPLE_USER_PASSWORD)
-      .pathParam("name", "default")
-      .contentType(ContentType.JSON)
-      .body(fetchExternalTasksDto)
-    .then().expect()
-      .statusCode(Status.UNAUTHORIZED.getStatusCode())
-      .header(HttpHeaders.WWW_AUTHENTICATE, "Basic realm=\"default\"")
-    .when().post(FETCH_EXTERNAL_TASK_URL_NAMED_ENGINE);
-  }
-
-  @Test
-  public void shouldFailByMissingAuthHeader() {
-    FetchExternalTasksExtendedDto fetchExternalTasksDto = createDto(FetchAndLockHandler.MIN_TIMEOUT);
-    given()
-      .pathParam("name", "someengine")
-      .contentType(ContentType.JSON)
-      .body(fetchExternalTasksDto)
-    .then().expect()
-      .statusCode(Status.UNAUTHORIZED.getStatusCode())
-      .header(HttpHeaders.WWW_AUTHENTICATE, "Basic realm=\"someengine\"")
-    .when().post(FETCH_EXTERNAL_TASK_URL_NAMED_ENGINE);
-  }
-
-  @Test
-  public void shouldFailByMalformedCredentials() {
-    FetchExternalTasksExtendedDto fetchExternalTasksDto = createDto(FetchAndLockHandler.MIN_TIMEOUT);
-    given()
-      .header(HttpHeaders.AUTHORIZATION, "Basic " + new String(Base64.encodeBase64("this is not a valid format".getBytes())))
-      .pathParam("name", "default")
-      .contentType(ContentType.JSON)
-      .body(fetchExternalTasksDto)
-    .then().expect()
-      .statusCode(Status.UNAUTHORIZED.getStatusCode())
-      .header(HttpHeaders.WWW_AUTHENTICATE, "Basic realm=\"default\"")
-    .when().post(FETCH_EXTERNAL_TASK_URL_NAMED_ENGINE);
-  }
-
-  @Test
-  public void shouldFailByMalformedBase64Value() {
-    FetchExternalTasksExtendedDto fetchExternalTasksDto = createDto(FetchAndLockHandler.MIN_TIMEOUT);
-    given()
-      .header(HttpHeaders.AUTHORIZATION, "Basic someNonBase64Characters!(#")
-      .pathParam("name", "default")
-      .contentType(ContentType.JSON)
-      .body(fetchExternalTasksDto)
-    .then().expect()
-      .statusCode(Status.UNAUTHORIZED.getStatusCode())
-      .header(HttpHeaders.WWW_AUTHENTICATE, "Basic realm=\"default\"")
-    .when().post(FETCH_EXTERNAL_TASK_URL_NAMED_ENGINE);
+    assertThat(argumentCaptor.getValue().getUserId(), is(MockProvider.EXAMPLE_USER_ID));
+    assertThat(argumentCaptor.getValue().getGroupIds(), is(groupIds));
+    assertThat(argumentCaptor.getValue().getTenantIds(), is(tenantIds));
   }
   
   // helper /////////////////////////
@@ -388,21 +322,33 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
     return fetchExternalTasksDto;
   }
 
-  private void setupGroupQueryMock(List<Group> groups) {
+  private List<String> setupGroupQueryMock(List<Group> groups) {
     GroupQuery mockGroupQuery = mock(GroupQuery.class);
 
     when(identityServiceMock.createGroupQuery()).thenReturn(mockGroupQuery);
     when(mockGroupQuery.groupMember(anyString())).thenReturn(mockGroupQuery);
     when(mockGroupQuery.list()).thenReturn(groups);
+
+    List<String> groupIds = new ArrayList<String>();
+    for (Group groupMock : groups) {
+      groupIds.add(groupMock.getId());
+    }
+    return groupIds;
   }
 
-  private void setupTenantQueryMock(List<Tenant> tenants) {
+  private List<String> setupTenantQueryMock(List<Tenant> tenants) {
     TenantQuery mockTenantQuery = mock(TenantQuery.class);
 
     when(identityServiceMock.createTenantQuery()).thenReturn(mockTenantQuery);
     when(mockTenantQuery.userMember(anyString())).thenReturn(mockTenantQuery);
     when(mockTenantQuery.includingGroupsOfUser(anyBoolean())).thenReturn(mockTenantQuery);
     when(mockTenantQuery.list()).thenReturn(tenants);
+
+    List<String> tenantIds = new ArrayList<String>();
+    for(Tenant tenant: tenants) {
+      tenantIds.add(tenant.getId());
+    }
+    return tenantIds;
   }
 
 }

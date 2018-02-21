@@ -18,8 +18,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Produces;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 
 /**
@@ -32,6 +30,6 @@ public interface FetchAndLockRestService {
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
-  void fetchAndLock(FetchExternalTasksExtendedDto dto, @Suspended final AsyncResponse asyncResponse, @Context HttpHeaders headers);
+  void fetchAndLock(FetchExternalTasksExtendedDto dto, @Suspended final AsyncResponse asyncResponse);
 
 }

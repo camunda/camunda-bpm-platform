@@ -18,7 +18,6 @@ import org.camunda.bpm.engine.rest.exception.JsonParseExceptionHandler;
 import org.camunda.bpm.engine.rest.exception.ProcessEngineExceptionHandler;
 import org.camunda.bpm.engine.rest.exception.RestExceptionHandler;
 import org.camunda.bpm.engine.rest.hal.JacksonHalJsonProvider;
-import org.camunda.bpm.engine.rest.impl.fetchAndLock.FetchAndLockProvider;
 import org.camunda.bpm.engine.rest.mapper.JacksonConfigurator;
 import org.camunda.bpm.engine.rest.mapper.MultipartPayloadProvider;
 
@@ -35,14 +34,8 @@ public class CamundaRestResources {
   private static final Set<Class<?>> CONFIGURATION_CLASSES = new HashSet<Class<?>>();
 
   static {
-    // JAX-RS 2.0
     RESOURCE_CLASSES.add(JaxRsTwoNamedProcessEngineRestServiceImpl.class);
     RESOURCE_CLASSES.add(JaxRsTwoDefaultProcessEngineRestServiceImpl.class);
-    CONFIGURATION_CLASSES.add(FetchAndLockProvider.class);
-
-    // JAX-RS 1.0
-    RESOURCE_CLASSES.add(NamedProcessEngineRestServiceImpl.class);
-    RESOURCE_CLASSES.add(DefaultProcessEngineRestServiceImpl.class);
 
     CONFIGURATION_CLASSES.add(JacksonConfigurator.class);
     CONFIGURATION_CLASSES.add(JacksonJsonProvider.class);
