@@ -333,7 +333,7 @@ public class DbEntityManager implements Session, EntityLoadListener {
       try {
         persistenceSession.executeDbOperation(dbOperation);
       } catch (Exception e) {
-        boolean doOptimisticLockingException = isOptimisticLockingException(dbOperation);
+        boolean doOptimisticLockingException = isOptimisticLockingException(dbOperation, e);
         throw LOG.flushDbOperationException(operationsToFlush, dbOperation, e, doOptimisticLockingException);
       }
       if (dbOperation.isFailed()) {
@@ -362,15 +362,14 @@ public class DbEntityManager implements Session, EntityLoadListener {
    */
   private boolean isOptimisticLockingException(List<DbOperation> operationsToFlush, Throwable cause) {
 
-    boolean isConstraintViolation = ExceptionUtil.checkForeignKeyConstraintViolation(cause);
     BatchExecutorException batchExecutorException = ExceptionUtil.findBatchExecutorException(cause);
 
-    if (isConstraintViolation && batchExecutorException != null) {
+    if (batchExecutorException != null) {
 
       int failedOperationIndex = batchExecutorException.getSuccessfulBatchResults().size();
       if (failedOperationIndex < operationsToFlush.size()) {
         DbOperation failedOperation = operationsToFlush.get(failedOperationIndex);
-        return isOptimisticLockingException(failedOperation);
+        return isOptimisticLockingException(failedOperation, cause);
       }
     }
 
@@ -385,9 +384,11 @@ public class DbEntityManager implements Session, EntityLoadListener {
    * @param failedOperation
    * @return
    */
-  private boolean isOptimisticLockingException(DbOperation failedOperation) {
+  private boolean isOptimisticLockingException(DbOperation failedOperation, Throwable cause) {
 
-    if (failedOperation instanceof DbEntityOperation
+    boolean isConstraintViolation = ExceptionUtil.checkForeignKeyConstraintViolation(cause);
+
+    if (isConstraintViolation && failedOperation instanceof DbEntityOperation
       && ((DbEntityOperation) failedOperation).getEntity() instanceof HasDbReferences
       && (failedOperation.getOperationType().equals(DbOperationType.INSERT)
       || failedOperation.getOperationType().equals(DbOperationType.UPDATE))) {
