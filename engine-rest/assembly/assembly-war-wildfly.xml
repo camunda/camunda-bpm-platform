@@ -26,6 +26,7 @@
       <unpack>true</unpack>
       <unpackOptions>
         <excludes>
+          <exclude>**/jboss-deployment-structure.xml</exclude>
           <exclude>**/web.xml</exclude>
           <exclude>**/camunda-engine-rest-core-*</exclude>
         </excludes>

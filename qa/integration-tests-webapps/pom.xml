@@ -183,6 +183,7 @@
         <dependency>
           <groupId>org.camunda.bpm</groupId>
           <artifactId>camunda-engine-rest</artifactId>
+          <classifier>jbossas7</classifier>
           <scope>test</scope>
           <type>war</type>
           <version>${project.version}</version>
@@ -261,6 +262,7 @@
                   <groupId>org.camunda.bpm</groupId>
                   <artifactId>camunda-engine-rest</artifactId>
                   <type>war</type>
+                  <classifier>jbossas7</classifier>
                   <pingURL>http://localhost:${jboss.http.port}/engine-rest/engine/default/process-definition</pingURL>
                   <pingTimeout>${cargo.deploy.timeout}</pingTimeout>
                   <properties>
@@ -342,6 +344,7 @@
           <groupId>org.camunda.bpm</groupId>
           <artifactId>camunda-engine-rest</artifactId>
           <version>${project.version}</version>
+          <classifier>wildfly</classifier>
           <scope>test</scope>
           <type>war</type>
         </dependency>
@@ -395,6 +398,7 @@
                 <deployable>
                   <groupId>org.camunda.bpm</groupId>
                   <artifactId>camunda-engine-rest</artifactId>
+                  <classifier>wildfly</classifier>
                   <type>war</type>
                   <pingURL>http://localhost:${jboss.http.port}/engine-rest/engine/default/process-definition</pingURL>
                   <pingTimeout>${cargo.deploy.timeout}</pingTimeout>
