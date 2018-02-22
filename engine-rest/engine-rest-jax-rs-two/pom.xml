@@ -13,7 +13,7 @@
   </parent>
 
   <properties>
-    <version.resteasy>3.0.19.Final</version.resteasy>
+    <version.resteasy>3.0.10.Final</version.resteasy>
   </properties>
 
   <dependencies>
@@ -129,7 +129,7 @@
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-netty4</artifactId>
-      <version>${version.resteasy}</version>
+      <version>3.0.19.Final</version>
       <scope>test</scope>
     </dependency>
 
