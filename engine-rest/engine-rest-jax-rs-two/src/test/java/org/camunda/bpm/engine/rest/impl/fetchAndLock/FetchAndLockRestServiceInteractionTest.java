@@ -51,6 +51,7 @@ import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -231,7 +232,7 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
     .when()
       .post(FETCH_EXTERNAL_TASK_URL_NAMED_ENGINE);
 
-    verify(fetchTopicBuilder, times(3)).execute();
+    verify(fetchTopicBuilder, atLeastOnce()).execute();
   }
 
   @Test
@@ -289,7 +290,7 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
       .post(FETCH_EXTERNAL_TASK_URL_NAMED_ENGINE);
 
     ArgumentCaptor<Authentication> argumentCaptor = ArgumentCaptor.forClass(Authentication.class);
-    verify(identityServiceMock, times(3)).setAuthentication(argumentCaptor.capture());
+    verify(identityServiceMock, atLeastOnce()).setAuthentication(argumentCaptor.capture());
 
     assertThat(argumentCaptor.getValue().getUserId(), is(MockProvider.EXAMPLE_USER_ID));
     assertThat(argumentCaptor.getValue().getGroupIds(), is(groupIds));
