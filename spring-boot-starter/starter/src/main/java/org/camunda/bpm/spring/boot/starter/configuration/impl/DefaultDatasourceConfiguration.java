@@ -44,6 +44,8 @@ public class DefaultDatasourceConfiguration extends AbstractCamundaConfiguration
     if(!StringUtils.isEmpty(database.getSchemaName())) {
       configuration.setDatabaseSchema(database.getSchemaName());
     }
+
+    configuration.setJdbcBatchProcessing(database.isJdbcBatchProcessing());
   }
 
 }

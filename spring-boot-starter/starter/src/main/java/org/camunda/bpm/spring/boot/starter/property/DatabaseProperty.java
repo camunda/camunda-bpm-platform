@@ -40,6 +40,11 @@ public class DatabaseProperty {
    */
   private String schemaName = Defaults.INSTANCE.getDatabaseSchema();
 
+  /**
+   * enables batch processing mode for db operations
+   */
+  private boolean jdbcBatchProcessing = true;
+
   public String getSchemaUpdate() {
     return schemaUpdate;
   }
@@ -80,6 +85,14 @@ public class DatabaseProperty {
     this.schemaName = schemaName;
   }
 
+  public boolean isJdbcBatchProcessing() {
+    return jdbcBatchProcessing;
+  }
+
+  public void setJdbcBatchProcessing(boolean jdbcBatchProcessing) {
+    this.jdbcBatchProcessing = jdbcBatchProcessing;
+  }
+
   @Override
   public String toString() {
     return joinOn(this.getClass())
@@ -87,6 +100,7 @@ public class DatabaseProperty {
       .add("schemaUpdate=" + schemaUpdate)
       .add("schemaName=" + schemaName)
       .add("tablePrefix=" + tablePrefix)
+      .add("jdbcBatchProcessing=" + jdbcBatchProcessing)
       .toString();
   }
 }
