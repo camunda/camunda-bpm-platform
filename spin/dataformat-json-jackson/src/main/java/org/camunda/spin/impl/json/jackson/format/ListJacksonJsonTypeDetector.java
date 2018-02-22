@@ -12,6 +12,7 @@
  */
 package org.camunda.spin.impl.json.jackson.format;
 
+import java.lang.reflect.TypeVariable;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.JavaType;
@@ -26,18 +27,31 @@ public class ListJacksonJsonTypeDetector extends AbstractJacksonJsonTypeDetector
   public String detectType(Object object) {
     return constructType(object).toCanonical();
   }
-  
+
   protected JavaType constructType(Object object) {
     TypeFactory typeFactory = TypeFactory.defaultInstance();
-    
+
     if (object instanceof List && !((List<?>) object).isEmpty()) {
       List<?> list = (List<?>) object;
       Object firstElement = list.get(0);
-      return typeFactory.constructCollectionType(list.getClass(), constructType(firstElement));
-
-    } else {
-      return typeFactory.constructType(object.getClass());
+      if (bindingsArePresent(list.getClass())) {
+        final JavaType elementType = constructType(firstElement);
+        return typeFactory.constructCollectionType(list.getClass(), elementType);
+      }
     }
+    return typeFactory.constructType(object.getClass());
+  }
+
+  private boolean bindingsArePresent(Class<?> erasedType) {
+    TypeVariable<?>[] vars = erasedType.getTypeParameters();
+    int varLen = (vars == null) ? 0 : vars.length;
+    if (varLen == 0) {
+      return false;
+    }
+    if (varLen != 1) {
+      throw new IllegalArgumentException("Cannot create TypeBindings for class " + erasedType.getName() + " with 1 type parameter: class expects " + varLen);
+    }
+    return true;
   }
 
 }

@@ -20,6 +20,7 @@ import org.camunda.spin.impl.json.jackson.JacksonJsonLogger;
 import org.camunda.spin.spi.TextBasedDataFormatReader;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
@@ -40,7 +41,11 @@ public class JacksonJsonDataFormatReader extends TextBasedDataFormatReader {
     ObjectMapper mapper = format.getObjectMapper();
 
     try {
-      return mapper.readTree(input);
+      final JsonNode jsonNode = mapper.readTree(input);
+      if (jsonNode == null) {
+        throw new IOException("Input is empty");
+      }
+      return jsonNode;
     }
     catch (JsonProcessingException e) {
       throw JSON_LOGGER.unableToParseInput(e);
