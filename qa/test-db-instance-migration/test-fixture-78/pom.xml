@@ -15,39 +15,14 @@
     <camunda.version.previous>7.7.0</camunda.version.previous>
   </properties>
 
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.camunda.bpm</groupId>
-        <artifactId>camunda-bom</artifactId>
-        <version>7.8.0</version>
-        <scope>import</scope>
-        <type>pom</type>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-
   <dependencies>
     <!-- NOTE: this pulls transitive dependencies of version ${project.version} in unless
       you declare them to be ${camunda.version.current} here -->
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine</artifactId>
-      <version>7.8.0</version>
     </dependency>
 
-    <dependency>
-      <groupId>org.camunda.spin</groupId>
-      <artifactId>camunda-spin-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.camunda.spin</groupId>
-      <artifactId>camunda-spin-dataformat-json-jackson</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.camunda.bpm</groupId>
-      <artifactId>camunda-engine-plugin-spin</artifactId>
-    </dependency>
     <dependency>
       <groupId>org.camunda.bpm.qa.upgrade</groupId>
       <artifactId>camunda-qa-upgrade-scenario-util</artifactId>
@@ -208,28 +183,6 @@
                     <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}_to_${camunda.current.majorVersion}.${camunda.current.minorVersion}.sql</srcFile>
                     <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_identity_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}_to_${camunda.current.majorVersion}.${camunda.current.minorVersion}.sql</srcFile>
                   </srcFiles>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>exec-maven-plugin</artifactId>
-            <configuration>
-              <cleanupDaemonThreads>false</cleanupDaemonThreads>
-              <includeProjectDependencies>true</includeProjectDependencies>
-              <includePluginDependencies>false</includePluginDependencies>
-              <classpathScope>test</classpathScope>
-            </configuration>
-            <executions>
-              <execution>
-                <id>create-test-fixture</id>
-                <goals>
-                  <goal>java</goal>
-                </goals>
-                <phase>process-test-classes</phase>
-                <configuration>
-                  <mainClass>org.camunda.bpm.qa.upgrade.TestFixture</mainClass>
                 </configuration>
               </execution>
             </executions>

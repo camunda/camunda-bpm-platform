@@ -19,19 +19,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.camunda.spin</groupId>
-      <artifactId>camunda-spin-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.camunda.spin</groupId>
-      <artifactId>camunda-spin-dataformat-json-jackson</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.camunda.bpm</groupId>
-      <artifactId>camunda-engine-plugin-spin</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>org.camunda.bpm.qa.upgrade</groupId>
       <artifactId>camunda-qa-upgrade-scenario-util</artifactId>
       <version>${project.version}</version>
