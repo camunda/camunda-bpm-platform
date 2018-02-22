@@ -24,6 +24,7 @@
     <version.logback>1.1.2</version.logback>
     <version.slf4j>1.7.7</version.slf4j>
     <version.resteasy>2.3.5.Final</version.resteasy>
+    <version.resteasy3>3.0.12.Final</version.resteasy3>
     <version.jersey2>2.25.1</version.jersey2>
 
     <version.commonj>1.1.0</version.commonj>

@@ -17,9 +17,13 @@
       <useTransitiveFiltering>true</useTransitiveFiltering>
       <scope>provided</scope>
       <includes>
+        <include>org.camunda.bpm:camunda-engine-rest-jaxrs2:jar:*</include>
         <include>org.jboss.resteasy:resteasy-jaxrs:jar:*</include>
+        <include>org.jboss.resteasy:async-http-servlet-3.0:jar:*</include>
+        <include>org.jboss.resteasy:jaxrs-api:jar:*</include>
       </includes>
     </dependencySet>
+
     <dependencySet>
       <outputDirectory>/</outputDirectory>
       <includes>

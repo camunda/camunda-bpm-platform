@@ -56,6 +56,7 @@
     <profile>
         <subsystem xmlns="urn:jboss:domain:logging:1.2">
             <console-handler name="CONSOLE">
+                <filter value='not(match("JBAS011006"))' />
                 <level name="INFO"/>
                 <formatter>
                     <pattern-formatter pattern="%K{level}%d{HH:mm:ss,SSS} %-5p [%c] (%t) %s%E%n"/>

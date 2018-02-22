@@ -19,11 +19,23 @@
 
   <dependencySets>
     <dependencySet>
+      <outputDirectory>WEB-INF/lib</outputDirectory>
+      <useTransitiveDependencies>true</useTransitiveDependencies>
+      <useTransitiveFiltering>true</useTransitiveFiltering>
+      <scope>provided</scope>
+      <includes>
+        <include>org.camunda.bpm:camunda-engine-rest-jaxrs2:jar:*</include>
+        <include>org.glassfish.jersey.containers:jersey-container-servlet:*</include>
+      </includes>
+    </dependencySet>
+
+    <dependencySet>
       <outputDirectory>/</outputDirectory>
       <unpack>true</unpack>
       <unpackOptions>
         <excludes>
           <exclude>**/web.xml</exclude>
+          <exclude>**/camunda-engine-rest-core-*</exclude>
         </excludes>
       </unpackOptions>
       <includes>

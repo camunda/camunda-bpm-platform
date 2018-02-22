@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee"
+<web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
 
   <display-name>camunda bpm rest api</display-name>
 
@@ -12,6 +12,7 @@
   <filter>
     <filter-name>EmptyBodyFilter</filter-name>
     <filter-class>org.camunda.bpm.engine.rest.filter.EmptyBodyFilter</filter-class>
+    <async-supported>true</async-supported>
   </filter>
   <filter-mapping>
     <filter-name>EmptyBodyFilter</filter-name>
@@ -21,6 +22,7 @@
   <filter>
     <filter-name>CacheControlFilter</filter-name>
     <filter-class>org.camunda.bpm.engine.rest.filter.CacheControlFilter</filter-class>
+    <async-supported>true</async-supported>
   </filter>
   <filter-mapping>
     <filter-name>CacheControlFilter</filter-name>
@@ -45,20 +47,10 @@
   </filter-mapping> -->
 
   <servlet>
-    <servlet-name>Engine API</servlet-name>
-    <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
-    <init-param>
-      <param-name>javax.ws.rs.Application</param-name>
-      <param-value>org.camunda.bpm.engine.rest.impl.application.DefaultApplication</param-value>
-    </init-param>
+    <servlet-name>org.camunda.bpm.engine.rest.impl.application.DefaultApplication</servlet-name>
     <!-- disable Moxy as Jersey default JSON processor in case running on WLS 12R2 and above -->
     <init-param>
       <param-name>jersey.config.server.disableMoxyJson</param-name>
-      <param-value>true</param-value>
-    </init-param>
-    <!-- disable META-INF services scanning, so no auto-configuration happens -->
-    <init-param>
-      <param-name>jersey.config.server.disableMetainfServicesLookup</param-name>
       <param-value>true</param-value>
     </init-param>
     <!-- Enable to debug Jersey requests -->
@@ -68,10 +60,11 @@
       <param-value>ALL</param-value>
     </init-param>
     -->
+    <async-supported>true</async-supported>
   </servlet>
 
   <servlet-mapping>
-    <servlet-name>Engine API</servlet-name>
+    <servlet-name>org.camunda.bpm.engine.rest.impl.application.DefaultApplication</servlet-name>
     <url-pattern>/*</url-pattern>
   </servlet-mapping>
 

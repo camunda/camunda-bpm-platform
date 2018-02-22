@@ -1,6 +1,6 @@
-<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee"
+<web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://java.sun.com/xml/ns/javaee    http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+  xsi:schemaLocation="http://java.sun.com/xml/ns/javaee    http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
 
   <listener>
     <listener-class>org.camunda.bpm.engine.rest.impl.fetchAndLock.FetchAndLockContextListener</listener-class>
@@ -9,6 +9,7 @@
   <filter>
     <filter-name>EmptyBodyFilter</filter-name>
     <filter-class>org.camunda.bpm.engine.rest.filter.EmptyBodyFilter</filter-class>
+    <async-supported>true</async-supported>
   </filter>
   <filter-mapping>
     <filter-name>EmptyBodyFilter</filter-name>
@@ -17,7 +18,8 @@
 
   <filter>
     <filter-name>CacheControlFilter</filter-name>
-    <filter-class>org.camunda.bpm.engine.rest.filter.CacheControlFilter</filter-class>    
+    <filter-class>org.camunda.bpm.engine.rest.filter.CacheControlFilter</filter-class>
+    <async-supported>true</async-supported>
   </filter>
   <filter-mapping>
     <filter-name>CacheControlFilter</filter-name>
@@ -45,20 +47,19 @@
     <url-pattern>/*</url-pattern>
   </filter-mapping> -->
 
-  <filter>
-      <filter-name>Resteasy</filter-name>
-      <filter-class>
-          org.jboss.resteasy.plugins.server.servlet.FilterDispatcher
-      </filter-class>
-      <init-param>
-          <param-name>javax.ws.rs.Application</param-name>
-          <param-value>org.camunda.bpm.engine.rest.impl.application.DefaultApplication</param-value>
-      </init-param>
-  </filter>
+  <servlet>
+    <servlet-name>Resteasy</servlet-name>
+    <servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServlet30Dispatcher</servlet-class>
+    <init-param>
+      <param-name>javax.ws.rs.Application</param-name>
+      <param-value>org.camunda.bpm.engine.rest.impl.application.DefaultApplication</param-value>
+    </init-param>
+    <async-supported>true</async-supported>
+  </servlet>
 
-  <filter-mapping>
-      <filter-name>Resteasy</filter-name>
-      <url-pattern>/*</url-pattern>
-  </filter-mapping>
+  <servlet-mapping>
+    <servlet-name>Resteasy</servlet-name>
+    <url-pattern>/*</url-pattern>
+  </servlet-mapping>
 
 </web-app>
