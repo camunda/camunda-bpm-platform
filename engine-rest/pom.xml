@@ -16,7 +16,7 @@
 
   <modules>
     <module>engine-rest</module>
-    <module>engine-rest-jax-rs-two</module>
+    <module>engine-rest-jaxrs2</module>
     <module>assembly</module>
   </modules>
 

@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <name>camunda BPM - engine - REST JAX RS 2.0</name>
-  <artifactId>engine-rest-jax-rs-two</artifactId>
+  <artifactId>camunda-engine-rest-jaxrs2</artifactId>
   <version>7.9.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
@@ -11,10 +11,6 @@
     <relativePath>../</relativePath>
     <version>7.9.0-SNAPSHOT</version>
   </parent>
-
-  <properties>
-    <version.resteasy>3.0.10.Final</version.resteasy>
-  </properties>
 
   <dependencies>
     <!-- compile -->
@@ -36,20 +32,6 @@
     <dependency>
       <groupId>org.jboss.spec.javax.servlet</groupId>
       <artifactId>jboss-servlet-api_3.0_spec</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>commons-fileupload</groupId>
-      <artifactId>commons-fileupload</artifactId>
-      <version>1.3.2</version>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>com.fasterxml.jackson.jaxrs</groupId>
-      <artifactId>jackson-jaxrs-json-provider</artifactId>
-      <version>2.6.3</version>
       <scope>provided</scope>
     </dependency>
 
@@ -136,14 +118,14 @@
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-jaxrs</artifactId>
-      <version>${version.resteasy}</version>
+      <version>${version.resteasy3}</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-client</artifactId>
-      <version>${version.resteasy}</version>
+      <version>${version.resteasy3}</version>
       <scope>test</scope>
     </dependency>
 
@@ -151,6 +133,14 @@
 
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
@@ -161,6 +151,14 @@
               <goal>shade</goal>
             </goals>
             <configuration>
+              <artifactSet>
+                <includes>
+                  <include>org.camunda.bpm:camunda-engine-rest-core</include>
+                </includes>
+                <excludes>
+                  <exclude>com*:*</exclude>
+                </excludes>
+              </artifactSet>
               <filters>
                 <filter>
                   <artifact>org.camunda.bpm:camunda-engine-rest-core</artifact>
