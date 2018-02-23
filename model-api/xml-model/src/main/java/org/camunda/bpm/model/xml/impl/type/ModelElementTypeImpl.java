@@ -236,7 +236,7 @@ public class ModelElementTypeImpl implements ModelElementType {
 
     List<ModelElementInstance> resultList = new ArrayList<ModelElementInstance>();
     for (DomElement element : elements) {
-      resultList.add(ModelUtil.getModelElement(element, modelInstanceImpl));
+      resultList.add(ModelUtil.getModelElement(element, modelInstanceImpl, this));
     }
     return resultList;
   }

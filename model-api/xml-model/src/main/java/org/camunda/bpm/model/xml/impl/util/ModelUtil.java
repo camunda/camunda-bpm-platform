@@ -52,6 +52,25 @@ public final class ModelUtil {
     return modelElement;
   }
 
+  /**
+   * Returns the {@link ModelElementInstanceImpl ModelElement} for a DOM element.
+   * If the model element does not yet exist, it is created and linked to the DOM.
+   *
+   * @param domElement the child element to create a new {@link ModelElementInstanceImpl ModelElement} for
+   * @param modelInstance the {@link ModelInstanceImpl ModelInstance} for which the new {@link ModelElementInstanceImpl ModelElement} is created
+   * @param modelType the {@link ModelElementTypeImpl ModelElementType} to create a new {@link ModelElementInstanceImpl ModelElement} for
+   * @return the child model element
+   */
+  public static ModelElementInstance getModelElement(DomElement domElement, ModelInstanceImpl modelInstance, ModelElementTypeImpl modelType) {
+    ModelElementInstance modelElement = domElement.getModelElementInstance();
+
+    if(modelElement == null) {
+      modelElement = modelType.newInstance(modelInstance, domElement);
+      domElement.setModelElementInstance(modelElement);
+    }
+    return modelElement;
+  }
+
   protected static ModelElementTypeImpl getModelElement(DomElement domElement, ModelInstanceImpl modelInstance, String namespaceUri) {
     String localName = domElement.getLocalName();
     ModelElementTypeImpl modelType = (ModelElementTypeImpl) modelInstance.getModel().getTypeForName(namespaceUri, localName);
