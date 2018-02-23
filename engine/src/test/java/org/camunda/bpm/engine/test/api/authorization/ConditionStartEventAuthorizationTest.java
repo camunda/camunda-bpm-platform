@@ -34,10 +34,9 @@ public class ConditionStartEventAuthorizationTest extends AuthorizationTest {
   protected static final String PROCESS_KEY = "conditionalEventProcess";
   protected static final String PROCESS_KEY_TWO = "trueConditionProcess";
 
-  @Deployment(resources = { SINGLE_CONDITIONAL_XML })
+  @Deployment(resources = { SINGLE_CONDITIONAL_XML, TRUE_CONDITIONAL_XML })
   public void testWithAllPermissions() {
-    org.camunda.bpm.engine.repository.Deployment deployment = createDeployment("name", TRUE_CONDITIONAL_XML);
-    // given deployed process with conditional start event
+    // given two deployed processes with conditional start event
 
     createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY_TWO, userId, CREATE_INSTANCE);
     createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ, CREATE_INSTANCE);
@@ -51,7 +50,6 @@ public class ConditionStartEventAuthorizationTest extends AuthorizationTest {
 
     // then
     assertEquals(1, instances.size());
-    deleteDeployment(deployment.getId());
   }
 
   @Deployment(resources = { SINGLE_CONDITIONAL_XML })
@@ -113,5 +111,25 @@ public class ConditionStartEventAuthorizationTest extends AuthorizationTest {
       assertTrue(e.getMessage().contains("The user with id 'test' does not have 'CREATE' permission on resource 'ProcessInstance'."));
     }
 
+  }
+
+  @Deployment(resources = { SINGLE_CONDITIONAL_XML })
+  public void testWithRevokeAuthorizations() {
+    // given deployed process with conditional start event
+
+    createRevokeAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, CREATE_INSTANCE);
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, CREATE);
+
+    // when
+    try {
+      runtimeService
+          .createConditionEvaluation()
+          .setVariable("foo", 42)
+          .evaluateStartConditions();
+      fail("expected exception");
+    } catch (ProcessEngineException e) {
+      assertTrue(e.getMessage().contains("No subscriptions were found during evaluation of the conditional start events."));
+    }
   }
 }
