@@ -20,7 +20,7 @@ public class AuthenticationException extends ProcessEngineException {
   protected final String userId;
 
   public AuthenticationException(String userId) {
-    super("The user with id '" + userId + "' tries to login without success.");
+    super("The user with id '" + userId + "' is locked.");
     this.userId = userId;
   }
 
