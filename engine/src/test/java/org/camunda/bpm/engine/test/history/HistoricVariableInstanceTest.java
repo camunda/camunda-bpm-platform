@@ -2272,4 +2272,35 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
     assertEquals("initial", variable.getName());
     assertEquals("foo", variable.getValue());
   }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/twoTasksProcess.bpmn20.xml"})
+  public void testQueryByProcessDefinitionKeyTwoInstances() {
+    // given
+    runtimeService.startProcessInstanceByKey("twoTasksProcess", Variables.createVariables().putValue("initial", "foo").putValue("vegie", "cucumber"));
+    runtimeService.startProcessInstanceByKey("twoTasksProcess", Variables.createVariables().putValue("initial", "bar").putValue("fruit", "marakuia"));
+
+    // when
+    List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery()
+    .processDefinitionKey("twoTasksProcess").list();
+
+    // then
+    assertNotNull(variables);
+    assertEquals(4, variables.size());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml", "org/camunda/bpm/engine/test/api/twoTasksProcess.bpmn20.xml"})
+  public void testQueryByProcessDefinitionKeyTwoDefinitions() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", Variables.createVariables().putValue("initial", "bar"));
+    runtimeService.startProcessInstanceByKey("twoTasksProcess", Variables.createVariables().putValue("initial", "foo"));
+
+    // when
+    HistoricVariableInstance variable = historyService.createHistoricVariableInstanceQuery()
+        .processDefinitionKey("twoTasksProcess").singleResult();
+
+    // then
+    assertNotNull(variable);
+    assertEquals("initial", variable.getName());
+    assertEquals("foo", variable.getValue());
+  }
 }
