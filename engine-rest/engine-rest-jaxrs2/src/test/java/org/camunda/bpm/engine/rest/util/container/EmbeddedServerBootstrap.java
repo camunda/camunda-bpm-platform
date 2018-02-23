@@ -9,7 +9,7 @@ import java.util.Properties;
 public abstract class EmbeddedServerBootstrap {
 
   protected static final String PORT_PROPERTY = "rest.http.port";
-  protected static final String ROOT_RESOURCE_PATH = "/rest-test";
+  protected static final String ROOT_RESOURCE_PATH = "";
   private static final String PROPERTIES_FILE = "/testconfig.properties";
 
   public abstract void start();

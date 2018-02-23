@@ -19,14 +19,10 @@ import javax.ws.rs.core.Application;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ResteasySpecifics implements ContainerSpecifics {
+public class JerseySpecifics implements ContainerSpecifics {
 
   protected static final TestRuleFactory DEFAULT_RULE_FACTORY = new EmbeddedServerRuleFactory(new JaxrsApplication());
   protected static final Map<Class<?>, TestRuleFactory> TEST_RULE_FACTORIES = new HashMap<Class<?>, TestRuleFactory>();
-
-  static {
-    // TEST_RULE_FACTORIES.put(ExceptionHandlerTest.class, new EmbeddedServerRuleFactory(new TestCustomResourceApplication()));
-  }
 
   public TestRule getTestRule(Class<?> testClass) {
     TestRuleFactory ruleFactory = DEFAULT_RULE_FACTORY;
@@ -49,7 +45,7 @@ public class ResteasySpecifics implements ContainerSpecifics {
     public TestRule createTestRule() {
       return new ExternalResource() {
 
-        ResteasyServerBootstrap bootstrap = new ResteasyServerBootstrap(jaxRsApplication);
+        JerseyServerBootstrap bootstrap = new JerseyServerBootstrap(jaxRsApplication);
 
         protected void before() throws Throwable {
           bootstrap.start();
