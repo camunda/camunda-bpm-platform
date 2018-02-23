@@ -26,6 +26,7 @@ import java.util.List;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
+import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
@@ -315,5 +316,41 @@ public class ParallelGatewayTest extends PluggableProcessEngineTestCase {
 
     // then
     assertEquals(0, runtimeService.createVariableInstanceQuery().count());
+  }
+
+  @Deployment
+  public void testImplicitParallelGatewayAfterSignalBehavior() {
+    // given
+    Exception exceptionOccurred = null;
+    runtimeService.startProcessInstanceByKey("process");
+    Execution execution = runtimeService.createExecutionQuery()
+      .activityId("service")
+      .singleResult();
+
+    // when
+    try {
+      runtimeService.signal(execution.getId());
+    } catch (Exception e) {
+      exceptionOccurred = e;
+    }
+
+    // then
+    assertNull(exceptionOccurred);
+    assertEquals(3, taskService.createTaskQuery().count());
+  }
+
+  @Deployment
+  public void testExplicitParallelGatewayAfterSignalBehavior() {
+    // given
+    runtimeService.startProcessInstanceByKey("process");
+    Execution execution = runtimeService.createExecutionQuery()
+      .activityId("service")
+      .singleResult();
+
+    // when
+    runtimeService.signal(execution.getId());
+
+    // then
+    assertEquals(3, taskService.createTaskQuery().count());
   }
 }

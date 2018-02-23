@@ -32,6 +32,7 @@ public class OutgoingExecution {
     this.outgoingExecution = outgoingExecution;
     this.outgoingTransition = outgoingTransition;
     outgoingExecution.setTransition(outgoingTransition);
+    outgoingExecution.setActivityInstanceId(null);
   }
 
   public void take() {
@@ -43,5 +44,9 @@ public class OutgoingExecution {
     } else {
       LOG.notTakingTranistion(outgoingTransition);
     }
+  }
+
+  public PvmExecutionImpl getOutgoingExecution() {
+    return outgoingExecution;
   }
 }
