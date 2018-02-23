@@ -1,14 +1,10 @@
-This is a distribution of 
+This is a distribution of Camunda BPM platform v${project.version} (visit
+http://docs.camunda.org/) a dual-license Java-based framework. This particular
+copy of the software is released either under the Apache License 2.0 (Community
+Platform) OR a commercial license agreement (Enterprise Platform).
 
-       camunda BPM platform v${project.version}
-          
-visit     
-       http://docs.camunda.org/
+License information can be found in the LICENSE file.
 
-   
-camunda BPM platform is licensed under the Apache License v2.0
-http://www.apache.org/licenses/LICENSE-2.0
- 
 The packaged JBoss Application Server 7 server is licensed under 
 the LGPL license.
 
@@ -24,16 +20,16 @@ Contents:
         This directory contains additional modules for JBoss Application 
         erver 7. You can use these modules to patch a vanilla distribution 
         of JBoss Application Server.
-    
+
   server/
         This directory contains a preconfigured distribution 
-        of JBoss Application Server 7 with camunda BPM platform readily 
+        of JBoss Application Server 7 with Camunda BPM platform readily 
         installed. 
-        
-        run the    
+
+        run the
           server/jboss-as-${version.jboss.as}/bin/standalone.{bat/sh} 
         script to start up the the server.
-        
+
         After starting the server, you can access the 
         following web applications:
         
@@ -46,11 +42,11 @@ Contents:
         The engine create script contain the engine and history tables.
         
         Execute the current upgrade script to make the database compatible
-        with the newest camunda BPM platform release.
+        with the newest Camunda BPM platform release.
 
 ==================
-    
-camunda BPM platform version: ${project.version}
+
+Camunda BPM platform version: ${project.version}
 JBoss Application Server version: ${version.jboss.as}
 
 =================
