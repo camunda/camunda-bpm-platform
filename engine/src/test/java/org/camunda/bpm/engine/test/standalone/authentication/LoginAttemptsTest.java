@@ -54,7 +54,7 @@ public class LoginAttemptsTest extends ResourceProcessEngineTestCase {
       }
       fail("expected exception");
     } catch (AuthenticationException e) {
-      assertTrue(e.getMessage().contains("The user with id 'johndoe' tries to login without success."));
+      assertTrue(e.getMessage().contains("The user with id 'johndoe' is locked."));
     }
 
     identityService.deleteUser(user.getId());
