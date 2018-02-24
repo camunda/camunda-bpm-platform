@@ -1,7 +1,14 @@
-This is a distribution of Camunda BPM platform v${project.version} (visit
-http://docs.camunda.org/) a dual-license Java-based framework. This particular
-copy of the software is released either under the Apache License 2.0 (Community
-Platform) OR a commercial license agreement (Enterprise Platform).
+This is a distribution of
+
+       Camunda BPM platform v${project.version}
+
+visit
+       http://docs.camunda.org/
+
+The Camunda BPM platform is a dual-license Java-based framework.
+This particular copy of the Camunda BPM Platform is released either
+under the Apache License 2.0 (Community Platform) OR a commercial
+license agreement (Enterprise Platform).
 
 License information can be found in the LICENSE file.
 
