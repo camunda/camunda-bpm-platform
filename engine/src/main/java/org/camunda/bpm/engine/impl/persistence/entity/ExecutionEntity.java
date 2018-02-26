@@ -533,11 +533,11 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
       observer.onClear(this);
     }
 
-    // delete all the variable instances
-    removeVariablesLocalInternal();
-
     // delete all the tasks and external tasks
     removeAllTasks();
+
+    // delete all the variable instances
+    removeVariablesLocalInternal();
 
     // remove all jobs
     removeJobs();

@@ -18,17 +18,37 @@ package org.camunda.bpm.engine.test.standalone.entity;
 import java.util.ArrayList;
 import java.util.List;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.DelegateTask;
+import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.runtime.Execution;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.engine.variable.value.StringValue;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 /**
  *
  * @author Christopher Zell <christopher.zell@camunda.com>
+ * @author Nikola Koevski <nikola.koevski@camunda.com>
  */
 public class ExecutionEntityTest {
 
+  @Rule
+  public ProcessEngineRule processEngineRule = new ProcessEngineRule();
+  @Rule
+  public ProcessEngineTestRule testRule = new ProcessEngineTestRule(processEngineRule);
   @Rule
   public ExpectedException thrown = ExpectedException.none();
 
@@ -59,5 +79,59 @@ public class ExecutionEntityTest {
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage("Cannot resolve parent with id 'parent' of execution 'child', perhaps it was deleted in the meantime");
     parent.restoreProcessInstance(entities, null, null, null, null, null, null);
+  }
+
+  @Test
+  public void testRemoveExecutionSequence() {
+    // given
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("singleTaskProcess")
+      .startEvent()
+      .userTask("taskWithLocalVariables")
+        .camundaExecutionListenerClass("start", TestLocalVariableExecutionListener.class)
+        .camundaTaskListenerClass("delete", TestLocalVariableTaskListener.class)
+        .boundaryEvent()
+          .signal("interruptSignal")
+        .endEvent()
+      .moveToActivity("taskWithLocalVariables")
+      .endEvent()
+      .done();
+
+    testRule.deploy(modelInstance);
+    ProcessInstance pi = processEngineRule.getRuntimeService()
+      .startProcessInstanceByKey("singleTaskProcess");
+    Execution execution = processEngineRule.getRuntimeService()
+      .createExecutionQuery()
+      .variableValueEquals("localVar", "localVarVal")
+      .singleResult();
+
+    // when
+    assertNotNull(execution);
+    assertEquals(pi.getId(), execution.getProcessInstanceId());
+    processEngineRule.getRuntimeService().signal(execution.getId());
+
+    // then (see #TestLocalVariableTaskListener::notify)
+  }
+
+  public static class TestLocalVariableExecutionListener implements ExecutionListener {
+
+    @Override
+    public void notify(DelegateExecution execution) throws Exception {
+      // given (see #testRemoveExecutionSequence)
+      execution.setVariableLocal("localVar", "localVarVal");
+    }
+  }
+
+  public static class TestLocalVariableTaskListener implements TaskListener{
+
+    @Override
+    public void notify(DelegateTask delegateTask) {
+      try {
+        // then (see #testRemoveExecutionSequence)
+        StringValue var = delegateTask.getExecution().getVariableLocalTyped("localVar");
+        assertEquals("localVarVal", var.getValue());
+      } catch (NullPointerException e) {
+        fail("Local variable shouldn't be null.");
+      }
+    }
   }
 }
