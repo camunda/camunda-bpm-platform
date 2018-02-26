@@ -6,7 +6,7 @@
   <display-name>camunda bpm rest api</display-name>
 
   <listener>
-    <listener-class>org.camunda.bpm.engine.rest.impl.fetchAndLock.FetchAndLockContextListener</listener-class>
+    <listener-class>org.camunda.bpm.engine.rest.impl.FetchAndLockContextListener</listener-class>
   </listener>
 
   <filter>
