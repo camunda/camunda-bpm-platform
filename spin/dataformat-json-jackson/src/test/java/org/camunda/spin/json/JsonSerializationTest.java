@@ -19,6 +19,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import org.camunda.spin.json.mapping.CustomerList;
 import org.camunda.spin.json.mapping.GenericCustomerList;
@@ -34,6 +35,7 @@ import org.junit.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.spin.DataFormats.json;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class JsonSerializationTest {
 
@@ -135,6 +137,17 @@ public class JsonSerializationTest {
 
     //deserialization is not working for this kind of class
 
+  }
+
+  @Test
+  public void deserializeHashMap() throws Exception {
+    final byte[] bytes = new String("{\"foo\": \"bar\"}").getBytes();
+    assertThat(bytes).isNotEmpty();
+
+    final Object o = deserializeFromByteArray(bytes, "java.util.HashMap");
+    assertThat(o).isInstanceOf(HashMap.class);
+    assertTrue(((HashMap)o).containsKey("foo"));
+    assertEquals("bar", ((HashMap)o).get("foo"));
   }
 
   protected byte[] serializeToByteArray(Object deserializedObject) throws Exception {
