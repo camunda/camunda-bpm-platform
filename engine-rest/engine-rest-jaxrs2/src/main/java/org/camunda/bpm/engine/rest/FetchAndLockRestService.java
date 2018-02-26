@@ -10,8 +10,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.rest.impl.fetchAndLock;
+package org.camunda.bpm.engine.rest;
 
+
+import org.camunda.bpm.engine.rest.dto.externaltask.FetchExternalTasksExtendedDto;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;

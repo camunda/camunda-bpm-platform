@@ -10,10 +10,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.rest.impl.fetchAndLock;
+package org.camunda.bpm.engine.rest.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.camunda.bpm.engine.rest.impl.AbstractRestProcessEngineAware;
+import org.camunda.bpm.engine.rest.FetchAndLockRestService;
+import org.camunda.bpm.engine.rest.dto.externaltask.FetchExternalTasksExtendedDto;
+import org.camunda.bpm.engine.rest.spi.FetchAndLockHandler;
 
 import javax.ws.rs.container.AsyncResponse;
 

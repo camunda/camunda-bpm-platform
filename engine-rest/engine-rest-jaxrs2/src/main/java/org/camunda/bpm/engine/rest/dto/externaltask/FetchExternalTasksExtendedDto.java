@@ -10,9 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.rest.impl.fetchAndLock;
-
-import org.camunda.bpm.engine.rest.dto.externaltask.FetchExternalTasksDto;
+package org.camunda.bpm.engine.rest.dto.externaltask;
 
 /**
  * @author Tassilo Weidner

@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.rest.impl.fetchAndLock;
+package org.camunda.bpm.engine.rest.impl;
 
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -20,8 +20,10 @@ import org.camunda.bpm.engine.externaltask.ExternalTaskQueryTopicBuilder;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.rest.dto.externaltask.FetchExternalTasksExtendedDto;
 import org.camunda.bpm.engine.rest.dto.externaltask.LockedExternalTaskDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.spi.FetchAndLockHandler;
 
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.Response.Status;
@@ -47,46 +49,51 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
   @Override
   public void run() {
     while (isRunning) {
-      long backoffTime = MAX_BACK_OFF_TIME;
-      long start = ClockUtil.getCurrentTime().getTime();
-
-      for (FetchAndLockRequest pendingRequest : pendingRequests) {
-
-        FetchAndLockResult result = tryFetchAndLock(pendingRequest);
-
-        if (result.wasSuccessful()) {
-
-          List<LockedExternalTaskDto> lockedTasks = result.tasks;
-
-          FetchExternalTasksExtendedDto dto = pendingRequest.getDto();
-          long requestTime = pendingRequest.getRequestTime().getTime();
-          long asyncResponseTimeout = dto.getAsyncResponseTimeout();
-          long currentTime = ClockUtil.getCurrentTime().getTime();
-
-          long timeout = requestTime + asyncResponseTimeout;
-
-          if (!lockedTasks.isEmpty() || timeout <= currentTime) {
-            AsyncResponse asyncResponse = pendingRequest.getAsyncResponse();
-            pendingRequests.remove(pendingRequest);
-            asyncResponse.resume(lockedTasks);
-          } else {
-            long slackTime = timeout - currentTime;
-            if (slackTime < backoffTime) {
-              backoffTime = slackTime;
-            }
-          }
-        } else {
-          handleProcessEngineException(pendingRequest, result.processEngineException);
-        }
-      }
-
-      backoffTime = Math.max(0, (start + backoffTime) - ClockUtil.getCurrentTime().getTime());
+      long backoffTime = checkPendingRequests();
       suspend(backoffTime);
     }
 
     for (FetchAndLockRequest pendingRequest: pendingRequests) {
       invalidRequest(pendingRequest.getAsyncResponse(), "Request rejected due to shutdown of application server.");
     }
+  }
+
+  protected long checkPendingRequests() {
+    long backoffTime = MAX_BACK_OFF_TIME;
+    long start = ClockUtil.getCurrentTime().getTime();
+
+    for (FetchAndLockRequest pendingRequest : pendingRequests) {
+
+      FetchAndLockResult result = tryFetchAndLock(pendingRequest);
+
+      if (result.wasSuccessful()) {
+
+        List<LockedExternalTaskDto> lockedTasks = result.tasks;
+
+        FetchExternalTasksExtendedDto dto = pendingRequest.getDto();
+        long requestTime = pendingRequest.getRequestTime().getTime();
+        long asyncResponseTimeout = dto.getAsyncResponseTimeout();
+        long currentTime = ClockUtil.getCurrentTime().getTime();
+
+        long timeout = requestTime + asyncResponseTimeout;
+
+        if (!lockedTasks.isEmpty() || timeout <= currentTime) {
+          AsyncResponse asyncResponse = pendingRequest.getAsyncResponse();
+          pendingRequests.remove(pendingRequest);
+          asyncResponse.resume(lockedTasks);
+        } else {
+          long slackTime = timeout - currentTime;
+          if (slackTime < backoffTime) {
+            backoffTime = slackTime;
+          }
+        }
+      } else {
+        handleProcessEngineException(pendingRequest, result.processEngineException);
+      }
+    }
+
+    backoffTime = Math.max(0, (start + backoffTime) - ClockUtil.getCurrentTime().getTime());
+    return backoffTime;
   }
 
   @Override

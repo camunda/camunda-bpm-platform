@@ -12,8 +12,7 @@
  */
 package org.camunda.bpm.engine.rest.impl;
 
-import org.camunda.bpm.engine.rest.impl.fetchAndLock.FetchAndLockRestService;
-import org.camunda.bpm.engine.rest.impl.fetchAndLock.FetchAndLockRestServiceImpl;
+import org.camunda.bpm.engine.rest.FetchAndLockRestService;
 
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;

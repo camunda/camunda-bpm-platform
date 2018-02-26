@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.rest.impl.fetchAndLock;
+package org.camunda.bpm.engine.rest.impl;
 
 import com.jayway.restassured.http.ContentType;
 import org.camunda.bpm.engine.ExternalTaskService;
@@ -24,8 +24,11 @@ import org.camunda.bpm.engine.identity.Tenant;
 import org.camunda.bpm.engine.identity.TenantQuery;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
+import org.camunda.bpm.engine.rest.dto.externaltask.FetchExternalTasksExtendedDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
+import org.camunda.bpm.engine.rest.impl.FetchAndLockContextListener;
+import org.camunda.bpm.engine.rest.impl.FetchAndLockHandlerImpl;
 import org.camunda.bpm.engine.rest.impl.NamedProcessEngineRestServiceImpl;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
 import org.junit.Before;

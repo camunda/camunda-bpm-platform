@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.rest.impl.fetchAndLock;
+package org.camunda.bpm.engine.rest.impl;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.rest.dto.externaltask.LockedExternalTaskDto;

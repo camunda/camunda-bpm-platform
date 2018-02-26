@@ -10,9 +10,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.rest.impl.fetchAndLock;
+package org.camunda.bpm.engine.rest.impl;
 
 import org.camunda.bpm.engine.rest.exception.RestException;
+import org.camunda.bpm.engine.rest.spi.FetchAndLockHandler;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -50,7 +51,8 @@ public class FetchAndLockContextListener implements ServletContextListener {
     if(iterator.hasNext()) {
       return iterator.next();
     } else {
-      throw new RestException(Response.Status.INTERNAL_SERVER_ERROR, "Could not find an implementation of the " + FetchAndLockHandlerImpl.class.getSimpleName() + "- SPI");
+      throw new RestException(Response.Status.INTERNAL_SERVER_ERROR,
+        "Could not find an implementation of the " + FetchAndLockHandlerImpl.class.getSimpleName() + "- SPI");
     }
   }
 
