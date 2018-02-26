@@ -1,10 +1,12 @@
 package org.camunda.bpm.qa.upgrade.scenarios790;
 
+import java.util.HashMap;
 import java.util.List;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.camunda.bpm.qa.upgrade.Origin;
 
 import org.camunda.bpm.qa.upgrade.ScenarioUnderTest;
@@ -15,6 +17,7 @@ import org.camunda.bpm.qa.upgrade.json.beans.Order;
 import org.camunda.bpm.qa.upgrade.json.beans.OrderDetails;
 import org.camunda.bpm.qa.upgrade.json.beans.RegularCustomer;
 import org.camunda.bpm.qa.upgrade.json.beans.SpecialCustomer;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
@@ -35,7 +38,7 @@ public class CreateProcessInstanceWithJsonVariablesTest {
     // then
     ProcessInstance processInstance = engineRule.getRuntimeService().createProcessInstanceQuery().processInstanceBusinessKey("processWithJsonVariables").singleResult();
     List<VariableInstance> variables = engineRule.getRuntimeService().createVariableInstanceQuery().processInstanceIdIn(processInstance.getId()).list();
-    assertEquals(3, variables.size());
+    assertEquals(4, variables.size());
 
     final Object objectVariable = engineRule.getRuntimeService().getVariable(processInstance.getId(), "objectVariable");
     assertObjectVariable(objectVariable);
@@ -45,6 +48,9 @@ public class CreateProcessInstanceWithJsonVariablesTest {
 
     final Object notGenericObjectListVariable = engineRule.getRuntimeService().getVariable(processInstance.getId(), "notGenericObjectListVariable");
     assertNotGenericObjectListVariable(notGenericObjectListVariable);
+
+    final TypedValue serializedObject = engineRule.getRuntimeService().getVariableTyped(processInstance.getId(), "serializedMapVariable", true);
+    assertSerializedMap(serializedObject);
   }
 
   private void assertNotGenericObjectListVariable(Object notGenericObjectListVariable) {
@@ -74,6 +80,12 @@ public class CreateProcessInstanceWithJsonVariablesTest {
     assertEquals(2, array.length);
     assertEquals(5, array[0]);
     assertEquals(10, array[1]);
+  }
+
+  public void assertSerializedMap(TypedValue typedValue) {
+    HashMap<String, String> expected = new HashMap<String, String>();
+    expected.put("foo", "bar");
+    Assert.assertEquals(expected, typedValue.getValue());
   }
 
 }

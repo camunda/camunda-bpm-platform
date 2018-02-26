@@ -1,17 +1,20 @@
 package org.camunda.bpm.qa.upgrade.json;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.variable.value.builder.SerializedObjectValueBuilder;
 import org.camunda.bpm.qa.upgrade.DescribesScenario;
 import org.camunda.bpm.qa.upgrade.ScenarioSetup;
 import org.camunda.bpm.qa.upgrade.json.beans.ObjectList;
 import org.camunda.bpm.qa.upgrade.json.beans.Order;
 import org.camunda.bpm.qa.upgrade.json.beans.OrderDetails;
 import org.camunda.bpm.qa.upgrade.json.beans.RegularCustomer;
+import static org.camunda.bpm.engine.variable.Variables.serializedObjectValue;
 import static org.junit.Assert.assertEquals;
 
 public class CreateProcessInstanceWithJsonVariablesScenario {
@@ -32,7 +35,7 @@ public class CreateProcessInstanceWithJsonVariablesScenario {
         engine.getRuntimeService().setVariable(execution.getId(), "objectVariable", createObjectVariable());
         engine.getRuntimeService().setVariable(execution.getId(), "plainTypeArrayVariable", createPlainTypeArray());
         engine.getRuntimeService().setVariable(execution.getId(), "notGenericObjectListVariable", createNotGenericObjectList());
-
+        engine.getRuntimeService().setVariable(execution.getId(), "serializedMapVariable", createSerializedMap());
       }
     };
   }
@@ -76,6 +79,10 @@ public class CreateProcessInstanceWithJsonVariablesScenario {
     customers.add(new RegularCustomer("someCustomer", 5));
     customers.add(new RegularCustomer("secondCustomer", 666));
     return customers;
+  }
+
+  public static SerializedObjectValueBuilder createSerializedMap(){
+    return serializedObjectValue("{\"foo\": \"bar\"}").serializationDataFormat("application/json").objectTypeName(HashMap.class.getName());
   }
 
 }
