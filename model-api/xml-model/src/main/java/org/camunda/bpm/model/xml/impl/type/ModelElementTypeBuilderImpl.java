@@ -62,6 +62,16 @@ public class ModelElementTypeBuilderImpl implements ModelElementTypeBuilder, Mod
     return this;
   }
 
+  public ModelElementTypeBuilder schemaTypeName(String schemaTypeName) {
+    modelType.setSchemaTypeName(schemaTypeName);
+    return this;
+  }
+
+  public ModelElementTypeBuilder schemaTypeNamespaceUri(String schemaNamespaceUri) {
+    modelType.setSchemaTypeNamespace(schemaNamespaceUri);
+    return this;
+  }
+
   public AttributeBuilder<Boolean> booleanAttribute(String attributeName) {
     BooleanAttributeBuilder builder = new BooleanAttributeBuilder(attributeName, modelType);
     modelBuildOperations.add(builder);

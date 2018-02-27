@@ -44,7 +44,7 @@ public class DomElementImpl implements DomElement {
     this.document = element.getOwnerDocument();
   }
 
-  protected Element getElement() {
+  public Element getElement() {
     return element;
   }
 

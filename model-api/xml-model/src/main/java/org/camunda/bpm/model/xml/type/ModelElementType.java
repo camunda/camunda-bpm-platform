@@ -30,6 +30,10 @@ public interface ModelElementType {
 
   String getTypeNamespace();
 
+  String getSchemaTypeName();
+
+  String getSchemaTypeNamespace();
+
   Class<? extends ModelElementInstance> getInstanceType();
 
   List<Attribute<?>> getAttributes();

@@ -15,6 +15,7 @@ package org.camunda.bpm.model.xml.impl.util;
 import org.camunda.bpm.model.xml.Model;
 import org.camunda.bpm.model.xml.ModelException;
 import org.camunda.bpm.model.xml.impl.ModelInstanceImpl;
+import org.camunda.bpm.model.xml.impl.instance.DomElementImpl;
 import org.camunda.bpm.model.xml.impl.instance.ModelElementInstanceImpl;
 import org.camunda.bpm.model.xml.impl.type.ModelElementTypeImpl;
 import org.camunda.bpm.model.xml.impl.type.attribute.StringAttribute;
@@ -22,6 +23,7 @@ import org.camunda.bpm.model.xml.instance.DomElement;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.ModelElementType;
 import org.camunda.bpm.model.xml.type.attribute.Attribute;
+import org.w3c.dom.TypeInfo;
 
 import java.util.*;
 
@@ -72,8 +74,13 @@ public final class ModelUtil {
   }
 
   protected static ModelElementTypeImpl getModelElement(DomElement domElement, ModelInstanceImpl modelInstance, String namespaceUri) {
+
+    TypeInfo domElementTypeInfo = ((DomElementImpl) domElement).getElement().getSchemaTypeInfo();
+
     String localName = domElement.getLocalName();
-    ModelElementTypeImpl modelType = (ModelElementTypeImpl) modelInstance.getModel().getTypeForName(namespaceUri, localName);
+    ModelElementTypeImpl modelType = (ModelElementTypeImpl) modelInstance.getModel()
+            .getTypeForNameAndSchemaType(namespaceUri, localName,
+                    domElementTypeInfo.getTypeNamespace(), domElementTypeInfo.getTypeName());
 
     if (modelType == null) {
 
@@ -93,6 +100,10 @@ public final class ModelUtil {
 
   public static QName getQName(String namespaceUri, String localName) {
     return new QName(namespaceUri, localName);
+  }
+
+  public static QName getQName(String namespaceUri, String localName, String schemaNamespaceUri, String schemaTypeName) {
+    return new QName(namespaceUri, localName, schemaNamespaceUri, schemaTypeName);
   }
 
   public static void ensureInstanceOf(Object instance, Class<?> type) {
@@ -263,5 +274,4 @@ public final class ModelUtil {
   public static String getUniqueIdentifier(ModelElementType type) {
     return type.getTypeName() + "_" + UUID.randomUUID();
   }
-
 }
