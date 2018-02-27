@@ -25,17 +25,18 @@ import static org.camunda.bpm.model.dmn.HitPolicy.PRIORITY;
 import static org.camunda.bpm.model.dmn.HitPolicy.RULE_ORDER;
 import static org.camunda.bpm.model.dmn.HitPolicy.UNIQUE;
 
-import org.camunda.bpm.model.dmn.instance.Decision;
-import org.camunda.bpm.model.dmn.instance.DecisionTable;
-import org.camunda.bpm.model.dmn.instance.Definitions;
-import org.camunda.bpm.model.dmn.instance.Output;
+import org.camunda.bpm.model.dmn.impl.instance.InputDataImpl;
+import org.camunda.bpm.model.dmn.instance.*;
 import org.camunda.bpm.model.dmn.util.DmnModelResource;
 import org.junit.Test;
+
+import java.util.Collection;
 
 public class ReadWriteTest extends DmnModelTest {
 
   public static final String DECISION_TABLE_ORIENTATION_DMN = "org/camunda/bpm/model/dmn/ReadWriteTest.decisionTableOrientation.dmn";
   public static final String HIT_POLICY_DMN = "org/camunda/bpm/model/dmn/ReadWriteTest.hitPolicy.dmn";
+  public static final String INPUT_DATA_DMN = "org/camunda/bpm/model/dmn/ReadWriteTest.inputData.dmn";
 
   @Test
   @DmnModelResource(resource = DECISION_TABLE_ORIENTATION_DMN)
@@ -221,4 +222,18 @@ public class ReadWriteTest extends DmnModelTest {
 
   }
 
+  @Test
+  @DmnModelResource(resource = INPUT_DATA_DMN)
+  public void shouldReadInputData() {
+
+    Collection<InputData> inputDataCollection = modelInstance.getModelElementsByType(InputData.class);
+
+    assertThat(inputDataCollection).hasSize(2);
+    assertThat(inputDataCollection).extracting("class").contains(InputDataImpl.class);
+
+    InputData inputData = modelInstance.getModelElementById("customerStatusIn");
+
+    assertThat(inputData).isNotNull();
+    assertThat(inputData).isInstanceOf(InputData.class);
+  }
 }
