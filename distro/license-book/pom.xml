@@ -33,6 +33,7 @@
                   <filtering>true</filtering>
                 </resource>
               </resources>
+              <outputDirectory>${project.build.directory}</outputDirectory>
             </configuration>
           </execution>
         </executions>
@@ -53,7 +54,7 @@
             <configuration>
               <artifacts>
                 <artifact>
-                  <file>${project.build.outputDirectory}/license-book.txt</file>
+                  <file>${project.build.directory}/license-book.txt</file>
                   <type>txt</type>
                 </artifact>
               </artifacts>
