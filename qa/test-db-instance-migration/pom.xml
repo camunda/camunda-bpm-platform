@@ -13,6 +13,10 @@
     <version>7.9.0-SNAPSHOT</version>
   </parent>
 
+  <properties>
+    <jdbcBatchProcessing>true</jdbcBatchProcessing>
+  </properties>
+
   <modules>
     <module>test-fixture-72</module>
     <module>test-fixture-73</module>
@@ -24,6 +28,16 @@
 	  <module>test-fixture-79</module>
     <module>test-migration</module>
   </modules>
+
+  <profiles>
+    <profile>
+      <id>cfgJdbcBatchProcessingOff</id>
+      <properties>
+        <jdbcBatchProcessing>false</jdbcBatchProcessing>
+      </properties>
+    </profile>
+  </profiles>
+
   <build>
     <pluginManagement>
       <plugins>

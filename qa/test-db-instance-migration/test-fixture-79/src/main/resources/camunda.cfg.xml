@@ -28,6 +28,8 @@
 
     <property name="defaultSerializationFormat" value="application/json"/>
 
+    <property name="jdbcBatchProcessing" value="${jdbcBatchProcessing}"/>
+
     <property name="processEnginePlugins">
       <list>
         <bean class="org.camunda.spin.plugin.impl.SpinProcessEnginePlugin" />
