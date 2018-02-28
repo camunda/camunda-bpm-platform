@@ -115,7 +115,7 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
   }
 
   public ProcessEngineException flushDbOperationException(List<DbOperation> operationsToFlush, DbOperation operation,
-      Throwable cause, boolean throwOptimisticLockingException) {
+      Throwable cause) {
 
     String exceptionMessage = exceptionMessage(
       "004",
@@ -124,10 +124,6 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
       cause.getMessage(),
       buildStringFromList(operationsToFlush)
     );
-
-    if (throwOptimisticLockingException) {
-      return new OptimisticLockingException(exceptionMessage);
-    }
 
     return new ProcessEngineException(exceptionMessage, cause);
   }
@@ -675,7 +671,7 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
   }
 
   public ProcessEngineException flushDbOperationsException(List<DbOperation> operationsToFlush,
-    Throwable cause, boolean isOptimisticLockingException) {
+    Throwable cause) {
     String message = cause.getMessage();
 
     //collect real SQL exception messages in case of batch processing
@@ -698,10 +694,6 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
       buildStringFromList(operationsToFlush)
     );
 
-    if (isOptimisticLockingException) {
-      return new OptimisticLockingException(exceptionMessage);
-    }
-
     return new ProcessEngineException(exceptionMessage, cause);
   }
 
@@ -710,14 +702,6 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
       "084",
       "Exception while executing Batch Database Operations: the size of Batch Result does not correspond to the number of flushed operations. Flush summary: \n {}",
       buildStringFromList(operationsToFlush)
-    ));
-  }
-
-  public ProcessEngineException noAccessToFieldValue(Throwable cause) {
-    return new ProcessEngineException(exceptionMessage(
-      "085",
-      "Exception while trying to access field value of class. Check SecurityManager configuration. Summary: \n {}",
-      cause.getMessage()
     ));
   }
 

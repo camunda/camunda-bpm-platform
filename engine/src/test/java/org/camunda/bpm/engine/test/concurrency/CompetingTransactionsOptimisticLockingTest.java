@@ -4,11 +4,14 @@ import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmd.CompleteTaskCmd;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.DatabaseHelper;
 import org.slf4j.Logger;
 
+import java.sql.Connection;
 import java.util.List;
 
 /**
@@ -44,6 +47,18 @@ public class CompetingTransactionsOptimisticLockingTest extends PluggableProcess
         this.exception = e;
       }
       LOG.debug(getName() + " ends.");
+    }
+  }
+
+  @Override
+  protected void runTest() throws Throwable {
+    String databaseType = DatabaseHelper.getDatabaseType(processEngineConfiguration);
+
+    if (DbSqlSessionFactory.POSTGRES.equals(databaseType)) {
+      // skip test method - if database is PostgreSQL
+    } else {
+      // invoke the test method
+      super.runTest();
     }
   }
 

@@ -1841,7 +1841,13 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
 
   @Override
   public Set<String> getReferencedEntityIds() {
-    return getReferencedEntitiesIdAndClass().keySet();
+    Set<String> referencedEntityIds = new HashSet<String>();
+
+    referencedEntityIds.add(this.processInstanceId);
+    referencedEntityIds.add(this.superExecutionId);
+    referencedEntityIds.add(this.parentId);
+
+    return referencedEntityIds;
   }
 
   @Override
@@ -1853,6 +1859,12 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     }
     if (parentId != null) {
       referenceIdAndClass.put(this.parentId, ExecutionEntity.class);
+    }
+    if (processInstanceId != null) {
+      referenceIdAndClass.put(this.processInstanceId, ExecutionEntity.class);
+    }
+    if (processDefinitionId != null) {
+      referenceIdAndClass.put(this.processDefinitionId, ProcessDefinitionEntity.class);
     }
 
     return referenceIdAndClass;

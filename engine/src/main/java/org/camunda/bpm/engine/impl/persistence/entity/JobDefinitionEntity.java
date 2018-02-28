@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -181,7 +182,8 @@ public class JobDefinitionEntity implements JobDefinition, HasDbRevision, HasDbR
 
   @Override
   public Set<String> getReferencedEntityIds() {
-    return getReferencedEntitiesIdAndClass().keySet();
+    Set<String> referencedEntityIds = new HashSet<String>();
+    return referencedEntityIds;
   }
 
   @Override

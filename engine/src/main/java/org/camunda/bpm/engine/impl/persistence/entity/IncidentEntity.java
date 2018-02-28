@@ -240,7 +240,12 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
 
   @Override
   public Set<String> getReferencedEntityIds() {
-    return getReferencedEntitiesIdAndClass().keySet();
+    Set<String> referencedEntityIds = new HashSet<String>();
+
+    referencedEntityIds.add(causeIncidentId);
+    referencedEntityIds.add(rootCauseIncidentId);
+
+    return referencedEntityIds;
   }
 
   @Override

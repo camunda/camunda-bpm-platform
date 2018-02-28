@@ -19,6 +19,7 @@ import static org.camunda.bpm.engine.impl.util.StringUtil.toByteArray;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -659,7 +660,8 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
 
   @Override
   public Set<String> getReferencedEntityIds() {
-    return getReferencedEntitiesIdAndClass().keySet();
+    Set<String> referencedEntityIds = new HashSet<String>();
+    return referencedEntityIds;
   }
 
   @Override

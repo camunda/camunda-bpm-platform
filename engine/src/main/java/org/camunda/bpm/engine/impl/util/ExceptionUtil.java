@@ -105,18 +105,32 @@ public class ExceptionUtil {
 
   public static boolean checkForeignKeyConstraintViolation(Throwable cause) {
 
-    while (cause != null) {
-      List<SQLException> relatedSqlExceptions = findRelatedSqlExceptions(cause);
-      for (SQLException exception : relatedSqlExceptions) {
-        if (exception.getMessage().contains("FOREIGN KEY constraint")
-          || exception.getMessage().contains("foreign key constraint")
-          || exception.getMessage().contains("integrity constraint")
-          || exception.getMessage().contains("constraint violation")
-          || exception.getMessage().contains("SQLCODE=-530, SQLSTATE=23503")) {
-          return true;
-        }
+    List<SQLException> relatedSqlExceptions = findRelatedSqlExceptions(cause);
+    for (SQLException exception : relatedSqlExceptions) {
+
+      // PostgreSQL doesn't allow for a proper check
+      if ("23503".equals(exception.getSQLState()) && exception.getErrorCode() == 0) {
+        return false;
+      } else if (
+        // SqlServer
+        (exception.getMessage().contains("FOREIGN KEY constraint")
+          || ("23000".equals(exception.getSQLState()) && exception.getErrorCode() == 547))
+        // MySql, MariaDB & PostgreSQL
+        || (exception.getMessage().contains("foreign key constraint")
+          // MySql & MariaDB
+          || ("23000".equals(exception.getSQLState()) && exception.getErrorCode() == 1452))
+        // Oracle & H2
+        || (exception.getMessage().contains("integrity constraint")
+          // Oracle
+          || ("23000".equals(exception.getSQLState()) && exception.getErrorCode() == 2291)
+          // H2
+          || ("23506".equals(exception.getSQLState()) && exception.getErrorCode() == 23506))
+        // DB2
+        || (exception.getMessage().contains("SQLSTATE=23503") && exception.getMessage().contains("SQLCODE=-530"))
+        ) {
+
+        return true;
       }
-      cause = cause.getCause();
     }
 
     return false;

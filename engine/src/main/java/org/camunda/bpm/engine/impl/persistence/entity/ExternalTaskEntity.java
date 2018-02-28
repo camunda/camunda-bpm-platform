@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -484,7 +485,8 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
 
   @Override
   public Set<String> getReferencedEntityIds() {
-    return getReferencedEntitiesIdAndClass().keySet();
+    Set<String> referencedEntityIds = new HashSet<String>();
+    return referencedEntityIds;
   }
 
   @Override

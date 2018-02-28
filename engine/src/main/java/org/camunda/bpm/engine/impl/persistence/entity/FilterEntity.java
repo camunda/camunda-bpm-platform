@@ -19,6 +19,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNull;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -223,7 +224,8 @@ public class FilterEntity implements Filter, Serializable, DbEntity, HasDbRevisi
 
   @Override
   public Set<String> getReferencedEntityIds() {
-    return getReferencedEntitiesIdAndClass().keySet();
+    Set<String> referencedEntityIds = new HashSet<String>();
+    return referencedEntityIds;
   }
 
   @Override

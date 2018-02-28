@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.impl.batch;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -388,7 +389,8 @@ public class BatchEntity implements Batch, DbEntity, HasDbReferences, Nameable, 
 
   @Override
   public Set<String> getReferencedEntityIds() {
-    return getReferencedEntitiesIdAndClass().keySet();
+    Set<String> referencedEntityIds = new HashSet<String>();
+    return referencedEntityIds;
   }
 
   @Override

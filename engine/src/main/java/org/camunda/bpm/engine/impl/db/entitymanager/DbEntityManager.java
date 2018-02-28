@@ -330,24 +330,32 @@ public class DbEntityManager implements Session, EntityLoadListener {
   protected void flushDbOperations(List<DbOperation> operationsToFlush) {
     // execute the flush
     for (DbOperation dbOperation : operationsToFlush) {
+      boolean doOptimisticLockingException = false;
       try {
         persistenceSession.executeDbOperation(dbOperation);
       } catch (Exception e) {
-        boolean doOptimisticLockingException = isOptimisticLockingException(dbOperation, e);
-        throw LOG.flushDbOperationException(operationsToFlush, dbOperation, e, doOptimisticLockingException);
+        doOptimisticLockingException = isOptimisticLockingException(dbOperation, e);
+        if (!doOptimisticLockingException) {
+          throw LOG.flushDbOperationException(operationsToFlush, dbOperation, e);
+        }
       }
-      if (dbOperation.isFailed()) {
+      if (dbOperation.isFailed() || doOptimisticLockingException) {
         handleOptimisticLockingException(dbOperation);
       }
     }
 
     if (Context.getProcessEngineConfiguration().isJdbcBatchProcessing()) {
-      List<BatchResult> flushResult;
+      List<BatchResult> flushResult = new ArrayList<BatchResult>();
+      boolean doOptimisticLockingException = false;
       try {
         flushResult = persistenceSession.flushOperations();
       } catch (Exception e) {
-        boolean doOptimisticLockingException = isOptimisticLockingException(operationsToFlush, e);
-        throw LOG.flushDbOperationsException(operationsToFlush, e, doOptimisticLockingException);
+        DbOperation failedOperation = hasOptimisticLockingException(operationsToFlush, e);
+        if (failedOperation == null) {
+          throw LOG.flushDbOperationsException(operationsToFlush, e);
+        } else {
+          handleOptimisticLockingException(failedOperation);
+        }
       }
       checkFlushResults(operationsToFlush, flushResult);
     }
@@ -358,9 +366,10 @@ public class DbEntityManager implements Session, EntityLoadListener {
    *
    * @param operationsToFlush The list of DB operations in which the Exception occurred
    * @param cause the Exception object
-   * @return A boolean determining if an OptimisticLockingException should be thrown
+   * @return The DbOperation where the OptimisticLockingException has occurred
+   * or null if no OptimisticLockingException occurred
    */
-  private boolean isOptimisticLockingException(List<DbOperation> operationsToFlush, Throwable cause) {
+  private DbOperation hasOptimisticLockingException(List<DbOperation> operationsToFlush, Throwable cause) {
 
     BatchExecutorException batchExecutorException = ExceptionUtil.findBatchExecutorException(cause);
 
@@ -369,11 +378,13 @@ public class DbEntityManager implements Session, EntityLoadListener {
       int failedOperationIndex = batchExecutorException.getSuccessfulBatchResults().size();
       if (failedOperationIndex < operationsToFlush.size()) {
         DbOperation failedOperation = operationsToFlush.get(failedOperationIndex);
-        return isOptimisticLockingException(failedOperation, cause);
+        if (isOptimisticLockingException(failedOperation, cause)) {
+          return failedOperation;
+        }
       }
     }
 
-    return false;
+    return null;
   }
 
   /**
@@ -395,15 +406,9 @@ public class DbEntityManager implements Session, EntityLoadListener {
 
       DbEntity entity = ((DbEntityOperation) failedOperation).getEntity();
       for (Map.Entry<String, Class> reference : ((HasDbReferences)entity).getReferencedEntitiesIdAndClass().entrySet()) {
-        try {
-          DbEntity referencedEntity = this.persistenceSession.selectById(reference.getValue(), reference.getKey());
-          if (referencedEntity == null) {
-            return true;
-          }
-        } catch (Exception e) {
-          if (ExceptionUtil.findRelatedSqlExceptions(e).size() > 0) {
-            return true;
-          }
+        DbEntity referencedEntity = this.persistenceSession.selectById(reference.getValue(), reference.getKey());
+        if (referencedEntity == null) {
+          return true;
         }
       }
     }

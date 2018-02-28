@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.impl.cmmn.entity.runtime;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -186,7 +187,8 @@ public class CaseSentryPartEntity extends CmmnSentryPart implements DbEntity, Ha
 
   @Override
   public Set<String> getReferencedEntityIds() {
-    return getReferencedEntitiesIdAndClass().keySet();
+    Set<String> referencedEntityIds = new HashSet<String>();
+    return referencedEntityIds;
   }
 
   @Override

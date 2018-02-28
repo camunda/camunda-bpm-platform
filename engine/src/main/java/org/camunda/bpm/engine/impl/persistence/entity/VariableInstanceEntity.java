@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -654,7 +655,8 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
 
   @Override
   public Set<String> getReferencedEntityIds() {
-    return getReferencedEntitiesIdAndClass().keySet();
+    Set<String> referencedEntityIds = new HashSet<String>();
+    return referencedEntityIds;
   }
 
   @Override
