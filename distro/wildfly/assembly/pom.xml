@@ -56,7 +56,15 @@
       <classifier>classes</classifier>
       <version>${project.version}</version>
     </dependency>
-    
+
+    <!-- license book -->
+    <dependency>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>license-book</artifactId>
+      <version>${project.version}</version>
+      <type>zip</type>
+    </dependency>
+
     <dependency>
       <groupId>com.fasterxml.uuid</groupId>
       <artifactId>java-uuid-generator</artifactId>

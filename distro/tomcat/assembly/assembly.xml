@@ -12,6 +12,13 @@
 
   <dependencySets>
    <dependencySet>
+      <outputDirectory>/</outputDirectory>
+      <includes>
+        <include>org.camunda.bpm:license-book:zip</include>
+      </includes>
+      <unpack>true</unpack>
+    </dependencySet>
+   <dependencySet>
       <outputDirectory>server/</outputDirectory>
       <includes>
         <include>org.apache.tomcat:tomcat:tar.gz</include>

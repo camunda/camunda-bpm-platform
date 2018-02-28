@@ -12,6 +12,11 @@ license agreement (Enterprise Platform).
 
 License information can be found in the LICENSE file.
 
+The Camunda BPM platform includes libraries developed by third
+parties. For license and attribution notices for these libraries,
+please refer to the documentation that accompanies this distribution
+(see the LICENSE_BOOK-${project.version} file).
+
 The packaged JBoss Application Server 7 server is licensed under 
 the LGPL license.
 
