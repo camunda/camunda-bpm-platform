@@ -15,7 +15,7 @@
     <bpmn2:sequenceFlow id="SequenceFlow_2" name="" sourceRef="UserTask_1" targetRef="EndEvent_1"/>
   </bpmn2:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
-    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="TestProcess">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="TestProcess1">
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
         <dc:Bounds height="36.0" width="36.0" x="120.0" y="126.0"/>
       </bpmndi:BPMNShape>

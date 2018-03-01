@@ -11,13 +11,6 @@
   <groupId>org.camunda.bpm.springboot</groupId>
   <artifactId>camunda-bpm-spring-boot-starter-test</artifactId>
 
-  <properties>
-    <camunda-bpm-mockito.version>3.1.0</camunda-bpm-mockito.version>
-
-    <camunda-assert.version>2.0-alpha2</camunda-assert.version>
-    <camunda-assert.sources>${project.build.directory}/camunda-bpm-assert</camunda-assert.sources>
-  </properties>
-
   <dependencies>
 
     <dependency>
@@ -27,63 +20,10 @@
     </dependency>
 
     <dependency>
-      <groupId>org.camunda.bpm.extension.mockito</groupId>
-      <artifactId>camunda-bpm-mockito</artifactId>
-      <version>${camunda-bpm-mockito.version}</version>
-    </dependency>
-
-    <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine</artifactId>
       <scope>provided</scope>
     </dependency>
   </dependencies>
 
-  <build>
-    <plugins>
-    <plugin>
-      <groupId>org.apache.maven.plugins</groupId>
-      <artifactId>maven-dependency-plugin</artifactId>
-      <executions>
-        <execution>
-          <id>unpack</id>
-          <phase>process-sources</phase>
-          <goals>
-            <goal>unpack</goal>
-          </goals>
-          <configuration>
-            <artifactItems>
-              <artifactItem>
-                <groupId>org.camunda.bpm.extension</groupId>
-                <artifactId>camunda-bpm-assert</artifactId>
-                <version>${camunda-assert.version}</version>
-                <classifier>sources</classifier>
-                <overWrite>false</overWrite>
-                <outputDirectory>${camunda-assert.sources}</outputDirectory>
-              </artifactItem>
-            </artifactItems>
-          </configuration>
-        </execution>
-      </executions>
-    </plugin>
-    <plugin>
-      <groupId>org.codehaus.mojo</groupId>
-      <artifactId>build-helper-maven-plugin</artifactId>
-      <executions>
-        <execution>
-          <id>add-source</id>
-          <phase>generate-sources</phase>
-          <goals>
-            <goal>add-source</goal>
-          </goals>
-          <configuration>
-            <sources>
-              <source>${camunda-assert.sources}</source>
-            </sources>
-          </configuration>
-        </execution>
-      </executions>
-    </plugin>
-</plugins>
-  </build>
 </project>

@@ -99,18 +99,10 @@
       <artifactId>spring-boot-starter-websocket</artifactId>
       <scope>test</scope>
     </dependency>
-
-    <!-- PowerMock -->
     <dependency>
-      <groupId>org.powermock</groupId>
-      <artifactId>powermock-api-mockito</artifactId>
-      <version>1.6.5</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.powermock</groupId>
-      <artifactId>powermock-module-junit4</artifactId>
-      <version>1.6.5</version>
+      <groupId>javax.interceptor</groupId>
+      <artifactId>javax.interceptor-api</artifactId>
+      <version>1.2.1</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

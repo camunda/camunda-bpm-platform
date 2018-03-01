@@ -27,11 +27,11 @@ public class CamundaBpmActuatorConfigurationIT extends AbstractCamundaAutoConfig
   @Test
   public void processEngineHealthIndicatorTest() {
     final String body = getHealthBody();
-    assertTrue("wrong body " + body, body.contains("\"processEngine\":{\"status\":\"UP\",\"name\":\"testEngine\"}"));
+    assertTrue("wrong body " + body, body.contains("processEngine\":{\"status\":\"UP\",\"details\":{\"name\":\"testEngine\"}}"));
   }
 
   private String getHealthBody() {
-    ResponseEntity<String> entity = testRestTemplate.getForEntity("/health", String.class);
+    ResponseEntity<String> entity = testRestTemplate.getForEntity("/actuator/health", String.class);
     final String body = entity.getBody();
     return body;
   }

@@ -9,7 +9,6 @@ public interface TransactionalTestService {
 
   ProcessInstance doOk();
 
-  @Transactional(TxType.REQUIRES_NEW)
   void doThrowing();
 
 }

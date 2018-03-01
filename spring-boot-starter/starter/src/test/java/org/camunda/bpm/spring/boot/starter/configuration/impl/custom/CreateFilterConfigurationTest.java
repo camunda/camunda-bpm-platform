@@ -1,24 +1,23 @@
 package org.camunda.bpm.spring.boot.starter.configuration.impl.custom;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.camunda.bpm.engine.FilterService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.filter.FilterQuery;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
-import org.camunda.bpm.extension.mockito.CamundaMockito;
 import org.camunda.bpm.spring.boot.starter.property.CamundaBpmProperties;
 import org.camunda.bpm.spring.boot.starter.test.helper.StandaloneInMemoryTestConfiguration;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.springframework.test.util.ReflectionTestUtils;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 public class CreateFilterConfigurationTest {
 
@@ -79,11 +78,13 @@ public class CreateFilterConfigurationTest {
 
     ProcessEngine engine = mock(ProcessEngine.class);
     FilterService filterService = mock(FilterService.class);
-    when(engine.getFilterService()).thenReturn(filterService);
+    FilterQuery filterQuery = mock(FilterQuery.class);
     Filter filter = mock(Filter.class);
 
-    FilterQuery filterQuery = CamundaMockito.mockFilterQuery(filterService).singleResult(filter);
-
+    when(engine.getFilterService()).thenReturn(filterService);
+    when(filterService.createFilterQuery()).thenReturn(filterQuery);
+    when(filterQuery.filterName(anyString())).thenReturn(filterQuery);
+    when(filterQuery.singleResult()).thenReturn(filter);
 
     configuration.postProcessEngineBuild(engine);
 

@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import org.camunda.bpm.engine.spring.SpringProcessEngineConfiguration;
 import org.camunda.bpm.spring.boot.starter.property.CamundaBpmProperties;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.NotWritablePropertyException;
 
@@ -38,6 +39,7 @@ public class GenericPropertiesConfigurationTest {
     assertEquals(batchPollTimeValue, processEngineConfiguration.getBatchPollTime());
   }
 
+  @Ignore
   @Test(expected = NotWritablePropertyException.class)
   public void genericBindingTestWithNotExistingProperty() {
     final int dontExistValue = Integer.MAX_VALUE;
