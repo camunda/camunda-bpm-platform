@@ -1,8 +1,8 @@
-Licensing Information for Camunda BPM ${project.version}
+Licensing Information for Camunda BPM @project.version@
 
 
-DateAuthorReleaseDescription of Change<revision number>YYYY-MM-DD<author><release number>change1.02017-12-27Ulrike Liss${project.version}Final version
-This is a license book. It contains Camunda BPM product license and other licensing information, including licensing information for third-party libraries which may be included in this release of Camunda BPM ${project.version}
+DateAuthorReleaseDescription of Change<revision number>YYYY-MM-DD<author><release number>change1.02017-12-27Ulrike Liss@project.version@Final version
+This is a license book. It contains Camunda BPM product license and other licensing information, including licensing information for third-party libraries which may be included in this release of Camunda BPM @project.version@
 (Document generated on: 2017-12-27)
 
 Introduction
@@ -11,8 +11,8 @@ This Licensing Information document is a part of the program documentation and i
 
 Licensing Information
 
-Product License � Camunda BPM ${project.version}
-This is a distribution of Camunda BPM platform v${project.version} (visit http://docs.camunda.org/) a dual-license Java-based framework. The
+Product License � Camunda BPM @project.version@
+This is a distribution of Camunda BPM platform v@project.version@ (visit http://docs.camunda.org/) a dual-license Java-based framework. The
  software is released either under the Apache License 2.0 (Community Platform) OR a commercial license agreement (Enterprise Platform). If you have a commercial license agreement, this software is containing restrictions on use and disclosure and is protected by intellectual property laws. Except as expressly permitted in your license agreement or allowed by law, you may not use, copy, reproduce, translate, broadcast, modify, license, transmit, distribute, exhibit, perform, publish, or display any part, in any form, or by any means. Reverse engineering, disassembly, or decompilation of this software, unless required by law for interoperability, is prohibited.�
 
 Licenses for Third-Party Libraries
