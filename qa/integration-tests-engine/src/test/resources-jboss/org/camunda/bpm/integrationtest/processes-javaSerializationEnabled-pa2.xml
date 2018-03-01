@@ -4,7 +4,7 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.camunda.org/schema/1.0/ProcessApplication http://www.camunda.org/schema/1.0/ProcessApplication ">
 
-  <process-archive name="pa2">
+  <process-archive name="paJavaSerialization2">
 		<process-engine>engine1</process-engine>
     <properties>
       <property name="isDeleteUponUndeploy">true</property>

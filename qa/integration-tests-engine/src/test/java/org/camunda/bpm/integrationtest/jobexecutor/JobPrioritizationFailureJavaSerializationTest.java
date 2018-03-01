@@ -74,7 +74,7 @@ public class JobPrioritizationFailureJavaSerializationTest extends AbstractFoxPl
 
   @Deployment(order = 1)
   public static WebArchive createDeployment() {
-    final WebArchive webArchive = initWebArchiveDeployment("pa1.war", "org/camunda/bpm/integrationtest/processes-javaSerializationEnabled-pa1.xml")
+    final WebArchive webArchive = initWebArchiveDeployment("paJavaSerialization1.war", "org/camunda/bpm/integrationtest/processes-javaSerializationEnabled-pa1.xml")
       .addClass(PriorityBean.class)
       .addAsResource("org/camunda/bpm/integrationtest/jobexecutor/JobPrioritizationTest.priorityProcess.bpmn20.xml");
 
@@ -84,7 +84,7 @@ public class JobPrioritizationFailureJavaSerializationTest extends AbstractFoxPl
 
   @Deployment(name = "dummy-client", order = 2)
   public static WebArchive createDummyClientDeployment() {
-    final WebArchive webArchive = initWebArchiveDeployment("pa2.war", "org/camunda/bpm/integrationtest/processes-javaSerializationEnabled-pa2.xml")
+    final WebArchive webArchive = initWebArchiveDeployment("paJavaSerialization2.war", "org/camunda/bpm/integrationtest/processes-javaSerializationEnabled-pa2.xml")
       .addAsResource(new ByteArrayAsset(serializeJavaObjectValue(new PriorityBean())), PRIORITY_BEAN_INSTANCE_FILE);
     return webArchive;
   }

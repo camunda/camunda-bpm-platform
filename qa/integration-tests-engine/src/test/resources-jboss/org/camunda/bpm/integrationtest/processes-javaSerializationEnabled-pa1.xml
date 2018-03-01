@@ -12,7 +12,7 @@
       <property name="javaSerializationFormatEnabled">true</property>
 	  </properties>
 	</process-engine>
-  <process-archive name="pa1">
+  <process-archive name="paJavaSerialization1">
 		<process-engine>engine1</process-engine>
     <properties>
       <property name="isDeleteUponUndeploy">true</property>
