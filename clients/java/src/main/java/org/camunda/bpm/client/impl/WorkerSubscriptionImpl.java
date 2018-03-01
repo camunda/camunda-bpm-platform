@@ -12,31 +12,27 @@
  */
 package org.camunda.bpm.client.impl;
 
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import org.camunda.bpm.client.WorkerSubscription;
 
 /**
  * @author Tassilo Weidner
  */
-public class WorkerManager {
+public class WorkerSubscriptionImpl implements WorkerSubscription {
 
-  private RestRequestExecutor requestExecutor;
-  private List<WorkerSubscriptionImpl> subscriptions = new CopyOnWriteArrayList<WorkerSubscriptionImpl>();
+  private String topicName;
+  private long lockDuration;
 
-  public void addSubscription(WorkerSubscriptionImpl subscription) {
-    subscriptions.add(subscription);
+  public WorkerSubscriptionImpl(String topicName, long lockDuration) {
+    this.topicName = topicName;
+    this.lockDuration = lockDuration;
   }
 
-  public WorkerManager(RestRequestExecutor requestExecutor) {
-    this.requestExecutor = requestExecutor;
+  public String getTopicName() {
+    return topicName;
   }
 
-  public RestRequestExecutor getRequestExecutor() {
-    return requestExecutor;
-  }
-
-  public List<WorkerSubscriptionImpl> getSubscriptions() {
-    return subscriptions;
+  public long getLockDuration() {
+    return lockDuration;
   }
 
 }

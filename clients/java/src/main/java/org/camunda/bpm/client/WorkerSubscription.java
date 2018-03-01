@@ -12,30 +12,11 @@
  */
 package org.camunda.bpm.client;
 
-import org.camunda.bpm.client.impl.CamundaClientBuilderImpl;
-
 /**
- * <p>Camunda external task client</p>
+ * <p>Worker subscription to a topic</p>
  *
  * @author Tassilo Weidner
  */
-public abstract class CamundaClient {
-
-  /**
-   * Creates a fluent builder to configure the Camunda client
-   *
-   * @return builder to apply configurations on
-   */
-  public static CamundaClientBuilder create() {
-    return new CamundaClientBuilderImpl();
-  }
-
-  /**
-   * Creates a fluent builder to create and configure a topic subscription
-   *
-   * @param topicName the worker subscribes to
-   * @return builder to apply configurations on
-   */
-  public abstract WorkerSubscriptionBuilder subscribe(String topicName);
+public interface WorkerSubscription {
 
 }

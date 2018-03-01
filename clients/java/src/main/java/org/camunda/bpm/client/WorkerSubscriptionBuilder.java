@@ -12,30 +12,22 @@
  */
 package org.camunda.bpm.client;
 
-import org.camunda.bpm.client.impl.CamundaClientBuilderImpl;
-
 /**
- * <p>Camunda external task client</p>
+ * <p>A fluent builder to configure the worker subscription</p>
  *
  * @author Tassilo Weidner
  */
-public abstract class CamundaClient {
+public interface WorkerSubscriptionBuilder {
 
   /**
-   * Creates a fluent builder to configure the Camunda client
-   *
-   * @return builder to apply configurations on
+   * @param lockDuration <ul><li>in milliseconds to lock the external tasks</li>
+   *                     <li>must be greater than zero</li></ul>
    */
-  public static CamundaClientBuilder create() {
-    return new CamundaClientBuilderImpl();
-  }
+  WorkerSubscriptionBuilder lockDuration(long lockDuration);
 
   /**
-   * Creates a fluent builder to create and configure a topic subscription
-   *
-   * @param topicName the worker subscribes to
-   * @return builder to apply configurations on
+   * Release the topic subscription for being executed asynchronously
    */
-  public abstract WorkerSubscriptionBuilder subscribe(String topicName);
+  WorkerSubscription execute();
 
 }

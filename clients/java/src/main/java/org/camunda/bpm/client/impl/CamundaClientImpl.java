@@ -14,6 +14,7 @@ package org.camunda.bpm.client.impl;
 
 import org.camunda.bpm.client.CamundaClient;
 import org.camunda.bpm.client.CamundaClientException;
+import org.camunda.bpm.client.WorkerSubscriptionBuilder;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -42,6 +43,9 @@ public class CamundaClientImpl extends CamundaClient {
     workerManager = new WorkerManager(requestExecutor);
   }
 
+  public WorkerSubscriptionBuilder subscribe(String topicName) {
+    return new WorkerSubscriptionBuilderImpl(topicName, workerManager);
+  }
 
   protected String checkHostname() {
     String hostname;
