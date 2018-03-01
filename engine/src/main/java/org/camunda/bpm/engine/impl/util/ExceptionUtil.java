@@ -136,6 +136,29 @@ public class ExceptionUtil {
     return false;
   }
 
+  public static boolean checkVariableIntegrityViolation(Throwable cause) {
+
+    List<SQLException> relatedSqlExceptions = findRelatedSqlExceptions(cause);
+    for (SQLException exception : relatedSqlExceptions) {
+      if (
+        // MySQL & MariaDB
+        (exception.getMessage().contains("ACT_UNIQ_VARIABLE") && "23000".equals(exception.getSQLState()) && exception.getErrorCode() == 1062)
+        // PostgreSQL
+        || (exception.getMessage().contains("act_uniq_variable") && "23505".equals(exception.getSQLState()) && exception.getErrorCode() == 0)
+        // SqlServer
+        || (exception.getMessage().contains("ACT_UNIQ_VARIABLE") && "23000".equals(exception.getSQLState()) && exception.getErrorCode() == 2601)
+        // Oracle
+        || (exception.getMessage().contains("ACT_UNIQ_VARIABLE") && "23000".equals(exception.getSQLState()) && exception.getErrorCode() == 1)
+        // H2
+        || (exception.getMessage().contains("ACT_UNIQ_VARIABLE_INDEX_C") && "23505".equals(exception.getSQLState()) && exception.getErrorCode() == 23505)
+        ) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   public static BatchExecutorException findBatchExecutorException(Throwable exception) {
     Throwable cause = exception;
     do {

@@ -24,7 +24,6 @@ import static org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation
 import static org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperationType.UPDATE;
 import static org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperationType.UPDATE_BULK;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -398,16 +397,24 @@ public class DbEntityManager implements Session, EntityLoadListener {
   private boolean isOptimisticLockingException(DbOperation failedOperation, Throwable cause) {
 
     boolean isConstraintViolation = ExceptionUtil.checkForeignKeyConstraintViolation(cause);
+    boolean isVariableIntegrityViolation = ExceptionUtil.checkVariableIntegrityViolation(cause);
 
-    if (isConstraintViolation && failedOperation instanceof DbEntityOperation
+    if (isVariableIntegrityViolation) {
+
+      return true;
+    } else if (
+      isConstraintViolation
+      && failedOperation instanceof DbEntityOperation
       && ((DbEntityOperation) failedOperation).getEntity() instanceof HasDbReferences
       && (failedOperation.getOperationType().equals(DbOperationType.INSERT)
-      || failedOperation.getOperationType().equals(DbOperationType.UPDATE))) {
+      || failedOperation.getOperationType().equals(DbOperationType.UPDATE))
+      ) {
 
       DbEntity entity = ((DbEntityOperation) failedOperation).getEntity();
       for (Map.Entry<String, Class> reference : ((HasDbReferences)entity).getReferencedEntitiesIdAndClass().entrySet()) {
         DbEntity referencedEntity = this.persistenceSession.selectById(reference.getValue(), reference.getKey());
         if (referencedEntity == null) {
+
           return true;
         }
       }

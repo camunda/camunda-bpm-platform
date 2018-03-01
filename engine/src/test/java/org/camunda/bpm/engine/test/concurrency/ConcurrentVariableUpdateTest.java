@@ -12,13 +12,16 @@
  */
 package org.camunda.bpm.engine.test.concurrency;
 
+import java.sql.Connection;
 import java.util.Collections;
 
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmd.SetTaskVariablesCmd;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.DatabaseHelper;
 import org.slf4j.Logger;
 
 /**
@@ -66,6 +69,22 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
     }
   }
 
+
+  @Override
+  protected void runTest() throws Throwable {
+
+    String databaseType = DatabaseHelper.getDatabaseType(processEngineConfiguration);
+
+    if (DbSqlSessionFactory.DB2.equals(databaseType) && "testConcurrentVariableCreate".equals(getName())) {
+      // skip test method - if database is DB2
+    } else {
+      // invoke the test method
+      super.runTest();
+    }
+  }
+
+  // Test is skipped when testing on DB2.
+  // Please update the IF condition in #runTest, if the method name is changed.
   @Deployment(resources="org/camunda/bpm/engine/test/concurrency/ConcurrentVariableUpdateTest.process.bpmn20.xml")
   public void testConcurrentVariableCreate() {
 
@@ -86,8 +105,8 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
     assertNull(thread1.optimisticLockingException);
 
     thread2.proceedAndWaitTillDone();
-    assertNotNull(thread2.exception);
-    assertNull(thread2.optimisticLockingException);
+    assertNull(thread2.exception);
+    assertNotNull(thread2.optimisticLockingException);
 
     // should not fail with FK violation because one of the variables is not deleted.
     taskService.complete(taskId);
