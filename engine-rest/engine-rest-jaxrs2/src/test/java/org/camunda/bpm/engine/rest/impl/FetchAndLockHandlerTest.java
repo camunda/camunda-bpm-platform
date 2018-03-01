@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -46,6 +47,7 @@ import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyLong;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -94,6 +96,7 @@ public class FetchAndLockHandlerTest {
     ClockUtil.reset();
   }
 
+  @Ignore("CAM-8818")
   @Test(timeout = 30000)
   public void shouldResumeMultipleConcurrentRequestsDueToTasksAvailable() throws InterruptedException {
     when(fetchTopicBuilder.execute())
@@ -132,6 +135,7 @@ public class FetchAndLockHandlerTest {
     }
   }
 
+  @Ignore("CAM-8818")
   @Test(timeout = 30000)
   public void shouldResumeMultipleConcurrentRequestsDueToTimeout() throws InterruptedException {
     when(fetchTopicBuilder.execute())
