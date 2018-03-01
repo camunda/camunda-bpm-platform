@@ -33,7 +33,6 @@
                   <filtering>true</filtering>
                 </resource>
               </resources>
-              <outputDirectory>${project.build.directory}</outputDirectory>
             </configuration>
           </execution>
         </executions>
@@ -43,18 +42,17 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>
-        <version>3.0.0</version>
         <executions>
           <execution>
             <id>attach-artifacts</id>
-            <phase>generate-resources</phase>
+            <phase>prepare-package</phase>
             <goals>
               <goal>attach-artifact</goal>
             </goals>
             <configuration>
               <artifacts>
                 <artifact>
-                  <file>${project.build.directory}/license-book.txt</file>
+                  <file>${project.build.outputDirectory}/license-book.txt</file>
                   <type>txt</type>
                 </artifact>
               </artifacts>
