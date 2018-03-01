@@ -174,8 +174,16 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
         ExternalTaskQueryTopicBuilder topicFetchBuilder =
           fetchBuilder.topic(topicDto.getTopicName(), topicDto.getLockDuration());
 
+        if (topicDto.getBusinessKey() != null) {
+          topicFetchBuilder = topicFetchBuilder.businessKey(topicDto.getBusinessKey());
+        }
+
         if (topicDto.getVariables() != null) {
           topicFetchBuilder = topicFetchBuilder.variables(topicDto.getVariables());
+        }
+
+        if (topicDto.getProcessVariables() != null) {
+          topicFetchBuilder = topicFetchBuilder.processInstanceVariableEquals(topicDto.getProcessVariables());
         }
 
         if (topicDto.isDeserializeValues()) {
