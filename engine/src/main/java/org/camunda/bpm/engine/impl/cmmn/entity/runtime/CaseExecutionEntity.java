@@ -797,12 +797,16 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
 
   @Override
   public Set<String> getReferencedEntityIds() {
-    Set<String> referencedEntityIds = new HashSet<String>();
+    Set<String> referenceIds = new HashSet<String>();
 
-    referencedEntityIds.add(parentId);
-    referencedEntityIds.add(superCaseExecutionId);
+    if (parentId != null) {
+      referenceIds.add(parentId);
+    }
+    if (superCaseExecutionId != null) {
+      referenceIds.add(superCaseExecutionId);
+    }
 
-    return referencedEntityIds;
+    return referenceIds;
   }
 
   @Override

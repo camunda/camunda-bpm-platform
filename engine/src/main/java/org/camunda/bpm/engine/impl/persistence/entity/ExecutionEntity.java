@@ -1841,13 +1841,16 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
 
   @Override
   public Set<String> getReferencedEntityIds() {
-    Set<String> referencedEntityIds = new HashSet<String>();
+    Set<String> referenceIds = new HashSet<String>();
 
-    referencedEntityIds.add(this.processInstanceId);
-    referencedEntityIds.add(this.superExecutionId);
-    referencedEntityIds.add(this.parentId);
+    if (superExecutionId != null) {
+      referenceIds.add(superExecutionId);
+    }
+    if (parentId != null) {
+      referenceIds.add(parentId);
+    }
 
-    return referencedEntityIds;
+    return referenceIds;
   }
 
   @Override

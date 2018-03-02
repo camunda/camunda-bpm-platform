@@ -113,20 +113,20 @@ public class ExceptionUtil {
         return false;
       } else if (
         // SqlServer
-        (exception.getMessage().contains("FOREIGN KEY constraint")
+        (exception.getMessage().toLowerCase().contains("foreign key constraint")
           || ("23000".equals(exception.getSQLState()) && exception.getErrorCode() == 547))
         // MySql, MariaDB & PostgreSQL
-        || (exception.getMessage().contains("foreign key constraint")
+        || (exception.getMessage().toLowerCase().contains("foreign key constraint")
           // MySql & MariaDB
           || ("23000".equals(exception.getSQLState()) && exception.getErrorCode() == 1452))
         // Oracle & H2
-        || (exception.getMessage().contains("integrity constraint")
+        || (exception.getMessage().toLowerCase().contains("integrity constraint")
           // Oracle
           || ("23000".equals(exception.getSQLState()) && exception.getErrorCode() == 2291)
           // H2
           || ("23506".equals(exception.getSQLState()) && exception.getErrorCode() == 23506))
         // DB2
-        || (exception.getMessage().contains("SQLSTATE=23503") && exception.getMessage().contains("SQLCODE=-530"))
+        || (exception.getMessage().toLowerCase().contains("sqlstate=23503") && exception.getMessage().toLowerCase().contains("sqlcode=-530"))
         ) {
 
         return true;
@@ -142,15 +142,15 @@ public class ExceptionUtil {
     for (SQLException exception : relatedSqlExceptions) {
       if (
         // MySQL & MariaDB
-        (exception.getMessage().contains("ACT_UNIQ_VARIABLE") && "23000".equals(exception.getSQLState()) && exception.getErrorCode() == 1062)
+        (exception.getMessage().toLowerCase().contains("act_uniq_variable") && "23000".equals(exception.getSQLState()) && exception.getErrorCode() == 1062)
         // PostgreSQL
-        || (exception.getMessage().contains("act_uniq_variable") && "23505".equals(exception.getSQLState()) && exception.getErrorCode() == 0)
+        || (exception.getMessage().toLowerCase().contains("act_uniq_variable") && "23505".equals(exception.getSQLState()) && exception.getErrorCode() == 0)
         // SqlServer
-        || (exception.getMessage().contains("ACT_UNIQ_VARIABLE") && "23000".equals(exception.getSQLState()) && exception.getErrorCode() == 2601)
+        || (exception.getMessage().toLowerCase().contains("act_uniq_variable") && "23000".equals(exception.getSQLState()) && exception.getErrorCode() == 2601)
         // Oracle
-        || (exception.getMessage().contains("ACT_UNIQ_VARIABLE") && "23000".equals(exception.getSQLState()) && exception.getErrorCode() == 1)
+        || (exception.getMessage().toLowerCase().contains("act_uniq_variable") && "23000".equals(exception.getSQLState()) && exception.getErrorCode() == 1)
         // H2
-        || (exception.getMessage().contains("ACT_UNIQ_VARIABLE_INDEX_C") && "23505".equals(exception.getSQLState()) && exception.getErrorCode() == 23505)
+        || (exception.getMessage().toLowerCase().contains("act_uniq_variable_index_c") && "23505".equals(exception.getSQLState()) && exception.getErrorCode() == 23505)
         ) {
         return true;
       }

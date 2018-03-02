@@ -333,6 +333,7 @@ public class DbEntityManager implements Session, EntityLoadListener {
       try {
         persistenceSession.executeDbOperation(dbOperation);
       } catch (Exception e) {
+        //some of the exceptions are considered to be optimistic locking exception
         doOptimisticLockingException = isOptimisticLockingException(dbOperation, e);
         if (!doOptimisticLockingException) {
           throw LOG.flushDbOperationException(operationsToFlush, dbOperation, e);
@@ -345,10 +346,10 @@ public class DbEntityManager implements Session, EntityLoadListener {
 
     if (Context.getProcessEngineConfiguration().isJdbcBatchProcessing()) {
       List<BatchResult> flushResult = new ArrayList<BatchResult>();
-      boolean doOptimisticLockingException = false;
       try {
         flushResult = persistenceSession.flushOperations();
       } catch (Exception e) {
+        //some of the exceptions are considered to be optimistic locking exception
         DbOperation failedOperation = hasOptimisticLockingException(operationsToFlush, e);
         if (failedOperation == null) {
           throw LOG.flushDbOperationsException(operationsToFlush, e);
