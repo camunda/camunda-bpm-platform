@@ -38,4 +38,9 @@ public abstract class CamundaClient {
    */
   public abstract WorkerSubscriptionBuilder subscribe(String topicName);
 
+  /**
+   * Stops continuous fetching and locking of tasks
+   */
+  public abstract void shutdown();
+
 }

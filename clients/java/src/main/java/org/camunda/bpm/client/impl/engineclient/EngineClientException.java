@@ -10,29 +10,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.client;
+package org.camunda.bpm.client.impl.engineclient;
 
 /**
- * <p>A fluent builder to configure the Camunda client</p>
- *
  * @author Tassilo Weidner
  */
-public interface CamundaClientBuilder {
+public class EngineClientException extends RuntimeException {
 
-  /**
-   * @param endpointUrl of the Camunda BPM Platform REST API
-   */
-  CamundaClientBuilder endpointUrl(String endpointUrl);
-
-  /**
-   * Bootstraps the Camunda client
-   *
-   * @throws CamundaClientException
-   * <ul>
-   *   <li> if endpoint url is null or string is empty
-   *   <li> if hostname cannot be retrieved
-   * </ul>
-   */
-  CamundaClient build();
+  public EngineClientException(String message) {
+    super(message);
+  }
 
 }

@@ -10,27 +10,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.client.impl;
+package org.camunda.bpm.client.impl.dto;
 
 /**
  * @author Tassilo Weidner
  */
-public class RestRequestExecutor {
-
-  private String url;
-  private String workerId;
-
-  public RestRequestExecutor(String workerId, String url) {
-    this.workerId = workerId;
-    this.url = url;
-  }
-
-  public String getUrl() {
-    return url;
-  }
-
-  public String getWorkerId() {
-    return workerId;
-  }
+public abstract class AbstractDto {
 
 }

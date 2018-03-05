@@ -26,8 +26,21 @@ public interface WorkerSubscriptionBuilder {
   WorkerSubscriptionBuilder lockDuration(long lockDuration);
 
   /**
-   * Release the topic subscription for being executed asynchronously
+   * @param handler which will be executed for the locked task
    */
-  WorkerSubscription execute();
+  WorkerSubscriptionBuilder handler(LockedTaskHandler handler);
+
+  /**
+   * Release the topic subscription for being executed asynchronously
+   *
+   * @throws CamundaClientException
+   * <ul>
+   *   <li> if topic name is null or an empty string
+   *   <li> if lock duration is not greater than zero
+   *   <li> if locked task handler is null
+   *   <li> if topic name has already been subscribed
+   * </ul>
+   */
+  WorkerSubscription open();
 
 }

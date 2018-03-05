@@ -13,26 +13,17 @@
 package org.camunda.bpm.client;
 
 /**
- * <p>A fluent builder to configure the Camunda client</p>
+ * <p>Interface for a custom implementation of the handler, which is invoked for each fetched and locked task</p>
  *
  * @author Tassilo Weidner
  */
-public interface CamundaClientBuilder {
+public interface LockedTaskHandler {
 
   /**
-   * @param endpointUrl of the Camunda BPM Platform REST API
-   */
-  CamundaClientBuilder endpointUrl(String endpointUrl);
-
-  /**
-   * Bootstraps the Camunda client
+   * Has been executed for each fetched and locked task
    *
-   * @throws CamundaClientException
-   * <ul>
-   *   <li> if endpoint url is null or string is empty
-   *   <li> if hostname cannot be retrieved
-   * </ul>
+   * @param lockedTask the context is represented of
    */
-  CamundaClient build();
+  void execute(LockedTask lockedTask);
 
 }

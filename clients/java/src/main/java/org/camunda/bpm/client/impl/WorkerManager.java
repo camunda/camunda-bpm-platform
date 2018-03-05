@@ -12,30 +12,106 @@
  */
 package org.camunda.bpm.client.impl;
 
+import org.camunda.bpm.client.LockedTask;
+import org.camunda.bpm.client.LockedTaskHandler;
+import org.camunda.bpm.client.impl.dto.TaskTopicRequestDto;
+import org.camunda.bpm.client.impl.engineclient.EngineClient;
+import org.camunda.bpm.client.impl.engineclient.EngineClientException;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * @author Tassilo Weidner
  */
-public class WorkerManager {
+public class WorkerManager implements Runnable {
 
-  private RestRequestExecutor requestExecutor;
-  private List<WorkerSubscriptionImpl> subscriptions = new CopyOnWriteArrayList<WorkerSubscriptionImpl>();
+  private static final WorkerManagerLogger LOG = ClientLogger.WORKER_MANAGER_LOGGER;
 
-  public void addSubscription(WorkerSubscriptionImpl subscription) {
+  private EngineClient engineClient;
+  private List<WorkerSubscriptionImpl> subscriptions;
+  private Thread thread;
+  private boolean isRunning;
+
+  WorkerManager(EngineClient engineClient) {
+    this.engineClient = engineClient;
+    this.thread = new Thread(this, WorkerManager.class.getSimpleName());
+    this.isRunning = true;
+    this.subscriptions = new CopyOnWriteArrayList<WorkerSubscriptionImpl>();
+
+    this.thread.start();
+  }
+
+  public void run() {
+    while (isRunning) {
+      acquire();
+    }
+  }
+
+  private void acquire() {
+    List<TaskTopicRequestDto> taskTopicRequests = new ArrayList<TaskTopicRequestDto>();
+    Map<String, LockedTaskHandler> lockedTasksHandlers = new HashMap<String, LockedTaskHandler>();
+
+    for (WorkerSubscriptionImpl subscription : subscriptions) {
+      String topicName = subscription.getTopicName();
+      long lockDuration = subscription.getLockDuration();
+      TaskTopicRequestDto taskTopicRequest = new TaskTopicRequestDto(topicName, lockDuration);
+      taskTopicRequests.add(taskTopicRequest);
+
+      LockedTaskHandler lockedTaskHandler = subscription.getLockedTaskHandler();
+      lockedTasksHandlers.put(topicName, lockedTaskHandler);
+    }
+
+    if (!subscriptions.isEmpty()) {
+      List<LockedTask> lockedTasks = Collections.emptyList();
+      try {
+        lockedTasks = engineClient.fetchAndLock(taskTopicRequests);
+      } catch (EngineClientException e) {
+        LOG.exceptionWhilePerformingFetchAndLock(e);
+      }
+
+      for (LockedTask lockedTask : lockedTasks) {
+        String topicName = lockedTask.getTopicName();
+        LockedTaskHandler lockedTaskHandler = lockedTasksHandlers.get(topicName);
+        try {
+          lockedTaskHandler.execute(lockedTask);
+        } catch (Throwable e) {
+          LOG.exceptionWhileExecutingLockedTaskHandler(e);
+        }
+      }
+    }
+  }
+
+  void shutdown() {
+    if (!isRunning) {
+      return;
+    }
+
+    isRunning = false;
+
+    acquire(); // one last time
+
+    try {
+      thread.join();
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      LOG.exceptionWhileShuttingDown(e);
+    }
+  }
+
+  void addSubscription(WorkerSubscriptionImpl subscription) {
     subscriptions.add(subscription);
   }
 
-  public WorkerManager(RestRequestExecutor requestExecutor) {
-    this.requestExecutor = requestExecutor;
+  EngineClient getEngineClient() {
+    return engineClient;
   }
 
-  public RestRequestExecutor getRequestExecutor() {
-    return requestExecutor;
-  }
-
-  public List<WorkerSubscriptionImpl> getSubscriptions() {
+  List<WorkerSubscriptionImpl> getSubscriptions() {
     return subscriptions;
   }
 

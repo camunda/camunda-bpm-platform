@@ -14,15 +14,17 @@ package org.camunda.bpm.client.impl;
 
 import org.camunda.bpm.client.CamundaClient;
 import org.camunda.bpm.client.CamundaClientException;
-import org.junit.jupiter.api.Test;
+import org.camunda.bpm.client.impl.engineclient.EngineClient;
+import org.junit.Test;
 
 import java.net.UnknownHostException;
 
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.camunda.bpm.client.helper.MockProvider.ENDPOINT_URL;
 import static org.hamcrest.core.Is.is;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.Mockito.mock;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+import static org.junit.matchers.JUnitMatchers.containsString;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
@@ -31,25 +33,23 @@ import static org.mockito.Mockito.when;
  */
 public class CamundaClientTest {
 
-  private static String ENDPOINT_URL = "http://localhost:8080/engine-rest";
-
   @Test
-  public void shouldSucceedDueToExistingEndpointUrl() {
+  public void shouldSucceedAfterSanitizingEndpointUrl() {
     // given & when
     CamundaClient camundaClient = CamundaClient.create()
-      .endpointUrl(ENDPOINT_URL)
+      .endpointUrl(ENDPOINT_URL + " / / / ")
       .build();
 
     CamundaClientImpl camundaClientImpl = ((CamundaClientImpl) camundaClient);
-    RestRequestExecutor restRequestExecutor = camundaClientImpl.getWorkerManager().getRequestExecutor();
+    EngineClient engineClient = camundaClientImpl.getWorkerManager().getEngineClient();
 
     // then
-    assertThat(restRequestExecutor.getUrl(), is(ENDPOINT_URL));
-    assertFalse(restRequestExecutor.getWorkerId().isEmpty());
+    assertThat(engineClient.getEndpointUrl(), is(ENDPOINT_URL));
+    assertFalse(engineClient.getWorkerId().isEmpty());
   }
 
   @Test
-  public void shouldThrowExceptionDueToEndpointUrlisEmpty() {
+  public void shouldThrowExceptionDueToEndpointUrlIsEmpty() {
     // given & When
     try {
       CamundaClient.create()
@@ -59,7 +59,7 @@ public class CamundaClientTest {
       fail("No CamundaClientException thrown!");
     } catch (CamundaClientException e) {
       // then
-      assertThat(e.getMessage(), is("Endpoint URL cannot be empty"));
+      assertThat(e.getMessage(), containsString("Endpoint URL cannot be null or an empty string"));
     }
   }
 
@@ -74,27 +74,25 @@ public class CamundaClientTest {
       fail("No CamundaClientException thrown!");
     } catch (CamundaClientException e) {
       // then
-      assertThat(e.getMessage(), is("Endpoint URL cannot be empty"));
+      assertThat(e.getMessage(), containsString("Endpoint URL cannot be null or an empty string"));
     }
   }
 
   @Test
   public void shouldThrowExceptionDueToUnknownHostname() throws UnknownHostException {
     // given
-    CamundaClientBuilderImpl camundaClientBuilder = mock(CamundaClientBuilderImpl.class);
+    CamundaClientBuilderImpl camundaClientBuilder = spy(CamundaClientBuilderImpl.class);
     when(camundaClientBuilder.getEndpointUrl()).thenReturn(ENDPOINT_URL);
-
-    CamundaClientImpl camundaClient = spy(new CamundaClientImpl());
-    when(camundaClient.getHostname()).thenThrow(UnknownHostException.class);
+    when(camundaClientBuilder.getHostname()).thenThrow(UnknownHostException.class);
 
     try {
       // when
-      camundaClient.checkHostname();
+      camundaClientBuilder.checkHostname();
 
       fail("No CamundaClientException thrown!");
     } catch (CamundaClientException e) {
       // then
-      assertThat(e.getMessage(), is("Cannot get hostname"));
+      assertThat(e.getMessage(), containsString("Cannot get hostname"));
     }
   }
 

@@ -10,29 +10,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.client;
+package org.camunda.bpm.client.impl.dto;
 
 /**
- * <p>A fluent builder to configure the Camunda client</p>
- *
  * @author Tassilo Weidner
  */
-public interface CamundaClientBuilder {
+public class TaskTopicRequestDto extends AbstractDto {
 
-  /**
-   * @param endpointUrl of the Camunda BPM Platform REST API
-   */
-  CamundaClientBuilder endpointUrl(String endpointUrl);
+  private String topicName;
+  private long lockDuration;
 
-  /**
-   * Bootstraps the Camunda client
-   *
-   * @throws CamundaClientException
-   * <ul>
-   *   <li> if endpoint url is null or string is empty
-   *   <li> if hostname cannot be retrieved
-   * </ul>
-   */
-  CamundaClient build();
+  public TaskTopicRequestDto(String topicName, long lockDuration) {
+    this.topicName = topicName;
+    this.lockDuration = lockDuration;
+  }
+
+  public String getTopicName() {
+    return topicName;
+  }
+
+  public void setTopicName(String topicName) {
+    this.topicName = topicName;
+  }
+
+  public long getLockDuration() {
+    return lockDuration;
+  }
+
+  public void setLockDuration(int lockTime) {
+    this.lockDuration = lockTime;
+  }
 
 }

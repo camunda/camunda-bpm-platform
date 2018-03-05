@@ -12,27 +12,34 @@
  */
 package org.camunda.bpm.client.impl;
 
+import org.camunda.bpm.client.LockedTaskHandler;
 import org.camunda.bpm.client.WorkerSubscription;
 
 /**
  * @author Tassilo Weidner
  */
-public class WorkerSubscriptionImpl implements WorkerSubscription {
+class WorkerSubscriptionImpl implements WorkerSubscription {
 
   private String topicName;
   private long lockDuration;
+  private LockedTaskHandler lockedTaskHandler;
 
-  public WorkerSubscriptionImpl(String topicName, long lockDuration) {
+  WorkerSubscriptionImpl(String topicName, long lockDuration, LockedTaskHandler lockedTaskHandler) {
     this.topicName = topicName;
     this.lockDuration = lockDuration;
+    this.lockedTaskHandler = lockedTaskHandler;
   }
 
-  public String getTopicName() {
+  String getTopicName() {
     return topicName;
   }
 
-  public long getLockDuration() {
+  long getLockDuration() {
     return lockDuration;
+  }
+
+  LockedTaskHandler getLockedTaskHandler() {
+    return lockedTaskHandler;
   }
 
 }

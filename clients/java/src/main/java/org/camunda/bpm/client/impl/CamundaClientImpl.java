@@ -13,12 +13,8 @@
 package org.camunda.bpm.client.impl;
 
 import org.camunda.bpm.client.CamundaClient;
-import org.camunda.bpm.client.CamundaClientException;
 import org.camunda.bpm.client.WorkerSubscriptionBuilder;
-
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.UUID;
+import org.camunda.bpm.client.impl.engineclient.EngineClient;
 
 /**
  * @author Tassilo Weidner
@@ -27,42 +23,22 @@ public class CamundaClientImpl extends CamundaClient {
 
   private WorkerManager workerManager;
 
-  protected CamundaClientImpl () {
-
-  }
-
-  protected CamundaClientImpl(CamundaClientBuilderImpl clientBuilder) {
+  CamundaClientImpl(CamundaClientBuilderImpl clientBuilder) {
+    String workerId = clientBuilder.getWorkerId();
     String endpointUrl = clientBuilder.getEndpointUrl();
-    if (endpointUrl == null || endpointUrl.isEmpty()) {
-      throw new CamundaClientException("Endpoint URL cannot be empty");
-    }
-
-    String hostname = checkHostname();
-    String workerId = hostname + UUID.randomUUID();
-    RestRequestExecutor requestExecutor = new RestRequestExecutor(workerId, endpointUrl);
-    workerManager = new WorkerManager(requestExecutor);
+    EngineClient engineClient = new EngineClient(workerId, endpointUrl);
+    workerManager = new WorkerManager(engineClient);
   }
 
   public WorkerSubscriptionBuilder subscribe(String topicName) {
     return new WorkerSubscriptionBuilderImpl(topicName, workerManager);
   }
 
-  protected String checkHostname() {
-    String hostname;
-    try {
-      hostname = getHostname();
-    } catch (UnknownHostException e) {
-      throw new CamundaClientException("Cannot get hostname", e);
-    }
-
-    return hostname;
+  public void shutdown() {
+    workerManager.shutdown();
   }
 
-  protected String getHostname() throws UnknownHostException {
-    return InetAddress.getLocalHost().getHostName();
-  }
-
-  protected WorkerManager getWorkerManager() {
+  WorkerManager getWorkerManager() {
     return workerManager;
   }
 

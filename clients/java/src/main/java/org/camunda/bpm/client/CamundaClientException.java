@@ -13,16 +13,14 @@
 package org.camunda.bpm.client;
 
 /**
+ * <p>Camunda client exception is thrown on invalid user input</p>
+ *
  * @author Tassilo Weidner
  */
 public class CamundaClientException extends RuntimeException {
 
   public CamundaClientException(String message) {
     super(message);
-  }
-
-  public CamundaClientException(String message, Throwable cause) {
-    super(message, cause);
   }
 
 }

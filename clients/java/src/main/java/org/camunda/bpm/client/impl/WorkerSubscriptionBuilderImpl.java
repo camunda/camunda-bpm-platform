@@ -12,20 +12,25 @@
  */
 package org.camunda.bpm.client.impl;
 
-import org.camunda.bpm.client.CamundaClientException;
+import org.camunda.bpm.client.LockedTaskHandler;
 import org.camunda.bpm.client.WorkerSubscription;
 import org.camunda.bpm.client.WorkerSubscriptionBuilder;
+
+import java.util.List;
 
 /**
  * @author Tassilo Weidner
  */
 public class WorkerSubscriptionBuilderImpl implements WorkerSubscriptionBuilder {
 
+  private static final ClientLogger LOG = ClientLogger.CLIENT_LOGGER;
+
   private String topicName;
   private long lockDuration;
+  private LockedTaskHandler lockedTaskHandler;
   private WorkerManager workerManager;
 
-  public WorkerSubscriptionBuilderImpl(String topicName, WorkerManager workerManager) {
+  WorkerSubscriptionBuilderImpl(String topicName, WorkerManager workerManager) {
     this.topicName = topicName;
     this.workerManager = workerManager;
   }
@@ -35,18 +40,38 @@ public class WorkerSubscriptionBuilderImpl implements WorkerSubscriptionBuilder 
     return this;
   }
 
-  public WorkerSubscription execute() {
+  public WorkerSubscriptionBuilder handler(LockedTaskHandler lockedTaskHandler) {
+    this.lockedTaskHandler = lockedTaskHandler;
+    return this;
+  }
+
+  public WorkerSubscription open() {
     if (topicName == null) {
-      throw new CamundaClientException("Topic name cannot be null");
+      throw LOG.topicNameNullException();
     }
 
     if (lockDuration <= 0L) {
-      throw new CamundaClientException("Lock duration is not greater than 0");
+      throw LOG.lockDurationIsNotGreaterThanZeroException();
     }
 
-    WorkerSubscriptionImpl subscription = new WorkerSubscriptionImpl(topicName, lockDuration);
+    if (lockedTaskHandler == null) {
+      throw LOG.lockedTaskHandlerNullException();
+    }
+
+    checkTopicNameAlreadySubscribed();
+
+    WorkerSubscriptionImpl subscription = new WorkerSubscriptionImpl(topicName, lockDuration, lockedTaskHandler);
     workerManager.addSubscription(subscription);
     return subscription;
+  }
+
+  private void checkTopicNameAlreadySubscribed() {
+    List<WorkerSubscriptionImpl> subscriptions = workerManager.getSubscriptions();
+    for(WorkerSubscriptionImpl subscription : subscriptions) {
+      if (subscription.getTopicName().equals(topicName)) {
+        throw LOG.topicNameAlreadySubscribedException();
+      }
+    }
   }
 
 }
