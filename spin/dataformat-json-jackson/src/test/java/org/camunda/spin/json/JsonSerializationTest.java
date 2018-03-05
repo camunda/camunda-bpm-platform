@@ -49,7 +49,6 @@ public class JsonSerializationTest {
 
     final byte[] bytes = serializeToByteArray(customers);
     assertThat(bytes).isNotEmpty();
-    System.out.println(new String(bytes));
 
     final Object o = deserializeFromByteArray(bytes, canonicalTypeString);
     assertThat(o).isInstanceOf(CustomerList.class);
@@ -58,6 +57,7 @@ public class JsonSerializationTest {
     assertEquals("someCustomer", deserializedCustomerList.get(0).getName());
     assertEquals(5, deserializedCustomerList.get(0).getContractStartDate());
   }
+
   @Test
   public void testOrder() throws Exception {
     Order order = JsonTestConstants.createExampleOrder();
@@ -67,7 +67,6 @@ public class JsonSerializationTest {
 
     final byte[] bytes = serializeToByteArray(order);
     assertThat(bytes).isNotEmpty();
-    System.out.println(new String(bytes));
 
     final Object o = deserializeFromByteArray(bytes, canonicalTypeString);
     assertThat(o).isInstanceOf(Order.class);
@@ -85,7 +84,6 @@ public class JsonSerializationTest {
 
     final byte[] bytes = serializeToByteArray(array);
     assertThat(bytes).isNotEmpty();
-    System.out.println(new String(bytes));
 
     final Object o = deserializeFromByteArray(bytes, canonicalTypeString);
     assertThat(o).isInstanceOf(int[].class);
@@ -105,7 +103,6 @@ public class JsonSerializationTest {
 
     final byte[] bytes = serializeToByteArray(customers);
     assertThat(bytes).isNotEmpty();
-    System.out.println(new String(bytes));
 
     final Object o = deserializeFromByteArray(bytes, canonicalTypeString);
     assertThat(o).isInstanceOf(GenericCustomerList.class);
