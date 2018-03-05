@@ -19,9 +19,9 @@ public abstract class HistoryCleanupHelper {
 
   private static final SimpleDateFormat TIME_FORMAT_WITHOUT_SECONDS = new SimpleDateFormat("yyyy-MM-ddHH:mm");
 
-  public static final SimpleDateFormat TIME_FORMAT_WITHOUT_SECONDS_WITH_TIMEZONE = new SimpleDateFormat("yyyy-MM-ddHH:mmZ");
+  private static final SimpleDateFormat TIME_FORMAT_WITHOUT_SECONDS_WITH_TIMEZONE = new SimpleDateFormat("yyyy-MM-ddHH:mmZ");
 
-  public static final SimpleDateFormat DATE_FORMAT_WITHOUT_TIME = new SimpleDateFormat("yyyy-MM-dd");
+  private static final SimpleDateFormat DATE_FORMAT_WITHOUT_TIME = new SimpleDateFormat("yyyy-MM-dd");
 
   public static Date getCurrentOrNextRunWithinBatchWindow(Date date, CommandContext commandContext) {
     if (!isBatchWindowConfigured(commandContext)) {
@@ -132,7 +132,7 @@ public abstract class HistoryCleanupHelper {
     return c.getTime();
   }
 
-  public static Date parseTimeConfiguration(String time) throws ParseException {
+  public static synchronized Date parseTimeConfiguration(String time) throws ParseException {
     String today = DATE_FORMAT_WITHOUT_TIME.format(ClockUtil.getCurrentTime());
     try {
       return TIME_FORMAT_WITHOUT_SECONDS_WITH_TIMEZONE.parse(today+time);
