@@ -31,6 +31,7 @@ import org.mockito.ArgumentCaptor;
 
 import javax.ws.rs.container.AsyncResponse;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -96,7 +97,6 @@ public class FetchAndLockHandlerTest {
     ClockUtil.reset();
   }
 
-  @Ignore("CAM-8818")
   @Test(timeout = 30000)
   public void shouldResumeMultipleConcurrentRequestsDueToTasksAvailable() throws InterruptedException {
     when(fetchTopicBuilder.execute())
@@ -104,12 +104,14 @@ public class FetchAndLockHandlerTest {
     fetchAndLockHandler.start();
 
     final List<Runnable> runnables = new ArrayList<Runnable>();
-    final AsyncResponse asyncResponse = mock(AsyncResponse.class);
+    final List<AsyncResponse> mockedAsyncResponses = new ArrayList<AsyncResponse>();
     for (int i = 0; i < 100; i++) {
       runnables.add(new Runnable() {
         @Override
         public void run() {
-          fetchAndLockHandler.addPendingRequest(createDto(5000L), asyncResponse, processEngine);
+          AsyncResponse mockedAsyncResponse = mock(AsyncResponse.class);
+          mockedAsyncResponses.add(mockedAsyncResponse);
+          fetchAndLockHandler.addPendingRequest(createDto(5000L), mockedAsyncResponse, processEngine);
         }
       });
     }
@@ -119,43 +121,46 @@ public class FetchAndLockHandlerTest {
     assertThat(fetchAndLockHandler.getPendingRequests().size(), is(100));
 
     when(fetchTopicBuilder.execute())
-      .thenReturn(Collections.singletonList(lockedExternalTaskMock));
+      .thenReturn(Arrays.asList(lockedExternalTaskMock));
 
     while (!fetchAndLockHandler.getPendingRequests().isEmpty()) {
       // busy waiting
     }
 
     assertThat(fetchAndLockHandler.getPendingRequests().size(), is(0));
-    ArgumentCaptor<List> argumentCaptor = ArgumentCaptor.forClass(List.class);
-    verify(asyncResponse, times(100)).resume(argumentCaptor.capture());
 
-    for (List lockedExternalTasks : argumentCaptor.getAllValues()) {
-      assertThat(((LockedExternalTaskDto)lockedExternalTasks.get(0)).getActivityId(),
-        is(lockedExternalTaskMock.getActivityId()));
+    for (AsyncResponse asyncResponse : mockedAsyncResponses) {
+      ArgumentCaptor<List> argumentCaptor = ArgumentCaptor.forClass(List.class);
+      verify(asyncResponse).resume(argumentCaptor.capture());
+
+      for (List lockedExternalTasks : argumentCaptor.getAllValues()) {
+        assertThat(((LockedExternalTaskDto) lockedExternalTasks.get(0)).getActivityId(),
+          is(lockedExternalTaskMock.getActivityId()));
+      }
     }
   }
 
-  @Ignore("CAM-8818")
   @Test(timeout = 30000)
   public void shouldResumeMultipleConcurrentRequestsDueToTimeout() throws InterruptedException {
     when(fetchTopicBuilder.execute())
-      .thenReturn(Collections.<LockedExternalTask>emptyList());
+      .thenReturn(new ArrayList<LockedExternalTask>());
 
     fetchAndLockHandler.start();
 
-    final List<Runnable> runners = new ArrayList<Runnable>();
-
-    final AsyncResponse asyncResponse = mock(AsyncResponse.class);
+    final List<Runnable> runnables = new ArrayList<Runnable>();
+    final List<AsyncResponse> mockedAsyncResponses = new ArrayList<AsyncResponse>();
     for (int i = 0; i < 100; i++) {
-      runners.add(new Runnable() {
+      runnables.add(new Runnable() {
         @Override
         public void run() {
-          fetchAndLockHandler.addPendingRequest(createDto(3000L), asyncResponse, processEngine);
+          AsyncResponse mockedAsyncResponse = mock(AsyncResponse.class);
+          mockedAsyncResponses.add(mockedAsyncResponse);
+          fetchAndLockHandler.addPendingRequest(createDto(5000L), mockedAsyncResponse, processEngine);
         }
       });
     }
 
-    assertConcurrent(runners);
+    assertConcurrent(runnables);
 
     while (!fetchAndLockHandler.getPendingRequests().isEmpty()) {
       // busy waiting
@@ -163,11 +168,13 @@ public class FetchAndLockHandlerTest {
 
     assertThat(fetchAndLockHandler.getPendingRequests().size(), is(0));
 
-    ArgumentCaptor<List> argumentCaptor = ArgumentCaptor.forClass(List.class);
-    verify(asyncResponse, times(100)).resume(argumentCaptor.capture());
+    for (AsyncResponse asyncResponse : mockedAsyncResponses) {
+      ArgumentCaptor<List> argumentCaptor = ArgumentCaptor.forClass(List.class);
+      verify(asyncResponse).resume(argumentCaptor.capture());
 
-    for (List lockedExternalTasks : argumentCaptor.getAllValues()) {
-      assertThat(lockedExternalTasks.isEmpty(), is(true));
+      for (List lockedExternalTasks : argumentCaptor.getAllValues()) {
+        assertThat(lockedExternalTasks.isEmpty(), is(true));
+      }
     }
   }
 
