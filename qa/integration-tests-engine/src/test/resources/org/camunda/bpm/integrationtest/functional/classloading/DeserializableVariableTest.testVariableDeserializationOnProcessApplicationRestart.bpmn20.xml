@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+  typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="Examples">
+
+
+  <process id="testDeserializeVariable" isExecutable="true">
+    <startEvent id="theStart" />    
+    <sequenceFlow sourceRef="theStart" targetRef="servicetask1" />
+    
+    <serviceTask id="servicetask1"    
+        camunda:class="org.camunda.bpm.integrationtest.functional.classloading.variables.beans.SetVariableDelegate" />
+    <sequenceFlow sourceRef="servicetask1" targetRef="servicetask2" />
+    
+    <serviceTask id="servicetask2"    
+        camunda:class="org.camunda.bpm.integrationtest.functional.classloading.variables.beans.GetDeserializableVariableDelegate" />
+    <sequenceFlow sourceRef="servicetask2" targetRef="endevent1" />
+    
+    <endEvent id="endevent1" name="End"></endEvent>
+  </process>
+
+
+</definitions>

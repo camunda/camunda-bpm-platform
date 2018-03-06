@@ -7,6 +7,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import java.util.Collection;
 import java.util.List;
 
+import org.camunda.bpm.application.ProcessApplicationContext;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.authorization.Permissions;
@@ -22,6 +23,7 @@ import org.camunda.bpm.engine.impl.ProcessInstanceModificationBuilderImpl;
 import org.camunda.bpm.engine.impl.ProcessInstantiationBuilderImpl;
 import org.camunda.bpm.engine.impl.RestartProcessInstanceBuilderImpl;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.context.ProcessApplicationContextUtil;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
@@ -46,15 +48,15 @@ public class RestartProcessInstancesCmd extends AbstractRestartProcessInstanceCm
   }
 
   @Override
-  public Void execute(CommandContext commandContext) {
-    Collection<String> processInstanceIds = collectProcessInstanceIds();
-    List<AbstractProcessInstanceModificationCommand> instructions = builder.getInstructions();
+  public Void execute(final CommandContext commandContext) {
+    final Collection<String> processInstanceIds = collectProcessInstanceIds();
+    final List<AbstractProcessInstanceModificationCommand> instructions = builder.getInstructions();
 
     ensureNotEmpty(BadUserRequestException.class, "Restart instructions cannot be empty", "instructions", instructions);
     ensureNotEmpty(BadUserRequestException.class, "Process instance ids cannot be empty", "Process instance ids", processInstanceIds);
     ensureNotContainsNull(BadUserRequestException.class, "Process instance ids cannot be null", "Process instance ids", processInstanceIds);
 
-    ProcessDefinitionEntity processDefinition = getProcessDefinition(commandContext, builder.getProcessDefinitionId());
+    final ProcessDefinitionEntity processDefinition = getProcessDefinition(commandContext, builder.getProcessDefinitionId());
     ensureNotNull("Process definition cannot be found", "processDefinition", processDefinition);
 
     checkAuthorization(commandContext, processDefinition);
@@ -63,26 +65,33 @@ public class RestartProcessInstancesCmd extends AbstractRestartProcessInstanceCm
       writeUserOperationLog(commandContext, processDefinition, processInstanceIds.size(), false);
     }
 
-    String processDefinitionId = builder.getProcessDefinitionId();
+    final String processDefinitionId = builder.getProcessDefinitionId();
 
-    for (String processInstanceId : processInstanceIds) {
-      HistoricProcessInstance historicProcessInstance = getHistoricProcessInstance(commandContext, processInstanceId);
+    Runnable runnable = new Runnable() {
+      @Override public void run() {
 
-      ensureNotNull(BadUserRequestException.class, "Historic process instance cannot be found", "historicProcessInstanceId", historicProcessInstance);
-      ensureHistoricProcessInstanceNotActive(historicProcessInstance);
-      ensureSameProcessDefinition(historicProcessInstance, processDefinitionId);
+        for (String processInstanceId : processInstanceIds) {
+          HistoricProcessInstance historicProcessInstance = getHistoricProcessInstance(commandContext, processInstanceId);
 
-      ProcessInstantiationBuilderImpl instantiationBuilder = getProcessInstantiationBuilder(commandExecutor, processDefinitionId);
-      applyProperties(instantiationBuilder, processDefinition, historicProcessInstance);
+          ensureNotNull(BadUserRequestException.class, "Historic process instance cannot be found", "historicProcessInstanceId", historicProcessInstance);
+          ensureHistoricProcessInstanceNotActive(historicProcessInstance);
+          ensureSameProcessDefinition(historicProcessInstance, processDefinitionId);
 
-      ProcessInstanceModificationBuilderImpl modificationBuilder = instantiationBuilder.getModificationBuilder();
-      modificationBuilder.setModificationOperations(instructions);
+          ProcessInstantiationBuilderImpl instantiationBuilder = getProcessInstantiationBuilder(commandExecutor, processDefinitionId);
+          applyProperties(instantiationBuilder, processDefinition, historicProcessInstance);
 
-      VariableMap variables = collectVariables(commandContext, historicProcessInstance);
-      instantiationBuilder.setVariables(variables);
+          ProcessInstanceModificationBuilderImpl modificationBuilder = instantiationBuilder.getModificationBuilder();
+          modificationBuilder.setModificationOperations(instructions);
 
-      instantiationBuilder.execute(builder.isSkipCustomListeners(), builder.isSkipIoMappings());
-    }
+          VariableMap variables = collectVariables(commandContext, historicProcessInstance);
+          instantiationBuilder.setVariables(variables);
+
+          instantiationBuilder.execute(builder.isSkipCustomListeners(), builder.isSkipIoMappings());
+        }
+      }
+    };
+    ProcessApplicationContextUtil.doContextSwitch(runnable, processDefinition);
+
     return null;
   }
 

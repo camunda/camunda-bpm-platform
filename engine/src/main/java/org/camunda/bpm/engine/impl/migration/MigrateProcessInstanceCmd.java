@@ -161,20 +161,7 @@ public class MigrateProcessInstanceCmd extends AbstractMigrationCmd<Void> {
   }
 
   protected <T> void executeInContext(final Runnable runnable, ProcessDefinitionEntity contextDefinition) {
-    ProcessApplicationReference processApplication = ProcessApplicationContextUtil.getTargetProcessApplication(contextDefinition);
-    if (ProcessApplicationContextUtil.requiresContextSwitch(processApplication)) {
-      Context.executeWithinProcessApplication(new Callable<Void>() {
-
-        @Override
-        public Void call() throws Exception {
-          runnable.run();
-          return null;
-        }
-      }, processApplication);
-    }
-    else {
-      runnable.run();
-    }
+    ProcessApplicationContextUtil.doContextSwitch(runnable, contextDefinition);
   }
 
   /**
