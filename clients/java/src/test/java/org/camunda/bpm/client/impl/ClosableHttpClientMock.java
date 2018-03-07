@@ -29,7 +29,7 @@ public class ClosableHttpClientMock extends CloseableHttpClient {
 
   private CloseableHttpResponse closeableHttpResponse;
 
-  public ClosableHttpClientMock(CloseableHttpResponse closeableHttpResponse) {
+  public ClosableHttpClientMock(final CloseableHttpResponse closeableHttpResponse) {
     this.closeableHttpResponse = closeableHttpResponse;
   }
 

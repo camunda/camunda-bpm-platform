@@ -30,10 +30,11 @@ public class MockProvider {
   public static final String ENDPOINT_URL = "http://localhost:8080/engine-rest";
   public static final int MAX_TASKS = 10;
 
+  // locked task
   public static final String ACTIVITY_ID = "ServiceTask_1";
   public static final String ACTIVITY_INSTANCE_ID = "ServiceTask_1:be7bb005-1cb7-11e8-a8b4-769e8e30ca9b";
   public static final String EXECUTION_ID = "be7bb004-1cb7-11e8-a8b4-769e8e30ca9b";
-  public static final Date LOCK_EXPIRATION_TIME = createLockExpirationTime("March 5, 2018");
+  public static final Date LOCK_EXPIRATION_TIME = createDate("March 5, 2018");
   public static final String PROCESS_DEFINITION_ID = "testProcess:1:20725ab5-1c95-11e8-a8b4-769e8e30ca9b";
   public static final String PROCESS_DEFINITION_KEY = "testProcess";
   public static final String PROCESS_INSTANCE_ID = "be7b88f2-1cb7-11e8-a8b4-769e8e30ca9b";
@@ -48,7 +49,16 @@ public class MockProvider {
   public static final int RETRIES = 3;
   public static final long PRIORITY = 500;
 
-  public static Date createLockExpirationTime(String date) {
+  // handle failure
+  public static final long RETRY_TIMEOUT = 600000;
+
+  // handle bpmn error
+  public static final String ERROR_CODE = "bpmn-error";
+
+  // extend lock
+  public static final long NEW_DURATION = 123456;
+
+  public static Date createDate(String date) {
     try {
       return new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH).parse(date);
     } catch (ParseException e) {

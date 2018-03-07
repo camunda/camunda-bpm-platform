@@ -21,12 +21,15 @@ import org.camunda.bpm.client.CamundaClient;
 import org.camunda.bpm.client.CamundaClientException;
 import org.camunda.bpm.client.LockedTask;
 import org.camunda.bpm.client.LockedTaskHandler;
+import org.camunda.bpm.client.LockedTaskService;
 import org.camunda.bpm.client.WorkerSubscription;
 import org.camunda.bpm.client.WorkerSubscriptionBuilder;
 import org.camunda.bpm.client.helper.MockProvider;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -34,6 +37,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static junit.framework.TestCase.fail;
 import static org.hamcrest.Matchers.is;
@@ -41,6 +45,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.internal.matchers.StringContains.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
@@ -54,7 +59,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
 @PowerMockIgnore("javax.net.ssl.*")
 public class SubscriptionTest {
 
-  private HttpClient httpClient;
+  private CloseableHttpClient httpClient;
   private CamundaClient camundaClient;
 
   @Before
@@ -62,7 +67,7 @@ public class SubscriptionTest {
     mockStatic(HttpClients.class);
     httpClient = mock(CloseableHttpClient.class);
     when(HttpClients.createDefault())
-      .thenReturn((CloseableHttpClient) httpClient);
+      .thenReturn(httpClient);
 
     when(httpClient.execute(any(HttpUriRequest.class), any(AbstractResponseHandler.class)))
       .thenReturn(new LockedTask[]{MockProvider.createLockedTask()});
@@ -183,7 +188,7 @@ public class SubscriptionTest {
   }
 
   @Test
-  public void shouldExecuteHandler() throws IOException {
+  public void shouldExecuteHandler() throws IOException, InterruptedException {
     // given
     List<LockedTask> lockedTasks = new ArrayList<LockedTask>();
     for (int i = 0; i < 5; i++) {
@@ -194,17 +199,30 @@ public class SubscriptionTest {
       .thenReturn(lockedTasks.toArray(new LockedTask[0]));
 
     LockedTaskHandler lockedTaskHandlerMock = mock(LockedTaskHandler.class);
+    final AtomicBoolean invoked = new AtomicBoolean();
+    doAnswer(new Answer<Void>() {
+      @Override
+      public Void answer(InvocationOnMock invocationOnMock) throws Throwable {
+        invoked.set(true);
+        return null;
+      }
+    }).when(lockedTaskHandlerMock).execute(any(LockedTask.class), any(LockedTaskService.class));
+
     WorkerSubscriptionBuilder workerSubscriptionBuilder = camundaClient.subscribe(MockProvider.TOPIC_NAME)
       .lockDuration(5000)
       .handler(lockedTaskHandlerMock);
 
     // when
     workerSubscriptionBuilder.open();
-    camundaClient.shutdown();
 
     // then
+    while (!invoked.get()) {
+      // sync
+    }
+    camundaClient.shutdown();
+
     verify(lockedTaskHandlerMock, atLeast(5))
-      .execute(any(LockedTask.class));
+      .execute(any(LockedTask.class), any(LockedTaskService.class));
   }
 
 }

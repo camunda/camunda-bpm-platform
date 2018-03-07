@@ -10,35 +10,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.client.impl.dto;
+package org.camunda.bpm.client;
 
 /**
+ * <p>Task failure exception is thrown if an exception occurred while executing {@link LockedTaskService#failure(String, String, int, long)}</p>
+ *
  * @author Tassilo Weidner
  */
-public class TaskTopicRequestDto extends AbstractDto {
-
-  private String topicName;
-  private long lockDuration;
-
-  public TaskTopicRequestDto(String topicName, long lockDuration) {
-    this.topicName = topicName;
-    this.lockDuration = lockDuration;
+public class TaskFailureException extends CamundaClientException {
+  public TaskFailureException(String message) {
+    super(message);
   }
-
-  public String getTopicName() {
-    return topicName;
-  }
-
-  public void setTopicName(String topicName) {
-    this.topicName = topicName;
-  }
-
-  public long getLockDuration() {
-    return lockDuration;
-  }
-
-  public void setLockDuration(int lockTime) {
-    this.lockDuration = lockTime;
-  }
-
 }

@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.client.impl;
 
+import org.camunda.bpm.client.CamundaClientException;
 import org.camunda.bpm.client.impl.engineclient.EngineClientException;
 
 /**
@@ -29,15 +30,14 @@ public class WorkerManagerLogger extends ClientLogger {
       "002", "Exception while executing locked task handler '{}'", e);
   }
 
-  public void exceptionWhileSuspending(InterruptedException e) {
-    logError(
-      "003", "Exception while suspending '{}'", e);
-  }
-
   public void exceptionWhileShuttingDown(InterruptedException e) {
     logError(
-      "004", "Exception while shutting down '{}'", e);
+      "003", "Exception while shutting down '{}'", e);
   }
 
+  public void exceptionOnLockedTaskServiceMethodInvocation(CamundaClientException e) {
+    logError(
+      "004", "Exception on locked task service method invocation '{}'", e);
+  }
 
 }

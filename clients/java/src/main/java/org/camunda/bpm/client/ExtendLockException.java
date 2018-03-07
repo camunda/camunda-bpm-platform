@@ -13,18 +13,12 @@
 package org.camunda.bpm.client;
 
 /**
- * <p>Interface for a custom implementation of the handler, which is invoked for each fetched and locked task</p>
+ * <p>Unlock task exception is thrown if an exception occurred while executing {@link LockedTaskService#extendLock(long)}</p>
  *
  * @author Tassilo Weidner
  */
-public interface LockedTaskHandler {
-
-  /**
-   * Has been executed for each fetched and locked task
-   *
-   * @param lockedTask the context is represented of
-   * @param lockedTaskService to interact with fetched and locked tasks
-   */
-  void execute(LockedTask lockedTask, LockedTaskService lockedTaskService);
-
+public class ExtendLockException extends CamundaClientException {
+  public ExtendLockException(String message) {
+    super(message);
+  }
 }

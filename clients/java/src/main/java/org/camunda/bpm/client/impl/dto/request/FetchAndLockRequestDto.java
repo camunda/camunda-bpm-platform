@@ -10,7 +10,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.client.impl.dto;
+package org.camunda.bpm.client.impl.dto.request;
+
+import org.camunda.bpm.client.impl.dto.AbstractDto;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,24 +36,12 @@ public class FetchAndLockRequestDto extends AbstractDto {
     return maxTasks;
   }
 
-  public void setMaxTasks(int maxTasks) {
-    this.maxTasks = maxTasks;
-  }
-
   public String getWorkerId() {
     return workerId;
   }
 
-  public void setWorkerId(String workerId) {
-    this.workerId = workerId;
-  }
-
   public List<TaskTopicRequestDto> getTopics() {
     return topics;
-  }
-
-  public void setTopics(List<TaskTopicRequestDto> topics) {
-    this.topics = topics;
   }
 
 }

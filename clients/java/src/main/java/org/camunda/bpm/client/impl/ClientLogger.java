@@ -12,7 +12,13 @@
  */
 package org.camunda.bpm.client.impl;
 
+import org.camunda.bpm.client.BpmnErrorException;
 import org.camunda.bpm.client.CamundaClientException;
+import org.camunda.bpm.client.CompleteTaskException;
+import org.camunda.bpm.client.ExtendLockException;
+import org.camunda.bpm.client.TaskFailureException;
+import org.camunda.bpm.client.UnlockTaskException;
+import org.camunda.bpm.client.impl.engineclient.EngineClientException;
 import org.camunda.bpm.client.impl.engineclient.EngineClientLogger;
 import org.camunda.commons.logging.BaseLogger;
 
@@ -63,6 +69,31 @@ public class ClientLogger extends BaseLogger {
   public CamundaClientException topicNameAlreadySubscribedException() {
     return new CamundaClientException(exceptionMessage(
       "006", "Topic name has already been subscribed"));
+  }
+
+  public UnlockTaskException unlockTaskException(EngineClientException e) {
+    return new UnlockTaskException(exceptionMessage(
+      "007", "Exception while unlocking task '{}'", e));
+  }
+
+  public CompleteTaskException completeTaskException(EngineClientException e) {
+    return new CompleteTaskException(exceptionMessage(
+      "008", "Exception while completing task '{}'", e));
+  }
+
+  public TaskFailureException taskFailureException(EngineClientException e) {
+    return new TaskFailureException(exceptionMessage(
+      "009", "Exception while notifying task failure '{}'", e));
+  }
+
+  public BpmnErrorException bpmnErrorException(EngineClientException e) {
+    return new BpmnErrorException(exceptionMessage(
+      "010", "Exception while notifying bpmn error '{}'", e));
+  }
+
+  public ExtendLockException extendLockException(EngineClientException e) {
+    return new ExtendLockException(exceptionMessage(
+      "011", "Exception while extending lock '{}'", e));
   }
 
 }

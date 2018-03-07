@@ -14,6 +14,7 @@ package org.camunda.bpm.client.impl.engineclient;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.Header;
@@ -48,7 +49,7 @@ public class EngineInteractionManager {
 
   EngineInteractionManager() {
     this.httpClient = HttpClients.createDefault();
-    this.objectMapper = new ObjectMapper();
+    initObjectMapper();
   }
 
   <T, D extends AbstractDto> T postRequest(String resourceUrl, D requestDto, Class<T> responseDtoClass) {
@@ -77,7 +78,10 @@ public class EngineInteractionManager {
     return new AbstractResponseHandler<T>() {
       @Override
       public T handleEntity(HttpEntity responseEntity) {
-        T deserializedResponse = deserializeResponse(responseEntity, responseDtoClass);
+        T deserializedResponse = null;
+        if (!responseDtoClass.isAssignableFrom(Void.class)) {
+          deserializedResponse = deserializeResponse(responseEntity, responseDtoClass);
+        }
 
         try {
           EntityUtils.consume(responseEntity);
@@ -111,7 +115,12 @@ public class EngineInteractionManager {
       throw LOG.exceptionWhileSerializingJsonObject(dto, e);
     }
 
-    return new ByteArrayEntity(serializedRequest);
+    ByteArrayEntity byteArrayEntity = null;
+    if (serializedRequest != null) {
+      byteArrayEntity = new ByteArrayEntity(serializedRequest);
+    }
+
+    return byteArrayEntity;
   }
 
   String sanitizeUrl(String url) {
@@ -123,6 +132,13 @@ public class EngineInteractionManager {
     }
 
     return url;
+  }
+
+  private void initObjectMapper() {
+    this.objectMapper = new ObjectMapper();
+    objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    objectMapper.configure(DeserializationFeature.FAIL_ON_UNRESOLVED_OBJECT_IDS, false);
+    objectMapper.configure(DeserializationFeature.FAIL_ON_INVALID_SUBTYPE, false);
   }
 
 }

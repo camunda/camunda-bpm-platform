@@ -10,21 +10,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.client;
+package org.camunda.bpm.client.impl.dto.request;
+
+import org.camunda.bpm.client.impl.dto.AbstractDto;
 
 /**
- * <p>Interface for a custom implementation of the handler, which is invoked for each fetched and locked task</p>
- *
  * @author Tassilo Weidner
  */
-public interface LockedTaskHandler {
+public class TaskTopicRequestDto extends AbstractDto {
 
-  /**
-   * Has been executed for each fetched and locked task
-   *
-   * @param lockedTask the context is represented of
-   * @param lockedTaskService to interact with fetched and locked tasks
-   */
-  void execute(LockedTask lockedTask, LockedTaskService lockedTaskService);
+  private String topicName;
+  private long lockDuration;
+
+  public TaskTopicRequestDto(String topicName, long lockDuration) {
+    this.topicName = topicName;
+    this.lockDuration = lockDuration;
+  }
+
+  public String getTopicName() {
+    return topicName;
+  }
+
+  public long getLockDuration() {
+    return lockDuration;
+  }
 
 }

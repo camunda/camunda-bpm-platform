@@ -12,9 +12,11 @@
  */
 package org.camunda.bpm.client.impl;
 
+import org.camunda.bpm.client.CamundaClientException;
 import org.camunda.bpm.client.LockedTask;
 import org.camunda.bpm.client.LockedTaskHandler;
-import org.camunda.bpm.client.impl.dto.TaskTopicRequestDto;
+import org.camunda.bpm.client.LockedTaskService;
+import org.camunda.bpm.client.impl.dto.request.TaskTopicRequestDto;
 import org.camunda.bpm.client.impl.engineclient.EngineClient;
 import org.camunda.bpm.client.impl.engineclient.EngineClientException;
 
@@ -77,8 +79,11 @@ public class WorkerManager implements Runnable {
       for (LockedTask lockedTask : lockedTasks) {
         String topicName = lockedTask.getTopicName();
         LockedTaskHandler lockedTaskHandler = lockedTasksHandlers.get(topicName);
+        LockedTaskService lockedTaskService = new LockedTaskServiceImpl(lockedTask.getId(), engineClient);
         try {
-          lockedTaskHandler.execute(lockedTask);
+          lockedTaskHandler.execute(lockedTask, lockedTaskService);
+        } catch (CamundaClientException e) {
+          LOG.exceptionOnLockedTaskServiceMethodInvocation(e);
         } catch (Throwable e) {
           LOG.exceptionWhileExecutingLockedTaskHandler(e);
         }
@@ -92,8 +97,6 @@ public class WorkerManager implements Runnable {
     }
 
     isRunning = false;
-
-    acquire(); // one last time
 
     try {
       thread.join();

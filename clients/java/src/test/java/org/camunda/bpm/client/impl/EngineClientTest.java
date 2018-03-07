@@ -30,32 +30,31 @@ import org.apache.http.impl.client.HttpClients;
 import org.camunda.bpm.client.CamundaClient;
 import org.camunda.bpm.client.LockedTask;
 import org.camunda.bpm.client.LockedTaskHandler;
+import org.camunda.bpm.client.LockedTaskService;
 import org.camunda.bpm.client.WorkerSubscriptionBuilder;
 import org.camunda.bpm.client.helper.MockProvider;
-import org.camunda.bpm.client.impl.dto.AbstractDto;
-import org.camunda.bpm.client.impl.dto.FetchAndLockRequestDto;
-import org.camunda.bpm.client.impl.dto.TaskTopicRequestDto;
+import org.camunda.bpm.client.impl.dto.request.FetchAndLockRequestDto;
 import org.camunda.bpm.client.impl.engineclient.EngineInteractionManager;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
@@ -67,76 +66,81 @@ import static org.powermock.api.mockito.PowerMockito.whenNew;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({HttpClients.class, EngineInteractionManager.class})
 @PowerMockIgnore("javax.net.ssl.*")
-public class EngineInteractionManagerTest {
-
-  private ObjectMapper objectMapper;
+public class EngineClientTest {
 
   @Before
   public void setUp() throws JsonProcessingException {
-    objectMapper = new ObjectMapper();
-
     mockStatic(HttpClients.class);
-    final CloseableHttpResponse closeableHttpResponse = mock(CloseableHttpResponse.class);
-    when(closeableHttpResponse.getStatusLine()).thenReturn(mock(StatusLine.class));
+    
+    CloseableHttpResponse closeableHttpResponse = mock(CloseableHttpResponse.class);
+    when(closeableHttpResponse.getStatusLine())
+      .thenReturn(mock(StatusLine.class));
+    
     CloseableHttpClient httpClient = spy(new ClosableHttpClientMock(closeableHttpResponse));
-
     when(HttpClients.createDefault())
       .thenReturn(httpClient);
 
-    HttpEntity entity = new ByteArrayEntity(objectMapper.writeValueAsBytes(Collections.singletonList(MockProvider.createLockedTask())));
+    List<LockedTask> lockedTasks = Collections.singletonList(MockProvider.createLockedTask());
+    ObjectMapper objectMapper = new ObjectMapper();
+    byte[] lockedTasksAsBytes = objectMapper.writeValueAsBytes(lockedTasks);
+    HttpEntity entity = new ByteArrayEntity(lockedTasksAsBytes);
     doReturn(entity)
       .when(closeableHttpResponse).getEntity();
   }
 
   @Test
-  public void shouldDeserializeResponse() throws IOException {
+  public void shouldDeserializeFetchAndLockResponse() throws IOException {
     // given
     CamundaClient camundaClient = CamundaClient.create()
       .endpointUrl(MockProvider.ENDPOINT_URL)
       .build();
 
-    LockedTaskHandler lockedTaskHandlerMock = mock(LockedTaskHandler.class);
-    WorkerSubscriptionBuilder workerSubscriptionBuilder = camundaClient.subscribe(MockProvider.TOPIC_NAME)
-      .lockDuration(5000)
-      .handler(lockedTaskHandlerMock);
+    final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
+    final List<LockedTask> lockedTaskReference = new ArrayList<LockedTask>(); // list, as container must be final and changeable
+    LockedTaskHandler lockedTaskHandler = new LockedTaskHandler() {
+      @Override
+      public void execute(LockedTask lockedTask, LockedTaskService lockedTaskService) {
+        lockedTaskReference.add(lockedTask);
+        handlerInvoked.set(true);
+      }
+    };
+
+    WorkerSubscriptionBuilder workerSubscriptionBuilder =
+      camundaClient.subscribe(MockProvider.TOPIC_NAME)
+        .lockDuration(5000)
+        .handler(lockedTaskHandler);
 
     // when
     workerSubscriptionBuilder.open();
+    while (!handlerInvoked.get()) {
+      // busy waiting
+    }
     camundaClient.shutdown();
 
     // then
-    ArgumentCaptor<LockedTask> argumentCaptor = ArgumentCaptor.forClass(LockedTask.class);
-    verify(lockedTaskHandlerMock, atLeastOnce()).execute(argumentCaptor.capture());
-
-    assertThat(argumentCaptor.getValue().getActivityId(), is(MockProvider.ACTIVITY_ID));
-    assertThat(argumentCaptor.getValue().getActivityInstanceId(), is(MockProvider.ACTIVITY_INSTANCE_ID));
-    assertThat(argumentCaptor.getValue().getExecutionId(), is(MockProvider.EXECUTION_ID));
-    assertThat(argumentCaptor.getValue().getLockExpirationTime(), is(MockProvider.LOCK_EXPIRATION_TIME));
-    assertThat(argumentCaptor.getValue().getProcessDefinitionId(), is(MockProvider.PROCESS_DEFINITION_ID));
-    assertThat(argumentCaptor.getValue().getProcessDefinitionKey(), is(MockProvider.PROCESS_DEFINITION_KEY));
-    assertThat(argumentCaptor.getValue().getProcessInstanceId(), is(MockProvider.PROCESS_INSTANCE_ID));
-    assertThat(argumentCaptor.getValue().getId(), is(MockProvider.ID));
-    assertThat(argumentCaptor.getValue().getWorkerId(), is(MockProvider.WORKER_ID));
-    assertThat(argumentCaptor.getValue().getTopicName(), is(MockProvider.TOPIC_NAME));
-    assertThat(argumentCaptor.getValue().getVariables(), is(MockProvider.VARIABLES));
-    assertThat(argumentCaptor.getValue().getErrorMessage(), is(MockProvider.ERROR_MESSAGE));
-    assertThat(argumentCaptor.getValue().getErrorDetails(), is(MockProvider.ERROR_DETAILS));
-    assertThat(argumentCaptor.getValue().isSuspended(), is(MockProvider.SUSPENSION_STATE));
-    assertThat(argumentCaptor.getValue().getTenantId(), is(MockProvider.TENANT_ID));
-    assertThat(argumentCaptor.getValue().getRetries(), is(MockProvider.RETRIES));
-    assertThat(argumentCaptor.getValue().getPriority(), is(MockProvider.PRIORITY));
+    assertThat(lockedTaskReference.get(0).getActivityId(), is(MockProvider.ACTIVITY_ID));
+    assertThat(lockedTaskReference.get(0).getActivityInstanceId(), is(MockProvider.ACTIVITY_INSTANCE_ID));
+    assertThat(lockedTaskReference.get(0).getExecutionId(), is(MockProvider.EXECUTION_ID));
+    assertThat(lockedTaskReference.get(0).getLockExpirationTime(), is(MockProvider.LOCK_EXPIRATION_TIME));
+    assertThat(lockedTaskReference.get(0).getProcessDefinitionId(), is(MockProvider.PROCESS_DEFINITION_ID));
+    assertThat(lockedTaskReference.get(0).getProcessDefinitionKey(), is(MockProvider.PROCESS_DEFINITION_KEY));
+    assertThat(lockedTaskReference.get(0).getProcessInstanceId(), is(MockProvider.PROCESS_INSTANCE_ID));
+    assertThat(lockedTaskReference.get(0).getId(), is(MockProvider.ID));
+    assertThat(lockedTaskReference.get(0).getWorkerId(), is(MockProvider.WORKER_ID));
+    assertThat(lockedTaskReference.get(0).getTopicName(), is(MockProvider.TOPIC_NAME));
+    assertThat(lockedTaskReference.get(0).getVariables(), is(MockProvider.VARIABLES));
+    assertThat(lockedTaskReference.get(0).getErrorMessage(), is(MockProvider.ERROR_MESSAGE));
+    assertThat(lockedTaskReference.get(0).getErrorDetails(), is(MockProvider.ERROR_DETAILS));
+    assertThat(lockedTaskReference.get(0).isSuspended(), is(MockProvider.SUSPENSION_STATE));
+    assertThat(lockedTaskReference.get(0).getTenantId(), is(MockProvider.TENANT_ID));
+    assertThat(lockedTaskReference.get(0).getRetries(), is(MockProvider.RETRIES));
+    assertThat(lockedTaskReference.get(0).getPriority(), is(MockProvider.PRIORITY));
   }
 
   @Test
   public void shouldThrowExceptionWhileParsingResponse() throws Exception {
     // given
-    ObjectMapper objectMapper = mock(ObjectMapper.class);
-    whenNew(ObjectMapper.class).withNoArguments().thenReturn(objectMapper);
-    when(objectMapper.readValue(any(InputStream.class), (Class<?>) any(Class.class)))
-      .thenThrow(mock(JsonParseException.class));
-    when(objectMapper.writeValueAsBytes(any(FetchAndLockRequestDto.class)))
-      .thenReturn(serializeRequest(new FetchAndLockRequestDto(MockProvider.WORKER_ID, MockProvider.MAX_TASKS,
-        Collections.<TaskTopicRequestDto>emptyList())));
+    mockDeserializationException(JsonParseException.class);
 
     CamundaClient camundaClient = CamundaClient.create()
       .endpointUrl(MockProvider.ENDPOINT_URL)
@@ -149,6 +153,7 @@ public class EngineInteractionManagerTest {
 
     // when
     workerSubscriptionBuilder.open();
+    Thread.sleep(1000);
     camundaClient.shutdown();
 
     // then
@@ -158,13 +163,7 @@ public class EngineInteractionManagerTest {
   @Test
   public void shouldThrowExceptionWhileMappingResponse() throws Exception {
     // given
-    ObjectMapper objectMapper = mock(ObjectMapper.class);
-    whenNew(ObjectMapper.class).withNoArguments().thenReturn(objectMapper);
-    when(objectMapper.readValue(any(InputStream.class), (Class<?>) any(Class.class)))
-      .thenThrow(mock(JsonMappingException.class));
-    when(objectMapper.writeValueAsBytes(any(FetchAndLockRequestDto.class)))
-      .thenReturn(serializeRequest(new FetchAndLockRequestDto(MockProvider.WORKER_ID, MockProvider.MAX_TASKS,
-        Collections.<TaskTopicRequestDto>emptyList())));
+    mockDeserializationException(JsonMappingException.class);
 
     CamundaClient camundaClient = CamundaClient.create()
       .endpointUrl(MockProvider.ENDPOINT_URL)
@@ -177,6 +176,7 @@ public class EngineInteractionManagerTest {
 
     // when
     workerSubscriptionBuilder.open();
+    Thread.sleep(1000);
     camundaClient.shutdown();
 
     // then
@@ -185,13 +185,8 @@ public class EngineInteractionManagerTest {
 
   @Test
   public void shouldThrowExceptionWhileDeserializingResponse() throws Exception {
-    ObjectMapper objectMapper = mock(ObjectMapper.class);
-    whenNew(ObjectMapper.class).withNoArguments().thenReturn(objectMapper);
-    when(objectMapper.readValue(any(InputStream.class), (Class<?>) any(Class.class)))
-      .thenThrow(new IOException());
-    when(objectMapper.writeValueAsBytes(any(FetchAndLockRequestDto.class)))
-      .thenReturn(serializeRequest(new FetchAndLockRequestDto(MockProvider.WORKER_ID, MockProvider.MAX_TASKS,
-        Collections.<TaskTopicRequestDto>emptyList())));
+    // given
+    mockDeserializationException(IOException.class);
 
     CamundaClient camundaClient = CamundaClient.create()
       .endpointUrl(MockProvider.ENDPOINT_URL)
@@ -204,6 +199,7 @@ public class EngineInteractionManagerTest {
 
     // when
     workerSubscriptionBuilder.open();
+    Thread.sleep(1000);
     camundaClient.shutdown();
 
     // then
@@ -212,118 +208,126 @@ public class EngineInteractionManagerTest {
 
   @Test
   public void shouldThrowExceptionWhileSerializingRequest() throws Exception {
+    // given
+    mockSerializationException(JsonProcessingException.class);
+
+    CamundaClient camundaClient = CamundaClient.create()
+      .endpointUrl(MockProvider.ENDPOINT_URL)
+      .build();
+
+    LockedTaskHandler lockedTaskHandlerMock = mock(LockedTaskHandler.class);
+    WorkerSubscriptionBuilder workerSubscriptionBuilder = camundaClient.subscribe(MockProvider.TOPIC_NAME)
+      .lockDuration(5000)
+      .handler(lockedTaskHandlerMock);
+
+    // when
+    workerSubscriptionBuilder.open();
+    Thread.sleep(1000);
+    camundaClient.shutdown();
+
+    // then
+    verifyZeroInteractions(lockedTaskHandlerMock);
+  }
+
+  @Test
+  public void shouldThrowExceptionDueToHttpRequestWrongHttpStatusCode() throws IOException, InterruptedException {
+    // given
+    mockHttpRequestException(HttpResponseException.class);
+
+    CamundaClient camundaClient = CamundaClient.create()
+      .endpointUrl(MockProvider.ENDPOINT_URL)
+      .build();
+
+    LockedTaskHandler lockedTaskHandlerMock = mock(LockedTaskHandler.class);
+
+    WorkerSubscriptionBuilder workerSubscriptionBuilder = camundaClient.subscribe(MockProvider.TOPIC_NAME)
+      .lockDuration(5000)
+      .handler(lockedTaskHandlerMock);
+
+    // when
+    workerSubscriptionBuilder.open();
+    Thread.sleep(1000);
+    camundaClient.shutdown();
+
+    // then
+    verifyZeroInteractions(lockedTaskHandlerMock);
+  }
+
+  @Test
+  public void shouldThrowExceptionDueToHttpRequestClientProtocolProblem() throws IOException, InterruptedException {
+    // given
+    mockHttpRequestException(ClientProtocolException.class);
+
+    CamundaClient camundaClient = CamundaClient.create()
+      .endpointUrl(MockProvider.ENDPOINT_URL)
+      .build();
+
+    LockedTaskHandler lockedTaskHandlerMock = mock(LockedTaskHandler.class);
+
+    WorkerSubscriptionBuilder workerSubscriptionBuilder = camundaClient.subscribe(MockProvider.TOPIC_NAME)
+      .lockDuration(5000)
+      .handler(lockedTaskHandlerMock);
+
+    // when
+    workerSubscriptionBuilder.open();
+    Thread.sleep(1000);
+    camundaClient.shutdown();
+
+    // then
+    verifyZeroInteractions(lockedTaskHandlerMock);
+  }
+
+  @Test
+  public void shouldThrowExceptionDueToHttpRequestIoProblem() throws IOException, InterruptedException {
+    // given
+    mockHttpRequestException(IOException.class);
+
+    CamundaClient camundaClient = CamundaClient.create()
+      .endpointUrl(MockProvider.ENDPOINT_URL)
+      .build();
+
+    LockedTaskHandler lockedTaskHandlerMock = mock(LockedTaskHandler.class);
+
+    WorkerSubscriptionBuilder workerSubscriptionBuilder = camundaClient.subscribe(MockProvider.TOPIC_NAME)
+      .lockDuration(5000)
+      .handler(lockedTaskHandlerMock);
+
+    // when
+    workerSubscriptionBuilder.open();
+    Thread.sleep(1000);
+    camundaClient.shutdown();
+
+    // then
+    verifyZeroInteractions(lockedTaskHandlerMock);
+  }
+
+  private ObjectMapper mockObjectMapper() throws Exception {
     ObjectMapper objectMapper = mock(ObjectMapper.class);
-    whenNew(ObjectMapper.class).withNoArguments().thenReturn(objectMapper);
+    whenNew(ObjectMapper.class).withNoArguments()
+      .thenReturn(objectMapper);
+    return objectMapper;
+  }
+
+  private void mockDeserializationException(Class<? extends Throwable> exception) throws Exception {
+    ObjectMapper objectMapper = mockObjectMapper();
+    when(objectMapper.readValue(any(InputStream.class), (Class<?>) any(Class.class)))
+      .thenThrow(mock(exception));
+  }
+
+  private void mockSerializationException(Class<? extends Throwable> exception) throws Exception {
+    ObjectMapper objectMapper = mockObjectMapper();
     when(objectMapper.writeValueAsBytes(any(FetchAndLockRequestDto.class)))
-      .thenThrow(mock(JsonProcessingException.class));
-
-    CamundaClient camundaClient = CamundaClient.create()
-      .endpointUrl(MockProvider.ENDPOINT_URL)
-      .build();
-
-    LockedTaskHandler lockedTaskHandlerMock = mock(LockedTaskHandler.class);
-    WorkerSubscriptionBuilder workerSubscriptionBuilder = camundaClient.subscribe(MockProvider.TOPIC_NAME)
-      .lockDuration(5000)
-      .handler(lockedTaskHandlerMock);
-
-    // when
-    workerSubscriptionBuilder.open();
-    camundaClient.shutdown();
-
-    // then
-    verifyZeroInteractions(lockedTaskHandlerMock);
+      .thenThrow(mock(exception));
   }
 
-  @Test
-  public void shouldThrowExceptionDueToWrongHttpStatusCode() throws IOException {
-    // given
-    mockStatic(HttpClients.class);
-    HttpClient httpClient = mock(CloseableHttpClient.class);
-    when(HttpClients.createDefault())
-      .thenReturn((CloseableHttpClient) httpClient);
-
-    CamundaClient camundaClient = CamundaClient.create()
-      .endpointUrl(MockProvider.ENDPOINT_URL)
-      .build();
-
-    when(httpClient.execute(any(HttpUriRequest.class), any(AbstractResponseHandler.class)))
-      .thenThrow(new HttpResponseException(404, "Not Found"));
-
-    LockedTaskHandler lockedTaskHandlerMock = mock(LockedTaskHandler.class);
-
-    WorkerSubscriptionBuilder workerSubscriptionBuilder = camundaClient.subscribe(MockProvider.TOPIC_NAME)
-      .lockDuration(5000)
-      .handler(lockedTaskHandlerMock);
-
-    // when
-    workerSubscriptionBuilder.open();
-    camundaClient.shutdown();
-
-    // then
-    verifyZeroInteractions(lockedTaskHandlerMock);
-  }
-
-  @Test
-  public void shouldThrowExceptionDueToClientProtocolProblem() throws IOException {
-    // given
+  private void mockHttpRequestException(Class<? extends Throwable> exception) throws IOException {
     mockStatic(HttpClients.class);
     HttpClient httpClient = mock(CloseableHttpClient.class);
     when(HttpClients.createDefault())
       .thenReturn((CloseableHttpClient) httpClient);
 
     when(httpClient.execute(any(HttpUriRequest.class), any(AbstractResponseHandler.class)))
-      .thenThrow(new ClientProtocolException());
-
-    CamundaClient camundaClient = CamundaClient.create()
-      .endpointUrl(MockProvider.ENDPOINT_URL)
-      .build();
-
-    LockedTaskHandler lockedTaskHandlerMock = mock(LockedTaskHandler.class);
-
-    WorkerSubscriptionBuilder workerSubscriptionBuilder = camundaClient.subscribe(MockProvider.TOPIC_NAME)
-      .lockDuration(5000)
-      .handler(lockedTaskHandlerMock);
-
-    // when
-    workerSubscriptionBuilder.open();
-    camundaClient.shutdown();
-
-    // then
-    verifyZeroInteractions(lockedTaskHandlerMock);
-  }
-
-  @Test
-  public void shouldThrowExceptionDueToIoProblem() throws IOException {
-    // given
-    mockStatic(HttpClients.class);
-    HttpClient httpClient = mock(CloseableHttpClient.class);
-    when(HttpClients.createDefault())
-      .thenReturn((CloseableHttpClient) httpClient);
-
-    when(httpClient.execute(any(HttpUriRequest.class), any(AbstractResponseHandler.class)))
-      .thenThrow(new IOException());
-
-    CamundaClient camundaClient = CamundaClient.create()
-      .endpointUrl(MockProvider.ENDPOINT_URL)
-      .build();
-
-    LockedTaskHandler lockedTaskHandlerMock = mock(LockedTaskHandler.class);
-
-    WorkerSubscriptionBuilder workerSubscriptionBuilder = camundaClient.subscribe(MockProvider.TOPIC_NAME)
-      .lockDuration(5000)
-      .handler(lockedTaskHandlerMock);
-
-    // when
-    workerSubscriptionBuilder.open();
-    camundaClient.shutdown();
-
-    // then
-    verifyZeroInteractions(lockedTaskHandlerMock);
-  }
-
-  // helper //////////////////
-  private byte[] serializeRequest(AbstractDto dto) throws JsonProcessingException {
-      return objectMapper.writeValueAsBytes(dto);
+      .thenThrow(mock(exception));
   }
 
 }
