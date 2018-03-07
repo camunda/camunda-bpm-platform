@@ -138,6 +138,35 @@
         </plugins>
       </build>
     </profile>
+    <profile>
+      <id>license-management</id>
+
+      <properties>
+        <license.includeTransitiveDependencies>false</license.includeTransitiveDependencies>
+      </properties>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>license-maven-plugin</artifactId>
+            <version>1.14</version>
+            <executions>
+              <execution>
+                <id>license-management</id>
+                <goals>
+                  <goal>add-third-party</goal>
+                </goals>
+                <configuration>
+                  <excludedScopes>test</excludedScopes>
+                  <includeTransitiveDependencies>${license.includeTransitiveDependencies}</includeTransitiveDependencies>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
   </profiles>
 
   <licenses>
