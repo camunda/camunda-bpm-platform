@@ -16,7 +16,6 @@ import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryBuilder;
-import org.camunda.bpm.engine.externaltask.ExternalTaskQueryTopicBuilder;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
@@ -27,48 +26,53 @@ import org.camunda.bpm.engine.rest.spi.FetchAndLockHandler;
 
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.Response.Status;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 /**
  * @author Tassilo Weidner
  */
 public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
 
-  private static final long MAX_BACK_OFF_TIME = Long.MAX_VALUE;
-  public static final long MAX_TIMEOUT = 1800000; // 30 minutes
+  protected static final long MAX_BACK_OFF_TIME = Long.MAX_VALUE;
+  protected static final long MAX_TIMEOUT = 1800000; // 30 minutes
 
-  private List<FetchAndLockRequest> pendingRequests = new CopyOnWriteArrayList<FetchAndLockRequest>();
+  protected BlockingQueue<FetchAndLockRequest> queue = new ArrayBlockingQueue<FetchAndLockRequest>(100);
+  protected List<FetchAndLockRequest> pendingRequests = new ArrayList<FetchAndLockRequest>();
 
-  private AtomicBoolean isWaiting = new AtomicBoolean(false);
-  private final Object MONITOR = new Object();
-  private Thread handlerThread = new Thread(this, this.getClass().getSimpleName());
-  private boolean isRunning = false;
+  protected final Object MONITOR = new Object();
+  protected Thread handlerThread = new Thread(this, this.getClass().getSimpleName());
+
+  protected boolean isWaiting = false;
+  protected boolean isRunning = false;
 
   @Override
   public void run() {
     while (isRunning) {
-      long backoffTime = checkPendingRequests();
-      suspend(backoffTime);
+      acquire();
     }
 
-    for (FetchAndLockRequest pendingRequest: pendingRequests) {
-      invalidRequest(pendingRequest.getAsyncResponse(), "Request rejected due to shutdown of application server.");
-    }
+    rejectPendingRequests();
   }
 
-  protected long checkPendingRequests() {
+  protected void acquire() {
+    queue.drainTo(pendingRequests);
+
     long backoffTime = MAX_BACK_OFF_TIME;
     long start = ClockUtil.getCurrentTime().getTime();
 
-    for (FetchAndLockRequest pendingRequest : pendingRequests) {
+    Iterator<FetchAndLockRequest> iterator = pendingRequests.iterator();
+    while (iterator.hasNext()) {
 
+      FetchAndLockRequest pendingRequest = iterator.next();
       FetchAndLockResult result = tryFetchAndLock(pendingRequest);
 
       if (result.wasSuccessful()) {
 
-        List<LockedExternalTaskDto> lockedTasks = result.tasks;
+        List<LockedExternalTaskDto> lockedTasks = result.getTasks();
 
         FetchExternalTasksExtendedDto dto = pendingRequest.getDto();
         long requestTime = pendingRequest.getRequestTime().getTime();
@@ -79,7 +83,7 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
 
         if (!lockedTasks.isEmpty() || timeout <= currentTime) {
           AsyncResponse asyncResponse = pendingRequest.getAsyncResponse();
-          pendingRequests.remove(pendingRequest);
+          iterator.remove();
           asyncResponse.resume(lockedTasks);
         } else {
           long slackTime = timeout - currentTime;
@@ -88,12 +92,15 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
           }
         }
       } else {
-        handleProcessEngineException(pendingRequest, result.processEngineException);
+        AsyncResponse asyncResponse = pendingRequest.getAsyncResponse();
+        iterator.remove();
+        ProcessEngineException processEngineException = result.getProcessEngineException();
+        asyncResponse.resume(processEngineException);
       }
     }
 
     backoffTime = Math.max(0, (start + backoffTime) - ClockUtil.getCurrentTime().getTime());
-    return backoffTime;
+    suspend(backoffTime);
   }
 
   @Override
@@ -110,39 +117,60 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
   public void shutdown() {
     synchronized (MONITOR) {
       isRunning = false;
-      if(isWaiting.compareAndSet(true, false)) {
+      if (isWaiting) {
         MONITOR.notifyAll();
       }
     }
   }
 
-  private void suspend(long millis) {
+  protected void suspend(long millis) {
     if (millis <= 0) {
       return;
     }
 
+    if (!queue.isEmpty()) {
+      return;
+    }
+
+    suspendAcquisition(millis);
+  }
+
+  protected void suspendAcquisition(long millis) {
     try {
       synchronized (MONITOR) {
-        isWaiting.set(true);
-        MONITOR.wait(millis);
+        if (queue.isEmpty()) {
+          isWaiting = true;
+          MONITOR.wait(millis);
+        }
       }
+
     }
-    catch (InterruptedException ignore) {}
+    catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+    }
     finally {
-      isWaiting.set(false);
+      isWaiting = false;
     }
   }
 
-  private void addRequest(FetchAndLockRequest request) {
-    pendingRequests.add(request);
-    if (isWaiting.compareAndSet(true, false)) {
-      synchronized (MONITOR) {
+  protected void addRequest(FetchAndLockRequest request) {
+    if (!queue.offer(request)) {
+      AsyncResponse asyncResponse = request.getAsyncResponse();
+      errorTooManyRequests(asyncResponse);
+    }
+
+    notifyAcquisition();
+  }
+
+  protected void notifyAcquisition() {
+    synchronized (MONITOR) {
+      if (isWaiting) {
         MONITOR.notifyAll();
       }
     }
   }
 
-  private FetchAndLockResult tryFetchAndLock(FetchAndLockRequest request) {
+  protected FetchAndLockResult tryFetchAndLock(FetchAndLockRequest request) {
     ProcessEngine processEngine = request.getProcessEngine();
     IdentityService identityService = processEngine.getIdentityService();
 
@@ -164,54 +192,32 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
     return result;
   }
 
-  private List<LockedExternalTaskDto> executeFetchAndLock(FetchExternalTasksExtendedDto fetchingDto, ProcessEngine processEngine) {
-    ExternalTaskQueryBuilder fetchBuilder = processEngine
-      .getExternalTaskService()
-      .fetchAndLock(fetchingDto.getMaxTasks(), fetchingDto.getWorkerId(), fetchingDto.isUsePriority());
-
-    if (fetchingDto.getTopics() != null) {
-      for (FetchExternalTasksExtendedDto.FetchExternalTaskTopicDto topicDto : fetchingDto.getTopics()) {
-        ExternalTaskQueryTopicBuilder topicFetchBuilder =
-          fetchBuilder.topic(topicDto.getTopicName(), topicDto.getLockDuration());
-
-        if (topicDto.getBusinessKey() != null) {
-          topicFetchBuilder = topicFetchBuilder.businessKey(topicDto.getBusinessKey());
-        }
-
-        if (topicDto.getVariables() != null) {
-          topicFetchBuilder = topicFetchBuilder.variables(topicDto.getVariables());
-        }
-
-        if (topicDto.getProcessVariables() != null) {
-          topicFetchBuilder = topicFetchBuilder.processInstanceVariableEquals(topicDto.getProcessVariables());
-        }
-
-        if (topicDto.isDeserializeValues()) {
-          topicFetchBuilder = topicFetchBuilder.enableCustomObjectDeserialization();
-        }
-
-        fetchBuilder = topicFetchBuilder;
-      }
-    }
-
+  protected List<LockedExternalTaskDto> executeFetchAndLock(FetchExternalTasksExtendedDto fetchingDto, ProcessEngine processEngine) {
+    ExternalTaskQueryBuilder fetchBuilder = fetchingDto.buildQuery(processEngine);
     List<LockedExternalTask> externalTasks = fetchBuilder.execute();
     return LockedExternalTaskDto.fromLockedExternalTasks(externalTasks);
   }
 
-  private void invalidRequest(AsyncResponse asyncResponse, String message) {
+  protected void invalidRequest(AsyncResponse asyncResponse, String message) {
     InvalidRequestException invalidRequestException = new InvalidRequestException(Status.BAD_REQUEST, message);
     asyncResponse.resume(invalidRequestException);
   }
 
-  private void handleProcessEngineException(FetchAndLockRequest request, ProcessEngineException exception) {
-    AsyncResponse asyncResponse = request.getAsyncResponse();
-    pendingRequests.remove(request);
-    asyncResponse.resume(exception);
+  protected void errorTooManyRequests(AsyncResponse asyncResponse) {
+    String errorMessage = "At the moment the server has to handle too many requests at the same time. Please try again later.";
+    InvalidRequestException invalidRequestException = new InvalidRequestException(Status.INTERNAL_SERVER_ERROR, errorMessage); // status code 429 would fit better
+    asyncResponse.resume(invalidRequestException);
+  }
+
+  protected void rejectPendingRequests() {
+    for (FetchAndLockRequest pendingRequest : pendingRequests) {
+      AsyncResponse asyncResponse = pendingRequest.getAsyncResponse();
+      invalidRequest(asyncResponse, "Request rejected due to shutdown of application server.");
+    }
   }
 
   @Override
   public void addPendingRequest(FetchExternalTasksExtendedDto dto, AsyncResponse asyncResponse, ProcessEngine processEngine) {
-
     Long asyncResponseTimeout = dto.getAsyncResponseTimeout();
     if (asyncResponseTimeout != null && asyncResponseTimeout > MAX_TIMEOUT) {
       invalidRequest(asyncResponse, "The asynchronous response timeout cannot be set to a value greater than "
@@ -231,8 +237,7 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
     FetchAndLockResult result = tryFetchAndLock(incomingRequest);
 
     if (result.wasSuccessful()) {
-
-      List<LockedExternalTaskDto> lockedTasks = result.tasks;
+      List<LockedExternalTaskDto> lockedTasks = result.getTasks();
       if (!lockedTasks.isEmpty() || dto.getAsyncResponseTimeout() == null) { // response immediately if tasks available
         asyncResponse.resume(lockedTasks);
       } else {
@@ -240,13 +245,9 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
       }
     }
     else {
-      handleProcessEngineException(incomingRequest, result.processEngineException);
+      ProcessEngineException processEngineException = result.getProcessEngineException();
+      asyncResponse.resume(processEngineException);
     }
-
-  }
-
-  public Thread getHandlerThread() {
-    return handlerThread;
   }
 
   public List<FetchAndLockRequest> getPendingRequests() {

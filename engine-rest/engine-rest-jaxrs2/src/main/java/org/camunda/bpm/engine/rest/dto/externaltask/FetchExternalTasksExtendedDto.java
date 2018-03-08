@@ -17,7 +17,7 @@ package org.camunda.bpm.engine.rest.dto.externaltask;
  */
 public class FetchExternalTasksExtendedDto extends FetchExternalTasksDto {
 
-  private Long asyncResponseTimeout = null;
+  protected Long asyncResponseTimeout = null;
 
   public void setAsyncResponseTimeout(Long asyncResponseTimeout) {
     this.asyncResponseTimeout = asyncResponseTimeout;

@@ -12,6 +12,10 @@
  */
 package org.camunda.bpm.engine.rest.dto.externaltask;
 
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.externaltask.ExternalTaskQueryBuilder;
+import org.camunda.bpm.engine.externaltask.ExternalTaskQueryTopicBuilder;
+
 import java.util.HashMap;
 import java.util.List;
 
@@ -98,4 +102,38 @@ public class FetchExternalTasksDto {
       this.deserializeValues = deserializeValues;
     }
   }
+
+  public ExternalTaskQueryBuilder buildQuery(ProcessEngine processEngine) {
+    ExternalTaskQueryBuilder fetchBuilder = processEngine
+      .getExternalTaskService()
+      .fetchAndLock(getMaxTasks(), getWorkerId(), isUsePriority());
+
+    if (getTopics() != null) {
+      for (FetchExternalTaskTopicDto topicDto : getTopics()) {
+        ExternalTaskQueryTopicBuilder topicFetchBuilder =
+          fetchBuilder.topic(topicDto.getTopicName(), topicDto.getLockDuration());
+
+        if (topicDto.getBusinessKey() != null) {
+          topicFetchBuilder = topicFetchBuilder.businessKey(topicDto.getBusinessKey());
+        }
+
+        if (topicDto.getVariables() != null) {
+          topicFetchBuilder = topicFetchBuilder.variables(topicDto.getVariables());
+        }
+
+        if (topicDto.getProcessVariables() != null) {
+          topicFetchBuilder = topicFetchBuilder.processInstanceVariableEquals(topicDto.getProcessVariables());
+        }
+
+        if (topicDto.isDeserializeValues()) {
+          topicFetchBuilder = topicFetchBuilder.enableCustomObjectDeserialization();
+        }
+
+        fetchBuilder = topicFetchBuilder;
+      }
+    }
+
+    return fetchBuilder;
+  }
+
 }

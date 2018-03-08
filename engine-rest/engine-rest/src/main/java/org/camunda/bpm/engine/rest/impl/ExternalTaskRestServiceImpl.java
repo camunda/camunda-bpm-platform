@@ -116,38 +116,9 @@ public class ExternalTaskRestServiceImpl extends AbstractRestProcessEngineAware 
 
   @Override
   public List<LockedExternalTaskDto> fetchAndLock(FetchExternalTasksDto fetchingDto) {
-    ExternalTaskQueryBuilder fetchBuilder = processEngine
-      .getExternalTaskService()
-      .fetchAndLock(fetchingDto.getMaxTasks(), fetchingDto.getWorkerId(), fetchingDto.isUsePriority());
-
-    if (fetchingDto.getTopics() != null) {
-      for (FetchExternalTaskTopicDto topicDto : fetchingDto.getTopics()) {
-        ExternalTaskQueryTopicBuilder topicFetchBuilder =
-            fetchBuilder.topic(topicDto.getTopicName(), topicDto.getLockDuration());
-
-        if (topicDto.getBusinessKey() != null) {
-          topicFetchBuilder = topicFetchBuilder.businessKey(topicDto.getBusinessKey());
-        }
-
-        if (topicDto.getVariables() != null) {
-          topicFetchBuilder = topicFetchBuilder.variables(topicDto.getVariables());
-        }
-
-        if (topicDto.getProcessVariables() != null) {
-          topicFetchBuilder = topicFetchBuilder.processInstanceVariableEquals(topicDto.getProcessVariables());
-        }
-
-        if (topicDto.isDeserializeValues()) {
-          topicFetchBuilder = topicFetchBuilder.enableCustomObjectDeserialization();
-        }
-
-        fetchBuilder = topicFetchBuilder;
-      }
-    }
-
-    List<LockedExternalTask> tasks = fetchBuilder.execute();
-
-    return LockedExternalTaskDto.fromLockedExternalTasks(tasks);
+    ExternalTaskQueryBuilder fetchBuilder = fetchingDto.buildQuery(processEngine);
+    List<LockedExternalTask> externalTasks = fetchBuilder.execute();
+    return LockedExternalTaskDto.fromLockedExternalTasks(externalTasks);
   }
 
   @Override

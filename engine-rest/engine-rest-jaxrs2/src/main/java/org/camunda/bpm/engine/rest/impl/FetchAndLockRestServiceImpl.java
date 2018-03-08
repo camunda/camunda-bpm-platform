@@ -30,7 +30,7 @@ public class FetchAndLockRestServiceImpl extends AbstractRestProcessEngineAware 
 
   @Override
   public void fetchAndLock(FetchExternalTasksExtendedDto dto, AsyncResponse asyncResponse) {
-    FetchAndLockHandler fetchAndLockHandler = FetchAndLockContextListener.newInstance();
+    FetchAndLockHandler fetchAndLockHandler = FetchAndLockContextListener.getFetchAndLockHandler();
     fetchAndLockHandler.addPendingRequest(dto, asyncResponse, processEngine);
   }
 

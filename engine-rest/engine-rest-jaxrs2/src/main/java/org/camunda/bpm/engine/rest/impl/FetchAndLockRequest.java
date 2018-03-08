@@ -25,11 +25,11 @@ import java.util.Date;
  */
 public class FetchAndLockRequest {
 
-  private Date requestTime = ClockUtil.getCurrentTime();
-  private FetchExternalTasksExtendedDto dto;
-  private AsyncResponse asyncResponse;
-  private ProcessEngine processEngine;
-  private Authentication authentication;
+  protected Date requestTime = ClockUtil.getCurrentTime();
+  protected FetchExternalTasksExtendedDto dto;
+  protected AsyncResponse asyncResponse;
+  protected ProcessEngine processEngine;
+  protected Authentication authentication;
 
   public Date getRequestTime() {
     return requestTime;

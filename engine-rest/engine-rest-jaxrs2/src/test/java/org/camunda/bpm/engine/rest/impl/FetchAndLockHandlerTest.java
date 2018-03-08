@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * 
  *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,65 +20,69 @@ import org.camunda.bpm.engine.externaltask.ExternalTaskQueryTopicBuilder;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.rest.dto.externaltask.FetchExternalTasksExtendedDto;
-import org.camunda.bpm.engine.rest.dto.externaltask.LockedExternalTaskDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
-import org.junit.After;
+import org.hamcrest.collection.IsCollectionWithSize;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 
 import javax.ws.rs.container.AsyncResponse;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
-import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.argThat;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 /**
  * @author Tassilo Weidner
  */
 public class FetchAndLockHandlerTest {
+  
+  @Mock
+  protected ProcessEngine processEngine;
+  
+  @Mock
+  protected IdentityService identityService;
+  
+  @Mock
+  protected ExternalTaskService externalTaskService;
+  
+  @Mock
+  protected ExternalTaskQueryTopicBuilder fetchTopicBuilder;
+  
+  @Spy
+  protected FetchAndLockHandlerImpl handler;
 
-  private ProcessEngine processEngine;
+  protected LockedExternalTask lockedExternalTaskMock;
 
-  private ExternalTaskQueryTopicBuilder fetchTopicBuilder;
-  private LockedExternalTask lockedExternalTaskMock;
-
-  private FetchAndLockHandlerImpl fetchAndLockHandler;
+  protected static final Date START_DATE = new Date(1457326800000L);
 
   @Before
-  public void setUpRuntimeData() {
-    processEngine = mock(ProcessEngine.class);
-
-    IdentityService identityServiceMock = mock(IdentityService.class);
-    when(processEngine.getIdentityService()).thenReturn(identityServiceMock);
-
-    ExternalTaskService externalTaskService = mock(ExternalTaskService.class);
+  public void initMocks() {
+    MockitoAnnotations.initMocks(this);
+    
+    when(processEngine.getIdentityService()).thenReturn(identityService);
     when(processEngine.getExternalTaskService()).thenReturn(externalTaskService);
 
-    fetchTopicBuilder = mock(ExternalTaskQueryTopicBuilder.class);
-    lockedExternalTaskMock = MockProvider.createMockLockedExternalTask();
     when(externalTaskService.fetchAndLock(anyInt(), any(String.class), any(Boolean.class)))
       .thenReturn(fetchTopicBuilder);
     when(fetchTopicBuilder.topic(any(String.class), anyLong()))
@@ -88,296 +92,266 @@ public class FetchAndLockHandlerTest {
     when(fetchTopicBuilder.enableCustomObjectDeserialization())
       .thenReturn(fetchTopicBuilder);
 
-    fetchAndLockHandler = new FetchAndLockHandlerImpl();
+    doNothing().when(handler).suspend(anyLong());
+
+    lockedExternalTaskMock = MockProvider.createMockLockedExternalTask();
   }
 
-  @After
-  public void tearDown() {
-    fetchAndLockHandler.getHandlerThread().stop(); // provoke thread death
-    ClockUtil.reset();
-  }
-
-  @Test(timeout = 30000)
-  public void shouldResumeMultipleConcurrentRequestsDueToTasksAvailable() throws InterruptedException {
-    when(fetchTopicBuilder.execute())
-      .thenReturn(Collections.<LockedExternalTask>emptyList());
-    fetchAndLockHandler.start();
-
-    final List<Runnable> runnables = new ArrayList<Runnable>();
-    final List<AsyncResponse> mockedAsyncResponses = new ArrayList<AsyncResponse>();
-    for (int i = 0; i < 100; i++) {
-      runnables.add(new Runnable() {
-        @Override
-        public void run() {
-          AsyncResponse mockedAsyncResponse = mock(AsyncResponse.class);
-          mockedAsyncResponses.add(mockedAsyncResponse);
-          fetchAndLockHandler.addPendingRequest(createDto(5000L), mockedAsyncResponse, processEngine);
-        }
-      });
-    }
-
-    assertConcurrent(runnables);
-
-    assertThat(fetchAndLockHandler.getPendingRequests().size(), is(100));
-
-    when(fetchTopicBuilder.execute())
-      .thenReturn(Arrays.asList(lockedExternalTaskMock));
-
-    while (!fetchAndLockHandler.getPendingRequests().isEmpty()) {
-      // busy waiting
-    }
-
-    assertThat(fetchAndLockHandler.getPendingRequests().size(), is(0));
-
-    for (AsyncResponse asyncResponse : mockedAsyncResponses) {
-      ArgumentCaptor<List> argumentCaptor = ArgumentCaptor.forClass(List.class);
-      verify(asyncResponse).resume(argumentCaptor.capture());
-
-      for (List lockedExternalTasks : argumentCaptor.getAllValues()) {
-        assertThat(((LockedExternalTaskDto) lockedExternalTasks.get(0)).getActivityId(),
-          is(lockedExternalTaskMock.getActivityId()));
-      }
-    }
-  }
-
-  @Test(timeout = 30000)
-  public void shouldResumeMultipleConcurrentRequestsDueToTimeout() throws InterruptedException {
-    when(fetchTopicBuilder.execute())
-      .thenReturn(new ArrayList<LockedExternalTask>());
-
-    fetchAndLockHandler.start();
-
-    final List<Runnable> runnables = new ArrayList<Runnable>();
-    final List<AsyncResponse> mockedAsyncResponses = new ArrayList<AsyncResponse>();
-    for (int i = 0; i < 100; i++) {
-      runnables.add(new Runnable() {
-        @Override
-        public void run() {
-          AsyncResponse mockedAsyncResponse = mock(AsyncResponse.class);
-          mockedAsyncResponses.add(mockedAsyncResponse);
-          fetchAndLockHandler.addPendingRequest(createDto(5000L), mockedAsyncResponse, processEngine);
-        }
-      });
-    }
-
-    assertConcurrent(runnables);
-
-    while (!fetchAndLockHandler.getPendingRequests().isEmpty()) {
-      // busy waiting
-    }
-
-    assertThat(fetchAndLockHandler.getPendingRequests().size(), is(0));
-
-    for (AsyncResponse asyncResponse : mockedAsyncResponses) {
-      ArgumentCaptor<List> argumentCaptor = ArgumentCaptor.forClass(List.class);
-      verify(asyncResponse).resume(argumentCaptor.capture());
-
-      for (List lockedExternalTasks : argumentCaptor.getAllValues()) {
-        assertThat(lockedExternalTasks.isEmpty(), is(true));
-      }
-    }
-  }
-
-  @Test(timeout = 30000)
-  public void shouldResumeAllRequestsDueToTimeout() {
-    // given
-    when(fetchTopicBuilder.execute())
-      .thenReturn(Collections.<LockedExternalTask>emptyList());
-
-    AsyncResponse asyncResponse = mock(AsyncResponse.class);
-    fetchAndLockHandler.addPendingRequest(createDto(100L), asyncResponse, processEngine);
-    fetchAndLockHandler.addPendingRequest(createDto(100L), asyncResponse, processEngine);
-    fetchAndLockHandler.addPendingRequest(createDto(100L), asyncResponse, processEngine);
-    fetchAndLockHandler.addPendingRequest(createDto(100L), asyncResponse, processEngine);
-
-    // when
-    fetchAndLockHandler.start();
-
-    while (!fetchAndLockHandler.getPendingRequests().isEmpty()) {
-      // busy waiting
-    }
-
-    // then
-    verify(asyncResponse, times(4)).resume(anyList());
-    assertThat(fetchAndLockHandler.getPendingRequests().size(), is(0));
+  @Before
+  public void setClock() {
+    ClockUtil.setCurrentTime(START_DATE);
   }
 
   @Test
-  public void shouldSetCorrectSlacktime() {
+  public void shouldResumeAsyncResponseDueToAvailableTasks() {
     // given
-    when(fetchTopicBuilder.execute())
-      .thenReturn(Collections.<LockedExternalTask>emptyList());
-
-    ClockUtil.setCurrentTime(new Date(ClockUtil.getCurrentTime().getTime()));
+    List<LockedExternalTask> tasks = new ArrayList<LockedExternalTask>();
+    tasks.add(lockedExternalTaskMock);
+    doReturn(tasks).when(fetchTopicBuilder).execute();
 
     AsyncResponse asyncResponse = mock(AsyncResponse.class);
-    fetchAndLockHandler.addPendingRequest(createDto(5000L), asyncResponse, processEngine);
-    fetchAndLockHandler.addPendingRequest(createDto(3000L), asyncResponse, processEngine);
-    fetchAndLockHandler.addPendingRequest(createDto(7000L), asyncResponse, processEngine);
-    fetchAndLockHandler.addPendingRequest(createDto(6000L), asyncResponse, processEngine);
+    handler.addPendingRequest(createDto(5000L), asyncResponse, processEngine);
 
     // when
-    ClockUtil.setCurrentTime(new Date(ClockUtil.getCurrentTime().getTime() + 1000L));
-    long backOffTime = fetchAndLockHandler.checkPendingRequests();
+    handler.acquire();
 
     // then
-    verifyNoMoreInteractions(asyncResponse);
-    assertThat(fetchAndLockHandler.getPendingRequests().size(), is(4));
-    assertThat(backOffTime, is(2000L));
+    verify(asyncResponse).resume(argThat(IsCollectionWithSize.hasSize(1)));
+    assertThat(handler.getPendingRequests().size(), is(0));
+    verify(handler).suspend(Long.MAX_VALUE);
   }
 
   @Test
-  public void shouldResumeRequestsDueToAvailableTasks() {
+  public void shouldNotResumeAsyncResponseDueToNoAvailableTasks() {
     // given
-    when(fetchTopicBuilder.execute())
-      .thenReturn(Collections.<LockedExternalTask>emptyList())
-      .thenReturn(Collections.<LockedExternalTask>emptyList())
-      .thenReturn(Collections.<LockedExternalTask>emptyList())
-      .thenReturn(Collections.<LockedExternalTask>emptyList())
-      .thenReturn(new ArrayList<LockedExternalTask>(Collections.singleton(lockedExternalTaskMock)));
+    doReturn(Collections.emptyList()).when(fetchTopicBuilder).execute();
 
-    ClockUtil.setCurrentTime(new Date(ClockUtil.getCurrentTime().getTime()));
-
-    AsyncResponse asyncResponse1 = mock(AsyncResponse.class);
-    fetchAndLockHandler.addPendingRequest(createDto(5000L), asyncResponse1, processEngine);
-
-    AsyncResponse asyncResponse2 = mock(AsyncResponse.class);
-    fetchAndLockHandler.addPendingRequest(createDto(3000L), asyncResponse2, processEngine);
-
-    AsyncResponse asyncResponse3 = mock(AsyncResponse.class);
-    fetchAndLockHandler.addPendingRequest(createDto(7000L), asyncResponse3, processEngine);
-
-    AsyncResponse asyncResponse4 = mock(AsyncResponse.class);
-    fetchAndLockHandler.addPendingRequest(createDto(6000L), asyncResponse4, processEngine);
+    AsyncResponse asyncResponse = mock(AsyncResponse.class);
+    handler.addPendingRequest(createDto(5000L), asyncResponse, processEngine);
 
     // when
-    ClockUtil.setCurrentTime(new Date(ClockUtil.getCurrentTime().getTime() + 1000L));
-    long backOffTime = fetchAndLockHandler.checkPendingRequests();
+    handler.acquire();
 
     // then
-    verify(asyncResponse1).resume(anyList());
-    verify(asyncResponse2).resume(anyList());
-    verify(asyncResponse3).resume(anyList());
-    verify(asyncResponse4).resume(anyList());
-
-    assertThat(fetchAndLockHandler.getPendingRequests().size(), is(0));
-    assertThat(backOffTime, is(Long.MAX_VALUE));
+    verify(asyncResponse, never()).resume(any());
+    assertThat(handler.getPendingRequests().size(), is(1));
+    verify(handler).suspend(5000L);
   }
 
   @Test
-  public void shouldResumeRequestDueToProcessEngineException() {
+  public void shouldResumeAsyncResponseDueToTimeoutExpired_1() {
     // given
-    when(fetchTopicBuilder.execute())
-      .thenReturn(Collections.<LockedExternalTask>emptyList())
-      .thenThrow(new ProcessEngineException("anExceptionMessage"));
-
-    ClockUtil.setCurrentTime(new Date(ClockUtil.getCurrentTime().getTime()));
+    doReturn(Collections.emptyList()).when(fetchTopicBuilder).execute();
 
     AsyncResponse asyncResponse = mock(AsyncResponse.class);
-    fetchAndLockHandler.addPendingRequest(createDto(5000L), asyncResponse, processEngine);
+    handler.addPendingRequest(createDto(5000L), asyncResponse, processEngine);
+    handler.acquire();
+
+    // assume
+    assertThat(handler.getPendingRequests().size(), is(1));
+    verify(handler).suspend(5000L);
+
+    List<LockedExternalTask> tasks = new ArrayList<LockedExternalTask>();
+    tasks.add(lockedExternalTaskMock);
+    doReturn(tasks).when(fetchTopicBuilder).execute();
+
+    addSecondsToClock(5);
 
     // when
-    ClockUtil.setCurrentTime(new Date(ClockUtil.getCurrentTime().getTime() + 1000L));
-    long backOffTime = fetchAndLockHandler.checkPendingRequests();
+    handler.acquire();
 
     // then
-    ArgumentCaptor<ProcessEngineException> argumentCaptor = ArgumentCaptor.forClass(ProcessEngineException.class);
-    verify(asyncResponse, times(1)).resume(argumentCaptor.capture());
-    assertThat(argumentCaptor.getValue().getMessage(), is("anExceptionMessage"));
-    assertThat(fetchAndLockHandler.getPendingRequests().size(), is(0));
-    assertThat(backOffTime, is(Long.MAX_VALUE));
+    verify(asyncResponse).resume(argThat(IsCollectionWithSize.hasSize(1)));
+    assertThat(handler.getPendingRequests().size(), is(0));
+    verify(handler).suspend(Long.MAX_VALUE);
   }
 
   @Test
-  public void shouldResumeRequestImmediatelyDueToNegativeTimeout() {
+  public void shouldResumeAsyncResponseDueToTimeoutExpired_2() {
     // given
-    when(fetchTopicBuilder.execute())
-      .thenReturn(Collections.<LockedExternalTask>emptyList());
-
-    ClockUtil.setCurrentTime(new Date(ClockUtil.getCurrentTime().getTime()));
+    doReturn(Collections.emptyList()).when(fetchTopicBuilder).execute();
 
     AsyncResponse asyncResponse = mock(AsyncResponse.class);
-    fetchAndLockHandler.addPendingRequest(createDto(-5000L), asyncResponse, processEngine);
+    handler.addPendingRequest(createDto(5000L), asyncResponse, processEngine);
+
+    addSecondsToClock(1);
+    handler.acquire();
+
+    // assume
+    assertThat(handler.getPendingRequests().size(), is(1));
+    verify(handler).suspend(4000L);
+
+    addSecondsToClock(4);
 
     // when
-    ClockUtil.setCurrentTime(new Date(ClockUtil.getCurrentTime().getTime() + 1000L));
-    long backOffTime = fetchAndLockHandler.checkPendingRequests();
+    handler.acquire();
 
     // then
-    verify(asyncResponse, times(1)).resume(Collections.emptyList());
-    assertThat(fetchAndLockHandler.getPendingRequests().size(), is(0));
-    assertThat(backOffTime, is(Long.MAX_VALUE));
+    verify(asyncResponse).resume(argThat(IsCollectionWithSize.hasSize(0)));
+    assertThat(handler.getPendingRequests().size(), is(0));
+    verify(handler).suspend(Long.MAX_VALUE);
   }
 
   @Test
-  public void shouldShutdownThreadGracefully() {
+  public void shouldResumeAsyncResponseDueToTimeoutExpired_3() {
     // given
+    doReturn(Collections.emptyList()).when(fetchTopicBuilder).execute();
+
     AsyncResponse asyncResponse = mock(AsyncResponse.class);
-    fetchAndLockHandler.addPendingRequest(createDto(FetchAndLockHandlerImpl.MAX_TIMEOUT), asyncResponse, processEngine);
-    fetchAndLockHandler.run();
+    handler.addPendingRequest(createDto(5000L), asyncResponse, processEngine);
+    handler.addPendingRequest(createDto(4000L), asyncResponse, processEngine);
+
+    addSecondsToClock(1);
+    handler.acquire();
+
+    // assume
+    assertThat(handler.getPendingRequests().size(), is(2));
+    verify(handler).suspend(3000L);
+
+    addSecondsToClock(4);
 
     // when
-    fetchAndLockHandler.shutdown();
-    fetchAndLockHandler.getHandlerThread().interrupt();
+    handler.acquire();
+
+    // then
+    verify(asyncResponse, times(2)).resume(Collections.emptyList());
+    assertThat(handler.getPendingRequests().size(), is(0));
+    verify(handler).suspend(Long.MAX_VALUE);
+  }
+
+  @Test
+  public void shouldResumeAsyncResponseImmediatelyDueToProcessEngineException() {
+    // given
+    doThrow(new ProcessEngineException()).when(fetchTopicBuilder).execute();
+
+    // when
+    AsyncResponse asyncResponse = mock(AsyncResponse.class);
+    handler.addPendingRequest(createDto(5000L), asyncResponse, processEngine);
+
+    // Then
+    assertThat(handler.getPendingRequests().size(), is(0));
+    verify(handler, never()).suspend(anyLong());
+    verify(asyncResponse).resume(any(ProcessEngineException.class));
+  }
+
+  @Test
+  public void shouldResumeAsyncResponseAfterBackoffDueToProcessEngineException() {
+    // given
+    doReturn(Collections.emptyList()).when(fetchTopicBuilder).execute();
+
+    AsyncResponse asyncResponse = mock(AsyncResponse.class);
+    handler.addPendingRequest(createDto(5000L), asyncResponse, processEngine);
+    handler.acquire();
+
+    // assume
+    assertThat(handler.getPendingRequests().size(), is(1));
+    verify(handler).suspend(5000L);
+
+    // when
+    doThrow(new ProcessEngineException()).when(fetchTopicBuilder).execute();
+    handler.acquire();
+
+    // then
+    assertThat(handler.getPendingRequests().size(), is(0));
+    verify(handler).suspend(Long.MAX_VALUE);
+    verify(asyncResponse).resume(any(ProcessEngineException.class));
+  }
+
+  @Test
+  public void shouldResumeAsyncResponseDueToTimeoutExceeded() {
+    // given - no pending requests
+
+    // assume
+    assertThat(handler.getPendingRequests().size(), is(0));
+
+    // when
+    AsyncResponse asyncResponse = mock(AsyncResponse.class);
+    handler.addPendingRequest(createDto(FetchAndLockHandlerImpl.MAX_TIMEOUT + 1), asyncResponse, processEngine);
+
+    // then
+    verify(handler, never()).suspend(anyLong());
+    assertThat(handler.getPendingRequests().size(), is(0));
+
+    ArgumentCaptor<InvalidRequestException> argumentCaptor = ArgumentCaptor.forClass(InvalidRequestException.class);
+    verify(asyncResponse).resume(argumentCaptor.capture());
+    assertThat(argumentCaptor.getValue().getMessage(), is("The asynchronous response timeout cannot " +
+      "be set to a value greater than " + FetchAndLockHandlerImpl.MAX_TIMEOUT +  " milliseconds"));
+  }
+
+  @Test
+  public void shouldResumeAsyncResponseDueToTooManyRequests() {
+    // given
+
+    // when
+    AsyncResponse asyncResponse = mock(AsyncResponse.class);
+    handler.errorTooManyRequests(asyncResponse);
 
     // then
     ArgumentCaptor<InvalidRequestException> argumentCaptor = ArgumentCaptor.forClass(InvalidRequestException.class);
-    verify(asyncResponse, times(1)).resume(argumentCaptor.capture());
+    verify(asyncResponse).resume(argumentCaptor.capture());
+    assertThat(argumentCaptor.getValue().getMessage(), is("At the moment the server has to handle too " +
+      "many requests at the same time. Please try again later."));
+  }
+
+  @Test
+  public void shouldSuspendForeverDueToNoPendingRequests() {
+    // given - no pending requests
+
+    // assume
+    assertThat(handler.getPendingRequests().size(), is(0));
+
+    // when
+    handler.acquire();
+
+    // then
+    assertThat(handler.getPendingRequests().size(), is(0));
+    verify(handler).suspend(Long.MAX_VALUE);
+  }
+
+  @Test
+  public void shouldRejectRequestDueToShutdown() {
+    // given
+    AsyncResponse asyncResponse = mock(AsyncResponse.class);
+    handler.addPendingRequest(createDto(5000L), asyncResponse, processEngine);
+    handler.acquire();
+
+    // assume
+    assertThat(handler.getPendingRequests().size(), is(1));
+
+    // when
+    handler.rejectPendingRequests();
+
+    // then
+    ArgumentCaptor<InvalidRequestException> argumentCaptor = ArgumentCaptor.forClass(InvalidRequestException.class);
+    verify(asyncResponse).resume(argumentCaptor.capture());
     assertThat(argumentCaptor.getValue().getMessage(), is("Request rejected due to shutdown of application server."));
   }
 
-  // helper /////////////////////////
-  private void assertConcurrent(List<? extends Runnable> runnables) throws InterruptedException {
-    final int numThreads = runnables.size();
-    final List<Throwable> exceptions = Collections.synchronizedList(new ArrayList<Throwable>());
-    final ExecutorService threadPool = Executors.newFixedThreadPool(numThreads);
-    try {
-        final CountDownLatch allExecutorThreadsReady = new CountDownLatch(numThreads);
-        final CountDownLatch afterInitBlocker = new CountDownLatch(1);
-        final CountDownLatch allDone = new CountDownLatch(numThreads);
-        for (final Runnable submittedTestRunnable : runnables) {
-            threadPool.submit(new Runnable() {
-                public void run() {
-                    allExecutorThreadsReady.countDown();
-                    try {
-                        afterInitBlocker.await();
-                        submittedTestRunnable.run();
-                    } catch (final Throwable e) {
-                        exceptions.add(e);
-                    } finally {
-                        allDone.countDown();
-                    }
-                }
-            });
-        }
-        // wait until all threads are ready
-        assertTrue("Timeout initializing threads! Perform long lasting initializations before passing runnables to assertConcurrent",
-          allExecutorThreadsReady.await(runnables.size() * 10, TimeUnit.MILLISECONDS));
+  protected FetchExternalTasksExtendedDto createDto(Long responseTimeout) {
+    FetchExternalTasksExtendedDto externalTask = new FetchExternalTasksExtendedDto();
 
-        // start all test runners
-        afterInitBlocker.countDown();
-        final int maxTimeoutSeconds = 3;
-        assertTrue("Timeout! More than " + maxTimeoutSeconds + " seconds to start runners", allDone.await(maxTimeoutSeconds, TimeUnit.SECONDS));
-    } finally {
-        threadPool.shutdownNow();
+    FetchExternalTasksExtendedDto.FetchExternalTaskTopicDto topic = new FetchExternalTasksExtendedDto.FetchExternalTaskTopicDto();
+    topic.setTopicName("aTopicName");
+    topic.setLockDuration(12354L);
+
+    externalTask.setMaxTasks(5);
+    externalTask.setWorkerId("aWorkerId");
+    externalTask.setTopics(Collections.singletonList(topic));
+
+    if (responseTimeout != null) {
+      externalTask.setAsyncResponseTimeout(responseTimeout);
     }
-    assertTrue("Failed with exception(s) " + exceptions, exceptions.isEmpty());
+
+    return externalTask;
   }
 
-  private FetchExternalTasksExtendedDto createDto(Long responseTimeout) {
-    FetchExternalTasksExtendedDto fetchExternalTasksDto = new FetchExternalTasksExtendedDto();
-    if (responseTimeout != null) {
-      fetchExternalTasksDto.setAsyncResponseTimeout(responseTimeout);
-    }
-    fetchExternalTasksDto.setMaxTasks(5);
-    fetchExternalTasksDto.setWorkerId("aWorkerId");
-    FetchExternalTasksExtendedDto.FetchExternalTaskTopicDto topicDto =
-      new FetchExternalTasksExtendedDto.FetchExternalTaskTopicDto();
-    fetchExternalTasksDto.setTopics(Collections.singletonList(topicDto));
-    topicDto.setTopicName("aTopicName");
-    topicDto.setLockDuration(12354L);
-    fetchExternalTasksDto.setTopics(Collections.singletonList(topicDto));
-    return fetchExternalTasksDto;
+  protected Date addSeconds(Date date, int seconds) {
+    return new Date(date.getTime() + seconds * 1000);
+  }
+
+  protected void addSecondsToClock(int seconds) {
+    Date newDate = addSeconds(ClockUtil.getCurrentTime(), seconds);
+    ClockUtil.setCurrentTime(newDate);
   }
 
 }

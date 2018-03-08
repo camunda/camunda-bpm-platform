@@ -26,7 +26,7 @@ import java.util.ServiceLoader;
  */
 public class FetchAndLockContextListener implements ServletContextListener {
 
-  private static FetchAndLockHandler fetchAndLockHandler;
+  protected static FetchAndLockHandler fetchAndLockHandler;
 
   @Override
   public void contextInitialized(ServletContextEvent sce) {
@@ -41,18 +41,18 @@ public class FetchAndLockContextListener implements ServletContextListener {
     fetchAndLockHandler.shutdown();
   }
 
-  static FetchAndLockHandler newInstance() {
+  public static FetchAndLockHandler getFetchAndLockHandler() {
     return fetchAndLockHandler;
   }
 
-  private FetchAndLockHandler lookupFetchAndLockHandler() {
+  protected FetchAndLockHandler lookupFetchAndLockHandler() {
     ServiceLoader<FetchAndLockHandler> serviceLoader = ServiceLoader.load(FetchAndLockHandler.class);
     Iterator<FetchAndLockHandler> iterator = serviceLoader.iterator();
     if(iterator.hasNext()) {
       return iterator.next();
     } else {
       throw new RestException(Response.Status.INTERNAL_SERVER_ERROR,
-        "Could not find an implementation of the " + FetchAndLockHandlerImpl.class.getSimpleName() + "- SPI");
+        "Could not find an implementation of the " + FetchAndLockHandler.class.getSimpleName() + "- SPI");
     }
   }
 

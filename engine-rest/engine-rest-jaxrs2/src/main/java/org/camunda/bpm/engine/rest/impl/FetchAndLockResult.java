@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.rest.impl;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.rest.dto.externaltask.LockedExternalTaskDto;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -22,8 +23,8 @@ import java.util.List;
  */
 public class FetchAndLockResult {
 
-  List<LockedExternalTaskDto> tasks;
-  ProcessEngineException processEngineException;
+  protected List<LockedExternalTaskDto> tasks = new ArrayList<LockedExternalTaskDto>();
+  protected ProcessEngineException processEngineException;
 
   public FetchAndLockResult(List<LockedExternalTaskDto> tasks) {
     this.tasks = tasks;
@@ -42,7 +43,7 @@ public class FetchAndLockResult {
   }
 
   public boolean wasSuccessful() {
-    return tasks != null && processEngineException == null;
+    return processEngineException == null;
   }
 
   public static FetchAndLockResult successful(List<LockedExternalTaskDto> tasks) {
