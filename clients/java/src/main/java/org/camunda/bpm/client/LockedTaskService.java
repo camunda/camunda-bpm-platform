@@ -21,11 +21,25 @@ public interface LockedTaskService {
 
   /**
    * Unlocks a task and clears the task’s lock expiration time and worker id.
+   *
+   * @throws UnlockTaskException
+   * <ul>
+   *   <li> if the task has been canceled and therefore does not exist anymore
+   *   <li> if the connection could not be established
+   * </ul>
    */
   void unlock();
 
   /**
    * Completes a task.
+   *
+   * @throws CompleteTaskException
+   * <ul>
+   *   <li> if the task's most recent lock could not be acquired
+   *   <li> if the task has been canceled and therefore does not exist anymore
+   *   <li> if the corresponding process instance could not be resumed
+   *   <li> if the connection could not be established
+   * </ul>
    */
   void complete();
 
@@ -42,6 +56,14 @@ public interface LockedTaskService {
    *                     to the {@param errorMessage} parameter.
    * @param retryTimeout specifies a timeout in milliseconds before the external task
    *                     becomes available again for fetching. Must be >= 0.
+   *
+   * @throws TaskFailureException
+   * <ul>
+   *   <li> if the task's most recent lock could not be acquired
+   *   <li> if the task has been canceled and therefore does not exist anymore
+   *   <li> if the corresponding process instance could not be resumed
+   *   <li> if the connection could not be established
+   * </ul>
    */
   void failure(String errorMessage, String errorDetails, int retries, long retryTimeout);
 
@@ -51,6 +73,14 @@ public interface LockedTaskService {
    *
    * @param errorCode that indicates the predefined error. The error code
    *                  is used to identify the BPMN error handler.
+   *
+   * @throws BpmnErrorException
+   * <ul>
+   *   <li> if the task's most recent lock could not be acquired
+   *   <li> if the task has been canceled and therefore does not exist anymore
+   *   <li> if the corresponding process instance could not be resumed
+   *   <li> if the connection could not be established
+   * </ul>
    */
   void bpmnError(String errorCode);
 
@@ -58,6 +88,13 @@ public interface LockedTaskService {
    * Extends the timeout of the lock by a given amount of time.
    *
    * @param newDuration specifies the the new lock duration in milliseconds
+   *
+   * @throws ExtendLockException
+   * <ul>
+   *   <li> if the task's most recent lock could not be acquired
+   *   <li> if the task has been canceled and therefore does not exist anymore
+   *   <li> if the connection could not be established
+   * </ul>
    */
   void extendLock(long newDuration);
 
