@@ -12,8 +12,8 @@
  */
 package org.camunda.bpm.client.helper;
 
-import org.camunda.bpm.client.LockedTask;
-import org.camunda.bpm.client.impl.dto.LockedTaskDto;
+import org.camunda.bpm.client.task.ExternalTask;
+import org.camunda.bpm.client.task.impl.ExternalTaskImpl;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -74,8 +74,8 @@ public class MockProvider {
     return variables;
   }
 
-  public static LockedTask createLockedTask() {
-    LockedTaskDto lockedTask = new LockedTaskDto();
+  public static ExternalTask createLockedTask() {
+    ExternalTaskImpl lockedTask = new ExternalTaskImpl();
     lockedTask.setActivityId(ACTIVITY_ID);
     lockedTask.setActivityInstanceId(ACTIVITY_INSTANCE_ID);
     lockedTask.setExecutionId(EXECUTION_ID);

@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.client.impl;
 
+import java.io.IOException;
+
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -19,8 +21,6 @@ import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.HttpContext;
-
-import java.io.IOException;
 
 /**
  * @author Tassilo Weidner

@@ -12,9 +12,8 @@
  */
 package org.camunda.bpm.client.impl;
 
-import org.camunda.bpm.client.CamundaClient;
-import org.camunda.bpm.client.CamundaClientException;
-import org.camunda.bpm.client.impl.engineclient.EngineClient;
+import org.camunda.bpm.client.ExternalTaskClient;
+import org.camunda.bpm.client.exception.CamundaClientException;
 import org.junit.Test;
 
 import java.net.UnknownHostException;
@@ -36,11 +35,11 @@ public class CamundaClientTest {
   @Test
   public void shouldSucceedAfterSanitizingEndpointUrl() {
     // given & when
-    CamundaClient camundaClient = CamundaClient.create()
+    ExternalTaskClient camundaClient = ExternalTaskClient.create()
       .endpointUrl(ENDPOINT_URL + " / / / ")
       .build();
 
-    CamundaClientImpl camundaClientImpl = ((CamundaClientImpl) camundaClient);
+    ExternalTaskClientImpl camundaClientImpl = ((ExternalTaskClientImpl) camundaClient);
     EngineClient engineClient = camundaClientImpl.getWorkerManager().getEngineClient();
 
     // then
@@ -52,7 +51,7 @@ public class CamundaClientTest {
   public void shouldThrowExceptionDueToEndpointUrlIsEmpty() {
     // given & When
     try {
-      CamundaClient.create()
+      ExternalTaskClient.create()
         .endpointUrl("")
         .build();
 
@@ -67,7 +66,7 @@ public class CamundaClientTest {
   public void shouldThrowExceptionDueToEndpointUrlIsNull() {
     // given & When
     try {
-      CamundaClient.create()
+      ExternalTaskClient.create()
         .endpointUrl(null)
         .build();
 
@@ -81,7 +80,7 @@ public class CamundaClientTest {
   @Test
   public void shouldThrowExceptionDueToUnknownHostname() throws UnknownHostException {
     // given
-    CamundaClientBuilderImpl camundaClientBuilder = spy(CamundaClientBuilderImpl.class);
+    ExternalTaskClientBuilderImpl camundaClientBuilder = spy(ExternalTaskClientBuilderImpl.class);
     when(camundaClientBuilder.getEndpointUrl()).thenReturn(ENDPOINT_URL);
     when(camundaClientBuilder.getHostname()).thenThrow(UnknownHostException.class);
 

@@ -1,0 +1,52 @@
+/* Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.camunda.bpm.client.topic.impl;
+
+import org.camunda.bpm.client.task.ExternalTaskHandler;
+import org.camunda.bpm.client.topic.TopicSubscription;
+
+/**
+ * @author Tassilo Weidner
+ */
+public class TopicSubscriptionImpl implements TopicSubscription {
+
+  protected String topicName;
+  protected long lockDuration;
+  protected ExternalTaskHandler lockedTaskHandler;
+  protected TopicSubscriptionManager topicSubscriptionManager;
+
+  public TopicSubscriptionImpl(String topicName, long lockDuration, ExternalTaskHandler lockedTaskHandler, TopicSubscriptionManager topicSubscriptionManager) {
+    this.topicName = topicName;
+    this.lockDuration = lockDuration;
+    this.lockedTaskHandler = lockedTaskHandler;
+    this.topicSubscriptionManager = topicSubscriptionManager;
+  }
+
+  public String getTopicName() {
+    return topicName;
+  }
+
+  public long getLockDuration() {
+    return lockDuration;
+  }
+
+  public ExternalTaskHandler getLockedTaskHandler() {
+    return lockedTaskHandler;
+  }
+
+  @Override
+  public void close() {
+    topicSubscriptionManager.unsubscribe(this);
+  }
+
+}
