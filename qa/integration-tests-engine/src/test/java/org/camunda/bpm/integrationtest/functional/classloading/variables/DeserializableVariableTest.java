@@ -45,7 +45,6 @@ public class DeserializableVariableTest extends AbstractFoxPlatformIntegrationTe
     TestContainer.addContainerSpecificResources(webArchive);
 
     return webArchive;
-
   }
 
   @Test
@@ -62,18 +61,13 @@ public class DeserializableVariableTest extends AbstractFoxPlatformIntegrationTe
       .execute();
 
     // then
+
     // Since the variable retrieval is done outside the Process Application Context as well,
     // custom object deserialization is disabled and a null check is performed
     List<HistoricVariableInstance> variableInstances = historyService.createHistoricVariableInstanceQuery().disableCustomObjectDeserialization().list();
     for (HistoricVariableInstance variable : variableInstances) {
       if (variable.getProcessInstanceId() != pi.getId() && variable instanceof HistoricVariableInstanceEntity) {
-        Exception exception = null;
-        try {
-          Assert.assertNotNull(((HistoricVariableInstanceEntity) variable).getByteArrayValue());
-        } catch (NullPointerException e) {
-          exception = e;
-        }
-        Assert.assertNull(exception);
+        Assert.assertNotNull(((HistoricVariableInstanceEntity) variable).getByteArrayValue());
       }
     }
   }
