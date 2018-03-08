@@ -60,7 +60,7 @@ public class WorkerSubscriptionBuilderImpl implements WorkerSubscriptionBuilder 
 
     checkTopicNameAlreadySubscribed();
 
-    WorkerSubscriptionImpl subscription = new WorkerSubscriptionImpl(topicName, lockDuration, lockedTaskHandler);
+    WorkerSubscriptionImpl subscription = new WorkerSubscriptionImpl(topicName, lockDuration, lockedTaskHandler, workerManager);
     workerManager.addSubscription(subscription);
     return subscription;
   }

@@ -188,6 +188,30 @@ public class SubscriptionTest {
   }
 
   @Test
+  public void shouldUnsubscribeFromTopic() {
+    // given
+    WorkerSubscription topicSubscription = camundaClient.subscribe(MockProvider.TOPIC_NAME)
+      .lockDuration(5000)
+      .handler(mock(LockedTaskHandler.class))
+      .open();
+
+    // when
+    topicSubscription.close();
+
+    // then
+    try {
+      camundaClient.subscribe(MockProvider.TOPIC_NAME)
+        .lockDuration(5000)
+        .handler(mock(LockedTaskHandler.class))
+        .open();
+    } catch (CamundaClientException e) {
+      fail("CamundaClientException thrown!");
+    }
+    
+    camundaClient.shutdown();
+  }
+
+  @Test
   public void shouldExecuteHandler() throws IOException, InterruptedException {
     // given
     List<LockedTask> lockedTasks = new ArrayList<LockedTask>();

@@ -110,6 +110,10 @@ public class WorkerManager implements Runnable {
     subscriptions.add(subscription);
   }
 
+  void unsubscribe(WorkerSubscriptionImpl subscription) {
+    subscriptions.remove(subscription);
+  }
+
   EngineClient getEngineClient() {
     return engineClient;
   }

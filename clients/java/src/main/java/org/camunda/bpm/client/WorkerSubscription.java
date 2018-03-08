@@ -19,4 +19,9 @@ package org.camunda.bpm.client;
  */
 public interface WorkerSubscription {
 
+  /**
+   * The worker has been unsubscribed from the topic
+   */
+  void close();
+
 }

@@ -23,11 +23,13 @@ class WorkerSubscriptionImpl implements WorkerSubscription {
   private String topicName;
   private long lockDuration;
   private LockedTaskHandler lockedTaskHandler;
+  private WorkerManager workerManager;
 
-  WorkerSubscriptionImpl(String topicName, long lockDuration, LockedTaskHandler lockedTaskHandler) {
+  WorkerSubscriptionImpl(String topicName, long lockDuration, LockedTaskHandler lockedTaskHandler, WorkerManager workerManager) {
     this.topicName = topicName;
     this.lockDuration = lockDuration;
     this.lockedTaskHandler = lockedTaskHandler;
+    this.workerManager = workerManager;
   }
 
   String getTopicName() {
@@ -40,6 +42,11 @@ class WorkerSubscriptionImpl implements WorkerSubscription {
 
   LockedTaskHandler getLockedTaskHandler() {
     return lockedTaskHandler;
+  }
+
+  @Override
+  public void close() {
+    workerManager.unsubscribe(this);
   }
 
 }
