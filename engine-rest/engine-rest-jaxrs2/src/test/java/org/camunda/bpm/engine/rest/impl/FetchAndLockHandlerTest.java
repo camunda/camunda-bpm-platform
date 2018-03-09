@@ -25,10 +25,11 @@ import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.hamcrest.collection.IsCollectionWithSize;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import javax.ws.rs.container.AsyncResponse;
 import java.util.ArrayList;
@@ -55,8 +56,9 @@ import static org.mockito.Mockito.when;
 /**
  * @author Tassilo Weidner
  */
+@RunWith(MockitoJUnitRunner.class)
 public class FetchAndLockHandlerTest {
-  
+
   @Mock
   protected ProcessEngine processEngine;
   
@@ -78,8 +80,6 @@ public class FetchAndLockHandlerTest {
 
   @Before
   public void initMocks() {
-    MockitoAnnotations.initMocks(this);
-    
     when(processEngine.getIdentityService()).thenReturn(identityService);
     when(processEngine.getExternalTaskService()).thenReturn(externalTaskService);
 

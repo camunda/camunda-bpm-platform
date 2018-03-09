@@ -27,15 +27,15 @@ import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
 import org.camunda.bpm.engine.rest.dto.externaltask.FetchExternalTasksExtendedDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
-import org.camunda.bpm.engine.rest.impl.FetchAndLockContextListener;
-import org.camunda.bpm.engine.rest.impl.FetchAndLockHandlerImpl;
-import org.camunda.bpm.engine.rest.impl.NamedProcessEngineRestServiceImpl;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import javax.ws.rs.core.Response.Status;
 import java.util.ArrayList;
@@ -65,6 +65,7 @@ import static org.mockito.Mockito.when;
 /**
  * @author Tassilo Weidner
  */
+@RunWith(MockitoJUnitRunner.class)
 public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceTest {
 
   @ClassRule
@@ -73,29 +74,41 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
   private static final String FETCH_EXTERNAL_TASK_URL =  "/external-task/fetchAndLock";
   private static final String FETCH_EXTERNAL_TASK_URL_NAMED_ENGINE =  NamedProcessEngineRestServiceImpl.PATH + "/{name}" + FETCH_EXTERNAL_TASK_URL;
 
+  @Mock
   private ExternalTaskService externalTaskService;
-  private ExternalTaskQueryTopicBuilder fetchTopicBuilder;
-  private LockedExternalTask lockedExternalTaskMock;
 
+  @Mock
+  private ExternalTaskQueryTopicBuilder fetchTopicBuilder;
+
+  @Mock
   private IdentityService identityServiceMock;
+
+  private LockedExternalTask lockedExternalTaskMock;
 
   private List<String> groupIds;
   private List<String> tenantIds;
 
   @Before
   public void setUpRuntimeData() {
-    externalTaskService = mock(ExternalTaskService.class);
-    when(processEngine.getExternalTaskService()).thenReturn(externalTaskService);
-    fetchTopicBuilder = mock(ExternalTaskQueryTopicBuilder.class);
+    when(processEngine.getExternalTaskService())
+      .thenReturn(externalTaskService);
+
     lockedExternalTaskMock = MockProvider.createMockLockedExternalTask();
-    when(externalTaskService.fetchAndLock(anyInt(), any(String.class), any(Boolean.class))).thenReturn(fetchTopicBuilder);
-    when(fetchTopicBuilder.topic(any(String.class), anyLong())).thenReturn(fetchTopicBuilder);
-    when(fetchTopicBuilder.variables(anyListOf(String.class))).thenReturn(fetchTopicBuilder);
-    when(fetchTopicBuilder.enableCustomObjectDeserialization()).thenReturn(fetchTopicBuilder);
+    when(externalTaskService.fetchAndLock(anyInt(), any(String.class), any(Boolean.class)))
+      .thenReturn(fetchTopicBuilder);
+
+    when(fetchTopicBuilder.topic(any(String.class), anyLong()))
+      .thenReturn(fetchTopicBuilder);
+
+    when(fetchTopicBuilder.variables(anyListOf(String.class)))
+      .thenReturn(fetchTopicBuilder);
+
+    when(fetchTopicBuilder.enableCustomObjectDeserialization())
+      .thenReturn(fetchTopicBuilder);
 
     // for authentication
-    identityServiceMock = mock(IdentityService.class);
-    when(processEngine.getIdentityService()).thenReturn(identityServiceMock);
+    when(processEngine.getIdentityService())
+      .thenReturn(identityServiceMock);
 
     List<Group> groupMocks = MockProvider.createMockGroups();
     groupIds = setupGroupQueryMock(groupMocks);
