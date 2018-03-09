@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl.bpmn.parser;
 
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
+import org.camunda.bpm.engine.impl.core.model.CallableElement;
 import org.camunda.bpm.engine.impl.el.Expression;
 import org.camunda.bpm.engine.impl.el.StartProcessVariableScope;
 import org.camunda.bpm.engine.impl.event.EventType;
@@ -30,7 +31,6 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.Map;
 
-
 /**
  * @author Daniel Meyer
  * @author Falko Menge
@@ -42,6 +42,7 @@ public class EventSubscriptionDeclaration implements Serializable {
 
   protected final EventType eventType;
   protected final Expression eventName;
+  protected final CallableElement eventPayload;
 
   protected boolean async;
   protected String activityId = null;
@@ -53,6 +54,13 @@ public class EventSubscriptionDeclaration implements Serializable {
   public EventSubscriptionDeclaration(Expression eventExpression, EventType eventType) {
     this.eventName = eventExpression;
     this.eventType = eventType;
+    this.eventPayload = null;
+  }
+
+  public EventSubscriptionDeclaration(Expression eventExpression, EventType eventType, CallableElement eventPayload) {
+    this.eventType = eventType;
+    this.eventName = eventExpression;
+    this.eventPayload = eventPayload;
   }
 
   public static Map<String, EventSubscriptionDeclaration> getDeclarationsForScope(PvmScope scope) {
@@ -112,6 +120,10 @@ public class EventSubscriptionDeclaration implements Serializable {
 
   public String getEventType() {
     return eventType.name();
+  }
+
+  public CallableElement getEventPayload() {
+    return eventPayload;
   }
 
   public void setJobDeclaration(EventSubscriptionJobDeclaration jobDeclaration) {

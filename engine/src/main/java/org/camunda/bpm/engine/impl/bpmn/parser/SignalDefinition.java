@@ -29,7 +29,6 @@ public class SignalDefinition implements Serializable {
   protected String id;
   protected Expression name;
 
-    
   public String getId() {
     return id;
   }
@@ -49,4 +48,5 @@ public class SignalDefinition implements Serializable {
   public void setExpression(Expression name) {
     this.name = name;
   }
+
 }

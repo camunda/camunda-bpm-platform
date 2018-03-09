@@ -16,14 +16,13 @@ package org.camunda.bpm.engine.impl.bpmn.behavior;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.el.Expression;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
+import org.camunda.bpm.engine.variable.VariableMap;
 
 import java.util.List;
-
 
 /**
  * Defines activity behavior for signal end event and intermediate throw signal event.
@@ -43,6 +42,9 @@ public class ThrowSignalEventActivityBehavior extends AbstractBpmnActivityBehavi
   @Override
   public void execute(ActivityExecution execution) throws Exception {
 
+    String businessKey = signalDefinition.getEventPayload().getBusinessKey(execution);
+    VariableMap variableMap = signalDefinition.getEventPayload().getInputVariables(execution);
+
     String eventName = signalDefinition.resolveExpressionOfEventName(execution);
     // trigger all event subscriptions for the signal (start and intermediate)
     List<EventSubscriptionEntity> signalEventSubscriptions =
@@ -50,7 +52,7 @@ public class ThrowSignalEventActivityBehavior extends AbstractBpmnActivityBehavi
 
     for (EventSubscriptionEntity signalEventSubscription : signalEventSubscriptions) {
       if (isActiveEventSubscription(signalEventSubscription)) {
-        signalEventSubscription.eventReceived(null, signalDefinition.isAsync());
+        signalEventSubscription.eventReceived(variableMap, businessKey, signalDefinition.isAsync());
       }
     }
     leave(execution);

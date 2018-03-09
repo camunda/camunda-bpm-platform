@@ -22,11 +22,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValueProvider;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.HasDbReferences;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
-import org.camunda.bpm.engine.impl.el.Expression;
 import org.camunda.bpm.engine.impl.event.EventHandler;
 import org.camunda.bpm.engine.impl.event.EventType;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -82,28 +80,39 @@ public class EventSubscriptionEntity implements EventSubscription, DbEntity, Has
   }
 
   // processing /////////////////////////////
-
   public void eventReceived(Object payload, boolean processASync) {
     if(processASync) {
-      scheduleEventAsync(payload);
+      scheduleEventAsync(payload, null);
     } else {
-      processEventSync(payload);
+      processEventSync(payload, null);
+    }
+  }
+
+  public void eventReceived(Object payload, String businessKey, boolean processASync) {
+    if(processASync) {
+      scheduleEventAsync(payload, businessKey);
+    } else {
+      processEventSync(payload, businessKey);
     }
   }
 
   protected void processEventSync(Object payload) {
-    EventHandler eventHandler = Context.getProcessEngineConfiguration().getEventHandler(eventType);
-    ensureNotNull("Could not find eventhandler for event of type '" + eventType + "'", "eventHandler", eventHandler);
-    eventHandler.handleEvent(this, payload, Context.getCommandContext());
+    this.processEventSync(payload, null);
   }
 
-  protected void scheduleEventAsync(Object payload) {
+  protected void processEventSync(Object payload, String businessKey) {
+    EventHandler eventHandler = Context.getProcessEngineConfiguration().getEventHandler(eventType);
+    ensureNotNull("Could not find eventhandler for event of type '" + eventType + "'", "eventHandler", eventHandler);
+    eventHandler.handleEvent(this, payload, businessKey, Context.getCommandContext());
+  }
+
+  protected void scheduleEventAsync(Object payload, String businessKey) {
 
     EventSubscriptionJobDeclaration asyncDeclaration = getJobDeclaration();
 
     if (asyncDeclaration == null) {
       // fallback to sync if we couldn't find a job declaration
-      processEventSync(payload);
+      processEventSync(payload, businessKey);
     }
     else {
       MessageEntity message = asyncDeclaration.createJobInstance(this);

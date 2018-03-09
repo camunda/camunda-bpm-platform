@@ -16,7 +16,6 @@ package org.camunda.bpm.engine.impl.event;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 
-
 /**
  * @author Daniel Meyer
  */
@@ -24,6 +23,6 @@ public interface EventHandler {
 
   public String getEventHandlerType();
 
-  public void handleEvent(EventSubscriptionEntity eventSubscription, Object payload, CommandContext commandContext);
+  public void handleEvent(EventSubscriptionEntity eventSubscription, Object payload, String businessKey, CommandContext commandContext);
 
 }

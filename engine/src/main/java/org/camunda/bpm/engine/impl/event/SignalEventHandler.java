@@ -13,7 +13,6 @@
 
 package org.camunda.bpm.engine.impl.event;
 
-
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmd.CommandLogger;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -23,9 +22,10 @@ import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
+
+import java.util.Map;
+
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
-
-
 
 /**
  * @author Daniel Meyer
@@ -38,7 +38,7 @@ public class SignalEventHandler extends EventHandlerImpl {
     super(EventType.SIGNAL);
   }
 
-  protected void handleStartEvent(EventSubscriptionEntity eventSubscription, Object payload, CommandContext commandContext) {
+  protected void handleStartEvent(EventSubscriptionEntity eventSubscription, Map<String, Object> payload, String businessKey, CommandContext commandContext) {
     String processDefinitionId = eventSubscription.getConfiguration();
     ensureNotNull("Configuration of signal start event subscription '" + eventSubscription.getId() + "' contains no process definition id.",
         processDefinitionId);
@@ -49,20 +49,19 @@ public class SignalEventHandler extends EventHandlerImpl {
       // ignore event subscription
       LOG.debugIgnoringEventSubscription(eventSubscription, processDefinitionId);
     } else {
-
       ActivityImpl signalStartEvent = processDefinition.findActivity(eventSubscription.getActivityId());
-      PvmProcessInstance processInstance = processDefinition.createProcessInstanceForInitial(signalStartEvent);
-      processInstance.start();
+      PvmProcessInstance processInstance = processDefinition.createProcessInstance(businessKey, signalStartEvent);
+      processInstance.start(payload);
     }
   }
 
   @Override
-  public void handleEvent(EventSubscriptionEntity eventSubscription, Object payload, CommandContext commandContext) {
+  public void handleEvent(EventSubscriptionEntity eventSubscription, Object payload, String businessKey, CommandContext commandContext) {
     if (eventSubscription.getExecutionId() != null) {
       handleIntermediateEvent(eventSubscription, payload, commandContext);
     }
     else {
-      handleStartEvent(eventSubscription, payload, commandContext);
+      handleStartEvent(eventSubscription, (Map<String, Object>) payload, businessKey, commandContext);
     }
   }
 

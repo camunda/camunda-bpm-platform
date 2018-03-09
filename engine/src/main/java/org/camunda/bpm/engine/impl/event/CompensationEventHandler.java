@@ -38,7 +38,7 @@ public class CompensationEventHandler implements EventHandler {
   }
 
   @Override
-  public void handleEvent(EventSubscriptionEntity eventSubscription, Object payload, CommandContext commandContext) {
+  public void handleEvent(EventSubscriptionEntity eventSubscription, Object payload, String businessKey, CommandContext commandContext) {
     eventSubscription.delete();
 
     String configuration = eventSubscription.getConfiguration();
