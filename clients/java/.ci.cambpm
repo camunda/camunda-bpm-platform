@@ -1,1 +1,1 @@
-buildMavenAndDeployToMavenCentral([jdk:8])
+buildMavenAndDeployToMavenCentral([jdk:8, mvn:3.5])
