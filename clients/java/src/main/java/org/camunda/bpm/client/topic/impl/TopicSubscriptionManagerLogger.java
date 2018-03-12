@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.client.topic.impl;
 
-import org.camunda.bpm.client.exception.CamundaClientException;
+import org.camunda.bpm.client.exception.ExternalTaskClientException;
 import org.camunda.bpm.client.impl.EngineClientException;
 import org.camunda.bpm.client.impl.ExternalTaskClientLogger;
 
@@ -36,7 +36,7 @@ public class TopicSubscriptionManagerLogger extends ExternalTaskClientLogger {
       "003", "Exception while shutting down '{}'", e);
   }
 
-  public void exceptionOnLockedTaskServiceMethodInvocation(CamundaClientException e) {
+  public void exceptionOnLockedTaskServiceMethodInvocation(ExternalTaskClientException e) {
     logError(
       "004", "Exception on locked task service method invocation '{}'", e);
   }

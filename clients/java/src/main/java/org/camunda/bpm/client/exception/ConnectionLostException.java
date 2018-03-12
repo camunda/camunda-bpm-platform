@@ -12,15 +12,15 @@
  */
 package org.camunda.bpm.client.exception;
 
-import org.camunda.bpm.client.task.ExternalTaskService;
-
 /**
- * <p>Unlock task exception is thrown if an exception occurred while executing {@link ExternalTaskService#unlock()}</p>
+ * <p>Exception is thrown if the connection could not be established</p>
  *
  * @author Tassilo Weidner
  */
-public class UnlockTaskException extends CamundaClientException {
-  public UnlockTaskException(String message) {
+public class ConnectionLostException extends ExternalTaskClientException {
+
+  public ConnectionLostException(String message) {
     super(message);
   }
+
 }

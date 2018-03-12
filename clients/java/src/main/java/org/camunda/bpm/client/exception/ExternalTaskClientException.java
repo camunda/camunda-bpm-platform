@@ -13,14 +13,18 @@
 package org.camunda.bpm.client.exception;
 
 /**
- * <p>Camunda client exception is thrown on invalid user input</p>
+ * <p>External task client exception</p>
  *
  * @author Tassilo Weidner
  */
-public class CamundaClientException extends RuntimeException {
+public class ExternalTaskClientException extends RuntimeException {
 
-  public CamundaClientException(String message) {
+  public ExternalTaskClientException(String message) {
     super(message);
+  }
+
+  public ExternalTaskClientException(String message, Throwable e) {
+    super(message, e);
   }
 
 }

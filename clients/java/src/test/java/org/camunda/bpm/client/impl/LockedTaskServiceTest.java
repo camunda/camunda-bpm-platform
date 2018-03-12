@@ -18,6 +18,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
 import org.apache.http.StatusLine;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -27,11 +28,10 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.protocol.HttpContext;
 import org.camunda.bpm.client.ExternalTaskClient;
-import org.camunda.bpm.client.exception.BpmnErrorException;
-import org.camunda.bpm.client.exception.CompleteTaskException;
-import org.camunda.bpm.client.exception.ExtendLockException;
-import org.camunda.bpm.client.exception.TaskFailureException;
-import org.camunda.bpm.client.exception.UnlockTaskException;
+import org.camunda.bpm.client.exception.NotAcquiredException;
+import org.camunda.bpm.client.exception.ConnectionLostException;
+import org.camunda.bpm.client.exception.NotFoundException;
+import org.camunda.bpm.client.exception.NotResumedException;
 import org.camunda.bpm.client.helper.MockProvider;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskHandler;
@@ -318,218 +318,159 @@ public class LockedTaskServiceTest {
   }
 
   @Test
-  public void shouldThrowUnlockTaskException() throws IOException {
+  public void shouldThrowNotFoundExceptionOnUnlockingTask() throws IOException {
     // given
-    CloseableHttpClient httpClient = mockHttpResponseException(EngineClient.UNLOCK_RESOURCE_PATH);
+    CloseableHttpClient httpClient = mockHttpResponseException(EngineClient.UNLOCK_RESOURCE_PATH, 404);
 
-    ExternalTaskClient camundaClient = ExternalTaskClient.create()
+    ExternalTaskClient externalTaskClient = ExternalTaskClient.create()
       .endpointUrl(MockProvider.ENDPOINT_URL)
       .build();
 
     final AtomicBoolean exceptionThrown = new AtomicBoolean(false);
-    final List<UnlockTaskException> unlockTaskException = new ArrayList<UnlockTaskException>(); // list, as container must be final and changeable
-    ExternalTaskHandler lockedTaskHandler = new ExternalTaskHandler() {
-      @Override
-      public void execute(ExternalTask lockedTask, ExternalTaskService lockedTaskService) {
-        try {
-          lockedTaskService.unlock();
-        } catch (UnlockTaskException e) {
-          unlockTaskException.add(e);
-          exceptionThrown.set(true);
-        }
-      }
-    };
+    final List<NotFoundException> notFoundException = new ArrayList<>(); // list, as container must be final and changeable
 
-    TopicSubscriptionBuilder workerSubscriptionBuilder =
-      camundaClient.subscribe(MockProvider.TOPIC_NAME)
+    TopicSubscriptionBuilder topicSubscriptionBuilder =
+      externalTaskClient.subscribe(MockProvider.TOPIC_NAME)
         .lockDuration(5000)
-        .handler(lockedTaskHandler);
+        .handler((lockedTask, lockedTaskService) -> {
+          try {
+            lockedTaskService.unlock();
+          } catch (NotFoundException e) {
+            notFoundException.add(e);
+            exceptionThrown.set(true);
+          }
+        });
 
     // when
-    workerSubscriptionBuilder.open();
+    topicSubscriptionBuilder.open();
 
     while (!exceptionThrown.get()) {
       // sync
     }
 
     // then
-    assertThat(unlockTaskException.get(0).getMessage(), containsString("Exception while unlocking task"));
-    assertThat(unlockTaskException.get(0).getMessage(), containsString("returned error: status code '404' - message: Not Found!"));
+    assertThat(notFoundException.get(0).getMessage(),
+      containsString("Exception while unlocking the external task: The task could not be found"));
     assertRequestPerformed(EngineClient.UNLOCK_RESOURCE_PATH, httpClient);
 
-    camundaClient.shutdown();
+    externalTaskClient.shutdown();
   }
 
   @Test
-  public void shouldThrowCompleteTaskException() throws IOException {
+  public void shouldThrowNotResumedExceptionOnCompletingTask() throws IOException {
     // given
-    CloseableHttpClient httpClient = mockHttpResponseException(EngineClient.COMPLETE_RESOURCE_PATH);
+    CloseableHttpClient httpClient = mockHttpResponseException(EngineClient.COMPLETE_RESOURCE_PATH, 500);
 
-    ExternalTaskClient camundaClient = ExternalTaskClient.create()
+    ExternalTaskClient externalTaskClient = ExternalTaskClient.create()
       .endpointUrl(MockProvider.ENDPOINT_URL)
       .build();
 
     final AtomicBoolean exceptionThrown = new AtomicBoolean(false);
-    final List<CompleteTaskException> completeTaskException = new ArrayList<CompleteTaskException>(); // list, as container must be final and changeable
-    ExternalTaskHandler lockedTaskHandler = new ExternalTaskHandler() {
-      @Override
-      public void execute(ExternalTask lockedTask, ExternalTaskService lockedTaskService) {
-        try {
-          lockedTaskService.complete();
-        } catch (CompleteTaskException e) {
-          completeTaskException.add(e);
-          exceptionThrown.set(true);
-        }
-      }
-    };
+    final List<NotResumedException> notResumedException = new ArrayList<>(); // list, as container must be final and changeable
 
-    TopicSubscriptionBuilder workerSubscriptionBuilder =
-      camundaClient.subscribe(MockProvider.TOPIC_NAME)
+    TopicSubscriptionBuilder topicSubscriptionBuilder =
+      externalTaskClient.subscribe(MockProvider.TOPIC_NAME)
         .lockDuration(5000)
-        .handler(lockedTaskHandler);
+        .handler((lockedTask, lockedTaskService) -> {
+          try {
+            lockedTaskService.complete();
+          } catch (NotResumedException e) {
+            notResumedException.add(e);
+            exceptionThrown.set(true);
+          }
+        });
 
     // when
-    workerSubscriptionBuilder.open();
+    topicSubscriptionBuilder.open();
 
     while (!exceptionThrown.get()) {
       // sync
     }
 
     // then
-    assertThat(completeTaskException.get(0).getMessage(), containsString("Exception while completing task"));
-    assertThat(completeTaskException.get(0).getMessage(), containsString("returned error: status code '404' - message: Not Found!"));
+    assertThat(notResumedException.get(0).getMessage(),
+      containsString("Exception while completing the external task: The corresponding process instance could not be resumed"));
     assertRequestPerformed(EngineClient.COMPLETE_RESOURCE_PATH, httpClient);
 
-    camundaClient.shutdown();
+    externalTaskClient.shutdown();
   }
 
   @Test
-  public void shouldThrowTaskFailureException() throws IOException {
+  public void shouldThrowNotAcquiredExceptionOnNotifyingTaskFailure() throws IOException {
     // given
-    CloseableHttpClient httpClient = mockHttpResponseException(EngineClient.FAILURE_RESOURCE_PATH);
+    CloseableHttpClient httpClient = mockHttpResponseException(EngineClient.FAILURE_RESOURCE_PATH, 400);
 
-    ExternalTaskClient camundaClient = ExternalTaskClient.create()
+    ExternalTaskClient externalTaskClient = ExternalTaskClient.create()
       .endpointUrl(MockProvider.ENDPOINT_URL)
       .build();
 
     final AtomicBoolean exceptionThrown = new AtomicBoolean(false);
-    final List<TaskFailureException> taskFailureException = new ArrayList<TaskFailureException>(); // list, as container must be final and changeable
-    ExternalTaskHandler lockedTaskHandler = new ExternalTaskHandler() {
-      @Override
-      public void execute(ExternalTask lockedTask, ExternalTaskService lockedTaskService) {
-        try {
-          lockedTaskService.failure(MockProvider.ERROR_MESSAGE, MockProvider.ERROR_DETAILS, MockProvider.RETRIES, MockProvider.RETRY_TIMEOUT);
-        } catch (TaskFailureException e) {
-          taskFailureException.add(e);
-          exceptionThrown.set(true);
-        }
-      }
-    };
+    final List<NotAcquiredException> notAcquiredException = new ArrayList<>(); // list, as container must be final and changeable
 
-    TopicSubscriptionBuilder workerSubscriptionBuilder =
-      camundaClient.subscribe(MockProvider.TOPIC_NAME)
+    TopicSubscriptionBuilder topicSubscriptionBuilder =
+      externalTaskClient.subscribe(MockProvider.TOPIC_NAME)
         .lockDuration(5000)
-        .handler(lockedTaskHandler);
+        .handler((lockedTask, lockedTaskService) -> {
+          try {
+            lockedTaskService.failure(MockProvider.ERROR_MESSAGE, MockProvider.ERROR_DETAILS, MockProvider.RETRIES, MockProvider.RETRY_TIMEOUT);
+          } catch (NotAcquiredException e) {
+            notAcquiredException.add(e);
+            exceptionThrown.set(true);
+          }
+        });
 
     // when
-    workerSubscriptionBuilder.open();
+    topicSubscriptionBuilder.open();
 
     while (!exceptionThrown.get()) {
       // sync
     }
 
     // then
-    assertThat(taskFailureException.get(0).getMessage(), containsString("Exception while notifying task failure"));
-    assertThat(taskFailureException.get(0).getMessage(), containsString("returned error: status code '404' - message: Not Found!"));
+    assertThat(notAcquiredException.get(0).getMessage(),
+      containsString("Exception while notifying a failure: The task's most recent lock could not be acquired"));
     assertRequestPerformed(EngineClient.FAILURE_RESOURCE_PATH, httpClient);
 
-    camundaClient.shutdown();
+    externalTaskClient.shutdown();
   }
 
   @Test
-  public void shouldThrowBpmnErrorException() throws IOException {
+  public void shouldThrowConnectionLostExceptionOnNotifyingBpmnError() throws IOException {
     // given
-    CloseableHttpClient httpClient = mockHttpResponseException(EngineClient.BPMN_ERROR_RESOURCE_PATH);
+    CloseableHttpClient httpClient = mockHttpResponseException(EngineClient.BPMN_ERROR_RESOURCE_PATH, null);
 
-    ExternalTaskClient camundaClient = ExternalTaskClient.create()
+    ExternalTaskClient externalTaskClient = ExternalTaskClient.create()
       .endpointUrl(MockProvider.ENDPOINT_URL)
       .build();
 
     final AtomicBoolean exceptionThrown = new AtomicBoolean(false); // list, as container must be final and changeable
-    final List<BpmnErrorException> bpmnErrorException = new ArrayList<BpmnErrorException>();
-    ExternalTaskHandler lockedTaskHandler = new ExternalTaskHandler() {
-      @Override
-      public void execute(ExternalTask lockedTask, ExternalTaskService lockedTaskService) {
-        try {
-          lockedTaskService.bpmnError(MockProvider.ERROR_CODE);
-        } catch (BpmnErrorException e) {
-          bpmnErrorException.add(e);
-          exceptionThrown.set(true);
-        }
-      }
-    };
+    final List<ConnectionLostException> connectionLostException = new ArrayList<>();
 
-    TopicSubscriptionBuilder workerSubscriptionBuilder =
-      camundaClient.subscribe(MockProvider.TOPIC_NAME)
+    TopicSubscriptionBuilder topicSubscriptionBuilder =
+      externalTaskClient.subscribe(MockProvider.TOPIC_NAME)
         .lockDuration(5000)
-        .handler(lockedTaskHandler);
+        .handler((lockedTask, lockedTaskService) -> {
+          try {
+            lockedTaskService.bpmnError(MockProvider.ERROR_CODE);
+          } catch (ConnectionLostException e) {
+            connectionLostException.add(e);
+            exceptionThrown.set(true);
+          }
+        });
 
     // when
-    workerSubscriptionBuilder.open();
+    topicSubscriptionBuilder.open();
 
     while (!exceptionThrown.get()) {
       // sync
     }
 
     // then
-    assertThat(bpmnErrorException.get(0).getMessage(), containsString("Exception while notifying bpmn error"));
-    assertThat(bpmnErrorException.get(0).getMessage(), containsString("returned error: status code '404' - message: Not Found!"));
+    assertThat(connectionLostException.get(0).getMessage(),
+      containsString("Exception while notifying a BPMN error: Connection could not be established"));
     assertRequestPerformed(EngineClient.BPMN_ERROR_RESOURCE_PATH, httpClient);
 
-    camundaClient.shutdown();
-  }
-
-  @Test
-  public void shouldThrowExtendLockException() throws IOException {
-    // given
-    CloseableHttpClient httpClient = mockHttpResponseException(EngineClient.EXTEND_LOCK_RESOURCE_PATH);
-
-    ExternalTaskClient camundaClient = ExternalTaskClient.create()
-      .endpointUrl(MockProvider.ENDPOINT_URL)
-      .build();
-
-    final AtomicBoolean exceptionThrown = new AtomicBoolean(false);
-    final List<ExtendLockException> extendLockException = new ArrayList<ExtendLockException>(); // list, as container must be final and changeable
-    ExternalTaskHandler lockedTaskHandler = new ExternalTaskHandler() {
-      @Override
-      public void execute(ExternalTask lockedTask, ExternalTaskService lockedTaskService) {
-        try {
-          lockedTaskService.extendLock(MockProvider.NEW_DURATION);
-        } catch (ExtendLockException e) {
-          extendLockException.add(e);
-          exceptionThrown.set(true);
-        }
-      }
-    };
-
-    TopicSubscriptionBuilder workerSubscriptionBuilder =
-      camundaClient.subscribe(MockProvider.TOPIC_NAME)
-        .lockDuration(5000)
-        .handler(lockedTaskHandler);
-
-    // when
-    workerSubscriptionBuilder.open();
-
-    while (!exceptionThrown.get()) {
-      // sync
-    }
-
-    // then
-    assertThat(extendLockException.get(0).getMessage(), containsString("Exception while extending lock"));
-    assertThat(extendLockException.get(0).getMessage(), containsString("returned error: status code '404' - message: Not Found!"));
-    assertRequestPerformed(EngineClient.EXTEND_LOCK_RESOURCE_PATH, httpClient);
-
-    camundaClient.shutdown();
+    externalTaskClient.shutdown();
   }
 
   // helper ////////////////////////////////////////////////
@@ -553,14 +494,20 @@ public class LockedTaskServiceTest {
     assertThat(requestUrls, hasItems(resourceUrl));
   }
 
-  private CloseableHttpClient mockHttpResponseException(final String resourcePath) {
+  private CloseableHttpClient mockHttpResponseException(String resourcePath, Integer statusCode) {
     CloseableHttpClient httpClient = spy(new ClosableHttpClientMock(closeableHttpResponse) {
       @Override
       protected CloseableHttpResponse doExecute(HttpHost target, HttpRequest request, HttpContext context) throws IOException {
         String resourceUrl = MockProvider.ENDPOINT_URL + resourcePath;
         resourceUrl = resourceUrl.replace(EngineClient.ID_PATH_PARAM, MockProvider.ID);
-        if (request.toString().equals("POST " + resourceUrl + " HTTP/1.1"))
-          throw new HttpResponseException(404, "Not Found!");
+
+        if (request.toString().equals("POST " + resourceUrl + " HTTP/1.1") && statusCode == null) {
+          throw new ClientProtocolException();
+        }
+
+        if (request.toString().equals("POST " + resourceUrl + " HTTP/1.1")) {
+          throw new HttpResponseException(statusCode, "Exception thrown!");
+        }
 
         return closeableHttpResponse;
       }

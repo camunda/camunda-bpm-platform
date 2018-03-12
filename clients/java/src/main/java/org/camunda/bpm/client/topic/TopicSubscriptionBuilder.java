@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.client.topic;
 
-import org.camunda.bpm.client.exception.CamundaClientException;
+import org.camunda.bpm.client.exception.ExternalTaskClientException;
 import org.camunda.bpm.client.task.ExternalTaskHandler;
 
 /**
@@ -36,7 +36,7 @@ public interface TopicSubscriptionBuilder {
   /**
    * Release the topic subscription for being executed asynchronously
    *
-   * @throws CamundaClientException
+   * @throws ExternalTaskClientException
    * <ul>
    *   <li> if topic name is null or an empty string
    *   <li> if lock duration is not greater than zero

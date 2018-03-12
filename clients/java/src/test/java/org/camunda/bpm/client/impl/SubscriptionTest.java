@@ -12,13 +12,12 @@
  */
 package org.camunda.bpm.client.impl;
 
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.AbstractResponseHandler;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.camunda.bpm.client.ExternalTaskClient;
-import org.camunda.bpm.client.exception.CamundaClientException;
+import org.camunda.bpm.client.exception.ExternalTaskClientException;
 import org.camunda.bpm.client.helper.MockProvider;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskHandler;
@@ -113,8 +112,8 @@ public class SubscriptionTest {
       camundaClient.subscribe(null)
         .open();
 
-      fail("No CamundaClientException thrown!");
-    } catch (CamundaClientException e) {
+      fail("No ExternalTaskClientException thrown!");
+    } catch (ExternalTaskClientException e) {
       // then
       assertThat(e.getMessage(), containsString("Topic name cannot be null"));
     }
@@ -136,8 +135,8 @@ public class SubscriptionTest {
 
         workerSubscriptionBuilder.open();
 
-        fail("No CamundaClientException thrown!");
-      } catch (CamundaClientException e) {
+        fail("No ExternalTaskClientException thrown!");
+      } catch (ExternalTaskClientException e) {
         // then
         assertThat(e.getMessage(), containsString("Lock duration is not greater than 0"));
       }
@@ -155,8 +154,8 @@ public class SubscriptionTest {
         .lockDuration(5000)
         .open();
 
-      fail("No CamundaClientException thrown!");
-    } catch (CamundaClientException e) {
+      fail("No ExternalTaskClientException thrown!");
+    } catch (ExternalTaskClientException e) {
       // then
       assertThat(e.getMessage(), containsString("Locked task handler cannot be null"));
     }
@@ -180,8 +179,8 @@ public class SubscriptionTest {
         .handler(lockedTaskHandlerMock)
         .open();
 
-      fail("No CamundaClientException thrown!");
-    } catch (CamundaClientException e) {
+      fail("No ExternalTaskClientException thrown!");
+    } catch (ExternalTaskClientException e) {
       // then
       assertThat(e.getMessage(), containsString("Topic name has already been subscribed"));
     }
@@ -206,8 +205,8 @@ public class SubscriptionTest {
         .lockDuration(5000)
         .handler(mock(ExternalTaskHandler.class))
         .open();
-    } catch (CamundaClientException e) {
-      fail("CamundaClientException thrown!");
+    } catch (ExternalTaskClientException e) {
+      fail("ExternalTaskClientException thrown!");
     }
     
     camundaClient.shutdown();

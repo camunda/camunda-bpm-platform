@@ -12,15 +12,15 @@
  */
 package org.camunda.bpm.client.exception;
 
-import org.camunda.bpm.client.task.ExternalTaskService;
-
 /**
- * <p>Task failure exception is thrown if an exception occurred while executing {@link ExternalTaskService#failure(String, String, int, long)}</p>
+ * <p>Exception is thrown if the task has been canceled and therefore does not exist anymore</p>
  *
  * @author Tassilo Weidner
  */
-public class TaskFailureException extends CamundaClientException {
-  public TaskFailureException(String message) {
+public class NotFoundException extends ExternalTaskClientException {
+
+  public NotFoundException(String message) {
     super(message);
   }
+
 }

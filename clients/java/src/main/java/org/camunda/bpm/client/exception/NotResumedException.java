@@ -12,16 +12,14 @@
  */
 package org.camunda.bpm.client.exception;
 
-import org.camunda.bpm.client.task.ExternalTaskService;
-
 /**
- * <p>BPMN error exception is thrown if an exception occurred while executing {@link ExternalTaskService#bpmnError(String)} ()}</p>
+ * <p>Exception is thrown if the corresponding process instance could not be resumed</p>
  *
  * @author Tassilo Weidner
  */
-public class BpmnErrorException extends CamundaClientException {
+public class NotResumedException extends ExternalTaskClientException {
 
-  public BpmnErrorException(String message) {
+  public NotResumedException(String message) {
     super(message);
   }
 

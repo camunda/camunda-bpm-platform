@@ -97,11 +97,11 @@ public class RequestExecutor {
       InputStream responseBody = httpEntity.getContent();
       return objectMapper.readValue(responseBody, responseDtoClass);
     } catch (JsonParseException e) {
-      throw LOG.exceptionWhileParsingJsonObject(responseDtoClass, e);
+      throw LOG.exceptionWhileParsingJsonObject(responseDtoClass);
     } catch (JsonMappingException e) {
-      throw LOG.exceptionWhileMappingJsonObject(responseDtoClass, e);
+      throw LOG.exceptionWhileMappingJsonObject(responseDtoClass);
     } catch (IOException e) {
-      throw LOG.exceptionWhileDeserializingJsonObject(responseDtoClass, e);
+      throw LOG.exceptionWhileDeserializingJsonObject(responseDtoClass);
     }
   }
 
@@ -111,7 +111,7 @@ public class RequestExecutor {
     try {
       serializedRequest = objectMapper.writeValueAsBytes(dto);
     } catch (JsonProcessingException e) {
-      throw LOG.exceptionWhileSerializingJsonObject(dto, e);
+      throw LOG.exceptionWhileSerializingJsonObject(dto);
     }
 
     ByteArrayEntity byteArrayEntity = null;

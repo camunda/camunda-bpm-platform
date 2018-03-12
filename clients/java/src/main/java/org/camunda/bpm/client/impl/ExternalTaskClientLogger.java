@@ -12,16 +12,17 @@
  */
 package org.camunda.bpm.client.impl;
 
-import org.camunda.bpm.client.exception.BpmnErrorException;
-import org.camunda.bpm.client.exception.CamundaClientException;
-import org.camunda.bpm.client.exception.CompleteTaskException;
-import org.camunda.bpm.client.exception.ExtendLockException;
-import org.camunda.bpm.client.exception.TaskFailureException;
-import org.camunda.bpm.client.exception.UnlockTaskException;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpResponseException;
+import org.camunda.bpm.client.exception.ConnectionLostException;
+import org.camunda.bpm.client.exception.ExternalTaskClientException;
+import org.camunda.bpm.client.exception.NotAcquiredException;
+import org.camunda.bpm.client.exception.NotFoundException;
+import org.camunda.bpm.client.exception.NotResumedException;
 import org.camunda.bpm.client.topic.impl.TopicSubscriptionManagerLogger;
 import org.camunda.commons.logging.BaseLogger;
 
-import java.net.UnknownHostException;
+import java.io.IOException;
 
 /**
  * @author Tassilo Weidner
@@ -40,59 +41,60 @@ public class ExternalTaskClientLogger extends BaseLogger {
   public static final TopicSubscriptionManagerLogger WORKER_MANAGER_LOGGER =
     createLogger(TopicSubscriptionManagerLogger.class, PROJECT_CODE, PROJECT_LOGGER, "03");
 
-  public CamundaClientException endpointUrlNullException() {
-    return new CamundaClientException(exceptionMessage(
+  public ExternalTaskClientException endpointUrlNullException() {
+    return new ExternalTaskClientException(exceptionMessage(
       "001", "Endpoint URL cannot be null or an empty string"));
   }
 
-  public CamundaClientException cannotGetHostnameException(UnknownHostException e) {
-    return new CamundaClientException(exceptionMessage(
-      "002", "Cannot get hostname", e));
+  public ExternalTaskClientException cannotGetHostnameException() {
+    return new ExternalTaskClientException(exceptionMessage(
+      "002", "Cannot get hostname"));
   }
 
-  public CamundaClientException topicNameNullException() {
-    return new CamundaClientException(exceptionMessage(
+  public ExternalTaskClientException topicNameNullException() {
+    return new ExternalTaskClientException(exceptionMessage(
       "003", "Topic name cannot be null"));
   }
 
-  public CamundaClientException lockDurationIsNotGreaterThanZeroException() {
-    return new CamundaClientException(exceptionMessage(
+  public ExternalTaskClientException lockDurationIsNotGreaterThanZeroException() {
+    return new ExternalTaskClientException(exceptionMessage(
       "004", "Lock duration is not greater than 0"));
   }
 
-  public CamundaClientException lockedTaskHandlerNullException() {
-    return new CamundaClientException(exceptionMessage(
+  public ExternalTaskClientException lockedTaskHandlerNullException() {
+    return new ExternalTaskClientException(exceptionMessage(
       "005", "Locked task handler cannot be null"));
   }
 
-  public CamundaClientException topicNameAlreadySubscribedException() {
-    return new CamundaClientException(exceptionMessage(
+  public ExternalTaskClientException topicNameAlreadySubscribedException() {
+    return new ExternalTaskClientException(exceptionMessage(
       "006", "Topic name has already been subscribed"));
   }
 
-  public UnlockTaskException unlockTaskException(EngineClientException e) {
-    return new UnlockTaskException(exceptionMessage(
-      "007", "Exception while unlocking task '{}'", e));
-  }
+  public ExternalTaskClientException externalTaskServiceException(String actionName, EngineClientException e) {
+    Throwable causedException = e.getCause();
 
-  public CompleteTaskException completeTaskException(EngineClientException e) {
-    return new CompleteTaskException(exceptionMessage(
-      "008", "Exception while completing task '{}'", e));
-  }
+    if (causedException instanceof HttpResponseException) {
+      switch (((HttpResponseException) causedException).getStatusCode()) {
+        case 400:
+          return new NotAcquiredException(exceptionMessage(
+            "007", "Exception while {}: The task's most recent lock could not be acquired", actionName));
+        case 404:
+          return new NotFoundException(exceptionMessage(
+            "008", "Exception while {}: The task could not be found", actionName));
+        case 500:
+          return new NotResumedException(exceptionMessage(
+            "009", "Exception while {}: The corresponding process instance could not be resumed", actionName));
+      }
+    }
 
-  public TaskFailureException taskFailureException(EngineClientException e) {
-    return new TaskFailureException(exceptionMessage(
-      "009", "Exception while notifying task failure '{}'", e));
-  }
+    if (causedException instanceof ClientProtocolException || causedException instanceof IOException) {
+      return new ConnectionLostException(exceptionMessage(
+        "010", "Exception while {}: Connection could not be established", actionName));
+    }
 
-  public BpmnErrorException bpmnErrorException(EngineClientException e) {
-    return new BpmnErrorException(exceptionMessage(
-      "010", "Exception while notifying bpmn error '{}'", e));
-  }
-
-  public ExtendLockException extendLockException(EngineClientException e) {
-    return new ExtendLockException(exceptionMessage(
-      "011", "Exception while extending lock '{}'", e));
+    return new ExternalTaskClientException(exceptionMessage(
+      "011", "Exception while {}: '{}'", actionName));
   }
 
 }

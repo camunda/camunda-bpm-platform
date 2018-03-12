@@ -13,8 +13,8 @@
 package org.camunda.bpm.client.task.impl;
 
 import org.camunda.bpm.client.impl.EngineClient;
-import org.camunda.bpm.client.impl.EngineClientException;
 import org.camunda.bpm.client.impl.ExternalTaskClientLogger;
+import org.camunda.bpm.client.impl.EngineClientException;
 import org.camunda.bpm.client.task.ExternalTaskService;
 
 /**
@@ -37,7 +37,7 @@ public class ExternalTaskServiceImpl implements ExternalTaskService {
     try {
       engineClient.unlock(taskId);
     } catch (EngineClientException e) {
-      throw LOG.unlockTaskException(e);
+      throw LOG.externalTaskServiceException("unlocking the external task", e);
     }
   }
 
@@ -46,7 +46,7 @@ public class ExternalTaskServiceImpl implements ExternalTaskService {
     try {
       engineClient.complete(taskId);
     } catch (EngineClientException e) {
-      throw LOG.completeTaskException(e);
+      throw LOG.externalTaskServiceException("completing the external task", e);
     }
   }
 
@@ -55,7 +55,7 @@ public class ExternalTaskServiceImpl implements ExternalTaskService {
     try {
       engineClient.failure(taskId, errorMessage, errorDetails, retries, retryTimeout);
     } catch (EngineClientException e) {
-      throw LOG.taskFailureException(e);
+      throw LOG.externalTaskServiceException("notifying a failure", e);
     }
   }
 
@@ -64,7 +64,7 @@ public class ExternalTaskServiceImpl implements ExternalTaskService {
     try {
       engineClient.bpmnError(taskId, errorCode);
     } catch (EngineClientException e) {
-      throw LOG.bpmnErrorException(e);
+      throw LOG.externalTaskServiceException("notifying a BPMN error", e);
     }
   }
 
@@ -73,7 +73,7 @@ public class ExternalTaskServiceImpl implements ExternalTaskService {
     try {
       engineClient.extendLock(taskId, newDuration);
     } catch (EngineClientException e) {
-      throw LOG.extendLockException(e);
+      throw LOG.externalTaskServiceException("extending lock", e);
     }
   }
 

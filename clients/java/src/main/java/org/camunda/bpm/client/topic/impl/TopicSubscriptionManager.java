@@ -12,8 +12,7 @@
  */
 package org.camunda.bpm.client.topic.impl;
 
-import org.camunda.bpm.client.exception.CamundaClientException;
-import org.camunda.bpm.client.exception.TaskFailureException;
+import org.camunda.bpm.client.exception.ExternalTaskClientException;
 import org.camunda.bpm.client.impl.EngineClient;
 import org.camunda.bpm.client.impl.EngineClientException;
 import org.camunda.bpm.client.impl.ExternalTaskClientLogger;
@@ -91,7 +90,7 @@ public class TopicSubscriptionManager implements Runnable {
 
         try {
           taskHandler.execute(externalTask, service);
-        } catch (CamundaClientException e) {
+        } catch (ExternalTaskClientException e) {
           LOG.exceptionOnLockedTaskServiceMethodInvocation(e);
         } catch (Throwable e) {
           LOG.exceptionWhileExecutingLockedTaskHandler(e);

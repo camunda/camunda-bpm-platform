@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.client;
 
-import org.camunda.bpm.client.exception.CamundaClientException;
+import org.camunda.bpm.client.exception.ExternalTaskClientException;
 
 /**
  * <p>A fluent builder to configure the Camunda client</p>
@@ -29,7 +29,7 @@ public interface ExternalTaskClientBuilder {
   /**
    * Bootstraps the Camunda client
    *
-   * @throws CamundaClientException
+   * @throws ExternalTaskClientException
    * <ul>
    *   <li> if endpoint url is null or string is empty
    *   <li> if hostname cannot be retrieved

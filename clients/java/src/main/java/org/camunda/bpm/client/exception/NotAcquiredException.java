@@ -12,15 +12,15 @@
  */
 package org.camunda.bpm.client.exception;
 
-import org.camunda.bpm.client.task.ExternalTaskService;
-
 /**
- * <p>Unlock task exception is thrown if an exception occurred while executing {@link ExternalTaskService#extendLock(long)}</p>
+ * <p>Exception is thrown if if the task's most recent lock could not be acquired</p>
  *
  * @author Tassilo Weidner
  */
-public class ExtendLockException extends CamundaClientException {
-  public ExtendLockException(String message) {
+public class NotAcquiredException extends ExternalTaskClientException {
+
+  public NotAcquiredException(String message) {
     super(message);
   }
+
 }

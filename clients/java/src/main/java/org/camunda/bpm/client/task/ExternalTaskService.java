@@ -12,11 +12,10 @@
  */
 package org.camunda.bpm.client.task;
 
-import org.camunda.bpm.client.exception.BpmnErrorException;
-import org.camunda.bpm.client.exception.CompleteTaskException;
-import org.camunda.bpm.client.exception.ExtendLockException;
-import org.camunda.bpm.client.exception.TaskFailureException;
-import org.camunda.bpm.client.exception.UnlockTaskException;
+import org.camunda.bpm.client.exception.NotAcquiredException;
+import org.camunda.bpm.client.exception.ConnectionLostException;
+import org.camunda.bpm.client.exception.NotFoundException;
+import org.camunda.bpm.client.exception.NotResumedException;
 
 /**
  * <p>Service that provides possibilities to interact with fetched and locked tasks.</p>
@@ -28,24 +27,18 @@ public interface ExternalTaskService {
   /**
    * Unlocks a task and clears the tasks lock expiration time and worker id.
    *
-   * @throws UnlockTaskException
-   * <ul>
-   *   <li> if the task has been canceled and therefore does not exist anymore
-   *   <li> if the connection could not be established
-   * </ul>
+   * @throws NotFoundException if the task has been canceled and therefore does not exist anymore
+   * @throws ConnectionLostException if the connection could not be established
    */
   void unlock();
 
   /**
    * Completes a task.
    *
-   * @throws CompleteTaskException
-   * <ul>
-   *   <li> if the task's most recent lock could not be acquired
-   *   <li> if the task has been canceled and therefore does not exist anymore
-   *   <li> if the corresponding process instance could not be resumed
-   *   <li> if the connection could not be established
-   * </ul>
+   * @throws NotFoundException if the task has been canceled and therefore does not exist anymore
+   * @throws NotAcquiredException if the task's most recent lock could not be acquired
+   * @throws NotResumedException if the corresponding process instance could not be resumed
+   * @throws ConnectionLostException if the connection could not be established
    */
   void complete();
 
@@ -63,13 +56,10 @@ public interface ExternalTaskService {
    * @param retryTimeout specifies a timeout in milliseconds before the external task
    *                     becomes available again for fetching. Must be >= 0.
    *
-   * @throws TaskFailureException
-   * <ul>
-   *   <li> if the task's most recent lock could not be acquired
-   *   <li> if the task has been canceled and therefore does not exist anymore
-   *   <li> if the corresponding process instance could not be resumed
-   *   <li> if the connection could not be established
-   * </ul>
+   * @throws NotFoundException if the task has been canceled and therefore does not exist anymore
+   * @throws NotAcquiredException if the task's most recent lock could not be acquired
+   * @throws NotResumedException if the corresponding process instance could not be resumed
+   * @throws ConnectionLostException if the connection could not be established
    */
   void failure(String errorMessage, String errorDetails, int retries, long retryTimeout);
 
@@ -80,13 +70,10 @@ public interface ExternalTaskService {
    * @param errorCode that indicates the predefined error. The error code
    *                  is used to identify the BPMN error handler.
    *
-   * @throws BpmnErrorException
-   * <ul>
-   *   <li> if the task's most recent lock could not be acquired
-   *   <li> if the task has been canceled and therefore does not exist anymore
-   *   <li> if the corresponding process instance could not be resumed
-   *   <li> if the connection could not be established
-   * </ul>
+   * @throws NotFoundException if the task has been canceled and therefore does not exist anymore
+   * @throws NotAcquiredException if the task's most recent lock could not be acquired
+   * @throws NotResumedException if the corresponding process instance could not be resumed
+   * @throws ConnectionLostException if the connection could not be established
    */
   void bpmnError(String errorCode);
 
@@ -95,12 +82,9 @@ public interface ExternalTaskService {
    *
    * @param newDuration specifies the the new lock duration in milliseconds
    *
-   * @throws ExtendLockException
-   * <ul>
-   *   <li> if the task's most recent lock could not be acquired
-   *   <li> if the task has been canceled and therefore does not exist anymore
-   *   <li> if the connection could not be established
-   * </ul>
+   * @throws NotFoundException if the task has been canceled and therefore does not exist anymore
+   * @throws NotAcquiredException if the task's most recent lock could not be acquired
+   * @throws ConnectionLostException if the connection could not be established
    */
   void extendLock(long newDuration);
 

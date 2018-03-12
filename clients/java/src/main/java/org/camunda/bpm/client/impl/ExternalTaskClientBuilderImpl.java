@@ -50,7 +50,7 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
     try {
       hostname = getHostname();
     } catch (UnknownHostException e) {
-      throw LOG.cannotGetHostnameException(e);
+      throw LOG.cannotGetHostnameException();
     }
 
     return hostname;

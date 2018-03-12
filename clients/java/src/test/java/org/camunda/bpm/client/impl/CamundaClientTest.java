@@ -13,7 +13,7 @@
 package org.camunda.bpm.client.impl;
 
 import org.camunda.bpm.client.ExternalTaskClient;
-import org.camunda.bpm.client.exception.CamundaClientException;
+import org.camunda.bpm.client.exception.ExternalTaskClientException;
 import org.junit.Test;
 
 import java.net.UnknownHostException;
@@ -55,8 +55,8 @@ public class CamundaClientTest {
         .endpointUrl("")
         .build();
 
-      fail("No CamundaClientException thrown!");
-    } catch (CamundaClientException e) {
+      fail("No ExternalTaskClientException thrown!");
+    } catch (ExternalTaskClientException e) {
       // then
       assertThat(e.getMessage(), containsString("Endpoint URL cannot be null or an empty string"));
     }
@@ -70,8 +70,8 @@ public class CamundaClientTest {
         .endpointUrl(null)
         .build();
 
-      fail("No CamundaClientException thrown!");
-    } catch (CamundaClientException e) {
+      fail("No ExternalTaskClientException thrown!");
+    } catch (ExternalTaskClientException e) {
       // then
       assertThat(e.getMessage(), containsString("Endpoint URL cannot be null or an empty string"));
     }
@@ -88,8 +88,8 @@ public class CamundaClientTest {
       // when
       camundaClientBuilder.checkHostname();
 
-      fail("No CamundaClientException thrown!");
-    } catch (CamundaClientException e) {
+      fail("No ExternalTaskClientException thrown!");
+    } catch (ExternalTaskClientException e) {
       // then
       assertThat(e.getMessage(), containsString("Cannot get hostname"));
     }

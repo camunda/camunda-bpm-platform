@@ -21,4 +21,8 @@ public class EngineClientException extends RuntimeException {
     super(message);
   }
 
+  public EngineClientException(String message, Throwable e) {
+    super(message, e);
+  }
+
 }
