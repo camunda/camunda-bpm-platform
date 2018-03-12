@@ -97,4 +97,14 @@ public class ExternalTaskClientLogger extends BaseLogger {
       "011", "Exception while {}: '{}'", actionName));
   }
 
+  public ExternalTaskClientException basicAuthCredentialsNullException() {
+    return new ExternalTaskClientException(exceptionMessage(
+      "012", "Basic authentication credentials (username, password) cannot be null"));
+  }
+
+  public ExternalTaskClientException interceptorNullException() {
+    return new ExternalTaskClientException(exceptionMessage(
+      "013", "Interceptor cannot be null"));
+  }
+
 }

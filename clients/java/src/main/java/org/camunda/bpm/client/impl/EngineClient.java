@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.client.impl;
 
+import org.camunda.bpm.client.interceptor.impl.RequestInterceptorHandler;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.impl.ExternalTaskImpl;
 import org.camunda.bpm.client.task.impl.FailureRequestDto;
@@ -44,9 +45,9 @@ public class EngineClient {
   private String workerId;
   private RequestExecutor engineInteraction;
 
-  public EngineClient(String workerId, String endpointUrl) {
+  public EngineClient(String workerId, String endpointUrl, RequestInterceptorHandler requestInterceptorHandler) {
     this.workerId = workerId;
-    this.engineInteraction = new RequestExecutor();
+    this.engineInteraction = new RequestExecutor(requestInterceptorHandler);
     this.endpointUrl = engineInteraction.sanitizeUrl(endpointUrl);
   }
 

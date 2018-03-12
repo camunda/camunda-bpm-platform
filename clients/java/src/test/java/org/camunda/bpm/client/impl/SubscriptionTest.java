@@ -15,6 +15,7 @@ package org.camunda.bpm.client.impl;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.AbstractResponseHandler;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.client.exception.ExternalTaskClientException;
@@ -29,6 +30,7 @@ import org.camunda.bpm.client.topic.impl.TopicSubscriptionManager;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
@@ -66,8 +68,13 @@ public class SubscriptionTest {
   @Before
   public void setUp() throws IOException {
     mockStatic(HttpClients.class);
+
+    HttpClientBuilder httpClientBuilderMock = mock(HttpClientBuilder.class, Mockito.RETURNS_DEEP_STUBS);
+    Mockito.when(HttpClients.custom())
+      .thenReturn(httpClientBuilderMock);
+
     httpClient = mock(CloseableHttpClient.class);
-    when(HttpClients.createDefault())
+    when(httpClientBuilderMock.build())
       .thenReturn(httpClient);
 
     when(httpClient.execute(any(HttpUriRequest.class), any(AbstractResponseHandler.class)))

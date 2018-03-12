@@ -16,16 +16,17 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.AbstractResponseHandler;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.client.helper.MockProvider;
@@ -37,6 +38,8 @@ import org.camunda.bpm.client.topic.impl.dto.FetchAndLockRequestDto;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -44,16 +47,20 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
@@ -74,9 +81,13 @@ public class EngineClientTest {
     CloseableHttpResponse closeableHttpResponse = mock(CloseableHttpResponse.class);
     when(closeableHttpResponse.getStatusLine())
       .thenReturn(mock(StatusLine.class));
-    
+
+    HttpClientBuilder httpClientBuilderMock = mock(HttpClientBuilder.class, Mockito.RETURNS_DEEP_STUBS);
+    when(HttpClients.custom())
+      .thenReturn(httpClientBuilderMock);
+
     CloseableHttpClient httpClient = spy(new ClosableHttpClientMock(closeableHttpResponse));
-    when(HttpClients.createDefault())
+    when(httpClientBuilderMock.build())
       .thenReturn(httpClient);
 
     List<ExternalTask> lockedTasks = Collections.singletonList(MockProvider.createLockedTask());
@@ -300,6 +311,7 @@ public class EngineClientTest {
     verifyZeroInteractions(lockedTaskHandlerMock);
   }
 
+  // helper //////////////////////////////
   private ObjectMapper mockObjectMapper() throws Exception {
     ObjectMapper objectMapper = mock(ObjectMapper.class);
     whenNew(ObjectMapper.class).withNoArguments()
@@ -321,9 +333,14 @@ public class EngineClientTest {
 
   private void mockHttpRequestException(Class<? extends Throwable> exception) throws IOException {
     mockStatic(HttpClients.class);
-    HttpClient httpClient = mock(CloseableHttpClient.class);
-    when(HttpClients.createDefault())
-      .thenReturn((CloseableHttpClient) httpClient);
+
+    HttpClientBuilder httpClientBuilderMock = mock(HttpClientBuilder.class, Mockito.RETURNS_DEEP_STUBS);
+    when(HttpClients.custom())
+      .thenReturn(httpClientBuilderMock);
+
+    CloseableHttpClient httpClient = mock(CloseableHttpClient.class);
+    when(httpClientBuilderMock.build())
+      .thenReturn(httpClient);
 
     when(httpClient.execute(any(HttpUriRequest.class), any(AbstractResponseHandler.class)))
       .thenThrow(mock(exception));

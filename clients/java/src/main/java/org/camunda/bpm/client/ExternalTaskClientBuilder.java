@@ -13,6 +13,7 @@
 package org.camunda.bpm.client;
 
 import org.camunda.bpm.client.exception.ExternalTaskClientException;
+import org.camunda.bpm.client.interceptor.ClientRequestInterceptor;
 
 /**
  * <p>A fluent builder to configure the Camunda client</p>
@@ -25,6 +26,13 @@ public interface ExternalTaskClientBuilder {
    * @param endpointUrl of the Camunda BPM Platform REST API
    */
   ExternalTaskClientBuilder endpointUrl(String endpointUrl);
+
+  /**
+   * Adds an interceptor to change a request before it is sent to the http server
+   *
+   * @param interceptor which changes the request
+   */
+  ExternalTaskClientBuilder addInterceptor(ClientRequestInterceptor interceptor);
 
   /**
    * Bootstraps the Camunda client

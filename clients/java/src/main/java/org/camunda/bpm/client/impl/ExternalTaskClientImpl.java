@@ -13,9 +13,13 @@
 package org.camunda.bpm.client.impl;
 
 import org.camunda.bpm.client.ExternalTaskClient;
+import org.camunda.bpm.client.interceptor.ClientRequestInterceptor;
+import org.camunda.bpm.client.interceptor.impl.RequestInterceptorHandler;
 import org.camunda.bpm.client.topic.TopicSubscriptionBuilder;
 import org.camunda.bpm.client.topic.impl.TopicSubscriptionBuilderImpl;
 import org.camunda.bpm.client.topic.impl.TopicSubscriptionManager;
+
+import java.util.List;
 
 /**
  * @author Tassilo Weidner
@@ -23,11 +27,16 @@ import org.camunda.bpm.client.topic.impl.TopicSubscriptionManager;
 public class ExternalTaskClientImpl implements ExternalTaskClient {
 
   private TopicSubscriptionManager topicSubscriptionManager;
+  private RequestInterceptorHandler requestInterceptorHandler;
 
   public ExternalTaskClientImpl(ExternalTaskClientBuilderImpl clientBuilder) {
     String workerId = clientBuilder.getWorkerId();
     String endpointUrl = clientBuilder.getEndpointUrl();
-    EngineClient engineClient = new EngineClient(workerId, endpointUrl);
+
+    List<ClientRequestInterceptor> interceptors = clientBuilder.getInterceptors();
+    requestInterceptorHandler = new RequestInterceptorHandler(interceptors);
+
+    EngineClient engineClient = new EngineClient(workerId, endpointUrl, requestInterceptorHandler);
     topicSubscriptionManager = new TopicSubscriptionManager(engineClient);
   }
 
@@ -41,6 +50,10 @@ public class ExternalTaskClientImpl implements ExternalTaskClient {
 
   public TopicSubscriptionManager getWorkerManager() {
     return topicSubscriptionManager;
+  }
+
+  public RequestInterceptorHandler getRequestInterceptorHandler() {
+    return requestInterceptorHandler;
   }
 
 }

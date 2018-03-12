@@ -58,4 +58,9 @@ public class EngineClientLogger extends ExternalTaskClientLogger {
       "007", "Exception while serializing json object to '{}'", dto));
   }
 
+  public void requestInterceptorException(Throwable e) {
+    logError(
+      "008", "Exception while executing request interceptor: {}", e);
+  }
+
 }

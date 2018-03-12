@@ -14,9 +14,12 @@ package org.camunda.bpm.client.impl;
 
 import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.client.ExternalTaskClientBuilder;
+import org.camunda.bpm.client.interceptor.ClientRequestInterceptor;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -28,9 +31,19 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
 
   private String endpointUrl;
   private String workerId;
+  protected List<ClientRequestInterceptor> interceptors;
+
+  public ExternalTaskClientBuilderImpl() {
+    this.interceptors = new ArrayList<>();
+  }
 
   public ExternalTaskClientBuilder endpointUrl(String endpointUrl) {
     this.endpointUrl = endpointUrl;
+    return this;
+  }
+
+  public ExternalTaskClientBuilder addInterceptor(ClientRequestInterceptor interceptor) {
+    this.interceptors.add(interceptor);
     return this;
   }
 
@@ -39,10 +52,20 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
       throw LOG.endpointUrlNullException();
     }
 
+    checkInterceptors();
+
     String hostname = checkHostname();
     this.workerId = hostname + UUID.randomUUID();
 
     return new ExternalTaskClientImpl(this);
+  }
+
+  protected void checkInterceptors() {
+    interceptors.forEach((ClientRequestInterceptor interceptor) -> {
+      if (interceptor == null) {
+        throw LOG.interceptorNullException();
+      }
+    });
   }
 
   protected String checkHostname() {
@@ -66,6 +89,10 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
 
   protected String getWorkerId() {
     return workerId;
+  }
+
+  protected List<ClientRequestInterceptor> getInterceptors() {
+    return interceptors;
   }
 
 }

@@ -25,11 +25,12 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.AbstractResponseHandler;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.protocol.HttpContext;
 import org.camunda.bpm.client.ExternalTaskClient;
-import org.camunda.bpm.client.exception.NotAcquiredException;
 import org.camunda.bpm.client.exception.ConnectionLostException;
+import org.camunda.bpm.client.exception.NotAcquiredException;
 import org.camunda.bpm.client.exception.NotFoundException;
 import org.camunda.bpm.client.exception.NotResumedException;
 import org.camunda.bpm.client.helper.MockProvider;
@@ -67,7 +68,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
-import static org.powermock.api.mockito.PowerMockito.when;
 import static org.powermock.api.mockito.PowerMockito.whenNew;
 
 /**
@@ -85,12 +85,16 @@ public class LockedTaskServiceTest {
   public void setUp() throws JsonProcessingException {
     mockStatic(HttpClients.class);
 
+    HttpClientBuilder httpClientBuilderMock = mock(HttpClientBuilder.class, Mockito.RETURNS_DEEP_STUBS);
+    Mockito.when(HttpClients.custom())
+      .thenReturn(httpClientBuilderMock);
+
     closeableHttpResponse = mock(CloseableHttpResponse.class);
     Mockito.when(closeableHttpResponse.getStatusLine())
       .thenReturn(mock(StatusLine.class));
 
     httpClient = spy(new ClosableHttpClientMock(closeableHttpResponse));
-    Mockito.when(HttpClients.createDefault())
+    Mockito.when(httpClientBuilderMock.build())
       .thenReturn(httpClient);
 
     List<ExternalTask> lockedTasks = Collections.singletonList(MockProvider.createLockedTask());
@@ -513,7 +517,13 @@ public class LockedTaskServiceTest {
       }
     });
 
-    when(HttpClients.createDefault())
+    mockStatic(HttpClients.class);
+
+    HttpClientBuilder httpClientBuilderMock = mock(HttpClientBuilder.class, Mockito.RETURNS_DEEP_STUBS);
+    Mockito.when(HttpClients.custom())
+      .thenReturn(httpClientBuilderMock);
+
+    Mockito.when(httpClientBuilderMock.build())
       .thenReturn(httpClient);
 
     return httpClient;

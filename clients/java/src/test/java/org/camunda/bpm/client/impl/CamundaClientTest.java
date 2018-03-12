@@ -13,10 +13,15 @@
 package org.camunda.bpm.client.impl;
 
 import org.camunda.bpm.client.ExternalTaskClient;
+import org.camunda.bpm.client.ExternalTaskClientBuilder;
 import org.camunda.bpm.client.exception.ExternalTaskClientException;
+import org.camunda.bpm.client.helper.MockProvider;
+import org.camunda.bpm.client.interceptor.ClientRequestInterceptor;
+import org.camunda.bpm.client.interceptor.auth.BasicAuthProvider;
 import org.junit.Test;
 
 import java.net.UnknownHostException;
+import java.util.List;
 
 import static org.camunda.bpm.client.helper.MockProvider.ENDPOINT_URL;
 import static org.hamcrest.core.Is.is;
@@ -93,6 +98,32 @@ public class CamundaClientTest {
       // then
       assertThat(e.getMessage(), containsString("Cannot get hostname"));
     }
+  }
+
+  @Test
+  public void shouldAddInterceptors() {
+    // given
+    ExternalTaskClientBuilder clientBuilder = ExternalTaskClient.create()
+      .endpointUrl(MockProvider.ENDPOINT_URL)
+      .addInterceptor(new BasicAuthProvider("demo", "demo"));
+
+    // when
+    ExternalTaskClient client = clientBuilder.build();
+
+    // then
+    List<ClientRequestInterceptor> interceptors = ((ExternalTaskClientImpl)client)
+      .getRequestInterceptorHandler()
+      .getInterceptors();
+
+    assertThat(interceptors.size(), is(1));
+
+    // when
+    clientBuilder.addInterceptor(request -> {
+      // another interceptor implementation
+    });
+
+    // then
+    assertThat(interceptors.size(), is(2));
   }
 
 }
