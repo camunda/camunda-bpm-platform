@@ -20,11 +20,11 @@ import java.util.Map;
 /**
  * @author Tassilo Weidner
  */
-public class ClientRequestImpl implements ClientRequestContext {
+public class ClientRequestContextImpl implements ClientRequestContext {
 
   protected Map<String, String> headers;
 
-  public ClientRequestImpl() {
+  public ClientRequestContextImpl() {
     this.headers = new LinkedHashMap<>();
   }
 

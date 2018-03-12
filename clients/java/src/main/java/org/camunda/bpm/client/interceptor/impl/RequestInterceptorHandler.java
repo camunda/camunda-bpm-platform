@@ -40,7 +40,7 @@ public class RequestInterceptorHandler implements HttpRequestInterceptor {
 
   @Override
   public void process(HttpRequest httpRequest, HttpContext context) throws HttpException, IOException {
-    ClientRequestImpl interceptedRequest = new ClientRequestImpl();
+    ClientRequestContextImpl interceptedRequest = new ClientRequestContextImpl();
     interceptors.forEach((ClientRequestInterceptor requestInterceptor) -> {
       try {
         requestInterceptor.intercept(interceptedRequest);
