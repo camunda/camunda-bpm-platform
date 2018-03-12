@@ -187,6 +187,25 @@ module.exports = [ '$routeProvider', function($routeProvider) {
           });
         };
 
+        // Unlock User
+        $scope.unlockUser = function() {
+          UserResource.unlock({ id: $scope.decodedUserId })
+            .then(function() {
+              Notifications.addMessage({
+                type: 'success',
+                status: $translate.instant('NOTIFICATIONS_STATUS_SUCCESS'),
+                message: $translate.instant('USERS_USER_UNLOCK_SUCCESS', { user: $scope.user.id })
+              });
+              $location.path('/users');
+            })
+            .catch(function(e) {
+              Notifications.addError({
+                status : $translate.instant('NOTIFICATIONS_STATUS_FAILED'),
+                message : $translate.instant(e.message)
+              });
+            });
+        };
+
         // group form /////////////////////////////
 
         var groupsSorting = $scope.groupsSorting = null;
