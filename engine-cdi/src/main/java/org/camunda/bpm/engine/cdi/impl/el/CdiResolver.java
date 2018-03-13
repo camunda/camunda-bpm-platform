@@ -58,11 +58,16 @@ public class CdiResolver extends ELResolver {
 
   @Override
   public Object getValue(ELContext context, Object base, Object property) {
-    Object result = ProgrammaticBeanLookup.lookup(property.toString(), getBeanManager());
-    if(result != null) {
-      context.setPropertyResolved(true);
+    //we need to resolve a bean only for the first "member" of expression, e.g. bean.property1.property2
+    if (base == null) {
+      Object result = ProgrammaticBeanLookup.lookup(property.toString(), getBeanManager());
+      if (result != null) {
+        context.setPropertyResolved(true);
+      }
+      return result;
+    } else {
+      return null;
     }
-    return result;
   }
 
   @Override

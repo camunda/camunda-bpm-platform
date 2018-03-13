@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<process-application
+  xmlns="http://www.camunda.org/schema/1.0/ProcessApplication"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.camunda.org/schema/1.0/ProcessApplication http://www.camunda.org/schema/1.0/ProcessApplication ">
+
+  <process-engine name="engine1">
+    <job-acquisition>default</job-acquisition>
+    <configuration>org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration</configuration>
+    <datasource>java:comp/env/ProcessEngineDataSource</datasource>
+    <properties>
+      <property name="history">full</property>
+    </properties>
+  </process-engine>
+
+  <process-archive name="paEngine1">
+    <process-engine>engine1</process-engine>
+    <properties>
+      <property name="isDeleteUponUndeploy">true</property>
+    </properties>
+  </process-archive>
+
+</process-application>
