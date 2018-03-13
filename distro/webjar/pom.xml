@@ -50,7 +50,7 @@
                   <version>${project.parent.version}</version>
                   <type>war</type>
                   <overWrite>true</overWrite>
-                  <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+                  <outputDirectory>${project.build.outputDirectory}/META-INF/resources</outputDirectory>
                   <excludes>META-INF/**</excludes>
                 </artifactItem>
               </artifactItems>
@@ -67,8 +67,8 @@
             <phase>generate-resources</phase>
             <configuration>
               <target>
-                <move file="${project.build.outputDirectory}/WEB-INF/securityFilterRules.json" todir="${project.build.outputDirectory}" />
-                <delete dir="${project.build.outputDirectory}/WEB-INF" />
+                <move file="${project.build.outputDirectory}/META-INF/resources/WEB-INF/securityFilterRules.json" todir="${project.build.outputDirectory}/META-INF/resources/" />
+                <delete dir="${project.build.outputDirectory}/META-INF/resources/WEB-INF" />
               </target>
             </configuration>
             <goals>
