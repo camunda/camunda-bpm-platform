@@ -19,13 +19,10 @@ import static org.camunda.bpm.model.bpmn.BpmnTestConstants.*;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN20_NS;
 import static org.junit.Assert.assertEquals;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
-import javax.naming.directory.ModificationItem;
 
 import org.camunda.bpm.model.bpmn.*;
 
@@ -1409,6 +1406,49 @@ public class ProcessBuilderTest {
     assertThat(signal1).isEqualTo(signal2);
 
     assertOnlyOneSignalExists("signal");
+  }
+
+  @Test
+  public void testIntermediateSignalThrowEventWithPayload() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .intermediateThrowEvent("throw")
+        .signalEventDefinition("signal")
+          .camundaIn("source", "target1", false)
+          .camundaIn("${'sourceExpression'}", "target2", true)
+          .camundaIn("all", true)
+          .camundaIn("aBusinessKey")
+      .done();
+
+    assertSignalEventDefinition("throw", "signal");
+    SignalEventDefinition signalEventDefinition = assertAndGetSingleEventDefinition("throw", SignalEventDefinition.class);
+
+    assertThat(signalEventDefinition.getSignal().getName()).isEqualTo("signal");
+
+    List<CamundaIn> camundaInParams = signalEventDefinition.getExtensionElements().getElementsQuery().filterByType(CamundaIn.class).list();
+    assertThat(camundaInParams.size()).isEqualTo(4);
+
+    int paramCounter = 0;
+    for (CamundaIn inParam : camundaInParams) {
+      if (inParam.getCamundaVariables() != null) {
+        assertThat(inParam.getCamundaVariables()).isEqualTo("all");
+        if (inParam.getCamundaLocal()) {
+          paramCounter++;
+        }
+      } else if (inParam.getCamundaBusinessKey() != null) {
+        assertThat(inParam.getCamundaBusinessKey()).isEqualTo("aBusinessKey");
+        paramCounter++;
+      } else if (inParam.getCamundaSourceExpression() != null) {
+        assertThat(inParam.getCamundaSourceExpression()).isEqualTo("${'sourceExpression'}");
+        assertThat(inParam.getCamundaTarget()).isEqualTo("target2");
+        paramCounter++;
+      } else if (inParam.getCamundaSource() != null) {
+        assertThat(inParam.getCamundaSource()).isEqualTo("source");
+        assertThat(inParam.getCamundaTarget()).isEqualTo("target1");
+        paramCounter++;
+      }
+    }
+    assertThat(paramCounter).isEqualTo(camundaInParams.size());
   }
 
   @Test

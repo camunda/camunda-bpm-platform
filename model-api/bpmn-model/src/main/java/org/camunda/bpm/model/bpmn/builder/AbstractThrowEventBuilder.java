@@ -84,6 +84,21 @@ public abstract class AbstractThrowEventBuilder<B extends AbstractThrowEventBuil
   }
 
   /**
+   * Sets an event definition for the given Signal name. If a signal with this
+   * name already exists it will be used, otherwise a new signal is created.
+   * It returns a builder for the Signal Event Definition.
+   *
+   * @param signalName the name of the signal
+   * @return the signal event definition builder object
+   */
+  public SignalEventDefinitionBuilder signalEventDefinition(String signalName) {
+    SignalEventDefinition signalEventDefinition = createSignalEventDefinition(signalName);
+    element.getEventDefinitions().add(signalEventDefinition);
+
+    return new SignalEventDefinitionBuilder(modelInstance, signalEventDefinition);
+  }
+
+  /**
    * Sets an escalation definition for the given escalation code. If already an
    * escalation with this code exists it will be used, otherwise a new
    * escalation is created.
