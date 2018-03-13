@@ -116,7 +116,7 @@ public class LockedTaskServiceTest {
     ExternalTaskHandler lockedTaskHandler = new ExternalTaskHandler() {
       @Override
       public void execute(ExternalTask lockedTask, ExternalTaskService lockedTaskService) {
-        lockedTaskService.unlock();
+        lockedTaskService.unlock(lockedTask);
         handlerInvoked.set(true);
       }
     };
@@ -150,7 +150,7 @@ public class LockedTaskServiceTest {
     ExternalTaskHandler lockedTaskHandler = new ExternalTaskHandler() {
       @Override
       public void execute(ExternalTask lockedTask, ExternalTaskService lockedTaskService) {
-        lockedTaskService.complete();
+        lockedTaskService.complete(lockedTask);
         handlerInvoked.set(true);
       }
     };
@@ -187,7 +187,7 @@ public class LockedTaskServiceTest {
     ExternalTaskHandler lockedTaskHandler = new ExternalTaskHandler() {
       @Override
       public void execute(ExternalTask lockedTask, ExternalTaskService lockedTaskService) {
-        lockedTaskService.failure(MockProvider.ERROR_MESSAGE, MockProvider.ERROR_DETAILS,
+        lockedTaskService.failure(lockedTask, MockProvider.ERROR_MESSAGE, MockProvider.ERROR_DETAILS,
           MockProvider.RETRIES, MockProvider.RETRY_TIMEOUT);
         handlerInvoked.set(true);
       }
@@ -239,7 +239,7 @@ public class LockedTaskServiceTest {
     ExternalTaskHandler lockedTaskHandler = new ExternalTaskHandler() {
       @Override
       public void execute(ExternalTask lockedTask, ExternalTaskService lockedTaskService) {
-        lockedTaskService.bpmnError(MockProvider.ERROR_CODE);
+        lockedTaskService.bpmnError(lockedTask, MockProvider.ERROR_CODE);
         handlerInvoked.set(true);
       }
     };
@@ -287,7 +287,7 @@ public class LockedTaskServiceTest {
     ExternalTaskHandler lockedTaskHandler = new ExternalTaskHandler() {
       @Override
       public void execute(ExternalTask lockedTask, ExternalTaskService lockedTaskService) {
-        lockedTaskService.extendLock(MockProvider.NEW_DURATION);
+        lockedTaskService.extendLock(lockedTask, MockProvider.NEW_DURATION);
         handlerInvoked.set(true);
       }
     };
@@ -338,7 +338,7 @@ public class LockedTaskServiceTest {
         .lockDuration(5000)
         .handler((lockedTask, lockedTaskService) -> {
           try {
-            lockedTaskService.unlock();
+            lockedTaskService.unlock(lockedTask);
           } catch (NotFoundException e) {
             notFoundException.add(e);
             exceptionThrown.set(true);
@@ -377,7 +377,7 @@ public class LockedTaskServiceTest {
         .lockDuration(5000)
         .handler((lockedTask, lockedTaskService) -> {
           try {
-            lockedTaskService.complete();
+            lockedTaskService.complete(lockedTask);
           } catch (NotResumedException e) {
             notResumedException.add(e);
             exceptionThrown.set(true);
@@ -416,7 +416,7 @@ public class LockedTaskServiceTest {
         .lockDuration(5000)
         .handler((lockedTask, lockedTaskService) -> {
           try {
-            lockedTaskService.failure(MockProvider.ERROR_MESSAGE, MockProvider.ERROR_DETAILS, MockProvider.RETRIES, MockProvider.RETRY_TIMEOUT);
+            lockedTaskService.failure(lockedTask, MockProvider.ERROR_MESSAGE, MockProvider.ERROR_DETAILS, MockProvider.RETRIES, MockProvider.RETRY_TIMEOUT);
           } catch (NotAcquiredException e) {
             notAcquiredException.add(e);
             exceptionThrown.set(true);
@@ -455,7 +455,7 @@ public class LockedTaskServiceTest {
         .lockDuration(5000)
         .handler((lockedTask, lockedTaskService) -> {
           try {
-            lockedTaskService.bpmnError(MockProvider.ERROR_CODE);
+            lockedTaskService.bpmnError(lockedTask, MockProvider.ERROR_CODE);
           } catch (ConnectionLostException e) {
             connectionLostException.add(e);
             exceptionThrown.set(true);

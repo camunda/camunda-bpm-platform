@@ -27,26 +27,31 @@ public interface ExternalTaskService {
   /**
    * Unlocks a task and clears the tasks lock expiration time and worker id.
    *
+   * @param externalTask which will be unlocked
+   *
    * @throws NotFoundException if the task has been canceled and therefore does not exist anymore
    * @throws ConnectionLostException if the connection could not be established
    */
-  void unlock();
+  void unlock(ExternalTask externalTask);
 
   /**
    * Completes a task.
+   *
+   * @param externalTask which will be completed
    *
    * @throws NotFoundException if the task has been canceled and therefore does not exist anymore
    * @throws NotAcquiredException if the task's most recent lock could not be acquired
    * @throws NotResumedException if the corresponding process instance could not be resumed
    * @throws ConnectionLostException if the connection could not be established
    */
-  void complete();
+  void complete(ExternalTask externalTask);
 
   /**
    * Reports a failure to execute a task. A number of retries and a timeout until
    * the task can be specified. If the retries are set to 0, an incident for this
    * task is created.
    *
+   * @param externalTask which is meant to notify a failure for
    * @param errorMessage indicates the reason of the failure.
    * @param errorDetails provides a detailed error description.
    * @param retries      specifies how often the task should be retried. Must be >= 0.
@@ -61,31 +66,33 @@ public interface ExternalTaskService {
    * @throws NotResumedException if the corresponding process instance could not be resumed
    * @throws ConnectionLostException if the connection could not be established
    */
-  void failure(String errorMessage, String errorDetails, int retries, long retryTimeout);
+  void failure(ExternalTask externalTask, String errorMessage, String errorDetails, int retries, long retryTimeout);
 
   /**
    * Reports a business error in the context of a running task.
    * The error code must be specified to identify the BPMN error handler.
    *
-   * @param errorCode that indicates the predefined error. The error code
-   *                  is used to identify the BPMN error handler.
+   * @param externalTask which is meant to notify a BPMN error for
+   * @param errorCode    that indicates the predefined error. The error code
+   *                     is used to identify the BPMN error handler.
    *
    * @throws NotFoundException if the task has been canceled and therefore does not exist anymore
    * @throws NotAcquiredException if the task's most recent lock could not be acquired
    * @throws NotResumedException if the corresponding process instance could not be resumed
    * @throws ConnectionLostException if the connection could not be established
    */
-  void bpmnError(String errorCode);
+  void bpmnError(ExternalTask externalTask, String errorCode);
 
   /**
    * Extends the timeout of the lock by a given amount of time.
    *
-   * @param newDuration specifies the the new lock duration in milliseconds
+   * @param externalTask which lock will be extended
+   * @param newDuration  specifies the the new lock duration in milliseconds
    *
    * @throws NotFoundException if the task has been canceled and therefore does not exist anymore
    * @throws NotAcquiredException if the task's most recent lock could not be acquired
    * @throws ConnectionLostException if the connection could not be established
    */
-  void extendLock(long newDuration);
+  void extendLock(ExternalTask externalTask, long newDuration);
 
 }

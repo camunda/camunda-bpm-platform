@@ -15,6 +15,7 @@ package org.camunda.bpm.client.task.impl;
 import org.camunda.bpm.client.impl.EngineClient;
 import org.camunda.bpm.client.impl.ExternalTaskClientLogger;
 import org.camunda.bpm.client.impl.EngineClientException;
+import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
 
 /**
@@ -33,45 +34,45 @@ public class ExternalTaskServiceImpl implements ExternalTaskService {
   }
 
   @Override
-  public void unlock() {
+  public void unlock(ExternalTask externalTask) {
     try {
-      engineClient.unlock(taskId);
+      engineClient.unlock(externalTask.getId());
     } catch (EngineClientException e) {
       throw LOG.externalTaskServiceException("unlocking the external task", e);
     }
   }
 
   @Override
-  public void complete() {
+  public void complete(ExternalTask externalTask) {
     try {
-      engineClient.complete(taskId);
+      engineClient.complete(externalTask.getId());
     } catch (EngineClientException e) {
       throw LOG.externalTaskServiceException("completing the external task", e);
     }
   }
 
   @Override
-  public void failure(String errorMessage, String errorDetails, int retries, long retryTimeout) {
+  public void failure(ExternalTask externalTask, String errorMessage, String errorDetails, int retries, long retryTimeout) {
     try {
-      engineClient.failure(taskId, errorMessage, errorDetails, retries, retryTimeout);
+      engineClient.failure(externalTask.getId(), errorMessage, errorDetails, retries, retryTimeout);
     } catch (EngineClientException e) {
       throw LOG.externalTaskServiceException("notifying a failure", e);
     }
   }
 
   @Override
-  public void bpmnError(String errorCode) {
+  public void bpmnError(ExternalTask externalTask, String errorCode) {
     try {
-      engineClient.bpmnError(taskId, errorCode);
+      engineClient.bpmnError(externalTask.getId(), errorCode);
     } catch (EngineClientException e) {
       throw LOG.externalTaskServiceException("notifying a BPMN error", e);
     }
   }
 
   @Override
-  public void extendLock(long newDuration) {
+  public void extendLock(ExternalTask externalTask, long newDuration) {
     try {
-      engineClient.extendLock(taskId, newDuration);
+      engineClient.extendLock(externalTask.getId(), newDuration);
     } catch (EngineClientException e) {
       throw LOG.externalTaskServiceException("extending lock", e);
     }
