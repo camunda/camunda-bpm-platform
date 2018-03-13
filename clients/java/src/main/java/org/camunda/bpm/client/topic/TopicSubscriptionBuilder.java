@@ -16,7 +16,7 @@ import org.camunda.bpm.client.exception.ExternalTaskClientException;
 import org.camunda.bpm.client.task.ExternalTaskHandler;
 
 /**
- * <p>A fluent builder to configure the worker subscription</p>
+ * <p>A fluent builder to configure the topic subscription</p>
  *
  * @author Tassilo Weidner
  */

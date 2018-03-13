@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.client.impl;
+package org.camunda.bpm.client.topic;
 
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.AbstractResponseHandler;
@@ -20,18 +20,16 @@ import org.apache.http.impl.client.HttpClients;
 import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.client.exception.ExternalTaskClientException;
 import org.camunda.bpm.client.helper.MockProvider;
+import org.camunda.bpm.client.impl.ExternalTaskClientImpl;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskHandler;
 import org.camunda.bpm.client.task.ExternalTaskService;
-import org.camunda.bpm.client.topic.TopicSubscription;
-import org.camunda.bpm.client.topic.TopicSubscriptionBuilder;
 import org.camunda.bpm.client.topic.impl.TopicSubscriptionImpl;
 import org.camunda.bpm.client.topic.impl.TopicSubscriptionManager;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -60,10 +58,10 @@ import static org.powermock.api.mockito.PowerMockito.when;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({HttpClients.class})
 @PowerMockIgnore("javax.net.ssl.*")
-public class SubscriptionTest {
+public class TopicSubscriptionTest {
 
   private CloseableHttpClient httpClient;
-  private ExternalTaskClient camundaClient;
+  private ExternalTaskClient client;
 
   @Before
   public void setUp() throws IOException {
@@ -80,7 +78,7 @@ public class SubscriptionTest {
     when(httpClient.execute(any(HttpUriRequest.class), any(AbstractResponseHandler.class)))
       .thenReturn(new ExternalTask[]{MockProvider.createLockedTask()});
 
-    camundaClient = ExternalTaskClient.create()
+    client = ExternalTaskClient.create()
       .endpointUrl(MockProvider.ENDPOINT_URL)
       .build();
   }
@@ -92,23 +90,23 @@ public class SubscriptionTest {
 
     // when
     for (int i = 0; i < 10; i++) {
-      TopicSubscription workerSubscription = camundaClient.subscribe(MockProvider.TOPIC_NAME+i)
+      TopicSubscription topicSubscription = client.subscribe(MockProvider.TOPIC_NAME+i)
         .lockDuration(5000+i)
         .handler(lockedTaskHandlerMock)
         .open();
 
       // then
-      TopicSubscriptionImpl workerSubscriptionImpl = (TopicSubscriptionImpl) workerSubscription;
-      assertThat(workerSubscriptionImpl.getLockDuration(), is(5000L+i));
-      assertThat(workerSubscriptionImpl.getTopicName(), is(MockProvider.TOPIC_NAME+i));
+      TopicSubscriptionImpl topicSubscriptionImpl = (TopicSubscriptionImpl) topicSubscription;
+      assertThat(topicSubscriptionImpl.getLockDuration(), is(5000L+i));
+      assertThat(topicSubscriptionImpl.getTopicName(), is(MockProvider.TOPIC_NAME+i));
     }
 
     // then
-    ExternalTaskClientImpl camundaClientImpl = (ExternalTaskClientImpl) camundaClient;
-    TopicSubscriptionManager workerManager = camundaClientImpl.getWorkerManager();
-    assertThat(workerManager.getSubscriptions().size(), is(10));
+    ExternalTaskClientImpl clientImpl = (ExternalTaskClientImpl) client;
+    TopicSubscriptionManager topicSubscriptionManager = clientImpl.getTopicSubscriptionManager();
+    assertThat(topicSubscriptionManager.getSubscriptions().size(), is(10));
 
-    camundaClient.shutdown();
+    client.shutdown();
   }
 
   @Test
@@ -116,7 +114,7 @@ public class SubscriptionTest {
     // given
     try {
       // when
-      camundaClient.subscribe(null)
+      client.subscribe(null)
         .open();
 
       fail("No ExternalTaskClientException thrown!");
@@ -125,7 +123,7 @@ public class SubscriptionTest {
       assertThat(e.getMessage(), containsString("Topic name cannot be null"));
     }
 
-    camundaClient.shutdown();
+    client.shutdown();
   }
 
   @Test
@@ -133,14 +131,14 @@ public class SubscriptionTest {
     // given
     for (int i = -1; i < 2; i++) {
       try {
-        TopicSubscriptionBuilder workerSubscriptionBuilder = camundaClient.subscribe(MockProvider.TOPIC_NAME);
+        TopicSubscriptionBuilder topicSubscriptionBuilder = client.subscribe(MockProvider.TOPIC_NAME);
 
         // when
         if (i <= 0) {
-          workerSubscriptionBuilder.lockDuration(i);
+          topicSubscriptionBuilder.lockDuration(i);
         }
 
-        workerSubscriptionBuilder.open();
+        topicSubscriptionBuilder.open();
 
         fail("No ExternalTaskClientException thrown!");
       } catch (ExternalTaskClientException e) {
@@ -149,7 +147,7 @@ public class SubscriptionTest {
       }
     }
 
-    camundaClient.shutdown();
+    client.shutdown();
   }
 
   @Test
@@ -157,7 +155,7 @@ public class SubscriptionTest {
     // given
     try {
       // when
-      camundaClient.subscribe(MockProvider.TOPIC_NAME)
+      client.subscribe(MockProvider.TOPIC_NAME)
         .lockDuration(5000)
         .open();
 
@@ -167,21 +165,21 @@ public class SubscriptionTest {
       assertThat(e.getMessage(), containsString("Locked task handler cannot be null"));
     }
 
-    camundaClient.shutdown();
+    client.shutdown();
   }
 
   @Test
   public void shouldThrowExceptionDueToTopicNameAlreadySubscribed() {
     // given
     ExternalTaskHandler lockedTaskHandlerMock = mock(ExternalTaskHandler.class);
-    camundaClient.subscribe(MockProvider.TOPIC_NAME)
+    client.subscribe(MockProvider.TOPIC_NAME)
       .lockDuration(5000)
       .handler(lockedTaskHandlerMock)
       .open();
 
     try {
       // when
-      camundaClient.subscribe(MockProvider.TOPIC_NAME)
+      client.subscribe(MockProvider.TOPIC_NAME)
         .lockDuration(5000)
         .handler(lockedTaskHandlerMock)
         .open();
@@ -192,13 +190,13 @@ public class SubscriptionTest {
       assertThat(e.getMessage(), containsString("Topic name has already been subscribed"));
     }
 
-    camundaClient.shutdown();
+    client.shutdown();
   }
 
   @Test
   public void shouldUnsubscribeFromTopic() {
     // given
-    TopicSubscription topicSubscription = camundaClient.subscribe(MockProvider.TOPIC_NAME)
+    TopicSubscription topicSubscription = client.subscribe(MockProvider.TOPIC_NAME)
       .lockDuration(5000)
       .handler(mock(ExternalTaskHandler.class))
       .open();
@@ -208,7 +206,7 @@ public class SubscriptionTest {
 
     // then
     try {
-      camundaClient.subscribe(MockProvider.TOPIC_NAME)
+      client.subscribe(MockProvider.TOPIC_NAME)
         .lockDuration(5000)
         .handler(mock(ExternalTaskHandler.class))
         .open();
@@ -216,13 +214,13 @@ public class SubscriptionTest {
       fail("ExternalTaskClientException thrown!");
     }
     
-    camundaClient.shutdown();
+    client.shutdown();
   }
 
   @Test
   public void shouldExecuteHandler() throws IOException, InterruptedException {
     // given
-    List<ExternalTask> lockedTasks = new ArrayList<ExternalTask>();
+    List<ExternalTask> lockedTasks = new ArrayList<>();
     for (int i = 0; i < 5; i++) {
       lockedTasks.add(MockProvider.createLockedTask());
     }
@@ -232,26 +230,23 @@ public class SubscriptionTest {
 
     ExternalTaskHandler lockedTaskHandlerMock = mock(ExternalTaskHandler.class);
     final AtomicBoolean invoked = new AtomicBoolean();
-    doAnswer(new Answer<Void>() {
-      @Override
-      public Void answer(InvocationOnMock invocationOnMock) throws Throwable {
-        invoked.set(true);
-        return null;
-      }
+    doAnswer((Answer<Void>) invocationOnMock -> {
+      invoked.set(true);
+      return null;
     }).when(lockedTaskHandlerMock).execute(any(ExternalTask.class), any(ExternalTaskService.class));
 
-    TopicSubscriptionBuilder workerSubscriptionBuilder = camundaClient.subscribe(MockProvider.TOPIC_NAME)
+    TopicSubscriptionBuilder topicSubscriptionBuilder = client.subscribe(MockProvider.TOPIC_NAME)
       .lockDuration(5000)
       .handler(lockedTaskHandlerMock);
 
     // when
-    workerSubscriptionBuilder.open();
+    topicSubscriptionBuilder.open();
 
     // then
     while (!invoked.get()) {
       // sync
     }
-    camundaClient.shutdown();
+    client.shutdown();
 
     verify(lockedTaskHandlerMock, atLeast(5))
       .execute(any(ExternalTask.class), any(ExternalTaskService.class));

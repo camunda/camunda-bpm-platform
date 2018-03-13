@@ -43,14 +43,14 @@ public class TopicSubscriptionManager implements Runnable {
   protected Thread thread;
 
   protected List<TopicRequestDto> taskTopicRequests = new ArrayList<>();
-  protected Map<String, ExternalTaskHandler> lockedTasksHandlers = new HashMap<String, ExternalTaskHandler>();
+  protected Map<String, ExternalTaskHandler> lockedTasksHandlers = new HashMap<>();
 
   public TopicSubscriptionManager(EngineClient engineClient) {
     this.engineClient = engineClient;
-    this.subscriptions = new CopyOnWriteArrayList<TopicSubscriptionImpl>();
+    this.subscriptions = new CopyOnWriteArrayList<>();
     this.isRunning = true;
-    this.thread = new Thread(this, TopicSubscriptionManager.class.getSimpleName());
 
+    this.thread = new Thread(this, TopicSubscriptionManager.class.getSimpleName());
     this.thread.start();
   }
 
@@ -65,14 +65,14 @@ public class TopicSubscriptionManager implements Runnable {
     taskTopicRequests.clear();
     lockedTasksHandlers.clear();
 
-    for (TopicSubscriptionImpl subscription : subscriptions) {
+    subscriptions.forEach(subscription -> {
       TopicRequestDto taskTopicRequest = TopicRequestDto.fromTopicSubscription(subscription);
       taskTopicRequests.add(taskTopicRequest);
 
       String topicName = subscription.getTopicName();
       ExternalTaskHandler lockedTaskHandler = subscription.getLockedTaskHandler();
       lockedTasksHandlers.put(topicName, lockedTaskHandler);
-    }
+    });
 
     if (!taskTopicRequests.isEmpty()) {
       List<ExternalTask> externalTasks = Collections.emptyList();
@@ -83,7 +83,7 @@ public class TopicSubscriptionManager implements Runnable {
         LOG.exceptionWhilePerformingFetchAndLock(e);
       }
 
-      for (ExternalTask externalTask : externalTasks) {
+      externalTasks.forEach(externalTask -> {
         String topicName = externalTask.getTopicName();
         ExternalTaskHandler taskHandler = lockedTasksHandlers.get(topicName);
         ExternalTaskService service = new ExternalTaskServiceImpl(externalTask.getId(), engineClient);
@@ -95,7 +95,7 @@ public class TopicSubscriptionManager implements Runnable {
         } catch (Throwable e) {
           LOG.exceptionWhileExecutingLockedTaskHandler(e);
         }
-      }
+      });
 
     }
   }
@@ -115,7 +115,7 @@ public class TopicSubscriptionManager implements Runnable {
     }
   }
 
-  protected void addSubscription(TopicSubscriptionImpl subscription) {
+  protected void subscribe(TopicSubscriptionImpl subscription) {
     subscriptions.add(subscription);
   }
 

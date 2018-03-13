@@ -17,11 +17,11 @@ package org.camunda.bpm.client.impl;
  */
 public class EngineClientException extends RuntimeException {
 
-  public EngineClientException(String message) {
+  protected EngineClientException(String message) {
     super(message);
   }
 
-  public EngineClientException(String message, Throwable e) {
+  protected EngineClientException(String message, Throwable e) {
     super(message, e);
   }
 

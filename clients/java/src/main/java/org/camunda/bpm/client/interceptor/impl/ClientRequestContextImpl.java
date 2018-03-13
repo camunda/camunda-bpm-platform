@@ -24,7 +24,7 @@ public class ClientRequestContextImpl implements ClientRequestContext {
 
   protected Map<String, String> headers;
 
-  public ClientRequestContextImpl() {
+  protected ClientRequestContextImpl() {
     this.headers = new LinkedHashMap<>();
   }
 
@@ -33,7 +33,7 @@ public class ClientRequestContextImpl implements ClientRequestContext {
     headers.put(name, value);
   }
 
-  public Map<String, String> getHeaders() {
+  protected Map<String, String> getHeaders() {
     return headers;
   }
 

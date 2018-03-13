@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.client.impl;
+package org.camunda.bpm.client.task;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,10 +33,10 @@ import org.camunda.bpm.client.exception.ConnectionLostException;
 import org.camunda.bpm.client.exception.NotAcquiredException;
 import org.camunda.bpm.client.exception.NotFoundException;
 import org.camunda.bpm.client.exception.NotResumedException;
+import org.camunda.bpm.client.helper.ClosableHttpClientMock;
 import org.camunda.bpm.client.helper.MockProvider;
-import org.camunda.bpm.client.task.ExternalTask;
-import org.camunda.bpm.client.task.ExternalTaskHandler;
-import org.camunda.bpm.client.task.ExternalTaskService;
+import org.camunda.bpm.client.impl.EngineClient;
+import org.camunda.bpm.client.impl.RequestExecutor;
 import org.camunda.bpm.client.task.impl.FailureRequestDto;
 import org.camunda.bpm.client.task.impl.dto.BpmnErrorRequestDto;
 import org.camunda.bpm.client.task.impl.dto.ExtendLockRequestDto;
@@ -76,7 +76,7 @@ import static org.powermock.api.mockito.PowerMockito.whenNew;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({HttpClients.class, RequestExecutor.class})
 @PowerMockIgnore("javax.net.ssl.*")
-public class LockedTaskServiceTest {
+public class ExternalTaskServiceTest {
 
   private CloseableHttpClient httpClient;
   private CloseableHttpResponse closeableHttpResponse;
@@ -108,26 +108,21 @@ public class LockedTaskServiceTest {
   @Test
   public void shouldUnlockTask() throws IOException {
     // given
-    ExternalTaskClient camundaClient = ExternalTaskClient.create()
+    ExternalTaskClient client = ExternalTaskClient.create()
       .endpointUrl(MockProvider.ENDPOINT_URL)
       .build();
 
     final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
-    ExternalTaskHandler lockedTaskHandler = new ExternalTaskHandler() {
-      @Override
-      public void execute(ExternalTask lockedTask, ExternalTaskService lockedTaskService) {
-        lockedTaskService.unlock(lockedTask);
-        handlerInvoked.set(true);
-      }
-    };
-
-    TopicSubscriptionBuilder workerSubscriptionBuilder =
-      camundaClient.subscribe(MockProvider.TOPIC_NAME)
+    TopicSubscriptionBuilder topicSubscriptionBuilder =
+      client.subscribe(MockProvider.TOPIC_NAME)
         .lockDuration(5000)
-        .handler(lockedTaskHandler);
+        .handler((lockedTask, lockedTaskService) -> {
+          lockedTaskService.unlock(lockedTask);
+          handlerInvoked.set(true);
+        });
 
     // when
-    workerSubscriptionBuilder.open();
+    topicSubscriptionBuilder.open();
 
     while (!handlerInvoked.get()) {
       // sync
@@ -136,32 +131,27 @@ public class LockedTaskServiceTest {
     // then
     assertRequestPerformed(EngineClient.UNLOCK_RESOURCE_PATH);
 
-    camundaClient.shutdown();
+    client.shutdown();
   }
 
   @Test
   public void shouldCompleteTask() throws IOException {
     // given
-    ExternalTaskClient camundaClient = ExternalTaskClient.create()
+    ExternalTaskClient client = ExternalTaskClient.create()
       .endpointUrl(MockProvider.ENDPOINT_URL)
       .build();
 
     final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
-    ExternalTaskHandler lockedTaskHandler = new ExternalTaskHandler() {
-      @Override
-      public void execute(ExternalTask lockedTask, ExternalTaskService lockedTaskService) {
-        lockedTaskService.complete(lockedTask);
-        handlerInvoked.set(true);
-      }
-    };
-
-    TopicSubscriptionBuilder workerSubscriptionBuilder =
-      camundaClient.subscribe(MockProvider.TOPIC_NAME)
+    TopicSubscriptionBuilder topicSubscriptionBuilder =
+      client.subscribe(MockProvider.TOPIC_NAME)
         .lockDuration(5000)
-        .handler(lockedTaskHandler);
+        .handler((lockedTask, lockedTaskService) -> {
+          lockedTaskService.complete(lockedTask);
+          handlerInvoked.set(true);
+        });
 
     // when
-    workerSubscriptionBuilder.open();
+    topicSubscriptionBuilder.open();
 
     while (!handlerInvoked.get()) {
       // sync
@@ -170,7 +160,7 @@ public class LockedTaskServiceTest {
     // then
     assertRequestPerformed(EngineClient.COMPLETE_RESOURCE_PATH);
 
-    camundaClient.shutdown();
+    client.shutdown();
   }
 
   @Test
@@ -179,27 +169,23 @@ public class LockedTaskServiceTest {
     ObjectMapper objectMapper = spy(ObjectMapper.class);
     whenNew(ObjectMapper.class).withNoArguments().thenReturn(objectMapper);
 
-    ExternalTaskClient camundaClient = ExternalTaskClient.create()
+    ExternalTaskClient client = ExternalTaskClient.create()
       .endpointUrl(MockProvider.ENDPOINT_URL)
       .build();
 
     final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
-    ExternalTaskHandler lockedTaskHandler = new ExternalTaskHandler() {
-      @Override
-      public void execute(ExternalTask lockedTask, ExternalTaskService lockedTaskService) {
-        lockedTaskService.failure(lockedTask, MockProvider.ERROR_MESSAGE, MockProvider.ERROR_DETAILS,
-          MockProvider.RETRIES, MockProvider.RETRY_TIMEOUT);
-        handlerInvoked.set(true);
-      }
-    };
 
-    TopicSubscriptionBuilder workerSubscriptionBuilder =
-      camundaClient.subscribe(MockProvider.TOPIC_NAME)
+    TopicSubscriptionBuilder topicSubscriptionBuilder =
+      client.subscribe(MockProvider.TOPIC_NAME)
         .lockDuration(5000)
-        .handler(lockedTaskHandler);
+        .handler((lockedTask, lockedTaskService) -> {
+          lockedTaskService.failure(lockedTask, MockProvider.ERROR_MESSAGE, MockProvider.ERROR_DETAILS,
+            MockProvider.RETRIES, MockProvider.RETRY_TIMEOUT);
+          handlerInvoked.set(true);
+        });
 
     // when
-    workerSubscriptionBuilder.open();
+    topicSubscriptionBuilder.open();
 
     while (!handlerInvoked.get()) {
       // sync
@@ -222,7 +208,7 @@ public class LockedTaskServiceTest {
 
     assertRequestPerformed(EngineClient.FAILURE_RESOURCE_PATH);
 
-    camundaClient.shutdown();
+    client.shutdown();
   }
 
   @Test
@@ -231,26 +217,21 @@ public class LockedTaskServiceTest {
     ObjectMapper objectMapper = spy(ObjectMapper.class);
     whenNew(ObjectMapper.class).withNoArguments().thenReturn(objectMapper);
 
-    ExternalTaskClient camundaClient = ExternalTaskClient.create()
+    ExternalTaskClient client = ExternalTaskClient.create()
       .endpointUrl(MockProvider.ENDPOINT_URL)
       .build();
 
     final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
-    ExternalTaskHandler lockedTaskHandler = new ExternalTaskHandler() {
-      @Override
-      public void execute(ExternalTask lockedTask, ExternalTaskService lockedTaskService) {
-        lockedTaskService.bpmnError(lockedTask, MockProvider.ERROR_CODE);
-        handlerInvoked.set(true);
-      }
-    };
-
-    TopicSubscriptionBuilder workerSubscriptionBuilder =
-      camundaClient.subscribe(MockProvider.TOPIC_NAME)
+    TopicSubscriptionBuilder topicSubscriptionBuilder =
+      client.subscribe(MockProvider.TOPIC_NAME)
         .lockDuration(5000)
-        .handler(lockedTaskHandler);
+        .handler((lockedTask, lockedTaskService) -> {
+          lockedTaskService.bpmnError(lockedTask, MockProvider.ERROR_CODE);
+          handlerInvoked.set(true);
+        });
 
     // when
-    workerSubscriptionBuilder.open();
+    topicSubscriptionBuilder.open();
 
     while (!handlerInvoked.get()) {
       // sync
@@ -270,7 +251,7 @@ public class LockedTaskServiceTest {
 
     assertRequestPerformed(EngineClient.BPMN_ERROR_RESOURCE_PATH);
 
-    camundaClient.shutdown();
+    client.shutdown();
   }
 
   @Test
@@ -279,26 +260,21 @@ public class LockedTaskServiceTest {
     ObjectMapper objectMapper = spy(ObjectMapper.class);
     whenNew(ObjectMapper.class).withNoArguments().thenReturn(objectMapper);
 
-    ExternalTaskClient camundaClient = ExternalTaskClient.create()
+    ExternalTaskClient client = ExternalTaskClient.create()
       .endpointUrl(MockProvider.ENDPOINT_URL)
       .build();
 
     final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
-    ExternalTaskHandler lockedTaskHandler = new ExternalTaskHandler() {
-      @Override
-      public void execute(ExternalTask lockedTask, ExternalTaskService lockedTaskService) {
-        lockedTaskService.extendLock(lockedTask, MockProvider.NEW_DURATION);
-        handlerInvoked.set(true);
-      }
-    };
-
-    TopicSubscriptionBuilder workerSubscriptionBuilder =
-      camundaClient.subscribe(MockProvider.TOPIC_NAME)
+    TopicSubscriptionBuilder topicSubscriptionBuilder =
+      client.subscribe(MockProvider.TOPIC_NAME)
         .lockDuration(5000)
-        .handler(lockedTaskHandler);
+        .handler((lockedTask, lockedTaskService) -> {
+          lockedTaskService.extendLock(lockedTask, MockProvider.NEW_DURATION);
+          handlerInvoked.set(true);
+        });
 
     // when
-    workerSubscriptionBuilder.open();
+    topicSubscriptionBuilder.open();
 
     while (!handlerInvoked.get()) {
       // sync
@@ -318,7 +294,7 @@ public class LockedTaskServiceTest {
 
     assertRequestPerformed(EngineClient.EXTEND_LOCK_RESOURCE_PATH);
 
-    camundaClient.shutdown();
+    client.shutdown();
   }
 
   @Test

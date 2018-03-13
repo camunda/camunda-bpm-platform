@@ -32,7 +32,7 @@ public class RequestInterceptorHandler implements HttpRequestInterceptor {
 
   protected static final EngineClientLogger LOG = ExternalTaskClientLogger.ENGINE_CLIENT_LOGGER;
 
-  private List<ClientRequestInterceptor> interceptors;
+  protected List<ClientRequestInterceptor> interceptors;
 
   public RequestInterceptorHandler(List<ClientRequestInterceptor> interceptors) {
     this.interceptors = interceptors;
@@ -51,10 +51,7 @@ public class RequestInterceptorHandler implements HttpRequestInterceptor {
     });
 
     Map<String, String> newHeaders = interceptedRequest.getHeaders();
-    if (!interceptedRequest.getHeaders().isEmpty()) {
-      newHeaders.forEach((headerName, headerValue) ->
-        httpRequest.addHeader(new BasicHeader(headerName, headerValue)));
-    }
+    newHeaders.forEach((headerName, headerValue) -> httpRequest.addHeader(new BasicHeader(headerName, headerValue)));
   }
 
   public List<ClientRequestInterceptor> getInterceptors() {

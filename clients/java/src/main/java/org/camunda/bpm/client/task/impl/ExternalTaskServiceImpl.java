@@ -13,8 +13,8 @@
 package org.camunda.bpm.client.task.impl;
 
 import org.camunda.bpm.client.impl.EngineClient;
-import org.camunda.bpm.client.impl.ExternalTaskClientLogger;
 import org.camunda.bpm.client.impl.EngineClientException;
+import org.camunda.bpm.client.impl.ExternalTaskClientLogger;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
 

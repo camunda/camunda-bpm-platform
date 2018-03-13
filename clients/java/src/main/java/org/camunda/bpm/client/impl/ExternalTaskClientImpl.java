@@ -26,10 +26,10 @@ import java.util.List;
  */
 public class ExternalTaskClientImpl implements ExternalTaskClient {
 
-  private TopicSubscriptionManager topicSubscriptionManager;
-  private RequestInterceptorHandler requestInterceptorHandler;
+  protected TopicSubscriptionManager topicSubscriptionManager;
+  protected RequestInterceptorHandler requestInterceptorHandler;
 
-  public ExternalTaskClientImpl(ExternalTaskClientBuilderImpl clientBuilder) {
+  protected ExternalTaskClientImpl(ExternalTaskClientBuilderImpl clientBuilder) {
     String workerId = clientBuilder.getWorkerId();
     String endpointUrl = clientBuilder.getEndpointUrl();
 
@@ -48,7 +48,7 @@ public class ExternalTaskClientImpl implements ExternalTaskClient {
     topicSubscriptionManager.shutdown();
   }
 
-  public TopicSubscriptionManager getWorkerManager() {
+  public TopicSubscriptionManager getTopicSubscriptionManager() {
     return topicSubscriptionManager;
   }
 

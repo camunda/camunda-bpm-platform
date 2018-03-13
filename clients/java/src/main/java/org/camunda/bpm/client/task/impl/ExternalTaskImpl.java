@@ -12,10 +12,10 @@
  */
 package org.camunda.bpm.client.task.impl;
 
+import org.camunda.bpm.client.task.ExternalTask;
+
 import java.util.Date;
 import java.util.Map;
-
-import org.camunda.bpm.client.task.ExternalTask;
 
 /**
  * @author Tassilo Weidner

@@ -27,21 +27,21 @@ public interface ExternalTaskClient {
    *
    * @return builder to apply configurations on
    */
-  public static ExternalTaskClientBuilder create() {
+  static ExternalTaskClientBuilder create() {
     return new ExternalTaskClientBuilderImpl();
   }
 
   /**
    * Creates a fluent builder to create and configure a topic subscription
    *
-   * @param topicName the worker subscribes to
+   * @param topicName the client subscribes to
    * @return builder to apply configurations on
    */
-  public TopicSubscriptionBuilder subscribe(String topicName);
+  TopicSubscriptionBuilder subscribe(String topicName);
 
   /**
    * Stops continuous fetching and locking of tasks
    */
-  public void shutdown();
+  void shutdown();
 
 }

@@ -22,38 +22,38 @@ import java.io.IOException;
  */
 public class EngineClientLogger extends ExternalTaskClientLogger {
 
-  public EngineClientException exceptionWhileReceivingResponse(HttpRequest httpRequest, HttpResponseException e) {
+  protected EngineClientException exceptionWhileReceivingResponse(HttpRequest httpRequest, HttpResponseException e) {
     return new EngineClientException(exceptionMessage(
       "001", "Request '{}' returned error: status code '{}' - message: {}",
       httpRequest, e.getStatusCode(), e.getMessage()), e);
   }
 
-  public EngineClientException exceptionWhileEstablishingConnection(HttpRequest httpRequest, IOException e) {
+  protected EngineClientException exceptionWhileEstablishingConnection(HttpRequest httpRequest, IOException e) {
     return new EngineClientException(exceptionMessage(
       "002", "Exception while establishing connection for request '{}'", httpRequest), e);
   }
 
-  public <T> void exceptionWhileClosingResourceStream(T response, IOException e) {
+  protected <T> void exceptionWhileClosingResourceStream(T response, IOException e) {
     logError(
       "003", "Exception while closing resource stream of response '{}': {}", response, e);
   }
 
-  public <T> EngineClientException exceptionWhileParsingJsonObject(Class<T> responseDtoClass) {
+  protected <T> EngineClientException exceptionWhileParsingJsonObject(Class<T> responseDtoClass) {
     return new EngineClientException(exceptionMessage(
       "004", "Exception while parsing json object to response dto class '{}'", responseDtoClass));
   }
 
-  public <T> EngineClientException exceptionWhileMappingJsonObject(Class<T> responseDtoClass) {
+  protected <T> EngineClientException exceptionWhileMappingJsonObject(Class<T> responseDtoClass) {
     return new EngineClientException(exceptionMessage(
       "005", "Exception while mapping json object to response dto class '{}'", responseDtoClass));
   }
 
-  public <T> EngineClientException exceptionWhileDeserializingJsonObject(Class<T> responseDtoClass) {
+  protected <T> EngineClientException exceptionWhileDeserializingJsonObject(Class<T> responseDtoClass) {
     return new EngineClientException(exceptionMessage(
       "006", "Exception while deserializing json object to response dto class '{}'", responseDtoClass));
   }
 
-  public <D extends RequestDto> EngineClientException exceptionWhileSerializingJsonObject(D dto) {
+  protected <D extends RequestDto> EngineClientException exceptionWhileSerializingJsonObject(D dto) {
     return new EngineClientException(exceptionMessage(
       "007", "Exception while serializing json object to '{}'", dto));
   }

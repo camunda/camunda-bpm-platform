@@ -69,7 +69,7 @@ public class MockProvider {
   }
 
   public static Map<String, Object> createVariables() {
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("aVariableName", "aVariableValue");
     return variables;
   }

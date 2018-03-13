@@ -10,9 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.client.impl;
-
-import java.io.IOException;
+package org.camunda.bpm.client.helper;
 
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
@@ -22,20 +20,22 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.HttpContext;
 
+import java.io.IOException;
+
 /**
  * @author Tassilo Weidner
  */
 public class ClosableHttpClientMock extends CloseableHttpClient {
 
-  private CloseableHttpResponse closeableHttpResponse;
+  private CloseableHttpResponse httpResponse;
 
-  public ClosableHttpClientMock(final CloseableHttpResponse closeableHttpResponse) {
-    this.closeableHttpResponse = closeableHttpResponse;
+  public ClosableHttpClientMock(final CloseableHttpResponse httpResponse) {
+    this.httpResponse = httpResponse;
   }
 
   @Override
   protected CloseableHttpResponse doExecute(HttpHost target, HttpRequest request, HttpContext context) throws IOException {
-    return closeableHttpResponse;
+    return httpResponse;
   }
 
   @Override

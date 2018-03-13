@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.client.impl;
+package org.camunda.bpm.client.interceptor;
 
 import org.apache.http.Header;
 import org.apache.http.HttpHeaders;
@@ -19,7 +19,7 @@ import org.apache.http.protocol.HttpContext;
 import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.client.exception.ExternalTaskClientException;
 import org.camunda.bpm.client.helper.MockProvider;
-import org.camunda.bpm.client.interceptor.ClientRequestContext;
+import org.camunda.bpm.client.impl.ExternalTaskClientImpl;
 import org.camunda.bpm.client.interceptor.auth.BasicAuthProvider;
 import org.camunda.bpm.client.interceptor.impl.RequestInterceptorHandler;
 import org.camunda.bpm.client.task.ExternalTaskHandler;
@@ -49,7 +49,7 @@ import static org.powermock.api.mockito.PowerMockito.whenNew;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ExternalTaskClientImpl.class})
 @PowerMockIgnore("javax.net.ssl.*")
-public class InterceptorTest {
+public class ClientRequestInterceptorTest {
 
   @Test
   public void shouldSetAuthorizationHeader() throws Exception {

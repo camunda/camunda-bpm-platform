@@ -12,8 +12,8 @@
  */
 package org.camunda.bpm.client.task;
 
-import org.camunda.bpm.client.exception.NotAcquiredException;
 import org.camunda.bpm.client.exception.ConnectionLostException;
+import org.camunda.bpm.client.exception.NotAcquiredException;
 import org.camunda.bpm.client.exception.NotFoundException;
 import org.camunda.bpm.client.exception.NotResumedException;
 

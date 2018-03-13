@@ -27,10 +27,10 @@ import java.util.UUID;
  */
 public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder {
 
-  private static final ExternalTaskClientLogger LOG = ExternalTaskClientLogger.CLIENT_LOGGER;
+  protected static final ExternalTaskClientLogger LOG = ExternalTaskClientLogger.CLIENT_LOGGER;
 
-  private String endpointUrl;
-  private String workerId;
+  protected String endpointUrl;
+  protected String workerId;
   protected List<ClientRequestInterceptor> interceptors;
 
   public ExternalTaskClientBuilderImpl() {
@@ -61,14 +61,14 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
   }
 
   protected void checkInterceptors() {
-    interceptors.forEach((ClientRequestInterceptor interceptor) -> {
+    interceptors.forEach(interceptor -> {
       if (interceptor == null) {
         throw LOG.interceptorNullException();
       }
     });
   }
 
-  protected String checkHostname() {
+  public String checkHostname() {
     String hostname;
     try {
       hostname = getHostname();
@@ -79,11 +79,11 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
     return hostname;
   }
 
-  protected String getHostname() throws UnknownHostException {
+  public String getHostname() throws UnknownHostException {
     return InetAddress.getLocalHost().getHostName();
   }
 
-  protected String getEndpointUrl() {
+  public String getEndpointUrl() {
     return endpointUrl;
   }
 

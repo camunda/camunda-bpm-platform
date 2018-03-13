@@ -13,14 +13,14 @@
 package org.camunda.bpm.client.topic;
 
 /**
- * <p>Worker subscription to a topic</p>
+ * <p>Subscription to a topic</p>
  *
  * @author Tassilo Weidner
  */
 public interface TopicSubscription {
 
   /**
-   * The worker has been unsubscribed from the topic
+   * The client has been unsubscribed from the topic
    */
   void close();
 

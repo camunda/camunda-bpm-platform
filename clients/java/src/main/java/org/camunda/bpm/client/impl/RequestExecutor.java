@@ -50,12 +50,12 @@ public class RequestExecutor {
   protected HttpClient httpClient;
   protected ObjectMapper objectMapper;
 
-  public RequestExecutor(RequestInterceptorHandler requestInterceptorHandler) {
+  protected RequestExecutor(RequestInterceptorHandler requestInterceptorHandler) {
     initHttpClient(requestInterceptorHandler);
     initObjectMapper();
   }
 
-  public <T> T postRequest(String resourceUrl, RequestDto requestDto, Class<T> responseDtoClass) {
+  protected <T> T postRequest(String resourceUrl, RequestDto requestDto, Class<T> responseDtoClass) {
     ByteArrayEntity serializedRequest = serializeRequest(requestDto);
     HttpUriRequest httpRequest = RequestBuilder.post(resourceUrl)
       .addHeader(HEADER_USER_AGENT)

@@ -21,22 +21,22 @@ import org.camunda.bpm.client.impl.ExternalTaskClientLogger;
  */
 public class TopicSubscriptionManagerLogger extends ExternalTaskClientLogger {
 
-  public void exceptionWhilePerformingFetchAndLock(EngineClientException e) {
+  protected void exceptionWhilePerformingFetchAndLock(EngineClientException e) {
     logError(
       "001", "Exception while fetch and lock tasks '{}'", e);
   }
 
-  public void exceptionWhileExecutingLockedTaskHandler(Throwable e) {
+  protected void exceptionWhileExecutingLockedTaskHandler(Throwable e) {
     logError(
       "002", "Exception while executing locked task handler '{}'", e);
   }
 
-  public void exceptionWhileShuttingDown(InterruptedException e) {
+  protected void exceptionWhileShuttingDown(InterruptedException e) {
     logError(
       "003", "Exception while shutting down '{}'", e);
   }
 
-  public void exceptionOnLockedTaskServiceMethodInvocation(ExternalTaskClientException e) {
+  protected void exceptionOnLockedTaskServiceMethodInvocation(ExternalTaskClientException e) {
     logError(
       "004", "Exception on locked task service method invocation '{}'", e);
   }

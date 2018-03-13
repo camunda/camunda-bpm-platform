@@ -30,20 +30,20 @@ import java.util.List;
  */
 public class EngineClient {
 
-  private static final int MAX_TASKS = 10;
-  private static final String EXTERNAL_TASK_RESOURCE_PATH = "/external-task";
-  public static final String FETCH_AND_LOCK_RESOURCE_PATH = EXTERNAL_TASK_RESOURCE_PATH + "/fetchAndLock";
+  protected static final int MAX_TASKS = 10;
+  protected static final String EXTERNAL_TASK_RESOURCE_PATH = "/external-task";
+  protected static final String FETCH_AND_LOCK_RESOURCE_PATH = EXTERNAL_TASK_RESOURCE_PATH + "/fetchAndLock";
   public static final String ID_PATH_PARAM = "{id}";
-  private static final String ID_RESOURCE_PATH = EXTERNAL_TASK_RESOURCE_PATH + "/" + ID_PATH_PARAM;
+  protected static final String ID_RESOURCE_PATH = EXTERNAL_TASK_RESOURCE_PATH + "/" + ID_PATH_PARAM;
   public static final String UNLOCK_RESOURCE_PATH = ID_RESOURCE_PATH + "/unlock";
   public static final String COMPLETE_RESOURCE_PATH = ID_RESOURCE_PATH + "/complete";
   public static final String FAILURE_RESOURCE_PATH = ID_RESOURCE_PATH + "/failure";
   public static final String BPMN_ERROR_RESOURCE_PATH = ID_RESOURCE_PATH + "/bpmnError";
   public static final String EXTEND_LOCK_RESOURCE_PATH = ID_RESOURCE_PATH + "/extendLock";
 
-  private String endpointUrl;
-  private String workerId;
-  private RequestExecutor engineInteraction;
+  protected String endpointUrl;
+  protected String workerId;
+  protected RequestExecutor engineInteraction;
 
   public EngineClient(String workerId, String endpointUrl, RequestInterceptorHandler requestInterceptorHandler) {
     this.workerId = workerId;

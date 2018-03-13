@@ -10,12 +10,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.client.impl;
+package org.camunda.bpm.client;
 
-import org.camunda.bpm.client.ExternalTaskClient;
-import org.camunda.bpm.client.ExternalTaskClientBuilder;
 import org.camunda.bpm.client.exception.ExternalTaskClientException;
 import org.camunda.bpm.client.helper.MockProvider;
+import org.camunda.bpm.client.impl.EngineClient;
+import org.camunda.bpm.client.impl.ExternalTaskClientBuilderImpl;
+import org.camunda.bpm.client.impl.ExternalTaskClientImpl;
 import org.camunda.bpm.client.interceptor.ClientRequestInterceptor;
 import org.camunda.bpm.client.interceptor.auth.BasicAuthProvider;
 import org.junit.Test;
@@ -35,17 +36,17 @@ import static org.mockito.Mockito.when;
 /**
  * @author Tassilo Weidner
  */
-public class CamundaClientTest {
+public class ExternalTaskClientTest {
 
   @Test
   public void shouldSucceedAfterSanitizingEndpointUrl() {
     // given & when
-    ExternalTaskClient camundaClient = ExternalTaskClient.create()
+    ExternalTaskClient client = ExternalTaskClient.create()
       .endpointUrl(ENDPOINT_URL + " / / / ")
       .build();
 
-    ExternalTaskClientImpl camundaClientImpl = ((ExternalTaskClientImpl) camundaClient);
-    EngineClient engineClient = camundaClientImpl.getWorkerManager().getEngineClient();
+    ExternalTaskClientImpl clientImpl = ((ExternalTaskClientImpl) client);
+    EngineClient engineClient = clientImpl.getTopicSubscriptionManager().getEngineClient();
 
     // then
     assertThat(engineClient.getEndpointUrl(), is(ENDPOINT_URL));
@@ -85,13 +86,13 @@ public class CamundaClientTest {
   @Test
   public void shouldThrowExceptionDueToUnknownHostname() throws UnknownHostException {
     // given
-    ExternalTaskClientBuilderImpl camundaClientBuilder = spy(ExternalTaskClientBuilderImpl.class);
-    when(camundaClientBuilder.getEndpointUrl()).thenReturn(ENDPOINT_URL);
-    when(camundaClientBuilder.getHostname()).thenThrow(UnknownHostException.class);
+    ExternalTaskClientBuilderImpl clientBuilder = spy(ExternalTaskClientBuilderImpl.class);
+    when(clientBuilder.getEndpointUrl()).thenReturn(ENDPOINT_URL);
+    when(clientBuilder.getHostname()).thenThrow(UnknownHostException.class);
 
     try {
       // when
-      camundaClientBuilder.checkHostname();
+      clientBuilder.checkHostname();
 
       fail("No ExternalTaskClientException thrown!");
     } catch (ExternalTaskClientException e) {

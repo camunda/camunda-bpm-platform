@@ -29,8 +29,8 @@ import java.io.IOException;
  */
 public class ExternalTaskClientLogger extends BaseLogger {
 
-  public static final String PROJECT_CODE = "CAMUNDA_EXTERNAL_TASK_CLIENT";
-  public static final String PROJECT_LOGGER = "org.camunda.bpm.client";
+  protected static final String PROJECT_CODE = "CAMUNDA_EXTERNAL_TASK_CLIENT";
+  protected static final String PROJECT_LOGGER = "org.camunda.bpm.client";
 
   public static final ExternalTaskClientLogger CLIENT_LOGGER =
     createLogger(ExternalTaskClientLogger.class, PROJECT_CODE, PROJECT_LOGGER, "01");
@@ -41,12 +41,12 @@ public class ExternalTaskClientLogger extends BaseLogger {
   public static final TopicSubscriptionManagerLogger WORKER_MANAGER_LOGGER =
     createLogger(TopicSubscriptionManagerLogger.class, PROJECT_CODE, PROJECT_LOGGER, "03");
 
-  public ExternalTaskClientException endpointUrlNullException() {
+  protected ExternalTaskClientException endpointUrlNullException() {
     return new ExternalTaskClientException(exceptionMessage(
       "001", "Endpoint URL cannot be null or an empty string"));
   }
 
-  public ExternalTaskClientException cannotGetHostnameException() {
+  protected ExternalTaskClientException cannotGetHostnameException() {
     return new ExternalTaskClientException(exceptionMessage(
       "002", "Cannot get hostname"));
   }
@@ -102,7 +102,7 @@ public class ExternalTaskClientLogger extends BaseLogger {
       "012", "Basic authentication credentials (username, password) cannot be null"));
   }
 
-  public ExternalTaskClientException interceptorNullException() {
+  protected ExternalTaskClientException interceptorNullException() {
     return new ExternalTaskClientException(exceptionMessage(
       "013", "Interceptor cannot be null"));
   }

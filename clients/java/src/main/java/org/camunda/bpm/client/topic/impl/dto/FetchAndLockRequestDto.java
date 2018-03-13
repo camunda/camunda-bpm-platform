@@ -12,10 +12,10 @@
  */
 package org.camunda.bpm.client.topic.impl.dto;
 
+import org.camunda.bpm.client.impl.RequestDto;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import org.camunda.bpm.client.impl.RequestDto;
 
 /**
  * @author Tassilo Weidner
@@ -23,7 +23,7 @@ import org.camunda.bpm.client.impl.RequestDto;
 public class FetchAndLockRequestDto extends RequestDto {
 
   protected int maxTasks;
-  protected List<TopicRequestDto> topics = new ArrayList<TopicRequestDto>();
+  protected List<TopicRequestDto> topics = new ArrayList<>();
 
   public FetchAndLockRequestDto(String workerId, int maxTasks, List<TopicRequestDto> topics) {
     super(workerId);
