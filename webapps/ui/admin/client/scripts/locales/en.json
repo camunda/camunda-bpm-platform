@@ -242,7 +242,7 @@
   "USERS_WARNING": "Warning:",
   "USERS_DELETING_UNDONE": "deleting a user account cannot be undone.",
   "USERS_NOTICE": "Notice:",
-  "USERS_UNLOCKING_USER": "this is doesn't mean that the user is necessarly locked.",
+  "USERS_UNLOCKING_USER": "Only relevant if the user is locked.",
   "USERS_UNLOCK_USER": "Unlock User",
   "USERS_GROUP_ID": "Group ID",
   "USERS_GROUP_NAME": "Group Name",
