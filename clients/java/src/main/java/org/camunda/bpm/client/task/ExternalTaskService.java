@@ -66,7 +66,7 @@ public interface ExternalTaskService {
    * @throws NotResumedException if the corresponding process instance could not be resumed
    * @throws ConnectionLostException if the connection could not be established
    */
-  void failure(ExternalTask externalTask, String errorMessage, String errorDetails, int retries, long retryTimeout);
+  void handleFailure(ExternalTask externalTask, String errorMessage, String errorDetails, int retries, long retryTimeout);
 
   /**
    * Reports a business error in the context of a running task.
@@ -81,7 +81,7 @@ public interface ExternalTaskService {
    * @throws NotResumedException if the corresponding process instance could not be resumed
    * @throws ConnectionLostException if the connection could not be established
    */
-  void bpmnError(ExternalTask externalTask, String errorCode);
+  void handleBpmnError(ExternalTask externalTask, String errorCode);
 
   /**
    * Extends the timeout of the lock by a given amount of time.

@@ -41,9 +41,9 @@ public class ExternalTaskClientLogger extends BaseLogger {
   public static final TopicSubscriptionManagerLogger WORKER_MANAGER_LOGGER =
     createLogger(TopicSubscriptionManagerLogger.class, PROJECT_CODE, PROJECT_LOGGER, "03");
 
-  protected ExternalTaskClientException endpointUrlNullException() {
+  protected ExternalTaskClientException baseUrlNullException() {
     return new ExternalTaskClientException(exceptionMessage(
-      "001", "Endpoint URL cannot be null or an empty string"));
+      "001", "Base URL cannot be null or an empty string"));
   }
 
   protected ExternalTaskClientException cannotGetHostnameException() {

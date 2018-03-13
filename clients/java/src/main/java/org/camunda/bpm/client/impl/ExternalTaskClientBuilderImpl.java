@@ -29,7 +29,7 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
 
   protected static final ExternalTaskClientLogger LOG = ExternalTaskClientLogger.CLIENT_LOGGER;
 
-  protected String endpointUrl;
+  protected String baseUrl;
   protected String workerId;
   protected List<ClientRequestInterceptor> interceptors;
 
@@ -37,8 +37,8 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
     this.interceptors = new ArrayList<>();
   }
 
-  public ExternalTaskClientBuilder endpointUrl(String endpointUrl) {
-    this.endpointUrl = endpointUrl;
+  public ExternalTaskClientBuilder baseUrl(String baseUrl) {
+    this.baseUrl = baseUrl;
     return this;
   }
 
@@ -48,8 +48,8 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
   }
 
   public ExternalTaskClient build() {
-    if (endpointUrl == null || endpointUrl.isEmpty()) {
-      throw LOG.endpointUrlNullException();
+    if (baseUrl == null || baseUrl.isEmpty()) {
+      throw LOG.baseUrlNullException();
     }
 
     checkInterceptors();
@@ -83,8 +83,8 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
     return InetAddress.getLocalHost().getHostName();
   }
 
-  public String getEndpointUrl() {
-    return endpointUrl;
+  public String getBaseUrl() {
+    return baseUrl;
   }
 
   protected String getWorkerId() {

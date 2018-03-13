@@ -96,7 +96,7 @@ public class EngineClientTest {
   public void shouldDeserializeFetchAndLockResponse() throws IOException {
     // given
     ExternalTaskClient client = ExternalTaskClient.create()
-      .endpointUrl(MockProvider.ENDPOINT_URL)
+      .baseUrl(MockProvider.BASE_URL)
       .build();
 
     final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
@@ -115,7 +115,7 @@ public class EngineClientTest {
     while (!handlerInvoked.get()) {
       // busy waiting
     }
-    client.shutdown();
+    client.stop();
 
     // then
     assertThat(lockedTaskReference.get(0).getActivityId(), is(MockProvider.ACTIVITY_ID));
@@ -143,7 +143,7 @@ public class EngineClientTest {
     mockDeserializationException(JsonParseException.class);
 
     ExternalTaskClient client = ExternalTaskClient.create()
-      .endpointUrl(MockProvider.ENDPOINT_URL)
+      .baseUrl(MockProvider.BASE_URL)
       .build();
 
     ExternalTaskHandler lockedTaskHandlerMock = mock(ExternalTaskHandler.class);
@@ -154,7 +154,7 @@ public class EngineClientTest {
     // when
     topicSubscriptionBuilder.open();
     Thread.sleep(1000);
-    client.shutdown();
+    client.stop();
 
     // then
     verifyZeroInteractions(lockedTaskHandlerMock);
@@ -166,7 +166,7 @@ public class EngineClientTest {
     mockDeserializationException(JsonMappingException.class);
 
     ExternalTaskClient client = ExternalTaskClient.create()
-      .endpointUrl(MockProvider.ENDPOINT_URL)
+      .baseUrl(MockProvider.BASE_URL)
       .build();
 
     ExternalTaskHandler lockedTaskHandlerMock = mock(ExternalTaskHandler.class);
@@ -177,7 +177,7 @@ public class EngineClientTest {
     // when
     topicSubscriptionBuilder.open();
     Thread.sleep(1000);
-    client.shutdown();
+    client.stop();
 
     // then
     verifyZeroInteractions(lockedTaskHandlerMock);
@@ -189,7 +189,7 @@ public class EngineClientTest {
     mockDeserializationException(IOException.class);
 
     ExternalTaskClient client = ExternalTaskClient.create()
-      .endpointUrl(MockProvider.ENDPOINT_URL)
+      .baseUrl(MockProvider.BASE_URL)
       .build();
 
     ExternalTaskHandler lockedTaskHandlerMock = mock(ExternalTaskHandler.class);
@@ -200,7 +200,7 @@ public class EngineClientTest {
     // when
     topicSubscriptionBuilder.open();
     Thread.sleep(1000);
-    client.shutdown();
+    client.stop();
 
     // then
     verifyZeroInteractions(lockedTaskHandlerMock);
@@ -212,7 +212,7 @@ public class EngineClientTest {
     mockSerializationException(JsonProcessingException.class);
 
     ExternalTaskClient client = ExternalTaskClient.create()
-      .endpointUrl(MockProvider.ENDPOINT_URL)
+      .baseUrl(MockProvider.BASE_URL)
       .build();
 
     ExternalTaskHandler lockedTaskHandlerMock = mock(ExternalTaskHandler.class);
@@ -223,7 +223,7 @@ public class EngineClientTest {
     // when
     topicSubscriptionBuilder.open();
     Thread.sleep(1000);
-    client.shutdown();
+    client.stop();
 
     // then
     verifyZeroInteractions(lockedTaskHandlerMock);
@@ -235,7 +235,7 @@ public class EngineClientTest {
     mockHttpRequestException(HttpResponseException.class);
 
     ExternalTaskClient client = ExternalTaskClient.create()
-      .endpointUrl(MockProvider.ENDPOINT_URL)
+      .baseUrl(MockProvider.BASE_URL)
       .build();
 
     ExternalTaskHandler lockedTaskHandlerMock = mock(ExternalTaskHandler.class);
@@ -247,7 +247,7 @@ public class EngineClientTest {
     // when
     topicSubscriptionBuilder.open();
     Thread.sleep(1000);
-    client.shutdown();
+    client.stop();
 
     // then
     verifyZeroInteractions(lockedTaskHandlerMock);
@@ -259,7 +259,7 @@ public class EngineClientTest {
     mockHttpRequestException(ClientProtocolException.class);
 
     ExternalTaskClient client = ExternalTaskClient.create()
-      .endpointUrl(MockProvider.ENDPOINT_URL)
+      .baseUrl(MockProvider.BASE_URL)
       .build();
 
     ExternalTaskHandler lockedTaskHandlerMock = mock(ExternalTaskHandler.class);
@@ -271,7 +271,7 @@ public class EngineClientTest {
     // when
     topicSubscriptionBuilder.open();
     Thread.sleep(1000);
-    client.shutdown();
+    client.stop();
 
     // then
     verifyZeroInteractions(lockedTaskHandlerMock);
@@ -283,7 +283,7 @@ public class EngineClientTest {
     mockHttpRequestException(IOException.class);
 
     ExternalTaskClient client = ExternalTaskClient.create()
-      .endpointUrl(MockProvider.ENDPOINT_URL)
+      .baseUrl(MockProvider.BASE_URL)
       .build();
 
     ExternalTaskHandler lockedTaskHandlerMock = mock(ExternalTaskHandler.class);
@@ -295,7 +295,7 @@ public class EngineClientTest {
     // when
     topicSubscriptionBuilder.open();
     Thread.sleep(1000);
-    client.shutdown();
+    client.stop();
 
     // then
     verifyZeroInteractions(lockedTaskHandlerMock);

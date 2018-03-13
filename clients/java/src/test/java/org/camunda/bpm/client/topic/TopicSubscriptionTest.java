@@ -79,7 +79,7 @@ public class TopicSubscriptionTest {
       .thenReturn(new ExternalTask[]{MockProvider.createLockedTask()});
 
     client = ExternalTaskClient.create()
-      .endpointUrl(MockProvider.ENDPOINT_URL)
+      .baseUrl(MockProvider.BASE_URL)
       .build();
   }
 
@@ -106,7 +106,7 @@ public class TopicSubscriptionTest {
     TopicSubscriptionManager topicSubscriptionManager = clientImpl.getTopicSubscriptionManager();
     assertThat(topicSubscriptionManager.getSubscriptions().size(), is(10));
 
-    client.shutdown();
+    client.stop();
   }
 
   @Test
@@ -123,7 +123,7 @@ public class TopicSubscriptionTest {
       assertThat(e.getMessage(), containsString("Topic name cannot be null"));
     }
 
-    client.shutdown();
+    client.stop();
   }
 
   @Test
@@ -147,7 +147,7 @@ public class TopicSubscriptionTest {
       }
     }
 
-    client.shutdown();
+    client.stop();
   }
 
   @Test
@@ -165,7 +165,7 @@ public class TopicSubscriptionTest {
       assertThat(e.getMessage(), containsString("Locked task handler cannot be null"));
     }
 
-    client.shutdown();
+    client.stop();
   }
 
   @Test
@@ -190,7 +190,7 @@ public class TopicSubscriptionTest {
       assertThat(e.getMessage(), containsString("Topic name has already been subscribed"));
     }
 
-    client.shutdown();
+    client.stop();
   }
 
   @Test
@@ -214,7 +214,7 @@ public class TopicSubscriptionTest {
       fail("ExternalTaskClientException thrown!");
     }
     
-    client.shutdown();
+    client.stop();
   }
 
   @Test
@@ -246,7 +246,7 @@ public class TopicSubscriptionTest {
     while (!invoked.get()) {
       // sync
     }
-    client.shutdown();
+    client.stop();
 
     verify(lockedTaskHandlerMock, atLeast(5))
       .execute(any(ExternalTask.class), any(ExternalTaskService.class));

@@ -109,7 +109,7 @@ public class ExternalTaskServiceTest {
   public void shouldUnlockTask() throws IOException {
     // given
     ExternalTaskClient client = ExternalTaskClient.create()
-      .endpointUrl(MockProvider.ENDPOINT_URL)
+      .baseUrl(MockProvider.BASE_URL)
       .build();
 
     final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
@@ -131,14 +131,14 @@ public class ExternalTaskServiceTest {
     // then
     assertRequestPerformed(EngineClient.UNLOCK_RESOURCE_PATH);
 
-    client.shutdown();
+    client.stop();
   }
 
   @Test
   public void shouldCompleteTask() throws IOException {
     // given
     ExternalTaskClient client = ExternalTaskClient.create()
-      .endpointUrl(MockProvider.ENDPOINT_URL)
+      .baseUrl(MockProvider.BASE_URL)
       .build();
 
     final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
@@ -160,7 +160,7 @@ public class ExternalTaskServiceTest {
     // then
     assertRequestPerformed(EngineClient.COMPLETE_RESOURCE_PATH);
 
-    client.shutdown();
+    client.stop();
   }
 
   @Test
@@ -170,7 +170,7 @@ public class ExternalTaskServiceTest {
     whenNew(ObjectMapper.class).withNoArguments().thenReturn(objectMapper);
 
     ExternalTaskClient client = ExternalTaskClient.create()
-      .endpointUrl(MockProvider.ENDPOINT_URL)
+      .baseUrl(MockProvider.BASE_URL)
       .build();
 
     final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
@@ -179,7 +179,7 @@ public class ExternalTaskServiceTest {
       client.subscribe(MockProvider.TOPIC_NAME)
         .lockDuration(5000)
         .handler((lockedTask, lockedTaskService) -> {
-          lockedTaskService.failure(lockedTask, MockProvider.ERROR_MESSAGE, MockProvider.ERROR_DETAILS,
+          lockedTaskService.handleFailure(lockedTask, MockProvider.ERROR_MESSAGE, MockProvider.ERROR_DETAILS,
             MockProvider.RETRIES, MockProvider.RETRY_TIMEOUT);
           handlerInvoked.set(true);
         });
@@ -208,7 +208,7 @@ public class ExternalTaskServiceTest {
 
     assertRequestPerformed(EngineClient.FAILURE_RESOURCE_PATH);
 
-    client.shutdown();
+    client.stop();
   }
 
   @Test
@@ -218,7 +218,7 @@ public class ExternalTaskServiceTest {
     whenNew(ObjectMapper.class).withNoArguments().thenReturn(objectMapper);
 
     ExternalTaskClient client = ExternalTaskClient.create()
-      .endpointUrl(MockProvider.ENDPOINT_URL)
+      .baseUrl(MockProvider.BASE_URL)
       .build();
 
     final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
@@ -226,7 +226,7 @@ public class ExternalTaskServiceTest {
       client.subscribe(MockProvider.TOPIC_NAME)
         .lockDuration(5000)
         .handler((lockedTask, lockedTaskService) -> {
-          lockedTaskService.bpmnError(lockedTask, MockProvider.ERROR_CODE);
+          lockedTaskService.handleBpmnError(lockedTask, MockProvider.ERROR_CODE);
           handlerInvoked.set(true);
         });
 
@@ -251,7 +251,7 @@ public class ExternalTaskServiceTest {
 
     assertRequestPerformed(EngineClient.BPMN_ERROR_RESOURCE_PATH);
 
-    client.shutdown();
+    client.stop();
   }
 
   @Test
@@ -261,7 +261,7 @@ public class ExternalTaskServiceTest {
     whenNew(ObjectMapper.class).withNoArguments().thenReturn(objectMapper);
 
     ExternalTaskClient client = ExternalTaskClient.create()
-      .endpointUrl(MockProvider.ENDPOINT_URL)
+      .baseUrl(MockProvider.BASE_URL)
       .build();
 
     final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
@@ -294,7 +294,7 @@ public class ExternalTaskServiceTest {
 
     assertRequestPerformed(EngineClient.EXTEND_LOCK_RESOURCE_PATH);
 
-    client.shutdown();
+    client.stop();
   }
 
   @Test
@@ -303,7 +303,7 @@ public class ExternalTaskServiceTest {
     CloseableHttpClient httpClient = mockHttpResponseException(EngineClient.UNLOCK_RESOURCE_PATH, 404);
 
     ExternalTaskClient externalTaskClient = ExternalTaskClient.create()
-      .endpointUrl(MockProvider.ENDPOINT_URL)
+      .baseUrl(MockProvider.BASE_URL)
       .build();
 
     final AtomicBoolean exceptionThrown = new AtomicBoolean(false);
@@ -333,7 +333,7 @@ public class ExternalTaskServiceTest {
       containsString("Exception while unlocking the external task: The task could not be found"));
     assertRequestPerformed(EngineClient.UNLOCK_RESOURCE_PATH, httpClient);
 
-    externalTaskClient.shutdown();
+    externalTaskClient.stop();
   }
 
   @Test
@@ -342,7 +342,7 @@ public class ExternalTaskServiceTest {
     CloseableHttpClient httpClient = mockHttpResponseException(EngineClient.COMPLETE_RESOURCE_PATH, 500);
 
     ExternalTaskClient externalTaskClient = ExternalTaskClient.create()
-      .endpointUrl(MockProvider.ENDPOINT_URL)
+      .baseUrl(MockProvider.BASE_URL)
       .build();
 
     final AtomicBoolean exceptionThrown = new AtomicBoolean(false);
@@ -372,7 +372,7 @@ public class ExternalTaskServiceTest {
       containsString("Exception while completing the external task: The corresponding process instance could not be resumed"));
     assertRequestPerformed(EngineClient.COMPLETE_RESOURCE_PATH, httpClient);
 
-    externalTaskClient.shutdown();
+    externalTaskClient.stop();
   }
 
   @Test
@@ -381,7 +381,7 @@ public class ExternalTaskServiceTest {
     CloseableHttpClient httpClient = mockHttpResponseException(EngineClient.FAILURE_RESOURCE_PATH, 400);
 
     ExternalTaskClient externalTaskClient = ExternalTaskClient.create()
-      .endpointUrl(MockProvider.ENDPOINT_URL)
+      .baseUrl(MockProvider.BASE_URL)
       .build();
 
     final AtomicBoolean exceptionThrown = new AtomicBoolean(false);
@@ -392,7 +392,7 @@ public class ExternalTaskServiceTest {
         .lockDuration(5000)
         .handler((lockedTask, lockedTaskService) -> {
           try {
-            lockedTaskService.failure(lockedTask, MockProvider.ERROR_MESSAGE, MockProvider.ERROR_DETAILS, MockProvider.RETRIES, MockProvider.RETRY_TIMEOUT);
+            lockedTaskService.handleFailure(lockedTask, MockProvider.ERROR_MESSAGE, MockProvider.ERROR_DETAILS, MockProvider.RETRIES, MockProvider.RETRY_TIMEOUT);
           } catch (NotAcquiredException e) {
             notAcquiredException.add(e);
             exceptionThrown.set(true);
@@ -411,7 +411,7 @@ public class ExternalTaskServiceTest {
       containsString("Exception while notifying a failure: The task's most recent lock could not be acquired"));
     assertRequestPerformed(EngineClient.FAILURE_RESOURCE_PATH, httpClient);
 
-    externalTaskClient.shutdown();
+    externalTaskClient.stop();
   }
 
   @Test
@@ -420,7 +420,7 @@ public class ExternalTaskServiceTest {
     CloseableHttpClient httpClient = mockHttpResponseException(EngineClient.BPMN_ERROR_RESOURCE_PATH, null);
 
     ExternalTaskClient externalTaskClient = ExternalTaskClient.create()
-      .endpointUrl(MockProvider.ENDPOINT_URL)
+      .baseUrl(MockProvider.BASE_URL)
       .build();
 
     final AtomicBoolean exceptionThrown = new AtomicBoolean(false); // list, as container must be final and changeable
@@ -431,7 +431,7 @@ public class ExternalTaskServiceTest {
         .lockDuration(5000)
         .handler((lockedTask, lockedTaskService) -> {
           try {
-            lockedTaskService.bpmnError(lockedTask, MockProvider.ERROR_CODE);
+            lockedTaskService.handleBpmnError(lockedTask, MockProvider.ERROR_CODE);
           } catch (ConnectionLostException e) {
             connectionLostException.add(e);
             exceptionThrown.set(true);
@@ -450,7 +450,7 @@ public class ExternalTaskServiceTest {
       containsString("Exception while notifying a BPMN error: Connection could not be established"));
     assertRequestPerformed(EngineClient.BPMN_ERROR_RESOURCE_PATH, httpClient);
 
-    externalTaskClient.shutdown();
+    externalTaskClient.stop();
   }
 
   // helper ////////////////////////////////////////////////
@@ -462,7 +462,7 @@ public class ExternalTaskServiceTest {
     ArgumentCaptor<HttpUriRequest> argumentCaptor = ArgumentCaptor.forClass(HttpUriRequest.class);
     verify(httpClient, atLeastOnce()).execute(argumentCaptor.capture(), any(AbstractResponseHandler.class));
 
-    String resourceUrl = MockProvider.ENDPOINT_URL + resourcePath;
+    String resourceUrl = MockProvider.BASE_URL + resourcePath;
     resourceUrl = resourceUrl.replace(EngineClient.ID_PATH_PARAM, MockProvider.ID);
 
     List<String> requestUrls = new ArrayList<String>();
@@ -478,7 +478,7 @@ public class ExternalTaskServiceTest {
     CloseableHttpClient httpClient = spy(new ClosableHttpClientMock(closeableHttpResponse) {
       @Override
       protected CloseableHttpResponse doExecute(HttpHost target, HttpRequest request, HttpContext context) throws IOException {
-        String resourceUrl = MockProvider.ENDPOINT_URL + resourcePath;
+        String resourceUrl = MockProvider.BASE_URL + resourcePath;
         resourceUrl = resourceUrl.replace(EngineClient.ID_PATH_PARAM, MockProvider.ID);
 
         if (request.toString().equals("POST " + resourceUrl + " HTTP/1.1") && statusCode == null) {

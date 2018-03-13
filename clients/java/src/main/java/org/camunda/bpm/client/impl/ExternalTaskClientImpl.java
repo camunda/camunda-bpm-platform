@@ -31,12 +31,12 @@ public class ExternalTaskClientImpl implements ExternalTaskClient {
 
   protected ExternalTaskClientImpl(ExternalTaskClientBuilderImpl clientBuilder) {
     String workerId = clientBuilder.getWorkerId();
-    String endpointUrl = clientBuilder.getEndpointUrl();
+    String baseUrl = clientBuilder.getBaseUrl();
 
     List<ClientRequestInterceptor> interceptors = clientBuilder.getInterceptors();
     requestInterceptorHandler = new RequestInterceptorHandler(interceptors);
 
-    EngineClient engineClient = new EngineClient(workerId, endpointUrl, requestInterceptorHandler);
+    EngineClient engineClient = new EngineClient(workerId, baseUrl, requestInterceptorHandler);
     topicSubscriptionManager = new TopicSubscriptionManager(engineClient);
   }
 
@@ -44,8 +44,8 @@ public class ExternalTaskClientImpl implements ExternalTaskClient {
     return new TopicSubscriptionBuilderImpl(topicName, topicSubscriptionManager);
   }
 
-  public void shutdown() {
-    topicSubscriptionManager.shutdown();
+  public void stop() {
+    topicSubscriptionManager.stop();
   }
 
   public TopicSubscriptionManager getTopicSubscriptionManager() {

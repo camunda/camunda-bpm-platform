@@ -71,7 +71,7 @@ public class ClientRequestInterceptorTest {
       .thenReturn(interceptionHandlerSpy);
 
     ExternalTaskClient client = ExternalTaskClient.create()
-      .endpointUrl(MockProvider.ENDPOINT_URL)
+      .baseUrl(MockProvider.BASE_URL)
       // .addInterceptor(...) interceptor is injected as a spy
       .build();
 
@@ -86,7 +86,7 @@ public class ClientRequestInterceptorTest {
       // busy waiting
     }
 
-    client.shutdown();
+    client.stop();
 
     // then
     ArgumentCaptor<HttpRequest> argumentCaptor = ArgumentCaptor.forClass(HttpRequest.class);

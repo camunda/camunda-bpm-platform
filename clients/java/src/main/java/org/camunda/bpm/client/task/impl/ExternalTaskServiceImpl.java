@@ -52,7 +52,7 @@ public class ExternalTaskServiceImpl implements ExternalTaskService {
   }
 
   @Override
-  public void failure(ExternalTask externalTask, String errorMessage, String errorDetails, int retries, long retryTimeout) {
+  public void handleFailure(ExternalTask externalTask, String errorMessage, String errorDetails, int retries, long retryTimeout) {
     try {
       engineClient.failure(externalTask.getId(), errorMessage, errorDetails, retries, retryTimeout);
     } catch (EngineClientException e) {
@@ -61,7 +61,7 @@ public class ExternalTaskServiceImpl implements ExternalTaskService {
   }
 
   @Override
-  public void bpmnError(ExternalTask externalTask, String errorCode) {
+  public void handleBpmnError(ExternalTask externalTask, String errorCode) {
     try {
       engineClient.bpmnError(externalTask.getId(), errorCode);
     } catch (EngineClientException e) {

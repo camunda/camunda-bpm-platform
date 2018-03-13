@@ -100,7 +100,7 @@ public class TopicSubscriptionManager implements Runnable {
     }
   }
 
-  public void shutdown() {
+  public void stop() {
     if (!isRunning) {
       return;
     }

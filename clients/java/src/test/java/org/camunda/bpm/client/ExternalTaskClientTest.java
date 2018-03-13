@@ -24,7 +24,7 @@ import org.junit.Test;
 import java.net.UnknownHostException;
 import java.util.List;
 
-import static org.camunda.bpm.client.helper.MockProvider.ENDPOINT_URL;
+import static org.camunda.bpm.client.helper.MockProvider.BASE_URL;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
@@ -39,47 +39,47 @@ import static org.mockito.Mockito.when;
 public class ExternalTaskClientTest {
 
   @Test
-  public void shouldSucceedAfterSanitizingEndpointUrl() {
+  public void shouldSucceedAfterSanitizingBaseUrl() {
     // given & when
     ExternalTaskClient client = ExternalTaskClient.create()
-      .endpointUrl(ENDPOINT_URL + " / / / ")
+      .baseUrl(BASE_URL + " / / / ")
       .build();
 
     ExternalTaskClientImpl clientImpl = ((ExternalTaskClientImpl) client);
     EngineClient engineClient = clientImpl.getTopicSubscriptionManager().getEngineClient();
 
     // then
-    assertThat(engineClient.getEndpointUrl(), is(ENDPOINT_URL));
+    assertThat(engineClient.getBaseUrl(), is(BASE_URL));
     assertFalse(engineClient.getWorkerId().isEmpty());
   }
 
   @Test
-  public void shouldThrowExceptionDueToEndpointUrlIsEmpty() {
+  public void shouldThrowExceptionDueToBaseUrlIsEmpty() {
     // given & When
     try {
       ExternalTaskClient.create()
-        .endpointUrl("")
+        .baseUrl("")
         .build();
 
       fail("No ExternalTaskClientException thrown!");
     } catch (ExternalTaskClientException e) {
       // then
-      assertThat(e.getMessage(), containsString("Endpoint URL cannot be null or an empty string"));
+      assertThat(e.getMessage(), containsString("Base URL cannot be null or an empty string"));
     }
   }
 
   @Test
-  public void shouldThrowExceptionDueToEndpointUrlIsNull() {
+  public void shouldThrowExceptionDueToBaseUrlIsNull() {
     // given & When
     try {
       ExternalTaskClient.create()
-        .endpointUrl(null)
+        .baseUrl(null)
         .build();
 
       fail("No ExternalTaskClientException thrown!");
     } catch (ExternalTaskClientException e) {
       // then
-      assertThat(e.getMessage(), containsString("Endpoint URL cannot be null or an empty string"));
+      assertThat(e.getMessage(), containsString("Base URL cannot be null or an empty string"));
     }
   }
 
@@ -87,7 +87,7 @@ public class ExternalTaskClientTest {
   public void shouldThrowExceptionDueToUnknownHostname() throws UnknownHostException {
     // given
     ExternalTaskClientBuilderImpl clientBuilder = spy(ExternalTaskClientBuilderImpl.class);
-    when(clientBuilder.getEndpointUrl()).thenReturn(ENDPOINT_URL);
+    when(clientBuilder.getBaseUrl()).thenReturn(BASE_URL);
     when(clientBuilder.getHostname()).thenThrow(UnknownHostException.class);
 
     try {
@@ -105,7 +105,7 @@ public class ExternalTaskClientTest {
   public void shouldAddInterceptors() {
     // given
     ExternalTaskClientBuilder clientBuilder = ExternalTaskClient.create()
-      .endpointUrl(MockProvider.ENDPOINT_URL)
+      .baseUrl(MockProvider.BASE_URL)
       .addInterceptor(new BasicAuthProvider("demo", "demo"));
 
     // when

@@ -42,6 +42,6 @@ public interface ExternalTaskClient {
   /**
    * Stops continuous fetching and locking of tasks
    */
-  void shutdown();
+  void stop();
 
 }

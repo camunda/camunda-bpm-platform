@@ -27,7 +27,7 @@ import java.util.Map;
  */
 public class MockProvider {
 
-  public static final String ENDPOINT_URL = "http://localhost:8080/engine-rest";
+  public static final String BASE_URL = "http://localhost:8080/engine-rest";
   public static final int MAX_TASKS = 10;
 
   // locked task
