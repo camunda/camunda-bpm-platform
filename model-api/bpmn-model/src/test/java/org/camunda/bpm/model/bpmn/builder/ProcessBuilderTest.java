@@ -1418,6 +1418,8 @@ public class ProcessBuilderTest {
           .camundaIn("${'sourceExpression'}", "target2", true)
           .camundaIn("all", true)
           .camundaIn("aBusinessKey")
+          .throwEventDefinitionDone()
+      .endEvent()
       .done();
 
     assertSignalEventDefinition("throw", "signal");

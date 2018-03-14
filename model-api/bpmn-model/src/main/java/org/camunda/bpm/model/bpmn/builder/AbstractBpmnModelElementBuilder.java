@@ -16,8 +16,11 @@ package org.camunda.bpm.model.bpmn.builder;
 import org.camunda.bpm.model.bpmn.BpmnModelException;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.BpmnModelElementInstance;
+import org.camunda.bpm.model.bpmn.instance.EndEvent;
+import org.camunda.bpm.model.bpmn.instance.IntermediateThrowEvent;
 import org.camunda.bpm.model.bpmn.instance.SubProcess;
 import org.camunda.bpm.model.bpmn.instance.Transaction;
+import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 
 /**
  * @author Sebastian Menski
@@ -67,6 +70,18 @@ public abstract class AbstractBpmnModelElementBuilder<B extends AbstractBpmnMode
     }
     else {
       throw new BpmnModelException("Unable to find a parent transaction.");
+    }
+  }
+
+  public AbstractThrowEventBuilder throwEventDefinitionDone() {
+    ModelElementInstance lastEvent = element.getDomElement().getParentElement().getModelElementInstance();
+    if (lastEvent != null && lastEvent instanceof IntermediateThrowEvent) {
+      return new IntermediateThrowEventBuilder(modelInstance, (IntermediateThrowEvent) lastEvent);
+    } else if (lastEvent != null && lastEvent instanceof EndEvent) {
+      return new EndEventBuilder(modelInstance, (EndEvent) lastEvent);
+    }
+    else {
+      throw new BpmnModelException("Unable to find a parent event.");
     }
   }
 
