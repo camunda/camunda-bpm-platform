@@ -188,13 +188,12 @@
 
     <profile>
       <id>license-management</id>
-
       <properties>
         <license.includeTransitiveDependencies>false</license.includeTransitiveDependencies>
+        <license.excludedScopes>test</license.excludedScopes>
+        <license.acceptPomPackaging>true</license.acceptPomPackaging>
       </properties>
-
       <modules>
-
         <module>engine</module>
         <module>engine-cdi</module>
         <module>engine-plugins</module>
@@ -212,7 +211,6 @@
         <module>distro/wildfly</module>
         <module>distro/wildfly10</module>
         <module>distro/wildfly11</module>
-
       </modules>
       <build>
         <plugins>
@@ -226,11 +224,6 @@
                 <goals>
                   <goal>aggregate-add-third-party</goal>
                 </goals>
-                <configuration>
-                  <acceptPomPackaging>true</acceptPomPackaging>
-                  <excludedScopes>test</excludedScopes>
-                  <includeTransitiveDependencies>${license.includeTransitiveDependencies}</includeTransitiveDependencies>
-                </configuration>
               </execution>
             </executions>
           </plugin>
