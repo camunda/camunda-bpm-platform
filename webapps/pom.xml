@@ -36,6 +36,8 @@
     <authorizationCheckRevokes>auto</authorizationCheckRevokes>
 
     <jdbcBatchProcessing>true</jdbcBatchProcessing>
+
+    <license.includeTransitiveDependencies>false</license.includeTransitiveDependencies>
   </properties>
 
   <dependencyManagement>
@@ -185,6 +187,15 @@
           <artifactId>build-helper-maven-plugin</artifactId>
           <version>1.9.1</version>
         </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>license-maven-plugin</artifactId>
+          <version>1.14</version>
+          <configuration>
+            <excludedScopes>test</excludedScopes>
+          </configuration>
+        </plugin>
+
       </plugins>
     </pluginManagement>
 
@@ -983,36 +994,6 @@
       <properties>
         <jdbcBatchProcessing>false</jdbcBatchProcessing>
       </properties>
-    </profile>
-
-    <profile>
-      <id>license-management</id>
-
-      <properties>
-        <license.includeTransitiveDependencies>false</license.includeTransitiveDependencies>
-      </properties>
-
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>license-maven-plugin</artifactId>
-            <version>1.14</version>
-            <executions>
-              <execution>
-                <id>license-management</id>
-                <goals>
-                  <goal>add-third-party</goal>
-                </goals>
-                <configuration>
-                  <excludedScopes>test</excludedScopes>
-                  <includeTransitiveDependencies>${license.includeTransitiveDependencies}</includeTransitiveDependencies>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
     </profile>
 
   </profiles>
