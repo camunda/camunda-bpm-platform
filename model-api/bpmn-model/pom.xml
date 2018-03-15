@@ -17,6 +17,7 @@
 
   <properties>
     <camunda.version.old>7.8.0</camunda.version.old>
+    <license.includeTransitiveDependencies>false</license.includeTransitiveDependencies>
   </properties>
 
   <dependencyManagement>
@@ -85,6 +86,14 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>1.14</version>
+        <configuration>
+          <excludedScopes>test</excludedScopes>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 
@@ -132,32 +141,6 @@
                   <failOnWarning>true</failOnWarning>
                   <ignoredDifferencesFile>.clirr-jenkins-ignore.xml</ignoredDifferencesFile>
                 </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>license-management</id>
-
-      <properties>
-        <license.includeTransitiveDependencies>false</license.includeTransitiveDependencies>
-        <license.excludedScopes>test</license.excludedScopes>
-      </properties>
-
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>license-maven-plugin</artifactId>
-            <version>1.14</version>
-            <executions>
-              <execution>
-                <id>license-management</id>
-                <goals>
-                  <goal>add-third-party</goal>
-                </goals>
               </execution>
             </executions>
           </plugin>
