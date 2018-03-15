@@ -20,6 +20,24 @@
     The parent pom for all camunda BPM projects can be found in the parent directory relative to this file.
   </description>
 
+  <properties>
+    <license.includeTransitiveDependencies>false</license.includeTransitiveDependencies>
+  </properties>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>1.14</version>
+        <configuration>
+          <acceptPomPackaging>true</acceptPomPackaging>
+          <excludedScopes>test</excludedScopes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
   <profiles>
     <!-- distro profile is default and builds the complete distribution.
          Does not run integration tests. -->
@@ -186,50 +204,6 @@
       </modules>
     </profile>
 
-    <profile>
-      <id>license-management</id>
-      <properties>
-        <license.includeTransitiveDependencies>false</license.includeTransitiveDependencies>
-        <license.excludedScopes>test</license.excludedScopes>
-        <license.acceptPomPackaging>true</license.acceptPomPackaging>
-      </properties>
-      <modules>
-        <module>engine</module>
-        <module>engine-cdi</module>
-        <module>engine-plugins</module>
-        <module>engine-rest</module>
-        <module>engine-spring</module>
-
-        <module>javaee/ejb-service</module>
-        <module>javaee/ejb-client</module>
-        <module>javaee/jobexecutor-ra</module>
-        <module>javaee/jobexecutor-rar</module>
-
-        <module>distro/jbossas7</module>
-        <module>distro/tomcat</module>
-        <module>distro/webjar</module>
-        <module>distro/wildfly</module>
-        <module>distro/wildfly10</module>
-        <module>distro/wildfly11</module>
-      </modules>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>license-maven-plugin</artifactId>
-            <version>1.14</version>
-            <executions>
-              <execution>
-                <id>license-management</id>
-                <goals>
-                  <goal>aggregate-add-third-party</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
   </profiles>
 
   <licenses>
