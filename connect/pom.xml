@@ -14,6 +14,7 @@
 
   <properties>
     <connect.version.old>1.0.5</connect.version.old>
+    <license.includeTransitiveDependencies>false</license.includeTransitiveDependencies>
   </properties>
 
   <modules>
@@ -86,6 +87,17 @@
         </plugin>
       </plugins>
     </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>1.14</version>
+        <configuration>
+          <acceptPomPackaging>true</acceptPomPackaging>
+          <excludedScopes>test</excludedScopes>
+        </configuration>
+      </plugin>
+    </plugins>
   </build>
 
   <scm>
