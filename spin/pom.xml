@@ -25,6 +25,7 @@
     <jackson.version>2.9.3</jackson.version>
     <spin.version.old>1.5.0</spin.version.old>
     <groovy.version>2.4.13</groovy.version>
+    <license.includeTransitiveDependencies>false</license.includeTransitiveDependencies>
   </properties>
 
   <dependencyManagement>
@@ -104,34 +105,6 @@
         <jackson.version>2.6.3</jackson.version>
       </properties>
     </profile>
-    <profile>
-      <id>license-management</id>
-      <properties>
-        <license.includeTransitiveDependencies>false</license.includeTransitiveDependencies>
-      </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>license-maven-plugin</artifactId>
-            <version>1.14</version>
-            <executions>
-              <execution>
-                <id>license-management</id>
-                <goals>
-                  <goal>aggregate-add-third-party</goal>
-                </goals>
-                <configuration>
-                  <acceptPomPackaging>true</acceptPomPackaging>
-                  <excludedScopes>test</excludedScopes>
-                  <includeTransitiveDependencies>${license.includeTransitiveDependencies}</includeTransitiveDependencies>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
   </profiles>
 
   <build>
@@ -156,6 +129,17 @@
         </plugin>
       </plugins>
     </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>1.14</version>
+        <configuration>
+          <acceptPomPackaging>true</acceptPomPackaging>
+          <excludedScopes>test</excludedScopes>
+        </configuration>
+      </plugin>
+    </plugins>
   </build>
 
   <scm>
