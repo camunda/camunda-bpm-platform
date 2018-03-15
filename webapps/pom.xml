@@ -187,14 +187,6 @@
           <artifactId>build-helper-maven-plugin</artifactId>
           <version>1.9.1</version>
         </plugin>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>license-maven-plugin</artifactId>
-          <version>1.14</version>
-          <configuration>
-            <excludedScopes>test</excludedScopes>
-          </configuration>
-        </plugin>
 
       </plugins>
     </pluginManagement>
@@ -254,6 +246,14 @@
             </configuration>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>1.14</version>
+        <configuration>
+          <excludedScopes>test</excludedScopes>
+        </configuration>
       </plugin>
     </plugins>
   </build>
