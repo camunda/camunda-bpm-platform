@@ -16,7 +16,11 @@
 			<signalEventDefinition signalRef="alertSignal" />
 		</intermediateCatchEvent>
 
-		<sequenceFlow sourceRef="signalEvent" targetRef="end" />
+		<sequenceFlow sourceRef="signalEvent" targetRef="task" />
+
+		<userTask id="task" />
+
+		<sequenceFlow sourceRef="task" targetRef="end" />
 
 		<endEvent id="end" />
 

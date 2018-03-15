@@ -31,6 +31,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -122,20 +123,16 @@ public class SignalEventPayloadTest {
     ProcessInstance catchingPI = runtimeService.startProcessInstanceByKey("catchIntermediatePayloadSignal");
 
     // when
-    ProcessInstance throwingPI = runtimeService.startProcessInstanceByKey("throwPayloadSignal", variables);
+    runtimeService.startProcessInstanceByKey("throwPayloadSignal", variables);
 
     // then
-    assertEquals(0, runtimeService.createProcessInstanceQuery()
-      .processInstanceIds(new HashSet<String>(Arrays.asList(throwingPI.getId(), catchingPI.getId())))
-      .count());
-
-    List<HistoricVariableInstance> catchingPiVariables = processEngineConfiguration.getHistoryService()
-      .createHistoricVariableInstanceQuery()
-      .processInstanceId(catchingPI.getId())
+    List<VariableInstance> catchingPiVariables = runtimeService
+      .createVariableInstanceQuery()
+      .processInstanceIdIn(catchingPI.getId())
       .list();
     assertEquals(2, catchingPiVariables.size());
 
-    for(HistoricVariableInstance variable : catchingPiVariables) {
+    for(VariableInstance variable : catchingPiVariables) {
       if(variable.getName().equals("payloadVar1Target")) {
         assertEquals("payloadVal1", variable.getValue());
       } else {
@@ -158,16 +155,12 @@ public class SignalEventPayloadTest {
     ProcessInstance catchingPI = runtimeService.startProcessInstanceByKey("catchIntermediatePayloadSignal");
 
     // when
-    ProcessInstance throwingPI = runtimeService.startProcessInstanceByKey("throwExpressionPayloadSignal", variables);
+    runtimeService.startProcessInstanceByKey("throwExpressionPayloadSignal", variables);
 
     // then
-    assertEquals(0, runtimeService.createProcessInstanceQuery()
-      .processInstanceIds(new HashSet<String>(Arrays.asList(throwingPI.getId(), catchingPI.getId())))
-      .count());
-
-    List<HistoricVariableInstance> catchingPiVariables = processEngineConfiguration.getHistoryService()
-      .createHistoricVariableInstanceQuery()
-      .processInstanceId(catchingPI.getId())
+    List<VariableInstance> catchingPiVariables = runtimeService
+      .createVariableInstanceQuery()
+      .processInstanceIdIn(catchingPI.getId())
       .list();
     assertEquals(1, catchingPiVariables.size());
 
@@ -191,20 +184,16 @@ public class SignalEventPayloadTest {
     ProcessInstance catchingPI = runtimeService.startProcessInstanceByKey("catchIntermediatePayloadSignal");
 
     // when
-    ProcessInstance throwingPI = runtimeService.startProcessInstanceByKey("throwPayloadSignal", variables);
+    runtimeService.startProcessInstanceByKey("throwPayloadSignal", variables);
 
     // then
-    assertEquals(0, runtimeService.createProcessInstanceQuery()
-      .processInstanceIds(new HashSet<String>(Arrays.asList(throwingPI.getId(), catchingPI.getId())))
-      .count());
-
-    List<HistoricVariableInstance> catchingPiVariables = processEngineConfiguration.getHistoryService()
-      .createHistoricVariableInstanceQuery()
-      .processInstanceId(catchingPI.getId())
+    List<VariableInstance> catchingPiVariables = runtimeService
+      .createVariableInstanceQuery()
+      .processInstanceIdIn(catchingPI.getId())
       .list();
     assertEquals(2, catchingPiVariables.size());
 
-    for(HistoricVariableInstance variable : catchingPiVariables) {
+    for(VariableInstance variable : catchingPiVariables) {
       if(variable.getName().equals("payloadVar1")) {
         assertEquals("payloadVal1", variable.getValue());
       } else {
@@ -232,20 +221,16 @@ public class SignalEventPayloadTest {
     ProcessInstance catchingPI = runtimeService.startProcessInstanceByKey("catchIntermediatePayloadSignal");
 
     // when
-    ProcessInstance throwingPI = runtimeService.startProcessInstanceByKey("throwPayloadSignal", variables);
+    runtimeService.startProcessInstanceByKey("throwPayloadSignal", variables);
 
     // then
-    assertEquals(0, runtimeService.createProcessInstanceQuery()
-      .processInstanceIds(new HashSet<String>(Arrays.asList(throwingPI.getId(), catchingPI.getId())))
-      .count());
-
-    List<HistoricVariableInstance> catchingPiVariables = processEngineConfiguration.getHistoryService()
-      .createHistoricVariableInstanceQuery()
-      .processInstanceId(catchingPI.getId())
+    List<VariableInstance> catchingPiVariables = runtimeService
+      .createVariableInstanceQuery()
+      .processInstanceIdIn(catchingPI.getId())
       .list();
     assertEquals(2, catchingPiVariables.size());
 
-    for(HistoricVariableInstance variable : catchingPiVariables) {
+    for(VariableInstance variable : catchingPiVariables) {
       if(variable.getName().equals(localVar1)) {
         assertEquals(localVal1, variable.getValue());
       } else {
@@ -267,7 +252,7 @@ public class SignalEventPayloadTest {
     String businessKey = "aBusinessKey";
 
     // when
-    ProcessInstance throwingPI = runtimeService.startProcessInstanceByKey("throwBusinessKeyPayloadSignal", businessKey);
+    runtimeService.startProcessInstanceByKey("throwBusinessKeyPayloadSignal", businessKey);
 
     // then
     ProcessInstance catchingPI = runtimeService.createProcessInstanceQuery().singleResult();
@@ -318,7 +303,5 @@ public class SignalEventPayloadTest {
         assertEquals(localVal2, variable.getValue());
       }
     }
-
-
   }
 }
