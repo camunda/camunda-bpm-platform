@@ -105,4 +105,15 @@ public abstract class AbstractSignalEventDefinitionBuilder<B extends AbstractSig
 
     return myself;
   }
+
+  /**
+   * Sets a "camunda:in" parameter to pass all the process variables of the
+   * signal-throwing process instance to the signal-catching process instance
+   *
+   * @param variables a String flag to declare that all of the signal-throwing process-instance variables should be passed
+   * @return the builder object
+   */
+  public B camundaInAllVariables(String variables) {
+    return camundaInAllVariables(variables, false);
+  }
 }

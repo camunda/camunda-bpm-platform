@@ -1409,7 +1409,7 @@ public class ProcessBuilderTest {
   }
 
   @Test
-  public void testIntermediateSignalThrowEventWithPayload() {
+  public void testIntermediateSignalThrowEventWithPayloadLocalVar() {
     modelInstance = Bpmn.createProcess()
       .startEvent()
       .intermediateThrowEvent("throw")
@@ -1451,6 +1451,25 @@ public class ProcessBuilderTest {
       }
     }
     assertThat(paramCounter).isEqualTo(camundaInParams.size());
+  }
+
+  @Test
+  public void testIntermediateSignalThrowEventWithPayload() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .intermediateThrowEvent("throw")
+        .signalEventDefinition("signal")
+          .camundaInAllVariables("all")
+          .throwEventDefinitionDone()
+      .endEvent()
+      .done();
+
+    SignalEventDefinition signalEventDefinition = assertAndGetSingleEventDefinition("throw", SignalEventDefinition.class);
+
+    List<CamundaIn> camundaInParams = signalEventDefinition.getExtensionElements().getElementsQuery().filterByType(CamundaIn.class).list();
+    assertThat(camundaInParams.size()).isEqualTo(1);
+
+    assertThat(camundaInParams.get(0).getCamundaVariables()).isEqualTo("all");
   }
 
   @Test
