@@ -14,13 +14,23 @@ package org.camunda.bpm.client.task.impl.dto;
 
 import org.camunda.bpm.client.impl.RequestDto;
 
+import java.util.Map;
+
 /**
  * @author Tassilo Weidner
  */
 public class CompleteRequestDto extends RequestDto {
 
-  public CompleteRequestDto(String workerId) {
+  protected Map<String, TypedValueDto> variables;
+
+  public CompleteRequestDto(String workerId, Map<String, TypedValueDto> variables) {
     super(workerId);
+
+    this.variables = variables;
+  }
+
+  public Map<String, TypedValueDto> getVariables() {
+    return variables;
   }
 
 }

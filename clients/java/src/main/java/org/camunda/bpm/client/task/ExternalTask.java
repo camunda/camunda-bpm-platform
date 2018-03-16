@@ -12,6 +12,9 @@
  */
 package org.camunda.bpm.client.task;
 
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.value.TypedValue;
+
 import java.util.Date;
 import java.util.Map;
 
@@ -103,11 +106,76 @@ public interface ExternalTask {
   long getPriority();
 
   /**
-   * @return a map of variables that contains an entry for each variable that
-   * was specified at fetching time, if such a variable exists in the task's
-   * ancestor execution hierarchy.
+   * Returns an untyped variable of the task's ancestor execution hierarchy
+   *
+   * @param variableName of the variable to be returned
+   * @return
+   * <ul>
+   *   <li> an untyped variable if such a named variable exists
+   *   <li> null if such a named variable not exists
+   * </ul>
    */
-  Map<String, Object> getVariables();
+  <T> T getVariable(String variableName);
+
+  /**
+   * Returns a typed variable of the task's ancestor execution hierarchy
+   *
+   * @param variableName of the variable to be returned
+   * @return
+   * <ul>
+   *   <li> a typed variable if such a named variable exists
+   *   <li> null if such a named variable not exists
+   * </ul>
+   */
+  <T extends TypedValue> T getVariableTyped(String variableName);
+
+  /**
+   * Returns untyped variables that exist in the task's ancestor execution hierarchy
+   *
+   * @return a map of untyped variables that contains an entry for each variable
+   */
+  Map<String, Object> getAllVariables();
+
+  /**
+   * Returns typed variables that exist in the task's ancestor execution hierarchy
+   *
+   * @return a map of typed variables that contains an entry for each variable
+   */
+  VariableMap getAllVariablesTyped();
+
+  /**
+   * Sets an untyped variable in the task's ancestor execution hierarchy
+   *
+   * @param variableName of the variable
+   * @param variableValue of the variable
+   */
+  void setVariable(String variableName, Object variableValue);
+
+  /**
+   * Sets a typed variable in the task's ancestor execution hierarchy
+   *
+   * @param variableName of the variable
+   * @param variableTypedValue of the variable
+   */
+  void setVariableTyped(String variableName, TypedValue variableTypedValue);
+
+  /**
+   * Sets a map of variables in the task's ancestor execution hierarchy, where the key
+   * and the value represent the variable name and its value. Map can consist of both
+   * typed and untyped variables.
+   *
+   * @param variableMap that contains both typed and untyped values
+   */
+  void setAllVariables(Map<String, Object> variableMap);
+
+  /**
+   * Sets a map of variables in the task's ancestor execution hierarchy, where the key
+   * and the value represent the variable name and its value.
+   * Map can only consist of typed variables.
+   *
+   * @param variableMap that contains typed values
+   */
+  void setAllVariablesTyped(Map<String, TypedValue> variableMap);
 
 }
 

@@ -32,8 +32,15 @@ import org.camunda.bpm.client.helper.ClosableHttpClientMock;
 import org.camunda.bpm.client.helper.MockProvider;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskHandler;
+import org.camunda.bpm.client.task.impl.ExternalTaskImpl;
+import org.camunda.bpm.client.task.impl.dto.TypedValueDto;
 import org.camunda.bpm.client.topic.TopicSubscriptionBuilder;
 import org.camunda.bpm.client.topic.impl.dto.FetchAndLockRequestDto;
+import org.camunda.bpm.engine.variable.type.PrimitiveValueType;
+import org.camunda.bpm.engine.variable.value.BooleanValue;
+import org.camunda.bpm.engine.variable.value.IntegerValue;
+import org.camunda.bpm.engine.variable.value.StringValue;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -46,11 +53,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -100,13 +111,13 @@ public class EngineClientTest {
       .build();
 
     final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
-    final List<ExternalTask> lockedTaskReference = new ArrayList<>(); // list, as container must be final and changeable
+    final List<ExternalTask> externalTaskReference = new ArrayList<>(); // list, as container must be final and changeable
 
     TopicSubscriptionBuilder topicSubscriptionBuilder =
       client.subscribe(MockProvider.TOPIC_NAME)
         .lockDuration(5000)
         .handler((lockedTask, lockedTaskService) -> {
-          lockedTaskReference.add(lockedTask);
+          externalTaskReference.add(lockedTask);
           handlerInvoked.set(true);
         });
 
@@ -118,23 +129,23 @@ public class EngineClientTest {
     client.stop();
 
     // then
-    assertThat(lockedTaskReference.get(0).getActivityId(), is(MockProvider.ACTIVITY_ID));
-    assertThat(lockedTaskReference.get(0).getActivityInstanceId(), is(MockProvider.ACTIVITY_INSTANCE_ID));
-    assertThat(lockedTaskReference.get(0).getExecutionId(), is(MockProvider.EXECUTION_ID));
-    assertThat(lockedTaskReference.get(0).getLockExpirationTime(), is(MockProvider.LOCK_EXPIRATION_TIME));
-    assertThat(lockedTaskReference.get(0).getProcessDefinitionId(), is(MockProvider.PROCESS_DEFINITION_ID));
-    assertThat(lockedTaskReference.get(0).getProcessDefinitionKey(), is(MockProvider.PROCESS_DEFINITION_KEY));
-    assertThat(lockedTaskReference.get(0).getProcessInstanceId(), is(MockProvider.PROCESS_INSTANCE_ID));
-    assertThat(lockedTaskReference.get(0).getId(), is(MockProvider.ID));
-    assertThat(lockedTaskReference.get(0).getWorkerId(), is(MockProvider.WORKER_ID));
-    assertThat(lockedTaskReference.get(0).getTopicName(), is(MockProvider.TOPIC_NAME));
-    assertThat(lockedTaskReference.get(0).getVariables(), is(MockProvider.VARIABLES));
-    assertThat(lockedTaskReference.get(0).getErrorMessage(), is(MockProvider.ERROR_MESSAGE));
-    assertThat(lockedTaskReference.get(0).getErrorDetails(), is(MockProvider.ERROR_DETAILS));
-    assertThat(lockedTaskReference.get(0).isSuspended(), is(MockProvider.SUSPENSION_STATE));
-    assertThat(lockedTaskReference.get(0).getTenantId(), is(MockProvider.TENANT_ID));
-    assertThat(lockedTaskReference.get(0).getRetries(), is(MockProvider.RETRIES));
-    assertThat(lockedTaskReference.get(0).getPriority(), is(MockProvider.PRIORITY));
+    ExternalTask externalTask = externalTaskReference.get(0);
+    assertThat(externalTask.getActivityId(), is(MockProvider.ACTIVITY_ID));
+    assertThat(externalTask.getActivityInstanceId(), is(MockProvider.ACTIVITY_INSTANCE_ID));
+    assertThat(externalTask.getExecutionId(), is(MockProvider.EXECUTION_ID));
+    assertThat(externalTask.getLockExpirationTime(), is(MockProvider.LOCK_EXPIRATION_TIME));
+    assertThat(externalTask.getProcessDefinitionId(), is(MockProvider.PROCESS_DEFINITION_ID));
+    assertThat(externalTask.getProcessDefinitionKey(), is(MockProvider.PROCESS_DEFINITION_KEY));
+    assertThat(externalTask.getProcessInstanceId(), is(MockProvider.PROCESS_INSTANCE_ID));
+    assertThat(externalTask.getId(), is(MockProvider.ID));
+    assertThat(externalTask.getWorkerId(), is(MockProvider.WORKER_ID));
+    assertThat(externalTask.getTopicName(), is(MockProvider.TOPIC_NAME));
+    assertThat(externalTask.getErrorMessage(), is(MockProvider.ERROR_MESSAGE));
+    assertThat(externalTask.getErrorDetails(), is(MockProvider.ERROR_DETAILS));
+    assertThat(externalTask.isSuspended(), is(MockProvider.SUSPENSION_STATE));
+    assertThat(externalTask.getTenantId(), is(MockProvider.TENANT_ID));
+    assertThat(externalTask.getRetries(), is(MockProvider.RETRIES));
+    assertThat(externalTask.getPriority(), is(MockProvider.PRIORITY));
   }
 
   @Test

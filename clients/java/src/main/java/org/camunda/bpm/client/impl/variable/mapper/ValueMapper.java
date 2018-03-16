@@ -10,19 +10,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.client.impl;
+package org.camunda.bpm.client.impl.variable.mapper;
+
+import org.camunda.bpm.client.task.impl.dto.TypedValueDto;
+import org.camunda.bpm.engine.variable.impl.value.UntypedValueImpl;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
  * @author Tassilo Weidner
  */
-public class EngineClientException extends RuntimeException {
+public interface ValueMapper<T extends TypedValue> {
 
-  public EngineClientException(String message) {
-    super(message);
-  }
+  String getTypeName();
 
-  protected EngineClientException(String message, Throwable e) {
-    super(message, e);
-  }
+  boolean isAssignable(TypedValue typedValue);
+
+  <B extends TypedValue> B convertToTypedValue(UntypedValueImpl untypedValue);
+
+  <A extends TypedValue> A deserializeTypedValue(TypedValueDto typedValueDto);
+
+  TypedValueDto serializeTypedValue(TypedValue typedValue);
 
 }

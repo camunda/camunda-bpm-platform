@@ -222,7 +222,7 @@ public class TopicSubscriptionTest {
     // given
     List<ExternalTask> lockedTasks = new ArrayList<>();
     for (int i = 0; i < 5; i++) {
-      lockedTasks.add(MockProvider.createLockedTask());
+      lockedTasks.add(MockProvider.createExternalTaskWithoutVariables());
     }
 
     when(httpClient.execute(any(HttpUriRequest.class), any(AbstractResponseHandler.class)))

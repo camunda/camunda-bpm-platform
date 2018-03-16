@@ -19,6 +19,7 @@ import org.camunda.bpm.client.exception.ExternalTaskClientException;
 import org.camunda.bpm.client.exception.NotAcquiredException;
 import org.camunda.bpm.client.exception.NotFoundException;
 import org.camunda.bpm.client.exception.NotResumedException;
+import org.camunda.bpm.client.exception.UnsupportedTypeException;
 import org.camunda.bpm.client.topic.impl.TopicSubscriptionManagerLogger;
 import org.camunda.commons.logging.BaseLogger;
 
@@ -38,7 +39,7 @@ public class ExternalTaskClientLogger extends BaseLogger {
   public static final EngineClientLogger ENGINE_CLIENT_LOGGER =
     createLogger(EngineClientLogger.class, PROJECT_CODE, PROJECT_LOGGER, "02");
 
-  public static final TopicSubscriptionManagerLogger WORKER_MANAGER_LOGGER =
+  public static final TopicSubscriptionManagerLogger TOPIC_SUBSCRIPTION_MANAGER_LOGGER =
     createLogger(TopicSubscriptionManagerLogger.class, PROJECT_CODE, PROJECT_LOGGER, "03");
 
   protected ExternalTaskClientException baseUrlNullException() {
@@ -105,6 +106,11 @@ public class ExternalTaskClientLogger extends BaseLogger {
   protected ExternalTaskClientException interceptorNullException() {
     return new ExternalTaskClientException(exceptionMessage(
       "013", "Interceptor cannot be null"));
+  }
+
+  public UnsupportedTypeException unsupportedTypeException(Object variableValue) {
+    return new UnsupportedTypeException(exceptionMessage(
+      "014", "Exception while converting variable value '{}' to typed variable value: no suitable mapper found for type {}", variableValue, variableValue.getClass().getSimpleName()));
   }
 
 }

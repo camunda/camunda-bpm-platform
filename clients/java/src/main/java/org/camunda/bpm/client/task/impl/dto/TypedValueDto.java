@@ -10,19 +10,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.client.impl;
+package org.camunda.bpm.client.task.impl.dto;
+
+import java.util.Map;
 
 /**
  * @author Tassilo Weidner
  */
-public class EngineClientException extends RuntimeException {
+public class TypedValueDto {
 
-  public EngineClientException(String message) {
-    super(message);
+  protected Object value;
+  protected String type;
+  protected Map<String, Object> valueInfo;
+
+  public Object getValue() {
+    return value;
   }
 
-  protected EngineClientException(String message, Throwable e) {
-    super(message, e);
+  public String getType() {
+    return type;
+  }
+
+  public Map<String, Object> getValueInfo() {
+    return valueInfo;
+  }
+
+  public void setType(String type) {
+    this.type = type;
+  }
+
+  public void setValue(Object value) {
+    this.value = value;
+  }
+
+  public void setValueInfo(Map<String,Object> valueInfo) {
+    this.valueInfo = valueInfo;
   }
 
 }

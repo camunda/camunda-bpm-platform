@@ -41,4 +41,9 @@ public class TopicSubscriptionManagerLogger extends ExternalTaskClientLogger {
       "004", "Exception on locked task service method invocation '{}'", e);
   }
 
+  protected void exceptionWhileDeserializingVariables(Throwable e) {
+    logError(
+      "005", "Exception while deserializing variables '{}'", e);
+  }
+
 }

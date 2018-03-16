@@ -10,19 +10,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.client.impl;
+package org.camunda.bpm.client.exception;
 
 /**
+ * <p>Exception is thrown if a variable is set that has an unsupported type</p>
+ *
  * @author Tassilo Weidner
  */
-public class EngineClientException extends RuntimeException {
+public class UnsupportedTypeException extends ExternalTaskClientException {
 
-  public EngineClientException(String message) {
+  public UnsupportedTypeException(String message) {
     super(message);
-  }
-
-  protected EngineClientException(String message, Throwable e) {
-    super(message, e);
   }
 
 }

@@ -10,19 +10,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.client.impl;
+package org.camunda.bpm.client.impl.variable.mapper.primitive;
+
+import org.camunda.bpm.engine.variable.type.ValueType;
+import org.camunda.bpm.engine.variable.value.BooleanValue;
 
 /**
  * @author Tassilo Weidner
  */
-public class EngineClientException extends RuntimeException {
+public class BooleanValueMapper extends AbstractPrimitiveValueMapper<BooleanValue> {
 
-  public EngineClientException(String message) {
-    super(message);
-  }
-
-  protected EngineClientException(String message, Throwable e) {
-    super(message, e);
+  public BooleanValueMapper() {
+    super(ValueType.BOOLEAN);
   }
 
 }

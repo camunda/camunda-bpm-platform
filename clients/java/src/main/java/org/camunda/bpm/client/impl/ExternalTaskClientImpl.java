@@ -13,6 +13,7 @@
 package org.camunda.bpm.client.impl;
 
 import org.camunda.bpm.client.ExternalTaskClient;
+import org.camunda.bpm.client.impl.variable.VariableMappers;
 import org.camunda.bpm.client.interceptor.ClientRequestInterceptor;
 import org.camunda.bpm.client.interceptor.impl.RequestInterceptorHandler;
 import org.camunda.bpm.client.topic.TopicSubscriptionBuilder;
@@ -36,8 +37,9 @@ public class ExternalTaskClientImpl implements ExternalTaskClient {
     List<ClientRequestInterceptor> interceptors = clientBuilder.getInterceptors();
     requestInterceptorHandler = new RequestInterceptorHandler(interceptors);
 
-    EngineClient engineClient = new EngineClient(workerId, baseUrl, requestInterceptorHandler);
-    topicSubscriptionManager = new TopicSubscriptionManager(engineClient);
+    VariableMappers variableMappers = new VariableMappers();
+    EngineClient engineClient = new EngineClient(workerId, baseUrl, requestInterceptorHandler, variableMappers);
+    topicSubscriptionManager = new TopicSubscriptionManager(engineClient, variableMappers);
   }
 
   public TopicSubscriptionBuilder subscribe(String topicName) {

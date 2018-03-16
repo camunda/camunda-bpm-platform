@@ -16,11 +16,16 @@ import org.camunda.bpm.client.exception.ExternalTaskClientException;
 import org.camunda.bpm.client.impl.EngineClient;
 import org.camunda.bpm.client.impl.EngineClientException;
 import org.camunda.bpm.client.impl.ExternalTaskClientLogger;
+import org.camunda.bpm.client.impl.variable.VariableMappers;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskHandler;
 import org.camunda.bpm.client.task.ExternalTaskService;
+import org.camunda.bpm.client.task.impl.ExternalTaskImpl;
 import org.camunda.bpm.client.task.impl.ExternalTaskServiceImpl;
+import org.camunda.bpm.client.task.impl.dto.TypedValueDto;
 import org.camunda.bpm.client.topic.impl.dto.TopicRequestDto;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.impl.VariableMapImpl;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,7 +39,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class TopicSubscriptionManager implements Runnable {
 
-  protected static final TopicSubscriptionManagerLogger LOG = ExternalTaskClientLogger.WORKER_MANAGER_LOGGER;
+  protected static final TopicSubscriptionManagerLogger LOG = ExternalTaskClientLogger.TOPIC_SUBSCRIPTION_MANAGER_LOGGER;
 
   protected EngineClient engineClient;
   protected List<TopicSubscriptionImpl> subscriptions;
@@ -45,13 +50,17 @@ public class TopicSubscriptionManager implements Runnable {
   protected List<TopicRequestDto> taskTopicRequests = new ArrayList<>();
   protected Map<String, ExternalTaskHandler> lockedTasksHandlers = new HashMap<>();
 
-  public TopicSubscriptionManager(EngineClient engineClient) {
+  protected VariableMappers variableMappers;
+
+  public TopicSubscriptionManager(EngineClient engineClient, VariableMappers variableMappers) {
     this.engineClient = engineClient;
     this.subscriptions = new CopyOnWriteArrayList<>();
     this.isRunning = true;
 
     this.thread = new Thread(this, TopicSubscriptionManager.class.getSimpleName());
     this.thread.start();
+
+    this.variableMappers = variableMappers;
   }
 
   public void run() {
@@ -84,17 +93,35 @@ public class TopicSubscriptionManager implements Runnable {
       }
 
       externalTasks.forEach(externalTask -> {
-        String topicName = externalTask.getTopicName();
-        ExternalTaskHandler taskHandler = lockedTasksHandlers.get(topicName);
-        ExternalTaskService service = new ExternalTaskServiceImpl(externalTask.getId(), engineClient);
+        Map<String, TypedValueDto> variableDtoMap = ((ExternalTaskImpl) externalTask).getVariables();
+        VariableMap variableMap = null;
 
+        boolean variablesDeserialized = false;
         try {
-          taskHandler.execute(externalTask, service);
-        } catch (ExternalTaskClientException e) {
-          LOG.exceptionOnLockedTaskServiceMethodInvocation(e);
+
+          variableMap = variableMappers.deserializeVariables(variableDtoMap);
+          variablesDeserialized = true;
+
         } catch (Throwable e) {
-          LOG.exceptionWhileExecutingLockedTaskHandler(e);
+          LOG.exceptionWhileDeserializingVariables(e);
         }
+
+        if (variablesDeserialized) {
+          ((ExternalTaskImpl) externalTask).setVariableMappers(variableMappers);
+          ((ExternalTaskImpl) externalTask).setLocalVariableMap(variableMap);
+
+          String topicName = externalTask.getTopicName();
+          ExternalTaskHandler taskHandler = lockedTasksHandlers.get(topicName);
+          ExternalTaskService service = new ExternalTaskServiceImpl(externalTask.getId(), engineClient);
+
+          try {
+            taskHandler.execute(externalTask, service);
+          } catch (ExternalTaskClientException e) {
+            LOG.exceptionOnLockedTaskServiceMethodInvocation(e);
+          } catch (Throwable e) {
+            LOG.exceptionWhileExecutingLockedTaskHandler(e);
+          }
+        } // else: skip handler execution
       });
 
     }

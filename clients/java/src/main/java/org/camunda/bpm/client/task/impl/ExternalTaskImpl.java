@@ -12,7 +12,15 @@
  */
 package org.camunda.bpm.client.task.impl;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.camunda.bpm.client.impl.variable.VariableMappers;
 import org.camunda.bpm.client.task.ExternalTask;
+import org.camunda.bpm.client.task.impl.dto.TypedValueDto;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.impl.VariableMapImpl;
+import org.camunda.bpm.engine.variable.impl.value.UntypedValueImpl;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 import java.util.Date;
 import java.util.Map;
@@ -38,7 +46,16 @@ public class ExternalTaskImpl implements ExternalTask {
   protected String topicName;
   protected String tenantId;
   protected long priority;
-  protected Map<String, Object> variables;
+  protected Map<String, TypedValueDto> variables;
+
+  @JsonIgnore
+  protected VariableMap localVariableMap;
+
+  @JsonIgnore
+  protected VariableMap writtenVariableMap = new VariableMapImpl();
+
+  @JsonIgnore
+  protected VariableMappers variableMappers;
 
   public void setActivityId(String activityId) {
     this.activityId = activityId;
@@ -104,8 +121,27 @@ public class ExternalTaskImpl implements ExternalTask {
     this.priority = priority;
   }
 
-  public void setVariables(Map<String, Object> variables) {
+  public void setVariables(Map<String, TypedValueDto> variables) {
     this.variables = variables;
+  }
+
+  public Map<String, TypedValueDto> getVariables() {
+    return variables;
+  }
+
+  @JsonIgnore
+  public VariableMap getWrittenVariableMap() {
+    return writtenVariableMap;
+  }
+
+  @JsonIgnore
+  public void setLocalVariableMap(VariableMap localVariableMap) {
+    this.localVariableMap = localVariableMap;
+  }
+
+  @JsonIgnore
+  public void setVariableMappers(VariableMappers variableMappers) {
+    this.variableMappers = variableMappers;
   }
 
   @Override
@@ -188,9 +224,71 @@ public class ExternalTaskImpl implements ExternalTask {
     return priority;
   }
 
+  @JsonIgnore
   @Override
-  public Map<String, Object> getVariables() {
-    return variables;
+  public Map<String, Object> getAllVariables() {
+    return localVariableMap;
+  }
+
+  @JsonIgnore
+  @Override
+  public VariableMap getAllVariablesTyped() {
+    return localVariableMap;
+  }
+
+  @JsonIgnore
+  @Override
+  public <T extends TypedValue> T getVariableTyped(String variableName) {
+    return localVariableMap.getValueTyped(variableName);
+  }
+
+  @JsonIgnore
+  @Override
+  @SuppressWarnings("unchecked")
+  public <T> T getVariable(String variableName) {
+    return (T) localVariableMap.get(variableName);
+  }
+
+  @JsonIgnore
+  @Override
+  public void setVariable(String variableName, Object variableValue) {
+    TypedValue typedValue = Variables.untypedValue(variableValue);
+    setVariableTyped(variableName, typedValue);
+  }
+
+  @JsonIgnore
+  @Override
+  public void setVariableTyped(String variableName, TypedValue variableTypedValue) {
+    TypedValue typedValue = convertToTypedValue(variableTypedValue);
+
+    writtenVariableMap.putValueTyped(variableName, typedValue);
+    localVariableMap.putValueTyped(variableName, typedValue);
+  }
+
+  @JsonIgnore
+  @Override
+  public void setAllVariables(Map<String, Object> variables) {
+    variables.forEach(this::setVariable);
+  }
+
+  @JsonIgnore
+  @Override
+  public void setAllVariablesTyped(Map<String, TypedValue> variables) {
+    variables.forEach(this::setVariableTyped);
+  }
+
+  protected TypedValue convertToTypedValue(TypedValue typedValue) {
+    Object value = null;
+    if (typedValue != null) {
+      value = typedValue.getValue();
+    }
+
+    if (typedValue == null || typedValue instanceof UntypedValueImpl) {
+      return variableMappers.convertToTypedValue(value);
+    }
+    else {
+      return typedValue;
+    }
   }
 
 }

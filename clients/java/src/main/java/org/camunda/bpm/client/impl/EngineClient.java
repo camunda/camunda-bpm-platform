@@ -12,18 +12,24 @@
  */
 package org.camunda.bpm.client.impl;
 
+import org.camunda.bpm.client.impl.variable.VariableMappers;
 import org.camunda.bpm.client.interceptor.impl.RequestInterceptorHandler;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.impl.ExternalTaskImpl;
-import org.camunda.bpm.client.task.impl.FailureRequestDto;
 import org.camunda.bpm.client.task.impl.dto.BpmnErrorRequestDto;
 import org.camunda.bpm.client.task.impl.dto.CompleteRequestDto;
 import org.camunda.bpm.client.task.impl.dto.ExtendLockRequestDto;
+import org.camunda.bpm.client.task.impl.dto.FailureRequestDto;
+import org.camunda.bpm.client.task.impl.dto.TypedValueDto;
 import org.camunda.bpm.client.topic.impl.dto.FetchAndLockRequestDto;
 import org.camunda.bpm.client.topic.impl.dto.TopicRequestDto;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Tassilo Weidner
@@ -45,10 +51,13 @@ public class EngineClient {
   protected String workerId;
   protected RequestExecutor engineInteraction;
 
-  public EngineClient(String workerId, String baseUrl, RequestInterceptorHandler requestInterceptorHandler) {
+  protected VariableMappers variableMappers;
+
+  public EngineClient(String workerId, String baseUrl, RequestInterceptorHandler requestInterceptorHandler, VariableMappers variableMappers) {
     this.workerId = workerId;
     this.engineInteraction = new RequestExecutor(requestInterceptorHandler);
     this.baseUrl = engineInteraction.sanitizeUrl(baseUrl);
+    this.variableMappers = variableMappers;
   }
 
   public List<ExternalTask> fetchAndLock(List<TopicRequestDto> topics) {
@@ -64,8 +73,10 @@ public class EngineClient {
     engineInteraction.postRequest(resourceUrl, null, Void.class);
   }
 
-  public void complete(String taskId) {
-    CompleteRequestDto payload = new CompleteRequestDto(workerId);
+  public void complete(String taskId, VariableMap variableMap) {
+    Map<String, TypedValueDto> typedValueDtoMap = variableMappers.serializeVariables(variableMap);
+
+    CompleteRequestDto payload = new CompleteRequestDto(workerId, typedValueDtoMap);
     String resourcePath = COMPLETE_RESOURCE_PATH.replace("{id}", taskId);
     String resourceUrl = baseUrl + resourcePath;
     engineInteraction.postRequest(resourceUrl, payload, Void.class);

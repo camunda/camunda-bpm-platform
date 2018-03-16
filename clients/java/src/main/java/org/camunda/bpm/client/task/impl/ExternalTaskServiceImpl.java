@@ -17,6 +17,7 @@ import org.camunda.bpm.client.impl.EngineClientException;
 import org.camunda.bpm.client.impl.ExternalTaskClientLogger;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
+import org.camunda.bpm.engine.variable.VariableMap;
 
 /**
  * @author Tassilo Weidner
@@ -45,7 +46,8 @@ public class ExternalTaskServiceImpl implements ExternalTaskService {
   @Override
   public void complete(ExternalTask externalTask) {
     try {
-      engineClient.complete(externalTask.getId());
+      VariableMap writtenVariableMap = ((ExternalTaskImpl)externalTask).getWrittenVariableMap();
+      engineClient.complete(externalTask.getId(), writtenVariableMap);
     } catch (EngineClientException e) {
       throw LOG.externalTaskServiceException("completing the external task", e);
     }
