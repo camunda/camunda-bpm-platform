@@ -37,17 +37,31 @@ public abstract class AbstractSignalEventDefinitionBuilder<B extends AbstractSig
    * @param target the name of the variable in the signal-catching process instance
    * @return the builder object
    */
-  public B camundaIn(String source, String target, boolean isSourceExpression) {
+  public B camundaInSourceTarget(String source, String target) {
     CamundaIn param = modelInstance.newInstance(CamundaIn.class);
-
-    if (isSourceExpression) {
-      param.setCamundaSourceExpression(source);
-    } else {
-      param.setCamundaSource(source);
-    }
 
     param.setCamundaSource(source);
     param.setCamundaTarget(target);
+
+    addExtensionElement(param);
+
+    return myself;
+  }
+
+  /**
+   * Sets a "camunda:in" parameter to pass an expression from the signal-throwing
+   * process instance to a variable in the signal-catching process instance
+   *
+   * @param sourceExpression the expression in the signal-throwing process instance
+   * @param target the name of the variable in the signal-catching process instance
+   * @return the builder object
+   */
+  public B camundaInSourceExpressionTarget(String sourceExpression, String target) {
+    CamundaIn param = modelInstance.newInstance(CamundaIn.class);
+
+    param.setCamundaSourceExpression(sourceExpression);
+    param.setCamundaTarget(target);
+
     addExtensionElement(param);
 
     return myself;
@@ -60,9 +74,11 @@ public abstract class AbstractSignalEventDefinitionBuilder<B extends AbstractSig
    * @param businessKey the business key string or expression of the signal-throwing process instance
    * @return the builder object
    */
-  public B camundaIn(String businessKey) {
+  public B camundaInBusinessKey(String businessKey) {
     CamundaIn param = modelInstance.newInstance(CamundaIn.class);
+
     param.setCamundaBusinessKey(businessKey);
+
     addExtensionElement(param);
 
     return myself;
@@ -76,8 +92,9 @@ public abstract class AbstractSignalEventDefinitionBuilder<B extends AbstractSig
    * @param local a Boolean flag to declare that only the local variables should be passed
    * @return the builder object
    */
-  public B camundaIn(String variables, boolean local) {
+  public B camundaInAllVariables(String variables, boolean local) {
     CamundaIn param = modelInstance.newInstance(CamundaIn.class);
+
     param.setCamundaVariables(variables);
 
     if (local) {
