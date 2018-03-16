@@ -12,6 +12,10 @@
   <name>camunda template engines jsr223 - root</name>
   <packaging>pom</packaging>
 
+  <properties>
+    <license.includeTransitiveDependencies>false</license.includeTransitiveDependencies>
+  </properties>
+
   <modules>
     <module>bom</module>
     <module>freemarker</module>
@@ -91,6 +95,15 @@
           <instructions>
             <Export-Package>org.camunda.templateengines*</Export-Package>
           </instructions>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>1.14</version>
+        <configuration>
+          <acceptPomPackaging>true</acceptPomPackaging>
+          <excludedScopes>test</excludedScopes>
         </configuration>
       </plugin>
     </plugins>
