@@ -6,7 +6,7 @@ public class WebappProperty {
   private boolean indexRedirectEnabled = true;
 
   // TODO: META-INF/resources/webjars/camunda}")
-  private String webjarClasspath = "";
+  private String webjarClasspath = "/META-INF/resources";
 
   private String securityConfigFile = "/securityFilterRules.json";
 

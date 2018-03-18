@@ -7,6 +7,7 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 
 import org.camunda.bpm.engine.impl.util.IoUtil;
+import org.camunda.bpm.spring.boot.starter.property.WebappProperty;
 import org.camunda.bpm.webapp.impl.security.filter.SecurityFilter;
 import org.camunda.bpm.webapp.impl.security.filter.util.FilterRules;
 import org.springframework.core.io.Resource;
@@ -16,10 +17,11 @@ public class ResourceLoadingSecurityFilter extends SecurityFilter implements Res
 
   private ResourceLoader resourceLoader;
 
+  private WebappProperty webappProperty;
   @Override
   protected void loadFilterRules(FilterConfig filterConfig) throws ServletException {
     String configFileName = filterConfig.getInitParameter("configFile");
-    Resource resource = resourceLoader.getResource("classpath:" + configFileName);
+    Resource resource = resourceLoader.getResource("classpath:" +webappProperty.getWebjarClasspath() + configFileName);
     InputStream configFileResource;
     try {
       configFileResource = resource.getInputStream();
@@ -34,7 +36,7 @@ public class ResourceLoadingSecurityFilter extends SecurityFilter implements Res
       IoUtil.closeSilently(configFileResource);
     }
   }
-
+  
   /**
    * @return the resourceLoader
    */
@@ -49,5 +51,20 @@ public class ResourceLoadingSecurityFilter extends SecurityFilter implements Res
   public void setResourceLoader(ResourceLoader resourceLoader) {
     this.resourceLoader = resourceLoader;
   }
+  
+  /**
+   * @return the webappProperty
+   */
+    public WebappProperty getWebappProperty() {
+        return webappProperty;
+    }
 
+    /**
+     * @param webappProperty 
+     *          webappProperty to set
+     */
+    public void setWebappProperty(WebappProperty webappProperty) {
+        this.webappProperty = webappProperty;
+    }
+  
 }

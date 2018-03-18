@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
+import org.camunda.bpm.spring.boot.starter.property.WebappProperty;
 
 import org.camunda.bpm.webapp.impl.engine.ProcessEnginesFilter;
 import org.springframework.core.io.Resource;
@@ -13,13 +14,14 @@ import org.springframework.core.io.ResourceLoader;
 public class ResourceLoadingProcessEnginesFilter extends ProcessEnginesFilter implements ResourceLoaderDependingFilter {
 
   private ResourceLoader resourceLoader;
+  private WebappProperty webappProperty;
 
   @Override
   protected String getWebResourceContents(String name) throws IOException {
     InputStream is = null;
 
     try {
-      Resource resource = resourceLoader.getResource("classpath:" + name);
+      Resource resource = resourceLoader.getResource("classpath:"+webappProperty.getWebjarClasspath() + name);
       is = resource.getInputStream();
 
       BufferedReader reader = new BufferedReader(new InputStreamReader(is));
@@ -57,5 +59,20 @@ public class ResourceLoadingProcessEnginesFilter extends ProcessEnginesFilter im
   public void setResourceLoader(ResourceLoader resourceLoader) {
     this.resourceLoader = resourceLoader;
   }
+
+  /**
+   * @return the webappProperty
+   */
+    public WebappProperty getWebappProperty() {
+        return webappProperty;
+    }
+
+    /**
+     * @param webappProperty 
+     *          webappProperty to set
+     */
+    public void setWebappProperty(WebappProperty webappProperty) {
+        this.webappProperty = webappProperty;
+    }
 
 }

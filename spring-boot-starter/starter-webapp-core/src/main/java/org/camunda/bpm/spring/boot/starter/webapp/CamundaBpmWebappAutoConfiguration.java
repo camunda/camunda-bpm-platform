@@ -36,7 +36,10 @@ public class CamundaBpmWebappAutoConfiguration extends WebMvcConfigurerAdapter {
 
   @Bean(name = "resourceLoaderDependingInitHook")
   public InitHook<ResourceLoaderDependingFilter> resourceLoaderDependingInitHook() {
-    return filter -> filter.setResourceLoader(resourceLoader);
+    return filter -> {
+      filter.setResourceLoader(resourceLoader);
+      filter.setWebappProperty(properties.getWebapp());
+    };
   }
 
   @Bean
@@ -47,9 +50,9 @@ public class CamundaBpmWebappAutoConfiguration extends WebMvcConfigurerAdapter {
   @Override
   public void addResourceHandlers(ResourceHandlerRegistry registry) {
     final String classpath = "classpath:" + properties.getWebapp().getWebjarClasspath();
-    registry.addResourceHandler("/lib/**").addResourceLocations("classpath:/lib/");
+    registry.addResourceHandler("/lib/**").addResourceLocations(classpath + "/lib/");
     registry.addResourceHandler("/api/**").addResourceLocations("classpath:/api/");
-    registry.addResourceHandler("/app/**").addResourceLocations("classpath:/app/");
+    registry.addResourceHandler("/app/**").addResourceLocations(classpath + "/app/");
     super.addResourceHandlers(registry);
   }
 
