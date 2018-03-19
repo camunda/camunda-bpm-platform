@@ -40,7 +40,7 @@ public class AdministratorAuthorizationPlugin extends AbstractProcessEnginePlugi
    * on all built-in resources. */
   protected String administratorGroupName;
 
-  /** The name of the administrator group.
+  /** The name of the administrator user.
    *
    * If this name is set to a non-null and non-empty value,
    * the plugin will create group-level Administrator authorizations
