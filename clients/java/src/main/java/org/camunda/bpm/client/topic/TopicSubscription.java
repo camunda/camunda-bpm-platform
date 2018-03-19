@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.client.topic;
 
+import org.camunda.bpm.client.task.ExternalTaskHandler;
+
 /**
  * <p>Subscription to a topic</p>
  *
@@ -23,5 +25,20 @@ public interface TopicSubscription {
    * The client has been unsubscribed from the topic
    */
   void close();
+
+  /**
+   * @return the topic name of the subscription
+   */
+  String getTopicName();
+
+  /**
+   * @return the duration of the lock applied to the topic
+   */
+  long getLockDuration();
+
+  /**
+   * @return the external task handler of the topic
+   */
+  ExternalTaskHandler getExternalTaskHandler();
 
 }

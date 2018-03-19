@@ -22,13 +22,13 @@ public class TopicSubscriptionImpl implements TopicSubscription {
 
   protected String topicName;
   protected long lockDuration;
-  protected ExternalTaskHandler lockedTaskHandler;
+  protected ExternalTaskHandler externalTaskHandler;
   protected TopicSubscriptionManager topicSubscriptionManager;
 
-  public TopicSubscriptionImpl(String topicName, long lockDuration, ExternalTaskHandler lockedTaskHandler, TopicSubscriptionManager topicSubscriptionManager) {
+  public TopicSubscriptionImpl(String topicName, long lockDuration, ExternalTaskHandler externalTaskHandler, TopicSubscriptionManager topicSubscriptionManager) {
     this.topicName = topicName;
     this.lockDuration = lockDuration;
-    this.lockedTaskHandler = lockedTaskHandler;
+    this.externalTaskHandler = externalTaskHandler;
     this.topicSubscriptionManager = topicSubscriptionManager;
   }
 
@@ -40,8 +40,8 @@ public class TopicSubscriptionImpl implements TopicSubscription {
     return lockDuration;
   }
 
-  public ExternalTaskHandler getLockedTaskHandler() {
-    return lockedTaskHandler;
+  public ExternalTaskHandler getExternalTaskHandler() {
+    return externalTaskHandler;
   }
 
   @Override

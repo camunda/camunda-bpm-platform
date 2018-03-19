@@ -23,9 +23,9 @@ import org.camunda.bpm.client.task.ExternalTaskService;
 import org.camunda.bpm.client.task.impl.ExternalTaskImpl;
 import org.camunda.bpm.client.task.impl.ExternalTaskServiceImpl;
 import org.camunda.bpm.client.task.impl.dto.TypedValueDto;
+import org.camunda.bpm.client.topic.TopicSubscription;
 import org.camunda.bpm.client.topic.impl.dto.TopicRequestDto;
 import org.camunda.bpm.engine.variable.VariableMap;
-import org.camunda.bpm.engine.variable.impl.VariableMapImpl;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,13 +42,10 @@ public class TopicSubscriptionManager implements Runnable {
   protected static final TopicSubscriptionManagerLogger LOG = ExternalTaskClientLogger.TOPIC_SUBSCRIPTION_MANAGER_LOGGER;
 
   protected EngineClient engineClient;
-  protected List<TopicSubscriptionImpl> subscriptions;
+  protected List<TopicSubscription> subscriptions;
 
   protected boolean isRunning;
   protected Thread thread;
-
-  protected List<TopicRequestDto> taskTopicRequests = new ArrayList<>();
-  protected Map<String, ExternalTaskHandler> lockedTasksHandlers = new HashMap<>();
 
   protected VariableMappers variableMappers;
 
@@ -70,16 +67,15 @@ public class TopicSubscriptionManager implements Runnable {
   }
 
   protected void acquire() {
-    
-    taskTopicRequests.clear();
-    lockedTasksHandlers.clear();
+    List<TopicRequestDto> taskTopicRequests = new ArrayList<>();
+    Map<String, ExternalTaskHandler> lockedTasksHandlers = new HashMap<>();
 
     subscriptions.forEach(subscription -> {
       TopicRequestDto taskTopicRequest = TopicRequestDto.fromTopicSubscription(subscription);
       taskTopicRequests.add(taskTopicRequest);
 
       String topicName = subscription.getTopicName();
-      ExternalTaskHandler lockedTaskHandler = subscription.getLockedTaskHandler();
+      ExternalTaskHandler lockedTaskHandler = subscription.getExternalTaskHandler();
       lockedTasksHandlers.put(topicName, lockedTaskHandler);
     });
 
@@ -154,7 +150,7 @@ public class TopicSubscriptionManager implements Runnable {
     return engineClient;
   }
 
-  public List<TopicSubscriptionImpl> getSubscriptions() {
+  public List<TopicSubscription> getSubscriptions() {
     return subscriptions;
   }
 

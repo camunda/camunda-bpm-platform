@@ -18,8 +18,6 @@ import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.BytesValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
-import java.util.Date;
-
 /**
  * @author Tassilo Weidner
  */

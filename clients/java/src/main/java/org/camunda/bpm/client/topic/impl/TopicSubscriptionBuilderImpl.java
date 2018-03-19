@@ -69,7 +69,7 @@ public class TopicSubscriptionBuilderImpl implements TopicSubscriptionBuilder {
   }
 
   protected void checkTopicNameAlreadySubscribed() {
-    List<TopicSubscriptionImpl> subscriptions = topicSubscriptionManager.getSubscriptions();
+    List<TopicSubscription> subscriptions = topicSubscriptionManager.getSubscriptions();
     subscriptions.forEach(subscription -> {
       if (subscription.getTopicName().equals(topicName)) {
         throw LOG.topicNameAlreadySubscribedException();

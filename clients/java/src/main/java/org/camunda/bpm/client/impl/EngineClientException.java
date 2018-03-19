@@ -15,7 +15,7 @@ package org.camunda.bpm.client.impl;
 /**
  * @author Tassilo Weidner
  */
-public class EngineClientException extends RuntimeException {
+public class EngineClientException extends Exception {
 
   public EngineClientException(String message) {
     super(message);

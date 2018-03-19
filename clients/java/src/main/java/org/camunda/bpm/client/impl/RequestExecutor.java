@@ -55,7 +55,7 @@ public class RequestExecutor {
     initObjectMapper();
   }
 
-  protected <T> T postRequest(String resourceUrl, RequestDto requestDto, Class<T> responseDtoClass) {
+  protected <T> T postRequest(String resourceUrl, RequestDto requestDto, Class<T> responseDtoClass) throws EngineClientException {
     ByteArrayEntity serializedRequest = serializeRequest(requestDto);
     HttpUriRequest httpRequest = RequestBuilder.post(resourceUrl)
       .addHeader(HEADER_USER_AGENT)
@@ -66,9 +66,16 @@ public class RequestExecutor {
     return executeRequest(httpRequest, responseDtoClass);
   }
 
-  protected <T> T executeRequest(HttpUriRequest httpRequest, Class<T> responseDtoClass) {
+  protected <T> T executeRequest(HttpUriRequest httpRequest, Class<T> responseDtoClass) throws EngineClientException {
     try {
       return httpClient.execute(httpRequest, handleResponse(responseDtoClass));
+    } catch (RuntimeException e) {
+      Throwable cause = e.getCause();
+      if (cause instanceof EngineClientException) {
+        throw (EngineClientException) e.getCause();
+      } else {
+        throw e;
+      }
     } catch (HttpResponseException e) { // catches >= 300 HTTP status responses
       throw LOG.exceptionWhileReceivingResponse(httpRequest, e);
     } catch (ClientProtocolException e) {
@@ -84,7 +91,11 @@ public class RequestExecutor {
       public T handleEntity(HttpEntity responseEntity) {
         T deserializedResponse = null;
         if (!responseDtoClass.isAssignableFrom(Void.class)) {
-          deserializedResponse = deserializeResponse(responseEntity, responseDtoClass);
+          try {
+            deserializedResponse = deserializeResponse(responseEntity, responseDtoClass);
+          } catch (EngineClientException e) {
+            throw new RuntimeException(e);
+          }
         }
 
         try {
@@ -98,7 +109,7 @@ public class RequestExecutor {
     };
   }
 
-  protected <T> T deserializeResponse(HttpEntity httpEntity, Class<T> responseDtoClass) {
+  protected <T> T deserializeResponse(HttpEntity httpEntity, Class<T> responseDtoClass) throws EngineClientException {
     try {
       InputStream responseBody = httpEntity.getContent();
       return objectMapper.readValue(responseBody, responseDtoClass);
@@ -111,7 +122,7 @@ public class RequestExecutor {
     }
   }
 
-  protected ByteArrayEntity serializeRequest(RequestDto dto) {
+  protected ByteArrayEntity serializeRequest(RequestDto dto) throws EngineClientException {
     byte[] serializedRequest = null;
 
     try {

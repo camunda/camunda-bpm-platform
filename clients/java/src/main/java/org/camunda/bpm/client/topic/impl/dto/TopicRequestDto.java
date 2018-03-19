@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.client.topic.impl.dto;
 
-import org.camunda.bpm.client.topic.impl.TopicSubscriptionImpl;
+import org.camunda.bpm.client.topic.TopicSubscription;
 
 /**
  * @author Tassilo Weidner
@@ -35,7 +35,7 @@ public class TopicRequestDto {
     return lockDuration;
   }
   
-  public static TopicRequestDto fromTopicSubscription(TopicSubscriptionImpl topicSubscription) {
+  public static TopicRequestDto fromTopicSubscription(TopicSubscription topicSubscription) {
     long lockDuration = topicSubscription.getLockDuration();
     String topicName = topicSubscription.getTopicName();
     return new TopicRequestDto(topicName, lockDuration);

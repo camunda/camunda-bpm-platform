@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.client.impl.variable;
 
+import org.camunda.bpm.client.impl.EngineClientException;
 import org.camunda.bpm.client.impl.EngineClientLogger;
 import org.camunda.bpm.client.impl.ExternalTaskClientLogger;
 import org.camunda.bpm.client.impl.variable.mapper.ValueMapper;
@@ -58,10 +59,13 @@ public class VariableMappers {
     registerMapper(new DoubleValueMapper());
   }
 
-  public VariableMap deserializeVariables(Map<String, TypedValueDto> typedValueDtoMap) {
+  public VariableMap deserializeVariables(Map<String, TypedValueDto> typedValueDtoMap) throws EngineClientException {
     VariableMap variableMap = new VariableMapImpl();
 
-    typedValueDtoMap.forEach((variableName, typedValueDto) -> {
+    for (Map.Entry<String, TypedValueDto> entry : typedValueDtoMap.entrySet()) {
+      String variableName = entry.getKey();
+      TypedValueDto typedValueDto = entry.getValue();
+
       String variableType = decapitalize(typedValueDto.getType()); // decapitalize first letter
 
       ValueMapper<?> mapper = mappers.get(variableType);
@@ -76,7 +80,7 @@ public class VariableMappers {
 
         variableMap.put(variableName, typedValue);
       }
-    });
+    }
 
     return variableMap;
   }

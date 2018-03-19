@@ -60,20 +60,20 @@ public class EngineClient {
     this.variableMappers = variableMappers;
   }
 
-  public List<ExternalTask> fetchAndLock(List<TopicRequestDto> topics) {
+  public List<ExternalTask> fetchAndLock(List<TopicRequestDto> topics) throws EngineClientException {
     FetchAndLockRequestDto payload = new FetchAndLockRequestDto(workerId, MAX_TASKS, topics);
     String resourceUrl = baseUrl + FETCH_AND_LOCK_RESOURCE_PATH;
     ExternalTask[] lockedTasksResponse = engineInteraction.postRequest(resourceUrl, payload, ExternalTaskImpl[].class);
     return Arrays.asList(lockedTasksResponse);
   }
 
-  public void unlock(String taskId) {
+  public void unlock(String taskId) throws EngineClientException {
     String resourcePath = UNLOCK_RESOURCE_PATH.replace("{id}", taskId);
     String resourceUrl = baseUrl + resourcePath;
     engineInteraction.postRequest(resourceUrl, null, Void.class);
   }
 
-  public void complete(String taskId, VariableMap variableMap) {
+  public void complete(String taskId, VariableMap variableMap) throws EngineClientException {
     Map<String, TypedValueDto> typedValueDtoMap = variableMappers.serializeVariables(variableMap);
 
     CompleteRequestDto payload = new CompleteRequestDto(workerId, typedValueDtoMap);
@@ -82,21 +82,21 @@ public class EngineClient {
     engineInteraction.postRequest(resourceUrl, payload, Void.class);
   }
 
-  public void failure(String taskId, String errorMessage, String errorDetails, int retries, long retryTimeout) {
+  public void failure(String taskId, String errorMessage, String errorDetails, int retries, long retryTimeout) throws EngineClientException {
     FailureRequestDto payload = new FailureRequestDto(workerId, errorMessage, errorDetails, retries, retryTimeout);
     String resourcePath = FAILURE_RESOURCE_PATH.replace("{id}", taskId);
     String resourceUrl = baseUrl + resourcePath;
     engineInteraction.postRequest(resourceUrl, payload, Void.class);
   }
 
-  public void bpmnError(String taskId, String errorCode) {
+  public void bpmnError(String taskId, String errorCode) throws EngineClientException {
     BpmnErrorRequestDto payload = new BpmnErrorRequestDto(workerId, errorCode);
     String resourcePath = BPMN_ERROR_RESOURCE_PATH.replace("{id}", taskId);
     String resourceUrl = baseUrl + resourcePath;
     engineInteraction.postRequest(resourceUrl, payload, Void.class);
   }
 
-  public void extendLock(String taskId, long newDuration) {
+  public void extendLock(String taskId, long newDuration) throws EngineClientException {
     ExtendLockRequestDto payload = new ExtendLockRequestDto(workerId, newDuration);
     String resourcePath = EXTEND_LOCK_RESOURCE_PATH.replace("{id}", taskId);
     String resourceUrl = baseUrl + resourcePath;
