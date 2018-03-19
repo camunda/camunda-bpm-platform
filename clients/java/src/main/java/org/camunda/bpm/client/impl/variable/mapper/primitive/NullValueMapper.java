@@ -19,6 +19,8 @@ import org.camunda.bpm.engine.variable.impl.value.UntypedValueImpl;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
+import java.util.Map;
+
 /**
  * @author Tassilo Weidner
  */
@@ -34,6 +36,17 @@ public class NullValueMapper extends AbstractPrimitiveValueMapper<NullValueImpl>
 
   @SuppressWarnings("unchecked")
   public NullValueImpl deserializeTypedValue(TypedValueDto typedValueDto) {
+    Map<String, Object> valueInfo = typedValueDto.getValueInfo();
+    if (valueInfo != null) {
+
+      Object isTransient = valueInfo.get("transient");
+      if (isTransient != null && isTransient instanceof Boolean) {
+        if ((boolean) isTransient) {
+          return NullValueImpl.INSTANCE_TRANSIENT;
+        }
+      }
+    }
+
     return NullValueImpl.INSTANCE;
   }
 

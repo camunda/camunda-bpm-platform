@@ -14,7 +14,6 @@ package org.camunda.bpm.client.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import javassist.compiler.ast.Variable;
 import org.apache.http.HttpEntity;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -1397,6 +1396,144 @@ public class VariableTest {
     verifyZeroInteractions(externalTaskHandlerMock);
   }
 
+  /** tests for transient variables */
+
+  @Test
+  public void shouldDeserializeTransientVariables() throws JsonProcessingException {
+    // given
+    ExternalTask externalTaskMock = MockProvider.createExternalTaskWithoutVariables();
+
+    TypedValueDto typedValueDtoTransient = createTypedValueDto("aVariableValue", "String", true);
+    TypedValueDto typedValueDtoNotTransient = createTypedValueDto("aVariableValue", "String");
+
+    Map<String, TypedValueDto> typedValueDtoMap = new HashMap<>();
+    typedValueDtoMap.put("aVariableName", typedValueDtoTransient);
+    typedValueDtoMap.put("anotherVariableName", typedValueDtoNotTransient);
+
+    ((ExternalTaskImpl)externalTaskMock).setVariables(typedValueDtoMap);
+    mockFetchAndLockResponse(Collections.singletonList(externalTaskMock));
+
+    ExternalTaskClient client = ExternalTaskClient.create()
+      .baseUrl(MockProvider.BASE_URL)
+      .build();
+
+    final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
+    final List<ExternalTask> externalTaskReference = new ArrayList<>(); // list, as container must be final and changeable
+
+    TopicSubscriptionBuilder topicSubscriptionBuilder =
+      client.subscribe(MockProvider.TOPIC_NAME)
+        .lockDuration(5000)
+        .handler((externalTask, externalTaskService) -> {
+          externalTaskReference.add(externalTask);
+
+          handlerInvoked.set(true);
+        });
+
+    // when
+    topicSubscriptionBuilder.open();
+    while (!handlerInvoked.get()) {
+      // busy waiting
+    }
+    client.stop();
+
+    // then
+    ExternalTask externalTask = externalTaskReference.get(0);
+    assertThat(externalTask.getVariableTyped("aVariableName").isTransient(), is(true));
+    assertThat(externalTask.getVariableTyped("anotherVariableName").isTransient(), is(false));
+  }
+
+  @Test
+  public void shouldSerializeTransientVariables() throws Exception {
+    // given
+    ExternalTask externalTaskMock = MockProvider.createExternalTaskWithoutVariables();
+
+    mockFetchAndLockResponse(Collections.singletonList(externalTaskMock));
+
+    ObjectMapper objectMapper = spy(ObjectMapper.class);
+    whenNew(ObjectMapper.class).withNoArguments().thenReturn(objectMapper);
+
+    ExternalTaskClient client = ExternalTaskClient.create()
+      .baseUrl(MockProvider.BASE_URL)
+      .build();
+
+    final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
+
+    TopicSubscriptionBuilder topicSubscriptionBuilder =
+      client.subscribe(MockProvider.TOPIC_NAME)
+        .lockDuration(5000)
+        .handler((externalTask, externalTaskService) -> {
+          externalTask.setVariableTyped("aVariableName", Variables.stringValue("aVariableValue", true));
+          externalTask.setVariableTyped("anotherVariableName", Variables.stringValue("aVariableValue", false));
+
+          externalTaskService.complete(externalTask);
+
+          handlerInvoked.set(true);
+        });
+
+    // when
+    topicSubscriptionBuilder.open();
+    while (!handlerInvoked.get()) {
+      // busy waiting
+    }
+    client.stop();
+
+    // then
+    TypedValueDto typedValueDtoTransient = createTypedValueDto("aVariableValue", "String", true);
+    TypedValueDto typedValueDtoNotTransient = createTypedValueDto("aVariableValue", "String", false);
+
+    Map<String, TypedValueDto> expectedValueDtoMap = new HashMap<>();
+    expectedValueDtoMap.put("aVariableName", typedValueDtoTransient);
+    expectedValueDtoMap.put("anotherVariableName", typedValueDtoNotTransient);
+
+    assertVariablePayloadOfCompleteRequest(objectMapper, expectedValueDtoMap);
+  }
+
+  @Test
+  public void shouldSerializeTransientVariableOfTypeNullValue() throws Exception {
+    // given
+    ExternalTask externalTaskMock = MockProvider.createExternalTaskWithoutVariables();
+
+    mockFetchAndLockResponse(Collections.singletonList(externalTaskMock));
+
+    ObjectMapper objectMapper = spy(ObjectMapper.class);
+    whenNew(ObjectMapper.class).withNoArguments().thenReturn(objectMapper);
+
+    ExternalTaskClient client = ExternalTaskClient.create()
+      .baseUrl(MockProvider.BASE_URL)
+      .build();
+
+    final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
+
+    TopicSubscriptionBuilder topicSubscriptionBuilder =
+      client.subscribe(MockProvider.TOPIC_NAME)
+        .lockDuration(5000)
+        .handler((externalTask, externalTaskService) -> {
+          externalTask.setVariableTyped("aVariableName", Variables.untypedNullValue( true));
+          externalTask.setVariableTyped("anotherVariableName", Variables.untypedNullValue( false));
+
+          externalTaskService.complete(externalTask);
+
+          handlerInvoked.set(true);
+        });
+
+    // when
+    topicSubscriptionBuilder.open();
+    while (!handlerInvoked.get()) {
+      // busy waiting
+    }
+    client.stop();
+
+    // then
+    TypedValueDto typedValueDtoTransient = createTypedValueDto(null, "Null", true);
+    TypedValueDto typedValueDtoNotTransient = createTypedValueDto(null, "Null", false);
+
+    Map<String, TypedValueDto> expectedValueDtoMap = new HashMap<>();
+    expectedValueDtoMap.put("aVariableName", typedValueDtoTransient);
+    expectedValueDtoMap.put("anotherVariableName", typedValueDtoNotTransient);
+
+    assertVariablePayloadOfCompleteRequest(objectMapper, expectedValueDtoMap);
+  }
+
   // helper //////////////////////////////////
 
   private void assertVariableValue(ExternalTask externalTask, String variableName, Object variableValue, String variableType) {
@@ -1412,12 +1549,21 @@ public class VariableTest {
   }
 
   protected TypedValueDto createTypedValueDto(Object variableValue, String variableType) {
+    return createTypedValueDto(variableValue, variableType, null);
+  }
+
+  protected TypedValueDto createTypedValueDto(Object variableValue, String variableType, Boolean isTransient) {
     TypedValueDto typedValueDto = new TypedValueDto();
     typedValueDto.setValue(variableValue);
     typedValueDto.setType(variableType);
 
+    if (isTransient != null) {
+      typedValueDto.setValueInfo(Collections.singletonMap("transient", isTransient));
+    }
+
     return typedValueDto;
   }
+
   protected void mockFetchAndLockResponse(List<ExternalTask> externalTasks) throws JsonProcessingException {
     ObjectMapper objectMapper = new ObjectMapper();
     byte[] externalTasksAsBytes = objectMapper.writeValueAsBytes(externalTasks);
@@ -1600,6 +1746,15 @@ public class VariableTest {
       Map<String, TypedValueDto> variableMap = completeRequestDto.getVariables();
       assertThat(variableMap.get(variableName).getType(), is(typedValueDto.getType()));
       assertThat(variableMap.get(variableName).getValue(), is(typedValueDto.getValue()));
+
+      if (typedValueDto.getValueInfo() != null && typedValueDto.getValueInfo().get("transient") != null) {
+        boolean expectedTransience = (boolean) typedValueDto.getValueInfo().get("transient");
+        if (expectedTransience) {
+          assertTrue((boolean) variableMap.get(variableName).getValueInfo().get("transient"));
+        } else {
+          assertNull(variableMap.get(variableName).getValueInfo().get("transient"));
+        }
+      }
 
       isAsserted[0] = true;
     });
