@@ -61,34 +61,29 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
   protected void acquire() {
     queue.drainTo(pendingRequests);
 
-    long backoffTime = MAX_BACK_OFF_TIME;
-    long start = ClockUtil.getCurrentTime().getTime();
+    long backoffTime = MAX_BACK_OFF_TIME;     //timestamp
 
     Iterator<FetchAndLockRequest> iterator = pendingRequests.iterator();
     while (iterator.hasNext()) {
 
       FetchAndLockRequest pendingRequest = iterator.next();
+
+      long currentTime = ClockUtil.getCurrentTime().getTime();
       FetchAndLockResult result = tryFetchAndLock(pendingRequest);
 
       if (result.wasSuccessful()) {
 
         List<LockedExternalTaskDto> lockedTasks = result.getTasks();
 
-        FetchExternalTasksExtendedDto dto = pendingRequest.getDto();
-        long requestTime = pendingRequest.getRequestTime().getTime();
-        long asyncResponseTimeout = dto.getAsyncResponseTimeout();
-        long currentTime = ClockUtil.getCurrentTime().getTime();
-
-        long timeout = requestTime + asyncResponseTimeout;
+        long timeout = pendingRequest.getTimeoutTimestamp();
 
         if (!lockedTasks.isEmpty() || timeout <= currentTime) {
           AsyncResponse asyncResponse = pendingRequest.getAsyncResponse();
           iterator.remove();
           asyncResponse.resume(lockedTasks);
         } else {
-          long slackTime = timeout - currentTime;
-          if (slackTime < backoffTime) {
-            backoffTime = slackTime;
+          if (timeout < backoffTime) {
+            backoffTime = timeout;
           }
         }
       } else {
@@ -99,8 +94,7 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
       }
     }
 
-    backoffTime = Math.max(0, (start + backoffTime) - ClockUtil.getCurrentTime().getTime());
-    suspend(backoffTime);
+    suspend(Math.max(0, backoffTime - ClockUtil.getCurrentTime().getTime()));
   }
 
   @Override
