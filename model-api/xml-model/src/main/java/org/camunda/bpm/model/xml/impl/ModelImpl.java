@@ -12,15 +12,16 @@
  */
 package org.camunda.bpm.model.xml.impl;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.camunda.bpm.model.xml.Model;
 import org.camunda.bpm.model.xml.impl.util.ModelUtil;
 import org.camunda.bpm.model.xml.impl.util.QName;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.ModelElementType;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * A model contains all defined types and the relationship between them.
@@ -77,7 +78,7 @@ public class ModelImpl implements Model {
   }
 
   public Collection<ModelElementType> getTypes() {
-    return typesByName.values();
+    return new ArrayList<ModelElementType>(typesByName.values());
   }
 
   public ModelElementType getType(Class<? extends ModelElementInstance> instanceClass) {
@@ -92,12 +93,6 @@ public class ModelImpl implements Model {
     return typesByName.get(ModelUtil.getQName(namespaceUri, typeName));
   }
 
-  public ModelElementType getTypeForNameAndSchemaType(String namespaceUri, String typeName,
-                                                      String schemaNamespaceUri, String schemaTypeName) {
-
-    return typesByName.get(ModelUtil.getQName(namespaceUri, typeName, schemaNamespaceUri, schemaTypeName));
-  }
-
   /**
    * Registers a {@link ModelElementType} in this {@link Model}.
    *
@@ -105,9 +100,7 @@ public class ModelImpl implements Model {
    * @param instanceType  the instance class of the type to register
    */
   public void registerType(ModelElementType modelElementType, Class<? extends ModelElementInstance> instanceType) {
-    QName qName = ModelUtil.getQName(modelElementType.getTypeNamespace(), modelElementType.getTypeName(),
-            modelElementType.getSchemaTypeNamespace(), modelElementType.getSchemaTypeName());
-
+    QName qName = ModelUtil.getQName(modelElementType.getTypeNamespace(), modelElementType.getTypeName());
     typesByName.put(qName, modelElementType);
     typesByClass.put(instanceType, modelElementType);
   }

@@ -25,10 +25,6 @@ public interface ModelElementTypeBuilder {
 
   ModelElementTypeBuilder namespaceUri(String namespaceUri);
 
-  ModelElementTypeBuilder schemaTypeName(String schemaTypeName);
-
-  ModelElementTypeBuilder schemaTypeNamespaceUri(String schemaNamespaceUri);
-
   ModelElementTypeBuilder extendsType(Class<? extends ModelElementInstance> extendedType);
 
   <T extends ModelElementInstance> ModelElementTypeBuilder instanceProvider(ModelTypeInstanceProvider<T> instanceProvider);

@@ -12,6 +12,13 @@
  */
 package org.camunda.bpm.model.xml.impl.type;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.camunda.bpm.model.xml.Model;
 import org.camunda.bpm.model.xml.ModelException;
 import org.camunda.bpm.model.xml.ModelInstance;
@@ -28,13 +35,6 @@ import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder.ModelTypeInstanceP
 import org.camunda.bpm.model.xml.type.attribute.Attribute;
 import org.camunda.bpm.model.xml.type.child.ChildElementCollection;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 /**
  * @author Daniel Meyer
  *
@@ -50,10 +50,6 @@ public class ModelElementTypeImpl implements ModelElementType {
   private String typeNamespace;
 
   private ModelElementTypeImpl baseType;
-
-  private String schemaTypeName;
-
-  private String schemaTypeNamespace;
 
   private final List<ModelElementType> extendingTypes = new ArrayList<ModelElementType>();
 
@@ -136,22 +132,6 @@ public class ModelElementTypeImpl implements ModelElementType {
 
   public String getTypeNamespace() {
     return typeNamespace;
-  }
-
-  public void setSchemaTypeName(String schemaTypeName) {
-    this.schemaTypeName = schemaTypeName;
-  }
-
-  public String getSchemaTypeName() {
-    return schemaTypeName;
-  }
-
-  public void setSchemaTypeNamespace(String schemaTypeNamespace) {
-    this.schemaTypeNamespace = schemaTypeNamespace;
-  }
-
-  public String getSchemaTypeNamespace() {
-    return schemaTypeNamespace;
   }
 
   public void setBaseType(ModelElementTypeImpl baseType) {

@@ -60,19 +60,6 @@ public interface Model {
   ModelElementType getTypeForName(String namespaceUri, String typeName);
 
   /**
-   * Gets the defined {@link ModelElementType} for a type by its name, namespace URI, schema type and schema namespace URI.
-   *
-   *
-   * @param namespaceUri the namespace URI for the type
-   * @param typeName the name of the type
-   * @param schemaNamespaceUri the namespace URI for the schema type
-   * @param schemaTypeName the name of the schema type
-   * @return the element type or null if no type is defined for the name and namespace URI
-   */
-  ModelElementType getTypeForNameAndSchemaType(String namespaceUri, String typeName,
-                                               String schemaNamespaceUri, String schemaTypeName);
-
-  /**
    * Returns the model name, which is the identifier of this model.
    *
    * @return the model name
