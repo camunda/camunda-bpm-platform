@@ -105,7 +105,7 @@ public class RestJaxRs2IT extends AbstractWebappIntegrationTest {
 
     List<Future<String>> futures = service.invokeAll(requests);
     service.shutdown();
-    service.awaitTermination(1, TimeUnit.DAYS);
+    service.awaitTermination(1, TimeUnit.HOURS);
 
     for (Future<String> future : futures) {
       assertEquals(future.get(), "[]");
