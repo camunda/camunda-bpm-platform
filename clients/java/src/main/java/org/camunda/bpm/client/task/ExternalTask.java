@@ -19,7 +19,7 @@ import java.util.Date;
 import java.util.Map;
 
 /**
- * <p>Represents a locked task</p>
+ * <p>Represents an external task</p>
  *
  * @author Tassilo Weidner
  */

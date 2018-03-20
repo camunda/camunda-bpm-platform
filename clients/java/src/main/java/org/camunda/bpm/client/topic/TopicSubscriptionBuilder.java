@@ -29,7 +29,7 @@ public interface TopicSubscriptionBuilder {
   TopicSubscriptionBuilder lockDuration(long lockDuration);
 
   /**
-   * @param handler which will be executed for the locked task
+   * @param handler which will be executed for the external task
    */
   TopicSubscriptionBuilder handler(ExternalTaskHandler handler);
 
@@ -40,7 +40,7 @@ public interface TopicSubscriptionBuilder {
    * <ul>
    *   <li> if topic name is null or an empty string
    *   <li> if lock duration is not greater than zero
-   *   <li> if locked task handler is null
+   *   <li> if external task handler is null
    *   <li> if topic name has already been subscribed
    * </ul>
    */

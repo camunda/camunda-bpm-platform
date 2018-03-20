@@ -26,9 +26,9 @@ public class TopicSubscriptionManagerLogger extends ExternalTaskClientLogger {
       "001", "Exception while fetch and lock tasks '{}'", e);
   }
 
-  protected void exceptionWhileExecutingLockedTaskHandler(Throwable e) {
+  protected void exceptionWhileExecutingExternalTaskHandler(Throwable e) {
     logError(
-      "002", "Exception while executing locked task handler '{}'", e);
+      "002", "Exception while executing external task handler '{}'", e);
   }
 
   protected void exceptionWhileShuttingDown(InterruptedException e) {
@@ -36,9 +36,9 @@ public class TopicSubscriptionManagerLogger extends ExternalTaskClientLogger {
       "003", "Exception while shutting down '{}'", e);
   }
 
-  protected void exceptionOnLockedTaskServiceMethodInvocation(ExternalTaskClientException e) {
+  protected void exceptionOnExternalTaskServiceMethodInvocation(ExternalTaskClientException e) {
     logError(
-      "004", "Exception on locked task service method invocation '{}'", e);
+      "004", "Exception on external task service method invocation '{}'", e);
   }
 
   protected void exceptionWhileDeserializingVariables(Throwable e) {

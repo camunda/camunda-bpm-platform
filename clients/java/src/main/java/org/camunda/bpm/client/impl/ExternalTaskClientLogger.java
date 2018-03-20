@@ -62,9 +62,9 @@ public class ExternalTaskClientLogger extends BaseLogger {
       "004", "Lock duration is not greater than 0"));
   }
 
-  public ExternalTaskClientException lockedTaskHandlerNullException() {
+  public ExternalTaskClientException externalTaskHandlerNullException() {
     return new ExternalTaskClientException(exceptionMessage(
-      "005", "Locked task handler cannot be null"));
+      "005", "External task handler cannot be null"));
   }
 
   public ExternalTaskClientException topicNameAlreadySubscribedException() {

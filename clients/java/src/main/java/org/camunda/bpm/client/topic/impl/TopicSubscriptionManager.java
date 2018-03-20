@@ -68,15 +68,15 @@ public class TopicSubscriptionManager implements Runnable {
 
   protected void acquire() {
     List<TopicRequestDto> taskTopicRequests = new ArrayList<>();
-    Map<String, ExternalTaskHandler> lockedTasksHandlers = new HashMap<>();
+    Map<String, ExternalTaskHandler> externalTaskHandlers = new HashMap<>();
 
     subscriptions.forEach(subscription -> {
       TopicRequestDto taskTopicRequest = TopicRequestDto.fromTopicSubscription(subscription);
       taskTopicRequests.add(taskTopicRequest);
 
       String topicName = subscription.getTopicName();
-      ExternalTaskHandler lockedTaskHandler = subscription.getExternalTaskHandler();
-      lockedTasksHandlers.put(topicName, lockedTaskHandler);
+      ExternalTaskHandler externalTaskHandler = subscription.getExternalTaskHandler();
+      externalTaskHandlers.put(topicName, externalTaskHandler);
     });
 
     if (!taskTopicRequests.isEmpty()) {
@@ -107,15 +107,15 @@ public class TopicSubscriptionManager implements Runnable {
           ((ExternalTaskImpl) externalTask).setLocalVariableMap(variableMap);
 
           String topicName = externalTask.getTopicName();
-          ExternalTaskHandler taskHandler = lockedTasksHandlers.get(topicName);
+          ExternalTaskHandler taskHandler = externalTaskHandlers.get(topicName);
           ExternalTaskService service = new ExternalTaskServiceImpl(externalTask.getId(), engineClient);
 
           try {
             taskHandler.execute(externalTask, service);
           } catch (ExternalTaskClientException e) {
-            LOG.exceptionOnLockedTaskServiceMethodInvocation(e);
+            LOG.exceptionOnExternalTaskServiceMethodInvocation(e);
           } catch (Throwable e) {
-            LOG.exceptionWhileExecutingLockedTaskHandler(e);
+            LOG.exceptionWhileExecutingExternalTaskHandler(e);
           }
         } // else: skip handler execution
       });

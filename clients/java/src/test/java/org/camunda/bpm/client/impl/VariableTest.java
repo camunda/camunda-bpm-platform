@@ -106,7 +106,7 @@ public class VariableTest {
   @Test
   public void shouldRetrieveAllVariablesUntypedFromEngine() throws JsonProcessingException {
     // given
-    mockFetchAndLockResponse(Collections.singletonList(MockProvider.createLockedTask()));
+    mockFetchAndLockResponse(Collections.singletonList(MockProvider.createExternalTask()));
 
     ExternalTaskClient client = ExternalTaskClient.create()
       .baseUrl(MockProvider.BASE_URL)
@@ -139,7 +139,7 @@ public class VariableTest {
   @Test
   public void shouldRetrieveAllVariablesTypedFromEngine() throws JsonProcessingException {
     // given
-    mockFetchAndLockResponse(Collections.singletonList(MockProvider.createLockedTask()));
+    mockFetchAndLockResponse(Collections.singletonList(MockProvider.createExternalTask()));
 
     ExternalTaskClient client = ExternalTaskClient.create()
       .baseUrl(MockProvider.BASE_URL)
@@ -172,7 +172,7 @@ public class VariableTest {
   @Test
   public void shouldRetrieveSingleVariableUntypedFromEngine() throws JsonProcessingException {
     // given
-    mockFetchAndLockResponse(Collections.singletonList(MockProvider.createLockedTask()));
+    mockFetchAndLockResponse(Collections.singletonList(MockProvider.createExternalTask()));
 
     ExternalTaskClient client = ExternalTaskClient.create()
       .baseUrl(MockProvider.BASE_URL)
@@ -205,7 +205,7 @@ public class VariableTest {
   @Test
   public void shouldRetrieveSingleVariableTypedFromEngine() throws JsonProcessingException {
     // given
-    mockFetchAndLockResponse(Collections.singletonList(MockProvider.createLockedTask()));
+    mockFetchAndLockResponse(Collections.singletonList(MockProvider.createExternalTask()));
 
     ExternalTaskClient client = ExternalTaskClient.create()
       .baseUrl(MockProvider.BASE_URL)
@@ -1315,7 +1315,7 @@ public class VariableTest {
   @Test
   public void shouldThrowUnsupportedTypeException() throws JsonProcessingException {
     // given
-    mockFetchAndLockResponse(Collections.singletonList(MockProvider.createLockedTask()));
+    mockFetchAndLockResponse(Collections.singletonList(MockProvider.createExternalTask()));
 
     ExternalTaskClient client = ExternalTaskClient.create()
       .baseUrl(MockProvider.BASE_URL)

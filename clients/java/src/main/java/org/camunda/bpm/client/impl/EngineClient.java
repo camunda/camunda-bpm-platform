@@ -63,8 +63,8 @@ public class EngineClient {
   public List<ExternalTask> fetchAndLock(List<TopicRequestDto> topics) throws EngineClientException {
     FetchAndLockRequestDto payload = new FetchAndLockRequestDto(workerId, MAX_TASKS, topics);
     String resourceUrl = baseUrl + FETCH_AND_LOCK_RESOURCE_PATH;
-    ExternalTask[] lockedTasksResponse = engineInteraction.postRequest(resourceUrl, payload, ExternalTaskImpl[].class);
-    return Arrays.asList(lockedTasksResponse);
+    ExternalTask[] externalTasks = engineInteraction.postRequest(resourceUrl, payload, ExternalTaskImpl[].class);
+    return Arrays.asList(externalTasks);
   }
 
   public void unlock(String taskId) throws EngineClientException {

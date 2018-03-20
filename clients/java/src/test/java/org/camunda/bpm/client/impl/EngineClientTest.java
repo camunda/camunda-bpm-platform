@@ -95,10 +95,10 @@ public class EngineClientTest {
     when(httpClientBuilderMock.build())
       .thenReturn(httpClientSpy);
 
-    List<ExternalTask> lockedTasks = Collections.singletonList(MockProvider.createLockedTask());
+    List<ExternalTask> externalTasks = Collections.singletonList(MockProvider.createExternalTask());
     ObjectMapper objectMapper = new ObjectMapper();
-    byte[] lockedTasksAsBytes = objectMapper.writeValueAsBytes(lockedTasks);
-    HttpEntity entity = new ByteArrayEntity(lockedTasksAsBytes);
+    byte[] externalTasksAsBytes = objectMapper.writeValueAsBytes(externalTasks);
+    HttpEntity entity = new ByteArrayEntity(externalTasksAsBytes);
     doReturn(entity)
       .when(httpResponse).getEntity();
   }
@@ -116,8 +116,8 @@ public class EngineClientTest {
     TopicSubscriptionBuilder topicSubscriptionBuilder =
       client.subscribe(MockProvider.TOPIC_NAME)
         .lockDuration(5000)
-        .handler((lockedTask, lockedTaskService) -> {
-          externalTaskReference.add(lockedTask);
+        .handler((externalTask, externalTaskService) -> {
+          externalTaskReference.add(externalTask);
           handlerInvoked.set(true);
         });
 
@@ -157,10 +157,10 @@ public class EngineClientTest {
       .baseUrl(MockProvider.BASE_URL)
       .build();
 
-    ExternalTaskHandler lockedTaskHandlerMock = mock(ExternalTaskHandler.class);
+    ExternalTaskHandler externalTaskHandlerMock = mock(ExternalTaskHandler.class);
     TopicSubscriptionBuilder topicSubscriptionBuilder = client.subscribe(MockProvider.TOPIC_NAME)
       .lockDuration(5000)
-      .handler(lockedTaskHandlerMock);
+      .handler(externalTaskHandlerMock);
 
     // when
     topicSubscriptionBuilder.open();
@@ -168,7 +168,7 @@ public class EngineClientTest {
     client.stop();
 
     // then
-    verifyZeroInteractions(lockedTaskHandlerMock);
+    verifyZeroInteractions(externalTaskHandlerMock);
   }
 
   @Test
@@ -180,10 +180,10 @@ public class EngineClientTest {
       .baseUrl(MockProvider.BASE_URL)
       .build();
 
-    ExternalTaskHandler lockedTaskHandlerMock = mock(ExternalTaskHandler.class);
+    ExternalTaskHandler externalTaskHandlerMock = mock(ExternalTaskHandler.class);
     TopicSubscriptionBuilder topicSubscriptionBuilder = client.subscribe(MockProvider.TOPIC_NAME)
       .lockDuration(5000)
-      .handler(lockedTaskHandlerMock);
+      .handler(externalTaskHandlerMock);
 
     // when
     topicSubscriptionBuilder.open();
@@ -191,7 +191,7 @@ public class EngineClientTest {
     client.stop();
 
     // then
-    verifyZeroInteractions(lockedTaskHandlerMock);
+    verifyZeroInteractions(externalTaskHandlerMock);
   }
 
   @Test
@@ -203,10 +203,10 @@ public class EngineClientTest {
       .baseUrl(MockProvider.BASE_URL)
       .build();
 
-    ExternalTaskHandler lockedTaskHandlerMock = mock(ExternalTaskHandler.class);
+    ExternalTaskHandler externalTaskHandlerMock = mock(ExternalTaskHandler.class);
     TopicSubscriptionBuilder topicSubscriptionBuilder = client.subscribe(MockProvider.TOPIC_NAME)
       .lockDuration(5000)
-      .handler(lockedTaskHandlerMock);
+      .handler(externalTaskHandlerMock);
 
     // when
     topicSubscriptionBuilder.open();
@@ -214,7 +214,7 @@ public class EngineClientTest {
     client.stop();
 
     // then
-    verifyZeroInteractions(lockedTaskHandlerMock);
+    verifyZeroInteractions(externalTaskHandlerMock);
   }
 
   @Test
@@ -226,10 +226,10 @@ public class EngineClientTest {
       .baseUrl(MockProvider.BASE_URL)
       .build();
 
-    ExternalTaskHandler lockedTaskHandlerMock = mock(ExternalTaskHandler.class);
+    ExternalTaskHandler externalTaskHandlerMock = mock(ExternalTaskHandler.class);
     TopicSubscriptionBuilder topicSubscriptionBuilder = client.subscribe(MockProvider.TOPIC_NAME)
       .lockDuration(5000)
-      .handler(lockedTaskHandlerMock);
+      .handler(externalTaskHandlerMock);
 
     // when
     topicSubscriptionBuilder.open();
@@ -237,7 +237,7 @@ public class EngineClientTest {
     client.stop();
 
     // then
-    verifyZeroInteractions(lockedTaskHandlerMock);
+    verifyZeroInteractions(externalTaskHandlerMock);
   }
 
   @Test
@@ -249,11 +249,11 @@ public class EngineClientTest {
       .baseUrl(MockProvider.BASE_URL)
       .build();
 
-    ExternalTaskHandler lockedTaskHandlerMock = mock(ExternalTaskHandler.class);
+    ExternalTaskHandler externalTaskHandlerMock = mock(ExternalTaskHandler.class);
 
     TopicSubscriptionBuilder topicSubscriptionBuilder = client.subscribe(MockProvider.TOPIC_NAME)
       .lockDuration(5000)
-      .handler(lockedTaskHandlerMock);
+      .handler(externalTaskHandlerMock);
 
     // when
     topicSubscriptionBuilder.open();
@@ -261,7 +261,7 @@ public class EngineClientTest {
     client.stop();
 
     // then
-    verifyZeroInteractions(lockedTaskHandlerMock);
+    verifyZeroInteractions(externalTaskHandlerMock);
   }
 
   @Test
@@ -273,11 +273,11 @@ public class EngineClientTest {
       .baseUrl(MockProvider.BASE_URL)
       .build();
 
-    ExternalTaskHandler lockedTaskHandlerMock = mock(ExternalTaskHandler.class);
+    ExternalTaskHandler externalTaskHandlerMock = mock(ExternalTaskHandler.class);
 
     TopicSubscriptionBuilder topicSubscriptionBuilder = client.subscribe(MockProvider.TOPIC_NAME)
       .lockDuration(5000)
-      .handler(lockedTaskHandlerMock);
+      .handler(externalTaskHandlerMock);
 
     // when
     topicSubscriptionBuilder.open();
@@ -285,7 +285,7 @@ public class EngineClientTest {
     client.stop();
 
     // then
-    verifyZeroInteractions(lockedTaskHandlerMock);
+    verifyZeroInteractions(externalTaskHandlerMock);
   }
 
   @Test
@@ -297,11 +297,11 @@ public class EngineClientTest {
       .baseUrl(MockProvider.BASE_URL)
       .build();
 
-    ExternalTaskHandler lockedTaskHandlerMock = mock(ExternalTaskHandler.class);
+    ExternalTaskHandler externalTaskHandlerMock = mock(ExternalTaskHandler.class);
 
     TopicSubscriptionBuilder topicSubscriptionBuilder = client.subscribe(MockProvider.TOPIC_NAME)
       .lockDuration(5000)
-      .handler(lockedTaskHandlerMock);
+      .handler(externalTaskHandlerMock);
 
     // when
     topicSubscriptionBuilder.open();
@@ -309,7 +309,7 @@ public class EngineClientTest {
     client.stop();
 
     // then
-    verifyZeroInteractions(lockedTaskHandlerMock);
+    verifyZeroInteractions(externalTaskHandlerMock);
   }
 
   // helper //////////////////////////////

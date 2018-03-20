@@ -97,10 +97,10 @@ public class ExternalTaskServiceTest {
     Mockito.when(httpClientBuilderMock.build())
       .thenReturn(httpClient);
 
-    List<ExternalTask> lockedTasks = Collections.singletonList(MockProvider.createLockedTask());
+    List<ExternalTask> externalTasks = Collections.singletonList(MockProvider.createExternalTask());
     ObjectMapper objectMapper = new ObjectMapper();
-    byte[] lockedTasksAsBytes = objectMapper.writeValueAsBytes(lockedTasks);
-    HttpEntity entity = new ByteArrayEntity(lockedTasksAsBytes);
+    byte[] externalTasksAsBytes = objectMapper.writeValueAsBytes(externalTasks);
+    HttpEntity entity = new ByteArrayEntity(externalTasksAsBytes);
     doReturn(entity)
       .when(closeableHttpResponse).getEntity();
   }
@@ -116,8 +116,8 @@ public class ExternalTaskServiceTest {
     TopicSubscriptionBuilder topicSubscriptionBuilder =
       client.subscribe(MockProvider.TOPIC_NAME)
         .lockDuration(5000)
-        .handler((lockedTask, lockedTaskService) -> {
-          lockedTaskService.unlock(lockedTask);
+        .handler((externalTask, externalTaskService) -> {
+          externalTaskService.unlock(externalTask);
           handlerInvoked.set(true);
         });
 
@@ -145,8 +145,8 @@ public class ExternalTaskServiceTest {
     TopicSubscriptionBuilder topicSubscriptionBuilder =
       client.subscribe(MockProvider.TOPIC_NAME)
         .lockDuration(5000)
-        .handler((lockedTask, lockedTaskService) -> {
-          lockedTaskService.complete(lockedTask);
+        .handler((externalTask, externalTaskService) -> {
+          externalTaskService.complete(externalTask);
           handlerInvoked.set(true);
         });
 
@@ -178,8 +178,8 @@ public class ExternalTaskServiceTest {
     TopicSubscriptionBuilder topicSubscriptionBuilder =
       client.subscribe(MockProvider.TOPIC_NAME)
         .lockDuration(5000)
-        .handler((lockedTask, lockedTaskService) -> {
-          lockedTaskService.handleFailure(lockedTask, MockProvider.ERROR_MESSAGE, MockProvider.ERROR_DETAILS,
+        .handler((externalTask, externalTaskService) -> {
+          externalTaskService.handleFailure(externalTask, MockProvider.ERROR_MESSAGE, MockProvider.ERROR_DETAILS,
             MockProvider.RETRIES, MockProvider.RETRY_TIMEOUT);
           handlerInvoked.set(true);
         });
@@ -225,8 +225,8 @@ public class ExternalTaskServiceTest {
     TopicSubscriptionBuilder topicSubscriptionBuilder =
       client.subscribe(MockProvider.TOPIC_NAME)
         .lockDuration(5000)
-        .handler((lockedTask, lockedTaskService) -> {
-          lockedTaskService.handleBpmnError(lockedTask, MockProvider.ERROR_CODE);
+        .handler((externalTask, externalTaskService) -> {
+          externalTaskService.handleBpmnError(externalTask, MockProvider.ERROR_CODE);
           handlerInvoked.set(true);
         });
 
@@ -268,8 +268,8 @@ public class ExternalTaskServiceTest {
     TopicSubscriptionBuilder topicSubscriptionBuilder =
       client.subscribe(MockProvider.TOPIC_NAME)
         .lockDuration(5000)
-        .handler((lockedTask, lockedTaskService) -> {
-          lockedTaskService.extendLock(lockedTask, MockProvider.NEW_DURATION);
+        .handler((externalTask, externalTaskService) -> {
+          externalTaskService.extendLock(externalTask, MockProvider.NEW_DURATION);
           handlerInvoked.set(true);
         });
 
@@ -312,9 +312,9 @@ public class ExternalTaskServiceTest {
     TopicSubscriptionBuilder topicSubscriptionBuilder =
       externalTaskClient.subscribe(MockProvider.TOPIC_NAME)
         .lockDuration(5000)
-        .handler((lockedTask, lockedTaskService) -> {
+        .handler((externalTask, externalTaskService) -> {
           try {
-            lockedTaskService.unlock(lockedTask);
+            externalTaskService.unlock(externalTask);
           } catch (NotFoundException e) {
             notFoundException.add(e);
             exceptionThrown.set(true);
@@ -351,9 +351,9 @@ public class ExternalTaskServiceTest {
     TopicSubscriptionBuilder topicSubscriptionBuilder =
       externalTaskClient.subscribe(MockProvider.TOPIC_NAME)
         .lockDuration(5000)
-        .handler((lockedTask, lockedTaskService) -> {
+        .handler((externalTask, externalTaskService) -> {
           try {
-            lockedTaskService.complete(lockedTask);
+            externalTaskService.complete(externalTask);
           } catch (NotResumedException e) {
             notResumedException.add(e);
             exceptionThrown.set(true);
@@ -390,9 +390,9 @@ public class ExternalTaskServiceTest {
     TopicSubscriptionBuilder topicSubscriptionBuilder =
       externalTaskClient.subscribe(MockProvider.TOPIC_NAME)
         .lockDuration(5000)
-        .handler((lockedTask, lockedTaskService) -> {
+        .handler((externalTask, externalTaskService) -> {
           try {
-            lockedTaskService.handleFailure(lockedTask, MockProvider.ERROR_MESSAGE, MockProvider.ERROR_DETAILS, MockProvider.RETRIES, MockProvider.RETRY_TIMEOUT);
+            externalTaskService.handleFailure(externalTask, MockProvider.ERROR_MESSAGE, MockProvider.ERROR_DETAILS, MockProvider.RETRIES, MockProvider.RETRY_TIMEOUT);
           } catch (NotAcquiredException e) {
             notAcquiredException.add(e);
             exceptionThrown.set(true);
@@ -429,9 +429,9 @@ public class ExternalTaskServiceTest {
     TopicSubscriptionBuilder topicSubscriptionBuilder =
       externalTaskClient.subscribe(MockProvider.TOPIC_NAME)
         .lockDuration(5000)
-        .handler((lockedTask, lockedTaskService) -> {
+        .handler((externalTask, externalTaskService) -> {
           try {
-            lockedTaskService.handleBpmnError(lockedTask, MockProvider.ERROR_CODE);
+            externalTaskService.handleBpmnError(externalTask, MockProvider.ERROR_CODE);
           } catch (ConnectionLostException e) {
             connectionLostException.add(e);
             exceptionThrown.set(true);

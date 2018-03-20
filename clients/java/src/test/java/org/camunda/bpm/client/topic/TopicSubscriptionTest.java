@@ -76,7 +76,7 @@ public class TopicSubscriptionTest {
       .thenReturn(httpClient);
 
     when(httpClient.execute(any(HttpUriRequest.class), any(AbstractResponseHandler.class)))
-      .thenReturn(new ExternalTask[]{MockProvider.createLockedTask()});
+      .thenReturn(new ExternalTask[]{MockProvider.createExternalTask()});
 
     client = ExternalTaskClient.create()
       .baseUrl(MockProvider.BASE_URL)
@@ -86,13 +86,13 @@ public class TopicSubscriptionTest {
   @Test
   public void shouldSubscribeToTopicsWithLockDuration() throws IOException {
     // given
-    ExternalTaskHandler lockedTaskHandlerMock = mock(ExternalTaskHandler.class);
+    ExternalTaskHandler externalTaskHandlerMock = mock(ExternalTaskHandler.class);
 
     // when
     for (int i = 0; i < 10; i++) {
       TopicSubscription topicSubscription = client.subscribe(MockProvider.TOPIC_NAME+i)
         .lockDuration(5000+i)
-        .handler(lockedTaskHandlerMock)
+        .handler(externalTaskHandlerMock)
         .open();
 
       // then
@@ -151,7 +151,7 @@ public class TopicSubscriptionTest {
   }
 
   @Test
-  public void shouldThrowExceptionDueToNoLockedTaskHandlerDefined() {
+  public void shouldThrowExceptionDueToNoExternalTaskHandlerDefined() {
     // given
     try {
       // when
@@ -162,7 +162,7 @@ public class TopicSubscriptionTest {
       fail("No ExternalTaskClientException thrown!");
     } catch (ExternalTaskClientException e) {
       // then
-      assertThat(e.getMessage(), containsString("Locked task handler cannot be null"));
+      assertThat(e.getMessage(), containsString("External task handler cannot be null"));
     }
 
     client.stop();
@@ -171,17 +171,17 @@ public class TopicSubscriptionTest {
   @Test
   public void shouldThrowExceptionDueToTopicNameAlreadySubscribed() {
     // given
-    ExternalTaskHandler lockedTaskHandlerMock = mock(ExternalTaskHandler.class);
+    ExternalTaskHandler externalTaskHandlerMock = mock(ExternalTaskHandler.class);
     client.subscribe(MockProvider.TOPIC_NAME)
       .lockDuration(5000)
-      .handler(lockedTaskHandlerMock)
+      .handler(externalTaskHandlerMock)
       .open();
 
     try {
       // when
       client.subscribe(MockProvider.TOPIC_NAME)
         .lockDuration(5000)
-        .handler(lockedTaskHandlerMock)
+        .handler(externalTaskHandlerMock)
         .open();
 
       fail("No ExternalTaskClientException thrown!");
@@ -220,24 +220,24 @@ public class TopicSubscriptionTest {
   @Test
   public void shouldExecuteHandler() throws IOException, InterruptedException {
     // given
-    List<ExternalTask> lockedTasks = new ArrayList<>();
+    List<ExternalTask> externalTasks = new ArrayList<>();
     for (int i = 0; i < 5; i++) {
-      lockedTasks.add(MockProvider.createExternalTaskWithoutVariables());
+      externalTasks.add(MockProvider.createExternalTaskWithoutVariables());
     }
 
     when(httpClient.execute(any(HttpUriRequest.class), any(AbstractResponseHandler.class)))
-      .thenReturn(lockedTasks.toArray(new ExternalTask[0]));
+      .thenReturn(externalTasks.toArray(new ExternalTask[0]));
 
-    ExternalTaskHandler lockedTaskHandlerMock = mock(ExternalTaskHandler.class);
+    ExternalTaskHandler externalTaskHandlerMock = mock(ExternalTaskHandler.class);
     final AtomicBoolean invoked = new AtomicBoolean();
     doAnswer((Answer<Void>) invocationOnMock -> {
       invoked.set(true);
       return null;
-    }).when(lockedTaskHandlerMock).execute(any(ExternalTask.class), any(ExternalTaskService.class));
+    }).when(externalTaskHandlerMock).execute(any(ExternalTask.class), any(ExternalTaskService.class));
 
     TopicSubscriptionBuilder topicSubscriptionBuilder = client.subscribe(MockProvider.TOPIC_NAME)
       .lockDuration(5000)
-      .handler(lockedTaskHandlerMock);
+      .handler(externalTaskHandlerMock);
 
     // when
     topicSubscriptionBuilder.open();
@@ -248,7 +248,7 @@ public class TopicSubscriptionTest {
     }
     client.stop();
 
-    verify(lockedTaskHandlerMock, atLeast(5))
+    verify(externalTaskHandlerMock, atLeast(5))
       .execute(any(ExternalTask.class), any(ExternalTaskService.class));
   }
 

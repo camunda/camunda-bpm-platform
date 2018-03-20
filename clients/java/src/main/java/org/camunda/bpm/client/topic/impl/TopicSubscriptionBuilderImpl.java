@@ -56,7 +56,7 @@ public class TopicSubscriptionBuilderImpl implements TopicSubscriptionBuilder {
     }
 
     if (externalTaskHandler == null) {
-      throw LOG.lockedTaskHandlerNullException();
+      throw LOG.externalTaskHandlerNullException();
     }
 
     // TODO: synchronize check + add (+remove)

@@ -35,7 +35,7 @@ public class MockProvider {
   public static final String BASE_URL = "http://localhost:8080/engine-rest";
   public static final int MAX_TASKS = 10;
 
-  // locked task
+  // external task
   public static final String ACTIVITY_ID = "ServiceTask_1";
   public static final String ACTIVITY_INSTANCE_ID = "ServiceTask_1:be7bb005-1cb7-11e8-a8b4-769e8e30ca9b";
   public static final String EXECUTION_ID = "be7bb004-1cb7-11e8-a8b4-769e8e30ca9b";
@@ -200,48 +200,48 @@ public class MockProvider {
     return variables;
   }
 
-  public static ExternalTask createLockedTask() {
-    ExternalTaskImpl lockedTask = new ExternalTaskImpl();
-    lockedTask.setActivityId(ACTIVITY_ID);
-    lockedTask.setActivityInstanceId(ACTIVITY_INSTANCE_ID);
-    lockedTask.setExecutionId(EXECUTION_ID);
-    lockedTask.setLockExpirationTime(LOCK_EXPIRATION_TIME);
-    lockedTask.setProcessDefinitionId(PROCESS_DEFINITION_ID);
-    lockedTask.setProcessDefinitionKey(PROCESS_DEFINITION_KEY);
-    lockedTask.setProcessInstanceId(PROCESS_INSTANCE_ID);
-    lockedTask.setId(ID);
-    lockedTask.setWorkerId(WORKER_ID);
-    lockedTask.setTopicName(TOPIC_NAME);
-    lockedTask.setVariables(VARIABLES);
-    lockedTask.setErrorMessage(ERROR_MESSAGE);
-    lockedTask.setErrorDetails(ERROR_DETAILS);
-    lockedTask.setSuspended(SUSPENSION_STATE);
-    lockedTask.setTenantId(TENANT_ID);
-    lockedTask.setRetries(RETRIES);
-    lockedTask.setPriority(PRIORITY);
-    return lockedTask;
+  public static ExternalTask createExternalTask() {
+    ExternalTaskImpl externalTask = new ExternalTaskImpl();
+    externalTask.setActivityId(ACTIVITY_ID);
+    externalTask.setActivityInstanceId(ACTIVITY_INSTANCE_ID);
+    externalTask.setExecutionId(EXECUTION_ID);
+    externalTask.setLockExpirationTime(LOCK_EXPIRATION_TIME);
+    externalTask.setProcessDefinitionId(PROCESS_DEFINITION_ID);
+    externalTask.setProcessDefinitionKey(PROCESS_DEFINITION_KEY);
+    externalTask.setProcessInstanceId(PROCESS_INSTANCE_ID);
+    externalTask.setId(ID);
+    externalTask.setWorkerId(WORKER_ID);
+    externalTask.setTopicName(TOPIC_NAME);
+    externalTask.setVariables(VARIABLES);
+    externalTask.setErrorMessage(ERROR_MESSAGE);
+    externalTask.setErrorDetails(ERROR_DETAILS);
+    externalTask.setSuspended(SUSPENSION_STATE);
+    externalTask.setTenantId(TENANT_ID);
+    externalTask.setRetries(RETRIES);
+    externalTask.setPriority(PRIORITY);
+    return externalTask;
   }
 
   public static ExternalTask createExternalTaskWithoutVariables() {
-    ExternalTaskImpl lockedTask = new ExternalTaskImpl();
-    lockedTask.setActivityId(ACTIVITY_ID);
-    lockedTask.setActivityInstanceId(ACTIVITY_INSTANCE_ID);
-    lockedTask.setExecutionId(EXECUTION_ID);
-    lockedTask.setLockExpirationTime(LOCK_EXPIRATION_TIME);
-    lockedTask.setProcessDefinitionId(PROCESS_DEFINITION_ID);
-    lockedTask.setProcessDefinitionKey(PROCESS_DEFINITION_KEY);
-    lockedTask.setProcessInstanceId(PROCESS_INSTANCE_ID);
-    lockedTask.setId(ID);
-    lockedTask.setWorkerId(WORKER_ID);
-    lockedTask.setTopicName(TOPIC_NAME);
-    lockedTask.setVariables(new HashMap<>());
-    lockedTask.setErrorMessage(ERROR_MESSAGE);
-    lockedTask.setErrorDetails(ERROR_DETAILS);
-    lockedTask.setSuspended(SUSPENSION_STATE);
-    lockedTask.setTenantId(TENANT_ID);
-    lockedTask.setRetries(RETRIES);
-    lockedTask.setPriority(PRIORITY);
-    return lockedTask;
+    ExternalTaskImpl externalTask = new ExternalTaskImpl();
+    externalTask.setActivityId(ACTIVITY_ID);
+    externalTask.setActivityInstanceId(ACTIVITY_INSTANCE_ID);
+    externalTask.setExecutionId(EXECUTION_ID);
+    externalTask.setLockExpirationTime(LOCK_EXPIRATION_TIME);
+    externalTask.setProcessDefinitionId(PROCESS_DEFINITION_ID);
+    externalTask.setProcessDefinitionKey(PROCESS_DEFINITION_KEY);
+    externalTask.setProcessInstanceId(PROCESS_INSTANCE_ID);
+    externalTask.setId(ID);
+    externalTask.setWorkerId(WORKER_ID);
+    externalTask.setTopicName(TOPIC_NAME);
+    externalTask.setVariables(new HashMap<>());
+    externalTask.setErrorMessage(ERROR_MESSAGE);
+    externalTask.setErrorDetails(ERROR_DETAILS);
+    externalTask.setSuspended(SUSPENSION_STATE);
+    externalTask.setTenantId(TENANT_ID);
+    externalTask.setRetries(RETRIES);
+    externalTask.setPriority(PRIORITY);
+    return externalTask;
   }
 
 }
