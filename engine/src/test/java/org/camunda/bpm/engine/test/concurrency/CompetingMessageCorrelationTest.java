@@ -14,7 +14,6 @@ package org.camunda.bpm.engine.test.concurrency;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -23,17 +22,31 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.impl.MessageCorrelationBuilderImpl;
 import org.camunda.bpm.engine.impl.cmd.CompleteTaskCmd;
 import org.camunda.bpm.engine.impl.cmd.MessageEventReceivedCmd;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.DatabaseHelper;
 
 /**
  * @author Thorben Lindhauer
  *
  */
 public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
+
+  @Override
+  protected void runTest() throws Throwable {
+    String databaseType = DatabaseHelper.getDatabaseType(processEngineConfiguration);
+
+    if (DbSqlSessionFactory.H2.equals(databaseType) && getName().equals("testConcurrentExclusiveCorrelation")) {
+      // skip test method - if database is H2
+    } else {
+      // invoke the test method
+      super.runTest();
+    }
+  }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/concurrency/CompetingMessageCorrelationTest.catchMessageProcess.bpmn20.xml")
   public void testConcurrentCorrelationFailsWithOptimisticLockingException() {
