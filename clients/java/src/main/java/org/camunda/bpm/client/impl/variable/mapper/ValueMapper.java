@@ -25,9 +25,9 @@ public interface ValueMapper<T extends TypedValue> {
 
   boolean isAssignable(TypedValue typedValue);
 
-  <B extends TypedValue> B convertToTypedValue(UntypedValueImpl untypedValue);
+  T convertToTypedValue(UntypedValueImpl untypedValue);
 
-  <A extends TypedValue> A deserializeTypedValue(TypedValueDto typedValueDto);
+  T deserializeTypedValue(TypedValueDto typedValueDto);
 
   TypedValueDto serializeTypedValue(TypedValue typedValue);
 

@@ -13,10 +13,8 @@
 package org.camunda.bpm.client.impl.variable.mapper.primitive;
 
 import org.camunda.bpm.client.task.impl.dto.TypedValueDto;
-import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.DateValue;
-import org.camunda.bpm.engine.variable.value.StringValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 import java.text.ParseException;

@@ -25,7 +25,6 @@ public class ShortValueMapper extends AbstractPrimitiveValueMapper<ShortValue> {
     super(ValueType.SHORT);
   }
 
-  @SuppressWarnings("unchecked")
   public ShortValue deserializeTypedValue(TypedValueDto typedValueDto) {
     Object value = typedValueDto.getValue();
     short shortValue = ((Number) value).shortValue();

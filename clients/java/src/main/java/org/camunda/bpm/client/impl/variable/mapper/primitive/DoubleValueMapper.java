@@ -25,7 +25,6 @@ public class DoubleValueMapper extends AbstractPrimitiveValueMapper<DoubleValue>
     super(ValueType.DOUBLE);
   }
 
-  @SuppressWarnings("unchecked")
   public DoubleValue deserializeTypedValue(TypedValueDto typedValueDto) {
     Object value = typedValueDto.getValue();
     double doubleValue = ((Number) value).doubleValue();

@@ -34,7 +34,6 @@ public class NullValueMapper extends AbstractPrimitiveValueMapper<NullValueImpl>
     return typedValue == null || typedValue.getValue() == null;
   }
 
-  @SuppressWarnings("unchecked")
   public NullValueImpl deserializeTypedValue(TypedValueDto typedValueDto) {
     Map<String, Object> valueInfo = typedValueDto.getValueInfo();
     if (valueInfo != null) {
@@ -50,7 +49,6 @@ public class NullValueMapper extends AbstractPrimitiveValueMapper<NullValueImpl>
     return NullValueImpl.INSTANCE;
   }
 
-  @SuppressWarnings("unchecked")
   public NullValueImpl convertToTypedValue(UntypedValueImpl untypedValue) {
     return NullValueImpl.INSTANCE;
   }

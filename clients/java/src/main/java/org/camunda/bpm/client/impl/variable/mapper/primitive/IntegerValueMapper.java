@@ -25,7 +25,6 @@ public class IntegerValueMapper extends AbstractPrimitiveValueMapper<IntegerValu
     super(ValueType.INTEGER);
   }
 
-  @SuppressWarnings("unchecked")
   public IntegerValue deserializeTypedValue(TypedValueDto typedValueDto) {
     Object value = typedValueDto.getValue();
     int intValue = ((Number) value).intValue();

@@ -14,19 +14,17 @@ package org.camunda.bpm.client.impl.variable.mapper.primitive;
 
 import org.camunda.bpm.client.task.impl.dto.TypedValueDto;
 import org.camunda.bpm.engine.variable.type.ValueType;
-import org.camunda.bpm.engine.variable.value.IntegerValue;
 import org.camunda.bpm.engine.variable.value.LongValue;
 
 /**
  * @author Tassilo Weidner
  */
-public class LongValueMapper extends AbstractPrimitiveValueMapper<IntegerValue> {
+public class LongValueMapper extends AbstractPrimitiveValueMapper<LongValue> {
 
   public LongValueMapper() {
     super(ValueType.LONG);
   }
 
-  @SuppressWarnings("unchecked")
   public LongValue deserializeTypedValue(TypedValueDto typedValueDto) {
     Object value = typedValueDto.getValue();
     long longValue = ((Number) value).longValue();

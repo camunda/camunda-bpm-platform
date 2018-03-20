@@ -48,16 +48,16 @@ public abstract class AbstractPrimitiveValueMapper<T extends TypedValue> impleme
   }
 
   @SuppressWarnings("unchecked")
-  public <B extends TypedValue> B convertToTypedValue(UntypedValueImpl untypedValue) {
-    return (B) type.createValue(untypedValue.getValue(), null); // untyped variables have no value info
+  public T convertToTypedValue(UntypedValueImpl untypedValue) {
+    return (T) type.createValue(untypedValue.getValue(), null); // untyped variables have no value info
   }
 
   @SuppressWarnings("unchecked")
-  public <A extends TypedValue> A deserializeTypedValue(TypedValueDto typedValueDto) {
+  public T deserializeTypedValue(TypedValueDto typedValueDto) {
     Object value = typedValueDto.getValue();
 
     if (isAssignable(value)) {
-      return (A) type.createValue(value, typedValueDto.getValueInfo());
+      return (T) type.createValue(value, typedValueDto.getValueInfo());
     }
     else {
       return null; // value does not correspond to type; might occur due to manipulated engine database
