@@ -38,12 +38,4 @@ public class GenericPropertiesConfigurationTest {
     genericPropertiesConfiguration.preInit(processEngineConfiguration);
     assertEquals(batchPollTimeValue, processEngineConfiguration.getBatchPollTime());
   }
-
-  @Ignore
-  @Test(expected = NotWritablePropertyException.class)
-  public void genericBindingTestWithNotExistingProperty() {
-    final int dontExistValue = Integer.MAX_VALUE;
-    camundaBpmProperties.getGenericProperties().getProperties().put("dont-exist", dontExistValue);
-    genericPropertiesConfiguration.preInit(processEngineConfiguration);
-  }
 }
