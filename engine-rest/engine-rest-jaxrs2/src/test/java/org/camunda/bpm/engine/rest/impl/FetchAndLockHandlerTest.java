@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.rest.dto.externaltask.FetchExternalTasksExtendedDt
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.hamcrest.collection.IsCollectionWithSize;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -102,6 +103,11 @@ public class FetchAndLockHandlerTest {
     ClockUtil.setCurrentTime(START_DATE);
   }
 
+  @After
+  public void resetClock() {
+    ClockUtil.reset();
+  }
+
   @Test
   public void shouldResumeAsyncResponseDueToAvailableTasks() {
     // given
@@ -118,7 +124,7 @@ public class FetchAndLockHandlerTest {
     // then
     verify(asyncResponse).resume(argThat(IsCollectionWithSize.hasSize(1)));
     assertThat(handler.getPendingRequests().size(), is(0));
-    verify(handler).suspend(Long.MAX_VALUE);
+    verify(handler).suspend(Long.MAX_VALUE - ClockUtil.getCurrentTime().getTime());
   }
 
   @Test
@@ -163,7 +169,7 @@ public class FetchAndLockHandlerTest {
     // then
     verify(asyncResponse).resume(argThat(IsCollectionWithSize.hasSize(1)));
     assertThat(handler.getPendingRequests().size(), is(0));
-    verify(handler).suspend(Long.MAX_VALUE);
+    verify(handler).suspend(Long.MAX_VALUE - ClockUtil.getCurrentTime().getTime());
   }
 
   @Test
@@ -189,7 +195,7 @@ public class FetchAndLockHandlerTest {
     // then
     verify(asyncResponse).resume(argThat(IsCollectionWithSize.hasSize(0)));
     assertThat(handler.getPendingRequests().size(), is(0));
-    verify(handler).suspend(Long.MAX_VALUE);
+    verify(handler).suspend(Long.MAX_VALUE - ClockUtil.getCurrentTime().getTime());
   }
 
   @Test
@@ -216,7 +222,7 @@ public class FetchAndLockHandlerTest {
     // then
     verify(asyncResponse, times(2)).resume(Collections.emptyList());
     assertThat(handler.getPendingRequests().size(), is(0));
-    verify(handler).suspend(Long.MAX_VALUE);
+    verify(handler).suspend(Long.MAX_VALUE - ClockUtil.getCurrentTime().getTime());
   }
 
   @Test
@@ -253,7 +259,7 @@ public class FetchAndLockHandlerTest {
 
     // then
     assertThat(handler.getPendingRequests().size(), is(0));
-    verify(handler).suspend(Long.MAX_VALUE);
+    verify(handler).suspend(Long.MAX_VALUE - ClockUtil.getCurrentTime().getTime());
     verify(asyncResponse).resume(any(ProcessEngineException.class));
   }
 
@@ -305,7 +311,7 @@ public class FetchAndLockHandlerTest {
 
     // then
     assertThat(handler.getPendingRequests().size(), is(0));
-    verify(handler).suspend(Long.MAX_VALUE);
+    verify(handler).suspend(Long.MAX_VALUE - ClockUtil.getCurrentTime().getTime());
   }
 
   @Test
