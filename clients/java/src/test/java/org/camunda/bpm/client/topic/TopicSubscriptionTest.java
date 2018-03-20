@@ -12,6 +12,22 @@
  */
 package org.camunda.bpm.client.topic;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.verify;
+import static org.powermock.api.mockito.PowerMockito.doAnswer;
+import static org.powermock.api.mockito.PowerMockito.mock;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.when;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.AbstractResponseHandler;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -29,28 +45,10 @@ import org.camunda.bpm.client.topic.impl.TopicSubscriptionManager;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.mockito.stubbing.Answer;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import static junit.framework.TestCase.fail;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.internal.matchers.StringContains.containsString;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.atLeast;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
-import static org.powermock.api.mockito.PowerMockito.when;
 
 /**
  * @author Tassilo Weidner
@@ -67,8 +65,8 @@ public class TopicSubscriptionTest {
   public void setUp() throws IOException {
     mockStatic(HttpClients.class);
 
-    HttpClientBuilder httpClientBuilderMock = mock(HttpClientBuilder.class, Mockito.RETURNS_DEEP_STUBS);
-    Mockito.when(HttpClients.custom())
+    HttpClientBuilder httpClientBuilderMock = mock(HttpClientBuilder.class, RETURNS_DEEP_STUBS);
+    when(HttpClients.custom())
       .thenReturn(httpClientBuilderMock);
 
     httpClient = mock(CloseableHttpClient.class);
@@ -97,14 +95,14 @@ public class TopicSubscriptionTest {
 
       // then
       TopicSubscriptionImpl topicSubscriptionImpl = (TopicSubscriptionImpl) topicSubscription;
-      assertThat(topicSubscriptionImpl.getLockDuration(), is(5000L+i));
-      assertThat(topicSubscriptionImpl.getTopicName(), is(MockProvider.TOPIC_NAME+i));
+      assertThat(topicSubscriptionImpl.getLockDuration()).isEqualTo(5000L+i);
+      assertThat(topicSubscriptionImpl.getTopicName()).isEqualTo(MockProvider.TOPIC_NAME+i);
     }
 
     // then
     ExternalTaskClientImpl clientImpl = (ExternalTaskClientImpl) client;
     TopicSubscriptionManager topicSubscriptionManager = clientImpl.getTopicSubscriptionManager();
-    assertThat(topicSubscriptionManager.getSubscriptions().size(), is(10));
+    assertThat(topicSubscriptionManager.getSubscriptions().size()).isEqualTo(10);
 
     client.stop();
   }
@@ -120,7 +118,7 @@ public class TopicSubscriptionTest {
       fail("No ExternalTaskClientException thrown!");
     } catch (ExternalTaskClientException e) {
       // then
-      assertThat(e.getMessage(), containsString("Topic name cannot be null"));
+      assertThat(e.getMessage()).contains(("Topic name cannot be null"));
     }
 
     client.stop();
@@ -143,7 +141,7 @@ public class TopicSubscriptionTest {
         fail("No ExternalTaskClientException thrown!");
       } catch (ExternalTaskClientException e) {
         // then
-        assertThat(e.getMessage(), containsString("Lock duration is not greater than 0"));
+        assertThat(e.getMessage()).contains("Lock duration is not greater than 0");
       }
     }
 
@@ -162,7 +160,7 @@ public class TopicSubscriptionTest {
       fail("No ExternalTaskClientException thrown!");
     } catch (ExternalTaskClientException e) {
       // then
-      assertThat(e.getMessage(), containsString("External task handler cannot be null"));
+      assertThat(e.getMessage()).contains("External task handler cannot be null");
     }
 
     client.stop();
@@ -187,7 +185,7 @@ public class TopicSubscriptionTest {
       fail("No ExternalTaskClientException thrown!");
     } catch (ExternalTaskClientException e) {
       // then
-      assertThat(e.getMessage(), containsString("Topic name has already been subscribed"));
+      assertThat(e.getMessage()).contains("Topic name has already been subscribed");
     }
 
     client.stop();

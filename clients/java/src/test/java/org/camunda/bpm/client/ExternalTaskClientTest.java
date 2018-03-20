@@ -12,6 +12,15 @@
  */
 package org.camunda.bpm.client;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.camunda.bpm.client.helper.MockProvider.BASE_URL;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
+
+import java.net.UnknownHostException;
+import java.util.List;
+
 import org.camunda.bpm.client.exception.ExternalTaskClientException;
 import org.camunda.bpm.client.helper.MockProvider;
 import org.camunda.bpm.client.impl.EngineClient;
@@ -20,18 +29,6 @@ import org.camunda.bpm.client.impl.ExternalTaskClientImpl;
 import org.camunda.bpm.client.interceptor.ClientRequestInterceptor;
 import org.camunda.bpm.client.interceptor.auth.BasicAuthProvider;
 import org.junit.Test;
-
-import java.net.UnknownHostException;
-import java.util.List;
-
-import static org.camunda.bpm.client.helper.MockProvider.BASE_URL;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
-import static org.junit.matchers.JUnitMatchers.containsString;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
 
 /**
  * @author Tassilo Weidner
@@ -49,8 +46,8 @@ public class ExternalTaskClientTest {
     EngineClient engineClient = clientImpl.getTopicSubscriptionManager().getEngineClient();
 
     // then
-    assertThat(engineClient.getBaseUrl(), is(BASE_URL));
-    assertFalse(engineClient.getWorkerId().isEmpty());
+    assertThat(engineClient.getBaseUrl()).isEqualTo(BASE_URL);
+    assertThat(engineClient.getWorkerId().isEmpty()).isFalse();
   }
 
   @Test
@@ -64,7 +61,7 @@ public class ExternalTaskClientTest {
       fail("No ExternalTaskClientException thrown!");
     } catch (ExternalTaskClientException e) {
       // then
-      assertThat(e.getMessage(), containsString("Base URL cannot be null or an empty string"));
+      assertThat(e.getMessage()).contains("Base URL cannot be null or an empty string");
     }
   }
 
@@ -79,7 +76,7 @@ public class ExternalTaskClientTest {
       fail("No ExternalTaskClientException thrown!");
     } catch (ExternalTaskClientException e) {
       // then
-      assertThat(e.getMessage(), containsString("Base URL cannot be null or an empty string"));
+      assertThat(e.getMessage()).contains("Base URL cannot be null or an empty string");
     }
   }
 
@@ -97,7 +94,7 @@ public class ExternalTaskClientTest {
       fail("No ExternalTaskClientException thrown!");
     } catch (ExternalTaskClientException e) {
       // then
-      assertThat(e.getMessage(), containsString("Cannot get hostname"));
+      assertThat(e.getMessage()).contains("Cannot get hostname");
     }
   }
 
@@ -116,7 +113,7 @@ public class ExternalTaskClientTest {
       .getRequestInterceptorHandler()
       .getInterceptors();
 
-    assertThat(interceptors.size(), is(1));
+    assertThat(interceptors.size()).isEqualTo(1);
 
     // when
     clientBuilder.addInterceptor(request -> {
@@ -124,7 +121,7 @@ public class ExternalTaskClientTest {
     });
 
     // then
-    assertThat(interceptors.size(), is(2));
+    assertThat(interceptors.size()).isEqualTo(2);
   }
 
 }

@@ -12,8 +12,24 @@
  */
 package org.camunda.bpm.client.task;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.powermock.api.mockito.PowerMockito.doReturn;
+import static org.powermock.api.mockito.PowerMockito.mock;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.when;
+import static org.powermock.api.mockito.PowerMockito.whenNew;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
@@ -45,30 +61,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import static junit.framework.TestCase.assertTrue;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.internal.matchers.StringContains.containsString;
-import static org.junit.matchers.JUnitMatchers.hasItems;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
-import static org.powermock.api.mockito.PowerMockito.whenNew;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Tassilo Weidner
@@ -85,16 +83,16 @@ public class ExternalTaskServiceTest {
   public void setUp() throws JsonProcessingException {
     mockStatic(HttpClients.class);
 
-    HttpClientBuilder httpClientBuilderMock = mock(HttpClientBuilder.class, Mockito.RETURNS_DEEP_STUBS);
-    Mockito.when(HttpClients.custom())
+    HttpClientBuilder httpClientBuilderMock = mock(HttpClientBuilder.class, RETURNS_DEEP_STUBS);
+    when(HttpClients.custom())
       .thenReturn(httpClientBuilderMock);
 
     closeableHttpResponse = mock(CloseableHttpResponse.class);
-    Mockito.when(closeableHttpResponse.getStatusLine())
+    when(closeableHttpResponse.getStatusLine())
       .thenReturn(mock(StatusLine.class));
 
     httpClient = spy(new ClosableHttpClientMock(closeableHttpResponse));
-    Mockito.when(httpClientBuilderMock.build())
+    when(httpClientBuilderMock.build())
       .thenReturn(httpClient);
 
     List<ExternalTask> externalTasks = Collections.singletonList(MockProvider.createExternalTask());
@@ -198,11 +196,11 @@ public class ExternalTaskServiceTest {
     for (Object request : payloads.getAllValues()) {
       if (request instanceof FailureRequestDto) {
         FailureRequestDto failureRequestDto = (FailureRequestDto) request;
-        assertTrue(failureRequestDto.getWorkerId().length() > 35);
-        assertThat(failureRequestDto.getErrorDetails(), is(MockProvider.ERROR_DETAILS));
-        assertThat(failureRequestDto.getErrorMessage(), is(MockProvider.ERROR_MESSAGE));
-        assertThat(failureRequestDto.getRetries(), is(MockProvider.RETRIES));
-        assertThat(failureRequestDto.getRetryTimeout(), is(MockProvider.RETRY_TIMEOUT));
+        assertThat(failureRequestDto.getWorkerId().length()).isGreaterThan(35);
+        assertThat(failureRequestDto.getErrorDetails()).isEqualTo(MockProvider.ERROR_DETAILS);
+        assertThat(failureRequestDto.getErrorMessage()).isEqualTo(MockProvider.ERROR_MESSAGE);
+        assertThat(failureRequestDto.getRetries()).isEqualTo(MockProvider.RETRIES);
+        assertThat(failureRequestDto.getRetryTimeout()).isEqualTo(MockProvider.RETRY_TIMEOUT);
       }
     }
 
@@ -244,8 +242,8 @@ public class ExternalTaskServiceTest {
     for (Object request : payloads.getAllValues()) {
       if (request instanceof BpmnErrorRequestDto) {
         BpmnErrorRequestDto bpmnErrorRequestDto = (BpmnErrorRequestDto) request;
-        assertTrue(bpmnErrorRequestDto.getWorkerId().length() > 35);
-        assertThat(bpmnErrorRequestDto.getErrorCode(), is(MockProvider.ERROR_CODE));
+        assertThat(bpmnErrorRequestDto.getWorkerId().length()).isGreaterThan(35);
+        assertThat(bpmnErrorRequestDto.getErrorCode()).isEqualTo(MockProvider.ERROR_CODE);
       }
     }
 
@@ -287,8 +285,8 @@ public class ExternalTaskServiceTest {
     for (Object request : payloads.getAllValues()) {
       if (request instanceof ExtendLockRequestDto) {
         ExtendLockRequestDto extendLockRequestDto = (ExtendLockRequestDto) request;
-        assertTrue(extendLockRequestDto.getWorkerId().length() > 35);
-        assertThat(extendLockRequestDto.getNewDuration(), is(MockProvider.NEW_DURATION));
+        assertThat(extendLockRequestDto.getWorkerId().length()).isGreaterThan(35);
+        assertThat(extendLockRequestDto.getNewDuration()).isEqualTo(MockProvider.NEW_DURATION);
       }
     }
 
@@ -329,8 +327,8 @@ public class ExternalTaskServiceTest {
     }
 
     // then
-    assertThat(notFoundException.get(0).getMessage(),
-      containsString("Exception while unlocking the external task: The task could not be found"));
+    assertThat(notFoundException.get(0).getMessage())
+      .contains("Exception while unlocking the external task: The task could not be found");
     assertRequestPerformed(EngineClient.UNLOCK_RESOURCE_PATH, httpClient);
 
     externalTaskClient.stop();
@@ -368,8 +366,8 @@ public class ExternalTaskServiceTest {
     }
 
     // then
-    assertThat(notResumedException.get(0).getMessage(),
-      containsString("Exception while completing the external task: The corresponding process instance could not be resumed"));
+    assertThat(notResumedException.get(0).getMessage())
+      .contains("Exception while completing the external task: The corresponding process instance could not be resumed");
     assertRequestPerformed(EngineClient.COMPLETE_RESOURCE_PATH, httpClient);
 
     externalTaskClient.stop();
@@ -407,8 +405,8 @@ public class ExternalTaskServiceTest {
     }
 
     // then
-    assertThat(notAcquiredException.get(0).getMessage(),
-      containsString("Exception while notifying a failure: The task's most recent lock could not be acquired"));
+    assertThat(notAcquiredException.get(0).getMessage())
+      .contains("Exception while notifying a failure: The task's most recent lock could not be acquired");
     assertRequestPerformed(EngineClient.FAILURE_RESOURCE_PATH, httpClient);
 
     externalTaskClient.stop();
@@ -446,8 +444,8 @@ public class ExternalTaskServiceTest {
     }
 
     // then
-    assertThat(connectionLostException.get(0).getMessage(),
-      containsString("Exception while notifying a BPMN error: Connection could not be established"));
+    assertThat(connectionLostException.get(0).getMessage())
+      .contains("Exception while notifying a BPMN error: Connection could not be established");
     assertRequestPerformed(EngineClient.BPMN_ERROR_RESOURCE_PATH, httpClient);
 
     externalTaskClient.stop();
@@ -471,7 +469,7 @@ public class ExternalTaskServiceTest {
       requestUrls.add(request.getURI().toString());
     }
 
-    assertThat(requestUrls, hasItems(resourceUrl));
+    assertThat(requestUrls).contains(resourceUrl);
   }
 
   private CloseableHttpClient mockHttpResponseException(String resourcePath, Integer statusCode) {
@@ -495,11 +493,11 @@ public class ExternalTaskServiceTest {
 
     mockStatic(HttpClients.class);
 
-    HttpClientBuilder httpClientBuilderMock = mock(HttpClientBuilder.class, Mockito.RETURNS_DEEP_STUBS);
-    Mockito.when(HttpClients.custom())
+    HttpClientBuilder httpClientBuilderMock = mock(HttpClientBuilder.class, RETURNS_DEEP_STUBS);
+    when(HttpClients.custom())
       .thenReturn(httpClientBuilderMock);
 
-    Mockito.when(httpClientBuilderMock.build())
+    when(httpClientBuilderMock.build())
       .thenReturn(httpClient);
 
     return httpClient;

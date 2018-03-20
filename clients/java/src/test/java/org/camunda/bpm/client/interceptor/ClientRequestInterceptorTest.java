@@ -12,6 +12,17 @@
  */
 package org.camunda.bpm.client.interceptor;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.powermock.api.mockito.PowerMockito.mock;
+import static org.powermock.api.mockito.PowerMockito.whenNew;
+
+import java.util.Collections;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.apache.http.Header;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpRequest;
@@ -29,19 +40,6 @@ import org.mockito.ArgumentCaptor;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-
-import java.util.Collections;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import static junit.framework.TestCase.fail;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.internal.matchers.StringContains.containsString;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.powermock.api.mockito.PowerMockito.mock;
-import static org.powermock.api.mockito.PowerMockito.whenNew;
 
 /**
  * @author Tassilo Weidner
@@ -93,8 +91,8 @@ public class ClientRequestInterceptorTest {
     verify(interceptionHandlerSpy).process(argumentCaptor.capture(), any(HttpContext.class));
 
     Header[] headers = argumentCaptor.getValue().getHeaders(HttpHeaders.AUTHORIZATION);
-    assertThat(headers.length, is(1));
-    assertThat(headers[0].getValue(), is("Basic ZGVtbzpkZW1v"));
+    assertThat(headers.length).isEqualTo(1);
+    assertThat(headers[0].getValue()).isEqualTo("Basic ZGVtbzpkZW1v");
   }
 
   @Test
@@ -107,7 +105,7 @@ public class ClientRequestInterceptorTest {
       fail("No ExternalTaskClientException thrown!");
     } catch (ExternalTaskClientException e) {
       // then
-      assertThat(e.getMessage(), containsString("Basic authentication credentials (username, password) cannot be null"));
+      assertThat(e.getMessage()).contains("Basic authentication credentials (username, password) cannot be null");
     }
   }
 
@@ -121,7 +119,7 @@ public class ClientRequestInterceptorTest {
       fail("No ExternalTaskClientException thrown!");
     } catch (ExternalTaskClientException e) {
       // then
-      assertThat(e.getMessage(), containsString("Basic authentication credentials (username, password) cannot be null"));
+      assertThat(e.getMessage()).contains("Basic authentication credentials (username, password) cannot be null");
     }
   }
 

@@ -17,7 +17,6 @@ import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.impl.ExternalTaskImpl;
 import org.camunda.bpm.client.task.impl.dto.TypedValueDto;
 
-import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -172,7 +171,7 @@ public class MockProvider {
   public static TypedValueDto createBytesVariable() {
     TypedValueDto typedValueDto = new TypedValueDto();
     typedValueDto.setType(BYTES_VARIABLE_TYPE);
-    typedValueDto.setValue(BYTES_VARIABLE_VALUE);
+    typedValueDto.setValue(BYTES_VARIABLE_VALUE_SERIALIZED);
 
     return typedValueDto;
   }

@@ -12,10 +12,24 @@
  */
 package org.camunda.bpm.client.impl;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.powermock.api.mockito.PowerMockito.mock;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.when;
+import static org.powermock.api.mockito.PowerMockito.whenNew;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;
@@ -32,44 +46,19 @@ import org.camunda.bpm.client.helper.ClosableHttpClientMock;
 import org.camunda.bpm.client.helper.MockProvider;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskHandler;
-import org.camunda.bpm.client.task.impl.ExternalTaskImpl;
-import org.camunda.bpm.client.task.impl.dto.TypedValueDto;
 import org.camunda.bpm.client.topic.TopicSubscriptionBuilder;
 import org.camunda.bpm.client.topic.impl.dto.FetchAndLockRequestDto;
-import org.camunda.bpm.engine.variable.type.PrimitiveValueType;
-import org.camunda.bpm.engine.variable.value.BooleanValue;
-import org.camunda.bpm.engine.variable.value.IntegerValue;
-import org.camunda.bpm.engine.variable.value.StringValue;
-import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
-import static org.powermock.api.mockito.PowerMockito.whenNew;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Tassilo Weidner
@@ -87,7 +76,7 @@ public class EngineClientTest {
     when(httpResponse.getStatusLine())
       .thenReturn(mock(StatusLine.class));
 
-    HttpClientBuilder httpClientBuilderMock = mock(HttpClientBuilder.class, Mockito.RETURNS_DEEP_STUBS);
+    HttpClientBuilder httpClientBuilderMock = mock(HttpClientBuilder.class, RETURNS_DEEP_STUBS);
     when(HttpClients.custom())
       .thenReturn(httpClientBuilderMock);
 
@@ -130,22 +119,22 @@ public class EngineClientTest {
 
     // then
     ExternalTask externalTask = externalTaskReference.get(0);
-    assertThat(externalTask.getActivityId(), is(MockProvider.ACTIVITY_ID));
-    assertThat(externalTask.getActivityInstanceId(), is(MockProvider.ACTIVITY_INSTANCE_ID));
-    assertThat(externalTask.getExecutionId(), is(MockProvider.EXECUTION_ID));
-    assertThat(externalTask.getLockExpirationTime(), is(MockProvider.LOCK_EXPIRATION_TIME));
-    assertThat(externalTask.getProcessDefinitionId(), is(MockProvider.PROCESS_DEFINITION_ID));
-    assertThat(externalTask.getProcessDefinitionKey(), is(MockProvider.PROCESS_DEFINITION_KEY));
-    assertThat(externalTask.getProcessInstanceId(), is(MockProvider.PROCESS_INSTANCE_ID));
-    assertThat(externalTask.getId(), is(MockProvider.ID));
-    assertThat(externalTask.getWorkerId(), is(MockProvider.WORKER_ID));
-    assertThat(externalTask.getTopicName(), is(MockProvider.TOPIC_NAME));
-    assertThat(externalTask.getErrorMessage(), is(MockProvider.ERROR_MESSAGE));
-    assertThat(externalTask.getErrorDetails(), is(MockProvider.ERROR_DETAILS));
-    assertThat(externalTask.isSuspended(), is(MockProvider.SUSPENSION_STATE));
-    assertThat(externalTask.getTenantId(), is(MockProvider.TENANT_ID));
-    assertThat(externalTask.getRetries(), is(MockProvider.RETRIES));
-    assertThat(externalTask.getPriority(), is(MockProvider.PRIORITY));
+    assertThat(externalTask.getActivityId()).isEqualTo(MockProvider.ACTIVITY_ID);
+    assertThat(externalTask.getActivityInstanceId()).isEqualTo(MockProvider.ACTIVITY_INSTANCE_ID);
+    assertThat(externalTask.getExecutionId()).isEqualTo(MockProvider.EXECUTION_ID);
+    assertThat(externalTask.getLockExpirationTime()).isEqualTo(MockProvider.LOCK_EXPIRATION_TIME);
+    assertThat(externalTask.getProcessDefinitionId()).isEqualTo(MockProvider.PROCESS_DEFINITION_ID);
+    assertThat(externalTask.getProcessDefinitionKey()).isEqualTo(MockProvider.PROCESS_DEFINITION_KEY);
+    assertThat(externalTask.getProcessInstanceId()).isEqualTo(MockProvider.PROCESS_INSTANCE_ID);
+    assertThat(externalTask.getId()).isEqualTo(MockProvider.ID);
+    assertThat(externalTask.getWorkerId()).isEqualTo(MockProvider.WORKER_ID);
+    assertThat(externalTask.getTopicName()).isEqualTo(MockProvider.TOPIC_NAME);
+    assertThat(externalTask.getErrorMessage()).isEqualTo(MockProvider.ERROR_MESSAGE);
+    assertThat(externalTask.getErrorDetails()).isEqualTo(MockProvider.ERROR_DETAILS);
+    assertThat(externalTask.isSuspended()).isEqualTo(MockProvider.SUSPENSION_STATE);
+    assertThat(externalTask.getTenantId()).isEqualTo(MockProvider.TENANT_ID);
+    assertThat(externalTask.getRetries()).isEqualTo(MockProvider.RETRIES);
+    assertThat(externalTask.getPriority()).isEqualTo(MockProvider.PRIORITY);
   }
 
   @Test
@@ -335,7 +324,7 @@ public class EngineClientTest {
   private void mockHttpRequestException(Class<? extends Throwable> exception) throws IOException {
     mockStatic(HttpClients.class);
 
-    HttpClientBuilder httpClientBuilderMock = mock(HttpClientBuilder.class, Mockito.RETURNS_DEEP_STUBS);
+    HttpClientBuilder httpClientBuilderMock = mock(HttpClientBuilder.class, RETURNS_DEEP_STUBS);
     when(HttpClients.custom())
       .thenReturn(httpClientBuilderMock);
 

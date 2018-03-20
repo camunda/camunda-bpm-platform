@@ -12,8 +12,26 @@
  */
 package org.camunda.bpm.client.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.powermock.api.mockito.PowerMockito.mock;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.when;
+import static org.powermock.api.mockito.PowerMockito.whenNew;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -48,32 +66,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import static junit.framework.TestCase.assertNotNull;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.matchers.JUnitMatchers.containsString;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
-import static org.powermock.api.mockito.PowerMockito.whenNew;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Tassilo Weidner
@@ -88,16 +85,16 @@ public class VariableTest {
   public void setUp() throws JsonProcessingException {
     mockStatic(HttpClients.class);
 
-    HttpClientBuilder httpClientBuilderMock = mock(HttpClientBuilder.class, Mockito.RETURNS_DEEP_STUBS);
-    Mockito.when(HttpClients.custom())
+    HttpClientBuilder httpClientBuilderMock = mock(HttpClientBuilder.class, RETURNS_DEEP_STUBS);
+    when(HttpClients.custom())
       .thenReturn(httpClientBuilderMock);
 
     closeableHttpResponse = mock(CloseableHttpResponse.class);
-    Mockito.when(closeableHttpResponse.getStatusLine())
+    when(closeableHttpResponse.getStatusLine())
       .thenReturn(mock(StatusLine.class));
 
     CloseableHttpClient httpClient = spy(new ClosableHttpClientMock(closeableHttpResponse));
-    Mockito.when(httpClientBuilderMock.build())
+    when(httpClientBuilderMock.build())
       .thenReturn(httpClient);
   }
   
@@ -455,8 +452,8 @@ public class VariableTest {
 
     // then
     TypedValue typedValue = catchedExternalTask[0].getVariableTyped(MockProvider.STRING_VARIABLE_NAME);
-    assertThat(typedValue.getType().getName(), is(MockProvider.STRING_VARIABLE_TYPE.toLowerCase()));
-    assertThat(typedValue.getValue(), is(MockProvider.STRING_VARIABLE_VALUE));
+    assertThat(typedValue.getType().getName()).isEqualTo(MockProvider.STRING_VARIABLE_TYPE.toLowerCase());
+    assertThat(typedValue.getValue()).isEqualTo(MockProvider.STRING_VARIABLE_VALUE);
   }
 
   @Test
@@ -492,13 +489,13 @@ public class VariableTest {
 
     // then
     VariableMap variableMap = catchedExternalTask[0].getAllVariablesTyped();
-    assertThat(variableMap.size(), is(2));
+    assertThat(variableMap.size()).isEqualTo(2);
 
-    assertThat(variableMap.getValueTyped(MockProvider.BOOLEAN_VARIABLE_NAME).getType().getName(), is(MockProvider.BOOLEAN_VARIABLE_TYPE.toLowerCase()));
-    assertThat(variableMap.getValueTyped(MockProvider.BOOLEAN_VARIABLE_NAME).getValue(), is(MockProvider.BOOLEAN_VARIABLE_VALUE));
+    assertThat(variableMap.getValueTyped(MockProvider.BOOLEAN_VARIABLE_NAME).getType().getName()).isEqualTo(MockProvider.BOOLEAN_VARIABLE_TYPE.toLowerCase());
+    assertThat(variableMap.getValueTyped(MockProvider.BOOLEAN_VARIABLE_NAME).getValue()).isEqualTo(MockProvider.BOOLEAN_VARIABLE_VALUE);
 
-    assertThat(variableMap.getValueTyped(MockProvider.BYTES_VARIABLE_NAME).getType().getName(), is(MockProvider.BYTES_VARIABLE_TYPE.toLowerCase()));
-    assertThat(variableMap.getValueTyped(MockProvider.BYTES_VARIABLE_NAME).getValue(), is(MockProvider.BYTES_VARIABLE_VALUE));
+    assertThat(variableMap.getValueTyped(MockProvider.BYTES_VARIABLE_NAME).getType().getName()).isEqualTo(MockProvider.BYTES_VARIABLE_TYPE.toLowerCase());
+    assertThat(variableMap.getValueTyped(MockProvider.BYTES_VARIABLE_NAME).getValue()).isEqualTo(MockProvider.BYTES_VARIABLE_VALUE);
   }
 
   @Test
@@ -535,11 +532,11 @@ public class VariableTest {
     // then
     ExternalTask externalTask = catchedExternalTask[0];
 
-    assertThat(externalTask.getVariableTyped(MockProvider.BOOLEAN_VARIABLE_NAME).getType().getName(), is(MockProvider.BOOLEAN_VARIABLE_TYPE.toLowerCase()));
-    assertThat(externalTask.getVariableTyped(MockProvider.BOOLEAN_VARIABLE_NAME).getValue(), is(MockProvider.BOOLEAN_VARIABLE_VALUE));
+    assertThat(externalTask.getVariableTyped(MockProvider.BOOLEAN_VARIABLE_NAME).getType().getName()).isEqualTo(MockProvider.BOOLEAN_VARIABLE_TYPE.toLowerCase());
+    assertThat(externalTask.getVariableTyped(MockProvider.BOOLEAN_VARIABLE_NAME).getValue()).isEqualTo(MockProvider.BOOLEAN_VARIABLE_VALUE);
 
-    assertThat(externalTask.getVariableTyped(MockProvider.BYTES_VARIABLE_NAME).getType().getName(), is(MockProvider.BYTES_VARIABLE_TYPE.toLowerCase()));
-    assertThat(externalTask.getVariableTyped(MockProvider.BYTES_VARIABLE_NAME).getValue(), is(MockProvider.BYTES_VARIABLE_VALUE));
+    assertThat(externalTask.getVariableTyped(MockProvider.BYTES_VARIABLE_NAME).getType().getName()).isEqualTo(MockProvider.BYTES_VARIABLE_TYPE.toLowerCase());
+    assertThat(externalTask.getVariableTyped(MockProvider.BYTES_VARIABLE_NAME).getValue()).isEqualTo(MockProvider.BYTES_VARIABLE_VALUE);
   }
 
   @Test
@@ -575,13 +572,13 @@ public class VariableTest {
 
     // then
     VariableMap variableMap = catchedExternalTask[0].getAllVariablesTyped();
-    assertThat(variableMap.size(), is(2));
+    assertThat(variableMap.size()).isEqualTo(2);
 
-    assertThat(variableMap.getValueTyped(MockProvider.BOOLEAN_VARIABLE_NAME).getType().getName(), is(MockProvider.BOOLEAN_VARIABLE_TYPE.toLowerCase()));
-    assertThat(variableMap.getValueTyped(MockProvider.BOOLEAN_VARIABLE_NAME).getValue(), is(MockProvider.BOOLEAN_VARIABLE_VALUE));
+    assertThat(variableMap.getValueTyped(MockProvider.BOOLEAN_VARIABLE_NAME).getType().getName()).isEqualTo(MockProvider.BOOLEAN_VARIABLE_TYPE.toLowerCase());
+    assertThat(variableMap.getValueTyped(MockProvider.BOOLEAN_VARIABLE_NAME).getValue()).isEqualTo(MockProvider.BOOLEAN_VARIABLE_VALUE);
 
-    assertThat(variableMap.getValueTyped(MockProvider.BYTES_VARIABLE_NAME).getType().getName(), is(MockProvider.BYTES_VARIABLE_TYPE.toLowerCase()));
-    assertThat(variableMap.getValueTyped(MockProvider.BYTES_VARIABLE_NAME).getValue(), is(MockProvider.BYTES_VARIABLE_VALUE));
+    assertThat(variableMap.getValueTyped(MockProvider.BYTES_VARIABLE_NAME).getType().getName()).isEqualTo(MockProvider.BYTES_VARIABLE_TYPE.toLowerCase());
+    assertThat(variableMap.getValueTyped(MockProvider.BYTES_VARIABLE_NAME).getValue()).isEqualTo(MockProvider.BYTES_VARIABLE_VALUE);
   }
 
   @Test
@@ -619,13 +616,13 @@ public class VariableTest {
 
     // then
     VariableMap variableMap = catchedExternalTask[0].getAllVariablesTyped();
-    assertThat(variableMap.size(), is(2));
+    assertThat(variableMap.size()).isEqualTo(2);
 
-    assertThat(variableMap.getValueTyped(MockProvider.BOOLEAN_VARIABLE_NAME).getType().getName(), is(MockProvider.BOOLEAN_VARIABLE_TYPE.toLowerCase()));
-    assertThat(variableMap.getValueTyped(MockProvider.BOOLEAN_VARIABLE_NAME).getValue(), is(MockProvider.BOOLEAN_VARIABLE_VALUE));
+    assertThat(variableMap.getValueTyped(MockProvider.BOOLEAN_VARIABLE_NAME).getType().getName()).isEqualTo(MockProvider.BOOLEAN_VARIABLE_TYPE.toLowerCase());
+    assertThat(variableMap.getValueTyped(MockProvider.BOOLEAN_VARIABLE_NAME).getValue()).isEqualTo(MockProvider.BOOLEAN_VARIABLE_VALUE);
 
-    assertThat(variableMap.getValueTyped(MockProvider.BYTES_VARIABLE_NAME).getType().getName(), is(MockProvider.BYTES_VARIABLE_TYPE.toLowerCase()));
-    assertThat(variableMap.getValueTyped(MockProvider.BYTES_VARIABLE_NAME).getValue(), is(MockProvider.BYTES_VARIABLE_VALUE));
+    assertThat(variableMap.getValueTyped(MockProvider.BYTES_VARIABLE_NAME).getType().getName()).isEqualTo(MockProvider.BYTES_VARIABLE_TYPE.toLowerCase());
+    assertThat(variableMap.getValueTyped(MockProvider.BYTES_VARIABLE_NAME).getValue()).isEqualTo(MockProvider.BYTES_VARIABLE_VALUE);
   }
 
   @Test
@@ -663,13 +660,13 @@ public class VariableTest {
 
     // then
     VariableMap variableMap = catchedExternalTask[0].getAllVariablesTyped();
-    assertThat(variableMap.size(), is(2));
+    assertThat(variableMap.size()).isEqualTo(2);
 
-    assertThat(variableMap.getValueTyped(MockProvider.BOOLEAN_VARIABLE_NAME).getType().getName(), is(MockProvider.BOOLEAN_VARIABLE_TYPE.toLowerCase()));
-    assertThat(variableMap.getValueTyped(MockProvider.BOOLEAN_VARIABLE_NAME).getValue(), is(MockProvider.BOOLEAN_VARIABLE_VALUE));
+    assertThat(variableMap.getValueTyped(MockProvider.BOOLEAN_VARIABLE_NAME).getType().getName()).isEqualTo(MockProvider.BOOLEAN_VARIABLE_TYPE.toLowerCase());
+    assertThat(variableMap.getValueTyped(MockProvider.BOOLEAN_VARIABLE_NAME).getValue()).isEqualTo(MockProvider.BOOLEAN_VARIABLE_VALUE);
 
-    assertThat(variableMap.getValueTyped(MockProvider.BYTES_VARIABLE_NAME).getType().getName(), is(MockProvider.BYTES_VARIABLE_TYPE.toLowerCase()));
-    assertThat(variableMap.getValueTyped(MockProvider.BYTES_VARIABLE_NAME).getValue(), is(MockProvider.BYTES_VARIABLE_VALUE));
+    assertThat(variableMap.getValueTyped(MockProvider.BYTES_VARIABLE_NAME).getType().getName()).isEqualTo(MockProvider.BYTES_VARIABLE_TYPE.toLowerCase());
+    assertThat(variableMap.getValueTyped(MockProvider.BYTES_VARIABLE_NAME).getValue()).isEqualTo(MockProvider.BYTES_VARIABLE_VALUE);
   }
 
   @Test
@@ -708,11 +705,11 @@ public class VariableTest {
     // then
     ExternalTask externalTask = catchedExternalTask[0];
 
-    assertThat(externalTask.getVariableTyped(MockProvider.BOOLEAN_VARIABLE_NAME).getType().getName(), is(MockProvider.BOOLEAN_VARIABLE_TYPE.toLowerCase()));
-    assertThat(externalTask.getVariableTyped(MockProvider.BOOLEAN_VARIABLE_NAME).getValue(), is(MockProvider.BOOLEAN_VARIABLE_VALUE));
+    assertThat(externalTask.getVariableTyped(MockProvider.BOOLEAN_VARIABLE_NAME).getType().getName()).isEqualTo(MockProvider.BOOLEAN_VARIABLE_TYPE.toLowerCase());
+    assertThat(externalTask.getVariableTyped(MockProvider.BOOLEAN_VARIABLE_NAME).getValue()).isEqualTo(MockProvider.BOOLEAN_VARIABLE_VALUE);
 
-    assertThat(externalTask.getVariableTyped(MockProvider.BYTES_VARIABLE_NAME).getType().getName(), is(MockProvider.BYTES_VARIABLE_TYPE.toLowerCase()));
-    assertThat(externalTask.getVariableTyped(MockProvider.BYTES_VARIABLE_NAME).getValue(), is(MockProvider.BYTES_VARIABLE_VALUE));
+    assertThat(externalTask.getVariableTyped(MockProvider.BYTES_VARIABLE_NAME).getType().getName()).isEqualTo(MockProvider.BYTES_VARIABLE_TYPE.toLowerCase());
+    assertThat(externalTask.getVariableTyped(MockProvider.BYTES_VARIABLE_NAME).getValue()).isEqualTo(MockProvider.BYTES_VARIABLE_VALUE);
   }
 
   /* tests if overriding variables works properly */
@@ -1363,10 +1360,10 @@ public class VariableTest {
     client.stop();
 
     // then
-    assertThat(exceptionReference.get(0).getMessage(), containsString("no suitable mapper found for type ExternalTaskImpl"));
-    assertThat(exceptionReference.get(1).getMessage(), containsString("no suitable mapper found for type ExternalTaskImpl"));
-    assertThat(exceptionReference.get(2).getMessage(), containsString("no suitable mapper found for type ExternalTaskImpl"));
-    assertThat(exceptionReference.get(3).getMessage(), containsString("no suitable mapper found for type ExternalTaskImpl"));
+    assertThat(exceptionReference.get(0).getMessage().contains("no suitable mapper found for type ExternalTaskImpl"));
+    assertThat(exceptionReference.get(1).getMessage().contains("no suitable mapper found for type ExternalTaskImpl"));
+    assertThat(exceptionReference.get(2).getMessage().contains("no suitable mapper found for type ExternalTaskImpl"));
+    assertThat(exceptionReference.get(3).getMessage().contains("no suitable mapper found for type ExternalTaskImpl"));
   }
 
   @Test
@@ -1438,8 +1435,8 @@ public class VariableTest {
 
     // then
     ExternalTask externalTask = externalTaskReference.get(0);
-    assertThat(externalTask.getVariableTyped("aVariableName").isTransient(), is(true));
-    assertThat(externalTask.getVariableTyped("anotherVariableName").isTransient(), is(false));
+    assertThat(externalTask.getVariableTyped("aVariableName").isTransient()).isEqualTo(true);
+    assertThat(externalTask.getVariableTyped("anotherVariableName").isTransient()).isEqualTo(false);
   }
 
   @Test
@@ -1537,15 +1534,15 @@ public class VariableTest {
   // helper //////////////////////////////////
 
   private void assertVariableValue(ExternalTask externalTask, String variableName, Object variableValue, String variableType) {
-    assertThat(externalTask.getVariableTyped(variableName).getType().getName(), is(variableType.toLowerCase()));
-    assertThat(externalTask.getVariableTyped(variableName).getValue(), is(variableValue));
+    assertThat(externalTask.getVariableTyped(variableName).getType().getName()).isEqualTo(variableType.toLowerCase());
+    assertThat(externalTask.getVariableTyped(variableName).getValue()).isEqualTo(variableValue);
 
-    assertThat(externalTask.getAllVariablesTyped().getValueTyped(variableName).getType().getName(), is(variableType.toLowerCase()));
-    assertThat(externalTask.getAllVariablesTyped().getValueTyped(variableName).getValue(), is(variableValue));
+    assertThat(externalTask.getAllVariablesTyped().getValueTyped(variableName).getType().getName()).isEqualTo(variableType.toLowerCase());
+    assertThat(externalTask.getAllVariablesTyped().getValueTyped(variableName).getValue()).isEqualTo(variableValue);
 
-    assertThat(externalTask.getVariable(variableName), is(variableValue));
+    assertThat((Object) externalTask.getVariable(variableName)).isEqualTo(variableValue);
 
-    assertThat(externalTask.getAllVariables().get(variableName), is(variableValue));
+    assertThat(externalTask.getAllVariables().get(variableName)).isEqualTo(variableValue);
   }
 
   protected TypedValueDto createTypedValueDto(Object variableValue, String variableType) {
@@ -1573,103 +1570,111 @@ public class VariableTest {
   }
 
   protected void assertAllVariablesUntyped(ExternalTask externalTask) {
-    assertThat(externalTask.getAllVariables().size(), is(MockProvider.VARIABLES.size()));
+    assertThat(externalTask.getAllVariables().size()).isEqualTo(MockProvider.VARIABLES.size());
 
     MockProvider.VARIABLES.forEach((variableName, variableValue) -> {
-      assertNotNull(variableName);
-      assertNotNull(variableValue);
+      assertThat(variableName).isNotNull();
+      assertThat(variableValue).isNotNull();
 
       if (variableValue.getType().equals("Date")) {
-        assertThat(externalTask.getAllVariables().get(variableName), is(MockProvider.DATE_VARIABLE_VALUE));
-      } else {
-        assertThat(externalTask.getAllVariables().get(variableName), is(variableValue.getValue()));
+        assertThat(externalTask.getAllVariables().get(variableName)).isEqualTo(MockProvider.DATE_VARIABLE_VALUE);
+      }
+      else if (variableValue.getType().equals("Bytes")) {
+        assertThat(externalTask.getAllVariables().get(variableName)).isEqualTo(MockProvider.BYTES_VARIABLE_VALUE);
+      }
+      else {
+        assertThat(externalTask.getAllVariables().get(variableName)).isEqualTo(variableValue.getValue());
       }
     });
   }
 
   protected void assertAllVariablesTyped(ExternalTask externalTask) {
-    assertThat(externalTask.getAllVariables().size(), is(MockProvider.VARIABLES.size()));
+    assertThat(externalTask.getAllVariables().size()).isEqualTo(MockProvider.VARIABLES.size());
 
     MockProvider.VARIABLES.forEach((expectedVariableName, expectedVariableValue) -> {
-      assertNotNull(expectedVariableName);
-      assertNotNull(expectedVariableValue);
+      assertThat(expectedVariableName).isNotNull();
+      assertThat(expectedVariableValue).isNotNull();
 
       TypedValue typedValue = externalTask.getAllVariablesTyped().getValueTyped(expectedVariableName);
 
       if (typedValue.getType().getName().equals("date")) {
-        assertThat(typedValue.getValue(), is(MockProvider.DATE_VARIABLE_VALUE));
-      } else {
-        assertThat(typedValue.getType().getName(), is(expectedVariableValue.getType().toLowerCase()));
-        assertThat(typedValue.getValue(), is(expectedVariableValue.getValue()));
+        assertThat(typedValue.getValue()).isEqualTo(MockProvider.DATE_VARIABLE_VALUE);
+      }
+      else if (typedValue.getType().getName().equals("bytes")) {
+        assertThat(typedValue.getValue()).isEqualTo(MockProvider.BYTES_VARIABLE_VALUE);
+      }
+      else {
+        assertThat(typedValue.getType().getName()).isEqualTo(expectedVariableValue.getType().toLowerCase());
+        assertThat(typedValue.getValue()).isEqualTo(expectedVariableValue.getValue());
       }
     });
   }
 
   protected void assertSingleVariableUntyped(ExternalTask externalTask) {
     boolean booleanValue = externalTask.getVariable(MockProvider.BOOLEAN_VARIABLE_NAME);
-    assertThat(booleanValue, is(MockProvider.BOOLEAN_VARIABLE_VALUE));
+    assertThat(booleanValue).isEqualTo(MockProvider.BOOLEAN_VARIABLE_VALUE);
 
     short shortValue = externalTask.getVariable(MockProvider.SHORT_VARIABLE_NAME);
-    assertThat(shortValue, is(MockProvider.SHORT_VARIABLE_VALUE));
+    assertThat(shortValue).isEqualTo(MockProvider.SHORT_VARIABLE_VALUE);
 
     int integerValue = externalTask.getVariable(MockProvider.INTEGER_VARIABLE_NAME);
-    assertThat(integerValue, is(MockProvider.INTEGER_VARIABLE_VALUE));
+    assertThat(integerValue).isEqualTo(MockProvider.INTEGER_VARIABLE_VALUE);
 
     long longValue = externalTask.getVariable(MockProvider.LONG_VARIABLE_NAME);
-    assertThat(longValue, is(MockProvider.LONG_VARIABLE_VALUE));
+    assertThat(longValue).isEqualTo(MockProvider.LONG_VARIABLE_VALUE);
 
     double doubleValue = externalTask.getVariable(MockProvider.DOUBLE_VARIABLE_NAME);
-    assertThat(doubleValue, is(MockProvider.DOUBLE_VARIABLE_VALUE));
+    assertThat(doubleValue).isEqualTo(MockProvider.DOUBLE_VARIABLE_VALUE);
 
     String stringValue = externalTask.getVariable(MockProvider.STRING_VARIABLE_NAME);
-    assertThat(stringValue, is(MockProvider.STRING_VARIABLE_VALUE));
+    assertThat(stringValue).isEqualTo(MockProvider.STRING_VARIABLE_VALUE);
 
     Date dateValue = externalTask.getVariable(MockProvider.DATE_VARIABLE_NAME);
-    assertThat(dateValue, is(MockProvider.DATE_VARIABLE_VALUE));
+    assertThat(dateValue).isEqualTo(MockProvider.DATE_VARIABLE_VALUE);
 
     byte[] bytesValue = externalTask.getVariable(MockProvider.BYTES_VARIABLE_NAME);
-    assertThat(bytesValue, is(MockProvider.BYTES_VARIABLE_VALUE));
+    assertThat(bytesValue).isEqualTo(MockProvider.BYTES_VARIABLE_VALUE);
 
     Object nullValue = externalTask.getVariable(MockProvider.NULL_VARIABLE_NAME);
-    assertNull(nullValue);
+    assertThat(nullValue).isNull();
   }
 
   protected void assertSingleVariableTyped(ExternalTask externalTask) {
     BooleanValue booleanValue = externalTask.getVariableTyped(MockProvider.BOOLEAN_VARIABLE_NAME);
-    assertThat(booleanValue.getType(), is(PrimitiveValueType.BOOLEAN));
-    assertThat(booleanValue.getValue(), is(MockProvider.BOOLEAN_VARIABLE_VALUE));
+    assertThat(booleanValue.getType()).isEqualTo(PrimitiveValueType.BOOLEAN);
+    assertThat(booleanValue.getValue()).isEqualTo(MockProvider.BOOLEAN_VARIABLE_VALUE);
 
     ShortValue shortValue = externalTask.getVariableTyped(MockProvider.SHORT_VARIABLE_NAME);
-    assertThat(shortValue.getType(), is(PrimitiveValueType.SHORT));
-    assertThat(shortValue.getValue(), is(MockProvider.SHORT_VARIABLE_VALUE));
+    assertThat(shortValue.getType()).isEqualTo(PrimitiveValueType.SHORT);
+    assertThat(shortValue.getValue()).isEqualTo(MockProvider.SHORT_VARIABLE_VALUE);
 
     IntegerValue integerValue = externalTask.getVariableTyped(MockProvider.INTEGER_VARIABLE_NAME);
-    assertThat(integerValue.getType(), is(PrimitiveValueType.INTEGER));
-    assertThat(integerValue.getValue(), is(MockProvider.INTEGER_VARIABLE_VALUE));
+    assertThat(integerValue.getType()).isEqualTo(PrimitiveValueType.INTEGER);
+    assertThat(integerValue.getValue()).isEqualTo(MockProvider.INTEGER_VARIABLE_VALUE);
 
     LongValue longValue = externalTask.getVariableTyped(MockProvider.LONG_VARIABLE_NAME);
-    assertThat(longValue.getType(), is(PrimitiveValueType.LONG));
-    assertThat(longValue.getValue(), is(MockProvider.LONG_VARIABLE_VALUE));
+    assertThat(longValue.getType()).isEqualTo(PrimitiveValueType.LONG);
+    assertThat(longValue.getValue()).isEqualTo(MockProvider.LONG_VARIABLE_VALUE);
 
     DoubleValue doubleValue = externalTask.getVariableTyped(MockProvider.DOUBLE_VARIABLE_NAME);
-    assertThat(doubleValue.getType(), is(PrimitiveValueType.DOUBLE));
-    assertThat(doubleValue.getValue(), is(MockProvider.DOUBLE_VARIABLE_VALUE));
+    assertThat(doubleValue.getType()).isEqualTo(PrimitiveValueType.DOUBLE);
+    assertThat(doubleValue.getValue()).isEqualTo(MockProvider.DOUBLE_VARIABLE_VALUE);
 
     StringValue stringValue = externalTask.getVariableTyped(MockProvider.STRING_VARIABLE_NAME);
-    assertThat(stringValue.getType(), is(PrimitiveValueType.STRING));
-    assertThat(stringValue.getValue(), is(MockProvider.STRING_VARIABLE_VALUE));
+    assertThat(stringValue.getType()).isEqualTo(PrimitiveValueType.STRING);
+    assertThat(stringValue.getValue()).isEqualTo(MockProvider.STRING_VARIABLE_VALUE);
 
     DateValue dateValue = externalTask.getVariableTyped(MockProvider.DATE_VARIABLE_NAME);
-    assertThat(dateValue.getType(), is(PrimitiveValueType.DATE));
-    assertThat(dateValue.getValue(), is(MockProvider.DATE_VARIABLE_VALUE));
+    assertThat(dateValue.getType()).isEqualTo(PrimitiveValueType.DATE);
+    assertThat(dateValue.getValue()).isEqualTo(MockProvider.DATE_VARIABLE_VALUE);
 
     BytesValue bytesValue = externalTask.getVariableTyped(MockProvider.BYTES_VARIABLE_NAME);
-    assertThat(bytesValue.getType(), is(PrimitiveValueType.BYTES));
-    assertThat(bytesValue.getValue(), is(MockProvider.BYTES_VARIABLE_VALUE));
+    assertThat(bytesValue.getType()).isEqualTo(PrimitiveValueType.BYTES);
+    assertThat(bytesValue.getValue()).isEqualTo(MockProvider.BYTES_VARIABLE_VALUE);
 
     NullValueImpl nullValue = externalTask.getVariableTyped(MockProvider.NULL_VARIABLE_NAME);
-    assertThat(nullValue.getType(), is(PrimitiveValueType.NULL));
-    assertNull(nullValue.getValue());
+    assertThat(nullValue.getType()).isEqualTo(PrimitiveValueType.NULL);
+    assertThat(nullValue.getValue()).isNull();
   }
 
   protected void assertCompleteRequestSerialization(ObjectMapper objectMapper) throws JsonProcessingException {
@@ -1683,46 +1688,46 @@ public class VariableTest {
         Map<String, TypedValueDto> typedValueDtoMap = completeRequestDto.getVariables();
 
         TypedValueDto booleanValueDto = typedValueDtoMap.get(MockProvider.BOOLEAN_VARIABLE_NAME);
-        assertThat(booleanValueDto.getType(), is(MockProvider.BOOLEAN_VARIABLE_TYPE));
-        assertThat(booleanValueDto.getValue(), is(MockProvider.BOOLEAN_VARIABLE_VALUE));
+        assertThat(booleanValueDto.getType()).isEqualTo(MockProvider.BOOLEAN_VARIABLE_TYPE);
+        assertThat(booleanValueDto.getValue()).isEqualTo(MockProvider.BOOLEAN_VARIABLE_VALUE);
 
         TypedValueDto shortValueDto = typedValueDtoMap.get(MockProvider.SHORT_VARIABLE_NAME);
-        assertThat(shortValueDto.getType(), is(MockProvider.SHORT_VARIABLE_TYPE));
-        assertThat(shortValueDto.getValue(), is(MockProvider.SHORT_VARIABLE_VALUE));
+        assertThat(shortValueDto.getType()).isEqualTo(MockProvider.SHORT_VARIABLE_TYPE);
+        assertThat(shortValueDto.getValue()).isEqualTo(MockProvider.SHORT_VARIABLE_VALUE);
 
         TypedValueDto integerValueDto = typedValueDtoMap.get(MockProvider.INTEGER_VARIABLE_NAME);
-        assertThat(integerValueDto.getType(), is(MockProvider.INTEGER_VARIABLE_TYPE));
-        assertThat(integerValueDto.getValue(), is(MockProvider.INTEGER_VARIABLE_VALUE));
+        assertThat(integerValueDto.getType()).isEqualTo(MockProvider.INTEGER_VARIABLE_TYPE);
+        assertThat(integerValueDto.getValue()).isEqualTo(MockProvider.INTEGER_VARIABLE_VALUE);
 
         TypedValueDto longValueDto = typedValueDtoMap.get(MockProvider.LONG_VARIABLE_NAME);
-        assertThat(longValueDto.getType(), is(MockProvider.LONG_VARIABLE_TYPE));
-        assertThat(longValueDto.getValue(), is(MockProvider.LONG_VARIABLE_VALUE));
+        assertThat(longValueDto.getType()).isEqualTo(MockProvider.LONG_VARIABLE_TYPE);
+        assertThat(longValueDto.getValue()).isEqualTo(MockProvider.LONG_VARIABLE_VALUE);
 
         TypedValueDto doubleValueDto = typedValueDtoMap.get(MockProvider.DOUBLE_VARIABLE_NAME);
-        assertThat(doubleValueDto.getType(), is(MockProvider.DOUBLE_VARIABLE_TYPE));
-        assertThat(doubleValueDto.getValue(), is(MockProvider.DOUBLE_VARIABLE_VALUE));
+        assertThat(doubleValueDto.getType()).isEqualTo(MockProvider.DOUBLE_VARIABLE_TYPE);
+        assertThat(doubleValueDto.getValue()).isEqualTo(MockProvider.DOUBLE_VARIABLE_VALUE);
 
         TypedValueDto stringValueDto = typedValueDtoMap.get(MockProvider.STRING_VARIABLE_NAME);
-        assertThat(stringValueDto.getType(), is(MockProvider.STRING_VARIABLE_TYPE));
-        assertThat(stringValueDto.getValue(), is(MockProvider.STRING_VARIABLE_VALUE));
+        assertThat(stringValueDto.getType()).isEqualTo(MockProvider.STRING_VARIABLE_TYPE);
+        assertThat(stringValueDto.getValue()).isEqualTo(MockProvider.STRING_VARIABLE_VALUE);
 
         TypedValueDto dateValueDto = typedValueDtoMap.get(MockProvider.DATE_VARIABLE_NAME);
-        assertThat(dateValueDto.getType(), is(MockProvider.DATE_VARIABLE_TYPE));
-        assertThat(dateValueDto.getValue(), is(MockProvider.DATE_VARIABLE_VALUE_SERIALIZED));
+        assertThat(dateValueDto.getType()).isEqualTo(MockProvider.DATE_VARIABLE_TYPE);
+        assertThat(dateValueDto.getValue()).isEqualTo(MockProvider.DATE_VARIABLE_VALUE_SERIALIZED);
 
         TypedValueDto bytesValue = typedValueDtoMap.get(MockProvider.BYTES_VARIABLE_NAME);
-        assertThat(bytesValue.getType(), is(MockProvider.BYTES_VARIABLE_TYPE));
-        assertThat(bytesValue.getValue(), is(MockProvider.BYTES_VARIABLE_VALUE_SERIALIZED));
+        assertThat(bytesValue.getType()).isEqualTo(MockProvider.BYTES_VARIABLE_TYPE);
+        assertThat(bytesValue.getValue()).isEqualTo(MockProvider.BYTES_VARIABLE_VALUE_SERIALIZED);
 
         TypedValueDto nullValueDto = typedValueDtoMap.get(MockProvider.NULL_VARIABLE_NAME);
-        assertThat(nullValueDto.getType(), is(MockProvider.NULL_VARIABLE_TYPE));
-        assertNull(nullValueDto.getValue());
+        assertThat(nullValueDto.getType()).isEqualTo(MockProvider.NULL_VARIABLE_TYPE);
+        assertThat(nullValueDto.getValue()).isNull();
 
         isAsserted = true;
       }
     }
 
-    assertTrue(isAsserted);
+    assertThat(isAsserted).isTrue();
   }
 
   protected void assertVariablePayloadOfCompleteRequest(ObjectMapper objectMapper, String variableName, Object variableValue, String variableType) throws JsonProcessingException {
@@ -1744,24 +1749,24 @@ public class VariableTest {
 
     expectedDtoMap.forEach((variableName, typedValueDto) -> {
       Map<String, TypedValueDto> variableMap = completeRequestDto.getVariables();
-      assertThat(variableMap.get(variableName).getType(), is(typedValueDto.getType()));
-      assertThat(variableMap.get(variableName).getValue(), is(typedValueDto.getValue()));
+      assertThat(variableMap.get(variableName).getType()).isEqualTo(typedValueDto.getType());
+      assertThat(variableMap.get(variableName).getValue()).isEqualTo(typedValueDto.getValue());
 
       if (typedValueDto.getValueInfo() != null && typedValueDto.getValueInfo().get("transient") != null) {
         boolean expectedTransience = (boolean) typedValueDto.getValueInfo().get("transient");
         if (expectedTransience) {
-          assertTrue((boolean) variableMap.get(variableName).getValueInfo().get("transient"));
+          assertThat((boolean) variableMap.get(variableName).getValueInfo().get("transient")).isTrue();
         } else {
-          assertNull(variableMap.get(variableName).getValueInfo().get("transient"));
+          assertThat(variableMap.get(variableName).getValueInfo().get("transient")).isNull();;
         }
       }
 
       isAsserted[0] = true;
     });
 
-    assertThat(expectedDtoMap.size(), is(completeRequestDto.getVariables().size()));
+    assertThat(expectedDtoMap.size()).isEqualTo(completeRequestDto.getVariables().size());
 
-    assertTrue(isAsserted[0]);
+    assertThat(isAsserted[0]).isTrue();
   }
 
 }
