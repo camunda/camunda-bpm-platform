@@ -2,6 +2,7 @@ package org.camunda.bpm.engine.test.api.externaltask;
 
 import java.util.ArrayList;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 
 import java.util.Arrays;
@@ -20,6 +21,7 @@ import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -44,6 +46,8 @@ public class SetExternalTasksRetriesTest {
   private static String PROCESS_DEFINITION_KEY = "oneExternalTaskProcess";
   private static String PROCESS_DEFINITION_KEY_2 = "twoExternalTaskWithPriorityProcess";
 
+  private int defaultBatchJobsPerSeed;
+  private int defaultInvocationsPerBatchJob;
   protected RuntimeService runtimeService;
   protected RepositoryService repositoryService;
   protected ManagementService managementService;
@@ -79,17 +83,30 @@ public class SetExternalTasksRetriesTest {
 
   @After
   public void cleanBatch() {
-    Batch batch = managementService.createBatchQuery().singleResult();
-    if (batch != null) {
-      managementService.deleteBatch(
-          batch.getId(), true);
+    List<Batch> batches = managementService.createBatchQuery().list();
+    if (batches.size() > 0) {
+      for (Batch batch : batches)
+        managementService.deleteBatch(batch.getId(), true);
     }
 
-    HistoricBatch historicBatch = engineRule.getHistoryService().createHistoricBatchQuery().singleResult();
+    HistoricBatch historicBatch = historyService.createHistoricBatchQuery().singleResult();
     if (historicBatch != null) {
-      engineRule.getHistoryService().deleteHistoricBatch(
-          historicBatch.getId());
+      historyService.deleteHistoricBatch(historicBatch.getId());
     }
+  }
+
+  @Before
+  public void storeEngineSettings() {
+    ProcessEngineConfigurationImpl configuration = engineRule.getProcessEngineConfiguration();
+    defaultBatchJobsPerSeed = configuration.getBatchJobsPerSeed();
+    defaultInvocationsPerBatchJob = configuration.getInvocationsPerBatchJob();
+  }
+
+  @After
+  public void restoreEngineSettings() {
+    ProcessEngineConfigurationImpl configuration = engineRule.getProcessEngineConfiguration();
+    configuration.setBatchJobsPerSeed(defaultBatchJobsPerSeed);
+    configuration.setInvocationsPerBatchJob(defaultInvocationsPerBatchJob);
   }
 
   @Test
@@ -291,6 +308,33 @@ public class SetExternalTasksRetriesTest {
     externalTasks = externalTaskService.createExternalTaskQuery().list();
     for (ExternalTask task : externalTasks) {
       Assert.assertEquals(5, (int) task.getRetries());
+    }
+  }
+
+  @Test
+  public void shouldSetExternalTaskRetriesWithLargeList() {
+    // given
+    engineRule.getProcessEngineConfiguration().setBatchJobsPerSeed(1010);
+    List<String> processIds = startProcessInstance(PROCESS_DEFINITION_KEY, 1100);
+
+    HistoricProcessInstanceQuery processInstanceQuery = historyService.createHistoricProcessInstanceQuery();
+
+    // when
+    Batch batch = externalTaskService.updateRetries()
+        .historicProcessInstanceQuery(processInstanceQuery)
+        .setAsync(3);
+
+    createAndExecuteSeedJobs(batch.getSeedJobDefinitionId(), 2);
+    executeBatchJobs(batch);
+
+    // then no error is thrown
+    assertHistoricBatchExists();
+
+    // cleanup
+    if (!testHelper.isHistoryLevelNone()) {
+      batch = historyService.deleteHistoricProcessInstancesAsync(processIds, null);
+      createAndExecuteSeedJobs(batch.getSeedJobDefinitionId(), 2);
+      executeBatchJobs(batch);
     }
   }
 
@@ -505,11 +549,63 @@ public class SetExternalTasksRetriesTest {
     }
   }
 
+  protected void assertHistoricBatchExists() {
+    if (testHelper.isHistoryLevelFull()) {
+      assertThat(historyService.createHistoricBatchQuery().count(), is(1L));
+    }
+  }
+
+  protected void createAndExecuteSeedJobs(String seedJobDefinitionId, int expectedSeedJobsCount) {
+    for (int i = 0; i <= expectedSeedJobsCount; i++) {
+      Job seedJob = managementService.createJobQuery().jobDefinitionId(seedJobDefinitionId).singleResult();
+      if (i != expectedSeedJobsCount) {
+        assertNotNull(seedJob);
+        managementService.executeJob(seedJob.getId());
+      } else {
+        //the last seed job should not trigger another seed job
+        assertNull(seedJob);
+      }
+    }
+  }
+
+  /**
+   * Execute all batch jobs of batch once and collect exceptions during job execution.
+   *
+   * @param batch the batch for which the batch jobs should be executed
+   * @return the catched exceptions of the batch job executions, is empty if non where thrown
+   */
+  protected List<Exception> executeBatchJobs(Batch batch) {
+    String batchJobDefinitionId = batch.getBatchJobDefinitionId();
+    List<Job> batchJobs = managementService.createJobQuery().jobDefinitionId(batchJobDefinitionId).list();
+    assertFalse(batchJobs.isEmpty());
+
+    List<Exception> catchedExceptions = new ArrayList<Exception>();
+
+    for (Job batchJob : batchJobs) {
+      try {
+        managementService.executeJob(batchJob.getId());
+      } catch (Exception e) {
+        catchedExceptions.add(e);
+      }
+    }
+
+    return catchedExceptions;
+  }
+
+  protected void startTestProcesses() {
+    RuntimeService runtimeService = engineRule.getRuntimeService();
+    for (int i = 4; i < 1000; i++) {
+      processInstanceIds.add(runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY, i + "").getId());
+    }
+
+  }
+
   protected List<String> startProcessInstance(String key, int instances) {
     List<String> ids = new ArrayList<String>();
     for (int i = 0; i < instances; i++) {
       ids.add(runtimeService.startProcessInstanceByKey(key, String.valueOf(i)).getId());
     }
+    processInstanceIds.addAll(ids);
     return ids;
   }
 

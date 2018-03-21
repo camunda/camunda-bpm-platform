@@ -530,6 +530,28 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(processInstances.get(0).getId(), task.getProcessInstanceId());
   }
 
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  public void testQueryByLargeListOfProcessInstanceIdIn() {
+    // given
+    List<String> processInstances = new ArrayList<String>();
+    for (int i = 0; i < 1001; i++) {
+      processInstances.add(runtimeService.startProcessInstanceByKey("oneExternalTaskProcess").getProcessInstanceId());
+    }
+    String[] processInstanceIds = convertListToArray(processInstances);
+
+    // when
+    List<ExternalTask> tasks = externalTaskService
+      .createExternalTaskQuery()
+      .processInstanceIdIn(processInstanceIds)
+      .list();
+
+    // then
+    assertNotNull(tasks);
+    assertEquals(1001, tasks.size());
+    for (ExternalTask task : tasks) {
+      assertTrue(processInstances.contains(task.getProcessInstanceId()));
+    }
+  }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
   public void testQueryByProcessInstanceIdIn() {
@@ -845,6 +867,15 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
     return processInstances;
   }
 
+  protected List<String> startInstancesByKey1(String processDefinitionKey, int number) {
+    List<String> processInstances = new ArrayList<String>();
+    for (int i = 0; i < number; i++) {
+      processInstances.add(runtimeService.startProcessInstanceByKey(processDefinitionKey).getProcessInstanceId());
+    }
+
+    return processInstances;
+  }
+
   protected List<ProcessInstance> startInstancesById(String processDefinitionId, int number) {
     List<ProcessInstance> processInstances = new ArrayList<ProcessInstance>();
     for (int i = 0; i < number; i++) {
@@ -874,6 +905,14 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
     for (LockedExternalTask task : tasks) {
       externalTaskService.handleFailure(task.getId(), task.getWorkerId(), errorMessage, errorDetails, retries, retryTimeout);
     }
+  }
+
+  protected String[] convertListToArray(List<String> processInstances) {
+    String[] processInstanceIds=new String[processInstances.size()];
+    for (int i = 0; i < processInstances.size(); i++) {
+      processInstanceIds[i] = new String(processInstances.get(i));
+    }
+    return processInstanceIds;
   }
 
 }
