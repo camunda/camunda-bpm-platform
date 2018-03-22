@@ -156,5 +156,13 @@ public class ProcessEngineLogger extends BaseLogger {
     logInfo("007", "Process Engine {} closed", name);
   }
 
+  public void historyCleanupJobReconfigurationFailure(Exception exception) {
+    logInfo(
+      "008",
+      "History Cleanup Job reconfiguration failed on Process Engine Bootstrap. Possible concurrent execution with the JobExecutor: {}",
+      exception.getMessage()
+    );
+  }
+
 }
 

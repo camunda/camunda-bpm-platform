@@ -55,7 +55,7 @@ public abstract class ConcurrencyTestCase extends PluggableProcessEngineTestCase
     Thread thread = new Thread(new Runnable() {
       public void run() {
         try {
-          processEngineConfiguration.getCommandExecutorTxRequired().execute(command);
+          processEngineConfiguration.getCommandExecutorTxRequiresNew().execute(command);
         } catch(RuntimeException e) {
           command.monitor.setException(e);
           controlThread.interrupt();
