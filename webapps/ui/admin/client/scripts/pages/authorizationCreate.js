@@ -87,7 +87,10 @@ module.exports = ['$scope', '$q', '$location', 'Uri', 'Notifications', 'camAPI',
           message: err.toString()
         });
         $scope.cancelUpdateAuthorization(authorization);
-        $scope.$apply();
+        var phase = $scope.$root.$$phase;
+        if(phase !== '$apply' && phase !== '$digest') {
+          $scope.$apply();
+        }
       }
       if(result) {
         authorization.id = result.id;
