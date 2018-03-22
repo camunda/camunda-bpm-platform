@@ -4,6 +4,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.impl.cfg.AbstractProcessEnginePlugin;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin;
 import org.camunda.bpm.spring.boot.starter.configuration.Ordering;
@@ -25,7 +26,7 @@ public class AdditionalCammundaBpmConfigurations {
   }
 
   @Order(Ordering.DEFAULT_ORDER - 1)
-  public static class BeforeStandardConfiguration implements ProcessEnginePlugin {
+  public static class BeforeStandardConfiguration extends AbstractProcessEnginePlugin {
 
     static boolean PROCESSED = false;
 
@@ -34,23 +35,10 @@ public class AdditionalCammundaBpmConfigurations {
       assertNull(configuration.getDataSource());
       PROCESSED = true;
     }
-
-    @Override
-    public void postInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
-      // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void postProcessEngineBuild(ProcessEngine processEngine) {
-      // TODO Auto-generated method stub
-
-    }
-
   }
 
   @Order(Ordering.DEFAULT_ORDER + 1)
-  public static class AfterStandardConfiguration implements ProcessEnginePlugin {
+  public static class AfterStandardConfiguration extends  AbstractProcessEnginePlugin {
 
     static boolean PROCESSED = false;
 
@@ -59,18 +47,5 @@ public class AdditionalCammundaBpmConfigurations {
       assertNotNull(configuration.getDataSource());
       PROCESSED = true;
     }
-
-    @Override
-    public void postInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
-      // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void postProcessEngineBuild(ProcessEngine processEngine) {
-      // TODO Auto-generated method stub
-
-    }
-
   }
 }

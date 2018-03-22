@@ -5,6 +5,7 @@ import static org.camunda.bpm.application.ProcessApplicationInfo.PROP_SERVLET_CO
 import static org.camunda.bpm.spring.boot.starter.util.GetProcessApplicationNameFromAnnotation.processApplicationNameFromAnnotation;
 import static org.camunda.bpm.spring.boot.starter.util.SpringBootProcessEngineLogger.LOG;
 
+import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 
@@ -36,7 +37,7 @@ public class SpringBootProcessApplication extends SpringProcessApplication {
     return new CamundaDeploymentConfiguration() {
       @Override
       public Set<Resource> getDeploymentResources() {
-        return EMPTY_SET;
+        return Collections.emptySet();
       }
 
       @Override

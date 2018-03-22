@@ -12,7 +12,7 @@ import static org.camunda.bpm.spring.boot.starter.property.CamundaBpmProperties.
 /**
  * Return the full version string of the present Camunda codebase, or
  * {@code null} if it cannot be determined.
- * <p>
+ * <p/>
  * return the version of Camunda or {@code null}
  *
  * @see Package#getImplementationVersion()
@@ -41,7 +41,7 @@ public class CamundaBpmVersion implements Supplier<String> {
       .map(String::trim)
       .orElse("");
     this.isEnterprise = version.endsWith("-ee");
-    this.formattedVersion = String.format(String.format(VERSION_FORMAT, version));
+    this.formattedVersion = String.format(VERSION_FORMAT, version);
   }
 
   @Override

@@ -5,12 +5,12 @@ import static org.camunda.bpm.spring.boot.starter.property.CamundaBpmProperties.
 public class AuthorizationProperty {
 
   /**
-   * enables authorization
+   * Enables authorization.
    */
   private boolean enabled = Defaults.INSTANCE.isAuthorizationEnabled();
 
   /**
-   * enables authorization for custom code
+   * Enables authorization for custom code.
    */
   private boolean enabledForCustomCode = Defaults.INSTANCE.isAuthorizationEnabledForCustomCode();
 
