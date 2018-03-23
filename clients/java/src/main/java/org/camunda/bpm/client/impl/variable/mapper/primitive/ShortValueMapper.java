@@ -19,7 +19,7 @@ import org.camunda.bpm.engine.variable.value.ShortValue;
 /**
  * @author Tassilo Weidner
  */
-public class ShortValueMapper extends AbstractPrimitiveValueMapper<ShortValue> {
+public class ShortValueMapper extends PrimitiveValueMapper<ShortValue> {
 
   public ShortValueMapper() {
     super(ValueType.SHORT);

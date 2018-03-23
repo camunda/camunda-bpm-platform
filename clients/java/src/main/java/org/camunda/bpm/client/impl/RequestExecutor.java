@@ -50,9 +50,10 @@ public class RequestExecutor {
   protected HttpClient httpClient;
   protected ObjectMapper objectMapper;
 
-  protected RequestExecutor(RequestInterceptorHandler requestInterceptorHandler) {
+  protected RequestExecutor(RequestInterceptorHandler requestInterceptorHandler, ObjectMapper objectMapper) {
+    this.objectMapper = objectMapper;
+
     initHttpClient(requestInterceptorHandler);
-    initObjectMapper();
   }
 
   protected <T> T postRequest(String resourceUrl, RequestDto requestDto, Class<T> responseDtoClass) throws EngineClientException {
@@ -155,13 +156,6 @@ public class RequestExecutor {
       .addInterceptorLast(requestInterceptorHandler);
 
     this.httpClient = httpClientBuilder.build();
-  }
-
-  protected void initObjectMapper() {
-    this.objectMapper = new ObjectMapper();
-    objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    objectMapper.configure(DeserializationFeature.FAIL_ON_UNRESOLVED_OBJECT_IDS, false);
-    objectMapper.configure(DeserializationFeature.FAIL_ON_INVALID_SUBTYPE, false);
   }
 
 }

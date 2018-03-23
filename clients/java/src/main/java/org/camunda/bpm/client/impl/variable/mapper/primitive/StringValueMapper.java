@@ -18,7 +18,7 @@ import org.camunda.bpm.engine.variable.value.StringValue;
 /**
  * @author Tassilo Weidner
  */
-public class StringValueMapper extends AbstractPrimitiveValueMapper<StringValue> {
+public class StringValueMapper extends PrimitiveValueMapper<StringValue> {
 
   public StringValueMapper() {
     super(ValueType.STRING);

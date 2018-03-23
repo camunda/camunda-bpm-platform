@@ -21,7 +21,7 @@ import org.camunda.bpm.engine.variable.value.TypedValue;
 /**
  * @author Tassilo Weidner
  */
-public class BytesValueMapper extends AbstractPrimitiveValueMapper<BytesValue> {
+public class BytesValueMapper extends PrimitiveValueMapper<BytesValue> {
 
   public BytesValueMapper() {
     super(ValueType.BYTES);

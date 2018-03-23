@@ -19,7 +19,7 @@ import org.camunda.bpm.engine.variable.value.LongValue;
 /**
  * @author Tassilo Weidner
  */
-public class LongValueMapper extends AbstractPrimitiveValueMapper<LongValue> {
+public class LongValueMapper extends PrimitiveValueMapper<LongValue> {
 
   public LongValueMapper() {
     super(ValueType.LONG);

@@ -18,7 +18,7 @@ import org.camunda.bpm.engine.variable.value.BooleanValue;
 /**
  * @author Tassilo Weidner
  */
-public class BooleanValueMapper extends AbstractPrimitiveValueMapper<BooleanValue> {
+public class BooleanValueMapper extends PrimitiveValueMapper<BooleanValue> {
 
   public BooleanValueMapper() {
     super(ValueType.BOOLEAN);

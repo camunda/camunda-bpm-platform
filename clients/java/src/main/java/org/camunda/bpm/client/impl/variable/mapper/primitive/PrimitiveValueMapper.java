@@ -16,17 +16,16 @@ import org.camunda.bpm.client.impl.variable.mapper.ValueMapper;
 import org.camunda.bpm.client.task.impl.dto.TypedValueDto;
 import org.camunda.bpm.engine.variable.impl.value.UntypedValueImpl;
 import org.camunda.bpm.engine.variable.type.PrimitiveValueType;
-import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
  * @author Tassilo Weidner
  */
-public abstract class AbstractPrimitiveValueMapper<T extends TypedValue> implements ValueMapper<T> {
+public abstract class PrimitiveValueMapper<T extends TypedValue> implements ValueMapper<T> {
 
   protected PrimitiveValueType type;
 
-  protected AbstractPrimitiveValueMapper(PrimitiveValueType type) {
+  protected PrimitiveValueMapper(PrimitiveValueType type) {
     this.type = type;
   }
 
@@ -62,21 +61,6 @@ public abstract class AbstractPrimitiveValueMapper<T extends TypedValue> impleme
     else {
       return null; // value does not correspond to type; might occur due to manipulated engine database
     }
-  }
-
-  public TypedValueDto serializeTypedValue(TypedValue typedValue) {
-    TypedValueDto typedValueDto = new TypedValueDto();
-
-    ValueType valueType = typedValue.getType();
-    typedValueDto.setValueInfo(valueType.getValueInfo(typedValue));
-    typedValueDto.setType(capitalize(valueType.getName()));
-    typedValueDto.setValue(typedValue.getValue());
-
-    return typedValueDto;
-  }
-
-  protected String capitalize(String name) {
-    return Character.toUpperCase(name.charAt(0)) + name.substring(1);
   }
 
 }

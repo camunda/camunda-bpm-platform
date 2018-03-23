@@ -64,7 +64,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author Tassilo Weidner
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({HttpClients.class, RequestExecutor.class})
+@PrepareForTest({HttpClients.class, ExternalTaskClientImpl.class})
 @PowerMockIgnore("javax.net.ssl.*")
 public class EngineClientTest {
 

@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.client.impl;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.client.impl.variable.VariableMappers;
 import org.camunda.bpm.client.interceptor.ClientRequestInterceptor;
@@ -37,8 +39,9 @@ public class ExternalTaskClientImpl implements ExternalTaskClient {
     List<ClientRequestInterceptor> interceptors = clientBuilder.getInterceptors();
     requestInterceptorHandler = new RequestInterceptorHandler(interceptors);
 
-    VariableMappers variableMappers = new VariableMappers();
-    EngineClient engineClient = new EngineClient(workerId, baseUrl, requestInterceptorHandler, variableMappers);
+    ObjectMapper objectMapper = initObjectMapper();
+    VariableMappers variableMappers = new VariableMappers(objectMapper);
+    EngineClient engineClient = new EngineClient(workerId, baseUrl, requestInterceptorHandler, variableMappers, objectMapper);
     topicSubscriptionManager = new TopicSubscriptionManager(engineClient, variableMappers);
   }
 
@@ -56,6 +59,15 @@ public class ExternalTaskClientImpl implements ExternalTaskClient {
 
   public RequestInterceptorHandler getRequestInterceptorHandler() {
     return requestInterceptorHandler;
+  }
+
+  protected ObjectMapper initObjectMapper() {
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    objectMapper.configure(DeserializationFeature.FAIL_ON_UNRESOLVED_OBJECT_IDS, false);
+    objectMapper.configure(DeserializationFeature.FAIL_ON_INVALID_SUBTYPE, false);
+
+    return objectMapper;
   }
 
 }

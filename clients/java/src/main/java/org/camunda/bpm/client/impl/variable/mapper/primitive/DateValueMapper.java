@@ -24,7 +24,7 @@ import java.util.Date;
 /**
  * @author Tassilo Weidner
  */
-public class DateValueMapper extends AbstractPrimitiveValueMapper<DateValue> {
+public class DateValueMapper extends PrimitiveValueMapper<DateValue> {
 
   public static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 

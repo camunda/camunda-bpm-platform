@@ -13,6 +13,7 @@
 package org.camunda.bpm.client.task.impl;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.camunda.bpm.client.impl.ExternalTaskClientLogger;
 import org.camunda.bpm.client.impl.variable.VariableMappers;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.impl.dto.TypedValueDto;
@@ -20,6 +21,7 @@ import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.impl.VariableMapImpl;
 import org.camunda.bpm.engine.variable.impl.value.UntypedValueImpl;
+import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 import java.util.Date;
@@ -29,6 +31,8 @@ import java.util.Map;
  * @author Tassilo Weidner
  */
 public class ExternalTaskImpl implements ExternalTask {
+
+  protected static final ExternalTaskClientLogger LOG = ExternalTaskClientLogger.CLIENT_LOGGER;
 
   protected String activityId;
   protected String activityInstanceId;
@@ -259,6 +263,10 @@ public class ExternalTaskImpl implements ExternalTask {
   @JsonIgnore
   @Override
   public void setVariableTyped(String variableName, TypedValue variableTypedValue) {
+    if (variableTypedValue instanceof ObjectValue) {
+      checkSerializationDataFormat(variableTypedValue);
+    }
+
     TypedValue typedValue = convertToTypedValue(variableTypedValue);
 
     writtenVariableMap.putValueTyped(variableName, typedValue);
@@ -286,8 +294,23 @@ public class ExternalTaskImpl implements ExternalTask {
     if (typedValue == null || typedValue instanceof UntypedValueImpl) {
       return variableMappers.convertToTypedValue(value);
     }
+    else if (typedValue instanceof ObjectValue) {
+      return variableMappers.convertToObjectValue((ObjectValue) typedValue);
+    }
     else {
       return typedValue;
+    }
+  }
+
+  protected void checkSerializationDataFormat(TypedValue variableTypedValue) {
+    String serializationDataFormat = ((ObjectValue) variableTypedValue).getSerializationDataFormat();
+
+    if (serializationDataFormat != null) {
+      boolean isDataFormatJson = serializationDataFormat.equals(Variables.SerializationDataFormats.JSON.getName());
+
+      if (!isDataFormatJson) {
+        throw LOG.unsupportedSerializationDataFormat(variableTypedValue);
+      }
     }
   }
 

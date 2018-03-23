@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.client.impl.variable;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.client.impl.EngineClientException;
 import org.camunda.bpm.client.impl.EngineClientLogger;
 import org.camunda.bpm.client.impl.ExternalTaskClientLogger;
@@ -23,13 +24,15 @@ import org.camunda.bpm.client.impl.variable.mapper.primitive.DoubleValueMapper;
 import org.camunda.bpm.client.impl.variable.mapper.primitive.IntegerValueMapper;
 import org.camunda.bpm.client.impl.variable.mapper.primitive.LongValueMapper;
 import org.camunda.bpm.client.impl.variable.mapper.primitive.NullValueMapper;
+import org.camunda.bpm.client.impl.variable.mapper.primitive.PrimitiveValueMapper;
 import org.camunda.bpm.client.impl.variable.mapper.primitive.ShortValueMapper;
 import org.camunda.bpm.client.impl.variable.mapper.primitive.StringValueMapper;
+import org.camunda.bpm.client.impl.variable.mapper.serializable.ObjectValueMapper;
 import org.camunda.bpm.client.task.impl.dto.TypedValueDto;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.impl.VariableMapImpl;
 import org.camunda.bpm.engine.variable.impl.value.UntypedValueImpl;
-import org.camunda.bpm.engine.variable.type.ValueType;
+import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 import java.util.HashMap;
@@ -45,7 +48,7 @@ public class VariableMappers {
 
   protected Map<String, ValueMapper<?>> mappers = new HashMap<>();
 
-  public VariableMappers() {
+  public VariableMappers(ObjectMapper objectMapper) {
     registerMapper(new NullValueMapper());
     registerMapper(new BooleanValueMapper());
     registerMapper(new StringValueMapper());
@@ -57,6 +60,9 @@ public class VariableMappers {
     registerMapper(new IntegerValueMapper());
     registerMapper(new LongValueMapper());
     registerMapper(new DoubleValueMapper());
+
+    // serializable mappers
+    registerMapper(new ObjectValueMapper(objectMapper));
   }
 
   public VariableMap deserializeVariables(Map<String, TypedValueDto> typedValueDtoMap) throws EngineClientException {
@@ -89,12 +95,18 @@ public class VariableMappers {
   public <T extends TypedValue> T convertToTypedValue(Object value) {
     UntypedValueImpl untypedValue = new UntypedValueImpl(value);
 
-    ValueMapper mapper = getMapperByValue(untypedValue);
+    PrimitiveValueMapper mapper = getMapperByValue(untypedValue);
     if (mapper == null) { // throw user exception due to unsupported type
       throw USER_LOG.unsupportedTypeException(value);
     }
 
     return (T) mapper.convertToTypedValue(untypedValue);
+  }
+
+  public ObjectValue convertToObjectValue(ObjectValue objectValue) {
+    ObjectValueMapper mapper = (ObjectValueMapper) mappers.get("object");
+
+    return mapper.convertToObjectValue(objectValue);
   }
 
   public Map<String, TypedValueDto> serializeVariables(VariableMap variableMap) {
@@ -103,7 +115,7 @@ public class VariableMappers {
     variableMap.keySet().forEach(variableName -> {
       TypedValue typedValue = variableMap.getValueTyped(variableName);
 
-      ValueMapper mapper = mappers.get(typedValue.getType().getName()); // mapper cannot be null as variable has been checked for unsupported
+      ValueMapper mapper = mappers.get(typedValue.getType().getName()); // mapper cannot be null as variable has been checked for unsupported type
       TypedValueDto typedValueDto = mapper.serializeTypedValue(typedValue);
 
       typedValueDtoMap.put(variableName, typedValueDto);
@@ -112,9 +124,10 @@ public class VariableMappers {
     return typedValueDtoMap;
   }
 
-  protected ValueMapper<?> getMapperByValue(TypedValue value) {
-    return mappers.values().stream()
-      .filter(mapper -> mapper.isAssignable(value))
+  protected PrimitiveValueMapper<?> getMapperByValue(TypedValue value) {
+    return (PrimitiveValueMapper) mappers.values().stream()
+      .filter(mapper -> mapper instanceof PrimitiveValueMapper)
+      .filter(mapper -> ((PrimitiveValueMapper) mapper).isAssignable(value))
       .findFirst()
       .orElse(null);
   }

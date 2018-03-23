@@ -19,7 +19,7 @@ import org.camunda.bpm.engine.variable.value.IntegerValue;
 /**
  * @author Tassilo Weidner
  */
-public class IntegerValueMapper extends AbstractPrimitiveValueMapper<IntegerValue> {
+public class IntegerValueMapper extends PrimitiveValueMapper<IntegerValue> {
 
   public IntegerValueMapper() {
     super(ValueType.INTEGER);

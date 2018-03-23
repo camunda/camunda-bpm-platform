@@ -13,7 +13,7 @@
 package org.camunda.bpm.client.impl.variable.mapper;
 
 import org.camunda.bpm.client.task.impl.dto.TypedValueDto;
-import org.camunda.bpm.engine.variable.impl.value.UntypedValueImpl;
+import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
@@ -23,12 +23,21 @@ public interface ValueMapper<T extends TypedValue> {
 
   String getTypeName();
 
-  boolean isAssignable(TypedValue typedValue);
-
-  T convertToTypedValue(UntypedValueImpl untypedValue);
-
   T deserializeTypedValue(TypedValueDto typedValueDto);
 
-  TypedValueDto serializeTypedValue(TypedValue typedValue);
+  default TypedValueDto serializeTypedValue(TypedValue typedValue) {
+    TypedValueDto typedValueDto = new TypedValueDto();
+
+    ValueType valueType = typedValue.getType();
+    typedValueDto.setValueInfo(valueType.getValueInfo(typedValue));
+
+    String typeName = valueType.getName();
+    String typeNameCapitalizedCharacter = Character.toUpperCase(typeName.charAt(0)) + typeName.substring(1);
+    typedValueDto.setType(typeNameCapitalizedCharacter);
+
+    typedValueDto.setValue(typedValue.getValue());
+
+    return typedValueDto;
+  }
 
 }

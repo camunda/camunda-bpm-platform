@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.client.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.client.impl.variable.VariableMappers;
 import org.camunda.bpm.client.interceptor.impl.RequestInterceptorHandler;
 import org.camunda.bpm.client.task.ExternalTask;
@@ -24,10 +25,8 @@ import org.camunda.bpm.client.task.impl.dto.TypedValueDto;
 import org.camunda.bpm.client.topic.impl.dto.FetchAndLockRequestDto;
 import org.camunda.bpm.client.topic.impl.dto.TopicRequestDto;
 import org.camunda.bpm.engine.variable.VariableMap;
-import org.camunda.bpm.engine.variable.value.TypedValue;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -53,9 +52,9 @@ public class EngineClient {
 
   protected VariableMappers variableMappers;
 
-  public EngineClient(String workerId, String baseUrl, RequestInterceptorHandler requestInterceptorHandler, VariableMappers variableMappers) {
+  public EngineClient(String workerId, String baseUrl, RequestInterceptorHandler requestInterceptorHandler, VariableMappers variableMappers, ObjectMapper objectMapper) {
     this.workerId = workerId;
-    this.engineInteraction = new RequestExecutor(requestInterceptorHandler);
+    this.engineInteraction = new RequestExecutor(requestInterceptorHandler, objectMapper);
     this.baseUrl = engineInteraction.sanitizeUrl(baseUrl);
     this.variableMappers = variableMappers;
   }

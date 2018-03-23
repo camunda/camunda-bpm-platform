@@ -113,4 +113,9 @@ public class ExternalTaskClientLogger extends BaseLogger {
       "014", "Exception while converting variable value '{}' to typed variable value: no suitable mapper found for type {}", variableValue, variableValue.getClass().getSimpleName()));
   }
 
+  public UnsupportedTypeException unsupportedSerializationDataFormat(Object variableValue) {
+    return new UnsupportedTypeException(exceptionMessage(
+      "015", "Exception while converting variable value '{}' to typed variable value: serialization data format not supported", variableValue, variableValue.getClass().getSimpleName()));
+  }
+
 }

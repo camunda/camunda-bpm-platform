@@ -19,7 +19,7 @@ import org.camunda.bpm.engine.variable.value.DoubleValue;
 /**
  * @author Tassilo Weidner
  */
-public class DoubleValueMapper extends AbstractPrimitiveValueMapper<DoubleValue> {
+public class DoubleValueMapper extends PrimitiveValueMapper<DoubleValue> {
 
   public DoubleValueMapper() {
     super(ValueType.DOUBLE);

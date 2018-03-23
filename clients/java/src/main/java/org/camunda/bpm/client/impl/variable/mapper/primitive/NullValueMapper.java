@@ -24,7 +24,7 @@ import java.util.Map;
 /**
  * @author Tassilo Weidner
  */
-public class NullValueMapper extends AbstractPrimitiveValueMapper<NullValueImpl> implements ValueMapper<NullValueImpl> {
+public class NullValueMapper extends PrimitiveValueMapper<NullValueImpl> implements ValueMapper<NullValueImpl> {
 
   public NullValueMapper() {
     super(ValueType.NULL);

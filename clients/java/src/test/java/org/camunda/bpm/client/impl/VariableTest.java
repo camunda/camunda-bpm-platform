@@ -76,7 +76,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author Tassilo Weidner
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({HttpClients.class, RequestExecutor.class})
+@PrepareForTest({HttpClients.class, ExternalTaskClientImpl.class})
 public class VariableTest {
 
   private CloseableHttpResponse closeableHttpResponse;
@@ -1530,6 +1530,9 @@ public class VariableTest {
 
     assertVariablePayloadOfCompleteRequest(objectMapper, expectedValueDtoMap);
   }
+
+  /* tests for object  */
+
 
   // helper //////////////////////////////////
 
