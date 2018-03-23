@@ -54,12 +54,12 @@ public interface ExternalTaskService {
    * @param externalTask which is meant to notify a failure for
    * @param errorMessage indicates the reason of the failure.
    * @param errorDetails provides a detailed error description.
-   * @param retries      specifies how often the task should be retried. Must be >= 0.
+   * @param retries      specifies how often the task should be retried. Must be &gt;= 0.
    *                     If 0, an incident is created and the task cannot be fetched anymore
    *                     unless the retries are increased again. The incident's message is set
-   *                     to the {@param errorMessage} parameter.
+   *                     to the errorMessage parameter.
    * @param retryTimeout specifies a timeout in milliseconds before the external task
-   *                     becomes available again for fetching. Must be >= 0.
+   *                     becomes available again for fetching. Must be &gt;= 0.
    *
    * @throws NotFoundException if the task has been canceled and therefore does not exist anymore
    * @throws NotAcquiredException if the task's most recent lock could not be acquired

@@ -25,11 +25,13 @@ public interface TopicSubscriptionBuilder {
   /**
    * @param lockDuration <ul><li>in milliseconds to lock the external tasks</li>
    *                     <li>must be greater than zero</li></ul>
+   * @return the builder
    */
   TopicSubscriptionBuilder lockDuration(long lockDuration);
 
   /**
    * @param handler which will be executed for the external task
+   * @return the builder
    */
   TopicSubscriptionBuilder handler(ExternalTaskHandler handler);
 
@@ -43,6 +45,7 @@ public interface TopicSubscriptionBuilder {
    *   <li> if external task handler is null
    *   <li> if topic name has already been subscribed
    * </ul>
+   * @return the builder
    */
   TopicSubscription open();
 

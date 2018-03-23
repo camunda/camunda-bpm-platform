@@ -109,6 +109,7 @@ public interface ExternalTask {
    * Returns an untyped variable of the task's ancestor execution hierarchy
    *
    * @param variableName of the variable to be returned
+   * @param <T> the type of the variable
    * @return
    * <ul>
    *   <li> an untyped variable if such a named variable exists
@@ -121,6 +122,7 @@ public interface ExternalTask {
    * Returns a typed variable of the task's ancestor execution hierarchy
    *
    * @param variableName of the variable to be returned
+   * @param <T> the type of the variable
    * @return
    * <ul>
    *   <li> a typed variable if such a named variable exists

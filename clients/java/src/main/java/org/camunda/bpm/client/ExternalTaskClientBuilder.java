@@ -24,6 +24,7 @@ public interface ExternalTaskClientBuilder {
 
   /**
    * @param baseUrl of the Camunda BPM Platform REST API
+   * @return the builder
    */
   ExternalTaskClientBuilder baseUrl(String baseUrl);
 
@@ -31,6 +32,7 @@ public interface ExternalTaskClientBuilder {
    * Adds an interceptor to change a request before it is sent to the http server
    *
    * @param interceptor which changes the request
+   * @return the builder
    */
   ExternalTaskClientBuilder addInterceptor(ClientRequestInterceptor interceptor);
 
@@ -42,6 +44,7 @@ public interface ExternalTaskClientBuilder {
    *   <li> if base url is null or string is empty
    *   <li> if hostname cannot be retrieved
    * </ul>
+   * @return the builder
    */
   ExternalTaskClient build();
 
