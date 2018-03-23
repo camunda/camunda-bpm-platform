@@ -41,7 +41,7 @@ public class App {
 
       }).open();
 
-    Thread.sleep(60 * 5);
+    Thread.sleep(1000 * 60 * 5);
   }
 
 }
