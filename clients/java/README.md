@@ -1,7 +1,5 @@
 # Camunda External Task Client (Java)
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.camunda.bpm/camunda-external-task-client/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.camunda.bpm/camunda-external-task-client)
-
 The **Camunda External Task Client (Java)** allows to set up remote Service Tasks for your workflow.
 
 > **Heads Up!** 
