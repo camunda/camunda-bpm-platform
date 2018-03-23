@@ -1,4 +1,4 @@
-# External Task Client (Java) Example
+# Camunda External Task Client (Java) Example
 
 In this tutorial you will learn how to use the External Task client for Java.
 
