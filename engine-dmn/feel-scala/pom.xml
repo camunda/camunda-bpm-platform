@@ -37,6 +37,7 @@
 	<dependency>
 	    <groupId>org.camunda.spin</groupId>
 	    <artifactId>camunda-spin-core</artifactId>
+	    <scope>provided</scope>
 	</dependency>
 	
 	<dependency>
