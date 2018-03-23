@@ -167,12 +167,25 @@ If a lock of an External Task should be returned so that other clients are allow
 if the task is currently locked by the client. Otherwise a `NotAcquiredException` is thrown.
 
 ### Reporting Failures
-`ExternalTaskService#handleFailure`
+If the client faces a problem that makes it impossible to complete the External Task successfully, this problem can be reported to 
+the Workflow Engine. The following parameters need to be passed on calling `ExternalTaskService#handleFailure`:
+
+* External Task
+* Error message: a short description of the failure (limited to 666 characters)
+* Error details: a detailed error message (unlimited size)
+* Retries: amount of fetch and lock actions; each successful performed fetch and lock action decrements the counter; 
+If zero, an incident is created
+* Retry timeout: the time period in milliseconds between two fetch and lock actions
+
+A failure can only be reported, if the External Task is currently locked by the client. Otherwise a `NotAcquiredException` is thrown.
 
 You can find a detailed documentation about this action in the Camunda BPM [User Guide](https://docs.camunda.org/manual/develop/user-guide/process-engine/external-tasks/#reporting-task-failure).
 
 ### Reporting BPMN Errors
-`ExternalTaskService#handleBpmnError`
+[Error boundary events](https://docs.camunda.org/manual/develop/reference/bpmn20/events/error-events/#error-boundary-event) 
+are triggered by BPMN errors. On calling `ExternalTaskService#handleBpmnError` a BPMN error can be passed.
+
+A BPMN error can only be reported, if the External Task is currently locked by the client. Otherwise a `NotAcquiredException` is thrown.
 
 You can find a detailed documentation about this action in the Camunda BPM [User Guide](https://docs.camunda.org/manual/develop/user-guide/process-engine/external-tasks/#reporting-bpmn-error).
 
