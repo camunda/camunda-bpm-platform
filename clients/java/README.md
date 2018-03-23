@@ -98,7 +98,7 @@ Once implemented, a custom request interceptor can be added by calling `#addInte
 In some cases it is necessary to secure the REST API of the Camunda Workflow Engine via Basic Authentication. For such
 situations the a Basic Authentication implementation is provided by the client. On instantiation of `BasicAuthProvider` 
 the respective credentials are demanded. This instance needs to be added to the client as a request interceptor. Once added, 
-the basic authentication header, based on the provided credentials, is added to each REST API request.
+the basic authentication header based on the provided credentials is added to each REST API request.
 
 ```java
 ...
@@ -125,8 +125,7 @@ The client subscribes to the topic and fetches continuously for newly appearing 
 Workflow Engine. Each fetched External Task is marked with a temporary lock. Like this, no other clients can work on this 
 certain External Task in the meanwhile.
 
-A new topic subscription can be configured by calling `client#subscribe`. Mandatory information are the topic name, 
-the lock duration in milliseconds as well as the handler. See the following code snippet:
+A new topic subscription can be configured by calling `client#subscribe`. The topic name, the lock duration in milliseconds as well as the handler are mandatory information. See the following code snippet:
 
 ```java
 // ...
