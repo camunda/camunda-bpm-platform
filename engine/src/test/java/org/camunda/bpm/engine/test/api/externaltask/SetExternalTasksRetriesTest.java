@@ -2,7 +2,6 @@ package org.camunda.bpm.engine.test.api.externaltask;
 
 import java.util.ArrayList;
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 
 import java.util.Arrays;
@@ -85,8 +84,9 @@ public class SetExternalTasksRetriesTest {
   public void cleanBatch() {
     List<Batch> batches = managementService.createBatchQuery().list();
     if (batches.size() > 0) {
-      for (Batch batch : batches)
+      for (Batch batch : batches) {
         managementService.deleteBatch(batch.getId(), true);
+      }
     }
 
     HistoricBatch historicBatch = historyService.createHistoricBatchQuery().singleResult();
@@ -552,7 +552,7 @@ public class SetExternalTasksRetriesTest {
 
   protected void assertHistoricBatchExists() {
     if (testHelper.isHistoryLevelFull()) {
-      assertThat(historyService.createHistoricBatchQuery().count(), is(1L));
+      assertEquals(1, historyService.createHistoricBatchQuery().count());
     }
   }
 

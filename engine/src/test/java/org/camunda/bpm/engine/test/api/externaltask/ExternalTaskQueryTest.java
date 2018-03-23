@@ -21,7 +21,6 @@ import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.inverted;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.verifySorting;
 
 import java.util.*;
-import java.util.concurrent.locks.Lock;
 
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
@@ -537,12 +536,11 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
     for (int i = 0; i < 1001; i++) {
       processInstances.add(runtimeService.startProcessInstanceByKey("oneExternalTaskProcess").getProcessInstanceId());
     }
-    String[] processInstanceIds = convertListToArray(processInstances);
 
     // when
     List<ExternalTask> tasks = externalTaskService
       .createExternalTaskQuery()
-      .processInstanceIdIn(processInstanceIds)
+      .processInstanceIdIn(processInstances.toArray(new String[processInstances.size()]))
       .list();
 
     // then
@@ -867,15 +865,6 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
     return processInstances;
   }
 
-  protected List<String> startInstancesByKey1(String processDefinitionKey, int number) {
-    List<String> processInstances = new ArrayList<String>();
-    for (int i = 0; i < number; i++) {
-      processInstances.add(runtimeService.startProcessInstanceByKey(processDefinitionKey).getProcessInstanceId());
-    }
-
-    return processInstances;
-  }
-
   protected List<ProcessInstance> startInstancesById(String processDefinitionId, int number) {
     List<ProcessInstance> processInstances = new ArrayList<ProcessInstance>();
     for (int i = 0; i < number; i++) {
@@ -905,14 +894,6 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
     for (LockedExternalTask task : tasks) {
       externalTaskService.handleFailure(task.getId(), task.getWorkerId(), errorMessage, errorDetails, retries, retryTimeout);
     }
-  }
-
-  protected String[] convertListToArray(List<String> processInstances) {
-    String[] processInstanceIds=new String[processInstances.size()];
-    for (int i = 0; i < processInstances.size(); i++) {
-      processInstanceIds[i] = new String(processInstances.get(i));
-    }
-    return processInstanceIds;
   }
 
 }
