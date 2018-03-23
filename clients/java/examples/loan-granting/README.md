@@ -29,7 +29,7 @@ Open the Camunda Modeler, create a new BPMN diagram and model the following simp
 1. When a process instance is started, an External Task instance with the name "creditScoreChecker" is created
 2. The External Task client will start to fetch and lock the External Task instances
 3. Once the External Task client has performed some work based on the fetched task, 
-these task is completed and the result is sent to the workflow engine in the form of a list containing all credit scores
+these task is completed and the result is sent to the Workflow Engine in the form of a list containing all credit scores
 4. For each entry in the list a new instance of the subprocess (parallel multi instance subprocess) is created
 5. According to the respective credit score, a path of the exclusive gateway is selected
 6. Based on the selection, further External Task topics are created
@@ -37,7 +37,7 @@ these task is completed and the result is sent to the workflow engine in the for
 > **Note**
 > Make sure to set the properties for the respective notation elements in the properties panel correctly.
 
-You can find the BPMN 2.0 XML of the workflow [here](./workflow.bpmn).
+You can find the BPMN 2.0 XML of the workflow [here](https://raw.githubusercontent.com/camunda/camunda-external-task-client-java/master/examples/loan-granting/workflow.bpmn?token=AC4ECoUBLIfKY3tOw6jhzJC4KIQWO4q_ks5avekvwA%3D%3D).
 
 ## Deploy a Workflow
 
