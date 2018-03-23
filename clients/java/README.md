@@ -36,7 +36,8 @@ The **Camunda External Task Client (Java)** allows to set up remote Service Task
     * [Typed Variables](#typed-variables)
     * [Object Typed Variables](#object-typed-variables)
     * [Transient Variables](#transient-variables)
-13. [License](#license)
+13. [Logging](#logging)
+14. [License](#license)
 
 ### Prerequisites
 * Oracle Hotspot v1.8+ (JDK 8)
@@ -283,6 +284,26 @@ a waiting state, transient variables get lost. Transient variables can only be d
 ```java
 StringValue stringValue = Variables.stringValue("transientVariable", true);
 ```
+### Logging
+The client uses SLF4J for logging. Since handlers are not invoked in the main thread it is sensible to enable logging 
+and be reported about the following situations:
+
+* External Tasks could not be fetched and locked successfully
+* An exception occurred...
+   * while invoking a handler
+   * while deserializing variables
+   * while invoking a request interceptor
+ 
+ Any implementations that rely on SLF4J can be used. Logging can be enabled by simply add the desired implementation as 
+ a dependency to the `pom.xml`:
+ 
+ ```xml
+ <dependency>
+    <groupId>org.slf4j</groupId>
+    <artifactId>slf4j-simple</artifactId>
+    <version>1.6.1</version>
+ </dependency>
+ ```
 
 ## License
 Unless otherwise specified this project is licensed under [Apache License Version 2.0](./LICENSE).
