@@ -10,7 +10,7 @@ import java.util.List;
 
 public class App {
 
-  public static void main(String... args) {
+  public static void main(String... args) throws InterruptedException {
     // bootstrap the client
     ExternalTaskClient client = ExternalTaskClient.create()
       .baseUrl("http://localhost:8080/engine-rest")
@@ -24,26 +24,24 @@ public class App {
         // retrieve a variable from the Workflow Engine
         int defaultScore = externalTask.getVariable("defaultScore");
 
-        List<Integer> creditScores =
-          new ArrayList<>(Arrays.asList(defaultScore, 9, 1, 4, 10));
+        List<Integer> creditScores = new ArrayList<>(Arrays.asList(defaultScore, 9, 1, 4, 10));
 
         // create an object typed variable
         ObjectValue creditScoresObject = Variables
           .objectValue(creditScores)
           .create();
 
+        // set the recently created variable
         externalTask.setVariableTyped("creditScores", creditScoresObject);
 
+        // complete the external task
         externalTaskService.complete(externalTask);
 
-        System.out.println("The External Task " + externalTask.getId()
-          + " has been completed!");
+        System.out.println("The External Task " + externalTask.getId() + " has been completed!");
 
       }).open();
 
-    while (true) {
-      // busy waiting
-    }
+    Thread.sleep(60 * 5);
   }
 
 }
