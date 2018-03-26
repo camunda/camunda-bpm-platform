@@ -112,8 +112,6 @@ public class VariableMappers {
       return (T) mapper.convertToTypedValue(untypedValue);
     }
     else if (typedValue instanceof ObjectValue) {
-      checkSerializationDataFormat(typedValue);
-
       ObjectValueMapper mapper = (ObjectValueMapper) mappers.get(ObjectTypeImpl.TYPE_NAME);
 
       return (T) mapper.convertToObjectValue((ObjectValue) typedValue);
@@ -121,19 +119,6 @@ public class VariableMappers {
     else {
       return (T) typedValue;
     }
-  }
-
-  protected void checkSerializationDataFormat(TypedValue variableTypedValue) {
-    String serializationDataFormat = ((ObjectValue) variableTypedValue).getSerializationDataFormat();
-
-    if (serializationDataFormat != null) {
-      String serializationDataFormatJson = Variables.SerializationDataFormats.JSON.getName();
-      boolean isDataFormatJson = serializationDataFormat.equals(serializationDataFormatJson);
-
-      if (!isDataFormatJson) {
-        throw USER_LOG.unsupportedSerializationDataFormat(variableTypedValue);
-      }
-    } // else: default json
   }
 
   public Map<String, TypedValueDto> serializeVariables(VariableMap variableMap) {

@@ -46,4 +46,9 @@ public class TopicSubscriptionManagerLogger extends ExternalTaskClientLogger {
       "005", "Exception while deserializing variables '{}'", e);
   }
 
+  protected void exceptionWhileDeserializingVariables(String message) {
+    logError(
+      "006", "Exception while deserializing variables '{}'", message);
+  }
+
 }

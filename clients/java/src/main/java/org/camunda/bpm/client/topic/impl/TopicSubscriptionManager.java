@@ -98,8 +98,13 @@ public class TopicSubscriptionManager implements Runnable {
           variableMap = variableMappers.deserializeVariables(variableDtoMap);
           variablesDeserialized = true;
 
-        } catch (Throwable e) {
-          LOG.exceptionWhileDeserializingVariables(e);
+        }
+        catch (Throwable e) {
+          if (e instanceof EngineClientException) {
+            LOG.exceptionWhileDeserializingVariables(e.getMessage());
+          } else {
+            LOG.exceptionWhileDeserializingVariables(e);
+          }
         }
 
         if (variablesDeserialized) {
