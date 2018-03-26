@@ -14,7 +14,7 @@ package org.camunda.bpm.client.impl.variable.mapper.serializable;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.camunda.bpm.client.impl.EngineClientLogger;
+import org.camunda.bpm.client.impl.EngineClientException;
 import org.camunda.bpm.client.impl.ExternalTaskClientLogger;
 import org.camunda.bpm.client.impl.variable.mapper.ValueMapper;
 import org.camunda.bpm.client.task.impl.dto.TypedValueDto;
@@ -50,28 +50,28 @@ public class ObjectValueMapper implements ValueMapper<ObjectValue> {
   }
 
   @Override
-  public ObjectValue deserializeTypedValue(TypedValueDto typedValueDto) {
+  public ObjectValue deserializeTypedValue(TypedValueDto typedValueDto) throws EngineClientException {
     String serializedValue = (String) typedValueDto.getValue();
+
+    Map<String, Object> valueInfo = typedValueDto.getValueInfo();
 
     Class<?> type = null;
     try {
-      type = Class.forName((String) typedValueDto.getValueInfo().get(OBJECT_TYPE_NAME));
+      type = Class.forName((String) valueInfo.get(OBJECT_TYPE_NAME));
     } catch (ClassNotFoundException e) {
-      return null;
+      throw new EngineClientException(e);
     }
 
     Object object = null;
     try {
       object = objectMapper.readValue(serializedValue, type);
     } catch (IOException e) {
-      return null;
+      throw new EngineClientException(e.getMessage()); // avoid exceptions of third party components
     }
 
     ObjectValueImpl objectValue = new ObjectValueImpl(object);
 
     objectValue.setSerializedValue(serializedValue);
-
-    Map<String, Object> valueInfo = typedValueDto.getValueInfo();
 
     String objectTypeName = (String) valueInfo.get(OBJECT_TYPE_NAME);
     if (objectTypeName != null) {
@@ -108,18 +108,23 @@ public class ObjectValueMapper implements ValueMapper<ObjectValue> {
   public ObjectValue convertToObjectValue(ObjectValue objectValue) {
     ObjectValueImpl serializedObjectValue = (ObjectValueImpl) objectValue;
 
-    Object object = objectValue.getValue();
+    Object value = objectValue.getValue();
 
     String serializedObject = null;
     try {
-      serializedObject = objectMapper.writeValueAsString(object);
+      serializedObject = objectMapper.writeValueAsString(value);
     } catch (JsonProcessingException e) {
       throw LOG.unsupportedTypeException(objectValue);
     }
 
     serializedObjectValue.setSerializedValue(serializedObject);
-    serializedObjectValue.setObjectTypeName(object.getClass().getName());
-    serializedObjectValue.setSerializationDataFormat(Variables.SerializationDataFormats.JSON.getName());
+
+    String className = value.getClass().getName();
+    serializedObjectValue.setObjectTypeName(className);
+
+    String serializationDataFormat = Variables.SerializationDataFormats.JSON.getName();
+    serializedObjectValue.setSerializationDataFormat(serializationDataFormat);
+
     serializedObjectValue.setTransient(objectValue.isTransient());
 
     return serializedObjectValue;

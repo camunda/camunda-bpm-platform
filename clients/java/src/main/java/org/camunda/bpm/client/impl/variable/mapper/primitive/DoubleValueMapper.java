@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.client.impl.variable.mapper.primitive;
 
+import org.camunda.bpm.client.impl.EngineClientException;
 import org.camunda.bpm.client.task.impl.dto.TypedValueDto;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.DoubleValue;
@@ -25,7 +26,7 @@ public class DoubleValueMapper extends PrimitiveValueMapper<DoubleValue> {
     super(ValueType.DOUBLE);
   }
 
-  public DoubleValue deserializeTypedValue(TypedValueDto typedValueDto) {
+  public DoubleValue deserializeTypedValue(TypedValueDto typedValueDto) throws EngineClientException {
     Object value = typedValueDto.getValue();
     double doubleValue = ((Number) value).doubleValue();
     typedValueDto.setValue(doubleValue);

@@ -30,7 +30,9 @@ import org.camunda.bpm.client.impl.variable.mapper.primitive.StringValueMapper;
 import org.camunda.bpm.client.impl.variable.mapper.serializable.ObjectValueMapper;
 import org.camunda.bpm.client.task.impl.dto.TypedValueDto;
 import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.impl.VariableMapImpl;
+import org.camunda.bpm.engine.variable.impl.type.ObjectTypeImpl;
 import org.camunda.bpm.engine.variable.impl.value.UntypedValueImpl;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
@@ -61,7 +63,7 @@ public class VariableMappers {
     registerMapper(new LongValueMapper());
     registerMapper(new DoubleValueMapper());
 
-    // serializable mappers
+    // object mappers
     registerMapper(new ObjectValueMapper(objectMapper));
   }
 
@@ -81,7 +83,8 @@ public class VariableMappers {
       else {
         TypedValue typedValue = mapper.deserializeTypedValue(typedValueDto);
         if (typedValue == null) { // type of value and type of variable response dto not the same; don't invoke handler
-          throw INTERNAL_LOG.exceptionWhileDeserializingVariablesWrongType(variableName, variableType);
+          Object variableValue = typedValueDto.getValue();
+          throw INTERNAL_LOG.exceptionWhileDeserializingVariablesWrongType(variableName, variableType, variableValue);
         }
 
         variableMap.put(variableName, typedValue);
@@ -92,21 +95,45 @@ public class VariableMappers {
   }
 
   @SuppressWarnings("unchecked")
-  public <T extends TypedValue> T convertToTypedValue(Object value) {
-    UntypedValueImpl untypedValue = new UntypedValueImpl(value);
-
-    PrimitiveValueMapper mapper = getMapperByValue(untypedValue);
-    if (mapper == null) { // throw user exception due to unsupported type
-      throw USER_LOG.unsupportedTypeException(value);
+  public  <T extends TypedValue> T convertToTypedValue(TypedValue typedValue) {
+    Object value = null;
+    if (typedValue != null) {
+      value = typedValue.getValue();
     }
 
-    return (T) mapper.convertToTypedValue(untypedValue);
+    if (typedValue == null || typedValue instanceof UntypedValueImpl) {
+      UntypedValueImpl untypedValue = new UntypedValueImpl(value);
+
+      PrimitiveValueMapper mapper = getMapperByValue(untypedValue);
+      if (mapper == null) { // throw user exception due to unsupported type
+        throw USER_LOG.unsupportedTypeException(value);
+      }
+
+      return (T) mapper.convertToTypedValue(untypedValue);
+    }
+    else if (typedValue instanceof ObjectValue) {
+      checkSerializationDataFormat(typedValue);
+
+      ObjectValueMapper mapper = (ObjectValueMapper) mappers.get(ObjectTypeImpl.TYPE_NAME);
+
+      return (T) mapper.convertToObjectValue((ObjectValue) typedValue);
+    }
+    else {
+      return (T) typedValue;
+    }
   }
 
-  public ObjectValue convertToObjectValue(ObjectValue objectValue) {
-    ObjectValueMapper mapper = (ObjectValueMapper) mappers.get("object");
+  protected void checkSerializationDataFormat(TypedValue variableTypedValue) {
+    String serializationDataFormat = ((ObjectValue) variableTypedValue).getSerializationDataFormat();
 
-    return mapper.convertToObjectValue(objectValue);
+    if (serializationDataFormat != null) {
+      String serializationDataFormatJson = Variables.SerializationDataFormats.JSON.getName();
+      boolean isDataFormatJson = serializationDataFormat.equals(serializationDataFormatJson);
+
+      if (!isDataFormatJson) {
+        throw USER_LOG.unsupportedSerializationDataFormat(variableTypedValue);
+      }
+    } // else: default json
   }
 
   public Map<String, TypedValueDto> serializeVariables(VariableMap variableMap) {

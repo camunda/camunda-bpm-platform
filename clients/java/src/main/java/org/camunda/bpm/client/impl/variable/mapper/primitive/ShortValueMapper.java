@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.client.impl.variable.mapper.primitive;
 
+import org.camunda.bpm.client.impl.EngineClientException;
 import org.camunda.bpm.client.task.impl.dto.TypedValueDto;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.ShortValue;
@@ -25,7 +26,7 @@ public class ShortValueMapper extends PrimitiveValueMapper<ShortValue> {
     super(ValueType.SHORT);
   }
 
-  public ShortValue deserializeTypedValue(TypedValueDto typedValueDto) {
+  public ShortValue deserializeTypedValue(TypedValueDto typedValueDto) throws EngineClientException {
     Object value = typedValueDto.getValue();
     short shortValue = ((Number) value).shortValue();
     typedValueDto.setValue(shortValue);

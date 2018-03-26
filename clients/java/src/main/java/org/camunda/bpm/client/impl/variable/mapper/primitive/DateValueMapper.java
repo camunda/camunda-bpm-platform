@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.client.impl.variable.mapper.primitive;
 
+import org.camunda.bpm.client.impl.EngineClientException;
 import org.camunda.bpm.client.task.impl.dto.TypedValueDto;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.DateValue;
@@ -34,15 +35,14 @@ public class DateValueMapper extends PrimitiveValueMapper<DateValue> {
     super(ValueType.DATE);
   }
 
-  @SuppressWarnings("unchecked")
-  public DateValue deserializeTypedValue(TypedValueDto typedValueDto) {
+  public DateValue deserializeTypedValue(TypedValueDto typedValueDto) throws EngineClientException {
     Object value = typedValueDto.getValue();
 
     Date date = null;
     try {
       date = sdf.parse((String) value);
     } catch (ParseException e) {
-      return null;
+      throw new EngineClientException(e);
     }
 
     typedValueDto.setValue(date);

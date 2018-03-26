@@ -13,6 +13,7 @@
 package org.camunda.bpm.client.impl.variable.mapper.primitive;
 
 import org.apache.commons.codec.binary.Base64;
+import org.camunda.bpm.client.impl.EngineClientException;
 import org.camunda.bpm.client.task.impl.dto.TypedValueDto;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.BytesValue;
@@ -27,8 +28,7 @@ public class BytesValueMapper extends PrimitiveValueMapper<BytesValue> {
     super(ValueType.BYTES);
   }
 
-  @SuppressWarnings("unchecked")
-  public BytesValue deserializeTypedValue(TypedValueDto typedValueDto) {
+  public BytesValue deserializeTypedValue(TypedValueDto typedValueDto) throws EngineClientException {
     String value = (String) typedValueDto.getValue();
     byte[] bytes = Base64.decodeBase64(value);
     typedValueDto.setValue(bytes);

@@ -21,6 +21,10 @@ public class EngineClientException extends Exception {
     super(message);
   }
 
+  public EngineClientException(Throwable throwable) {
+    super(throwable);
+  }
+
   protected EngineClientException(String message, Throwable e) {
     super(message, e);
   }

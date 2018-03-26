@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.client.impl.variable.mapper.primitive;
 
+import org.camunda.bpm.client.impl.EngineClientException;
 import org.camunda.bpm.client.impl.variable.mapper.ValueMapper;
 import org.camunda.bpm.client.task.impl.dto.TypedValueDto;
 import org.camunda.bpm.engine.variable.impl.value.UntypedValueImpl;
@@ -52,7 +53,7 @@ public abstract class PrimitiveValueMapper<T extends TypedValue> implements Valu
   }
 
   @SuppressWarnings("unchecked")
-  public T deserializeTypedValue(TypedValueDto typedValueDto) {
+  public T deserializeTypedValue(TypedValueDto typedValueDto) throws EngineClientException {
     Object value = typedValueDto.getValue();
 
     if (isAssignable(value)) {

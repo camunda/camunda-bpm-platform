@@ -68,9 +68,10 @@ public class EngineClientLogger extends ExternalTaskClientLogger {
       "009", "Exception while deserializing variable {}: no suitable mapper found for type {}", variableName, variableType));
   }
 
-  public EngineClientException exceptionWhileDeserializingVariablesWrongType(String variableName, String variableType) {
+  public EngineClientException exceptionWhileDeserializingVariablesWrongType(String variableName, String variableType, Object variableValue) {
     return new EngineClientException(exceptionMessage(
-      "010", "Exception while deserializing variable {}: value does not match to the type {}", variableName, variableType));
+      "010", "Exception while deserializing variable '{}': value '{}' does not match type '{}'",
+      variableName, variableValue, variableType));
   }
 
 }

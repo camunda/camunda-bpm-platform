@@ -263,11 +263,7 @@ public class ExternalTaskImpl implements ExternalTask {
   @JsonIgnore
   @Override
   public void setVariableTyped(String variableName, TypedValue variableTypedValue) {
-    if (variableTypedValue instanceof ObjectValue) {
-      checkSerializationDataFormat(variableTypedValue);
-    }
-
-    TypedValue typedValue = convertToTypedValue(variableTypedValue);
+    TypedValue typedValue = variableMappers.convertToTypedValue(variableTypedValue);
 
     writtenVariableMap.putValueTyped(variableName, typedValue);
     localVariableMap.putValueTyped(variableName, typedValue);
@@ -283,35 +279,6 @@ public class ExternalTaskImpl implements ExternalTask {
   @Override
   public void setAllVariablesTyped(Map<String, TypedValue> variables) {
     variables.forEach(this::setVariableTyped);
-  }
-
-  protected TypedValue convertToTypedValue(TypedValue typedValue) {
-    Object value = null;
-    if (typedValue != null) {
-      value = typedValue.getValue();
-    }
-
-    if (typedValue == null || typedValue instanceof UntypedValueImpl) {
-      return variableMappers.convertToTypedValue(value);
-    }
-    else if (typedValue instanceof ObjectValue) {
-      return variableMappers.convertToObjectValue((ObjectValue) typedValue);
-    }
-    else {
-      return typedValue;
-    }
-  }
-
-  protected void checkSerializationDataFormat(TypedValue variableTypedValue) {
-    String serializationDataFormat = ((ObjectValue) variableTypedValue).getSerializationDataFormat();
-
-    if (serializationDataFormat != null) {
-      boolean isDataFormatJson = serializationDataFormat.equals(Variables.SerializationDataFormats.JSON.getName());
-
-      if (!isDataFormatJson) {
-        throw LOG.unsupportedSerializationDataFormat(variableTypedValue);
-      }
-    }
   }
 
 }

@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.client.impl.variable.mapper.primitive;
 
+import org.camunda.bpm.client.impl.EngineClientException;
 import org.camunda.bpm.client.task.impl.dto.TypedValueDto;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.LongValue;
@@ -25,7 +26,7 @@ public class LongValueMapper extends PrimitiveValueMapper<LongValue> {
     super(ValueType.LONG);
   }
 
-  public LongValue deserializeTypedValue(TypedValueDto typedValueDto) {
+  public LongValue deserializeTypedValue(TypedValueDto typedValueDto) throws EngineClientException {
     Object value = typedValueDto.getValue();
     long longValue = ((Number) value).longValue();
     typedValueDto.setValue(longValue);

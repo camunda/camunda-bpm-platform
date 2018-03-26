@@ -13,11 +13,13 @@
 package org.camunda.bpm.client.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
@@ -25,6 +27,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
 import static org.powermock.api.mockito.PowerMockito.whenNew;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -59,6 +62,7 @@ import org.camunda.bpm.engine.variable.value.DateValue;
 import org.camunda.bpm.engine.variable.value.DoubleValue;
 import org.camunda.bpm.engine.variable.value.IntegerValue;
 import org.camunda.bpm.engine.variable.value.LongValue;
+import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.bpm.engine.variable.value.ShortValue;
 import org.camunda.bpm.engine.variable.value.StringValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
@@ -1531,8 +1535,202 @@ public class VariableTest {
     assertVariablePayloadOfCompleteRequest(objectMapper, expectedValueDtoMap);
   }
 
-  /* tests for object  */
+  /* tests for object typed variables */
 
+  @Test
+  public void shouldDeserializeObjectTypedVariable() throws JsonProcessingException {
+    // given
+    ExternalTask externalTaskMock = MockProvider.createExternalTaskWithoutVariables();
+
+    TypedValueDto typedValueDtoObject = createTypedValueDto("[1, 2, 3, 4, 5]",
+      "Object", "java.util.ArrayList");
+
+    ((ExternalTaskImpl)externalTaskMock).setVariables(Collections.singletonMap("aVariableName", typedValueDtoObject));
+
+    mockFetchAndLockResponse(Collections.singletonList(externalTaskMock));
+
+    ExternalTaskClient client = ExternalTaskClient.create()
+      .baseUrl(MockProvider.BASE_URL)
+      .build();
+
+    final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
+    final List<ExternalTask> externalTaskReference = new ArrayList<>(); // list, as container must be final and changeable
+
+    TopicSubscriptionBuilder topicSubscriptionBuilder =
+      client.subscribe(MockProvider.TOPIC_NAME)
+        .lockDuration(5000)
+        .handler((externalTask, externalTaskService) -> {
+          externalTaskReference.add(externalTask);
+
+          handlerInvoked.set(true);
+        });
+
+    // when
+    topicSubscriptionBuilder.open();
+    while (!handlerInvoked.get()) {
+      // busy waiting
+    }
+    client.stop();
+
+    // then
+    ExternalTask externalTask = externalTaskReference.get(0);
+
+    ObjectValue aVariableName = externalTask.getVariableTyped("aVariableName");
+    assertThat(aVariableName.getType().getName()).isEqualTo("object");
+    assertThat((List<Integer>) aVariableName.getValue()).containsOnly(1, 2, 3, 4, 5);
+    assertThat(aVariableName.getObjectType()).isEqualTo(ArrayList.class);
+    assertThat(aVariableName.getObjectTypeName()).isEqualTo(ArrayList.class.getName());
+    assertThat(aVariableName.getSerializationDataFormat()).isEqualTo("application/json");
+  }
+
+  @Test
+  public void shouldThrowExceptionDueToUnknownTypeWhileDeserializingObjectTypedVariable() throws JsonProcessingException, InterruptedException {
+    // given
+    ExternalTask externalTaskMock = MockProvider.createExternalTaskWithoutVariables();
+
+    TypedValueDto typedValueDtoObject = createTypedValueDto("[1, 2, 3, 4, 5]",
+      "Object", "#§#4431%%");
+
+    ((ExternalTaskImpl)externalTaskMock).setVariables(Collections.singletonMap("aVariableName", typedValueDtoObject));
+
+    mockFetchAndLockResponse(Collections.singletonList(externalTaskMock));
+
+    ExternalTaskClient client = ExternalTaskClient.create()
+      .baseUrl(MockProvider.BASE_URL)
+      .build();
+
+    ExternalTaskHandler externalTaskHandlerMock = mock(ExternalTaskHandler.class);
+
+    TopicSubscriptionBuilder topicSubscriptionBuilder =
+      client.subscribe(MockProvider.TOPIC_NAME)
+        .lockDuration(5000)
+        .handler(externalTaskHandlerMock);
+
+    // when
+    topicSubscriptionBuilder.open();
+    Thread.sleep(1000);
+    verifyNoMoreInteractions(externalTaskHandlerMock);
+  }
+
+  @Test
+  public void shouldThrowExceptionDueToInvalidJsonWhileDeserializingObjectTypedVariable() throws JsonProcessingException, InterruptedException {
+    // given
+    ExternalTask externalTaskMock = MockProvider.createExternalTaskWithoutVariables();
+
+    TypedValueDto typedValueDtoObject = createTypedValueDto("[1, 2, 3, 4, 5",
+      "Object", "java.util.ArrayList");
+
+    ((ExternalTaskImpl)externalTaskMock).setVariables(Collections.singletonMap("aVariableName", typedValueDtoObject));
+
+    mockFetchAndLockResponse(Collections.singletonList(externalTaskMock));
+
+    ExternalTaskClient client = ExternalTaskClient.create()
+      .baseUrl(MockProvider.BASE_URL)
+      .build();
+
+    ExternalTaskHandler externalTaskHandlerMock = mock(ExternalTaskHandler.class);
+
+    TopicSubscriptionBuilder topicSubscriptionBuilder =
+      client.subscribe(MockProvider.TOPIC_NAME)
+        .lockDuration(5000)
+        .handler(externalTaskHandlerMock);
+
+    // when
+    topicSubscriptionBuilder.open();
+    Thread.sleep(1000);
+    verifyNoMoreInteractions(externalTaskHandlerMock);
+  }
+
+  @Test
+  public void shouldSerializeObjectTypedVariable() throws Exception {
+    // given
+    ExternalTask externalTaskMock = MockProvider.createExternalTaskWithoutVariables();
+
+    mockFetchAndLockResponse(Collections.singletonList(externalTaskMock));
+
+    ObjectMapper objectMapper = spy(ObjectMapper.class);
+    whenNew(ObjectMapper.class).withNoArguments().thenReturn(objectMapper);
+
+    ExternalTaskClient client = ExternalTaskClient.create()
+      .baseUrl(MockProvider.BASE_URL)
+      .build();
+
+    final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
+
+    TopicSubscriptionBuilder topicSubscriptionBuilder =
+      client.subscribe(MockProvider.TOPIC_NAME)
+        .lockDuration(5000)
+        .handler((externalTask, externalTaskService) -> {
+          ObjectValue objectValue = Variables
+            .objectValue(new ArrayList<>(Arrays.asList(1,2,3,4,5)))
+            .create();
+
+          externalTask.setVariableTyped("aVariableName", objectValue);
+
+          externalTaskService.complete(externalTask);
+
+          handlerInvoked.set(true);
+        });
+
+    // when
+    topicSubscriptionBuilder.open();
+    while (!handlerInvoked.get()) {
+      // busy waiting
+    }
+    client.stop();
+
+    // then
+    assertVariablePayloadOfCompleteRequest(objectMapper, Collections.singletonMap("aVariableName", createTypedValueDto("[1,2,3,4,5]", "Object", ArrayList.class.getTypeName())));
+  }
+
+  @Test
+  public void shouldThrowUnsupportedTypeExceptionDueToUnknownObjectType() throws Exception {
+    // given
+    ExternalTask externalTaskMock = MockProvider.createExternalTaskWithoutVariables();
+
+    mockFetchAndLockResponse(Collections.singletonList(externalTaskMock));
+
+    ObjectMapper objectMapper = spy(ObjectMapper.class);
+    whenNew(ObjectMapper.class).withNoArguments().thenReturn(objectMapper);
+
+    ExternalTaskClient client = ExternalTaskClient.create()
+      .baseUrl(MockProvider.BASE_URL)
+      .build();
+
+    final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
+    List<UnsupportedTypeException> unsupportedTypeExceptionReference = new ArrayList<>();
+
+    class Unknown {}
+
+    TopicSubscriptionBuilder topicSubscriptionBuilder =
+      client.subscribe(MockProvider.TOPIC_NAME)
+        .lockDuration(5000)
+        .handler((externalTask, externalTaskService) -> {
+
+          ObjectValue objectValue = Variables
+            .objectValue(new Unknown())
+            .create();
+
+          try {
+            externalTask.setVariableTyped("aVariableName", objectValue);
+            fail("No UnsupportedTypeException thrown!");
+          } catch (UnsupportedTypeException e) {
+            unsupportedTypeExceptionReference.add(e);
+            handlerInvoked.set(true);
+          }
+        });
+
+    // when
+    topicSubscriptionBuilder.open();
+    while (!handlerInvoked.get()) {
+      // busy waiting
+    }
+    client.stop();
+
+    // then
+    UnsupportedTypeException unsupportedTypeException = unsupportedTypeExceptionReference.get(0);
+    assertThat(unsupportedTypeException).hasMessageContaining("Exception while converting variable value");
+  }
 
   // helper //////////////////////////////////
 
@@ -1548,17 +1746,33 @@ public class VariableTest {
     assertThat(externalTask.getAllVariables().get(variableName)).isEqualTo(variableValue);
   }
 
-  protected TypedValueDto createTypedValueDto(Object variableValue, String variableType) {
-    return createTypedValueDto(variableValue, variableType, null);
+  protected TypedValueDto createTypedValueDto(Object variableValue, String variableType, boolean isTransient) {
+    return createTypedValueDto(variableValue, variableType, isTransient, null);
   }
 
-  protected TypedValueDto createTypedValueDto(Object variableValue, String variableType, Boolean isTransient) {
+  protected TypedValueDto createTypedValueDto(Object variableValue, String variableType, String objectTypeName) {
+    return createTypedValueDto(variableValue, variableType, null, objectTypeName);
+  }
+
+  protected TypedValueDto createTypedValueDto(Object variableValue, String variableType) {
+    return createTypedValueDto(variableValue, variableType, null, null);
+  }
+
+  protected TypedValueDto createTypedValueDto(Object variableValue, String variableType, Boolean isTransient, String objectTypeName) {
     TypedValueDto typedValueDto = new TypedValueDto();
     typedValueDto.setValue(variableValue);
     typedValueDto.setType(variableType);
 
     if (isTransient != null) {
       typedValueDto.setValueInfo(Collections.singletonMap("transient", isTransient));
+    }
+
+    if (objectTypeName != null) {
+      Map<String, Object> valueInfo = new HashMap<>();
+      valueInfo.put("objectTypeName", objectTypeName);
+      valueInfo.put("serializationDataFormat", "application/json");
+
+      typedValueDto.setValueInfo(valueInfo);
     }
 
     return typedValueDto;
