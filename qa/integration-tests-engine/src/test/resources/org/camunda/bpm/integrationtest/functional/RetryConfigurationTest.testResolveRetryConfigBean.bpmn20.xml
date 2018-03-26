@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_1"
+                  targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler"
+                  exporterVersion="1.10.0">
+  <bpmn:process id="testRetry" name="Retry config" isExecutable="true">
+    <bpmn:startEvent id="startEventProcessStarted" name="Process&#10;started">
+      <bpmn:outgoing>SequenceFlow1</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:endEvent id="endEventProcessEnded" name="Process&#10;ended">
+      <bpmn:incoming>SequenceFlow_1qnaq1y</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow1" sourceRef="startEventProcessStarted" targetRef="Task_1a7s6c9" />
+    <bpmn:sequenceFlow id="SequenceFlow_1qnaq1y" sourceRef="Task_1a7s6c9" targetRef="endEventProcessEnded" />
+    <bpmn:serviceTask id="Task_1a7s6c9" name="test" camunda:asyncBefore="true" camunda:delegateExpression="${errorDelegate}">
+      <bpmn:extensionElements>
+        <camunda:failedJobRetryTimeCycle>${retryConfig.defaultConfig()}
+        </camunda:failedJobRetryTimeCycle>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow1</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1qnaq1y</bpmn:outgoing>
+    </bpmn:serviceTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="testRetry">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="startEventProcessStarted">
+        <dc:Bounds x="173" y="102" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_0fkea3f_di" bpmnElement="endEventProcessEnded">
+        <dc:Bounds x="556" y="102" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="529" y="138" width="90" height="20" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_08va5r8_di" bpmnElement="SequenceFlow1">
+        <di:waypoint xsi:type="dc:Point" x="209" y="120" />
+        <di:waypoint xsi:type="dc:Point" x="347" y="120" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="233" y="105" width="90" height="0" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1qnaq1y_di" bpmnElement="SequenceFlow_1qnaq1y">
+        <di:waypoint xsi:type="dc:Point" x="447" y="120" />
+        <di:waypoint xsi:type="dc:Point" x="556" y="120" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="501.5" y="99" width="0" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_021bcq3_di" bpmnElement="Task_1a7s6c9">
+        <dc:Bounds x="347" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

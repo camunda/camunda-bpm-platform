@@ -165,7 +165,7 @@ public class DefaultJobRetryCmd extends JobRetryCmd {
     }
 
     try {
-       value = expression.getValue(execution);
+       value = expression.getValue(execution, execution);
     }
     catch (Exception e) {
       LOG.exceptionWhileParsingExpression(jobId, e.getCause().getMessage());
