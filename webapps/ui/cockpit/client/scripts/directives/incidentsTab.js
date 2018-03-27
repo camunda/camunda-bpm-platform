@@ -1,7 +1,6 @@
 'use strict';
 
 var angular = require('angular');
-
 var fs = require('fs');
 
 var template = fs.readFileSync(__dirname + '/incidents-tab.html', 'utf8');
@@ -12,12 +11,14 @@ var Directive = [
 
     var Link = function linkFunction(scope) {
 
+      // ordered available columns
       var availableColumns = [
         { class: 'state',      request: 'incidentState',     sortable: true, content: $translate.instant('PLUGIN_INCIDENTS_TAB_STATE')},
+        { class: 'message',    request: '',                  sortable: false, content: $translate.instant('PLUGIN_INCIDENTS_TAB_MESSAGE')},
+        { class: 'process-instance', request: 'processInstanceId', sortable: false, content: $translate.instant('PLUGIN_INCIDENTS_TAB_MESSAGE_PROCESS_INSTANCE')},
         { class: 'create-time',request: 'createTime',        sortable: true, content: $translate.instant('PLUGIN_INCIDENTS_TAB_CREATE_TIME')},
         { class: 'end-time',   request: 'endTime',           sortable: true, content: $translate.instant('PLUGIN_INCIDENTS_TAB_END_TIME')},
         { class: 'timestamp',  request: 'incidentTimestamp', sortable: true, content: $translate.instant('PLUGIN_INCIDENTS_TAB_TIMESTAMP')},
-        { class: 'message',    request: '',                  sortable: false, content: $translate.instant('PLUGIN_INCIDENTS_TAB_MESSAGE')},
         { class: 'activity',   request: 'activityId',        sortable: true, content: $translate.instant('PLUGIN_INCIDENTS_TAB_ACTIVITY')},
         { class: 'cause instance-id uuid',      request: 'causeIncidentProcessInstanceId',     sortable: false, content: $translate.instant('PLUGIN_INCIDENTS_TAB_CAUSE_INSTANCE_ID')},
         { class: 'cause-root instance-id uuid', request: 'rootCauseIncidentProcessInstanceId', sortable: false, content: $translate.instant('PLUGIN_INCIDENTS_TAB_CAUSE_ROOT_INSTANCE_ID')},
@@ -26,51 +27,24 @@ var Directive = [
       ];
 
       scope.onSortChange = updateView;
-      setHeader();
 
-      function setHeader() {
-        var commonClasses = [
-          'activity',
-          'cause instance-id uuid',
-          'cause-root instance-id uuid',
-          'type',
-          'action'
-        ];
-
-        if (scope.incidentsContext === 'history') {
-          var histColClasses = [
-            'state',
-            'message',
-            'create-time',
-            'end-time'
-          ];
-          scope.headColumns = setColumns(availableColumns, histColClasses.concat(commonClasses));
-          scope.localConfKey = 'sortHistInci';
-
-        } else {
-          var runtimeColClasses = [
-            'message',
-            'timestamp'
-          ];
-          scope.headColumns = setColumns(availableColumns, runtimeColClasses.concat(commonClasses));
-          scope.localConfKey = 'sortInci';
-        }
-
-        var defaultSort = {sortBy: 'incidentType', sortOrder: 'asc'};
-        scope.sortObj = loadLocal(defaultSort);
+      // filter table column based on the view level (definition | instance | history | runtime)
+      var classesToInclude = ['activity', 'cause instance-id uuid', 'cause-root instance-id uuid', 'type', 'action'];
+      var PInstanceClass = scope.processDefinition && 'process-instance';
+      if(scope.incidentsContext === 'history') {
+        scope.localConfKey = 'sortHistInci';
+        classesToInclude = ['state', 'message', PInstanceClass, 'create-time', 'end-time'].concat(classesToInclude);
+      } else {
+        scope.localConfKey = 'sortInci';
+        classesToInclude = ['message', PInstanceClass, 'timestamp'].concat(classesToInclude);
       }
 
-      function setColumns(availableColumns, selectedColClasses) {
-        var columns = [];
+      scope.headColumns = availableColumns.filter(function(column) {
+        return classesToInclude.indexOf(column.class) !== -1;
+      });
 
-        selectedColClasses.forEach(function(selectedColumnClass) {
-          var matchedColumn = availableColumns.filter(function(column) {
-            return column.class === selectedColumnClass;
-          })[0];
-          columns.push(matchedColumn);
-        });
-        return columns;
-      }
+
+      scope.sortObj = loadLocal({ sortBy: 'incidentType', sortOrder: 'asc' });
 
       var incidentData = scope.processData.newChild(scope);
 

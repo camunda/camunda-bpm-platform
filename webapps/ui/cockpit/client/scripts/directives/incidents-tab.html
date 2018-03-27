@@ -65,6 +65,18 @@
         <i>Message is null.</i>
       </td>
 
+      <td ng-if="processDefinition && incidentsContext === 'history'"
+          class="process-instance"
+          cam-widget-clipboard="operation.processInstanceId" >
+        <a href="#/process-instance/{{ incident.processInstanceId }}/history"> {{incident.processInstanceId}} </a>
+      </td>
+
+      <td ng-if="processDefinition && incidentsContext !== 'history'"
+          class="process-instance"
+          cam-widget-clipboard="operation.processInstanceId" >
+        <a href="#/process-instance/{{ incident.processInstanceId }}/runtime"> {{incident.processInstanceId}} </a>
+      </td>
+
       <td  ng-if="incidentsContext !== 'history'" class="timestamp">
         {{ incident.incidentTimestamp | camDate }}
       </td>
