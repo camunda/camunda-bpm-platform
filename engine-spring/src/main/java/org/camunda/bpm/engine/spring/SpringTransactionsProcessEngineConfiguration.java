@@ -52,6 +52,7 @@ public class SpringTransactionsProcessEngineConfiguration extends ProcessEngineC
   protected String deploymentName = "SpringAutoDeployment";
   protected Resource[] deploymentResources = new Resource[0];
   protected String deploymentTenantId;
+  protected boolean deployChangedOnly;
 
   public SpringTransactionsProcessEngineConfiguration() {
     transactionsExternallyManaged = true;
@@ -110,7 +111,7 @@ public class SpringTransactionsProcessEngineConfiguration extends ProcessEngineC
 
       DeploymentBuilder deploymentBuilder = repositoryService
         .createDeployment()
-        .enableDuplicateFiltering(false)
+        .enableDuplicateFiltering(deployChangedOnly)
         .name(deploymentName)
         .tenantId(deploymentTenantId);
 
@@ -189,6 +190,14 @@ public class SpringTransactionsProcessEngineConfiguration extends ProcessEngineC
 
   public void setDeploymentTenantId(String deploymentTenantId) {
     this.deploymentTenantId = deploymentTenantId;
+  }
+
+  public boolean isDeployChangedOnly() {
+    return deployChangedOnly;
+  }
+
+  public void setDeployChangedOnly(boolean deployChangedOnly) {
+    this.deployChangedOnly = deployChangedOnly;
   }
 
 }
