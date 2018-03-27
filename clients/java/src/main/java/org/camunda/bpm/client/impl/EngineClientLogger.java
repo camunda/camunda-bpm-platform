@@ -14,6 +14,8 @@ package org.camunda.bpm.client.impl;
 
 import org.apache.http.HttpRequest;
 import org.apache.http.client.HttpResponseException;
+import org.camunda.bpm.client.exception.UnsupportedTypeException;
+import org.camunda.bpm.client.task.impl.dto.TypedValueDto;
 
 import java.io.IOException;
 
@@ -74,4 +76,24 @@ public class EngineClientLogger extends ExternalTaskClientLogger {
       variableName, variableValue, variableType));
   }
 
+  public EngineClientException unsupportedSerializationDataFormatException(String serializationDataFormat, TypedValueDto typedValueDto) {
+    return new EngineClientException(exceptionMessage(
+      "011", "Exception while deserializing variable: value '{}' has unsupported serialization data format '{}'",
+      typedValueDto, serializationDataFormat));
+  }
+
+  public EngineClientException missingSpinXmlDependencyExceptionInternal() {
+    return new EngineClientException(exceptionMessage(
+      "012", "Exception while deserializing object value of type 'xml': the dependency 'camunda-spin-dataformat-xml-dom' needs to be added"));
+  }
+
+  public EngineClientException invalidSerializedValueException(String serializedValue, String message) {
+    return new EngineClientException(exceptionMessage(
+      "013", "Exception while deserializing object value '{}': {}", serializedValue, message));
+  }
+
+  public EngineClientException objectTypeNameUnknownException(String objectTypeName, Object serializedValue) {
+    return new EngineClientException(exceptionMessage(
+      "013", "Exception while deserializing object value '{}': object type '{}' is unknown", serializedValue, objectTypeName));
+  }
 }

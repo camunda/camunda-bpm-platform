@@ -19,8 +19,10 @@ import org.camunda.bpm.client.exception.ExternalTaskClientException;
 import org.camunda.bpm.client.exception.NotAcquiredException;
 import org.camunda.bpm.client.exception.NotFoundException;
 import org.camunda.bpm.client.exception.NotResumedException;
+import org.camunda.bpm.client.exception.UnknownTypeException;
 import org.camunda.bpm.client.exception.UnsupportedTypeException;
 import org.camunda.bpm.client.topic.impl.TopicSubscriptionManagerLogger;
+import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.commons.logging.BaseLogger;
 
 import java.io.IOException;
@@ -118,4 +120,13 @@ public class ExternalTaskClientLogger extends BaseLogger {
       "015", "Exception while converting variable value '{}' to typed variable value: serialization data format not supported", variableValue, variableValue.getClass().getSimpleName()));
   }
 
+  public UnsupportedTypeException missingSpinXmlDependencyException() {
+    return new UnsupportedTypeException(exceptionMessage(
+      "016", "Exception while deserializing object value of type 'xml': the dependency 'camunda-spin-dataformat-xml-dom' needs to be added"));
+  }
+
+  public UnknownTypeException unknownTypeException(ObjectValue objectValue) {
+    return new UnknownTypeException(exceptionMessage(
+      "017", "Exception while serializing variable of type object: the type of the object is not on the class path: '{}'", objectValue));
+  }
 }

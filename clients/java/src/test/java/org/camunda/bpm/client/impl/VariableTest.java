@@ -47,6 +47,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.camunda.bpm.client.ExternalTaskClient;
+import org.camunda.bpm.client.exception.ExternalTaskClientException;
+import org.camunda.bpm.client.exception.UnknownTypeException;
 import org.camunda.bpm.client.exception.UnsupportedTypeException;
 import org.camunda.bpm.client.helper.ClosableHttpClientMock;
 import org.camunda.bpm.client.helper.MockProvider;
@@ -1552,9 +1554,13 @@ public class VariableTest {
     TypedValueDto typedValueDtoJavaObject = createTypedValueDto(encodeObjectToBase64(new ArrayList<>(Arrays.asList(1,2,3,4,5))),
       "Object", "java.util.ArrayList", Variables.SerializationDataFormats.JAVA.getName());
 
+    TypedValueDto typedValueDtoXmlObject = createTypedValueDto("<xmlList><e>1</e><e>2</e><e>3</e><e>4</e><e>5</e></xmlList>",
+      "Object", XmlList.class.getTypeName(), Variables.SerializationDataFormats.XML.getName());
+
     Map<String, TypedValueDto> typedValueDtoMap = new HashMap<>();
     typedValueDtoMap.put("aVariableName", typedValueDtoJsonObject);
     typedValueDtoMap.put("anotherVariableName", typedValueDtoJavaObject);
+    typedValueDtoMap.put("aXmlVariableName", typedValueDtoXmlObject);
     ((ExternalTaskImpl)externalTaskMock).setVariables(typedValueDtoMap);
 
     mockFetchAndLockResponse(Collections.singletonList(externalTaskMock));
@@ -1590,8 +1596,12 @@ public class VariableTest {
     assertThat((List<Integer>) aVariableName.getValue()).containsOnly(1, 2, 3, 4, 5);
 
     ObjectValue anotherVariableName = externalTask.getVariableTyped("anotherVariableName");
-    assertObjectValue(aVariableName, ArrayList.class, Variables.SerializationDataFormats.JSON.getName());
+    assertObjectValue(anotherVariableName, ArrayList.class, Variables.SerializationDataFormats.JAVA.getName());
     assertThat((List<Integer>) anotherVariableName.getValue()).containsOnly(1, 2, 3, 4, 5);
+
+    ObjectValue aXmlVariableName = externalTask.getVariableTyped("aXmlVariableName");
+    assertObjectValue(aXmlVariableName, XmlList.class, Variables.SerializationDataFormats.XML.getName());
+    assertThat((XmlList) aXmlVariableName.getValue()).containsOnly(1, 2, 3, 4, 5);
   }
 
   @Test
@@ -1657,12 +1667,74 @@ public class VariableTest {
   }
 
   @Test
+  public void shouldThrowExceptionDueToUnknownTypeWhileDeserializingXmlObjectTypedVariable() throws IOException, InterruptedException {
+    // given
+    ExternalTask externalTaskMock = MockProvider.createExternalTaskWithoutVariables();
+
+    TypedValueDto typedValueDtoObject = createTypedValueDto("<xmlList><e>1</e><e>2</e><e>3</e><e>4</e><e>5</e></xmlList>",
+      "Object", "#§#4431%%", Variables.SerializationDataFormats.XML.getName());
+
+    ((ExternalTaskImpl)externalTaskMock).setVariables(Collections.singletonMap("aVariableName", typedValueDtoObject));
+
+    mockFetchAndLockResponse(Collections.singletonList(externalTaskMock));
+
+    ExternalTaskClient client = ExternalTaskClient.create()
+      .baseUrl(MockProvider.BASE_URL)
+      .build();
+
+    ExternalTaskHandler externalTaskHandlerMock = mock(ExternalTaskHandler.class);
+
+    TopicSubscriptionBuilder topicSubscriptionBuilder =
+      client.subscribe(MockProvider.TOPIC_NAME)
+        .lockDuration(5000)
+        .handler(externalTaskHandlerMock);
+
+    // when
+    topicSubscriptionBuilder.open();
+    Thread.sleep(1000);
+
+    // then
+    verifyNoMoreInteractions(externalTaskHandlerMock);
+  }
+
+  @Test
   public void shouldThrowExceptionDueToInvalidJsonSerializationDataWhileDeserializingObjectTypedVariable() throws JsonProcessingException, InterruptedException {
     // given
     ExternalTask externalTaskMock = MockProvider.createExternalTaskWithoutVariables();
 
     TypedValueDto typedValueDtoObject = createTypedValueDto("[1, 2, 3, 4, 5",
       "Object", "java.util.ArrayList", Variables.SerializationDataFormats.JSON.getName());
+
+    ((ExternalTaskImpl)externalTaskMock).setVariables(Collections.singletonMap("aVariableName", typedValueDtoObject));
+
+    mockFetchAndLockResponse(Collections.singletonList(externalTaskMock));
+
+    ExternalTaskClient client = ExternalTaskClient.create()
+      .baseUrl(MockProvider.BASE_URL)
+      .build();
+
+    ExternalTaskHandler externalTaskHandlerMock = mock(ExternalTaskHandler.class);
+
+    TopicSubscriptionBuilder topicSubscriptionBuilder =
+      client.subscribe(MockProvider.TOPIC_NAME)
+        .lockDuration(5000)
+        .handler(externalTaskHandlerMock);
+
+    // when
+    topicSubscriptionBuilder.open();
+    Thread.sleep(1000);
+
+    // then
+    verifyNoMoreInteractions(externalTaskHandlerMock);
+  }
+
+  @Test
+  public void shouldThrowExceptionDueToInvalidXmlSerializationDataWhileDeserializingObjectTypedVariable() throws JsonProcessingException, InterruptedException {
+    // given
+    ExternalTask externalTaskMock = MockProvider.createExternalTaskWithoutVariables();
+
+    TypedValueDto typedValueDtoObject = createTypedValueDto("<xmlList><e>1</e><e>2</e><e>3</e><e>4</e><e>5</e></xmlList",
+      "Object", XmlList.class.getTypeName(), Variables.SerializationDataFormats.XML.getName());
 
     ((ExternalTaskImpl)externalTaskMock).setVariables(Collections.singletonMap("aVariableName", typedValueDtoObject));
 
@@ -1853,7 +1925,7 @@ public class VariableTest {
   }
 
   @Test
-  public void shouldThrowUnsupportedTypeExceptionDueToUnknownObjectTypeWithDefaultDataSerializationFormat() throws Exception {
+  public void shouldSerializeObjectTypedVariableWithXmlDataSerializationFormat() throws Exception {
     // given
     ExternalTask externalTaskMock = MockProvider.createExternalTaskWithoutVariables();
 
@@ -1867,7 +1939,53 @@ public class VariableTest {
       .build();
 
     final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
-    List<UnsupportedTypeException> unsupportedTypeExceptionReference = new ArrayList<>();
+
+    TopicSubscriptionBuilder topicSubscriptionBuilder =
+      client.subscribe(MockProvider.TOPIC_NAME)
+        .lockDuration(5000)
+        .handler((externalTask, externalTaskService) -> {
+          ObjectValue objectValue = Variables
+            .objectValue(new XmlList(Arrays.asList(1,2,3,4,5)))
+            .serializationDataFormat(Variables.SerializationDataFormats.XML.getName())
+            .create();
+
+          externalTask.setVariableTyped("aVariableName", objectValue);
+
+          externalTaskService.complete(externalTask);
+
+          handlerInvoked.set(true);
+        });
+
+    // when
+    topicSubscriptionBuilder.open();
+    while (!handlerInvoked.get()) {
+      // busy waiting
+    }
+    client.stop();
+
+    // then
+    assertVariablePayloadOfCompleteRequest(objectMapper, Collections.singletonMap("aVariableName",
+      createTypedValueDto("<?xml version=\"1.0\" encoding=\"UTF-8\"?><xmlList>\n  <e>1</e>\n  <e>2</e>\n  " +
+        "<e>3</e>\n  <e>4</e>\n  <e>5</e>\n</xmlList>\n", "Object", ArrayList.class.getTypeName(),
+        Variables.SerializationDataFormats.XML.getName())));
+  }
+
+  @Test
+  public void shouldThrowUnknownTypeExceptionDueToUnknownObjectTypeWithDefaultDataSerializationFormat() throws Exception {
+    // given
+    ExternalTask externalTaskMock = MockProvider.createExternalTaskWithoutVariables();
+
+    mockFetchAndLockResponse(Collections.singletonList(externalTaskMock));
+
+    ObjectMapper objectMapper = spy(ObjectMapper.class);
+    whenNew(ObjectMapper.class).withNoArguments().thenReturn(objectMapper);
+
+    ExternalTaskClient client = ExternalTaskClient.create()
+      .baseUrl(MockProvider.BASE_URL)
+      .build();
+
+    final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
+    List<UnknownTypeException> unknownTypeExceptionReference = new ArrayList<>();
 
     class Unknown {}
 
@@ -1882,9 +2000,9 @@ public class VariableTest {
 
           try {
             externalTask.setVariableTyped("aVariableName", objectValue);
-            fail("No UnsupportedTypeException thrown!");
-          } catch (UnsupportedTypeException e) {
-            unsupportedTypeExceptionReference.add(e);
+            fail("No UnknownTypeException thrown!");
+          } catch (UnknownTypeException e) {
+            unknownTypeExceptionReference.add(e);
             handlerInvoked.set(true);
           }
         });
@@ -1897,12 +2015,12 @@ public class VariableTest {
     client.stop();
 
     // then
-    UnsupportedTypeException unsupportedTypeException = unsupportedTypeExceptionReference.get(0);
-    assertThat(unsupportedTypeException).hasMessageContaining("Exception while converting variable value");
+    UnknownTypeException unknownTypeException = unknownTypeExceptionReference.get(0);
+    assertThat(unknownTypeException).hasMessageContaining("the type of the object is not on the class path");
   }
 
   @Test
-  public void shouldThrowUnsupportedTypeExceptionDueToUnknownObjectTypeWithJavaDataSerializationFormat() throws Exception {
+  public void shouldThrowUnknownTypeExceptionDueToUnknownObjectTypeWithJavaDataSerializationFormat() throws Exception {
     // given
     ExternalTask externalTaskMock = MockProvider.createExternalTaskWithoutVariables();
 
@@ -1916,7 +2034,7 @@ public class VariableTest {
       .build();
 
     final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
-    List<UnsupportedTypeException> unsupportedTypeExceptionReference = new ArrayList<>();
+    List<UnknownTypeException> unknownTypeExceptionReference = new ArrayList<>();
 
     class Unknown {}
 
@@ -1932,9 +2050,9 @@ public class VariableTest {
 
           try {
             externalTask.setVariableTyped("aVariableName", objectValue);
-            fail("No UnsupportedTypeException thrown!");
-          } catch (UnsupportedTypeException e) {
-            unsupportedTypeExceptionReference.add(e);
+            fail("No UnknownTypeException thrown!");
+          } catch (UnknownTypeException e) {
+            unknownTypeExceptionReference.add(e);
             handlerInvoked.set(true);
           }
         });
@@ -1947,8 +2065,58 @@ public class VariableTest {
     client.stop();
 
     // then
-    UnsupportedTypeException unsupportedTypeException = unsupportedTypeExceptionReference.get(0);
-    assertThat(unsupportedTypeException).hasMessageContaining("Exception while converting variable value");
+    UnknownTypeException unknownTypeException = unknownTypeExceptionReference.get(0);
+    assertThat(unknownTypeException).hasMessageContaining("the type of the object is not on the class path");
+  }
+
+  @Test
+  public void shouldThrowUnknownTypeExceptionDueToUnknownObjectTypeWithXmlDataSerializationFormat() throws Exception {
+    // given
+    ExternalTask externalTaskMock = MockProvider.createExternalTaskWithoutVariables();
+
+    mockFetchAndLockResponse(Collections.singletonList(externalTaskMock));
+
+    ObjectMapper objectMapper = spy(ObjectMapper.class);
+    whenNew(ObjectMapper.class).withNoArguments().thenReturn(objectMapper);
+
+    ExternalTaskClient client = ExternalTaskClient.create()
+      .baseUrl(MockProvider.BASE_URL)
+      .build();
+
+    final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
+    List<UnknownTypeException> unknownTypeExceptionReference = new ArrayList<>();
+
+    class Unknown {}
+
+    TopicSubscriptionBuilder topicSubscriptionBuilder =
+      client.subscribe(MockProvider.TOPIC_NAME)
+        .lockDuration(5000)
+        .handler((externalTask, externalTaskService) -> {
+
+          ObjectValue objectValue = Variables
+            .objectValue(new Unknown())
+            .serializationDataFormat(Variables.SerializationDataFormats.XML.getName())
+            .create();
+
+          try {
+            externalTask.setVariableTyped("aVariableName", objectValue);
+            fail("No UnknownTypeException thrown!");
+          } catch (UnknownTypeException e) {
+            unknownTypeExceptionReference.add(e);
+            handlerInvoked.set(true);
+          }
+        });
+
+    // when
+    topicSubscriptionBuilder.open();
+    while (!handlerInvoked.get()) {
+      // busy waiting
+    }
+    client.stop();
+
+    // then
+    UnknownTypeException unknownTypeException = unknownTypeExceptionReference.get(0);
+    assertThat(unknownTypeException).hasMessageContaining("the type of the object is not on the class path");
   }
 
   @Test

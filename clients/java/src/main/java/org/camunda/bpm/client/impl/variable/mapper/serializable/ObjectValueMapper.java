@@ -12,9 +12,12 @@
  */
 package org.camunda.bpm.client.impl.variable.mapper.serializable;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.client.impl.EngineClientException;
+import org.camunda.bpm.client.impl.EngineClientLogger;
 import org.camunda.bpm.client.impl.ExternalTaskClientLogger;
 import org.camunda.bpm.client.impl.variable.mapper.ValueMapper;
 import org.camunda.bpm.client.task.impl.dto.TypedValueDto;
@@ -23,11 +26,17 @@ import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Base64;
 import java.util.Map;
 
@@ -36,19 +45,23 @@ import java.util.Map;
  */
 public class ObjectValueMapper implements ValueMapper<ObjectValue> {
 
-  protected static final ExternalTaskClientLogger LOG = ExternalTaskClientLogger.CLIENT_LOGGER;
+  protected static final EngineClientLogger INTERNAL_LOG = ExternalTaskClientLogger.ENGINE_CLIENT_LOGGER;
+  protected static final ExternalTaskClientLogger USER_LOG = ExternalTaskClientLogger.CLIENT_LOGGER;
 
   protected static final String OBJECT_TYPE_NAME = "objectTypeName";
   protected static final String SERIALIZATION_DATA_FORMAT = "serializationDataFormat";
   protected static final String TRANSIENT = "transient";
 
-  public static final String SERIALIZATION_DATA_FORMAT_JSON = "application/json";
-  public static final String SERIALIZATION_DATA_FORMAT_JAVA = "application/x-java-serialized-object";
+  protected static final String SERIALIZATION_DATA_FORMAT_JSON = "application/json";
+  protected static final String SERIALIZATION_DATA_FORMAT_XML = "application/xml";
+  protected static final String SERIALIZATION_DATA_FORMAT_JAVA = "application/x-java-serialized-object";
 
   protected ObjectMapper objectMapper;
+  protected Class<?> spinDataFormatsClass;
 
   public ObjectValueMapper(ObjectMapper objectMapper) {
     this.objectMapper = objectMapper;
+    this.spinDataFormatsClass = reflectSpinDataFormatsClazz();
   }
 
   @Override
@@ -58,16 +71,16 @@ public class ObjectValueMapper implements ValueMapper<ObjectValue> {
 
   @Override
   public ObjectValue deserializeTypedValue(TypedValueDto typedValueDto) throws EngineClientException {
-    String serializedValue = (String) typedValueDto.getValue();
-
     Map<String, Object> valueInfo = typedValueDto.getValueInfo();
 
+    String serializedValue = (String) typedValueDto.getValue();
+    String objectTypeName = (String) valueInfo.get(OBJECT_TYPE_NAME);
     Class<?> type = null;
     try {
-      type = Class.forName((String) valueInfo.get(OBJECT_TYPE_NAME));
+      type = Class.forName(objectTypeName);
     }
     catch (ClassNotFoundException e) {
-      throw new EngineClientException(e);
+      throw INTERNAL_LOG.objectTypeNameUnknownException(objectTypeName, serializedValue);
     }
 
     String serializationDataFormat = (String) valueInfo.get(SERIALIZATION_DATA_FORMAT);
@@ -78,12 +91,16 @@ public class ObjectValueMapper implements ValueMapper<ObjectValue> {
         deserializedValue = fromJson(serializedValue, type);
         break;
 
+      case SERIALIZATION_DATA_FORMAT_XML:
+        deserializedValue = fromXml(serializedValue, type);
+        break;
+
       case SERIALIZATION_DATA_FORMAT_JAVA:
-        deserializedValue = fromJavaBase64(serializedValue);
+        deserializedValue = fromJavaBase64(serializedValue, type);
         break;
 
       default:
-        throw LOG.unsupportedSerializationDataFormat(typedValueDto);
+        throw INTERNAL_LOG.unsupportedSerializationDataFormatException(serializationDataFormat, typedValueDto);
     }
 
     ObjectValueImpl objectValue = new ObjectValueImpl(deserializedValue);
@@ -91,7 +108,6 @@ public class ObjectValueMapper implements ValueMapper<ObjectValue> {
     objectValue.setSerializedValue(serializedValue);
     objectValue.setSerializationDataFormat(serializationDataFormat);
 
-    String objectTypeName = (String) valueInfo.get(OBJECT_TYPE_NAME);
     objectValue.setObjectTypeName(objectTypeName);
 
     Boolean isTransient = (Boolean) valueInfo.get(TRANSIENT);
@@ -106,18 +122,61 @@ public class ObjectValueMapper implements ValueMapper<ObjectValue> {
     try {
       return objectMapper.readValue(serializedValue, type);
     }
+    catch (JsonParseException | JsonMappingException e) {
+      throw INTERNAL_LOG.invalidSerializedValueException(serializedValue, e.getMessage()); // avoid exceptions of third party components
+    }
     catch (IOException e) {
-      throw new EngineClientException(e.getMessage()); // avoid exceptions of third party components
+      throw INTERNAL_LOG.invalidSerializedValueException(serializedValue, e.toString());
     }
   }
 
-  protected Object fromJavaBase64(String serializedValue) throws EngineClientException {
+  protected Object fromXml(String serializedValue, Class<?> type) throws EngineClientException {
+    if (spinDataFormatsClass == null) {
+      throw INTERNAL_LOG.missingSpinXmlDependencyExceptionInternal();
+    }
+
+    try {
+      Object xmlDataFormat = reflectXmlDataFormat();
+      Object reader = xmlDataFormat.getClass()
+        .getMethod("getReader")
+        .invoke(xmlDataFormat);
+
+      Object mappedObject = null;
+      try (StringReader stringReader = new StringReader(serializedValue)) {
+        try (BufferedReader bufferedReader = new BufferedReader(stringReader)) {
+          mappedObject = reader.getClass()
+            .getMethod("readInput", Reader.class)
+            .invoke(reader, bufferedReader);
+        }
+        catch (IOException e) {
+          throw new EngineClientException(e); // unable to close resource
+        }
+      }
+
+      Object mapper = reflectXmlMapper(xmlDataFormat);
+      return mapper.getClass()
+        .getMethod("mapInternalToJava", Object.class, String.class)
+        .invoke(mapper, mappedObject, type.getTypeName());
+
+    }
+    catch (InvocationTargetException e) {
+      throw INTERNAL_LOG.invalidSerializedValueException(serializedValue, e.getTargetException().toString());
+    }
+    catch (IllegalAccessException | NoSuchMethodException e) {
+      throw INTERNAL_LOG.invalidSerializedValueException(serializedValue, e.toString()); // reflection problem
+    }
+  }
+
+  protected Object fromJavaBase64(String serializedValue, Class<?> type) throws EngineClientException {
     byte[] base64DecodedSerializedValue = Base64.getDecoder().decode(serializedValue);
     try (ObjectInputStream objectInputStream = new ObjectInputStream(new ByteArrayInputStream(base64DecodedSerializedValue))) {
       return objectInputStream.readObject();
     }
-    catch (IOException | ClassNotFoundException e) {
-      throw new EngineClientException(e);
+    catch (IOException e) {
+      throw INTERNAL_LOG.invalidSerializedValueException(serializedValue, e.toString());
+    }
+    catch (ClassNotFoundException e) {
+      throw INTERNAL_LOG.objectTypeNameUnknownException(type.getTypeName(), serializedValue);
     }
   }
 
@@ -150,12 +209,16 @@ public class ObjectValueMapper implements ValueMapper<ObjectValue> {
         serializedObject = toJson(objectValue);
         break;
 
+      case SERIALIZATION_DATA_FORMAT_XML:
+        serializedObject = toXml(objectValue);
+        break;
+
       case SERIALIZATION_DATA_FORMAT_JAVA:
         serializedObject = toJavaBase64(objectValue);
       break;
 
       default:
-        throw LOG.unsupportedSerializationDataFormat(objectValue);
+        throw USER_LOG.unsupportedSerializationDataFormat(objectValue);
     }
 
     serializedObjectValue.setSerializedValue(serializedObject);
@@ -168,25 +231,77 @@ public class ObjectValueMapper implements ValueMapper<ObjectValue> {
     return serializedObjectValue;
   }
 
+  protected String toJson(ObjectValue objectValue) {
+    try {
+      return objectMapper.writeValueAsString(objectValue.getValue());
+    }
+    catch (JsonProcessingException e) {
+      throw USER_LOG.unknownTypeException(objectValue);
+    }
+  }
+
+  protected String toXml(ObjectValue objectValue) {
+    if (spinDataFormatsClass == null) {
+      throw USER_LOG.missingSpinXmlDependencyException();
+    }
+
+    try {
+
+      Object xmlDataFormat = reflectXmlDataFormat();
+      Object mapper = reflectXmlMapper(xmlDataFormat);
+
+      Object object = mapper.getClass()
+        .getMethod("mapJavaToInternal", Object.class)
+        .invoke(mapper, objectValue.getValue());
+
+      Object writer = xmlDataFormat.getClass()
+        .getMethod("getWriter")
+        .invoke(xmlDataFormat);
+
+      StringWriter valueWriter = new StringWriter();
+
+      writer.getClass()
+        .getMethod("writeToWriter", Writer.class, Object.class)
+        .invoke(writer, valueWriter, object);
+
+      return valueWriter.toString();
+
+    }
+    catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
+      throw USER_LOG.unknownTypeException(objectValue);
+    }
+  }
+
   protected String toJavaBase64(ObjectValue objectValue) {
     ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
     try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream)) {
       objectOutputStream.writeObject(objectValue.getValue());
     }
     catch (IOException e) {
-      throw LOG.unsupportedTypeException(objectValue);
+      throw USER_LOG.unknownTypeException(objectValue);
     }
 
     return Base64.getEncoder().encodeToString(byteArrayOutputStream.toByteArray());
   }
 
-  protected String toJson(ObjectValue objectValue) {
+  protected Class<?> reflectSpinDataFormatsClazz() {
     try {
-      return objectMapper.writeValueAsString(objectValue.getValue());
+      return Class.forName("org.camunda.spin.DataFormats");
+    } catch (ClassNotFoundException e) {
+      return null;
     }
-    catch (JsonProcessingException e) {
-      throw LOG.unsupportedTypeException(objectValue);
-    }
+  }
+
+  protected Object reflectXmlDataFormat() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    return spinDataFormatsClass
+      .getMethod("getDataFormat", String.class)
+      .invoke(null, SERIALIZATION_DATA_FORMAT_XML);
+  }
+
+  protected Object reflectXmlMapper(Object xmlDataFormat) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    return xmlDataFormat.getClass()
+      .getMethod("getMapper")
+      .invoke(xmlDataFormat);
   }
 
 }
