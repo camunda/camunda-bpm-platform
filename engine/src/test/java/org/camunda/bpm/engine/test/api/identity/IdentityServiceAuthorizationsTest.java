@@ -183,10 +183,11 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     lockUser(userId, "invalid pwd");
 
     // assume
+    int maxNumOfAttempts = 10;
     UserEntity lockedUser = (UserEntity) identityService.createUserQuery().userId(jonny.getId()).singleResult();
     assertNotNull(lockedUser);
     assertNotNull(lockedUser.getLockExpirationTime());
-    assertEquals(5, lockedUser.getAttempts());
+    assertEquals(maxNumOfAttempts, lockedUser.getAttempts());
 
 
     // create global auth
@@ -221,10 +222,11 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     lockUser(userId, "invalid pwd");
 
     // assume
+    int maxNumOfAttempts = 10;
     UserEntity lockedUser = (UserEntity) identityService.createUserQuery().userId(jonny.getId()).singleResult();
     assertNotNull(lockedUser);
     assertNotNull(lockedUser.getLockExpirationTime());
-    assertEquals(5, lockedUser.getAttempts());
+    assertEquals(maxNumOfAttempts, lockedUser.getAttempts());
 
     processEngineConfiguration.setAuthorizationEnabled(true);
     identityService.setAuthentication("admin", null, null);
@@ -241,10 +243,11 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     processEngineConfiguration.setAuthorizationEnabled(false);
 
     // then
+    int maxNumOfLoginAttempts = 10;
     lockedUser = (UserEntity) identityService.createUserQuery().userId(jonny.getId()).singleResult();
     assertNotNull(lockedUser);
     assertNotNull(lockedUser.getLockExpirationTime());
-    assertEquals(5, lockedUser.getAttempts());
+    assertEquals(maxNumOfLoginAttempts, lockedUser.getAttempts());
   }
 
   public void testGroupCreateAuthorizations() {

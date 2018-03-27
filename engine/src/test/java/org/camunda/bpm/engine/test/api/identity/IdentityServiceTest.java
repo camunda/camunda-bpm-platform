@@ -635,7 +635,7 @@ public class IdentityServiceTest {
 
     Date now = sdf.parse("2000-01-24T13:00:00");
     ClockUtil.setCurrentTime(now);
-    for (int i = 0; i <= 6; i++) {
+    for (int i = 0; i <= 11; i++) {
       assertFalse(identityService.checkPassword("johndoe", "invalid pwd"));
       now = DateUtils.addMinutes(now, 1);
       ClockUtil.setCurrentTime(now);
