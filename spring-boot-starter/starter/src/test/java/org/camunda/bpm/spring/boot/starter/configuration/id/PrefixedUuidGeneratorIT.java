@@ -1,24 +1,17 @@
 package org.camunda.bpm.spring.boot.starter.configuration.id;
 
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.camunda.bpm.spring.boot.starter.configuration.id.IdGeneratorConfiguration.PREFIXED;
-import static org.junit.Assert.assertEquals;
-
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.cfg.IdGenerator;
-import org.camunda.bpm.engine.spring.SpringProcessEngineConfiguration;
 import org.camunda.bpm.spring.boot.starter.property.CamundaBpmProperties;
-import org.camunda.bpm.spring.boot.starter.property.GenericProperties;
 import org.camunda.bpm.spring.boot.starter.test.nonpa.TestApplication;
 import org.camunda.bpm.spring.boot.starter.util.CamundaSpringBootUtil;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.camunda.bpm.spring.boot.starter.configuration.id.IdGeneratorConfiguration.PREFIXED;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(

@@ -1,25 +1,19 @@
 package org.camunda.bpm.spring.boot.starter.configuration.impl;
 
 import java.util.Map;
-
 import org.camunda.bpm.engine.spring.SpringProcessEngineConfiguration;
 import org.camunda.bpm.spring.boot.starter.configuration.Ordering;
 import org.camunda.bpm.spring.boot.starter.property.GenericProperties;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.bind.Bindable;
 import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.boot.context.properties.source.ConfigurationPropertyName;
 import org.springframework.boot.context.properties.source.ConfigurationPropertySource;
 import org.springframework.boot.context.properties.source.MapConfigurationPropertySource;
-import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.Order;
 import org.springframework.util.CollectionUtils;
 
 @Order(Ordering.DEFAULT_ORDER - 1)
 public class GenericPropertiesConfiguration extends AbstractCamundaConfiguration {
-
-  @Autowired
-  public ApplicationContext applicationContext;
 
   @Override
   public void preInit(SpringProcessEngineConfiguration springProcessEngineConfiguration) {
