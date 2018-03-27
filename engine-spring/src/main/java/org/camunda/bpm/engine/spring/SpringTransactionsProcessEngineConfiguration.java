@@ -30,9 +30,6 @@ import org.camunda.bpm.engine.impl.interceptor.LogInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.ProcessApplicationContextInterceptor;
 import org.camunda.bpm.engine.impl.variable.serializer.jpa.EntityManagerSession;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.ContextResource;
 import org.springframework.core.io.Resource;
@@ -52,6 +49,7 @@ public class SpringTransactionsProcessEngineConfiguration extends ProcessEngineC
   protected String deploymentName = "SpringAutoDeployment";
   protected Resource[] deploymentResources = new Resource[0];
   protected String deploymentTenantId;
+  protected boolean deployChangedOnly;
 
   public SpringTransactionsProcessEngineConfiguration() {
     transactionsExternallyManaged = true;
@@ -110,7 +108,7 @@ public class SpringTransactionsProcessEngineConfiguration extends ProcessEngineC
 
       DeploymentBuilder deploymentBuilder = repositoryService
         .createDeployment()
-        .enableDuplicateFiltering(false)
+        .enableDuplicateFiltering(deployChangedOnly)
         .name(deploymentName)
         .tenantId(deploymentTenantId);
 
@@ -189,6 +187,14 @@ public class SpringTransactionsProcessEngineConfiguration extends ProcessEngineC
 
   public void setDeploymentTenantId(String deploymentTenantId) {
     this.deploymentTenantId = deploymentTenantId;
+  }
+
+  public boolean isDeployChangedOnly() {
+    return deployChangedOnly;
+  }
+
+  public void setDeployChangedOnly(boolean deployChangedOnly) {
+    this.deployChangedOnly = deployChangedOnly;
   }
 
 }

@@ -46,8 +46,11 @@ public class SpringAutoDeployTest extends PvmTestCase {
   protected static final String CTX_CMMN_BPMN_TOGETHER_PATH
       = "org/camunda/bpm/engine/spring/test/autodeployment/SpringAutoDeployCmmnBpmnTest-context.xml";
 
+  protected static final String CTX_DEPLOY_CHANGE_ONLY_PATH
+      = "org/camunda/bpm/engine/spring/test/autodeployment/SpringAutoDeployDeployChangeOnlyTest-context.xml";
+
   protected static final String CTX_TENANT_ID_PATH
-  = "org/camunda/bpm/engine/spring/test/autodeployment/SpringAutoDeployTenantIdTest-context.xml";
+      = "org/camunda/bpm/engine/spring/test/autodeployment/SpringAutoDeployTenantIdTest-context.xml";
 
 
   protected ApplicationContext applicationContext;
@@ -113,6 +116,40 @@ public class SpringAutoDeployTest extends PvmTestCase {
 
     assertEquals(1, caseDefs);
     assertEquals(3, procDefs);
+  }
+
+  // when deployChangeOnly=true, new deployment should be created only for the changed resources
+  public void testDeployChangeOnly() throws Exception {
+    // given
+    createAppContext(CTX_DEPLOY_CHANGE_ONLY_PATH);
+    // assume
+    assertEquals(1, repositoryService.createDeploymentQuery().count());
+
+    // when
+    ((AbstractXmlApplicationContext) applicationContext).destroy();
+
+    String filePath = "org/camunda/bpm/engine/spring/test/autodeployment/autodeploy.a.bpmn20.xml";
+    String originalBpmnFileContent = IoUtil.readFileAsString(filePath);
+    String updatedBpmnFileContent = originalBpmnFileContent.replace("flow1", "fromStartToEndFlow");
+    assertTrue(updatedBpmnFileContent.length() > originalBpmnFileContent.length());
+    IoUtil.writeStringToFile(updatedBpmnFileContent, filePath);
+
+    // Classic produced/consumer problem here:
+    // The file is already written in Java, but not yet completely persisted by the OS
+    // Constructing the new app context reads the same file which is sometimes not yet fully written to disk
+    waitUntilFileIsWritten(filePath, updatedBpmnFileContent.length());
+
+    try {
+      applicationContext = new ClassPathXmlApplicationContext(CTX_DEPLOY_CHANGE_ONLY_PATH);
+      repositoryService = (RepositoryService) applicationContext.getBean("repositoryService");
+    } finally {
+      // Reset file content such that future test are not seeing something funny
+      IoUtil.writeStringToFile(originalBpmnFileContent, filePath);
+    }
+
+    // then
+    assertEquals(2, repositoryService.createDeploymentQuery().count());
+    assertEquals(4, repositoryService.createProcessDefinitionQuery().count());
   }
 
   // Updating the bpmn20 file should lead to a new deployment when restarting the Spring container
