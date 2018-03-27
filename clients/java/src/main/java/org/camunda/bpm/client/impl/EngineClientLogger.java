@@ -94,6 +94,6 @@ public class EngineClientLogger extends ExternalTaskClientLogger {
 
   public EngineClientException objectTypeNameUnknownException(String objectTypeName, Object serializedValue) {
     return new EngineClientException(exceptionMessage(
-      "013", "Exception while deserializing object value '{}': object type '{}' is unknown", serializedValue, objectTypeName));
+      "014", "Exception while deserializing object value '{}': object type '{}' is unknown", serializedValue, objectTypeName));
   }
 }
