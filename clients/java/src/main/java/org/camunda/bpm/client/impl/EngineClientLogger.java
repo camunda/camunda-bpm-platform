@@ -82,9 +82,17 @@ public class EngineClientLogger extends ExternalTaskClientLogger {
       typedValueDto, serializationDataFormat));
   }
 
-  public EngineClientException missingSpinXmlDependencyExceptionInternal() {
+  public EngineClientException missingSpinDependencyExceptionInternal(String mapperName) {
+    String spinDependency = null;
+    if (mapperName.equals("xml")) {
+      spinDependency = "camunda-spin-dataformat-xml-dom";
+    } else {
+      spinDependency = "camunda-spin-dataformat-json-jackson";
+    }
+
     return new EngineClientException(exceptionMessage(
-      "012", "Exception while deserializing object value of type 'xml': the dependency 'camunda-spin-dataformat-xml-dom' needs to be added"));
+      "012", "Exception while deserializing object value of type '{}': " +
+        "the dependency '{}' needs to be added", mapperName, spinDependency));
   }
 
   public EngineClientException invalidSerializedValueException(String serializedValue, String message) {
@@ -96,4 +104,5 @@ public class EngineClientLogger extends ExternalTaskClientLogger {
     return new EngineClientException(exceptionMessage(
       "014", "Exception while deserializing object value '{}': object type '{}' is unknown", serializedValue, objectTypeName));
   }
+
 }

@@ -132,7 +132,7 @@ public class ObjectValueMapper implements ValueMapper<ObjectValue> {
 
   protected Object fromXml(String serializedValue, Class<?> type) throws EngineClientException {
     if (spinDataFormatsClass == null) {
-      throw INTERNAL_LOG.missingSpinXmlDependencyExceptionInternal();
+      throw INTERNAL_LOG.missingSpinDependencyExceptionInternal("xml");
     }
 
     try {

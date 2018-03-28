@@ -65,8 +65,22 @@
 
     <!-- optional -->
     <dependency>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-engine-plugin-spin</artifactId>
+      <version>7.9.0-SNAPSHOT</version>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
       <groupId>org.camunda.spin</groupId>
       <artifactId>camunda-spin-dataformat-xml-dom</artifactId>
+      <version>1.6.0-SNAPSHOT</version>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.spin</groupId>
+      <artifactId>camunda-spin-dataformat-json-jackson</artifactId>
       <version>1.6.0-SNAPSHOT</version>
       <optional>true</optional>
     </dependency>

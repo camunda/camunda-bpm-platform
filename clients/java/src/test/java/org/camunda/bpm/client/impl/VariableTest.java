@@ -13,6 +13,8 @@
 package org.camunda.bpm.client.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.camunda.spin.plugin.variable.SpinValues.jsonValue;
+import static org.camunda.spin.plugin.variable.SpinValues.xmlValue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.atLeastOnce;
@@ -72,6 +74,8 @@ import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.bpm.engine.variable.value.ShortValue;
 import org.camunda.bpm.engine.variable.value.StringValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
+import org.camunda.spin.impl.json.jackson.JacksonJsonNode;
+import org.camunda.spin.impl.xml.dom.DomXmlElement;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -2167,6 +2171,100 @@ public class VariableTest {
     assertThat(unsupportedTypeException).hasMessageContaining("Exception while converting variable value");
   }
 
+  /* tests for spin types */
+
+  @Test
+  public void shouldDeserializeSpinTypes() throws IOException {
+    // given
+    ExternalTask externalTaskMock = MockProvider.createExternalTaskWithoutVariables();
+
+    TypedValueDto typedValueDtoJson = createTypedValueDto("[1, 2, 3, 4, 5]", "Json");
+    TypedValueDto typedValueDtoXml = createTypedValueDto("<entry>hello world</entry>", "Xml");
+
+    Map<String, TypedValueDto> typedValueDtoMap = new HashMap<>();
+    typedValueDtoMap.put("aJsonVariable", typedValueDtoJson);
+    typedValueDtoMap.put("aXmlVariable", typedValueDtoXml);
+    ((ExternalTaskImpl)externalTaskMock).setVariables(typedValueDtoMap);
+
+    mockFetchAndLockResponse(Collections.singletonList(externalTaskMock));
+
+    ExternalTaskClient client = ExternalTaskClient.create()
+      .baseUrl(MockProvider.BASE_URL)
+      .build();
+
+    final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
+    final List<ExternalTask> externalTaskReference = new ArrayList<>(); // list, as container must be final and changeable
+
+    TopicSubscriptionBuilder topicSubscriptionBuilder =
+      client.subscribe(MockProvider.TOPIC_NAME)
+        .lockDuration(5000)
+        .handler((externalTask, externalTaskService) -> {
+          externalTaskReference.add(externalTask);
+
+          handlerInvoked.set(true);
+        });
+
+    // when
+    topicSubscriptionBuilder.open();
+    while (!handlerInvoked.get()) {
+      // busy waiting
+    }
+    client.stop();
+
+    // then
+    ExternalTask externalTask = externalTaskReference.get(0);
+
+    assertSpinVariableValue(externalTask, "aJsonVariable", "[1,2,3,4,5]", "Json");
+    assertSpinVariableValue(externalTask, "aXmlVariable", "<?xml version=\"1.0\" encoding=\"UTF-8\"?><entry>hello world</entry>\n", "Xml");
+  }
+
+  @Test
+  public void shouldSetSpinTypes() throws Exception {
+    // given
+    ObjectMapper objectMapper = spy(ObjectMapper.class);
+    whenNew(ObjectMapper.class).withNoArguments().thenReturn(objectMapper);
+
+    mockFetchAndLockResponse(Collections.singletonList(MockProvider.createExternalTaskWithoutVariables()));
+
+    ExternalTaskClient client = ExternalTaskClient.create()
+      .baseUrl(MockProvider.BASE_URL)
+      .build();
+
+    final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
+    final List<ExternalTask> externalTaskReference = new ArrayList<>(); // list, as container must be final and changeable
+
+    TopicSubscriptionBuilder topicSubscriptionBuilder =
+      client.subscribe(MockProvider.TOPIC_NAME)
+        .lockDuration(5000)
+        .handler((externalTask, externalTaskService) -> {
+          externalTask.setVariableTyped("aJsonVariable", jsonValue("[1,2,3,4,5]").create());
+          externalTask.setVariableTyped("aXmlVariable", xmlValue("<entry>hello world</entry>").create());
+
+          externalTaskService.complete(externalTask);
+
+          externalTaskReference.add(externalTask);
+          handlerInvoked.set(true);
+        });
+
+    // when
+    topicSubscriptionBuilder.open();
+    while (!handlerInvoked.get()) {
+      // busy waiting
+    }
+    client.stop();
+
+    // then
+    ExternalTask externalTask = externalTaskReference.get(0);
+
+    assertSpinVariableValue(externalTask, "aJsonVariable", "[1,2,3,4,5]", "Json");
+    assertSpinVariableValue(externalTask, "aXmlVariable", "<?xml version=\"1.0\" encoding=\"UTF-8\"?><entry>hello world</entry>\n", "Xml");
+
+    Map<String, TypedValueDto> expectedVariables = new HashMap<>();
+    expectedVariables.put("aJsonVariable", createTypedValueDto("[1,2,3,4,5]", "Json"));
+    expectedVariables.put("aXmlVariable", createTypedValueDto("<?xml version=\"1.0\" encoding=\"UTF-8\"?><entry>hello world</entry>\n", "Xml"));
+    assertVariablePayloadOfCompleteRequest(objectMapper, expectedVariables);
+  }
+
   // helper //////////////////////////////////
 
   protected String encodeObjectToBase64(Object object) throws IOException {
@@ -2183,6 +2281,32 @@ public class VariableTest {
     assertThat(objectValue.getObjectType()).isEqualTo(type);
     assertThat(objectValue.getObjectTypeName()).isEqualTo(type.getName());
     assertThat(objectValue.getSerializationDataFormat()).isEqualTo(serializationDataFormat);
+  }
+
+  protected void assertSpinVariableValue(ExternalTask externalTask, String variableName, String variableValue, String variableType) {
+    assertThat(externalTask.getVariableTyped(variableName).getType().getName()).isEqualTo(variableType.toLowerCase());
+    assertThat(externalTask.getVariableTyped(variableName).getValue().toString()).isEqualTo(variableValue);
+
+    assertThat(externalTask.getAllVariablesTyped().getValueTyped(variableName).getType().getName()).isEqualTo(variableType.toLowerCase());
+    assertThat(externalTask.getAllVariablesTyped().getValueTyped(variableName).getValue().toString()).isEqualTo(variableValue);
+
+    assertThat((Object) externalTask.getVariable(variableName).toString()).isEqualTo(variableValue);
+
+    assertThat(externalTask.getAllVariables().get(variableName).toString()).isEqualTo(variableValue);
+
+    if (externalTask.getVariableTyped(variableName).getValue() instanceof JacksonJsonNode) {
+      assertThat(externalTask.getVariableTyped(variableName).getValue()).isInstanceOf(JacksonJsonNode.class);
+      assertThat(externalTask.getAllVariablesTyped().getValueTyped(variableName).getValue()).isInstanceOf(JacksonJsonNode.class);
+      assertThat((Object) externalTask.getVariable(variableName)).isInstanceOf(JacksonJsonNode.class);
+      assertThat(externalTask.getAllVariables().get(variableName)).isInstanceOf(JacksonJsonNode.class);
+    }
+
+    if (externalTask.getVariableTyped(variableName).getValue() instanceof DomXmlElement) {
+      assertThat(externalTask.getVariableTyped(variableName).getValue()).isInstanceOf(DomXmlElement.class);
+      assertThat(externalTask.getAllVariablesTyped().getValueTyped(variableName).getValue()).isInstanceOf(DomXmlElement.class);
+      assertThat((Object) externalTask.getVariable(variableName)).isInstanceOf(DomXmlElement.class);
+      assertThat(externalTask.getAllVariables().get(variableName)).isInstanceOf(DomXmlElement.class);
+    }
   }
 
   protected void assertVariableValue(ExternalTask externalTask, String variableName, Object variableValue, String variableType) {

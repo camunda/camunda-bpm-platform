@@ -27,14 +27,16 @@ import org.camunda.bpm.client.impl.variable.mapper.primitive.NullValueMapper;
 import org.camunda.bpm.client.impl.variable.mapper.primitive.PrimitiveValueMapper;
 import org.camunda.bpm.client.impl.variable.mapper.primitive.ShortValueMapper;
 import org.camunda.bpm.client.impl.variable.mapper.primitive.StringValueMapper;
+import org.camunda.bpm.client.impl.variable.mapper.serializable.JsonValueMapper;
 import org.camunda.bpm.client.impl.variable.mapper.serializable.ObjectValueMapper;
+import org.camunda.bpm.client.impl.variable.mapper.serializable.XmlValueMapper;
 import org.camunda.bpm.client.task.impl.dto.TypedValueDto;
 import org.camunda.bpm.engine.variable.VariableMap;
-import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.impl.VariableMapImpl;
 import org.camunda.bpm.engine.variable.impl.type.ObjectTypeImpl;
 import org.camunda.bpm.engine.variable.impl.value.UntypedValueImpl;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
+import org.camunda.bpm.engine.variable.value.SerializableValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 import java.util.HashMap;
@@ -63,8 +65,10 @@ public class VariableMappers {
     registerMapper(new LongValueMapper());
     registerMapper(new DoubleValueMapper());
 
-    // object mappers
+    // serializable mappers
     registerMapper(new ObjectValueMapper(objectMapper));
+    registerMapper(new JsonValueMapper());
+    registerMapper(new XmlValueMapper());
   }
 
   public VariableMap deserializeVariables(Map<String, TypedValueDto> typedValueDtoMap) throws EngineClientException {
