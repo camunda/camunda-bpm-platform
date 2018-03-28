@@ -14,6 +14,8 @@
 package org.camunda.bpm.integrationtest.functional.cdi;
 
 import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.runtime.JobQuery;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.integrationtest.functional.cdi.beans.DependentScopedBean;
 import org.camunda.bpm.integrationtest.functional.cdi.beans.ErrorDelegate;
 import org.camunda.bpm.integrationtest.functional.cdi.beans.RetryConfig;
@@ -58,9 +60,13 @@ public class CdiRetryConfigurationTest extends AbstractFoxPlatformIntegrationTes
   @OperateOnDeployment("clientDeployment")
   public void testResolveBean() {
     // given
-    runtimeService.startProcessInstanceByKey("testRetry");
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testRetry");
 
-    Job job = managementService.createJobQuery().singleResult();
+    JobQuery query = managementService
+        .createJobQuery()
+        .processInstanceId(processInstance.getId());
+
+    Job job = query.singleResult();
 
     // when job fails
      try {
@@ -70,7 +76,7 @@ public class CdiRetryConfigurationTest extends AbstractFoxPlatformIntegrationTes
      }
 
      // then
-     job = managementService.createJobQuery().singleResult();
+     job = query.singleResult();
      Assert.assertEquals(6, job.getRetries());
   }
 }

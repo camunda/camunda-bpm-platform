@@ -13,9 +13,10 @@
 package org.camunda.bpm.integrationtest.functional.spring;
 
 import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.runtime.JobQuery;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.integrationtest.functional.spring.beans.ErrorDelegate;
 import org.camunda.bpm.integrationtest.functional.spring.beans.RetryConfig;
-import org.camunda.bpm.integrationtest.functional.spring.beans.ExampleBean;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.camunda.bpm.integrationtest.util.DeploymentHelper;
 import org.camunda.bpm.integrationtest.util.TestContainer;
@@ -87,9 +88,13 @@ public class SpringRetryConfigurationTest extends AbstractFoxPlatformIntegration
   @OperateOnDeployment("clientDeployment")
   public void testResolveRetryConfigBean() {
     // given
-    runtimeService.startProcessInstanceByKey("testRetry");
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testRetry");
 
-    Job job = managementService.createJobQuery().singleResult();
+    JobQuery query = managementService
+        .createJobQuery()
+        .processInstanceId(processInstance.getId());
+
+    Job job = query.singleResult();
 
     // when job fails
     try {
@@ -99,7 +104,7 @@ public class SpringRetryConfigurationTest extends AbstractFoxPlatformIntegration
     }
 
     // then
-    job = managementService.createJobQuery().singleResult();
+    job = query.singleResult();
     Assert.assertEquals(6, job.getRetries());
   }
 
