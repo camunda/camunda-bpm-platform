@@ -130,3 +130,19 @@ table.cam-table > tbody > tr > td.action {
     min-height: 250px;
   }
 }
+
+table.group,
+table.tenant {
+  table-layout: fixed;
+
+  td {
+    &.group-id,
+    &.group-name,
+    &.group-type,
+    &.tenant-name,
+    &.tenant-id {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+}
