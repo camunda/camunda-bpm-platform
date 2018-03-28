@@ -23,7 +23,7 @@
          text-empty="{{ 'TENANTS_NO_TENANTS' | translate }}"
          storage-group="'ANT'"
          blocked="blocked">
-      <table class="cam-table">
+      <table class="cam-table tenant">
         <thead cam-sortable-table-header
                default-sort-by="id"
                default-sort-order="asc"
@@ -31,11 +31,11 @@
                on-sort-change="onSortChanged(sorting)"
                on-sort-initialized="onSortInitialized(sorting)">
           <tr>
-            <th class="id"
+            <th class="tenant-id"
                 cam-sortable-table-column
                 sort-by-property="id">{{ 'TENANTS_TENANT_ID' | translate }}
             </th>
-            <th class="name"
+            <th class="tenant-name"
                 cam-sortable-table-column
                 sort-by-property="name">{{ 'TENANTS_TENANT_NAME' | translate }}
             </th>
