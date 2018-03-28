@@ -13,12 +13,33 @@
 
 package org.camunda.bpm.engine.test.history;
 
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.ACTIVE;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.AVAILABLE;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.COMPLETED;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.DISABLED;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.ENABLED;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.SUSPENDED;
+import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.TERMINATED;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
+import static org.junit.Assert.assertThat;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.history.HistoricCaseActivityInstance;
 import org.camunda.bpm.engine.history.HistoricCaseActivityInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricCaseInstance;
+import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.Direction;
 import org.camunda.bpm.engine.impl.QueryOrderingProperty;
@@ -37,14 +58,6 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.variable.Variables;
 import org.hamcrest.Matcher;
-
-import java.util.*;
-
-import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.*;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasProperty;
-import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
-import static org.junit.Assert.assertThat;
 
 /**
  * @author Sebastian Menski
@@ -1179,6 +1192,35 @@ public class HistoricCaseActivityInstanceTest extends CmmnProcessEngineTestCase 
         .caseExecutionIdIn(casePlanExecution.getId());
 
     assertEquals(0, query.count());
+  }
+
+  @Deployment(resources={
+    "org/camunda/bpm/engine/test/api/cmmn/oneProcessTaskCaseWithManualActivation.cmmn",
+    "org/camunda/bpm/engine/test/history/HistoricCaseActivityInstanceTest.oneTaskProcess.bpmn20.xml"
+  })
+  public void testHistoricCalledProcessInstanceId() {
+    String taskId = "PI_ProcessTask_1";
+
+    createCaseInstanceByKey("oneProcessTaskCase").getId();
+
+    // as long as the process task is not activated there should be no process instance
+    assertCount(0, historyService.createHistoricProcessInstanceQuery());
+
+    HistoricCaseActivityInstance historicInstance = queryHistoricActivityCaseInstance(taskId);
+    assertNull(historicInstance.getCalledProcessInstanceId());
+
+    // start process task manually to create case instance
+    CaseExecution processTask = queryCaseExecutionByActivityId(taskId);
+    manualStart(processTask.getId());
+
+    // there should exist a new process instance
+    HistoricProcessInstance calledProcessInstance = historyService.createHistoricProcessInstanceQuery().singleResult();
+    assertNotNull(calledProcessInstance);
+    assertNotNull(calledProcessInstance.getEndTime());
+
+    // check that the called process instance id was correctly set
+    historicInstance = queryHistoricActivityCaseInstance(taskId);
+    assertEquals(calledProcessInstance.getId(), historicInstance.getCalledProcessInstanceId());
   }
 
 }
