@@ -25,8 +25,12 @@ import org.camunda.bpm.client.task.impl.dto.TypedValueDto;
 import org.camunda.bpm.client.topic.impl.dto.FetchAndLockRequestDto;
 import org.camunda.bpm.client.topic.impl.dto.TopicRequestDto;
 import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.impl.VariableMapImpl;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -72,10 +76,18 @@ public class EngineClient {
     engineInteraction.postRequest(resourceUrl, null, Void.class);
   }
 
-  public void complete(String taskId, VariableMap variableMap) throws EngineClientException {
-    Map<String, TypedValueDto> typedValueDtoMap = variableMappers.serializeVariables(variableMap);
+  public void complete(String taskId, Map<String, Object> variables, Map<String, Object> localVariables) throws EngineClientException {
+    Map<String, TypedValueDto> typedValueDtoMap = new HashMap<>();
+    if (variables != null) {
+      typedValueDtoMap.putAll(variableMappers.serializeVariables(variables));
+    }
 
-    CompleteRequestDto payload = new CompleteRequestDto(workerId, typedValueDtoMap);
+    Map<String, TypedValueDto> localTypedValueDtoMap = new HashMap<>();
+    if (localVariables != null) {
+      localTypedValueDtoMap.putAll(variableMappers.serializeVariables(localVariables));
+    }
+
+    CompleteRequestDto payload = new CompleteRequestDto(workerId, typedValueDtoMap, localTypedValueDtoMap);
     String resourcePath = COMPLETE_RESOURCE_PATH.replace("{id}", taskId);
     String resourceUrl = baseUrl + resourcePath;
     engineInteraction.postRequest(resourceUrl, payload, Void.class);

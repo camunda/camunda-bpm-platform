@@ -145,39 +145,5 @@ public interface ExternalTask {
    */
   VariableMap getAllVariablesTyped();
 
-  /**
-   * Sets an untyped variable in the task's ancestor execution hierarchy
-   *
-   * @param variableName of the variable
-   * @param variableValue of the variable
-   */
-  void setVariable(String variableName, Object variableValue);
-
-  /**
-   * Sets a typed variable in the task's ancestor execution hierarchy
-   *
-   * @param variableName of the variable
-   * @param variableTypedValue of the variable
-   */
-  void setVariableTyped(String variableName, TypedValue variableTypedValue);
-
-  /**
-   * Sets a map of variables in the task's ancestor execution hierarchy, where the key
-   * and the value represent the variable name and its value. Map can consist of both
-   * typed and untyped variables.
-   *
-   * @param variableMap that contains both typed and untyped values
-   */
-  void setAllVariables(Map<String, Object> variableMap);
-
-  /**
-   * Sets a map of variables in the task's ancestor execution hierarchy, where the key
-   * and the value represent the variable name and its value.
-   * Map can only consist of typed variables.
-   *
-   * @param variableMap that contains typed values
-   */
-  void setAllVariablesTyped(Map<String, TypedValue> variableMap);
-
 }
 

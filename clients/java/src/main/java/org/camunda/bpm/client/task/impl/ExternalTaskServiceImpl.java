@@ -19,6 +19,8 @@ import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
 import org.camunda.bpm.engine.variable.VariableMap;
 
+import java.util.Map;
+
 /**
  * @author Tassilo Weidner
  */
@@ -45,9 +47,18 @@ public class ExternalTaskServiceImpl implements ExternalTaskService {
 
   @Override
   public void complete(ExternalTask externalTask) {
+    complete(externalTask, null,  null);
+  }
+
+  @Override
+  public void complete(ExternalTask externalTask, Map<String, Object> variables) {
+    complete(externalTask, variables,  null);
+  }
+
+  @Override
+  public void complete(ExternalTask externalTask, Map<String, Object> variables,  Map<String, Object> localVariables) {
     try {
-      VariableMap writtenVariableMap = ((ExternalTaskImpl)externalTask).getWrittenVariableMap();
-      engineClient.complete(externalTask.getId(), writtenVariableMap);
+      engineClient.complete(externalTask.getId(), variables, localVariables);
     } catch (EngineClientException e) {
       throw LOG.externalTaskServiceException("completing the external task", e);
     }

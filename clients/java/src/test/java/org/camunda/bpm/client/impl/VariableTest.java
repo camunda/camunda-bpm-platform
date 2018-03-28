@@ -277,9 +277,8 @@ public class VariableTest {
           untypedVariables.put(MockProvider.DATE_VARIABLE_NAME, MockProvider.DATE_VARIABLE_VALUE);
           untypedVariables.put(MockProvider.BYTES_VARIABLE_NAME, MockProvider.BYTES_VARIABLE_VALUE);
           untypedVariables.put(MockProvider.NULL_VARIABLE_NAME, null);
-          externalTask.setAllVariables(untypedVariables);
 
-          externalTaskService.complete(externalTask);
+          externalTaskService.complete(externalTask, untypedVariables);
 
           handlerInvoked.set(true);
         });
@@ -314,7 +313,7 @@ public class VariableTest {
         .lockDuration(5000)
         .handler((externalTask, externalTaskService) -> {
 
-          Map<String, TypedValue> typedVariables = new HashMap<>();
+          Map<String, Object> typedVariables = new HashMap<>();
           typedVariables.put(MockProvider.BOOLEAN_VARIABLE_NAME, Variables.booleanValue(MockProvider.BOOLEAN_VARIABLE_VALUE));
           typedVariables.put(MockProvider.SHORT_VARIABLE_NAME, Variables.shortValue(MockProvider.SHORT_VARIABLE_VALUE));
           typedVariables.put(MockProvider.INTEGER_VARIABLE_NAME, Variables.integerValue(MockProvider.INTEGER_VARIABLE_VALUE));
@@ -324,54 +323,8 @@ public class VariableTest {
           typedVariables.put(MockProvider.DATE_VARIABLE_NAME, Variables.dateValue(MockProvider.DATE_VARIABLE_VALUE));
           typedVariables.put(MockProvider.BYTES_VARIABLE_NAME, Variables.byteArrayValue(MockProvider.BYTES_VARIABLE_VALUE));
           typedVariables.put(MockProvider.NULL_VARIABLE_NAME, Variables.untypedNullValue());
-          externalTask.setAllVariablesTyped(typedVariables);
 
-          externalTaskService.complete(externalTask);
-
-          handlerInvoked.set(true);
-        });
-
-    // when
-    topicSubscriptionBuilder.open();
-    while (!handlerInvoked.get()) {
-      // busy waiting
-    }
-    client.stop();
-
-    // then
-    assertCompleteRequestSerialization(objectMapper);
-  }
-
-  @Test
-  public void shouldSetSingleVariableUntypedAccordingToCompleteRequest() throws Exception {
-    // given
-    mockFetchAndLockResponse(Collections.singletonList(MockProvider.createExternalTaskWithoutVariables()));
-
-    ObjectMapper objectMapper = spy(ObjectMapper.class);
-    whenNew(ObjectMapper.class).withNoArguments().thenReturn(objectMapper);
-
-    ExternalTaskClient client = ExternalTaskClient.create()
-      .baseUrl(MockProvider.BASE_URL)
-      .build();
-
-    final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
-
-    TopicSubscriptionBuilder topicSubscriptionBuilder =
-      client.subscribe(MockProvider.TOPIC_NAME)
-        .lockDuration(5000)
-        .handler((externalTask, externalTaskService) -> {
-
-          externalTask.setVariable(MockProvider.BOOLEAN_VARIABLE_NAME, MockProvider.BOOLEAN_VARIABLE_VALUE);
-          externalTask.setVariable(MockProvider.SHORT_VARIABLE_NAME, MockProvider.SHORT_VARIABLE_VALUE);
-          externalTask.setVariable(MockProvider.INTEGER_VARIABLE_NAME, MockProvider.INTEGER_VARIABLE_VALUE);
-          externalTask.setVariable(MockProvider.LONG_VARIABLE_NAME, MockProvider.LONG_VARIABLE_VALUE);
-          externalTask.setVariable(MockProvider.STRING_VARIABLE_NAME, MockProvider.STRING_VARIABLE_VALUE);
-          externalTask.setVariable(MockProvider.DOUBLE_VARIABLE_NAME, MockProvider.DOUBLE_VARIABLE_VALUE);
-          externalTask.setVariable(MockProvider.DATE_VARIABLE_NAME, MockProvider.DATE_VARIABLE_VALUE);
-          externalTask.setVariable(MockProvider.BYTES_VARIABLE_NAME, MockProvider.BYTES_VARIABLE_VALUE);
-          externalTask.setVariable(MockProvider.NULL_VARIABLE_NAME, null);
-
-          externalTaskService.complete(externalTask);
+          externalTaskService.complete(externalTask, typedVariables);
 
           handlerInvoked.set(true);
         });
@@ -385,940 +338,6 @@ public class VariableTest {
 
     // then
     assertCompleteRequestSerialization(objectMapper);
-  }
-
-  @Test
-  public void shouldSetSingleVariableTypedAccordingToCompleteRequest() throws Exception {
-    // given
-    mockFetchAndLockResponse(Collections.singletonList(MockProvider.createExternalTaskWithoutVariables()));
-
-    ObjectMapper objectMapper = spy(ObjectMapper.class);
-    whenNew(ObjectMapper.class).withNoArguments().thenReturn(objectMapper);
-
-    ExternalTaskClient client = ExternalTaskClient.create()
-      .baseUrl(MockProvider.BASE_URL)
-      .build();
-
-    final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
-
-    TopicSubscriptionBuilder topicSubscriptionBuilder =
-      client.subscribe(MockProvider.TOPIC_NAME)
-        .lockDuration(5000)
-        .handler((externalTask, externalTaskService) -> {
-
-          externalTask.setVariableTyped(MockProvider.BOOLEAN_VARIABLE_NAME, Variables.booleanValue(MockProvider.BOOLEAN_VARIABLE_VALUE));
-          externalTask.setVariableTyped(MockProvider.SHORT_VARIABLE_NAME, Variables.shortValue(MockProvider.SHORT_VARIABLE_VALUE));
-          externalTask.setVariableTyped(MockProvider.INTEGER_VARIABLE_NAME, Variables.integerValue(MockProvider.INTEGER_VARIABLE_VALUE));
-          externalTask.setVariableTyped(MockProvider.LONG_VARIABLE_NAME, Variables.longValue(MockProvider.LONG_VARIABLE_VALUE));
-          externalTask.setVariableTyped(MockProvider.DOUBLE_VARIABLE_NAME, Variables.doubleValue(MockProvider.DOUBLE_VARIABLE_VALUE));
-          externalTask.setVariableTyped(MockProvider.STRING_VARIABLE_NAME, Variables.stringValue(MockProvider.STRING_VARIABLE_VALUE));
-          externalTask.setVariableTyped(MockProvider.DATE_VARIABLE_NAME, Variables.dateValue(MockProvider.DATE_VARIABLE_VALUE));
-          externalTask.setVariableTyped(MockProvider.BYTES_VARIABLE_NAME, Variables.byteArrayValue(MockProvider.BYTES_VARIABLE_VALUE));
-          externalTask.setVariableTyped(MockProvider.NULL_VARIABLE_NAME, Variables.untypedNullValue());
-
-          externalTaskService.complete(externalTask);
-
-          handlerInvoked.set(true);
-        });
-
-    // when
-    topicSubscriptionBuilder.open();
-    while (!handlerInvoked.get()) {
-      // busy waiting
-    }
-    client.stop();
-
-    // then
-    assertCompleteRequestSerialization(objectMapper);
-  }
-  
-  /* tests if written variables can be read properly */
-
-  @Test
-  public void shouldSetSingleVariableUntypedAndGetSingleVariableTyped() throws JsonProcessingException {
-    // given
-    mockFetchAndLockResponse(Collections.singletonList(MockProvider.createExternalTaskWithoutVariables()));
-
-    ExternalTaskClient client = ExternalTaskClient.create()
-      .baseUrl(MockProvider.BASE_URL)
-      .build();
-
-    final ExternalTask[] catchedExternalTask = {null};
-    final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
-    TopicSubscriptionBuilder topicSubscriptionBuilder =
-      client.subscribe(MockProvider.TOPIC_NAME)
-        .lockDuration(5000)
-        .handler((externalTask, externalTaskService) -> {
-
-          externalTask.setVariable(MockProvider.STRING_VARIABLE_NAME, MockProvider.STRING_VARIABLE_VALUE);
-
-          handlerInvoked.set(true);
-
-          catchedExternalTask[0] = externalTask;
-        });
-
-    // when
-    topicSubscriptionBuilder.open();
-    while (!handlerInvoked.get()) {
-      // busy waiting
-    }
-    client.stop();
-
-    // then
-    TypedValue typedValue = catchedExternalTask[0].getVariableTyped(MockProvider.STRING_VARIABLE_NAME);
-    assertThat(typedValue.getType().getName()).isEqualTo(MockProvider.STRING_VARIABLE_TYPE.toLowerCase());
-    assertThat(typedValue.getValue()).isEqualTo(MockProvider.STRING_VARIABLE_VALUE);
-  }
-
-  @Test
-  public void shouldSetSingleVariableUntypedAndGetAllVariablesTyped() throws JsonProcessingException {
-    // given
-    mockFetchAndLockResponse(Collections.singletonList(MockProvider.createExternalTaskWithoutVariables()));
-
-    ExternalTaskClient client = ExternalTaskClient.create()
-      .baseUrl(MockProvider.BASE_URL)
-      .build();
-
-    final ExternalTask[] catchedExternalTask = {null};
-    final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
-    TopicSubscriptionBuilder topicSubscriptionBuilder =
-      client.subscribe(MockProvider.TOPIC_NAME)
-        .lockDuration(5000)
-        .handler((externalTask, externalTaskService) -> {
-
-          externalTask.setVariable(MockProvider.BOOLEAN_VARIABLE_NAME, MockProvider.BOOLEAN_VARIABLE_VALUE);
-          externalTask.setVariable(MockProvider.BYTES_VARIABLE_NAME, MockProvider.BYTES_VARIABLE_VALUE);
-
-          handlerInvoked.set(true);
-
-          catchedExternalTask[0] = externalTask;
-        });
-
-    // when
-    topicSubscriptionBuilder.open();
-    while (!handlerInvoked.get()) {
-      // busy waiting
-    }
-    client.stop();
-
-    // then
-    VariableMap variableMap = catchedExternalTask[0].getAllVariablesTyped();
-    assertThat(variableMap.size()).isEqualTo(2);
-
-    assertThat(variableMap.getValueTyped(MockProvider.BOOLEAN_VARIABLE_NAME).getType().getName()).isEqualTo(MockProvider.BOOLEAN_VARIABLE_TYPE.toLowerCase());
-    assertThat(variableMap.getValueTyped(MockProvider.BOOLEAN_VARIABLE_NAME).getValue()).isEqualTo(MockProvider.BOOLEAN_VARIABLE_VALUE);
-
-    assertThat(variableMap.getValueTyped(MockProvider.BYTES_VARIABLE_NAME).getType().getName()).isEqualTo(MockProvider.BYTES_VARIABLE_TYPE.toLowerCase());
-    assertThat(variableMap.getValueTyped(MockProvider.BYTES_VARIABLE_NAME).getValue()).isEqualTo(MockProvider.BYTES_VARIABLE_VALUE);
-  }
-
-  @Test
-  public void shouldSetSingleVariableTypedAndGetSingleVariableTyped() throws JsonProcessingException {
-    // given
-    mockFetchAndLockResponse(Collections.singletonList(MockProvider.createExternalTaskWithoutVariables()));
-
-    ExternalTaskClient client = ExternalTaskClient.create()
-      .baseUrl(MockProvider.BASE_URL)
-      .build();
-
-    final ExternalTask[] catchedExternalTask = {null};
-    final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
-    TopicSubscriptionBuilder topicSubscriptionBuilder =
-      client.subscribe(MockProvider.TOPIC_NAME)
-        .lockDuration(5000)
-        .handler((externalTask, externalTaskService) -> {
-
-          externalTask.setVariableTyped(MockProvider.BOOLEAN_VARIABLE_NAME, Variables.booleanValue(MockProvider.BOOLEAN_VARIABLE_VALUE));
-          externalTask.setVariableTyped(MockProvider.BYTES_VARIABLE_NAME, Variables.byteArrayValue(MockProvider.BYTES_VARIABLE_VALUE));
-
-          handlerInvoked.set(true);
-
-          catchedExternalTask[0] = externalTask;
-        });
-
-    // when
-    topicSubscriptionBuilder.open();
-    while (!handlerInvoked.get()) {
-      // busy waiting
-    }
-    client.stop();
-
-    // then
-    ExternalTask externalTask = catchedExternalTask[0];
-
-    assertThat(externalTask.getVariableTyped(MockProvider.BOOLEAN_VARIABLE_NAME).getType().getName()).isEqualTo(MockProvider.BOOLEAN_VARIABLE_TYPE.toLowerCase());
-    assertThat(externalTask.getVariableTyped(MockProvider.BOOLEAN_VARIABLE_NAME).getValue()).isEqualTo(MockProvider.BOOLEAN_VARIABLE_VALUE);
-
-    assertThat(externalTask.getVariableTyped(MockProvider.BYTES_VARIABLE_NAME).getType().getName()).isEqualTo(MockProvider.BYTES_VARIABLE_TYPE.toLowerCase());
-    assertThat(externalTask.getVariableTyped(MockProvider.BYTES_VARIABLE_NAME).getValue()).isEqualTo(MockProvider.BYTES_VARIABLE_VALUE);
-  }
-
-  @Test
-  public void shouldSetSingleVariableTypedAndGetAllVariablesTyped() throws JsonProcessingException {
-    // given
-    mockFetchAndLockResponse(Collections.singletonList(MockProvider.createExternalTaskWithoutVariables()));
-
-    ExternalTaskClient client = ExternalTaskClient.create()
-      .baseUrl(MockProvider.BASE_URL)
-      .build();
-
-    final ExternalTask[] catchedExternalTask = {null};
-    final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
-    TopicSubscriptionBuilder topicSubscriptionBuilder =
-      client.subscribe(MockProvider.TOPIC_NAME)
-        .lockDuration(5000)
-        .handler((externalTask, externalTaskService) -> {
-
-          externalTask.setVariableTyped(MockProvider.BOOLEAN_VARIABLE_NAME, Variables.booleanValue(MockProvider.BOOLEAN_VARIABLE_VALUE));
-          externalTask.setVariableTyped(MockProvider.BYTES_VARIABLE_NAME, Variables.byteArrayValue(MockProvider.BYTES_VARIABLE_VALUE));
-
-          handlerInvoked.set(true);
-
-          catchedExternalTask[0] = externalTask;
-        });
-
-    // when
-    topicSubscriptionBuilder.open();
-    while (!handlerInvoked.get()) {
-      // busy waiting
-    }
-    client.stop();
-
-    // then
-    VariableMap variableMap = catchedExternalTask[0].getAllVariablesTyped();
-    assertThat(variableMap.size()).isEqualTo(2);
-
-    assertThat(variableMap.getValueTyped(MockProvider.BOOLEAN_VARIABLE_NAME).getType().getName()).isEqualTo(MockProvider.BOOLEAN_VARIABLE_TYPE.toLowerCase());
-    assertThat(variableMap.getValueTyped(MockProvider.BOOLEAN_VARIABLE_NAME).getValue()).isEqualTo(MockProvider.BOOLEAN_VARIABLE_VALUE);
-
-    assertThat(variableMap.getValueTyped(MockProvider.BYTES_VARIABLE_NAME).getType().getName()).isEqualTo(MockProvider.BYTES_VARIABLE_TYPE.toLowerCase());
-    assertThat(variableMap.getValueTyped(MockProvider.BYTES_VARIABLE_NAME).getValue()).isEqualTo(MockProvider.BYTES_VARIABLE_VALUE);
-  }
-
-  @Test
-  public void shouldSetAllVariablesUntypedAndGetAllVariablesTyped() throws JsonProcessingException {
-    // given
-    mockFetchAndLockResponse(Collections.singletonList(MockProvider.createExternalTaskWithoutVariables()));
-
-    ExternalTaskClient client = ExternalTaskClient.create()
-      .baseUrl(MockProvider.BASE_URL)
-      .build();
-
-    final ExternalTask[] catchedExternalTask = {null};
-    final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
-    TopicSubscriptionBuilder topicSubscriptionBuilder =
-      client.subscribe(MockProvider.TOPIC_NAME)
-        .lockDuration(5000)
-        .handler((externalTask, externalTaskService) -> {
-
-          Map<String, Object> variableMap = new HashMap<>();
-          variableMap.put(MockProvider.BOOLEAN_VARIABLE_NAME, MockProvider.BOOLEAN_VARIABLE_VALUE);
-          variableMap.put(MockProvider.BYTES_VARIABLE_NAME, MockProvider.BYTES_VARIABLE_VALUE);
-          externalTask.setAllVariables(variableMap);
-
-          handlerInvoked.set(true);
-
-          catchedExternalTask[0] = externalTask;
-        });
-
-    // when
-    topicSubscriptionBuilder.open();
-    while (!handlerInvoked.get()) {
-      // busy waiting
-    }
-    client.stop();
-
-    // then
-    VariableMap variableMap = catchedExternalTask[0].getAllVariablesTyped();
-    assertThat(variableMap.size()).isEqualTo(2);
-
-    assertThat(variableMap.getValueTyped(MockProvider.BOOLEAN_VARIABLE_NAME).getType().getName()).isEqualTo(MockProvider.BOOLEAN_VARIABLE_TYPE.toLowerCase());
-    assertThat(variableMap.getValueTyped(MockProvider.BOOLEAN_VARIABLE_NAME).getValue()).isEqualTo(MockProvider.BOOLEAN_VARIABLE_VALUE);
-
-    assertThat(variableMap.getValueTyped(MockProvider.BYTES_VARIABLE_NAME).getType().getName()).isEqualTo(MockProvider.BYTES_VARIABLE_TYPE.toLowerCase());
-    assertThat(variableMap.getValueTyped(MockProvider.BYTES_VARIABLE_NAME).getValue()).isEqualTo(MockProvider.BYTES_VARIABLE_VALUE);
-  }
-
-  @Test
-  public void shouldSetAllVariablesTypedAndGetAllVariablesTyped() throws JsonProcessingException {
-    // given
-    mockFetchAndLockResponse(Collections.singletonList(MockProvider.createExternalTaskWithoutVariables()));
-
-    ExternalTaskClient client = ExternalTaskClient.create()
-      .baseUrl(MockProvider.BASE_URL)
-      .build();
-
-    final ExternalTask[] catchedExternalTask = {null};
-    final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
-    TopicSubscriptionBuilder topicSubscriptionBuilder =
-      client.subscribe(MockProvider.TOPIC_NAME)
-        .lockDuration(5000)
-        .handler((externalTask, externalTaskService) -> {
-
-          Map<String, TypedValue> variableMap = new HashMap<>();
-          variableMap.put(MockProvider.BOOLEAN_VARIABLE_NAME, Variables.booleanValue(MockProvider.BOOLEAN_VARIABLE_VALUE));
-          variableMap.put(MockProvider.BYTES_VARIABLE_NAME, Variables.byteArrayValue(MockProvider.BYTES_VARIABLE_VALUE));
-          externalTask.setAllVariablesTyped(variableMap);
-
-          handlerInvoked.set(true);
-
-          catchedExternalTask[0] = externalTask;
-        });
-
-    // when
-    topicSubscriptionBuilder.open();
-    while (!handlerInvoked.get()) {
-      // busy waiting
-    }
-    client.stop();
-
-    // then
-    VariableMap variableMap = catchedExternalTask[0].getAllVariablesTyped();
-    assertThat(variableMap.size()).isEqualTo(2);
-
-    assertThat(variableMap.getValueTyped(MockProvider.BOOLEAN_VARIABLE_NAME).getType().getName()).isEqualTo(MockProvider.BOOLEAN_VARIABLE_TYPE.toLowerCase());
-    assertThat(variableMap.getValueTyped(MockProvider.BOOLEAN_VARIABLE_NAME).getValue()).isEqualTo(MockProvider.BOOLEAN_VARIABLE_VALUE);
-
-    assertThat(variableMap.getValueTyped(MockProvider.BYTES_VARIABLE_NAME).getType().getName()).isEqualTo(MockProvider.BYTES_VARIABLE_TYPE.toLowerCase());
-    assertThat(variableMap.getValueTyped(MockProvider.BYTES_VARIABLE_NAME).getValue()).isEqualTo(MockProvider.BYTES_VARIABLE_VALUE);
-  }
-
-  @Test
-  public void shouldSetAllVariablesTypedAndGetSingleVariableTyped() throws JsonProcessingException {
-    // given
-    mockFetchAndLockResponse(Collections.singletonList(MockProvider.createExternalTaskWithoutVariables()));
-
-    ExternalTaskClient client = ExternalTaskClient.create()
-      .baseUrl(MockProvider.BASE_URL)
-      .build();
-
-    final ExternalTask[] catchedExternalTask = {null};
-    final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
-    TopicSubscriptionBuilder topicSubscriptionBuilder =
-      client.subscribe(MockProvider.TOPIC_NAME)
-        .lockDuration(5000)
-        .handler((externalTask, externalTaskService) -> {
-
-          Map<String, TypedValue> variableMap = new HashMap<>();
-          variableMap.put(MockProvider.BOOLEAN_VARIABLE_NAME, Variables.booleanValue(MockProvider.BOOLEAN_VARIABLE_VALUE));
-          variableMap.put(MockProvider.BYTES_VARIABLE_NAME, Variables.byteArrayValue(MockProvider.BYTES_VARIABLE_VALUE));
-          externalTask.setAllVariablesTyped(variableMap);
-
-          handlerInvoked.set(true);
-
-          catchedExternalTask[0] = externalTask;
-        });
-
-    // when
-    topicSubscriptionBuilder.open();
-    while (!handlerInvoked.get()) {
-      // busy waiting
-    }
-    client.stop();
-
-    // then
-    ExternalTask externalTask = catchedExternalTask[0];
-
-    assertThat(externalTask.getVariableTyped(MockProvider.BOOLEAN_VARIABLE_NAME).getType().getName()).isEqualTo(MockProvider.BOOLEAN_VARIABLE_TYPE.toLowerCase());
-    assertThat(externalTask.getVariableTyped(MockProvider.BOOLEAN_VARIABLE_NAME).getValue()).isEqualTo(MockProvider.BOOLEAN_VARIABLE_VALUE);
-
-    assertThat(externalTask.getVariableTyped(MockProvider.BYTES_VARIABLE_NAME).getType().getName()).isEqualTo(MockProvider.BYTES_VARIABLE_TYPE.toLowerCase());
-    assertThat(externalTask.getVariableTyped(MockProvider.BYTES_VARIABLE_NAME).getValue()).isEqualTo(MockProvider.BYTES_VARIABLE_VALUE);
-  }
-
-  /* tests if overriding variables works properly */
-
-  @Test
-  public void shouldOverridePreviouslySetVariableBySetAllVariable() throws Exception {
-    // given
-    ObjectMapper objectMapper = spy(ObjectMapper.class);
-    whenNew(ObjectMapper.class).withNoArguments().thenReturn(objectMapper);
-
-    mockFetchAndLockResponse(Collections.singletonList(MockProvider.createExternalTaskWithoutVariables()));
-
-    ExternalTaskClient client = ExternalTaskClient.create()
-      .baseUrl(MockProvider.BASE_URL)
-      .build();
-
-    final ExternalTask[] catchedExternalTask = {null};
-    final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
-    TopicSubscriptionBuilder topicSubscriptionBuilder =
-      client.subscribe(MockProvider.TOPIC_NAME)
-        .lockDuration(5000)
-        .handler((externalTask, externalTaskService) -> {
-
-          Map<String, TypedValue> typedVariableMap = new HashMap<>();
-          typedVariableMap.put("aVariableName", Variables.stringValue("aVariableValue"));
-          externalTask.setAllVariablesTyped(typedVariableMap);
-
-          Map<String, Object> untypedVariableMap = new HashMap<>();
-          untypedVariableMap.put("aVariableName", 47L);
-          externalTask.setAllVariables(untypedVariableMap);
-
-          externalTaskService.complete(externalTask);
-
-          handlerInvoked.set(true);
-
-          catchedExternalTask[0] = externalTask;
-        });
-
-    // when
-    topicSubscriptionBuilder.open();
-    while (!handlerInvoked.get()) {
-      // busy waiting
-    }
-    client.stop();
-
-    // then
-    ExternalTask externalTask = catchedExternalTask[0];
-
-    assertVariableValue(externalTask, "aVariableName", 47L, MockProvider.LONG_VARIABLE_TYPE);
-
-    assertVariablePayloadOfCompleteRequest(objectMapper, "aVariableName", 47L, MockProvider.LONG_VARIABLE_TYPE);
-  }
-
-  @Test
-  public void shouldOverridePreviouslySetVariableBySetVariable() throws Exception {
-    // given
-    ObjectMapper objectMapper = spy(ObjectMapper.class);
-    whenNew(ObjectMapper.class).withNoArguments().thenReturn(objectMapper);
-
-    mockFetchAndLockResponse(Collections.singletonList(MockProvider.createExternalTaskWithoutVariables()));
-
-    ExternalTaskClient client = ExternalTaskClient.create()
-      .baseUrl(MockProvider.BASE_URL)
-      .build();
-
-    final ExternalTask[] catchedExternalTask = {null};
-    final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
-    TopicSubscriptionBuilder topicSubscriptionBuilder =
-      client.subscribe(MockProvider.TOPIC_NAME)
-        .lockDuration(5000)
-        .handler((externalTask, externalTaskService) -> {
-
-          Map<String, TypedValue> typedVariableMap = new HashMap<>();
-          typedVariableMap.put("aVariableName", Variables.stringValue("aVariableValue"));
-          externalTask.setAllVariablesTyped(typedVariableMap);
-
-          externalTask.setVariable("aVariableName", 47L);
-
-          handlerInvoked.set(true);
-
-          externalTaskService.complete(externalTask);
-
-          catchedExternalTask[0] = externalTask;
-        });
-
-    // when
-    topicSubscriptionBuilder.open();
-    while (!handlerInvoked.get()) {
-      // busy waiting
-    }
-    client.stop();
-
-    // then
-    ExternalTask externalTask = catchedExternalTask[0];
-
-    assertVariableValue(externalTask, "aVariableName", 47L, MockProvider.LONG_VARIABLE_TYPE);
-
-    assertVariablePayloadOfCompleteRequest(objectMapper, "aVariableName", 47L, MockProvider.LONG_VARIABLE_TYPE);
-  }
-
-  @Test
-  public void shouldOverridePreviouslySetVariableBySetVariableTyped() throws Exception {
-    // given
-    ObjectMapper objectMapper = spy(ObjectMapper.class);
-    whenNew(ObjectMapper.class).withNoArguments().thenReturn(objectMapper);
-
-    mockFetchAndLockResponse(Collections.singletonList(MockProvider.createExternalTaskWithoutVariables()));
-
-    ExternalTaskClient client = ExternalTaskClient.create()
-      .baseUrl(MockProvider.BASE_URL)
-      .build();
-
-    final ExternalTask[] catchedExternalTask = {null};
-    final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
-    TopicSubscriptionBuilder topicSubscriptionBuilder =
-      client.subscribe(MockProvider.TOPIC_NAME)
-        .lockDuration(5000)
-        .handler((externalTask, externalTaskService) -> {
-
-          Map<String, TypedValue> typedVariableMap = new HashMap<>();
-          typedVariableMap.put("aVariableName", Variables.stringValue("aVariableValue"));
-          externalTask.setAllVariablesTyped(typedVariableMap);
-
-          externalTask.setVariableTyped("aVariableName", Variables.longValue(47L));
-
-          handlerInvoked.set(true);
-
-          externalTaskService.complete(externalTask);
-
-          catchedExternalTask[0] = externalTask;
-        });
-
-    // when
-    topicSubscriptionBuilder.open();
-    while (!handlerInvoked.get()) {
-      // busy waiting
-    }
-    client.stop();
-
-    // then
-    ExternalTask externalTask = catchedExternalTask[0];
-
-    assertVariableValue(externalTask, "aVariableName", 47L, MockProvider.LONG_VARIABLE_TYPE);
-
-    assertVariablePayloadOfCompleteRequest(objectMapper, "aVariableName", 47L, MockProvider.LONG_VARIABLE_TYPE);
-  }
-
-  @Test
-  public void shouldOverrideVariableRetrievedFromFetchAndLockBySetAllTyped() throws Exception {
-    // given
-    ObjectMapper objectMapper = spy(ObjectMapper.class);
-    whenNew(ObjectMapper.class).withNoArguments().thenReturn(objectMapper);
-
-    ExternalTaskImpl externalTaskResponse = (ExternalTaskImpl) MockProvider.createExternalTaskWithoutVariables();
-    Map<String, TypedValueDto> variableMap = externalTaskResponse.getVariables();
-    TypedValueDto typedValueDto = new TypedValueDto();
-    typedValueDto.setValue("aVariableValue");
-    typedValueDto.setType("String");
-    variableMap.put("aVariableName", typedValueDto);
-
-    mockFetchAndLockResponse(Collections.singletonList(externalTaskResponse));
-
-    ExternalTaskClient client = ExternalTaskClient.create()
-      .baseUrl(MockProvider.BASE_URL)
-      .build();
-
-    final ExternalTask[] externalTaskReference = {null};
-    final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
-    TopicSubscriptionBuilder topicSubscriptionBuilder =
-      client.subscribe(MockProvider.TOPIC_NAME)
-        .lockDuration(5000)
-        .handler((externalTask, externalTaskService) -> {
-          externalTaskReference[0] = externalTask;
-
-          Map<String, TypedValue> untypedVariableMap = new HashMap<>();
-          untypedVariableMap.put("aVariableName", Variables.longValue(47L));
-          externalTask.setAllVariablesTyped(untypedVariableMap);
-
-          externalTaskService.complete(externalTask);
-
-          handlerInvoked.set(true);
-        });
-
-    // when
-    topicSubscriptionBuilder.open();
-    while (!handlerInvoked.get()) {
-      // busy waiting
-    }
-    client.stop();
-
-    // then
-    ExternalTask externalTask = externalTaskReference[0];
-
-    assertVariableValue(externalTask, "aVariableName", 47L, MockProvider.LONG_VARIABLE_TYPE);
-
-    assertVariablePayloadOfCompleteRequest(objectMapper, "aVariableName", 47L, MockProvider.LONG_VARIABLE_TYPE);
-  }
-
-  @Test
-  public void shouldOverrideVariableRetrievedFromFetchAndLockBySetAll() throws Exception {
-    // given
-    ObjectMapper objectMapper = spy(ObjectMapper.class);
-    whenNew(ObjectMapper.class).withNoArguments().thenReturn(objectMapper);
-
-    ExternalTaskImpl externalTaskResponse = (ExternalTaskImpl) MockProvider.createExternalTaskWithoutVariables();
-    Map<String, TypedValueDto> variableMap = externalTaskResponse.getVariables();
-    TypedValueDto typedValueDto = new TypedValueDto();
-    typedValueDto.setValue("aVariableValue");
-    typedValueDto.setType("String");
-    variableMap.put("aVariableName", typedValueDto);
-
-    mockFetchAndLockResponse(Collections.singletonList(externalTaskResponse));
-
-    ExternalTaskClient client = ExternalTaskClient.create()
-      .baseUrl(MockProvider.BASE_URL)
-      .build();
-
-    final ExternalTask[] externalTaskReference = {null};
-    final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
-    TopicSubscriptionBuilder topicSubscriptionBuilder =
-      client.subscribe(MockProvider.TOPIC_NAME)
-        .lockDuration(5000)
-        .handler((externalTask, externalTaskService) -> {
-          externalTaskReference[0] = externalTask;
-
-          Map<String, Object> untypedVariableMap = new HashMap<>();
-          untypedVariableMap.put("aVariableName", 47L);
-          externalTask.setAllVariables(untypedVariableMap);
-
-          externalTaskService.complete(externalTask);
-
-          handlerInvoked.set(true);
-        });
-
-    // when
-    topicSubscriptionBuilder.open();
-    while (!handlerInvoked.get()) {
-      // busy waiting
-    }
-    client.stop();
-
-    // then
-    ExternalTask externalTask = externalTaskReference[0];
-
-    assertVariableValue(externalTask, "aVariableName", 47L, MockProvider.LONG_VARIABLE_TYPE);
-
-    assertVariablePayloadOfCompleteRequest(objectMapper, "aVariableName", 47L, MockProvider.LONG_VARIABLE_TYPE);
-  }
-
-  @Test
-  public void shouldOverrideVariableRetrievedFromFetchAndLockBySetSingleUntypedVariable() throws Exception {
-    // given
-    ObjectMapper objectMapper = spy(ObjectMapper.class);
-    whenNew(ObjectMapper.class).withNoArguments().thenReturn(objectMapper);
-
-    ExternalTaskImpl externalTaskResponse = (ExternalTaskImpl) MockProvider.createExternalTaskWithoutVariables();
-    Map<String, TypedValueDto> variableMap = externalTaskResponse.getVariables();
-    TypedValueDto typedValueDto = new TypedValueDto();
-    typedValueDto.setValue("aVariableValue");
-    typedValueDto.setType("String");
-    variableMap.put("aVariableName", typedValueDto);
-
-    mockFetchAndLockResponse(Collections.singletonList(externalTaskResponse));
-
-    ExternalTaskClient client = ExternalTaskClient.create()
-      .baseUrl(MockProvider.BASE_URL)
-      .build();
-
-    final ExternalTask[] externalTaskReference = {null};
-    final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
-    TopicSubscriptionBuilder topicSubscriptionBuilder =
-      client.subscribe(MockProvider.TOPIC_NAME)
-        .lockDuration(5000)
-        .handler((externalTask, externalTaskService) -> {
-          externalTaskReference[0] = externalTask;
-
-          externalTask.setVariable("aVariableName", 47L);
-
-          externalTaskService.complete(externalTask);
-
-          handlerInvoked.set(true);
-        });
-
-    // when
-    topicSubscriptionBuilder.open();
-    while (!handlerInvoked.get()) {
-      // busy waiting
-    }
-    client.stop();
-
-    // then
-    ExternalTask externalTask = externalTaskReference[0];
-
-    assertVariableValue(externalTask, "aVariableName", 47L, MockProvider.LONG_VARIABLE_TYPE);
-
-    assertVariablePayloadOfCompleteRequest(objectMapper, "aVariableName", 47L, MockProvider.LONG_VARIABLE_TYPE);
-  }
-
-  @Test
-  public void shouldOverrideVariableRetrievedFromFetchAndLockBySetSingleTypedVariable() throws Exception {
-    // given
-    ObjectMapper objectMapper = spy(ObjectMapper.class);
-    whenNew(ObjectMapper.class).withNoArguments().thenReturn(objectMapper);
-
-    ExternalTaskImpl externalTaskResponse = (ExternalTaskImpl) MockProvider.createExternalTaskWithoutVariables();
-    Map<String, TypedValueDto> variableMap = externalTaskResponse.getVariables();
-    TypedValueDto typedValueDto = new TypedValueDto();
-    typedValueDto.setValue("aVariableValue");
-    typedValueDto.setType("String");
-    variableMap.put("aVariableName", typedValueDto);
-
-    mockFetchAndLockResponse(Collections.singletonList(externalTaskResponse));
-
-    ExternalTaskClient client = ExternalTaskClient.create()
-      .baseUrl(MockProvider.BASE_URL)
-      .build();
-
-    final ExternalTask[] externalTaskReference = {null};
-    final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
-    TopicSubscriptionBuilder topicSubscriptionBuilder =
-      client.subscribe(MockProvider.TOPIC_NAME)
-        .lockDuration(5000)
-        .handler((externalTask, externalTaskService) -> {
-          externalTaskReference[0] = externalTask;
-
-          externalTask.setVariableTyped("aVariableName", Variables.longValue(47L));
-
-          externalTaskService.complete(externalTask);
-
-          handlerInvoked.set(true);
-        });
-
-    // when
-    topicSubscriptionBuilder.open();
-    while (!handlerInvoked.get()) {
-      // busy waiting
-    }
-
-    client.stop();
-
-    // then
-    ExternalTask externalTask = externalTaskReference[0];
-    assertVariableValue(externalTask, "aVariableName", 47L, MockProvider.LONG_VARIABLE_TYPE);
-
-    assertVariablePayloadOfCompleteRequest(objectMapper, "aVariableName", 47L, MockProvider.LONG_VARIABLE_TYPE);
-  }
-
-  /* tests if variables are merged correctly */
-
-  @Test
-  public void shouldMergeFetchedVariablesWithSetAllVariables() throws Exception {
-    // given
-    ObjectMapper objectMapper = spy(ObjectMapper.class);
-    whenNew(ObjectMapper.class).withNoArguments().thenReturn(objectMapper);
-
-    ExternalTaskImpl externalTaskResponse = (ExternalTaskImpl) MockProvider.createExternalTaskWithoutVariables();
-    Map<String, TypedValueDto> variableMap = externalTaskResponse.getVariables();
-
-    TypedValueDto aVariable = new TypedValueDto();
-    aVariable.setValue("aVariableValue");
-    aVariable.setType("String");
-    variableMap.put("aVariableName", aVariable);
-
-    TypedValueDto anotherVariable = new TypedValueDto();
-    anotherVariable.setValue((short) 47);
-    anotherVariable.setType("Short");
-    variableMap.put("anotherVariableName", anotherVariable);
-
-    mockFetchAndLockResponse(Collections.singletonList(externalTaskResponse));
-
-    ExternalTaskClient client = ExternalTaskClient.create()
-      .baseUrl(MockProvider.BASE_URL)
-      .build();
-
-    final ExternalTask[] externalTaskReference = {null};
-    final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
-    TopicSubscriptionBuilder topicSubscriptionBuilder =
-      client.subscribe(MockProvider.TOPIC_NAME)
-        .lockDuration(5000)
-        .handler((externalTask, externalTaskService) -> {
-          externalTaskReference[0] = externalTask;
-
-          Map<String, Object> variables = new HashMap<>();
-          variables.put("variableOne", true);
-          variables.put("variableTwo", 4711);
-          externalTask.setAllVariables(variables);
-
-          externalTaskService.complete(externalTask);
-
-          handlerInvoked.set(true);
-        });
-
-    // when
-    topicSubscriptionBuilder.open();
-    while (!handlerInvoked.get()) {
-      // busy waiting
-    }
-    client.stop();
-
-    // then
-    ExternalTask externalTask = externalTaskReference[0];
-    assertVariableValue(externalTask, "aVariableName", "aVariableValue", MockProvider.STRING_VARIABLE_TYPE);
-    assertVariableValue(externalTask, "anotherVariableName", (short) 47, MockProvider.SHORT_VARIABLE_TYPE);
-    assertVariableValue(externalTask, "variableOne", true, MockProvider.BOOLEAN_VARIABLE_TYPE);
-    assertVariableValue(externalTask, "variableTwo", 4711, MockProvider.INTEGER_VARIABLE_TYPE);
-
-    Map<String, TypedValueDto> expectedDtoMap = new HashMap<>();
-
-    TypedValueDto variableOneDto = createTypedValueDto(true, MockProvider.BOOLEAN_VARIABLE_TYPE);
-    expectedDtoMap.put("variableOne", variableOneDto);
-
-    TypedValueDto variableTwoDto = createTypedValueDto(4711, MockProvider.INTEGER_VARIABLE_TYPE);
-    expectedDtoMap.put("variableTwo", variableTwoDto);
-
-    assertVariablePayloadOfCompleteRequest(objectMapper, expectedDtoMap);
-  }
-
-  @Test
-  public void shouldMergeFetchedVariablesWithSetAllVariablesTyped() throws Exception {
-    // given
-    ObjectMapper objectMapper = spy(ObjectMapper.class);
-    whenNew(ObjectMapper.class).withNoArguments().thenReturn(objectMapper);
-
-    ExternalTaskImpl externalTaskResponse = (ExternalTaskImpl) MockProvider.createExternalTaskWithoutVariables();
-    Map<String, TypedValueDto> variableMap = externalTaskResponse.getVariables();
-
-    TypedValueDto aVariable = createTypedValueDto("aVariableValue", "String");
-    variableMap.put("aVariableName", aVariable);
-
-    TypedValueDto anotherVariable = createTypedValueDto((short) 47, "Short");
-    variableMap.put("anotherVariableName", anotherVariable);
-
-    mockFetchAndLockResponse(Collections.singletonList(externalTaskResponse));
-
-    ExternalTaskClient client = ExternalTaskClient.create()
-      .baseUrl(MockProvider.BASE_URL)
-      .build();
-
-    final ExternalTask[] externalTaskReference = {null};
-    final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
-    TopicSubscriptionBuilder topicSubscriptionBuilder =
-      client.subscribe(MockProvider.TOPIC_NAME)
-        .lockDuration(5000)
-        .handler((externalTask, externalTaskService) -> {
-          externalTaskReference[0] = externalTask;
-
-          Map<String, TypedValue> variables = new HashMap<>();
-          variables.put("variableOne", Variables.booleanValue(true));
-          variables.put("variableTwo", Variables.integerValue(4711));
-          externalTask.setAllVariablesTyped(variables);
-
-          externalTaskService.complete(externalTask);
-
-          handlerInvoked.set(true);
-        });
-
-    // when
-    topicSubscriptionBuilder.open();
-    while (!handlerInvoked.get()) {
-      // busy waiting
-    }
-    client.stop();
-
-    // then
-    ExternalTask externalTask = externalTaskReference[0];
-    assertVariableValue(externalTask, "aVariableName", "aVariableValue", MockProvider.STRING_VARIABLE_TYPE);
-    assertVariableValue(externalTask, "anotherVariableName", (short) 47, MockProvider.SHORT_VARIABLE_TYPE);
-    assertVariableValue(externalTask, "variableOne", true, MockProvider.BOOLEAN_VARIABLE_TYPE);
-    assertVariableValue(externalTask, "variableTwo", 4711, MockProvider.INTEGER_VARIABLE_TYPE);
-
-    Map<String, TypedValueDto> expectedDtoMap = new HashMap<>();
-
-    TypedValueDto variableOneDto = createTypedValueDto(true, MockProvider.BOOLEAN_VARIABLE_TYPE);
-    expectedDtoMap.put("variableOne", variableOneDto);
-
-    TypedValueDto variableTwoDto = createTypedValueDto(4711, MockProvider.INTEGER_VARIABLE_TYPE);
-    expectedDtoMap.put("variableTwo", variableTwoDto);
-
-    assertVariablePayloadOfCompleteRequest(objectMapper, expectedDtoMap);
-  }
-
-  @Test
-  public void shouldMergeAndOverrideFetchedVariablesWithSetAllVariables() throws Exception {
-    // given
-    ExternalTaskImpl externalTaskResponse = (ExternalTaskImpl) MockProvider.createExternalTaskWithoutVariables();
-
-    Map<String, TypedValueDto> variableMap = externalTaskResponse.getVariables();
-    variableMap.put("aVariableName", createTypedValueDto("aVariableValue", MockProvider.STRING_VARIABLE_TYPE));
-    variableMap.put("anotherVariableName", createTypedValueDto((short) 47, MockProvider.SHORT_VARIABLE_TYPE));
-
-    mockFetchAndLockResponse(Collections.singletonList(externalTaskResponse));
-
-    ObjectMapper objectMapper = spy(ObjectMapper.class);
-    whenNew(ObjectMapper.class).withNoArguments().thenReturn(objectMapper);
-
-    ExternalTaskClient client = ExternalTaskClient.create()
-      .baseUrl(MockProvider.BASE_URL)
-      .build();
-
-    final ExternalTask[] externalTaskReference = {null};
-    final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
-    TopicSubscriptionBuilder topicSubscriptionBuilder =
-      client.subscribe(MockProvider.TOPIC_NAME)
-        .lockDuration(5000)
-        .handler((externalTask, externalTaskService) -> {
-          externalTaskReference[0] = externalTask;
-
-          Map<String, Object> variables = new HashMap<>();
-          variables.put("aVariableName", 3.1415926535897932384626433);
-          variables.put("variableOne", true);
-          variables.put("variableTwo", 4711);
-          externalTask.setAllVariables(variables);
-
-          externalTaskService.complete(externalTask);
-
-          handlerInvoked.set(true);
-        });
-
-    // when
-    topicSubscriptionBuilder.open();
-    while (!handlerInvoked.get()) {
-      // busy waiting
-    }
-    client.stop();
-
-    // then
-    ExternalTask externalTask = externalTaskReference[0];
-    assertVariableValue(externalTask, "aVariableName", 3.1415926535897932384626433, MockProvider.DOUBLE_VARIABLE_TYPE);
-    assertVariableValue(externalTask, "anotherVariableName", (short) 47, MockProvider.SHORT_VARIABLE_TYPE);
-    assertVariableValue(externalTask, "variableOne", true, MockProvider.BOOLEAN_VARIABLE_TYPE);
-    assertVariableValue(externalTask, "variableTwo", 4711, MockProvider.INTEGER_VARIABLE_TYPE);
-
-    Map<String, TypedValueDto> typedValueDtoMap = new HashMap<>();
-    typedValueDtoMap.put("variableOne", createTypedValueDto(true, MockProvider.BOOLEAN_VARIABLE_TYPE));
-    typedValueDtoMap.put("variableTwo", createTypedValueDto(4711,  MockProvider.INTEGER_VARIABLE_TYPE));
-    typedValueDtoMap.put("aVariableName", createTypedValueDto(3.1415926535897932384626433, MockProvider.DOUBLE_VARIABLE_TYPE));
-
-    assertVariablePayloadOfCompleteRequest(objectMapper, typedValueDtoMap);
-  }
-
-  @Test
-  public void shouldMergeAndOverrideFetchedVariablesWithSetSingleUntypedVariable() throws Exception {
-    // given
-    ExternalTaskImpl externalTaskResponse = (ExternalTaskImpl) MockProvider.createExternalTaskWithoutVariables();
-
-    Map<String, TypedValueDto> variableMap = externalTaskResponse.getVariables();
-    variableMap.put("aVariableName", createTypedValueDto("aVariableValue", MockProvider.STRING_VARIABLE_TYPE));
-    variableMap.put("anotherVariableName", createTypedValueDto((short) 47, MockProvider.SHORT_VARIABLE_TYPE));
-
-    mockFetchAndLockResponse(Collections.singletonList(externalTaskResponse));
-
-    ObjectMapper objectMapper = spy(ObjectMapper.class);
-    whenNew(ObjectMapper.class).withNoArguments().thenReturn(objectMapper);
-
-    ExternalTaskClient client = ExternalTaskClient.create()
-      .baseUrl(MockProvider.BASE_URL)
-      .build();
-
-    final ExternalTask[] externalTaskReference = { null };
-    final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
-    TopicSubscriptionBuilder topicSubscriptionBuilder =
-      client.subscribe(MockProvider.TOPIC_NAME)
-        .lockDuration(5000)
-        .handler((externalTask, externalTaskService) -> {
-          externalTaskReference[0] = externalTask;
-
-          externalTask.setVariable("aVariableName", 3.1415926535897932384626433);
-          externalTask.setVariable("variableOne", true);
-          externalTask.setVariable("variableTwo", 4711);
-
-          externalTaskService.complete(externalTask);
-
-          handlerInvoked.set(true);
-        });
-
-    // when
-    topicSubscriptionBuilder.open();
-    while (!handlerInvoked.get()) {
-      // busy waiting
-    }
-    client.stop();
-
-    // then
-    ExternalTask externalTask = externalTaskReference[0];
-    assertVariableValue(externalTask, "aVariableName", 3.1415926535897932384626433, MockProvider.DOUBLE_VARIABLE_TYPE);
-    assertVariableValue(externalTask, "anotherVariableName", (short) 47, MockProvider.SHORT_VARIABLE_TYPE);
-    assertVariableValue(externalTask, "variableOne", true, MockProvider.BOOLEAN_VARIABLE_TYPE);
-    assertVariableValue(externalTask, "variableTwo", 4711, MockProvider.INTEGER_VARIABLE_TYPE);
-
-    Map<String, TypedValueDto> typedValueDtoMap = new HashMap<>();
-    typedValueDtoMap.put("variableOne", createTypedValueDto(true, MockProvider.BOOLEAN_VARIABLE_TYPE));
-    typedValueDtoMap.put("variableTwo", createTypedValueDto(4711,  MockProvider.INTEGER_VARIABLE_TYPE));
-    typedValueDtoMap.put("aVariableName", createTypedValueDto(3.1415926535897932384626433, MockProvider.DOUBLE_VARIABLE_TYPE));
-
-    assertVariablePayloadOfCompleteRequest(objectMapper, typedValueDtoMap);
   }
 
   /* tests if exceptions are thrown correctly */
@@ -1339,26 +358,15 @@ public class VariableTest {
       client.subscribe(MockProvider.TOPIC_NAME)
         .lockDuration(5000)
         .handler((externalTask, externalTaskService) -> {
+
           try {
-            externalTask.setVariable("aVariableName", new ExternalTaskImpl());
+            externalTaskService.complete(externalTask, null, Collections.singletonMap("aVariableName", new ExternalTaskImpl()));
           } catch (UnsupportedTypeException e) {
             exceptionReference.add(e);
           }
 
           try {
-            externalTask.setVariableTyped("aVariableName", Variables.untypedValue(new ExternalTaskImpl()));
-          } catch (UnsupportedTypeException e) {
-            exceptionReference.add(e);
-          }
-
-          try {
-            externalTask.setAllVariablesTyped(Collections.singletonMap("aVariableName", Variables.untypedValue(new ExternalTaskImpl())));
-          } catch (UnsupportedTypeException e) {
-            exceptionReference.add(e);
-          }
-
-          try {
-            externalTask.setAllVariables(Collections.singletonMap("aVariableName", new ExternalTaskImpl()));
+            externalTaskService.complete(externalTask, Collections.singletonMap("aVariableName", new ExternalTaskImpl()));
           } catch (UnsupportedTypeException e) {
             exceptionReference.add(e);
           }
@@ -1407,7 +415,7 @@ public class VariableTest {
     verifyZeroInteractions(externalTaskHandlerMock);
   }
 
-  /** tests for transient variables */
+  /* tests for transient variables */
 
   @Test
   public void shouldDeserializeTransientVariables() throws JsonProcessingException {
@@ -1473,10 +481,11 @@ public class VariableTest {
       client.subscribe(MockProvider.TOPIC_NAME)
         .lockDuration(5000)
         .handler((externalTask, externalTaskService) -> {
-          externalTask.setVariableTyped("aVariableName", Variables.stringValue("aVariableValue", true));
-          externalTask.setVariableTyped("anotherVariableName", Variables.stringValue("aVariableValue", false));
 
-          externalTaskService.complete(externalTask);
+          Map<String, Object> variables = new HashMap<>();
+          variables.put("aVariableName", Variables.stringValue("aVariableValue", true));
+          variables.put("anotherVariableName", Variables.stringValue("aVariableValue", true));
+          externalTaskService.complete(externalTask, variables);
 
           handlerInvoked.set(true);
         });
@@ -1490,7 +499,7 @@ public class VariableTest {
 
     // then
     TypedValueDto typedValueDtoTransient = createTypedValueDto("aVariableValue", "String", true);
-    TypedValueDto typedValueDtoNotTransient = createTypedValueDto("aVariableValue", "String", false);
+    TypedValueDto typedValueDtoNotTransient = createTypedValueDto("aVariableValue", "String", true);
 
     Map<String, TypedValueDto> expectedValueDtoMap = new HashMap<>();
     expectedValueDtoMap.put("aVariableName", typedValueDtoTransient);
@@ -1519,10 +528,10 @@ public class VariableTest {
       client.subscribe(MockProvider.TOPIC_NAME)
         .lockDuration(5000)
         .handler((externalTask, externalTaskService) -> {
-          externalTask.setVariableTyped("aVariableName", Variables.untypedNullValue( true));
-          externalTask.setVariableTyped("anotherVariableName", Variables.untypedNullValue( false));
-
-          externalTaskService.complete(externalTask);
+          Map<String, Object> variables = new HashMap<>();
+          variables.put("aVariableName", Variables.untypedNullValue( true));
+          variables.put("anotherVariableName", Variables.untypedNullValue( false));
+          externalTaskService.complete(externalTask, variables);
 
           handlerInvoked.set(true);
         });
@@ -1818,9 +827,7 @@ public class VariableTest {
             .objectValue(new ArrayList<>(Arrays.asList(1,2,3,4,5)))
             .create();
 
-          externalTask.setVariableTyped("aVariableName", objectValue);
-
-          externalTaskService.complete(externalTask);
+          externalTaskService.complete(externalTask, Collections.singletonMap("aVariableName", objectValue));
 
           handlerInvoked.set(true);
         });
@@ -1863,9 +870,7 @@ public class VariableTest {
             .serializationDataFormat(Variables.SerializationDataFormats.JSON.getName())
             .create();
 
-          externalTask.setVariableTyped("aVariableName", objectValue);
-
-          externalTaskService.complete(externalTask);
+          externalTaskService.complete(externalTask, Collections.singletonMap("aVariableName", objectValue));
 
           handlerInvoked.set(true);
         });
@@ -1908,9 +913,7 @@ public class VariableTest {
             .serializationDataFormat(Variables.SerializationDataFormats.JAVA.getName())
             .create();
 
-          externalTask.setVariableTyped("aVariableName", objectValue);
-
-          externalTaskService.complete(externalTask);
+          externalTaskService.complete(externalTask, Collections.singletonMap("aVariableName", objectValue));
 
           handlerInvoked.set(true);
         });
@@ -1953,9 +956,7 @@ public class VariableTest {
             .serializationDataFormat(Variables.SerializationDataFormats.XML.getName())
             .create();
 
-          externalTask.setVariableTyped("aVariableName", objectValue);
-
-          externalTaskService.complete(externalTask);
+          externalTaskService.complete(externalTask, Collections.singletonMap("aVariableName", objectValue));
 
           handlerInvoked.set(true);
         });
@@ -2003,7 +1004,7 @@ public class VariableTest {
             .create();
 
           try {
-            externalTask.setVariableTyped("aVariableName", objectValue);
+            externalTaskService.complete(externalTask, Collections.singletonMap("aVariableName", objectValue));
             fail("No UnknownTypeException thrown!");
           } catch (UnknownTypeException e) {
             unknownTypeExceptionReference.add(e);
@@ -2053,7 +1054,7 @@ public class VariableTest {
             .create();
 
           try {
-            externalTask.setVariableTyped("aVariableName", objectValue);
+            externalTaskService.complete(externalTask, Collections.singletonMap("aVariableName", objectValue));
             fail("No UnknownTypeException thrown!");
           } catch (UnknownTypeException e) {
             unknownTypeExceptionReference.add(e);
@@ -2103,7 +1104,7 @@ public class VariableTest {
             .create();
 
           try {
-            externalTask.setVariableTyped("aVariableName", objectValue);
+            externalTaskService.complete(externalTask, Collections.singletonMap("aVariableName", objectValue));
             fail("No UnknownTypeException thrown!");
           } catch (UnknownTypeException e) {
             unknownTypeExceptionReference.add(e);
@@ -2151,7 +1152,7 @@ public class VariableTest {
             .create();
 
           try {
-            externalTask.setVariableTyped("aVariableName", objectValue);
+            externalTaskService.complete(externalTask, Collections.singletonMap("aVariableName", objectValue));
             fail("No UnsupportedTypeException thrown!");
           } catch (UnsupportedTypeException e) {
             unsupportedTypeExceptionReference.add(e);
@@ -2231,18 +1232,17 @@ public class VariableTest {
       .build();
 
     final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
-    final List<ExternalTask> externalTaskReference = new ArrayList<>(); // list, as container must be final and changeable
 
     TopicSubscriptionBuilder topicSubscriptionBuilder =
       client.subscribe(MockProvider.TOPIC_NAME)
         .lockDuration(5000)
         .handler((externalTask, externalTaskService) -> {
-          externalTask.setVariableTyped("aJsonVariable", jsonValue("[1,2,3,4,5]").create());
-          externalTask.setVariableTyped("aXmlVariable", xmlValue("<entry>hello world</entry>").create());
+          Map<String, Object> variables = new HashMap<>();
+          variables.put("aJsonVariable", jsonValue("[1,2,3,4,5]").create());
+          variables.put("aXmlVariable", xmlValue("<entry>hello world</entry>").create());
 
-          externalTaskService.complete(externalTask);
+          externalTaskService.complete(externalTask, variables);
 
-          externalTaskReference.add(externalTask);
           handlerInvoked.set(true);
         });
 
@@ -2254,15 +1254,92 @@ public class VariableTest {
     client.stop();
 
     // then
-    ExternalTask externalTask = externalTaskReference.get(0);
-
-    assertSpinVariableValue(externalTask, "aJsonVariable", "[1,2,3,4,5]", "Json");
-    assertSpinVariableValue(externalTask, "aXmlVariable", "<?xml version=\"1.0\" encoding=\"UTF-8\"?><entry>hello world</entry>\n", "Xml");
-
     Map<String, TypedValueDto> expectedVariables = new HashMap<>();
     expectedVariables.put("aJsonVariable", createTypedValueDto("[1,2,3,4,5]", "Json"));
     expectedVariables.put("aXmlVariable", createTypedValueDto("<?xml version=\"1.0\" encoding=\"UTF-8\"?><entry>hello world</entry>\n", "Xml"));
     assertVariablePayloadOfCompleteRequest(objectMapper, expectedVariables);
+  }
+
+  /* tests for local variables */
+
+  @Test
+  public void shouldCompleteWithLocalVariables() throws Exception {
+    // given
+    ObjectMapper objectMapper = spy(ObjectMapper.class);
+    whenNew(ObjectMapper.class).withNoArguments().thenReturn(objectMapper);
+
+    mockFetchAndLockResponse(Collections.singletonList(MockProvider.createExternalTaskWithoutVariables()));
+
+    ExternalTaskClient client = ExternalTaskClient.create()
+      .baseUrl(MockProvider.BASE_URL)
+      .build();
+
+    final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
+    TopicSubscriptionBuilder topicSubscriptionBuilder =
+      client.subscribe(MockProvider.TOPIC_NAME)
+        .lockDuration(5000)
+        .handler((externalTask, externalTaskService) -> {
+
+          Map<String, Object> localVariables = new HashMap<>();
+          localVariables.put("aVariableName", Variables.stringValue("aVariableValue"));
+          localVariables.put("anotherVariableName", 47L);
+
+          externalTaskService.complete(externalTask, null, localVariables);
+
+          handlerInvoked.set(true);
+        });
+
+    // when
+    topicSubscriptionBuilder.open();
+    while (!handlerInvoked.get()) {
+      // busy waiting
+    }
+    client.stop();
+
+    // then
+    Map<String, TypedValueDto> expectedVariableDtoMap = new HashMap<>();
+    expectedVariableDtoMap.put("aVariableName", createTypedValueDto("aVariableValue", MockProvider.STRING_VARIABLE_TYPE));
+    expectedVariableDtoMap.put("anotherVariableName", createTypedValueDto( 47L, MockProvider.LONG_VARIABLE_TYPE));
+
+    assertLocalVariablePayloadOfCompleteRequest(objectMapper, expectedVariableDtoMap);
+  }
+
+  @Test
+  public void shouldCompleteWithBothVariablesAndLocalVariables() throws Exception {
+    // given
+    ObjectMapper objectMapper = spy(ObjectMapper.class);
+    whenNew(ObjectMapper.class).withNoArguments().thenReturn(objectMapper);
+
+    mockFetchAndLockResponse(Collections.singletonList(MockProvider.createExternalTaskWithoutVariables()));
+
+    ExternalTaskClient client = ExternalTaskClient.create()
+      .baseUrl(MockProvider.BASE_URL)
+      .build();
+
+    final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
+    TopicSubscriptionBuilder topicSubscriptionBuilder =
+      client.subscribe(MockProvider.TOPIC_NAME)
+        .lockDuration(5000)
+        .handler((externalTask, externalTaskService) -> {
+
+          externalTaskService.complete(externalTask, Collections.singletonMap("anotherVariableName", 47L),
+            Collections.singletonMap("aVariableName", Variables.stringValue("aVariableValue")));
+
+          handlerInvoked.set(true);
+        });
+
+    // when
+    topicSubscriptionBuilder.open();
+    while (!handlerInvoked.get()) {
+      // busy waiting
+    }
+    client.stop();
+
+    // then
+    assertLocalVariablePayloadOfCompleteRequest(objectMapper, Collections.singletonMap("aVariableName",
+      createTypedValueDto("aVariableValue", MockProvider.STRING_VARIABLE_TYPE)));
+    assertVariablePayloadOfCompleteRequest(objectMapper, Collections.singletonMap("anotherVariableName",
+      createTypedValueDto(47L, MockProvider.LONG_VARIABLE_TYPE)));
   }
 
   // helper //////////////////////////////////
@@ -2307,18 +1384,6 @@ public class VariableTest {
       assertThat((Object) externalTask.getVariable(variableName)).isInstanceOf(DomXmlElement.class);
       assertThat(externalTask.getAllVariables().get(variableName)).isInstanceOf(DomXmlElement.class);
     }
-  }
-
-  protected void assertVariableValue(ExternalTask externalTask, String variableName, Object variableValue, String variableType) {
-    assertThat(externalTask.getVariableTyped(variableName).getType().getName()).isEqualTo(variableType.toLowerCase());
-    assertThat(externalTask.getVariableTyped(variableName).getValue()).isEqualTo(variableValue);
-
-    assertThat(externalTask.getAllVariablesTyped().getValueTyped(variableName).getType().getName()).isEqualTo(variableType.toLowerCase());
-    assertThat(externalTask.getAllVariablesTyped().getValueTyped(variableName).getValue()).isEqualTo(variableValue);
-
-    assertThat((Object) externalTask.getVariable(variableName)).isEqualTo(variableValue);
-
-    assertThat(externalTask.getAllVariables().get(variableName)).isEqualTo(variableValue);
   }
 
   protected TypedValueDto createTypedValueDto(Object variableValue, String variableType, boolean isTransient) {
@@ -2522,13 +1587,15 @@ public class VariableTest {
     assertThat(isAsserted).isTrue();
   }
 
-  protected void assertVariablePayloadOfCompleteRequest(ObjectMapper objectMapper, String variableName, Object variableValue, String variableType) throws JsonProcessingException {
-    Map<String, TypedValueDto> expectedTypedValueMap = Collections.singletonMap(variableName, createTypedValueDto(variableValue, variableType));
-    assertVariablePayloadOfCompleteRequest(objectMapper, expectedTypedValueMap);
-
+  protected void assertVariablePayloadOfCompleteRequest(ObjectMapper objectMapper, Map<String, TypedValueDto> expectedDtoMap) throws JsonProcessingException {
+    assertVariablePayloadOfCompleteRequest(objectMapper, expectedDtoMap, false);
   }
 
-  protected void assertVariablePayloadOfCompleteRequest(ObjectMapper objectMapper, Map<String, TypedValueDto> expectedDtoMap) throws JsonProcessingException {
+  protected void assertLocalVariablePayloadOfCompleteRequest(ObjectMapper objectMapper, Map<String, TypedValueDto> expectedDtoMap) throws JsonProcessingException {
+    assertVariablePayloadOfCompleteRequest(objectMapper, expectedDtoMap, true);
+  }
+
+  protected void assertVariablePayloadOfCompleteRequest(ObjectMapper objectMapper, Map<String, TypedValueDto> expectedDtoMap, boolean assertLocalVariables) throws JsonProcessingException {
     ArgumentCaptor<Object> payloads = ArgumentCaptor.forClass(Object.class);
     verify(objectMapper, atLeastOnce()).writeValueAsBytes(payloads.capture());
 
@@ -2539,8 +1606,16 @@ public class VariableTest {
       .findFirst()
       .orElse(null);
 
+    Map<String, TypedValueDto> variableMap;
+    if (assertLocalVariables) {
+      variableMap = completeRequestDto.getLocalVariables();
+    } else {
+      variableMap = completeRequestDto.getVariables();
+    }
+
+    assertThat(expectedDtoMap.size()).isEqualTo(variableMap.size());
+
     expectedDtoMap.forEach((variableName, typedValueDto) -> {
-      Map<String, TypedValueDto> variableMap = completeRequestDto.getVariables();
       assertThat(variableMap.get(variableName).getType()).isEqualTo(typedValueDto.getType());
       assertThat(variableMap.get(variableName).getValue()).isEqualTo(typedValueDto.getValue());
 
@@ -2549,14 +1624,12 @@ public class VariableTest {
         if (expectedTransience) {
           assertThat((boolean) variableMap.get(variableName).getValueInfo().get("transient")).isTrue();
         } else {
-          assertThat(variableMap.get(variableName).getValueInfo().get("transient")).isNull();;
+          assertThat(variableMap.get(variableName).getValueInfo().get("transient")).isNull();
         }
       }
 
       isAsserted[0] = true;
     });
-
-    assertThat(expectedDtoMap.size()).isEqualTo(completeRequestDto.getVariables().size());
 
     assertThat(isAsserted[0]).isTrue();
   }

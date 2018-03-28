@@ -108,8 +108,7 @@ public class TopicSubscriptionManager implements Runnable {
         }
 
         if (variablesDeserialized) {
-          ((ExternalTaskImpl) externalTask).setVariableMappers(variableMappers);
-          ((ExternalTaskImpl) externalTask).setLocalVariableMap(variableMap);
+          ((ExternalTaskImpl) externalTask).setReceivedVariableMap(variableMap);
 
           String topicName = externalTask.getTopicName();
           ExternalTaskHandler taskHandler = externalTaskHandlers.get(topicName);

@@ -22,15 +22,21 @@ import java.util.Map;
 public class CompleteRequestDto extends RequestDto {
 
   protected Map<String, TypedValueDto> variables;
+  protected Map<String, TypedValueDto> localVariables;
 
-  public CompleteRequestDto(String workerId, Map<String, TypedValueDto> variables) {
+  public CompleteRequestDto(String workerId, Map<String, TypedValueDto> variables, Map<String, TypedValueDto> localVariables) {
     super(workerId);
 
     this.variables = variables;
+    this.localVariables = localVariables;
   }
 
   public Map<String, TypedValueDto> getVariables() {
     return variables;
+  }
+
+  public Map<String, TypedValueDto> getLocalVariables() {
+    return localVariables;
   }
 
 }

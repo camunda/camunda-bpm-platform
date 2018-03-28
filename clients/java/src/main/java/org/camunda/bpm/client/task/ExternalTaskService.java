@@ -16,6 +16,10 @@ import org.camunda.bpm.client.exception.ConnectionLostException;
 import org.camunda.bpm.client.exception.NotAcquiredException;
 import org.camunda.bpm.client.exception.NotFoundException;
 import org.camunda.bpm.client.exception.NotResumedException;
+import org.camunda.bpm.client.exception.UnknownTypeException;
+import org.camunda.bpm.client.exception.UnsupportedTypeException;
+
+import java.util.Map;
 
 /**
  * <p>Service that provides possibilities to interact with fetched and locked tasks.</p>
@@ -45,6 +49,40 @@ public interface ExternalTaskService {
    * @throws ConnectionLostException if the connection could not be established
    */
   void complete(ExternalTask externalTask);
+
+  /**
+   * Completes a task.
+   *
+   * @param externalTask  which will be completed
+   * @param variables     are set in the task's ancestor execution hierarchy The key and the value represent
+   *                      the variable name and its value. Map can consist of both typed and untyped variables.
+   *
+   * @throws NotFoundException if the task has been canceled and therefore does not exist anymore
+   * @throws NotAcquiredException if the task's most recent lock could not be acquired
+   * @throws NotResumedException if the corresponding process instance could not be resumed
+   * @throws ConnectionLostException if the connection could not be established
+   * @throws UnknownTypeException if a variable is set that type is not on the class path
+   * @throws UnsupportedTypeException if a variable is set that has an unsupported type
+   */
+  void complete(ExternalTask externalTask, Map<String, Object> variables);
+
+  /**
+   * Completes a task.
+   *
+   * @param externalTask    which will be completed
+   * @param variables       are set in the task's ancestor execution hierarchy. The key and the value represent
+   *                        the variable name and its value. Map can consist of both typed and untyped variables.
+   * @param localVariables  are set in the execution of the external task instance. The key and the value represent
+   *                        the variable name and its value. Map can consist of both typed and untyped variables.
+   *
+   * @throws NotFoundException if the task has been canceled and therefore does not exist anymore
+   * @throws NotAcquiredException if the task's most recent lock could not be acquired
+   * @throws NotResumedException if the corresponding process instance could not be resumed
+   * @throws ConnectionLostException if the connection could not be established
+   * @throws UnknownTypeException if a variable is set that type is not on the class path
+   * @throws UnsupportedTypeException if a variable is set that has an unsupported type
+   */
+  void complete(ExternalTask externalTask, Map<String, Object> variables, Map<String, Object> localVariables);
 
   /**
    * Reports a failure to execute a task. A number of retries and a timeout until
