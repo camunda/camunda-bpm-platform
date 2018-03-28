@@ -85,7 +85,7 @@ module.exports = [
             }
           } else {
             if( completeCount == selectedGroupIds.length ) {
-              deferred.reject();
+              deferred.reject(err);
             }
           }
         });
