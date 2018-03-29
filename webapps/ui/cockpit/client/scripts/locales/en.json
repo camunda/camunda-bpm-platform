@@ -639,6 +639,7 @@
   "PLUGIN_VARIABLE_VALUE" : "Value",
   "PLUGIN_VARIABLE_TYPE" : "Type",
   "PLUGIN_VARIABLE_SCOPE" : "Scope",
+  "PLUGIN_VARIABLE_ACTION" : "Action",
 
   "PLUGIN_USER_TASKS_MESSAGE_1" : "The assignee of the user task '{{name}}' has been set to '{{assignee}}' successfully",
   "PLUGIN_USER_TASKS_MESSAGE_2" : "The assignee of the task '{{name}}' has been reset successfully",
