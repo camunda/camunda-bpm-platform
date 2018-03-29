@@ -32,7 +32,8 @@ module.exports = function(ngModule) {
       $scope.headColumns = [
         { class: 'name',  request: 'variableName', sortable: true, content: $translate.instant('PLUGIN_VARIABLE_NAME')},
         { class: 'type',  request: 'variableType', sortable: true, content: $translate.instant('PLUGIN_VARIABLE_TYPE')},
-        { class: 'value', request: '',             sortable: false, content: $translate.instant('PLUGIN_VARIABLE_VALUE')}
+        { class: 'value', request: '',             sortable: false, content: $translate.instant('PLUGIN_VARIABLE_VALUE')},
+        { class: 'scope', request: '',             sortable: false, content: $translate.instant('PLUGIN_VARIABLE_SCOPE')}
       ];
 
       // Default sorting
