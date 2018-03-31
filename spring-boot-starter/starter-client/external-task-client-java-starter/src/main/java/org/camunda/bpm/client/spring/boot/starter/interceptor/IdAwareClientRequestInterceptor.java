@@ -6,4 +6,11 @@ public interface IdAwareClientRequestInterceptor extends ClientRequestIntercepto
 
   String getId();
 
+  default boolean accepts(String id) {
+    if (getId() == null) {
+      return id == null;
+    }
+    return getId().equals(id);
+  }
+
 }

@@ -46,14 +46,6 @@ public class PropertiesAwareExternalTaskClientFactory extends ExternalTaskClient
             .add(new BasicAuthProvider(basicAuth.getUsername(), basicAuth.getPassword())));
   }
 
-  protected boolean isIdMatch(IdAwareClientRequestInterceptor interceptor) {
-    String interceptorId = interceptor.getId();
-    if (interceptorId == null) {
-      return getId() == null;
-    }
-    return interceptorId.equals(getId());
-  }
-
   @Override
   public void setClientRequestInterceptors(List<ClientRequestInterceptor> clientRequestInterceptors) {
     if (CollectionUtils.isEmpty(clientRequestInterceptors)) {
@@ -64,7 +56,7 @@ public class PropertiesAwareExternalTaskClientFactory extends ExternalTaskClient
     for (ClientRequestInterceptor clientRequestInterceptor : clientRequestInterceptors) {
       if (clientRequestInterceptor instanceof IdAwareClientRequestInterceptor) {
         IdAwareClientRequestInterceptor idAwareClientRequestInterceptor = (IdAwareClientRequestInterceptor) clientRequestInterceptor;
-        if (isIdMatch(idAwareClientRequestInterceptor)) {
+        if (idAwareClientRequestInterceptor.accepts(getId())) {
           idAwareClientRequestInterceptors.add(idAwareClientRequestInterceptor);
         }
       } else {
