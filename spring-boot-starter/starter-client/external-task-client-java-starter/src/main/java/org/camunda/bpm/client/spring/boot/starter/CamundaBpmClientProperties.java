@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import lombok.AllArgsConstructor;
@@ -13,19 +14,16 @@ import lombok.ToString;
 
 @ConfigurationProperties(prefix = "camunda.bpm.client")
 @Data
-public class CamundaBpmClientProperties {
+public class CamundaBpmClientProperties implements InitializingBean {
 
+  protected String baseUrl;
   protected BasicAuthProperties basicAuth = new BasicAuthProperties();
   protected Map<String, SubscriptionProperties> subscriptions = new HashMap<>();
   protected Map<String, Client> clients = new HashMap<>();
 
-  public String getBaseUrl() {
-    Client client = clients.get("");
-    return client == null ? null : client.getBaseUrl();
-  }
-
-  public void setBaseUrl(String baseUrl) {
-    clients.put("", new Client(baseUrl));
+  @Override
+  public void afterPropertiesSet() throws Exception {
+    clients.put("", new Client(baseUrl, basicAuth));
   }
 
   public Optional<SubscriptionProperties> subscriptionInformationFor(String topic) {
@@ -42,6 +40,10 @@ public class CamundaBpmClientProperties {
       baseUrl = this.getBaseUrl();
     }
     return Optional.ofNullable(baseUrl);
+  }
+
+  public Optional<Client> getClient(String id) {
+    return Optional.ofNullable(clients.get(id));
   }
 
   @Data
@@ -64,6 +66,7 @@ public class CamundaBpmClientProperties {
   @AllArgsConstructor
   public static class Client {
     protected String baseUrl;
+    protected BasicAuthProperties basicAuth = new BasicAuthProperties();
   }
 
 }

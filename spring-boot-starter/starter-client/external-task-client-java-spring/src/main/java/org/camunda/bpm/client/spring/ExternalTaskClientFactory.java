@@ -27,10 +27,14 @@ public class ExternalTaskClientFactory implements FactoryBean<ExternalTaskClient
   public ExternalTaskClient getObject() throws Exception {
     if (externalTaskClient == null) {
       ExternalTaskClientBuilder taskClientBuilder = ExternalTaskClient.create().baseUrl(baseUrl);
-      clientRequestInterceptors.forEach(taskClientBuilder::addInterceptor);
+      addClientRequestInterceptors(taskClientBuilder);
       externalTaskClient = taskClientBuilder.build();
     }
     return externalTaskClient;
+  }
+
+  protected void addClientRequestInterceptors(ExternalTaskClientBuilder taskClientBuilder) {
+    clientRequestInterceptors.forEach(taskClientBuilder::addInterceptor);
   }
 
   @Override
