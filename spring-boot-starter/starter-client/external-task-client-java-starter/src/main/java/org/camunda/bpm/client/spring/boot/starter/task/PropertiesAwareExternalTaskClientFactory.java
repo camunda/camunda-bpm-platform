@@ -37,7 +37,7 @@ public class PropertiesAwareExternalTaskClientFactory extends ExternalTaskClient
   @Override
   protected void addClientRequestInterceptors(ExternalTaskClientBuilder taskClientBuilder) {
     super.addClientRequestInterceptors(taskClientBuilder);
-    idAwareClientRequestInterceptors.stream().filter(this::isIdMatch).forEach(taskClientBuilder::addInterceptor);
+    idAwareClientRequestInterceptors.forEach(taskClientBuilder::addInterceptor);
   }
 
   protected void addBasicAuthInterceptor() {
@@ -47,7 +47,11 @@ public class PropertiesAwareExternalTaskClientFactory extends ExternalTaskClient
   }
 
   protected boolean isIdMatch(IdAwareClientRequestInterceptor interceptor) {
-    return interceptor.getId().map(id -> id.equals(getId())).orElse(false);
+    String interceptorId = interceptor.getId();
+    if (interceptorId == null) {
+      return getId() == null;
+    }
+    return interceptorId.equals(getId());
   }
 
   @Override
@@ -59,7 +63,10 @@ public class PropertiesAwareExternalTaskClientFactory extends ExternalTaskClient
     List<ClientRequestInterceptor> interceptors = new ArrayList<>();
     for (ClientRequestInterceptor clientRequestInterceptor : clientRequestInterceptors) {
       if (clientRequestInterceptor instanceof IdAwareClientRequestInterceptor) {
-        idAwareClientRequestInterceptors.add((IdAwareClientRequestInterceptor) clientRequestInterceptor);
+        IdAwareClientRequestInterceptor idAwareClientRequestInterceptor = (IdAwareClientRequestInterceptor) clientRequestInterceptor;
+        if (isIdMatch(idAwareClientRequestInterceptor)) {
+          idAwareClientRequestInterceptors.add(idAwareClientRequestInterceptor);
+        }
       } else {
         interceptors.add(clientRequestInterceptor);
       }
