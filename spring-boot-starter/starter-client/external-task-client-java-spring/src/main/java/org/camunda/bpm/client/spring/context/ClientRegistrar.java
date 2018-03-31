@@ -1,12 +1,9 @@
 package org.camunda.bpm.client.spring.context;
 
-import org.camunda.bpm.client.spring.BaseUrlSupplier;
-import org.camunda.bpm.client.spring.DefaultBaseUrlSupplier;
 import org.camunda.bpm.client.spring.EnableTaskSubscription;
 import org.camunda.bpm.client.spring.ExternalTaskClientFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.AutowireCandidateQualifier;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -22,39 +19,33 @@ import lombok.extern.slf4j.Slf4j;
 public class ClientRegistrar implements ImportBeanDefinitionRegistrar {
 
   public static final Class<? extends ExternalTaskClientFactory> DEFAULT_EXTERNAL_TASK_CLIENT_FACTORY_CLASS = ExternalTaskClientFactory.class;
-  public static final Class<? extends BaseUrlSupplier> DEFAULT_ID_AWARE_BASE_URL_SUPPLIER_CLASS = DefaultBaseUrlSupplier.class;
 
   private final Class<? extends ExternalTaskClientFactory> externalTaskClientFactoryClass;
-  private final Class<? extends BaseUrlSupplier> idAwareBaseUrlSupplierClass;
 
   public ClientRegistrar() {
-    this(DEFAULT_EXTERNAL_TASK_CLIENT_FACTORY_CLASS, DEFAULT_ID_AWARE_BASE_URL_SUPPLIER_CLASS);
+    this(DEFAULT_EXTERNAL_TASK_CLIENT_FACTORY_CLASS);
   }
 
-  public ClientRegistrar(Class<? extends ExternalTaskClientFactory> externalTaskClientFactoryClass,
-      Class<? extends BaseUrlSupplier> idAwareBaseUrlSupplierClass) {
+  public ClientRegistrar(Class<? extends ExternalTaskClientFactory> externalTaskClientFactoryClass) {
     Assert.notNull(externalTaskClientFactoryClass, "externalTaskClientFactoryClass must not be 'null'");
-    Assert.notNull(idAwareBaseUrlSupplierClass, "idAwareBaseUrlSupplierClass must not be 'null'");
     this.externalTaskClientFactoryClass = externalTaskClientFactoryClass;
-    this.idAwareBaseUrlSupplierClass = idAwareBaseUrlSupplierClass;
   }
 
   @Override
   public void registerBeanDefinitions(AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry) {
-    AnnotationAttributes enableTaskSubscription = getEnableTaskSubscription(importingClassMetadata);
-    String baseUrlSupplier = registerBaseUrlSupplier(enableTaskSubscription, importingClassMetadata, registry);
-    registerExternalTaskClient(enableTaskSubscription, baseUrlSupplier, importingClassMetadata, registry);
+    registerExternalTaskClient(importingClassMetadata, registry);
   }
 
-  protected void registerExternalTaskClient(AnnotationAttributes enableTaskSubscription, String baseUrlSupplier,
-      AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry) {
+  protected void registerExternalTaskClient(AnnotationMetadata importingClassMetadata,
+      BeanDefinitionRegistry registry) {
+    AnnotationAttributes enableTaskSubscription = getEnableTaskSubscription(importingClassMetadata);
     String id = getId(enableTaskSubscription);
     String beanName = "externalTaskClient" + id;
     if (!isUniqueBean(beanName, importingClassMetadata, registry)) {
       return;
     }
     BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(externalTaskClientFactoryClass)
-        .addPropertyValue("id", id).addPropertyReference("baseUrlSupplier", baseUrlSupplier);
+        .addPropertyValue("id", id).addPropertyValue("baseUrl", getBaseUrl(enableTaskSubscription));
     if (!StringUtils.isEmpty(id)) {
       AutowireCandidateQualifier qualifierMetadata = new AutowireCandidateQualifier(Qualifier.class);
       qualifierMetadata.setAttribute(AutowireCandidateQualifier.VALUE_KEY, id);
@@ -62,21 +53,6 @@ public class ClientRegistrar implements ImportBeanDefinitionRegistrar {
     }
     registry.registerBeanDefinition(beanName, builder.getBeanDefinition());
     log.debug("registered external task client with beanName '{}'", beanName);
-  }
-
-  protected String registerBaseUrlSupplier(AnnotationAttributes enableTaskSubscription,
-      AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry) {
-    String id = getId(enableTaskSubscription);
-    String beanName = "baseUrlSupplier" + id;
-    if (!isUniqueBean(beanName, importingClassMetadata, registry)) {
-      return beanName;
-    }
-    BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(idAwareBaseUrlSupplierClass)
-        .addPropertyValue("baseUrl", getBaseUrl(enableTaskSubscription)).addPropertyValue("id", id);
-    AbstractBeanDefinition beanDefinition = builder.getBeanDefinition();
-    registry.registerBeanDefinition(beanName, beanDefinition);
-    log.debug("registered baseUrlSupplier with beanName '{}'", beanName);
-    return beanName;
   }
 
   protected boolean isUniqueBean(String beanName, AnnotationMetadata importingClassMetadata,

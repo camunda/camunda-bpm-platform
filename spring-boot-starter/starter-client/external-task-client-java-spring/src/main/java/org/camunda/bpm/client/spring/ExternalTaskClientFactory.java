@@ -17,7 +17,8 @@ import lombok.Setter;
 public class ExternalTaskClientFactory implements FactoryBean<ExternalTaskClient>, InitializingBean {
 
   @Getter
-  private BaseUrlSupplier baseUrlSupplier;
+  @Setter
+  private String baseUrl;
   @Getter
   private List<ClientRequestInterceptor> clientRequestInterceptors = new ArrayList<>();
   private ExternalTaskClient externalTaskClient;
@@ -28,7 +29,7 @@ public class ExternalTaskClientFactory implements FactoryBean<ExternalTaskClient
   @Override
   public ExternalTaskClient getObject() throws Exception {
     if (externalTaskClient == null) {
-      ExternalTaskClientBuilder taskClientBuilder = ExternalTaskClient.create().baseUrl(baseUrlSupplier.get(id));
+      ExternalTaskClientBuilder taskClientBuilder = ExternalTaskClient.create().baseUrl(baseUrl);
       clientRequestInterceptors.forEach(taskClientBuilder::addInterceptor);
       externalTaskClient = taskClientBuilder.build();
     }
@@ -37,7 +38,7 @@ public class ExternalTaskClientFactory implements FactoryBean<ExternalTaskClient
 
   @Override
   public void afterPropertiesSet() throws Exception {
-    Assert.notNull(baseUrlSupplier, "baseUrlSupplier must not be 'null'");
+    Assert.notNull(baseUrl, "baseUrlSupplier must not be 'null'");
   }
 
   @Override
@@ -53,10 +54,6 @@ public class ExternalTaskClientFactory implements FactoryBean<ExternalTaskClient
   @Autowired(required = false)
   public void setClientRequestInterceptors(List<ClientRequestInterceptor> clientRequestInterceptors) {
     this.clientRequestInterceptors = clientRequestInterceptors == null ? new ArrayList<>() : clientRequestInterceptors;
-  }
-
-  public void setBaseUrlSupplier(BaseUrlSupplier baseUrlSupplier) {
-    this.baseUrlSupplier = baseUrlSupplier;
   }
 
 }
