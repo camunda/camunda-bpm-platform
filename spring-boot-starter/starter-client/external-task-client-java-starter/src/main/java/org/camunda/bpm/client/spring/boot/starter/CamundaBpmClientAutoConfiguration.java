@@ -10,6 +10,7 @@ import org.camunda.bpm.client.spring.boot.starter.task.PropertiesAwareSubscribed
 import org.camunda.bpm.client.spring.context.ClientRegistrar;
 import org.camunda.bpm.client.spring.context.ExternalTaskBeanDefinitionRegistryPostProcessor;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -17,6 +18,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Role;
+import org.springframework.core.annotation.AnnotationAttributes;
 
 @EnableConfigurationProperties({ CamundaBpmClientProperties.class })
 @EnableTaskSubscription
@@ -44,6 +46,13 @@ public class CamundaBpmClientAutoConfiguration {
   static class PropertiesAwareClientRegistrar extends ClientRegistrar {
     public PropertiesAwareClientRegistrar() {
       super(PropertiesAwareExternalTaskClientFactory.class);
+    }
+
+    @Override
+    protected BeanDefinitionBuilder getExternalTaskClientFactoryBeanDefinitionBuilder(
+        AnnotationAttributes enableTaskSubscription, String id) {
+      return super.getExternalTaskClientFactoryBeanDefinitionBuilder(enableTaskSubscription, id).addPropertyValue("id",
+          id);
     }
   }
 }

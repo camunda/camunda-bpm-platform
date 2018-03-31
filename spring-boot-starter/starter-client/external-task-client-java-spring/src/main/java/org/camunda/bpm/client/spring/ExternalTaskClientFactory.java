@@ -22,9 +22,6 @@ public class ExternalTaskClientFactory implements FactoryBean<ExternalTaskClient
   @Getter
   private List<ClientRequestInterceptor> clientRequestInterceptors = new ArrayList<>();
   private ExternalTaskClient externalTaskClient;
-  @Getter
-  @Setter
-  private String id;
 
   @Override
   public ExternalTaskClient getObject() throws Exception {

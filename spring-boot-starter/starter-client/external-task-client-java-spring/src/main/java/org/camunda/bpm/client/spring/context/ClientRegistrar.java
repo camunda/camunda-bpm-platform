@@ -44,8 +44,7 @@ public class ClientRegistrar implements ImportBeanDefinitionRegistrar {
     if (!isUniqueBean(beanName, importingClassMetadata, registry)) {
       return;
     }
-    BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(externalTaskClientFactoryClass)
-        .addPropertyValue("id", id).addPropertyValue("baseUrl", getBaseUrl(enableTaskSubscription));
+    BeanDefinitionBuilder builder = getExternalTaskClientFactoryBeanDefinitionBuilder(enableTaskSubscription, id);
     if (!StringUtils.isEmpty(id)) {
       AutowireCandidateQualifier qualifierMetadata = new AutowireCandidateQualifier(Qualifier.class);
       qualifierMetadata.setAttribute(AutowireCandidateQualifier.VALUE_KEY, id);
@@ -53,6 +52,12 @@ public class ClientRegistrar implements ImportBeanDefinitionRegistrar {
     }
     registry.registerBeanDefinition(beanName, builder.getBeanDefinition());
     log.debug("registered external task client with beanName '{}'", beanName);
+  }
+
+  protected BeanDefinitionBuilder getExternalTaskClientFactoryBeanDefinitionBuilder(
+      AnnotationAttributes enableTaskSubscription, String id) {
+    return BeanDefinitionBuilder.genericBeanDefinition(externalTaskClientFactoryClass).addPropertyValue("baseUrl",
+        getBaseUrl(enableTaskSubscription));
   }
 
   protected boolean isUniqueBean(String beanName, AnnotationMetadata importingClassMetadata,
