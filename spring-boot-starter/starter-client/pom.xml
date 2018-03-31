@@ -93,5 +93,6 @@
   <modules>
     <module>external-task-client-java-starter</module>
     <module>external-task-client-java-spring</module>
+    <module>examples</module>
   </modules>
 </project>

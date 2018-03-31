@@ -13,7 +13,7 @@
 
 	<parent>
 		<groupId>org.camunda.bpm.spring.boot</groupId>
-		<artifactId>external-task-client-java-spring-root</artifactId>
+		<artifactId>external-task-client-java-spring-examples</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 
