@@ -38,7 +38,7 @@ public class ExternalTaskClientFactory implements FactoryBean<ExternalTaskClient
 
   @Override
   public void afterPropertiesSet() throws Exception {
-    Assert.notNull(baseUrl, "baseUrlSupplier must not be 'null'");
+    Assert.notNull(baseUrl, "baseUrl must not be 'null'");
   }
 
   @Override
