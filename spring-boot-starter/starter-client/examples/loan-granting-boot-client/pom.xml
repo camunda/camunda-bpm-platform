@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.camunda.bpm.spring.boot.example</groupId>
-	<artifactId>loan-granting-client</artifactId>
+	<artifactId>loan-granting-boot-client</artifactId>
 	<packaging>jar</packaging>
 
 	<name>loan-granting-client</name>

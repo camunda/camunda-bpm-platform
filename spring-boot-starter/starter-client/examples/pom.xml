@@ -12,8 +12,9 @@
   <packaging>pom</packaging>
   
   <modules>
-    <module>loan-granting-client</module>
     <module>loan-granting-webapp</module>
+    <module>loan-granting-boot-client</module>
+    <module>loan-granting-spring-client</module>
   </modules>
   
 </project>
