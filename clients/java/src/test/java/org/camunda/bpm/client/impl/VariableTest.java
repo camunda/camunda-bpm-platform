@@ -49,7 +49,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.camunda.bpm.client.ExternalTaskClient;
-import org.camunda.bpm.client.exception.ExternalTaskClientException;
 import org.camunda.bpm.client.exception.UnknownTypeException;
 import org.camunda.bpm.client.exception.UnsupportedTypeException;
 import org.camunda.bpm.client.helper.ClosableHttpClientMock;
@@ -60,7 +59,7 @@ import org.camunda.bpm.client.task.impl.ExternalTaskImpl;
 import org.camunda.bpm.client.task.impl.dto.CompleteRequestDto;
 import org.camunda.bpm.client.task.impl.dto.TypedValueDto;
 import org.camunda.bpm.client.topic.TopicSubscriptionBuilder;
-import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.client.topic.impl.dto.FetchAndLockRequestDto;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.impl.value.NullValueImpl;
 import org.camunda.bpm.engine.variable.type.PrimitiveValueType;
@@ -1342,7 +1341,121 @@ public class VariableTest {
       createTypedValueDto(47L, MockProvider.LONG_VARIABLE_TYPE)));
   }
 
+  /* tests if variables filter is applied */
+  @Test
+  public void shouldApplyVariablesFilter() throws Exception {
+    // given
+    ObjectMapper objectMapper = spy(ObjectMapper.class);
+    whenNew(ObjectMapper.class).withNoArguments().thenReturn(objectMapper);
+
+    mockFetchAndLockResponse(Collections.singletonList(MockProvider.createExternalTaskWithoutVariables()));
+
+    ExternalTaskClient client = ExternalTaskClient.create()
+      .baseUrl(MockProvider.BASE_URL)
+      .build();
+
+    final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
+    TopicSubscriptionBuilder topicSubscriptionBuilder =
+      client.subscribe(MockProvider.TOPIC_NAME)
+        .lockDuration(5000)
+        .variables("aVariableName", "anotherVariableName")
+        .handler((externalTask, externalTaskService) -> {
+          handlerInvoked.set(true);
+        });
+
+    // when
+    topicSubscriptionBuilder.open();
+    while (!handlerInvoked.get()) {
+      // busy waiting
+    }
+    client.stop();
+
+    // then
+    assertVariablesFilterAppliedAccordingToFetchAndLockPayload(objectMapper, "aVariableName", "anotherVariableName");
+  }
+
+  @Test
+  public void shouldApplyVariablesFilterAndNotRetrieveVariables() throws Exception {
+    // given
+    ObjectMapper objectMapper = spy(ObjectMapper.class);
+    whenNew(ObjectMapper.class).withNoArguments().thenReturn(objectMapper);
+
+    mockFetchAndLockResponse(Collections.singletonList(MockProvider.createExternalTaskWithoutVariables()));
+
+    ExternalTaskClient client = ExternalTaskClient.create()
+      .baseUrl(MockProvider.BASE_URL)
+      .build();
+
+    final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
+    TopicSubscriptionBuilder topicSubscriptionBuilder =
+      client.subscribe(MockProvider.TOPIC_NAME)
+        .lockDuration(5000)
+        .variables()
+        .handler((externalTask, externalTaskService) -> {
+          handlerInvoked.set(true);
+        });
+
+    // when
+    topicSubscriptionBuilder.open();
+    while (!handlerInvoked.get()) {
+      // busy waiting
+    }
+    client.stop();
+
+    // then
+    assertVariablesFilterAppliedAccordingToFetchAndLockPayload(objectMapper);
+  }
+
+  @Test
+  public void shouldNotApplyVariablesFilter() throws Exception {
+    // given
+    ObjectMapper objectMapper = spy(ObjectMapper.class);
+    whenNew(ObjectMapper.class).withNoArguments().thenReturn(objectMapper);
+
+    mockFetchAndLockResponse(Collections.singletonList(MockProvider.createExternalTaskWithoutVariables()));
+
+    ExternalTaskClient client = ExternalTaskClient.create()
+      .baseUrl(MockProvider.BASE_URL)
+      .build();
+
+    final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
+    TopicSubscriptionBuilder topicSubscriptionBuilder =
+      client.subscribe(MockProvider.TOPIC_NAME)
+        .lockDuration(5000)
+        .handler((externalTask, externalTaskService) -> {
+          handlerInvoked.set(true);
+        });
+
+    // when
+    topicSubscriptionBuilder.open();
+    while (!handlerInvoked.get()) {
+      // busy waiting
+    }
+    client.stop();
+
+    // then
+    assertVariablesFilterAppliedAccordingToFetchAndLockPayload(objectMapper, (String[]) null);
+  }
+
   // helper //////////////////////////////////
+
+  protected void assertVariablesFilterAppliedAccordingToFetchAndLockPayload(ObjectMapper objectMapper, String... expectedVariables) throws JsonProcessingException {
+    ArgumentCaptor<Object> payloads = ArgumentCaptor.forClass(Object.class);
+    verify(objectMapper, atLeastOnce()).writeValueAsBytes(payloads.capture());
+
+    FetchAndLockRequestDto fetchAndLockRequestDto = (FetchAndLockRequestDto) payloads.getAllValues().stream()
+      .filter(payload -> payload instanceof FetchAndLockRequestDto)
+      .findFirst()
+      .orElse(null);
+
+    if (expectedVariables == null) {
+      assertThat(fetchAndLockRequestDto.getTopics().get(0).getVariables()).isNull();
+    } else if (expectedVariables.length > 0) {
+      assertThat(fetchAndLockRequestDto.getTopics().get(0).getVariables()).containsExactly(expectedVariables);
+    } else {
+      assertThat(fetchAndLockRequestDto.getTopics().get(0).getVariables()).isEmpty();
+    }
+  }
 
   protected String encodeObjectToBase64(Object object) throws IOException {
     ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();

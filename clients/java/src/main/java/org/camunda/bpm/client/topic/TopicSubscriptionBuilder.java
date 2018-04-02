@@ -36,6 +36,12 @@ public interface TopicSubscriptionBuilder {
   TopicSubscriptionBuilder handler(ExternalTaskHandler handler);
 
   /**
+   * @param variableNames of variables which are supposed to be retrieved
+   * @return the builder
+   */
+  TopicSubscriptionBuilder variables(String... variableNames);
+
+  /**
    * Release the topic subscription for being executed asynchronously
    *
    * @throws ExternalTaskClientException

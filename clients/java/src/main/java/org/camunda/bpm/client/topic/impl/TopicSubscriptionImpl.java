@@ -15,6 +15,8 @@ package org.camunda.bpm.client.topic.impl;
 import org.camunda.bpm.client.task.ExternalTaskHandler;
 import org.camunda.bpm.client.topic.TopicSubscription;
 
+import java.util.List;
+
 /**
  * @author Tassilo Weidner
  */
@@ -24,12 +26,15 @@ public class TopicSubscriptionImpl implements TopicSubscription {
   protected long lockDuration;
   protected ExternalTaskHandler externalTaskHandler;
   protected TopicSubscriptionManager topicSubscriptionManager;
+  protected List<String> variableNames;
 
-  public TopicSubscriptionImpl(String topicName, long lockDuration, ExternalTaskHandler externalTaskHandler, TopicSubscriptionManager topicSubscriptionManager) {
+  public TopicSubscriptionImpl(String topicName, long lockDuration, ExternalTaskHandler externalTaskHandler,
+                               TopicSubscriptionManager topicSubscriptionManager, List<String> variableNames) {
     this.topicName = topicName;
     this.lockDuration = lockDuration;
     this.externalTaskHandler = externalTaskHandler;
     this.topicSubscriptionManager = topicSubscriptionManager;
+    this.variableNames = variableNames;
   }
 
   public String getTopicName() {
@@ -47,6 +52,10 @@ public class TopicSubscriptionImpl implements TopicSubscription {
   @Override
   public void close() {
     topicSubscriptionManager.unsubscribe(this);
+  }
+
+  public List<String> getVariableNames() {
+    return variableNames;
   }
 
 }

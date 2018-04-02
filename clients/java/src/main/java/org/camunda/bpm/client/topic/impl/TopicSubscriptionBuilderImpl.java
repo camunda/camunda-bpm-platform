@@ -17,6 +17,7 @@ import org.camunda.bpm.client.task.ExternalTaskHandler;
 import org.camunda.bpm.client.topic.TopicSubscription;
 import org.camunda.bpm.client.topic.TopicSubscriptionBuilder;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -28,11 +29,13 @@ public class TopicSubscriptionBuilderImpl implements TopicSubscriptionBuilder {
 
   protected String topicName;
   protected long lockDuration;
+  protected List<String> variableNames;
   protected ExternalTaskHandler externalTaskHandler;
   protected TopicSubscriptionManager topicSubscriptionManager;
 
   public TopicSubscriptionBuilderImpl(String topicName, TopicSubscriptionManager topicSubscriptionManager) {
     this.topicName = topicName;
+    this.variableNames = null; // if not null, no variables are retrieved by default
     this.topicSubscriptionManager = topicSubscriptionManager;
   }
 
@@ -43,6 +46,11 @@ public class TopicSubscriptionBuilderImpl implements TopicSubscriptionBuilder {
 
   public TopicSubscriptionBuilder handler(ExternalTaskHandler externalTaskHandler) {
     this.externalTaskHandler = externalTaskHandler;
+    return this;
+  }
+
+  public TopicSubscriptionBuilder variables(String... variableNames) {
+    this.variableNames = Arrays.asList(variableNames);
     return this;
   }
 
@@ -62,7 +70,7 @@ public class TopicSubscriptionBuilderImpl implements TopicSubscriptionBuilder {
     // TODO: synchronize check + add (+remove)
     checkTopicNameAlreadySubscribed();
 
-    TopicSubscriptionImpl subscription = new TopicSubscriptionImpl(topicName, lockDuration, externalTaskHandler, topicSubscriptionManager);
+    TopicSubscriptionImpl subscription = new TopicSubscriptionImpl(topicName, lockDuration, externalTaskHandler, topicSubscriptionManager, variableNames);
     topicSubscriptionManager.subscribe(subscription);
 
     return subscription;

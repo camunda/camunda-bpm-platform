@@ -14,6 +14,8 @@ package org.camunda.bpm.client.topic;
 
 import org.camunda.bpm.client.task.ExternalTaskHandler;
 
+import java.util.List;
+
 /**
  * <p>Subscription to a topic</p>
  *
@@ -40,5 +42,10 @@ public interface TopicSubscription {
    * @return the external task handler of the topic
    */
   ExternalTaskHandler getExternalTaskHandler();
+
+  /**
+   * @return a list of variable names which are supposed to be retrieved
+   */
+  List<String> getVariableNames();
 
 }

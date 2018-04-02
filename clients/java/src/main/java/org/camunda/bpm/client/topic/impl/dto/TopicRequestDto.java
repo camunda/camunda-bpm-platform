@@ -14,6 +14,8 @@ package org.camunda.bpm.client.topic.impl.dto;
 
 import org.camunda.bpm.client.topic.TopicSubscription;
 
+import java.util.List;
+
 /**
  * @author Tassilo Weidner
  */
@@ -21,10 +23,12 @@ public class TopicRequestDto {
 
   protected String topicName;
   protected long lockDuration;
+  protected List<String> variables;
 
-  public TopicRequestDto(String topicName, long lockDuration) {
+  public TopicRequestDto(String topicName, long lockDuration, List<String> variables) {
     this.topicName = topicName;
     this.lockDuration = lockDuration;
+    this.variables = variables;
   }
 
   public String getTopicName() {
@@ -34,11 +38,17 @@ public class TopicRequestDto {
   public long getLockDuration() {
     return lockDuration;
   }
-  
+
+  public List<String> getVariables() {
+    return variables;
+  }
+
   public static TopicRequestDto fromTopicSubscription(TopicSubscription topicSubscription) {
     long lockDuration = topicSubscription.getLockDuration();
     String topicName = topicSubscription.getTopicName();
-    return new TopicRequestDto(topicName, lockDuration);
+    List<String> variables = topicSubscription.getVariableNames();
+
+    return new TopicRequestDto(topicName, lockDuration, variables);
   }
 
 }
