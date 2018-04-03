@@ -631,7 +631,7 @@ public class IdentityServiceTest {
     identityService.saveUser(user);
 
     thrown.expect(AuthenticationException.class);
-    thrown.expectMessage("The user with id 'johndoe' is locked.");
+    thrown.expectMessage("The user with id 'johndoe' is permanently locked. Please contact your admin to unlock the account.");
 
     Date now = sdf.parse("2000-01-24T13:00:00");
     ClockUtil.setCurrentTime(now);
@@ -669,7 +669,7 @@ public class IdentityServiceTest {
     assertFalse(identityService.checkPassword("johndoe", "xxx"));
     fail("expected exception");
     } catch (AuthenticationException e) {
-      assertEquals("The user with id 'johndoe' is locked.", e.getMessage());
+      assertTrue(e.getMessage().contains("The user with id 'johndoe' is locked."));
     }
     ClockUtil.setCurrentTime(DateUtils.addSeconds(now, 30));
     assertTrue(identityService.checkPassword("johndoe", "xxx"));
@@ -687,13 +687,15 @@ public class IdentityServiceTest {
     now = ClockUtil.getCurrentTime();
     assertFalse(identityService.checkPassword("johndoe", "invalid pwd"));
 
+
     // try again before exprTime
     ClockUtil.setCurrentTime(DateUtils.addSeconds(now, 1));
     try {
       assertFalse(identityService.checkPassword("johndoe", "invalid pwd"));
       fail("expected exception");
     } catch (AuthenticationException e) {
-      assertEquals("The user with id 'johndoe' is locked.", e.getMessage());
+      Date expectedLockExpitation = DateUtils.addSeconds(now, 3);
+      assertTrue(e.getMessage().contains("The lock will expire at " + expectedLockExpitation));
     }
 
     identityService.deleteUser("johndoe");

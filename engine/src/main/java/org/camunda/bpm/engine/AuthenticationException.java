@@ -13,19 +13,22 @@
 
 package org.camunda.bpm.engine;
 
+import java.util.Date;
+
 public class AuthenticationException extends ProcessEngineException {
 
   private static final long serialVersionUID = 1L;
 
-  protected final String userId;
-
   public AuthenticationException(String userId) {
-    super("The user with id '" + userId + "' is locked.");
-    this.userId = userId;
+    super("The user with id '" + userId + "' is permanently locked. Please contact your admin to unlock the account.");
+  }
+
+  public AuthenticationException(String userId, Date lockExpirationDate) {
+    super("The user with id '" + userId + "' is locked. The lock will expire at " + lockExpirationDate);
   }
 
   public AuthenticationException(String userId, String message) {
     super("The user with id '" + userId + "' tries to login without success. " + message);
-    this.userId = userId;
   }
+
 }

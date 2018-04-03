@@ -87,7 +87,7 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
     }
 
     if (isUserLocked(user)) {
-      throw new AuthenticationException(userId);
+      throw new AuthenticationException(userId, user.getLockExpirationTime());
     }
 
     if (matchPassword(password, user)) {
@@ -107,7 +107,7 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
     int attempts = user.getAttempts();
 
     if (attempts >= maxAttempts) {
-      return true;
+      throw new AuthenticationException(user.getId());
     }
 
     Date lockExpirationTime = user.getLockExpirationTime();
