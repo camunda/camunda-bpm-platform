@@ -32,16 +32,19 @@ public class ExternalTaskClientImpl implements ExternalTaskClient {
   protected TopicSubscriptionManager topicSubscriptionManager;
   protected RequestInterceptorHandler requestInterceptorHandler;
 
+  protected int maxTasks;
+
   protected ExternalTaskClientImpl(ExternalTaskClientBuilderImpl clientBuilder) {
     String workerId = clientBuilder.getWorkerId();
     String baseUrl = clientBuilder.getBaseUrl();
+    int maxTasks = clientBuilder.getMaxTasks();
 
     List<ClientRequestInterceptor> interceptors = clientBuilder.getInterceptors();
     requestInterceptorHandler = new RequestInterceptorHandler(interceptors);
 
     ObjectMapper objectMapper = initObjectMapper();
     VariableMappers variableMappers = new VariableMappers(objectMapper);
-    EngineClient engineClient = new EngineClient(workerId, baseUrl, requestInterceptorHandler, variableMappers, objectMapper);
+    EngineClient engineClient = new EngineClient(workerId, maxTasks, baseUrl, requestInterceptorHandler, variableMappers, objectMapper);
     topicSubscriptionManager = new TopicSubscriptionManager(engineClient, variableMappers);
   }
 

@@ -15,24 +15,56 @@ package org.camunda.bpm.client;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.client.helper.MockProvider.BASE_URL;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.powermock.api.mockito.PowerMockito.mock;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.whenNew;
 
 import java.net.UnknownHostException;
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.http.HttpEntity;
+import org.apache.http.StatusLine;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.entity.ByteArrayEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
 import org.camunda.bpm.client.exception.ExternalTaskClientException;
+import org.camunda.bpm.client.helper.ClosableHttpClientMock;
 import org.camunda.bpm.client.helper.MockProvider;
 import org.camunda.bpm.client.impl.EngineClient;
 import org.camunda.bpm.client.impl.ExternalTaskClientBuilderImpl;
 import org.camunda.bpm.client.impl.ExternalTaskClientImpl;
 import org.camunda.bpm.client.interceptor.ClientRequestInterceptor;
 import org.camunda.bpm.client.interceptor.auth.BasicAuthProvider;
+import org.camunda.bpm.client.task.ExternalTask;
+import org.camunda.bpm.client.topic.TopicSubscriptionBuilder;
+import org.camunda.bpm.client.topic.impl.dto.FetchAndLockRequestDto;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
  * @author Tassilo Weidner
  */
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({HttpClients.class, ExternalTaskClientImpl.class})
+@PowerMockIgnore("javax.net.ssl.*")
 public class ExternalTaskClientTest {
 
   @Test
@@ -122,6 +154,125 @@ public class ExternalTaskClientTest {
 
     // then
     assertThat(interceptors.size()).isEqualTo(2);
+  }
+
+  @Test
+  public void shouldUseDefaultAmountOfMaxTasks() throws Exception {
+    // given
+    ObjectMapper objectMapper = spy(ObjectMapper.class);
+    whenNew(ObjectMapper.class).withNoArguments()
+      .thenReturn(objectMapper);
+
+    mockFetchAndLockResponse(Collections.singletonList(MockProvider.createExternalTaskWithoutVariables()));
+
+    ExternalTaskClient client = ExternalTaskClient.create()
+      .baseUrl(MockProvider.BASE_URL)
+      .build();
+
+    final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
+    TopicSubscriptionBuilder topicSubscriptionBuilder =
+      client.subscribe(MockProvider.TOPIC_NAME)
+        .lockDuration(5000)
+        .handler((externalTask, externalTaskService) -> {
+          handlerInvoked.set(true);
+        });
+
+    // when
+    topicSubscriptionBuilder.open();
+    while (!handlerInvoked.get()) {
+      // busy waiting
+    }
+    client.stop();
+
+    // then
+    assertMaxTasksAccordingToFetchAndLockPayload(objectMapper, 10);
+  }
+
+  @Test
+  public void shouldSpecifyMaxTasks() throws Exception {
+    // given
+    ObjectMapper objectMapper = spy(ObjectMapper.class);
+    whenNew(ObjectMapper.class).withNoArguments()
+      .thenReturn(objectMapper);
+
+    mockFetchAndLockResponse(Collections.singletonList(MockProvider.createExternalTaskWithoutVariables()));
+
+    ExternalTaskClient client = ExternalTaskClient.create()
+      .baseUrl(MockProvider.BASE_URL)
+      .maxTasks(5)
+      .build();
+
+    final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
+    TopicSubscriptionBuilder topicSubscriptionBuilder =
+      client.subscribe(MockProvider.TOPIC_NAME)
+        .lockDuration(5000)
+        .handler((externalTask, externalTaskService) -> {
+          handlerInvoked.set(true);
+        });
+
+    // when
+    topicSubscriptionBuilder.open();
+    while (!handlerInvoked.get()) {
+      // busy waiting
+    }
+    client.stop();
+
+    // then
+    assertMaxTasksAccordingToFetchAndLockPayload(objectMapper, 5);
+  }
+
+  @Test
+  public void shouldThrowExceptionDueToMaxTasksNotGreaterThanZeroException() {
+    // given
+    ExternalTaskClientBuilder clientBuilder = ExternalTaskClient.create()
+      .baseUrl(MockProvider.BASE_URL)
+      .maxTasks(-5);
+
+    try {
+      // when
+      clientBuilder.build();
+
+      fail("No ExternalTaskClientException thrown!");
+    } catch (ExternalTaskClientException e) {
+      // then
+      assertThat(e.getMessage()).contains("Maximum amount of fetched tasks cannot be less than zero");
+    }
+  }
+
+  // helper /////////////////////////////////////////
+
+  protected void mockFetchAndLockResponse(List<ExternalTask> externalTasks) throws JsonProcessingException {
+    mockStatic(HttpClients.class);
+
+    HttpClientBuilder httpClientBuilderMock = mock(HttpClientBuilder.class, RETURNS_DEEP_STUBS);
+    PowerMockito.when(HttpClients.custom())
+      .thenReturn(httpClientBuilderMock);
+
+    CloseableHttpResponse closeableHttpResponse = mock(CloseableHttpResponse.class);
+    PowerMockito.when(closeableHttpResponse.getStatusLine())
+      .thenReturn(mock(StatusLine.class));
+
+    CloseableHttpClient httpClient = spy(new ClosableHttpClientMock(closeableHttpResponse));
+    PowerMockito.when(httpClientBuilderMock.build())
+      .thenReturn(httpClient);
+
+    ObjectMapper objectMapper = new ObjectMapper();
+    byte[] externalTasksAsBytes = objectMapper.writeValueAsBytes(externalTasks);
+    HttpEntity entity = new ByteArrayEntity(externalTasksAsBytes);
+    doReturn(entity)
+      .when(closeableHttpResponse).getEntity();
+  }
+
+  protected void assertMaxTasksAccordingToFetchAndLockPayload(ObjectMapper objectMapper, int expectedMaxTasks) throws JsonProcessingException {
+    ArgumentCaptor<Object> payloads = ArgumentCaptor.forClass(Object.class);
+    verify(objectMapper, atLeastOnce()).writeValueAsBytes(payloads.capture());
+
+    FetchAndLockRequestDto fetchAndLockRequestDto = (FetchAndLockRequestDto) payloads.getAllValues().stream()
+      .filter(payload -> payload instanceof FetchAndLockRequestDto)
+      .findFirst()
+      .orElse(null);
+
+    assertThat(fetchAndLockRequestDto.getMaxTasks()).isEqualTo(expectedMaxTasks);
   }
 
 }

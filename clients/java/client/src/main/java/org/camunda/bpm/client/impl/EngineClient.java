@@ -39,7 +39,6 @@ import java.util.Map;
  */
 public class EngineClient {
 
-  protected static final int MAX_TASKS = 10;
   protected static final String EXTERNAL_TASK_RESOURCE_PATH = "/external-task";
   protected static final String FETCH_AND_LOCK_RESOURCE_PATH = EXTERNAL_TASK_RESOURCE_PATH + "/fetchAndLock";
   public static final String ID_PATH_PARAM = "{id}";
@@ -52,19 +51,21 @@ public class EngineClient {
 
   protected String baseUrl;
   protected String workerId;
+  protected int maxTasks;
   protected RequestExecutor engineInteraction;
 
   protected VariableMappers variableMappers;
 
-  public EngineClient(String workerId, String baseUrl, RequestInterceptorHandler requestInterceptorHandler, VariableMappers variableMappers, ObjectMapper objectMapper) {
+  public EngineClient(String workerId, int maxTasks, String baseUrl, RequestInterceptorHandler requestInterceptorHandler, VariableMappers variableMappers, ObjectMapper objectMapper) {
     this.workerId = workerId;
+    this.maxTasks = maxTasks;
     this.engineInteraction = new RequestExecutor(requestInterceptorHandler, objectMapper);
     this.baseUrl = engineInteraction.sanitizeUrl(baseUrl);
     this.variableMappers = variableMappers;
   }
 
   public List<ExternalTask> fetchAndLock(List<TopicRequestDto> topics) throws EngineClientException {
-    FetchAndLockRequestDto payload = new FetchAndLockRequestDto(workerId, MAX_TASKS, topics);
+    FetchAndLockRequestDto payload = new FetchAndLockRequestDto(workerId, maxTasks, topics);
     String resourceUrl = baseUrl + FETCH_AND_LOCK_RESOURCE_PATH;
     ExternalTask[] externalTasks = engineInteraction.postRequest(resourceUrl, payload, ExternalTaskImpl[].class);
     return Arrays.asList(externalTasks);

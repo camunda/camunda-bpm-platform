@@ -14,6 +14,7 @@ package org.camunda.bpm.client.impl;
 
 import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.client.ExternalTaskClientBuilder;
+import org.camunda.bpm.client.exception.ExternalTaskClientException;
 import org.camunda.bpm.client.interceptor.ClientRequestInterceptor;
 
 import java.net.InetAddress;
@@ -31,9 +32,11 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
 
   protected String baseUrl;
   protected String workerId;
+  protected int maxTasks;
   protected List<ClientRequestInterceptor> interceptors;
 
   public ExternalTaskClientBuilderImpl() {
+    this.maxTasks = 10; // default value
     this.interceptors = new ArrayList<>();
   }
 
@@ -47,7 +50,16 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
     return this;
   }
 
+  public ExternalTaskClientBuilder maxTasks(int maxTasks) {
+    this.maxTasks = maxTasks;
+    return this;
+  }
+
   public ExternalTaskClient build() {
+    if (maxTasks <= 0) {
+      throw LOG.maxTasksNotGreaterThanZeroException();
+    }
+
     if (baseUrl == null || baseUrl.isEmpty()) {
       throw LOG.baseUrlNullException();
     }
@@ -93,6 +105,10 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
 
   protected List<ClientRequestInterceptor> getInterceptors() {
     return interceptors;
+  }
+
+  protected int getMaxTasks() {
+    return maxTasks;
   }
 
 }

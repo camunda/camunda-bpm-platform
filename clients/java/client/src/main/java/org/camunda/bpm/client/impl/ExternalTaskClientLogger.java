@@ -129,4 +129,10 @@ public class ExternalTaskClientLogger extends BaseLogger {
     return new UnknownTypeException(exceptionMessage(
       "017", "Exception while serializing variable of type object: the type of the object is not on the class path: '{}'", objectValue));
   }
+
+  public ExternalTaskClientException maxTasksNotGreaterThanZeroException() {
+    return new ExternalTaskClientException(exceptionMessage(
+      "018", "Maximum amount of fetched tasks cannot be less than zero"));
+  }
+
 }

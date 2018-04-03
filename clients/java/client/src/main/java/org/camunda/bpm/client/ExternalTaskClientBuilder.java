@@ -37,12 +37,21 @@ public interface ExternalTaskClientBuilder {
   ExternalTaskClientBuilder addInterceptor(ClientRequestInterceptor interceptor);
 
   /**
+   * Specifies the amount of maximum tasks which are supposed to be fetched within one request
+   *
+   * @param maxTasks which are supposed to be fetched within one request
+   * @return the builder
+   */
+  ExternalTaskClientBuilder maxTasks(int maxTasks);
+
+  /**
    * Bootstraps the Camunda client
    *
    * @throws ExternalTaskClientException
    * <ul>
    *   <li> if base url is null or string is empty
    *   <li> if hostname cannot be retrieved
+   *   <li> if maximum amount of tasks is not greater than zero
    * </ul>
    * @return the builder
    */
