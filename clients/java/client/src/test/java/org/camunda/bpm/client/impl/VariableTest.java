@@ -406,7 +406,7 @@ public class VariableTest {
 
     // when
     topicSubscriptionBuilder.open();
-    Thread.sleep(1000);
+
 
     client.stop();
 
@@ -641,7 +641,7 @@ public class VariableTest {
 
     // when
     topicSubscriptionBuilder.open();
-    Thread.sleep(1000);
+
 
     // then
     verifyNoMoreInteractions(externalTaskHandlerMock);
@@ -672,7 +672,7 @@ public class VariableTest {
 
     // when
     topicSubscriptionBuilder.open();
-    Thread.sleep(1000);
+
 
     // then
     verifyNoMoreInteractions(externalTaskHandlerMock);
@@ -703,7 +703,7 @@ public class VariableTest {
 
     // when
     topicSubscriptionBuilder.open();
-    Thread.sleep(1000);
+
 
     // then
     verifyNoMoreInteractions(externalTaskHandlerMock);
@@ -734,7 +734,7 @@ public class VariableTest {
 
     // when
     topicSubscriptionBuilder.open();
-    Thread.sleep(1000);
+
 
     // then
     verifyNoMoreInteractions(externalTaskHandlerMock);
@@ -765,7 +765,7 @@ public class VariableTest {
 
     // when
     topicSubscriptionBuilder.open();
-    Thread.sleep(1000);
+
 
     // then
     verifyNoMoreInteractions(externalTaskHandlerMock);
@@ -796,7 +796,7 @@ public class VariableTest {
 
     // when
     topicSubscriptionBuilder.open();
-    Thread.sleep(1000);
+
 
     // then
     verifyNoMoreInteractions(externalTaskHandlerMock);

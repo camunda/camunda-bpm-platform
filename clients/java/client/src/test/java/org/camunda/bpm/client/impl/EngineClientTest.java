@@ -153,7 +153,7 @@ public class EngineClientTest {
 
     // when
     topicSubscriptionBuilder.open();
-    Thread.sleep(1000);
+
     client.stop();
 
     // then
@@ -176,7 +176,7 @@ public class EngineClientTest {
 
     // when
     topicSubscriptionBuilder.open();
-    Thread.sleep(1000);
+
     client.stop();
 
     // then
@@ -199,7 +199,7 @@ public class EngineClientTest {
 
     // when
     topicSubscriptionBuilder.open();
-    Thread.sleep(1000);
+
     client.stop();
 
     // then
@@ -222,7 +222,7 @@ public class EngineClientTest {
 
     // when
     topicSubscriptionBuilder.open();
-    Thread.sleep(1000);
+
     client.stop();
 
     // then
@@ -246,7 +246,7 @@ public class EngineClientTest {
 
     // when
     topicSubscriptionBuilder.open();
-    Thread.sleep(1000);
+
     client.stop();
 
     // then
@@ -270,7 +270,7 @@ public class EngineClientTest {
 
     // when
     topicSubscriptionBuilder.open();
-    Thread.sleep(1000);
+
     client.stop();
 
     // then
@@ -294,7 +294,7 @@ public class EngineClientTest {
 
     // when
     topicSubscriptionBuilder.open();
-    Thread.sleep(1000);
+
     client.stop();
 
     // then
