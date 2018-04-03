@@ -264,6 +264,37 @@ public class ExternalTaskClientTest {
     }
   }
 
+  @Test
+  public void shouldUseCustomWorkerId() throws Exception {
+    // given
+    mockFetchAndLockResponse(Collections.singletonList(MockProvider.createExternalTaskWithoutVariables()));
+
+    ObjectMapper objectMapper = spy(ObjectMapper.class);
+    whenNew(ObjectMapper.class).withNoArguments()
+      .thenReturn(objectMapper);
+
+    client = ExternalTaskClient.create()
+      .workerId("aWorkerId")
+      .baseUrl(MockProvider.BASE_URL)
+      .build();
+
+    final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
+    TopicSubscriptionBuilder topicSubscriptionBuilder =
+      client.subscribe(MockProvider.TOPIC_NAME)
+        .lockDuration(5000)
+        .handler((externalTask, externalTaskService) -> handlerInvoked.set(true));
+
+    // when
+    topicSubscriptionBuilder.open();
+    while (!handlerInvoked.get()) {
+      // busy waiting
+    }
+    client.stop();
+
+    // then
+    assertWorkerIdAccordingToFetchAndLockPayload(objectMapper, "aWorkerId");
+  }
+
   // helper /////////////////////////////////////////
 
   protected void mockFetchAndLockResponse(List<ExternalTask> externalTasks) throws JsonProcessingException {
@@ -276,6 +307,10 @@ public class ExternalTaskClientTest {
 
   protected void assertMaxTasksAccordingToFetchAndLockPayload(ObjectMapper objectMapper, int expectedMaxTasks) throws JsonProcessingException {
     assertThat(assertAccordingToFetchAndLockPayload(objectMapper).getMaxTasks()).isEqualTo(expectedMaxTasks);
+  }
+
+  protected void assertWorkerIdAccordingToFetchAndLockPayload(ObjectMapper objectMapper, String workerId) throws JsonProcessingException {
+    assertThat(assertAccordingToFetchAndLockPayload(objectMapper).getWorkerId()).isEqualTo(workerId);
   }
 
   protected FetchAndLockRequestDto assertAccordingToFetchAndLockPayload(ObjectMapper objectMapper) throws JsonProcessingException {

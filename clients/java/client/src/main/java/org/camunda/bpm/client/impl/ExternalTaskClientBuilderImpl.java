@@ -45,6 +45,11 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
     return this;
   }
 
+  public ExternalTaskClientBuilder workerId(String workerId) {
+    this.workerId = workerId;
+    return this;
+  }
+
   public ExternalTaskClientBuilder addInterceptor(ClientRequestInterceptor interceptor) {
     this.interceptors.add(interceptor);
     return this;
@@ -66,8 +71,10 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
 
     checkInterceptors();
 
-    String hostname = checkHostname();
-    this.workerId = hostname + UUID.randomUUID();
+    if (workerId == null) {
+      String hostname = checkHostname();
+      this.workerId = hostname + UUID.randomUUID();
+    }
 
     return new ExternalTaskClientImpl(this);
   }

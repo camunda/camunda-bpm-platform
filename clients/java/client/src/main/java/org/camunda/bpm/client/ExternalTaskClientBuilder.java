@@ -23,13 +23,28 @@ import org.camunda.bpm.client.interceptor.ClientRequestInterceptor;
 public interface ExternalTaskClientBuilder {
 
   /**
+   * Base url of the Camunda BPM Platform REST API. This information is mandatory.
+   *
    * @param baseUrl of the Camunda BPM Platform REST API
    * @return the builder
    */
   ExternalTaskClientBuilder baseUrl(String baseUrl);
 
   /**
-   * Adds an interceptor to change a request before it is sent to the http server
+   * A custom worker id the Workflow Engine is aware of. This information is optional.
+   * Note: make sure to choose a unique worker id
+   *
+   * If not given or null, a worker id is generated automatically which consists of the
+   * hostname as well as a random and unique 128 bit string (UUID).
+   *
+   * @param workerId the Workflow Engine is aware of
+   * @return the builder
+   */
+  ExternalTaskClientBuilder workerId(String workerId);
+
+  /**
+   * Adds an interceptor to change a request before it is sent to the http server.
+   * This information is optional.
    *
    * @param interceptor which changes the request
    * @return the builder
@@ -38,6 +53,7 @@ public interface ExternalTaskClientBuilder {
 
   /**
    * Specifies the amount of maximum tasks which are supposed to be fetched within one request
+   * This information is optional.
    *
    * @param maxTasks which are supposed to be fetched within one request
    * @return the builder
