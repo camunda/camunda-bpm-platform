@@ -12,6 +12,7 @@ import java.util.List;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -20,6 +21,7 @@ import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -493,6 +495,104 @@ public class ProcessInstanceModificationSubProcessTest {
     Task task = taskService.createTaskQuery().singleResult();
     assertThat(task.getProcessInstanceId(), is(parentPI.getId()));
   }
+
+  @Test
+  @Ignore
+  public void shouldCancelParentProcessWithMultiInstanceCallActivity() {
+    BpmnModelInstance parentProcess = Bpmn.createExecutableProcess("parentProcess")
+      .startEvent()
+      .callActivity("callActivity")
+        .calledElement("subprocess")
+        .multiInstance()
+        .cardinality("3")
+        .multiInstanceDone()
+      .endEvent()
+      .userTask()
+      .endEvent()
+      .done();
+
+    BpmnModelInstance subProcess = Bpmn.createExecutableProcess("subprocess")
+      .startEvent()
+        .userTask("userTask")
+      .endEvent("subEnd")
+      .done();
+
+    testHelper.deploy(parentProcess, subProcess);
+    ProcessDefinition subProcessDefinition = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("subprocess")
+        .singleResult();
+
+    // given
+    runtimeService.startProcessInstanceByKey("parentProcess");
+
+    // assume
+    List<ProcessInstance> subProcessInstances = runtimeService.createProcessInstanceQuery()
+        .processDefinitionKey("subprocess")
+        .list();
+    assertEquals(3, subProcessInstances.size());
+
+    // when
+    runtimeService.createModification(subProcessDefinition.getId())
+      .startAfterActivity("userTask")
+      .cancelAllForActivity("userTask")
+      .processInstanceIds(collectIds(subProcessInstances))
+      .execute();
+
+    // then
+    assertThat(runtimeService.createProcessInstanceQuery().count(), is(0L));
+  }
+
+  @Test
+  @Ignore
+  public void shouldCancelParentProcessWithCallActivityInMultiInstanceEmbeddedSubprocess() {
+    BpmnModelInstance parentProcess = Bpmn.createExecutableProcess("parentProcess")
+      .startEvent()
+      .subProcess()
+        .embeddedSubProcess()
+        .startEvent()
+        .callActivity("callActivity")
+          .calledElement("subprocess")
+        .endEvent()
+      .subProcessDone()
+        .multiInstance()
+        .cardinality("3")
+        .multiInstanceDone()
+      .endEvent()
+      .userTask()
+      .endEvent()
+      .done();
+
+    BpmnModelInstance subProcess = Bpmn.createExecutableProcess("subprocess")
+      .startEvent()
+        .userTask("userTask")
+      .endEvent("subEnd")
+      .done();
+
+    testHelper.deploy(parentProcess, subProcess);
+    ProcessDefinition subProcessDefinition = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("subprocess")
+        .singleResult();
+
+    // given
+    runtimeService.startProcessInstanceByKey("parentProcess");
+
+    // assume
+    List<ProcessInstance> subProcessInstances = runtimeService.createProcessInstanceQuery()
+        .processDefinitionKey("subprocess")
+        .list();
+    assertEquals(3, subProcessInstances.size());
+
+    // when
+    runtimeService.createModification(subProcessDefinition.getId())
+      .startAfterActivity("userTask")
+      .cancelAllForActivity("userTask")
+      .processInstanceIds(collectIds(subProcessInstances))
+      .execute();
+
+    // then
+    assertThat(runtimeService.createProcessInstanceQuery().count(), is(0L));
+  }
+
 
   private List<String> collectIds(List<ProcessInstance> processInstances) {
     List<String> supbrocessIds = new ArrayList<String>();
