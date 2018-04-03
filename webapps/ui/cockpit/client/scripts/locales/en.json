@@ -735,7 +735,7 @@
 
   "PAGES_PROCESS_INSTANCES_NOTHING" : "Nothing selected",
   "PAGES_PROCESS_INSTANCES_ONE_SELECT" : "1 activity instance selected",
-  "PAGES_PROCESS_INSTANCES_OTHER_SELECT" : "{{count}} activity instances selected",
+  "PAGES_PROCESS_INSTANCES_OTHER_SELECT" : "{} activity instances selected",
 
   "PROCESS_INSTANCE_ADD_CRITERIA" : "Add criteria",
   "PROCESS_INSTANCE_INVALID" : "This search query is not valid",
