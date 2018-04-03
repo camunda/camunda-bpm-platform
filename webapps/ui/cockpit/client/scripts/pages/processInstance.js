@@ -593,12 +593,12 @@ ngModule
           processData.set('filter', filterData.filter);
         };
 
-        $scope.getDataWhen = function(value) {
+        $scope.getDataWhen = function() {
           return {
             'null' : $translate.instant('PAGES_PROCESS_INSTANCES_NOTHING'),
             '0': $translate.instant('PAGES_PROCESS_INSTANCES_NOTHING'),
             'one': $translate.instant('PAGES_PROCESS_INSTANCES_ONE_SELECT'),
-            'other': $translate.instant('PAGES_PROCESS_INSTANCES_OTHER_SELECT', { count: value })
+            'other': $translate.instant('PAGES_PROCESS_INSTANCES_OTHER_SELECT')
           };
         };
 
