@@ -101,7 +101,7 @@
   "GROUP_CREATE_LABEL_GROUP" : "Groups",
   "GROUP_CREATE_LABEL_NEW_GROUP" : "Create New Group",
   "GROUP_CREATE_MESSAGE_SUCCESS" : "Successfully created new group {{group}}",
-  "GROUP_CREATE_MESSAGE_ERROR_1" : "Could not create group {{group}}. Check if it already exists.",
+  "GROUP_CREATE_MESSAGE_ERROR" : "Could not create group {{group}}. Check if it already exists.",
 
   "GROUP_EDIT_INFORMATION" : "Information",
   "GROUP_EDIT_TENANTS" : "{{group}}'s Tenants",
