@@ -101,6 +101,7 @@
           <configuration>
             <trimStackTrace>false</trimStackTrace>
             <redirectTestOutputToFile>true</redirectTestOutputToFile>
+            <argLine>-Xmx1024m -XX:MaxPermSize=256m</argLine>
           </configuration>
         </plugin>
 
