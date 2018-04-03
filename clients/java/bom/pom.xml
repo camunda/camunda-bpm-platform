@@ -101,7 +101,6 @@
           <configuration>
             <trimStackTrace>false</trimStackTrace>
             <redirectTestOutputToFile>true</redirectTestOutputToFile>
-            <argLine>-Xmx1024m</argLine>
           </configuration>
         </plugin>
 
