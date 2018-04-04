@@ -1568,4 +1568,69 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
     return parameters;
   }
 
+  @Test
+  public void testQueryByActive() {
+    given()
+      .queryParam("active", true)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).active();
+  }
+
+  @Test
+  public void testQueryByCompleted() {
+    given()
+      .queryParam("completed", true)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).completed();
+  }
+
+  @Test
+  public void testQueryBySuspended() {
+    given()
+      .queryParam("suspended", true)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).suspended();
+  }
+
+  @Test
+  public void testQueryByExternallyTerminated() {
+    given()
+      .queryParam("externallyTerminated", true)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).externallyTerminated();
+  }
+
+  @Test
+  public void testQueryByInternallyTerminated() {
+    given()
+      .queryParam("internallyTerminated", true)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).internallyTerminated();
+  }
+
 }

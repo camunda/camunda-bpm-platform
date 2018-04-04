@@ -258,6 +258,10 @@
           and DEF.KEY_ not like #{procDefKey} ESCAPE ${escapeChar}
         </foreach>
       </if>
+      <if test="state != null">
+        and STATE_ = #{state}
+      </if>
+      
 
       <!-- DEPRECATED : TO BE REMOVED IN 5.11 -->
       <if test="startDateOn">

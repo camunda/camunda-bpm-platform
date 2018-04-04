@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -71,6 +72,7 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   protected String[] tenantIds;
   protected String[] executedActivityIds;
   protected String[] activeActivityIds;
+  protected String state;
 
   protected String caseInstanceId;
 
@@ -511,4 +513,48 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     return this;
   }
 
+  @Override
+  public HistoricProcessInstanceQuery active() {
+    if (state != null) {
+      throw new ProcessEngineException("Already querying for historic process instance state <" + state + ">");
+    }
+    state = HistoricProcessInstance.STATE_ACTIVE;
+    return this;
+  }
+
+  @Override
+  public HistoricProcessInstanceQuery suspended() {
+    if (state != null) {
+      throw new ProcessEngineException("Already querying for historic process instance state <" + state + ">");
+    }
+    state = HistoricProcessInstance.STATE_SUSPENDED;
+    return this;
+  }
+
+  @Override
+  public HistoricProcessInstanceQuery completed() {
+    if (state != null) {
+      throw new ProcessEngineException("Already querying for historic process instance state <" + state + ">");
+    }
+    state = HistoricProcessInstance.STATE_COMPLETED;
+    return this;
+  }
+
+  @Override
+  public HistoricProcessInstanceQuery externallyTerminated() {
+    if (state != null) {
+      throw new ProcessEngineException("Already querying for historic process instance state <" + state + ">");
+    }
+    state = HistoricProcessInstance.STATE_EXTERNALLY_TERMINATED;
+    return this;
+  }
+
+  @Override
+  public HistoricProcessInstanceQuery internallyTerminated() {
+    if (state != null) {
+      throw new ProcessEngineException("Already querying for historic process instance state <" + state + ">");
+    }
+    state = HistoricProcessInstance.STATE_INTERNALLY_TERMINATED;
+    return this;
+  }
 }

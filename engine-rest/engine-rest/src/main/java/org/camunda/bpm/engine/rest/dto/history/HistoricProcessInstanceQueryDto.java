@@ -95,6 +95,11 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
   private List<String> tenantIds;
   private List<String> executedActivityIdIn;
   private List<String> activeActivityIdIn;
+  private Boolean active;
+  private Boolean suspended;
+  private Boolean completed;
+  private Boolean externallyTerminated;
+  private Boolean internallyTerminated;
 
   private List<VariableQueryParameterDto> variables;
 
@@ -287,6 +292,31 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
     this.executedJobBefore = executedJobBefore;
   }
 
+  @CamundaQueryParam(value = "active", converter = BooleanConverter.class)
+  public void setActive(Boolean active) {
+    this.active = active;
+  }
+
+  @CamundaQueryParam(value = "suspended", converter = BooleanConverter.class)
+  public void setSuspended(Boolean suspended) {
+    this.suspended = suspended;
+  }
+
+  @CamundaQueryParam(value = "completed", converter = BooleanConverter.class)
+  public void setCompleted(Boolean completed) {
+    this.completed = completed;
+  }
+
+  @CamundaQueryParam(value = "externallyTerminated", converter = BooleanConverter.class)
+  public void setExternallyTerminated(Boolean externallyTerminated) {
+    this.externallyTerminated = externallyTerminated;
+  }
+
+  @CamundaQueryParam(value = "internallyTerminated", converter = BooleanConverter.class)
+  public void setInternallyTerminated(Boolean internallyTerminated) {
+    this.internallyTerminated = internallyTerminated;
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -433,6 +463,22 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
 
     if (executedJobBefore != null) {
       query.executedJobBefore(executedJobBefore);
+    }
+
+    if (active != null && active) {
+      query.active();
+    }
+    if (suspended != null && suspended) {
+      query.suspended();
+    }
+    if (completed != null && completed) {
+      query.completed();
+    }
+    if (externallyTerminated != null && externallyTerminated) {
+      query.externallyTerminated();
+    }
+    if (internallyTerminated != null && internallyTerminated) {
+      query.internallyTerminated();
     }
   }
 

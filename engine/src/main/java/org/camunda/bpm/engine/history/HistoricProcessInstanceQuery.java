@@ -87,7 +87,7 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
 
   /**
    * Only select historic process instances with root incidents
-   * 
+   *
    * @return HistoricProcessInstanceQuery
    */
   HistoricProcessInstanceQuery withRootIncidents();
@@ -307,4 +307,19 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
 
   /** Only select historic process instances that executed an job before the given date. */
   HistoricProcessInstanceQuery executedJobBefore(Date date);
+
+  /** Only select historic process instances that are active. */
+  HistoricProcessInstanceQuery active();
+
+  /** Only select historic process instances that are suspended. */
+  HistoricProcessInstanceQuery suspended();
+
+  /** Only select historic process instances that are completed. */
+  HistoricProcessInstanceQuery completed();
+
+  /** Only select historic process instances that are externallyTerminated. */
+  HistoricProcessInstanceQuery externallyTerminated();
+
+  /** Only select historic process instances that are internallyTerminated. */
+  HistoricProcessInstanceQuery internallyTerminated();
 }
