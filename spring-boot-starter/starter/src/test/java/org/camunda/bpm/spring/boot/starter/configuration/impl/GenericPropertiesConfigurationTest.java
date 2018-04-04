@@ -4,10 +4,9 @@ import static org.junit.Assert.assertEquals;
 
 import org.camunda.bpm.engine.spring.SpringProcessEngineConfiguration;
 import org.camunda.bpm.spring.boot.starter.property.CamundaBpmProperties;
+import org.camunda.bpm.spring.boot.starter.util.SpringBootStarterException;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.springframework.beans.NotWritablePropertyException;
 
 public class GenericPropertiesConfigurationTest {
 
@@ -37,5 +36,12 @@ public class GenericPropertiesConfigurationTest {
     camundaBpmProperties.getGenericProperties().getProperties().put("batch-poll-time", Integer.valueOf(batchPollTimeValue).toString());
     genericPropertiesConfiguration.preInit(processEngineConfiguration);
     assertEquals(batchPollTimeValue, processEngineConfiguration.getBatchPollTime());
+  }
+
+  @Test(expected = SpringBootStarterException.class)
+  public void genericBindingTestWithNotExistingProperty() {
+    final int dontExistValue = Integer.MAX_VALUE;
+    camundaBpmProperties.getGenericProperties().getProperties().put("dont-exist", dontExistValue);
+    genericPropertiesConfiguration.preInit(processEngineConfiguration);
   }
 }

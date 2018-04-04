@@ -42,4 +42,10 @@ public class SpringBootProcessEngineLogger extends BaseLogger {
   public void configureJobExecutorPool(Integer corePoolSize, Integer maxPoolSize) {
     logInfo("040", "Setting up jobExecutor with corePoolSize={}, maxPoolSize:{}", corePoolSize, maxPoolSize);
   }
+
+  public SpringBootStarterException exceptionDuringBinding(String message) {
+    return new SpringBootStarterException(exceptionMessage(
+        "050", message));
+  }
+
 }
