@@ -1633,4 +1633,89 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
     verify(mockedQuery).internallyTerminated();
   }
 
+  @Test
+  public void testQueryByActiveAsPost() {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("active", true);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(parameters)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .post(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).active();
+  }
+
+  @Test
+  public void testQueryByCompletedAsPost() {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("completed", true);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(parameters)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .post(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).completed();
+  }
+
+  @Test
+  public void testQueryBySuspendedAsPost() {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("suspended", true);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(parameters)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .post(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).suspended();
+  }
+
+  @Test
+  public void testQueryByExternallyTerminatedAsPost() {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("externallyTerminated", true);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(parameters)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .post(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).externallyTerminated();
+  }
+
+
+  @Test
+  public void testQueryByInternallyTerminatedAsPost() {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("internallyTerminated", true);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(parameters)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).internallyTerminated();
+  }
+
 }
