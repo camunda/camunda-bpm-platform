@@ -47,6 +47,7 @@ public class BusinessRuleTaskTest extends BpmnModelElementInstanceTest {
       new AttributeAssumption(CAMUNDA_NS, "decisionRef"),
       new AttributeAssumption(CAMUNDA_NS, "decisionRefBinding"),
       new AttributeAssumption(CAMUNDA_NS, "decisionRefVersion"),
+      new AttributeAssumption(CAMUNDA_NS, "decisionRefVersionTag"),
       new AttributeAssumption(CAMUNDA_NS, "decisionRefTenantId"),
       new AttributeAssumption(CAMUNDA_NS, "mapDecisionResult"),
       new AttributeAssumption(CAMUNDA_NS, "taskPriority")

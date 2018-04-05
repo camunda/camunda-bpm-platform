@@ -61,6 +61,7 @@ public class BusinessRuleTaskImpl extends TaskImpl implements BusinessRuleTask {
   protected static Attribute<String> camundaDecisionRefAttribute;
   protected static Attribute<String> camundaDecisionRefBindingAttribute;
   protected static Attribute<String> camundaDecisionRefVersionAttribute;
+  protected static Attribute<String> camundaDecisionRefVersionTagAttribute;
   protected static Attribute<String> camundaDecisionRefTenantIdAttribute;
   protected static Attribute<String> camundaMapDecisionResultAttribute;
   protected static Attribute<String> camundaTaskPriorityAttribute;
@@ -117,6 +118,10 @@ public class BusinessRuleTaskImpl extends TaskImpl implements BusinessRuleTask {
       .namespace(CAMUNDA_NS)
       .build();
 
+    camundaDecisionRefVersionTagAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_DECISION_REF_VERSION_TAG)
+        .namespace(CAMUNDA_NS)
+        .build();
+
     camundaDecisionRefTenantIdAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_DECISION_REF_TENANT_ID)
       .namespace(CAMUNDA_NS)
       .build();
@@ -124,7 +129,7 @@ public class BusinessRuleTaskImpl extends TaskImpl implements BusinessRuleTask {
     camundaMapDecisionResultAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_MAP_DECISION_RESULT)
         .namespace(CAMUNDA_NS)
         .build();
-    
+
     camundaTaskPriorityAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_TASK_PRIORITY)
       .namespace(CAMUNDA_NS)
       .build();
@@ -223,6 +228,14 @@ public class BusinessRuleTaskImpl extends TaskImpl implements BusinessRuleTask {
     camundaDecisionRefVersionAttribute.setValue(this, camundaDecisionRefVersion);
   }
 
+  public String getCamundaDecisionRefVersionTag() {
+    return camundaDecisionRefVersionTagAttribute.getValue(this);
+  }
+
+  public void setCamundaDecisionRefVersionTag(String camundaDecisionRefVersionTag) {
+    camundaDecisionRefVersionTagAttribute.setValue(this, camundaDecisionRefVersionTag);
+  }
+
   @Override
   public String getCamundaMapDecisionResult() {
     return camundaMapDecisionResultAttribute.getValue(this);
@@ -243,7 +256,7 @@ public class BusinessRuleTaskImpl extends TaskImpl implements BusinessRuleTask {
 
   @Override
   public String getCamundaTaskPriority() {
-    return camundaTaskPriorityAttribute.getValue(this);    
+    return camundaTaskPriorityAttribute.getValue(this);
   }
 
   @Override

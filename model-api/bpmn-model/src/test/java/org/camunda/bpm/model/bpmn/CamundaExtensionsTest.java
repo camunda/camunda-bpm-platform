@@ -324,6 +324,13 @@ public class CamundaExtensionsTest {
   }
 
   @Test
+  public void testDecisionRefVersionTag() {
+    assertThat(businessRuleTask.getCamundaDecisionRefVersionTag()).isEqualTo(TEST_STRING_XML);
+    businessRuleTask.setCamundaDecisionRefVersionTag(TEST_STRING_API);
+    assertThat(businessRuleTask.getCamundaDecisionRefVersionTag()).isEqualTo(TEST_STRING_API);
+  }
+
+  @Test
   public void testDecisionRefTenantId() {
     assertThat(businessRuleTask.getCamundaDecisionRefTenantId()).isEqualTo(TEST_STRING_XML);
     businessRuleTask.setCamundaDecisionRefTenantId(TEST_STRING_API);

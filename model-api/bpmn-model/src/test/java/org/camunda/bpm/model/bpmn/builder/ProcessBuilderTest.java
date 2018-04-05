@@ -598,6 +598,7 @@ public class ProcessBuilderTest {
         .camundaDecisionRef("decisionRef")
         .camundaDecisionRefBinding("latest")
         .camundaDecisionRefVersion("7")
+        .camundaDecisionRefVersionTag("0.1.0")
         .camundaDecisionRefTenantId("tenantId")
         .camundaMapDecisionResult("singleEntry")
         .camundaTaskPriority(TEST_SERVICE_TASK_PRIORITY)
@@ -615,6 +616,7 @@ public class ProcessBuilderTest {
     assertThat(businessRuleTask.getCamundaDecisionRef()).isEqualTo("decisionRef");
     assertThat(businessRuleTask.getCamundaDecisionRefBinding()).isEqualTo("latest");
     assertThat(businessRuleTask.getCamundaDecisionRefVersion()).isEqualTo("7");
+    assertThat(businessRuleTask.getCamundaDecisionRefVersionTag()).isEqualTo("0.1.0");
     assertThat(businessRuleTask.getCamundaDecisionRefTenantId()).isEqualTo("tenantId");
     assertThat(businessRuleTask.getCamundaMapDecisionResult()).isEqualTo("singleEntry");
     assertThat(businessRuleTask.getCamundaTaskPriority()).isEqualTo(TEST_SERVICE_TASK_PRIORITY);

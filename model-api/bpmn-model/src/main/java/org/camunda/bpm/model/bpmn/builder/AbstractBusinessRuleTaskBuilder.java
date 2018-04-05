@@ -150,6 +150,17 @@ public abstract class AbstractBusinessRuleTaskBuilder<B extends AbstractBusiness
   }
 
   /**
+   * Sets the camunda decisionRefVersionTag attribute.
+   *
+   * @param camundaDecisionRefVersionTag the decisionRefVersionTag to set
+   * @return the builder object
+   */
+  public B camundaDecisionRefVersionTag(String camundaDecisionRefVersionTag) {
+    element.setCamundaDecisionRefVersionTag(camundaDecisionRefVersionTag);
+    return myself;
+  }
+
+  /**
    * Sets the camunda decisionRefTenantId attribute.
    *
    * @param decisionRefTenantId the decisionRefTenantId to set
@@ -174,8 +185,8 @@ public abstract class AbstractBusinessRuleTaskBuilder<B extends AbstractBusiness
   /**
    * Sets the camunda task priority attribute. This is only meaningful when
    * the {@link #camundaType(String)} attribute has the value <code>external</code>.
-   * 
-   * 
+   *
+   *
    * @param taskPriority the priority for the external task
    * @return the builder object
    */

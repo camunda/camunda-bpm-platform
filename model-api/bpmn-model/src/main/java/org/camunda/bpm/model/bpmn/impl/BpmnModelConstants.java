@@ -426,6 +426,7 @@ public final class BpmnModelConstants {
   public static final String CAMUNDA_ATTRIBUTE_DECISION_REF = "decisionRef";
   public static final String CAMUNDA_ATTRIBUTE_DECISION_REF_BINDING = "decisionRefBinding";
   public static final String CAMUNDA_ATTRIBUTE_DECISION_REF_VERSION = "decisionRefVersion";
+  public static final String CAMUNDA_ATTRIBUTE_DECISION_REF_VERSION_TAG = "decisionRefVersionTag";
   public static final String CAMUNDA_ATTRIBUTE_DECISION_REF_TENANT_ID = "decisionRefTenantId";
   public static final String CAMUNDA_ATTRIBUTE_DEFAULT = "default";
   public static final String CAMUNDA_ATTRIBUTE_DEFAULT_VALUE = "defaultValue";

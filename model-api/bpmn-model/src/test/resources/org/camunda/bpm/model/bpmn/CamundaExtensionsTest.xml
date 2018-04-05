@@ -179,6 +179,7 @@
                       camunda:decisionRef="test"
                       camunda:decisionRefBinding="test"
                       camunda:decisionRefVersion="test"
+                      camunda:decisionRefVersionTag="test"
                       camunda:decisionRefTenantId="test"
                       camunda:mapDecisionResult="test"
                       camunda:taskPriority="test"/>
