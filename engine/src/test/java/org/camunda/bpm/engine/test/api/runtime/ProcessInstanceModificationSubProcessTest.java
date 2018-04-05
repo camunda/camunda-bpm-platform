@@ -1,6 +1,8 @@
 package org.camunda.bpm.engine.test.api.runtime;
 
 import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
+import static org.camunda.bpm.engine.test.util.ExecutionAssert.assertThat;
+import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecutionTree;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -16,10 +18,12 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.util.ExecutionTree;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -591,6 +595,56 @@ public class ProcessInstanceModificationSubProcessTest {
 
     // then
     assertThat(runtimeService.createProcessInstanceQuery().count(), is(0L));
+  }
+
+  @Test
+  @Ignore("https://app.camunda.com/jira/browse/CAM-8949")
+  public void shouldCancelConcurrentExecutionInCallingProcess()
+  {
+    // given
+    final BpmnModelInstance parentProcessInstance =
+        Bpmn.createExecutableProcess("parentProcess")
+          .startEvent()
+          .parallelGateway("split")
+            .callActivity("callActivity").calledElement("subprocess")
+            .endEvent()
+          .moveToLastGateway()
+            .userTask("parentUserTask")
+            .endEvent()
+          .done();
+
+      final BpmnModelInstance subprocessInstance =
+        Bpmn.createExecutableProcess("subprocess")
+          .startEvent()
+            .userTask("childUserTask")
+          .endEvent("subEnd")
+          .done();
+
+      testHelper.deploy(parentProcessInstance, subprocessInstance);
+
+      ProcessInstance callingInstance = runtimeService.startProcessInstanceByKey("parentProcess");
+      ProcessInstance calledInstance = runtimeService.createProcessInstanceQuery()
+          .superProcessInstanceId(callingInstance.getId()).singleResult();
+
+      // when
+      runtimeService
+        .createProcessInstanceModification(calledInstance.getId())
+        .cancelAllForActivity("childUserTask")
+        .execute();
+
+      // then
+      ProcessInstance calledInstanceAfterModification = runtimeService
+          .createProcessInstanceQuery()
+          .processInstanceId(calledInstance.getId())
+          .singleResult();
+
+      Assert.assertNull(calledInstanceAfterModification);
+
+      ExecutionTree executionTree = ExecutionTree.forExecution(callingInstance.getId(), rule.getProcessEngine());
+      assertThat(executionTree)
+        .matches(
+          describeExecutionTree("parentUserTask").scope()
+        .done());
   }
 
 
