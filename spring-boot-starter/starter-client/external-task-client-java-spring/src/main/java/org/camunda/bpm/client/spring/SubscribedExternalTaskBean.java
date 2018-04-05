@@ -4,18 +4,28 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.camunda.bpm.client.ExternalTaskClient;
+import org.camunda.bpm.client.spring.helper.ExternalTaskClientHelper;
 import org.camunda.bpm.client.task.ExternalTaskHandler;
 import org.camunda.bpm.client.topic.TopicSubscription;
 import org.camunda.bpm.client.topic.TopicSubscriptionBuilder;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.EventListener;
+import org.springframework.context.support.AbstractApplicationContext;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
-public class SubscribedExternalTaskBean implements SubscribedExternalTask {
+public class SubscribedExternalTaskBean implements SubscribedExternalTask, InitializingBean, ApplicationContextAware {
 
   private Map<ExternalTaskClient, Subscription> subscriptions = new HashMap<>();
   @Getter
@@ -24,6 +34,25 @@ public class SubscribedExternalTaskBean implements SubscribedExternalTask {
   @Getter
   @Setter
   private SubscriptionInformation subscriptionInformation;
+  private AbstractApplicationContext applicationContext;
+
+  @Override
+  public void afterPropertiesSet() throws Exception {
+    ExternalTaskClientHelper.findMatchingClients(applicationContext, this).forEach(client -> {
+      register(client);
+    });
+  }
+
+  @EventListener
+  public void start(ApplicationEvent event) {
+    if (isEventThatCanStartSubscription().test(event)) {
+      start();
+    }
+  }
+
+  protected Predicate<ApplicationEvent> isEventThatCanStartSubscription() {
+    return event -> event instanceof ContextRefreshedEvent;
+  }
 
   @Override
   public void register(ExternalTaskClient externalTaskClient) {
@@ -110,6 +139,11 @@ public class SubscribedExternalTaskBean implements SubscribedExternalTask {
     return subscriptionInformation.isAutoOpen();
   }
 
+  @Override
+  public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+    this.applicationContext = (AbstractApplicationContext) applicationContext;
+  }
+
   @RequiredArgsConstructor
   public static class Subscription {
     private final ExternalTaskHandler externalTaskHandler;
@@ -125,8 +159,8 @@ public class SubscribedExternalTaskBean implements SubscribedExternalTask {
 
     public void subscribe() {
       if (!isSubscribed()) {
-        topicSubscriptionBuilder = externalTaskClient.subscribe(subscriptionInformation.getTopicName())
-            .lockDuration(subscriptionInformation.getLockDuration()).handler(externalTaskHandler);
+        topicSubscriptionBuilder = externalTaskClient.subscribe(subscriptionInformation.getTopicName()).lockDuration(subscriptionInformation.getLockDuration())
+            .handler(externalTaskHandler);
       }
     }
 

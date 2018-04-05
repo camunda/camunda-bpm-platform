@@ -36,8 +36,7 @@ public class ClientRegistrar implements ImportBeanDefinitionRegistrar {
     registerExternalTaskClient(importingClassMetadata, registry);
   }
 
-  protected void registerExternalTaskClient(AnnotationMetadata importingClassMetadata,
-      BeanDefinitionRegistry registry) {
+  protected void registerExternalTaskClient(AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry) {
     AnnotationAttributes enableTaskSubscription = getEnableTaskSubscription(importingClassMetadata);
     String id = getId(enableTaskSubscription);
     String beanName = "externalTaskClient" + id;
@@ -54,18 +53,16 @@ public class ClientRegistrar implements ImportBeanDefinitionRegistrar {
     log.debug("registered external task client with beanName '{}'", beanName);
   }
 
-  protected BeanDefinitionBuilder getExternalTaskClientFactoryBeanDefinitionBuilder(
-      AnnotationAttributes enableTaskSubscription, String id) {
-    return BeanDefinitionBuilder.genericBeanDefinition(externalTaskClientFactoryClass).addPropertyValue("baseUrl",
-        getBaseUrl(enableTaskSubscription));
+  protected BeanDefinitionBuilder getExternalTaskClientFactoryBeanDefinitionBuilder(AnnotationAttributes enableTaskSubscription, String id) {
+    return BeanDefinitionBuilder.genericBeanDefinition(externalTaskClientFactoryClass).addPropertyValue("baseUrl", getBaseUrl(enableTaskSubscription))
+        .addPropertyValue("id", id);
   }
 
-  protected boolean isUniqueBean(String beanName, AnnotationMetadata importingClassMetadata,
-      BeanDefinitionRegistry registry) {
+  protected boolean isUniqueBean(String beanName, AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry) {
     if (registry.containsBeanDefinition(beanName)) {
       BeanDefinition beanDefinition = registry.getBeanDefinition(beanName);
-      log.debug("skipping creation of bean for factory '{}'. A bean with name '{}' created by '{}' already exists",
-          importingClassMetadata.getClassName(), beanName, beanDefinition.getFactoryBeanName());
+      log.debug("skipping creation of bean for factory '{}'. A bean with name '{}' created by '{}' already exists", importingClassMetadata.getClassName(),
+          beanName, beanDefinition.getFactoryBeanName());
       return false;
     }
     return true;
@@ -80,7 +77,6 @@ public class ClientRegistrar implements ImportBeanDefinitionRegistrar {
   }
 
   public static AnnotationAttributes getEnableTaskSubscription(AnnotationMetadata annotationMetadata) {
-    return AnnotationAttributes
-        .fromMap(annotationMetadata.getAnnotationAttributes(EnableTaskSubscription.class.getName(), false));
+    return AnnotationAttributes.fromMap(annotationMetadata.getAnnotationAttributes(EnableTaskSubscription.class.getName(), false));
   }
 }

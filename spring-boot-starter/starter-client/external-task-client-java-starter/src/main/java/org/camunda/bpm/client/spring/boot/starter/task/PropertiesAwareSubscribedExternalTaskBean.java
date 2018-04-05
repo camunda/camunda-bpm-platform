@@ -1,12 +1,15 @@
 package org.camunda.bpm.client.spring.boot.starter.task;
 
+import java.util.function.Predicate;
+
 import org.camunda.bpm.client.spring.SubscribedExternalTaskBean;
 import org.camunda.bpm.client.spring.SubscriptionInformation;
 import org.camunda.bpm.client.spring.boot.starter.CamundaBpmClientProperties;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.ApplicationStartedEvent;
+import org.springframework.context.ApplicationEvent;
 
-public class PropertiesAwareSubscribedExternalTaskBean extends SubscribedExternalTaskBean implements InitializingBean {
+public class PropertiesAwareSubscribedExternalTaskBean extends SubscribedExternalTaskBean {
 
   @Autowired
   private CamundaBpmClientProperties camundaBpmClientProperties;
@@ -14,6 +17,12 @@ public class PropertiesAwareSubscribedExternalTaskBean extends SubscribedExterna
   @Override
   public void afterPropertiesSet() throws Exception {
     mergeSubscriptionInformationWithProperties();
+    super.afterPropertiesSet();
+  }
+
+  @Override
+  protected Predicate<ApplicationEvent> isEventThatCanStartSubscription() {
+    return event -> event instanceof ApplicationStartedEvent;
   }
 
   protected void mergeSubscriptionInformationWithProperties() {
