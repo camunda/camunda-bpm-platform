@@ -3,7 +3,7 @@ package org.camunda.bpm.client.spring;
 import org.camunda.bpm.client.interceptor.ClientRequestContext;
 import org.camunda.bpm.client.interceptor.ClientRequestInterceptor;
 import org.camunda.bpm.client.spring.extendedsubscription.ExtendedTestClassSubscription;
-import org.camunda.bpm.client.spring.interceptor.ClientIdAwareClientRequestInterceptor;
+import org.camunda.bpm.client.spring.interceptor.ClientIdAcceptingClientRequestInterceptor;
 import org.camunda.bpm.client.task.ExternalTaskHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -48,9 +48,9 @@ public class ExtendedConfiguration {
     static final String CLIENT_ID = "Second";
 
     @Bean
-    public ClientIdAwareClientRequestInterceptor clientIdAwareClientRequestInterceptor() {
+    public ClientIdAcceptingClientRequestInterceptor clientIdAcceptingClientRequestInterceptor() {
 
-      return new ClientIdAwareClientRequestInterceptor() {
+      return new ClientIdAcceptingClientRequestInterceptor() {
 
         @Override
         public void intercept(ClientRequestContext requestContext) {

@@ -7,7 +7,7 @@ import java.util.function.Predicate;
 import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.client.ExternalTaskClientBuilder;
 import org.camunda.bpm.client.interceptor.ClientRequestInterceptor;
-import org.camunda.bpm.client.spring.interceptor.ClientIdAwareClientRequestInterceptor;
+import org.camunda.bpm.client.spring.interceptor.ClientIdAcceptingClientRequestInterceptor;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,11 +45,11 @@ public class ExternalTaskClientFactory implements FactoryBean<ExternalTaskClient
   }
 
   protected Predicate<ClientRequestInterceptor> filterClientRequestInterceptors() {
-    Predicate<ClientRequestInterceptor> isIdAware = clientRequestInterceptor -> clientRequestInterceptor instanceof ClientIdAwareClientRequestInterceptor;
-    Predicate<ClientRequestInterceptor> isAcceptingId = clientRequestInterceptor -> ((ClientIdAwareClientRequestInterceptor) clientRequestInterceptor)
+    Predicate<ClientRequestInterceptor> isIdAccepting = clientRequestInterceptor -> clientRequestInterceptor instanceof ClientIdAcceptingClientRequestInterceptor;
+    Predicate<ClientRequestInterceptor> isAcceptingId = clientRequestInterceptor -> ((ClientIdAcceptingClientRequestInterceptor) clientRequestInterceptor)
         .accepts(getId());
 
-    return isIdAware.negate().or(isIdAware.and(isAcceptingId));
+    return isIdAccepting.negate().or(isIdAccepting.and(isAcceptingId));
   }
 
   @Override
