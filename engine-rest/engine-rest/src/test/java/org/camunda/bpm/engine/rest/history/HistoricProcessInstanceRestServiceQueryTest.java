@@ -13,6 +13,7 @@ import java.util.Set;
 import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.response.Response;
 
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
@@ -36,6 +37,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -1581,6 +1583,7 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
     verify(mockedQuery).active();
   }
 
+
   @Test
   public void testQueryByCompleted() {
     given()
@@ -1631,6 +1634,25 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
         .get(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
 
     verify(mockedQuery).internallyTerminated();
+  }
+
+  @Test
+  public void testQueryByTwoStates() {
+    String message = "expected exception";
+    doThrow(new BadUserRequestException(message)).when(mockedQuery).completed();
+
+    given()
+      .queryParam("active", true)
+      .queryParam("completed", true)
+    .then()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("type", equalTo(BadUserRequestException.class.getSimpleName()))
+      .body("message", equalTo(message))
+    .when()
+        .get(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).active();
   }
 
   @Test
@@ -1716,6 +1738,29 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
       .post(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
 
     verify(mockedQuery).internallyTerminated();
+  }
+
+  @Test
+  public void testQueryByTwoStatesAsPost() {
+    String message = "expected exception";
+    doThrow(new BadUserRequestException(message)).when(mockedQuery).completed();
+
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("active", true);
+    parameters.put("completed", true);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(parameters)
+    .then()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("type", equalTo(BadUserRequestException.class.getSimpleName()))
+      .body("message", equalTo(message))
+    .when()
+      .post(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).active();
   }
 
 }

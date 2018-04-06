@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.camunda.bpm.engine.BadUserRequestException;
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -29,7 +28,7 @@ import org.camunda.bpm.engine.impl.util.CompareUtil;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotContainsEmptyString;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotContainsNull;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.*;
 
 /**
  * @author Tom Baeyens
@@ -515,45 +514,35 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
 
   @Override
   public HistoricProcessInstanceQuery active() {
-    if (state != null) {
-      throw new ProcessEngineException("Already querying for historic process instance state <" + state + ">");
-    }
+    ensureNull(BadUserRequestException.class, "Already querying for historic process instance with another state", state, state);
     state = HistoricProcessInstance.STATE_ACTIVE;
     return this;
   }
 
   @Override
   public HistoricProcessInstanceQuery suspended() {
-    if (state != null) {
-      throw new ProcessEngineException("Already querying for historic process instance state <" + state + ">");
-    }
+    ensureNull(BadUserRequestException.class, "Already querying for historic process instance with another state", state, state);
     state = HistoricProcessInstance.STATE_SUSPENDED;
     return this;
   }
 
   @Override
   public HistoricProcessInstanceQuery completed() {
-    if (state != null) {
-      throw new ProcessEngineException("Already querying for historic process instance state <" + state + ">");
-    }
+    ensureNull(BadUserRequestException.class, "Already querying for historic process instance with another state", state, state);
     state = HistoricProcessInstance.STATE_COMPLETED;
     return this;
   }
 
   @Override
   public HistoricProcessInstanceQuery externallyTerminated() {
-    if (state != null) {
-      throw new ProcessEngineException("Already querying for historic process instance state <" + state + ">");
-    }
+    ensureNull(BadUserRequestException.class, "Already querying for historic process instance with another state", state, state);
     state = HistoricProcessInstance.STATE_EXTERNALLY_TERMINATED;
     return this;
   }
 
   @Override
   public HistoricProcessInstanceQuery internallyTerminated() {
-    if (state != null) {
-      throw new ProcessEngineException("Already querying for historic process instance state <" + state + ">");
-    }
+    ensureNull(BadUserRequestException.class, "Already querying for historic process instance with another state", state, state);
     state = HistoricProcessInstance.STATE_INTERNALLY_TERMINATED;
     return this;
   }
