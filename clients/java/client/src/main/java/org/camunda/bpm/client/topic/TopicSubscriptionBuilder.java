@@ -23,8 +23,12 @@ import org.camunda.bpm.client.task.ExternalTaskHandler;
 public interface TopicSubscriptionBuilder {
 
   /**
-   * @param lockDuration <ul><li>in milliseconds to lock the external tasks</li>
-   *                     <li>must be greater than zero</li></ul>
+   * @param lockDuration <ul>
+   *                       <li> in milliseconds to lock the external tasks
+   *                       <li> must be greater than zero
+   *                       <li> the default lock duration is 20 seconds (20,000 milliseconds)
+   *                       <li> overrides the lock duration configured on bootstrapping the client
+   *                     </ul>
    * @return the builder
    */
   TopicSubscriptionBuilder lockDuration(long lockDuration);

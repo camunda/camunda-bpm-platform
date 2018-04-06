@@ -43,8 +43,13 @@ public class TopicRequestDto {
     return variables;
   }
 
-  public static TopicRequestDto fromTopicSubscription(TopicSubscription topicSubscription) {
-    long lockDuration = topicSubscription.getLockDuration();
+  public static TopicRequestDto fromTopicSubscription(TopicSubscription topicSubscription, long clientLockDuration) {
+    Long lockDuration = topicSubscription.getLockDuration();
+
+    if (lockDuration == null) {
+      lockDuration = clientLockDuration;
+    }
+
     String topicName = topicSubscription.getTopicName();
     List<String> variables = topicSubscription.getVariableNames();
 

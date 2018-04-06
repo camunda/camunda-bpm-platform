@@ -127,22 +127,18 @@ public class TopicSubscriptionTest {
   @Test
   public void shouldThrowExceptionDueToLockDurationIsNotGreaterThanZero() {
     // given
-    for (int i = -1; i < 2; i++) {
-      try {
-        TopicSubscriptionBuilder topicSubscriptionBuilder = client.subscribe(MockProvider.TOPIC_NAME);
+    try {
+      TopicSubscriptionBuilder topicSubscriptionBuilder = client.subscribe(MockProvider.TOPIC_NAME);
 
-        // when
-        if (i <= 0) {
-          topicSubscriptionBuilder.lockDuration(i);
-        }
+      // when
+      topicSubscriptionBuilder
+        .lockDuration(0)
+        .open();
 
-        topicSubscriptionBuilder.open();
-
-        fail("No ExternalTaskClientException thrown!");
-      } catch (ExternalTaskClientException e) {
-        // then
-        assertThat(e.getMessage()).contains("Lock duration is not greater than 0");
-      }
+      fail("No ExternalTaskClientException thrown!");
+    } catch (ExternalTaskClientException e) {
+      // then
+      assertThat(e.getMessage()).contains("Lock duration is not greater than 0");
     }
 
     client.stop();

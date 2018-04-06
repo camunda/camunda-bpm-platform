@@ -28,7 +28,7 @@ public class TopicSubscriptionBuilderImpl implements TopicSubscriptionBuilder {
   protected static final ExternalTaskClientLogger LOG = ExternalTaskClientLogger.CLIENT_LOGGER;
 
   protected String topicName;
-  protected long lockDuration;
+  protected Long lockDuration;
   protected List<String> variableNames;
   protected ExternalTaskHandler externalTaskHandler;
   protected TopicSubscriptionManager topicSubscriptionManager;
@@ -36,6 +36,7 @@ public class TopicSubscriptionBuilderImpl implements TopicSubscriptionBuilder {
   public TopicSubscriptionBuilderImpl(String topicName, TopicSubscriptionManager topicSubscriptionManager) {
     this.topicName = topicName;
     this.variableNames = null; // if not null, no variables are retrieved by default
+    this.lockDuration = null;
     this.topicSubscriptionManager = topicSubscriptionManager;
   }
 
@@ -59,7 +60,7 @@ public class TopicSubscriptionBuilderImpl implements TopicSubscriptionBuilder {
       throw LOG.topicNameNullException();
     }
 
-    if (lockDuration <= 0L) {
+    if (lockDuration != null && lockDuration <= 0L) {
       throw LOG.lockDurationIsNotGreaterThanZeroException();
     }
 

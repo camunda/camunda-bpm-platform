@@ -33,11 +33,13 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
   protected String workerId;
   protected int maxTasks;
   protected Long asyncResponseTimeout;
+  protected long lockDuration;
   protected List<ClientRequestInterceptor> interceptors;
 
   public ExternalTaskClientBuilderImpl() {
     this.maxTasks = 10; // default value
     this.asyncResponseTimeout = null; // default value
+    this.lockDuration = 20_000; // default value
     this.interceptors = new ArrayList<>();
   }
 
@@ -66,6 +68,11 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
     return this;
   }
 
+  public ExternalTaskClientBuilder lockDuration(long lockDuration) {
+    this.lockDuration = lockDuration;
+    return this;
+  }
+
   public ExternalTaskClient build() {
     if (maxTasks <= 0) {
       throw LOG.maxTasksNotGreaterThanZeroException();
@@ -73,6 +80,10 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
 
     if (asyncResponseTimeout != null && asyncResponseTimeout <= 0) {
       throw LOG.asyncResponseTimeoutNotGreaterThanZeroException();
+    }
+
+    if (lockDuration <= 0L) {
+      throw LOG.lockDurationIsNotGreaterThanZeroException();
     }
 
     if (baseUrl == null || baseUrl.isEmpty()) {
@@ -130,6 +141,10 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
 
   protected Long getAsyncResponseTimeout() {
     return asyncResponseTimeout;
+  }
+
+  protected long getLockDuration() {
+    return lockDuration;
   }
 
 }

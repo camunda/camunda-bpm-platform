@@ -34,9 +34,12 @@ public interface TopicSubscription {
   String getTopicName();
 
   /**
-   * @return the duration of the lock applied to the topic
+   * @return <ul>
+   *           <li> the duration of the lock applied to the topic
+   *           <li> if {@code null}, the client or the default lock duration is applied
+   *         </ul>
    */
-  long getLockDuration();
+  Long getLockDuration();
 
   /**
    * @return the external task handler of the topic

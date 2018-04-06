@@ -48,6 +48,7 @@ import org.camunda.bpm.client.impl.ExternalTaskClientImpl;
 import org.camunda.bpm.client.interceptor.ClientRequestInterceptor;
 import org.camunda.bpm.client.interceptor.auth.BasicAuthProvider;
 import org.camunda.bpm.client.task.ExternalTask;
+import org.camunda.bpm.client.task.ExternalTaskHandler;
 import org.camunda.bpm.client.topic.TopicSubscriptionBuilder;
 import org.camunda.bpm.client.topic.impl.dto.FetchAndLockRequestDto;
 import org.junit.After;
@@ -377,6 +378,144 @@ public class ExternalTaskClientTest {
     assertAsyncResponseTimeoutAccordingToFetchAndLockPayload(objectMapper, null);
   }
 
+  @Test
+  public void shouldUseDefaultLockDuration() throws Exception {
+    // given
+    mockFetchAndLockResponse(Collections.singletonList(MockProvider.createExternalTaskWithoutVariables()));
+
+    ObjectMapper objectMapper = spy(ObjectMapper.class);
+    whenNew(ObjectMapper.class).withNoArguments()
+      .thenReturn(objectMapper);
+
+    client = ExternalTaskClient.create()
+      .baseUrl(MockProvider.BASE_URL)
+      .build();
+
+    final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
+    TopicSubscriptionBuilder topicSubscriptionBuilder =
+      client.subscribe(MockProvider.TOPIC_NAME)
+        .handler((externalTask, externalTaskService) -> handlerInvoked.set(true));
+
+    // when
+    topicSubscriptionBuilder.open();
+    while (!handlerInvoked.get()) {
+      // busy waiting
+    }
+
+    // then
+    assertLockDurationAccordingToFetchAndLockPayload(objectMapper, 20000L);
+  }
+
+  @Test
+  public void shouldUseClientLockDuration() throws Exception {
+    // given
+    mockFetchAndLockResponse(Collections.singletonList(MockProvider.createExternalTaskWithoutVariables()));
+
+    ObjectMapper objectMapper = spy(ObjectMapper.class);
+    whenNew(ObjectMapper.class).withNoArguments()
+      .thenReturn(objectMapper);
+
+    client = ExternalTaskClient.create()
+      .lockDuration(4711)
+      .baseUrl(MockProvider.BASE_URL)
+      .build();
+
+    final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
+    TopicSubscriptionBuilder topicSubscriptionBuilder =
+      client.subscribe(MockProvider.TOPIC_NAME)
+        .handler((externalTask, externalTaskService) -> handlerInvoked.set(true));
+
+    // when
+    topicSubscriptionBuilder.open();
+    while (!handlerInvoked.get()) {
+      // busy waiting
+    }
+
+    // then
+    assertLockDurationAccordingToFetchAndLockPayload(objectMapper, 4711L);
+  }
+
+  @Test
+  public void shouldUseSubscriptionLockDuration() throws Exception {
+    // given
+    mockFetchAndLockResponse(Collections.singletonList(MockProvider.createExternalTaskWithoutVariables()));
+
+    ObjectMapper objectMapper = spy(ObjectMapper.class);
+    whenNew(ObjectMapper.class).withNoArguments()
+      .thenReturn(objectMapper);
+
+    client = ExternalTaskClient.create()
+      .baseUrl(MockProvider.BASE_URL)
+      .build();
+
+    final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
+    TopicSubscriptionBuilder topicSubscriptionBuilder =
+      client.subscribe(MockProvider.TOPIC_NAME)
+        .lockDuration(4711)
+        .handler((externalTask, externalTaskService) -> handlerInvoked.set(true));
+
+    // when
+    topicSubscriptionBuilder.open();
+    while (!handlerInvoked.get()) {
+      // busy waiting
+    }
+
+    // then
+    assertLockDurationAccordingToFetchAndLockPayload(objectMapper, 4711L);
+  }
+
+  @Test
+  public void shouldOverrideClientBySubscriptionLockDuration() throws Exception {
+    // given
+    mockFetchAndLockResponse(Collections.singletonList(MockProvider.createExternalTaskWithoutVariables()));
+
+    ObjectMapper objectMapper = spy(ObjectMapper.class);
+    whenNew(ObjectMapper.class).withNoArguments()
+      .thenReturn(objectMapper);
+
+    client = ExternalTaskClient.create()
+      .lockDuration(31415)
+      .baseUrl(MockProvider.BASE_URL)
+      .build();
+
+    final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
+    TopicSubscriptionBuilder topicSubscriptionBuilder =
+      client.subscribe(MockProvider.TOPIC_NAME)
+        .lockDuration(4711)
+        .handler((externalTask, externalTaskService) -> handlerInvoked.set(true));
+
+    // when
+    topicSubscriptionBuilder.open();
+    while (!handlerInvoked.get()) {
+      // busy waiting
+    }
+
+    // then
+    assertLockDurationAccordingToFetchAndLockPayload(objectMapper, 4711L);
+  }
+
+  @Test
+  public void shouldThrowExceptionDueToClientLockDurationNotGreaterThanZero() throws Exception {
+    // given
+    client = ExternalTaskClient.create()
+      .baseUrl(MockProvider.BASE_URL)
+      .build();
+
+    TopicSubscriptionBuilder topicSubscriptionBuilder = client.subscribe(MockProvider.TOPIC_NAME)
+      .lockDuration(0)
+      .handler(mock(ExternalTaskHandler.class));
+
+    try {
+      // when
+      topicSubscriptionBuilder.open();
+
+      fail("No ExternalTaskClientException thrown!");
+    } catch (ExternalTaskClientException e) {
+      // then
+      assertThat(e.getMessage()).contains("Lock duration is not greater than 0");
+    }
+  }
+
   // helper /////////////////////////////////////////
 
   protected void mockFetchAndLockResponse(List<ExternalTask> externalTasks) throws JsonProcessingException {
@@ -401,6 +540,10 @@ public class ExternalTaskClientTest {
     } else {
       assertThat(assertAccordingToFetchAndLockPayload(objectMapper).getAsyncResponseTimeout()).isEqualTo(asyncResponseTimeout);
     }
+  }
+
+  protected void assertLockDurationAccordingToFetchAndLockPayload(ObjectMapper objectMapper, Long lockDuration) throws JsonProcessingException {
+      assertThat(assertAccordingToFetchAndLockPayload(objectMapper).getTopics().get(0).getLockDuration()).isEqualTo(lockDuration);
   }
 
   protected FetchAndLockRequestDto assertAccordingToFetchAndLockPayload(ObjectMapper objectMapper) throws JsonProcessingException {

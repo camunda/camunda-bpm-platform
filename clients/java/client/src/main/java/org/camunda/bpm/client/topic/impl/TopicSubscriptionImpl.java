@@ -23,12 +23,12 @@ import java.util.List;
 public class TopicSubscriptionImpl implements TopicSubscription {
 
   protected String topicName;
-  protected long lockDuration;
+  protected Long lockDuration;
   protected ExternalTaskHandler externalTaskHandler;
   protected TopicSubscriptionManager topicSubscriptionManager;
   protected List<String> variableNames;
 
-  public TopicSubscriptionImpl(String topicName, long lockDuration, ExternalTaskHandler externalTaskHandler,
+  public TopicSubscriptionImpl(String topicName, Long lockDuration, ExternalTaskHandler externalTaskHandler,
                                TopicSubscriptionManager topicSubscriptionManager, List<String> variableNames) {
     this.topicName = topicName;
     this.lockDuration = lockDuration;
@@ -41,7 +41,7 @@ public class TopicSubscriptionImpl implements TopicSubscription {
     return topicName;
   }
 
-  public long getLockDuration() {
+  public Long getLockDuration() {
     return lockDuration;
   }
 

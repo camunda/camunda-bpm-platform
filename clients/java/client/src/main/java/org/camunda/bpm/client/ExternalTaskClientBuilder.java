@@ -71,6 +71,17 @@ public interface ExternalTaskClientBuilder {
   ExternalTaskClientBuilder asyncResponseTimeout(long asyncResponseTimeout);
 
   /**
+   * @param lockDuration <ul>
+   *                       <li> in milliseconds to lock the external tasks
+   *                       <li> must be greater than zero
+   *                       <li> the default lock duration is 20 seconds (20,000 milliseconds)
+   *                       <li> is overridden by the lock duration configured on a topic subscription
+   *                     </ul>
+   * @return the builder
+   */
+  ExternalTaskClientBuilder lockDuration(long lockDuration);
+
+  /**
    * Bootstraps the Camunda client
    *
    * @throws ExternalTaskClientException
@@ -79,6 +90,7 @@ public interface ExternalTaskClientBuilder {
    *   <li> if hostname cannot be retrieved
    *   <li> if maximum amount of tasks is not greater than zero
    *   <li> if maximum asynchronous response timeout is not greater than zero
+   *   <li> if lock duration is not greater than zero
    * </ul>
    * @return the builder
    */

@@ -49,7 +49,9 @@ public class TopicSubscriptionManager implements Runnable {
 
   protected VariableMappers variableMappers;
 
-  public TopicSubscriptionManager(EngineClient engineClient, VariableMappers variableMappers) {
+  protected long clientLockDuration;
+
+  public TopicSubscriptionManager(EngineClient engineClient, VariableMappers variableMappers, long clientLockDuration) {
     this.engineClient = engineClient;
     this.subscriptions = new CopyOnWriteArrayList<>();
     this.isRunning = true;
@@ -58,6 +60,8 @@ public class TopicSubscriptionManager implements Runnable {
     this.thread.start();
 
     this.variableMappers = variableMappers;
+
+    this.clientLockDuration = clientLockDuration;
   }
 
   public void run() {
@@ -71,7 +75,7 @@ public class TopicSubscriptionManager implements Runnable {
     Map<String, ExternalTaskHandler> externalTaskHandlers = new HashMap<>();
 
     subscriptions.forEach(subscription -> {
-      TopicRequestDto taskTopicRequest = TopicRequestDto.fromTopicSubscription(subscription);
+      TopicRequestDto taskTopicRequest = TopicRequestDto.fromTopicSubscription(subscription, clientLockDuration);
       taskTopicRequests.add(taskTopicRequest);
 
       String topicName = subscription.getTopicName();
