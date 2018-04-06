@@ -32,8 +32,6 @@ public class ExternalTaskClientImpl implements ExternalTaskClient {
   protected TopicSubscriptionManager topicSubscriptionManager;
   protected RequestInterceptorHandler requestInterceptorHandler;
 
-  protected int maxTasks;
-
   protected ExternalTaskClientImpl(ExternalTaskClientBuilderImpl clientBuilder) {
     String workerId = clientBuilder.getWorkerId();
     String baseUrl = clientBuilder.getBaseUrl();
