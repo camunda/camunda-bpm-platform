@@ -72,10 +72,27 @@ public abstract class ResourceDefinitionCache<T extends ResourceDefinitionEntity
     definition = resolveDefinition(definition);
     return definition;
   }
-public T findDeployedDefinitionByKeyVersionAndTenantId(final String definitionKey, final Integer definitionVersion, final String tenantId) { final CommandContext commandContext = Context.getCommandContext(); T definition = commandContext.runWithoutAuthorization(new Callable<T>() { public T call() throws Exception { return getManager(). findDefinitionByKeyVersionAndTenantId(definitionKey, definitionVersion, tenantId);
+
+  public T findDeployedDefinitionByKeyVersionAndTenantId(final String definitionKey, final Integer definitionVersion, final String tenantId) {
+    final CommandContext commandContext = Context.getCommandContext();
+    T definition = commandContext.runWithoutAuthorization(new Callable<T>() {
+      public T call() throws Exception {
+        return getManager().findDefinitionByKeyVersionAndTenantId(definitionKey, definitionVersion, tenantId);
       }
     });
     checkInvalidDefinitionByKeyVersionAndTenantId(definitionKey, definitionVersion, tenantId, definition);
+    definition = resolveDefinition(definition);
+    return definition;
+  }
+
+  public T findDeployedDefinitionByKeyVersionTagAndTenantId(final String definitionKey, final String definitionVersionTag, final String tenantId) {
+    final CommandContext commandContext = Context.getCommandContext();
+    T definition = commandContext.runWithoutAuthorization(new Callable<T>() {
+      public T call() throws Exception {
+        return getManager().findDefinitionByKeyVersionTagAndTenantId(definitionKey, definitionVersionTag, tenantId);
+      }
+    });
+    checkInvalidDefinitionByKeyVersionTagAndTenantId(definitionKey, definitionVersionTag, tenantId, definition);
     definition = resolveDefinition(definition);
     return definition;
   }
@@ -143,6 +160,8 @@ public T findDeployedDefinitionByKeyVersionAndTenantId(final String definitionKe
   protected abstract void checkInvalidDefinitionByKeyAndTenantId(String definitionKey, String tenantId, T definition);
 
   protected abstract void checkInvalidDefinitionByKeyVersionAndTenantId(String definitionKey, Integer definitionVersion, String tenantId, T definition);
+
+  protected abstract void checkInvalidDefinitionByKeyVersionTagAndTenantId(String definitionKey, String definitionVersionTag, String tenantId, T definition);
 
   protected abstract void checkInvalidDefinitionByDeploymentAndKey(String deploymentId, String definitionKey, T definition);
 

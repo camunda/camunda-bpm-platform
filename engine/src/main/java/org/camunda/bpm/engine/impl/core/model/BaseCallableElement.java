@@ -22,13 +22,15 @@ public class BaseCallableElement {
   protected ParameterValueProvider definitionKeyValueProvider;
   protected CallableElementBinding binding;
   protected ParameterValueProvider versionValueProvider;
+  protected ParameterValueProvider versionTagValueProvider;
   protected ParameterValueProvider tenantIdProvider;
   protected String deploymentId;
 
   public enum CallableElementBinding {
     LATEST("latest"),
     DEPLOYMENT("deployment"),
-    VERSION("version");
+    VERSION("version"),
+    VERSION_TAG("versionTag");
 
     private String value;
 
@@ -82,6 +84,11 @@ public class BaseCallableElement {
     return CallableElementBinding.VERSION.equals(binding);
   }
 
+  public boolean isVersionTagBinding() {
+    CallableElementBinding binding = getBinding();
+    return CallableElementBinding.VERSION_TAG.equals(binding);
+  }
+
   public Integer getVersion(VariableScope variableScope) {
     Object result = versionValueProvider.getValue(variableScope);
 
@@ -104,6 +111,29 @@ public class BaseCallableElement {
 
   public void setVersionValueProvider(ParameterValueProvider version) {
     this.versionValueProvider = version;
+  }
+
+  public String getVersionTag(VariableScope variableScope) {
+    Object result = versionTagValueProvider.getValue(variableScope);
+
+    if (result != null) {
+      if (result instanceof String) {
+        return (String) result;
+      } else {
+        throw new ProcessEngineException("It is not possible to transform '"+result+"' into a string.");
+      }
+    }
+
+    return null;
+  }
+
+
+  public ParameterValueProvider getVersionTagValueProvider() {
+    return versionTagValueProvider;
+  }
+
+  public void setVersionTagValueProvider(ParameterValueProvider version) {
+    this.versionTagValueProvider = version;
   }
 
   public void setTenantIdProvider(ParameterValueProvider tenantIdProvider) {

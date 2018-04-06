@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" id="definitions_bbfdd863-d073-440a-9027-e5a4fdf9f85a" targetNamespace="http://www.omg.org/spec/BPMN/20100524/MODEL" exporter="Camunda Modeler" exporterVersion="1.12.0">
+  <process id="process" isExecutable="true">
+    <startEvent id="startEvent_648db707-1c56-4110-9359-bc105737a25b">
+      <outgoing>sequenceFlow_ac59b697-c430-4a52-a340-5118231b1105</outgoing>
+    </startEvent>
+    <businessRuleTask id="businessRuleTask_1" name="Check decision" camunda:resultVariable="result" camunda:decisionRef="testDecision" camunda:decisionRefBinding="versionTag" camunda:mapDecisionResult="singleEntry" camunda:decisionRefVersionTag="${versionTagBean.versionTag()}">
+      <incoming>sequenceFlow_ac59b697-c430-4a52-a340-5118231b1105</incoming>
+      <outgoing>sequenceFlow_09430669-12e9-4826-9b75-df4bb409699c</outgoing>
+    </businessRuleTask>
+    <sequenceFlow id="sequenceFlow_ac59b697-c430-4a52-a340-5118231b1105" sourceRef="startEvent_648db707-1c56-4110-9359-bc105737a25b" targetRef="businessRuleTask_1" />
+    <endEvent id="endEvent_29aff5da-2fa7-4482-8175-239821d6326f" camunda:asyncBefore="true">
+      <incoming>sequenceFlow_09430669-12e9-4826-9b75-df4bb409699c</incoming>
+    </endEvent>
+    <sequenceFlow id="sequenceFlow_09430669-12e9-4826-9b75-df4bb409699c" sourceRef="businessRuleTask_1" targetRef="endEvent_29aff5da-2fa7-4482-8175-239821d6326f" />
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_40ac02b6-1d07-47f7-8f9f-5c8ab21e4ab2">
+    <bpmndi:BPMNPlane id="BPMNPlane_28813a3f-cc36-4a99-b9de-38dcf8d027b1" bpmnElement="process">
+      <bpmndi:BPMNShape id="BPMNShape_e47b5a4c-b7dc-4daa-a4f9-5a9507524b55" bpmnElement="startEvent_648db707-1c56-4110-9359-bc105737a25b">
+        <dc:Bounds x="100" y="100" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_e8890dc7-f7af-42ce-83fe-3123282b6f98" bpmnElement="businessRuleTask_1">
+        <dc:Bounds x="186" y="78" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_56dd03b0-2219-4dc1-a866-92548de66b55" bpmnElement="sequenceFlow_ac59b697-c430-4a52-a340-5118231b1105">
+        <di:waypoint x="136" y="118" />
+        <di:waypoint x="186" y="118" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="BPMNShape_54a857db-40d0-4d9e-97f7-6df3f129d513" bpmnElement="endEvent_29aff5da-2fa7-4482-8175-239821d6326f">
+        <dc:Bounds x="336" y="100" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_2984a038-79be-4f0a-87d6-c2f49d485ff8" bpmnElement="sequenceFlow_09430669-12e9-4826-9b75-df4bb409699c">
+        <di:waypoint x="286" y="118" />
+        <di:waypoint x="336" y="118" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

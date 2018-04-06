@@ -392,6 +392,11 @@ public class ProcessDefinitionManager extends AbstractManager implements Abstrac
   }
 
   @Override
+  public ProcessDefinitionEntity findDefinitionByKeyVersionTagAndTenantId(String definitionKey, String definitionVersionTag, String tenantId) {
+    throw new UnsupportedOperationException("Currently finding process definition by version tag and tenant is not implemented.");
+  }
+
+  @Override
   public ProcessDefinitionEntity findDefinitionByDeploymentAndKey(String deploymentId, String definitionKey) {
     return findProcessDefinitionByDeploymentAndKey(deploymentId, definitionKey);
   }

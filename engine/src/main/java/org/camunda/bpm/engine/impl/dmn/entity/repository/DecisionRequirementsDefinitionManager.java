@@ -122,6 +122,11 @@ public class DecisionRequirementsDefinitionManager extends AbstractManager imple
   }
 
   @Override
+  public DecisionRequirementsDefinitionEntity findDefinitionByKeyVersionTagAndTenantId(String definitionKey, String definitionVersionTag, String tenantId) {
+    return null;
+  }
+
+  @Override
   public DecisionRequirementsDefinitionEntity findDefinitionByDeploymentAndKey(String deploymentId, String definitionKey) {
     return null;
   }

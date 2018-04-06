@@ -2173,6 +2173,7 @@ public class BpmnParse extends Parse {
 
     parseBinding(businessRuleTaskElement, activity, callableElement, "decisionRefBinding");
     parseVersion(businessRuleTaskElement, activity, callableElement, "decisionRefBinding", "decisionRefVersion");
+    parseVersionTag(businessRuleTaskElement, activity, callableElement, "decisionRefBinding", "decisionRefVersionTag");
     parseTenantId(businessRuleTaskElement, activity, callableElement, "decisionRefTenantId");
 
     String resultVariable = parseResultVariable(businessRuleTaskElement);
@@ -3683,6 +3684,8 @@ public class BpmnParse extends Parse {
       callableElement.setBinding(CallableElementBinding.LATEST);
     } else if (CallableElementBinding.VERSION.getValue().equals(binding)) {
       callableElement.setBinding(CallableElementBinding.VERSION);
+    } else if (CallableElementBinding.VERSION_TAG.getValue().equals(binding)) {
+      callableElement.setBinding(CallableElementBinding.VERSION_TAG);
     }
   }
 
@@ -3712,6 +3715,21 @@ public class BpmnParse extends Parse {
 
     ParameterValueProvider versionProvider = createParameterValueProvider(version, expressionManager);
     callableElement.setVersionValueProvider(versionProvider);
+  }
+
+  protected void parseVersionTag(Element callingActivityElement, ActivityImpl activity, BaseCallableElement callableElement, String bindingAttributeName, String versionTagAttributeName) {
+    String versionTag = null;
+
+    CallableElementBinding binding = callableElement.getBinding();
+    versionTag = callingActivityElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, versionTagAttributeName);
+
+    if (binding != null && binding.equals(CallableElementBinding.VERSION_TAG) && versionTag == null) {
+      addError("Missing attribute '" + versionTagAttributeName + "' when '" + bindingAttributeName + "' has value '" + CallableElementBinding.VERSION_TAG.getValue()
+        + "'", callingActivityElement);
+    }
+
+    ParameterValueProvider versionTagProvider = createParameterValueProvider(versionTag, expressionManager);
+    callableElement.setVersionTagValueProvider(versionTagProvider);
   }
 
   protected void parseInputParameter(Element elementWithParameters, CallableElement callableElement) {

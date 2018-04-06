@@ -102,6 +102,27 @@ public class DecisionDefinitionManager extends AbstractManager implements Abstra
     }
   }
 
+  @SuppressWarnings("unchecked")
+  public DecisionDefinitionEntity findDecisionDefinitionByKeyVersionTagAndTenantId(String decisionDefinitionKey, String decisionDefinitionVersionTag, String tenantId) {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("decisionDefinitionVersionTag", decisionDefinitionVersionTag);
+    parameters.put("decisionDefinitionKey", decisionDefinitionKey);
+    parameters.put("tenantId", tenantId);
+
+    ListQueryParameterObject parameterObject = new ListQueryParameterObject();
+    parameterObject.setParameter(parameters);
+
+    List<DecisionDefinitionEntity> decisionDefinitions = getDbEntityManager().selectList("selectDecisionDefinitionByKeyVersionTag", parameterObject);
+
+    if (decisionDefinitions.size() == 1) {
+      return decisionDefinitions.get(0);
+    } else if (decisionDefinitions.isEmpty()) {
+      return null;
+    } else {
+      throw LOG.multipleDefinitionsForVersionTagException(decisionDefinitionKey, decisionDefinitionVersionTag);
+    }
+  }
+
   public DecisionDefinitionEntity findDecisionDefinitionByDeploymentAndKey(String deploymentId, String decisionDefinitionKey) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("deploymentId", deploymentId);
@@ -175,6 +196,11 @@ public class DecisionDefinitionManager extends AbstractManager implements Abstra
   @Override
   public DecisionDefinitionEntity findDefinitionByKeyVersionAndTenantId(String definitionKey, Integer definitionVersion, String tenantId) {
     return findDecisionDefinitionByKeyVersionAndTenantId(definitionKey, definitionVersion, tenantId);
+  }
+
+  @Override
+  public DecisionDefinitionEntity findDefinitionByKeyVersionTagAndTenantId(String definitionKey, String definitionVersionTag, String tenantId) {
+    return findDecisionDefinitionByKeyVersionTagAndTenantId(definitionKey, definitionVersionTag, tenantId);
   }
 
   @Override

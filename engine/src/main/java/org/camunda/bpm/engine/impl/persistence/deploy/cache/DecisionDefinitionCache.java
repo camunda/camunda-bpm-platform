@@ -74,6 +74,11 @@ public class DecisionDefinitionCache extends ResourceDefinitionCache<DecisionDef
   }
 
   @Override
+  protected void checkInvalidDefinitionByKeyVersionTagAndTenantId(String definitionKey, String definitionVersionTag, String tenantId, DecisionDefinitionEntity definition) {
+    ensureNotNull(DecisionDefinitionNotFoundException.class, "no decision definition deployed with key = '" + definitionKey + "', versionTag = '" + definitionVersionTag + "' and tenant-id '" + tenantId + "'", "decisionDefinition", definition);
+  }
+
+  @Override
   protected void checkInvalidDefinitionByDeploymentAndKey(String deploymentId, String definitionKey, DecisionDefinitionEntity definition) {
     ensureNotNull(DecisionDefinitionNotFoundException.class, "no decision definition deployed with key = '" + definitionKey + "' in deployment = '" + deploymentId + "'", "decisionDefinition", definition);
   }

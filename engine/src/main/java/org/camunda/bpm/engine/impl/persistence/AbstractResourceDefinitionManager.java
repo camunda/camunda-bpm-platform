@@ -29,4 +29,6 @@ public interface AbstractResourceDefinitionManager<T> {
 
   T getCachedResourceDefinitionEntity(String definitionId);
 
+  T findDefinitionByKeyVersionTagAndTenantId(String definitionKey, String definitionVersionTag, String tenantId);
+
 }

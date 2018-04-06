@@ -60,6 +60,12 @@ public class ProcessDefinitionCache extends ResourceDefinitionCache<ProcessDefin
   }
 
   @Override
+  protected void checkInvalidDefinitionByKeyVersionTagAndTenantId(String definitionKey, String definitionVersionTag, String tenantId,
+      ProcessDefinitionEntity definition) {
+    // TODO Auto-generated method stub
+  }
+
+  @Override
   protected void checkInvalidDefinitionByDeploymentAndKey(String deploymentId, String definitionKey, ProcessDefinitionEntity definition) {
     ensureNotNull("no processes deployed with key = '" + definitionKey + "' in deployment = '" + deploymentId + "'", "processDefinition", definition);
   }

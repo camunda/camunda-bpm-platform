@@ -59,6 +59,11 @@ public class DecisionRequirementsDefinitionCache extends ResourceDefinitionCache
   }
 
   @Override
+  protected void checkInvalidDefinitionByKeyVersionTagAndTenantId(String definitionKey, String definitionVersionTag, String tenantId, DecisionRequirementsDefinitionEntity definition) {
+    // not needed
+  }
+
+  @Override
   protected void checkInvalidDefinitionByDeploymentAndKey(String deploymentId, String definitionKey, DecisionRequirementsDefinitionEntity definition) {
     // not needed
   }

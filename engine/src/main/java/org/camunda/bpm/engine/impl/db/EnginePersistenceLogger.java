@@ -705,4 +705,12 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
     ));
   }
 
+  public ProcessEngineException multipleDefinitionsForVersionTagException(String decisionDefinitionKey, String decisionDefinitionVersionTag) {
+    return new ProcessEngineException(exceptionMessage(
+        "085",
+        "Found more that one decision definition for key '{}' exist with versionTag: {}",
+        decisionDefinitionKey, decisionDefinitionVersionTag
+        ));
+  }
+
 }

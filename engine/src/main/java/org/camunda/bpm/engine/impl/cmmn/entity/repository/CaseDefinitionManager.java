@@ -152,6 +152,11 @@ public class CaseDefinitionManager extends AbstractManager implements AbstractRe
   }
 
   @Override
+  public CaseDefinitionEntity findDefinitionByKeyVersionTagAndTenantId(String definitionKey, String definitionVersionTag, String tenantId) {
+    throw new UnsupportedOperationException("Currently finding case definition by version tag and tenant is not implemented.");
+  }
+
+  @Override
   public CaseDefinitionEntity findDefinitionByKeyVersionAndTenantId(String definitionKey, Integer definitionVersion, String tenantId) {
     return findCaseDefinitionByKeyVersionAndTenantId(definitionKey, definitionVersion, tenantId);
   }

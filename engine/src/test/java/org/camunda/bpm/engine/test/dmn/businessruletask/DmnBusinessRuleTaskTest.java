@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.test.dmn.businessruletask;
 
 import static org.junit.Assert.assertEquals;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.exception.dmn.DecisionDefinitionNotFoundException;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -24,7 +25,7 @@ import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
-import org.camunda.bpm.model.dmn.Dmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -41,10 +42,23 @@ public class DmnBusinessRuleTaskTest {
   public static final String DECISION_PROCESS_VERSION = "org/camunda/bpm/engine/test/dmn/businessruletask/DmnBusinessRuleTaskTest.testDecisionRefVersionBinding.bpmn20.xml";
   public static final String DECISION_OKAY_DMN = "org/camunda/bpm/engine/test/dmn/businessruletask/DmnBusinessRuleTaskTest.testDecisionOkay.dmn11.xml";
   public static final String DECISION_NOT_OKAY_DMN = "org/camunda/bpm/engine/test/dmn/businessruletask/DmnBusinessRuleTaskTest.testDecisionNotOkay.dmn11.xml";
+  public static final String DECISION_VERSION_TAG_OKAY_DMN = "org/camunda/bpm/engine/test/dmn/businessruletask/DmnBusinessRuleTaskTest.testDecisionVersionTagOkay.dmn11.xml";
   public static final String DECISION_POJO_DMN = "org/camunda/bpm/engine/test/dmn/businessruletask/DmnBusinessRuleTaskTest.testPojo.dmn11.xml";
 
   public static final String DECISION_LITERAL_EXPRESSION_DMN = "org/camunda/bpm/engine/test/dmn/deployment/DecisionWithLiteralExpression.dmn";
   public static final String DRD_DISH_RESOURCE = "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml";
+
+  public static final BpmnModelInstance BPMN_VERSION_TAG_BINDING = Bpmn.createExecutableProcess("process")
+              .startEvent()
+              .businessRuleTask()
+                    .camundaDecisionRef("testDecision")
+                    .camundaDecisionRefBinding("versionTag")
+                    .camundaDecisionRefVersionTag("0.0.2")
+                    .camundaMapDecisionResult("singleEntry")
+                    .camundaResultVariable("result")
+              .endEvent()
+                    .camundaAsyncBefore()
+              .done();
 
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
@@ -119,6 +133,91 @@ public class DmnBusinessRuleTaskTest {
 
     processInstance = startExpressionProcess("testDecision", 2);
     assertEquals("not okay", getDecisionResult(processInstance));
+  }
+
+  @Test
+  public void decisionRefVersionTagBinding() {
+    // given
+    testRule.deploy(DECISION_VERSION_TAG_OKAY_DMN);
+    testRule.deploy(BPMN_VERSION_TAG_BINDING);
+
+    // when
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    // then
+    assertEquals("okay", getDecisionResult(processInstance));
+  }
+
+  @Test
+  public void decisionRefVersionTagBindingExpression() {
+    // given
+    testRule.deploy(DECISION_VERSION_TAG_OKAY_DMN);
+    testRule.deploy(Bpmn.createExecutableProcess("process")
+        .startEvent()
+        .businessRuleTask()
+          .camundaDecisionRef("testDecision")
+          .camundaDecisionRefBinding("versionTag")
+          .camundaDecisionRefVersionTag("${versionTagExpr}")
+          .camundaMapDecisionResult("singleEntry")
+          .camundaResultVariable("result")
+        .endEvent()
+          .camundaAsyncBefore()
+        .done());
+
+    // when
+    VariableMap variables = Variables.createVariables()
+        .putValue("versionTagExpr", "0.0.2");
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process", variables);
+
+    // then
+    assertEquals("okay", getDecisionResult(processInstance));
+  }
+
+  @Test
+  public void decisionRefVersionTagBindingWithoutVersionTag() {
+    // expected
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("Could not parse BPMN process.");
+
+    // when
+    testRule.deploy(Bpmn.createExecutableProcess("process")
+        .startEvent()
+        .businessRuleTask()
+          .camundaDecisionRef("testDecision")
+          .camundaDecisionRefBinding("versionTag")
+          .camundaMapDecisionResult("singleEntry")
+          .camundaResultVariable("result")
+        .endEvent()
+          .camundaAsyncBefore()
+        .done());
+  }
+
+  @Test
+  public void decisionRefVersionTagBindingNoneDecisionDefinition() {
+    // expected
+    thrown.expect(DecisionDefinitionNotFoundException.class);
+    thrown.expectMessage("no decision definition deployed with key = 'testDecision', versionTag = '0.0.2' and tenant-id 'null'");
+
+    // given
+    testRule.deploy(BPMN_VERSION_TAG_BINDING);
+
+    // when
+    runtimeService.startProcessInstanceByKey("process");
+  }
+
+  @Test
+  public void decisionRefVersionTagBindingTwoDecisionDefinitions() {
+    // expected
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("Found more that one decision definition for key 'testDecision' exist with versionTag: 0.0.2");
+
+    // given
+    testRule.deploy(DECISION_VERSION_TAG_OKAY_DMN);
+    testRule.deploy(DECISION_VERSION_TAG_OKAY_DMN);
+    testRule.deploy(BPMN_VERSION_TAG_BINDING);
+
+    // when
+    runtimeService.startProcessInstanceByKey("process");
   }
 
   @Deployment(resources = {DECISION_PROCESS, DECISION_POJO_DMN})

@@ -151,6 +151,18 @@
           and TENANT_ID_ = #{tenantId}
   </select>
 
+  <select id="selectDecisionDefinitionByKeyVersionTag" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="decisionDefinitionResultMap">
+    select *
+    from ${prefix}ACT_RE_DECISION_DEF
+    where KEY_ = #{parameter.decisionDefinitionKey}
+          and VERSION_TAG_ = #{parameter.decisionDefinitionVersionTag}
+          <if test="parameter.tenantId == null">
+                and TENANT_ID_ is null
+          </if>
+          <if test="parameter.tenantId != null">
+                and TENANT_ID_ = #{parameter.tenantId}
+          </if>
+  </select>
 
   <select id="selectPreviousDecisionDefinitionId" parameterType="map" resultType="string">
     select distinct RES.*
