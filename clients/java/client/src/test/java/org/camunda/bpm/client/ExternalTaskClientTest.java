@@ -260,7 +260,7 @@ public class ExternalTaskClientTest {
       fail("No ExternalTaskClientException thrown!");
     } catch (ExternalTaskClientException e) {
       // then
-      assertThat(e.getMessage()).contains("Maximum amount of fetched tasks cannot be less than zero");
+      assertThat(e.getMessage()).contains("Maximum amount of fetched tasks must be greater than zero");
     }
   }
 
