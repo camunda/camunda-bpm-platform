@@ -48,7 +48,7 @@ public class ExternalTaskClientFactory implements FactoryBean<ExternalTaskClient
     Predicate<ClientRequestInterceptor> isAcceptingIdAware = clientRequestInterceptor -> (clientRequestInterceptor instanceof ClientIdAwareClientRequestInterceptor)
         && ((ClientIdAwareClientRequestInterceptor) clientRequestInterceptor).accepts(getId());
 
-    Predicate<ClientRequestInterceptor> isNotIdAware = clientRequestInterceptor -> !(clientRequestInterceptor instanceof ClientRequestInterceptor);
+    Predicate<ClientRequestInterceptor> isNotIdAware = clientRequestInterceptor -> !(clientRequestInterceptor instanceof ClientIdAwareClientRequestInterceptor);
     return isNotIdAware.or(isAcceptingIdAware);
   }
 

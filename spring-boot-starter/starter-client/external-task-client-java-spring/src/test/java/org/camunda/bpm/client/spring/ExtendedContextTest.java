@@ -6,6 +6,8 @@ import java.util.List;
 
 import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.client.impl.ExternalTaskClientImpl;
+import org.camunda.bpm.client.interceptor.ClientRequestInterceptor;
+import org.camunda.bpm.client.spring.interceptor.ClientIdAwareClientRequestInterceptor;
 import org.camunda.bpm.client.topic.TopicSubscription;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,26 +31,37 @@ public class ExtendedContextTest {
   @Autowired
   private List<SubscribedExternalTask> scheduledExternalTasks;
 
+  @Autowired
+  private ClientRequestInterceptor clientRequestInterceptor;
+
+  @Autowired
+  private ClientIdAwareClientRequestInterceptor idAwareInterceptor;
+
   @Test
   public void startup() {
     assertThat(externalTaskClientFirst).isNotNull();
     assertThat(externalTaskClientSecond).isNotNull();
     assertThat(scheduledExternalTasks).hasSize(2);
-    scheduledExternalTasks.stream().flatMap(task -> task.getSubscriptions().stream())
-        .forEach(subscription -> assertThat(subscription.isOpen()));
+    scheduledExternalTasks.stream().flatMap(task -> task.getSubscriptions().stream()).forEach(subscription -> assertThat(subscription.isOpen()));
   }
 
   @Test
-  public void testSubscriptions() {
-    testSubscription(externalTaskClientFirst, "methodSubscription");
-    testSubscription(externalTaskClientSecond, "testClassSubscription");
+  public void testSubscriptionAndInterceptor() {
+    testSubscriptionAndInterceptor(externalTaskClientFirst, "methodSubscription", clientRequestInterceptor);
+    testSubscriptionAndInterceptor(externalTaskClientSecond, "testClassSubscription", clientRequestInterceptor, idAwareInterceptor);
   }
 
-  private void testSubscription(ExternalTaskClient taskClient, String topicName) {
-    List<TopicSubscription> subscriptions = ((ExternalTaskClientImpl) taskClient).getTopicSubscriptionManager()
-        .getSubscriptions();
+  private void testSubscriptionAndInterceptor(ExternalTaskClient taskClient, String topicName, ClientRequestInterceptor... expectedInterceptors) {
+    ExternalTaskClientImpl clientImpl = (ExternalTaskClientImpl) taskClient;
+    List<TopicSubscription> subscriptions = clientImpl.getTopicSubscriptionManager().getSubscriptions();
     assertThat(subscriptions).hasSize(1);
     TopicSubscription subscription = subscriptions.iterator().next();
     assertThat(subscription.getTopicName()).isEqualTo(topicName);
+    List<ClientRequestInterceptor> interceptors = clientImpl.getRequestInterceptorHandler().getInterceptors();
+    if (expectedInterceptors == null) {
+      assertThat(interceptors).hasSize(0);
+    } else {
+      assertThat(interceptors).containsOnly(expectedInterceptors);
+    }
   }
 }
