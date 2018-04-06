@@ -45,11 +45,11 @@ public class ExternalTaskClientFactory implements FactoryBean<ExternalTaskClient
   }
 
   protected Predicate<ClientRequestInterceptor> filterClientRequestInterceptors() {
-    Predicate<ClientRequestInterceptor> isIdAccepting = clientRequestInterceptor -> clientRequestInterceptor instanceof ClientIdAcceptingClientRequestInterceptor;
+    Predicate<ClientRequestInterceptor> isIdAcceptingInterceptor = clientRequestInterceptor -> clientRequestInterceptor instanceof ClientIdAcceptingClientRequestInterceptor;
     Predicate<ClientRequestInterceptor> isAcceptingId = clientRequestInterceptor -> ((ClientIdAcceptingClientRequestInterceptor) clientRequestInterceptor)
         .accepts(getId());
 
-    return isIdAccepting.negate().or(isIdAccepting.and(isAcceptingId));
+    return isIdAcceptingInterceptor.negate().or(isIdAcceptingInterceptor.and(isAcceptingId));
   }
 
   @Override
