@@ -1,5 +1,6 @@
 package org.camunda.bpm.engine.test.concurrency;
 
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineBootstrapCommand;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngines;
@@ -33,6 +34,32 @@ public class ConcurrentProcessEngineJobExecutorHistoryCleanupJobTest extends Con
     ClockUtil.setCurrentTime(timeOfDay.getTime());
 
     super.setUp();
+  }
+
+  @Override
+  protected void closeDownProcessEngine() {
+    super.closeDownProcessEngine();
+    final ProcessEngine otherProcessEngine = ProcessEngines.getProcessEngine(PROCESS_ENGINE_NAME);
+    if (otherProcessEngine != null) {
+
+      ((ProcessEngineConfigurationImpl)otherProcessEngine.getProcessEngineConfiguration()).getCommandExecutorTxRequired().execute(new Command<Void>() {
+        public Void execute(CommandContext commandContext) {
+
+          List<Job> jobs = otherProcessEngine.getManagementService().createJobQuery().list();
+          if (jobs.size() > 0) {
+            assertEquals(1, jobs.size());
+            String jobId = jobs.get(0).getId();
+            commandContext.getJobManager().deleteJob((JobEntity) jobs.get(0));
+            commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(jobId);
+          }
+
+          return null;
+        }
+      });
+
+      otherProcessEngine.close();
+      ProcessEngines.unregister(otherProcessEngine);
+    }
   }
 
   @Override
