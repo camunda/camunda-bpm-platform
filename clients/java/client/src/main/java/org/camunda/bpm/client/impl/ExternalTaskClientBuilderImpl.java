@@ -14,7 +14,6 @@ package org.camunda.bpm.client.impl;
 
 import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.client.ExternalTaskClientBuilder;
-import org.camunda.bpm.client.exception.ExternalTaskClientException;
 import org.camunda.bpm.client.interceptor.ClientRequestInterceptor;
 
 import java.net.InetAddress;
@@ -33,10 +32,12 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
   protected String baseUrl;
   protected String workerId;
   protected int maxTasks;
+  protected Long asyncResponseTimeout;
   protected List<ClientRequestInterceptor> interceptors;
 
   public ExternalTaskClientBuilderImpl() {
     this.maxTasks = 10; // default value
+    this.asyncResponseTimeout = null; // default value
     this.interceptors = new ArrayList<>();
   }
 
@@ -60,9 +61,18 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
     return this;
   }
 
+  public ExternalTaskClientBuilder asyncResponseTimeout(long asyncResponseTimeout) {
+    this.asyncResponseTimeout = asyncResponseTimeout;
+    return this;
+  }
+
   public ExternalTaskClient build() {
     if (maxTasks <= 0) {
       throw LOG.maxTasksNotGreaterThanZeroException();
+    }
+
+    if (asyncResponseTimeout != null && asyncResponseTimeout <= 0) {
+      throw LOG.asyncResponseTimeoutNotGreaterThanZeroException();
     }
 
     if (baseUrl == null || baseUrl.isEmpty()) {
@@ -116,6 +126,10 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
 
   protected int getMaxTasks() {
     return maxTasks;
+  }
+
+  protected Long getAsyncResponseTimeout() {
+    return asyncResponseTimeout;
   }
 
 }

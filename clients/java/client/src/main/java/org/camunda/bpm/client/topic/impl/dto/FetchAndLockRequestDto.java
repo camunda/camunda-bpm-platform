@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.client.topic.impl.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.camunda.bpm.client.impl.RequestDto;
 
 import java.util.ArrayList;
@@ -20,14 +21,17 @@ import java.util.List;
 /**
  * @author Tassilo Weidner
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class FetchAndLockRequestDto extends RequestDto {
 
   protected int maxTasks;
+  protected Long asyncResponseTimeout;
   protected List<TopicRequestDto> topics = new ArrayList<>();
 
-  public FetchAndLockRequestDto(String workerId, int maxTasks, List<TopicRequestDto> topics) {
+  public FetchAndLockRequestDto(String workerId, int maxTasks, Long asyncResponseTimeout, List<TopicRequestDto> topics) {
     super(workerId);
     this.maxTasks = maxTasks;
+    this.asyncResponseTimeout = asyncResponseTimeout;
     this.topics = topics;
   }
 
@@ -37,6 +41,10 @@ public class FetchAndLockRequestDto extends RequestDto {
 
   public List<TopicRequestDto> getTopics() {
     return topics;
+  }
+
+  public Long getAsyncResponseTimeout() {
+    return asyncResponseTimeout;
   }
 
 }

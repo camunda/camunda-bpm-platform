@@ -295,6 +295,88 @@ public class ExternalTaskClientTest {
     assertWorkerIdAccordingToFetchAndLockPayload(objectMapper, "aWorkerId");
   }
 
+  @Test
+  public void shouldThrowExceptionDueToAsyncResponseTimeoutNotGreaterThanZero() throws Exception {
+    // given
+    mockFetchAndLockResponse(Collections.singletonList(MockProvider.createExternalTaskWithoutVariables()));
+
+    ObjectMapper objectMapper = spy(ObjectMapper.class);
+    whenNew(ObjectMapper.class).withNoArguments()
+      .thenReturn(objectMapper);
+
+    ExternalTaskClientBuilder clientBuilder = ExternalTaskClient.create()
+      .baseUrl(MockProvider.BASE_URL)
+      .asyncResponseTimeout(0);
+
+    try {
+      // when
+      client = clientBuilder.build();
+
+      fail("No ExternalTaskClientException thrown!");
+    } catch (ExternalTaskClientException e) {
+      assertThat(e.getMessage()).contains("Asynchronous response timeout must be greater than zero");
+    }
+  }
+
+  @Test
+  public void shouldUseAsyncResponseTimeout() throws Exception {
+    // given
+    mockFetchAndLockResponse(Collections.singletonList(MockProvider.createExternalTaskWithoutVariables()));
+
+    ObjectMapper objectMapper = spy(ObjectMapper.class);
+    whenNew(ObjectMapper.class).withNoArguments()
+      .thenReturn(objectMapper);
+
+    client = ExternalTaskClient.create()
+      .asyncResponseTimeout(5000)
+      .baseUrl(MockProvider.BASE_URL)
+      .build();
+
+    final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
+    TopicSubscriptionBuilder topicSubscriptionBuilder =
+      client.subscribe(MockProvider.TOPIC_NAME)
+        .lockDuration(5000)
+        .handler((externalTask, externalTaskService) -> handlerInvoked.set(true));
+
+    // when
+    topicSubscriptionBuilder.open();
+    while (!handlerInvoked.get()) {
+      // busy waiting
+    }
+
+    // then
+    assertAsyncResponseTimeoutAccordingToFetchAndLockPayload(objectMapper, 5000L);
+  }
+
+  @Test
+  public void shouldNotUseAsyncResponseTimeout() throws Exception {
+    // given
+    mockFetchAndLockResponse(Collections.singletonList(MockProvider.createExternalTaskWithoutVariables()));
+
+    ObjectMapper objectMapper = spy(ObjectMapper.class);
+    whenNew(ObjectMapper.class).withNoArguments()
+      .thenReturn(objectMapper);
+
+    client = ExternalTaskClient.create()
+      .baseUrl(MockProvider.BASE_URL)
+      .build();
+
+    final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
+    TopicSubscriptionBuilder topicSubscriptionBuilder =
+      client.subscribe(MockProvider.TOPIC_NAME)
+        .lockDuration(5000)
+        .handler((externalTask, externalTaskService) -> handlerInvoked.set(true));
+
+    // when
+    topicSubscriptionBuilder.open();
+    while (!handlerInvoked.get()) {
+      // busy waiting
+    }
+
+    // then
+    assertAsyncResponseTimeoutAccordingToFetchAndLockPayload(objectMapper, null);
+  }
+
   // helper /////////////////////////////////////////
 
   protected void mockFetchAndLockResponse(List<ExternalTask> externalTasks) throws JsonProcessingException {
@@ -311,6 +393,14 @@ public class ExternalTaskClientTest {
 
   protected void assertWorkerIdAccordingToFetchAndLockPayload(ObjectMapper objectMapper, String workerId) throws JsonProcessingException {
     assertThat(assertAccordingToFetchAndLockPayload(objectMapper).getWorkerId()).isEqualTo(workerId);
+  }
+
+  protected void assertAsyncResponseTimeoutAccordingToFetchAndLockPayload(ObjectMapper objectMapper, Long asyncResponseTimeout) throws JsonProcessingException {
+    if (asyncResponseTimeout == null) {
+      assertThat(assertAccordingToFetchAndLockPayload(objectMapper).getAsyncResponseTimeout()).isNull();
+    } else {
+      assertThat(assertAccordingToFetchAndLockPayload(objectMapper).getAsyncResponseTimeout()).isEqualTo(asyncResponseTimeout);
+    }
   }
 
   protected FetchAndLockRequestDto assertAccordingToFetchAndLockPayload(ObjectMapper objectMapper) throws JsonProcessingException {

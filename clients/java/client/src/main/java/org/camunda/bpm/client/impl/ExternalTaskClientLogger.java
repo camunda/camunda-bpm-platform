@@ -135,4 +135,9 @@ public class ExternalTaskClientLogger extends BaseLogger {
       "018", "Maximum amount of fetched tasks cannot be less than zero"));
   }
 
+  public ExternalTaskClientException asyncResponseTimeoutNotGreaterThanZeroException() {
+    return new ExternalTaskClientException(exceptionMessage(
+      "019", "Asynchronous response timeout must be greater than zero"));
+  }
+
 }

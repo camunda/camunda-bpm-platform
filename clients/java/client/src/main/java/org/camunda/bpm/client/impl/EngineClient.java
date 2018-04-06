@@ -52,12 +52,14 @@ public class EngineClient {
   protected String baseUrl;
   protected String workerId;
   protected int maxTasks;
+  protected Long asyncResponseTimeout;
   protected RequestExecutor engineInteraction;
 
   protected VariableMappers variableMappers;
 
-  public EngineClient(String workerId, int maxTasks, String baseUrl, RequestInterceptorHandler requestInterceptorHandler, VariableMappers variableMappers, ObjectMapper objectMapper) {
+  public EngineClient(String workerId, int maxTasks, Long asyncResponseTimeout, String baseUrl, RequestInterceptorHandler requestInterceptorHandler, VariableMappers variableMappers, ObjectMapper objectMapper) {
     this.workerId = workerId;
+    this.asyncResponseTimeout = asyncResponseTimeout;
     this.maxTasks = maxTasks;
     this.engineInteraction = new RequestExecutor(requestInterceptorHandler, objectMapper);
     this.baseUrl = engineInteraction.sanitizeUrl(baseUrl);
@@ -65,7 +67,7 @@ public class EngineClient {
   }
 
   public List<ExternalTask> fetchAndLock(List<TopicRequestDto> topics) throws EngineClientException {
-    FetchAndLockRequestDto payload = new FetchAndLockRequestDto(workerId, maxTasks, topics);
+    FetchAndLockRequestDto payload = new FetchAndLockRequestDto(workerId, maxTasks, asyncResponseTimeout, topics);
     String resourceUrl = baseUrl + FETCH_AND_LOCK_RESOURCE_PATH;
     ExternalTask[] externalTasks = engineInteraction.postRequest(resourceUrl, payload, ExternalTaskImpl[].class);
     return Arrays.asList(externalTasks);

@@ -61,6 +61,16 @@ public interface ExternalTaskClientBuilder {
   ExternalTaskClientBuilder maxTasks(int maxTasks);
 
   /**
+   * Specifies the maximum waiting time for the response of fetched and locked external tasks.
+   * The response is performed immediately, if external tasks are available in the moment of the request.
+   * This information is optional.
+   *
+   * @param asyncResponseTimeout of fetched and locked external tasks
+   * @return the builder
+   */
+  ExternalTaskClientBuilder asyncResponseTimeout(long asyncResponseTimeout);
+
+  /**
    * Bootstraps the Camunda client
    *
    * @throws ExternalTaskClientException
@@ -68,6 +78,7 @@ public interface ExternalTaskClientBuilder {
    *   <li> if base url is null or string is empty
    *   <li> if hostname cannot be retrieved
    *   <li> if maximum amount of tasks is not greater than zero
+   *   <li> if maximum asynchronous response timeout is not greater than zero
    * </ul>
    * @return the builder
    */
