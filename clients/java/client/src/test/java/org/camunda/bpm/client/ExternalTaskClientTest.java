@@ -588,18 +588,12 @@ public class ExternalTaskClientTest {
     mockFetchAndLockResponse(Collections.singletonList(MockProvider.createExternalTaskWithoutVariables()));
 
     ObjectMapper objectMapper = spy(ObjectMapper.class);
-    whenNew(ObjectMapper.class).withNoArguments()
-      .thenReturn(objectMapper);
+    whenNew(ObjectMapper.class).withNoArguments().thenReturn(objectMapper);
 
-    client = ExternalTaskClient.create()
-      .baseUrl(MockProvider.BASE_URL)
-      .build();
+    client = ExternalTaskClient.create().baseUrl(MockProvider.BASE_URL).build();
 
     final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
-    TopicSubscriptionBuilder topicSubscriptionBuilder =
-      client.subscribe(MockProvider.TOPIC_NAME)
-        .businessKey(MockProvider.BUSINESS_KEY)
-        .handler((externalTask, externalTaskService) -> handlerInvoked.set(true));
+    TopicSubscriptionBuilder topicSubscriptionBuilder = client.subscribe(MockProvider.TOPIC_NAME).businessKey(MockProvider.BUSINESS_KEY).handler((externalTask, externalTaskService) -> handlerInvoked.set(true));
 
     // when
     topicSubscriptionBuilder.open();
@@ -609,6 +603,136 @@ public class ExternalTaskClientTest {
 
     // then
     assertBusinessKeyAccordingToFetchAndLockPayload(objectMapper, MockProvider.BUSINESS_KEY);
+  }
+
+  @Test(timeout = 10000)
+  public void shouldInvokeBackOffStrategyStartWaitingMethod() throws Exception {
+    // given
+    AtomicBoolean startWaitInvoke = new AtomicBoolean(false);
+    ClientBackOffStrategy backOffStrategy = new ClientBackOffStrategy() {
+
+      @Override public void startWaiting() {
+        startWaitInvoke.set(true);
+      }
+
+      @Override public void reset() {
+
+      }
+
+      @Override public void stopWaiting() {
+
+      }
+    };
+
+    mockFetchAndLockResponse(Collections.emptyList());
+
+    client = ExternalTaskClient.create()
+      .workerId("aWorkerId")
+      .baseUrl(MockProvider.BASE_URL)
+      .backOff(backOffStrategy)
+      .build();
+
+    TopicSubscriptionBuilder topicSubscriptionBuilder =
+      client.subscribe(MockProvider.TOPIC_NAME)
+        .lockDuration(5000)
+        .handler((externalTask, externalTaskService) -> {});
+
+    // when
+    topicSubscriptionBuilder.open();
+    while (!startWaitInvoke.get()) {
+      // busy waiting
+    }
+    client.stop();
+
+    // then
+    assertThat(startWaitInvoke.get()).isTrue();
+  }
+
+  @Test(timeout = 10000)
+  public void shouldInvokeBackOffStrategyStopWaitingMethod() throws Exception {
+    // given
+    AtomicBoolean stopWaitInvoke = new AtomicBoolean(false);
+    ClientBackOffStrategy backOffStrategy = new ClientBackOffStrategy() {
+
+      @Override public void startWaiting() {
+      }
+
+      @Override public void reset() {
+
+      }
+
+      @Override public void stopWaiting() {
+        stopWaitInvoke.set(true);
+      }
+    };
+
+    mockFetchAndLockResponse(Collections.emptyList());
+
+    client = ExternalTaskClient.create()
+      .workerId("aWorkerId")
+      .baseUrl(MockProvider.BASE_URL)
+      .backOff(backOffStrategy)
+      .build();
+
+    TopicSubscriptionBuilder topicSubscriptionBuilder =
+      client.subscribe(MockProvider.TOPIC_NAME)
+        .lockDuration(5000)
+        .handler((externalTask, externalTaskService) -> {});
+
+    // when
+    topicSubscriptionBuilder.open();
+
+    while (!stopWaitInvoke.get()) {
+      // busy waiting
+      client.stop();
+    }
+
+    // then
+    assertThat(stopWaitInvoke.get()).isTrue();
+  }
+
+  @Test(timeout = 10000)
+  public void shouldInvokeBackOffStrategyResetMethod() throws Exception {
+    // given
+    AtomicBoolean resetInvoke = new AtomicBoolean(false);
+    ClientBackOffStrategy backOffStrategy = new ClientBackOffStrategy() {
+
+      @Override
+      public void startWaiting() {
+      }
+
+      @Override
+      public void reset() {
+        resetInvoke.set(true);
+      }
+
+      @Override
+      public void stopWaiting() {
+      }
+    };
+
+    mockFetchAndLockResponse(Collections.singletonList(MockProvider.createExternalTaskWithoutVariables()));
+
+    client = ExternalTaskClient.create()
+      .workerId("aWorkerId")
+      .baseUrl(MockProvider.BASE_URL)
+      .backOff(backOffStrategy)
+      .build();
+
+    TopicSubscriptionBuilder topicSubscriptionBuilder =
+      client.subscribe(MockProvider.TOPIC_NAME)
+        .lockDuration(5000)
+        .handler((externalTask, externalTaskService) -> {});
+
+    // when
+    topicSubscriptionBuilder.open();
+    while (!resetInvoke.get()) {
+      // busy waiting
+    }
+    client.stop();
+
+    // then
+    assertThat(resetInvoke.get()).isTrue();
   }
 
   // helper /////////////////////////////////////////

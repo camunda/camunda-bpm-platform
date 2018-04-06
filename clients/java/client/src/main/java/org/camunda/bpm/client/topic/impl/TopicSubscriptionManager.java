@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.client.topic.impl;
 
+import org.camunda.bpm.client.ClientBackOffStrategy;
 import org.camunda.bpm.client.exception.ExternalTaskClientException;
 import org.camunda.bpm.client.impl.EngineClient;
 import org.camunda.bpm.client.impl.EngineClientException;
@@ -48,6 +49,8 @@ public class TopicSubscriptionManager implements Runnable {
 
   protected boolean isRunning;
   protected Thread thread;
+
+  protected ClientBackOffStrategy backOffStrategy;
 
   protected VariableMappers variableMappers;
 
@@ -127,6 +130,15 @@ public class TopicSubscriptionManager implements Runnable {
         } // else: skip handler execution
       });
 
+      try {
+        if (backOffStrategy != null && externalTasks.isEmpty()) {
+          backOffStrategy.startWaiting();
+        } else if (backOffStrategy != null && !externalTasks.isEmpty()) {
+          backOffStrategy.reset();
+        }
+      } catch (Throwable e) {
+        LOG.exceptionWhileExecutingBackOffStrategyMethod(e);
+      }
     }
   }
 
@@ -137,6 +149,14 @@ public class TopicSubscriptionManager implements Runnable {
       }
 
       isRunning = false;
+
+      if (backOffStrategy != null) {
+        try {
+          backOffStrategy.stopWaiting();
+        } catch (Throwable e) {
+          LOG.exceptionWhileExecutingBackOffStrategyMethod(e);
+        }
+      }
 
       try {
         thread.join();
@@ -187,6 +207,10 @@ public class TopicSubscriptionManager implements Runnable {
 
   public boolean isRunning() {
     return isRunning;
+  }
+
+  public void setBackOffStrategy(ClientBackOffStrategy backOffStrategy) {
+    this.backOffStrategy = backOffStrategy;
   }
 
 }

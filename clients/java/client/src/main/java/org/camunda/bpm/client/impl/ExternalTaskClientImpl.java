@@ -44,8 +44,13 @@ public class ExternalTaskClientImpl implements ExternalTaskClient {
 
     ObjectMapper objectMapper = initObjectMapper();
     VariableMappers variableMappers = new VariableMappers(objectMapper);
+
     EngineClient engineClient = new EngineClient(workerId, maxTasks, asyncResponseTimeout, baseUrl, requestInterceptorHandler, variableMappers, objectMapper);
     topicSubscriptionManager = new TopicSubscriptionManager(engineClient, variableMappers, lockDuration);
+
+    if (clientBuilder.getBackOffStrategy() != null) {
+      topicSubscriptionManager.setBackOffStrategy(clientBuilder.getBackOffStrategy());
+    }
 
     boolean isAutoFetchingEnabled = clientBuilder.isAutoFetchingEnabled();
     if (isAutoFetchingEnabled) {

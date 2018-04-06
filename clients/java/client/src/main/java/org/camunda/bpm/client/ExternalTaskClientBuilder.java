@@ -90,6 +90,15 @@ public interface ExternalTaskClientBuilder {
   ExternalTaskClientBuilder disableAutoFetching();
 
   /**
+   * Adds a back off strategy to the client for defining the wait time until a new request is sent.
+   * This information is optional.
+   *
+   * @param backOffStrategy to be used to generate/calculate the wait time between requests
+   * @return the builder
+   */
+  ExternalTaskClientBuilder backOff(ClientBackOffStrategy backOffStrategy);
+
+  /**
    * Bootstraps the Camunda client
    *
    * @throws ExternalTaskClientException

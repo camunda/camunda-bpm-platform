@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.client.impl;
 
+import org.camunda.bpm.client.ClientBackOffStrategy;
 import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.client.ExternalTaskClientBuilder;
 import org.camunda.bpm.client.interceptor.ClientRequestInterceptor;
@@ -36,6 +37,7 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
   protected long lockDuration;
   protected List<ClientRequestInterceptor> interceptors;
   protected boolean isAutoFetchingEnabled;
+  protected ClientBackOffStrategy backOffStrategy;
 
   public ExternalTaskClientBuilderImpl() {
     // default values
@@ -78,6 +80,11 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
 
   public ExternalTaskClientBuilder disableAutoFetching() {
     this.isAutoFetchingEnabled = false;
+    return this;
+  }
+
+  public ExternalTaskClientBuilder backOff(ClientBackOffStrategy backOffStrategy) {
+    this.backOffStrategy = backOffStrategy;
     return this;
   }
 
@@ -157,6 +164,10 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
 
   protected boolean isAutoFetchingEnabled() {
     return isAutoFetchingEnabled;
+  }
+
+  protected ClientBackOffStrategy getBackOffStrategy() {
+    return backOffStrategy;
   }
 
 }

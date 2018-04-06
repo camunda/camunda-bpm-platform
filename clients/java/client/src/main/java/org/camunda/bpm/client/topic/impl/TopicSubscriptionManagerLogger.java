@@ -46,6 +46,11 @@ public class TopicSubscriptionManagerLogger extends ExternalTaskClientLogger {
       "005", "Exception while deserializing variables '{}'", e);
   }
 
+  protected void exceptionWhileExecutingBackOffStrategyMethod(Throwable e) {
+    logError(
+      "006", "Exception while executing back off strategy method: {}", e);
+  }
+
   protected void exceptionWhileDeserializingVariables(String message) {
     delegateLogger.error(message);
   }
