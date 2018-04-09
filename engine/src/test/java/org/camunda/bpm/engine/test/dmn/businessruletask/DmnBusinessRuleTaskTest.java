@@ -51,7 +51,7 @@ public class DmnBusinessRuleTaskTest {
   public static final BpmnModelInstance BPMN_VERSION_TAG_BINDING = Bpmn.createExecutableProcess("process")
               .startEvent()
               .businessRuleTask()
-                    .camundaDecisionRef("testDecision")
+                    .camundaDecisionRef("decision")
                     .camundaDecisionRefBinding("versionTag")
                     .camundaDecisionRefVersionTag("0.0.2")
                     .camundaMapDecisionResult("singleEntry")
@@ -142,10 +142,12 @@ public class DmnBusinessRuleTaskTest {
     testRule.deploy(BPMN_VERSION_TAG_BINDING);
 
     // when
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+    ProcessInstance processInstance = runtimeService.createProcessInstanceByKey("process")
+        .setVariable("status", "gold")
+        .execute();
 
     // then
-    assertEquals("okay", getDecisionResult(processInstance));
+    assertEquals("A", getDecisionResult(processInstance));
   }
 
   @Test
@@ -155,7 +157,7 @@ public class DmnBusinessRuleTaskTest {
     testRule.deploy(Bpmn.createExecutableProcess("process")
         .startEvent()
         .businessRuleTask()
-          .camundaDecisionRef("testDecision")
+          .camundaDecisionRef("decision")
           .camundaDecisionRefBinding("versionTag")
           .camundaDecisionRefVersionTag("${versionTagExpr}")
           .camundaMapDecisionResult("singleEntry")
@@ -166,11 +168,12 @@ public class DmnBusinessRuleTaskTest {
 
     // when
     VariableMap variables = Variables.createVariables()
-        .putValue("versionTagExpr", "0.0.2");
+        .putValue("versionTagExpr", "0.0.2")
+        .putValue("status", "gold");
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process", variables);
 
     // then
-    assertEquals("okay", getDecisionResult(processInstance));
+    assertEquals("A", getDecisionResult(processInstance));
   }
 
   @Test
@@ -196,7 +199,7 @@ public class DmnBusinessRuleTaskTest {
   public void decisionRefVersionTagBindingNoneDecisionDefinition() {
     // expected
     thrown.expect(DecisionDefinitionNotFoundException.class);
-    thrown.expectMessage("no decision definition deployed with key = 'testDecision', versionTag = '0.0.2' and tenant-id 'null'");
+    thrown.expectMessage("no decision definition deployed with key = 'decision', versionTag = '0.0.2' and tenant-id 'null'");
 
     // given
     testRule.deploy(BPMN_VERSION_TAG_BINDING);
@@ -209,7 +212,7 @@ public class DmnBusinessRuleTaskTest {
   public void decisionRefVersionTagBindingTwoDecisionDefinitions() {
     // expected
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Found more that one decision definition for key 'testDecision' exist with versionTag: 0.0.2");
+    thrown.expectMessage("Found more than one decision definition for key 'decision' and versionTag '0.0.2'");
 
     // given
     testRule.deploy(DECISION_VERSION_TAG_OKAY_DMN);

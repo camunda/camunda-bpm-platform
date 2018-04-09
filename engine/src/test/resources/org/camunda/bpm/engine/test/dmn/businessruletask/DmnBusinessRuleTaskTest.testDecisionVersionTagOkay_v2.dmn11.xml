@@ -8,10 +8,9 @@
       </input>
       <output id="output1" label="result" name="result" typeRef="string" />
       <rule id="row-928575414-1">
-        <description></description>
         <inputEntry id="UnaryTests_0yaqbiy">        <text><![CDATA["gold"]]></text>
 </inputEntry>
-        <outputEntry id="LiteralExpression_00jmzea">        <text><![CDATA["A"]]></text>
+        <outputEntry id="LiteralExpression_00jmzea">        <text><![CDATA["C"]]></text>
 </outputEntry>
       </rule>
       <rule id="row-928575414-2">
@@ -23,7 +22,7 @@
       <rule id="row-928575414-3">
         <inputEntry id="UnaryTests_17w26sl">        <text><![CDATA["bronze"]]></text>
 </inputEntry>
-        <outputEntry id="LiteralExpression_1yupghb">        <text><![CDATA["C"]]></text>
+        <outputEntry id="LiteralExpression_1yupghb">        <text><![CDATA["A"]]></text>
 </outputEntry>
       </rule>
     </decisionTable>

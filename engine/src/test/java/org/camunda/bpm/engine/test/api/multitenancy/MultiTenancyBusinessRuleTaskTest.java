@@ -35,6 +35,10 @@ public class MultiTenancyBusinessRuleTaskTest extends PluggableProcessEngineTest
   protected static final String RESULT_OF_VERSION_TWO = "C";
 
   public static final String DMN_FILE_VERSION_TAG = "org/camunda/bpm/engine/test/dmn/businessruletask/DmnBusinessRuleTaskTest.testDecisionVersionTagOkay.dmn11.xml";
+  public static final String DMN_FILE_VERSION_TAG_TWO = "org/camunda/bpm/engine/test/dmn/businessruletask/DmnBusinessRuleTaskTest.testDecisionVersionTagOkay_v2.dmn11.xml";
+
+  protected static final String RESULT_OF_VERSION_TAG_ONE = "A";
+  protected static final String RESULT_OF_VERSION_TAG_TWO = "C";
 
   public void testEvaluateDecisionWithDeploymentBinding() {
 
@@ -160,21 +164,52 @@ public class MultiTenancyBusinessRuleTaskTest extends PluggableProcessEngineTest
     deployment(Bpmn.createExecutableProcess("process")
         .startEvent()
         .businessRuleTask()
-          .camundaDecisionRef("testDecision")
+          .camundaDecisionRef("decision")
           .camundaDecisionRefTenantId(TENANT_ONE)
           .camundaDecisionRefBinding("versionTag")
           .camundaDecisionRefVersionTag("0.0.2")
           .camundaMapDecisionResult("singleEntry")
-          .camundaResultVariable("result")
+          .camundaResultVariable("decisionVar")
         .endEvent()
           .camundaAsyncBefore()
         .done());
 
     // when
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+    ProcessInstance processInstance = runtimeService.createProcessInstanceByKey("process")
+        .setVariable("status", "gold")
+        .execute();
 
     // then
-    assertEquals("okay", getDecisionResult(processInstance));
+    assertThat((String)runtimeService.getVariable(processInstance.getId(), "decisionVar"), is(RESULT_OF_VERSION_TAG_ONE));
+  }
+
+  public void testEvaluateDecisionWithVersionTagBinding_ResolveTenantFromDefinition() {
+    // given
+    BpmnModelInstance process = Bpmn.createExecutableProcess("process")
+        .startEvent()
+        .businessRuleTask()
+          .camundaDecisionRef("decision")
+          .camundaDecisionRefBinding("versionTag")
+          .camundaDecisionRefVersionTag("0.0.2")
+          .camundaMapDecisionResult("singleEntry")
+          .camundaResultVariable("decisionVar")
+        .endEvent()
+          .camundaAsyncBefore()
+        .done();
+
+    deploymentForTenant(TENANT_ONE, DMN_FILE_VERSION_TAG, process);
+    deploymentForTenant(TENANT_TWO, DMN_FILE_VERSION_TAG_TWO, process);
+
+    ProcessInstance processInstanceOne = runtimeService.createProcessInstanceByKey("process")
+      .setVariable("status", "gold")
+      .processDefinitionTenantId(TENANT_ONE).execute();
+
+    ProcessInstance processInstanceTwo = runtimeService.createProcessInstanceByKey("process")
+      .setVariable("status", "gold")
+      .processDefinitionTenantId(TENANT_TWO).execute();
+
+    assertThat((String)runtimeService.getVariable(processInstanceOne.getId(), "decisionVar"), is(RESULT_OF_VERSION_TAG_ONE));
+    assertThat((String)runtimeService.getVariable(processInstanceTwo.getId(), "decisionVar"), is(RESULT_OF_VERSION_TAG_TWO));
   }
 
   public void testFailEvaluateDecisionFromOtherTenantWithDeploymentBinding() {
@@ -260,7 +295,7 @@ public class MultiTenancyBusinessRuleTaskTest extends PluggableProcessEngineTest
     BpmnModelInstance process = Bpmn.createExecutableProcess("process")
         .startEvent()
         .businessRuleTask()
-        .camundaDecisionRef("testDecision")
+        .camundaDecisionRef("decision")
         .camundaDecisionRefBinding("versionTag")
         .camundaDecisionRefVersionTag("0.0.2")
         .camundaMapDecisionResult("singleEntry")
@@ -282,7 +317,7 @@ public class MultiTenancyBusinessRuleTaskTest extends PluggableProcessEngineTest
       fail("expected exception");
     } catch (ProcessEngineException e) {
       // then
-      assertThat(e.getMessage(), containsString("no decision definition deployed with key = 'testDecision', versionTag = '0.0.2' and tenant-id 'tenant1': decisionDefinition is null"));
+      assertThat(e.getMessage(), containsString("no decision definition deployed with key = 'decision', versionTag = '0.0.2' and tenant-id 'tenant1': decisionDefinition is null"));
     }
   }
 
@@ -381,11 +416,6 @@ public class MultiTenancyBusinessRuleTaskTest extends PluggableProcessEngineTest
 
     // then
     assertThat((String)runtimeService.getVariable(processInstanceOne.getId(), "decisionVar"), is(RESULT_OF_VERSION_ONE));
-  }
-
-  protected Object getDecisionResult(ProcessInstance processInstance) {
-    // the single entry of the single result of the decision result is stored as process variable
-    return runtimeService.getVariable(processInstance.getId(), "result");
   }
 
 }
