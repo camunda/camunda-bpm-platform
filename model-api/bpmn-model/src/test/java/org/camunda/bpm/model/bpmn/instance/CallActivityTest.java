@@ -41,6 +41,7 @@ public class CallActivityTest extends BpmnModelElementInstanceTest {
       new AttributeAssumption(CAMUNDA_NS, "async", false, false, false),
       new AttributeAssumption(CAMUNDA_NS, "calledElementBinding"),
       new AttributeAssumption(CAMUNDA_NS, "calledElementVersion"),
+      new AttributeAssumption(CAMUNDA_NS, "calledElementVersionTag"),
       new AttributeAssumption(CAMUNDA_NS, "calledElementTenantId"),
       new AttributeAssumption(CAMUNDA_NS, "caseRef"),
       new AttributeAssumption(CAMUNDA_NS, "caseBinding"),

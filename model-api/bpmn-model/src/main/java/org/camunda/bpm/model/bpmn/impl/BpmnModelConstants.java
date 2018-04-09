@@ -414,6 +414,7 @@ public final class BpmnModelConstants {
   public static final String CAMUNDA_ATTRIBUTE_BUSINESS_KEY = "businessKey";
   public static final String CAMUNDA_ATTRIBUTE_CALLED_ELEMENT_BINDING = "calledElementBinding";
   public static final String CAMUNDA_ATTRIBUTE_CALLED_ELEMENT_VERSION = "calledElementVersion";
+  public static final String CAMUNDA_ATTRIBUTE_CALLED_ELEMENT_VERSION_TAG = "calledElementVersionTag";
   public static final String CAMUNDA_ATTRIBUTE_CALLED_ELEMENT_TENANT_ID = "calledElementTenantId";
   public static final String CAMUNDA_ATTRIBUTE_CANDIDATE_GROUPS = "candidateGroups";
   public static final String CAMUNDA_ATTRIBUTE_CANDIDATE_STARTER_GROUPS = "candidateStarterGroups";

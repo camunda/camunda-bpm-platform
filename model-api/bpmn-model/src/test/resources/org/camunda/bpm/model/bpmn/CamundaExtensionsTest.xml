@@ -161,6 +161,7 @@
     <callActivity id="callActivity"
                   camunda:calledElementBinding="test"
                   camunda:calledElementVersion="test"
+                  camunda:calledElementVersionTag="test"
                   camunda:calledElementTenantId="test"
                   camunda:caseRef="test"
                   camunda:caseBinding="test"

@@ -20,6 +20,7 @@ import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBU
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_CALLED_ELEMENT_BINDING;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_CALLED_ELEMENT_TENANT_ID;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_CALLED_ELEMENT_VERSION;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_CALLED_ELEMENT_VERSION_TAG;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_CASE_BINDING;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_CASE_REF;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_CASE_TENANT_ID;
@@ -53,6 +54,7 @@ public class CallActivityImpl extends ActivityImpl implements CallActivity {
   protected static Attribute<Boolean> camundaAsyncAttribute;
   protected static Attribute<String> camundaCalledElementBindingAttribute;
   protected static Attribute<String> camundaCalledElementVersionAttribute;
+  protected static Attribute<String> camundaCalledElementVersionTagAttribute;
   protected static Attribute<String> camundaCalledElementTenantIdAttribute;
 
   protected static Attribute<String> camundaCaseRefAttribute;
@@ -87,6 +89,10 @@ public class CallActivityImpl extends ActivityImpl implements CallActivity {
       .build();
 
     camundaCalledElementVersionAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_CALLED_ELEMENT_VERSION)
+      .namespace(CAMUNDA_NS)
+      .build();
+
+    camundaCalledElementVersionTagAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_CALLED_ELEMENT_VERSION_TAG)
       .namespace(CAMUNDA_NS)
       .build();
 
@@ -169,6 +175,14 @@ public class CallActivityImpl extends ActivityImpl implements CallActivity {
 
   public void setCamundaCalledElementVersion(String camundaCalledElementVersion) {
     camundaCalledElementVersionAttribute.setValue(this, camundaCalledElementVersion);
+  }
+
+  public String getCamundaCalledElementVersionTag() {
+    return camundaCalledElementVersionTagAttribute.getValue(this);
+  }
+
+  public void setCamundaCalledElementVersionTag(String camundaCalledElementVersionTag) {
+    camundaCalledElementVersionTagAttribute.setValue(this, camundaCalledElementVersionTag);
   }
 
   public String getCamundaCaseRef() {

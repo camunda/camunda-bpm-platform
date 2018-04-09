@@ -90,6 +90,17 @@ public class AbstractCallActivityBuilder<B extends AbstractCallActivityBuilder<B
   }
 
   /**
+   * Sets the camunda calledElementVersionTag attribute
+   *
+   * @param camundaCalledElementVersionTag  the element version to use
+   * @return the builder object
+   */
+  public B camundaCalledElementVersionTag(String camundaCalledElementVersionTag) {
+    element.setCamundaCalledElementVersionTag(camundaCalledElementVersionTag);
+    return myself;
+  }
+
+  /**
    * Sets the camunda calledElementTenantId attribute
    * @param camundaCalledElementTenantId the called element tenant id
    * @return the builder object

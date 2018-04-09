@@ -268,6 +268,13 @@ public class CamundaExtensionsTest {
   }
 
   @Test
+  public void testCalledElementVersionTag() {
+    assertThat(callActivity.getCamundaCalledElementVersionTag()).isEqualTo(TEST_STRING_XML);
+    callActivity.setCamundaCalledElementVersionTag(TEST_STRING_API);
+    assertThat(callActivity.getCamundaCalledElementVersionTag()).isEqualTo(TEST_STRING_API);
+  }
+
+  @Test
   public void testCalledElementTenantId() {
     assertThat(callActivity.getCamundaCalledElementTenantId()).isEqualTo(TEST_STRING_XML);
     callActivity.setCamundaCalledElementTenantId(TEST_STRING_API);
