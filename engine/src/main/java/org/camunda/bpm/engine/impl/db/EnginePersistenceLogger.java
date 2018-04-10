@@ -407,13 +407,14 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
         thatDeploymentId);
   }
 
-  public ProcessEngineException toManyProcessDefinitionsException(int count, String key, Integer version, String tenantId) {
+  public ProcessEngineException toManyProcessDefinitionsException(int count, String key, String versionAttribute, String versionValue, String tenantId) {
     return new ProcessEngineException(exceptionMessage(
       "045",
-      "There are '{}' results for a process definition with key '{}', version '{}' and tenant-id '{}'.",
+      "There are '{}' results for a process definition with key '{}', '{}' '{}' and tenant-id '{}'.",
       count,
       key,
-      version
+      versionAttribute,
+      versionValue
     ));
   }
 

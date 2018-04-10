@@ -62,7 +62,8 @@ public class ProcessDefinitionCache extends ResourceDefinitionCache<ProcessDefin
   @Override
   protected void checkInvalidDefinitionByKeyVersionTagAndTenantId(String definitionKey, String definitionVersionTag, String tenantId,
       ProcessDefinitionEntity definition) {
-    // TODO Auto-generated method stub
+    ensureNotNull("no processes deployed with key = '" + definitionKey + "', versionTag = '" + definitionVersionTag
+        + "' and tenant-id = '" + tenantId + "'", "processDefinition", definition);
   }
 
   @Override

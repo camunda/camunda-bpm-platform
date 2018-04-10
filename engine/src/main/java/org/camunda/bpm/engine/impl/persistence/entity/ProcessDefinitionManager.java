@@ -116,8 +116,21 @@ public class ProcessDefinitionManager extends AbstractManager implements Abstrac
   }
 
   public ProcessDefinitionEntity findProcessDefinitionByKeyVersionAndTenantId(String processDefinitionKey, Integer processDefinitionVersion, String tenantId) {
+    return findProcessDefinitionByKeyVersionOrVersionTag(processDefinitionKey, processDefinitionVersion, null, tenantId);
+  }
+
+  public ProcessDefinitionEntity findProcessDefinitionByKeyVersionTagAndTenantId(String processDefinitionKey, String processDefinitionVersionTag, String tenantId) {
+    return findProcessDefinitionByKeyVersionOrVersionTag(processDefinitionKey, null, processDefinitionVersionTag, tenantId);
+  }
+
+  protected ProcessDefinitionEntity findProcessDefinitionByKeyVersionOrVersionTag(String processDefinitionKey, Integer processDefinitionVersion, String processDefinitionVersionTag,
+      String tenantId) {
     Map<String, Object> parameters = new HashMap<String, Object>();
-    parameters.put("processDefinitionVersion", processDefinitionVersion);
+    if (processDefinitionVersion != null) {
+      parameters.put("processDefinitionVersion", processDefinitionVersion);
+    } else if (processDefinitionVersionTag != null) {
+      parameters.put("processDefinitionVersionTag", processDefinitionVersionTag);
+    }
     parameters.put("processDefinitionKey", processDefinitionKey);
     parameters.put("tenantId", tenantId);
 
@@ -126,7 +139,11 @@ public class ProcessDefinitionManager extends AbstractManager implements Abstrac
     if (results.size() == 1) {
       return results.get(0);
     } else if (results.size() > 1) {
-      throw LOG.toManyProcessDefinitionsException(results.size(), processDefinitionKey, processDefinitionVersion, tenantId);
+      if (processDefinitionVersion != null) {
+        throw LOG.toManyProcessDefinitionsException(results.size(), processDefinitionKey, "version", processDefinitionVersion.toString(), tenantId);
+      } else if (processDefinitionVersionTag != null) {
+        throw LOG.toManyProcessDefinitionsException(results.size(), processDefinitionKey, "versionTag", processDefinitionVersionTag, tenantId);
+      }
     }
     return null;
   }
@@ -393,7 +410,7 @@ public class ProcessDefinitionManager extends AbstractManager implements Abstrac
 
   @Override
   public ProcessDefinitionEntity findDefinitionByKeyVersionTagAndTenantId(String definitionKey, String definitionVersionTag, String tenantId) {
-    throw new UnsupportedOperationException("Currently finding process definition by version tag and tenant is not implemented.");
+    return findProcessDefinitionByKeyVersionTagAndTenantId(definitionKey, definitionVersionTag, tenantId);
   }
 
   @Override

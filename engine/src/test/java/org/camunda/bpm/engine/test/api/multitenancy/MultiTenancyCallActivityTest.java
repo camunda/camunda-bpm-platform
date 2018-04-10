@@ -17,7 +17,10 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+import java.util.List;
+
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -129,6 +132,33 @@ public class MultiTenancyCallActivityTest extends PluggableProcessEngineTestCase
     assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
   }
 
+  public void testStartProcessInstanceWithVersionTagBinding() {
+    // given
+    BpmnModelInstance callingProcess = createCallingProcess("callingProcess", "ver_tag_1");
+
+    deploymentForTenant(TENANT_ONE, callingProcess);
+    deploymentForTenant(TENANT_ONE, "org/camunda/bpm/engine/test/bpmn/callactivity/subProcessWithVersionTag.bpmn20.xml");
+    deploymentForTenant(TENANT_TWO, callingProcess);
+    deploymentForTenant(TENANT_TWO, "org/camunda/bpm/engine/test/bpmn/callactivity/subProcessWithVersionTag2.bpmn20.xml");
+
+    // when
+    runtimeService.createProcessInstanceByKey("callingProcess").processDefinitionTenantId(TENANT_ONE).execute();
+    runtimeService.createProcessInstanceByKey("callingProcess").processDefinitionTenantId(TENANT_TWO).execute();
+
+    // then
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery().processDefinitionKey("subProcess");
+    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertEquals(((ExecutionEntity) query.tenantIdIn(TENANT_ONE).singleResult()).getActivityId(), "Task_1");
+    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
+    assertEquals(((ExecutionEntity) query.tenantIdIn(TENANT_TWO).singleResult()).getActivityId(), "Task_2");
+
+    // clean up
+    List<org.camunda.bpm.engine.repository.Deployment> deployments = repositoryService.createDeploymentQuery().list();
+    for (org.camunda.bpm.engine.repository.Deployment deployment : deployments) {
+      repositoryService.deleteDeployment(deployment.getId(), true);
+    }
+  }
+
   public void testFailStartProcessInstanceFromOtherTenantWithDeploymentBinding() {
 
     BpmnModelInstance callingProcess = Bpmn.createExecutableProcess("callingProcess")
@@ -200,6 +230,28 @@ public class MultiTenancyCallActivityTest extends PluggableProcessEngineTestCase
 
       fail("expected exception");
     } catch (ProcessEngineException e) {
+      assertThat(e.getMessage(), containsString("no processes deployed with key = 'subProcess'"));
+    }
+  }
+
+  public void testFailStartProcessInstanceFromOtherTenantWithVersionTagBinding() {
+    // given
+    BpmnModelInstance callingProcess = createCallingProcess("callingProcess", "ver_tag_2");
+    deploymentForTenant(TENANT_ONE, callingProcess);
+    deploymentForTenant(TENANT_ONE, "org/camunda/bpm/engine/test/bpmn/callactivity/subProcessWithVersionTag.bpmn20.xml");
+
+    BpmnModelInstance callingProcess2 = createCallingProcess("callingProcess2", "ver_tag_1");
+    deploymentForTenant(TENANT_ONE, callingProcess2);
+    deploymentForTenant(TENANT_TWO, "org/camunda/bpm/engine/test/bpmn/callactivity/subProcessWithVersionTag2.bpmn20.xml");
+
+    try {
+      // when
+      runtimeService.createProcessInstanceByKey("callingProcess")
+        .processDefinitionTenantId(TENANT_ONE)
+        .execute();
+      fail("expected exception");
+    } catch (ProcessEngineException e) {
+      // then
       assertThat(e.getMessage(), containsString("no processes deployed with key = 'subProcess'"));
     }
   }
@@ -465,6 +517,17 @@ public class MultiTenancyCallActivityTest extends PluggableProcessEngineTestCase
     // then
     CaseInstanceQuery query = caseService.createCaseInstanceQuery().caseDefinitionKey("Case_1");
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
+  }
+
+  protected BpmnModelInstance createCallingProcess(String processId, String versionTagValue) {
+    return Bpmn.createExecutableProcess(processId)
+        .startEvent()
+        .callActivity()
+          .calledElement("subProcess")
+          .camundaCalledElementBinding("versionTag")
+          .camundaCalledElementVersionTag(versionTagValue)
+        .endEvent()
+        .done();
   }
 
 }

@@ -118,7 +118,12 @@
     select *
     from ${prefix}ACT_RE_PROCDEF
     where KEY_ = #{parameter.processDefinitionKey}
-      and VERSION_ = #{parameter.processDefinitionVersion}
+      <if test="parameter.processDefinitionVersion != null">
+        and VERSION_ = #{parameter.processDefinitionVersion}
+      </if>
+      <if test="parameter.processDefinitionVersionTag != null">
+        and VERSION_TAG_ = #{parameter.processDefinitionVersionTag}
+      </if>
       <if test="parameter.tenantId != null">
         and TENANT_ID_ = #{parameter.tenantId}
       </if>

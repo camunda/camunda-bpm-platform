@@ -22,4 +22,8 @@ public class MyVersionDelegate {
     return 2;
   }
 
+  public String getVersionTag() {
+    return "ver_tag_1";
+  }
+
 }

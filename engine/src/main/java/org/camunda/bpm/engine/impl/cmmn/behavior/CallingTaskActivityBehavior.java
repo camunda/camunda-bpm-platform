@@ -76,4 +76,8 @@ public abstract class CallingTaskActivityBehavior extends TaskActivityBehavior {
     return getCallableElement().isVersionBinding();
   }
 
+  protected boolean isVersionTagBinding() {
+    return getCallableElement().isVersionTagBinding();
+  }
+
 }

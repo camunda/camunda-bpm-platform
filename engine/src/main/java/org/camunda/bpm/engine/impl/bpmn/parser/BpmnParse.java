@@ -3610,6 +3610,7 @@ public class BpmnParse extends Parse {
 
     String bindingAttributeName = "calledElementBinding";
     String versionAttributeName = "calledElementVersion";
+    String versionTagAttributeName = "calledElementVersionTag";
     String tenantIdAttributeName = "calledElementTenantId";
 
     String deploymentId = deployment.getId();
@@ -3647,6 +3648,9 @@ public class BpmnParse extends Parse {
 
     // parse version
     parseVersion(callActivityElement, activity, callableElement, bindingAttributeName, versionAttributeName);
+
+    // parse versionTag
+    parseVersionTag(callActivityElement, activity, callableElement, bindingAttributeName, versionTagAttributeName);
 
     // parse tenant id
     parseTenantId(callActivityElement, activity, callableElement, tenantIdAttributeName);

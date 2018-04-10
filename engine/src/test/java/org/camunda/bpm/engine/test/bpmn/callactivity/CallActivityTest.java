@@ -15,7 +15,6 @@ package org.camunda.bpm.engine.test.bpmn.callactivity;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertThat;
 
 import java.util.HashMap;
@@ -27,7 +26,6 @@ import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
-import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.EventSubscriptionQuery;
 import org.camunda.bpm.engine.runtime.Job;
@@ -80,7 +78,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
     taskService.complete(taskAfterSubProcess.getId());
     assertProcessEnded(processInstance.getId());
   }
-  
+
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testCallSimpleSubProcess.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcessParentVariableAccess.bpmn20.xml"
@@ -1462,6 +1460,120 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
     repositoryService.deleteDeployment(thirdDeploymentId, true);
   }
 
+  @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/callactivity/subProcessWithVersionTag.bpmn20.xml" })
+  public void testCallProcessByVersionTag() {
+    // given
+    BpmnModelInstance modelInstance = getModelWithCallActivityVersionTagBinding("ver_tag_1");
+
+    deployment(modelInstance);
+
+    // when
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    // then
+    ProcessInstance subInstance = runtimeService.createProcessInstanceQuery().processDefinitionKey("subProcess").superProcessInstanceId(processInstance.getId()).singleResult();
+    assertNotNull(subInstance);
+
+    // clean up
+    cleanupDeployments();
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/callactivity/subProcessWithVersionTag.bpmn20.xml" })
+  public void testCallProcessByVersionTagAsExpression() {
+    // given
+    BpmnModelInstance modelInstance = getModelWithCallActivityVersionTagBinding("${versionTagExpr}");
+
+    deployment(modelInstance);
+
+    // when
+    VariableMap variables = Variables.createVariables().putValue("versionTagExpr", "ver_tag_1");
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process", variables);
+
+    // then
+    ProcessInstance subInstance = runtimeService.createProcessInstanceQuery().processDefinitionKey("subProcess").superProcessInstanceId(processInstance.getId()).singleResult();
+    assertNotNull(subInstance);
+
+    // clean up
+    cleanupDeployments();
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/callactivity/subProcessWithVersionTag.bpmn20.xml" })
+  public void testCallProcessByVersionTagAsDelegateExpression() {
+    // given
+    processEngineConfiguration.getBeans().put("myDelegate", new MyVersionDelegate());
+    BpmnModelInstance modelInstance = getModelWithCallActivityVersionTagBinding("${myDelegate.getVersionTag()}");
+
+    deployment(modelInstance);
+
+    // when
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    // then
+    ProcessInstance subInstance = runtimeService.createProcessInstanceQuery().processDefinitionKey("subProcess").superProcessInstanceId(processInstance.getId()).singleResult();
+    assertNotNull(subInstance);
+
+    // clean up
+    cleanupDeployments();
+  }
+
+  public void testCallProcessWithoutVersionTag() {
+    // given
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("process")
+        .startEvent()
+        .callActivity("callActivity")
+        .calledElement("subProcess")
+        .camundaCalledElementBinding("versionTag")
+        .endEvent()
+        .done();
+
+    try {
+      // when
+      deployment(modelInstance);
+      fail("expected exception");
+    } catch (ProcessEngineException e) {
+      // then
+      assertTrue(e.getMessage().contains("Could not parse BPMN process."));
+      assertTrue(e.getMessage().contains("Missing attribute 'calledElementVersionTag' when 'calledElementBinding' has value 'versionTag'"));
+    }
+  }
+
+  public void testCallProcessByVersionTagNoneSubprocess() {
+    // given
+    BpmnModelInstance modelInstance = getModelWithCallActivityVersionTagBinding("ver_tag_1");
+
+    deployment(modelInstance);
+
+    try {
+      // when
+      runtimeService.startProcessInstanceByKey("process");
+      fail("expected exception");
+    } catch (ProcessEngineException e) {
+      // then
+      assertTrue(e.getMessage().contains("no processes deployed with key = 'subProcess', versionTag = 'ver_tag_1' and tenant-id = 'null': processDefinition is null"));
+    }
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/callactivity/subProcessWithVersionTag.bpmn20.xml" })
+  public void testCallProcessByVersionTagTwoSubprocesses() {
+    // given
+    BpmnModelInstance modelInstance = getModelWithCallActivityVersionTagBinding("ver_tag_1");
+
+    deployment(modelInstance);
+    deployment("org/camunda/bpm/engine/test/bpmn/callactivity/subProcessWithVersionTag.bpmn20.xml");
+
+    try {
+      // when
+      runtimeService.startProcessInstanceByKey("process");
+      fail("expected exception");
+    } catch (ProcessEngineException e) {
+      // then
+      assertTrue(e.getMessage().contains("There are '2' results for a process definition with key 'subProcess', 'versionTag' 'ver_tag_1' and tenant-id '{}'."));
+    }
+
+    // clean up
+    cleanupDeployments();
+  }
+
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/callactivity/orderProcess.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/checkCreditProcess.bpmn20.xml"
@@ -1493,7 +1605,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
   })
   public void testDeleteProcessInstanceInCallActivity() {
     // given
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callSimpleSubProcess");
+    runtimeService.startProcessInstanceByKey("callSimpleSubProcess");
 
 
     // one task in the subprocess should be active after starting the process instance
@@ -1576,7 +1688,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
   })
   public void testDeleteMultilevelProcessInstanceInCallActivity() {
     // given
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nestedCallActivity");
+    runtimeService.startProcessInstanceByKey("nestedCallActivity");
 
     // one task in the subprocess should be active after starting the process instance
     TaskQuery taskQuery = taskService.createTaskQuery();
@@ -1626,7 +1738,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
   })
   public void testDeleteDoubleNestedProcessInstanceInCallActivity() {
     // given
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("doubleNestedCallActivity");
+    runtimeService.startProcessInstanceByKey("doubleNestedCallActivity");
 
     // one task in the subprocess should be active after starting the process instance
     TaskQuery taskQuery = taskService.createTaskQuery();
@@ -1661,5 +1773,23 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
     assertNotNull(instanceList);
     assertEquals(0, instanceList.size());
 
+  }
+
+  protected BpmnModelInstance getModelWithCallActivityVersionTagBinding(String versionTag) {
+    return Bpmn.createExecutableProcess("process")
+        .startEvent()
+        .callActivity("callActivity")
+        .calledElement("subProcess")
+        .camundaCalledElementBinding("versionTag")
+        .camundaCalledElementVersionTag(versionTag)
+        .endEvent()
+        .done();
+  }
+
+  protected void cleanupDeployments() {
+    List<org.camunda.bpm.engine.repository.Deployment> deployments = repositoryService.createDeploymentQuery().list();
+    for (org.camunda.bpm.engine.repository.Deployment currentDeployment : deployments) {
+      repositoryService.deleteDeployment(currentDeployment.getId(), true);
+    }
   }
 }
