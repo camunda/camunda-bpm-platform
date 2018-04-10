@@ -13,6 +13,7 @@ import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.Job;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -78,6 +79,7 @@ public class ConcurrentProcessEngineJobExecutorHistoryCleanupJobTest extends Con
         return null;
       }
     });
+    ClockUtil.setCurrentTime(new Date());
     super.tearDown();
   }
 
