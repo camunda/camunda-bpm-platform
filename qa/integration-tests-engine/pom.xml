@@ -435,6 +435,7 @@
                 <excludes>**/jboss/**</excludes>
                 <excludes>**/SpringPAExpressionResolvingTest.java</excludes>
                 <excludes>**/SpringServletPALifecycleTest.java</excludes>
+                <exclude>**/BusinessRuleTaskVersionTagTest.java</exclude>
                 <!-- CAM-1778 -->
                 <exludes>**/TestWarDeploymentWithProcessEnginePlugin.java</exludes>
                 <exclude>**/JavascriptScriptEngineSupportTest.java</exclude>
