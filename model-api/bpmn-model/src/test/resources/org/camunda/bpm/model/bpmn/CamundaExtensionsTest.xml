@@ -166,6 +166,7 @@
                   camunda:caseRef="test"
                   camunda:caseBinding="test"
                   camunda:caseVersion="test"
+                  camunda:caseVersionTag="test"
                   camunda:caseTenantId="test"
                   camunda:exclusive="false"
                   camunda:variableMappingClass="org.camunda.test.Test"

@@ -721,6 +721,7 @@ public class ProcessBuilderTest {
         .camundaCaseRef("case")
         .camundaCaseBinding("deployment")
         .camundaCaseVersion("2")
+        .camundaCaseVersionTag("ver-2")
         .camundaCaseTenantId("t2")
         .camundaIn("in-source", "in-target")
         .camundaOut("out-source", "out-target")
@@ -741,6 +742,7 @@ public class ProcessBuilderTest {
     assertThat(callActivity.getCamundaCaseRef()).isEqualTo("case");
     assertThat(callActivity.getCamundaCaseBinding()).isEqualTo("deployment");
     assertThat(callActivity.getCamundaCaseVersion()).isEqualTo("2");
+    assertThat(callActivity.getCamundaCaseVersionTag()).isEqualTo("ver-2");
     assertThat(callActivity.getCamundaCaseTenantId()).isEqualTo("t2");
     assertThat(callActivity.isCamundaExclusive()).isFalse();
 
