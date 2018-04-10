@@ -29,7 +29,11 @@ public class GenericPropertiesConfiguration extends AbstractCamundaConfiguration
       ConfigurationPropertySource source = new MapConfigurationPropertySource(properties);
       Binder binder = new Binder(source);
       try {
-        binder.bind(ConfigurationPropertyName.EMPTY, Bindable.ofInstance(springProcessEngineConfiguration), new NoUnboundElementsBindHandler(BindHandler.DEFAULT));
+        if (genericProperties.isIgnoreUnknownFields()) {
+          binder.bind(ConfigurationPropertyName.EMPTY, Bindable.ofInstance(springProcessEngineConfiguration));
+        } else {
+          binder.bind(ConfigurationPropertyName.EMPTY, Bindable.ofInstance(springProcessEngineConfiguration), new NoUnboundElementsBindHandler(BindHandler.DEFAULT));
+        }
       } catch (Exception e) {
         throw LOG.exceptionDuringBinding(e.getMessage());
       }
