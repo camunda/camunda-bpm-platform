@@ -25,7 +25,6 @@ import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBU
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_CASE_REF;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_CASE_TENANT_ID;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_CASE_VERSION;
-import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_CASE_VERSION_TAG;
 
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.builder.CallActivityBuilder;
@@ -61,7 +60,6 @@ public class CallActivityImpl extends ActivityImpl implements CallActivity {
   protected static Attribute<String> camundaCaseRefAttribute;
   protected static Attribute<String> camundaCaseBindingAttribute;
   protected static Attribute<String> camundaCaseVersionAttribute;
-  protected static Attribute<String> camundaCaseVersionTagAttribute;
   protected static Attribute<String> camundaCaseTenantIdAttribute;
   protected static Attribute<String> camundaVariableMappingClassAttribute;
   protected static Attribute<String> camundaVariableMappingDelegateExpressionAttribute;
@@ -107,10 +105,6 @@ public class CallActivityImpl extends ActivityImpl implements CallActivity {
         .build();
 
     camundaCaseVersionAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_CASE_VERSION)
-        .namespace(CAMUNDA_NS)
-        .build();
-
-    camundaCaseVersionTagAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_CASE_VERSION_TAG)
         .namespace(CAMUNDA_NS)
         .build();
 
@@ -213,14 +207,6 @@ public class CallActivityImpl extends ActivityImpl implements CallActivity {
 
   public void setCamundaCaseVersion(String camundaCaseVersion) {
     camundaCaseVersionAttribute.setValue(this, camundaCaseVersion);
-  }
-
-  public String getCamundaCaseVersionTag() {
-    return camundaCaseVersionTagAttribute.getValue(this);
-  }
-
-  public void setCamundaCaseVersionTag(String camundaCaseVersionTag) {
-    camundaCaseVersionTagAttribute.setValue(this, camundaCaseVersionTag);
   }
 
   public String getCamundaCalledElementTenantId() {

@@ -46,7 +46,6 @@ public class CallActivityTest extends BpmnModelElementInstanceTest {
       new AttributeAssumption(CAMUNDA_NS, "caseRef"),
       new AttributeAssumption(CAMUNDA_NS, "caseBinding"),
       new AttributeAssumption(CAMUNDA_NS, "caseVersion"),
-      new AttributeAssumption(CAMUNDA_NS, "caseVersionTag"),
       new AttributeAssumption(CAMUNDA_NS, "caseTenantId"),
       new AttributeAssumption(CAMUNDA_NS, "variableMappingClass"),
       new AttributeAssumption(CAMUNDA_NS, "variableMappingDelegateExpression")

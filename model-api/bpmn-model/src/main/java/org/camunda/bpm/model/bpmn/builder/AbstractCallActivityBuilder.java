@@ -92,7 +92,7 @@ public class AbstractCallActivityBuilder<B extends AbstractCallActivityBuilder<B
   /**
    * Sets the camunda calledElementVersionTag attribute
    *
-   * @param camundaCalledElementVersionTag  the element version tag to use
+   * @param camundaCalledElementVersionTag  the element version to use
    * @return the builder object
    */
   public B camundaCalledElementVersionTag(String camundaCalledElementVersionTag) {
@@ -140,17 +140,6 @@ public class AbstractCallActivityBuilder<B extends AbstractCallActivityBuilder<B
    */
   public B camundaCaseVersion(String camundaCaseVersion) {
     element.setCamundaCaseVersion(camundaCaseVersion);
-    return myself;
-  }
-
-  /**
-   * Sets the camunda caseVersionTag attribute
-   *
-   * @param camundaCaseVersionTag  the case version tag to use
-   * @return the builder object
-   */
-  public B camundaCaseVersionTag(String camundaCaseVersionTag) {
-    element.setCamundaCaseVersionTag(camundaCaseVersionTag);
     return myself;
   }
 
