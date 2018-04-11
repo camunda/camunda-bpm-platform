@@ -25,7 +25,6 @@ import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -501,7 +500,6 @@ public class ProcessInstanceModificationSubProcessTest {
   }
 
   @Test
-  @Ignore
   public void shouldCancelParentProcessWithMultiInstanceCallActivity() {
     BpmnModelInstance parentProcess = Bpmn.createExecutableProcess("parentProcess")
       .startEvent()
@@ -547,7 +545,6 @@ public class ProcessInstanceModificationSubProcessTest {
   }
 
   @Test
-  @Ignore
   public void shouldCancelParentProcessWithCallActivityInMultiInstanceEmbeddedSubprocess() {
     BpmnModelInstance parentProcess = Bpmn.createExecutableProcess("parentProcess")
       .startEvent()
@@ -598,7 +595,6 @@ public class ProcessInstanceModificationSubProcessTest {
   }
 
   @Test
-  @Ignore("https://app.camunda.com/jira/browse/CAM-8949")
   public void shouldCancelConcurrentExecutionInCallingProcess()
   {
     // given
