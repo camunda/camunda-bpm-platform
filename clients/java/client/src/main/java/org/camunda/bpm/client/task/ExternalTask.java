@@ -145,5 +145,12 @@ public interface ExternalTask {
    */
   VariableMap getAllVariablesTyped();
 
+  /**
+   * Returns the business key of the process instance the external task is associated with
+   *
+   * @return the business key
+   */
+  String getBusinessKey();
+
 }
 

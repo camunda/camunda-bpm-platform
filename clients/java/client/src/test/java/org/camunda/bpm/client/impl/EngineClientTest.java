@@ -135,6 +135,7 @@ public class EngineClientTest {
     assertThat(externalTask.getTenantId()).isEqualTo(MockProvider.TENANT_ID);
     assertThat(externalTask.getRetries()).isEqualTo(MockProvider.RETRIES);
     assertThat(externalTask.getPriority()).isEqualTo(MockProvider.PRIORITY);
+    assertThat(externalTask.getBusinessKey()).isEqualTo(MockProvider.BUSINESS_KEY);
   }
 
   @Test

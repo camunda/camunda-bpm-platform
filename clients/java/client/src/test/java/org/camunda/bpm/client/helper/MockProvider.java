@@ -219,6 +219,7 @@ public class MockProvider {
     externalTask.setTenantId(TENANT_ID);
     externalTask.setRetries(RETRIES);
     externalTask.setPriority(PRIORITY);
+    externalTask.setBusinessKey(BUSINESS_KEY);
     return externalTask;
   }
 

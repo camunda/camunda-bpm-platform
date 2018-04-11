@@ -27,8 +27,6 @@ import java.util.Map;
  */
 public class ExternalTaskImpl implements ExternalTask {
 
-  protected static final ExternalTaskClientLogger LOG = ExternalTaskClientLogger.CLIENT_LOGGER;
-
   protected String activityId;
   protected String activityInstanceId;
   protected String errorMessage;
@@ -46,6 +44,7 @@ public class ExternalTaskImpl implements ExternalTask {
   protected String tenantId;
   protected long priority;
   protected Map<String, TypedValueDto> variables;
+  protected String businessKey;
 
   @JsonIgnore
   protected VariableMap receivedVariableMap;
@@ -116,6 +115,10 @@ public class ExternalTaskImpl implements ExternalTask {
 
   public void setVariables(Map<String, TypedValueDto> variables) {
     this.variables = variables;
+  }
+
+  public void setBusinessKey(String businessKey) {
+    this.businessKey = businessKey;
   }
 
   public Map<String, TypedValueDto> getVariables() {
@@ -230,6 +233,11 @@ public class ExternalTaskImpl implements ExternalTask {
   @SuppressWarnings("unchecked")
   public <T> T getVariable(String variableName) {
     return (T) receivedVariableMap.get(variableName);
+  }
+
+  @Override
+  public String getBusinessKey() {
+    return businessKey;
   }
 
 }
