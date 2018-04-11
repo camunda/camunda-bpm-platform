@@ -74,22 +74,10 @@ public class TopicSubscriptionBuilderImpl implements TopicSubscriptionBuilder {
       throw LOG.externalTaskHandlerNullException();
     }
 
-    // TODO: synchronize check + add (+remove)
-    checkTopicNameAlreadySubscribed();
-
     TopicSubscriptionImpl subscription = new TopicSubscriptionImpl(topicName, lockDuration, externalTaskHandler, topicSubscriptionManager, variableNames, businessKey);
     topicSubscriptionManager.subscribe(subscription);
 
     return subscription;
-  }
-
-  protected void checkTopicNameAlreadySubscribed() {
-    List<TopicSubscription> subscriptions = topicSubscriptionManager.getSubscriptions();
-    subscriptions.forEach(subscription -> {
-      if (subscription.getTopicName().equals(topicName)) {
-        throw LOG.topicNameAlreadySubscribedException();
-      }
-    });
   }
 
 }

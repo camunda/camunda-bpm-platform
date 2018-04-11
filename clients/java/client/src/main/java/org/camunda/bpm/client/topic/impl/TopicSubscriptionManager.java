@@ -159,8 +159,18 @@ public class TopicSubscriptionManager implements Runnable {
     }
   }
 
-  protected void subscribe(TopicSubscriptionImpl subscription) {
+  protected synchronized void subscribe(TopicSubscriptionImpl subscription) {
+    checkTopicNameAlreadySubscribed(subscription.getTopicName());
+
     subscriptions.add(subscription);
+  }
+
+  protected void checkTopicNameAlreadySubscribed(String topicName) {
+    subscriptions.forEach(subscription -> {
+      if (subscription.getTopicName().equals(topicName)) {
+        throw LOG.topicNameAlreadySubscribedException();
+      }
+    });
   }
 
   protected void unsubscribe(TopicSubscriptionImpl subscription) {
