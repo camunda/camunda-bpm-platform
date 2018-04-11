@@ -71,9 +71,7 @@ public class CaseDefinitionCache extends ResourceDefinitionCache<CaseDefinitionE
 
   @Override
   protected void checkInvalidDefinitionByKeyVersionTagAndTenantId(String definitionKey, String definitionVersionTag, String tenantId, CaseDefinitionEntity definition) {
-    ensureNotNull(CaseDefinitionNotFoundException.class, "no case definition deployed with key = '" + definitionKey + "', versionTag = '" + definitionVersionTag + "'"
-        + " and tenant-id = '" + tenantId + "'", "caseDefinition", definition);
-  }
+    throw new UnsupportedOperationException("Version tag is not implemented in case definition.");  }
 
   @Override
   protected void checkInvalidDefinitionByDeploymentAndKey(String deploymentId, String definitionKey, CaseDefinitionEntity definition) {
