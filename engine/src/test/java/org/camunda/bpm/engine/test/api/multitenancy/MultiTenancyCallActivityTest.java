@@ -17,10 +17,7 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-import java.util.List;
-
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -147,16 +144,8 @@ public class MultiTenancyCallActivityTest extends PluggableProcessEngineTestCase
 
     // then
     ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery().processDefinitionKey("subProcess");
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
-    assertEquals(((ExecutionEntity) query.tenantIdIn(TENANT_ONE).singleResult()).getActivityId(), "Task_1");
-    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
-    assertEquals(((ExecutionEntity) query.tenantIdIn(TENANT_TWO).singleResult()).getActivityId(), "Task_2");
-
-    // clean up
-    List<org.camunda.bpm.engine.repository.Deployment> deployments = repositoryService.createDeploymentQuery().list();
-    for (org.camunda.bpm.engine.repository.Deployment deployment : deployments) {
-      repositoryService.deleteDeployment(deployment.getId(), true);
-    }
+    assertThat(query.activityIdIn("Task_1").tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(query.activityIdIn("Task_2").tenantIdIn(TENANT_TWO).count(), is(1L));
   }
 
   public void testFailStartProcessInstanceFromOtherTenantWithDeploymentBinding() {
@@ -238,10 +227,6 @@ public class MultiTenancyCallActivityTest extends PluggableProcessEngineTestCase
     // given
     BpmnModelInstance callingProcess = createCallingProcess("callingProcess", "ver_tag_2");
     deploymentForTenant(TENANT_ONE, callingProcess);
-    deploymentForTenant(TENANT_ONE, "org/camunda/bpm/engine/test/bpmn/callactivity/subProcessWithVersionTag.bpmn20.xml");
-
-    BpmnModelInstance callingProcess2 = createCallingProcess("callingProcess2", "ver_tag_1");
-    deploymentForTenant(TENANT_ONE, callingProcess2);
     deploymentForTenant(TENANT_TWO, "org/camunda/bpm/engine/test/bpmn/callactivity/subProcessWithVersionTag2.bpmn20.xml");
 
     try {

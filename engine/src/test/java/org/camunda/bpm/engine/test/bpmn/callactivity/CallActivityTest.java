@@ -1567,7 +1567,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
       fail("expected exception");
     } catch (ProcessEngineException e) {
       // then
-      assertTrue(e.getMessage().contains("There are '2' results for a process definition with key 'subProcess', 'versionTag' 'ver_tag_1' and tenant-id '{}'."));
+      assertTrue(e.getMessage().contains("There are '2' results for a process definition with key 'subProcess', versionTag 'ver_tag_1' and tenant-id '{}'."));
     }
 
     // clean up
