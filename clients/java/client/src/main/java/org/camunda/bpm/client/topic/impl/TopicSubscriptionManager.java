@@ -41,6 +41,8 @@ public class TopicSubscriptionManager implements Runnable {
 
   protected static final TopicSubscriptionManagerLogger LOG = ExternalTaskClientLogger.TOPIC_SUBSCRIPTION_MANAGER_LOGGER;
 
+  protected final Object MONITOR = new Object();
+
   protected EngineClient engineClient;
   protected List<TopicSubscription> subscriptions;
 
@@ -54,10 +56,7 @@ public class TopicSubscriptionManager implements Runnable {
   public TopicSubscriptionManager(EngineClient engineClient, VariableMappers variableMappers, long clientLockDuration) {
     this.engineClient = engineClient;
     this.subscriptions = new CopyOnWriteArrayList<>();
-    this.isRunning = true;
-
-    this.thread = new Thread(this, TopicSubscriptionManager.class.getSimpleName());
-    this.thread.start();
+    this.isRunning = false;
 
     this.variableMappers = variableMappers;
 
@@ -132,17 +131,31 @@ public class TopicSubscriptionManager implements Runnable {
   }
 
   public void stop() {
-    if (!isRunning) {
-      return;
+    synchronized (MONITOR) {
+      if (!isRunning || thread == null) {
+        return;
+      }
+
+      isRunning = false;
+
+      try {
+        thread.join();
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+        LOG.exceptionWhileShuttingDown(e);
+      }
     }
+  }
 
-    isRunning = false;
+  public void start() {
+    synchronized (MONITOR) {
+      if (isRunning && thread != null) {
+        return;
+      }
 
-    try {
-      thread.join();
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-      LOG.exceptionWhileShuttingDown(e);
+      isRunning = true;
+      thread = new Thread(this, TopicSubscriptionManager.class.getSimpleName());
+      thread.start();
     }
   }
 
@@ -160,6 +173,10 @@ public class TopicSubscriptionManager implements Runnable {
 
   public List<TopicSubscription> getSubscriptions() {
     return subscriptions;
+  }
+
+  public boolean isRunning() {
+    return isRunning;
   }
 
 }

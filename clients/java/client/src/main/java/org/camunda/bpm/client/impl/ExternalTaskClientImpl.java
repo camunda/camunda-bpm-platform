@@ -46,6 +46,11 @@ public class ExternalTaskClientImpl implements ExternalTaskClient {
     VariableMappers variableMappers = new VariableMappers(objectMapper);
     EngineClient engineClient = new EngineClient(workerId, maxTasks, asyncResponseTimeout, baseUrl, requestInterceptorHandler, variableMappers, objectMapper);
     topicSubscriptionManager = new TopicSubscriptionManager(engineClient, variableMappers, lockDuration);
+
+    boolean isAutoFetchingEnabled = clientBuilder.isAutoFetchingEnabled();
+    if (isAutoFetchingEnabled) {
+      topicSubscriptionManager.start();
+    }
   }
 
   public TopicSubscriptionBuilder subscribe(String topicName) {
@@ -54,6 +59,14 @@ public class ExternalTaskClientImpl implements ExternalTaskClient {
 
   public void stop() {
     topicSubscriptionManager.stop();
+  }
+
+  public void start() {
+    topicSubscriptionManager.start();
+  }
+
+  public boolean isFetching() {
+    return topicSubscriptionManager.isRunning();
   }
 
   public TopicSubscriptionManager getTopicSubscriptionManager() {

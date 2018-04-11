@@ -82,6 +82,14 @@ public interface ExternalTaskClientBuilder {
   ExternalTaskClientBuilder lockDuration(long lockDuration);
 
   /**
+   * Disables immediate fetching for external tasks after calling {@link #build} to bootstrap the client.
+   * To start fetching {@link ExternalTaskClient#start()} must be called.
+   *
+   * @return the builder
+   */
+  ExternalTaskClientBuilder disableAutoFetching();
+
+  /**
    * Bootstraps the Camunda client
    *
    * @throws ExternalTaskClientException

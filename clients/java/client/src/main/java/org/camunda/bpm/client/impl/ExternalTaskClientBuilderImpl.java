@@ -35,11 +35,14 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
   protected Long asyncResponseTimeout;
   protected long lockDuration;
   protected List<ClientRequestInterceptor> interceptors;
+  protected boolean isAutoFetchingEnabled;
 
   public ExternalTaskClientBuilderImpl() {
-    this.maxTasks = 10; // default value
-    this.asyncResponseTimeout = null; // default value
-    this.lockDuration = 20_000; // default value
+    // default values
+    this.maxTasks = 10;
+    this.asyncResponseTimeout = null;
+    this.lockDuration = 20_000;
+    this.isAutoFetchingEnabled = true;
     this.interceptors = new ArrayList<>();
   }
 
@@ -70,6 +73,11 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
 
   public ExternalTaskClientBuilder lockDuration(long lockDuration) {
     this.lockDuration = lockDuration;
+    return this;
+  }
+
+  public ExternalTaskClientBuilder disableAutoFetching() {
+    this.isAutoFetchingEnabled = false;
     return this;
   }
 
@@ -145,6 +153,10 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
 
   protected long getLockDuration() {
     return lockDuration;
+  }
+
+  protected boolean isAutoFetchingEnabled() {
+    return isAutoFetchingEnabled;
   }
 
 }

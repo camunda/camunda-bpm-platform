@@ -516,6 +516,72 @@ public class ExternalTaskClientTest {
     }
   }
 
+  @Test
+  public void shouldPerformAutoFetching() throws Exception {
+    // given
+    ExternalTaskClientBuilder clientBuilder = ExternalTaskClient.create()
+      .baseUrl(MockProvider.BASE_URL);
+
+    // when
+    client = clientBuilder.build();
+
+    // then
+    assertThat(client.isFetching()).isTrue();
+  }
+
+  @Test
+  public void shouldDisableAutoFetching() throws Exception {
+    // given
+    ExternalTaskClientBuilder clientBuilder = ExternalTaskClient.create()
+      .baseUrl(MockProvider.BASE_URL)
+      .disableAutoFetching();
+
+    // when
+    client = clientBuilder.build();
+
+    // then
+    assertThat(client.isFetching()).isFalse();
+  }
+
+  @Test
+  public void shouldStartFetchingWhenAutoFetchingIsDisabled() throws Exception {
+    // given
+    client = ExternalTaskClient.create()
+      .baseUrl(MockProvider.BASE_URL)
+      .disableAutoFetching()
+      .build();
+
+    // assume
+    assertThat(client.isFetching()).isFalse();
+
+    // when
+    client.start();
+
+    // then
+    assertThat(client.isFetching()).isTrue();
+  }
+
+  @Test
+  public void shouldRestartFetchingWhenAutoFetchingIsDisabled() throws Exception {
+    // given
+    client = ExternalTaskClient.create()
+      .baseUrl(MockProvider.BASE_URL)
+      .disableAutoFetching()
+      .build();
+
+    client.start();
+    client.stop();
+
+    // assume
+    assertThat(client.isFetching()).isFalse();
+
+    // when
+    client.start();
+
+    // then
+    assertThat(client.isFetching()).isTrue();
+  }
+
   // helper /////////////////////////////////////////
 
   protected void mockFetchAndLockResponse(List<ExternalTask> externalTasks) throws JsonProcessingException {
