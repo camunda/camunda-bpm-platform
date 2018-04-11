@@ -27,14 +27,17 @@ public class TopicSubscriptionImpl implements TopicSubscription {
   protected ExternalTaskHandler externalTaskHandler;
   protected TopicSubscriptionManager topicSubscriptionManager;
   protected List<String> variableNames;
+  protected String businessKey;
 
   public TopicSubscriptionImpl(String topicName, Long lockDuration, ExternalTaskHandler externalTaskHandler,
-                               TopicSubscriptionManager topicSubscriptionManager, List<String> variableNames) {
+                               TopicSubscriptionManager topicSubscriptionManager, List<String> variableNames,
+                               String businessKey) {
     this.topicName = topicName;
     this.lockDuration = lockDuration;
     this.externalTaskHandler = externalTaskHandler;
     this.topicSubscriptionManager = topicSubscriptionManager;
     this.variableNames = variableNames;
+    this.businessKey = businessKey;
   }
 
   public String getTopicName() {
@@ -56,6 +59,10 @@ public class TopicSubscriptionImpl implements TopicSubscription {
 
   public List<String> getVariableNames() {
     return variableNames;
+  }
+
+  public String getBusinessKey() {
+    return businessKey;
   }
 
 }

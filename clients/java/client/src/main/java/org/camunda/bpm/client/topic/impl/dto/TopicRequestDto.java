@@ -24,11 +24,13 @@ public class TopicRequestDto {
   protected String topicName;
   protected long lockDuration;
   protected List<String> variables;
+  protected String businessKey;
 
-  public TopicRequestDto(String topicName, long lockDuration, List<String> variables) {
+  public TopicRequestDto(String topicName, long lockDuration, List<String> variables, String businessKey) {
     this.topicName = topicName;
     this.lockDuration = lockDuration;
     this.variables = variables;
+    this.businessKey = businessKey;
   }
 
   public String getTopicName() {
@@ -43,6 +45,10 @@ public class TopicRequestDto {
     return variables;
   }
 
+  public String getBusinessKey() {
+    return businessKey;
+  }
+
   public static TopicRequestDto fromTopicSubscription(TopicSubscription topicSubscription, long clientLockDuration) {
     Long lockDuration = topicSubscription.getLockDuration();
 
@@ -52,8 +58,9 @@ public class TopicRequestDto {
 
     String topicName = topicSubscription.getTopicName();
     List<String> variables = topicSubscription.getVariableNames();
+    String businessKey = topicSubscription.getBusinessKey();
 
-    return new TopicRequestDto(topicName, lockDuration, variables);
+    return new TopicRequestDto(topicName, lockDuration, variables, businessKey);
   }
 
 }

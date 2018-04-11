@@ -101,6 +101,7 @@ public class MockProvider {
   public static final String NULL_VARIABLE_NAME = "nullVariable";
 
   public static final Map<String, TypedValueDto> VARIABLES = createVariables();
+  public static final String BUSINESS_KEY = "aBusinessKey";
 
   public static Date createDate(String date) {
     try {

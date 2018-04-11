@@ -582,6 +582,35 @@ public class ExternalTaskClientTest {
     assertThat(client.isFetching()).isTrue();
   }
 
+  @Test
+  public void shouldFetchExternalTasksByBusinessKey() throws Exception {
+    // given
+    mockFetchAndLockResponse(Collections.singletonList(MockProvider.createExternalTaskWithoutVariables()));
+
+    ObjectMapper objectMapper = spy(ObjectMapper.class);
+    whenNew(ObjectMapper.class).withNoArguments()
+      .thenReturn(objectMapper);
+
+    client = ExternalTaskClient.create()
+      .baseUrl(MockProvider.BASE_URL)
+      .build();
+
+    final AtomicBoolean handlerInvoked = new AtomicBoolean(false);
+    TopicSubscriptionBuilder topicSubscriptionBuilder =
+      client.subscribe(MockProvider.TOPIC_NAME)
+        .businessKey(MockProvider.BUSINESS_KEY)
+        .handler((externalTask, externalTaskService) -> handlerInvoked.set(true));
+
+    // when
+    topicSubscriptionBuilder.open();
+    while (!handlerInvoked.get()) {
+      // busy waiting
+    }
+
+    // then
+    assertBusinessKeyAccordingToFetchAndLockPayload(objectMapper, MockProvider.BUSINESS_KEY);
+  }
+
   // helper /////////////////////////////////////////
 
   protected void mockFetchAndLockResponse(List<ExternalTask> externalTasks) throws JsonProcessingException {
@@ -610,6 +639,10 @@ public class ExternalTaskClientTest {
 
   protected void assertLockDurationAccordingToFetchAndLockPayload(ObjectMapper objectMapper, Long lockDuration) throws JsonProcessingException {
       assertThat(assertAccordingToFetchAndLockPayload(objectMapper).getTopics().get(0).getLockDuration()).isEqualTo(lockDuration);
+  }
+
+  protected void assertBusinessKeyAccordingToFetchAndLockPayload(ObjectMapper objectMapper, String businessKey) throws JsonProcessingException {
+    assertThat(assertAccordingToFetchAndLockPayload(objectMapper).getTopics().get(0).getBusinessKey()).isEqualTo(businessKey);
   }
 
   protected FetchAndLockRequestDto assertAccordingToFetchAndLockPayload(ObjectMapper objectMapper) throws JsonProcessingException {

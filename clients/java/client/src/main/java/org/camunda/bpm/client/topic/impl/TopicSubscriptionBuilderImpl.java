@@ -30,6 +30,7 @@ public class TopicSubscriptionBuilderImpl implements TopicSubscriptionBuilder {
   protected String topicName;
   protected Long lockDuration;
   protected List<String> variableNames;
+  protected String businessKey;
   protected ExternalTaskHandler externalTaskHandler;
   protected TopicSubscriptionManager topicSubscriptionManager;
 
@@ -55,6 +56,11 @@ public class TopicSubscriptionBuilderImpl implements TopicSubscriptionBuilder {
     return this;
   }
 
+  public TopicSubscriptionBuilder businessKey(String businessKey) {
+    this.businessKey = businessKey;
+    return this;
+  }
+
   public TopicSubscription open() {
     if (topicName == null) {
       throw LOG.topicNameNullException();
@@ -71,7 +77,7 @@ public class TopicSubscriptionBuilderImpl implements TopicSubscriptionBuilder {
     // TODO: synchronize check + add (+remove)
     checkTopicNameAlreadySubscribed();
 
-    TopicSubscriptionImpl subscription = new TopicSubscriptionImpl(topicName, lockDuration, externalTaskHandler, topicSubscriptionManager, variableNames);
+    TopicSubscriptionImpl subscription = new TopicSubscriptionImpl(topicName, lockDuration, externalTaskHandler, topicSubscriptionManager, variableNames, businessKey);
     topicSubscriptionManager.subscribe(subscription);
 
     return subscription;

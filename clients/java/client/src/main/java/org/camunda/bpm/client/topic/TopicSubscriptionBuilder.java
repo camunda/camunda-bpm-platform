@@ -46,6 +46,12 @@ public interface TopicSubscriptionBuilder {
   TopicSubscriptionBuilder variables(String... variableNames);
 
   /**
+   * @param businessKey to filter for external tasks which are supposed be fetched and locked
+   * @return the builder
+   */
+  TopicSubscriptionBuilder businessKey(String businessKey);
+
+  /**
    * Release the topic subscription for being executed asynchronously
    *
    * @throws ExternalTaskClientException
