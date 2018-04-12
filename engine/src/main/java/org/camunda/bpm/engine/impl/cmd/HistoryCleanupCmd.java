@@ -78,7 +78,9 @@ public class HistoryCleanupCmd implements Command<Job> {
 
       // don't set a new due date if the current one is already within the batch window
       Date newDueDate;
-      if (!immediatelyDue && HistoryCleanupHelper.isWithinBatchWindow(historyCleanupJob.getDuedate(), commandContext)) {
+      if (!immediatelyDue
+        && historyCleanupJob.getDuedate() != null
+        && HistoryCleanupHelper.isWithinBatchWindow(historyCleanupJob.getDuedate(), commandContext)) {
         newDueDate = historyCleanupJob.getDuedate();
       } else {
         newDueDate = HISTORY_CLEANUP_JOB_DECLARATION.resolveDueDate(historyCleanupContext);
