@@ -42,8 +42,7 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
   protected static final long MAX_BACK_OFF_TIME = Long.MAX_VALUE;
   protected static final long MAX_TIMEOUT = 1800000; // 30 minutes
 
-  protected static final String QUEUE_CAPACITY_CONTEXT_PARAMETER_NAME = FetchAndLockHandlerImpl.class.getName() + ".queueCapacity";
-  protected int queueCapacity = 100; // default capacity
+  protected static final String QUEUE_CAPACITY_PARAMETER_NAME = "fetch-and-lock-queue-capacity";
 
   protected BlockingQueue<FetchAndLockRequest> queue = null;
   protected List<FetchAndLockRequest> pendingRequests = new ArrayList<FetchAndLockRequest>();
@@ -251,12 +250,13 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
 
   public void contextInitialized(ServletContextEvent sce) {
     ServletContext servletContext = sce.getServletContext();
-    String queueCapacityParameter = servletContext.getInitParameter(QUEUE_CAPACITY_CONTEXT_PARAMETER_NAME);
+    String queueCapacityParameter = servletContext.getInitParameter(QUEUE_CAPACITY_PARAMETER_NAME);
 
     initQueue(queueCapacityParameter);
   }
 
   protected void initQueue(String queueCapacityParameter) {
+    int queueCapacity = 100; // default capacity
     if (queueCapacityParameter != null) {
       try {
         queueCapacity = Integer.valueOf(queueCapacityParameter);
