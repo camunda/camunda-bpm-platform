@@ -32,6 +32,7 @@ public class FetchAndLockContextListener implements ServletContextListener {
   public void contextInitialized(ServletContextEvent sce) {
     if (fetchAndLockHandler == null) {
       fetchAndLockHandler = lookupFetchAndLockHandler();
+      fetchAndLockHandler.contextInitialized(sce);
       fetchAndLockHandler.start();
     }
   }

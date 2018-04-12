@@ -24,6 +24,8 @@ import org.camunda.bpm.engine.rest.dto.externaltask.LockedExternalTaskDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.spi.FetchAndLockHandler;
 
+import javax.servlet.ServletContext;
+import javax.servlet.ServletContextEvent;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.Response.Status;
 import java.util.ArrayList;
@@ -40,7 +42,9 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
   protected static final long MAX_BACK_OFF_TIME = Long.MAX_VALUE;
   protected static final long MAX_TIMEOUT = 1800000; // 30 minutes
 
-  protected BlockingQueue<FetchAndLockRequest> queue = new ArrayBlockingQueue<FetchAndLockRequest>(100);
+  protected static final String QUEUE_CAPACITY_PARAMETER_NAME = "fetch-and-lock-queue-capacity";
+
+  protected BlockingQueue<FetchAndLockRequest> queue = null;
   protected List<FetchAndLockRequest> pendingRequests = new ArrayList<FetchAndLockRequest>();
 
   protected final Object MONITOR = new Object();
@@ -242,6 +246,24 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
       ProcessEngineException processEngineException = result.getProcessEngineException();
       asyncResponse.resume(processEngineException);
     }
+  }
+
+  public void contextInitialized(ServletContextEvent sce) {
+    ServletContext servletContext = sce.getServletContext();
+    String queueCapacityParameter = servletContext.getInitParameter(QUEUE_CAPACITY_PARAMETER_NAME);
+
+    initQueue(queueCapacityParameter);
+  }
+
+  protected void initQueue(String queueCapacityParameter) {
+    int queueCapacity = 100; // default capacity
+    if (queueCapacityParameter != null) {
+      try {
+        queueCapacity = Integer.valueOf(queueCapacityParameter);
+      } catch (NumberFormatException ignored) { }
+    }
+
+    queue = new ArrayBlockingQueue<FetchAndLockRequest>(queueCapacity);
   }
 
   public List<FetchAndLockRequest> getPendingRequests() {

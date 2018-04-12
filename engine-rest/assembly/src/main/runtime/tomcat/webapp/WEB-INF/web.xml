@@ -2,6 +2,14 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://java.sun.com/xml/ns/javaee    http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
 
+  <!-- Fetch And Lock Handler (long polling): Queue Capacity (default value 100) -->
+  <!--
+  <context-param>
+    <param-name>fetch-and-lock-queue-capacity</param-name>
+    <param-value>100</param-value>
+  </context-param>
+  -->
+
   <listener>
     <listener-class>org.camunda.bpm.engine.rest.impl.FetchAndLockContextListener</listener-class>
   </listener>
