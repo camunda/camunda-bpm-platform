@@ -32,7 +32,6 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import javax.servlet.ServletContextEvent;
 import javax.ws.rs.container.AsyncResponse;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,7 +45,6 @@ import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.argThat;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -96,7 +94,6 @@ public class FetchAndLockHandlerTest {
       .thenReturn(fetchTopicBuilder);
 
     doNothing().when(handler).suspend(anyLong());
-    handler.contextInitialized(mock(ServletContextEvent.class, RETURNS_DEEP_STUBS));
 
     lockedExternalTaskMock = MockProvider.createMockLockedExternalTask();
   }

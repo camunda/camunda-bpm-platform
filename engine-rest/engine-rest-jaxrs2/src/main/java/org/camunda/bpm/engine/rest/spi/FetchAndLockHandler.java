@@ -15,7 +15,6 @@ package org.camunda.bpm.engine.rest.spi;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.rest.dto.externaltask.FetchExternalTasksExtendedDto;
 
-import javax.servlet.ServletContextEvent;
 import javax.ws.rs.container.AsyncResponse;
 
 /**
@@ -43,12 +42,5 @@ public interface FetchAndLockHandler {
    * @param processEngine provides the process engine context of the respective request
    */
   void addPendingRequest(FetchExternalTasksExtendedDto dto, AsyncResponse asyncResponse, ProcessEngine processEngine);
-
-  /**
-   * Invoked on initialization of the servlet context
-   *
-   * @param servletContextEvent provides the servlet context
-   */
-  void contextInitialized(ServletContextEvent servletContextEvent);
 
 }

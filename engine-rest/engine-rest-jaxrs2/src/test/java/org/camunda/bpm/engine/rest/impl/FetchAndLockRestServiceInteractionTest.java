@@ -38,7 +38,6 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import javax.servlet.ServletContextEvent;
 import javax.ws.rs.core.Response.Status;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -56,7 +55,6 @@ import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -119,7 +117,7 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
     List<Tenant> tenantMocks = Collections.singletonList(MockProvider.createMockTenant());
     tenantIds = setupTenantQueryMock(tenantMocks);
 
-    new FetchAndLockContextListener().contextInitialized(mock(ServletContextEvent.class, RETURNS_DEEP_STUBS));
+    new FetchAndLockContextListener().contextInitialized(null);
   }
 
   @Test

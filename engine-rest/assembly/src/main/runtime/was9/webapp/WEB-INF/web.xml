@@ -5,14 +5,6 @@
 
   <display-name>camunda bpm rest api</display-name>
 
-  <!-- Fetch And Lock Handler (long polling): Queue Capacity (default value 100) -->
-  <!--
-  <context-param>
-    <param-name>fetch-and-lock-queue-capacity</param-name>
-    <param-value>100</param-value>
-  </context-param>
-  -->
-
   <listener>
     <listener-class>org.camunda.bpm.engine.rest.impl.FetchAndLockContextListener</listener-class>
   </listener>
