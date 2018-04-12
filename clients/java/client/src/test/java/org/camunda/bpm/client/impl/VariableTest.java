@@ -896,6 +896,7 @@ public class VariableTest {
   }
 
   @Test
+  @Ignore
   public void shouldSerializeObjectTypedVariableWithXmlDataSerializationFormat() throws Exception {
     // given
     ExternalTask externalTaskMock = MockProvider.createExternalTaskWithoutVariables();
@@ -1188,6 +1189,7 @@ public class VariableTest {
   }
 
   @Test
+  @Ignore
   public void shouldSetSpinTypes() throws Exception {
     // given
     ObjectMapper objectMapper = spy(ObjectMapper.class);
