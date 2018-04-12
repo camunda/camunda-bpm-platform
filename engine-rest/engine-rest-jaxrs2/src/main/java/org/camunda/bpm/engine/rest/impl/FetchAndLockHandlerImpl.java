@@ -40,7 +40,7 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
   protected static final long MAX_BACK_OFF_TIME = Long.MAX_VALUE;
   protected static final long MAX_TIMEOUT = 1800000; // 30 minutes
 
-  protected BlockingQueue<FetchAndLockRequest> queue = new ArrayBlockingQueue<FetchAndLockRequest>(100);
+  protected BlockingQueue<FetchAndLockRequest> queue = new ArrayBlockingQueue<FetchAndLockRequest>(200);
   protected List<FetchAndLockRequest> pendingRequests = new ArrayList<FetchAndLockRequest>();
 
   protected final Object MONITOR = new Object();
