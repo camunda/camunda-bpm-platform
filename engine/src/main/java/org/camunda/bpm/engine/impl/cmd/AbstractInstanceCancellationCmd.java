@@ -14,10 +14,7 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.camunda.bpm.engine.impl.pvm.delegate.ModificationObserverBehavior;
-import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
-import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
-import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
+import org.camunda.bpm.engine.impl.util.ModificationUtil;
 
 /**
  * @author Thorben Lindhauer
@@ -63,45 +60,10 @@ public abstract class AbstractInstanceCancellationCmd extends AbstractProcessIns
       topmostCancellableExecution.setActivity(null);
     } else {
       topmostCancellableExecution.deleteCascade(cancellationReason, skipCustomListeners, skipIoMappings);
-      handleChildRemovalInScope(topmostCancellableExecution);
-
+      ModificationUtil.handleChildRemovalInScope(topmostCancellableExecution);
     }
 
     return null;
-  }
-
-  protected void handleChildRemovalInScope(ExecutionEntity removedExecution) {
-    // TODO: the following should be closer to PvmAtomicOperationDeleteCascadeFireActivityEnd
-    // (note though that e.g. boundary events expect concurrent executions to be preserved)
-    //
-    // Idea: attempting to prune and synchronize on the parent is the default behavior when
-    // a concurrent child is removed, but scope activities implementing ModificationObserverBehavior
-    // override this default (and therefore *must* take care of reorganization themselves)
-
-    // notify the behavior that a concurrent execution has been removed
-
-    // must be set due to deleteCascade behavior
-    ActivityImpl activity = removedExecution.getActivity();
-    if (activity == null) {
-      return;
-    }
-    ScopeImpl flowScope = activity.getFlowScope();
-
-    PvmExecutionImpl scopeExecution = removedExecution.getParentScopeExecution(false);
-    PvmExecutionImpl executionInParentScope = removedExecution.isConcurrent() ? removedExecution : removedExecution.getParent();
-
-    if (flowScope.getActivityBehavior() != null && flowScope.getActivityBehavior() instanceof ModificationObserverBehavior) {
-      // let child removal be handled by the scope itself
-      ModificationObserverBehavior behavior = (ModificationObserverBehavior) flowScope.getActivityBehavior();
-      behavior.destroyInnerInstance(executionInParentScope);
-    }
-    else {
-      if (executionInParentScope.isConcurrent()) {
-        executionInParentScope.remove();
-        scopeExecution.tryPruneLastConcurrentChild();
-        scopeExecution.forceUpdate();
-      }
-    }
   }
 
   protected abstract ExecutionEntity determineSourceInstanceExecution(CommandContext commandContext);

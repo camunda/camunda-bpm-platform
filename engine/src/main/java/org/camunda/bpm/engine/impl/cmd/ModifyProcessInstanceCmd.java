@@ -26,10 +26,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
-import org.camunda.bpm.engine.impl.pvm.delegate.ModificationObserverBehavior;
-import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
-import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
-import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
+import org.camunda.bpm.engine.impl.util.ModificationUtil;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 
 /**
@@ -151,41 +148,7 @@ public class ModifyProcessInstanceCmd implements Command<Void> {
     }
 
     topmostDeletableExecution.deleteCascade(deleteReason, skipCustomListeners, skipIoMappings);
-    handleChildRemovalInScope(topmostDeletableExecution);
-
-  }
-
-  //partially copied from AbstractInstanceCancellationCmd
-  protected void handleChildRemovalInScope(ExecutionEntity removedExecution) {
-    ActivityImpl activity = removedExecution.getActivity();
-    if (activity == null) {
-      if (removedExecution.getSuperExecution() != null) {
-        removedExecution = removedExecution.getSuperExecution();
-        activity = removedExecution.getActivity();
-        if (activity == null) {
-          return;
-        }
-      } else {
-        return;
-      }
-    }
-    ScopeImpl flowScope = activity.getFlowScope();
-
-    PvmExecutionImpl scopeExecution = removedExecution.getParentScopeExecution(false);
-    PvmExecutionImpl executionInParentScope = removedExecution.isConcurrent() ? removedExecution : removedExecution.getParent();
-
-    if (flowScope.getActivityBehavior() != null && flowScope.getActivityBehavior() instanceof ModificationObserverBehavior) {
-      // let child removal be handled by the scope itself
-      ModificationObserverBehavior behavior = (ModificationObserverBehavior) flowScope.getActivityBehavior();
-      behavior.destroyInnerInstance(executionInParentScope);
-    }
-    else {
-      if (executionInParentScope.isConcurrent()) {
-        executionInParentScope.remove();
-        scopeExecution.tryPruneLastConcurrentChild();
-        scopeExecution.forceUpdate();
-      }
-    }
+    ModificationUtil.handleChildRemovalInScope(topmostDeletableExecution);
   }
 
 }
