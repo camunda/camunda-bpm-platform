@@ -12,26 +12,36 @@
  */
 package org.camunda.bpm.client.impl.variable.mapper.primitive;
 
-import org.camunda.bpm.client.impl.EngineClientException;
-import org.camunda.bpm.client.task.impl.dto.TypedValueDto;
+import org.camunda.bpm.client.impl.variable.TypedValueField;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.impl.value.UntypedValueImpl;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.LongValue;
 
-/**
- * @author Tassilo Weidner
- */
-public class LongValueMapper extends PrimitiveValueMapper<LongValue> {
+public class LongValueMapper extends NumberValueMapper<LongValue> {
 
   public LongValueMapper() {
     super(ValueType.LONG);
   }
 
-  public LongValue deserializeTypedValue(TypedValueDto typedValueDto) throws EngineClientException {
-    Object value = typedValueDto.getValue();
-    long longValue = ((Number) value).longValue();
-    typedValueDto.setValue(longValue);
+  public LongValue convertToTypedValue(UntypedValueImpl untypedValue) {
+    return Variables.longValue((Long) untypedValue.getValue());
+  }
 
-    return super.deserializeTypedValue(typedValueDto);
+  public void writeValue(LongValue longValue, TypedValueField typedValueField) {
+    typedValueField.setValue(longValue.getValue());
+  }
+
+  public LongValue readValue(TypedValueField typedValueField) {
+    Long longValue = null;
+
+    Object value = typedValueField.getValue();
+    if (value != null) {
+      Number numValue = (Number) value;
+      longValue = numValue.longValue();
+    }
+
+    return Variables.longValue(longValue);
   }
 
 }

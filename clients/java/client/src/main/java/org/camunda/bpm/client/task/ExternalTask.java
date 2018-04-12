@@ -131,6 +131,8 @@ public interface ExternalTask {
    */
   <T extends TypedValue> T getVariableTyped(String variableName);
 
+  <T extends TypedValue> T getVariableTyped(String variableName, boolean deserializeObjectValues);
+
   /**
    * Returns untyped variables that exist in the task's ancestor execution hierarchy
    *
@@ -144,6 +146,8 @@ public interface ExternalTask {
    * @return a map of typed variables that contains an entry for each variable
    */
   VariableMap getAllVariablesTyped();
+
+  VariableMap getAllVariablesTyped(boolean deserializeObjectValues);
 
   /**
    * Returns the business key of the process instance the external task is associated with

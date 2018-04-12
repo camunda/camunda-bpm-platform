@@ -12,28 +12,28 @@
  */
 package org.camunda.bpm.client.topic.impl;
 
-import org.camunda.bpm.client.ClientBackOffStrategy;
-import org.camunda.bpm.client.exception.ExternalTaskClientException;
-import org.camunda.bpm.client.impl.EngineClient;
-import org.camunda.bpm.client.impl.EngineClientException;
-import org.camunda.bpm.client.impl.ExternalTaskClientLogger;
-import org.camunda.bpm.client.impl.variable.VariableMappers;
-import org.camunda.bpm.client.task.ExternalTask;
-import org.camunda.bpm.client.task.ExternalTaskHandler;
-import org.camunda.bpm.client.task.ExternalTaskService;
-import org.camunda.bpm.client.task.impl.ExternalTaskImpl;
-import org.camunda.bpm.client.task.impl.ExternalTaskServiceImpl;
-import org.camunda.bpm.client.task.impl.dto.TypedValueDto;
-import org.camunda.bpm.client.topic.TopicSubscription;
-import org.camunda.bpm.client.topic.impl.dto.TopicRequestDto;
-import org.camunda.bpm.engine.variable.VariableMap;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import org.camunda.bpm.client.ClientBackOffStrategy;
+import org.camunda.bpm.client.exception.ExternalTaskClientException;
+import org.camunda.bpm.client.impl.EngineClient;
+import org.camunda.bpm.client.impl.EngineClientException;
+import org.camunda.bpm.client.impl.ExternalTaskClientLogger;
+import org.camunda.bpm.client.impl.variable.TypedValueField;
+import org.camunda.bpm.client.impl.variable.TypedValues;
+import org.camunda.bpm.client.impl.variable.VariableValue;
+import org.camunda.bpm.client.task.ExternalTask;
+import org.camunda.bpm.client.task.ExternalTaskHandler;
+import org.camunda.bpm.client.task.ExternalTaskService;
+import org.camunda.bpm.client.task.impl.ExternalTaskImpl;
+import org.camunda.bpm.client.task.impl.ExternalTaskServiceImpl;
+import org.camunda.bpm.client.topic.TopicSubscription;
+import org.camunda.bpm.client.topic.impl.dto.TopicRequestDto;
 
 /**
  * @author Tassilo Weidner
@@ -52,23 +52,26 @@ public class TopicSubscriptionManager implements Runnable {
 
   protected ClientBackOffStrategy backOffStrategy;
 
-  protected VariableMappers variableMappers;
+  protected TypedValues typedValues;
 
   protected long clientLockDuration;
 
-  public TopicSubscriptionManager(EngineClient engineClient, VariableMappers variableMappers, long clientLockDuration) {
+  public TopicSubscriptionManager(EngineClient engineClient, TypedValues typedValues, long clientLockDuration) {
     this.engineClient = engineClient;
     this.subscriptions = new CopyOnWriteArrayList<>();
     this.isRunning = false;
-
-    this.variableMappers = variableMappers;
-
     this.clientLockDuration = clientLockDuration;
+    this.typedValues = typedValues;
   }
 
   public void run() {
     while (isRunning) {
-      acquire();
+      try {
+        acquire();
+      }
+      catch (Throwable e) {
+        // TODO: log exception
+      }
     }
   }
 
@@ -86,48 +89,18 @@ public class TopicSubscriptionManager implements Runnable {
     });
 
     if (!taskTopicRequests.isEmpty()) {
-      List<ExternalTask> externalTasks = Collections.emptyList();
-
-      try {
-        externalTasks = engineClient.fetchAndLock(taskTopicRequests);
-      } catch (EngineClientException e) {
-        LOG.exceptionWhilePerformingFetchAndLock(e);
-      }
+      List<ExternalTask> externalTasks = fetchAndLock(taskTopicRequests);
 
       externalTasks.forEach(externalTask -> {
-        Map<String, TypedValueDto> variableDtoMap = ((ExternalTaskImpl) externalTask).getVariables();
-        VariableMap variableMap = null;
+        String topicName = externalTask.getTopicName();
+        ExternalTaskHandler taskHandler = externalTaskHandlers.get(topicName);
 
-        boolean variablesDeserialized = false;
-        try {
-
-          variableMap = variableMappers.deserializeVariables(variableDtoMap);
-          variablesDeserialized = true;
-
+        if (taskHandler != null) {
+          handleExternalTask(externalTask, taskHandler);
         }
-        catch (Throwable e) {
-          if (e instanceof EngineClientException) {
-            LOG.exceptionWhileDeserializingVariables(e.getMessage());
-          } else {
-            LOG.exceptionWhileDeserializingVariables(e);
-          }
+        else {
+          // TODO: log
         }
-
-        if (variablesDeserialized) {
-          ((ExternalTaskImpl) externalTask).setReceivedVariableMap(variableMap);
-
-          String topicName = externalTask.getTopicName();
-          ExternalTaskHandler taskHandler = externalTaskHandlers.get(topicName);
-          ExternalTaskService service = new ExternalTaskServiceImpl(externalTask.getId(), engineClient);
-
-          try {
-            taskHandler.execute(externalTask, service);
-          } catch (ExternalTaskClientException e) {
-            LOG.exceptionOnExternalTaskServiceMethodInvocation(e);
-          } catch (Throwable e) {
-            LOG.exceptionWhileExecutingExternalTaskHandler(e);
-          }
-        } // else: skip handler execution
       });
 
       try {
@@ -139,6 +112,36 @@ public class TopicSubscriptionManager implements Runnable {
       } catch (Throwable e) {
         LOG.exceptionWhileExecutingBackOffStrategyMethod(e);
       }
+    }
+  }
+
+  protected List<ExternalTask> fetchAndLock(List<TopicRequestDto> subscriptions) {
+    List<ExternalTask> externalTasks = Collections.emptyList();
+
+    try {
+      externalTasks = engineClient.fetchAndLock(subscriptions);
+    } catch (EngineClientException e) {
+      LOG.exceptionWhilePerformingFetchAndLock(e);
+    }
+
+    return externalTasks;
+  }
+
+  protected void handleExternalTask(ExternalTask externalTask, ExternalTaskHandler taskHandler) {
+    ExternalTaskImpl task = (ExternalTaskImpl) externalTask;
+
+    Map<String, TypedValueField> variables = task.getVariables();
+    Map<String, VariableValue> deserializeVariables = typedValues.deserializeVariables(variables);
+    task.setReceivedVariableMap(deserializeVariables);
+
+    ExternalTaskService service = new ExternalTaskServiceImpl(externalTask.getId(), engineClient);
+
+    try {
+      taskHandler.execute(task, service);
+    } catch (ExternalTaskClientException e) {
+      LOG.exceptionOnExternalTaskServiceMethodInvocation(e);
+    } catch (Throwable e) {
+      LOG.exceptionWhileExecutingExternalTaskHandler(e);
     }
   }
 

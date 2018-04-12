@@ -13,6 +13,7 @@
 package org.camunda.bpm.client.task.impl.dto;
 
 import org.camunda.bpm.client.impl.RequestDto;
+import org.camunda.bpm.client.impl.variable.TypedValueField;
 
 import java.util.Map;
 
@@ -21,21 +22,21 @@ import java.util.Map;
  */
 public class CompleteRequestDto extends RequestDto {
 
-  protected Map<String, TypedValueDto> variables;
-  protected Map<String, TypedValueDto> localVariables;
+  protected Map<String, TypedValueField> variables;
+  protected Map<String, TypedValueField> localVariables;
 
-  public CompleteRequestDto(String workerId, Map<String, TypedValueDto> variables, Map<String, TypedValueDto> localVariables) {
+  public CompleteRequestDto(String workerId, Map<String, TypedValueField> variables, Map<String, TypedValueField> localVariables) {
     super(workerId);
 
     this.variables = variables;
     this.localVariables = localVariables;
   }
 
-  public Map<String, TypedValueDto> getVariables() {
+  public Map<String, TypedValueField> getVariables() {
     return variables;
   }
 
-  public Map<String, TypedValueDto> getLocalVariables() {
+  public Map<String, TypedValueField> getLocalVariables() {
     return localVariables;
   }
 

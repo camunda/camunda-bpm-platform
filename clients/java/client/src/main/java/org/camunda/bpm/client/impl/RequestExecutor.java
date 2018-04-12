@@ -12,11 +12,9 @@
  */
 package org.camunda.bpm.client.impl;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.io.InputStream;
+
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
@@ -34,8 +32,10 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
 import org.camunda.bpm.client.interceptor.impl.RequestInterceptorHandler;
 
-import java.io.IOException;
-import java.io.InputStream;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Tassilo Weidner
@@ -138,17 +138,6 @@ public class RequestExecutor {
     }
 
     return byteArrayEntity;
-  }
-
-  protected String sanitizeUrl(String url) {
-    url = url.trim();
-
-    if (url.endsWith("/")) {
-      url = url.replaceAll("/$", "");
-      url = sanitizeUrl(url);
-    }
-
-    return url;
   }
 
   protected void initHttpClient(RequestInterceptorHandler requestInterceptorHandler) {

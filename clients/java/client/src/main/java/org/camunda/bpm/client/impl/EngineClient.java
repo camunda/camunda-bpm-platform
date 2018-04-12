@@ -12,27 +12,20 @@
  */
 package org.camunda.bpm.client.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.camunda.bpm.client.impl.variable.VariableMappers;
-import org.camunda.bpm.client.interceptor.impl.RequestInterceptorHandler;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+import org.camunda.bpm.client.impl.variable.TypedValueField;
+import org.camunda.bpm.client.impl.variable.TypedValues;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.impl.ExternalTaskImpl;
 import org.camunda.bpm.client.task.impl.dto.BpmnErrorRequestDto;
 import org.camunda.bpm.client.task.impl.dto.CompleteRequestDto;
 import org.camunda.bpm.client.task.impl.dto.ExtendLockRequestDto;
 import org.camunda.bpm.client.task.impl.dto.FailureRequestDto;
-import org.camunda.bpm.client.task.impl.dto.TypedValueDto;
 import org.camunda.bpm.client.topic.impl.dto.FetchAndLockRequestDto;
 import org.camunda.bpm.client.topic.impl.dto.TopicRequestDto;
-import org.camunda.bpm.engine.variable.VariableMap;
-import org.camunda.bpm.engine.variable.Variables;
-import org.camunda.bpm.engine.variable.impl.VariableMapImpl;
-import org.camunda.bpm.engine.variable.value.TypedValue;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author Tassilo Weidner
@@ -54,16 +47,15 @@ public class EngineClient {
   protected int maxTasks;
   protected Long asyncResponseTimeout;
   protected RequestExecutor engineInteraction;
+  protected TypedValues typedValues;
 
-  protected VariableMappers variableMappers;
-
-  public EngineClient(String workerId, int maxTasks, Long asyncResponseTimeout, String baseUrl, RequestInterceptorHandler requestInterceptorHandler, VariableMappers variableMappers, ObjectMapper objectMapper) {
+  public EngineClient(String workerId, int maxTasks, Long asyncResponseTimeout, String baseUrl, RequestExecutor engineInteraction, TypedValues typedValues) {
     this.workerId = workerId;
     this.asyncResponseTimeout = asyncResponseTimeout;
     this.maxTasks = maxTasks;
-    this.engineInteraction = new RequestExecutor(requestInterceptorHandler, objectMapper);
-    this.baseUrl = engineInteraction.sanitizeUrl(baseUrl);
-    this.variableMappers = variableMappers;
+    this.engineInteraction = engineInteraction;
+    this.baseUrl = baseUrl;
+    this.typedValues = typedValues;
   }
 
   public List<ExternalTask> fetchAndLock(List<TopicRequestDto> topics) throws EngineClientException {
@@ -80,15 +72,8 @@ public class EngineClient {
   }
 
   public void complete(String taskId, Map<String, Object> variables, Map<String, Object> localVariables) throws EngineClientException {
-    Map<String, TypedValueDto> typedValueDtoMap = new HashMap<>();
-    if (variables != null) {
-      typedValueDtoMap.putAll(variableMappers.serializeVariables(variables));
-    }
-
-    Map<String, TypedValueDto> localTypedValueDtoMap = new HashMap<>();
-    if (localVariables != null) {
-      localTypedValueDtoMap.putAll(variableMappers.serializeVariables(localVariables));
-    }
+    Map<String, TypedValueField> typedValueDtoMap = typedValues.serializeVariables(variables);
+    Map<String, TypedValueField> localTypedValueDtoMap = typedValues.serializeVariables(localVariables);
 
     CompleteRequestDto payload = new CompleteRequestDto(workerId, typedValueDtoMap, localTypedValueDtoMap);
     String resourcePath = COMPLETE_RESOURCE_PATH.replace("{id}", taskId);

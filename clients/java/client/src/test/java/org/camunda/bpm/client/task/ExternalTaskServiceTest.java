@@ -52,7 +52,7 @@ import org.camunda.bpm.client.exception.NotResumedException;
 import org.camunda.bpm.client.helper.ClosableHttpClientMock;
 import org.camunda.bpm.client.helper.MockProvider;
 import org.camunda.bpm.client.impl.EngineClient;
-import org.camunda.bpm.client.impl.ExternalTaskClientImpl;
+import org.camunda.bpm.client.impl.ExternalTaskClientBuilderImpl;
 import org.camunda.bpm.client.task.impl.dto.BpmnErrorRequestDto;
 import org.camunda.bpm.client.task.impl.dto.ExtendLockRequestDto;
 import org.camunda.bpm.client.task.impl.dto.FailureRequestDto;
@@ -72,7 +72,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author Tassilo Weidner
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({HttpClients.class, ExternalTaskClientImpl.class})
+@PrepareForTest({HttpClients.class, ExternalTaskClientBuilderImpl.class})
 @PowerMockIgnore("javax.net.ssl.*")
 public class ExternalTaskServiceTest {
 

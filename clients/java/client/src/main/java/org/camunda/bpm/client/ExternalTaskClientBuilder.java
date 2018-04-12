@@ -60,6 +60,10 @@ public interface ExternalTaskClientBuilder {
    */
   ExternalTaskClientBuilder maxTasks(int maxTasks);
 
+  ExternalTaskClientBuilder defaultSerializationFormat(String defaultSerializationFormat);
+
+  ExternalTaskClientBuilder dateFormat(String dateFormat);
+
   /**
    * Specifies the maximum waiting time for the response of fetched and locked external tasks.
    * The response is performed immediately, if external tasks are available in the moment of the request.

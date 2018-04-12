@@ -19,6 +19,8 @@ package org.camunda.bpm.client.exception;
  */
 public class NotAcquiredException extends ExternalTaskClientException {
 
+  private static final long serialVersionUID = 1L;
+
   public NotAcquiredException(String message) {
     super(message);
   }

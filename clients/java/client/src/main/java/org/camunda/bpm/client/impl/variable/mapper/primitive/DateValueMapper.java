@@ -12,50 +12,59 @@
  */
 package org.camunda.bpm.client.impl.variable.mapper.primitive;
 
-import org.camunda.bpm.client.impl.EngineClientException;
-import org.camunda.bpm.client.task.impl.dto.TypedValueDto;
-import org.camunda.bpm.engine.variable.type.ValueType;
-import org.camunda.bpm.engine.variable.value.DateValue;
-import org.camunda.bpm.engine.variable.value.TypedValue;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-/**
- * @author Tassilo Weidner
- */
+import org.camunda.bpm.client.impl.EngineClientException;
+import org.camunda.bpm.client.impl.variable.TypedValueField;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.impl.value.UntypedValueImpl;
+import org.camunda.bpm.engine.variable.type.ValueType;
+import org.camunda.bpm.engine.variable.value.DateValue;
+
 public class DateValueMapper extends PrimitiveValueMapper<DateValue> {
 
-  public static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
+  protected String dateFormat;
 
-  protected final SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
-
-  public DateValueMapper() {
+  public DateValueMapper(String dateFormat) {
     super(ValueType.DATE);
+    this.dateFormat = dateFormat;
   }
 
-  public DateValue deserializeTypedValue(TypedValueDto typedValueDto) throws EngineClientException {
-    Object value = typedValueDto.getValue();
+  public DateValue convertToTypedValue(UntypedValueImpl untypedValue) {
+    return Variables.dateValue((Date) untypedValue.getValue());
+  }
 
+  public DateValue readValue(TypedValueField typedValueField) {
     Date date = null;
-    try {
-      date = sdf.parse((String) value);
-    } catch (ParseException e) {
-      throw new EngineClientException(e);
+
+    String value = (String) typedValueField.getValue();
+    if (value != null) {
+      SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
+      try {
+        date = sdf.parse(value);
+      } catch (ParseException e) {
+        // TODO: handle that case!
+        throw new RuntimeException(new EngineClientException(e));
+      }
     }
 
-    typedValueDto.setValue(date);
-
-    return super.deserializeTypedValue(typedValueDto);
+    return Variables.dateValue(date);
   }
 
-  public TypedValueDto serializeTypedValue(TypedValue typedValue) {
-    TypedValueDto typedValueDto = super.serializeTypedValue(typedValue);
-    Date date = (Date) typedValue.getValue();
-    typedValueDto.setValue(sdf.format(date));
+  public void writeValue(DateValue dateValue, TypedValueField typedValueField) {
+    Date date = (Date) dateValue.getValue();
 
-    return typedValueDto;
+    if (date != null) {
+      SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
+      typedValueField.setValue(sdf.format(date));
+    }
+  }
+
+  protected boolean canReadValue(TypedValueField typedValueField) {
+    Object value = typedValueField.getValue();
+    return value == null || value instanceof String;
   }
 
 }

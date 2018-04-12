@@ -19,6 +19,8 @@ package org.camunda.bpm.client.exception;
  */
 public class UnknownTypeException extends ExternalTaskClientException {
 
+  private static final long serialVersionUID = 1L;
+
   public UnknownTypeException(String message) {
     super(message);
   }

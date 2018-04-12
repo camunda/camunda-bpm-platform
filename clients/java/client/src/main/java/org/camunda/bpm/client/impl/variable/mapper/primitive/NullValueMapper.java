@@ -12,45 +12,44 @@
  */
 package org.camunda.bpm.client.impl.variable.mapper.primitive;
 
-import org.camunda.bpm.client.impl.variable.mapper.ValueMapper;
-import org.camunda.bpm.client.task.impl.dto.TypedValueDto;
+import org.camunda.bpm.client.impl.variable.TypedValueField;
+import org.camunda.bpm.client.impl.variable.mapper.AbstractTypedValueMapper;
 import org.camunda.bpm.engine.variable.impl.value.NullValueImpl;
 import org.camunda.bpm.engine.variable.impl.value.UntypedValueImpl;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
-import java.util.Map;
-
-/**
- * @author Tassilo Weidner
- */
-public class NullValueMapper extends PrimitiveValueMapper<NullValueImpl> implements ValueMapper<NullValueImpl> {
+public class NullValueMapper extends AbstractTypedValueMapper<NullValueImpl> {
 
   public NullValueMapper() {
     super(ValueType.NULL);
   }
 
-  public boolean isAssignable(TypedValue typedValue) {
-    return typedValue == null || typedValue.getValue() == null;
-  }
-
-  public NullValueImpl deserializeTypedValue(TypedValueDto typedValueDto) {
-    Map<String, Object> valueInfo = typedValueDto.getValueInfo();
-    if (valueInfo != null) {
-
-      Object isTransient = valueInfo.get("transient");
-      if (isTransient != null && isTransient instanceof Boolean) {
-        if ((boolean) isTransient) {
-          return NullValueImpl.INSTANCE_TRANSIENT;
-        }
-      }
-    }
-
-    return NullValueImpl.INSTANCE;
+  public String getName() {
+    return ValueType.NULL.getName().toLowerCase();
   }
 
   public NullValueImpl convertToTypedValue(UntypedValueImpl untypedValue) {
     return NullValueImpl.INSTANCE;
   }
 
+  public void writeValue(NullValueImpl typedValue, TypedValueField typedValueField) {
+    typedValueField.setValue(null);
+  }
+
+  public NullValueImpl readValue(TypedValueField typedValueField, boolean deserialize) {
+    return NullValueImpl.INSTANCE;
+  }
+
+  protected boolean isNull(Object value) {
+    return value == null;
+  }
+
+  protected boolean canWriteValue(TypedValue value) {
+    return isNull(value.getValue());
+  }
+
+  protected boolean canReadValue(TypedValueField value) {
+    return isNull(value.getValue());
+  }
 }

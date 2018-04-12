@@ -12,12 +12,11 @@
  */
 package org.camunda.bpm.client.impl;
 
+import java.io.IOException;
+
 import org.apache.http.HttpRequest;
 import org.apache.http.client.HttpResponseException;
-import org.camunda.bpm.client.exception.UnsupportedTypeException;
-import org.camunda.bpm.client.task.impl.dto.TypedValueDto;
-
-import java.io.IOException;
+import org.camunda.bpm.client.impl.variable.TypedValueField;
 
 /**
  * @author Tassilo Weidner
@@ -76,7 +75,7 @@ public class EngineClientLogger extends ExternalTaskClientLogger {
       variableName, variableValue, variableType));
   }
 
-  public EngineClientException unsupportedSerializationDataFormatException(String serializationDataFormat, TypedValueDto typedValueDto) {
+  public EngineClientException unsupportedSerializationDataFormatException(String serializationDataFormat, TypedValueField typedValueDto) {
     return new EngineClientException(exceptionMessage(
       "011", "Exception while deserializing variable: value '{}' has unsupported serialization data format '{}'",
       typedValueDto, serializationDataFormat));

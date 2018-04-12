@@ -30,7 +30,7 @@ import org.apache.http.protocol.HttpContext;
 import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.client.exception.ExternalTaskClientException;
 import org.camunda.bpm.client.helper.MockProvider;
-import org.camunda.bpm.client.impl.ExternalTaskClientImpl;
+import org.camunda.bpm.client.impl.ExternalTaskClientBuilderImpl;
 import org.camunda.bpm.client.interceptor.auth.BasicAuthProvider;
 import org.camunda.bpm.client.interceptor.impl.RequestInterceptorHandler;
 import org.camunda.bpm.client.task.ExternalTaskHandler;
@@ -45,7 +45,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
  * @author Tassilo Weidner
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ExternalTaskClientImpl.class})
+@PrepareForTest({ExternalTaskClientBuilderImpl.class})
 @PowerMockIgnore("javax.net.ssl.*")
 public class ClientRequestInterceptorTest {
 

@@ -12,56 +12,41 @@
  */
 package org.camunda.bpm.client.impl.variable.mapper.primitive;
 
-import org.camunda.bpm.client.impl.EngineClientException;
-import org.camunda.bpm.client.impl.variable.mapper.ValueMapper;
-import org.camunda.bpm.client.task.impl.dto.TypedValueDto;
-import org.camunda.bpm.engine.variable.impl.value.UntypedValueImpl;
+import org.camunda.bpm.client.impl.variable.TypedValueField;
+import org.camunda.bpm.client.impl.variable.mapper.AbstractTypedValueMapper;
 import org.camunda.bpm.engine.variable.type.PrimitiveValueType;
+import org.camunda.bpm.engine.variable.value.PrimitiveValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
-/**
- * @author Tassilo Weidner
- */
-public abstract class PrimitiveValueMapper<T extends TypedValue> implements ValueMapper<T> {
+public abstract class PrimitiveValueMapper<T extends PrimitiveValue<?>> extends AbstractTypedValueMapper<T> {
 
-  protected PrimitiveValueType type;
-
-  protected PrimitiveValueMapper(PrimitiveValueType type) {
-    this.type = type;
+  public PrimitiveValueMapper(PrimitiveValueType variableType) {
+    super(variableType);
   }
 
-  public String getTypeName() {
-    return type.getName();
+  public T readValue(TypedValueField typedValueField, boolean deserializeObjectValue) {
+    return readValue(typedValueField);
   }
 
-  public boolean isAssignable(TypedValue typedValue) {
-    if (typedValue == null || typedValue.getValue() == null) { // forward to null value mapper
-      return false;
-    }
+  public abstract T readValue(TypedValueField typedValueField);
 
-    Object value = typedValue.getValue();
-    return isAssignable(value);
+  public PrimitiveValueType getType() {
+    return (PrimitiveValueType) super.getType();
   }
 
   protected boolean isAssignable(Object value) {
-    return type.getJavaType().isAssignableFrom(value.getClass());
+    Class<?> javaType = getType().getJavaType();
+    return javaType.isAssignableFrom(value.getClass());
   }
 
-  @SuppressWarnings("unchecked")
-  public T convertToTypedValue(UntypedValueImpl untypedValue) {
-    return (T) type.createValue(untypedValue.getValue(), null); // untyped variables have no value info
+  protected boolean canWriteValue(TypedValue typedValue) {
+    Object value = typedValue.getValue();
+    return value == null || isAssignable(value);
   }
 
-  @SuppressWarnings("unchecked")
-  public T deserializeTypedValue(TypedValueDto typedValueDto) throws EngineClientException {
-    Object value = typedValueDto.getValue();
-
-    if (isAssignable(value)) {
-      return (T) type.createValue(value, typedValueDto.getValueInfo());
-    }
-    else {
-      return null; // value does not correspond to type; might occur due to manipulated engine database
-    }
+  protected boolean canReadValue(TypedValueField typedValueField) {
+    Object value = typedValueField.getValue();
+    return value == null || isAssignable(value);
   }
 
 }

@@ -12,26 +12,36 @@
  */
 package org.camunda.bpm.client.impl.variable.mapper.primitive;
 
-import org.camunda.bpm.client.impl.EngineClientException;
-import org.camunda.bpm.client.task.impl.dto.TypedValueDto;
+import org.camunda.bpm.client.impl.variable.TypedValueField;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.impl.value.UntypedValueImpl;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.ShortValue;
 
-/**
- * @author Tassilo Weidner
- */
-public class ShortValueMapper extends PrimitiveValueMapper<ShortValue> {
+public class ShortValueMapper extends NumberValueMapper<ShortValue> {
 
   public ShortValueMapper() {
     super(ValueType.SHORT);
   }
 
-  public ShortValue deserializeTypedValue(TypedValueDto typedValueDto) throws EngineClientException {
-    Object value = typedValueDto.getValue();
-    short shortValue = ((Number) value).shortValue();
-    typedValueDto.setValue(shortValue);
+  public ShortValue convertToTypedValue(UntypedValueImpl untypedValue) {
+    return Variables.shortValue((Short) untypedValue.getValue());
+  }
 
-    return super.deserializeTypedValue(typedValueDto);
+  public void writeValue(ShortValue shortValue, TypedValueField typedValueField) {
+    typedValueField.setValue(shortValue.getValue());
+  }
+
+  public ShortValue readValue(TypedValueField typedValueField) {
+    Short shortValue = null;
+
+    Object value = typedValueField.getValue();
+    if (value != null) {
+      Number numValue = (Number) value;
+      shortValue = numValue.shortValue();
+    }
+
+    return Variables.shortValue(shortValue);
   }
 
 }

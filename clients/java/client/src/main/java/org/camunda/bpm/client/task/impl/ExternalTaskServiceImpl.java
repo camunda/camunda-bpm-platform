@@ -12,14 +12,13 @@
  */
 package org.camunda.bpm.client.task.impl;
 
+import java.util.Map;
+
 import org.camunda.bpm.client.impl.EngineClient;
 import org.camunda.bpm.client.impl.EngineClientException;
 import org.camunda.bpm.client.impl.ExternalTaskClientLogger;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
-import org.camunda.bpm.engine.variable.VariableMap;
-
-import java.util.Map;
 
 /**
  * @author Tassilo Weidner

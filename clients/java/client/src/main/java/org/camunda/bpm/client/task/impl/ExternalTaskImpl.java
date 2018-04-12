@@ -12,15 +12,18 @@
  */
 package org.camunda.bpm.client.task.impl;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.camunda.bpm.client.impl.ExternalTaskClientLogger;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.camunda.bpm.client.impl.variable.TypedValueField;
+import org.camunda.bpm.client.impl.variable.VariableValue;
 import org.camunda.bpm.client.task.ExternalTask;
-import org.camunda.bpm.client.task.impl.dto.TypedValueDto;
 import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
-import java.util.Date;
-import java.util.Map;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * @author Tassilo Weidner
@@ -43,11 +46,11 @@ public class ExternalTaskImpl implements ExternalTask {
   protected String topicName;
   protected String tenantId;
   protected long priority;
-  protected Map<String, TypedValueDto> variables;
+  protected Map<String, TypedValueField> variables;
   protected String businessKey;
 
   @JsonIgnore
-  protected VariableMap receivedVariableMap;
+  protected Map<String, VariableValue> receivedVariableMap;
 
   public void setActivityId(String activityId) {
     this.activityId = activityId;
@@ -113,7 +116,7 @@ public class ExternalTaskImpl implements ExternalTask {
     this.priority = priority;
   }
 
-  public void setVariables(Map<String, TypedValueDto> variables) {
+  public void setVariables(Map<String, TypedValueField> variables) {
     this.variables = variables;
   }
 
@@ -121,12 +124,12 @@ public class ExternalTaskImpl implements ExternalTask {
     this.businessKey = businessKey;
   }
 
-  public Map<String, TypedValueDto> getVariables() {
+  public Map<String, TypedValueField> getVariables() {
     return variables;
   }
 
   @JsonIgnore
-  public void setReceivedVariableMap(VariableMap receivedVariableMap) {
+  public void setReceivedVariableMap(Map<String, VariableValue> receivedVariableMap) {
     this.receivedVariableMap = receivedVariableMap;
   }
 
@@ -213,26 +216,63 @@ public class ExternalTaskImpl implements ExternalTask {
   @JsonIgnore
   @Override
   public Map<String, Object> getAllVariables() {
-    return receivedVariableMap;
+    Map<String, Object> variables = new HashMap<>();
+
+    receivedVariableMap.forEach((variableName, variableValue) -> {
+      Object variable = getVariable(variableName);
+      variables.put(variableName, variable);
+    });
+
+    return variables;
+  }
+
+  @JsonIgnore
+  @Override
+  public <T> T getVariable(String variableName) {
+    T value = null;
+
+    VariableValue variableValue = receivedVariableMap.get(variableName);
+    if (variableValue != null) {
+      value = variableValue.getValue();
+    }
+
+    return value;
   }
 
   @JsonIgnore
   @Override
   public VariableMap getAllVariablesTyped() {
-    return receivedVariableMap;
+    return getAllVariablesTyped(true);
+  }
+
+  public VariableMap getAllVariablesTyped(boolean deserializeObjectValues) {
+    VariableMap variables = Variables.createVariables();
+
+    receivedVariableMap.forEach((variableName, variableValue) -> {
+      TypedValue typedValue = getVariableTyped(variableName, deserializeObjectValues);
+      variables.putValueTyped(variableName, typedValue);
+    });
+
+    return variables;
   }
 
   @JsonIgnore
   @Override
   public <T extends TypedValue> T getVariableTyped(String variableName) {
-    return receivedVariableMap.getValueTyped(variableName);
+    return getVariableTyped(variableName, true);
   }
 
   @JsonIgnore
   @Override
-  @SuppressWarnings("unchecked")
-  public <T> T getVariable(String variableName) {
-    return (T) receivedVariableMap.get(variableName);
+  public <T extends TypedValue> T getVariableTyped(String variableName, boolean deserializeObjectValues) {
+    T typedValue = null;
+
+    VariableValue variableValue = receivedVariableMap.get(variableName);
+    if (variableValue != null) {
+      typedValue = variableValue.getTypedValue(deserializeObjectValues);
+    }
+
+    return typedValue;
   }
 
   @Override

@@ -12,17 +12,16 @@
  */
 package org.camunda.bpm.client.helper;
 
-import org.camunda.bpm.client.impl.variable.mapper.primitive.DateValueMapper;
-import org.camunda.bpm.client.task.ExternalTask;
-import org.camunda.bpm.client.task.impl.ExternalTaskImpl;
-import org.camunda.bpm.client.task.impl.dto.TypedValueDto;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+
+import org.camunda.bpm.client.impl.variable.TypedValueField;
+import org.camunda.bpm.client.task.ExternalTask;
+import org.camunda.bpm.client.task.impl.ExternalTaskImpl;
 
 /**
  * @author Tassilo Weidner
@@ -90,7 +89,7 @@ public class MockProvider {
   public static final String DATE_VARIABLE_TYPE = "Date";
   public static final String DATE_VARIABLE_NAME = "dateVariable";
   public static final Date DATE_VARIABLE_VALUE = createDate("March 5, 2018");
-  public static final String DATE_VARIABLE_VALUE_SERIALIZED = new SimpleDateFormat(DateValueMapper.DATE_FORMAT).format(DATE_VARIABLE_VALUE);
+  public static final String DATE_VARIABLE_VALUE_SERIALIZED = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").format(DATE_VARIABLE_VALUE);
 
   public static final String BYTES_VARIABLE_TYPE = "Bytes";
   public static final String BYTES_VARIABLE_NAME = "bytesVariable";
@@ -100,7 +99,7 @@ public class MockProvider {
   public static final String NULL_VARIABLE_TYPE = "Null";
   public static final String NULL_VARIABLE_NAME = "nullVariable";
 
-  public static final Map<String, TypedValueDto> VARIABLES = createVariables();
+  public static final Map<String, TypedValueField> VARIABLES = createVariables();
   public static final String BUSINESS_KEY = "aBusinessKey";
 
   public static Date createDate(String date) {
@@ -113,80 +112,80 @@ public class MockProvider {
     return null;
   }
 
-  public static TypedValueDto createBooleanVariable() {
-    TypedValueDto typedValueDto = new TypedValueDto();
+  public static TypedValueField createBooleanVariable() {
+    TypedValueField typedValueDto = new TypedValueField();
     typedValueDto.setType(BOOLEAN_VARIABLE_TYPE);
     typedValueDto.setValue(BOOLEAN_VARIABLE_VALUE);
 
     return typedValueDto;
   }
 
-  public static TypedValueDto createShortVariable() {
-    TypedValueDto typedValueDto = new TypedValueDto();
+  public static TypedValueField createShortVariable() {
+    TypedValueField typedValueDto = new TypedValueField();
     typedValueDto.setType(SHORT_VARIABLE_TYPE);
     typedValueDto.setValue(SHORT_VARIABLE_VALUE);
 
     return typedValueDto;
   }
 
-  public static TypedValueDto createIntegerVariable() {
-    TypedValueDto typedValueDto = new TypedValueDto();
+  public static TypedValueField createIntegerVariable() {
+    TypedValueField typedValueDto = new TypedValueField();
     typedValueDto.setType(INTEGER_VARIABLE_TYPE);
     typedValueDto.setValue(INTEGER_VARIABLE_VALUE);
 
     return typedValueDto;
   }
 
-  public static TypedValueDto createLongVariable() {
-    TypedValueDto typedValueDto = new TypedValueDto();
+  public static TypedValueField createLongVariable() {
+    TypedValueField typedValueDto = new TypedValueField();
     typedValueDto.setType(LONG_VARIABLE_TYPE);
     typedValueDto.setValue(LONG_VARIABLE_VALUE);
 
     return typedValueDto;
   }
 
-  public static TypedValueDto createStringVariable() {
-    TypedValueDto typedValueDto = new TypedValueDto();
+  public static TypedValueField createStringVariable() {
+    TypedValueField typedValueDto = new TypedValueField();
     typedValueDto.setType(STRING_VARIABLE_TYPE);
     typedValueDto.setValue(STRING_VARIABLE_VALUE);
 
     return typedValueDto;
   }
 
-  public static TypedValueDto createDoubleVariable() {
-    TypedValueDto typedValueDto = new TypedValueDto();
+  public static TypedValueField createDoubleVariable() {
+    TypedValueField typedValueDto = new TypedValueField();
     typedValueDto.setType(DOUBLE_VARIABLE_TYPE);
     typedValueDto.setValue(DOUBLE_VARIABLE_VALUE);
 
     return typedValueDto;
   }
 
-  public static TypedValueDto createDateVariable() {
-    TypedValueDto typedValueDto = new TypedValueDto();
+  public static TypedValueField createDateVariable() {
+    TypedValueField typedValueDto = new TypedValueField();
     typedValueDto.setType(DATE_VARIABLE_TYPE);
     typedValueDto.setValue(DATE_VARIABLE_VALUE_SERIALIZED);
 
     return typedValueDto;
   }
 
-  public static TypedValueDto createBytesVariable() {
-    TypedValueDto typedValueDto = new TypedValueDto();
+  public static TypedValueField createBytesVariable() {
+    TypedValueField typedValueDto = new TypedValueField();
     typedValueDto.setType(BYTES_VARIABLE_TYPE);
     typedValueDto.setValue(BYTES_VARIABLE_VALUE_SERIALIZED);
 
     return typedValueDto;
   }
 
-  public static TypedValueDto createNullVariable() {
-    TypedValueDto typedValueDto = new TypedValueDto();
+  public static TypedValueField createNullVariable() {
+    TypedValueField typedValueDto = new TypedValueField();
     typedValueDto.setType(NULL_VARIABLE_TYPE);
     typedValueDto.setValue(null);
 
     return typedValueDto;
   }
 
-  public static Map<String, TypedValueDto> createVariables() {
-    Map<String, TypedValueDto> variables = new HashMap<>();
+  public static Map<String, TypedValueField> createVariables() {
+    Map<String, TypedValueField> variables = new HashMap<>();
     variables.put(BOOLEAN_VARIABLE_NAME, createBooleanVariable());
     variables.put(SHORT_VARIABLE_NAME, createShortVariable());
     variables.put(LONG_VARIABLE_NAME, createLongVariable());

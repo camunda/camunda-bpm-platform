@@ -19,6 +19,8 @@ package org.camunda.bpm.client.exception;
  */
 public class ExternalTaskClientException extends RuntimeException {
 
+  private static final long serialVersionUID = 1L;
+
   public ExternalTaskClientException(String message) {
     super(message);
   }

@@ -12,16 +12,30 @@
  */
 package org.camunda.bpm.client.impl.variable.mapper.primitive;
 
+import org.camunda.bpm.client.impl.variable.TypedValueField;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.impl.value.UntypedValueImpl;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.BooleanValue;
 
-/**
- * @author Tassilo Weidner
- */
 public class BooleanValueMapper extends PrimitiveValueMapper<BooleanValue> {
 
   public BooleanValueMapper() {
     super(ValueType.BOOLEAN);
+  }
+
+  public BooleanValue convertToTypedValue(UntypedValueImpl untypedValue) {
+    return Variables.booleanValue((Boolean) untypedValue.getValue());
+  }
+
+  public BooleanValue readValue(TypedValueField typedValueField) {
+    Boolean boolValue = (Boolean) typedValueField.getValue();
+    return Variables.booleanValue(boolValue);
+  }
+
+  public void writeValue(BooleanValue booleanValue, TypedValueField typedValueField) {
+    Boolean boolValue = booleanValue.getValue();
+    typedValueField.setValue(boolValue);
   }
 
 }

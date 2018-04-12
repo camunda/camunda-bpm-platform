@@ -12,26 +12,36 @@
  */
 package org.camunda.bpm.client.impl.variable.mapper.primitive;
 
-import org.camunda.bpm.client.impl.EngineClientException;
-import org.camunda.bpm.client.task.impl.dto.TypedValueDto;
+import org.camunda.bpm.client.impl.variable.TypedValueField;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.impl.value.UntypedValueImpl;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.IntegerValue;
 
-/**
- * @author Tassilo Weidner
- */
-public class IntegerValueMapper extends PrimitiveValueMapper<IntegerValue> {
+public class IntegerValueMapper extends NumberValueMapper<IntegerValue> {
 
   public IntegerValueMapper() {
     super(ValueType.INTEGER);
   }
 
-  public IntegerValue deserializeTypedValue(TypedValueDto typedValueDto) throws EngineClientException {
-    Object value = typedValueDto.getValue();
-    int intValue = ((Number) value).intValue();
-    typedValueDto.setValue(intValue);
+  public IntegerValue convertToTypedValue(UntypedValueImpl untypedValue) {
+    return Variables.integerValue((Integer) untypedValue.getValue());
+  }
 
-    return super.deserializeTypedValue(typedValueDto);
+  public void writeValue(IntegerValue intValue, TypedValueField typedValueField) {
+    typedValueField.setValue(intValue.getValue());
+  }
+
+  public IntegerValue readValue(TypedValueField typedValueField) {
+    Integer intValue = null;
+
+    Object value = typedValueField.getValue();
+    if (value != null) {
+      Number numValue = (Number) value;
+      intValue = numValue.intValue();
+    }
+
+    return Variables.integerValue(intValue);
   }
 
 }

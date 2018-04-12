@@ -19,6 +19,8 @@ package org.camunda.bpm.client.exception;
  */
 public class NotResumedException extends ExternalTaskClientException {
 
+  private static final long serialVersionUID = 1L;
+
   public NotResumedException(String message) {
     super(message);
   }

@@ -12,16 +12,28 @@
  */
 package org.camunda.bpm.client.impl.variable.mapper.primitive;
 
+import org.camunda.bpm.client.impl.variable.TypedValueField;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.impl.value.UntypedValueImpl;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.StringValue;
 
-/**
- * @author Tassilo Weidner
- */
 public class StringValueMapper extends PrimitiveValueMapper<StringValue> {
 
   public StringValueMapper() {
     super(ValueType.STRING);
+  }
+
+  public StringValue convertToTypedValue(UntypedValueImpl untypedValue) {
+    return Variables.stringValue((String) untypedValue.getValue());
+  }
+
+  public StringValue readValue(TypedValueField typedValueField) {
+    return Variables.stringValue((String) typedValueField.getValue());
+  }
+
+  public void writeValue(StringValue stringValue, TypedValueField typedValueField) {
+    typedValueField.setValue(stringValue.getValue());
   }
 
 }

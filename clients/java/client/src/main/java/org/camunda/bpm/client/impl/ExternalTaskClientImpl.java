@@ -12,17 +12,10 @@
  */
 package org.camunda.bpm.client.impl;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.client.ExternalTaskClient;
-import org.camunda.bpm.client.impl.variable.VariableMappers;
-import org.camunda.bpm.client.interceptor.ClientRequestInterceptor;
-import org.camunda.bpm.client.interceptor.impl.RequestInterceptorHandler;
 import org.camunda.bpm.client.topic.TopicSubscriptionBuilder;
 import org.camunda.bpm.client.topic.impl.TopicSubscriptionBuilderImpl;
 import org.camunda.bpm.client.topic.impl.TopicSubscriptionManager;
-
-import java.util.List;
 
 /**
  * @author Tassilo Weidner
@@ -30,32 +23,9 @@ import java.util.List;
 public class ExternalTaskClientImpl implements ExternalTaskClient {
 
   protected TopicSubscriptionManager topicSubscriptionManager;
-  protected RequestInterceptorHandler requestInterceptorHandler;
 
-  protected ExternalTaskClientImpl(ExternalTaskClientBuilderImpl clientBuilder) {
-    String workerId = clientBuilder.getWorkerId();
-    String baseUrl = clientBuilder.getBaseUrl();
-    int maxTasks = clientBuilder.getMaxTasks();
-    Long asyncResponseTimeout = clientBuilder.getAsyncResponseTimeout();
-    long lockDuration = clientBuilder.getLockDuration();
-
-    List<ClientRequestInterceptor> interceptors = clientBuilder.getInterceptors();
-    requestInterceptorHandler = new RequestInterceptorHandler(interceptors);
-
-    ObjectMapper objectMapper = initObjectMapper();
-    VariableMappers variableMappers = new VariableMappers(objectMapper);
-
-    EngineClient engineClient = new EngineClient(workerId, maxTasks, asyncResponseTimeout, baseUrl, requestInterceptorHandler, variableMappers, objectMapper);
-    topicSubscriptionManager = new TopicSubscriptionManager(engineClient, variableMappers, lockDuration);
-
-    if (clientBuilder.getBackOffStrategy() != null) {
-      topicSubscriptionManager.setBackOffStrategy(clientBuilder.getBackOffStrategy());
-    }
-
-    boolean isAutoFetchingEnabled = clientBuilder.isAutoFetchingEnabled();
-    if (isAutoFetchingEnabled) {
-      topicSubscriptionManager.start();
-    }
+  public ExternalTaskClientImpl(TopicSubscriptionManager topicSubscriptionManager) {
+    this.topicSubscriptionManager = topicSubscriptionManager;
   }
 
   public TopicSubscriptionBuilder subscribe(String topicName) {
@@ -76,19 +46,6 @@ public class ExternalTaskClientImpl implements ExternalTaskClient {
 
   public TopicSubscriptionManager getTopicSubscriptionManager() {
     return topicSubscriptionManager;
-  }
-
-  public RequestInterceptorHandler getRequestInterceptorHandler() {
-    return requestInterceptorHandler;
-  }
-
-  protected ObjectMapper initObjectMapper() {
-    ObjectMapper objectMapper = new ObjectMapper();
-    objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    objectMapper.configure(DeserializationFeature.FAIL_ON_UNRESOLVED_OBJECT_IDS, false);
-    objectMapper.configure(DeserializationFeature.FAIL_ON_INVALID_SUBTYPE, false);
-
-    return objectMapper;
   }
 
 }
