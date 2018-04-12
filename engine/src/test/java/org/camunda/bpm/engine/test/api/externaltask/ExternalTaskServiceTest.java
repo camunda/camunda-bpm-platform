@@ -52,7 +52,9 @@ import org.junit.Assert;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
@@ -2234,6 +2236,308 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
     LockedExternalTask task = tasks.get(0);
     assertNotNull(task.getId());
     assertEquals(0, task.getVariables().size());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/parallelExternalTaskProcess.bpmn20.xml")
+  public void testQueryByBusinessKey() {
+    // given
+    String topicName1 = "topic1";
+    String topicName2 = "topic2";
+    String topicName3 = "topic3";
+
+    String businessKey1 = "testBusinessKey1";
+    String businessKey2 = "testBusinessKey2";
+
+    Long lockDuration = 60L * 1000L;
+
+    runtimeService.startProcessInstanceByKey("parallelExternalTaskProcess", businessKey1);
+    runtimeService.startProcessInstanceByKey("parallelExternalTaskProcess", businessKey2);
+
+    //when
+    List<LockedExternalTask> topicTasks = externalTaskService
+        .fetchAndLock(3, "externalWorkerId")
+        .topic(topicName1, lockDuration)
+          .businessKey(businessKey1)
+        .topic(topicName2, lockDuration)
+          .businessKey(businessKey2)
+        .topic(topicName3, lockDuration)
+          .businessKey("fakeBusinessKey")
+        .execute();
+
+    //then
+    assertEquals(2, topicTasks.size());
+
+    for (LockedExternalTask externalTask : topicTasks) {
+      ProcessInstance pi = runtimeService.createProcessInstanceQuery()
+          .processInstanceId(externalTask.getProcessInstanceId())
+          .singleResult();
+      if (externalTask.getTopicName().equals(topicName1)) {
+        assertEquals(businessKey1, pi.getBusinessKey());
+      } else if (externalTask.getTopicName().equals(topicName2)){
+        assertEquals(businessKey2, pi.getBusinessKey());
+      } else {
+        fail("No other topic name values should be available!");
+      }
+    }
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/parallelExternalTaskProcess.bpmn20.xml")
+  public void testQueryByBusinessKeyLocking() {
+    // given
+    String topicName1 = "topic1";
+    String topicName2 = "topic2";
+    String topicName3 = "topic3";
+
+    String businessKey1 = "testBusinessKey1";
+    String businessKey2 = "testBusinessKey2";
+
+    Long lockDuration = 60L * 1000L;
+
+    runtimeService.startProcessInstanceByKey("parallelExternalTaskProcess", businessKey1);
+    runtimeService.startProcessInstanceByKey("parallelExternalTaskProcess", businessKey2);
+
+    //when
+    List<LockedExternalTask> lockedTopicTasks = externalTaskService
+        .fetchAndLock(3, "externalWorkerId")
+        .topic(topicName1, lockDuration)
+          .businessKey(businessKey1)
+        .topic(topicName2, lockDuration)
+          .businessKey(businessKey2)
+        .topic(topicName3, lockDuration)
+          .businessKey("fakeBusinessKey")
+        .execute();
+
+    List<LockedExternalTask> topicTasks = externalTaskService
+        .fetchAndLock(3, "externalWorkerId")
+        .topic(topicName1, lockDuration)
+          .businessKey(businessKey1)
+        .topic(topicName2, 2 * lockDuration)
+          .businessKey(businessKey2)
+        .topic(topicName3, 2 * lockDuration)
+          .businessKey(businessKey1)
+        .execute();
+
+    //then
+    assertEquals(2, lockedTopicTasks.size());
+    assertEquals(1, topicTasks.size());
+
+    LockedExternalTask externalTask = topicTasks.get(0);
+    ProcessInstance pi = runtimeService.createProcessInstanceQuery()
+      .processInstanceId(externalTask.getProcessInstanceId())
+      .singleResult();
+
+    assertEquals(businessKey1, pi.getBusinessKey());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.testVariableValueTopicQuery.bpmn20.xml")
+  public void testTopicQueryByVariableValue() {
+    // given
+    String topicName1 = "testTopic1";
+    String topicName2 = "testTopic2";
+
+    String variableName = "testVariable";
+    String variableValue1 = "testValue1";
+    String variableValue2 = "testValue2";
+
+    Map<String, Object> variables = new HashMap<String, Object>();
+
+    Long lockDuration = 60L * 1000L;
+
+    //when
+    variables.put(variableName, variableValue1);
+    runtimeService.startProcessInstanceByKey("parallelExternalTaskProcessTopicQueryVariableValues", variables);
+
+    variables.put(variableName, variableValue2);
+    runtimeService.startProcessInstanceByKey("parallelExternalTaskProcessTopicQueryVariableValues", variables);
+
+    List<LockedExternalTask> topicTasks = externalTaskService
+        .fetchAndLock(3, "externalWorkerId")
+        .topic(topicName1, lockDuration)
+          .processInstanceVariableEquals(variableName, variableValue1)
+        .topic(topicName2, lockDuration)
+          .processInstanceVariableEquals(variableName, variableValue2)
+        .execute();
+
+    //then
+    assertEquals(2, topicTasks.size());
+
+    for (LockedExternalTask externalTask : topicTasks) {
+      if (externalTask.getTopicName().equals(topicName1)) {
+        assertEquals(variableValue1, externalTask.getVariables().get(variableName));
+      } else if (externalTask.getTopicName().equals(topicName2)){
+        assertEquals(variableValue2, externalTask.getVariables().get(variableName));
+      } else {
+        fail("No other topic name values should be available!");
+      }
+    }
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.testVariableValueTopicQuery.bpmn20.xml")
+  public void testTopicQueryByVariableValueLocking() {
+    // given
+    String topicName1 = "testTopic1";
+    String topicName2 = "testTopic2";
+    String topicName3 = "testTopic3";
+
+    String variableName = "testVariable";
+    String variableValue1 = "testValue1";
+    String variableValue2 = "testValue2";
+
+    Map<String, Object> variables = new HashMap<String, Object>();
+
+    Long lockDuration = 60L * 1000L;
+
+    //when
+    variables.put(variableName, variableValue1);
+    runtimeService.startProcessInstanceByKey("parallelExternalTaskProcessTopicQueryVariableValues", variables);
+
+    variables.put(variableName, variableValue2);
+    runtimeService.startProcessInstanceByKey("parallelExternalTaskProcessTopicQueryVariableValues", variables);
+
+    List<LockedExternalTask> lockedTopicTasks = externalTaskService
+        .fetchAndLock(3, "externalWorkerId")
+        .topic(topicName1, lockDuration)
+          .processInstanceVariableEquals(variableName, variableValue1)
+        .topic(topicName2, lockDuration)
+          .processInstanceVariableEquals(variableName, variableValue2)
+        .execute();
+
+    List<LockedExternalTask> topicTasks = externalTaskService
+        .fetchAndLock(3, "externalWorkerId")
+        .topic(topicName1, 2 * lockDuration)
+          .processInstanceVariableEquals(variableName, variableValue1)
+        .topic(topicName2, 2 * lockDuration)
+          .processInstanceVariableEquals(variableName, variableValue2)
+        .topic(topicName3, lockDuration)
+          .processInstanceVariableEquals(variableName, variableValue2)
+        .execute();
+
+    //then
+    assertEquals(2, lockedTopicTasks.size());
+    assertEquals(1, topicTasks.size());
+
+    LockedExternalTask externalTask = topicTasks.get(0);
+    assertEquals(topicName3, externalTask.getTopicName());
+    assertEquals(variableValue2, externalTask.getVariables().get(variableName));
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.testVariableValueTopicQuery.bpmn20.xml")
+  public void testTopicQueryByVariableValues() {
+    // given
+    String topicName1 = "testTopic1";
+    String topicName2 = "testTopic2";
+    String topicName3 = "testTopic3";
+
+    String variableName1 = "testVariable1";
+    String variableName2 = "testVariable2";
+    String variableName3 = "testVariable3";
+
+    String variableValue1 = "testValue1";
+    String variableValue2 = "testValue2";
+    String variableValue3 = "testValue3";
+    String variableValue4 = "testValue4";
+    String variableValue5 = "testValue5";
+    String variableValue6 = "testValue6";
+
+    Map<String, Object> variables = new HashMap<String, Object>();
+
+    Long lockDuration = 60L * 1000L;
+
+    //when
+    variables.put(variableName1, variableValue1);
+    variables.put(variableName2, variableValue2);
+    variables.put(variableName3, variableValue3);
+    runtimeService.startProcessInstanceByKey("parallelExternalTaskProcessTopicQueryVariableValues", variables);
+
+    variables.put(variableName1, variableValue4);
+    variables.put(variableName2, variableValue5);
+    variables.put(variableName3, variableValue6);
+    runtimeService.startProcessInstanceByKey("parallelExternalTaskProcessTopicQueryVariableValues", variables);
+
+    List<LockedExternalTask> topicTasks = externalTaskService
+        .fetchAndLock(3, "externalWorkerId")
+        .topic(topicName1, lockDuration)
+          .processInstanceVariableEquals(variableName1, variableValue1)
+          .processInstanceVariableEquals(variableName2, variableValue2)
+        .topic(topicName2, lockDuration)
+          .processInstanceVariableEquals(variableName2, variableValue5)
+          .processInstanceVariableEquals(variableName3, variableValue6)
+        .topic(topicName3, lockDuration)
+          .processInstanceVariableEquals(variableName1, "fakeVariableValue")
+        .execute();
+
+    //then
+    assertEquals(2, topicTasks.size());
+
+    for (LockedExternalTask externalTask : topicTasks) {
+      // topic names are not always in the same order
+      if (externalTask.getTopicName().equals(topicName1)) {
+        assertEquals(variableValue1, externalTask.getVariables().get(variableName1));
+        assertEquals(variableValue2, externalTask.getVariables().get(variableName2));
+      } else if (externalTask.getTopicName().equals(topicName2)){
+        assertEquals(variableValue5, externalTask.getVariables().get(variableName2));
+        assertEquals(variableValue6, externalTask.getVariables().get(variableName3));
+      } else {
+        fail("No other topic name values should be available!");
+      }
+
+    }
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.testVariableValueTopicQuery.bpmn20.xml")
+  public void testTopicQueryByBusinessKeyAndVariableValue() {
+    // given
+    String topicName1 = "testTopic1";
+    String topicName2 = "testTopic2";
+    String topicName3 = "testTopic3";
+
+    String businessKey1 = "testBusinessKey1";
+    String businessKey2 = "testBusinessKey2";
+
+    String variableName = "testVariable1";
+    String variableValue1 = "testValue1";
+    String variableValue2 = "testValue2";
+
+    Map<String, Object> variables = new HashMap<String, Object>();
+
+    Long lockDuration = 60L * 1000L;
+
+    //when
+    variables.put(variableName, variableValue1);
+    runtimeService.startProcessInstanceByKey("parallelExternalTaskProcessTopicQueryVariableValues", businessKey1, variables);
+    variables.put(variableName, variableValue2);
+    runtimeService.startProcessInstanceByKey("parallelExternalTaskProcessTopicQueryVariableValues", businessKey2, variables);
+
+    List<LockedExternalTask> topicTasks = externalTaskService
+        .fetchAndLock(3, "externalWorkerId")
+        .topic(topicName1, lockDuration)
+          .businessKey(businessKey1)
+          .processInstanceVariableEquals(variableName, variableValue1)
+        .topic(topicName2, lockDuration)
+          .businessKey(businessKey2)
+          .processInstanceVariableEquals(variableName, variableValue2)
+        .topic(topicName3, lockDuration)
+          .businessKey("fakeBusinessKey")
+        .execute();
+
+    //then
+    assertEquals(2, topicTasks.size());
+
+    for (LockedExternalTask externalTask : topicTasks) {
+      ProcessInstance pi = runtimeService.createProcessInstanceQuery()
+          .processInstanceId(externalTask.getProcessInstanceId())
+          .singleResult();
+      // topic names are not always in the same order
+      if (externalTask.getTopicName().equals(topicName1)) {
+        assertEquals(businessKey1, pi.getBusinessKey());
+        assertEquals(variableValue1, externalTask.getVariables().get(variableName));
+      } else if (externalTask.getTopicName().equals(topicName2)){
+        assertEquals(businessKey2, pi.getBusinessKey());
+        assertEquals(variableValue2, externalTask.getVariables().get(variableName));
+      } else {
+        fail("No other topic name values should be available!");
+      }
+    }
   }
 
   protected Date nowPlus(long millis) {
