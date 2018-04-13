@@ -36,14 +36,16 @@ public class HistoryCleanupOnConsecutiveEngineBootstrap {
     ProcessEngineConfiguration processEngineConfiguration = ProcessEngineConfiguration
       .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/history/no-batchwindow.camunda.cfg.xml");
     processEngineConfiguration.setProcessEngineName(FIRST_ENGINE_NAME);
-    ProcessEngine processEngine = processEngineConfiguration.buildProcessEngine();
-    processEngine.close();
+    ProcessEngine processEngine1 = processEngineConfiguration.buildProcessEngine();
+    processEngine1.close();
 
     processEngineConfiguration = ProcessEngineConfiguration
       .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/history/batchwindow.camunda.cfg.xml");
     processEngineConfiguration.setProcessEngineName(SECOND_ENGINE_NAME);
-    processEngineConfiguration.buildProcessEngine();
+    ProcessEngine processEngine2 = processEngineConfiguration.buildProcessEngine();
 
     assertNotNull(ProcessEngines.getProcessEngine(SECOND_ENGINE_NAME));
+
+    processEngine2.close();
   }
 }
