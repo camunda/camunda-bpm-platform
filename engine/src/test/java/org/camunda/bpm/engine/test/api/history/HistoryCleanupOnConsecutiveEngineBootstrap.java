@@ -27,25 +27,34 @@ import static org.junit.Assert.assertNotNull;
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
 public class HistoryCleanupOnConsecutiveEngineBootstrap {
 
-  private static final String FIRST_ENGINE_NAME = "engineWithoutHistoryCleanupBatchWindow";
-  private static final String SECOND_ENGINE_NAME = "engineWithHistoryCleanupBatchWindow";
+  private static final String ENGINE_NAME = "engineWithHistoryCleanupBatchWindow";
 
   @Test
   public void testConsecutiveEngineBootstrapHistoryCleanupJobReconfiguration() {
 
+    // given
+    // create history cleanup job
+    ProcessEngineConfiguration
+      .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/history/batchwindow.camunda.cfg.xml")
+      .buildProcessEngine()
+      .close();
+
+    // when
+    // suspend history cleanup job
+    ProcessEngineConfiguration
+      .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/history/no-batchwindow.camunda.cfg.xml")
+      .buildProcessEngine()
+      .close();
+
+    // then
+    // reconfigure history cleanup job
     ProcessEngineConfiguration processEngineConfiguration = ProcessEngineConfiguration
-      .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/history/no-batchwindow.camunda.cfg.xml");
-    processEngineConfiguration.setProcessEngineName(FIRST_ENGINE_NAME);
-    ProcessEngine processEngine1 = processEngineConfiguration.buildProcessEngine();
-    processEngine1.close();
-
-    processEngineConfiguration = ProcessEngineConfiguration
       .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/history/batchwindow.camunda.cfg.xml");
-    processEngineConfiguration.setProcessEngineName(SECOND_ENGINE_NAME);
-    ProcessEngine processEngine2 = processEngineConfiguration.buildProcessEngine();
+    processEngineConfiguration.setProcessEngineName(ENGINE_NAME);
+    ProcessEngine processEngine = processEngineConfiguration.buildProcessEngine();
 
-    assertNotNull(ProcessEngines.getProcessEngine(SECOND_ENGINE_NAME));
+    assertNotNull(ProcessEngines.getProcessEngine(ENGINE_NAME));
 
-    processEngine2.close();
+    processEngine.close();
   }
 }
