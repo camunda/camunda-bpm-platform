@@ -45,6 +45,7 @@ public class MockExternalTaskBuilder {
   protected String tenantId;
   protected VariableMap variables = Variables.createVariables();
   protected long priority;
+  protected String businessKey;
 
   public MockExternalTaskBuilder activityId(String activityId) {
     this.activityId = activityId;
@@ -120,9 +121,14 @@ public class MockExternalTaskBuilder {
     this.variables.putValueTyped(variableName, value);
     return this;
   }
-  
+
   public MockExternalTaskBuilder priority(long priority) {
     this.priority = priority;
+    return this;
+  }
+
+  public MockExternalTaskBuilder businessKey(String businessKey) {
+    this.businessKey = businessKey;
     return this;
   }
 
@@ -143,6 +149,7 @@ public class MockExternalTaskBuilder {
     when(task.getWorkerId()).thenReturn(workerId);
     when(task.getTenantId()).thenReturn(tenantId);
     when(task.getPriority()).thenReturn(priority);
+    when(task.getBusinessKey()).thenReturn(businessKey);
 
     return task;
   }

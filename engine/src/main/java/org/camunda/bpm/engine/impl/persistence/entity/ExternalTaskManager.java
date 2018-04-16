@@ -52,7 +52,7 @@ public class ExternalTaskManager extends AbstractManager {
 
   @SuppressWarnings("unchecked")
   public List<ExternalTaskEntity> findExternalTasksByProcessInstanceId(String processInstanceId) {
-    return getDbEntityManager().selectList("selectExternalTasksByExecutionId", processInstanceId);
+    return getDbEntityManager().selectList("selectExternalTasksByProcessInstanceId", processInstanceId);
   }
 
   public List<ExternalTaskEntity> selectExternalTasksForTopics(Collection<TopicFetchInstruction> queryFilters, boolean filterByBusinessKey, int maxResults, boolean usePriority) {

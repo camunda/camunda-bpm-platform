@@ -76,7 +76,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 
 import com.jayway.restassured.http.ContentType;
-import org.mockito.Mock;
 
 /**
  * @author Thorben Lindhauer
@@ -1020,6 +1019,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
       .body("workerId", equalTo(MockProvider.EXTERNAL_TASK_WORKER_ID))
       .body("tenantId", equalTo(MockProvider.EXAMPLE_TENANT_ID))
       .body("priority", equalTo(MockProvider.EXTERNAL_TASK_PRIORITY))
+      .body("businessKey", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY))
     .when()
       .get(SINGLE_EXTERNAL_TASK_URL);
   }
@@ -1443,7 +1443,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
 
   @Test
   public void testExtendLockOnExternalTask() {
-    
+
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("workerId", "workerId");
     parameters.put("newDuration", "1000");

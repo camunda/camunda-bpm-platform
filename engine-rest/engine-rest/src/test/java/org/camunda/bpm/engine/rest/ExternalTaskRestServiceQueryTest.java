@@ -136,6 +136,7 @@ public class ExternalTaskRestServiceQueryTest extends AbstractRestServiceTest {
     String workerId = from(content).getString("[0].workerId");
     String tenantId = from(content).getString("[0].tenantId");
     long priority = from(content).getLong("[0].priority");
+    String businessKey = from(content).getString("[0].businessKey");
 
     Assert.assertEquals(MockProvider.EXAMPLE_ACTIVITY_ID, activityId);
     Assert.assertEquals(MockProvider.EXAMPLE_ACTIVITY_INSTANCE_ID, activityInstanceId);
@@ -152,6 +153,7 @@ public class ExternalTaskRestServiceQueryTest extends AbstractRestServiceTest {
     Assert.assertEquals(MockProvider.EXTERNAL_TASK_WORKER_ID, workerId);
     Assert.assertEquals(MockProvider.EXAMPLE_TENANT_ID, tenantId);
     Assert.assertEquals(MockProvider.EXTERNAL_TASK_PRIORITY, priority);
+    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY, businessKey);
   }
 
   @Test

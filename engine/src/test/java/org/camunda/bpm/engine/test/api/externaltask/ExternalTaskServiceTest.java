@@ -2273,8 +2273,10 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
           .singleResult();
       if (externalTask.getTopicName().equals(topicName1)) {
         assertEquals(businessKey1, pi.getBusinessKey());
+        assertEquals(businessKey1, externalTask.getBusinessKey());
       } else if (externalTask.getTopicName().equals(topicName2)){
         assertEquals(businessKey2, pi.getBusinessKey());
+        assertEquals(businessKey2, externalTask.getBusinessKey());
       } else {
         fail("No other topic name values should be available!");
       }
@@ -2327,6 +2329,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
       .singleResult();
 
     assertEquals(businessKey1, pi.getBusinessKey());
+    assertEquals(businessKey1, externalTask.getBusinessKey());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.testVariableValueTopicQuery.bpmn20.xml")

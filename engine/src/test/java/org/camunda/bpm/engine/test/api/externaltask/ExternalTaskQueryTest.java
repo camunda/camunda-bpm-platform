@@ -554,6 +554,34 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(firstTask.getId(), resultTask.getId());
   }
 
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  public void testQueryByBusinessKey() {
+    // given
+    String businessKey = "theUltimateKey";
+    runtimeService.startProcessInstanceByKey("oneExternalTaskProcess", businessKey);
+
+    // when
+    ExternalTask externalTask = externalTaskService.createExternalTaskQuery().singleResult();
+
+    // then
+    assertNotNull(externalTask);
+    assertEquals(businessKey, externalTask.getBusinessKey());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  public void testQueryListByBusinessKey() {
+    for (int i = 0; i < 5; i++) {
+      runtimeService.startProcessInstanceByKey("oneExternalTaskProcess", "businessKey" + i);
+    }
+
+    assertEquals(5, externalTaskService.createExternalTaskQuery().count());
+    List<ExternalTask> list = externalTaskService.createExternalTaskQuery().list();
+    for (ExternalTask externalTask : list) {
+      assertNotNull(externalTask.getBusinessKey());
+    }
+  }
+
+
   protected List<ProcessInstance> startInstancesByKey(String processDefinitionKey, int number) {
     List<ProcessInstance> processInstances = new ArrayList<ProcessInstance>();
     for (int i = 0; i < number; i++) {

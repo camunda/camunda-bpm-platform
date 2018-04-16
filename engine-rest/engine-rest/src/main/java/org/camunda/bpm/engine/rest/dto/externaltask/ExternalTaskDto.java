@@ -38,6 +38,7 @@ public class ExternalTaskDto {
   protected String topicName;
   protected String tenantId;
   protected long priority;
+  protected String businessKey;
 
   public String getActivityId() {
     return activityId;
@@ -90,6 +91,10 @@ public class ExternalTaskDto {
     return errorDetails;
   }
 
+  public String getBusinessKey() {
+    return businessKey;
+  }
+
   public static ExternalTaskDto fromExternalTask(ExternalTask task) {
     ExternalTaskDto dto = new ExternalTaskDto();
     dto.activityId = task.getActivityId();
@@ -107,6 +112,7 @@ public class ExternalTaskDto {
     dto.workerId = task.getWorkerId();
     dto.tenantId = task.getTenantId();
     dto.priority = task.getPriority();
+    dto.businessKey = task.getBusinessKey();
 
     return dto;
   }

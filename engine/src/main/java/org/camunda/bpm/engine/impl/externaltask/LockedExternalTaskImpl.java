@@ -44,6 +44,7 @@ public class LockedExternalTaskImpl implements LockedExternalTask {
   protected String tenantId;
   protected long priority;
   protected VariableMapImpl variables;
+  protected String businessKey;
 
   public String getId() {
     return id;
@@ -110,6 +111,11 @@ public class LockedExternalTaskImpl implements LockedExternalTask {
     return priority;
   }
 
+  @Override
+  public String getBusinessKey() {
+    return businessKey;
+  }
+
   /**
    * Construct representation of locked ExternalTask from corresponding entity.
    * During mapping variables will be collected,during collection variables will not be deserialized
@@ -141,6 +147,7 @@ public class LockedExternalTaskImpl implements LockedExternalTask {
     result.processDefinitionKey = externalTaskEntity.getProcessDefinitionKey();
     result.tenantId = externalTaskEntity.getTenantId();
     result.priority = externalTaskEntity.getPriority();
+    result.businessKey = externalTaskEntity.getBusinessKey();
 
     ExecutionEntity execution = externalTaskEntity.getExecution();
     result.variables = new VariableMapImpl();

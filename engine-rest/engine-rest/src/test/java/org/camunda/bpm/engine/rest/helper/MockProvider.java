@@ -2860,7 +2860,8 @@ public abstract class MockProvider {
       .topicName(EXTERNAL_TASK_TOPIC_NAME)
       .workerId(EXTERNAL_TASK_WORKER_ID)
       .tenantId(EXAMPLE_TENANT_ID)
-      .priority(EXTERNAL_TASK_PRIORITY);
+      .priority(EXTERNAL_TASK_PRIORITY)
+      .businessKey(EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY);
 
   }
 

@@ -23,6 +23,7 @@
     <result property="activityInstanceId" column="ACT_INST_ID_" jdbcType="VARCHAR" />
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     <result property="priority" column="PRIORITY_" jdbcType="BIGINT" />
+    <result property="businessKey" column="BUSINESS_KEY_" jdbcType="VARCHAR" />
     <!-- note: if you add mappings here, make sure to select the columns in 'columnSelection' -->
   </resultMap>
 
@@ -146,11 +147,11 @@
     ${limitBefore}
     select ${distinct} RES.*
     ${limitBetween}
+    from (
+    select RES.*, PI.BUSINESS_KEY_
     from ${prefix}ACT_RU_EXT_TASK RES
 
-    <if test="parameter != null &amp;&amp; parameter.businessKeyFilter">
-      inner join ${prefix}ACT_RU_EXECUTION REX on RES.PROC_INST_ID_ = REX.PROC_INST_ID_
-    </if>
+    left join ${prefix}ACT_RU_EXECUTION PI on RES.PROC_INST_ID_ = PI.ID_
 
     <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" /> 
@@ -183,7 +184,7 @@
         <foreach collection="parameter.topics" open="(" close=")" separator="or" item="topicFilters">
           RES.TOPIC_NAME_ like #{topicFilters.topicName}
           <if test="parameter.businessKeyFilter">
-            and REX.BUSINESS_KEY_ = #{topicFilters.businessKey}
+            and PI.BUSINESS_KEY_ = #{topicFilters.businessKey}
           </if>
           <if test="topicFilters.filterVariables.size() > 0">
             and RES.PROC_INST_ID_ in (
@@ -206,6 +207,7 @@
     </where>
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
+    ) RES
     <if test="parameter.applyOrdering">
       ${orderBy}
     </if>
@@ -237,10 +239,14 @@
     select count(distinct RES.ID_)
     <include refid="selectExternalTaskByQueryCriteriaSql"/>
   </select>
-  
+
   <sql id="selectExternalTaskByQueryCriteriaSql">
+    from (
+    select RES.*, PI.BUSINESS_KEY_
     from ${prefix}ACT_RU_EXT_TASK RES
     
+    left join ${prefix}ACT_RU_EXECUTION PI on RES.PROC_INST_ID_ = PI.ID_
+
     <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" /> 
       AUTH ON (
@@ -334,6 +340,7 @@
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
     </where>
+    ) RES
   </sql>
   
   <sql id="columnSelection">
@@ -353,7 +360,8 @@
     RES.ACT_INST_ID_,
     RES.SUSPENSION_STATE_,
     RES.TENANT_ID_,
-    RES.PRIORITY_
+    RES.PRIORITY_,
+    RES.BUSINESS_KEY_
   </sql>
 
 </mapper>
