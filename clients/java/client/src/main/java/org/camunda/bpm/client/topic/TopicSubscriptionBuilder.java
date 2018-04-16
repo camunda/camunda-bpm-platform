@@ -46,7 +46,7 @@ public interface TopicSubscriptionBuilder {
   TopicSubscriptionBuilder variables(String... variableNames);
 
   /**
-   * @param businessKey to filter for external tasks which are supposed be fetched and locked
+   * @param businessKey to filter for external tasks that are supposed to be fetched and locked
    * @return the builder
    */
   TopicSubscriptionBuilder businessKey(String businessKey);

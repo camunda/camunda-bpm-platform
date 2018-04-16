@@ -52,7 +52,7 @@ public interface TopicSubscription {
   List<String> getVariableNames();
 
   /**
-   * @return the business key associated with external tasks which are supposed be fetched and locked
+   * @return the business key associated with the external tasks which are supposed to be fetched and locked
    */
   String getBusinessKey();
 
