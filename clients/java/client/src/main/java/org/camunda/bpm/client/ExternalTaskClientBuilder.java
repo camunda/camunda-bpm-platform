@@ -97,10 +97,10 @@ public interface ExternalTaskClientBuilder {
    * Adds a back off strategy to the client for defining the wait time until a new request is sent.
    * This information is optional.
    *
-   * @param backOffStrategy to be used to generate/calculate the wait time between requests
+   * @param backoffStrategy to be used to generate/calculate the wait time between requests
    * @return the builder
    */
-  ExternalTaskClientBuilder backOff(ClientBackOffStrategy backOffStrategy);
+  ExternalTaskClientBuilder backoffStrategy(ClientBackoffStrategy backoffStrategy);
 
   /**
    * Bootstraps the Camunda client

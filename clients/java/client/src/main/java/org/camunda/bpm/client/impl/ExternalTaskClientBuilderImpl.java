@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import org.camunda.bpm.client.ClientBackOffStrategy;
+import org.camunda.bpm.client.ClientBackoffStrategy;
 import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.client.ExternalTaskClientBuilder;
 import org.camunda.bpm.client.impl.variable.TypedValues;
@@ -76,7 +76,7 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
 
   protected List<ClientRequestInterceptor> interceptors;
   protected boolean isAutoFetchingEnabled;
-  protected ClientBackOffStrategy backOffStrategy;
+  protected ClientBackoffStrategy backoffStrategy;
 
   public ExternalTaskClientBuilderImpl() {
     // default values
@@ -122,8 +122,8 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
     return this;
   }
 
-  public ExternalTaskClientBuilder backOff(ClientBackOffStrategy backOffStrategy) {
-    this.backOffStrategy = backOffStrategy;
+  public ExternalTaskClientBuilder backoffStrategy(ClientBackoffStrategy backoffStrategy) {
+    this.backoffStrategy = backoffStrategy;
     return this;
   }
 
@@ -234,9 +234,7 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
   protected void initTopicSubscriptionManager() {
     topicSubscriptionManager = new TopicSubscriptionManager(engineClient, typedValues, lockDuration);
 
-    if (getBackOffStrategy() != null) {
-      topicSubscriptionManager.setBackOffStrategy(getBackOffStrategy());
-    }
+    topicSubscriptionManager.setBackoffStrategy(getBackoffStrategy());
 
     if (isAutoFetchingEnabled()) {
       topicSubscriptionManager.start();
@@ -344,8 +342,8 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
     return isAutoFetchingEnabled;
   }
 
-  protected ClientBackOffStrategy getBackOffStrategy() {
-    return backOffStrategy;
+  protected ClientBackoffStrategy getBackoffStrategy() {
+    return backoffStrategy;
   }
 
   public String getDefaultSerializationFormat() {

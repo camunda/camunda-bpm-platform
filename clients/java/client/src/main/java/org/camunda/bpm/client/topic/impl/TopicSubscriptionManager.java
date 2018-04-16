@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.camunda.bpm.client.ClientBackOffStrategy;
+import org.camunda.bpm.client.ClientBackoffStrategy;
 import org.camunda.bpm.client.exception.ExternalTaskClientException;
 import org.camunda.bpm.client.impl.EngineClient;
 import org.camunda.bpm.client.impl.EngineClientException;
@@ -50,7 +50,7 @@ public class TopicSubscriptionManager implements Runnable {
   protected boolean isRunning;
   protected Thread thread;
 
-  protected ClientBackOffStrategy backOffStrategy;
+  protected ClientBackoffStrategy backoffStrategy;
 
   protected TypedValues typedValues;
 
@@ -103,14 +103,8 @@ public class TopicSubscriptionManager implements Runnable {
         }
       });
 
-      try {
-        if (backOffStrategy != null && externalTasks.isEmpty()) {
-          backOffStrategy.startWaiting();
-        } else if (backOffStrategy != null && !externalTasks.isEmpty()) {
-          backOffStrategy.reset();
-        }
-      } catch (Throwable e) {
-        LOG.exceptionWhileExecutingBackOffStrategyMethod(e);
+      if (backoffStrategy != null) {
+        runBackoffStrategy(externalTasks.isEmpty());
       }
     }
   }
@@ -153,12 +147,8 @@ public class TopicSubscriptionManager implements Runnable {
 
       isRunning = false;
 
-      if (backOffStrategy != null) {
-        try {
-          backOffStrategy.stopWaiting();
-        } catch (Throwable e) {
-          LOG.exceptionWhileExecutingBackOffStrategyMethod(e);
-        }
+      if (backoffStrategy != null) {
+        resumeBackoffStrategy();
       }
 
       try {
@@ -186,6 +176,10 @@ public class TopicSubscriptionManager implements Runnable {
     checkTopicNameAlreadySubscribed(subscription.getTopicName());
 
     subscriptions.add(subscription);
+
+    if (backoffStrategy != null) {
+      resumeBackoffStrategy();
+    }
   }
 
   protected void checkTopicNameAlreadySubscribed(String topicName) {
@@ -212,8 +206,28 @@ public class TopicSubscriptionManager implements Runnable {
     return isRunning;
   }
 
-  public void setBackOffStrategy(ClientBackOffStrategy backOffStrategy) {
-    this.backOffStrategy = backOffStrategy;
+  public void setBackoffStrategy(ClientBackoffStrategy backOffStrategy) {
+    this.backoffStrategy = backOffStrategy;
+  }
+
+  protected void runBackoffStrategy(boolean isExternalTasksEmpty) {
+    try {
+      if (isExternalTasksEmpty) {
+        backoffStrategy.suspend();
+      } else {
+        backoffStrategy.reset();
+      }
+    } catch (Throwable e) {
+      LOG.exceptionWhileExecutingBackoffStrategyMethod(e);
+    }
+  }
+
+  protected void resumeBackoffStrategy() {
+    try {
+      backoffStrategy.resume();
+    } catch (Throwable e) {
+      LOG.exceptionWhileExecutingBackoffStrategyMethod(e);
+    }
   }
 
 }

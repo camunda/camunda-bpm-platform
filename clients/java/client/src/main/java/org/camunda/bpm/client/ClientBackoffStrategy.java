@@ -16,16 +16,16 @@ package org.camunda.bpm.client;
 import org.camunda.bpm.client.topic.impl.TopicSubscriptionManager;
 
 /**
- * <p>The ClientBackOffStrategy provides a way to define the wait time between requests to the server.</p>
+ * <p>The ClientBackoffStrategy provides a way to define the wait time between requests to the server.</p>
  *
  * @author Nikola Koevski
  */
-public interface ClientBackOffStrategy {
+public interface ClientBackoffStrategy {
 
   /**
    * Is invoked if the client receives no external tasks for the current topic subscriptions
    */
-  void startWaiting();
+  void suspend();
 
   /**
    * Is invoked when a request to the server returns a non-empty list of external tasks. This method
@@ -36,5 +36,5 @@ public interface ClientBackOffStrategy {
   /**
    * Is invoked before stopping the task acquisition thread in the {@link TopicSubscriptionManager#stop()} method
    */
-  void stopWaiting();
+  void resume();
 }
