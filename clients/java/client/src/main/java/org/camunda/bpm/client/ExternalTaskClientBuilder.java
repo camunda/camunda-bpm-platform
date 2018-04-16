@@ -52,7 +52,7 @@ public interface ExternalTaskClientBuilder {
   ExternalTaskClientBuilder addInterceptor(ClientRequestInterceptor interceptor);
 
   /**
-   * Specifies the amount of maximum tasks which are supposed to be fetched within one request
+   * Specifies the maximum amount of tasks that can be fetched within one request.
    * This information is optional.
    *
    * @param maxTasks which are supposed to be fetched within one request
