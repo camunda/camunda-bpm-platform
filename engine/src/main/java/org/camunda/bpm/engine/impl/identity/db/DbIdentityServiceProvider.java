@@ -134,8 +134,6 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
   }
 
   public void unlockUser(String userId) {
-    getAuthorizationManager().checkCamundaAdmin();
-
     UserEntity user = findUserById(userId);
     if(user != null) {
       unlockUser(user);
