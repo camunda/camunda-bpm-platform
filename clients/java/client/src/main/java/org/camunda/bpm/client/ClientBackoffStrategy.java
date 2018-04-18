@@ -13,28 +13,33 @@
 
 package org.camunda.bpm.client;
 
-import org.camunda.bpm.client.topic.impl.TopicSubscriptionManager;
-
 /**
- * <p>The ClientBackoffStrategy provides a way to define the wait time between requests to the server.</p>
+ * <p>The ClientBackoffStrategy provides a way to define a back off between fetch and lock requests.</p>
  *
  * @author Nikola Koevski
  */
 public interface ClientBackoffStrategy {
 
   /**
-   * Is invoked if the client receives no external tasks for the current topic subscriptions
+   * Is invoked when no external tasks have been received for the current topic subscriptions.
+   * The implementation might realize a back off between fetch and lock requests.
    */
   void suspend();
 
   /**
-   * Is invoked when a request to the server returns a non-empty list of external tasks. This method
-   * is used to reset the back off strategy to its starting state.
+   * Is invoked when at least one external task has been received for the current topic subscriptions.
+   * The implementation might realize a reset of the back off to its starting state.
    */
   void reset();
 
   /**
-   * Is invoked before stopping the task acquisition thread in the {@link TopicSubscriptionManager#stop()} method
+   * Is invoked to interrupt the suspension when:
+   * <ul>
+   *   <li> a new topic subscription has been added
+   *   <li> the client has been stopped
+   * </ul>
+   *
+   * The implementation might interrupt the back off.
    */
   void resume();
 }

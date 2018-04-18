@@ -94,10 +94,10 @@ public interface ExternalTaskClientBuilder {
   ExternalTaskClientBuilder disableAutoFetching();
 
   /**
-   * Adds a back off strategy to the client for defining the wait time until a new request is sent.
+   * Adds a custom strategy to the client for defining the backoff between two requests.
    * This information is optional.
    *
-   * @param backoffStrategy to be used to generate/calculate the wait time between requests
+   * @param backoffStrategy which realizes a custom backoff strategy
    * @return the builder
    */
   ExternalTaskClientBuilder backoffStrategy(ClientBackoffStrategy backoffStrategy);
