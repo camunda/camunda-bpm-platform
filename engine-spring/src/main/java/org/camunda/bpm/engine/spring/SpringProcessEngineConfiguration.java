@@ -27,7 +27,7 @@ public class SpringProcessEngineConfiguration extends SpringTransactionsProcessE
 
   @Override
   protected void initArtifactFactory() {
-    if (artifactFactory == null) {
+    if (artifactFactory == null && applicationContext != null) {
       artifactFactory = new SpringArtifactFactory(applicationContext);
     }
   }
