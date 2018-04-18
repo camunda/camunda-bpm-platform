@@ -83,8 +83,9 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
     this.maxTasks = 10;
     this.asyncResponseTimeout = null;
     this.lockDuration = 20_000;
-    this.isAutoFetchingEnabled = true;
     this.interceptors = new ArrayList<>();
+    this.isAutoFetchingEnabled = true;
+    this.backoffStrategy = null;
   }
 
   public ExternalTaskClientBuilder baseUrl(String baseUrl) {
