@@ -14,6 +14,7 @@ package org.camunda.bpm.client.impl.variable.mapper.serializable;
 
 import java.util.Map;
 
+import org.camunda.bpm.client.impl.ExternalTaskClientLogger;
 import org.camunda.bpm.client.impl.variable.TypedValueField;
 import org.camunda.bpm.client.impl.variable.mapper.AbstractTypedValueMapper;
 import org.camunda.bpm.engine.variable.impl.value.UntypedValueImpl;
@@ -22,6 +23,8 @@ import org.camunda.bpm.engine.variable.value.SerializableValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 public abstract class AbstractSerializableValueMapper<T extends SerializableValue> extends AbstractTypedValueMapper<T> {
+
+  protected static final ExternalTaskClientLogger LOG = ExternalTaskClientLogger.CLIENT_LOGGER;
 
   protected String serializationDataFormat;
 
@@ -42,8 +45,8 @@ public abstract class AbstractSerializableValueMapper<T extends SerializableValu
       if(objectToSerialize != null) {
         try {
           serializedStringValue = serializeToString(objectToSerialize);
-        } catch(Exception e) {
-          throw new RuntimeException("Cannot serialize object in variable:"+e.getMessage(), e);
+        } catch (Exception e) {
+          throw LOG.valueMapperExceptionWhileSerializingObject(e);
         }
       }
     }
@@ -62,7 +65,7 @@ public abstract class AbstractSerializableValueMapper<T extends SerializableValu
         try {
           deserializedObject = deserializeFromString(serializedStringValue, typedValueField);
         } catch (Exception e) {
-          throw new RuntimeException("Cannot deserialize object in variable '"+typedValueField+"': "+e.getMessage(), e);
+          throw LOG.valueMapperExceptionWhileDeserializingObject(e);
         }
       }
 

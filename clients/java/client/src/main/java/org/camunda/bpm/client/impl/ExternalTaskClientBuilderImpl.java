@@ -249,7 +249,7 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
 
     if (isDataFormatsAvailable()) {
 
-      // TODO: log that spin dataformat has been detected
+      LOG.spinDetected();
 
       Set<DataFormat<?>> availableDataFormats = DataFormats.getAvailableDataFormats();
       for (DataFormat<?> dataFormat : availableDataFormats) {
@@ -281,7 +281,7 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
       Class.forName("org.camunda.spin.DataFormats");
       isAvailable = true;
     } catch (ClassNotFoundException e) {
-      // TODO: Log that spin data formats are not available
+      LOG.spinNotAvailable(e);
     }
 
     return isAvailable;
@@ -294,7 +294,7 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
       Class.forName("org.camunda.spin.plugin.variable.SpinValues");
       isAvailable = true;
     } catch (ClassNotFoundException e) {
-      // TODO: Log that spin data formats are not available
+      LOG.spinNotAvailable(e);
     }
 
     return isAvailable;

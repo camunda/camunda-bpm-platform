@@ -27,6 +27,7 @@ import java.util.Arrays;
 import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.client.dto.ProcessDefinitionDto;
 import org.camunda.bpm.client.dto.ProcessInstanceDto;
+import org.camunda.bpm.client.exception.ValueMapperException;
 import org.camunda.bpm.client.rule.ClientRule;
 import org.camunda.bpm.client.rule.EngineRule;
 import org.camunda.bpm.client.task.ExternalTask;
@@ -241,7 +242,7 @@ public class XmlSerializationIT {
     engineRule.startProcessInstance(processDefinition.getId(), VARIABLE_NAME_XML, objectValue);
 
     // then
-    thrown.expect(RuntimeException.class);
+    thrown.expect(ValueMapperException.class);
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
@@ -266,7 +267,7 @@ public class XmlSerializationIT {
     engineRule.startProcessInstance(processDefinition.getId(), VARIABLE_NAME_XML, objectValue);
 
     // then
-    thrown.expect(RuntimeException.class);
+    thrown.expect(ValueMapperException.class);
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
@@ -353,7 +354,7 @@ public class XmlSerializationIT {
     engineRule.startProcessInstance(processDefinition.getId(), VARIABLE_NAME_XML, serializedValue);
 
     // then
-    thrown.expect(RuntimeException.class);
+    thrown.expect(ValueMapperException.class);
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
@@ -382,7 +383,7 @@ public class XmlSerializationIT {
     engineRule.startProcessInstance(processDefinition.getId(), VARIABLE_NAME_XML, serializedValue);
 
     // then
-    thrown.expect(RuntimeException.class);
+    thrown.expect(ValueMapperException.class);
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)

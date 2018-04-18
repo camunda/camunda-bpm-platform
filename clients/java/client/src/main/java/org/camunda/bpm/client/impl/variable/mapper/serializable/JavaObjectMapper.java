@@ -14,7 +14,6 @@ package org.camunda.bpm.client.impl.variable.mapper.serializable;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -49,14 +48,6 @@ public class JavaObjectMapper extends AbstractObjectMapper {
     try {
       return ois.readObject();
     }
-    catch (IOException e) {
-//      throw INTERNAL_LOG.invalidSerializedValueException(serializedValue, e.toString());
-      throw new RuntimeException(e);
-    }
-    catch (ClassNotFoundException e) {
-//      throw INTERNAL_LOG.objectTypeNameUnknownException(type.getTypeName(), serializedValue);
-      throw new RuntimeException(e);
-    }
     finally {
       IoUtil.closeSilently(ois);
       IoUtil.closeSilently(is);
@@ -73,10 +64,6 @@ public class JavaObjectMapper extends AbstractObjectMapper {
 
       Encoder encoder = Base64.getEncoder();
       return encoder.encodeToString(deserializedObjectByteArray);
-    }
-    catch (IOException e) {
-      // TODO throw USER_LOG.unknownTypeException(objectValue);
-      throw new RuntimeException();
     }
     finally {
       IoUtil.closeSilently(ois);

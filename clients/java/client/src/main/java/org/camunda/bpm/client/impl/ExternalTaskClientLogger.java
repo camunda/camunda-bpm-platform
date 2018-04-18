@@ -19,10 +19,9 @@ import org.camunda.bpm.client.exception.ExternalTaskClientException;
 import org.camunda.bpm.client.exception.NotAcquiredException;
 import org.camunda.bpm.client.exception.NotFoundException;
 import org.camunda.bpm.client.exception.NotResumedException;
-import org.camunda.bpm.client.exception.UnknownTypeException;
-import org.camunda.bpm.client.exception.UnsupportedTypeException;
+import org.camunda.bpm.client.exception.ValueMapperException;
 import org.camunda.bpm.client.topic.impl.TopicSubscriptionManagerLogger;
-import org.camunda.bpm.engine.variable.value.ObjectValue;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.camunda.commons.logging.BaseLogger;
 
 import java.io.IOException;
@@ -32,7 +31,7 @@ import java.io.IOException;
  */
 public class ExternalTaskClientLogger extends BaseLogger {
 
-  protected static final String PROJECT_CODE = "CAMUNDA_EXTERNAL_TASK_CLIENT";
+  protected static final String PROJECT_CODE = "TASK/CLIENT";
   protected static final String PROJECT_LOGGER = "org.camunda.bpm.client";
 
   public static final ExternalTaskClientLogger CLIENT_LOGGER =
@@ -43,6 +42,20 @@ public class ExternalTaskClientLogger extends BaseLogger {
 
   public static final TopicSubscriptionManagerLogger TOPIC_SUBSCRIPTION_MANAGER_LOGGER =
     createLogger(TopicSubscriptionManagerLogger.class, PROJECT_CODE, PROJECT_LOGGER, "03");
+
+  protected void logError(String id, String messageTemplate, Throwable t) {
+    if (delegateLogger.isErrorEnabled()) {
+      String msg = formatMessageTemplate(id, messageTemplate);
+      delegateLogger.error(msg, t);
+    }
+  }
+
+  protected void logInfo(String id, String messageTemplate, Throwable t) {
+    if(delegateLogger.isInfoEnabled()) {
+      String msg = formatMessageTemplate(id, messageTemplate);
+      delegateLogger.info(msg, t);
+    }
+  }
 
   protected ExternalTaskClientException baseUrlNullException() {
     return new ExternalTaskClientException(exceptionMessage(
@@ -97,7 +110,7 @@ public class ExternalTaskClientLogger extends BaseLogger {
     }
 
     return new ExternalTaskClientException(exceptionMessage(
-      "011", "Exception while {}: '{}'", actionName));
+      "011", "Exception while {}: ", actionName), e);
   }
 
   public ExternalTaskClientException basicAuthCredentialsNullException() {
@@ -110,34 +123,60 @@ public class ExternalTaskClientLogger extends BaseLogger {
       "013", "Interceptor cannot be null"));
   }
 
-  public UnsupportedTypeException unsupportedTypeException(Object variableValue) {
-    return new UnsupportedTypeException(exceptionMessage(
-      "014", "Exception while converting variable value '{}' to typed variable value: no suitable mapper found for type {}", variableValue, variableValue.getClass().getSimpleName()));
-  }
-
-  public UnsupportedTypeException unsupportedSerializationDataFormat(Object variableValue) {
-    return new UnsupportedTypeException(exceptionMessage(
-      "015", "Exception while converting variable value '{}' to typed variable value: serialization data format not supported", variableValue, variableValue.getClass().getSimpleName()));
-  }
-
-  public UnsupportedTypeException missingSpinXmlDependencyException() {
-    return new UnsupportedTypeException(exceptionMessage(
-      "016", "Exception while deserializing object value of type 'xml': the dependency 'camunda-spin-dataformat-xml-dom' needs to be added"));
-  }
-
-  public UnknownTypeException unknownTypeException(ObjectValue objectValue) {
-    return new UnknownTypeException(exceptionMessage(
-      "017", "Exception while serializing variable of type object: the type of the object is not on the class path: '{}'", objectValue));
-  }
-
   public ExternalTaskClientException maxTasksNotGreaterThanZeroException() {
     return new ExternalTaskClientException(exceptionMessage(
-      "018", "Maximum amount of fetched tasks must be greater than zero"));
+      "014", "Maximum amount of fetched tasks must be greater than zero"));
   }
 
   public ExternalTaskClientException asyncResponseTimeoutNotGreaterThanZeroException() {
     return new ExternalTaskClientException(exceptionMessage(
-      "019", "Asynchronous response timeout must be greater than zero"));
+      "015", "Asynchronous response timeout must be greater than zero"));
+  }
+
+  public void spinNotAvailable(Exception e) {
+    logInfo(
+      "016", "Spin dependency not available", e);
+  }
+
+  public void spinDetected() {
+    logInfo(
+      "017", "Spin dependency detected");
+  }
+
+  public ValueMapperException valueMapperExceptionWhileParsingDate(Exception e) {
+    return new ValueMapperException(exceptionMessage(
+      "018", "Exception while mapping value: Cannot parse variable of type date"), e);
+  }
+
+  public ValueMapperException valueMapperExceptionDueToNoObjectTypeName() {
+    return new ValueMapperException(exceptionMessage(
+      "019", "Exception while mapping value: " +
+        "Cannot write serialized value for variable: no 'objectTypeName' provided for non-null value."));
+  }
+
+  public ValueMapperException valueMapperExceptionWhileSerializingObject(Exception e) {
+    return new ValueMapperException(exceptionMessage(
+      "020", "Exception while mapping value: Cannot serialize object in variable: "), e);
+  }
+
+  public ValueMapperException valueMapperExceptionWhileDeserializingObject(Exception e) {
+    return new ValueMapperException(exceptionMessage(
+      "021", "Exception while mapping value: Cannot deserialize object in variable: "), e);
+  }
+
+  public ValueMapperException valueMapperExceptionWhileSerializingAbstractValue(String name) {
+    return new ValueMapperException(exceptionMessage(
+      "022", "Cannot serialize value of abstract type {}", name));
+  }
+
+  public ValueMapperException valueMapperExceptionDueToSerializerNotFoundForTypedValue(TypedValue typedValue) {
+    return new ValueMapperException(exceptionMessage(
+      "023", "Cannot find serializer for value '{}'", typedValue));
+  }
+
+  public ValueMapperException valueMapperExceptionDueToSerializerNotFoundForTypedValueField(Object value) {
+    return new ValueMapperException(exceptionMessage(
+      "024", "Cannot find serializer for value '{}'", value));
   }
 
 }

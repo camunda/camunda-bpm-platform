@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.client.task;
 
+import org.camunda.bpm.client.exception.ValueMapperException;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
@@ -110,6 +111,8 @@ public interface ExternalTask {
    *
    * @param variableName of the variable to be returned
    * @param <T> the type of the variable
+   * @throws ValueMapperException if an object cannot be deserialized
+   *
    * @return
    * <ul>
    *   <li> an untyped variable if such a named variable exists
@@ -123,6 +126,8 @@ public interface ExternalTask {
    *
    * @param variableName of the variable to be returned
    * @param <T> the type of the variable
+   * @throws ValueMapperException if an object cannot be deserialized
+   *
    * @return
    * <ul>
    *   <li> a typed variable if such a named variable exists
@@ -131,11 +136,30 @@ public interface ExternalTask {
    */
   <T extends TypedValue> T getVariableTyped(String variableName);
 
-  <T extends TypedValue> T getVariableTyped(String variableName, boolean deserializeObjectValues);
+  /**
+   * Returns a typed variable of the task's ancestor execution hierarchy
+   *
+   * @param variableName of the variable to be returned
+   * @param deserializeObjectValue
+   * <ul>
+   *   <li> {@code false} to retrieve the object without deserialization
+   *   <li> {@code true} to retrieve the deserialized object
+   * </ul>
+   * @param <T> the type of the variable
+   * @throws ValueMapperException if an object cannot be deserialized
+   *
+   * @return
+   * <ul>
+   *   <li> a typed variable if such a named variable exists
+   *   <li> null if such a named variable not exists
+   * </ul>
+   */
+  <T extends TypedValue> T getVariableTyped(String variableName, boolean deserializeObjectValue);
 
   /**
    * Returns untyped variables that exist in the task's ancestor execution hierarchy
    *
+   * @throws ValueMapperException if an object cannot be deserialized
    * @return a map of untyped variables that contains an entry for each variable
    */
   Map<String, Object> getAllVariables();
@@ -143,10 +167,22 @@ public interface ExternalTask {
   /**
    * Returns typed variables that exist in the task's ancestor execution hierarchy
    *
+   * @throws ValueMapperException if an object cannot be deserialized
    * @return a map of typed variables that contains an entry for each variable
    */
   VariableMap getAllVariablesTyped();
 
+  /**
+   * Returns typed variables that exist in the task's ancestor execution hierarchy
+   *
+   * @throws ValueMapperException if an object cannot be deserialized
+   * @param deserializeObjectValues
+   * <ul>
+   *   <li> {@code false} to retrieve the object without deserialization
+   *   <li> {@code true} to retrieve the deserialized object
+   * </ul>
+   * @return a map of typed variables that contains an entry for each variable
+   */
   VariableMap getAllVariablesTyped(boolean deserializeObjectValues);
 
   /**

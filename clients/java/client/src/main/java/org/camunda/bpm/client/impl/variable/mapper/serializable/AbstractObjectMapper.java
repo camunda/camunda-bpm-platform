@@ -14,6 +14,7 @@ package org.camunda.bpm.client.impl.variable.mapper.serializable;
 
 import java.util.Map;
 
+import org.camunda.bpm.client.impl.ExternalTaskClientLogger;
 import org.camunda.bpm.client.impl.variable.TypedValueField;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.impl.value.ObjectValueImpl;
@@ -23,6 +24,8 @@ import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 
 public abstract class AbstractObjectMapper extends AbstractSerializableValueMapper<ObjectValue> {
+
+  protected static final ExternalTaskClientLogger LOG = ExternalTaskClientLogger.CLIENT_LOGGER;
 
   public AbstractObjectMapper(String serializationDataFormat) {
     super(ValueType.OBJECT, serializationDataFormat);
@@ -36,7 +39,7 @@ public abstract class AbstractObjectMapper extends AbstractSerializableValueMapp
     String objectTypeName = value.getObjectTypeName();
 
     if (objectTypeName == null && !value.isDeserialized() && value.getValueSerialized() != null) {
-      throw new RuntimeException("Cannot write serialized value for variable: no 'objectTypeName' provided for non-null value.");
+      throw LOG.valueMapperExceptionDueToNoObjectTypeName();
     }
 
     // update type name if the object is deserialized

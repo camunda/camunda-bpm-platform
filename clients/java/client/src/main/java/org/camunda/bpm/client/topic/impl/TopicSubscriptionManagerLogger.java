@@ -23,36 +23,37 @@ public class TopicSubscriptionManagerLogger extends ExternalTaskClientLogger {
 
   protected void exceptionWhilePerformingFetchAndLock(EngineClientException e) {
     logError(
-      "001", "Exception while fetch and lock tasks '{}'", e);
+      "001", "Exception while fetch and lock tasks:", e);
   }
 
   protected void exceptionWhileExecutingExternalTaskHandler(Throwable e) {
     logError(
-      "002", "Exception while executing external task handler '{}'", e);
+      "002", "Exception while executing external task handler:", e);
   }
 
   protected void exceptionWhileShuttingDown(InterruptedException e) {
     logError(
-      "003", "Exception while shutting down '{}'", e);
+      "003", "Exception while shutting down:", e);
   }
 
   protected void exceptionOnExternalTaskServiceMethodInvocation(ExternalTaskClientException e) {
     logError(
-      "004", "Exception on external task service method invocation '{}'", e);
-  }
-
-  protected void exceptionWhileDeserializingVariables(Throwable e) {
-    logError(
-      "005", "Exception while deserializing variables '{}'", e);
+      "004", "Exception on external task service method invocation:", e);
   }
 
   protected void exceptionWhileExecutingBackoffStrategyMethod(Throwable e) {
     logError(
-      "006", "Exception while executing back off strategy method: {}", e);
+      "005", "Exception while executing back off strategy method:", e);
   }
 
-  protected void exceptionWhileDeserializingVariables(String message) {
-    delegateLogger.error(message);
+  protected void exceptionWhileAcquiringTasks(Throwable e) {
+    logError(
+      "006", "Exception while acquiring tasks:", e);
+  }
+
+  protected void taskHandlerIsNull() {
+    logError(
+      "007", "Task handler is null");
   }
 
 }

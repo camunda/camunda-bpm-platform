@@ -85,7 +85,7 @@ public abstract class SpinValueMapper<T extends SpinValue> extends AbstractSeria
       Object mappedObject = reader.readInput(bufferedReader);
       return dataFormat.createWrapperInstance(mappedObject);
     }
-    finally{
+    finally {
       IoUtil.closeSilently(bufferedReader);
       IoUtil.closeSilently(stringReader);
     }

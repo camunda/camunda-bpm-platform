@@ -70,7 +70,7 @@ public class TopicSubscriptionManager implements Runnable {
         acquire();
       }
       catch (Throwable e) {
-        // TODO: log exception
+        LOG.exceptionWhileAcquiringTasks(e);
       }
     }
   }
@@ -99,7 +99,7 @@ public class TopicSubscriptionManager implements Runnable {
           handleExternalTask(externalTask, taskHandler);
         }
         else {
-          // TODO: log
+          LOG.taskHandlerIsNull();
         }
       });
 

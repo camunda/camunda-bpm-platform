@@ -16,7 +16,6 @@ import java.io.IOException;
 
 import org.apache.http.HttpRequest;
 import org.apache.http.client.HttpResponseException;
-import org.camunda.bpm.client.impl.variable.TypedValueField;
 
 /**
  * @author Tassilo Weidner
@@ -36,72 +35,32 @@ public class EngineClientLogger extends ExternalTaskClientLogger {
 
   protected <T> void exceptionWhileClosingResourceStream(T response, IOException e) {
     logError(
-      "003", "Exception while closing resource stream of response '{}': {}", response, e);
+      "003", "Exception while closing resource stream of response '" + response + "': ", e);
   }
 
-  protected <T> EngineClientException exceptionWhileParsingJsonObject(Class<T> responseDtoClass) {
+  protected <T> EngineClientException exceptionWhileParsingJsonObject(Class<T> responseDtoClass, Throwable t) {
     return new EngineClientException(exceptionMessage(
-      "004", "Exception while parsing json object to response dto class '{}'", responseDtoClass));
+      "004", "Exception while parsing json object to response dto class '{}'", responseDtoClass), t);
   }
 
-  protected <T> EngineClientException exceptionWhileMappingJsonObject(Class<T> responseDtoClass) {
+  protected <T> EngineClientException exceptionWhileMappingJsonObject(Class<T> responseDtoClass, Throwable t) {
     return new EngineClientException(exceptionMessage(
-      "005", "Exception while mapping json object to response dto class '{}'", responseDtoClass));
+      "005", "Exception while mapping json object to response dto class '{}'", responseDtoClass), t);
   }
 
-  protected <T> EngineClientException exceptionWhileDeserializingJsonObject(Class<T> responseDtoClass) {
+  protected <T> EngineClientException exceptionWhileDeserializingJsonObject(Class<T> responseDtoClass, Throwable t) {
     return new EngineClientException(exceptionMessage(
-      "006", "Exception while deserializing json object to response dto class '{}'", responseDtoClass));
+      "006", "Exception while deserializing json object to response dto class '{}'", responseDtoClass), t);
   }
 
-  protected <D extends RequestDto> EngineClientException exceptionWhileSerializingJsonObject(D dto) {
+  protected <D extends RequestDto> EngineClientException exceptionWhileSerializingJsonObject(D dto, Throwable t) {
     return new EngineClientException(exceptionMessage(
-      "007", "Exception while serializing json object to '{}'", dto));
+      "007", "Exception while serializing json object to '{}'", dto), t);
   }
 
   public void requestInterceptorException(Throwable e) {
     logError(
       "008", "Exception while executing request interceptor: {}", e);
-  }
-
-  public EngineClientException exceptionWhileDeserializingVariables(String variableName, String variableType) {
-    return new EngineClientException(exceptionMessage(
-      "009", "Exception while deserializing variable {}: no suitable mapper found for type {}", variableName, variableType));
-  }
-
-  public EngineClientException exceptionWhileDeserializingVariablesWrongType(String variableName, String variableType, Object variableValue) {
-    return new EngineClientException(exceptionMessage(
-      "010", "Exception while deserializing variable '{}': value '{}' does not match type '{}'",
-      variableName, variableValue, variableType));
-  }
-
-  public EngineClientException unsupportedSerializationDataFormatException(String serializationDataFormat, TypedValueField typedValueDto) {
-    return new EngineClientException(exceptionMessage(
-      "011", "Exception while deserializing variable: value '{}' has unsupported serialization data format '{}'",
-      typedValueDto, serializationDataFormat));
-  }
-
-  public EngineClientException missingSpinDependencyExceptionInternal(String mapperName) {
-    String spinDependency = null;
-    if (mapperName.equals("xml")) {
-      spinDependency = "camunda-spin-dataformat-xml-dom";
-    } else {
-      spinDependency = "camunda-spin-dataformat-json-jackson";
-    }
-
-    return new EngineClientException(exceptionMessage(
-      "012", "Exception while deserializing object value of type '{}': " +
-        "the dependency '{}' needs to be added", mapperName, spinDependency));
-  }
-
-  public EngineClientException invalidSerializedValueException(String serializedValue, String message) {
-    return new EngineClientException(exceptionMessage(
-      "013", "Exception while deserializing object value '{}': {}", serializedValue, message));
-  }
-
-  public EngineClientException objectTypeNameUnknownException(String objectTypeName, Object serializedValue) {
-    return new EngineClientException(exceptionMessage(
-      "014", "Exception while deserializing object value '{}': object type '{}' is unknown", serializedValue, objectTypeName));
   }
 
 }

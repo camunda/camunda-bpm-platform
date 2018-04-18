@@ -16,12 +16,15 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.camunda.bpm.client.impl.ExternalTaskClientLogger;
 import org.camunda.bpm.client.impl.variable.TypedValueField;
 import org.camunda.bpm.client.impl.variable.ValueMappers;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 public class DefaultValueMappers implements Serializable, ValueMappers {
+
+  protected static final ExternalTaskClientLogger LOG = ExternalTaskClientLogger.CLIENT_LOGGER;
 
   private static final long serialVersionUID = 1L;
 
@@ -36,7 +39,7 @@ public class DefaultValueMappers implements Serializable, ValueMappers {
     ValueType type = typedValue.getType();
 
     if (type != null && type.isAbstract()) {
-      throw new RuntimeException("Cannot serialize value of abstract type " + type.getName());
+      throw LOG.valueMapperExceptionWhileSerializingAbstractValue(type.getName());
     }
 
     List<ValueMapper<?>> matchedSerializers = new ArrayList<ValueMapper<?>>();
@@ -61,7 +64,7 @@ public class DefaultValueMappers implements Serializable, ValueMappers {
         .orElse(matchedSerializers.get(0));
     }
     else {
-      throw new RuntimeException("Cannot find serializer for value '"+typedValue+"'.");
+      throw LOG.valueMapperExceptionDueToSerializerNotFoundForTypedValue(typedValue);
     }
   }
 
@@ -73,7 +76,7 @@ public class DefaultValueMappers implements Serializable, ValueMappers {
       .orElse(null);
 
     if (matchedSerializer == null) {
-      throw new RuntimeException("Cannot find serializer for value '"+typedValueField+"'.");
+      throw LOG.valueMapperExceptionDueToSerializerNotFoundForTypedValueField(typedValueField.getValue());
     }
 
     return matchedSerializer;

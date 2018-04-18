@@ -16,8 +16,7 @@ import org.camunda.bpm.client.exception.ConnectionLostException;
 import org.camunda.bpm.client.exception.NotAcquiredException;
 import org.camunda.bpm.client.exception.NotFoundException;
 import org.camunda.bpm.client.exception.NotResumedException;
-import org.camunda.bpm.client.exception.UnknownTypeException;
-import org.camunda.bpm.client.exception.UnsupportedTypeException;
+import org.camunda.bpm.client.exception.ValueMapperException;
 
 import java.util.Map;
 
@@ -47,6 +46,13 @@ public interface ExternalTaskService {
    * @throws NotAcquiredException if the task's most recent lock could not be acquired
    * @throws NotResumedException if the corresponding process instance could not be resumed
    * @throws ConnectionLostException if the connection could not be established
+   * @throws ValueMapperException
+   * <ul>
+   *   <li> if an object cannot be serialized
+   *   <li> if no 'objectTypeName' is provided for non-null value
+   *   <li> if value is of type abstract
+   *   <li> if no suitable serializer could be found
+   * </ul>
    */
   void complete(ExternalTask externalTask);
 
@@ -61,8 +67,13 @@ public interface ExternalTaskService {
    * @throws NotAcquiredException if the task's most recent lock could not be acquired
    * @throws NotResumedException if the corresponding process instance could not be resumed
    * @throws ConnectionLostException if the connection could not be established
-   * @throws UnknownTypeException if a variable is set that type is not on the class path
-   * @throws UnsupportedTypeException if a variable is set that has an unsupported type
+   * @throws ValueMapperException
+   * <ul>
+   *   <li> if an object cannot be serialized
+   *   <li> if no 'objectTypeName' is provided for non-null value
+   *   <li> if value is of type abstract
+   *   <li> if no suitable serializer could be found
+   * </ul>
    */
   void complete(ExternalTask externalTask, Map<String, Object> variables);
 
@@ -79,8 +90,13 @@ public interface ExternalTaskService {
    * @throws NotAcquiredException if the task's most recent lock could not be acquired
    * @throws NotResumedException if the corresponding process instance could not be resumed
    * @throws ConnectionLostException if the connection could not be established
-   * @throws UnknownTypeException if a variable is set that type is not on the class path
-   * @throws UnsupportedTypeException if a variable is set that has an unsupported type
+   * @throws ValueMapperException
+   * <ul>
+   *   <li> if an object cannot be serialized
+   *   <li> if no 'objectTypeName' is provided for non-null value
+   *   <li> if value is of type abstract
+   *   <li> if no suitable serializer could be found
+   * </ul>
    */
   void complete(ExternalTask externalTask, Map<String, Object> variables, Map<String, Object> localVariables);
 

@@ -16,7 +16,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.camunda.bpm.client.impl.EngineClientException;
+import org.camunda.bpm.client.impl.ExternalTaskClientLogger;
 import org.camunda.bpm.client.impl.variable.TypedValueField;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.impl.value.UntypedValueImpl;
@@ -24,6 +24,8 @@ import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.DateValue;
 
 public class DateValueMapper extends PrimitiveValueMapper<DateValue> {
+
+  protected static final ExternalTaskClientLogger LOG = ExternalTaskClientLogger.CLIENT_LOGGER;
 
   protected String dateFormat;
 
@@ -45,8 +47,7 @@ public class DateValueMapper extends PrimitiveValueMapper<DateValue> {
       try {
         date = sdf.parse(value);
       } catch (ParseException e) {
-        // TODO: handle that case!
-        throw new RuntimeException(new EngineClientException(e));
+        throw LOG.valueMapperExceptionWhileParsingDate(e);
       }
     }
 
