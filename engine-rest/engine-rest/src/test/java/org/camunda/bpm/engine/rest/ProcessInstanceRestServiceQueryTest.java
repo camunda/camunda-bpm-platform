@@ -867,4 +867,34 @@ public class ProcessInstanceRestServiceQueryTest extends
       .when()
         .post(PROCESS_INSTANCE_QUERY_URL);
   }
+
+  @Test
+  public void testQueryRootProcessInstances() {
+    given()
+      .queryParam("rootProcessInstances", true)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(PROCESS_INSTANCE_QUERY_URL);
+
+    verify(mockedQuery).rootProcessInstances();
+  }
+
+  @Test
+  public void testQueryRootProcessInstancesAsPost() {
+    Map<String, Object> params =new HashMap<String, Object>();
+    params.put("rootProcessInstances", true);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(PROCESS_INSTANCE_QUERY_URL);
+
+    verify(mockedQuery).rootProcessInstances();
+  }
 }

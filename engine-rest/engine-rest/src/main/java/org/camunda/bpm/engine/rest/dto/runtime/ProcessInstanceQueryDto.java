@@ -73,6 +73,7 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
   private List<String> tenantIds;
   private Boolean withoutTenantId;
   private List<String> activityIds;
+  private Boolean rootProcessInstances;
 
   private List<VariableQueryParameterDto> variables;
 
@@ -273,6 +274,11 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
     this.activityIds = activityIds;
   }
 
+  @CamundaQueryParam(value = "rootProcessInstances", converter = BooleanConverter.class)
+  public void setRootProcessInstances(Boolean rootProcessInstances) {
+    this.rootProcessInstances = rootProcessInstances;
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -345,6 +351,9 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
     }
     if (activityIds != null && !activityIds.isEmpty()) {
       query.activityIdIn(activityIds.toArray(new String[activityIds.size()]));
+    }
+    if (rootProcessInstances == true) {
+      query.rootProcessInstances();
     }
     if (variables != null) {
       for (VariableQueryParameterDto variableQueryParam : variables) {

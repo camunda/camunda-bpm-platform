@@ -17,11 +17,10 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
@@ -57,6 +56,7 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
   protected String superCaseInstanceId;
   protected String subCaseInstanceId;
   protected String[] activityIds;
+  protected boolean isRootProcessInstances;
 
   protected boolean isTenantIdSet = false;
   protected String[] tenantIds;
@@ -117,6 +117,9 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
   }
 
   public ProcessInstanceQuery superProcessInstanceId(String superProcessInstanceId) {
+    if (isRootProcessInstances) {
+      throw new ProcessEngineException("Invalid query usage: cannot set both rootProcessInstances and superProcessInstanceId");
+    }
     this.superProcessInstanceId = superProcessInstanceId;
     return this;
   }
@@ -224,6 +227,14 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     return this;
   }
 
+  public ProcessInstanceQuery rootProcessInstances() {
+    if (superProcessInstanceId != null) {
+      throw new ProcessEngineException("Invalid query usage: cannot set both rootProcessInstances and superProcessInstanceId");
+    }
+    isRootProcessInstances = true;
+    return this;
+  }
+
   //results /////////////////////////////////////////////////////////////////
 
   @Override
@@ -326,4 +337,7 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     return subCaseInstanceId;
   }
 
+  public boolean isRootProcessInstances() {
+    return isRootProcessInstances;
+  }
 }

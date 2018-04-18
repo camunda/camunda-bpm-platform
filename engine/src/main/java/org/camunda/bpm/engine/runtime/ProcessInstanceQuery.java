@@ -217,6 +217,9 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
    */
   ProcessInstanceQuery activityIdIn(String... activityIds);
 
+  /** Only selects process instances which are top level process instances. */
+  ProcessInstanceQuery rootProcessInstances();
+
   //ordering /////////////////////////////////////////////////////////////////
 
   /** Order by id (needs to be followed by {@link #asc()} or {@link #desc()}). */

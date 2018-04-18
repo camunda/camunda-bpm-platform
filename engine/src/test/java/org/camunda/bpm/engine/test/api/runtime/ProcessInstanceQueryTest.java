@@ -1984,6 +1984,59 @@ public class ProcessInstanceQueryTest {
     assertReturnedProcessInstances(query, processInstance);
   }
 
+  @Test
+  public void testQueryByRootProcessInstances() {
+    // given
+    String superProcess = "calling";
+    String subProcess = "called";
+    BpmnModelInstance callingInstance = ProcessModels.newModel(superProcess)
+      .startEvent()
+      .callActivity()
+      .calledElement(subProcess)
+      .endEvent()
+      .done();
+
+    BpmnModelInstance calledInstance = ProcessModels.newModel(subProcess)
+      .startEvent()
+      .userTask()
+      .endEvent()
+      .done();
+
+    testHelper.deploy(callingInstance, calledInstance);
+    String businessKey = "theOne";
+    String processInstanceId = runtimeService.startProcessInstanceByKey(superProcess, businessKey).getProcessInstanceId();
+
+    // when
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery().rootProcessInstances();
+
+    // then
+    assertEquals(6, query.count());
+    List<ProcessInstance> list = query.processInstanceBusinessKey(businessKey).list();
+    assertEquals(1, list.size());
+    assertEquals(processInstanceId, list.get(0).getId());
+  }
+
+  @Test
+  public void testQueryByRootProcessInstancesAndSuperProcess() {
+    // when
+    try {
+      runtimeService.createProcessInstanceQuery().rootProcessInstances().superProcessInstanceId("processInstanceId");
+      fail("expected exception");
+    } catch (ProcessEngineException e) {
+      // then
+      assertTrue(e.getMessage().contains("Invalid query usage: cannot set both rootProcessInstances and superProcessInstanceId"));
+    }
+
+    // when
+    try {
+      runtimeService.createProcessInstanceQuery().superProcessInstanceId("processInstanceId").rootProcessInstances();
+      fail("expected exception");
+    } catch (ProcessEngineException e) {
+      // then
+      assertTrue(e.getMessage().contains("Invalid query usage: cannot set both rootProcessInstances and superProcessInstanceId"));
+    }
+  }
+
   protected void executeJobForProcessInstance(ProcessInstance processInstance) {
     Job job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
     managementService.executeJob(job.getId());
