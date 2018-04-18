@@ -13,6 +13,8 @@
 
   <properties>
     <license.includeTransitiveDependencies>false</license.includeTransitiveDependencies>
+    <camunda.engine.version>7.9.0-SNAPSHOT</camunda.engine.version>
+    <version.tomcat>9.0.5</version.tomcat>
   </properties>
 
   <dependencies>
@@ -66,7 +68,7 @@
 
     <dependency>
       <groupId>junit</groupId>
-      <artifactId>junit-dep</artifactId>
+      <artifactId>junit</artifactId>
       <scope>test</scope>
     </dependency>
 
@@ -100,6 +102,27 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>org.camunda.bpm.model</groupId>
+      <artifactId>camunda-bpmn-model</artifactId>
+      <version>${camunda.engine.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpmime</artifactId>
+        <version>${version.httpclient}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.skyscreamer</groupId>
+      <artifactId>jsonassert</artifactId>
+      <scope>test</scope>
+      <version>1.5.0</version>
+    </dependency>
+
   </dependencies>
 
   <build>
@@ -111,13 +134,239 @@
         <artifactId>license-maven-plugin</artifactId>
       </plugin>
 
-      <!-- SUREFIRE PLUGIN -->
       <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>add-it-source</id>
+            <phase>generate-test-sources</phase>
+            <goals>
+              <goal>add-test-source</goal>
+            </goals>
+            <configuration>
+              <sources>
+                <source>src/it/java</source>
+              </sources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <skipTests>${skip.unit.tests}</skipTests>
+          <trimStackTrace>false</trimStackTrace>
+        </configuration>
       </plugin>
 
     </plugins>
+
+    <testResources>
+      <testResource>
+        <directory>src/it/resources</directory>
+      </testResource>
+      <testResource>
+        <directory>src/test/resources</directory>
+      </testResource>
+    </testResources>
+
   </build>
+
+  <profiles>
+    <profile>
+      <id>it</id>
+
+      <!-- DO NOT REMOVE IF YOU DON'T KNOW WHAT YOU DO -->
+      <repositories>
+        <repository>
+          <id>test</id>
+          <url>http://repository</url>
+          <releases>
+            <enabled>false</enabled>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+        </repository>
+      </repositories>
+
+      <properties>
+        <engine.runtime>${project.build.directory}/camunda-tomcat</engine.runtime>
+        <tomcat.runtime>${engine.runtime}/server/apache-tomcat-${version.tomcat}</tomcat.runtime>
+        <http.port>${tomcat.connector.http.port}</http.port>
+
+        <tomcat.connector.http.port>48080</tomcat.connector.http.port>
+        <tomcat.connector.http.redirectPort>48443</tomcat.connector.http.redirectPort>
+        <tomcat.connector.ajp.port>48009</tomcat.connector.ajp.port>
+        <tomcat.connector.ajp.redirectPort>48443</tomcat.connector.ajp.redirectPort>
+        <tomcat.server.port>48005</tomcat.server.port>
+
+        <cargo.timeout>240000</cargo.timeout>
+        <cargo.deploy.timeout>60000</cargo.deploy.timeout>
+        <skip.unit.tests>true</skip.unit.tests>
+      </properties>
+
+      <dependencies>
+
+        <dependency>
+          <groupId>org.camunda.bpm.tomcat</groupId>
+          <artifactId>camunda-tomcat-assembly</artifactId>
+          <version>${camunda.engine.version}</version>
+          <type>tar.gz</type>
+          <scope>test</scope>
+          <exclusions>
+            <exclusion>
+              <artifactId>slf4j-api</artifactId>
+              <groupId>org.slf4j</groupId>
+            </exclusion>
+          </exclusions>
+        </dependency>
+
+        <dependency>
+          <groupId>org.camunda.bpm.webapp</groupId>
+          <artifactId>camunda-webapp-tomcat</artifactId>
+          <version>${camunda.engine.version}</version>
+          <type>war</type>
+          <scope>test</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>org.camunda.bpm</groupId>
+          <artifactId>camunda-engine-rest</artifactId>
+          <scope>test</scope>
+          <type>war</type>
+          <classifier>tomcat</classifier>
+          <version>${camunda.engine.version}</version>
+        </dependency>
+
+      </dependencies>
+
+      <build>
+        <plugins>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <executions>
+              <execution>
+                <phase>generate-resources</phase>
+                <goals>
+                  <goal>unpack</goal>
+                </goals>
+                <configuration>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>org.camunda.bpm.tomcat</groupId>
+                      <artifactId>camunda-tomcat-assembly</artifactId>
+                      <version>${camunda.engine.version}</version>
+                      <type>tar.gz</type>
+                      <outputDirectory>${engine.runtime}</outputDirectory>
+                      <overWrite>true</overWrite>
+                    </artifactItem>
+                  </artifactItems>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <version>2.20</version>
+            <configuration>
+              <redirectTestOutputToFile>true</redirectTestOutputToFile>
+            </configuration>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>integration-test</goal>
+                  <goal>verify</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>org.codehaus.cargo</groupId>
+            <artifactId>cargo-maven2-plugin</artifactId>
+            <version>1.6.2</version>
+            <executions>
+              <execution>
+                <id>start-container</id>
+                <phase>pre-integration-test</phase>
+                <goals>
+                  <goal>start</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>stop-container</id>
+                <phase>post-integration-test</phase>
+                <goals>
+                  <goal>stop</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <!-- Container configuration -->
+              <container>
+                <type>installed</type>
+                <containerId>tomcat9x</containerId>
+                <append>false</append>
+                <home>${tomcat.runtime}</home>
+                <timeout>${cargo.timeout}</timeout>
+                <log>${tomcat.runtime}/logs/catalina.out</log>
+              </container>
+              <configuration>
+                <type>standalone</type>
+                <home>${project.build.directory}/cargo-config-tomcat</home>
+                <properties>
+                  <cargo.servlet.port>${tomcat.connector.http.port}</cargo.servlet.port>
+                  <cargo.tomcat.ajp.port>${tomcat.connector.ajp.port}</cargo.tomcat.ajp.port>
+                  <cargo.start.jvmargs>-Djava.security.egd=file:/dev/./urandom</cargo.start.jvmargs>
+                </properties>
+                <files>
+                  <copy>
+                    <configfile>true</configfile>
+                    <file>${project.basedir}/src/it/resources/tomcat/bpm-platform.xml</file>
+                    <tofile>conf/bpm-platform.xml</tofile>
+                    <overwrite>true</overwrite>
+                  </copy>
+                </files>
+              </configuration>
+              <deployables>
+                <deployable>
+                  <groupId>org.camunda.bpm</groupId>
+                  <artifactId>camunda-engine-rest</artifactId>
+                  <type>war</type>
+                  <classifier>tomcat</classifier>
+                  <pingURL>
+                    http://localhost:${tomcat.connector.http.port}/engine-rest/engine/default/process-definition
+                  </pingURL>
+                  <pingTimeout>${cargo.deploy.timeout}</pingTimeout>
+                  <properties>
+                    <context>engine-rest</context>
+                  </properties>
+                </deployable>
+                <deployable>
+                  <groupId>org.camunda.bpm.webapp</groupId>
+                  <artifactId>camunda-webapp-tomcat</artifactId>
+                  <type>war</type>
+                  <pingURL>http://localhost:${tomcat.connector.http.port}/camunda</pingURL>
+                  <pingTimeout>${cargo.deploy.timeout}</pingTimeout>
+                  <properties>
+                    <context>camunda</context>
+                  </properties>
+                </deployable>
+              </deployables>
+              <wait>false</wait>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
   <scm>
     <url>http://github.com/camunda/camunda-external-task-client-java</url>
