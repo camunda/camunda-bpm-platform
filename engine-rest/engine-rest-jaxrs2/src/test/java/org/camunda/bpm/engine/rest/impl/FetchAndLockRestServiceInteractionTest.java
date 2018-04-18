@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.identity.Tenant;
 import org.camunda.bpm.engine.identity.TenantQuery;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
 import org.camunda.bpm.engine.rest.dto.externaltask.FetchExternalTasksExtendedDto;
@@ -93,6 +94,8 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
   public void setUpRuntimeData() {
     when(processEngine.getExternalTaskService())
       .thenReturn(externalTaskService);
+    when(processEngine.getProcessEngineConfiguration())
+      .thenReturn(mock(ProcessEngineConfigurationImpl.class));
 
     lockedExternalTaskMock = MockProvider.createMockLockedExternalTask();
     when(externalTaskService.fetchAndLock(anyInt(), any(String.class), any(Boolean.class)))

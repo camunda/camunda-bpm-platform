@@ -18,6 +18,7 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryTopicBuilder;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.rest.dto.externaltask.FetchExternalTasksExtendedDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
@@ -83,6 +84,8 @@ public class FetchAndLockHandlerTest {
   public void initMocks() {
     when(processEngine.getIdentityService()).thenReturn(identityService);
     when(processEngine.getExternalTaskService()).thenReturn(externalTaskService);
+    when(processEngine.getProcessEngineConfiguration())
+      .thenReturn(mock(ProcessEngineConfigurationImpl.class));
 
     when(externalTaskService.fetchAndLock(anyInt(), any(String.class), any(Boolean.class)))
       .thenReturn(fetchTopicBuilder);
@@ -238,6 +241,17 @@ public class FetchAndLockHandlerTest {
     assertThat(handler.getPendingRequests().size(), is(0));
     verify(handler, never()).suspend(anyLong());
     verify(asyncResponse).resume(any(ProcessEngineException.class));
+  }
+
+  @Test
+  public void shouldRegisterHandlerAtProcessEngine() {
+    // given
+    doReturn(Collections.emptyList()).when(fetchTopicBuilder).execute();
+    AsyncResponse asyncResponse = mock(AsyncResponse.class);
+
+    handler.addPendingRequest(createDto(5000L), asyncResponse, processEngine);
+
+    verify((ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration()).addExternalTaskCreatedListener(handler);
   }
 
   @Test

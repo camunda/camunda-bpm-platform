@@ -24,16 +24,8 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Properties;
-import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import javax.naming.InitialContext;
@@ -253,46 +245,7 @@ import org.camunda.bpm.engine.impl.persistence.deploy.Deployer;
 import org.camunda.bpm.engine.impl.persistence.deploy.cache.CacheFactory;
 import org.camunda.bpm.engine.impl.persistence.deploy.cache.DefaultCacheFactory;
 import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
-import org.camunda.bpm.engine.impl.persistence.entity.AttachmentManager;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
-import org.camunda.bpm.engine.impl.persistence.entity.BatchManager;
-import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayManager;
-import org.camunda.bpm.engine.impl.persistence.entity.CommentManager;
-import org.camunda.bpm.engine.impl.persistence.entity.DeploymentManager;
-import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionManager;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionManager;
-import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskManager;
-import org.camunda.bpm.engine.impl.persistence.entity.FilterManager;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricActivityInstanceManager;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricBatchManager;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricCaseActivityInstanceManager;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricCaseInstanceManager;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailManager;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricExternalTaskLogManager;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricIdentityLinkLogManager;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentManager;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogManager;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceManager;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricStatisticsManager;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceManager;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceManager;
-import org.camunda.bpm.engine.impl.persistence.entity.IdentityInfoManager;
-import org.camunda.bpm.engine.impl.persistence.entity.IdentityLinkManager;
-import org.camunda.bpm.engine.impl.persistence.entity.IncidentManager;
-import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionManager;
-import org.camunda.bpm.engine.impl.persistence.entity.JobManager;
-import org.camunda.bpm.engine.impl.persistence.entity.MeterLogManager;
-import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionManager;
-import org.camunda.bpm.engine.impl.persistence.entity.PropertyManager;
-import org.camunda.bpm.engine.impl.persistence.entity.ReportManager;
-import org.camunda.bpm.engine.impl.persistence.entity.ResourceManager;
-import org.camunda.bpm.engine.impl.persistence.entity.StatisticsManager;
-import org.camunda.bpm.engine.impl.persistence.entity.TableDataManager;
-import org.camunda.bpm.engine.impl.persistence.entity.TaskManager;
-import org.camunda.bpm.engine.impl.persistence.entity.TaskReportManager;
-import org.camunda.bpm.engine.impl.persistence.entity.TenantManager;
-import org.camunda.bpm.engine.impl.persistence.entity.UserOperationLogManager;
-import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceManager;
+import org.camunda.bpm.engine.impl.persistence.entity.*;
 import org.camunda.bpm.engine.impl.runtime.ConditionHandler;
 import org.camunda.bpm.engine.impl.runtime.CorrelationHandler;
 import org.camunda.bpm.engine.impl.runtime.DefaultConditionHandler;
@@ -457,6 +410,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected Map<String, BatchJobHandler<?>> batchHandlers;
   protected List<BatchJobHandler<?>> customBatchJobHandlers;
+
+  // EXTERNAL TASK CREATED LISTENERS //////////////////////////////////////////
+
+  protected Set<ExternalTaskCreatedListener> externalTaskCreatedListeners;
 
   /**
    * Number of jobs created by a batch seed job invocation
@@ -776,6 +733,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initJpa();
     initDelegateInterceptor();
     initEventHandlers();
+    initExternalTaskCreatedListeners();
     initProcessApplicationManager();
     initCorrelationHandler();
     initConditionHandler();
@@ -961,6 +919,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       for (BatchJobHandler<?> customBatchJobHandler : customBatchJobHandlers) {
         batchHandlers.put(customBatchJobHandler.getType(), customBatchJobHandler);
       }
+    }
+  }
+
+  // external task created listeners ///////////////////////////////////////////
+
+  protected void initExternalTaskCreatedListeners() {
+    if (this.externalTaskCreatedListeners == null) {
+      this.externalTaskCreatedListeners = new HashSet<ExternalTaskCreatedListener>();
     }
   }
 
@@ -3138,6 +3104,24 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setBatchHandlers(Map<String, BatchJobHandler<?>> batchHandlers) {
     this.batchHandlers = batchHandlers;
+  }
+
+  public Set<ExternalTaskCreatedListener> getExternalTaskCreatedListeners() {
+    return externalTaskCreatedListeners;
+  }
+
+  public void setExternalTaskCreatedListeners(Set<ExternalTaskCreatedListener> externalTaskCreatedListeners) {
+    this.externalTaskCreatedListeners = externalTaskCreatedListeners;
+  }
+
+  public void addExternalTaskCreatedListener(ExternalTaskCreatedListener externalTaskCreatedListener) {
+    this.externalTaskCreatedListeners.add(externalTaskCreatedListener);
+  }
+
+  public void notifyExternalTaskCreatedListeners() {
+    for (ExternalTaskCreatedListener externalTaskCreatedListener : externalTaskCreatedListeners) {
+      externalTaskCreatedListener.onExternalTaskCreated();
+    }
   }
 
   public List<BatchJobHandler<?>> getCustomBatchJobHandlers() {

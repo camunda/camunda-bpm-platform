@@ -17,7 +17,9 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryBuilder;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.identity.Authentication;
+import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskCreatedListener;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.rest.dto.externaltask.FetchExternalTasksExtendedDto;
 import org.camunda.bpm.engine.rest.dto.externaltask.LockedExternalTaskDto;
@@ -35,7 +37,7 @@ import java.util.concurrent.BlockingQueue;
 /**
  * @author Tassilo Weidner
  */
-public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
+public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler, ExternalTaskCreatedListener {
 
   protected static final long MAX_BACK_OFF_TIME = Long.MAX_VALUE;
   protected static final long MAX_TIMEOUT = 1800000; // 30 minutes
@@ -153,6 +155,16 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
       errorTooManyRequests(asyncResponse);
     }
 
+    // Listen for new ExternalTasks
+    ((ProcessEngineConfigurationImpl)request.getProcessEngine()
+      .getProcessEngineConfiguration())
+      .addExternalTaskCreatedListener(this);
+
+    notifyAcquisition();
+  }
+
+  @Override
+  public void onExternalTaskCreated() {
     notifyAcquisition();
   }
 
