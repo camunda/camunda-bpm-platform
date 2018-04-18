@@ -242,7 +242,7 @@
              A sub process instance is NOT stored under the process instance, hence the following: -->
         and RES.SUPER_EXEC_ IN (select ID_ from ${prefix}ACT_RU_EXECUTION where PROC_INST_ID_ = #{superProcessInstanceId})
       </if>
-      <if test="isRootProcessInstance == true">
+      <if test="isRootProcessInstances == true">
         and RES.SUPER_EXEC_ is null
       </if>
       <if test="subProcessInstanceId != null">
