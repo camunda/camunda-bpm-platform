@@ -15,6 +15,7 @@
 package org.camunda.bpm.client.variable;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 import static org.camunda.bpm.client.util.ProcessModels.EXTERNAL_TASK_TOPIC_FOO;
 import static org.camunda.bpm.client.util.ProcessModels.LOCK_DURATION;
 import static org.camunda.bpm.client.util.ProcessModels.TWO_EXTERNAL_TASK_PROCESS;
@@ -227,6 +228,276 @@ public class XmlSerializationIT {
       assertThat(VARIABLE_VALUE_XML_DESERIALIZED.getBooleanProperty()).isEqualTo(Boolean.parseBoolean(c.childElement("booleanProperty").textContent()));
       assertThat(VARIABLE_VALUE_XML_DESERIALIZED.getIntProperty()).isEqualTo(Integer.parseInt(c.childElement("intProperty").textContent()));
     });
+  }
+
+  @Test
+  public void shouldFailWhileDeserialization() {
+    // given
+    ObjectValue objectValue = Variables.serializedObjectValue(VARIABLE_VALUE_XML_SERIALIZED)
+      .objectTypeName(FailingDeserializationBean.class.getName())
+      .serializationDataFormat(XML_DATAFORMAT_NAME)
+      .create();
+
+    engineRule.startProcessInstance(processDefinition.getId(), VARIABLE_NAME_XML, objectValue);
+
+    // then
+    thrown.expect(RuntimeException.class);
+
+    // when
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .lockDuration(LOCK_DURATION)
+      .handler(handler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+    task.getVariable(VARIABLE_NAME_XML);
+  }
+
+  @Test
+  public void shouldFailWhileDeserializationTypedValue() {
+    // given
+    ObjectValue objectValue = Variables.serializedObjectValue(VARIABLE_VALUE_XML_SERIALIZED)
+      .objectTypeName(FailingDeserializationBean.class.getName())
+      .serializationDataFormat(XML_DATAFORMAT_NAME)
+      .create();
+
+    engineRule.startProcessInstance(processDefinition.getId(), VARIABLE_NAME_XML, objectValue);
+
+    // then
+    thrown.expect(RuntimeException.class);
+
+    // when
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .lockDuration(LOCK_DURATION)
+      .handler(handler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+    task.getVariableTyped(VARIABLE_NAME_XML);
+  }
+
+  @Test
+  public void shouldStillReturnSerializedXmlWhenDeserializationFails() {
+    // given
+    ObjectValue objectValue = Variables.serializedObjectValue(VARIABLE_VALUE_XML_SERIALIZED)
+      .objectTypeName(FailingDeserializationBean.class.getName())
+      .serializationDataFormat(XML_DATAFORMAT_NAME)
+      .create();
+
+    engineRule.startProcessInstance(processDefinition.getId(), VARIABLE_NAME_XML, objectValue);
+
+    // when
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .lockDuration(LOCK_DURATION)
+      .handler(handler)
+      .open();
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    try {
+      task.getVariableTyped(VARIABLE_NAME_XML);
+      fail("exception expected");
+    }
+    catch (Exception e) {
+    }
+
+    // However, the serialized value can be accessed
+    ObjectValue typedValue = task.getVariableTyped(VARIABLE_NAME_XML, false);
+    assertThat(typedValue.getObjectTypeName()).isNotNull();
+    assertThat(typedValue.getType()).isEqualTo(OBJECT);
+    assertThat(typedValue.isDeserialized()).isFalse();
+
+    SpinXmlElement serializedValue = Spin.XML(typedValue.getValueSerialized());
+    assertThat(VARIABLE_VALUE_XML_DESERIALIZED.getStringProperty()).isEqualTo(serializedValue.childElement("stringProperty").textContent());
+    assertThat(VARIABLE_VALUE_XML_DESERIALIZED.getBooleanProperty()).isEqualTo(Boolean.parseBoolean(serializedValue.childElement("booleanProperty").textContent()));
+    assertThat(VARIABLE_VALUE_XML_DESERIALIZED.getIntProperty()).isEqualTo(Integer.parseInt(serializedValue.childElement("intProperty").textContent()));
+
+    // but not the deserialized properties
+    try {
+      typedValue.getValue();
+      fail("exception expected");
+    }
+    catch(IllegalStateException e) {
+    }
+
+    try {
+      typedValue.getValue(XmlSerializable.class);
+      fail("exception expected");
+    }
+    catch(IllegalStateException e) {
+    }
+
+    try {
+      typedValue.getObjectType();
+      fail("exception expected");
+    }
+    catch(IllegalStateException e) {
+    }
+  }
+
+  @Test
+  public void shouldFailWhileDeserializationDueToMismatchingTypeName() {
+    // given
+    ObjectValue serializedValue = Variables.serializedObjectValue(VARIABLE_VALUE_XML_SERIALIZED)
+      .serializationDataFormat(XML_DATAFORMAT_NAME)
+      .objectTypeName("Insensible type name")  // < not a valid type name
+      .create();
+
+    engineRule.startProcessInstance(processDefinition.getId(), VARIABLE_NAME_XML, serializedValue);
+
+    // then
+    thrown.expect(RuntimeException.class);
+
+    // when
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .lockDuration(LOCK_DURATION)
+      .handler(handler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+    task.getVariable(VARIABLE_NAME_XML);
+  }
+
+  @Test
+  public void shouldFailWhileDeserializationDueToWrongTypeName() {
+    // given
+
+    // not reachable class
+    class Foo {}
+
+    ObjectValue serializedValue = Variables.serializedObjectValue(VARIABLE_VALUE_XML_SERIALIZED)
+      .serializationDataFormat(XML_DATAFORMAT_NAME)
+      .objectTypeName(Foo.class.getName())  // < not the right type name
+      .create();
+
+    engineRule.startProcessInstance(processDefinition.getId(), VARIABLE_NAME_XML, serializedValue);
+
+    // then
+    thrown.expect(RuntimeException.class);
+
+    // when
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .lockDuration(LOCK_DURATION)
+      .handler(handler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+    task.getVariable(VARIABLE_NAME_XML);
+  }
+
+  @Test
+  public void shouldDeserializeNull() {
+    // given
+    ObjectValue serializedValue = Variables.serializedObjectValue()
+        .serializationDataFormat(XML_DATAFORMAT_NAME)
+        .objectTypeName(XmlSerializable.class.getName())
+        .create();
+
+    engineRule.startProcessInstance(processDefinition.getId(), VARIABLE_NAME_XML, serializedValue);
+
+    // when
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .lockDuration(LOCK_DURATION)
+      .handler(handler)
+      .open();
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    XmlSerializable returnedBean = task.getVariable(VARIABLE_NAME_XML);
+    assertThat(returnedBean).isNull();
+  }
+
+  @Test
+  public void shouldDeserializeNullTyped() {
+    // given
+    ObjectValue serializedValue = Variables.serializedObjectValue()
+        .serializationDataFormat(XML_DATAFORMAT_NAME)
+        .objectTypeName(XmlSerializable.class.getName())
+        .create();
+
+    engineRule.startProcessInstance(processDefinition.getId(), VARIABLE_NAME_XML, serializedValue);
+
+    // when
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .lockDuration(LOCK_DURATION)
+      .handler(handler)
+      .open();
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    ObjectValue typedValue = task.getVariableTyped(VARIABLE_NAME_XML);
+    assertThat(typedValue.getValue()).isNull();
+    assertThat(typedValue.getObjectTypeName()).isEqualTo(XmlSerializable.class.getName());
+    assertThat(typedValue.getType()).isEqualTo(OBJECT);
+    assertThat(typedValue.isDeserialized()).isTrue();
+  }
+
+  @Test
+  public void shouldDeserializeNullWithoutTypeName()  {
+    // given
+    ObjectValue serializedValue = Variables.serializedObjectValue()
+        .serializationDataFormat(XML_DATAFORMAT_NAME)
+        .create();
+
+    engineRule.startProcessInstance(processDefinition.getId(), VARIABLE_NAME_XML, serializedValue);
+
+    // when
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .lockDuration(LOCK_DURATION)
+      .handler(handler)
+      .open();
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    XmlSerializable returnedBean = task.getVariable(VARIABLE_NAME_XML);
+    assertThat(returnedBean).isNull();
+  }
+
+  @Test
+  public void shouldDeserializeNullTypedWithoutTypeName()  {
+    // given
+    ObjectValue serializedValue = Variables.serializedObjectValue()
+        .serializationDataFormat(XML_DATAFORMAT_NAME)
+        .create();
+
+    engineRule.startProcessInstance(processDefinition.getId(), VARIABLE_NAME_XML, serializedValue);
+
+    // when
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .lockDuration(LOCK_DURATION)
+      .handler(handler)
+      .open();
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    ObjectValue typedValue = task.getVariableTyped(VARIABLE_NAME_XML);
+    assertThat(typedValue.getValue()).isNull();
+    assertThat(typedValue.getObjectTypeName()).isNull();
+    assertThat(typedValue.getType()).isEqualTo(OBJECT);
+    assertThat(typedValue.isDeserialized()).isTrue();
   }
 
 }
