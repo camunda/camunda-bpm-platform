@@ -22,6 +22,7 @@ import static org.camunda.spin.plugin.variable.type.SpinValueType.XML;
 import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.client.dto.ProcessDefinitionDto;
 import org.camunda.bpm.client.dto.ProcessInstanceDto;
+import org.camunda.bpm.client.exception.ValueMapperException;
 import org.camunda.bpm.client.rule.ClientRule;
 import org.camunda.bpm.client.rule.EngineRule;
 import org.camunda.bpm.client.task.ExternalTask;
@@ -197,7 +198,7 @@ public class XmlValueIT {
     engineRule.startProcessInstance(processDefinition.getId(), VARIABLE_NAME_XML, VARIABLE_VALUE_XML_VALUE_BROKEN);
 
     // then
-    thrown.expect(RuntimeException.class);
+    thrown.expect(ValueMapperException.class);
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
@@ -217,7 +218,7 @@ public class XmlValueIT {
     engineRule.startProcessInstance(processDefinition.getId(), VARIABLE_NAME_XML, VARIABLE_VALUE_XML_VALUE_BROKEN);
 
     // then
-    thrown.expect(RuntimeException.class);
+    thrown.expect(ValueMapperException.class);
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
