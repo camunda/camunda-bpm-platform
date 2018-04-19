@@ -26,7 +26,6 @@ import org.camunda.bpm.client.rule.ClientRule;
 import org.camunda.bpm.client.rule.EngineRule;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.util.RecordingExternalTaskHandler;
-import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.camunda.spin.json.SpinJsonNode;
 import org.camunda.spin.plugin.variable.SpinValues;
 import org.camunda.spin.plugin.variable.value.JsonValue;
