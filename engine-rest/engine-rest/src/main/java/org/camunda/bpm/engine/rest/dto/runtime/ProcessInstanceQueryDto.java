@@ -274,6 +274,10 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
     this.activityIds = activityIds;
   }
 
+  public Boolean isRootProcessInstances() {
+    return rootProcessInstances;
+  }
+
   @CamundaQueryParam(value = "rootProcessInstances", converter = BooleanConverter.class)
   public void setRootProcessInstances(Boolean rootProcessInstances) {
     this.rootProcessInstances = rootProcessInstances;
@@ -352,7 +356,7 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
     if (activityIds != null && !activityIds.isEmpty()) {
       query.activityIdIn(activityIds.toArray(new String[activityIds.size()]));
     }
-    if (rootProcessInstances == true) {
+    if (TRUE.equals(rootProcessInstances)) {
       query.rootProcessInstances();
     }
     if (variables != null) {
