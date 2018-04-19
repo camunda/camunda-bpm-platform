@@ -39,7 +39,7 @@ public class XmlValueMapper extends SpinValueMapper<XmlValue> {
 
   protected XmlValue createDeserializedValue(Object deserializedObject, String serializedValue, TypedValueField typedValueField) {
     SpinXmlElement value = (SpinXmlElement) deserializedObject;
-    return new XmlValueImpl(value, serializedValue, value.getDataFormatName(), true);
+    return new XmlValueImpl(value, serializedValue, serializationDataFormat, true);
   }
 
   protected XmlValue createSerializedValue(String serializedValue, TypedValueField typedValueField) {

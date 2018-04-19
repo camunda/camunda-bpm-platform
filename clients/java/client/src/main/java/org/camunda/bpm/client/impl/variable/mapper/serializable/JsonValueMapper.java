@@ -39,7 +39,7 @@ public class JsonValueMapper extends SpinValueMapper<JsonValue> {
 
   protected JsonValue createDeserializedValue(Object deserializedObject, String serializedValue, TypedValueField typedValueField) {
     SpinJsonNode value = (SpinJsonNode) deserializedObject;
-    return new JsonValueImpl(value, serializedValue, value.getDataFormatName(), true);
+    return new JsonValueImpl(value, serializedValue, serializationDataFormat, true);
   }
 
   protected JsonValue createSerializedValue(String serializedValue, TypedValueField typedValueField) {
