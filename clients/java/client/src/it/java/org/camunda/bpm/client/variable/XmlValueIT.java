@@ -14,7 +14,6 @@ package org.camunda.bpm.client.variable;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.client.util.ProcessModels.EXTERNAL_TASK_TOPIC_FOO;
-import static org.camunda.bpm.client.util.ProcessModels.LOCK_DURATION;
 import static org.camunda.bpm.client.util.ProcessModels.TWO_EXTERNAL_TASK_PROCESS;
 import static org.camunda.spin.DataFormats.XML_DATAFORMAT_NAME;
 import static org.camunda.spin.plugin.variable.type.SpinValueType.XML;
@@ -79,7 +78,6 @@ public class XmlValueIT {
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-      .lockDuration(LOCK_DURATION)
       .handler(handler)
       .open();
 
@@ -100,7 +98,6 @@ public class XmlValueIT {
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-      .lockDuration(LOCK_DURATION)
       .handler(handler)
       .open();
 
@@ -125,7 +122,6 @@ public class XmlValueIT {
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-      .lockDuration(LOCK_DURATION)
       .handler(handler)
       .open();
 
@@ -153,7 +149,6 @@ public class XmlValueIT {
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-      .lockDuration(LOCK_DURATION)
       .handler(handler)
       .open();
 
@@ -177,7 +172,6 @@ public class XmlValueIT {
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-      .lockDuration(LOCK_DURATION)
       .handler(handler)
       .open();
 
@@ -202,7 +196,6 @@ public class XmlValueIT {
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-      .lockDuration(LOCK_DURATION)
       .handler(handler)
       .open();
 
@@ -222,7 +215,6 @@ public class XmlValueIT {
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-      .lockDuration(LOCK_DURATION)
       .handler(handler)
       .open();
 
@@ -239,7 +231,6 @@ public class XmlValueIT {
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-      .lockDuration(LOCK_DURATION)
       .handler(handler)
       .open();
 

@@ -27,8 +27,6 @@ public class ProcessModels {
   public static final String EXTERNAL_TASK_TOPIC_FOO = "foo";
   public static final String EXTERNAL_TASK_TOPIC_BAR = "bar";
 
-  public static final long LOCK_DURATION = 1000 * 60 * 5;
-
   public static ProcessBuilder newModel() {
     return newModel(PROCESS_KEY);
   }

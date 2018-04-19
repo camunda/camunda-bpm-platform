@@ -17,7 +17,6 @@ package org.camunda.bpm.client.variable;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.camunda.bpm.client.util.ProcessModels.EXTERNAL_TASK_TOPIC_FOO;
-import static org.camunda.bpm.client.util.ProcessModels.LOCK_DURATION;
 import static org.camunda.bpm.client.util.ProcessModels.TWO_EXTERNAL_TASK_PROCESS;
 import static org.camunda.bpm.engine.variable.type.ValueType.OBJECT;
 import static org.camunda.spin.DataFormats.JSON_DATAFORMAT_NAME;
@@ -91,7 +90,6 @@ public class JsonSerializationIT {
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-      .lockDuration(LOCK_DURATION)
       .handler(handler)
       .open();
 
@@ -111,7 +109,6 @@ public class JsonSerializationIT {
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-      .lockDuration(LOCK_DURATION)
       .handler(handler)
       .open();
 
@@ -134,7 +131,6 @@ public class JsonSerializationIT {
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-      .lockDuration(LOCK_DURATION)
       .handler(handler)
       .open();
 
@@ -157,7 +153,6 @@ public class JsonSerializationIT {
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-      .lockDuration(LOCK_DURATION)
       .handler(handler)
       .open();
 
@@ -178,7 +173,6 @@ public class JsonSerializationIT {
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-      .lockDuration(LOCK_DURATION)
       .handler(handler)
       .open();
 
@@ -201,7 +195,6 @@ public class JsonSerializationIT {
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-      .lockDuration(LOCK_DURATION)
       .handler(handler)
       .open();
 
@@ -232,7 +225,6 @@ public class JsonSerializationIT {
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-      .lockDuration(LOCK_DURATION)
       .handler(handler)
       .open();
 
@@ -257,7 +249,6 @@ public class JsonSerializationIT {
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-      .lockDuration(LOCK_DURATION)
       .handler(handler)
       .open();
 
@@ -279,7 +270,6 @@ public class JsonSerializationIT {
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-      .lockDuration(LOCK_DURATION)
       .handler(handler)
       .open();
 
@@ -340,7 +330,6 @@ public class JsonSerializationIT {
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-      .lockDuration(LOCK_DURATION)
       .handler(handler)
       .open();
 
@@ -365,7 +354,6 @@ public class JsonSerializationIT {
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-      .lockDuration(LOCK_DURATION)
       .handler(handler)
       .open();
 
@@ -387,7 +375,6 @@ public class JsonSerializationIT {
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-      .lockDuration(LOCK_DURATION)
       .handler(handler)
       .open();
 
@@ -412,7 +399,6 @@ public class JsonSerializationIT {
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-      .lockDuration(LOCK_DURATION)
       .handler(handler)
       .open();
 
@@ -439,7 +425,6 @@ public class JsonSerializationIT {
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-      .lockDuration(LOCK_DURATION)
       .handler(handler)
       .open();
 
@@ -463,7 +448,6 @@ public class JsonSerializationIT {
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-      .lockDuration(LOCK_DURATION)
       .handler(handler)
       .open();
 

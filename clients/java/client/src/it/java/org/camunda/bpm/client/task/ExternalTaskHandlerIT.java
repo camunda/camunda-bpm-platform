@@ -13,10 +13,10 @@
 package org.camunda.bpm.client.task;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.camunda.bpm.client.rule.ClientRule.LOCK_DURATION;
 import static org.camunda.bpm.client.util.ProcessModels.BPMN_ERROR_EXTERNAL_TASK_PROCESS;
 import static org.camunda.bpm.client.util.ProcessModels.EXTERNAL_TASK_ID;
 import static org.camunda.bpm.client.util.ProcessModels.EXTERNAL_TASK_TOPIC_FOO;
-import static org.camunda.bpm.client.util.ProcessModels.LOCK_DURATION;
 import static org.camunda.bpm.client.util.ProcessModels.PROCESS_KEY;
 import static org.camunda.bpm.client.util.ProcessModels.USER_TASK_AFTER_BPMN_ERROR;
 import static org.camunda.bpm.client.util.ProcessModels.USER_TASK_ID;
@@ -63,7 +63,6 @@ public class ExternalTaskHandlerIT {
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-      .lockDuration(LOCK_DURATION)
       .handler(handler)
       .open();
 
@@ -98,7 +97,6 @@ public class ExternalTaskHandlerIT {
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-      .lockDuration(LOCK_DURATION)
       .handler(handler)
       .open();
 
@@ -120,7 +118,6 @@ public class ExternalTaskHandlerIT {
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-      .lockDuration(LOCK_DURATION)
       .handler(handler)
       .open();
 
@@ -145,7 +142,6 @@ public class ExternalTaskHandlerIT {
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-      .lockDuration(LOCK_DURATION)
       .handler(handler)
       .open();
 
@@ -166,7 +162,6 @@ public class ExternalTaskHandlerIT {
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-      .lockDuration(LOCK_DURATION)
       .handler(handler)
       .open();
 
@@ -188,7 +183,6 @@ public class ExternalTaskHandlerIT {
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-      .lockDuration(LOCK_DURATION)
       .handler(handler)
       .open();
 
