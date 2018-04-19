@@ -28,7 +28,9 @@ public class ClientRule extends ExternalResource {
   protected ExternalTaskClient client;
 
   public ClientRule() {
-    this(() -> ExternalTaskClient.create().baseUrl("http://localhost:48080/engine-rest"));
+    this(() -> ExternalTaskClient.create()
+      .baseUrl("http://localhost:48080/engine-rest")
+      .lockDuration(LOCK_DURATION));
   }
 
   public ClientRule(Supplier<ExternalTaskClientBuilder> builderSupplier) {

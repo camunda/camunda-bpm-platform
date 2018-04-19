@@ -200,16 +200,28 @@ public class EngineRule extends ExternalResource {
   }
 
   public ProcessInstanceDto startProcessInstance(String processDefinitionId) {
-    return startProcessInstance(processDefinitionId, null);
+    return startProcessInstance(processDefinitionId, null, (Map<String, TypedValue>) null);
+  }
+
+  public ProcessInstanceDto startProcessInstance(String processDefinitionId, String businessKey) {
+    return startProcessInstance(processDefinitionId, businessKey, (Map<String, TypedValue>) null);
+  }
+
+  public ProcessInstanceDto startProcessInstance(String processDefinitionId, String businessKey, String variableName, TypedValue variableValue) {
+    Map<String, TypedValue> variables = new HashMap<>();
+    variables.put(variableName, variableValue);
+    return startProcessInstance(processDefinitionId, businessKey, variables);
   }
 
   public ProcessInstanceDto startProcessInstance(String processDefinitionId, String variableName, TypedValue variableValue) {
-    Map<String, TypedValue> variables = new HashMap<>();
-    variables.put(variableName, variableValue);
-    return startProcessInstance(processDefinitionId, variables);
+    return startProcessInstance(processDefinitionId, null, variableName, variableValue);
   }
 
   public ProcessInstanceDto startProcessInstance(String processDefinitionId, Map<String, TypedValue> variables) {
+    return startProcessInstance(processDefinitionId, null, variables);
+  }
+
+  public ProcessInstanceDto startProcessInstance(String processDefinitionId, String businessKey, Map<String, TypedValue> variables) {
     if (variables == null) {
       variables = new HashMap<>();
     }
@@ -250,8 +262,21 @@ public class EngineRule extends ExternalResource {
         map.put(key, dto);
       });
 
-      String variablesAsString = objectMapper.writeValueAsString(map);
-      httpPost.setEntity(new StringEntity("{ \"variables\": " + variablesAsString + "}"));
+      StringBuilder payload = new StringBuilder();
+      payload.append("{");
+      if (!map.isEmpty()) {
+        String variablesAsString = objectMapper.writeValueAsString(map);
+        payload.append("\"variables\": " + variablesAsString);
+        payload.append(",");
+      }
+      if (businessKey != null) {
+        payload.append("\"businessKey\": \"" + businessKey + "\"");
+      } else {
+        payload.append("\"businessKey\": null");
+      }
+      payload.append("}");
+
+      httpPost.setEntity(new StringEntity(payload.toString()));
 
       return executeRequest(httpPost, ProcessInstanceDto.class);
     }
