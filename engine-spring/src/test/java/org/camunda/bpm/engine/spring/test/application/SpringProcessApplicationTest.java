@@ -115,4 +115,29 @@ public class SpringProcessApplicationTest {
 
   }
 
+  @Test
+  public void testPostDeployWithNestedContext() {
+    /*
+     * This test case checks if the process application deployment is done when
+     * application context is refreshed, but not when child contexts are
+     * refreshed.
+     * 
+     * As a side test it checks if events thrown in the PostDeploy-method are
+     * catched by the main application context.
+     */
+
+    AbstractApplicationContext applicationContext = new ClassPathXmlApplicationContext(
+        "org/camunda/bpm/engine/spring/test/application/PostDeployWithNestedContext-context.xml");
+    applicationContext.start();
+
+    // lookup the process application spring bean:
+    PostDeployWithNestedContext processApplication = applicationContext.getBean("customProcessApplicaiton", PostDeployWithNestedContext.class);
+
+    Assert.assertFalse(processApplication.isDeployOnChildRefresh());
+    Assert.assertTrue(processApplication.isLateEventTriggered());
+
+    processApplication.undeploy();
+    applicationContext.close();
+  }
+
 }
