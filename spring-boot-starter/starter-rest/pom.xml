@@ -20,8 +20,7 @@
 
     <dependency>
       <groupId>org.camunda.bpm</groupId>
-      <artifactId>camunda-engine-rest</artifactId>
-      <classifier>classes</classifier>
+      <artifactId>camunda-engine-rest-jaxrs2</artifactId>
     </dependency>
 
     <dependency>
