@@ -13,6 +13,7 @@
 package org.camunda.bpm.client.variable;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.camunda.bpm.client.util.ProcessModels.EXTERNAL_TASK_TOPIC_BAR;
 import static org.camunda.bpm.client.util.ProcessModels.EXTERNAL_TASK_TOPIC_FOO;
 import static org.camunda.bpm.client.util.ProcessModels.TWO_EXTERNAL_TASK_PROCESS;
 import static org.camunda.bpm.engine.variable.type.ValueType.BOOLEAN;
@@ -35,7 +36,10 @@ import org.camunda.bpm.client.dto.ProcessInstanceDto;
 import org.camunda.bpm.client.rule.ClientRule;
 import org.camunda.bpm.client.rule.EngineRule;
 import org.camunda.bpm.client.task.ExternalTask;
+import org.camunda.bpm.client.task.ExternalTaskService;
 import org.camunda.bpm.client.util.RecordingExternalTaskHandler;
+import org.camunda.bpm.client.util.RecordingInvocationHandler;
+import org.camunda.bpm.client.util.RecordingInvocationHandler.RecordedInvocation;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.TypedValue;
@@ -79,6 +83,7 @@ public class PrimitiveVariableIT {
   protected ProcessInstanceDto processInstance;
 
   protected RecordingExternalTaskHandler handler = new RecordingExternalTaskHandler();
+  protected RecordingInvocationHandler invocationHandler = new RecordingInvocationHandler();
 
   @Before
   public void setup() throws Exception {
@@ -166,6 +171,154 @@ public class PrimitiveVariableIT {
   }
 
   @Test
+  public void shoudSetVariable_Integer() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // when
+    Map<String, Object> variables = Variables.createVariables();
+    variables.put(VARIABLE_NAME, VARIABLE_VALUE_INT);
+    fooService.complete(fooTask, variables);
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    int variableValue = task.getVariable(VARIABLE_NAME);
+    assertThat(variableValue).isEqualTo(VARIABLE_VALUE_INT);
+
+    TypedValue typedValue = task.getVariableTyped(VARIABLE_NAME);
+    assertThat(typedValue.getValue()).isEqualTo(VARIABLE_VALUE_INT);
+    assertThat(typedValue.getType()).isEqualTo(INTEGER);
+  }
+
+  @Test
+  public void shoudSetVariableTyped_Integer() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // when
+    Map<String, Object> variables = Variables.createVariables();
+    variables.put(VARIABLE_NAME, Variables.integerValue(VARIABLE_VALUE_INT));
+    fooService.complete(fooTask, variables);
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    int variableValue = task.getVariable(VARIABLE_NAME);
+    assertThat(variableValue).isEqualTo(VARIABLE_VALUE_INT);
+
+    TypedValue typedValue = task.getVariableTyped(VARIABLE_NAME);
+    assertThat(typedValue.getValue()).isEqualTo(VARIABLE_VALUE_INT);
+    assertThat(typedValue.getType()).isEqualTo(INTEGER);
+  }
+
+  @Test
+  public void shoudSetVariableUntyped_Integer() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // when
+    Map<String, Object> variables = Variables.createVariables();
+    variables.put(VARIABLE_NAME, Variables.untypedValue(VARIABLE_VALUE_INT));
+    fooService.complete(fooTask, variables);
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    int variableValue = task.getVariable(VARIABLE_NAME);
+    assertThat(variableValue).isEqualTo(VARIABLE_VALUE_INT);
+
+    TypedValue typedValue = task.getVariableTyped(VARIABLE_NAME);
+    assertThat(typedValue.getValue()).isEqualTo(VARIABLE_VALUE_INT);
+    assertThat(typedValue.getType()).isEqualTo(INTEGER);
+  }
+
+  @Test
+  public void shoudSetVariableTyped_NullInteger() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // when
+    Map<String, Object> variables = Variables.createVariables();
+    variables.put(VARIABLE_NAME, Variables.integerValue(null));
+    fooService.complete(fooTask, variables);
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    Integer variableValue = task.getVariable(VARIABLE_NAME);
+    assertThat(variableValue).isNull();
+
+    TypedValue typedValue = task.getVariableTyped(VARIABLE_NAME);
+    assertThat(typedValue.getValue()).isNull();
+    assertThat(typedValue.getType()).isEqualTo(INTEGER);
+  }
+
+  @Test
   public void shoudGetVariable_Long() {
     // given
     engineRule.startProcessInstance(processDefinition.getId(), VARIABLE_NAME, Variables.longValue(VARIABLE_VALUE_LONG));
@@ -237,6 +390,154 @@ public class PrimitiveVariableIT {
     clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
 
     ExternalTask task = handler.getHandledTasks().get(0);
+
+    TypedValue typedValue = task.getVariableTyped(VARIABLE_NAME);
+    assertThat(typedValue.getValue()).isNull();
+    assertThat(typedValue.getType()).isEqualTo(LONG);
+  }
+
+  @Test
+  public void shoudSetVariable_Long() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // when
+    Map<String, Object> variables = Variables.createVariables();
+    variables.put(VARIABLE_NAME, VARIABLE_VALUE_LONG);
+    fooService.complete(fooTask, variables);
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    long variableValue = task.getVariable(VARIABLE_NAME);
+    assertThat(variableValue).isEqualTo(VARIABLE_VALUE_LONG);
+
+    TypedValue typedValue = task.getVariableTyped(VARIABLE_NAME);
+    assertThat(typedValue.getValue()).isEqualTo(VARIABLE_VALUE_LONG);
+    assertThat(typedValue.getType()).isEqualTo(LONG);
+  }
+
+  @Test
+  public void shoudSetVariableTyped_Long() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // when
+    Map<String, Object> variables = Variables.createVariables();
+    variables.put(VARIABLE_NAME, Variables.longValue(VARIABLE_VALUE_LONG));
+    fooService.complete(fooTask, variables);
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    long variableValue = task.getVariable(VARIABLE_NAME);
+    assertThat(variableValue).isEqualTo(VARIABLE_VALUE_LONG);
+
+    TypedValue typedValue = task.getVariableTyped(VARIABLE_NAME);
+    assertThat(typedValue.getValue()).isEqualTo(VARIABLE_VALUE_LONG);
+    assertThat(typedValue.getType()).isEqualTo(LONG);
+  }
+
+  @Test
+  public void shoudSetVariableUntyped_Long() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // when
+    Map<String, Object> variables = Variables.createVariables();
+    variables.put(VARIABLE_NAME, Variables.untypedValue(VARIABLE_VALUE_LONG));
+    fooService.complete(fooTask, variables);
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    long variableValue = task.getVariable(VARIABLE_NAME);
+    assertThat(variableValue).isEqualTo(VARIABLE_VALUE_INT);
+
+    TypedValue typedValue = task.getVariableTyped(VARIABLE_NAME);
+    assertThat(typedValue.getValue()).isEqualTo(VARIABLE_VALUE_LONG);
+    assertThat(typedValue.getType()).isEqualTo(LONG);
+  }
+
+  @Test
+  public void shoudSetVariableTyped_NullLong() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // when
+    Map<String, Object> variables = Variables.createVariables();
+    variables.put(VARIABLE_NAME, Variables.longValue(null));
+    fooService.complete(fooTask, variables);
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    Long variableValue = task.getVariable(VARIABLE_NAME);
+    assertThat(variableValue).isNull();
 
     TypedValue typedValue = task.getVariableTyped(VARIABLE_NAME);
     assertThat(typedValue.getValue()).isNull();
@@ -322,6 +623,154 @@ public class PrimitiveVariableIT {
   }
 
   @Test
+  public void shoudSetVariable_Short() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // when
+    Map<String, Object> variables = Variables.createVariables();
+    variables.put(VARIABLE_NAME, VARIABLE_VALUE_SHORT);
+    fooService.complete(fooTask, variables);
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    short variableValue = task.getVariable(VARIABLE_NAME);
+    assertThat(variableValue).isEqualTo(VARIABLE_VALUE_SHORT);
+
+    TypedValue typedValue = task.getVariableTyped(VARIABLE_NAME);
+    assertThat(typedValue.getValue()).isEqualTo(VARIABLE_VALUE_SHORT);
+    assertThat(typedValue.getType()).isEqualTo(SHORT);
+  }
+
+  @Test
+  public void shoudSetVariableTyped_Short() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // when
+    Map<String, Object> variables = Variables.createVariables();
+    variables.put(VARIABLE_NAME, Variables.shortValue(VARIABLE_VALUE_SHORT));
+    fooService.complete(fooTask, variables);
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    short variableValue = task.getVariable(VARIABLE_NAME);
+    assertThat(variableValue).isEqualTo(VARIABLE_VALUE_SHORT);
+
+    TypedValue typedValue = task.getVariableTyped(VARIABLE_NAME);
+    assertThat(typedValue.getValue()).isEqualTo(VARIABLE_VALUE_SHORT);
+    assertThat(typedValue.getType()).isEqualTo(SHORT);
+  }
+
+  @Test
+  public void shoudSetVariableUntyped_Short() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // when
+    Map<String, Object> variables = Variables.createVariables();
+    variables.put(VARIABLE_NAME, Variables.untypedValue(VARIABLE_VALUE_SHORT));
+    fooService.complete(fooTask, variables);
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    short variableValue = task.getVariable(VARIABLE_NAME);
+    assertThat(variableValue).isEqualTo(VARIABLE_VALUE_SHORT);
+
+    TypedValue typedValue = task.getVariableTyped(VARIABLE_NAME);
+    assertThat(typedValue.getValue()).isEqualTo(VARIABLE_VALUE_SHORT);
+    assertThat(typedValue.getType()).isEqualTo(SHORT);
+  }
+
+  @Test
+  public void shoudSetVariableTyped_NullShort() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // when
+    Map<String, Object> variables = Variables.createVariables();
+    variables.put(VARIABLE_NAME, Variables.shortValue(null));
+    fooService.complete(fooTask, variables);
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    Short variableValue = task.getVariable(VARIABLE_NAME);
+    assertThat(variableValue).isNull();
+
+    TypedValue typedValue = task.getVariableTyped(VARIABLE_NAME);
+    assertThat(typedValue.getValue()).isNull();
+    assertThat(typedValue.getType()).isEqualTo(SHORT);
+  }
+
+  @Test
   public void shoudGetVariable_Double() {
     // given
     engineRule.startProcessInstance(processDefinition.getId(), VARIABLE_NAME, Variables.doubleValue(VARIABLE_VALUE_DOUBLE));
@@ -393,6 +842,154 @@ public class PrimitiveVariableIT {
     clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
 
     ExternalTask task = handler.getHandledTasks().get(0);
+
+    TypedValue typedValue = task.getVariableTyped(VARIABLE_NAME);
+    assertThat(typedValue.getValue()).isNull();
+    assertThat(typedValue.getType()).isEqualTo(DOUBLE);
+  }
+
+  @Test
+  public void shoudSetVariable_Double() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // when
+    Map<String, Object> variables = Variables.createVariables();
+    variables.put(VARIABLE_NAME, VARIABLE_VALUE_DOUBLE);
+    fooService.complete(fooTask, variables);
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    double variableValue = task.getVariable(VARIABLE_NAME);
+    assertThat(variableValue).isEqualTo(VARIABLE_VALUE_DOUBLE);
+
+    TypedValue typedValue = task.getVariableTyped(VARIABLE_NAME);
+    assertThat(typedValue.getValue()).isEqualTo(VARIABLE_VALUE_DOUBLE);
+    assertThat(typedValue.getType()).isEqualTo(DOUBLE);
+  }
+
+  @Test
+  public void shoudSetVariableTyped_Double() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // when
+    Map<String, Object> variables = Variables.createVariables();
+    variables.put(VARIABLE_NAME, Variables.doubleValue(VARIABLE_VALUE_DOUBLE));
+    fooService.complete(fooTask, variables);
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    double variableValue = task.getVariable(VARIABLE_NAME);
+    assertThat(variableValue).isEqualTo(VARIABLE_VALUE_DOUBLE);
+
+    TypedValue typedValue = task.getVariableTyped(VARIABLE_NAME);
+    assertThat(typedValue.getValue()).isEqualTo(VARIABLE_VALUE_DOUBLE);
+    assertThat(typedValue.getType()).isEqualTo(DOUBLE);
+  }
+
+  @Test
+  public void shoudSetVariableUntyped_Double() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // when
+    Map<String, Object> variables = Variables.createVariables();
+    variables.put(VARIABLE_NAME, Variables.untypedValue(VARIABLE_VALUE_DOUBLE));
+    fooService.complete(fooTask, variables);
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    double variableValue = task.getVariable(VARIABLE_NAME);
+    assertThat(variableValue).isEqualTo(VARIABLE_VALUE_DOUBLE);
+
+    TypedValue typedValue = task.getVariableTyped(VARIABLE_NAME);
+    assertThat(typedValue.getValue()).isEqualTo(VARIABLE_VALUE_DOUBLE);
+    assertThat(typedValue.getType()).isEqualTo(DOUBLE);
+  }
+
+  @Test
+  public void shoudSetVariableTyped_NullDouble() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // when
+    Map<String, Object> variables = Variables.createVariables();
+    variables.put(VARIABLE_NAME, Variables.doubleValue(null));
+    fooService.complete(fooTask, variables);
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    Double variableValue = task.getVariable(VARIABLE_NAME);
+    assertThat(variableValue).isNull();
 
     TypedValue typedValue = task.getVariableTyped(VARIABLE_NAME);
     assertThat(typedValue.getValue()).isNull();
@@ -478,6 +1075,154 @@ public class PrimitiveVariableIT {
   }
 
   @Test
+  public void shoudSetVariable_String() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // when
+    Map<String, Object> variables = Variables.createVariables();
+    variables.put(VARIABLE_NAME, VARIABLE_VALUE_STRING);
+    fooService.complete(fooTask, variables);
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    String variableValue = task.getVariable(VARIABLE_NAME);
+    assertThat(variableValue).isEqualTo(VARIABLE_VALUE_STRING);
+
+    TypedValue typedValue = task.getVariableTyped(VARIABLE_NAME);
+    assertThat(typedValue.getValue()).isEqualTo(VARIABLE_VALUE_STRING);
+    assertThat(typedValue.getType()).isEqualTo(STRING);
+  }
+
+  @Test
+  public void shoudSetVariableTyped_String() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // when
+    Map<String, Object> variables = Variables.createVariables();
+    variables.put(VARIABLE_NAME, Variables.stringValue(VARIABLE_VALUE_STRING));
+    fooService.complete(fooTask, variables);
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    String variableValue = task.getVariable(VARIABLE_NAME);
+    assertThat(variableValue).isEqualTo(VARIABLE_VALUE_STRING);
+
+    TypedValue typedValue = task.getVariableTyped(VARIABLE_NAME);
+    assertThat(typedValue.getValue()).isEqualTo(VARIABLE_VALUE_STRING);
+    assertThat(typedValue.getType()).isEqualTo(STRING);
+  }
+
+  @Test
+  public void shoudSetVariableUntyped_String() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // when
+    Map<String, Object> variables = Variables.createVariables();
+    variables.put(VARIABLE_NAME, Variables.untypedValue(VARIABLE_VALUE_STRING));
+    fooService.complete(fooTask, variables);
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    String variableValue = task.getVariable(VARIABLE_NAME);
+    assertThat(variableValue).isEqualTo(VARIABLE_VALUE_STRING);
+
+    TypedValue typedValue = task.getVariableTyped(VARIABLE_NAME);
+    assertThat(typedValue.getValue()).isEqualTo(VARIABLE_VALUE_STRING);
+    assertThat(typedValue.getType()).isEqualTo(STRING);
+  }
+
+  @Test
+  public void shoudSetVariableTyped_NullString() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // when
+    Map<String, Object> variables = Variables.createVariables();
+    variables.put(VARIABLE_NAME, Variables.stringValue(null));
+    fooService.complete(fooTask, variables);
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    String variableValue = task.getVariable(VARIABLE_NAME);
+    assertThat(variableValue).isNull();
+
+    TypedValue typedValue = task.getVariableTyped(VARIABLE_NAME);
+    assertThat(typedValue.getValue()).isNull();
+    assertThat(typedValue.getType()).isEqualTo(STRING);
+  }
+
+  @Test
   public void shoudGetVariable_Boolean() {
     // given
     engineRule.startProcessInstance(processDefinition.getId(), VARIABLE_NAME, Variables.booleanValue(VARIABLE_VALUE_BOOLEAN));
@@ -549,6 +1294,154 @@ public class PrimitiveVariableIT {
     clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
 
     ExternalTask task = handler.getHandledTasks().get(0);
+
+    TypedValue typedValue = task.getVariableTyped(VARIABLE_NAME);
+    assertThat(typedValue.getValue()).isNull();
+    assertThat(typedValue.getType()).isEqualTo(BOOLEAN);
+  }
+
+  @Test
+  public void shoudSetVariable_Boolean() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // when
+    Map<String, Object> variables = Variables.createVariables();
+    variables.put(VARIABLE_NAME, VARIABLE_VALUE_BOOLEAN);
+    fooService.complete(fooTask, variables);
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    boolean variableValue = task.getVariable(VARIABLE_NAME);
+    assertThat(variableValue).isEqualTo(VARIABLE_VALUE_BOOLEAN);
+
+    TypedValue typedValue = task.getVariableTyped(VARIABLE_NAME);
+    assertThat(typedValue.getValue()).isEqualTo(VARIABLE_VALUE_BOOLEAN);
+    assertThat(typedValue.getType()).isEqualTo(BOOLEAN);
+  }
+
+  @Test
+  public void shoudSetVariableTyped_Boolean() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // when
+    Map<String, Object> variables = Variables.createVariables();
+    variables.put(VARIABLE_NAME, Variables.booleanValue(VARIABLE_VALUE_BOOLEAN));
+    fooService.complete(fooTask, variables);
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    boolean variableValue = task.getVariable(VARIABLE_NAME);
+    assertThat(variableValue).isEqualTo(VARIABLE_VALUE_BOOLEAN);
+
+    TypedValue typedValue = task.getVariableTyped(VARIABLE_NAME);
+    assertThat(typedValue.getValue()).isEqualTo(VARIABLE_VALUE_BOOLEAN);
+    assertThat(typedValue.getType()).isEqualTo(BOOLEAN);
+  }
+
+  @Test
+  public void shoudSetVariableUntyped_Boolean() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // when
+    Map<String, Object> variables = Variables.createVariables();
+    variables.put(VARIABLE_NAME, Variables.untypedValue(VARIABLE_VALUE_BOOLEAN));
+    fooService.complete(fooTask, variables);
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    boolean variableValue = task.getVariable(VARIABLE_NAME);
+    assertThat(variableValue).isEqualTo(VARIABLE_VALUE_BOOLEAN);
+
+    TypedValue typedValue = task.getVariableTyped(VARIABLE_NAME);
+    assertThat(typedValue.getValue()).isEqualTo(VARIABLE_VALUE_BOOLEAN);
+    assertThat(typedValue.getType()).isEqualTo(BOOLEAN);
+  }
+
+  @Test
+  public void shoudSetVariableTyped_NullBoolean() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // when
+    Map<String, Object> variables = Variables.createVariables();
+    variables.put(VARIABLE_NAME, Variables.booleanValue(null));
+    fooService.complete(fooTask, variables);
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    Boolean variableValue = task.getVariable(VARIABLE_NAME);
+    assertThat(variableValue).isNull();
 
     TypedValue typedValue = task.getVariableTyped(VARIABLE_NAME);
     assertThat(typedValue.getValue()).isNull();
@@ -634,6 +1527,154 @@ public class PrimitiveVariableIT {
   }
 
   @Test
+  public void shoudSetVariable_Date() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // when
+    Map<String, Object> variables = Variables.createVariables();
+    variables.put(VARIABLE_NAME, VARIABLE_VALUE_DATE);
+    fooService.complete(fooTask, variables);
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    Date variableValue = task.getVariable(VARIABLE_NAME);
+    assertThat(variableValue).isEqualTo(VARIABLE_VALUE_DATE);
+
+    TypedValue typedValue = task.getVariableTyped(VARIABLE_NAME);
+    assertThat(typedValue.getValue()).isEqualTo(VARIABLE_VALUE_DATE);
+    assertThat(typedValue.getType()).isEqualTo(DATE);
+  }
+
+  @Test
+  public void shoudSetVariableTyped_Date() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // when
+    Map<String, Object> variables = Variables.createVariables();
+    variables.put(VARIABLE_NAME, Variables.dateValue(VARIABLE_VALUE_DATE));
+    fooService.complete(fooTask, variables);
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    Date variableValue = task.getVariable(VARIABLE_NAME);
+    assertThat(variableValue).isEqualTo(VARIABLE_VALUE_DATE);
+
+    TypedValue typedValue = task.getVariableTyped(VARIABLE_NAME);
+    assertThat(typedValue.getValue()).isEqualTo(VARIABLE_VALUE_DATE);
+    assertThat(typedValue.getType()).isEqualTo(DATE);
+  }
+
+  @Test
+  public void shoudSetVariableUntyped_Date() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // when
+    Map<String, Object> variables = Variables.createVariables();
+    variables.put(VARIABLE_NAME, Variables.untypedValue(VARIABLE_VALUE_DATE));
+    fooService.complete(fooTask, variables);
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    Date variableValue = task.getVariable(VARIABLE_NAME);
+    assertThat(variableValue).isEqualTo(VARIABLE_VALUE_DATE);
+
+    TypedValue typedValue = task.getVariableTyped(VARIABLE_NAME);
+    assertThat(typedValue.getValue()).isEqualTo(VARIABLE_VALUE_DATE);
+    assertThat(typedValue.getType()).isEqualTo(DATE);
+  }
+
+  @Test
+  public void shoudSetVariableTyped_NullDate() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // when
+    Map<String, Object> variables = Variables.createVariables();
+    variables.put(VARIABLE_NAME, Variables.dateValue(null));
+    fooService.complete(fooTask, variables);
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    Date variableValue = task.getVariable(VARIABLE_NAME);
+    assertThat(variableValue).isNull();
+
+    TypedValue typedValue = task.getVariableTyped(VARIABLE_NAME);
+    assertThat(typedValue.getValue()).isNull();
+    assertThat(typedValue.getType()).isEqualTo(DATE);
+  }
+
+  @Test
   public void shoudGetVariable_Bytes() {
     // given
     engineRule.startProcessInstance(processDefinition.getId(), VARIABLE_NAME, Variables.byteArrayValue(VARIABLE_VALUE_BYTES));
@@ -712,6 +1753,154 @@ public class PrimitiveVariableIT {
   }
 
   @Test
+  public void shoudSetVariable_Bytes() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // when
+    Map<String, Object> variables = Variables.createVariables();
+    variables.put(VARIABLE_NAME, VARIABLE_VALUE_BYTES);
+    fooService.complete(fooTask, variables);
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    byte[] variableValue = task.getVariable(VARIABLE_NAME);
+    assertThat(variableValue).isEqualTo(VARIABLE_VALUE_BYTES);
+
+    TypedValue typedValue = task.getVariableTyped(VARIABLE_NAME);
+    assertThat(typedValue.getValue()).isEqualTo(VARIABLE_VALUE_BYTES);
+    assertThat(typedValue.getType()).isEqualTo(BYTES);
+  }
+
+  @Test
+  public void shoudSetVariableTyped_Bytes() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // when
+    Map<String, Object> variables = Variables.createVariables();
+    variables.put(VARIABLE_NAME, Variables.byteArrayValue(VARIABLE_VALUE_BYTES));
+    fooService.complete(fooTask, variables);
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    byte[] variableValue = task.getVariable(VARIABLE_NAME);
+    assertThat(variableValue).isEqualTo(VARIABLE_VALUE_BYTES);
+
+    TypedValue typedValue = task.getVariableTyped(VARIABLE_NAME);
+    assertThat(typedValue.getValue()).isEqualTo(VARIABLE_VALUE_BYTES);
+    assertThat(typedValue.getType()).isEqualTo(BYTES);
+  }
+
+  @Test
+  public void shoudSetVariableUntyped_Bytes() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // when
+    Map<String, Object> variables = Variables.createVariables();
+    variables.put(VARIABLE_NAME, Variables.untypedValue(VARIABLE_VALUE_BYTES));
+    fooService.complete(fooTask, variables);
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    byte[] variableValue = task.getVariable(VARIABLE_NAME);
+    assertThat(variableValue).isEqualTo(VARIABLE_VALUE_BYTES);
+
+    TypedValue typedValue = task.getVariableTyped(VARIABLE_NAME);
+    assertThat(typedValue.getValue()).isEqualTo(VARIABLE_VALUE_BYTES);
+    assertThat(typedValue.getType()).isEqualTo(BYTES);
+  }
+
+  @Test
+  public void shoudSetVariableTyped_NullBytes() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // when
+    Map<String, Object> variables = Variables.createVariables();
+    variables.put(VARIABLE_NAME, Variables.byteArrayValue(null));
+    fooService.complete(fooTask, variables);
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    byte[] variableValue = task.getVariable(VARIABLE_NAME);
+    assertThat(variableValue).isNull();
+
+    TypedValue typedValue = task.getVariableTyped(VARIABLE_NAME);
+    assertThat(typedValue.getValue()).isNull();
+    assertThat(typedValue.getType()).isEqualTo(BYTES);
+  }
+
+  @Test
   public void shoudGetVariable_Null() {
     // given
     engineRule.startProcessInstance(processDefinition.getId(), VARIABLE_NAME, Variables.untypedNullValue());
@@ -744,6 +1933,117 @@ public class PrimitiveVariableIT {
     clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
 
     ExternalTask task = handler.getHandledTasks().get(0);
+
+    TypedValue typedValue = task.getVariableTyped(VARIABLE_NAME);
+    assertThat(typedValue.getValue()).isNull();
+    assertThat(typedValue.getType()).isEqualTo(NULL);
+  }
+
+  @Test
+  public void shoudSetVariable_Null() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // when
+    Map<String, Object> variables = Variables.createVariables();
+    variables.put(VARIABLE_NAME, null);
+    fooService.complete(fooTask, variables);
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    Object variableValue = task.getVariable(VARIABLE_NAME);
+    assertThat(variableValue).isNull();
+
+    TypedValue typedValue = task.getVariableTyped(VARIABLE_NAME);
+    assertThat(typedValue.getValue()).isNull();
+    assertThat(typedValue.getType()).isEqualTo(NULL);
+  }
+
+  @Test
+  public void shoudSetVariableTyped_Null() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // when
+    Map<String, Object> variables = Variables.createVariables();
+    variables.put(VARIABLE_NAME, Variables.untypedNullValue());
+    fooService.complete(fooTask, variables);
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    Object variableValue = task.getVariable(VARIABLE_NAME);
+    assertThat(variableValue).isNull();
+
+    TypedValue typedValue = task.getVariableTyped(VARIABLE_NAME);
+    assertThat(typedValue.getValue()).isNull();
+    assertThat(typedValue.getType()).isEqualTo(NULL);
+  }
+
+  @Test
+  public void shoudSetVariableUntyped_Null() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // when
+    Map<String, Object> variables = Variables.createVariables();
+    variables.put(VARIABLE_NAME, Variables.untypedValue(null));
+    fooService.complete(fooTask, variables);
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    Object variableValue = task.getVariable(VARIABLE_NAME);
+    assertThat(variableValue).isNull();
 
     TypedValue typedValue = task.getVariableTyped(VARIABLE_NAME);
     assertThat(typedValue.getValue()).isNull();

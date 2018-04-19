@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.client.impl.variable.mapper.ValueMapper;
+import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.impl.value.UntypedValueImpl;
 import org.camunda.bpm.engine.variable.type.ValueType;
@@ -33,11 +34,21 @@ public class TypedValues {
     Map<String, TypedValueField> result = new HashMap<>();
 
     if (variables != null) {
-      variables.forEach((variableName, variableValue) -> {
+      for (String variableName : variables.keySet()) {
+
+        Object variableValue = null;
+        if (variables instanceof VariableMap) {
+          variableValue = ((VariableMap) variables).getValueTyped(variableName);
+        }
+        else {
+          variableValue = variables.get(variableName);
+        }
+
         TypedValue typedValue = createTypedValue(variableValue);
         TypedValueField typedValueField = toTypedValueField(typedValue);
         result.put(variableName, typedValueField);
-      });
+      }
+
     }
 
     return result;
