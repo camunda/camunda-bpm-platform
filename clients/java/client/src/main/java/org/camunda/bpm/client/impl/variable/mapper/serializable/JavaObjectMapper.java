@@ -42,10 +42,12 @@ public class JavaObjectMapper extends AbstractObjectMapper {
     Decoder decoder = Base64.getDecoder();
     byte[] base64DecodedSerializedValue = decoder.decode(serializedValue);
 
-    InputStream is = new ByteArrayInputStream(base64DecodedSerializedValue);
-    ObjectInputStream ois = new ObjectInputStream(is);
+    InputStream is = null;
+    ObjectInputStream ois = null;
 
     try {
+      is = new ByteArrayInputStream(base64DecodedSerializedValue);
+      ois = new ObjectInputStream(is);
       return ois.readObject();
     }
     finally {
@@ -55,10 +57,13 @@ public class JavaObjectMapper extends AbstractObjectMapper {
   }
 
   protected String serializeToString(Object deserializedObject) throws Exception {
-    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    ObjectOutputStream ois = new ObjectOutputStream(baos);
+    ByteArrayOutputStream baos = null;
+    ObjectOutputStream ois = null;
 
     try {
+      baos = new ByteArrayOutputStream();
+      ois = new ObjectOutputStream(baos);
+
       ois.writeObject(deserializedObject);
       byte[] deserializedObjectByteArray = baos.toByteArray();
 

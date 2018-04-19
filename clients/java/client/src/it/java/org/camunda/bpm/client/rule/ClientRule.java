@@ -22,6 +22,8 @@ import org.junit.rules.ExternalResource;
 
 public class ClientRule extends ExternalResource {
 
+  public static final long LOCK_DURATION = 1000 * 60 * 5;
+
   protected ExternalTaskClientBuilder builder;
   protected ExternalTaskClient client;
 

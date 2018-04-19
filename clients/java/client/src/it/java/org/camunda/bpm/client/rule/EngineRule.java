@@ -64,9 +64,10 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 
 public class EngineRule extends ExternalResource {
 
+  public static final String DEFAULT_PROPERTIES_PATH = "integration-rules.properties";
+
   protected static final int MAX_WAIT = 10;
   protected static final String COUNT = "count";
-  protected static final String DEFAULT_PROPERTIES_PATH = "integration-rules.properties";
 
   protected static final String URI_DEPLOYMEN_CREATE = "%s/deployment/create";
   protected static final String URI_DEPLOYMENT_DELETE = "%s/deployment/%s";
