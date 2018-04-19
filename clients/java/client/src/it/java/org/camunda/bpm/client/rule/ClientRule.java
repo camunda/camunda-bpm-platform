@@ -12,26 +12,37 @@
  */
 package org.camunda.bpm.client.rule;
 
-import static org.camunda.bpm.client.util.TestUtil.*;
+import static org.camunda.bpm.client.util.PropertyUtil.*;
+import static org.camunda.bpm.client.util.TestUtil.waitUntil;
+
+import java.util.Properties;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.client.ExternalTaskClientBuilder;
+import org.camunda.bpm.client.util.PropertyUtil;
 import org.junit.rules.ExternalResource;
 
 public class ClientRule extends ExternalResource {
 
   public static final long LOCK_DURATION = 1000 * 60 * 5;
-  public static final String BASE_URL = "http://localhost:48080/engine-rest";
 
   protected ExternalTaskClientBuilder builder;
   protected ExternalTaskClient client;
 
   public ClientRule() {
-    this(() -> ExternalTaskClient.create()
-      .baseUrl(BASE_URL)
-      .lockDuration(LOCK_DURATION));
+    this(PropertyUtil.loadProperties(DEFAULT_PROPERTIES_PATH));
+  }
+
+  public ClientRule(Properties properties) {
+    this(() -> {
+      String endpoint = properties.getProperty(CAMUNDA_ENGINE_REST);
+      String engine = properties.getProperty(CAMUNDA_ENGINE_NAME);
+      return ExternalTaskClient.create()
+          .baseUrl(endpoint + engine)
+          .lockDuration(LOCK_DURATION);
+    });
   }
 
   public ClientRule(Supplier<ExternalTaskClientBuilder> builderSupplier) {

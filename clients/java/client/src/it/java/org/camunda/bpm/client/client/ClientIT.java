@@ -12,6 +12,17 @@
  */
 package org.camunda.bpm.client.client;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.camunda.bpm.client.util.ProcessModels.BPMN_ERROR_EXTERNAL_TASK_PROCESS;
+import static org.camunda.bpm.client.util.ProcessModels.EXTERNAL_TASK_TOPIC_FOO;
+import static org.camunda.bpm.client.util.PropertyUtil.DEFAULT_PROPERTIES_PATH;
+import static org.camunda.bpm.client.util.PropertyUtil.loadProperties;
+
+import java.util.Date;
+import java.util.Properties;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.camunda.bpm.client.ClientBackoffStrategy;
 import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.client.ExternalTaskClientBuilder;
@@ -21,6 +32,7 @@ import org.camunda.bpm.client.rule.ClientRule;
 import org.camunda.bpm.client.rule.EngineRule;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.topic.TopicSubscription;
+import org.camunda.bpm.client.util.PropertyUtil;
 import org.camunda.bpm.client.util.RecordingExternalTaskHandler;
 import org.junit.Before;
 import org.junit.Rule;
@@ -28,18 +40,19 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
-import java.util.Date;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.camunda.bpm.client.rule.ClientRule.BASE_URL;
-import static org.camunda.bpm.client.util.ProcessModels.*;
-
 /**
  * @author Tassilo Weidner
  */
 public class ClientIT {
+
+  protected static final String BASE_URL;
+
+  static {
+    Properties properties = loadProperties(DEFAULT_PROPERTIES_PATH);
+    String engineRest = properties.getProperty(PropertyUtil.CAMUNDA_ENGINE_REST);
+    String engineName = properties.getProperty(PropertyUtil.CAMUNDA_ENGINE_NAME);
+    BASE_URL = engineRest + engineName;
+  }
 
   protected ClientRule clientRule = new ClientRule(() -> ExternalTaskClient.create().baseUrl(BASE_URL)); // without lock duration
   protected EngineRule engineRule = new EngineRule();
@@ -62,48 +75,70 @@ public class ClientIT {
 
   @Test
   public void shouldThrowExceptionDueToBaseUrlIsEmpty() {
-    // given
-    ExternalTaskClientBuilder externalTaskClientBuilder = ExternalTaskClient.create();
+    ExternalTaskClient client = null;
 
-    // then
-    thrown.expect(ExternalTaskClientException.class);
-
-    // when
-    ExternalTaskClient client = externalTaskClientBuilder.build();
-    client.stop();
+    try {
+      // given
+      ExternalTaskClientBuilder externalTaskClientBuilder = ExternalTaskClient.create();
+      
+      // then
+      thrown.expect(ExternalTaskClientException.class);
+      
+      // when
+      client = externalTaskClientBuilder.build();
+    }
+    finally {
+      if (client != null) {
+        client.stop();
+      }
+    }
   }
 
   @Test
   public void shouldThrowExceptionDueToBaseUrlIsNull() {
-    // given
-    ExternalTaskClientBuilder externalTaskClientBuilder = ExternalTaskClient.create();
+    ExternalTaskClient client = null;
 
-    // then
-    thrown.expect(ExternalTaskClientException.class);
-
-    // when
-    ExternalTaskClient client = externalTaskClientBuilder
-      .baseUrl(null)
-      .build();
-
-    client.stop();
+    try {
+      // given
+      ExternalTaskClientBuilder externalTaskClientBuilder = ExternalTaskClient.create();
+      
+      // then
+      thrown.expect(ExternalTaskClientException.class);
+      
+      // when
+      client = externalTaskClientBuilder
+          .baseUrl(null)
+          .build();
+    }
+    finally {
+      if (client != null) {
+        client.stop();
+      }
+    }
   }
 
   @Test
   public void shouldThrowExceptionDueToMaxTasksNotGreaterThanZero() {
-    // given
-    ExternalTaskClientBuilder externalTaskClientBuilder = ExternalTaskClient.create()
-      .baseUrl("http://camunda.com/engine-rest");
+    ExternalTaskClient client = null;
 
-    // then
-    thrown.expect(ExternalTaskClientException.class);
-
-    // when
-    ExternalTaskClient client = externalTaskClientBuilder
-      .maxTasks(0)
-      .build();
-
-    client.stop();
+    try {
+      // given
+      ExternalTaskClientBuilder externalTaskClientBuilder = ExternalTaskClient.create()
+          .baseUrl("http://camunda.com/engine-rest");
+      
+      // then
+      thrown.expect(ExternalTaskClientException.class);
+      
+      // when
+      client = externalTaskClientBuilder
+          .maxTasks(0)
+          .build();
+    }
+    finally {
+      if (client != null) {
+        client.stop();
+      }
+    }
   }
 
   @Test
@@ -135,17 +170,25 @@ public class ClientIT {
 
   @Test
   public void shouldThrowExceptionDueToAsyncResponseTimeoutNotGreaterThanZero() {
-    // given
-    ExternalTaskClientBuilder clientBuilder = ExternalTaskClient.create()
-      .baseUrl("http://camunda.com/engine-rest")
-      .asyncResponseTimeout(0);
+    ExternalTaskClient client = null;
 
-    // then
-    thrown.expect(ExternalTaskClientException.class);
-
-    // when
-    ExternalTaskClient client = clientBuilder.build();
-    client.stop();
+    try {
+      // given
+      ExternalTaskClientBuilder clientBuilder = ExternalTaskClient.create()
+          .baseUrl("http://camunda.com/engine-rest")
+          .asyncResponseTimeout(0);
+      
+      // then
+      thrown.expect(ExternalTaskClientException.class);
+      
+      // when
+      client = clientBuilder.build();
+    }
+    finally {
+      if (client != null) {
+        client.stop();
+      }
+    }
   }
 
   @Test
@@ -201,17 +244,25 @@ public class ClientIT {
 
   @Test
   public void shouldThrowExceptionDueToClientLockDurationNotGreaterThanZero() {
-    // given
-    ExternalTaskClientBuilder externalTaskClientBuilder = ExternalTaskClient.create()
-      .baseUrl("http://camunda.com/engine-rest")
-      .lockDuration(0);
+    ExternalTaskClient client = null;
 
-    // then
-    thrown.expect(ExternalTaskClientException.class);
-
-    // when
-    ExternalTaskClient client = externalTaskClientBuilder.build();
-    client.stop();
+    try {
+      // given
+      ExternalTaskClientBuilder externalTaskClientBuilder = ExternalTaskClient.create()
+          .baseUrl("http://camunda.com/engine-rest")
+          .lockDuration(0);
+      
+      // then
+      thrown.expect(ExternalTaskClientException.class);
+      
+      // when
+      client = externalTaskClientBuilder.build();
+    }
+    finally {
+      if (client != null) {
+        client.stop();
+      }
+    }
   }
 
   @Test

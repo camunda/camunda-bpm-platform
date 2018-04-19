@@ -20,6 +20,10 @@ import org.slf4j.LoggerFactory;
 
 public class PropertyUtil {
 
+  public static final String DEFAULT_PROPERTIES_PATH = "integration-rules.properties";
+  public static final String CAMUNDA_ENGINE_REST = "camunda.engine.rest";
+  public static final String CAMUNDA_ENGINE_NAME = "camunda.engine.name";
+
   private static Logger logger = LoggerFactory.getLogger(PropertyUtil.class);
 
   public static Properties loadProperties(String resource) {

@@ -13,6 +13,8 @@
 package org.camunda.bpm.client.rule;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.camunda.bpm.client.util.PropertyUtil.DEFAULT_PROPERTIES_PATH;
+import static org.camunda.bpm.client.util.PropertyUtil.loadProperties;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,26 +50,18 @@ import org.camunda.bpm.client.dto.TaskDto;
 import org.camunda.bpm.client.impl.variable.TypedValueField;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.impl.ExternalTaskImpl;
-import org.camunda.bpm.client.util.PropertyUtil;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.SerializableValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.rules.ExternalResource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 public class EngineRule extends ExternalResource {
-
-  public static final String DEFAULT_PROPERTIES_PATH = "integration-rules.properties";
-
-  protected static final int MAX_WAIT = 10;
-  protected static final String COUNT = "count";
 
   protected static final String URI_DEPLOYMEN_CREATE = "%s/deployment/create";
   protected static final String URI_DEPLOYMENT_DELETE = "%s/deployment/%s";
@@ -77,8 +71,6 @@ public class EngineRule extends ExternalResource {
   protected static final String URI_GET_EXTERNAL_TASKS = "%s/external-task";
 
   protected Properties properties;
-  protected Logger logger = LoggerFactory.getLogger(EngineRule.class);
-
   protected CloseableHttpClient httpClient;
   protected ObjectMapper objectMapper;
 
@@ -89,7 +81,7 @@ public class EngineRule extends ExternalResource {
   }
 
   public EngineRule(String propertiesLocation) {
-    this(() -> PropertyUtil.loadProperties(propertiesLocation));
+    this(() -> loadProperties(propertiesLocation));
   }
 
   public EngineRule(Supplier<Properties> properties) {

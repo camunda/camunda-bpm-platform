@@ -14,9 +14,12 @@ package org.camunda.bpm.client.variable;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.client.rule.ClientRule.LOCK_DURATION;
-import static org.camunda.bpm.client.rule.EngineRule.DEFAULT_PROPERTIES_PATH;
 import static org.camunda.bpm.client.util.ProcessModels.EXTERNAL_TASK_TOPIC_FOO;
 import static org.camunda.bpm.client.util.ProcessModels.TWO_EXTERNAL_TASK_PROCESS;
+import static org.camunda.bpm.client.util.PropertyUtil.CAMUNDA_ENGINE_NAME;
+import static org.camunda.bpm.client.util.PropertyUtil.CAMUNDA_ENGINE_REST;
+import static org.camunda.bpm.client.util.PropertyUtil.DEFAULT_PROPERTIES_PATH;
+import static org.camunda.bpm.client.util.PropertyUtil.loadProperties;
 import static org.camunda.bpm.engine.variable.Variables.SerializationDataFormats.JAVA;
 import static org.camunda.bpm.engine.variable.type.ValueType.OBJECT;
 
@@ -28,7 +31,6 @@ import org.camunda.bpm.client.dto.ProcessInstanceDto;
 import org.camunda.bpm.client.rule.ClientRule;
 import org.camunda.bpm.client.rule.EngineRule;
 import org.camunda.bpm.client.task.ExternalTask;
-import org.camunda.bpm.client.util.PropertyUtil;
 import org.camunda.bpm.client.util.RecordingExternalTaskHandler;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
@@ -53,9 +55,9 @@ public class JavaSerializationIT {
       .serializationDataFormat(JAVA)
       .create();
 
-  protected ClientRule clientRule = new ClientRule(() ->  {
-    Properties properties = PropertyUtil.loadProperties(DEFAULT_PROPERTIES_PATH);
-    String baseUrl = properties.get("camunda.engine.rest") + ENGINE_NAME;
+  protected ClientRule clientRule = new ClientRule(() -> {
+    Properties properties = loadProperties(DEFAULT_PROPERTIES_PATH);
+    String baseUrl = properties.getProperty(CAMUNDA_ENGINE_REST) + ENGINE_NAME;
     return ExternalTaskClient.create()
         .baseUrl(baseUrl)
         .disableAutoFetching()
@@ -63,8 +65,8 @@ public class JavaSerializationIT {
   });
 
   protected EngineRule engineRule = new EngineRule(() -> {
-    Properties properties = PropertyUtil.loadProperties(DEFAULT_PROPERTIES_PATH);
-    properties.put("camunda.engine.name", ENGINE_NAME);
+    Properties properties = loadProperties(DEFAULT_PROPERTIES_PATH);
+    properties.put(CAMUNDA_ENGINE_NAME, ENGINE_NAME);
     return properties;
   });
 
