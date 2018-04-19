@@ -86,6 +86,7 @@ public class ExternalTaskHandlerIT {
     assertThat(task.getLockExpirationTime()).isNotNull();
 
     assertThat(task.getAllVariables()).isEmpty();
+    // todo assert business key
   }
 
   @Test

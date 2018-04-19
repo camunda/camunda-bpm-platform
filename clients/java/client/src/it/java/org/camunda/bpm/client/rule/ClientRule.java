@@ -23,13 +23,14 @@ import org.junit.rules.ExternalResource;
 public class ClientRule extends ExternalResource {
 
   public static final long LOCK_DURATION = 1000 * 60 * 5;
+  public static final String BASE_URL = "http://localhost:48080/engine-rest";
 
   protected ExternalTaskClientBuilder builder;
   protected ExternalTaskClient client;
 
   public ClientRule() {
     this(() -> ExternalTaskClient.create()
-      .baseUrl("http://localhost:48080/engine-rest")
+      .baseUrl(BASE_URL)
       .lockDuration(LOCK_DURATION));
   }
 

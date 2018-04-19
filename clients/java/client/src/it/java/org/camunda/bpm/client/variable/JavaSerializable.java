@@ -19,7 +19,7 @@ import java.io.Serializable;
 import java.util.Base64;
 import java.util.Base64.Encoder;
 
-import org.camunda.bpm.engine.impl.util.IoUtil;
+import org.camunda.commons.utils.IoUtil;
 
 public class JavaSerializable implements Serializable {
 
