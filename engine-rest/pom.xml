@@ -14,6 +14,10 @@
   <packaging>pom</packaging>
   <name>camunda BPM - engine - REST - Root</name>
 
+  <properties>
+    <jackson.version>2.6.3</jackson.version>
+  </properties>
+
   <modules>
     <module>engine-rest</module>
     <module>engine-rest-jaxrs2</module>
