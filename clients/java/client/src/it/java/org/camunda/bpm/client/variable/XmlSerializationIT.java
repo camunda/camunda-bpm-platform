@@ -18,8 +18,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.camunda.bpm.client.util.ProcessModels.EXTERNAL_TASK_TOPIC_FOO;
 import static org.camunda.bpm.client.util.ProcessModels.TWO_EXTERNAL_TASK_PROCESS;
+import static org.camunda.bpm.engine.variable.Variables.SerializationDataFormats.XML;
 import static org.camunda.bpm.engine.variable.type.ValueType.OBJECT;
-import static org.camunda.spin.DataFormats.XML_DATAFORMAT_NAME;
 
 import java.util.Arrays;
 
@@ -45,6 +45,7 @@ import org.junit.rules.RuleChain;
 public class XmlSerializationIT {
 
   protected static final String VARIABLE_NAME_XML = "xmlVariable";
+  protected static final String XML_DATAFORMAT_NAME = XML.getName();
 
   protected static final XmlSerializable VARIABLE_VALUE_XML_DESERIALIZED = new XmlSerializable("a String", 42, true);
   protected static final XmlSerializables VARIABLE_VALUE_XML_LIST_DESERIALIZED = new XmlSerializables(Arrays.asList(VARIABLE_VALUE_XML_DESERIALIZED, VARIABLE_VALUE_XML_DESERIALIZED));

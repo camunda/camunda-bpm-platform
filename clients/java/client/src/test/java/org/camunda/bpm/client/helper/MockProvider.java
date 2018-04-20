@@ -19,9 +19,9 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import org.camunda.bpm.client.impl.variable.TypedValueField;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.impl.ExternalTaskImpl;
+import org.camunda.bpm.client.variable.impl.TypedValueField;
 
 /**
  * @author Tassilo Weidner

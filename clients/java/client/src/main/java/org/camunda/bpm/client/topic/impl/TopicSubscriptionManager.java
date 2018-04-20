@@ -24,9 +24,6 @@ import org.camunda.bpm.client.exception.ExternalTaskClientException;
 import org.camunda.bpm.client.impl.EngineClient;
 import org.camunda.bpm.client.impl.EngineClientException;
 import org.camunda.bpm.client.impl.ExternalTaskClientLogger;
-import org.camunda.bpm.client.impl.variable.TypedValueField;
-import org.camunda.bpm.client.impl.variable.TypedValues;
-import org.camunda.bpm.client.impl.variable.VariableValue;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskHandler;
 import org.camunda.bpm.client.task.ExternalTaskService;
@@ -34,6 +31,9 @@ import org.camunda.bpm.client.task.impl.ExternalTaskImpl;
 import org.camunda.bpm.client.task.impl.ExternalTaskServiceImpl;
 import org.camunda.bpm.client.topic.TopicSubscription;
 import org.camunda.bpm.client.topic.impl.dto.TopicRequestDto;
+import org.camunda.bpm.client.variable.impl.TypedValueField;
+import org.camunda.bpm.client.variable.impl.TypedValues;
+import org.camunda.bpm.client.variable.impl.VariableValue;
 
 /**
  * @author Tassilo Weidner

@@ -13,7 +13,7 @@
 package org.camunda.bpm.client.task.impl.dto;
 
 import org.camunda.bpm.client.impl.RequestDto;
-import org.camunda.bpm.client.impl.variable.TypedValueField;
+import org.camunda.bpm.client.variable.impl.TypedValueField;
 
 import java.util.Map;
 

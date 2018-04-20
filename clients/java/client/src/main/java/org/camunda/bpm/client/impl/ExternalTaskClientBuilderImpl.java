@@ -15,38 +15,39 @@ package org.camunda.bpm.client.impl;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.UUID;
 
 import org.camunda.bpm.client.ClientBackoffStrategy;
 import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.client.ExternalTaskClientBuilder;
-import org.camunda.bpm.client.impl.variable.TypedValues;
-import org.camunda.bpm.client.impl.variable.ValueMappers;
-import org.camunda.bpm.client.impl.variable.mapper.DefaultValueMappers;
-import org.camunda.bpm.client.impl.variable.mapper.ValueMapper;
-import org.camunda.bpm.client.impl.variable.mapper.primitive.BooleanValueMapper;
-import org.camunda.bpm.client.impl.variable.mapper.primitive.ByteArrayValueMapper;
-import org.camunda.bpm.client.impl.variable.mapper.primitive.DateValueMapper;
-import org.camunda.bpm.client.impl.variable.mapper.primitive.DoubleValueMapper;
-import org.camunda.bpm.client.impl.variable.mapper.primitive.IntegerValueMapper;
-import org.camunda.bpm.client.impl.variable.mapper.primitive.LongValueMapper;
-import org.camunda.bpm.client.impl.variable.mapper.primitive.NullValueMapper;
-import org.camunda.bpm.client.impl.variable.mapper.primitive.ShortValueMapper;
-import org.camunda.bpm.client.impl.variable.mapper.primitive.StringValueMapper;
-import org.camunda.bpm.client.impl.variable.mapper.serializable.JavaObjectMapper;
-import org.camunda.bpm.client.impl.variable.mapper.serializable.JsonValueMapper;
-import org.camunda.bpm.client.impl.variable.mapper.serializable.SpinObjectValueMapper;
-import org.camunda.bpm.client.impl.variable.mapper.serializable.XmlValueMapper;
 import org.camunda.bpm.client.interceptor.ClientRequestInterceptor;
 import org.camunda.bpm.client.interceptor.impl.RequestInterceptorHandler;
+import org.camunda.bpm.client.spi.DataFormat;
+import org.camunda.bpm.client.spi.DataFormatConfigurator;
+import org.camunda.bpm.client.spi.DataFormatProvider;
 import org.camunda.bpm.client.topic.impl.TopicSubscriptionManager;
+import org.camunda.bpm.client.variable.impl.DefaultValueMappers;
+import org.camunda.bpm.client.variable.impl.TypedValues;
+import org.camunda.bpm.client.variable.impl.ValueMapper;
+import org.camunda.bpm.client.variable.impl.ValueMappers;
+import org.camunda.bpm.client.variable.impl.mapper.BooleanValueMapper;
+import org.camunda.bpm.client.variable.impl.mapper.ByteArrayValueMapper;
+import org.camunda.bpm.client.variable.impl.mapper.DateValueMapper;
+import org.camunda.bpm.client.variable.impl.mapper.DoubleValueMapper;
+import org.camunda.bpm.client.variable.impl.mapper.IntegerValueMapper;
+import org.camunda.bpm.client.variable.impl.mapper.JavaObjectMapper;
+import org.camunda.bpm.client.variable.impl.mapper.JsonValueMapper;
+import org.camunda.bpm.client.variable.impl.mapper.LongValueMapper;
+import org.camunda.bpm.client.variable.impl.mapper.NullValueMapper;
+import org.camunda.bpm.client.variable.impl.mapper.ShortValueMapper;
+import org.camunda.bpm.client.variable.impl.mapper.StringValueMapper;
+import org.camunda.bpm.client.variable.impl.mapper.XmlValueMapper;
 import org.camunda.bpm.engine.variable.Variables;
-import org.camunda.spin.DataFormats;
-import org.camunda.spin.json.SpinJsonNode;
-import org.camunda.spin.spi.DataFormat;
-import org.camunda.spin.xml.SpinXmlElement;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -205,24 +206,28 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
   protected void initVariableMappers() {
     valueMappers = new DefaultValueMappers(defaultSerializationFormat);
 
-    valueMappers.addSerializer(new NullValueMapper());
-    valueMappers.addSerializer(new BooleanValueMapper());
-    valueMappers.addSerializer(new StringValueMapper());
-    valueMappers.addSerializer(new DateValueMapper(dateFormat));
-    valueMappers.addSerializer(new ByteArrayValueMapper());
+    valueMappers.addMapper(new NullValueMapper());
+    valueMappers.addMapper(new BooleanValueMapper());
+    valueMappers.addMapper(new StringValueMapper());
+    valueMappers.addMapper(new DateValueMapper(dateFormat));
+    valueMappers.addMapper(new ByteArrayValueMapper());
 
     // number mappers
-    valueMappers.addSerializer(new IntegerValueMapper());
-    valueMappers.addSerializer(new LongValueMapper());
-    valueMappers.addSerializer(new ShortValueMapper());
-    valueMappers.addSerializer(new DoubleValueMapper());
+    valueMappers.addMapper(new IntegerValueMapper());
+    valueMappers.addMapper(new LongValueMapper());
+    valueMappers.addMapper(new ShortValueMapper());
+    valueMappers.addMapper(new DoubleValueMapper());
 
-    // spin
-    List<ValueMapper<?>> spinMappers = lookupSpinDataformats();
-    spinMappers.forEach(valueMappers::addSerializer);
+    // object
+    Map<String, DataFormat> dataFormats = lookupDataFormats();
+    dataFormats.forEach((key, format) -> {
+      valueMappers.addMapper(new JavaObjectMapper(key, format));
+    });
 
-    // default object serialization
-    valueMappers.addSerializer(new JavaObjectMapper());
+    // json/xml
+    valueMappers.addMapper(new JsonValueMapper());
+    valueMappers.addMapper(new XmlValueMapper());
+
     typedValues = new TypedValues(valueMappers);
   }
 
@@ -234,70 +239,61 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
 
   protected void initTopicSubscriptionManager() {
     topicSubscriptionManager = new TopicSubscriptionManager(engineClient, typedValues, lockDuration);
-
     topicSubscriptionManager.setBackoffStrategy(getBackoffStrategy());
 
     if (isAutoFetchingEnabled()) {
       topicSubscriptionManager.start();
     }
-
   }
 
-  @SuppressWarnings("unchecked")
-  protected List<ValueMapper<?>> lookupSpinDataformats() {
-    List<ValueMapper<?>> serializers = new ArrayList<ValueMapper<?>>();
+  protected Map<String, DataFormat> lookupDataFormats() {
+    Map<String, DataFormat> dataFormats = new HashMap<String, DataFormat>();
 
-    if (isDataFormatsAvailable()) {
+    lookupCustomDataFormats(dataFormats);
+    applyConfigurators(dataFormats);
 
-      LOG.spinDetected();
+    return dataFormats;
+  }
 
-      Set<DataFormat<?>> availableDataFormats = DataFormats.getAvailableDataFormats();
-      for (DataFormat<?> dataFormat : availableDataFormats) {
-        serializers.add(new SpinObjectValueMapper("spin://"+dataFormat.getName(), dataFormat));
+  protected void lookupCustomDataFormats(Map<String, DataFormat> dataFormats) {
+    // use java.util.ServiceLoader to load custom DataFormatProvider instances on the classpath
+    ServiceLoader<DataFormatProvider> providerLoader = ServiceLoader.load(DataFormatProvider.class);
+
+    for (DataFormatProvider provider : providerLoader) {
+      lookupProvider(dataFormats, provider);
+    }
+  }
+
+  protected void lookupProvider(Map<String, DataFormat> dataFormats, DataFormatProvider provider) {
+
+    String dataFormatName = provider.getDataFormatName();
+
+    if(!dataFormats.containsKey(dataFormatName)) {
+      DataFormat dataFormatInstance = provider.createInstance();
+      dataFormats.put(dataFormatName, dataFormatInstance);
+    }
+    else {
+      // throw LOG.multipleProvidersForDataformat(dataFormatName);
+      throw new RuntimeException();
+    }
+  }
+
+  @SuppressWarnings("rawtypes")
+  protected void applyConfigurators(Map<String, DataFormat> dataFormats) {
+    ServiceLoader<DataFormatConfigurator> configuratorLoader = ServiceLoader.load(DataFormatConfigurator.class);
+
+    for (DataFormatConfigurator configurator : configuratorLoader) {
+      applyConfigurator(dataFormats, configurator);
+    }
+  }
+
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  protected void applyConfigurator(Map<String, DataFormat> dataFormats, DataFormatConfigurator configurator) {
+    for (DataFormat dataFormat : dataFormats.values()) {
+      if (configurator.getDataFormatClass().isAssignableFrom(dataFormat.getClass())) {
+        configurator.configure(dataFormat);
       }
-
-      if (isSpinValuesAvailable()) {
-        DataFormats dataFormats = DataFormats.getInstance();
-        if(dataFormats.getDataFormatByName(DataFormats.JSON_DATAFORMAT_NAME) != null) {
-          DataFormat<SpinJsonNode> jsonDataFormat = (DataFormat<SpinJsonNode>) dataFormats.getDataFormatByName(DataFormats.JSON_DATAFORMAT_NAME);
-          serializers.add(new JsonValueMapper(jsonDataFormat));
-        }
-        if(dataFormats.getDataFormatByName(DataFormats.XML_DATAFORMAT_NAME) != null){
-          DataFormat<SpinXmlElement> xmlDataFormat = (DataFormat<SpinXmlElement>) dataFormats.getDataFormatByName(DataFormats.XML_DATAFORMAT_NAME);
-          serializers.add(new XmlValueMapper(xmlDataFormat));
-        }
-
-      }
     }
-
-    return serializers;
-  }
-
-
-  protected boolean isDataFormatsAvailable() {
-    boolean isAvailable = false;
-
-    try {
-      Class.forName("org.camunda.spin.DataFormats");
-      isAvailable = true;
-    } catch (ClassNotFoundException e) {
-      LOG.spinNotAvailable(e);
-    }
-
-    return isAvailable;
-  }
-
-  protected boolean isSpinValuesAvailable() {
-    boolean isAvailable = false;
-
-    try {
-      Class.forName("org.camunda.spin.plugin.variable.SpinValues");
-      isAvailable = true;
-    } catch (ClassNotFoundException e) {
-      LOG.spinNotAvailable(e);
-    }
-
-    return isAvailable;
   }
 
   public String checkHostname() {

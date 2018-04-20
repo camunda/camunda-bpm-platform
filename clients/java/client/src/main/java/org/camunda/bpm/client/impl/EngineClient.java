@@ -16,8 +16,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.camunda.bpm.client.impl.variable.TypedValueField;
-import org.camunda.bpm.client.impl.variable.TypedValues;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.impl.ExternalTaskImpl;
 import org.camunda.bpm.client.task.impl.dto.BpmnErrorRequestDto;
@@ -26,6 +24,8 @@ import org.camunda.bpm.client.task.impl.dto.ExtendLockRequestDto;
 import org.camunda.bpm.client.task.impl.dto.FailureRequestDto;
 import org.camunda.bpm.client.topic.impl.dto.FetchAndLockRequestDto;
 import org.camunda.bpm.client.topic.impl.dto.TopicRequestDto;
+import org.camunda.bpm.client.variable.impl.TypedValueField;
+import org.camunda.bpm.client.variable.impl.TypedValues;
 
 /**
  * @author Tassilo Weidner

@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.fail;
 import static org.camunda.bpm.client.util.ProcessModels.EXTERNAL_TASK_TOPIC_FOO;
 import static org.camunda.bpm.client.util.ProcessModels.TWO_EXTERNAL_TASK_PROCESS;
 import static org.camunda.bpm.engine.variable.type.ValueType.OBJECT;
-import static org.camunda.spin.DataFormats.JSON_DATAFORMAT_NAME;
+import static org.camunda.bpm.engine.variable.Variables.SerializationDataFormats.JSON;
 
 import java.util.List;
 
@@ -44,6 +44,7 @@ import org.skyscreamer.jsonassert.JSONAssert;
 public class JsonSerializationIT {
 
   protected static final String VARIABLE_NAME_JSON = "jsonVariable";
+  protected static final String JSON_DATAFORMAT_NAME = JSON.getName();
 
   protected static final JsonSerializable VARIABLE_VALUE_JSON_DESIALIZED = new JsonSerializable("a String", 42, true);
 

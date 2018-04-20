@@ -58,25 +58,6 @@
         <version>${version.jackson-databind}</version>
       </dependency>
 
-      <!-- optional dependencies -->
-      <dependency>
-        <groupId>org.camunda.bpm</groupId>
-        <artifactId>camunda-engine-plugin-spin</artifactId>
-        <version>${version.camunda.platform}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.camunda.spin</groupId>
-        <artifactId>camunda-spin-dataformat-xml-dom</artifactId>
-        <version>${version.camunda.spin}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.camunda.spin</groupId>
-        <artifactId>camunda-spin-dataformat-json-jackson</artifactId>
-        <version>${version.camunda.spin}</version>
-      </dependency>
-
     </dependencies>
   </dependencyManagement>
 
