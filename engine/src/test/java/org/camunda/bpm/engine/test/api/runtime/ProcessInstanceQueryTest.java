@@ -2007,11 +2007,13 @@ public class ProcessInstanceQueryTest {
     String processInstanceId = runtimeService.startProcessInstanceByKey(superProcess, businessKey).getProcessInstanceId();
 
     // when
-    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery().rootProcessInstances();
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery()
+      .processInstanceBusinessKey(businessKey)
+      .rootProcessInstances();
 
     // then
-    assertEquals(6, query.count());
-    List<ProcessInstance> list = query.processInstanceBusinessKey(businessKey).list();
+    assertEquals(1, query.count());
+    List<ProcessInstance> list = query.list();
     assertEquals(1, list.size());
     assertEquals(processInstanceId, list.get(0).getId());
   }
@@ -2020,7 +2022,10 @@ public class ProcessInstanceQueryTest {
   public void testQueryByRootProcessInstancesAndSuperProcess() {
     // when
     try {
-      runtimeService.createProcessInstanceQuery().rootProcessInstances().superProcessInstanceId("processInstanceId");
+      runtimeService.createProcessInstanceQuery()
+        .rootProcessInstances()
+        .superProcessInstanceId("processInstanceId");
+
       fail("expected exception");
     } catch (ProcessEngineException e) {
       // then
@@ -2029,7 +2034,10 @@ public class ProcessInstanceQueryTest {
 
     // when
     try {
-      runtimeService.createProcessInstanceQuery().superProcessInstanceId("processInstanceId").rootProcessInstances();
+      runtimeService.createProcessInstanceQuery()
+        .superProcessInstanceId("processInstanceId")
+        .rootProcessInstances();
+
       fail("expected exception");
     } catch (ProcessEngineException e) {
       // then
