@@ -140,9 +140,11 @@ public class ConcurrentProcessEngineJobExecutorHistoryCleanupJobTest extends Con
 
       monitor.sync();
 
-      Job historyCleanupJob = commandContext.getProcessEngineConfiguration().getHistoryService().findHistoryCleanupJob();
+      List<Job> historyCleanupJobs = commandContext.getProcessEngineConfiguration().getHistoryService().findHistoryCleanupJobs();
 
-      commandContext.getProcessEngineConfiguration().getManagementService().executeJob(historyCleanupJob.getId());
+      for (Job job : historyCleanupJobs) {
+        commandContext.getProcessEngineConfiguration().getManagementService().executeJob(job.getId());
+      }
 
       monitor.sync();
 

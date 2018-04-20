@@ -32,7 +32,7 @@
     FROM
       (
         SELECT
-          ${datepart1}<include refid="periodUnitFunction"/>${datepart2}HPI.START_TIME_${datepart3} AS PERIOD_, HPI.DURATION_
+          ${datepart1}<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.periodUnitFunction"/>${datepart2}HPI.START_TIME_${datepart3} AS PERIOD_, HPI.DURATION_
           <include refid="selectHistoricProcessInstancesByCriteria"/>
        ) RES
     GROUP BY
@@ -45,7 +45,7 @@
     FROM
       (
         SELECT
-          ${datepart1}HPI.START_TIME_${datepart2}<include refid="periodUnitFunction"/>${datepart3} AS PERIOD_, HPI.DURATION_
+          ${datepart1}HPI.START_TIME_${datepart2}<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.periodUnitFunction"/>${datepart3} AS PERIOD_, HPI.DURATION_
           <include refid="selectHistoricProcessInstancesByCriteria"/>
        ) RES
     GROUP BY
@@ -80,13 +80,6 @@
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithPrefix" />
 
     </where>
-  </sql>
-
-  <sql id="periodUnitFunction">
-    <choose>
-      <when test="reportPeriodUnitName.equals('MONTH')">${constant.datepart.month}</when>
-      <when test="reportPeriodUnitName.equals('QUARTER')">${constant.datepart.quarter}</when>
-   </choose>
   </sql>
 
 </mapper>

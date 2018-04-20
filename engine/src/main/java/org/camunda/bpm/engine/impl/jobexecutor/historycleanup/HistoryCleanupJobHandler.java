@@ -1,6 +1,7 @@
 package org.camunda.bpm.engine.impl.jobexecutor.historycleanup;
 
 import java.util.Date;
+import java.util.List;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -25,15 +26,22 @@ public class HistoryCleanupJobHandler implements JobHandler<HistoryCleanupJobHan
   @Override
   public void execute(HistoryCleanupJobHandlerConfiguration configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
     //find JobEntity
-    JobEntity jobEntity = commandContext.getJobManager().findJobByHandlerType(getType());
+    final List<JobEntity> jobs = commandContext.getJobManager()
+      .findJobsByConfiguration(getType(), configuration.toCanonicalString(), null, true);
 
+    if (jobs.size() != 1) {
+      //this must not happen
+      throw new RuntimeException("No unique job can be identified by configuration: " + configuration.toCanonicalString());
+    }
+
+    JobEntity jobEntity = jobs.get(0);
     boolean rescheduled = false;
 
     if (configuration.isImmediatelyDue()
         || (HistoryCleanupHelper.isBatchWindowConfigured(commandContext)
             && HistoryCleanupHelper.isWithinBatchWindow(ClockUtil.getCurrentTime(), commandContext)) ) {
       //find data to delete
-      final HistoryCleanupBatch nextBatch = HistoryCleanupHelper.getNextBatch(commandContext);
+      final HistoryCleanupBatch nextBatch = HistoryCleanupHelper.getNextBatch(commandContext, configuration);
       if (nextBatch.size() >= getBatchSizeThreshold(commandContext)) {
 
         //delete bunch of data

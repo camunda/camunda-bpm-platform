@@ -173,4 +173,12 @@
     <bind name="sizeOfIds" value="listOfIds.length" />
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedSql" />
   </sql>
+
+  <sql id="periodUnitFunction">
+    <choose>
+      <when test="reportPeriodUnitName.equals('MONTH')">${constant.datepart.month}</when>
+      <when test="reportPeriodUnitName.equals('QUARTER')">${constant.datepart.quarter}</when>
+      <when test="reportPeriodUnitName.equals('MINUTE')">${constant.datepart.minute}</when>
+    </choose>
+  </sql>
 </mapper>

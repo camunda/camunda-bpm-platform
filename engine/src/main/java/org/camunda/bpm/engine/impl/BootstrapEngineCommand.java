@@ -14,7 +14,6 @@
 
 package org.camunda.bpm.engine.impl;
 
-import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.ProcessEngineBootstrapCommand;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;

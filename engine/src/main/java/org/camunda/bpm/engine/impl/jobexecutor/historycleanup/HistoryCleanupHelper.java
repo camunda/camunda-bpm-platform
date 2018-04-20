@@ -151,16 +151,17 @@ public abstract class HistoryCleanupHelper {
    * instances and historic batches - and adds them to the batch.
    *
    * @param commandContext
+   * @param configuration
    * @return
    */
-  public static HistoryCleanupBatch getNextBatch(CommandContext commandContext) {
+  public static HistoryCleanupBatch getNextBatch(CommandContext commandContext, HistoryCleanupJobHandlerConfiguration configuration) {
     final Integer batchSize = getHistoryCleanupBatchSize(commandContext);
     HistoryCleanupBatch historyCleanupBatch = new HistoryCleanupBatch();
     ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
 
     //add process instance ids
     final List<String> historicProcessInstanceIds = commandContext.getHistoricProcessInstanceManager()
-        .findHistoricProcessInstanceIdsForCleanup(batchSize);
+        .findHistoricProcessInstanceIdsForCleanup(batchSize, configuration.getMinuteFrom(), configuration.getMinuteTo());
     if (historicProcessInstanceIds.size() > 0) {
       historyCleanupBatch.setHistoricProcessInstanceIds(historicProcessInstanceIds);
     }
@@ -168,7 +169,7 @@ public abstract class HistoryCleanupHelper {
     //if batch is not full, add decision instance ids
     if (historyCleanupBatch.size() < batchSize && processEngineConfiguration.isDmnEnabled()) {
       final List<String> historicDecisionInstanceIds = commandContext.getHistoricDecisionInstanceManager()
-          .findHistoricDecisionInstanceIdsForCleanup(batchSize - historyCleanupBatch.size());
+          .findHistoricDecisionInstanceIdsForCleanup(batchSize - historyCleanupBatch.size(), configuration.getMinuteFrom(), configuration.getMinuteTo());
       if (historicDecisionInstanceIds.size() > 0) {
         historyCleanupBatch.setHistoricDecisionInstanceIds(historicDecisionInstanceIds);
       }
@@ -177,7 +178,7 @@ public abstract class HistoryCleanupHelper {
     //if batch is not full, add case instance ids
     if (historyCleanupBatch.size() < batchSize && processEngineConfiguration.isCmmnEnabled()) {
       final List<String> historicCaseInstanceIds = commandContext.getHistoricCaseInstanceManager()
-          .findHistoricCaseInstanceIdsForCleanup(batchSize - historyCleanupBatch.size());
+          .findHistoricCaseInstanceIdsForCleanup(batchSize - historyCleanupBatch.size(), configuration.getMinuteFrom(), configuration.getMinuteTo());
       if (historicCaseInstanceIds.size() > 0) {
         historyCleanupBatch.setHistoricCaseInstanceIds(historicCaseInstanceIds);
       }
@@ -188,12 +189,23 @@ public abstract class HistoryCleanupHelper {
     if (historyCleanupBatch.size() < batchSize && batchOperationsForHistoryCleanup != null && !batchOperationsForHistoryCleanup.isEmpty()) {
       List<String> historicBatchIds = commandContext
           .getHistoricBatchManager()
-          .findHistoricBatchIdsForCleanup(batchSize - historyCleanupBatch.size(), batchOperationsForHistoryCleanup);
+          .findHistoricBatchIdsForCleanup(batchSize - historyCleanupBatch.size(), batchOperationsForHistoryCleanup, configuration.getMinuteFrom(), configuration.getMinuteTo());
       if (historicBatchIds.size() > 0) {
         historyCleanupBatch.setHistoricBatchIds(historicBatchIds);
       }
     }
 
     return historyCleanupBatch;
+  }
+
+  public static int[][] listMinuteChunks(int numberOfChunks) {
+    final int[][] minuteChunks = new int[numberOfChunks][2];
+    int chunkLength = 60 / numberOfChunks;
+    for (int i = 0; i < numberOfChunks; i++) {
+      minuteChunks[i][0] = chunkLength * i;
+      minuteChunks[i][1] = chunkLength * (i + 1) - 1;
+    }
+    minuteChunks[numberOfChunks - 1][1] = 59;
+    return minuteChunks;
   }
 }

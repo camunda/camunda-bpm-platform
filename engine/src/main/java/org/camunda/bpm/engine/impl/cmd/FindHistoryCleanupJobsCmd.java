@@ -14,6 +14,7 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.Serializable;
+import java.util.List;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupJobHandler;
@@ -22,11 +23,11 @@ import org.camunda.bpm.engine.runtime.Job;
 /**
  * @author Svetlana Dorokhova
  */
-public class FindHistoryCleanupJobCmd implements Command<Job>, Serializable {
+public class FindHistoryCleanupJobsCmd implements Command<List<Job>>, Serializable {
 
   @Override
-  public Job execute(CommandContext commandContext) {
-    return commandContext.getJobManager().findJobByHandlerType(HistoryCleanupJobHandler.TYPE);
+  public List<Job> execute(CommandContext commandContext) {
+    return commandContext.getJobManager().findJobsByHandlerType(HistoryCleanupJobHandler.TYPE);
   }
 
 }

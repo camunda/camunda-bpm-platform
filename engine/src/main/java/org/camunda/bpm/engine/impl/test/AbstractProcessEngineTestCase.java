@@ -131,7 +131,7 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
 
       deleteDeployments();
 
-      deleteHistoryCleanupJob();
+      deleteHistoryCleanupJobs();
 
       // only fail if no test failure was recorded
       TestHelper.assertAndEnsureCleanDbAndCache(processEngine, exception == null);
@@ -145,9 +145,9 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
     }
   }
 
-  private void deleteHistoryCleanupJob() {
-    final Job job = historyService.findHistoryCleanupJob();
-    if (job != null) {
+  private void deleteHistoryCleanupJobs() {
+    final List<Job> jobs = historyService.findHistoryCleanupJobs();
+    for (final Job job: jobs) {
       processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
         public Void execute(CommandContext commandContext) {
             commandContext.getJobManager().deleteJob((JobEntity) job);

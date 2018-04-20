@@ -118,7 +118,7 @@ public class HistoricInstanceForCleanupQueryTest {
       public Void execute(CommandContext commandContext) {
 
         HistoricBatchManager historicBatchManager = commandContext.getHistoricBatchManager();
-        List<String> ids = historicBatchManager.findHistoricBatchIdsForCleanup(7, batchOperationsMap);
+        List<String> ids = historicBatchManager.findHistoricBatchIdsForCleanup(7, batchOperationsMap, 0, 59);
         assertEquals(3, ids.size());
         HistoricBatchEntity instance0 = historicBatchManager.findHistoricBatchById(ids.get(0));
         HistoricBatchEntity instance1 = historicBatchManager.findHistoricBatchById(ids.get(1));

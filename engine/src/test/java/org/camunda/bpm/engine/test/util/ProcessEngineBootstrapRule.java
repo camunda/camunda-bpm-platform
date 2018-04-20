@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.engine.test.util;
 
+import java.util.List;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngines;
@@ -60,8 +61,8 @@ public class ProcessEngineBootstrapRule extends TestWatcher {
   }
 
   private void deleteHistoryCleanupJob() {
-    final Job job = processEngine.getHistoryService().findHistoryCleanupJob();
-    if (job != null) {
+    final List<Job> jobs = processEngine.getHistoryService().findHistoryCleanupJobs();
+    for (final Job job: jobs) {
       ((ProcessEngineConfigurationImpl)processEngine.getProcessEngineConfiguration()).getCommandExecutorTxRequired().execute(new Command<Void>() {
         public Void execute(CommandContext commandContext) {
           commandContext.getJobManager().deleteJob((JobEntity) job);

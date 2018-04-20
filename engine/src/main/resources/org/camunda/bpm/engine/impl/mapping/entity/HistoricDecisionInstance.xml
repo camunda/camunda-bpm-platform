@@ -286,24 +286,42 @@
   <sql id="selectHistoricDecisionInstanceIdsForCleanupSql">
     <bind name="days" value="'dd.HISTORY_TTL_'"/>
     <bind name="date" value="'di.EVAL_TIME_'"/>
-    <bind name="currentTimestamp" value="parameter"/>
+    <bind name="currentTimestamp" value="parameter.currentTimestamp"/>
+    <bind name="reportPeriodUnitName" value="'MINUTE'"/>
     FROM ${prefix}ACT_HI_DECINST di, ${prefix}ACT_RE_DECISION_DEF dd
     where
         di.DEC_DEF_ID_ = dd.ID_
         AND not dd.HISTORY_TTL_ is NULL
         AND ${dayComparator}
-    ${limitAfterWithoutOffset}
   </sql>
 
   <select id="selectHistoricDecisionInstanceIdsForCleanup" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
     SELECT ${limitBeforeWithoutOffset} di.ID_, di.EVAL_TIME_
     <include refid="selectHistoricDecisionInstanceIdsForCleanupSql"/>
+    <include refid="andWhereMinuteInDateBetweenSql"/>
+    ${limitAfterWithoutOffset}
   </select>
 
   <select id="selectHistoricDecisionInstanceIdsForCleanup_oracle" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
     SELECT /*+ FIRST_ROWS(${maxResults}) NO_PARALLEL(di) NO_PARALLEL(dd) */ di.ID_, di.EVAL_TIME_
     <include refid="selectHistoricDecisionInstanceIdsForCleanupSql"/>
+    <include refid="andWhereMinuteInDateBetweenSql_oracle"/>
+    ${limitAfterWithoutOffset}
   </select>
+
+  <sql id="andWhereMinuteInDateBetweenSql">
+    <if test="parameter.minuteFrom != null and parameter.minuteTo != null">
+      AND ${datepart1}<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.periodUnitFunction"/>${datepart2}di.EVAL_TIME_${datepart3}
+      between #{parameter.minuteFrom, jdbcType=INTEGER} and #{parameter.minuteTo, jdbcType=INTEGER}
+    </if>
+  </sql>
+
+  <sql id="andWhereMinuteInDateBetweenSql_oracle">
+    <if test="parameter.minuteFrom != null and parameter.minuteTo != null">
+      AND ${datepart1}di.EVAL_TIME_${datepart2}<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.periodUnitFunction"/>${datepart3}
+      between #{parameter.minuteFrom, jdbcType=INTEGER} and #{parameter.minuteTo, jdbcType=INTEGER}
+    </if>
+  </sql>
 
   <!-- Select History Cleanup Report Entities -->
   <select id="selectFinishedDecisionInstancesReportEntitiesCount" parameterType="org.camunda.bpm.engine.impl.CleanableHistoricDecisionInstanceReportImpl" resultType="long">

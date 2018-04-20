@@ -56,16 +56,16 @@ public class HistoricBatchManager extends AbstractManager {
   }
 
   @SuppressWarnings("unchecked")
-  public List<String> findHistoricBatchIdsForCleanup(Integer batchSize, Map<String, Integer> batchOperationsForHistoryCleanup) {
+  public List<String> findHistoricBatchIdsForCleanup(Integer batchSize, Map<String, Integer> batchOperationsForHistoryCleanup, int minuteFrom, int minuteTo) {
     Map<String, Object> queryParameters = new HashMap<String, Object>();
     queryParameters.put("currentTimestamp", ClockUtil.getCurrentTime());
     queryParameters.put("map", batchOperationsForHistoryCleanup);
-
-    ListQueryParameterObject parameterObject = new ListQueryParameterObject();
-    parameterObject.setParameter(queryParameters);
+    if (minuteTo - minuteFrom + 1 < 60) {
+      queryParameters.put("minuteFrom", minuteFrom);
+      queryParameters.put("minuteTo", minuteTo);
+    }
+    ListQueryParameterObject parameterObject = new ListQueryParameterObject(queryParameters, 0, batchSize);
     parameterObject.getOrderingProperties().add(new QueryOrderingProperty(new QueryPropertyImpl("END_TIME_"), Direction.ASCENDING));
-    parameterObject.setFirstResult(0);
-    parameterObject.setMaxResults(batchSize);
 
     return (List<String>) getDbEntityManager().selectList("selectHistoricBatchIdsForCleanup", parameterObject);
   }

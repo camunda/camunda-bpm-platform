@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.TimeZone;
 import org.apache.commons.lang.time.DateUtils;
 import org.camunda.bpm.engine.CaseService;
@@ -33,17 +34,16 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.history.HistoricCaseInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricIncident;
+import org.camunda.bpm.engine.history.HistoricJobLog;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.jobexecutor.ExecuteJobHelper;
 import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupHelper;
 import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupJobHandlerConfiguration;
 import org.camunda.bpm.engine.impl.metrics.Meter;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.ExceptionUtil;
 import org.camunda.bpm.engine.impl.util.json.JSONObject;
@@ -91,6 +91,7 @@ public class HistoryCleanupTest {
   protected static final String ONE_TASK_PROCESS = "oneTaskProcess";
   protected static final String DECISION = "decision";
   protected static final String ONE_TASK_CASE = "case";
+  private static final int NUMBER_OF_THREADS = 3;
 
   protected String defaultStartTime;
   protected String defaultEndTime;
@@ -101,12 +102,15 @@ public class HistoryCleanupTest {
       configuration.setHistoryCleanupBatchSize(20);
       configuration.setHistoryCleanupBatchThreshold(10);
       configuration.setDefaultNumberOfRetries(5);
+      configuration.setHistoryCleanupNumberOfThreads(NUMBER_OF_THREADS);
       return configuration;
     }
   };
 
   protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
+
+  private Random random = new Random();
 
   @Rule
   public ExpectedException thrown = ExpectedException.none();
@@ -145,12 +149,17 @@ public class HistoryCleanupTest {
     processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
       public Void execute(CommandContext commandContext) {
 
-        List<Job> jobs = managementService.createJobQuery().list();
-        if (jobs.size() > 0) {
-          assertEquals(1, jobs.size());
-          String jobId = jobs.get(0).getId();
-          commandContext.getJobManager().deleteJob((JobEntity) jobs.get(0));
-          commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(jobId);
+        List<Job> jobs = historyService.findHistoryCleanupJobs();
+//        assertEquals(NUMBER_OF_THREADS, jobs.size());
+        for (Job job: jobs) {
+          commandContext.getJobManager().deleteJob((JobEntity) job);
+          commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(job.getId());
+        }
+
+        //cleanup "detached" historic job logs
+        final List<HistoricJobLog> list = historyService.createHistoricJobLogQuery().list();
+        for (HistoricJobLog jobLog: list) {
+          commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(jobLog.getJobId());
         }
 
         List<HistoricIncident> historicIncidents = historyService.createHistoricIncidentQuery().list();
@@ -193,17 +202,80 @@ public class HistoryCleanupTest {
 
   @Test
   public void testHistoryCleanupManualRun() {
-      //given
+    //given
     prepareData(15);
 
     ClockUtil.setCurrentTime(new Date());
-      //when
-    String jobId = historyService.cleanUpHistoryAsync(true).getId();
-
-    managementService.executeJob(jobId);
+    //when
+    runHistoryCleanup(true);
 
     //then
     assertResult(0);
+  }
+
+  @Test
+  public void testDataSplitBetweenThreads() {
+    //given
+    prepareData(15);
+
+    ClockUtil.setCurrentTime(new Date());
+
+    //when
+    historyService.cleanUpHistoryAsync(true).getId();
+    for (Job job : historyService.findHistoryCleanupJobs()) {
+      managementService.executeJob(job.getId());
+      //assert that the corresponding data was removed
+      final HistoryCleanupJobHandlerConfiguration jobHandlerConfiguration = getHistoryCleanupJobHandlerConfiguration(job);
+      final int minuteFrom = jobHandlerConfiguration.getMinuteFrom();
+      final int minuteTo = jobHandlerConfiguration.getMinuteTo();
+
+      final List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery().list();
+      for (HistoricProcessInstance historicProcessInstance: historicProcessInstances) {
+        if (historicProcessInstance.getEndTime() != null) {
+          Calendar calendar = Calendar.getInstance();
+          calendar.setTime(historicProcessInstance.getEndTime());
+          assertTrue(minuteFrom > calendar.get(Calendar.MINUTE) || calendar.get(Calendar.MINUTE) > minuteTo);
+        }
+      }
+
+      final List<HistoricDecisionInstance> historicDecisionInstances = historyService.createHistoricDecisionInstanceQuery().list();
+      for (HistoricDecisionInstance historicDecisionInstance: historicDecisionInstances) {
+        if (historicDecisionInstance.getEvaluationTime() != null) {
+          Calendar calendar = Calendar.getInstance();
+          calendar.setTime(historicDecisionInstance.getEvaluationTime());
+          assertTrue(minuteFrom > calendar.get(Calendar.MINUTE) || calendar.get(Calendar.MINUTE) > minuteTo);
+        }
+      }
+
+      final List<HistoricCaseInstance> historicCaseInstances = historyService.createHistoricCaseInstanceQuery().list();
+      for (HistoricCaseInstance historicCaseInstance: historicCaseInstances) {
+        if (historicCaseInstance.getCloseTime() != null) {
+          Calendar calendar = Calendar.getInstance();
+          calendar.setTime(historicCaseInstance.getCloseTime());
+          assertTrue(minuteFrom > calendar.get(Calendar.MINUTE) || calendar.get(Calendar.MINUTE) > minuteTo);
+        }
+      }
+
+    }
+
+    assertResult(0);
+  }
+
+  private HistoryCleanupJobHandlerConfiguration getHistoryCleanupJobHandlerConfiguration(Job job) {
+    return HistoryCleanupJobHandlerConfiguration
+          .fromJson(new JSONObject(((JobEntity) job).getJobHandlerConfigurationRaw()));
+  }
+
+  private void runHistoryCleanup() {
+    runHistoryCleanup(false);
+  }
+
+  private void runHistoryCleanup(boolean manualRun) {
+    historyService.cleanUpHistoryAsync(manualRun);
+
+    for (Job job : historyService.findHistoryCleanupJobs()) {
+      managementService.executeJob(job.getId());
+    }
   }
 
   @Test
@@ -214,9 +286,7 @@ public class HistoryCleanupTest {
 
     ClockUtil.setCurrentTime(new Date());
     //when
-    String jobId = historyService.cleanUpHistoryAsync(true).getId();
-
-    managementService.executeJob(jobId);
+    runHistoryCleanup(true);
 
     //then
     final long removedProcessInstances = managementService.createMetricsQuery().name(Metrics.HISTORY_CLEANUP_REMOVED_PROCESS_INSTANCES).sum();
@@ -240,9 +310,7 @@ public class HistoryCleanupTest {
 
     ClockUtil.setCurrentTime(currentDate);
     // when
-    String jobId = historyService.cleanUpHistoryAsync(true).getId();
-
-    managementService.executeJob(jobId);
+    runHistoryCleanup(true);
 
     // assume
     assertResult(0);
@@ -285,9 +353,7 @@ public class HistoryCleanupTest {
 
     ClockUtil.setCurrentTime(new Date());
     // when
-    String jobId = historyService.cleanUpHistoryAsync(true).getId();
-
-    managementService.executeJob(jobId);
+    runHistoryCleanup(true);
 
     // then
     assertEquals(PROCESS_INSTANCES_COUNT, historyService.createHistoricProcessInstanceQuery().count());
@@ -303,9 +369,7 @@ public class HistoryCleanupTest {
 
     ClockUtil.setCurrentTime(new Date());
     // when
-    String jobId = historyService.cleanUpHistoryAsync(true).getId();
-
-    managementService.executeJob(jobId);
+    runHistoryCleanup(true);
 
     // then
     assertEquals(0, historyService.createHistoricProcessInstanceQuery().count());
@@ -323,9 +387,7 @@ public class HistoryCleanupTest {
     ClockUtil.setCurrentTime(new Date());
 
     // when
-    String jobId = historyService.cleanUpHistoryAsync(true).getId();
-
-    managementService.executeJob(jobId);
+    runHistoryCleanup(true);
 
     // then
     assertEquals(PROCESS_INSTANCES_COUNT, historyService.createHistoricProcessInstanceQuery().count());
@@ -342,9 +404,7 @@ public class HistoryCleanupTest {
 
     ClockUtil.setCurrentTime(new Date());
     // when
-    String jobId = historyService.cleanUpHistoryAsync(true).getId();
-
-    managementService.executeJob(jobId);
+    runHistoryCleanup(true);
 
     // then
     assertEquals(0, historyService.createHistoricProcessInstanceQuery().count());
@@ -361,9 +421,7 @@ public class HistoryCleanupTest {
 
     ClockUtil.setCurrentTime(new Date());
     // when
-    String jobId = historyService.cleanUpHistoryAsync(true).getId();
-
-    managementService.executeJob(jobId);
+    runHistoryCleanup(true);
 
     // then
     assertEquals(PROCESS_INSTANCES_COUNT, historyService.createHistoricProcessInstanceQuery().count());
@@ -381,9 +439,7 @@ public class HistoryCleanupTest {
     ClockUtil.setCurrentTime(new Date());
 
     // when
-    String jobId = historyService.cleanUpHistoryAsync(true).getId();
-
-    managementService.executeJob(jobId);
+    runHistoryCleanup(true);
 
     // then
     assertEquals(0, historyService.createHistoricProcessInstanceQuery().count());
@@ -400,9 +456,7 @@ public class HistoryCleanupTest {
 
     ClockUtil.setCurrentTime(new Date());
     // when
-    String jobId = historyService.cleanUpHistoryAsync(true).getId();
-
-    managementService.executeJob(jobId);
+    runHistoryCleanup(true);
 
     // then
     assertResult(0);
@@ -417,9 +471,7 @@ public class HistoryCleanupTest {
 
     ClockUtil.setCurrentTime(new Date());
     // when
-    String jobId = historyService.cleanUpHistoryAsync(true).getId();
-
-    managementService.executeJob(jobId);
+    runHistoryCleanup(true);
 
     // then
     assertEquals(PROCESS_INSTANCES_COUNT, historyService.createHistoricProcessInstanceQuery().count());
@@ -483,9 +535,7 @@ public class HistoryCleanupTest {
     processEngineConfiguration.initHistoryCleanup();
 
     //when
-    String jobId = historyService.cleanUpHistoryAsync(false).getId();
-
-    managementService.executeJob(jobId);
+    runHistoryCleanup();
 
     //then
     assertResult(0);
@@ -500,9 +550,7 @@ public class HistoryCleanupTest {
 
     ClockUtil.setCurrentTime(new Date());
     //when
-    String jobId = historyService.cleanUpHistoryAsync(true).getId();
-
-    managementService.executeJob(jobId);
+    runHistoryCleanup(true);
 
     //then
     assertResult(15);
@@ -530,9 +578,7 @@ public class HistoryCleanupTest {
 
     ClockUtil.setCurrentTime(new Date());
     //when
-    String jobId = historyService.cleanUpHistoryAsync(true).getId();
-
-    managementService.executeJob(jobId);
+    runHistoryCleanup(true);
 
     //then
     assertResult(15);
@@ -541,14 +587,13 @@ public class HistoryCleanupTest {
   @Test
   public void testFindHistoryCleanupJob() {
     //given
-    String jobId = historyService.cleanUpHistoryAsync(true).getId();
+    historyService.cleanUpHistoryAsync(true).getId();
 
     //when
-    Job historyCleanupJob = historyService.findHistoryCleanupJob();
+    final List<Job> historyCleanupJobs = historyService.findHistoryCleanupJobs();
 
     //then
-    assertNotNull(historyCleanupJob);
-    assertEquals(jobId, historyCleanupJob.getId());
+    assertEquals(NUMBER_OF_THREADS, historyCleanupJobs.size());
   }
 
   @Test
@@ -557,9 +602,11 @@ public class HistoryCleanupTest {
 
     //force creation of job
     historyService.cleanUpHistoryAsync(true);
-    JobEntity historyCleanupJob = (JobEntity)historyService.findHistoryCleanupJob();
-    assertNotNull(historyCleanupJob);
-    assertNotNull(historyCleanupJob.getDuedate());
+    List<Job> historyCleanupJobs = historyService.findHistoryCleanupJobs();
+    assertFalse(historyCleanupJobs.isEmpty());
+    for (Job job : historyCleanupJobs) {
+      assertNotNull(job.getDuedate());
+    }
 
     processEngineConfiguration.setHistoryCleanupBatchWindowStartTime(null);
     processEngineConfiguration.setHistoryCleanupBatchWindowStartTime(null);
@@ -571,9 +618,11 @@ public class HistoryCleanupTest {
     historyService.cleanUpHistoryAsync(false);
 
     //then
-    historyCleanupJob = (JobEntity)historyService.findHistoryCleanupJob();
-    assertEquals(SuspensionState.SUSPENDED.getStateCode(), historyCleanupJob.getSuspensionState());
-    assertNull(historyCleanupJob.getDuedate());
+    historyCleanupJobs = historyService.findHistoryCleanupJobs();
+    for (Job job : historyCleanupJobs) {
+      assertTrue(job.isSuspended());
+      assertNull(job.getDuedate());
+    }
 
   }
 
@@ -615,41 +664,42 @@ public class HistoryCleanupTest {
 
     ClockUtil.setCurrentTime(new Date());
     //when
-    String jobId = historyService.cleanUpHistoryAsync(true).getId();
-
-    managementService.executeJob(jobId);
+    runHistoryCleanup(true);
 
     //then
     assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKey(ONE_TASK_PROCESS).count());
 
-    JobEntity jobEntity = getJobEntity(jobId);
-    assertEquals(SuspensionState.SUSPENDED.getStateCode(), jobEntity.getSuspensionState());
+    for (Job job : historyService.findHistoryCleanupJobs()) {
+      assertTrue(job.isSuspended());
+    }
   }
 
   @Test
   public void testNotEnoughTimeToDeleteEverything() {
     //given
     //we have something to cleanup
-    prepareData(40);
+    prepareData(80);
     //we call history cleanup within batch window
     Date now = new Date();
     ClockUtil.setCurrentTime(now);
     processEngineConfiguration.setHistoryCleanupBatchWindowStartTime(new SimpleDateFormat("HH:mm").format(now));
     processEngineConfiguration.setHistoryCleanupBatchWindowEndTime(new SimpleDateFormat("HH:mm").format(DateUtils.addHours(now, HISTORY_TIME_TO_LIVE)));
     processEngineConfiguration.initHistoryCleanup();
-    String jobId = historyService.cleanUpHistoryAsync().getId();
     //job is executed once within batch window
-    managementService.executeJob(jobId);
+    //we run the job in 3 threads, so not more than 60 instances can be removed in one run
+    runHistoryCleanup();
 
     //when
     //time passed -> outside batch window
     ClockUtil.setCurrentTime(DateUtils.addHours(now, 6));
     //the job is called for the second time
-    managementService.executeJob(jobId);
+    for (Job job : historyService.findHistoryCleanupJobs()) {
+      managementService.executeJob(job.getId());
+    }
 
     //then
     //second execution was not able to delete rest data
-    assertResult(20);
+    assertResultNotLess(20);
   }
 
   @Test
@@ -668,12 +718,13 @@ public class HistoryCleanupTest {
 
     //when
     //job is executed before batch window start
-    String jobId = historyService.cleanUpHistoryAsync(true).getId();
-    managementService.executeJob(jobId);
+    runHistoryCleanup(true);
 
     //the job is called for the second time after batch window end
     ClockUtil.setCurrentTime(DateUtils.addHours(now, 6)); //now + 6 hours
-    managementService.executeJob(jobId);
+    for (Job job : historyService.findHistoryCleanupJobs()) {
+      managementService.executeJob(job.getId());
+    }
 
     //then
     assertResult(0);
@@ -693,22 +744,23 @@ public class HistoryCleanupTest {
     processEngineConfiguration.initHistoryCleanup();
 
     //when
-    String jobId = historyService.cleanUpHistoryAsync().getId();
-
-    managementService.executeJob(jobId);
+    runHistoryCleanup();
 
     //then
-    JobEntity jobEntity = getJobEntity(jobId);
-    HistoryCleanupJobHandlerConfiguration configuration = getConfiguration(jobEntity);
+    final List<Job> historyCleanupJobs = historyService.findHistoryCleanupJobs();
+    for (Job job : historyCleanupJobs) {
+      JobEntity jobEntity = (JobEntity) job;
+      HistoryCleanupJobHandlerConfiguration configuration = getConfiguration(jobEntity);
 
-    //job rescheduled till current time + delay
-    Date nextRun = getNextRunWithDelay(ClockUtil.getCurrentTime(), 0);
-    assertTrue(jobEntity.getDuedate().equals(nextRun) || jobEntity.getDuedate().after(nextRun));
-    Date nextRunMax = DateUtils.addSeconds(ClockUtil.getCurrentTime(), HistoryCleanupJobHandlerConfiguration.MAX_DELAY);
-    assertTrue(jobEntity.getDuedate().before(nextRunMax));
+      //job rescheduled till current time + delay
+      Date nextRun = getNextRunWithDelay(ClockUtil.getCurrentTime(), 0);
+      assertTrue(jobEntity.getDuedate().equals(nextRun) || jobEntity.getDuedate().after(nextRun));
+      Date nextRunMax = DateUtils.addSeconds(ClockUtil.getCurrentTime(), HistoryCleanupJobHandlerConfiguration.MAX_DELAY);
+      assertTrue(jobEntity.getDuedate().before(nextRunMax));
 
-    //countEmptyRuns incremented
-    assertEquals(1, configuration.getCountEmptyRuns());
+      //countEmptyRuns incremented
+      assertEquals(1, configuration.getCountEmptyRuns());
+    }
 
     //data is still removed
     assertResult(0);
@@ -737,23 +789,29 @@ public class HistoryCleanupTest {
     processEngineConfiguration.initHistoryCleanup();
 
     //when
-    String jobId = historyService.cleanUpHistoryAsync().getId();
+    historyService.cleanUpHistoryAsync();
+    List<Job> historyCleanupJobs = historyService.findHistoryCleanupJobs();
     for (int i = 1; i <= 6; i++) {
-      managementService.executeJob(jobId);
+      for (Job job : historyCleanupJobs) {
+        managementService.executeJob(job.getId());
+      }
     }
 
     //then
-    JobEntity jobEntity = getJobEntity(jobId);
-    HistoryCleanupJobHandlerConfiguration configuration = getConfiguration(jobEntity);
+    historyCleanupJobs = historyService.findHistoryCleanupJobs();
+    for (Job job : historyCleanupJobs) {
+      JobEntity jobEntity = (JobEntity) job;
+      HistoryCleanupJobHandlerConfiguration configuration = getConfiguration(jobEntity);
 
-    //job rescheduled till current time + (2 power count)*delay
-    Date nextRun = getNextRunWithDelay(ClockUtil.getCurrentTime(), HISTORY_TIME_TO_LIVE);
-    assertTrue(jobEntity.getDuedate().equals(nextRun) || jobEntity.getDuedate().after(nextRun));
-    Date nextRunMax = DateUtils.addSeconds(ClockUtil.getCurrentTime(), HistoryCleanupJobHandlerConfiguration.MAX_DELAY);
-    assertTrue(jobEntity.getDuedate().before(nextRunMax));
+      //job rescheduled till current time + (2 power count)*delay
+      Date nextRun = getNextRunWithDelay(ClockUtil.getCurrentTime(), HISTORY_TIME_TO_LIVE);
+      assertTrue(jobEntity.getDuedate().equals(nextRun) || jobEntity.getDuedate().after(nextRun));
+      Date nextRunMax = DateUtils.addSeconds(ClockUtil.getCurrentTime(), HistoryCleanupJobHandlerConfiguration.MAX_DELAY);
+      assertTrue(jobEntity.getDuedate().before(nextRunMax));
 
-    //countEmptyRuns incremented
-    assertEquals(6, configuration.getCountEmptyRuns());
+      //countEmptyRuns incremented
+      assertEquals(6, configuration.getCountEmptyRuns());
+    }
 
     //data is still removed
     assertResult(0);
@@ -772,22 +830,28 @@ public class HistoryCleanupTest {
     processEngineConfiguration.initHistoryCleanup();
 
     //when
-    String jobId = historyService.cleanUpHistoryAsync().getId();
+    historyService.cleanUpHistoryAsync();
+    List<Job> historyCleanupJobs = historyService.findHistoryCleanupJobs();
     for (int i = 1; i <= 11; i++) {
-      managementService.executeJob(jobId);
+      for (Job job : historyCleanupJobs) {
+        managementService.executeJob(job.getId());
+      }
     }
 
     //then
-    JobEntity jobEntity = getJobEntity(jobId);
-    HistoryCleanupJobHandlerConfiguration configuration = getConfiguration(jobEntity);
+    historyCleanupJobs = historyService.findHistoryCleanupJobs();
+    for (Job job : historyCleanupJobs) {
+      JobEntity jobEntity = (JobEntity) job;
+      HistoryCleanupJobHandlerConfiguration configuration = getConfiguration(jobEntity);
 
-    //job rescheduled till current time + max delay
-    Date nextRun = getNextRunWithDelay(ClockUtil.getCurrentTime(), 10);
-    assertTrue(jobEntity.getDuedate().equals(nextRun) || jobEntity.getDuedate().after(nextRun));
-    assertTrue(jobEntity.getDuedate().before(getNextRunWithinBatchWindow(now)));
+      //job rescheduled till current time + max delay
+      Date nextRun = getNextRunWithDelay(ClockUtil.getCurrentTime(), 10);
+      assertTrue(jobEntity.getDuedate().equals(nextRun) || jobEntity.getDuedate().after(nextRun));
+      assertTrue(jobEntity.getDuedate().before(getNextRunWithinBatchWindow(now)));
 
-    //countEmptyRuns incremented
-    assertEquals(11, configuration.getCountEmptyRuns());
+      //countEmptyRuns incremented
+      assertEquals(11, configuration.getCountEmptyRuns());
+    }
 
     //data is still removed
     assertResult(0);
@@ -806,21 +870,27 @@ public class HistoryCleanupTest {
     processEngineConfiguration.initHistoryCleanup();
 
     //when
-    String jobId = historyService.cleanUpHistoryAsync().getId();
+    historyService.cleanUpHistoryAsync();
+    List<Job> historyCleanupJobs = historyService.findHistoryCleanupJobs();
     for (int i = 1; i <= 9; i++) {
-      managementService.executeJob(jobId);
+      for (Job job : historyCleanupJobs) {
+        managementService.executeJob(job.getId());
+      }
     }
 
     //then
-    JobEntity jobEntity = getJobEntity(jobId);
-    HistoryCleanupJobHandlerConfiguration configuration = getConfiguration(jobEntity);
+    historyCleanupJobs = historyService.findHistoryCleanupJobs();
+    for (Job job: historyCleanupJobs) {
+      JobEntity jobEntity = (JobEntity)job;
+      HistoryCleanupJobHandlerConfiguration configuration = getConfiguration(jobEntity);
 
-    //job rescheduled till next batch window start time
-    Date nextRun = getNextRunWithinBatchWindow(ClockUtil.getCurrentTime());
-    assertTrue(jobEntity.getDuedate().equals(nextRun));
+      //job rescheduled till next batch window start time
+      Date nextRun = getNextRunWithinBatchWindow(ClockUtil.getCurrentTime());
+      assertTrue(jobEntity.getDuedate().equals(nextRun));
 
-    //countEmptyRuns canceled
-    assertEquals(0, configuration.getCountEmptyRuns());
+      //countEmptyRuns canceled
+      assertEquals(0, configuration.getCountEmptyRuns());
+    }
 
     //data is still removed
     assertResult(0);
@@ -839,21 +909,23 @@ public class HistoryCleanupTest {
     ClockUtil.setCurrentTime(DateUtils.addHours(twoHoursAgo, 2));
 
     //when
-    String jobId = historyService.cleanUpHistoryAsync().getId();
     for (int i = 1; i <= 3; i++) {
-      managementService.executeJob(jobId);
+      runHistoryCleanup();
     }
 
     //then
-    JobEntity jobEntity = getJobEntity(jobId);
-    HistoryCleanupJobHandlerConfiguration configuration = getConfiguration(jobEntity);
+    final List<Job> historyCleanupJobs = historyService.findHistoryCleanupJobs();
+    for (Job job : historyCleanupJobs) {
+      JobEntity jobEntity = (JobEntity) job;
+      HistoryCleanupJobHandlerConfiguration configuration = getConfiguration(jobEntity);
 
-    //job rescheduled till next batch window start
-    Date nextRun = getNextRunWithinBatchWindow(ClockUtil.getCurrentTime());
-    assertTrue(jobEntity.getDuedate().equals(nextRun));
+      //job rescheduled till next batch window start
+      Date nextRun = getNextRunWithinBatchWindow(ClockUtil.getCurrentTime());
+      assertTrue(jobEntity.getDuedate().equals(nextRun));
 
-    //countEmptyRuns canceled
-    assertEquals(0, configuration.getCountEmptyRuns());
+      //countEmptyRuns canceled
+      assertEquals(0, configuration.getCountEmptyRuns());
+    }
 
     //nothing was removed
     assertResult(5);
@@ -936,22 +1008,23 @@ public class HistoryCleanupTest {
     processEngineConfiguration.initHistoryCleanup();
 
     //when
-    String jobId = historyService.cleanUpHistoryAsync().getId();
-
-    ExecuteJobHelper.executeJob(jobId, processEngineConfiguration.getCommandExecutorTxRequired());
+    runHistoryCleanup();
 
     //then
-    JobEntity jobEntity = getJobEntity(jobId);
-    HistoryCleanupJobHandlerConfiguration configuration = getConfiguration(jobEntity);
+    final List<Job> historyCleanupJobs = historyService.findHistoryCleanupJobs();
+    for (Job job : historyCleanupJobs) {
+      JobEntity jobEntity = (JobEntity) job;
+      HistoryCleanupJobHandlerConfiguration configuration = getConfiguration(jobEntity);
 
-    //job rescheduled till current time + delay
-    Date nextRun = getNextRunWithDelay(ClockUtil.getCurrentTime(), 0);
-    assertTrue(jobEntity.getDuedate().equals(nextRun) || jobEntity.getDuedate().after(nextRun));
-    Date nextRunMax = DateUtils.addSeconds(ClockUtil.getCurrentTime(), HistoryCleanupJobHandlerConfiguration.MAX_DELAY);
-    assertTrue(jobEntity.getDuedate().before(nextRunMax));
+      //job rescheduled till current time + delay
+      Date nextRun = getNextRunWithDelay(ClockUtil.getCurrentTime(), 0);
+      assertTrue(jobEntity.getDuedate().equals(nextRun) || jobEntity.getDuedate().after(nextRun));
+      Date nextRunMax = DateUtils.addSeconds(ClockUtil.getCurrentTime(), HistoryCleanupJobHandlerConfiguration.MAX_DELAY);
+      assertTrue(jobEntity.getDuedate().before(nextRunMax));
 
-    //countEmptyRuns incremented
-    assertEquals(1, configuration.getCountEmptyRuns());
+      //countEmptyRuns incremented
+      assertEquals(1, configuration.getCountEmptyRuns());
+    }
 
     //data is still removed
     assertResult(0);
@@ -970,22 +1043,23 @@ public class HistoryCleanupTest {
     processEngineConfiguration.initHistoryCleanup();
 
     //when
-    String jobId = historyService.cleanUpHistoryAsync().getId();
-
-    ExecuteJobHelper.executeJob(jobId, processEngineConfiguration.getCommandExecutorTxRequired());
+    runHistoryCleanup(false);
 
     //then
-    JobEntity jobEntity = getJobEntity(jobId);
-    HistoryCleanupJobHandlerConfiguration configuration = getConfiguration(jobEntity);
+    final List<Job> historyCleanupJobs = historyService.findHistoryCleanupJobs();
+    for (Job job : historyCleanupJobs) {
+      JobEntity jobEntity = (JobEntity) job;
+      HistoryCleanupJobHandlerConfiguration configuration = getConfiguration(jobEntity);
 
-    //job rescheduled till current time + delay
-    Date nextRun = getNextRunWithDelay(ClockUtil.getCurrentTime(), 0);
-    assertTrue(jobEntity.getDuedate().equals(nextRun) || jobEntity.getDuedate().after(nextRun));
-    Date nextRunMax = DateUtils.addSeconds(ClockUtil.getCurrentTime(), HistoryCleanupJobHandlerConfiguration.MAX_DELAY);
-    assertTrue(jobEntity.getDuedate().before(nextRunMax));
+      //job rescheduled till current time + delay
+      Date nextRun = getNextRunWithDelay(ClockUtil.getCurrentTime(), 0);
+      assertTrue(jobEntity.getDuedate().equals(nextRun) || jobEntity.getDuedate().after(nextRun));
+      Date nextRunMax = DateUtils.addSeconds(ClockUtil.getCurrentTime(), HistoryCleanupJobHandlerConfiguration.MAX_DELAY);
+      assertTrue(jobEntity.getDuedate().before(nextRunMax));
 
-    //countEmptyRuns incremented
-    assertEquals(1, configuration.getCountEmptyRuns());
+      //countEmptyRuns incremented
+      assertEquals(1, configuration.getCountEmptyRuns());
+    }
 
     //data is still removed
     assertResult(0);
@@ -1062,6 +1136,23 @@ public class HistoryCleanupTest {
   }
 
   @Test
+  public void testConfigurationFailureWrongNumberOfThreads() {
+    processEngineConfiguration.setHistoryCleanupNumberOfThreads(0);
+
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("historyCleanupNumberOfThreads");
+
+    processEngineConfiguration.initHistoryCleanup();
+
+    processEngineConfiguration.setHistoryCleanupNumberOfThreads(5);
+
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("historyCleanupNumberOfThreads");
+
+    processEngineConfiguration.initHistoryCleanup();
+  }
+
+  @Test
   public void testConfigurationFailureWrongEndTime() {
     processEngineConfiguration.setHistoryCleanupBatchWindowStartTime("23:00");
     processEngineConfiguration.setHistoryCleanupBatchWindowEndTime("wrongValue");
@@ -1102,6 +1193,58 @@ public class HistoryCleanupTest {
     processEngineConfiguration.initHistoryCleanup();
   }
 
+  @Test
+  public void testReconfigureNumberOfThreads() {
+
+      //when
+      historyService.cleanUpHistoryAsync(true);
+      //then
+      assertEquals(3, managementService.createJobQuery().list().size());
+      for (Job historyJob : managementService.createJobQuery().list()) {
+        final int minuteTo = getHistoryCleanupJobHandlerConfiguration(historyJob).getMinuteTo();
+        final int minuteFrom = getHistoryCleanupJobHandlerConfiguration(historyJob).getMinuteFrom();
+        if (minuteFrom == 0) {
+          assertEquals(19, minuteTo);
+        } else if (minuteFrom == 20) {
+          assertEquals(39, minuteTo);
+        } else {
+          assertEquals(40, minuteFrom);
+          assertEquals(59, minuteTo);
+        }
+      }
+
+      //given
+      processEngineConfiguration.setHistoryCleanupNumberOfThreads(1);
+      processEngineConfiguration.initHistoryCleanup();
+      //when
+      historyService.cleanUpHistoryAsync(true);
+      //then
+      assertEquals(1, managementService.createJobQuery().list().size());
+      Job job = managementService.createJobQuery().singleResult();
+      assertEquals(0, getHistoryCleanupJobHandlerConfiguration(job).getMinuteFrom());
+      assertEquals(59, getHistoryCleanupJobHandlerConfiguration(job).getMinuteTo());
+
+      //given
+      processEngineConfiguration.setHistoryCleanupNumberOfThreads(2);
+      processEngineConfiguration.initHistoryCleanup();
+      //when
+      historyService.cleanUpHistoryAsync(true);
+      //then
+      assertEquals(2, managementService.createJobQuery().list().size());
+      for (Job historyJob : managementService.createJobQuery().list()) {
+        final int minuteTo = getHistoryCleanupJobHandlerConfiguration(historyJob).getMinuteTo();
+        final int minuteFrom = getHistoryCleanupJobHandlerConfiguration(historyJob).getMinuteFrom();
+        if (minuteFrom == 0) {
+          assertEquals(29, minuteTo);
+        } else {
+          assertEquals(30, minuteFrom);
+          assertEquals(59, minuteTo);
+        }
+      }
+
+
+  }
+
   private Date getNextRunWithinBatchWindow(Date currentTime) {
     Date batchWindowStartTime = processEngineConfiguration.getHistoryCleanupBatchWindowStartTimeAsDate();
     return HistoryCleanupHelper.getNextRunWithinBatchWindow(currentTime, batchWindowStartTime);
@@ -1116,21 +1259,32 @@ public class HistoryCleanupTest {
     int createdInstances = instanceCount / 3;
     prepareBPMNData(createdInstances, ONE_TASK_PROCESS);
     prepareDMNData(createdInstances);
-    prepareCMMNData(instanceCount - 2*createdInstances);
+    prepareCMMNData(instanceCount - 2 * createdInstances);
   }
 
   private void prepareBPMNData(int instanceCount, String businesskey) {
     Date oldCurrentTime = ClockUtil.getCurrentTime();
     ClockUtil.setCurrentTime(DateUtils.addDays(new Date(), DAYS_IN_THE_PAST));
     final List<String> ids = prepareHistoricProcesses(businesskey, getVariables(), instanceCount);
-    runtimeService.deleteProcessInstances(ids, null, true, true);
+    deleteProcessInstances(ids);
     ClockUtil.setCurrentTime(oldCurrentTime);
+  }
+
+  private void deleteProcessInstances(List<String> ids) {
+    final Date currentTime = ClockUtil.getCurrentTime();
+    for (String id : ids) {
+      //spread end_time between different "minutes"
+      ClockUtil.setCurrentTime(DateUtils.setMinutes(currentTime, random.nextInt(60)));
+      runtimeService.deleteProcessInstance(id, null, true, true);
+    }
   }
 
   private void prepareDMNData(int instanceCount) {
     Date oldCurrentTime = ClockUtil.getCurrentTime();
     ClockUtil.setCurrentTime(DateUtils.addDays(new Date(), DAYS_IN_THE_PAST));
     for (int i = 0; i < instanceCount; i++) {
+      //spread end_time between different "minutes"
+      ClockUtil.setCurrentTime(DateUtils.setMinutes(ClockUtil.getCurrentTime(), random.nextInt(60)));
       engineRule.getDecisionService().evaluateDecisionByKey(DECISION).variables(getDMNVariables()).evaluate();
     }
     ClockUtil.setCurrentTime(oldCurrentTime);
@@ -1142,6 +1296,8 @@ public class HistoryCleanupTest {
 
     for (int i = 0; i < instanceCount; i++) {
       CaseInstance caseInstance = caseService.createCaseInstanceByKey(ONE_TASK_CASE);
+      //spread end_time between different "minutes"
+      ClockUtil.setCurrentTime(DateUtils.setMinutes(ClockUtil.getCurrentTime(), random.nextInt(60)));
       caseService.terminateCaseExecution(caseInstance.getId());
       caseService.closeCaseInstance(caseInstance.getId());
     }
@@ -1172,6 +1328,13 @@ public class HistoryCleanupTest {
         + historyService.createHistoricDecisionInstanceQuery().count()
         + historyService.createHistoricCaseInstanceQuery().count();
     assertEquals(expectedInstanceCount, count);
+  }
+
+  private void assertResultNotLess(long expectedInstanceCount) {
+    long count = historyService.createHistoricProcessInstanceQuery().count()
+      + historyService.createHistoricDecisionInstanceQuery().count()
+      + historyService.createHistoricCaseInstanceQuery().count();
+    assertTrue(expectedInstanceCount <= count);
   }
 
 }

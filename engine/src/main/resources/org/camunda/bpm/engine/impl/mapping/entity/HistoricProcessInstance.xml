@@ -433,24 +433,42 @@
   <sql id="selectHistoricProcessInstanceIdsForCleanupSql">
     <bind name="days" value="'pd.HISTORY_TTL_'"/>
     <bind name="date" value="'pi.END_TIME_'"/>
-    <bind name="currentTimestamp" value="parameter"/>
+    <bind name="currentTimestamp" value="parameter.currentTimestamp"/>
+    <bind name="reportPeriodUnitName" value="'MINUTE'"/>
     FROM ${prefix}ACT_HI_PROCINST pi, ${prefix}ACT_RE_PROCDEF pd
     where
         pi.PROC_DEF_ID_ = pd.ID_
         AND not pi.END_TIME_ is NULL
         AND not pd.HISTORY_TTL_ is NULL
         AND ${dayComparator}
-    ${limitAfterWithoutOffset}
+  </sql>
+
+  <sql id="andWhereMinuteInDateBetweenSql">
+    <if test="parameter.minuteFrom != null and parameter.minuteTo != null">
+      AND ${datepart1}<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.periodUnitFunction"/>${datepart2}pi.END_TIME_${datepart3}
+      between #{parameter.minuteFrom, jdbcType=INTEGER} and #{parameter.minuteTo, jdbcType=INTEGER}
+    </if>
+  </sql>
+
+  <sql id="andWhereMinuteInDateBetweenSql_oracle">
+    <if test="parameter.minuteFrom != null and parameter.minuteTo != null">
+      AND ${datepart1}pi.END_TIME_${datepart2}<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.periodUnitFunction"/>${datepart3}
+      between #{parameter.minuteFrom, jdbcType=INTEGER} and #{parameter.minuteTo, jdbcType=INTEGER}
+    </if>
   </sql>
 
   <select id="selectHistoricProcessInstanceIdsForCleanup" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
     SELECT ${limitBeforeWithoutOffset} pi.PROC_INST_ID_, pi.END_TIME_
     <include refid="selectHistoricProcessInstanceIdsForCleanupSql"/>
+    <include refid="andWhereMinuteInDateBetweenSql"/>
+    ${limitAfterWithoutOffset}
   </select>
 
   <select id="selectHistoricProcessInstanceIdsForCleanup_oracle" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
     SELECT /*+ FIRST_ROWS(${maxResults}) NO_PARALLEL(pi) NO_PARALLEL(pd) */ pi.PROC_INST_ID_, pi.END_TIME_
     <include refid="selectHistoricProcessInstanceIdsForCleanupSql"/>
+    <include refid="andWhereMinuteInDateBetweenSql_oracle"/>
+    ${limitAfterWithoutOffset}
   </select>
 
   <!-- DB2 or MSSQL -->

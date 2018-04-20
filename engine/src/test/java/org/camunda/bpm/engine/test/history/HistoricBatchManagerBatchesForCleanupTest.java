@@ -110,7 +110,7 @@ public class HistoricBatchManagerBatchesForCleanupTest {
       @Override
       public Object execute(CommandContext commandContext) {
         // when
-        List<String> historicBatchIdsForCleanup = commandContext.getHistoricBatchManager().findHistoricBatchIdsForCleanup(batchSize, batchOperationsMap);
+        List<String> historicBatchIdsForCleanup = commandContext.getHistoricBatchManager().findHistoricBatchIdsForCleanup(batchSize, batchOperationsMap, 0, 59);
 
         // then
         assertEquals(resultCount, historicBatchIdsForCleanup.size());

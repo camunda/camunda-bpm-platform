@@ -178,7 +178,7 @@ public interface HistoryService {
    *
    * @throws AuthorizationException
    *          If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#PROCESS_DEFINITION}
-   * @return history cleanup job. Job id can be used to check job logs, incident etc.
+   * @return history cleanup job. NB! As of v. 7.9.0, method does not guarantee to return a job. Use {@link #findHistoryCleanupJobs()} instead.
    */
   Job cleanUpHistoryAsync();
 
@@ -197,10 +197,18 @@ public interface HistoryService {
   Job cleanUpHistoryAsync(boolean immediatelyDue);
 
   /**
+   * Finds history cleanup job, if present.
+   * @deprecated As of v. 7.9.0, because there can be more than one history cleanup job at once, use {@link #findHistoryCleanupJobs} instead.
+   * @return job entity
+   */
+  @Deprecated
+  Job findHistoryCleanupJob();
+
+  /**
    * Finds history cleanup job if present.
    * @return job entity
    */
-  Job findHistoryCleanupJob();
+  List<Job> findHistoryCleanupJobs();
 
   /**
    * Deletes historic process instances asynchronously. All historic activities, historic task and

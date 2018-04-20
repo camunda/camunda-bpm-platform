@@ -118,7 +118,7 @@ public class HistoricProcessInstanceManagerProcessInstancesForCleanupTest {
       public Object execute(CommandContext commandContext) {
         //when
         List<String> historicProcessInstanceIdsForCleanup = commandContext.getHistoricProcessInstanceManager().findHistoricProcessInstanceIdsForCleanup(
-            batchSize);
+            batchSize, 0, 60);
 
         //then
         assertEquals(resultCount, historicProcessInstanceIdsForCleanup.size());

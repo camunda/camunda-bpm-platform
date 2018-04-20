@@ -35,6 +35,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
 /**
@@ -89,14 +90,16 @@ public class HistoryCleanupOnEngineStartTest {
 
   @Test
   public void testHistoryCleanupJob() throws ParseException {
-    Job historyCleanupJob = historyService.findHistoryCleanupJob();
-    assertNotNull(historyCleanupJob);
+    final List<Job> historyCleanupJobs = historyService.findHistoryCleanupJobs();
+    assertFalse(historyCleanupJobs.isEmpty());
     Date historyCleanupBatchWindowStartTime = ((ProcessEngineConfigurationImpl) engineRule.getProcessEngine().getProcessEngineConfiguration())
         .getHistoryCleanupBatchWindowStartTimeAsDate();
     Date historyCleanupBatchWindowEndTime = ((ProcessEngineConfigurationImpl) engineRule.getProcessEngine().getProcessEngineConfiguration())
         .getHistoryCleanupBatchWindowEndTimeAsDate();
-    assertEquals(HistoryCleanupHelper.getCurrentOrNextBatchWindowStartTime(ClockUtil.getCurrentTime(),
-        historyCleanupBatchWindowStartTime, HistoryCleanupHelper.addDays(historyCleanupBatchWindowEndTime, 1)), historyCleanupJob.getDuedate());
+    for (Job historyCleanupJob : historyCleanupJobs) {
+      assertEquals(HistoryCleanupHelper.getCurrentOrNextBatchWindowStartTime(ClockUtil.getCurrentTime(), historyCleanupBatchWindowStartTime,
+        HistoryCleanupHelper.addDays(historyCleanupBatchWindowEndTime, 1)), historyCleanupJob.getDuedate());
+    }
   }
 
 }

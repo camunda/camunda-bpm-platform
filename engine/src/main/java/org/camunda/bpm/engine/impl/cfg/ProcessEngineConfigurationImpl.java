@@ -14,6 +14,7 @@
 package org.camunda.bpm.engine.impl.cfg;
 
 
+import static org.camunda.bpm.engine.impl.cmd.HistoryCleanupCmd.MAX_THREADS_NUMBER;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.InputStream;
@@ -113,6 +114,7 @@ import org.camunda.bpm.engine.impl.cfg.auth.ResourceAuthorizationProvider;
 import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantCommandChecker;
 import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProvider;
 import org.camunda.bpm.engine.impl.cfg.standalone.StandaloneTransactionContextFactory;
+import org.camunda.bpm.engine.impl.cmd.HistoryCleanupCmd;
 import org.camunda.bpm.engine.impl.cmmn.CaseServiceImpl;
 import org.camunda.bpm.engine.impl.cmmn.deployer.CmmnDeployer;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionManager;
@@ -707,6 +709,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   private Date historyCleanupBatchWindowStartTimeAsDate;
   private Date historyCleanupBatchWindowEndTimeAsDate;
 
+  private int historyCleanupNumberOfThreads = 1;
+
   protected String batchOperationHistoryTimeToLive;
   protected Map<String, String> batchOperationsForHistoryCleanup;
   protected Map<String, Integer> parsedBatchOperationsForHistoryCleanup;
@@ -799,6 +803,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   }
 
   public void initHistoryCleanup() {
+    //validate number of threads
+    if (historyCleanupNumberOfThreads < 1 || historyCleanupNumberOfThreads > MAX_THREADS_NUMBER) {
+      throw LOG.invalidPropertyValue("historyCleanupNumberOfThreads", String.valueOf(historyCleanupNumberOfThreads),
+        String.format("value for number of threads for history cleanup should be between 1 and %s", HistoryCleanupCmd.HISTORY_CLEANUP_JOB_DECLARATION));
+    }
+
     if (historyCleanupBatchWindowStartTime != null) {
       initHistoryCleanupBatchWindowStartTime();
     }
@@ -3877,6 +3887,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public String getBatchOperationHistoryTimeToLive() {
     return batchOperationHistoryTimeToLive;
+  }
+
+  public int getHistoryCleanupNumberOfThreads() {
+    return historyCleanupNumberOfThreads;
+  }
+
+  public void setHistoryCleanupNumberOfThreads(int historyCleanupNumberOfThreads) {
+    this.historyCleanupNumberOfThreads = historyCleanupNumberOfThreads;
   }
 
   public void setBatchOperationHistoryTimeToLive(String batchOperationHistoryTimeToLive) {

@@ -27,6 +27,8 @@ public class HistoryCleanupJobHandlerConfiguration implements JobHandlerConfigur
 
   public static final String JOB_CONFIG_COUNT_EMPTY_RUNS = "countEmptyRuns";
   public static final String JOB_CONFIG_EXECUTE_AT_ONCE = "immediatelyDue";
+  public static final String JOB_CONFIG_MINUTE_FROM = "minuteFrom";
+  public static final String JOB_CONFIG_MINUTE_TO = "minuteTo";
 
   /**
    * Counts runs without data. Is used within batch window to calculate the delay between two job runs in case no data for cleanup was found.
@@ -38,6 +40,13 @@ public class HistoryCleanupJobHandlerConfiguration implements JobHandlerConfigur
    */
   private boolean immediatelyDue;
 
+  /**
+   * Process definition id.
+   */
+  private int minuteFrom = 0;
+
+  private int minuteTo = 59;
+
   public HistoryCleanupJobHandlerConfiguration() {
   }
 
@@ -46,6 +55,8 @@ public class HistoryCleanupJobHandlerConfiguration implements JobHandlerConfigur
     JSONObject json = new JSONObject();
     json.put(JOB_CONFIG_COUNT_EMPTY_RUNS, countEmptyRuns);
     json.put(JOB_CONFIG_EXECUTE_AT_ONCE, immediatelyDue);
+    json.put(JOB_CONFIG_MINUTE_FROM, minuteFrom);
+    json.put(JOB_CONFIG_MINUTE_TO, minuteTo);
     return json.toString();
   }
 
@@ -57,6 +68,8 @@ public class HistoryCleanupJobHandlerConfiguration implements JobHandlerConfigur
     if (jsonObject.has(JOB_CONFIG_EXECUTE_AT_ONCE)) {
       config.setImmediatelyDue(jsonObject.getBoolean(JOB_CONFIG_EXECUTE_AT_ONCE));
     }
+    config.setMinuteFrom(jsonObject.getInt(JOB_CONFIG_MINUTE_FROM));
+    config.setMinuteTo(jsonObject.getInt(JOB_CONFIG_MINUTE_TO));
     return config;
   }
 
@@ -93,5 +106,20 @@ public class HistoryCleanupJobHandlerConfiguration implements JobHandlerConfigur
     this.immediatelyDue = immediatelyDue;
   }
 
+  public int getMinuteFrom() {
+    return minuteFrom;
+  }
+
+  public void setMinuteFrom(int minuteFrom) {
+    this.minuteFrom = minuteFrom;
+  }
+
+  public int getMinuteTo() {
+    return minuteTo;
+  }
+
+  public void setMinuteTo(int minuteTo) {
+    this.minuteTo = minuteTo;
+  }
 }
 

@@ -117,6 +117,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     constants.put("constant_for_update", "for update");
     constants.put("constant.datepart.quarter", "QUARTER");
     constants.put("constant.datepart.month", "MONTH");
+    constants.put("constant.datepart.minute", "MINUTE");
     constants.put("constant.null.startTime", "null START_TIME_");
     constants.put("constant.varchar.cast", "'${key}'");
     dbSpecificConstants.put(H2, constants);
@@ -181,6 +182,7 @@ public class DbSqlSessionFactory implements SessionFactory {
       constants.put("constant_for_update", "for update");
       constants.put("constant.datepart.quarter", "QUARTER");
       constants.put("constant.datepart.month", "MONTH");
+      constants.put("constant.datepart.minute", "MINUTE");
       constants.put("constant.null.startTime", "null START_TIME_");
       constants.put("constant.varchar.cast", "'${key}'");
       dbSpecificConstants.put(mysqlLikeDatabase, constants);
@@ -243,6 +245,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     constants.put("constant_for_update", "for update");
     constants.put("constant.datepart.quarter", "QUARTER");
     constants.put("constant.datepart.month", "MONTH");
+    constants.put("constant.datepart.minute", "MINUTE");
     constants.put("constant.null.startTime", "null START_TIME_");
     constants.put("constant.varchar.cast", "cast('${key}' as varchar(64))");
     dbSpecificConstants.put(POSTGRES, constants);
@@ -282,6 +285,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     addDatabaseSpecificStatement(ORACLE, "selectHistoricProcessInstanceIdsForCleanup", "selectHistoricProcessInstanceIdsForCleanup_oracle");
     addDatabaseSpecificStatement(ORACLE, "selectHistoricDecisionInstanceIdsForCleanup", "selectHistoricDecisionInstanceIdsForCleanup_oracle");
     addDatabaseSpecificStatement(ORACLE, "selectHistoricCaseInstanceIdsForCleanup", "selectHistoricCaseInstanceIdsForCleanup_oracle");
+    addDatabaseSpecificStatement(ORACLE, "selectHistoricBatchIdsForCleanup", "selectHistoricBatchIdsForCleanup_oracle");
 
     constants = new HashMap<String, String>();
     constants.put("constant.event", "cast('event' as nvarchar2(255))");
@@ -289,6 +293,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     constants.put("constant_for_update", "for update");
     constants.put("constant.datepart.quarter", "'Q'");
     constants.put("constant.datepart.month", "'MM'");
+    constants.put("constant.datepart.minute", "'MI'");
     constants.put("constant.null.startTime", "null START_TIME_");
     constants.put("constant.varchar.cast", "'${key}'");
     dbSpecificConstants.put(ORACLE, constants);
@@ -340,6 +345,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     constants.put("constant_for_update", "for read only with rs use and keep update locks");
     constants.put("constant.datepart.quarter", "QUARTER");
     constants.put("constant.datepart.month", "MONTH");
+    constants.put("constant.datepart.minute", "MINUTE");
     constants.put("constant.null.startTime", "CAST(NULL as timestamp) as START_TIME_");
     constants.put("constant.varchar.cast", "cast('${key}' as varchar(64))");
     dbSpecificConstants.put(DB2, constants);
@@ -394,6 +400,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     constants.put("constant.op_message", "NEW_VALUE_ + '_|_' + PROPERTY_");
     constants.put("constant.datepart.quarter", "QUARTER");
     constants.put("constant.datepart.month", "MONTH");
+    constants.put("constant.datepart.minute", "MINUTE");
     constants.put("constant.null.startTime", "null START_TIME_");
     constants.put("constant.varchar.cast", "'${key}'");
     dbSpecificConstants.put(MSSQL, constants);

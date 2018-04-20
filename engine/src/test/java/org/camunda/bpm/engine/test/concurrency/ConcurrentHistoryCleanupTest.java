@@ -40,7 +40,6 @@ public class ConcurrentHistoryCleanupTest extends ConcurrencyTestCase {
 
         List<Job> jobs = processEngine.getManagementService().createJobQuery().list();
         if (jobs.size() > 0) {
-          assertEquals(1, jobs.size());
           String jobId = jobs.get(0).getId();
           commandContext.getJobManager().deleteJob((JobEntity) jobs.get(0));
           commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(jobId);
@@ -85,8 +84,9 @@ public class ConcurrentHistoryCleanupTest extends ConcurrencyTestCase {
     thread2.waitUntilDone();
 
     //only one history cleanup job exists -> no exception
-    Job historyCleanupJob = processEngine.getHistoryService().findHistoryCleanupJob();
-    assertNotNull(historyCleanupJob);
+    List<Job> historyCleanupJobs = processEngine.getHistoryService().findHistoryCleanupJobs();
+    assertFalse(historyCleanupJobs.isEmpty());
+    assertEquals(1, historyCleanupJobs.size());
 
     assertNull(thread1.getException());
     assertNull(thread2.getException());

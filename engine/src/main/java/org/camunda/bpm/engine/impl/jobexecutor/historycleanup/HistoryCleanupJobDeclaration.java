@@ -48,6 +48,8 @@ public class HistoryCleanupJobDeclaration extends JobDeclaration<HistoryCleanupC
   protected HistoryCleanupJobHandlerConfiguration resolveJobHandlerConfiguration(HistoryCleanupContext context) {
     HistoryCleanupJobHandlerConfiguration config = new HistoryCleanupJobHandlerConfiguration();
     config.setImmediatelyDue(context.isImmediatelyDue());
+    config.setMinuteFrom(context.getMinuteFrom());
+    config.setMinuteTo(context.getMinuteTo());
     return config;
   }
 

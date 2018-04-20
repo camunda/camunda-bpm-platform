@@ -22,11 +22,8 @@ import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.history.CleanableHistoricProcessInstanceReportResult;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.CleanableHistoricProcessInstanceReportImpl;
-import org.camunda.bpm.engine.impl.Direction;
 import org.camunda.bpm.engine.impl.HistoricProcessInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
-import org.camunda.bpm.engine.impl.QueryOrderingProperty;
-import org.camunda.bpm.engine.impl.QueryPropertyImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
@@ -113,8 +110,14 @@ public class HistoricProcessInstanceManager extends AbstractHistoricManager {
   }
 
   @SuppressWarnings("unchecked")
-  public List<String> findHistoricProcessInstanceIdsForCleanup(Integer batchSize) {
-    ListQueryParameterObject parameterObject = new ListQueryParameterObject(ClockUtil.getCurrentTime(), 0, batchSize);
+  public List<String> findHistoricProcessInstanceIdsForCleanup(Integer batchSize, int minuteFrom, int minuteTo) {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("currentTimestamp", ClockUtil.getCurrentTime());
+    if (minuteTo - minuteFrom + 1 < 60) {
+      parameters.put("minuteFrom", minuteFrom);
+      parameters.put("minuteTo", minuteTo);
+    }
+    ListQueryParameterObject parameterObject = new ListQueryParameterObject(parameters, 0, batchSize);
     return (List<String>) getDbEntityManager().selectList("selectHistoricProcessInstanceIdsForCleanup", parameterObject);
   }
 
