@@ -21,6 +21,8 @@ import static org.camunda.bpm.client.util.ProcessModels.PROCESS_KEY;
 import static org.camunda.bpm.client.util.ProcessModels.USER_TASK_AFTER_BPMN_ERROR;
 import static org.camunda.bpm.client.util.ProcessModels.USER_TASK_ID;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.camunda.bpm.client.ExternalTaskClient;
@@ -28,8 +30,10 @@ import org.camunda.bpm.client.dto.IncidentDto;
 import org.camunda.bpm.client.dto.ProcessDefinitionDto;
 import org.camunda.bpm.client.dto.ProcessInstanceDto;
 import org.camunda.bpm.client.dto.TaskDto;
+import org.camunda.bpm.client.dto.VariableInstanceDto;
 import org.camunda.bpm.client.rule.ClientRule;
 import org.camunda.bpm.client.rule.EngineRule;
+import org.camunda.bpm.client.util.ProcessModels;
 import org.camunda.bpm.client.util.RecordingExternalTaskHandler;
 import org.junit.Before;
 import org.junit.Rule;
@@ -107,6 +111,107 @@ public class ExternalTaskHandlerIT {
     assertThat(task).isNotNull();
     assertThat(task.getProcessInstanceId()).isEqualTo(processInstance.getId());
     assertThat(task.getTaskDefinitionKey()).isEqualTo(USER_TASK_ID);
+  }
+
+  @Test
+  public void shouldCompleteWithVariables() {
+    // given
+    String variableName = "foo";
+    String variableValue = "bar";
+
+    RecordingExternalTaskHandler handler = new RecordingExternalTaskHandler((task, client) -> {
+      Map<String, Object> variables = new HashMap<>();
+      variables.put(variableName, variableValue);
+      client.complete(task, variables);
+    });
+
+    // when
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(handler)
+      .open();
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    VariableInstanceDto variable = engineRule.getVariableByProcessInstanceId(processInstance.getId());
+    assertThat(variable).isNotNull();
+    assertThat(variable.getProcessInstanceId()).isEqualTo(processInstance.getId());
+
+    assertThat(variable.getName()).isEqualTo(variableName);
+    assertThat(variable.getValue()).isEqualTo(variableValue);
+  }
+
+  @Test
+  public void shouldCompleteWithLocalVariables() {
+    // given
+    ProcessDefinitionDto definition = engineRule.deploy(ProcessModels.ONE_EXTERNAL_TASK_WITH_OUTPUT_PARAM_PROCESS).get(0);
+    ProcessInstanceDto processInstance = engineRule.startProcessInstance(definition.getId());
+
+    String variableName = "foo";
+    String variableValue = "bar";
+
+    RecordingExternalTaskHandler handler = new RecordingExternalTaskHandler((task, client) -> {
+      Map<String, Object> variables = new HashMap<>();
+      variables.put(variableName, variableValue);
+      client.complete(task, null, variables);
+    });
+
+    // when
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(handler)
+      .open();
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    VariableInstanceDto variable = engineRule.getVariableByProcessInstanceId(processInstance.getId());
+    assertThat(variable).isNotNull();
+    assertThat(variable.getProcessInstanceId()).isEqualTo(processInstance.getId());
+
+    assertThat(variable.getName()).isEqualTo("bar");
+    assertThat(variable.getValue()).isEqualTo(variableValue);
+  }
+
+  @Test
+  public void shouldCompleteWithVariablesAndLocalVariables() {
+    // given
+    ProcessDefinitionDto definition = engineRule.deploy(ProcessModels.ONE_EXTERNAL_TASK_WITH_OUTPUT_PARAM_PROCESS).get(0);
+    ProcessInstanceDto processInstance = engineRule.startProcessInstance(definition.getId());
+
+    String variableName = "x";
+    String variableValue = "y";
+    String localVariableName = "foo";
+    String localVariableValue = "bar";
+
+    RecordingExternalTaskHandler handler = new RecordingExternalTaskHandler((task, client) -> {
+      Map<String, Object> variables = new HashMap<>();
+      variables.put(variableName, variableValue);
+
+      Map<String, Object> localVariables = new HashMap<>();
+      localVariables.put(localVariableName, localVariableValue);
+
+      client.complete(task, variables, localVariables);
+    });
+
+    // when
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(handler)
+      .open();
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    VariableInstanceDto variable = engineRule.getVariableByProcessInstanceId(processInstance.getId(), variableName);
+    assertThat(variable).isNotNull();
+    assertThat(variable.getProcessInstanceId()).isEqualTo(processInstance.getId());
+    assertThat(variable.getName()).isEqualTo(variableName);
+    assertThat(variable.getValue()).isEqualTo(variableValue);
+
+    VariableInstanceDto localVariable = engineRule.getVariableByProcessInstanceId(processInstance.getId(), "bar");
+    assertThat(localVariable).isNotNull();
+    assertThat(localVariable.getProcessInstanceId()).isEqualTo(processInstance.getId());
+    assertThat(localVariable.getName()).isEqualTo("bar");
+    assertThat(localVariable.getValue()).isEqualTo(localVariableValue);
   }
 
   @Test

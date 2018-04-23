@@ -19,6 +19,7 @@ import org.camunda.bpm.model.bpmn.builder.ProcessBuilder;
 public class ProcessModels {
 
   public static final String PROCESS_KEY = "process";
+  public static final String PROCESS_KEY_2 = "process2";
   public static final String EXTERNAL_TASK_ID = "externalTask";
   public static final String EXTERNAL_TASK_ONE_ID = "externalTask1";
   public static final String EXTERNAL_TASK_TWO_ID = "externalTask2";
@@ -35,14 +36,6 @@ public class ProcessModels {
     return Bpmn.createExecutableProcess(processKey);
   }
 
-  public static final BpmnModelInstance ONE_EXTERNAL_TASK_PROCESS =
-      newModel()
-      .startEvent("startEvent")
-      .serviceTask(EXTERNAL_TASK_ID)
-        .camundaExternalTask(EXTERNAL_TASK_TOPIC_FOO)
-      .endEvent("endEvent")
-      .done();
-
   public static final BpmnModelInstance TWO_EXTERNAL_TASK_PROCESS =
       newModel()
       .startEvent("startEvent")
@@ -53,11 +46,12 @@ public class ProcessModels {
       .endEvent("endEvent")
       .done();
 
-  public static final BpmnModelInstance ONE_EXTERNAL_TASK_AND_ONE_TASK_PROCESS =
-      newModel()
+  public static final BpmnModelInstance ONE_EXTERNAL_TASK_WITH_OUTPUT_PARAM_PROCESS =
+      newModel(PROCESS_KEY_2)
       .startEvent("startEvent")
       .serviceTask(EXTERNAL_TASK_ID)
         .camundaExternalTask(EXTERNAL_TASK_TOPIC_FOO)
+        .camundaOutputParameter("bar", "${foo}")
       .userTask(USER_TASK_ID)
       .endEvent("endEvent")
       .done();

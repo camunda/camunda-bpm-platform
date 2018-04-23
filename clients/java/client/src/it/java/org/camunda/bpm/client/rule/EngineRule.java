@@ -47,6 +47,7 @@ import org.camunda.bpm.client.dto.IncidentDto;
 import org.camunda.bpm.client.dto.ProcessDefinitionDto;
 import org.camunda.bpm.client.dto.ProcessInstanceDto;
 import org.camunda.bpm.client.dto.TaskDto;
+import org.camunda.bpm.client.dto.VariableInstanceDto;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.impl.ExternalTaskImpl;
 import org.camunda.bpm.client.variable.impl.TypedValueField;
@@ -69,6 +70,7 @@ public class EngineRule extends ExternalResource {
   protected static final String URI_GET_TASKS = "%s/task";
   protected static final String URI_GET_INCIDENTS = "%s/incident";
   protected static final String URI_GET_EXTERNAL_TASKS = "%s/external-task";
+  protected static final String URI_GET_VARIABLE_INSTANCE = "%s/variable-instance";
 
   protected Properties properties;
   protected CloseableHttpClient httpClient;
@@ -276,6 +278,23 @@ public class EngineRule extends ExternalResource {
       throw new RuntimeException(e);
     }
 
+  }
+
+  public VariableInstanceDto getVariableByProcessInstanceId(String processInstanceId) {
+    return getVariableByProcessInstanceId(processInstanceId, null);
+  }
+
+  public VariableInstanceDto getVariableByProcessInstanceId(String processInstanceId, String varName) {
+    String uri = String.format(URI_GET_VARIABLE_INSTANCE, getEngineUrl()) + "?processInstanceIdIn=" + processInstanceId;
+
+    if (varName != null) {
+      uri = uri + "&variableName=" + varName;
+    }
+
+    HttpGet httpGet = new HttpGet(uri);
+    VariableInstanceDto[] variables = executeRequest(httpGet, VariableInstanceDto[].class);
+    assertThat(variables).hasSize(1);
+    return (VariableInstanceDto) variables[0];
   }
 
   public TaskDto getTaskByProcessInstanceId(String processInstanceId) {
