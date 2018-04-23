@@ -2,6 +2,7 @@ package org.camunda.bpm.engine.rest;
 
 import static com.jayway.restassured.RestAssured.given;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_ID;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.createMockBatch;
 import static org.camunda.bpm.engine.rest.util.DateTimeUtils.DATE_FORMAT_WITH_TIMEZONE;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
@@ -106,6 +107,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
   protected static final String PROCESS_INSTANCE_SUSPENDED_URL = PROCESS_INSTANCE_URL + "/suspended";
   protected static final String PROCESS_INSTANCE_SUSPENDED_ASYNC_URL = PROCESS_INSTANCE_URL + "/suspended-async";
   protected static final String PROCESS_INSTANCE_MODIFICATION_URL = SINGLE_PROCESS_INSTANCE_URL + "/modification";
+  protected static final String PROCESS_INSTANCE_MODIFICATION_ASYNC_URL = SINGLE_PROCESS_INSTANCE_URL + "/modification-async";
 
   protected static final VariableMap EXAMPLE_OBJECT_VARIABLES = Variables.createVariables();
   static {
@@ -158,6 +160,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
     when(processEngine.getRuntimeService()).thenReturn(runtimeServiceMock);
     when(processEngine.getManagementService()).thenReturn(mockManagementService);
     when(processEngine.getHistoryService()).thenReturn(historyServiceMock);
+
   }
 
   @Test
@@ -3256,6 +3259,192 @@ public class ProcessInstanceRestServiceInteractionTest extends
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
     .when().post(SET_JOB_RETRIES_ASYNC_HIST_QUERY_URL);
+  }
+
+  @Test
+  public void testProcessInstanceModificationAsync() {
+    ProcessInstanceModificationInstantiationBuilder mockModificationBuilder = setUpMockModificationBuilder();
+    when(runtimeServiceMock.createProcessInstanceModification(anyString())).thenReturn(mockModificationBuilder);
+    Batch batchMock = createMockBatch();
+    when(mockModificationBuilder.executeAsync(anyBoolean(), anyBoolean())).thenReturn(batchMock);
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("skipCustomListeners", true);
+    json.put("skipIoMappings", true);
+
+    List<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
+
+    instructions.add(ModificationInstructionBuilder.cancellation().activityId("activityId").getJson());
+    instructions.add(ModificationInstructionBuilder.cancellation().activityInstanceId("activityInstanceId").getJson());
+    instructions.add(ModificationInstructionBuilder.cancellation().transitionInstanceId("transitionInstanceId").getJson());
+    instructions.add(ModificationInstructionBuilder.startBefore().activityId("activityId").getJson());
+    instructions.add(ModificationInstructionBuilder.startBefore()
+        .activityId("activityId").ancestorActivityInstanceId("ancestorActivityInstanceId").getJson());
+    instructions.add(ModificationInstructionBuilder.startAfter().activityId("activityId").getJson());
+    instructions.add(ModificationInstructionBuilder.startAfter()
+        .activityId("activityId").ancestorActivityInstanceId("ancestorActivityInstanceId").getJson());
+    instructions.add(ModificationInstructionBuilder.startTransition().transitionId("transitionId").getJson());
+    instructions.add(ModificationInstructionBuilder.startTransition()
+        .transitionId("transitionId").ancestorActivityInstanceId("ancestorActivityInstanceId").getJson());
+
+    json.put("instructions", instructions);
+
+    given()
+      .pathParam("id", EXAMPLE_PROCESS_INSTANCE_ID)
+      .contentType(ContentType.JSON)
+      .body(json)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .post(PROCESS_INSTANCE_MODIFICATION_ASYNC_URL);
+
+    verify(runtimeServiceMock).createProcessInstanceModification(eq(EXAMPLE_PROCESS_INSTANCE_ID));
+
+    InOrder inOrder = inOrder(mockModificationBuilder);
+    inOrder.verify(mockModificationBuilder).cancelAllForActivity("activityId");
+    inOrder.verify(mockModificationBuilder).cancelActivityInstance("activityInstanceId");
+    inOrder.verify(mockModificationBuilder).cancelTransitionInstance("transitionInstanceId");
+    inOrder.verify(mockModificationBuilder).startBeforeActivity("activityId");
+    inOrder.verify(mockModificationBuilder).startBeforeActivity("activityId", "ancestorActivityInstanceId");
+    inOrder.verify(mockModificationBuilder).startAfterActivity("activityId");
+    inOrder.verify(mockModificationBuilder).startAfterActivity("activityId", "ancestorActivityInstanceId");
+    inOrder.verify(mockModificationBuilder).startTransition("transitionId");
+    inOrder.verify(mockModificationBuilder).startTransition("transitionId", "ancestorActivityInstanceId");
+
+    inOrder.verify(mockModificationBuilder).executeAsync(true, true);
+
+    inOrder.verifyNoMoreInteractions();
+  }
+
+  @Test
+  public void testInvalidModificationAsync() {
+    Map<String, Object> json = new HashMap<String, Object>();
+
+    // start before: missing activity id
+    List<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
+    instructions.add(ModificationInstructionBuilder.startBefore().getJson());
+    json.put("instructions", instructions);
+
+    given()
+      .pathParam("id", EXAMPLE_PROCESS_INSTANCE_ID)
+      .contentType(ContentType.JSON)
+      .body(json)
+    .then()
+    .expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", is(InvalidRequestException.class.getSimpleName()))
+      .body("message", containsString("'activityId' must be set"))
+    .when()
+      .post(PROCESS_INSTANCE_MODIFICATION_ASYNC_URL);
+
+    // start after: missing ancestor activity instance id
+    instructions = new ArrayList<Map<String, Object>>();
+    instructions.add(ModificationInstructionBuilder.startAfter().getJson());
+    json.put("instructions", instructions);
+
+    given()
+      .pathParam("id", EXAMPLE_PROCESS_INSTANCE_ID)
+      .contentType(ContentType.JSON)
+      .body(json)
+    .then()
+    .expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", is(InvalidRequestException.class.getSimpleName()))
+      .body("message", containsString("'activityId' must be set"))
+    .when()
+      .post(PROCESS_INSTANCE_MODIFICATION_ASYNC_URL);
+
+    // start transition: missing ancestor activity instance id
+    instructions = new ArrayList<Map<String, Object>>();
+    instructions.add(ModificationInstructionBuilder.startTransition().getJson());
+    json.put("instructions", instructions);
+
+    given()
+      .pathParam("id", EXAMPLE_PROCESS_INSTANCE_ID)
+      .contentType(ContentType.JSON)
+      .body(json)
+    .then()
+    .expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", is(InvalidRequestException.class.getSimpleName()))
+      .body("message", containsString("'transitionId' must be set"))
+    .when()
+      .post(PROCESS_INSTANCE_MODIFICATION_ASYNC_URL);
+
+    // cancel: missing activity id and activity instance id
+    instructions = new ArrayList<Map<String, Object>>();
+    instructions.add(ModificationInstructionBuilder.cancellation().getJson());
+    json.put("instructions", instructions);
+
+    given()
+      .pathParam("id", EXAMPLE_PROCESS_INSTANCE_ID)
+      .contentType(ContentType.JSON)
+      .body(json)
+    .then()
+    .expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", is(InvalidRequestException.class.getSimpleName()))
+      .body("message", containsString("For instruction type 'cancel': exactly one, "
+          + "'activityId', 'activityInstanceId', or 'transitionInstanceId', is required"))
+    .when()
+      .post(PROCESS_INSTANCE_MODIFICATION_ASYNC_URL);
+
+    // cancel: both, activity id and activity instance id, set
+    instructions = new ArrayList<Map<String, Object>>();
+    instructions.add(ModificationInstructionBuilder.cancellation().activityId("anActivityId")
+        .activityInstanceId("anActivityInstanceId").getJson());
+    json.put("instructions", instructions);
+
+    given()
+      .pathParam("id", EXAMPLE_PROCESS_INSTANCE_ID)
+      .contentType(ContentType.JSON)
+      .body(json)
+    .then()
+    .expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", is(InvalidRequestException.class.getSimpleName()))
+      .body("message", containsString("For instruction type 'cancel': exactly one, "
+          + "'activityId', 'activityInstanceId', or 'transitionInstanceId', is required"))
+    .when()
+      .post(PROCESS_INSTANCE_MODIFICATION_ASYNC_URL);
+
+  }
+
+  @Test
+  public void testModifyProcessInstanceAsyncThrowsAuthorizationException() {
+    ProcessInstanceModificationInstantiationBuilder mockModificationBuilder = setUpMockModificationBuilder();
+    when(runtimeServiceMock.createProcessInstanceModification(anyString())).thenReturn(mockModificationBuilder);
+
+    String message = "expected exception";
+    doThrow(new AuthorizationException(message)).when(mockModificationBuilder).executeAsync(anyBoolean(), anyBoolean());
+
+    Map<String, Object> json = new HashMap<String, Object>();
+
+    List<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
+
+    instructions.add(
+        ModificationInstructionBuilder.startBefore()
+          .activityId("activityId")
+          .getJson());
+    instructions.add(
+        ModificationInstructionBuilder.startAfter()
+          .activityId("activityId")
+          .getJson());
+
+    json.put("instructions", instructions);
+
+    given()
+      .pathParam("id", EXAMPLE_PROCESS_INSTANCE_ID)
+      .contentType(ContentType.JSON)
+      .body(json)
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo(message))
+    .when()
+      .post(PROCESS_INSTANCE_MODIFICATION_ASYNC_URL);
   }
 
   @SuppressWarnings("unchecked")

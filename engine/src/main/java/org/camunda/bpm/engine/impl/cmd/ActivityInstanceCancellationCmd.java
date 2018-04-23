@@ -39,6 +39,10 @@ public class ActivityInstanceCancellationCmd extends AbstractInstanceCancellatio
     this.activityInstanceId = activityInstanceId;
   }
 
+  public String getActivityInstanceId() {
+    return activityInstanceId;
+  }
+
   protected ExecutionEntity determineSourceInstanceExecution(final CommandContext commandContext) {
     ExecutionEntity processInstance = commandContext.getExecutionManager().findExecutionById(processInstanceId);
 

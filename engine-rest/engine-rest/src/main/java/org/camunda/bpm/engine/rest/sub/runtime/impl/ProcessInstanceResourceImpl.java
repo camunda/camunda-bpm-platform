@@ -15,9 +15,12 @@ package org.camunda.bpm.engine.rest.sub.runtime.impl;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.AuthorizationException;
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.batch.Batch;
+import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ActivityInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceSuspensionStateDto;
@@ -111,5 +114,25 @@ public class ProcessInstanceResourceImpl implements ProcessInstanceResource {
 
       modificationBuilder.execute(dto.isSkipCustomListeners(), dto.isSkipIoMappings());
     }
+  }
+
+  @Override
+  public BatchDto modifyProcessInstanceAsync(ProcessInstanceModificationDto dto) {
+    Batch batch = null;
+    if (dto.getInstructions() != null && !dto.getInstructions().isEmpty()) {
+      ProcessInstanceModificationBuilder modificationBuilder =
+          engine.getRuntimeService().createProcessInstanceModification(processInstanceId);
+
+      dto.applyTo(modificationBuilder, engine, objectMapper);
+
+      try {
+        batch = modificationBuilder.executeAsync(dto.isSkipCustomListeners(), dto.isSkipIoMappings());
+      } catch (BadUserRequestException e) {
+        throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());
+      }
+      return BatchDto.fromBatch(batch);
+    }
+
+    throw new InvalidRequestException(Status.BAD_REQUEST, "The provided instuctions are invalid.");
   }
 }

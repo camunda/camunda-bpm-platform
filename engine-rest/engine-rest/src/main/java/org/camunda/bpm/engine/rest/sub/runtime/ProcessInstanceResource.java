@@ -23,6 +23,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ActivityInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceSuspensionStateDto;
@@ -57,4 +58,10 @@ public interface ProcessInstanceResource {
   @Path("/modification")
   @Consumes(MediaType.APPLICATION_JSON)
   void modifyProcessInstance(ProcessInstanceModificationDto dto);
+
+  @POST
+  @Path("/modification-async")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  BatchDto modifyProcessInstanceAsync(ProcessInstanceModificationDto dto);
 }

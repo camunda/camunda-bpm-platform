@@ -54,6 +54,10 @@ public abstract class AbstractProcessInstanceModificationCommand implements Comm
     this.processInstanceId = processInstanceId;
   }
 
+  public String getProcessInstanceId() {
+    return processInstanceId;
+  }
+
   protected ActivityInstance findActivityInstance(ActivityInstance tree, String activityInstanceId) {
     if (activityInstanceId.equals(tree.getId())) {
       return tree;

@@ -35,6 +35,10 @@ public class TransitionInstanceCancellationCmd extends AbstractInstanceCancellat
 
   }
 
+  public String getTransitionInstanceId() {
+    return transitionInstanceId;
+  }
+
   protected ExecutionEntity determineSourceInstanceExecution(final CommandContext commandContext) {
     ActivityInstance instance = commandContext.runWithoutAuthorization(new Callable<ActivityInstance>() {
       public ActivityInstance call() throws Exception {

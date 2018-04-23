@@ -16,6 +16,7 @@ import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
+import org.camunda.bpm.engine.batch.Batch;
 
 /**
  * <p>A fluent builder to specify a modification of process instance state in terms
@@ -145,6 +146,8 @@ public interface ProcessInstanceModificationBuilder extends
    */
   void execute(boolean skipCustomListeners, boolean skipIoMappings);
 
+  Batch executeAsync();
 
+  Batch executeAsync(boolean skipCustomListeners, boolean skipIoMappings);
 
 }
