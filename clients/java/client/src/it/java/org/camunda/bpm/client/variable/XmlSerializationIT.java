@@ -16,12 +16,14 @@ package org.camunda.bpm.client.variable;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
+import static org.camunda.bpm.client.util.ProcessModels.EXTERNAL_TASK_TOPIC_BAR;
 import static org.camunda.bpm.client.util.ProcessModels.EXTERNAL_TASK_TOPIC_FOO;
 import static org.camunda.bpm.client.util.ProcessModels.TWO_EXTERNAL_TASK_PROCESS;
 import static org.camunda.bpm.engine.variable.Variables.SerializationDataFormats.XML;
 import static org.camunda.bpm.engine.variable.type.ValueType.OBJECT;
 
 import java.util.Arrays;
+import java.util.Map;
 
 import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.client.dto.ProcessDefinitionDto;
@@ -30,7 +32,10 @@ import org.camunda.bpm.client.exception.ValueMapperException;
 import org.camunda.bpm.client.rule.ClientRule;
 import org.camunda.bpm.client.rule.EngineRule;
 import org.camunda.bpm.client.task.ExternalTask;
+import org.camunda.bpm.client.task.ExternalTaskService;
 import org.camunda.bpm.client.util.RecordingExternalTaskHandler;
+import org.camunda.bpm.client.util.RecordingInvocationHandler;
+import org.camunda.bpm.client.util.RecordingInvocationHandler.RecordedInvocation;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.spin.Spin;
@@ -78,12 +83,15 @@ public class XmlSerializationIT {
   protected ProcessInstanceDto processInstance;
 
   protected RecordingExternalTaskHandler handler = new RecordingExternalTaskHandler();
+  protected RecordingInvocationHandler invocationHandler = new RecordingInvocationHandler();
 
   @Before
   public void setup() throws Exception {
     client = clientRule.client();
-    handler.clear();
     processDefinition = engineRule.deploy(TWO_EXTERNAL_TASK_PROCESS).get(0);
+
+    handler.clear();
+    invocationHandler.clear();
   }
 
   @Test
@@ -484,6 +492,154 @@ public class XmlSerializationIT {
     assertThat(typedValue.getObjectTypeName()).isNull();
     assertThat(typedValue.getType()).isEqualTo(OBJECT);
     assertThat(typedValue.isDeserialized()).isTrue();
+  }
+
+  @Test
+  public void shoudSetVariableTyped() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // when
+    Map<String, Object> variables = Variables.createVariables();
+    variables.put(VARIABLE_NAME_XML, Variables.objectValue(VARIABLE_VALUE_XML_DESERIALIZED).serializationDataFormat(XML).create());
+    fooService.complete(fooTask, variables);
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    ObjectValue serializedValue = task.getVariableTyped(VARIABLE_NAME_XML, false);
+    assertThat(serializedValue.isDeserialized()).isFalse();
+    assertThat(serializedValue.getType()).isEqualTo(OBJECT);
+    assertThat(serializedValue.getObjectTypeName()).isEqualTo(XmlSerializable.class.getName());
+
+    SpinXmlElement spinElement = Spin.XML(serializedValue.getValueSerialized());
+    assertThat(VARIABLE_VALUE_XML_DESERIALIZED.getStringProperty()).isEqualTo(spinElement.childElement("stringProperty").textContent());
+    assertThat(VARIABLE_VALUE_XML_DESERIALIZED.getBooleanProperty()).isEqualTo(Boolean.parseBoolean(spinElement.childElement("booleanProperty").textContent()));
+    assertThat(VARIABLE_VALUE_XML_DESERIALIZED.getIntProperty()).isEqualTo(Integer.parseInt(spinElement.childElement("intProperty").textContent()));
+
+    ObjectValue deserializedValue = task.getVariableTyped(VARIABLE_NAME_XML);
+    assertThat(deserializedValue.isDeserialized()).isTrue();
+    assertThat(deserializedValue.getValue()).isEqualTo(VARIABLE_VALUE_XML_DESERIALIZED);
+    assertThat(deserializedValue.getType()).isEqualTo(OBJECT);
+    assertThat(deserializedValue.getObjectTypeName()).isEqualTo(XmlSerializable.class.getName());
+
+    XmlSerializable variableValue = task.getVariable(VARIABLE_NAME_XML);
+    assertThat(variableValue).isEqualTo(VARIABLE_VALUE_XML_DESERIALIZED);
+  }
+
+  @Test
+  public void shoudSetVariableTyped_Null() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // when
+    Map<String, Object> variables = Variables.createVariables();
+    variables.put(VARIABLE_NAME_XML, Variables.objectValue(null)
+        .serializationDataFormat(XML)
+        .create());
+    fooService.complete(fooTask, variables);
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    ObjectValue serializedValue = task.getVariableTyped(VARIABLE_NAME_XML, false);
+    assertThat(serializedValue.isDeserialized()).isFalse();
+    assertThat(serializedValue.getValueSerialized()).isNull();
+    assertThat(serializedValue.getType()).isEqualTo(OBJECT);
+    assertThat(serializedValue.getObjectTypeName()).isNull();
+
+    ObjectValue deserializedValue = task.getVariableTyped(VARIABLE_NAME_XML);
+    assertThat(deserializedValue.isDeserialized()).isTrue();
+    assertThat(deserializedValue.getValue()).isNull();
+    assertThat(deserializedValue.getType()).isEqualTo(OBJECT);
+    assertThat(deserializedValue.getObjectTypeName()).isNull();
+
+    XmlSerializable variableValue = task.getVariable(VARIABLE_NAME_XML);
+    assertThat(variableValue).isNull();
+  }
+
+  @Test
+  public void shoudSetXmlListVariable() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // when
+    Map<String, Object> variables = Variables.createVariables();
+    variables.put(VARIABLE_NAME_XML, Variables.objectValue(VARIABLE_VALUE_XML_LIST_DESERIALIZED).serializationDataFormat(XML).create());
+    fooService.complete(fooTask, variables);
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    ObjectValue serializedValue = task.getVariableTyped(VARIABLE_NAME_XML, false);
+    assertThat(serializedValue.isDeserialized()).isFalse();
+    assertThat(serializedValue.getType()).isEqualTo(OBJECT);
+    assertThat(serializedValue.getObjectTypeName()).isEqualTo("org.camunda.bpm.client.variable.XmlSerializables");
+
+    SpinXmlElement spinElement = Spin.XML(serializedValue.getValueSerialized());
+    SpinList<SpinXmlElement> childElements = spinElement.childElements();
+    childElements.forEach((c) -> {
+      assertThat(VARIABLE_VALUE_XML_DESERIALIZED.getStringProperty()).isEqualTo(c.childElement("stringProperty").textContent());
+      assertThat(VARIABLE_VALUE_XML_DESERIALIZED.getBooleanProperty()).isEqualTo(Boolean.parseBoolean(c.childElement("booleanProperty").textContent()));
+      assertThat(VARIABLE_VALUE_XML_DESERIALIZED.getIntProperty()).isEqualTo(Integer.parseInt(c.childElement("intProperty").textContent()));
+    });
+
+    ObjectValue deserializedValue = task.getVariableTyped(VARIABLE_NAME_XML);
+    assertThat(deserializedValue.isDeserialized()).isTrue();
+    assertThat(deserializedValue.getValue()).isEqualTo(VARIABLE_VALUE_XML_LIST_DESERIALIZED);
+    assertThat(deserializedValue.getType()).isEqualTo(OBJECT);
+    assertThat(deserializedValue.getObjectTypeName()).isEqualTo("org.camunda.bpm.client.variable.XmlSerializables");
+
+    XmlSerializables variableValue = task.getVariable(VARIABLE_NAME_XML);
+    assertThat(variableValue).isEqualTo(VARIABLE_VALUE_XML_LIST_DESERIALIZED);
   }
 
 }

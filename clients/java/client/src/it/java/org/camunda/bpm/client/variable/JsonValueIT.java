@@ -13,9 +13,12 @@
 package org.camunda.bpm.client.variable;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.camunda.bpm.client.util.ProcessModels.EXTERNAL_TASK_TOPIC_BAR;
 import static org.camunda.bpm.client.util.ProcessModels.EXTERNAL_TASK_TOPIC_FOO;
 import static org.camunda.bpm.client.util.ProcessModels.TWO_EXTERNAL_TASK_PROCESS;
 import static org.camunda.bpm.client.variable.ClientValues.JSON;
+
+import java.util.Map;
 
 import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.client.dto.ProcessDefinitionDto;
@@ -23,8 +26,13 @@ import org.camunda.bpm.client.dto.ProcessInstanceDto;
 import org.camunda.bpm.client.rule.ClientRule;
 import org.camunda.bpm.client.rule.EngineRule;
 import org.camunda.bpm.client.task.ExternalTask;
+import org.camunda.bpm.client.task.ExternalTaskService;
 import org.camunda.bpm.client.util.RecordingExternalTaskHandler;
+import org.camunda.bpm.client.util.RecordingInvocationHandler;
+import org.camunda.bpm.client.util.RecordingInvocationHandler.RecordedInvocation;
 import org.camunda.bpm.client.variable.value.JsonValue;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.json.JSONException;
 import org.junit.Before;
 import org.junit.Rule;
@@ -55,12 +63,15 @@ public class JsonValueIT {
   protected ProcessInstanceDto processInstance;
 
   protected RecordingExternalTaskHandler handler = new RecordingExternalTaskHandler();
+  protected RecordingInvocationHandler invocationHandler = new RecordingInvocationHandler();
 
   @Before
   public void setup() throws Exception {
     client = clientRule.client();
-    handler.clear();
     processDefinition = engineRule.deploy(TWO_EXTERNAL_TASK_PROCESS).get(0);
+
+    handler.clear();
+    invocationHandler.clear();
   }
 
   @Test
@@ -161,6 +172,80 @@ public class JsonValueIT {
 
     String variableValue = task.getVariable(VARIABLE_NAME_JSON);
     assertThat(variableValue).isEqualTo(VARIABLE_VALUE_JSON_SERIALIZED_BROKEN);
+  }
+
+  @Test
+  public void shoudSetVariable() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // when
+    Map<String, Object> variables = Variables.createVariables();
+    variables.put(VARIABLE_NAME_JSON, ClientValues.jsonValue(VARIABLE_VALUE_JSON_SERIALIZED));
+    fooService.complete(fooTask, variables);
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    String variableValue = task.getVariable(VARIABLE_NAME_JSON);
+    assertThat(variableValue).isEqualTo(VARIABLE_VALUE_JSON_SERIALIZED);
+
+    TypedValue typedValue = task.getVariableTyped(VARIABLE_NAME_JSON);
+    assertThat(typedValue.getValue()).isEqualTo(VARIABLE_VALUE_JSON_SERIALIZED);
+    assertThat(typedValue.getType()).isEqualTo(JSON);
+  }
+
+  @Test
+  public void shoudSetVariableNull() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // when
+    Map<String, Object> variables = Variables.createVariables();
+    variables.put(VARIABLE_NAME_JSON, ClientValues.jsonValue(null));
+    fooService.complete(fooTask, variables);
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    String variableValue = task.getVariable(VARIABLE_NAME_JSON);
+    assertThat(variableValue).isNull();
+
+    TypedValue typedValue = task.getVariableTyped(VARIABLE_NAME_JSON);
+    assertThat(typedValue.getValue()).isNull();
+    assertThat(typedValue.getType()).isEqualTo(JSON);
   }
 
 }

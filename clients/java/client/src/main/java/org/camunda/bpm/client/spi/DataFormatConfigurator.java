@@ -14,8 +14,15 @@ package org.camunda.bpm.client.spi;
 
 public interface DataFormatConfigurator<T extends DataFormat> {
 
+  /**
+   * @return the dataformat class this configurator can configure (including subclasses)
+   */
   Class<T> getDataFormatClass();
-  
+
+  /**
+   * Applies configuration to the desired format.
+   * This method is invoked with all dataformats of the required type.
+   */
   void configure(T dataFormat);
 
 }

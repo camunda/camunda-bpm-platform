@@ -22,8 +22,10 @@ public class JsonTypeImpl extends PrimitiveValueTypeImpl {
 
   private static final long serialVersionUID = 1L;
 
+  public static final String JSON_TYPE_NAME = "json";
+
   public JsonTypeImpl() {
-    super("json", String.class);
+    super(JSON_TYPE_NAME, String.class);
   }
 
   public JsonValue createValue(Object value, Map<String, Object> valueInfo) {

@@ -101,8 +101,9 @@ public class RequestExecutor {
 
         try {
           EntityUtils.consume(responseEntity);
-        } catch (IOException e) {
-          LOG.exceptionWhileClosingResourceStream(deserializedResponse, e); // log without rethrow exception
+        }
+        catch (IOException e) {
+          LOG.exceptionWhileClosingResourceStream(deserializedResponse, e);
         }
 
         return deserializedResponse;

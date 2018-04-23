@@ -60,8 +60,21 @@ public interface ExternalTaskClientBuilder {
    */
   ExternalTaskClientBuilder maxTasks(int maxTasks);
 
+  /**
+   * Specifies the serialization format that is used to serialize objects when no specific
+   * format is requested. This option defaults to application/json.
+   *
+   * @param defaultSerializationFormat serialization format to be used
+   * @return the builder
+   */
   ExternalTaskClientBuilder defaultSerializationFormat(String defaultSerializationFormat);
 
+  /**
+   * Specifies the date format to de-/serialize date variables.
+   *
+   * @param dateFormat date format to be used
+   * @return the builder
+   */
   ExternalTaskClientBuilder dateFormat(String dateFormat);
 
   /**

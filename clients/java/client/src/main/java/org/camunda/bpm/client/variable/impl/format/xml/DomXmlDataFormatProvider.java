@@ -24,7 +24,7 @@ public class DomXmlDataFormatProvider implements DataFormatProvider {
   }
 
   public DataFormat createInstance() {
-    return new DomXmlDataFormat();
+    return new DomXmlDataFormat(XML.getName());
   }
 
 }

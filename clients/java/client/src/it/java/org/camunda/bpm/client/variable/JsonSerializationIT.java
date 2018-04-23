@@ -16,12 +16,15 @@ package org.camunda.bpm.client.variable;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
+import static org.camunda.bpm.client.util.ProcessModels.EXTERNAL_TASK_TOPIC_BAR;
 import static org.camunda.bpm.client.util.ProcessModels.EXTERNAL_TASK_TOPIC_FOO;
 import static org.camunda.bpm.client.util.ProcessModels.TWO_EXTERNAL_TASK_PROCESS;
-import static org.camunda.bpm.engine.variable.type.ValueType.OBJECT;
 import static org.camunda.bpm.engine.variable.Variables.SerializationDataFormats.JSON;
+import static org.camunda.bpm.engine.variable.type.ValueType.OBJECT;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.client.dto.ProcessDefinitionDto;
@@ -30,7 +33,10 @@ import org.camunda.bpm.client.exception.ValueMapperException;
 import org.camunda.bpm.client.rule.ClientRule;
 import org.camunda.bpm.client.rule.EngineRule;
 import org.camunda.bpm.client.task.ExternalTask;
+import org.camunda.bpm.client.task.ExternalTaskService;
 import org.camunda.bpm.client.util.RecordingExternalTaskHandler;
+import org.camunda.bpm.client.util.RecordingInvocationHandler;
+import org.camunda.bpm.client.util.RecordingInvocationHandler.RecordedInvocation;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.json.JSONException;
@@ -46,13 +52,13 @@ public class JsonSerializationIT {
   protected static final String VARIABLE_NAME_JSON = "jsonVariable";
   protected static final String JSON_DATAFORMAT_NAME = JSON.getName();
 
-  protected static final JsonSerializable VARIABLE_VALUE_JSON_DESIALIZED = new JsonSerializable("a String", 42, true);
+  protected static final JsonSerializable VARIABLE_VALUE_JSON_DESERIALIZED = new JsonSerializable("a String", 42, true);
 
-  protected static final String VARIABLE_VALUE_JSON_SERIALIZED = VARIABLE_VALUE_JSON_DESIALIZED.toExpectedJsonString();
+  protected static final String VARIABLE_VALUE_JSON_SERIALIZED = VARIABLE_VALUE_JSON_DESERIALIZED.toExpectedJsonString();
   protected static final String VARIABLE_VALUE_JSON_LIST_SERIALIZED = String.format("[%s, %s]", VARIABLE_VALUE_JSON_SERIALIZED, VARIABLE_VALUE_JSON_SERIALIZED);
 
   protected static final ObjectValue VARIABLE_VALUE_JSON_OBJECT_VALUE = Variables
-      .serializedObjectValue(VARIABLE_VALUE_JSON_DESIALIZED.toExpectedJsonString())
+      .serializedObjectValue(VARIABLE_VALUE_JSON_DESERIALIZED.toExpectedJsonString())
       .objectTypeName(JsonSerializable.class.getName())
       .serializationDataFormat(JSON_DATAFORMAT_NAME)
       .create();
@@ -76,12 +82,15 @@ public class JsonSerializationIT {
   protected ProcessInstanceDto processInstance;
 
   protected RecordingExternalTaskHandler handler = new RecordingExternalTaskHandler();
+  protected RecordingInvocationHandler invocationHandler = new RecordingInvocationHandler();
 
   @Before
   public void setup() throws Exception {
     client = clientRule.client();
-    handler.clear();
     processDefinition = engineRule.deploy(TWO_EXTERNAL_TASK_PROCESS).get(0);
+
+    handler.clear();
+    invocationHandler.clear();
   }
 
   @Test
@@ -100,7 +109,7 @@ public class JsonSerializationIT {
     ExternalTask task = handler.getHandledTasks().get(0);
 
     JsonSerializable variableValue = task.getVariable(VARIABLE_NAME_JSON);
-    assertThat(variableValue).isEqualTo(VARIABLE_VALUE_JSON_DESIALIZED);
+    assertThat(variableValue).isEqualTo(VARIABLE_VALUE_JSON_DESERIALIZED);
   }
 
   @Test
@@ -119,7 +128,7 @@ public class JsonSerializationIT {
     ExternalTask task = handler.getHandledTasks().get(0);
 
     ObjectValue typedValue = task.getVariableTyped(VARIABLE_NAME_JSON);
-    assertThat(typedValue.getValue()).isEqualTo(VARIABLE_VALUE_JSON_DESIALIZED);
+    assertThat(typedValue.getValue()).isEqualTo(VARIABLE_VALUE_JSON_DESERIALIZED);
     assertThat(typedValue.getObjectTypeName()).isEqualTo(JsonSerializable.class.getName());
     assertThat(typedValue.getType()).isEqualTo(OBJECT);
     assertThat(typedValue.isDeserialized()).isTrue();
@@ -141,7 +150,7 @@ public class JsonSerializationIT {
     ExternalTask task = handler.getHandledTasks().get(0);
 
     ObjectValue typedValue = task.getVariableTyped(VARIABLE_NAME_JSON, false);
-    JSONAssert.assertEquals(VARIABLE_VALUE_JSON_DESIALIZED.toExpectedJsonString(), new String(typedValue.getValueSerialized()), true);
+    JSONAssert.assertEquals(VARIABLE_VALUE_JSON_DESERIALIZED.toExpectedJsonString(), new String(typedValue.getValueSerialized()), true);
     assertThat(typedValue.getObjectTypeName()).isEqualTo(JsonSerializable.class.getName());
     assertThat(typedValue.getType()).isEqualTo(OBJECT);
     assertThat(typedValue.isDeserialized()).isFalse();
@@ -164,7 +173,7 @@ public class JsonSerializationIT {
 
     List<JsonSerializable> variableValue = task.getVariable(VARIABLE_NAME_JSON);
     assertThat(variableValue).hasSize(2);
-    assertThat(variableValue).containsExactly(VARIABLE_VALUE_JSON_DESIALIZED, VARIABLE_VALUE_JSON_DESIALIZED);
+    assertThat(variableValue).containsExactly(VARIABLE_VALUE_JSON_DESERIALIZED, VARIABLE_VALUE_JSON_DESERIALIZED);
   }
 
   @Test
@@ -183,7 +192,7 @@ public class JsonSerializationIT {
     ExternalTask task = handler.getHandledTasks().get(0);
 
     ObjectValue typedValue = task.getVariableTyped(VARIABLE_NAME_JSON);
-    assertThat(typedValue.getValue()).isEqualTo(VARIABLE_VALUE_JSON_DESIALIZED);
+    assertThat(typedValue.getValue()).isEqualTo(VARIABLE_VALUE_JSON_DESERIALIZED);
     assertThat(typedValue.getObjectTypeName()).isEqualTo(JsonSerializable.class.getName());
     assertThat(typedValue.getType()).isEqualTo(OBJECT);
     assertThat(typedValue.isDeserialized()).isTrue();
@@ -205,7 +214,7 @@ public class JsonSerializationIT {
     ExternalTask task = handler.getHandledTasks().get(0);
 
     ObjectValue typedValue = task.getVariableTyped(VARIABLE_NAME_JSON, false);
-    JSONAssert.assertEquals(VARIABLE_VALUE_JSON_DESIALIZED.toExpectedJsonString(), new String(typedValue.getValueSerialized()), true);
+    JSONAssert.assertEquals(VARIABLE_VALUE_JSON_DESERIALIZED.toExpectedJsonString(), new String(typedValue.getValueSerialized()), true);
     assertThat(typedValue.getObjectTypeName()).isEqualTo(JsonSerializable.class.getName());
     assertThat(typedValue.getType()).isEqualTo(OBJECT);
     assertThat(typedValue.isDeserialized()).isFalse();
@@ -288,7 +297,7 @@ public class JsonSerializationIT {
 
     // However, the serialized value can be accessed
     ObjectValue typedValue = task.getVariableTyped(VARIABLE_NAME_JSON, false);
-    JSONAssert.assertEquals(VARIABLE_VALUE_JSON_DESIALIZED.toExpectedJsonString(), new String(typedValue.getValueSerialized()), true);
+    JSONAssert.assertEquals(VARIABLE_VALUE_JSON_DESERIALIZED.toExpectedJsonString(), new String(typedValue.getValueSerialized()), true);
     assertThat(typedValue.getObjectTypeName()).isNotNull();
     assertThat(typedValue.getType()).isEqualTo(OBJECT);
     assertThat(typedValue.isDeserialized()).isFalse();
@@ -463,4 +472,285 @@ public class JsonSerializationIT {
     assertThat(typedValue.getType()).isEqualTo(OBJECT);
     assertThat(typedValue.isDeserialized()).isTrue();
   }
+
+  @Test
+  public void shoudSetVariable() throws JSONException {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // when
+    Map<String, Object> variables = Variables.createVariables();
+    variables.put(VARIABLE_NAME_JSON, VARIABLE_VALUE_JSON_DESERIALIZED);
+    fooService.complete(fooTask, variables);
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    ObjectValue serializedValue = task.getVariableTyped(VARIABLE_NAME_JSON, false);
+    assertThat(serializedValue.isDeserialized()).isFalse();
+    JSONAssert.assertEquals(VARIABLE_VALUE_JSON_SERIALIZED, new String(serializedValue.getValueSerialized()), true);
+    assertThat(serializedValue.getType()).isEqualTo(OBJECT);
+    assertThat(serializedValue.getObjectTypeName()).isEqualTo(JsonSerializable.class.getName());
+
+    ObjectValue deserializedValue = task.getVariableTyped(VARIABLE_NAME_JSON);
+    assertThat(deserializedValue.isDeserialized()).isTrue();
+    assertThat(deserializedValue.getValue()).isEqualTo(VARIABLE_VALUE_JSON_DESERIALIZED);
+    assertThat(deserializedValue.getType()).isEqualTo(OBJECT);
+    assertThat(deserializedValue.getObjectTypeName()).isEqualTo(JsonSerializable.class.getName());
+
+    JsonSerializable variableValue = task.getVariable(VARIABLE_NAME_JSON);
+    assertThat(variableValue).isEqualTo(VARIABLE_VALUE_JSON_DESERIALIZED);
+  }
+
+  @Test
+  public void shoudSetVariableTyped() throws JSONException {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // when
+    Map<String, Object> variables = Variables.createVariables();
+    variables.put(VARIABLE_NAME_JSON, VARIABLE_VALUE_JSON_OBJECT_VALUE);
+    fooService.complete(fooTask, variables);
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    ObjectValue serializedValue = task.getVariableTyped(VARIABLE_NAME_JSON, false);
+    assertThat(serializedValue.isDeserialized()).isFalse();
+    JSONAssert.assertEquals(VARIABLE_VALUE_JSON_DESERIALIZED.toExpectedJsonString(), new String(serializedValue.getValueSerialized()), true);
+    assertThat(serializedValue.getType()).isEqualTo(OBJECT);
+    assertThat(serializedValue.getObjectTypeName()).isEqualTo(JsonSerializable.class.getName());
+
+    ObjectValue deserializedValue = task.getVariableTyped(VARIABLE_NAME_JSON);
+    assertThat(deserializedValue.isDeserialized()).isTrue();
+    assertThat(deserializedValue.getValue()).isEqualTo(VARIABLE_VALUE_JSON_DESERIALIZED);
+    assertThat(deserializedValue.getType()).isEqualTo(OBJECT);
+    assertThat(deserializedValue.getObjectTypeName()).isEqualTo(JsonSerializable.class.getName());
+
+    JsonSerializable variableValue = task.getVariable(VARIABLE_NAME_JSON);
+    assertThat(variableValue).isEqualTo(VARIABLE_VALUE_JSON_DESERIALIZED);
+  }
+
+  @Test
+  public void shoudSetVariableUntyped() throws JSONException {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // when
+    Map<String, Object> variables = Variables.createVariables();
+    variables.put(VARIABLE_NAME_JSON, Variables.untypedValue(VARIABLE_VALUE_JSON_DESERIALIZED));
+    fooService.complete(fooTask, variables);
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    ObjectValue serializedValue = task.getVariableTyped(VARIABLE_NAME_JSON, false);
+    assertThat(serializedValue.isDeserialized()).isFalse();
+    JSONAssert.assertEquals(VARIABLE_VALUE_JSON_DESERIALIZED.toExpectedJsonString(), new String(serializedValue.getValueSerialized()), true);
+    assertThat(serializedValue.getType()).isEqualTo(OBJECT);
+    assertThat(serializedValue.getObjectTypeName()).isEqualTo(JsonSerializable.class.getName());
+
+    ObjectValue deserializedValue = task.getVariableTyped(VARIABLE_NAME_JSON);
+    assertThat(deserializedValue.isDeserialized()).isTrue();
+    assertThat(deserializedValue.getValue()).isEqualTo(VARIABLE_VALUE_JSON_DESERIALIZED);
+    assertThat(deserializedValue.getType()).isEqualTo(OBJECT);
+    assertThat(deserializedValue.getObjectTypeName()).isEqualTo(JsonSerializable.class.getName());
+
+    JsonSerializable variableValue = task.getVariable(VARIABLE_NAME_JSON);
+    assertThat(variableValue).isEqualTo(VARIABLE_VALUE_JSON_DESERIALIZED);
+  }
+
+  @Test
+  public void shoudSetVariableTyped_Null() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // when
+    Map<String, Object> variables = Variables.createVariables();
+    variables.put(VARIABLE_NAME_JSON, Variables.objectValue(null)
+        .serializationDataFormat(JSON)
+        .create());
+    fooService.complete(fooTask, variables);
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    ObjectValue serializedValue = task.getVariableTyped(VARIABLE_NAME_JSON, false);
+    assertThat(serializedValue.isDeserialized()).isFalse();
+    assertThat(serializedValue.getValueSerialized()).isNull();
+    assertThat(serializedValue.getType()).isEqualTo(OBJECT);
+    assertThat(serializedValue.getObjectTypeName()).isNull();
+
+    ObjectValue deserializedValue = task.getVariableTyped(VARIABLE_NAME_JSON);
+    assertThat(deserializedValue.isDeserialized()).isTrue();
+    assertThat(deserializedValue.getValue()).isNull();
+    assertThat(deserializedValue.getType()).isEqualTo(OBJECT);
+    assertThat(deserializedValue.getObjectTypeName()).isNull();
+
+    JsonSerializable variableValue = task.getVariable(VARIABLE_NAME_JSON);
+    assertThat(variableValue).isNull();
+  }
+
+  @Test
+  public void shoudSetJsonListVariable() throws JSONException {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // when
+    List<JsonSerializable> variable = new ArrayList<>();
+    variable.add(VARIABLE_VALUE_JSON_DESERIALIZED);
+    variable.add(VARIABLE_VALUE_JSON_DESERIALIZED);
+
+    Map<String, Object> variables = Variables.createVariables();
+    variables.put(VARIABLE_NAME_JSON, variable);
+    fooService.complete(fooTask, variables);
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    ObjectValue serializedValue = task.getVariableTyped(VARIABLE_NAME_JSON, false);
+    assertThat(serializedValue.isDeserialized()).isFalse();
+    JSONAssert.assertEquals(VARIABLE_VALUE_JSON_LIST_SERIALIZED, new String(serializedValue.getValueSerialized()), true);
+    assertThat(serializedValue.getType()).isEqualTo(OBJECT);
+    assertThat(serializedValue.getObjectTypeName()).isEqualTo("java.util.ArrayList<org.camunda.bpm.client.variable.JsonSerializable>");
+
+    ObjectValue deserializedValue = task.getVariableTyped(VARIABLE_NAME_JSON);
+    assertThat(deserializedValue.isDeserialized()).isTrue();
+    assertThat(deserializedValue.getValue()).isEqualTo(variable);
+    assertThat(deserializedValue.getType()).isEqualTo(OBJECT);
+    assertThat(deserializedValue.getObjectTypeName()).isEqualTo("java.util.ArrayList<org.camunda.bpm.client.variable.JsonSerializable>");
+
+    List<JsonSerializable> variableValue = task.getVariable(VARIABLE_NAME_JSON);
+    assertThat(variableValue).isEqualTo(variable);
+  }
+
+  @Test
+  public void shoudSetJsonListVariableTyped() throws JSONException {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // when
+    List<JsonSerializable> variable = new ArrayList<>();
+    variable.add(VARIABLE_VALUE_JSON_DESERIALIZED);
+    variable.add(VARIABLE_VALUE_JSON_DESERIALIZED);
+
+    Map<String, Object> variables = Variables.createVariables();
+    variables.put(VARIABLE_NAME_JSON, Variables.objectValue(variable).create());
+    fooService.complete(fooTask, variables);
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    ObjectValue serializedValue = task.getVariableTyped(VARIABLE_NAME_JSON, false);
+    assertThat(serializedValue.isDeserialized()).isFalse();
+    JSONAssert.assertEquals(VARIABLE_VALUE_JSON_LIST_SERIALIZED, new String(serializedValue.getValueSerialized()), true);
+    assertThat(serializedValue.getType()).isEqualTo(OBJECT);
+    assertThat(serializedValue.getObjectTypeName()).isEqualTo("java.util.ArrayList<org.camunda.bpm.client.variable.JsonSerializable>");
+
+    ObjectValue deserializedValue = task.getVariableTyped(VARIABLE_NAME_JSON);
+    assertThat(deserializedValue.isDeserialized()).isTrue();
+    assertThat(deserializedValue.getValue()).isEqualTo(variable);
+    assertThat(deserializedValue.getType()).isEqualTo(OBJECT);
+    assertThat(deserializedValue.getObjectTypeName()).isEqualTo("java.util.ArrayList<org.camunda.bpm.client.variable.JsonSerializable>");
+
+    List<JsonSerializable> variableValue = task.getVariable(VARIABLE_NAME_JSON);
+    assertThat(variableValue).isEqualTo(variable);
+  }
+
 }

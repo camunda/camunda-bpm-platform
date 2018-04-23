@@ -14,12 +14,12 @@ package org.camunda.bpm.client.impl;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
-import java.util.Set;
 import java.util.UUID;
 
 import org.camunda.bpm.client.ClientBackoffStrategy;
@@ -33,7 +33,6 @@ import org.camunda.bpm.client.spi.DataFormatProvider;
 import org.camunda.bpm.client.topic.impl.TopicSubscriptionManager;
 import org.camunda.bpm.client.variable.impl.DefaultValueMappers;
 import org.camunda.bpm.client.variable.impl.TypedValues;
-import org.camunda.bpm.client.variable.impl.ValueMapper;
 import org.camunda.bpm.client.variable.impl.ValueMappers;
 import org.camunda.bpm.client.variable.impl.mapper.BooleanValueMapper;
 import org.camunda.bpm.client.variable.impl.mapper.ByteArrayValueMapper;
@@ -51,6 +50,7 @@ import org.camunda.bpm.engine.variable.Variables;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 /**
  * @author Tassilo Weidner
@@ -65,7 +65,7 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
   protected Long asyncResponseTimeout;
   protected long lockDuration;
 
-  protected String defaultSerializationFormat = Variables.SerializationDataFormats.JAVA.getName();
+  protected String defaultSerializationFormat = Variables.SerializationDataFormats.JSON.getName();
 
   protected String dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 
@@ -141,15 +141,15 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
 
   public ExternalTaskClient build() {
     if (maxTasks <= 0) {
-      throw LOG.maxTasksNotGreaterThanZeroException();
+      throw LOG.maxTasksNotGreaterThanZeroException(maxTasks);
     }
 
     if (asyncResponseTimeout != null && asyncResponseTimeout <= 0) {
-      throw LOG.asyncResponseTimeoutNotGreaterThanZeroException();
+      throw LOG.asyncResponseTimeoutNotGreaterThanZeroException(asyncResponseTimeout);
     }
 
     if (lockDuration <= 0L) {
-      throw LOG.lockDurationIsNotGreaterThanZeroException();
+      throw LOG.lockDurationIsNotGreaterThanZeroException(lockDuration);
     }
 
     if (baseUrl == null || baseUrl.isEmpty()) {
@@ -201,6 +201,10 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
     objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     objectMapper.configure(DeserializationFeature.FAIL_ON_UNRESOLVED_OBJECT_IDS, false);
     objectMapper.configure(DeserializationFeature.FAIL_ON_INVALID_SUBTYPE, false);
+
+    SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
+    objectMapper.setDateFormat(sdf);
+    objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
   }
 
   protected void initVariableMappers() {
@@ -260,6 +264,7 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
     ServiceLoader<DataFormatProvider> providerLoader = ServiceLoader.load(DataFormatProvider.class);
 
     for (DataFormatProvider provider : providerLoader) {
+      LOG.logDataFormatProvider(provider);
       lookupProvider(dataFormats, provider);
     }
   }
@@ -271,10 +276,10 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
     if(!dataFormats.containsKey(dataFormatName)) {
       DataFormat dataFormatInstance = provider.createInstance();
       dataFormats.put(dataFormatName, dataFormatInstance);
+      LOG.logDataFormat(dataFormatInstance);
     }
     else {
-      // throw LOG.multipleProvidersForDataformat(dataFormatName);
-      throw new RuntimeException();
+      throw LOG.multipleProvidersForDataformat(dataFormatName);
     }
   }
 
@@ -283,6 +288,7 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
     ServiceLoader<DataFormatConfigurator> configuratorLoader = ServiceLoader.load(DataFormatConfigurator.class);
 
     for (DataFormatConfigurator configurator : configuratorLoader) {
+      LOG.logDataFormatConfigurator(configurator);
       applyConfigurator(dataFormats, configurator);
     }
   }
@@ -301,7 +307,7 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
     try {
       hostname = getHostname();
     } catch (UnknownHostException e) {
-      throw LOG.cannotGetHostnameException();
+      throw LOG.cannotGetHostnameException(e);
     }
 
     return hostname;

@@ -46,8 +46,9 @@ public class DateValueMapper extends PrimitiveValueMapper<DateValue> {
       SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
       try {
         date = sdf.parse(value);
-      } catch (ParseException e) {
-        throw LOG.valueMapperExceptionWhileParsingDate(e);
+      }
+      catch (ParseException e) {
+        throw LOG.valueMapperExceptionWhileParsingDate(value, e);
       }
     }
 

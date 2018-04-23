@@ -14,6 +14,7 @@ package org.camunda.bpm.client.variable.impl.format.serializable;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -22,16 +23,29 @@ import java.util.Base64;
 import java.util.Base64.Decoder;
 import java.util.Base64.Encoder;
 
+import org.camunda.bpm.client.impl.ExternalTaskClientLogger;
 import org.camunda.bpm.client.spi.DataFormat;
 import org.camunda.commons.utils.IoUtil;
 
 public class SerializableDataFormat implements DataFormat {
 
+  private static final SerializableLogger LOG = ExternalTaskClientLogger.SERIALIZABLE_FORMAT_LOGGER;
+
+  protected String name;
+
+  public SerializableDataFormat(String name) {
+    this.name = name;
+  }
+
+  public String getName() {
+    return name;
+  }
+
   public boolean canMap(Object value) {
     return value instanceof Serializable;
   }
 
-  public String writeValue(Object value) throws Exception {
+  public String writeValue(Object value) {
     ByteArrayOutputStream baos = null;
     ObjectOutputStream ois = null;
 
@@ -45,22 +59,25 @@ public class SerializableDataFormat implements DataFormat {
       Encoder encoder = Base64.getEncoder();
       return encoder.encodeToString(deserializedObjectByteArray);
     }
+    catch (IOException e) {
+      throw LOG.unableToWriteValue(value, e);
+    }
     finally {
       IoUtil.closeSilently(ois);
       IoUtil.closeSilently(baos);
     }
   }
 
-  public <T> T readValue(String value, String typeIdentifier) throws Exception {
+  public <T> T readValue(String value, String typeIdentifier) {
     return readValue(value);
   }
 
-  public <T> T readValue(String value, Class<T> cls) throws Exception {
+  public <T> T readValue(String value, Class<T> cls) {
     return readValue(value);
   }
 
   @SuppressWarnings("unchecked")
-  protected <T> T readValue(String value) throws Exception {
+  protected <T> T readValue(String value) {
     Decoder decoder = Base64.getDecoder();
     byte[] base64DecodedSerializedValue = decoder.decode(value);
 
@@ -71,6 +88,12 @@ public class SerializableDataFormat implements DataFormat {
       is = new ByteArrayInputStream(base64DecodedSerializedValue);
       ois = new ObjectInputStream(is);
       return (T) ois.readObject();
+    }
+    catch (ClassNotFoundException e) {
+      throw LOG.classNotFound(e);
+    }
+    catch (IOException e) {
+      throw LOG.unableToReadValue(value, e);
     }
     finally {
       IoUtil.closeSilently(ois);

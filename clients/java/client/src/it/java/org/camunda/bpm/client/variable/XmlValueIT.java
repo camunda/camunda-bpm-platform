@@ -13,9 +13,12 @@
 package org.camunda.bpm.client.variable;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.camunda.bpm.client.util.ProcessModels.EXTERNAL_TASK_TOPIC_BAR;
 import static org.camunda.bpm.client.util.ProcessModels.EXTERNAL_TASK_TOPIC_FOO;
 import static org.camunda.bpm.client.util.ProcessModels.TWO_EXTERNAL_TASK_PROCESS;
 import static org.camunda.bpm.client.variable.ClientValues.XML;
+
+import java.util.Map;
 
 import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.client.dto.ProcessDefinitionDto;
@@ -23,12 +26,16 @@ import org.camunda.bpm.client.dto.ProcessInstanceDto;
 import org.camunda.bpm.client.rule.ClientRule;
 import org.camunda.bpm.client.rule.EngineRule;
 import org.camunda.bpm.client.task.ExternalTask;
+import org.camunda.bpm.client.task.ExternalTaskService;
 import org.camunda.bpm.client.util.RecordingExternalTaskHandler;
+import org.camunda.bpm.client.util.RecordingInvocationHandler;
+import org.camunda.bpm.client.util.RecordingInvocationHandler.RecordedInvocation;
 import org.camunda.bpm.client.variable.value.XmlValue;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 public class XmlValueIT {
@@ -54,12 +61,15 @@ public class XmlValueIT {
   protected ProcessInstanceDto processInstance;
 
   protected RecordingExternalTaskHandler handler = new RecordingExternalTaskHandler();
+  protected RecordingInvocationHandler invocationHandler = new RecordingInvocationHandler();
 
   @Before
   public void setup() throws Exception {
     client = clientRule.client();
-    handler.clear();
     processDefinition = engineRule.deploy(TWO_EXTERNAL_TASK_PROCESS).get(0);
+
+    handler.clear();
+    invocationHandler.clear();
   }
 
   @Test
@@ -146,7 +156,7 @@ public class XmlValueIT {
   }
 
   @Test
-  public void shouldReturnBrokenJson() {
+  public void shouldReturnBrokenXml() {
     // given
     engineRule.startProcessInstance(processDefinition.getId(), VARIABLE_NAME_XML, VARIABLE_VALUE_XML_VALUE_BROKEN);
 
@@ -161,6 +171,80 @@ public class XmlValueIT {
 
     String variableValue = task.getVariable(VARIABLE_NAME_XML);
     assertThat(variableValue).isEqualTo(VARIABLE_VALUE_XML_SERIALIZED_BROKEN);
+  }
+
+  @Test
+  public void shoudSetVariable() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // when
+    Map<String, Object> variables = Variables.createVariables();
+    variables.put(VARIABLE_NAME_XML, ClientValues.xmlValue(VARIABLE_VALUE_XML_SERIALIZED));
+    fooService.complete(fooTask, variables);
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    String variableValue = task.getVariable(VARIABLE_NAME_XML);
+    assertThat(variableValue).isEqualTo(VARIABLE_VALUE_XML_SERIALIZED);
+
+    TypedValue typedValue = task.getVariableTyped(VARIABLE_NAME_XML);
+    assertThat(typedValue.getValue()).isEqualTo(VARIABLE_VALUE_XML_SERIALIZED);
+    assertThat(typedValue.getType()).isEqualTo(XML);
+  }
+
+  @Test
+  public void shoudSetVariableNull() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // when
+    Map<String, Object> variables = Variables.createVariables();
+    variables.put(VARIABLE_NAME_XML, ClientValues.xmlValue(null));
+    fooService.complete(fooTask, variables);
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    String variableValue = task.getVariable(VARIABLE_NAME_XML);
+    assertThat(variableValue).isNull();
+
+    TypedValue typedValue = task.getVariableTyped(VARIABLE_NAME_XML);
+    assertThat(typedValue.getValue()).isNull();
+    assertThat(typedValue.getType()).isEqualTo(XML);
   }
 
 }

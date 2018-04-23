@@ -88,8 +88,10 @@ public class PrimitiveVariableIT {
   @Before
   public void setup() throws Exception {
     client = clientRule.client();
-    handler.clear();
     processDefinition = engineRule.deploy(TWO_EXTERNAL_TASK_PROCESS).get(0);
+
+    handler.clear();
+    invocationHandler.clear();
   }
 
   @Test

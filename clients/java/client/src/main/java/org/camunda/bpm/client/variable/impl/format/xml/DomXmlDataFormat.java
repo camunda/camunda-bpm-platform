@@ -16,6 +16,7 @@ import static org.camunda.commons.utils.EnsureUtil.ensureNotNull;
 
 import java.beans.Introspector;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 
@@ -28,22 +29,30 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.camunda.bpm.client.impl.ExternalTaskClientLogger;
 import org.camunda.bpm.client.spi.DataFormat;
 import org.camunda.commons.utils.IoUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 public class DomXmlDataFormat implements DataFormat {
+
+  protected static final DomXmlLogger LOG = ExternalTaskClientLogger.XML_FORMAT_LOGGER;
+
+  protected String name;
 
   /** the DocumentBuilderFactory used by the reader */
   protected DocumentBuilderFactory documentBuilderFactory;
@@ -51,17 +60,24 @@ public class DomXmlDataFormat implements DataFormat {
   /** the TransformerFactory instance used by the writer */
   protected TransformerFactory transformerFactory;
 
-  public DomXmlDataFormat() {
-    this(defaultDocumentBuilderFactory());
+  public DomXmlDataFormat(String name) {
+    this(name, defaultDocumentBuilderFactory());
   }
 
-  public DomXmlDataFormat(DocumentBuilderFactory documentBuilderFactory) {
-    this(documentBuilderFactory, defaultTransformerFactory());
+  public DomXmlDataFormat(String name, DocumentBuilderFactory documentBuilderFactory) {
+    this(name, documentBuilderFactory, defaultTransformerFactory());
   }
 
-  public DomXmlDataFormat(DocumentBuilderFactory documentBuilderFactory, TransformerFactory transformerFactory) {
+  public DomXmlDataFormat(String name, DocumentBuilderFactory documentBuilderFactory, TransformerFactory transformerFactory) {
+    this.name = name;
     this.documentBuilderFactory = documentBuilderFactory;
+    LOG.usingDocumentBuilderFactory(documentBuilderFactory.getClass().getName());
+
     this.transformerFactory = transformerFactory;
+  }
+
+  public String getName() {
+    return name;
   }
 
   public DocumentBuilderFactory getDocumentBuilderFactory() {
@@ -76,15 +92,15 @@ public class DomXmlDataFormat implements DataFormat {
     return value != null;
   }
 
-  public String writeValue(Object value) throws Exception {
+  public String writeValue(Object value) {
     Element mappedObject = writeAsElement(value);
 
     StringWriter writer = null;
 
     try {
       writer = new StringWriter();
-      StreamResult streamReseult = new StreamResult(writer);
-      writeResult(streamReseult, mappedObject);
+      StreamResult streamResult = new StreamResult(writer);
+      writeResult(streamResult, mappedObject);
       return writer.toString();
     }
     finally {
@@ -93,56 +109,76 @@ public class DomXmlDataFormat implements DataFormat {
   }
 
   @SuppressWarnings("unchecked")
-  public <T> T readValue(String value, String typeIdentifier) throws Exception {
+  public <T> T readValue(String value, String typeIdentifier) {
     ensureNotNull("value", value);
     ensureNotNull("typeIdentifier", typeIdentifier);
 
-    Class<?> javaClass = loadClass(typeIdentifier, this);
-    return (T) readValue(value, javaClass);
+    try {
+      Class<?> javaClass = loadClass(typeIdentifier, this);
+      return (T) readValue(value, javaClass);
+    }
+    catch (Exception e) {
+      throw LOG.unableToDeserialize(value, typeIdentifier, e);
+    }
   }
 
-  public <T> T readValue(String value, Class<T> cls) throws Exception {
+  public <T> T readValue(String value, Class<T> cls) {
     ensureNotNull("value", value);
     ensureNotNull("class", cls);
 
-    Element xmlNode = readInput(value);
-    Unmarshaller unmarshaller = createUnmarshaller(cls);
-    DOMSource domSource = new DOMSource(xmlNode);
-    JAXBElement<T> root = unmarshaller.unmarshal(domSource, cls);
-    return root.getValue();
+    try {
+      Element xmlNode = readAsElement(value);
+      Unmarshaller unmarshaller = createUnmarshaller(cls);
+      DOMSource domSource = new DOMSource(xmlNode);
+      JAXBElement<T> root = unmarshaller.unmarshal(domSource, cls);
+      return root.getValue();
+    }
+    catch (JAXBException e) {
+      throw LOG.unableToDeserialize(value, cls.getCanonicalName(), e);
+    }
   }
 
   public String getCanonicalTypeName(Object value) {
     return value.getClass().getName();
   }
 
-  protected void writeResult(StreamResult streamResult, Object input) throws Exception{
+  protected void writeResult(StreamResult streamResult, Object input) {
     Node node = (Node) input;
     DOMSource domSource = new DOMSource(node);
-    getTransformer().transform(domSource, streamResult);
+    try {
+      getTransformer().transform(domSource, streamResult);
+    }
+    catch (TransformerException e) {
+      throw LOG.unableToTransformElement(node, e);
+    }
   }
 
   @SuppressWarnings({ "rawtypes", "unchecked" })
-  protected Element writeAsElement(Object value) throws Exception {
+  protected Element writeAsElement(Object value) {
     ensureNotNull("value", value);
 
     final Class<?> valueClass = value.getClass();
     final DOMResult domResult = new DOMResult();
 
-    Marshaller marshaller = createMarshaller(valueClass);
+    try {
+      Marshaller marshaller = createMarshaller(valueClass);
 
-    boolean isRootElement = valueClass.getAnnotation(XmlRootElement.class) != null;
-    if(isRootElement) {
-      marshaller.marshal(value, domResult);
-    }
-    else {
-      String simpleName = Introspector.decapitalize(valueClass.getSimpleName());
-      JAXBElement<?> root = new JAXBElement(new QName(simpleName), valueClass, value);
-      marshaller.marshal(root, domResult);
-    }
+      boolean isRootElement = valueClass.getAnnotation(XmlRootElement.class) != null;
+      if(isRootElement) {
+        marshaller.marshal(value, domResult);
+      }
+      else {
+        String simpleName = Introspector.decapitalize(valueClass.getSimpleName());
+        JAXBElement<?> root = new JAXBElement(new QName(simpleName), valueClass, value);
+        marshaller.marshal(root, domResult);
+      }
 
-    Node node = domResult.getNode();
-    return ((Document)node).getDocumentElement();
+      Node node = domResult.getNode();
+      return ((Document)node).getDocumentElement();
+    }
+    catch (JAXBException e) {
+      throw LOG.unableToWriteInput(value, e);
+    }
   }
 
   protected Transformer getTransformer() {
@@ -154,12 +190,12 @@ public class DomXmlDataFormat implements DataFormat {
       return transformer;
     }
     catch (TransformerConfigurationException e) {
-      throw new RuntimeException(e);
+      throw LOG.unableToCreateTransformer(e);
     }
   }
 
-  public Element readInput(String value) throws Exception {
-    DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+  public Element readAsElement(String value) {
+    DocumentBuilder documentBuilder = getDocumentBuilder();
     StringReader stringReader = null;
     BufferedReader bufferedReader = null;
 
@@ -168,12 +204,33 @@ public class DomXmlDataFormat implements DataFormat {
       bufferedReader = new BufferedReader(stringReader);
       InputSource inputSource = new InputSource(bufferedReader);
 
+      LOG.parsingInput();
       Document document = documentBuilder.parse(inputSource);
       return document.getDocumentElement();
+    }
+    catch (SAXException e) {
+      throw LOG.unableToParseInput(e);
+    }
+    catch (IOException e) {
+      throw LOG.unableToParseInput(e);
+
     }
     finally{
       IoUtil.closeSilently(bufferedReader);
       IoUtil.closeSilently(stringReader);
+    }
+  }
+
+  protected DocumentBuilder getDocumentBuilder() {
+    try {
+      DocumentBuilder docBuilder = documentBuilderFactory.newDocumentBuilder();
+      LOG.createdDocumentBuilder();
+
+      return docBuilder;
+    }
+    catch (ParserConfigurationException e) {
+      throw LOG.unableToCreateParser(e);
+
     }
   }
 
@@ -182,26 +239,25 @@ public class DomXmlDataFormat implements DataFormat {
       return JAXBContext.newInstance(types);
     }
     catch (JAXBException e) {
-//      throw LOG.unableToCreateContext(e);
-      throw new RuntimeException(e);
+      throw LOG.unableToCreateContext(e);
     }
   }
 
   protected Marshaller createMarshaller(Class<?>... types) {
     try {
       return getContext(types).createMarshaller();
-    } catch (JAXBException e) {
-//      throw LOG.unableToCreateMarshaller(e);
-      throw new RuntimeException(e);
+    }
+    catch (JAXBException e) {
+      throw LOG.unableToCreateMarshaller(e);
     }
   }
 
   protected Unmarshaller createUnmarshaller(Class<?>... types) {
     try {
       return getContext(types).createUnmarshaller();
-    } catch (JAXBException e) {
-//      throw LOG.unableToCreateUnmarshaller(e);
-      throw new RuntimeException(e);
+    }
+    catch (JAXBException e) {
+      throw LOG.unableToCreateUnmarshaller(e);
     }
   }
 
@@ -211,10 +267,18 @@ public class DomXmlDataFormat implements DataFormat {
 
   public static DocumentBuilderFactory defaultDocumentBuilderFactory() {
     DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+
     documentBuilderFactory.setNamespaceAware(true);
+    LOG.documentBuilderFactoryConfiguration("namespaceAware", "true");
+
     documentBuilderFactory.setValidating(false);
+    LOG.documentBuilderFactoryConfiguration("validating", "false");
+
     documentBuilderFactory.setIgnoringComments(true);
+    LOG.documentBuilderFactoryConfiguration("ignoringComments", "true");
+
     documentBuilderFactory.setIgnoringElementContentWhitespace(false);
+    LOG.documentBuilderFactoryConfiguration("ignoringElementContentWhitespace", "false");
 
     return documentBuilderFactory;
   }
@@ -238,7 +302,7 @@ public class DomXmlDataFormat implements DataFormat {
       return cl.loadClass(classname);
     }
     catch (ClassNotFoundException e) {
-      throw new RuntimeException(e);
+      throw LOG.classNotFound(classname, e);
     }
   }
 

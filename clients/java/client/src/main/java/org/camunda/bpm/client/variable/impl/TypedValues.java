@@ -15,6 +15,7 @@ package org.camunda.bpm.client.variable.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.camunda.bpm.client.impl.ExternalTaskClientLogger;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.impl.value.UntypedValueImpl;
@@ -22,6 +23,8 @@ import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 public class TypedValues {
+
+  protected static final ExternalTaskClientLogger LOG = ExternalTaskClientLogger.CLIENT_LOGGER;
 
   protected ValueMappers serializers;
 
@@ -43,9 +46,14 @@ public class TypedValues {
           variableValue = variables.get(variableName);
         }
 
-        TypedValue typedValue = createTypedValue(variableValue);
-        TypedValueField typedValueField = toTypedValueField(typedValue);
-        result.put(variableName, typedValueField);
+        try {
+          TypedValue typedValue = createTypedValue(variableValue);
+          TypedValueField typedValueField = toTypedValueField(typedValue);
+          result.put(variableName, typedValueField);
+        }
+        catch (Throwable e) {
+          LOG.cannotSerializeVariable(variableName, e);
+        }
       }
 
     }

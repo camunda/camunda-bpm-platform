@@ -12,6 +12,9 @@
  */
 package org.camunda.bpm.client.impl;
 
+import java.io.IOException;
+import java.util.Collection;
+
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpResponseException;
 import org.camunda.bpm.client.exception.ConnectionLostException;
@@ -20,11 +23,15 @@ import org.camunda.bpm.client.exception.NotAcquiredException;
 import org.camunda.bpm.client.exception.NotFoundException;
 import org.camunda.bpm.client.exception.NotResumedException;
 import org.camunda.bpm.client.exception.ValueMapperException;
+import org.camunda.bpm.client.spi.DataFormat;
+import org.camunda.bpm.client.spi.DataFormatConfigurator;
+import org.camunda.bpm.client.spi.DataFormatProvider;
 import org.camunda.bpm.client.topic.impl.TopicSubscriptionManagerLogger;
+import org.camunda.bpm.client.variable.impl.format.json.JacksonJsonLogger;
+import org.camunda.bpm.client.variable.impl.format.serializable.SerializableLogger;
+import org.camunda.bpm.client.variable.impl.format.xml.DomXmlLogger;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.camunda.commons.logging.BaseLogger;
-
-import java.io.IOException;
 
 /**
  * @author Tassilo Weidner
@@ -42,6 +49,15 @@ public class ExternalTaskClientLogger extends BaseLogger {
 
   public static final TopicSubscriptionManagerLogger TOPIC_SUBSCRIPTION_MANAGER_LOGGER =
     createLogger(TopicSubscriptionManagerLogger.class, PROJECT_CODE, PROJECT_LOGGER, "03");
+
+  public static final DomXmlLogger XML_FORMAT_LOGGER =
+      createLogger(DomXmlLogger.class, PROJECT_CODE, PROJECT_LOGGER, "04");
+
+  public static final JacksonJsonLogger JSON_FORMAT_LOGGER =
+      createLogger(JacksonJsonLogger.class, PROJECT_CODE, PROJECT_LOGGER, "05");
+
+  public static final SerializableLogger SERIALIZABLE_FORMAT_LOGGER =
+      createLogger(SerializableLogger.class, PROJECT_CODE, PROJECT_LOGGER, "06");
 
   protected void logError(String id, String messageTemplate, Throwable t) {
     if (delegateLogger.isErrorEnabled()) {
@@ -62,9 +78,8 @@ public class ExternalTaskClientLogger extends BaseLogger {
       "001", "Base URL cannot be null or an empty string"));
   }
 
-  protected ExternalTaskClientException cannotGetHostnameException() {
-    return new ExternalTaskClientException(exceptionMessage(
-      "002", "Cannot get hostname"));
+  protected ExternalTaskClientException cannotGetHostnameException(Throwable cause) {
+    return new ExternalTaskClientException(exceptionMessage("002", "Cannot get hostname"), cause);
   }
 
   public ExternalTaskClientException topicNameNullException() {
@@ -72,9 +87,9 @@ public class ExternalTaskClientLogger extends BaseLogger {
       "003", "Topic name cannot be null"));
   }
 
-  public ExternalTaskClientException lockDurationIsNotGreaterThanZeroException() {
+  public ExternalTaskClientException lockDurationIsNotGreaterThanZeroException(Long lockDuration) {
     return new ExternalTaskClientException(exceptionMessage(
-      "004", "Lock duration is not greater than 0"));
+      "004", "Lock duration must be greater than 0, but was '{}'", lockDuration));
   }
 
   public ExternalTaskClientException externalTaskHandlerNullException() {
@@ -82,9 +97,9 @@ public class ExternalTaskClientLogger extends BaseLogger {
       "005", "External task handler cannot be null"));
   }
 
-  public ExternalTaskClientException topicNameAlreadySubscribedException() {
+  public ExternalTaskClientException topicNameAlreadySubscribedException(String topicName) {
     return new ExternalTaskClientException(exceptionMessage(
-      "006", "Topic name has already been subscribed"));
+      "006", "Topic name '{}' has already been subscribed", topicName));
   }
 
   public ExternalTaskClientException externalTaskServiceException(String actionName, EngineClientException e) {
@@ -123,29 +138,19 @@ public class ExternalTaskClientLogger extends BaseLogger {
       "013", "Interceptor cannot be null"));
   }
 
-  public ExternalTaskClientException maxTasksNotGreaterThanZeroException() {
+  public ExternalTaskClientException maxTasksNotGreaterThanZeroException(Integer maxTasks) {
     return new ExternalTaskClientException(exceptionMessage(
-      "014", "Maximum amount of fetched tasks must be greater than zero"));
+      "014", "Maximum amount of fetched tasks must be greater than zero, bus was '{}'", maxTasks));
   }
 
-  public ExternalTaskClientException asyncResponseTimeoutNotGreaterThanZeroException() {
+  public ExternalTaskClientException asyncResponseTimeoutNotGreaterThanZeroException(Long asyncResponseTimeout) {
     return new ExternalTaskClientException(exceptionMessage(
-      "015", "Asynchronous response timeout must be greater than zero"));
+      "015", "Asynchronous response timeout must be greater than zero, but was '{}'", asyncResponseTimeout));
   }
 
-  public void spinNotAvailable(Exception e) {
-    logInfo(
-      "016", "Spin dependency not available", e);
-  }
-
-  public void spinDetected() {
-    logInfo(
-      "017", "Spin dependency detected");
-  }
-
-  public ValueMapperException valueMapperExceptionWhileParsingDate(Exception e) {
+  public ValueMapperException valueMapperExceptionWhileParsingDate(String date, Exception e) {
     return new ValueMapperException(exceptionMessage(
-      "018", "Exception while mapping value: Cannot parse variable of type date"), e);
+      "018", "Exception while mapping value: Cannot parse date '{}'", date), e);
   }
 
   public ValueMapperException valueMapperExceptionDueToNoObjectTypeName() {
@@ -156,17 +161,17 @@ public class ExternalTaskClientLogger extends BaseLogger {
 
   public ValueMapperException valueMapperExceptionWhileSerializingObject(Exception e) {
     return new ValueMapperException(exceptionMessage(
-      "020", "Exception while mapping value: Cannot serialize object in variable: "), e);
+      "020", "Exception while mapping value: Cannot serialize object in variable."), e);
   }
 
   public ValueMapperException valueMapperExceptionWhileDeserializingObject(Exception e) {
     return new ValueMapperException(exceptionMessage(
-      "021", "Exception while mapping value: Cannot deserialize object in variable: "), e);
+      "021", "Exception while mapping value: Cannot deserialize object in variable."), e);
   }
 
   public ValueMapperException valueMapperExceptionWhileSerializingAbstractValue(String name) {
     return new ValueMapperException(exceptionMessage(
-      "022", "Cannot serialize value of abstract type {}", name));
+      "022", "Cannot serialize value of abstract type '{}'", name));
   }
 
   public ValueMapperException valueMapperExceptionDueToSerializerNotFoundForTypedValue(TypedValue typedValue) {
@@ -179,4 +184,38 @@ public class ExternalTaskClientLogger extends BaseLogger {
       "024", "Cannot find serializer for value '{}'", value));
   }
 
+  public ValueMapperException cannotSerializeVariable(String variableName, Throwable e) {
+    return new ValueMapperException(exceptionMessage("025", "Cannot serialize variable '{}'", variableName), e); 
+  }
+
+  public void logDataFormats(Collection<DataFormat> formats) {
+    if (isInfoEnabled()) {
+      for (DataFormat format : formats) {
+        logDataFormat(format);
+      }
+    }
+  }
+
+  protected void logDataFormat(DataFormat dataFormat) {
+    logInfo("025", "Discovered data format: {}[name = {}]", dataFormat.getClass().getName(), dataFormat.getName());
+  }
+
+  public void logDataFormatProvider(DataFormatProvider provider) {
+    if (isInfoEnabled()) {
+      logInfo("026", "Discovered data format provider: {}[name = {}]",
+          provider.getClass().getName(), provider.getDataFormatName());
+    }
+  }
+
+  @SuppressWarnings("rawtypes")
+  public void logDataFormatConfigurator(DataFormatConfigurator configurator) {
+    if (isInfoEnabled()) {
+      logInfo("027", "Discovered data format configurator: {}[dataformat = {}]",
+          configurator.getClass(), configurator.getDataFormatClass().getName());
+    }
+  }
+
+  public ExternalTaskClientException multipleProvidersForDataformat(String dataFormatName) {
+    return new ExternalTaskClientException(exceptionMessage("028", "Multiple providers found for dataformat '{}'", dataFormatName));
+  }
 }

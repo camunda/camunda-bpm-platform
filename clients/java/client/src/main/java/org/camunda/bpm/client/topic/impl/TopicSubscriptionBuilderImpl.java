@@ -67,7 +67,7 @@ public class TopicSubscriptionBuilderImpl implements TopicSubscriptionBuilder {
     }
 
     if (lockDuration != null && lockDuration <= 0L) {
-      throw LOG.lockDurationIsNotGreaterThanZeroException();
+      throw LOG.lockDurationIsNotGreaterThanZeroException(lockDuration);
     }
 
     if (externalTaskHandler == null) {

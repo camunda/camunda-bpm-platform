@@ -23,12 +23,13 @@ public class TopicSubscriptionManagerLogger extends ExternalTaskClientLogger {
 
   protected void exceptionWhilePerformingFetchAndLock(EngineClientException e) {
     logError(
-      "001", "Exception while fetch and lock tasks:", e);
+      "001", "Exception while fetch and lock task.:", e);
   }
 
-  protected void exceptionWhileExecutingExternalTaskHandler(Throwable e) {
+  protected void exceptionWhileExecutingExternalTaskHandler(String topicName, Throwable e) {
     logError(
-      "002", "Exception while executing external task handler:", e);
+      "002",
+      String.format("Exception while executing external task handler '%s'.", topicName), e);
   }
 
   protected void exceptionWhileShuttingDown(InterruptedException e) {
@@ -36,24 +37,26 @@ public class TopicSubscriptionManagerLogger extends ExternalTaskClientLogger {
       "003", "Exception while shutting down:", e);
   }
 
-  protected void exceptionOnExternalTaskServiceMethodInvocation(ExternalTaskClientException e) {
+  protected void exceptionOnExternalTaskServiceMethodInvocation(String topicName, ExternalTaskClientException e) {
     logError(
-      "004", "Exception on external task service method invocation:", e);
+      "004",
+      String.format("Exception on external task service method invocation for topic '%s':", topicName), e);
   }
 
   protected void exceptionWhileExecutingBackoffStrategyMethod(Throwable e) {
     logError(
-      "005", "Exception while executing back off strategy method:", e);
+      "005", "Exception while executing back off strategy method.", e);
   }
 
   protected void exceptionWhileAcquiringTasks(Throwable e) {
     logError(
-      "006", "Exception while acquiring tasks:", e);
+      "006", "Exception while acquiring tasks.", e);
   }
 
-  protected void taskHandlerIsNull() {
+  protected void taskHandlerIsNull(String topicName) {
     logError(
-      "007", "Task handler is null");
+      "007",
+      String.format("Task handler is null for topic '%s'.", topicName));
   }
 
 }

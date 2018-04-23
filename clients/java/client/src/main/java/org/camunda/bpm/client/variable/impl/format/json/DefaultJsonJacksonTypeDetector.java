@@ -12,9 +12,11 @@
  */
 package org.camunda.bpm.client.variable.impl.format.json;
 
+import org.camunda.bpm.client.variable.impl.format.TypeDetector;
+
 import com.fasterxml.jackson.databind.type.TypeFactory;
 
-public class DefaultJsonJacksonTypeDetector extends AbstractJacksonJsonTypeDetector {
+public class DefaultJsonJacksonTypeDetector implements TypeDetector {
 
   public boolean canHandle(Object object) {
     return true;

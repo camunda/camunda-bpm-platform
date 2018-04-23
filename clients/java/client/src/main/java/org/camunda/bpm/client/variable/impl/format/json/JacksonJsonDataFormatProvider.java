@@ -24,7 +24,7 @@ public class JacksonJsonDataFormatProvider implements DataFormatProvider {
   }
 
   public DataFormat createInstance() {
-    return new JacksonJsonDataFormat();
+    return new JacksonJsonDataFormat(JSON.getName());
   }
 
 }

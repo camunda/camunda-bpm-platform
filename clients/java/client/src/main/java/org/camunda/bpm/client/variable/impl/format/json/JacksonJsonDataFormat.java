@@ -14,30 +14,42 @@ package org.camunda.bpm.client.variable.impl.format.json;
 
 import static org.camunda.commons.utils.EnsureUtil.ensureNotNull;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.camunda.bpm.client.impl.ExternalTaskClientLogger;
 import org.camunda.bpm.client.spi.DataFormat;
 import org.camunda.bpm.client.variable.impl.format.TypeDetector;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 
 public class JacksonJsonDataFormat implements DataFormat {
 
+  private static final JacksonJsonLogger LOG = ExternalTaskClientLogger.JSON_FORMAT_LOGGER;
+
+  protected String name;
   protected ObjectMapper objectMapper;
   protected List<TypeDetector> typeDetectors;
 
-  public JacksonJsonDataFormat() {
-    this(new ObjectMapper());
+  public JacksonJsonDataFormat(String name) {
+    this(name, new ObjectMapper());
   }
 
-  public JacksonJsonDataFormat(ObjectMapper objectMapper) {
+  public JacksonJsonDataFormat(String name, ObjectMapper objectMapper) {
     this.objectMapper = objectMapper;
     this.typeDetectors = new ArrayList<TypeDetector>();
     this.typeDetectors.add(new ListJacksonJsonTypeDetector());
     this.typeDetectors.add(new DefaultJsonJacksonTypeDetector());
+  }
+
+  public String getName() {
+    return name;
   }
 
   public ObjectMapper getObjectMapper() {
@@ -57,12 +69,17 @@ public class JacksonJsonDataFormat implements DataFormat {
     }
   }
 
-  public String writeValue(Object value) throws Exception {
-    return objectMapper.writeValueAsString(value);
+  public String writeValue(Object value) {
+    try {
+      return objectMapper.writeValueAsString(value);
+    }
+    catch (JsonProcessingException e) {
+      throw LOG.unableToWriteValue(value, e);
+    }
   }
 
   @SuppressWarnings("unchecked")
-  public <T> T readValue(String value, String typeIdentifier) throws Exception {
+  public <T> T readValue(String value, String typeIdentifier) {
     try {
       Class<?> cls = Class.forName(typeIdentifier);
       return (T) readValue(value, cls);
@@ -73,19 +90,42 @@ public class JacksonJsonDataFormat implements DataFormat {
     }
   }
 
-  public <T> T readValue(String value, Class<T> cls) throws Exception {
-    return objectMapper.readValue(value, cls);
+  public <T> T readValue(String value, Class<T> cls) {
+    try {
+      return objectMapper.readValue(value, cls);
+    }
+    catch (JsonParseException e) {
+      throw LOG.unableToReadValue(value, e);
+    }
+    catch (JsonMappingException e) {
+      throw LOG.unableToReadValue(value, e);
+    }
+    catch (IOException e) {
+      throw LOG.unableToReadValue(value, e);
+    }
   }
 
-  protected <C> C readValue(String value, JavaType type) throws Exception {
-    return objectMapper.readValue(value, type);
+  protected <C> C readValue(String value, JavaType type) {
+    try {
+      return objectMapper.readValue(value, type);
+    }
+    catch (JsonParseException e) {
+      throw LOG.unableToReadValue(value, e);
+    }
+    catch (JsonMappingException e) {
+      throw LOG.unableToReadValue(value, e);
+    }
+    catch (IOException e) {
+      throw LOG.unableToReadValue(value, e);
+    }
   }
 
   public JavaType constructJavaTypeFromCanonicalString(String canonicalString) {
     try {
       return TypeFactory.defaultInstance().constructFromCanonical(canonicalString);
-    } catch (IllegalArgumentException e) {
-      throw new RuntimeException(e);
+    }
+    catch (IllegalArgumentException e) {
+      throw LOG.unableToConstructJavaType(canonicalString, e);
     }
   }
 
@@ -98,8 +138,7 @@ public class JacksonJsonDataFormat implements DataFormat {
       }
     }
 
-    // TODO
-    throw new RuntimeException();
+    throw LOG.unableToDetectCanonicalType(value);
   }
 
 }

@@ -54,7 +54,8 @@ public class JavaObjectMapper extends AbstractTypedValueMapper<ObjectValue> {
       if(objectToSerialize != null) {
         try {
           serializedStringValue = dataFormat.writeValue(objectToSerialize);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
           throw LOG.valueMapperExceptionWhileSerializingObject(e);
         }
       }
@@ -74,7 +75,8 @@ public class JavaObjectMapper extends AbstractTypedValueMapper<ObjectValue> {
         try {
           String objectTypeName = readObjectNameFromFields(value);
           deserializedObject = dataFormat.readValue(serializedStringValue, objectTypeName);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
           throw LOG.valueMapperExceptionWhileDeserializingObject(e);
         }
       }

@@ -24,7 +24,7 @@ public class SerializableDataFormatProvider implements DataFormatProvider {
   }
 
   public DataFormat createInstance() {
-    return new SerializableDataFormat();
+    return new SerializableDataFormat(JAVA.getName());
   }
 
 }

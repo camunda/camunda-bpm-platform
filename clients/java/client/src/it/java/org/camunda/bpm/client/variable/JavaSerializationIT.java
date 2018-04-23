@@ -14,6 +14,7 @@ package org.camunda.bpm.client.variable;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.client.rule.ClientRule.LOCK_DURATION;
+import static org.camunda.bpm.client.util.ProcessModels.EXTERNAL_TASK_TOPIC_BAR;
 import static org.camunda.bpm.client.util.ProcessModels.EXTERNAL_TASK_TOPIC_FOO;
 import static org.camunda.bpm.client.util.ProcessModels.TWO_EXTERNAL_TASK_PROCESS;
 import static org.camunda.bpm.client.util.PropertyUtil.CAMUNDA_ENGINE_NAME;
@@ -23,6 +24,7 @@ import static org.camunda.bpm.client.util.PropertyUtil.loadProperties;
 import static org.camunda.bpm.engine.variable.Variables.SerializationDataFormats.JAVA;
 import static org.camunda.bpm.engine.variable.type.ValueType.OBJECT;
 
+import java.util.Map;
 import java.util.Properties;
 
 import org.camunda.bpm.client.ExternalTaskClient;
@@ -31,7 +33,10 @@ import org.camunda.bpm.client.dto.ProcessInstanceDto;
 import org.camunda.bpm.client.rule.ClientRule;
 import org.camunda.bpm.client.rule.EngineRule;
 import org.camunda.bpm.client.task.ExternalTask;
+import org.camunda.bpm.client.task.ExternalTaskService;
 import org.camunda.bpm.client.util.RecordingExternalTaskHandler;
+import org.camunda.bpm.client.util.RecordingInvocationHandler;
+import org.camunda.bpm.client.util.RecordingInvocationHandler.RecordedInvocation;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.junit.Before;
@@ -45,9 +50,9 @@ public class JavaSerializationIT {
   protected static final String ENGINE_NAME = "/engine/another-engine";
   protected static final String VARIABLE_NAME_JAVA = "javaVariable";
 
-  protected static final JavaSerializable VARIABLE_VALUE_JAVA_DESIALIZED = new JavaSerializable("a String", 42, true);
+  protected static final JavaSerializable VARIABLE_VALUE_JAVA_DESERIALIZED = new JavaSerializable("a String", 42, true);
 
-  protected static final String VARIABLE_VALUE_JAVA_SERIALIZED = VARIABLE_VALUE_JAVA_DESIALIZED.toExpectedByteArrayString();
+  protected static final String VARIABLE_VALUE_JAVA_SERIALIZED = VARIABLE_VALUE_JAVA_DESERIALIZED.toExpectedByteArrayString();
 
   protected static final ObjectValue VARIABLE_VALUE_JAVA_OBJECT_VALUE = Variables
       .serializedObjectValue(VARIABLE_VALUE_JAVA_SERIALIZED)
@@ -81,12 +86,15 @@ public class JavaSerializationIT {
   protected ProcessInstanceDto processInstance;
 
   protected RecordingExternalTaskHandler handler = new RecordingExternalTaskHandler();
+  protected RecordingInvocationHandler invocationHandler = new RecordingInvocationHandler();
 
   @Before
   public void setup() throws Exception {
     client = clientRule.client();
-    handler.clear();
     processDefinition = engineRule.deploy(TWO_EXTERNAL_TASK_PROCESS).get(0);
+
+    handler.clear();
+    invocationHandler.clear();
   }
 
   @Test
@@ -105,7 +113,7 @@ public class JavaSerializationIT {
     ExternalTask task = handler.getHandledTasks().get(0);
 
     JavaSerializable variableValue = task.getVariable(VARIABLE_NAME_JAVA);
-    assertThat(variableValue).isEqualTo(VARIABLE_VALUE_JAVA_DESIALIZED);
+    assertThat(variableValue).isEqualTo(VARIABLE_VALUE_JAVA_DESERIALIZED);
   }
 
   @Test
@@ -124,7 +132,7 @@ public class JavaSerializationIT {
     ExternalTask task = handler.getHandledTasks().get(0);
 
     ObjectValue typedValue = task.getVariableTyped(VARIABLE_NAME_JAVA);
-    assertThat(typedValue.getValue()).isEqualTo(VARIABLE_VALUE_JAVA_DESIALIZED);
+    assertThat(typedValue.getValue()).isEqualTo(VARIABLE_VALUE_JAVA_DESERIALIZED);
     assertThat(typedValue.getObjectTypeName()).isEqualTo(JavaSerializable.class.getName());
     assertThat(typedValue.getType()).isEqualTo(OBJECT);
     assertThat(typedValue.isDeserialized()).isTrue();
@@ -252,4 +260,95 @@ public class JavaSerializationIT {
     assertThat(typedValue.isDeserialized()).isTrue();
   }
 
+  @Test
+  public void shoudSetVariableTyped() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // when
+    Map<String, Object> variables = Variables.createVariables();
+    variables.put(VARIABLE_NAME_JAVA, Variables.objectValue(VARIABLE_VALUE_JAVA_DESERIALIZED).serializationDataFormat(JAVA).create());
+    fooService.complete(fooTask, variables);
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    ObjectValue serializedValue = task.getVariableTyped(VARIABLE_NAME_JAVA, false);
+    assertThat(serializedValue.isDeserialized()).isFalse();
+    assertThat(serializedValue.getValueSerialized()).isEqualTo(VARIABLE_VALUE_JAVA_SERIALIZED);
+    assertThat(serializedValue.getType()).isEqualTo(OBJECT);
+    assertThat(serializedValue.getObjectTypeName()).isEqualTo(JavaSerializable.class.getName());
+
+    ObjectValue deserializedValue = task.getVariableTyped(VARIABLE_NAME_JAVA);
+    assertThat(deserializedValue.isDeserialized()).isTrue();
+    assertThat(deserializedValue.getValue()).isEqualTo(VARIABLE_VALUE_JAVA_DESERIALIZED);
+    assertThat(deserializedValue.getType()).isEqualTo(OBJECT);
+    assertThat(deserializedValue.getObjectTypeName()).isEqualTo(JavaSerializable.class.getName());
+
+    JavaSerializable variableValue = task.getVariable(VARIABLE_NAME_JAVA);
+    assertThat(variableValue).isEqualTo(VARIABLE_VALUE_JAVA_DESERIALIZED);
+  }
+
+  @Test
+  public void shoudSetVariableTyped_Null() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // when
+    Map<String, Object> variables = Variables.createVariables();
+    variables.put(VARIABLE_NAME_JAVA, Variables.objectValue(null)
+        .serializationDataFormat(JAVA)
+        .create());
+    fooService.complete(fooTask, variables);
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    ObjectValue serializedValue = task.getVariableTyped(VARIABLE_NAME_JAVA, false);
+    assertThat(serializedValue.isDeserialized()).isFalse();
+    assertThat(serializedValue.getValueSerialized()).isNull();
+    assertThat(serializedValue.getType()).isEqualTo(OBJECT);
+    assertThat(serializedValue.getObjectTypeName()).isNull();
+
+    ObjectValue deserializedValue = task.getVariableTyped(VARIABLE_NAME_JAVA);
+    assertThat(deserializedValue.isDeserialized()).isTrue();
+    assertThat(deserializedValue.getValue()).isNull();
+    assertThat(deserializedValue.getType()).isEqualTo(OBJECT);
+    assertThat(deserializedValue.getObjectTypeName()).isNull();
+
+    JavaSerializable variableValue = task.getVariable(VARIABLE_NAME_JAVA);
+    assertThat(variableValue).isNull();
+  }
 }

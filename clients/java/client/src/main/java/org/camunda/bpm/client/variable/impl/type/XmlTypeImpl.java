@@ -22,8 +22,10 @@ public class XmlTypeImpl extends PrimitiveValueTypeImpl {
 
   private static final long serialVersionUID = 1L;
 
+  public static final String XML_TYPE_NAME = "xml";
+
   public XmlTypeImpl() {
-    super("xml", String.class);
+    super(XML_TYPE_NAME, String.class);
   }
 
   public XmlValue createValue(Object value, Map<String, Object> valueInfo) {

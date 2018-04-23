@@ -15,10 +15,12 @@ package org.camunda.bpm.client.variable.impl.format.json;
 import java.lang.reflect.TypeVariable;
 import java.util.List;
 
+import org.camunda.bpm.client.variable.impl.format.TypeDetector;
+
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 
-public class ListJacksonJsonTypeDetector extends AbstractJacksonJsonTypeDetector {
+public class ListJacksonJsonTypeDetector implements TypeDetector {
 
   public boolean canHandle(Object object) {
     return object instanceof List;

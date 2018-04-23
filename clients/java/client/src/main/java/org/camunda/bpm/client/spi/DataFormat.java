@@ -12,16 +12,58 @@
  */
 package org.camunda.bpm.client.spi;
 
+/**
+ * Maps a java object to the data format's internal representation and vice versa.
+ */
 public interface DataFormat {
 
+  /**
+   * Returns the data format name.
+   */
+  String getName();
+
+  /**
+   * Returns true if this data format can map the provided Java Object.
+   *
+   * @param parameter the java object to check
+   * @return true if this object can be mapped.
+   */
   public boolean canMap(Object value);
 
-  public String writeValue(Object value) throws Exception;
+  /**
+   * Writes a java object to a data format's internal data representation.
+   *
+   * @param value object that is written into internal data representation
+   * @return the data format's internal representation of that object
+   */
+  public String writeValue(Object value);
 
-  public <T> T readValue(String value, String typeIdentifier) throws Exception;
+  /**
+   * Reads the internal representation of a data format to a java object of the
+   * desired class.
+   *
+   * @param value the object to be read
+   * @param typeIdentifier the class to map the object to
+   * @return a java object of the specified class that was populated with the input
+   * parameter
+   */
+  public <T> T readValue(String value, String typeIdentifier);
 
-  public <T> T readValue(String value, Class<T> cls) throws Exception;
+  /**
+   * Reads the internal representation of a data format to a java object of the
+   * desired class.
+   *
+   * @param value the object to be read
+   * @param cls a data-format-specific type identifier that describes
+   *   the class to map to
+   * @return a java object of the specified class that was populated with the input
+   * parameter
+   */
+  public <T> T readValue(String value, Class<T> cls);
 
+  /**
+   * Returns a data-format-specific canonical type name.
+   */
   String getCanonicalTypeName(Object value);
 
 }

@@ -99,7 +99,7 @@ public class TopicSubscriptionManager implements Runnable {
           handleExternalTask(externalTask, taskHandler);
         }
         else {
-          LOG.taskHandlerIsNull();
+          LOG.taskHandlerIsNull(topicName);
         }
       });
 
@@ -133,9 +133,9 @@ public class TopicSubscriptionManager implements Runnable {
     try {
       taskHandler.execute(task, service);
     } catch (ExternalTaskClientException e) {
-      LOG.exceptionOnExternalTaskServiceMethodInvocation(e);
+      LOG.exceptionOnExternalTaskServiceMethodInvocation(task.getTopicName(), e);
     } catch (Throwable e) {
-      LOG.exceptionWhileExecutingExternalTaskHandler(e);
+      LOG.exceptionWhileExecutingExternalTaskHandler(task.getTopicName(), e);
     }
   }
 
@@ -185,7 +185,7 @@ public class TopicSubscriptionManager implements Runnable {
   protected void checkTopicNameAlreadySubscribed(String topicName) {
     subscriptions.forEach(subscription -> {
       if (subscription.getTopicName().equals(topicName)) {
-        throw LOG.topicNameAlreadySubscribedException();
+        throw LOG.topicNameAlreadySubscribedException(topicName);
       }
     });
   }
