@@ -3167,6 +3167,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     this.externalTaskCreatedListeners.add(externalTaskCreatedListener);
   }
 
+  public void removeExternalTaskCreatedListener(ExternalTaskCreatedListener externalTaskCreatedListener) {
+      this.externalTaskCreatedListeners.remove(externalTaskCreatedListener);
+  }
+
   public void notifyExternalTaskCreatedListeners() {
     for (ExternalTaskCreatedListener externalTaskCreatedListener : externalTaskCreatedListeners) {
       externalTaskCreatedListener.onExternalTaskCreated();

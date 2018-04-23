@@ -29,8 +29,10 @@ import org.camunda.bpm.engine.rest.spi.FetchAndLockHandler;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.Response.Status;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -44,6 +46,7 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler, E
 
   protected BlockingQueue<FetchAndLockRequest> queue = new ArrayBlockingQueue<FetchAndLockRequest>(200);
   protected List<FetchAndLockRequest> pendingRequests = new ArrayList<FetchAndLockRequest>();
+  protected Set<ProcessEngine> processEngines = new HashSet<ProcessEngine>();
 
   protected final Object MONITOR = new Object();
   protected Thread handlerThread = new Thread(this, this.getClass().getSimpleName());
@@ -116,6 +119,7 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler, E
       if (isWaiting) {
         MONITOR.notifyAll();
       }
+      unregisterExternalTaskListeners();
     }
   }
 
@@ -155,10 +159,8 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler, E
       errorTooManyRequests(asyncResponse);
     }
 
-    // Listen for new ExternalTasks
-    ((ProcessEngineConfigurationImpl)request.getProcessEngine()
-      .getProcessEngineConfiguration())
-      .addExternalTaskCreatedListener(this);
+    // Listen for new ExternalTasks from the process engines
+    registerExternalTaskListener(request.getProcessEngine());
 
     notifyAcquisition();
   }
@@ -260,4 +262,19 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler, E
     return pendingRequests;
   }
 
+  protected void registerExternalTaskListener(ProcessEngine processEngine) {
+    if (!processEngines.contains(processEngine)) {
+      // register listener at a new process engine
+      ((ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration())
+        .addExternalTaskCreatedListener(this);
+      processEngines.add(processEngine);
+    }
+  }
+
+  protected void unregisterExternalTaskListeners() {
+    for (ProcessEngine processEngine : processEngines) {
+      ((ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration())
+        .removeExternalTaskCreatedListener(this);
+    }
+  }
 }

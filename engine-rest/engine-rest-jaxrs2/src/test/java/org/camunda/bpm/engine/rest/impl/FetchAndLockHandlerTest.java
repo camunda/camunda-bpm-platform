@@ -347,6 +347,22 @@ public class FetchAndLockHandlerTest {
     assertThat(argumentCaptor.getValue().getMessage(), is("Request rejected due to shutdown of application server."));
   }
 
+  @Test
+  public void shouldDeregisterListenersDueToShutdown() {
+    // given
+    doReturn(Collections.emptyList()).when(fetchTopicBuilder).execute();
+
+    AsyncResponse asyncResponse = mock(AsyncResponse.class);
+    handler.addPendingRequest(createDto(5000L), asyncResponse, processEngine);
+    handler.acquire();
+
+    // when
+    handler.shutdown();
+
+    // then
+    verify(handler).unregisterExternalTaskListeners();
+  }
+
   protected FetchExternalTasksExtendedDto createDto(Long responseTimeout) {
     FetchExternalTasksExtendedDto externalTask = new FetchExternalTasksExtendedDto();
 
