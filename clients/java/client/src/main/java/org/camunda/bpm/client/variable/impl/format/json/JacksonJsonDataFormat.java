@@ -42,6 +42,7 @@ public class JacksonJsonDataFormat implements DataFormat {
   }
 
   public JacksonJsonDataFormat(String name, ObjectMapper objectMapper) {
+    this.name = name;
     this.objectMapper = objectMapper;
     this.typeDetectors = new ArrayList<TypeDetector>();
     this.typeDetectors.add(new ListJacksonJsonTypeDetector());
