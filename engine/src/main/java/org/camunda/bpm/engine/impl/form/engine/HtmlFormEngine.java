@@ -120,13 +120,10 @@ public class HtmlFormEngine implements FormEngine {
   protected static final String OPEN_DATEPICKER_SNIPPET = "$scope.open%s = function ($event) { $event.preventDefault(); $event.stopPropagation(); $scope.dateFieldOpened%s = true; };";
   protected static final String OPEN_DATEPICKER_FUNCTION_SNIPPET = "open%s($event)";
 
-  /* date format */
-  protected static final String DATE_FORMAT = "dd/MM/yyyy";
-
   /* messages */
   protected static final String REQUIRED_FIELD_MESSAGE = "Required field";
   protected static final String TYPE_FIELD_MESSAGE = "Only a %s value is allowed";
-  protected static final String INVALID_DATE_FIELD_MESSAGE = "Invalid date format: the date should have the pattern '" + DATE_FORMAT + "'";
+  protected static final String INVALID_DATE_FIELD_MESSAGE = "Invalid date format: the date should have the pattern ";
 
   public String getName() {
     return "html";
@@ -239,9 +236,10 @@ public class HtmlFormEngine implements FormEngine {
     // input field
     HtmlElementWriter inputField = createInputField(formField);
 
+    String dateFormat = (String) formField.getType().getInformation("datePattern");
     if(!isReadOnly) {
       inputField
-          .attribute(DATEPICKER_POPUP_ATTRIBUTE, DATE_FORMAT)
+          .attribute(DATEPICKER_POPUP_ATTRIBUTE, dateFormat)
           .attribute(IS_OPEN_ATTRIBUTE, String.format(DATE_FIELD_OPENED_ATTRIBUTE, formFieldId));
     }
 
@@ -436,7 +434,7 @@ public class HtmlFormEngine implements FormEngine {
     secondDivElement
         .attribute(NG_SHOW_ATTRIBUTE, secondExpression)
         .attribute(CLASS_ATTRIBUTE, HELP_BLOCK_CLASS)
-        .textContent(INVALID_DATE_FIELD_MESSAGE);
+        .textContent(INVALID_DATE_FIELD_MESSAGE+"'" + (String) formField.getType().getInformation("datePattern") + "'");
 
     documentBuilder
         .startElement(secondDivElement)
