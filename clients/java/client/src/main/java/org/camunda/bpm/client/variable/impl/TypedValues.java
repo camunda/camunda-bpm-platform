@@ -52,7 +52,7 @@ public class TypedValues {
           result.put(variableName, typedValueField);
         }
         catch (Throwable e) {
-          LOG.cannotSerializeVariable(variableName, e);
+          throw LOG.cannotSerializeVariable(variableName, e);
         }
       }
 

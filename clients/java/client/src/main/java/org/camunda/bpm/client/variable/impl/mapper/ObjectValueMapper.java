@@ -29,14 +29,14 @@ import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.bpm.engine.variable.value.SerializableValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
-public class JavaObjectMapper extends AbstractTypedValueMapper<ObjectValue> {
+public class ObjectValueMapper extends AbstractTypedValueMapper<ObjectValue> {
 
   protected static final ExternalTaskClientLogger LOG = ExternalTaskClientLogger.CLIENT_LOGGER;
 
   protected DataFormat dataFormat;
   protected String serializationDataFormat;
 
-  public JavaObjectMapper(String serializationDataFormat, DataFormat dataFormat) {
+  public ObjectValueMapper(String serializationDataFormat, DataFormat dataFormat) {
     super(OBJECT);
     this.serializationDataFormat = serializationDataFormat;
     this.dataFormat = dataFormat;

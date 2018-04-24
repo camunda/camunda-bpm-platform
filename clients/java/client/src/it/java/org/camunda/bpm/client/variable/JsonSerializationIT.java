@@ -753,4 +753,35 @@ public class JsonSerializationIT {
     assertThat(variableValue).isEqualTo(variable);
   }
 
+  @Test
+  public void shouldFailWithMapperNotFound() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // then
+    thrown.expect(ValueMapperException.class);
+
+    // when
+    Map<String, Object> variables = Variables.createVariables();
+    ObjectValue objectValue = Variables.objectValue(VARIABLE_VALUE_JSON_DESERIALIZED)
+        .serializationDataFormat("not existing data format")
+        .create();
+    variables.put(VARIABLE_NAME_JSON, objectValue);
+    fooService.complete(fooTask, variables);
+  }
+
 }

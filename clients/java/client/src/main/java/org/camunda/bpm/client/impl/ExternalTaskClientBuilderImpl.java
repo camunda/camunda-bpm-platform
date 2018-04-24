@@ -39,7 +39,7 @@ import org.camunda.bpm.client.variable.impl.mapper.ByteArrayValueMapper;
 import org.camunda.bpm.client.variable.impl.mapper.DateValueMapper;
 import org.camunda.bpm.client.variable.impl.mapper.DoubleValueMapper;
 import org.camunda.bpm.client.variable.impl.mapper.IntegerValueMapper;
-import org.camunda.bpm.client.variable.impl.mapper.JavaObjectMapper;
+import org.camunda.bpm.client.variable.impl.mapper.ObjectValueMapper;
 import org.camunda.bpm.client.variable.impl.mapper.JsonValueMapper;
 import org.camunda.bpm.client.variable.impl.mapper.LongValueMapper;
 import org.camunda.bpm.client.variable.impl.mapper.NullValueMapper;
@@ -225,7 +225,7 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
     // object
     Map<String, DataFormat> dataFormats = lookupDataFormats();
     dataFormats.forEach((key, format) -> {
-      valueMappers.addMapper(new JavaObjectMapper(key, format));
+      valueMappers.addMapper(new ObjectValueMapper(key, format));
     });
 
     // json/xml

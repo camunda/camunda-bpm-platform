@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -285,6 +286,12 @@ public class EngineRule extends ExternalResource {
   }
 
   public VariableInstanceDto getVariableByProcessInstanceId(String processInstanceId, String varName) {
+    List<VariableInstanceDto> variables = getVariablesByProcessInstanceIdAndVariableName(processInstanceId, varName);
+    assertThat(variables).hasSize(1);
+    return (VariableInstanceDto) variables.get(0);
+  }
+
+  public List<VariableInstanceDto> getVariablesByProcessInstanceIdAndVariableName(String processInstanceId, String varName) {
     String uri = String.format(URI_GET_VARIABLE_INSTANCE, getEngineUrl()) + "?processInstanceIdIn=" + processInstanceId;
 
     if (varName != null) {
@@ -293,8 +300,7 @@ public class EngineRule extends ExternalResource {
 
     HttpGet httpGet = new HttpGet(uri);
     VariableInstanceDto[] variables = executeRequest(httpGet, VariableInstanceDto[].class);
-    assertThat(variables).hasSize(1);
-    return (VariableInstanceDto) variables[0];
+    return Arrays.asList(variables);
   }
 
   public TaskDto getTaskByProcessInstanceId(String processInstanceId) {

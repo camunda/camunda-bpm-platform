@@ -15,6 +15,8 @@ package org.camunda.bpm.client.util;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.builder.ProcessBuilder;
+import org.camunda.bpm.model.bpmn.instance.ExclusiveGateway;
+import org.camunda.bpm.model.bpmn.instance.SequenceFlow;
 
 public class ProcessModels {
 
@@ -23,7 +25,8 @@ public class ProcessModels {
   public static final String EXTERNAL_TASK_ID = "externalTask";
   public static final String EXTERNAL_TASK_ONE_ID = "externalTask1";
   public static final String EXTERNAL_TASK_TWO_ID = "externalTask2";
-  public static final String USER_TASK_ID = "userTask";
+  public static final String USER_TASK_ID = "userTask1";
+  public static final String USER_TASK_2_ID = "userTask2";
   public static final String USER_TASK_AFTER_BPMN_ERROR = "userTaskAfterBpmnError";
   public static final String EXTERNAL_TASK_TOPIC_FOO = "foo";
   public static final String EXTERNAL_TASK_TOPIC_BAR = "bar";
@@ -34,6 +37,29 @@ public class ProcessModels {
 
   public static ProcessBuilder newModel(String processKey) {
     return Bpmn.createExecutableProcess(processKey);
+  }
+
+  public static BpmnModelInstance createProcessWithExclusiveGateway(String processKey, String condition) {
+    BpmnModelInstance modelInstance = newModel(processKey)
+        .startEvent()
+        .serviceTask()
+          .camundaExternalTask(EXTERNAL_TASK_TOPIC_FOO)
+        .exclusiveGateway("gtw")
+          .sequenceFlowId("flow1")
+          .condition("cond", condition)
+          .userTask(USER_TASK_ID)
+          .endEvent()
+        .moveToLastGateway()
+          .sequenceFlowId("flow2")
+          .userTask(USER_TASK_2_ID)
+          .endEvent()
+        .done();
+
+    SequenceFlow sequenceFlow = (SequenceFlow) modelInstance.getModelElementById("flow2");
+    ExclusiveGateway exclusiveGateway = (ExclusiveGateway) modelInstance.getModelElementById("gtw");
+    exclusiveGateway.setDefault(sequenceFlow);
+
+    return modelInstance;
   }
 
   public static final BpmnModelInstance TWO_EXTERNAL_TASK_PROCESS =
