@@ -709,7 +709,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   private Date historyCleanupBatchWindowStartTimeAsDate;
   private Date historyCleanupBatchWindowEndTimeAsDate;
 
-  private int historyCleanupNumberOfThreads = 1;
+  private int historyCleanupDegreeOfParallelism = 1;
 
   protected String batchOperationHistoryTimeToLive;
   protected Map<String, String> batchOperationsForHistoryCleanup;
@@ -804,9 +804,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void initHistoryCleanup() {
     //validate number of threads
-    if (historyCleanupNumberOfThreads < 1 || historyCleanupNumberOfThreads > MAX_THREADS_NUMBER) {
-      throw LOG.invalidPropertyValue("historyCleanupNumberOfThreads", String.valueOf(historyCleanupNumberOfThreads),
-        String.format("value for number of threads for history cleanup should be between 1 and %s", HistoryCleanupCmd.HISTORY_CLEANUP_JOB_DECLARATION));
+    if (historyCleanupDegreeOfParallelism < 1 || historyCleanupDegreeOfParallelism > MAX_THREADS_NUMBER) {
+      throw LOG.invalidPropertyValue("historyCleanupDegreeOfParallelism", String.valueOf(historyCleanupDegreeOfParallelism),
+        String.format("value for number of threads for history cleanup should be between 1 and %s", HistoryCleanupCmd.MAX_THREADS_NUMBER));
     }
 
     if (historyCleanupBatchWindowStartTime != null) {
@@ -3889,12 +3889,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return batchOperationHistoryTimeToLive;
   }
 
-  public int getHistoryCleanupNumberOfThreads() {
-    return historyCleanupNumberOfThreads;
+  public int getHistoryCleanupDegreeOfParallelism() {
+    return historyCleanupDegreeOfParallelism;
   }
 
-  public void setHistoryCleanupNumberOfThreads(int historyCleanupNumberOfThreads) {
-    this.historyCleanupNumberOfThreads = historyCleanupNumberOfThreads;
+  public void setHistoryCleanupDegreeOfParallelism(int historyCleanupDegreeOfParallelism) {
+    this.historyCleanupDegreeOfParallelism = historyCleanupDegreeOfParallelism;
   }
 
   public void setBatchOperationHistoryTimeToLive(String batchOperationHistoryTimeToLive) {

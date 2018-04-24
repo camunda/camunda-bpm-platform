@@ -13,7 +13,6 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
@@ -25,10 +24,8 @@ import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupCont
 import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupHelper;
 import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupJobDeclaration;
 import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupJobHandler;
-import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
-import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
 
 /**
@@ -40,7 +37,7 @@ public class HistoryCleanupCmd implements Command<Job> {
 
   public static final JobDeclaration HISTORY_CLEANUP_JOB_DECLARATION = new HistoryCleanupJobDeclaration();
 
-  public static final int MAX_THREADS_NUMBER = 4;
+  public static final int MAX_THREADS_NUMBER = 8;
 
   private boolean immediatelyDue;
 
@@ -74,7 +71,7 @@ public class HistoryCleanupCmd implements Command<Job> {
       historyCleanupJobs = commandContext.getJobManager().findJobsByHandlerType(HistoryCleanupJobHandler.TYPE);
 
       if (historyCleanupJobs.isEmpty()) {
-        int[][] minuteChunks = HistoryCleanupHelper.listMinuteChunks(commandContext.getProcessEngineConfiguration().getHistoryCleanupNumberOfThreads());
+        int[][] minuteChunks = HistoryCleanupHelper.listMinuteChunks(commandContext.getProcessEngineConfiguration().getHistoryCleanupDegreeOfParallelism());
         for (int[] minuteChunk: minuteChunks) {
           final JobEntity jobInstance = HISTORY_CLEANUP_JOB_DECLARATION.createJobInstance(new HistoryCleanupContext(immediatelyDue, minuteChunk[0], minuteChunk[1]));
           historyCleanupJobs.add(jobInstance);
@@ -82,12 +79,12 @@ public class HistoryCleanupCmd implements Command<Job> {
         }
       }
     } else if (reconfigureJobs) {
-      final int numberOfThreads = commandContext.getProcessEngineConfiguration().getHistoryCleanupNumberOfThreads();
-      int[][] minuteChunks = HistoryCleanupHelper.listMinuteChunks(commandContext.getProcessEngineConfiguration().getHistoryCleanupNumberOfThreads());
+      final int degreeOfParallelism = commandContext.getProcessEngineConfiguration().getHistoryCleanupDegreeOfParallelism();
+      int[][] minuteChunks = HistoryCleanupHelper.listMinuteChunks(commandContext.getProcessEngineConfiguration().getHistoryCleanupDegreeOfParallelism());
 
       int i = 0;
       int[] minuteChunk;
-      while (i < numberOfThreads) {
+      while (i < degreeOfParallelism) {
         minuteChunk = minuteChunks[i];
 
         Job job = null;

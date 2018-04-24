@@ -69,7 +69,7 @@ public class HistoryCleanupHistoricBatchTest {
 
   public ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
     public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
-      configuration.setHistoryCleanupNumberOfThreads(3);
+      configuration.setHistoryCleanupDegreeOfParallelism(3);
       return configuration;
     }
   };

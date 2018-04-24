@@ -37,6 +37,7 @@ import org.camunda.bpm.engine.history.HistoricIncident;
 import org.camunda.bpm.engine.history.HistoricJobLog;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.cmd.HistoryCleanupCmd;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupHelper;
@@ -102,7 +103,7 @@ public class HistoryCleanupTest {
       configuration.setHistoryCleanupBatchSize(20);
       configuration.setHistoryCleanupBatchThreshold(10);
       configuration.setDefaultNumberOfRetries(5);
-      configuration.setHistoryCleanupNumberOfThreads(NUMBER_OF_THREADS);
+      configuration.setHistoryCleanupDegreeOfParallelism(NUMBER_OF_THREADS);
       return configuration;
     }
   };
@@ -1136,18 +1137,18 @@ public class HistoryCleanupTest {
   }
 
   @Test
-  public void testConfigurationFailureWrongNumberOfThreads() {
-    processEngineConfiguration.setHistoryCleanupNumberOfThreads(0);
+  public void testConfigurationFailureWrongDegreeOfParallelism() {
+    processEngineConfiguration.setHistoryCleanupDegreeOfParallelism(0);
 
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("historyCleanupNumberOfThreads");
+    thrown.expectMessage("historyCleanupDegreeOfParallelism");
 
     processEngineConfiguration.initHistoryCleanup();
 
-    processEngineConfiguration.setHistoryCleanupNumberOfThreads(5);
+    processEngineConfiguration.setHistoryCleanupDegreeOfParallelism(HistoryCleanupCmd.MAX_THREADS_NUMBER);
 
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("historyCleanupNumberOfThreads");
+    thrown.expectMessage("historyCleanupDegreeOfParallelism");
 
     processEngineConfiguration.initHistoryCleanup();
   }
@@ -1194,7 +1195,7 @@ public class HistoryCleanupTest {
   }
 
   @Test
-  public void testReconfigureNumberOfThreads() {
+  public void testReconfigureDegreeOfParallelism() {
 
       //when
       historyService.cleanUpHistoryAsync(true);
@@ -1214,7 +1215,7 @@ public class HistoryCleanupTest {
       }
 
       //given
-      processEngineConfiguration.setHistoryCleanupNumberOfThreads(1);
+      processEngineConfiguration.setHistoryCleanupDegreeOfParallelism(1);
       processEngineConfiguration.initHistoryCleanup();
       //when
       historyService.cleanUpHistoryAsync(true);
@@ -1225,7 +1226,7 @@ public class HistoryCleanupTest {
       assertEquals(59, getHistoryCleanupJobHandlerConfiguration(job).getMinuteTo());
 
       //given
-      processEngineConfiguration.setHistoryCleanupNumberOfThreads(2);
+      processEngineConfiguration.setHistoryCleanupDegreeOfParallelism(2);
       processEngineConfiguration.initHistoryCleanup();
       //when
       historyService.cleanUpHistoryAsync(true);
