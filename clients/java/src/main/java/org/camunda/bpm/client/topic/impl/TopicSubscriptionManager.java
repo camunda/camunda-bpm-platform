@@ -45,7 +45,10 @@ public class TopicSubscriptionManager implements Runnable {
   protected final Object MONITOR = new Object();
 
   protected EngineClient engineClient;
+
   protected List<TopicSubscription> subscriptions;
+  protected List<TopicRequestDto> taskTopicRequests;
+  protected Map<String, ExternalTaskHandler> externalTaskHandlers;
 
   protected boolean isRunning;
   protected Thread thread;
@@ -59,6 +62,8 @@ public class TopicSubscriptionManager implements Runnable {
   public TopicSubscriptionManager(EngineClient engineClient, TypedValues typedValues, long clientLockDuration) {
     this.engineClient = engineClient;
     this.subscriptions = new CopyOnWriteArrayList<>();
+    this.taskTopicRequests = new ArrayList<>();
+    this.externalTaskHandlers = new HashMap<>();
     this.isRunning = false;
     this.clientLockDuration = clientLockDuration;
     this.typedValues = typedValues;
@@ -76,17 +81,9 @@ public class TopicSubscriptionManager implements Runnable {
   }
 
   protected void acquire() {
-    List<TopicRequestDto> taskTopicRequests = new ArrayList<>();
-    Map<String, ExternalTaskHandler> externalTaskHandlers = new HashMap<>();
-
-    subscriptions.forEach(subscription -> {
-      TopicRequestDto taskTopicRequest = TopicRequestDto.fromTopicSubscription(subscription, clientLockDuration);
-      taskTopicRequests.add(taskTopicRequest);
-
-      String topicName = subscription.getTopicName();
-      ExternalTaskHandler externalTaskHandler = subscription.getExternalTaskHandler();
-      externalTaskHandlers.put(topicName, externalTaskHandler);
-    });
+    taskTopicRequests.clear();
+    externalTaskHandlers.clear();
+    subscriptions.forEach(this::prepareAcquisition);
 
     if (!taskTopicRequests.isEmpty()) {
       List<ExternalTask> externalTasks = fetchAndLock(taskTopicRequests);
@@ -107,6 +104,15 @@ public class TopicSubscriptionManager implements Runnable {
         runBackoffStrategy(externalTasks.isEmpty());
       }
     }
+  }
+
+  protected void prepareAcquisition(TopicSubscription subscription) {
+    TopicRequestDto taskTopicRequest = TopicRequestDto.fromTopicSubscription(subscription, clientLockDuration);
+    taskTopicRequests.add(taskTopicRequest);
+
+    String topicName = subscription.getTopicName();
+    ExternalTaskHandler externalTaskHandler = subscription.getExternalTaskHandler();
+    externalTaskHandlers.put(topicName, externalTaskHandler);
   }
 
   protected List<ExternalTask> fetchAndLock(List<TopicRequestDto> subscriptions) {
