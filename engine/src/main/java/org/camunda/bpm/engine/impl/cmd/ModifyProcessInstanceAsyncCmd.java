@@ -54,7 +54,7 @@ public class ModifyProcessInstanceAsyncCmd implements Command<Batch> {
 
     ExecutionManager executionManager = commandContext.getExecutionManager();
     ExecutionEntity processInstance = executionManager.findExecutionById(processInstanceId);
-    ensureProcessInstanceExist(processInstanceId, processInstance);
+    ensureProcessInstanceExists(processInstanceId, processInstance);
 
     commandContext.getAuthorizationManager().checkAuthorization(Permissions.CREATE, Resources.BATCH);
 
@@ -108,7 +108,7 @@ public class ModifyProcessInstanceAsyncCmd implements Command<Batch> {
     return (BatchJobHandler<ModificationBatchConfiguration>) batchHandlers.get(Batch.TYPE_PROCESS_INSTANCE_MODIFICATION);
   }
 
-  protected void ensureProcessInstanceExist(String processInstanceId, ExecutionEntity processInstance) {
+  protected void ensureProcessInstanceExists(String processInstanceId, ExecutionEntity processInstance) {
     if (processInstance == null) {
       throw LOG.processInstanceDoesNotExist(processInstanceId);
     }

@@ -92,7 +92,7 @@ public class MultiTenancySingleProcessInstanceModificationAsyncTest {
   }
 
   @Test
-  public void testtestModificationSameTenant() {
+  public void testModificationSameTenant() {
     // given
     testRule.deployForTenant(TENANT_ONE, PARALLEL_GATEWAY_PROCESS);
 
@@ -134,17 +134,6 @@ public class MultiTenancySingleProcessInstanceModificationAsyncTest {
     // complete the process
     completeTasksInOrder("task2");
     assertProcessEnded(processInstanceId);
-  }
-
-  protected void executeSeedAndBatchJobs(Batch batch) {
-    Job job = managementService.createJobQuery().jobDefinitionId(batch.getSeedJobDefinitionId()).singleResult();
-    // seed job
-    managementService.executeJob(job.getId());
-
-
-    for (Job pending : managementService.createJobQuery().jobDefinitionId(batch.getBatchJobDefinitionId()).list()) {
-      managementService.executeJob(pending.getId());
-    }
   }
 
   protected String getInstanceIdForActivity(ActivityInstance activityInstance, String activityId) {

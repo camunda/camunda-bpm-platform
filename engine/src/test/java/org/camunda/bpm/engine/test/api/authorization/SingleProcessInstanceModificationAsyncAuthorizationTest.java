@@ -41,8 +41,6 @@ import org.camunda.bpm.engine.test.util.ExecutionTree;
 public class SingleProcessInstanceModificationAsyncAuthorizationTest extends AuthorizationTest {
 
   protected static final String PARALLEL_GATEWAY_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.parallelGateway.bpmn20.xml";
-  protected static final String PROCESS_KEY = "conditionalEventProcess";
-  protected static final String PROCESS_KEY_TWO = "trueConditionProcess";
 
   @Override
   public void tearDown() {
