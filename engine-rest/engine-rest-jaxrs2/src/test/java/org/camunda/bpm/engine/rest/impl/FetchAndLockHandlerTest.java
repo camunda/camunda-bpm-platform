@@ -251,7 +251,7 @@ public class FetchAndLockHandlerTest {
 
     handler.addPendingRequest(createDto(5000L), asyncResponse, processEngine);
 
-    verify((ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration()).addExternalTaskCreatedListener(handler);
+    verify(handler).registerExternalTaskListener(processEngine);
   }
 
   @Test
