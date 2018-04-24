@@ -401,7 +401,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     constants.put("constant.datepart.quarter", "QUARTER");
     constants.put("constant.datepart.month", "MONTH");
     constants.put("constant.datepart.minute", "MINUTE");
-    constants.put("constant.null.startTime", "null START_TIME_");
+    constants.put("constant.null.startTime", "CAST(NULL as TIMESTAMP) as START_TIME_");
     constants.put("constant.varchar.cast", "'${key}'");
     dbSpecificConstants.put(MSSQL, constants);
   }
