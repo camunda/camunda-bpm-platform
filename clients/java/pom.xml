@@ -29,6 +29,9 @@
 
     <version.plugin.license>1.14</version.plugin.license>
     <version.plugin.surefire>2.16</version.plugin.surefire>
+    <version.plugin.failsafe>2.20</version.plugin.failsafe>
+    <version.plugin.helper>3.0.0</version.plugin.helper>
+    <version.plugin.cargo>1.6.2</version.plugin.cargo>
 
     <version.junit>4.10</version.junit>
     <version.slf4j>1.6.1</version.slf4j>
@@ -124,11 +127,13 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>license-maven-plugin</artifactId>
+        <version>${version.plugin.license}</version>
       </plugin>
 
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>
+        <version>${version.plugin.helper}</version>
         <executions>
           <execution>
             <id>add-it-source</id>
@@ -148,6 +153,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
+        <version>${version.plugin.surefire}</version>
         <configuration>
           <skipTests>${skip.unit.tests}</skipTests>
           <trimStackTrace>false</trimStackTrace>
@@ -266,7 +272,7 @@
 
           <plugin>
             <artifactId>maven-failsafe-plugin</artifactId>
-            <version>2.20</version>
+            <version>${version.plugin.failsafe}</version>
             <configuration>
               <redirectTestOutputToFile>true</redirectTestOutputToFile>
             </configuration>
@@ -283,7 +289,7 @@
           <plugin>
             <groupId>org.codehaus.cargo</groupId>
             <artifactId>cargo-maven2-plugin</artifactId>
-            <version>1.6.2</version>
+            <version>${version.plugin.cargo}</version>
             <executions>
               <execution>
                 <id>start-container</id>
