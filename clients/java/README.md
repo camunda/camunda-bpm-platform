@@ -117,8 +117,7 @@ BPMN 2.0 XML could look as follows:
   camunda:topic="creditScoreChecker" />
 ...
 ```
-As soon as the Workflow Engine has been executed an External Task, an activity instance is created and waits to be 
-fetched and locked by a client.
+As soon as the Workflow Engine reached an External Task in BPMN process, corresponding activity instance is created, which is waiting to be fetched and locked by a client.
 
 The client subscribes to the topic and fetches continuously for newly appearing External Tasks provided by the 
 Workflow Engine. Each fetched External Task is marked with a temporary lock. Like this, no other clients can work on this 
@@ -145,9 +144,9 @@ provided by the `ExternalTaskService` cannot be applied to the External Task any
 released and available again for being fetched and locked by clients.
 
 ### Handler
-A handler object has to be provided for each topic subscription. To do so, the lambda expression `(externalTask, externalTaskService) -> {...}`
+A handler object implementing `ExternalTaskHandler` interface has to be provided for each topic subscription. Handlers
 can be used to implement a custom routine which is invoked whenever an External Task is fetched and locked successfully. 
-The lambda expression provides access to the respective `ExternalTask` as well as the `ExternalTaskService`.
+The `execute` method, which will be invoked in this case, provides access to the respective `ExternalTask` as well as the `ExternalTaskService`.
 
 ### Completing Tasks
 Once the work is done, the External Task can be completed. This means for the Workflow Engine that the execution will 
@@ -162,7 +161,7 @@ is thrown.
 
 ### Unlocking Tasks
 If a lock of an External Task should be returned so that other clients are allowed to fetch and lock this task again, 
-`ExternalTaskService#unlock` can be called while passing the External Task. The External Task can only be unlocked, 
+`ExternalTaskService#unlock` can be called. The External Task can only be unlocked, 
 if the task is currently locked by the client. Otherwise a `NotAcquiredException` is thrown.
 
 ### Reporting Failures
@@ -172,9 +171,8 @@ the Workflow Engine. The following parameters need to be passed on calling `Exte
 * External Task
 * Error message: a short description of the failure (limited to 666 characters)
 * Error details: a detailed error message (unlimited size)
-* Retries: amount of fetch and lock actions; each successful performed fetch and lock action decrements the counter; 
-If zero, an incident is created
-* Retry timeout: the time period in milliseconds between two fetch and lock actions
+* Retries: amount of fetch and lock actions, which can be performed aftre the failure is reported; each successfully performed fetch and lock action decrements the counter; if zero, an incident is created
+* Retry timeout: a timeout in milliseconds before the external task becomes available again for fetching. Must be >= 0.
 
 A failure can only be reported, if the External Task is currently locked by the client. Otherwise a `NotAcquiredException` is thrown.
 
@@ -189,7 +187,7 @@ A BPMN error can only be reported, if the External Task is currently locked by t
 You can find a detailed documentation about this action in the Camunda BPM [User Guide](https://docs.camunda.org/manual/develop/user-guide/process-engine/external-tasks/#reporting-bpmn-error).
 
 ### Process Variables
-Information can be shared between the client and the Workflow Engine with the concept of process variables. The client
+Information can be shared between the client and the Workflow Engine by means of process variables. The client
 supports a wide range of primitive types.
 
 #### Supported Types
@@ -224,10 +222,8 @@ the External Task of the current lock.
 Besides storing, it is also possible to retrieve a variable:
 
 ```java
-int defaultScore = (int) externalTask.getVariable("defaultScore");
+int defaultScore = externalTask.getVariable("defaultScore");
 ```
-
-The return value has to be casted to the expected typed.
 
 `ExternalTask#getAllVariables` can be used to retrieve all variables at once.
 
@@ -272,8 +268,14 @@ externalTask.setVariableTyped("creditScores", creditScoresObject);
 **Note:** to make sure that an object is readable by other clients or by the Workflow Engine, the respective class must 
 exist on the respective class path.
 
-The client supports the serialization format JSON by default. The serialization formats XML and Java are currently not
-supported.
+The client supports following serialization formats: JSON (default), XML and Java. To change it, one should provide desired 
+serialization data format, when creating the external task client:
+```java
+ExternalTaskClient client = ExternalTaskClient.create()
+  .baseUrl("http://localhost:8080/engine-rest")
+  .defaultSerializationFormat("application/xml")
+  .build();
+```
 
 #### Transient Variables
 Transient variables are not persisted. They only exist during the current transaction. Whenever a process instance reaches
@@ -283,7 +285,7 @@ a waiting state, transient variables get lost. Transient variables can only be d
 StringValue stringValue = Variables.stringValue("transientVariable", true);
 ```
 ### Logging
-The client uses SLF4J for logging. Since handlers are not invoked in the main thread it is sensible to enable logging 
+The client uses SLF4J for logging. Since handlers are not invoked in the main thread it makes sense to enable the logging 
 and be reported about the following situations:
 
 * External Tasks could not be fetched and locked successfully
