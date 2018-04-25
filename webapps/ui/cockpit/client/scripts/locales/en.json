@@ -39,6 +39,7 @@
   "DECISION_DEFINITION_HIDE_TABS" : "Hide tabs",
   "DECISION_DEFINITION_DECISIONS" : "Decisions",
   "DECISION_DEFINITION_DEFINITION_VIEW" : "Definition View",
+  "DECISION_DEFINITION_VERSION_TAG": "Version Tag:",
 
   "DECISION_INSTANCE_TOOLTIP_INSTANCE_ID" : "Decision instance ID as it appears in the database",
   "DECISION_INSTANCE_INSTANCE_ID" : "Instance ID:",
