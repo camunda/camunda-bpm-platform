@@ -125,6 +125,8 @@ public class HtmlFormEngine implements FormEngine {
   protected static final String TYPE_FIELD_MESSAGE = "Only a %s value is allowed";
   protected static final String INVALID_DATE_FIELD_MESSAGE = "Invalid date format: the date should have the pattern ";
 
+  protected static final String DATE_PATTERN_ATTRIBUTE = "datePattern";
+
   public String getName() {
     return "html";
   }
@@ -236,7 +238,7 @@ public class HtmlFormEngine implements FormEngine {
     // input field
     HtmlElementWriter inputField = createInputField(formField);
 
-    String dateFormat = (String) formField.getType().getInformation("datePattern");
+    String dateFormat = (String) formField.getType().getInformation(DATE_PATTERN_ATTRIBUTE);
     if(!isReadOnly) {
       inputField
           .attribute(DATEPICKER_POPUP_ATTRIBUTE, dateFormat)
@@ -434,7 +436,7 @@ public class HtmlFormEngine implements FormEngine {
     secondDivElement
         .attribute(NG_SHOW_ATTRIBUTE, secondExpression)
         .attribute(CLASS_ATTRIBUTE, HELP_BLOCK_CLASS)
-        .textContent(INVALID_DATE_FIELD_MESSAGE+"'" + (String) formField.getType().getInformation("datePattern") + "'");
+        .textContent(INVALID_DATE_FIELD_MESSAGE + "'" + formField.getType().getInformation(DATE_PATTERN_ATTRIBUTE) + "'");
 
     documentBuilder
         .startElement(secondDivElement)
