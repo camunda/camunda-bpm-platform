@@ -12,11 +12,24 @@
  */
 package org.camunda.bpm.engine.rest.impl;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
+
+import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.core.Response.Status;
+
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryBuilder;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
+import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.rest.dto.externaltask.FetchExternalTasksExtendedDto;
@@ -24,18 +37,14 @@ import org.camunda.bpm.engine.rest.dto.externaltask.LockedExternalTaskDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.spi.FetchAndLockHandler;
 
-import javax.ws.rs.container.AsyncResponse;
-import javax.ws.rs.core.Response.Status;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
 
 /**
  * @author Tassilo Weidner
  */
 public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
+
+  protected static final ReentrantLock LOCK_MONITOR = ProcessEngineImpl.LOCK_MONITOR;
+  protected static final Condition IS_EXTERNAL_TASK_AVAILABLE = ProcessEngineImpl.IS_EXTERNAL_TASK_AVAILABLE;
 
   protected static final long MAX_BACK_OFF_TIME = Long.MAX_VALUE;
   protected static final long MAX_TIMEOUT = 1800000; // 30 minutes
@@ -43,7 +52,6 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
   protected BlockingQueue<FetchAndLockRequest> queue = new ArrayBlockingQueue<FetchAndLockRequest>(200);
   protected List<FetchAndLockRequest> pendingRequests = new ArrayList<FetchAndLockRequest>();
 
-  protected final Object MONITOR = new Object();
   protected Thread handlerThread = new Thread(this, this.getClass().getSimpleName());
 
   protected boolean isWaiting = false;
@@ -109,11 +117,16 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
 
   @Override
   public void shutdown() {
-    synchronized (MONITOR) {
+    LOCK_MONITOR.lock();
+
+    try {
       isRunning = false;
       if (isWaiting) {
-        MONITOR.notifyAll();
+        IS_EXTERNAL_TASK_AVAILABLE.signal();
       }
+    }
+    finally {
+      LOCK_MONITOR.unlock();
     }
   }
 
@@ -130,20 +143,18 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
   }
 
   protected void suspendAcquisition(long millis) {
+    LOCK_MONITOR.lock();
     try {
-      synchronized (MONITOR) {
-        if (queue.isEmpty()) {
-          isWaiting = true;
-          MONITOR.wait(millis);
-        }
+      if (queue.isEmpty()) {
+        isWaiting = true;
+        IS_EXTERNAL_TASK_AVAILABLE.await(millis, TimeUnit.MILLISECONDS);
       }
-
-    }
-    catch (InterruptedException e) {
+    } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
     }
     finally {
       isWaiting = false;
+      LOCK_MONITOR.unlock();
     }
   }
 
@@ -157,10 +168,12 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
   }
 
   protected void notifyAcquisition() {
-    synchronized (MONITOR) {
-      if (isWaiting) {
-        MONITOR.notifyAll();
-      }
+    LOCK_MONITOR.lock();
+    try {
+      IS_EXTERNAL_TASK_AVAILABLE.signal();
+    }
+    finally {
+      LOCK_MONITOR.unlock();
     }
   }
 

@@ -13,6 +13,8 @@
 package org.camunda.bpm.engine.impl;
 
 import java.util.Map;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.camunda.bpm.engine.*;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -28,6 +30,9 @@ import org.camunda.bpm.engine.impl.metrics.reporter.DbMetricsReporter;
  * @author Tom Baeyens
  */
 public class ProcessEngineImpl implements ProcessEngine {
+
+  public static final ReentrantLock LOCK_MONITOR = new ReentrantLock(false);
+  public static final Condition IS_EXTERNAL_TASK_AVAILABLE = LOCK_MONITOR.newCondition();
 
   private final static ProcessEngineLogger LOG = ProcessEngineLogger.INSTANCE;
 
