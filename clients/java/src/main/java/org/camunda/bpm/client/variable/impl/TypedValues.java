@@ -61,7 +61,7 @@ public class TypedValues {
     return result;
   }
 
-  public Map<String, VariableValue> deserializeVariables(Map<String, TypedValueField> variables) {
+  public Map<String, VariableValue> wrapVariables(Map<String, TypedValueField> variables) {
     Map<String, VariableValue> result = new HashMap<>();
 
     if (variables != null) {
@@ -80,8 +80,8 @@ public class TypedValues {
   }
 
   @SuppressWarnings("unchecked")
-  protected TypedValueField toTypedValueField(TypedValue typedValue) {
-    ValueMapper<?> serializer = findSerializer(typedValue);
+  protected <T extends TypedValue> TypedValueField toTypedValueField(T typedValue) {
+    ValueMapper<T> serializer = findSerializer(typedValue);
 
     if(typedValue instanceof UntypedValueImpl) {
       typedValue = serializer.convertToTypedValue((UntypedValueImpl) typedValue);
@@ -89,7 +89,7 @@ public class TypedValues {
 
     TypedValueField typedValueField = new TypedValueField();
 
-    ((ValueMapper<TypedValue>) serializer).writeValue(typedValue, typedValueField);
+    serializer.writeValue(typedValue, typedValueField);
 
     ValueType valueType = typedValue.getType();
     typedValueField.setValueInfo(valueType.getValueInfo(typedValue));
@@ -101,7 +101,7 @@ public class TypedValues {
     return typedValueField;
   }
 
-  protected ValueMapper<?> findSerializer(TypedValue typedValue) {
+  protected <T extends TypedValue> ValueMapper<T> findSerializer(T typedValue) {
     return serializers.findMapperForTypedValue(typedValue);
   }
 

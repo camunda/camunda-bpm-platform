@@ -14,14 +14,12 @@ package org.camunda.bpm.client.variable.impl;
 
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
-public interface ValueMappers {
+public interface ValueMappers<T extends TypedValue> {
 
-  @SuppressWarnings("rawtypes")
-  public ValueMapper findMapperForTypedValue(TypedValue value);
+  ValueMapper findMapperForTypedValue(T value);
 
-  @SuppressWarnings("rawtypes")
-  public ValueMapper findMapperForTypedValueField(TypedValueField value);
+  ValueMapper<T> findMapperForTypedValueField(TypedValueField value);
 
-  public ValueMappers addMapper(ValueMapper<?> serializer);
+  ValueMappers addMapper(ValueMapper<T> serializer);
 
 }

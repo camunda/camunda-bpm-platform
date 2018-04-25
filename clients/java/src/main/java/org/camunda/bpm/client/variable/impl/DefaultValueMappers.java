@@ -20,31 +20,31 @@ import org.camunda.bpm.client.impl.ExternalTaskClientLogger;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
-public class DefaultValueMappers implements Serializable, ValueMappers {
+public class DefaultValueMappers<T extends TypedValue> implements Serializable, ValueMappers<T> {
 
   protected static final ExternalTaskClientLogger LOG = ExternalTaskClientLogger.CLIENT_LOGGER;
 
   private static final long serialVersionUID = 1L;
 
-  protected List<ValueMapper<?>> serializerList = new ArrayList<ValueMapper<?>>();
+  protected List<ValueMapper<? extends TypedValue>> serializerList = new ArrayList<>();
   protected String defaultSerializationFormat;
 
   public DefaultValueMappers(String defaultSerializationFormat) {
     this.defaultSerializationFormat = defaultSerializationFormat;
   }
 
-  public ValueMapper<?> findMapperForTypedValue(TypedValue typedValue) {
+  public ValueMapper<T> findMapperForTypedValue(T typedValue) {
     ValueType type = typedValue.getType();
 
     if (type != null && type.isAbstract()) {
       throw LOG.valueMapperExceptionWhileSerializingAbstractValue(type.getName());
     }
 
-    List<ValueMapper<?>> matchedSerializers = new ArrayList<ValueMapper<?>>();
+    List<ValueMapper<T>> matchedSerializers = new ArrayList<>();
 
     for (ValueMapper<?> serializer : serializerList) {
       if(serializer.canHandleTypedValue(typedValue)) {
-        matchedSerializers.add(serializer);
+        matchedSerializers.add((ValueMapper<T>)serializer);
         if(serializer.getType().isPrimitiveValueType()) {
           break;
         }
@@ -67,8 +67,8 @@ public class DefaultValueMappers implements Serializable, ValueMappers {
   }
 
   @Override
-  public ValueMapper<?> findMapperForTypedValueField(TypedValueField typedValueField) {
-    ValueMapper<?> matchedSerializer = serializerList.stream()
+  public ValueMapper<T> findMapperForTypedValueField(TypedValueField typedValueField) {
+    ValueMapper<? extends TypedValue> matchedSerializer = serializerList.stream()
       .filter(serializer -> serializer.canHandleTypedValueField(typedValueField))
       .findFirst()
       .orElse(null);
@@ -77,10 +77,10 @@ public class DefaultValueMappers implements Serializable, ValueMappers {
       throw LOG.valueMapperExceptionDueToSerializerNotFoundForTypedValueField(typedValueField.getValue());
     }
 
-    return matchedSerializer;
+    return (ValueMapper<T>)matchedSerializer;
   }
 
-  public DefaultValueMappers addMapper(ValueMapper<?> serializer) {
+  public ValueMappers addMapper(ValueMapper<T> serializer) {
     serializerList.add(serializer);
     return this;
   }

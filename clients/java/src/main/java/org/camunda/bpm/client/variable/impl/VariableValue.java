@@ -15,14 +15,14 @@ package org.camunda.bpm.client.variable.impl;
 import org.camunda.bpm.engine.variable.value.SerializableValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
-public class VariableValue {
+public class VariableValue<T extends TypedValue> {
 
   protected ValueMappers mappers;
 
   protected TypedValueField typedValueField;
 
-  protected ValueMapper<?> serializer;
-  protected TypedValue cachedValue;
+  protected ValueMapper<T> serializer;
+  protected T cachedValue;
 
   public VariableValue(TypedValueField typedValueField, ValueMappers mappers) {
     this.typedValueField = typedValueField;
@@ -30,21 +30,21 @@ public class VariableValue {
   }
 
   @SuppressWarnings("unchecked")
-  public <T> T getValue() {
+  public Object getValue() {
     TypedValue typedValue = getTypedValue();
     if (typedValue != null) {
-      return (T) typedValue.getValue();
+      return typedValue.getValue();
     } else {
       return null;
     }
   }
 
-  public <T extends TypedValue> T getTypedValue() {
+  public T getTypedValue() {
     return getTypedValue(true);
   }
 
   @SuppressWarnings("unchecked")
-  public <T extends TypedValue> T getTypedValue(boolean deserializeValue) {
+  public T getTypedValue(boolean deserializeValue) {
     if (cachedValue != null && cachedValue instanceof SerializableValue) {
       SerializableValue serializableValue = (SerializableValue) cachedValue;
       if(deserializeValue && !serializableValue.isDeserialized()) {
@@ -56,10 +56,10 @@ public class VariableValue {
       cachedValue = getSerializer().readValue(typedValueField, deserializeValue);
     }
 
-    return (T) cachedValue;
+    return cachedValue;
   }
 
-  public ValueMapper<?> getSerializer() {
+  public ValueMapper<T> getSerializer() {
     if (serializer == null) {
       serializer = mappers.findMapperForTypedValueField(typedValueField);
     }

@@ -233,7 +233,7 @@ public class ExternalTaskImpl implements ExternalTask {
 
     VariableValue variableValue = receivedVariableMap.get(variableName);
     if (variableValue != null) {
-      value = variableValue.getValue();
+      value = (T) variableValue.getValue();
     }
 
     return value;
@@ -265,14 +265,14 @@ public class ExternalTaskImpl implements ExternalTask {
   @JsonIgnore
   @Override
   public <T extends TypedValue> T getVariableTyped(String variableName, boolean deserializeObjectValues) {
-    T typedValue = null;
+    TypedValue typedValue = null;
 
     VariableValue variableValue = receivedVariableMap.get(variableName);
     if (variableValue != null) {
       typedValue = variableValue.getTypedValue(deserializeObjectValues);
     }
 
-    return typedValue;
+    return (T) typedValue;
   }
 
   @Override

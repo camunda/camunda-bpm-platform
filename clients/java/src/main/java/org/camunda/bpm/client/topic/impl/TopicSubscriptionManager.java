@@ -26,7 +26,6 @@ import org.camunda.bpm.client.impl.EngineClientException;
 import org.camunda.bpm.client.impl.ExternalTaskClientLogger;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskHandler;
-import org.camunda.bpm.client.task.ExternalTaskService;
 import org.camunda.bpm.client.task.impl.ExternalTaskImpl;
 import org.camunda.bpm.client.task.impl.ExternalTaskServiceImpl;
 import org.camunda.bpm.client.topic.TopicSubscription;
@@ -43,6 +42,8 @@ public class TopicSubscriptionManager implements Runnable {
   protected static final TopicSubscriptionManagerLogger LOG = ExternalTaskClientLogger.TOPIC_SUBSCRIPTION_MANAGER_LOGGER;
 
   protected final Object MONITOR = new Object();
+
+  protected ExternalTaskServiceImpl externalTaskService;
 
   protected EngineClient engineClient;
 
@@ -67,6 +68,7 @@ public class TopicSubscriptionManager implements Runnable {
     this.isRunning = false;
     this.clientLockDuration = clientLockDuration;
     this.typedValues = typedValues;
+    externalTaskService = new ExternalTaskServiceImpl(engineClient);
   }
 
   public void run() {
@@ -131,13 +133,11 @@ public class TopicSubscriptionManager implements Runnable {
     ExternalTaskImpl task = (ExternalTaskImpl) externalTask;
 
     Map<String, TypedValueField> variables = task.getVariables();
-    Map<String, VariableValue> deserializeVariables = typedValues.deserializeVariables(variables);
-    task.setReceivedVariableMap(deserializeVariables);
-
-    ExternalTaskService service = new ExternalTaskServiceImpl(externalTask.getId(), engineClient);
+    Map<String, VariableValue> wrappedVariables = typedValues.wrapVariables(variables);
+    task.setReceivedVariableMap(wrappedVariables);
 
     try {
-      taskHandler.execute(task, service);
+      taskHandler.execute(task, externalTaskService);
     } catch (ExternalTaskClientException e) {
       LOG.exceptionOnExternalTaskServiceMethodInvocation(task.getTopicName(), e);
     } catch (Throwable e) {

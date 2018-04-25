@@ -27,11 +27,9 @@ public class ExternalTaskServiceImpl implements ExternalTaskService {
 
   protected static final ExternalTaskClientLogger LOG = ExternalTaskClientLogger.CLIENT_LOGGER;
 
-  protected String taskId;
   protected EngineClient engineClient;
 
-  public ExternalTaskServiceImpl(String taskId, EngineClient engineClient) {
-    this.taskId = taskId;
+  public ExternalTaskServiceImpl(EngineClient engineClient) {
     this.engineClient = engineClient;
   }
 
