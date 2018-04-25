@@ -592,7 +592,7 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
     if(user.getId() == null) {
       return false;
     }
-    return user.getId().equals(org.camunda.bpm.engine.impl.context.Context.getCommandContext().getAuthenticatedUserId());
+    return user.getId().equalsIgnoreCase(org.camunda.bpm.engine.impl.context.Context.getCommandContext().getAuthenticatedUserId());
   }
 
   protected boolean isAuthorized(Permission permission, Resource resource, String resourceId) {
