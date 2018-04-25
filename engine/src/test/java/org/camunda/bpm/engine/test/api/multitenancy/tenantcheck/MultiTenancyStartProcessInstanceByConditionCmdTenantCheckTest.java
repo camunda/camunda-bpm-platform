@@ -15,14 +15,19 @@ package org.camunda.bpm.engine.test.api.multitenancy.tenantcheck;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.event.EventType;
+import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -32,6 +37,7 @@ import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -60,6 +66,17 @@ public class MultiTenancyStartProcessInstanceByConditionCmdTenantCheckTest {
   @Rule
   public ExpectedException thrown= ExpectedException.none();
 
+  public IdentityService identityService;
+  public RepositoryService repositoryService;
+  public RuntimeService runtimeService;
+
+  @Before
+  public void setUp() {
+    identityService = engineRule.getIdentityService();
+    repositoryService = engineRule.getRepositoryService();
+    runtimeService = engineRule.getRuntimeService();
+  }
+
   @Test
   public void testNoAuthenticatedTenants() throws Exception {
     // given
@@ -69,7 +86,7 @@ public class MultiTenancyStartProcessInstanceByConditionCmdTenantCheckTest {
 
     ensureEventSubscriptions(3);
 
-    engineRule.getIdentityService().setAuthentication("user", null, null);
+    identityService.setAuthentication("user", null, null);
 
     Map<String, Object> variableMap = new HashMap<String, Object>();
     variableMap.put("foo", "bar");
@@ -84,7 +101,7 @@ public class MultiTenancyStartProcessInstanceByConditionCmdTenantCheckTest {
     assertNotNull(instances);
     assertEquals(1, instances.size());
 
-    engineRule.getIdentityService().clearAuthentication();
+    identityService.clearAuthentication();
 
     ProcessInstanceQuery processInstanceQuery = engineRule.getRuntimeService().createProcessInstanceQuery();
     assertEquals(1, processInstanceQuery.count());
@@ -99,7 +116,7 @@ public class MultiTenancyStartProcessInstanceByConditionCmdTenantCheckTest {
 
     ensureEventSubscriptions(2);
 
-    engineRule.getIdentityService().setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
     Map<String, Object> variableMap = new HashMap<String, Object>();
     variableMap.put("foo", "bar");
@@ -115,7 +132,7 @@ public class MultiTenancyStartProcessInstanceByConditionCmdTenantCheckTest {
     assertNotNull(processInstances);
     assertEquals(1, processInstances.size());
 
-    engineRule.getIdentityService().clearAuthentication();
+    identityService.clearAuthentication();
 
     ProcessInstanceQuery processInstanceQuery = engineRule.getRuntimeService().createProcessInstanceQuery();
     assertEquals(1, processInstanceQuery.tenantIdIn(TENANT_ONE).count());
@@ -130,7 +147,7 @@ public class MultiTenancyStartProcessInstanceByConditionCmdTenantCheckTest {
 
     ensureEventSubscriptions(2);
 
-    engineRule.getIdentityService().setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
     Map<String, Object> variableMap = new HashMap<String, Object>();
     variableMap.put("foo", "bar");
@@ -145,7 +162,7 @@ public class MultiTenancyStartProcessInstanceByConditionCmdTenantCheckTest {
     assertNotNull(processInstances);
     assertEquals(1, processInstances.size());
 
-    engineRule.getIdentityService().clearAuthentication();
+    identityService.clearAuthentication();
 
     ProcessInstanceQuery processInstanceQuery = engineRule.getRuntimeService().createProcessInstanceQuery();
     assertEquals(1, processInstanceQuery.tenantIdIn(TENANT_ONE).count());
@@ -161,7 +178,7 @@ public class MultiTenancyStartProcessInstanceByConditionCmdTenantCheckTest {
     ensureEventSubscriptions(2);
 
     engineRule.getProcessEngineConfiguration().setTenantCheckEnabled(false);
-    engineRule.getIdentityService().setAuthentication("user", null, null);
+    identityService.setAuthentication("user", null, null);
 
     System.out.println(engineRule.getProcessEngineConfiguration().isAuthorizationEnabled());
 
@@ -175,7 +192,7 @@ public class MultiTenancyStartProcessInstanceByConditionCmdTenantCheckTest {
       .evaluateStartConditions();
     assertEquals(2, evaluateStartConditions.size());
 
-    engineRule.getIdentityService().clearAuthentication();
+    identityService.clearAuthentication();
   }
 
   @Test
@@ -191,7 +208,7 @@ public class MultiTenancyStartProcessInstanceByConditionCmdTenantCheckTest {
     thrown.expect(ProcessEngineException.class);
     thrown.expectMessage("Cannot create an instance of the process definition");
 
-    engineRule.getIdentityService().setAuthentication("user", null, null);
+    identityService.setAuthentication("user", null, null);
 
     // when
     engineRule.getRuntimeService()
@@ -210,7 +227,8 @@ public class MultiTenancyStartProcessInstanceByConditionCmdTenantCheckTest {
 
     ProcessDefinition processDefinition = engineRule.getRepositoryService().createProcessDefinitionQuery().processDefinitionKey("conditionStart").singleResult();
 
-    engineRule.getIdentityService().setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+    identityService = engineRule.getIdentityService();
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
     // when
     List<ProcessInstance> instances = engineRule.getRuntimeService()
@@ -225,13 +243,63 @@ public class MultiTenancyStartProcessInstanceByConditionCmdTenantCheckTest {
     assertEquals(1, instances.size());
     assertEquals(TENANT_ONE, instances.get(0).getTenantId());
 
-    engineRule.getIdentityService().clearAuthentication();
+    identityService.clearAuthentication();
 
     ProcessInstanceQuery processInstanceQuery = engineRule.getRuntimeService().createProcessInstanceQuery();
     assertEquals(1, processInstanceQuery.tenantIdIn(TENANT_ONE).count());
 
     EventSubscription eventSubscription = engineRule.getRuntimeService().createEventSubscriptionQuery().singleResult();
     assertEquals(EventType.CONDITONAL.name(), eventSubscription.getEventType());
+  }
+
+  @Test
+  public void testSubscriptionsWhenDeletingGroupsProcessDefinitionsByIds() {
+    // given
+    String processDefId1 = testRule.deployForTenantAndGetDefinition(TENANT_ONE, PROCESS).getId();
+    String processDefId2 = testRule.deployForTenantAndGetDefinition(TENANT_ONE, PROCESS).getId();
+    String processDefId3 = testRule.deployForTenantAndGetDefinition(TENANT_ONE, PROCESS).getId();
+
+    @SuppressWarnings("unused")
+    String processDefId4 = testRule.deployAndGetDefinition(PROCESS).getId();
+    String processDefId5 = testRule.deployAndGetDefinition(PROCESS).getId();
+    String processDefId6 = testRule.deployAndGetDefinition(PROCESS).getId();
+
+    BpmnModelInstance processAnotherKey = Bpmn.createExecutableProcess("anotherKey")
+        .startEvent()
+          .conditionalEventDefinition()
+            .condition("${true}")
+          .conditionalEventDefinitionDone()
+        .userTask()
+        .endEvent()
+        .done();
+
+    String processDefId7 = testRule.deployForTenantAndGetDefinition(TENANT_ONE, processAnotherKey).getId();
+    String processDefId8 = testRule.deployForTenantAndGetDefinition(TENANT_ONE, processAnotherKey).getId();
+    String processDefId9 = testRule.deployForTenantAndGetDefinition(TENANT_ONE, processAnotherKey).getId();
+
+    // assume
+    assertEquals(3, runtimeService.createEventSubscriptionQuery().count());
+
+    // when
+    repositoryService.deleteProcessDefinitions()
+                     .byIds(processDefId8, processDefId5, processDefId3, processDefId9, processDefId1)
+                     .delete();
+
+    // then
+    List<EventSubscription> list = runtimeService.createEventSubscriptionQuery().list();
+    assertEquals(3, list.size());
+    for (EventSubscription eventSubscription : list) {
+      EventSubscriptionEntity eventSubscriptionEntity = (EventSubscriptionEntity) eventSubscription;
+      if (eventSubscriptionEntity.getConfiguration().equals(processDefId2)) {
+        assertEquals(TENANT_ONE, eventSubscription.getTenantId());
+      } else if (eventSubscriptionEntity.getConfiguration().equals(processDefId6)) {
+        assertEquals(null, eventSubscription.getTenantId());
+      } else if (eventSubscriptionEntity.getConfiguration().equals(processDefId7)) {
+        assertEquals(TENANT_ONE, eventSubscription.getTenantId());
+      } else {
+        fail("This process definition '" + eventSubscriptionEntity.getConfiguration() + "' and the respective event subscription should not exist.");
+      }
+    }
   }
 
   protected void ensureEventSubscriptions(int count) {

@@ -251,7 +251,7 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
 
   }
 
-  protected String getPreviousProcessDefinitionId() {
+  public String getPreviousProcessDefinitionId() {
     ensurePreviousProcessDefinitionIdInitialized();
     return previousProcessDefinitionId;
   }

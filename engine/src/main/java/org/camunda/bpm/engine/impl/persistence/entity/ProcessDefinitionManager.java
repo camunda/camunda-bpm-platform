@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -187,7 +188,7 @@ public class ProcessDefinitionManager extends AbstractManager implements Abstrac
   }
 
   @SuppressWarnings("unchecked")
-  public List<ProcessDefinition> findDefinitionsByIds(List<String> processDefinitionIds) {
+  public List<ProcessDefinition> findDefinitionsByIds(Set<String> processDefinitionIds) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("processDefinitionIds", processDefinitionIds);
     parameters.put("isTenantIdSet", false);

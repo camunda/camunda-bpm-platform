@@ -31,6 +31,8 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
  */
 public class DeleteProcessDefinitionsByKeyCmd extends AbstractDeleteProcessDefinitionCmd {
 
+  private static final long serialVersionUID = 1L;
+
   private final String processDefinitionKey;
   private final String tenantId;
   private final boolean isTenantIdSet;

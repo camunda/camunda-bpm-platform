@@ -13,16 +13,20 @@
 
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.impl.DeploymentQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.auth.ResourceAuthorizationProvider;
+import org.camunda.bpm.engine.impl.cmd.DeleteProcessDefinitionsByIdsCmd;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionManager;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionManager;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
 import org.camunda.bpm.engine.repository.CaseDefinition;
@@ -58,7 +62,7 @@ public class DeploymentManager extends AbstractManager {
     deleteDeployment(deploymentId, cascade, false, false);
   }
 
-  public void deleteDeployment(String deploymentId, boolean cascade, boolean skipCustomListeners, boolean skipIoMappings) {
+  public void deleteDeployment(String deploymentId, final boolean cascade, final boolean skipCustomListeners, boolean skipIoMappings) {
     List<ProcessDefinition> processDefinitions = getProcessDefinitionManager().findProcessDefinitionsByDeploymentId(deploymentId);
     if (cascade) {
       // *NOTE*:
@@ -91,15 +95,25 @@ public class DeploymentManager extends AbstractManager {
 
 
     for (ProcessDefinition processDefinition : processDefinitions) {
-      String processDefinitionId = processDefinition.getId();
+      final String processDefinitionId = processDefinition.getId();
       // Process definition cascade true deletes the history and
       // process instances if instances flag is set as well to true.
       // Problem as described above, redeployes the deployment.
       // Represents no problem if only one process definition is deleted
       // in a transaction! We have to set the instances flag to false.
-      getProcessDefinitionManager()
-        .deleteProcessDefinition(processDefinition, processDefinitionId,
-                cascade, false, skipCustomListeners);
+      final CommandContext commandContext = Context.getCommandContext();
+      commandContext.runWithoutAuthorization(new Callable<Void>() {
+        public Void call() throws Exception {
+          DeleteProcessDefinitionsByIdsCmd cmd = new DeleteProcessDefinitionsByIdsCmd(
+              Arrays.asList(processDefinitionId),
+              cascade,
+              false,
+              skipCustomListeners,
+              false);
+          cmd.execute(commandContext);
+          return null;
+        }
+      });
     }
 
     deleteCaseDeployment(deploymentId, cascade);
