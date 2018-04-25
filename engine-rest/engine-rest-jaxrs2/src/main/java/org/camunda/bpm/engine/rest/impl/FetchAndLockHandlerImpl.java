@@ -17,9 +17,7 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryBuilder;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.identity.Authentication;
-import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskCreatedListener;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.rest.dto.externaltask.FetchExternalTasksExtendedDto;
 import org.camunda.bpm.engine.rest.dto.externaltask.LockedExternalTaskDto;
@@ -29,24 +27,21 @@ import org.camunda.bpm.engine.rest.spi.FetchAndLockHandler;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.Response.Status;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 /**
  * @author Tassilo Weidner
  */
-public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler, ExternalTaskCreatedListener {
+public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler {
 
   protected static final long MAX_BACK_OFF_TIME = Long.MAX_VALUE;
   protected static final long MAX_TIMEOUT = 1800000; // 30 minutes
 
   protected BlockingQueue<FetchAndLockRequest> queue = new ArrayBlockingQueue<FetchAndLockRequest>(200);
   protected List<FetchAndLockRequest> pendingRequests = new ArrayList<FetchAndLockRequest>();
-  protected Set<ProcessEngine> processEngines = new HashSet<ProcessEngine>();
 
   protected final Object MONITOR = new Object();
   protected Thread handlerThread = new Thread(this, this.getClass().getSimpleName());
@@ -119,7 +114,6 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler, E
       if (isWaiting) {
         MONITOR.notifyAll();
       }
-      unregisterExternalTaskListeners();
     }
   }
 
@@ -159,14 +153,6 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler, E
       errorTooManyRequests(asyncResponse);
     }
 
-    // Listen for new ExternalTasks from the process engines
-    registerExternalTaskListener(request.getProcessEngine());
-
-    notifyAcquisition();
-  }
-
-  @Override
-  public void onExternalTaskCreated() {
     notifyAcquisition();
   }
 
@@ -262,19 +248,4 @@ public class FetchAndLockHandlerImpl implements Runnable, FetchAndLockHandler, E
     return pendingRequests;
   }
 
-  protected void registerExternalTaskListener(ProcessEngine processEngine) {
-    if (!processEngines.contains(processEngine)) {
-      // register listener at a new process engine
-      ((ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration())
-        .addExternalTaskCreatedListener(this);
-      processEngines.add(processEngine);
-    }
-  }
-
-  protected void unregisterExternalTaskListeners() {
-    for (ProcessEngine processEngine : processEngines) {
-      ((ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration())
-        .removeExternalTaskCreatedListener(this);
-    }
-  }
 }

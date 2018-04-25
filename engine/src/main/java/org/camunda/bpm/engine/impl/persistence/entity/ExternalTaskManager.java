@@ -19,13 +19,9 @@ import org.camunda.bpm.engine.impl.Direction;
 import org.camunda.bpm.engine.impl.ExternalTaskQueryImpl;
 import org.camunda.bpm.engine.impl.ExternalTaskQueryProperty;
 import org.camunda.bpm.engine.impl.QueryOrderingProperty;
-import org.camunda.bpm.engine.impl.cfg.TransactionListener;
-import org.camunda.bpm.engine.impl.cfg.TransactionState;
-import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.externaltask.TopicFetchInstruction;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 
@@ -43,7 +39,6 @@ public class ExternalTaskManager extends AbstractManager {
 
   public void insert(ExternalTaskEntity externalTask) {
     getDbEntityManager().insert(externalTask);
-    fireExternalTaskCreatedEvent();
   }
 
   public void delete(ExternalTaskEntity externalTask) {
@@ -140,19 +135,6 @@ public class ExternalTaskManager extends AbstractManager {
 
   protected ListQueryParameterObject configureParameterizedQuery(Object parameter) {
     return getTenantManager().configureQuery(parameter);
-  }
-
-  public void fireExternalTaskCreatedEvent() {
-
-    Context.getCommandContext()
-      .getTransactionContext()
-      .addTransactionListener(TransactionState.COMMITTED, new TransactionListener() {
-        @Override
-        public void execute(CommandContext commandContext) {
-          commandContext.getProcessEngineConfiguration()
-            .notifyExternalTaskCreatedListeners();
-        }
-      });
   }
 }
 

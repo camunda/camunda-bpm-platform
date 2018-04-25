@@ -30,7 +30,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -264,7 +263,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.CommentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionManager;
-import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskCreatedListener;
 import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskManager;
 import org.camunda.bpm.engine.impl.persistence.entity.FilterManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricActivityInstanceManager;
@@ -461,10 +459,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected Map<String, BatchJobHandler<?>> batchHandlers;
   protected List<BatchJobHandler<?>> customBatchJobHandlers;
-
-  // EXTERNAL TASK CREATED LISTENERS //////////////////////////////////////////
-
-  protected Set<ExternalTaskCreatedListener> externalTaskCreatedListeners;
 
   /**
    * Number of jobs created by a batch seed job invocation
@@ -786,7 +780,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initJpa();
     initDelegateInterceptor();
     initEventHandlers();
-    initExternalTaskCreatedListeners();
     initProcessApplicationManager();
     initCorrelationHandler();
     initConditionHandler();
@@ -978,14 +971,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       for (BatchJobHandler<?> customBatchJobHandler : customBatchJobHandlers) {
         batchHandlers.put(customBatchJobHandler.getType(), customBatchJobHandler);
       }
-    }
-  }
-
-  // external task created listeners ///////////////////////////////////////////
-
-  protected void initExternalTaskCreatedListeners() {
-    if (this.externalTaskCreatedListeners == null) {
-      this.externalTaskCreatedListeners = new HashSet<ExternalTaskCreatedListener>();
     }
   }
 
@@ -3163,28 +3148,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setBatchHandlers(Map<String, BatchJobHandler<?>> batchHandlers) {
     this.batchHandlers = batchHandlers;
-  }
-
-  public Set<ExternalTaskCreatedListener> getExternalTaskCreatedListeners() {
-    return externalTaskCreatedListeners;
-  }
-
-  public void setExternalTaskCreatedListeners(Set<ExternalTaskCreatedListener> externalTaskCreatedListeners) {
-    this.externalTaskCreatedListeners = externalTaskCreatedListeners;
-  }
-
-  public void addExternalTaskCreatedListener(ExternalTaskCreatedListener externalTaskCreatedListener) {
-    this.externalTaskCreatedListeners.add(externalTaskCreatedListener);
-  }
-
-  public void removeExternalTaskCreatedListener(ExternalTaskCreatedListener externalTaskCreatedListener) {
-      this.externalTaskCreatedListeners.remove(externalTaskCreatedListener);
-  }
-
-  public void notifyExternalTaskCreatedListeners() {
-    for (ExternalTaskCreatedListener externalTaskCreatedListener : externalTaskCreatedListeners) {
-      externalTaskCreatedListener.onExternalTaskCreated();
-    }
   }
 
   public List<BatchJobHandler<?>> getCustomBatchJobHandlers() {
