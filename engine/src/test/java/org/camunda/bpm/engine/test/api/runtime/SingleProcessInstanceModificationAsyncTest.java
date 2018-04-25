@@ -71,9 +71,8 @@ public class SingleProcessInstanceModificationAsyncTest extends PluggableProcess
   }
 
   @Deployment(resources = PARALLEL_GATEWAY_PROCESS)
-  public void testCancellation() {
+  public void testTheDeploymentIdIsSet() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("parallelGateway");
-    String processInstanceId = processInstance.getId();
     String processDefinitionId = processInstance.getProcessDefinitionId();
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionId).singleResult();
 
@@ -92,6 +91,21 @@ public class SingleProcessInstanceModificationAsyncTest extends PluggableProcess
       managementService.executeJob(pending.getId());
       assertEquals(processDefinition.getDeploymentId(), pending.getDeploymentId());
     }
+  }
+
+  @Deployment(resources = PARALLEL_GATEWAY_PROCESS)
+  public void testCancellation() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("parallelGateway");
+    String processInstanceId = processInstance.getId();
+
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
+
+    Batch modificationBatch = runtimeService
+        .createProcessInstanceModification(processInstance.getId())
+        .cancelActivityInstance(getInstanceIdForActivity(tree, "task1"))
+        .executeAsync();
+    assertNotNull(modificationBatch);
+    executeSeedAndBatchJobs(modificationBatch);
 
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
     assertNotNull(updatedTree);
