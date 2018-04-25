@@ -40,11 +40,16 @@
               </li>
             </ul>
           </div>
-
           <span ng-if="allDefinitions && allDefinitions.length < 2 && decisionDefinition">
             {{ decisionDefinition.version }}
           </span>
         </dd>
+
+        <dt>{{ 'DECISION_DEFINITION_VERSION_TAG' | translate }}</dt>
+        <dd class="version-tag"
+            ng-if="decisionDefinition.versionTag">{{ decisionDefinition.versionTag }}</dd>
+        <dd class="version-tag"
+            ng-if="!decisionDefinition.versionTag"><span class="null-value">{{ 'DECISION_DEFINITION_NULL' | translate }}</span></dd>
 
         <dt cam-widget-clipboard="decisionDefinition.id"
             cam-hoverable-title="definition-id">{{ 'DECISION_DEFINITION_DEFINITION_ID' | translate }}</dt>
