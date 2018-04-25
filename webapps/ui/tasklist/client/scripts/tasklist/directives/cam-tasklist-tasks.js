@@ -182,9 +182,9 @@ module.exports = [function() {
           tasksData.set('taskId', { 'taskId' : taskId });
           $scope.currentTaskId = taskId;
 
-          var searchParams = angular.copy(search) || {};
+          var searchParams = $location.search() || {};
           searchParams.task = taskId;
-          search.updateSilently(searchParams);
+          updateSilently(searchParams);
 
           var el = document.querySelector('[cam-tasks] .tasks-list .task [href*="#/?task=' + taskId + '"]');
           if(el) {
