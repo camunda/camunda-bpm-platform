@@ -68,6 +68,25 @@ public class LdapUserQueryTest extends LdapIdentityProviderTest {
     assertNotNull(users);
     assertEquals(3, users.size());
   }
+  
+  public void testFilterByUserIdWithCapitalization() {
+	try {
+	  processEngineConfiguration.setAuthorizationEnabled(true);
+	  identityService.setAuthenticatedUserId("Oscar");
+	  User user = identityService.createUserQuery().userId("Oscar").singleResult();
+	  assertNotNull(user);
+
+	  // validate user
+	  assertEquals("oscar", user.getId());
+	  assertEquals("Oscar", user.getFirstName());
+	  assertEquals("The Crouch", user.getLastName());
+	  assertEquals("oscar@camunda.org", user.getEmail());
+	}
+	finally {
+      processEngineConfiguration.setAuthorizationEnabled(false);
+	  identityService.clearAuthentication();
+	}
+  }
 
   public void testFilterByFirstname() {
     User user = identityService.createUserQuery().userFirstName("Oscar").singleResult();
