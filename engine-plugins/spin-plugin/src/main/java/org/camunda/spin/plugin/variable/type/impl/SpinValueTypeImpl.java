@@ -12,7 +12,7 @@
  */
 package org.camunda.spin.plugin.variable.type.impl;
 
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.engine.variable.impl.type.AbstractValueTypeImpl;
@@ -36,11 +36,13 @@ public abstract class SpinValueTypeImpl extends AbstractValueTypeImpl implements
 
   public TypedValue createValue(Object value, Map<String, Object> valueInfo) {
     SpinValueBuilder<?> builder = createValue((SpinValue) value);
+    applyValueInfo(builder, valueInfo);
     return builder.create();
   }
 
   public SerializableValue createValueFromSerialized(String serializedValue, Map<String, Object> valueInfo) {
     SpinValueBuilder<?> builder = createValueFromSerialized(serializedValue);
+    applyValueInfo(builder, valueInfo);
     return builder.create();
   }
 
@@ -49,7 +51,24 @@ public abstract class SpinValueTypeImpl extends AbstractValueTypeImpl implements
   }
 
   public Map<String, Object> getValueInfo(TypedValue typedValue) {
-    return Collections.emptyMap();
+    if(!(typedValue instanceof SpinValue)) {
+      throw new IllegalArgumentException("Value not of type Spin Value.");
+    }
+    SpinValue spinValue = (SpinValue) typedValue;
+
+    Map<String, Object> valueInfo = new HashMap<String, Object>();
+
+    if (spinValue.isTransient()) {
+      valueInfo.put(VALUE_INFO_TRANSIENT, spinValue.isTransient());
+    }
+
+    return valueInfo;
+  }
+
+  protected void applyValueInfo(SpinValueBuilder<?> builder, Map<String, Object> valueInfo) {
+    if(valueInfo != null) {
+      builder.setTransient(isTransient(valueInfo));
+    }
   }
 
   protected abstract SpinValueBuilder<?> createValue(SpinValue value);

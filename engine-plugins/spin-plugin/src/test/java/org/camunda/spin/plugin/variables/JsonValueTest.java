@@ -16,7 +16,9 @@ import static org.camunda.spin.DataFormats.json;
 import static org.camunda.spin.plugin.variable.SpinValues.jsonValue;
 import static org.camunda.spin.plugin.variable.type.SpinValueType.JSON;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
@@ -25,9 +27,13 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.type.ValueType;
+import org.camunda.bpm.engine.variable.value.SerializableValue;
 import org.camunda.spin.DataFormats;
 import org.camunda.spin.SpinRuntimeException;
 import org.camunda.spin.json.SpinJsonNode;
+import org.camunda.spin.plugin.variable.SpinValues;
+import org.camunda.spin.plugin.variable.type.SpinValueType;
 import org.camunda.spin.plugin.variable.value.JsonValue;
 import org.camunda.spin.plugin.variable.value.builder.JsonValueBuilder;
 import org.json.JSONException;
@@ -180,7 +186,7 @@ public class JsonValueTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = ONE_TASK_PROCESS)
-  public void testTransientJsonValue() throws JSONException {
+  public void testTransientJsonValueFluent() {
     // given
     JsonValue jsonValue = jsonValue(jsonString).setTransient(true).create();
     VariableMap variables = Variables.createVariables().putValueTyped(variableName, jsonValue);
@@ -191,6 +197,34 @@ public class JsonValueTest extends PluggableProcessEngineTestCase {
     // then
     List<VariableInstance> variableInstances = runtimeService.createVariableInstanceQuery().list();
     assertEquals(0, variableInstances.size());
+  }
+
+  @Deployment(resources = ONE_TASK_PROCESS)
+  public void testTransientJsonValue() {
+    // given
+    JsonValue jsonValue = jsonValue(jsonString, true).create();
+    VariableMap variables = Variables.createVariables().putValueTyped(variableName, jsonValue);
+
+    // when
+    runtimeService.startProcessInstanceByKey(ONE_TASK_PROCESS_KEY, variables).getId();
+
+    // then
+    List<VariableInstance> variableInstances = runtimeService.createVariableInstanceQuery().list();
+    assertEquals(0, variableInstances.size());
+  }
+
+  public void testApplyValueInfoFromSerializedValue() {
+    // given
+    Map<String, Object> valueInfo = new HashMap<String, Object>();
+    valueInfo.put(ValueType.VALUE_INFO_TRANSIENT, true);
+
+    // when
+    JsonValue jsonValue = (JsonValue) SpinValueType.JSON.createValueFromSerialized(jsonString, valueInfo);
+
+    // then
+    assertEquals(true, jsonValue.isTransient());
+    Map<String, Object> returnedValueInfo = SpinValueType.JSON.getValueInfo(jsonValue);
+    assertEquals(true, returnedValueInfo.get(ValueType.VALUE_INFO_TRANSIENT));
   }
 
 }

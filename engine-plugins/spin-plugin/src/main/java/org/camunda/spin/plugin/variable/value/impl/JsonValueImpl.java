@@ -27,12 +27,8 @@ public class JsonValueImpl extends SpinValueImpl implements JsonValue {
 
   private static final long serialVersionUID = 1L;
 
-  public JsonValueImpl(
-      SpinJsonNode value,
-      String serializedValue,
-      String dataFormatName,
-      boolean isDeserialized) {
-    super(value, serializedValue, dataFormatName, isDeserialized, SpinValueType.JSON);
+  public JsonValueImpl(String value) {
+    this(null, value, DataFormats.JSON_DATAFORMAT_NAME, false);
   }
 
   public JsonValueImpl(SpinJsonNode value) {
@@ -43,8 +39,21 @@ public class JsonValueImpl extends SpinValueImpl implements JsonValue {
     this(null, value, dataFormatName, false);
   }
 
-  public JsonValueImpl(String value) {
-    this(value, DataFormats.JSON_DATAFORMAT_NAME);
+  public JsonValueImpl(
+      SpinJsonNode value,
+      String serializedValue,
+      String dataFormatName,
+      boolean isDeserialized) {
+    this(value, serializedValue, dataFormatName, isDeserialized, false);
+  }
+
+  public JsonValueImpl(
+      SpinJsonNode value,
+      String serializedValue,
+      String dataFormatName,
+      boolean isDeserialized,
+      boolean isTransient) {
+    super(value, serializedValue, dataFormatName, isDeserialized, SpinValueType.JSON, isTransient);
   }
 
   @SuppressWarnings("unchecked")

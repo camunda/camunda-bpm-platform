@@ -38,13 +38,15 @@ public abstract class SpinValueImpl extends AbstractTypedValue<Spin<?>> implemen
       String serializedValue,
       String dataFormatName,
       boolean isDeserialized,
-      ValueType type) {
+      ValueType type,
+      boolean isTransient) {
 
     super(value, type);
 
     this.serializedValue = serializedValue;
     this.dataFormatName = dataFormatName;
     this.isDeserialized = isDeserialized;
+    this.isTransient = isTransient;
   }
 
   public Spin<?> getValue() {

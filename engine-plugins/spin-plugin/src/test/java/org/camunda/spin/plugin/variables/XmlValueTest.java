@@ -16,7 +16,9 @@ import static org.camunda.spin.DataFormats.xml;
 import static org.camunda.spin.plugin.variable.SpinValues.xmlValue;
 import static org.camunda.spin.plugin.variable.type.SpinValueType.XML;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
@@ -25,8 +27,11 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.spin.DataFormats;
 import org.camunda.spin.SpinRuntimeException;
+import org.camunda.spin.plugin.variable.type.SpinValueType;
+import org.camunda.spin.plugin.variable.value.JsonValue;
 import org.camunda.spin.plugin.variable.value.XmlValue;
 import org.camunda.spin.plugin.variable.value.builder.XmlValueBuilder;
 import org.camunda.spin.xml.SpinXmlElement;
@@ -182,7 +187,7 @@ public class XmlValueTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = ONE_TASK_PROCESS)
-  public void testTransientXmlValue() {
+  public void testTransientXmlValueFluent() {
     // given
     XmlValue xmlValue = xmlValue(xmlString).setTransient(true).create();
     VariableMap variables = Variables.createVariables().putValueTyped(variableName, xmlValue);
@@ -195,4 +200,31 @@ public class XmlValueTest extends PluggableProcessEngineTestCase {
     assertEquals(0, variableInstances.size());
   }
 
+  @Deployment(resources = ONE_TASK_PROCESS)
+  public void testTransientXmlValue() {
+    // given
+    XmlValue xmlValue = xmlValue(xmlString, true).create();
+    VariableMap variables = Variables.createVariables().putValueTyped(variableName, xmlValue);
+
+    // when
+    runtimeService.startProcessInstanceByKey(ONE_TASK_PROCESS_KEY, variables).getId();
+
+    // then
+    List<VariableInstance> variableInstances = runtimeService.createVariableInstanceQuery().list();
+    assertEquals(0, variableInstances.size());
+  }
+
+  public void testApplyValueInfoFromSerializedValue() {
+    // given
+    Map<String, Object> valueInfo = new HashMap<String, Object>();
+    valueInfo.put(ValueType.VALUE_INFO_TRANSIENT, true);
+
+    // when
+    XmlValue xmlValue = (XmlValue) SpinValueType.XML.createValueFromSerialized(xmlString, valueInfo);
+
+    // then
+    assertEquals(true, xmlValue.isTransient());
+    Map<String, Object> returnedValueInfo = SpinValueType.XML.getValueInfo(xmlValue);
+    assertEquals(true, returnedValueInfo.get(ValueType.VALUE_INFO_TRANSIENT));
+  }
 }

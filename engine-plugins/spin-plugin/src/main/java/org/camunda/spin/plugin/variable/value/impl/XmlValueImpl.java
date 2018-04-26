@@ -27,14 +27,6 @@ public class XmlValueImpl extends SpinValueImpl implements XmlValue {
 
   private static final long serialVersionUID = 1L;
 
-  public XmlValueImpl(
-      SpinXmlElement value,
-      String serializedValue,
-      String dataFormatName,
-      boolean isDeserialized) {
-    super(value, serializedValue, dataFormatName, isDeserialized, SpinValueType.XML);
-  }
-
   public XmlValueImpl(SpinXmlElement value) {
     this(value, null, value.getDataFormatName(), true);
   }
@@ -44,7 +36,24 @@ public class XmlValueImpl extends SpinValueImpl implements XmlValue {
   }
 
   public XmlValueImpl(String value) {
-    this(value, DataFormats.XML_DATAFORMAT_NAME);
+    this(null, value, DataFormats.XML_DATAFORMAT_NAME, false);
+  }
+
+  public XmlValueImpl(
+      SpinXmlElement value,
+      String serializedValue,
+      String dataFormatName,
+      boolean isDeserialized) {
+    this(value, serializedValue, dataFormatName, isDeserialized, false);
+  }
+
+  public XmlValueImpl(
+      SpinXmlElement value,
+      String serializedValue,
+      String dataFormatName,
+      boolean isDeserialized,
+      boolean isTransient) {
+    super(value, serializedValue, dataFormatName, isDeserialized, SpinValueType.XML, isTransient);
   }
 
   @SuppressWarnings("unchecked")

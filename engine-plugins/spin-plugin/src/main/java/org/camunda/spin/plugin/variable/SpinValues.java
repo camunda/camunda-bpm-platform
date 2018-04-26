@@ -26,19 +26,34 @@ import org.camunda.spin.xml.SpinXmlElement;
 public class SpinValues {
 
   public static JsonValueBuilder jsonValue(SpinJsonNode value) {
-    return new JsonValueBuilderImpl(value);
+    return jsonValue(value, false);
   }
 
   public static JsonValueBuilder jsonValue(String value) {
-    return new JsonValueBuilderImpl(value);
+    return jsonValue(value, false);
+  }
+
+  public static JsonValueBuilder jsonValue(SpinJsonNode value, boolean isTransient) {
+    return (JsonValueBuilder) new JsonValueBuilderImpl(value).setTransient(isTransient);
+  }
+
+  public static JsonValueBuilder jsonValue(String value, boolean isTransient) {
+    return (JsonValueBuilder) new JsonValueBuilderImpl(value).setTransient(isTransient);
   }
 
   public static XmlValueBuilder xmlValue(SpinXmlElement value) {
-    return new XmlValueBuilderImpl(value);
+    return xmlValue(value, false);
   }
 
   public static XmlValueBuilder xmlValue(String value) {
-    return new XmlValueBuilderImpl(value);
+    return xmlValue(value, false);
   }
 
+  public static XmlValueBuilder xmlValue(SpinXmlElement value, boolean isTransient) {
+    return (XmlValueBuilder) new XmlValueBuilderImpl(value).setTransient(isTransient);
+  }
+
+  public static XmlValueBuilder xmlValue(String value, boolean isTransient) {
+    return (XmlValueBuilder) new XmlValueBuilderImpl(value).setTransient(isTransient);
+  }
 }
