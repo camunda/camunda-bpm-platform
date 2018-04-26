@@ -4,19 +4,8 @@ import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
-
-
-class Invoice {
-
-  public String invoiceId;
-
-  public Invoice(String invoiceId) {
-    this.invoiceId = invoiceId;
-  }
-
-}
 
 public class App {
 
@@ -40,19 +29,18 @@ public class App {
           .serializationDataFormat("application/xml")
           .create();
 
-        // add the invoice object to a map
-        Map<String, Object> variablesMap =
-          Collections.singletonMap("invoice", invoiceValue);
+        // add the invoice object and its id to a map
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("invoiceId", invoice.id);
+        variables.put("invoice", invoice);
 
-        try {
-          if (Math.random() <= 0.5) {
-            // complete the external task with process variables
-            externalTaskService.complete(externalTask, variablesMap);
-          } else {
-            // complete the external task with local variables
-            externalTaskService.complete(externalTask, null, variablesMap);
-          }
-        } catch (Exception ignored) { }
+        // select the scope of the variables
+        boolean isRandomSample = Math.random() <= 0.5;
+        if (isRandomSample) {
+          externalTaskService.complete(externalTask, variables);
+        } else {
+          externalTaskService.complete(externalTask, null, variables);
+        }
 
         System.out.println("The External Task " + externalTask.getId() +
           " has been completed!");

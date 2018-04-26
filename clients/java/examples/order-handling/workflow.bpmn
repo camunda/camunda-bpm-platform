@@ -26,7 +26,7 @@
       <bpmn:incoming>SequenceFlow_140kl02</bpmn:incoming>
     </bpmn:endEvent>
     <bpmn:sequenceFlow id="SequenceFlow_1k59pur" sourceRef="BoundaryEvent_1y1bvad" targetRef="Task_1yjkccw" />
-    <bpmn:task id="Task_1yjkccw" name="Store invoice">
+    <bpmn:task id="Task_1yjkccw" name="Archive invoice">
       <bpmn:incoming>SequenceFlow_1k59pur</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_140kl02</bpmn:outgoing>
     </bpmn:task>
@@ -37,10 +37,10 @@
         <bpmn:timeCycle xsi:type="bpmn:tFormalExpression">0/5 0/1 * 1/1 * ? *</bpmn:timeCycle>
       </bpmn:timerEventDefinition>
     </bpmn:startEvent>
-    <bpmn:boundaryEvent id="BoundaryEvent_1y1bvad" name="Random sample?" attachedToRef="Task_1nbdup3">
+    <bpmn:boundaryEvent id="BoundaryEvent_1y1bvad" name="Archive invoice?" attachedToRef="Task_1nbdup3">
       <bpmn:outgoing>SequenceFlow_1k59pur</bpmn:outgoing>
       <bpmn:conditionalEventDefinition>
-        <bpmn:condition xsi:type="bpmn:tFormalExpression">${invoice != null}</bpmn:condition>
+        <bpmn:condition xsi:type="bpmn:tFormalExpression">${invoiceId != null}</bpmn:condition>
       </bpmn:conditionalEventDefinition>
     </bpmn:boundaryEvent>
   </bpmn:process>
@@ -130,7 +130,7 @@
       <bpmndi:BPMNShape id="BoundaryEvent_1jdmsqk_di" bpmnElement="BoundaryEvent_1y1bvad">
         <dc:Bounds x="927" y="351" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="901" y="395" width="87" height="13" />
+          <dc:Bounds x="905" y="395" width="81" height="13" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
