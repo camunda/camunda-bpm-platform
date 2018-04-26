@@ -15,6 +15,7 @@ package org.camunda.bpm.client.variable.impl.format.json;
 import static org.camunda.commons.utils.EnsureUtil.ensureNotNull;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -72,9 +73,11 @@ public class JacksonJsonDataFormat implements DataFormat {
 
   public String writeValue(Object value) {
     try {
-      return objectMapper.writeValueAsString(value);
+      StringWriter stringWriter = new StringWriter();
+      objectMapper.writeValue(stringWriter, value);
+      return stringWriter.toString();
     }
-    catch (JsonProcessingException e) {
+    catch (IOException e) {
       throw LOG.unableToWriteValue(value, e);
     }
   }
