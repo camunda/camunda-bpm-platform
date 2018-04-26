@@ -82,11 +82,6 @@ public interface ExternalTask {
   Integer getRetries();
 
   /**
-   * @return a flag indicating whether the external task is suspended or not
-   */
-  boolean isSuspended();
-
-  /**
    * @return the id of the worker that possesses or possessed the most recent lock
    */
   String getWorkerId();

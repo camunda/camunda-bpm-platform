@@ -16,6 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.client.rule.ClientRule.LOCK_DURATION;
 import static org.camunda.bpm.client.util.ProcessModels.BPMN_ERROR_EXTERNAL_TASK_PROCESS;
 import static org.camunda.bpm.client.util.ProcessModels.EXTERNAL_TASK_ID;
+import static org.camunda.bpm.client.util.ProcessModels.EXTERNAL_TASK_PRIORITY;
 import static org.camunda.bpm.client.util.ProcessModels.EXTERNAL_TASK_TOPIC_FOO;
 import static org.camunda.bpm.client.util.ProcessModels.PROCESS_KEY;
 import static org.camunda.bpm.client.util.ProcessModels.PROCESS_KEY_2;
@@ -27,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.client.dto.IncidentDto;
@@ -47,6 +49,7 @@ import org.junit.rules.RuleChain;
 
 public class ExternalTaskHandlerIT {
 
+  private static final String BUSINESS_KEY = "aBusinessKey";
   protected ClientRule clientRule = new ClientRule();
   protected EngineRule engineRule = new EngineRule();
 
@@ -62,7 +65,7 @@ public class ExternalTaskHandlerIT {
   public void setup() throws Exception {
     client = clientRule.client();
     processDefinition = engineRule.deploy(BPMN_ERROR_EXTERNAL_TASK_PROCESS).get(0);
-    processInstance = engineRule.startProcessInstance(processDefinition.getId());
+    processInstance = engineRule.startProcessInstance(processDefinition.getId(), BUSINESS_KEY);
   }
 
   @Test
@@ -85,7 +88,7 @@ public class ExternalTaskHandlerIT {
     assertThat(task.getProcessDefinitionId()).isEqualTo(processDefinition.getId());
     assertThat(task.getProcessDefinitionKey()).isEqualTo(PROCESS_KEY);
 
-    assertThat(task.getBusinessKey()).isNull();
+    assertThat(task.getBusinessKey()).isEqualTo(BUSINESS_KEY);
     assertThat(task.getProcessInstanceId()).isEqualTo(processInstance.getId());
     assertThat(task.getActivityId()).isEqualTo(EXTERNAL_TASK_ID);
     assertThat(task.getActivityInstanceId()).isNotNull();
@@ -94,7 +97,6 @@ public class ExternalTaskHandlerIT {
     assertThat(task.getLockExpirationTime()).isNotNull();
 
     assertThat(task.getAllVariables()).isEmpty();
-    // todo assert business key
   }
 
   @Test
@@ -336,6 +338,89 @@ public class ExternalTaskHandlerIT {
     assertThat(incident).isNotNull();
     assertThat(incident.getProcessInstanceId()).isEqualTo(processInstance.getId());
     assertThat(incident.getActivityId()).isEqualTo(EXTERNAL_TASK_ID);
+  }
+
+  @Test
+  public void shouldInvokeHandleFailureWithRetries() {
+    // given
+    RecordingExternalTaskHandler handler = new RecordingExternalTaskHandler((task, client) -> {
+      client.handleFailure(task, "my-message", "my-details", 1, 0);
+    });
+
+    // when
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .lockDuration(1000)
+      .handler(handler)
+      .open();
+
+
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    handler.clear();
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+    assertThat(task.getErrorMessage()).isEqualTo("my-message");
+    assertThat(task.getErrorDetails()).isEqualTo("my-details");
+    assertThat(task.getRetries()).isEqualTo(1);
+  }
+
+  @Test
+  public void shouldCheckExecutionId() {
+    // given
+    RecordingExternalTaskHandler handler = new RecordingExternalTaskHandler();
+
+    // when
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(handler)
+      .open();
+
+    // then
+    List<ExternalTask> handledTasks = handler.getHandledTasks();
+    clientRule.waitForFetchAndLockUntil(() -> !handledTasks.isEmpty());
+
+    ExternalTask task = engineRule.getExternalTaskByProcessInstanceId(processInstance.getId());
+    assertThat(task).isNotNull();
+    assertThat(task.getExecutionId()).isEqualTo(handledTasks.get(0).getExecutionId());
+  }
+
+  @Test
+  public void shouldCheckTenantId() {
+    // given
+    RecordingExternalTaskHandler handler = new RecordingExternalTaskHandler();
+    processDefinition = engineRule.deploy("aTenantId", BPMN_ERROR_EXTERNAL_TASK_PROCESS).get(0);
+    processInstance = engineRule.startProcessInstanceByKey(processDefinition.getKey(), "aTenantId");
+
+    // when
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(handler)
+      .open();
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = engineRule.getExternalTaskByProcessInstanceId(processInstance.getId());
+    assertThat(task).isNotNull();
+    assertThat(task.getTenantId()).isEqualTo("aTenantId");
+  }
+
+  @Test
+  public void shouldCheckTaskPriority() {
+    // given
+    RecordingExternalTaskHandler handler = new RecordingExternalTaskHandler();
+    // when
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(handler)
+      .open();
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = engineRule.getExternalTaskByProcessInstanceId(processInstance.getId());
+    assertThat(task).isNotNull();
+    assertThat(task.getPriority()).isEqualTo(EXTERNAL_TASK_PRIORITY);
   }
 
 }

@@ -55,6 +55,6 @@ public interface ExternalTaskClient {
    *           <li> {@code false} if the client is not actively fetching for tasks
    *         </ul>
    */
-  boolean isFetching();
+  boolean isActive();
 
 }

@@ -51,7 +51,7 @@ public class TopicSubscriptionManager implements Runnable {
   protected List<TopicRequestDto> taskTopicRequests;
   protected Map<String, ExternalTaskHandler> externalTaskHandlers;
 
-  protected boolean isRunning;
+  protected volatile boolean isRunning;
   protected Thread thread;
 
   protected ClientBackoffStrategy backoffStrategy;

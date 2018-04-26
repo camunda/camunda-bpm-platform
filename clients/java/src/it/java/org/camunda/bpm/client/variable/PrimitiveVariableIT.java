@@ -26,6 +26,8 @@ import static org.camunda.bpm.engine.variable.type.ValueType.NULL;
 import static org.camunda.bpm.engine.variable.type.ValueType.SHORT;
 import static org.camunda.bpm.engine.variable.type.ValueType.STRING;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -70,6 +72,7 @@ public class PrimitiveVariableIT {
   protected static final boolean VARIABLE_VALUE_BOOLEAN = true;
   protected static final Date VARIABLE_VALUE_DATE = new Date(1514790000000l);
   protected static final byte[] VARIABLE_VALUE_BYTES = VARIABLE_VALUE_STRING.getBytes();
+  protected static final InputStream VARIABLE_VALUE_BYTES_INPUTSTREAM = new ByteArrayInputStream(VARIABLE_VALUE_STRING.getBytes());
 
   protected ClientRule clientRule = new ClientRule();
   protected EngineRule engineRule = new EngineRule();
@@ -1899,6 +1902,80 @@ public class PrimitiveVariableIT {
 
     TypedValue typedValue = task.getVariableTyped(VARIABLE_NAME);
     assertThat(typedValue.getValue()).isNull();
+    assertThat(typedValue.getType()).isEqualTo(BYTES);
+  }
+
+  @Test
+  public void shoudSetVariable_Bytes_InputStream() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // when
+    Map<String, Object> variables = Variables.createVariables();
+    variables.put(VARIABLE_NAME, VARIABLE_VALUE_BYTES_INPUTSTREAM);
+    fooService.complete(fooTask, variables);
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    byte[] variableValue = task.getVariable(VARIABLE_NAME);
+    assertThat(variableValue).isEqualTo(VARIABLE_VALUE_BYTES);
+
+    TypedValue typedValue = task.getVariableTyped(VARIABLE_NAME);
+    assertThat(typedValue.getValue()).isEqualTo(VARIABLE_VALUE_BYTES);
+    assertThat(typedValue.getType()).isEqualTo(BYTES);
+  }
+
+  @Test
+  public void shoudSetVariableUntyped_Bytes_InputStream() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // when
+    Map<String, Object> variables = Variables.createVariables();
+    variables.put(VARIABLE_NAME, Variables.untypedValue(VARIABLE_VALUE_BYTES_INPUTSTREAM));
+    fooService.complete(fooTask, variables);
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    byte[] variableValue = task.getVariable(VARIABLE_NAME);
+    assertThat(variableValue).isEqualTo(VARIABLE_VALUE_BYTES);
+
+    TypedValue typedValue = task.getVariableTyped(VARIABLE_NAME);
+    assertThat(typedValue.getValue()).isEqualTo(VARIABLE_VALUE_BYTES);
     assertThat(typedValue.getType()).isEqualTo(BYTES);
   }
 

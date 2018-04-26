@@ -30,6 +30,7 @@ public class ProcessModels {
   public static final String USER_TASK_AFTER_BPMN_ERROR = "userTaskAfterBpmnError";
   public static final String EXTERNAL_TASK_TOPIC_FOO = "foo";
   public static final String EXTERNAL_TASK_TOPIC_BAR = "bar";
+  public static final long EXTERNAL_TASK_PRIORITY = 4711L;
 
   public static ProcessBuilder newModel() {
     return newModel(PROCESS_KEY);
@@ -87,6 +88,7 @@ public class ProcessModels {
       .startEvent()
       .serviceTask(EXTERNAL_TASK_ID)
         .camundaExternalTask(EXTERNAL_TASK_TOPIC_FOO)
+        .camundaTaskPriority(String.valueOf(EXTERNAL_TASK_PRIORITY))
       .userTask(USER_TASK_ID)
       .endEvent()
       .moveToActivity(EXTERNAL_TASK_ID)

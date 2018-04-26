@@ -17,6 +17,7 @@ public class TaskDto {
   protected String id;
   protected String processInstanceId;
   protected String taskDefinitionKey;
+  protected String executionId;
 
   public String getId() {
     return id;
@@ -41,4 +42,13 @@ public class TaskDto {
   public void setTaskDefinitionKey(String taskDefinitionKey) {
     this.taskDefinitionKey = taskDefinitionKey;
   }
+
+  public String getExecutionId() {
+    return executionId;
+  }
+
+  public void setExecutionId(String executionId) {
+    this.executionId = executionId;
+  }
+
 }

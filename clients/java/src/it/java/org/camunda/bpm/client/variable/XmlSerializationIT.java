@@ -55,6 +55,8 @@ public class XmlSerializationIT {
   protected static final XmlSerializable VARIABLE_VALUE_XML_DESERIALIZED = new XmlSerializable("a String", 42, true);
   protected static final XmlSerializables VARIABLE_VALUE_XML_LIST_DESERIALIZED = new XmlSerializables(Arrays.asList(VARIABLE_VALUE_XML_DESERIALIZED, VARIABLE_VALUE_XML_DESERIALIZED));
 
+  protected static final XmlSerializableNoAnnotation VARIABLE_VALUE_XML_NO_ANNOTATION_DESERIALIZED = new XmlSerializableNoAnnotation("a String", 42, true);
+
   protected static final String VARIABLE_VALUE_XML_SERIALIZED = VARIABLE_VALUE_XML_DESERIALIZED.toExpectedXmlString();
   protected static final String VARIABLE_VALUE_XML_LIST_SERIALIZED = VARIABLE_VALUE_XML_LIST_DESERIALIZED.toExpectedXmlString();
 
@@ -63,6 +65,12 @@ public class XmlSerializationIT {
       .objectTypeName(XmlSerializable.class.getName())
       .serializationDataFormat(XML_DATAFORMAT_NAME)
       .create();
+
+  protected static final ObjectValue VARIABLE_VALUE_XML_NO_ANNOTATION_OBJECT_VALUE = Variables
+    .serializedObjectValue(VARIABLE_VALUE_XML_NO_ANNOTATION_DESERIALIZED.toExpectedXmlString())
+    .objectTypeName(XmlSerializableNoAnnotation.class.getName())
+    .serializationDataFormat(XML_DATAFORMAT_NAME)
+    .create();
 
   protected static final ObjectValue VARIABLE_VALUE_XML_LIST_OBJECT_VALUE = Variables
       .serializedObjectValue(VARIABLE_VALUE_XML_LIST_SERIALIZED)
@@ -111,6 +119,25 @@ public class XmlSerializationIT {
 
     XmlSerializable variableValue = task.getVariable(VARIABLE_NAME_XML);
     assertThat(variableValue).isEqualTo(VARIABLE_VALUE_XML_DESERIALIZED);
+  }
+
+  @Test
+  public void shouldGetDeserializedXmlNoAnnotation() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId(), VARIABLE_NAME_XML, VARIABLE_VALUE_XML_NO_ANNOTATION_OBJECT_VALUE);
+
+    // when
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(handler)
+      .open();
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    XmlSerializableNoAnnotation variableValue = task.getVariable(VARIABLE_NAME_XML);
+    assertThat(variableValue).isEqualTo(VARIABLE_VALUE_XML_NO_ANNOTATION_DESERIALIZED);
   }
 
   @Test
@@ -541,6 +568,55 @@ public class XmlSerializationIT {
 
     XmlSerializable variableValue = task.getVariable(VARIABLE_NAME_XML);
     assertThat(variableValue).isEqualTo(VARIABLE_VALUE_XML_DESERIALIZED);
+  }
+
+  @Test
+  public void shoudSetVariableTypedNoAnnotation() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(invocationHandler)
+      .open();
+
+    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
+
+    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
+    ExternalTask fooTask = invocation.getExternalTask();
+    ExternalTaskService fooService = invocation.getExternalTaskService();
+
+    client.subscribe(EXTERNAL_TASK_TOPIC_BAR)
+      .handler(handler)
+      .open();
+
+    // when
+    Map<String, Object> variables = Variables.createVariables();
+    variables.put(VARIABLE_NAME_XML, Variables.objectValue(VARIABLE_VALUE_XML_NO_ANNOTATION_DESERIALIZED).serializationDataFormat(XML).create());
+    fooService.complete(fooTask, variables);
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    ExternalTask task = handler.getHandledTasks().get(0);
+
+    ObjectValue serializedValue = task.getVariableTyped(VARIABLE_NAME_XML, false);
+    assertThat(serializedValue.isDeserialized()).isFalse();
+    assertThat(serializedValue.getType()).isEqualTo(OBJECT);
+    assertThat(serializedValue.getObjectTypeName()).isEqualTo(XmlSerializableNoAnnotation.class.getName());
+
+    SpinXmlElement spinElement = Spin.XML(serializedValue.getValueSerialized());
+    assertThat(VARIABLE_VALUE_XML_NO_ANNOTATION_DESERIALIZED.getStringProperty()).isEqualTo(spinElement.childElement("stringProperty").textContent());
+    assertThat(VARIABLE_VALUE_XML_NO_ANNOTATION_DESERIALIZED.getBooleanProperty()).isEqualTo(Boolean.parseBoolean(spinElement.childElement("booleanProperty").textContent()));
+    assertThat(VARIABLE_VALUE_XML_NO_ANNOTATION_DESERIALIZED.getIntProperty()).isEqualTo(Integer.parseInt(spinElement.childElement("intProperty").textContent()));
+
+    ObjectValue deserializedValue = task.getVariableTyped(VARIABLE_NAME_XML);
+    assertThat(deserializedValue.isDeserialized()).isTrue();
+    assertThat(deserializedValue.getValue()).isEqualTo(VARIABLE_VALUE_XML_NO_ANNOTATION_DESERIALIZED);
+    assertThat(deserializedValue.getType()).isEqualTo(OBJECT);
+    assertThat(deserializedValue.getObjectTypeName()).isEqualTo(XmlSerializableNoAnnotation.class.getName());
+
+    XmlSerializableNoAnnotation variableValue = task.getVariable(VARIABLE_NAME_XML);
+    assertThat(variableValue).isEqualTo(VARIABLE_VALUE_XML_NO_ANNOTATION_DESERIALIZED);
   }
 
   @Test

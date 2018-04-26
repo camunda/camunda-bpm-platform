@@ -23,7 +23,7 @@ public class TopicSubscriptionManagerLogger extends ExternalTaskClientLogger {
 
   protected void exceptionWhilePerformingFetchAndLock(EngineClientException e) {
     logError(
-      "001", "Exception while fetch and lock task.:", e);
+      "001", "Exception while fetch and lock task.", e);
   }
 
   protected void exceptionWhileExecutingExternalTaskHandler(String topicName, Throwable e) {

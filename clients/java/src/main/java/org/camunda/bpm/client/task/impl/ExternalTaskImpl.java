@@ -41,7 +41,6 @@ public class ExternalTaskImpl implements ExternalTask {
   protected String processDefinitionKey;
   protected String processInstanceId;
   protected Integer retries;
-  protected boolean suspended;
   protected String workerId;
   protected String topicName;
   protected String tenantId;
@@ -94,10 +93,6 @@ public class ExternalTaskImpl implements ExternalTask {
 
   public void setRetries(Integer retries) {
     this.retries = retries;
-  }
-
-  public void setSuspended(boolean suspended) {
-    this.suspended = suspended;
   }
 
   public void setWorkerId(String workerId) {
@@ -186,11 +181,6 @@ public class ExternalTaskImpl implements ExternalTask {
   @Override
   public Integer getRetries() {
     return retries;
-  }
-
-  @Override
-  public boolean isSuspended() {
-    return suspended;
   }
 
   @Override

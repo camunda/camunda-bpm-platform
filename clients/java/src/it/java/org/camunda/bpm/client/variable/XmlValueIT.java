@@ -15,14 +15,21 @@ package org.camunda.bpm.client.variable;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.client.util.ProcessModels.EXTERNAL_TASK_TOPIC_BAR;
 import static org.camunda.bpm.client.util.ProcessModels.EXTERNAL_TASK_TOPIC_FOO;
+import static org.camunda.bpm.client.util.ProcessModels.PROCESS_KEY_2;
 import static org.camunda.bpm.client.util.ProcessModels.TWO_EXTERNAL_TASK_PROCESS;
+import static org.camunda.bpm.client.util.ProcessModels.USER_TASK_ID;
+import static org.camunda.bpm.client.util.ProcessModels.createProcessWithExclusiveGateway;
 import static org.camunda.bpm.client.variable.ClientValues.XML;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.client.dto.ProcessDefinitionDto;
 import org.camunda.bpm.client.dto.ProcessInstanceDto;
+import org.camunda.bpm.client.dto.TaskDto;
+import org.camunda.bpm.client.dto.VariableInstanceDto;
 import org.camunda.bpm.client.rule.ClientRule;
 import org.camunda.bpm.client.rule.EngineRule;
 import org.camunda.bpm.client.task.ExternalTask;
@@ -33,7 +40,9 @@ import org.camunda.bpm.client.util.RecordingInvocationHandler.RecordedInvocation
 import org.camunda.bpm.client.variable.value.XmlValue;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.TypedValue;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -245,6 +254,37 @@ public class XmlValueIT {
     TypedValue typedValue = task.getVariableTyped(VARIABLE_NAME_XML);
     assertThat(typedValue.getValue()).isNull();
     assertThat(typedValue.getType()).isEqualTo(XML);
+  }
+
+  @Test
+  @Ignore("CAM-9000")
+  public void shoudSetTransientVariable() {
+    // given
+    BpmnModelInstance process = createProcessWithExclusiveGateway(PROCESS_KEY_2, "${XML(" + VARIABLE_NAME_XML + ").attr('attrName').value() == 'attrValue'}");
+    ProcessDefinitionDto definition = engineRule.deploy(process).get(0);
+    ProcessInstanceDto processInstance = engineRule.startProcessInstance(definition.getId());
+
+    RecordingExternalTaskHandler handler = new RecordingExternalTaskHandler((task, client) -> {
+      Map<String, Object> variables = new HashMap<>();
+      variables.put(VARIABLE_NAME_XML, ClientValues.xmlValue(VARIABLE_VALUE_XML_SERIALIZED, true));
+      client.complete(task, variables);
+    });
+
+    // when
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      .handler(handler)
+      .open();
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    TaskDto task = engineRule.getTaskByProcessInstanceId(processInstance.getId());
+    assertThat(task).isNotNull();
+    assertThat(task.getProcessInstanceId()).isEqualTo(processInstance.getId());
+    assertThat(task.getTaskDefinitionKey()).isEqualTo(USER_TASK_ID);
+
+    List<VariableInstanceDto> variables = engineRule.getVariablesByProcessInstanceIdAndVariableName(processInstance.getId(), VARIABLE_NAME_XML);
+    assertThat(variables).isEmpty();
   }
 
 }

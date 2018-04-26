@@ -40,7 +40,7 @@ public class ExternalTaskClientImpl implements ExternalTaskClient {
     topicSubscriptionManager.start();
   }
 
-  public boolean isFetching() {
+  public boolean isActive() {
     return topicSubscriptionManager.isRunning();
   }
 

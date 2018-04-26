@@ -18,7 +18,11 @@ import static org.camunda.bpm.client.util.ProcessModels.EXTERNAL_TASK_TOPIC_FOO;
 import static org.camunda.bpm.client.util.PropertyUtil.DEFAULT_PROPERTIES_PATH;
 import static org.camunda.bpm.client.util.PropertyUtil.loadProperties;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -34,6 +38,8 @@ import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.topic.TopicSubscription;
 import org.camunda.bpm.client.util.PropertyUtil;
 import org.camunda.bpm.client.util.RecordingExternalTaskHandler;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -71,6 +77,101 @@ public class ClientIT {
     client = clientRule.client();
     handler.clear();
     processDefinition = engineRule.deploy(BPMN_ERROR_EXTERNAL_TASK_PROCESS).get(0);
+  }
+
+  @Test
+  public void shouldSanitizeWhitespaceOfBaseUrl() {
+    ExternalTaskClient client = null;
+
+    try {
+      // given
+      engineRule.startProcessInstance(processDefinition.getId());
+
+      client = ExternalTaskClient.create()
+        .baseUrl(" " + BASE_URL + " ")
+        .build();
+
+      client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+        .handler(handler)
+        .open();
+
+      // when
+      clientRule.waitForFetchAndLockUntil(() -> handler.getHandledTasks().size() == 1);
+
+      // then
+      assertThat(handler.getHandledTasks().size()).isEqualTo(1);
+    }
+    finally {
+      if (client != null) {
+        client.stop();
+      }
+    }
+  }
+
+  @Test
+  public void shouldSanitizeMultipleBackslashesOfBaseUrl() {
+    ExternalTaskClient client = null;
+
+    try {
+      // given
+      engineRule.startProcessInstance(processDefinition.getId());
+
+      client = ExternalTaskClient.create()
+        .baseUrl(BASE_URL + "//")
+        .build();
+
+      client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+        .handler(handler)
+        .open();
+
+      // when
+      clientRule.waitForFetchAndLockUntil(() -> handler.getHandledTasks().size() == 1);
+
+      // then
+      assertThat(handler.getHandledTasks().size()).isEqualTo(1);
+    }
+    finally {
+      if (client != null) {
+        client.stop();
+      }
+    }
+  }
+
+  @Test
+  public void shouldSetDefaultSerializationFormat() {
+    ExternalTaskClient client = null;
+
+    try {
+      // given
+      engineRule.startProcessInstance(processDefinition.getId());
+
+      client = ExternalTaskClient.create()
+        .baseUrl(BASE_URL)
+        .defaultSerializationFormat("application/x-java-serialized-object")
+        .build();
+
+      final ObjectValue[] objectValue = { null };
+      RecordingExternalTaskHandler recordingHandler = new RecordingExternalTaskHandler((t, s) -> {
+        List<String> list = new ArrayList<>(Arrays.asList("lorem", "ipsum", "dolor", "sit"));
+        objectValue[0] = Variables.objectValue(list).create();
+        s.complete(t, Collections.singletonMap("variable", objectValue[0]));
+      });
+
+      client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+        .handler(recordingHandler)
+        .open();
+
+      // when
+      clientRule.waitForFetchAndLockUntil(() -> recordingHandler.getHandledTasks().size() == 1);
+
+      // then
+      assertThat(objectValue[0].getSerializationDataFormat()).isEqualTo("application/x-java-serialized-object");
+    }
+    finally {
+      if (client != null) {
+        client.stop();
+      }
+    }
   }
 
   @Test
@@ -266,6 +367,29 @@ public class ClientIT {
   }
 
   @Test
+  public void shouldThrowExceptionDueToInterceptorIsNull() {
+    ExternalTaskClient client = null;
+
+    try {
+      // given
+      ExternalTaskClientBuilder externalTaskClientBuilder = ExternalTaskClient.create()
+        .baseUrl("http://camunda.com/engine-rest")
+        .addInterceptor(null);
+
+      // then
+      thrown.expect(ExternalTaskClientException.class);
+
+      // when
+      client = externalTaskClientBuilder.build();
+    }
+    finally {
+      if (client != null) {
+        client.stop();
+      }
+    }
+  }
+
+  @Test
   public void shouldPerformBackoff() {
     // given
     AtomicBoolean isBackoffPerformed = new AtomicBoolean(false);
@@ -356,6 +480,104 @@ public class ClientIT {
 
     // then
     assertThat(isBackoffReset.get()).isTrue();
+  }
+
+  @Test
+  public void shouldPerformAutoFetching() {
+    ExternalTaskClient client = null;
+
+    try {
+      // given
+      ExternalTaskClientBuilder clientBuilder = ExternalTaskClient.create()
+        .baseUrl(BASE_URL);
+
+      // when
+      client = clientBuilder.build();
+
+      // then
+      assertThat(client.isActive()).isTrue();
+    } finally {
+      if (client != null) {
+        client.stop();
+      }
+    }
+  }
+
+  @Test
+  public void shouldDisableAutoFetching() {
+    ExternalTaskClient client = null;
+
+    try {
+      // given
+      ExternalTaskClientBuilder clientBuilder = ExternalTaskClient.create()
+        .baseUrl(BASE_URL)
+        .disableAutoFetching();
+
+      // when
+      client = clientBuilder.build();
+
+      // then
+      assertThat(client.isActive()).isFalse();
+    } finally {
+      if (client != null) {
+        client.stop();
+      }
+    }
+  }
+
+  @Test
+  public void shouldStartFetchingWhenAutoFetchingIsDisabled() {
+    ExternalTaskClient client = null;
+
+    try {
+      // given
+      client = ExternalTaskClient.create()
+        .baseUrl(BASE_URL)
+        .disableAutoFetching()
+        .build();
+
+      // assume
+      assertThat(client.isActive()).isFalse();
+
+      // when
+      client.start();
+
+      // then
+      assertThat(client.isActive()).isTrue();
+    } finally {
+      if (client != null) {
+        client.stop();
+      }
+    }
+  }
+
+  @Test
+  public void shouldRestartFetchingWhenAutoFetchingIsDisabled() {
+    ExternalTaskClient client = null;
+
+    try {
+      // given
+      client = ExternalTaskClient.create()
+        .baseUrl(BASE_URL)
+        .disableAutoFetching()
+        .build();
+
+      client.start();
+      client.stop();
+
+      // assume
+      assertThat(client.isActive()).isFalse();
+
+      // when
+      client.start();
+
+      // then
+      assertThat(client.isActive()).isTrue();
+    } finally {
+      if (client != null) {
+        client.stop();
+      }
+    }
   }
 
 }

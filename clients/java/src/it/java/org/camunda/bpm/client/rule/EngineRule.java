@@ -68,6 +68,7 @@ public class EngineRule extends ExternalResource {
   protected static final String URI_DEPLOYMEN_CREATE = "%s/deployment/create";
   protected static final String URI_DEPLOYMENT_DELETE = "%s/deployment/%s";
   protected static final String URI_START_PROCESS_INSTANCE = "%s/process-definition/%s/start";
+  protected static final String URI_START_PROCESS_INSTANCE_TENANT = "%s/process-definition/key/%s/tenant-id/%s/start";
   protected static final String URI_GET_TASKS = "%s/task";
   protected static final String URI_GET_INCIDENTS = "%s/incident";
   protected static final String URI_GET_EXTERNAL_TASKS = "%s/external-task";
@@ -130,11 +131,15 @@ public class EngineRule extends ExternalResource {
     });
   }
 
-  @SuppressWarnings({ "unchecked", "rawtypes" })
   public List<ProcessDefinitionDto> deploy(BpmnModelInstance... processes) {
+    return deploy(null, processes);
+  }
+
+  @SuppressWarnings({"unchecked", "rawtypes"})
+  public List<ProcessDefinitionDto> deploy(String tenantId, BpmnModelInstance... processes) {
     List<ProcessDefinitionDto> definitions = new ArrayList<>();
 
-    HttpPost post = createDeploymentRequest(processes);
+    HttpPost post = createDeploymentRequest(tenantId, processes);
     HashMap<String, Object> response = executeRequest(post, HashMap.class);
 
     deployments.add((String) response.get("id"));
@@ -146,8 +151,7 @@ public class EngineRule extends ExternalResource {
         String definitionAsString = objectMapper.writeValueAsString(value);
         ProcessDefinitionDto definition = objectMapper.readValue(definitionAsString, ProcessDefinitionDto.class);
         definitions.add(definition);
-      }
-      catch (Exception e) {
+      } catch (Exception e) {
         throw new RuntimeException(e);
       }
     });
@@ -156,6 +160,10 @@ public class EngineRule extends ExternalResource {
   }
 
   protected HttpPost createDeploymentRequest(BpmnModelInstance... processes) {
+    return createDeploymentRequest(null, processes);
+  }
+
+  protected HttpPost createDeploymentRequest(String tenantId, BpmnModelInstance... processes) {
     String uri = String.format(URI_DEPLOYMEN_CREATE, getEngineUrl());
     HttpPost post = new HttpPost(uri);
 
@@ -163,6 +171,10 @@ public class EngineRule extends ExternalResource {
       .addTextBody("deployment-name", "deployment")
       .addTextBody("enable-duplicate-filtering", "false")
       .addTextBody("deployment-source", "process application");
+
+    if (tenantId != null) {
+      builder.addTextBody("tenant-id", tenantId);
+    }
 
     for (int i = 0; i < processes.length; i++) {
       BpmnModelInstance process = processes[i];
@@ -217,12 +229,25 @@ public class EngineRule extends ExternalResource {
   }
 
   public ProcessInstanceDto startProcessInstance(String processDefinitionId, String businessKey, Map<String, TypedValue> variables) {
+    return startProcessInstance(processDefinitionId, businessKey, variables, null, null);
+  }
+
+  public ProcessInstanceDto startProcessInstanceByKey(String processDefinitionKey, String tenantId) {
+    return startProcessInstance(null, null, null, processDefinitionKey, tenantId);
+  }
+
+  public ProcessInstanceDto startProcessInstance(String processDefinitionId, String businessKey, Map<String, TypedValue> variables, String processDefinitionKey, String tenantId) {
     if (variables == null) {
       variables = new HashMap<>();
     }
 
     try {
-      String uri = String.format(URI_START_PROCESS_INSTANCE, getEngineUrl(), processDefinitionId);
+      String uri = null;
+      if (tenantId == null && processDefinitionKey == null) {
+        uri = String.format(URI_START_PROCESS_INSTANCE, getEngineUrl(), processDefinitionId);
+      } else {
+        uri = String.format(URI_START_PROCESS_INSTANCE_TENANT, getEngineUrl(), processDefinitionKey, tenantId);
+      }
 
       HttpPost httpPost = new HttpPost(uri);
       httpPost.addHeader("Content-Type", "application/json");
