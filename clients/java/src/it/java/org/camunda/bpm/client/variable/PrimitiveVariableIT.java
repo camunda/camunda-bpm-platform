@@ -46,6 +46,7 @@ import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -1943,6 +1944,7 @@ public class PrimitiveVariableIT {
   }
 
   @Test
+  @Ignore
   public void shoudSetVariableUntyped_Bytes_InputStream() {
     // given
     engineRule.startProcessInstance(processDefinition.getId());
