@@ -33,10 +33,10 @@ button {
 @media (max-width: @screen-xs-max) {
   .three-cols-layout-handheld();
 
-  .columns {
+  .three-cols-layout-columns {
     > .column {
 
-      > .cell.top button {
+      > .three-cols-layout-cell.top button {
         &.region-toggle,
         &.maximize,
         &.reset-regions {
@@ -72,7 +72,7 @@ button {
 }
 // prevent "tab navigation focus" glitch
 .task-column-close .column-right {
-  .cell.top {
+  .three-cols-layout-cell.top {
     .reset-regions,
     .maximize,
     .task-actions {
@@ -80,7 +80,7 @@ button {
     }
   }
 
-  .cell.content {
+  .three-cols-layout-cell.content {
     display: none;
   }
 }
@@ -97,11 +97,11 @@ button {
       margin: 0 (@grid-gutter-width * 0.5) (@grid-gutter-width * 0.5) (@grid-gutter-width * 0.5);
     }
 
-    .cells-wrapper {
+    .three-cols-layout-cells-wrapper {
       display: table;
       width: 100%;
       > * {
-        display: table-cell;
+        display: table-three-cols-layout-cell;
       }
     }
   }
@@ -258,18 +258,18 @@ body.task-column-close [cam-widget-search].multiline-pills [cam-widget-search-pi
       width: auto;
       clear: none;
       float: none;
-      display: table-cell;
+      display: table-three-cols-layout-cell;
     }
   }
 }
 
 
 
-// S+ (columns layout)
+// S+ (three-cols-layout-columns layout)
 @media (min-width: @screen-sm-min) {
   .filters-column-close {
     .task-filters {
-      .cell.content {
+      .three-cols-layout-cell.content {
         display: none;
       }
     }
@@ -278,7 +278,7 @@ body.task-column-close [cam-widget-search].multiline-pills [cam-widget-search-pi
 
   .list-column-close {
     .tasks-list {
-      .cell.content {
+      .three-cols-layout-cell.content {
         display: none;
       }
     }
@@ -286,7 +286,7 @@ body.task-column-close [cam-widget-search].multiline-pills [cam-widget-search-pi
 
   .task-column-close {
     .task-details {
-      .cell.content {
+      .three-cols-layout-cell.content {
         display: none;
       }
     }
@@ -331,14 +331,14 @@ body.task-column-close [cam-widget-search].multiline-pills [cam-widget-search-pi
 
   .task-filters,
   .tasks-list {
-    > .cell.top > button {
+    > .three-cols-layout-cell.top > button {
       margin-right: (3 - (@grid-gutter-width / 2));
     }
   }
 
 
   .tasks-list {
-    > .cell.top {
+    > .three-cols-layout-cell.top {
       > div,
       > view {
         width: ~"calc(100% - 35px)";
@@ -363,7 +363,7 @@ body.task-column-close [cam-widget-search].multiline-pills [cam-widget-search-pi
 
 
   .task-details {
-    > .cell.top {
+    > .three-cols-layout-cell.top {
       > button {
         float: left;
         &:first-child {
