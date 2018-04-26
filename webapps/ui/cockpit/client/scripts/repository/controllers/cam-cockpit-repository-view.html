@@ -1,20 +1,20 @@
 <!-- # cockpit client/scripts/repository/controllers/cam-cockpit-repository-view.html -->
 <div cam-repository
      class="three-cols-layout">
-  <div class="columns">
+  <div class="three-cols-layout-columns">
 
       <!-- # deployment-list column -->
     <section class="column column-left deployments"
              ng-controller="camDeploymentsCtrl">
 
-      <header class="cell top">
+      <header class="three-cols-layout-cell top">
         <div cam-deployments-sorting-choices
              deployments-data="deploymentsData"></div>
 
         <div cam-deploy="onDeployed()"></div>
       </header>
 
-      <div class="cell content">
+      <div class="three-cols-layout-cell content">
 
         <view ng-repeat="deploymentsPlugin in deploymentsPlugins"
               provider="deploymentsPlugin"
@@ -32,10 +32,10 @@
     <!-- # resource-list column -->
     <section class="column column-center resources">
 
-      <header class="cell top">
+      <header class="three-cols-layout-cell top">
       </header>
 
-      <div class="cell content"
+      <div class="three-cols-layout-cell content"
            cam-resources
            repository-data="repositoryData">
       </div>
@@ -49,7 +49,7 @@
     <section class="column column-right resource-details"
              ng-controller="camResourceDetailsCtrl">
 
-      <header class="cell top">
+      <header class="three-cols-layout-cell top">
         <div class="resource-actions"
              ng-if="resource"
              ng-repeat="resourceAction in resourceActions">
@@ -57,7 +57,7 @@
         </div>
       </header>
 
-      <div class="cell content"
+      <div class="three-cols-layout-cell content"
            cam-resource-wrapper
            resource-details-data="resourceDetailsData"
            control="control">

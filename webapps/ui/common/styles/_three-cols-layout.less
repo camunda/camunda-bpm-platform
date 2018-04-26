@@ -112,16 +112,16 @@
     }
   }
 
-  .column .cell.content {
+  .column .three-cols-layout-cell.content {
     padding-top: @grid-gutter-width * 0.5;
   }
 
-  .column-right .cell.content {
+  .column-right .three-cols-layout-cell.content {
     padding: (@grid-gutter-width * 0.5);
   }
 
   .page-wrap,
-  .columns,
+  .three-cols-layout-columns,
   .column {
     .abs-box();
   }
@@ -132,7 +132,7 @@
     bottom: @footer-height;
   }
 
-  .columns {
+  .three-cols-layout-columns {
     overflow: hidden;
 
     > .column {
@@ -145,7 +145,7 @@
                   margin-right @layout-transition-duration @layout-transition-timing;
     }
 
-    .cell {
+    .three-cols-layout-cell {
       z-index: 1;
       position: absolute;
       top: (@column-top-height + (@padding-base-vertical * 2));
@@ -191,7 +191,7 @@
     overflow: auto;
   }
 
-  .columns {
+  .three-cols-layout-columns {
     position: relative;
     > .column {
       border-width: 1px 0 0 0;
@@ -201,13 +201,13 @@
       left: 0;
       width: 100%;
 
-      > .cell {
+      > .three-cols-layout-cell {
         position: relative;
       }
     }
   }
 
-  .column > .cell.content {
+  .column > .three-cols-layout-cell.content {
     position: static;
     padding-top: (@grid-gutter-width * 0.5);
     padding-bottom: (@grid-gutter-width * 0.5);
@@ -222,7 +222,7 @@
     overflow: hidden;
   }
 
-  .columns {
+  .three-cols-layout-columns {
     position: absolute;
     > .column {
       position: absolute;
@@ -315,7 +315,7 @@
 
 
 .three-cols-layout-colors(@left, @center, @right) {
-  .columns,
+  .three-cols-layout-columns,
   .column-right {
     color: @gray-dark;
   }
@@ -331,7 +331,7 @@
     border: none;
     box-shadow: @box-shadow;
 
-    .cell.top {
+    .three-cols-layout-cell.top {
       border: none;
       background-color: @custom-gray-lighter;
       box-shadow: @box-shadow-lower;
@@ -342,7 +342,7 @@
     border-right: none;
   }
 
-  .cell.top {
+  .three-cols-layout-cell.top {
     > a,
     > button,
     > .btn-link,
@@ -379,7 +379,7 @@
 
 
 .three-cols-layout-header() {
-  .cell.top {
+  .three-cols-layout-cell.top {
     min-height: (@column-top-height + (@padding-base-vertical * 2) + @border-thin-width);
     padding: calc(@padding-base-vertical + 2px) (@grid-gutter-width * 0.5) calc(@padding-base-vertical - 2px) (@grid-gutter-width * 0.5);
     margin: (0 - (@grid-gutter-width * 0.5))
