@@ -15,12 +15,16 @@ package org.camunda.bpm.engine.test.api.multitenancy;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 import java.util.List;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
+import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
+import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
@@ -326,6 +330,55 @@ public class MultiTenancyMessageCorrelationTest {
     thrown.expectMessage("Cannot correlate a message with name 'message' to a single execution");
 
     engineRule.getRuntimeService().createMessageCorrelation("message").correlate();
+  }
+
+  @Test
+  public void testSubscriptionsWhenDeletingGroupsProcessDefinitionsByIds() {
+    // given
+    String processDefId1 = testRule.deployForTenantAndGetDefinition(TENANT_ONE, MESSAGE_START_PROCESS).getId();
+    String processDefId2 = testRule.deployForTenantAndGetDefinition(TENANT_ONE, MESSAGE_START_PROCESS).getId();
+    String processDefId3 = testRule.deployForTenantAndGetDefinition(TENANT_ONE, MESSAGE_START_PROCESS).getId();
+
+    @SuppressWarnings("unused")
+    String processDefId4 = testRule.deployAndGetDefinition(MESSAGE_START_PROCESS).getId();
+    String processDefId5 = testRule.deployAndGetDefinition(MESSAGE_START_PROCESS).getId();
+    String processDefId6 = testRule.deployAndGetDefinition(MESSAGE_START_PROCESS).getId();
+
+    BpmnModelInstance processAnotherKey = Bpmn.createExecutableProcess("anotherKey")
+        .startEvent()
+          .message("sophisticated message")
+        .userTask()
+        .endEvent()
+        .done();
+
+    String processDefId7 = testRule.deployForTenantAndGetDefinition(TENANT_ONE, processAnotherKey).getId();
+    String processDefId8 = testRule.deployForTenantAndGetDefinition(TENANT_ONE, processAnotherKey).getId();
+    String processDefId9 = testRule.deployForTenantAndGetDefinition(TENANT_ONE, processAnotherKey).getId();
+
+    // assume
+    assertEquals(3, engineRule.getRuntimeService().createEventSubscriptionQuery().count());
+
+    // when
+    engineRule.getRepositoryService()
+              .deleteProcessDefinitions()
+              .byIds(processDefId8, processDefId5, processDefId3, processDefId9, processDefId1)
+              .delete();
+
+    // then
+    List<EventSubscription> list = engineRule.getRuntimeService().createEventSubscriptionQuery().list();
+    assertEquals(3, list.size());
+    for (EventSubscription eventSubscription : list) {
+      EventSubscriptionEntity eventSubscriptionEntity = (EventSubscriptionEntity) eventSubscription;
+      if (eventSubscriptionEntity.getConfiguration().equals(processDefId2)) {
+        assertEquals(TENANT_ONE, eventSubscription.getTenantId());
+      } else if (eventSubscriptionEntity.getConfiguration().equals(processDefId6)) {
+        assertEquals(null, eventSubscription.getTenantId());
+      } else if (eventSubscriptionEntity.getConfiguration().equals(processDefId7)) {
+        assertEquals(TENANT_ONE, eventSubscription.getTenantId());
+      } else {
+        fail("This process definition '" + eventSubscriptionEntity.getConfiguration() + "' and the respective event subscription should not exist.");
+      }
+    }
   }
 
   @Test
