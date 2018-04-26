@@ -46,7 +46,6 @@ import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -73,7 +72,7 @@ public class PrimitiveVariableIT {
   protected static final boolean VARIABLE_VALUE_BOOLEAN = true;
   protected static final Date VARIABLE_VALUE_DATE = new Date(1514790000000l);
   protected static final byte[] VARIABLE_VALUE_BYTES = VARIABLE_VALUE_STRING.getBytes();
-  protected static final InputStream VARIABLE_VALUE_BYTES_INPUTSTREAM = new ByteArrayInputStream(VARIABLE_VALUE_STRING.getBytes());
+//  protected static final InputStream VARIABLE_VALUE_BYTES_INPUTSTREAM = new ByteArrayInputStream(VARIABLE_VALUE_STRING.getBytes());
 
   protected ClientRule clientRule = new ClientRule();
   protected EngineRule engineRule = new EngineRule();
@@ -1927,7 +1926,8 @@ public class PrimitiveVariableIT {
 
     // when
     Map<String, Object> variables = Variables.createVariables();
-    variables.put(VARIABLE_NAME, VARIABLE_VALUE_BYTES_INPUTSTREAM);
+    InputStream inputStream = new ByteArrayInputStream(VARIABLE_VALUE_STRING.getBytes());
+    variables.put(VARIABLE_NAME, inputStream);
     fooService.complete(fooTask, variables);
 
     // then
@@ -1944,7 +1944,6 @@ public class PrimitiveVariableIT {
   }
 
   @Test
-  @Ignore
   public void shoudSetVariableUntyped_Bytes_InputStream() {
     // given
     engineRule.startProcessInstance(processDefinition.getId());
@@ -1965,7 +1964,8 @@ public class PrimitiveVariableIT {
 
     // when
     Map<String, Object> variables = Variables.createVariables();
-    variables.put(VARIABLE_NAME, Variables.untypedValue(VARIABLE_VALUE_BYTES_INPUTSTREAM));
+    InputStream inputStream = new ByteArrayInputStream(VARIABLE_VALUE_STRING.getBytes());
+    variables.put(VARIABLE_NAME, Variables.untypedValue(inputStream));
     fooService.complete(fooTask, variables);
 
     // then
