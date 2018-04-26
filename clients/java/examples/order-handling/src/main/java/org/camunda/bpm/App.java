@@ -32,7 +32,7 @@ public class App {
         // add the invoice object and its id to a map
         Map<String, Object> variables = new HashMap<>();
         variables.put("invoiceId", invoice.id);
-        variables.put("invoice", invoice);
+        variables.put("invoice", invoiceValue);
 
         // select the scope of the variables
         boolean isRandomSample = Math.random() <= 0.5;
