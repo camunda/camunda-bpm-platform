@@ -39,6 +39,10 @@
     <version.assertj>3.9.0</version.assertj>
     <version.jsonassert>1.5.0</version.jsonassert>
     <version.tomcat>9.0.5</version.tomcat>
+
+    <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
+    <!-- disable javadoc linter for JDK8 to not fail on incomplete javadoc -->
+    <additionalparam>-Xdoclint:none</additionalparam>
   </properties>
 
   <dependencies>
