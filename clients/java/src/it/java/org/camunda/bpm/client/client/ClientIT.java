@@ -25,9 +25,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
-import org.camunda.bpm.client.ClientBackoffStrategy;
+import org.camunda.bpm.client.backoff.BackoffStrategy;
 import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.client.ExternalTaskClientBuilder;
 import org.camunda.bpm.client.dto.ProcessDefinitionDto;
@@ -392,10 +391,11 @@ public class ClientIT {
   @Test
   public void shouldPerformBackoff() {
     // given
-    AtomicBoolean isBackoffPerformed = new AtomicBoolean(false);
-    ClientBackoffStrategy backOffStrategy = new BackOffStrategyBean() {
-      public void suspend() {
+    AtomicBoolean   isBackoffPerformed = new AtomicBoolean(false);
+    BackoffStrategy backOffStrategy = new BackOffStrategyBean() {
+      public long calculateBackoffTime() {
         isBackoffPerformed.set(true);
+        return 1000L;
       }
     };
 
@@ -421,39 +421,12 @@ public class ClientIT {
   }
 
   @Test
-  public void shouldResumeAfterBackoff() {
-    // given
-    AtomicInteger backoffResumedCount = new AtomicInteger(0);
-    ClientBackoffStrategy backOffStrategy = new BackOffStrategyBean() {
-      public void resume() {
-        backoffResumedCount.incrementAndGet();
-      }
-    };
-
-    ExternalTaskClient client = ExternalTaskClient.create()
-      .baseUrl(BASE_URL)
-      .backoffStrategy(backOffStrategy)
-      .build();
-
-    try {
-      // when
-      client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-        .handler(handler)
-        .open();
-    } finally {
-      client.stop();
-    }
-
-    // then
-    assertThat(backoffResumedCount.get()).isEqualTo(2);
-  }
-
-  @Test
   public void shouldResetBackoff() {
     // given
     AtomicBoolean isBackoffReset = new AtomicBoolean(false);
-    ClientBackoffStrategy backOffStrategy = new BackOffStrategyBean() {
-      public void reset() {
+    BackoffStrategy backOffStrategy = new BackOffStrategyBean() {
+      @Override
+      public void reconfigure(List<ExternalTask> externalTasks) {
         isBackoffReset.set(true);
       }
     };

@@ -22,9 +22,10 @@ import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.UUID;
 
-import org.camunda.bpm.client.ClientBackoffStrategy;
+import org.camunda.bpm.client.backoff.BackoffStrategy;
 import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.client.ExternalTaskClientBuilder;
+import org.camunda.bpm.client.backoff.impl.ExponentialBackoffStrategy;
 import org.camunda.bpm.client.interceptor.ClientRequestInterceptor;
 import org.camunda.bpm.client.interceptor.impl.RequestInterceptorHandler;
 import org.camunda.bpm.client.spi.DataFormat;
@@ -77,7 +78,7 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
 
   protected List<ClientRequestInterceptor> interceptors;
   protected boolean isAutoFetchingEnabled;
-  protected ClientBackoffStrategy backoffStrategy;
+  protected BackoffStrategy backoffStrategy;
 
   public ExternalTaskClientBuilderImpl() {
     // default values
@@ -86,7 +87,7 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
     this.lockDuration = 20_000;
     this.interceptors = new ArrayList<>();
     this.isAutoFetchingEnabled = true;
-    this.backoffStrategy = null;
+    this.backoffStrategy = new ExponentialBackoffStrategy();
   }
 
   public ExternalTaskClientBuilder baseUrl(String baseUrl) {
@@ -124,7 +125,7 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
     return this;
   }
 
-  public ExternalTaskClientBuilder backoffStrategy(ClientBackoffStrategy backoffStrategy) {
+  public ExternalTaskClientBuilder backoffStrategy(BackoffStrategy backoffStrategy) {
     this.backoffStrategy = backoffStrategy;
     return this;
   }
@@ -345,7 +346,7 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
     return isAutoFetchingEnabled;
   }
 
-  protected ClientBackoffStrategy getBackoffStrategy() {
+  protected BackoffStrategy getBackoffStrategy() {
     return backoffStrategy;
   }
 

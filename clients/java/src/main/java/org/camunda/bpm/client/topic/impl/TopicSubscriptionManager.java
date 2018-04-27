@@ -18,8 +18,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
-import org.camunda.bpm.client.ClientBackoffStrategy;
+import org.camunda.bpm.client.backoff.BackoffStrategy;
 import org.camunda.bpm.client.exception.ExternalTaskClientException;
 import org.camunda.bpm.client.impl.EngineClient;
 import org.camunda.bpm.client.impl.EngineClientException;
@@ -41,20 +45,21 @@ public class TopicSubscriptionManager implements Runnable {
 
   protected static final TopicSubscriptionManagerLogger LOG = ExternalTaskClientLogger.TOPIC_SUBSCRIPTION_MANAGER_LOGGER;
 
-  protected final Object MONITOR = new Object();
+  protected ReentrantLock ACQUISITION_MONITOR = new ReentrantLock(false);
+  protected Condition IS_WAITING = ACQUISITION_MONITOR.newCondition();
+  protected AtomicBoolean isRunning = new AtomicBoolean(false);
 
   protected ExternalTaskServiceImpl externalTaskService;
 
   protected EngineClient engineClient;
 
-  protected List<TopicSubscription> subscriptions;
+  protected CopyOnWriteArrayList<TopicSubscription> subscriptions;
   protected List<TopicRequestDto> taskTopicRequests;
   protected Map<String, ExternalTaskHandler> externalTaskHandlers;
 
-  protected volatile boolean isRunning;
   protected Thread thread;
 
-  protected ClientBackoffStrategy backoffStrategy;
+  protected BackoffStrategy backoffStrategy;
 
   protected TypedValues typedValues;
 
@@ -65,14 +70,13 @@ public class TopicSubscriptionManager implements Runnable {
     this.subscriptions = new CopyOnWriteArrayList<>();
     this.taskTopicRequests = new ArrayList<>();
     this.externalTaskHandlers = new HashMap<>();
-    this.isRunning = false;
     this.clientLockDuration = clientLockDuration;
     this.typedValues = typedValues;
     externalTaskService = new ExternalTaskServiceImpl(engineClient);
   }
 
   public void run() {
-    while (isRunning) {
+    while (isRunning.get()) {
       try {
         acquire();
       }
@@ -102,9 +106,7 @@ public class TopicSubscriptionManager implements Runnable {
         }
       });
 
-      if (backoffStrategy != null) {
-        runBackoffStrategy(externalTasks.isEmpty());
-      }
+      runBackoffStrategy(externalTasks);
     }
   }
 
@@ -145,17 +147,9 @@ public class TopicSubscriptionManager implements Runnable {
     }
   }
 
-  public void stop() {
-    synchronized (MONITOR) {
-      if (!isRunning || thread == null) {
-        return;
-      }
-
-      isRunning = false;
-
-      if (backoffStrategy != null) {
-        resumeBackoffStrategy();
-      }
+  public synchronized void stop() {
+    if (isRunning.compareAndSet(true, false)) {
+      resume();
 
       try {
         thread.join();
@@ -166,34 +160,20 @@ public class TopicSubscriptionManager implements Runnable {
     }
   }
 
-  public void start() {
-    synchronized (MONITOR) {
-      if (isRunning && thread != null) {
-        return;
-      }
-
-      isRunning = true;
+  public synchronized void start() {
+    if (isRunning.compareAndSet(false, true)) {
       thread = new Thread(this, TopicSubscriptionManager.class.getSimpleName());
       thread.start();
     }
   }
 
-  protected synchronized void subscribe(TopicSubscriptionImpl subscription) {
-    checkTopicNameAlreadySubscribed(subscription.getTopicName());
-
-    subscriptions.add(subscription);
-
-    if (backoffStrategy != null) {
-      resumeBackoffStrategy();
+  protected void subscribe(TopicSubscription subscription) {
+    if (!subscriptions.addIfAbsent(subscription)) {
+      String topicName = subscription.getTopicName();
+      throw LOG.topicNameAlreadySubscribedException(topicName);
     }
-  }
 
-  protected void checkTopicNameAlreadySubscribed(String topicName) {
-    subscriptions.forEach(subscription -> {
-      if (subscription.getTopicName().equals(topicName)) {
-        throw LOG.topicNameAlreadySubscribedException(topicName);
-      }
-    });
+    resume();
   }
 
   protected void unsubscribe(TopicSubscriptionImpl subscription) {
@@ -209,30 +189,46 @@ public class TopicSubscriptionManager implements Runnable {
   }
 
   public boolean isRunning() {
-    return isRunning;
+    return isRunning.get();
   }
 
-  public void setBackoffStrategy(ClientBackoffStrategy backOffStrategy) {
+  public void setBackoffStrategy(BackoffStrategy backOffStrategy) {
     this.backoffStrategy = backOffStrategy;
   }
 
-  protected void runBackoffStrategy(boolean isExternalTasksEmpty) {
+  protected void runBackoffStrategy(List<ExternalTask> externalTasks) {
     try {
-      if (isExternalTasksEmpty) {
-        backoffStrategy.suspend();
-      } else {
-        backoffStrategy.reset();
-      }
+      backoffStrategy.reconfigure(externalTasks);
+      long waitTime = backoffStrategy.calculateBackoffTime();
+      suspend(waitTime);
     } catch (Throwable e) {
       LOG.exceptionWhileExecutingBackoffStrategyMethod(e);
     }
   }
 
-  protected void resumeBackoffStrategy() {
+  protected void suspend(long waitTime) {
+    if (waitTime > 0 && isRunning.get()) {
+      ACQUISITION_MONITOR.lock();
+      try {
+        if (isRunning.get()) {
+          IS_WAITING.await(waitTime, TimeUnit.MILLISECONDS);
+        }
+      } catch (InterruptedException e) {
+        LOG.exceptionWhileExecutingBackoffStrategyMethod(e);
+      }
+      finally {
+        ACQUISITION_MONITOR.unlock();
+      }
+    }
+  }
+
+  protected void resume() {
+    ACQUISITION_MONITOR.lock();
     try {
-      backoffStrategy.resume();
-    } catch (Throwable e) {
-      LOG.exceptionWhileExecutingBackoffStrategyMethod(e);
+      IS_WAITING.signal();
+    }
+    finally {
+      ACQUISITION_MONITOR.unlock();
     }
   }
 

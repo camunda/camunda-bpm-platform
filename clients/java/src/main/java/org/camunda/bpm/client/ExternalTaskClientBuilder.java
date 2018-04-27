@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.client;
 
+import org.camunda.bpm.client.backoff.BackoffStrategy;
 import org.camunda.bpm.client.exception.ExternalTaskClientException;
 import org.camunda.bpm.client.interceptor.ClientRequestInterceptor;
 
@@ -107,13 +108,13 @@ public interface ExternalTaskClientBuilder {
   ExternalTaskClientBuilder disableAutoFetching();
 
   /**
-   * Adds a custom strategy to the client for defining the backoff between two requests.
+   * Adds a custom strategy to the client for defining the org.camunda.bpm.client.backoff between two requests.
    * This information is optional.
    *
-   * @param backoffStrategy which realizes a custom backoff strategy
+   * @param backoffStrategy which realizes a custom org.camunda.bpm.client.backoff strategy
    * @return the builder
    */
-  ExternalTaskClientBuilder backoffStrategy(ClientBackoffStrategy backoffStrategy);
+  ExternalTaskClientBuilder backoffStrategy(BackoffStrategy backoffStrategy);
 
   /**
    * Bootstraps the Camunda client

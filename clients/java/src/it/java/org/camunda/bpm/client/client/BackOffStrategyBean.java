@@ -12,26 +12,22 @@
  */
 package org.camunda.bpm.client.client;
 
-import org.camunda.bpm.client.ClientBackoffStrategy;
+import org.camunda.bpm.client.backoff.BackoffStrategy;
+import org.camunda.bpm.client.task.ExternalTask;
+
+import java.util.List;
 
 /**
  * @author Tassilo Weidner
  */
-public class BackOffStrategyBean implements ClientBackoffStrategy {
+public class BackOffStrategyBean implements BackoffStrategy {
 
   @Override
-  public void suspend() {
-
+  public void reconfigure(List<ExternalTask> externalTasks) {
   }
 
   @Override
-  public void reset() {
-
+  public long calculateBackoffTime() {
+    return 2000L;
   }
-
-  @Override
-  public void resume() {
-
-  }
-
 }

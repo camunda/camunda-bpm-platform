@@ -65,4 +65,31 @@ public class TopicSubscriptionImpl implements TopicSubscription {
     return businessKey;
   }
 
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((topicName == null) ? 0 : topicName.hashCode());
+    return result;
+  }
+
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    TopicSubscriptionImpl other = (TopicSubscriptionImpl) obj;
+    if (topicName == null) {
+      if (other.topicName != null)
+        return false;
+    } else if (!topicName.equals(other.topicName)) {
+      return false;
+    }
+    return true;
+  }
+
 }

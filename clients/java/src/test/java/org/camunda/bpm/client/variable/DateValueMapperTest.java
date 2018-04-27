@@ -21,7 +21,6 @@ import org.camunda.bpm.engine.variable.value.DateValue;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
