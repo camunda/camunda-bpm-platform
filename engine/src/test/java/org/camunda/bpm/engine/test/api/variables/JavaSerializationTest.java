@@ -32,6 +32,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
@@ -40,14 +41,18 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
 import org.camunda.bpm.engine.impl.util.StringUtil;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -342,6 +347,45 @@ public class JavaSerializationTest {
       taskService.deleteTask(taskId, true);
     }
 
+  }
+
+  public void testTransientObjectValue() throws IOException {
+    // given
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("foo")
+        .startEvent()
+        .exclusiveGateway("gtw")
+          .sequenceFlowId("flow1")
+          .condition("cond", "${x.property == \"bar\"}")
+          .userTask("userTask1")
+          .endEvent()
+        .moveToLastGateway()
+          .sequenceFlowId("flow2")
+          .userTask("userTask2")
+          .endEvent()
+        .done();
+
+    testRule.deploy(modelInstance);
+
+    JavaSerializable bean = new JavaSerializable("bar");
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    new ObjectOutputStream(baos).writeObject(bean);
+    String serializedObject = StringUtil.fromBytes(Base64.encodeBase64(baos.toByteArray()), engineRule.getProcessEngine());
+    ObjectValue jsonValue = serializedObjectValue(serializedObject, true)
+        .serializationDataFormat(Variables.SerializationDataFormats.JAVA)
+        .objectTypeName(JavaSerializable.class.getName())
+        .create();
+    VariableMap variables = Variables.createVariables().putValueTyped("x", jsonValue);
+
+    // when
+    runtimeService.startProcessInstanceByKey("foo", variables).getId();
+
+    // then
+    List<VariableInstance> variableInstances = runtimeService.createVariableInstanceQuery().list();
+    assertEquals(0, variableInstances.size());
+
+    Task task = taskService.createTaskQuery().singleResult();
+    assertNotNull(task);
+    assertEquals("userTask1", task.getTaskDefinitionKey());
   }
 
 }

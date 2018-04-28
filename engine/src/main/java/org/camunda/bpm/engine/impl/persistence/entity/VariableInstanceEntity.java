@@ -243,11 +243,7 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
   }
 
   public void setByteArrayValue(byte[] bytes) {
-    // avoid setting a byte array value for a transient variable because this
-    // would create and insert an entity in the data base
-    if (!isTransient) {
-      byteArrayField.setByteArrayValue(bytes);
-    }
+    byteArrayField.setByteArrayValue(bytes, isTransient);
   }
 
   protected void deleteByteArrayValue() {

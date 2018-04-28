@@ -73,6 +73,10 @@ public class ByteArrayField {
   }
 
   public void setByteArrayValue(byte[] bytes) {
+    setByteArrayValue(bytes, false);
+  }
+
+  public void setByteArrayValue(byte[] bytes, boolean isTransient) {
     if (bytes != null) {
       // note: there can be cases where byteArrayId is not null
       //   but the corresponding byte array entity has been removed in parallel;
@@ -84,12 +88,16 @@ public class ByteArrayField {
         deleteByteArrayValue();
 
         byteArrayValue = new ByteArrayEntity(nameProvider.getName(), bytes);
-        Context.
+
+        // avoid insert of byte array value for a transient variable
+        if (!isTransient) {
+          Context.
           getCommandContext()
           .getDbEntityManager()
           .insert(byteArrayValue);
 
-        byteArrayId = byteArrayValue.getId();
+          byteArrayId = byteArrayValue.getId();
+        }
       }
     }
     else {

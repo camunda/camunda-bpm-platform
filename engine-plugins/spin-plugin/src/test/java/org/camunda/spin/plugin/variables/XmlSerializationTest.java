@@ -14,11 +14,13 @@
 
 package org.camunda.spin.plugin.variables;
 
+import static org.camunda.bpm.engine.variable.Variables.objectValue;
+import static org.camunda.bpm.engine.variable.Variables.serializedObjectValue;
 import static org.camunda.spin.plugin.variables.TypedValueAssert.assertObjectValueDeserializedNull;
 import static org.camunda.spin.plugin.variables.TypedValueAssert.assertObjectValueSerializedNull;
 import static org.camunda.spin.plugin.variables.TypedValueAssert.assertUntypedNullValue;
-import static org.camunda.bpm.engine.variable.Variables.objectValue;
-import static org.camunda.bpm.engine.variable.Variables.serializedObjectValue;
+
+import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -26,11 +28,16 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
+import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.camunda.bpm.engine.variable.value.builder.SerializedObjectValueBuilder;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.spin.DataFormats;
 import org.camunda.spin.Spin;
 import org.camunda.spin.xml.SpinXmlElement;
@@ -432,5 +439,41 @@ public class XmlSerializationTest extends PluggableProcessEngineTestCase {
     // variable is still of type object
     ObjectValue typedValue = runtimeService.getVariableTyped(instance.getId(), "varName");
     assertObjectValueDeserializedNull(typedValue);
+  }
+
+  public void testTransientXmlValue() {
+    // given
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("foo")
+        .startEvent()
+        .exclusiveGateway("gtw")
+          .sequenceFlowId("flow1")
+          .condition("cond", "${x.stringProperty == \"bar\"}")
+          .userTask("userTask1")
+          .endEvent()
+        .moveToLastGateway()
+          .sequenceFlowId("flow2")
+          .userTask("userTask2")
+          .endEvent()
+        .done();
+
+    deployment(modelInstance);
+
+    XmlSerializable bean = new XmlSerializable("bar", 42, true);
+    ObjectValue xmlValue = serializedObjectValue(bean.toExpectedXmlString(), true)
+        .serializationDataFormat(XML_FORMAT_NAME)
+        .objectTypeName(XmlSerializable.class.getName())
+        .create();
+    VariableMap variables = Variables.createVariables().putValueTyped("x", xmlValue);
+
+    // when
+    runtimeService.startProcessInstanceByKey("foo", variables).getId();
+
+    // then
+    List<VariableInstance> variableInstances = runtimeService.createVariableInstanceQuery().list();
+    assertEquals(0, variableInstances.size());
+
+    Task task = taskService.createTaskQuery().singleResult();
+    assertNotNull(task);
+    assertEquals("userTask1", task.getTaskDefinitionKey());
   }
 }

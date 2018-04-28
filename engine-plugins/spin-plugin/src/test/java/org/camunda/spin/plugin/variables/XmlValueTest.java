@@ -28,10 +28,11 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.spin.DataFormats;
 import org.camunda.spin.SpinRuntimeException;
 import org.camunda.spin.plugin.variable.type.SpinValueType;
-import org.camunda.spin.plugin.variable.value.JsonValue;
 import org.camunda.spin.plugin.variable.value.XmlValue;
 import org.camunda.spin.plugin.variable.value.builder.XmlValueBuilder;
 import org.camunda.spin.xml.SpinXmlElement;
@@ -226,5 +227,37 @@ public class XmlValueTest extends PluggableProcessEngineTestCase {
     assertEquals(true, xmlValue.isTransient());
     Map<String, Object> returnedValueInfo = SpinValueType.XML.getValueInfo(xmlValue);
     assertEquals(true, returnedValueInfo.get(ValueType.VALUE_INFO_TRANSIENT));
+  }
+
+  public void testDeserializeTransientXmlValue() {
+    // given
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("foo")
+        .startEvent()
+        .exclusiveGateway("gtw")
+          .sequenceFlowId("flow1")
+          .condition("cond", "${XML(" + variableName + ").attr('attrName').value() == 'attrValue'}")
+          .userTask("userTask1")
+          .endEvent()
+        .moveToLastGateway()
+          .sequenceFlowId("flow2")
+          .userTask("userTask2")
+          .endEvent()
+        .done();
+
+    deployment(modelInstance);
+
+    XmlValue jsonValue = xmlValue(xmlString, true).create();
+    VariableMap variables = Variables.createVariables().putValueTyped(variableName, jsonValue);
+
+    // when
+    runtimeService.startProcessInstanceByKey("foo", variables).getId();
+
+    // then
+    List<VariableInstance> variableInstances = runtimeService.createVariableInstanceQuery().list();
+    assertEquals(0, variableInstances.size());
+
+    Task task = taskService.createTaskQuery().singleResult();
+    assertNotNull(task);
+    assertEquals("userTask1", task.getTaskDefinitionKey());
   }
 }
