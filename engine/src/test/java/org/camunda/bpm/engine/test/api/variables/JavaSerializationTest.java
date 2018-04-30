@@ -349,6 +349,7 @@ public class JavaSerializationTest {
 
   }
 
+  @Test
   public void testTransientObjectValue() throws IOException {
     // given
     BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("foo")
@@ -370,14 +371,14 @@ public class JavaSerializationTest {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     new ObjectOutputStream(baos).writeObject(bean);
     String serializedObject = StringUtil.fromBytes(Base64.encodeBase64(baos.toByteArray()), engineRule.getProcessEngine());
-    ObjectValue jsonValue = serializedObjectValue(serializedObject, true)
+    ObjectValue javaValue = serializedObjectValue(serializedObject, true)
         .serializationDataFormat(Variables.SerializationDataFormats.JAVA)
         .objectTypeName(JavaSerializable.class.getName())
         .create();
-    VariableMap variables = Variables.createVariables().putValueTyped("x", jsonValue);
+    VariableMap variables = Variables.createVariables().putValueTyped("x", javaValue);
 
     // when
-    runtimeService.startProcessInstanceByKey("foo", variables).getId();
+    runtimeService.startProcessInstanceByKey("foo", variables);
 
     // then
     List<VariableInstance> variableInstances = runtimeService.createVariableInstanceQuery().list();

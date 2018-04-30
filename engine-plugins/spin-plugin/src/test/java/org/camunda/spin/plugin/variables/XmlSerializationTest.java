@@ -466,7 +466,7 @@ public class XmlSerializationTest extends PluggableProcessEngineTestCase {
     VariableMap variables = Variables.createVariables().putValueTyped("x", xmlValue);
 
     // when
-    runtimeService.startProcessInstanceByKey("foo", variables).getId();
+    runtimeService.startProcessInstanceByKey("foo", variables);
 
     // then
     List<VariableInstance> variableInstances = runtimeService.createVariableInstanceQuery().list();

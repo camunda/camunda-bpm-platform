@@ -248,7 +248,7 @@ public class JsonValueTest extends PluggableProcessEngineTestCase {
     VariableMap variables = Variables.createVariables().putValueTyped(variableName, jsonValue);
 
     // when
-    runtimeService.startProcessInstanceByKey("foo", variables).getId();
+    runtimeService.startProcessInstanceByKey("foo", variables);
 
     // then
     List<VariableInstance> variableInstances = runtimeService.createVariableInstanceQuery().list();

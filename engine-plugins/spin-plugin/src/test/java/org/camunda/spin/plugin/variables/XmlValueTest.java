@@ -246,11 +246,11 @@ public class XmlValueTest extends PluggableProcessEngineTestCase {
 
     deployment(modelInstance);
 
-    XmlValue jsonValue = xmlValue(xmlString, true).create();
-    VariableMap variables = Variables.createVariables().putValueTyped(variableName, jsonValue);
+    XmlValue xmlValue = xmlValue(xmlString, true).create();
+    VariableMap variables = Variables.createVariables().putValueTyped(variableName, xmlValue);
 
     // when
-    runtimeService.startProcessInstanceByKey("foo", variables).getId();
+    runtimeService.startProcessInstanceByKey("foo", variables);
 
     // then
     List<VariableInstance> variableInstances = runtimeService.createVariableInstanceQuery().list();
