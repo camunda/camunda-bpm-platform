@@ -87,17 +87,17 @@ module.exports = function(ngModule) {
           controller: uploadTemplate.controller,
           template: uploadTemplate.template
         })
-        .result.then(function() {
+          .result.then(function() {
           // updated the variable, need to get the new data
           // reject the promise anyway
-          promise.reject();
+            promise.reject();
 
-          // but then update the filter to force re-get of variables
-          variableInstanceData.set('filter', angular.copy($scope.filter));
-        }, function() {
+            // but then update the filter to force re-get of variables
+            variableInstanceData.set('filter', angular.copy($scope.filter));
+          }, function() {
           // did not update the variable, reject the promise
-          promise.reject();
-        });
+            promise.reject();
+          });
 
         return promise.promise;
       };
@@ -173,17 +173,17 @@ module.exports = function(ngModule) {
             variable: function() { return info.variable; }
           }
         })
-        .result.then(function() {
+          .result.then(function() {
           // updated the variable, need to get the new data
           // reject the promise anyway
-          promise.reject();
+            promise.reject();
 
-          // but then update the filter to force re-get of variables
-          variableInstanceData.set('filter', angular.copy($scope.filter));
-        }, function() {
+            // but then update the filter to force re-get of variables
+            variableInstanceData.set('filter', angular.copy($scope.filter));
+          }, function() {
           // did not update the variable, reject the promise
-          promise.reject();
-        });
+            promise.reject();
+          });
 
         return promise.promise;
       };
