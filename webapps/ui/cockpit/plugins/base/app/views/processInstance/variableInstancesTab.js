@@ -18,7 +18,7 @@ module.exports = function(ngModule) {
     function($scope, $sce, $http, search, Uri, LocalExecutionVariableResource,
       Notifications, $modal, $q, camAPI, fixDate, unfixDate, $translate,localConf) {
 
-        // input: processInstance, processData
+      // input: processInstance, processData
       var variableInstanceData = $scope.processData.newChild($scope),
           processInstance = $scope.processInstance,
           variableInstanceIdexceptionMessageMap,
@@ -61,19 +61,12 @@ module.exports = function(ngModule) {
         $scope.instanceIdToInstanceMap = instanceIdToInstanceMap;
       });
 
-      variableInstanceData.observe('filter', function() {
-        if ($scope.instanceIdToInstanceMap && $scope.pages ) {
-          return updateView($scope.instanceIdToInstanceMap, $scope.query, $scope.pages);
-        }
-        return $q.when($scope.total);
-      });
-
       $scope.onSearchChange = function(query, pages, sortObj) {
         $scope.query = query ||  $scope.query;
         $scope.pages = pages ||  $scope.pages;
 
         if ($scope.instanceIdToInstanceMap) {
-          return updateView($scope.instanceIdToInstanceMap,  $scope.query,   $scope.pages , sortObj);
+          return updateView($scope.instanceIdToInstanceMap, $scope.query, $scope.pages, sortObj);
         }
 
         return $q.when($scope.total);
@@ -290,9 +283,8 @@ module.exports = function(ngModule) {
           maxResults     : count,
           deserializeValues: false
         };
-
         var countParams = angular.extend({}, defaultParams, variableQuery);
-        var params = angular.extend({}, pagingParams, defaultParams);
+        var params = angular.extend({}, pagingParams, defaultParams, variableQuery);
 
         $scope.variables = null;
         $scope.loadingState = 'LOADING';
