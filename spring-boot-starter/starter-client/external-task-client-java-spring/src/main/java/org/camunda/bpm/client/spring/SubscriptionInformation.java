@@ -1,5 +1,8 @@
 package org.camunda.bpm.client.spring;
 
+import java.util.Arrays;
+import java.util.List;
+
 import lombok.Data;
 
 @Data
@@ -14,5 +17,14 @@ public class SubscriptionInformation {
   private boolean autoSubscribe = DEFAULT_AUTO_SUBSCRIBE;
   private boolean autoOpen = DEFAULT_AUTO_OPEN;
   private String[] externalTaskClientIds = new String[] {};
+  private List<String> variableNames;
+  private String businessKey;
 
+  public void setVariableNames(String... variableNames) {
+    if (variableNames == null) {
+      this.variableNames = null;
+    } else {
+      this.variableNames = Arrays.asList(variableNames);
+    }
+  }
 }

@@ -12,7 +12,7 @@
   <properties>
     <spring.version>4.3.14.RELEASE</spring.version>
     <lombok.version>1.16.2</lombok.version>
-    <camunda-external-task-client.version>0.1.0-alpha1</camunda-external-task-client.version>
+    <camunda-external-task-client.version>0.1.0-alpha2</camunda-external-task-client.version>
   </properties>
 
   <dependencies>

@@ -2,6 +2,7 @@ package org.camunda.bpm.client.spring.context;
 
 import org.camunda.bpm.client.spring.EnableTaskSubscription;
 import org.camunda.bpm.client.spring.ExternalTaskClientFactory;
+import org.camunda.bpm.client.spring.helper.AnnotationNullValueHelper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AutowireCandidateQualifier;
@@ -54,8 +55,16 @@ public class ClientRegistrar implements ImportBeanDefinitionRegistrar {
   }
 
   protected BeanDefinitionBuilder getExternalTaskClientFactoryBeanDefinitionBuilder(AnnotationAttributes enableTaskSubscription, String id) {
-    return BeanDefinitionBuilder.genericBeanDefinition(externalTaskClientFactoryClass).addPropertyValue("baseUrl", getBaseUrl(enableTaskSubscription))
-        .addPropertyValue("id", id);
+    // @formatter:off
+    return BeanDefinitionBuilder.genericBeanDefinition(externalTaskClientFactoryClass)
+        .addPropertyValue("baseUrl", getBaseUrl(enableTaskSubscription))
+        .addPropertyValue("id", id)
+        .addPropertyValue("maxTasks", getMaxTasks(enableTaskSubscription))
+        .addPropertyValue("workerId", getWorkerId(enableTaskSubscription))
+        .addPropertyValue("asyncResponseTimeout", getAsyncResponseTimeout(enableTaskSubscription))
+        .addPropertyValue("autoFetchingEnabled", getAutoFetchingEnabled(enableTaskSubscription))
+        .addPropertyValue("lockDuration", getLockDuration(enableTaskSubscription));
+    // @formatter:on
   }
 
   protected boolean isUniqueBean(String beanName, AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry) {
@@ -74,6 +83,26 @@ public class ClientRegistrar implements ImportBeanDefinitionRegistrar {
 
   public static String getBaseUrl(AnnotationAttributes annotationAttributes) {
     return annotationAttributes.getString("baseUrl");
+  }
+
+  public static Integer getMaxTasks(AnnotationAttributes annotationAttributes) {
+    return annotationAttributes.getNumber("maxTasks");
+  }
+
+  public static Long getLockDuration(AnnotationAttributes annotationAttributes) {
+    return annotationAttributes.getNumber("lockDuration");
+  }
+
+  public static boolean getAutoFetchingEnabled(AnnotationAttributes annotationAttributes) {
+    return annotationAttributes.getBoolean("autoFetchingEnabled");
+  }
+
+  public static Long getAsyncResponseTimeout(AnnotationAttributes annotationAttributes) {
+    return AnnotationNullValueHelper.respectNullValue(annotationAttributes.getNumber("asyncResponseTimeout"));
+  }
+
+  public static String getWorkerId(AnnotationAttributes annotationAttributes) {
+    return AnnotationNullValueHelper.respectNullValue(annotationAttributes.getString("workerId"));
   }
 
   public static AnnotationAttributes getEnableTaskSubscription(AnnotationMetadata annotationMetadata) {

@@ -6,8 +6,6 @@ import java.util.List;
 
 import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.client.impl.ExternalTaskClientImpl;
-import org.camunda.bpm.client.interceptor.ClientRequestInterceptor;
-import org.camunda.bpm.client.spring.interceptor.ClientIdAcceptingClientRequestInterceptor;
 import org.camunda.bpm.client.topic.TopicSubscription;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,12 +29,6 @@ public class ExtendedContextTest {
   @Autowired
   private List<SubscribedExternalTask> scheduledExternalTasks;
 
-  @Autowired
-  private ClientRequestInterceptor clientRequestInterceptor;
-
-  @Autowired
-  private ClientIdAcceptingClientRequestInterceptor idAcceptingInterceptor;
-
   @Test
   public void startup() {
     assertThat(externalTaskClientFirst).isNotNull();
@@ -46,22 +38,16 @@ public class ExtendedContextTest {
   }
 
   @Test
-  public void testSubscriptionAndInterceptor() {
-    testSubscriptionAndInterceptor(externalTaskClientFirst, "methodSubscription", clientRequestInterceptor);
-    testSubscriptionAndInterceptor(externalTaskClientSecond, "testClassSubscription", clientRequestInterceptor, idAcceptingInterceptor);
+  public void testSubscription() {
+    testSubscription(externalTaskClientFirst, "methodSubscription");
+    testSubscription(externalTaskClientSecond, "testClassSubscription");
   }
 
-  private void testSubscriptionAndInterceptor(ExternalTaskClient taskClient, String topicName, ClientRequestInterceptor... expectedInterceptors) {
+  private void testSubscription(ExternalTaskClient taskClient, String topicName) {
     ExternalTaskClientImpl clientImpl = (ExternalTaskClientImpl) taskClient;
     List<TopicSubscription> subscriptions = clientImpl.getTopicSubscriptionManager().getSubscriptions();
     assertThat(subscriptions).hasSize(1);
     TopicSubscription subscription = subscriptions.iterator().next();
     assertThat(subscription.getTopicName()).isEqualTo(topicName);
-    List<ClientRequestInterceptor> interceptors = clientImpl.getRequestInterceptorHandler().getInterceptors();
-    if (expectedInterceptors == null) {
-      assertThat(interceptors).hasSize(0);
-    } else {
-      assertThat(interceptors).containsOnly(expectedInterceptors);
-    }
   }
 }

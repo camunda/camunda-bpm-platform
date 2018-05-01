@@ -2,6 +2,7 @@ package org.camunda.bpm.client.spring;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -125,7 +126,7 @@ public class SubscribedExternalTaskBean implements SubscribedExternalTask, Initi
   }
 
   @Override
-  public long getLockDuration() {
+  public Long getLockDuration() {
     return subscriptionInformation.getLockDuration();
   }
 
@@ -137,6 +138,16 @@ public class SubscribedExternalTaskBean implements SubscribedExternalTask, Initi
   @Override
   public boolean isAutoOpen() {
     return subscriptionInformation.isAutoOpen();
+  }
+
+  @Override
+  public List<String> getVariableNames() {
+    return subscriptionInformation.getVariableNames();
+  }
+
+  @Override
+  public String getBusinessKey() {
+    return subscriptionInformation.getBusinessKey();
   }
 
   @Override
@@ -160,7 +171,11 @@ public class SubscribedExternalTaskBean implements SubscribedExternalTask, Initi
     public void subscribe() {
       if (!isSubscribed()) {
         topicSubscriptionBuilder = externalTaskClient.subscribe(subscriptionInformation.getTopicName()).lockDuration(subscriptionInformation.getLockDuration())
-            .handler(externalTaskHandler);
+            .businessKey(subscriptionInformation.getBusinessKey()).handler(externalTaskHandler);
+        List<String> variableNames = subscriptionInformation.getVariableNames();
+        if (variableNames != null) {
+          topicSubscriptionBuilder.variables(variableNames.toArray(new String[variableNames.size()]));
+        }
       }
     }
 

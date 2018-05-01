@@ -30,11 +30,8 @@ public class TaskHandlerConfiguration {
       // create an object typed variable
       ObjectValue creditScoresObject = Variables.objectValue(creditScores).create();
 
-      // set the recently created variable
-      externalTask.setVariableTyped("creditScores", creditScoresObject);
-
       // complete the external task
-      externalTaskService.complete(externalTask);
+      externalTaskService.complete(externalTask, Variables.putValueTyped("creditScores", creditScoresObject));
 
       log.info("The External Task {} has been checked!", externalTask.getId());
     };
