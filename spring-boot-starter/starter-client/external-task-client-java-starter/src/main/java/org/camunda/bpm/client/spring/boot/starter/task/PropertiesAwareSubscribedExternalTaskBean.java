@@ -37,6 +37,12 @@ public class PropertiesAwareSubscribedExternalTaskBean extends SubscribedExterna
       if (properties.getAutoSubscribe() != null) {
         merge.setAutoSubscribe(properties.getAutoSubscribe());
       }
+      if (properties.getVariableNames() != null) {
+        merge.setVariableNames(properties.getVariableNames());
+      }
+      if (properties.getBusinessKey() != null) {
+        merge.setBusinessKey(properties.getBusinessKey());
+      }
       return merge;
     });
     setSubscriptionInformation(merge);

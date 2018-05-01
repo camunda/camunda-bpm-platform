@@ -17,13 +17,21 @@ import lombok.ToString;
 public class CamundaBpmClientProperties implements InitializingBean {
 
   protected String baseUrl;
+  protected Integer maxTasks;
+  protected String workerId;
+  protected Long asyncResponseTimeout;
+  protected Boolean autoFetchingEnabled;
+  protected Long lockDuration;
+  protected String dateFormat;
+  protected String defaultSerializationFormat;
   protected BasicAuthProperties basicAuth = new BasicAuthProperties();
   protected Map<String, SubscriptionProperties> subscriptions = new HashMap<>();
   protected Map<String, Client> clients = new HashMap<>();
 
   @Override
   public void afterPropertiesSet() throws Exception {
-    clients.put("", new Client(baseUrl, basicAuth));
+    clients.put("",
+        new Client(baseUrl, basicAuth, maxTasks, workerId, asyncResponseTimeout, autoFetchingEnabled, lockDuration, dateFormat, defaultSerializationFormat));
   }
 
   public Optional<SubscriptionProperties> subscriptionInformationFor(String topic) {
@@ -59,6 +67,8 @@ public class CamundaBpmClientProperties implements InitializingBean {
     private Long lockDuration;
     private Boolean autoSubscribe;
     private Boolean autoOpen;
+    private String[] variableNames;
+    private String businessKey;
   }
 
   @Data
@@ -67,6 +77,13 @@ public class CamundaBpmClientProperties implements InitializingBean {
   public static class Client {
     protected String baseUrl;
     protected BasicAuthProperties basicAuth = new BasicAuthProperties();
+    protected Integer maxTasks;
+    protected String workerId;
+    protected Long asyncResponseTimeout;
+    protected Boolean autoFetchingEnabled;
+    protected Long lockDuration;
+    protected String dateFormat;
+    protected String defaultSerializationFormat;
   }
 
 }
