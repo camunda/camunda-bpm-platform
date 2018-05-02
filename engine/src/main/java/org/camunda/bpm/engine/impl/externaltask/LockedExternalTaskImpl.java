@@ -125,11 +125,12 @@ public class LockedExternalTaskImpl implements LockedExternalTask {
    *
    * @param externalTaskEntity - source persistent entity to use for fields
    * @param variablesToFetch - list of variable names to fetch, if null then all variables will be fetched
+   * @param isLocal - if true only local variables will be collected
    *
    * @return object with all fields copied from the ExternalTaskEntity, error details fetched from the
    * database and variables attached
    */
-  public static LockedExternalTaskImpl fromEntity(ExternalTaskEntity externalTaskEntity, List<String> variablesToFetch, boolean deserializeVariables) {
+  public static LockedExternalTaskImpl fromEntity(ExternalTaskEntity externalTaskEntity, List<String> variablesToFetch, boolean isLocal, boolean deserializeVariables) {
     LockedExternalTaskImpl result = new LockedExternalTaskImpl();
     result.id = externalTaskEntity.getId();
     result.topicName = externalTaskEntity.getTopicName();
@@ -151,7 +152,7 @@ public class LockedExternalTaskImpl implements LockedExternalTask {
 
     ExecutionEntity execution = externalTaskEntity.getExecution();
     result.variables = new VariableMapImpl();
-    execution.collectVariables(result.variables, variablesToFetch, false, deserializeVariables);
+    execution.collectVariables(result.variables, variablesToFetch, isLocal, deserializeVariables);
 
     return result;
   }

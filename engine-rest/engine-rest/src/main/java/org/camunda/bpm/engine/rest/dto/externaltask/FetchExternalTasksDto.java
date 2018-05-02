@@ -64,6 +64,7 @@ public class FetchExternalTasksDto {
     protected List<String> variables;
     protected HashMap<String, Object> processVariables;
     protected boolean deserializeValues = false;
+    protected boolean localVariables = false;
 
     public String getTopicName() {
       return topicName;
@@ -101,6 +102,12 @@ public class FetchExternalTasksDto {
     public void setDeserializeValues(boolean deserializeValues) {
       this.deserializeValues = deserializeValues;
     }
+    public boolean isLocalVariables() {
+	  return localVariables;
+    }
+    public void setLocalVariables(boolean localVariables) {
+      this.localVariables = localVariables;
+    }
   }
 
   public ExternalTaskQueryBuilder buildQuery(ProcessEngine processEngine) {
@@ -127,6 +134,10 @@ public class FetchExternalTasksDto {
 
         if (topicDto.isDeserializeValues()) {
           topicFetchBuilder = topicFetchBuilder.enableCustomObjectDeserialization();
+        }
+
+        if (topicDto.isLocalVariables()) {
+          topicFetchBuilder = topicFetchBuilder.localVariables();
         }
 
         fetchBuilder = topicFetchBuilder;

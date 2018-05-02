@@ -33,9 +33,11 @@ public class TopicFetchInstruction implements Serializable {
   protected String topicName;
   protected String businessKey;
   protected List<String> variablesToFetch;
+
   protected List<QueryVariableValue> filterVariables;
   protected long lockDuration;
   protected boolean deserializeVariables = false;
+  protected boolean localVariables = false;
 
   public TopicFetchInstruction(String topicName, long lockDuration) {
     this.topicName = topicName;
@@ -98,4 +100,13 @@ public class TopicFetchInstruction implements Serializable {
       }
     }
   }
+
+  public boolean isLocalVariables() {
+	return localVariables;
+  }
+
+  public void setLocalVariables(boolean localVariables) {
+	this.localVariables = localVariables;
+  }
+
 }

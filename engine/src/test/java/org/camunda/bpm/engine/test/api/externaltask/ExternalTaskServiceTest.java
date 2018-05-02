@@ -488,6 +488,67 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
     assertEquals("value1", receivedCustomValue.getTestValue());
   }
 
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/externaltask/ExternalTaskVariablesTest.testExternalTaskVariablesLocal.bpmn20.xml" })
+  public void testFetchOnlyLocalVariables() {
+
+    VariableMap globalVars = Variables.putValue("globalVar", "globalVal");
+
+    runtimeService.startProcessInstanceByKey("oneExternalTaskProcess", globalVars);
+
+    final String workerId = "workerId";
+    final String topicName = "testTopic";
+
+    List<LockedExternalTask> lockedExternalTasks = externalTaskService.fetchAndLock(10, workerId)
+      .topic(topicName, 60000)
+      .execute();
+
+    assertEquals(1, lockedExternalTasks.size());
+
+    LockedExternalTask lockedExternalTask = lockedExternalTasks.get(0);
+    VariableMap variables = lockedExternalTask.getVariables();
+    assertEquals(2, variables.size());
+    assertEquals("globalVal", variables.getValue("globalVar", String.class));
+    assertEquals("localVal", variables.getValue("localVar", String.class));
+
+    externalTaskService.unlock(lockedExternalTask.getId());
+
+    lockedExternalTasks = externalTaskService.fetchAndLock(10, workerId)
+      .topic(topicName, 60000)
+      .variables("globalVar", "localVar")
+      .localVariables()
+      .execute();
+
+    assertEquals(1, lockedExternalTasks.size());
+
+    lockedExternalTask = lockedExternalTasks.get(0);
+    variables = lockedExternalTask.getVariables();
+    assertEquals(1, variables.size());
+    assertEquals("localVal", variables.getValue("localVar", String.class));
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/externaltask/ExternalTaskVariablesTest.testExternalTaskVariablesLocal.bpmn20.xml" })
+  public void testFetchNonExistingLocalVariables() {
+
+    VariableMap globalVars = Variables.putValue("globalVar", "globalVal");
+
+    runtimeService.startProcessInstanceByKey("oneExternalTaskProcess", globalVars);
+
+    final String workerId = "workerId";
+    final String topicName = "testTopic";
+
+    List<LockedExternalTask> lockedExternalTasks = externalTaskService.fetchAndLock(10, workerId)
+      .topic(topicName, 60000)
+      .variables("globalVar", "nonExistingLocalVar")
+      .localVariables()
+      .execute();
+
+    assertEquals(1, lockedExternalTasks.size());
+
+    LockedExternalTask lockedExternalTask = lockedExternalTasks.get(0);
+    VariableMap variables = lockedExternalTask.getVariables();
+    assertEquals(0, variables.size());
+  }
+
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.testFetchVariables.bpmn20.xml")
   public void testFetchAllVariables() {
     // given
