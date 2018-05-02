@@ -1,5 +1,7 @@
 package org.camunda.bpm.engine.rest.history;
 
+import java.util.List;
+
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -23,6 +25,11 @@ public interface HistoryCleanupRestService {
   @Path("/job")
   @Produces(MediaType.APPLICATION_JSON)
   JobDto findCleanupJob();
+
+  @GET
+  @Path("/jobs")
+  @Produces(MediaType.APPLICATION_JSON)
+  List<JobDto> findCleanupJobs();
 
   @GET
   @Path("/configuration")

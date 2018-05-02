@@ -38,6 +38,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 public class HistoryCleanupRestServiceInteractionTest extends AbstractRestServiceTest {
 
@@ -46,6 +47,7 @@ public class HistoryCleanupRestServiceInteractionTest extends AbstractRestServic
 
   protected static final String HISTORY_CLEANUP_URL = TEST_RESOURCE_ROOT_PATH + "/history/cleanup";
   protected static final String FIND_HISTORY_CLEANUP_JOB_URL = HISTORY_CLEANUP_URL + "/job";
+  protected static final String FIND_HISTORY_CLEANUP_JOBS_URL = HISTORY_CLEANUP_URL + "/jobs";
   protected static final String CONFIGURATION_URL = HISTORY_CLEANUP_URL + "/configuration";
 
   private HistoryService historyServiceMock;
@@ -54,10 +56,13 @@ public class HistoryCleanupRestServiceInteractionTest extends AbstractRestServic
   public void setUpRuntimeData() {
     historyServiceMock = mock(HistoryService.class);
     Job mockJob = MockProvider.createMockJob();
+    List<Job> mockJobs = MockProvider.createMockJobs();
     when(historyServiceMock.cleanUpHistoryAsync(anyBoolean()))
         .thenReturn(mockJob);
     when(historyServiceMock.findHistoryCleanupJob())
         .thenReturn(mockJob);
+    when(historyServiceMock.findHistoryCleanupJobs())
+    .thenReturn(mockJobs);
 
     // runtime service
     when(processEngine.getHistoryService()).thenReturn(historyServiceMock);
@@ -84,6 +89,29 @@ public class HistoryCleanupRestServiceInteractionTest extends AbstractRestServic
         .when().get(FIND_HISTORY_CLEANUP_JOB_URL);
 
    verify(historyServiceMock).findHistoryCleanupJob();
+  }
+
+  @Test
+  public void testFindHistoryCleanupJobs() {
+    given().contentType(ContentType.JSON)
+        .then()
+        .expect().statusCode(Status.OK.getStatusCode())
+        .when().get(FIND_HISTORY_CLEANUP_JOBS_URL);
+
+   verify(historyServiceMock).findHistoryCleanupJobs();
+  }
+
+  @Test
+  public void testFindNoHistoryCleanupJobs() {
+    when(historyServiceMock.findHistoryCleanupJobs())
+        .thenReturn(null);
+
+    given().contentType(ContentType.JSON)
+        .then()
+        .expect().statusCode(Status.NOT_FOUND.getStatusCode())
+        .when().get(FIND_HISTORY_CLEANUP_JOBS_URL);
+
+   verify(historyServiceMock).findHistoryCleanupJobs();
   }
 
   @Test
