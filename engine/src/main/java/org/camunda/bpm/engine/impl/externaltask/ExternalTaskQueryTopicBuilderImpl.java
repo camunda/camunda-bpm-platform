@@ -106,4 +106,10 @@ public class ExternalTaskQueryTopicBuilderImpl implements ExternalTaskQueryTopic
     return this;
   }
 
+  public ExternalTaskQueryTopicBuilder localVariables(boolean localVariables) {
+	currentInstruction.setLocalVariables(localVariables);
+	return this;
+  }
+
+
 }

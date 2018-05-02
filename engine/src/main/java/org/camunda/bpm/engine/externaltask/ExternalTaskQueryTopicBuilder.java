@@ -74,4 +74,12 @@ public interface ExternalTaskQueryTopicBuilder extends ExternalTaskQueryBuilder 
    */
   public ExternalTaskQueryTopicBuilder enableCustomObjectDeserialization();
 
+  /**
+   * Define whether only local variables will be fetched with all tasks for the current topic.
+   *
+   * @param localVariables if true only local variables will be fetched
+   * @return this builder
+   */
+  public ExternalTaskQueryTopicBuilder localVariables(boolean localVariables);
+
 }
