@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -62,16 +62,16 @@ public class FetchAndLockHandlerTest {
 
   @Mock
   protected ProcessEngine processEngine;
-  
+
   @Mock
   protected IdentityService identityService;
-  
+
   @Mock
   protected ExternalTaskService externalTaskService;
-  
+
   @Mock
   protected ExternalTaskQueryTopicBuilder fetchTopicBuilder;
-  
+
   @Spy
   protected FetchAndLockHandlerImpl handler;
 
@@ -83,6 +83,7 @@ public class FetchAndLockHandlerTest {
   public void initMocks() {
     when(processEngine.getIdentityService()).thenReturn(identityService);
     when(processEngine.getExternalTaskService()).thenReturn(externalTaskService);
+    when(processEngine.getName()).thenReturn("default");
 
     when(externalTaskService.fetchAndLock(anyInt(), any(String.class), any(Boolean.class)))
       .thenReturn(fetchTopicBuilder);
@@ -94,6 +95,7 @@ public class FetchAndLockHandlerTest {
       .thenReturn(fetchTopicBuilder);
 
     doNothing().when(handler).suspend(anyLong());
+    doReturn(processEngine).when(handler).getProcessEngine(any(FetchAndLockRequest.class));
 
     lockedExternalTaskMock = MockProvider.createMockLockedExternalTask();
   }

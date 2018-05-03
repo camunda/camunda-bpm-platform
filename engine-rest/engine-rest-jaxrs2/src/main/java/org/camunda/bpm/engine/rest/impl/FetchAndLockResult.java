@@ -12,11 +12,10 @@
  */
 package org.camunda.bpm.engine.rest.impl;
 
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.rest.dto.externaltask.LockedExternalTaskDto;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.camunda.bpm.engine.rest.dto.externaltask.LockedExternalTaskDto;
 
 /**
  * @author Tassilo Weidner
@@ -24,34 +23,34 @@ import java.util.List;
 public class FetchAndLockResult {
 
   protected List<LockedExternalTaskDto> tasks = new ArrayList<LockedExternalTaskDto>();
-  protected ProcessEngineException processEngineException;
+  protected Throwable throwable;
 
   public FetchAndLockResult(List<LockedExternalTaskDto> tasks) {
     this.tasks = tasks;
   }
 
-  public FetchAndLockResult(ProcessEngineException processEngineException) {
-    this.processEngineException = processEngineException;
+  public FetchAndLockResult(Throwable throwable) {
+    this.throwable = throwable;
   }
 
   public List<LockedExternalTaskDto> getTasks() {
     return tasks;
   }
 
-  public ProcessEngineException getProcessEngineException() {
-    return processEngineException;
+  public Throwable getThrowable() {
+    return throwable;
   }
 
   public boolean wasSuccessful() {
-    return processEngineException == null;
+    return throwable == null;
   }
 
   public static FetchAndLockResult successful(List<LockedExternalTaskDto> tasks) {
     return new FetchAndLockResult(tasks);
   }
 
-  public static FetchAndLockResult failed(ProcessEngineException processEngineException) {
-    return new FetchAndLockResult(processEngineException);
+  public static FetchAndLockResult failed(Throwable throwable) {
+    return new FetchAndLockResult(throwable);
   }
 
 }

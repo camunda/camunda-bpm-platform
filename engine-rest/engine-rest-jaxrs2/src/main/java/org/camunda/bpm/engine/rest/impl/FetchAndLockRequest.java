@@ -12,13 +12,13 @@
  */
 package org.camunda.bpm.engine.rest.impl;
 
-import org.camunda.bpm.engine.ProcessEngine;
+import java.util.Date;
+
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.rest.dto.externaltask.FetchExternalTasksExtendedDto;
 
 import javax.ws.rs.container.AsyncResponse;
-import java.util.Date;
 
 /**
  * @author Tassilo Weidner
@@ -28,7 +28,7 @@ public class FetchAndLockRequest {
   protected Date requestTime = ClockUtil.getCurrentTime();
   protected FetchExternalTasksExtendedDto dto;
   protected AsyncResponse asyncResponse;
-  protected ProcessEngine processEngine;
+  protected String processEngineName;
   protected Authentication authentication;
 
   public Date getRequestTime() {
@@ -58,12 +58,12 @@ public class FetchAndLockRequest {
     return this;
   }
 
-  public ProcessEngine getProcessEngine() {
-    return processEngine;
+  public String getProcessEngineName() {
+    return processEngineName;
   }
 
-  public FetchAndLockRequest setProcessEngine(ProcessEngine processEngine) {
-    this.processEngine = processEngine;
+  public FetchAndLockRequest setProcessEngineName(String processEngineName) {
+    this.processEngineName = processEngineName;
     return this;
   }
 
