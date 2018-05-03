@@ -24,15 +24,24 @@
         </div>
 
         <div class="names">
-          <h2 class="task">{{ task.name || task.taskDefinitionKey || task.id }}</h2>
+          <h2 class="task">{{ task.name || task.taskDefinitionKey || task.id }} </h2>
+          <div class="definition-name">
           <h4 class="process-definition"
               ng-if="task.processDefinitionId">
             {{ task._embedded.processDefinition[0].name || task._embedded.processDefinition[0].key }}
-          </h4>
+            </h4>
           <h4 class="case-definition"
               ng-if="task.caseDefinitionId">
             {{ task._embedded.caseDefinition[0].name || task._embedded.caseDefinition[0].key }}
           </h4>
+          <a class="instance-link"  ng-if="instanceLink"
+            ng-href="{{instanceLink}}" class="ng-binding" href="{{instanceLink}}">
+            <span tooltip-placement="top"
+                  tooltip="{{ 'INSTANCE_LINK' | translate }}"
+                  class="glyphicon glyphicon-new-window">
+              </span>
+          </a>
+          </div>
         </div>
 
         <div cam-tasklist-task-meta

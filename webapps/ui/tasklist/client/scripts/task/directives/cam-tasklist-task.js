@@ -43,6 +43,20 @@ module.exports = [ function() {
 
         var taskData = $scope.taskData = $scope.tasklistData.newChild($scope);
 
+        function setLink() {
+          var task = $scope.task;
+          var url =  '../../cockpit/default/#/';
+
+          if(task.processInstanceId) {
+            url += ('process-instance/'+ task.processInstanceId);
+          } else if (task.caseInstanceId) {
+            url += ('case-instance/'+ task.caseInstanceId);
+          } else {
+            url = '';
+          }
+
+          $scope.instanceLink = url;
+        }
         // error handling //////////////////////////////////////////////////////////////
 
         function errorNotification(src, err) {
@@ -193,6 +207,7 @@ module.exports = [ function() {
          */
         $scope.taskState = taskData.observe('task', function(task) {
           $scope.task = task;
+          setLink();
         });
 
         taskData.observe('isAssignee', function(isAssignee) {
