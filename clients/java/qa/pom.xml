@@ -4,6 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <name>Camunda External Task Client - QA</name>
 
+  <groupId>org.camunda.bpm.qa</groupId>
   <artifactId>qa</artifactId>
 
   <packaging>pom</packaging>
