@@ -39,29 +39,47 @@ public class ExponentialBackoffStrategyTest {
     assertThat(initialWaitingTime).isEqualTo(0L);
 
     // when
-    // no external tasks available
+    // in consecutive iterations, no external tasks are available
     backoffStrategy.reconfigure(Lists.emptyList());
     long waitingTime1 = backoffStrategy.calculateBackoffTime();
     backoffStrategy.reconfigure(Lists.emptyList());
     long waitingTime2 = backoffStrategy.calculateBackoffTime();
 
     // then
-    assertThat(waitingTime1).isGreaterThan(0L);
-    assertThat(waitingTime2).isGreaterThan(waitingTime1);
+    assertThat(waitingTime1).isEqualTo(500L);
+    assertThat(waitingTime2).isEqualTo(1000L);
   }
 
   @Test
   public void shouldResetBackoffStrategy() {
     // given
     backoffStrategy.reconfigure(Lists.emptyList());
-    long waitingTime = backoffStrategy.calculateBackoffTime();
-    assertThat(waitingTime).isGreaterThan(0L);
+    long waitingTime1 = backoffStrategy.calculateBackoffTime();
+    assertThat(waitingTime1).isEqualTo(500L);
 
     // when
+    // a not-empty response is received
     backoffStrategy.reconfigure(Lists.newArrayList(new ExternalTaskImpl()));
 
     // then
     long waitingTime2 = backoffStrategy.calculateBackoffTime();
     assertThat(waitingTime2).isEqualTo(0L);
+  }
+
+  @Test
+  public void shouldCapWaitingTime() {
+    // given
+    long waitingTime = backoffStrategy.calculateBackoffTime();
+    assertThat(waitingTime).isEqualTo(0L);
+
+    // when
+    // reach maximum waiting time
+    for (int i=0; i<8; i++) {
+      backoffStrategy.reconfigure(Lists.emptyList());
+    }
+
+    // then
+    waitingTime = backoffStrategy.calculateBackoffTime();
+    assertThat(waitingTime).isEqualTo(60000L);
   }
 }
