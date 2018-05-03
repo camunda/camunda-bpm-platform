@@ -18,28 +18,29 @@ import org.camunda.bpm.client.task.ExternalTask;
 import java.util.List;
 
 /**
- * <p>The BackoffStrategy provides a way to define a back off between fetch and lock requests.</p>
+ * <p>Provides a way to define a back off between fetch and lock requests.
  *
- * <p>Since an implementation of this interface may be executed by multiple threads,
- * it is recommended that a BackoffStrategy is implemented in a thread-safe manner.</p>
+ * <p>Note: Since an implementation of this interface may be executed by multiple threads,
+ * it is recommended to implement the custom backoff strategy in a thread-safe manner.
  *
  * @author Nikola Koevski
  */
 public interface BackoffStrategy {
 
   /**
-   * Is invoked before the wait time calculation in order to check the conditions for executing the
-   * backoff strategy and do a reconfiguration of the backoff strategy parameters if needed.
-   * The implementation might realize a strategy reset.
+   * <p>Reconfigures the back off strategy based on the fetched external tasks and is invoked
+   * before {@link #calculateBackoffTime}.
    *
-   * @param externalTasks the list of retrieved external tasks
-   * @return a boolean indicating if a backoff strategy should be invoked
+   * <p>The implementation might count the amount of invocations and realize a strategy reset.
+   *
+   * @param externalTasks which have been fetched
    */
   void reconfigure(List<ExternalTask> externalTasks);
 
   /**
-   * Is invoked when the retrieved external tasks do not satisfy the defined conditions.
-   * The implementation might realize a back off between fetch and lock requests.
+   * <p>Calculates the back off time and is invoked after {@link #reconfigure(List)}.
+   *
+   * @return the back off time between fetch and lock requests in milliseconds
    */
   long calculateBackoffTime();
 }

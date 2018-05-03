@@ -25,7 +25,7 @@ import java.util.UUID;
 import org.camunda.bpm.client.backoff.BackoffStrategy;
 import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.client.ExternalTaskClientBuilder;
-import org.camunda.bpm.client.backoff.impl.ExponentialBackoffStrategy;
+import org.camunda.bpm.client.backoff.ExponentialBackoffStrategy;
 import org.camunda.bpm.client.interceptor.ClientRequestInterceptor;
 import org.camunda.bpm.client.interceptor.impl.RequestInterceptorHandler;
 import org.camunda.bpm.client.spi.DataFormat;

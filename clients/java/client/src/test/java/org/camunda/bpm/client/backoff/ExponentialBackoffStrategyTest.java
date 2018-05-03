@@ -14,8 +14,6 @@
 package org.camunda.bpm.client.backoff;
 
 import org.assertj.core.util.Lists;
-import org.camunda.bpm.client.backoff.impl.ExponentialBackoffStrategy;
-import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.impl.ExternalTaskImpl;
 import org.junit.Before;
 import org.junit.Test;
