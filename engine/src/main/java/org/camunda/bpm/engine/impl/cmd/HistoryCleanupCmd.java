@@ -63,6 +63,8 @@ public class HistoryCleanupCmd implements Command<Job> {
 
     boolean suspendJobs = !historyCleanupJobs.isEmpty() && !willBeScheduled(commandContext);
 
+    int degreeOfParallelism = commandContext.getProcessEngineConfiguration().getHistoryCleanupDegreeOfParallelism();
+    int[][] minuteChunks = HistoryCleanupHelper.listMinuteChunks(degreeOfParallelism);
     if (createJobs) {
       //exclusive lock
       commandContext.getPropertyManager().acquireExclusiveLockForHistoryCleanupJob();
@@ -71,7 +73,6 @@ public class HistoryCleanupCmd implements Command<Job> {
       historyCleanupJobs = commandContext.getJobManager().findJobsByHandlerType(HistoryCleanupJobHandler.TYPE);
 
       if (historyCleanupJobs.isEmpty()) {
-        int[][] minuteChunks = HistoryCleanupHelper.listMinuteChunks(commandContext.getProcessEngineConfiguration().getHistoryCleanupDegreeOfParallelism());
         for (int[] minuteChunk: minuteChunks) {
           final JobEntity jobInstance = HISTORY_CLEANUP_JOB_DECLARATION.createJobInstance(new HistoryCleanupContext(immediatelyDue, minuteChunk[0], minuteChunk[1]));
           historyCleanupJobs.add(jobInstance);
@@ -79,9 +80,6 @@ public class HistoryCleanupCmd implements Command<Job> {
         }
       }
     } else if (reconfigureJobs) {
-      final int degreeOfParallelism = commandContext.getProcessEngineConfiguration().getHistoryCleanupDegreeOfParallelism();
-      int[][] minuteChunks = HistoryCleanupHelper.listMinuteChunks(commandContext.getProcessEngineConfiguration().getHistoryCleanupDegreeOfParallelism());
-
       int i = 0;
       int[] minuteChunk;
       while (i < degreeOfParallelism) {

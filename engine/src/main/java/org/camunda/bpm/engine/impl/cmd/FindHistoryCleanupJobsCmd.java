@@ -25,6 +25,8 @@ import org.camunda.bpm.engine.runtime.Job;
  */
 public class FindHistoryCleanupJobsCmd implements Command<List<Job>>, Serializable {
 
+  private static final long serialVersionUID = 1L;
+
   @Override
   public List<Job> execute(CommandContext commandContext) {
     return commandContext.getJobManager().findJobsByHandlerType(HistoryCleanupJobHandler.TYPE);

@@ -206,6 +206,7 @@ public class JobManager extends AbstractManager {
     return getDbEntityManager().selectList("selectJobsByJobDefinitionId", jobDefinitionId);
   }
 
+  @SuppressWarnings("unchecked")
   public List<Job> findJobsByHandlerType(String handlerType) {
     return getDbEntityManager().selectList("selectJobsByHandlerType", handlerType);
   }
@@ -227,21 +228,12 @@ public class JobManager extends AbstractManager {
     return getDbEntityManager().selectList("selectJobByQueryCriteria", jobQuery, page);
   }
 
-  public List<JobEntity> findJobsByConfiguration(String jobHandlerType, String jobHandlerConfiguration) {
-    return findJobsByConfiguration(jobHandlerType, jobHandlerConfiguration, null, true);
-  }
-
-  public List<JobEntity> findJobsByConfiguration(String jobHandlerType, String jobHandlerConfiguration, String tenantId) {
-    return findJobsByConfiguration(jobHandlerType, jobHandlerConfiguration, tenantId, false);
-  }
-
   @SuppressWarnings("unchecked")
-  public List<JobEntity> findJobsByConfiguration(String jobHandlerType, String jobHandlerConfiguration, String tenantId, boolean ignoreTenantCheck) {
-    Map<String, Object> params = new HashMap<String, Object>();
+  public List<JobEntity> findJobsByConfiguration(String jobHandlerType, String jobHandlerConfiguration, String tenantId) {
+    Map<String, String> params = new HashMap<String, String>();
     params.put("handlerType", jobHandlerType);
     params.put("handlerConfiguration", jobHandlerConfiguration);
     params.put("tenantId", tenantId);
-    params.put("ignoreTenantCheck", ignoreTenantCheck);
 
     if (TimerCatchIntermediateEventJobHandler.TYPE.equals(jobHandlerType)
       || TimerExecuteNestedActivityJobHandler.TYPE.equals(jobHandlerType)

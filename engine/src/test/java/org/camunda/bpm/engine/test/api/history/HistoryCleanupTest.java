@@ -151,7 +151,6 @@ public class HistoryCleanupTest {
       public Void execute(CommandContext commandContext) {
 
         List<Job> jobs = historyService.findHistoryCleanupJobs();
-//        assertEquals(NUMBER_OF_THREADS, jobs.size());
         for (Job job: jobs) {
           commandContext.getJobManager().deleteJob((JobEntity) job);
           commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(job.getId());
@@ -1192,58 +1191,6 @@ public class HistoryCleanupTest {
     thrown.expectMessage("historyCleanupBatchThreshold");
 
     processEngineConfiguration.initHistoryCleanup();
-  }
-
-  @Test
-  public void testReconfigureDegreeOfParallelism() {
-
-      //when
-      historyService.cleanUpHistoryAsync(true);
-      //then
-      assertEquals(3, managementService.createJobQuery().list().size());
-      for (Job historyJob : managementService.createJobQuery().list()) {
-        final int minuteTo = getHistoryCleanupJobHandlerConfiguration(historyJob).getMinuteTo();
-        final int minuteFrom = getHistoryCleanupJobHandlerConfiguration(historyJob).getMinuteFrom();
-        if (minuteFrom == 0) {
-          assertEquals(19, minuteTo);
-        } else if (minuteFrom == 20) {
-          assertEquals(39, minuteTo);
-        } else {
-          assertEquals(40, minuteFrom);
-          assertEquals(59, minuteTo);
-        }
-      }
-
-      //given
-      processEngineConfiguration.setHistoryCleanupDegreeOfParallelism(1);
-      processEngineConfiguration.initHistoryCleanup();
-      //when
-      historyService.cleanUpHistoryAsync(true);
-      //then
-      assertEquals(1, managementService.createJobQuery().list().size());
-      Job job = managementService.createJobQuery().singleResult();
-      assertEquals(0, getHistoryCleanupJobHandlerConfiguration(job).getMinuteFrom());
-      assertEquals(59, getHistoryCleanupJobHandlerConfiguration(job).getMinuteTo());
-
-      //given
-      processEngineConfiguration.setHistoryCleanupDegreeOfParallelism(2);
-      processEngineConfiguration.initHistoryCleanup();
-      //when
-      historyService.cleanUpHistoryAsync(true);
-      //then
-      assertEquals(2, managementService.createJobQuery().list().size());
-      for (Job historyJob : managementService.createJobQuery().list()) {
-        final int minuteTo = getHistoryCleanupJobHandlerConfiguration(historyJob).getMinuteTo();
-        final int minuteFrom = getHistoryCleanupJobHandlerConfiguration(historyJob).getMinuteFrom();
-        if (minuteFrom == 0) {
-          assertEquals(29, minuteTo);
-        } else {
-          assertEquals(30, minuteFrom);
-          assertEquals(59, minuteTo);
-        }
-      }
-
-
   }
 
   private Date getNextRunWithinBatchWindow(Date currentTime) {
