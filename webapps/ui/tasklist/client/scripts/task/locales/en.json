@@ -119,7 +119,8 @@
         "The assignee has been reset.",
   "ASSIGNEE_RESET_ERROR":
         "Could not reset the assignee.",
-
+  "INSTANCE_LINK":
+    "Link to instance view.",
   "TASK_NO_PROCESS_DEFINITION":
         "Could not find the process definition of the task.",
 
