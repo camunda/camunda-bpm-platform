@@ -171,7 +171,7 @@ module.exports = function(grunt) {
     }
   });
 
-  require('camunda-commons-ui/grunt/tasks/dmncompile')(grunt);
+  require('camunda-commons-ui/grunt/tasks/compileLibs')(grunt);
   require('camunda-commons-ui/grunt/tasks/localescompile')(grunt);
   require('camunda-commons-ui/grunt/tasks/persistify')(grunt);
   require('camunda-commons-ui/grunt/tasks/ensureLibs')(grunt);
@@ -208,7 +208,7 @@ grunt.registerTask('build', function(mode, app) {
 
 
     tasksToRun.push(
-      'dmncompile',
+      'compileLibs',
       'clean',
       'ensureLibs',
       'persistify',
