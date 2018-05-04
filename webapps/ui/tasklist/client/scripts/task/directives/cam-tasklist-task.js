@@ -207,7 +207,7 @@ module.exports = [ function() {
          */
         $scope.taskState = taskData.observe('task', function(task) {
           $scope.task = task;
-          setLink();
+          task && setLink();
         });
 
         taskData.observe('isAssignee', function(isAssignee) {
