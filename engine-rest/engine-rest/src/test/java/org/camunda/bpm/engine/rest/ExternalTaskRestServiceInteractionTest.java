@@ -18,6 +18,7 @@ import static org.fest.assertions.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyString;
@@ -136,6 +137,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     when(fetchTopicBuilder.variables(anyListOf(String.class))).thenReturn(fetchTopicBuilder);
     when(fetchTopicBuilder.variables(any(String[].class))).thenReturn(fetchTopicBuilder);
     when(fetchTopicBuilder.enableCustomObjectDeserialization()).thenReturn(fetchTopicBuilder);
+    when(fetchTopicBuilder.localVariables(anyBoolean())).thenReturn(fetchTopicBuilder);
     when(fetchTopicBuilder.topic(any(String.class), anyLong())).thenReturn(fetchTopicBuilder);
     when(fetchTopicBuilder.businessKey(any(String.class))).thenReturn(fetchTopicBuilder);
     when(fetchTopicBuilder.processInstanceVariableEquals(anyMapOf(String.class, Object.class))).thenReturn(fetchTopicBuilder);
@@ -397,6 +399,44 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     inOrder.verify(fetchTopicBuilder).execute();
     verifyNoMoreInteractions(fetchTopicBuilder, externalTaskService);
   }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void testLocalVariables() {
+    // given
+    when(fetchTopicBuilder.execute()).thenReturn(Arrays.asList(lockedExternalTaskMock));
+
+    // when
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("maxTasks", 5);
+    parameters.put("workerId", "aWorkerId");
+
+    Map<String, Object> topicParameter = new HashMap<String, Object>();
+    topicParameter.put("topicName", "aTopicName");
+    topicParameter.put("lockDuration", 12354L);
+    topicParameter.put("variables", Arrays.asList(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME));
+    topicParameter.put("localVariables", true);
+    parameters.put("topics", Arrays.asList(topicParameter));
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(parameters)
+      .header("accept", MediaType.APPLICATION_JSON)
+    .then()
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(FETCH_EXTERNAL_TASK_URL);
+
+    InOrder inOrder = inOrder(fetchTopicBuilder, externalTaskService);
+    inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId", false);
+    inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
+    inOrder.verify(fetchTopicBuilder).variables(Arrays.asList(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME));
+    inOrder.verify(fetchTopicBuilder).localVariables(true);
+    inOrder.verify(fetchTopicBuilder).execute();
+    verifyNoMoreInteractions(fetchTopicBuilder, externalTaskService);
+  }
+
 
   @Test
   public void testComplete() {
