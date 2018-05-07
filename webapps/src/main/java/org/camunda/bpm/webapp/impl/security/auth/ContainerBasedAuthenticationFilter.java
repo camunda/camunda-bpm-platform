@@ -12,11 +12,6 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.ext.Providers;
-
-import org.camunda.bpm.engine.rest.util.ProvidersUtil;
 
 /**
  * This Servlet filter relies on the Servlet container (application server) to
