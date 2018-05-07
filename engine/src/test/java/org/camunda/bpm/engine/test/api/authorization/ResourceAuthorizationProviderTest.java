@@ -16,6 +16,8 @@ import static org.camunda.bpm.engine.authorization.Authorization.ANY;
 import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GRANT;
 import static org.camunda.bpm.engine.authorization.Permissions.ALL;
 import static org.camunda.bpm.engine.authorization.Resources.AUTHORIZATION;
+import static org.camunda.bpm.engine.authorization.Resources.DASHBOARD;
+import static org.camunda.bpm.engine.authorization.Resources.REPORT;
 import static org.camunda.bpm.engine.authorization.Resources.TASK;
 import static org.camunda.bpm.engine.authorization.Resources.USER;
 
@@ -256,6 +258,22 @@ public class ResourceAuthorizationProviderTest extends ResourceProcessEngineTest
     assertEquals("management", MyResourceAuthorizationProvider.DELETE_GROUP_IDENTITY_LINK_GROUP);
 
     taskService.deleteTask(taskId, true);
+  }
+
+  public void testReportResourceAuthorization() {
+    MyResourceAuthorizationProvider.clearProperties();
+
+    createGrantAuthorization(REPORT, ANY, ALL, userId);
+
+    assertEquals(true, authorizationService.isUserAuthorized(userId, Arrays.asList(groupId), ALL, REPORT));
+  }
+
+  public void testDashboardResourceAuthorization() {
+    MyResourceAuthorizationProvider.clearProperties();
+
+    createGrantAuthorization(DASHBOARD, ANY, ALL, userId);
+
+    assertEquals(true, authorizationService.isUserAuthorized(userId, Arrays.asList(groupId), ALL, DASHBOARD));
   }
 
   // user ////////////////////////////////////////////////////////////////
