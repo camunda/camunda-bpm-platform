@@ -40,5 +40,7 @@ public class EntityTypes {
   public static final String BATCH = "Batch";
   public static final String DECISION_REQUIREMENTS_DEFINITION = "DecisionRequirementsDefinition";
   public static final String DECISION_INSTANCE = "DecisionInstance";
+  public static final String REPORT = "Report";
+  public static final String DASHBOARD = "Dashboard";
 
 }
