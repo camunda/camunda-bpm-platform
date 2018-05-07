@@ -16,11 +16,10 @@ import static org.camunda.bpm.engine.authorization.Permissions.ACCESS;
 import static org.camunda.bpm.engine.authorization.Resources.APPLICATION;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceLoader;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.FormParam;
@@ -39,6 +38,7 @@ import org.camunda.bpm.engine.identity.Tenant;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
+import org.camunda.bpm.webapp.impl.util.ProcessEngineUtil;
 
 /**
  * Jax-Rs resource allowing users to authenticate with username and password</p>
@@ -50,8 +50,6 @@ import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
 public class UserAuthenticationResource {
 
   public static final String PATH = "/auth/user";
-
-  private static final String[] APPS = new String[] { "cockpit", "tasklist", "admin"};
 
   @Context
   protected HttpServletRequest request;
@@ -82,10 +80,7 @@ public class UserAuthenticationResource {
       @FormParam("username") String username,
       @FormParam("password") String password) {
 
-    final ProcessEngine processEngine = lookupProcessEngine(engineName);
-    if(processEngine == null) {
-      throw new InvalidRequestException(Status.BAD_REQUEST, "Process engine with name "+engineName+" does not exist");
-    }
+    final ProcessEngine processEngine = ProcessEngineUtil.lookupProcessEngine(engineName);
 
     // make sure authentication is executed without authentication :)
     processEngine.getIdentityService().clearAuthentication();
@@ -95,45 +90,21 @@ public class UserAuthenticationResource {
 
     if (!isPasswordValid) {
       return unauthorized();
-
-    } else {
-
-      List<String> groupIds = getGroupsOfUser(processEngine, username);
-      List<String> tenantIds = getTenantsOfUser(processEngine, username);
-
-      // check user's app authorizations
-      AuthorizationService authorizationService = processEngine.getAuthorizationService();
-
-      HashSet<String> authorizedApps = new HashSet<String>();
-      authorizedApps.add("welcome");
-
-      if (processEngine.getProcessEngineConfiguration().isAuthorizationEnabled()) {
-        for (String application: APPS) {
-          if (isAuthorizedForApp(authorizationService, username, groupIds, application)) {
-            authorizedApps.add(application);
-          }
-        }
-
-      } else {
-        Collections.addAll(authorizedApps, APPS);
-      }
-
-      if (!authorizedApps.contains(appName)) {
-        return forbidden();
-      }
-
-      final Authentications authentications = Authentications.getCurrent();
-
-      // create new authentication
-      UserAuthentication newAuthentication = new UserAuthentication(username, engineName);
-      newAuthentication.setGroupIds(groupIds);
-      newAuthentication.setTenantIds(tenantIds);
-      newAuthentication.setAuthorizedApps(authorizedApps);
-      authentications.addAuthentication(newAuthentication);
-
-      // send reponse including updated cookie
-      return Response.ok(AuthenticationDto.fromAuthentication(newAuthentication)).build();
     }
+
+    AuthenticationService authenticationService = new AuthenticationService();
+    UserAuthentication authentication = (UserAuthentication) authenticationService.createAuthenticate(processEngine, username, null, null);
+
+    Set<String> authorizedApps = authentication.getAuthorizedApps();
+
+    if (!authorizedApps.contains(appName)) {
+      return forbidden();
+    }
+
+    final Authentications authentications = Authentications.getCurrent();
+    authentications.addAuthentication(authentication);
+
+    return Response.ok(AuthenticationDto.fromAuthentication(authentication)).build();
   }
 
   protected List<String> getGroupsOfUser(ProcessEngine engine, String userId) {
@@ -172,35 +143,15 @@ public class UserAuthenticationResource {
     return Response.ok().build();
   }
 
-  protected ProcessEngine lookupProcessEngine(String engineName) {
-
-    ServiceLoader<ProcessEngineProvider> serviceLoader = ServiceLoader.load(ProcessEngineProvider.class);
-    Iterator<ProcessEngineProvider> iterator = serviceLoader.iterator();
-
-    if(iterator.hasNext()) {
-      ProcessEngineProvider provider = iterator.next();
-      return provider.getProcessEngine(engineName);
-
-    } else {
-      throw new RestException(Status.INTERNAL_SERVER_ERROR, "Could not find an implementation of the "+ProcessEngineProvider.class+"- SPI");
-
-    }
-
-  }
-
-  private Response unauthorized() {
+  protected Response unauthorized() {
     return Response.status(Status.UNAUTHORIZED).build();
   }
 
-  private Response forbidden() {
+  protected Response forbidden() {
     return Response.status(Status.FORBIDDEN).build();
   }
 
-  protected boolean isAuthorizedForApp(AuthorizationService authorizationService, String username, List<String> groupIds, String application) {
-    return authorizationService.isUserAuthorized(username, groupIds, ACCESS, APPLICATION, application);
-  }
-
-  private Response notFound() {
+  protected Response notFound() {
     return Response.status(Status.NOT_FOUND).build();
   }
 }
