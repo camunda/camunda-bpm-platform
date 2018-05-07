@@ -20,7 +20,7 @@ var Controller = ['$scope', 'page', 'camAPI', 'Notifications', '$location', '$tr
       href: '#/tenants/'
     },
     {
-      label: $translate.instant('TENANTS_CREATE_NEW_TENANT'),
+      label: $translate.instant('TENANTS_CREATE_NEW'),
       href: '#/tenants-create'
     }
   ]);
