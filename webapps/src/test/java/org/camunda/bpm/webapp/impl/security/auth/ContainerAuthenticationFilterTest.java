@@ -47,6 +47,9 @@ import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.AuthorizationServiceImpl;
 import org.camunda.bpm.engine.impl.IdentityServiceImpl;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
+import org.camunda.bpm.engine.rest.security.auth.ProcessEngineAuthenticationFilter;
+import org.camunda.bpm.engine.rest.security.auth.impl.ContainerBasedAuthenticationProvider;
+import org.camunda.bpm.engine.rest.security.auth.impl.HttpBasicAuthenticationProvider;
 import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
 import org.camunda.bpm.engine.rest.spi.impl.MockedProcessEngineProvider;
 import org.camunda.bpm.webapp.impl.util.ProcessEngineUtil;
@@ -72,7 +75,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 @RunWith(Parameterized.class)
 @PrepareForTest({ ProcessEngineUtil.class, ServiceLoader.class, Authentications.class })
 @PowerMockIgnore("javax.security.*")
-public class ContainerBasedAuthenticationFilterTest {
+public class ContainerAuthenticationFilterTest {
 
   protected static final String SERVICE_PATH = "/camunda";
 
@@ -100,7 +103,7 @@ public class ContainerBasedAuthenticationFilterTest {
 
   protected ProcessEngine currentEngine;
 
-  public ContainerBasedAuthenticationFilterTest(String requestUrl, String engineName, boolean alreadyAuthenticated, boolean authenticationExpected) {
+  public ContainerAuthenticationFilterTest(String requestUrl, String engineName, boolean alreadyAuthenticated, boolean authenticationExpected) {
     this.requestUrl = requestUrl;
     this.engineName = engineName;
     if (engineName == null) {
@@ -213,6 +216,7 @@ public class ContainerBasedAuthenticationFilterTest {
 
   protected void setupFilter() throws ServletException {
     MockFilterConfig config = new MockFilterConfig();
+    config.addInitParameter(ProcessEngineAuthenticationFilter.AUTHENTICATION_PROVIDER_PARAM, ContainerBasedAuthenticationProvider.class.getName());
     authenticationFilter = new ContainerBasedAuthenticationFilter();
     authenticationFilter.init(config);
   }
@@ -222,14 +226,12 @@ public class ContainerBasedAuthenticationFilterTest {
     when(principal.getName()).thenReturn(username);
     request.setUserPrincipal(principal);
     request.setMethod("GET");
-
-
     FilterChain filterChain = new MockFilterChain();
     authenticationFilter.doFilter(request, response, filterChain);
   }
 
   @Test
-  public void testHttpBasicAuthenticationCheck() throws IOException, ServletException {
+  public void testContainerAuthenticationCheck() throws IOException, ServletException {
     if (alreadyAuthenticated) {
       Authentication authentication = mock(Authentication.class);
       when(authentication.getProcessEngineName()).thenReturn(engineName);

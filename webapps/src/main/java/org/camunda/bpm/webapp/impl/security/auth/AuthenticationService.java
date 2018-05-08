@@ -20,10 +20,13 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
+import javax.ws.rs.core.Response.Status;
+
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.Tenant;
+import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.webapp.impl.util.ProcessEngineUtil;
 
 public class AuthenticationService {
@@ -37,6 +40,11 @@ public class AuthenticationService {
 
   public Authentication createAuthenticate(String engineName, String username, List<String> groupIds, List<String> tenantIds) {
     ProcessEngine processEngine = ProcessEngineUtil.lookupProcessEngine(engineName);
+
+    if(processEngine == null) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, "Process engine with name "+engineName+" does not exist");
+    }
+
     return createAuthenticate(processEngine, username, groupIds, tenantIds);
   }
 

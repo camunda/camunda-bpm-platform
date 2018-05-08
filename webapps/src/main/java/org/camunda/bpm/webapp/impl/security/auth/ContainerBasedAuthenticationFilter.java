@@ -1,7 +1,9 @@
 package org.camunda.bpm.webapp.impl.security.auth;
 
+import static org.camunda.bpm.engine.rest.security.auth.ProcessEngineAuthenticationFilter.AUTHENTICATION_PROVIDER_PARAM;
+
 import java.io.IOException;
-import java.security.Principal;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -12,18 +14,14 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.Response.Status;
 
-/**
- * This Servlet filter relies on the Servlet container (application server) to
- * authenticate a user and only forward a request to the application upon
- * successful authentication.
- * 
- * It passes the username provided by the container through the Servlet API into
- * the Servlet session used by the Camunda REST API.
- *
- * @author Eberhard Heber
- * @author Falko Menge
- */
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.rest.security.auth.AuthenticationProvider;
+import org.camunda.bpm.engine.rest.security.auth.AuthenticationResult;
+import org.camunda.bpm.webapp.impl.util.ProcessEngineUtil;
+
 public class ContainerBasedAuthenticationFilter implements Filter {
 
   public static Pattern APP_PATTERN = Pattern.compile("/app/(cockpit|admin|tasklist|welcome)/([^/]+)/");
@@ -31,48 +29,74 @@ public class ContainerBasedAuthenticationFilter implements Filter {
   public static Pattern API_STATIC_PLUGIN_PATTERN = Pattern.compile("/api/(cockpit|admin|tasklist|welcome)/plugin/[^/]+/static/.*");
   public static Pattern API_PLUGIN_PATTERN = Pattern.compile("/api/(cockpit|admin|tasklist|welcome)/plugin/[^/]+/([^/]+)/.*");
 
+  protected AuthenticationProvider authenticationProvider;
   protected AuthenticationService userAuthentications;
 
   public void init(FilterConfig filterConfig) throws ServletException {
     userAuthentications = new AuthenticationService();
-  }
 
-  public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-    final HttpServletRequest req = (HttpServletRequest) request;
-    doAuthentication(req);
-    chain.doFilter(request, response);
+    String authenticationProviderClassName = filterConfig.getInitParameter(AUTHENTICATION_PROVIDER_PARAM);
+
+    if (authenticationProviderClassName == null) {
+      throw new ServletException("Cannot instantiate authentication filter: no authentication provider set. init-param " + AUTHENTICATION_PROVIDER_PARAM + " missing");
+    }
+
+    try {
+      Class<?> authenticationProviderClass = Class.forName(authenticationProviderClassName);
+      authenticationProvider = (AuthenticationProvider) authenticationProviderClass.newInstance();
+    } catch (ClassNotFoundException e) {
+      throw new ServletException("Cannot instantiate authentication filter: authentication provider not found", e);
+    } catch (InstantiationException e) {
+      throw new ServletException("Cannot instantiate authentication filter: cannot instantiate authentication provider", e);
+    } catch (IllegalAccessException e) {
+      throw new ServletException("Cannot instantiate authentication filter: constructor not accessible", e);
+    } catch (ClassCastException e) {
+      throw new ServletException("Cannot instantiate authentication filter: authentication provider does not implement interface " +
+          AuthenticationProvider.class.getName(), e);
+    }
   }
 
   public void destroy() {
   }
 
-  protected void doAuthentication(HttpServletRequest request) {
-    // get authentication from session
-    Authentications authentications = Authentications.getFromSession(request.getSession());
+  public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+    final HttpServletRequest req = (HttpServletRequest) request;
+    final HttpServletResponse resp = (HttpServletResponse) response;
 
-    String username = getUserName(request);
-    String engineName = getEngineName(request);
+    String engineName = extractEngineName(req);
 
-    if (username != null && engineName != null && !isAuthenticated(authentications, engineName, username)) {
-      Authentication authentication = createAuthentication(username, engineName);
-      authentications.addAuthentication(authentication);
+    if (engineName == null) {
+      chain.doFilter(request, response);
+      return;
     }
 
-  }
+    ProcessEngine engine = getAddressedEngine(engineName);
 
-  protected String getUserName(HttpServletRequest request) {
-    Principal principal = request.getUserPrincipal();
+    if (engine == null) {
+      resp.sendError(404, "Process engine " + engineName + " not available");
+      return;
+    }
 
-    String username = null;
-    if (principal != null) {
-      username = principal.getName();
+    AuthenticationResult authenticationResult = authenticationProvider.extractAuthenticatedUser(req, engine);
+    if (authenticationResult.isAuthenticated()) {
+      Authentications authentications = Authentications.getFromSession(req.getSession());
+      String authenticatedUser = authenticationResult.getAuthenticatedUser();
 
-      if (username != null && username.isEmpty()) {
-        username = null;
+      if (!existisAuthentication(authentications, engineName, authenticatedUser)) {
+        List<String> groups = authenticationResult.getGroups();
+        List<String> tenants = authenticationResult.getTenants();
+
+        Authentication authentication = createAuthentication(engine, authenticatedUser, groups, tenants);
+        authentications.addAuthentication(authentication);
       }
+
+      chain.doFilter(request, response);
+    }
+    else {
+      resp.setStatus(Status.UNAUTHORIZED.getStatusCode());
+      authenticationProvider.augmentResponseByAuthenticationChallenge(resp, engine);
     }
 
-    return username;
   }
 
   protected String getRequestUri(HttpServletRequest request) {
@@ -80,8 +104,9 @@ public class ContainerBasedAuthenticationFilter implements Filter {
     return request.getRequestURI().substring(contextPath.length());
   }
 
-  protected String getEngineName(HttpServletRequest request) {
+  protected String extractEngineName(HttpServletRequest request) {
     String requestUri = getRequestUri(request);
+    String requestMethod = request.getMethod();
 
     Matcher appMatcher = APP_PATTERN.matcher(requestUri);
     if (appMatcher.matches()) {
@@ -94,7 +119,7 @@ public class ContainerBasedAuthenticationFilter implements Filter {
     }
 
     Matcher apiStaticPluginPattern = API_STATIC_PLUGIN_PATTERN.matcher(requestUri);
-    if (request.getMethod().equals("GET") && apiStaticPluginPattern.matches()) {
+    if (requestMethod.equals("GET") && apiStaticPluginPattern.matches()) {
       return null;
     }
 
@@ -106,18 +131,24 @@ public class ContainerBasedAuthenticationFilter implements Filter {
     return null;
   }
 
-  protected boolean isAuthenticated(Authentications authentications, String engineName, String username) {
+  protected ProcessEngine getAddressedEngine(String engineName) {
+    return ProcessEngineUtil.lookupProcessEngine(engineName);
+  }
+
+  protected boolean existisAuthentication(Authentications authentications, String engineName, String username) {
     // For each process engine, there can be at most one authentication active in a given session.
     Authentication authentication = authentications.getAuthenticationForProcessEngine(engineName);
-    return isAuthenticated(authentication, engineName, username);
+    return authentication != null && isAuthenticated(authentication, engineName, username);
   }
 
   protected boolean isAuthenticated(Authentication authentication, String engineName, String username) {
-    return authentication != null && authentication.getProcessEngineName().equals(engineName) && authentication.getIdentityId().equals(username);
+    String processEngineName = authentication.getProcessEngineName();
+    String identityId = authentication.getIdentityId();
+    return processEngineName.equals(engineName) && identityId.equals(username);
   }
 
-  protected Authentication createAuthentication(String username, String engineName) {
-    return userAuthentications.createAuthenticate(engineName, username);
+  protected Authentication createAuthentication(ProcessEngine processEngine, String username, List<String> groups, List<String> tenants) {
+    return userAuthentications.createAuthenticate(processEngine, username, groups, tenants);
   }
 
 }
