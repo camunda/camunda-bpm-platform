@@ -144,7 +144,10 @@ public class ProcessEngineAuthenticationFilter implements Filter {
 
     if (authenticationResult.isAuthenticated()) {
       try {
-        setAuthenticatedUser(engine, authenticationResult.getAuthenticatedUser());
+        String authenticatedUser = authenticationResult.getAuthenticatedUser();
+        List<String> groups = authenticationResult.getGroups();
+        List<String> tenants = authenticationResult.getTenants();
+        setAuthenticatedUser(engine, authenticatedUser, groups, tenants);
         chain.doFilter(request, response);
       } finally {
         clearAuthentication(engine);
@@ -161,9 +164,14 @@ public class ProcessEngineAuthenticationFilter implements Filter {
 
   }
 
-  protected void setAuthenticatedUser(ProcessEngine engine, String userId) {
-    List<String> groupIds = getGroupsOfUser(engine, userId);
-    List<String> tenantIds = getTenantsOfUser(engine, userId);
+  protected void setAuthenticatedUser(ProcessEngine engine, String userId, List<String> groupIds, List<String> tenantIds) {
+    if (groupIds == null) {
+      groupIds = getGroupsOfUser(engine, userId);
+    }
+
+    if (tenantIds == null) {
+      tenantIds = getTenantsOfUser(engine, userId);
+    }
 
     engine.getIdentityService().setAuthentication(userId, groupIds, tenantIds);
   }
