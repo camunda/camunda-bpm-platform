@@ -67,6 +67,11 @@
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
+          <forkCount>0.5C</forkCount>
+          <reuseForks>true</reuseForks>
+          <systemPropertyVariables>
+            <jdbcUrl>jdbc:h2:mem:camunda_${surefire.forkNumber};DB_CLOSE_DELAY=1000</jdbcUrl>
+          </systemPropertyVariables>
           <redirectTestOutputToFile>true</redirectTestOutputToFile>
         </configuration>
       </plugin>
