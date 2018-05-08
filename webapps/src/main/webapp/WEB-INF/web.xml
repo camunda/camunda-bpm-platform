@@ -28,6 +28,10 @@
   <!-- <filter>
     <filter-name>Container Based Authentication Filter</filter-name>
     <filter-class>org.camunda.bpm.webapp.impl.security.auth.ContainerBasedAuthenticationFilter</filter-class>
+    <init-param>
+      <param-name>authentication-provider</param-name>
+      <param-value>org.camunda.bpm.engine.rest.security.auth.impl.ContainerBasedAuthenticationProvider</param-value>
+    </init-param>
   </filter>
   <filter-mapping>
     <filter-name>Container Based Authentication Filter</filter-name>

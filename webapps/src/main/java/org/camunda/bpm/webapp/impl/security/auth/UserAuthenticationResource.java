@@ -12,13 +12,8 @@
  */
 package org.camunda.bpm.webapp.impl.security.auth;
 
-import static org.camunda.bpm.engine.authorization.Permissions.ACCESS;
-import static org.camunda.bpm.engine.authorization.Resources.APPLICATION;
-
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ServiceLoader;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -31,13 +26,10 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.Tenant;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-import org.camunda.bpm.engine.rest.exception.RestException;
-import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
 import org.camunda.bpm.webapp.impl.util.ProcessEngineUtil;
 
 /**
@@ -81,6 +73,9 @@ public class UserAuthenticationResource {
       @FormParam("password") String password) {
 
     final ProcessEngine processEngine = ProcessEngineUtil.lookupProcessEngine(engineName);
+    if(processEngine == null) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, "Process engine with name "+engineName+" does not exist");
+    }
 
     // make sure authentication is executed without authentication :)
     processEngine.getIdentityService().clearAuthentication();

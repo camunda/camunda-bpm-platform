@@ -18,30 +18,21 @@ import java.util.ServiceLoader;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
 
 public class ProcessEngineUtil {
 
   public static ProcessEngine lookupProcessEngine(String engineName) {
-    ProcessEngine processEngine = null;
-
     ServiceLoader<ProcessEngineProvider> serviceLoader = ServiceLoader.load(ProcessEngineProvider.class);
     Iterator<ProcessEngineProvider> iterator = serviceLoader.iterator();
 
     if(iterator.hasNext()) {
       ProcessEngineProvider provider = iterator.next();
-      processEngine = provider.getProcessEngine(engineName);
+      return provider.getProcessEngine(engineName);
     } else {
       throw new RestException(Status.INTERNAL_SERVER_ERROR, "Could not find an implementation of the "+ProcessEngineProvider.class+"- SPI");
     }
-
-    if(processEngine == null) {
-      throw new InvalidRequestException(Status.BAD_REQUEST, "Process engine with name "+engineName+" does not exist");
-    }
-
-    return processEngine;
   }
 
 }
