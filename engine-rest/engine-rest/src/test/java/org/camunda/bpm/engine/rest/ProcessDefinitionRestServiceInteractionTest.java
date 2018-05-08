@@ -19,6 +19,7 @@ import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.rest.dto.HistoryTimeToLiveDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
+import org.camunda.bpm.engine.impl.form.validator.FormFieldValidationException;
 import org.camunda.bpm.engine.rest.helper.*;
 import org.camunda.bpm.engine.rest.helper.variable.EqualsObjectValue;
 import org.camunda.bpm.engine.rest.helper.variable.EqualsPrimitiveValue;
@@ -784,6 +785,23 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
       .statusCode(Status.FORBIDDEN.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(AuthorizationException.class.getSimpleName()))
       .body("message", equalTo(message))
+    .when()
+      .post(SUBMIT_FORM_URL);
+  }
+
+  @Test
+  public void testSubmitFormByIdThrowsFormFieldValidationException() {
+    String message = "expected exception";
+    doThrow(new FormFieldValidationException("form-exception", message)).when(formServiceMock).submitStartForm(any(String.class), Matchers.<Map<String, Object>>any());
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(EMPTY_JSON_OBJECT)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot instantiate process definition " + MockProvider.EXAMPLE_PROCESS_DEFINITION_ID + ": " + message))
     .when()
       .post(SUBMIT_FORM_URL);
   }
@@ -3019,6 +3037,23 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
       .statusCode(Status.FORBIDDEN.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(AuthorizationException.class.getSimpleName()))
       .body("message", equalTo(message))
+    .when()
+      .post(SUBMIT_FORM_BY_KEY_URL);
+  }
+
+  @Test
+  public void testSubmitFormByKeyThrowsFormFieldValidationException() {
+    String message = "expected exception";
+    doThrow(new FormFieldValidationException("form-exception", message)).when(formServiceMock).submitStartForm(any(String.class), Matchers.<Map<String, Object>>any());
+
+    given()
+      .pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(EMPTY_JSON_OBJECT)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot instantiate process definition " + MockProvider.EXAMPLE_PROCESS_DEFINITION_ID + ": " + message))
     .when()
       .post(SUBMIT_FORM_BY_KEY_URL);
   }
