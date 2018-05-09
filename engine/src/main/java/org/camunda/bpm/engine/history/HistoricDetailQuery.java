@@ -67,6 +67,9 @@ public interface HistoricDetailQuery extends Query<HistoricDetailQuery, Historic
   /** Only select historic variable updates associated to the given {@link HistoricVariableInstance historic variable instance}. */
   HistoricDetailQuery variableInstanceId(String variableInstanceId);
 
+  /** Only select historic process variables which match one of the given variable types. */
+  HistoricDetailQuery variableTypeIn(String... variableTypes);
+
   /** Only select {@link HistoricFormProperty}s. */
   @Deprecated
   HistoricDetailQuery formProperties();

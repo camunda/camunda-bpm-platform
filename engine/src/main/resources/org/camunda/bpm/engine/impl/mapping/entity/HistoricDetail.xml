@@ -259,6 +259,15 @@
       <if test="variableInstanceId != null">
         and RES.VAR_INST_ID_ = #{variableInstanceId}
       </if>
+
+      <!-- variableTypes -->
+      <if test="variableTypes != null &amp;&amp; variableTypes.length > 0">
+        and lower(RES.VAR_TYPE_) in
+        <foreach item="item" index="index" collection="variableTypes"
+                 open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
       <choose>
         <when test="taskId != null">
           and RES.TASK_ID_ = #{taskId}

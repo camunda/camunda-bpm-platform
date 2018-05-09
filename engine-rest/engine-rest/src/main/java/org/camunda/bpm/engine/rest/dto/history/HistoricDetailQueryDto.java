@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.history.HistoricDetailQuery;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
+import org.camunda.bpm.engine.rest.dto.converter.StringArrayConverter;
 import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -61,6 +62,7 @@ public class HistoricDetailQueryDto extends AbstractQueryDto<HistoricDetailQuery
   protected String caseInstanceId;
   protected String caseExecutionId;
   protected String variableInstanceId;
+  protected String[] variableTypeIn;
   protected String taskId;
   protected Boolean formFields;
   protected Boolean variableUpdates;
@@ -103,6 +105,11 @@ public class HistoricDetailQueryDto extends AbstractQueryDto<HistoricDetailQuery
   @CamundaQueryParam(value = "variableInstanceId")
   public void setVariableInstanceId(String variableInstanceId) {
     this.variableInstanceId = variableInstanceId;
+  }
+
+   @CamundaQueryParam(value="variableTypeIn", converter = StringArrayConverter.class)
+  public void setVariableTypeIn(String[] variableTypeIn) {
+    this.variableTypeIn = variableTypeIn;
   }
 
   @CamundaQueryParam(value = "taskId")
@@ -164,6 +171,9 @@ public class HistoricDetailQueryDto extends AbstractQueryDto<HistoricDetailQuery
     }
     if (variableInstanceId != null) {
       query.variableInstanceId(variableInstanceId);
+    }
+    if (variableTypeIn != null && variableTypeIn.length > 0) {
+      query.variableTypeIn(variableTypeIn);
     }
     if (taskId != null) {
       query.taskId(taskId);

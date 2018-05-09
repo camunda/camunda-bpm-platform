@@ -46,6 +46,7 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
   protected String activityInstanceId;
   protected String type;
   protected String variableInstanceId;
+  protected String[] variableTypes;
   protected String[] tenantIds;
   protected String userOperationId;
   protected Long sequenceCounter;
@@ -71,6 +72,19 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
     ensureNotNull("variableInstanceId", variableInstanceId);
     this.variableInstanceId = variableInstanceId;
     return this;
+  }
+
+  public HistoricDetailQuery variableTypeIn(String... variableTypes) {
+    ensureNotNull("Variable types", (Object[]) variableTypes);
+    this.variableTypes = lowerCase(variableTypes);
+    return this;
+  }
+
+  private String[] lowerCase(String... variableTypes) {
+    for (int i = 0; i < variableTypes.length; i++) {
+      variableTypes[i] = variableTypes[i].toLowerCase();
+    }
+    return variableTypes;
   }
 
   public HistoricDetailQuery processInstanceId(String processInstanceId) {

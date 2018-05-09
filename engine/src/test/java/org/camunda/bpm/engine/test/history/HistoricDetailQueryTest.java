@@ -19,10 +19,13 @@ import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricDetailQuery;
+import org.camunda.bpm.engine.history.HistoricVariableUpdate;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.camunda.bpm.engine.test.cmmn.decisiontask.TestPojo;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.VariableMap;
@@ -32,7 +35,13 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
@@ -150,6 +159,128 @@ public class HistoricDetailQueryTest {
     assertEquals(0, query.count());
   }
 
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  public void testQueryByVariableTypeIn() {
+    // given
+    Map<String, Object> variables1 = new HashMap<String, Object>();
+    variables1.put("stringVar", "test");
+    variables1.put("boolVar", true);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
+
+    // when
+    HistoricDetailQuery query =
+      historyService.createHistoricDetailQuery()
+        .variableTypeIn("string");
+
+    // then
+    assertEquals(1, query.list().size());
+    assertEquals(1, query.count());
+    HistoricDetail historicDetail = query.list().get(0);
+    if (historicDetail instanceof HistoricVariableUpdate) {
+      HistoricVariableUpdate variableUpdate = (HistoricVariableUpdate) historicDetail;
+      assertEquals(variableUpdate.getVariableName(), "stringVar");
+      assertEquals(variableUpdate.getTypeName(), "string");
+    } else {
+      fail("Historic detail should be a variable update!");
+    }
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  public void testQueryByVariableTypeInWithCapitalLetter() {
+    // given
+    Map<String, Object> variables1 = new HashMap<String, Object>();
+    variables1.put("stringVar", "test");
+    variables1.put("boolVar", true);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
+
+    // when
+    HistoricDetailQuery query =
+      historyService.createHistoricDetailQuery()
+        .variableTypeIn("Boolean");
+
+    // then
+    assertEquals(1, query.list().size());
+    assertEquals(1, query.count());
+    HistoricDetail historicDetail = query.list().get(0);
+    if (historicDetail instanceof HistoricVariableUpdate) {
+      HistoricVariableUpdate variableUpdate = (HistoricVariableUpdate) historicDetail;
+      assertEquals(variableUpdate.getVariableName(), "boolVar");
+      assertEquals(variableUpdate.getTypeName(), "boolean");
+    } else {
+      fail("Historic detail should be a variable update!");
+    }
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  public void testQueryByVariableTypeInWithSeveralTypes() {
+    // given
+    Map<String, Object> variables1 = new HashMap<String, Object>();
+    variables1.put("stringVar", "test");
+    variables1.put("boolVar", true);
+    variables1.put("intVar", 5);
+    variables1.put("nullVar", null);
+    variables1.put("pojoVar", new TestPojo("str", .0));
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
+
+    // when
+    HistoricDetailQuery query =
+      historyService.createHistoricDetailQuery()
+        .variableTypeIn("boolean", "integer", "Serializable");
+
+    // then
+    assertEquals(3, query.list().size());
+    assertEquals(3, query.count());
+    Set<String> allowedVariableTypes = new HashSet<String>();
+    allowedVariableTypes.add("boolean");
+    allowedVariableTypes.add("integer");
+    allowedVariableTypes.add("object");
+    for (HistoricDetail detail : query.list()) {
+      if (detail instanceof HistoricVariableUpdate) {
+        HistoricVariableUpdate variableUpdate = (HistoricVariableUpdate) detail;
+        assertTrue(allowedVariableTypes.contains(variableUpdate.getTypeName()));
+      } else {
+        fail("Historic detail should be a variable update!");
+      }
+    }
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  public void testQueryByInvalidVariableTypeIn() {
+    // given
+    Map<String, Object> variables1 = new HashMap<String, Object>();
+    variables1.put("stringVar", "test");
+    variables1.put("boolVar", true);
+    variables1.put("intVar", 5);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
+
+    // when
+    HistoricDetailQuery query =
+      historyService.createHistoricDetailQuery()
+        .variableTypeIn("invalid");
+
+    // then
+    assertEquals(0, query.count());
+
+    try {
+      // when
+      query.variableTypeIn(null);
+      fail("A ProcessEngineException was expected.");
+    } catch (ProcessEngineException e) {
+      // then fails
+    }
+
+    try {
+      // when
+      query.variableTypeIn((String)null);
+      fail("A ProcessEngineException was expected.");
+    } catch (ProcessEngineException e) {
+      // then fails
+    }
+  }
 
   protected VariableMap getVariables() {
     return Variables.createVariables()
