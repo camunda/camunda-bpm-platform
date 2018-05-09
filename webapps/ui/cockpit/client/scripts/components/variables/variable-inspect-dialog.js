@@ -108,7 +108,7 @@ var Controller = [
           $scope.status = BEFORE_CHANGE;
           Notifications.addError({
             status: $translate.instant('VARIABLE_INSPECT_VARIABLE'),
-            message: $translate.instant('VARIABLE_INSPECT_MESSAGE_ERR_1', { exception: e }),
+            message: $translate.instant('VARIABLE_INSPECT_MESSAGE_ERR_1', { exception: e.message }),
             exclusive: true
           });
           return;
@@ -219,7 +219,7 @@ var Controller = [
     function addMessage(variable) {
       Notifications.addMessage({
         status: $translate.instant('VARIABLE_INSPECT_VARIABLE'),
-        message: $translate.instant('VARIABLE_INSPECT_MESSAGE_ERR_2', { name : variable.name })
+        message: $translate.instant('VARIABLE_INSPECT_MESSAGE_ADD', { name : variable.name })
       });
     }
 
