@@ -309,6 +309,13 @@
         and RES.SEQUENCE_COUNTER_ = #{sequenceCounter}
       </if>
 
+      <if test="occurredBefore != null">
+        and RES.TIME_ &lt;= #{occurredBefore}
+      </if>
+      <if test="occurredAfter != null">
+        and RES.TIME_ &gt;= #{occurredAfter}
+      </if>
+
       <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
         and (
         (RES.EXECUTION_ID_ is not null

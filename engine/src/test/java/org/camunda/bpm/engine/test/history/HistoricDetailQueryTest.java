@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricDetailQuery;
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -36,6 +37,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -367,6 +369,126 @@ public class HistoricDetailQueryTest {
     try {
       // when
       query.processInstanceIdIn((String)null);
+      fail("A ProcessEngineException was expected.");
+    } catch (ProcessEngineException e) {
+      // then fails
+    }
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testQueryByOccurredBefore() {
+    // given
+    Calendar startTime = Calendar.getInstance();
+    ClockUtil.setCurrentTime(startTime.getTime());
+
+    Calendar hourAgo = Calendar.getInstance();
+    hourAgo.add(Calendar.HOUR_OF_DAY, -1);
+    Calendar hourFromNow = Calendar.getInstance();
+    hourFromNow.add(Calendar.HOUR_OF_DAY, 1);
+
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("stringVar", "test");
+    runtimeService.startProcessInstanceByKey(PROCESS_KEY, variables);
+
+    // when
+    HistoricDetailQuery query =
+      historyService.createHistoricDetailQuery();
+
+    // then
+    assertEquals(1, query.occurredBefore(hourFromNow.getTime()).count());
+    assertEquals(0, query.occurredBefore(hourAgo.getTime()).count());
+
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testQueryByOccurredAfter() {
+    // given
+    Calendar startTime = Calendar.getInstance();
+    ClockUtil.setCurrentTime(startTime.getTime());
+
+    Calendar hourAgo = Calendar.getInstance();
+    hourAgo.add(Calendar.HOUR_OF_DAY, -1);
+    Calendar hourFromNow = Calendar.getInstance();
+    hourFromNow.add(Calendar.HOUR_OF_DAY, 1);
+
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("stringVar", "test");
+    runtimeService.startProcessInstanceByKey(PROCESS_KEY, variables);
+
+    // when
+    HistoricDetailQuery query =
+      historyService.createHistoricDetailQuery();
+
+    // then
+    assertEquals(0, query.occurredAfter(hourFromNow.getTime()).count());
+    assertEquals(1, query.occurredAfter(hourAgo.getTime()).count());
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testQueryByOccurredAfterAndOccurredBefore() {
+    // given
+    Calendar startTime = Calendar.getInstance();
+    ClockUtil.setCurrentTime(startTime.getTime());
+
+    Calendar hourAgo = Calendar.getInstance();
+    hourAgo.add(Calendar.HOUR_OF_DAY, -1);
+    Calendar hourFromNow = Calendar.getInstance();
+    hourFromNow.add(Calendar.HOUR_OF_DAY, 1);
+
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("stringVar", "test");
+    runtimeService.startProcessInstanceByKey(PROCESS_KEY, variables);
+
+    // when
+    HistoricDetailQuery query =
+      historyService.createHistoricDetailQuery();
+
+    // then
+    assertEquals(0, query.occurredAfter(hourFromNow.getTime()).occurredBefore(hourFromNow.getTime()).count());
+    assertEquals(1, query.occurredAfter(hourAgo.getTime()).occurredBefore(hourFromNow.getTime()).count());
+    assertEquals(0, query.occurredAfter(hourFromNow.getTime()).occurredBefore(hourAgo.getTime()).count());
+    assertEquals(0, query.occurredAfter(hourAgo.getTime()).occurredBefore(hourAgo.getTime()).count());
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  public void testQueryByInvalidOccurredBeforeDate() {
+    // given
+    Map<String, Object> variables1 = new HashMap<String, Object>();
+    variables1.put("stringVar", "test");
+    runtimeService.startProcessInstanceByKey(PROCESS_KEY, variables1);
+
+    // when
+    HistoricDetailQuery query =
+      historyService.createHistoricDetailQuery();
+
+    try {
+      // when
+      query.occurredBefore(null);
+      fail("A ProcessEngineException was expected.");
+    } catch (ProcessEngineException e) {
+      // then fails
+    }
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  public void testQueryByInvalidOccurredAfterDate() {
+    // given
+    Map<String, Object> variables1 = new HashMap<String, Object>();
+    variables1.put("stringVar", "test");
+    runtimeService.startProcessInstanceByKey(PROCESS_KEY, variables1);
+
+    // when
+    HistoricDetailQuery query =
+      historyService.createHistoricDetailQuery();
+
+    try {
+      // when
+      query.occurredAfter(null);
       fail("A ProcessEngineException was expected.");
     } catch (ProcessEngineException e) {
       // then fails

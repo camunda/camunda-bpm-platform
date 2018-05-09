@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
+import java.util.Date;
 import java.util.List;
 
 import org.camunda.bpm.engine.history.HistoricDetail;
@@ -49,6 +50,8 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
   protected String[] processInstanceIds;
   protected String userOperationId;
   protected Long sequenceCounter;
+  protected Date occurredBefore;
+  protected Date occurredAfter;
 
   protected boolean excludeTaskRelated = false;
   protected boolean isByteArrayFetchingEnabled = true;
@@ -163,6 +166,18 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
 
   public HistoricDetailQuery excludeTaskDetails() {
     this.excludeTaskRelated = true;
+    return this;
+  }
+
+  public HistoricDetailQuery occurredBefore(Date date) {
+    ensureNotNull("occurred before", date);
+    occurredBefore = date;
+    return this;
+  }
+
+  public HistoricDetailQuery occurredAfter(Date date) {
+    ensureNotNull("occurred after", date);
+    occurredAfter = date;
     return this;
   }
 
@@ -297,4 +312,11 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
     return processInstanceIds;
   }
 
+  public Date getOccurredBefore() {
+    return occurredBefore;
+  }
+
+  public Date getOccurredAfter() {
+    return occurredAfter;
+  }
 }

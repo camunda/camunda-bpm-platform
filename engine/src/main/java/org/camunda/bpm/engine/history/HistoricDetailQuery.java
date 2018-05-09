@@ -20,6 +20,7 @@ import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 
+import java.util.Date;
 
 /**
  * Programmatic querying for {@link HistoricDetail}s.
@@ -113,6 +114,12 @@ public interface HistoricDetailQuery extends Query<HistoricDetailQuery, Historic
    * Select historic details related with given userOperationId.
    */
   HistoricDetailQuery userOperationId(String userOperationId);
+
+  /** Only select historic details that were occurred before the given date (inclusive). */
+  HistoricDetailQuery occurredBefore(Date date);
+
+  /** Only select historic details that were occurred after the given date (inclusive). */
+  HistoricDetailQuery occurredAfter(Date date);
 
   /**
    * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).

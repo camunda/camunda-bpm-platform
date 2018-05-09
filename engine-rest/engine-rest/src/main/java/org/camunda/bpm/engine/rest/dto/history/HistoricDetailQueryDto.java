@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.rest.dto.history;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -23,6 +24,7 @@ import org.camunda.bpm.engine.history.HistoricDetailQuery;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
+import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
 import org.camunda.bpm.engine.rest.dto.converter.StringArrayConverter;
 import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 
@@ -70,6 +72,8 @@ public class HistoricDetailQueryDto extends AbstractQueryDto<HistoricDetailQuery
   protected List<String> tenantIds;
   protected String[] processInstanceIdIn;
   protected String userOperationId;
+  private Date occurredBefore;
+  private Date occurredAfter;
 
   public HistoricDetailQueryDto() {
   }
@@ -149,6 +153,16 @@ public class HistoricDetailQueryDto extends AbstractQueryDto<HistoricDetailQuery
     this.userOperationId = userOperationId;
   }
 
+  @CamundaQueryParam(value = "occurredBefore", converter = DateConverter.class)
+  public void setOccurredBefore(Date occurredBefore) {
+    this.occurredBefore = occurredBefore;
+  }
+
+  @CamundaQueryParam(value = "occurredAfter", converter = DateConverter.class)
+  public void setOccurredAfter(Date occurredAfter) {
+    this.occurredAfter = occurredAfter;
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -202,6 +216,12 @@ public class HistoricDetailQueryDto extends AbstractQueryDto<HistoricDetailQuery
     }
     if (userOperationId != null) {
       query.userOperationId(userOperationId);
+    }
+    if (occurredBefore != null) {
+      query.occurredBefore(occurredBefore);
+    }
+    if (occurredAfter != null) {
+      query.occurredAfter(occurredAfter);
     }
   }
 

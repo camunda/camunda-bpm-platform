@@ -609,17 +609,45 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
   }
 
    @Test
-  public void testHistoricVariableQueryByProcessInstanceIdIn () {
+  public void testByProcessInstanceIdIn () {
     String aProcessInstanceId = "aProcessInstanceId";
     String anotherProcessInstanceId = "anotherProcessInstanceId";
 
     given()
-            .queryParam("processInstanceIdIn", aProcessInstanceId + "," + anotherProcessInstanceId)
-            .then().expect().statusCode(Status.OK.getStatusCode())
-            .when().get(HISTORIC_DETAIL_RESOURCE_URL);
+      .queryParam("processInstanceIdIn", aProcessInstanceId + "," + anotherProcessInstanceId)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(HISTORIC_DETAIL_RESOURCE_URL);
 
     verify(mockedQuery)
       .processInstanceIdIn(aProcessInstanceId, anotherProcessInstanceId);
+  }
+
+  @Test
+  public void testByOccurredBefore () {
+    given()
+      .queryParam("occurredBefore", MockProvider.EXAMPLE_HISTORIC_VAR_UPDATE_TIME)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(HISTORIC_DETAIL_RESOURCE_URL);
+
+    verify(mockedQuery)
+      .occurredBefore(DateTimeUtil.parseDate(MockProvider.EXAMPLE_HISTORIC_VAR_UPDATE_TIME));
+  }
+
+  @Test
+  public void testByOccurredAfter () {
+    given()
+      .queryParam("occurredAfter", MockProvider.EXAMPLE_HISTORIC_VAR_UPDATE_TIME)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(HISTORIC_DETAIL_RESOURCE_URL);
+
+    verify(mockedQuery)
+      .occurredAfter(DateTimeUtil.parseDate(MockProvider.EXAMPLE_HISTORIC_VAR_UPDATE_TIME));
   }
 
   private List<HistoricDetail> createMockHistoricDetailsTwoTenants() {
