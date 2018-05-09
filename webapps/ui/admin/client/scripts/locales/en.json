@@ -33,6 +33,8 @@
   "AUTHORIZATION_TENANT_MEMBERSHIP" : "Tenant Membership",
   "AUTHORIZATION_BATCH" : "Batch",
   "AUTHORIZATION_DECISION_REQUIREMENTS_DEFINITION" : "Decision Requirements Definition",
+  "AUTHORIZATION_REPORT" : "Report",
+  "AUTHORIZATION_DASHBOARD" : "Dashboard",
 
   "AUTHORIZATION_CONFIRM_DELETE_TITLE" : "Confirm Delete",
   "AUTHORIZATION_CONFIRM_DELETE_MESSAGE" : "Are you sure you want to delete the following authorization?",

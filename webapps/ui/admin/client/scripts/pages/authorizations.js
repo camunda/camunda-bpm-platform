@@ -35,7 +35,9 @@ module.exports = [ '$routeProvider', function($routeProvider) {
           11: $translate.instant('AUTHORIZATION_TENANT'),
           12: $translate.instant('AUTHORIZATION_TENANT_MEMBERSHIP'),
           13: $translate.instant('AUTHORIZATION_BATCH'),
-          14: $translate.instant('AUTHORIZATION_DECISION_REQUIREMENTS_DEFINITION')
+          14: $translate.instant('AUTHORIZATION_DECISION_REQUIREMENTS_DEFINITION'),
+          15: $translate.instant('AUTHORIZATION_REPORT'),
+          16: $translate.instant('AUTHORIZATION_DASHBOARD')
         };
 
         pageService.breadcrumbsAdd([
@@ -60,7 +62,9 @@ module.exports = [ '$routeProvider', function($routeProvider) {
           11: [ 'READ', 'UPDATE', 'CREATE', 'DELETE' ],
           12: [ 'CREATE', 'DELETE' ],
           13: [ 'READ', 'UPDATE', 'CREATE', 'DELETE', 'READ_HISTORY', 'DELETE_HISTORY' ],
-          14: [ 'READ' ]
+          14: [ 'READ' ],
+          15: [ 'ALL', 'READ', 'UPDATE', 'CREATE', 'DELETE' ],
+          16: [ 'ALL', 'READ', 'UPDATE', 'CREATE', 'DELETE' ]
         };
 
         $scope.typeMap = {
