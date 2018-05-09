@@ -15,13 +15,11 @@ package org.camunda.bpm.engine.impl;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricDetailQuery;
 import org.camunda.bpm.engine.impl.cmd.CommandLogger;
-import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
@@ -48,6 +46,7 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
   protected String variableInstanceId;
   protected String[] variableTypes;
   protected String[] tenantIds;
+  protected String[] processInstanceIds;
   protected String userOperationId;
   protected Long sequenceCounter;
 
@@ -142,6 +141,12 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
   public HistoricDetailQuery tenantIdIn(String... tenantIds) {
     ensureNotNull("tenantIds", (Object[]) tenantIds);
     this.tenantIds = tenantIds;
+    return this;
+  }
+
+  public HistoricDetailQuery processInstanceIdIn(String... processInstanceIds) {
+    ensureNotNull("Process Instance Ids", (Object[]) processInstanceIds);
+    this.processInstanceIds = processInstanceIds;
     return this;
   }
 
@@ -286,6 +291,10 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
 
   public String getDetailId() {
     return detailId;
+  }
+
+  public String[] getProcessInstanceIds() {
+    return processInstanceIds;
   }
 
 }

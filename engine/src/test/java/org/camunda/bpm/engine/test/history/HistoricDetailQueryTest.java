@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricDetailQuery;
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
@@ -276,6 +277,96 @@ public class HistoricDetailQueryTest {
     try {
       // when
       query.variableTypeIn((String)null);
+      fail("A ProcessEngineException was expected.");
+    } catch (ProcessEngineException e) {
+      // then fails
+    }
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testQueryBySingleProcessInstanceId() {
+    // given
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("stringVar", "test");
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(PROCESS_KEY, variables);
+
+    // when
+    HistoricDetailQuery query =
+      historyService.createHistoricDetailQuery()
+        .variableUpdates()
+        .processInstanceIdIn(processInstance.getProcessInstanceId());
+
+    // then
+    assertEquals(1, query.count());
+    assertEquals(query.list().get(0).getProcessInstanceId(), processInstance.getId());
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testQueryBySeveralProcessInstanceIds() {
+    // given
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("stringVar", "test");
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(PROCESS_KEY, variables);
+    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey(PROCESS_KEY, variables);
+    runtimeService.startProcessInstanceByKey(PROCESS_KEY, variables);
+
+    // when
+    HistoricDetailQuery query =
+      historyService.createHistoricDetailQuery()
+        .variableUpdates()
+        .processInstanceIdIn(processInstance.getProcessInstanceId(), processInstance2.getProcessInstanceId());
+
+    // then
+    Set<String> expectedProcessInstanceIds = new HashSet<String>();
+    expectedProcessInstanceIds.add(processInstance.getId());
+    expectedProcessInstanceIds.add(processInstance2.getId());
+    assertEquals(2, query.count());
+    assertTrue(expectedProcessInstanceIds.contains(query.list().get(0).getProcessInstanceId()));
+    assertTrue(expectedProcessInstanceIds.contains(query.list().get(1).getProcessInstanceId()));
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testQueryByNonExistingProcessInstanceId() {
+    // given
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("stringVar", "test");
+    runtimeService.startProcessInstanceByKey(PROCESS_KEY, variables);
+
+    // when
+    HistoricDetailQuery query =
+      historyService.createHistoricDetailQuery()
+        .processInstanceIdIn("foo");
+
+    // then
+    assertEquals(0, query.count());
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  public void testQueryByInvalidProcessInstanceIds() {
+    // given
+    Map<String, Object> variables1 = new HashMap<String, Object>();
+    variables1.put("stringVar", "test");
+    runtimeService.startProcessInstanceByKey(PROCESS_KEY, variables1);
+
+    // when
+    HistoricDetailQuery query =
+      historyService.createHistoricDetailQuery();
+
+    try {
+      // when
+      query.processInstanceIdIn(null);
+      fail("A ProcessEngineException was expected.");
+    } catch (ProcessEngineException e) {
+      // then fails
+    }
+
+    try {
+      // when
+      query.processInstanceIdIn((String)null);
       fail("A ProcessEngineException was expected.");
     } catch (ProcessEngineException e) {
       // then fails

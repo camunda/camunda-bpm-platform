@@ -268,6 +268,16 @@
           #{item}
         </foreach>
       </if>
+
+      <!-- processInstanceIds -->
+      <if test="processInstanceIds != null &amp;&amp; processInstanceIds.length > 0">
+        and RES.PROC_INST_ID_ in
+        <foreach item="item" index="index" collection="processInstanceIds"
+                 open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
+
       <choose>
         <when test="taskId != null">
           and RES.TASK_ID_ = #{taskId}

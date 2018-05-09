@@ -608,6 +608,20 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
     assertThat(returnedTenantId4).isEqualTo(MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
   }
 
+   @Test
+  public void testHistoricVariableQueryByProcessInstanceIdIn () {
+    String aProcessInstanceId = "aProcessInstanceId";
+    String anotherProcessInstanceId = "anotherProcessInstanceId";
+
+    given()
+            .queryParam("processInstanceIdIn", aProcessInstanceId + "," + anotherProcessInstanceId)
+            .then().expect().statusCode(Status.OK.getStatusCode())
+            .when().get(HISTORIC_DETAIL_RESOURCE_URL);
+
+    verify(mockedQuery)
+      .processInstanceIdIn(aProcessInstanceId, anotherProcessInstanceId);
+  }
+
   private List<HistoricDetail> createMockHistoricDetailsTwoTenants() {
     List<HistoricDetail> mockHistoricDetails = MockProvider.createMockHistoricDetails(MockProvider.EXAMPLE_TENANT_ID);
     List<HistoricDetail> mockHistoricDetails2 = MockProvider.createMockHistoricDetails(MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
