@@ -20,6 +20,7 @@ import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 
+import java.util.Date;
 
 /**
  * Programmatic querying for {@link HistoricDetail}s.
@@ -67,6 +68,9 @@ public interface HistoricDetailQuery extends Query<HistoricDetailQuery, Historic
   /** Only select historic variable updates associated to the given {@link HistoricVariableInstance historic variable instance}. */
   HistoricDetailQuery variableInstanceId(String variableInstanceId);
 
+  /** Only select historic process variables which match one of the given variable types. */
+  HistoricDetailQuery variableTypeIn(String... variableTypes);
+
   /** Only select {@link HistoricFormProperty}s. */
   @Deprecated
   HistoricDetailQuery formProperties();
@@ -103,10 +107,19 @@ public interface HistoricDetailQuery extends Query<HistoricDetailQuery, Historic
   /** Only select historic details with one of the given tenant ids. */
   HistoricDetailQuery tenantIdIn(String... tenantIds);
 
+  /** Only select historic details with the given process instance ids. */
+  HistoricDetailQuery processInstanceIdIn(String... processInstanceIds);
+
   /**
    * Select historic details related with given userOperationId.
    */
   HistoricDetailQuery userOperationId(String userOperationId);
+
+  /** Only select historic details that were occurred before the given date (inclusive). */
+  HistoricDetailQuery occurredBefore(Date date);
+
+  /** Only select historic details that were occurred after the given date (inclusive). */
+  HistoricDetailQuery occurredAfter(Date date);
 
   /**
    * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).

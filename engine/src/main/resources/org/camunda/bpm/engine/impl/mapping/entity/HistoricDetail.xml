@@ -259,6 +259,25 @@
       <if test="variableInstanceId != null">
         and RES.VAR_INST_ID_ = #{variableInstanceId}
       </if>
+
+      <!-- variableTypes -->
+      <if test="variableTypes != null &amp;&amp; variableTypes.length > 0">
+        and lower(RES.VAR_TYPE_) in
+        <foreach item="item" index="index" collection="variableTypes"
+                 open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
+
+      <!-- processInstanceIds -->
+      <if test="processInstanceIds != null &amp;&amp; processInstanceIds.length > 0">
+        and RES.PROC_INST_ID_ in
+        <foreach item="item" index="index" collection="processInstanceIds"
+                 open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
+
       <choose>
         <when test="taskId != null">
           and RES.TASK_ID_ = #{taskId}
@@ -288,6 +307,13 @@
 
       <if test="sequenceCounter != null">
         and RES.SEQUENCE_COUNTER_ = #{sequenceCounter}
+      </if>
+
+      <if test="occurredBefore != null">
+        and RES.TIME_ &lt;= #{occurredBefore}
+      </if>
+      <if test="occurredAfter != null">
+        and RES.TIME_ &gt;= #{occurredAfter}
       </if>
 
       <if test="authCheck.isAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">

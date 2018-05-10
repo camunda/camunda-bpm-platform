@@ -12,10 +12,15 @@
  */
 package org.camunda.bpm.engine.rest.security.auth;
 
+import java.util.List;
+
 public class AuthenticationResult {
 
-  protected String authenticatedUser;
   protected boolean isAuthenticated;
+
+  protected String authenticatedUser;
+  protected List<String> groups;
+  protected List<String> tenants;
 
   public AuthenticationResult(String authenticatedUser, boolean isAuthenticated) {
     this.authenticatedUser = authenticatedUser;
@@ -25,14 +30,33 @@ public class AuthenticationResult {
   public String getAuthenticatedUser() {
     return authenticatedUser;
   }
+
   public void setAuthenticatedUser(String authenticatedUser) {
     this.authenticatedUser = authenticatedUser;
   }
+
   public boolean isAuthenticated() {
     return isAuthenticated;
   }
+
   public void setAuthenticated(boolean isAuthenticated) {
     this.isAuthenticated = isAuthenticated;
+  }
+
+  public List<String> getGroups() {
+    return groups;
+  }
+
+  public void setGroups(List<String> groups) {
+    this.groups = groups;
+  }
+
+  public List<String> getTenants() {
+    return tenants;
+  }
+
+  public void setTenants(List<String> tenants) {
+    this.tenants = tenants;
   }
 
   public static AuthenticationResult successful(String userId) {

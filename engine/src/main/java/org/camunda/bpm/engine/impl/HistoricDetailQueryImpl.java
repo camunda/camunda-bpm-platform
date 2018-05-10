@@ -15,13 +15,12 @@ package org.camunda.bpm.engine.impl;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
-import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricDetailQuery;
 import org.camunda.bpm.engine.impl.cmd.CommandLogger;
-import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
@@ -46,9 +45,13 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
   protected String activityInstanceId;
   protected String type;
   protected String variableInstanceId;
+  protected String[] variableTypes;
   protected String[] tenantIds;
+  protected String[] processInstanceIds;
   protected String userOperationId;
   protected Long sequenceCounter;
+  protected Date occurredBefore;
+  protected Date occurredAfter;
 
   protected boolean excludeTaskRelated = false;
   protected boolean isByteArrayFetchingEnabled = true;
@@ -71,6 +74,19 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
     ensureNotNull("variableInstanceId", variableInstanceId);
     this.variableInstanceId = variableInstanceId;
     return this;
+  }
+
+  public HistoricDetailQuery variableTypeIn(String... variableTypes) {
+    ensureNotNull("Variable types", (Object[]) variableTypes);
+    this.variableTypes = lowerCase(variableTypes);
+    return this;
+  }
+
+  private String[] lowerCase(String... variableTypes) {
+    for (int i = 0; i < variableTypes.length; i++) {
+      variableTypes[i] = variableTypes[i].toLowerCase();
+    }
+    return variableTypes;
   }
 
   public HistoricDetailQuery processInstanceId(String processInstanceId) {
@@ -131,6 +147,12 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
     return this;
   }
 
+  public HistoricDetailQuery processInstanceIdIn(String... processInstanceIds) {
+    ensureNotNull("Process Instance Ids", (Object[]) processInstanceIds);
+    this.processInstanceIds = processInstanceIds;
+    return this;
+  }
+
   public HistoricDetailQuery userOperationId(String userOperationId) {
     ensureNotNull("userOperationId", userOperationId);
     this.userOperationId = userOperationId;
@@ -144,6 +166,18 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
 
   public HistoricDetailQuery excludeTaskDetails() {
     this.excludeTaskRelated = true;
+    return this;
+  }
+
+  public HistoricDetailQuery occurredBefore(Date date) {
+    ensureNotNull("occurred before", date);
+    occurredBefore = date;
+    return this;
+  }
+
+  public HistoricDetailQuery occurredAfter(Date date) {
+    ensureNotNull("occurred after", date);
+    occurredAfter = date;
     return this;
   }
 
@@ -274,4 +308,15 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
     return detailId;
   }
 
+  public String[] getProcessInstanceIds() {
+    return processInstanceIds;
+  }
+
+  public Date getOccurredBefore() {
+    return occurredBefore;
+  }
+
+  public Date getOccurredAfter() {
+    return occurredAfter;
+  }
 }

@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.rest.dto.history;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -23,6 +24,8 @@ import org.camunda.bpm.engine.history.HistoricDetailQuery;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
+import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
+import org.camunda.bpm.engine.rest.dto.converter.StringArrayConverter;
 import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -61,12 +64,16 @@ public class HistoricDetailQueryDto extends AbstractQueryDto<HistoricDetailQuery
   protected String caseInstanceId;
   protected String caseExecutionId;
   protected String variableInstanceId;
+  protected String[] variableTypeIn;
   protected String taskId;
   protected Boolean formFields;
   protected Boolean variableUpdates;
   protected Boolean excludeTaskDetails;
   protected List<String> tenantIds;
+  protected String[] processInstanceIdIn;
   protected String userOperationId;
+  private Date occurredBefore;
+  private Date occurredAfter;
 
   public HistoricDetailQueryDto() {
   }
@@ -105,6 +112,11 @@ public class HistoricDetailQueryDto extends AbstractQueryDto<HistoricDetailQuery
     this.variableInstanceId = variableInstanceId;
   }
 
+   @CamundaQueryParam(value="variableTypeIn", converter = StringArrayConverter.class)
+  public void setVariableTypeIn(String[] variableTypeIn) {
+    this.variableTypeIn = variableTypeIn;
+  }
+
   @CamundaQueryParam(value = "taskId")
   public void setTaskId(String taskId) {
     this.taskId = taskId;
@@ -130,9 +142,25 @@ public class HistoricDetailQueryDto extends AbstractQueryDto<HistoricDetailQuery
     this.tenantIds = tenantIds;
   }
 
+  @CamundaQueryParam(value="processInstanceIdIn", converter = StringArrayConverter.class)
+  public void setProcessInstanceIdIn(String[] processInstanceIdIn) {
+    this.processInstanceIdIn = processInstanceIdIn;
+  }
+
+
   @CamundaQueryParam(value = "userOperationId")
   public void setUserOperationId(String userOperationId) {
     this.userOperationId = userOperationId;
+  }
+
+  @CamundaQueryParam(value = "occurredBefore", converter = DateConverter.class)
+  public void setOccurredBefore(Date occurredBefore) {
+    this.occurredBefore = occurredBefore;
+  }
+
+  @CamundaQueryParam(value = "occurredAfter", converter = DateConverter.class)
+  public void setOccurredAfter(Date occurredAfter) {
+    this.occurredAfter = occurredAfter;
   }
 
   @Override
@@ -165,6 +193,9 @@ public class HistoricDetailQueryDto extends AbstractQueryDto<HistoricDetailQuery
     if (variableInstanceId != null) {
       query.variableInstanceId(variableInstanceId);
     }
+    if (variableTypeIn != null && variableTypeIn.length > 0) {
+      query.variableTypeIn(variableTypeIn);
+    }
     if (taskId != null) {
       query.taskId(taskId);
     }
@@ -180,8 +211,17 @@ public class HistoricDetailQueryDto extends AbstractQueryDto<HistoricDetailQuery
     if (tenantIds != null && !tenantIds.isEmpty()) {
       query.tenantIdIn(tenantIds.toArray(new String[tenantIds.size()]));
     }
+    if (processInstanceIdIn != null && processInstanceIdIn.length > 0) {
+      query.processInstanceIdIn(processInstanceIdIn);
+    }
     if (userOperationId != null) {
       query.userOperationId(userOperationId);
+    }
+    if (occurredBefore != null) {
+      query.occurredBefore(occurredBefore);
+    }
+    if (occurredAfter != null) {
+      query.occurredAfter(occurredAfter);
     }
   }
 
