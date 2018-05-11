@@ -6,6 +6,7 @@ import org.camunda.bpm.engine.variable.value.ObjectValue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class App {
@@ -31,11 +32,9 @@ public class App {
           .objectValue(creditScores)
           .create();
 
-        // set the recently created variable
-        externalTask.setVariableTyped("creditScores", creditScoresObject);
-
         // complete the external task
-        externalTaskService.complete(externalTask);
+        externalTaskService.complete(externalTask,
+          Collections.singletonMap("creditScores", creditScoresObject));
 
         System.out.println("The External Task " + externalTask.getId() + " has been completed!");
 
