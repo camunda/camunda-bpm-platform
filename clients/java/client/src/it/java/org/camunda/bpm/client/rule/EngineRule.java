@@ -53,6 +53,7 @@ import org.camunda.bpm.client.dto.VariableInstanceDto;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.impl.ExternalTaskImpl;
 import org.camunda.bpm.client.variable.impl.TypedValueField;
+import org.camunda.bpm.engine.variable.impl.value.FileValueImpl;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.SerializableValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
@@ -284,6 +285,9 @@ public class EngineRule extends ExternalResource {
             dto.setValue(serializableValue.getValueSerialized());
           }
 
+        }
+        else if (typedValue instanceof FileValueImpl) {
+          dto.setValue(((FileValueImpl)typedValue).getByteArray());
         }
         else {
           dto.setValue(typedValue.getValue());

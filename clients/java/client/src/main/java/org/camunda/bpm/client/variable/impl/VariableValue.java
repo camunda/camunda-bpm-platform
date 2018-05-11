@@ -43,6 +43,10 @@ public class VariableValue<T extends TypedValue> {
     return getTypedValue(true);
   }
 
+  public void setCachedValue(T cachedValue) {
+    this.cachedValue = cachedValue;
+  }
+
   @SuppressWarnings("unchecked")
   public T getTypedValue(boolean deserializeValue) {
     if (cachedValue != null && cachedValue instanceof SerializableValue) {

@@ -36,6 +36,7 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.camunda.commons.utils.IoUtil;
 
 /**
  * @author Tassilo Weidner
@@ -56,7 +57,7 @@ public class RequestExecutor {
     initHttpClient(requestInterceptorHandler);
   }
 
-  protected <T> T postRequest(String resourceUrl, RequestDto requestDto, Class<T> responseDtoClass) throws EngineClientException {
+  protected <T> T postRequest(String resourceUrl, RequestDto requestDto, Class<T> responseClass) throws EngineClientException {
     ByteArrayEntity serializedRequest = serializeRequest(requestDto);
     HttpUriRequest httpRequest = RequestBuilder.post(resourceUrl)
       .addHeader(HEADER_USER_AGENT)
@@ -64,12 +65,21 @@ public class RequestExecutor {
       .setEntity(serializedRequest)
       .build();
     
-    return executeRequest(httpRequest, responseDtoClass);
+    return executeRequest(httpRequest, responseClass);
   }
 
-  protected <T> T executeRequest(HttpUriRequest httpRequest, Class<T> responseDtoClass) throws EngineClientException {
+  protected byte[] getRequest(String resourceUrl) throws EngineClientException {
+    HttpUriRequest httpRequest = RequestBuilder.get(resourceUrl)
+      .addHeader(HEADER_USER_AGENT)
+      .addHeader(HEADER_CONTENT_TYPE_JSON)
+      .build();
+    
+    return executeRequest(httpRequest, byte[].class);
+  }
+
+  protected <T> T executeRequest(HttpUriRequest httpRequest, Class<T> responseClass) throws EngineClientException {
     try {
-      return httpClient.execute(httpRequest, handleResponse(responseDtoClass));
+      return httpClient.execute(httpRequest, handleResponse(responseClass));
     } catch (RuntimeException e) {
       Throwable cause = e.getCause();
       if (cause instanceof EngineClientException) {
@@ -86,14 +96,22 @@ public class RequestExecutor {
     }
   }
 
-  protected <T> ResponseHandler<T> handleResponse(final Class<T> responseDtoClass) {
+  protected <T> ResponseHandler<T> handleResponse(final Class<T> responseClass) {
     return new AbstractResponseHandler<T>() {
-      @Override
-      public T handleEntity(HttpEntity responseEntity) {
-        T deserializedResponse = null;
-        if (!responseDtoClass.isAssignableFrom(Void.class)) {
+      public T handleEntity(HttpEntity responseEntity) throws IOException {
+        T response = null;
+        if (responseClass.isAssignableFrom(byte[].class)) {
+          InputStream inputStream = null;
+
           try {
-            deserializedResponse = deserializeResponse(responseEntity, responseDtoClass);
+            inputStream = responseEntity.getContent();
+            response = (T) IoUtil.inputStreamAsByteArray(inputStream);
+          } finally {
+            IoUtil.closeSilently(inputStream);
+          }
+        } else if (!responseClass.isAssignableFrom(Void.class)) {
+          try {
+            response = deserializeResponse(responseEntity, responseClass);
           } catch (EngineClientException e) {
             throw new RuntimeException(e);
           }
@@ -103,24 +121,24 @@ public class RequestExecutor {
           EntityUtils.consume(responseEntity);
         }
         catch (IOException e) {
-          LOG.exceptionWhileClosingResourceStream(deserializedResponse, e);
+          LOG.exceptionWhileClosingResourceStream(response, e);
         }
 
-        return deserializedResponse;
+        return response;
       }
     };
   }
 
-  protected <T> T deserializeResponse(HttpEntity httpEntity, Class<T> responseDtoClass) throws EngineClientException {
+  protected <T> T deserializeResponse(HttpEntity httpEntity, Class<T> responseClass) throws EngineClientException {
     try {
       InputStream responseBody = httpEntity.getContent();
-      return objectMapper.readValue(responseBody, responseDtoClass);
+      return objectMapper.readValue(responseBody, responseClass);
     } catch (JsonParseException e) {
-      throw LOG.exceptionWhileParsingJsonObject(responseDtoClass, e);
+      throw LOG.exceptionWhileParsingJsonObject(responseClass, e);
     } catch (JsonMappingException e) {
-      throw LOG.exceptionWhileMappingJsonObject(responseDtoClass, e);
+      throw LOG.exceptionWhileMappingJsonObject(responseClass, e);
     } catch (IOException e) {
-      throw LOG.exceptionWhileDeserializingJsonObject(responseDtoClass, e);
+      throw LOG.exceptionWhileDeserializingJsonObject(responseClass, e);
     }
   }
 

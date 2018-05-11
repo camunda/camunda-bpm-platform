@@ -41,6 +41,11 @@ public class EngineClient {
   public static final String FAILURE_RESOURCE_PATH = ID_RESOURCE_PATH + "/failure";
   public static final String BPMN_ERROR_RESOURCE_PATH = ID_RESOURCE_PATH + "/bpmnError";
   public static final String EXTEND_LOCK_RESOURCE_PATH = ID_RESOURCE_PATH + "/extendLock";
+  public static final String NAME_PATH_PARAM = "{name}";
+  public static final String EXECUTION_RESOURCE_PATH = "/execution";
+  public static final String EXECUTION_ID_RESOURCE_PATH = EXECUTION_RESOURCE_PATH + "/" + ID_PATH_PARAM;
+  public static final String GET_LOCAL_VARIABLE =  EXECUTION_ID_RESOURCE_PATH + "/localVariables/" + NAME_PATH_PARAM;
+  public static final String GET_LOCAL_BINARY_VARIABLE =  GET_LOCAL_VARIABLE + "/data";
 
   protected String baseUrl;
   protected String workerId;
@@ -100,6 +105,14 @@ public class EngineClient {
     String resourcePath = EXTEND_LOCK_RESOURCE_PATH.replace("{id}", taskId);
     String resourceUrl = baseUrl + resourcePath;
     engineInteraction.postRequest(resourceUrl, payload, Void.class);
+  }
+
+  public byte[] getLocalBinaryVariable(String variableName, String processInstanceId) throws EngineClientException {
+    String resourcePath = baseUrl + GET_LOCAL_BINARY_VARIABLE
+      .replace(ID_PATH_PARAM, processInstanceId)
+      .replace(NAME_PATH_PARAM, variableName);
+
+    return engineInteraction.getRequest(resourcePath);
   }
 
   public String getBaseUrl() {

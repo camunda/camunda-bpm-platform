@@ -16,11 +16,15 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.camunda.bpm.client.impl.EngineClient;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.variable.impl.TypedValueField;
 import org.camunda.bpm.client.variable.impl.VariableValue;
+import org.camunda.bpm.client.variable.impl.value.DeferredFileValue;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.type.PrimitiveValueType;
+import org.camunda.bpm.engine.variable.value.FileValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -50,6 +54,9 @@ public class ExternalTaskImpl implements ExternalTask {
 
   @JsonIgnore
   protected Map<String, VariableValue> receivedVariableMap;
+
+  @JsonIgnore
+  protected EngineClient engineClient;
 
   public void setActivityId(String activityId) {
     this.activityId = activityId;
@@ -126,6 +133,11 @@ public class ExternalTaskImpl implements ExternalTask {
   @JsonIgnore
   public void setReceivedVariableMap(Map<String, VariableValue> receivedVariableMap) {
     this.receivedVariableMap = receivedVariableMap;
+  }
+
+  @JsonIgnore
+  public void setEngineClient(EngineClient engineClient) {
+    this.engineClient = engineClient;
   }
 
   @Override
@@ -260,6 +272,12 @@ public class ExternalTaskImpl implements ExternalTask {
     VariableValue variableValue = receivedVariableMap.get(variableName);
     if (variableValue != null) {
       typedValue = variableValue.getTypedValue(deserializeObjectValues);
+
+      if (typedValue.getType().equals(PrimitiveValueType.FILE) && !(typedValue instanceof DeferredFileValue)){
+        DeferredFileValue deferredFileValue = new DeferredFileValue((FileValue) typedValue, variableName, getProcessInstanceId(), engineClient);
+        variableValue.setCachedValue(deferredFileValue);
+        typedValue = deferredFileValue;
+      }
     }
 
     return (T) typedValue;

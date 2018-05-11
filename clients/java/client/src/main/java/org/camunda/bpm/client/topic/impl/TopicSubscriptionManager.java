@@ -133,6 +133,7 @@ public class TopicSubscriptionManager implements Runnable {
 
   protected void handleExternalTask(ExternalTask externalTask, ExternalTaskHandler taskHandler) {
     ExternalTaskImpl task = (ExternalTaskImpl) externalTask;
+    task.setEngineClient(engineClient);
 
     Map<String, TypedValueField> variables = task.getVariables();
     Map<String, VariableValue> wrappedVariables = typedValues.wrapVariables(variables);

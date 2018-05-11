@@ -218,4 +218,9 @@ public class ExternalTaskClientLogger extends BaseLogger {
   public ExternalTaskClientException multipleProvidersForDataformat(String dataFormatName) {
     return new ExternalTaskClientException(exceptionMessage("028", "Multiple providers found for dataformat '{}'", dataFormatName));
   }
+
+  public ExternalTaskClientException cannotLoadDeferedFileValueException(String variableName, Exception e) {
+    return new ExternalTaskClientException(exceptionMessage("029", "Variable '{}' of type file could not be retrieved", variableName), e);
+  }
+
 }
