@@ -115,10 +115,10 @@ public interface HistoricDetailQuery extends Query<HistoricDetailQuery, Historic
    */
   HistoricDetailQuery userOperationId(String userOperationId);
 
-  /** Only select historic details that were occurred before the given date (inclusive). */
+  /** Only select historic details that have occurred before the given date (inclusive). */
   HistoricDetailQuery occurredBefore(Date date);
 
-  /** Only select historic details that were occurred after the given date (inclusive). */
+  /** Only select historic details that have occurred after the given date (inclusive). */
   HistoricDetailQuery occurredAfter(Date date);
 
   /**
