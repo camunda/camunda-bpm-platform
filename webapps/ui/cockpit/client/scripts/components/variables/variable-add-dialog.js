@@ -96,10 +96,10 @@ var Controller = [
         .setVariable(instance.id, data)
         .then(function() {
           $scope.status = SUCCESS;
-
+          console.log(data);
           Notifications.addMessage({
             status: $translate.instant('VARIABLE_ADD_MESSAGE_STATUS_FINISHED'),
-            message: $translate.instant('VARIABLE_ADD_MESSAGE_MESSAGE_ADD'),
+            message: $translate.instant('VARIABLE_ADD_MESSAGE_MESSAGE_ADD', { name: data.name }),
             exclusive: true
           });
         })

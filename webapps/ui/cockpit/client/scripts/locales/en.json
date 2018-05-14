@@ -189,7 +189,7 @@
   "VARIABLE_ADD_OK" : "OK",
 
   "VARIABLE_ADD_MESSAGE_STATUS_FINISHED" : "Finished",
-  "VARIABLE_ADD_MESSAGE_MESSAGE_ADD" : "Added the variable",
+  "VARIABLE_ADD_MESSAGE_MESSAGE_ADD" : "Added the variable \"{{name}}\".",
   "VARIABLE_ADD_MESSAGE_MESSAGE_ERROR" : "Could not add the new variable: {{message}}",
 
   "VARIABLE_INSPECT_MODAL_TITLE" : "Inspect \"{{name}}\" variable",
