@@ -154,6 +154,35 @@ public class ProcessDefinitionQueryTest extends AbstractDefinitionQueryTest {
     verifyQueryResults(query, 1);
   }
 
+  public void testQueryByKeys() {
+
+    // empty list
+    assertTrue(repositoryService.createProcessDefinitionQuery().processDefinitionKeysIn("a", "b").list().isEmpty());
+
+
+    // collect all definition keys
+    List<ProcessDefinition> list = repositoryService.createProcessDefinitionQuery().list();
+    String[] processDefinitionKeys = new String[list.size()];
+    for (int i = 0; i < processDefinitionKeys.length; i++) {
+      processDefinitionKeys[i] = list.get(i).getKey();
+    }
+
+    List<ProcessDefinition> keyInList = repositoryService.createProcessDefinitionQuery().processDefinitionKeysIn(processDefinitionKeys).list();
+    for (ProcessDefinition processDefinition : keyInList) {
+      boolean found = false;
+      for (ProcessDefinition otherProcessDefinition : list) {
+        if(otherProcessDefinition.getKey().equals(processDefinition.getKey())) {
+          found = true; break;
+        }
+      }
+      if(!found) {
+        fail("Expected to find process definition "+processDefinition);
+      }
+    }
+
+    assertEquals(0, repositoryService.createProcessDefinitionQuery().processDefinitionKey("dummyKey").processDefinitionKeysIn(processDefinitionKeys).count());
+  }
+
   public void testQueryByInvalidKey() {
     ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery().processDefinitionKey("invalid");
     verifyQueryResults(query, 0);
