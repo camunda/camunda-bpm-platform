@@ -14,6 +14,7 @@
 package org.camunda.bpm.engine.repository;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl;
 import org.camunda.bpm.engine.query.Query;
 
 /**
@@ -60,6 +61,11 @@ public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, Pr
    * Only select process definition with the given key.
    */
   ProcessDefinitionQuery processDefinitionKey(String processDefinitionKey);
+
+  /**
+   * Only select process definitions with the given keys
+   */
+  ProcessDefinitionQueryImpl processDefinitionKeysIn(String... processDefinitionKeys);
 
   /**
    * Only select process definitions where the key matches the given parameter.

@@ -254,6 +254,9 @@ public abstract class MockProvider {
   public static final String EXAMPLE_PROCESS_DEFINITION_NAME = "aName";
   public static final String EXAMPLE_PROCESS_DEFINITION_NAME_LIKE = "aNameLike";
   public static final String EXAMPLE_PROCESS_DEFINITION_KEY = "aKey";
+  public static final String ANOTHER_EXAMPLE_PROCESS_DEFINITION_KEY="anotherProcessDefinitionKey";
+  public static final String EXAMPLE_KEY_LIST = EXAMPLE_PROCESS_DEFINITION_KEY + "," + ANOTHER_EXAMPLE_PROCESS_DEFINITION_KEY;
+
   public static final String NON_EXISTING_PROCESS_DEFINITION_KEY = "aNonExistingKey";
   public static final String EXAMPLE_PROCESS_DEFINITION_CATEGORY = "aCategory";
   public static final String EXAMPLE_PROCESS_DEFINITION_DESCRIPTION = "aDescription";

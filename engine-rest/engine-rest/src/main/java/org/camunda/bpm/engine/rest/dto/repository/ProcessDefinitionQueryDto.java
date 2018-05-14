@@ -79,6 +79,7 @@ public class ProcessDefinitionQueryDto extends AbstractQueryDto<ProcessDefinitio
   private Boolean includeDefinitionsWithoutTenantId;
   private String versionTag;
   private String versionTagLike;
+  private List<String> keys;
 
   public ProcessDefinitionQueryDto() {
 
@@ -126,6 +127,12 @@ public class ProcessDefinitionQueryDto extends AbstractQueryDto<ProcessDefinitio
   @CamundaQueryParam("key")
   public void setKey(String key) {
     this.key = key;
+  }
+
+
+  @CamundaQueryParam(value = "keysIn", converter = StringListConverter.class)
+  public void setKeysIn(List<String> keys) {
+    this.keys = keys;
   }
 
   @CamundaQueryParam("keyLike")
@@ -269,6 +276,10 @@ public class ProcessDefinitionQueryDto extends AbstractQueryDto<ProcessDefinitio
     }
     if (keyLike != null) {
       query.processDefinitionKeyLike(keyLike);
+    }
+
+    if (keys != null && !keys.isEmpty()) {
+      query.processDefinitionKeysIn(keys.toArray(new String[keys.size()]));
     }
     if (version != null) {
       query.processDefinitionVersion(version);

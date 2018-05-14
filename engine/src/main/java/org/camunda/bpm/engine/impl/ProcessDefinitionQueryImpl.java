@@ -54,6 +54,7 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
   protected String nameLike;
   protected String deploymentId;
   protected String key;
+  protected String[] keys;
   protected String keyLike;
   protected String resourceName;
   protected String resourceNameLike;
@@ -127,6 +128,11 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
   public ProcessDefinitionQueryImpl processDefinitionKey(String key) {
     ensureNotNull("key", key);
     this.key = key;
+    return this;
+  }
+
+  public ProcessDefinitionQueryImpl processDefinitionKeysIn(String... keys) {
+    this.keys = keys;
     return this;
   }
 
