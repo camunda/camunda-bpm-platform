@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.rest.util;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 public abstract class DateTimeUtils {
@@ -35,5 +36,26 @@ public abstract class DateTimeUtils {
     } catch (ParseException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  public static Date updateTime(Date now, Date newTime) {
+    Calendar c = Calendar.getInstance();
+    c.setTime(now);
+    Calendar newTimeCalendar = Calendar.getInstance();
+    newTimeCalendar.setTime(newTime);
+    c.set(Calendar.ZONE_OFFSET, newTimeCalendar.get(Calendar.ZONE_OFFSET));
+    c.set(Calendar.DST_OFFSET, newTimeCalendar.get(Calendar.DST_OFFSET));
+    c.set(Calendar.HOUR_OF_DAY, newTimeCalendar.get(Calendar.HOUR_OF_DAY));
+    c.set(Calendar.MINUTE, newTimeCalendar.get(Calendar.MINUTE));
+    c.set(Calendar.SECOND, newTimeCalendar.get(Calendar.SECOND));
+    c.set(Calendar.MILLISECOND, newTimeCalendar.get(Calendar.MILLISECOND));
+    return c.getTime();
+  }
+
+  public static Date addDays(Date date, int amount) {
+    Calendar c = Calendar.getInstance();
+    c.setTime(date);
+    c.add(Calendar.DATE, amount);
+    return c.getTime();
   }
 }

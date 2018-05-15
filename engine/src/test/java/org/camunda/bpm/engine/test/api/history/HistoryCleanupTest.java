@@ -36,10 +36,12 @@ import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricIncident;
 import org.camunda.bpm.engine.history.HistoricJobLog;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
+import org.camunda.bpm.engine.impl.cfg.BatchWindowConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmd.HistoryCleanupCmd;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.BatchWindow;
 import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupHelper;
 import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupJobHandlerConfiguration;
 import org.camunda.bpm.engine.impl.metrics.Meter;
@@ -93,6 +95,8 @@ public class HistoryCleanupTest {
   protected static final String DECISION = "decision";
   protected static final String ONE_TASK_CASE = "case";
   private static final int NUMBER_OF_THREADS = 3;
+
+  private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
   protected String defaultStartTime;
   protected String defaultEndTime;
@@ -1116,12 +1120,10 @@ public class HistoryCleanupTest {
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
     Date date = sdf.parse("2017-09-06T22:15:00+0100");
 
-    assertTrue(HistoryCleanupHelper.isWithinBatchWindow(date, processEngineConfiguration.getHistoryCleanupBatchWindowStartTimeAsDate(),
-      processEngineConfiguration.getHistoryCleanupBatchWindowEndTimeAsDate()));
+    assertTrue(HistoryCleanupHelper.isWithinBatchWindow(date, processEngineConfiguration));
 
     date = sdf.parse("2017-09-06T22:15:00+0200");
-    assertFalse(HistoryCleanupHelper.isWithinBatchWindow(date, processEngineConfiguration.getHistoryCleanupBatchWindowStartTimeAsDate(),
-      processEngineConfiguration.getHistoryCleanupBatchWindowEndTimeAsDate()));
+    assertFalse(HistoryCleanupHelper.isWithinBatchWindow(date, processEngineConfiguration));
   }
 
   @Test
@@ -1133,6 +1135,24 @@ public class HistoryCleanupTest {
     thrown.expectMessage("historyCleanupBatchWindowStartTime");
 
     processEngineConfiguration.initHistoryCleanup();
+  }
+
+  @Test
+  public void testConfigurationFailureWrongDayOfTheWeekStartTime() throws ParseException {
+    processEngineConfiguration.getHistoryCleanupBatchWindows().put(Calendar.MONDAY, new BatchWindowConfiguration("23", "01:00"));
+    ClockUtil.setCurrentTime(sdf.parse("2018-05-14T10:00:00"));
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("startTime");
+    historyService.cleanUpHistoryAsync(false);
+  }
+
+  @Test
+  public void testConfigurationFailureWrongDayOfTheWeekEndTime() throws ParseException {
+    processEngineConfiguration.getHistoryCleanupBatchWindows().put(Calendar.MONDAY, new BatchWindowConfiguration("23:00", "01"));
+    ClockUtil.setCurrentTime(sdf.parse("2018-05-14T10:00:00"));
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("endTime");
+    historyService.cleanUpHistoryAsync(false);
   }
 
   @Test
@@ -1194,8 +1214,7 @@ public class HistoryCleanupTest {
   }
 
   private Date getNextRunWithinBatchWindow(Date currentTime) {
-    Date batchWindowStartTime = processEngineConfiguration.getHistoryCleanupBatchWindowStartTimeAsDate();
-    return HistoryCleanupHelper.getNextRunWithinBatchWindow(currentTime, batchWindowStartTime);
+    return processEngineConfiguration.getBatchWindowManager().getNextBatchWindow(currentTime, processEngineConfiguration).getStart();
   }
 
   private HistoryCleanupJobHandlerConfiguration getConfiguration(JobEntity jobEntity) {

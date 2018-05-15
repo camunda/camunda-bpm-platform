@@ -15,11 +15,13 @@ package org.camunda.bpm.engine.rest.history;
 import javax.ws.rs.core.Response.Status;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.DefaultBatchWindowManager;
 import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupHelper;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.mapper.JacksonConfigurator;
+import org.camunda.bpm.engine.rest.util.DateTimeUtils;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
 import org.camunda.bpm.engine.runtime.Job;
 import org.junit.Before;
@@ -151,6 +153,7 @@ public class HistoryCleanupRestServiceInteractionTest extends AbstractRestServic
     when(processEngine.getProcessEngineConfiguration()).thenReturn(processEngineConfigurationImplMock);
     when(processEngineConfigurationImplMock.getHistoryCleanupBatchWindowStartTimeAsDate()).thenReturn(startDate);
     when(processEngineConfigurationImplMock.getHistoryCleanupBatchWindowEndTimeAsDate()).thenReturn(endDate);
+    when(processEngineConfigurationImplMock.getBatchWindowManager()).thenReturn(new DefaultBatchWindowManager());
 
     SimpleDateFormat sdf = new SimpleDateFormat(JacksonConfigurator.dateFormatString);
     Date now = sdf.parse("2017-09-01T22:00:00.000+0200");
@@ -159,10 +162,10 @@ public class HistoryCleanupRestServiceInteractionTest extends AbstractRestServic
     Calendar today = Calendar.getInstance();
     today.setTime(now);
     Calendar tomorrow = Calendar.getInstance();
-    tomorrow.setTime(HistoryCleanupHelper.addDays(now, 1));
+    tomorrow.setTime(DateTimeUtils.addDays(now, 1));
 
-    Date dateToday = HistoryCleanupHelper.updateTime(today.getTime(), startDate);
-    Date dateTomorrow = HistoryCleanupHelper.updateTime(tomorrow.getTime(), endDate);
+    Date dateToday = DateTimeUtils.updateTime(today.getTime(), startDate);
+    Date dateTomorrow = DateTimeUtils.updateTime(tomorrow.getTime(), endDate);
 
     given()
       .contentType(ContentType.JSON)
@@ -193,8 +196,8 @@ public class HistoryCleanupRestServiceInteractionTest extends AbstractRestServic
     Calendar today = Calendar.getInstance();
     today.setTime(now);
 
-    Date dateToday = HistoryCleanupHelper.updateTime(today.getTime(), startDate);
-    Date dateTomorrow = HistoryCleanupHelper.updateTime(today.getTime(), endDate);
+    Date dateToday = DateTimeUtils.updateTime(today.getTime(), startDate);
+    Date dateTomorrow = DateTimeUtils.updateTime(today.getTime(), endDate);
 
     given()
       .contentType(ContentType.JSON)

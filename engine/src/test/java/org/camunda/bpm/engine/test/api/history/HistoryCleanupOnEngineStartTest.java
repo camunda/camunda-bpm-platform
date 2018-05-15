@@ -14,14 +14,13 @@
 package org.camunda.bpm.engine.test.api.history;
 
 import java.text.ParseException;
-import java.util.Date;
 import java.util.List;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupHelper;
+import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.BatchWindow;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.Job;
@@ -92,13 +91,10 @@ public class HistoryCleanupOnEngineStartTest {
   public void testHistoryCleanupJob() throws ParseException {
     final List<Job> historyCleanupJobs = historyService.findHistoryCleanupJobs();
     assertFalse(historyCleanupJobs.isEmpty());
-    Date historyCleanupBatchWindowStartTime = ((ProcessEngineConfigurationImpl) engineRule.getProcessEngine().getProcessEngineConfiguration())
-        .getHistoryCleanupBatchWindowStartTimeAsDate();
-    Date historyCleanupBatchWindowEndTime = ((ProcessEngineConfigurationImpl) engineRule.getProcessEngine().getProcessEngineConfiguration())
-        .getHistoryCleanupBatchWindowEndTimeAsDate();
+    final ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) engineRule.getProcessEngine()
+      .getProcessEngineConfiguration();
     for (Job historyCleanupJob : historyCleanupJobs) {
-      assertEquals(HistoryCleanupHelper.getCurrentOrNextBatchWindowStartTime(ClockUtil.getCurrentTime(), historyCleanupBatchWindowStartTime,
-        HistoryCleanupHelper.addDays(historyCleanupBatchWindowEndTime, 1)), historyCleanupJob.getDuedate());
+      assertEquals(processEngineConfiguration.getBatchWindowManager().getCurrentOrNextBatchWindow(ClockUtil.getCurrentTime(), processEngineConfiguration).getStart(), historyCleanupJob.getDuedate());
     }
   }
 
