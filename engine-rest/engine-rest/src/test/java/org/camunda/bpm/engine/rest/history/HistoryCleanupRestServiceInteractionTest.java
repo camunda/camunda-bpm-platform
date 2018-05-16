@@ -151,8 +151,8 @@ public class HistoryCleanupRestServiceInteractionTest extends AbstractRestServic
     Date startDate = HistoryCleanupHelper.parseTimeConfiguration("23:59+0200");
     Date endDate = HistoryCleanupHelper.parseTimeConfiguration("00:00+0200");
     when(processEngine.getProcessEngineConfiguration()).thenReturn(processEngineConfigurationImplMock);
-    when(processEngineConfigurationImplMock.getHistoryCleanupBatchWindowStartTimeAsDate()).thenReturn(startDate);
-    when(processEngineConfigurationImplMock.getHistoryCleanupBatchWindowEndTimeAsDate()).thenReturn(endDate);
+    when(processEngineConfigurationImplMock.getHistoryCleanupBatchWindowStartTime()).thenReturn("23:59+0200");
+    when(processEngineConfigurationImplMock.getHistoryCleanupBatchWindowEndTime()).thenReturn("00:00+0200");
     when(processEngineConfigurationImplMock.getBatchWindowManager()).thenReturn(new DefaultBatchWindowManager());
 
     SimpleDateFormat sdf = new SimpleDateFormat(JacksonConfigurator.dateFormatString);
@@ -176,8 +176,6 @@ public class HistoryCleanupRestServiceInteractionTest extends AbstractRestServic
     .when()
       .get(CONFIGURATION_URL);
 
-    verify(processEngineConfigurationImplMock).getHistoryCleanupBatchWindowStartTimeAsDate();
-    verify(processEngineConfigurationImplMock).getHistoryCleanupBatchWindowEndTimeAsDate();
   }
 
   @Test
@@ -186,8 +184,9 @@ public class HistoryCleanupRestServiceInteractionTest extends AbstractRestServic
     Date startDate = HistoryCleanupHelper.parseTimeConfiguration("22:00+0200");
     Date endDate = HistoryCleanupHelper.parseTimeConfiguration("23:00+0200");
     when(processEngine.getProcessEngineConfiguration()).thenReturn(processEngineConfigurationImplMock);
-    when(processEngineConfigurationImplMock.getHistoryCleanupBatchWindowStartTimeAsDate()).thenReturn(startDate);
-    when(processEngineConfigurationImplMock.getHistoryCleanupBatchWindowEndTimeAsDate()).thenReturn(endDate);
+    when(processEngineConfigurationImplMock.getHistoryCleanupBatchWindowStartTime()).thenReturn("22:00+0200");
+    when(processEngineConfigurationImplMock.getHistoryCleanupBatchWindowEndTime()).thenReturn("23:00+0200");
+    when(processEngineConfigurationImplMock.getBatchWindowManager()).thenReturn(new DefaultBatchWindowManager());
 
     SimpleDateFormat sdf = new SimpleDateFormat(JacksonConfigurator.dateFormatString);
     Date now = sdf.parse("2017-09-01T22:00:00.000+0200");
@@ -208,16 +207,15 @@ public class HistoryCleanupRestServiceInteractionTest extends AbstractRestServic
     .when()
       .get(CONFIGURATION_URL);
 
-    verify(processEngineConfigurationImplMock).getHistoryCleanupBatchWindowStartTimeAsDate();
-    verify(processEngineConfigurationImplMock).getHistoryCleanupBatchWindowEndTimeAsDate();
   }
 
   @Test
   public void testHistoryConfigurationWhenBatchNotDefined() {
     ProcessEngineConfigurationImpl processEngineConfigurationImplMock = mock(ProcessEngineConfigurationImpl.class);
     when(processEngine.getProcessEngineConfiguration()).thenReturn(processEngineConfigurationImplMock);
-    when(processEngineConfigurationImplMock.getHistoryCleanupBatchWindowStartTimeAsDate()).thenReturn(null);
-    when(processEngineConfigurationImplMock.getHistoryCleanupBatchWindowEndTimeAsDate()).thenReturn(null);
+    when(processEngineConfigurationImplMock.getHistoryCleanupBatchWindowStartTime()).thenReturn(null);
+    when(processEngineConfigurationImplMock.getHistoryCleanupBatchWindowEndTime()).thenReturn(null);
+    when(processEngineConfigurationImplMock.getBatchWindowManager()).thenReturn(new DefaultBatchWindowManager());
 
     given()
       .contentType(ContentType.JSON)
@@ -228,8 +226,6 @@ public class HistoryCleanupRestServiceInteractionTest extends AbstractRestServic
     .when()
       .get(CONFIGURATION_URL);
 
-    verify(processEngineConfigurationImplMock).getHistoryCleanupBatchWindowStartTimeAsDate();
-    verify(processEngineConfigurationImplMock).getHistoryCleanupBatchWindowEndTimeAsDate();
   }
 
 }
