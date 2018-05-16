@@ -24,7 +24,6 @@ import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.form.handler.DefaultTaskFormHandler;
-import org.camunda.bpm.engine.impl.form.handler.TaskFormHandler;
 import org.camunda.bpm.engine.impl.scripting.ExecutableScript;
 import org.camunda.bpm.engine.impl.task.TaskDecorator;
 import org.camunda.bpm.engine.impl.task.TaskDefinition;
@@ -32,6 +31,7 @@ import org.camunda.bpm.engine.impl.task.listener.ClassDelegateTaskListener;
 import org.camunda.bpm.engine.impl.task.listener.DelegateExpressionTaskListener;
 import org.camunda.bpm.engine.impl.task.listener.ExpressionTaskListener;
 import org.camunda.bpm.engine.impl.task.listener.ScriptTaskListener;
+import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.model.cmmn.instance.CmmnElement;
 import org.camunda.bpm.model.cmmn.instance.HumanTask;
 import org.camunda.bpm.model.cmmn.instance.Role;
@@ -86,9 +86,13 @@ public class HumanTaskItemHandler extends TaskItemHandler {
   }
 
   protected TaskDefinition createTaskDefinition(CmmnElement element, CmmnHandlerContext context) {
+    Deployment deployment = context.getDeployment();
+    String deploymentId = deployment.getId();
+
     // at the moment a default task form handler is only supported,
     // custom task form handler are not supported.
-    TaskFormHandler taskFormHandler = new DefaultTaskFormHandler();
+    DefaultTaskFormHandler taskFormHandler = new DefaultTaskFormHandler();
+    taskFormHandler.setDeploymentId(deploymentId);
 
     // create new taskDefinition
     TaskDefinition taskDefinition = new TaskDefinition(taskFormHandler);
