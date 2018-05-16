@@ -73,6 +73,7 @@ import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.commons.utils.IoUtil;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -1194,6 +1195,25 @@ public class FormServiceTest {
   public void testGetDeployedTaskForm() {
     // given
     runtimeService.startProcessInstanceByKey("FormsProcess");
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+
+    // when
+    InputStream deployedTaskForm = formService.getDeployedTaskForm(taskId);
+
+    // then
+    assertNotNull(deployedTaskForm);
+    String fileAsString = IoUtil.fileAsString("org/camunda/bpm/engine/test/api/form/task.form");
+    String deployedStartFormAsString = IoUtil.inputStreamAsString(deployedTaskForm);
+    assertEquals(deployedStartFormAsString, fileAsString);
+  }
+
+  @Ignore("CAM-9081")
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/form/DeployedFormsCase.cmmn11.xml",
+    "org/camunda/bpm/engine/test/api/form/task.form" })
+  @Test
+  public void testGetDeployedTaskForm_Case() {
+    // given
+    caseService.createCaseInstanceByKey("Case_1");
     String taskId = taskService.createTaskQuery().singleResult().getId();
 
     // when
