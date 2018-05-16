@@ -79,18 +79,18 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
 
       deleteAuthorizations(Resources.USER, userId);
 
-//      Context.getCommandContext().runWithoutAuthorization(new Callable<Void>() {
-//        @Override
-//        public Void call() throws Exception {
-//          final List<Tenant> tenants = createTenantQuery().userMember(userId).list();
-//          if (tenants != null && !tenants.isEmpty()) {
-//            for (Tenant tenant : tenants) {
-//              deleteAuthorizationsForUser(Resources.TENANT, tenant.getId(), userId);
-//            }
-//          }
-//          return null;
-//        }
-//      });
+      Context.getCommandContext().runWithoutAuthorization(new Callable<Void>() {
+        @Override
+        public Void call() throws Exception {
+          final List<Tenant> tenants = createTenantQuery().userMember(userId).list();
+          if (tenants != null && !tenants.isEmpty()) {
+            for (Tenant tenant : tenants) {
+              deleteAuthorizationsForUser(Resources.TENANT, tenant.getId(), userId);
+            }
+          }
+          return null;
+        }
+      });
 
       getDbEntityManager().delete(user);
     }
