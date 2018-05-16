@@ -1,49 +1,37 @@
   'use strict';
 
+  var angular = require('camunda-commons-ui/vendor/angular');
+
   module.exports = [ 'ViewsProvider', function(ViewsProvider) {
 
     ViewsProvider.registerDefaultView('cockpit.decisionInstance.table', {
       id: 'realInput',
       initialize: function(data) {
-        var viewer = data.tableControl.getViewer().getActiveViewer();
+        var realInput, dataEl;
+        var inputHeaders = angular.element('th[data-col-id]');
 
-        var elementRegistry = viewer.get('elementRegistry');
+        inputHeaders && inputHeaders.each(function(idx, inputHeader) {
+          dataEl = data.decisionInstance.inputs.filter(function(inputObject) {
+            return inputObject.clauseId === inputHeader.getAttribute('data-col-id');
+          })[0];
+          
+          if(dataEl) {
+            realInput = document.createElement('span');
+            if (dataEl.type !== 'Object' &&
+            dataEl.type !== 'Bytes' &&
+            dataEl.type !== 'File') {
 
-        var clauseRow = elementRegistry.filter(function(element) {
-          return element.isClauseRow;
-        })[0];
+              realInput.className = 'dmn-input';
+              realInput.textContent = ' = ' + dataEl.value;
 
-        if (clauseRow && clauseRow.id) {
-          viewer.get('eventBus').on('cell.render', function(event) {
-
-            var inputIdx = data.decisionInstance.inputs.map(function(inputObject) {
-              return inputObject.clauseId;
-            }).indexOf(event.data.column.id);
-
-            if (event.data.row === clauseRow &&
-              inputIdx !== -1) {
-
-              var input = data.decisionInstance.inputs[inputIdx];
-
-              var realInput = document.createElement('span');
-              if (input.type !== 'Object' &&
-                input.type !== 'Bytes' &&
-                input.type !== 'File') {
-
-                realInput.className = 'dmn-input';
-                realInput.textContent = ' = ' + input.value;
-
-              } else {
-                realInput.className = 'dmn-input-object';
-                realInput.setAttribute('title', 'Variable value of type ' + input.type + ' is not shown');
-                realInput.textContent = ' = [' + input.type + ']';
-              }
-              event.gfx.firstChild.appendChild(realInput);
+            } else {
+              realInput.className = 'dmn-input-object';
+              realInput.setAttribute('title', 'Variable value of type ' + dataEl.type + ' is not shown');
+              realInput.textContent = ' = [' + dataEl.type + ']';
             }
-          });
-
-          viewer.get('graphicsFactory').update('row', clauseRow, elementRegistry.getGraphics(clauseRow.id));
-        }
+            inputHeader.firstChild.appendChild(realInput);
+          }
+        });
       }
     });
   }];

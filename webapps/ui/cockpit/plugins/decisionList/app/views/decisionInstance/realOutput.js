@@ -1,45 +1,31 @@
   'use strict';
 
+  var angular = require('camunda-commons-ui/vendor/angular');  
+
   module.exports = [ 'ViewsProvider', function(ViewsProvider) {
 
     ViewsProvider.registerDefaultView('cockpit.decisionInstance.table', {
       id: 'realOutput',
       initialize: function(data) {
-        var viewer = data.tableControl.getViewer().getActiveViewer();
+        var outputCell, selector, realOutput;
 
-        viewer.get('eventBus').on('cell.render', function(event) {
+        data.decisionInstance.outputs.map(function(output) {
+          selector = '.output-cell[data-col-id='+output.clauseId+'][data-row-id='+output.ruleId+']';
+          outputCell = angular.element(selector)[0];
+          realOutput = document.createElement('span');
+          if(output.type !== 'Object' &&
+          output.type !== 'Bytes' &&
+          output.type !== 'File') {
 
-          var row = event.data.row;
-          var ruleIndex = data.decisionInstance.outputs.map(function(output) {
-            return output.ruleId;
-          }).indexOf(row.id);
+            realOutput.className = 'dmn-output';
+            realOutput.textContent = ' = ' + output.value;
 
-          var column = event.data.column;
-          var columnIndex = data.decisionInstance.outputs.map(function(output) {
-            return output.clauseId;
-          }).indexOf(column.id);
-
-          if(ruleIndex !== -1 && columnIndex !== -1) {
-
-            var output = data.decisionInstance.outputs.filter(function(output) {
-              return output.ruleId === row.id && output.clauseId === column.id;
-            })[0];
-
-            var realOutput = document.createElement('span');
-            if(output.type !== 'Object' &&
-               output.type !== 'Bytes' &&
-               output.type !== 'File') {
-
-              realOutput.className = 'dmn-output';
-              realOutput.textContent = ' = ' + output.value;
-
-            } else {
-              realOutput.className = 'dmn-output-object';
-              realOutput.setAttribute('title', 'Variable value of type ' + output.type + ' is not shown');
-              realOutput.textContent = ' = [' + output.type + ']';
-            }
-            event.gfx.lastChild.appendChild(realOutput);
+          } else {
+            realOutput.className = 'dmn-output-object';
+            realOutput.setAttribute('title', 'Variable value of type ' + output.type + ' is not shown');
+            realOutput.textContent = ' = [' + output.type + ']';
           }
+          outputCell.appendChild(realOutput);
         });
       }
     });
