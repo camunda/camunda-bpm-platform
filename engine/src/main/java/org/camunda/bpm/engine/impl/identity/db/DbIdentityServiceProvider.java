@@ -16,7 +16,9 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.AuthenticationException;
 import org.camunda.bpm.engine.authorization.Permissions;
@@ -68,7 +70,7 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
     return userEntity;
   }
 
-  public void deleteUser(String userId) {
+  public void deleteUser(final String userId) {
     checkAuthorization(Permissions.DELETE, Resources.USER, userId);
     UserEntity user = findUserById(userId);
     if(user != null) {
@@ -76,6 +78,20 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
       deleteTenantMembershipsOfUser(userId);
 
       deleteAuthorizations(Resources.USER, userId);
+
+//      Context.getCommandContext().runWithoutAuthorization(new Callable<Void>() {
+//        @Override
+//        public Void call() throws Exception {
+//          final List<Tenant> tenants = createTenantQuery().userMember(userId).list();
+//          if (tenants != null && !tenants.isEmpty()) {
+//            for (Tenant tenant : tenants) {
+//              deleteAuthorizationsForUser(Resources.TENANT, tenant.getId(), userId);
+//            }
+//          }
+//          return null;
+//        }
+//      });
+
       getDbEntityManager().delete(user);
     }
   }
@@ -166,7 +182,7 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
     return groupEntity;
   }
 
-  public void deleteGroup(String groupId) {
+  public void deleteGroup(final String groupId) {
     checkAuthorization(Permissions.DELETE, Resources.GROUP, groupId);
     GroupEntity group = findGroupById(groupId);
     if(group != null) {
@@ -174,6 +190,19 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
       deleteTenantMembershipsOfGroup(groupId);
 
       deleteAuthorizations(Resources.GROUP, groupId);
+
+      Context.getCommandContext().runWithoutAuthorization(new Callable<Void>() {
+        @Override
+        public Void call() throws Exception {
+          final List<Tenant> tenants = createTenantQuery().groupMember(groupId).list();
+          if (tenants != null && !tenants.isEmpty()) {
+            for (Tenant tenant : tenants) {
+              deleteAuthorizationsForGroup(Resources.TENANT, tenant.getId(), groupId);
+            }
+          }
+          return null;
+        }
+      });
       getDbEntityManager().delete(group);
     }
   }
