@@ -447,7 +447,7 @@ public class MultiTenancyExecutionPropagationTest extends PluggableProcessEngine
     assertThat(variableInstance.getTenantId(), is(TENANT_ID));
   }
 
-  public void FAILING_testPropagateTenantIdToTaskOnCreateCaseInstance() {
+  public void testPropagateTenantIdToTaskOnCreateCaseInstance() {
     deploymentForTenant(TENANT_ID, CMMN_FILE);
 
     CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().singleResult();
