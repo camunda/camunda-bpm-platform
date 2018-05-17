@@ -44,7 +44,7 @@ public class JacksonJsonDataFormat implements DataFormat {
   public JacksonJsonDataFormat(String name, ObjectMapper objectMapper) {
     this.name = name;
     this.objectMapper = objectMapper;
-    this.typeDetectors = new ArrayList<TypeDetector>();
+    this.typeDetectors = new ArrayList<>();
     this.typeDetectors.add(new ListJacksonJsonTypeDetector());
     this.typeDetectors.add(new DefaultJsonJacksonTypeDetector());
   }
@@ -62,12 +62,7 @@ public class JacksonJsonDataFormat implements DataFormat {
   }
 
   public boolean canMap(Object parameter) {
-    if(parameter != null) {
-      return objectMapper.canSerialize(parameter.getClass());
-    }
-    else {
-      return false;
-    }
+    return parameter != null;
   }
 
   public String writeValue(Object value) {
