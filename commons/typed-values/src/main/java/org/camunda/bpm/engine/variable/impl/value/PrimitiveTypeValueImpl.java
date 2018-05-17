@@ -80,7 +80,7 @@ public class PrimitiveTypeValueImpl<T> extends AbstractTypedValue<T> implements 
   }
 
 
-  // value type implemenations ////////////////////////////////////
+  // value type implementations ////////////////////////////////////
 
   public static class BooleanValueImpl extends PrimitiveTypeValueImpl<Boolean> implements BooleanValue {
 

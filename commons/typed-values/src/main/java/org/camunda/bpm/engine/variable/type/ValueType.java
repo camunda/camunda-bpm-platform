@@ -38,31 +38,31 @@ import org.camunda.bpm.engine.variable.value.TypedValue;
  */
 public interface ValueType extends Serializable {
 
-  public static final PrimitiveValueType NULL = new NullTypeImpl();
+  PrimitiveValueType NULL = new NullTypeImpl();
 
-  public static final PrimitiveValueType BOOLEAN = new BooleanTypeImpl();
+  PrimitiveValueType BOOLEAN = new BooleanTypeImpl();
 
-  public static final PrimitiveValueType SHORT = new ShortTypeImpl();
+  PrimitiveValueType SHORT = new ShortTypeImpl();
 
-  public static final PrimitiveValueType LONG = new LongTypeImpl();
+  PrimitiveValueType LONG = new LongTypeImpl();
 
-  public static final PrimitiveValueType DOUBLE = new DoubleTypeImpl();
+  PrimitiveValueType DOUBLE = new DoubleTypeImpl();
 
-  public static final PrimitiveValueType STRING = new StringTypeImpl();
+  PrimitiveValueType STRING = new StringTypeImpl();
 
-  public static final PrimitiveValueType INTEGER = new IntegerTypeImpl();
+  PrimitiveValueType INTEGER = new IntegerTypeImpl();
 
-  public static final PrimitiveValueType DATE = new DateTypeImpl();
+  PrimitiveValueType DATE = new DateTypeImpl();
 
-  public static final PrimitiveValueType BYTES = new BytesTypeImpl();
+  PrimitiveValueType BYTES = new BytesTypeImpl();
 
-  public static final PrimitiveValueType NUMBER = new NumberTypeImpl();
+  PrimitiveValueType NUMBER = new NumberTypeImpl();
 
-  public static final SerializableValueType OBJECT = new ObjectTypeImpl();
+  SerializableValueType OBJECT = new ObjectTypeImpl();
 
-  public static final FileValueType FILE = new FileValueTypeImpl();
+  FileValueType FILE = new FileValueTypeImpl();
 
-  public static final String VALUE_INFO_TRANSIENT = "transient";
+  String VALUE_INFO_TRANSIENT = "transient";
   /**
    * Returns the name of the variable type
    */

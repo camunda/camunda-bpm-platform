@@ -88,7 +88,7 @@ public class Variables {
    *
    * @author Daniel Meyer
    */
-  public static enum SerializationDataFormats implements SerializationDataFormat {
+  public enum SerializationDataFormats implements SerializationDataFormat {
 
     /**
      * <p>The Java Serialization Data format. If this data format is used for serializing an object,
@@ -120,7 +120,7 @@ public class Variables {
 
     private final String name;
 
-    private SerializationDataFormats(String name) {
+    SerializationDataFormats(String name) {
       this.name = name;
     }
 

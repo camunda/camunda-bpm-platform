@@ -25,12 +25,12 @@ public interface SerializableValueType extends ValueType {
   /**
    * Identifies the object's java type name.
    */
-  static final String VALUE_INFO_OBJECT_TYPE_NAME = "objectTypeName";
+  String VALUE_INFO_OBJECT_TYPE_NAME = "objectTypeName";
 
   /**
    * Identifies the format in which the object is serialized.
    */
-  static final String VALUE_INFO_SERIALIZATION_DATA_FORMAT = "serializationDataFormat";
+  String VALUE_INFO_SERIALIZATION_DATA_FORMAT = "serializationDataFormat";
 
 
   /**

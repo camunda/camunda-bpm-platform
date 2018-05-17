@@ -31,11 +31,11 @@ public class UntypedValueImpl implements TypedValue {
   protected boolean isTransient;
 
   public UntypedValueImpl(Object object) {
-    value = object;
+    this(object, false);
   }
 
   public UntypedValueImpl(Object object, boolean isTransient) {
-    value = object;
+    this.value = object;
     this.isTransient = isTransient;
   }
 
