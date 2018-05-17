@@ -18,17 +18,20 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.HistoricDetailQuery;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
+import org.camunda.bpm.engine.rest.dto.SortingDto;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
 import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
 import org.camunda.bpm.engine.rest.dto.converter.StringArrayConverter;
 import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 
 /**
  * @author Roman Smirnov
@@ -171,6 +174,26 @@ public class HistoricDetailQueryDto extends AbstractQueryDto<HistoricDetailQuery
   @Override
   protected HistoricDetailQuery createNewQuery(ProcessEngine engine) {
     return engine.getHistoryService().createHistoricDetailQuery();
+  }
+
+  @Override
+  protected boolean sortOptionsValid() {
+    if (sortings != null) {
+      for (SortingDto sorting : sortings) {
+        String sortingOrder = sorting.getSortOrder();
+        String sortingBy = sorting.getSortBy();
+
+        if (!VALID_SORT_BY_VALUES.contains(sortingBy)) {
+          throw new InvalidRequestException(Response.Status.BAD_REQUEST, "sortBy parameter has invalid value: " + sortingBy);
+        }
+
+        if (sortingBy == null || sortingOrder == null) {
+          return false;
+        }
+      }
+    }
+
+    return super.sortOptionsValid();
   }
 
   @Override

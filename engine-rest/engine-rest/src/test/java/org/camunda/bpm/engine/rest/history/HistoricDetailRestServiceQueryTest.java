@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.helper.MockHistoricVariableUpdateBuilder;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.helper.VariableTypeHelper;
+import org.camunda.bpm.engine.rest.util.OrderingBuilder;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.SerializableValueType;
@@ -36,10 +37,14 @@ import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.jayway.restassured.RestAssured.expect;
 import static com.jayway.restassured.RestAssured.given;
@@ -51,13 +56,14 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 /**
  * @author Roman Smirnov
- *
+ * @author Nikola Koevski
  */
 public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest {
 
@@ -112,6 +118,7 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
 
   @Test
   public void testNoParametersQuery() {
+    // GET
     expect()
       .statusCode(Status.OK.getStatusCode())
     .when()
@@ -120,10 +127,27 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
     verify(mockedQuery).list();
     verify(mockedQuery).disableBinaryFetching();
     verifyNoMoreInteractions(mockedQuery);
+
+    reset(mockedQuery);
+
+    // POST
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .body(Collections.emptyMap())
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(HISTORIC_DETAIL_RESOURCE_URL);
+
+    verify(mockedQuery).list();
+    verify(mockedQuery).disableBinaryFetching();
+    verifyNoMoreInteractions(mockedQuery);
   }
 
   @Test
   public void testNoParametersQueryDisableObjectDeserialization() {
+    // GET
     given()
       .queryParam("deserializeValues", false)
     .expect()
@@ -135,12 +159,86 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
     verify(mockedQuery).disableBinaryFetching();
     verify(mockedQuery).disableCustomObjectDeserialization();
     verifyNoMoreInteractions(mockedQuery);
+
+    reset(mockedQuery);
+
+    // POST
+    given()
+      .queryParam("deserializeValues", false)
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .body(Collections.emptyMap())
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(HISTORIC_DETAIL_RESOURCE_URL);
+
+    verify(mockedQuery).list();
+    verify(mockedQuery).disableBinaryFetching();
+    verify(mockedQuery).disableCustomObjectDeserialization();
+    verifyNoMoreInteractions(mockedQuery);
+  }
+
+  @Test
+  public void testSecondarySortingAsPost() {
+    InOrder inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySortingAsPost(
+      OrderingBuilder.create()
+        .orderBy("processInstanceId").desc()
+        .orderBy("variableName").asc()
+        .orderBy("variableType").desc()
+        .orderBy("variableRevision").asc()
+        .orderBy("formPropertyId").desc()
+        .orderBy("time").asc()
+        .orderBy("occurrence").desc()
+        .orderBy("tenantId").asc()
+        .getJson(),
+      Status.OK);
+
+    inOrder.verify(mockedQuery).orderByProcessInstanceId();
+    inOrder.verify(mockedQuery).desc();
+    inOrder.verify(mockedQuery).orderByVariableName();
+    inOrder.verify(mockedQuery).asc();
+    inOrder.verify(mockedQuery).orderByVariableType();
+    inOrder.verify(mockedQuery).desc();
+    inOrder.verify(mockedQuery).orderByVariableRevision();
+    inOrder.verify(mockedQuery).asc();
+    inOrder.verify(mockedQuery).orderByFormPropertyId();
+    inOrder.verify(mockedQuery).desc();
+    inOrder.verify(mockedQuery).orderByTime();
+    inOrder.verify(mockedQuery).asc();
+    inOrder.verify(mockedQuery).orderPartiallyByOccurrence();
+    inOrder.verify(mockedQuery).desc();
+    inOrder.verify(mockedQuery).orderByTenantId();
+    inOrder.verify(mockedQuery).asc();
   }
 
   @Test
   public void testInvalidSortingOptions() {
     executeAndVerifySorting("anInvalidSortByOption", "asc", Status.BAD_REQUEST);
     executeAndVerifySorting("processInstanceId", "anInvalidSortOrderOption", Status.BAD_REQUEST);
+  }
+
+  @Test
+  public void testInvalidSecondarySortingOptions() {
+    executeAndVerifySortingAsPost(
+      OrderingBuilder.create()
+        .orderBy("processInstanceId").desc()
+        .orderBy("invalidParameter").asc()
+        .getJson(),
+      Status.BAD_REQUEST
+    );
+  }
+
+  @Test
+  public void testMissingSecondarySortingOptions() {
+    executeAndVerifySortingAsPost(
+      OrderingBuilder.create()
+        .orderBy("processInstanceId").desc()
+        .orderBy("variableName")
+        .getJson(),
+      Status.BAD_REQUEST
+    );
   }
 
   protected void executeAndVerifySorting(String sortBy, String sortOrder, Status expectedStatus) {
@@ -152,6 +250,21 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
         .statusCode(expectedStatus.getStatusCode())
       .when()
         .get(HISTORIC_DETAIL_RESOURCE_URL);
+  }
+
+  protected void executeAndVerifySortingAsPost(List<Map<String, Object>> sortingJson, Status expectedStatus) {
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("sorting", sortingJson);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .body(json)
+    .then()
+      .expect()
+        .statusCode(expectedStatus.getStatusCode())
+    .when()
+      .post(HISTORIC_DETAIL_RESOURCE_URL);
   }
 
   @Test
@@ -256,6 +369,7 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
     int firstResult = 0;
     int maxResults = 10;
 
+    // GET
     given()
       .queryParam("firstResult", firstResult)
       .queryParam("maxResults", maxResults)
@@ -266,12 +380,30 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
         .get(HISTORIC_DETAIL_RESOURCE_URL);
 
     verify(mockedQuery).listPage(firstResult, maxResults);
+
+    reset(mockedQuery);
+
+    // POST
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .queryParam("firstResult", firstResult)
+      .queryParam("maxResults", maxResults)
+      .body(Collections.emptyMap())
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(HISTORIC_DETAIL_RESOURCE_URL);
+
+    verify(mockedQuery).listPage(firstResult, maxResults);
   }
 
   @Test
   public void testMissingFirstResultParameter() {
     int maxResults = 10;
 
+    // GET
     given()
       .queryParam("maxResults", maxResults)
     .then()
@@ -281,19 +413,52 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
         .get(HISTORIC_DETAIL_RESOURCE_URL);
 
     verify(mockedQuery).listPage(0, maxResults);
+
+    reset(mockedQuery);
+
+    // POST
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .queryParam("maxResults", maxResults)
+      .body(Collections.emptyMap())
+    .then()
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(HISTORIC_DETAIL_RESOURCE_URL);
+
+    verify(mockedQuery).listPage(0, maxResults);
   }
 
   @Test
   public void testMissingMaxResultsParameter() {
     int firstResult = 10;
 
+    // GET
     given()
       .queryParam("firstResult", firstResult)
     .then()
       .expect()
         .statusCode(Status.OK.getStatusCode())
-      .when()
-        .get(HISTORIC_DETAIL_RESOURCE_URL);
+    .when()
+      .get(HISTORIC_DETAIL_RESOURCE_URL);
+
+    verify(mockedQuery).listPage(firstResult, Integer.MAX_VALUE);
+
+    reset(mockedQuery);
+
+    // POST
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .queryParam("firstResult", firstResult)
+      .body(Collections.emptyMap())
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(HISTORIC_DETAIL_RESOURCE_URL);
 
     verify(mockedQuery).listPage(firstResult, Integer.MAX_VALUE);
   }
@@ -311,6 +476,7 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
 
   @Test
   public void testSimpleHistoricActivityQuery() {
+    // GET
     Response response = given()
       .then()
         .expect()
@@ -319,8 +485,7 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
           .body("[0].id", equalTo(historicUpdateBuilder.getId()))
           .body("[0].variableName", equalTo(historicUpdateBuilder.getName()))
           .body("[0].variableInstanceId", equalTo(historicUpdateBuilder.getVariableInstanceId()))
-          .body("[0].variableType", equalTo(VariableTypeHelper.toExpectedValueTypeName(
-              historicUpdateBuilder.getTypedValue().getType())))
+          .body("[0].variableType", equalTo(VariableTypeHelper.toExpectedValueTypeName(historicUpdateBuilder.getTypedValue().getType())))
           .body("[0].value", equalTo(historicUpdateBuilder.getTypedValue().getValue()))
           .body("[0].processDefinitionKey", equalTo(historicUpdateBuilder.getProcessDefinitionKey()))
           .body("[0].processDefinitionId", equalTo(historicUpdateBuilder.getProcessDefinitionId()))
@@ -338,12 +503,58 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
           .body("[0].caseExecutionId", equalTo(historicUpdateBuilder.getCaseExecutionId()))
           .body("[0].tenantId", equalTo(historicUpdateBuilder.getTenantId()))
           .body("[0].userOperationId", equalTo(historicUpdateBuilder.getUserOperationId()))
-        .when()
-          .get(HISTORIC_DETAIL_RESOURCE_URL);
+      .when()
+        .get(HISTORIC_DETAIL_RESOURCE_URL);
 
     InOrder inOrder = inOrder(mockedQuery);
     inOrder.verify(mockedQuery).list();
 
+    verifySimpleHistoricActivityQueryResponse(response);
+  }
+
+  @Test
+  public void testSimpleHistoricActivityQueryPost() {
+    // POST
+    Response response = given()
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .header("accept", MediaType.APPLICATION_JSON)
+        .body(Collections.emptyMap())
+      .then()
+        .expect()
+          .statusCode(Status.OK.getStatusCode())
+        .and()
+          .body("[0].id", equalTo(historicUpdateBuilder.getId()))
+          .body("[0].variableName", equalTo(historicUpdateBuilder.getName()))
+          .body("[0].variableInstanceId", equalTo(historicUpdateBuilder.getVariableInstanceId()))
+          .body("[0].variableType", equalTo(VariableTypeHelper.toExpectedValueTypeName(
+            historicUpdateBuilder.getTypedValue().getType())))
+          .body("[0].value", equalTo(historicUpdateBuilder.getTypedValue().getValue()))
+          .body("[0].processDefinitionKey", equalTo(historicUpdateBuilder.getProcessDefinitionKey()))
+          .body("[0].processDefinitionId", equalTo(historicUpdateBuilder.getProcessDefinitionId()))
+          .body("[0].processInstanceId", equalTo(historicUpdateBuilder.getProcessInstanceId()))
+          .body("[0].errorMessage", equalTo(historicUpdateBuilder.getErrorMessage()))
+          .body("[0].activityInstanceId", equalTo(historicUpdateBuilder.getActivityInstanceId()))
+          .body("[0].revision", equalTo(historicUpdateBuilder.getRevision()))
+          .body("[0].time", equalTo(historicUpdateBuilder.getTime()))
+          .body("[0].taskId", equalTo(historicUpdateBuilder.getTaskId()))
+          .body("[0].executionId", equalTo(historicUpdateBuilder.getExecutionId()))
+          .body("[0].type", equalTo("variableUpdate"))
+          .body("[0].caseDefinitionKey", equalTo(historicUpdateBuilder.getCaseDefinitionKey()))
+          .body("[0].caseDefinitionId", equalTo(historicUpdateBuilder.getCaseDefinitionId()))
+          .body("[0].caseInstanceId", equalTo(historicUpdateBuilder.getCaseInstanceId()))
+          .body("[0].caseExecutionId", equalTo(historicUpdateBuilder.getCaseExecutionId()))
+          .body("[0].tenantId", equalTo(historicUpdateBuilder.getTenantId()))
+          .body("[0].userOperationId", equalTo(historicUpdateBuilder.getUserOperationId()))
+      .when()
+        .post(HISTORIC_DETAIL_RESOURCE_URL);
+
+    InOrder inOrder = inOrder(mockedQuery);
+    inOrder.verify(mockedQuery).list();
+
+    verifySimpleHistoricActivityQueryResponse(response);
+  }
+
+  private void verifySimpleHistoricActivityQueryResponse(Response response) {
     String content = response.asString();
     List<String> details = from(content).getList("");
     Assert.assertEquals("There should be two activity instance returned.", 2, details.size());
@@ -388,7 +599,6 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
     Assert.assertEquals(MockProvider.EXAMPLE_TENANT_ID, returnedTenantId2);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_FORM_FIELD_EXEC_ID, returnedExecutionId2);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_FORM_FIELD_OPERATION_ID, returnedOperationId2);
-
   }
 
   @Test
@@ -400,6 +610,7 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
     List<HistoricDetail> details = new ArrayList<HistoricDetail>();
     details.add(builder.build());
 
+    // GET
     mockedQuery = setUpMockedDetailsQuery(details);
 
     given()
@@ -412,6 +623,27 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
 
     // should not resolve custom objects but existing API requires it
 //  verify(mockedQuery).disableCustomObjectDeserialization();
+    verify(mockedQuery, never()).disableCustomObjectDeserialization();
+
+    // POST
+    mockedQuery = setUpMockedDetailsQuery(details);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .body(Collections.emptyMap())
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .and()
+        .body("[0].value", equalTo("a serialized value"))
+        .body("[0].variableType", equalTo(VariableTypeHelper.toExpectedValueTypeName(serializedValue.getType())))
+        .body("[0].errorMessage", nullValue())
+    .when()
+      .post(HISTORIC_DETAIL_RESOURCE_URL);
+
+    // should not resolve custom objects but existing API requires it
+    //  verify(mockedQuery).disableCustomObjectDeserialization();
     verify(mockedQuery, never()).disableCustomObjectDeserialization();
   }
 
@@ -427,10 +659,13 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
     List<HistoricDetail> details = new ArrayList<HistoricDetail>();
     details.add(builder.build());
 
+    // GET
     mockedQuery = setUpMockedDetailsQuery(details);
 
     given()
-        .then().expect().statusCode(Status.OK.getStatusCode())
+      .then()
+        .expect()
+          .statusCode(Status.OK.getStatusCode())
         .and()
           .body("[0].variableType", equalTo(VariableTypeHelper.toExpectedValueTypeName(ValueType.OBJECT)))
           .body("[0].errorMessage", nullValue())
@@ -439,16 +674,61 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
               equalTo("aRootType"))
           .body("[0].valueInfo." + SerializableValueType.VALUE_INFO_SERIALIZATION_DATA_FORMAT,
               equalTo("aDataFormat"))
-        .when().get(HISTORIC_DETAIL_RESOURCE_URL);
+      .when()
+        .get(HISTORIC_DETAIL_RESOURCE_URL);
+
+    // POST
+    mockedQuery = setUpMockedDetailsQuery(details);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .body(Collections.emptyMap())
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .and()
+        .body("[0].variableType", equalTo(VariableTypeHelper.toExpectedValueTypeName(ValueType.OBJECT)))
+        .body("[0].errorMessage", nullValue())
+        .body("[0].value", equalTo("aSerializedValue"))
+        .body("[0].valueInfo." + SerializableValueType.VALUE_INFO_OBJECT_TYPE_NAME,
+          equalTo("aRootType"))
+        .body("[0].valueInfo." + SerializableValueType.VALUE_INFO_SERIALIZATION_DATA_FORMAT,
+          equalTo("aDataFormat"))
+    .when()
+      .post(HISTORIC_DETAIL_RESOURCE_URL);
   }
 
   @Test
   public void testQueryByProcessInstanceId() {
     String processInstanceId = MockProvider.EXAMPLE_HISTORIC_VAR_UPDATE_PROC_INST_ID;
+
+    // GET
     given()
       .queryParam("processInstanceId", processInstanceId)
-      .then().expect().statusCode(Status.OK.getStatusCode())
-      .when().get(HISTORIC_DETAIL_RESOURCE_URL);
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(HISTORIC_DETAIL_RESOURCE_URL);
+
+    verify(mockedQuery).processInstanceId(processInstanceId);
+
+    reset(mockedQuery);
+
+    // POST
+    Map<String, String> jsonBody = new HashMap<String, String>();
+    jsonBody.put("processInstanceId", processInstanceId);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .body(jsonBody)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(HISTORIC_DETAIL_RESOURCE_URL);
 
     verify(mockedQuery).processInstanceId(processInstanceId);
   }
@@ -456,10 +736,33 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
   @Test
   public void testQueryByExecutionId() {
     String executionId = MockProvider.EXAMPLE_HISTORIC_VAR_UPDATE_EXEC_ID;
+
+    // GET
     given()
       .queryParam("executionId", executionId)
-      .then().expect().statusCode(Status.OK.getStatusCode())
-      .when().get(HISTORIC_DETAIL_RESOURCE_URL);
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(HISTORIC_DETAIL_RESOURCE_URL);
+
+    verify(mockedQuery).executionId(executionId);
+
+    reset(mockedQuery);
+
+    // POST
+    Map<String, String> jsonBody = new HashMap<String, String>();
+    jsonBody.put("executionId", executionId);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .body(jsonBody)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(HISTORIC_DETAIL_RESOURCE_URL);
 
     verify(mockedQuery).executionId(executionId);
   }
@@ -467,10 +770,33 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
   @Test
   public void testQueryByOperationId() {
     String operationId = MockProvider.EXAMPLE_HISTORIC_VAR_UPDATE_OPERATION_ID;
+
+    // GET
     given()
-        .queryParam("userOperationId", operationId)
-        .then().expect().statusCode(Status.OK.getStatusCode())
-        .when().get(HISTORIC_DETAIL_RESOURCE_URL);
+      .queryParam("userOperationId", operationId)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(HISTORIC_DETAIL_RESOURCE_URL);
+
+    verify(mockedQuery).userOperationId(operationId);
+
+    reset(mockedQuery);
+
+    // POST
+    Map<String, String> jsonBody = new HashMap<String, String>();
+    jsonBody.put("userOperationId", operationId);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .body(jsonBody)
+    .then()
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(HISTORIC_DETAIL_RESOURCE_URL);
 
     verify(mockedQuery).userOperationId(operationId);
   }
@@ -478,10 +804,33 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
   @Test
   public void testQueryByActivityInstanceId() {
     String activityInstanceId = MockProvider.EXAMPLE_HISTORIC_VAR_UPDATE_ACT_INST_ID;
+
+    // GET
     given()
       .queryParam("activityInstanceId", activityInstanceId)
-      .then().expect().statusCode(Status.OK.getStatusCode())
-      .when().get(HISTORIC_DETAIL_RESOURCE_URL);
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(HISTORIC_DETAIL_RESOURCE_URL);
+
+    verify(mockedQuery).activityInstanceId(activityInstanceId);
+
+    reset(mockedQuery);
+
+    // POST
+    Map<String, String> jsonBody = new HashMap<String, String>();
+    jsonBody.put("activityInstanceId", activityInstanceId);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .body(jsonBody)
+    .then()
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(HISTORIC_DETAIL_RESOURCE_URL);
 
     verify(mockedQuery).activityInstanceId(activityInstanceId);
   }
@@ -489,10 +838,33 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
   @Test
   public void testQueryByTaskId() {
     String taskId = MockProvider.EXAMPLE_HISTORIC_VAR_UPDATE_TASK_ID;
+
+    // GET
     given()
       .queryParam("taskId", taskId)
-      .then().expect().statusCode(Status.OK.getStatusCode())
-      .when().get(HISTORIC_DETAIL_RESOURCE_URL);
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(HISTORIC_DETAIL_RESOURCE_URL);
+
+    verify(mockedQuery).taskId(taskId);
+
+    reset(mockedQuery);
+
+    // POST
+    Map<String, String> jsonBody = new HashMap<String, String>();
+    jsonBody.put("taskId", taskId);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .body(jsonBody)
+    .then()
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(HISTORIC_DETAIL_RESOURCE_URL);
 
     verify(mockedQuery).taskId(taskId);
   }
@@ -500,10 +872,33 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
   @Test
   public void testQueryByVariableInstanceId() {
     String variableInstanceId = MockProvider.EXAMPLE_HISTORIC_VAR_UPDATE_ID;
+
+    // GET
     given()
       .queryParam("variableInstanceId", variableInstanceId)
-      .then().expect().statusCode(Status.OK.getStatusCode())
-      .when().get(HISTORIC_DETAIL_RESOURCE_URL);
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(HISTORIC_DETAIL_RESOURCE_URL);
+
+    verify(mockedQuery).variableInstanceId(variableInstanceId);
+
+    reset(mockedQuery);
+
+    // POST
+    Map<String, String> jsonBody = new HashMap<String, String>();
+    jsonBody.put("variableInstanceId", variableInstanceId);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .body(jsonBody)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(HISTORIC_DETAIL_RESOURCE_URL);
 
     verify(mockedQuery).variableInstanceId(variableInstanceId);
   }
@@ -513,46 +908,136 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
     String aVariableType = "string";
     String anotherVariableType = "integer";
 
+    // GET
     given()
       .queryParam("variableTypeIn", aVariableType + "," + anotherVariableType)
-      .then().expect().statusCode(Status.OK.getStatusCode())
-      .when().get(HISTORIC_DETAIL_RESOURCE_URL);
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(HISTORIC_DETAIL_RESOURCE_URL);
+
+    verify(mockedQuery).variableTypeIn(aVariableType, anotherVariableType);
+
+    reset(mockedQuery);
+
+    // POST
+    Map<String, Object> jsonBody = new HashMap<String, Object>();
+    String[] variableTypeIn = { aVariableType, anotherVariableType};
+    jsonBody.put("variableTypeIn", variableTypeIn);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .body(jsonBody)
+    .then()
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(HISTORIC_DETAIL_RESOURCE_URL);
 
     verify(mockedQuery).variableTypeIn(aVariableType, anotherVariableType);
   }
 
   @Test
   public void testQueryByFormFields() {
+    // GET
     given()
       .queryParam("formFields", "true")
-      .then().expect().statusCode(Status.OK.getStatusCode())
-      .when().get(HISTORIC_DETAIL_RESOURCE_URL);
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(HISTORIC_DETAIL_RESOURCE_URL);
+
+    verify(mockedQuery).formFields();
+
+    reset(mockedQuery);
+
+    // POST
+    Map<String, Object> jsonBody = new HashMap<String, Object>();
+    jsonBody.put("formFields", true);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .body(jsonBody)
+    .then()
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(HISTORIC_DETAIL_RESOURCE_URL);
 
     verify(mockedQuery).formFields();
   }
 
   @Test
   public void testQueryByVariableUpdates() {
+    // GET
     given()
       .queryParam("variableUpdates", "true")
-      .then().expect().statusCode(Status.OK.getStatusCode())
-      .when().get(HISTORIC_DETAIL_RESOURCE_URL);
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(HISTORIC_DETAIL_RESOURCE_URL);
+
+    verify(mockedQuery).variableUpdates();
+
+    reset(mockedQuery);
+
+    // POST
+    Map<String, Object> jsonBody = new HashMap<String, Object>();
+    jsonBody.put("variableUpdates", true);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .body(jsonBody)
+    .then()
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(HISTORIC_DETAIL_RESOURCE_URL);
 
     verify(mockedQuery).variableUpdates();
   }
 
   @Test
   public void testQueryByExcludeTaskDetails() {
+    // GET
     given()
       .queryParam("excludeTaskDetails", "true")
-      .then().expect().statusCode(Status.OK.getStatusCode())
-      .when().get(HISTORIC_DETAIL_RESOURCE_URL);
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(HISTORIC_DETAIL_RESOURCE_URL);
+
+    verify(mockedQuery).excludeTaskDetails();
+
+    reset(mockedQuery);
+
+    // POST
+    Map<String, Object> jsonBody = new HashMap<String, Object>();
+    jsonBody.put("excludeTaskDetails", true);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .body(jsonBody)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(HISTORIC_DETAIL_RESOURCE_URL);
 
     verify(mockedQuery).excludeTaskDetails();
   }
 
   @Test
   public void testQueryByCaseInstanceId() {
+    // GET
     given()
       .queryParam("caseInstanceId", MockProvider.EXAMPLE_CASE_INSTANCE_ID)
     .then().expect()
@@ -561,16 +1046,54 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
       .get(HISTORIC_DETAIL_RESOURCE_URL);
 
     verify(mockedQuery).caseInstanceId(MockProvider.EXAMPLE_CASE_INSTANCE_ID);
+
+    reset(mockedQuery);
+
+    // POST
+    Map<String, Object> jsonBody = new HashMap<String, Object>();
+    jsonBody.put("caseInstanceId", MockProvider.EXAMPLE_CASE_INSTANCE_ID);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .body(jsonBody)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(HISTORIC_DETAIL_RESOURCE_URL);
+
+    verify(mockedQuery).caseInstanceId(MockProvider.EXAMPLE_CASE_INSTANCE_ID);
   }
 
   @Test
   public void testQueryByCaseExecutionId() {
+    // GET
     given()
       .queryParam("caseExecutionId", MockProvider.EXAMPLE_CASE_EXECUTION_ID)
-    .then().expect()
-      .statusCode(Status.OK.getStatusCode())
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
     .when()
       .get(HISTORIC_DETAIL_RESOURCE_URL);
+
+    verify(mockedQuery).caseExecutionId(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
+
+    reset(mockedQuery);
+
+    // POST
+    Map<String, Object> jsonBody = new HashMap<String, Object>();
+    jsonBody.put("caseExecutionId", MockProvider.EXAMPLE_CASE_EXECUTION_ID);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .body(jsonBody)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(HISTORIC_DETAIL_RESOURCE_URL);
 
     verify(mockedQuery).caseExecutionId(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
   }
@@ -579,6 +1102,7 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
   public void testTenantIdListParameter() {
     mockedQuery = setUpMockedDetailsQuery(createMockHistoricDetailsTwoTenants());
 
+    // GET
     Response response = given()
       .queryParam("tenantIdIn", MockProvider.EXAMPLE_TENANT_ID_LIST)
       .queryParam("variableUpdates", "true")
@@ -593,6 +1117,36 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
     verify(mockedQuery).formFields();
     verify(mockedQuery).list();
 
+    verifyTenantIdListParameterResponse(response);
+
+    mockedQuery = setUpMockedDetailsQuery(createMockHistoricDetailsTwoTenants());
+
+    // POST
+    Map<String, Object> jsonBody = new HashMap<String, Object>();
+    String[] exampleTenantIdList = {MockProvider.EXAMPLE_TENANT_ID, MockProvider.ANOTHER_EXAMPLE_TENANT_ID};
+    jsonBody.put("tenantIdIn", exampleTenantIdList);
+    jsonBody.put("variableUpdates", true);
+    jsonBody.put("formFields", true);
+
+    response = given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .body(jsonBody)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(HISTORIC_DETAIL_RESOURCE_URL);
+
+    verify(mockedQuery).tenantIdIn(MockProvider.EXAMPLE_TENANT_ID, MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
+    verify(mockedQuery).variableUpdates();
+    verify(mockedQuery).formFields();
+    verify(mockedQuery).list();
+
+    verifyTenantIdListParameterResponse(response);
+  }
+
+  private void verifyTenantIdListParameterResponse(Response response) {
     String content = response.asString();
     List<String> historicDetails = from(content).getList("");
     assertThat(historicDetails).hasSize(4);
@@ -613,25 +1167,68 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
     String aProcessInstanceId = "aProcessInstanceId";
     String anotherProcessInstanceId = "anotherProcessInstanceId";
 
+    // GET
     given()
       .queryParam("processInstanceIdIn", aProcessInstanceId + "," + anotherProcessInstanceId)
-    .then().expect()
-      .statusCode(Status.OK.getStatusCode())
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
     .when()
       .get(HISTORIC_DETAIL_RESOURCE_URL);
 
     verify(mockedQuery)
       .processInstanceIdIn(aProcessInstanceId, anotherProcessInstanceId);
+
+    reset(mockedQuery);
+
+     // POST
+     Map<String, Object> jsonBody = new HashMap<String, Object>();
+     String[] processInstanceIdIn = {aProcessInstanceId, anotherProcessInstanceId};
+     jsonBody.put("processInstanceIdIn", processInstanceIdIn);
+
+     given()
+       .contentType(POST_JSON_CONTENT_TYPE)
+       .header("accept", MediaType.APPLICATION_JSON)
+       .body(jsonBody)
+     .then()
+       .expect()
+         .statusCode(Status.OK.getStatusCode())
+     .when()
+       .post(HISTORIC_DETAIL_RESOURCE_URL);
+
+     verify(mockedQuery)
+       .processInstanceIdIn(aProcessInstanceId, anotherProcessInstanceId);
   }
 
   @Test
   public void testByOccurredBefore () {
+    // GET
     given()
       .queryParam("occurredBefore", MockProvider.EXAMPLE_HISTORIC_VAR_UPDATE_TIME)
-    .then().expect()
-      .statusCode(Status.OK.getStatusCode())
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
     .when()
       .get(HISTORIC_DETAIL_RESOURCE_URL);
+
+    verify(mockedQuery)
+      .occurredBefore(DateTimeUtil.parseDate(MockProvider.EXAMPLE_HISTORIC_VAR_UPDATE_TIME));
+
+    reset(mockedQuery);
+
+    // POST
+    Map<String, Object> jsonBody = new HashMap<String, Object>();
+    jsonBody.put("occurredBefore", MockProvider.EXAMPLE_HISTORIC_VAR_UPDATE_TIME);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .body(jsonBody)
+    .then()
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(HISTORIC_DETAIL_RESOURCE_URL);
 
     verify(mockedQuery)
       .occurredBefore(DateTimeUtil.parseDate(MockProvider.EXAMPLE_HISTORIC_VAR_UPDATE_TIME));
@@ -639,12 +1236,33 @@ public class HistoricDetailRestServiceQueryTest extends AbstractRestServiceTest 
 
   @Test
   public void testByOccurredAfter () {
+    // GET
     given()
       .queryParam("occurredAfter", MockProvider.EXAMPLE_HISTORIC_VAR_UPDATE_TIME)
-    .then().expect()
-      .statusCode(Status.OK.getStatusCode())
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
     .when()
       .get(HISTORIC_DETAIL_RESOURCE_URL);
+
+    verify(mockedQuery)
+      .occurredAfter(DateTimeUtil.parseDate(MockProvider.EXAMPLE_HISTORIC_VAR_UPDATE_TIME));
+
+    reset(mockedQuery);
+
+    // POST
+    Map<String, Object> jsonBody = new HashMap<String, Object>();
+    jsonBody.put("occurredAfter", MockProvider.EXAMPLE_HISTORIC_VAR_UPDATE_TIME);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .body(jsonBody)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(HISTORIC_DETAIL_RESOURCE_URL);
 
     verify(mockedQuery)
       .occurredAfter(DateTimeUtil.parseDate(MockProvider.EXAMPLE_HISTORIC_VAR_UPDATE_TIME));
