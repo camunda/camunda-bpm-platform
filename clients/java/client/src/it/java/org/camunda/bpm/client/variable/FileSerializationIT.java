@@ -286,15 +286,11 @@ public class FileSerializationIT {
     clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
 
     ExternalTask task = handler.getHandledTasks().get(0);
-    DeferredFileValue deferredFileValue = task.getVariableTyped(VARIABLE_NAME_FILE);
-
-    // assume
-    assertThat(deferredFileValue.isLoaded()).isFalse();
 
     // then
     DeferredFileValue typedValue = task.getVariableTyped(VARIABLE_NAME_FILE);
 
-    assertThat(typedValue.isLoaded()).isTrue();
+    assertThat(typedValue.isLoaded()).isFalse();
     assertThat(typedValue.getValue()).isNull();
     assertThat(typedValue.getFilename()).isEqualTo(VARIABLE_VALUE_FILE_NAME);
     assertThat(typedValue.getType()).isEqualTo(FILE);
@@ -332,15 +328,11 @@ public class FileSerializationIT {
     clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
 
     ExternalTask task = handler.getHandledTasks().get(0);
-    DeferredFileValue deferredFileValue = task.getVariableTyped(VARIABLE_NAME_FILE);
-
-    // assume
-    assertThat(deferredFileValue.isLoaded()).isFalse();
 
     // then
     DeferredFileValue typedValue = task.getVariableTyped(VARIABLE_NAME_FILE);
 
-    assertThat(typedValue.isLoaded()).isTrue();
+    assertThat(typedValue.isLoaded()).isFalse();
     assertThat(typedValue.getValue()).isNull();
     assertThat(typedValue.getFilename()).isEqualTo(VARIABLE_VALUE_FILE_NAME);
     assertThat(typedValue.getType()).isEqualTo(FILE);
